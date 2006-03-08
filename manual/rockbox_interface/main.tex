@@ -1,5 +1,4 @@
 \chapter{\label{ref:PARTII}The Rockbox interface}
-\clearpage
 \section{Your Jukebox}
 \begin{minipage}{16.554cm}
 {\centering\itshape
@@ -33,12 +32,11 @@ information about flashing Rockbox.)
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      model & POWER OFF \\\hline
-      V2 / FM RECORDER/ ONDIO & Hold  the OFF key for 2{}-3 seconds \\\hline
-      V1 RECORDER & Double{}-tap the OFF key when playback is stopped \\\hline
-      PLAYER & From the Rockbox Main Menu select \textbf{Shutdown} \\\hline
+    \begin{tabular}{@{}lc@{}}\toprule
+      \textbf{Model} & \textbf{Power Off} \\\midrule
+      V2 / FM RECORDER/ ONDIO & Hold  the OFF key for 2{}-3 seconds \\
+      V1 RECORDER & Double{}-tap the OFF key when playback is stopped \\
+      PLAYER & From the Rockbox Main Menu select \textbf{Shutdown} \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
@@ -69,27 +67,32 @@ can select which file types are displayed (see page
 \opt{Rec}{
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        \tabelth{KEY} & \tabelth{FUNCTION} \\ \hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Function} \\\midrule
         %
-        \tabeltc{UP/DOWN} & Go to previous/next item in list. If you are on the first/last entry, the cursor will wrap to the last/first entry. \\ \hline
+        UP/DOWN & Go to previous/next item in list. \\
+                & If you are on the first/last entry, \\
+                & the cursor will wrap to the last/first entry. \\
         %
-        \tabeltc{ON+UP/DOWN} & Move one page up/down on the list.\\ \hline
+        ON+UP/DOWN & Move one page up/down on the list.\\
         %
-        \tabeltc{LEFT} & Go to the parent directory.  \\ \hline
+        LEFT & Go to the parent directory. \\
         %
-        \tabeltc{PLAY/RIGHT} & Executes an action. Depending on the file type, that action may vary. (See page \pageref{ref:Filemenu}) \\ \hline
+        PLAY/RIGHT & Executes an action. \\
+                   & Depending on the file type, that action may vary. \\
+                   & (See page \pageref{ref:Filemenu}) \\
         %
-        \tabeltc{centering} & If there is a MP3 playing, returns to the While Playing Screen (WPS) without stopping playback.  \\ \hline
+        Centering & If there is a MP3 playing, \\
+                  & returns to the While Playing Screen (WPS) \\
+                  & without stopping playback.  \\
         %
-        \tabeltc{ON+PLAY/HOLD PLAY} & Enters the File Menu \\ \hline
+        ON+PLAY/HOLD PLAY & Enters the File Menu \\
         %
-        \tabeltc{F1} & Switches to the Main Menu \\ \hline
+        F1 & Switches to the Main Menu \\
         %
-        \tabeltc{F2} & Switches to the Browse/Play Quick Menu \\ \hline
+        F2 & Switches to the Browse/Play Quick Menu \\
         %
-        \tabeltc{F3} & Switches to the Display Quick Menu \\ \hline
+        F3 & Switches to the Display Quick Menu \\ \bottomrule
         %
       \end{tabular}
     \end{center}
@@ -99,15 +102,20 @@ can select which file types are displayed (see page
 \opt{PS}{
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        KEY & FUNCTION \\\hline
-        MINUS/PLUS &Go to previous/next item in list. If you are on the first/last entry, the cursor will wrap to the last/first entry. \\\hline
-        STOP & Go to the parent directory. \\\hline
-        PLAY & Executes an action. Depending on the file type, that action may vary.(See page \pageref{ref:Filemenu}) \\\hline
-        ON & If there is a MP3 playing, returns to the While Playing Screen (WPS) without stopping playback. \\\hline
-        ON+PLAY/HOLD PLAY & Enters the File Menu \\\hline
-        Menu & Switches to the Main Menu \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Function} \\\midrule
+        MINUS/PLUS & Go to previous/next item in list. \\
+                   & If you are on the first/last entry, \\
+                   & the cursor will wrap to the last/first entry. \\
+        STOP & Go to the parent directory. \\
+        PLAY & Executes an action. \\
+             & Depending on the file type, that action may vary.\\
+             & (See page \pageref{ref:Filemenu}) \\
+        ON & If there is a MP3 playing, \\
+           & returns to the While Playing Screen (WPS) \\
+           & without stopping playback. \\
+        ON+PLAY/HOLD PLAY & Enters the File Menu \\
+        Menu & Switches to the Main Menu \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
@@ -207,17 +215,21 @@ Rockbox.
 \opt{Rec}{
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        KEY & FUNCTION \\\hline
-        ARROW KEYS & Move about the virtual keyboard (moves the solid cursor) \\\hline
-        ON+LEFT/RIGHT & Move about within the current file name (moves the line cursor) \\\hline
-        PLAY &Inserts the currently selected keyboard letter at the current filename cursor position \\\hline
-        STOP & Exits the virtual keyboard without saving any changes \\\hline
-        ON & No action \\\hline
-        F1 & SHIFT: Shifts between the upper case, lower case and accented keyboards \\\hline
-        F2 & OK: Exits the virtual keyboard and saves any changer \\\hline
-        F3 & DEL: Deletes the character before the current filename cursor \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Function} \\\midrule
+        ARROW KEYS & Move about the virtual keyboard \\
+                   & (moves the solid cursor) \\
+        ON+LEFT/RIGHT & Move about within the current file name \\
+                      & (moves the line cursor) \\
+        PLAY & Inserts the currently selected keyboard letter \\
+             & at the current filename cursor position \\
+        STOP & Exits the virtual keyboard without saving any changes \\
+        ON & No action \\
+        F1 & SHIFT: Shifts between the upper case, \\
+           & lower case and accented keyboards \\
+        F2 & OK: Exits the virtual keyboard and saves any changer \\
+        F3 & DEL: Deletes the character before\\ 
+           & the current filename cursor \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
@@ -231,13 +243,16 @@ Rockbox.
   
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        KEY & FUNCTION \\\hline
-        MINUS/PLUS & Moves the arrow to/from the filename and changes between the character bar and BACKSPACE, DELETE, ACCEPT and ABORT. \\\hline
-        PLAY/STOP & Varies (see below) \\\hline
-        ON & Nothing \\\hline
-        Menu & Shift.  When the character selection bar is selected this changes between upper case, lower case, and accented letters. \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Function} \\\midrule
+        MINUS/PLUS & Moves the arrow to/from the filename \\
+                   & and changes between the character bar \\
+                   & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
+        PLAY/STOP & Varies (see below) \\
+        ON & Nothing \\
+        Menu & Shift.  When the character selection bar is selected\\
+             & this changes between upper case, lower case, \\
+             & and accented letters. \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
@@ -246,15 +261,20 @@ Rockbox.
   
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        SELECTED OPTION & PLAY/STOP FUNCTION \\\hline
-        filename & Moves the cursor left (STOP) or right (PLAY) within the filename \\\hline
-        character bar & Moves the character bar to the next (PLAY) or previous (STOP) character. \\\hline
-        BACKSPACE & PLAY deletes the character before the current cursor position \\\hline
-        DELETE & PLAY deletes the character at the current cursor position\\\hline
-        ACCEPT & PLAY exits the virtual keyboard and saves any changes \\\hline
-        ABORT & PLAY exits the virtual keyboard and discards any changes \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Selected option} & \textbf{Play/Stop function} \\\midrule
+        filename & Moves the cursor left (STOP) \\
+                 & or right (PLAY) within the filename \\
+        character bar & Moves the character bar to the next (PLAY)\\
+                      & or previous (STOP) character. \\
+        BACKSPACE & PLAY deletes the character before \\
+                  & the current cursor position \\
+        DELETE & PLAY deletes the character at the \\
+               & current cursor position\\
+        ACCEPT & PLAY exits the virtual keyboard and \\
+               & saves any changes \\
+        ABORT & PLAY exits the virtual keyboard and \\
+              & discards any changes \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
@@ -303,24 +323,25 @@ details of customising your WPS (While Playing Screen).
 \opt{Rec}{
   \begin{table}[h!]
     \begin{flushleft}
-      \begin{tabular}{|c|c|}
-        \hline
-        KEY & ACTION \\\hline
-        UP/DOWN & Volume up/down \\\hline
-        LEFT & (quick press) Go to beginning of track, or if pressed while in the first seconds of a track, go to previous track \\\hline
-        LEFT (hold) & Rewind in track \\\hline
-        RIGHT & (quick press) Go to next track. \\\hline
-        RIGHT (hold) & Fast forward in track. \\\hline
-        PLAY & Toggle play/pause \\\hline
-        ON & (quick press) Go to file browser \\\hline
-        ON (hold) & Show pitch setting screen \\\hline
-        STOP & Stop playback \\\hline
-        F1 & Go to Main menu \\\hline
-        F2 & Toggles Play/browse quick menu \\\hline
-        F3 & Toggles Display quick menu \\\hline
-        F1+DOWN & Key lock on/off \\\hline
-        F1+PLAY & Mute on/off \\\hline
-        F1+ON & Enter ID3 viewer \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Action} \\\midrule
+        UP/DOWN & Volume up/down \\
+        LEFT & (quick press) Go to beginning of track, \\
+             & or if pressed while in the first seconds of a track, \\
+             & go to previous track \\
+        LEFT (hold) & Rewind in track \\
+        RIGHT & (quick press) Go to next track. \\
+        RIGHT (hold) & Fast forward in track. \\
+        PLAY & Toggle play/pause \\
+        ON & (quick press) Go to file browser \\
+        ON (hold) & Show pitch setting screen \\
+        STOP & Stop playback \\
+        F1 & Go to Main menu \\
+        F2 & Toggles Play/browse quick menu \\
+        F3 & Toggles Display quick menu \\
+        F1+DOWN & Key lock on/off \\
+        F1+PLAY & Mute on/off \\
+        F1+ON & Enter ID3 viewer \\\bottomrule
       \end{tabular}
     \end{flushleft}
   \end{table}
@@ -329,22 +350,23 @@ details of customising your WPS (While Playing Screen).
 \opt{PS}{
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}
-        \hline
-        KEY & ACTION \\\hline
-        MENU+PLUS & Increases volume \\\hline
-        MENU+MINUS & Decreases volume \\\hline
-        MINUS &(quick press) Go to beginning of track, or if pressed while in the first seconds of a track, go to previous track. \\\hline
-        MINUS (hold) & Rewind in track \\\hline
-        PLUS & (quick press) Go to next track. \\\hline
-        PLUS (hold) & Fast{}-forward in track. \\\hline
-        PLAY & Toggle play/pause \\\hline
-        ON & Quick press = Go to file browser \\\hline
-        OFF & Stop playback \\\hline
-        MENU & Go to Main menu \\\hline
-        MENU+STOP & Key lock on/off \\\hline
-        MENU+PLAY & Mute on/off \\\hline
-        MENU+ON & Enter ID3 viewer \\\hline
+      \begin{tabular}{@{}cc@{}}\toprule
+        \textbf{Key} & \textbf{Action} \\\midrule
+        MENU+PLUS & Increases volume \\
+        MENU+MINUS & Decreases volume \\
+        MINUS & (quick press) Go to beginning of track, \\
+              & or if pressed while in the first seconds of a track, \\
+              & go to previous track. \\
+        MINUS (hold) & Rewind in track \\
+        PLUS & (quick press) Go to next track. \\
+        PLUS (hold) & Fast{}-forward in track. \\
+        PLAY & Toggle play/pause \\
+        ON & Quick press = Go to file browser \\
+        OFF & Stop playback \\
+        MENU & Go to Main menu \\
+        MENU+STOP & Key lock on/off \\
+        MENU+PLAY & Mute on/off \\
+        MENU+ON & Enter ID3 viewer \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
@@ -423,12 +445,11 @@ settings.
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      KEY & ACTION \\\hline
-      LEFT & Controls Shuffle mode setting \\\hline
-      RIGHT & Controls Repeat mode setting \\\hline
-      DOWN & Controls Show file setting \\\hline
+    \begin{tabular}{@cc@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      LEFT & Controls Shuffle mode setting \\
+      RIGHT & Controls Repeat mode setting \\
+      DOWN & Controls Show file setting \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
@@ -449,12 +470,11 @@ settings.
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      KEY & ACTION \\\hline
-      LEFT & Controls scroll bar display \\\hline
-      RIGHT & Controls status bar display \\\hline
-      DOWN & Controls upside down screen setting \\\hline
+    \begin{tabular}{@{}cc@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      LEFT & Controls scroll bar display \\
+      RIGHT & Controls status bar display \\
+      DOWN & Controls upside down screen setting \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}

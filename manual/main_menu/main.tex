@@ -1,5 +1,4 @@
 \chapter{The Main Menu}
-\newpage
 
 \section{Introducing the Main Menu}
 {\centering\itshape
@@ -35,12 +34,14 @@ Navigating through the menu:
 
 \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{|c|c|}\hline
-        KEY & ACTION \\\hline
-        UP & Moves up in the menu. Inside a setting, increases the value or chooses next option \\\hline
-        DOWN & Moves down in the menu. Inside a setting, decreases the value or chooses previous option \\\hline
-        PLAY/RIGHT & Selects option \\\hline
-        OFF/LEFT & Exits menu, setting or moves to parent menu\\\hline
+      \begin{tabular}{@{}lc@{}}\toprule
+       \textbf{Key} & \textbf{Action} \\\midrule
+        UP & Moves up in the menu. \\
+           & Inside a setting, increases the value or chooses next option \\
+        DOWN & Moves down in the menu. \\
+             & Inside a setting, decreases the value or chooses previous option \\
+        PLAY/RIGHT & Selects option \\
+        OFF/LEFT & Exits menu, setting or moves to parent menu\\\bottomrule
       \end{tabular}
     \end{center}
 \end{table}
@@ -49,13 +50,14 @@ Navigating through the menu:
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      KEY & ACTION \\\hline
-      MINUS & Selects previous option in the menu. Inside an setting, decreases the value or chooses previous option \\\hline
-      PLUS & Selects next option in the menu. Inside an setting increases the value or chooses next option \\\hline
-      PLAY & Selects item \\\hline
-      STOP & Exit menu, setting or moves to parent menu. \\\hline
+    \begin{tabular}{@{}cc@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      MINUS & Selects previous option in the menu. \\
+            & Inside an setting, decreases the value or chooses previous option \\
+      PLUS & Selects next option in the menu. \\
+           & Inside an setting increases the value or chooses next option \\
+      PLAY & Selects item \\
+      STOP & Exit menu, setting or moves to parent menu. \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
@@ -91,16 +93,22 @@ The controls for this screen are:
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      BUTTON & FUNCTION \\\hline
-      LEFT & Decreases Gain \\\hline
-      RIGHT & Increases Gain \\\hline
-      PLAY & Starts recording.  While recording, button closes the current file and opens a new one (while recording) Pauses / restarts recording \\\hline
-      STOP & Exits Recording Screen (while recording) Stop recording \\\hline
-      F1 & Opens Recording Settings screen (see below) \\\hline
-      F2 & Quick menu for recording settings. A quick press will leave the screen up (press F2 again to exit), while holding it will close the screen when you release it. \\\hline
-      F3 &Quick menu for source setting. Quick/hold works as for F2. (while recording) Start a new recording file \\\hline
+    \begin{tabular}{@{}cc@{}}\toprule
+      \textbf{Button} & \textbf{Function} \\\midrule
+      LEFT & Decreases Gain \\
+      RIGHT & Increases Gain \\
+      PLAY & Starts recording.  \\
+           & While recording, button closes the current file and opens a new one.\\
+           & (while recording) Pauses / restarts recording \\
+      STOP & Exits Recording Screen.\\
+           & (while recording) Stop recording \\
+      F1 & Opens Recording Settings screen (see below) \\
+      F2 & Quick menu for recording settings. \\
+         & A quick press will leave the screen up (press F2 again to exit),\\
+         & while holding it will close the screen when you release it. \\
+      F3 & Quick menu for source setting. \\
+         & Quick/hold works as for F2. \\
+         & (while recording) Start a new recording file \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
@@ -121,13 +129,12 @@ and the average bitrate changes as follows.
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      FREQUENCY & BITRATE  (Kbit/s) {}- quality 0{}-{\textgreater}7 \\\hline
-      44100Hz stereo: & 75, 80, 90, 100, 120, 140, 160, 170 \\\hline
-      22050Hz stereo & 39, 41, 45, 50, 60, 80, 110, 130 \\\hline
-      44100Hz mono & 65, 68, 73, 80, 90, 105, 125, 140 \\\hline
-      22050Hz mono & 35, 38, 40, 45, 50, 60, 75, 90 \\\hline
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Frequency} & \textbf{Bitrate}  (Kbit/s) {}- quality 0{}-{\textgreater}7 \\\midrule
+      44100Hz stereo: & 75, 80, 90, 100, 120, 140, 160, 170 \\
+      22050Hz stereo & 39, 41, 45, 50, 60, 80, 110, 130 \\
+      44100Hz mono & 65, 68, 73, 80, 90, 105, 125, 140 \\
+      22050Hz mono & 35, 38, 40, 45, 50, 60, 75, 90 \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
@@ -196,14 +203,16 @@ The keys are:
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{|c|c|}
-      \hline
-      BUTTON & FUNCTION \\\hline
-      LEFT, RIGHT &Change frequency in 0.1 MHz steps.  For automatic station seek, hold LEFT/RIGHT for a little longer. \\\hline
-      UP, DOWN & Change volume \\\hline
-      PLAY & \textbf{(EXPERIMENTAL) } freezes all screen updates, may enhance radio reception in some cases. \\\hline
-      ON & Leave the radio screen with the radio playing \\\hline
-      OFF & Back to main menu \\\hline
+    \begin{tabular}{@{}lc@{}}\toprule
+      \textbf{Button} & \textbf{Function} \\\midrule
+      LEFT, RIGHT & Change frequency in 0.1 MHz steps. \\
+                  & For automatic station seek, \\
+                  & hold LEFT/RIGHT for a little longer. \\
+      UP, DOWN & Change volume \\
+      PLAY & \textbf{(EXPERIMENTAL)} freezes all screen updates.\\
+           & May enhance radio reception in some cases. \\
+      ON & Leave the radio screen with the radio playing \\
+      OFF & Back to main menu \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
