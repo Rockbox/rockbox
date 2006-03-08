@@ -31,7 +31,7 @@ Author: xameius
 # prefered font:
 Font: chicago12.fnt
 # Weather the WPS is designed to have the statusbar present or not
-Statusbar: off
+Statusbar: on
 # The minimum required pixel height for the WPS
 Height: 128
 # The minimum required pixel width for the WPS
