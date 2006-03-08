@@ -14,7 +14,7 @@
 %xl|D|bqf.bmp|136|2|
 %xl|E|bf.bmp|136|2|
 %xl|F|bfp.bmp|136|2|
-%x|V|vol.bmp|60|117|
+%x|V|vol.bmp|60|109|
 %x|g|bg.bmp|0|0|
 %wd
 %ac%?mp<Now Stopped|Now Playing %?ps<(S)|>|Now Paused %?ps<(S)|>|Now Playing %?ps<(S)|>|Now Playing %?ps<(S)|>>
@@ -26,7 +26,7 @@
 %s%t3%ac%?id<%id|%d1>
 
 %pb
-%al%pc %ac     %pv%% %ar-%pr
+%al%pc %ac      %pv %ar-%pr
 %?mp<|%xdy|%xdp|%xdf|%xdv>
 %?mh<%xdh|%xdb>
 %?bp<%xdF|%?bl<%xdA|%xdB|%xdC|%xdD|%xdE>>

@@ -29,7 +29,7 @@ RWPS: rockbox_default.rwps
 # Name of the creator of the WPS
 Author: xameius
 # prefered font:
-Font: chicago12.fnt
+Font: nimbus-12.fnt
 # Weather the WPS is designed to have the statusbar present or not
 Statusbar: on
 # The minimum required pixel height for the WPS
