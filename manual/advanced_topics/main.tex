@@ -418,219 +418,141 @@ A .cfg file is used to load settings from a plain text file. A .cfg file
 may reside anywhere on the hard disk. The only restriction is that the
 filename must end in .cfg
 
-Hint: Use the ``Write .cfg file'' feature
-(Main Menu{}-{\textgreater} General Settings) to save the current
-settings, then use a text editor to customize the settings file.
+Hint: Use the ``Write .cfg file'' feature (Main Menu{}-{\textgreater} General Settings) to save the current settings, then use a text editor to customize the settings file.
 
-{\bfseries
-Format Rules}
+\subsection{Format Rules}
 
 \begin{itemize}
-\item Format: setting: value
+\item Format: \verb+setting: value+
 \item Each setting must be on a separate line.
 \item Lines starting with \# are ignored.
 \end{itemize}
-{\bfseries
-Settings    (allowed values) [unit]}
 
-volume   (0 {}- 100)
-
-bass    ({}-15 {}- 15)
-
-treble    ({}-15 {}- 15)
-
-balance   ({}-100 {}- 100)
-
-channels   (stereo, stereo narrow, stereo wide, mono, mono left,
-
-     mono right, karaoke)
-
-shuffle   (on, off)
-
-repeat   (off, all, one)
-
-play selected  (on, off)
-
-resume   (off, ask, ask once, on)
-
-scan min step  (1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 45, 60) [secs]
-
-scan accel   (0 {}- 15) [double scan speed every X seconds]
-
-antiskip   (0 {}- 7) [seconds]
-
-volume fade  (on, off)
-
-sort case   (on, off)
-
-show files   (all, supported, music, playlists)
-
-follow playlist  (on, off)
-
-playlist viewer icons
-
-    (on, off)
-
-playlist viewer track display
-
-    (on, off)
-
-recursive directory insert
-
-    (on, off)
-
-scroll speed  (0 {}- 15) 
-
-scroll delay   (0 {}- 250) [1/10s]
-
-scroll step   (1 {}- 112) [pixels]
-
-bidir limit   (0 {}- 200) [\% of screen width]
-
-contrast   (0 {}- 63)
-
-backlight timeout  (off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25,
-30, 
-
-     45, 60, 90) [seconds]
-
-backlight when plugged 
-
-    (on, off)
-
-disk spindown  (3 {}- 254) [seconds]
-
-battery capacity  (1500 {}- 2400) [mAh]
-
-idle poweroff  (off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 30, 45, 60)     
- [minutes]
-
-lang    (/path/filename.lng)
-
-wps    (/path/filename.wps)
-
-autocreate bookmarks (on, off)
-
-autoload bookmarks (on, off)
-
-use most{}-recent{}-bookmarks
-
-    (on, off)
-
-talk dir   (off, number, spell, hover)
-
-talk file   (off, number, spell, hover)
-
-talk menu   (off, on)
-
-{\bfseries
-Recorder{}-specific settings}
-
-loudness   (0 {}- 17)
-
-super bass    (on, off)
-
-auto volume  (off, 0.02, 2, 4, 8) [seconds]
-
-MDB enable  (on, off)
-
-MDB strength  (0 {--} 127) [dB]
-
-MDB harmonics  (0 {--} 100) [\%]
-
-MDB center frequency (20{}-300) [Hz]
-
-MDB shape   (50{}-300) [Hz]
-
-peak meter release (1 {}- 126)
-
-peak meter hold  (off, 200ms, 300ms, 500ms, 1, 2, 3, 4, 5, 6, 7, 8,
-
-      9, 10, 15, 20, 30, 1min)
-
-peak meter clip hold (on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
-
-
-     45, 60, 90, 2min, 3min, 5min, 10min, 20min,
-
-     45min, 90min)
-
-peak meter busy  (on, off)
-
-peak meter dbfs  (on, off) (on = dbfs, off = linear)
-
-peak meter min  (0 {}- 89) [dB] or (0 {}- 100) [\%]
-
-peak meter max  (0 {}- 89) [dB] or (0 {}- 100) [\%]
-
-statusbar   (on, off)
-
-scrollbar   (on, off)
-
-volume display  (graphic, numeric)
-
-battery display  (graphic, numeric)
-
-time format   (12hour, 24hour)
-
-font    (/path/filename.fnt)
-
-invert    (on, off)
-
-deep discharge  (on, off)
-
-trickle charge  (on, off)
-
-disk poweroff  (on, off)
-
-rec quality   (0 {}- 7) (0=smallest size, 7=highest quality)
-
-rec frequency  (48, 44, 32, 24, 22, 16) [kHz]
-
-rec source    (mic, line, spdif)
-
-rec channels  (mono, stereo)
-
-rec mic gain  (0 to 15)
-
-rec left gain  (0 to 15)
-
-rec right gain  (0 to 15)
-
-editable recordings (on,off)
-
-rec timesplit  (off, 00:05, 00:10, 00:20, 00:30, 01:00, 01:12, \newline
-     01:20, 02:00, 04:00, 06:00, 08:00, 16:00,\newline
-     24:00) [hh:mm]
-
-pre{}-recording time (off, 1{}-30) [secs]
-
-rec directory  (/recordings, current) 
-
-{\bfseries
-FM recorder specific settings}
-
-\textmd{force fm mono  (on,off)}
-
-\textbf{Example File}
-
-volume: 70
-
-bass: 11
-
-treble: 12
-
-balance: 0
-
-time format: 12hour
-
-volume display: numeric
-
-show files: supported
-
-wps: /.rockbox/car.wps
-
-lang: /.rockbox/afrikaans.lng
+\subsection{General Settings}
+\begin{center}
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\\midrule
+     volume & 0 to 100 & \%\\
+     bass & -15 to +15 & dB\\
+     treble & -15 to +15 &dB\\
+     balance & -100 to +100 & \%\\
+     channels & stereo, stereo narrow, stereo wide, & N/A\\
+              & mono, mono left, mono right, karaoke & \\
+     shuffle & on, off & N/A\\
+     repeat & off, all, one & N/A\\
+     play selected & on, off & N/A\\
+     resume & off, ask, ask once, on & N/A\\
+     scan min step & 1, 2, 3, 4, 5, 6, 8, 10, 15, 20, 25, 30, 45, 60 & seconds\\
+     scan accel & 0 to 15 & seconds\\
+     antiskip & 0 to 7 & seconds\\
+     volume fade & on, off & N/A\\
+     id3 tag priority & v2-v1, v1-v2 & N/A\\
+     sort case & on, off & N/A\\
+     show files & all, supported, music, playlists & N/A\\
+     follow playlist & on, off & N/A\\
+     playlist viewer icons & off,on & N/A\\
+     playlist viewer indices & off,on & N/A\\
+     playlist viewer track display & track name,full path & N/A\\
+     recursive directory insert & off,on & N/A\\
+     scroll speed & 1 to 25 & Hz\\
+     scroll delay & 0 to 250 & 1/10s\\
+     scroll step & 1 to 112 & pixels\\
+     bidir limit & 0 to 200 & \% of screen width\\
+     contrast & 0 to 63 & N/A\\
+     backlight timeout & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, & seconds\\ 
+                       & 15, 20, 25, 30, 45, 60, 90 & \\
+     backlight when plugged & on, off & N/A\\
+     disk spindown & 3 to 254 & seconds\\
+     battery capacity & 1500 - 3200 & mAh\\
+     idle poweroff & off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, & minutes\\
+                   & 15, 30, 45, 60 & \\
+     lang & /path/filename.lng & N/A\\
+     wps & /path/filename.wps & N/A\\
+     autocreate bookmarks & off,on & N/A\\
+     autoload bookmarks & off,on & N/A\\
+     use most-recent-bookmarks & off,on & N/A\\
+     talk dir & off,number,spell,enter.hover & N/A\\
+     talk file & off,number,spell & N/A\\
+     talk menu & off,on & N/A\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{Recorder{}-specific settings}
+\begin{center}
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\\midrule
+     loudness & 0 to 17 & N/A\\
+     super bass & on,off & N/A\\
+     auto volume & off, 20ms, 2s, 4s, 8s & seconds\\
+     MDB enable & on,off & N/A\\
+     MDB strength & 0 to 127 & dB\\
+     MDB harmonics & 0 to 100 & \%\\
+     MDB center frequency & 20 to 300 & Hz\\
+     MDB shape & 50 to 300 & Hz\\
+     peak meter release & 1 to 126 & ?\\
+     peak meter hold & off, 200ms, 300ms, 500ms, & N/A \\
+                     & 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 30, 1min & \\
+     peak meter clip hold & on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,& N/A \\
+                     & 15, 20, 25, 30, 45, 60, 90, 2min, 3min, 5min, &\\
+                     & 10min, 20min, 45min, 90min & \\
+     peak meter busy & on, off & N/A\\
+     peak meter dbfs & on, off & on = dbfs,\\
+                     &         & off = linear\\
+     peak meter min  & 0 to 89 (dB) or 0 to 100 (\%) & dB or \%\\
+     peak meter max  & 0 to 89 /dB) or 0 to 100 (\%) & dB or \%\\
+     statusbar & on, off & N/A\\
+     scrollbar & on, off & N/A\\
+     volume display & graphic, numeric & N/A\\
+     battery display & graphic, numeric & N/A\\
+     time format & 12hour, 24hour & N/A\\
+     font & /path/filename.fnt & N/A\\
+     invert & on, off & N/A\\
+     deep discharge & on, off & N/A\\
+     trickle charge & on, off & N/A\\
+     disk poweroff & on, off & N/A\\
+     rec quality & 0 to 7 & 0=smallest size, 7=highest quality\\
+     rec frequency & 48, 44, 32, 24, 22, 16 & kHz\\
+     rec source & mic, line, spdif & N/A\\
+     rec channels & mono, stereo & N/A\\
+     rec mic gain & 0 to 15 & N/A\\
+     rec left gain & 0 to 15 & N/A\\
+     rec right gain & 0 to 15 & N/A\\
+     editable recordings & off,on & N/A\\
+     rec timesplit & off, 0:05, 0:10, 0:15, 0:30, 1:00, & h:mm\\
+                   & 2:00, 4:00, 6:00, 8:00, 16:00, 24:00 & \\
+     pre-recording time & off, 1 to 30 & s\\
+     rec directory & /recordings,current & N/A\\\bottomrule
+    \end{tabular}
+\end{center}
+
+\subsection{FM recorder specific settings}
+\begin{center}
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\\midrule
+    Force FM mono & off,on & N/A\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\subsection{Example File}
+\begin{verbatim}
+  volume: 70
+  
+  bass: 11
+
+  treble: 12
+  
+  balance: 0
+  
+  time format: 12hour
+
+  volume display: numeric
+
+  show files: supported
+  
+  wps: /.rockbox/car.wps
+  
+  lang: /.rockbox/afrikaans.lng
+\end{verbatim}
 
 \section{\label{ref:PartISection1}Differences between binaries}
 There are 3 different types of firmware binaries from Rockbox website. Current Version, Daily Builds and Bleeding Edge.
