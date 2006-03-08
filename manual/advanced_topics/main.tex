@@ -50,131 +50,238 @@ tracker.
 \subsection{Description / General Info}
 
 \begin{itemize}
-\item The Custom While Playing Screen (WPS) display is used on both the
-Player and Recorder as a means to customise the WPS to the
-user's likings.
+\item The Custom While Playing Screen (WPS) display is used as a means to customise the WPS to the user's likings.
 \item After editing the .wps file, ``play'' it to make it take effect.
-\item The file may be 2 lines long for the Player, and 13 lines for the
-Recorder.
 \item All characters not preceded by \% are displayed as typed.
 \item Lines beginning with \# are comments and will be ignored.
+\item Maximum file size used is \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{1600}\opt{player}{400} bytes. If you have a bigger WPS file, only the first part of it will be loaded and used.
 \end{itemize}
 
 \subsection{File Location}
-Custom WPS files may be located anywhere on the drive. The only
-restriction is that they must end in .wps. When PLAY is pressed on a
-.wps file, it will be used for future WPS screens. If the
-``played'' .wps file is located in the
-/.rockbox folder, it will be remembered and used after reboot. The .wps
-filename must be no more than 24 characters long for it to be
-remembered.
+Custom WPS files may be located anywhere on the drive. The only restriction is that they must end in .wps. When you ``play'' a .wps file, it will be used for future WPS screens. If the ``played'' .wps file is located in the /.rockbox folder, it will be remembered and used after reboot. The .wps filename must be no more than 24 characters long for it to be remembered.
+
+\subsection{How To Create A .wps File}
+Quite simply, enter the WPS code in your favourite text editor, Notepad on Windows works fine. When you save it, instead of saving it as a .txt file, save it as a .wps file. Example: Instead of Rockbox.txt, save the file as Rockbox.wps. To make sure non english characters display correctly in your WPS you must save the .wps file with UTF-8 character encoding. This can be done in most editors, for example Notepad in Windows 2000 or XP (but not in 9x/ME) can do this.
 
 \subsection{Tags}
 
+\subsubsection{Status Bar}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%we & Status Bar Enabled\\
+    \%wd & Status Bar Disabled\\\bottomrule
+  \end{tabular}
+\end{center}
+These tags override the player setting for the display of the status bar, they must be on their own line.
+
+\subsubsection{ID3 Info}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%ia & ID3 Artist\\
+    \%ic & ID3 Composer\\
+    \%id & ID3 Album Name\\
+    \%ig & ID3 Genre Name\\
+    \%in & ID3 Track Number\\
+    \%it & ID3 Track Title\\
+    \%iv & ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag)\\
+    \%iy & ID3 Year\\\bottomrule
+  \end{tabular}
+\end{center}
+Remember that this information is not always available, so use the conditionals to show alternate information in preference to assuming.
+
+\subsubsection{Battery Info}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%bl & Show numeric battery level in percent.\\
+         & Can also be used in a conditional: \%?bl{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textgreater}\\
+    \%bv & Show the battery level in volts\\
+    \%bt & Show estimated battery time left\\
+    \%bp & "p" if the charger is connected \\
+         & (only on targets that can charge batteries)\\
+    \%bc & "c" if the unit is currently charging the battery\\
+         & (only on targets that have software charge control or monitoring)\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\subsubsection{File Info}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%fb & File Bitrate (in kbps)\\
+    \%fc & File Codec (e.g. "MP3" or "FLAC")\\
+         & This tag can also be used in a conditional tag,\\
+         & \%?fc{\textless}mp1{\textbar}mp2{\textbar}mp3{\textbar}wav{\textbar}vorbis{\textbar}flac{\textbar}mpc{\textbar}a52{\textbar}wavpack{\textbar}unknown{\textgreater}\\
+         & The codec order is as follows: MP1, MP2, MP3, WAV, Ogg Vorbis (OGG),\\
+         & FLAC, MPC, AC3, WavPack (WV), ALAC, AAC, Shorten (SHN), AIFF\\
+    \%ff & File Frequency (in Hz)\\
+    \%fm & File Name\\
+    \%fn & File Name (without extension)\\
+    \%fp & File Path\\
+    \%fs & File Size (In Kilobytes)\\
+    \%fv & "(avg)" if variable bit rate or "" if constant bit rate\\
+    \%d1 & First directory from end of file path.\\
+    \%d2 & Second directory from end of file path.\\
+    \%d3 & Third directory from end of file path.\\\bottomrule
+  \end{tabular}
+\end{center}
+Example for the the \%dN commands: If the path is "/Rock/Kent/Isola/11 - 747.mp3", \%d1 is "Isola", \%d2 is "Kent"... You get the picture.
+
+\subsubsection{Playlist/Song Info}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%pb & Progress Bar
+    \opt{player}{
+         & This will display a 1 character "cup" \\
+         & that empties as the time progresses.}\\
+    \opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{
+         & This will replace the entire line with a progress bar. \\
+         & You can set the height, position and width of the progressbar\\
+         & (in pixels): \%pb{\textbar}height{\textbar}leftpos{\textbar}rightpos{\textbar}} \\
+    \%pf & Player: Full-line progress bar + time display\\
+    \%pc & Current Time In Song\\
+    \%pe & Total Number of Playlist Entries\\
+    \%pm & Peak Meter (Recorder only) The entire line is used as volume peak meter.\\
+    \%pn & Playlist Name (Without path or extension)\\
+    \%pp & Playlist Position\\
+    \%pr & Remaining Time In Song\\
+    \%ps & Shuffle. Shows 's' if shuffle mode is enabled.\\
+    \%pt & Total Track Time\\
+    \%pv & Current volume. Can also be used in a conditional: \\
+         & \%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}10{\textgreater}\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\subsubsection{Runtime Database}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%rp & Song playcount\\
+    \%rr & Song rating (0-10). This tag can also be used in a conditional tag,\\
+         & \%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}10{\textgreater}\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\opt{h1xx,h300}{
+\subsubsection{Hold Switches}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mh & "h" if the main unit hold switch is on\\
+    \%mr & "r" if the remote hold switch is on\\\bottomrule
+  \end{tabular}
+\end{center}
+}
+
+\subsubsection{Virtual LED}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%lh & "h" if there is hard disk activity\\\bottomrule
+  \end{tabular}
+\end{center}
+
+\subsubsection{Repeat Mode}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mm & Repeat mode, 0-4, in the order: Off, All, One, Shuffle, \opt{player,recorder,recorderv2fm}{A-B}\\\bottomrule
+  \end{tabular}
+\end{center}
+Example: \%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle{\textbar}A-B{\textgreater}
+
+\subsubsection{Playback Mode Tags}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mp & Play status, 0-4, in the order: Stop, Play, Pause, Fast forward, Rewind\\\bottomrule
+  \end{tabular}
+\end{center}
+Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}
+
+\subsubsection{Images}
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%X{\textbar}filename.bmp{\textbar} & Load and set a backdrop image for the WPS.\\
+                      & This image must be exactly the same size as your LCD.\\
+    \%P{\textbar}filename.bmp{\textbar} & Load a Progress bar image for the WPS.\\
+                      & Use \%pb tag to show the progress bar\\
+    \%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar} & Load and display an image\\
+                        & n = image ID (a-z and A-Z)\\
+                        & filename = filename (relative to /.rockbox/ and including .bmp)\\
+                        & x = x coordinate\\
+                        & y = y coordinate.\\
+    \%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar} & Preload an image for later display\\
+                         & n = image ID (a-z and A-Z)\\
+                         & filename = filename (relative to /.rockbox/ and including .bmp)\\
+                         & x = x coordinate\\
+                         & y = y coordinate.\\
+    \%xdn & Display a preloaded image\\
+
+          & n = image ID (a-z and A-Z)\\\bottomrule
+  \end{tabular}
+\end{center}
+Example: image /.rockbox/bg.bmp with ID "a" at 37, 109 would be: \%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}
+
 \begin{itemize}
-\item {\bfseries
-ID3 Info Tags:}
-
-\%ia : ID3 Artist
-
-\%ic : ID3 Composer
-
-\%id : ID3 Album Name
-
-\%ig : ID3 Genre Name
-
-\%in : ID3 Track Number
-
-\%it : ID3 Track Title
-
-\%iy : ID3 Year
-
-\%iv : ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag)
-\item {\bfseries
-Battery Info:}
-
-\%bl : Show numeric battery level in percent
-
-\%bt : Show estimated battery time left
-\item {\bfseries
-File Info Tags:}
-
-\%fb : File Bitrate (in kbps)
-
-\%ff : File Frequency (in Hz)
-
-\%fm : File Name
-
-\%fn : File Name (without extension)
-
-\%fp : File Path
-
-\%fs : File Size (In Kilobytes)
-
-\%fv : ``(vbr)'' if variable bit rate or ``'' if constant bit rate
-
-\%d1 : First directory from end of file path.
-
-\%d2 : Second directory from end of file path.
-
-\%d3 : Third directory from end of file path.
-
-Example for the the \%dN commands: If the path is /Rock/Kent/Isola/11
-{}-747.mp3, \%d1 is ``Isola'', \%d2 is ``Kent'', \%d3 is ``Rock''.
+\item \textbf{Note:} The images must be in a rockbox compatible format (1 bit per pixel BMP)
+\item \textbf{Note:} The image tag must be on its own line
+\item \textbf{Note:} The ID is case sensitive, giving 52 different ID's
+\item \textbf{Note:} The size of the LCD screen for each player varies. See table below for appropriate sizes of each device. The x and y coordinates must repect each of the players' limits.
 \end{itemize}
 
-\begin{itemize}
-\item {\bfseries
-Playlist/Song Info Tags:}
+\subsubsection{LCD Screen Sizes}
+\begin{center}
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Player} & \textbf{Main LCD Size} & \textbf{Remote LCD Size}\\\midrule
+    iRiver H1x0 & 160x128 & 128x64\\
+    iRiver H3x0 & 220x176 & 128x64\\
+    Archos Recorders & 112x64 & \\ 
+    Archos Ondio & 112x64 & \\
+    iPod Nano & 176x132 & \\
+    iPod 4G Color & 220x176 & \\
+    iPod 5G Video & 320x240 & \\
+    iAudio X5 & 160x128 & \\\bottomrule
+  \end{tabular}
+\end{center}
 
-\%pb : Progress Bar 
+\subsubsection{Alignment}
+\begin{center}
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%al & Text is left aligned\\
+    \%ac & Text is center aligned\\
+    \%ar & Text is right aligned\\\bottomrule
+  \end{tabular}
+\end{center}
+All alignment tags may be present in one line, but they need to be in the order left - center - right. If the aligned texts overlap, they are merged.
 
-\begin{itemize}
-\item[] {
-Player: This will display a 1 character
-``cup'' that empties as the song progresses.}
+\subsubsection{Conditional Tags}
+\textbf{If/else}\\
+\newline
+Syntax: \%?xx{\textless}true{\textbar}false{\textgreater}\\
 
-Recorder: This will replace the entire line with a progress bar.
-\end{itemize}
-\%pf : Player: Full{}-line progress bar + time display
+If the tag specified by ``xx'' has a value, the text between the ``{\textless}'' and the ``{\textbar}'' is displayed (the true part), else the text between the ``{\textbar}'' and the ``{\textgreater}'' is displayed (the false part).
+The else part is optional, so the ``{\textbar}'' does not have to be specified if no else part is desired. The conditionals nest, so the text in the if and else part can contain all \% commands, including conditionals.
+\newline
+\textbf{Enumerations}\\
+\newline
+Syntax: \%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}
 
-\%pc : Current Time In Song
+For tags with multiple values, like Play status, the conditional can hold a list of alternatives, one for each value the tag can have.
 
-\%pe : Total Number of Playlist Entries
+Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}
 
-\%pm : Peak Meter (Recorder only) {}- the entire line is used as volume
-peak meter.
+The last else part is optional, and will be displayed if the tag has no value. The WPS parser will always display the last part if the tag has no value, or if the list of alternatives is too short. 
 
-\%pn : Playlist Name (Without path or extension)
-
-\%pp : Playlist Position
-
-\%pr : Remaining Time In Song
-
-\%ps : Shuffle. Shows 's' if shuffle
-mode is enabled.
-
-\%pt : Total Track Time
-
-\%pv : Current volume
-\item {\bfseries
-Conditional Tags (If/Else block):}
-
- \%?xx{\textless}{\textbar}{\textgreater} : Conditional: if the tag
-specified by ``xx'' has a value, the text
-between the ``{\textless}'' and the ``{\textbar}'' is displayed, else the text
-between the ``{\textbar}'' and the
-``{\textgreater}'' is displayed. The else part is optional, so the ``{\textbar}'' does not have to be specified if no else part is desired. The conditionals
-nest, so the text in the if and else part can contain all \% commands,
-including conditionals.
-\end{itemize}
-\begin{itemize}
-\item {\bfseries
-Next Song info}
-
+\subsubsection{Next Song info}
 You can display information about the next song {}- the song that is
 about to play after the one currently playing (unless you change the
-plan). 
+plan).
 
 If you use the upper{}-case versions of the
 three tags: F, I and D, they will instead refer to the next song
@@ -185,8 +292,8 @@ Take note that the next song information WILL NOT be available at all
 times, but will most likely be available at the end of a song. We
 suggest you use the conditional display tag a lot when displaying
 information about the next song! 
-\item {\bfseries
-Alternating sublines}
+
+\subsubsection{Alternating sublines}
 
 It is possible to group items on each line into 2 or more groups or
 ``sublines''. Each subline will be displayed
@@ -211,70 +318,100 @@ seconds (\%t5), or seconds and tenths of a second (\%t3.5).
 Each alternating subline can still be optionally scrolled while it is
 being displayed, and scrollable formats can be displayed on the same
 line with non{}-scrollable formats (such as track elapsed time) as long
-as they are separated into different sublines. 
-\item {\bfseries
-Other Tags:}
+as they are separated into different sublines.
 
-\%\% : Display a '\%'
+Example subline definition:
 
-\%{\textless} : Display a
-'{\textless}'
+\begin{verbatim}
+  %s%t4%ia;%s%it;%t3%pc %pr :          Display id3 artist for 4 seconds,
+                                       Display id3 title for 2 seconds,
+                                       Display current and remaining track time
+                                       for 3 seconds,
+                                       repeat...
+\end{verbatim}
 
-\%{\textbar} : Display a '{\textbar}'
+Conditionals can be used with sublines to display a different set and/or number of sublines on the line depending on the evaluation of the conditional.
 
-\%{\textgreater} : Display a
-'{\textgreater}'
+Example subline with conditionals:
 
-\%s : Indicate that the line should scroll. Can occur anywhere in a line
-(given that the text is displayed; see conditionals above). You can
-specify up to 10 scrolling lines. Scrolling lines can not contain
-dynamic content such as timers, peak meters or progress bars.
-\end{itemize}
-{\bfseries
-Example File}
+\%?it{\textless}\%t8\%s\%it{\textbar}\%s\%fn{\textgreater};\%?ia{\textless}\%t3\%s\%ia{\textbar}\%t0{\textgreater}\\
 
-\%s\%pp/\%pe: \%?it{\textless}\%it{\textbar}\%fn{\textgreater} {}-
-\%?ia{\textless}\%ia{\textbar}\%d2{\textgreater} {}-
-\%?id{\textless}\%id{\textbar}\%d1{\textgreater}
+The format above will do two different things depending if ID3 tags are present. If the ID3 artist and title are present :
 
-\%pb\%pc/\%pt
+Display id3 title for 8 seconds,\\
 
-That is, ``tracknum {}- title [artist,
-album]'', where most fields are only displayed if
-available. Could also be rendered as
-``filename'' or ``tracknum {}-title [artist]''.
+Display id3 artist for 3 seconds,\\
 
-{\bfseries
-Default}
+repeat...\\
 
+If the ID3 artist and title are not present :\\
+
+Display the filename continuously.\\
+
+Note that by using a subline display time of 0 in one branch of a conditional, a subline can be skipped (not displayed) when that condition is met. 
+
+\subsubsection{Other Tags}
+\begin{verbatim}
+  %%  : Display a '%'
+  %<  : Display a '<'
+  %|  : Display a '|'
+  %>  : Display a '>'
+  %;  : Display a ';'
+  %s  : Indicate that the line should scroll. Can occur anywhere in
+        a line (given that the text is displayed; see conditionals
+        above). You can specify up to 10 scrolling lines.
+        Scrolling lines can not contain dynamic content such as timers,
+        peak meters or progress bars.
+\end{verbatim}
+
+\subsubsection{Using Images}
+You can have as many as 52 images in your WPS. There are two ways of displaying images:
+\begin{enumerate}
+  \item Load and always show the image, using the \%x tag
+  \item Preload the image with \%xl and show it with \%xd. This way you can have your images displayed conditionally.
+  \item Load an image and show as backdrop using the \%X tag. The image must be of the same exact dimensions as your display. (Currently only supported on color targets).
+\end{enumerate}
+Example:
+\begin{verbatim}
+%X|background.bmp|
+%x|a|static_icon.bmp|50|50|
+%xl|b|rep_off.bmp|16|64|
+%xl|c|rep_all.bmp|16|64|
+%xl|d|rep_one.bmp|16|64|
+%xl|e|rep_shuffle.bmp|16|64|
+%?mm<%xdb|%xdc|%xdd|%xde>
+\end{verbatim}
+This example loads and displays a background image, and preloads four other images at the same x and y position. Which image to display is determined by the \%mm tag (the repeat mode).
+
+\subsubsection{Example File}
+\begin{verbatim}
+%s%?in<%in - >%?it<%it|%fn> %?ia<[%ia%?id<, %id>]>
+%pb%pc/%pt
+\end{verbatim}
+That is, "tracknum - title [artist, album]", where most fields are only displayed if available. Could also be rendered as "filename" or "tracknum - title [artist]".
+
+\subsubsection{Default}
 If you haven't selected a .wps file in the /.rockbox
-directory, you get the hard coded layout. The default WPS screen for
-Players is:
+directory, you get the hard coded layout. The default WPS screen is:
+\opt{player}{
+%\begin{verbatim}
+  %s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>
+  %pc%?ps<*|/>%pt
+%\end{verbatim}
+}
 
-\%s\%pp/\%pe: \%?it{\textless}\%it{\textbar}\%fn{\textgreater} {}-
-\%?ia{\textless}\%ia{\textbar}\%d2{\textgreater} {}-
-\%?id{\textless}\%id{\textbar}\%d1{\textgreater}
-
-\%pc\%?ps{\textless}*{\textbar}/{\textgreater}\%pt
-
-And for the Recorder and Ondio:
-
-\%s\%?it{\textless}\%?in{\textless}\%in.
-{\textbar}{\textgreater}\%it{\textbar}\%fn{\textgreater}
-
-\%s\%?ia{\textless}\%ia{\textbar}\%?d2{\textless}\%d2{\textbar}(root){\textgreater}{\textgreater}
-
-\%s\%?id{\textless}\%id{\textbar}\%?d1{\textless}\%d1{\textbar}(root){\textgreater}{\textgreater}
-\%?iy{\textless}(\%iy){\textbar}{\textgreater}
-
-\%pc/\%pt [\%pp:\%pe]
-
-\%fbkBit \%?fv{\textless}avg{\textbar}{\textgreater}
-\%?iv{\textless}(id3v\%iv){\textbar}(no id3){\textgreater}
-
-\%pb
-
-\%pm
+\opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{
+%  \begin{verbatim}
+    %s%?it<%?in<%in. |>%it|%fn>
+    %s%?ia<%ia|%?d2<%d2|(root)>>
+    %s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>
+  
+    %al%pc/%pt%ar[%pp:%pe]
+    %fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
+    %pb
+    %pm
+ % \end{verbatim}
+}
 
 \section{\label{ref:SettingsFile}Making your own settings file}
 A .cfg file is used to load settings from a plain text file. A .cfg file
