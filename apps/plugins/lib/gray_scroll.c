@@ -378,7 +378,7 @@ void gray_ub_scroll_up(int count)
             "subq.l  #1,%%d2     \n"  /* planes-- */
             "bne.b   .su_oloop   \n"
 
-            "lea.l   (1,%[addr]),%[addr] \n"  /* start_address++ */
+            "addq.l  #1,%[addr]  \n"  /* start_address++ */
             "subq.l  #1,%%d4     \n"  /* columns-- */
             "bne.b   .su_cloop   \n"
             : /* outputs */
@@ -559,7 +559,7 @@ void gray_ub_scroll_down(int count)
             "subq.l  #1,%%d2     \n"  /* planes-- */
             "bne.b   .sd_oloop   \n"
 
-            "lea.l   (1,%[addr]),%[addr] \n"  /* start_address++ */
+            "addq.l  #1,%[addr]  \n"  /* start_address++ */
             "subq.l  #1,%%d4     \n"  /* columns-- */
             "bne.b   .sd_cloop   \n"
             : /* outputs */
