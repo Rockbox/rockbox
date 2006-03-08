@@ -81,18 +81,16 @@ static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
 
         outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
 
-        set_irq_level(old_irq_level);
-
         if (data)
         {
             if (ipod_i2c_wait_not_busy() < 0)
             {
+                set_irq_level(old_irq_level);
                 return -1;
             }
-            old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
             *data = inb(IPOD_I2C_DATA0);
-            set_irq_level(old_irq_level);
         }
+        set_irq_level(old_irq_level);
     }
 
     return 0;
