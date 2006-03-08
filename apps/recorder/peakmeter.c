@@ -563,16 +563,26 @@ void peak_meter_peek(void)
        of the volume are at full scale. This is proven
        to be inaccurate in both ways: it may detect clips
        when no clip occurred and it may fail to detect
-       a real clip. */
+       a real clip. For software codecs, the peak is already
+       the max of a bunch of samples, so use one max value
+       or you fail to detect clipping! */
+#if CONFIG_CODEC == SWCODEC
+    if (left == MAX_PEAK - 1) {
+#else
     if ((left == pm_max_left) &&
         (left == MAX_PEAK - 1)) {
+#endif
         pm_clip_left = true;
         pm_clip_timeout_l = 
             current_tick + clip_time_out[pm_clip_hold];
     }
 
+#if CONFIG_CODEC == SWCODEC
+    if (right == MAX_PEAK - 1) {
+#else
     if ((right == pm_max_right) &&
         (right == MAX_PEAK - 1)) {
+#endif
         pm_clip_right = true;
         pm_clip_timeout_r = 
             current_tick + clip_time_out[pm_clip_hold];
