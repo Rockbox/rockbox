@@ -16,5 +16,7 @@ playergfx.c
 profile_plugin.c
 #endif
 #ifdef HAVE_LCD_BITMAP
-xlcd.c
+xlcd_core.c
+xlcd_draw.c
+xlcd_scroll.c
 #endif

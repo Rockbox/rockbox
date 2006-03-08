@@ -38,7 +38,7 @@
 
 /*** globals ***/
 
-unsigned char lcd_framebuffer[LCD_HEIGHT][FB_WIDTH] IBSS_ATTR;
+unsigned char lcd_framebuffer[LCD_HEIGHT][LCD_FBWIDTH] IBSS_ATTR;
 
 static const unsigned char dibits[16] ICONST_ATTR = {
     0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
@@ -419,11 +419,11 @@ void lcd_vline(int x, int y1, int y2)
     dst   = &lcd_framebuffer[y1][x>>2];
     mask  = pixmask[x & 3];
     
-    dst_end = dst + (y2 - y1) * FB_WIDTH;
+    dst_end = dst + (y2 - y1) * LCD_FBWIDTH;
     do
     {
         bfunc(dst, mask, 0xFFu);
-        dst += FB_WIDTH;
+        dst += LCD_FBWIDTH;
     }
     while (dst <= dst_end);
 }
@@ -482,11 +482,11 @@ void lcd_fillrect(int x, int y, int width, int height)
     {
         unsigned char *dst_col = dst;
 
-        dst_end = dst_col + height * FB_WIDTH;
+        dst_end = dst_col + height * LCD_FBWIDTH;
         do
         {
             bfunc(dst_col, mask, 0xFFu);
-            dst_col += FB_WIDTH;
+            dst_col += LCD_FBWIDTH;
         }
         while (dst_col < dst_end);
 
@@ -495,11 +495,11 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     mask &= mask_right;
 
-    dst_end = dst + height * FB_WIDTH;
+    dst_end = dst + height * LCD_FBWIDTH;
     do
     {
         bfunc(dst, mask, 0xFFu);
-        dst += FB_WIDTH;
+        dst += LCD_FBWIDTH;
     }
     while (dst < dst_end);
 }
@@ -651,7 +651,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     mask_right = 0xFFu >> (2 * (~nx & 3));
     
     shift *= 2;
-    dst_end = dst + height * FB_WIDTH;
+    dst_end = dst + height * LCD_FBWIDTH;
     do
     {
         const unsigned char *src_row = src;
@@ -678,7 +678,7 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
         setblock(dst_row, mask_row & mask_right, data);
 
         src += stride;
-        dst += FB_WIDTH;
+        dst += LCD_FBWIDTH;
     }
     while (dst < dst_end);
 }

@@ -24,6 +24,7 @@
 
 #ifdef HAVE_LCD_BITMAP /* and also not for the Player */
 #if CONFIG_CODEC != SWCODEC /* only for MAS-targets */
+#include "xlcd.h"
 
 PLUGIN_HEADER
 
@@ -77,88 +78,34 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter);
 
 /* implementation */
 
-void lcd_scroll_left(int count, bool black_border)
-{
-    int by;
-    unsigned filler;
-    unsigned char *ptr;
-
-    if ((unsigned) count >= LCD_WIDTH)
-        return;
-        
-    filler = black_border ? 0xFF : 0;
-
-    for (by = 0; by < (LCD_HEIGHT/8); by++)
-    {
-        ptr = rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
-        asm volatile (
-            "mov     %0,r1            \n" /* check if both source... */
-            "or      %2,r1            \n" /* ...and offset are even */
-            "shlr    r1               \n" /* -> lsb = 0 */
-            "bf      .sl_start2       \n" /* -> copy word-wise */
-
-            "add     #-1,%2           \n" /* copy byte-wise */
-        ".sl_loop1:                   \n"
-            "mov.b   @%0+,r1          \n"
-            "mov.b   r1,@(%2,%0)      \n"
-            "cmp/hi  %0,%1            \n"
-            "bt      .sl_loop1        \n"
-
-            "bra     .sl_end          \n"
-            "nop                      \n"
-
-        ".sl_start2:                  \n" /* copy word-wise */
-            "add     #-2,%2           \n"
-        ".sl_loop2:                   \n"
-            "mov.w   @%0+,r1          \n"
-            "mov.w   r1,@(%2,%0)      \n"
-            "cmp/hi  %0,%1            \n"
-            "bt      .sl_loop2        \n"
-
-        ".sl_end:                     \n"
-            : /* outputs */
-            : /* inputs */
-            /* %0 */ "r"(ptr + count),
-            /* %1 */ "r"(ptr + LCD_WIDTH),
-            /* %2 */ "z"(-count)
-            : /* clobbers */
-            "r1"
-        );
-
-        rb->memset(ptr + LCD_WIDTH - count, filler, count);
-    }
-}
-
 void timer_isr(void)
 {
     static int last_left, last_right;
     bool full_update = false;
 
     if (new_val)
-    {
+    {   
         if ((unsigned)x >= LCD_WIDTH)
         {
             if (scroll)
             {
-                lcd_scroll_left(1, false);
+                xlcd_scroll_left(1);
                 x = LCD_WIDTH-1;
                 full_update = true;
             }
             else
                 x = 0;
         }
-        
+
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_drawline(x, 0, x, LCD_HEIGHT-1);
+        rb->lcd_vline(x, 0, LCD_HEIGHT-1);
         rb->lcd_set_drawmode(DRMODE_SOLID);
 
         switch (draw_mode)
         {
             case DRAW_MODE_FILLED:
-                rb->lcd_drawline(x, LCD_HEIGHT/2+1,
-                                 x, LCD_HEIGHT/2+1 + left_val);
-                rb->lcd_drawline(x, LCD_HEIGHT/2-1,
-                                 x, LCD_HEIGHT/2-1 - right_val);
+                rb->lcd_vline(x, LCD_HEIGHT/2+1, LCD_HEIGHT/2+1 + left_val);
+                rb->lcd_vline(x, LCD_HEIGHT/2-1, LCD_HEIGHT/2-1 - right_val);
                 break;
                 
             case DRAW_MODE_OUTLINE:
@@ -205,6 +152,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)parameter;
     rb = api;
+
+    xlcd_init(rb);
     
     rb->timer_register(1, NULL, FREQ / 67, 1, timer_isr);
 

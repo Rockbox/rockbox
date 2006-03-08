@@ -205,8 +205,8 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 extern fb_data lcd_framebuffer[LCD_HEIGHT/8][LCD_WIDTH];
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define FB_WIDTH ((LCD_WIDTH+3)/4)
-extern fb_data lcd_framebuffer[LCD_HEIGHT][FB_WIDTH];
+#define LCD_FBWIDTH ((LCD_WIDTH+3)/4)
+extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_FBWIDTH];
 #else
 extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 #endif
@@ -214,6 +214,10 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #elif LCD_DEPTH == 18
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
+#endif       
+
+#ifndef LCD_FBWIDTH
+#define LCD_FBWIDTH LCD_WIDTH
 #endif
 
 #if (CONFIG_BACKLIGHT==BL_IRIVER_H300) || (CONFIG_BACKLIGHT==BL_IPOD3G)

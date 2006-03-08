@@ -47,6 +47,9 @@ void xlcd_scroll_right(int count);
 void xlcd_scroll_up(int count);
 void xlcd_scroll_down(int count);
 
+/* internal stuff */
+extern struct plugin_api *_xlcd_rb; /* global api struct pointer */
+
 #endif /* HAVE_LCD_BITMAP */
 #endif /* __XLCD_H__ */
 
