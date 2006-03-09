@@ -196,7 +196,12 @@ bool button_hold(void);
 #define BUTTON_DOWN           0x0010
 #define BUTTON_SELECT         0x0020
 
-#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
+#define BUTTON_RC_PLAY        (BUTTON_REMOTE | 0x00010000)
+#define BUTTON_RC_REW         (BUTTON_REMOTE | 0x00020000)
+#define BUTTON_RC_FF          (BUTTON_REMOTE | 0x00040000)
+#define BUTTON_RC_MODE        (BUTTON_REMOTE | 0x00080000)
+#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00100000)
+#define BUTTON_RC_MENU        (BUTTON_REMOTE | 0x00200000)
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 

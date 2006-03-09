@@ -582,9 +582,9 @@ void button_init(void)
     GPIO1_ENABLE &= ~0x00100060;
     GPIO1_FUNCTION |= 0x00100062;
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-    /* Hold switch */
-    GPIO_FUNCTION |= 0x08000000;
-    GPIO_ENABLE &= ~0x08000000;
+    /* Power, Remote Play & Hold switch */
+    GPIO_FUNCTION |= 0x0e000000;
+    GPIO_ENABLE &= ~0x0e000000;
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
@@ -1167,6 +1167,43 @@ static int button_read(void)
                     if(data < 0xf0)
                         btn = BUTTON_UP;
     }    
+
+    /* remote buttons */
+    data = adc_scan(ADC_REMOTE);
+    if(data < 0x17)
+        remote_hold_button = true;
+
+    if(!remote_hold_button)
+    {
+        if(data < 0x7a)
+            if(data < 0x41)
+                btn = BUTTON_RC_REW;
+            else
+                if(data < 0x61)
+                    btn = BUTTON_RC_FF;
+                else
+                    btn = BUTTON_RC_MODE;
+        else
+            if(data < 0xb4)
+                if(data < 0x96)
+                    btn = BUTTON_RC_REC;
+                else
+                    btn = BUTTON_RC_MENU;
+            else
+                if(data < 0xd1)
+                    btn = BUTTON_RC_VOL_UP;
+                else
+                    if(data < 0xee)
+                        btn = BUTTON_RC_VOL_DOWN;
+    }
+    
+    data = GPIO_READ;
+    if (!(data & 0x04000000))
+        btn |= BUTTON_POWER;
+
+    if (!(data & 0x02000000))
+        btn |= BUTTON_RC_PLAY;
+
 #endif /* CONFIG_KEYPAD */
 
 
