@@ -61,7 +61,7 @@
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
 
-#define BATTERY_SCALE_FACTOR 2353
+#define BATTERY_SCALE_FACTOR 5865
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
