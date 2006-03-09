@@ -92,6 +92,8 @@ void button_event(int key, bool pressed)
         break;
 
     case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
 #ifdef BUTTON_OFF
         new_btn = BUTTON_OFF;
 #elif defined BUTTON_A
