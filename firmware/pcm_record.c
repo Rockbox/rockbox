@@ -361,6 +361,8 @@ void pcm_rec_get_peaks(int *left, int *right)
         *left = (int)peak_left;
     if (right)
         *right = (int)peak_right;
+    peak_left = 0;
+    peak_right = 0;
 }
 
 /***************************************************************************/
@@ -391,8 +393,6 @@ static void pcmrec_callback(bool flush)
     if (num_new < 0)
         num_new += num_chunks;
 
-    peak_left = 0;
-    peak_right = 0;
     for (i=0; i<num_new; i++)
     {
         /* Convert the samples to little-endian so we only have to write later
