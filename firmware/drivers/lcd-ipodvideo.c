@@ -181,18 +181,18 @@ void lcd_update_rect(int x, int y, int width, int height)
     while ((inw(0x30030000) & 0x2) == 0);
 
     {
-        int r;
-        int line_size = (LCD_WIDTH - width);
         unsigned short *src = (unsigned short*)&lcd_framebuffer[y][x];
-        for (r = 0; r < height; r++) {
+        unsigned short *end = &src[LCD_WIDTH * height];
+        int line_rem = (LCD_WIDTH - width);
+        while (src < end) {
             /* for each column */
-            unsigned short *end = src + width;
-            while (src < end) {
+            unsigned short *end_line = src + width;
+            while (src < end_line) {
                 /* write out two pixels */
                 outw(*(src++), 0x30000000);
                 outw(*(src++), 0x30000000);
             }
-            src += line_size;
+            src += line_rem;
         }
     }
 
