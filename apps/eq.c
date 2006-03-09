@@ -217,12 +217,28 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 void eq_filter(long **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift)
 {
-    /* TODO: Implement generic filtering routine. */
-    (void)x;
-    (void)f;
-    (void)num;
-    (void)channels;
-    (void)shift;
+    unsigned c, i;
+    long long acc;
+
+    /* Direct form 1 filtering code.
+       y[n] = b0*x[i] + b1*x[i - 1] + b2*x[i - 2] + a1*y[i - 1] + a2*y[i - 2],
+       where y[] is output and x[] is input.
+     */
+
+    for (c = 0; c < channels; c++) {
+        for (i = 0; i < num; i++) {
+            acc  = (long long) x[c][i] * f->coefs[0];
+            acc += (long long) f->history[c][0] * f->coefs[1];
+            acc += (long long) f->history[c][1] * f->coefs[2];
+            acc += (long long) f->history[c][2] * f->coefs[3];
+            acc += (long long) f->history[c][3] * f->coefs[4];
+            f->history[c][1] = f->history[c][0];
+            f->history[c][0] = x[c][i];
+            f->history[c][3] = f->history[c][2];
+            x[c][i] = (acc << shift) >> 32;
+            f->history[c][2] = x[c][i];
+        }
+    }
 }
 #endif
 
