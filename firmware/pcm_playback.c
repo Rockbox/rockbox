@@ -348,8 +348,8 @@ static void dma_start(const void *addr, size_t size)
     outl(I2S_MASK, 0x60004024);
 #else
     /* setup I2S interrupt for FIQ */
-    outl(inl(0xcf00103c) | DMA_OUT_MASK, 0xcf00103c);
-    outl(DMA_OUT_MASK, 0xcf001034);
+    outl(inl(0xcf00102c) | DMA_OUT_MASK, 0xcf00102c);
+    outl(DMA_OUT_MASK, 0xcf001024);
 #endif
 
     /* Clear the FIQ disable bit in cpsr_c */
