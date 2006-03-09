@@ -108,7 +108,9 @@ void gui_list_flash(struct gui_list * gui_list)
 void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                       bool put_from_end)
 {
+#ifdef HAVE_LCD_BITMAP
     gui_list->display->setfont(FONT_UI);
+#endif
     gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
     if(put_from_end)
