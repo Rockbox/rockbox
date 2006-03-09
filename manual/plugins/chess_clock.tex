@@ -1,7 +1,7 @@
 \subsection{Chess Clock}
 \begin{figure}[h!]
 \begin{center}
-\includegraphics{plugins/images/ss-chess_clock-\genericimg.png}
+\includegraphics[width=4cm]{plugins/images/ss-chess_clock-\genericimg.png}
 \end{center}
 \caption{Chess Clock}
 \end{figure}
@@ -32,15 +32,14 @@ Keys are as follows:
 
 \begin{table}[h!]
 \begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-PLAYER & RECORDER & ONDIO & FUNCTION \\\hline
-ON & OFF & ONOFF & Exit plugin \\\hline
-STOP & LEFT & LEFT & Restart round for the player \\\hline
-PLAY & PLAY & RIGHT & Pausing the time (press again to continue) \\\hline
-RIGHT & UP & UP & Switch to next player \\\hline
-LEFT & DOWN & DOWN & Switch to previous player \\\hline
-MENU & F1 & MODE & Enter a simple menu \\\hline
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Key} & \textbf{Action}\\\midrule
+\opt{player}{On}\opt{recorder,recorderv2fm}{Off}\opt{ondio}{OnOff}\opt{h1xx,h300,ipodcolor,ipodnano}{Select} & Exit plugin \\
+\opt{player}{Stop}\opt{recorder,recorderv2fm,Ondio}{Left}\opt{h1xx,h300,ipodcolor,ipodnano}{Stop} & Restart round for the player \\
+\opt{player,h1xx,h300,ipodcolor,ipodnano,recorder,recorderv2fm}{Play}\opt{Ondio}{Right} & Pausing the time (press again to continue) \\
+\opt{player,h1xx,h300,ipodcolor,ipodnano}{Right}\opt{ondio,recorder,recorderv2fm}{Up} & Switch to next player \\
+\opt{player,h1xx,h300,ipodcolor,ipodnano}{Left}\opt{ondio,recorder,recorderv2fm}{Down} & Switch to previous player \\
+\opt{player}{Menu}\opt{recorder,recorderv2fm}{F1}\opt{ondio}{Mode}\opt{h1xx,h300,ipodcolor,ipodnano}{Rec} & Exit plugin \\\bottomrule
 \end{tabular}
 \end{center}
 \end{table}
@@ -50,5 +49,4 @@ for the current player or set the total time for the game.
 When the round time is up for a player the message ``ROUND UP!'' is shown (press  NEXT to continue). 
 
 When the total time is up for a player the message ``TIME UP!''is shown. Then player will  then be removed from the timer. 
-
 

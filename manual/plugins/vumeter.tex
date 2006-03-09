@@ -14,14 +14,15 @@ settings menu the decay time for the meter (its memory), the meter type
 and the meter scale can be changed. 
 
 \begin{table}[h!]
-\begin{tabular}{|c|c|c|}
-\hline
-RECORDER & ONDIO & FUNCTION \\\hline
-OFF & ONOFF & Save settings and quit \\\hline
-ON & MODE & Help \\\hline
-F1 & HOLD MODE & Settings \\\hline
-UP & UP & Raise Volume \\\hline
-DOWN & DOWN & Lower Volume \\\hline
+\begin{center}
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Key} & \textbf{Action} \\\midrule
+\opt{recorder,recorderv2fm}{OFF}\opt{ondio}{ON/OFF}\opt{h1xx,h300}{Stop}\opt{ipodcolor,ipodnano}{Unknown} & Save settings and quit \\
+\opt{recorder,recorderv2fm}{ON}\opt{ondio}{MODE}\opt{h1xx,h300}{Play}\opt{ipodcolor,ipodnano}{Unknown} & Help \\
+\opt{recorder,recorderv2fm}{F1}\opt{ondio}{HOLD MODE}\opt{h1xx,h300,ipodcolor,ipodnano}{Unknown} & Settings \\
+UP & Raise Volume \\
+DOWN & Lower Volume \\\bottomrule
 \end{tabular}
+\end{center}
 \end{table}
 

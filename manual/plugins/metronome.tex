@@ -4,17 +4,14 @@ practice.  Adjust the tempo though the interface or by tapping it out
 on the appropriate button.
 
 \begin{table}[h!]
-\begin{tabular}{|c|c|c|c|}
-\hline
-PLAYER & RECORDER & ONDIO & FUNCTION \\\hline
-STOP & OFF & ONOFF & Exit plugin \\\hline
-PLAY & PLAY & ~ & Start / Stop \\\hline
-ON & ON & ~ & Tap tempo \\\hline
-~ & ~ & MODE & Start / Tap tempo \\\hline
-~ & ~ & HOLD MODE & Stop \\\hline
-MINUS/PLUS & LEFT/RIGHT & LEFT/RIGHT & Adjust tempo \\\hline
-ON+MINUS/ON+PLUS & UP/DOWN & UP/DOWN & Adjust volume \\\hline
+\begin{center}
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Key} & \textbf{Action}\\\midrule
+\opt{player,h1xx,h300}{Stop}\opt{recorder,recorderv2fm}{Off}\opt{ondio}{OnOff}\opt{ipodcolor,ipodnano}{Menu} & Exit plugin \\
+\opt{player,recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{Play}\opt{ondio}{Mode (hold: Stop)} & Start / Stop \\
+\opt{player,recorder,recorderv2fm}{On}\opt{ondio}{Mode (repeatedly)}\opt{h1xx,h300,ipodcolor,ipodnano}{Select} & Tap tempo \\
+Left/Right & Adjust tempo \\
+\opt{player}{On+Left/Right}\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{Up/Down} & Adjust volume \\\bottomrule
 \end{tabular}
+\end{center}
 \end{table}
-
-

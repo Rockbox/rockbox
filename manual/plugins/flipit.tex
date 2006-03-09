@@ -11,14 +11,15 @@ above, below, left and right of the cursor.  The aim is to end up with
 a screen containing tokens of only one colour.
 
 \begin{table}[h!]
-\begin{tabular}{|c|c|c|}
-\hline
-Recorder & Ondio & ACTION \\\hline
-UP/DOWN/LEFT/RIGHT & UP/DOWN/LEFT/RIGHT & Changes the cursor \\\hline
-PLAY & Mode & Toggle \\\hline
-F1 & Mode +Left & Shuffle \\\hline
-F2 & Mode + Right & Solution \\\hline
-F3 & Mode + On/off & Step by step \\\hline
-OFF & On/off & Stop the game \\\hline
+\begin{center}
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Key} & \textbf{Action} \\\midrule
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{Up/Down/Left/Right} & Changes the cursor \\
+\opt{recorder,recorderv2fm}{PLAY}\opt{ondio}{Mode}\opt{h1xx,h300}{Select}\opt{ipodcolor,ipodnano}{Unknown} & Toggle \\
+\opt{recorder,recorderv2fm}{F1}\opt{ondio}{Mode +Left}\opt{h1xx,h300}{Mode}\opt{ipodcolor,ipodnano}{Unknown} & Shuffle \\
+\opt{recorder,recorderv2fm}{F2}\opt{ondio}{Mode + Right}\opt{h1xx,h300}{Play}\opt{ipodcolor,ipodnano}{Unknown} & Solution \\
+\opt{recorder,recorderv2fm}{F3}\opt{ondio}{Mode + On/off}\opt{h1xx,h300}{Rec}\opt{ipodcolor,ipodnano}{Unknown} & Step by step \\
+\opt{recorder,recorderv2fm}{OFF}\opt{ondio}{On/off}\opt{h1xx,h300}{Stop}\opt{ipodcolor,ipodnano}{Unknown} & Stop the game \\\bottomrule
 \end{tabular}
+\end{center}
 \end{table}
