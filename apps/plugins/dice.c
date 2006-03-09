@@ -97,7 +97,6 @@ use stop to exit
 #define DICE_BUTTON_OFF        BUTTON_MENU
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-
 #define DICE_BUTTON_UP         BUTTON_UP
 #define DICE_BUTTON_DOWN       BUTTON_DOWN
 #define DICE_BUTTON_LEFT       BUTTON_LEFT
@@ -106,6 +105,15 @@ use stop to exit
 #define DICE_BUTTON_ON         BUTTON_PLAY
 #define DICE_BUTTON_OFF        BUTTON_POWER
  
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define DICE_BUTTON_UP         BUTTON_UP
+#define DICE_BUTTON_DOWN       BUTTON_DOWN
+#define DICE_BUTTON_LEFT       BUTTON_LEFT
+#define DICE_BUTTON_RIGHT      BUTTON_RIGHT
+#define DICE_BUTTON_SELECT     BUTTON_SELECT
+#define DICE_BUTTON_ON         BUTTON_POWER
+#define DICE_BUTTON_OFF        BUTTON_A
+
 #else
     #error DICE: Unsupported keypad
 #endif
