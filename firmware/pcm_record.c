@@ -420,7 +420,8 @@ static void pcmrec_callback(bool flush)
             ptr++;
         }
 
-        num_rec_bytes += CHUNK_SIZE;
+        if(is_recording && !is_paused) 
+            num_rec_bytes += CHUNK_SIZE;
         
         read2_index++;
         if (read2_index >= num_chunks)
@@ -460,7 +461,10 @@ static void pcmrec_callback(bool flush)
                 read_index = 0;
             yield();
         }
-        
+
+        /* sync file */
+        fsync(wav_file);
+
         logf("done");
     }
 }
@@ -641,7 +645,7 @@ static void pcmrec_start(void)
     peak_left = 0;
     peak_right = 0;
  
-    num_rec_bytes = 0;
+    num_rec_bytes = pre_chunks * CHUNK_SIZE;
     num_file_bytes = 0;
     pause_start_time = 0;
     
