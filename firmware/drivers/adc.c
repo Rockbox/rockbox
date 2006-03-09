@@ -298,12 +298,17 @@ static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
  * a 13 bit value corresponding to 0-5.4v, the resulting range is 13FB-17FA,
  * representing 3.1-5.4v */
 static unsigned short ten_bit_subtractor(unsigned short data) {
-    return (data<<2)+0x13FB;
+    return (data<<2)+0x4FB;
 }
 
 static unsigned short _adc_scan(struct adc_struct *adc)
 {
-    unsigned short data = pcf50605_a2d_read(adc->channelnum);
+    unsigned short data;
+
+    /* ADCC1, 8 bit, start */
+    pcf50605_write(0x2f, 0x80 | (adc->channelnum << 1) | 0x1);
+    data = pcf50605_read(0x30); /* ADCS1 */
+
     if (adc->conversion) {
         data = adc->conversion(data);
     }

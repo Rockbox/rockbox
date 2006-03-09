@@ -98,18 +98,6 @@ int pcf50605_write_multiple(int address, const unsigned char* buf, int count)
     return 0;
 }
 
-unsigned short pcf50605_a2d_read(int adc_input)
-{
-    unsigned short hi;
-    unsigned char lo;
-
-    ipod_i2c_send(0x8, 0x2f, (adc_input<<1) | 0x1); /* ADCC2, ADCMUX = adc_input, ADCSTART = 1 */
-    hi = i2c_readbyte(0x8, 0x30);           /* ADCS1 */
-    lo = (i2c_readbyte(0x8, 0x31) & 0x3);   /* ADCS2 */
-
-    return (hi << 2) | lo;
-}
-
 /* The following command puts the iPod into a deep sleep.  Warning
    from the good people of ipodlinux - never issue this command
    without setting CHGWAK or EXTONWAK if you ever want to be able to
