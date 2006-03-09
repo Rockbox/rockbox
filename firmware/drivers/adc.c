@@ -286,60 +286,57 @@ void adc_init(void)
 #elif CONFIG_CPU == PP5020 || (CONFIG_CPU == PP5002)
 
 struct adc_struct {
-    long last_read;
-    unsigned short (*conversion)(unsigned short data);
+    long timeout;
+    void (*conversion)(unsigned short *data);
     short channelnum;
     unsigned short data;
 };
 
 static struct adc_struct adcdata[NUM_ADC_CHANNELS] IDATA_ATTR;
 
-/* This takes 10 bit ADC data from the subtractor circuit and scales it to
- * a 13 bit value corresponding to 0-5.4v, the resulting range is 13FB-17FA,
- * representing 3.1-5.4v */
-static unsigned short ten_bit_subtractor(unsigned short data) {
-    return (data<<2)+0x4FB;
-}
-
-static unsigned short _adc_scan(struct adc_struct *adc)
+static unsigned short _adc_read(struct adc_struct *adc)
 {
-    unsigned short data;
+    if (adc->timeout < current_tick) {
+        unsigned char data[2];
+        unsigned short value;
+        /* 5x per 2 seconds */
+        adc->timeout = current_tick + (HZ * 2 / 5);
 
-    /* ADCC1, 8 bit, start */
-    pcf50605_write(0x2f, 0x80 | (adc->channelnum << 1) | 0x1);
-    data = pcf50605_read(0x30); /* ADCS1 */
+        /* ADCC1, 10 bit, start */
+        pcf50605_write(0x2f, (adc->channelnum << 1) | 0x1);
+        pcf50605_read_multiple(0x30, data, 2); /* ADCS1, ADCS2 */
+        value   = data[0];
+        value <<= 2;
+        value  |= data[1] & 0x3;
 
-    if (adc->conversion) {
-        data = adc->conversion(data);
-    }
-    adc->data = data;
-    return data;
-}
-
-/* Force an ADC scan _now_ */
-unsigned short adc_scan(int channel) {
-    return _adc_scan(&adcdata[channel]);
-}
-
-/* Retrieve the ADC value, only does a scan once per second or less */
-unsigned short adc_read(int channel)
-{
-    struct adc_struct *adc = &adcdata[channel];
-    if (adc->last_read + HZ < current_tick) {
-        adc->last_read = current_tick;
-        return _adc_scan(adc);
+        if (adc->conversion) {
+            adc->conversion(&value);
+        }
+        adc->data = value;
+        return value;
     } else {
         return adc->data;
     }
 }
 
+/* Force an ADC scan _now_ */
+unsigned short adc_scan(int channel) {
+    struct adc_struct *adc = &adcdata[channel];
+    adc->timeout = 0;
+    return _adc_read(adc);
+}
+
+/* Retrieve the ADC value, only does a scan periodically */
+unsigned short adc_read(int channel) {
+    return _adc_read(&adcdata[channel]);
+}
+
 void adc_init(void)
 {
     struct adc_struct *adc_battery = &adcdata[ADC_BATTERY];
-    adc_battery->channelnum = 0x3; /* ADCVIN1, subtractor */
-    adc_battery->conversion = ten_bit_subtractor;
-    adc_battery->last_read = current_tick;
-    _adc_scan(adc_battery);
+    adc_battery->channelnum = 0x2; /* ADCVIN1, resistive divider */
+    adc_battery->timeout = 0;
+    _adc_read(adc_battery);
 }
 
 #elif CONFIG_CPU == PNX0101

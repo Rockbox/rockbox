@@ -63,7 +63,6 @@ static int ipod_i2c_wait_not_busy(void)
     return -1;
 }
 
-
 static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
 {
     if (ipod_i2c_wait_not_busy() < 0)
@@ -72,6 +71,7 @@ static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
     }
 
     {
+        unsigned int byte;
         int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
         /* clear top 15 bits, left shift 1, or in 0x1 for a read */
@@ -81,15 +81,18 @@ static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
 
         outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
 
-        if (data)
+        set_irq_level(old_irq_level);
+        if (ipod_i2c_wait_not_busy() < 0)
         {
-            if (ipod_i2c_wait_not_busy() < 0)
-            {
-                set_irq_level(old_irq_level);
-                return -1;
-            }
-            *data = inb(IPOD_I2C_DATA0);
+            return -1;
         }
+        old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+        byte = inb(IPOD_I2C_DATA0);
+
+        if (data)
+            *data = byte;
+
         set_irq_level(old_irq_level);
     }
 
@@ -147,6 +150,19 @@ static int ipod_i2c_send_byte(unsigned int addr, int data0)
 
 /* Public functions */
 static struct mutex i2c_mutex;
+
+int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
+    unsigned int temp;
+    int i;
+    mutex_lock(&i2c_mutex);
+    ipod_i2c_send_byte(dev_addr, addr);
+    for (i = 0; i < len; i++) {
+        ipod_i2c_read_byte(dev_addr, &temp);
+        data[i] = temp;
+    }
+    mutex_unlock(&i2c_mutex);
+    return i;
+}
 
 int i2c_readbyte(unsigned int dev_addr, int addr)
 {

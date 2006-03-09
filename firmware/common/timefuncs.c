@@ -47,12 +47,13 @@ struct tm *get_time(void)
 {
 #ifndef SIMULATOR
 #ifdef CONFIG_RTC
-    static long last_tick = 0;
+    static long timeout = 0;
 
-    /* Don't read the RTC more than 4 times per second */
-    if (last_tick + HZ < current_tick) {
+    /* Don't read the RTC more than once per second */
+    if (current_tick > timeout) {
         char rtcbuf[7];
-        last_tick = HZ * (current_tick / HZ);
+        /* Once per second, 1/10th of a second off */
+        timeout = HZ * (current_tick / HZ + 1) + HZ / 5;
         rtc_read_datetime(rtcbuf);
 
         tm.tm_sec = ((rtcbuf[0] & 0x70) >> 4) * 10 + (rtcbuf[0] & 0x0f);

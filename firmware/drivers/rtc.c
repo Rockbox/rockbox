@@ -34,11 +34,11 @@
 void rtc_init(void)
 {
 }
+
 int rtc_read_datetime(unsigned char* buf)
 {
     return pcf50605_read_multiple(0x0a, buf, 7);
 }
-
 
 int rtc_write_datetime(unsigned char* buf)
 {

@@ -23,6 +23,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "system.h"
 #include "config.h"
 #if CONFIG_I2C == I2C_PP5020
 #include "i2c-pp5020.h"
@@ -72,15 +73,8 @@ int pcf50605_read(int address)
 
 int pcf50605_read_multiple(int address, unsigned char* buf, int count)
 {
-    int i;
-
-    for (i=0;i<count;i++)
-    {
-        buf[i]=pcf50605_read(address);
-        address++;
-    }
-
-    return 0;
+    int read = i2c_readbytes(0x08, address, count, buf);
+    return read - count;
 }
 
 int pcf50605_write(int address, unsigned char val)

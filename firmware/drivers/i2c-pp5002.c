@@ -136,6 +136,16 @@ int ipod_i2c_send_byte(unsigned int addr, int data0)
     return ipod_i2c_send_bytes(addr, 1, data);
 }
 
+int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data) {
+    unsigned int temp;
+    int i;
+    ipod_i2c_send_byte(dev_addr, addr);
+    for (i = 0; i < len; i++) {
+        ipod_i2c_read_byte(dev_addr, &temp);
+        data[i] = temp;
+    }
+    return i;
+}
 
 int i2c_readbyte(unsigned int dev_addr, int addr)
 {
