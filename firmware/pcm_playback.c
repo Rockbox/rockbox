@@ -774,9 +774,9 @@ void pcm_calculate_peaks(int *left, int *right)
 #endif
 
         if (samples > PEAK_SAMPLES)
-            samples = PEAK_SAMPLES - (PEAK_STRIDE - 1);
+            samples = PEAK_SAMPLES - PEAK_STRIDE;
         else
-            samples -= MIN((PEAK_STRIDE - 1), samples);
+            samples -= MIN(PEAK_STRIDE, samples);
 
         end = addr + samples * 4;
     }
