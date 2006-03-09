@@ -29,8 +29,12 @@ void profile_init(struct plugin_api* pa)
 }
 
 void __cyg_profile_func_enter(void *this_fn, void *call_site) {
+#ifdef CPU_COLDFIRE
     (void)call_site;
     local_rb->profile_func_enter(this_fn, __builtin_return_address(1));
+#else
+    local_rb->profile_func_enter(this_fn, call_site);
+#endif
 }
 
 void __cyg_profile_func_exit(void *this_fn, void *call_site) {

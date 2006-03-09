@@ -76,10 +76,14 @@ static void profile_timer_unregister(void);
 static void write_function_recursive(int fd, struct pfd_struct *pfd, int depth);
 
 /* Be careful to use the right one for the size of your variable */
+#ifdef CPU_COLDFIRE
 #define ADDQI_L(_var,_value) \
     asm ("addq.l %[value],%[var];" \
          : [var] "+g" (_var) \
          : [value] "I" (_value) )
+#else
+#define ADDQI_L(var, value) var += value
+#endif
 
 void profile_thread_stopped(int current_thread) {
     if (current_thread == profiling_thread) {
@@ -227,7 +231,6 @@ void profile_func_enter(void *self_pc, void *from_pc) {
     if (profiling) {
         return;
     }
-    /* this is equivalent to 'profiling = PROF_BUSY;' but it's faster */
     profiling = PROF_BUSY;
     /* A check that the PC is in the code range here wouldn't hurt, but this is
      * logically guaranteed to be a valid address unless the constants are
