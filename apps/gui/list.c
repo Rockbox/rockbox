@@ -108,6 +108,7 @@ void gui_list_flash(struct gui_list * gui_list)
 void gui_list_put_selection_in_screen(struct gui_list * gui_list,
                                       bool put_from_end)
 {
+    gui_list->display->setfont(FONT_UI);
     gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
     if(put_from_end)
@@ -346,8 +347,8 @@ void gui_list_select_previous(struct gui_list * gui_list)
              * we jump to a new page if there are more items*/
             if( item_pos < 0 && gui_list->start_item > 0 )
                 gui_list->start_item = gui_list->selected_item-nb_lines+1;
-    	    if( gui_list->start_item < 0 )
-    	    	gui_list->start_item = 0;
+            if( gui_list->start_item < 0 )
+                gui_list->start_item = 0;
         }
         else
         {
