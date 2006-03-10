@@ -774,11 +774,11 @@ void pcm_calculate_peaks(int *left, int *right)
 #endif
 
         if (samples > PEAK_SAMPLES)
-            samples = PEAK_SAMPLES - PEAK_STRIDE;
+            samples = PEAK_SAMPLES - (PEAK_STRIDE - 1);
         else
-            samples -= MIN(PEAK_STRIDE, samples);
+            samples -= MIN(PEAK_STRIDE - 1, samples);
 
-        end = addr + samples * 4;
+        end = &addr[samples * 2];
     }
 
     if (left && right) {
@@ -796,7 +796,7 @@ void pcm_calculate_peaks(int *left, int *right)
             else if (-value > right_peak)
                 right_peak = -value;
 
-            addr += PEAK_STRIDE * 2;
+            addr = &addr[PEAK_STRIDE * 2];
         }
 
         *left = left_peak;
