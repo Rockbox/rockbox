@@ -259,42 +259,42 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
     }
     else if (!was_hold) {
         switch (scroll_state[prev_scroll][new_scroll]) {
-        case 1:
-            if (reverse) {
-                /* 'r' keypress */
-                wheel_keycode = BUTTON_SCROLL_FWD;
-            }
-            else {
-                /* 'l' keypress */
-                wheel_keycode = BUTTON_SCROLL_BACK;
-            }
-            break;
-        case -1:
-            if (reverse) {
-                /* 'l' keypress */
-                wheel_keycode = BUTTON_SCROLL_BACK;
-            }
-            else {
-                /* 'r' keypress */
-                wheel_keycode = BUTTON_SCROLL_FWD;
-            }
-            break;
-        default:
-            /* only happens if we get out of sync */
-            break;
-        
+            case 1:
+                if (reverse) {
+                    /* 'r' keypress */
+                    wheel_keycode = BUTTON_SCROLL_FWD;
+                }
+                else {
+                    /* 'l' keypress */
+                    wheel_keycode = BUTTON_SCROLL_BACK;
+                }
+                break;
+            case -1:
+                if (reverse) {
+                    /* 'l' keypress */
+                    wheel_keycode = BUTTON_SCROLL_BACK;
+                }
+                else {
+                    /* 'r' keypress */
+                    wheel_keycode = BUTTON_SCROLL_FWD;
+                }
+                break;
+            default:
+                /* only happens if we get out of sync */
+                break;
+
         }
     }
     if (wheel_keycode != BUTTON_NONE)
-              queue_post(&button_queue, wheel_keycode, NULL);
+        queue_post(&button_queue, wheel_keycode, NULL);
     prev_scroll = new_scroll;
 }
 #endif
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) && (defined(APPLE_IPODMINI))
 static int ipod_mini_button_read(void)
 {
-     unsigned char source, wheel_source, state, wheel_state;
-     int btn = BUTTON_NONE;
+    unsigned char source, wheel_source, state, wheel_state;
+    int btn = BUTTON_NONE;
 
     /*
      * we need some delay for mini, cause hold generates several interrupts,
@@ -353,63 +353,63 @@ void ipod_mini_button_int(void)
 #if CONFIG_KEYPAD == IPOD_3G_PAD
 static int ipod_3g_button_read(void)
 {
-     unsigned char source, state;
+    unsigned char source, state;
     static int was_hold = 0;
-int btn = BUTTON_NONE;
+    int btn = BUTTON_NONE;
     /*
      * we need some delay for g3, cause hold generates several interrupts,
      * some of them delayed
      */
-        udelay(250);
+    udelay(250);
 
     /* get source of interupts */
     source = GPIOA_INT_STAT;
 
-        
-        /* get current keypad status */
-        state = GPIOA_INPUT_VAL;
-        GPIOA_INT_LEV = ~state;
-    
-            if (was_hold && source == 0x40 && state == 0xbf) {
-                /* ack any active interrupts */
-                GPIOA_INT_CLR = source;
-                return BUTTON_NONE;
-            }
-            was_hold = 0;
-    
-    
-        if ((state & 0x20) == 0) {
-                /* 3g hold switch is active low */
-                    btn |= BUTTON_HOLD;
-                    was_hold = 1;
-                /* hold switch on 3g causes all outputs to go low */
-                /* we shouldn't interpret these as key presses */
-                GPIOA_INT_CLR = source;
-                return BUTTON_NONE;
-        }
-        if ((state & 0x1) == 0) {
-             btn |= BUTTON_RIGHT;
-        }
-        if ((state & 0x2) == 0) {
-            btn |= BUTTON_SELECT;
-        }
-        if ((state & 0x4) == 0) {
-            btn |= BUTTON_PLAY;
-        }
-        if ((state & 0x8) == 0) {
-            btn |= BUTTON_LEFT;
-        }
-        if ((state & 0x10) == 0) {
-            btn |= BUTTON_MENU;
-        }
-    
-        if (source & 0xc0) {
-            handle_scroll_wheel((state & 0xc0) >> 6, was_hold, 0);
-        }
-    
+
+    /* get current keypad status */
+    state = GPIOA_INPUT_VAL;
+    GPIOA_INT_LEV = ~state;
+
+    if (was_hold && source == 0x40 && state == 0xbf) {
         /* ack any active interrupts */
-       GPIOA_INT_CLR = source;
-    
+        GPIOA_INT_CLR = source;
+        return BUTTON_NONE;
+    }
+    was_hold = 0;
+
+
+    if ((state & 0x20) == 0) {
+        /* 3g hold switch is active low */
+        btn |= BUTTON_HOLD;
+        was_hold = 1;
+        /* hold switch on 3g causes all outputs to go low */
+        /* we shouldn't interpret these as key presses */
+        GPIOA_INT_CLR = source;
+        return BUTTON_NONE;
+    }
+    if ((state & 0x1) == 0) {
+        btn |= BUTTON_RIGHT;
+    }
+    if ((state & 0x2) == 0) {
+        btn |= BUTTON_SELECT;
+    }
+    if ((state & 0x4) == 0) {
+        btn |= BUTTON_PLAY;
+    }
+    if ((state & 0x8) == 0) {
+        btn |= BUTTON_LEFT;
+    }
+    if ((state & 0x10) == 0) {
+        btn |= BUTTON_MENU;
+    }
+
+    if (source & 0xc0) {
+        handle_scroll_wheel((state & 0xc0) >> 6, was_hold, 0);
+    }
+
+    /* ack any active interrupts */
+    GPIOA_INT_CLR = source;
+
     return btn;
 }
 
@@ -478,15 +478,16 @@ static void button_tick(void)
                                which doesn't shut down easily with the OFF
                                key */
 #ifdef HAVE_SW_POWEROFF
+                            if ((btn == POWEROFF_BUTTON
 #ifdef BUTTON_RC_STOP
-                            if ((btn == POWEROFF_BUTTON || btn == BUTTON_RC_STOP) &&
+                                        || btn == BUTTON_RC_STOP) &&
 #else
-                            if (btn == POWEROFF_BUTTON &&
+                                        ) &&
 #endif
 #if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                                !charger_inserted() &&
+                                    !charger_inserted() &&
 #endif
-                                repeat_count > POWEROFF_COUNT)
+                                    repeat_count > POWEROFF_COUNT)
                             {
                                 /* Tell the main thread that it's time to
                                    power off */
@@ -518,7 +519,8 @@ static void button_tick(void)
                     {
                         if (queue_empty(&button_queue))
                         {
-                            queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                            queue_post(
+                                    &button_queue, BUTTON_REPEAT | btn, NULL);
                             post = false;
                         }
                     }
@@ -1239,9 +1241,9 @@ bool button_hold(void)
 static bool remote_button_hold_only(void)
 {        
     if(remote_type() == REMOTETYPE_H300_NONLCD)
-            return adc_scan(ADC_REMOTE)<0x0d; /* hold should be 0x00 */
+        return adc_scan(ADC_REMOTE)<0x0d; /* hold should be 0x00 */
     else
-            return (GPIO1_READ & 0x00100000)?true:false;
+        return (GPIO1_READ & 0x00100000)?true:false;
 }
 
 /* returns true only if there is remote present */
