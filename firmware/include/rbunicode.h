@@ -15,7 +15,6 @@
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */
 
-extern int codepage;
 
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
 unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);

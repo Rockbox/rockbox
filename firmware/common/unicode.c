@@ -41,7 +41,7 @@ static const char *filename[NUM_TABLES] =
 
 static const char cp_2_table[NUM_CODEPAGES] =
 {
-    0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5
+    0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 5, 0
 };
 
 /* Load codepage file into memory */
@@ -52,7 +52,7 @@ int load_cp_table(int cp)
     int file, tablesize;
     unsigned char tmp[2];
 
-    if (cp == 0 || table == loaded_cp_table)
+    if (table == 0 || table == loaded_cp_table)
         return 1;
 
     file = open(filename[table-1], O_RDONLY|O_BINARY);
@@ -109,12 +109,12 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
     unsigned short ucs, tmp;
 
     if (cp == -1) /* use default codepage */
-       cp = default_codepage;
+        cp = default_codepage;
 
     if (!load_cp_table(cp)) cp = 0;
 
     while (count--) {
-        if (*iso < 128)
+        if (*iso < 128 || cp == 0x0C) /* Already UTF-8 */
             *utf8++ = *iso++;
 
         else {
@@ -125,7 +125,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                 case 0x02: /* Hebrew (ISO-8859-8) */
                 case 0x03: /* Russian (CP1251) */
                 case 0x04: /* Thai (ISO-8859-11) */
-                case 0x05: /* Arabic (ISO-8859-6) */
+                case 0x05: /* Arabic (CP1256) */
                 case 0x06: /* Turkish (ISO-8859-9) */
                 case 0x07: /* Latin Extended (ISO-8859-2) */
                     tmp = ((cp-1)*128) + (*iso++ - 128);
@@ -134,7 +134,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
 
                 case 0x08: /* Japanese (SJIS) */
                     if (*iso > 0xA0 && *iso < 0xE0) {
-                        tmp = *iso | 0xA100;
+                        tmp = *iso++ | (0xA100 - 0x8000);
                         ucs = codepage_table[tmp];
                         break;
                     }
@@ -156,14 +156,13 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                     count--;
                     break;
 
-                case 0x0C: /* UTF-8, do nothing */
                 default:
                     ucs = *iso++;
                     break;
             }
 
-            if (ucs == 0) /* unknown char, assume invalid encoding */
-                ucs = 0xffff;
+            if (ucs == 0) /* unknown char, use replacement char */
+                ucs = 0xfffd;
             utf8 = utf8encode(ucs, utf8);
         }
     }
@@ -268,7 +267,7 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
             code = c & 0x07;
         } else {
             /* Invalid size. */
-            code = 0xffff;
+            code = 0xfffd;
         }
 
         while (tail-- && ((c = *utf8++) != 0)) {
@@ -278,17 +277,17 @@ const unsigned char* utf8decode(const unsigned char *utf8, unsigned short *ucs)
 
             } else {
                 /* Invalid continuation char */
-                code = 0xffff;
+                code = 0xfffd;
                 utf8--;
                 break;
             }
         }
     } else {
         /* Invalid UTF-8 char */
-        code = 0xffff;
+        code = 0xfffd;
     }
     /* currently we don't support chars above U-FFFF */
-    *ucs = (code < 0x10000) ? code : 0xffff;
+    *ucs = (code < 0x10000) ? code : 0xfffd;
     return utf8;
 }
 
