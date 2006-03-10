@@ -62,7 +62,15 @@ struct tm *get_time(void)
         tm.tm_wday = rtcbuf[3] & 0x07;
         tm.tm_mday = ((rtcbuf[4] & 0x30) >> 4) * 10 + (rtcbuf[4] & 0x0f);
         tm.tm_mon = ((rtcbuf[5] & 0x10) >> 4) * 10 + (rtcbuf[5] & 0x0f) - 1;
+#ifdef IRIVER_H300_SERIES 
+     /* Special kludge to coexist with the iriver firmware. The iriver firmware
+        stores the date as 1965+nn, and allows a range of 1980..2064. We use
+        1964+nn here to make leap years work correctly, so the date will be one
+        year off in the iriver firmware but at least won't be reset anymore. */
+        tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 64;
+#else
         tm.tm_year = ((rtcbuf[6] & 0xf0) >> 4) * 10 + (rtcbuf[6] & 0x0f) + 100;
+#endif
 
         tm.tm_yday = 0; /* Not implemented for now */
         tm.tm_isdst = -1; /* Not implemented for now */
@@ -99,7 +107,12 @@ int set_time(const struct tm *tm)
         rtcbuf[3]=tm->tm_wday;
         rtcbuf[4]=((tm->tm_mday/10) << 4) | (tm->tm_mday%10);
         rtcbuf[5]=(((tm->tm_mon+1)/10) << 4) | ((tm->tm_mon+1)%10);
+#ifdef IRIVER_H300_SERIES
+        /* Iriver firmware compatibility kludge, see get_time(). */
+        rtcbuf[6]=(((tm->tm_year-64)/10) << 4) | ((tm->tm_year-64)%10);
+#else
         rtcbuf[6]=(((tm->tm_year-100)/10) << 4) | ((tm->tm_year-100)%10);
+#endif
 
         rc = rtc_write_datetime(rtcbuf);
 
