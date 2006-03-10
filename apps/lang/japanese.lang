@@ -13,6 +13,7 @@
 #
 # The "voice' entry contains how we want the speech UI to pronounce this.
 #
+
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
 eng: "Sound Settings"
@@ -35,25 +36,25 @@ id: LANG_VERSION
 desc: in the main menu
 eng: "Version"
 voice: "Version"
-new: "Rockboxバージョン"
+new: "バージョン情報"
 
 id: LANG_DEBUG
 desc: in the main menu
 eng: "Debug (Keep Out!)"
 voice: "Debug, keep out!"
-new: "デバッグ情報（立入禁止！）"
+new: "デバッグ情報 (立入禁止!)"
 
 id: LANG_USB
 desc: in the main menu
 eng: "USB (Sim)"
 voice: ""
-new:
+new: 
 
 id: LANG_ROCKBOX_INFO
 desc: displayed topmost on the info screen
 eng: "Rockbox Info:"
 voice: ""
-new: "Rockbox情報"
+new: "Rockbox情報:"
 
 id: LANG_BUFFER_STAT_PLAYER
 desc: the buffer size player-screen width, %d MB %d fraction of MB
@@ -107,7 +108,7 @@ id: LANG_SETTINGS_BATTERY_PLAYER
 desc: if save settings has failed
 eng: "Partition?"
 voice: ""
-new: "パーティション？"
+new: "パーティション?"
 
 id: LANG_SETTINGS_SAVE_RECORDER
 desc: displayed if save settings has failed
@@ -119,7 +120,7 @@ id: LANG_SETTINGS_BATTERY_RECORDER
 desc: if save settings has failed
 eng: "No partition?"
 voice: ""
-new: "パーティション不要？"
+new: "パーティションが存在しない!?"
 
 id: LANG_TIME_SET
 desc: used in set_time()
@@ -167,25 +168,25 @@ id: LANG_OFF
 desc: Used in a lot of places
 eng: "Off"
 voice: "Off"
-new: "オフ"
+new: 
 
 id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
 eng: "Ask"
 voice: "Ask"
-new: "その都度確認"
+new: "逐次確認"
 
 id: LANG_ON
 desc: Used in a lot of places
 eng: "On"
 voice: "On"
-new: "オン"
+new: 
 
 id: LANG_BACKLIGHT
 desc: in settings_menu
 eng: "Backlight"
 voice: "Backlight"
-new: "バックライト持続時間（バッテリ使用時）"
+new: "バックライト持続時間 (バッテリ使用時)"
 
 id: LANG_SCROLL
 desc: in settings_menu
@@ -197,7 +198,7 @@ id: LANG_DISCHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_TIME
 desc: in settings_menu
@@ -233,7 +234,7 @@ id: LANG_RESET_ASK_RECORDER
 desc: confirm to reset settings
 eng: "Are You Sure?"
 voice: ""
-new: "よろしいですか？"
+new: "よろしいですか?"
 
 id: LANG_RESET_DONE_SETTING
 desc: visual confirmation after settings reset
@@ -257,7 +258,7 @@ id: LANG_CASE_MENU
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_SCROLL_MENU
 desc: in display_settings_menu()
@@ -329,7 +330,7 @@ id: LANG_BBOOST
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DECAY
 desc: in sound_settings
@@ -365,13 +366,13 @@ id: LANG_CHANNEL_LEFT
 desc: in sound_settings
 eng: "Mono Left"
 voice: "Mono Left"
-new: "モノラル（左）"
+new: "モノラル (左)"
 
 id: LANG_CHANNEL_RIGHT
 desc: in sound_settings
 eng: "Mono Right"
 voice: "Mono Right"
-new: "モノラル（右）"
+new: "モノラル (右)"
 
 id: LANG_AUTOVOL
 desc: in sound_settings
@@ -395,13 +396,13 @@ id: LANG_RESUME_CONFIRM_PLAYER
 desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
-new: "（再生／停止）"
+new: "(再生/停止)"
 
 id: LANG_RESUME_ASK
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_KEYLOCK_ON_PLAYER
 desc: displayed when key lock is on
@@ -425,115 +426,115 @@ id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
 eng: "Key Lock Is OFF"
 voice: ""
-new: "キーロックが解除されています"
+new: "キーロックを解除しました"
 
 id: LANG_MUTE_ON_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_ON_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MUTE_OFF_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_INFO
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_SCREEN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TITLE
 desc: in wps
 eng: "[Title]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ARTIST
-desc: in wps 
+desc: in wps
 eng: "[Artist]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_ALBUM
 desc: in wps
 eng: "[Album]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_TRACKNUM
 desc: in wps
 eng: "[Tracknum]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
+desc: DEPRECATED
+eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_LENGHT
 desc: in wps
 eng: "[Length]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
 eng: "[Playlist]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_BITRATE
 desc: in wps
 eng: "[Bitrate]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_FRECUENCY
 desc: in wps
 eng: "[Frequency]"
 voice: ""
-new:
+new: 
 
 id: LANG_ID3_PATH
 desc: in wps
@@ -545,43 +546,43 @@ id: LANG_PITCH_UP
 desc: in wps
 eng: "Pitch Up"
 voice: ""
-new:
+new: 
 
 id: LANG_PITCH_DOWN
 desc: in wps
 eng: "Pitch Down"
 voice: ""
-new:
+new: 
 
 id: LANG_PAUSE
 desc: in wps
 eng: "Pause"
 voice: ""
-new:
+new: 
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new:
+new: 
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
 eng: "Status"
 voice: ""
-new:
+new: 
 
 id: LANG_F3_SCROLL
 desc: in wps F3 pressed
 eng: "Scroll"
 voice: ""
-new:
+new: 
 
 id: LANG_F3_BAR
 desc: in wps F3 pressed
 eng: "Bar"
 voice: ""
-new:
+new: 
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
@@ -617,19 +618,19 @@ id: LANG_FILTER_MUSIC
 desc: show only music-related files
 eng: "Music"
 voice: "Music"
-new: "音楽ファイル"
+new: "音楽"
 
 id: LANG_FILTER_SUPPORTED
 desc: show all file types supported by Rockbox
 eng: "Supported"
 voice: "Supported"
-new: "サポートしているファイル"
+new: "サポートされる"
 
 id: LANG_FILTER_ALL
 desc: show all files
 eng: "All"
 voice: "All"
-new: "全てのファイル"
+new: "すべて"
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
@@ -677,13 +678,13 @@ id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
 voice: "Units Per Read"
-new: "単位／目盛"
+new: "単位/目盛"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu, backlight timeout with charger connected
 eng: "Backlight When Plugged"
 voice: "Backlight When Plugged"
-new: "バックライト持続時間（給電時）"
+new: "バックライト持続時間 (給電時)"
 
 id: LANG_REPEAT
 desc: in settings_menu
@@ -725,13 +726,13 @@ id: LANG_12_HOUR_CLOCK
 desc: option for 12 hour clock
 eng: "12 Hour Clock"
 voice: "12 Hour Clock"
-new: "時計（12時間表示）"
+new: "時計 (12時間表示)"
 
 id: LANG_24_HOUR_CLOCK
 desc: option for 24 hour clock
 eng: "24 Hour Clock"
 voice: "24 Hour Clock"
-new: "時計（24時間表示）"
+new: "時計 (24時間表示)"
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -851,7 +852,7 @@ id: LANG_RESUME_SETTING_ASK_ONCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_DISPLAY
 desc: Battery type title
@@ -880,20 +881,20 @@ new: "数値"
 id: LANG_PM_PERFORMANCE
 desc: DEPRECATED
 eng: ""
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_PM_HIGH_PERFORMANCE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_ENERGY_SAVER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PM_SCALE
 desc: in the peak meter menu
@@ -935,7 +936,7 @@ id: LANG_RECORDING_GAIN
 desc: in the recording screen
 eng: "Gain"
 voice: ""
-new: "ゲイン調整"
+new: "ゲイン"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
@@ -1001,13 +1002,13 @@ id: LANG_DISK_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_DISK_FREE_STAT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_POWEROFF
 desc: disk poweroff flag
@@ -1025,7 +1026,7 @@ id: LANG_BATTERY_TIME
 desc: battery level in % and estimated time remaining
 eng: "%d%% %dh %dm"
 voice: "Battery level"
-new:
+new: 
 
 id: LANG_SLEEP_TIMER
 desc: sleep timer setting
@@ -1073,19 +1074,19 @@ id: LANG_TRICKLE_CHARGE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BATTERY_TOPOFF_CHARGE
 desc: in info display, shows that top off charge is running
 eng: "Battery: Top-Off Chg"
 voice: ""
-new:
+new: "バッテリ: 最終充電"
 
 id: LANG_BATTERY_TRICKLE_CHARGE
 desc: in info display, shows that trickle charge is running
 eng: "Battery: Trickle Chg"
 voice: ""
-new:
+new: "バッテリ: 維持充電"
 
 id: LANG_BATTERY_CAPACITY
 desc: in settings_menu
@@ -1151,7 +1152,7 @@ id: LANG_ALARM_MOD_TIME_TO_GO
 desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
 eng: "Waking Up In %d:%02d"
 voice: ""
-new:  "%d:%02d に起きます"
+new: "%d:%02d に起きます"
 
 id: LANG_ALARM_MOD_SHUTDOWN
 desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
@@ -1169,7 +1170,7 @@ id: LANG_ALARM_MOD_KEYS
 desc: Shown key functions in alarm menu (for the RTC alarm mod).
 eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new:  "[再生]:セット　[停止]:キャンセル"
+new: "[再生]:セット　[停止]:キャンセル"
 
 id: LANG_CREATE_PLAYLIST
 desc: Menu option for creating a playlist
@@ -1187,25 +1188,25 @@ id: LANG_PLAYER_KEYBOARD_BACKSPACE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_DELETE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ACCEPT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_PLAYER_KEYBOARD_ABORT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MENU_SHOW_ID3_INFO
 desc: Menu option to start id3 viewer
@@ -1217,31 +1218,31 @@ id: LANG_ID3_GENRE
 desc: ID3 frame 'genre'
 eng: "[Genre]"
 voice: ""
-new:
+new: "[ジャンル]"
 
 id: LANG_ID3_YEAR
 desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
-new:
+new: "[年]"
 
 id: LANG_ID3_NO_INFO
 desc: ID3 info is missing
 eng: "<No Info>"
 voice: ""
-new:
+new: "<情報無し>"
 
 id: LANG_RECORDING_TIME
 desc: Display of recorded time
 eng: "Time:"
 voice: ""
-new:
+new: "時間:"
 
 id: LANG_RECORDING_SIZE
 desc: Display of recorded file size
 eng: "Size:"
 voice: ""
-new:
+new: "サイズ:"
 
 id: LANG_SETTINGS_LOADED1
 desc: Feedback shown when a .cfg file is loaded
@@ -1265,7 +1266,7 @@ id: LANG_SOKOBAN_ON
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1277,19 +1278,19 @@ id: LANG_CHANNEL_STEREO_NARROW_PLAYER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_NARROW_RECORDER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_STEREO_WIDE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
@@ -1343,7 +1344,7 @@ id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
 eng: "Independent frames"
 voice: "Independent frames"
-new: "独立したフレーム"
+new: "フレームの独立"
 
 id: LANG_STATUS_BAR
 desc: display menu, F3 substitute
@@ -1421,19 +1422,19 @@ id: LANG_JUMP_SCROLL_DELAY
 desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Jump Scroll Delay"
-new:
+new: "ジャンプ・スクロール開始までの時間"
 
 id: LANG_RECORD_TIMESPLIT
 desc: Prompt for record timer interval setting, in the record settings menu
 eng: "Time Split"
 voice: "Time Split"
-new: "分割時間"
+new: "自動時間分割"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
 eng: "Split time:"
 voice: ""
-new: "分割時間"
+new: "分割時間:"
 
 id: LANG_SHOW_ICONS
 desc: in settings_menu
@@ -1555,19 +1556,19 @@ id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
 voice: ""
-new: "%d 曲を追加（%s）"
+new: "%d 曲を追加 (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
 voice: ""
-new: "%d 曲を予約（%s）"
+new: "%d 曲を予約 (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
 voice: ""
-new: "%d 曲を保存（%s）"
+new: "%d 曲を保存 (%s)"
 
 id: LANG_OFF_ABORT
 desc: Used on recorder models
@@ -1647,12 +1648,6 @@ eng: "Browse .wps files"
 voice: "Browse while-playing-screen files"
 new: ".wpsファイルの閲覧"
 
-id: LANG_WHILE_PLAYING
-desc: in settings_menu()
-eng: "Browse .rwps files"
-voice: "Browse remote-controler-screen files"
-new: ".rwpsファイルの閲覧"
-
 id: LANG_CUSTOM_CFG
 desc: in setting_menu()
 eng: "Browse .cfg files"
@@ -1672,49 +1667,49 @@ voice: "Car Adapter Mode"
 new: "カーアダプタ・モード"
 
 id: LANG_LINE_IN
-desc:  in settings_menu
+desc: in settings_menu
 eng: "Line In"
 voice: "Line In"
 new: "ラインイン"
 
 id: LANG_NO_FILES
-desc:  in settings_menu
+desc: in settings_menu
 eng: "No files"
 voice: ""
 new: "ファイルがありません"
 
 id: LANG_BUTTONBAR_MENU
-desc:  in button bar
+desc: in button bar
 eng: "Menu"
 voice: ""
 new: "メニュー"
 
 id: LANG_FM_BUTTONBAR_PRESETS
-desc:  in button bar
+desc: in button bar
 eng: "Preset"
 voice: ""
 new: "プリセット"
 
 id: LANG_FM_SAVE_PRESET
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_DELETE_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Remove preset"
 voice: ""
-new: "プリセット解除"
+new: "プリセットを削除"
 
 id: LANG_FM_STATION
-desc:  in radio screen
+desc: in radio screen
 eng: "Station: %d.%dMHz"
 voice: ""
 new: "放送局: %d.%dMHz"
 
 id: LANG_FM_PRESET_SAVE_FAILED
-desc:  in radio screen
+desc: in radio screen
 eng: "Preset save failed"
 voice: ""
 new: "プリセットの保存に失敗しました"
@@ -1726,19 +1721,19 @@ voice: ""
 new: "プリセットが空です"
 
 id: LANG_FM_NO_FREE_PRESETS
-desc:  in radio screen
+desc: in radio screen
 eng: "The preset list is full"
 voice: ""
 new: "プリセットが一杯です"
 
 id: LANG_FM_RADIO
-desc:  in main menu
+desc: in main menu
 eng: "FM Radio"
 voice: "FM Radio"
 new: "FMラジオ"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc:  in main menu
+desc: in main menu
 eng: "Record"
 voice: ""
 new: "録音"
@@ -1771,15 +1766,16 @@ id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
 eng: "Prerecording"
 voice: ""
-new: "プレ・レコーディング"
+new: "遡り録音"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
 eng: "Prerecord time"
 voice: "Pre-Record time"
-new: "プレ・レコーディング時間"
+new: "遡り録音時間"
 
 #Auto bookmark prompts
+
 id: LANG_BOOKMARK_AUTOLOAD_QUERY
 desc: prompt for user to decide to create a bookmark
 eng: "Load Last Bookmark?"
@@ -1793,6 +1789,7 @@ voice: ""
 new: "ブックマークを作成しますか？"
 
 # Bookmark Select Menu Text
+
 id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
 desc: From the auto-load screen, allows user to list all bookmarks
 eng: "Down = List"
@@ -1836,6 +1833,7 @@ voice: ""
 new: "[電源]+[再生]:削除"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_CREATE_SUCCESS
 desc: Indicates bookmark was successfully created
 eng: "Bookmark Created"
@@ -1849,6 +1847,7 @@ voice: ""
 new: "ブックマークの追加に失敗しました"
 
 # Bookmark creation/failure text
+
 id: LANG_BOOKMARK_LOAD_EMPTY
 desc: Indicates bookmark was empty
 eng: "Bookmark Empty"
@@ -1856,6 +1855,7 @@ voice: ""
 new: "ブックマークが空です"
 
 # Bookmark Settings Text
+
 id: LANG_BOOKMARK_SETTINGS
 desc: in general settings
 eng: "Bookmarking"
@@ -1892,14 +1892,14 @@ eng: "Ask - Recent only"
 voice: "Ask - Recent only"
 new: "最近のリストのみ毎回尋ねる"
 
-
 id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
 desc: Save only on bookmark for each playlist in recent bookmarks
-voice: "Unique only"
 eng: "Unique only"
+voice: "Unique only"
 new: "ユニークのみ"
 
 # Main Bookmarks Menu
+
 id: LANG_BOOKMARK_MENU
 desc: Text on main menu to get to bookmark commands
 eng: "Bookmarks"
@@ -1973,6 +1973,7 @@ voice: "Time and Date"
 new: "日付と時刻"
 
 # Limits
+
 id: LANG_LIMITS_MENU
 desc: in the system sub menu
 eng: "Limits"
@@ -2031,25 +2032,25 @@ id: LANG_DISPLAY_FULL_PATH
 desc: track display options
 eng: "Full path"
 voice: "Full path"
-new: "フルパス"
+new: "完全パス"
 
 id: LANG_REMOVE
 desc: in playlist viewer on+play menu
 eng: "Remove"
 voice: "Remove"
-new: "除外"
+new: "削除"
 
 id: LANG_FILE_OPTIONS
 desc: in playlist viewer on+play menu
 eng: "File Options"
 voice: "File Options"
-new: "ファイルオプション"
+new: "ファイルのオプション"
 
 id: LANG_BUTTON_BAR
 desc: in settings menu
 eng: "Button bar"
 voice: "Button bar"
-new: "ボタンバー"
+new: "ボタン・バー"
 
 id: LANG_DIRBROWSE_F1
 desc: in dir browser, F1 button bar text
@@ -2067,7 +2068,7 @@ id: LANG_DIRBROWSE_F3
 desc: in dir browser, F3 button bar text
 eng: "LCD"
 voice: ""
-new:
+new: "液晶"
 
 #digits and units for voice, the order is important
 
@@ -2075,307 +2076,307 @@ id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "0"
-new:
+new: 
 
 id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "1"
-new:
+new: 
 
 id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
 voice: "2"
-new:
+new: 
 
 id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "3"
-new:
+new: 
 
 id: VOICE_FOUR
 desc: spoken only, for composing numbers
 eng: ""
 voice: "4"
-new:
+new: 
 
 id: VOICE_FIFE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "5"
-new:
+new: 
 
 id: VOICE_SIX
 desc: spoken only, for composing numbers
 eng: ""
 voice: "6"
-new:
+new: 
 
 id: VOICE_SEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "7"
-new:
+new: 
 
 id: VOICE_EIGHT
 desc: spoken only, for composing numbers
 eng: ""
 voice: "8"
-new:
+new: 
 
 id: VOICE_NINE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "9"
-new:
+new: 
 
 id: VOICE_TEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "10"
-new:
+new: 
 
 id: VOICE_ELEVEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "11"
-new:
+new: 
 
 id: VOICE_TWELVE
 desc: spoken only, for composing numbers
 eng: ""
 voice: "12"
-new:
+new: 
 
 id: VOICE_THIRTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "13"
-new:
+new: 
 
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
-new:
+new: 
 
 id: VOICE_FIFTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "15"
-new:
+new: 
 
 id: VOICE_SIXTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "16"
-new:
+new: 
 
 id: VOICE_SEVENTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "17"
-new:
+new: 
 
 id: VOICE_EIGHTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "18"
-new:
+new: 
 
 id: VOICE_NINETEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "19"
-new:
+new: 
 
 id: VOICE_TWENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "20"
-new:
+new: 
 
 id: VOICE_THIRTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "30"
-new:
+new: 
 
 id: VOICE_FORTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "40"
-new:
+new: 
 
 id: VOICE_FIFTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "50"
-new:
+new: 
 
 id: VOICE_SIXTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "60"
-new:
+new: 
 
 id: VOICE_SEVENTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "70"
-new:
+new: 
 
 id: VOICE_EIGHTY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "80"
-new:
+new: 
 
 id: VOICE_NINETY
 desc: spoken only, for composing numbers
 eng: ""
 voice: "90"
-new:
+new: 
 
 id: VOICE_HUNDRED
 desc: spoken only, for composing numbers
 eng: ""
 voice: "hundred"
-new:
+new: 
 
 id: VOICE_BILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "billion"
-new:
+new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
 eng: ""
 voice: "million"
-new:
+new: 
 
 id: VOICE_THOUSAND
 desc: spoken only, for composing numbers
 eng: ""
 voice: "thousand"
-new:
+new: 
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "minus"
-new:
+new: 
 
 id: VOICE_PLUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "plus"
-new:
+new: 
 
 id: VOICE_POINT
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLISECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milliseconds"
-new:
+new: 
 
 id: VOICE_SECOND
 desc: spoken only, a unit postfix
 eng: ""
 voice: "second"
-new:
+new: 
 
 id: VOICE_SECONDS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "seconds"
-new:
+new: 
 
 id: VOICE_MINUTE
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minute"
-new:
+new: 
 
 id: VOICE_MINUTES
 desc: spoken only, a unit postfix
 eng: ""
 voice: "minutes"
-new:
+new: 
 
 id: VOICE_HOUR
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hour"
-new:
+new: 
 
 id: VOICE_HOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hours"
-new:
+new: 
 
 id: VOICE_KHZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "kilohertz"
-new:
+new: 
 
 id: VOICE_DB
 desc: spoken only, a unit postfix
 eng: ""
 voice: "decibel"
-new:
+new: 
 
 id: VOICE_PERCENT
 desc: spoken only, a unit postfix
 eng: ""
 voice: "percent"
-new:
+new: 
 
 id: VOICE_MEGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_GIGABYTE
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
 voice: "milli-amp hours"
-new:
+new: 
 
 id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
 voice: "pixel"
-new:
+new: 
 
 id: VOICE_PER_SEC
 desc: spoken only, a unit postfix
 eng: ""
 voice: "per second"
-new:
+new: 
 
 id: VOICE_HERTZ
 desc: spoken only, a unit postfix
 eng: ""
 voice: "hertz"
-new:
+new: 
 
 #carry on adding normal LANG_ strings below
 
@@ -2413,7 +2414,7 @@ id: LANG_VOICE_DIR_ENTER
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_VOICE_DIR_HOVER
 desc: "talkbox" mode for directories + files
@@ -2425,229 +2426,229 @@ id: VOICE_FILE
 desc: spoken only, prefix for file number
 eng: ""
 voice: "file"
-new:
+new: 
 
 id: VOICE_DIR
 desc: spoken only, prefix for directory number
 eng: ""
 voice: "folder"
-new:
+new: 
 
 id: LANG_VOICE_SPELL
 desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: "Spell"
-new: "スペル方式"
+new: "スペリング"
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
 eng: ""
 voice: "A"
-new:
+new: 
 
 id: VOICE_CHAR_B
 desc: spoken only, for spelling
 eng: ""
 voice: "B"
-new:
+new: 
 
 id: VOICE_CHAR_C
 desc: spoken only, for spelling
 eng: ""
 voice: "C"
-new:
+new: 
 
 id: VOICE_CHAR_D
 desc: spoken only, for spelling
 eng: ""
 voice: "D"
-new:
+new: 
 
 id: VOICE_CHAR_E
 desc: spoken only, for spelling
 eng: ""
 voice: "E"
-new:
+new: 
 
 id: VOICE_CHAR_F
 desc: spoken only, for spelling
 eng: ""
 voice: "F"
-new:
+new: 
 
 id: VOICE_CHAR_G
 desc: spoken only, for spelling
 eng: ""
 voice: "G"
-new:
+new: 
 
 id: VOICE_CHAR_H
 desc: spoken only, for spelling
 eng: ""
 voice: "H"
-new:
+new: 
 
 id: VOICE_CHAR_I
 desc: spoken only, for spelling
 eng: ""
 voice: "I"
-new:
+new: 
 
 id: VOICE_CHAR_J
 desc: spoken only, for spelling
 eng: ""
 voice: "J"
-new:
+new: 
 
 id: VOICE_CHAR_K
 desc: spoken only, for spelling
 eng: ""
 voice: "K"
-new:
+new: 
 
 id: VOICE_CHAR_L
 desc: spoken only, for spelling
 eng: ""
 voice: "L"
-new:
+new: 
 
 id: VOICE_CHAR_M
 desc: spoken only, for spelling
 eng: ""
 voice: "M"
-new:
+new: 
 
 id: VOICE_CHAR_N
 desc: spoken only, for spelling
 eng: ""
 voice: "N"
-new:
+new: 
 
 id: VOICE_CHAR_O
 desc: spoken only, for spelling
 eng: ""
 voice: "O"
-new:
+new: 
 
 id: VOICE_CHAR_P
 desc: spoken only, for spelling
 eng: ""
 voice: "P"
-new:
+new: 
 
 id: VOICE_CHAR_Q
 desc: spoken only, for spelling
 eng: ""
 voice: "Q"
-new:
+new: 
 
 id: VOICE_CHAR_R
 desc: spoken only, for spelling
 eng: ""
 voice: "R"
-new:
+new: 
 
 id: VOICE_CHAR_S
 desc: spoken only, for spelling
 eng: ""
 voice: "S"
-new:
+new: 
 
 id: VOICE_CHAR_T
 desc: spoken only, for spelling
 eng: ""
 voice: "T"
-new:
+new: 
 
 id: VOICE_CHAR_U
 desc: spoken only, for spelling
 eng: ""
 voice: "U"
-new:
+new: 
 
 id: VOICE_CHAR_V
 desc: spoken only, for spelling
 eng: ""
 voice: "V"
-new:
+new: 
 
 id: VOICE_CHAR_W
 desc: spoken only, for spelling
 eng: ""
 voice: "W"
-new:
+new: 
 
 id: VOICE_CHAR_X
 desc: spoken only, for spelling
 eng: ""
 voice: "X"
-new:
+new: 
 
 id: VOICE_CHAR_Y
 desc: spoken only, for spelling
 eng: ""
 voice: "Y"
-new:
+new: 
 
 id: VOICE_CHAR_Z
 desc: spoken only, for spelling
 eng: ""
 voice: "Z"
-new:
+new: 
 
 id: VOICE_EXT_MPA
 desc: spoken only, for file extension
 eng: ""
 voice: "audio"
-new:
+new: 
 
 id: VOICE_EXT_CFG
 desc: spoken only, for file extension
 eng: ""
 voice: "configuration"
-new:
+new: 
 
 id: VOICE_EXT_WPS
 desc: spoken only, for file extension
 eng: ""
 voice: "while-playing-screen"
-new:
+new: 
 
 id: VOICE_EXT_TXT
 desc: spoken only, for file extension
 eng: ""
 voice: "text"
-new:
+new: 
 
 id: VOICE_EXT_ROCK
 desc: spoken only, for file extension
 eng: ""
 voice: "plugin"
-new:
+new: 
 
 id: VOICE_EXT_FONT
 desc: spoken only, for file extension
 eng: ""
 voice: "font"
-new:
+new: 
 
 id: VOICE_EXT_BMARK
 desc: spoken only, for file extension and the word in general
 eng: ""
 voice: "bookmark"
-new:
+new: 
 
 id: VOICE_EXT_UCL
 desc: spoken only, for file extension
 eng: ""
 voice: "flash"
-new:
+new: 
 
 id: VOICE_EXT_AJZ
 desc: spoken only, for file extension
 eng: ""
 voice: "firmware"
-new:
+new: 
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
@@ -2659,9 +2660,10 @@ id: VOICE_CURRENT_TIME
 desc: spoken only, for wall clock announce
 eng: ""
 voice: "Current time:"
-new:
+new: 
 
 #Filetypes
+
 id: LANG_FILETYPES_EXTENSION_FULL
 desc: Extension array full
 eng: "Extension array full"
@@ -2729,109 +2731,109 @@ voice: "by type"
 new: "拡張子別"
 
 id: LANG_FM_EDIT_PRESET
-desc:  in radio screen
+desc: in radio screen
 eng: "Edit preset"
 voice: ""
 new: "プリセットの編集"
 
 id: LANG_FM_MONO_MODE
-desc:  in radio screen
+desc: in radio screen
 eng: "Force mono"
 voice: ""
 new: "モノラルに変換"
 
 id: LANG_FM_BUTTONBAR_EXIT
-desc:  in radio screen
+desc: in radio screen
 eng: "Exit"
 voice: ""
 new: "終了"
 
 id: LANG_FM_BUTTONBAR_EDIT
-desc:  DEPRECATED
+desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_FM_BUTTONBAR_ADD
-desc:  in radio screen
+desc: in radio screen
 eng: "Add"
 voice: ""
 new: "追加"
 
 id: LANG_FM_BUTTONBAR_ACTION
-desc:  in radio screen
+desc: in radio screen
 eng: "Action"
 voice: ""
 new: "アクション"
 
 id: LANG_MDB_STRENGTH
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Strength"
 voice: "MDB Strength"
 new: "MDB強度"
 
 id: LANG_MDB_HARMONICS
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Harmonics"
 voice: "MDB Harmonics"
 new: "MBDハーモニクス"
 
 id: LANG_MDB_CENTER
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Center frequency"
 voice: "MDB Center frequency"
 new: "MDB中心周波数"
 
 id: LANG_MDB_SHAPE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Shape"
 voice: "MDB Shape"
 new: "MDB形状"
 
 id: LANG_MDB_ENABLE
-desc:  in sound settings
+desc: in sound settings
 eng: "MDB Enable"
 voice: "MDB Enable"
 new: "MDB有効"
 
 id: LANG_SUPERBASS
-desc:  in sound settings
+desc: in sound settings
 eng: "Super bass"
 voice: "Super bass"
 new: "超低音"
 
 id: LANG_SHUTDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shut down"
 voice: "Shut down"
 new: "シャットダウン"
 
 id: LANG_SHUTTINGDOWN
-desc:  in main menu
+desc: in main menu
 eng: "Shutting down..."
 voice: ""
 new: "シャットダウン中..."
 
 id: LANG_CONFIRM_SHUTDOWN
-desc:  in shutdown screen
+desc: in shutdown screen
 eng: "Press OFF to shut down"
 voice: ""
 new: "OFFボタンを押すとシャットダウンします"
 
 id: LANG_ID3_ORDER
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "ID3 tag priority"
 voice: "ID3 tag priority"
 new: "ID3タグの優先度"
 
 id: LANG_ID3_V1_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V1 then V2"
 voice: "Version 1 then version 2"
 new: "ID3V1を優先"
 
 id: LANG_ID3_V2_FIRST
-desc:  in playback settings screen
+desc: in playback settings screen
 eng: "V2 then V1"
 voice: "Version 2 then version 1"
 new: "ID3V2を優先"
@@ -2858,13 +2860,13 @@ id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
 voice: "dot"
-new:
+new: 
 
 id: VOICE_PAUSE
 desc: spoken only, for spelling, a split second of silence (difficult to author)
 eng: ""
 voice: " "
-new:
+new: 
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
@@ -2882,7 +2884,7 @@ id: LANG_FILTER_ID3DB
 desc: show ID3 database
 eng: "ID3 database"
 voice: "ID3 database"
-new: "データベース方式"
+new: 
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
@@ -2954,31 +2956,31 @@ id: LANG_POINT
 desc: decimal separator for composing numbers
 eng: "."
 voice: "point"
-new:
+new: 
 
 id: LANG_BYTE
 desc: a unit postfix
 eng: "B"
 voice: ""
-new:
+new: 
 
 id: LANG_KILOBYTE
 desc: a unit postfix, also voiced
 eng: "KB"
 voice: "kilobyte"
-new:
+new: 
 
 id: LANG_MEGABYTE
 desc: a unit postfix, also voiced
 eng: "MB"
 voice: "megabyte"
-new:
+new: 
 
 id: LANG_GIGABYTE
 desc: a unit postfix, also voiced
 eng: "GB"
 voice: "gigabyte"
-new:
+new: 
 
 id: LANG_DISK_SIZE_INFO
 desc: disk size info
@@ -2996,7 +2998,7 @@ id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
 eng: "<All songs>"
 voice: ""
-new:
+new: "<すべての曲>"
 
 id: LANG_PLAYLIST
 desc: Used when you need to say playlist, also voiced
@@ -3016,78 +3018,77 @@ eng: "Alarm Disabled"
 voice: "Alarm Disabled"
 new: "アラームが解除されました"
 
-###########################
 id: LANG_RECORD_TRIGGER
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
-new:
+voice: "Trigger"
+new: 
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
 eng: "Start above"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_MIN_DURATION
 desc: in recording settings_menu
 eng: "for at least"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
 eng: "Stop below"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_STOP_POSTREC
 desc: in recording settings_menu
 eng: "for at least"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
 eng: "Presplit gap"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_TRIGGER_MODE
 desc: in recording settings_menu
 eng: "Trigger"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_TRIG_NOREARM
 desc: in recording settings_menu
 eng: "Once"
-voice:
+voice: 
 new: "一度だけ"
 
 id: LANG_RECORD_TRIG_REARM
 desc: in recording settings_menu
 eng: "Repeat"
-voice:
+voice: 
 new: "リピート"
 
 id: LANG_DB_INF
 desc: -inf db for values below measurement
 eng: "-inf"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
 eng: "Trigger idle"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_RECORD_TRIGGER_ACTIVE
-desc:
+desc: 
 eng: "Trigger active"
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_LCD_REMOTE_MENU
 desc: in the display sub menu
@@ -3177,7 +3178,7 @@ id: LANG_CROSSFADE_DURATION
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_MIX
 desc: in playback settings, crossfade option
@@ -3231,25 +3232,25 @@ id: LANG_ID3_TRACK_GAIN
 desc: in browse_id3
 eng: "[Track gain]"
 voice: ""
-new:
+new: "[トラックゲイン]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in browse_id3
 eng: "[Album gain]"
 voice: ""
-new:
+new: "[アルバムゲイン]"
 
 id: LANG_ID3_NO_GAIN
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_BIDI_SUPPORT
-desc: in settings_menu, option to enable reversal of hebrew/arabic text
-eng: "BiDi Hebrew/Arabic"
-voice: "Bidirectional text"
-new: "ヘブライ／アラビア語 (BiDi)"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_REPLAYGAIN_PREAMP
 desc: in replaygain settings
@@ -3267,7 +3268,7 @@ id: LANG_ID3_VBR
 desc: in browse_id3
 eng: " (VBR)"
 voice: ""
-new: " (VBR)"
+new: 
 
 id: LANG_BEEP
 desc: in playback settings
@@ -3360,22 +3361,22 @@ voice: "Fade out mode"
 new: "フェードアウト・モード"
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
-eng: "ADC Gain Right"
-voice: "ADC Gain Right"
-new: "ADCゲイン（右）"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
-eng: "ADC Gain Left"
-voice: "ADC Gain Left"
-new: "ADCゲイン（左）"
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: 
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
 eng: ""
 voice: ""
-new:
+new: 
 
 id: LANG_RADIO_SCAN_MODE
 desc: in radio screen / menu
@@ -3398,8 +3399,8 @@ new: "スクリーン凍結！"
 id: LANG_CROSSFEED_ENABLE
 desc: DEPRECATED
 eng: ""
-voice:
-new:
+voice: 
+new: 
 
 id: LANG_CROSSFEED
 desc: in the sound settings menu
@@ -3422,7 +3423,7 @@ new: "%d.%01dMHz をスキャン中"
 id: LANG_FM_DEFAULT_PRESET_NAME
 desc: default preset name for auto scan mode
 eng: "%d.%01dMHz"
-voice:
+voice: 
 new: "%d.%01dMHz"
 
 id: LANG_FM_ADD_PRESET
@@ -3447,7 +3448,7 @@ id: VOICE_EXT_RWPS
 desc: spoken only, for file extension
 eng: ""
 voice: "remote while-playing-screen"
-new:
+new: 
 
 id: LANG_REMOTE_WHILE_PLAYING
 desc: in settings_menu()
@@ -3471,4 +3472,335 @@ id: LANG_FM_TUNE_MODE
 desc: in radio screen / menu
 eng: "Mode:"
 voice: ""
-new: "モード"
+new: "モード:"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice: 
+new: "規定のコードページ"
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (CP1256)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice: 
+new: 
+
+id: LANG_CODEPAGE_UTF8
+desc: 
+eng: "Unicode (UTF-8)"
+voice: 
+new: 
+
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new: "明るさ"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "画面範囲外スクロール"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new: "スクロールのステップ"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "ダイナミックリストに予約 (シャッフル)"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: "Clear backdrop"
+new: "背景を消去"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: "Set as backdrop"
+new: "背景に設定"
+
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: "Backdrop loaded"
+new: "背景をロードしました"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: "Backdrop failed"
+new: "背景のロードに失敗しました"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice: 
+new: "ダイナミックリストを削除するときに警告を表示"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice: 
+new: "ダイナミックリストを削除しましか?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new: "イコライザ"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "Enable EQ"
+new: "イコライザの有効/無効"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graphical EQ"
+new: "グラフィックEQ"
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+### Not previously translated
+voice: "Simple EQ Settings"
+new: "簡易EQ設定"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Advanced EQ Settings"
+new: "詳細EQ設定"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Save EQ Preset"
+new: "EQプリセットを保存"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Browse EQ Presets"
+new: "EQプリセットを閲覧"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "%d Hz ゲイン"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "カットオフ周波数"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "中心周波数"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Q値"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Gain"
+new: "ゲイン"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "調整項目: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: ""
+new: "ローブースト・フィルタ"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: ""
+new: "ピーク・フィルタ"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: ""
+new: "ハイブースト・フィルタ"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analog Gain"
+new: 
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digital Gain"
+new: 
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new: "ページ単位でのスクロール"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "クリッピング軽減"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "本体のみ"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "リモコンのみ"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "本体とリモコンの両方"
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice: 
+new: 
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice: 
+new: 
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice: 
+new: "背景色"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice: 
+new: "文字色"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice: 
+new: "色設定のリセット"
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: ""
+new: "無効な色指定です"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice: 
+new: "プレイリスト内の検索"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new: "検索中: %d 件 (%s)"
