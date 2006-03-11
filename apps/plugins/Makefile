@@ -77,6 +77,12 @@ ifneq (-DIRIVER_IFP7XX,$(TARGET))
 endif
 endif
 
+# For all the colour targets and iriver H1x0
+ifneq (,$(strip $(foreach tgt,IPOD_VIDEO IPOD_NANO IPOD_COLOR IRIVER \
+                  IAUDIO_X5 GIGABEAT,$(findstring $(tgt),$(TARGET)))))
+    SUBDIRS += pacbox
+endif
+
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 

@@ -410,6 +410,14 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+#if CONFIG_KEYPAD == IRIVER_H300_PAD || CONFIG_KEYPAD == IPOD_4G_PAD
+    /* NOTE: This is already in the plugin api for the H100 - but we put it
+       at the end for other targets to keep the plugin api compatible */
+    button_hold,
+#endif
+    /* options */
+    set_option,
 };
 
 int plugin_load(const char* plugin, void* parameter)
