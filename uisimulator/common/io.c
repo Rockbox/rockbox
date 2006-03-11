@@ -361,7 +361,6 @@ void *sim_codec_load_ram(char* codecptr, int size,
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
 #endif
-        dlclose(*pd);
         return NULL;
     }
 
@@ -399,7 +398,6 @@ void *sim_plugin_load(char *plugin, void **pd)
 #else
         DEBUGF("dlopen(%s): %s\n", path, dlerror());
 #endif
-        dlclose(*pd);
         return NULL;
     }
 
