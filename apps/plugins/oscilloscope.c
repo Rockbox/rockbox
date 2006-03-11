@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id$
 *
-* Oscilloscope, with the thought-to-be impossible horizontal aspect!
+* Oscilloscope, with many different modes of operation.
 *
 * Copyright (C) 2004-2006 Jens Arnold
 *
@@ -23,105 +23,129 @@
 
 #ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
+#include "configfile.h"
 
 PLUGIN_HEADER
 
-/* The different drawing modes */
-#define OSC_MODE_FILLED  0
-#define OSC_MODE_OUTLINE 1
-#define OSC_MODE_PIXEL   2
-#define OSC_MODE_COUNT   3
-
-#define MAX_PEAK 0x8000
-
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define OSCILLOSCOPE_QUIT BUTTON_OFF
-#define OSCILLOSCOPE_MODE BUTTON_F1
-#define OSCILLOSCOPE_SCROLL BUTTON_F2
-#define OSCILLOSCOPE_ORIENTATION BUTTON_F3
-#define OSCILLOSCOPE_PAUSE BUTTON_PLAY
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_DOWN
+#define OSCILLOSCOPE_QUIT         BUTTON_OFF
+#define OSCILLOSCOPE_DRAWMODE     BUTTON_F1
+#define OSCILLOSCOPE_ADVMODE      BUTTON_F2
+#define OSCILLOSCOPE_ORIENTATION  BUTTON_F3
+#define OSCILLOSCOPE_PAUSE        BUTTON_PLAY
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_UP
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define OSCILLOSCOPE_QUIT BUTTON_OFF
-#define OSCILLOSCOPE_MODE_PRE BUTTON_MENU
-#define OSCILLOSCOPE_MODE (BUTTON_MENU | BUTTON_REL)
-#define OSCILLOSCOPE_SCROLL (BUTTON_MENU | BUTTON_RIGHT)
-#define OSCILLOSCOPE_ORIENTATION (BUTTON_MENU | BUTTON_LEFT)
-#define OSCILLOSCOPE_PAUSE (BUTTON_MENU | BUTTON_OFF)
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_DOWN
+#define OSCILLOSCOPE_QUIT         BUTTON_OFF
+#define OSCILLOSCOPE_DRAWMODE_PRE BUTTON_MENU
+#define OSCILLOSCOPE_DRAWMODE     (BUTTON_MENU | BUTTON_REL)
+#define OSCILLOSCOPE_ADVMODE      (BUTTON_MENU | BUTTON_RIGHT)
+#define OSCILLOSCOPE_ORIENTATION  (BUTTON_MENU | BUTTON_LEFT)
+#define OSCILLOSCOPE_PAUSE        (BUTTON_MENU | BUTTON_OFF)
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_UP
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define OSCILLOSCOPE_QUIT BUTTON_OFF
-#define OSCILLOSCOPE_MODE BUTTON_SELECT
-#define OSCILLOSCOPE_SCROLL BUTTON_MODE
-#define OSCILLOSCOPE_ORIENTATION BUTTON_REC
-#define OSCILLOSCOPE_PAUSE BUTTON_ON
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_DOWN
+#define OSCILLOSCOPE_QUIT         BUTTON_OFF
+#define OSCILLOSCOPE_DRAWMODE     BUTTON_SELECT
+#define OSCILLOSCOPE_ADVMODE      BUTTON_MODE
+#define OSCILLOSCOPE_ORIENTATION  BUTTON_REC
+#define OSCILLOSCOPE_PAUSE        BUTTON_ON
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_UP
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define OSCILLOSCOPE_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define OSCILLOSCOPE_MODE (BUTTON_SELECT | BUTTON_PLAY)
-#define OSCILLOSCOPE_SCROLL (BUTTON_SELECT | BUTTON_RIGHT)
-#define OSCILLOSCOPE_ORIENTATION (BUTTON_SELECT | BUTTON_LEFT)
-#define OSCILLOSCOPE_PAUSE BUTTON_PLAY
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_SCROLL_FWD
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_SCROLL_BACK
+#define OSCILLOSCOPE_QUIT         (BUTTON_SELECT | BUTTON_MENU)
+#define OSCILLOSCOPE_DRAWMODE     (BUTTON_SELECT | BUTTON_PLAY)
+#define OSCILLOSCOPE_ADVMODE      (BUTTON_SELECT | BUTTON_RIGHT)
+#define OSCILLOSCOPE_ORIENTATION  (BUTTON_SELECT | BUTTON_LEFT)
+#define OSCILLOSCOPE_PAUSE        BUTTON_PLAY
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_SCROLL_FWD
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_SCROLL_BACK
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define OSCILLOSCOPE_QUIT BUTTON_POWER
-#define OSCILLOSCOPE_MODE BUTTON_SELECT
-#define OSCILLOSCOPE_SCROLL BUTTON_DOWN
-#define OSCILLOSCOPE_ORIENTATION BUTTON_UP
-#define OSCILLOSCOPE_PAUSE BUTTON_A
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_VOL_UP
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_VOL_DOWN
+#define OSCILLOSCOPE_QUIT         BUTTON_POWER
+#define OSCILLOSCOPE_DRAWMODE     BUTTON_SELECT
+#define OSCILLOSCOPE_ADVMODE      BUTTON_DOWN
+#define OSCILLOSCOPE_ORIENTATION  BUTTON_UP
+#define OSCILLOSCOPE_PAUSE        BUTTON_A
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_VOL_UP
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_VOL_DOWN
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define OSCILLOSCOPE_QUIT BUTTON_POWER
-#define OSCILLOSCOPE_MODE_PRE BUTTON_SELECT
-#define OSCILLOSCOPE_MODE (BUTTON_SELECT | BUTTON_REL)
-#define OSCILLOSCOPE_SCROLL BUTTON_REC
-#define OSCILLOSCOPE_ORIENTATION (BUTTON_SELECT | BUTTON_REPEAT)
-#define OSCILLOSCOPE_PAUSE BUTTON_PLAY
-#define OSCILLOSCOPE_SPEED_UP BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN BUTTON_DOWN
+#define OSCILLOSCOPE_QUIT         BUTTON_POWER
+#define OSCILLOSCOPE_DRAWMODE_PRE BUTTON_SELECT
+#define OSCILLOSCOPE_DRAWMODE     (BUTTON_SELECT | BUTTON_REL)
+#define OSCILLOSCOPE_ADVMODE      BUTTON_REC
+#define OSCILLOSCOPE_ORIENTATION  (BUTTON_SELECT | BUTTON_REPEAT)
+#define OSCILLOSCOPE_PAUSE        BUTTON_PLAY
+#define OSCILLOSCOPE_SPEED_UP     BUTTON_RIGHT
+#define OSCILLOSCOPE_SPEED_DOWN   BUTTON_LEFT
+#define OSCILLOSCOPE_VOL_UP       BUTTON_UP
+#define OSCILLOSCOPE_VOL_DOWN     BUTTON_DOWN
 
 #endif
+
+/* colours */
+#if LCD_DEPTH > 1
+#ifdef HAVE_LCD_COLOR
+#define BACKG_COLOR  LCD_BLACK
+#define GRAPH_COLOR  LCD_RGBPACK(128, 255, 0)
+#define CURSOR_COLOR LCD_RGBPACK(255, 0, 0)
+#else
+#define BACKG_COLOR  LCD_WHITE
+#define GRAPH_COLOR  LCD_BLACK
+#define CURSOR_COLOR LCD_DARKGRAY
+#endif
+#endif
+
+enum { DRAW_FILLED, DRAW_LINE, DRAW_PIXEL, MAX_DRAW };
+enum { ADV_SCROLL, ADV_WRAP, MAX_ADV };
+enum { OSC_HORIZ, OSC_VERT, MAX_OSC };
+
+#define CFGFILE_VERSION 0     /* Current config file version */
+#define CFGFILE_MINVERSION 0  /* Minimum config file version to accept */
+
+
+#define MAX_PEAK 0x8000
 
 #if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
 #define mas_codec_readreg(x) rand()%MAX_PEAK
 #endif
 
-/* prototypes */
-
-void anim_horizontal(int, int);
-void anim_vertical(int, int);
-
 /* global variables */
 
 struct plugin_api* rb;     /* global api struct pointer */
 
-int  osc_mode = OSC_MODE_FILLED;
-int  osc_delay = 2;        /* in ticks */
-bool osc_scroll = true;
-void (*anim)(int, int) = anim_horizontal;
+/* settings */
+int osc_delay = 2;  /* in ticks */
+int osc_draw = DRAW_FILLED;
+int osc_advance = ADV_SCROLL;
+int osc_orientation = OSC_HORIZ;
+
+static const char cfg_filename[] =  "oscilloscope.cfg";
+static char *draw_str[3]        = { "filled", "line", "pixel" };
+static char *advance_str[2]     = { "scroll", "wrap" };
+static char *orientation_str[2] = { "horizontal", "vertical" };
+
+struct configdata config[] = {
+   { TYPE_INT,  1, 99, &osc_delay, "delay", NULL, NULL },
+   { TYPE_ENUM, 0, MAX_DRAW, &osc_draw, "draw", draw_str, NULL },
+   { TYPE_ENUM, 0, MAX_ADV, &osc_advance, "advance", advance_str, NULL },
+   { TYPE_ENUM, 0, MAX_OSC, &osc_orientation, "orientation", orientation_str, NULL }
+};
 
 long last_tick = 0;  /* time of last drawing */
 int last_pos = 0;    /* last x or y drawing position. Reset for aspect switch. */
@@ -157,7 +181,7 @@ void anim_horizontal(int cur_left, int cur_right)
 
     if (cur_x >= LCD_WIDTH)
     {
-        if (osc_scroll)  /* scroll */
+        if (osc_advance == ADV_SCROLL)
         {
             int shift = cur_x - (LCD_WIDTH-1);
             xlcd_scroll_left(shift);
@@ -165,7 +189,7 @@ void anim_horizontal(int cur_left, int cur_right)
             cur_x -= shift;
             last_pos -= shift;
         }
-        else             /* wrap */
+        else
         {
             cur_x -= LCD_WIDTH;
         }
@@ -174,18 +198,18 @@ void anim_horizontal(int cur_left, int cur_right)
 
     if (cur_x > last_pos)
     {
-        rb->lcd_fillrect(last_pos + 1, 0, d + 2, LCD_HEIGHT);
+        rb->lcd_fillrect(last_pos + 1, 0, d, LCD_HEIGHT);
     }
     else
     {
-        rb->lcd_fillrect(last_pos + 1, 0, (LCD_WIDTH-1) - last_pos, LCD_HEIGHT);
-        rb->lcd_fillrect(0, 0, cur_x + 2, LCD_HEIGHT);
+        rb->lcd_fillrect(last_pos + 1, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
+        rb->lcd_fillrect(0, 0, cur_x + 1, LCD_HEIGHT);
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    switch (osc_mode)
+    switch (osc_draw)
     {
-        case OSC_MODE_FILLED:
+        case DRAW_FILLED:
             left = last_left;
             right = last_right;
             dl = (cur_left  - left)  / d;
@@ -206,7 +230,7 @@ void anim_horizontal(int cur_left, int cur_right)
             }
             break;
 
-        case OSC_MODE_OUTLINE:
+        case DRAW_LINE:
             if (cur_x > last_pos)
             {
                 rb->lcd_drawline(
@@ -230,21 +254,24 @@ void anim_horizontal(int cur_left, int cur_right)
                     LCD_WIDTH, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16)
                 );
                 rb->lcd_drawline(
-                    0, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16),
-                    cur_x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * cur_left) >> 16)
-                );
-                rb->lcd_drawline(
                     last_pos, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * last_right) >> 16),
                     LCD_WIDTH, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16)
                 );
-                rb->lcd_drawline(
-                    0, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16),
-                    cur_x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * cur_right) >> 16)
-                );
+                if (cur_x > 0)
+                {
+                    rb->lcd_drawline(
+                        0, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * left) >> 16),
+                        cur_x, LCD_HEIGHT/2-1 - (((LCD_HEIGHT-2) * cur_left) >> 16)
+                    );
+                    rb->lcd_drawline(
+                        0, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * right) >> 16),
+                        cur_x, LCD_HEIGHT/2+1 + (((LCD_HEIGHT-2) * cur_right) >> 16)
+                    );
+                }
             }
             break;
             
-        case OSC_MODE_PIXEL:
+        case DRAW_PIXEL:
             left = last_left;
             right = last_right;
             dl = (cur_left - left) / d;
@@ -266,20 +293,30 @@ void anim_horizontal(int cur_left, int cur_right)
     }
     last_left  = cur_left;
     last_right = cur_right;
-
+    
     if (full_update)
     {
         rb->lcd_update();
     }
     else
     {
+#if LCD_DEPTH > 1                 /* cursor bar */    
+        rb->lcd_set_foreground(CURSOR_COLOR);
+        rb->lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1); 
+        rb->lcd_set_foreground(GRAPH_COLOR);
+#else
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_vline(cur_x + 1, 0, LCD_HEIGHT-1);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+#endif
+
         if (cur_x > last_pos)
         {
             rb->lcd_update_rect(last_pos, 0, cur_x - last_pos + 2, LCD_HEIGHT);
         }
         else
         {
-            rb->lcd_update_rect(last_pos, 0, (LCD_WIDTH-1) - last_pos, LCD_HEIGHT);
+            rb->lcd_update_rect(last_pos, 0, LCD_WIDTH - last_pos, LCD_HEIGHT);
             rb->lcd_update_rect(0, 0, cur_x + 2, LCD_HEIGHT);
         }
     }
@@ -309,7 +346,7 @@ void anim_vertical(int cur_left, int cur_right)
 
     if (cur_y >= LCD_HEIGHT)
     {
-        if (osc_scroll)  /* scroll */
+        if (osc_advance == ADV_SCROLL)
         {
             int shift = cur_y - (LCD_HEIGHT-1);
             xlcd_scroll_up(shift);
@@ -317,7 +354,7 @@ void anim_vertical(int cur_left, int cur_right)
             cur_y -= shift;
             last_pos -= shift;
         }
-        else             /* wrap */
+        else 
         {
             cur_y -= LCD_HEIGHT;
         }
@@ -326,18 +363,18 @@ void anim_vertical(int cur_left, int cur_right)
 
     if (cur_y > last_pos)
     {
-        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, d + 2);
+        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, d);
     }
     else
     {
-        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, (LCD_HEIGHT-1) - last_pos);
-        rb->lcd_fillrect(0, 0, LCD_WIDTH, cur_y + 2);
+        rb->lcd_fillrect(0, last_pos + 1, LCD_WIDTH, LCD_HEIGHT - last_pos);
+        rb->lcd_fillrect(0, 0, LCD_WIDTH, cur_y + 1);
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    switch (osc_mode)
+    switch (osc_draw)
     {
-        case OSC_MODE_FILLED:
+        case DRAW_FILLED:
             left = last_left;
             right = last_right;
             dl = (cur_left  - left)  / d;
@@ -358,7 +395,7 @@ void anim_vertical(int cur_left, int cur_right)
             }
             break;
 
-        case OSC_MODE_OUTLINE:
+        case DRAW_LINE:
             if (cur_y > last_pos)
             {
                 rb->lcd_drawline(
@@ -382,21 +419,24 @@ void anim_vertical(int cur_left, int cur_right)
                     LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), LCD_HEIGHT
                 );
                 rb->lcd_drawline(
-                    LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), 0,
-                    LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * cur_left) >> 16), cur_y
-                );
-                rb->lcd_drawline(
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * last_right) >> 16), last_pos,
                     LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), LCD_HEIGHT
                 );
-                rb->lcd_drawline(
-                    LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), 0,
-                    LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * cur_right) >> 16), cur_y
-                );
+                if (cur_y > 0)
+                {
+                    rb->lcd_drawline(
+                        LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * left) >> 16), 0,
+                        LCD_WIDTH/2-1 - (((LCD_WIDTH-2) * cur_left) >> 16), cur_y
+                    );
+                    rb->lcd_drawline(
+                        LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * right) >> 16), 0,
+                        LCD_WIDTH/2+1 + (((LCD_WIDTH-2) * cur_right) >> 16), cur_y
+                    );
+                }
             }
             break;
             
-        case OSC_MODE_PIXEL:
+        case DRAW_PIXEL:
             left = last_left;
             right = last_right;
             dl = (cur_left - left) / d;
@@ -435,13 +475,23 @@ void anim_vertical(int cur_left, int cur_right)
     }
     else
     {
+#if LCD_DEPTH > 1               /* cursor bar */
+        rb->lcd_set_foreground(CURSOR_COLOR);
+        rb->lcd_hline(0, LCD_WIDTH-1, cur_y + 1); 
+        rb->lcd_set_foreground(GRAPH_COLOR);
+#else
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        rb->lcd_hline(0, LCD_WIDTH-1, cur_y + 1);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+#endif
+
         if (cur_y > last_pos)
         {
             rb->lcd_update_rect(0, last_pos, LCD_WIDTH, cur_y - last_pos + 2);
         }
         else
         {
-            rb->lcd_update_rect(0, last_pos, LCD_WIDTH, (LCD_HEIGHT-1) - last_pos);
+            rb->lcd_update_rect(0, last_pos, LCD_WIDTH, LCD_HEIGHT - last_pos);
             rb->lcd_update_rect(0, 0, LCD_WIDTH, cur_y + 2);
         }
     }
@@ -451,9 +501,11 @@ void anim_vertical(int cur_left, int cur_right)
 void cleanup(void *parameter)
 {
     (void)parameter;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_DEFAULT_FG);
     rb->lcd_set_background(LCD_DEFAULT_BG);
+#endif
+#ifdef HAVE_LCD_COLOR
     rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
 #endif
 }
@@ -470,12 +522,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     xlcd_init(rb);
-    
-#ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_RGBPACK(128, 255, 0));
-    rb->lcd_set_background(LCD_BLACK);
+    configfile_init(rb);
+
+    configfile_load(cfg_filename, config, sizeof(config) / sizeof(config[0]),
+                    CFGFILE_MINVERSION);
+
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(GRAPH_COLOR);
+    rb->lcd_set_background(BACKG_COLOR);
     rb->lcd_clear_display();
     rb->lcd_update();
+#endif
+#ifdef HAVE_LCD_COLOR
     rb->backlight_set_timeout(1); /* keep the light on */
 #endif
     rb->lcd_getstringsize("A", NULL, &font_height);
@@ -494,7 +552,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #elif (CONFIG_CODEC == SWCODEC)
             rb->pcm_calculate_peaks(&left, &right);
 #endif
-            anim(left, right);
+            if (osc_orientation == OSC_HORIZ)
+                anim_horizontal(left, right);
+            else
+                anim_vertical(left, right);
         }
 
         tell_speed = false;
@@ -505,23 +566,25 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 exit = true;
                 break;
 
-            case OSCILLOSCOPE_SCROLL:
-                osc_scroll = !osc_scroll;
+            case OSCILLOSCOPE_ADVMODE:
+                if (++osc_advance >= MAX_ADV)
+                    osc_advance = 0;
                 break;
 
-            case OSCILLOSCOPE_MODE:
-#ifdef OSCILLOSCOPE_MODE_PRE
-                if (lastbutton != OSCILLOSCOPE_MODE_PRE)
+            case OSCILLOSCOPE_DRAWMODE:
+#ifdef OSCILLOSCOPE_DRAWMODE_PRE
+                if (lastbutton != OSCILLOSCOPE_DRAWMODE_PRE)
                     break;
 #endif
-                if (++osc_mode >= OSC_MODE_COUNT)
-                    osc_mode = 0;
+                if (++osc_draw >= MAX_DRAW)
+                    osc_draw = 0;
                 break;
                 
             case OSCILLOSCOPE_ORIENTATION:
-                anim = (anim == anim_horizontal) ? anim_vertical : anim_horizontal;
+                if (++osc_orientation >= MAX_OSC)
+                    osc_orientation = 0;
                 last_pos = 0;
-                last_tick = 0;           
+                last_tick = 0;
                 displaymsg = false;
                 rb->lcd_clear_display();
                 rb->lcd_update();
@@ -585,6 +648,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
     }
     cleanup(NULL);
+    configfile_save(cfg_filename, config, sizeof(config) / sizeof(config[0]),
+                    CFGFILE_VERSION);
     return PLUGIN_OK;
 }
 #endif /* HAVE_LCD_BITMAP */
