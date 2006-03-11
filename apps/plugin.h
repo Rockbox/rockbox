@@ -346,9 +346,11 @@ struct plugin_api {
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
     void (*pcm_play_pause)(bool play);
-    void (*pcm_calculate_peaks)(int *left, int *right);
 #endif
 #endif /* !SIMULATOR */
+#if CONFIG_CODEC == SWCODEC
+    void (*pcm_calculate_peaks)(int *left, int *right);
+#endif
 
     /* playback control */
     void (*PREFIX(audio_play))(long offset);

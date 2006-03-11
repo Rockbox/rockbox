@@ -292,8 +292,10 @@ static const struct plugin_api rockbox_api = {
     pcm_set_frequency,
     pcm_is_playing,
     pcm_play_pause,
-    pcm_calculate_peaks,
 #endif
+#endif
+#if CONFIG_CODEC == SWCODEC
+    pcm_calculate_peaks,
 #endif
 
     /* playback control */
