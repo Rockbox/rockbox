@@ -24,9 +24,6 @@ dice.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 
 #if CONFIG_LCD != LCD_IPOD2BPP     /* Plugins needing the grayscale lib */
-#ifndef HAVE_LCD_COLOR
-grayscale.c
-#endif
 fire.c
 jpeg.c
 mandelbrot.c
