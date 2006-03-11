@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
+#include "debug.h"
 #include "kernel.h"
 #include "sound.h"
 #include "SDL.h"
@@ -209,54 +210,50 @@ void pcm_calculate_peaks(int *left, int *right)
 
 void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 {
-    Uint32 pcm_data_played, need_to_play;
+    Uint32 have_now;
     FILE *debug = (FILE *)udata;
 
     /* At all times we need to write a full 'len' bytes to stream. */
 
     if (pcm_data_size > 0) {
-        /* We have some PCM data to play. Play as much as we can. */
+        have_now = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
 
-        pcm_data_played = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
-
-        memcpy(stream, pcm_data, pcm_data_played);
+        memcpy(stream, pcm_data, have_now);
 
         if (debug != NULL) {
-            fwrite(pcm_data, sizeof(Uint8), pcm_data_played, debug);
+            fwrite(pcm_data, sizeof(Uint8), have_now, debug);
         }
-        
-        stream += pcm_data_played;
-        need_to_play = len - pcm_data_played;
-        pcm_data += pcm_data_played;
-        pcm_data_size -= pcm_data_played;
+        stream += have_now;
+        len -= have_now;
+        pcm_data += have_now;
+        pcm_data_size -= have_now;
+    }
 
-        while(need_to_play > 0) {
-            /* Loop until we have written enough */
-
+    while (len > 0)
+    {
+        if (callback_for_more) {
             callback_for_more(&pcm_data, &pcm_data_size);
-
-            if (pcm_data_size > 0) {
-                /* We got more data */
-                pcm_data_played = (need_to_play > pcm_data_size) ? pcm_data_size : need_to_play;
-
-                memcpy(stream, pcm_data, pcm_data_played);
-
-                if (debug != NULL) {
-                    fwrite(pcm_data, sizeof(Uint8), pcm_data_played, debug);
-                }
-
-                stream += pcm_data_played;
-                need_to_play -= pcm_data_played;
-                pcm_data += pcm_data_played;
-                pcm_data_size -= pcm_data_played;
-            }
+        } else {
+            pcm_data = NULL;
+            pcm_data_size = 0;
         }
-    } else {
-        pcm_data_size = 0;
-        pcm_data = NULL;
+        if (pcm_data_size > 0) {
+            have_now = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
 
-        /* No data, try and get some */
-        callback_for_more(&pcm_data, &pcm_data_size);
+            memcpy(stream, pcm_data, have_now);
+
+            if (debug != NULL) {
+                fwrite(pcm_data, sizeof(Uint8), have_now, debug);
+            }
+            stream += have_now;
+            len -= have_now;
+            pcm_data += have_now;
+            pcm_data_size -= have_now;
+        } else {
+            DEBUGF("sdl_audio_callback: No Data.\n");
+            sdl_dma_stop();
+            break;
+        }
     }
 }
 
