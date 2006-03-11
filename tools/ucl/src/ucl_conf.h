@@ -181,7 +181,7 @@
 
 
 #if !defined(SIZEOF_SIZE_T)
-#  define SIZEOF_SIZE_T             SIZEOF_UNSIGNED
+#  define SIZEOF_SIZE_T             SIZEOF_UNSIGNED_LONG
 #endif
 #if !defined(SIZE_T_MAX)
 #  define SIZE_T_MAX                UCL_UTYPE_MAX(SIZEOF_SIZE_T)
