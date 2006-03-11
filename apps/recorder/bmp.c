@@ -119,7 +119,7 @@ int read_bmp_file(char* filename,
     unsigned char bmpbuf[LCD_WIDTH*sizeof(struct rgb_quad)]; /* Buffer for one line */
 
 #if LCD_DEPTH == 1
-    (void)format;
+    format = FORMAT_MONO;
 #else
     bool transparent;
     
