@@ -259,6 +259,8 @@ int kbd_input(char* text, int buflen)
     int button, lastbutton = 0;
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
+    bool buttonbar_config = global_settings.buttonbar;
+    global_settings.buttonbar = true;
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
@@ -401,6 +403,9 @@ int kbd_input(char* text, int buflen)
 
             case KBD_ABORT:
                 lcd_setfont(FONT_UI);
+#ifdef HAS_BUTTONBAR
+                global_settings.buttonbar=buttonbar_config;
+#endif
                 return -1;
                 break;
 
@@ -734,6 +739,9 @@ int kbd_input(char* text, int buflen)
         if (button != BUTTON_NONE)
             lastbutton = button;
     }
+#ifdef HAS_BUTTONBAR
+    global_settings.buttonbar=buttonbar_config;
+#endif
     lcd_setfont(FONT_UI);
 
     return 0;
