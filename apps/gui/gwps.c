@@ -802,29 +802,6 @@ long gui_wps_show(void)
 /* needs checking if needed end*/
 
 /* wps_data*/
-/* initial setup of wps_data */
-void wps_data_init(struct wps_data *wps_data)
-{
-    int i;
-#ifdef HAVE_LCD_BITMAP
-    for (i = 0; i < MAX_IMAGES; i++) {
-        wps_data->img[i].loaded = false;
-        wps_data->img[i].display = false;
-        wps_data->img[i].always_display = false;
-    }
-    wps_data->wps_sb_tag = false;
-    wps_data->show_sb_on_wps = false;
-    wps_data->progressbar.have_bitmap_pb=false;
-#else /* HAVE_LCD_CHARCELLS */
-    for(i = 0; i < 8; i++)
-        wps_data->wps_progress_pat[i] = 0;
-    wps_data->full_line_progressbar = 0;
-#endif
-    wps_data->format_buffer[0] = '\0';
-    wps_data->wps_loaded = false;
-    wps_data->peak_meter_enabled = false;
-}
-
 #ifdef HAVE_LCD_BITMAP
 /* Clear the WPS image cache */
 static void wps_clear(struct wps_data *data )
@@ -844,11 +821,32 @@ static void wps_clear(struct wps_data *data )
 #define wps_clear(a)
 #endif
 
+/* initial setup of wps_data */
+void wps_data_init(struct wps_data *wps_data)
+{
+#ifdef HAVE_LCD_BITMAP
+    wps_clear(wps_data);
+#else /* HAVE_LCD_CHARCELLS */
+    {
+        int i;
+        for(i = 0; i < 8; i++)
+            wps_data->wps_progress_pat[i] = 0;
+        wps_data->full_line_progressbar = 0;
+    }
+#endif
+    wps_data->format_buffer[0] = '\0';
+    wps_data->wps_loaded = false;
+    wps_data->peak_meter_enabled = false;
+}
+
 static void wps_reset(struct wps_data *data)
 {
     data->wps_loaded = false;
     memset(&data->format_buffer, 0, sizeof data->format_buffer);
-    wps_clear(data);
+    wps_data_init(data);
+#ifdef HAVE_LCD_COLOR
+    wps_has_backdrop = false;
+#endif
 }
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
