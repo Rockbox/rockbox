@@ -104,9 +104,6 @@ static const struct plugin_api rockbox_api = {
     PREFIX(lcd_icon),
     lcd_double_height,
 #else
-#ifndef SIMULATOR
-    lcd_roll,
-#endif
     lcd_set_drawmode,
     lcd_get_drawmode,
     lcd_setfont,
@@ -155,9 +152,6 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_puts,
     lcd_remote_puts_scroll,
     lcd_remote_stop_scroll,
-#ifndef SIMULATOR
-    lcd_remote_roll,
-#endif
     lcd_remote_set_drawmode,
     lcd_remote_get_drawmode,
     lcd_remote_setfont,
@@ -245,6 +239,14 @@ static const struct plugin_api rockbox_api = {
     profile_func_exit,
 #endif
 
+#ifdef SIMULATOR
+    /* special simulator hooks */
+#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+    sim_lcd_ex_init,
+    sim_lcd_ex_update_rect,
+#endif
+#endif
+
     /* strings and memory */
     snprintf,
     strcpy,
@@ -290,6 +292,7 @@ static const struct plugin_api rockbox_api = {
     pcm_set_frequency,
     pcm_is_playing,
     pcm_play_pause,
+    pcm_calculate_peaks,
 #endif
 #endif
 
@@ -401,18 +404,10 @@ static const struct plugin_api rockbox_api = {
     screen_dump_set_hook,
 #endif
     show_logo,
+    tree_get_context,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    tree_get_context,
-#if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
-    sim_lcd_ex_init,
-    sim_lcd_ex_update_rect,
-#endif
-
-#if (CONFIG_CODEC == SWCODEC)
-    pcm_calculate_peaks,
-#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -44,7 +44,6 @@ chip8.c
 demystify.c
 flipit.c
 minesweeper.c
-oscillograph.c
 oscilloscope.c
 pong.c
 rockblox.c

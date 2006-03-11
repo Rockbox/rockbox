@@ -99,12 +99,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 10
+#define PLUGIN_API_VERSION 11
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 10
+#define PLUGIN_MIN_API_VERSION 11
 
 /* plugin return codes */
 enum plugin_status {
@@ -137,9 +137,6 @@ struct plugin_api {
     void (*PREFIX(lcd_icon))(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
-#ifndef SIMULATOR
-    void (*lcd_roll)(int pixels);
-#endif
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);
@@ -200,9 +197,6 @@ struct plugin_api {
     void (*lcd_remote_puts)(int x, int y, const unsigned char *string);
     void (*lcd_remote_lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_remote_lcd_stop_scroll)(void);
-#ifndef SIMULATOR
-    void (*lcd_remote_roll)(int pixels);
-#endif
     void (*lcd_remote_set_drawmode)(int mode);
     int  (*lcd_remote_get_drawmode)(void);
     void (*lcd_remote_setfont)(int font);
@@ -298,6 +292,14 @@ struct plugin_api {
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
 
+#ifdef SIMULATOR
+    /* special simulator hooks */
+#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+    void (*sim_lcd_ex_init)(int shades, unsigned long (*getpixel)(int, int));
+    void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
+#endif
+#endif
+
     /* strings and memory */
     int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
     char* (*strcpy)(char *dst, const char *src);
@@ -344,6 +346,7 @@ struct plugin_api {
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
     void (*pcm_play_pause)(bool play);
+    void (*pcm_calculate_peaks)(int *left, int *right);
 #endif
 #endif /* !SIMULATOR */
 
@@ -466,16 +469,7 @@ struct plugin_api {
     void (*screen_dump_set_hook)(void (*hook)(int fh));
 #endif
     int (*show_logo)(void);
-
     struct tree_context* (*tree_get_context)(void);
-#if defined(SIMULATOR) && defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
-    void (*sim_lcd_ex_init)(int shades, unsigned long (*getpixel)(int, int));
-    void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
-#endif
-    
-#if (CONFIG_CODEC == SWCODEC)
-    void (*pcm_calculate_peaks)(int *left, int *right);
-#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     

@@ -226,18 +226,6 @@ void lcd_set_flip(bool yesno)
 #endif
 }
 
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_HEIGHT. */
-void lcd_roll(int lines)
-{
-    lcd_write_command(LCD_SET_DISPLAY_START_LINE | (lines & (LCD_HEIGHT-1)));
-}
-
 #endif /* !SIMULATOR */
 
 /* LCD init */

@@ -141,19 +141,6 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
     (void)stride;
 }
 
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_HEIGHT. */
-void lcd_roll(int lines)
-{
-    /* TODO Implement lcd_roll() */
-    lines &= LCD_HEIGHT-1;
-}
-
 /*** hardware configuration ***/
 
 /* Update the display.
@@ -312,19 +299,6 @@ void lcd_set_flip(bool yesno)
 {
   /* TODO: Implement lcd_set_flip() */
   (void)yesno;
-}
-
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_HEIGHT. */
-void lcd_roll(int lines)
-{
-    /* TODO: Implement lcd_roll() */
-    lines &= LCD_HEIGHT-1;
 }
 
 /* LCD init */

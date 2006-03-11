@@ -136,19 +136,6 @@ void lcd_set_flip(bool yesno)
     }
 }
 
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_HEIGHT. */
-void lcd_roll(int lines)
-{
-    lines &= LCD_HEIGHT-1;
-    lcd_write_command_ex(LCD_CNTL_DISPLAY_START_LINE, lines, -1);
-}
-
 #endif /* !SIMULATOR */
 
 /* LCD init */
@@ -163,8 +150,6 @@ void lcd_init(void)
 
 void lcd_init(void)
 {
-    static unsigned char area_data[4] = { 0x01, 0x00, 0x7f, 0x80 };
-
     /* GPO35 is the LCD A0 pin
        GPO46 is LCD RESET */
     or_l(0x00004008, &GPIO1_OUT);
@@ -197,9 +182,6 @@ void lcd_init(void)
     lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x16, -1);
     sleep(HZ/10);                               /* 100 ms pause */
     lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x17, -1);
-
-    lcd_write_command(LCD_CNTL_AREA_SCROLL);
-    lcd_write_data(area_data, sizeof(area_data));
 
     lcd_write_command_ex(LCD_CNTL_DISPLAY_START_LINE, 0, -1);
     lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x42, -1);

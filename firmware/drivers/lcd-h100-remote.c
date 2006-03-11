@@ -100,7 +100,6 @@ static bool remote_initialized = false;
 static bool cached_invert = false;
 static bool cached_flip = false;
 static int cached_contrast = 32;
-static int cached_roll = 0;
 #endif
 
 /* scrolling */
@@ -393,30 +392,6 @@ void lcd_remote_set_flip(bool yesno)
     }
 }
 
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware 
- * remapping only and all operations on the lcd are affected.
- * -> 
- * @param int lines - The number of lines that are rolled. 
- *  The value must be 0 <= pixels < LCD_REMOTE_HEIGHT. */
-void lcd_remote_roll(int lines)
-{
-    char data[2];
-    
-    cached_roll = lines;
-
-    if (remote_initialized)
-    {
-        lines &= LCD_REMOTE_HEIGHT-1;
-        data[0] = lines & 0xff;
-        data[1] = lines >> 8;
-    
-        lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
-        lcd_remote_write_data(data, 2);
-    }
-}
-
 /* The actual LCD init */
 static void remote_lcd_init(void)
 {
@@ -443,7 +418,6 @@ static void remote_lcd_init(void)
     lcd_remote_set_flip(cached_flip);
     lcd_remote_set_contrast(cached_contrast);
     lcd_remote_set_invert_display(cached_invert);
-    lcd_remote_roll(cached_roll);
 }
 
 static int _remote_type = 0;
