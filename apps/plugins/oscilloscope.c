@@ -130,22 +130,28 @@ enum { OSC_HORIZ, OSC_VERT, MAX_OSC };
 struct plugin_api* rb;     /* global api struct pointer */
 
 /* settings */
-int osc_delay = 2;  /* in ticks */
-int osc_draw = DRAW_FILLED;
-int osc_advance = ADV_SCROLL;
-int osc_orientation = OSC_HORIZ;
+struct osc_config {
+    int delay;     /* in ticks */
+    int draw;
+    int advance;
+    int orientation;
+};
+
+struct osc_config osc_disk = { 2, DRAW_FILLED, ADV_SCROLL, OSC_HORIZ };
+struct osc_config osc;       /* running config */
 
 static const char cfg_filename[] =  "oscilloscope.cfg";
 static char *draw_str[3]        = { "filled", "line", "pixel" };
 static char *advance_str[2]     = { "scroll", "wrap" };
 static char *orientation_str[2] = { "horizontal", "vertical" };
 
-struct configdata config[] = {
-   { TYPE_INT,  1, 99, &osc_delay, "delay", NULL, NULL },
-   { TYPE_ENUM, 0, MAX_DRAW, &osc_draw, "draw", draw_str, NULL },
-   { TYPE_ENUM, 0, MAX_ADV, &osc_advance, "advance", advance_str, NULL },
-   { TYPE_ENUM, 0, MAX_OSC, &osc_orientation, "orientation", orientation_str, NULL }
+struct configdata disk_config[] = {
+   { TYPE_INT,  1, 99, &osc_disk.delay, "delay", NULL, NULL },
+   { TYPE_ENUM, 0, MAX_DRAW, &osc_disk.draw, "draw", draw_str, NULL },
+   { TYPE_ENUM, 0, MAX_ADV, &osc_disk.advance, "advance", advance_str, NULL },
+   { TYPE_ENUM, 0, MAX_OSC, &osc_disk.orientation, "orientation", orientation_str, NULL }
 };
+
 
 long last_tick = 0;  /* time of last drawing */
 int last_pos = 0;    /* last x or y drawing position. Reset for aspect switch. */
@@ -163,7 +169,7 @@ void anim_horizontal(int cur_left, int cur_right)
     int cur_x, x;
     int left, right, dl, dr;
     long cur_tick = *rb->current_tick;
-    long d = (cur_tick - last_tick) / osc_delay;
+    long d = (cur_tick - last_tick) / osc.delay;
     bool full_update = false;
 
     if (d == 0)  /* too early, bail out */
@@ -181,7 +187,7 @@ void anim_horizontal(int cur_left, int cur_right)
 
     if (cur_x >= LCD_WIDTH)
     {
-        if (osc_advance == ADV_SCROLL)
+        if (osc.advance == ADV_SCROLL)
         {
             int shift = cur_x - (LCD_WIDTH-1);
             xlcd_scroll_left(shift);
@@ -207,7 +213,7 @@ void anim_horizontal(int cur_left, int cur_right)
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    switch (osc_draw)
+    switch (osc.draw)
     {
         case DRAW_FILLED:
             left = last_left;
@@ -328,7 +334,7 @@ void anim_vertical(int cur_left, int cur_right)
     int cur_y, y;
     int left, right, dl, dr;
     long cur_tick = *rb->current_tick;
-    long d = (cur_tick - last_tick) / osc_delay;
+    long d = (cur_tick - last_tick) / osc.delay;
     bool full_update = false;
 
     if (d == 0)  /* too early, bail out */
@@ -346,7 +352,7 @@ void anim_vertical(int cur_left, int cur_right)
 
     if (cur_y >= LCD_HEIGHT)
     {
-        if (osc_advance == ADV_SCROLL)
+        if (osc.advance == ADV_SCROLL)
         {
             int shift = cur_y - (LCD_HEIGHT-1);
             xlcd_scroll_up(shift);
@@ -372,7 +378,7 @@ void anim_vertical(int cur_left, int cur_right)
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
-    switch (osc_draw)
+    switch (osc.draw)
     {
         case DRAW_FILLED:
             left = last_left;
@@ -524,8 +530,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
     configfile_init(rb);
 
-    configfile_load(cfg_filename, config, sizeof(config) / sizeof(config[0]),
+    configfile_load(cfg_filename, disk_config,
+                    sizeof(disk_config) / sizeof(disk_config[0]),
                     CFGFILE_MINVERSION);
+    rb->memcpy(&osc, &osc_disk, sizeof(osc));   /* copy to running config */
 
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(GRAPH_COLOR);
@@ -544,7 +552,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
             int left, right;
 
-            rb->sleep(MAX(last_tick + osc_delay - *rb->current_tick - 1, 0));
+            rb->sleep(MAX(last_tick + osc.delay - *rb->current_tick - 1, 0));
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
             left = rb->mas_codec_readreg(0xC);
@@ -552,7 +560,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #elif (CONFIG_CODEC == SWCODEC)
             rb->pcm_calculate_peaks(&left, &right);
 #endif
-            if (osc_orientation == OSC_HORIZ)
+            if (osc.orientation == OSC_HORIZ)
                 anim_horizontal(left, right);
             else
                 anim_vertical(left, right);
@@ -567,8 +575,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 break;
 
             case OSCILLOSCOPE_ADVMODE:
-                if (++osc_advance >= MAX_ADV)
-                    osc_advance = 0;
+                if (++osc.advance >= MAX_ADV)
+                    osc.advance = 0;
                 break;
 
             case OSCILLOSCOPE_DRAWMODE:
@@ -576,13 +584,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 if (lastbutton != OSCILLOSCOPE_DRAWMODE_PRE)
                     break;
 #endif
-                if (++osc_draw >= MAX_DRAW)
-                    osc_draw = 0;
+                if (++osc.draw >= MAX_DRAW)
+                    osc.draw = 0;
                 break;
                 
             case OSCILLOSCOPE_ORIENTATION:
-                if (++osc_orientation >= MAX_OSC)
-                    osc_orientation = 0;
+                if (++osc.orientation >= MAX_OSC)
+                    osc.orientation = 0;
                 last_pos = 0;
                 last_tick = 0;
                 displaymsg = false;
@@ -597,16 +605,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 
             case OSCILLOSCOPE_SPEED_UP:
             case OSCILLOSCOPE_SPEED_UP | BUTTON_REPEAT:
-                if (osc_delay > 1)
+                if (osc.delay > 1)
                 {
-                    osc_delay--;
+                    osc.delay--;
                     tell_speed = true;
                 }
                 break;
                 
             case OSCILLOSCOPE_SPEED_DOWN:
             case OSCILLOSCOPE_SPEED_DOWN | BUTTON_REPEAT:
-                osc_delay++;
+                osc.delay++;
                 tell_speed = true;
                 break;
 
@@ -643,13 +651,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             
         if (tell_speed)
         {
-            rb->snprintf(message, sizeof(message), "Speed: %d", 100 / osc_delay);
+            rb->snprintf(message, sizeof(message), "Speed: %d", 100 / osc.delay);
             displaymsg = true;
         }
     }
     cleanup(NULL);
-    configfile_save(cfg_filename, config, sizeof(config) / sizeof(config[0]),
-                    CFGFILE_VERSION);
+    if (rb->memcmp(&osc, &osc_disk, sizeof(osc))) /* save settings if changed */
+    {
+        rb->memcpy(&osc_disk, &osc, sizeof(osc));
+        configfile_save(cfg_filename, disk_config,
+                        sizeof(disk_config) / sizeof(disk_config[0]),
+                        CFGFILE_VERSION);
+    }
     return PLUGIN_OK;
 }
 #endif /* HAVE_LCD_BITMAP */
