@@ -489,10 +489,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
     int status;
+#ifdef USE_IRAM
+    void* audiobuf;
+    int audiosize;
+#endif
 
     rb = api;
 
 #ifdef USE_IRAM
+    /* We need to stop audio playback in order to use IRAM, so we grab
+       the audio buffer - but we don't use it. */
+    audiobuf = rb->plugin_get_audio_buffer(&audiosize);
+
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
     rb->memset(iedata, 0, iend - iedata);
 #endif
