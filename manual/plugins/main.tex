@@ -16,7 +16,8 @@ loaded, run and then exited, which returns control to Rockbox.  Music
 will carry on playing whilst plugins are being run.
 
 \section{Games}
-See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}.
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}
+    {See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}.}
 
 \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{\input{plugins/bejeweled.tex}}
 
@@ -71,7 +72,7 @@ They cannot be run directly but are started by ``playing''
 the associated file.  Viewers are stored in the
 \textbf{/.rockbox/viewers/ }directory.
 
-\opt{recorder,recorderv2fm,ondio}{\input{plugins/chip8emulator.tex}}
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{\input{plugins/chip8emulator.tex}}
 
 \opt{recorder,recorderv2fm,ondio,h1xx,h300}{\input{plugins/jpegviewer.tex}}
 

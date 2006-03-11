@@ -1,28 +1,53 @@
 \subsection{\label{ref:Chip8emulator}Chip{}-8 Emulator}
-The Chip{}-8 Emulator allows you to play many old chip8 games found on
-the Net. It modifies Rockbox, so file extensions .ch8 will be
-recognised as chip8 games. Just press PLAY on a .ch8 file to start a
-game.
+Chip8 is a kind of assembly language for a long-gone architecture.
+This plugin runs games written using the chip8 instructions.
+Just press PLAY on a .ch8 file to start a game.
 
 There are lots of tiny Chip8 games (usually only about 256 bytes to a
 couple of KB) which were made popular by the HP48
 calculator's emulator for them. The original Chip8 had
 64x32 pixel graphics, and the new superchip emulator supports 128x64
-graphics, which almost fits on the Recorder's display.
-The only problem is they are based on a 4x4 keyboard, but since most
+graphics.
+
+The only problem is that they are based on a 4x4 keyboard, but since most
 games do not use all of the buttons, this can easily be worked around.
 
-Some places where can you can find .ch8 files:
+To do this, one may put a ".c8k" file with the same name as the
+original program which contains new key mappings (for BLINKY.ch8, one
+writes a BLINKY.c8k file).
+That c8k file contains 16 characters
+describing the mapping from the Chip8 keyboard to the default key
+mapping (that way, several Chip8 keys can be pressed using only one
+Rockbox key). For example, a file containing the single line:\\\\
+\textbf{0122458469ABCDEF}\\\\
+would correspond to the following non-default mappings:\\\\
+3-\textgreater 2\hspace{1cm} 6-\textgreater 8\hspace{1cm} 7-\textgreater 4\hspace{1cm} 8-\textgreater 6\\\\
+Default keymappings:
+\begin{table}[ht!]
+  \begin{center}
+  \begin{footnotesize}
+    \begin{tabular}{@{}*{16}{@{\hspace{1mm}}c@{\hspace{1mm}}|}@{\hspace{1mm}}c@{}}\toprule
+       \textbf{Chip8 key} & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & A & B & C & D & E & F\\
+       \textbf{Key} &
+       \opt{recorder,recorderv2fm}{& F1 & UP & F3 & LEFT & PLAY & RIGHT & F2 & DOWN & ON & & & & & &}
+       \opt{ondio}{& & UP & & LEFT & MODE & RIGHT & & DOWN & & & & & & &}
+       \opt{h1xx}{& & UP & & LEFT & SELECT & RIGHT & & DOWN & & & & & & &}
+       \opt{h300}{& & UP & & LEFT & NAVI & RIGHT & & DOWN & & & & & & &}
+       \opt{ipodcolor,ipodnano}{& & Scroll back & & LEFT & PLAY & RIGHT & & Scroll forward& & & & & & &}
+       \\\bottomrule
+    \end{tabular}
+    \end{footnotesize}
+  \end{center}
+\end{table}
 
+Some places where can you can find .ch8 files:
 \begin{itemize}
-\item The original chip8 patch had several attached:
-\url{http://sourceforge.net/tracker/index.php?func=detail&aid=628509&group_id=44306&atid=439120}
+\item The PluginChip8 page on www.rockbox.org has several attached:
+\url{http://www.rockbox.org/twiki/bin/view/Main/PluginChip8}
 \item Check out the HP48 chip games section:
 \url{http://www.hpcalc.org/hp48/games/chip/}
-\item Check out the PC emulator by the guy who wrote the HP48 emulator:
+\item PC emulator by the guy who wrote the HP48 emulator:
 \url{http://www.pdc.kth.se/~lfo/chip8/CHIP8.htm}
 \item Links to other chip8 emulators: 
 \url{http://www.zophar.net/chip8.html}
 \end{itemize}
-
-
