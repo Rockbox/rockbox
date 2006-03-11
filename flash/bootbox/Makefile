@@ -67,14 +67,8 @@ $(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootbox.bin
 	@$(MKFIRMWARE) $< $@
 
 $(FLASHFILE): $(OBJDIR)/bootbox.bin
-	@a=`uclpack -h 2>/dev/null`; \
-	if test -n "$$a"; then \
-	  echo "UCLPACK bootbox" ; \
-	  uclpack --best --2e $< $@ >/dev/null 2>&1; \
-	else \
-	  echo "no uclpack command found, makes a fake bootbox.ucl"; \
-	  echo "fake" > $@; \
-	fi
+	$(SILENT)(echo "UCLPACK bootbox" ; \
+	$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1;)
 
 include $(TOOLSDIR)/make.inc
 
