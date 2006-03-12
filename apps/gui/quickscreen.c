@@ -20,6 +20,7 @@
 #include "quickscreen.h"
 #ifdef HAS_QUICKSCREEN
 
+#include <stdio.h>
 #include "system.h"
 #include "icons.h"
 #include "textarea.h"
@@ -44,56 +45,44 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
 
 void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
-    int w,h;
     char buffer[30];
     const unsigned char *option;
     const unsigned char *title;
+    const unsigned char *left_right_title;
+    char line_text[40];
 #ifdef HAS_BUTTONBAR
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
     display->setfont(FONT_SYSFIXED);
-    display->getstringsize((unsigned char *)"M", NULL, &h);
+    left_right_title=(unsigned char *)qs->left_right_title;
     /* Displays the icons */
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                         display->width/2 - 16,
-                         display->height/2 - 4, 7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                         display->width/2 - 3,
-                         display->height - h*3, 7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                         display->width/2 + 8,
-                         display->height/2 - 4, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1, 8, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], 1, 24, 7, 8);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1, 40, 7, 8);
 
-    /* Displays the left's text */
-    title=(unsigned char *)qs->left_option->title;
+    /* Displays the first line of text */
     option=(unsigned char *)option_select_get_text(qs->left_option, buffer,
                                                    sizeof buffer);
-    display->putsxy(0, display->height/2 - h*2, title);
-    display->putsxy(0, display->height/2 - h,
-                    (unsigned char *)qs->left_right_title);
-    display->putsxy(0, display->height/2, option);
+    title=(unsigned char *)qs->left_option->title;
+    snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
+    display->puts_scroll(0, 0+!(global_settings.statusbar), line_text);
+    display->puts_scroll(3, 1+!(global_settings.statusbar), option);
 
-    /* Displays the bottom's text */
-    title=(unsigned char *)qs->bottom_option->title;
+    /* Displays the second line of text */
     option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
                                                    sizeof buffer);
-    display->getstringsize(title, &w, &h);
-    display->putsxy((display->width-w)/2, display->height - h*2, title);
-    display->getstringsize(option, &w, &h);
-    display->putsxy((display->width-w)/2, display->height - h, option);
+    title=(unsigned char *)qs->bottom_option->title;
+    display->puts_scroll(0, 2+!(global_settings.statusbar), title);
+    display->puts_scroll(3, 3+!(global_settings.statusbar), option);
 
-    /* Displays the right's text */
-    title=(unsigned char *)qs->right_option->title;
+    /* Displays the third line of text */
     option=(unsigned char *)option_select_get_text(qs->right_option, buffer,
                                                    sizeof buffer);
-    display->getstringsize(title,&w,&h);
-    display->putsxy(display->width - w, display->height/2 - h*2, title);
-    display->getstringsize((unsigned char *)qs->left_right_title, &w, &h);
-    display->putsxy(display->width - w, display->height/2 - h,
-                    (unsigned char *)qs->left_right_title);
-    display->getstringsize(option,&w,&h);
-    display->putsxy(display->width - w, display->height/2, option);
+    title=(unsigned char *)qs->right_option->title;
+    snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
+    display->puts_scroll(0, 4+!(global_settings.statusbar), line_text);
+    display->puts_scroll(3, 5+!(global_settings.statusbar), option);
 
     gui_textarea_update(display);
     display->setfont(FONT_UI);
@@ -108,7 +97,7 @@ void gui_syncquickscreen_draw(struct gui_quickscreen * qs)
 
 bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
-    
+
     switch(button)
     {
         case QUICKSCREEN_LEFT :
