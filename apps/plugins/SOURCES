@@ -77,6 +77,11 @@ rockboy.c
 #endif
 #endif
 
+/* not support recorder models for now */
+#if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
+xobox.c
+#endif
+
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
