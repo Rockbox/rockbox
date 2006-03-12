@@ -300,6 +300,19 @@ void anim_horizontal(int cur_left, int cur_right)
     last_left  = cur_left;
     last_right = cur_right;
     
+    if (displaymsg)
+    {
+        int width;
+        
+        rb->lcd_getstringsize(message, &width, NULL);
+        last_pos -= width - 1;
+        rb->lcd_putsxy(last_pos, 0, message);
+        displaymsg = false;
+
+        if (last_pos < 0)
+            last_pos = 0;
+    }
+
     if (full_update)
     {
         rb->lcd_update();
@@ -468,11 +481,11 @@ void anim_vertical(int cur_left, int cur_right)
     if (displaymsg)
     {
         last_pos -= font_height - 1;
-        if (last_pos < 0)
-            last_pos = LCD_HEIGHT - font_height;
-        
         rb->lcd_putsxy(0, last_pos, message);
         displaymsg = false;
+
+        if (last_pos < 0)
+            last_pos = 0;
     }
 
     if (full_update)
@@ -651,7 +664,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             
         if (tell_speed)
         {
-            rb->snprintf(message, sizeof(message), "Speed: %d", 100 / osc.delay);
+            rb->snprintf(message, sizeof(message), "%s%d", 
+                        (osc.orientation == OSC_VERT) ? "Speed: " : "",
+                        100 / osc.delay);
             displaymsg = true;
         }
     }
