@@ -1084,7 +1084,7 @@ bool browse_id3(void)
             playlist_amount());
         line = draw_id3_item(line, top, LANG_ID3_PLAYLIST, buf);
 
-        snprintf(buf, sizeof(buf), "%d kbps%s", id3->bitrate, 
+        snprintf(buf, sizeof(buf), "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
         line = draw_id3_item(line, top, LANG_ID3_BITRATE, buf);
 
@@ -1118,9 +1118,9 @@ bool browse_id3(void)
             switch(button)
             {
             /* It makes more sense to have the keys mapped "backwards" when
-             * scrolling a list.
+             * scrolling a list on the archos studios/players and the ipod.
              */
-#if defined(HAVE_LCD_BITMAP)
+#if defined(HAVE_LCD_BITMAP) && !(CONFIG_KEYPAD == IPOD_4G_PAD)
             case SETTINGS_INC:
             case SETTINGS_INC | BUTTON_REPEAT:
 #else
@@ -1137,7 +1137,7 @@ bool browse_id3(void)
 
                 break;
 
-#if defined(HAVE_LCD_BITMAP)
+#if defined(HAVE_LCD_BITMAP) && !(CONFIG_KEYPAD == IPOD_4G_PAD)
             case SETTINGS_DEC:
             case SETTINGS_DEC | BUTTON_REPEAT:
 #else
