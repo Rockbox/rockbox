@@ -31,18 +31,27 @@ use stop to exit
 #include "button.h"
 #include "lcd.h"
 
-#define SELECTIONS_SIZE 7
-#define SELECTIONS_ROW 4
-#define LINE_LENGTH 26
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
-#define START_DICE_ROW 0
-#define ROWS 3
-#else
-#define START_DICE_ROW 7
-#define ROWS 2
-#endif
 #define MAX_DICE 12
 #define NUM_SIDE_CHOICES 8
+#if (CONFIG_KEYPAD == PLAYER_PAD)
+    #define SELECTIONS_SIZE 9
+    #define START_DICE_ROW 1
+    #define ROWS 1
+    #define LINE_LENGTH 50
+    #define SELECTIONS_ROW 0
+#else
+    #define SELECTIONS_SIZE 7
+    #define SELECTIONS_ROW 4
+    #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
+        #define START_DICE_ROW 0
+        #define ROWS 3
+        #define LINE_LENGTH 18
+    #else
+        #define START_DICE_ROW 7
+        #define ROWS 2
+        #define LINE_LENGTH 26
+    #endif
+#endif
 
 /* Values for selected */
 #define CHANGE_DICE 0
@@ -242,13 +251,16 @@ static void print_dice(const int dice[], const int total) {
             space -= count;
         }
         if (i > start) {
-            rb->lcd_puts(0,START_DICE_ROW+row,showdice);
+            rb->lcd_puts_scroll(0,START_DICE_ROW+row,showdice);
         } else {
             row--;
             break;
         }
         if (i < end || end == MAX_DICE) break;
     }
+#if (CONFIG_KEYPAD == PLAYER_PAD)
+    (void)total;
+#else
     rb->lcd_puts(0,START_DICE_ROW+(++row)," ");
     if (total > 0) {
         rb->snprintf(showdice,LINE_LENGTH,"Total: %4d",total);
@@ -257,6 +269,7 @@ static void print_dice(const int dice[], const int total) {
     while (row < ROWS+2) {
         rb->lcd_puts(0,START_DICE_ROW+(++row)," ");
     }
+#endif
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
 #endif
@@ -267,6 +280,12 @@ static void print_selections(const int selected,
         const int num_dice,
         const int side_index) {
     char buffer[SELECTIONS_SIZE];
+#if (CONFIG_KEYPAD == PLAYER_PAD)
+    rb->snprintf(buffer, SELECTIONS_SIZE, "%c%2dd%c%3d",
+            selected==CHANGE_DICE?'*':' ', num_dice,
+            selected==CHANGE_SIDES?'*':' ', SIDES[side_index]);
+    rb->lcd_puts(1,SELECTIONS_ROW,buffer);
+#else
     rb->snprintf(
             buffer,SELECTIONS_SIZE,"%2dd%3d",num_dice,SIDES[side_index]);
     rb->lcd_puts(1,SELECTIONS_ROW,buffer);
@@ -275,16 +294,22 @@ static void print_selections(const int selected,
     } else if (selected==CHANGE_SIDES) {
         rb->lcd_puts(1,SELECTIONS_ROW+1,"   ---");
     }
+#endif
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
 #endif
 }
 
 static void print_help() {
+#if (CONFIG_KEYPAD == PLAYER_PAD)
+    rb->lcd_puts_scroll(1,SELECTIONS_ROW, "</>, +/- setup");
+    rb->lcd_puts_scroll(1,SELECTIONS_ROW+1, "on roll, menu exit");
+#else
     rb->lcd_puts(1,START_DICE_ROW,"</> pick dice/sides");
     rb->lcd_puts(1,START_DICE_ROW+1,"+/- change");
     rb->lcd_puts(1,START_DICE_ROW+2,"on/select roll");
     rb->lcd_puts(1,START_DICE_ROW+3,"off exit");
+#endif
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
 #endif
