@@ -1,947 +1,110 @@
 \appendix
-\chapter{The appendix}
-\section{Feature comparison chart}
-\begin{tabular}[c]{|p{10.382cm}|p{2.799cm}|p{2.411cm}|}
-\hline
-{\centering\bfseries\itshape
-FEATURE
-\par}
-&
-{\centering\bfseries\itshape
-ROCKBOX
-\par}
-&
-{\centering\bfseries\itshape
-ARCHOS
-\par}
-\\\hline
-\endhead
-ID3v1 and ID3v2 support 
-&
-Yes 
-&
-ID3v1 
-\\\hline
-Background noise during playback 
-&
-No 
-&
-Yes 
-\\\hline
-Mid{}-track resume 
-&
-Yes 
-&
-No 
-\\\hline
-Mid{}-playlist resume 
-&
-Yes 
-&
-No 
-\\\hline
-Resumed playlist order 
-&
-Yes 
-&
-No 
-\\\hline
-Battery lifetime 
-&
-Longer 
-&
-Long 
-\\\hline
-Battery time indicator 
-&
-Yes 
-&
-No 
-\\\hline
-Customizable font (Recorder) 
-&
-Yes 
-&
-No 
-\\\hline
-Customizable screen info when playing songs 
-&
-Yes 
-&
-No 
-\\\hline
-USB attach/detach without reboot 
-&
-Yes 
-&
-No 
-\\\hline
-Can load another firmware without rebooting 
-&
-Yes 
-&
-No 
-\\\hline
-Playlist load speed, songs/sec 
-&
-3000 {}- 4000 
-&
-15 {}- 20 
-\\\hline
-Max number of songs in a playlist 
-&
-20 000 
-&
-999 
-\\\hline
-Supports bad path prefixes in playlists 
-&
-Yes 
-&
-Yes 
-\\\hline
-Open source/development process 
-&
-Yes 
-&
-No 
-\\\hline
-Corrects reported bugs 
-&
-Yes 
-&
-No 
-\\\hline
-Automatic Volume Control (Recorder) 
-&
-Yes 
-&
-No 
-\\\hline
-Pitch control (Recorder) 
-&
-Yes 
-&
-No 
-\\\hline
-Text File Reader 
-&
-Yes 
-&
-Yes 
-\\\hline
-Games (Recorder) 
-&
-8 
-&
-No 
-\\\hline
-Games (Player) 
-&
-2 
-&
-No 
-\\\hline
-File Delete \& Rename 
-&
-Yes 
-&
-Yes 
-\\\hline
-Playlist Building 
-&
-Yes 
-&
-Yes 
-\\\hline
-Recording (Recorder) 
-&
-Yes 
-&
-Yes 
-\\\hline
-Generates XING VBR header when recording 
-&
-Yes 
-&
-Yes 
-\\\hline
-High Resolution Volume Control 
-&
-Yes 
-&
-No 
-\\\hline
-Deep discharge option (Recorder) 
-&
-Yes 
-&
-No 
-\\\hline
-Customizable backlight timeout 
-&
-Yes 
-&
-Yes 
-\\\hline
-Backlight{}-on when charging option 
-&
-Yes 
-&
-No 
-\\\hline
-Queue function 
-&
-Yes 
-&
-Yes 
-\\\hline
-Supports the XING header 
-&
-Yes 
-&
-Yes 
-\\\hline
-Supports the VBRI header 
-&
-Partly 
-&
-Yes 
-\\\hline
-Max number of files in a directory
-&
-10 000 
-&
-999 
-\\\hline
-Adjustable scroll speed 
-&
-Yes 
-&
-No 
-\\\hline
-Screensaver style demos (Recorder) 
-&
-Yes 
-&
-No 
-\\\hline
-Variable step / accelerating ffwd and rwd 
-&
-Yes 
-&
-No 
-\\\hline
-Visual Progress Bar 
-&
-Yes 
-&
-No 
-\\\hline
-Select/Load configurations
-&
-Yes 
-&
-No 
-\\\hline
-Sleep timer 
-&
-Yes 
-&
-No 
-\\\hline
-Easy User Interface 
-&
-Yes 
-&
-No 
-\\\hline
-Remote Control Controllable 
-&
-Yes 
-&
-Yes 
-\\\hline
-ISO8859{}-1 font support (Player) 
-&
-Yes 
-&
-No 
-\\\hline
-Queue songs to play next 
-&
-Yes 
-&
-Yes 
-\\\hline
-Bookmark positions in songs 
-&
-Yes 
-&
-No 
-\\\hline
-Number of available languages 
-&
-24 
-&
-3 
-\\\hline
-Accurate VBR bitrate display 
-&
-Yes 
-&
-No 
-\\\hline
-FM Tuner support (FM Recorder) 
-&
-Yes 
-&
-Yes 
-\\\hline
-FF/FR with sound 
-&
-No 
-&
-Yes 
-\\\hline
-Pre{}-Recording (Recorders) 
-&
-Yes 
-&
-Yes 
-\\\hline
-Video Playback with sound (Recorders) 
-&
-Yes 
-&
-No 
-\\\hline
-Boot Time from Flash (in seconds) 
-&
-4 
-&
-12 
-\\\hline
-Speaking Menus Support 
-&
-Yes 
-&
-No 
-\\\hline
-\end{tabular}
-
+\chapter{File formats}
 \section{Supported file formats}
-\begin{center}\begin{tabular}{|p{0.46100003cm}|p{3.296cm}|p{12.339cm}|}
-\hline
-&
-{\centering\bfseries\itshape
-FILE TYPE
-\par}
-&
-{\centering\bfseries\itshape
-ACTION
-\par}
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.37cm,height=0.423cm]{images/rockbox-manual-img80.png}
- 
-&
-Directory
-&
-The browser enters that directory
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.45cm,height=0.385cm]{images/rockbox-manual-img81.png}
- 
-&
-.mp3
-&
-Rockbox takes you to the WPS and starts playing the file
-\\\hline
- [Warning: Image ignored]
-% Unhandled or unsupported graphics:
-%\includegraphics[width=0.019cm,height=0.041cm]{images/rockbox-manual-img82.jpg}
- [Warning: Image ignored]
-% Unhandled or unsupported graphics:
-%\includegraphics[width=0.397cm,height=0.45cm]{images/rockbox-manual-img83.png}
- 
-&
-.m3u
-&
-Rockbox loads the playlist and starts playing the first file
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.448cm,height=0.51cm]{images/rockbox-manual-img84.png}
- 
-&
-.ajz/ .mod
-&
-ROLO will load the new firmware
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.467cm,height=0.513cm]{images/rockbox-manual-img85.png}
- 
-&
-.wps
-&
-The new WPS display configuration will be loaded
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.439cm,height=0.437cm]{images/rockbox-manual-img86.png}
- 
-&
-.lng
-&
-That language will replace current one
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.439cm,height=0.483cm]{images/rockbox-manual-img87.png}
- 
-&
-.txt
-&
-This will display the text file using Rockbox text browser plugin
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.445cm,height=0.487cm]{images/rockbox-manual-img88.png}
- 
-&
-.cfg
-&
-The settings file will be loaded
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.492cm,height=0.513cm]{images/rockbox-manual-img89.png}
- 
-&
-.fnt
-&
-This font will replace the current one (Recorder only)
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.413cm,height=0.45cm]{images/rockbox-manual-img90.png}
- 
-&
-.rock
-&
-Starts a Rockbox plugin
-\\\hline
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.413cm,height=0.439cm]{images/rockbox-manual-img91.png}
- 
-&
-.ucl
-&
-This Rockbox image will be flashed into the ROM
-\\\hline
-
 \begin{center}
- [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.318cm,height=0.423cm]{images/rockbox-manual-img92.png}
-
+\begin{tabular}{lll}\toprule
+\textbf{Icon} & \textbf{File Type} & \textbf{Action} \\\midrule
+\includegraphics[width=0.37cm]{appendix/images/icon-directory.png} & Directory & The browser enters that directory \\
+\includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} & Audio file & Rockbox takes you to the WPS and starts playing the file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png} & .m3u & Rockbox loads the playlist and starts playing the first file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} & Rockbox firmware file &  ROLO will load the new firmware \\
+\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} & .wps & The new WPS display configuration will be loaded \\
+\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} & .lng & Loads a language file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-text.png} & .txt & This will display the text file using Rockbox text browser plugin\\
+\includegraphics[width=0.37cm]{appendix/images/icon-config.png} & .cfg & The settings file will be loaded\\
+\includegraphics[width=0.37cm]{appendix/images/icon-font.png} & .fnt & This font will replace the current one\\
+\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} & .rock & Starts a Rockbox plugin\\
+\includegraphics[width=0.37cm]{appendix/images/icon-ucl.png} & .ucl & This Rockbox image will be flashed into the ROM \\
+\includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} & .ch8 & Play a Chip8 game \\
+\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} & .jpg & View a JPEG image \\
+\includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png} & .rvf & View a movie (Rockbox format)\\\bottomrule
+\end{tabular}
 \end{center}
-&
-.ch8
-&
-Play a Chip8 game
-\\\hline
 
-\begin{center}
- [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.318cm,height=0.423cm]{images/rockbox-manual-img93.png}
-
-\end{center}
-&
-.jpg
-&
-View a JPEG image
-\\\hline
-
-\begin{center}
- [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=0.319cm,height=0.42cm]{images/rockbox-manual-img94.png}
-
-\end{center}
-&
-.rvf
-&
-View a movie (Rockbox format)
-\\\hline
-\end{tabular}\end{center}
-
+\chapter{User feedback}
 \section{Bug reports}
 If you experience inappropriate performance from any supported feature,
 please file a bug report on our web page. Do not report missing
 features as bugs, instead file them as feature requests (see below).
 
 For open bug reports refer to
-\url{http://www.rockbox.org/bugs.shtml}{http://www.rockbox.org/bugs.shtml}
+\url{http://www.rockbox.org/bugs/index.php?type=2}
 
-{\bfseries
-Rules for submitting new bug reports:}
+\subsection{Rules for submitting new bug reports}
 
 \begin{enumerate}
 \item  Check that the bug hasn't already been reported
 \item  Always include the following information in your bug report:
 \end{enumerate}
+
 \begin{itemize}
-\item \begin{itemize}
 \item  Which exact model Jukebox you have (as printed on the unit)
 \item  Which exact ROM firmware version you have
 \item  Which exact Rockbox version you are using
 (Menu{}-{\textgreater}Info {}-{\textgreater} Version)
 \item  A step{}-by{}-step description of what you did and what happened
-\item  Whether the problem is repeatable or a one{}-time
-\foreignlanguage{english}{occurrence}
+\item  Whether the problem is repeatable or a one{}-time occurrence
 \item  All relevant data regarding the problem, such as playlists, MP3
 files etc. (IMPORTANT!) 
 \end{itemize}
-\end{itemize}
-\begin{enumerate}
-\item  If you have a Sourceforge account, log
-in before you file the report.
-\item  If you don't have a SF account, sign the report
-with your email. 
-\end{enumerate}
 
 \section{Feature requests}
 For open feature requests refer to
-\url{http://www.rockbox.org/requests.shtml}
+\url{http://www.rockbox.org/bugs/index.php?type=1}
 
-{\bfseries
-Rules for submitting a new feature request:}
+\subsection{Rules for submitting a new feature request}
 
 \begin{enumerate}
-\item Check that the feature hasn't already been
-requested. Duplicates are really boring!
-\item Check that the feature hasn't already been
-implemented. Download the latest daily build and/or search the mail
-list archive.
-\item Check that the feature is possible to implement (see page
-\pageref{ref:NODO}).
-\item You must be logged in with your Sourceforge account to submit a
-request. If you don't have an account, get one. 
+\item Check that the feature hasn't already been requested. Duplicates are really boring!
+\item Check that the feature hasn't already been implemented. Download the latest daily build and/or search the mail list archive.
+\item Check that the feature is possible to implement (see page \pageref{ref:NODO}).
 \end{enumerate}
-
 
 \subsection{\label{ref:NODO}Features we will not implement}
 This is a list of Feature Requests we get repeatedly that we simply
 cannot do. View it as the opposite of a TODO!
 
+\opt{player,recorder,recorderv2fm}{
 \begin{itemize}
-\item {\bfseries
-Record to WAV (uncompressed) or MP3pro format!}
-
+\item Record to WAV (uncompressed) or MP3pro format!\\
 The recording hardware (the MAS) does not allow us to do this
-\item {\bfseries
-Crossfade between tracks!}
-Crossfading would require two mp3 decoders,
-and we only have one. This is not possible.
-\item {\bfseries
-Interfacing with other USB devices (like cameras) or 2 player games over
-USB}
-
-The USB system demands that there is a master that talks to a slave. The
-Jukebox can only serve as a slave, as most other USB devices such as
-cameras can. Thus, without a master no communication between the slaves
-can take place.
-
-If that is not enough, we have no ways of actually controlling the
-communication performed over USB since the USB circuit in the Jukebox
-is strictly made for disk{}-access and does not allow us to play with
-it the way we'd need for any good communication to
-work.
-\item {\bfseries
-Support MP3pro, WMA or other sound format playback!}
-
-The mp3{}-decoding hardware can only play MP3. We cannot make it play
-other sound formats.
-\item {\bfseries
-Converting OGG{}-{\textgreater}MP3}
-
-The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed,
-but there is too little memory for OGG and we have no documentation on
-how to program the MAS' DSP.
-
-Doing the conversion with the CPU is impossible, since a 12MHz SH1 is
-far too slow for this daunting task.
-\item {\bfseries
-Archos Multimedia support!}
-
-The Archos Multimedia is a completely different beast. It is an entirely
-different architecture, different CPU and upgrading the software is
-done a completely different way. We do not wish to venture into this. 
-
-Others may do so. We won't.
-\item {\bfseries
-Multi{}-band (or graphic) equaliser!}
-
-We cannot access information for that kind of visualisation from the MP3
-decoding hardware.
-\item {\bfseries
-Support other filesystems than FAT32 (like
-NTFS or ext2 or whatever)!}
-
-No. Rockbox needs to support FAT32 since it can only start off a FAT32
-partition (since that is the only way the ROM can load it), and adding
-support for more file systems will just take away valuable ram for
-unnecessary features.
-
-You can partition your Jukebox fine, just make sure the first one is
-FAT32 and then make the other ones whatever file system you want. Just
-don't expect Rockbox to understand them.
-\item {\bfseries
-Add scandisk{}-like features!}
-
-It would be a very slow operation that would drain the batteries and
-take a lot of useful ram for something that is much better and faster
-done when connected to a host computer.
-\item {\bfseries
-CBR recording!}
-
+\item Crossfade between tracks!\\
+ Crossfading would require two mp3 decoders, and we only have one. This is not possible.
+\item Interfacing with other USB devices (like cameras) or 2 player games over USB\\
+The USB system demands that there is a master that talks to a slave. The Jukebox can only serve as a slave, as most other USB devices such as cameras can. Thus, without a master no communication between the slaves can take place. If that is not enough, we have no ways of actually controlling the communication performed over USB since the USB circuit in the Jukebox is strictly made for disk{}-access and does not allow us to play with it the way we'd need for any good communication to work.
+\item Support MP3pro, WMA or other sound format playback!\\
+The mp3{}-decoding hardware can only play MP3. We cannot make it play other sound formats.
+\item  Converting OGG{}-{\textgreater}MP3 \\
+The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed, but there is too little memory for OGG and we have no documentation on how to program the MAS' DSP. Doing the conversion with the CPU is impossible, since a 12MHz SH1 is far too slow for this daunting task.
+\item Archos Multimedia support!\\
+The Archos Multimedia is a completely different beast. It is an entirely different architecture, different CPU and upgrading the software is done a completely different way. We do not wish to venture into this.  Others may do so. We won't.
+\item Multi{}-band (or graphic) equaliser\\
+We cannot access information for that kind of visualisation from the MP3 decoding hardware.
+\item Support other filesystems than FAT32 (likeNTFS or ext2 or whatever)!\\
+No. Rockbox needs to support FAT32 since it can only start off a FAT32 partition (since that is the only way the ROM can load it), and adding support for more file systems will just take away valuable ram for unnecessary features. You can partition your Jukebox fine, just make sure the first one is FAT32 and then make the other ones whatever file system you want. Just don't expect Rockbox to understand them.
+\item Add scandisk{}-like features!\\
+It would be a very slow operation that would drain the batteries and take a lot of useful ram for something that is much better and faster done when connected to a host computer.
+\item CBR recording!\\
 The MP3 encoding hardware does not allow this.
-\item {\bfseries
-Change tempo of a song without changing pitch!}
-
-The MP3 decoding hardware does not allow this.
+\item Change tempo of a song without changing pitch!\\
+ The MP3 decoding hardware does not allow this.
+\item Graphic frequency (spectrum analyser!)\\
+We can't access the audio waveform from the MP3 decoder so we can't analyse it. Even if we had access to it, the CPU would probably be too slow to perform the analysis anyway.
+\item Cool sound effects!\\
+ Adding new sound effects requires reprogramming the MAS chip, and wecan't do that. The MAS chip is programmable, but we have no access to the chip documentation.
 \end{itemize}
-\begin{itemize}
-\item {\bfseries
-Graphic frequency (spectrum analyser!)}
-
-We can't access the audio waveform from the MP3 decoder
-so we can't analyse it. Even if we had access to it, the CPU would probably be too slow to perform the analysis anyway.
-\end{itemize}
-\begin{itemize}
-\item {\bfseries
-Cool sound effects!}
-
-Adding new sound effects requires reprogramming the MAS chip, and we
-can't do that. The MAS chip is programmable, but we
-have no access to the chip documentation.
-\end{itemize}
+}
 
 
+\chapter{Changelog}
+\section{What's new since v2.5?}
+Changes in version 2.5
 
-\section{What's new since 2.0?}
-{\bfseries
-Changes in version 2.4}
-
-\begin{itemize}
-\item Improved shuffle
-\item Improved disk write performance
-\item Improved Ondio support
-\item Various bug fixes
-\item Added 74 and 80 minute recording time splits for convenient CD
-creation
-\end{itemize}
-{\bfseries
-Changes in version 2.3}
-
-\begin{itemize}
-\item {\bfseries
-General changes since 2.2}
-
-\begin{itemize}
-\item Spoken menus, filenames and directories
-\item Support for Archos Ondio
-\item File type associations and ``open with...'' plugin bindings
-\item Added ability to delete directories, even recursively
-\item New WPS tags for information about next song in playlist
-\item ON+PLAY menu can now also be accessed with a long press on PLAY
-\item New directory sort options: date and file type
-\item Clean shutdown which spins down the disk before cutting power
-\item Faster scrolling in file browser
-\item Easy{}-to{}-use installation program for windows
-\item New language: Bulgarian
-\item New plugins: Sort, euroconverter, search, chess clock, vbrfix,
-stopwatch, metronome
-\end{itemize}
-\item {\bfseries
-Recorder{}-specific changes since 2.2}
-
-\begin{itemize}
-\item During recording disk doesn't spin up until
-needed, allowing undisturbed use of internal mic for short recordings
-\item Optional button help bar at bottom of screen
-\item More detailed MDB (dynamic bass) settings
-\item ROMbox, optionally saving \~{}170KB RAM by running code from flash
-on Recorder v1 and Ondio SP
-\item Recording can pause
-\item Recorded files now get ID3 v2.3 tags instead of v2.4, since some
-tools have problems reading v2.4 tags
-\item Red LED behaviour changed during recording: On during recording
-and blinking when paused
-\item New font format. 2.3 requires new fonts, 2.2 fonts are not
-compatible.
-\item New plugins: Minesweeper, solitaire, mp3 split editor, snake2,
-pong, JPEG viewer, Mandelbrot
-\end{itemize}
-\end{itemize}
-{\bfseries
-Changes in version 2.2}
-
-\begin{itemize}
-\item Bookmarking functions added
-\item Improved playlist support
-\item WPS enhancements
-\item New plugins: greyscale, Mandelbrot,
-metronome
-\item Recording enhancements (recorder)
-\item Bug fixes
-\end{itemize}
-{\bfseries
-General changes since 2.0}
-
-\begin{itemize}
-\item Loadable plugins
-\item Dynamic playlist creation and manipulation
-\item Configurable max directory size (default: 400 files)
-\item Configurable max playlist size (default: 10000 files)
-\item Remote control now works while keys are locked
-\item Car mode: Pauses and resumes playback with charger power loss and
-restore
-\item Caption backlight: Briefly turns on backlight during track change
-\item Battery meter is more accurate during the first minutes after boot
-\item Automatically detects modified archos.mod/ ajbrec.ajz after
-exiting USB mode and asks if you want to run it
-\item Files and configurations in /.rockbox are now accessible from Menu
-\item Stopped playlists can be resumed from File Browser by pressing ON
-\item Never turns off/reboots while charger is connected
-\item .wps files now support comments
-\item Improved ID3v2 support
-\item Option of hiding icons in File Browser
-\end{itemize}
-{\bfseries
-Player{}-specific changes since 2.0}
-
-\begin{itemize}
-\item Games: Jackpot and NIM
-\item Jump scroll: Scrolls the entire screen width each step
-\item The Line In port is enabled
-\end{itemize}
-{\bfseries
-Recorder{}-specific changes since 2.0}
-
-\begin{itemize}
-\item Rockbox can now be stored in flash ROM, giving much quicker boot up
-\item Support for V2 recorders
-\item Radio support (FM Recorder only)
-\item Default contrast is now auto{}-detected, preventing unreadable
-display
-\item Option of using an inverted bar instead of cursor in File Browser
-and Menu
-\item Frame{}-accurate recording file splits set manually or preset by time
-\item Improved Xing header generation in recorded files
-\item New games: FlipIt, Snake, Star, Sliding Puzzle and Chip8 emulator
-\item A calendar application plugin
-\end{itemize}
-
-
-\section{Credits}
-People that have contributed to the project, one way or another.
-Friends!}
-
-\begin{center}
-\begin{minipage}{16.15cm}
-Bj\"orn Stenberg \newline
-Linus Nielsen Feltzing \newline
-Andy Choi \newline
-Andrew Jamieson \newline
-Paul Suade \newline
-Joachim Schiffer \newline
-Daniel Stenberg \newline
-Alan Korr \newline
-Gary Czvitkovicz \newline
-Stuart Martin \newline
-Felix Arends \newline
-Ulf Ralberg \newline
-David H\"ardeman \newline
-Thomas Saeys \newline
-Grant Wier \newline
-Julien Labruy\'ere \newline
-Nicolas Sauzede \newline
-Robert Hak \newline
-Dave Chapman \newline
-Stefan Meyer \newline
-Eric Linenberg \newline
-Tom Cvitan \newline
-Magnus \"Oman \newline
-Jerome Kuptz \newline
-Julien Boissinot \newline
-Nuutti Kotivuori \newline
-Heikki Hannikainen \newline
-Hardeep Sidhu \newline
-Markus Braun \newline
-Justin Heiner \newline
-Magnus Holmgren \newline
-Bill Napier \newline
-George Styles \newline
-Mats Lidell \newline
-Lee Marlow \newline
-Nate Nystrom \newline
-Nick Robinson \newline
-Chad Lockwood \newline
-John Pybus \newline
-Uwe Freese \newline
-Randy Wood \newline
-Gregory Haerr \newline
-Philipp Pertermann \newline
-Gilles Roux \newline
-Mark Hillebrand \newline
-Damien Teney \newline
-Andreas Zwirtes \newline
-Kjell Ericson \newline
-Jim Hagani \newline
-Ludovic Lange \newline
-Mike Holden \newline
-Simon El\'en \newline
-Matthew P. OReilly \newline
-Christian Sch\"onberger \newline
-Henrik Backe \newline
-Craig Sather \newline
-Jos\'e Maria Garcia{}-Valdecasas Bernal\newline
-Stevie Oh \newline
-J\"org Hohensohn \newline
-Dave Jones \newline
-Thomas Paul Diffenbach \newline
-Roland Kletzing \newline
-Itai Shaked \newline
-Keith Hubbard \newline
-Benjamin Metzler \newline
-Frederic Dang Ngoc \newline
-Pierre Delore \newline
-Huw Smith \newline
-Garrett Derner \newline
-Barry McIntosh \newline
-Leslie Donaldson \newline
-Lee Pilgrim \newline
-Zakk Roberts \newline
-Francois Boucher \newline
-Matthias Wientapper \newline
-Brent Coutts \newline
-Jens Arnold \newline
-Gerald Vanbaren \newline
-Christi Scarborough \newline
-Steve Cundari \newline
-Mat Holton \newline
-Jan Gajdos \newline
-Antoine Cellerier \newline
-Brian King \newline
-Jiri Jurecek \newline
-Jacob Erlbeck 
-\end{minipage}\end{center}
-
-
-\section{GNU Free Documentation Licence}
-Version 1.2, November 2002
-
+\chapter{Credits}
+People that have contributed to the project, one way or another.Friends!
 \begin{verbatim}
-Copyright (C) 2000,2001,2002  Free Software Foundation, Inc.
-51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-Everyone is permitted to copy and distribute verbatim copies
-of this license document, but changing it is not allowed.
+/* Include the CREDITS file */
 \end{verbatim}
 
-\textbf{0. PREAMBLE}
-The purpose of this License is to make a manual, textbook, or other functional and useful document "free" in the sense of freedom: to assure everyone the effective freedom to copy and redistribute it, with or without modifying it, either commercially or noncommercially. Secondarily, this License preserves for the author and publisher a way to get credit for their work, while not being considered responsible for modifications made by others.
-
-This License is a kind of "copyleft", which means that derivative works of the document must themselves be free in the same sense. It complements the GNU General Public License, which is a copyleft license designed for free software.
-
-We have designed this License in order to use it for manuals for free software, because free software needs free documentation: a free program should come with manuals providing the same freedoms that the software does. But this License is not limited to software manuals; it can be used for any textual work, regardless of subject matter or whether it is published as a printed book. We recommend this License principally for works whose purpose is instruction or reference. 
-
-\textbf{1. APPLICABILITY AND DEFINITIONS}
-This License applies to any manual or other work, in any medium, that contains a notice placed by the copyright holder saying it can be distributed under the terms of this License. Such a notice grants a world-wide, royalty-free license, unlimited in duration, to use that work under the conditions stated herein. The "Document", below, refers to any such manual or work. Any member of the public is a licensee, and is addressed as "you". You accept the license if you copy, modify or distribute the work in a way requiring permission under copyright law.
-
-A "Modified Version" of the Document means any work containing the Document or a portion of it, either copied verbatim, or with modifications and/or translated into another language.
-
-A "Secondary Section" is a named appendix or a front-matter section of the Document that deals exclusively with the relationship of the publishers or authors of the Document to the Document's overall subject (or to related matters) and contains nothing that could fall directly within that overall subject. (Thus, if the Document is in part a textbook of mathematics, a Secondary Section may not explain any mathematics.) The relationship could be a matter of historical connection with the subject or with related matters, or of legal, commercial, philosophical, ethical or political position regarding them.
-
-The "Invariant Sections" are certain Secondary Sections whose titles are designated, as being those of Invariant Sections, in the notice that says that the Document is released under this License. If a section does not fit the above definition of Secondary then it is not allowed to be designated as Invariant. The Document may contain zero Invariant Sections. If the Document does not identify any Invariant Sections then there are none.
-
-The "Cover Texts" are certain short passages of text that are listed, as Front-Cover Texts or Back-Cover Texts, in the notice that says that the Document is released under this License. A Front-Cover Text may be at most 5 words, and a Back-Cover Text may be at most 25 words.
-
-A "Transparent" copy of the Document means a machine-readable copy, represented in a format whose specification is available to the general public, that is suitable for revising the document straightforwardly with generic text editors or (for images composed of pixels) generic paint programs or (for drawings) some widely available drawing editor, and that is suitable for input to text formatters or for automatic translation to a variety of formats suitable for input to text formatters. A copy made in an otherwise Transparent file format whose markup, or absence of markup, has been arranged to thwart or discourage subsequent modification by readers is not Transparent. An image format is not Transparent if used for any substantial amount of text. A copy that is not "Transparent" is called "Opaque".
-
-Examples of suitable formats for Transparent copies include plain ASCII without markup, Texinfo input format, LaTeX input format, SGML or XML using a publicly available DTD, and standard-conforming simple HTML, PostScript or PDF designed for human modification. Examples of transparent image formats include PNG, XCF and JPG. Opaque formats include proprietary formats that can be read and edited only by proprietary word processors, SGML or XML for which the DTD and/or processing tools are not generally available, and the machine-generated HTML, PostScript or PDF produced by some word processors for output purposes only.
-
-The "Title Page" means, for a printed book, the title page itself, plus such following pages as are needed to hold, legibly, the material this License requires to appear in the title page. For works in formats which do not have any title page as such, "Title Page" means the text near the most prominent appearance of the work's title, preceding the beginning of the body of the text.
-
-A section "Entitled XYZ" means a named subunit of the Document whose title either is precisely XYZ or contains XYZ in parentheses following text that translates XYZ in another language. (Here XYZ stands for a specific section name mentioned below, such as "Acknowledgements", "Dedications", "Endorsements", or "History".) To "Preserve the Title" of such a section when you modify the Document means that it remains a section "Entitled XYZ" according to this definition.
-
-The Document may include Warranty Disclaimers next to the notice which states that this License applies to the Document. These Warranty Disclaimers are considered to be included by reference in this License, but only as regards disclaiming warranties: any other implication that these Warranty Disclaimers may have is void and has no effect on the meaning of this License. 
-
-
-\textbf{2. VERBATIM COPYING}
-You may copy and distribute the Document in any medium, either commercially or noncommercially, provided that this License, the copyright notices, and the license notice saying this License applies to the Document are reproduced in all copies, and that you add no other conditions whatsoever to those of this License. You may not use technical measures to obstruct or control the reading or further copying of the copies you make or distribute. However, you may accept compensation in exchange for copies. If you distribute a large enough number of copies you must also follow the conditions in section 3.
-
-You may also lend copies, under the same conditions stated above, and you may publicly display copies.
-
-
-\textbf{3. COPYING IN QUANTITY}
-If you publish printed copies (or copies in media that commonly have printed covers) of the Document, numbering more than 100, and the Document's license notice requires Cover Texts, you must enclose the copies in covers that carry, clearly and legibly, all these Cover Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on the back cover. Both covers must also clearly and legibly identify you as the publisher of these copies. The front cover must present the full title with all words of the title equally prominent and visible. You may add other material on the covers in addition. Copying with changes limited to the covers, as long as they preserve the title of the Document and satisfy these conditions, can be treated as verbatim copying in other respects.
-
-If the required texts for either cover are too voluminous to fit legibly, you should put the first ones listed (as many as fit reasonably) on the actual cover, and continue the rest onto adjacent pages.
-
-If you publish or distribute Opaque copies of the Document numbering more than 100, you must either include a machine-readable Transparent copy along with each Opaque copy, or state in or with each Opaque copy a computer-network location from which the general network-using public has access to download using public-standard network protocols a complete Transparent copy of the Document, free of added material. If you use the latter option, you must take reasonably prudent steps, when you begin distribution of Opaque copies in quantity, to ensure that this Transparent copy will remain thus accessible at the stated location until at least one year after the last time you distribute an Opaque copy (directly or through your agents or retailers) of that edition to the public.
-
-It is requested, but not required, that you contact the authors of the Document well before redistributing any large number of copies, to give them a chance to provide you with an updated version of the Document. 
-
-
-\textbf{4. MODIFICATIONS}
-
-You may copy and distribute a Modified Version of the Document under the conditions of sections 2 and 3 above, provided that you release the Modified Version under precisely this License, with the Modified Version filling the role of the Document, thus licensing distribution and modification of the Modified Version to whoever possesses a copy of it. In addition, you must do these things in the Modified Version:
-
-    * A. Use in the Title Page (and on the covers, if any) a title distinct from that of the Document, and from those of previous versions (which should, if there were any, be listed in the History section of the Document). You may use the same title as a previous version if the original publisher of that version gives permission.
-    * B. List on the Title Page, as authors, one or more persons or entities responsible for authorship of the modifications in the Modified Version, together with at least five of the principal authors of the Document (all of its principal authors, if it has fewer than five), unless they release you from this requirement.
-    * C. State on the Title page the name of the publisher of the Modified Version, as the publisher.
-    * D. Preserve all the copyright notices of the Document.
-    * E. Add an appropriate copyright notice for your modifications adjacent to the other copyright notices.
-    * F. Include, immediately after the copyright notices, a license notice giving the public permission to use the Modified Version under the terms of this License, in the form shown in the Addendum below.
-    * G. Preserve in that license notice the full lists of Invariant Sections and required Cover Texts given in the Document's license notice.
-    * H. Include an unaltered copy of this License.
-    * I. Preserve the section Entitled "History", Preserve its Title, and add to it an item stating at least the title, year, new authors, and publisher of the Modified Version as given on the Title Page. If there is no section Entitled "History" in the Document, create one stating the title, year, authors, and publisher of the Document as given on its Title Page, then add an item describing the Modified Version as stated in the previous sentence.
-    * J. Preserve the network location, if any, given in the Document for public access to a Transparent copy of the Document, and likewise the network locations given in the Document for previous versions it was based on. These may be placed in the "History" section. You may omit a network location for a work that was published at least four years before the Document itself, or if the original publisher of the version it refers to gives permission.
-    * K. For any section Entitled "Acknowledgements" or "Dedications", Preserve the Title of the section, and preserve in the section all the substance and tone of each of the contributor acknowledgements and/or dedications given therein.
-    * L. Preserve all the Invariant Sections of the Document, unaltered in their text and in their titles. Section numbers or the equivalent are not considered part of the section titles.
-    * M. Delete any section Entitled "Endorsements". Such a section may not be included in the Modified Version.
-    * N. Do not retitle any existing section to be Entitled "Endorsements" or to conflict in title with any Invariant Section.
-    * O. Preserve any Warranty Disclaimers. 
-
-If the Modified Version includes new front-matter sections or appendices that qualify as Secondary Sections and contain no material copied from the Document, you may at your option designate some or all of these sections as invariant. To do this, add their titles to the list of Invariant Sections in the Modified Version's license notice. These titles must be distinct from any other section titles.
-
-You may add a section Entitled "Endorsements", provided it contains nothing but endorsements of your Modified Version by various parties--for example, statements of peer review or that the text has been approved by an organization as the authoritative definition of a standard.
-
-You may add a passage of up to five words as a Front-Cover Text, and a passage of up to 25 words as a Back-Cover Text, to the end of the list of Cover Texts in the Modified Version. Only one passage of Front-Cover Text and one of Back-Cover Text may be added by (or through arrangements made by) any one entity. If the Document already includes a cover text for the same cover, previously added by you or by arrangement made by the same entity you are acting on behalf of, you may not add another; but you may replace the old one, on explicit permission from the previous publisher that added the old one.
-
-The author(s) and publisher(s) of the Document do not by this License give permission to use their names for publicity for or to assert or imply endorsement of any Modified Version.
-
-\textbf{5. COMBINING DOCUMENTS}
-You may combine the Document with other documents released under this License, under the terms defined in section 4 above for modified versions, provided that you include in the combination all of the Invariant Sections of all of the original documents, unmodified, and list them all as Invariant Sections of your combined work in its license notice, and that you preserve all their Warranty Disclaimers.
-
-The combined work need only contain one copy of this License, and multiple identical Invariant Sections may be replaced with a single copy. If there are multiple Invariant Sections with the same name but different contents, make the title of each such section unique by adding at the end of it, in parentheses, the name of the original author or publisher of that section if known, or else a unique number. Make the same adjustment to the section titles in the list of Invariant Sections in the license notice of the combined work.
-
-In the combination, you must combine any sections Entitled "History" in the various original documents, forming one section Entitled "History"; likewise combine any sections Entitled "Acknowledgements", and any sections Entitled "Dedications". You must delete all sections Entitled "Endorsements."
-
-\textbf{6. COLLECTIONS OF DOCUMENTS}
-You may make a collection consisting of the Document and other documents released under this License, and replace the individual copies of this License in the various documents with a single copy that is included in the collection, provided that you follow the rules of this License for verbatim copying of each of the documents in all other respects.
-
-You may extract a single document from such a collection, and distribute it individually under this License, provided you insert a copy of this License into the extracted document, and follow this License in all other respects regarding verbatim copying of that document. 
-
-\textbf{7. AGGREGATION WITH INDEPENDENT WORKS}
-A compilation of the Document or its derivatives with other separate and independent documents or works, in or on a volume of a storage or distribution medium, is called an "aggregate" if the copyright resulting from the compilation is not used to limit the legal rights of the compilation's users beyond what the individual works permit. When the Document is included in an aggregate, this License does not apply to the other works in the aggregate which are not themselves derivative works of the Document.
-
-If the Cover Text requirement of section 3 is applicable to these copies of the Document, then if the Document is less than one half of the entire aggregate, the Document's Cover Texts may be placed on covers that bracket the Document within the aggregate, or the electronic equivalent of covers if the Document is in electronic form. Otherwise they must appear on printed covers that bracket the whole aggregate. 
-
-\textbf{8. TRANSLATION}
-Translation is considered a kind of modification, so you may distribute translations of the Document under the terms of section 4. Replacing Invariant Sections with translations requires special permission from their copyright holders, but you may include translations of some or all Invariant Sections in addition to the original versions of these Invariant Sections. You may include a translation of this License, and all the license notices in the Document, and any Warranty Disclaimers, provided that you also include the original English version of this License and the original versions of those notices and disclaimers. In case of a disagreement between the translation and the original version of this License or a notice or disclaimer, the original version will prevail.
-
-If a section in the Document is Entitled "Acknowledgements", "Dedications", or "History", the requirement (section 4) to Preserve its Title (section 1) will typically require changing the actual title. 
-
-\textbf{9. TERMINATION}
-You may not copy, modify, sublicense, or distribute the Document except as expressly provided for under this License. Any other attempt to copy, modify, sublicense or distribute the Document is void, and will automatically terminate your rights under this License. However, parties who have received copies, or rights, from you under this License will not have their licenses terminated so long as such parties remain in full compliance.
-
-\textbf{10. FUTURE REVISIONS OF THIS LICENSE}
-The Free Software Foundation may publish new, revised versions of the GNU Free Documentation License from time to time. Such new versions will be similar in spirit to the present version, but may differ in detail to address new problems or concerns. See http://www.gnu.org/copyleft/.
-
-Each version of the License is given a distinguishing version number. If the Document specifies that a particular numbered version of this License "or any later version" applies to it, you have the option of following the terms and conditions either of that specified version or of any later version that has been published (not as a draft) by the Free Software Foundation. If the Document does not specify a version number of this License, you may choose any version ever published (not as a draft) by the Free Software Foundation.
+\chapter{GNU Free Documentation Licence}
+\input{appendix/fdl.tex}
