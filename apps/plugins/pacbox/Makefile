@@ -19,10 +19,13 @@ endif
 
 LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-pacbox
-SRC = arcade.c pacbox.c hardware.c z80.c
+
+# This sets up 'SRC' based on the files mentioned in SOURCES
+include $(TOOLSDIR)/makesrc.inc
 
 SOURCES = $(SRC)
-OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS2 := $(SRC:%.c=$(OBJDIR)/%.o)
+OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DIRS = .
 
 LDS := ../plugin.lds

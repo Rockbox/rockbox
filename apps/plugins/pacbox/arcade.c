@@ -252,19 +252,19 @@ static unsigned decodePaletteByte( unsigned char value )
     unsigned    bit0, bit1, bit2;
     unsigned    red, green, blue;
 
-	bit0 = (value >> 0) & 0x01;
-	bit1 = (value >> 1) & 0x01;
-	bit2 = (value >> 2) & 0x01;
-	red = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+    bit0 = (value >> 0) & 0x01;
+    bit1 = (value >> 1) & 0x01;
+    bit2 = (value >> 2) & 0x01;
+    red = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
     bit0 = (value >> 3) & 0x01;
-	bit1 = (value >> 4) & 0x01;
-	bit2 = (value >> 5) & 0x01;
-	green = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+    bit1 = (value >> 4) & 0x01;
+    bit2 = (value >> 5) & 0x01;
+    green = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
     bit0 = 0;
-	bit1 = (value >> 6) & 0x01;
-	bit2 = (value >> 7) & 0x01;
+    bit1 = (value >> 6) & 0x01;
+    bit2 = (value >> 7) & 0x01;
     blue = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
     return (blue << 16 ) | (green << 8) | red;
@@ -428,6 +428,7 @@ inline void drawSprite( unsigned char * buffer, int index )
 {
     struct PacmanSprite ps = sprites_[index];
     int x,y;
+    char * s, * s2;
 
     // Exit now if sprite not visible at all
     if( (ps.color == 0) || (ps.x >= ScreenWidth) || (ps.y < 16) || (ps.y >= (ScreenHeight-32)) ) {
@@ -436,59 +437,77 @@ inline void drawSprite( unsigned char * buffer, int index )
     
     // Clip the sprite coordinates to cut the parts that fall off the screen
     int start_x = (ps.x < 0) ? 0 : ps.x;
-    int end_x = (ps.x < (ScreenWidth-16)) ? ps.x+16 : ScreenWidth;
+    int end_x = (ps.x < (ScreenWidth-16)) ? ps.x+15 : ScreenWidth-1;
 
     // Prepare variables for drawing
     int color = (ps.color & 0x3F)*4;
     unsigned char * spritemap_base = spritemap_ + ((ps.n & 0x3F)*256);
     
     buffer += ScreenWidth*ps.y;
+    s2 = &spritemap_base[start_x-ps.x];
+
+    dirty_[(start_x >> 3) + (ps.y >> 3)*28] = 1;
+    dirty_[(start_x >> 3) + 1 + (ps.y >> 3)*28] = 1;
+    dirty_[(end_x >> 3) + (ps.y >> 3)*28] = 1;
+    dirty_[(start_x >> 3) + ((ps.y >> 3)+1)*28] = 1;
+    dirty_[(start_x >> 3) + 1 + ((ps.y >> 3)+1)*28] = 1;
+    dirty_[(end_x >> 3) + ((ps.y >> 3)+1)*28] = 1;
+    dirty_[(start_x >> 3) + ((ps.y+15) >> 3)*28] = 1;
+    dirty_[(start_x >> 3) + 1 + ((ps.y+15) >> 3)*28] = 1;
+    dirty_[(end_x >> 3) + ((ps.y+15) >> 3)*28] = 1;
 
     // Draw the 16x16 sprite
     if( ps.mode == 0 ) {                 // Normal
         // Draw the 16x16 sprite
-        for( y=0; y<16; y++ ) {
-            char* s = &spritemap_base[start_x-ps.x+y*16];
-            for( x=start_x; x<end_x; x++ ) {
+        for( y=15; y>=0; y-- ) {
+            s = s2;
+            for( x=start_x; x<=end_x; x++ ) {
                 int c = *(s++);
                 if( c ) {
                     buffer[x] = c + color;
                 }
             }
             buffer += ScreenWidth;
+            s2 += 16;
         }
     } else if( ps.mode == 1 ) {            // Flip Y
-        for( y=0; y<16; y++ ) {
-            char* s = &spritemap_base[start_x-ps.x+(15-y)*16];
-            for( x=start_x; x<end_x; x++ ) {
+        s2 += 240;
+        for( y=15; y>=0; y-- ) {
+            s = s2;
+            for( x=start_x; x<=end_x; x++ ) {
                 int c = *(s++);
                 if( c ) {
                     buffer[x] = c + color;
                 }
             }
             buffer += ScreenWidth;
+            s2 -= 16;
         }
     } else if( ps.mode == 2 ) {            // Flip X
-        for( y=0; y<16; y++ ) {
-            char* s = &spritemap_base[15-start_x+ps.x+y*16];
-            for( x=start_x; x<end_x; x++ ) {
+        s2 += 15;
+        for( y=15; y>=-0; y-- ) {
+            s = s2;
+            for( x=start_x; x<=end_x; x++ ) {
                 int c = *(s--);
                 if( c ) {
                     buffer[x] = c + color;
                 }
             }
             buffer += ScreenWidth;
+            s2 += 16;
         }
     } else {                           // Flip X and Y
-        for( y=0; y<16; y++ ) {
-            char* s = &spritemap_base[15-start_x+ps.x+(15-y)*16];
-            for( x=start_x; x<end_x; x++ ) {
+      s2 += 255;
+        for( y=15; y>=0; y-- ) {
+            s = s2;
+            for( x=start_x; x<=end_x; x++ ) {
                 int c = *(s--);
                 if( c ) {
                     buffer[x] = c + color;
                 }
             }
             buffer += ScreenWidth;
+            s2 -= 16;
         }
     }
 }

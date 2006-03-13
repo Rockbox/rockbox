@@ -24,6 +24,8 @@
 
 #include "plugin.h"
 #include "arcade.h"
+#include "pacbox.h"
+#include "pacbox_lcd.h"
 
 PLUGIN_HEADER
 
@@ -37,64 +39,6 @@ extern char iend[];
 
 /* How many video frames (out of a possible 60) we display each second */
 #define FPS 20
-
-#if CONFIG_KEYPAD == IPOD_4G_PAD
-
-#define PACMAN_UP      BUTTON_RIGHT
-#define PACMAN_DOWN    BUTTON_LEFT
-#define PACMAN_LEFT    BUTTON_MENU
-#define PACMAN_RIGHT   BUTTON_PLAY
-#define PACMAN_1UP     BUTTON_SELECT
-#define PACMAN_COIN    BUTTON_SELECT
-
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
-
-#define PACMAN_UP      BUTTON_RIGHT
-#define PACMAN_DOWN    BUTTON_LEFT
-#define PACMAN_LEFT    BUTTON_UP
-#define PACMAN_RIGHT   BUTTON_DOWN
-#define PACMAN_1UP     BUTTON_SELECT
-#define PACMAN_2UP     BUTTON_ON
-#define PACMAN_COIN    BUTTON_REC
-#define PACMAN_MENU    BUTTON_MODE
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-
-#define PACMAN_UP      BUTTON_UP
-#define PACMAN_DOWN    BUTTON_DOWN
-#define PACMAN_LEFT    BUTTON_LEFT
-#define PACMAN_RIGHT   BUTTON_RIGHT
-#define PACMAN_1UP     BUTTON_SELECT
-#define PACMAN_2UP     BUTTON_POWER
-#define PACMAN_COIN    BUTTON_A
-#define PACMAN_MENU    BUTTON_MENU
-
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-
-#define PACMAN_UP      BUTTON_RIGHT
-#define PACMAN_DOWN    BUTTON_LEFT
-#define PACMAN_LEFT    BUTTON_UP
-#define PACMAN_RIGHT   BUTTON_DOWN
-#define PACMAN_1UP     BUTTON_SELECT
-#define PACMAN_2UP     BUTTON_POWER
-#define PACMAN_COIN    BUTTON_REC
-#define PACMAN_MENU    BUTTON_PLAY
-
-#endif
-
-#if (LCD_HEIGHT >= 288)
-#define XOFS ((LCD_WIDTH-224)/2)
-#define YOFS ((LCD_HEIGHT-288)/2)
-#elif (LCD_WIDTH >= 288)
-#define XOFS ((LCD_WIDTH-288)/2)
-#define YOFS ((LCD_HEIGHT-224)/2)
-#elif (LCD_WIDTH >= 220)
-#define XOFS ((LCD_WIDTH-(288*3/4))/2)
-#define YOFS ((LCD_HEIGHT-(224*3/4))/2)
-#elif (LCD_WIDTH >= 144)
-#define XOFS ((LCD_WIDTH-288/2)/2)
-#define YOFS ((LCD_HEIGHT-224/2)/2)
-#endif
 
 struct plugin_api* rb;
 
@@ -180,31 +124,6 @@ int settings_to_dip(struct pacman_settings settings)
            );
 }
 
-
-
-int pacbox_menu_cb(int key, int m)
-{
-    (void)m;
-    switch(key)
-    {
-#ifdef MENU_ENTER2
-    case MENU_ENTER2:
-#endif
-    case MENU_ENTER:
-        key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
-        break;
-
-#ifdef MENU_ENTER2
-    case MENU_ENTER2 | BUTTON_REL:
-#endif
-    case MENU_ENTER | BUTTON_REL:
-        key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
-        break;
-    }
-
-    return key;
-}
-
 bool pacbox_menu(void)
 {
     int m;
@@ -253,7 +172,7 @@ bool pacbox_menu(void)
     };
     
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      pacbox_menu_cb, NULL, NULL, NULL);
+                      NULL, NULL, NULL, NULL);
 
     rb->button_clear_queue();
 
@@ -331,14 +250,11 @@ bool pacbox_menu(void)
 */
 int gameProc( void )
 {
-    int x,y;
+    int x;
     int fps;
     char str[80];
     int status;
     long end_time;
-    unsigned char* vbuf = video_buffer;
-    fb_data* dst;
-    fb_data* next_dst;
 
     /* Run the machine for one frame (1/60th second) */
     run();
@@ -348,11 +264,7 @@ int gameProc( void )
     /* Check the button status */
     status = rb->button_status();
 
-#ifdef PACMAN_MENU
-    if (status & PACMAN_MENU) {
-#else
-    if (rb->button_hold()) {
-#endif
+    if ((status & PACMAN_MENU) == PACMAN_MENU) {
         end_time = *rb->current_tick;
         x = pacbox_menu();
         rb->lcd_clear_display();
@@ -389,80 +301,11 @@ int gameProc( void )
            the sprites on top.  Even with the memcpy, this is faster than redrawing
            the whole background.
         */
-        renderBackground( background );
-        rb->memcpy(video_buffer,background,sizeof(video_buffer));
-        renderSprites( video_buffer );
 
-#ifdef HAVE_LCD_COLOR
-#if (LCD_WIDTH >= 224) && (LCD_HEIGHT >= 288)
-        /* Native resolution = 224x288 */
-        (void)next_dst;
-        dst=&rb->lcd_framebuffer[YOFS*LCD_WIDTH+XOFS];
-        for (y=0;y<ScreenHeight;y++) {
-            for (x=0;x<ScreenWidth;x++) {
-                *(dst++) = palette[*(vbuf++)];
-            }
-            dst += XOFS*2;
-        }
-#elif (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
-        /* Native resolution - rotated 90 degrees = 288x224 */
-        next_dst=&rb->lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+ScreenHeight-1];
-        for( y=ScreenHeight-1; y>=0; y-- ) {
-            dst = (next_dst--);
-            for( x=0; x<ScreenWidth; x++ ) {
-                *dst = palette[*(vbuf++)];
-                dst+=LCD_WIDTH;
-            }
-        }
-#elif (LCD_WIDTH >= 216) && (LCD_HEIGHT >= 168)
-        /* 0.75 scaling - display 3 out of 4 pixels = 216x168 
-           Skipping pixel #2 out of 4 seems to give the most legible display 
-         */
-        next_dst=&rb->lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+((ScreenHeight*3)/4)-1];
-        for (y=ScreenHeight-1;y >= 0; y--) {
-            if ((y & 3) != 1) {
-                dst = (next_dst--);
-                for (x=0;x<ScreenWidth;x++) {
-                    if ((x & 3) == 1) { vbuf++; }
-                    else {
-                       *dst = palette[*(vbuf++)];
-                       dst+=LCD_WIDTH;
-                    }
-                }
-            } else {
-                vbuf+=ScreenWidth;
-            }
-        }
-#elif (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
-        /* 0.5 scaling - display every other pixel = 144x112 */
-        next_dst=&rb->lcd_framebuffer[YOFS*LCD_WIDTH+XOFS+ScreenHeight/2-1];
-        for (y=(ScreenHeight/2)-1;y >= 0; y--) {
-            dst = (next_dst--);
-            for (x=0;x<ScreenWidth/2;x++) {
-                *dst = palette[*(vbuf)];
-                vbuf+=2;
-                dst+=LCD_WIDTH;
-            }
-            vbuf+=ScreenWidth;
-        }
-#endif
-#else  /* Greyscale LCDs */
-#if (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
-#if LCD_PIXELFORMAT == VERTICAL_PACKING
-        /* 0.5 scaling - display every other pixel = 144x112 */
-        next_dst=&rb->lcd_framebuffer[YOFS/4*LCD_WIDTH+XOFS+ScreenHeight/2-1];
-        for (y=(ScreenHeight/2)-1;y >= 0; y--) {
-            dst = (next_dst--);
-            for (x=0;x<ScreenWidth/8;x++) {
-                *dst = (palette[*(vbuf+6)]<<6) | (palette[*(vbuf+4)] << 4) | (palette[*(vbuf+2)] << 2) | palette[*(vbuf)];
-                vbuf+=8;
-                dst+=LCD_WIDTH;
-            }
-            vbuf+=ScreenWidth;
-        }
-#endif /* Vertical Packing */
-#endif /* Size >= 144x112 */
-#endif /* Not Colour */
+        renderBackground( video_buffer );
+	renderSprites( video_buffer );
+
+        blit_display(rb->lcd_framebuffer,video_buffer);
 
         if (settings.showfps) {
             fps = (video_frames*HZ*100) / (*rb->current_tick-start_time);
@@ -519,7 +362,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     settings.numlives = 2;   /* 3 lives */
     settings.bonus = 0;      /* 10000 points */
     settings.ghostnames = 0; /* Normal names */
-    settings.showfps = 0;    /* Do not show FPS */
+    settings.showfps = 1;    /* Do not show FPS */
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));

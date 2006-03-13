@@ -1,0 +1,9 @@
+arcade.c
+pacbox.c
+hardware.c
+z80.c
+#if (CONFIG_CPU == PP5020) && (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
+pacbox_arm.S
+#else
+pacbox_lcd.c
+#endif
