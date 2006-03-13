@@ -33,8 +33,7 @@ plasma.c
 bejeweled.c
 bounce.c
 
-#if !(CONFIG_KEYPAD == IAUDIO_X5_PAD) || 
-    !(CONFIG_KEYPAD == IPOD_3G_PAD)
+#if !(CONFIG_KEYPAD == IAUDIO_X5_PAD) || !(CONFIG_KEYPAD == IPOD_3G_PAD)
 wormlet.c
 #endif
 
