@@ -362,7 +362,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     settings.numlives = 2;   /* 3 lives */
     settings.bonus = 0;      /* 10000 points */
     settings.ghostnames = 0; /* Normal names */
-    settings.showfps = 1;    /* Do not show FPS */
+    settings.showfps = 0;    /* Do not show FPS */
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
