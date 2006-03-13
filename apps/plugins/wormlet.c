@@ -70,9 +70,9 @@ PLUGIN_HEADER
 #define BTN_DIR_DOWN BUTTON_DOWN
 #define BTN_DIR_LEFT BUTTON_LEFT
 #define BTN_DIR_RIGHT BUTTON_RIGHT
-#define BTN_STARTPAUSE (BUTTON_MODE|BUTTON_REL)
-#define BTN_QUIT (BUTTON_ONOFF|BUTTON_REL)
-#define BTN_STOPRESET (BUTTON_ONOFF|BUTTON_MODE)
+#define BTN_STARTPAUSE (BUTTON_MENU|BUTTON_REL)
+#define BTN_QUIT (BUTTON_OFF|BUTTON_REL)
+#define BTN_STOPRESET (BUTTON_OFF|BUTTON_MENU)
 
 #define PLAYERS_TEXT "UP/DN"
 #define WORMS_TEXT "L/R"
@@ -90,8 +90,7 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "Menu/Play"
 #define WORMS_TEXT "Left/Right"
 
-#elif (CONFIG_KEYPAD == IRIVER_H300_PAD) ||
-      (CONFIG_KEYPAD == IRIVER_H100_PAD)
+#elif (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD)
 
 #define BTN_DIR_UP BUTTON_UP
 #define BTN_DIR_DOWN BUTTON_DOWN
@@ -2014,8 +2013,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Setup screen */
     do {
-        char buf[40];
+#if defined MULTIPLAYER && defined REMOTE
         char* ptr;
+#endif
         rb->lcd_clear_display();
 
         /* first line players */
