@@ -2013,6 +2013,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Setup screen */
     do {
+        char buf[40];
 #if defined MULTIPLAYER && defined REMOTE
         char* ptr;
 #endif
