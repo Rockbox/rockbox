@@ -246,6 +246,13 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
     {
         if (filetypes[i].plugin)
         {
+            int j;
+            for (j=0;j<cnt;j++) /* check if the plugin is in the list yet */
+            {
+                if (!strcmp(menu[j].desc,filetypes[i].plugin))
+                    break;
+            }
+            if (j<cnt) continue; /* it is so grab the next plugin */
             cp=strrchr(filetypes[i].plugin,'/');
             if (cp) cp++;
             else    cp=filetypes[i].plugin;
@@ -261,9 +268,25 @@ int filetype_load_menu(struct menu_item*  menu,int max_items)
 /* start a plugin with an argument (called from onplay.c) */
 int filetype_load_plugin(const char* plugin, char* file)
 {
+    int fd;
     snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
              VIEWERS_DIR,plugin);
-    return plugin_load(plugin_name,file);
+    if ((fd = open(plugin_name,O_RDONLY))>=0)
+    {
+        close(fd);
+        return plugin_load(plugin_name,file);
+    }
+    else
+    { 
+        snprintf(plugin_name,sizeof(plugin_name),"%s/%s.rock",
+             PLUGIN_DIR,plugin);
+        if ((fd = open(plugin_name,O_RDONLY))>=0)
+        {
+            close(fd);
+            return plugin_load(plugin_name,file);
+        }
+    }
+    return PLUGIN_ERROR;
 }
 
 /* get index to filetypes[] from the file attribute */

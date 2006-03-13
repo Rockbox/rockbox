@@ -628,7 +628,7 @@ int onplay(char* file, int attr, int from)
             }
         }
 
-        if (!(attr & ATTR_DIRECTORY) && attr)
+        if (!(attr & ATTR_DIRECTORY))
         {
             items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
             items[i].function = list_viewers;
