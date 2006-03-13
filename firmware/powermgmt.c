@@ -140,7 +140,10 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
     /* Below 337 the backlight starts flickering during HD access */
-    { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
+    /* Calibrated for Ionity 1900 mAh battery. If necessary, re-calibrate
+     * for the 1300 mAh stock battery. */
+//  { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
+    { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
@@ -156,7 +159,9 @@ charger_input_state_type charger_input_state IDATA_ATTR;
 static const short percent_to_volt_charge[11] =
 {
 #if CONFIG_BATTERY == BATT_LIPOL1300
-    340, 349, 358, 367, 376, 385, 394, 403, 408, 413, 418 /* Estimated */
+    /* Calibrated for 1900 mAh Ionity battery (estimated 90% charge when 
+     entering in trickle-charging). We will never reach 100%. */
+    340, 390, 394, 399, 400, 404, 407, 413, 417, 422, 426
 #else
     /* values guessed, see
        http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
@@ -533,8 +538,8 @@ static void power_thread_sleep(int ticks)
 #ifdef HAVE_CHARGE_STATE
         switch (charger_input_state) {
             case CHARGER_UNPLUGGED:
-                charge_state = DISCHARGING;
             case NO_CHARGER:
+                charge_state = DISCHARGING;
                 break;
             case CHARGER_PLUGGED:
             case CHARGER:

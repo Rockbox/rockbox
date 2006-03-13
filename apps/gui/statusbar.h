@@ -53,9 +53,6 @@ struct status_info {
 #ifdef HAVE_USB_POWER
     bool usb_power;
 #endif
-#ifdef HAVE_CHARGING
-    int battery_charge_step;
-#endif
 };
 
 struct gui_statusbar
@@ -63,12 +60,9 @@ struct gui_statusbar
     /* Volume icon stuffs */
     long volume_icon_switch_tick;
     int last_volume;
-
+    
     long battery_icon_switch_tick;
-
-#ifdef HAVE_CHARGING
-    int battery_charge_step;
-#endif
+    int animated_level;
 
     struct status_info info;
     struct status_info lastinfo;
@@ -101,7 +95,7 @@ extern void gui_statusbar_init(struct gui_statusbar * bar);
  */
 extern void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw);
 
-void gui_statusbar_icon_battery(struct screen * display, int percent);
+void gui_statusbar_icon_battery(struct screen * display, int percent, int animated_percent);
 bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume);
 void gui_statusbar_icon_play_state(struct screen * display, int state);
 void gui_statusbar_icon_play_mode(struct screen * display, int mode);

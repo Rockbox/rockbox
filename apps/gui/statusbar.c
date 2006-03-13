@@ -109,9 +109,7 @@ void gui_statusbar_init(struct gui_statusbar * bar)
 {
     bar->last_volume = -1000; /* -1000 means "first update ever" */
     bar->battery_icon_switch_tick = 0;
-#ifdef HAVE_CHARGING
-    bar->battery_charge_step = 0;
-#endif
+    bar->animated_level = 0;
 }
 
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
@@ -199,11 +197,20 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
             {
 #endif
                 /* animate in three steps (34% per step for a better look) */
-                bar->info.battlevel = bar->battery_charge_step * 34;
-                if (bar->info.battlevel > 100)
-                    bar->info.battlevel = 100;
+#ifndef HAVE_CHARGE_STATE
+                bar->info.battlevel = 0;
+#endif
                 if(TIME_AFTER(current_tick, bar->battery_icon_switch_tick)) {
-                    bar->battery_charge_step=(bar->battery_charge_step+1)%4;
+                    if (bar->animated_level == 100)
+                    {
+                        bar->animated_level = bar->info.battlevel;
+                    }
+                    else
+                    {
+                        bar->animated_level += 34;
+                        if (bar->animated_level > 100)
+                            bar->animated_level = 100;
+                    }
                     bar->battery_icon_switch_tick = current_tick + HZ;
                 }
             }
@@ -211,6 +218,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         else
 #endif /* HAVE_CHARGING */
         {
+            bar->animated_level = 0;
             if (bar->info.battery_safe)
                 battery_state = true;
             else {
@@ -224,7 +232,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         }
 #ifdef HAVE_LCD_BITMAP
         if (battery_state)
-            gui_statusbar_icon_battery(display, bar->info.battlevel);
+            gui_statusbar_icon_battery(display, bar->info.battlevel, 
+                                       bar->animated_level);
 #ifdef HAVE_USB_POWER
         if (bar->info.usb_power)
             display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
@@ -316,11 +325,15 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 /*
  * Print battery icon to status bar
  */
-void gui_statusbar_icon_battery(struct screen * display, int percent)
+void gui_statusbar_icon_battery(struct screen * display, int percent, 
+                                int animated_percent)
 {
-    int fill;
+    int fill, endfill;
     char buffer[5];
     unsigned int width, height;
+#if LCD_DEPTH > 1
+    unsigned int prevfg = LCD_DEFAULT_FG;
+#endif
 
     /* fill battery */
     fill = percent;
@@ -329,6 +342,12 @@ void gui_statusbar_icon_battery(struct screen * display, int percent)
     if (fill > 100)
         fill = 100;
 
+    endfill = animated_percent;
+    if (endfill < 0)
+        endfill = 0;
+    if (endfill > 100)
+        endfill = 100;
+    
 #if (defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)) && \
     !defined(SIMULATOR) /* Certain charge controlled targets */
     /* show graphical animation when charging instead of numbers */
@@ -358,6 +377,20 @@ void gui_statusbar_icon_battery(struct screen * display, int percent)
         fill = fill * 15 / 100;
         display->fillrect(STATUSBAR_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1,
                           fill, 5);
+#if LCD_DEPTH > 1
+        if (display->depth > 1)
+        {
+            prevfg = display->get_foreground();
+            display->set_foreground(LCD_DARKGRAY);
+        }
+#endif
+        endfill = endfill * 15 / 100 - fill;
+        display->fillrect(STATUSBAR_BATTERY_X_POS + 1 + fill, 
+                          STATUSBAR_Y_POS + 1, endfill, 5);
+#if LCD_DEPTH > 1
+        if (display->depth > 1)
+            display->set_foreground(prevfg);
+#endif
     }
 
     if (percent == -1) {

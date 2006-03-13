@@ -150,8 +150,13 @@ void charger_enable(bool on)
 #endif
 
 #ifdef HAVE_CHARGE_STATE
+/* Returns true if the unit is charging the batteries. */
 bool charging_state(void) {
+#if defined(IRIVER_H100_SERIES)
+    return charger_inserted();
+#else /* Iriver H300 */
     return (GPIO_READ & 0x00800000)?true:false;
+#endif
 }
 #endif
 
