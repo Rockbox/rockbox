@@ -114,17 +114,14 @@ PLUGIN_HEADER
 #define ARGH_SIZE 5
 #define SPEED 8
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
-#define COLOR_LCD
 #define FOOD_SIZE 4
 #define ARGH_SIZE 5
 #define SPEED 6
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
-#define COLOR_LCD
 #define FOOD_SIZE 5
 #define ARGH_SIZE 6
 #define SPEED 4
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
-#define COLOR_LCD
 #define FOOD_SIZE 7
 #define ARGH_SIZE 8
 #define SPEED 4
@@ -632,7 +629,7 @@ static void clear_food(int index)
 static void draw_food(int index)
 {
     /* draw the food object */
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(0, 150, 0));
 #endif
     rb->lcd_fillrect(foodx[index] + FIELD_RECT_X,
@@ -643,7 +640,7 @@ static void draw_food(int index)
                      foody[index] + FIELD_RECT_Y + 1,
                      FOOD_SIZE - 2, FOOD_SIZE - 2);
     rb->lcd_set_drawmode(DRMODE_SOLID);
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
 #endif
 }
@@ -708,13 +705,13 @@ static int make_argh(int index)
 static void draw_argh(int index)
 {
     /* draw the new argh */
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(175, 0, 0));
 #endif
     rb->lcd_fillrect(arghx[index] + FIELD_RECT_X,
                  arghy[index] + FIELD_RECT_Y,
                  ARGH_SIZE, ARGH_SIZE);
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
 #endif
 }
@@ -933,7 +930,7 @@ static void move_worm(struct worm *w)
  */
 static void draw_worm(struct worm *w)
 {
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(80, 40, 0));
 #endif
     /* draw the new head */
@@ -952,7 +949,7 @@ static void draw_worm(struct worm *w)
         rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
 #endif
 }
@@ -1998,7 +1995,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     rb->lcd_setfont(FONT_SYSFIXED);
 
-#ifdef COLOR_LCD
+#ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_RGBPACK(200, 210, 230));
 #endif
 

@@ -33,10 +33,6 @@ plasma.c
 bejeweled.c
 bounce.c
 
-#if (CONFIG_KEYPAD != IAUDIO_X5_PAD) && (CONFIG_KEYPAD != IPOD_3G_PAD)
-wormlet.c
-#endif
-
 #if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
 /* These need adjusting for the Mini's and iRiver if'p screen */
 brickmania.c
@@ -64,6 +60,9 @@ sudoku.c
 video.c
 #endif
 vu_meter.c
+#if (CONFIG_KEYPAD != IAUDIO_X5_PAD) && (CONFIG_KEYPAD != IPOD_3G_PAD)
+wormlet.c
+#endif
 
 #ifdef CONFIG_RTC 
 clock.c
