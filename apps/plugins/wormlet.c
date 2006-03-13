@@ -18,8 +18,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_KEYPAD == RECORDER_PAD)
-
 PLUGIN_HEADER
 
 /* size of the field the worm lives in */
@@ -28,31 +26,118 @@ PLUGIN_HEADER
 #define FIELD_RECT_WIDTH  (LCD_WIDTH - 45)
 #define FIELD_RECT_HEIGHT (LCD_HEIGHT - 2)
 
-/* size of the ring of the worm 
-   choos a value that is a power of 2 to help 
+/* size of the ring of the worm
+   choos a value that is a power of 2 to help
    the compiler optimize modul operations*/
-#define MAX_WORM_SEGMENTS 64   
+#define MAX_WORM_SEGMENTS 64
 
 /* when the game starts */
-#define INITIAL_WORM_LENGTH 10 
+#define INITIAL_WORM_LENGTH 10
 
 /* num of pixel the worm grows per eaten food */
-#define WORM_PER_FOOD 7        
+#define WORM_PER_FOOD 7
 
 /* num of worms creeping in the FIELD */
-#define MAX_WORMS 3            
+#define MAX_WORMS 3
 
-/* minimal distance between a worm and an argh 
+/* minimal distance between a worm and an argh
    when a new argh is made */
 #define MIN_ARGH_DIST 5
+
+#if (CONFIG_KEYPAD == RECORDER_PAD)
+#define BTN_DIR_UP BUTTON_UP
+#define BTN_DIR_DOWN BUTTON_DOWN
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_PLAYER2_DIR1 BUTTON_F2
+#define BTN_PLAYER2_DIR2 BUTTON_F3
+#define BTN_RC_UP BUTTON_RC_VOL_UP
+#define BTN_RC_DOWN BUTTON_RC_VOL_DOWN
+#define BTN_STARTPAUSE BUTTON_PLAY
+#define BTN_QUIT BUTTON_OFF
+#define BTN_STOPRESET BUTTON_ON
+#define BTN_TOGGLE_KEYS BUTTON_F1
+
+#define REMOTE
+#define MULTIPLAYER
+
+#define PLAYERS_TEXT "UP/DN"
+#define WORMS_TEXT "L/R"
+#define KEY_CONTROL_TEXT "F1"
+
+#elif (CONFIG_KEYPAD == ONDIO_PAD)
+#define BTN_DIR_UP BUTTON_UP
+#define BTN_DIR_DOWN BUTTON_DOWN
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_STARTPAUSE (BUTTON_MODE|BUTTON_REL)
+#define BTN_QUIT (BUTTON_ONOFF|BUTTON_REL)
+#define BTN_STOPRESET (BUTTON_ONOFF|BUTTON_MODE)
+
+#define PLAYERS_TEXT "UP/DN"
+#define WORMS_TEXT "L/R"
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+
+#define BTN_DIR_UP BUTTON_MENU
+#define BTN_DIR_DOWN BUTTON_PLAY
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_STARTPAUSE (BUTTON_SELECT|BUTTON_REL)
+#define BTN_QUIT (BUTTON_SELECT|BUTTON_MENU)
+#define BTN_STOPRESET (BUTTON_SELECT|BUTTON_PLAY)
+
+#define PLAYERS_TEXT "Menu/Play"
+#define WORMS_TEXT "Left/Right"
+
+#elif (CONFIG_KEYPAD == IRIVER_H300_PAD) ||
+      (CONFIG_KEYPAD == IRIVER_H100_PAD)
+
+#define BTN_DIR_UP BUTTON_UP
+#define BTN_DIR_DOWN BUTTON_DOWN
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_STARTPAUSE (BUTTON_SELECT|BUTTON_REL)
+#define BTN_QUIT BUTTON_OFF
+#define BTN_STOPRESET BUTTON_ON
+
+#define PLAYERS_TEXT "Up/Down"
+#define WORMS_TEXT "Left/Right"
+
+#endif
+
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+#define FOOD_SIZE 3
+#define ARGH_SIZE 4
+#define SPEED 14
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+#define FOOD_SIZE 4
+#define ARGH_SIZE 5
+#define SPEED 8
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
+#define COLOR_LCD
+#define FOOD_SIZE 4
+#define ARGH_SIZE 5
+#define SPEED 6
+#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
+#define COLOR_LCD
+#define FOOD_SIZE 5
+#define ARGH_SIZE 6
+#define SPEED 4
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#define COLOR_LCD
+#define FOOD_SIZE 7
+#define ARGH_SIZE 8
+#define SPEED 4
+#endif
 
 /**
  * All the properties that a worm has.
  */
 static struct worm {
     /* The worm is stored in a ring of xy coordinates */
-    char x[MAX_WORM_SEGMENTS];
-    char y[MAX_WORM_SEGMENTS];
+    int x[MAX_WORM_SEGMENTS];
+    int y[MAX_WORM_SEGMENTS];
 
     int head;      /* index of the head within the buffer */
     int tail;      /* index of the tail within the buffer */
@@ -65,8 +150,8 @@ static struct worm {
 
     /* this method is used to fetch the direction the user
        has selected. It can be one of the values
-       human_player1, human_player2, remote_player, virtual_player. 
-       All these values are fuctions, that can change the direction 
+       human_player1, human_player2, remote_player, virtual_player.
+       All these values are fuctions, that can change the direction
        of the worm */
     void (*fetch_worm_direction)(struct worm *w);
 } worms[MAX_WORMS];
@@ -74,31 +159,26 @@ static struct worm {
 /* stores the highscore - besides it was scored by a virtual player */
 static int highscore;
 
-#define MAX_FOOD  5 /* maximal number of food items */
-#define FOOD_SIZE 3 /* the width and height of a food */
+#define MAX_FOOD 5 /* maximal number of food items */
 
 /* The arrays store the food coordinates  */
 static char foodx[MAX_FOOD];
 static char foody[MAX_FOOD];
 
-#define MAX_ARGH  100    /* maximal number of argh items */
-#define ARGH_SIZE 4      /* the width and height of a argh */
+#define MAX_ARGH 100    /* maximal number of argh items */
 #define ARGHS_PER_FOOD 2 /* number of arghs produced per eaten food */
 
 /* The arrays store the argh coordinates */
 static char arghx[MAX_ARGH];
 static char arghy[MAX_ARGH];
 
-/* the number of arghs that are currently in use */ 
+/* the number of arghs that are currently in use */
 static int argh_count;
 
 #ifdef DEBUG_WORMLET
 /* just a buffer used for debug output */
 static char debugout[15];
 #endif
-
-/* the number of ticks each game cycle should take */ 
-#define SPEED 14
 
 /* the number of active worms (dead or alive) */
 static int worm_count = MAX_WORMS;
@@ -124,9 +204,9 @@ static bool use_remote = false;
 #define SOUTH 3
 
 /* direction of human player 1 */
-static int player1_dir = EAST; 
+static int player1_dir = EAST;
 /* direction of human player 2 */
-static int player2_dir = EAST; 
+static int player2_dir = EAST;
 /* direction of human player 3 */
 static int player3_dir = EAST;
 
@@ -146,7 +226,7 @@ static void set_debug_out(char *str){
 /**
  * Returns the direction id in which the worm
  * currently is creeping.
- * @param struct worm *w The worm that is to be investigated. 
+ * @param struct worm *w The worm that is to be investigated.
  *        w Must not be null.
  * @return int A value 0 <= value < 4
  *         Note the predefined constants NORTH, SOUTH, EAST, WEST
@@ -175,7 +255,7 @@ static int get_worm_dir(struct worm *w) {
  * to right by 90 degree.
  * @param struct worm *w The worm that is to be altered. w Must not be null.
  * @param int dir The new direction in which the worm is to creep.
- *        dir must be  0 <= dir < 4. Use predefined constants 
+ *        dir must be  0 <= dir < 4. Use predefined constants
  *        NORTH, SOUTH, EAST, WEST
  */
 static void set_worm_dir(struct worm *w, int dir) {
@@ -255,7 +335,7 @@ static int get_score(struct worm *w) {
 /**
  * Determines wether the line specified by startx, starty, endx, endy intersects
  * the rectangle specified by x, y, width, height. Note that the line must be exactly
- * horizontal or vertical (startx == endx or starty == endy). 
+ * horizontal or vertical (startx == endx or starty == endy).
  * @param int startx The x coordinate of the start point of the line.
  * @param int starty The y coordinate of the start point of the line.
  * @param int endx The x coordinate of the end point of the line.
@@ -305,7 +385,7 @@ static bool line_in_rect(int startx, int starty, int endx, int endy, int x, int 
     return retval;
 }
 
-/** 
+/**
  * Tests wether the specified worm intersects with the rect.
  * @param struct worm *w The worm to be investigated
  * @param int x The x coordinate of the top left corner of the rect
@@ -433,7 +513,7 @@ static bool worm_food_collision(struct worm *w, int foodIndex)
 {
     bool retVal = false;
 
-    retVal = worm_in_rect(w, foodx[foodIndex], foody[foodIndex], 
+    retVal = worm_in_rect(w, foodx[foodIndex], foody[foodIndex],
                           FOOD_SIZE - 1, FOOD_SIZE - 1);
 
     return retVal;
@@ -443,7 +523,7 @@ static bool worm_food_collision(struct worm *w, int foodIndex)
  * Returns true if the worm hits the argh within the next moves (unless
  * the worm changes it's direction).
  * @param struct worm *w - The worm to investigate
- * @param int argh_idx - The index of the argh 
+ * @param int argh_idx - The index of the argh
  * @param int moves - The number of moves that are considered.
  * @return Returns false if the specified argh is not hit within the next
  *         moves.
@@ -457,7 +537,7 @@ static bool worm_argh_collision_in_moves(struct worm *w, int argh_idx, int moves
     x2 = w->x[w->head] + moves * w->dirx;
     y2 = w->y[w->head] + moves * w->diry;
 
-    retVal = line_in_rect(x1, y1, x2, y2, arghx[argh_idx], arghy[argh_idx], 
+    retVal = line_in_rect(x1, y1, x2, y2, arghx[argh_idx], arghy[argh_idx],
                          ARGH_SIZE, ARGH_SIZE);
     return retVal;
 }
@@ -472,7 +552,7 @@ static bool worm_argh_collision(struct worm *w, int arghIndex)
 {
     bool retVal = false;
 
-    retVal = worm_in_rect(w, arghx[arghIndex], arghy[arghIndex], 
+    retVal = worm_in_rect(w, arghx[arghIndex], arghy[arghIndex],
                           ARGH_SIZE - 1, ARGH_SIZE - 1);
 
     return retVal;
@@ -481,7 +561,7 @@ static bool worm_argh_collision(struct worm *w, int arghIndex)
 /**
  * Find new coordinates for the food stored in foodx[index], foody[index]
  * that don't collide with any other food or argh
- * @param int index 
+ * @param int index
  * Ensure that 0 <= index < MAX_FOOD.
  */
 static int make_food(int index) {
@@ -504,12 +584,12 @@ static int make_food(int index) {
            If one or more corners of the new food hit any existing
            argh or food a collision is detected.
         */
-        collisionDetected = 
+        collisionDetected =
             food_collision(x                , y                ) >= 0 ||
             food_collision(x                , y + FOOD_SIZE - 1) >= 0 ||
             food_collision(x + FOOD_SIZE - 1, y                ) >= 0 ||
             food_collision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0 ||
-            argh_collision(x                , y                ) >= 0 || 
+            argh_collision(x                , y                ) >= 0 ||
             argh_collision(x                , y + FOOD_SIZE - 1) >= 0 ||
             argh_collision(x + FOOD_SIZE - 1, y                ) >= 0 ||
             argh_collision(x + FOOD_SIZE - 1, y + FOOD_SIZE - 1) >= 0;
@@ -531,7 +611,7 @@ static int make_food(int index) {
 /**
  * Clears a food from the lcd buffer.
  * @param int index The index of the food arrays under which
- * the coordinates of the desired food can be found. Ensure 
+ * the coordinates of the desired food can be found. Ensure
  * that the value is 0 <= index <= MAX_FOOD.
  */
 static void clear_food(int index)
@@ -547,13 +627,16 @@ static void clear_food(int index)
 /**
  * Draws a food in the lcd buffer.
  * @param int index The index of the food arrays under which
- * the coordinates of the desired food can be found. Ensure 
+ * the coordinates of the desired food can be found. Ensure
  * that the value is 0 <= index <= MAX_FOOD.
  */
 static void draw_food(int index)
 {
     /* draw the food object */
-    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X, 
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(0, 150, 0));
+#endif
+    rb->lcd_fillrect(foodx[index] + FIELD_RECT_X,
                      foody[index] + FIELD_RECT_Y,
                      FOOD_SIZE, FOOD_SIZE);
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -561,18 +644,21 @@ static void draw_food(int index)
                      foody[index] + FIELD_RECT_Y + 1,
                      FOOD_SIZE - 2, FOOD_SIZE - 2);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
+#endif
 }
 
 /**
  * Find new coordinates for the argh stored in arghx[index], arghy[index]
  * that don't collide with any other food or argh.
- * @param int index 
+ * @param int index
  * Ensure that 0 <= index < argh_count < MAX_ARGH.
  */
 static int make_argh(int index)
 {
-    int x = -1; 
-    int y = -1; 
+    int x = -1;
+    int y = -1;
     bool collisionDetected = false;
     int tries = 0;
     int i;
@@ -589,12 +675,12 @@ static int make_argh(int index)
            If one or more corners of the new argh hit any existing
            argh or food an intersection is detected.
         */
-        collisionDetected = 
-            food_collision(x                , y                ) >= 0 || 
+        collisionDetected =
+            food_collision(x                , y                ) >= 0 ||
             food_collision(x                , y + ARGH_SIZE - 1) >= 0 ||
             food_collision(x + ARGH_SIZE - 1, y                ) >= 0 ||
             food_collision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0 ||
-            argh_collision(x                , y                ) >= 0 || 
+            argh_collision(x                , y                ) >= 0 ||
             argh_collision(x                , y + ARGH_SIZE - 1) >= 0 ||
             argh_collision(x + ARGH_SIZE - 1, y                ) >= 0 ||
             argh_collision(x + ARGH_SIZE - 1, y + ARGH_SIZE - 1) >= 0;
@@ -606,7 +692,7 @@ static int make_argh(int index)
         /* now test wether we accidently hit the worm with argh ;) */
         for (i = 0; i < worm_count && !collisionDetected; i++) {
             collisionDetected |= worm_argh_collision(&worms[i], index);
-            collisionDetected |= worm_argh_collision_in_moves(&worms[i], index, 
+            collisionDetected |= worm_argh_collision_in_moves(&worms[i], index,
                                                               MIN_ARGH_DIST);
         }
     }
@@ -617,15 +703,21 @@ static int make_argh(int index)
 /**
  * Draws an argh in the lcd buffer.
  * @param int index The index of the argh arrays under which
- * the coordinates of the desired argh can be found. Ensure 
+ * the coordinates of the desired argh can be found. Ensure
  * that the value is 0 <= index < argh_count <= MAX_ARGH.
  */
 static void draw_argh(int index)
 {
     /* draw the new argh */
-    rb->lcd_fillrect(arghx[index] + FIELD_RECT_X, 
-                 arghy[index] + FIELD_RECT_Y, 
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(175, 0, 0));
+#endif
+    rb->lcd_fillrect(arghx[index] + FIELD_RECT_X,
+                 arghy[index] + FIELD_RECT_Y,
                  ARGH_SIZE, ARGH_SIZE);
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
+#endif
 }
 
 static void virtual_player(struct worm *w);
@@ -659,40 +751,40 @@ static void init_worm(struct worm *w, int x, int y){
         w->fetch_worm_direction = virtual_player;
 }
 
-/** 
+/**
  * Writes the direction that was stored for
  * human player 1 into the specified worm. This function
- * may be used to be stored in worm.fetch_worm_direction. 
- * The value of 
+ * may be used to be stored in worm.fetch_worm_direction.
+ * The value of
  * the direction is read from player1_dir.
- * @param struct worm *w - The worm of which the direction 
+ * @param struct worm *w - The worm of which the direction
  * is altered.
  */
 static void human_player1(struct worm *w) {
     set_worm_dir(w, player1_dir);
 }
 
-/** 
+/**
  * Writes the direction that was stored for
  * human player 2 into the specified worm. This function
- * may be used to be stored in worm.fetch_worm_direction. 
- * The value of 
+ * may be used to be stored in worm.fetch_worm_direction.
+ * The value of
  * the direction is read from player2_dir.
- * @param struct worm *w - The worm of which the direction 
+ * @param struct worm *w - The worm of which the direction
  * is altered.
  */
 static void human_player2(struct worm *w) {
     set_worm_dir(w, player2_dir);
 }
 
-/** 
+/**
  * Writes the direction that was stored for
- * human player using a remote control 
+ * human player using a remote control
  * into the specified worm. This function
- * may be used to be stored in worm.fetch_worm_direction. 
- * The value of 
+ * may be used to be stored in worm.fetch_worm_direction.
+ * The value of
  * the direction is read from player3_dir.
- * @param struct worm *w - The worm of which the direction 
+ * @param struct worm *w - The worm of which the direction
  * is altered.
  */
 static void remote_player(struct worm *w) {
@@ -735,7 +827,7 @@ static void init_wormlet(void)
         worms[2].fetch_worm_direction = human_player2;
     }
 
-    /* Needed when the game is restarted using BUTTON_ON */
+    /* Needed when the game is restarted using BTN_STOPRESET */
     rb->lcd_clear_display();
 
     /* make and display some food and argh */
@@ -758,9 +850,9 @@ static void init_wormlet(void)
 }
 
 
-/** 
+/**
  * Move the worm one step further if it is alive.
- * The direction in which the worm moves is taken from dirx and diry. 
+ * The direction in which the worm moves is taken from dirx and diry.
  * move_worm decreases growing if > 0. While the worm is growing the tail
  * is left untouched.
  * @param struct worm *w The worm to move. w must not be NULL.
@@ -787,7 +879,7 @@ static void move_worm(struct worm *w)
         }
 
         /* olddir == dir?
-           a change of direction means a new segment 
+           a change of direction means a new segment
            has been opened */
         if (olddirx != w->dirx ||
             olddiry != w->diry) {
@@ -804,15 +896,15 @@ static void move_worm(struct worm *w)
     /* update the worms grow state */
             w->growing--;
         }
-        
+
         /* if the worm isn't growing the tail has to be dragged */
         else {
-            /* index of the end of the tail segment */ 
+            /* index of the end of the tail segment */
             int tail_segment_end = (w->tail + 1) % MAX_WORM_SEGMENTS;
 
             /* drag the end of the tail */
-            /* only one coordinate has to be altered. Here it is 
-               determined which one */ 
+            /* only one coordinate has to be altered. Here it is
+               determined which one */
             int dir = 0; /* specifies wether the coord has to be in- or decreased */
             if (w->x[w->tail] == w->x[tail_segment_end]) {
                 dir = (w->y[w->tail] - w->y[tail_segment_end] < 0) ? 1 : -1;
@@ -827,7 +919,7 @@ static void move_worm(struct worm *w)
                must be freed */
             if (w->x[w->tail] == w->x[tail_segment_end] &&
                 w->y[w->tail] == w->y[tail_segment_end]){
-                
+
                 /* drop the last tail point */
                 w->tail = tail_segment_end;
             }
@@ -836,12 +928,15 @@ static void move_worm(struct worm *w)
 }
 
 /**
- * Draws the head and clears the tail of the worm in 
+ * Draws the head and clears the tail of the worm in
  * the display buffer. lcd_update() is NOT called thus
  * the caller has to take care that the buffer is displayed.
  */
 static void draw_worm(struct worm *w)
 {
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(80, 40, 0));
+#endif
     /* draw the new head */
     int x = w->x[w->head];
     int y = w->y[w->head];
@@ -858,16 +953,19 @@ static void draw_worm(struct worm *w)
         rb->lcd_drawpixel(x + FIELD_RECT_X, y + FIELD_RECT_Y);
     }
     rb->lcd_set_drawmode(DRMODE_SOLID);
+#ifdef COLOR_LCD
+    rb->lcd_set_foreground(LCD_RGBPACK(0, 0, 0));
+#endif
 }
 
 /**
  * Checks wether the coordinate is part of the worm. Returns
  * true if any part of the worm was hit - including the head.
- * @param x int The x coordinate 
+ * @param x int The x coordinate
  * @param y int The y coordinate
  * @return int The index of the worm arrays that contain x, y.
  * Returns -1 if the coordinates are not part of the worm.
- */ 
+ */
 static int specific_worm_collision(struct worm *w, int x, int y)
 {
     int retVal = -1;
@@ -891,7 +989,7 @@ static int specific_worm_collision(struct worm *w, int x, int y)
             if (samey) {
                 min = w->x[linestart];
                 max = w->x[lineend];
-                test = x; 
+                test = x;
             } else {
                 min = w->y[linestart];
                 max = w->y[lineend];
@@ -911,7 +1009,7 @@ static int specific_worm_collision(struct worm *w, int x, int y)
 }
 
 /**
- * Increases the length of the specified worm by marking 
+ * Increases the length of the specified worm by marking
  * that it may grow by len pixels. Note that the worm has
  * to move to make the growing happen.
  * @param worm *w The worm that is to be altered.
@@ -926,8 +1024,8 @@ static void add_growing(struct worm *w, int len) {
  * Determins the worm that is at the coordinates x, y. The parameter
  * w is a switch parameter that changes the functionality of worm_collision.
  * If w is specified and x,y hits the head of w NULL is returned.
- * This is a useful way to determine wether the head of w hits 
- * any worm but including itself but excluding its own head. 
+ * This is a useful way to determine wether the head of w hits
+ * any worm but including itself but excluding its own head.
  * (It hits always its own head ;))
  * If w is set to NULL worm_collision returns any worm including all heads
  * that is at position of x,y.
@@ -954,9 +1052,9 @@ static struct worm* worm_collision(struct worm *w, int x, int y){
 
 /**
  * Returns true if the head of the worm just has
- * crossed the field boundaries. 
+ * crossed the field boundaries.
  * @return bool true if the worm just has wrapped.
- */ 
+ */
 static bool field_collision(struct worm *w)
 {
     bool retVal = false;
@@ -972,11 +1070,11 @@ static bool field_collision(struct worm *w)
 
 
 /**
- * Returns true if the specified coordinates are within the 
+ * Returns true if the specified coordinates are within the
  * field specified by the FIELD_RECT_XXX constants.
  * @param int x The x coordinate of the point that is investigated
  * @param int y The y coordinate of the point that is investigated
- * @return bool Returns false if x,y specifies a point outside the 
+ * @return bool Returns false if x,y specifies a point outside the
  * field of worms.
  */
 static bool is_in_field_rect(int x, int y) {
@@ -1017,7 +1115,7 @@ static int check_collision(struct worm *w)
 
 /**
  * Returns the index of the food that is closest to the point
- * specified by x, y. This index may be used in the foodx and 
+ * specified by x, y. This index may be used in the foodx and
  * foody arrays.
  * @param int x The x coordinate of the point
  * @param int y The y coordinate of the point
@@ -1045,10 +1143,10 @@ static int get_nearest_food(int x, int y){
     return nearestfood;
 }
 
-/** 
+/**
  * Returns wether the specified position is next to the worm
- * and in the direction the worm looks. Use this method to 
- * test wether this position would be hit with the next move of 
+ * and in the direction the worm looks. Use this method to
+ * test wether this position would be hit with the next move of
  * the worm unless the worm changes its direction.
  * @param struct worm *w - The worm to be investigated
  * @param int x - The x coordinate of the position to test.
@@ -1083,21 +1181,21 @@ static bool will_worm_collide(struct worm *w) {
     if (!retVal) {
         retVal = (argh_collision(x, y) != -1);
     }
-    
+
     if (!retVal) {
         retVal = (worm_collision(w, x, y) != NULL);
     }
     return retVal;
 }
 
-/** 
+/**
  * This function
  * may be used to be stored in worm.fetch_worm_direction for
- * worms that are not controlled by humans but by artificial stupidity. 
+ * worms that are not controlled by humans but by artificial stupidity.
  * A direction is searched that doesn't lead to collision but to the nearest
  * food - but not very intelligent. The direction is written to the specified
  * worm.
- * @param struct worm *w - The worm of which the direction 
+ * @param struct worm *w - The worm of which the direction
  * is altered.
  */
 static void virtual_player(struct worm *w) {
@@ -1171,7 +1269,7 @@ static void score_board(void)
     rb->lcd_set_drawmode(DRMODE_SOLID);
     for (i = 0; i < worm_count; i++) {
         int score = get_score(&worms[i]);
-    
+
         /* high score */
         if (worms[i].fetch_worm_direction != virtual_player){
             if (highscore < score) {
@@ -1184,7 +1282,7 @@ static void score_board(void)
 
         /* worm state */
         switch (check_collision(&worms[i])) {
-            case COLLISION_NONE:  
+            case COLLISION_NONE:
                 if (worms[i].growing > 0)
                     buf2 = "Growing";
                 else {
@@ -1195,19 +1293,19 @@ static void score_board(void)
                 }
                 break;
 
-            case COLLISION_WORM:  
+            case COLLISION_WORM:
                 buf2 = "Wormed";
                 break;
 
-            case COLLISION_FOOD:  
+            case COLLISION_FOOD:
                 buf2 = "Growing";
                 break;
 
-            case COLLISION_ARGH:  
+            case COLLISION_ARGH:
                 buf2 = "Argh";
                 break;
 
-            case COLLISION_FIELD: 
+            case COLLISION_FIELD:
                 buf2 = "Crashed";
                 break;
         }
@@ -1248,11 +1346,11 @@ static bool process_collisions(struct worm *w)
         index = food_collision(w->x[w->head], w->y[w->head]);
         if (index != -1){
             int i;
-            
+
             clear_food(index);
             make_food(index);
             draw_food(index);
-            
+
             for (i = 0; i < ARGHS_PER_FOOD; i++) {
                 argh_count++;
                 if (argh_count > MAX_ARGH)
@@ -1287,7 +1385,7 @@ static bool process_collisions(struct worm *w)
  * @return bool Returns true if the game ended
  * with a dead worm. Returns false if the user
  * aborted the game manually.
- */ 
+ */
 static bool run(void)
 {
     int button = 0;
@@ -1306,24 +1404,24 @@ static bool run(void)
 
     cycle_start = *rb->current_tick;
     /* change the direction of the worm */
-    while (button != BUTTON_OFF && ! wormDead)
+    while (button != BTN_QUIT && ! wormDead)
     {
         int i;
         long cycle_duration ;
         switch (button) {
-            case BUTTON_UP:
+            case BTN_DIR_UP:
                 if (players == 1 && !use_remote) {
                     player1_dir = NORTH;
                 }
                 break;
 
-            case BUTTON_DOWN:
+            case BTN_DIR_DOWN:
                 if (players == 1 && !use_remote) {
                     player1_dir = SOUTH;
                 }
                 break;
 
-            case BUTTON_LEFT:
+            case BTN_DIR_LEFT:
                 if (players != 1 || use_remote) {
                     player1_dir = (player1_dir + 3) % 4;
                 } else {
@@ -1331,7 +1429,7 @@ static bool run(void)
                 }
                 break;
 
-            case BUTTON_RIGHT:
+            case BTN_DIR_RIGHT:
                 if (players != 1 || use_remote) {
                     player1_dir = (player1_dir + 1) % 4;
                 } else {
@@ -1339,28 +1437,32 @@ static bool run(void)
                 }
                 break;
 
-            case BUTTON_F2:
+#ifdef MULTIPLAYER
+            case BTN_PLAYER2_DIR1:
                 player2_dir = (player2_dir + 3) % 4;
                 break;
 
-            case BUTTON_F3:
+            case BTN_PLAYER2_DIR2:
                 player2_dir = (player2_dir + 1) % 4;
                 break;
+#endif
 
-            case BUTTON_RC_VOL_UP:
+#ifdef REMOTE
+            case BTN_RC_UP:
                 player3_dir = (player3_dir + 1) % 4;
                 break;
 
-            case BUTTON_RC_VOL_DOWN:
+            case BTN_RC_DOWN:
                 player3_dir = (player3_dir + 3) % 4;
                 break;
+#endif
 
-            case BUTTON_PLAY:
+            case BTN_STARTPAUSE:
                 do {
                     button = rb->button_get(true);
-                } while (button != BUTTON_PLAY &&
-                         button != BUTTON_OFF  &&
-                         button != BUTTON_ON);
+                } while (button != BTN_STARTPAUSE &&
+                         button != BTN_QUIT  &&
+                         button != BTN_STOPRESET);
                 break;
         }
 
@@ -1377,7 +1479,7 @@ static bool run(void)
         }
         score_board();
         rb->lcd_update();
-        if (button == BUTTON_ON) {
+        if (button == BTN_STOPRESET) {
             wormDead = true;
         }
 
@@ -1477,7 +1579,6 @@ static void test_worm_food_collision(void) {
     }
 
 }
-
 
 static bool expensive_worm_in_rect(struct worm *w, int rx, int ry, int rw, int rh){
     int x, y;
@@ -1876,10 +1977,10 @@ static void test_worm_argh_collision_in_moves(void) {
         rb->snprintf(buf, sizeof buf, "in 5 moves hits: %d", hit_count);
         rb->lcd_putsxy(0, LCD_HEIGHT - 8, buf);
         rb->lcd_update();
-    }    
+    }
     if (hit_count != ARGH_SIZE + 5) {
         rb->button_get(true);
-    }    
+    }
 }
 #endif /* DEBUG_WORMLET */
 
@@ -1892,11 +1993,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     bool worm_dead = false;
     int button;
-    
+
     (void)(parameter);
 
     rb = api;
     rb->lcd_setfont(FONT_SYSFIXED);
+
+#ifdef COLOR_LCD
+    rb->lcd_set_background(LCD_RGBPACK(200, 210, 230));
+#endif
 
 #ifdef DEBUG_WORMLET
     testline_in_rect();
@@ -1905,47 +2010,65 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     test_worm_food_collision();
     test_worm_argh_collision();
     test_specific_worm_collision();
-#endif 
+#endif
 
     /* Setup screen */
     do {
-        char buf[20];
+        char buf[40];
         char* ptr;
         rb->lcd_clear_display();
 
         /* first line players */
-        rb->snprintf(buf, sizeof buf, "%d Players    UP/DN", players);
+#ifdef MULTIPLAYER
+        rb->snprintf(buf, sizeof buf, "%d Players (%s)", players, PLAYERS_TEXT);
+#else
+        rb->snprintf(buf, sizeof buf, "1 Player");
+#endif
         rb->lcd_puts(0, 0, buf);
 
         /* second line worms */
-        rb->snprintf(buf, sizeof buf, "%d Worms        L/R", worm_count);
+        rb->snprintf(buf, sizeof buf, "%d Worms (%s)", worm_count, WORMS_TEXT);
         rb->lcd_puts(0, 1, buf);
 
+#if defined MULTIPLAYER && defined REMOTE
         /* third line control */
         if (players > 1) {
             if (use_remote) {
-                ptr = "Remote Control F1";
+                rb->snprintf(buf, sizeof(buf), "Remote Control (%s)", KEY_CONTROL_TEXT);
+                ptr = buf;
             } else {
-                ptr = "No Rem. Control F1";
+                rb->snprintf(buf, sizeof(buf), "No Rem. Control (%s)", KEY_CONTROL_TEXT);
+                ptr = buf;
             }
         } else {
             if (players > 0) {
                 if (use_remote) {
-                    ptr = "2 Key Control   F1";
+                rb->snprintf(buf, sizeof(buf), "2 Key Control (%s)", KEY_CONTROL_TEXT);
+                    ptr = buf;
                 } else {
-                    ptr = "4 Key Control   F1";
+                rb->snprintf(buf, sizeof(buf), "4 Key Control (%s)", KEY_CONTROL_TEXT);
+                    ptr = buf;
                 }
             } else {
                 ptr = "Out Of Control";
             }
         }
         rb->lcd_puts(0, 2, ptr);
+#endif
         rb->lcd_update();
 
         /* user selection */
         button = rb->button_get(true);
         switch (button) {
-            case BUTTON_UP:
+#ifdef MULTIPLAYER
+            case BTN_TOGGLE_KEYS:
+                use_remote = !use_remote;
+                if (players > 2) {
+                    use_remote = true;
+                }
+                break;
+
+            case BTN_DIR_UP:
                 if (players < 3) {
                     players ++;
                     if (players > worm_count) {
@@ -1956,12 +2079,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     }
                 }
                 break;
-            case BUTTON_DOWN:
+
+            case BTN_DIR_DOWN:
                 if (players > 0) {
                     players --;
                 }
                 break;
-            case BUTTON_LEFT: 
+#endif
+            case BTN_DIR_LEFT:
                 if (worm_count > 1) {
                     worm_count--;
                     if (worm_count < players) {
@@ -1969,15 +2094,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     }
                 }
                 break;
-            case BUTTON_RIGHT:
+
+            case BTN_DIR_RIGHT:
                 if (worm_count < MAX_WORMS) {
                     worm_count ++;
-                }
-                break;
-            case BUTTON_F1:
-                use_remote = !use_remote;
-                if (players > 2) {
-                    use_remote = true;
                 }
                 break;
 
@@ -1986,39 +2106,37 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
-    } while (button != BUTTON_PLAY && 
-             button != BUTTON_OFF  && button != BUTTON_ON);
+    } while (button != BTN_STARTPAUSE &&
+             button != BTN_QUIT  && button != BTN_STOPRESET);
 
     rb->lcd_clear_display();
     /* end of setup */
 
-    do {    
+    do {
 
         /* button state will be overridden if
            the game quits with the death of the worm.
-           Initializing button to BUTTON_OFF ensures
-           that the user can hit BUTTON_OFF during the
+           Initializing button to BTN_QUIT ensures
+           that the user can hit BTN_QUIT during the
            game to return to the menu.
         */
-        button  = BUTTON_OFF;
+        button = BTN_QUIT;
 
         /* start the game */
         worm_dead = run();
 
         /* if worm isn't dead the game was quit
-           via BUTTON_OFF -> no need to wait for buttons. */
+           via BTN_QUIT -> no need to wait for buttons. */
         if (worm_dead) {
             do {
                 button = rb->button_get(true);
             }
-            /* BUTTON_ON -> start new game */
-            /* BUTTON_OFF -> back to game menu */
-            while (button != BUTTON_OFF && button != BUTTON_ON);
+            /* BTN_STOPRESET -> start new game */
+            /* BTN_QUIT -> back to game menu */
+            while (button != BTN_QUIT && button != BTN_STOPRESET);
         }
     }
-    while (button != BUTTON_OFF);
+    while (button != BTN_QUIT);
 
     return PLUGIN_OK;
 }
-
-#endif
