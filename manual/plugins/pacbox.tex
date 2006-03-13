@@ -1,0 +1,41 @@
+\subsection{Pacbox}
+Pacbox is an emulator of the Pacman arcade machine hardware. It is a port of \emph{PIE - Pacman Instructional Emulator} (\url{http://www.ascotti.org/programming/pie/pie.htm}).
+\begin{figure}[h!]
+  \begin{center}
+    \includegraphics[width=4cm]{plugins/images/ss-pacbox-\genericimg.png}
+  \end{center}
+  \caption{Pacbox}
+\end{figure}
+
+\subsubsection{ROMs}
+To use the emulator to play Pacman, you need a copy of ROMs for "Midway Pacman".
+\begin{center}
+  \begin{tabular}{ll}\toprule
+    \textbf{Filename} & \textbf{MD5 checksum}\\\midrule
+    pacman.5e & 2791455babaf26e0b396c78d2b45f8f6\\
+    pacman.5f & 9240f35d1d2beee0ff17195653b5e405\\
+    pacman.6e & 290aa5eae9e2f63587b5dd5a7da932da\\
+    pacman.6f & 19a886fcd8b5e88b0ed1b97f9d8659c0\\
+    pacman.6h & d7cce8bffd9563b133ec17ebbb6373d4\\
+    pacman.6j & 33c0e197be4c787142af6c3be0d8f6b0\\\bottomrule
+  \end{tabular}
+\end{center}
+
+These need to be stored in the \fname{/.rockbox/pacman/} directory on your player.
+In the MAME ROMs collection the necessary files can be found in \fname{pacman.zip} and \fname{puckman.zip}.
+
+\subsubsection{Keys}
+\begin{center}
+  \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    Move Up & \opt{h1xx,h300}{RIGHT}\opt{ipodcolor,ipodnano}{NEXT}\\
+    Move Down & \opt{h1xx,h300}{LEFT}\opt{ipodcolor,ipodnano}{PREV}\\
+    Move Left & \opt{h1xx,h300}{UP}\opt{ipodcolor,ipodnano}{MENU}\\
+    Move Right & \opt{h1xx,h300}{DOWN}\opt{ipodcolor,ipodnano}{PLAY}\\
+    Insert Coin & \opt{h1xx,h300}{REC}\opt{ipodcolor,ipodnano}{SELECT}\\
+    1-Player Start & \opt{h1xx,h300,ipodcolor,ipodnano}{SELECT}\\
+    2-Player Start & \opt{h1xx,h300}{ON}\opt{ipodcolor,ipodnano}{n/a}\\
+    Menu & \opt{h1xx,h300}{MODE}\opt{ipodcolor,ipodnano}{SELECT+MENU}\\\bottomrule
+  \end{tabular}
+\end{center}
+
