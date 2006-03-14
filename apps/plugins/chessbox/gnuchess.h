@@ -19,14 +19,28 @@
 #define valueQ 1100
 #define valueK 1200
 
-/* ---- chess system global variables ---- */
-extern short mate,opponent,computer;
+/* ---- chess engine global types ---- */
+struct GameRec {
+    unsigned short gmove;
+    short score,depth,time,piece,color;
+    long nodes;
+};
+struct TimeControlRec {
+    short moves[2];
+    long clock[2];
+};
+
+/* ---- chess engine global variables ---- */
+extern short mate,opponent,computer,Sdepth;
 extern short locn[8][8];
 extern short board[64];
 extern short color[64];
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
 extern short timeout;
+extern short GameCnt,Game50,castld[2],kingmoved[2],OperatorTime;
+extern struct TimeControlRec TimeControl;
+extern struct GameRec GameList[240];
 
 /* ---- RockBox integration ---- */
 extern struct plugin_api* rb;
@@ -36,5 +50,6 @@ void SetTimeControl(void);
 void GNUChess_Initialize(void);
 int  VerifyMove(char s[],short iop,unsigned short *mv);
 int  SelectMove ( short side, short iop , void (*callback)(void) );
+void InitializeStats ( void );
 
 #endif

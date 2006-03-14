@@ -32,9 +32,6 @@
 
 #define ttblsz 4096
 
-/*#define ttblsz 16384*/
-#define huge
-
 #define ctlP 0x4000
 #define ctlN 0x2800
 #define ctlB 0x1800
@@ -73,17 +70,6 @@ struct leaf
   {
     short f,t,score,reply;
     unsigned short flags;
-  };
-struct GameRec
-  {
-    unsigned short gmove;
-    short score,depth,time,piece,color;
-    long nodes;
-  };
-struct TimeControlRec
-  {
-    short moves[2];
-    long clock[2];
   };
 struct BookEntry
   {
@@ -182,7 +168,7 @@ unsigned short hashkey;
 unsigned long hashbd;
 struct hashval hashcode[2][7][64];
 struct hashentry ttable[ttblsz];
-struct hashentry huge *ptbl;
+struct hashentry *ptbl;
 unsigned char history[8192];
 
 short Mwpawn[64],Mbpawn[64],Mknight[2][64],Mbishop[2][64];
