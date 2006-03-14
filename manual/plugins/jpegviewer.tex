@@ -1,7 +1,24 @@
 \subsection{JPEG viewer}
-Press PLAY on a .jpg file in order to view the contents using Rockbox's greyscale library.  Use the arrow keys to move around the image, PLAY to zoom in
-and ON to zoom out.  Press OFF to exit the viewer.
+Open a .jpg file in the file browser to view it\opt{recorder,recorderv2fm,ondio,h1xx}
+    { contents using Rockbox's greyscale library}.
+
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    UP/DOWN/LEFT/RIGHT & Move around in zoomed in image\\
+    \opt{recorder,recorderv2fm}{PLAY}\opt{ondio}{MODE}\opt{h1xx}{SELECT}\opt{h300}{NAVI}\opt{ipodcolor,ipodnano}{Scroll forward}
+    & Zoom in\\
+    \opt{recorder,recorderv2fm}{MENU}\opt{ondio}{MODE+DOWN}\opt{h1xx,h300}{A-B}\opt{ipodcolor,ipodnano}{Scroll backward}
+    & Zoom out\\
+    \opt{recorder,recorderv2fm}{F3}\opt{ondio}{MODE+RIGHT}\opt{h1xx}{PLAY}\opt{h300}{RECORD}\opt{ipodcolor,ipodnano}{SELECT+RIGHT}
+    & Next jpeg in folder\\
+    \opt{recorder,recorderv2fm}{F2}\opt{ondio}{MODE+LEFT}\opt{h1xx}{RECORD}\opt{h300}{PLAY}\opt{ipodcolor,ipodnano}{SELECT+LEFT}
+    & Previous jpeg in folder\\
+    \opt{recorder,recorderv2fm,h1xx,h300}{STOP}\opt{ondio}{OFF}\opt{ipodcolor,ipodnano}{SELECT+MENU}
+    & Quit\\\bottomrule
+    \end{tabular}
+    \end{center}
+\end{table}
 
 Note: JPEGs that use progressive scan encoding are not supported and will produce an error.
-
-
