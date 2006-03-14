@@ -345,6 +345,10 @@ struct wps_data
     int progress_end; 
     bool wps_loaded;
     bool peak_meter_enabled;
+#ifdef HAVE_LCD_COLOR
+    bool has_backdrop;
+    fb_data* old_backdrop;
+#endif
 };
 
 /* initial setup of wps_data */

@@ -64,11 +64,6 @@ struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
 static struct wps_data wps_datas[NB_SCREENS];
 
-#ifdef HAVE_LCD_COLOR
-bool wps_has_backdrop;
-fb_data* old_backdrop;
-#endif
-
 bool keys_locked = false;
 
 /* change the path to the current played track */
@@ -110,8 +105,8 @@ long gui_wps_show(void)
         gui_wps_set_margin(&gui_wps[i]);
     }
 #ifdef HAVE_LCD_COLOR
-    old_backdrop = lcd_get_backdrop();
-    if (wps_has_backdrop) {
+    gui_wps[SCREEN_MAIN].data->old_backdrop = lcd_get_backdrop();
+    if (gui_wps[SCREEN_MAIN].data->has_backdrop) {
         lcd_set_backdrop(&wps_backdrop[0][0]);
     }
 #endif
@@ -239,11 +234,11 @@ long gui_wps_show(void)
             case WPS_RC_CONTEXT:
 #endif
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(old_backdrop);
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
                 onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
 #ifdef HAVE_LCD_COLOR
-                if (wps_has_backdrop)
+                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
                     lcd_set_backdrop(&wps_backdrop[0][0]);
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -531,12 +526,12 @@ long gui_wps_show(void)
                     gui_wps[i].display->stop_scroll();
 
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(old_backdrop);
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
                 if (main_menu())
                     return true;
 #ifdef HAVE_LCD_COLOR
-                if (wps_has_backdrop)
+                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
                     lcd_set_backdrop(&wps_backdrop[0][0]);
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -568,12 +563,12 @@ long gui_wps_show(void)
             case WPS_RC_QUICK:
 #endif
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(old_backdrop);
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
-                if (wps_has_backdrop)
+                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
                     lcd_set_backdrop(&wps_backdrop[0][0]);
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -604,12 +599,12 @@ long gui_wps_show(void)
             case BUTTON_ON | BUTTON_OFF:
 #endif
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(old_backdrop);
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
                 if (2 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
-                if (wps_has_backdrop)
+                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
                     lcd_set_backdrop(&wps_backdrop[0][0]);
 #endif
                 restore = true;
@@ -837,6 +832,9 @@ void wps_data_init(struct wps_data *wps_data)
     wps_data->format_buffer[0] = '\0';
     wps_data->wps_loaded = false;
     wps_data->peak_meter_enabled = false;
+#ifdef HAVE_LCD_COLOR
+    wps_data->has_backdrop = false;
+#endif
 }
 
 static void wps_reset(struct wps_data *data)
@@ -844,9 +842,6 @@ static void wps_reset(struct wps_data *data)
     data->wps_loaded = false;
     memset(&data->format_buffer, 0, sizeof data->format_buffer);
     wps_data_init(data);
-#ifdef HAVE_LCD_COLOR
-    wps_has_backdrop = false;
-#endif
 }
 
 /* to setup up the wps-data from a format-buffer (isfile = false)
@@ -1025,7 +1020,4 @@ void gui_sync_wps_init(void)
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
-#ifdef HAVE_LCD_COLOR
-    wps_has_backdrop = false;
-#endif
 }

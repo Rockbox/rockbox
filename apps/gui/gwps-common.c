@@ -61,10 +61,6 @@ static void draw_player_fullbar(struct gui_wps *gwps,
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
-#ifdef HAVE_LCD_COLOR
-extern bool wps_has_backdrop;
-#endif
-
 /* Skip leading UTF-8 BOM, if present. */
 static char* skip_utf8_bom(char* buf)
 {
@@ -179,7 +175,7 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
 
                 if ((ret > 0) && (bm.width == LCD_WIDTH) 
                               && (bm.height == LCD_HEIGHT)) {
-                    wps_has_backdrop=true;
+                    data->has_backdrop=true;
                     return true;
                 } else {
                     return false;
