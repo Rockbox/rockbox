@@ -33,8 +33,13 @@ extern struct plugin_api* rb;
 /* Convert RGB888 to 2-bit greyscale - logic taken from bmp2rb.c */
 static fb_data rgb_to_gray(unsigned int r, unsigned int g, unsigned int b)
 {
-    int brightness = ((3*r + 6*g + b) / 10);
-    return ((brightness & 0xc0) >> 6);
+    int brightness = ( 2*r + 4*g + b );
+    if( r == 0 && g == 0 && b == 0 )
+      return 3;
+
+    brightness = (brightness/450);
+    if( brightness > 2 ) return 0;
+    else return 2-brightness;
 }
 #endif
 
@@ -294,7 +299,9 @@ void decodeROMs(void)
                                  (unsigned char) (c >> 8),
                                  (unsigned char) (c >> 16));
 #else
-        palette[i] = rgb_to_gray(c, c >> 8, c >> 16);
+        palette[i] = rgb_to_gray((unsigned char) (c), 
+                                 (unsigned char) (c >> 8), 
+                                 (unsigned char) (c >> 16) );
 #endif
     }
 }
