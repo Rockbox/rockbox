@@ -1,0 +1,279 @@
+\section{\label{ref:Rockboxinflash}Rockbox in flash}
+\textbf{FLASHING ROCKBOX IS OPTIONAL!} It is not required for using
+Rockbox on your Jukebox Recorder. Please read the whole section
+thoroughly before flashing.
+
+\subsection{\label{ref:PartISection61}Introduction}
+Flashing in the sense used here and elsewhere in regard to Rockbox means
+reprogramming the flash memory of the Jukebox unit. Flash memory
+(sometimes called ``Flash ROM'') is a type of
+non{}-volatile memory that can be erased and reprogrammed in circuit. It is a variation of electrically erasable
+programmable read{}-only memory (EEPROM). 
+
+A from the factory Jukebox comes with the Archos firmware flashed. It is
+possible to replace the built{}-in software with Rockbox. 
+
+Terminology used in the following:\newline
+\textbf{Firmware} means the flash ROM content as a whole.\newline
+\textbf{Image} means one operating software started from there. 
+
+By reprogramming the firmware,  the Jukebox will boot much faster. The
+Archos boot loader seems to take forever compared to the Rockbox
+version. In fact, the Rockbox boot loader is so fast that it has to
+wait for the disk to spin up.  The flashing procedure is a bit involved
+for the first time, updates are very simple later on. 
+
+\subsection{\label{ref:Method}Method}
+The replaced firmware will host a bootloader and 2 images. This is made
+possible by compression. The first is the
+``permanent'' backup. The second is the
+default image to be started.  The former is only used when you hold the
+F1 key during start, and is the original Archos firmware, the second is
+a current build of Rockbox. This second image is meant to be
+reprogrammed whenever a Rockbox upgrade is performed.
+
+There are two programming tools supplied: 
+
+\begin{itemize}
+\item The first one is called \textbf{firmware\_flash.rock} and is used
+to program the whole flash with new content.  It can also be used to
+revert back to the original firmware that is backed up as part of this
+procedure.  This tool will only be needed once, and can be viewed as
+``formatting'' the flash with the desired image structure. 
+\item The second one is called \textbf{rockbox\_flash.rock }and is used
+to reprogram only the second image. If the resulting programmed
+firmware image is not operational, it is
+possible to hold down the F1 key while booting to start the Jukebox
+with the Archos firmware and Rockbox booted from disk to reinstall a
+working firmware image. 
+\end{itemize}
+
+\subsubsection{\label{ref:PartISection63}Risks}
+Well, is it dangerous? Yes, certainly, like programming a
+mainboard BIOS, CD/DVD drive firmware,
+mobile phone, etc. If the power fails, the chip malfunctions while
+programming or particularly if the programming software malfunctions,
+your Jukebox may stop functioning. The Rockbox team take no
+responsibility of any kind {}- do this at your own risk. 
+
+However, the code has been extensively tested and is known to work well.
+ The new firmware file is completely read before it starts programming,
+there are a lot of sanity checks. If any fail, it will not program.
+There is no reason why such low level code should behave differently on
+your Jukebox. 
+
+There's one ultimate safety net to bring back Jukeboxes
+with even completely garbled flash content: the UART boot mod, which in
+turn requires the serial mod. This can bring the dead back to life,
+with that it's possible to reflash independently from the outside, even
+if the flash is completely erased. It has been used during development,
+else Rockbox in flash wouldn't have been possible.
+Extensive development effort went into the development of the UART boot
+mod.  Mechanically adept users with good soldering skills can easily
+perform these mods. Others may feel uncomfortable using the first tool
+(\textbf{firmware\_flash.rock}) for reflashing the firmware.
+
+If you are starting with a known{}-good image, you are unlikely to
+experience problems.  The flash tools have been stable for quite a
+while. Several users have used them extensively, even flashing while
+playing! Although it worked, it's not the recommended
+method.  
+
+The flashing software is very paranoid about making sure that the
+correct flash version is being installed.  If the wrong file is used,
+it will simply refuse to flash the Jukebox.
+
+About the safety of operation: Since the Rockbox boot code gives ``dual
+boot'' capability, the Archos firmware is still there when you hold F1
+during startup. So even if you have problems with Rockbox from flash, you can still use
+the Jukebox, reflash the second image with an updated Rockbox copy,
+etc. 
+
+The flash chip being used by Archos is specified for 100,000 cycles, so
+it's very unlikely that flashing it will wear it out. 
+
+\subsection{\label{ref:Requirements}Requirements}
+You need two things: 
+
+\begin{itemize}
+\item The first is a Recorder or FM model, or an Ondio SP or FM. Be sure
+you're using the correct package, they differ
+depending on your precise hardware! The technology works for the Player
+models, too. Players can also be flashed, but Rockbox does not run
+cold{}-started on those, yet. 
+\item Second, you need an in{}-circuit programmable flash. Chances are
+about 85\% that you have, but Archos also used an older flash chip
+which can't do the trick. You can find out via Rockbox
+debug menu, entry Hardware Info. If the flash info gives you question
+marks, you're out of luck. The only option for
+flashing if this is the case is to solder in the right chip
+(SST39VF020), preferably with the firmware already in. If the chip is
+blank, you'll need the UART boot mod as well. 
+\end{itemize}
+\subsubsection{\label{ref:FlashingProcedure}Flashing Procedure}
+Here are step{}-by{}-step instructions on how to flash and update to a
+current build.  It is assumed that you can install and operate Rockbox
+the usual way. The flashing procedure has a lot of failsafes, and will
+check for correct model, file, etc. {}- if something is incompatible it
+just won't flash, that's all. 
+
+Now here are the steps: 
+
+\textbf{Preparation}
+
+Install (with all the files, not just the .ajz) and use the current
+daily build you'd like to have. Enable any voice
+features that are helpful throughout the process, such as menus and
+filename spelling. Set the file view to show all files, with  the menu
+option \textbf{General Settings {}-{\textgreater} File View
+{}-{\textgreater} Show Files} set to ``all''.
+Have the Jukebox nicely charged to avoid
+running out of power during the flash write.  Keep the Jukebox plugged
+into the charger until flashing is complete.
+
+{\bfseries
+Backup }
+
+Backup the existing flash content.  This is not an essential part of the
+procedure, but is strongly recommended since you will need these files
+if you wish to reverse the flashing procedure, or if you need to update
+the bootloader (as opposed to the firmware) in the future.  Keep them
+safe!
+
+Access the main menu by pressing F1 then select \textbf{Info
+{}-{\textgreater} Debug}.  Select the first entry, \textbf{Dump ROM
+contents}, by pressing Play one more time. The disk should start to
+spin. Wait for it to settle down, then plug in the USB cable  to copy
+the dump file this has just been created to your PC. The main folder of
+your Jukebox now should contain two strange .bin files. Copy the larger
+one named
+\textbf{internal\_rom\_2000000{}-203FFFF.bin}
+to a safe place, then delete them both from the box. 
+
+{\bfseries
+Copy the new flash content file to your box }
+
+Depending on your model (recorder, FM, V2 recorder), download one of the
+3 packages: 
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_rec.zip}
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_fm.zip}
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_v2.zip}
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_v2.zip}
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_v2.zip}
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_ondiosp.zip}
+
+\url{http://joerg.hohensohn.bei.t-online.de/archos/flash/flash_ondiofm.zip}
+
+The zip archives contain two .bin files each. Those firmware*.bin files
+are all we want, copy them to the root directory of your box. The names
+differ depending on the model, the flash
+plugin will pick the right one, no way of
+doing this wrong. 
+
+{\bfseries
+Install the Rockbox
+Bootloader (``formatting'' the flash)}
+
+This procedure is only necessary the first time you flash Rockbox. 
+Unplug the USB cable again, then select \textbf{Browse
+}\textbf{Plugins}\textbf{ } from the main menu (F1).  Locate \textbf{firmware\_flash.rock}, and start it with PLAY.  Rockbox now displays an info screen, press F1 to acknowledge it and start a file check. Again wait for the disk to
+settle, then press F2 to proceed to a warning message (if the plugin
+has exited, you don't have the proper file) and F3 to actually program
+the file. This takes maybe 15 seconds, wait for the disk to settle
+again. Then press a key to exit the plugin.
+
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.609cm,height=2.062cm]{images/rockbox-manual-img75.png}
+     [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.669cm,height=2.097cm]{images/rockbox-manual-img76.png}
+ \textmd{  }  [Warning: Image ignored]
+% Unhandled or unsupported graphics:
+%\includegraphics[width=3.739cm,height=2.136cm]{images/rockbox-manual-img77.png}
+ \newline
+Flashing boot loader in 3 easy steps
+\par}
+
+{\bfseries
+\label{ref:FlashingRockbox}Install the Rockbox binary in flash}
+
+All the above was necessary only once, although there will not be any
+obvious difference (other than the Archos firmware loading a bit more quickly)
+after the step above is complete.  Next install the actual Rockbox firmware thatwill be used from ROM.  This is how Rockbox will be updated when
+installing a new release from now on. 
+
+\begin{itemize}
+\item Unpack the whole build that you are installing onto the Jukebox,
+including plugins and support files.  This can be done using the Windows setup program to install the new version onto the Jukebox.
+\item Test the build you are going to flash by playing the .ajz file so
+that ROLO loads it up.  This puts the firmware in memory without
+changing your flash, so you can check that everything is working.  If
+you have just installed the bootloader (see above) then this will happen automatically as the existing Archos firmware loads the .ajz that you have just installed.  If upgrading ROMbox, this step \textbf{must }be carried out since Rockbox cannot overwrite the ROM while it is running from it.  
+\item Play the .ucl file, which is usually found in the
+\textbf{/.rockbox} directory, this will kick off the
+\textbf{rockbox\_flash.rock} plugin. It's a bit
+similar to the other one, but it's made different to
+make the user aware. It will check the file, available size, etc. With
+F2 it begins programming, there is no need for warning this time. If it
+goes wrong, you'll still have the permanent image. 
+
+{\centering\itshape
+  [Warning: Image ignored] % Unhandled or unsupported graphics:
+%\includegraphics[width=3.53cm,height=2.016cm]{images/rockbox-manual-img78.png}
+ \textmd{  }  [Warning: Image ignored]
+% Unhandled or unsupported graphics:
+%\includegraphics[width=3.528cm,height=2.016cm]{images/rockbox-manual-img79.png}
+ \newline
+Using rockbox\_flash to update your boot firmware
+\par}
+\item It is possible that you could get an ``Incompatible
+Version'' error if the plugin interface has changed since
+you last flashed Rockbox. This means you are running an
+``old'' copy of Rockbox, but are trying to
+execute a newer plugin, the one you just downloaded. The easiest
+solution is to ROLO into this new version,
+by playing the\textbf{ ajbrec.ajz }file. Then you are consistent and can play
+\textbf{rockbox.ucl}. 
+\item When done, you can restart the box and hopefully your new Rockbox
+image. 
+\end{itemize}
+UCLs for the latest Recorder and FM firmware are included in Rockbox 2.4
+and also the daily builds.
+
+\subsection{\label{ref:KnownIssuesAndLimits}Known Issues and Limitations}
+There are two variants as to how the Jukebox starts, which is why there
+are normal and \_norom firmware files. The vast majority of Jukeboxes
+all have the same boot ROM content, but some have different flash
+content. Rockbox identifies this boot ROM with a CRC value of 0x222F in
+the hardware info screen. Some recorders have the boot ROM disabled (it
+might be unprogrammed) and start directly from a flash mirror at
+address zero. They need the \_norom firmware, it has a slightly
+different bootloader. Without a boot ROM there is no UART boot safety
+net. To compensate for that as much as possible the MiniMon monitor is
+included, and can be started by pressing  F3+ON. Using this the box can
+be reprogrammed via serial if the UART mod has been applied and the
+first \~{}2000 bytes of the flash are OK. 
+
+\subsubsection{ROMbox}
+ROMbox is a flashable version of Rockbox that is
+uncompressed and runs directly from the flash chip rather than being
+copied into memory first.  The advantage of this is that memory that
+would normally be used for storing the Rockbox code can be used for
+buffering MP3s instead, resulting in less disk
+spin{}-ups and therefore longer battery life
+ Unfortunately being uncompressed, ROMbox requires more space in flash
+than Rockbox and will therefore not fit in the space that is left on an
+FM recorder.  ROMbox therefore runs on the V1 and V2 recorder models
+only.
+
+The procedure for flashing ROMbox is identical to the procedure for
+flashing Rockbox as laid out on page \pageref{ref:FlashingRockbox}. 
+The only difference is that the file to install is called
+\textbf{rombox.ucl}.  ROMbox is included automatically with rockbox 2.4
+and all the current daily builds, so the procedure is identical
+otherwise.
