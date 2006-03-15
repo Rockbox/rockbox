@@ -43,7 +43,7 @@ plugins/chessbox/*.lds
 plugins/chessbox/*.[ch]
 plugins/pacbox/Makefile
 plugins/pacbox/readme.txt
-plugins/pacbox/*.[ch]
+plugins/pacbox/*.[chS]
 plugins/midi/*.[ch]
 codecs/SOURCES
 codecs/*.[ch]
