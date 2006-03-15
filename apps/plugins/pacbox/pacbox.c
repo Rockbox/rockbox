@@ -37,9 +37,6 @@ extern char iedata[];
 extern char iend[];
 #endif
 
-/* How many video frames (out of a possible 60) we display each second */
-#define FPS 20
-
 struct plugin_api* rb;
 
 unsigned framesPerSecond    = VideoFrequency;
@@ -98,7 +95,6 @@ bool loadROMS( void )
 }
 
 /* A buffer to render Pacman's 244x288 screen into */
-unsigned char background[ScreenWidth*ScreenHeight] __attribute__ ((aligned (4)));
 unsigned char video_buffer[ScreenWidth*ScreenHeight] __attribute__ ((aligned (4)));
 
 long start_time;
@@ -316,13 +312,11 @@ int gameProc( void )
 
         rb->lcd_update();
 
-#ifdef SIMULATOR
         /* Keep the framerate at Pacman's 60fps */
         end_time = start_time + (video_frames*HZ)/FPS;
         while (TIME_BEFORE(*rb->current_tick,end_time)) {
              rb->sleep(1);
         }
-#endif
     }
 
     return 0;

@@ -88,4 +88,15 @@
 #define YOFS ((LCD_HEIGHT-224/2)/2)
 #endif
 
+/* How many video frames (out of a possible 60) we display each second.
+   NOTE: pacbox.c assumes this is an integer divisor of 60
+ */
+#ifdef APPLE_IPOD_NANO
+/* The Nano can manage full-speed at 30fps (1 in 2 frames) */
+#define FPS 30
+#else
+/* We aim for 20fps on the other targets (1 in 3 frames) */
+#define FPS 20
+#endif
+
 #endif
