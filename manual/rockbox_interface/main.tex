@@ -141,31 +141,18 @@ the disk.
 
 \subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
 If the playlist submenu is invoked on a directory, it will act on all the files within that directory.  If invoked on a playlist it will act on all the files in that playlist. Otherwise it acts only on the current file.
-
-{\centering\itshape
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=4.15cm,height=2.35cm]{images/rockbox-manual-img15.png}
-     [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=4.15cm,height=1.951cm]{images/rockbox-manual-img16.png}
- \newline
-  Recorder playlist submenu  Player playlist submenu
-\par}
-
+\begin{center}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-playlist-menu-112x64x1.png}
+\end{center}
 This menu provides the following options:
 
 \begin{itemize}
-\item \textbf{Insert:} Add track(s) to playlist. If no other tracks have been
-inserted then the selected track will be added immediately after
-current playing track, otherwise they will be added to end of insertion
-list.
+\item \textbf{Insert:} Add track(s) to playlist. If no other tracks have been inserted then the selected track will be added immediately after current playing track, otherwise they will be added to end of insertion list.
 \item \textbf{Insert next: }Add track(s) immediately after current playing
 track, no matter what else has been inserted.
 \item \textbf{Insert last: }Add track(s) to end of playlist.
-\item \textbf{Queue: } Queue is the same as Insert except queued
-tracks are deleted immediately from the playlist after
-they've been played. Also, queued tracks are not saved to the playlist file (see page \pageref{ref:playlistoptions}).
-\item \textbf{Queue next:} Queue track(s) immediately after current playing
-track.
+\item \textbf{Queue: } Queue is the same as Insert except queued tracks are deleted immediately from the playlist after they've been played. Also, queued tracks are not saved to the playlist file (see page \pageref{ref:playlistoptions}).
+\item \textbf{Queue next:} Queue track(s) immediately after current playing track.
 \item \textbf{Queue last: }Queue track(s) at end of playlist.
 \end{itemize}
 
@@ -181,20 +168,12 @@ pressing ON.
 
 
 \subsection{Virtual Keyboard}
-{\centering\itshape
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=4.165cm,height=2.177cm]{images/rockbox-manual-img17.png}
- \textmd{  }  [Warning: Image ignored]
-% Unhandled or unsupported graphics:
-%\includegraphics[width=4.598cm,height=2.071cm]{images/rockbox-manual-img18.png}
- \newline
-  Recorder keyboard  Player Keyboard  
-\par}
+\begin{center}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-virtual-keyboard-112x64x1.png}
+\end{center}
+This is the virtual keyboard that is used when entering file names in Rockbox.
 
-This is the virtual keyboard that is used when entering file names in
-Rockbox.
-
-\opt{Rec}{
+\opt{recorder,recorderv2fm,ondio}{
   \begin{table}[h!]
     \begin{center}
       \begin{tabular}{@{}cc@{}}\toprule
@@ -218,11 +197,8 @@ Rockbox.
 }
 
 
-\opt{PS}{
-  The current filename is always listed on the first line of the display. 
-  The second line of the display can contain the character selection bar,
-  as in the screenshot above, or  one of a number of other options.
-  
+\opt{player}{
+  The current filename is always listed on the first line of the display. The second line of the display can contain the character selection bar, as in the screenshot above, or  one of a number of other options.
   \begin{table}[h!]
     \begin{center}
       \begin{tabular}{@{}cc@{}}\toprule
@@ -263,13 +239,11 @@ Rockbox.
 }
 
 \section{\label{ref:WPS}While Playing Screen}
-The While Playing Screen (WPS) displays various pieces of information
-about the currently playing MP3 file:
+The While Playing Screen (WPS) displays various pieces of information about the currently playing audio file:
 %
-\opt{Rec}{
+\opt{recorder,recorderv2fm}{
 \begin{itemize}
-\item Status bar: Battery level, charger status, volume, play mode, repeat
-mode, shuffle mode and clock.
+\item Status bar: Battery level, charger status, volume, play mode, repeat mode, shuffle mode and clock.
 \item Scrolling path+filename of the current song.
 \item The ID3 track name.
 \item The ID3 album name.
@@ -289,7 +263,7 @@ using a small font that gives 8 or more display lines.
 \end{itemize}
 }
 %
-\opt{PS}{
+\opt{player}{
 \begin{itemize}
 \item Playlist index/Playlist size: Artist {}- Title.
 \item Current{}-time Progress{}-indicator Left.
@@ -301,7 +275,7 @@ details of customising your WPS (While Playing Screen).
 
 \subsection{\label{ref:PartIISectionWPSCtrls}WPS Key Controls}
 
-\opt{Rec}{
+\opt{recorder}{
   \begin{table}[h!]
     \begin{flushleft}
       \begin{tabular}{@{}cc@{}}\toprule
@@ -328,7 +302,7 @@ details of customising your WPS (While Playing Screen).
   \end{table}
 }
 %
-\opt{PS}{
+\opt{player}{
   \begin{table}[h!]
     \begin{center}
       \begin{tabular}{@{}cc@{}}\toprule
@@ -353,80 +327,51 @@ details of customising your WPS (While Playing Screen).
   \end{table}
 }
 
-\opt{Rec,Rec2,FMRec,OndioSP,OndioFM,H120}{
-\subsection{Peak Meter}
-The peak meter can be displayed on the While Playing Screen and consists
-of several indicators.  For a picture of the peak meter, please see the
-While Recording Screen on page \pageref{ref:Whilerecordingscreen}.
-
-\begin{itemize}
-\item \textbf{The bar: }This is the wide horizontal bar. It represents the
-current volume value.
-\item \textbf{The peak indicator:} This is a little vertical line at the right
-end of the bar. It indicates the peak volume value that occurred
-recently.
-\item \textbf{The clip indicator: }This is a little black block that is
-displayed at the very right of the scale when an overflow occurs. It
-usually doesn't show up during normal playback unless
-you play an audio file that is distorted heavily. If you encounter
-clipping while recording your recording will sound distorted. You
-should lower the gain. Note that the clip detection is not very
-precise. Clipping might occur without being indicated.
-\item \textbf{The scale: }Between the indicators of the right and left channel
-there are little dots. These dots represent important volume values. In
-linear mode each dot is a 10\% mark. In dbfs mode the dots represent
-the following values (from right to left): 0db, {}-3db, {}-6db, {}-9db,
-{}-12db, {}-18db, {}-24db, {}-30db, {}-40db, {}-50db, {}-60db.
+\opt{recorder,recorderv2fm,ondio,H1xx,h300,ipodcolor,ipodnano,ipodvideo}{
+  \subsection{Peak Meter}
+  The peak meter can be displayed on the While Playing Screen and consists
+  of several indicators.  For a picture of the peak meter, please see the
+  While Recording Screen on page \pageref{ref:Whilerecordingscreen}.
+  
+  \begin{itemize}
+  \item \textbf{The bar: }
+    This is the wide horizontal bar. It represents the current volume value.
+  \item \textbf{The peak indicator:} 
+    This is a little vertical line at the rightend of the bar. It indicates the peak volume value that occurred recently.
+  \item \textbf{The clip indicator: }
+    This is a little black block that is displayed at the very right of the scale when an overflow occurs. It usually doesn't show up during normal playback unless you play an audio file that is distorted heavily. If you encounter clipping while recording your recording will sound distorted. You should lower the gain. Note that the clip detection is not very precise. Clipping might occur without being indicated.
+  \item \textbf{The scale: }
+    Between the indicators of the right and left channel there are little dots. These dots represent important volume values. In linear mode each dot is a 10\% mark. In dbfs mode the dots represent the following values (from right to left): 0db, {}-3db, {}-6db, {}-9db, {}-12db, {}-18db, {}-24db, {}-30db, {}-40db, {}-50db, {}-60db.
 \end{itemize}
 }
 
 \subsection{\label{ref:ID3viewer}ID3 Viewer}
-{\centering\itshape
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=3.833cm,height=2.191cm]{images/rockbox-manual-img21.png}
- \newline
-The ID3 viewer
-\par}
+\begin{center}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-id3-viewer-112x64x1.png}
+\end{center}
 
 This screen is accessible from the WPS screen by pressing F1+ON (recorder) or MENU+ON (player).  It provides a detailed view of all the identity information about the current track that is stored in an MP3 file.  Use the LEFT and RIGHT (recorder) or PLUS and MINUS (player) keys to move through the information and the STOP key to exit the viewer.
 
-
-\opt{Rec,Rec2,FMRec,H120}{
 \section{\label{ref:QuickScreenMenus}Quick Screen Menus}
+\begin{center}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-quick-screen-112x64x1.png}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-quick-screen2-112x64x1.png}
+\end{center}
+Rockbox handles function buttons in a different way to the Archos software. F1 is always bound to the menu function, while F2 and F3 enable two quick menus.
 
-{\centering\itshape
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\includegraphics[width=4.15cm,height=2.35cm]{images/rockbox-manual-img22.png}
- \textmd{  }  [Warning: Image ignored]
-% Unhandled or unsupported graphics:
-%\includegraphics[width=4.15cm,height=2.35cm]{images/rockbox-manual-img23.png}
- \newline
-F2 Quick Screen Menu  F3 Quick Screen Menu
-\par}
+F2 displays some browse and play settings which are likely to be changed frequently. This settings are Shuffle mode, Repeat mode and the Show files options
 
-Rockbox handles function buttons in a different way to the Archos
-software. F1 is always bound to the menu function, while F2 and F3
-enable two quick menus.  
+Shuffle mode plays each track in the currently playing list in a random order rather than in the order shown in the browser.
 
-F2 displays some browse and play settings which are likely to be changed
-frequently. This settings are Shuffle mode, Repeat mode and the Show
-files options
+Repeat mode repeats either a single track (One) or the entire playlist (All).
 
-Shuffle mode plays each track in the currently playing list in a random
-order rather than in the order shown in the browser.
+Show files determines what type files can be seen in the browser.  This can be just MP3 files and directories (Music), Playlists, MP3 files and directories  (Playlists), any files that Rockbox supports (Supported) or all files on the disk (All).
 
-Repeat mode repeats either a single track (One) or the entire playlist
-(All).
-
-Show files determines what type files can be seen in the browser.  This
-can be just MP3 files and directories (Music), Playlists, MP3 files and directories  (Playlists), any files that Rockbox supports (Supported) or all files on the disk (All).
-
-See page \pageref{ref:PlaybackOptions} for more information about these
-settings.
+See page \pageref{ref:PlaybackOptions} for more information about these settings.
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{@cc@{}}\toprule
+    \begin{tabular}{@{}cc@{}}\toprule
       \textbf{Key} & \textbf{Action} \\\midrule
       LEFT & Controls Shuffle mode setting \\
       RIGHT & Controls Repeat mode setting \\
@@ -436,27 +381,17 @@ settings.
 \end{table}
 F3 controls frequently used display options.
 
-Scroll bar turns the display of the Scroll bar on the left of the screen
-on or off.
+Scroll bar turns the display of the Scroll bar on the left of the screen on or off.
 
-Status bar turns the status display at the top of the screen on or off.
+Status bar turns the status display at the top of the screen on or off. Upside down inverts the screen so that the top of the display appears nearest to the buttons.  This is sometimes useful when storing the \dap in a pocket.  Key assignments swap over with the display orientation where it is logical for them to do so.
 
-Upside down inverts the screen so that the top of the display appears
-nearest to the buttons.  This is sometimes useful when storing the
-Jukebox in a pocket.  Key assignments swap over with the display
-orientation where it is logical for them to do so.
+See page \pageref{ref:Displayoptions} for more information about these settings.
+\begin{center}
+  \begin{tabular}{@{}cc@{}}\toprule
+    \textbf{Key} & \textbf{Action} \\\midrule
+    LEFT & Controls scroll bar display \\
+    RIGHT & Controls status bar display \\
+    DOWN & Controls upside down screen setting \\\bottomrule
+  \end{tabular}
+\end{center}
 
-See page \pageref{ref:Displayoptions} for more information about these
-settings.
-
-\begin{table}[h!]
-  \begin{center}
-    \begin{tabular}{@{}cc@{}}\toprule
-      \textbf{Key} & \textbf{Action} \\\midrule
-      LEFT & Controls scroll bar display \\
-      RIGHT & Controls status bar display \\
-      DOWN & Controls upside down screen setting \\\bottomrule
-    \end{tabular}
-  \end{center}
-\end{table}
-}
