@@ -28,7 +28,7 @@
 #include "z80_internal.h"
 
 // Table with parity, sign and zero flags precomputed for each byte value
-unsigned char PSZ_[256] = {
+unsigned char PSZ_[256] IDATA_ATTR = {
     Zero|Parity, 0, 0, Parity, 0, Parity, Parity, 0, 0, Parity, Parity, 0, Parity, 0, 0, Parity, 
     0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
     0, Parity, Parity, 0, Parity, 0, 0, Parity, Parity, 0, 0, Parity, 0, Parity, Parity, 0, 
@@ -76,33 +76,33 @@ void do_opcode_xy( OpcodeInfo * );
 /** */
 unsigned do_opcode_xycb( unsigned xy );
 
-unsigned    iflags_;    // Interrupt mode (bits 0 and 1) and flags
-unsigned    cycles_;    // Number of CPU cycles elapsed so far
+unsigned    iflags_ IBSS_ATTR;    // Interrupt mode (bits 0 and 1) and flags
+unsigned    cycles_ IBSS_ATTR;    // Number of CPU cycles elapsed so far
 
 
 // Registers
-unsigned char   B;      //@- B register
-unsigned char   C;      //@- C register
-unsigned char   D;      //@- D register
-unsigned char   E;      //@- E register
-unsigned char   H;      //@- H register
-unsigned char   L;      //@- L register
-unsigned char   A;      //@- A register (accumulator)
-unsigned char   F;      //@- Flags register
-unsigned char   B1;     //@- Alternate B register (B')
-unsigned char   C1;     //@- Alternate C register (C')
-unsigned char   D1;     //@- Alternate D register (D')
-unsigned char   E1;     //@- Alternate E register (E')
-unsigned char   H1;     //@- Alternate H register (H')
-unsigned char   L1;     //@- Alternate L register (L')
-unsigned char   A1;     //@- Alternate A register (A')
-unsigned char   F1;     //@- Alternate flags register (F')
-unsigned        IX;     //@- Index register X
-unsigned        IY;     //@- Index register Y
-unsigned        PC;     //@- Program counter
-unsigned        SP;     //@- Stack pointer
-unsigned char   I;      //@- Interrupt register
-unsigned char   R;      //@- Refresh register
+unsigned char   B  IBSS_ATTR;     //@- B register
+unsigned char   C  IBSS_ATTR;     //@- C register
+unsigned char   D  IBSS_ATTR;     //@- D register
+unsigned char   E  IBSS_ATTR;     //@- E register
+unsigned char   H  IBSS_ATTR;     //@- H register
+unsigned char   L  IBSS_ATTR;     //@- L register
+unsigned char   A  IBSS_ATTR;     //@- A register (accumulator)
+unsigned char   F  IBSS_ATTR;     //@- Flags register
+unsigned char   B1 IBSS_ATTR;     //@- Alternate B register (B')
+unsigned char   C1 IBSS_ATTR;     //@- Alternate C register (C')
+unsigned char   D1 IBSS_ATTR;     //@- Alternate D register (D')
+unsigned char   E1 IBSS_ATTR;     //@- Alternate E register (E')
+unsigned char   H1 IBSS_ATTR;     //@- Alternate H register (H')
+unsigned char   L1 IBSS_ATTR;     //@- Alternate L register (L')
+unsigned char   A1 IBSS_ATTR;     //@- Alternate A register (A')
+unsigned char   F1 IBSS_ATTR;     //@- Alternate flags register (F')
+unsigned        IX IBSS_ATTR;     //@- Index register X
+unsigned        IY IBSS_ATTR;     //@- Index register Y
+unsigned        PC IBSS_ATTR;     //@- Program counter
+unsigned        SP IBSS_ATTR;     //@- Stack pointer
+unsigned char   I  IBSS_ATTR;     //@- Interrupt register
+unsigned char   R  IBSS_ATTR;     //@- Refresh register
 
 
 /** Returns the 16 bit register BC. */
