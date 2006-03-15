@@ -26,6 +26,7 @@
 #include "arcade.h"
 #include "pacbox.h"
 #include "pacbox_lcd.h"
+#include "lib/configfile.h"
 
 PLUGIN_HEADER
 
@@ -39,8 +40,7 @@ extern char iend[];
 
 struct plugin_api* rb;
 
-unsigned framesPerSecond    = VideoFrequency;
-unsigned long frame_counter = 0;
+static unsigned long frame_counter = 0;
 
 struct pacman_settings {
     int difficulty;
@@ -50,9 +50,29 @@ struct pacman_settings {
     int showfps;
 };
 
-struct pacman_settings settings;
+static struct pacman_settings settings;
+static struct pacman_settings old_settings;
 
-bool loadFile( const char * name, unsigned char * buf, int len )
+#define SETTINGS_VERSION 1
+#define SETTINGS_MIN_VERSION 1
+#define SETTINGS_FILENAME "pacbox.cfg"
+
+static char* difficulty_options[] = { "Normal", "Hard" };
+static char* numlives_options[] = { "1", "2", "3", "5" };
+static char* bonus_options[] = {"10000", "15000", "20000", "No Bonus"};
+static char* ghostnames_options[] = {"Normal", "Alternate"};
+static char* showfps_options[] = {"No", "Yes"};
+
+static struct configdata config[] =
+{
+   {TYPE_ENUM, 0, 2, &settings.difficulty, "Difficulty", difficulty_options, NULL},
+   {TYPE_ENUM, 0, 4, &settings.numlives, "Pacmen Per Game", numlives_options, NULL},
+   {TYPE_ENUM, 0, 4, &settings.bonus, "Bonus", bonus_options, NULL},
+   {TYPE_ENUM, 0, 2, &settings.ghostnames, "Ghost Names", ghostnames_options , NULL},
+   {TYPE_ENUM, 0, 2, &settings.showfps, "Show FPS", showfps_options, NULL},
+};
+
+static bool loadFile( const char * name, unsigned char * buf, int len )
 {
     char filename[MAX_PATH];
 
@@ -75,7 +95,7 @@ bool loadFile( const char * name, unsigned char * buf, int len )
     return true;
 }
 
-bool loadROMS( void )
+static bool loadROMS( void )
 {
     bool romsLoaded = false;
 
@@ -95,18 +115,18 @@ bool loadROMS( void )
 }
 
 /* A buffer to render Pacman's 244x288 screen into */
-unsigned char video_buffer[ScreenWidth*ScreenHeight] __attribute__ ((aligned (4)));
+static unsigned char video_buffer[ScreenWidth*ScreenHeight] __attribute__ ((aligned (4)));
 
-long start_time;
-long sleep_counter = 0;
-long video_frames = 0;
+static long start_time;
+static long video_frames = 0;
 
-int dipDifficulty[] = { DipDifficulty_Normal, DipDifficulty_Hard };
-int dipLives[] = { DipLives_1, DipLives_2, DipLives_3, DipLives_5 };
-int dipBonus[] = { DipBonus_10000, DipBonus_15000, DipBonus_20000, DipBonus_None };
-int dipGhostNames[] = { DipGhostNames_Normal, DipGhostNames_Alternate };
+static int dipDifficulty[] = { DipDifficulty_Normal, DipDifficulty_Hard };
+static int dipLives[] = { DipLives_1, DipLives_2, DipLives_3, DipLives_5 };
+static int dipBonus[] = { DipBonus_10000, DipBonus_15000, DipBonus_20000, 
+                          DipBonus_None };
+static int dipGhostNames[] = { DipGhostNames_Normal, DipGhostNames_Alternate };
 
-int settings_to_dip(struct pacman_settings settings)
+static int settings_to_dip(struct pacman_settings settings)
 {
     return ( DipPlay_OneCoinOneGame | 
              DipCabinet_Upright | 
@@ -120,7 +140,7 @@ int settings_to_dip(struct pacman_settings settings)
            );
 }
 
-bool pacbox_menu(void)
+static bool pacbox_menu(void)
 {
     int m;
     int result;
@@ -214,7 +234,8 @@ bool pacbox_menu(void)
                 }
                 break;
             case 4: /* Show FPS */
-                rb->set_option("Display FPS",&settings.showfps,INT, noyes, 2, NULL);
+                rb->set_option("Display FPS",&settings.showfps,INT, 
+                               noyes, 2, NULL);
                 break;
             case 5: /* Restart */
                 need_restart=true;
@@ -244,7 +265,7 @@ bool pacbox_menu(void)
 /*
     Runs the game engine for one frame.
 */
-int gameProc( void )
+static int gameProc( void )
 {
     int x;
     int fps;
@@ -291,15 +312,10 @@ int gameProc( void )
         /* The following functions render the Pacman screen from the contents
            of the video and color ram.  We first update the background, and
            then draw the Sprites on top. 
-
-           Note that we only redraw the parts of the background that have
-           changed, which is why we need to keep a copy of the background without
-           the sprites on top.  Even with the memcpy, this is faster than redrawing
-           the whole background.
         */
 
         renderBackground( video_buffer );
-	renderSprites( video_buffer );
+        renderSprites( video_buffer );
 
         blit_display(rb->lcd_framebuffer,video_buffer);
 
@@ -351,12 +367,30 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_clear_display();
     rb->lcd_update();
 
-    /* Set the default settings (we should load these from a file) */
+    /* Set the default settings */
     settings.difficulty = 0; /* Normal */
     settings.numlives = 2;   /* 3 lives */
     settings.bonus = 0;      /* 10000 points */
     settings.ghostnames = 0; /* Normal names */
     settings.showfps = 0;    /* Do not show FPS */
+
+    configfile_init(rb);
+
+    if (configfile_load(SETTINGS_FILENAME, config,
+                        sizeof(config)/sizeof(*config),
+                        SETTINGS_MIN_VERSION
+                       ) < 0)
+    {
+        /* If the loading failed, save a new config file (as the disk is
+           already spinning) */
+        configfile_save(SETTINGS_FILENAME, config,
+                        sizeof(config)/sizeof(*config),
+                        SETTINGS_VERSION);
+    }
+
+    /* Keep a copy of the saved version of the settings - so we can check if 
+       the settings have changed when we quit */
+    old_settings = settings;
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
@@ -367,6 +401,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         do {
             status = gameProc();
         } while (!status);
+
+        /* Save the user settings if they have changed */
+        if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
+            rb->splash(0,true,"Saving settings...");
+            configfile_save(SETTINGS_FILENAME, config,
+                            sizeof(config)/sizeof(*config),
+                            SETTINGS_VERSION);
+        }
     } else {
         rb->splash(HZ*2,true,"No ROMs in /.rockbox/pacman/");
     }
