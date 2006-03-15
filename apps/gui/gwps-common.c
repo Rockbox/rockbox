@@ -746,13 +746,15 @@ static char* get_tag(struct wps_data* wps_data,
                     snprintf(buf, buf_size, "%d", *intval);
                     return buf;
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#ifdef HAS_BUTTON_HOLD
                 case 'h': /* hold */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     if (button_hold())
                         return "h";
                     else
                         return NULL;
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
                 case 'r': /* remote hold */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     if (remote_button_hold())
