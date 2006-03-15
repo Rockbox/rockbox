@@ -7,11 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Pacbox - a Pacman Emulator for Rockbox
- *
- * Based on PIE - Pacman Instructional Emulator
- *
- * Copyright (c) 1997-2003,2004 Alessandro Scotti
+ * Copyright (c) 2006 Dave Chapman
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -42,14 +38,12 @@
 #if (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
 
 blit_display:
-         stmdb   sp!, {r4-r12, lr}
+         stmdb   sp!, {r4-r11, lr}
 
          add     r3, r0, #5696            
          add     r3, r3, #24  @ 5720 = (2*(YOFS*LCD_WIDTH+XOFS+ScreenHeight-4))
          ldr     r0, =palette
          mov     lr, #288                 @ y = 288
-
-         mov     r12, #224*3
 
 loop_y:  mov     r2, r3                   @ r2 = next_dst
          sub     r3, r3, #8               @ next_dst-=4
@@ -59,10 +53,10 @@ loop_y:  mov     r2, r3                   @ r2 = next_dst
 /* store 2 input bytes from the next four lines in r7-r10 */
 loop_x:  
          ldrh    r8,  [r1, #224]          @ r8 = vbuf[224]
-         ldrh    r7,  [r1]                @ r7 = vbuf[0] ; vbuf += 2;
+         ldrh    r7,  [r1]                @ r7 = vbuf[0]
          add     r1,  r1, #448
-         ldrh    r10,  [r1, #224]         @ r8 = vbuf[224]
-         ldrh    r9,  [r1], #2            @ r7 = vbuf[0] ; vbuf += 2;
+         ldrh    r10,  [r1, #224]         @ r10 = vbuf[224*3]
+         ldrh    r9,  [r1], #2            @ r9 = vbuf[224*2] ; vbuf += 2;
          sub     r1,  r1, #448
 
 
@@ -124,7 +118,7 @@ loop_x:
 /* end of y loop */
          add     r1, r1, #224*3           @ vbuf += 224*3
          subs    lr, lr, #4               @ y-=4
-         ldmeqia sp!, {r4-r12, pc}
+         ldmeqia sp!, {r4-r11, pc}
          b       loop_y
 #endif
 #endif
