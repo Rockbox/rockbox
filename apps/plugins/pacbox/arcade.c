@@ -87,9 +87,15 @@ enum {
     FlipXY  = 0x03
 };
 
-fb_data  palette[256];          /* Color palette */
-int      vchar_to_x_[1024];
-int      vchar_to_y_[1024];
+/* Putting this in IRAM actually slows down the iPods, but is good for
+   the Coldfire
+*/
+#ifdef CPU_COLDFIRE
+fb_data  palette[256] IBSS_ATTR; /* Color palette */
+#else
+fb_data  palette[256];           /* Color palette */
+#endif
+
 
 void init_PacmanMachine(int dip)
 {
@@ -129,8 +135,6 @@ void init_PacmanMachine(int dip)
           x = 27 - ((i-0x40) >> 5);
           y = 2 + ((i-0x40) & 0x1F);
         }
-        vchar_to_x_[i] = x;
-        vchar_to_y_[i] = y;
         if( (y >= 0) && (y < 36) && (x >= 0) && (x < 28) )
             vchar_to_i_[i] = y*28 + x;
         else
