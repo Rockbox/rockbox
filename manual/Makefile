@@ -1,10 +1,17 @@
-DOCUMENT := rockbox-build
-LATEX := pdflatex
-include LaTeX.Rules
-GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
+.PHONY: all buildmanual clean
 
-.PHONY: all cleaner buildmanual output
+all: rockbox-build.tex
 
-buildmanual: rockbox-build.tex
-	@cp $(OBJDIR)/rockbox-build.pdf $(OBJDIR)/../rockbox-$(ARCHOS)-$(VERSION).pdf
+rockbox-build.tex: rockbox.tex
+	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build diriectory!; false; fi
+	@mkdir -p $(OBJDIR)
+	@cp -R * $(OBJDIR)
+	@echo "\newcommand{\platform}{${ARCHOS}}" > $(OBJDIR)/rockbox-build.tex
+	@echo "\newcommand{\buildversion}{$(VERSION)}" >> $(OBJDIR)/rockbox-build.tex
+	@echo "\input{rockbox.tex}" >> $(OBJDIR)/rockbox-build.tex
+	@mv $(OBJDIR)/Makefile.pdflatex $(OBJDIR)/Makefile
+	make -C $(OBJDIR)
 
+clean:
+	@if [ "$(OBJDIR)" == "" ]; then echo Run make in you build diriectory!; false; fi
+	@rm -rf $(OBJDIR)/manual $(OBJDIR)/*.pdf
