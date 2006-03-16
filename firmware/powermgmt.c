@@ -456,6 +456,8 @@ static int runcurrent(void)
     if(usb_inserted()
 #if defined(HAVE_USB_POWER) && (CURRENT_USB < CURRENT_NORMAL)
        || usb_powered()
+#else
+       && !usb_powered()
 #endif
     )
     {

@@ -406,11 +406,7 @@ bool usb_detect(void)
     if (USB2D_IDENT != 0x22FA05) {
         return false;
     }
-#ifdef APPLE_IPODVIDEO
-    current_status = (GPIOB_INPUT_VAL & 0x01)?false:true;
-#else
     current_status = (USB_STATUS & 0x800)?true:false;
-#endif
 #endif
 #ifdef USB_ISP1582
     /* TODO: Implement USB_ISP1582 */

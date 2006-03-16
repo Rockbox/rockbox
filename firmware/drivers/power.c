@@ -123,8 +123,11 @@ bool charger_inserted(void)
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
-#elif defined(IPOD_ARCH)
+#elif defined(APPLE_IPODVIDEO)
     /* We need to get this value a faster way than i2c */
+    return (GPIOA_INPUT_VAL & 0x10)?true:false;
+#elif defined(IPOD_ARCH)
+    /* This needs filling in for other ipods. */
     return false;
 #else
     /* Player */
@@ -154,8 +157,10 @@ void charger_enable(bool on)
 bool charging_state(void) {
 #if defined(IRIVER_H100_SERIES)
     return charger_inserted();
-#else /* Iriver H300 */
+#elif defined(IRIVER_H300_SERIES)
     return (GPIO_READ & 0x00800000)?true:false;
+#elif defined(APPLE_IPODVIDEO)
+    return (GPIOB_INPUT_VAL & 0x01)?false:true;
 #endif
 }
 #endif
