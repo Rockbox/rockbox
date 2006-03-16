@@ -520,6 +520,7 @@ void* plugin_get_audio_buffer(int *buffer_size);
 void plugin_tsr(void (*exit_callback)(void));
 
 /* defined by the plugin */
-enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter);
+enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)
+    NO_PROF_ATTR;
 
 #endif
