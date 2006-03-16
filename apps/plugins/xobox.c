@@ -797,17 +797,16 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout (1);
 
+    ret = PLUGIN_OK;
+    
     randomize ();
-    ret = game_menu ();
-    if (ret == MENU_START) {
+    if (game_menu () == MENU_START) {
         init_game ();
         ret = xobox_loop ();
-        return ret;
     }
 
     rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
     rb->lcd_setfont (FONT_UI);
 
-
-    return PLUGIN_OK;
+    return ret;
 }
