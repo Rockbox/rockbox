@@ -42,6 +42,7 @@ plugins/chessbox/Makefile
 plugins/chessbox/*.lds
 plugins/chessbox/*.[ch]
 plugins/pacbox/Makefile
+plugins/pacbox/SOURCES
 plugins/pacbox/readme.txt
 plugins/pacbox/*.[chS]
 plugins/midi/*.[ch]
