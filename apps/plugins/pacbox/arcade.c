@@ -410,27 +410,39 @@ unsigned getDipSwitches(void) {
 
 static inline void drawChar( unsigned char * buffer, int index, int ox, int oy, int color )
 {
-    buffer += ox + oy*224; // Make the buffer point to the character position
-    index *= 64; // Make the index point to the character offset into the character table
-    color = (color & 0x3F)*4;
     int x,y;
+
+    /* Make the index point to the character offset into the character table */
+    unsigned char * chrmap = charmap_ + index*64;
+    buffer += ox + oy*224; /* Make the buffer point to the character position*/
+    color = (color & 0x3F)*4;
+
+    if( color == 0 )
+    {
+        for( y=7; y>=0; y-- )
+        {
+            rb->memset( buffer, 0, 8 );
+            buffer += ScreenWidth;
+        };
+        return;
+    };
 
     if( output_devices_ & FlipScreen ) {
         // Flip character
         buffer += 7*ScreenWidth;
-        for( y=0; y<8; y++ ) {
+        for( y=7; y>=0; y-- ) {
             for( x=7; x>=0; x-- ) {
-                buffer[x] = charmap_[ index++ ] + color;
+                *buffer++ = (*chrmap++) + color;
             }
-            buffer -= ScreenWidth; // Go to the next line
+            buffer -= ScreenWidth + 8; // Go to the next line
         }
     }
     else {
-        for( y=0; y<8; y++ ) {
-            for( x=0; x<=7; x++ ) {
-                buffer[x] = charmap_[ index++ ] + color;
+        for( y=7; y>=0; y-- ) {
+            for( x=7; x>=0; x-- ) {
+                *buffer++ = (*chrmap++) + color;
             }
-            buffer += ScreenWidth; // Go to the next line
+            buffer += ScreenWidth - 8; // Go to the next line
         }
     }
 }
@@ -455,7 +467,6 @@ inline void drawSprite( unsigned char * buffer, int index )
     unsigned char * spritemap_base = spritemap_ + ((ps.n & 0x3F)*256);
     
     buffer += ScreenWidth*ps.y;
-    s2 = &spritemap_base[start_x-ps.x];
 
     dirty_[(start_x >> 3) + (ps.y >> 3)*28] = 1;
     dirty_[(start_x >> 3) + 1 + (ps.y >> 3)*28] = 1;
@@ -469,52 +480,49 @@ inline void drawSprite( unsigned char * buffer, int index )
 
     // Draw the 16x16 sprite
     if( ps.mode == 0 ) {                 // Normal
+       s2 = spritemap_base + start_x-ps.x;
         // Draw the 16x16 sprite
         for( y=15; y>=0; y-- ) {
             s = s2;
-            for( x=start_x; x<=end_x; x++ ) {
-                int c = *(s++);
-                if( c ) {
-                    buffer[x] = c + color;
+            for( x=start_x; x<=end_x; x++, s++ ) {
+                if( *s ) {
+                    buffer[x] = color + *s;
                 }
             }
             buffer += ScreenWidth;
             s2 += 16;
         }
     } else if( ps.mode == 1 ) {            // Flip Y
-        s2 += 240;
+        s2 = spritemap_base + start_x-ps.x + 240;
         for( y=15; y>=0; y-- ) {
             s = s2;
-            for( x=start_x; x<=end_x; x++ ) {
-                int c = *(s++);
-                if( c ) {
-                    buffer[x] = c + color;
+            for( x=start_x; x<=end_x; x++, s++ ) {
+                if( *s ) {
+                    buffer[x] = color + *s;
                 }
             }
             buffer += ScreenWidth;
             s2 -= 16;
         }
     } else if( ps.mode == 2 ) {            // Flip X
-        s2 += 15;
+        s2 = spritemap_base + 15 + ps.x-start_x;
         for( y=15; y>=-0; y-- ) {
             s = s2;
-            for( x=start_x; x<=end_x; x++ ) {
-                int c = *(s--);
-                if( c ) {
-                    buffer[x] = c + color;
+            for( x=start_x; x<=end_x; x++, s-- ) {
+                if( *s ) {
+                    buffer[x] = color + *s;
                 }
             }
             buffer += ScreenWidth;
             s2 += 16;
         }
     } else {                           // Flip X and Y
-      s2 += 255;
+        s2 = spritemap_base + 255 + ps.x-start_x;
         for( y=15; y>=0; y-- ) {
             s = s2;
-            for( x=start_x; x<=end_x; x++ ) {
-                int c = *(s--);
-                if( c ) {
-                    buffer[x] = c + color;
+            for( x=start_x; x<=end_x; x++, s-- ) {
+                if( *s ) {
+                    buffer[x] = color + *s;
                 }
             }
             buffer += ScreenWidth;
