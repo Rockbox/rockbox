@@ -278,6 +278,8 @@ static int gameProc( void )
 
     frame_counter++;
 
+    rb->yield();
+
     /* Check the button status */
     status = rb->button_status();
 
