@@ -23,8 +23,6 @@
 #include "system.h"
 #include "timer.h"
 
-#ifndef SIMULATOR
-
 static int timer_prio = -1;
 static void (*pfn_timer)(void) = NULL;      /* timer callback */
 static void (*pfn_unregister)(void) = NULL; /* unregister callback */
@@ -49,6 +47,13 @@ void TIMER1(void)
         pfn_timer();
     TER1 = 0xff; /* clear all events */
 }
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+void TIMER2(void)
+{
+    TIMER2_VAL; /* ACK interrupt */
+    if (pfn_timer != NULL)
+        pfn_timer();
+}
 #endif /* CONFIG_CPU */
 
 static bool timer_set(long cycles, bool start)
@@ -57,15 +62,21 @@ static bool timer_set(long cycles, bool start)
     int prescale = 1;
 
 #if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
-    /* TODO: Implement for iPod and iFP */
-    (void)start;
+    /* TODO: Implement for iPod and iFP (if they have prescaler capabilities) */
     (void)phi;
+#endif
+
+#if CONFIG_CPU == PNX0101
+    (void)start;
 #endif
 
 #ifdef CPU_COLDFIRE
     cycles >>= 1; /* the coldfire timer works on busclk == cpuclk/2 */
 #endif
 
+/* Don't do this on ipods, we don't know if these platforms have prescaler
+   capabilities on the timer we use. */
+#if CONFIG_CPU != PP5020 && CONFIG_CPU != PP5002
     while (cycles > 0x10000)
     {   /* work out the smallest prescaler that makes it fit */
 #if CONFIG_CPU == SH7034
@@ -74,6 +85,7 @@ static bool timer_set(long cycles, bool start)
         prescale *= 2;
         cycles >>= 1;
     }
+#endif
 
 #if CONFIG_CPU == SH7034
     if (prescale > 8)
@@ -131,7 +143,20 @@ static bool timer_set(long cycles, bool start)
     if (start || (TCN1 >= TRR1))
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
-
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+    (void)prescale;
+    if (start)
+    {
+        if (pfn_unregister != NULL)
+        {
+            pfn_unregister();
+            pfn_unregister = NULL;
+        }
+    }
+    TIMER2_CFG = 0x0;
+    TIMER2_VAL;
+    /* enable timer */
+    TIMER2_CFG = 0xc0000000 | cycles;
 #endif /* CONFIG_CPU */
     return true;
 }
@@ -155,7 +180,7 @@ void timers_adjust_prescale(int multiplier, bool enable_irq)
 }
 #endif
 
-/* Register a user timer, called every <cycles> CPU_FREQ cycles */
+/* Register a user timer, called every <cycles> TIMER_FREQ cycles */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void))
 {
@@ -163,7 +188,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
         return false;
 
 #if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
-    /* TODO: Implement for iPod and iFP */
+    /* TODO: Implement for iPod and iFP (if possible) */
     (void)int_prio;
 #endif
 
@@ -188,8 +213,10 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     ICR2 = 0x90;       /* interrupt on level 4.0 */
     and_l(~(1<<10), &IMR);
     TMR1 |= 1;         /* start timer */
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+    /* unmask interrupt source */
+    CPU_INT_EN = TIMER2_MASK;
 #endif
-
     return true;
 }
 
@@ -206,10 +233,11 @@ void timer_unregister(void)
 #elif defined CPU_COLDFIRE
     TMR1 = 0;               /* disable timer 1 */
     or_l((1<<10), &IMR);    /* disable interrupt */
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+    CPU_INT_CLR = TIMER2_MASK;
 #endif
     pfn_timer = NULL;
     pfn_unregister = NULL;
     timer_prio = -1;
 }
 
-#endif /* !SIMULATOR */

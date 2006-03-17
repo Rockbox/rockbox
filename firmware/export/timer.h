@@ -25,6 +25,14 @@
 
 #ifndef SIMULATOR
 
+/* Assume timer base freq. is CPU clock base freq. Portalplayer chips use a
+   microsecond timer instead. */
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#define TIMER_FREQ 1000000
+#else
+#define TIMER_FREQ CPU_FREQ
+#endif
+
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, int int_prio, void (*timer_callback)(void));
 bool timer_set_period(long cycles);

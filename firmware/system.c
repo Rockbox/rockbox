@@ -1140,6 +1140,7 @@ unsigned int ipod_hw_rev;
 
 #ifndef BOOTLOADER
 extern void TIMER1(void);
+extern void TIMER2(void);
 
 #if defined(APPLE_IPODMINI)
 extern void ipod_mini_button_int(void);
@@ -1148,6 +1149,8 @@ void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK)
         TIMER1();
+	else if (CPU_INT_STAT & TIMER2_MASK)
+        TIMER2();
     else if (CPU_HI_INT_STAT & GPIO_MASK)
         ipod_mini_button_int();        
 }
@@ -1158,6 +1161,8 @@ void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK) 
         TIMER1();
+	else if (CPU_INT_STAT & TIMER2_MASK)
+        TIMER2();
     else if (CPU_HI_INT_STAT & I2C_MASK)
         ipod_4g_button_int();
 }
@@ -1243,11 +1248,14 @@ int system_memory_guard(int newmode)
 unsigned int ipod_hw_rev;
 #ifndef BOOTLOADER
 extern void TIMER1(void);
+extern void TIMER2(void);
 
 void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK) 
         TIMER1();
+	else if (CPU_INT_STAT & TIMER2_MASK) 
+        TIMER2();
 }
 
 #endif
