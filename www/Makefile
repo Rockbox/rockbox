@@ -2,7 +2,7 @@ ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -Uunix -H -C -V -
 
 SRC := $(wildcard *.t)
 SOBJS := daily.shtml main.shtml index.shtml status.shtml \
-	bugs.shtml requests.shtml patches.shtml
+	bugs.shtml requests.shtml patches.shtml cvs.shtml
 OBJS := $(SRC:%.t=%.html) $(SOBJS)
 
 .SUFFIXES: .t .html
@@ -30,6 +30,8 @@ all: $(OBJS) head.tmpl
 	@(cd screenshots; $(MAKE))
 	@(cd digest; $(MAKE))
 	@(cd playerhistory; $(MAKE))
+	@(cd devcon2006; $(MAKE))
+	@(cd doom; $(MAKE))
 
 head.tmpl: head.t
 	$(ACTION) -DTWIKI $<
@@ -42,6 +44,11 @@ index.shtml: main.shtml
 	ln -s main.shtml index.shtml
 
 daily.shtml: daily.t
+
+cvs.shtml: daily.t
+
+since25.html:
+	ln -s /home/dast/daniel_html/rockbox/since25.html since25.html
 
 clean:
 	find . -name "*html" | xargs rm
