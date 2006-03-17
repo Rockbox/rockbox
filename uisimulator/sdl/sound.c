@@ -51,7 +51,7 @@ static void sdl_dma_start(const void *addr, size_t size)
     SDL_PauseAudio(0);
 }
 
-static void sdl_dma_stop() 
+static void sdl_dma_stop(void) 
 {
     pcm_playing = false;
 

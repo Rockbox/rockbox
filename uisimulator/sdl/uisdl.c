@@ -101,7 +101,7 @@ void gui_message_loop(void)
     }
 }
 
-bool gui_startup()
+bool gui_startup(void)
 {
     SDL_Surface *picture_surface;
     int width, height;
@@ -162,7 +162,7 @@ bool gui_startup()
     return true;
 }
 
-bool gui_shutdown()
+bool gui_shutdown(void)
 {
     int i;
 
