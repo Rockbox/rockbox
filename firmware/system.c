@@ -1199,7 +1199,8 @@ static void ipod_init_cache(void)
     for (i = 0x10000000; i < 0x10002000; i += 16)
         inb(i);
 }
-    
+#endif
+
 /* Only these two support CPU boosting at the moment */
 #if defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
 void set_cpu_frequency(long frequency)
@@ -1228,7 +1229,7 @@ void set_cpu_frequency(long frequency)
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
-#else
+#elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
 {
     /* Enable PLL? */
@@ -1246,8 +1247,6 @@ void ipod_set_cpu_frequency(void)
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
 #endif
-
-#endif /* BOOTLOADER */
 
 void system_init(void)
 {
