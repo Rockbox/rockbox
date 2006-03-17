@@ -217,18 +217,15 @@ lpc_decode_arm:
     /* we do the filtering in an unrolled by 4 loop as far as we can, and then
        do the rest by jump table. */
     add r5, r4, r2, lsl #2   @ need to start in the other end of coefs
-    mov r6, r3               @ working copy of history pointer
     mov r7, r2, lsr #2       @ r7 = coefs/4
-    mov r14, #0              @ init accumulator 
+    mov r14, #0              @ init accumulator
 .dloop1:
     ldmdb r5!, { r8-r11 }
-    ldr r12, [r6], #4
-    mla r14, r12, r11, r14
-    ldr r12, [r6], #4
+    ldmia r3!, { r6, r12 }
+    mla r14, r6, r11, r14
     mla r14, r12, r10, r14
-    ldr r12, [r6], #4
-    mla r14, r12, r9, r14
-    ldr r12, [r6], #4
+    ldmia r3!, { r6, r12 }
+    mla r14, r6, r9, r14
     mla r14, r12, r8, r14
     subs r7, r7, #1
     bne .dloop1
@@ -242,24 +239,25 @@ lpc_decode_arm:
     b .twoleft
 @ implicit .threeleft 
     ldr r12, [r5, #-4]!
-    ldr r8, [r6], #4
+    ldr r8, [r3], #4
     mla r14, r12, r8, r14  
 .twoleft:
     ldr r12, [r5, #-4]!
-    ldr r8, [r6], #4
+    ldr r8, [r3], #4
     mla r14, r12, r8, r14  
 .oneleft:
     ldr r12, [r5, #-4]!
-    ldr r8, [r6], #4
+    ldr r8, [r3], #4
     mla r14, r12, r8, r14  
 
 .dsave:
-    ldr r12, [r6]             @ load residual
+    ldr r12, [r3]             @ load residual
     add r14, r12, r14, asr r1 @ shift sum by qlevel bits and add residual
-    str r14, [r6]             @ store result
-    add r3, r3, #4            @ increment history pointer
+    str r14, [r3], #4         @ store result
+    sub r3, r3, r2, lsl #2    @ and wrap history pointer back to next first pos
     subs r0, r0, #1           @ are we done?
     bne .default              @ no, prepare for next sample
 
 .exit:
     ldmia sp!, { r4-r11, pc }
+
