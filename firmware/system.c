@@ -1215,7 +1215,7 @@ void set_cpu_frequency(long frequency)
     cpu_frequency = frequency;
 
     /* Enable PLL? */
-	outl(inl(0x70000020) | (1<<30), 0x70000020);
+    outl(inl(0x70000020) | (1<<30), 0x70000020);
 
     /* Select 24MHz crystal as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
@@ -1223,16 +1223,16 @@ void set_cpu_frequency(long frequency)
     /* Clock frequency = (24/8)*postmult */
     outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
     /* Wait for PLL relock? */
-	udelay(2000);
+    udelay(2000);
 
     /* Select PLL as clock source? */
-	outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
 #else
 void ipod_set_cpu_frequency(void)
 {
     /* Enable PLL? */
-	outl(inl(0x70000020) | (1<<30), 0x70000020);
+    outl(inl(0x70000020) | (1<<30), 0x70000020);
 
     /* Select 24MHz crystal as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
@@ -1240,10 +1240,10 @@ void ipod_set_cpu_frequency(void)
     /* Clock frequency = (24/8)*25 = 75MHz */
     outl(0xaa020000 | 8 | (25 << 8), 0x60006034);
     /* Wait for PLL relock? */
-	udelay(2000);
+    udelay(2000);
 
     /* Select PLL as clock source? */
-	outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
 #endif
 
@@ -1267,7 +1267,7 @@ void system_init(void)
 #if !defined(APPLE_IPODNANO) && !defined(APPLE_IPODVIDEO)
     ipod_set_cpu_frequency();
 #endif
-	ipod_init_cache();
+    ipod_init_cache();
 #endif
 }
 
