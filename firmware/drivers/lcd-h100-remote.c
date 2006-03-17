@@ -456,16 +456,21 @@ static void remote_tick(void)
                 level = set_irq_level(HIGHEST_IRQ_LEVEL);
                 val = adc_scan(ADC_REMOTEDETECT);
                 set_irq_level(level);
-
-                if(val < (ADCVAL_H100_LCD_REMOTE + 8))
-                    if(val < (ADCVAL_H300_LCD_REMOTE + 8))
-                        _remote_type = REMOTETYPE_H300_LCD;
+                if (val < ADCVAL_H300_LCD_REMOTE_HOLD)
+                    if (val < ADCVAL_H300_LCD_REMOTE)
+                        _remote_type = REMOTETYPE_H300_LCD;  /* hold off */
                     else
-                        _remote_type = REMOTETYPE_H100_LCD;
+                        if (val < ADCVAL_H100_LCD_REMOTE)
+                            _remote_type = REMOTETYPE_H100_LCD;  /* hold off */
+                        else
+                            _remote_type = REMOTETYPE_H300_LCD;  /* hold on */
                 else
-                    _remote_type = REMOTETYPE_H300_NONLCD;
-                
-                init_remote = true;   
+                    if (val < ADCVAL_H100_LCD_REMOTE_HOLD)
+                        _remote_type = REMOTETYPE_H100_LCD;  /* hold on, or no remote */
+                    else
+                        _remote_type = REMOTETYPE_H300_NONLCD;  /* hold doesn't matter */
+
+                init_remote = true;
                 /* request init in scroll_thread */
             }
             else

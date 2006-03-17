@@ -113,9 +113,4 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-/* ADC values for different remote control types */
-#define ADCVAL_H100_LCD_REMOTE 0x3c
-#define ADCVAL_H300_LCD_REMOTE 0x2b
-#define ADCVAL_H300_NONLCD_REMOTE 0x8e
-
 #endif
