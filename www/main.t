@@ -1,4 +1,5 @@
-#define _LOGO_ <img src="rockbox400.png" align=center width=400 height=123 alt="Rockbox Logo">
+
+        #define _LOGO_ <img src="rockbox400devcon.png" align=center width=400 height=123 alt="Rockbox Logo">
 #define _PAGE_ Open Source Jukebox Firmware
 #define MAIN_PAGE
 #include "head.t"
@@ -21,20 +22,17 @@ players</a>.
 
 <h2>News</h2>
 
+<p><i>2006-03-17</i>: The <a href="devcon2006/">The Rockbox International Developers Conference 2006</a> is currently in progress
+
+<p><i>2006-02-23</i>: We have migrated to a new bugtracker: Flyspray. It's faster and better in practically every aspect. <a href="/bugs/">See it here</a>.
+
+<p><i>2006-01-28</i>: <a href="http://www.rockbox.org/mail/archive/rockbox-archive-2006-01/0543.shtml">Sound</a> on <a href="http://www.rockbox.org/twiki/bin/view/Main/IpodPort">iPod!</a>
+
 <p><i>2005-12-06</i>: Unicode support!
 
 <p><i>2005-09-22</i>: Rockbox v2.5 is <a href="download/">released</a>.
 
-<p><i>2005-09-21</i>: The Wiki pages are now restored as much as possible with the exception of the <a href="http://www.rockbox.org/twiki/bin/view/Main/WpsGallery">WPS Gallery</a>. The Wiki has been upgraded and the hole is plugged. Backups are done manually currently - work is underway to fix the automatic system that failed us.
-
-<p><i>2005-09-19</i>: An oldish backup restored, work in progress on getting pages more up-to-date. Mailing lists are up again, but check that you are still subscribed!
-
-<p><i>2005-09-17</i>: Some nice gentleman deleted our entire Wiki (and more) using a security hole in TWiki. The mailing list is also dead until we sort this out.
-
-<p><i>2005-08-24</i>: Linus ran his first <a href=/twiki/bin/view/Main/IriverBDM>BDM session</a> on his H320.
-
-<p><i><small>(Old news items have moved to a 
-<a href="history.html">separate page</a>.)</small></i>
+<p><i><a href="history.html">More news</a></i>
 
 <h2>Recent CVS activity</h2>
 <i><small><a href="since25.html">all commits since 2.5</a>.</small></i>
