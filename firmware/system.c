@@ -1201,8 +1201,8 @@ static void ipod_init_cache(void)
 }
 #endif
 
-/* Only these two support CPU boosting at the moment */
-#if defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
+/* Not all iPod targets support CPU freq. boosting yet */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 void set_cpu_frequency(long frequency)
 {
     unsigned long postmult;
@@ -1263,7 +1263,7 @@ void system_init(void)
     outl(-1, 0x60001038);
     outl(-1, 0x60001028);
     outl(-1, 0x6000101c);
-#if !defined(APPLE_IPODNANO) && !defined(APPLE_IPODVIDEO)
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
     ipod_set_cpu_frequency();
 #endif
     ipod_init_cache();
