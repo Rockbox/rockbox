@@ -1049,9 +1049,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_D:       %02x", gpio_d);
         lcd_puts(0, line++, buf);
-        unsigned hehe = 0x12345678;
-	    snprintf(buf, sizeof(buf), "%x %x", hehe, swap32(hehe));
-		lcd_puts(0, line++, buf);	
+        
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
