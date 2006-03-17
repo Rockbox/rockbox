@@ -165,11 +165,7 @@ static struct pos
 } stack[STACK_SIZE];
 static int stackPointer;
 
-/* div function (divide two numbers and truncate the answer) */
-static inline int div (int a, int b)
-{
-    return (a/b);
-}
+#define div(a,b) (((a)/(b)))
 
 static bool pop (struct pos *p)
 {
@@ -353,7 +349,7 @@ static inline int infested_area (int i, int j)
     init_testboard ();
     if (!push (&p))
         return -1;
-    while ((pop (&p)) && (!hit)) {
+    while (pop (&p)) {
         hit = (boardcopy[p.y][p.x] == QIX);
         testboard[p.y][p.x] = CHECKED;
         if (hit)
@@ -436,34 +432,39 @@ static inline int fill_area (int i, int j)
 
 
 /* take care of stuff after xonix has landed on a filled spot */
-static void complete_trail (void)
+static void complete_trail (int fill)
 {
     int i, j, ret;
     for (j = 0; j < BOARD_H; j++)
-        for (i = 0; i < BOARD_W; i++)
-            if (board[j][i] == TRAIL)
-                board[j][i] = FILLED;
-
-    for (j = 0; j < BOARD_H; j++)
-        for (i = 0; i < BOARD_W; i++)
+        for (i = 0; i < BOARD_W; i++) {
+            if (board[j][i] == TRAIL) {
+                if (fill)
+                    board[j][i] = FILLED;
+                else
+                    board[j][i] = EMPTIED;
+            }
             boardcopy[j][i] = board[j][i];
-    for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
-        boardcopy[div (qixes[i].y - BOARD_Y, CUBE_SIZE)][div
-                                                         (qixes[i].x - BOARD_X,
-                                                          CUBE_SIZE)] = QIX;
+        }
 
-    for (j = 1; j < BOARD_H - 1; j++)
-        for (i = 0; i < BOARD_W - 0; i++)
-            if (board[j][i] != FILLED) {
-                ret = infested_area (i, j);
-                if (ret < 0)
-                    quit = true;
-                else if (ret == 0) {
-                    ret = fill_area (i, j);
+    if (fill) {
+        for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
+            boardcopy[div (qixes[i].y - BOARD_Y, CUBE_SIZE)][div
+                                                             (qixes[i].x - BOARD_X,
+                                                              CUBE_SIZE)] = QIX;
+    
+        for (j = 1; j < BOARD_H - 1; j++)
+            for (i = 0; i < BOARD_W - 0; i++)
+                if (board[j][i] != FILLED) {
+                    ret = infested_area (i, j);
                     if (ret < 0)
                         quit = true;
+                    else if (ret == 0) {
+                        ret = fill_area (i, j);
+                        if (ret < 0)
+                            quit = true;
+                    }
                 }
-            }
+     }
 }
 
 /* returns the color the real pixel(x,y) on the lcd is pointing at */
@@ -523,6 +524,22 @@ static bool line_check (int newx, int newy, int side)
         }
     }
     return filled;
+}
+
+static void die (void)
+{
+    player.lives--;
+    if (player.lives == 0)
+        player.gameover = true;
+    else {
+        refresh_board ();
+        rb->splash (HZ, true, "Crash!");
+        complete_trail (false);
+        player.move = MOVE_NO;
+        player.drawing = false;
+        player.i = BOARD_W / 2;
+        player.j = 1;
+    }
 }
 
 static void move_qix (struct qix *q)
@@ -585,18 +602,8 @@ static void move_qix (struct qix *q)
         }
         q->x = newx;
         q->y = newy;
-        refresh_board ();
-        newx = get_newx (newx, q->velocity, q->angle);
-        newy = get_newy (newy, q->velocity, q->angle);
-        q->x = newx;
-        q->y = newy;
     } else if (nexthit == TRAIL) {
-        player.lives--;
-        if (player.lives == 0)
-            player.gameover = true;
-        refresh_board ();
-        rb->splash (HZ, true, "Crash!");
-        init_board ();
+        die();
     }
 }
 
@@ -637,7 +644,7 @@ static inline void move_board (void)
         else if ((player.drawing) && (board[newj][newi] == FILLED)) {   /* finish drawing */
             player.move = MOVE_NO;      /* stop moving */
             player.drawing = false;
-            complete_trail ();
+            complete_trail (true);
         } else if ((board[player.j][player.i] == FILLED)
                    && (board[newj][newi] == EMPTIED)) {
             /* start drawing */
@@ -656,8 +663,6 @@ static inline void move_board (void)
         init_board ();
         refresh_board ();
         rb->splash (HZ * 2, true, "READY?");
-        rb->lcd_update ();
-        refresh_board ();
     }
 }
 
@@ -719,8 +724,6 @@ static void init_game (void)
     init_board ();
     refresh_board ();
     rb->splash (HZ * 2, true, "READY?");
-    rb->lcd_update ();
-    refresh_board ();
 }
 
 /* general keypad handler loop */
