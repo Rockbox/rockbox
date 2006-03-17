@@ -306,7 +306,7 @@ static inline void invalidate_icache(void)
 /* TODO: Implement set_irq_level and check CPU frequencies */
 
 #define CPUFREQ_DEFAULT_MULT 8
-#define CPUFREQ_DEFAULT 240000000
+#define CPUFREQ_DEFAULT 24000000
 #define CPUFREQ_NORMAL_MULT 10 
 #define CPUFREQ_NORMAL 30000000
 #define CPUFREQ_MAX_MULT 25
@@ -328,10 +328,17 @@ static inline unsigned long swap32(unsigned long value)
       result[15.. 8] = value[23..16];
       result[ 7.. 0] = value[31..24];
     */
-{
-    unsigned long hi = swap16(value >> 16);
-    unsigned long lo = swap16(value & 0xffff);
-    return (lo << 16) | hi;
+{   
+    unsigned int tmp;
+
+    asm volatile (
+        "eor %1, %0, %0, ror #16 \n\t"
+        "bic %1, %1, #0xff0000   \n\t"
+        "mov %0, %0, ror #8      \n\t"
+        "eor %0, %0, %1, lsr #8  \n\t"
+        : "+r" (value), "=r" (tmp)
+    );
+    return value;
 }
 
 #define HIGHEST_IRQ_LEVEL (1)
@@ -463,18 +470,10 @@ static inline unsigned long swap32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned int tmp;
-
-    asm volatile (
-        "eor %1, %0, %0, ror #16 \n\t"
-        "bic %1, %1, #0xff0000   \n\t"
-        "mov %0, %0, ror #8      \n\t"
-        "eor %0, %0, %1, lsr #8  \n\t"
-        : "+r" (value), "=r" (tmp)
-    );
-    return value;
+    unsigned long hi = swap16(value >> 16);
+    unsigned long lo = swap16(value & 0xffff);
+    return (lo << 16) | hi;
 }
-
 
 #define invalidate_icache()
 
