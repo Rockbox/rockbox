@@ -57,7 +57,6 @@
 #define DEV_RS (*(volatile unsigned long *)( 0xcf005030))
 #define DEV_EN (*(volatile unsigned long *)( 0xcf005000))
 
-
 #define CPU_INT_STAT     (*(volatile unsigned long*)(0xcf001000))
 #define CPU_INT_EN       (*(volatile unsigned long*)(0xcf001024))
 #define CPU_INT_CLR      (*(volatile unsigned long*)(0xcf001028))
@@ -70,11 +69,13 @@
 #define IISFIFO_CFG         (*(volatile unsigned long*)(0xc000251c))
 #define IISFIFO_WR          (*(volatile unsigned long*)(0xc0002540))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0xc0002580))
-/* PP5002 registers */
-#define PP5002_TIMER1       0xcf001100
-#define PP5002_TIMER1_ACK   0xcf001104
-#define PP5002_TIMER2       0xcf001108
-#define PP5002_TIMER2_ACK   0xcf00110c
+
+#define TIMER1_CFG   (*(volatile unsigned long *)(0xcf001100))
+#define TIMER1_VAL   (*(volatile unsigned long *)(0xcf001104))
+#define TIMER2_CFG   (*(volatile unsigned long *)(0xcf001108))
+#define TIMER2_VAL   (*(volatile unsigned long *)(0xcf00110c))
+
+#define USEC_TIMER   (*(volatile unsigned long *)(0xcf001110))
 
 #define PP5002_TIMER_STATUS 0xcf001110
 
@@ -83,23 +84,18 @@
 #define I2S_IRQ          5
 #define SER1_IRQ         7
 #define TIMER1_IRQ      11
+#define TIMER2_IRQ      12 /* NOTE: THIS IS A GUESS, NEEDS TESTING */
 #define GPIO_IRQ        14
 #define DMA_OUT_IRQ     30
 #define DMA_IN_IRQ      31
 
-
-
 #define TIMER1_MASK  (1 << TIMER1_IRQ)
+#define TIMER2_MASK  (1 << TIMER2_IRQ)
 #define I2S_MASK     (1 << I2S_IRQ)
 #define IDE_MASK     (1 << IDE_IRQ)
 #define GPIO_MASK    (1 << GPIO_IRQ)
 #define SER0_MASK    (1 << SER0_IRQ)
 #define SER1_MASK    (1 << SER1_IRQ)
 #define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
-
-
-#define TIMER1_VAL   (*(volatile unsigned long *)(0xcf001104))
-#define TIMER1_CFG   (*(volatile unsigned long *)(0xcf001100))
-#define USEC_TIMER   (*(volatile unsigned long *)(0xcf001110))
 
 #endif

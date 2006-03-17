@@ -82,6 +82,7 @@
 #define I2C_IRQ      (32+8)
 
 #define TIMER1_MASK  (1 << TIMER1_IRQ)
+#define TIMER2_MASK  (1 << TIMER2_IRQ)
 #define I2S_MASK     (1 << I2S_IRQ)
 #define IDE_MASK     (1 << IDE_IRQ)
 #define GPIO_MASK    (1 << (GPIO_IRQ-32))
