@@ -1049,7 +1049,9 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_D:       %02x", gpio_d);
         lcd_puts(0, line++, buf);
-        
+        unsigned hehe = 0x12345678;
+	    snprintf(buf, sizeof(buf), "%x %x", hehe, swap32(hehe));
+		lcd_puts(0, line++, buf);	
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
@@ -1183,16 +1185,24 @@ bool dbg_cpufreq(void)
 
         switch(button)
         {
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+        case BUTTON_MENU:
+#else
         case BUTTON_UP:
+#endif
             cpu_boost(true);
             break;
-            
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+        case BUTTON_PLAY:
+#else 
         case BUTTON_DOWN:
+#endif
             cpu_boost(false);
             break;
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
         case BUTTON_SELECT:
 #else
         case BUTTON_PLAY:
@@ -1200,9 +1210,13 @@ bool dbg_cpufreq(void)
             set_cpu_frequency(CPUFREQ_DEFAULT);
             boost_counter = 0;
             break;
-            
+
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+        case BUTTON_LEFT:
+#else
         case SETTINGS_CANCEL:
         case SETTINGS_OK2:
+#endif
             return false;
         }
     }

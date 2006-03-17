@@ -1200,20 +1200,54 @@ static void ipod_init_cache(void)
         inb(i);
 }
     
-static void ipod_set_cpu_speed(void)
+/* Only these two support CPU boosting at the moment */
+#if defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
+void set_cpu_frequency(long frequency)
 {
-    outl(inl(0x70000020) | (1<<30), 0x70000020);
+    unsigned long postmult;
 
-    /* Set run state to 24MHz */
+    if (frequency == CPUFREQ_NORMAL)
+        postmult = CPUFREQ_NORMAL_MULT;
+    else if (frequency == CPUFREQ_MAX)
+        postmult = CPUFREQ_MAX_MULT;
+    else
+        postmult = CPUFREQ_DEFAULT_MULT;
+    cpu_frequency = frequency;
+
+    /* Enable PLL? */
+	outl(inl(0x70000020) | (1<<30), 0x70000020);
+
+    /* Select 24MHz crystal as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
 
-    /* 75 MHz (24/8)*25 */
-    outl(0xaa021908, 0x60006034);
-    udelay(2000);
+    /* Clock frequency = (24/8)*postmult */
+    outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
+    /* Wait for PLL relock? */
+	udelay(2000);
 
-    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+    /* Select PLL as clock source? */
+	outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+}
+#else
+void ipod_set_cpu_frequency(void)
+{
+    /* Enable PLL? */
+	outl(inl(0x70000020) | (1<<30), 0x70000020);
+
+    /* Select 24MHz crystal as clock source? */
+    outl((inl(0x60006020) & 0x0fffff0f) | 0x20000020, 0x60006020);
+
+    /* Clock frequency = (24/8)*25 = 75MHz */
+    outl(0xaa020000 | 8 | (25 << 8), 0x60006034);
+    /* Wait for PLL relock? */
+	udelay(2000);
+
+    /* Select PLL as clock source? */
+	outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 }
 #endif
+
+#endif /* BOOTLOADER */
 
 void system_init(void)
 {
@@ -1230,8 +1264,10 @@ void system_init(void)
     outl(-1, 0x60001038);
     outl(-1, 0x60001028);
     outl(-1, 0x6000101c);
-    ipod_set_cpu_speed();
-    ipod_init_cache();
+#if !defined(APPLE_IPODNANO) && !defined(APPLE_IPODVIDEO)
+    ipod_set_cpu_frequency();
+#endif
+	ipod_init_cache();
 #endif
 }
 

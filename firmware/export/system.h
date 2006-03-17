@@ -305,8 +305,11 @@ static inline void invalidate_icache(void)
 
 /* TODO: Implement set_irq_level and check CPU frequencies */
 
-#define CPUFREQ_DEFAULT CPU_FREQ
-#define CPUFREQ_NORMAL 37500000
+#define CPUFREQ_DEFAULT_MULT 8
+#define CPUFREQ_DEFAULT 240000000
+#define CPUFREQ_NORMAL_MULT 10 
+#define CPUFREQ_NORMAL 30000000
+#define CPUFREQ_MAX_MULT 25
 #define CPUFREQ_MAX 75000000
 
 static inline unsigned short swap16(unsigned short value)
