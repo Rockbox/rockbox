@@ -463,9 +463,16 @@ static inline unsigned long swap32(unsigned long value)
       result[ 7.. 0] = value[31..24];
     */
 {
-    unsigned long hi = swap16(value >> 16);
-    unsigned long lo = swap16(value & 0xffff);
-    return (lo << 16) | hi;
+    unsigned int tmp;
+
+    asm volatile (
+        "eor %1, %0, %0, ror #16 \n\t"
+        "bic %1, %1, #0xff0000   \n\t"
+        "mov %0, %0, ror #8      \n\t"
+        "eor %0, %0, %1, lsr #8  \n\t"
+        : "+r" (value), "=r" (tmp)
+    );
+    return value;
 }
 
 
