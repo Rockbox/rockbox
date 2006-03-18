@@ -124,8 +124,7 @@ bool charger_inserted(void)
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
 #elif defined(APPLE_IPODVIDEO)
-    /* We need to get this value a faster way than i2c */
-    return (GPIOA_INPUT_VAL & 0x10)?true:false;
+    return (GPIOL_INPUT_VAL & 0x08)?false:true;
 #elif defined(IPOD_ARCH)
     /* This needs filling in for other ipods. */
     return false;
