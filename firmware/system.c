@@ -579,6 +579,7 @@ int system_memory_guard(int newmode)
     return oldmode;
 }
 
+#ifndef TARGET_TREE
 #ifdef IRIVER_H100
 #define MAX_REFRESH_TIMER     59
 #define NORMAL_REFRESH_TIMER  21
@@ -642,7 +643,7 @@ void set_cpu_frequency(long frequency)
         break;
     }
 }
-
+#endif
 
 #elif CONFIG_CPU == SH7034
 #include "led.h"
