@@ -85,7 +85,7 @@ static int countdown;
 
 static int usb_state;
 
-#ifdef HAVE_MMC
+#if defined(HAVE_MMC) && !defined(BOOTLOADER)
 static int usb_mmc_countdown = 0;
 #endif
 
