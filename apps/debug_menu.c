@@ -1341,7 +1341,6 @@ bool view_battery(void)
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
 #else /* !HAVE_CHARGE_CTRL */
-#if defined IPOD_ARCH
 #if defined APPLE_IPODNANO || defined APPLE_IPODVIDEO 
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
                 int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
@@ -1364,13 +1363,7 @@ bool view_battery(void)
                 snprintf(buf, 30, "Headphone: %s",
                          headphone ? "connected" : "disconnected");
                 lcd_puts(0, 7, buf);
-#else 
-				/* other ipod devices go here */
-                snprintf(buf, 30, "Charger: %s",
-                         charger_inserted() ? "present" : "absent");
-                lcd_puts(0, 3, buf);
-#endif
-#elif
+#else
                 snprintf(buf, 30, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
