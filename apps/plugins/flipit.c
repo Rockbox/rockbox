@@ -55,14 +55,14 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
-#define FLIPIT_UP   BUTTON_SCROLL_FWD
-#define FLIPIT_DOWN BUTTON_SCROLL_BACK
-#define FLIPIT_QUIT BUTTON_MENU
-#define FLIPIT_SHUFFLE (BUTTON_SELECT | BUTTON_LEFT)
-#define FLIPIT_SOLVE (BUTTON_SELECT | BUTTON_PLAY)
-#define FLIPIT_STEP_BY_STEP (BUTTON_SELECT | BUTTON_MENU)
-#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
-#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
+#define FLIPIT_UP   BUTTON_MENU
+#define FLIPIT_DOWN BUTTON_PLAY
+#define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
+#define FLIPIT_SHUFFLE      (BUTTON_SELECT | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_SELECT | BUTTON_PLAY)
+#define FLIPIT_STEP_BY_STEP (BUTTON_SELECT | BUTTON_RIGHT)
+#define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
+#define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 
@@ -352,9 +352,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[MODE] shuffle");
     rb->lcd_putsxy(2, 38, "[PLAY] solution");
     rb->lcd_putsxy(2, 48, "[REC] step by step");
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_4G_PAD)
+    rb->lcd_putsxy(2, 8, "[S-MENU] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");
+    rb->lcd_putsxy(2, 38, "[S-PLAY] solution");
+    rb->lcd_putsxy(2, 48, "[S-RIGHT] step by step");
 #endif
     rb->lcd_update();
-    rb->sleep(HZ*3);
+    rb->button_get_w_tmo(HZ*3);
 
     rb->lcd_clear_display();
     rb->lcd_drawrect(80, 0, 32, 64);
