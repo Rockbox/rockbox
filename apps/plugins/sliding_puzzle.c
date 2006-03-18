@@ -47,11 +47,11 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define PUZZLE_QUIT BUTTON_MENU
-#define PUZZLE_UP BUTTON_SCROLL_BACK
-#define PUZZLE_DOWN BUTTON_SCROLL_FWD
-#define PUZZLE_SHUFFLE BUTTON_SELECT
-#define PUZZLE_PICTURE BUTTON_PLAY
+#define PUZZLE_QUIT    (BUTTON_SELECT | BUTTON_MENU)
+#define PUZZLE_UP      BUTTON_MENU
+#define PUZZLE_DOWN    BUTTON_PLAY
+#define PUZZLE_SHUFFLE (BUTTON_SELECT | BUTTON_LEFT)
+#define PUZZLE_PICTURE (BUTTON_SELECT | BUTTON_RIGHT)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define PUZZLE_QUIT BUTTON_POWER
@@ -373,9 +373,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(0, 18, "[OFF] to stop");
     rb->lcd_putsxy(0, 28, "[MODE..] shuffle");
     rb->lcd_putsxy(0, 38, "[MODE] change pic");
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD)
+    rb->lcd_putsxy(0, 18, "[S-MENU] to stop");
+    rb->lcd_putsxy(0, 28, "[S-LEFT] shuffle");
+    rb->lcd_putsxy(0, 38, "[S-RIGHT] change pic");
 #endif
     rb->lcd_update();
-    rb->sleep(HZ*2);
+    rb->button_get_w_tmo(HZ*2);
     
     rb->lcd_clear_display();
     rb->lcd_drawrect(80, 0, 32, 64);
