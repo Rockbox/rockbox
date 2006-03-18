@@ -1022,6 +1022,8 @@ bool dbg_ports(void)
 #elif CONFIG_CPU == PP5020
 
     unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
+    unsigned int gpio_e, gpio_f, gpio_g, gpio_h;
+    unsigned int gpio_i, gpio_j, gpio_k, gpio_l;
 
     char buf[128];
     int button;
@@ -1049,7 +1051,37 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_D:       %02x", gpio_d);
         lcd_puts(0, line++, buf);
-        
+        line++;
+
+        gpio_e = GPIOE_INPUT_VAL;
+        gpio_f = GPIOF_INPUT_VAL;
+        gpio_g = GPIOG_INPUT_VAL;
+        gpio_h = GPIOH_INPUT_VAL;
+
+        snprintf(buf, sizeof(buf), "GPIO_E:       %02x", gpio_e);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_F:       %02x", gpio_f);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_G:       %02x", gpio_g);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_H:       %02x", gpio_h);
+        lcd_puts(0, line++, buf);
+        line++;
+
+        gpio_i = GPIOI_INPUT_VAL;
+        gpio_j = GPIOJ_INPUT_VAL;
+        gpio_k = GPIOK_INPUT_VAL;
+        gpio_l = GPIOL_INPUT_VAL;
+
+        snprintf(buf, sizeof(buf), "GPIO_I:       %02x", gpio_i);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_J:       %02x", gpio_j);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_K:       %02x", gpio_k);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_L:       %02x", gpio_l);
+        lcd_puts(0, line++, buf);
+      
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
@@ -1309,9 +1341,40 @@ bool view_battery(void)
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
 #else /* !HAVE_CHARGE_CTRL */
+#if defined IPOD_ARCH
+#if defined APPLE_IPODNANO || defined APPLE_IPODVIDEO 
+                int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
+                int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
+                int dock     = (GPIOA_INPUT_VAL & 0x10)?true:false;
+                int charging = (GPIOB_INPUT_VAL & 0x01)?false:true;
+                int headphone= (GPIOA_INPUT_VAL & 0x80)?true:false;
+
+                snprintf(buf, 30, "USB pwr:   %s",
+                         usb_pwr ? "present" : "absent");
+                lcd_puts(0, 3, buf);
+                snprintf(buf, 30, "EXT pwr:   %s",
+                         ext_pwr ? "present" : "absent");
+                lcd_puts(0, 4, buf);
+                snprintf(buf, 30, "Battery:   %s",
+					charging ? "charging" : (usb_pwr||ext_pwr) ? "charged" : "discharging");
+                lcd_puts(0, 5, buf);
+                snprintf(buf, 30, "Dock mode: %s",
+                         dock    ? "enabled" : "disabled");
+                lcd_puts(0, 6, buf);
+                snprintf(buf, 30, "Headphone: %s",
+                         headphone ? "connected" : "disconnected");
+                lcd_puts(0, 7, buf);
+#else 
+				/* other ipod devices go here */
                 snprintf(buf, 30, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
+#endif
+#elif
+                snprintf(buf, 30, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                lcd_puts(0, 3, buf);
+#endif
 #endif /* !HAVE_CHARGE_CTRL */
 #endif /* HAVE_CHARGING */
                 break;
