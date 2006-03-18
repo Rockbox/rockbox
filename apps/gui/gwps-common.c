@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include "system.h"
 #include "settings.h"
+#include "rtc.h"
 #include "audio.h"
 #include "status.h"
 #include "power.h"
@@ -913,6 +914,144 @@ static char* get_tag(struct wps_data* wps_data,
                     return buf;
             }
             break;
+#ifdef CONFIG_RTC
+       case 'c':  /* Real Time Clock display */
+            *flags |= WPS_REFRESH_DYNAMIC;
+            {
+                int value;
+                char *format = 0;
+                char *bufptr = buf;
+                struct tm* tm = get_time();
+                int i;
+                for (i=1;/*break*/;i++) {
+                    switch(tag[i])
+                    {
+                        case 'a': /* abbreviated weekday name (Sun..Sat) */
+                            value = tm->tm_wday;
+                            if (value > 6 || value < 0) continue;
+                            value = snprintf(
+                                    bufptr,buf_size,"%s",str(dayname[value]));
+                            bufptr += value;
+                            buf_size -= value;
+                            continue;
+                        case 'b': /* abbreviated month name (Jan..Dec) */
+                            value = tm->tm_mon;
+                            if (value > 11 || value < 0) continue;
+                            value = snprintf(
+                                    bufptr,buf_size,"%s",str(monthname[value]));
+                            bufptr += value;
+                            buf_size -= value;
+                            continue;
+                        case 'd': /* day of month (01..31) */
+                            value = tm->tm_mday;
+                            if (value > 31 || value < 1) continue;
+                            format = "%02d";
+                            break;
+                        case 'e': /* day of month, blank padded ( 1..31) */
+                            value = tm->tm_mday;
+                            if (value > 31 || value < 1) continue;
+                            format = "%2d";
+                            break;
+                        case 'H': /* hour (00..23) */
+                            value = tm->tm_hour;
+                            if (value > 23) continue;
+                            format = "%02d";
+                            break;
+                        case 'k': /* hour ( 0..23) */
+                            value = tm->tm_hour;
+                            if (value > 23) continue;
+                            format = "%2d";
+                            break;
+                        case 'I': /* hour (01..12) */
+                            value = tm->tm_hour;
+                            if (value > 23) continue;
+                            value %= 12;
+                            if (value == 0) value = 12;
+                            format = "%02d";
+                            break;
+                        case 'l': /* hour ( 1..12) */
+                            value = tm->tm_hour;
+                            if (value > 23 || value < 0) continue;
+                            value %= 12;
+                            if (value == 0) value = 12;
+                            format = "%2d";
+                            break;
+                        case 'm': /* month (01..12) */
+                            value = tm->tm_mon;
+                            if (value > 11 || value < 0) continue;
+                            value++;
+                            format = "%02d";
+                            break;
+                        case 'M': /* minute (00..59) */
+                            value = tm->tm_min;
+                            if (value > 59 || value < 0) continue;
+                            format = "%02d";
+                            break;
+                        case 'S': /* second (00..59) */
+                            value = tm->tm_sec;
+                            if (value > 59 || value < 0) continue;
+                            format = "%02d";
+                            break;
+                        case 'y': /* last two digits of year (00..99) */
+                            value = tm->tm_year;
+                            value %= 100;
+                            format = "%02d";
+                            break;
+                        case 'Y': /* year (1970...) */
+                            value = tm->tm_year;
+                            if (value > 199 || value < 100) continue;
+                            value += 1900;
+                            format = "%04d";
+                            break;
+                        case 'p': /* upper case AM or PM indicator */
+                            if (tm->tm_hour/12 == 0) format = "AM";
+                            else format = "PM";
+                            snprintf(bufptr,buf_size,"%s",format);
+                            bufptr += 2;
+                            buf_size -= 2;
+                            continue;
+                        case 'P': /* lower case am or pm indicator */
+                            if (tm->tm_hour/12 == 0) format = "am";
+                            else format = "pm";
+                            snprintf(bufptr,buf_size,"%s",format);
+                            bufptr += 2;
+                            buf_size -= 2;
+                            continue;
+                        case 'u': /* day of week (1..7); 1 is Monday */
+                            value = tm->tm_wday;
+                            if (value < 0 || value > 6) continue;
+                            value++;
+                            format = "%1d";
+                            break;
+                        case 'w': /* day of week (0..6); 0 is Sunday */
+                            value = tm->tm_wday;
+                            if (value < 0 || value > 6) continue;
+                            format = "%1d";
+                            break;
+                        default:
+                            if (tag[i] == 'c') {
+                                i++;
+                                value = -1;
+                                break;
+                            } else if (tag[i] == '\n') {
+                                value = -1;
+                                break;
+                            }
+                            snprintf(bufptr,buf_size,"%c",tag[i]);
+                            bufptr++;
+                            buf_size--;
+                            continue;
+                    } /* switch */
+                    if (value < 0) break;
+
+                    value = snprintf(bufptr, buf_size, format, value);
+                    bufptr += value;
+                    buf_size -= value;
+                } /* while */
+                *tag_len = i;
+                return buf;
+            }
+#endif /* CONFIG_RTC */
     }
     return NULL;
 }
