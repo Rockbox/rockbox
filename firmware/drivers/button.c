@@ -122,7 +122,7 @@ static void opto_i2c_init(void)
     outl(0x1000000, 0x7000c104);
 }
 
-static int ipod_4g_button_read(void)
+static inline int ipod_4g_button_read(void)
 {
     /* The ipodlinux source had a udelay(250) here, but testing has shown that
        it is not needed - tested on Nano, Color/Photo and Video. */
@@ -137,9 +137,11 @@ static int ipod_4g_button_read(void)
         outl(0x0, 0x7000c140); /* clear interrupt status? */
 
         if ((status & 0x800000ff) == 0x8000001a) {
-            static int clickwheel_down IDATA_ATTR = 0;
             static int old_wheel_value IDATA_ATTR = -1;
-            
+            /* NB: highest wheel = 0x5F, clockwise increases */
+            int new_wheel_value = (status << 9) >> 25;
+            int wheel_delta = new_wheel_value - old_wheel_value;
+
             if (status & 0x100)
                 btn |= BUTTON_SELECT;
             if (status & 0x200)
@@ -151,66 +153,40 @@ static int ipod_4g_button_read(void)
             if (status & 0x1000)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) {
-                /* NB: highest wheel = 0x5F, clockwise increases */
-                int new_wheel_value = ((status << 9) >> 25) & 0xff;
-
-                /* scroll wheel down */
-                clickwheel_down = 1;
                 backlight_on();
-                if (old_wheel_value >= 0) {
-                    int wheel_keycode = BUTTON_NONE;
-                    int wheel_delta;
-                    if (old_wheel_value > new_wheel_value + 48) {
-                        /* Forward wrapping case */
-                        wheel_delta = new_wheel_value + 96 - old_wheel_value;
-                    } else {
-                        wheel_delta = new_wheel_value - old_wheel_value;
-                        if (wheel_delta > 48)
+                /* The queue should have no other events when scrolling */
+                if (queue_empty(&button_queue)) {
+
+                    if (old_wheel_value >= 0) {
+                        /* This is for later = BUTTON_SCROLL_TOUCH;*/
+                        unsigned long data;
+
+                        if (wheel_delta < -48)
+                            wheel_delta += 96; /* Forward wrapping case */
+                        else if (wheel_delta > 48)
                             wheel_delta -= 96; /* Backward wrapping case */
-                    }
 
-                    /* TODO: these thresholds should most definitely be
-                       settings, and we're probably going to want a more
-                       advanced scheme than this anyway. */
-                    if (wheel_delta > 4) {
-                        wheel_keycode = BUTTON_SCROLL_FWD;
+                        if (wheel_delta > 4) {
+                            old_wheel_value = new_wheel_value;
+                            data = (wheel_delta << 16) | new_wheel_value;
+                            queue_post(&button_queue, BUTTON_SCROLL_FWD,
+                                    (void *)data);
+                        } else if (wheel_delta < -4) {
+                            old_wheel_value = new_wheel_value;
+                            data = (wheel_delta << 16) | new_wheel_value;
+                            queue_post(&button_queue, BUTTON_SCROLL_BACK, 
+                                    (void *)data);
+                        }
+                        
+                    } else
                         old_wheel_value = new_wheel_value;
-                    } else if (wheel_delta < -4) {
-                        wheel_keycode = BUTTON_SCROLL_BACK;
-                        old_wheel_value = new_wheel_value;
-                    }
-
-                    if (wheel_keycode != BUTTON_NONE) {
-                        /* When you use the clickwheel, the queue should
-                           usually have no other events in it, so we check if
-                           it's empty to see whether pending clickwheel events
-                           have been handled. This way, Rockbox will stop
-                           responding to the clickwheel if it doesn't have time
-                           to handle the events immediately.
-                           Can also implement queue_peek() to do this in a
-                           cleaner way.
-                         */
-                        if (queue_empty(&button_queue))
-                            queue_post(&button_queue, wheel_keycode, NULL);
-                    }
                 }
-                else {
-                    old_wheel_value = new_wheel_value;
-                }
-            }
-            else if (clickwheel_down) {
+            } else if (wheel_delta == 0) {
                 /* scroll wheel up */
                 old_wheel_value = -1;
-                clickwheel_down = 0;
             }
-        }
-        /* 
-       Don't know why this should be needed, let me know if you do. 
-       else if ((status & 0x800000FF) == 0x8000003A) {
-            wheel_value = status & 0x800000FF;
-        }
-        */
-        else if (status == 0xffffffff) {
+
+        } else if (status == 0xffffffff) {
             opto_i2c_init();
         }
     }

@@ -164,6 +164,8 @@ bool button_hold(void);
 #define  BUTTON_SELECT        0x0008
 #define  BUTTON_SCROLL_FWD    0x0010
 #define  BUTTON_SCROLL_BACK   0x0020
+/* This is for later
+#define  BUTTON_SCROLL_TOUCH  0x0100*/
 
 #elif CONFIG_KEYPAD == IPOD_3G_PAD
 
