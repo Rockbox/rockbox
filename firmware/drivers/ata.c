@@ -567,7 +567,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "lea.l   (16,%[buf]),%[buf]  \n"
         "move.l  %%d6,%%d2       \n"
         "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
-        "bhi.b   .loop_a_line    \n"
+        "bhi.b   .loop_u_line    \n"
 
         "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
         "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
