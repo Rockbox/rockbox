@@ -387,7 +387,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #else /* memory mapped */
 #if CONFIG_CPU == SH7034
     volatile unsigned char* flash = (unsigned char*)0x2000000; /* flash mapping */
-#elif CONFIG_CPU == MCF5249
+#elif defined(CPU_COLDFIRE)
     volatile unsigned short* flash = (unsigned short*)0; /* flash mapping */
 #endif
 #define FLASH(addr) (flash[addr])
@@ -715,7 +715,7 @@ bool dbg_partitions(void)
     return false;
 }
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF)
 bool dbg_spdif(void)
 {
     char buf[128];
@@ -943,7 +943,10 @@ bool dbg_ports(void)
     unsigned int gpio1_function;
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
-    int adc_buttons, adc_remote, adc_battery, adc_remotedetect;
+    int adc_buttons, adc_remote, adc_battery;
+#ifdef IRIVER
+    int adc_remotedetect;
+#endif
     char buf[128];
     int button;
     int line;
@@ -987,16 +990,20 @@ bool dbg_ports(void)
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote = adc_read(ADC_REMOTE);
         adc_battery = adc_read(ADC_BATTERY);
+#ifdef IRIVER
         adc_remotedetect = adc_read(ADC_REMOTEDETECT);
-
+#endif
+        
         snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
+#ifdef IRIVER
         snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x", adc_remotedetect);
         lcd_puts(0, line++, buf);
+#endif
 
         battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
         batt_int = battery_voltage / 100;
@@ -1006,9 +1013,11 @@ bool dbg_ports(void)
                  battery_level());
         lcd_puts(0, line++, buf);
         
+#ifdef IRIVER
         snprintf(buf, sizeof(buf), "remotetype:: %d", remote_type());
         lcd_puts(0, line++, buf);
-
+#endif
+        
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
@@ -1889,6 +1898,8 @@ bool dbg_save_roms(void)
 #if defined(IRIVER_H100_SERIES)
     fd = creat("/internal_rom_000000-1FFFFF.bin", O_WRONLY);
 #elif defined(IRIVER_H300_SERIES)
+    fd = creat("/internal_rom_000000-3FFFFF.bin", O_WRONLY);
+#elif defined(IAUDIO_X5)
     fd = creat("/internal_rom_000000-3FFFFF.bin", O_WRONLY);
 #endif
     if(fd >= 0)
