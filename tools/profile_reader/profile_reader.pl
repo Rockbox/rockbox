@@ -84,7 +84,7 @@ sub get_name {
         return $offsets{$location};
     } else {
         my $retval = $_[0];
-        $retval =~ y/[A-Z]/a-z/;
+        $retval =~ y/[A-Z]/[a-z]/;
         warning("No symbol found for $retval");
         return $retval;
     }
