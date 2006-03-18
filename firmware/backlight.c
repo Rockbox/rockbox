@@ -543,7 +543,7 @@ void remote_backlight_set_timeout_plugged(int index)
 
 #else /* no backlight, empty dummy functions */
 
-#ifdef BOOTLOADER
+#if defined(BOOTLOADER) && defined(CONFIG_BACKLIGHT)
 void backlight_init(void)
 {
 #ifdef IRIVER_H300_SERIES
