@@ -715,7 +715,7 @@ bool dbg_partitions(void)
     return false;
 }
 
-#if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF)
+#if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF_OUT)
 bool dbg_spdif(void)
 {
     char buf[128];
