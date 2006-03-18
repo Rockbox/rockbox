@@ -332,7 +332,11 @@ void backlight_thread(void)
 #ifdef HAVE_REMOTE_LCD
             case REMOTE_BACKLIGHT_ON:
 #ifdef HAVE_CHARGING
-                if (charger_inserted())
+                if (charger_inserted()
+#ifdef HAVE_USB_POWER
+                        || usb_powered()
+#endif
+                        )
                     remote_backlight_timer = remote_backlight_timeout_plugged;
                 else
 #endif
@@ -357,7 +361,11 @@ void backlight_thread(void)
 #endif /* HAVE_REMOTE_LCD */
             case BACKLIGHT_ON:
 #ifdef HAVE_CHARGING
-                if (charger_inserted())
+                if (charger_inserted()
+#ifdef HAVE_USB_POWER
+                        || usb_powered()
+#endif
+                        )
                     backlight_timer = backlight_timeout_plugged;
                 else
 #endif
