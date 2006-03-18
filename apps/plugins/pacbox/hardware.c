@@ -35,7 +35,7 @@ unsigned char spriteset_rom_[4*1024] IBSS_ATTR; // Sprite set ROM (4K)
 unsigned char dirty_[1024] IBSS_ATTR;
 unsigned char video_mem_[1024] IBSS_ATTR;       // Video memory (1K)
 unsigned char color_mem_[1024] IBSS_ATTR;       // Color memory (1K)
-unsigned char charmap_[256*8*8];    /* Character data for 256 8x8 characters */
+unsigned char charmap_[256*8*8] IBSS_ATTR;    /* Character data for 256 8x8 characters */
 unsigned char spritemap_[64*16*16]; /* Sprite data for 64 16x16 sprites */
 unsigned char output_devices_ IBSS_ATTR;  /* Output flip-flops set by the game program */
 unsigned char interrupt_vector_ IBSS_ATTR;

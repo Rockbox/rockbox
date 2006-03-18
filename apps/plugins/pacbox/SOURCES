@@ -4,8 +4,9 @@ hardware.c
 z80.c
 #if (CONFIG_CPU == PP5020) && (LCD_WIDTH >= 288) && (LCD_HEIGHT >= 224)
 pacbox_arm.S
-#elif defined(IRIVER_H300_SERIES) && !defined(SIMULATOR)
-pacbox_cf.S
 #else
 pacbox_lcd.c
+#endif
+#if defined(CPU_COLDFIRE)
+pacbox_cf.S
 #endif

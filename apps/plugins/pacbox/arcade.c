@@ -408,6 +408,9 @@ unsigned getDipSwitches(void) {
     return result;
 }
 
+#if defined (CPU_COLDFIRE)
+extern void drawChar( unsigned char * buffer, int index, int ox, int oy, int color );
+#else
 static inline void drawChar( unsigned char * buffer, int index, int ox, int oy, int color )
 {
     int x,y;
@@ -446,6 +449,7 @@ static inline void drawChar( unsigned char * buffer, int index, int ox, int oy, 
         }
     }
 }
+#endif
 
 inline void drawSprite( unsigned char * buffer, int index )
 {

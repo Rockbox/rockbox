@@ -115,7 +115,7 @@ static bool loadROMS( void )
 }
 
 /* A buffer to render Pacman's 244x288 screen into */
-static unsigned char video_buffer[ScreenWidth*ScreenHeight] __attribute__ ((aligned (4)));
+static unsigned char video_buffer[ScreenWidth*ScreenHeight] __attribute__ ((aligned (16)));
 
 static long start_time;
 static long video_frames = 0;
@@ -283,7 +283,11 @@ static int gameProc( void )
     /* Check the button status */
     status = rb->button_status();
 
-    if ((status & PACMAN_MENU) == PACMAN_MENU) {
+    if ((status & PACMAN_MENU) == PACMAN_MENU
+#ifdef PACMAN_RC_MENU
+        || status == PACMAN_RC_MENU
+#endif
+    ) {
         end_time = *rb->current_tick;
         x = pacbox_menu();
         rb->lcd_clear_display();
@@ -295,6 +299,15 @@ static int gameProc( void )
         start_time += *rb->current_tick-end_time;
     }
 
+#ifdef PACMAN_HAS_REMOTE
+    setDeviceMode( Joy1_Left, (status & PACMAN_LEFT || status == PACMAN_RC_LEFT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT || status == PACMAN_RC_RIGHT) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Up, (status & PACMAN_UP || status == PACMAN_RC_UP) ? DeviceOn : DeviceOff);
+    setDeviceMode( Joy1_Down, (status & PACMAN_DOWN || status == PACMAN_RC_DOWN) ? DeviceOn : DeviceOff);
+    setDeviceMode( CoinSlot_1, (status & PACMAN_COIN || status == PACMAN_RC_COIN) ? DeviceOn : DeviceOff);
+    setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP || status == PACMAN_RC_1UP) ? DeviceOn : DeviceOff);
+    setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP || status == PACMAN_RC_2UP) ? DeviceOn : DeviceOff);
+#else
     setDeviceMode( Joy1_Left, (status & PACMAN_LEFT) ? DeviceOn : DeviceOff);
     setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT) ? DeviceOn : DeviceOff);
     setDeviceMode( Joy1_Up, (status & PACMAN_UP) ? DeviceOn : DeviceOff);
@@ -303,6 +316,7 @@ static int gameProc( void )
     setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP) ? DeviceOn : DeviceOff);
 #ifdef PACMAN_2UP
     setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP) ? DeviceOn : DeviceOff);
+#endif
 #endif
 
     /* We only update the screen every third frame - Pacman's native 

@@ -26,6 +26,8 @@
 #include "arcade.h"
 #include "hardware.h"
 
+#if defined(SIMULATOR) || !defined(IRIVER_H300_SERIES)
+
 void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
 {
     fb_data* dst;
@@ -103,3 +105,5 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
 #endif /* Size >= 144x112 */
 #endif /* Not Colour */
 }
+
+#endif
