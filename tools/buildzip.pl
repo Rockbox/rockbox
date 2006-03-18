@@ -86,27 +86,28 @@ sub buildzip {
     mkdir ".rockbox", 0777;
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
-    mkdir ".rockbox/codecs", 0777;
-    mkdir ".rockbox/codepages", 0777;
-    mkdir ".rockbox/wps", 0777;
-    mkdir ".rockbox/themes", 0777;
-    mkdir ".rockbox/backdrops", 0777;
-    mkdir ".rockbox/eqs", 0777;
+    if($notplayer) {
+        mkdir ".rockbox/codepages", 0777;
+        mkdir ".rockbox/codecs", 0777;
+        mkdir ".rockbox/wps", 0777;
+        mkdir ".rockbox/themes", 0777;
+        mkdir ".rockbox/backdrops", 0777;
+        mkdir ".rockbox/eqs", 0777;
 
-    my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \;';
-    print `$c`;
+        my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \; 2>/dev/null';
+        `$c`;
 
-    system("$ROOT/tools/codepages");
-    my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
-    print `$c`;
+        system("$ROOT/tools/codepages");
+        my $c = 'find . -name "*.cp" ! -empty -exec mv {} .rockbox/codepages/ \; >/dev/null 2>&1';
+        `$c`;
 
-    my @call = `find .rockbox/codecs -type f`;
-    if(!$call[0]) {
-        # no codec was copied, remove directory again
-        rmdir(".rockbox/codecs");
+        my @call = `find .rockbox/codecs -type f 2>/dev/null`;
+        if(!$call[0]) {
+            # no codec was copied, remove directory again
+            rmdir(".rockbox/codecs");
 
+        }
     }
-
 
     $c= 'find apps "(" -name "*.rock" -o -name "*.ovl" ")" ! -empty -exec cp {} .rockbox/rocks/ \;';
     print `$c`;
