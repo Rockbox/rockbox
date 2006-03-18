@@ -288,10 +288,10 @@ int read_bmp_file(char* filename,
                 /* Mono -> RGB16 */
                 for (col = 0; col < width; col++) {
                     ret = getpix(col, bmpbuf);
-                    unsigned short rgb = (((palette[ret].red >> 3) << 11) |
-                                          ((palette[ret].green >> 2) << 5) |
-                                          ((palette[ret].blue >> 3)));
-                    dest[width * (height - row - 1) + col] = rgb;
+                    unsigned short rgb16 = LCD_RGBPACK(palette[ret].red,
+                                                       palette[ret].green,
+                                                       palette[ret].blue);
+                    dest[width * (height - row - 1) + col] = rgb16;
                 }
             }
 #endif
