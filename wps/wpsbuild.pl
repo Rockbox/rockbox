@@ -55,8 +55,10 @@ STOP
     else {
     print GCC <<STOP
 \#include "config.h"
+#ifdef HAVE_LCD_BITMAP
 Height: LCD_HEIGHT
 Width: LCD_WIDTH
+#endif
 STOP
 ;
 }
@@ -192,7 +194,7 @@ while(<WPS>) {
             }
 
             if(!$rheight || !$rwidth) {
-                printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
+                #printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
                 $isrwps?"remote ":"";
                 $within = 0;
                 next;
