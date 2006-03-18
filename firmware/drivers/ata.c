@@ -38,8 +38,7 @@
 
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 
-/* don't use sh7034 assembler routines */
-#define PREFER_C_READING
+/* asm reading, C writing */
 #define PREFER_C_WRITING
 
 #define ATA_IOBASE      0x20000000
@@ -484,6 +483,197 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         buf += SECTOR_SIZE;
         sectorcount--;
     } while (sectorcount > 0);
+#elif defined(CPU_COLDFIRE)
+    /* coldfire asm reading, utilising line bursts */
+    /* this assumes there is at least one full line to copy */
+    asm (
+        "add.l   %[wcnt],%[wcnt] \n" /* wordcount -> bytecount */
+        "add.l   %[buf],%[wcnt]  \n" /* bytecount -> bufend */
+        "move.l  %[buf],%%d0     \n"
+        "btst.l  #0,%%d0         \n" /* 16-bit aligned? */
+        "jeq     .aligned        \n" /* yes, do word copy */
+
+        /* not 16-bit aligned */
+        "subq.l  #1,%[wcnt]      \n" /* last byte is done unconditionally */
+        "moveq.l #24,%%d1        \n" /* preload shift count */
+
+        "move.w  (%[ata]),%%d2   \n" /* load initial word */
+        "move.l  %%d2,%%d3       \n"
+        "lsr.l   #8,%%d3         \n"
+        "move.b  %%d3,(%[buf])+  \n" /* write high byte of it, aligns dest addr */
+        
+        "btst.l  #1,%%d0         \n" /* longword aligned? */
+        "beq.b   .end_u_w1       \n" /* yes, skip leading word handling */
+        
+        "swap    %%d2            \n" /* move initila word up */
+        "move.w  (%[ata]),%%d2   \n" /* combine with second word */
+        "move.l  %%d2,%%d3       \n"
+        "lsr.l   #8,%%d3         \n"
+        "move.w  %%d3,(%[buf])+  \n" /* write bytes 2 and 3 as word */
+
+    ".end_u_w1:                  \n"
+        "moveq.l #12,%%d0        \n"
+        "add.l   %[buf],%%d0     \n"
+        "and.l   #0xFFFFFFF0,%%d0\n" /* d0 == first line bound */
+        "cmp.l   %[buf],%%d0     \n" /* any leading longwords? */
+        "bls.b   .end_u_l1       \n" /* no: skip loop */
+        
+    ".loop_u_l1:                 \n"
+        "move.w  (%[ata]),%%d3   \n" /* load first word */
+        "swap    %%d3            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d3   \n" /* load second word */
+        "move.l  %%d3,%%d4       \n"
+        "lsl.l   %%d1,%%d2       \n"
+        "lsr.l   #8,%%d3         \n"
+        "or.l    %%d3,%%d2       \n" /* combine old low byte with new top 3 bytes */
+        "move.l  %%d2,(%[buf])+  \n" /* store as long */
+        "move.l  %%d4,%%d2       \n"
+        "cmp.l   %[buf],%%d0     \n" /* run up to first line bound */
+        "bhi.b   .loop_u_l1      \n"
+
+    ".end_u_l1:                  \n"
+        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+        
+    ".loop_u_line:               \n"
+        "move.w  (%[ata]),%%d3   \n" /* load 1st word */
+        "swap    %%d3            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d3   \n" /* load 2nd word */
+        "move.l  %%d3,%%d0       \n"
+        "lsl.l   %%d1,%%d2       \n"
+        "lsr.l   #8,%%d0         \n"
+        "or.l    %%d0,%%d2       \n" /* combine old low byte with new top 3 bytes */
+        "move.w  (%[ata]),%%d4   \n" /* load 3rd word */
+        "swap    %%d4            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d4   \n" /* load 4th word */
+        "move.l  %%d4,%%d0       \n"
+        "lsl.l   %%d1,%%d3       \n"
+        "lsr.l   #8,%%d0         \n"
+        "or.l    %%d0,%%d3       \n" /* combine old low byte with new top 3 bytes */
+        "move.w  (%[ata]),%%d5   \n" /* load 5th word */
+        "swap    %%d5            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d5   \n" /* load 6th word */
+        "move.l  %%d5,%%d0       \n"
+        "lsl.l   %%d1,%%d4       \n"
+        "lsr.l   #8,%%d0         \n"
+        "or.l    %%d0,%%d4       \n" /* combine old low byte with new top 3 bytes */
+        "move.w  (%[ata]),%%d6   \n" /* load 7th word */
+        "swap    %%d6            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d6   \n" /* load 8th word */
+        "move.l  %%d6,%%d0       \n"
+        "lsl.l   %%d1,%%d5       \n"
+        "lsr.l   #8,%%d0         \n"
+        "or.l    %%d0,%%d5       \n" /* combine old low byte with new top 3 bytes */
+        "movem.l %%d2-%%d5,(%[buf])  \n"  /* store line */
+        "lea.l   (16,%[buf]),%[buf]  \n"
+        "move.l  %%d6,%%d2       \n"
+        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "bhi.b   .loop_a_line    \n"
+
+        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "bls.b   .end_u_l2       \n" /* no: skip loop */
+
+    ".loop_u_l2:                 \n"
+        "move.w  (%[ata]),%%d3   \n" /* load first word */
+        "swap    %%d3            \n" /* move to upper 16 bit */
+        "move.w  (%[ata]),%%d3   \n" /* load second word */
+        "move.l  %%d3,%%d4       \n"
+        "lsl.l   %%d1,%%d2       \n"
+        "lsr.l   #8,%%d3         \n"
+        "or.l    %%d3,%%d2       \n" /* combine old low byte with new top 3 bytes */
+        "move.l  %%d2,(%[buf])+  \n" /* store as long */
+        "move.l  %%d4,%%d2       \n"
+        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last long bound */
+        "bhi.b   .loop_u_l2      \n"
+        
+    ".end_u_l2:                  \n"
+        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
+        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "bls.b   .end_u_w2       \n"
+
+        "swap    %%d2            \n" /* move old word to upper 16 bits */
+        "move.w  (%[ata]),%%d2   \n" /* load final word */
+        "move.l  %%d2,%%d3       \n"
+        "lsr.l   #8,%%d3         \n"
+        "move.w  %%d3,(%[buf])+  \n" /* write bytes 2 and 3 as word */
+
+    ".end_u_w2:                  \n"
+        "move.b  %%d2,(%[buf])+  \n" /* store final byte */
+        "bra.b   .exit           \n"
+
+        /* 16-bit aligned */
+    ".aligned:                   \n"
+        "btst.l  #1,%%d0         \n" /* longword aligned? */
+        "beq.b   .end_a_w1       \n" /* yes, skip leading word handling */
+
+        "move.w  (%[ata]),(%[buf])+  \n"  /* copy initial word */
+
+    ".end_a_w1:                  \n"
+        "moveq.l #12,%%d0        \n"
+        "add.l   %[buf],%%d0     \n"
+        "and.l   #0xFFFFFFF0,%%d0\n" /* d0 == first line bound */
+        "cmp.l   %[buf],%%d0     \n" /* any leading longwords? */
+        "bls.b   .end_a_l1       \n" /* no: skip loop */
+
+    ".loop_a_l1:                 \n"
+        "move.w  (%[ata]),%%d1   \n" /* load first word */
+        "swap    %%d1            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d1   \n" /* load second word */
+        "move.l  %%d1,(%[buf])+  \n" /* store as long */
+        "cmp.l   %[buf],%%d0     \n" /* run up to first line bound */
+        "bhi.b   .loop_a_l1      \n"
+
+    ".end_a_l1:                  \n"
+        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+
+    ".loop_a_line:               \n"
+        "move.w  (%[ata]),%%d0   \n" /* load 1st word */
+        "swap    %%d0            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d0   \n" /* load 2nd word */
+        "move.w  (%[ata]),%%d1   \n" /* load 3rd word */
+        "swap    %%d1            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d1   \n" /* load 4th word */
+        "move.w  (%[ata]),%%d2   \n" /* load 5th word */
+        "swap    %%d2            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d2   \n" /* load 6th word */
+        "move.w  (%[ata]),%%d3   \n" /* load 7th word */
+        "swap    %%d3            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d3   \n" /* load 8th word */
+        "movem.l %%d0-%%d3,(%[buf])  \n"  /* store line */
+        "lea.l   (16,%[buf]),%[buf]  \n"
+        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "bhi.b   .loop_a_line    \n"
+        
+        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "bls.b   .end_a_l2       \n" /* no: skip loop */
+
+    ".loop_a_l2:                 \n"
+        "move.w  (%[ata]),%%d1   \n" /* read first word */
+        "swap    %%d1            \n" /* move it to upper 16 bits */
+        "move.w  (%[ata]),%%d1   \n" /* read second word */
+        "move.l  %%d1,(%[buf])+  \n" /* store as long */
+        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last long bound */
+        "bhi.b   .loop_a_l2      \n"
+        
+    ".end_a_l2:                  \n"
+        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
+        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "bls.b   .end_a_w2       \n"
+
+        "move.w  (%[ata]),(%[buf])+  \n"  /* copy final word */
+
+    ".end_a_w2:                  \n"
+
+    ".exit:                      \n"
+        : /* outputs */
+        : /* inputs */
+        [buf] "a"(buf),
+        [wcnt]"a"(wordcount),
+        [ata] "a"(&ATA_DATA)
+        : /*trashed */
+        "d0", "d1", "d2", "d3", "d4", "d5", "d6"
+    );
 #else
     /* turbo-charged assembler version */
     /* this assumes wordcount to be a multiple of 4 */
