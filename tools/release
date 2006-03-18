@@ -80,7 +80,7 @@ for(@entries) {
     #print "Create $dir\n";
     mkalldir($dir);
     #print "Copy $_ to $dir\n";
-    `cp -p $_ $dir`;
+    `cp -p $_ $dir 2>/dev/null`;
 }
 
 
