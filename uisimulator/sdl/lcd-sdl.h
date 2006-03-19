@@ -36,5 +36,5 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
 void sdl_set_gradient(SDL_Surface *surface, SDL_Color *start, SDL_Color *end,
                       int first, int steps);
 
-#endif // #ifndef __LCDSDL_H__
+#endif /* #ifndef __LCDSDL_H__ */
 

@@ -26,5 +26,5 @@ extern SDL_Thread* threads[256];
 extern int         threadCount;
 extern SDL_mutex*  mutex;
 
-#endif // #ifndef __THREADSDL_H__
+#endif /* #ifndef __THREADSDL_H__ */
 

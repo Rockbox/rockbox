@@ -25,5 +25,5 @@
 
 void sim_lcd_remote_init(void);
 
-#endif // #ifndef __LCDREMOTE_H__
+#endif /* #ifndef __LCDREMOTE_H__ */
 

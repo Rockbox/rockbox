@@ -38,7 +38,7 @@
 #include "SDL_thread.h"
 
 /* extern functions */
-extern void                 app_main (void *); // mod entry point
+extern void                 app_main (void *); /* mod entry point */
 extern void                 new_key(int key);
 extern void                 sim_tick_tasks(void);
 
@@ -95,7 +95,7 @@ void gui_message_loop(void)
                 done = true;
                 break;
             default:
-                //printf("Unhandled event\n");
+                /*printf("Unhandled event\n"); */
                 break;
         }
     }

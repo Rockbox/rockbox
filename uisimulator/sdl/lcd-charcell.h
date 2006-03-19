@@ -25,5 +25,5 @@
 
 void sim_lcd_init(void);
 
-#endif // #ifndef __LCDCHARCELL_H__
+#endif /* #ifndef __LCDCHARCELL_H__ */
 
