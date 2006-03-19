@@ -284,4 +284,5 @@ void pcf50606_init(void)
     pcf50606_write(0x29, 0x1C); /* Disable the unused MBC module */
     
     pcf50606_write(0x35, 0x13); /* Backlight PWM = 512Hz 50/50 */
+    pcf50606_write(0x3a, 0x3b); /* PWM output on GPOOD1 */
 }
