@@ -3796,3 +3796,9 @@ desc: splash number of tracks inserted
 eng: "Searching... %d found (%s)"
 voice: ""
 new:
+
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Party Mode"
+new:

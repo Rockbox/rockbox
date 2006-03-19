@@ -344,6 +344,11 @@ int ft_enter(struct tree_context* c)
         gui_syncsplash(0, true, str(LANG_WAIT));
         switch ( file->attr & TREE_ATTR_MASK ) {
             case TREE_ATTR_M3U:
+                if (global_settings.party_mode) {
+                    gui_syncsplash(HZ, true, str(LANG_PARTY_MODE));
+                    break;
+                }
+
                 if (bookmark_autoload(buf))
                     break;
 
@@ -385,7 +390,12 @@ int ft_enter(struct tree_context* c)
                         break;
                 }
 
-                if (playlist_create(c->currdir, NULL) != -1)
+                if (global_settings.party_mode) {
+                    playlist_insert_track(NULL, buf,
+                                          PLAYLIST_INSERT_LAST, true);
+                    gui_syncsplash(HZ, true, str(LANG_INSERT_LAST));
+                }
+                else if (playlist_create(c->currdir, NULL) != -1)
                 {
                     start_index = ft_build_playlist(c, c->selected_item);
                     if (global_settings.playlist_shuffle)
@@ -462,6 +472,11 @@ int ft_enter(struct tree_context* c)
 
                 /* plugin file */
             case TREE_ATTR_ROCK:
+                if (global_settings.party_mode) {
+                    gui_syncsplash(HZ, true, str(LANG_PARTY_MODE));
+                    break;
+                }
+
                 if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
                 {
                     if(*c->dirfilter > NUM_FILTER_MODES)
@@ -475,7 +490,14 @@ int ft_enter(struct tree_context* c)
 
             default:
             {
-                char* plugin = filetype_get_plugin(file);
+                char* plugin;
+
+                if (global_settings.party_mode) {
+                    gui_syncsplash(HZ, true, str(LANG_PARTY_MODE));
+                    break;
+                }
+                
+                plugin = filetype_get_plugin(file);
                 if (plugin)
                 {
                     if (plugin_load(plugin,buf) == PLUGIN_USB_CONNECTED)

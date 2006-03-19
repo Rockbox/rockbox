@@ -286,6 +286,8 @@ long gui_wps_show(void)
 #endif
 #ifdef WPS_RC_PAUSE
             case WPS_RC_PAUSE:
+                if (global_settings.party_mode)
+                    break;
 #ifdef WPS_RC_PAUSE_PRE
                 if ((button == WPS_RC_PAUSE) &&
                     (lastbutton != WPS_RC_PAUSE_PRE))
@@ -365,6 +367,8 @@ long gui_wps_show(void)
             case WPS_RC_FFWD:
 #endif
             case WPS_FFWD:
+                if (global_settings.party_mode)
+                    break;
 #ifdef WPS_NEXT_DIR
                 if (current_tick - right_lastclick < HZ)
                 {
@@ -377,6 +381,8 @@ long gui_wps_show(void)
             case WPS_RC_REW:
 #endif
             case WPS_REW:
+                if (global_settings.party_mode)
+                    break;
 #ifdef WPS_PREV_DIR
                 if (current_tick - left_lastclick < HZ)
                 {
@@ -396,6 +402,8 @@ long gui_wps_show(void)
 #endif
 #ifdef WPS_RC_PREV
             case WPS_RC_PREV:
+                if (global_settings.party_mode)
+                    break;
 #ifdef WPS_RC_PREV_PRE
                 if ((button == WPS_RC_PREV) && (lastbutton != WPS_RC_PREV_PRE))
                     break;
@@ -441,6 +449,8 @@ long gui_wps_show(void)
             case WPS_RC_NEXT_DIR:
 #endif
             case WPS_NEXT_DIR:
+                if (global_settings.party_mode)
+                    break;
 #if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
                 if (ab_repeat_mode_enabled())
                 {
@@ -460,6 +470,8 @@ long gui_wps_show(void)
             case WPS_RC_PREV_DIR:
 #endif
             case WPS_PREV_DIR:
+                if (global_settings.party_mode)
+                    break;
 #if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
                 if (ab_repeat_mode_enabled())
                     ab_set_A_marker(wps_state.id3->elapsed);
@@ -479,6 +491,8 @@ long gui_wps_show(void)
 #endif
 #ifdef WPS_RC_NEXT
             case WPS_RC_NEXT:
+                if (global_settings.party_mode)
+                    break;
 #ifdef WPS_RC_NEXT_PRE
                 if ((button == WPS_RC_NEXT) && (lastbutton != WPS_RC_NEXT_PRE))
                     break;
@@ -681,6 +695,8 @@ long gui_wps_show(void)
                 if (lastbutton != WPS_EXIT_PRE)
                     break;
 # endif
+                if (global_settings.party_mode)
+                    break;
                 exit = true;
 #ifdef WPS_RC_EXIT
             case WPS_RC_EXIT:
@@ -688,6 +704,8 @@ long gui_wps_show(void)
                  if (lastbutton != WPS_RC_EXIT_PRE)
                      break;
 #endif
+                if (global_settings.party_mode)
+                    break;
                 exit = true;
 #endif
                 break;

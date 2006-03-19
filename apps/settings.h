@@ -471,6 +471,7 @@ struct user_settings
     int bg_color; /* background color native format */
     int fg_color; /* foreground color native format */
 #endif
+    bool party_mode;	/* party mode - unstoppable music */
 };
 
 enum optiontype { INT, BOOL };

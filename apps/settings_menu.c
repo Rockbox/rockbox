@@ -1041,6 +1041,11 @@ static bool set_fade_on_stop(void)
     return set_bool( str(LANG_FADE_ON_STOP), &global_settings.fade_on_stop );
 }
 
+static bool set_party_mode(void)
+{
+    return set_bool( str(LANG_PARTY_MODE), &global_settings.party_mode );
+}
+
 
 static bool ff_rewind_accel(void) 
 { 
@@ -1461,6 +1466,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_WIND_MENU), ff_rewind_settings_menu },
         { ID2P(LANG_MP3BUFFER_MARGIN), buffer_margin },
         { ID2P(LANG_FADE_ON_STOP), set_fade_on_stop },
+        { ID2P(LANG_PARTY_MODE), set_party_mode },
 #if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFADE), crossfade_settings_menu },
         { ID2P(LANG_REPLAYGAIN), replaygain_settings_menu },

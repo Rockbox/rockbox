@@ -637,8 +637,10 @@ static bool dirbrowse(void)
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     /* Stop the music if it is playing */
-                    if(audio_status())
-                        audio_stop();
+                    if(audio_status()) {
+                        if (!global_settings.party_mode)
+                            audio_stop();
+                    }
 #if defined(HAVE_CHARGING) && \
     (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
                     else { 
