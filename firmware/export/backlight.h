@@ -27,7 +27,7 @@ void backlight_set_timeout(int index);
 #ifdef CONFIG_BACKLIGHT
 void backlight_init(void);
 int  backlight_get_current_timeout(void);
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#ifdef HAVE_BACKLIGHT_PWM_FADING
 void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif

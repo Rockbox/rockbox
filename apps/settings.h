@@ -271,7 +271,7 @@ struct user_settings
                                1=always,
                                then according to timeout_values[] */
     int backlight_timeout_plugged;
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#ifdef HAVE_BACKLIGHT_PWM_FADING
     int backlight_fade_in;  /* backlight fade in timing: 0..3 */
     int backlight_fade_out; /* backlight fade in timing: 0..7 */
 #endif

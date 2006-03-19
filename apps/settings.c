@@ -90,7 +90,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 37
+#define CONFIG_BLOCK_VERSION 38
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -436,7 +436,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_trigger_mode ), 0, "trigger mode", "off,once,repeat"},
 #endif
 
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+#ifdef HAVE_BACKLIGHT_PWM_FADING
     /* backlight fading */
     {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
     {3, S_O(backlight_fade_out), 3, "backlight fade out",
@@ -997,7 +997,7 @@ void settings_apply(void)
 #ifdef HAVE_CHARGING
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif
-#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
     backlight_set_fade_in(global_settings.backlight_fade_in);
     backlight_set_fade_out(global_settings.backlight_fade_out);
 #endif

@@ -40,6 +40,9 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 
+/* We can fade the backlight by using PWM */
+#define HAVE_BACKLIGHT_PWM_FADING
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

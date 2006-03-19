@@ -48,6 +48,9 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */
 
+/* We can fade the backlight by using PWM */
+#define HAVE_BACKLIGHT_PWM_FADING
+
 #ifndef SIMULATOR
 
 /* The Nano actually has a PP5021 - but it's register compatible with 

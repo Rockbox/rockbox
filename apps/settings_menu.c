@@ -191,7 +191,7 @@ static bool backlight_timer(void)
                       backlight_set_timeout );
 }
 
-#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 static bool backlight_fade_in(void)
 {
     static const struct opt_items names[] = {
@@ -1087,7 +1087,7 @@ static bool custom_remote_wps_browse(void)
     return rockbox_browse(WPS_DIR, SHOW_RWPS);
 }
 #endif
-	
+
 static bool custom_cfg_browse(void)
 {
     return rockbox_browse(ROCKBOX_DIR, SHOW_CFG);
@@ -1614,7 +1614,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_timer_plugged },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
-#if (CONFIG_BACKLIGHT == BL_IRIVER_H100) && !defined(SIMULATOR)
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
 #endif
