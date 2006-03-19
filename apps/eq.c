@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <inttypes.h>
 #include "config.h"
 #include "eq.h"
 
@@ -214,7 +215,7 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 }
 
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
-void eq_filter(long **x, struct eqfilter *f, unsigned num,
+void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift)
 {
     unsigned c, i;

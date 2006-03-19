@@ -192,7 +192,7 @@ struct dsp_config
 struct resample_data
 {
     long phase, delta;
-    long last_sample[2];
+    int32_t last_sample[2];
 };
 
 struct dither_data
@@ -203,9 +203,9 @@ struct dither_data
 
 struct crossfeed_data
 {
-    long lowpass[2];
-    long highpass[2];
-    long delay[2][13];
+    int32_t lowpass[2];
+    int32_t highpass[2];
+    int32_t delay[2][13];
     int index;
 };
 
@@ -233,8 +233,8 @@ struct dsp_config *dsp;
  * of copying needed is minimized for that case.
  */
 
-static long sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
-static long resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
+static int32_t sample_buf[SAMPLE_BUF_SIZE] IBSS_ATTR;
+static int32_t resample_buf[RESAMPLE_BUF_SIZE] IBSS_ATTR;
 
 int sound_get_pitch(void)
 {
@@ -254,7 +254,7 @@ void sound_set_pitch(int permille)
  * consume. Note that for mono, dst[0] equals dst[1], as there is no point
  * in processing the same data twice.
  */
-static int convert_to_internal(const char* src[], int count, long* dst[])
+static int convert_to_internal(const char* src[], int count, int32_t* dst[])
 {
     count = MIN(SAMPLE_BUF_SIZE / 2, count);
 
@@ -267,15 +267,15 @@ static int convert_to_internal(const char* src[], int count, long* dst[])
     }
     else
     {
-        dst[0] = (long*) src[0];
-        dst[1] = (long*) ((dsp->stereo_mode == STEREO_MONO) ? src[0] : src[1]);
+        dst[0] = (int32_t*) src[0];
+        dst[1] = (int32_t*) ((dsp->stereo_mode == STEREO_MONO) ? src[0] : src[1]);
     }
 
     if (dsp->sample_depth <= NATIVE_DEPTH)
     {
         short* s0 = (short*) src[0];
-        long* d0 = dst[0];
-        long* d1 = dst[1];
+        int32_t* d0 = dst[0];
+        int32_t* d1 = dst[1];
         int scale = WORD_SHIFT;
         int i;
 
@@ -307,9 +307,9 @@ static int convert_to_internal(const char* src[], int count, long* dst[])
     }
     else if (dsp->stereo_mode == STEREO_INTERLEAVED)
     {
-        long* s0 = (long*) src[0];
-        long* d0 = dst[0];
-        long* d1 = dst[1];
+        int32_t* s0 = (int32_t*) src[0];
+        int32_t* d0 = dst[0];
+        int32_t* d1 = dst[1];
         int i;
 
         for (i = 0; i < count; i++)
@@ -348,13 +348,13 @@ static void resampler_set_delta(int frequency)
 
 /* TODO: we really should have a separate set of resample functions for both
    mono and stereo to avoid all this internal branching and looping. */
-static long downsample(long **dst, long **src, int count,
+static long downsample(int32_t **dst, int32_t **src, int count,
     struct resample_data *r)
 {
     long phase = r->phase;
     long delta = r->delta;
-    long last_sample;
-    long *d[2] = { dst[0], dst[1] };
+    int32_t last_sample;
+    int32_t *d[2] = { dst[0], dst[1] };
     int pos = phase >> 16;
     int i = 1, j;
     int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
@@ -388,11 +388,11 @@ static long downsample(long **dst, long **src, int count,
     return i;
 }
 
-static long upsample(long **dst, long **src, int count, struct resample_data *r)
+static long upsample(int32_t **dst, int32_t **src, int count, struct resample_data *r)
 {
     long phase = r->phase;
     long delta = r->delta;
-    long *d[2] = { dst[0], dst[1] };
+    int32_t *d[2] = { dst[0], dst[1] };
     int i = 0, j;
     int pos;
     int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
@@ -427,13 +427,13 @@ static long upsample(long **dst, long **src, int count, struct resample_data *r)
  * done, to refer to the resampled data. Returns number of stereo samples
  * for further processing.
  */
-static inline int resample(long* src[], int count)
+static inline int resample(int32_t* src[], int count)
 {
     long new_count;
 
     if (dsp->frequency != NATIVE_FREQUENCY)
     {
-        long* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_SIZE / 2]};
+        int32_t* dst[2] = {&resample_buf[0], &resample_buf[RESAMPLE_BUF_SIZE / 2]};
 
         if (dsp->frequency < NATIVE_FREQUENCY)
         {
@@ -460,7 +460,7 @@ static inline int resample(long* src[], int count)
     return new_count;
 }
 
-static inline long clip_sample(long sample, long min, long max)
+static inline long clip_sample(int32_t sample, int32_t min, int32_t max)
 {
     if (sample > max)
     {
@@ -478,13 +478,13 @@ static inline long clip_sample(long sample, long min, long max)
  * taken from the coolplayer project - coolplayer.sourceforge.net
  */
 
-static long dither_sample(long sample, long bias, long mask,
+static long dither_sample(int32_t sample, int32_t bias, int32_t mask,
     struct dither_data* dither)
 {
-    long output;
-    long random;
-    long min;
-    long max;
+    int32_t output;
+    int32_t random;
+    int32_t min;
+    int32_t max;
 
     /* Noise shape and bias */
 
@@ -523,7 +523,7 @@ static const long crossfeed_coefs[6] ICONST_ATTR = {
     LOW, LOW_COMP, HIGH_NEG, HIGH_COMP, ATT, ATT_COMP
 };
 
-static void apply_crossfeed(long* src[], int count)
+static void apply_crossfeed(int32_t* src[], int count)
 {
     asm volatile (
         "lea.l crossfeed_data, %%a1 \n"
@@ -598,20 +598,20 @@ static void apply_crossfeed(long* src[], int count)
     );
 }
 #else
-static void apply_crossfeed(long* src[], int count)
+static void apply_crossfeed(int32_t* src[], int count)
 {
-    long a; /* accumulator */
+    int32_t a; /* accumulator */
 
-    long low_left = crossfeed_data.lowpass[0];
-    long low_right = crossfeed_data.lowpass[1];
-    long high_left = crossfeed_data.highpass[0];
-    long high_right = crossfeed_data.highpass[1];
+    int32_t low_left = crossfeed_data.lowpass[0];
+    int32_t low_right = crossfeed_data.lowpass[1];
+    int32_t high_left = crossfeed_data.highpass[0];
+    int32_t high_right = crossfeed_data.highpass[1];
     unsigned int index = crossfeed_data.index;
 
-    long left, right;
+    int32_t left, right;
 
-    long * delay_l = crossfeed_data.delay[0];
-    long * delay_r = crossfeed_data.delay[1];
+    int32_t* delay_l = crossfeed_data.delay[0];
+    int32_t* delay_r = crossfeed_data.delay[1];
 
     int i;
 
@@ -711,7 +711,7 @@ void dsp_eq_update_data(bool enabled, int band)
 }
 
 /* Apply EQ filters to those bands that have got it switched on. */
-static void eq_process(long **x, unsigned num)
+static void eq_process(int32_t **x, unsigned num)
 {
     int i;
     unsigned int channels = dsp->stereo_mode != STEREO_MONO ? 2 : 1;
@@ -736,19 +736,19 @@ static void eq_process(long **x, unsigned num)
  * the src array if gain was applied.
  * Note that this must be called before the resampler.
  */
-static void apply_gain(long* _src[], int _count)
+static void apply_gain(int32_t* _src[], int _count)
 {
     struct dsp_config *my_dsp = dsp;
     if (my_dsp->replaygain)
     {
-        long** src = _src;
+        int32_t** src = _src;
         int count = _count;
-        long* s0 = src[0];
-        long* s1 = src[1];
+        int32_t* s0 = src[0];
+        int32_t* s1 = src[1];
         long gain = my_dsp->replaygain;
-        long s;
+        int32_t s;
         int i;
-        long *d;
+        int32_t *d;
 
         if (s0 != s1)
         {
@@ -773,10 +773,10 @@ static void apply_gain(long* _src[], int _count)
     }
 }
 
-static void write_samples(short* dst, long* src[], int count)
+static void write_samples(short* dst, int32_t* src[], int count)
 {
-    long* s0 = src[0];
-    long* s1 = src[1];
+    int32_t* s0 = src[0];
+    int32_t* s1 = src[1];
     int scale = dsp->frac_bits + 1 - NATIVE_DEPTH;
 
     if (dsp->dither_enabled)
@@ -815,7 +815,7 @@ static void write_samples(short* dst, long* src[], int count)
  */
 long dsp_process(char* dst, const char* src[], long size)
 {
-    long* tmp[2];
+    int32_t* tmp[2];
     long written = 0;
     long factor;
     int samples;
@@ -980,7 +980,7 @@ bool dsp_configure(int setting, void *value)
         else
         {
             dsp->frac_bits = (long) value;
-            dsp->sample_bytes = sizeof(long);
+            dsp->sample_bytes = 4; /* samples are 32 bits */
             dsp->clip_max = (1 << (long)value) - 1;
             dsp->clip_min = -(1 << (long)value);
         }

@@ -20,6 +20,8 @@
 #ifndef _EQ_H
 #define _EQ_H
 
+#include <inttypes.h>
+
 /* These depend on the fixed point formats used by the different filter types
    and need to be changed when they change.
  */
@@ -27,14 +29,14 @@
 #define EQ_SHELF_SHIFT 8
 
 struct eqfilter {
-    long coefs[5];        /* Order is b0, b1, b2, a1, a2 */
-    long history[2][4];
+    int32_t coefs[5];        /* Order is b0, b1, b2, a1, a2 */
+    int32_t history[2][4];
 };
 
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
-void eq_filter(long **x, struct eqfilter *f, unsigned num,
+void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift);
 
 #endif
