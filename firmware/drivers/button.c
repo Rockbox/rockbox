@@ -138,9 +138,7 @@ static inline int ipod_4g_button_read(void)
 
         if ((status & 0x800000ff) == 0x8000001a) {
             static int old_wheel_value IDATA_ATTR = -1;
-            /* NB: highest wheel = 0x5F, clockwise increases */
-            int new_wheel_value = (status << 9) >> 25;
-            int wheel_delta = new_wheel_value - old_wheel_value;
+            static int wheel_repeat = 0;
 
             if (status & 0x100)
                 btn |= BUTTON_SELECT;
@@ -153,43 +151,48 @@ static inline int ipod_4g_button_read(void)
             if (status & 0x1000)
                 btn |= BUTTON_MENU;
             if (status & 0x40000000) {
+                /* NB: highest wheel = 0x5F, clockwise increases */
+                int new_wheel_value = (status << 9) >> 25;
                 backlight_on();
                 /* The queue should have no other events when scrolling */
-                if (queue_empty(&button_queue)) {
+                if (queue_empty(&button_queue) && old_wheel_value >= 0) {
 
-                    if (old_wheel_value >= 0) {
-                        /* This is for later = BUTTON_SCROLL_TOUCH;*/
-                        unsigned long data;
+                    /* This is for later = BUTTON_SCROLL_TOUCH;*/
+                    int wheel_delta = new_wheel_value - old_wheel_value;
+                    unsigned long data;
+                    int wheel_keycode;
 
-                        if (wheel_delta < -48)
-                            wheel_delta += 96; /* Forward wrapping case */
-                        else if (wheel_delta > 48)
-                            wheel_delta -= 96; /* Backward wrapping case */
+                    if (wheel_delta < -48)
+                        wheel_delta += 96; /* Forward wrapping case */
+                    else if (wheel_delta > 48)
+                        wheel_delta -= 96; /* Backward wrapping case */
 
-                        if (wheel_delta > 4) {
-                            old_wheel_value = new_wheel_value;
-                            data = (wheel_delta << 16) | new_wheel_value;
-                            queue_post(&button_queue, BUTTON_SCROLL_FWD,
-                                    (void *)data);
-                        } else if (wheel_delta < -4) {
-                            old_wheel_value = new_wheel_value;
-                            data = (wheel_delta << 16) | new_wheel_value;
-                            queue_post(&button_queue, BUTTON_SCROLL_BACK, 
-                                    (void *)data);
-                        }
-                        
-                    } else
-                        old_wheel_value = new_wheel_value;
+                    if (wheel_delta > 4) {
+                        wheel_keycode = BUTTON_SCROLL_FWD;
+                    } else if (wheel_delta < -4) {
+                        wheel_keycode = BUTTON_SCROLL_BACK;
+                    } else goto wheel_end;
+
+                    data = (wheel_delta << 16) | new_wheel_value;
+                    queue_post(&button_queue, wheel_keycode | wheel_repeat,
+                            (void *)data);
+
+                    if (!wheel_repeat) wheel_repeat = BUTTON_REPEAT;
                 }
-            } else if (wheel_delta == 0) {
+
+                old_wheel_value = new_wheel_value;
+            } else if (old_wheel_value >= 0) {
                 /* scroll wheel up */
                 old_wheel_value = -1;
+                wheel_repeat = 0;
             }
 
         } else if (status == 0xffffffff) {
             opto_i2c_init();
         }
     }
+
+wheel_end:
 
     if ((inl(reg) & 0x8000000) != 0) {
         outl(0xffffffff, 0x7000c120);
