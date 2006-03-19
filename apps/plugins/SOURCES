@@ -30,7 +30,7 @@ mandelbrot.c
 plasma.c
 #endif
 
-bejeweled.c
+jewels.c
 bounce.c
 
 #if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)

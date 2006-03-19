@@ -27,67 +27,67 @@ PLUGIN_HEADER
 
 /* button definitions, every keypad must only have directions & select */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define BEJEWELED_UP     BUTTON_UP
-#define BEJEWELED_DOWN   BUTTON_DOWN
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_SELECT BUTTON_PLAY
-#define BEJEWELED_CANCEL BUTTON_OFF
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_PLAY
+#define JEWELS_CANCEL BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define BEJEWELED_UP     BUTTON_UP
-#define BEJEWELED_DOWN   BUTTON_DOWN
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_SELECT BUTTON_MENU
-#define BEJEWELED_CANCEL BUTTON_OFF
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_MENU
+#define JEWELS_CANCEL BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define BEJEWELED_UP     BUTTON_UP
-#define BEJEWELED_DOWN   BUTTON_DOWN
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_SELECT BUTTON_SELECT
-#define BEJEWELED_CANCEL BUTTON_OFF
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define BEJEWELED_SCROLLWHEEL
-#define BEJEWELED_UP     BUTTON_MENU
-#define BEJEWELED_DOWN   BUTTON_PLAY
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_PREV   BUTTON_SCROLL_BACK
-#define BEJEWELED_NEXT   BUTTON_SCROLL_FWD
-#define BEJEWELED_SELECT BUTTON_SELECT
+#define JEWELS_SCROLLWHEEL
+#define JEWELS_UP     BUTTON_MENU
+#define JEWELS_DOWN   BUTTON_PLAY
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_PREV   BUTTON_SCROLL_BACK
+#define JEWELS_NEXT   BUTTON_SCROLL_FWD
+#define JEWELS_SELECT BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define BEJEWELED_UP     BUTTON_UP
-#define BEJEWELED_DOWN   BUTTON_DOWN
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_SELECT BUTTON_SELECT
-#define BEJEWELED_CANCEL BUTTON_PLAY
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define BEJEWELED_UP     BUTTON_UP
-#define BEJEWELED_DOWN   BUTTON_DOWN
-#define BEJEWELED_LEFT   BUTTON_LEFT
-#define BEJEWELED_RIGHT  BUTTON_RIGHT
-#define BEJEWELED_SELECT BUTTON_SELECT
-#define BEJEWELED_CANCEL BUTTON_PLAY
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define BEJEWELED_UP         BUTTON_UP
-#define BEJEWELED_DOWN       BUTTON_DOWN
-#define BEJEWELED_LEFT       BUTTON_LEFT
-#define BEJEWELED_RIGHT      BUTTON_RIGHT
-#define BEJEWELED_QUIT       BUTTON_A
-#define BEJEWELED_START      BUTTON_POWER
-#define BEJEWELED_SELECT     BUTTON_SELECT
-#define BEJEWELED_RESUME     BUTTON_MENU
+#define JEWELS_UP         BUTTON_UP
+#define JEWELS_DOWN       BUTTON_DOWN
+#define JEWELS_LEFT       BUTTON_LEFT
+#define JEWELS_RIGHT      BUTTON_RIGHT
+#define JEWELS_QUIT       BUTTON_A
+#define JEWELS_START      BUTTON_POWER
+#define JEWELS_SELECT     BUTTON_SELECT
+#define JEWELS_RESUME     BUTTON_MENU
 
 #else
-    #error BEJEWELED: Unsupported keypad
+    #error JEWELS: Unsupported keypad
 #endif
 
 /* use 30x30 tiles (iPod Video) */
@@ -140,12 +140,12 @@ PLUGIN_HEADER
 #define NUM_SCORES 8
 
 #else
-  #error BEJEWELED: Unsupported LCD
+  #error JEWELS: Unsupported LCD
 #endif
 
 /* save files */
-#define SCORE_FILE PLUGIN_DIR "/bejeweled.score"
-#define SAVE_FILE  PLUGIN_DIR "/bejeweled.save"
+#define SCORE_FILE PLUGIN_DIR "/jewels.score"
+#define SAVE_FILE  PLUGIN_DIR "/jewels.save"
 
 /* final game return status */
 #define BJ_END  3
@@ -194,17 +194,17 @@ enum menu_cmd {
 };
 
 /* menus */
-struct bejeweled_menu {
+struct jewels_menu {
     char *title;
     bool hasframe;
     int selected;
     int itemcnt;
-    struct bejeweled_menuitem {
+    struct jewels_menuitem {
         char *text;
         enum menu_result res;
     } items[MAX_MITEMS];
 } bjmenu[] = {
-    {"Bejeweled", false, 0, 5,
+    {"Jewels", false, 0, 5,
         {{"New Game",    MRES_NEW},
          {"Resume Game", MRES_RESUME},
          {"High Scores", MRES_SCORES},
@@ -220,11 +220,11 @@ struct bejeweled_menu {
 static struct plugin_api* rb;
 
 /* external bitmaps */
-extern const fb_data bejeweled_jewels[];
+extern const fb_data jewels[];
 
 /* tile background colors */
 #ifdef HAVE_LCD_COLOR
-static const unsigned bejeweled_bkgd[2] = {
+static const unsigned jewels_bkgd[2] = {
     LCD_RGBPACK(104, 63, 63),
     LCD_RGBPACK(83, 44, 44)
 };
@@ -261,9 +261,9 @@ struct game_context {
 };
 
 /*****************************************************************************
-* bejeweled_init() initializes bejeweled data structures.
+* jewels_init() initializes jewels data structures.
 ******************************************************************************/
-static void bejeweled_init(struct game_context* bj) {
+static void jewels_init(struct game_context* bj) {
     /* seed the rand generator */
     rb->srand(*rb->current_tick);
 
@@ -283,9 +283,9 @@ static void bejeweled_init(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_setcolors() set the foreground and background colors.
+* jewels_setcolors() set the foreground and background colors.
 ******************************************************************************/
-static inline void bejeweled_setcolors(void) {
+static inline void jewels_setcolors(void) {
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_RGBPACK(49, 26, 26));
     rb->lcd_set_foreground(LCD_RGBPACK(210, 181, 181));
@@ -293,9 +293,9 @@ static inline void bejeweled_setcolors(void) {
 }
 
 /*****************************************************************************
-* bejeweled_drawboard() redraws the entire game board.
+* jewels_drawboard() redraws the entire game board.
 ******************************************************************************/
-static void bejeweled_drawboard(struct game_context* bj) {
+static void jewels_drawboard(struct game_context* bj) {
     int i, j;
     int w, h;
     unsigned int tempscore;
@@ -316,15 +316,15 @@ static void bejeweled_drawboard(struct game_context* bj) {
     for(i=0; i<BJ_HEIGHT-1; i++){
         for(j=0; j<BJ_WIDTH; j++){
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(bejeweled_bkgd[(i+j)%2]);
+            rb->lcd_set_foreground(jewels_bkgd[(i+j)%2]);
             rb->lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                                 TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_transparent_part(bejeweled_jewels,
+            rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
                            TILE_WIDTH, j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
-            rb->lcd_bitmap_part(bejeweled_jewels,
+            rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[i+1][j].type),
                            TILE_WIDTH, j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
@@ -348,7 +348,7 @@ static void bejeweled_drawboard(struct game_context* bj) {
                          tempscore/LEVEL_PTS)+1,
                      (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
                      ((LCD_HEIGHT-10)-18)*tempscore/LEVEL_PTS-1);
-    bejeweled_setcolors();
+    jewels_setcolors();
     rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
                      (LCD_HEIGHT-10)-(((LCD_HEIGHT-10)-18)*
                          tempscore/LEVEL_PTS),
@@ -373,10 +373,10 @@ static void bejeweled_drawboard(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_showmenu() displays the chosen menu after performing the chosen
+* jewels_showmenu() displays the chosen menu after performing the chosen
 *     menu command.
 ******************************************************************************/
-static enum menu_result bejeweled_showmenu(struct bejeweled_menu* menu,
+static enum menu_result jewels_showmenu(struct jewels_menu* menu,
                                            enum menu_cmd cmd) {
     int i;
     int w, h;
@@ -438,10 +438,10 @@ static enum menu_result bejeweled_showmenu(struct bejeweled_menu* menu,
 }
 
 /*****************************************************************************
-* bejeweled_putjewels() makes the jewels fall to fill empty spots and adds
+* jewels_putjewels() makes the jewels fall to fill empty spots and adds
 * new random jewels at the empty spots at the top of each row.
 ******************************************************************************/
-static void bejeweled_putjewels(struct game_context* bj){
+static void jewels_putjewels(struct game_context* bj){
     int i, j, k;
     bool mark, done;
     long lasttick, currenttick;
@@ -485,12 +485,12 @@ static void bejeweled_putjewels(struct game_context* bj){
                         if(i == 0 && YOFS) {
                             rb->lcd_set_foreground(rb->lcd_get_background());
                         } else {
-                            rb->lcd_set_foreground(bejeweled_bkgd[(i-1+j)%2]);
+                            rb->lcd_set_foreground(jewels_bkgd[(i-1+j)%2]);
                         }
                         rb->lcd_fillrect(j*TILE_WIDTH, (i-1)*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         if(bj->playboard[i+1][j].type == 0) {
-                            rb->lcd_set_foreground(bejeweled_bkgd[(i+j)%2]);
+                            rb->lcd_set_foreground(jewels_bkgd[(i+j)%2]);
                             rb->lcd_fillrect(j*TILE_WIDTH, i*TILE_HEIGHT+YOFS,
                                             TILE_WIDTH, TILE_HEIGHT);
                         }
@@ -507,14 +507,14 @@ static void bejeweled_putjewels(struct game_context* bj){
 
                         /* draw new position */
 #ifdef HAVE_LCD_COLOR
-                        rb->lcd_bitmap_transparent_part(bejeweled_jewels, 0,
+                        rb->lcd_bitmap_transparent_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
                                        TILE_WIDTH, j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
                                            ((((TILE_HEIGHT<<10)*k)/8)>>10),
                                        TILE_WIDTH, TILE_HEIGHT);
 #else
-                        rb->lcd_bitmap_part(bejeweled_jewels, 0,
+                        rb->lcd_bitmap_part(jewels, 0,
                                        TILE_HEIGHT*(bj->playboard[i][j].type),
                                        TILE_WIDTH, j*TILE_WIDTH,
                                        (i-1)*TILE_HEIGHT+YOFS+
@@ -526,7 +526,7 @@ static void bejeweled_putjewels(struct game_context* bj){
             }
 
             rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
-            bejeweled_setcolors();
+            jewels_setcolors();
 
             /* framerate limiting */
             currenttick = *rb->current_tick;
@@ -562,10 +562,10 @@ static void bejeweled_putjewels(struct game_context* bj){
 }
 
 /*****************************************************************************
-* bejeweled_clearjewels() finds all the connected rows and columns and
+* jewels_clearjewels() finds all the connected rows and columns and
 *     calculates and returns the points earned.
 ******************************************************************************/
-static unsigned int bejeweled_clearjewels(struct game_context* bj) {
+static unsigned int jewels_clearjewels(struct game_context* bj) {
     int i, j;
     int last, run;
     unsigned int points = 0;
@@ -636,29 +636,29 @@ static unsigned int bejeweled_clearjewels(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_runboard() runs the board until it settles in a fixed state and
+* jewels_runboard() runs the board until it settles in a fixed state and
 *     returns points earned.
 ******************************************************************************/
-static unsigned int bejeweled_runboard(struct game_context* bj) {
+static unsigned int jewels_runboard(struct game_context* bj) {
     unsigned int points = 0;
     unsigned int ret;
 
     bj->segments = 0;
 
-    while((ret = bejeweled_clearjewels(bj)) > 0) {
+    while((ret = jewels_clearjewels(bj)) > 0) {
         points += ret;
-        bejeweled_drawboard(bj);
-        bejeweled_putjewels(bj);
+        jewels_drawboard(bj);
+        jewels_putjewels(bj);
     }
 
     return points;
 }
 
 /*****************************************************************************
-* bejeweled_swapjewels() swaps two jewels as long as it results in points and
+* jewels_swapjewels() swaps two jewels as long as it results in points and
 *     returns points earned.
 ******************************************************************************/
-static unsigned int bejeweled_swapjewels(struct game_context* bj,
+static unsigned int jewels_swapjewels(struct game_context* bj,
                                          int x, int y, int direc) {
     int k;
     int horzmod, vertmod;
@@ -710,11 +710,11 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
         for(k=0; k<=8; k++) {
             /* clear old position */
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_set_foreground(bejeweled_bkgd[(x+y)%2]);
+            rb->lcd_set_foreground(jewels_bkgd[(x+y)%2]);
             rb->lcd_fillrect(x*TILE_WIDTH,
                              y*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_set_foreground(bejeweled_bkgd[(x+horzmod+y+vertmod)%2]);
+            rb->lcd_set_foreground(jewels_bkgd[(x+horzmod+y+vertmod)%2]);
             rb->lcd_fillrect((x+horzmod)*TILE_WIDTH,
                              (y+vertmod)*TILE_HEIGHT+YOFS,
                              TILE_WIDTH, TILE_HEIGHT);
@@ -730,7 +730,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
 #endif
             /* draw new position */
 #ifdef HAVE_LCD_COLOR
-            rb->lcd_bitmap_transparent_part(bejeweled_jewels,
+            rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type), TILE_WIDTH,
                            (x+horzmod)*TILE_WIDTH-horzmod*
@@ -738,7 +738,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
                            (y+vertmod)*TILE_HEIGHT-vertmod*
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_transparent_part(bejeweled_jewels,
+            rb->lcd_bitmap_transparent_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
                            TILE_WIDTH, x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -746,7 +746,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
 #else
-            rb->lcd_bitmap_part(bejeweled_jewels,
+            rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard
                                [y+1+vertmod][x+horzmod].type), TILE_WIDTH,
                            (x+horzmod)*TILE_WIDTH-horzmod*
@@ -755,7 +755,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
                                ((((movelen<<10)*k)/8)>>10)+YOFS,
                            TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_set_drawmode(DRMODE_FG);
-            rb->lcd_bitmap_part(bejeweled_jewels,
+            rb->lcd_bitmap_part(jewels,
                            0, TILE_HEIGHT*(bj->playboard[y+1][x].type),
                            TILE_WIDTH, x*TILE_WIDTH+horzmod*
                                ((((movelen<<10)*k)/8)>>10),
@@ -766,7 +766,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
 #endif
 
             rb->lcd_update_rect(0, 0, TILE_WIDTH*8, LCD_HEIGHT);
-            bejeweled_setcolors();
+            jewels_setcolors();
 
             /* framerate limiting */
             currenttick = *rb->current_tick;
@@ -786,7 +786,7 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
 
         if(undo) break;
 
-        points = bejeweled_runboard(bj);
+        points = jewels_runboard(bj);
         if(points == 0) {
             undo = true;
         } else {
@@ -798,10 +798,10 @@ static unsigned int bejeweled_swapjewels(struct game_context* bj,
 }
 
 /*****************************************************************************
-* bejeweled_movesavail() uses pattern matching to see if there are any
+* jewels_movesavail() uses pattern matching to see if there are any
 *     available move left.
 ******************************************************************************/
-static bool bejeweled_movesavail(struct game_context* bj) {
+static bool jewels_movesavail(struct game_context* bj) {
     int i, j;
     bool moves = false;
     int mytype;
@@ -894,10 +894,10 @@ static bool bejeweled_movesavail(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_nextlevel() advances the game to the next level and returns
+* jewels_nextlevel() advances the game to the next level and returns
 *     points earned.
 ******************************************************************************/
-static unsigned int bejeweled_nextlevel(struct game_context* bj) {
+static unsigned int jewels_nextlevel(struct game_context* bj) {
     int i, x, y;
     unsigned int points = 0;
 
@@ -906,7 +906,7 @@ static unsigned int bejeweled_nextlevel(struct game_context* bj) {
         bj->score -= LEVEL_PTS;
         bj->level++;
         rb->splash(HZ*2, true, "Level %d", bj->level);
-        bejeweled_drawboard(bj);
+        jewels_drawboard(bj);
     }
 
     /* randomly clear some jewels */
@@ -919,11 +919,11 @@ static unsigned int bejeweled_nextlevel(struct game_context* bj) {
             bj->playboard[y][x].type = 0;
         }
     }
-    bejeweled_drawboard(bj);
+    jewels_drawboard(bj);
 
     /* run the play board */
-    bejeweled_putjewels(bj);
-    points += bejeweled_runboard(bj);
+    jewels_putjewels(bj);
+    points += jewels_runboard(bj);
     return points;
 }
 
@@ -931,7 +931,7 @@ static unsigned int bejeweled_nextlevel(struct game_context* bj) {
 * bejeweld_recordscore() inserts a high score into the high scores list and
 *     returns the high score position.
 ******************************************************************************/
-static int bejeweled_recordscore(struct game_context* bj) {
+static int jewels_recordscore(struct game_context* bj) {
     int i;
     int position = 0;
     unsigned short current, temp;
@@ -957,9 +957,9 @@ static int bejeweled_recordscore(struct game_context* bj) {
  }
 
 /*****************************************************************************
-* bejeweled_loadscores() loads the high scores saved file.
+* jewels_loadscores() loads the high scores saved file.
 ******************************************************************************/
-static void bejeweled_loadscores(struct game_context* bj) {
+static void jewels_loadscores(struct game_context* bj) {
     int fd;
 
     bj->dirty = false;
@@ -981,9 +981,9 @@ static void bejeweled_loadscores(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_savescores() saves the high scores saved file.
+* jewels_savescores() saves the high scores saved file.
 ******************************************************************************/
-static void bejeweled_savescores(struct game_context* bj) {
+static void jewels_savescores(struct game_context* bj) {
     int fd;
 
     /* write out the high scores to the save file */
@@ -994,9 +994,9 @@ static void bejeweled_savescores(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_loadgame() loads the saved game and returns load success.
+* jewels_loadgame() loads the saved game and returns load success.
 ******************************************************************************/
-static bool bejeweled_loadgame(struct game_context* bj) {
+static bool jewels_loadgame(struct game_context* bj) {
     int fd;
     bool loaded = false;
 
@@ -1022,9 +1022,9 @@ static bool bejeweled_loadgame(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_savegame() saves the current game state.
+* jewels_savegame() saves the current game state.
 ******************************************************************************/
-static void bejeweled_savegame(struct game_context* bj) {
+static void jewels_savegame(struct game_context* bj) {
     int fd;
 
     /* write out the game state to the save file */
@@ -1038,14 +1038,14 @@ static void bejeweled_savegame(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweled_callback() is the default event handler callback which is called
+* jewels_callback() is the default event handler callback which is called
 *     on usb connect and shutdown.
 ******************************************************************************/
-static void bejeweled_callback(void* param) {
+static void jewels_callback(void* param) {
     struct game_context* bj = (struct game_context*) param;
     if(bj->dirty) {
         rb->splash(HZ, true, "Saving high scores...");
-        bejeweled_savescores(bj);
+        jewels_savescores(bj);
     }
 }
 
@@ -1075,7 +1075,7 @@ static int bejeweled(struct game_context* bj) {
     rb->lcd_clear_display();
 
     while(!startgame) {
-        res = bejeweled_showmenu(&bjmenu[0], cmd);
+        res = jewels_showmenu(&bjmenu[0], cmd);
         cmd = MCMD_NONE;
 
         rb->snprintf(str, 18, "High Score: %d", bj->highscores[0]);
@@ -1089,7 +1089,7 @@ static int bejeweled(struct game_context* bj) {
                 continue;
 
             case MRES_RESUME:
-                if(!bejeweled_loadgame(bj)) {
+                if(!jewels_loadgame(bj)) {
                     rb->splash(HZ*2, true, "Nothing to resume");
                     rb->lcd_clear_display();
                 } else {
@@ -1170,34 +1170,34 @@ static int bejeweled(struct game_context* bj) {
         /* handle menu button presses */
         button = rb->button_get(true);
         switch(button){
-#ifdef BEJEWELED_SCROLLWHEEL
-            case BEJEWELED_PREV:
+#ifdef JEWELS_SCROLLWHEEL
+            case JEWELS_PREV:
 #endif
-            case BEJEWELED_UP:
-            case (BEJEWELED_UP|BUTTON_REPEAT):
+            case JEWELS_UP:
+            case (JEWELS_UP|BUTTON_REPEAT):
                 cmd = MCMD_PREV;
                 break;
 
-#ifdef BEJEWELED_SCROLLWHEEL
-            case BEJEWELED_NEXT:
+#ifdef JEWELS_SCROLLWHEEL
+            case JEWELS_NEXT:
 #endif
-            case BEJEWELED_DOWN:
-            case (BEJEWELED_DOWN|BUTTON_REPEAT):
+            case JEWELS_DOWN:
+            case (JEWELS_DOWN|BUTTON_REPEAT):
                 cmd = MCMD_NEXT;
                 break;
 
-            case BEJEWELED_SELECT:
-            case BEJEWELED_RIGHT:
+            case JEWELS_SELECT:
+            case JEWELS_RIGHT:
                 cmd = MCMD_SELECT;
                 break;
 
-#ifdef BEJEWELED_CANCEL
-            case BEJEWELED_CANCEL:
+#ifdef JEWELS_CANCEL
+            case JEWELS_CANCEL:
                 return BJ_QUIT;
 #endif
 
             default:
-                if(rb->default_event_handler_ex(button, bejeweled_callback,
+                if(rb->default_event_handler_ex(button, jewels_callback,
                    (void*) bj) == SYS_USB_CONNECTED)
                     return BJ_USB;
                 break;
@@ -1207,15 +1207,15 @@ static int bejeweled(struct game_context* bj) {
     /********************
     *       init        *
     ********************/
-    bejeweled_init(bj);
+    jewels_init(bj);
 
     /********************
     *  setup the board  *
     ********************/
-    bejeweled_drawboard(bj);
-    bejeweled_putjewels(bj);
-    bj->score += bejeweled_runboard(bj);
-    if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+    jewels_drawboard(bj);
+    jewels_putjewels(bj);
+    bj->score += jewels_runboard(bj);
+    if (!jewels_movesavail(bj)) return BJ_LOSE;
 
     /**********************
     *        play         *
@@ -1223,7 +1223,7 @@ static int bejeweled(struct game_context* bj) {
     while(true) {
         if(!inmenu) {
             /* refresh the board */
-            bejeweled_drawboard(bj);
+            jewels_drawboard(bj);
 
             /* display the cursor */
             if(selected) {
@@ -1238,7 +1238,7 @@ static int bejeweled(struct game_context* bj) {
             rb->lcd_update_rect(x*TILE_WIDTH, y*TILE_HEIGHT+YOFS,
                                 TILE_WIDTH, TILE_HEIGHT);
         } else {
-            res = bejeweled_showmenu(&bjmenu[1], cmd);
+            res = jewels_showmenu(&bjmenu[1], cmd);
             cmd = MCMD_NONE;
             switch(res) {
                 case MRES_RESUME:
@@ -1248,7 +1248,7 @@ static int bejeweled(struct game_context* bj) {
 
                 case MRES_SAVE:
                     rb->splash(HZ, true, "Saving game...");
-                    bejeweled_savegame(bj);
+                    jewels_savegame(bj);
                     return BJ_END;
 
                 case MRES_QUIT:
@@ -1262,24 +1262,24 @@ static int bejeweled(struct game_context* bj) {
         /* handle game button presses */
         button = rb->button_get(true);
         switch(button){
-            case BEJEWELED_LEFT:             /* move cursor left */
-            case (BEJEWELED_LEFT|BUTTON_REPEAT):
+            case JEWELS_LEFT:             /* move cursor left */
+            case (JEWELS_LEFT|BUTTON_REPEAT):
                 if(selected) {
-                    bj->score += bejeweled_swapjewels(bj, x, y, SWAP_LEFT);
+                    bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
                     selected = false;
-                    if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                    if (!jewels_movesavail(bj)) return BJ_LOSE;
                 } else {
                     x = (x+BJ_WIDTH-1)%BJ_WIDTH;
                 }
                 break;
 
-            case BEJEWELED_RIGHT:            /* move cursor right */
-            case (BEJEWELED_RIGHT|BUTTON_REPEAT):
+            case JEWELS_RIGHT:            /* move cursor right */
+            case (JEWELS_RIGHT|BUTTON_REPEAT):
                 if(!inmenu) {
                     if(selected) {
-                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_RIGHT);
+                        bj->score += jewels_swapjewels(bj, x, y, SWAP_RIGHT);
                         selected = false;
-                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) return BJ_LOSE;
                     } else {
                         x = (x+1)%BJ_WIDTH;
                     }
@@ -1288,13 +1288,13 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case BEJEWELED_DOWN:             /* move cursor down */
-            case (BEJEWELED_DOWN|BUTTON_REPEAT):
+            case JEWELS_DOWN:             /* move cursor down */
+            case (JEWELS_DOWN|BUTTON_REPEAT):
                 if(!inmenu) {
                     if(selected) {
-                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_DOWN);
+                        bj->score += jewels_swapjewels(bj, x, y, SWAP_DOWN);
                         selected = false;
-                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) return BJ_LOSE;
                     } else {
                         y = (y+1)%(BJ_HEIGHT-1);
                     }
@@ -1303,13 +1303,13 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case BEJEWELED_UP:               /* move cursor up */
-            case (BEJEWELED_UP|BUTTON_REPEAT):
+            case JEWELS_UP:               /* move cursor up */
+            case (JEWELS_UP|BUTTON_REPEAT):
                 if(!inmenu) {
                     if(selected) {
-                        bj->score += bejeweled_swapjewels(bj, x, y, SWAP_UP);
+                        bj->score += jewels_swapjewels(bj, x, y, SWAP_UP);
                         selected = false;
-                        if (!bejeweled_movesavail(bj)) return BJ_LOSE;
+                        if (!jewels_movesavail(bj)) return BJ_LOSE;
                     } else {
                         y = (y+(BJ_HEIGHT-1)-1)%(BJ_HEIGHT-1);
                     }
@@ -1318,9 +1318,9 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-#ifdef BEJEWELED_SCROLLWHEEL
-            case BEJEWELED_PREV:             /* scroll backwards */
-            case (BEJEWELED_PREV|BUTTON_REPEAT):
+#ifdef JEWELS_SCROLLWHEEL
+            case JEWELS_PREV:             /* scroll backwards */
+            case (JEWELS_PREV|BUTTON_REPEAT):
                 if(!inmenu) {
                     if(!selected) {
                         if(x == 0) {
@@ -1333,8 +1333,8 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case BEJEWELED_NEXT:             /* scroll forwards */
-            case (BEJEWELED_NEXT|BUTTON_REPEAT):
+            case JEWELS_NEXT:             /* scroll forwards */
+            case (JEWELS_NEXT|BUTTON_REPEAT):
                 if(!inmenu) {
                     if(!selected) {
                         if(x == BJ_WIDTH-1) {
@@ -1348,7 +1348,7 @@ static int bejeweled(struct game_context* bj) {
                 break;
 #endif
 
-            case BEJEWELED_SELECT:           /* toggle selected */
+            case JEWELS_SELECT:           /* toggle selected */
                 if(!inmenu) {
                     selected = !selected;
                 } else {
@@ -1356,25 +1356,25 @@ static int bejeweled(struct game_context* bj) {
                 }
                 break;
 
-            case (BEJEWELED_SELECT|BUTTON_REPEAT): /* show menu */
+            case (JEWELS_SELECT|BUTTON_REPEAT): /* show menu */
                 if(!inmenu) inmenu = true;
                 break;
 
-#ifdef BEJEWELED_CANCEL
-            case BEJEWELED_CANCEL:           /* toggle menu */
+#ifdef JEWELS_CANCEL
+            case JEWELS_CANCEL:           /* toggle menu */
                 inmenu = !inmenu;
                 selected = false;
                 break;
 #endif
 
             default:
-                if(rb->default_event_handler_ex(button, bejeweled_callback,
+                if(rb->default_event_handler_ex(button, jewels_callback,
                    (void*) bj) == SYS_USB_CONNECTED)
                     return BJ_USB;
                 break;
         }
 
-        if(bj->score >= LEVEL_PTS) bj->score = bejeweled_nextlevel(bj);
+        if(bj->score >= LEVEL_PTS) bj->score = jewels_nextlevel(bj);
     }
 }
 
@@ -1393,10 +1393,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     /* end of plugin init */
 
     /* load high scores */
-    bejeweled_loadscores(&bj);
+    jewels_loadscores(&bj);
 
     rb->lcd_setfont(FONT_SYSFIXED);
-    bejeweled_setcolors();
+    jewels_setcolors();
 
     while(!exit) {
         switch(bejeweled(&bj)){
@@ -1406,7 +1406,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
             case BJ_END:
                 if(!bj.resume) {
-                    if((position = bejeweled_recordscore(&bj))) {
+                    if((position = jewels_recordscore(&bj))) {
                         rb->snprintf(str, 19, "New high score #%d!", position);
                         rb->splash(HZ*2, true, str);
                     }
@@ -1420,7 +1420,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             case BJ_QUIT:
                 if(bj.dirty) {
                     rb->splash(HZ, true, "Saving high scores...");
-                    bejeweled_savescores(&bj);
+                    jewels_savescores(&bj);
                 }
                 exit = true;
                 break;

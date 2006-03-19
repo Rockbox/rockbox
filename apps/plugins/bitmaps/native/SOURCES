@@ -2,23 +2,23 @@
 
 /* Bejeweled */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-bejeweled_jewels.112x64x1.bmp
+jewels.112x64x1.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
-bejeweled_jewels.112x64x1.bmp
+jewels.112x64x1.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
-bejeweled_jewels.138x110x1.bmp
+jewels.138x110x1.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
-bejeweled_jewels.160x128x1.bmp
+jewels.160x128x1.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && defined(HAVE_LCD_COLOR)
-bejeweled_jewels.160x128x16.bmp
+jewels.160x128x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
-bejeweled_jewels.160x128x16.bmp
+jewels.160x128x16.bmp
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
-bejeweled_jewels.220x176x16.bmp
+jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
-bejeweled_jewels.220x176x16.bmp
+jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
-bejeweled_jewels.320x240x16.bmp
+jewels.320x240x16.bmp
 #endif
 
 /* ChessBox */
