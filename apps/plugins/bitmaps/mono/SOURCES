@@ -19,4 +19,9 @@ brickmania_start.112x64x1.bmp
 
 #endif
 
+/* Tetrox */
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+tetrox_background.112x64x1.bmp
+#endif
+
 #endif /* HAVE_LCD_BITMAP */

@@ -116,4 +116,18 @@ brickmania_break.176x132x16.bmp
 
 #endif
 
+/* Tetrox */
+#if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
+tetrox_background.320x240x16.bmp
+#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+tetrox_background.220x176x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
+tetrox_background.176x132x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
+tetrox_background.160x128x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+tetrox_background.160x128x2.bmp
+#endif
+
+
 #endif /* HAVE_LCD_BITMAP */
