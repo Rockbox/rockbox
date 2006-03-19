@@ -409,7 +409,11 @@ static void backlight_tick(void)
 {
 #ifdef HAVE_CHARGING
     static bool charger_was_inserted = false;
-    bool charger_is_inserted = charger_inserted();
+    bool charger_is_inserted = charger_inserted()
+#ifdef HAVE_USB_POWER
+        || usb_powered()
+#endif
+        ;
 
     if( charger_was_inserted != charger_is_inserted )
     {
@@ -483,7 +487,14 @@ void backlight_off(void)
 int backlight_get_current_timeout(void)
 {
 #ifdef HAVE_CHARGING
-    return charger_inserted() ? backlight_timeout_plugged : backlight_timeout;
+    if (charger_inserted()
+#ifdef HAVE_USB_POWER
+            || usb_powered()
+#endif
+        )
+        return backlight_timeout_plugged;
+    else
+        return backlight_timeout;
 #else
     return backlight_timeout;
 #endif

@@ -31,6 +31,7 @@
 #include "adc.h"
 #include "mas.h"
 #include "power.h"
+#include "usb.h"
 #include "rtc.h"
 #include "debug.h"
 #include "thread.h"
@@ -1470,7 +1471,11 @@ static bool view_runtime(void)
 
         if (state & 1) {
 #ifdef HAVE_CHARGING
-            if (charger_inserted())
+            if (charger_inserted()
+#ifdef HAVE_USB_POWER
+                    || usb_powered()
+#endif
+                    )
             {
                 global_settings.runtime = 0;
             }
