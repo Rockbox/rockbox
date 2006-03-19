@@ -354,7 +354,7 @@ int ft_enter(struct tree_context* c)
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
-                if (global_settings.warnon_erase_dynplaylist && 
+                if (global_settings.warnon_erase_dynplaylist &&
                     playlist_modified(NULL))
                 {
                     char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
@@ -381,6 +381,7 @@ int ft_enter(struct tree_context* c)
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
                 if (global_settings.warnon_erase_dynplaylist && 
+                    !global_settings.party_mode && 
                     playlist_modified(NULL))
                 {
                     char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
@@ -393,7 +394,7 @@ int ft_enter(struct tree_context* c)
                 if (global_settings.party_mode) {
                     playlist_insert_track(NULL, buf,
                                           PLAYLIST_INSERT_LAST, true);
-                    gui_syncsplash(HZ, true, str(LANG_INSERT_LAST));
+                    gui_syncsplash(HZ, true, str(LANG_QUEUE_LAST));
                 }
                 else if (playlist_create(c->currdir, NULL) != -1)
                 {
