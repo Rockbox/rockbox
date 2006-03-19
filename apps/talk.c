@@ -130,20 +130,6 @@ int talk_get_bufsize(void)
     return voicefile_size;
 }
 
-#ifdef SIMULATOR
-static unsigned short BSWAP16(unsigned short value)
-{
-    return (value >> 8) | (value << 8);
-}
-
-static unsigned long BSWAP32(unsigned long value)
-{
-    unsigned long hi = BSWAP16(value >> 16);
-    unsigned long lo = BSWAP16(value & 0xffff);
-    return (lo << 16) | hi;
-}
-#endif
-
 /* load the voice file into the mp3 buffer */
 static void load_voicefile(void)
 {
@@ -173,13 +159,13 @@ static void load_voicefile(void)
     if (got_size != load_size /* failure */)
         goto load_err;
             
-#ifdef SIMULATOR
+#ifdef ROCKBOX_LITTLE_ENDIAN
     logf("Byte swapping voice file");
     p_voicefile = (struct voicefile*)audiobuf;
-    p_voicefile->version = BSWAP32(p_voicefile->version);
-    p_voicefile->table = BSWAP32(p_voicefile->table);
-    p_voicefile->id1_max = BSWAP32(p_voicefile->id1_max);
-    p_voicefile->id2_max = BSWAP32(p_voicefile->id2_max);
+    p_voicefile->version = swap32(p_voicefile->version);
+    p_voicefile->table = swap32(p_voicefile->table);
+    p_voicefile->id1_max = swap32(p_voicefile->id1_max);
+    p_voicefile->id2_max = swap32(p_voicefile->id2_max);
     p_voicefile = NULL;
 #endif
 
@@ -196,13 +182,13 @@ static void load_voicefile(void)
     else
        goto load_err;
 
-#ifdef SIMULATOR
+#ifdef ROCKBOX_LITTLE_ENDIAN
     for (i = 0; i < p_voicefile->id1_max + p_voicefile->id2_max; i++)
     {
         struct clip_entry *ce;
         ce = &p_voicefile->index[i];
-        ce->offset = BSWAP32(ce->offset);
-        ce->size = BSWAP32(ce->size);
+        ce->offset = swap32(ce->offset);
+        ce->size = swap32(ce->size);
     }
 #endif
 
@@ -691,8 +677,6 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_KHZ, 
         VOICE_DB, 
         VOICE_PERCENT, 
-        VOICE_MEGABYTE, 
-        VOICE_GIGABYTE,
         VOICE_MILLIAMPHOURS,
         VOICE_PIXEL,
         VOICE_PER_SEC,
