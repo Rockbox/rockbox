@@ -291,8 +291,10 @@ boot_table:
     ldr    r12, =0x70002800 /* IISCONFIG */
     ldr    r11, =p
 #endif
-    /* Let abort mode use IRQ stack */
+    /* Let abort and undefined modes use IRQ stack */
     msr    cpsr_c, #0xd7
+    ldr    sp, =irq_stack
+    msr    cpsr_c, #0xdb
     ldr    sp, =irq_stack
     /* Switch to supervisor mode */
     msr    cpsr_c, #0xd3
