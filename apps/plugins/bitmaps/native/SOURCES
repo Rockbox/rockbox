@@ -61,7 +61,11 @@ jewels.320x240x16.bmp
 
 /* Solitaire */
 #ifdef HAVE_LCD_COLOR
+#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
 solitaire_cardback.220x176x16.bmp
+#else
+solitaire_cardback.176x132x16.bmp
+#endif
 #endif
 
 /* Sudoku */

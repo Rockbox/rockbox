@@ -221,8 +221,13 @@ static const unsigned colors[4] = {
 #define BMPWIDTH_c 8
 
 #ifdef HAVE_LCD_COLOR
+#if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
 #define BMPHEIGHT_CARDBACK 33
 #define BMPWIDTH_CARDBACK 26
+#else
+#define BMPHEIGHT_CARDBACK 24
+#define BMPWIDTH_CARDBACK 18
+#endif
 
 extern const fb_data solitaire_cardback[];
 #endif
