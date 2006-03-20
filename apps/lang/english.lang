@@ -3802,3 +3802,28 @@ desc: party mode
 eng: "Party Mode"
 voice: "Party Mode"
 new:
+
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Cut"
+new:
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Copy"
+new:
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Paste"
+new:
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice: "File or directory exists. Overwrite?"
+new:
+

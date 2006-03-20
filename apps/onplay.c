@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -67,6 +68,9 @@ static int context;
 static char* selected_file = NULL;
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+static char clipboard_selection[MAX_PATH];
+static int clipboard_selection_attr = 0;
+static bool clipboard_is_copy = false;
 
 /* For playlist options */
 struct playlist_args {
@@ -516,6 +520,262 @@ bool create_dir(void)
     return true;
 }
 
+/* Store the current selection in the clipboard */
+static bool clipboard_clip(bool copy)
+{
+    clipboard_selection[0] = 0;
+    strncpy(clipboard_selection, selected_file, MAX_PATH);
+    clipboard_selection_attr = selected_file_attr;
+    clipboard_is_copy = copy;
+
+    return true;    
+}
+
+static bool clipboard_cut(void)
+{
+    return clipboard_clip(false);
+}
+
+static bool clipboard_copy(void)
+{
+    return clipboard_clip(true);
+}
+
+/* Paste a file to a new directory. Will overwrite always. */
+static bool clipboard_pastefile(const char *src, const char *target, bool copy)
+{
+    int src_fd, target_fd, buffersize, size, bytesread, byteswritten;
+    char *buffer;
+    bool result = false;
+
+    if (copy) {
+        /* See if we can get the plugin buffer for the file copy buffer */
+        buffer = (char *) plugin_get_buffer(&buffersize);
+        if (buffer == NULL || buffersize < 512) {
+            /* Not large enough, try for a disk sector worth of stack instead */
+            buffersize = 512;
+            buffer = (char *) __builtin_alloca(buffersize);
+        }
+
+        if (buffer == NULL) {
+            return false;
+        }
+
+        buffersize &= ~0x1ff;  /* Round buffer size to multiple of sector size */
+
+        src_fd = open(src, O_RDONLY);
+
+        if (src_fd >= 0) {    
+            target_fd = creat(target, O_WRONLY);
+
+            if (target_fd >= 0) {
+                result = true;
+
+                size = filesize(src_fd);
+
+                if (size == -1) {
+                    result = false;
+                }
+
+                while(size > 0) {
+                    bytesread = read(src_fd, buffer, buffersize);
+
+                    if (bytesread == -1) {
+                        result = false;
+                        break;
+                    }
+
+                    size -= bytesread;
+
+                    while(bytesread > 0) {
+                        byteswritten = write(target_fd, buffer, bytesread);
+
+                        if (byteswritten == -1) {
+                            result = false;
+                            size = 0;
+                            break;
+                        }
+
+                        bytesread -= byteswritten;
+                    }
+                }
+
+                close(target_fd);
+
+                /* Copy failed. Cleanup. */
+                if (!result) {
+                    remove(target);
+                }
+            }
+
+            close(src_fd);
+        }
+    } else {
+        result = rename(src, target) == 0;
+#ifdef HAVE_MULTIVOLUME
+        if (!result) {
+            if (errno == EXDEV) {
+                /* Failed because cross volume rename doesn't work. Copy instead */
+                result = clipboard_pastefile(src, target, true);
+
+                if (result) {
+                    result = remove(src);
+                }
+            }
+        }
+#endif
+    }
+
+    return result;
+}
+
+/* Paste a directory to a new location. Designed to be called by clipboard_paste */
+static bool clipboard_pastedirectory(char *src, int srclen, char *target, int targetlen, bool copy)
+{
+    DIR *srcdir;
+    int srcdirlen = strlen(src);
+    int targetdirlen = strlen(target);
+    int fd;
+    bool result = true;
+
+    /* Check if the target exists */
+    fd = open(target, O_RDONLY);
+    close(fd);
+    
+    if (fd < 0) {
+        if (!copy) {
+            /* Just move the directory */
+            result = rename(src, target) == 0;
+
+#ifdef HAVE_MULTIVOLUME
+            if (!result && errno == EXDEV) {
+                /* Try a copy as we're going across devices */
+                result = clipboard_pastedirectory(src, srclen, target, targetlen, true);
+
+                /* If it worked, remove the source directory */
+                if (result) {
+                    remove_dir(src, srclen);
+                }
+            }
+#endif
+            return result;
+        } else {
+            /* Make a directory to copy things to */
+            result = mkdir(target, 0) == 0;
+        }
+    }
+
+    /* Check if something went wrong already */
+    if (!result) {
+        return result;
+    }
+
+    srcdir = opendir(src);
+    if (!srcdir) {
+        return false;
+    }
+
+    /* This loop will exit as soon as there's a problem */
+    while(result)
+    {
+        struct dirent* entry;
+        /* walk through the directory content */
+        entry = readdir(srcdir);
+        if (!entry)
+            break;
+
+        /* append name to current directory */
+        snprintf(src+srcdirlen, srclen-srcdirlen, "/%s", entry->d_name);
+        snprintf(target+targetdirlen, targetlen-targetdirlen, "/%s", entry->d_name);
+
+        DEBUGF("Copy %s to %s\n", src, target);
+
+        if (entry->attribute & ATTR_DIRECTORY) 
+        {   /* copy/move a subdirectory */
+            if (!strcmp((char *)entry->d_name, ".") ||
+                !strcmp((char *)entry->d_name, ".."))
+                continue; /* skip these */
+
+            result = clipboard_pastedirectory(src, srclen, target, targetlen, copy); /* recursion */
+        }
+        else 
+        {   /* copy/move a file */
+            result = clipboard_pastefile(src, target, copy);
+        }
+    }
+
+    closedir(srcdir);
+
+    if (result) {
+        src[srcdirlen] = '\0'; /* terminate to original length */
+        target[targetdirlen] = '\0'; /* terminate to original length */
+    }
+
+    return result;
+}
+
+/* Paste the clipboard to the current directory */
+static bool clipboard_paste(void)
+{
+    char target[MAX_PATH];
+    char *cwd, *nameptr;
+    bool success;
+    int target_fd;
+
+    unsigned char *lines[]={str(LANG_REALLY_OVERWRITE)};
+    struct text_message message={(char **)lines, 1};
+
+    /* Get the name of the current directory */
+    cwd = getcwd(NULL, 0);
+    snprintf(target, sizeof target, "%s", cwd[1] ? cwd : "");
+
+    /* Figure out the name of the selection */
+    nameptr = strrchr(clipboard_selection, '/');
+
+    /* Paste the name on to the current directory to give us our final target */
+    strcat(target, nameptr);
+
+    /* Check if we're going to overwrite */
+    target_fd = open(target, O_RDONLY);
+    close(target_fd);
+
+    /* If the target existed but they choose not to overwite, exit */
+    if (target_fd >= 0 &&
+        (gui_syncyesno_run(&message, NULL, NULL) == YESNO_NO)) {
+        return false;
+    }
+
+    /* Now figure out what we're doing */
+    if (clipboard_selection_attr & ATTR_DIRECTORY) {
+        /* Recursion. Set up external stack */
+        char srcpath[MAX_PATH];
+        char targetpath[MAX_PATH];
+
+        strncpy(srcpath, clipboard_selection, sizeof srcpath);
+        strncpy(targetpath, target, sizeof targetpath);
+
+        success = clipboard_pastedirectory(srcpath, sizeof(srcpath), target, sizeof(targetpath), clipboard_is_copy);
+    } else {
+        success = clipboard_pastefile(clipboard_selection, target, clipboard_is_copy);
+    }
+
+    /* Did it work? */
+    if (success) {
+        /* Reset everything */
+        clipboard_selection[0] = 0;
+        clipboard_selection_attr = 0;
+        clipboard_is_copy = false;
+
+        /* Force reload of the current directory */
+        onplay_result = ONPLAY_RELOAD_DIR;
+    } else {
+        gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
+               str(LANG_PASTE), str(LANG_FAILED));        
+    }
+
+    return true;
+}
+
 static bool exit_to_main;
 
 /* catch MENU_EXIT_MENU within context menu to call the main menu afterwards */
@@ -536,9 +796,9 @@ static int onplay_callback(int key, int menu)
 int onplay(char* file, int attr, int from)
 {
 #if CONFIG_CODEC == SWCODEC
-    struct menu_item items[10]; /* increase this if you add entries! */
+    struct menu_item items[13]; /* increase this if you add entries! */
 #else
-    struct menu_item items[8];
+    struct menu_item items[11];
 #endif
     int m, i=0, result;
 #ifdef HAVE_LCD_COLOR
@@ -557,7 +817,7 @@ int onplay(char* file, int attr, int from)
         items[i].function = sound_menu;
         i++;
     }
-        
+
     if (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
         ((context == CONTEXT_ID3DB) &&
@@ -582,7 +842,8 @@ int onplay(char* file, int attr, int from)
             items[i].desc = ID2P(LANG_MENU_SHOW_ID3_INFO);
             items[i].function = browse_id3;
             i++;
-            if(rundb_initialized) {
+            if(rundb_initialized)
+            {
                 items[i].desc = ID2P(LANG_MENU_SET_RATING);
                 items[i].function = set_rating;
                 i++;
@@ -598,6 +859,21 @@ int onplay(char* file, int attr, int from)
                 items[i].desc = ID2P(LANG_RENAME);
                 items[i].function = rename_file;
                 i++;
+
+                items[i].desc = ID2P(LANG_CUT);
+                items[i].function = clipboard_cut;
+                i++;
+
+                items[i].desc = ID2P(LANG_COPY);
+                items[i].function = clipboard_copy;
+                i++;
+
+                if (clipboard_selection[0] != 0) /* Something in the clipboard? */
+                {
+                    items[i].desc = ID2P(LANG_PASTE);
+                    items[i].function = clipboard_paste;
+                    i++;
+                }
             }
 
             if (!(attr & ATTR_DIRECTORY) && context == CONTEXT_TREE)
@@ -608,8 +884,10 @@ int onplay(char* file, int attr, int from)
 
 #ifdef HAVE_LCD_COLOR
                 suffix = strrchr(file, '.');
-                if (suffix) {
-                    if (strcasecmp(suffix, ".bmp") == 0) {
+                if (suffix)
+                {
+                    if (strcasecmp(suffix, ".bmp") == 0)
+                    {
                         items[i].desc = ID2P(LANG_SET_AS_BACKDROP);
                         items[i].function = set_backdrop;
                         i++;
@@ -632,6 +910,15 @@ int onplay(char* file, int attr, int from)
         {
             items[i].desc = ID2P(LANG_ONPLAY_OPEN_WITH);
             items[i].function = list_viewers;
+            i++;
+        }
+    }
+    else
+    {
+        if (strlen(clipboard_selection) != 0)
+        {
+            items[i].desc = ID2P(LANG_PASTE);
+            items[i].function = clipboard_paste;
             i++;
         }
     }
