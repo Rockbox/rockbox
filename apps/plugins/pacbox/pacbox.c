@@ -40,8 +40,6 @@ extern char iend[];
 
 struct plugin_api* rb;
 
-static unsigned long frame_counter = 0;
-
 struct pacman_settings {
     int difficulty;
     int numlives;
@@ -272,92 +270,101 @@ static int gameProc( void )
     char str[80];
     int status;
     long end_time;
+    int frame_counter = 0;
+    int yield_counter = 0;
 
-    /* Run the machine for one frame (1/60th second) */
-    run();
+    while (1)
+    {
+        /* Run the machine for one frame (1/60th second) */
+        run();
 
-    frame_counter++;
+        frame_counter++;
 
-    rb->yield();
+        /* Check the button status */
+        status = rb->button_status();
 
-    /* Check the button status */
-    status = rb->button_status();
-
-    if ((status & PACMAN_MENU) == PACMAN_MENU
+        if ((status & PACMAN_MENU) == PACMAN_MENU
 #ifdef PACMAN_RC_MENU
-        || status == PACMAN_RC_MENU
+            || status == PACMAN_RC_MENU
 #endif
-    ) {
-        end_time = *rb->current_tick;
-        x = pacbox_menu();
-        rb->lcd_clear_display();
+        ) {
+            end_time = *rb->current_tick;
+            x = pacbox_menu();
+            rb->lcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
-        rb->lcd_remote_clear_display();
-        rb->lcd_remote_update();
+            rb->lcd_remote_clear_display();
+            rb->lcd_remote_update();
 #endif
-        if (x == 1) { return 1; }
-        start_time += *rb->current_tick-end_time;
-    }
+            if (x == 1) { return 1; }
+            start_time += *rb->current_tick-end_time;
+        }
 
 #ifdef PACMAN_HAS_REMOTE
-    setDeviceMode( Joy1_Left, (status & PACMAN_LEFT || status == PACMAN_RC_LEFT) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT || status == PACMAN_RC_RIGHT) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Up, (status & PACMAN_UP || status == PACMAN_RC_UP) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Down, (status & PACMAN_DOWN || status == PACMAN_RC_DOWN) ? DeviceOn : DeviceOff);
-    setDeviceMode( CoinSlot_1, (status & PACMAN_COIN || status == PACMAN_RC_COIN) ? DeviceOn : DeviceOff);
-    setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP || status == PACMAN_RC_1UP) ? DeviceOn : DeviceOff);
-    setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP || status == PACMAN_RC_2UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Left, (status & PACMAN_LEFT || status == PACMAN_RC_LEFT) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT || status == PACMAN_RC_RIGHT) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Up, (status & PACMAN_UP || status == PACMAN_RC_UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Down, (status & PACMAN_DOWN || status == PACMAN_RC_DOWN) ? DeviceOn : DeviceOff);
+        setDeviceMode( CoinSlot_1, (status & PACMAN_COIN || status == PACMAN_RC_COIN) ? DeviceOn : DeviceOff);
+        setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP || status == PACMAN_RC_1UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP || status == PACMAN_RC_2UP) ? DeviceOn : DeviceOff);
 #else
-    setDeviceMode( Joy1_Left, (status & PACMAN_LEFT) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Up, (status & PACMAN_UP) ? DeviceOn : DeviceOff);
-    setDeviceMode( Joy1_Down, (status & PACMAN_DOWN) ? DeviceOn : DeviceOff);
-    setDeviceMode( CoinSlot_1, (status & PACMAN_COIN) ? DeviceOn : DeviceOff);
-    setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Left, (status & PACMAN_LEFT) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Right, (status & PACMAN_RIGHT) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Up, (status & PACMAN_UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Joy1_Down, (status & PACMAN_DOWN) ? DeviceOn : DeviceOff);
+        setDeviceMode( CoinSlot_1, (status & PACMAN_COIN) ? DeviceOn : DeviceOff);
+        setDeviceMode( Key_OnePlayer, (status & PACMAN_1UP) ? DeviceOn : DeviceOff);
 #ifdef PACMAN_2UP
-    setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP) ? DeviceOn : DeviceOff);
+        setDeviceMode( Key_TwoPlayers, (status & PACMAN_2UP) ? DeviceOn : DeviceOff);
 #endif
 #endif
 
-    /* We only update the screen every third frame - Pacman's native 
-       framerate is 60fps, so we are attempting to display 20fps */
-    if( (frame_counter % (60/FPS)) == 0) {
+        /* We only update the screen every third frame - Pacman's native 
+           framerate is 60fps, so we are attempting to display 20fps */
+        if (frame_counter == 60 / FPS) {
 
-        video_frames++;
+            frame_counter = 0;
+            video_frames++;
 
-        /* The following functions render the Pacman screen from the contents
-           of the video and color ram.  We first update the background, and
-           then draw the Sprites on top. 
-        */
+            yield_counter ++;
 
-        renderBackground( video_buffer );
-        renderSprites( video_buffer );
+            if (yield_counter == FPS) {
+                yield_counter = 0;
+                rb->yield ();
+            }
+ 
+            /* The following functions render the Pacman screen from the 
+               contents of the video and color ram.  We first update the 
+               background, and then draw the Sprites on top. 
+            */
 
-        blit_display(rb->lcd_framebuffer,video_buffer);
+            renderBackground( video_buffer );
+            renderSprites( video_buffer );
 
-        if (settings.showfps) {
-            fps = (video_frames*HZ*100) / (*rb->current_tick-start_time);
-            rb->snprintf(str,sizeof(str),"%d.%02d / %d fps  ",fps/100,fps%100,
-                                         FPS);
-            rb->lcd_putsxy(0,0,str);
-        }
+            blit_display(rb->lcd_framebuffer,video_buffer);
 
-        rb->lcd_update();
+            if (settings.showfps) {
+                fps = (video_frames*HZ*100) / (*rb->current_tick-start_time);
+                rb->snprintf(str,sizeof(str),"%d.%02d / %d fps  ",
+                                             fps/100,fps%100,FPS);
+                rb->lcd_putsxy(0,0,str);
+            }
 
-        /* Keep the framerate at Pacman's 60fps */
-        end_time = start_time + (video_frames*HZ)/FPS;
-        while (TIME_BEFORE(*rb->current_tick,end_time)) {
-             rb->sleep(1);
+            rb->lcd_update();
+
+           /* Keep the framerate at Pacman's 60fps */
+            end_time = start_time + (video_frames*HZ)/FPS;
+            while (TIME_BEFORE(*rb->current_tick,end_time)) {
+                 rb->sleep(1);
+            }
         }
     }
-
     return 0;
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
-    int status;
 #ifdef USE_IRAM
     void* audiobuf;
     int audiosize;
@@ -414,9 +421,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Load the romset */
     if (loadROMS()) {
         start_time = *rb->current_tick-1;
-        do {
-            status = gameProc();
-        } while (!status);
+
+        gameProc();
 
         /* Save the user settings if they have changed */
         if (rb->memcmp(&settings,&old_settings,sizeof(settings))!=0) {
