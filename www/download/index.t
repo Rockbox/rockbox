@@ -2,9 +2,11 @@
 #define DOWNLOAD_PAGE
 #include "head.t"
 
-<h2>Latest version is 2.4 (2004-12-23)</h2>
+<h2>Latest version is 2.5 (2005-09-22)</h2>
 
-<p>Please read the <a href="rockbox-2.4-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
+<p>Please read the <a href="rockbox-2.5-notes.txt">release notes</a>. (<a href="old.html">Older releases</a>)
+
+<p>Note: Version 2.5 was only released for Archos devices. For other devices, download the daily build.
 
 <p>Make sure you download the correct file for your device:
 <table class=rockbox><tr>
@@ -15,21 +17,21 @@
 </tr><tr valign=top>
 
 <td><a href=/docs/newplayer.jpg><img border=0 src=/docs/newplayer_t.jpg></a><br clear=all>Archos Jukebox 5000, 6000 and Studio models
-<p><a href="rockbox-2.4-player.zip">rockbox-2.4-player.zip</a>
-<br>(383 KB)</td>
+<p><a href="rockbox-2.5-player.zip">rockbox-2.5-player.zip</a>
+<br>(452 KB)</td>
 
 <td>
 <a href=/docs/recorder.jpg><img border=0 src=/docs/recorder_t.jpg></a><br clear=all>Archos Jukebox Recorder 6, 10, 15 and 20
-<p><a href="rockbox-2.4-recorder.zip">rockbox-2.4-recorder.zip</a>
-<br>(597 KB)</td>
+<p><a href="rockbox-2.5-recorder.zip">rockbox-2.5-recorder.zip</a>
+<br>(736 KB)</td>
 
 <td><a href=/docs/fmrecorder.jpg><img border=0 src=/docs/fmrecorder_t.jpg></a><br clear=all>Archos Jukebox Recorder V2
-<p><a href="rockbox-2.4-recorderv2.zip">rockbox-2.4-recorderv2.zip</a>
-<br>(605 KB)</td>
+<p><a href="rockbox-2.5-recorderv2.zip">rockbox-2.5-recorderv2.zip</a>
+<br>(744 KB)</td>
 
 <td><a href=/docs/fmrecorder.jpg><img border=0 src=/docs/fmrecorder_t.jpg></a><br clear=all>Archos Jukebox FM Recorder
-<p><a href="rockbox-2.4-fmrecorder.zip">rockbox-2.4-fmrecorder.zip</a>
-<br>(495 KB)</td>
+<p><a href="rockbox-2.5-fmrecorder.zip">rockbox-2.5-fmrecorder.zip</a>
+<br>(744 KB)</td>
 
 </tr><tr>
 <th>ondio fm</th>
@@ -38,16 +40,16 @@
 </tr><tr>
 
 <td><a href=/docs/ondiofm.jpg><img border=0 src=/docs/ondiofm_t.jpg></a><br clear=all>Archos Ondio 128 & 128 FM
-<p><a href="rockbox-2.4-ondiofm.zip">rockbox-2.4-ondiofm.zip</a>
+<p><a href="rockbox-2.5-ondiofm.zip">rockbox-2.5-ondiofm.zip</a>
 <br clear=all>(462 KB)</td>
 
 <td><a href=/docs/ondiosp.jpg><img border=0 src=/docs/ondiosp_t.jpg></a><br clear=all>Archos Ondio 128 SP
-<p><a href="rockbox-2.4-ondiosp.zip">rockbox-2.4-ondiosp.zip</a>
-<br>(536 KB)</td>
+<p><a href="rockbox-2.5-ondiosp.zip">rockbox-2.5-ondiosp.zip</a>
+<br>(620 KB)</td>
 
 <td><img border=0 src=/docs/install.png></a><br clear=all>Windows installer
-<p><a href="rockbox-2.4-install.exe">rockbox-2.4-install.exe</a>
-<br>(1.3 MB)</td>
+<p><a href="rockbox-2.5-install.exe">rockbox-2.5-install.exe</a>
+<br>(1.4 MB)</td>
 
 </tr></table>
 
@@ -67,14 +69,18 @@
 <p>If you ever want to remove the Rockbox firmware, simply delete archos.mod (player) or ajbrec.ajz (recorder) and the .rockbox directory from the root of your Archos disk.
 
 <h2>Source code</h2>
-<p><a href="rockbox-2.4.tar.gz">rockbox-2.4.tar.gz</a>
+<p><a href="rockbox-2.5.tar.gz">rockbox-2.5.tar.gz</a>
 <p>
-... or get the source directly off the <a href="/cvs.html">CVS server</a>.
+... or get the source directly off the <a href="/twiki/bin/view/Main/UsingCVS">CVS server</a>.
 
 <h2>Manual</h2>
 
-<p>We have a very nice <a href="/twiki/bin/view/Main/RockboxManual">manual</a> written by Christi Scarborough. Please read it. Check out the <a href="/docs/">documentation</a> page for further info.
-
+<p>We have a very nice <a href="/twiki/bin/view/Main/RockboxManual">manual</a>
+written by Christi Scarborough. Please read it. Check out the <a
+href="/twiki/bin/view/Main/DocsIndex">documentation</a> page for further info.
+ 
+<h2>Daily Builds</h2>
+<!--#exec cmd="./dailymod.pl" -->
 <h2>Bug reports</h2>
 
 <p>Please use our <a href="/bugs.shtml">bug page</a>
