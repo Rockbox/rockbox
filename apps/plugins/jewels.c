@@ -81,10 +81,8 @@ PLUGIN_HEADER
 #define JEWELS_DOWN       BUTTON_DOWN
 #define JEWELS_LEFT       BUTTON_LEFT
 #define JEWELS_RIGHT      BUTTON_RIGHT
-#define JEWELS_QUIT       BUTTON_A
-#define JEWELS_START      BUTTON_POWER
 #define JEWELS_SELECT     BUTTON_SELECT
-#define JEWELS_RESUME     BUTTON_MENU
+#define JEWELS_CANCEL     BUTTON_A
 
 #else
     #error JEWELS: Unsupported keypad
@@ -254,7 +252,7 @@ struct game_context {
     unsigned int score;
     unsigned int segments;
     unsigned int level;
-    unsigned short highscores[NUM_SCORES];
+    unsigned int highscores[NUM_SCORES];
     bool resume;
     bool dirty;
     struct tile playboard[BJ_HEIGHT][BJ_WIDTH];
@@ -934,7 +932,7 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
 static int jewels_recordscore(struct game_context* bj) {
     int i;
     int position = 0;
-    unsigned short current, temp;
+    unsigned int current, temp;
 
     /* calculate total score */
     current = (bj->level-1)*LEVEL_PTS+bj->score;
@@ -1129,12 +1127,25 @@ static int bejeweled(struct game_context* bj) {
                 rb->snprintf(str, 5, "%s", "Help");
                 rb->lcd_getstringsize(str, &w, &h);
                 rb->lcd_putsxy((LCD_WIDTH-w)/2, 0, str);
-#if (LCD_HEIGHT <= 64)
+#if CONFIG_KEYPAD == RECORDER_PAD
+                rb->lcd_puts(0, 2, "Controls:");
+                rb->lcd_puts(0, 3, "Directions = move");
+                rb->lcd_puts(0, 4, "PLAY = select");
+                rb->lcd_puts(0, 5, "Long PLAY = menu");
+                rb->lcd_puts(0, 6, "OFF = cancel");
+#elif CONFIG_KEYPAD == ONDIO_PAD
+                rb->lcd_puts(0, 2, "Controls:");
+                rb->lcd_puts(0, 3, "Directions = move");
+                rb->lcd_puts(0, 4, "MENU = select");
+                rb->lcd_puts(0, 5, "Long MENU = menu");
+                rb->lcd_puts(0, 6, "OFF = cancel");
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
                 rb->lcd_puts(0, 2, "Controls:");
                 rb->lcd_puts(0, 3, "Directions = move");
                 rb->lcd_puts(0, 4, "SELECT = select");
                 rb->lcd_puts(0, 5, "Long SELECT = menu");
-#elif (LCD_HEIGHT <= 132)
+                rb->lcd_puts(0, 6, "PLAY = cancel");
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                 rb->lcd_puts(0, 2, "Swap pairs of jewels to");
                 rb->lcd_puts(0, 3, "form connected segments");
                 rb->lcd_puts(0, 4, "of three or more of the");
@@ -1143,14 +1154,36 @@ static int bejeweled(struct game_context* bj) {
                 rb->lcd_puts(0, 8, "Directions to move");
                 rb->lcd_puts(0, 9, "SELECT to select");
                 rb->lcd_puts(0, 10, "Long SELECT to show menu");
-#else
-                rb->lcd_puts(0, 2, "Swap pairs of jewels to form");
-                rb->lcd_puts(0, 3, "connected segments of three");
-                rb->lcd_puts(0, 4, "or more of the same type.");
-                rb->lcd_puts(0, 6, "Controls:");
-                rb->lcd_puts(0, 7, "Directions to move cursor");
-                rb->lcd_puts(0, 8, "SELECT to select");
-                rb->lcd_puts(0, 9, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "OFF to cancel");
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions or scroll to move");
+                rb->lcd_puts(0, 9, "SELECT to select");
+                rb->lcd_puts(0, 10, "Long SELECT to show menu");
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "SELECT to select");
+                rb->lcd_puts(0, 10, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "PLAY to cancel");
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+                rb->lcd_puts(0, 2, "Swap pairs of jewels to");
+                rb->lcd_puts(0, 3, "form connected segments");
+                rb->lcd_puts(0, 4, "of three or more of the");
+                rb->lcd_puts(0, 5, "same type.");
+                rb->lcd_puts(0, 7, "Controls:");
+                rb->lcd_puts(0, 8, "Directions to move");
+                rb->lcd_puts(0, 9, "SELECT to select");
+                rb->lcd_puts(0, 10, "Long SELECT to show menu");
+                rb->lcd_puts(0, 11, "A to cancel");
 #endif
                 rb->lcd_update();
                 while(true) {
