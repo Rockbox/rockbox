@@ -30,9 +30,10 @@ mandelbrot.c
 plasma.c
 #endif
 
-jewels.c
 bounce.c
-
+#if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
+bubbles.c
+#endif 
 #if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
 /* These need adjusting for the Mini's and iRiver if'p screen */
 brickmania.c
@@ -41,6 +42,7 @@ calculator.c
 chip8.c
 demystify.c
 flipit.c
+jewels.c
 minesweeper.c
 oscilloscope.c
 pong.c

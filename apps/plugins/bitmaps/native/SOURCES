@@ -1,6 +1,44 @@
 #ifdef HAVE_LCD_BITMAP
 
-/* Bejeweled */
+/* Bubbles */
+#if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
+bubbles_emblem.160x128x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && defined(HAVE_LCD_COLOR)
+bubbles_emblem.160x128x16.bmp
+bubbles_left.160x128x16.bmp
+bubbles_right.160x128x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
+bubbles_emblem.160x128x16.bmp
+bubbles_left.176x132x16.bmp
+bubbles_right.176x132x16.bmp
+#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
+bubbles_emblem.220x176x16.bmp
+bubbles_left.220x176x16.bmp
+bubbles_right.220x176x16.bmp
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+bubbles_emblem.220x176x16.bmp
+bubbles_left.240x320x16.bmp
+bubbles_right.240x320x16.bmp
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+bubbles_emblem.320x240x16.bmp
+bubbles_left.320x240x16.bmp
+bubbles_right.320x240x16.bmp
+#endif
+
+/* ChessBox */
+#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) & (LCD_DEPTH >= 16)
+chessbox_pieces.240x240x16.bmp
+#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) & (LCD_DEPTH >= 16)
+chessbox_pieces.176x176x16.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) & (LCD_DEPTH > 1)
+chessbox_pieces.128x128x2.bmp
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
+chessbox_pieces.128x128x1.bmp
+#elif (LCD_WIDTH >= 64) && (LCD_HEIGHT >= 64)
+chessbox_pieces.64x64x1.bmp
+#endif
+
+/* Jewels */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 jewels.112x64x1.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
@@ -19,19 +57,6 @@ jewels.220x176x16.bmp
 jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 jewels.320x240x16.bmp
-#endif
-
-/* ChessBox */
-#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 240) & (LCD_DEPTH >= 16)
-chessbox_pieces.240x240x16.bmp
-#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 176) & (LCD_DEPTH >= 16)
-chessbox_pieces.176x176x16.bmp
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128) & (LCD_DEPTH > 1)
-chessbox_pieces.128x128x2.bmp
-#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
-chessbox_pieces.128x128x1.bmp
-#elif (LCD_WIDTH >= 64) && (LCD_HEIGHT >= 64)
-chessbox_pieces.64x64x1.bmp
 #endif
 
 /* Solitaire */

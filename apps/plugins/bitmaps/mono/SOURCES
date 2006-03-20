@@ -1,5 +1,17 @@
 #ifdef HAVE_LCD_BITMAP
 
+/* Bubbles */
+#if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+bubbles_bubble.160x128x1.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
+bubbles_bubble.160x128x1.bmp
+#elif ((LCD_WIDTH == 220) && (LCD_HEIGHT == 176)) || \
+      ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320))
+bubbles_bubble.220x176x1.bmp
+#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+bubbles_bubble.320x240x1.bmp
+#endif
+
 /* BrickMania */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 
