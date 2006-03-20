@@ -908,6 +908,7 @@ bool radio_screen(void)
         radio_stop();
 #if CONFIG_CODEC == SWCODEC
         pcm_rec_mux(0); /* Line In */
+        peak_meter_enabled = true;
 #endif
     }
 
