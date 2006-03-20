@@ -22,12 +22,15 @@
 
 CODEC_HEADER
 
-struct codec_api* rb;
+/* Macro that sign extends an unsigned byte */
+#define SE(x) ((int32_t)((int8_t)(x)))
+
+struct codec_api *rb;
 
 /* This codec support WAVE files with the following formats:
  * - PCM, up to 32 bits, supporting 32 bits playback when useful.
  * - ALAW and MULAW (16 bits compressed on 8 bits).
- * - DVI_ADPCM (16 bits compressed on 4 bits).
+ * - DVI_ADPCM (16 bits compressed on 3 or 4 bits).
  * 
  *  For a good documentation on WAVE files, see:
  *  http://www.tsp.ece.mcgill.ca/MMSP/Documents/AudioFormats/WAVE/WAVE.html
@@ -100,8 +103,6 @@ extern char iedata[];
 extern char iend[];
 #endif
 
-/* Those are lookup tables, so they should be in the idata section
- * (fast but small RAM on the coldfire processor) */
 static const int16_t alaw2linear16[256] ICONST_ATTR = {
      -5504,   -5248,   -6016,   -5760,   -4480,   -4224,   -4992,
      -4736,   -7552,   -7296,   -8064,   -7808,   -6528,   -6272,
@@ -182,7 +183,7 @@ static const int16_t ulaw2linear16[256] ICONST_ATTR = {
         24,      16,       8,       0
 };
 
-static const uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
+static const uint16_t dvi_adpcm_steptab[89] ICONST_ATTR = {
     7, 8, 9, 10, 11, 12, 13, 14,
     16, 17, 19, 21, 23, 25, 28, 31,
     34, 37, 41, 45, 50, 55, 60, 66,
@@ -195,387 +196,348 @@ static const uint16_t dvi_adpcm_steptab[ 89 ] ICONST_ATTR = {
     7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
     15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794,
     32767 };
-static const int dvi_adpcm_indextab4[ 8 ] ICONST_ATTR = { -1, -1, -1, -1, 2, 4, 6, 8 };
-static const int dvi_adpcm_indextab3[ 4 ] ICONST_ATTR = { -1, -1, 1, 2 };
 
-static int16_t int16_samples[WAV_CHUNK_SIZE] IBSS_ATTR;
+static const int dvi_adpcm_indextab4[8] ICONST_ATTR = {
+    -1, -1, -1, -1, 2, 4, 6, 8 };
+
+static const int dvi_adpcm_indextab3[4] ICONST_ATTR = { -1, -1, 1, 2 };
+
+static int32_t samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 
 static enum codec_status
-decode_dvi_adpcm(struct codec_api* ci,
+decode_dvi_adpcm(struct codec_api *ci,
                  const uint8_t *buf,
                  int n,
                  uint16_t channels, uint16_t bitspersample,
-                 int16_t *pcmout,
+                 int32_t *pcmout,
                  size_t *pcmoutsize);
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_start(struct codec_api *api)
 {
-  struct codec_api* ci;
-  uint32_t numbytes, bytesdone;
-  uint32_t totalsamples = 0;
-  uint16_t channels=0;
-  uint16_t samplesperblock = 0;
-  int bytespersample=0;
-  uint16_t bitspersample;
-  uint32_t i;
-  size_t n, wavbufsize;
-  int endofstream;
-  unsigned char* buf;
-  uint16_t* wavbuf;
-  long chunksize;
-  uint16_t formattag = 0;
-  uint16_t blockalign = 0;
-  uint32_t avgbytespersec = 0;
-  off_t firstblockposn;     /* position of the first block in file */
-  int shortorlong = 1;      /* do we output shorts (1) or longs (2)? */
-  int32_t * const int32_samples = (int32_t*)int16_samples;
-
-  /* Generic codec initialisation */
-  rb = api;
-  ci = api;
+    struct codec_api *ci;
+    uint32_t numbytes, bytesdone;
+    uint32_t totalsamples = 0;
+    uint16_t channels = 0;
+    uint16_t samplesperblock = 0;
+    int bytespersample = 0;
+    uint16_t bitspersample;
+    uint32_t i;
+    size_t n, bufsize;
+    int endofstream;
+    unsigned char *buf;
+    uint8_t *wavbuf;
+    long chunksize;
+    uint16_t formattag = 0;
+    uint16_t blockalign = 0;
+    uint32_t avgbytespersec = 0;
+    off_t firstblockposn;     /* position of the first block in file */
+ 
+    /* Generic codec initialisation */
+    rb = api;
+    ci = api;
 
 #ifdef USE_IRAM 
-  ci->memcpy(iramstart, iramcopy, iramend-iramstart);
-  ci->memset(iedata, 0, iend - iedata);
+    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
 
-  ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
-  ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
-
-  ci->configure(DSP_DITHER, (bool *)false);
+    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
+    ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
+    ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
+    ci->configure(DSP_DITHER, (bool *)false);
   
-  next_track:
-
-  if (codec_init(api)) {
-      i = CODEC_ERROR;
-      goto exit;
-  }
-
-  while (!*ci->taginfo_ready)
-      ci->yield();
-    
-  /* assume the WAV header is less than 1024 bytes */
-  buf=ci->request_buffer((long *)&n,1024);
-  if (n<44) {
-      i = CODEC_ERROR;
-      goto exit;
-  }
-  if ((memcmp(buf,"RIFF",4)!=0) || (memcmp(&buf[8],"WAVE",4)!=0)) {
-      i = CODEC_ERROR;
-      goto exit;
-  }
-
-  buf += 12;
-  n -= 12;
-  bitspersample = 0;
-  numbytes = 0;
-  totalsamples = 0;
-  /* read until the data chunk, which should be last */
-  while(numbytes == 0 && n >= 8) {
-      /* chunkSize */
-      i = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
-      if (memcmp(buf,"fmt ",4)==0) {
-          if (i<16) {
-              DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n",i);
-              i = CODEC_ERROR;
-              goto exit;
-          }
-          /* wFormatTag */
-          formattag=buf[8]|(buf[9]<<8);
-          /* wChannels */
-          channels=buf[10]|(buf[11]<<8);
-          /* skipping dwSamplesPerSec */
-          /* dwAvgBytesPerSec */
-          avgbytespersec = buf[16]|(buf[17]<<8)|(buf[18]<<16)|(buf[19]<<24);
-          /* wBlockAlign */
-          blockalign=buf[20]|(buf[21]<<8);
-          /* wBitsPerSample */
-          bitspersample=buf[22]|(buf[23]<<8);
-          if (formattag != WAVE_FORMAT_PCM) {
-              uint16_t size;
-              if (i<18) {
-                  /* this is not a fatal error with some formats,
-                   * we'll see later if we can't decode it */
-                  DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
-                         "doesn't have ext. fmt descr (chunksize=%d<18).\n",
-                         formattag, i);
-              }
-              size = buf[24]|(buf[25]<<8);
-              if (formattag == WAVE_FORMAT_DVI_ADPCM) {
-                  if (size < 2) {
-                      DEBUGF("CODEC_ERROR: dvi_adpcm is missing "
-                             "SamplesPerBlock value\n");
-                      i = CODEC_ERROR;
-                      goto exit;
-                  }
-                  samplesperblock = buf[26]|(buf[27]<<8);
-              }
-              else if (formattag == WAVE_FORMAT_EXTENSIBLE) {
-                  if (size < 22) {
-                      DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
-                             "missing extension\n");
-                      i = CODEC_ERROR;
-                      goto exit;
-                  }
-                  /* wValidBitsPerSample */
-                  bitspersample = buf[26]|(buf[27]<<8);
-                  /* skipping dwChannelMask (4bytes) */
-                  /* SubFormat (only get the first two bytes) */
-                  formattag = buf[32]|(buf[33]<<8);
-              }
-          }
-      }
-      else if (memcmp(buf,"data",4)==0) {
-          numbytes=i;
-          i=0; /* advance to the beginning of data */
-      }
-      else if (memcmp(buf,"fact",4)==0) {
-          /* dwSampleLength */
-          if (i>=4) {
-              totalsamples = (buf[8]|(buf[9]<<8)|(buf[10]<<16)|(buf[11]<<24));
-          }
-      }
-      else {
-          DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
-                 buf[0], buf[1], buf[2], buf[3],i);
-      }
-      /* go to next chunk (even chunk sizes must be padded) */
-      if (i & 0x01)
-          i++;
-      buf += i+8;
-      if (n < (i+8)) {
-          DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
-          i = CODEC_ERROR;
-          goto exit;
-      }
-      n -= i+8;
-  }
-
-  if (channels == 0) {
-      DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
-      i = CODEC_ERROR;
-      goto exit;
-  }
-  if (numbytes == 0) {
-      DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
-      i = CODEC_ERROR;
-      goto exit;
-  }
-  if (formattag != WAVE_FORMAT_PCM && totalsamples == 0) {
-      /* This is non-fatal for some formats */
-      DEBUGF("CODEC_WARNING: non-PCM WAVE doesn't have a 'fact' chunk\n");
-  }
-  if (formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
-      formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
-      if (bitspersample != 8) {
-          DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample\n");
-          i = CODEC_ERROR;
-          goto exit;
-      }
-      bytespersample = channels;
-  }
-  if ( formattag == WAVE_FORMAT_DVI_ADPCM
-       && bitspersample != 4 && bitspersample != 3) {
-      DEBUGF("CODEC_ERROR: dvi_adpcm must have 3 or 4 bitspersample\n");
-      i = CODEC_ERROR;
-      goto exit;
-  }
-  if (formattag == WAVE_FORMAT_PCM && bitspersample > 32) {
-      DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
-             "is unsupported\n");
-      i = CODEC_ERROR;
-      goto exit;
-  }
-
-  ci->configure(CODEC_DSP_ENABLE, (bool *)true);
-  ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-
-  if (bitspersample <= 16) {
-      ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(16));
-  } else {
-      shortorlong = 2;
-      ci->configure(DSP_DITHER, (bool *)false);
-      ci->configure(DSP_SET_SAMPLE_DEPTH, (long *) (32));
-      ci->configure(DSP_SET_CLIP_MAX, (long *) (2147483647));
-      ci->configure(DSP_SET_CLIP_MIN, (long *) (-2147483647-1));
-  }
-
-  if (channels == 2) {
-      ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
-  } else if (channels == 1) {
-      ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_MONO);
-  } else {
-      DEBUGF("CODEC_ERROR: more than 2 channels\n");
-      i = CODEC_ERROR;
-      goto exit;
-  }
-
-  if (totalsamples == 0) {
-      if (formattag == WAVE_FORMAT_PCM ||
-          formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
-          formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
-          /* for PCM and derived formats only */
-          bytespersample=(((bitspersample-1)/8+1)*channels);
-          totalsamples=numbytes/bytespersample;
-      }
-      else {
-          DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
-          i = CODEC_ERROR;
-          goto exit;
-      }
-  }
-
-  firstblockposn = (1024-n);
-  ci->advance_buffer(firstblockposn);
-
-  /* The main decoder loop */
-
-  bytesdone=0;
-  ci->set_elapsed(0);
-  endofstream=0;
-  /* chunksize is computed so that one chunk is about 1/50s.
-   * this make 4096 for 44.1kHz 16bits stereo.
-   * It also has to be a multiple of blockalign */
-  chunksize = (1 + avgbytespersec / (50*blockalign)) * blockalign;
-  /* check that the output buffer is big enough (convert to samplespersec,
-     then round to the blockalign multiple below) */
-  if (((uint64_t)chunksize*ci->id3->frequency*channels*shortorlong)
-      / (uint64_t)avgbytespersec >= WAV_CHUNK_SIZE) {
-      chunksize = ((uint64_t)WAV_CHUNK_SIZE * avgbytespersec
-                   / ((uint64_t)ci->id3->frequency * channels * shortorlong 
-                      * blockalign)) * blockalign;
-  }
-
-  while (!endofstream) {
-      uint8_t *wavbuf8;
-
-      ci->yield();
-    if (ci->stop_codec || ci->reload_codec) {
-        break;
-    }
-
-    if (ci->seek_time) {
-        uint32_t newpos;
-
-        /* use avgbytespersec to round to the closest blockalign multiple,
-           add firstblockposn. 64-bit casts to avoid overflows. */
-        newpos = (((uint64_t)avgbytespersec * (ci->seek_time - 1))
-                  / (1000LL*blockalign)) * blockalign;
-        if (newpos > numbytes)
-            break;
-        if (ci->seek_buffer(firstblockposn + newpos)) {
-            bytesdone = newpos;
-        }
-        ci->seek_complete();
-    }
-    wavbuf=ci->request_buffer((long *)&n,chunksize);
-    wavbuf8 = (uint8_t*)wavbuf;
-
-    if (n==0)
-        break; /* End of stream */
-
-    if (bytesdone + n > numbytes) {
-        n = numbytes - bytesdone;
-        endofstream = 1;
-    }
-
-    wavbufsize = sizeof(int16_samples);
-
-    if (formattag == WAVE_FORMAT_PCM) {
-        if (bitspersample > 24) {
-            for (i=0;i<n;i+=4) {
-                int32_samples[i/4]=(int32_t)(wavbuf8[i]|(wavbuf8[i+1]<<8)|
-                                             (wavbuf8[i+2]<<16)|(wavbuf8[i+3]<<24));
-            }
-            wavbufsize = n;
-        }
-        else if (bitspersample > 16) {
-            for (i=0;i<n;i+=3) {
-                int32_samples[i/3]=(int32_t)((wavbuf8[i]<<8)|
-                           (wavbuf8[i+1]<<16)|(wavbuf8[i+2]<<24));
-           }
-            wavbufsize = n*4/3;
-        }
-        else if (bitspersample > 8) {
-            /* Byte-swap data. */
-            for (i=0;i<n/2;i++) {
-                int16_samples[i]=(int16_t)letoh16(wavbuf[i]);
-            }
-            wavbufsize = n;
-        }
-        else {
-            for (i=0;i<n;i++) {
-                int16_samples[i] = (wavbuf8[i]<<8) - 0x8000;
-            }
-            wavbufsize = n*2;
-        }
-    }
-    else if (formattag == WAVE_FORMAT_ALAW || formattag == IBM_FORMAT_ALAW) {
-        for (i=0;i<n;i++) {
-            int16_samples[i] = alaw2linear16[wavbuf8[i]];
-        }
-        wavbufsize = n*2;
-    }
-    else if (formattag == WAVE_FORMAT_MULAW || formattag == IBM_FORMAT_MULAW) {
-        for (i=0;i<n;i++) {
-            int16_samples[i] = ulaw2linear16[wavbuf8[i]];
-        }
-        wavbufsize = n*2;
-    }
-    else if (formattag == WAVE_FORMAT_DVI_ADPCM) {
-        unsigned int nblocks = chunksize/blockalign;
-
-        for (i=0; i<nblocks; i++) {
-            size_t decodedsize = samplesperblock*channels;
-            if (decode_dvi_adpcm(ci, ((uint8_t*)wavbuf)+i*blockalign,
-                                 blockalign, channels, bitspersample,
-                                 int16_samples+i*samplesperblock*channels,
-                                 &decodedsize)
-                != CODEC_OK) {
-                i = CODEC_ERROR;
-                goto exit;
-            }
-            if (decodedsize != samplesperblock) {
-                i = CODEC_ERROR;
-                goto exit;
-            }
-        }
-        wavbufsize = nblocks*samplesperblock*channels*2;
-    }
-    else {
-        DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
+next_track:
+    if (codec_init(api)) {
         i = CODEC_ERROR;
         goto exit;
     }
 
-    while (!ci->pcmbuf_insert((char*)int16_samples, wavbufsize)) {
+    while (!*ci->taginfo_ready)
         ci->yield();
+    
+    /* assume the WAV header is less than 1024 bytes */
+    buf = ci->request_buffer((long *)&n, 1024);
+    if (n < 44) {
+        i = CODEC_ERROR;
+        goto exit;
+    }
+    if ((memcmp(buf, "RIFF", 4) != 0) || (memcmp(&buf[8], "WAVE", 4) != 0)) {
+        i = CODEC_ERROR;
+        goto exit;
     }
 
-    ci->advance_buffer(n);
-    bytesdone += n;
-    if (bytesdone >= numbytes) {
-        endofstream=1;
+    buf += 12;
+    n -= 12;
+    bitspersample = 0;
+    numbytes = 0;
+    totalsamples = 0;
+    /* read until the data chunk, which should be last */
+    while (numbytes == 0 && n >= 8) {
+        /* chunkSize */
+        i = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
+        if (memcmp(buf, "fmt ", 4) == 0) {
+            if (i < 16) {
+                DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n", i);
+                i = CODEC_ERROR;
+                goto exit;
+            }
+            /* wFormatTag */
+            formattag=buf[8]|(buf[9]<<8);
+            /* wChannels */
+            channels=buf[10]|(buf[11]<<8);
+            /* skipping dwSamplesPerSec */
+            /* dwAvgBytesPerSec */
+            avgbytespersec = buf[16]|(buf[17]<<8)|(buf[18]<<16)|(buf[19]<<24);
+            /* wBlockAlign */
+            blockalign=buf[20]|(buf[21]<<8);
+            /* wBitsPerSample */
+            bitspersample=buf[22]|(buf[23]<<8);
+            if (formattag != WAVE_FORMAT_PCM) {
+                uint16_t size;
+                if (i < 18) {
+                    /* this is not a fatal error with some formats,
+                     * we'll see later if we can't decode it */
+                    DEBUGF("CODEC_WARNING: non-PCM WAVE (formattag=0x%x) "
+                           "doesn't have ext. fmt descr (chunksize=%d<18).\n",
+                           formattag, i);
+                }
+                size = buf[24]|(buf[25]<<8);
+                if (formattag == WAVE_FORMAT_DVI_ADPCM) {
+                    if (size < 2) {
+                        DEBUGF("CODEC_ERROR: dvi_adpcm is missing "
+                               "SamplesPerBlock value\n");
+                        i = CODEC_ERROR;
+                        goto exit;
+                    }
+                    samplesperblock = buf[26]|(buf[27]<<8);
+                } else if (formattag == WAVE_FORMAT_EXTENSIBLE) {
+                    if (size < 22) {
+                        DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
+                               "missing extension\n");
+                        i = CODEC_ERROR;
+                        goto exit;
+                    }
+                    /* wValidBitsPerSample */
+                    bitspersample = buf[26]|(buf[27]<<8);
+                    /* skipping dwChannelMask (4bytes) */
+                    /* SubFormat (only get the first two bytes) */
+                    formattag = buf[32]|(buf[33]<<8);
+                }
+            }
+        } else if (memcmp(buf, "data", 4) == 0) {
+            numbytes = i;
+            i = 0; /* advance to the beginning of data */
+        } else if (memcmp(buf, "fact", 4) == 0) {
+            /* dwSampleLength */
+            if (i >= 4)
+                totalsamples = (buf[8]|(buf[9]<<8)|(buf[10]<<16)|(buf[11]<<24));
+        } else {
+            DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
+                   buf[0], buf[1], buf[2], buf[3], i);
+        }
+        /* go to next chunk (even chunk sizes must be padded) */
+        if (i & 0x01)
+            i++;
+        buf += i + 8;
+        if (n < (i + 8)) {
+            DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
+            i = CODEC_ERROR;
+            goto exit;
+        }
+        n -= i + 8;
     }
 
-    ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
-  }
+    if (channels == 0) {
+        DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
+        i = CODEC_ERROR;
+        goto exit;
+    }
+    if (numbytes == 0) {
+        DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
+        i = CODEC_ERROR;
+        goto exit;
+    }
+    if (formattag != WAVE_FORMAT_PCM && totalsamples == 0) {
+        /* This is non-fatal for some formats */
+        DEBUGF("CODEC_WARNING: non-PCM WAVE doesn't have a 'fact' chunk\n");
+    }
+    if (formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
+        formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
+        if (bitspersample != 8) {
+            DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample\n");
+            i = CODEC_ERROR;
+            goto exit;
+        }
+        bytespersample = channels;
+    }
+    if (formattag == WAVE_FORMAT_DVI_ADPCM
+        && bitspersample != 4 && bitspersample != 3) {
+        DEBUGF("CODEC_ERROR: dvi_adpcm must have 3 or 4 bitspersample\n");
+        i = CODEC_ERROR;
+        goto exit;
+    }
+    if (formattag == WAVE_FORMAT_PCM && bitspersample > 32) {
+        DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
+               "is unsupported\n");
+        i = CODEC_ERROR;
+        goto exit;
+    }
 
-  if (ci->request_next_track())
-      goto next_track;
+    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+    if (channels == 2) {
+        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_INTERLEAVED);
+    } else if (channels == 1) {
+        ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
+    } else {
+        DEBUGF("CODEC_ERROR: more than 2 channels\n");
+        i = CODEC_ERROR;
+        goto exit;
+    }
 
-  i = CODEC_OK;
+    if (totalsamples == 0) {
+        if (formattag == WAVE_FORMAT_PCM ||
+            formattag == WAVE_FORMAT_ALAW || formattag == WAVE_FORMAT_MULAW ||
+            formattag == IBM_FORMAT_ALAW || formattag == IBM_FORMAT_MULAW) {
+            /* for PCM and derived formats only */
+            bytespersample = (((bitspersample - 1)/8 + 1)*channels);
+            totalsamples = numbytes/bytespersample;
+        } else {
+            DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
+            i = CODEC_ERROR;
+            goto exit;
+        }
+    }
+
+    firstblockposn = 1024 - n;
+    ci->advance_buffer(firstblockposn);
+
+    /* The main decoder loop */
+    bytesdone = 0;
+    ci->set_elapsed(0);
+    endofstream = 0;
+    /* chunksize is computed so that one chunk is about 1/50s.
+     * this make 4096 for 44.1kHz 16bits stereo.
+     * It also has to be a multiple of blockalign */
+    chunksize = (1 + avgbytespersec / (50*blockalign))*blockalign;
+    /* check that the output buffer is big enough (convert to samplespersec,
+       then round to the blockalign multiple below) */
+    if (((uint64_t)chunksize*ci->id3->frequency*channels*sizeof(long))
+        /(uint64_t)avgbytespersec >= WAV_CHUNK_SIZE) {
+        chunksize = ((uint64_t)WAV_CHUNK_SIZE*avgbytespersec
+                     /((uint64_t)ci->id3->frequency*channels*sizeof(long) 
+                     *blockalign))*blockalign;
+    }
+
+    while (!endofstream) {
+        ci->yield();
+        if (ci->stop_codec || ci->reload_codec) {
+            break;
+        }
+
+        if (ci->seek_time) {
+            uint32_t newpos;
+
+            /* use avgbytespersec to round to the closest blockalign multiple,
+               add firstblockposn. 64-bit casts to avoid overflows. */
+            newpos = (((uint64_t)avgbytespersec*(ci->seek_time - 1))
+                      / (1000LL*blockalign))*blockalign;
+            if (newpos > numbytes)
+                break;
+            if (ci->seek_buffer(firstblockposn + newpos))
+                bytesdone = newpos;
+            ci->seek_complete();
+        }
+        wavbuf = (uint8_t *)ci->request_buffer((long *)&n, chunksize);
+
+        if (n == 0)
+            break; /* End of stream */
+
+        if (bytesdone + n > numbytes) {
+            n = numbytes - bytesdone;
+            endofstream = 1;
+        }
+
+        if (formattag == WAVE_FORMAT_PCM) {
+            if (bitspersample > 24) {
+                for (i = 0; i < n; i += 4) {
+                    samples[i/4] = (wavbuf[i] >> 3)|
+                        (wavbuf[i + 1]<<5)|(wavbuf[i + 2]<<13)|
+                        (SE(wavbuf[i + 3])<<21);
+                }
+                bufsize = n;
+            } else if (bitspersample > 16) {
+                for (i = 0; i < n; i += 3) {
+                    samples[i/3] = (wavbuf[i]<<5)|
+                        (wavbuf[i + 1]<<13)|(SE(wavbuf[i + 2])<<21);
+                }
+                bufsize = n*4/3;
+            } else if (bitspersample > 8) {
+                for (i = 0; i < n; i += 2) {
+                    samples[i/2] = (wavbuf[i]<<13)|(SE(wavbuf[i + 1])<<21);
+                }
+                bufsize = n*2;
+            } else {
+                for (i = 0; i < n; i++) {
+                    samples[i] = (wavbuf[i] - 0x80)<<21;
+                }
+                bufsize = n*4;
+            }
+        } else if (formattag == WAVE_FORMAT_ALAW 
+                   || formattag == IBM_FORMAT_ALAW) {
+            for (i = 0; i < n; i++)
+                samples[i] = alaw2linear16[wavbuf[i]] << 13;
+            bufsize = n*4;
+        } else if (formattag == WAVE_FORMAT_MULAW
+                   || formattag == IBM_FORMAT_MULAW) {
+            for (i = 0; i < n; i++)
+                samples[i] = ulaw2linear16[wavbuf[i]] << 13;
+            bufsize = n*4;
+        }
+        else if (formattag == WAVE_FORMAT_DVI_ADPCM) {
+            unsigned int nblocks = chunksize/blockalign;
+
+            for (i = 0; i < nblocks; i++) {
+                size_t decodedsize = samplesperblock*channels;
+                if (decode_dvi_adpcm(ci, ((uint8_t *)wavbuf) + i*blockalign,
+                                     blockalign, channels, bitspersample,
+                                     samples + i*samplesperblock*channels,
+                                     &decodedsize) != CODEC_OK)
+                    i = CODEC_ERROR;
+                goto exit;
+            }
+            bufsize = nblocks*samplesperblock*channels*2;
+        } else {
+            DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
+            i = CODEC_ERROR;
+            goto exit;
+        }
+
+        while (!ci->pcmbuf_insert((char *)samples, bufsize))
+            ci->yield();
+
+        ci->advance_buffer(n);
+        bytesdone += n;
+        if (bytesdone >= numbytes)
+            endofstream = 1;
+        ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
+    }
+
+    if (ci->request_next_track())
+        goto next_track;
+
+    i = CODEC_OK;
 exit:
-  return i;
+    return i;
 }
 
 static enum codec_status
-decode_dvi_adpcm(struct codec_api* ci,
+decode_dvi_adpcm(struct codec_api *ci,
                  const uint8_t *buf,
                  int n,
                  uint16_t channels, uint16_t bitspersample,
-                 int16_t *pcmout,
+                 int32_t *pcmout,
                  size_t *pcmoutsize)
 {
     size_t nsamples = 0;
@@ -596,7 +558,7 @@ decode_dvi_adpcm(struct codec_api* ci,
     }
 
     /* decode block header */
-    for(c=0; c<channels && n>=4; c++) {
+    for (c = 0; c < channels && n >= 4; c++) {
         /* decode + push first sample */
         sample[c] = (short)(buf[0]|(buf[1]<<8));/* need cast for sign-extend */
         pcmout[c] = sample[c];
@@ -612,8 +574,8 @@ decode_dvi_adpcm(struct codec_api* ci,
         n -= 4;
     }
     if (bitspersample == 4) {
-        while( n>= channels*4 && (nsamples+8*channels) <= *pcmoutsize ) {
-            for (c=0; c<channels; c++) {
+        while (n>= channels*4 && (nsamples + 8*channels) <= *pcmoutsize) {
+            for (c = 0; c < channels; c++) {
                 samplecode[0][c] = buf[0]&0xf;
                 samplecode[1][c] = buf[0]>>4;
                 samplecode[2][c] = buf[1]&0xf;
@@ -625,9 +587,8 @@ decode_dvi_adpcm(struct codec_api* ci,
                 buf += 4;
                 n -= 4;
             }
-            
-            for (i=0; i<8; i++) {
-                for (c=0; c<channels; c++) {
+            for (i = 0; i < 8; i++) {
+                for (c = 0; c < channels; c++) {
                     step = dvi_adpcm_steptab[stepindex[c]];
                     codem = samplecode[i][c];
                     code = codem & 0x07;
@@ -653,7 +614,7 @@ decode_dvi_adpcm(struct codec_api* ci,
                     step = step >> 1;
                     diff += step;
 #else
-                    diff = ((code+code+1) * step) >> 3; /* faster */
+                    diff = ((code + code + 1) * step) >> 3; /* faster */
 #endif
                     /* check the sign bit */
                     /* check for overflow and underflow errors */
@@ -661,25 +622,23 @@ decode_dvi_adpcm(struct codec_api* ci,
                         sample[c] -= diff;
                         if (sample[c] < -32768)
                             sample[c] = -32768;
-                    }
-                    else {
+                    } else {
                         sample[c] += diff;
                         if (sample[c] > 32767)
                             sample[c] = 32767;
                     }
                     /* output the new sample */
-                    pcmout[nsamples] = sample[c];
+                    pcmout[nsamples] = sample[c] << 13;
                     nsamples++;
                 }
             }
         }
-    }
-    else {                  /* bitspersample == 3 */
-        while( n>= channels*12 && (nsamples+32*channels) <= *pcmoutsize) {
-            for (c=0; c<channels; c++) {
+    } else {                  /* bitspersample == 3 */
+        while (n >= channels*12 && (nsamples + 32*channels) <= *pcmoutsize) {
+            for (c = 0; c < channels; c++) {
                 uint16_t bitstream = 0;
                 int bitsread = 0;
-                for (i=0; i<32 && n>0; i++) {
+                for (i = 0; i < 32 && n > 0; i++) {
                     if (bitsread < 3) {
                         /* read 8 more bits */
                         bitstream |= buf[0]<<bitsread;
@@ -698,8 +657,8 @@ decode_dvi_adpcm(struct codec_api* ci,
                 }
             }
             
-            for (i=0; i<32; i++) {
-                for (c=0; c<channels; c++) {
+            for (i = 0; i < 32; i++) {
+                for (c = 0; c < channels; c++) {
                     step = dvi_adpcm_steptab[stepindex[c]];
                     codem = samplecode[i][c];
                     code = codem & 0x03;
@@ -722,7 +681,7 @@ decode_dvi_adpcm(struct codec_api* ci,
                     step = step >> 1;
                     diff += step;
 #else
-                    diff = ((code+code+1) * step) >> 3; /* faster */
+                    diff = ((code + code + 1) * step) >> 3; /* faster */
 #endif
                     /* check the sign bit */
                     /* check for overflow and underflow errors */
@@ -737,7 +696,7 @@ decode_dvi_adpcm(struct codec_api* ci,
                             sample[c] = 32767;
                     }
                     /* output the new sample */
-                    pcmout[nsamples] = sample[c];
+                    pcmout[nsamples] = sample[c] << 13;
                     nsamples++;
                 }
             }
@@ -749,8 +708,8 @@ decode_dvi_adpcm(struct codec_api* ci,
         return CODEC_ERROR;
     }
     *pcmoutsize = nsamples;
-    if (n!=0) {
-        DEBUGF("decode_dvi_adpcm: n=%d unprocessed bytes\n",n);
+    if (n != 0) {
+        DEBUGF("decode_dvi_adpcm: n=%d unprocessed bytes\n", n);
     }
     return CODEC_OK;
 }
