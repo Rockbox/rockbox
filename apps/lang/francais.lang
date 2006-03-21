@@ -10,7 +10,7 @@
 #     Eric LASSAUGE <lassauge AT users.sourceforge.net> - Juin 2004
 #     Modifié par Mourad Jaber <newbeewan AT users.sourceforge.net> - Octobre 2004
 #     Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
-#     Modifié par Mustapha Senhaji (Moos) <moos012 AT hotmail.com> - Novembre 2005,Fevrier 2006 
+#     Modifié par Mustapha Senhaji (Moos) <moos75 AT gmail.com> - Novembre 2005,Mars 2006 
 
 id: LANG_SOUND_SETTINGS
 desc: in the main menu
@@ -3312,7 +3312,7 @@ id: LANG_DIRCACHE_REBOOT
 desc: when activating directory cache
 eng: "Please reboot to enable the cache"
 voice: "Redémarrer pour activer le cache"
-new: "Redemarrer pour activer cache"
+new: "Redémarrer pour activer cache"
 
 id: LANG_DIRCACHE_BUILDING
 desc: when booting up and rebuilding the cache
@@ -3378,7 +3378,7 @@ id: LANG_RADIO_SCAN_MODE
 desc: in radio screen
 eng: "Scan Mode"
 voice: "Mode recherche automatique"
-new: "Mode recherche automatique"
+new: "Mode recherche auto."
 
 id: LANG_RADIO_PRESET_MODE
 desc: in radio screen
@@ -3715,3 +3715,117 @@ desc: in the recording screen
 eng: "D"
 voice: "Gain digital"
 new: "D"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: "Navigation par page"
+new: "Navigation par page"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Rétro-éclairage synchronisé"
+new: "Rétro-éclairage synchronisé"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Unité centrale seule"
+new: "Unité centrale seule"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Télécommande seule"
+new: "Télécommande seule"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Unité centrale et télécommande"
+new: "Unité centrale et télécommande"
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice:
+new: "RVB"
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice:
+new: "RVB: %02X%02X%02X"
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice: "Couleur arrière plan"
+new: "Couleur arrière plan"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice: "Couleur premier plan"
+new: "Couleur premier plan"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice: "Réinitialiser couleurs"
+new: "Réinitialiser couleurs"
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: ""
+new: "Couleur invalide"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice:
+new: "Recherche dans liste de lecture"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new: "Recherche... %d trouvé (%s)"
+
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Mode Fête"
+new: "Mode Fête"
+
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Couper"
+new: "Couper"
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Copier"
+new: "Copier"
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Coller"
+new: "Coller"
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice: "Fichier ou dossier existant. Écraser?"
+new: "Fichier ou dossier existant. Écraser?"
+
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "Vitesse de lecture"
+new: "Vitesse de lecture"
