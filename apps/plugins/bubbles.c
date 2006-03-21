@@ -1769,6 +1769,8 @@ static int bubbles_searchgroup(struct game_context* bb, int row, int col) {
     int adj = row%2;
     int mytype = bb->playboard[row][col].type;
 
+    if (bb->playboard[row][col].ingroup)
+         return 0;
     bb->playboard[row][col].ingroup = true;
 
     /* recursively call neighbors */
@@ -1875,6 +1877,8 @@ static int bubbles_remove(struct game_context* bb) {
 static void bubbles_anchored(struct game_context* bb, int row, int col) {
     int adj = row%2;
 
+    if (bb->playboard[row][col].anchored)
+         return;
     /* mark bubble */
     bb->playboard[row][col].anchored = true;
 
@@ -2289,7 +2293,6 @@ static int bubbles(struct game_context* bb) {
     int button;
     int buttonres;
     unsigned int startlevel = 0;
-    char str[30];
     char *title = "Bubbles";
     bool startgame = false;
     bool showscores = false;
@@ -2304,6 +2307,7 @@ static int bubbles(struct game_context* bb) {
     *       menu        *
     ********************/
     while(!startgame){
+        char str[30];
         rb->lcd_clear_display();
 
         if(!showscores) {
@@ -2466,7 +2470,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     struct game_context bb;
     bool exit = false;
     int position;
-    char str[19];
 
     /* plugin init */
     (void)parameter;
@@ -2486,6 +2489,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
 
     while(!exit) {
         switch(bubbles(&bb)){
+            char str[19];
             case BB_WIN:
                 rb->splash(HZ*2, true, "You Win!");
 
