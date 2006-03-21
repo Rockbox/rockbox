@@ -28,6 +28,10 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
 #define IRAMSIZE 0xc000
+#elif defined(IAUDIO_X5)
+#define DRAMORIG 0x31000000
+#define IRAMORIG 0x1000c000
+#define IRAMSIZE 0xc000
 #elif defined(ARCH_IPOD)
 #define DRAMORIG 0x00000000
 #define IRAMORIG 0x4000c000
@@ -57,7 +61,7 @@ OUTPUT_FORMAT(elf32-sh)
 MEMORY
 {
    PLUGIN_RAM : ORIGIN = THIS_ORIGIN, LENGTH = THIS_LENGTH
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
+#if defined(IRAMSIZE)
    PLUGIN_IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
 #endif
 }
@@ -88,7 +92,7 @@ SECTIONS
     .data :
     {
         *(.data*)
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
+#if defined(IRAMSIZE)
         iramcopy = .;
 #endif
     } > PLUGIN_RAM
@@ -98,7 +102,7 @@ SECTIONS
         *(.eh_frame)
     }
 
-#if defined(ARCH_IRIVER) || defined(ARCH_IPOD) || (CONFIG_CPU==PNX0101)
+#if defined(IRAMSIZE)
     .iram IRAMORIG : AT ( iramcopy)
     {
         iramstart = .;
