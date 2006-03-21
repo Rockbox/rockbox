@@ -1,0 +1,54 @@
+#!/usr/bin/perl -s
+
+while(<STDIN>) {
+    $line++;
+    if($_ =~ / *\#/) {
+        # comment
+        next;
+    }
+    # get rid of DOS newlines
+    $_ =~ s/\r//g;
+    if($_ =~ / *([a-z]+): *(.*)/) {
+        ($var, $value) = ($1, $2);
+        # print "$var => $value\n";
+
+        $set{$var} = $value;
+
+        if( (($var eq "new") && $value && ($value !~ /^\"(.*)\"\W*$/)) ||
+            (($var eq "voice") && $value && ($value !~ /^\"(.*)\"\W*$/)) ||
+            (($var eq "eng") && ($value !~ /^\"(.*)\"\W*$/)) ) {
+            print "$input:$line:missing quotes for ".$set{'id'}."\n";
+            $errors++;
+            next;
+        }
+
+        if($var eq "new") {
+            # the last one for a single phrase
+
+            if(!$value || ($value eq "\"\"") ) {
+                # if not set, get the english version
+                $value = $set{'eng'};
+            }
+            print <<MOO
+<phrase>
+  id: $set{'id'}
+  desc: $set{'desc'}
+  user:
+  <source>
+    *: $set{'eng'}
+  </source>
+  <dest>
+    *: $value
+  </dest>
+  <voice>
+    *: $set{'voice'}
+  </voice>
+</phrase>
+MOO
+;
+            undef %set;
+        }
+
+    }
+
+}
