@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$ 
+ * $Id$
  *
  * Copyright (C) Jonathan Gordon (2006)
  *
@@ -38,6 +38,7 @@
 #define SLIDER_LEFT      BUTTON_LEFT
 #define SLIDER_RIGHT     BUTTON_RIGHT
 #define SLIDER_OK        BUTTON_ON
+#define SLIDER_OK2       BUTTON_SELECT
 #define SLIDER_CANCEL    BUTTON_OFF
 
 #define SLIDER_RC_UP     BUTTON_RC_REW
@@ -75,7 +76,7 @@
 
 static const int max_val[3] = {LCD_MAX_RED,LCD_MAX_GREEN,LCD_MAX_BLUE};
 
-static void draw_screen(struct screen *display, char *title, 
+static void draw_screen(struct screen *display, char *title,
                         int *rgb_val, int color, int row)
 {
     int i;
@@ -95,11 +96,11 @@ static void draw_screen(struct screen *display, char *title,
 
     i = display->getstringsize(title,0,0);
     display->putsxy((display->width-i)/2,6,title );
-    
+
     for (i=0;i<3;i++)
     {
         text_top =display->char_height*((i*2)+2);
-        
+
         if (i==row)
         {
             if (global_settings.invert_cursor)
@@ -107,7 +108,7 @@ static void draw_screen(struct screen *display, char *title,
                 display->fillrect(0,text_top-1,display->width,display->char_height+2);
                 bg_col = text_color;
             }
-            else 
+            else
             {
                 display->putsxy(0,text_top,">");
                 display->putsxy(display->width-TEXT_MARGIN,text_top,"<");
@@ -124,9 +125,9 @@ static void draw_screen(struct screen *display, char *title,
             }
         }
         else
-        { 
+        {
             if (display->depth > 1)
-                display->set_foreground(text_color); 
+                display->set_foreground(text_color);
             bg_col = background_color;
         }
 
@@ -138,12 +139,12 @@ static void draw_screen(struct screen *display, char *title,
         display->putsxy(TEXT_MARGIN,text_top,rgb_dummy);
         snprintf(buf,3,"%02d",rgb_val[i]);
         display->putsxy(display->width-(display->char_width*4),text_top,buf);
-        
+
         text_top += display->char_height/4;
-     
+
         gui_scrollbar_draw(display,SLIDER_START,text_top,slider_width,
                            display->char_height/2,
-                           max_val[i],0,rgb_val[i],HORIZONTAL); 
+                           max_val[i],0,rgb_val[i],HORIZONTAL);
     }
 
     if (display->depth > 1) {
@@ -175,7 +176,7 @@ static void draw_screen(struct screen *display, char *title,
 }
 
 /***********
- set_color 
+ set_color
  returns true if USB was inserted, false otherwise
  color is a pointer to the colour (in native format) to modify
  set banned_color to -1 to allow all
@@ -215,7 +216,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
             draw_screen(&screens[i], title, rgb_val, newcolor, slider);
 
         button = button_get(true);
-        switch (button) 
+        switch (button)
         {
             case SLIDER_UP:
 #ifdef HAVE_LCD_REMOTE
@@ -250,16 +251,19 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
                 if (rgb_val[slider] > 0)
                     rgb_val[slider]--;
                 break;
-            
+
             case SLIDER_OK:
 #ifdef HAVE_LCD_REMOTE
             case SLIDER_RC_OK:
+#endif
+#ifdef SLIDER_OK2
+            case SLIDER_OK2:
 #endif
                 if ((banned_color!=-1) && (banned_color == newcolor))
                 {
                     gui_syncsplash(HZ*2,true,str(LANG_COLOR_UNACCEPTABLE));
                     break;
-                }                    
+                }
                 *color = newcolor;
                 exit = 1;
                 break;
