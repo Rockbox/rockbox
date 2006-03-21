@@ -15,9 +15,13 @@ and Ondio
 </ul>
 
 <p> Rockbox is a complete rewrite and uses no fragments of any original
-firmwares. It boasts <a href="/twiki/bin/view/Main/FeatureComparison">numerous
+firmwares. <a href="/twiki/bin/view/Main/WhyRockbox">Why Choose Rockbox?</a>
+
+#if 0
+ It boasts <a href="/twiki/bin/view/Main/FeatureComparison">numerous
 features</a> while remaining <a
 href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy to use</a>. Installing Rockbox does not harm your device.
+#endif
 
 <h2>News</h2>
 
