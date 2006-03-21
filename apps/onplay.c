@@ -164,6 +164,11 @@ static bool save_playlist(void)
 static bool add_to_playlist(int position, bool queue)
 {
     bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
+    char *lines[] = {
+        (char *)str(LANG_RECURSE_DIRECTORY_QUESTION),
+        selected_file
+    };
+    struct text_message message={lines, 2};
 
     if (new_playlist)
         playlist_create(NULL, NULL);
@@ -179,34 +184,7 @@ static bool add_to_playlist(int position, bool queue)
         else
         {
             /* Ask if user wants to recurse directory */
-            bool exit = false;
-            
-            lcd_clear_display();
-            lcd_puts_scroll(0, 0, str(LANG_RECURSE_DIRECTORY_QUESTION));
-            lcd_puts_scroll(0, 1, (unsigned char *)selected_file);
-            
-#ifdef HAVE_LCD_BITMAP
-            lcd_puts(0, 3, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-            lcd_puts(0, 4, str(LANG_CANCEL_WITH_ANY_RECORDER)); 
-#endif
-            
-            lcd_update();
-            
-            while (!exit) {
-                int btn = button_get(true);
-                switch (btn) {
-                    case SETTINGS_OK:
-                        recurse = true;
-                        exit = true;
-                        break;
-
-                    default:
-                        /* ignore button releases */
-                        if (!(btn & BUTTON_REL))
-                            exit = true;
-                        break;
-                }
-            }
+            recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
         }
 
         playlist_insert_directory(NULL, selected_file, position, queue,
