@@ -99,12 +99,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 12
+#define PLUGIN_API_VERSION 13
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 11
+#define PLUGIN_MIN_API_VERSION 13
 
 /* plugin return codes */
 enum plugin_status {
@@ -229,7 +229,7 @@ struct plugin_api {
     long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#ifdef HAS_BUTTON_HOLD  
     bool (*button_hold)(void);
 #endif
 
@@ -414,6 +414,11 @@ struct plugin_api {
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);
 
+    bool (*set_option)(const char* string, void* variable, 
+                       enum optiontype type, const struct opt_items* options, 
+                       int numoptions, void (*function)(int));
+
+
     /* power */
     int (*battery_level)(void);
     bool (*battery_level_safe)(void);
@@ -475,16 +480,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
-
-#if CONFIG_KEYPAD == IRIVER_H300_PAD || CONFIG_KEYPAD == IPOD_4G_PAD
-    /* NOTE: This is already in the plugin api for the H100 - but we put it
-       at the end for other targets to keep the plugin api compatible */
-    bool (*button_hold)(void);
-#endif
-    /* options */
-    bool (*set_option)(const char* string, void* variable, 
-                       enum optiontype type, const struct opt_items* options, 
-                       int numoptions, void (*function)(int));
 
 };
 

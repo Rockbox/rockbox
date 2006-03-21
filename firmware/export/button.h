@@ -28,7 +28,8 @@
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define HAS_BUTTON_HOLD
 #endif
 extern struct event_queue button_queue;
@@ -49,174 +50,292 @@ bool button_hold(void);
 bool remote_button_hold(void);
 #endif
 
-#if CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-bool button_hold(void);
-#endif
 
-#define  BUTTON_NONE          0x0000
+#define  BUTTON_NONE        0x00000000
 
-/* Shared button codes */
-#define  BUTTON_LEFT          0x0040
-#define  BUTTON_RIGHT         0x0080
+        /* Button modifiers */
+#define BUTTON_REL          0x02000000
+#define BUTTON_REPEAT       0x04000000
 
-/* Button modifiers */
-#define  BUTTON_REMOTE        0x2000
-#define  BUTTON_REPEAT        0x4000
-#define  BUTTON_REL           0x8000
 
-/* remote control buttons */
-#define  BUTTON_RC_VOL_UP     (0x0008 | BUTTON_REMOTE)
-#define  BUTTON_RC_VOL_DOWN   (0x0800 | BUTTON_REMOTE)
-#define  BUTTON_RC_LEFT       (BUTTON_LEFT | BUTTON_REMOTE)
-#define  BUTTON_RC_RIGHT      (BUTTON_RIGHT| BUTTON_REMOTE)
+  /* Target specific button codes */
 
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD)\
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 
-/* iRiver H100 specific button codes */
-#define  BUTTON_SELECT        0x0100
-#define  BUTTON_MODE          0x0200
-#define  BUTTON_REC           0x0400
-#define  BUTTON_ON            0x0001
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
+/* iRiver H100/H300 specific button codes */
 
-#define BUTTON_RC_ON          (BUTTON_REMOTE | 0x00010000)
-#define BUTTON_RC_STOP        (BUTTON_REMOTE | 0x00020000)
-#define BUTTON_RC_MODE        (BUTTON_REMOTE | 0x00040000)
-#define BUTTON_RC_BITRATE     (BUTTON_REMOTE | 0x00200000)
-#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
-#define BUTTON_RC_SOURCE      (BUTTON_REMOTE | 0x00800000)
-#define BUTTON_RC_MENU        (BUTTON_REMOTE | 0x01000000)
-#define BUTTON_RC_FF          (BUTTON_REMOTE | 0x02000000)
-#define BUTTON_RC_REW         (BUTTON_REMOTE | 0x04000000)
+        /* Main unit's buttons */
+#define BUTTON_ON           0x00000001
+#define BUTTON_OFF          0x00000002
 
-#elif CONFIG_KEYPAD == IRIVER_H300_PAD
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
 
-/* iRiver H300 specific button codes */
-#define  BUTTON_SELECT        0x0100
-#define  BUTTON_MODE          0x0200
-#define  BUTTON_REC           0x0400
-#define  BUTTON_ON            0x0001
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
+#define BUTTON_REC          0x00000040
+#define BUTTON_MODE         0x00000080
 
-#define BUTTON_RC_ON          (BUTTON_REMOTE | 0x00010000)
-#define BUTTON_RC_STOP        (BUTTON_REMOTE | 0x00020000)
-#define BUTTON_RC_MODE        (BUTTON_REMOTE | 0x00040000)
-#define BUTTON_RC_BITRATE     (BUTTON_REMOTE | 0x00200000)
-#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00400000)
-#define BUTTON_RC_SOURCE      (BUTTON_REMOTE | 0x00800000)
-#define BUTTON_RC_MENU        (BUTTON_REMOTE | 0x01000000)
-#define BUTTON_RC_FF          (BUTTON_REMOTE | 0x02000000)
-#define BUTTON_RC_REW         (BUTTON_REMOTE | 0x04000000)
+#define BUTTON_SELECT       0x00000100
+
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT|\
+                BUTTON_UP|BUTTON_DOWN|BUTTON_REC|BUTTON_MODE|BUTTON_SELECT)
+
+    /* Remote control's buttons */
+#define BUTTON_RC_ON        0x00100000
+#define BUTTON_RC_STOP      0x00080000
+
+#define BUTTON_RC_REW       0x00040000
+#define BUTTON_RC_FF        0x00020000
+#define BUTTON_RC_VOL_UP    0x00010000
+#define BUTTON_RC_VOL_DOWN  0x00008000
+
+#define BUTTON_RC_REC       0x00004000
+#define BUTTON_RC_MODE      0x00002000
+
+#define BUTTON_RC_MENU      0x00001000
+
+#define BUTTON_RC_BITRATE   0x00000800
+#define BUTTON_RC_SOURCE    0x00000400
+
+#define BUTTON_REMOTE (BUTTON_RC_ON|BUTTON_RC_STOP|BUTTON_RC_REW|BUTTON_RC_FF\
+                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN|BUTTON_RC_REC\
+                |BUTTON_RC_MODE|BUTTON_RC_MENU|BUTTON_RC_BITRATE\
+                |BUTTON_RC_SOURCE)
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 
-/* Recorder specific button codes */
-#define  BUTTON_ON            0x0001
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_PLAY          0x0004
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
-#define  BUTTON_F1            0x0100
-#define  BUTTON_F2            0x0200
-#define  BUTTON_F3            0x0400
+ /* Recorder specific button codes */
 
-#define  BUTTON_RC_PLAY       (BUTTON_PLAY | BUTTON_REMOTE)
-#define  BUTTON_RC_STOP       (BUTTON_OFF | BUTTON_REMOTE)
+      /* Main unit's buttons */
+#define BUTTON_ON           0x00000001
+#define BUTTON_OFF          0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+
+#define BUTTON_PLAY         0x00000040
+
+#define BUTTON_F1           0x00000080
+#define BUTTON_F2           0x00000100
+#define BUTTON_F3           0x00000200
+
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY\
+                |BUTTON_F1|BUTTON_F2|BUTTON_F3)
+                
+    /* Remote control's buttons */
+#define BUTTON_RC_PLAY      0x00100000
+#define BUTTON_RC_STOP      0x00080000
+
+#define BUTTON_RC_LEFT      0x00040000
+#define BUTTON_RC_RIGHT     0x00020000
+#define BUTTON_RC_VOL_UP    0x00010000
+#define BUTTON_RC_VOL_DOWN  0x00008000
+
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_STOP\
+                |BUTTON_RC_LEFT|BUTTON_RC_RIGHT\
+                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
 /* Jukebox 6000 and Studio specific button codes */
-#define  BUTTON_ON            0x0001
-#define  BUTTON_MENU          0x0002
-#define  BUTTON_PLAY          0x0010
-#define  BUTTON_STOP          0x0020
 
-#define  BUTTON_RC_PLAY       (BUTTON_PLAY | BUTTON_REMOTE)
-#define  BUTTON_RC_STOP       (BUTTON_STOP | BUTTON_REMOTE)
+        /* Main unit's buttons */
+#define BUTTON_ON           0x00000001
+#define BUTTON_STOP         0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_PLAY         0x00000010
+#define BUTTON_MENU         0x00000020
+
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_STOP|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_PLAY|BUTTON_MENU)
+
+    /* Remote control's buttons */
+#define BUTTON_RC_PLAY      0x00100000
+#define BUTTON_RC_STOP      0x00080000
+
+#define BUTTON_RC_LEFT      0x00040000
+#define BUTTON_RC_RIGHT     0x00020000
+#define BUTTON_RC_VOL_UP    0x00010000
+#define BUTTON_RC_VOL_DOWN  0x00008000
+
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_STOP\
+                |BUTTON_RC_LEFT|BUTTON_RC_RIGHT\
+                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
+
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
-/* Ondio specific button codes */
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
-#define  BUTTON_MENU          0x0100
+    /* Ondio specific button codes */
+
+#define BUTTON_OFF          0x00000001
+#define BUTTON_MENU         0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+
+#define BUTTON_MAIN (BUTTON_OFF|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN)
+
+#define BUTTON_REMOTE 0
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 
-#define  BUTTON_ON            0x0001
-#define  BUTTON_OFF           0x0002
-#define  BUTTON_PLAY          0x0004
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
-#define  BUTTON_MENU          0x0100
+  /* Gmini specific button codes */
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define BUTTON_ON           0x00000001
+#define BUTTON_OFF          0x00000002
 
-/* TODO: These codes should relate to the hardware */
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
 
-#define  BUTTON_MENU          0x0002
-#define  BUTTON_PLAY          0x0004
-#define  BUTTON_SELECT        0x0008
-#define  BUTTON_SCROLL_FWD    0x0010
-#define  BUTTON_SCROLL_BACK   0x0020
+#define BUTTON_PLAY         0x00000040
+#define BUTTON_MENU         0x00000080
+
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY|BUTTON_MENU)
+
+#define BUTTON_REMOTE 0
+
+#elif ((CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD))
+
+  /* iPod specific button codes */
+
+#define BUTTON_SELECT       0x00000001
+#define BUTTON_MENU         0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_SCROLL_FWD   0x00000010
+#define BUTTON_SCROLL_BACK  0x00000020
+
+#define BUTTON_PLAY         0x00000040
+
+#if CONFIG_KEYPAD == IPOD_3G_PAD
+#define  BUTTON_HOLD        0x00000100
+/* TODO Does the BUTTON_HOLD need to be here? */
+#define BUTTON_MAIN (BUTTON_SELECT|BUTTON_MENU\
+                |BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_SCROLL_FWD|BUTTON_SCROLL_BACK\
+                |BUTTON_PLAY|BUTTON_HOLD)
+#else
+#define BUTTON_MAIN (BUTTON_SELECT|BUTTON_MENU\
+                |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_SCROLL_FWD\
+                |BUTTON_SCROLL_BACK|BUTTON_PLAY)
+#endif
+
+#define BUTTON_REMOTE 0
+
 /* This is for later
-#define  BUTTON_SCROLL_TOUCH  0x0100*/
-
-#elif CONFIG_KEYPAD == IPOD_3G_PAD
-
-/* TODO: These codes should relate to the hardware */
-
-#define  BUTTON_MENU          0x0002
-#define  BUTTON_PLAY          0x0004
-#define  BUTTON_SELECT        0x0008
-#define  BUTTON_SCROLL_FWD    0x0010
-#define  BUTTON_SCROLL_BACK   0x0020
-#define  BUTTON_HOLD          0x0100
+#define  BUTTON_SCROLL_TOUCH 0x00000200
+*/
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
-#define  BUTTON_PLAY          0x0001
-#define  BUTTON_EQ            0x0002
-#define  BUTTON_MODE          0x0004
-#define  BUTTON_UP            0x0010
-#define  BUTTON_DOWN          0x0020
-#define  BUTTON_SELECT        0x0100
+/* iriver IFP7XX specific button codes */
+
+#define BUTTON_PLAY         0x00000001
+#define BUTTON_SELECT       0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+
+#define BUTTON_MODE         0x00000040
+#define BUTTON_EQ           0x00000080
+
+#define BUTTON_MAIN (BUTTON_PLAY|BUTTON_SELECT\
+                |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_UP|BUTTON_DOWN\
+                |BUTTON_MODE|BUTTON_EQ)
+
+#define BUTTON_REMOTE 0
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 
-/* TODO: These codes should relate to the hardware */
+/* iaudio X5 specific button codes */
 
-#define BUTTON_PLAY           0x0001
-#define BUTTON_REC            0x0002
-#define BUTTON_POWER          0x0004
-#define BUTTON_UP             0x0008
-#define BUTTON_DOWN           0x0010
-#define BUTTON_SELECT         0x0020
+    /* Main unit's buttons */
+#define BUTTON_POWER        0x00000001
+#define BUTTON_PLAY         0x00000002
 
-#define BUTTON_RC_PLAY        (BUTTON_REMOTE | 0x00010000)
-#define BUTTON_RC_REW         (BUTTON_REMOTE | 0x00020000)
-#define BUTTON_RC_FF          (BUTTON_REMOTE | 0x00040000)
-#define BUTTON_RC_MODE        (BUTTON_REMOTE | 0x00080000)
-#define BUTTON_RC_REC         (BUTTON_REMOTE | 0x00100000)
-#define BUTTON_RC_MENU        (BUTTON_REMOTE | 0x00200000)
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+
+#define BUTTON_REC          0x00000040
+#define BUTTON_SELECT       0x00000080
+
+#define BUTTON_MAIN (BUTTON_POWER|BUTTON_PLAY|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_REC|BUTTON_SELECT)
+
+    /* Remote control's buttons */
+#define BUTTON_RC_PLAY      0x00100000
+
+#define BUTTON_RC_REW       0x00080000
+#define BUTTON_RC_FF        0x00040000
+#define BUTTON_RC_VOL_UP    0x00020000
+#define BUTTON_RC_VOL_DOWN  0x00010000
+
+#define BUTTON_RC_REC       0x00008000
+#define BUTTON_RC_MENU      0x00004000
+
+#define BUTTON_RC_MODE      0x00002000
+
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN\
+                |BUTTON_RC_REW|BUTTON_RC_FF\
+                |BUTTON_RC_REC|BUTTON_RC_MENU|BUTTON_RC_MODE)
+
+
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
+/* Toshiba Gigabeat specific button codes */
 
-/* TODO: These codes should relate to the hardware */
+#define BUTTON_POWER        0x00000001
+#define BUTTON_MENU         0x00000002
 
-#define BUTTON_POWER           0x0001
-#define BUTTON_MENU            0x0002
-#define BUTTON_VOL_UP          0x0008
-#define BUTTON_VOL_DOWN        0x0010
-#define BUTTON_A               0x0020
-#define BUTTON_UP              0x0100
-#define BUTTON_DOWN            0x0200
-#define BUTTON_SELECT          0x0400
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
+
+#define BUTTON_VOL_UP       0x00000040
+#define BUTTON_VOL_DOWN     0x00000080
+
+#define BUTTON_SELECT       0x00000100
+#define BUTTON_A            0x00000200
+
+
+#define BUTTON_MAIN (BUTTON_POWER|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_VOL_UP|BUTTON_VOL_DOWN\
+                |BUTTON_SELECT|BUTTON_A)
+
+
+#define BUTTON_REMOTE 0
+
+#elif 0
+
+/* 
+ * Please, add the next Rockbox target's button defines here,
+ * using: 
+ *  - bits 0 and up:  for main unit's buttons
+ *  - bits 20 (0x00100000) and downwards for the remote buttons (if applicable)
+ * Don't forget to add BUTTON_MAIN and BUTTON_REMOTE masks
+ * Currently, main buttons on all targets are up to bit 9 (0x00000200),
+ * and remote buttons are down to bit 10 (0x00000400)
+ */ 
+
 
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */

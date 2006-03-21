@@ -179,7 +179,7 @@ static const struct plugin_api rockbox_api = {
     button_get_w_tmo,
     button_status,
     button_clear_queue,
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#ifdef HAS_BUTTON_HOLD 
     button_hold,
 #endif
 
@@ -357,6 +357,7 @@ static const struct plugin_api rockbox_api = {
     menu_draw,
     menu_insert,
     menu_set_cursor,
+    set_option,
 
     /* power */
     battery_level,
@@ -411,13 +412,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#if CONFIG_KEYPAD == IRIVER_H300_PAD || CONFIG_KEYPAD == IPOD_4G_PAD
-    /* NOTE: This is already in the plugin api for the H100 - but we put it
-       at the end for other targets to keep the plugin api compatible */
-    button_hold,
-#endif
-    /* options */
-    set_option,
 };
 
 int plugin_load(const char* plugin, void* parameter)
