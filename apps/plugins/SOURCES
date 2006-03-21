@@ -1,5 +1,7 @@
 /* plugins common to all models */
+#ifndef IAUDIO_X5
 battery_bench.c
+#endif
 battery_test.c
 chessclock.c
 credits.c
@@ -8,7 +10,9 @@ dict.c
 favorites.c
 firmware_flash.c
 logo.c
+#ifndef IAUDIO_X5
 metronome.c
+#endif
 mosaique.c
 rockbox_flash.c
 search.c
