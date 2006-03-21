@@ -138,13 +138,13 @@ static long dbtoA(long db)
    db is s15.16 fixed point and describes gain/attenuation at peak freq.
    c is a pointer where the coefs will be stored.
  */
-void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
+void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     const long one = 1 << 28; /* s3.28 */
     const long A = dbtoA(db);
     const long alpha = DIV64(fsin(cutoff), 2*Q, 15); /* s1.30 */
-    long a0, a1, a2; /* these are all s3.28 format */
-    long b0, b1, b2;
+    int32_t a0, a1, a2; /* these are all s3.28 format */
+    int32_t b0, b1, b2;
 
     /* possible numerical ranges listed after each coef */
     b0 = one + FRACMUL(alpha, A);     /* [1.25..5] */
@@ -161,7 +161,7 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 }
 
 /* Calculate coefficients for lowshelf filter */
-void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
+void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     const long one = 1 << 24; /* s7.24 */
     const long A = dbtoA(db);
@@ -169,8 +169,8 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     const long ap1 = (A >> 5) + one;
     const long am1 = (A >> 5) - one;
     const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
-    long a0, a1, a2; /* these are all s7.24 format */
-    long b0, b1, b2;
+    int32_t a0, a1, a2; /* these are all s7.24 format */
+    int32_t b0, b1, b2;
     long cs = fcos(cutoff);
 
     b0 = FRACMUL(A, ap1 - FRACMUL(am1, cs) + twosqrtalpha) << 2;
@@ -188,7 +188,7 @@ void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
 }
 
 /* Calculate coefficients for highshelf filter */
-void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
+void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     const long one = 1 << 24; /* s7.24 */
     const long A = dbtoA(db);
@@ -196,8 +196,8 @@ void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c)
     const long ap1 = (A >> 5) + one;
     const long am1 = (A >> 5) - one;
     const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
-    long a0, a1, a2; /* these are all s7.24 format */
-    long b0, b1, b2;
+    int32_t a0, a1, a2; /* these are all s7.24 format */
+    int32_t b0, b1, b2;
     long cs = fcos(cutoff);
 
     b0 = FRACMUL(A, ap1 + FRACMUL(am1, cs) + twosqrtalpha) << 2;

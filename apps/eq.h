@@ -33,9 +33,9 @@ struct eqfilter {
     int32_t history[2][4];
 };
 
-void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
-void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
-void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, long *c);
+void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
+void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
+void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_filter(int32_t **x, struct eqfilter *f, unsigned num,
                unsigned channels, unsigned shift);
 
