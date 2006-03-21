@@ -345,147 +345,120 @@ int charging_screen(void)
 }
 #endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
-
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
-    || CONFIG_KEYPAD == IRIVER_H300_PAD
+#if (CONFIG_KEYPAD != IAUDIO_X5_PAD) && (CONFIG_KEYPAD != PLAYER_PAD)
 /* returns:
    0 if no key was pressed
-   1 if a key was pressed (or if ON was held down long enough to repeat)
-   2 if USB was connected */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define PITCH_PAUSE BUTTON_PLAY
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
-#define PITCH_PAUSE BUTTON_SELECT
-#endif
-int pitch_screen(void)
+   1 if USB was connected */
+bool pitch_screen(void)
 {
     int button;
     int pitch = sound_get_pitch();
     bool exit = false;
-    bool used = false;
 
     while (!exit) {
+        unsigned char* ptr;
+        unsigned char buf[32];
+        int w, h;
 
-        if ( used ) {
-            unsigned char* ptr;
-            unsigned char buf[32];
-            int w, h;
+        lcd_clear_display();
+        lcd_setfont(FONT_SYSFIXED);
 
-            lcd_clear_display();
-            lcd_setfont(FONT_SYSFIXED);
+        /* UP: +0.1% */
+        ptr = "+0.1%";
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
+        lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                        LCD_WIDTH/2 - 3, h, 7, 8);
 
-            ptr = str(LANG_PITCH_UP);
-            lcd_getstringsize(ptr,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
-            lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                            LCD_WIDTH/2 - 3, h*2, 7, 8);
+        /* DOWN: -0.1% */
+        ptr = "-0.1%";
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+        lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*2, 7, 8);
 
-            snprintf((char *)buf, sizeof buf, "%d.%d%%",
-                     pitch / 10, pitch % 10 );
-            lcd_getstringsize(buf,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, h, buf);
+        /* RIGHT: +2% */
+        ptr = "+2%";
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy(LCD_WIDTH-w, (LCD_HEIGHT-h)/2, ptr);
+        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                        LCD_WIDTH-w-8, (LCD_HEIGHT-h)/2, 7, 8);
 
-            ptr = str(LANG_PITCH_DOWN);
-            lcd_getstringsize(ptr,&w,&h);
-            lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-            lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                            LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
+        /* LEFT: -2% */
+        ptr = "-2%";
+        lcd_getstringsize(ptr,&w,&h);
+        lcd_putsxy(0, (LCD_HEIGHT-h)/2, ptr);
+        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+                        w+1, (LCD_HEIGHT-h)/2, 7, 8);
 
-            ptr = str(LANG_PAUSE);
-            lcd_getstringsize(ptr,&w,&h);
-            lcd_putsxy((LCD_WIDTH-(w/2))/2, LCD_HEIGHT/2 - h/2, ptr);
-            lcd_mono_bitmap(bitmap_icons_7x8[Icon_Pause],
-                            (LCD_WIDTH-(w/2))/2-10, LCD_HEIGHT/2 - h/2, 7, 8);
+        /* "Pitch" */
+        snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
+        lcd_getstringsize(buf,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT/2)-h, buf);
+        /* "XX.X%" */
+        snprintf((char *)buf, sizeof(buf), "%d.%d%%",
+                 pitch / 10, pitch % 10 );
+        lcd_getstringsize(buf,&w,&h);
+        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT/2, buf);
 
-            lcd_update();
-        }
+        lcd_update();
 
         /* use lastbutton, so the main loop can decide whether to
            exit to browser or not */
         button = button_get(true);
         switch (button) {
-            case BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REPEAT:
-                used = true;
+            case PITCH_UP:
+            case PITCH_UP | BUTTON_REPEAT:
                 if ( pitch < 2000 )
                     pitch++;
                 sound_set_pitch(pitch);
                 break;
 
-            case BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REPEAT:
-                used = true;
+            case PITCH_DOWN:
+            case PITCH_DOWN | BUTTON_REPEAT:
                 if ( pitch > 500 )
                     pitch--;
                 sound_set_pitch(pitch);
                 break;
 
-            case BUTTON_ON | PITCH_PAUSE:
-                audio_pause();
-                used = true;
-                break;
-
-            case PITCH_PAUSE | BUTTON_REL:
-                audio_resume();
-                used = true;
-                break;
-
-            case BUTTON_ON | PITCH_PAUSE | BUTTON_REL:
-                audio_resume();
-                exit = true;
-                break;
-
-            case BUTTON_ON | BUTTON_RIGHT:
-            case BUTTON_LEFT | BUTTON_REL:
-                if ( pitch < 2000 ) {
+            case PITCH_RIGHT:
+            case PITCH_RIGHT | BUTTON_REPEAT:
+                if ( pitch < 1980 )
                     pitch += 20;
-                    sound_set_pitch(pitch);
-                }
+                else
+                    pitch = 2000;
+                sound_set_pitch(pitch);
                 break;
 
-            case BUTTON_ON | BUTTON_LEFT:
-            case BUTTON_RIGHT | BUTTON_REL:
-                if ( pitch > 500 ) {
+            case PITCH_LEFT:
+            case PITCH_LEFT | BUTTON_REPEAT:
+                if ( pitch > 520 )
                     pitch -= 20;
-                    sound_set_pitch(pitch);
-                }
+                else
+                    pitch = 500;
+                sound_set_pitch(pitch);
                 break;
 
-#ifdef SIMULATOR
-            case BUTTON_ON:
-#else
-            case BUTTON_ON | BUTTON_REL:
-            case BUTTON_ON | BUTTON_UP | BUTTON_REL:
-            case BUTTON_ON | BUTTON_DOWN | BUTTON_REL:
-#endif
-                exit = true;
-                break;
-
-            case BUTTON_ON | BUTTON_REPEAT:
-                used = true;
-                break;
-
-            case BUTTON_ON | BUTTON_OFF:
+            case PITCH_RESET:
                 pitch = 1000;
                 sound_set_pitch( pitch );
                 break;
 
+            case PITCH_EXIT:
+                exit = true;
+                break;
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return 2;
+                    return 1;
                 break;
         }
     }
 
     lcd_setfont(FONT_UI);
-
-    if ( used )
-        return 1;
-    else
-        return 0;
+    return 0;
 }
+
 #endif
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\

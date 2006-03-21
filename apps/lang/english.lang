@@ -3827,3 +3827,8 @@ eng: "File/directory exists. Overwrite?"
 voice: "File or directory exists. Overwrite?"
 new:
 
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "Pitch"
+new:

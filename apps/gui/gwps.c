@@ -134,7 +134,7 @@ long gui_wps_show(void)
     while ( 1 )
     {
         bool audio_paused = (audio_status() & AUDIO_STATUS_PAUSE)?true:false;
-        
+
         /* did someone else (i.e power thread) change audio pause mode? */
         if (wps_state.paused != audio_paused) {
             wps_state.paused = audio_paused;
@@ -160,7 +160,7 @@ long gui_wps_show(void)
            if(gui_wps[i].data->peak_meter_enabled)
                pm = true;
         }
-        
+
         if (pm) {
             long next_refresh = current_tick;
             long next_big_refresh = current_tick + HZ / 5;
@@ -171,7 +171,7 @@ long gui_wps_show(void)
                     break;
                 }
                 peak_meter_peek();
-                sleep(0);   /* Sleep until end of current tick. */  
+                sleep(0);   /* Sleep until end of current tick. */
 
                 if (TIME_AFTER(current_tick, next_refresh)) {
                     FOR_NB_SCREENS(i)
@@ -185,7 +185,7 @@ long gui_wps_show(void)
             }
 
         }
-        
+
         /* The peak meter is disabled
            -> no additional screen updates needed */
         else {
@@ -408,7 +408,7 @@ long gui_wps_show(void)
                 if ((button == WPS_RC_PREV) && (lastbutton != WPS_RC_PREV_PRE))
                     break;
 #endif
-#endif          
+#endif
                 left_lastclick = current_tick;
                 update_track = true;
 
@@ -487,7 +487,7 @@ long gui_wps_show(void)
             case WPS_NEXT:
 #ifdef WPS_NEXT_PRE
                 if (lastbutton != WPS_NEXT_PRE)
-                    break; 
+                    break;
 #endif
 #ifdef WPS_RC_NEXT
             case WPS_RC_NEXT:
@@ -607,15 +607,11 @@ long gui_wps_show(void)
                 /* pitch screen */
 #if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
     || CONFIG_KEYPAD == IRIVER_H300_PAD
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_DOWN:
-#if CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
-            case BUTTON_ON | BUTTON_OFF:
-#endif
+            case BUTTON_ON | BUTTON_REPEAT:
 #ifdef HAVE_LCD_COLOR
                 lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
-                if (2 == pitch_screen())
+                if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
                 if (gui_wps[SCREEN_MAIN].data->has_backdrop)
@@ -653,8 +649,8 @@ long gui_wps_show(void)
                 ab_set_A_marker(wps_state.id3->elapsed);
                 break;
 #endif
-                
-                
+
+
 #ifdef WPS_AB_SET_A_MARKER
             /* set A marker for A-B repeat */
             case WPS_AB_SET_A_MARKER:
@@ -717,7 +713,7 @@ long gui_wps_show(void)
                 restore = true;
                 break;
 #endif
-                
+
             case BUTTON_NONE: /* Timeout */
                 update_track = true;
                 break;
@@ -726,7 +722,7 @@ long gui_wps_show(void)
                 bookmark_autobookmark();
                 default_event_handler(SYS_POWEROFF);
                 break;
-                
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return SYS_USB_CONNECTED;
@@ -748,7 +744,7 @@ long gui_wps_show(void)
                 if (global_settings.browse_current &&
                     wps_state.current_track_path[0] != '\0')
                     set_current_file(wps_state.current_track_path);
-                
+
                 return 0;
             }
             update_track = false;
@@ -761,7 +757,7 @@ long gui_wps_show(void)
 #endif
             if (global_settings.fade_on_stop)
                 fade(0);
-                
+
             FOR_NB_SCREENS(i)
                 gui_wps[i].display->stop_scroll();
             bookmark_autobookmark();
@@ -778,10 +774,10 @@ long gui_wps_show(void)
             if (global_settings.browse_current &&
                 wps_state.current_track_path[0] != '\0')
                 set_current_file(wps_state.current_track_path);
-            
+
             return 0;
         }
-                    
+
         if ( button )
             ata_spin();
 
@@ -883,8 +879,8 @@ bool wps_data_load(struct wps_data *wps_data,
     }
     else
     {
-        /* 
-         * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this 
+        /*
+         * Hardcode loading WPS_DEFAULTCFG to cause a reset ideally this
          * wants to be a virtual file.  Feel free to modify dirbrowse()
          * if you're feeling brave.
          */
@@ -893,7 +889,7 @@ bool wps_data_load(struct wps_data *wps_data,
             wps_reset(wps_data);
             global_settings.wps_file[0] = 0;
             return false;
-        } 
+        }
 
 #ifdef HAVE_REMOTE_LCD
         if (! strcmp(buf, RWPS_DEFAULTCFG) )
@@ -907,13 +903,13 @@ bool wps_data_load(struct wps_data *wps_data,
         size_t bmpdirlen;
         char *bmpdir = strrchr(buf, '.');
         bmpdirlen = bmpdir - buf;
-        
+
         fd = open(buf, O_RDONLY);
 
         if (fd >= 0)
         {
             unsigned int start = 0;
-            
+
             wps_reset(wps_data);
 #ifdef HAVE_LCD_BITMAP
             wps_data->img_buf_ptr = wps_data->img_buf; /* where in image buffer */
@@ -928,7 +924,7 @@ bool wps_data_load(struct wps_data *wps_data,
                                           buf, bmpdirlen))
                 {
                     start += strlen(&wps_data->format_buffer[start]);
-                    
+
                     if (start < sizeof(wps_data->format_buffer) - 1)
                     {
                         wps_data->format_buffer[start++] = '\n';
@@ -941,11 +937,11 @@ bool wps_data_load(struct wps_data *wps_data,
             {
                 gui_wps_format(wps_data);
             }
-    
+
             close(fd);
-    
+
             wps_data->wps_loaded = true;
-    
+
             return start > 0;
         }
     }

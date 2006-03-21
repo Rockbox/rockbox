@@ -22,6 +22,30 @@
 #include "config.h"
 #include "timefuncs.h"
 
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == ONDIO_PAD)
+#define PITCH_UP BUTTON_UP
+#define PITCH_DOWN BUTTON_DOWN
+#define PITCH_RIGHT BUTTON_RIGHT
+#define PITCH_LEFT BUTTON_LEFT
+#define PITCH_EXIT BUTTON_OFF
+#define PITCH_RESET BUTTON_ON
+#elif (CONFIG_KEYPAD == ONDIO_PAD)
+#define PITCH_UP BUTTON_UP
+#define PITCH_DOWN BUTTON_DOWN
+#define PITCH_RIGHT BUTTON_RIGHT
+#define PITCH_LEFT BUTTON_LEFT
+#define PITCH_EXIT BUTTON_OFF
+#define PITCH_RESET BUTTON_MENU
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#define PITCH_UP BUTTON_SCROLL_FWD
+#define PITCH_DOWN BUTTON_SCROLL_BACK
+#define PITCH_RIGHT BUTTON_RIGHT
+#define PITCH_LEFT BUTTON_LEFT
+#define PITCH_EXIT BUTTON_SELECT
+#define PITCH_RESET BUTTON_MENU
+#endif
+
 struct screen;
 
 void usb_display_info(struct screen * display);
@@ -33,11 +57,9 @@ void charging_splash(void);
 int mmc_remove_request(void);
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
-    || CONFIG_KEYPAD == IRIVER_H300_PAD
-int pitch_screen(void);
-#endif
-#if CONFIG_KEYPAD == RECORDER_PAD 
+bool pitch_screen(void);
+
+#if CONFIG_KEYPAD == RECORDER_PAD
 extern bool quick_screen_f3(int button_enter);
 #endif
 extern bool quick_screen_quick(int button_enter);
