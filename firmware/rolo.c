@@ -93,7 +93,7 @@ int rolo_load(const char* filename)
 {
     int fd;
     long length;
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     int i;
     unsigned long checksum,file_checksum;
 #else
@@ -117,7 +117,7 @@ int rolo_load(const char* filename)
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
 
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {
