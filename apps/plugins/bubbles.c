@@ -43,9 +43,6 @@ PLUGIN_HEADER
 #define BB_WIDTH  8
 #define BB_LEVEL_HEIGHT BB_HEIGHT-2
 
-/* animation fps */
-#define MAX_FPS 20
-
 /* various amount */
 #define NUM_SCORES   10
 #define NUM_LEVELS   100
@@ -109,6 +106,7 @@ PLUGIN_HEADER
 #define XOFS       72
 #define ROW_HEIGHT 18
 #define ROW_INDENT 13
+#define MAX_FPS    40
 
 /* 16x16 bubbles (H300, iPod Color) */
 #elif (LCD_HEIGHT == 176) && (LCD_WIDTH == 220)
@@ -117,6 +115,7 @@ PLUGIN_HEADER
 #define XOFS       46
 #define ROW_HEIGHT 14
 #define ROW_INDENT 8
+#define MAX_FPS    30
 
 /* 16x16 bubbles (Gigabeat) */
 #elif (LCD_HEIGHT == 320) && (LCD_WIDTH == 240)
@@ -125,6 +124,7 @@ PLUGIN_HEADER
 #define XOFS       56
 #define ROW_HEIGHT 14
 #define ROW_INDENT 8
+#define MAX_FPS    20
 
 /* 12x12 bubbles (iPod Nano) */
 #elif (LCD_HEIGHT == 132) && (LCD_WIDTH == 176)
@@ -133,6 +133,7 @@ PLUGIN_HEADER
 #define XOFS       40
 #define ROW_HEIGHT 10
 #define ROW_INDENT 6
+#define MAX_FPS    40
 
 /* 12x12 bubbles (H100, iAudio X5, iPod 3G, iPod 4G grayscale) */
 #elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
@@ -141,6 +142,7 @@ PLUGIN_HEADER
 #define XOFS       33
 #define ROW_HEIGHT 10
 #define ROW_INDENT 6
+#define MAX_FPS    30
 
 #else
     #error BUBBLES: Unsupported LCD type
