@@ -49,7 +49,7 @@
 #include "button.h"
 #include <string.h>
 
-#ifdef HAVE_UDA1380
+#ifdef CPU_COLDFIRE
 
 #ifdef HAVE_SPDIF_OUT
 #define EBU_DEFPARM        ((7 << 12) | (3 << 8) | (1 << 5) | (5 << 2))
@@ -114,16 +114,22 @@ void pcm_set_frequency(unsigned int frequency)
     {
     case 11025:
         pcm_freq = 0x4;
+#ifdef HAVE_UDA1380
         uda1380_set_nsorder(3);
+#endif
         break;
     case 22050:
         pcm_freq = 0x6;
+#ifdef HAVE_UDA1380
         uda1380_set_nsorder(3);
+#endif
         break;
     case 44100:
     default:
         pcm_freq = 0xC;
+#ifdef HAVE_UDA1380
         uda1380_set_nsorder(5);
+#endif
         break;
     }
 }
@@ -154,7 +160,9 @@ size_t pcm_get_bytes_waiting(void)
 
 void pcm_mute(bool mute)
 {
+#ifdef HAVE_UDA1380
     uda1380_mute(mute);
+#endif
     if (mute)
         sleep(HZ/16);
 }
