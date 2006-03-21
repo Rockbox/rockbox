@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include <inttypes.h>
 #include <string.h>
+#include <sound.h>
 #include "dsp.h"
 #include "eq.h"
 #include "kernel.h"
@@ -224,6 +225,8 @@ struct crossfeed_data crossfeed_data IBSS_ATTR;
 static struct eq_state eq_data;
 
 static int pitch_ratio = 1000;
+static int channels_mode = 0;
+static int32_t sw_gain, sw_cross;
 
 extern int current_codec;
 struct dsp_config *dsp;
@@ -773,6 +776,70 @@ static void apply_gain(int32_t* _src[], int _count)
     }
 }
 
+void channels_set(int value)
+{
+    channels_mode =  value;    
+}
+
+void stereo_width_set(int value)
+{
+    long width, straight, cross;
+    
+    width = value*0x7fffff/100;
+    if (value <= 100) {
+        straight = (0x7fffff + width)/2;
+        cross = straight - width;
+    } else {
+        straight = 0x7fffff; 
+        cross = 0x7fffff - ((int64_t)(2*width) << 23)/(0x7fffff + width);
+    }
+    sw_gain = straight << 8;
+    sw_cross = cross << 8;
+}
+
+/* Implements the different channel configurations and stereo width.
+ * We might want to combine this with the write_samples stage for efficiency,
+ * but for now we'll just let it stay as a stage of its own. 
+ */
+static void channels_process(int32_t **src, int num)
+{
+    int i;
+    int32_t *sl = src[0], *sr = src[1];
+
+    if (channels_mode == SOUND_CHAN_STEREO)
+        return;
+    switch (channels_mode) {
+    case SOUND_CHAN_MONO:
+        for (i = 0; i < num; i++)
+            sl[i] = sr[i] = sl[i]/2 + sr[i]/2;
+        break;
+    case SOUND_CHAN_CUSTOM:
+        for (i = 0; i < num; i++) {
+            int32_t left_sample = sl[i];
+
+            sl[i] = FRACMUL(sl[i], sw_gain) + FRACMUL(sr[i], sw_cross);
+            sr[i] = FRACMUL(sr[i], sw_gain) + FRACMUL(left_sample, sw_cross);
+        }
+        break;
+    case SOUND_CHAN_MONO_LEFT:
+        for (i = 0; i < num; i++)
+            sr[i] = sl[i];
+        break;
+    case SOUND_CHAN_MONO_RIGHT:
+        for (i = 0; i < num; i++)
+            sl[i] = sr[i];
+        break;
+    case SOUND_CHAN_KARAOKE:
+        for (i = 0; i < num; i++) {
+            int32_t left_sample = sl[i];
+            
+            sl[i] -= sr[i];
+            sr[i] -= left_sample;
+        }
+        break;
+    }
+}
+
 static void write_samples(short* dst, int32_t* src[], int count)
 {
     int32_t* s0 = src[0];
@@ -843,6 +910,8 @@ long dsp_process(char* dst, const char* src[], long size)
             apply_crossfeed(tmp, samples);
         if (dsp->eq_enabled)
             eq_process(tmp, samples);
+        if (dsp->stereo_mode != STEREO_MONO)
+            channels_process(tmp, samples);
         write_samples((short*) dst, tmp, samples);
         written += samples;
         dst += samples * sizeof(short) * 2;

@@ -950,8 +950,13 @@ void sound_settings_apply(void)
     sound_set(SOUND_TREBLE, global_settings.treble);
     sound_set(SOUND_BALANCE, global_settings.balance);
     sound_set(SOUND_VOLUME, global_settings.volume);
+#if CONFIG_CODEC == SWCODEC
+    channels_set(global_settings.channel_config);
+    stereo_width_set(global_settings.stereo_width);
+#else
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     sound_set(SOUND_LOUDNESS, global_settings.loudness);
     sound_set(SOUND_AVC, global_settings.avc);

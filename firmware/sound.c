@@ -458,10 +458,14 @@ static void set_prescaled_volume(void)
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
 #endif /* !SIMULATOR */
 
+#if CONFIG_CODEC != SWCODEC
 int channel_configuration = SOUND_CHAN_STEREO;
 int stereo_width = 100;
+#endif
 
 #ifndef SIMULATOR
+
+#if CONFIG_CODEC != SWCODEC
 static void set_channel_config(void)
 {
     /* default values: stereo */
@@ -539,6 +543,8 @@ static void set_channel_config(void)
     mas_writemem(MAS_BANK_D1, 0x7fb, &val_rr, 1); /* RR */
 #endif
 }
+
+#endif /* CONFIG_CODEC != SWCODEC */
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
 unsigned long mdb_shape_shadow = 0;
@@ -631,19 +637,27 @@ void sound_set_treble(int value)
 
 void sound_set_channels(int value)
 {
+#if CONFIG_CODEC == SWCODEC
+    (void)value;
+#else
     if(!audio_is_initialized)
         return;
     channel_configuration = value;
-    set_channel_config();  
+    set_channel_config();
+#endif
 }
 
 void sound_set_stereo_width(int value)
 {
+#if CONFIG_CODEC == SWCODEC
+    (void)value;
+#else
     if(!audio_is_initialized)
         return;
     stereo_width = value;
     if (channel_configuration == SOUND_CHAN_CUSTOM)
         set_channel_config();
+#endif
 }
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)

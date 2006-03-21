@@ -83,6 +83,14 @@ bool set_sound(const unsigned char * string,
     else if (*unit == 'H')
         talkunit = UNIT_HERTZ;
     if(!numdec)
+#if CONFIG_CODEC == SWCODEC
+        /* We need to hijack this one and send it off to apps/dsp.c instead of
+           firmware/sound.c */
+        if (setting == SOUND_STEREO_WIDTH)
+            return set_int(string, unit, talkunit,  variable, &stereo_width_set,
+                           steps, min, max, NULL );
+        else
+#endif   
         return set_int(string, unit, talkunit,  variable, sound_callback,
                        steps, min, max, NULL );
     else
@@ -375,8 +383,13 @@ static bool chanconf(void)
         { STR(LANG_CHANNEL_RIGHT) },
         { STR(LANG_CHANNEL_KARAOKE) }
     };
+#if CONFIG_CODEC == SWCODEC
+    return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
+                      names, 6, channels_set);
+#else
     return set_option(str(LANG_CHANNEL), &global_settings.channel_config, INT,
                       names, 6, sound_set_channels);
+#endif
 }
 
 static bool stereo_width(void)

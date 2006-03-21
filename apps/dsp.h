@@ -57,4 +57,7 @@ void dsp_set_crossfeed(bool enable);
 void dsp_eq_update_data(bool enabled, int band);
 void sound_set_pitch(int r);
 int sound_get_pitch(void);
+void channels_set(int value);
+void stereo_width_set(int value);
+
 #endif
