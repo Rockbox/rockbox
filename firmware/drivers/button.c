@@ -359,7 +359,6 @@ static int ipod_3g_button_read(void)
 
     if ((state & 0x20) == 0) {
         /* 3g hold switch is active low */
-        btn |= BUTTON_HOLD;
         was_hold = 1;
         /* hold switch on 3g causes all outputs to go low */
         /* we shouldn't interpret these as key presses */

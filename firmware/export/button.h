@@ -221,18 +221,9 @@ bool remote_button_hold(void);
 
 #define BUTTON_PLAY         0x00000040
 
-#if CONFIG_KEYPAD == IPOD_3G_PAD
-#define  BUTTON_HOLD        0x00000100
-/* TODO Does the BUTTON_HOLD need to be here? */
-#define BUTTON_MAIN (BUTTON_SELECT|BUTTON_MENU\
-                |BUTTON_LEFT|BUTTON_RIGHT\
-                |BUTTON_SCROLL_FWD|BUTTON_SCROLL_BACK\
-                |BUTTON_PLAY|BUTTON_HOLD)
-#else
 #define BUTTON_MAIN (BUTTON_SELECT|BUTTON_MENU\
                 |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_SCROLL_FWD\
                 |BUTTON_SCROLL_BACK|BUTTON_PLAY)
-#endif
 
 #define BUTTON_REMOTE 0
 
