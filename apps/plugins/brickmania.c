@@ -775,7 +775,7 @@ void sleep (int secs)
 }
 
 
-#define HIGH_SCORE "highscore.cfg"
+#define HIGH_SCORE "brickmania.score"
 #define MENU_LENGTH 4
 int game_menu(int when)
 {

@@ -926,7 +926,7 @@ static unsigned int jewels_nextlevel(struct game_context* bj) {
 }
 
 /*****************************************************************************
-* bejeweld_recordscore() inserts a high score into the high scores list and
+* jewels_recordscore() inserts a high score into the high scores list and
 *     returns the high score position.
 ******************************************************************************/
 static int jewels_recordscore(struct game_context* bj) {
@@ -1048,9 +1048,9 @@ static void jewels_callback(void* param) {
 }
 
 /*****************************************************************************
-* bejeweled() is the main game subroutine, it returns the final game status.
+* jewels_main() is the main game subroutine, it returns the final game status.
 ******************************************************************************/
-static int bejeweled(struct game_context* bj) {
+static int jewels_main(struct game_context* bj) {
     int i, j;
     int w, h;
     int button;
@@ -1432,7 +1432,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     jewels_setcolors();
 
     while(!exit) {
-        switch(bejeweled(&bj)){
+        switch(jewels_main(&bj)){
             case BJ_LOSE:
                 rb->splash(HZ*2, true, "No more moves!");
                 /* fall through to BJ_END */
