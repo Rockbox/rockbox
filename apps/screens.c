@@ -983,7 +983,7 @@ bool browse_id3(void)
     char buf[64];
     const struct mp3entry* id3 = audio_current_track();
 #if defined(HAVE_LCD_BITMAP)
-    const int y_margin = lcd_getymargin();
+    const int y_margin = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
     const int line_height = font_get(FONT_UI)->height;
     const int rows = (LCD_HEIGHT - y_margin) / line_height;
     const bool show_scrollbar = global_settings.scrollbar

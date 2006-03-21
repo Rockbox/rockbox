@@ -709,7 +709,20 @@ long gui_wps_show(void)
 
 #ifdef WPS_ID3
             case WPS_ID3:
+#ifdef HAVE_LCD_COLOR
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+#endif
                 browse_id3();
+#ifdef HAVE_LCD_COLOR
+                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
+                    lcd_set_backdrop(&wps_backdrop[0][0]);
+#endif
+#ifdef HAVE_LCD_BITMAP
+                FOR_NB_SCREENS(i)
+                {
+                    gui_wps_set_margin(&gui_wps[i]);
+                }
+#endif
                 restore = true;
                 break;
 #endif
