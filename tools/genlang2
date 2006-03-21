@@ -1,4 +1,14 @@
 #!/usr/bin/perl -s
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
+# Copyright (C) 2006 by Daniel Stenberg
+#
 
 if(!$ARGV[0]) {
     print <<MOO
@@ -130,7 +140,8 @@ sub voice {
     parsetarget("voice", \$voice, @_);
 }
 
-my $idcount; # counter for ID numbers
+my $idcount; # counter for lang ID numbers
+my $voiceid=0x8000; # counter for voice-only ID numbers
 
 open(LANG, "<$input");
 while(<LANG>) {
@@ -150,22 +161,28 @@ while(<LANG>) {
         if($part =~ /^\//) {
             if($part eq "/phrase") {
                 my $idstr = $phrase{'id'};
+                my $idnum;
+                
+                if($idstr =~ /^VOICE/) {
+                    $idnum = $voiceid++;
+                }
+                else {
+                    $idnum = $idcount++;
+                }
 
-                $id{$idstr} = $idcount;
-                $idnum[$idcount]=$idstr;
+                $id{$idstr} = $idnum;
+                $idnum[$idnum]=$idstr;
 
                 $source{$idstr}=$src;
                 $dest{$idstr}=$dest;
                 $voice{$idstr}=$voice;
 
                 if($verbose) {
-                    print "id: $phrase{id}\n";
+                    print "id: $phrase{id} ($idnum)\n";
                     print "source: $src\n";
                     print "dest: $dest\n";
                     print "voice: $voice\n";
                 }
-
-                $idcount++;
 
                 undef $src;
                 undef $dest;
@@ -208,7 +225,16 @@ print HFILE <<MOO
 MOO
     ;
 
-# TODO: add voice-only phrase IDs here
+# Output the ID names for the enum in the header file
+my $i;
+for $i (0x8000 .. ($voiceid-1)) {
+    my $name=$idnum[$i]; # get the ID name
+
+    $name =~ s/\"//g; # cut off the quotes
+
+    printf HFILE ("    %s,\n", $name);
+}
+
 
 # Output end of enum
 print HFILE <<MOO
