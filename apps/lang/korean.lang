@@ -1103,7 +1103,7 @@ id: LANG_QUEUE
 desc: The verb/action Queue
 eng: "Queue"
 voice: "Queue"
-new: "재생목록에 예약"
+new: "현재 재생목록에 예약"
 
 id: LANG_DELETE
 desc: The verb/action Delete
@@ -1513,7 +1513,7 @@ id: LANG_QUEUE_LAST
 desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Queue last"
-new: "재생목록 마지막에 예약"
+new: "현재 재생목록 마지막에 예약"
 
 id: LANG_INSERT
 desc: in onplay menu.  insert a track/playlist into dynamic playlist.
@@ -1922,7 +1922,7 @@ id: LANG_INFO_MENU
 desc: in the info sub menu
 eng: "Rockbox Info"
 voice: "Rockbox Info"
-new: "Rockbox 정보"
+new: "시스템 정보"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
@@ -3764,19 +3764,19 @@ new: "RGB 코드: %02X%02X%02X"
 id: LANG_BACKGROUND_COLOR
 desc: menu entry to set the background color
 eng: "Background Colour"
-voice:
+voice: "Background Colour"
 new: "배경색 변경"
 
 id: LANG_FOREGROUND_COLOR
 desc: menu entry to set the foreground color
 eng: "Foreground Colour"
-voice:
+voice: "Foreground Colour"
 new: "글자색 변경"
 
 id: LANG_RESET_COLORS
 desc: menu
 eng: "Reset Colours"
-voice:
+voice: "Reset Colours"
 new: "색상 초기화"
 
 id: LANG_COLOR_UNACCEPTABLE
@@ -3796,3 +3796,39 @@ desc: splash number of tracks inserted
 eng: "Searching... %d found (%s)"
 voice: ""
 new: "검색중... 현재 %d개를 찾았습니다. (%s)"
+
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Party Mode"
+new: "예약 모드"
+
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Cut"
+new: "잘라내기"
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Copy"
+new: "복사"
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Paste"
+new: "붙여넣기"
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice: "File or directory exists. Overwrite?"
+new: "이미 같은 이름의 파일 또는 폴더가 있습니다. 덮어 쓰시겠습니까?"
+
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "Pitch"
+new: "재생속도 변경"
