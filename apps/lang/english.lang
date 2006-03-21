@@ -3764,19 +3764,19 @@ new:
 id: LANG_BACKGROUND_COLOR
 desc: menu entry to set the background color
 eng: "Background Colour"
-voice:
+voice: "Background Colour"
 new:
 
 id: LANG_FOREGROUND_COLOR
 desc: menu entry to set the foreground color
 eng: "Foreground Colour"
-voice:
+voice: "Foreground Colour"
 new:
 
 id: LANG_RESET_COLORS
 desc: menu
 eng: "Reset Colours"
-voice:
+voice: "Reset Colours"
 new:
 
 id: LANG_COLOR_UNACCEPTABLE
