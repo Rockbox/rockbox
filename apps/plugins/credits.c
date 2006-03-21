@@ -40,7 +40,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_double_height(false);
 #endif
 
-    for (j = 0; j < 10; j++) {
+    for (j = 0; j < 15; j++) {
         rb->sleep((HZ*2)/10);
 
         btn = rb->button_get(false);
@@ -114,7 +114,7 @@ static int minisin[]={
 #if 1
     1, 2, 2, 3, 3, 3, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0
 #else
-    1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, -1, -1, -1, 0, 0, 
+    1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, -1, -1, -1, 0, 0,
 #endif
 };
 
