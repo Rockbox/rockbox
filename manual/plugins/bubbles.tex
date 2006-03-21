@@ -1,0 +1,44 @@
+\subsection{Bubbles}
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=4cm]{plugins/images/ss-bubbles-\genericimg.png}
+\end{center}
+\caption{Bubbles}
+\end{figure}
+The goal of the game is to beat each level as quickly as possible by clearing
+the board of all bubbles. Bubbles are removed from the board when a cluster of
+three of more of the same type is formed. The game is over when any bubbles on
+the board extend below the bottom line. To make things more difficult, the
+entire board is shifted down every time a certain number of shots have been
+fired. Points are awarded depending on how quickly the level was completed.
+
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    \multicolumn{2}{c}{\textbf{In menu}}\\\hline
+    \opt{IRIVER_H100_PAD}{\ButtonOn}\opt{IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonPlay} & Start new game\\
+    \opt{IRIVER_H100_PAD}{\ButtonMode}\opt{IPOD_4G_PAD}
+        {\ButtonLeft+\ButtonRight}\opt{IAUDIO_X5_PAD}{\ButtonRec}
+        & Resume saved game\\
+    \ButtonSelect & Show high scores\\
+    \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonUp/\ButtonDown}
+        \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
+        & Select starting level\\
+    \opt{IRIVER_H100_PAD}{\ButtonOff}\opt{IPOD_4G_PAD}{\ButtonMenu}
+        \opt{IAUDIO_X5_PAD}{\ButtonPower} & Quit\\\hline
+    \multicolumn{2}{c}{\textbf{In game}}\\\hline
+    \opt{IRIVER_H100_PAD}{\ButtonOn}\opt{IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonPlay} & Pause game\\
+    \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonLeft/\ButtonRight}
+        \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
+        & Aim the bubble\\
+    \ButtonSelect & Fire bubble\\
+    \opt{IRIVER_H100_PAD}{\ButtonMode}\opt{IPOD_4G_PAD}{\ButtonLeft+\ButtonRight}
+        \opt{IAUDIO_X5_PAD}{\ButtonRec} & Save game\\
+    \opt{IRIVER_H100_PAD}{\ButtonOff}\opt{IPOD_4G_PAD}{\ButtonMenu}
+        \opt{IAUDIO_X5_PAD}{\ButtonPower} & Exit to menu\\\bottomrule
+    \end{tabular}
+    \end{center}
+\end{table}
