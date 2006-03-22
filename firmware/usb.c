@@ -41,6 +41,9 @@
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
+#ifdef TARGET_TREE
+#include "usb-target.h"
+#endif
 
 extern void dbg_ports(void); /* NASTY! defined in apps/ */
 
@@ -99,6 +102,7 @@ static struct event_queue usb_queue;
 static bool last_usb_status;
 static bool usb_monitor_enabled;
 
+#ifndef TARGET_TREE
 void usb_enable(bool on)
 {
 #ifdef USB_ENABLE_ONDIOSTYLE
@@ -203,6 +207,7 @@ void usb_enable(bool on)
     or_b(0x04, &PAIORH);
 #endif
 }
+#endif
 
 #ifndef BOOTLOADER
 static void usb_slave_mode(bool on)
@@ -381,6 +386,7 @@ static void usb_thread(void)
 }
 #endif
 
+#ifndef TARGET_TREE
 bool usb_detect(void)
 {
     bool current_status;
@@ -414,6 +420,7 @@ bool usb_detect(void)
 #endif
     return current_status;
 }
+#endif
 
 #ifndef BOOTLOADER
 static void usb_tick(void)
