@@ -453,6 +453,10 @@ static void set_prescaled_volume(void)
     uda1380_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
     wmcodec_set_master_vol(tenthdb2master(l), tenthdb2master(r));
+#if defined(HAVE_WM8975) || defined(HAVE_WM8758)
+    wmcodec_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
+#endif
+
 #endif
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */

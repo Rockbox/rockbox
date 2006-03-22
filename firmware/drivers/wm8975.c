@@ -176,6 +176,11 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     wm8975_write(LOUT1VOL, vol_l);
     wm8975_write(ROUT1VOL, 0x100 | vol_r);
 
+    return 0;
+}
+
+int wmcodec_set_lineout_vol(int vol_l, int vol_r)
+{
     /* OUT2 */
     wm8975_write(LOUT2VOL, vol_l);
     wm8975_write(ROUT2VOL, 0x100 | vol_r);
