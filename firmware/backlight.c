@@ -44,14 +44,23 @@
 #include "backlight-target.h"
 #endif
 
+#ifdef SIMULATOR
+void __backlight_on(void)
+{
+    sim_backlight(100);
+}
+
+static inline void __backlight_off(void)
+{
+    sim_backlight(0);
+}
+#else
 /* Basic low-level code that simply switches backlight on or off. Probably
  * a nice candidate for inclusion in the target/ dir. */
 #ifndef TARGET_TREE
 static inline void __backlight_on(void)
 {
-#ifdef SIMULATOR
-    sim_backlight(100);
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     and_l(~0x00020000, &GPIO1_OUT);
 #elif CONFIG_BACKLIGHT == BL_IRIVER_H300
     lcd_enable(true);
@@ -90,9 +99,7 @@ static inline void __backlight_on(void)
 
 static inline void __backlight_off(void)
 {
-#ifdef SIMULATOR
-    sim_backlight(0);
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
     or_l(0x00020000, &GPIO1_OUT);
 #elif CONFIG_BACKLIGHT == BL_IRIVER_H300
     and_l(~0x00020000, &GPIO1_OUT);
@@ -126,6 +133,7 @@ static inline void __backlight_off(void)
 #endif
 }
 #endif
+#endif /* SIMULATOR */
 
 #if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
 
