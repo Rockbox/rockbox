@@ -423,10 +423,10 @@ next_track:
     chunksize = (1 + avgbytespersec / (50*blockalign))*blockalign;
     /* check that the output buffer is big enough (convert to samplespersec,
        then round to the blockalign multiple below) */
-    if (((uint64_t)chunksize*ci->id3->frequency*channels*sizeof(long))
+    if (((uint64_t)chunksize*ci->id3->frequency*channels*2)
         /(uint64_t)avgbytespersec >= WAV_CHUNK_SIZE) {
         chunksize = ((uint64_t)WAV_CHUNK_SIZE*avgbytespersec
-                     /((uint64_t)ci->id3->frequency*channels*sizeof(long) 
+                     /((uint64_t)ci->id3->frequency*channels*2
                      *blockalign))*blockalign;
     }
 
@@ -500,14 +500,15 @@ next_track:
 
             for (i = 0; i < nblocks; i++) {
                 size_t decodedsize = samplesperblock*channels;
-                if (decode_dvi_adpcm(ci, ((uint8_t *)wavbuf) + i*blockalign,
+                if (decode_dvi_adpcm(ci, wavbuf + i*blockalign,
                                      blockalign, channels, bitspersample,
                                      samples + i*samplesperblock*channels,
-                                     &decodedsize) != CODEC_OK)
+                                     &decodedsize) != CODEC_OK) {
                     i = CODEC_ERROR;
-                goto exit;
+                    goto exit;
+                }
             }
-            bufsize = nblocks*samplesperblock*channels*2;
+            bufsize = nblocks*samplesperblock*channels*4;
         } else {
             DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
             i = CODEC_ERROR;
@@ -561,7 +562,7 @@ decode_dvi_adpcm(struct codec_api *ci,
     for (c = 0; c < channels && n >= 4; c++) {
         /* decode + push first sample */
         sample[c] = (short)(buf[0]|(buf[1]<<8));/* need cast for sign-extend */
-        pcmout[c] = sample[c];
+        pcmout[c] = sample[c] << 13;
         nsamples++;
         stepindex[c] = buf[2];
         /* check for step table index overflow */
