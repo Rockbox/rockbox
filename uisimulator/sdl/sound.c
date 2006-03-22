@@ -33,7 +33,7 @@ static bool pcm_playing;
 static bool pcm_paused;
 
 static Uint8* pcm_data;
-static Uint32 pcm_data_size;
+static size_t pcm_data_size;
 
 extern bool debug_audio;
 
@@ -97,7 +97,7 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
-    Uint32 next_size;
+    size_t next_size;
     Uint8 *next_start;
     
     if (!pcm_playing) {
