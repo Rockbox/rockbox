@@ -886,11 +886,6 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         int width;
         const unsigned char *bits;
 
-        /* check input range */
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
-
         /* get proportional width and glyph bits */
         width = font_get_width(pf,ch);
 

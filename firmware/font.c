@@ -389,10 +389,6 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
 
     for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
     {
-        /* check input range*/
-        if (ch < pf->firstchar || ch >= pf->firstchar+pf->size)
-            ch = pf->defaultchar;
-        ch -= pf->firstchar;
 
         /* get proportional width and glyph bits*/
         width += font_get_width(pf,ch);
@@ -467,6 +463,11 @@ static void cache_create(int maxwidth, int height)
  */
 int font_get_width(struct font* pf, unsigned short char_code)
 {
+    /* check input range*/
+    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+        char_code = pf->defaultchar;
+    char_code -= pf->firstchar;
+
     return (fnt_file >= 0 && pf != &sysfont)?
         font_cache_get(&font_cache_ui,char_code,load_cache_entry,pf)->width:
         pf->width? pf->width[char_code]: pf->maxwidth;
@@ -475,6 +476,12 @@ int font_get_width(struct font* pf, unsigned short char_code)
 const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 {
     const unsigned char* bits;
+
+    /* check input range*/
+    if (char_code < pf->firstchar || char_code >= pf->firstchar+pf->size)
+        char_code = pf->defaultchar;
+    char_code -= pf->firstchar;
+
     if (fnt_file >= 0 && pf != &sysfont)
     {
         bits =
@@ -493,11 +500,15 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 void glyph_file_write(void* data)
 {
     struct font_cache_entry* p = data;
+    struct font* pf = &font_ui;
+    unsigned short ch;
     unsigned char tmp[2];
 
-    if (p->_char_code != 0xffff && glyph_file >= 0) {
-        tmp[0] = p->_char_code >> 8;
-        tmp[1] = p->_char_code & 0xff;
+    ch = p->_char_code + pf->firstchar;
+
+    if (ch != 0xffff && glyph_file >= 0) {
+        tmp[0] = ch >> 8;
+        tmp[1] = ch & 0xff;
         if (write(glyph_file, tmp, 2) != 2) {
             close(glyph_file);
             glyph_file = -1;
@@ -545,8 +556,8 @@ void glyph_cache_load(void)
             close(fd);
         } else {
             /* load latin1 chars into cache */
-            ch = 255 - pf->firstchar;
-            while (ch--)
+            ch = 256;
+            while (ch-- > 32)
                 font_get_bits(pf, ch);
         }
     }
