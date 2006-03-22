@@ -136,6 +136,27 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
 static struct travel_data dir_recursion[MAX_SCAN_DEPTH];
 
 /**
+ * Returns true if there is an event waiting in the queue
+ * that requires the current operation to be aborted.
+ */
+static bool check_event_queue(void)
+{
+    struct event ev;
+    
+    queue_wait_w_tmo(&dircache_queue, &ev, 0);
+    switch (ev.id)
+    {
+        case DIRCACHE_STOP:
+        case SYS_USB_CONNECTED:
+            /* Put the event back into the queue. */
+            queue_post(&dircache_queue, ev.id, ev.data);
+            return true;
+    }
+    
+    return false;
+}
+
+/**
  * Internal function to iterate a path.
  */
 static int dircache_scan(struct travel_data *td)
@@ -145,7 +166,7 @@ static int dircache_scan(struct travel_data *td)
         if (thread_enabled)
         {
             /* Stop if we got an external signal. */
-            if (!queue_empty(&dircache_queue))
+            if (check_event_queue())
                 return -6;
             yield();
         }
