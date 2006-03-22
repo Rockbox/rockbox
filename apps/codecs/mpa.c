@@ -54,7 +54,7 @@ int64_t samplecount;
 int64_t samplesdone;
 int stop_skip, start_skip;
 int current_stereo_mode = -1;
-unsigned int current_frequency = 0;
+unsigned long current_frequency = 0;
 
 void recalc_samplecount(void)
 {

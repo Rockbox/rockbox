@@ -96,7 +96,7 @@ next_track:
     }
 
     ci->id3->frequency = sc.sample_rate;
-    ci->configure(DSP_SET_FREQUENCY, (long *)(sc.sample_rate));
+    ci->configure(DSP_SET_FREQUENCY, (long *)(long)(sc.sample_rate));
 
     if (sc.sample_rate) {
         ci->id3->length = (sc.totalsamples / sc.sample_rate) * 1000;
