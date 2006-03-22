@@ -37,6 +37,10 @@
 #include "file.h"
 #include "uda1380.h"
 
+#include "pcf50606.h"
+
+#include <stdarg.h>
+
 #define DRAM_START 0x31000000
 
 int line = 0;
@@ -47,6 +51,25 @@ int usb_screen(void)
 }
 
 char version[] = APPSVERSION;
+
+char printfbuf[256];
+
+void printf(const char *format, ...)
+{
+    int len;
+    unsigned char *ptr;
+    va_list ap;
+    va_start(ap, format);
+
+    ptr = printfbuf;
+    len = vsnprintf(ptr, sizeof(printfbuf), format, ap);
+    va_end(ap);
+
+    lcd_puts(0, line++, ptr);
+    lcd_update();
+    if(line >= 16)
+        line = 0;
+}
 
 void start_iriver_fw(void)
 {
@@ -70,7 +93,6 @@ int load_firmware(void)
     unsigned long sum;
     int i;
     unsigned char *buf = (unsigned char *)DRAM_START;
-    char str[80];
     
     fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
     if(fd < 0)
@@ -82,8 +104,7 @@ int load_firmware(void)
 
     len = filesize(fd) - 8;
 
-    snprintf(str, 80, "Length: %x", len);
-    lcd_puts(0, line++, str);
+    printf("Length: %x", len);
     lcd_update();
 
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
@@ -92,8 +113,7 @@ int load_firmware(void)
     if(rc < 4)
         return -2;
 
-    snprintf(str, 80, "Checksum: %x", chksum);
-    lcd_puts(0, line++, str);
+    printf("Checksum: %x", chksum);
     lcd_update();
 
     rc = read(fd, model, 4);
@@ -102,8 +122,7 @@ int load_firmware(void)
 
     model[4] = 0;
     
-    snprintf(str, 80, "Model name: %s", model);
-    lcd_puts(0, line++, str);
+    printf("Model name: %s", model);
     lcd_update();
 
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
@@ -120,8 +139,7 @@ int load_firmware(void)
         sum += buf[i];
     }
 
-    snprintf(str, 80, "Sum: %x", sum);
-    lcd_puts(0, line++, str);
+    printf("Sum: %x", sum);
     lcd_update();
 
     if(sum != chksum)
@@ -148,12 +166,71 @@ void main(void)
 {
     int i;
     int rc;
-    char buf[256];
     bool rc_on_button = false;
     bool on_button = false;
     int data;
     int adc_battery, battery_voltage, batt_int, batt_frac;
 
+#ifdef IAUDIO_X5
+    (void)rc_on_button;
+    (void)on_button;
+    (void)data;
+    power_init();
+
+    system_init();
+    kernel_init();
+
+    set_cpu_frequency(CPUFREQ_NORMAL);
+
+    set_irq_level(0);
+    lcd_init();
+    font_init();
+    adc_init();
+    button_init();
+
+    printf("Rockbox boot loader");
+    printf("Version %s", version);
+    lcd_update();
+
+    adc_battery = adc_read(ADC_BATTERY);
+
+    battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
+    batt_int = battery_voltage / 100;
+    batt_frac = battery_voltage % 100;
+    
+    printf("Batt: %d.%02dV", batt_int, batt_frac);
+    lcd_update();
+
+    rc = ata_init();
+    if(rc)
+    {
+        printf("ATA error: %d", rc);
+        sleep(HZ*5);
+        power_off();
+    }
+
+    disk_init();
+
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        printf("No partition found");
+        sleep(HZ*5);
+        power_off();
+    }
+
+    printf("Loading firmware");
+    lcd_update();
+    i = load_firmware();
+    printf("Result: %d", i);
+    lcd_update();
+    
+    if(i == 0)
+        start_firmware();
+
+    power_off();
+    
+#else
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
 
@@ -225,9 +302,8 @@ void main(void)
 
     lcd_setfont(FONT_SYSFIXED);
 
-    lcd_puts(0, line++, "Rockbox boot loader");
-    snprintf(buf, sizeof(buf), "Version %s", version);
-    lcd_puts(0, line++, buf);
+    printf("Rockbox boot loader");
+    printf("Version %s", version);
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
@@ -235,7 +311,7 @@ void main(void)
     /* Holding REC while starting runs the original firmware */
     if(((button_status() & BUTTON_REC) == BUTTON_REC) ||
        ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC)) {
-        lcd_puts(0, 8, "Starting original firmware...");
+        printf("Starting original firmware...");
         lcd_update();
         start_iriver_fw();
     }
@@ -244,7 +320,7 @@ void main(void)
        are starting with */
     if(!usb_detect() && ((on_button && button_hold()) ||
        (rc_on_button && remote_button_hold()))) {
-        lcd_puts(0, 8, "HOLD switch on, power off...");
+        printf("HOLD switch on, power off...");
         lcd_update();
         sleep(HZ*2);
 
@@ -270,13 +346,11 @@ void main(void)
     batt_int = battery_voltage / 100;
     batt_frac = battery_voltage % 100;
     
-    snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
-    lcd_puts(0, line++, buf);
+    printf("Batt: %d.%02dV", batt_int, batt_frac);
     lcd_update();
 
     if(battery_voltage <= 300) {
-        line++;
-        lcd_puts(0, line++, "WARNING! BATTERY LOW!!");
+        printf("WARNING! BATTERY LOW!!");
         lcd_update();
         sleep(HZ*2);
     }
@@ -284,12 +358,10 @@ void main(void)
     rc = ata_init();
     if(rc)
     {
-        char str[32];
         lcd_clear_display();
-        snprintf(str, 31, "ATA error: %d", rc);
-        lcd_puts(0, line++, str);
-        lcd_puts(0, line++, "Insert USB cable and press");
-        lcd_puts(0, line++, "a button");
+        printf("ATA error: %d", rc);
+        printf("Insert USB cable and press");
+        printf("a button");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL));
     }
@@ -336,21 +408,22 @@ void main(void)
     if (rc<=0)
     {
         lcd_clear_display();
-        lcd_puts(0, 0, "No partition found");
+        printf("No partition found");
+        lcd_update();
         while(button_get(true) != SYS_USB_CONNECTED) {};
     }
 
-    lcd_puts(0, line++, "Loading firmware");
+    printf("Loading firmware");
     lcd_update();
     i = load_firmware();
-    snprintf(buf, 256, "Result: %d", i);
-    lcd_puts(0, line++, buf);
+    printf("Result: %d", i);
     lcd_update();
 
     if(i == 0)
         start_firmware();
     
     start_iriver_fw();
+#endif /* IAUDIO_X5 */
 }
 
 /* These functions are present in the firmware library, but we reimplement
