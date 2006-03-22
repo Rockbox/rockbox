@@ -98,10 +98,12 @@ PLUGIN_HEADER
 #define CLR_RED  LCD_RGBPACK(255,0,0)   /* used to imply danger */
 #define CLR_BLUE LCD_RGBPACK(0,0,128)   /* used for menu selection */
 #define CLR_CYAN LCD_RGBPACK(0,128,128) /* used for frame and filling */
+#define PLR_COL  LCD_WHITE              /* color used for the player */
 #else
 #define CLR_RED  LCD_DARKGRAY   /* used to imply danger */
-#define CLR_BLUE LCD_LIGHTGRAY  /* used for menu selection */
+#define CLR_BLUE LCD_BLACK      /* used for menu selection */
 #define CLR_CYAN LCD_LIGHTGRAY  /* used for frame and filling */
+#define PLR_COL  LCD_BLACK      /* color used for the player */
 #endif
 
 #define EMPTIED LCD_BLACK       /* empty spot */
@@ -326,11 +328,12 @@ static void refresh_board (void)
     rb->lcd_putsxy (BOARD_X + CUBE_SIZE * BOARD_W - 60,
                     BOARD_Y + CUBE_SIZE * BOARD_H - 8, str);
 
-    rb->lcd_set_foreground (LCD_WHITE);
+    rb->lcd_set_foreground (PLR_COL);
     rb->lcd_set_background (board[player.j][player.i]);
     rb->lcd_mono_bitmap (pics[PIC_PLAYER], player.i * CUBE_SIZE + BOARD_X,
                          player.j * CUBE_SIZE + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
     rb->lcd_set_background (EMPTIED);
+    rb->lcd_set_foreground (LCD_WHITE);
     for (j = 0; j < player.level + STARTING_QIXES; j++)
         rb->lcd_mono_bitmap (pics[PIC_QIX], qixes[j].x + BOARD_X,
                              qixes[j].y + BOARD_Y, CUBE_SIZE, CUBE_SIZE);
