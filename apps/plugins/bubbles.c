@@ -1765,58 +1765,90 @@ static bool bubbles_ingroup(struct game_context* bb, int row, int col) {
 *     type that the current bubble belongs to.
 ******************************************************************************/
 static int bubbles_searchgroup(struct game_context* bb, int row, int col) {
-    int count = 1;
-    int adj = row%2;
-    int mytype = bb->playboard[row][col].type;
+    int i, adj;
+    int myrow, mycol, mytype;
+    int count = 0;
 
-    if (bb->playboard[row][col].ingroup)
-         return 0;
+    struct coord {
+        int row;
+        int col;
+    } search[(2*BB_WIDTH-1)*(BB_HEIGHT/2)];
+
+    /* search initial bubble */
     bb->playboard[row][col].ingroup = true;
+    search[count].row = row;
+    search[count].col = col;
+    count++;
 
-    /* recursively call neighbors */
-    if(col-1 >= 0) {
-        if(bb->playboard[row][col-1].type == mytype &&
-           !bb->playboard[row][col-1].ingroup) {
-            count += bubbles_searchgroup(bb, row, col-1);
-        }
-    }
+    /* breadth-first search neighbors */
+    for(i=0; i<count; i++) {
+        myrow = search[i].row;
+        mycol = search[i].col;
+        mytype = bb->playboard[myrow][mycol].type;
+        adj = myrow%2;
 
-    if(col-1+adj >= 0) {
-        if(row-1 >= 0) {
-            if(bb->playboard[row-1][col-1+adj].type == mytype &&
-               !bb->playboard[row-1][col-1+adj].ingroup) {
-                count += bubbles_searchgroup(bb, row-1, col-1+adj);
+        if(mycol-1 >= 0) {
+            if(bb->playboard[myrow][mycol-1].type == mytype &&
+               !bb->playboard[myrow][mycol-1].ingroup) {
+                bb->playboard[myrow][mycol-1].ingroup = true;
+                search[count].row = myrow;
+                search[count].col = mycol-1;
+                count++;
             }
         }
 
-        if(row+1 < BB_HEIGHT) {
-            if(bb->playboard[row+1][col-1+adj].type == mytype &&
-               !bb->playboard[row+1][col-1+adj].ingroup) {
-                count += bubbles_searchgroup(bb, row+1, col-1+adj);
+        if(mycol-1+adj >= 0) {
+            if(myrow-1 >= 0) {
+                if(bb->playboard[myrow-1][mycol-1+adj].type == mytype &&
+                   !bb->playboard[myrow-1][mycol-1+adj].ingroup) {
+                    bb->playboard[myrow-1][mycol-1+adj].ingroup = true;
+                    search[count].row = myrow-1;
+                    search[count].col = mycol-1+adj;
+                    count++;
+                }
+            }
+
+            if(myrow+1 < BB_HEIGHT) {
+                if(bb->playboard[myrow+1][mycol-1+adj].type == mytype &&
+                   !bb->playboard[myrow+1][mycol-1+adj].ingroup) {
+                    bb->playboard[myrow+1][mycol-1+adj].ingroup = true;
+                    search[count].row = myrow+1;
+                    search[count].col = mycol-1+adj;
+                    count++;
+                }
             }
         }
-    }
 
-    if(col+adj >= 0) {
-        if(row-1 >= 0) {
-            if(bb->playboard[row-1][col+adj].type == mytype &&
-               !bb->playboard[row-1][col+adj].ingroup) {
-                count += bubbles_searchgroup(bb, row-1, col+adj);
+        if(mycol+adj >= 0) {
+            if(myrow-1 >= 0) {
+                if(bb->playboard[myrow-1][mycol+adj].type == mytype &&
+                   !bb->playboard[myrow-1][mycol+adj].ingroup) {
+                    bb->playboard[myrow-1][mycol+adj].ingroup = true;
+                    search[count].row = myrow-1;
+                    search[count].col = mycol+adj;
+                    count++;
+                }
+            }
+
+            if(myrow+1 < BB_HEIGHT) {
+                if(bb->playboard[myrow+1][mycol+adj].type == mytype &&
+                   !bb->playboard[myrow+1][mycol+adj].ingroup) {
+                    bb->playboard[myrow+1][mycol+adj].ingroup = true;
+                    search[count].row = myrow+1;
+                    search[count].col = mycol+adj;
+                    count++;
+                }
             }
         }
 
-        if(row+1 < BB_HEIGHT) {
-            if(bb->playboard[row+1][col+adj].type == mytype &&
-               !bb->playboard[row+1][col+adj].ingroup) {
-                count += bubbles_searchgroup(bb, row+1, col+adj);
+        if(mycol+1 < BB_WIDTH-adj) {
+            if(bb->playboard[myrow][mycol+1].type == mytype &&
+               !bb->playboard[myrow][mycol+1].ingroup) {
+                bb->playboard[myrow][mycol+1].ingroup = true;
+                search[count].row = myrow;
+                search[count].col = mycol+1;
+                count++;
             }
-        }
-    }
-
-    if(col+1 < BB_WIDTH-adj) {
-        if(bb->playboard[row][col+1].type == mytype &&
-           !bb->playboard[row][col+1].ingroup) {
-            count += bubbles_searchgroup(bb, row, col+1);
         }
     }
 
@@ -1875,63 +1907,96 @@ static int bubbles_remove(struct game_context* bb) {
 *     current bubble.
 ******************************************************************************/
 static void bubbles_anchored(struct game_context* bb, int row, int col) {
-    int adj = row%2;
+    int i, adj;
+    int myrow, mycol, mytype;
+    int count = 0;
 
-    if (bb->playboard[row][col].anchored)
-         return;
-    /* mark bubble */
+    struct coord {
+        int row;
+        int col;
+    } search[(2*BB_WIDTH-1)*(BB_HEIGHT/2)];
+
+    /* search initial bubble */
     bb->playboard[row][col].anchored = true;
+    search[count].row = row;
+    search[count].col = col;
+    count++;
 
-    /* recursively call neighbors */
-    if(col-1 >= 0) {
-        if(bb->playboard[row][col-1].type >= 0 &&
-           !bb->playboard[row][col-1].ingroup &&
-           !bb->playboard[row][col-1].anchored) {
-            bubbles_anchored(bb, row, col-1);
-        }
-    }
+    /* breadth-first search neighbors */
+    for(i=0; i<count; i++) {
+        myrow = search[i].row;
+        mycol = search[i].col;
+        mytype = bb->playboard[myrow][mycol].type;
+        adj = myrow%2;
 
-    if(col-1+adj >= 0) {
-        if(row-1 >= 0) {
-            if(bb->playboard[row-1][col-1+adj].type >= 0 &&
-               !bb->playboard[row-1][col-1+adj].ingroup &&
-               !bb->playboard[row-1][col-1+adj].anchored) {
-                bubbles_anchored(bb, row-1, col-1+adj);
+        if(mycol-1 >= 0) {
+            if(bb->playboard[myrow][mycol-1].type >= 0 &&
+               !bb->playboard[myrow][mycol-1].ingroup &&
+               !bb->playboard[myrow][mycol-1].anchored) {
+                bb->playboard[myrow][mycol-1].anchored = true;
+                search[count].row = myrow;
+                search[count].col = mycol-1;
+                count++;
             }
         }
 
-        if(row+1 < BB_HEIGHT) {
-            if(bb->playboard[row+1][col-1+adj].type >= 0 &&
-               !bb->playboard[row+1][col-1+adj].ingroup &&
-               !bb->playboard[row+1][col-1+adj].anchored) {
-                bubbles_anchored(bb, row+1, col-1+adj);
+        if(mycol-1+adj >= 0) {
+            if(myrow-1 >= 0) {
+                if(bb->playboard[myrow-1][mycol-1+adj].type >= 0 &&
+                   !bb->playboard[myrow-1][mycol-1+adj].ingroup &&
+                   !bb->playboard[myrow-1][mycol-1+adj].anchored) {
+                    bb->playboard[myrow-1][mycol-1+adj].anchored = true;
+                    search[count].row = myrow-1;
+                    search[count].col = mycol-1+adj;
+                    count++;
+                }
+            }
+
+            if(myrow+1 < BB_HEIGHT) {
+                if(bb->playboard[myrow+1][mycol-1+adj].type >= 0 &&
+                   !bb->playboard[myrow+1][mycol-1+adj].ingroup &&
+                   !bb->playboard[myrow+1][mycol-1+adj].anchored) {
+                    bb->playboard[myrow+1][mycol-1+adj].anchored = true;
+                    search[count].row = myrow+1;
+                    search[count].col = mycol-1+adj;
+                    count++;
+                }
             }
         }
-    }
 
-    if(col+adj >= 0) {
-        if(row-1 >= 0) {
-            if(bb->playboard[row-1][col+adj].type >= 0 &&
-               !bb->playboard[row-1][col+adj].ingroup &&
-               !bb->playboard[row-1][col+adj].anchored) {
-                bubbles_anchored(bb, row-1, col+adj);
+        if(mycol+adj >= 0) {
+            if(myrow-1 >= 0) {
+                if(bb->playboard[myrow-1][mycol+adj].type >= 0 &&
+                   !bb->playboard[myrow-1][mycol+adj].ingroup &&
+                   !bb->playboard[myrow-1][mycol+adj].anchored) {
+                    bb->playboard[myrow-1][mycol+adj].anchored = true;
+                    search[count].row = myrow-1;
+                    search[count].col = mycol+adj;
+                    count++;
+                }
+            }
+
+            if(myrow+1 < BB_HEIGHT) {
+                if(bb->playboard[myrow+1][mycol+adj].type >= 0 &&
+                   !bb->playboard[myrow+1][mycol+adj].ingroup &&
+                   !bb->playboard[myrow+1][mycol+adj].anchored) {
+                    bb->playboard[myrow+1][mycol+adj].anchored = true;
+                    search[count].row = myrow+1;
+                    search[count].col = mycol+adj;
+                    count++;
+                }
             }
         }
 
-        if(row+1 < BB_HEIGHT) {
-            if(bb->playboard[row+1][col+adj].type >= 0 &&
-               !bb->playboard[row+1][col+adj].ingroup &&
-               !bb->playboard[row+1][col+adj].anchored) {
-                bubbles_anchored(bb, row+1, col+adj);
+        if(mycol+1 < BB_WIDTH-adj) {
+            if(bb->playboard[myrow][mycol+1].type >= 0 &&
+               !bb->playboard[myrow][mycol+1].ingroup &&
+               !bb->playboard[myrow][mycol+1].anchored) {
+                bb->playboard[myrow][mycol+1].anchored = true;
+                search[count].row = myrow;
+                search[count].col = mycol+1;
+                count++;
             }
-        }
-    }
-
-    if(col+1 < BB_WIDTH-adj) {
-        if(bb->playboard[row][col+1].type >= 0 &&
-           !bb->playboard[row][col+1].ingroup &&
-           !bb->playboard[row][col+1].anchored) {
-            bubbles_anchored(bb, row, col+1);
         }
     }
 }
