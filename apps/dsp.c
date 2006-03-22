@@ -1016,7 +1016,7 @@ bool dsp_configure(int setting, void *value)
             sizeof(struct resample_data));
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
-        dsp->codec_frequency = ((int) value == 0) ? NATIVE_FREQUENCY : (int) value;
+        dsp->codec_frequency = ((long) value == 0) ? NATIVE_FREQUENCY : (long) value;
         /* Account for playback speed adjustment when settingg dsp->frequency
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.

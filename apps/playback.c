@@ -755,12 +755,12 @@ static void codec_configure_callback(int setting, void *value)
 {
     switch (setting) {
     case CODEC_SET_FILEBUF_WATERMARK:
-        conf_watermark = (unsigned int)value;
+        conf_watermark = (unsigned long)value;
         set_filebuf_watermark(buffer_margin);
         break;
         
     case CODEC_SET_FILEBUF_CHUNKSIZE:
-        conf_filechunk = (unsigned int)value;
+        conf_filechunk = (unsigned long)value;
         break;
         
     case CODEC_DSP_ENABLE:
