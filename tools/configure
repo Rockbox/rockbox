@@ -700,7 +700,7 @@ toolsdir='\$(ROOTDIR)/tools'
     target="-DIAUDIO_X5"
     memory=16 # always
     coldfirecc
-    tool="$rootdir/tools/scramble -add=h120" # wrong, must be fixed
+    tool="$rootdir/tools/scramble -add=iax5"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     bmp2rb_remotemono="$rootdir/tools/bmp2rb -f 0"
