@@ -45,7 +45,7 @@
 #endif
 
 #ifdef SIMULATOR
-void __backlight_on(void)
+static inline void __backlight_on(void)
 {
     sim_backlight(100);
 }
