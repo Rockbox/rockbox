@@ -212,5 +212,6 @@ target/coldfire/iaudio/x5/adc-x5.c
 target/coldfire/iaudio/x5/ata-x5.c
 target/coldfire/iaudio/x5/system-x5.c
 target/coldfire/iaudio/x5/usb-x5.c
+target/coldfire/iaudio/x5/backlight-x5.c
 #endif
 #endif

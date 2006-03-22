@@ -40,9 +40,13 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
+#ifdef TARGET_TREE
+#include "backlight-target.h"
+#endif
 
 /* Basic low-level code that simply switches backlight on or off. Probably
  * a nice candidate for inclusion in the target/ dir. */
+#ifndef TARGET_TREE
 static inline void __backlight_on(void)
 {
 #ifdef SIMULATOR
@@ -121,7 +125,7 @@ static inline void __backlight_off(void)
     outl(((0x100 | 0) << 3), 0x6000d824);
 #endif
 }
-
+#endif
 
 #if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
 
