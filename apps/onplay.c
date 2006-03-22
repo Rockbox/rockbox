@@ -150,8 +150,8 @@ static bool list_viewers(void)
 static bool shuffle_playlist(void)
 {
     playlist_sort(NULL, true);
-    playlist_randomise(NULL, current_tick, true);    
-    
+    playlist_randomise(NULL, current_tick, true);
+
     return false;
 }
 
@@ -225,7 +225,7 @@ static bool view_playlist(void)
 /* Sub-menu for playlist options */
 static bool playlist_options(void)
 {
-    struct menu_item items[13]; 
+    struct menu_item items[13];
     struct playlist_args args[13]; /* increase these 2 if you add entries! */
     int m, i=0, pstart=0, result;
     bool ret = false;
@@ -246,23 +246,23 @@ static bool playlist_options(void)
         items[i].function = playlist_viewer;
         i++;
         pstart++;
-        
+
         items[i].desc = ID2P(LANG_SEARCH_IN_PLAYLIST);
         items[i].function = search_playlist;
         i++;
         pstart++;
-        
+
         items[i].desc = ID2P(LANG_SAVE_DYNAMIC_PLAYLIST);
         items[i].function = save_playlist;
         i++;
         pstart++;
-        
+
         items[i].desc = ID2P(LANG_SHUFFLE_PLAYLIST);
         items[i].function = shuffle_playlist;
         i++;
-        pstart++;      
+        pstart++;
     }
-       
+
     if (context == CONTEXT_TREE || context == CONTEXT_ID3DB)
     {
         if (audio_status() & AUDIO_STATUS_PLAY)
@@ -286,7 +286,7 @@ static bool playlist_options(void)
             args[i].position = PLAYLIST_INSERT_SHUFFLED;
             args[i].queue = false;
             i++;
-         
+
             items[i].desc = ID2P(LANG_QUEUE);
             args[i].position = PLAYLIST_INSERT;
             args[i].queue = true;
@@ -335,7 +335,7 @@ static int remove_dir(char* dirname, int len)
     int result = 0;
     DIR* dir;
     int dirlen = strlen(dirname);
-    
+
     dir = opendir(dirname);
     if (!dir)
         return -1; /* open error */
@@ -351,17 +351,17 @@ static int remove_dir(char* dirname, int len)
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
 
-        if (entry->attribute & ATTR_DIRECTORY) 
+        if (entry->attribute & ATTR_DIRECTORY)
         {   /* remove a subdirectory */
             if (!strcmp((char *)entry->d_name, ".") ||
                 !strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
             result = remove_dir(dirname, len); /* recursion */
-            if (result) 
+            if (result)
                 break; /* or better continue, delete what we can? */
         }
-        else 
+        else
         {   /* remove a file */
             result = remove(dirname);
         }
@@ -371,7 +371,7 @@ static int remove_dir(char* dirname, int len)
     if (!result)
     {   /* remove the now empty directory */
         dirname[dirlen] = '\0'; /* terminate to original length */
-        
+
         result = rmdir(dirname);
     }
 
@@ -433,7 +433,7 @@ static bool set_backdrop(void)
     ret = read_bmp_file(selected_file, &bm,
                         sizeof(main_backdrop), FORMAT_NATIVE);
 
-    if ((ret > 0) && (bm.width == LCD_WIDTH) 
+    if ((ret > 0) && (bm.width == LCD_WIDTH)
                   && (bm.height == LCD_HEIGHT)) {
         lcd_set_backdrop(&main_backdrop[0][0]);
         gui_syncsplash(HZ, true, str(LANG_BACKDROP_LOADED));
@@ -478,7 +478,7 @@ bool create_dir(void)
 
     cwd = getcwd(NULL, 0);
     memset(dirname, 0, sizeof dirname);
-    
+
     snprintf(dirname, sizeof dirname, "%s/",
              cwd[1] ? cwd : "");
 
@@ -506,7 +506,7 @@ static bool clipboard_clip(bool copy)
     clipboard_selection_attr = selected_file_attr;
     clipboard_is_copy = copy;
 
-    return true;    
+    return true;
 }
 
 static bool clipboard_cut(void)
@@ -543,7 +543,7 @@ static bool clipboard_pastefile(const char *src, const char *target, bool copy)
 
         src_fd = open(src, O_RDONLY);
 
-        if (src_fd >= 0) {    
+        if (src_fd >= 0) {
             target_fd = creat(target, O_WRONLY);
 
             if (target_fd >= 0) {
@@ -619,7 +619,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
     /* Check if the target exists */
     fd = open(target, O_RDONLY);
     close(fd);
-    
+
     if (fd < 0) {
         if (!copy) {
             /* Just move the directory */
@@ -668,7 +668,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
 
         DEBUGF("Copy %s to %s\n", src, target);
 
-        if (entry->attribute & ATTR_DIRECTORY) 
+        if (entry->attribute & ATTR_DIRECTORY)
         {   /* copy/move a subdirectory */
             if (!strcmp((char *)entry->d_name, ".") ||
                 !strcmp((char *)entry->d_name, ".."))
@@ -676,7 +676,7 @@ static bool clipboard_pastedirectory(char *src, int srclen, char *target, int ta
 
             result = clipboard_pastedirectory(src, srclen, target, targetlen, copy); /* recursion */
         }
-        else 
+        else
         {   /* copy/move a file */
             result = clipboard_pastefile(src, target, copy);
         }
@@ -748,7 +748,7 @@ static bool clipboard_paste(void)
         onplay_result = ONPLAY_RELOAD_DIR;
     } else {
         gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
-               str(LANG_PASTE), str(LANG_FAILED));        
+               str(LANG_PASTE), str(LANG_FAILED));
     }
 
     return true;
@@ -812,7 +812,7 @@ int onplay(char* file, int attr, int from)
         items[i].function = bookmark_menu;
         i++;
     }
-        
+
     if (file)
     {
         if (context == CONTEXT_WPS)
@@ -827,7 +827,7 @@ int onplay(char* file, int attr, int from)
                 i++;
             }
         }
-        
+
 #ifdef HAVE_MULTIVOLUME
         if (!(attr & ATTR_VOLUME)) /* no rename+delete for volumes */
 #endif
@@ -907,19 +907,22 @@ int onplay(char* file, int attr, int from)
         items[i].function = create_dir;
         i++;
     }
-
-#if CONFIG_CODEC == SWCODEC
-    /* Equalizer menu items */
     if (context == CONTEXT_WPS)
     {
+        /* Pitch screen access */
+        items[i].desc = ID2P(LANG_PITCH);
+        items[i].function = pitch_screen;
+        i++;
+#if CONFIG_CODEC == SWCODEC
+        /* Equalizer menu items */
         items[i].desc = ID2P(LANG_EQUALIZER_GRAPHICAL);
         items[i].function = eq_menu_graphical;
         i++;
         items[i].desc = ID2P(LANG_EQUALIZER_BROWSE);
         items[i].function = eq_browse_presets;
         i++;
-    }
 #endif
+    }
 
     /* DIY menu handling, since we want to exit after selection */
     if (i)
@@ -929,7 +932,7 @@ int onplay(char* file, int attr, int from)
         if (result >= 0)
             items[result].function();
         menu_exit(m);
-        
+
         if (exit_to_main)
             result = main_menu();
 
