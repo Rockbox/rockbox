@@ -114,7 +114,11 @@ enum {
 #define GUARD_BUFSIZE  (32*1024)
 
 /* As defined in plugin.lds */
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#define CODEC_IRAM_ORIGIN   0x4000c000
+#else
 #define CODEC_IRAM_ORIGIN   0x1000c000
+#endif
 #define CODEC_IRAM_SIZE     0xc000
 
 extern bool audio_is_initialized;
