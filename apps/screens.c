@@ -345,6 +345,7 @@ int charging_screen(void)
 }
 #endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
+#if (CONFIG_KEYPAD != PLAYER_PAD)
 /* returns:
    0 if no key was pressed
    1 if USB was connected */
@@ -457,6 +458,7 @@ bool pitch_screen(void)
     lcd_setfont(FONT_UI);
     return 0;
 }
+#endif
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
     (CONFIG_KEYPAD == IRIVER_H300_PAD)

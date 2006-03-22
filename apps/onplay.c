@@ -909,10 +909,12 @@ int onplay(char* file, int attr, int from)
     }
     if (context == CONTEXT_WPS)
     {
+#if (CONFIG_KEYPAD != PLAYER_PAD)
         /* Pitch screen access */
         items[i].desc = ID2P(LANG_PITCH);
         items[i].function = pitch_screen;
         i++;
+#endif
 #if CONFIG_CODEC == SWCODEC
         /* Equalizer menu items */
         items[i].desc = ID2P(LANG_EQUALIZER_GRAPHICAL);
