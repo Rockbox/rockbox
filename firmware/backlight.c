@@ -40,7 +40,7 @@
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
-#ifdef TARGET_TREE
+#if defined(TARGET_TREE) && !defined(SIMULATOR)
 #include "backlight-target.h"
 #endif
 
