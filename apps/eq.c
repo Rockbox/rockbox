@@ -102,7 +102,7 @@ static const unsigned long atan_table[] = {
  *         representing -1 and 1 respectively. 
  */
 long fsincos(unsigned long phase, long *cos) {
-    long x, x1, y, y1;
+    int32_t x, x1, y, y1;
     unsigned long z, z1;
     int i;
 
