@@ -168,6 +168,11 @@ int filebufused;
 static volatile int buf_ridx;
 static volatile int buf_widx;
 
+#ifndef SIMULATOR
+static unsigned char *iram_buf[2];
+#endif
+static unsigned char *dram_buf[2];
+
 /* Step count to the next unbuffered track. */
 static int last_peek_offset;
 
@@ -227,56 +232,36 @@ bool is_filling(void)
 }
 #endif
 
-static void do_swap(int idx_old, int idx_new)
-{
-#ifndef SIMULATOR
-    unsigned char *iram_p = (unsigned char *)(CODEC_IRAM_ORIGIN);
-    unsigned char *iram_buf[2];
-#endif
-    unsigned char *dram_buf[2];
-
-
-#ifndef SIMULATOR
-    iram_buf[0] = &filebuf[filebuflen];
-    iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
-    memcpy(iram_buf[idx_old], iram_p, CODEC_IRAM_SIZE);
-    memcpy(iram_p, iram_buf[idx_new], CODEC_IRAM_SIZE);
-#endif
-
-    dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
-    dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
-    memcpy(dram_buf[idx_old], codecbuf, CODEC_SIZE);
-    memcpy(codecbuf, dram_buf[idx_new], CODEC_SIZE);
-}
-
 static void swap_codec(void)
 {
-    int last_codec;
-    
-    logf("swapping codec:%d", current_codec);
-    
-    /* We should swap codecs' IRAM contents and code space. */
-    do_swap(current_codec, !current_codec);
-    
-    last_codec = current_codec;
-    current_codec = !current_codec;
+    int my_codec = current_codec;
 
-    /* Release the semaphore and force a task switch. */
-    mutex_unlock(&mutex_codecthread);
-    sleep(1);
+    logf("swapping out codec:%d", current_codec);
 
-    /* Waiting until we are ready to run again. */
-    mutex_lock(&mutex_codecthread);
+    /* Save our current IRAM and DRAM */
+#ifndef SIMULATOR
+    memcpy(iram_buf[my_codec], (unsigned char *)CODEC_IRAM_ORIGIN,
+            CODEC_IRAM_SIZE);
+#endif
+    memcpy(dram_buf[my_codec], codecbuf, CODEC_SIZE);
 
-    /* Check if codec swap did not happen. */
-    if (current_codec != last_codec)
-    {
-        logf("no codec switch happened!");
-        do_swap(current_codec, !current_codec);
-        current_codec = !current_codec;
-    }
-    
+    do {
+        /* Release my semaphore and force a task switch. */
+        mutex_unlock(&mutex_codecthread);
+        yield();
+        mutex_lock(&mutex_codecthread);
+    /* Loop until the other codec has locked and run */
+    } while (my_codec == current_codec);
+    current_codec = my_codec;
+
+    /* Reload our IRAM and DRAM */
+#ifndef SIMULATOR
+    memcpy((unsigned char *)CODEC_IRAM_ORIGIN, iram_buf[my_codec],
+            CODEC_IRAM_SIZE);
+#endif
     invalidate_icache();
+    memcpy(codecbuf, dram_buf[my_codec], CODEC_SIZE);
+
     logf("codec resuming:%d", current_codec);
 }
 
@@ -2053,6 +2038,14 @@ static void reset_buffer(void)
         filebuf = &filebuf[talk_get_bufsize()];
         filebuflen -= 2*CODEC_IRAM_SIZE + 2*CODEC_SIZE + talk_get_bufsize();
     }
+
+#ifndef SIMULATOR
+    iram_buf[0] = &filebuf[filebuflen];
+    iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
+#endif
+    dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
+    dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+
 }
 
 void voice_codec_thread(void)
