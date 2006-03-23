@@ -1,135 +1,110 @@
-\chapter{\label{ref:PARTII}The Rockbox interface}
-\section{Your Jukebox}
-\begin{figure}[h!]
-\begin{center}
-\opt{player}{\includegraphics[height=11.8cm]{rockbox_interface/images/player-front.png}}
-\opt{recorder,recorderv2fm}{\includegraphics[height=11.8cm]{rockbox_interface/images/recorderv2fm-front.png}}
-\opt{ondio}{\includegraphics[height=11.8cm]{rockbox_interface/images/ondio-front.png}}
-\opt{h1xx}{\includegraphics[height=11.8cm]{rockbox_interface/images/h1xx-front.png}}
-\end{center}
-\caption{\playerman \vspace{1cm} \playertype}
-\end{figure}
+\chapter{\label{ref:rockbox_interface}The Rockbox interface}
+\section{Your \dap}
+  \begin{center}
+    \opt{player}{\includegraphics[height=11.8cm]{rockbox_interface/images/player-front.png}}
+    \opt{recorder,recorderv2fm}{\includegraphics[height=11.8cm]{rockbox_interface/images/recorderv2fm-front.png}}
+    \opt{ondio}{\includegraphics[height=11.8cm]{rockbox_interface/images/ondio-front.png}}
+    \opt{h1xx}{\includegraphics[height=11.8cm]{rockbox_interface/images/h1xx-front.png}}
+  \end{center}
 
-Throughout this manual, the buttons on the Jukebox are labelled
-according to the pictures above.  There are minor cosmetic differences
-between Jukebox models, but the buttons are in approximately the same
-position as on the picture.\\
-
-To turn on a Jukebox containing Rockbox, hold down the ON key
-for 2{}-3 seconds.  (Flashed Jukeboxes only require a tap of the ON key
-{--} see page \textup{\pageref{ref:FlashingRockboxReal}} for more
-information about flashing Rockbox.) 
-\label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings and turns off the hard drive safely. To tell Rockbox to shut the Jukebox down, do the following:
+Throughout this manual, the buttons on the \dap are labelled according to the picture above.
+To turn on and shutdown your \dap, the following keys are used:
 
 \begin{table}[h!]
   \begin{center}
-    \begin{tabular}{@{}lc@{}}\toprule
-      \textbf{Model} & \textbf{Power Off} \\\midrule
-      V2 / FM RECORDER/ ONDIO & Hold  the OFF key for 2{}-3 seconds \\
-      V1 RECORDER & Double{}-tap the OFF key when playback is stopped \\
-      PLAYER & From the Rockbox Main Menu select \textbf{Shutdown} \\\bottomrule
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{IPOD_4G_PAD}{\ButtonMenu\ or \ButtonSelect}
+      \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn\ for 2{}-3s}
+      \opt{IAUDIO_X5_PAD}{\ButtonPower} & Start Rockbox\\
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOff}
+      \opt{IPOD_4G_PAD}{Hold \ButtonPlay}
+      \opt{ONDIO_PAD,recorderv2fm}{Hold \ButtonOff}
+      \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}
+      \opt{PLAYER_PAD}{From the Main Menu, select \textbf{Shutdown}}
+      \opt{IAUDIO_X5_PAD}{Hold \ButtonPower} & Shutdown Rockbox\\\bottomrule
+    \end{tabular}
+  \end{center}
+\end{table}
+\label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
+
+\opt{ondio,player,RECORDER_PAD}{
+In the unlikely event of a software failure, a hardware power off can be performed by holding down STOP until the Jukebox power light goes off. This works for all models of Jukebox.
+}
+
+\section{\label{ref:file_browser}File Browser}
+\begin{center}
+  \includegraphics[width=4cm]{rockbox_interface/images/ss-file-browser-\genericimg.png}
+\end{center}
+The file browser helps you navigate through the files on your \dap, entering folders and executing the default action on each file. To help us differentiate files, each file format is displayed with an icon. You can select which file types are displayed (see page \pageref{ref:ShowFiles}).
+
+\subsection{\label{ref:controls}Controls}
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Function} \\\midrule
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonUp/\ButtonDown}
+      \opt{PLAYER_PAD}{\ButtonLeft/\ButtonRight}
+      \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd}
+      \opt{ONDIO_PAD}{\ButtonOff} & Go to previous/next item in list.\\
+                                  & If you are on the first/last entry, \\
+                                  & the cursor will wrap to the last/first entry.\\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonUp/\ButtonDown}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
+      \opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp/\ButtonDown} & Move one page up/down on the list.\\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft}
+      \opt{PLAYER_PAD}{\ButtonStop} & Go to the parent directory. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonRight/\ButtonSelect}
+      \opt{PLAYER_PAD}{\ButtonPlay}
+      \opt{ONDIO_PAD}{\ButtonRight}
+      \opt{RECORDER_PAD}{\ButtonRight/\ButtonPlay} & Executes an action. \\
+                                                             & Depending on the file type, that action may vary. \\
+                                                             & (See page \pageref{ref:Filemenu}) \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
+      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonPlay}
+      \opt{ONDIO_PAD}{\ButtonMenu} & If there is a MP3 playing, \\
+                                   & returns to the While Playing Screen (WPS) \\
+                                   & without stopping playback.  \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
+      \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonPlay/\ButtonOn+\ButtonPlay}
+      \opt{ONDIO_PAD}{Hold \ButtonRight} & Enters the File Menu\\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+      \opt{RECORDER_PAD}{\ButtonFOne}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD}{\ButtonMenu}
+      \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay} & Enters the Main Menu \\
+      %
+      \opt{RECORDER_PAD}{
+        \ButtonFTwo & Switches to the Browse/Play Quick Menu \\
+        %
+        \ButtonFThree & Switches to the Display Quick Menu \\ 
+        %
+      }
+      \bottomrule
     \end{tabular}
   \end{center}
 \end{table}
 
-In the unlikely event of a software failure, a hardware power off can be
-performed by holding down STOP until the Jukebox power light goes off. 
-This works for all models of Jukebox.\\
-
-For further details about connecting, charging and caring for your
-Jukebox, please see the Archos manual that came with it.
-
-\section{\label{ref:PartIIFB}File Browser}
-\begin{center}
-  \includegraphics[width=4cm]{rockbox_interface/images/ss-file-browser-\genericimg.png}
-\end{center}
-
-The file browser helps you navigate through the files on your Jukebox,
-entering folders and executing the default action on each file. To help
-us differentiate files, each file format is displayed with an icon. You
-can select which file types are displayed (see page
-\pageref{ref:ShowFiles}).
-
-\subsection{\label{ref:PartIISectionCtrls}Controls}
-\opt{Rec}{
-  \begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
-        \textbf{Key} & \textbf{Function} \\\midrule
-        %
-        UP/DOWN & Go to previous/next item in list. \\
-                & If you are on the first/last entry, \\
-                & the cursor will wrap to the last/first entry. \\
-        %
-        ON+UP/DOWN & Move one page up/down on the list.\\
-        %
-        LEFT & Go to the parent directory. \\
-        %
-        PLAY/RIGHT & Executes an action. \\
-                   & Depending on the file type, that action may vary. \\
-                   & (See page \pageref{ref:Filemenu}) \\
-        %
-        Centering & If there is a MP3 playing, \\
-                  & returns to the While Playing Screen (WPS) \\
-                  & without stopping playback.  \\
-        %
-        ON+PLAY/HOLD PLAY & Enters the File Menu \\
-        %
-        F1 & Switches to the Main Menu \\
-        %
-        F2 & Switches to the Browse/Play Quick Menu \\
-        %
-        F3 & Switches to the Display Quick Menu \\ \bottomrule
-        %
-      \end{tabular}
-    \end{center}
-  \end{table}
+\opt{RECORDER_PAD}{
+The functions of the F keys are also summarised on the button bar at the
+bottom of the screen.
 }
-%
-\opt{PS}{
-  \begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
-        \textbf{Key} & \textbf{Function} \\\midrule
-        MINUS/PLUS & Go to previous/next item in list. \\
-                   & If you are on the first/last entry, \\
-                   & the cursor will wrap to the last/first entry. \\
-        STOP & Go to the parent directory. \\
-        PLAY & Executes an action. \\
-             & Depending on the file type, that action may vary.\\
-             & (See page \pageref{ref:Filemenu}) \\
-        ON & If there is a MP3 playing, \\
-           & returns to the While Playing Screen (WPS) \\
-           & without stopping playback. \\
-        ON+PLAY/HOLD PLAY & Enters the File Menu \\
-        Menu & Switches to the Main Menu \\\bottomrule
-      \end{tabular}
-    \end{center}
-  \end{table}
-  The functions of the F keys are also summarised on the button bar at the
-  bottom of the screen.
-}
-
 
 \subsection{\label{ref:Filemenu}\label{ref:PartIISectionFM}File Menu}
 \begin{center}
   \includegraphics[width=4cm]{rockbox_interface/images/ss-file-menu-\genericimg.png}
 \end{center}
 
-This menu operates on the file that was selected in the browser at the
-time ON+PLAY was pressed to enter it.  It can also be accessed by
-holding down the PLAY key for a short while.  It offers the following
-options:
+This menu operates on the file that was selected in the browser. It offers the following options:
 
 \begin{itemize}
-\item \textbf{Open with:} Runs a viewer plugin on the file. 
-Normally the filetype of a file is detected and the appropriate plugin
-is run automatically when you press play on it.  Use this menu if for
-some reason you want to override the default action and select a viewer
-by hand.  See page \textmd{\pageref{ref:Viewersplugins}} for more details on viewers.
-For example, this would be used to run the VBRfix plugin to recreate the
-Xing header for an MP3 file, which can fix problems such as
-fast{}-forward and rewind not working correctly on a particular MP3 file or the play time of a track being listed incorrectly. 
+\item \textbf{Open with:} Runs a viewer plugin on the file. Normally the filetype of a file is detected and the appropriate plugin is run automatically when you press play on it.  Use this menu if for some reason you want to override the default action and select a viewer by hand.  See page \textmd{\pageref{ref:Viewersplugins}} for more details on viewers. For example, this would be used to view a text file with a non-standard extension, i.e. not ending with .txt.
 \item \textbf{Playlist:} Change to the Playlist submenu (see below).
 \item \textbf{Rename:} This function lets the user modify a file name.
 \item \textbf{Cut:} Copies the name of the currently selected file or directory to the clipboard and marks it to be 'cut'.
@@ -137,10 +112,8 @@ fast{}-forward and rewind not working correctly on a particular MP3 file or the 
 \item \textbf{Paste:} Only visible if a file or directory name is on the clipboard. When selected it will move or copy the clipboard to the current directory. 
 \item \textbf{Delete:} Only files can be deleted, not folders. Rockbox will ask for confirmation before deleting a file. Press PLAY to confirm deletion or any other key to cancel.
 \item \textbf{Delete Directory:} Deletes the folder pointed to by the cursor and all the files and folders contained in it.  Use with caution.
-\item \textbf{Create Directory:} Makes a new folder in the current folder on
-the disk.
+\item \textbf{Create Directory:} Makes a new folder in the current folder on the disk.
 \end{itemize}
-
 
 \subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
 If the playlist submenu is invoked on a directory, it will act on all the files within that directory.  If invoked on a playlist it will act on all the files in that playlist. Otherwise it acts only on the current file.
@@ -151,24 +124,15 @@ This menu provides the following options:
 
 \begin{itemize}
 \item \textbf{Insert:} Add track(s) to playlist. If no other tracks have been inserted then the selected track will be added immediately after current playing track, otherwise they will be added to end of insertion list.
-\item \textbf{Insert next: }Add track(s) immediately after current playing
-track, no matter what else has been inserted.
+\item \textbf{Insert next: }Add track(s) immediately after current playing track, no matter what else has been inserted.
 \item \textbf{Insert last: }Add track(s) to end of playlist.
 \item \textbf{Queue: } Queue is the same as Insert except queued tracks are deleted immediately from the playlist after they've been played. Also, queued tracks are not saved to the playlist file (see page \pageref{ref:playlistoptions}).
 \item \textbf{Queue next:} Queue track(s) immediately after current playing track.
 \item \textbf{Queue last: }Queue track(s) at end of playlist.
 \end{itemize}
 
-You can insert a track, directory or playlist even if nothing is
-currently playing. In this case, a new playlist is created with only
-the selected tracks and then play is started.
-
-Note: The dynamic playlist is saved so resume will restore it exactly as
-before shutdown. Stopped playlists can be resumed from File Browser by
-pressing ON.
-
-
-
+You can insert a track, directory or playlist even if nothing is currently playing. In this case, a new playlist is created with only the selected tracks and then play is started.\\
+\textbf{Note}: The dynamic playlist is saved so resume will restore it exactly as before shutdown.
 
 \subsection{Virtual Keyboard}
 \begin{center}
