@@ -1,0 +1,111 @@
+\section{Settings}
+\begin{center}
+  \begin{longtable}{@{}lll@{}}\toprule
+    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\\midrule
+    volume & 0 to 100 & \%\\
+    bass & -15 to +15 & dB\\
+    treble & -15 to +15 &dB\\
+    balance & -100 to +100 & \%\\
+    channels & stereo, stereo narrow, & n/a\\
+             & stereo wide, & \\
+             & mono, mono left, & \\ 
+             & mono right, karaoke & \\
+    shuffle & on, off & N/A\\
+    repeat & off, all, one & N/A\\
+    play selected & on, off & N/A\\
+    resume & off, ask, ask once, on & N/A\\
+    scan min step & 1, 2, 3, 4, 5, 6, 8, 10, 15, & seconds\\
+                  & 20, 25, 30, 45, 60 &\\
+    scan accel & 0 to 15 & seconds\\
+    antiskip & 0 to 7 & seconds\\
+    volume fade & on, off & N/A\\
+    id3 tag priority & v2-v1, v1-v2 & N/A\\
+    sort case & on, off & N/A\\
+    show files & all, supported, music, playlists & N/A\\
+    follow playlist & on, off & N/A\\
+    playlist viewer icons & off,on & N/A\\
+    playlist viewer indices & off,on & N/A\\
+    playlist viewer track display & track name,full path & N/A\\
+    recursive directory insert & off,on & N/A\\
+    scroll speed & 1 to 25 & Hz\\
+    scroll delay & 0 to 250 & 1/10s\\
+    scroll step & 1 to 112 & pixels\\
+    bidir limit & 0 to 200 & \% of \\
+                &          & screen width\\
+    contrast & 0 to 63 & N/A\\
+    backlight timeout & off, on, 1, 2, 3, 4, 5, & seconds\\
+                      & 6, 7, 8, 9, 10, 15, 20, & \\
+                      & 25, 30, 45, 60, 90 & \\
+    backlight when plugged & on, off & N/A\\
+    disk spindown & 3 to 254 & seconds\\
+    battery capacity & 1500 - 3200 & mAh\\
+    idle poweroff & off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, & minutes\\
+                  & 15, 30, 45, 60 & \\
+    lang & /path/filename.lng & N/A\\
+    wps & /path/filename.wps & N/A\\
+    autocreate bookmarks & off,on & N/A\\
+    autoload bookmarks & off,on & N/A\\
+    use most-recent-bookmarks & off,on & N/A\\
+    talk dir & off,number,spell,enter.hover & N/A\\
+    talk file & off,number,spell & N/A\\
+    talk menu & off,on & N/A\\
+
+    \opt{recorder,recorderv2fm}{
+      loudness & 0 to 17 & N/A\\
+      super bass & on,off & N/A\\
+      auto volume & off, 20ms, 2s, 4s, 8s & seconds\\
+      MDB enable & on,off & N/A\\
+      MDB strength & 0 to 127 & dB\\
+      MDB harmonics & 0 to 100 & \%\\
+      MDB center frequency & 20 to 300 & Hz\\
+      MDB shape & 50 to 300 & Hz\\
+      deep discharge & on, off & N/A\\
+      trickle charge & on, off & N/A\\
+    }
+
+    \opt{HAVE_LCD_BITMAP}{
+      peak meter release & 1 to 126 & ?\\
+      peak meter hold & off, 200ms, 300ms, 500ms, & N/A \\
+                     & 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, &\\ 
+                     & 20, 30, 1min & \\
+      peak meter clip hold & on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,& N/A \\
+                           & 15, 20, 25, 30, 45, 60, 90, 2min, &\\
+                           & 3min, 5min, 10min, 20min, &\\
+                           & 45min, 90min & \\
+      peak meter busy & on, off & N/A\\
+      peak meter dbfs & on, off & on = dbfs,\\
+                      &         & off = linear\\
+      peak meter min  & 0 to 89 (dB) or 0 to 100 (\%) & dB or \%\\
+      peak meter max  & 0 to 89 /(dB) or 0 to 100 (\%) & dB or \%\\
+      statusbar & on, off & N/A\\
+      scrollbar & on, off & N/A\\
+      volume display & graphic, numeric & N/A\\
+      battery display & graphic, numeric & N/A\\
+      font & /path/filename.fnt & N/A\\
+      invert & on, off & N/A\\
+      disk poweroff & on, off & N/A\\
+    }
+    \opt{CONFIG_RTC}{
+      time format & 12hour, 24hour & N/A\\      
+    }
+    \opt{HAVE_RECORDING}{
+     rec quality & 0 to 7 & 0=smallest size,\\
+                 &        & 7=highest quality\\
+     rec frequency & 48, 44, 32, 24, 22, 16 & kHz\\
+     rec source & mic, line, spdif & N/A\\
+     rec channels & mono, stereo & N/A\\
+     rec mic gain & 0 to 15 & N/A\\
+     rec left gain & 0 to 15 & N/A\\
+     rec right gain & 0 to 15 & N/A\\
+     editable recordings & off,on & N/A\\
+     rec timesplit & off, 0:05, 0:10, 0:15, 0:30, 1:00, & h:mm\\
+                   & 2:00, 4:00, 6:00, 8:00, 16:00, 24:00 & \\
+     pre-recording time & off, 1 to 30 & s\\
+     rec directory & /recordings,current & N/A\\
+    }
+    \opt{CONFIG_TUNER}{
+      Force FM mono & off,on & N/A\\
+    }
+    \bottomrule
+  \end{longtable}
+\end{center}
