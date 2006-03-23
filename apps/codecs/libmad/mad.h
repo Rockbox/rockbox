@@ -20,19 +20,14 @@
  * so by contacting: Underbit Technologies, Inc. <info@underbit.com>
  */
 
+#include <inttypes.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-# define FPM_INTEL
-
-
-
-# define SIZEOF_INT 4
-# define SIZEOF_LONG 4
-# define SIZEOF_LONG_LONG 8
-
-
+# define FPM_DEFAULT
+	
 /* Id: version.h,v 1.26 2004/01/23 09:41:33 rob Exp */
 
 # ifndef LIBMAD_VERSION_H
@@ -67,17 +62,10 @@ extern char const mad_build[];
 # ifndef LIBMAD_FIXED_H
 # define LIBMAD_FIXED_H
 
-# if SIZEOF_INT >= 4
-typedef   signed int mad_fixed_t;
+typedef   int32_t mad_fixed_t;
 
-typedef   signed int mad_fixed64hi_t;
-typedef unsigned int mad_fixed64lo_t;
-# else
-typedef   signed long mad_fixed_t;
-
-typedef   signed long mad_fixed64hi_t;
-typedef unsigned long mad_fixed64lo_t;
-# endif
+typedef   int32_t mad_fixed64hi_t;
+typedef  uint32_t mad_fixed64lo_t;
 
 # if defined(_MSC_VER)
 #  define mad_fixed64_t  signed __int64
