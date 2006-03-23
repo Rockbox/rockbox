@@ -21,7 +21,7 @@
 #include "kernel.h"
 #include "thread.h"
 #include "power.h"
-#include "debug.h"
+#include "logf.h"
 #include "system.h"
 #include "sprintf.h"
 #include "button.h"
@@ -68,7 +68,7 @@ void tlv320_write_reg(unsigned reg, unsigned value)
 
     if (i2c_write(1, data, 3) != 3)
     {
-        DEBUGF("tlv320 error reg=0x%x", reg);
+        logf("tlv320 error reg=0x%x", reg);
         return;
     } 
 
