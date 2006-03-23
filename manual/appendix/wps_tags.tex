@@ -1,0 +1,205 @@
+\subsubsection{Status Bar}
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Tag} & \textbf{Description}\\\midrule
+\%we & Status Bar Enabled\\
+\%wd & Status Bar Disabled\\\bottomrule
+\end{tabular}
+\newline
+\newline
+These tags override the player setting for the display of the status bar, they must be on their own line.
+
+\subsubsection{ID3 Info}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%ia & ID3 Artist\\
+    \%ic & ID3 Composer\\
+    \%id & ID3 Album Name\\
+    \%ig & ID3 Genre Name\\
+    \%in & ID3 Track Number\\
+    \%it & ID3 Track Title\\
+    \%iv & ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag)\\
+    \%iy & ID3 Year\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+Remember that this information is not always available, so use the conditionals to show alternate information in preference to assuming.
+
+\subsubsection{Battery Info}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%bl & Show numeric battery level in percent.\\
+         & Can also be used in a conditional: \%?bl{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textgreater}\\
+    \%bv & Show the battery level in volts\\
+    \%bt & Show estimated battery time left\\
+    \%bp & "p" if the charger is connected \\
+         & (only on targets that can charge batteries)\\
+    \%bc & "c" if the unit is currently charging the battery\\
+         & (only on targets that have software charge control or monitoring)\\\bottomrule
+  \end{tabular}
+
+\subsubsection{File Info}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%fb & File Bitrate (in kbps)\\
+    \%fc & File Codec (e.g. "MP3" or "FLAC")\\
+         & This tag can also be used in a conditional tag,\\
+         & \%?fc{\textless}mp1{\textbar}mp2{\textbar}mp3{\textbar}wav{\textbar}vorbis{\textbar}flac{\textbar}mpc{\textbar}a52{\textbar}wavpack{\textbar}unknown{\textgreater}\\
+         & The codec order is as follows: MP1, MP2, MP3, WAV, Ogg Vorbis (OGG),\\
+         & FLAC, MPC, AC3, WavPack (WV), ALAC, AAC, Shorten (SHN), AIFF\\
+    \%ff & File Frequency (in Hz)\\
+    \%fm & File Name\\
+    \%fn & File Name (without extension)\\
+    \%fp & File Path\\
+    \%fs & File Size (In Kilobytes)\\
+    \%fv & "(avg)" if variable bit rate or "" if constant bit rate\\
+    \%d1 & First directory from end of file path.\\
+    \%d2 & Second directory from end of file path.\\
+    \%d3 & Third directory from end of file path.\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+Example for the the \%dN commands: If the path is "/Rock/Kent/Isola/11 - 747.mp3", \%d1 is "Isola", \%d2 is "Kent"... You get the picture.
+
+\subsubsection{Playlist/Song Info}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%pb & Progress Bar\\
+    \opt{player}{
+          & This will display a 1 character "cup"\\
+          & that empties as the time progresses.}
+    \opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{
+         & This will replace the entire line with a progress bar. \\
+         & You can set the height, position and width of the progressbar\\
+         & (in pixels): \%pb{\textbar}height{\textbar}leftpos{\textbar}rightpos{\textbar}} \\
+    \%pf & Player: Full-line progress bar + time display\\
+    \%pc & Current Time In Song\\
+    \%pe & Total Number of Playlist Entries\\
+    \%pm & Peak Meter (Recorder only) The entire line is used as volume peak meter.\\
+    \%pn & Playlist Name (Without path or extension)\\
+    \%pp & Playlist Position\\
+    \%pr & Remaining Time In Song\\
+    \%ps & Shuffle. Shows 's' if shuffle mode is enabled.\\
+    \%pt & Total Track Time\\
+    \%pv & Current volume. Can also be used in a conditional: \\
+         & \%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}10{\textgreater}\\\bottomrule
+  \end{tabular}
+
+\subsubsection{Runtime Database}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%rp & Song playcount\\
+    \%rr & Song rating (0-10). This tag can also be used in a conditional tag,\\
+         & \%?rr{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}10{\textgreater}\\\bottomrule
+  \end{tabular}
+
+\opt{h1xx,h300}{
+\subsubsection{Hold Switches}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mh & "h" if the main unit hold switch is on\\
+    \%mr & "r" if the remote hold switch is on\\\bottomrule
+  \end{tabular}
+}
+
+\subsubsection{Virtual LED}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%lh & "h" if there is hard disk activity\\\bottomrule
+  \end{tabular}
+
+\subsubsection{Repeat Mode}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mm & Repeat mode, 0-4, in the order: Off, All, One, Shuffle, \opt{player,recorder,recorderv2fm}{A-B}\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+Example: \%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle{\textbar}A-B{\textgreater}
+
+\subsubsection{Playback Mode Tags}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%mp & Play status, 0-4, in the order: Stop, Play, Pause, Fast forward, Rewind\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}
+
+\subsubsection{Images}
+
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%X{\textbar}filename.bmp{\textbar} & Load and set a backdrop image for the WPS.\\
+                      & This image must be exactly the same size as your LCD.\\
+    \%P{\textbar}filename.bmp{\textbar} & Load a Progress bar image for the WPS.\\
+                      & Use \%pb tag to show the progress bar\\
+    \%x{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar} & Load and display an image\\
+                        & n = image ID (a-z and A-Z)\\
+                        & filename = filename (relative to /.rockbox/ and including .bmp)\\
+                        & x = x coordinate\\
+                        & y = y coordinate.\\
+    \%xl{\textbar}n{\textbar}filename{\textbar}x{\textbar}y{\textbar} & Preload an image for later display\\
+                         & n = image ID (a-z and A-Z)\\
+                         & filename = filename (relative to /.rockbox/ and including .bmp)\\
+                         & x = x coordinate\\
+                         & y = y coordinate.\\
+    \%xdn & Display a preloaded image\\
+
+          & n = image ID (a-z and A-Z)\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+Example: image /.rockbox/bg.bmp with ID "a" at 37, 109 would be:\\
+\%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}
+
+\begin{itemize}
+\item \textbf{Note:} The images must be in a rockbox compatible format (1 bit per pixel BMP)
+\item \textbf{Note:} The image tag must be on its own line
+\item \textbf{Note:} The ID is case sensitive, giving 52 different ID's
+\item \textbf{Note:} The size of the LCD screen for each player varies. See table below for appropriate sizes of each device. The x and y coordinates must repect each of the players' limits.
+\end{itemize}
+
+\subsubsection{Alignment}
+
+  \begin{tabular}{@{}lll@{}}\toprule
+    \textbf{Tag} & \textbf{Description}\\\midrule
+    \%al & Text is left aligned\\
+    \%ac & Text is center aligned\\
+    \%ar & Text is right aligned\\\bottomrule
+  \end{tabular}
+\newline
+\newline
+All alignment tags may be present in one line, but they need to be in the order left - center - right. If the aligned texts overlap, they are merged.
+
+\subsubsection{Conditional Tags}
+
+\textbf{If/else}\\
+
+Syntax: \%?xx{\textless}true{\textbar}false{\textgreater}\\
+
+\textbf{Enumerations}\\
+
+Syntax: \%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}\\
+
+\subsection{Other Tags}
+\begin{tabular}{@{}ll@{}}\toprule
+\textbf{Tag} & \textbf{Description}\\\midrule
+  \%\%          & Display a '\%'\\
+  \%{\textless} & Display a '{\textless}'\\
+  \%{\textbar}  & Display a '{\textbar}'\\
+  \%{\textgreater} & Display a '{\textgreater}'\\
+  \%;           & Display a ';'\\
+  \%s           & Indicate that the line should scroll. Can occur anywhere in a line\\
+                & (given that the text is displayed; see conditionals above). \\
+                & You can specify up to 10 scrolling lines. Scrolling lines can not \\
+                & contain dynamic content such as timers, peak meters or progress bars.
+\end{tabular}
