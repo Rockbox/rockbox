@@ -294,13 +294,6 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
     src[0] = ch1;
     src[1] = ch2;
 
-    while (paused)
-    {
-        sleep(1);
-        if (ci.stop_codec || ci.reload_codec || ci.seek_time)
-            return true;
-    }
-    
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
     {
         length *= 2;    /* Length is per channel */
