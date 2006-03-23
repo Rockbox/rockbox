@@ -28,6 +28,10 @@
 #include "replaygain.h"
 #include "debug.h"
 
+#ifndef SIMULATOR
+#include <dsp_asm.h>
+#endif
+
 /* The "dither" code to convert the 24-bit samples produced by libmad was
  * taken from the coolplayer project - coolplayer.sourceforge.net
  */
@@ -517,90 +521,12 @@ static long dither_sample(int32_t sample, int32_t bias, int32_t mask,
     return output;
 }
 
-/* Apply a constant gain to the samples (e.g., for ReplayGain). May update
- * the src array if gain was applied.
- * Note that this must be called before the resampler.
+/* Applies crossfeed to the stereo signal in src.
+ * Crossfeed is a process where listening over speakers is simulated. This
+ * is good for old hard panned stereo records, which might be quite fatiguing
+ * to listen to on headphones with no crossfeed.
  */
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-static const long crossfeed_coefs[6] ICONST_ATTR = { 
-    LOW, LOW_COMP, HIGH_NEG, HIGH_COMP, ATT, ATT_COMP
-};
-
-static void apply_crossfeed(int32_t* src[], int count)
-{
-    asm volatile (
-        "lea.l crossfeed_data, %%a1 \n"
-        "lea.l (16, %%a1), %%a0     \n"  
-        "movem.l (%%a1), %%d0-%%d3  \n"
-        "move.l (120, %%a1), %%d4   \n"
-        /* fetch left, right, LOW and LOW_COMP for first iteration */
-        "move.l (%[src0]), %%d5     \n"
-        "move.l (%[src1]), %%d6     \n"
-        "move.l (%[coef])+, %%a1    \n"
-        "move.l (%[coef])+, %%a2    \n"
-        /* Register usage in loop:
-         * a0 = &delay[0][0], a1 & a2 = coefs
-         * d0 = low_left, d1 = low_right,
-         * d2 = high_left, d3 = high_right,
-         * d4 = delay line index,
-         * d5 = src[0][i], d6 = src[1][i].
-         * The rest are described in asm constraint list.
-         */
-    ".cfloop:"
-        /* LOW*low_left + LOW_COMP*left */
-        "mac.l %%a1, %%d0, %%acc0                    \n" 
-        "mac.l %%a2, %%d5, %%acc0                    \n" 
-        /* LOW*low_right + LOW_COMP*right */
-        "mac.l %%a1, %%d1, (%[coef])+, %%a1, %%acc1  \n" /* a1 = HIGH_NEG */
-        "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = HIGH_COMP */
-        "movclr.l %%acc0, %%d0                       \n" /* get low_left */
-        "movclr.l %%acc1, %%d1                       \n" /* get low_right */
-        /* HIGH_NEG*high_left + HIGH_COMP*left */ 
-        "mac.l %%a1, %%d2, %%acc0                    \n"
-        "mac.l %%a2, %%d5, %%acc0                    \n"
-        /* HIGH_NEG*high_right + HIGH_COMP*right */
-        "mac.l %%a1, %%d3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = ATT */
-        "mac.l %%a2, %%d6, (%[coef])+, %%a2, %%acc1  \n" /* a2 = ATT_COMP */
-        "lea.l (-6*4, %[coef]), %[coef]              \n" /* coef = &coefs[0] */
-        "move.l (%%a0, %%d4*4), %%a3                 \n" /* a3=delay[0][idx] */
-        "move.l (52, %%a0, %%d4*4), %%d5             \n" /* d5=delay[1][idx] */
-        "movclr.l %%acc0, %%d2                       \n" /* get high_left */
-        "movclr.l %%acc1, %%d3                       \n" /* get high_right */
-        /* ATT*delay_r + ATT_COMP*high_left */
-        "mac.l %%a1, %%d5, (4, %[src0]), %%d5, %%acc0\n" /* d5 = src[0][i+1] */
-        "mac.l %%a2, %%d2, (4, %[src1]), %%d6, %%acc0\n" /* d6 = src[1][i+1] */
-        /* ATT*delay_l + ATT_COMP*high_right */
-        "mac.l %%a1, %%a3, (%[coef])+, %%a1, %%acc1  \n" /* a1 = LOW */
-        "mac.l %%a2, %%d3, (%[coef])+, %%a2, %%acc1  \n" /* a2 = LOW_COMP */
-        
-        /* save crossfed samples to output */
-        "movclr.l %%acc0, %%a3          \n"
-        "move.l %%a3, (%[src0])+        \n" /* src[0][i++] = out_l */
-        "movclr.l %%acc1, %%a3          \n"
-        "move.l %%a3, (%[src1])+        \n" /* src[1][i++] = out_r */
-        "move.l %%d0, (%%a0, %%d4*4)    \n" /* delay[0][index] = low_left */
-        "move.l %%d1, (52, %%a0, %%d4*4)\n" /* delay[1][index] = low_right */
-        "addq.l #1, %%d4                \n" /* index++ */
-        "cmp.l #13, %%d4                \n" /* if (index >= 13) { */
-        "jlt .nowrap                    \n"
-        "clr.l %%d4                     \n" /*     index = 0 */
-    ".nowrap:                           \n" /* } */
-        "subq.l #1, %[count]            \n"
-        "jne .cfloop                    \n"
-        /* save data back to struct */
-        "lea.l crossfeed_data, %%a1     \n"
-        "movem.l %%d0-%%d3, (%%a1)      \n"
-        "move.l %%d4, (120, %%a1)       \n"
-        /* NOTE: We _just_ have enough registers for our use here, clobber just
-           one more and GCC will fail. */
-        : 
-        : [count] "d" (count),
-          [src0] "a" (src[0]), [src1] "a" (src[1]), [coef] "a" (crossfeed_coefs)
-        : "d0", "d1", "d2", "d3", "d4", "d5", "d6",
-          "a0", "a1", "a2", "a3"
-    );
-}
-#else
+#ifndef DSP_HAVE_ASM_CROSSFEED
 static void apply_crossfeed(int32_t* src[], int count)
 {
     int32_t a; /* accumulator */
