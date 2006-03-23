@@ -98,9 +98,6 @@ sub create_list {
     my $offsets = $_[1];
     my $started = 0;
     my %pfds;
-#    my $totalCalls = 0;
-#    my $totalTicks = 0;
-#    my $pfds = 0;
     while (<PROFILE_FILE>) {
         if ($started == 0) {
             if (m/^0x/) {
@@ -121,9 +118,6 @@ sub create_list {
                 $pfd[1]+=@$old_pfd[1];
             }
             $pfds{$callName} = \@pfd;
-#            $pfds++;
-#            $totalCalls+=$calls;
-#            $totalTicks+=$ticks;
         } else {
             last;
         }
