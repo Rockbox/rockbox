@@ -283,7 +283,7 @@ void adc_init(void)
     sleep(2);    /* Ensure valid readings when adc_init returns */
 }
 
-#elif CONFIG_CPU == PP5020 || (CONFIG_CPU == PP5002)
+#elif (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5002)
 
 struct adc_struct {
     long timeout;
