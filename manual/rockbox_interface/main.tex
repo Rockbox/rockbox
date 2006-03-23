@@ -30,7 +30,7 @@ To turn on and shutdown your \dap, the following keys are used:
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
 
 \opt{ondio,player,RECORDER_PAD}{
-In the unlikely event of a software failure, a hardware power off can be performed by holding down STOP until the Jukebox power light goes off. This works for all models of Jukebox.
+  In the unlikely event of a software failure, a hardware power off can be performed by holding down STOP until the Jukebox power light goes off. This works for all models of Jukebox.
 }
 
 \section{\label{ref:file_browser}File Browser}
@@ -67,8 +67,8 @@ The file browser helps you navigate through the files on your \dap, entering fol
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
       \opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonPlay}
       \opt{ONDIO_PAD}{Short press on \ButtonMenu} & If there is a MP3 playing, \\
-                                   & returns to the While Playing Screen (WPS) \\
-                                   & without stopping playback.  \\
+                                                  & returns to the While Playing Screen (WPS) \\
+                                                  & without stopping playback.  \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonPlay/\ButtonOn+\ButtonPlay}
@@ -91,8 +91,8 @@ The file browser helps you navigate through the files on your \dap, entering fol
 \end{table}
 
 \opt{RECORDER_PAD}{
-The functions of the F keys are also summarised on the button bar at the
-bottom of the screen.
+  The functions of the F keys are also summarised on the button bar at the
+  bottom of the screen.
 }
 
 \subsection{\label{ref:Filemenu}\label{ref:PartIISectionFM}File Menu}
@@ -139,165 +139,221 @@ You can insert a track, directory or playlist even if nothing is currently playi
 \end{center}
 This is the virtual keyboard that is used when entering file names in Rockbox.
 
-\opt{recorder,recorderv2fm,ondio}{
-  \begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
-        \textbf{Key} & \textbf{Function} \\\midrule
-        ARROW KEYS & Move about the virtual keyboard \\
-                   & (moves the solid cursor) \\
-        ON+LEFT/RIGHT & Move about within the current file name \\
-                      & (moves the line cursor) \\
-        PLAY & Inserts the currently selected keyboard letter \\
-             & at the current filename cursor position \\
-        STOP & Exits the virtual keyboard without saving any changes \\
-        ON & No action \\
-        F1 & SHIFT: Shifts between the upper case, \\
-           & lower case and accented keyboards \\
-        F2 & OK: Exits the virtual keyboard and saves any changer \\
-        F3 & DEL: Deletes the character before\\ 
-           & the current filename cursor \\\bottomrule
-      \end{tabular}
-    \end{center}
-  \end{table}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD,IPOD_4G_PAD}{
+\begin{center}
+  \begin{tabular}{@{}ll@{}}\toprule
+    \textbf{Key} & \textbf{Function} \\\midrule
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+    \opt{IPOD_4G_PAD}{Please add correct keys} & Move about the virtual keyboard \\
+                                               & (moves the solid cursor) \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonLeft/\ButtonRight}
+    \opt{IPOD_4G_PAD}{Please add correct keys}
+    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Move about within the current file name \\
+                                                 & (moves the line cursor) \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IPOD_4G_PAD}{Please add correct keys}
+    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Inserts the currently selected keyboard letter \\
+                                                 & at the current filename cursor position \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{Please add correct keys}
+    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Exits the virtual keyboard without saving any changes \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
+    \opt{RECORDER_PAD}{\ButtonFOne} & SHIFT: Shifts between the upper case, \\
+                                    & lower case and accented keyboards \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IPOD_4G_PAD}{Please add correct keys}
+    \opt{IAUDIO_X5_PAD}{Please add correct keys} & OK: Exits the virtual keyboard and saves any changer \\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{IPOD_4G_PAD}{Please add correct keys}
+    \opt{IAUDIO_X5_PAD}{Please add correct keys} & DEL: Deletes the character before\\ 
+                                                 & the current filename cursor \\
+
+    \opt{SWCODEC}{
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Enters Morse input mode\\
+    }
+    \bottomrule
+  \end{tabular}
+\end{center}
 }
 
-
+\opt{ondio}{
+  \textbf{Picker area}
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Function} \\\midrule
+      \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight & Move about the virtual keyboard\\
+                                                     & (moves the solid cursor) \\
+                                                     & If you move out of the picker area\\
+                                                     & with \ButtonUp/\ButtonDown,\\
+                                                     & you get to the line edit mode\\
+      \ButtonMenu & Selects the letter underneath the cursor \\
+      Long press on \ButtonMenu & Accepts the currently selected letter\\
+      \ButtonOff & Aborts the currently selected letter\\\bottomrule
+    \end{tabular}
+  \end{center}
+  \textbf{Line edit mode}
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Function}\\\midrule
+      \ButtonLeft/\ButtonRight & Move left and right\\
+      \ButtonMenu & Deletes the letter to the left of the cursor\\
+      Long press on \ButtonMenu & Accepts the deletion\\
+      \ButtonUp/\ButtonDown & Returns to the picker area\\\bottomrule
+    \end{tabular}
+  \end{center}
+}
 \opt{player}{
   The current filename is always listed on the first line of the display. The second line of the display can contain the character selection bar, as in the screenshot above, or  one of a number of other options.
-  \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
+      \begin{tabular}{@{}ll@{}}\toprule
         \textbf{Key} & \textbf{Function} \\\midrule
-        MINUS/PLUS & Moves the arrow to/from the filename \\
-                   & and changes between the character bar \\
-                   & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
-        PLAY/STOP & Varies (see below) \\
-        ON & Nothing \\
-        Menu & Shift.  When the character selection bar is selected\\
-             & this changes between upper case, lower case, \\
-             & and accented letters. \\\bottomrule
+        \ButtonLeft/\ButtonRight & Moves the arrow to/from the filename \\
+                                 & and changes between the character bar \\
+                                 & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
+        \ButtonPlay/\ButtonStop & Varies (see below) \\
+        \ButtonMenu & Shift.  When the character selection bar is selected\\
+                    & this changes between upper case, lower case, \\
+                    & and accented letters. \\\bottomrule
       \end{tabular}
     \end{center}
-  \end{table}
-  The function of the PLAY and STOP buttons depends on what the arrow is
-  pointing to, as follows.
+    The function of the PLAY and STOP buttons depends on what the arrow is pointing to, as follows.
   
   \begin{table}[h!]
     \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
+      \begin{tabular}{@{}ll@{}}\toprule
         \textbf{Selected option} & \textbf{Play/Stop function} \\\midrule
-        filename & Moves the cursor left (STOP) \\
-                 & or right (PLAY) within the filename \\
-        character bar & Moves the character bar to the next (PLAY)\\
-                      & or previous (STOP) character. \\
-        BACKSPACE & PLAY deletes the character before \\
+        filename & Moves the cursor left (\ButtonStop) \\
+                 & or right (\ButtonPlay) within the filename \\
+        character bar & Moves the character bar to the next (\ButtonPlay)\\
+                      & or previous (\ButtonStop) character. \\
+        BACKSPACE & \ButtonPlay deletes the character before \\
                   & the current cursor position \\
-        DELETE & PLAY deletes the character at the \\
+        DELETE & \ButtonPlay deletes the character at the \\
                & current cursor position\\
-        ACCEPT & PLAY exits the virtual keyboard and \\
+        ACCEPT & \ButtonPlay exits the virtual keyboard and \\
                & saves any changes \\
-        ABORT & PLAY exits the virtual keyboard and \\
+        ABORT & \ButtonPlay exits the virtual keyboard and \\
               & discards any changes \\\bottomrule
       \end{tabular}
     \end{center}
   \end{table}
 }
 
+
 \section{\label{ref:WPS}While Playing Screen}
 The While Playing Screen (WPS) displays various pieces of information about the currently playing audio file:
 %
-\opt{recorder,recorderv2fm}{
-\begin{itemize}
-\item Status bar: Battery level, charger status, volume, play mode, repeat mode, shuffle mode and clock.
-\item Scrolling path+filename of the current song.
-\item The ID3 track name.
-\item The ID3 album name.
-\item The ID3 artist name.
-\item Bit rate. VBR files display average bitrate and ``(avg)''
-\item Elapsed and total time.
-\item A slidebar progress meter representing where in the song you are.
-\item Peak meter.
-\end{itemize}
-
+\opt{HAVE_LCD_BITMAP}{
+  \begin{itemize}
+  \item Status bar: Battery level, charger status, volume, play mode, repeat mode, shuffle mode and clock.
+  \item Scrolling path+filename of the current song.
+  \item The ID3 track name.
+  \item The ID3 album name.
+  \item The ID3 artist name.
+  \item Bit rate. VBR files display average bitrate and ``(avg)''
+  \item Elapsed and total time.
+  \item A slidebar progress meter representing where in the song you are.
+  \item Peak meter.
+  \end{itemize}
+}
 Notes:
-
-\begin{itemize}
-\item The number of lines shown depends on the size of the font used.
-\item The peak meter is only visible if you turn off the status bar or if
-using a small font that gives 8 or more display lines.
-\end{itemize}
+\opt{recorder,recorderv2fm,ondio}{
+  \begin{itemize}
+  \item The number of lines shown depends on the size of the font used.
+  \item The peak meter is only visible if you turn off the status bar or if using a small font that gives 8 or more display lines.
+  \end{itemize}
 }
 %
 \opt{player}{
-\begin{itemize}
-\item Playlist index/Playlist size: Artist {}- Title.
-\item Current{}-time Progress{}-indicator Left.
-\end{itemize}
-
-See page \textmd{\pageref{ref:ConfiguringtheWPS}} for
-details of customising your WPS (While Playing Screen).
+  \begin{itemize}
+  \item Playlist index/Playlist size: Artist {}- Title.
+  \item Current{}-time Progress{}-indicator Left.
+  \end{itemize}
+  
+  See page \textmd{\pageref{ref:ConfiguringtheWPS}} for details of customising your WPS (While Playing Screen).
 }
 
-\subsection{\label{ref:PartIISectionWPSCtrls}WPS Key Controls}
+\subsection{\label{ref:WPS_Key_Controls}WPS Key Controls}
 
-\opt{recorder}{
-  \begin{table}[h!]
-    \begin{flushleft}
-      \begin{tabular}{@{}cc@{}}\toprule
-        \textbf{Key} & \textbf{Action} \\\midrule
-        UP/DOWN & Volume up/down \\
-        LEFT & (quick press) Go to beginning of track, \\
-             & or if pressed while in the first seconds of a track, \\
-             & go to previous track \\
-        LEFT (hold) & Rewind in track \\
-        RIGHT & (quick press) Go to next track. \\
-        RIGHT (hold) & Fast forward in track. \\
-        PLAY & Toggle play/pause \\
-        ON & (quick press) Go to file browser \\
-        ON (hold) & Show pitch setting screen \\
-        STOP & Stop playback \\
-        F1 & Go to Main menu \\
-        F2 & Toggles Play/browse quick menu \\
-        F3 & Toggles Display quick menu \\
-        F1+DOWN & Key lock on/off \\
-        F1+PLAY & Mute on/off \\
-        F1+ON & Enter ID3 viewer \\\bottomrule
-      \end{tabular}
-    \end{flushleft}
-  \end{table}
-}
-%
-\opt{player}{
-  \begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}cc@{}}\toprule
-        \textbf{Key} & \textbf{Action} \\\midrule
-        MENU+PLUS & Increases volume \\
-        MENU+MINUS & Decreases volume \\
-        MINUS & (quick press) Go to beginning of track, \\
-              & or if pressed while in the first seconds of a track, \\
-              & go to previous track. \\
-        MINUS (hold) & Rewind in track \\
-        PLUS & (quick press) Go to next track. \\
-        PLUS (hold) & Fast{}-forward in track. \\
-        PLAY & Toggle play/pause \\
-        ON & Quick press = Go to file browser \\
-        OFF & Stop playback \\
-        MENU & Go to Main menu \\
-        MENU+STOP & Key lock on/off \\
-        MENU+PLAY & Mute on/off \\
-        MENU+ON & Enter ID3 viewer \\\bottomrule
-      \end{tabular}
+\begin{table}[h!]
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight/\ButtonLeft} & Volume up/down \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonLeft}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Go to beginning of track, \\
+                                                 & or if pressed while in the \\
+                                                 & first seconds of a track, \\
+                                                 & go to previous track \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonLeft}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Rewind in track \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Go to next track. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Fast forward in track. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{IPOD_4G_PAD,IAUDIO_X5_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonPlay}
+      \opt{ONDIO_PAD}{\ButtonOff} & Toggle play/pause \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{ONDIO_PAD}{\ButtonMenu}
+      \opt{RECORDER_PAD,PLAYER_PAD}{\ButtonOn}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Go to file browser \\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOn}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{n/a}
+      \opt{ONDIO_PAD}{In WPS context menu} & Show pitch setting screen \\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+      \opt{ONDIO_PAD}{Hold \ButtonOff}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{\ButtonStop} & Stop playback \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{RECORDER_PAD}{\ButtonFOne}
+      \opt{PLAYER_PAD,ONDIO_PAD}{\ButtonMenu}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Go to Main menu \\
+      %
+      %These actions need definitions for the other targets
+      \opt{RECORDER_PAD}{
+        \ButtonFTwo & Toggles Play/browse quick menu \\
+        \ButtonFThree & Toggles Display quick menu \\
+        \ButtonFOne+\ButtonDown & Key lock on/off \\
+        \ButtonFOne+\ButtonPlay & Mute on/off \\
+        \ButtonFOne+\ButtonOn & Enter ID3 viewer \\
+      }
+      \opt{PLAYER_PAD}{
+        \ButtonMenu+\ButtonStop & Key lock on/off \\
+        \ButtonMenu+\ButtonPlay & Mute on/off \\
+        \ButtonMenu+\ButtonOn & Enter ID3 viewer \\
+      }
+      \bottomrule
+    \end{tabular}
     \end{center}
-  \end{table}
-}
+\end{table}
 
-\opt{recorder,recorderv2fm,ondio,H1xx,h300,ipodcolor,ipodnano,ipodvideo}{
-  \subsection{Peak Meter}
-  The peak meter can be displayed on the While Playing Screen and consists
-  of several indicators.  For a picture of the peak meter, please see the
-  While Recording Screen on page \pageref{ref:Whilerecordingscreen}.
+
+\opt{HAVE_LCD_BITMAP}{
+  \subsection{\label{ref:peak_meter}Peak Meter}
+  The peak meter can be displayed on the While Playing Screen and consists of several indicators.  For a picture of the peak meter, please see the  While Recording Screen on page \pageref{ref:Whilerecordingscreen}.
   
   \begin{itemize}
   \item \textbf{The bar: }
