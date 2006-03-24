@@ -232,6 +232,16 @@ extern const fb_data brickmania_bricks[];
 #endif
 #define BMPWIDTH_menu 160
 
+#if LCD_DEPTH == 16
+#define BMPXOFS_start 38
+#define BMPYOFS_start 56
+#define BMPXOFS_resume 42
+#define BMPYOFS_resume 72
+#define BMPXOFS_help 65
+#define BMPYOFS_help 85
+#define BMPXOFS_quit 66
+#define BMPYOFS_quit 99
+#else
 #define BMPXOFS_start 34
 #define BMPYOFS_start 64
 #define BMPXOFS_resume 38
@@ -240,6 +250,7 @@ extern const fb_data brickmania_bricks[];
 #define BMPYOFS_help 90
 #define BMPXOFS_quit 64
 #define BMPYOFS_quit 103
+#endif
 #define HIGHSCORE_XPOS 7
 #define HIGHSCORE_YPOS 36
 
