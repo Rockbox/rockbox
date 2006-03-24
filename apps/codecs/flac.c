@@ -226,7 +226,7 @@ enum codec_status codec_start(struct codec_api* api)
     FLACContext fc;
     uint32_t samplesdone;
     uint32_t elapsedtime;
-    long bytesleft;
+    size_t bytesleft;
     int consumed;
     int res;
     int frame;

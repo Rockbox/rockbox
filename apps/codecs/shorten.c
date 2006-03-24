@@ -49,7 +49,7 @@ enum codec_status codec_start(struct codec_api* api)
     uint32_t elapsedtime;
     int8_t *buf;
     int consumed, res, nsamples;
-    long bytesleft;
+    size_t bytesleft;
 
     /* Generic codec initialisation */
     rb = api;

@@ -258,7 +258,7 @@ next_track:
         ci->yield();
     
     /* assume the WAV header is less than 1024 bytes */
-    buf = ci->request_buffer((long *)&n, 1024);
+    buf = ci->request_buffer(&n, 1024);
     if (n < 44) {
         i = CODEC_ERROR;
         goto exit;
@@ -449,7 +449,7 @@ next_track:
                 bytesdone = newpos;
             ci->seek_complete();
         }
-        wavbuf = (uint8_t *)ci->request_buffer((long *)&n, chunksize);
+        wavbuf = (uint8_t *)ci->request_buffer(&n, chunksize);
 
         if (n == 0)
             break; /* End of stream */

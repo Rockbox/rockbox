@@ -128,7 +128,7 @@ extern char iend[];
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api *api)
 {
-    long n;
+    size_t n;
     unsigned char *filebuf;
     int sample_loc;
     int retval;

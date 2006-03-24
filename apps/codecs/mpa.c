@@ -92,7 +92,7 @@ void init_mad(void)
 enum codec_status codec_start(struct codec_api *api)
 {
     int status = CODEC_OK;
-    long size;
+    size_t size;
     int file_end;
     int frame_skip;      /* samples to skip current frame */
     int samples_to_skip; /* samples to skip in total for this file (at start) */
