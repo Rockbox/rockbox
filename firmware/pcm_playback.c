@@ -61,9 +61,6 @@ static bool pcm_playing;
 static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
-size_t next_size IBSS_ATTR;
-unsigned char *next_start IBSS_ATTR;
-
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 static void dma_start(const void *addr, size_t size)
 {
@@ -103,8 +100,6 @@ static void dma_stop(void)
 #ifdef HAVE_SPDIF_OUT
     EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
-
-    pcm_paused = false;
 }
 
 /* sets frequency of input to DAC */
@@ -150,7 +145,13 @@ void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
             return;
     }
     if (start && size)
+    {
         dma_start(start, size);
+        if (pcm_paused) {
+            pcm_paused = false;
+            pcm_play_pause(false);
+        }
+    }
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -176,48 +177,54 @@ void pcm_play_stop(void)
 
 void pcm_play_pause(bool play)
 {
-    if (!pcm_playing)
-        return ;
+    size_t next_size;
+    unsigned char *next_start;
+    bool needs_change = pcm_paused == play;
 
-    if(pcm_paused && play)
+    /* This must be done ahead of the rest of the function to prevent
+     * infinite recursion in dma_start */
+    pcm_paused = !play;
+    if (pcm_playing && needs_change)
     {
-        if (BCR0 & 0xffffff)
+        if(play)
         {
-            logf("unpause");
-            /* Enable the FIFO and force one write to it */
-            IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+            if (pcm_get_bytes_waiting())
+            {
+                logf("unpause");
+                /* Enable the FIFO and force one write to it */
+                IIS2CONFIG = IIS_DEFPARM(pcm_freq);
 #ifdef HAVE_SPDIF_OUT
-            EBU1CONFIG = EBU_DEFPARM;
+                EBU1CONFIG = EBU_DEFPARM;
 #endif
-            DCR0 |= DMA_EEXT | DMA_START;
+                DCR0 |= DMA_EEXT | DMA_START;
+            }
+            else
+            {
+                logf("unpause, no data waiting");
+                void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+                if (get_more)
+                    get_more(&next_start, &next_size);
+                if (next_start && next_size)
+                    dma_start(next_start, next_size);
+                else
+                {
+                    dma_stop();
+                    logf("unpause attempted, no data");
+                }
+            }
         }
         else
         {
-            logf("unpause, no data waiting");
-            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
-            if (get_more)
-                get_more(&next_start, &next_size);
-            if (next_start && next_size)
-                dma_start(next_start, next_size);
-            else
-            {
-                dma_stop();
-                logf("unpause attempted, no data");
-            }
+            logf("pause");
+
+            /* Disable DMA peripheral request. */
+            DCR0 &= ~DMA_EEXT;
+            IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+#ifdef HAVE_SPDIF_OUT
+            EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
+#endif
         }
     }
-    else if(!pcm_paused && !play)
-    {
-        logf("pause");
-
-        /* Disable DMA peripheral request. */
-        DCR0 &= ~DMA_EEXT;
-        IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
-        EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
-#endif
-    }
-    pcm_paused = !play;
 }
 
 bool pcm_is_paused(void)
@@ -247,6 +254,8 @@ void DMA0(void)
     }
     else
     {
+        size_t next_size;
+        unsigned char *next_start;
         {
             void (*get_more)(unsigned char**, size_t*) = callback_for_more;
             if (get_more)
@@ -412,8 +421,6 @@ static void dma_stop(void)
 #endif
 
     disable_fiq();
-
-    pcm_paused = false;
 }
 
 void pcm_set_frequency(unsigned int frequency)
@@ -436,8 +443,13 @@ void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
         else
             return;
     }
-    if (start && size)
+    if (start && size) {
         dma_start(start, size);
+        if (pcm_paused) {
+            pcm_paused = false;
+            pcm_play_pause(false);
+        }
+    }
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -464,82 +476,85 @@ void pcm_play_pause(bool play)
     size_t next_size;
     unsigned char *next_start;
 
-    if (!pcm_playing)
-        return ;
-
-    if(pcm_paused && play)
+    bool needs_change = pcm_paused == play;
+    /* This needs to be done ahead of the rest to prevent infinite
+     * recursion from dma_start */
+    pcm_paused = !play;
+    if (pcm_playing && needs_change)
     {
-        if (pcm_get_bytes_waiting())
+        if(play)
         {
-            logf("unpause");
-            /* Enable the FIFO and fill it */
+            if (pcm_get_bytes_waiting())
+            {
+                logf("unpause");
+                /* Enable the FIFO and fill it */
 
-            enable_fiq();
+                enable_fiq();
 
-            /* Enable playback FIFO */
+                /* Enable playback FIFO */
 #if CONFIG_CPU == PP5020
-            IISCONFIG |= 0x20000000;
+                IISCONFIG |= 0x20000000;
 #elif CONFIG_CPU == PP5002
-            IISCONFIG |= 0x4;
+                IISCONFIG |= 0x4;
 #endif
 
-            /* Fill the FIFO - we assume there are enough bytes in the 
-               pcm buffer to fill the 32-byte FIFO. */
-            while (p_size > 0) {
-                if (FIFO_FREE_COUNT < 2) {
-                    /* Enable interrupt */
+                /* Fill the FIFO - we assume there are enough bytes in the 
+                   pcm buffer to fill the 32-byte FIFO. */
+                while (p_size > 0) {
+                    if (FIFO_FREE_COUNT < 2) {
+                        /* Enable interrupt */
 #if CONFIG_CPU == PP5020
-                    IISCONFIG |= 0x2;
+                        IISCONFIG |= 0x2;
 #elif CONFIG_CPU == PP5002
-                    IISFIFO_CFG |= (1<<9);
+                        IISFIFO_CFG |= (1<<9);
 #endif
-                    return;
+                        return;
+                    }
+
+                    IISFIFO_WR = (*(p++))<<16;
+                    IISFIFO_WR = (*(p++))<<16;
+                    p_size-=4;
                 }
-
-                IISFIFO_WR = (*(p++))<<16;
-                IISFIFO_WR = (*(p++))<<16;
-                p_size-=4;
+            }
+            else
+            {
+                logf("unpause, no data waiting");
+                void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+                if (get_more)
+                    get_more(&next_start, &next_size);
+                if (next_start && next_size)
+                    dma_start(next_start, next_size);
+                else
+                {
+                    dma_stop();
+                    logf("unpause attempted, no data");
+                }
             }
         }
         else
         {
-            logf("unpause, no data waiting");
-            void (*get_more)(unsigned char**, size_t*) = callback_for_more;
-            if (get_more)
-                get_more(&next_start, &next_size);
-            if (next_start && next_size)
-                dma_start(next_start, next_size);
-            else
-            {
-                dma_stop();
-                logf("unpause attempted, no data");
-            }
-        }
-    }
-    else if(!pcm_paused && !play)
-    {
-        logf("pause");
+            logf("pause");
 
 #if CONFIG_CPU == PP5020
 
-        /* Disable the interrupt */
-        IISCONFIG &= ~0x2;
+            /* Disable the interrupt */
+            IISCONFIG &= ~0x2;
 
-        /* Disable playback FIFO */
-        IISCONFIG &= ~0x20000000;
+            /* Disable playback FIFO */
+            IISCONFIG &= ~0x20000000;
 
 #elif CONFIG_CPU == PP5002
 
-        /* Disable the interrupt */
-        IISFIFO_CFG &= ~(1<<9);
+            /* Disable the interrupt */
+            IISFIFO_CFG &= ~(1<<9);
 
-        /* Disable playback FIFO */
-        IISCONFIG &= ~0x4;
+            /* Disable playback FIFO */
+            IISCONFIG &= ~0x4;
 #endif
 
-        disable_fiq();
+            disable_fiq();
+        }
     }
-    pcm_paused = !play;
 }
 
 bool pcm_is_paused(void)
@@ -615,8 +630,6 @@ void fiq(void)
         "mrs r10, cpsr        \n\t"
         "orr r10, r10, #0x40  \n\t" /* disable FIQ */
         "msr cpsr_c, r10      \n\t"
-        "ldr r10, =pcm_paused \n\t"
-        "strb r8, [r10]       \n\t" /* pcm_paused = false */
     ".exit:                   \n\t"
         "str r8, [r11, #4]    \n\t"
         "str r9, [r11]        \n\t"

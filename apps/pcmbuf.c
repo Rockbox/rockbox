@@ -390,8 +390,11 @@ static void pcmbuf_flush_audio(void)
 }
 
 void pcmbuf_pause(bool pause) {
-    pcm_mute(pause);
+    if (pause)
+        pcm_mute(true);
     pcm_play_pause(!pause);
+    if (!pause)
+        pcm_mute(false);
     pcmbuf_boost(!pause);
 }
 
