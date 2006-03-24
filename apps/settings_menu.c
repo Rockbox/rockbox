@@ -824,7 +824,7 @@ static bool sleep_timer(void)
     int minutes = get_sleep_timer() / 60;
 
     return set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
-        &sleep_timer_set, 1, 0, 300, sleep_timer_formatter);
+        &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);
 }
 
 static bool scroll_speed(void)
