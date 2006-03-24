@@ -37,6 +37,15 @@ struct event_queue button_queue;
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
+#ifdef CONFIG_BACKLIGHT
+static bool filter_first_keypress;
+
+void set_backlight_filter_keypress(bool value)
+{
+    filter_first_keypress = value;
+}
+#endif
+
 void button_event(int key, bool pressed)
 {
     int new_btn = 0;
@@ -219,7 +228,10 @@ void button_event(int key, bool pressed)
                 }
                 else
                 {
-                    queue_post(&button_queue, btn, NULL);
+#ifdef CONFIG_BACKLIGHT
+                    if ( !filter_first_keypress || is_backlight_on())
+#endif
+                        queue_post(&button_queue, btn, NULL);
                     post = false;
                 }    
 

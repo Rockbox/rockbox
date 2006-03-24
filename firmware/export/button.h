@@ -42,6 +42,9 @@ void button_clear_queue(void);
 #ifdef HAVE_LCD_BITMAP
 void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
+#ifdef CONFIG_BACKLIGHT
+void set_backlight_filter_keypress(bool value);
+#endif
 
 #ifdef HAS_BUTTON_HOLD
 bool button_hold(void);

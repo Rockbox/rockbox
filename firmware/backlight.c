@@ -522,6 +522,14 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
+bool is_backlight_on(void)
+{
+    if (backlight_timer || !backlight_get_current_timeout())
+        return true;
+    else
+        return false;
+}
+
 /* return value in ticks; 0 means always on, <0 means always off */
 int backlight_get_current_timeout(void)
 {

@@ -3832,3 +3832,9 @@ desc: "pitch" in the pitch screen
 eng: "Pitch"
 voice: "Pitch"
 new:
+
+id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+desc: Backlight behaviour setting
+eng: "First keypress enables backlight only"
+voice: "First keypress enables backlight only"
+new:

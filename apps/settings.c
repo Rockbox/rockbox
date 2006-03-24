@@ -296,6 +296,14 @@ static const struct bit_entry rtc_bits[] =
 #endif
 #endif
 
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_LCD_COLOR
+    {1, S_O(bl_filter_first_keypress), true, "backlight filters first keypress", off_on },
+#else
+    {1, S_O(bl_filter_first_keypress), false, "backlight filters first keypress", off_on },
+#endif
+#endif
+
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
 
@@ -1114,6 +1122,10 @@ void settings_apply(void)
 
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
+#endif
+
+#ifdef CONFIG_BACKLIGHT
+    set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
 #endif
 }
 

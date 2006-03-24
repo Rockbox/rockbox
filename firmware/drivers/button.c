@@ -52,6 +52,9 @@ static long last_read; /* Last button status, for debouncing/filtering */
 #ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
+#ifdef CONFIG_BACKLIGHT
+static bool filter_first_keypress;
+#endif
 
 /* how often we check to see if a button is pressed */
 #define POLL_FREQUENCY    HZ/100
@@ -504,7 +507,10 @@ static void button_tick(void)
                     }
                     else
                     {
-                        queue_post(&button_queue, btn, NULL);
+#ifdef CONFIG_BACKLIGHT
+                        if ( !filter_first_keypress || is_backlight_on())
+#endif
+                            queue_post(&button_queue, btn, NULL);
                         post = false;
                     }
 #ifdef HAVE_REMOTE_LCD
@@ -629,6 +635,9 @@ void button_init(void)
 #ifdef HAVE_LCD_BITMAP
     flipped = false;
 #endif
+#ifdef CONFIG_BACKLIGHT
+    filter_first_keypress = false;
+#endif
 }
 
 #ifdef HAVE_LCD_BITMAP /* only bitmap displays can be flipped */
@@ -686,6 +695,13 @@ void button_set_flip(bool flip)
     }
 }
 #endif /* HAVE_LCD_BITMAP */
+
+#ifdef CONFIG_BACKLIGHT
+void set_backlight_filter_keypress(bool value)
+{
+    filter_first_keypress = value;
+}
+#endif
 
 /*
  Archos hardware button hookup

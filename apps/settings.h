@@ -472,6 +472,10 @@ struct user_settings
     int fg_color; /* foreground color native format */
 #endif
     bool party_mode;	/* party mode - unstoppable music */
+    
+#ifdef CONFIG_BACKLIGHT
+    bool bl_filter_first_keypress;   /* filter first keypress when dark? */
+#endif
 };
 
 enum optiontype { INT, BOOL };

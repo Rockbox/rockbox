@@ -1046,6 +1046,15 @@ static bool set_party_mode(void)
     return set_bool( str(LANG_PARTY_MODE), &global_settings.party_mode );
 }
 
+#ifdef CONFIG_BACKLIGHT
+static bool set_bl_filter_first_keypress(void)
+{
+    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), 
+                            &global_settings.bl_filter_first_keypress );
+    set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
+    return result;
+}
+#endif 
 
 static bool ff_rewind_accel(void) 
 { 
@@ -1621,6 +1630,7 @@ static bool lcd_settings_menu(void)
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
         { ID2P(LANG_BRIGHTNESS), brightness },
 #endif
+        { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_bl_filter_first_keypress },
 #endif /* CONFIG_BACKLIGHT */
         { ID2P(LANG_CONTRAST),        contrast },
 #ifdef HAVE_LCD_BITMAP
