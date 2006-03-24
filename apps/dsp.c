@@ -589,27 +589,24 @@ static void apply_crossfeed(int32_t* src[], int count)
 }
 #endif
 
-#define EQ_CUTOFF_USER2REAL(x) (0xffffffff / NATIVE_FREQUENCY * (x))
-#define EQ_Q_USER2REAL(x) (((x) << 16) / 10)
-#define EQ_GAIN_USER2REAL(x) (((x) << 16) / 10)
-
 /* Synchronize the EQ filters with the global settings */
 void dsp_eq_update_data(bool enabled, int band)
 {
-    int *setting;
-    int gain, cutoff, q;
+    const int *setting;
+    long gain;
+    unsigned long cutoff, q;
 
     dsp->eq_enabled = enabled;
     
     /* Adjust setting pointer to the band we actually want to change */
     setting = &global_settings.eq_band0_cutoff + (band * 3);
 
-    cutoff = *setting++;
-    q = *setting++;
-    gain = *setting++;
+    /* Convert user settings to format required by coef generator functions */
+    cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
+    q = ((*setting++) << 16) / 10;        /* 16.16 */
+    gain = ((*setting++) << 16) / 10;     /* s15.16 */
 
-    DEBUGF("cutoff %d, q %d, gain %d\n", cutoff, q, gain);
-
+    /* The coef functions assume the EMAC unit is in fractional mode */
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set emac unit for dsp processing, and save old macsr, we're running in
        codec thread context at this point, so can't clobber it */
@@ -617,18 +614,16 @@ void dsp_eq_update_data(bool enabled, int band)
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
     #endif
 
+    /* Assume a band is disabled if the gain is zero */
     if (gain == 0) {
         eq_data.enabled[band] = 0;
     } else {
         if (band == 0)
-            eq_ls_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
+            eq_ls_coefs(cutoff, q, gain, eq_data.filters[band].coefs);
         else if (band == 4)
-            eq_hs_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
+            eq_hs_coefs(cutoff, q, gain, eq_data.filters[band].coefs);
         else
-            eq_pk_coefs(EQ_CUTOFF_USER2REAL(cutoff), EQ_Q_USER2REAL(q),
-                EQ_GAIN_USER2REAL(gain), eq_data.filters[band].coefs);
+            eq_pk_coefs(cutoff, q, gain, eq_data.filters[band].coefs);
 
         eq_data.enabled[band] = 1;
     }
