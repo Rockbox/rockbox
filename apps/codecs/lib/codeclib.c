@@ -36,7 +36,7 @@ int codec_init(struct codec_api* rb)
 {
     local_rb = rb;
     mem_ptr = 0;
-    mallocbuf = (unsigned char *)rb->get_codec_memory((long *)&bufsize);
+    mallocbuf = (unsigned char *)rb->get_codec_memory((size_t *)&bufsize);
   
     return 0;
 }
