@@ -19,7 +19,6 @@ plugin.c
 screens.c
 settings.c
 settings_menu.c
-sleeptimer.c
 sound_menu.c
 status.c
 #if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC

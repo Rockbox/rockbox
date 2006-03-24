@@ -36,7 +36,6 @@
 #include "backlight.h"
 #include "playlist.h"           /* for playlist_shuffle */
 #include "fat.h"                /* For dotfile settings */
-#include "sleeptimer.h"
 #include "powermgmt.h"
 #include "rtc.h"
 #include "ata.h"
@@ -797,6 +796,35 @@ static bool poweroff_idle_timer(void)
     };
     return set_option(str(LANG_POWEROFF_IDLE), &global_settings.poweroff,
                       INT, names, 15, set_poweroff_timeout);
+}
+
+static void sleep_timer_formatter(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    int minutes, hours;
+
+    (void) unit;
+
+    if (value) {
+        hours = value / 60;
+        minutes = value - (hours * 60);
+        snprintf(buffer, buffer_size, "%d:%02d", hours, minutes);
+    } else {
+        snprintf(buffer, buffer_size, "%s", str(LANG_OFF));
+    }
+}
+
+static void sleep_timer_set(int minutes)
+{
+    set_sleep_timer(minutes * 60);
+}
+
+static bool sleep_timer(void)
+{
+    int minutes = get_sleep_timer() / 60;
+
+    return set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
+        &sleep_timer_set, 15, 0, 300, sleep_timer_formatter);
 }
 
 static bool scroll_speed(void)
@@ -1864,7 +1892,7 @@ static bool system_settings_menu(void)
         { ID2P(LANG_TIME_MENU),        time_settings_menu     },
 #endif
         { ID2P(LANG_POWEROFF_IDLE),    poweroff_idle_timer    },
-        { ID2P(LANG_SLEEP_TIMER),      sleeptimer_screen      },
+        { ID2P(LANG_SLEEP_TIMER),      sleep_timer            },
 #ifdef HAVE_ALARM_MOD
         { ID2P(LANG_ALARM_MOD_ALARM_MENU), alarm_screen       },
 #endif
