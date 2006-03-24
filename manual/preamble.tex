@@ -3,6 +3,12 @@
 \usepackage{palatino}
 %\renewcommand{\familydefault}{\sfdefault}
 
+%Comment this out at release
+\usepackage{pdfdraftcopy}
+\draftstring{DRAFT VERSION}
+%\draftangle{45}
+
+
 \usepackage{float}
 \floatstyle{ruled}
 
@@ -49,9 +55,12 @@
 \renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \setlength{\headheight}{18.5pt}
 \newcounter{example}[chapter]
+
 \newenvironment{example}
     {\stepcounter{example}\paragraph{Example \theexample:}}
     {\hfill$\Box$
     
     \bigskip
     \noindent}
+
+
