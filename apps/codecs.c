@@ -143,6 +143,7 @@ struct codec_api ci = {
     strncasecmp,
     memset,
     memcpy,
+    memmove,
     _ctype_,
     atoi,
     strchr,
@@ -215,7 +216,6 @@ struct codec_api ci = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-    memmove,
 };
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,

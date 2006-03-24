@@ -401,8 +401,6 @@ void pcmbuf_pause(bool pause) {
 /* Force playback. */
 void pcmbuf_play_start(void)
 {
-    mutex_lock(&pcmbuf_mutex);
-
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
     {
         /** Prevent a very tiny pop from happening by muting audio
@@ -417,8 +415,6 @@ void pcmbuf_play_start(void)
         /* Now unmute the audio. */
         pcm_mute(false);
     }
-
-    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**
@@ -426,27 +422,22 @@ void pcmbuf_play_start(void)
  */
 static void pcmbuf_flush_fillpos(void)
 {
-    mutex_lock(&pcmbuf_mutex);
-
     if (audiobuffer_fillpos) {
         /* Never use the last buffer descriptor */
         while (pcmbuf_write == pcmbuf_write_end) {
             logf("pcmbuf_flush_fillpos no descriptors");
             /* Deboost to let the playback catchup */
             pcmbuf_boost(false);
-            /* Let someone else have fun in the meantime */
-            sleep(1);
-            /* This is a fatal error situation that should never happen. */
+            /* If this happens, something is being stupid */
             if (!pcm_is_playing()) {
                 logf("pcmbuf_flush_fillpos error");
                 pcmbuf_play_start();
-                return ;
             }
+            /* Let approximately one chunk of data playback */
+            sleep(PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY * 4) / 5);
         }
         pcmbuf_add_chunk();
     }
-
-    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**

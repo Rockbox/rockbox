@@ -118,11 +118,9 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 
         if ((buf[0] & 0x7f) == 0)       /* 0 is the STREAMINFO block */
         {
-            /* FIXME: Don't trust the value of blocklength */
-            if (ci->read_filebuf(buf, blocklength) < 0)
-            {
-                return false;
-            }
+            /* FIXME: Don't trust the value of blocklength, use actual return
+             * value in bytes instead */
+            ci->read_filebuf(buf, blocklength);
           
             fc->filesize = ci->filesize;
             fc->min_blocksize = (buf[0] << 8) | buf[1];

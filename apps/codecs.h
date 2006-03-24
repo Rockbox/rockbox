@@ -85,12 +85,12 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 4
+#define CODEC_API_VERSION 5
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 3
+#define CODEC_MIN_API_VERSION 5
 
 /* codec return codes */
 enum codec_status {
@@ -125,7 +125,7 @@ struct codec_api {
     long seek_time;
     
     /* Returns buffer to malloc array. Only codeclib should need this. */
-    void* (*get_codec_memory)(long *size);
+    void* (*get_codec_memory)(size_t *size);
     /* Insert PCM data into audio buffer for playback. Playback will start
        automatically. */
     bool (*pcmbuf_insert)(const char *data, size_t length);
@@ -135,18 +135,18 @@ struct codec_api {
     
     /* Read next <size> amount bytes from file buffer to <ptr>.
        Will return number of bytes read or 0 if end of file. */
-    long (*read_filebuf)(void *ptr, long size);
+    size_t (*read_filebuf)(void *ptr, size_t size);
     /* Request pointer to file buffer which can be used to read
        <realsize> amount of data. <reqsize> tells the buffer system
        how much data it should try to allocate. If <realsize> is 0,
        end of file is reached. */
-    void* (*request_buffer)(long *realsize, long reqsize);
+    void* (*request_buffer)(size_t *realsize, size_t reqsize);
     /* Advance file buffer position by <amount> amount of bytes. */
-    void (*advance_buffer)(long amount);
+    void (*advance_buffer)(size_t amount);
     /* Advance file buffer to a pointer location inside file buffer. */
     void (*advance_buffer_loc)(void *ptr);
     /* Seek file buffer to position <newpos> beginning of file. */
-    bool (*seek_buffer)(off_t newpos);
+    bool (*seek_buffer)(size_t newpos);
     /* Codec should call this function when it has done the seeking. */
     void (*seek_complete)(void);
     /* Calculate mp3 seek position from given time data in ms. */
@@ -156,7 +156,7 @@ struct codec_api {
        codec should exit immediately with PLUGIN_OK status. */
     bool (*request_next_track)(void);
     
-    void (*set_offset)(unsigned int value);
+    void (*set_offset)(size_t value);
     /* Configure different codec buffer parameters. */
     void (*configure)(int setting, void *value);
 
@@ -214,6 +214,7 @@ struct codec_api {
     int (*strncasecmp)(const char *s1, const char *s2, size_t n);
     void* (*memset)(void *dst, int c, size_t length);
     void* (*memcpy)(void *out, const void *in, size_t n);
+    void* (*memmove)(void *out, const void *in, size_t n);
     const char *_ctype_;
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
@@ -292,7 +293,6 @@ struct codec_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
 
-    void* (*memmove)(void *out, const void *in, size_t n);
 };
 
 /* codec header */

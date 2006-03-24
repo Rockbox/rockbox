@@ -145,7 +145,7 @@ static struct mutex mutex_codecthread;
 static struct mp3entry id3_voice;
 
 static char *voicebuf;
-static int voice_remaining;
+static size_t voice_remaining;
 static bool voice_is_playing;
 static void (*voice_getmore)(unsigned char** start, int* size);
 
@@ -159,14 +159,14 @@ extern unsigned char codecbuf[];
 static char *filebuf;
 
 /* Total size of the ring buffer. */
-int filebuflen;
+size_t filebuflen;
 
 /* Bytes available in the buffer. */
-int filebufused;
+size_t filebufused;
 
 /* Ring buffer read and write indexes. */
-static volatile int buf_ridx;
-static volatile int buf_widx;
+static volatile size_t buf_ridx;
+static volatile size_t buf_widx;
 
 #ifndef SIMULATOR
 static unsigned char *iram_buf[2];
@@ -187,7 +187,7 @@ static bool track_changed;
 static int current_fd;
 
 /* Information about how many bytes left on the buffer re-fill run. */
-static long fill_bytesleft;
+static size_t fill_bytesleft;
 
 /* Track info structure about songs in the file buffer. */
 static struct track_info tracks[MAX_TRACK];
@@ -215,10 +215,10 @@ void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
 static void playback_init(void);
 
 /* Configuration */
-static int conf_bufferlimit;
-static int conf_watermark;
-static int conf_filechunk;
-static int buffer_margin;
+static size_t conf_bufferlimit;
+static size_t conf_watermark;
+static size_t conf_filechunk;
+static size_t buffer_margin;
 
 static bool v1first = false;
 
@@ -388,7 +388,7 @@ bool codec_pcmbuf_insert_callback(const char *buf, size_t length)
         length);
 }
 
-void* get_codec_memory_callback(long *size)
+void* get_codec_memory_callback(size_t *size)
 {
     *size = MALLOC_BUFSIZE;
     if (voice_codec_loaded)
@@ -413,7 +413,8 @@ void codec_set_elapsed_callback(unsigned int value)
 {
     unsigned int latency;
 
-    if (ci.stop_codec || current_codec == CODEC_IDX_VOICE)
+    /* We don't save or display offsets for voice */
+    if (current_codec == CODEC_IDX_VOICE)
         return ;
         
 #ifdef AB_REPEAT_ENABLE
@@ -429,11 +430,12 @@ void codec_set_elapsed_callback(unsigned int value)
     }
 }
 
-void codec_set_offset_callback(unsigned int value)
+void codec_set_offset_callback(size_t value)
 {
     unsigned int latency;
 
-    if (ci.stop_codec || current_codec == CODEC_IDX_VOICE)
+    /* We don't save or display offsets for voice */
+    if (current_codec == CODEC_IDX_VOICE)
         return ;
         
     latency = pcmbuf_get_latency() * cur_ti->id3.bitrate / 8;
@@ -445,43 +447,56 @@ void codec_set_offset_callback(unsigned int value)
     }
 }
 
-long codec_filebuf_callback(void *ptr, long size)
+static void advance_buffer_counters(size_t amount) {
+    buf_ridx += amount;
+    if (buf_ridx >= filebuflen)
+        buf_ridx -= filebuflen;
+    ci.curpos += amount;
+    cur_ti->available -= amount;
+    filebufused -= amount;
+}
+
+/* copy up-to size bytes into ptr and return the actual size copied */
+size_t codec_filebuf_callback(void *ptr, size_t size)
 {
     char *buf = (char *)ptr;
-    int copy_n;
-    int part_n;
+    size_t copy_n;
+    size_t part_n;
     
     if (ci.stop_codec || !playing || current_codec == CODEC_IDX_VOICE)
         return 0;
     
-    copy_n = MIN((off_t)size, (off_t)cur_ti->available + cur_ti->filerem);
+    /* The ammount to copy is the lesser of the requested amount and the
+     * amount left of the current track (both on disk and already loaded) */
+    copy_n = MIN(size, cur_ti->available + cur_ti->filerem);
     
+    /* Nothing requested OR nothing left */
+    if (copy_n == 0)
+        return 0;
+    
+    /* Let the disk buffer catch fill until enough data is available */
     while (copy_n > cur_ti->available) {
         yield();
         if (ci.stop_codec || ci.reload_codec)
             return 0;
     }
     
-    if (copy_n == 0)
-        return 0;
-    
+    /* Copy as much as possible without wrapping */
     part_n = MIN(copy_n, filebuflen - buf_ridx);
     memcpy(buf, &filebuf[buf_ridx], part_n);
+    /* Copy the rest in the case of a wrap */
     if (part_n < copy_n) {
         memcpy(&buf[part_n], &filebuf[0], copy_n - part_n);
     }
     
-    buf_ridx += copy_n;
-    if (buf_ridx >= filebuflen)
-        buf_ridx -= filebuflen;
-    ci.curpos += copy_n;
-    cur_ti->available -= copy_n;
-    filebufused -= copy_n;
+    /* Update read and other position pointers */
+    advance_buffer_counters(copy_n);
     
+    /* Return the actual amount of data copied to the buffer */
     return copy_n;
 }
 
-void* voice_request_data(long *realsize, long reqsize)
+void* voice_request_data(size_t *realsize, size_t reqsize)
 {
     while (queue_empty(&voice_codec_queue) && (voice_remaining == 0
             || voicebuf == NULL) && !ci_voice.stop_codec)
@@ -503,10 +518,8 @@ void* voice_request_data(long *realsize, long reqsize)
         if (voice_remaining)
         {
             voice_is_playing = true;
-            break ;
         }
-            
-        if (voice_getmore != NULL)
+        else if (voice_getmore != NULL)
         {
             voice_getmore((unsigned char **)&voicebuf, (int *)&voice_remaining);
 
@@ -519,13 +532,8 @@ void* voice_request_data(long *realsize, long reqsize)
         }
     }
 
-    if (reqsize < 0)
-        reqsize = 0;
-        
     voice_is_playing = true;
-    *realsize = voice_remaining;
-    if (*realsize > reqsize)
-        *realsize = reqsize;
+    *realsize = MIN(voice_remaining, reqsize);
 
     if (*realsize == 0)
         return NULL;
@@ -533,9 +541,9 @@ void* voice_request_data(long *realsize, long reqsize)
     return voicebuf;
 }
 
-void* codec_request_buffer_callback(long *realsize, long reqsize)
+void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
 {
-    long part_n;
+    size_t short_n, copy_n, buf_rem;
 
     /* Voice codec. */
     if (current_codec == CODEC_IDX_VOICE) {
@@ -547,12 +555,13 @@ void* codec_request_buffer_callback(long *realsize, long reqsize)
         return NULL;
     }
     
-    *realsize = MIN((off_t)reqsize, (off_t)cur_ti->available + cur_ti->filerem);
-    if (*realsize == 0) {
+    copy_n = MIN(reqsize, cur_ti->available + cur_ti->filerem);
+    if (copy_n == 0) {
+        *realsize = 0;
         return NULL;
     }
     
-    while ((int)*realsize > cur_ti->available) {
+    while (copy_n > cur_ti->available) {
         yield();
         if (ci.stop_codec || ci.reload_codec) {
             *realsize = 0;
@@ -560,19 +569,24 @@ void* codec_request_buffer_callback(long *realsize, long reqsize)
         }
     }
     
-    part_n = MIN((int)*realsize, filebuflen - buf_ridx);
-    if (part_n < *realsize) {
-        part_n += GUARD_BUFSIZE;
-        if (part_n < *realsize)
-            *realsize = part_n;
-        memcpy(&filebuf[filebuflen], &filebuf[0], *realsize -
-            (filebuflen - buf_ridx));
+    /* How much is left at the end of the file buffer before wrap? */
+    buf_rem = filebuflen - buf_ridx;
+    /* If we can't satisfy the request without wrapping */
+    if (buf_rem < copy_n) {
+        /* How short are we? */
+        short_n = copy_n - buf_rem;
+        /* If we can fudge it with the guardbuf */
+        if (short_n < GUARD_BUFSIZE)
+            memcpy(&filebuf[filebuflen], &filebuf[0], short_n);
+        else
+            copy_n = buf_rem;
     }
     
+    *realsize = copy_n;
     return (char *)&filebuf[buf_ridx];
 }
 
-static bool rebuffer_and_seek(int newpos)
+static bool rebuffer_and_seek(size_t newpos)
 {
     int fd;
 
@@ -613,11 +627,11 @@ static bool rebuffer_and_seek(int newpos)
     return true;
 }
 
-void codec_advance_buffer_callback(long amount)
+void codec_advance_buffer_callback(size_t amount)
 {
     if (current_codec == CODEC_IDX_VOICE) {
         //logf("voice ad.buf:%d", amount);
-        amount = MAX(0, MIN(amount, voice_remaining));
+        amount = MIN(amount, voice_remaining);
         voicebuf += amount;
         voice_remaining -= amount;
         
@@ -636,23 +650,19 @@ void codec_advance_buffer_callback(long amount)
         return ;
     }
     
-    buf_ridx += amount;
-    if (buf_ridx >= filebuflen)
-        buf_ridx -= filebuflen;
-    cur_ti->available -= amount;
-    filebufused -= amount;
-    ci.curpos += amount;
+    advance_buffer_counters(amount);
+
     codec_set_offset_callback(ci.curpos);
 }
 
 void codec_advance_buffer_loc_callback(void *ptr)
 {
-    long amount;
+    size_t amount;
 
     if (current_codec == CODEC_IDX_VOICE)
-        amount = (long)ptr - (long)voicebuf;
+        amount = (size_t)ptr - (size_t)voicebuf;
     else
-        amount = (long)ptr - (long)&filebuf[buf_ridx];
+        amount = (size_t)ptr - (size_t)&filebuf[buf_ridx];
     codec_advance_buffer_callback(amount);
 }
 
@@ -672,16 +682,13 @@ void codec_seek_complete_callback(void)
     ci.seek_time = 0;
 }
 
-bool codec_seek_buffer_callback(off_t newpos)
+bool codec_seek_buffer_callback(size_t newpos)
 {
     int difference;
 
     if (current_codec == CODEC_IDX_VOICE)
         return false;
         
-    if (newpos < 0)
-        newpos = 0;
-    
     if (newpos >= cur_ti->filesize)
         newpos = cur_ti->filesize - 1;
      
@@ -706,9 +713,9 @@ bool codec_seek_buffer_callback(off_t newpos)
     logf("seek: -%d", difference);
     filebufused += difference;
     cur_ti->available += difference;
+    if (buf_ridx < (unsigned)difference)
+        buf_ridx += filebuflen;
     buf_ridx -= difference;
-    if (buf_ridx < 0)
-        buf_ridx = filebuflen + buf_ridx;
     ci.curpos -= difference;
     
     return true;
@@ -716,7 +723,7 @@ bool codec_seek_buffer_callback(off_t newpos)
 
 static void set_filebuf_watermark(int seconds)
 {
-    long bytes;
+    size_t bytes;
 
     if (current_codec == CODEC_IDX_VOICE)
         return ;
@@ -724,7 +731,7 @@ static void set_filebuf_watermark(int seconds)
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
         
-    bytes = MAX((int)cur_ti->id3.bitrate * seconds * (1000/8), conf_watermark);
+    bytes = MAX(cur_ti->id3.bitrate * seconds * (1000/8), conf_watermark);
     bytes = MIN(bytes, filebuflen / 2);
     conf_watermark = bytes;
 }
@@ -803,14 +810,15 @@ void strip_id3v1_tag(void)
 {
     int i;
     static const unsigned char tag[] = "TAG";
-    int tagptr;
+    size_t tagptr;
     bool found = true;
 
     if (filebufused >= 128)
     {
-        tagptr = buf_widx - 128;
-        if (tagptr < 0)
-            tagptr += filebuflen;
+        if (buf_widx < 128)
+            tagptr = filebuflen + buf_widx - 128;
+        else
+            tagptr = buf_widx - 128;
         
         for(i = 0;i < 3;i++)
         {
@@ -839,7 +847,9 @@ void strip_id3v1_tag(void)
 
 static void audio_fill_file_buffer(void)
 {
-    long i, size;
+    unsigned long i;
+    size_t size;
+    size_t copy_n;
     int rc;
 
     if (current_fd < 0)
@@ -858,9 +868,9 @@ static void audio_fill_file_buffer(void)
             
         if (fill_bytesleft == 0)
             break ;
-        rc = MIN(conf_filechunk, filebuflen - buf_widx);
-        rc = MIN(rc, fill_bytesleft);
-        rc = read(current_fd, &filebuf[buf_widx], rc);
+        copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
+        copy_n = MIN(copy_n, fill_bytesleft);
+        rc = read(current_fd, &filebuf[buf_widx], copy_n);
         if (rc <= 0) {
             tracks[track_widx].filerem = 0;
             break ;
@@ -901,11 +911,12 @@ static int get_codec_base_type(int type)
 
 static bool loadcodec(bool start_play)
 {
-    off_t size;
+    size_t size;
     int fd;
-    int i, rc;
+    unsigned int i;
+    int rc;
     const char *codec_path;
-    int copy_n;
+    size_t copy_n;
     int prev_track;
     
     switch (tracks[track_widx].id3.codectype) {
@@ -994,7 +1005,7 @@ static bool loadcodec(bool start_play)
     }
     
     size = filesize(fd);
-    if ((off_t)fill_bytesleft < size + conf_watermark) {
+    if (fill_bytesleft < size + conf_watermark) {
         logf("Not enough space");
         /* Set codectype back to zero to indicate no codec was loaded. */
         tracks[track_widx].id3.codectype = 0;
@@ -1464,7 +1475,10 @@ static void audio_check_buffer(void)
     /* Limit buffering size at first run. */
     if (conf_bufferlimit && fill_bytesleft > conf_bufferlimit
             - filebufused) {
-        fill_bytesleft = MAX(0, conf_bufferlimit - filebufused);
+        if (conf_bufferlimit > filebufused)
+            fill_bytesleft = conf_bufferlimit - filebufused;
+        else
+            fill_bytesleft = 0;
     }
     
     /* Try to load remainings of the file. */
@@ -1631,11 +1645,11 @@ static int skip_previous_track(bool inside_codec_thread)
     cur_ti->available = cur_ti->filesize - cur_ti->filerem;
     
     cur_ti = &tracks[track_ridx];
-    buf_ridx -= cur_ti->filesize;
     filebufused += cur_ti->filesize;
     cur_ti->available = cur_ti->filesize;
-    if (buf_ridx < 0)
+    if (buf_ridx < cur_ti->filesize)
         buf_ridx += filebuflen;
+    buf_ridx -= cur_ti->filesize;
     
     audio_update_trackinfo();
     
@@ -2096,8 +2110,6 @@ void voice_init(void)
     {
         logf("Terminating voice codec");
         ci_voice.stop_codec = true;
-        if (current_codec != CODEC_IDX_VOICE)
-            swap_codec();
         sleep(1);
     }
 
