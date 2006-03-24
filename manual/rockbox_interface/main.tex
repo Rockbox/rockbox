@@ -371,17 +371,18 @@ Notes:
 \begin{center}
   \includegraphics[width=4cm]{rockbox_interface/images/ss-id3-viewer-112x64x1.png}
 \end{center}
+This screen is accessible from the WPS screen, and provides a detailed view of all the identity information about the current track. This info is known as meta data and is stored in audio file formats to keep information on artist, album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{Please correct this information}\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\ to move through the information.}
 
-This screen is accessible from the WPS screen by pressing F1+ON (recorder) or MENU+ON (player).  It provides a detailed view of all the identity information about the current track that is stored in an MP3 file.  Use the LEFT and RIGHT (recorder) or PLUS and MINUS (player) keys to move through the information and the STOP key to exit the viewer.
-
+%********************QUICKSCREENS***********************************************
+\opt{RECORDER_PAD}{
 \section{\label{ref:QuickScreenMenus}Quick Screen Menus}
 \begin{center}
   \includegraphics[width=4cm]{rockbox_interface/images/ss-quick-screen-112x64x1.png}
   \includegraphics[width=4cm]{rockbox_interface/images/ss-quick-screen2-112x64x1.png}
 \end{center}
-Rockbox handles function buttons in a different way to the Archos software. F1 is always bound to the menu function, while F2 and F3 enable two quick menus.
+Rockbox handles function buttons in a different way to the Archos software. \ButtonFOne\ is always bound to the menu function, while \ButtonFTwo\ and \ButtonFThree\ enable two quick menus.
 
-F2 displays some browse and play settings which are likely to be changed frequently. This settings are Shuffle mode, Repeat mode and the Show files options
+\ButtonFTwo\ displays some browse and play settings which are likely to be changed frequently. This settings are Shuffle mode, Repeat mode and the Show files options
 
 Shuffle mode plays each track in the currently playing list in a random order rather than in the order shown in the browser.
 
@@ -395,13 +396,14 @@ See page \pageref{ref:PlaybackOptions} for more information about these settings
   \begin{center}
     \begin{tabular}{@{}cc@{}}\toprule
       \textbf{Key} & \textbf{Action} \\\midrule
-      LEFT & Controls Shuffle mode setting \\
-      RIGHT & Controls Repeat mode setting \\
-      DOWN & Controls Show file setting \\\bottomrule
+      \ButtonLeft & Controls Shuffle mode setting \\
+      \ButtonRight & Controls Repeat mode setting \\
+      \ButtonDown & Controls Show file setting \\\bottomrule
     \end{tabular}
   \end{center}
 \end{table}
-F3 controls frequently used display options.
+
+\ButtonFThree\ controls frequently used display options.
 
 Scroll bar turns the display of the Scroll bar on the left of the screen on or off.
 
@@ -411,9 +413,9 @@ See page \pageref{ref:Displayoptions} for more information about these settings.
 \begin{center}
   \begin{tabular}{@{}cc@{}}\toprule
     \textbf{Key} & \textbf{Action} \\\midrule
-    LEFT & Controls scroll bar display \\
-    RIGHT & Controls status bar display \\
-    DOWN & Controls upside down screen setting \\\bottomrule
+    \ButtonLeft & Controls scroll bar display \\
+    \ButtonRight & Controls status bar display \\
+    \ButtonDown & Controls upside down screen setting \\\bottomrule
   \end{tabular}
 \end{center}
-
+}
