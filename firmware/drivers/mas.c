@@ -198,9 +198,15 @@ int mas_writereg(int reg, unsigned int val)
 
     buf[0] = MAS_DATA_WRITE;
     buf[1] = MAS_CMD_WRITE_REG | (reg >> 4);
+#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
+    buf[2] = ((reg & 0x0f) << 4) | (val >> 16 & 0x0f);
+    buf[3] = (val >> 8) & 0xff;
+    buf[4] = val & 0xff;
+#else
     buf[2] = ((reg & 0x0f) << 4) | (val & 0x0f);
     buf[3] = (val >> 12) & 0xff;
     buf[4] = (val >> 4) & 0xff;
+#endif
 
     /* send write command */
     if (i2c_write(MAS_DEV_WRITE,buf,5))
