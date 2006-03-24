@@ -225,7 +225,11 @@ extern const fb_data brickmania_bricks[];
 #define BMPHEIGHT_powerup 6
 #define BMPWIDTH_powerup 10
 
+#if LCD_DEPTH == 16
+#define BMPHEIGHT_menu 128
+#else
 #define BMPHEIGHT_menu 45
+#endif
 #define BMPWIDTH_menu 160
 
 #define BMPXOFS_start 34
