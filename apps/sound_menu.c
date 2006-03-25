@@ -666,7 +666,7 @@ bool rectrigger(void)
 
         peak_meter_draw_trig(0, LCD_HEIGHT - 8 - TRIG_HEIGHT);
 
-        button = peak_meter_draw_get_btn(0, LCD_HEIGHT - 8, LCD_WIDTH, 8);
+        button = peak_meter_draw_get_btn(0, LCD_HEIGHT - 8, 8);
 
         lcd_update();
 

@@ -33,6 +33,7 @@
 #include "lang.h"
 #include "peakmeter.h"
 #include "audio.h"
+#include "screen_access.h"
 #ifdef CONFIG_BACKLIGHT
 #include "backlight.h"
 #endif
@@ -48,6 +49,8 @@ static bool pm_playback = true; /* selects between playback and recording peaks 
 
 #endif
 
+struct meter_scales scales[NB_SCREENS];
+
 #if !defined(SIMULATOR) && CONFIG_CODEC != SWCODEC
 /* Data source */
 static int pm_src_left = MAS_REG_DQPEAK_L;
@@ -59,12 +62,6 @@ static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
-
-/* Peak hold */
-static int pm_peak_left;       /* buffered peak values */
-static int pm_peak_right;
-static long pm_peak_timeout_l; /* peak hold timeouts */
-static long pm_peak_timeout_r;
 
 /* Clip hold */
 static bool pm_clip_left = false;  /* when true a clip has occurred */
@@ -82,6 +79,7 @@ unsigned short peak_meter_range_min;  /* minimum of range in samples */
 unsigned short peak_meter_range_max;  /* maximum of range in samples */
 static unsigned short pm_range;       /* range width in samples */
 static bool pm_use_dbfs = true;       /* true if peakmeter displays dBfs */
+bool level_check;                     /* true if peeked at peakmeter before drawing */
 static unsigned short pm_db_min = 0;      /* minimum of range in 1/100 dB */
 static unsigned short pm_db_max = 9000;   /* maximum of range in 1/100 dB */
 static unsigned short pm_db_range = 9000; /* range width in 1/100 dB */
@@ -140,7 +138,6 @@ static const long clip_time_out[] = {
 
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
-#define DB_SCALE_SRC_VALUES_SIZE 12
 static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
     32752, /*   0 db */
     22784, /* - 3 db */
@@ -157,15 +154,6 @@ static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
 };
 
 static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
-
-/* if db_scale_valid is false the content of
-   db_scale_lcd_coord needs recalculation */
-static bool db_scale_valid = false;
-
-/* contains the lcd x coordinates of the magical
-   scale values in db_scale_src_values */
-static int db_scale_lcd_coord[sizeof db_scale_src_values / sizeof (int)];
-
 
 /**
  * Calculates dB Value for the peak meter, uses peak value as input
@@ -368,7 +356,9 @@ void peak_meter_set_min(int newmin)
 
     pm_db_min = calc_db(peak_meter_range_min);
     pm_db_range = pm_db_max - pm_db_min;
-    db_scale_valid = false;
+    int i;
+    FOR_NB_SCREENS(i)
+        scales[i].db_scale_valid = false;
 }
 
 /**
@@ -410,7 +400,9 @@ void peak_meter_set_max(int newmax)
 
     pm_db_max = calc_db(peak_meter_range_max);
     pm_db_range = pm_db_max - pm_db_min;
-    db_scale_valid = false;
+    int i;
+    FOR_NB_SCREENS(i)
+        scales[i].db_scale_valid = false;
 }
 
 /**
@@ -449,8 +441,10 @@ bool peak_meter_get_use_dbfs(void)
  */
 void peak_meter_set_use_dbfs(bool use)
 {
+    int i;
     pm_use_dbfs = use;
-    db_scale_valid = false;
+    FOR_NB_SCREENS(i)
+        scales[i].db_scale_valid = false;
 }
 
 /**
@@ -713,7 +707,8 @@ void peak_meter_peek(void)
             break;
     }
 #endif
-
+    /* check levels next time peakmeter drawn */
+    level_check = true;
 #ifdef PM_DEBUG
     peek_calls++;
 #endif
@@ -816,23 +811,27 @@ unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
     }
     return retval;
 }
-
-
+void peak_meter_screen(struct screen *display, int x, int y, int height)
+{
+    peak_meter_draw(display, &scales[display->screen_type], x, y,
+                        display->width, height);
+}           
 /**
  * Draws a peak meter in the specified size at the specified position.
  * @param int x - The x coordinate. 
- *                Make sure that 0 <= x and x + width < LCD_WIDTH
+ *                Make sure that 0 <= x and x + width < display->width
  * @param int y - The y coordinate. 
- *                Make sure that 0 <= y and y + height < LCD_HEIGHT
+ *                Make sure that 0 <= y and y + height < display->height
  * @param int width - The width of the peak meter. Note that for display
  *                    of clips a 3 pixel wide area is used ->
  *                    width > 3
  * @param int height - The height of the peak meter. height > 3
  */
-void peak_meter_draw(int x, int y, int width, int height) 
+void peak_meter_draw(struct screen *display, struct meter_scales *scales,
+                         int x, int y, int width, int height) 
 {
+    static int left_level = 0, right_level = 0;
     int left = 0, right = 0;
-    static int last_left = 0, last_right = 0;
     int meterwidth = width - 3;
     int i;
 
@@ -844,17 +843,21 @@ void peak_meter_draw(int x, int y, int width, int height)
     /* if disabled only draw the peak meter */
     if (peak_meter_enabled) {
 
-        /* read the volume info from MAS */
-        left  = peak_meter_read_l(); 
-        right = peak_meter_read_r();
 
-        /* scale the samples dBfs */
-        left  = peak_meter_scale_value(left, meterwidth);
-        right = peak_meter_scale_value(right, meterwidth);
-    
-        /* if the scale has changed -> recalculate the scale 
+        if (level_check){
+            /* only read the volume info from MAS if peek since last read*/      
+            left_level  = peak_meter_read_l(); 
+            right_level = peak_meter_read_r();
+            level_check = false;
+        }
+
+        /* scale the samples dBfs */    
+        left  = peak_meter_scale_value(left_level, meterwidth);
+        right = peak_meter_scale_value(right_level, meterwidth);        
+
+         /*if the scale has changed -> recalculate the scale 
            (The scale becomes invalid when the range changed.) */
-        if (!db_scale_valid){
+        if (!scales->db_scale_valid){
 
             if (pm_use_dbfs) {
                 db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
@@ -862,7 +865,7 @@ void peak_meter_draw(int x, int y, int width, int height)
                     /* find the real x-coords for predefined interesting
                        dBfs values. These only are recalculated when the
                        scaling of the meter changed. */
-                        db_scale_lcd_coord[i] = 
+                        scales->db_scale_lcd_coord[i] = 
                             peak_meter_scale_value(
                                 db_scale_src_values[i], 
                                 meterwidth - 1);
@@ -873,7 +876,7 @@ void peak_meter_draw(int x, int y, int width, int height)
             else {
                 db_scale_count = 10;
                 for (i = 0; i < db_scale_count; i++) {
-                    db_scale_lcd_coord[i] = 
+                    scales->db_scale_lcd_coord[i] = 
                         (i * (MAX_PEAK / 10) - peak_meter_range_min) *
                         meterwidth / pm_range;
                 }
@@ -881,20 +884,20 @@ void peak_meter_draw(int x, int y, int width, int height)
 
             /* mark scale valid to avoid recalculating dBfs values
                of the scale. */
-            db_scale_valid = true;
+            scales->db_scale_valid = true;
         }
 
         /* apply release */
-        left  = MAX(left , last_left  - pm_peak_release);
-        right = MAX(right, last_right - pm_peak_release);
+        left  = MAX(left , scales->last_left  - pm_peak_release);
+        right = MAX(right, scales->last_right - pm_peak_release);
 
         /* reset max values after timeout */
-        if (TIME_AFTER(current_tick, pm_peak_timeout_l)){
-            pm_peak_left = 0;
+        if (TIME_AFTER(current_tick, scales->pm_peak_timeout_l)){
+            scales->pm_peak_left = 0;
         }
 
-        if (TIME_AFTER(current_tick, pm_peak_timeout_r)){
-            pm_peak_right = 0;
+        if (TIME_AFTER(current_tick, scales->pm_peak_timeout_r)){
+            scales->pm_peak_right = 0;
         }
 
         if (!pm_clip_eternal) {
@@ -910,51 +913,51 @@ void peak_meter_draw(int x, int y, int width, int height)
         }
 
         /* check for new max values */
-        if (left > pm_peak_left) {
-            pm_peak_left = left - 1;
-            pm_peak_timeout_l =
+        if (left > scales->pm_peak_left) {
+            scales->pm_peak_left = left - 1;
+            scales->pm_peak_timeout_l =
                 current_tick + peak_time_out[pm_peak_hold];
         }
 
-        if (right > pm_peak_right) {
-            pm_peak_right = right - 1;
-            pm_peak_timeout_r = 
+        if (right > scales->pm_peak_right) {
+            scales->pm_peak_right = right - 1;
+            scales->pm_peak_timeout_r = 
                 current_tick + peak_time_out[pm_peak_hold];
         }
     }
 
     /* draw the peak meter */
-    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    lcd_fillrect(x, y, width, height);
-    lcd_set_drawmode(DRMODE_SOLID);
+    display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    display->fillrect(x, y, width, height);
+    display->set_drawmode(DRMODE_SOLID);
 
     /* draw left */
-    lcd_fillrect (x, y, left, height / 2 - 2 );
-    if (pm_peak_left > 0) {
-        lcd_vline(x + pm_peak_left, y, y + height / 2 - 2 );
+    display->fillrect (x, y, left, height / 2 - 2 );
+    if (scales->pm_peak_left > 0) {
+        display->vline(x + scales->pm_peak_left, y, y + height / 2 - 2 );
     }
     if (pm_clip_left) {
-        lcd_fillrect(x + meterwidth, y, 3, height / 2 - 1);
+        display->fillrect(x + meterwidth, y, 3, height / 2 - 1);
     }
 
     /* draw right */
-    lcd_fillrect(x, y + height / 2 + 1, right, height / 2 - 2);
-    if (pm_peak_right > 0) {
-        lcd_vline( x + pm_peak_right, y + height / 2, y + height - 2);
+    display->fillrect(x, y + height / 2 + 1, right, height / 2 - 2);
+    if (scales->pm_peak_right > 0) {
+        display->vline( x + scales->pm_peak_right, y + height / 2, y + height - 2);
     }
     if (pm_clip_right) {
-        lcd_fillrect(x + meterwidth, y + height / 2, 3, height / 2 - 1);
+        display->fillrect(x + meterwidth, y + height / 2, 3, height / 2 - 1);
     }
 
     /* draw scale end */
-    lcd_vline(x + meterwidth, y, y + height - 2);
+    display->vline(x + meterwidth, y, y + height - 2);
 
-    lcd_set_drawmode(DRMODE_COMPLEMENT);
+    display->set_drawmode(DRMODE_COMPLEMENT);
     /* draw dots for scale marks */
     for (i = 0; i < db_scale_count; i++) {
         /* The x-coordinates of interesting scale mark points 
            have been calculated before */
-        lcd_drawpixel(db_scale_lcd_coord[i], y + height / 2 - 1);
+        display->drawpixel(scales->db_scale_lcd_coord[i], y + height / 2 - 1);
     }
     
 #ifdef HAVE_RECORDING
@@ -988,25 +991,25 @@ void peak_meter_draw(int x, int y, int width, int height)
     if (trig_status != TRIG_OFF) {
         int start_trigx, stop_trigx, ycenter;
 
-        lcd_set_drawmode(DRMODE_SOLID);
+        display->set_drawmode(DRMODE_SOLID);
         ycenter = y + height / 2;
         /* display threshold value */
         start_trigx = x+peak_meter_scale_value(trig_strt_threshold,meterwidth);
-        lcd_vline(start_trigx, ycenter - 2, ycenter);
+        display->vline(start_trigx, ycenter - 2, ycenter);
         start_trigx ++;
-        if (start_trigx < LCD_WIDTH) lcd_drawpixel(start_trigx, ycenter - 1);
+        if (start_trigx < display->width ) display->drawpixel(start_trigx, ycenter - 1);
 
         stop_trigx = x + peak_meter_scale_value(trig_stp_threshold,meterwidth);
-        lcd_vline(stop_trigx, ycenter - 2, ycenter);
-        if (stop_trigx > 0) lcd_drawpixel(stop_trigx - 1, ycenter - 1);
+        display->vline(stop_trigx, ycenter - 2, ycenter);
+        if (stop_trigx > 0) display->drawpixel(stop_trigx - 1, ycenter - 1);
     }
 #endif /*HAVE_RECORDING*/
 
 #ifdef PM_DEBUG
     /* display a bar to show how many calls to peak_meter_peek 
        have ocurred since the last display */
-    lcd_set_drawmode(DRMODE_COMPLEMENT);
-    lcd_fillrect(x, y, tmp, 3);
+    display->set_drawmode(DRMODE_COMPLEMENT);
+    display->fillrect(x, y, tmp, 3);
 
     if (tmp < PEEKS_PER_DRAW_SIZE) {
         peeks_per_redraw[tmp]++;
@@ -1019,14 +1022,14 @@ void peak_meter_draw(int x, int y, int width, int height)
 
     /* display a bar to show how many ticks have passed since 
        the last redraw */
-    lcd_fillrect(x, y + height / 2, current_tick - pm_tick, 2);
+    display->fillrect(x, y + height / 2, current_tick - pm_tick, 2);
     pm_tick = current_tick;
 #endif
 
-    last_left = left;
-    last_right = right;
+    scales->last_left = left;
+    scales->last_right = right;
 
-    lcd_set_drawmode(DRMODE_SOLID);
+    display->set_drawmode(DRMODE_SOLID);
 }
 
 #ifdef HAVE_RECORDING
@@ -1171,11 +1174,12 @@ void peak_meter_draw_trig(int xpos, int ypos)
 }
 #endif
 
-int peak_meter_draw_get_btn(int x, int y, int width, int height)
+int peak_meter_draw_get_btn(int x, int y, int height)
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
     long next_big_refresh = current_tick + HZ / 10;
+    int i;
 #ifndef SIMULATOR
     bool highperf = !ata_disk_is_active();
 #else
@@ -1196,8 +1200,11 @@ int peak_meter_draw_get_btn(int x, int y, int width, int height)
             sleep(0);          /* Sleep until end of current tick. */
         }
         if (TIME_AFTER(current_tick, next_refresh)) {
-            peak_meter_draw(x, y, width, height);
-            lcd_update_rect(x, y, width, height);
+            FOR_NB_SCREENS(i)
+            {
+                peak_meter_screen(&screens[i], x, y, height);
+                screens[i].update_rect(x, y, screens[i].width, height);
+            }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;
         }

@@ -1750,7 +1750,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 #endif
                 update_line = true;
             }
-            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER && display->height >= LCD_HEIGHT) {
+            if (flags & refresh_mode & WPS_REFRESH_PEAK_METER) {
                 /* peak meter */
                 int peak_meter_y;
 
@@ -1761,12 +1761,12 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                    line so that it is only displayed if no status bar is
                    visible. If so we neither want do draw nor enable the
                    peak meter. */
-                if (peak_meter_y + h <= LCD_HEIGHT) {
+                if (peak_meter_y + h <= display->height) {
                     /* found a line with a peak meter -> remember that we must
                        enable it later */
                     enable_pm = true;
-                    peak_meter_draw(0, peak_meter_y, LCD_WIDTH,
-                                    MIN(h, LCD_HEIGHT - peak_meter_y));
+                    peak_meter_screen(gwps->display, 0, peak_meter_y,
+                                    MIN(h, display->height - peak_meter_y));
                 }
             }
 #else

@@ -26,12 +26,14 @@
 void screen_put_iconxy(struct screen * display, int x, int y, ICON icon)
 {
 #ifdef HAVE_LCD_BITMAP
+    int width, height;
     int xpos, ypos;
+    display->getstringsize((unsigned char *)"M", &width, &height);
     xpos = x*CURSOR_WIDTH;
-    ypos = y*display->char_height + display->getymargin();
+    ypos = y*height + display->getymargin();
 
-    if ( display->char_height > CURSOR_HEIGHT )/* center the cursor */
-        ypos += (display->char_height - CURSOR_HEIGHT) / 2;
+    if ( height > CURSOR_HEIGHT )/* center the cursor */
+        ypos += (height - CURSOR_HEIGHT) / 2;
     if(icon==0)/* Don't display invalid icons */
         screen_clear_area(display, xpos, ypos, CURSOR_WIDTH, CURSOR_HEIGHT);
     else

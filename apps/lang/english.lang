@@ -939,13 +939,13 @@ new:
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Gain Left"
+eng: "Gain L"
 voice: ""
 new:
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Gain Right"
+eng: "Gain R"
 voice: ""
 new:
 

@@ -43,6 +43,7 @@
 #include "lang.h"
 #include "font.h"
 #include "icons.h"
+#include "icon.h"
 #include "screens.h"
 #include "peakmeter.h"
 #include "statusbar.h"
@@ -60,6 +61,7 @@
 #include "sound.h"
 #include "ata.h"
 #include "splash.h"
+#include "screen_access.h"
 #ifdef HAVE_RECORDING
 
 
@@ -102,6 +104,17 @@
 #define REC_RECPAUSE BUTTON_ON
 #define REC_INC BUTTON_RIGHT
 #define REC_DEC BUTTON_LEFT
+#endif
+
+#if (CONFIG_REMOTE_KEYPAD == H100_REMOTE) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define REC_RC_SHUTDOWN (BUTTON_RC_STOP | BUTTON_REPEAT)
+#define REC_RC_STOPEXIT BUTTON_RC_STOP
+#define REC_RC_RECPAUSE BUTTON_RC_ON
+#define REC_RC_INC BUTTON_RC_BITRATE
+#define REC_RC_DEC BUTTON_RC_SOURCE
+#define REC_RC_NEXT BUTTON_RC_FF
+#define REC_RC_PREV BUTTON_RC_REW
+#define REC_RC_SETTINGS BUTTON_RC_MODE
 #endif
 
 bool f2_rec_screen(void);
@@ -508,6 +521,7 @@ bool recording_screen(void)
     bool led_state = false;
     int led_countdown = 2;
 #endif
+    int i;
 
 #ifdef HAVE_UDA1380
 /*calculate no. of digital steps to each analogue step. Assuming 
@@ -565,10 +579,13 @@ bool recording_screen(void)
 
     settings_apply_trigger();
 
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("M", &w, &h);
-    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
-
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_SYSFIXED);
+        screens[i].getstringsize("M", &w, &h);
+        screens[i].setmargins(global_settings.invert_cursor ? 0 : w, 8);
+    }
+    
     if(rec_create_directory() > 0)
         have_recorded = true;
 
@@ -628,7 +645,7 @@ bool recording_screen(void)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(0, 8 + h*2, LCD_WIDTH, h);
+        button = peak_meter_draw_get_btn(0, 8 + h*2, h*2);
 
         if (last_audio_stat != audio_stat)
         {
@@ -643,6 +660,12 @@ bool recording_screen(void)
         {
             case REC_STOPEXIT:
             case REC_SHUTDOWN:
+#ifdef REC_RC_STOPEXIT
+            case REC_RC_STOPEXIT:
+#endif
+#ifdef REC_RC_SHUTDOWN
+            case REC_RC_SHUTDOWN:
+#endif          
                 /* turn off the trigger */
                 peak_meter_trigger(false);
                 peak_meter_set_trigger_listener(NULL);
@@ -663,6 +686,9 @@ bool recording_screen(void)
                 break;
 
             case REC_RECPAUSE:
+#ifdef REC_RC_RECPAUSE
+            case REC_RC_RECPAUSE:
+#endif
 #ifdef REC_RECPAUSE_PRE
                 if (lastbutton != REC_RECPAUSE_PRE)
                     break;
@@ -715,6 +741,9 @@ bool recording_screen(void)
 
 #ifdef REC_PREV
             case REC_PREV:
+#ifdef REC_RC_PREV
+            case REC_RC_PREV:
+#endif
                 cursor--;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
@@ -723,6 +752,9 @@ bool recording_screen(void)
 
 #ifdef REC_NEXT
             case REC_NEXT:
+#ifdef REC_RC_NEXT
+            case REC_RC_NEXT:
+#endif
                 cursor++;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
@@ -731,6 +763,10 @@ bool recording_screen(void)
        
             case REC_INC:
             case REC_INC | BUTTON_REPEAT:
+#ifdef REC_RC_INC
+            case REC_RC_INC:
+            case REC_RC_INC | BUTTON_REPEAT:
+#endif
                 switch(cursor)
                 {
                     case 0:
@@ -788,6 +824,10 @@ bool recording_screen(void)
                 
             case REC_DEC:
             case REC_DEC | BUTTON_REPEAT:
+#ifdef REC_RC_INC
+            case REC_RC_DEC:
+            case REC_RC_DEC | BUTTON_REPEAT:
+#endif
                 switch(cursor)
                 {
                     case 0:
@@ -848,6 +888,9 @@ bool recording_screen(void)
                 
 #ifdef REC_SETTINGS
             case REC_SETTINGS:
+#ifdef REC_RC_SETTINGS
+            case REC_RC_SETTINGS:
+#endif
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
 #if CONFIG_LED == LED_REAL
@@ -874,8 +917,11 @@ bool recording_screen(void)
                     set_gain();
                     update_countdown = 1; /* Update immediately */
 
-                    lcd_setfont(FONT_SYSFIXED);
-                    lcd_setmargins(global_settings.invert_cursor ? 0 : w, 8);
+                    FOR_NB_SCREENS(i)
+                    {
+                        screens[i].setfont(FONT_SYSFIXED);
+                        screens[i].setmargins(global_settings.invert_cursor ? 0 : w, 8);
+                    }
                 }
                 break;
 #endif
@@ -943,7 +989,8 @@ bool recording_screen(void)
         if (button != BUTTON_NONE)
             lastbutton = button;
 
-        lcd_setfont(FONT_SYSFIXED);
+            FOR_NB_SCREENS(i)       
+                screens[i].setfont(FONT_SYSFIXED);
 
         seconds = audio_recorded_time() / HZ;
         
@@ -957,14 +1004,16 @@ bool recording_screen(void)
             update_countdown = 5;
             last_seconds = seconds;
 
-            lcd_clear_display();
+            FOR_NB_SCREENS(i)
+                screens[i].clear_display(); 
 
             hours = seconds / 3600;
             minutes = (seconds - (hours * 3600)) / 60;
             snprintf(buf, 32, "%s %02d:%02d:%02d",
                      str(LANG_RECORDING_TIME),
                      hours, minutes, seconds%60);
-            lcd_puts(0, 0, buf);
+            FOR_NB_SCREENS(i)
+                screens[i].puts(0, 0, buf); 
 
             dseconds = rec_timesplit_seconds();
             num_recorded_bytes = audio_num_recorded_bytes();
@@ -997,7 +1046,8 @@ bool recording_screen(void)
                              str(LANG_RECORDING_SIZE), buf2);
                 }
             }
-            lcd_puts(0, 1, buf);
+            FOR_NB_SCREENS(i)
+                screens[i].puts(0, 1, buf);
 
             /* We will do file splitting regardless, either at the end of
                a split interval, or when the filesize approaches the 2GB
@@ -1017,10 +1067,15 @@ bool recording_screen(void)
                               buf2, sizeof(buf2)));
             
             if (global_settings.invert_cursor && (pos++ == cursor))
-                lcd_puts_style(0, 3, buf, STYLE_INVERT);
+            {
+                FOR_NB_SCREENS(i)
+                    screens[i].puts_style_offset(0, 4, buf, STYLE_INVERT,0);
+            }
             else
-                lcd_puts(0, 3, buf);
-                
+            {
+                FOR_NB_SCREENS(i)
+                    screens[i].puts(0, 4, buf);
+            }                
 
             if(global_settings.rec_source == SOURCE_MIC)
             { 
@@ -1059,9 +1114,15 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
 #endif
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
-                    lcd_puts_style(0, 4, buf, STYLE_INVERT);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].puts_style_offset(0, 5, buf, STYLE_INVERT,0);
+                }
                 else
-                    lcd_puts(0, 4, buf);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].puts(0, 5, buf);
+                }
             }
             else if(global_settings.rec_source == SOURCE_LINE)
             {
@@ -1104,9 +1165,16 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
 #endif /* HAVE_UDA1380 */
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
-                    lcd_puts_style(0, 4, buf, STYLE_INVERT);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].puts_style_offset(0, 5, buf, STYLE_INVERT,0);
+                }
                 else
-                    lcd_puts(0, 4, buf);
+                {
+                     FOR_NB_SCREENS(i)
+                         screens[i].puts(0, 5, buf);
+                }                
+
 #ifdef HAVE_UDA1380
                 snprintf(buf, 32, "%s:%s (%s)",
                          str(LANG_RECORDING_RIGHT),
@@ -1134,39 +1202,59 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
 #endif /* HAVE_UDA1380 */
                 if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
-                    lcd_puts_style(0, 5, buf, STYLE_INVERT);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].puts_style_offset(0, 6, buf, STYLE_INVERT,0);
+                }
                 else
-                    lcd_puts(0, 5, buf);
-            }
-            switch(cursor)
-            {
-            case 1:
-                put_cursorxy(0, 4, true);
-                
-                if(global_settings.rec_source != SOURCE_MIC)
-                    put_cursorxy(0, 5, true);
-                
-                break;
-            case 2:
-                put_cursorxy(0, 4, true);
-                break;
-            case 3:
-                put_cursorxy(0, 5, true);
-                break;
-            default:
-                put_cursorxy(0, 0, true);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].puts(0, 6, buf);
+                }                
             }
 
+            if(!global_settings.invert_cursor){
+                switch(cursor)
+                {
+                    case 1:
+                        FOR_NB_SCREENS(i)
+                            screen_put_cursorxy(&screens[i], 0, 5, true);
+
+                        if(global_settings.rec_source != SOURCE_MIC)
+                        {
+                            FOR_NB_SCREENS(i)
+                                screen_put_cursorxy(&screens[i], 0, 6, true);
+                        }               
+                    break;
+                    case 2:
+                        FOR_NB_SCREENS(i)
+                            screen_put_cursorxy(&screens[i], 0, 5, true);
+                    break;
+                    case 3:
+                        FOR_NB_SCREENS(i)
+                            screen_put_cursorxy(&screens[i], 0, 6, true);
+                    break;
+                    default:
+                        FOR_NB_SCREENS(i)
+                            screen_put_cursorxy(&screens[i], 0, 4, true);
+                }
+            }
+            
             snprintf(buf, 32, "%s %s",
                      freq_str[global_settings.rec_frequency],
                      global_settings.rec_channels?
                      str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO));
-            lcd_puts(0, 7, buf);
+
+            /* Main screen only for this info */
+            lcd_puts(0, 8, buf);
 
             gui_syncstatusbar_draw(&statusbars, true);
-            peak_meter_draw(0, 8 + h*2, LCD_WIDTH, h);
 
-            lcd_update();
+            FOR_NB_SCREENS(i)
+            {
+                peak_meter_screen(&screens[i], 0, 8 + h*2, h*2);
+                screens[i].update();                
+            }
 
             /* draw the trigger status */
             if (peak_meter_trigger_status() != TRIG_OFF)
@@ -1227,9 +1315,6 @@ bool recording_screen(void)
     ata_set_led_enabled(true);
 #endif
     return been_in_usb_mode;
-/*
-#endif
-*/
 }
 
 #ifdef REC_F2

@@ -29,8 +29,7 @@ extern bool peak_meter_histogram(void);
 extern bool peak_meter_enabled;
 
 extern void peak_meter_playback(bool playback);
-extern void peak_meter_draw(int x, int y, int width, int height);
-extern int  peak_meter_draw_get_btn(int x, int y, int width, int height);
+extern int  peak_meter_draw_get_btn(int x, int y, int height);
 extern void peak_meter_set_clip_hold(int time);
 extern void peak_meter_peek(void);
 extern void peak_meter_init_range( bool dbfs, int range_min, int range_max);
@@ -80,4 +79,24 @@ extern void peak_meter_draw_trig(int x, int y);
 extern unsigned short peak_meter_range_min;
 extern unsigned short peak_meter_range_max;
 
+#define DB_SCALE_SRC_VALUES_SIZE 12
+struct meter_scales{
+    /* buffered peak values */
+    int pm_peak_left;
+    int pm_peak_right;
+    /* if db_scale_valid is false the content of
+       db_scale_lcd_coord needs recalculation */
+    bool db_scale_valid;
+    /* contains the lcd x coordinates of the magical
+       scale values in db_scale_src_values */
+    int db_scale_lcd_coord[DB_SCALE_SRC_VALUES_SIZE];
+    int last_left;
+    int last_right;
+    /* peak hold timeouts */
+    long pm_peak_timeout_l;
+    long pm_peak_timeout_r;
+};
+extern void peak_meter_draw(struct screen *display, struct meter_scales *meter_scales,
+                                int x, int y, int width, int height);
+extern void peak_meter_screen(struct screen *display, int x, int y, int height);
 #endif /* __PEAKMETER_H__ */

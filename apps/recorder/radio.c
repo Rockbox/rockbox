@@ -768,11 +768,17 @@ bool radio_screen(void)
             /* Only display the peak meter when not recording */
             if(!audio_status())
             {
-                /* just main screen for the time being */
+
 #if CONFIG_CODEC != SWCODEC
-                peak_meter_draw(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4), LCD_WIDTH, fh);
+                FOR_NB_SCREENS(i)
+                {
+                    peak_meter_screen(&screens[i],0,
+                                          STATUSBAR_HEIGHT + fh*(top_of_screen + 4), fh);
+                    screens[i].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4),
+                                               screens[i].width, fh);
+                }
 #endif
-                screens[SCREEN_MAIN].update_rect(0, STATUSBAR_HEIGHT + fh*(top_of_screen + 4), screens[SCREEN_MAIN].width, fh);
+
             }
 
             if(TIME_AFTER(current_tick, timeout))
