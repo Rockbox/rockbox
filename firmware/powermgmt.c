@@ -51,6 +51,9 @@
 #endif
 #include "logf.h"
 #include "lcd-remote.h"
+#ifdef SIMULATOR
+#include <time.h>
+#endif
 
 /*
  * Define DEBUG_FILE to create a csv (spreadsheet) with battery information
@@ -73,19 +76,50 @@ static int shutdown_timeout = 0;
 
 #ifdef SIMULATOR /***********************************************************/
 
+#define TIME2CHANGE     10              /* change levels every 10 seconds */
+#define BATT_MINCVOLT   250             /* minimum centivolts of battery */
+#define BATT_MAXCVOLT   450             /* maximum centivolts of battery */
+#define BATT_MAXRUNTIME (10 * 60)       /* maximum runtime with full battery in minutes */
+
+static unsigned int batt_centivolts = (unsigned int)BATT_MAXCVOLT;
+static int batt_level = 100;            /* battery capacity level in percent */
+static int batt_time = BATT_MAXRUNTIME; /* estimated remaining time in minutes */
+static time_t last_change = 0;
+
+static void battery_status_update(void)
+{
+    time_t          now;
+
+    time(&now);
+    if (last_change < (now - TIME2CHANGE)) {
+        last_change = now;
+
+        /* change the values: */
+        batt_centivolts -= (unsigned int)(BATT_MAXCVOLT - BATT_MINCVOLT) / 11;
+        if (batt_centivolts < (unsigned int)BATT_MINCVOLT)
+            batt_centivolts = (unsigned int)BATT_MAXCVOLT;
+
+        batt_level = 100 * (batt_centivolts - BATT_MINCVOLT) / (BATT_MAXCVOLT - BATT_MINCVOLT);
+        batt_time = batt_level * BATT_MAXRUNTIME / 100;
+    }
+}
+
 unsigned int battery_voltage(void)
 {
-    return 400;
+    battery_status_update();
+    return batt_centivolts;
 }
 
 int battery_level(void)
 {
-    return 75;
+    battery_status_update();
+    return batt_level;
 }
 
 int battery_time(void)
 {
-    return 500;
+    battery_status_update();
+    return batt_time;
 }
 
 bool battery_level_safe(void)
