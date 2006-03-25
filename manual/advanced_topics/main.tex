@@ -227,7 +227,7 @@ There are 3 different types of firmware binaries from Rockbox website. Current V
 \end{itemize}
 
 \opt{recorder,recorderv2fm,ondo,player}{
-There are binaries for different Jukebox models: 
+There are binaries for different \dap\ models:
 
 \begin{itemize}
 \item \begin{itemize}
@@ -258,18 +258,18 @@ unless otherwise specified.
 
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
-\opt{player,recorder,recorderv2fm,ondio,player}{
+\opt{player,recorder,recorderv2fm,ondio}{
 When your Jukebox powers on, it loads the Archos firmware in ROM, which
 automatically checks your Jukebox hard disk's root folder for a file
-named \textbf{archos.mod} (on the player version) or
-\textbf{ajbrec.ajz} (on the recorder version). Note that Archos
+named \fname{archos.mod} (on the player version) or
+\fname{ajbrec.ajz} (on the recorder version). Note that Archos
 firmware can only read the first ten characters of each file name in
 this process, so don't rename your old firmware files with names like
 archos.mod.old and so on, because it's possible that the Jukebox will
 load a file other than the one you intended.
 }
 
-\section{\label{ref:PartISection4}Using ROLO (Rockbox loader)}
+\section{\label{ref:using_rolo}Using ROLO (Rockbox loader)}
 Rockbox is able to load and start another firmware file without rebooting. You just press PLAY on an \opt{recorder,recorderv2fm,ondio}{.ajz}\opt{player}{.mod}\opt{h1xx,h300}{.iriver}\opt{ipodnano,ipodvideo,ipodnano}{.ipod} file. This can be used to test new firmware versions without deleting your current version.
 
 \opt{recorder,recorderv2fm,ondio}{\input{advanced_topics/archos-flashing.tex}}
