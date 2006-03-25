@@ -69,7 +69,6 @@
 static volatile bool audio_codec_loaded;
 static volatile bool voice_codec_loaded;
 static volatile bool playing;
-static volatile bool paused;
 
 #define CODEC_VORBIS   "/.rockbox/codecs/vorbis.codec"
 #define CODEC_MPA_L3   "/.rockbox/codecs/mpa.codec"
@@ -797,7 +796,7 @@ static void pcmbuf_track_changed_callback(void)
 static void yield_codecs(void)
 {
     yield();
-    if (!pcm_is_playing() && !paused)
+    if (!pcm_is_playing() && !pcm_is_paused())
         sleep(5);
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && queue_empty(&audio_queue)
@@ -1338,12 +1337,12 @@ static void stop_codec_flush(void)
 static void audio_stop_playback(bool resume)
 {
     logf("stop_playback:%d", resume);
-    paused = false;
     if (playing)
         playlist_update_resume_info(resume ? audio_current_track() : NULL);
     playing = false;
     filling = false;
     stop_codec_flush();
+    pcmbuf_pause(false);
     if (current_fd >= 0) {
         close(current_fd);
         current_fd = -1;
@@ -1836,7 +1835,7 @@ void audio_thread(void)
                 last_tick = current_tick;
             
                 /* Do not start crossfading if audio is paused. */
-                if (paused)
+                if (pcm_is_paused())
                     pcmbuf_play_stop();
 
 #ifdef CONFIG_TUNER
@@ -1873,13 +1872,11 @@ void audio_thread(void)
             case Q_AUDIO_PAUSE:
                 logf("audio_pause");
                 pcmbuf_pause(true);
-                paused = true;
                 break ;
                 
             case Q_AUDIO_RESUME:
                 logf("audio_resume");
                 pcmbuf_pause(false);
-                paused = false;
                 break ;
             
             case Q_AUDIO_NEXT:
@@ -2205,7 +2202,7 @@ void audio_stop(void)
 
 bool mp3_pause_done(void)
 {
-    return paused;
+    return pcm_is_paused();
 }
 
 void audio_pause(void)
@@ -2293,7 +2290,7 @@ int audio_status(void)
     if (playing)
         ret |= AUDIO_STATUS_PLAY;
 
-    if (paused)
+    if (pcm_is_paused())
         ret |= AUDIO_STATUS_PAUSE;
     
     return ret;
@@ -2595,7 +2592,6 @@ void audio_preinit(void)
     playing = false;
     audio_codec_loaded = false;
     voice_is_playing = false;
-    paused = false;
     track_changed = false;
     current_fd = -1;
     track_buffer_callback = NULL;
