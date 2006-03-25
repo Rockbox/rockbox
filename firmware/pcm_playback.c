@@ -49,6 +49,12 @@
 #include "button.h"
 #include <string.h>
 
+static bool pcm_playing;
+static bool pcm_paused;
+
+/* the registered callback function to ask for more mp3 data */
+static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
+
 #ifdef CPU_COLDFIRE
 
 #ifdef HAVE_SPDIF_OUT
@@ -57,8 +63,6 @@
 #define IIS_DEFPARM(freq)  ((freq << 12) | 0x300 | 4 << 2)
 #define IIS_RESET          0x800
 
-static bool pcm_playing;
-static bool pcm_paused;
 static int pcm_freq = 0x6; /* 44.1 is default */
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
@@ -129,112 +133,9 @@ void pcm_set_frequency(unsigned int frequency)
     }
 }
 
-/* the registered callback function to ask for more mp3 data */
-static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
-
-void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
-        unsigned char* start, size_t size)
-{
-    callback_for_more = get_more;
-
-    if (!(start && size))
-    {
-        if (get_more)
-            get_more(&start, &size);
-        else
-            return;
-    }
-    if (start && size)
-    {
-        dma_start(start, size);
-        if (pcm_paused) {
-            pcm_paused = false;
-            pcm_play_pause(false);
-        }
-    }
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return (BCR0 & 0xffffff);
-}
-
-void pcm_mute(bool mute)
-{
-#ifdef HAVE_UDA1380
-    uda1380_mute(mute);
-#endif
-    if (mute)
-        sleep(HZ/16);
-}
-
-void pcm_play_stop(void)
-{
-    if (pcm_playing) {
-        dma_stop();
-    }
-}
-
-void pcm_play_pause(bool play)
-{
-    size_t next_size;
-    unsigned char *next_start;
-    bool needs_change = pcm_paused == play;
-
-    /* This must be done ahead of the rest of the function to prevent
-     * infinite recursion in dma_start */
-    pcm_paused = !play;
-    if (pcm_playing && needs_change)
-    {
-        if(play)
-        {
-            if (pcm_get_bytes_waiting())
-            {
-                logf("unpause");
-                /* Enable the FIFO and force one write to it */
-                IIS2CONFIG = IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
-                EBU1CONFIG = EBU_DEFPARM;
-#endif
-                DCR0 |= DMA_EEXT | DMA_START;
-            }
-            else
-            {
-                logf("unpause, no data waiting");
-                void (*get_more)(unsigned char**, size_t*) = callback_for_more;
-                if (get_more)
-                    get_more(&next_start, &next_size);
-                if (next_start && next_size)
-                    dma_start(next_start, next_size);
-                else
-                {
-                    dma_stop();
-                    logf("unpause attempted, no data");
-                }
-            }
-        }
-        else
-        {
-            logf("pause");
-
-            /* Disable DMA peripheral request. */
-            DCR0 &= ~DMA_EEXT;
-            IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
-#ifdef HAVE_SPDIF_OUT
-            EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
-#endif
-        }
-    }
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
 }
 
 /* DMA0 Interrupt is called when the DMA has finished transfering a chunk */
@@ -343,9 +244,7 @@ void pcm_init(void)
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x7800000) >> 23)
 #endif
 
-static bool pcm_playing;
-static bool pcm_paused;
-static int pcm_freq = 0x6; /* 44.1 is default */
+static int pcm_freq = 44100; /* 44.1 is default */
 
 /* NOTE: The order of these two variables is important if you use the iPod
    assembler optimised fiq handler, so don't change it. */
@@ -428,143 +327,9 @@ void pcm_set_frequency(unsigned int frequency)
     pcm_freq=frequency;
 }
 
-/* the registered callback function to ask for more PCM data */
-static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
-
-void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
-        unsigned char* start, size_t size)
-{
-    callback_for_more = get_more;
-
-    if (!(start && size))
-    {
-        if (get_more)
-            get_more(&start, &size);
-        else
-            return;
-    }
-    if (start && size) {
-        dma_start(start, size);
-        if (pcm_paused) {
-            pcm_paused = false;
-            pcm_play_pause(false);
-        }
-    }
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return p_size;
-}
-
-void pcm_mute(bool mute)
-{
-    wmcodec_mute(mute);
-    if (mute)
-        sleep(HZ/16);
-}
-
-void pcm_play_stop(void)
-{
-    if (pcm_playing) {
-        dma_stop();
-    }
-}
-
-void pcm_play_pause(bool play)
-{
-    size_t next_size;
-    unsigned char *next_start;
-
-    bool needs_change = pcm_paused == play;
-    /* This needs to be done ahead of the rest to prevent infinite
-     * recursion from dma_start */
-    pcm_paused = !play;
-    if (pcm_playing && needs_change)
-    {
-        if(play)
-        {
-            if (pcm_get_bytes_waiting())
-            {
-                logf("unpause");
-                /* Enable the FIFO and fill it */
-
-                enable_fiq();
-
-                /* Enable playback FIFO */
-#if CONFIG_CPU == PP5020
-                IISCONFIG |= 0x20000000;
-#elif CONFIG_CPU == PP5002
-                IISCONFIG |= 0x4;
-#endif
-
-                /* Fill the FIFO - we assume there are enough bytes in the 
-                   pcm buffer to fill the 32-byte FIFO. */
-                while (p_size > 0) {
-                    if (FIFO_FREE_COUNT < 2) {
-                        /* Enable interrupt */
-#if CONFIG_CPU == PP5020
-                        IISCONFIG |= 0x2;
-#elif CONFIG_CPU == PP5002
-                        IISFIFO_CFG |= (1<<9);
-#endif
-                        return;
-                    }
-
-                    IISFIFO_WR = (*(p++))<<16;
-                    IISFIFO_WR = (*(p++))<<16;
-                    p_size-=4;
-                }
-            }
-            else
-            {
-                logf("unpause, no data waiting");
-                void (*get_more)(unsigned char**, size_t*) = callback_for_more;
-                if (get_more)
-                    get_more(&next_start, &next_size);
-                if (next_start && next_size)
-                    dma_start(next_start, next_size);
-                else
-                {
-                    dma_stop();
-                    logf("unpause attempted, no data");
-                }
-            }
-        }
-        else
-        {
-            logf("pause");
-
-#if CONFIG_CPU == PP5020
-
-            /* Disable the interrupt */
-            IISCONFIG &= ~0x2;
-
-            /* Disable playback FIFO */
-            IISCONFIG &= ~0x20000000;
-
-#elif CONFIG_CPU == PP5002
-
-            /* Disable the interrupt */
-            IISFIFO_CFG &= ~(1<<9);
-
-            /* Disable playback FIFO */
-            IISCONFIG &= ~0x4;
-#endif
-
-            disable_fiq();
-        }
-    }
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
-}
-
-bool pcm_is_playing(void)
-{
-    return pcm_playing;
 }
 
 /* ASM optimised FIQ handler. GCC fails to make use of the fact that FIQ mode
@@ -717,42 +482,8 @@ void pcm_set_frequency(unsigned int frequency)
     (void)frequency;
 }
 
-void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
-        unsigned char* start, size_t size)
-{
-    (void)get_more;
-    (void)start;
-    (void)size;
-}
-
 void pcm_play_stop(void)
 {
-}
-
-void pcm_mute(bool mute)
-{
-    (void)mute;
-}
-
-void pcm_play_pause(bool play)
-{
-    (void)play;
-}
-
-bool pcm_is_paused(void)
-{
-    return false;
-}
-
-bool pcm_is_playing(void)
-{
-    return false;
-}
-
-void pcm_calculate_peaks(int *left, int *right)
-{
-    (void)left;
-    (void)right;
 }
 
 size_t pcm_get_bytes_waiting(void)
@@ -762,7 +493,155 @@ size_t pcm_get_bytes_waiting(void)
 
 #endif
 
+void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+        unsigned char* start, size_t size)
+{
+    callback_for_more = get_more;
+
+    if (!(start && size))
+    {
+        if (get_more)
+            get_more(&start, &size);
+        else
+            return;
+    }
+    if (start && size)
+    {
+        dma_start(start, size);
+        if (pcm_paused) {
+            pcm_paused = false;
+            pcm_play_pause(false);
+        }
+    }
+}
+
+void pcm_mute(bool mute)
+{
+#ifdef HAVE_UDA1380
+    uda1380_mute(mute);
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+    wmcodec_mute(mute);
+#elif defined(HAVE_TLV320)
+    tlv320_mute(mute);
+#endif
+    if (mute)
+        sleep(HZ/16);
+}
+
+void pcm_play_stop(void)
+{
+    if (pcm_playing) {
+        dma_stop();
+    }
+}
+
+void pcm_play_pause(bool play)
+{
+    bool needs_change = pcm_paused == play;
+
+    /* This needs to be done ahead of the rest to prevent infinite
+     * recursion from dma_start */
+    pcm_paused = !play;
+    if (pcm_playing && needs_change) {
+        if(play) {
+            if (pcm_get_bytes_waiting()) {
+                logf("unpause");
+
+#ifdef CPU_COLDFIRE
+                /* Enable the FIFO and force one write to it */
+                IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+#ifdef HAVE_SPDIF_OUT
+                EBU1CONFIG = EBU_DEFPARM;
+#endif
+                DCR0 |= DMA_EEXT | DMA_START;
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+                /* Enable the FIFO and fill it */
+
+                enable_fiq();
+
+                /* Enable playback FIFO */
+#if CONFIG_CPU == PP5020
+                IISCONFIG |= 0x20000000;
+#elif CONFIG_CPU == PP5002
+                IISCONFIG |= 0x4;
+#endif
+
+                /* Fill the FIFO - we assume there are enough bytes in the 
+                   pcm buffer to fill the 32-byte FIFO. */
+                while (p_size > 0) {
+                    if (FIFO_FREE_COUNT < 2) {
+                        /* Enable interrupt */
+#if CONFIG_CPU == PP5020
+                        IISCONFIG |= 0x2;
+#elif CONFIG_CPU == PP5002
+                        IISFIFO_CFG |= (1<<9);
+#endif
+                        return;
+                    }
+
+                    IISFIFO_WR = (*(p++))<<16;
+                    IISFIFO_WR = (*(p++))<<16;
+                    p_size-=4;
+                }
+#elif (CONFIG_CPU == PNX0101) /* End wmcodecs */
+                /* nothing yet */
+#endif
+            } else {
 #if (CONFIG_CPU != PNX0101)
+                size_t next_size;
+                unsigned char *next_start;
+                void (*get_more)(unsigned char**, size_t*) = callback_for_more;
+                logf("unpause, no data waiting");
+                if (get_more)
+                    get_more(&next_start, &next_size);
+                if (next_start && next_size)
+                    dma_start(next_start, next_size);
+                else
+                {
+                    dma_stop();
+                    logf("unpause attempted, no data");
+                }
+#endif
+            }
+        } else {
+            logf("pause");
+
+#ifdef CPU_COLDFIRE
+            /* Disable DMA peripheral request. */
+            DCR0 &= ~DMA_EEXT;
+            IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+#ifdef HAVE_SPDIF_OUT
+            EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
+#endif  
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#if CONFIG_CPU == PP5020
+            /* Disable the interrupt */
+            IISCONFIG &= ~0x2;
+            /* Disable playback FIFO */
+            IISCONFIG &= ~0x20000000;
+#elif CONFIG_CPU == PP5002
+            /* Disable the interrupt */
+            IISFIFO_CFG &= ~(1<<9);
+            /* Disable playback FIFO */
+            IISCONFIG &= ~0x4;
+#endif
+
+            disable_fiq();
+#elif (CONFIG_CPU == PNX0101) /* End wmcodecs */
+            /* nothing yet */
+#endif
+        }
+    }
+}
+
+bool pcm_is_playing(void) {
+    return pcm_playing;
+}
+
+bool pcm_is_paused(void) {
+    return pcm_paused;
+}
+
 /*
  * This function goes directly into the DMA buffer to calculate the left and
  * right peak values. To avoid missing peaks it tries to look forward two full
@@ -780,6 +659,10 @@ size_t pcm_get_bytes_waiting(void)
 
 void pcm_calculate_peaks(int *left, int *right)
 {
+#if (CONFIG_CPU == PNX0101)
+    (void)left;
+    (void)right;
+#else
     short *addr;
     short *end;
     {
@@ -843,6 +726,5 @@ void pcm_calculate_peaks(int *left, int *right)
         else
             *right = peak_value;
     }
-}
-
 #endif
+}
