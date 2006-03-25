@@ -198,13 +198,9 @@ sub buildzip {
     }
 
     mkdir ".rockbox/docs", 0777;
-    for(("BATTERY-FAQ",
-         "CUSTOM_CFG_FORMAT",
-         "CUSTOM_WPS_FORMAT",
-         "FAQ",
+    for(("COPYING",
          "LICENSES",
-         "NODO",
-         "TECH")) {
+        )) {
         `cp $ROOT/docs/$_ .rockbox/docs/$_.txt`;
     }
 
