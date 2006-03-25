@@ -401,6 +401,8 @@ void pcmbuf_pause(bool pause) {
 /* Force playback. */
 void pcmbuf_play_start(void)
 {
+    mutex_lock(&pcmbuf_mutex);
+
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
     {
         /** Prevent a very tiny pop from happening by muting audio
@@ -415,6 +417,8 @@ void pcmbuf_play_start(void)
         /* Now unmute the audio. */
         pcm_mute(false);
     }
+
+    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**
@@ -422,6 +426,8 @@ void pcmbuf_play_start(void)
  */
 static void pcmbuf_flush_fillpos(void)
 {
+    mutex_lock(&pcmbuf_mutex);
+
     if (audiobuffer_fillpos) {
         /* Never use the last buffer descriptor */
         while (pcmbuf_write == pcmbuf_write_end) {
@@ -438,6 +444,8 @@ static void pcmbuf_flush_fillpos(void)
         }
         pcmbuf_add_chunk();
     }
+
+    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**
