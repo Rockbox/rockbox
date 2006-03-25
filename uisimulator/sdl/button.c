@@ -44,6 +44,14 @@ void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;
 }
+#ifdef HAVE_REMOTE_LCD
+static bool remote_filter_first_keypress;
+
+void set_remote_backlight_filter_keypress(bool value)
+{
+    remote_filter_first_keypress = value;
+}
+#endif
 #endif
 
 void button_event(int key, bool pressed)
@@ -56,6 +64,12 @@ void button_event(int key, bool pressed)
     static int repeat_count = 0;
     static bool repeat = false;
     static bool post = false;
+#ifdef CONFIG_BACKLIGHT
+    static bool skip_release = false;
+#ifdef HAVE_REMOTE_LCD
+    static bool skip_remote_release = false;
+#endif
+#endif 
 
     switch (key)
     {
@@ -169,11 +183,26 @@ void button_event(int key, bool pressed)
 
     /* Find out if a key has been released */
     diff = btn ^ lastbtn;
-
     if(diff && (btn & diff) == 0)
     {
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+        if(diff & BUTTON_REMOTE)
+            if(!skip_remote_release)
+                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+            else
+                skip_remote_release = false;
+        else
+#endif
+            if(!skip_release)
+                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+            else
+                skip_release = false;
+#else
         queue_post(&button_queue, BUTTON_REL | diff, NULL);
+#endif
     }
+
     else
     {
         if ( btn )
@@ -223,15 +252,40 @@ void button_event(int key, bool pressed)
                     if (queue_empty(&button_queue))
                     {
                         queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                            if(btn & BUTTON_REMOTE)
+                            {
+                                if(skip_remote_release)
+                                    skip_remote_release = false;
+                            }
+                            else
+#endif                                    
+                                if(skip_release)
+                                    skip_release = false;
+#endif
                         post = false;
                     }
                 }
                 else
                 {
 #ifdef CONFIG_BACKLIGHT
-                    if ( !filter_first_keypress || is_backlight_on())
-#endif
+#ifdef HAVE_REMOTE_LCD
+                        if (btn & BUTTON_REMOTE) {
+                            if (!remote_filter_first_keypress || is_remote_backlight_on())
+                                queue_post(&button_queue, btn, NULL);
+                            else
+                                skip_remote_release = true;
+                        }
+                        else
+#endif                                    
+                            if (!filter_first_keypress || is_backlight_on())
+                                queue_post(&button_queue, btn, NULL);
+                            else
+                                skip_release = true;
+#else /* no backlight, nothing to skip */
                         queue_post(&button_queue, btn, NULL);
+#endif
                     post = false;
                 }    
 

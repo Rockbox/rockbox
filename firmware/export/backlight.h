@@ -43,6 +43,7 @@ void remote_backlight_on(void);
 void remote_backlight_off(void);
 void remote_backlight_set_timeout(int index);
 void remote_backlight_set_timeout_plugged(int index);
+bool is_remote_backlight_on(void);
 #endif
 
 #ifdef SIMULATOR

@@ -1082,6 +1082,15 @@ static bool set_bl_filter_first_keypress(void)
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
     return result;
 }
+#ifdef HAVE_REMOTE_LCD
+static bool set_remote_bl_filter_first_keypress(void)
+{
+    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), 
+                            &global_settings.remote_bl_filter_first_keypress );
+    set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
+    return result;
+}
+#endif
 #endif 
 
 static bool ff_rewind_accel(void) 
@@ -1694,6 +1703,7 @@ static bool lcd_remote_settings_menu(void)
                                       remote_backlight_timer_plugged },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), remote_caption_backlight },
+        { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_remote_bl_filter_first_keypress },
         { ID2P(LANG_CONTRAST),        remote_contrast },
         { ID2P(LANG_INVERT),          remote_invert },
         { ID2P(LANG_FLIP_DISPLAY),    remote_flip_display },

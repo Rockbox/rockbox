@@ -475,6 +475,9 @@ struct user_settings
     
 #ifdef CONFIG_BACKLIGHT
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
+#ifdef HAVE_REMOTE_LCD
+    bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
+#endif
 #endif
 };
 

@@ -40,8 +40,7 @@
 #include "system.h"
 #include "powermgmt.h"
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-                    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
 
@@ -54,6 +53,9 @@ static bool flipped;  /* buttons can be flipped to match the LCD flip */
 #endif
 #ifdef CONFIG_BACKLIGHT
 static bool filter_first_keypress;
+#ifdef HAVE_REMOTE_LCD
+static bool remote_filter_first_keypress;
+#endif
 #endif
 
 /* how often we check to see if a button is pressed */
@@ -403,6 +405,12 @@ static void button_tick(void)
     static int repeat_count = 0;
     static bool repeat = false;
     static bool post = false;
+#ifdef CONFIG_BACKLIGHT
+    static bool skip_release = false;
+#ifdef HAVE_REMOTE_LCD
+    static bool skip_remote_release = false;
+#endif
+#endif
     int diff;
     int btn;
 
@@ -425,7 +433,22 @@ static void button_tick(void)
         diff = btn ^ lastbtn;
         if(diff && (btn & diff) == 0)
         {
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+            if(diff & BUTTON_REMOTE)
+                if(!skip_remote_release)
+                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                else
+                    skip_remote_release = false;
+            else
+#endif
+                if(!skip_release)
+                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                else
+                    skip_release = false;
+#else
             queue_post(&button_queue, BUTTON_REL | diff, NULL);
+#endif
         }
         else
         {
@@ -502,15 +525,44 @@ static void button_tick(void)
                         {
                             queue_post(
                                     &button_queue, BUTTON_REPEAT | btn, NULL);
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAVE_REMOTE_LCD
+                            if(btn & BUTTON_REMOTE)
+                            {
+                                if(skip_remote_release)
+                                    skip_remote_release = false;
+                            }
+                            else
+#endif                                    
+                                if(skip_release)
+                                    skip_release = false;
+#endif
                             post = false;
                         }
                     }
                     else
                     {
 #ifdef CONFIG_BACKLIGHT
-                        if ( !filter_first_keypress || is_backlight_on())
+#ifdef HAVE_REMOTE_LCD
+                        if (btn & BUTTON_REMOTE) {
+                            if (!remote_filter_first_keypress || is_remote_backlight_on()
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+                               ||(remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
-                            queue_post(&button_queue, btn, NULL);
+                                            )
+                                queue_post(&button_queue, btn, NULL);
+                            else
+                                skip_remote_release = true;
+                        }
+                        else
+#endif                                    
+                            if (!filter_first_keypress || is_backlight_on())
+                                queue_post(&button_queue, btn, NULL);
+                            else
+                                skip_release = true;
+#else /* no backlight, nothing to skip */
+                        queue_post(&button_queue, btn, NULL);
+#endif
                         post = false;
                     }
 #ifdef HAVE_REMOTE_LCD
@@ -637,6 +689,9 @@ void button_init(void)
 #endif
 #ifdef CONFIG_BACKLIGHT
     filter_first_keypress = false;
+#ifdef HAVE_REMOTE_LCD
+    remote_filter_first_keypress = false;
+#endif    
 #endif
 }
 
@@ -701,6 +756,12 @@ void set_backlight_filter_keypress(bool value)
 {
     filter_first_keypress = value;
 }
+#ifdef HAVE_REMOTE_LCD
+void set_remote_backlight_filter_keypress(bool value)
+{
+    remote_filter_first_keypress = value;
+}
+#endif
 #endif
 
 /*

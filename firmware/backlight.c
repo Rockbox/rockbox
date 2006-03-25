@@ -597,6 +597,32 @@ void remote_backlight_set_timeout_plugged(int index)
     remote_backlight_on();
 }
 #endif
+
+/* return value in ticks; 0 means always on, <0 means always off */
+int remote_backlight_get_current_timeout(void)
+{
+#ifdef HAVE_CHARGING
+    if (charger_inserted()
+#ifdef HAVE_USB_POWER
+            || usb_powered()
+#endif
+        )
+        return remote_backlight_timeout_plugged;
+    else
+        return remote_backlight_timeout;
+#else
+    return remote_backlight_timeout;
+#endif
+}
+
+bool is_remote_backlight_on(void)
+{
+    if (remote_backlight_timer != 0 || !remote_backlight_get_current_timeout())
+        return true;
+    else
+        return false;
+}
+
 #endif /* HAVE_REMOTE_LCD */
 
 #else /* no backlight, empty dummy functions */
@@ -620,6 +646,7 @@ bool is_backlight_on(void) {return true;}
 void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}
 void remote_backlight_set_timeout(int index) {(void)index;}
+bool is_remote_backlight_on(void) {return true;}
 #endif
 #endif /* #ifdef CONFIG_BACKLIGHT */
 

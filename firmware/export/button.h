@@ -44,6 +44,9 @@ void button_set_flip(bool flip); /* turn 180 degrees */
 #endif
 #ifdef CONFIG_BACKLIGHT
 void set_backlight_filter_keypress(bool value);
+#ifdef HAVE_REMOTE_LCD
+void set_remote_backlight_filter_keypress(bool value);
+#endif
 #endif
 
 #ifdef HAS_BUTTON_HOLD

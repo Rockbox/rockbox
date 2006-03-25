@@ -297,11 +297,18 @@ static const struct bit_entry rtc_bits[] =
 #endif
 
 #ifdef CONFIG_BACKLIGHT
+    {1, S_O(bl_filter_first_keypress), 
 #ifdef HAVE_LCD_COLOR
-    {1, S_O(bl_filter_first_keypress), true, "backlight filters first keypress", off_on },
+            true,
 #else
-    {1, S_O(bl_filter_first_keypress), false, "backlight filters first keypress", off_on },
+            false,
 #endif
+            "backlight filters first keypress", off_on },
+#ifdef HAVE_REMOTE_LCD
+    {1, S_O(remote_bl_filter_first_keypress), false, 
+            "backlight filters first remote keypress", off_on },
+#endif    
+
 #endif
 
     /* new stuff to be added here */
@@ -1126,6 +1133,9 @@ void settings_apply(void)
 
 #ifdef CONFIG_BACKLIGHT
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
+#ifdef HAVE_REMOTE_LCD
+    set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
+#endif
 #endif
 }
 
