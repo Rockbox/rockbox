@@ -10,27 +10,84 @@
 # Copyright (C) 2006 by Daniel Stenberg
 #
 
+# binary version for the binary lang file
+my $langversion = 2; # 2 is the latest one used in the v1 format
+
+# A note for future users and readers: The original v1 language system allowed
+# the build to create and use a different language than english built-in. We
+# removed that feature from our build-system, but the build scripts still had
+# the ability. But, starting now, this ability is no longer provided since I
+# figured it was boring and unnecessary to write support for now since we
+# don't use it anymore.
+
 if(!$ARGV[0]) {
     print <<MOO
-Usage: genlang2 [-p=<prefix>][-t=<target>][-v] <language file>
+Usage: genlang2 [options] <langv2 file>
 
-<prefix>.h and <prefix>.c will be created in the current directory. <prefix>
-is "lang" by default.
+ -p=<prefix>
+    Make the tool create a [prefix].c and [prefix].h file.
 
-Use -v for verbose (debug) output.
+ -b=<outfile>
+    Make the tool create a binary language (.lng) file namaed [outfile].
+    The use of this option requires that you also use -e.
 
+ -u
+    Update language file. Given the translated file and the most recent english
+    file, you\'ll get an updated version sent to stdout. Suitable action to do
+    when you intend to update a translation.
+
+ -e=<english lang file>
+    Point out the english (original source) file, to use that as master
+    language template. Used in combination with -b or -u.
+
+ -t=<target>
+    Specify which target you want the translations/phrases for. Required when
+    -b or -p is used.
+
+ -v
+    Enables verbose (debug) output.
 MOO
 ;
     exit;
 }
 
+# How update works:
+#
+# 1) scan the english file, keep the whole <phrase> for each phrase.
+# 2) read the translated file, for each end of phrase, compare:
+#  A) all source strings, if there's any change there should be a comment about
+#     it output
+#  B) the desc fields
+#
+# 3) output the phrase with the comments from above
+# 4) check which phrases that the translated version didn't have, and spit out
+#    the english version of those
+#
+
 my $prefix = $p;
-if(!$prefix) {
-    $prefix="lang";
+my $binary = $b;
+my $update = $u;
+
+my $english = $e;
+
+my $check = $binary?1:0 + $prefix?1:0 + $update?1:0;
+
+if($check > 1) {
+    print "Please use only one of -p, -u and -b\n";
+    exit;
 }
+if(!$check) {
+    print "Please use at least one of -p, -u and -b\n";
+    exit;
+}
+if(($binary || $update) && !$english) {
+    print "Please use -e too when you use -b or -u\n";
+    exit;
+}
+
 my $target = $t;
-if(!$target) {
-    print "Please specify a target!\n";
+if(!$target && !$update) {
+    print "Please specify a target (with -t)!\n";
     exit;
 }
 my $verbose=$v;
@@ -44,40 +101,6 @@ my %voice; # id string to voice phrase hash
 
 
 my $input = $ARGV[0];
-
-open(HFILE, ">$prefix.h");
-open(CFILE, ">$prefix.c");
-
-print HFILE <<MOO
-/* This file was automatically generated using genlang2 */
-/*
- * The str() macro/functions is how to access strings that might be
- * translated. Use it like str(MACRO) and expect a string to be
- * returned!
- */
-#define str(x) language_strings[x]
-
-/* this is the array for holding the string pointers.
-   It will be initialized at runtime. */
-extern unsigned char *language_strings[];
-/* this contains the concatenation of all strings, separated by \\0 chars */
-extern const unsigned char language_builtin[];
-
-/* The enum below contains all available strings */
-enum {
-MOO
-    ;
-
-print CFILE <<MOO
-/* This file was automaticly generated using genlang2, the strings come
-   from "$input" */
-   
-#include "$prefix.h"
-
-unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
-const unsigned char language_builtin[] =
-MOO
-    ;
 
 my @m;
 my $m="blank";
@@ -140,29 +163,140 @@ sub voice {
     parsetarget("voice", \$voice, @_);
 }
 
-my $idcount; # counter for lang ID numbers
+my %english;
+if($english) {
+    # For the cases where the english file needs to be scanned/read, we do
+    # it before we read the translated file. For -b it isn't necessary, but for
+    # -u it is convenient.
+
+    my $idnum=0; # start with a true number
+    my %idmap;
+    open(ENG, "<$english") || die "can't open $english";
+    my @phrase;
+    my $id;
+    while(<ENG>) {
+
+        # get rid of DOS newlines
+        $_ =~ s/\r//g;
+
+        if($_ =~ /^ *\<phrase\>/) {
+            # this is the start of a phrase
+        }
+        elsif($_ =~ /^ *\<\/phrase\>/) {
+            # this is the end of a phrase, add it to the english hash
+            $english{$id}=join("", @phrase);
+            undef @phrase;
+        }
+        elsif($_ ne "\n") {
+            # gather everything related to this phrase
+            push @phrase, $_;
+        }
+
+        if($_ =~ /^ *id: ([^ \t\n]+)/i) {
+            $id=$1;
+            # Skip voice-only entries
+            if($id =~ /^VOICE_/) {
+                next;
+            }
+
+            # Assign an ID number to this entry
+            $idmap{$id}=$idnum;
+            $idnum++;
+        }
+    }
+    close(ENG);
+}
+
+# a function that compares the english phrase with the translated one.
+# compare source strings and desc
+sub compare {
+    my ($engref, $locref)=@_;
+    my ($edesc, $ldesc);
+    my ($esource, $lsource);
+    my $mode=0;
+    
+    for my $l (@$engref) {
+        if($l =~ /^ *desc: (.*)/) {
+            $edesc=$1;
+        }
+        elsif($l =~ / *\<source\>/i) {
+            $mode=1;
+        }
+        elsif($mode) {
+            if($l =~ / *\<\/source\>/i) {
+                last;
+            }
+            $esource .= "$l\n";
+        }
+    }
+
+    $mode = 0;
+    for my $l (@$locref) {
+        if($l =~ /^ *desc: (.*)/) {
+            $ldesc=$1;
+        }
+        elsif($l =~ / *\<source\>/i) {
+            $mode=1;
+        }
+        elsif($mode) {
+            if($l =~ / *\<\/source\>/i) {
+                last;
+            }
+            $lsource .= "$l";
+        }
+    }
+
+    if($edesc ne $ldesc) {
+        print "### The 'desc' field differs from the english!\n";
+    }
+    if($esource ne $lsource) {
+        print "### The <source> section differs from the english!\n";
+    }
+}
+
+my $idcount;        # counter for lang ID numbers
 my $voiceid=0x8000; # counter for voice-only ID numbers
 
+#
+# Now start the scanning of the selected language string
+#
+
 open(LANG, "<$input");
+my @phrase;
 while(<LANG>) {
+
     $line++;
-    if($_ =~ / *\#/) {
-        # comment
-        next;
-    }
+
     # get rid of DOS newlines
     $_ =~ s/\r//g;
 
+    if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
+        # comment or empty line
+        next;
+    }
+
+    my $ll = $_;
+
    # print "M: $m\n";
 
+    push @phrase, $ll;
+
+    # this is an XML-lookalike tag
     if(/ *<([^>]*)>/) {
         my $part = $1;
         #print "P: $part\n";
+
         if($part =~ /^\//) {
+            # this was a closing tag
+
             if($part eq "/phrase") {
+                # closing the phrase
+
                 my $idstr = $phrase{'id'};
                 my $idnum;
-                
+
+                # Use the ID name to figure out which id number range we should
+                # use for this phrase. Voice-only strings are separated.
                 if($idstr =~ /^VOICE/) {
                     $idnum = $voiceid++;
                 }
@@ -188,13 +322,39 @@ while(<LANG>) {
                 undef $dest;
                 undef $voice;
                 undef %phrase;
-            }
+
+                if($update) {
+                    my $e = $english{$idstr};
+
+                    if($e) {
+                        # compare original english with this!
+                        my @eng = split("\n", $english{$idstr});
+
+                        compare(\@eng, \@phrase);
+                    }
+                    else {
+                        print "### This phrase is not used, remove it!\n";
+                    }
+                }
+                undef @phrase;
+
+            } # end of </phrase>
+
             # starts with a slash, this _ends_ this section
-            $m = pop @m; # get back old value
+            $m = pop @m; # get back old value, the previous level's tag
+            if($update) {
+                print "$ll";
+            }
             next;
-        }
+        } # end of tag close
+
+        # This is an opening (sub) tag
+
         push @m, $m; # store old value
         $m = $1;
+        if($update) {
+            print "$ll";
+        }
         next;
     }
 
@@ -202,11 +362,51 @@ while(<LANG>) {
         my ($name, $val)=($1, $2);
         &$m($_, $name, $val);
     }
-
+    if($update) {
+        print "$ll";
+    }
+    
 }
 close(LANG);
 
-# Output the ID names for the enum in the header file
+if($prefix) {
+    # We create a .c and .h file
+
+    open(HFILE, ">$prefix.h");
+    open(CFILE, ">$prefix.c");
+
+    print HFILE <<MOO
+/* This file was automatically generated using genlang2 */
+/*
+ * The str() macro/functions is how to access strings that might be
+ * translated. Use it like str(MACRO) and expect a string to be
+ * returned!
+ */
+#define str(x) language_strings[x]
+
+/* this is the array for holding the string pointers.
+   It will be initialized at runtime. */
+extern unsigned char *language_strings[];
+/* this contains the concatenation of all strings, separated by \\0 chars */
+extern const unsigned char language_builtin[];
+
+/* The enum below contains all available strings */
+enum {
+MOO
+    ;
+
+print CFILE <<MOO
+/* This file was automaticly generated using genlang2, the strings come
+   from "$input" */
+   
+#include "$prefix.h"
+
+unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
+const unsigned char language_builtin[] =
+MOO
+    ;
+
+ # Output the ID names for the enum in the header file
 my $i;
 for $i (1 .. $idcount) {
     my $name=$idnum[$i - 1]; # get the ID name
@@ -235,23 +435,18 @@ for $i (0x8000 .. ($voiceid-1)) {
     printf HFILE ("    %s,\n", $name);
 }
 
-
 # Output end of enum
-print HFILE <<MOO
-};
-/* end of generated enum list */
-MOO
-    ;
+    print HFILE "\n};\n/* end of generated enum list */\n";
 
-# Output the target phrases for the source file
-for $i (1 .. $idcount) {
-    my $name=$idnum[$i - 1]; # get the ID
-    my $dest = $dest{$name}; # get the destination phrase
+    # Output the target phrases for the source file
+    for $i (1 .. $idcount) {
+        my $name=$idnum[$i - 1]; # get the ID
+        my $dest = $dest{$name}; # get the destination phrase
+        
+        $dest =~ s:\"$:\\0\":; # insert a \0 before the second quote
 
-    $dest =~ s:\"$:\\0\":; # insert a \0 before the second quote
-
-    printf CFILE ("    %s\n", $dest);
-}
+        printf CFILE ("    %s\n", $dest);
+    }
 
 # Output end of string chunk
 print CFILE <<MOO
@@ -260,8 +455,40 @@ print CFILE <<MOO
 MOO
     ;
 
-close(HFILE);
-close(CFILE);
+    close(HFILE);
+    close(CFILE);
+} # end of the c/h file generation
+elsif($binary) {
+    # Creation of a binary lang file was requested
+
+    # We must first scan the english file to get the correct order of the id
+    # numbers used there, as that is what sets the id order for all language
+    # files. The english file is scanned before the translated file was
+    # scanned.
+
+    open(OUTF, ">$binary") or die "Can't create $binary";
+    binmode OUTF;
+    printf OUTF ("\x1a%c", $langversion); # magic lang file header
+
+    # loop over the target phrases
+    for $i (1 .. $idcount) {
+        my $name=$idnum[$i - 1]; # get the ID
+        my $dest = $dest{$name}; # get the destination phrase
+
+        if($dest) {
+            $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
+
+            # Now, make sure we get the number from the english sort order:
+            $idnum = $idmap{$name};
+
+            printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
+            if($debug) {
+                printf("%02x => %s\n", $idnum, $value);
+            }
+        }
+    }
+}
+
 
 if($verbose) {
     printf("%d ID strings scanned\n", $idcount);
