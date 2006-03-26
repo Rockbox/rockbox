@@ -141,9 +141,9 @@ void init_dircache(void)
 
 void init_tagcache(void)
 {
+#ifdef HAVE_LCD_BITMAP
     int font_w, font_h;
     
-#ifdef HAVE_LCD_BITMAP
     /* Print "Scanning disk..." to the display. */
     lcd_getstringsize("A", &font_w, &font_h);
     lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_TAGCACHE_INIT))*font_w)/2),

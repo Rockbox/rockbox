@@ -1367,7 +1367,7 @@ static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
     tempbuf = (char *)(((long)audiobuf & ~0x03) + 0x04);
-    tempbuf_size = (int)audiobufend - (int)audiobuf - 4;
+    tempbuf_size = (long)audiobufend - (long)audiobuf - 4;
     audiobuf += tempbuf_size;
 }
 
