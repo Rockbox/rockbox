@@ -1877,6 +1877,7 @@ static bool dbg_dircache_info(void)
 
 #endif /* HAVE_DIRCACHE */
 
+#ifdef HAVE_LCD_BITMAP
 static bool dbg_tagcache_info(void)
 {
     bool done = false;
@@ -1908,6 +1909,7 @@ static bool dbg_tagcache_info(void)
 
     return false;
 }
+#endif
 
 #if CONFIG_CPU == SH7034
 bool dbg_save_roms(void)
@@ -2052,8 +2054,8 @@ bool debug_menu(void)
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
 #endif
-        { "View tagcache info", dbg_tagcache_info },
 #ifdef HAVE_LCD_BITMAP
+        { "View tagcache info", dbg_tagcache_info },
         { "View audio thread", dbg_audio_thread },
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
