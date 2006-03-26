@@ -50,6 +50,7 @@
 #include "buffer.h"
 #include "dsp.h"
 #include "abrepeat.h"
+#include "tagcache.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"
@@ -2132,8 +2133,8 @@ struct mp3entry* audio_current_track(void)
     if (!filename)
         filename = "No file!";
     
-    // if (tagcache_fill_tags(&temp_id3, filename))
-    //    return &temp_id3;
+    if (tagcache_fill_tags(&temp_id3, filename))
+        return &temp_id3;
     
     p = strrchr(filename, '/');
     if (!p)

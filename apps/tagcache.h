@@ -59,7 +59,6 @@ struct tagcache_search {
     long result_seek;
 };
 
-bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
@@ -69,6 +68,7 @@ void tagcache_search_finish(struct tagcache_search *tcs);
 int tagcache_get_progress(void);
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);
+bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 #endif
 void tagcache_init(void);
 void tagcache_start_scan(void);
