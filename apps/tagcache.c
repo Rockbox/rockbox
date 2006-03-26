@@ -751,7 +751,7 @@ static bool tempbuf_insert(char *str, int id)
     /* Make sure the entry is long aligned. */
     if ((long)index[tempbufidx].id & 0x03)
     {
-        int fix = 4 - ((long)id & 0x03);
+        int fix = 4 - ((long)index[tempbufidx].id & 0x03);
         tempbuf_left -= fix;
         tempbuf_pos += fix;
         index[tempbufidx].id = (struct tempbuf_id *)((
