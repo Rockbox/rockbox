@@ -1214,9 +1214,9 @@ static int button_read(void)
         else
             if(data < 0xb6)
                 if(data < 0x98)
-                    btn = BUTTON_PLAY;
-                else
                     btn = BUTTON_REC;
+                else
+                    btn = BUTTON_PLAY;
             else
                 if(data < 0xd3)
                     btn = BUTTON_DOWN;
