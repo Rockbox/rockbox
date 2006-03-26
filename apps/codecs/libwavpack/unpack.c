@@ -35,7 +35,7 @@ int unpack_init (WavpackContext *wpc)
     WavpackStream *wps = &wpc->stream;
     WavpackMetadata wpmd;
 
-    if (wps->wphdr.block_samples && wps->wphdr.block_index != (ulong) -1)
+    if (wps->wphdr.block_samples && wps->wphdr.block_index != (uint32_t) -1)
         wps->sample_index = wps->wphdr.block_index;
 
     wps->mute_error = FALSE;
@@ -237,7 +237,7 @@ int read_channel_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 {
     int bytecnt = wpmd->byte_length, shift = 0;
     char *byteptr = wpmd->data;
-    ulong mask = 0;
+    uint32_t mask = 0;
 
     if (!bytecnt || bytecnt > 5)
         return FALSE;
@@ -245,7 +245,7 @@ int read_channel_info (WavpackContext *wpc, WavpackMetadata *wpmd)
     wpc->config.num_channels = *byteptr++;
 
     while (--bytecnt) {
-        mask |= (ulong) *byteptr++ << shift;
+        mask |= (uint32_t) *byteptr++ << shift;
         shift += 8;
     }
 
@@ -262,9 +262,9 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 
     if (bytecnt >= 3) {
         wpc->config.flags &= 0xff;
-        wpc->config.flags |= (long) *byteptr++ << 8;
-        wpc->config.flags |= (long) *byteptr++ << 16;
-        wpc->config.flags |= (long) *byteptr << 24;
+        wpc->config.flags |= (int32_t) *byteptr++ << 8;
+        wpc->config.flags |= (int32_t) *byteptr++ << 16;
+        wpc->config.flags |= (int32_t) *byteptr << 24;
     }
 
     return TRUE;
@@ -273,7 +273,7 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 // This monster actually unpacks the WavPack bitstream(s) into the specified
 // buffer as 32-bit integers or floats (depending on orignal data). Lossy
 // samples will be clipped to their original limits (i.e. 8-bit samples are
-// clipped to -128/+127) but are still returned in longs. It is up to the
+// clipped to -128/+127) but are still returned in int32_ts. It is up to the
 // caller to potentially reformat this for the final output including any
 // multichannel distribution, block alignment or endian compensation. The
 // function unpack_init() must have been called and the entire WavPack block
@@ -287,25 +287,25 @@ int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd)
 // occurs or the end of the block is reached.
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, long *buffer, long sample_count);
+extern void decorr_stereo_pass_cont_mcf5249 (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
 #elif defined(CPU_ARM) && !defined(SIMULATOR)
-extern void decorr_stereo_pass_cont_arm (struct decorr_pass *dpp, long *buffer, long sample_count);
-extern void decorr_stereo_pass_cont_arml (struct decorr_pass *dpp, long *buffer, long sample_count);
+extern void decorr_stereo_pass_cont_arm (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
+extern void decorr_stereo_pass_cont_arml (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
 #else
-static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count);
+static void decorr_stereo_pass_cont (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
 #endif
 
-static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample_count);
-static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long sample_count);
-static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count);
+static void decorr_mono_pass (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
+static void decorr_stereo_pass (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count);
+static void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_count);
 
-long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
+int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong flags = wps->wphdr.flags, crc = wps->crc, i;
-    long mute_limit = (1L << ((flags & MAG_MASK) >> MAG_LSB)) + 2;
+    uint32_t flags = wps->wphdr.flags, crc = wps->crc, i;
+    int32_t mute_limit = (1L << ((flags & MAG_MASK) >> MAG_LSB)) + 2;
     struct decorr_pass *dpp;
-    long *bptr, *eptr;
+    int32_t *bptr, *eptr;
     int tcount;
 
     if (wps->sample_index + sample_count > wps->wphdr.block_index + wps->wphdr.block_samples)
@@ -403,10 +403,10 @@ long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count)
     return i;
 }
 
-static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long sample_count)
+static void decorr_stereo_pass (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count)
 {
-    long delta = dpp->delta, weight_A = dpp->weight_A, weight_B = dpp->weight_B;
-    long *bptr, *eptr = buffer + (sample_count * 2), sam_A, sam_B;
+    int32_t delta = dpp->delta, weight_A = dpp->weight_A, weight_B = dpp->weight_B;
+    int32_t *bptr, *eptr = buffer + (sample_count * 2), sam_A, sam_B;
     int m, k;
 
     switch (dpp->term) {
@@ -462,7 +462,7 @@ static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long samp
             }
 
             if (m) {
-                long temp_samples [MAX_TERM];
+                int32_t temp_samples [MAX_TERM];
 
                 memcpy (temp_samples, dpp->samples_A, sizeof (dpp->samples_A));
 
@@ -520,10 +520,10 @@ static void decorr_stereo_pass (struct decorr_pass *dpp, long *buffer, long samp
 
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
 
-static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long sample_count)
+static void decorr_stereo_pass_cont (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count)
 {
-    long delta = dpp->delta, weight_A = dpp->weight_A, weight_B = dpp->weight_B;
-    long *bptr, *tptr, *eptr = buffer + (sample_count * 2), sam_A, sam_B;
+    int32_t delta = dpp->delta, weight_A = dpp->weight_A, weight_B = dpp->weight_B;
+    int32_t *bptr, *tptr, *eptr = buffer + (sample_count * 2), sam_A, sam_B;
     int k, i;
 
     switch (dpp->term) {
@@ -619,10 +619,10 @@ static void decorr_stereo_pass_cont (struct decorr_pass *dpp, long *buffer, long
 
 #endif
 
-static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample_count)
+static void decorr_mono_pass (struct decorr_pass *dpp, int32_t *buffer, int32_t sample_count)
 {
-    long delta = dpp->delta, weight_A = dpp->weight_A;
-    long *bptr, *eptr = buffer + sample_count, sam_A;
+    int32_t delta = dpp->delta, weight_A = dpp->weight_A;
+    int32_t *bptr, *eptr = buffer + sample_count, sam_A;
     int m, k;
 
     switch (dpp->term) {
@@ -660,7 +660,7 @@ static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample
             }
 
             if (m) {
-                long temp_samples [MAX_TERM];
+                int32_t temp_samples [MAX_TERM];
 
                 memcpy (temp_samples, dpp->samples_A, sizeof (dpp->samples_A));
 
@@ -687,12 +687,12 @@ static void decorr_mono_pass (struct decorr_pass *dpp, long *buffer, long sample
 // as 28-bits, and clipping (for lossy mode) has been eliminated because this
 // now happens in the dsp module.
 
-static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
+static void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_count)
 {
-    ulong flags = wps->wphdr.flags;
+    uint32_t flags = wps->wphdr.flags;
     int shift = (flags & SHIFT_MASK) >> SHIFT_LSB;
 
-    shift += 20 - (flags & BYTES_STORED) * 8;   // this provides RockBox with 28-bit data
+    shift += 21 - (flags & BYTES_STORED) * 8;   // this provides RockBox with 28-bit (+sign)
 
     if (flags & FLOAT_DATA) {
         float_values (wps, buffer, (flags & MONO_FLAG) ? sample_count : sample_count * 2);
@@ -700,10 +700,10 @@ static void fixup_samples (WavpackStream *wps, long *buffer, ulong sample_count)
     }
 
     if (flags & INT32_DATA) {
-        ulong count = (flags & MONO_FLAG) ? sample_count : sample_count * 2;
+        uint32_t count = (flags & MONO_FLAG) ? sample_count : sample_count * 2;
         int sent_bits = wps->int32_sent_bits, zeros = wps->int32_zeros;
         int ones = wps->int32_ones, dups = wps->int32_dups;
-        long *dptr = buffer;
+        int32_t *dptr = buffer;
 
         if (!(flags & HYBRID_FLAG) && !sent_bits && (zeros + ones + dups))
             while (count--) {

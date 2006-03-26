@@ -23,12 +23,12 @@ static void strcpy_loc (char *dst, char *src) { while ((*dst++ = *src++) != 0); 
 
 ///////////////////////////// local table storage ////////////////////////////
 
-const ulong sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
+const uint32_t sample_rates [] = { 6000, 8000, 9600, 11025, 12000, 16000, 22050,
     24000, 32000, 44100, 48000, 64000, 88200, 96000, 192000 };
 
 ///////////////////////////// executable code ////////////////////////////////
 
-static ulong read_next_header (read_stream infile, WavpackHeader *wphdr);
+static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr);
         
 // This function reads data from the specified stream in search of a valid
 // WavPack 4.0 audio block. If this fails in 1 megabyte (or an invalid or
@@ -50,11 +50,11 @@ static WavpackContext wpc IBSS_ATTR;
 WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 {
     WavpackStream *wps = &wpc.stream;
-    ulong bcount;
+    uint32_t bcount;
 
     CLEAR (wpc);
     wpc.infile = infile;
-    wpc.total_samples = (ulong) -1;
+    wpc.total_samples = (uint32_t) -1;
     wpc.norm_offset = 0;
     wpc.open_flags = 0;
 
@@ -64,7 +64,7 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
 
         bcount = read_next_header (wpc.infile, &wps->wphdr);
 
-        if (bcount == (ulong) -1) {
+        if (bcount == (uint32_t) -1) {
             strcpy_loc (error, "invalid WavPack file!");
             return NULL;
         }
@@ -74,7 +74,7 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
             return NULL;
         }
 
-        if (wps->wphdr.block_samples && wps->wphdr.total_samples != (ulong) -1)
+        if (wps->wphdr.block_samples && wps->wphdr.total_samples != (uint32_t) -1)
             wpc.total_samples = wps->wphdr.total_samples;
 
         if (!unpack_init (&wpc)) {
@@ -148,18 +148,18 @@ int WavpackGetMode (WavpackContext *wpc)
 
 // Unpack the specified number of samples from the current file position.
 // Note that "samples" here refers to "complete" samples, which would be
-// 2 longs for stereo files. The audio data is returned right-justified in
-// 32-bit longs in the endian mode native to the executing processor. So,
+// 2 int32_t's for stereo files. The audio data is returned right-justified in
+// 32-bit int32_t's in the endian mode native to the executing processor. So,
 // if the original data was 16-bit, then the values returned would be
 // +/-32k. Floating point data can also be returned if the source was
 // floating point data (and this is normalized to +/-1.0). The actual number
 // of samples unpacked is returned, which should be equal to the number
 // requested unless the end of fle is encountered or an error occurs.
 
-ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples)
+uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t samples)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong bcount, samples_unpacked = 0, samples_to_unpack;
+    uint32_t bcount, samples_unpacked = 0, samples_to_unpack;
     int num_channels = wpc->config.num_channels;
 
     while (samples) {
@@ -167,7 +167,7 @@ ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples)
             wps->sample_index >= wps->wphdr.block_index + wps->wphdr.block_samples) {
                 bcount = read_next_header (wpc->infile, &wps->wphdr);
 
-                if (bcount == (ulong) -1)
+                if (bcount == (uint32_t) -1)
                     break;
 
                 if (wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
@@ -234,19 +234,19 @@ ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples)
 
 // Get total number of samples contained in the WavPack file, or -1 if unknown
 
-ulong WavpackGetNumSamples (WavpackContext *wpc)
+uint32_t WavpackGetNumSamples (WavpackContext *wpc)
 {
-    return wpc ? wpc->total_samples : (ulong) -1;
+    return wpc ? wpc->total_samples : (uint32_t) -1;
 }
 
 // Get the current sample index position, or -1 if unknown
 
-ulong WavpackGetSampleIndex (WavpackContext *wpc)
+uint32_t WavpackGetSampleIndex (WavpackContext *wpc)
 {
     if (wpc)
         return wpc->stream.sample_index;
 
-    return (ulong) -1;
+    return (uint32_t) -1;
 }
 
 // Get the number of errors encountered so far
@@ -265,7 +265,7 @@ int WavpackLossyBlocks (WavpackContext *wpc)
 
 // Returns the sample rate of the specified WavPack file
 
-ulong WavpackGetSampleRate (WavpackContext *wpc)
+uint32_t WavpackGetSampleRate (WavpackContext *wpc)
 {
     return wpc ? wpc->config.sample_rate : 44100;
 }
@@ -284,7 +284,7 @@ int WavpackGetNumChannels (WavpackContext *wpc)
 // always has 32 bits, integers may be from 1 to 32 bits each. When this
 // value is not a multiple of 8, then the "extra" bits are located in the
 // LSBs of the results. That is, values are right justified when unpacked
-// into longs, but are left justified in the number of bytes used by the
+// into int32_t's, but are left justified in the number of bytes used by the
 // original data.
 
 int WavpackGetBitsPerSample (WavpackContext *wpc)
@@ -294,8 +294,8 @@ int WavpackGetBitsPerSample (WavpackContext *wpc)
 
 // Returns the number of bytes used for each sample (1 to 4) in the original
 // file. This is required information for the user of this module because the
-// audio data is returned in the LOWER bytes of the long buffer and must be
-// left-shifted 8, 16, or 24 bits if normalized longs are required.
+// audio data is returned in the LOWER bytes of the int32_t buffer and must be
+// left-shifted 8, 16, or 24 bits if normalized int32_t's are required.
 
 int WavpackGetBytesPerSample (WavpackContext *wpc)
 {
@@ -321,10 +321,10 @@ int WavpackGetReducedChannels (WavpackContext *wpc)
 // to indicate the error. No additional bytes are read past the header and it
 // is returned in the processor's native endian mode. Seeking is not required.
 
-static ulong read_next_header (read_stream infile, WavpackHeader *wphdr)
+static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr)
 {
     char buffer [sizeof (*wphdr)], *sp = buffer + sizeof (*wphdr), *ep = sp;
-    ulong bytes_skipped = 0;
+    uint32_t bytes_skipped = 0;
     int bleft;
 
     while (1) {
@@ -335,7 +335,7 @@ static ulong read_next_header (read_stream infile, WavpackHeader *wphdr)
         else
             bleft = 0;
 
-        if (infile (buffer + bleft, sizeof (*wphdr) - bleft) != (long) sizeof (*wphdr) - bleft)
+        if (infile (buffer + bleft, sizeof (*wphdr) - bleft) != (int32_t) sizeof (*wphdr) - bleft)
             return -1;
 
         sp = buffer;
@@ -407,10 +407,10 @@ WavpackContext *WavpackOpenFileOutput (void)
 // WavPack file will not be directly unpackable to a valid wav file (although
 // it will still be usable by itself). A return of FALSE indicates an error.
 
-int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, ulong total_samples)
+int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, uint32_t total_samples)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong flags = (config->bytes_per_sample - 1), shift = 0;
+    uint32_t flags = (config->bytes_per_sample - 1), shift = 0;
     int num_chans = config->num_channels;
     int i;
 
@@ -467,7 +467,7 @@ int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, ulong t
 // first block written and update the header directly. An example of this can
 // be found in the Audition filter.
 
-void WavpackAddWrapper (WavpackContext *wpc, void *data, ulong bcount)
+void WavpackAddWrapper (WavpackContext *wpc, void *data, uint32_t bcount)
 {
     wpc->wrapper_data = data;
     wpc->wrapper_bytes = bcount;
@@ -484,7 +484,7 @@ int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end)
     return pack_start_block (wpc);
 }
 
-// Pack the specified samples. Samples must be stored in longs in the native
+// Pack the specified samples. Samples must be stored in int32_ts in the native
 // endian format of the executing processor. The number of samples specified
 // indicates composite samples (sometimes called "frames"). So, the actual
 // number of data points would be this "sample_count" times the number of
@@ -493,7 +493,7 @@ int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end)
 // many times as desired to build the final block (and performs the actual
 // compression during the call). A return of FALSE indicates an error.
 
-int WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count)
+int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sample_count)
 {
     if (!sample_count || pack_samples (wpc, sample_buffer, sample_count))
         return TRUE;
@@ -506,10 +506,10 @@ int WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_c
 // block in bytes. Note that the possible conversion of the WavPack header to
 // little-endian takes place here.
 
-ulong WavpackFinishBlock (WavpackContext *wpc)
+uint32_t WavpackFinishBlock (WavpackContext *wpc)
 {
     WavpackStream *wps = &wpc->stream;
-    ulong bcount;
+    uint32_t bcount;
 
     pack_finish_block (wpc);
     bcount = ((WavpackHeader *) wps->blockbuff)->ckSize + 8;

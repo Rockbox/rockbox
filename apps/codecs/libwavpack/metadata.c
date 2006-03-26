@@ -29,12 +29,12 @@ int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
         if (!wpc->infile (&tchar, 1))
             return FALSE;
 
-        wpmd->byte_length += (long) tchar << 9; 
+        wpmd->byte_length += (int32_t) tchar << 9; 
 
         if (!wpc->infile (&tchar, 1))
             return FALSE;
 
-        wpmd->byte_length += (long) tchar << 17;
+        wpmd->byte_length += (int32_t) tchar << 17;
     }
 
     if (wpmd->id & ID_ODD_SIZE) {
@@ -42,10 +42,10 @@ int read_metadata_buff (WavpackContext *wpc, WavpackMetadata *wpmd)
         wpmd->byte_length--;
     }
 
-    if (wpmd->byte_length && wpmd->byte_length <= (long)sizeof (wpc->read_buffer)) {
-        ulong bytes_to_read = wpmd->byte_length + (wpmd->byte_length & 1);
+    if (wpmd->byte_length && wpmd->byte_length <= (int32_t)sizeof (wpc->read_buffer)) {
+        uint32_t bytes_to_read = wpmd->byte_length + (wpmd->byte_length & 1);
 
-        if (wpc->infile (wpc->read_buffer, bytes_to_read) != (long) bytes_to_read) {
+        if (wpc->infile (wpc->read_buffer, bytes_to_read) != (int32_t) bytes_to_read) {
             wpmd->data = NULL;
             return FALSE;
         }
@@ -108,7 +108,7 @@ int process_metadata (WavpackContext *wpc, WavpackMetadata *wpmd)
 
 int copy_metadata (WavpackMetadata *wpmd, uchar *buffer_start, uchar *buffer_end)
 {
-    ulong mdsize = wpmd->byte_length + (wpmd->byte_length & 1);
+    uint32_t mdsize = wpmd->byte_length + (wpmd->byte_length & 1);
     WavpackHeader *wphdr = (WavpackHeader *) buffer_start;
 
     if (wpmd->byte_length & 1)

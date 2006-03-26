@@ -24,7 +24,7 @@
 
 static void bs_read (Bitstream *bs);
 
-void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_stream file, ulong file_bytes)
+void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_stream file, uint32_t file_bytes)
 {
     CLEAR (*bs);
     bs->buf = buffer_start;
@@ -49,7 +49,7 @@ void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_s
 static void bs_read (Bitstream *bs)
 {
     if (bs->file && bs->file_bytes) {
-        ulong bytes_read, bytes_to_read = bs->end - bs->buf;
+        uint32_t bytes_read, bytes_to_read = bs->end - bs->buf;
 
         if (bytes_to_read > bs->file_bytes)
             bytes_to_read = bs->file_bytes;
@@ -100,12 +100,12 @@ static void bs_write (Bitstream *bs)
 // This function forces a flushing write of the specified BitStream, and
 // returns the total number of bytes written into the buffer.
 
-ulong bs_close_write (Bitstream *bs)
+uint32_t bs_close_write (Bitstream *bs)
 {
-    ulong bytes_written;
+    uint32_t bytes_written;
 
     if (bs->error)
-        return (ulong) -1;
+        return (uint32_t) -1;
 
     while (bs->bc || ((bs->ptr - bs->buf) & 1)) putbit_1 (bs);
     bytes_written = bs->ptr - bs->buf;
@@ -118,13 +118,13 @@ ulong bs_close_write (Bitstream *bs)
 void little_endian_to_native (void *data, char *format)
 {
     uchar *cp = (uchar *) data;
-    long temp;
+    int32_t temp;
 
     while (*format) {
         switch (*format) {
             case 'L':
-                temp = cp [0] + ((long) cp [1] << 8) + ((long) cp [2] << 16) + ((long) cp [3] << 24);
-                * (long *) cp = temp;
+                temp = cp [0] + ((int32_t) cp [1] << 8) + ((int32_t) cp [2] << 16) + ((int32_t) cp [3] << 24);
+                * (int32_t *) cp = temp;
                 cp += 4;
                 break;
 
@@ -148,12 +148,12 @@ void little_endian_to_native (void *data, char *format)
 void native_to_little_endian (void *data, char *format)
 {
     uchar *cp = (uchar *) data;
-    long temp;
+    int32_t temp;
 
     while (*format) {
         switch (*format) {
             case 'L':
-                temp = * (long *) cp;
+                temp = * (int32_t *) cp;
                 *cp++ = (uchar) temp;
                 *cp++ = (uchar) (temp >> 8);
                 *cp++ = (uchar) (temp >> 16);

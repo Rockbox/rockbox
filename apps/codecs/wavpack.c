@@ -26,11 +26,11 @@ static struct codec_api *ci;
 
 #define BUFFER_SIZE 4096
 
-static long temp_buffer [BUFFER_SIZE] IBSS_ATTR;
+static int32_t temp_buffer [BUFFER_SIZE] IBSS_ATTR;
 
-static long read_callback (void *buffer, long bytes)
+static int32_t read_callback (void *buffer, int32_t bytes)
 {
-    long retval = ci->read_filebuf (buffer, bytes);
+    int32_t retval = ci->read_filebuf (buffer, bytes);
     ci->id3->offset = ci->curpos;
     return retval;
 }
@@ -63,7 +63,7 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
   
     ci->configure(DSP_DITHER, (bool *)false);
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(27));   // should be 28...
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(28));
 
     next_track:
 
@@ -97,7 +97,7 @@ enum codec_status codec_start(struct codec_api* api)
     /* The main decoder loop */
 
     while (1) {
-        long nsamples;  
+        int32_t nsamples;  
 
         if (ci->seek_time && ci->taginfo_ready && ci->id3->length) {
             ci->seek_time--;
@@ -107,13 +107,13 @@ enum codec_status codec_start(struct codec_api* api)
             if (ci->seek_time > curpos_ms) {
                 n = ci->seek_time - curpos_ms;
                 d = ci->id3->length - curpos_ms;
-                skip = (int)((long long)(ci->filesize - ci->curpos) * n / d);
+                skip = (int)((int64_t)(ci->filesize - ci->curpos) * n / d);
                 ci->seek_buffer (ci->curpos + skip);
             }
             else {
                 n = curpos_ms - ci->seek_time;
                 d = curpos_ms;
-                skip = (int)((long long) ci->curpos * n / d);
+                skip = (int)((int64_t) ci->curpos * n / d);
                 ci->seek_buffer (ci->curpos - skip);
             }
 

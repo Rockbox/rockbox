@@ -141,7 +141,7 @@ void init_words (WavpackStream *wps)
     CLEAR (wps->w);
 }
 
-static int mylog2 (unsigned long avalue);
+static int mylog2 (unsigned int32_t avalue);
 
 // Read the median log2 values from the specifed metadata structure, convert
 // them back to 32-bit unsigned values and store them. If length is not
@@ -221,11 +221,11 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
         }
     }
 
-    wps->w.bitrate_acc [0] = (long)(byteptr [0] + (byteptr [1] << 8)) << 16;
+    wps->w.bitrate_acc [0] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
 
     if (!(wps->wphdr.flags & MONO_FLAG)) {
-        wps->w.bitrate_acc [1] = (long)(byteptr [0] + (byteptr [1] << 8)) << 16;
+        wps->w.bitrate_acc [1] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
         byteptr += 2;
     }
 
@@ -253,7 +253,7 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
 // currently implemented) this is calculated from the slow_level values and the
 // bitrate accumulators. Note that the bitrate accumulators can be changing.
 
-void update_error_limit (struct words_data *w, ulong flags)
+void update_error_limit (struct words_data *w, uint32_t flags)
 {
     int bitrate_0 = (w->bitrate_acc [0] += w->bitrate_delta [0]) >> 16;
 
@@ -310,7 +310,7 @@ void update_error_limit (struct words_data *w, ulong flags)
     }
 }
 
-static ulong read_code (Bitstream *bs, ulong maxcode);
+static uint32_t read_code (Bitstream *bs, uint32_t maxcode);
 
 // Read the next word from the bitstream "wvbits" and return the value. This
 // function can be used for hybrid or lossless streams, but since an
@@ -320,7 +320,7 @@ static ulong read_code (Bitstream *bs, ulong maxcode);
 // of WORD_EOF indicates that the end of the bitstream was reached (all 1s) or
 // some other error occurred.
 
-long get_words (long *buffer, int nsamples, ulong flags,
+int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
                 struct words_data *w, Bitstream *bs)
 {
     register struct entropy_data *c = w->c;
@@ -330,13 +330,13 @@ long get_words (long *buffer, int nsamples, ulong flags,
         nsamples *= 2;
 
     for (csamples = 0; csamples < nsamples; ++csamples) {
-        ulong ones_count, low, mid, high;
+        uint32_t ones_count, low, mid, high;
 
         if (!(flags & MONO_FLAG))
             c = w->c + (csamples & 1);
 
         if (!(w->c [0].median [0] & ~1) && !w->holding_zero && !w->holding_one && !(w->c [1].median [0] & ~1)) {
-            ulong mask;
+            uint32_t mask;
             int cbits;
 
             if (w->zeros_acc) {
@@ -397,7 +397,7 @@ long get_words (long *buffer, int nsamples, ulong flags,
                     break;
 
                 if (ones_count == LIMIT_ONES) {
-                    ulong mask;
+                    uint32_t mask;
                     int cbits;
 
                     for (cbits = 0; cbits < 33 && getbit (bs); ++cbits);
@@ -493,10 +493,10 @@ long get_words (long *buffer, int nsamples, ulong flags,
 // minimum number of bits and then determines whether another bit is needed
 // to define the code.
 
-static ulong read_code (Bitstream *bs, ulong maxcode)
+static uint32_t read_code (Bitstream *bs, uint32_t maxcode)
 {
     int bitcount = count_bits (maxcode);
-    ulong extras = (1L << bitcount) - maxcode - 1, code;
+    uint32_t extras = (1L << bitcount) - maxcode - 1, code;
 
     if (!bitcount)
         return 0;
@@ -514,7 +514,7 @@ static ulong read_code (Bitstream *bs, ulong maxcode)
     return code;
 }
 
-void send_words (long *buffer, int nsamples, ulong flags,
+void send_words (int32_t *buffer, int nsamples, uint32_t flags,
                  struct words_data *w, Bitstream *bs)
 {
     register struct entropy_data *c = w->c;
@@ -523,9 +523,9 @@ void send_words (long *buffer, int nsamples, ulong flags,
         nsamples *= 2;
 
     while (nsamples--) {
-        long value = *buffer++;
+        int32_t value = *buffer++;
         int sign = (value < 0) ? 1 : 0;
-        ulong ones_count, low, high;
+        uint32_t ones_count, low, high;
 
         if (!(flags & MONO_FLAG))
             c = w->c + (~nsamples & 1);
@@ -553,7 +553,7 @@ void send_words (long *buffer, int nsamples, ulong flags,
         if (sign)
             value = ~value;
 
-        if ((unsigned long) value < GET_MED (0)) {
+        if ((unsigned int32_t) value < GET_MED (0)) {
             ones_count = low = 0;
             high = GET_MED (0) - 1;
             DEC_MED0 ();
@@ -604,9 +604,9 @@ void send_words (long *buffer, int nsamples, ulong flags,
         w->holding_one = ones_count * 2;
 
         if (high != low) {  
-            ulong maxcode = high - low, code = value - low;
+            uint32_t maxcode = high - low, code = value - low;
             int bitcount = count_bits (maxcode);
-            ulong extras = (1L << bitcount) - maxcode - 1;
+            uint32_t extras = (1L << bitcount) - maxcode - 1;
 
             if (code < extras) {
                 w->pend_data |= code << w->pend_count;
@@ -619,7 +619,7 @@ void send_words (long *buffer, int nsamples, ulong flags,
             }
         }
 
-        w->pend_data |= ((long) sign << w->pend_count++);
+        w->pend_data |= ((int32_t) sign << w->pend_count++);
 
         if (!w->holding_zero)
             flush_word (w, bs);
@@ -709,7 +709,7 @@ void flush_word (struct words_data *w, Bitstream *bs)
 // This function returns the log2 for the specified 32-bit unsigned value.
 // The maximum value allowed is about 0xff800000 and returns 8447.
 
-static int mylog2 (unsigned long avalue)
+static int mylog2 (unsigned int32_t avalue)
 {
     int dbits;
 
@@ -733,7 +733,7 @@ static int mylog2 (unsigned long avalue)
 // All input values are valid and the return values are in the range of
 // +/- 8192.
 
-int log2s (long value)
+int log2s (int32_t value)
 {
     return (value < 0) ? -mylog2 (-value) : mylog2 (value);
 }
@@ -743,9 +743,9 @@ int log2s (long value)
 // but since a full 32-bit value is returned this can be used for unsigned
 // conversions as well (i.e. the input range is -8192 to +8447).
 
-long exp2s (int log)
+int32_t exp2s (int log)
 {
-    ulong value;
+    uint32_t value;
 
     if (log < 0)
         return -exp2s (-log);

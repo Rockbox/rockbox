@@ -16,7 +16,6 @@
 
 typedef unsigned char   uchar;
 typedef unsigned short  ushort;
-typedef unsigned long   ulong;
 typedef unsigned int    uint;
 
 // This structure is used to access the individual fields of 32-bit ieee
@@ -43,10 +42,10 @@ typedef struct {
 
 typedef struct {
     char ckID [4];
-    ulong ckSize;
+    uint32_t ckSize;
     short version;
     uchar track_no, index_no;
-    ulong total_samples, block_index, block_samples, flags, crc;
+    uint32_t total_samples, block_index, block_samples, flags, crc;
 } WavpackHeader;
 
 #define WavpackHeaderFormat "4LS2LLLLL"
@@ -88,7 +87,7 @@ typedef struct {
 
 typedef struct {
     uchar temp_data [64];
-    long byte_length;
+    int32_t byte_length;
     void *data;
     uchar id;
 } WavpackMetadata;
@@ -128,7 +127,7 @@ typedef struct {
 typedef struct {
     int bits_per_sample, bytes_per_sample;
     int flags, num_channels, float_norm_exp;
-    ulong sample_rate, channel_mask;
+    uint32_t sample_rate, channel_mask;
 } WavpackConfig;
 
 #define CONFIG_BYTES_STORED     3       // 1-4 bytes/sample
@@ -169,12 +168,12 @@ typedef struct {
 // pointers to hold a complete allocated block of WavPack data, although it's
 // possible to decode WavPack blocks without buffering an entire block.
 
-typedef long (*read_stream)(void *, long);
+typedef int32_t (*read_stream)(void *, int32_t);
 
 typedef struct bs {
     uchar *buf, *end, *ptr;
     void (*wrap)(struct bs *bs);
-    ulong file_bytes, sr;
+    uint32_t file_bytes, sr;
     int error, bc;
     read_stream file;
 } Bitstream;
@@ -184,16 +183,16 @@ typedef struct bs {
 
 struct decorr_pass {
     short term, delta, weight_A, weight_B;
-    long samples_A [MAX_TERM], samples_B [MAX_TERM];
+    int32_t samples_A [MAX_TERM], samples_B [MAX_TERM];
 };
 
 struct entropy_data {
-    ulong median [3], slow_level, error_limit;
+    uint32_t median [3], slow_level, error_limit;
 };
 
 struct words_data {
-    ulong bitrate_delta [2], bitrate_acc [2];
-    ulong pend_data, holding_one, zeros_acc;
+    uint32_t bitrate_delta [2], bitrate_acc [2];
+    uint32_t pend_data, holding_one, zeros_acc;
     int holding_zero, pend_count;
     struct entropy_data c [2];
 };
@@ -205,7 +204,7 @@ typedef struct {
     struct words_data w;
 
     int num_terms, mute_error;
-    ulong sample_index, crc;
+    uint32_t sample_index, crc;
 
     uchar int32_sent_bits, int32_zeros, int32_ones, int32_dups;
     uchar float_flags, float_shift, float_max_exp, float_norm_exp;
@@ -241,7 +240,7 @@ typedef struct {
     char error_message [80];
 
     read_stream infile;
-    ulong total_samples, crc_errors, first_flags;
+    uint32_t total_samples, crc_errors, first_flags;
     int open_flags, norm_offset, reduced_channels, lossy_blocks;
 
 } WavpackContext;
@@ -252,9 +251,9 @@ typedef struct {
 
 // bits.c
 
-void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_stream file, ulong file_bytes);
+void bs_open_read (Bitstream *bs, uchar *buffer_start, uchar *buffer_end, read_stream file, uint32_t file_bytes);
 void bs_open_write (Bitstream *bs, uchar *buffer_start, uchar *buffer_end);
-ulong bs_close_write (Bitstream *bs);
+uint32_t bs_close_write (Bitstream *bs);
 
 #define bs_is_open(bs) ((bs)->ptr != NULL)
 
@@ -270,7 +269,7 @@ ulong bs_close_write (Bitstream *bs);
 #define getbits(value, nbits, bs) { \
     while ((nbits) > (bs)->bc) { \
         if (++((bs)->ptr) == (bs)->end) (bs)->wrap (bs); \
-        (bs)->sr |= (long)*((bs)->ptr) << (bs)->bc; \
+        (bs)->sr |= (int32_t)*((bs)->ptr) << (bs)->bc; \
         (bs)->bc += 8; \
     } \
     *(value) = (bs)->sr; \
@@ -300,7 +299,7 @@ ulong bs_close_write (Bitstream *bs);
     }}
 
 #define putbits(value, nbits, bs) { \
-    (bs)->sr |= (long)(value) << (bs)->bc; \
+    (bs)->sr |= (int32_t)(value) << (bs)->bc; \
     if (((bs)->bc += (nbits)) >= 8) \
         do { \
             *((bs)->ptr) = (bs)->sr; \
@@ -354,14 +353,14 @@ int read_float_info (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_int32_info (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_channel_info (WavpackContext *wpc, WavpackMetadata *wpmd);
 int read_config_info (WavpackContext *wpc, WavpackMetadata *wpmd);
-long unpack_samples (WavpackContext *wpc, long *buffer, ulong sample_count);
+int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count);
 int check_crc_error (WavpackContext *wpc);
 
 // pack.c
 
 void pack_init (WavpackContext *wpc);
 int pack_start_block (WavpackContext *wpc);
-int pack_samples (WavpackContext *wpc, long *buffer, ulong sample_count);
+int pack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_count);
 int pack_finish_block (WavpackContext *wpc);
 
 // metadata.c stuff
@@ -377,15 +376,15 @@ void init_words (WavpackStream *wps);
 int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd);
 void write_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd);
 int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd);
-long get_words (long *buffer, int nsamples, ulong flags,
+int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
                 struct words_data *w, Bitstream *bs);
-void send_word_lossless (long value, int chan,
+void send_word_lossless (int32_t value, int chan,
                          struct words_data *w, Bitstream *bs);
-void send_words (long *buffer, int nsamples, ulong flags,
+void send_words (int32_t *buffer, int nsamples, uint32_t flags,
                  struct words_data *w, Bitstream *bs);
 void flush_word (struct words_data *w, Bitstream *bs);
-int log2s (long value);
-long exp2s (int log);
+int log2s (int32_t value);
+int32_t exp2s (int log);
 signed char store_weight (int weight);
 int restore_weight (signed char weight);
 
@@ -394,8 +393,8 @@ int restore_weight (signed char weight);
 // float.c
 
 int read_float_info (WavpackStream *wps, WavpackMetadata *wpmd);
-void float_values (WavpackStream *wps, long *values, long num_values);
-void float_normalize (long *values, long num_values, int delta_exp);
+void float_values (WavpackStream *wps, int32_t *values, int32_t num_values);
+void float_normalize (int32_t *values, int32_t num_values, int delta_exp);
 
 // wputils.c
 
@@ -411,21 +410,21 @@ int WavpackGetMode (WavpackContext *wpc);
 #define MODE_HIGH       0x20
 #define MODE_FAST       0x40
 
-ulong WavpackUnpackSamples (WavpackContext *wpc, long *buffer, ulong samples);
-ulong WavpackGetNumSamples (WavpackContext *wpc);
-ulong WavpackGetSampleIndex (WavpackContext *wpc);
+uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t samples);
+uint32_t WavpackGetNumSamples (WavpackContext *wpc);
+uint32_t WavpackGetSampleIndex (WavpackContext *wpc);
 int WavpackGetNumErrors (WavpackContext *wpc);
 int WavpackLossyBlocks (WavpackContext *wpc);
-ulong WavpackGetSampleRate (WavpackContext *wpc);
+uint32_t WavpackGetSampleRate (WavpackContext *wpc);
 int WavpackGetBitsPerSample (WavpackContext *wpc);
 int WavpackGetBytesPerSample (WavpackContext *wpc);
 int WavpackGetNumChannels (WavpackContext *wpc);
 int WavpackGetReducedChannels (WavpackContext *wpc);
 WavpackContext *WavpackOpenFileOutput (void);
-int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, ulong total_samples);
-void WavpackAddWrapper (WavpackContext *wpc, void *data, ulong bcount);
+int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, uint32_t total_samples);
+void WavpackAddWrapper (WavpackContext *wpc, void *data, uint32_t bcount);
 int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end);
-int WavpackPackSamples (WavpackContext *wpc, long *sample_buffer, ulong sample_count);
-ulong WavpackFinishBlock (WavpackContext *wpc);
+int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sample_count);
+uint32_t WavpackFinishBlock (WavpackContext *wpc);
 
 

@@ -25,7 +25,7 @@ int read_float_info (WavpackStream *wps, WavpackMetadata *wpmd)
     return TRUE;
 }
 
-void float_values (WavpackStream *wps, long *values, long num_values)
+void float_values (WavpackStream *wps, int32_t *values, int32_t num_values)
 {
     while (num_values--) {
         int shift_count = 0, exp = wps->float_max_exp;
@@ -60,7 +60,7 @@ void float_values (WavpackStream *wps, long *values, long num_values)
     }
 }
 
-void float_normalize (long *values, long num_values, int delta_exp)
+void float_normalize (int32_t *values, int32_t num_values, int delta_exp)
 {
     f32 *fvalues = (f32 *) values, fzero = { 0, 0, 0 };
     int exp;

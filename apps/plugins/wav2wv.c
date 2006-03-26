@@ -42,42 +42,42 @@ static int audiobuflen;
 
 static struct wav_header {
     char ckID [4];                      /* RIFF chuck header */
-    long ckSize;
+    int32_t ckSize;
     char formType [4];
 
     char fmt_ckID [4];                 /* format chunk header */
-    long fmt_ckSize;
+    int32_t fmt_ckSize;
     ushort FormatTag, NumChannels;
-    ulong SampleRate, BytesPerSecond;
+    uint32_t SampleRate, BytesPerSecond;
     ushort BlockAlign, BitsPerSample;
 
     char data_ckID [4];                 /* data chunk header */
-    long data_ckSize;
+    int32_t data_ckSize;
 } raw_header, native_header;
 
 #define WAV_HEADER_FORMAT "4L44LSSLLSS4L"
 
-static void wvupdate (long start_tick,
-                      long sample_rate,
-                      ulong total_samples,
-                      ulong samples_converted,
-                      ulong bytes_read,
-                      ulong bytes_written)
+static void wvupdate (int32_t start_tick,
+                      int32_t sample_rate,
+                      uint32_t total_samples,
+                      uint32_t samples_converted,
+                      uint32_t bytes_read,
+                      uint32_t bytes_written)
 {
-    long elapsed_ticks = *rb->current_tick - start_tick;
+    int32_t elapsed_ticks = *rb->current_tick - start_tick;
     int compression = 0, progress = 0, realtime = 0;
     char buf[32];
 
     if (total_samples)
-        progress = (int)(((long long) samples_converted * 100 +
+        progress = (int)(((int64_t) samples_converted * 100 +
             (total_samples/2)) / total_samples);
 
     if (elapsed_ticks)
-        realtime = (int)(((long long) samples_converted * 100 * HZ /
+        realtime = (int)(((int64_t) samples_converted * 100 * HZ /
             sample_rate + (elapsed_ticks/2)) / elapsed_ticks);
 
     if (bytes_read)
-        compression = (int)(((long long)(bytes_read - bytes_written) * 100 +
+        compression = (int)(((int64_t)(bytes_read - bytes_written) * 100 +
             (bytes_read/2)) / bytes_read);
 
     rb->snprintf(buf, 32, "elapsed time: %d secs", (elapsed_ticks + (HZ/2)) / HZ);
@@ -99,19 +99,19 @@ static void wvupdate (long start_tick,
 
 #define TEMP_SAMPLES 4096
 
-static long temp_buffer [TEMP_SAMPLES] IDATA_ATTR;
+static int32_t temp_buffer [TEMP_SAMPLES] IDATA_ATTR;
 
 static int wav2wv (char *filename)
 {
     int in_fd, out_fd, num_chans, error = false, last_buttons;
-    unsigned long total_bytes_read = 0, total_bytes_written = 0;
-    unsigned long total_samples, samples_remaining;
-    long *input_buffer = (long *) audiobuf;
+    unsigned int32_t total_bytes_read = 0, total_bytes_written = 0;
+    unsigned int32_t total_samples, samples_remaining;
+    int32_t *input_buffer = (int32_t *) audiobuf;
     unsigned char *output_buffer = (unsigned char *)(audiobuf + 0x100000);
     char *extension, save_a;
     WavpackConfig config;
     WavpackContext *wpc;
-    long start_tick;
+    int32_t start_tick;
 
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, (unsigned char *)filename);
@@ -188,9 +188,9 @@ static int wav2wv (char *filename)
     wvupdate (start_tick, native_header.SampleRate, total_samples, 0, 0, 0);
 
     for (samples_remaining = total_samples; samples_remaining;) {
-        unsigned long samples_count, samples_to_pack, bytes_count;
+        unsigned int32_t samples_count, samples_to_pack, bytes_count;
         int cnt, buttons;
-        long value, *lp;
+        int32_t value, *lp;
         signed char *cp;
  
         samples_count = SAMPLES_PER_BLOCK;
@@ -200,7 +200,7 @@ static int wav2wv (char *filename)
 
         bytes_count = samples_count * num_chans * 2;
 
-        if (rb->read (in_fd, input_buffer, bytes_count) != (long) bytes_count) {
+        if (rb->read (in_fd, input_buffer, bytes_count) != (int32_t) bytes_count) {
             rb->splash(HZ*2, true, "could not read file!");
             error = true;
             break;
@@ -212,7 +212,7 @@ static int wav2wv (char *filename)
         cp = (signed char *) input_buffer;
 
         while (samples_to_pack) {
-            unsigned long samples_this_pass = TEMP_SAMPLES / num_chans;
+            unsigned int32_t samples_this_pass = TEMP_SAMPLES / num_chans;
 
             if (samples_this_pass > samples_to_pack)
                 samples_this_pass = samples_to_pack;
@@ -250,7 +250,7 @@ static int wav2wv (char *filename)
 
         bytes_count = WavpackFinishBlock (wpc);
 
-        if (rb->write (out_fd, output_buffer, bytes_count) != (long) bytes_count) {
+        if (rb->write (out_fd, output_buffer, bytes_count) != (int32_t) bytes_count) {
             rb->splash(HZ*2, true, "could not write file!");
             error = true;
             break;
