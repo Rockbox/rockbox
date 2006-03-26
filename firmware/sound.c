@@ -504,12 +504,12 @@ static void set_channel_config(void)
                 }
                 else
                 {
-                    fp_straight = - (1<<19);
-                    fp_cross = ((2 * fp_width / (((1<<19) + fp_width) >> 10))
-                                << 9) - (1<<19);
+                    /* straight = - (1 + width) / (2 * width) */
+                    fp_straight = - ((((1<<19) + fp_width) / (fp_width >> 9)) << 9);
+                    fp_cross = (1<<19) + fp_straight;
                 }
-                val_ll = val_rr = fp_straight & 0xFFFFF;
-                val_lr = val_rl = fp_cross & 0xFFFFF;
+                val_ll = val_rr = fp_straight & 0xfffff;
+                val_lr = val_rl = fp_cross & 0xfffff;
             }
             break;
 
@@ -528,10 +528,10 @@ static void set_channel_config(void)
             break;
 
         case SOUND_CHAN_KARAOKE:
-            val_ll = 0x80001;
-            val_lr = 0x7ffff;
-            val_rl = 0x7ffff;
-            val_rr = 0x80001;
+            val_ll = 0xc0000;
+            val_lr = 0x40000;
+            val_rl = 0x40000;
+            val_rr = 0xc0000;
             break;
     }
 

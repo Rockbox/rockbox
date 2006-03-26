@@ -706,13 +706,14 @@ void stereo_width_set(int value)
 {
     long width, straight, cross;
     
-    width = value*0x7fffff/100;
+    width = value * 0x7fffff / 100;
     if (value <= 100) {
-        straight = (0x7fffff + width)/2;
+        straight = (0x7fffff + width) / 2;
         cross = straight - width;
     } else {
-        straight = 0x7fffff; 
-        cross = 0x7fffff - ((int64_t)(2*width) << 23)/(0x7fffff + width);
+        /* straight = (1 + width) / (2 * width) */
+        straight = ((int64_t)(0x7fffff + width) << 22) / width;
+        cross = straight - 0x7fffff;
     }
     sw_gain = straight << 8;
     sw_cross = cross << 8;
@@ -752,10 +753,10 @@ static void channels_process(int32_t **src, int num)
         break;
     case SOUND_CHAN_KARAOKE:
         for (i = 0; i < num; i++) {
-            int32_t left_sample = sl[i];
+            int32_t left_sample = sl[i]/2;
             
-            sl[i] -= sr[i];
-            sr[i] -= left_sample;
+            sl[i] = left_sample - sr[i]/2;
+            sr[i] = sr[i]/2 - left_sample;
         }
         break;
     }
