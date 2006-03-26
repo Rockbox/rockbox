@@ -60,7 +60,8 @@ DIRS = .
 # Subdirs containing multi-file plugins
 
 #for all targets
-SUBDIRS += searchengine databox
+# SUBDIRS += searchengine databox
+SUBDIRS += databox
 
 #for any recorder, iRiver or iPod model
 ifneq (,$(strip $(foreach tgt,RECORDER IRIVER IPOD_COLOR IPOD_VIDEO GIGABEAT,$(findstring $(tgt),$(TARGET)))))

@@ -565,6 +565,11 @@ static const struct bit_entry hd_bits[] =
     {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"}, 
     {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"}, 
 #endif
+
+#ifdef HAVE_DIRCACHE
+    {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

@@ -3838,3 +3838,45 @@ desc: Backlight behaviour setting
 eng: "First keypress enables backlight only"
 voice: "First keypress enables backlight only"
 new:
+
+id: LANG_ID3DB_GENRES
+desc: in tag cache
+eng: "Genres"
+voice: "Genres"
+new:
+
+id: LANG_TAGCACHE
+desc: in tag cache settings
+eng: "Tag cache"
+voice: "Tag cache"
+new:
+
+id: LANG_TAGCACHE_INIT
+desc: while initializing tagcache on boot
+eng: "Committing tagcache"
+voice:
+new:
+
+id: LANG_TAGCACHE_DISK
+desc: in tag cache settings
+eng: "Keep on disk"
+voice: "Keep on disk"
+new:
+
+id: LANG_TAGCACHE_RAM
+desc: in tag cache settings
+eng: "Load to ram"
+voice: "Load to ram"
+new:
+
+id: LANG_TAGCACHE_FORCE_UPDATE
+desc: in tag cache settings
+eng: "Force tag cache update"
+voice: "Force tag cache update"
+new:
+
+id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+desc: in tag cache settings
+eng: "Updating in background"
+voice: "Updating in background"
+new:

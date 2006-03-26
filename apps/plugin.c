@@ -333,16 +333,6 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
-    /* tag database */
-    &tagdbheader,
-    &tagdb_fd,
-    &tagdb_initialized,
-    tagdb_init,
-    /* runtime database */
-    &rundbheader,
-    &rundb_fd,
-    &rundb_initialized,            
-
     /* menu */
     menu_init,
     menu_exit,

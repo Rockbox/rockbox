@@ -99,12 +99,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 13
+#define PLUGIN_API_VERSION 14
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 13
+#define PLUGIN_MIN_API_VERSION 14
 
 /* plugin return codes */
 enum plugin_status {
@@ -386,16 +386,6 @@ struct plugin_api {
     int (*mas_codec_readreg)(int reg);
 #endif
 #endif
-
-    /* tag database */
-    struct tagdb_header *tagdbheader;
-    int *tagdb_fd;
-    int *tagdb_initialized;
-    int (*tagdb_init) (void);
-    /* runtime database */
-    struct rundb_header *rundbheader;
-    int *rundb_fd;
-    int *rundb_initialized;            
 
     /* menu */
     int (*menu_init)(const struct menu_item* mitems, int count,

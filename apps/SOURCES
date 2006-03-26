@@ -25,8 +25,7 @@ status.c
 talk.c
 #endif
 tree.c
-dbtree.c
-database.c
+tagtree.c
 filetree.c
 
 screen_access.c
@@ -69,7 +68,6 @@ recorder/recording.c
 #if CONFIG_CODEC == SWCODEC
 pcmbuf.c
 playback.c
-metadata.c
 codecs.c
 dsp.c
 eq.c	 	
@@ -81,3 +79,5 @@ eq_arm.S
 #endif
 eq_menu.c
 #endif
+metadata.c
+tagcache.c

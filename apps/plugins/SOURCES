@@ -15,7 +15,7 @@ metronome.c
 #endif
 mosaique.c
 rockbox_flash.c
-search.c
+/* search.c */
 snow.c
 sort.c
 stats.c

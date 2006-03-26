@@ -49,6 +49,8 @@
 #include "screens.h"
 #include "misc.h"
 #include "splash.h"
+#include "dircache.h"
+#include "tagcache.h"
 #include "lcd-remote.h"
 
 #ifdef HAVE_LCD_BITMAP
@@ -1855,6 +1857,10 @@ static bool dbg_dircache_info(void)
                  dircache_get_build_ticks() / HZ);
         lcd_puts(0, line++, buf);
 
+        snprintf(buf, sizeof(buf), "Entry count: %d",
+                 dircache_get_entry_count());
+        lcd_puts(0, line++, buf);
+
         lcd_update();
 
         switch (button_get_w_tmo(HZ/2))
@@ -1870,6 +1876,38 @@ static bool dbg_dircache_info(void)
 }
 
 #endif /* HAVE_DIRCACHE */
+
+static bool dbg_tagcache_info(void)
+{
+    bool done = false;
+    int line;
+    char buf[32];
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+
+    while (!done)
+    {
+        line = 0;
+        
+        lcd_clear_display();
+        snprintf(buf, sizeof(buf), "Current progress: %d%%", 
+                 tagcache_get_progress());
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+
+        switch (button_get_w_tmo(HZ/2))
+        {
+            case SETTINGS_OK:
+            case SETTINGS_CANCEL:
+                done = true;
+                break;
+        }
+    }
+
+    return false;
+}
 
 #if CONFIG_CPU == SH7034
 bool dbg_save_roms(void)
@@ -2014,6 +2052,7 @@ bool debug_menu(void)
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
 #endif
+        { "View tagcache info", dbg_tagcache_info },
 #ifdef HAVE_LCD_BITMAP
         { "View audio thread", dbg_audio_thread },
 #ifdef PM_DEBUG

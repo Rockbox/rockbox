@@ -820,12 +820,12 @@ int onplay(char* file, int attr, int from)
             items[i].desc = ID2P(LANG_MENU_SHOW_ID3_INFO);
             items[i].function = browse_id3;
             i++;
-            if(rundb_initialized)
+/*            if(rundb_initialized)
             {
                 items[i].desc = ID2P(LANG_MENU_SET_RATING);
                 items[i].function = set_rating;
                 i++;
-            }
+            }*/
         }
 
 #ifdef HAVE_MULTIVOLUME

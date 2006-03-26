@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Dave Chapman
+ * Copyright (C) 2005 by Miika Pekkarinen
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,16 +16,26 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef _TAGTREE_H
+#define _TAGTREE_H
 
-#ifndef _METADATA_H
-#define _METADATA_H
+#include "tagcache.h"
+#include "tree.h"
 
-#include "playback.h"
+enum table { invalid, root, allsongs, allalbums, allartists, allgenres,
+             albums4artist, songs4album, songs4artist, artist4genres,
+             search, searchartists, searchalbums, searchsongs,
+             chunked_next };
 
-unsigned int probe_file_format(const char *filename);
-bool get_metadata(struct track_info* track, int fd, const char* trackname,
-                  bool v1first);
+int tagtree_enter(struct tree_context* c);
+void tagtree_exit(struct tree_context* c);
+int tagtree_load(struct tree_context* c);
+#ifdef HAVE_LCD_BITMAP
+const char* tagtree_get_icon(struct tree_context* c);
+#else
+int   tagtree_get_icon(struct tree_context* c);
+#endif
+int tagtree_get_filename(struct tree_context* c, char *buf, int buflen);
 
 #endif
-
 

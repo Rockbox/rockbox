@@ -57,10 +57,11 @@
 #include "filetypes.h"
 #include "misc.h"
 #include "filetree.h"
-#include "dbtree.h"
+#include "tagtree.h"
 #include "recorder/recording.h"
 #include "rtc.h"
 #include "dircache.h"
+#include "tagcache.h"
 #include "yesno.h"
 
 /* gui api */
@@ -164,7 +165,8 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
     if (id3db) {
-        name = ((char**)local_tc->dircache)[selected_item * local_tc->dentry_size];
+        char **buf = local_tc->dircache;
+        name = buf[selected_item * (local_tc->dentry_size/sizeof(int))];
     }
     else {
         struct entry* dc = local_tc->dircache;
@@ -189,7 +191,7 @@ void tree_get_fileicon(int selected_item, void * data, ICON * icon)
     struct tree_context * local_tc=(struct tree_context *)data;
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     if (id3db) {
-        *icon = (ICON)db_get_icon(&tc);
+        *icon = (ICON)tagtree_get_icon(&tc);
     }
     else {
         struct entry* dc = local_tc->dircache;
@@ -267,6 +269,7 @@ struct tree_context* tree_get_context(void)
 int tree_get_file_position(char * filename)
 {
     int i;
+
     /* use lastfile to determine the selected item (default=0) */
     for (i=0; i < tc.filesindir; i++)
     {
@@ -292,7 +295,7 @@ static int update_dir(void)
             tc.currextra != lastextra ||
             tc.firstpos  != lastfirstpos)
         {
-            if (db_load(&tc) < 0)
+            if (tagtree_load(&tc) < 0)
                 return -1;
 
             lasttable = tc.currtable;
@@ -494,7 +497,7 @@ static bool check_changed_id3mode(bool currmode)
         currmode = global_settings.dirfilter == SHOW_ID3DB;
         if (currmode) {
             curr_context=CONTEXT_ID3DB;
-            db_load(&tc);
+            tagtree_load(&tc);
         }
         else
         {
@@ -600,7 +603,7 @@ static bool dirbrowse(void)
                 if ( numentries == 0 )
                     break;
 
-                switch (id3db?db_enter(&tc):ft_enter(&tc))
+                switch (id3db?tagtree_enter(&tc):ft_enter(&tc))
                 {
                     case 1: reload_dir = true; break;
                     case 2: start_wps = true; break;
@@ -624,7 +627,7 @@ static bool dirbrowse(void)
                     break;
 
                 if (id3db)
-                    db_exit(&tc);
+                    tagtree_exit(&tc);
                 else
                     if (ft_exit(&tc) == 3)
                         exit_func = true;
@@ -732,6 +735,7 @@ static bool dirbrowse(void)
                     restore = true;
 
                     id3db = check_changed_id3mode(id3db);
+                    reload_dir = true;
                     break;
                 }
 
@@ -772,7 +776,7 @@ static bool dirbrowse(void)
                             case songs4artist:
                             case searchsongs:
                                 attr=TREE_ATTR_MPA;
-                                db_get_filename(&tc, buf, sizeof(buf));
+                                tagtree_get_filename(&tc, buf, sizeof(buf));
                                 break;
                         }
                     }
@@ -906,6 +910,7 @@ static bool dirbrowse(void)
                 lastextra = -1;
                 reload_root = false;
             }
+            
             if (! reload_dir )
             {
                 gui_synclist_select_item(&tree_lists, 0);
@@ -935,6 +940,7 @@ static bool dirbrowse(void)
             need_update = true;
             reload_dir = false;
         }
+
         if(need_update) {
             tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
             need_update=false;
@@ -1177,8 +1183,6 @@ void tree_init(void)
     memset(&tc, 0, sizeof(tc));
     tc.dirfilter = &global_settings.dirfilter;
 
-    tagdb_init();
-
     tc.name_buffer_size = AVERAGE_FILENAME_LENGTH * max_files;
     tc.name_buffer = buffer_alloc(tc.name_buffer_size);
 
@@ -1331,9 +1335,9 @@ void ft_play_filename(char *dir, char *file)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
-    rundb_shutdown();
-    tagdb_shutdown();
+    tagcache_stop_scan();
     playlist_shutdown();
+
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
@@ -1351,8 +1355,6 @@ void tree_flush(void)
 
 void tree_restore(void)
 {
-    tagdb_init();
-    rundb_init();
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
@@ -1376,5 +1378,6 @@ void tree_restore(void)
             gui_textarea_clear(&screens[i]);
         }
     }
+    tagcache_start_scan();
 #endif
 }

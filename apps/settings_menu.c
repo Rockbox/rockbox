@@ -49,6 +49,7 @@
 #include "database.h"
 #include "dir.h"
 #include "dircache.h"
+#include "tagcache.h"
 #include "rbunicode.h"
 #include "splash.h"
 #include "yesno.h"
@@ -1259,15 +1260,15 @@ static bool next_folder(void)
 static bool runtimedb(void)
 {
     bool rc;
-    bool old = global_settings.runtimedb;
+//    bool old = global_settings.runtimedb;
 
     rc = set_bool( str(LANG_RUNTIMEDB_ACTIVE),
                            &global_settings.runtimedb );
-    if (old && !global_settings.runtimedb)
+/*    if (old && !global_settings.runtimedb)
         rundb_shutdown();
     if (!old && global_settings.runtimedb)
         rundb_init();
-
+*/
     return rc;
 }
 
@@ -1479,6 +1480,7 @@ static bool beep(void)
 }
 #endif
 
+
 #ifdef HAVE_DIRCACHE
 static bool dircache(void)
 {
@@ -1497,6 +1499,16 @@ static bool dircache(void)
     return result;
 }
 
+static bool tagcache_ram(void)
+{
+    bool result = set_bool_options(str(LANG_TAGCACHE),
+                                   &global_settings.tagcache_ram,
+                                   STR(LANG_TAGCACHE_RAM),
+                                   STR(LANG_TAGCACHE_DISK),
+                                   NULL);
+
+    return result;
+}
 #endif /* HAVE_DIRCACHE */
 
 static bool playback_settings_menu(void)
@@ -1523,6 +1535,10 @@ static bool playback_settings_menu(void)
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
         { ID2P(LANG_NEXT_FOLDER), next_folder },
+#ifdef HAVE_DIRCACHE
+        { ID2P(LANG_TAGCACHE), tagcache_ram },
+#endif
+        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_force_update },
         { ID2P(LANG_RUNTIMEDB_ACTIVE), runtimedb },
     };
 

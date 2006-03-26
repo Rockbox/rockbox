@@ -68,6 +68,7 @@ static const struct format_list formats[] =
     { AFMT_MPA_L2,        "mp2"  },
     { AFMT_MPA_L2,        "mpa"  },
     { AFMT_MPA_L3,        "mp3"  },
+#if CONFIG_CODEC == SWCODEC
     { AFMT_OGG_VORBIS,    "ogg"  },
     { AFMT_PCM_WAV,       "wav"  },
     { AFMT_FLAC,          "flac" },
@@ -80,8 +81,10 @@ static const struct format_list formats[] =
     { AFMT_SHN,           "shn"  },
     { AFMT_AIFF,          "aif"  },
     { AFMT_AIFF,          "aiff" },
+#endif
 };
 
+#if CONFIG_CODEC == SWCODEC
 static const unsigned short a52_bitrates[] =
 {
      32,  40,  48,  56,  64,  80,  96, 112, 128, 160, 
@@ -1246,6 +1249,7 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     id3->bitrate = id3->filesize*8/id3->length;
     return true;
 }
+#endif /* CONFIG_CODEC == SWCODEC */
 
 static bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
@@ -1318,7 +1322,7 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
 }
 
 /* Simple file type probing by looking at the filename extension. */
-static unsigned int probe_file_format(const char *filename)
+unsigned int probe_file_format(const char *filename)
 {
     char *suffix;
     unsigned int i;
@@ -1349,9 +1353,11 @@ static unsigned int probe_file_format(const char *filename)
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
     bool v1first) 
 {
+#if CONFIG_CODEC == SWCODEC
     unsigned char* buf;
     unsigned long totalsamples;
     int i;
+#endif
 
     /* Take our best guess at the codec type based on file extension */
     track->id3.codectype = probe_file_format(trackname);
@@ -1369,6 +1375,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
 
+#if CONFIG_CODEC == SWCODEC
     case AFMT_FLAC:
         if (!get_flac_metadata(fd, &(track->id3)))
         {
@@ -1519,6 +1526,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
         /* TODO: read the id3v2 header if it exists */
         break;
+#endif /* CONFIG_CODEC == SWCODEC */
 
     case AFMT_AIFF:
         if (!get_aiff_metadata(fd, &(track->id3)))
@@ -1543,3 +1551,4 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
     return true;
 }
+

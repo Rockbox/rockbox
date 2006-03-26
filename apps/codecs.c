@@ -177,12 +177,6 @@ struct codec_api ci = {
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
 
-    /* tag database */
-    &tagdbheader,
-    &tagdb_fd,
-    &tagdb_initialized,
-    tagdb_init,
-
     /* misc */
     srand,
     rand,

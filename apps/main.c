@@ -60,6 +60,7 @@
 #include "misc.h"
 #include "database.h"
 #include "dircache.h"
+#include "tagcache.h"
 #include "lang.h"
 #include "string.h"
 #include "splash.h"
@@ -138,6 +139,29 @@ void init_dircache(void)
 # define init_dircache(...)
 #endif
 
+void init_tagcache(void)
+{
+    int font_w, font_h;
+    
+#ifdef HAVE_LCD_BITMAP
+    /* Print "Scanning disk..." to the display. */
+    lcd_getstringsize("A", &font_w, &font_h);
+    lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_TAGCACHE_INIT))*font_w)/2),
+                LCD_HEIGHT-font_h*3, str(LANG_TAGCACHE_INIT));
+    lcd_update();
+#endif
+    
+    tagcache_init();
+
+#ifdef HAVE_LCD_BITMAP
+    /* Clean the text when we are done. */
+    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_update();
+#endif
+}
+
 #ifdef SIMULATOR
 
 void init(void)
@@ -162,6 +186,7 @@ void init(void)
     gui_sync_wps_init();
     settings_apply();
     init_dircache();
+    init_tagcache();
     sleep(HZ/2);
     tree_init();
     playlist_init();
@@ -350,6 +375,7 @@ void init(void)
 
     
     init_dircache();
+    init_tagcache();
     gui_sync_wps_init();
     settings_apply();
 
@@ -379,7 +405,6 @@ void init(void)
 #endif
     talk_init();
     /* runtime database has to be initialized after audio_init() */
-    rundb_init();
     cpu_boost(false);
 
 #ifdef AUTOROCK

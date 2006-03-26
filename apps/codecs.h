@@ -85,12 +85,12 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 5
+#define CODEC_API_VERSION 6
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 5
+#define CODEC_MIN_API_VERSION 6
 
 /* codec return codes */
 enum codec_status {
@@ -247,12 +247,6 @@ struct codec_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-
-    /* tag database */
-    struct tagdb_header *tagdbheader;
-    int *tagdb_fd;
-    int *tagdb_initialized;
-    int (*tagdb_init) (void);
 
     /* misc */
     void (*srand)(unsigned int seed);

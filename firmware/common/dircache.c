@@ -84,8 +84,8 @@ static struct dircache_entry* allocate_entry(void)
     /* Make sure the entry is long aligned. */
     if ((long)next_entry & 0x03)
     {
-        next_entry = (struct dircache_entry *)(((long)next_entry & ~0x03) + 0x04);
         dircache_size += 4 - ((long)next_entry & 0x03);
+        next_entry = (struct dircache_entry *)(((long)next_entry & ~0x03) + 0x04);
     }
 #endif
     next_entry->name_len = 0;
@@ -95,7 +95,6 @@ static struct dircache_entry* allocate_entry(void)
     next_entry->next = NULL;
     
     dircache_size += sizeof(struct dircache_entry);
-    entry_count++;
 
     return next_entry;
 }
@@ -186,6 +185,7 @@ static int dircache_scan(struct travel_data *td)
         td->ce->wrttime = td->entry.wrttime;
         memcpy(td->ce->d_name, td->entry.name, td->ce->name_len);
         dircache_size += td->ce->name_len;
+        entry_count++;
         
         if (td->entry.attr & FAT_ATTR_DIRECTORY)
         {

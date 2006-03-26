@@ -419,6 +419,7 @@ struct user_settings
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */
     int dircache_size;      /* directory cache structure last size, 22 bits */
+    bool tagcache_ram;      /* tag cache mode (0=disabled,1=disk,2=ram) */
 #endif
     int default_codepage;   /* set default codepage for tag conversion */
 #ifdef HAVE_REMOTE_LCD
