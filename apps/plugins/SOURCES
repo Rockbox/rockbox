@@ -23,6 +23,10 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
+wavplay.c
+#endif
+
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */

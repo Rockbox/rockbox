@@ -33,6 +33,7 @@
 #include "logf.h"
 #include "screens.h"
 #include "misc.h"
+#include "i2c.h"
 #include "mas.h"
 #include "plugin.h"
 #include "lang.h"
@@ -403,6 +404,11 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     set_sound,
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
+    i2c_begin,
+    i2c_end,
+    i2c_write,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

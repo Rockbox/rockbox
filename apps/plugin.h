@@ -50,9 +50,11 @@
 #include "profile.h"
 #endif
 #include "misc.h"
-#if (HWCODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
 #include "dsp.h"
+#else
+#include "mas.h"
 #endif
 #include "settings.h"
 #include "timer.h"
@@ -99,7 +101,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 15
+#define PLUGIN_API_VERSION 16
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -472,7 +474,11 @@ struct plugin_api {
        the API gets incompatible */     
     bool (*set_sound)(const unsigned char * string,
                       int* variable, int setting);
-
+#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
+    void (*i2c_begin)(void);
+    void (*i2c_end)(void);
+    int  (*i2c_write)(int address, unsigned char* buf, int count );
+#endif
 };
 
 /* plugin header */

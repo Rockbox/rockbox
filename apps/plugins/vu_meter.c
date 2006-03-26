@@ -142,7 +142,7 @@ int last_num_right_leds;
 
 int i;
 
-#define MAX_PEAK 0x7FFF
+#define MAX_PEAK 0x8000
 
 struct saved_settings {
     int meter_type;
