@@ -31,9 +31,7 @@
 #include "splash.h"
 #include "lang.h"
 #include "tagcache.h"
-
-/* External reference to the big audiobuffer. */
-extern char *audiobuf, *audiobufend;
+#include "buffer.h"
 
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
