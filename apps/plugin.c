@@ -43,6 +43,7 @@
 #include "backlight.h"
 #include "ata.h"
 #include "talk.h"
+#include "sound_menu.h"
 #include "mp3data.h"
 #include "powermgmt.h"
 #include "system.h"
@@ -401,7 +402,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+    set_sound,
 };
 
 int plugin_load(const char* plugin, void* parameter)

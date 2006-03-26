@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2006 Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,14 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _SOUND_MENU_H
-#define _SOUND_MENU_H
+#ifndef __PLAYBACK_CONTROL_H__
+#define __PLAYBACK_CONTROL_H__
 
-#include "menu.h"
+bool playback_control(struct plugin_api* api);
 
-bool sound_menu(void);
-bool recording_menu(bool no_source);
-bool rectrigger(void);
-bool set_sound(const unsigned char * string, int* variable, int setting);
-
-#endif
+#endif /* __PLAYBACK_CONTROL_H__ */

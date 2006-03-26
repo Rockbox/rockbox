@@ -470,6 +470,8 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
+    bool (*set_sound)(const unsigned char * string,
+                      int* variable, int setting);
 
 };
 
