@@ -783,7 +783,7 @@ static bool tempbuf_unique_insert(char *str, int id)
         if (!strcasecmp(str, index[i].str))
         {
             tempbuf_left -= sizeof(struct tempbuf_id);
-            if (tempbuf_left < 0)
+            if (tempbuf_left - 4 < 0)
                 return false;
             
             idp = index[i].id;
@@ -791,6 +791,17 @@ static bool tempbuf_unique_insert(char *str, int id)
                 idp = idp->next;
             
             idp->next = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
+#ifdef ROCKBOX_STRICT_ALIGN
+            /* Make sure the entry is long aligned. */
+            if ((long)idp->next & 0x03)
+            {
+                int fix = 4 - ((long)idp->next & 0x03);
+                tempbuf_left -= fix;
+                tempbuf_pos += fix;
+                idp->next = (struct tempbuf_id *)((
+                        (long)idp->next & ~0x03) + 0x04);
+            }
+#endif
             idp = idp->next;
             idp->id = id;
             idp->next = NULL;

@@ -192,7 +192,7 @@
 #endif
 
 /* Determine if accesses should be strictly long aligned. */
-#if (CONFIG_CPU == SH7034) || (CONFIG_CPU == CPU_ARM)
+#if (CONFIG_CPU == SH7034) || defined(CPU_ARM)
 #define ROCKBOX_STRICT_ALIGN 1
 #endif
 
