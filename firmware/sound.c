@@ -72,7 +72,7 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_WM8975)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -25, sound_set_volume},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif defined(HAVE_WM8758)
@@ -80,7 +80,7 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif defined(HAVE_WM8731)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -25, sound_set_volume},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #else /* MAS3507D */
@@ -302,10 +302,10 @@ static int tenthdb2master(int db)
     /* 0110000 == -73dB (0x30 */
     /* 0101111 == mute  (0x2f) */
 
-    if (db <= -730) {
+    if (db < VOLUME_MIN) {
         return 0x0;
     } else {
-        return((db/10)+73+0x2f);
+        return((db/10)+73+0x30);
     }
 }
 
@@ -338,7 +338,7 @@ static int tenthdb2master(int db)
 
     /* 1000000 == Mute (0x40) */
 
-    if (db < -570) {
+    if (db < VOLUME_MIN) {
         return 0x40;
     } else {
         return((db/10)+57);
@@ -372,10 +372,10 @@ static int tenthdb2master(int db)
     /* 0110000 == -73dB (0x30 */
     /* 0101111 == mute  (0x2f) */
 
-    if (db <= -570) {
-        return 0x0;
+    if (db < VOLUME_MIN) {
+        return 0x2f;
     } else {
-        return((db/10)+57);
+        return((db/10)+0x30+73);
     }
 }
 
