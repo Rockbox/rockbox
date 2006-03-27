@@ -690,6 +690,8 @@ static bool dirbrowse(void)
                     restore = true;
 
                     id3db = check_changed_id3mode(id3db);
+                    if(id3db)
+                        reload_dir = true;
                 }
                 else /* use it as a quick exit instead */
                     exit_func = true;
