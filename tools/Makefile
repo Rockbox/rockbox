@@ -9,7 +9,7 @@
 CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
-CLEANALL := scramble descramble iriver iaudio sh2d bmp2rb rdf2binary convbdf	\
+CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
  generate_rocklatin mkboot ipod_fw codepages uclpack
 
 all:
@@ -17,12 +17,10 @@ all:
 
 scramble: scramble.o iriver.o
 descramble: descramble.o iriver.o
-iaudio: iaudio.o
 
 scramble.o: scramble.c iriver.h
 descramble.o: descramble.c iriver.h
 iriver.o: iriver.c iriver.h
-iaudio.o: iaudio.c
 
 sh2d: sh2d.c
 
