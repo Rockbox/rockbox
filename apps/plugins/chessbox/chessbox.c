@@ -130,6 +130,10 @@ PLUGIN_HEADER
 #elif (LCD_HEIGHT >= 128) && (LCD_WIDTH >= 128)
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
+/* use 10x8 tiles , only for the archoses */
+#elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
+#define TILE_WIDTH  10
+#define TILE_HEIGHT 8
 /* use 8x8 tiles */
 #elif (LCD_HEIGHT >= 64) && (LCD_WIDTH >= 64)
 #define TILE_WIDTH  8
