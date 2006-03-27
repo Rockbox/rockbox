@@ -3,6 +3,7 @@ ACTION=@echo preprocessing $@; rm -f $@; $(HOME)/bin/fcpp -WWW -Uunix -H -C -V -
 SRC := $(wildcard *.t)
 SOBJS := daily.shtml main.shtml index.shtml status.shtml \
 	bugs.shtml requests.shtml patches.shtml cvs.shtml
+
 OBJS := $(SRC:%.t=%.html) $(SOBJS)
 
 .SUFFIXES: .t .html

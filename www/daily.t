@@ -16,6 +16,9 @@ href="/twiki/bin/view/Main/DeviceChart">identify your model</a>
 
 <h2>CVS Compile Status</h2>
 
+#if 1
+The CVS builds are now <a href="cvs.shtml">here</a> in its <a href="cvs.shtml">own page</a>.
+#else
 <p>CVS code build status: number of compiler warnings the build generates. 0
 (zero) means no warnings. The timestamp is GMT. <a
 href="http://www.rockbox.org/twiki/bin/view/Main/TargetStatus">Target
@@ -46,9 +49,12 @@ every source change. (See status on the first line in the above table).
 <a href="auto/build-h300/rockbox.zip">iriver h300</a>
 <a href="auto/build-ipodcolor/rockbox.zip">iPod Color</a>
 <a href="auto/build-ipodnano/rockbox.zip">iPod Nano</a>
+<a href="auto/build-ipod4gray/rockbox.zip">iPod 4G Gray</a>
+<a href="auto/build-ipodvideo/rockbox.zip">iPod Video</a>
 <a href="auto/build-source/rockbox-bleeding.tar.gz">source</a>
 
 <p>
 <a href="/twiki/bin/view/Main/UsingCVS">How to use CVS</a>.
+#endif
 
 #include "foot.t"

@@ -33,7 +33,6 @@ BODY, P, DIV, TD, TH, TR, FORM, OL, UL, LI, INPUT, TEXTAREA, SELECT
  text-decoration:  none;
  font-family:      sans-serif;
  font-style:       normal;
-# font-size:        95%;
  font-size:        13px;
 }
 
@@ -54,7 +53,7 @@ pre {
 }
 
 .bgbox {
- left-border-width: 1px;
+ border-left: 1px;
  border-color: #000000;
 }
 
@@ -151,7 +150,7 @@ td.fgood {
 }
 
 td.fbad {
- background-color: #f0c0c0;
+ background-color: #f0a0a0;
 }
 
 td.toolscat {
@@ -208,4 +207,10 @@ td.toolscat {
 
 .blink:hover {
  text-decoration: underline;
+}
+
+.devcon {
+  color: #ff0;
+  font-weight: bold;
+  font-size: 10px; 
 }

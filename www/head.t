@@ -27,7 +27,7 @@
 <tr valign="top">
 <td bgcolor=MENUBG valign="top">
 <br>
-&nbsp;<a href="/"><img src="/rockbox100.png" width=99 height=30 border=0 alt="Rockbox Logo"></a>&nbsp;<br>
+<div align="center"><a href="/"><img src="/rockbox100.png" width=99 height=30 border=0 alt="Rockbox Logo"></a>
 
 <p align="right">
 <a class="menulink" href="/">home</a><br>
@@ -38,21 +38,20 @@
 <a class="menulink" href="/irc/">IRC</a><br>
 <a class="menulink" href="http://forums.rockbox.org">forums</a><br>
 <a class="menulink" href="/daily.shtml">daily builds</a><br>
-<a class="menulink" href="/requests.shtml">feature&nbsp;requests</a><br>
-<a class="menulink" href="/bugs.shtml">bug reports</a><br>
-<a class="menulink" href="/patches.shtml">patches</a><br>
+<a class="menulink" href="/cvs.shtml">CVS builds</a><br>
+<a class="menulink" href="/tracker/index.php?type=1">feature&nbsp;requests</a><br>
+<a class="menulink" href="/tracker/index.php?type=2">bug reports</a><br>
+<a class="menulink" href="/tracker/index.php?type=4">patches</a><br>
 
 <div align="right">
 <form action="http://www.google.com/search">
-<input name=as_q size=12><br>
+<input name=as_q size=10><br>
 <input value="Search" type=submit>
 <input type=hidden name=as_sitesearch value="www.rockbox.org">
 </form>
 
 <p class=menutext>Bandwidth and server<br>sponsored by:<br>
 <a href="http://www.contactor.se"><img border=0 src="/cont.png" width=101 height=36 alt="Contactor Data AB Logo"></a>
-
-<p><a href="http://sourceforge.net/projects/rockbox/"><img src="/sf_logo.png" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 <input type="hidden" name="cmd" value="_xclick">

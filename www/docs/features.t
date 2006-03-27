@@ -15,6 +15,12 @@
 #define UNKNOWN TD ? ETD
 #define NA TD N/A ETD
 
+<p>
+ Moved here:
+ <a href="http://www.rockbox.org/twiki/bin/view/Main/FeatureComparison">www.rockbox.org/twiki/bin/view/Main/FeatureComparison</a>
+
+#if 0
+
 <p> This chart compares Rockbox with the original firmwares as shipped by the
  manufacturers of the players. The Rockbox column may specify features only
  available in CVS and daily builds.
@@ -345,5 +351,7 @@ EFEAT
 
 <p>
  Wrong facts? Mail rockbox@cool.haxx.se now!
+
+#endif
 
 #include "foot.t"

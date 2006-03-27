@@ -9,10 +9,14 @@ my @list=("player",
           "fmrecorder", "fmrecorder8mb",
           "recorderv2",
           "ondiofm", "ondiosp",
-          "h100", "h120", "h300", "ipodcolor", "ipodnano",
+          "h100", "h120", "h300",
+
+          "ipodcolor", "ipodnano", "ipod4gray", "ipodvideo",
+          "ipod3g", "iaudiox5",
 
           # install and source are special cases
-          "install", "source");
+          #"install",
+          "source");
 
 for(@list) {
     my $dir = $_;
@@ -47,7 +51,7 @@ for(reverse sort keys %date) {
         my $show = $t;
         $show =~ s/recorder/rec/;
         # Remove the comment below to get long names
-        # $show = $longname{$t};
+        $show = $longname{$t};
         $head[$x] .= "<th>$show</th>\n";
 	$count++;
 	if ($count == $split) {
@@ -69,7 +73,7 @@ for(reverse sort keys %date) {
             $file = "Rockbox-${d}-install.exe";
         }
         if( -f "$basedir/$m/$file") {
-            printf "<a href=\"/daily/$_/$file\">latest</a>",
+            printf "<a href=\"http://download.rockbox.org/daily/$_/$file\">latest</a>",
         }
         print "<p><a href=\"/dl.cgi?bin=$_\">older</a></td>\n";
 

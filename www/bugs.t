@@ -9,13 +9,13 @@
 <h3>Rules for bug reporting:</h3>
 
 <ol>
+<li> Do not report bugs for unreleased code (i.e. Iriver at the moment). Use the <a href="/mail/">mailing list</a> or <a href="/irc/">IRC</a> to discuss such development.
 <li> Check that the bug hasn't already been fixed! Try the latest <a href="/daily.shtml">daily build</a>.
 <li> Check that the bug hasn't already been reported
 <li> Do not add "I have the same problem" to an existing bug report if you aren't <b>absolutely certain</b> that it really is the same problem
 <li> Always include the following information in your bug report:
   <ul>
-  <li> Which exact model Archos you have (as printed on the unit)
-  <li> Which exact ROM firmware version you have
+  <li> Which exact music player model you have (as printed on the unit)
   <li> Which exact Rockbox version you are using (Menu->Version)
   <li> A link to the data that malfunctions, if applicable (IMPORTANT!)
   </ul>

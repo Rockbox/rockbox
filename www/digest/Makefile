@@ -1,6 +1,5 @@
 ACTION=@echo preprocessing $@; \
-  rm -f $@; \
-  fcpp -WWW -I.. -Uunix -H -C -V -LL >$@
+  fcpp -WWW -I.. -Uunix -H -C -V -LL $< $@
 
 SRC := $(wildcard *.t)
 OBJS := $(SRC:%.t=%.html)
@@ -8,15 +7,16 @@ OBJS := $(SRC:%.t=%.html)
 all: $(OBJS) digest.rss digest.mail
 
 digest.html: digest.t news.t digesthead.t log.t
-	$(ACTION) $<
+	$(ACTION)
+
+index.html: index.t ../head.t news.t ../foot.t
 
 %.html : %.t news.t digesthead.t log.t
-	$(ACTION) $<
+	$(ACTION)
 
 digest.mail: mail.t log.t mailify.pl
-	echo mailifying $@;
-	rm -f $@;
-	fcpp -WWW -DMAKE_MAIL -Uunix -P -H -C -V -LL >digest.temp $<
+	@echo mailifying $@;
+	fcpp -WWW -DMAKE_MAIL -Uunix -P -H -C -V -LL $< digest.temp
 	./mailify.pl < digest.temp > digest.mail
 
 digest.rss: digest.t digesthead.t log.raw
