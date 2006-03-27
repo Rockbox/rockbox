@@ -320,7 +320,7 @@ new:
 id: LANG_DECAY
 desc: in sound_settings
 eng: "AV Decay Time"
-voice:
+voice: 
 new: "AV-laskuaika"
 
 id: LANG_CHANNEL_MENU
@@ -332,7 +332,7 @@ new: "Kanavat"
 id: LANG_CHANNEL
 desc: in sound_settings
 eng: "Channel Configuration"
-voice:
+voice: 
 new: "Kanavien asetukset"
 
 id: LANG_CHANNEL_STEREO
@@ -925,13 +925,13 @@ new: "Vahvistus"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Gain Left"
+eng: "Gain L"
 voice: 
 new: "Vahvistus (vasen)"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Gain Right"
+eng: "Gain R"
 voice: 
 new: "Vahvistus (oikea)"
 
@@ -3340,16 +3340,16 @@ voice: "Poish‰ivytyksen tyyli"
 new: "Poish√§ivytyksen tyyli"
 
 id: LANG_RECORDING_ADC_RIGHT
-desc: in the recording settings
-eng: "ADC Gain Right"
-voice: "ADC-vahvistus, oikea"
-new: "ADC-vahvistus (oikea)"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
 
 id: LANG_RECORDING_ADC_LEFT
-desc: in the recording settings
-eng: "ADC Gain Left"
-voice: "ADC-vahvistus, vasen"
-new: "ADC-vahvistus (vasen)"
+desc: DEPRECATED
+eng: ""
+voice: 
+new: 
 
 id: LANG_RECORDING_MONITOR
 desc: DEPRECATED
@@ -3532,7 +3532,7 @@ voice: "Perinteinen Kiina"
 new: "Perint. Kiina (BIG5)"
 
 id: LANG_CODEPAGE_UTF8
-desc: in codepage setting menu
+desc: 
 eng: "Unicode (UTF-8)"
 voice: "UTF 8"
 new: "Unicode (UTF-8)"
@@ -3548,36 +3548,6 @@ desc: in settings_menu
 eng: "Brightness"
 voice: "Kirkkaus"
 new: "Kirkkaus"
-
-id: LANG_REMOTE_TYPE
-desc: in settings_menu()
-eng: "Remote Type"
-voice: "Kaukos‰‰timen tyyppi"
-new: "Kaukos√§√§timen tyyppi"
-
-id: LANG_REMOTE_TYPE_H100
-desc: Remote type H100
-eng: "H100"
-voice: "H100"
-new: "H100"
-
-id: LANG_REMOTE_TYPE_H300_LCD
-desc: Remote type H300 LCD
-eng: "H300 LCD"
-voice: "H300 LCD"
-new: "H300 LCD"
-
-id: LANG_REMOTE_TYPE_H300_NON_LCD
-desc: Remote type H300 NON LCD
-eng: "H300 NON LCD"
-voice: "H300, ei n‰yttˆ‰"
-new: "H300 (ei n√§ytt√∂√§)"
-
-id: LANG_REMOTE_TYPE_OTHER
-desc: Remote type OTHER
-eng: "OTHER"
-voice: "Muu"
-new: "Muu"
 
 id: LANG_SCREEN_SCROLL_VIEW
 desc: should lines scroll out of the screen
@@ -3620,3 +3590,285 @@ desc: text for splash to indicate a failure to load a bitmap as backdrop
 eng: "Backdrop failed"
 voice:
 new: "Taustakuvan lataus ep√§onnistui"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice: "Varoita tyhjennett‰ess‰ soittolistaa"
+new: "Varoita tyhjennett√§ess√§ soittolistaa"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice: 
+new: "Tyhjennet√§√§nk√∂ soittolista?"
+
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Ekvalisaattori"
+new: "Ekvalisaattori"
+
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "K‰yt‰ ekvalisaattoria"
+new: "K√§yt√§ ekvalisaattoria"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graafinen ekvalisaattori"
+new: "Graafinen ekvalisaattori"
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: "Ekvalisaattorin perusasetukset"
+new: "Ekvalisaattorin perusasetukset"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Ekvalisaattorin lis‰asetukset"
+new: "Ekvalisaattorin lis√§asetukset"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Tallenna ekvalisaattorin esivalinta"
+new: "Tallenna ekvalisaattorin esivalinta"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Selaa ekvalisaattorin esivalintoja"
+new: "Selaa ekvalisaattorin esivalintoja"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: 
+new: "%d Hz taajuusvahvistus"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Katkaisutaajuus"
+new: "Katkaisutaajuus"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Keskitaajuus"
+new: "Keskitaajuus"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Q"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Vahvistus"
+new: "Vahvistus"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: 
+new: "Muokkaustila: %s"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: 
+new: "Alhainen hyllysuodatin"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: 
+new: "Huippusuodatin %d"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: 
+new: "Korkea hyllysuodatin"
+
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: "Analoginen vahvistus"
+new: "Analoginen vahvistus"
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: "Digitaalinen vahvistus"
+new: "Digitaalinen vahvistus"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: "Vaihda sivua vieritett‰ess‰"
+new: "Vaihda sivua vieritett√§ess√§"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Taustavalo leikkautumisessa"
+new: "Taustavalo leikkautumisessa"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Vain soittimessa"
+new: "Vain soittimessa"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Vain kaukos‰‰timess‰"
+new: "Vain kaukos√§√§timess√§"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Molemmissa"
+new: "Molemmissa"
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice: 
+new: "RGB"
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice: 
+new: "RGB: %02X%02X%02X"
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice: "Taustav‰ri"
+new: "Taustav√§ri"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice: "Edustan v‰ri"
+new: "Edustan v√§ri"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice: "Nollaa v‰rit""
+new: "Nollaa v√§rit"
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: 
+new: "V√§ri ei kelpaa"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice: "Etsi soittolistalta"
+new: "Etsi soittolistalta"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: 
+new: "Etsit√§√§n... %d l√∂ytyi (%s)"
+
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Juhlatila"
+new: "Juhlatila"
+
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Leikkaa"
+new: "Leikkaa"
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Kopioi"
+new: "Kopioi"
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Liit‰"
+new: "Liit√§"
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice:
+new: "Tiedosto/hakemisto on jo olemassa. Korvataanko?"
+
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "ƒ‰nenkorkeus"
+new: "√Ñ√§nenkorkeus"
+
+id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+desc: Backlight behaviour setting
+eng: "First keypress enables backlight only"
+voice: "Ensimm‰inen n‰pp‰inpainallus aktivoi taustavalon"
+new: "Ensimm√§inen n√§pp√§inpainallus aktivoi taustavalon"
+
+id: LANG_ID3DB_GENRES
+desc: in tag cache
+eng: "Genres"
+voice: "Tyylilajit"
+new: "Tyylilajit"
+
+id: LANG_TAGCACHE
+desc: in tag cache settings
+eng: "Tag cache"
+voice: "ID3 Tag-v‰limuisti"
+new: "ID3 Tag-v√§limuisti"
+
+id: LANG_TAGCACHE_INIT
+desc: while initializing tagcache on boot
+eng: "Committing tagcache"
+voice: 
+new: "Luodaan ID3 Tag-v√§limuistia"
+
+id: LANG_TAGCACHE_DISK
+desc: in tag cache settings
+eng: "Keep on disk"
+voice: "S‰ilyt‰ levyll‰"
+new: "S√§ilyt√§ levyll√§"
+
+id: LANG_TAGCACHE_RAM
+desc: in tag cache settings
+eng: "Load to ram"
+voice: "Lataa muistiin"
+new: "Lataa muistiin"
+
+id: LANG_TAGCACHE_FORCE_UPDATE
+desc: in tag cache settings
+eng: "Force tag cache update"
+voice: "Pakota ID3 Tag-v‰limuistin p‰ivitys"
+new: "Pakota ID3 Tag-v√§limuistin p√§ivitys"
+
+id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+desc: in tag cache settings
+eng: "Updating in background"
+voice:
+new: "P√§ivitet√§√§n taustalla"
