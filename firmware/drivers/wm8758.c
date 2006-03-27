@@ -121,12 +121,12 @@ void wmcodec_enable_output(bool enable)
 
         wm8758_write(RESET, 0x1ff);    /*Reset*/
     
-	wm8758_write(PWRMGMT1, 0x2b);
+        wm8758_write(PWRMGMT1, 0x2b);
         wm8758_write(PWRMGMT2, 0x180);
-	wm8758_write(PWRMGMT3, 0x6f);
+        wm8758_write(PWRMGMT3, 0x6f);
 
-	wm8758_write(AINTFCE, 0x10);
-	wm8758_write(CLKCTRL, 0x49);
+        wm8758_write(AINTFCE, 0x10);
+        wm8758_write(CLKCTRL, 0x49);
 
         wm8758_write(OUTCTRL, 1);
 

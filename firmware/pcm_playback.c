@@ -454,8 +454,6 @@ void pcm_init(void)
     /* Initialize default register values. */
     wmcodec_init();
     
-    /* The uda1380 needs a sleep(HZ) here - do we need one? */
-
     /* Power on */
     wmcodec_enable_output(true);
 
