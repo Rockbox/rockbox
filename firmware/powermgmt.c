@@ -1046,15 +1046,16 @@ void shutdown_hw(void)
 #elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
     wmcodec_close();
 #endif
+    backlight_off();
 #if defined(IPOD_ARCH) && defined(HAVE_LCD_COLOR)
     /* Clear the screen and backdrop to
     remove ghosting effect on shutdown */
     lcd_set_backdrop(NULL);
+    lcd_set_background(LCD_WHITE);
     lcd_clear_display();
     lcd_update();
     sleep(HZ/16);
 #endif
-    backlight_off();
     lcd_set_contrast(0);
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_off();
