@@ -11,36 +11,49 @@ All settings are persistently stored on the unit. However, Rockbox does not spin
 The two settings menus are covered in detail starting on page \pageref{ref:configure_rockbox}. All the other options on the main menu are explained here.
 
 Navigating through the menu:
-
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolor,ipodvideo}{
-\begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}lc@{}}\toprule
-       \textbf{Key} & \textbf{Action} \\\midrule
-        UP & Moves up in the menu. \\
-           & Inside a setting, increases the value or chooses next option \\
-        DOWN & Moves down in the menu. \\
-             & Inside a setting, decreases the value or chooses previous option \\
-        PLAY/RIGHT & Selects option \\
-        OFF/LEFT & Exits menu, setting or moves to parent menu\\\bottomrule
-      \end{tabular}
-    \end{center}
-\end{table}
-}
-\opt{player}{
-\begin{table}[h!]
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
   \begin{center}
-    \begin{tabular}{@{}cc@{}}\toprule
+    \begin{tabular}{@{}ll@{}}\toprule
       \textbf{Key} & \textbf{Action} \\\midrule
-      MINUS & Selects previous option in the menu. \\
-            & Inside an setting, decreases the value or chooses previous option \\
-      PLUS & Selects next option in the menu. \\
-           & Inside an setting increases the value or chooses next option \\
-      PLAY & Selects item \\
-      STOP & Exit menu, setting or moves to parent menu. \\\bottomrule
+      \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp} & Moves up in the menu. \\
+                                    & Inside a setting, increases the value or\\
+                                    & chooses next option \\
+      %
+      \opt{IPOD_4G_PAD}{\ButtonScrollBack}
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} & Moves down in the menu. \\
+                                    & Inside a setting, decreases the value or \\
+                                    & chooses previous option \\
+      %
+      \opt{RECORDER_PAD}{\ButtonPlay/\ButtonRight}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect/\ButtonRight}
+      \opt{ONDIO_PAD,IPOD_4G_PAD}{\ButtonRight} & Selects option \\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff/\ButtonLeft}
+      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft} & Exits menu, setting or moves to parent menu\\
+      \bottomrule
     \end{tabular}
   \end{center}
-\end{table}
+}
+\opt{PLAYER_PAD}{
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Action} \\\midrule
+      %
+      \ButtonLeft  & Selects previous option in the menu. \\
+                   & Inside an setting, decreases the value or \\
+                   & chooses previous option \\
+      %
+      \ButtonRight & Selects next option in the menu. \\
+                   & Inside an setting increases the value or \\
+                   & chooses next option \\
+      %
+      \ButtonPlay  & Selects item \\
+      %
+      \ButtonStop  & Exit menu, setting or moves to parent menu. \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
 }
 
 \section{\label{ref:Recording}Recording}
@@ -48,7 +61,6 @@ Navigating through the menu:
 \begin{center}
   \includegraphics[width=4cm]{main_menu/images/ss-while-recording-screen-112x64x1.png}
 \end{center}
-
 Entering the ``Recording'' option in the Main menu launches the recording application. The screen shows the time elapsed and the size of the file being recorded. A peak meter is present to allow you set Gain correctly.  The frequency, channels and quality settings are shown on the last line.
 
 The controls for this screen are:
