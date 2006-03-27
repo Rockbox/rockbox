@@ -69,6 +69,9 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre };
 /* Variable-length tag entry in tag files. */
 struct tagfile_entry {
     short tag_length;
+#ifdef ROCKBOX_STRICT_ALIGN
+    short padding;
+#endif
     char tag_data[0];
 };
 
@@ -690,14 +693,9 @@ static void add_tagcache(const char *path)
     close(fd);
 
     if (!ret)
-    {
-        track.id3.title = (char *)path;
-        track.id3.artist = "Unknown";
-        track.id3.album = "Unknown";
-        track.id3.genre_string = "Unknown";
-    }
-    else
-        check_if_empty(&track.id3.title);
+        return ;
+
+    check_if_empty(&track.id3.title);
     check_if_empty(&track.id3.artist);
     check_if_empty(&track.id3.album);
     check_if_empty(&track.id3.genre_string);
@@ -835,13 +833,34 @@ static int tempbuf_sort(int fd)
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     struct tagfile_entry fe;
     int i;
+    int length;
+#ifdef ROCKBOX_STRICT_ALIGN
+    int fix;
+#endif
     
     qsort(index, tempbufidx, sizeof(struct tempbuf_searchidx), compare);
 
     for (i = 0; i < tempbufidx; i++)
     {
         index[i].seek = lseek(fd, 0, SEEK_CUR);
-        fe.tag_length = strlen(index[i].str) + 1;
+        length = strlen(index[i].str) + 1;
+        fe.tag_length = length;
+        
+#ifdef ROCKBOX_STRICT_ALIGN
+        /* Make sure the entry is long aligned. */
+        if (index[i].seek & 0x03)
+        {
+            logf("tempbuf_sort: alignment error!");
+            return -3;
+        }
+        
+        fix = (sizeof(struct tagfile_entry) + length) & 0x03;
+        if (fix)
+            fix = 4-fix;
+        
+        fe.tag_length += fix;
+#endif
+        
         if (write(fd, &fe, sizeof(struct tagfile_entry)) !=
             sizeof(struct tagfile_entry))
         {
@@ -849,12 +868,17 @@ static int tempbuf_sort(int fd)
             return -1;
         }
         
-        if (write(fd, index[i].str, fe.tag_length) !=
-            fe.tag_length)
+        if (write(fd, index[i].str, length) != length)
         {
             logf("tempbuf_sort: write error #2");
             return -2;
         }
+        
+#ifdef ROCKBOX_STRICT_ALIGN
+        /* Write some padding. */
+        if (fix)
+            write(fd, "XXX", fix);
+#endif
     }
 
     return i;
@@ -1544,14 +1568,6 @@ static bool load_tagcache(void)
         {
             yield();
             fe = (struct tagfile_entry *)p;
-#ifdef ROCKBOX_STRICT_ALIGN
-            /* Make sure the entry is long aligned. */
-            if ((long)fe & 0x03)
-            {
-                bytesleft -= 4 - ((long)fe & 0x03);
-                fe = (struct tagfile_entry *)(((long)fe & ~0x03) + 0x04);
-            }
-#endif
             rc = read(fd, fe, sizeof(struct tagfile_entry));
             if (rc != sizeof(struct tagfile_entry))
             {
