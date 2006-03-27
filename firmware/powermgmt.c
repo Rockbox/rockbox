@@ -1046,13 +1046,11 @@ void shutdown_hw(void)
 #elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
     wmcodec_close();
 #endif
-#ifdef APPLE_IPODVIDEO
-    /* Fill the screen solid white on 5g to 
+#if defined(IPOD_ARCH) && defined(HAVE_LCD_COLOR)
+    /* Clear the screen and backdrop to
     remove ghosting effect on shutdown */
+    lcd_set_backdrop(NULL);
     lcd_clear_display();
-    lcd_set_drawmode(DRMODE_SOLID);
-    lcd_set_foreground(LCD_WHITE);
-    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
     lcd_update();
     sleep(HZ/16);
 #endif
