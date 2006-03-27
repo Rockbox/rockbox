@@ -22,7 +22,7 @@
 #include <string.h>
 #include "iriver.h"
 
-int iaudio_encode(char *iname, char *oname);
+int iaudio_encode(char *iname, char *oname, char *idstring);
 
 enum
 {
@@ -69,7 +69,8 @@ void usage(void)
            "\t-neo    SSI Neo format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
-           "\t-iaudio iAudio format\n"
+           "\t-iaudiox5 iAudio X5 format\n"
+           "\t-iaudiox5v iAudio X5V format\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
            "\t                   ip3g, ip4g, mini, x5)\n"
@@ -198,10 +199,15 @@ int main (int argc, char** argv)
         iriver_encode(iname, oname, FALSE);
         return 0;
     }
-    else if(!strcmp(argv[1], "-iaudio")) {
+    else if(!strcmp(argv[1], "-iaudiox5")) {
         iname = argv[2];
         oname = argv[3];
-        return iaudio_encode(iname, oname);
+        return iaudio_encode(iname, oname, "COWON_X5_FW");
+    }
+    else if(!strcmp(argv[1], "-iaudiox5v")) {
+        iname = argv[2];
+        oname = argv[3];
+        return iaudio_encode(iname, oname, "COWON_X5V_FW");
     }
     
     /* open file */
@@ -373,7 +379,7 @@ int main (int argc, char** argv)
     return 0;
 }
 
-int iaudio_encode(char *iname, char *oname)
+int iaudio_encode(char *iname, char *oname, char *idstring)
 {
     size_t len;
     int length;
@@ -405,7 +411,7 @@ int iaudio_encode(char *iname, char *oname)
     }
     
     memset(outbuf, 0, 0x1030);
-    strcpy((char *)outbuf, "COWON_X5_FW");
+    strcpy((char *)outbuf, idstring);
 
     for(i = 0; i < length;i++)
         sum += outbuf[0x1030 + i];
