@@ -1,0 +1,73 @@
+  \subsection{\label{ref:Displayoptions}Display Options}
+  
+  \begin{itemize}
+  \item \textbf{Browse fonts}
+    Browse the fonts that reside in your \fname{/.rockbox} directory. Selecting one will activate it.  See page \pageref{ref:Loadingfonts} for further details about fonts.
+    
+  \item \textbf{Browse WPS files}
+    Opens the file browser in the \textbf{/.rockbox} directory and displays all .wps files. Selecting one will activate it, stop will exit back to the menu.\\
+    For further information about the WPS see page \pageref{ref:WPS}. For information  about editing a .wps file see page \pageref{ref:ConfiguringtheWPS}.
+    
+  \item \textbf{LCD Settings}
+    This submenu contains settings that relate to the display of the \dap.
+    \begin{itemize}
+    \item \textbf{Backlight:} 
+      How long the backlight shines after a key press. Set to OFF to never light it, set to ON to never shut it off or set a preferred timeout period.
+    \item \textbf{Backlight on WhenPlugged:}
+      This option turns the backlight on constantly while the charger cable is connected.
+    \item \textbf{Caption Backlight:} This option turns the backlight on for 25 seconds either side of the start of a new track so that the display can be read to see song information.
+    \item \textbf{Contrast:} Changes the contrast of your LCD display. Warning: Setting the contrast too dark or too light can make it hard to find this menu option again!
+      \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolor,ipodvideo}{
+      \item \textbf{LCD Mode}: This setting lets you invert the whole screen, so now you get a black background and green text graphics.
+      }
+    \item \textbf{Upside Down: }Displays the screen so that the top of the display is nearest the buttons.  This is sometimes useful when carrying the \dap in a pocket for easy access to the headphone socket.
+    \item \textbf{Line Selector: }Select this option to have a bar of inverted text (``Bar'' option) mark the current line in the File Browser rather than the default arrow to the left (``Pointer'' option).  This gives slightly more room for filenames.
+    \end{itemize}
+    
+  \item \textbf{Scrolling}
+    This feature controls how text will scroll in Rockbox. You can configure the following parameters:
+    \begin{itemize}
+    \item \textbf{Scroll Speed:} 
+      Controls how many times per second the scrolling text moves a step.
+    \item \textbf{Scroll StartDelay:} 
+      Controls how many milliseconds Rockbox should wait before a new text begins scrolling.
+      \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolor,ipodvideo}{
+      \item \textbf{Scroll Step Size:}
+        Controls how many pixels the text scroll should move for each step.
+      }
+    \item \textbf{Bidirectional Scroll Limit: }
+      Rockbox has two different scroll methods,  always scrolling the text to the left, and when the line has ended, beginning again at the start, or moving to the left until you can read the end of the line, and scroll right until you see the beginning again. Rockbox chooses which method it should use, depending of how much it has to scroll left. This setting lets you tell Rockbox where that limit is, expressed in percentage of line length.
+    \end{itemize}
+    
+    \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolor,ipodvideo}{
+    \item \textbf{Status/Scrollbar}
+      Settings related to on screen status display and the scrollbar.
+      \begin{itemize}
+      \item \textbf{Scroll Bar: }Enables or disables the scroll bar at the left.
+      \item \textbf{Status Bar: }Enables or disables the status bar at the upper side.
+      \item \textbf{Button Bar:} Enables or disables the button bar prompts for the F keys at the bottom of the screen.
+      \item \textbf{Volume Display:} Controls whether the volume is displayed as a graphic or a numerical percentage value on the Status Bar.
+      \item \textbf{Battery Display: }Controls whether the battery charge status is displayed as a graphic or numerical percentage value on the Status Bar.
+      \end{itemize}
+    }
+    
+    \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolor,ipodvideo}{
+    \item \textbf{Peak Meter}
+      The peak meter can be configured with a number of parameters.  (For a description of the peak meter see page \pageref{ref:Peakmeter}.)
+      
+      \begin{itemize}
+      \item \textbf{Peak Release:}
+        This determines how fast the bar shrinks when the music becomes softer. Lower values make the peak meter look smoother.
+      \item \textbf{Peak Hold Time:} 
+        Specifies the time after which the peak indicator will reset. If you set this value e.g. to 5s then the peak indicator displays the loudest volume value that occurred within the last 5 seconds. Big values are good if you want to find the peak level of a song, which might be of interest when copying music from the \dap via the analogue output to some other recording device.
+      \item \textbf{Clip Hold Time:}
+        How long the clipping indicator will be visible after clipping was detected 
+      \item \textbf{Performance:}
+        In high performance mode, the peak meter is updated as often as possible. This reduces the chance of missing a peak value, making the peak meter more precise. In energy save mode the peak meter is updated just often enough to look fluid. This reduces the load on the CPU and thus saves a little bit of energy. If you crave every second of runtime for your \dap or simply use the peak meter as a screen effect, the use of energy save mode is recommended. If you want to use the peak meter as a measuring instrument you'll want to use high performance mode.
+      \item \textbf{Scale:}
+        Select whether the peak meter displays linear or logarithmic values. In ``dB'' (decibel) scale the volume values are scaled logarithmically. This very similar to the perception of loudness. The volume meters of digital audio devices usually are scaled this way. If you are interested in the power level that is applied to your headphones you should choose ``linear'' display. Unfortunately this value doesn't have real units like volts or watts since that depends on the phones. So they can only be displayed as percentage values.
+      \item \textbf{Minimum and maximum range:} 
+        These two options define the full value range that the peak meter displays. Recommended values for dB's are {}-40 for min. and 0 for maximum. For linear display, use 0 and 100\%. Note that {}-40 dB's is approximately 1\% in linear value, but if you change the minimum setting in linear mode slightly and then change to dbFs there will be a large change. You can use these values for 'zooming' into the peak meter.
+      \end{itemize}
+    }
+  \end{itemize}

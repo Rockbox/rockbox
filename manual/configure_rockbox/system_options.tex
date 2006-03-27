@@ -1,0 +1,105 @@
+  \subsection{\label{ref:SystemOptions}System Options}
+  
+  \begin{itemize}
+  \item \textbf{Battery}
+    Options relating to the batteries in the \dap.
+    \begin{itemize}
+    \item \textbf{Battery Capacity} can be used to tell Rockbox what capacity (in mAh) of battery is being used inside it. 
+      \opt{player,recorder,recorderv2fm,ondio}{The default is 1500mAh for NiMH battery based units, and 2300mAh for LiOn battery based units, which is the capacity value for the standard batteries shipped with these units.}
+      \opt{h1xx,h300}{The default is 1300mAh.}
+      This value is used for calculating remaining battery life.
+      \opt{recorder}{
+      \item \textbf{Deep discharge}
+        Set this to ON if you intend to keep your charger connected for a long period of time. It lets the batteries go down to 10\% before starting to charge again. Setting this to OFF will cause the charging to restart on 95\%.
+      }
+      \opt{recorder}{
+      \item \textbf{Trickle Charge}
+        The \dap cannot be turned off while the charger is connected.
+        Therefore, trickle charge is needed to keep the batteries full after
+        charging has completed. For more in depth information about charging
+        see Battery FAQ in your \textbf{/.rockbox/docs }directory.
+      }
+    \end{itemize}
+    
+  \item \textbf{Disk}
+    Options relating to the hard disk.  
+    
+    \begin{itemize}
+    \item \textbf{DiskSpindown:}
+      Rockbox has a timer that makes it spin down the hard disk after being idle for acertain time. You can modify this timeout here. This idle time is only affected by user activity, like navigating through file browser. When the hard disk spins up to fill mp3 buffer, it automatically spins down afterwards.
+      \opt{recorder,h1xx,h300}{
+      \item \textbf{Disk Poweroff:}
+        Whether the disk is powered OFF or only set to ``sleep'' when spun    down. Power off uses less power but takes longer to spin{}-up.}
+    \end{itemize}
+    
+    \opt{recorder,recorderv2fm,h3xx}{
+    \item \textbf{Time and Date}
+      Time related menu options.
+      
+      \begin{itemize}
+      \item \textbf{Set Time/Date: }
+        Set current time and date.
+      \item \textbf{Time Format: }
+        Choose 12 or 24 Hour clock. 
+      \end{itemize}
+    }
+    
+  \item \textbf{\label{ref:idlepoweroff}Idle Poweroff}
+    Rockbox can be configured to turn off power after the unit has been idle for a defined number of minutes. The unit is idle when playback is stopped or paused. It is not idle while the USB or charger is connected, or while recording.
+    
+  \item \textbf{Sleep Timer}
+    This option lets you power off your \dap after playing for a given time. \opt{recorderv2fm}{This setting is reset on boot.  Using this option disables the \textbf{Wake up alarm} (see below).}
+    
+    \opt{recorderv2fm}{
+    \item \textbf{Wake up alarm (Recorder v2/FM only)}
+      This option turns the \dap off and then starts it up again at the specified time. This is most useful when combined with the Resume setting in the Playback options set to ``Yes'', so that the \dap wakes up and immediately  starts playing music. Use LEFT and RIGHT to adjust the minutes setting, UP and DOWN to adjust the HOURS. PLAY confirms the alarm and shuts your \dap down, and STOP cancels setting an alarm.  If the \dap is turned on again before the alarm occurs the alarm will be canceled.  Using this option disables the \textbf{Sleep Timer} (see above).
+    }
+    
+  \item \textbf{Limits}
+    This submenu relates to limits in the Rockbox operating system.
+    
+    \begin{itemize}
+    \item \textbf{Max files in dir browser:}
+      Configurable limit of files in the directory browser (file buffer size). You can configure the size to be between 50 and 10000 files in steps of 50 files. The default is 400, higher values will shorten the music buffer.\\
+    \item \textbf{Max playlist size:}
+      Option to configure the maximum size of a playlist. The playlist size can be between 1000 and 20000 files in
+      steps of 1000.  By default it is 10000.  Higher values will shorten the music buffer.\\
+    \end{itemize}
+    
+    \opt{player,recorder,recorderv2fm}{
+    \item \textbf{Car Adapter Mode}
+      This option turns on and off the car ignition auto stop function. 
+      
+      When using the \dap in a car, car adapter mode automatically stops playback on the \dap when power (i.e. from cigarette lighter power adapter) to the external DC in jack is turned off.
+      
+      When the external power off condition is detected, the Car Adapter Mode function only pauses the playback. In order to shut down the \dap completely the \textbf{Idle Poweroff} function (see above) must also be set.
+      
+      If power to the DC in jack is turned back on before the \textbf{Idle Poweroff}  function has shut the \dap off, playback will be resumed 5 seconds after the power is applied. This delay is to allow for the time while the car engine is being started. Once the \dap is shut off either manually, or automatically with the \textbf{Idle Poweroff}function, it must be powered up manually to resume playback.
+    }
+    \opt{player}{
+    \item \textbf{Line In (Player only)}
+      This option activates the line in port on \dap Player, which is off by default.
+      
+      This is useful for such applications as:
+      \begin{itemize}
+      \item Game boy {}-{\textgreater} \dap {}-{\textgreater} human
+      \item laptop {}-{\textgreater} \dap {}-{\textgreater}human
+      \item LAN party computer {}-{\textgreater} \dap {}-{\textgreater} human 
+      \end{itemize}
+    }
+    
+  \item \textbf{Manage settings}
+    This submenu deals with loading and saving settings.
+    
+    \begin{itemize}
+    \item \textbf{Browse .cfg Files: }
+      This displays a list of configuration (.cfg) files stored in the \textbf{/.rockbox} system directory.  This is useful if the \dap is plugged into more than one different output device (e.g. headphones, computer, car stereo, hi{}-fi) so that a settings file can be maintained for each.
+    \item \textbf{Browse Firmwares:} 
+      This displays a list of firmware file in the \fname{/.rockbox} system directory. Playing a firmware file loads it into memory.  Thus it is possible to run the original Archos firmware or a different version of Rockbox from here assuming that you have the right files installed on your disk.
+    \item \textbf{Reset Settings: }
+      This wipes the saved settings in the \dap and resets all settings to their default values.
+    \item \textbf{Write .cfg file: }
+      Saves the current settings into a .cfg file for later use with \textbf{Browse .cfg Files} above.
+    \end{itemize}
+    
+  \end{itemize}
