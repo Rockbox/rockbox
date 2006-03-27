@@ -79,6 +79,21 @@
 written by Christi Scarborough. Please read it. Check out the <a
 href="/twiki/bin/view/Main/DocsIndex">documentation</a> page for further info.
  
+<h2>Donate</h2>
+
+<p>If you enjoy using Rockbox, consider donating to the project. While we
+develop the software in our spare time, equipment and players cost real money.
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="business" value="bjorn@haxx.se">
+<input type="hidden" name="item_name" value="Donation to the Rockbox project">
+<input type="hidden" name="no_shipping" value="1">
+<input type="hidden" name="cn" value="Note to the Rockbox team">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="tax" value="0">
+<input type="image" src="/paypal-donate.gif" border="0" name="submit">
+</form>
+
 <h2>Daily Builds</h2>
 <!--#exec cmd="./dailymod.pl" -->
 <h2>Bug reports</h2>

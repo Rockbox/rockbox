@@ -14,11 +14,25 @@ href="/twiki/bin/view/Main/DeviceChart">identify your model</a>
 <h2>Daily Changelog</h2>
 <!--#exec cmd="./dailysrc.pl" -->
 
+<h2>Donate</h2>
+
+<p>If you enjoy using Rockbox, consider donating to the project. While we
+develop the software in our spare time, equipment and players cost real money.
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="business" value="bjorn@haxx.se">
+<input type="hidden" name="item_name" value="Donation to the Rockbox project">
+<input type="hidden" name="no_shipping" value="1">
+<input type="hidden" name="cn" value="Note to the Rockbox team">
+<input type="hidden" name="currency_code" value="USD">
+<input type="hidden" name="tax" value="0">
+<input type="image" src="/paypal-donate.gif" border="0" name="submit">
+</form>
+
+
+#if 0
 <h2>CVS Compile Status</h2>
 
-#if 1
-The CVS builds are now <a href="cvs.shtml">here</a> in its <a href="cvs.shtml">own page</a>.
-#else
 <p>CVS code build status: number of compiler warnings the build generates. 0
 (zero) means no warnings. The timestamp is GMT. <a
 href="http://www.rockbox.org/twiki/bin/view/Main/TargetStatus">Target
