@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Jonas Häggqvist
+ * Copyright (C) 2005 Jonas Hï¿½gqvist
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -197,7 +197,7 @@ const unsigned char rockbox16x7[] = {
 #define LP_DEC_Y BUTTON_DOWN
 #define LP_INC_Y BUTTON_UP
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define LP_QUIT BUTTON_SELECT
+#define LP_QUIT BUTTON_POWER
 #define LP_DEC_X BUTTON_LEFT
 #define LP_INC_X BUTTON_RIGHT
 #define LP_DEC_Y BUTTON_DOWN
