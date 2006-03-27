@@ -145,8 +145,8 @@ void wmcodec_enable_output(bool enable)
 int wmcodec_set_master_vol(int vol_l, int vol_r)
 {
     /* OUT1 */
-    wm8758_write(LOUT1VOL, vol_l);
-    wm8758_write(ROUT1VOL, 0x100 | vol_r);
+    wm8758_write(LOUT1VOL, 0x080 | vol_l);
+    wm8758_write(ROUT1VOL, 0x180 | vol_r);
 
     return 0;
 }
