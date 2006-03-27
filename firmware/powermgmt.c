@@ -45,6 +45,10 @@
 #include "uda1380.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
+#elif defined(HAVE_WM8758)
+#include "wm8758.h"
+#elif defined(HAVE_WM8975)
+#include "wm8975.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
 #include "font.h"
@@ -1039,6 +1043,18 @@ void shutdown_hw(void)
     uda1380_close();
 #elif defined(HAVE_TLV320)
     tlv320_close();
+#elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
+    wmcodec_close();
+#endif
+#ifdef APPLE_IPODVIDEO
+    /* Fill the screen solid white on 5g to 
+    remove ghosting effect on shutdown */
+    lcd_clear_display();
+    lcd_set_drawmode(DRMODE_SOLID);
+    lcd_set_foreground(LCD_WHITE);
+    lcd_fillrect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+    lcd_update();
+    sleep(HZ/16);
 #endif
     backlight_off();
     lcd_set_contrast(0);
