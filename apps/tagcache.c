@@ -49,8 +49,9 @@ static long tempbuf_size; /* Buffer size (TEMPBUF_SIZE). */
 static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
-/* Tags we want to be unique (loaded to the tempbuf). */
-static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_title };
+/* Tags we want to get sorted (loaded to the tempbuf). */
+static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, tag_title };
+static const int unique_tags[] = { tag_artist, tag_album, tag_genre };
 
 /* Queue commands. */
 #define Q_STOP_SCAN     0
@@ -63,7 +64,7 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_title }
 #define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
 
 /* Tag database structures. */
-#define TAGCACHE_MAGIC  0x01020316
+#define TAGCACHE_MAGIC  0x01020317
 
 /* Variable-length tag entry in tag files. */
 struct tagfile_entry {
@@ -906,6 +907,19 @@ static bool is_unique_tag(int type)
     return false;
 }
 
+static bool is_sorted_tag(int type)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0])); i++)
+    {
+        if (type == sorted_tags[i])
+            return true;
+    }
+
+    return false;
+}
+
 static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
 {
     int i;
@@ -948,7 +962,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * it entirely into memory so we can resort it later for use with
          * chunked browsing.
          */
-        if (is_unique_tag(index_type))
+        if (is_sorted_tag(index_type))
         {
             for (i = 0; i < tch.entry_count; i++)
             {
@@ -1075,7 +1089,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
      * Load new unique tags in memory to be sorted later and added
      * to the master lookup file.
      */
-    if (is_unique_tag(index_type))
+    if (is_sorted_tag(index_type))
     {
         lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
         /* h is the header of the temporary file containing new tags. */
@@ -1107,11 +1121,15 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 error = true;
                 goto error_exit;
             }
-
-            if (!tempbuf_unique_insert(buf, i))
+            
+            if (is_unique_tag(index_type))
+                error = !tempbuf_unique_insert(buf, i);
+            else
+                error = !tempbuf_insert(buf, i);
+            
+            if (error)
             {
                 logf("insert error");
-                error = true;
                 goto error_exit;
             }
             
@@ -1189,7 +1207,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         }
 
         /* Read entry headers. */
-        if (!is_unique_tag(index_type))
+        if (!is_sorted_tag(index_type))
         {
             struct temp_file_entry entry;
             struct tagfile_entry fe;
@@ -1259,7 +1277,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
     }
 
     /* Finally write the uniqued tag index file. */
-    if (is_unique_tag(index_type))
+    if (is_sorted_tag(index_type))
     {
         tch.magic = TAGCACHE_MAGIC;
         tch.entry_count = tempbufidx;
