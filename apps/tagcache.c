@@ -1408,7 +1408,7 @@ static bool allocate_tagcache(void)
     }
 
     /* Load the header. */
-    hdr = (struct ramcache_header *)audiobuf;
+    hdr = (struct ramcache_header *)(((long)audiobuf & ~0x03) + 0x04);
     memset(hdr, 0, sizeof(struct ramcache_header));
     len = sizeof(struct tagcache_header);
     rc = read(fd, &hdr->h, len);
@@ -1424,8 +1424,11 @@ static bool allocate_tagcache(void)
 
     hdr->indices = (struct index_entry *)(hdr + 1);
     
-    /* Now calculate the required cache size. */
-    tagcache_size = hdr->h.datasize + 
+    /** 
+     * Now calculate the required cache size plus 
+     * some extra space for alignment fixes. 
+     */
+    tagcache_size = hdr->h.datasize + 128 +
         sizeof(struct index_entry) * hdr->h.entry_count +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
     logf("tagcache: %d bytes allocated.", tagcache_size);
@@ -1523,6 +1526,14 @@ static bool load_tagcache(void)
         {
             yield();
             fe = (struct tagfile_entry *)p;
+#ifdef ROCKBOX_STRICT_ALIGN
+            /* Make sure the entry is long aligned. */
+            if ((long)fe & 0x03)
+            {
+                bytesleft -= 4 - ((long)fe & 0x03);
+                fe = (struct tagfile_entry *)(((long)fe & ~0x03) + 0x04);
+            }
+#endif
             rc = read(fd, fe, sizeof(struct tagfile_entry));
             if (rc != sizeof(struct tagfile_entry))
             {
