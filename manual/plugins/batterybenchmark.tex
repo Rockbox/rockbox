@@ -1,0 +1,70 @@
+\subsection{Battery Benchmark}
+The Battery Benchmark Plugin enables you to test your battery's performance,
+while making normal use of your \dap. Once loaded it will run in the
+background (TSR plugin), reading various info about your battery while you use
+it. Once you finish your session you can find the benchmark output data in a
+file on your \dap\ \fname{/battery\_bench.txt}.
+Please submit your results to the Rockbox wiki.
+\url{http://www.rockbox.org/twiki/bin/view/Main/BatteryRuntime}
+
+\subsubsection{How it works}
+After you load the plug-in the operation of your \dap\ continues as normal.
+You can do whatever you could do before loading the plugin except loading
+another plugin. If you happen to load a plugin while benchmarking, a splash
+screen will inform you about the termination of the benchmark.
+While you operate it will log various battery related information every time
+the disk is activated by external causes, (buffer refill, open folder,
+USB mode) or an hour passes without updating the log file.\\
+The plugin will continue to log info until:
+
+\begin{itemize}
+\item Another plugin is loaded.
+\item The \dap\ is shut down.
+\item The battery is empty.
+\end{itemize}
+Between disk activity (or an hour), it will log info in memory (every
+measurement is captured when the voltage changes). If there are too many
+measurements older entries will be deleted and the log file will inform the
+user about the interval where entries were lost. Benchmarks can be resumed if
+you accidentally load a plugin, or turn off your \dap, as long as the log
+file \fname{/battery\_bench.txt} is not deleted. 
+
+\subsubsection{Information explained}
+On the top of the file you will see various info on how to use the plugin.
+\begin{description}
+\item[Time] It is the total time of operation of the \dap. It is not the time
+that you started the plug-in. If you have your player on for 5 minutes and then
+startt the plugin, it will start measuring from 5 minutes.
+\item[Seconds] As time, it shows time passed in seconds. Nothing special, it is
+there because it is free and maybe someone might want to make graphs with
+seconds.
+\item[Level] The percent level of the battery estimated by Rockbox. This is an
+estimation and not an accurate result. Using the real percentage (current
+battery voltage / top battery voltage) * 100) we can calculate the difference
+between the estimation. Goal of this column is to make the estimation algorithm
+of Rockbox more accurate.
+\item[Time Left] It shows the estimated (by Rockbox) remaining time until
+shutdown. Again, as Level, this column can be used to see differences between
+real time left and estimated time left. This could help make time left more
+accurate.
+\item[Voltage] The current, battery voltage, the moment the measurement was
+captured. Measurements are captured when this number changes while benchmarking.
+This column can be used to give quite interesting graphs in a spreadsheet
+program. (Excel, Calc, e.t.c)
+\item[M/DA] (Measurements per Disk Activity) The number of measurements stored
+temporarily in memory, before written on the log file. This can give you an
+idea on how many voltage changes are between disk activity (or one hour).
+\item[C] Stands for Charger. An "A" in that column shows if there was the power
+adapter attached to the unit, at the time of the measurement.
+\item[S] The "S" column shows the state of the device (Charging, or not). The
+"C" indicated that the unit was charging when the measurement was captured.
+\item[U] USB powered. Only for targets that support this. A "U" will indicate
+if the unit was using the USB port for powering. 
+\end{description}
+
+\subsubsection{Making graphs}
+While you can tell how long your battery lasted, with a single look at the last
+line of the battery log (\fname{/battery\_bench.txt}), the most useful purpose of
+Battery Benchmark is to make graphs using a spreadsheet program like Excel or
+Calc. The battery log (\fname{/battery\_bench.txt}) is in CSV format (comma separated)
+so you can quite easily import it to a spreadsheet program.
