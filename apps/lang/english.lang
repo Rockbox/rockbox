@@ -3880,3 +3880,10 @@ desc: in tag cache settings
 eng: "Updating in background"
 voice: "Updating in background"
 new:
+
+id: LANG_EQUALIZER_PRECUT
+desc: in eq settings
+eng: "Precut"
+voice: "Pre-cut"
+new:
+

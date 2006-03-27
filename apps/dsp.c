@@ -192,6 +192,7 @@ struct dsp_config
     bool new_gain;
     bool crossfeed_enabled;
     bool eq_enabled;
+    long eq_precut;     /* Note that this is in S8.23 format. */
 };
 
 struct resample_data
@@ -589,15 +590,31 @@ static void apply_crossfeed(int32_t* src[], int count)
 }
 #endif
 
-/* Synchronize the EQ filters with the global settings */
-void dsp_eq_update_data(bool enabled, int band)
+/**
+ * Use to enable the equalizer and set any pregain.
+ *
+ * @param enable true to enable the equalizer
+ * @param precut to apply in decibels (multiplied by 10)
+ */
+void dsp_eq_set(bool enable, unsigned int precut)
+{
+    dsp->eq_enabled = enable;
+
+    /* Needs to be in s8.23 format amplitude for apply_gain() */
+    dsp->eq_precut = get_replaygain_int(precut * -10) >> 1;
+}
+
+/**
+ * Synchronize the equalizer filter coefficients with the global settings.
+ *
+ * @param band the equalizer band to synchronize
+ */
+void dsp_eq_update_filter_coefs(int band)
 {
     const int *setting;
     long gain;
     unsigned long cutoff, q;
 
-    dsp->eq_enabled = enabled;
-    
     /* Adjust setting pointer to the band we actually want to change */
     setting = &global_settings.eq_band0_cutoff + (band * 3);
 
@@ -640,7 +657,7 @@ static void eq_process(int32_t **x, unsigned num)
     int i;
     unsigned int channels = dsp->stereo_mode != STEREO_MONO ? 2 : 1;
     unsigned shift;
-    
+
     /* filter configuration currently is 1 low shelf filter, 3 band peaking
        filters and 1 high shelf filter, in that order. we need to know this
        so we can choose the correct shift factor.
@@ -662,39 +679,51 @@ static void eq_process(int32_t **x, unsigned num)
  */
 static void apply_gain(int32_t* _src[], int _count)
 {
-    struct dsp_config *my_dsp = dsp;
-    if (my_dsp->replaygain)
+    int32_t** src = _src;
+    int count = _count;
+    int32_t* s0 = src[0];
+    int32_t* s1 = src[1];
+    long gain = 0;
+    int32_t s;
+    int i;
+    int32_t *d;
+
+    if (dsp->replaygain)
     {
-        int32_t** src = _src;
-        int count = _count;
-        int32_t* s0 = src[0];
-        int32_t* s1 = src[1];
-        long gain = my_dsp->replaygain;
-        int32_t s;
-        int i;
-        int32_t *d;
+        gain = dsp->replaygain;
+    }
 
-        if (s0 != s1)
-        {
-            d = &sample_buf[SAMPLE_BUF_SIZE / 2];
-            src[1] = d;
-            s = *s1++;
+    if (dsp->eq_enabled)
+    {
+        gain += dsp->eq_precut; /* FIXME: This isn't that easy right? */
+    }
 
-            for (i = 0; i < count; i++)
-                FRACMUL_8_LOOP(s, gain, s1, d);
-        }
-        else
-        {
-            src[1] = &sample_buf[0];
-        }
+    /* Don't bother if the gain is zero */
+    if (gain == 0)
+    {
+        return;
+    }
 
-        d = &sample_buf[0];
-        src[0] = d;
-        s = *s0++;
+    if (s0 != s1)
+    {
+        d = &sample_buf[SAMPLE_BUF_SIZE / 2];
+        src[1] = d;
+        s = *s1++;
 
         for (i = 0; i < count; i++)
-            FRACMUL_8_LOOP(s, gain, s0, d);
+            FRACMUL_8_LOOP(s, gain, s1, d);
     }
+    else
+    {
+        src[1] = &sample_buf[0];
+    }
+
+    d = &sample_buf[0];
+    src[0] = d;
+    s = *s0++;
+
+    for (i = 0; i < count; i++)
+        FRACMUL_8_LOOP(s, gain, s0, d);
 }
 
 void channels_set(int value)
@@ -815,7 +844,7 @@ long dsp_process(char* dst, const char* src[], long size)
     unsigned long old_macsr = coldfire_get_macsr();
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
     #endif
-    
+
     dsp = &dsp_conf[current_codec];
 
     factor = (dsp->stereo_mode != STEREO_MONO) ? 2 : 1;

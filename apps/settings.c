@@ -570,6 +570,10 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
 #endif
 
+#if (CONFIG_CODEC == SWCODEC)
+    {8, S_O(eq_precut), 0, "eq precut", NULL },
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -1125,10 +1129,11 @@ void settings_apply(void)
     audio_set_crossfade(global_settings.crossfade);
     dsp_set_replaygain(true);
     dsp_set_crossfeed(global_settings.crossfeed);
-    
+
+    dsp_eq_set(global_settings.eq_enabled, global_settings.eq_precut);
     /* Update all EQ bands */
     for(i = 0; i < 5; i++) {
-        dsp_eq_update_data(global_settings.eq_enabled, i);
+        dsp_eq_update_filter_coefs(i);
     }
 #endif
 

@@ -432,34 +432,35 @@ struct user_settings
 
 #if CONFIG_CODEC == SWCODEC
     bool eq_enabled;            /* Enable equalizer */
-    
+    unsigned int eq_precut;     /* dB */
+
     /* Order is important here, must be cutoff, q, then gain for each band.
        See dsp_eq_update_data in dsp.c for why. */
-    
+
     /* Band 0 settings */
-    int  eq_band0_cutoff;      /* Hz */
-    int  eq_band0_q;
-    int  eq_band0_gain;        /* +/- dB */
-    
+    int eq_band0_cutoff;        /* Hz */
+    int eq_band0_q;
+    int eq_band0_gain;          /* +/- dB */
+
     /* Band 1 settings */
-    int  eq_band1_cutoff;      /* Hz */
-    int  eq_band1_q;
-    int  eq_band1_gain;        /* +/- dB */
-    
+    int eq_band1_cutoff;        /* Hz */
+    int eq_band1_q;
+    int eq_band1_gain;          /* +/- dB */
+
     /* Band 2 settings */
-    int  eq_band2_cutoff;      /* Hz */
-    int  eq_band2_q;
-    int  eq_band2_gain;        /* +/- dB */
-    
+    int eq_band2_cutoff;        /* Hz */
+    int eq_band2_q;
+    int eq_band2_gain;          /* +/- dB */
+
     /* Band 3 settings */
-    int  eq_band3_cutoff;      /* Hz */
-    int  eq_band3_q;
-    int  eq_band3_gain;        /* +/- dB */
-    
+    int eq_band3_cutoff;        /* Hz */
+    int eq_band3_q;
+    int eq_band3_gain;          /* +/- dB */
+
     /* Band 4 settings */
-    int  eq_band4_cutoff;      /* Hz */
-    int  eq_band4_q;
-    int  eq_band4_gain;        /* +/- dB */
+    int eq_band4_cutoff;        /* Hz */
+    int eq_band4_q;
+    int eq_band4_gain;          /* +/- dB */
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -472,7 +473,7 @@ struct user_settings
     int bg_color; /* background color native format */
     int fg_color; /* foreground color native format */
 #endif
-    bool party_mode;	/* party mode - unstoppable music */
+    bool party_mode;    /* party mode - unstoppable music */
     
 #ifdef CONFIG_BACKLIGHT
     bool bl_filter_first_keypress;   /* filter first keypress when dark? */
