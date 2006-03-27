@@ -25,10 +25,14 @@
 %xl|R|mpc.bmp|70|66|
 %xl|S|ac3.bmp|70|66|
 %xl|T|wv.bmp|70|66|
-%xl|U|unk.bmp|70|66|
-%xl|V|A-B.bmp|114|0|
+%xl|U|alac.bmp|70|66|
+%xl|V|aac.bmp|70|66|
+%xl|W|shn.bmp|70|66|
+%xl|X|aiff.bmp|70|66|
+%xl|Y|unk.bmp|70|66|
+%xl|Z|A-B.bmp|145|0|
 %wd
-%al   %pv%?mh<%xdy|>%?mr<%xdz|>%ac%?mp<%xdb|%xdc|%xdd|%xde|%xdf>%?mm<|%xdg|%xdh|%xdi|%xdV>%?ps<%xdj|>
+%al   %pv%?mh<%xdy|>%?mr<%xdz|>%ac%?mp<%xdb|%xdc|%xdd|%xde|%xdf>%?mm<|%xdg|%xdh|%xdi|%xdZ>%?ps<%xdj|>
 %ac%s%?in<%in. |>%?it<%it|%fn>
 %t3%ac%s%?ia<%ia|%d2>;%t3%ac%s%?id<%id|%d1>
 %pb
