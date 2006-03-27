@@ -20,8 +20,8 @@ every source change. (See status on the first line in the above table).
 <!--#exec cmd="./bleedmod.pl" -->
 
 <p>
-<a href="/twiki/bin/view/Main/UsingCVS">How to use CVS</a>.
+<a href="/twiki/bin/view/Main/UsingCVS">How to use CVS</a>
 
-<hr>
+<p><a href="/viewcvs.cgi/">Browse the CVS repository</a>
 
 #include "foot.t"
