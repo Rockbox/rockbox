@@ -211,7 +211,7 @@
 /* IRAM usage */
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
-    (CONFIG_CPU == MCF5249) || /* Coldfire: core, plugins, codecs */ \
+    defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == PP5020) ||  /* iPod: core, plugins, codecs */ \
     (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
     (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
