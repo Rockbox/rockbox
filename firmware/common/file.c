@@ -99,9 +99,35 @@ int open(const char* pathname, int flags)
     }
     file->busy = true;
 
+#ifdef HAVE_DIRCACHE
+    if (dircache_is_enabled() && !file->write)
+    {
+        const struct dircache_entry *ce;
+        
+        ce = dircache_get_entry_ptr(pathname);
+        if (!ce)
+        {
+            errno = ENOENT;
+            file->busy = false;
+            return -7;
+        }
+        
+        fat_open(IF_MV2(unsupported at the moment,)
+                 ce->startcluster,
+                 &(file->fatfile),
+                 NULL);
+        file->size = ce->size;
+        file->attr = ce->attribute;
+        file->cacheoffset = -1;
+        file->fileoffset = 0;
+        
+        return fd;
+    }
+#endif
+    
     strncpy(pathnamecopy,pathname,sizeof(pathnamecopy));
     pathnamecopy[sizeof(pathnamecopy)-1] = 0;
-
+    
     /* locate filename */
     name=strrchr(pathnamecopy+1,'/');
     if ( name ) {
@@ -120,7 +146,7 @@ int open(const char* pathname, int flags)
         file->busy = false;
         return -4;
     }
-
+    
     if(name[0] == 0) {
         DEBUGF("Empty file name\n");
         errno = EINVAL;
@@ -156,7 +182,7 @@ int open(const char* pathname, int flags)
                 return rc * 10 - 6;
             }
 #ifdef HAVE_DIRCACHE
-            dircache_add_file(pathname);
+            dircache_add_file(pathname, file->fatfile.firstcluster);
 #endif
             file->size = 0;
             file->attr = 0;
@@ -394,6 +420,9 @@ int ftruncate(int fd, off_t size)
     }
 
     file->size = size;
+#ifdef HAVE_DIRCACHE
+    dircache_update_filesize(fd, size, file->fatfile.firstcluster);
+#endif
 
     return 0;
 }
@@ -569,7 +598,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
     {
         file->size = file->fileoffset;
 #ifdef HAVE_DIRCACHE
-        dircache_update_filesize(fd, file->size);
+        dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
 #endif
     }
 

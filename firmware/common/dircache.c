@@ -798,12 +798,20 @@ void dircache_bind(int fd, const char *path)
     fd_bindings[fd] = entry;
 }
 
-void dircache_update_filesize(int fd, long newsize)
+void dircache_update_filesize(int fd, long newsize, long startcluster)
 {
     if (!dircache_initialized || fd < 0)
         return ;
 
+    if (fd_bindings[fd] == NULL)
+    {
+        logf("dircache fd access error");
+        dircache_initialized = false;
+        return ;
+    }
+    
     fd_bindings[fd]->size = newsize;
+    fd_bindings[fd]->startcluster = startcluster;
 }
 
 void dircache_mkdir(const char *path)
@@ -915,13 +923,19 @@ void dircache_rename(const char *oldpath, const char *newpath)
     newentry->wrtdate = oldentry.wrtdate;
 }
 
-void dircache_add_file(const char *path)
+void dircache_add_file(const char *path, long startcluster)
 {
+    struct dircache_entry *entry;
+    
     if (!dircache_initialized)
         return ;
         
     logf("add file: %s", path);
-    dircache_new_entry(path, 0);
+    entry = dircache_new_entry(path, 0);
+    if (entry == NULL)
+        return ;
+    
+    entry->startcluster = startcluster;
 }
 
 DIRCACHED* opendir_cached(const char* name)

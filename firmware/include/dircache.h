@@ -82,12 +82,12 @@ const struct dircache_entry *dircache_get_entry_ptr(const char *filename);
 void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size);
 
 void dircache_bind(int fd, const char *path);
-void dircache_update_filesize(int fd, long newsize);
+void dircache_update_filesize(int fd, long newsize, long startcluster);
 void dircache_mkdir(const char *path);
 void dircache_rmdir(const char *path);
 void dircache_remove(const char *name);
 void dircache_rename(const char *oldpath, const char *newpath);
-void dircache_add_file(const char *path);
+void dircache_add_file(const char *path, long startcluster);
 
 DIRCACHED* opendir_cached(const char* name);
 struct dircache_entry* readdir_cached(DIRCACHED* dir);
