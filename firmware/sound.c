@@ -71,6 +71,10 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -84,   0, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
+#elif defined(HAVE_TLV320)
+    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   0,   6, sound_set_volume},
+    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
+    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_WM8975)
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
@@ -288,6 +292,26 @@ static int tenthdb2mixer(int db)
         return -db * 2 / 5;
 }
 
+#elif defined(HAVE_TLV320)
+#define VOLUME_MIN -730
+#define VOLUME_MAX  60
+
+/* convert tenth of dB volume (-840..0) to master volume register value */
+static int tenthdb2master(int db)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 == +6dB  (0x7f) */
+    /* 1111001 == 0dB   (0x79) */
+    /* 0110000 == -73dB (0x30 */
+    /* 0101111 == mute  (0x2f) */
+
+    if (db < VOLUME_MIN) {
+        return 0x0;
+    } else {
+        return((db/10)+73+0x30);
+    }
+}
+
 #elif defined(HAVE_WM8975) 
 /* volume/balance/treble/bass interdependency */
 #define VOLUME_MIN -730
@@ -395,7 +419,8 @@ static int tenthdb2mixer(int db)
 #endif
 
 #if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 || \
-    defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731)
+    defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) || \
+    defined(HAVE_TLV320)
  /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
@@ -457,6 +482,8 @@ static void set_prescaled_volume(void)
     wmcodec_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
+#elif defined(HAVE_TLV320)
+    tlv320_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
 #endif
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
@@ -563,7 +590,8 @@ void sound_set_volume(int value)
     unsigned tmp = ((unsigned)(value + 115) & 0xff) << 8;
     mas_codec_writereg(0x10, tmp);
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 || \
-      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731
+      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 || \
+      defined(HAVE_TLV320)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();                          
 #elif CONFIG_CPU == PNX0101
