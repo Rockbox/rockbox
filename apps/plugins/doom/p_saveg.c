@@ -95,7 +95,7 @@ void P_UnArchivePlayers (void)
          for (j=0 ; j<NUMPSPRITES ; j++)
             if (players[i]. psprites[j].state)
                players[i]. psprites[j].state =
-                  &states[ (int)players[i].psprites[j].state ];
+                  &states[ (unsigned long)players[i].psprites[j].state ];
       }
 }
 
@@ -447,10 +447,10 @@ void P_UnArchiveThinkers (void)
       PADSAVEP();
       memcpy (mobj, save_p, sizeof(mobj_t));
       save_p += sizeof(mobj_t);
-      mobj->state = states + (int) mobj->state;
+      mobj->state = states + (unsigned long) mobj->state;
 
       if (mobj->player)
-         (mobj->player = &players[(int) mobj->player - 1]) -> mo = mobj;
+         (mobj->player = &players[(unsigned long) mobj->player - 1]) -> mo = mobj;
 
       P_SetThingPosition (mobj);
       mobj->info = &mobjinfo[mobj->type];
@@ -768,7 +768,7 @@ void P_UnArchiveSpecials (void)
             ceiling_t *ceiling = Z_Malloc (sizeof(*ceiling), PU_LEVEL, NULL);
             memcpy (ceiling, save_p, sizeof(*ceiling));
             save_p += sizeof(*ceiling);
-            ceiling->sector = &sectors[(int)ceiling->sector];
+            ceiling->sector = &sectors[(unsigned long)ceiling->sector];
             ceiling->sector->ceilingdata = ceiling; //jff 2/22/98
 
             if (ceiling->thinker.function)
@@ -785,10 +785,10 @@ void P_UnArchiveSpecials (void)
             vldoor_t *door = Z_Malloc (sizeof(*door), PU_LEVEL, NULL);
             memcpy (door, save_p, sizeof(*door));
             save_p += sizeof(*door);
-            door->sector = &sectors[(int)door->sector];
+            door->sector = &sectors[(unsigned long)door->sector];
 
             //jff 1/31/98 unarchive line remembered by door as well
-            door->line = (int)door->line!=-1? &lines[(int)door->line] : NULL;
+            door->line = (unsigned long)door->line!=-1? &lines[(unsigned long)door->line] : NULL;
 
             door->sector->ceilingdata = door;       //jff 2/22/98
             door->thinker.function = T_VerticalDoor;
@@ -802,7 +802,7 @@ void P_UnArchiveSpecials (void)
             floormove_t *floor = Z_Malloc (sizeof(*floor), PU_LEVEL, NULL);
             memcpy (floor, save_p, sizeof(*floor));
             save_p += sizeof(*floor);
-            floor->sector = &sectors[(int)floor->sector];
+            floor->sector = &sectors[(unsigned long)floor->sector];
             floor->sector->floordata = floor; //jff 2/22/98
             floor->thinker.function = T_MoveFloor;
             P_AddThinker (&floor->thinker);
@@ -815,7 +815,7 @@ void P_UnArchiveSpecials (void)
             plat_t *plat = Z_Malloc (sizeof(*plat), PU_LEVEL, NULL);
             memcpy (plat, save_p, sizeof(*plat));
             save_p += sizeof(*plat);
-            plat->sector = &sectors[(int)plat->sector];
+            plat->sector = &sectors[(unsigned long)plat->sector];
             plat->sector->floordata = plat; //jff 2/22/98
 
             if (plat->thinker.function)
@@ -832,7 +832,7 @@ void P_UnArchiveSpecials (void)
             lightflash_t *flash = Z_Malloc (sizeof(*flash), PU_LEVEL, NULL);
             memcpy (flash, save_p, sizeof(*flash));
             save_p += sizeof(*flash);
-            flash->sector = &sectors[(int)flash->sector];
+            flash->sector = &sectors[(unsigned long)flash->sector];
             flash->thinker.function = T_LightFlash;
             P_AddThinker (&flash->thinker);
             break;
@@ -844,7 +844,7 @@ void P_UnArchiveSpecials (void)
             strobe_t *strobe = Z_Malloc (sizeof(*strobe), PU_LEVEL, NULL);
             memcpy (strobe, save_p, sizeof(*strobe));
             save_p += sizeof(*strobe);
-            strobe->sector = &sectors[(int)strobe->sector];
+            strobe->sector = &sectors[(unsigned long)strobe->sector];
             strobe->thinker.function = T_StrobeFlash;
             P_AddThinker (&strobe->thinker);
             break;
@@ -856,7 +856,7 @@ void P_UnArchiveSpecials (void)
             glow_t *glow = Z_Malloc (sizeof(*glow), PU_LEVEL, NULL);
             memcpy (glow, save_p, sizeof(*glow));
             save_p += sizeof(*glow);
-            glow->sector = &sectors[(int)glow->sector];
+            glow->sector = &sectors[(unsigned long)glow->sector];
             glow->thinker.function = T_Glow;
             P_AddThinker (&glow->thinker);
             break;
@@ -868,7 +868,7 @@ void P_UnArchiveSpecials (void)
             fireflicker_t *flicker = Z_Malloc (sizeof(*flicker), PU_LEVEL, NULL);
             memcpy (flicker, save_p, sizeof(*flicker));
             save_p += sizeof(*flicker);
-            flicker->sector = &sectors[(int)flicker->sector];
+            flicker->sector = &sectors[(unsigned long)flicker->sector];
             flicker->thinker.function = T_FireFlicker;
             P_AddThinker (&flicker->thinker);
             break;
@@ -881,7 +881,7 @@ void P_UnArchiveSpecials (void)
             elevator_t *elevator = Z_Malloc (sizeof(*elevator), PU_LEVEL, NULL);
             memcpy (elevator, save_p, sizeof(*elevator));
             save_p += sizeof(*elevator);
-            elevator->sector = &sectors[(int)elevator->sector];
+            elevator->sector = &sectors[(unsigned long)elevator->sector];
             elevator->sector->floordata = elevator; //jff 2/22/98
             elevator->sector->ceilingdata = elevator; //jff 2/22/98
             elevator->thinker.function = T_MoveElevator;

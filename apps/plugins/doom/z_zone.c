@@ -251,8 +251,8 @@ void Z_Init(void)
 
    // Align on cache boundary
 
-   zone = (memblock_t *) ((char *) zonebase + CACHE_ALIGN -
-                          ((unsigned) zonebase & (CACHE_ALIGN-1)));
+   zone = (memblock_t *) ((unsigned long)zonebase + CACHE_ALIGN -
+                         ((unsigned long)zonebase & (CACHE_ALIGN-1)));
 
    rover = zone;                            // Rover points to base of zone mem
    zone->next = zone->prev = zone;          // Single node
