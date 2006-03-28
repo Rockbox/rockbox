@@ -70,7 +70,7 @@ my $update = $u;
 
 my $english = $e;
 
-my $check = $binary?1:0 + $prefix?1:0 + $update?1:0;
+my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0);
 
 if($check > 1) {
     print "Please use only one of -p, -u and -b\n";
@@ -209,8 +209,10 @@ if($english) {
 
 # a function that compares the english phrase with the translated one.
 # compare source strings and desc
+
+# Then output the updated version!
 sub compare {
-    my ($engref, $locref)=@_;
+    my ($idstr, $engref, $locref)=@_;
     my ($edesc, $ldesc);
     my ($esource, $lsource);
     my $mode=0;
@@ -230,28 +232,52 @@ sub compare {
         }
     }
 
+    my @show;
+    my @source;
+
     $mode = 0;
     for my $l (@$locref) {
         if($l =~ /^ *desc: (.*)/) {
             $ldesc=$1;
+            if($edesc ne $ldesc) {
+                $l = "### The 'desc' field differs from the english!\n### the previously used desc is commented below:\n### desc: $ldesc\n  desc: $edesc\n";
+            }
+            push @show, $l;
         }
         elsif($l =~ / *\<source\>/i) {
             $mode=1;
+            push @show, $l;
         }
         elsif($mode) {
             if($l =~ / *\<\/source\>/i) {
-                last;
+                $mode = 0;
+                print @show;
+                if($esource ne $lsource) {
+                    print "### The <source> section differs from the english!\n",
+                    "### the previously used one is commented below:\n";
+                    for(split("\n", $lsource)) {
+                        print "### $_\n";
+                    }
+                    print $esource;
+                }
+                else {
+                    print $lsource;
+                }
+                undef @show; # start over
+
+                push @show, $l;
             }
-            $lsource .= "$l";
+            else {
+                $lsource .= "$l";
+            }
+        }
+        else {
+            push @show, $l;
         }
     }
 
-    if($edesc ne $ldesc) {
-        print "### The 'desc' field differs from the english!\n";
-    }
-    if($esource ne $lsource) {
-        print "### The <source> section differs from the english!\n";
-    }
+
+    print @show;
 }
 
 my $idcount;        # counter for lang ID numbers
@@ -295,33 +321,43 @@ while(<LANG>) {
                 my $idstr = $phrase{'id'};
                 my $idnum;
 
-                # Use the ID name to figure out which id number range we should
-                # use for this phrase. Voice-only strings are separated.
-                if($idstr =~ /^VOICE/) {
-                    $idnum = $voiceid++;
+                if($dest =~ /^none\z/i) {
+                    # "none" as dest means that this entire phrase is to be
+                    # ignored
+                    print "dest is NONE!\n";
                 }
                 else {
-                    $idnum = $idcount++;
+
+                    # Use the ID name to figure out which id number range we
+                    # should use for this phrase. Voice-only strings are
+                    # separated.
+
+                    if($idstr =~ /^VOICE/) {
+                        $idnum = $voiceid++;
+                    }
+                    else {
+                        $idnum = $idcount++;
+                    }
+                    
+                    $id{$idstr} = $idnum;
+                    $idnum[$idnum]=$idstr;
+                    
+                    $source{$idstr}=$src;
+                    $dest{$idstr}=$dest;
+                    $voice{$idstr}=$voice;
+                    
+                    if($verbose) {
+                        print "id: $phrase{id} ($idnum)\n";
+                        print "source: $src\n";
+                        print "dest: $dest\n";
+                        print "voice: $voice\n";
+                    }
+
+                    undef $src;
+                    undef $dest;
+                    undef $voice;
+                    undef %phrase;
                 }
-
-                $id{$idstr} = $idnum;
-                $idnum[$idnum]=$idstr;
-
-                $source{$idstr}=$src;
-                $dest{$idstr}=$dest;
-                $voice{$idstr}=$voice;
-
-                if($verbose) {
-                    print "id: $phrase{id} ($idnum)\n";
-                    print "source: $src\n";
-                    print "dest: $dest\n";
-                    print "voice: $voice\n";
-                }
-
-                undef $src;
-                undef $dest;
-                undef $voice;
-                undef %phrase;
 
                 if($update) {
                     my $e = $english{$idstr};
@@ -330,10 +366,12 @@ while(<LANG>) {
                         # compare original english with this!
                         my @eng = split("\n", $english{$idstr});
 
-                        compare(\@eng, \@phrase);
+                        compare($idstr, \@eng, \@phrase);
+
+                        $english{$idstr}=""; # clear it
                     }
                     else {
-                        print "### This phrase is not used, remove it!\n";
+                        print "### $idstr: The phrase is not used. Skipped\n";
                     }
                 }
                 undef @phrase;
@@ -342,9 +380,6 @@ while(<LANG>) {
 
             # starts with a slash, this _ends_ this section
             $m = pop @m; # get back old value, the previous level's tag
-            if($update) {
-                print "$ll";
-            }
             next;
         } # end of tag close
 
@@ -352,9 +387,6 @@ while(<LANG>) {
 
         push @m, $m; # store old value
         $m = $1;
-        if($update) {
-            print "$ll";
-        }
         next;
     }
 
@@ -362,12 +394,21 @@ while(<LANG>) {
         my ($name, $val)=($1, $2);
         &$m($_, $name, $val);
     }
-    if($update) {
-        print "$ll";
-    }
-    
 }
 close(LANG);
+
+if($update) {
+    my $any=0;
+    for(keys %english) {
+        if($english{$_}) {
+            print "###\n",
+            "### This phrase below was not present in the translated file\n",
+            "<phrase>\n";
+            print $english{$_};
+            print "</phrase>\n";
+        }
+    }
+}
 
 if($prefix) {
     # We create a .c and .h file
@@ -499,7 +540,3 @@ if($verbose) {
     }
 }
 
-#print "* phrase *\n";
-#for(keys %phrase) {
-#    print "$_\n";
-#}
