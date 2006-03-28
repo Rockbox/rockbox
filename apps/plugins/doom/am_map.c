@@ -889,7 +889,7 @@ boolean AM_clipMline
    register int outcode2 = 0;
    register int outside;
 
-   fpoint_t  tmp;
+   fpoint_t  tmp = {0,0};
    int   dx;
    int   dy;
 
