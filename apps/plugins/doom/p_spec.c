@@ -947,7 +947,7 @@ boolean P_CanUnlockGenDoor
 // jff 2/23/98 added to prevent old demos from
 //  succeeding in starting multiple specials on one sector
 //
-int P_SectorActive(special_e t,sector_t *sec)
+boolean P_SectorActive(special_e t,sector_t *sec)
 {
    if (demo_compatibility)  // return whether any thinker is active
       return sec->floordata || sec->ceilingdata || sec->lightingdata;
@@ -961,7 +961,7 @@ int P_SectorActive(special_e t,sector_t *sec)
       case lighting_special:
          return (sec->lightingdata!=NULL);
       }
-   return 1; // don't know which special, must be active, shouldn't be here
+   return true; // don't know which special, must be active, shouldn't be here
 }
 
 

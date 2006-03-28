@@ -853,7 +853,7 @@ boolean P_CanUnlockGenDoor
 ( line_t* line,
   player_t* player);
 
-int P_SectorActive
+boolean P_SectorActive
 ( special_e t,
   sector_t* s );
 
