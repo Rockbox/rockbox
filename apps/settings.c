@@ -1130,10 +1130,11 @@ void settings_apply(void)
     dsp_set_replaygain(true);
     dsp_set_crossfeed(global_settings.crossfeed);
 
-    dsp_eq_set(global_settings.eq_enabled, global_settings.eq_precut);
+    dsp_set_eq(global_settings.eq_enabled);
+    dsp_set_eq_precut(global_settings.eq_precut); 
     /* Update all EQ bands */
     for(i = 0; i < 5; i++) {
-        dsp_eq_update_filter_coefs(i);
+        dsp_set_eq_coefs(i);
     }
 #endif
 

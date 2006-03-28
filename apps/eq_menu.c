@@ -147,11 +147,13 @@ static bool eq_enabled(void)
     bool result = set_bool(str(LANG_EQUALIZER_ENABLED),
         &global_settings.eq_enabled);
 
-    dsp_eq_set(global_settings.eq_enabled, global_settings.eq_precut); 
+    dsp_set_eq(global_settings.eq_enabled); 
+
+    dsp_set_eq_precut(global_settings.eq_precut);
 
     /* Update all bands */
     for(i = 0; i < 5; i++) {
-        dsp_eq_update_filter_coefs(i);
+        dsp_set_eq_coefs(i);
     }
 
     return result;
@@ -160,10 +162,8 @@ static bool eq_enabled(void)
 static bool eq_precut(void)
 {
     bool result = set_int(str(LANG_EQUALIZER_PRECUT), str(LANG_UNIT_DB), 
-        UNIT_DB, &global_settings.eq_precut, NULL, 5, 0, 240, 
+        UNIT_DB, &global_settings.eq_precut, dsp_set_eq_precut, 5, 0, 240, 
         eq_precut_format);
-
-    dsp_eq_set(global_settings.eq_enabled, global_settings.eq_precut);
 
     return result;
 }
@@ -178,7 +178,7 @@ static bool eq_set_band ## band ## _center(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_CENTER), "Hertz", \
         UNIT_HERTZ, &global_settings.eq_band ## band ## _cutoff, NULL, \
         EQ_CUTOFF_STEP, EQ_CUTOFF_MIN, EQ_CUTOFF_MAX, NULL); \
-    dsp_eq_update_filter_coefs(band); \
+    dsp_set_eq_coefs(band); \
     return result; \
 }
     
@@ -188,7 +188,7 @@ static bool eq_set_band ## band ## _cutoff(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_CUTOFF), "Hertz", \
         UNIT_HERTZ, &global_settings.eq_band ## band ## _cutoff, NULL, \
         EQ_CUTOFF_STEP, EQ_CUTOFF_MIN, EQ_CUTOFF_MAX, NULL); \
-    dsp_eq_update_filter_coefs(band); \
+    dsp_set_eq_coefs(band); \
     return result; \
 }
 
@@ -198,7 +198,7 @@ static bool eq_set_band ## band ## _q(void) \
     bool result = set_int(str(LANG_EQUALIZER_BAND_Q), "Q", UNIT_INT, \
         &global_settings.eq_band ## band ## _q, NULL, \
         EQ_Q_STEP, EQ_Q_MIN, EQ_Q_MAX, eq_q_format); \
-    dsp_eq_update_filter_coefs(band); \
+    dsp_set_eq_coefs(band); \
     return result; \
 }
 
@@ -208,7 +208,7 @@ static bool eq_set_band ## band ## _gain(void) \
     bool result = set_int("Band " #band, str(LANG_UNIT_DB), UNIT_DB, \
         &global_settings.eq_band ## band ## _gain, NULL, \
         EQ_GAIN_STEP, EQ_GAIN_MIN, EQ_GAIN_MAX, eq_gain_format); \
-    dsp_eq_update_filter_coefs(band); \
+    dsp_set_eq_coefs(band); \
     return result; \
 }
 
@@ -693,7 +693,7 @@ bool eq_menu_graphical(void)
         
         /* Update the filter if the user changed something */
         if (has_changed) {
-            dsp_eq_update_filter_coefs(current_band);
+            dsp_set_eq_coefs(current_band);
             has_changed = false;
         }
     }

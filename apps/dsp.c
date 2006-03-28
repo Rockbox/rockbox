@@ -591,15 +591,22 @@ static void apply_crossfeed(int32_t* src[], int count)
 #endif
 
 /**
- * Use to enable the equalizer and set any pregain.
+ * Use to enable the equalizer.
  *
  * @param enable true to enable the equalizer
- * @param precut to apply in decibels (multiplied by 10)
  */
-void dsp_eq_set(bool enable, unsigned int precut)
+void dsp_set_eq(bool enable)
 {
     dsp->eq_enabled = enable;
+}
 
+/**
+ * Update the amount to cut the audio before applying the equalizer.
+ *
+ * @param precut to apply in decibels (multiplied by 10)
+ */
+void dsp_set_eq_precut(int precut)
+{
     /* Needs to be in s8.23 format amplitude for apply_gain() */
     dsp->eq_precut = get_replaygain_int(precut * -10) >> 1;
 }
@@ -609,7 +616,7 @@ void dsp_eq_set(bool enable, unsigned int precut)
  *
  * @param band the equalizer band to synchronize
  */
-void dsp_eq_update_filter_coefs(int band)
+void dsp_set_eq_coefs(int band)
 {
     const int *setting;
     long gain;
