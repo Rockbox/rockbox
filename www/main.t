@@ -25,6 +25,8 @@ href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy to use</a>. Ins
 
 <h2>News</h2>
 
+<p><i>2006-03-28</i>: <a href="mail/archive/rockbox-archive-2006-03/0502.shtml">Sound</a> on <a href="http://www.rockbox.org/twiki/bin/view/Main/IaudioPort">iAudio X5!</a>.
+
 <p><i>2006-03-17</i>: <a href="devcon2006/">The Rockbox International Developers Conference 2006</a>.
 
 <p><i>2006-02-23</i>: We have migrated to a new bugtracker: Flyspray. It's faster and better in practically every aspect. <a href="/tracker/">See it here</a>.
