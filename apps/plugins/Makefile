@@ -85,7 +85,7 @@ ifneq (,$(strip $(foreach tgt,IPOD_VIDEO IPOD_NANO IPOD_COLOR IRIVER \
 endif
 
 # Build Doom for the H300 and color ipods
-ifneq (,$(strip $(foreach tgt, IRIVER_H300 IPOD_NANO IPOD_COLOR IPOD_VIDEO,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt, IRIVER_H300 IPOD_NANO IPOD_COLOR IPOD_VIDEO IAUDIO_X5,$(findstring $(tgt),$(TARGET)))))
     SUBDIRS += doom
 endif
 
