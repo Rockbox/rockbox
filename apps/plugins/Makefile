@@ -84,6 +84,11 @@ ifneq (,$(strip $(foreach tgt,IPOD_VIDEO IPOD_NANO IPOD_COLOR IRIVER \
     SUBDIRS += pacbox
 endif
 
+# Build Doom for the H300 and color ipods
+ifneq (,$(strip $(foreach tgt, IRIVER_H300 IPOD_NANO IPOD_COLOR IPOD_VIDEO,$(findstring $(tgt),$(TARGET)))))
+    SUBDIRS += doom
+endif
+
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
 

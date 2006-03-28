@@ -67,6 +67,8 @@
 #include "bmp.h"
 #endif
 
+#include "backdrop.h"
+
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -409,6 +411,10 @@ static const struct plugin_api rockbox_api = {
     i2c_end,
     i2c_write,
 #endif
+
+    vsnprintf,
+    memchr,
+    load_main_backdrop
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -1,0 +1,47 @@
+Changelog:
+Fixed Nightmare mode
+Fixed end game
+Fixed quit crash
+Added more prboom rendering code -> speedup
+   expanded rendering code -> speedup
+Rewrote lowquality renderer and moved option to loader -> adds 1 fps to speed
+Changed Default Keys:
+   DOOM     PLAYER
+   ------   ------
+   UP       REC
+   DOWN     DOWN
+   LEFT     LEFT
+   RIGHT    RIGHT
+   SHOOT    MODE
+   OPEN     DOWN
+   ESC      ON
+   ENTER    SELECT
+   WEAPON   OFF
+Menu Keys now work independent of ingame keys
+All code reformatted and warnings reduced (only 6 now)
+New Menu code to select options and Base game
+   doom shareware                doom1.wad
+   doom registered               doom.wad
+   doom retail (ultimate doom)   doomu.wad
+   doom 2                        doom2.wad
+   plutonia                      plutonia.wad
+   tnt                           tnt.wad
+Doom directory is now /games/doom/
+Disabled mouse calls -> speedup
+Finally have the right timer. -> run is actually usable now
+Added a timedemo option for speed testing, only runs with doom shareware, 
+   Ultimate doom, or registered doom saves timedemo information in /games/doom/timedemo.txt
+Merged Paul's Ipod changes, hopefully it works now
+Added addon code so that additional wadfiles can be added to the startup.
+
+# Version 0.8
+Extended the addon code to automatically search for wads in /games/doom/addons/
+Changed the memory allocation to use doom's block allocator exclusively this can
+   be used in other plugins that need malloc, realloc, and calloc (include z_zone.c, z_zone.h)
+Included linuxstb's code for the Ipod
+Redid the sound code partially from prboom
+   -> caches all sound at startup
+   -> helped reduce the number of pauses in the game
+All new renderer from prboom -> translucent sprites, dynamic palettes FASTER
+   more wads work properly (no more graphical errors in halflife)
+

@@ -29,6 +29,7 @@
 #define MEM 2
 #endif
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,7 +102,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 16
+#define PLUGIN_API_VERSION 17
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -479,6 +480,10 @@ struct plugin_api {
     void (*i2c_end)(void);
     int  (*i2c_write)(int address, unsigned char* buf, int count );
 #endif
+
+    int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
+    void *(*memchr)(const void *s1, int c, size_t n);
+    bool (*load_main_backdrop)(char* filename);
 };
 
 /* plugin header */
