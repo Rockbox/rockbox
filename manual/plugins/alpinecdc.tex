@@ -1,0 +1,39 @@
+\subsection{Alpine CD changer emulator}
+This plugin emulates an Alpine CD changer. It allows to plug the Archos to a
+compatible head unit and control the playback from there, too. Currently
+implemented is track change, shuffle, seek, but no disk change. The plugin is a
+TSR, meaning it silently operates in the background once started. It will keep
+doing so until a new plugin is started.
+Alpine also did M-Bus as OEM for other brands (Honda, Acura, Volvo, BMW, etc.)
+Nowadays Alpine uses a different protocol, called Ai-Net, not supported by this
+plugin. (As well as all other protocols, please do not ask for such!)
+
+\subsubsection{The cable}
+Hookup to Archos works by connecting the headphone output including the remote
+pin (you need a 4-ring 3.5 mm plug for that) to the changer jack of the radio.
+M-Bus radios have a DIN-style circular jack with 8 pins (7 in a $\sim$ 270 degree
+circle, one in the center). A standard 5-pin DIN plug is OK for this, since we
+don't use the other (power) pins.
+
+As OEM, they shuffled the pins around a bit, better check first if it's not
+genuine Alpine. The bus pin is pulled high to 12 volts with a $\sim$ 2kOhm resistor,
+pulses driven low. Because it's open collector, this is not harmful to the
+Archos.\\
+ASCII art of the 4-pin headphone plug:
+\begin{verbatim}
+/ \
+\_/ left     -> Alpine pin 5
+|_| right   -> Alpine pin 4
+|_| remote  -> Alpine pin 1
+|_| ground  -> Alpine pin 2 + 3
+\end{verbatim}
+
+The remote pin can be programmed bidirectional, that's the reason this works.
+Very luckily the M-Bus uses a single wire communication and the two radios I
+tried are happy with the 3.3 Volt level the Arcos can deliver. So the
+connection is a simple cable! For all protocols requiring more lines, an
+external controller would be necessary.
+
+\textbf{Note:} Archos FMs don't have the remote pin internally connected, but
+one unit that was opened was internally prepared for it, a matter of closing a
+bridge. 
