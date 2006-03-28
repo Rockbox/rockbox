@@ -67,8 +67,6 @@
 #include "bmp.h"
 #endif
 
-#include "backdrop.h"
-
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
