@@ -56,6 +56,11 @@ void i2c_init(void)
     
     /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
     MFDR = 0x14;
+    MFDR2 = 0x14;
+
+#ifdef IAUDIO_X5
+    MBCR = IEN;  /* Enable interface */
+#endif
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     /* Audio Codec */
