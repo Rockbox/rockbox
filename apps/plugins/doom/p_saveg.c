@@ -269,7 +269,7 @@ void P_ThinkerToIndex(void)
    number_of_thinkers = 0;
    for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
       if (th->function == P_MobjThinker)
-         th->prev = (thinker_t *) ++number_of_thinkers;
+         th->prev = (thinker_t *)(long)(++number_of_thinkers);
 }
 
 // phares 9/13/98: Moved this code outside of P_ArchiveThinkers so the
@@ -788,7 +788,7 @@ void P_UnArchiveSpecials (void)
             door->sector = &sectors[(unsigned long)door->sector];
 
             //jff 1/31/98 unarchive line remembered by door as well
-            door->line = (unsigned long)door->line!=-1? &lines[(unsigned long)door->line] : NULL;
+            door->line = (long)door->line!=-1? &lines[(unsigned long)door->line] : NULL;
 
             door->sector->ceilingdata = door;       //jff 2/22/98
             door->thinker.function = T_VerticalDoor;
