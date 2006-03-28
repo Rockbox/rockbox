@@ -63,6 +63,12 @@ static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
 #define IIS_DEFPARM(freq)  ((freq << 12) | 0x300 | 4 << 2)
 #define IIS_RESET          0x800
 
+#ifdef IAUDIO_X5
+#define SET_IIS_CONFIG(x) IIS1CONFIG = (x);
+#else
+#define SET_IIS_CONFIG(x) IIS2CONFIG = (x);
+#endif
+
 static int pcm_freq = 0x6; /* 44.1 is default */
 
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
@@ -84,7 +90,7 @@ static void dma_start(const void *addr, size_t size)
     BCR0 = size;                  /* Bytes to transfer */
 
     /* Enable the FIFO and force one write to it */
-    IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+    SET_IIS_CONFIG(IIS_DEFPARM(pcm_freq));
     /* Also send the audio to S/PDIF */
 #ifdef HAVE_SPDIF_OUT
     EBU1CONFIG = EBU_DEFPARM;
@@ -100,7 +106,7 @@ static void dma_stop(void)
     DCR0 = 0;
     DSR0 = 1;
     /* Reset the FIFO */
-    IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+    SET_IIS_CONFIG(IIS_RESET | IIS_DEFPARM(pcm_freq));
 #ifdef HAVE_SPDIF_OUT
     EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif
@@ -196,7 +202,7 @@ void pcm_init(void)
     DMACONFIG = 1;   /* DMA0Req = PDOR3 */
 
     /* Reset the audio FIFO */
-    IIS2CONFIG = IIS_RESET;
+    SET_IIS_CONFIG(IIS_RESET);
 
     /* Enable interrupt at level 7, priority 0 */
     ICR6 = 0x1c;
@@ -205,7 +211,7 @@ void pcm_init(void)
     pcm_set_frequency(44100);
 
     /* Prevent pops (resets DAC to zero point) */
-    IIS2CONFIG = IIS_DEFPARM(pcm_freq) | IIS_RESET;
+    SET_IIS_CONFIG(IIS_DEFPARM(pcm_freq) | IIS_RESET);
     
 #if defined(HAVE_UDA1380)
     /* Initialize default register values. */
@@ -223,7 +229,6 @@ void pcm_init(void)
     
 #elif defined(HAVE_TLV320)
     tlv320_init();
-    tlv320_enable_output(true);
     sleep(HZ/4);
     tlv320_mute(false);
 #endif
@@ -547,7 +552,7 @@ void pcm_play_pause(bool play)
 
 #ifdef CPU_COLDFIRE
                 /* Enable the FIFO and force one write to it */
-                IIS2CONFIG = IIS_DEFPARM(pcm_freq);
+                SET_IIS_CONFIG(IIS_DEFPARM(pcm_freq));
 #ifdef HAVE_SPDIF_OUT
                 EBU1CONFIG = EBU_DEFPARM;
 #endif
@@ -607,7 +612,7 @@ void pcm_play_pause(bool play)
 #ifdef CPU_COLDFIRE
             /* Disable DMA peripheral request. */
             DCR0 &= ~DMA_EEXT;
-            IIS2CONFIG = IIS_RESET | IIS_DEFPARM(pcm_freq);
+            SET_IIS_CONFIG(IIS_RESET | IIS_DEFPARM(pcm_freq));
 #ifdef HAVE_SPDIF_OUT
             EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif  
@@ -664,15 +669,12 @@ void pcm_calculate_peaks(int *left, int *right)
     short *addr;
     short *end;
     {
-#ifdef HAVE_UDA1380
+#ifdef CPU_COLDFIRE
         size_t samples = (BCR0 & 0xffffff) / 4;
         addr = (short *) (SAR0 & ~3);
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
         size_t samples = p_size / 4;
         addr = p;
-#elif defined(HAVE_TLV320)
-        size_t samples = 4;  /* TODO X5 */
-        addr = NULL;
 #endif
 
         if (samples > PEAK_SAMPLES)
