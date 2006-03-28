@@ -172,6 +172,16 @@ Width: 128
 </rwps>
 
 <wps>
+Name: DancePuffDuo-220x176.wps
+RWPS: DancePuffDuo.rwps
+Author: Chris Oxtoby
+Font: chicago12.fnt
+Statusbar: on
+Height: 176
+Width: 220
+</wps>
+
+<wps>
 Name: DancePuffDuo.wps
 RWPS: DancePuffDuo.rwps
 Author: Chris Oxtoby
