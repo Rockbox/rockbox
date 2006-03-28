@@ -9,6 +9,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
 /* LCD dimensions */
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128

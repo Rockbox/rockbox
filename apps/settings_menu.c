@@ -105,7 +105,7 @@ static bool scroll_paginated(void)
 static bool remote_contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
-                    &global_settings.remote_contrast, 
+                    &global_settings.remote_contrast,
                     lcd_remote_set_contrast, 1, MIN_CONTRAST_SETTING,
                     MAX_CONTRAST_SETTING, NULL );
 }
@@ -124,7 +124,7 @@ static bool remote_flip_display(void)
 {
     bool rc = set_bool( (char *)str(LANG_FLIP_DISPLAY),
                         &global_settings.remote_flip_display);
-    
+
     lcd_remote_set_flip(global_settings.remote_flip_display);
     lcd_remote_update();
 
@@ -136,7 +136,7 @@ static bool remote_reduce_ticking(void)
 {
     bool rc = set_bool( str(LANG_REDUCE_TICKING),
                         &global_settings.remote_reduce_ticking);
-    
+
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 
     return rc;
@@ -228,7 +228,7 @@ static bool backlight_fade_out(void)
 static bool brightness(void)
 {
     return set_int( str(LANG_BRIGHTNESS), "", UNIT_INT,
-                    &global_settings.brightness, 
+                    &global_settings.brightness,
                     backlight_set_brightness, 1, MIN_BRIGHTNESS_SETTING,
                     MAX_BRIGHTNESS_SETTING, NULL );
 }
@@ -261,16 +261,18 @@ static bool remote_caption_backlight(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
+#ifndef HAVE_LCD_COLOR
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
-                    &global_settings.contrast, 
+                    &global_settings.contrast,
                     lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
                     MAX_CONTRAST_SETTING, NULL );
 }
+#endif /* HAVE_LCD_COLOR */
 
 #ifdef HAVE_LCD_BITMAP
-
+#ifndef HAVE_LCD_COLOR
  /**
  * Menu to set LCD Mode (normal/inverse)
  */
@@ -283,7 +285,9 @@ static bool invert(void)
                                lcd_set_invert_display);
     return rc;
 }
+#endif /* HAVE_LCD_COLOR */
 
+#ifdef HAVE_LCD_FLIP
 /**
  * Menu to turn the display+buttons by 180 degrees
  */
@@ -297,6 +301,7 @@ static bool flip_display(void)
 
     return rc;
 }
+#endif /* HAVE_LCD_FLIP */
 
 /**
  * Menu to set Line Selector Type (Pointer/Bar)
@@ -310,7 +315,7 @@ static bool invert_cursor(void)
                             NULL);
 }
 
-#ifdef HAVE_LCD_COLOR 
+#ifdef HAVE_LCD_COLOR
 /**
  * Menu to clear the backdrop image
  */
@@ -352,7 +357,7 @@ static bool reset_color(void)
 {
     global_settings.fg_color = LCD_DEFAULT_FG;
     global_settings.bg_color = LCD_DEFAULT_BG;
-    
+
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
     return false;
@@ -365,10 +370,10 @@ static bool reset_color(void)
 static bool battery_display(void)
 {
     static const struct opt_items names[] = {
-        { STR(LANG_DISPLAY_GRAPHIC) }, 
+        { STR(LANG_DISPLAY_GRAPHIC) },
         { STR(LANG_DISPLAY_NUMERIC) }
     };
-    return set_option( str(LANG_BATTERY_DISPLAY), 
+    return set_option( str(LANG_BATTERY_DISPLAY),
                        &global_settings.battery_display, INT, names, 2, NULL);
 }
 
@@ -377,8 +382,8 @@ static bool battery_display(void)
  */
 static bool volume_type(void)
 {
-    static const struct opt_items names[] = { 
-        { STR(LANG_DISPLAY_GRAPHIC) }, 
+    static const struct opt_items names[] = {
+        { STR(LANG_DISPLAY_GRAPHIC) },
         { STR(LANG_DISPLAY_NUMERIC) }
     };
     return set_option( str(LANG_VOLUME_DISPLAY), &global_settings.volume_type,
@@ -415,7 +420,7 @@ static bool peak_meter_hold(void) {
                          18, NULL);
 
     peak_meter_init_times(global_settings.peak_meter_release,
-        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
 
     return retval;
@@ -454,12 +459,12 @@ static bool peak_meter_clip_hold(void) {
         { "45min" , TALK_ID(45, UNIT_MIN) },
         { "90min" , TALK_ID(90, UNIT_MIN) }
     };
-    retval = set_option( str(LANG_PM_CLIP_HOLD), 
+    retval = set_option( str(LANG_PM_CLIP_HOLD),
                          &global_settings.peak_meter_clip_hold, INT, names,
                          25, peak_meter_set_clip_hold);
 
     peak_meter_init_times(global_settings.peak_meter_release,
-        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
 
     return retval;
@@ -481,21 +486,21 @@ static bool peak_meter_release(void)  {
                       NULL, 1, 1, 0x7e, NULL);
 
     peak_meter_init_times(global_settings.peak_meter_release,
-        global_settings.peak_meter_hold, 
+        global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
 
     return retval;
 }
 
 /**
- * Menu to select wether the scale of the meter 
+ * Menu to select wether the scale of the meter
  * displays dBfs of linear values.
  */
 static bool peak_meter_scale(void) {
     bool retval = false;
     bool use_dbfs = global_settings.peak_meter_dbfs;
-    retval = set_bool_options(str(LANG_PM_SCALE), 
-        &use_dbfs, 
+    retval = set_bool_options(str(LANG_PM_SCALE),
+        &use_dbfs,
         STR(LANG_PM_DBFS), STR(LANG_PM_LINEAR),
         NULL);
 
@@ -516,7 +521,7 @@ static bool peak_meter_scale(void) {
             global_settings.peak_meter_max = -peak_meter_get_max() / 100;
         } else {
             int max;
-            
+
             /* linear percent */
             global_settings.peak_meter_min = peak_meter_get_min();
 
@@ -549,14 +554,14 @@ static bool peak_meter_min(void) {
             &min, NULL, 1, -89, range_max, NULL);
 
         global_settings.peak_meter_min = - min;
-    } 
+    }
 
     /* for linear scale */
     else {
         int min = global_settings.peak_meter_min;
 
         retval =  set_int(str(LANG_PM_MIN), "%", UNIT_PERCENT,
-            &min, NULL, 
+            &min, NULL,
             1, 0, global_settings.peak_meter_max - 1, NULL);
 
         global_settings.peak_meter_min = (unsigned char)min;
@@ -584,14 +589,14 @@ static bool peak_meter_max(void) {
 
         global_settings.peak_meter_max = - max;
 
-    } 
-    
+    }
+
     /* for linear scale */
     else {
         int max = global_settings.peak_meter_max;
 
         retval =  set_int(str(LANG_PM_MAX), "%", UNIT_PERCENT,
-            &max, NULL, 
+            &max, NULL,
             1, global_settings.peak_meter_min + 1, 100, NULL);
 
         global_settings.peak_meter_max = (unsigned char)max;
@@ -604,14 +609,14 @@ static bool peak_meter_max(void) {
 /**
  * Menu to configure the peak meter
  */
-static bool peak_meter_menu(void) 
+static bool peak_meter_menu(void)
 {
     int m;
     bool result;
 
     static const struct menu_item items[] = {
-        { ID2P(LANG_PM_RELEASE)  , peak_meter_release   },  
-        { ID2P(LANG_PM_PEAK_HOLD), peak_meter_hold      },  
+        { ID2P(LANG_PM_RELEASE)  , peak_meter_release   },
+        { ID2P(LANG_PM_PEAK_HOLD), peak_meter_hold      },
         { ID2P(LANG_PM_CLIP_HOLD), peak_meter_clip_hold },
         { ID2P(LANG_PM_SCALE)    , peak_meter_scale     },
         { ID2P(LANG_PM_MIN)      , peak_meter_min       },
@@ -634,7 +639,7 @@ static bool shuffle(void)
 static bool repeat_mode(void)
 {
     bool result;
-    static const struct opt_items names[] = { 
+    static const struct opt_items names[] = {
         { STR(LANG_OFF) },
         { STR(LANG_REPEAT_ALL) },
         { STR(LANG_REPEAT_ONE) },
@@ -713,7 +718,7 @@ static bool sort_dir(void)
 
 static bool resume(void)
 {
-    return set_bool( str(LANG_RESUME), &global_settings.resume); 
+    return set_bool( str(LANG_RESUME), &global_settings.resume);
 }
 
 #ifdef HAVE_SPDIF_POWER
@@ -839,7 +844,7 @@ static bool scroll_delay(void)
 {
     int dummy = global_settings.scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
-                     &dummy, 
+                     &dummy,
                      &lcd_scroll_delay, 100, 0, 2500, NULL );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
@@ -871,7 +876,7 @@ static bool scroll_step(void)
 static bool bidir_limit(void)
 {
     return set_int(str(LANG_BIDIR_SCROLL), "%", UNIT_PERCENT,
-                   &global_settings.bidir_limit, 
+                   &global_settings.bidir_limit,
                    &lcd_bidir_scroll, 25, 0, 200, NULL );
 }
 
@@ -895,7 +900,7 @@ static bool jump_scroll_delay(void)
 {
     int dummy = global_settings.jump_scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_JUMP_SCROLL_DELAY), "ms", UNIT_MS,
-                     &dummy, 
+                     &dummy,
                      &lcd_jump_scroll_delay, 100, 0, 2500, NULL );
     global_settings.jump_scroll_delay = dummy / (HZ/10);
     return rc;
@@ -909,7 +914,7 @@ static bool jump_scroll_delay(void)
 static bool battery_capacity(void)
 {
     return set_int(str(LANG_BATTERY_CAPACITY), "mAh", UNIT_MAH,
-                   &global_settings.battery_capacity, 
+                   &global_settings.battery_capacity,
                    &set_battery_capacity, 50, BATTERY_CAPACITY_MIN,
                    BATTERY_CAPACITY_MAX, NULL );
 }
@@ -961,11 +966,11 @@ static bool timedate_set(void)
 
 static bool timeformat_set(void)
 {
-    static const struct opt_items names[] = { 
+    static const struct opt_items names[] = {
         { STR(LANG_24_HOUR_CLOCK) },
         { STR(LANG_12_HOUR_CLOCK) }
     };
-    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat, 
+    return set_option(str(LANG_TIMEFORMAT), &global_settings.timeformat,
                       INT, names, 2, NULL);
 }
 #endif
@@ -1027,11 +1032,11 @@ static bool buffer_margin(void)
         { "5min", TALK_ID(5, UNIT_MIN) },
         { "10min", TALK_ID(10, UNIT_MIN) }
     };
-    
+
     ret = set_option(str(LANG_MP3BUFFER_MARGIN), &global_settings.buffer_margin,
                         INT, names, 8, NULL);
     audio_set_buffer_margin(global_settings.buffer_margin);
-    
+
     return ret;
 }
 #else
@@ -1044,7 +1049,7 @@ static bool buffer_margin(void)
 #endif
 
 static bool ff_rewind_min_step(void)
-{ 
+{
     static const struct opt_items names[] = {
         { "1s", TALK_ID(1, UNIT_SEC) },
         { "2s", TALK_ID(2, UNIT_SEC) },
@@ -1062,8 +1067,8 @@ static bool ff_rewind_min_step(void)
         { "60s", TALK_ID(60, UNIT_SEC) }
     };
     return set_option(str(LANG_FFRW_STEP), &global_settings.ff_rewind_min_step,
-                      INT, names, 14, NULL ); 
-} 
+                      INT, names, 14, NULL );
+}
 
 static bool set_fade_on_stop(void)
 {
@@ -1078,7 +1083,7 @@ static bool set_party_mode(void)
 #ifdef CONFIG_BACKLIGHT
 static bool set_bl_filter_first_keypress(void)
 {
-    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), 
+    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS),
                             &global_settings.bl_filter_first_keypress );
     set_backlight_filter_keypress(global_settings.bl_filter_first_keypress);
     return result;
@@ -1086,18 +1091,18 @@ static bool set_bl_filter_first_keypress(void)
 #ifdef HAVE_REMOTE_LCD
 static bool set_remote_bl_filter_first_keypress(void)
 {
-    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), 
+    bool result = set_bool( str(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS),
                             &global_settings.remote_bl_filter_first_keypress );
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
     return result;
 }
 #endif
-#endif 
+#endif
 
-static bool ff_rewind_accel(void) 
-{ 
+static bool ff_rewind_accel(void)
+{
     static const struct opt_items names[] = {
-        { STR(LANG_OFF) }, 
+        { STR(LANG_OFF) },
         { "2x/1s", TALK_ID(1, UNIT_SEC) },
         { "2x/2s", TALK_ID(2, UNIT_SEC) },
         { "2x/3s", TALK_ID(3, UNIT_SEC) },
@@ -1114,9 +1119,9 @@ static bool ff_rewind_accel(void)
         { "2x/14s", TALK_ID(14, UNIT_SEC) },
         { "2x/15s", TALK_ID(15, UNIT_SEC) }
     };
-    return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel, 
-                      INT, names, 16, NULL ); 
-} 
+    return set_option(str(LANG_FFRW_ACCEL), &global_settings.ff_rewind_accel,
+                      INT, names, 16, NULL );
+}
 
 static bool browse_current(void)
 {
@@ -1157,7 +1162,7 @@ static bool voice_menus(void)
 
 /* this is used 2 times below, so it saves memory to put it in global scope */
 static const struct opt_items voice_names[] = {
-    { STR(LANG_OFF) }, 
+    { STR(LANG_OFF) },
     { STR(LANG_VOICE_NUMBER) },
     { STR(LANG_VOICE_SPELL) },
     { STR(LANG_VOICE_DIR_HOVER) }
@@ -1165,7 +1170,7 @@ static const struct opt_items voice_names[] = {
 
 static bool voice_dirs(void)
 {
-    return set_option( str(LANG_VOICE_DIR), 
+    return set_option( str(LANG_VOICE_DIR),
                        &global_settings.talk_dir, INT, voice_names, 4, NULL);
 }
 
@@ -1173,11 +1178,11 @@ static bool voice_files(void)
 {
     int oldval = global_settings.talk_file;
     bool ret;
-    ret = set_option( str(LANG_VOICE_FILE), 
+    ret = set_option( str(LANG_VOICE_FILE),
                        &global_settings.talk_file, INT, voice_names, 4, NULL);
     if (oldval != 3 && global_settings.talk_file == 3)
-    {   /* force reload if newly talking thumbnails, 
-           because the clip presence is cached only if enabled */  
+    {   /* force reload if newly talking thumbnails,
+           because the clip presence is cached only if enabled */
         reload_directory();
     }
     return ret;
@@ -1297,9 +1302,9 @@ static bool codepage_setting(void)
 #if CONFIG_CODEC == SWCODEC
 static bool replaygain(void)
 {
-    bool result = set_bool(str(LANG_REPLAYGAIN_ENABLE), 
+    bool result = set_bool(str(LANG_REPLAYGAIN_ENABLE),
         &global_settings.replaygain);
-        
+
     dsp_set_replaygain(true);
     return result;
 }
@@ -1320,26 +1325,26 @@ static bool replaygain_mode(void)
 
 static bool replaygain_noclip(void)
 {
-    bool result = set_bool(str(LANG_REPLAYGAIN_NOCLIP), 
+    bool result = set_bool(str(LANG_REPLAYGAIN_NOCLIP),
         &global_settings.replaygain_noclip);
 
     dsp_set_replaygain(true);
     return result;
 }
 
-void replaygain_preamp_format(char* buffer, int buffer_size, int value, 
+void replaygain_preamp_format(char* buffer, int buffer_size, int value,
     const char* unit)
 {
     int v = abs(value);
-    
+
     snprintf(buffer, buffer_size, "%s%d.%d %s", value < 0 ? "-" : "",
         v / 10, v % 10, unit);
 }
 
 static bool replaygain_preamp(void)
 {
-    bool result = set_int(str(LANG_REPLAYGAIN_PREAMP), str(LANG_UNIT_DB), 
-        UNIT_DB, &global_settings.replaygain_preamp, NULL, 1, -120, 120, 
+    bool result = set_int(str(LANG_REPLAYGAIN_PREAMP), str(LANG_UNIT_DB),
+        UNIT_DB, &global_settings.replaygain_preamp, NULL, 1, -120, 120,
         replaygain_preamp_format);
 
     dsp_set_replaygain(true);
@@ -1374,10 +1379,10 @@ static bool crossfade(void)
     };
 
     bool ret;
-    
+
     ret=set_option( str(LANG_CROSSFADE_ENABLE),
                     &global_settings.crossfade, INT, names, 3, NULL);
-    
+
     audio_set_crossfade(global_settings.crossfade);
 
     return ret;
@@ -1436,7 +1441,7 @@ static bool crossfade_fade_out_mixmode(void)
     bool ret;
     ret=set_option( str(LANG_CROSSFADE_FADE_OUT_MODE),
                     &global_settings.crossfade_fade_out_mixmode, INT, names, 2, NULL);
-                   
+
     return ret;
 }
 
@@ -1475,7 +1480,7 @@ static bool beep(void)
     bool ret;
     ret=set_option( str(LANG_BEEP),
                     &global_settings.beep, INT, names, 4, NULL);
-        
+
     return ret;
 }
 #endif
@@ -1495,7 +1500,7 @@ static bool dircache(void)
 
     if (!result)
         dircache_disable();
-        
+
     return result;
 }
 
@@ -1549,7 +1554,7 @@ static bool playback_settings_menu(void)
     result = menu_run(m);
     menu_exit(m);
 
-    if ((old_shuffle != global_settings.playlist_shuffle) 
+    if ((old_shuffle != global_settings.playlist_shuffle)
         && (audio_status() & AUDIO_STATUS_PLAY))
     {
 #if CONFIG_CODEC == SWCODEC
@@ -1685,10 +1690,16 @@ static bool lcd_settings_menu(void)
 #endif
         { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_bl_filter_first_keypress },
 #endif /* CONFIG_BACKLIGHT */
+#ifndef HAVE_LCD_COLOR
         { ID2P(LANG_CONTRAST),        contrast },
+#endif
 #ifdef HAVE_LCD_BITMAP
+#ifndef HAVE_LCD_COLOR
         { ID2P(LANG_INVERT),          invert },
+#endif
+#ifdef HAVE_LCD_FLIP
         { ID2P(LANG_FLIP_DISPLAY),    flip_display },
+#endif
         { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
 #endif
 #ifdef HAVE_LCD_COLOR
@@ -1952,7 +1963,7 @@ bool settings_menu(void)
         { ID2P(LANG_LANGUAGE),         language_browse        },
         { ID2P(LANG_VOICE),            voice_menu             },
     };
-    
+
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);

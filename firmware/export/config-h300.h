@@ -12,6 +12,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176
