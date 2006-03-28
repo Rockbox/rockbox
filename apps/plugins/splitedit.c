@@ -585,7 +585,7 @@ static int copy_file(
         bytes_written = rb->write(dest, buffer, bytes_read);
 
         if (bytes_written < 0) {
-            rb->splash(0, true, "Write failed in copy. Error %d", errno);
+            rb->splash(0, true, "Write failed in copy.");
             rb->button_get(true);
             rb->button_get(true);
             return -1;
@@ -722,7 +722,7 @@ static int save(
             if (file2 >= 0)
             {
                 end = mp3->filesize - end;
-                copy_file(file2, src_file, end, y * 5 + 1, y -1);
+                int rc = copy_file(file2, src_file, end, y * 5 + 1, y -1);
                 close_stat = rb->close(file2);
 
                 if (close_stat != 0)
