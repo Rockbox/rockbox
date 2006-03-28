@@ -955,11 +955,11 @@ int P_SectorActive(special_e t,sector_t *sec)
       switch (t)             // return whether thinker of same type is active
       {
       case floor_special:
-         return (int)sec->floordata;
+         return (sec->floordata!=NULL);
       case ceiling_special:
-         return (int)sec->ceilingdata;
+         return (sec->ceilingdata!=NULL);
       case lighting_special:
-         return (int)sec->lightingdata;
+         return (sec->lightingdata!=NULL);
       }
    return 1; // don't know which special, must be active, shouldn't be here
 }
