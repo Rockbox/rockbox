@@ -562,13 +562,14 @@ static void generateFileName(char* file_name, int part_no)
  * Copy bytes from src to dest while displaying a progressbar.
  * The files must be already open.
  */
-static void copy_file(
+static int copy_file(
     int dest,
     int src,
     unsigned int bytes,
     int prg_y,
     int prg_h)
 {
+    long button;
     unsigned char *buffer;
     unsigned int i = 0;
     ssize_t bytes_read = 1; /* ensure the for loop is executed */
@@ -583,9 +584,27 @@ static void copy_file(
         bytes_read = rb->read(src, buffer, bytes_to_read);
         bytes_written = rb->write(dest, buffer, bytes_read);
 
+        if (bytes_written < 0) {
+            rb->splash(0, true, "Write failed in copy. Error %d", errno);
+            rb->button_get(true);
+            rb->button_get(true);
+            return -1;
+        }
+
+        button = rb->button_get(false);
+
+        if (button == SPLITEDIT_QUIT) {
+            rb->splash(0, true, "Aborting copy.");
+            rb->button_get(true);
+            rb->button_get(true);
+            return -1;
+        }
+
         rb->scrollbar(0, prg_y, LCD_WIDTH, prg_h, bytes, 0, i, HORIZONTAL);
         rb->lcd_update_rect(0, prg_y, LCD_WIDTH, prg_h);
     }
+
+    return 0;
 }
 
 /**
@@ -659,7 +678,7 @@ static int save(
             file1 = rb->open (file_name1, O_WRONLY | O_CREAT);
             if (file1 >= 0)
             {
-                copy_file(file1, src_file, end, y*2 + 1, y -1);
+                int rc = copy_file(file1, src_file, end, y*2 + 1, y -1);
                 close_stat = rb->close(file1);
 
                 if (close_stat != 0)
@@ -668,6 +687,11 @@ static int save(
                         "failed closing file1: error %d", close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
+                } else {
+                    /* If there was an error, cleanup */
+                    if (rc) {
+                        rb->remove(file_name1);
+                    }
                 }
             }
             else
@@ -707,6 +731,11 @@ static int save(
                         "failed: closing file2: error %d", close_stat);
                     rb->button_get(true);
                     rb->button_get(true);
+                } else {
+                    /* If there was an error, cleanup */
+                    if (rc) {
+                        rb->remove(file_name2);
+                    }
                 }
             }
             else
