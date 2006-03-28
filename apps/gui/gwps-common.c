@@ -803,6 +803,20 @@ static char* get_tag(struct wps_data* wps_data,
                     return buf;
                 }
 
+                case 's': /* sleep timer */
+                {
+                    if (get_sleep_timer() == 0)
+                    {
+                        return NULL;
+                    }
+                    else
+                    {
+                        gui_wps_format_time(buf, buf_size, \
+                                            get_sleep_timer() * 1000);
+                        return buf;
+                    }
+                }
+                
 #ifdef HAVE_CHARGING
                 case 'p': /* External power plugged in? */
                 {
