@@ -424,8 +424,6 @@ void init(void)
 #ifdef HAVE_CHARGING
     car_adapter_mode_init();
 #endif
-
-//    tlv320_device_init();
 }
 
 int main(void)
