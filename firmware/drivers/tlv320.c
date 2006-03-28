@@ -41,21 +41,7 @@ struct tlv320_info
     int vol_r;
 } tlv320;
 
-/* Definition of a playback configuration to start with */
-#define NUM_DEFAULT_REGS 10
-unsigned tlv320_defaults[2*NUM_DEFAULT_REGS] =
-{
-    REG_PC,         PC_ON | PC_OSC | PC_CLK | PC_DAC | ~PC_OUT,     /* do we need to enable osciliator and clock? */
-    REG_LLIV,       LLIV_LIM,                                       /* mute adc input */
-    REG_RLIV,       RLIV_RIM,                                       /* mute adc input */
-    REG_LHV,        LHV_LHV(HEADPHONE_MUTE),                        /* mute headphone */
-    REG_RHV,        RHV_RHV(HEADPHONE_MUTE),                        /* mute headphone */
-    REG_AAP,        AAP_MICM,                                       /* mute microphone */
-    REG_DAP,        DAP_DEEMP_DIS,                                  /* de-emphasis control: disabled */
-    REG_DAIF,       DAIF_FOR_I2S | DAIF_IWL_24 | ~DAIF_MS,          /* i2s with 24 bit data len and slave mode */
-    REG_SRC,        0,                                              /* ToDo */
-    REG_DIA,        DIA_ACT,                                        /* activate digital interface */
-};
+/* Shadow registers */
 unsigned tlv320_regs[0xf];
 
 void tlv320_write_reg(unsigned reg, unsigned value)
@@ -63,7 +49,8 @@ void tlv320_write_reg(unsigned reg, unsigned value)
     unsigned char data[3];
 
     data[0] = TLV320_ADDR;
-    data[1] = reg << 1;
+    /* The register address is the high 7 bits and the data the low 9 bits */
+    data[1] = (reg << 1) | ((value >> 8) & 1);
     data[2] = value & 0xff; 
 
     if (i2c_write(1, data, 3) != 3)
@@ -75,22 +62,6 @@ void tlv320_write_reg(unsigned reg, unsigned value)
     tlv320_regs[reg] = value;
 }
 
-/* Returns 0 if successful or -1 if some register failed */
-void tlv320_set_regs(void)
-{
-    int i;
-    memset(tlv320_regs, 0, sizeof(tlv320_regs));
-
-    /* Initialize all registers */
-    for (i=0; i<NUM_DEFAULT_REGS; i++)
-    {
-        unsigned reg = tlv320_defaults[i*2+0];
-        unsigned value = tlv320_defaults[i*2+1];
-
-        tlv320_write_reg(reg, value);
-    }
-}
-
 /* public functions */
 
 /**
@@ -98,8 +69,19 @@ void tlv320_set_regs(void)
  */
 void tlv320_init(void)
 {
-    tlv320_reset();
-    tlv320_set_regs();
+    memset(tlv320_regs, 0, sizeof(tlv320_regs));
+
+    /* Initialize all registers */
+
+    tlv320_write_reg(REG_PC, 0x00); /* All ON */
+    tlv320_set_linein_vol(0, 0);
+    tlv320_mute(true);
+    tlv320_write_reg(REG_AAP, AAP_DAC|AAP_MICM);
+    tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
+    tlv320_write_reg(REG_DAIF, DAIF_IWL_16|DAIF_FOR_I2S);
+    tlv320_set_headphone_vol(0, 0);
+    tlv320_write_reg(REG_DIA, DIA_ACT);
+    tlv320_write_reg(REG_SRC, SRC_CLKIN);
 }
 
 /**
@@ -108,18 +90,6 @@ void tlv320_init(void)
 void tlv320_reset(void)
 {
     tlv320_write_reg(REG_RR, RR_RESET);
-}
-
-void tlv320_enable_output(bool enable)
-{
-    unsigned value = tlv320_regs[REG_PC];
-
-    if (enable)
-        value |= PC_OUT;
-    else
-        value &= ~PC_OUT;
-
-    tlv320_write_reg(REG_PC, value);
 }
 
 /**
@@ -135,8 +105,8 @@ void tlv320_set_headphone_vol(int vol_l, int vol_r)
     tlv320.vol_r = vol_r;
 
     /* set new values in local register holders */
-    value_l |= LHV_LHV(vol_l);
-    value_r |= LHV_LHV(vol_r);
+    value_l = LHV_LHV(vol_l);
+    value_r = RHV_RHV(vol_r);
 
     /* update */
     tlv320_write_reg(REG_LHV, value_l);
@@ -169,13 +139,13 @@ void tlv320_mute(bool mute)
 
     if (mute)
     {
-        value_l |= LHV_LHV(HEADPHONE_MUTE);
-        value_r |= RHV_RHV(HEADPHONE_MUTE);
+        value_l = LHV_LHV(HEADPHONE_MUTE);
+        value_r = RHV_RHV(HEADPHONE_MUTE);
     }
     else
     {
-        value_l |= LHV_LHV(tlv320.vol_l);
-        value_r |= RHV_RHV(tlv320.vol_r);
+        value_l = LHV_LHV(tlv320.vol_l);
+        value_r = RHV_RHV(tlv320.vol_r);
     }
 
     tlv320_write_reg(REG_LHV, value_r);
