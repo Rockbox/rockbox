@@ -89,5 +89,5 @@ inline void* memcpy(void* dst, const void* src, size_t size);
 //#define SIMPLECHECKS
 #define NO_PREDEFINED_LUMPS
 #define TABLES_AS_LUMPS // This frees up alot of space in the plugin buffer
-#define FANCY_MENU  // This is a call to allow load_main_backdrop to run in doom
+//#define FANCY_MENU  // This is a call to allow load_main_backdrop to run in doom
 #endif

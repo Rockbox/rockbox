@@ -483,7 +483,6 @@ struct plugin_api {
 
     int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
     void *(*memchr)(const void *s1, int c, size_t n);
-    bool (*load_main_backdrop)(char* filename);
 };
 
 /* plugin header */

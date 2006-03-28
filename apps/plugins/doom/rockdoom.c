@@ -642,6 +642,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->lcd_setfont(0);
 
 #ifdef FANCY_MENU
+   /* TO FIX: Don't use load_main_backdrop() - use lcd_set_backdrop() */
    if(rb->load_main_backdrop(GAMEBASE"backdrop.bmp"))
       rb->lcd_set_foreground(LCD_RGBPACK(85,208,56));
 

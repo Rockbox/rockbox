@@ -414,7 +414,6 @@ static const struct plugin_api rockbox_api = {
 
     vsnprintf,
     memchr,
-    load_main_backdrop
 };
 
 int plugin_load(const char* plugin, void* parameter)
