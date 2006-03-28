@@ -1,94 +1,102 @@
 \subsection{Text Viewer}
-This is a Viewer for text files with word wrap. Just press PLAY on a
-.txt file to display it. Has controls to handle various styles of text
-formatting. Has top{}-of{}-file and bottom{}-of{}-file buttons.  You
-can view files without a .txt extension by using \textbf{Open with ..}
-from the Play Screen menu
+This is a Viewer for text files with word wrap. Just open a .txt file to
+display it. The text vewer features controls to handle various styles of text
+formatting, has top{}-of{}-file and bottom{}-of{}-file buttons. You can view
+files without a \fname{.txt} extension by using \textbf{Open with} from the
+\textbf{File Menu} (see page \pageref{ref:Filemenu}).
 
-\subsubsection{Controls}
-
-\begin{itemize}
-\item \textbf{F1 (Recorder) / ON{}-MINUS (Player): }
-toggles Word mode between Wrap and Chop:
+\subsubsection{Mode settings}
 
 \begin{itemize}
-\item Wrap breaks lines at white space or hyphen.
-\item Chop breaks lines at the maximum column limit.
+\item\textbf{Word mode} toggles between Wrap and Chop.
+    \begin{itemize}
+        \item\textbf{Wrap} breaks lines at white space or hyphen.
+        \item\textbf{Chop} breaks lines at the maximum column limit.
+    \end{itemize}  
+\item\textbf{Line mode} cycles through Normal, Join and Expand.
+    \begin{itemize}
+        \item\textbf{Normal} breaks lines at newline characters.
+        \item\textbf{Join} ignores unpaired newline characters  (i.e., joins lines). Useful for adopting the orphans that occur with e{}-mail style (i.e.,pre{}-wrapped) text files.
+        \item\textbf{Expand} doubles unpaired newlines (i.e., adds a blank line). Useful for making the paragraphs clearer in some book style text files.
+    \end{itemize}
+\item\textbf{View mode} toggles between Narrow and Wide.
+    \begin{itemize}
+        \item\textbf{Narrow} sets maximum column to the screen width.
+        \item\textbf{Wide} sets maximum column to 114. Useful for navigating large files. (Currently, Wide and Join cannot be selected together.)
+    \end{itemize}
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{
+\item\textbf{Page mode} toggles between Normal and Overlap.
+    \begin{itemize}
+        \item\textbf{Normal} sets page{}-down/page{}-up to one full screen.
+        \item\textbf{Overlap} tells page{}-down/page{}-up to retain one line from previous screen.    
+    \end{itemize}
+\item\textbf{Scrollbar mode} toggles scrollbar for the current View mode.
+    \begin{itemize}
+        \item\textbf{Narrow mode} has no scrollbar by default, until toggled.
+        \item\textbf{Wide mode} has a scrollbar by default, until toggled.
+    \end{itemize}
+}
 \end{itemize}
+Settings are not remembered after the viewer has been exited.
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{
+If file fits on one screen, there is no scrollbar and toggling Scrollbar mode has no effect.}
 
-\item \textbf{F2 (Recorder) / ON{}-MENU{}-PLUS (Player): }
-cycles Line mode through Normal, Join and Expand:
-
-\begin{itemize}
-\item Normal breaks lines at newline characters.
-\item Join ignores unpaired newline characters  (i.e., joins lines). Useful for
-adopting the orphans that occur with e{}-mail style (i.e.,pre{}-wrapped) text files.
-\item Expand doubles unpaired newlines (i.e., adds a blank line). Useful
-for making the paragraphs clearer in some book style text files.
-\end{itemize}
-
-\item \textbf{F3 (Recorder) / ON{}-PLUS (Player):} 
-toggles View mode between Narrow and Wide:
-
-\begin{itemize}
-\item Narrow sets maximum column to the screen width.
-\item Wide sets maximum column to 114. Useful for navigating large
-files. (Currently, Wide and Join cannot be selected together.)
-\end{itemize}
-
-\item \textbf{ON{}-F1 (Recorder):} 
-toggles Page mode between Normal and Overlap:
-
-\begin{itemize}
-\item Normal sets page{}-down/page{}-up to one full screen.
-\item Overlap tells page{}-down/page{}-up to retain one line from
-previous screen.
-\end{itemize}
-
-\item \textbf{ON{}-F3 (Recorder):} 
-toggles Scrollbar mode, for the current View mode.
-
-\begin{itemize}
-\item Narrow mode has no scrollbar by default, until toggled.
-\item Wide mode has a scrollbar by default, until toggled.
-\item If file fits on one screen, there is no scrollbar and ON{}-F3 has
-no effect.
-\end{itemize}
-\end{itemize}
-
-Settings are not remembered after the viewer has been exited. 
-Keys are as follows:
-
-\subsubsection{Recorder}
-
-\begin{table}[h!]
-\begin{tabular}{|c|c|}
-\hline
-KEY & ACTION \\\hline
-UP & Page{}-up (one screen up) \\\hline
-DOWN & Page{}-down (one screen down) \\\hline
-LEFT & Top of file (Narrow mode) One screen left (Wide mode) \\\hline
-RIGHT & Bottom of file (Narrow mode) One screen right (Wide mode) \\\hline
-ON{}-UP & One line up \\\hline
-ON{}-DOWN & One line down \\\hline
-ON{}-LEFT & One column left \\\hline
-ON{}-RIGHT & One column right \\\hline
-OFF & Exit text viewer \\\hline
-\end{tabular}
-\end{table}
-
-\subsubsection{Player}
-
-\begin{table}[h!]
-\begin{tabular}{|c|c|}
-\hline
-KEY & ACTION \\\hline
-MINUS & Page{}-up (one screen up) \\\hline
-PLUS & Page{}-down (one screen down) \\\hline
-MENU MINUS & Top of file (Narrow mode) One screen left (Wide mode) \\\hline
-MENU PLUS & Bottom of file (Narrow mode) One screen right (Wide mode) \\\hline
-STOP & Exit text viewer \\\hline
-\end{tabular}
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    \opt{PLAYER_PAD}{\ButtonLeft}\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp}\opt{IPOD_4G_PAD}{\ButtonScrollBack} & Page{}-up (one screen up)\\
+        
+    \opt{PLAYER_PAD}{\ButtonRight}\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonDown}\opt{IPOD_4G_PAD}{\ButtonScrollFwd} & Page{}-down (one screen down)\\
+        
+    \opt{PLAYER_PAD}{\ButtonMenu+\ButtonLeft}
+        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonLeft} & Top of file (Narrow mode) One screen left (Wide mode)\\
+        
+    \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight}
+        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonRight} & Bottom of file (Narrow mode) One screen right (Wide mode)\\
+        
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonUp & One line up\\}
+    
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonDown & One line down\\}
+    
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft & One column left\\}
+        
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight & One column right\\}
+        
+    \opt{PLAYER_PAD}{\ButtonOn+\ButtonLeft}\opt{RECORDER_PAD}{\ButtonFOne}
+        \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+        \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft}\opt{IAUDIO_X5_PAD}{\ButtonPlay}
+        & Toggles Word mode\\
+        
+    \opt{PLAYER_PAD}{\ButtonOn+\ButtonMenu+\ButtonRight}\opt{RECORDER_PAD}{\ButtonFTwo}
+        \opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp}\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+        \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}\opt{IAUDIO_X5_PAD}{Long press on \ButtonPlay}
+        & Cycles line mode\\
+        
+    \opt{PLAYER_PAD}{\ButtonOn+\ButtonRight}\opt{RECORDER_PAD}{\ButtonFThree}
+        \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+        \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonRight}
+        & Toggles view mode\\
+        
+    \opt{RECORDER_PAD}{\ButtonOn+\ButtonFOne & Toggles page mode\\}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown & Toggles page mode\\}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonMode & Toggles page mode\\}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu+\ButtonLeft & Toggles page mode\\}
+        
+    \opt{RECORDER_PAD}{\ButtonOn+\ButtonFThree & Toggles scrollbar mode\\}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff & Toggles scrollbar mode\\}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRec & Toggles scrollbar mode\\}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft+\ButtonRight & Toggles scrollbar mode\\}
+        
+    \opt{PLAYER_PAD}{\ButtonStop}\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
+        {\ButtonOff}\opt{IPOD_4G_PAD}{\ButtonMenu}\opt{IAUDIO_X5_PAD}{\ButtonPower}
+        & Exit text viewer\\\bottomrule
+    \end{tabular}
+    \end{center}
 \end{table}
 
 \subsubsection{Compatibility}
@@ -102,5 +110,3 @@ pretends all characters are the width of a lower{}-case 'o'.
 \item Currently messages are in English 
 \item Does not currently support right{}-to{}-left languages.
 \end{itemize}
-
-
