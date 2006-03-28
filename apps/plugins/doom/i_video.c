@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.1  2006/03/28 15:44:01  dave
+ * Revision 1.2  2006/03/28 17:20:49  christian
+ * added good (tm) button mappings for x5, and added ifdef for HAS_BUTTON_HOLD
+ *
+ * Revision 1.1  2006-03-28 15:44:01  dave
  * Patch #2969 - Doom!  Currently only working on the H300.
  *
  *
@@ -116,6 +119,16 @@ void I_GetEvent(void)
 #define DOOMBUTTON_SHOOT      BUTTON_PLAY
 #define DOOMBUTTON_ENTER      BUTTON_SELECT
 #define DOOMBUTTON_OPEN       BUTTON_MENU
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define DOOMBUTTON_UP      BUTTON_UP
+#define DOOMBUTTON_DOWN    BUTTON_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_SELECT
+#define DOOMBUTTON_OPEN    BUTTON_PLAY
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_ENTER   BUTTON_SELECT
+#define DOOMBUTTON_WEAPON  BUTTON_REC
 #else
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN
@@ -135,7 +148,7 @@ int getkey(event_t * event)
 
    static int released, pressed;
 
-#if CONFIG_KEYPAD == IRIVER_H300_PAD
+#ifdef HAS_BUTTON_HOLD
    static unsigned int holdbutton=0;
    static int hswitch=0;
    if (rb->button_hold()&~holdbutton)
