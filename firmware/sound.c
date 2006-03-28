@@ -72,7 +72,7 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_TLV320)
-    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   0,   6, sound_set_volume},
+    [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_WM8975)
