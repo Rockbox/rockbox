@@ -37,6 +37,8 @@
 #pragma interface
 #endif
 
+#include "plugin.h"
+
 /* Endianess handling. */
 
 /* cph - First the macros to do the actual byte swapping */
@@ -70,7 +72,7 @@
  * Use separate macros so network could be converted to big-endian later.
  */
 
-#ifdef __BIG_ENDIAN__
+#ifndef ROCKBOX_LITTLE_ENDIAN
 
 #define doom_wtohl(x) doom_swap_l(x)
 #define doom_htowl(x) doom_swap_l(x)

@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.1  2006/03/28 15:44:01  dave
+# Revision 1.2  2006/03/29 21:16:45  kkurbjun
+# Use rockbox endian defines
+#
+# Revision 1.1  2006-03-28 15:44:01  dave
 # Patch #2969 - Doom!  Currently only working on the H300.
 #
 # 
@@ -21,10 +24,6 @@ endif
 ifneq (,$(strip $(foreach tgt,IPOD_NANO IPOD_COLOR IPOD_VIDEO,$(findstring $(tgt),$(TARGET)))))
 ifndef SIMVER
     CFLAGS += -mstructure-size-boundary=8
-endif
-else
-ifndef SIMVER
-   CFLAGS += -D__BIG_ENDIAN__
 endif
 endif
 
