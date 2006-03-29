@@ -2139,9 +2139,9 @@ int show_menu(void) /* return 1 to quit */
             playback_control(rb);
             break;
         case 4:
-            MYLCD(clear_display)();
             break;
     }
+    MYLCD(clear_display)();
     rb->menu_exit(m);
     return 0;
 }
