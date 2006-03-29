@@ -52,6 +52,7 @@ static struct dircache_entry *fd_bindings[MAX_OPEN_FILES];
 static struct dircache_entry *dircache_root;
 
 static bool dircache_initialized = false;
+static bool dircache_initializing = false;
 static bool thread_enabled = false;
 static unsigned long allocated_size = DIRCACHE_LIMIT;
 static unsigned long dircache_size = 0;
@@ -63,6 +64,9 @@ static char dircache_cur_path[MAX_PATH];
 static struct event_queue dircache_queue;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char dircache_thread_name[] = "dircache";
+
+static struct fdbind_queue fdbind_cache[MAX_PENDING_BINDINGS];
+static int fdbind_idx = 0;
 
 /* --- Internal cache structure control functions --- */
 
@@ -446,12 +450,15 @@ static int dircache_do_rebuild(void)
 {
     struct fat_dir dir;
     unsigned int start_tick;
+    int i;
     
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
+    dircache_initializing = true;
     
     if ( fat_opendir(IF_MV2(volume,) &dir, 0, NULL) < 0 ) {
         logf("Failed opening root dir");
+        dircache_initializing = false;
         return -3;
     }
 
@@ -472,13 +479,21 @@ static int dircache_do_rebuild(void)
         logf("dircache_travel failed");
         cpu_boost(false);
         dircache_size = 0;
+        dircache_initializing = false;
         return -2;
     }
     cpu_boost(false);
 
     logf("Done, %d KiB used", dircache_size / 1024);
+    
     dircache_initialized = true;
+    dircache_initializing = false;
     cache_build_ticks = current_tick - start_tick;
+    
+    /* Initialized fd bindings. */
+    memset(fd_bindings, 0, sizeof(fd_bindings));
+    for (i = 0; i < fdbind_idx; i++)
+        dircache_bind(fdbind_cache[i].fd, fdbind_cache[i].path);
     
     if (thread_enabled)
     {
@@ -710,6 +725,18 @@ void dircache_copy_path(const struct dircache_entry *entry, char *buf, int size)
 }
 
 /* --- Directory cache live updating functions --- */
+static int block_until_ready(void)
+{
+    /* Block until dircache has been built. */
+    while (!dircache_initialized && dircache_initializing)
+        sleep(1);
+    
+    if (!dircache_initialized)
+        return -1;
+    
+    return 0;
+}
+
 static struct dircache_entry* dircache_new_entry(const char *path, int attribute)
 {
     struct dircache_entry *entry;
@@ -783,6 +810,18 @@ void dircache_bind(int fd, const char *path)
 {
     struct dircache_entry *entry;
     
+    /* Queue requests until dircache has been built. */
+    if (!dircache_initialized && dircache_initializing)
+    {
+        if (fdbind_idx >= MAX_PENDING_BINDINGS)
+            return ;
+        strncpy(fdbind_cache[fdbind_idx].path, path, 
+                sizeof(fdbind_cache[fdbind_idx].path)-1);
+        fdbind_cache[fdbind_idx].fd = fd;
+        fdbind_idx++;
+        return ;
+    }
+    
     if (!dircache_initialized)
         return ;
 
@@ -816,7 +855,7 @@ void dircache_update_filesize(int fd, long newsize, long startcluster)
 
 void dircache_mkdir(const char *path)
 { /* Test ok. */
-    if (!dircache_initialized)
+    if (block_until_ready())
         return ;
         
     logf("mkdir: %s", path);
@@ -827,7 +866,7 @@ void dircache_rmdir(const char *path)
 { /* Test ok. */
     struct dircache_entry *entry;
     
-    if (!dircache_initialized)
+    if (block_until_ready())
         return ;
         
     logf("rmdir: %s", path);
@@ -848,7 +887,7 @@ void dircache_remove(const char *name)
 { /* Test ok. */
     struct dircache_entry *entry;
     
-    if (!dircache_initialized)
+    if (block_until_ready())
         return ;
         
     logf("remove: %s", name);
@@ -872,7 +911,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
     char absolute_path[MAX_PATH];
     char *p;
     
-    if (!dircache_initialized)
+    if (block_until_ready())
         return ;
         
     logf("rename: %s->%s", oldpath, newpath);
@@ -927,9 +966,9 @@ void dircache_add_file(const char *path, long startcluster)
 {
     struct dircache_entry *entry;
     
-    if (!dircache_initialized)
+    if (block_until_ready())
         return ;
-        
+    
     logf("add file: %s", path);
     entry = dircache_new_entry(path, 0);
     if (entry == NULL)

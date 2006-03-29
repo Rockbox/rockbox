@@ -46,6 +46,12 @@ struct dircache_maindata {
     struct dircache_entry *root_entry;
 };
 
+#define MAX_PENDING_BINDINGS 2
+struct fdbind_queue {
+    char path[MAX_PATH];
+    int fd;
+};
+
 /* Exported structures. */
 struct dircache_entry {
     struct dircache_entry *next;
