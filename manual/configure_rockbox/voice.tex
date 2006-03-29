@@ -1,20 +1,19 @@
-   \subsection{\label{ref:Voiceconfiguration}Voice}
+  \subsection{\label{ref:Voiceconfiguration}Voice}
   
   \begin{itemize}
-  \item \textbf{Voice Menus}
-    This option turns on the Voice User Interface, which will read out menu items and settings as they are selected by the cursor.  In order for this to work, a voice file must be present in the \textbf{/.rockbox/lang/} directory on the \dap.  Voice files are large (1.5MB) and are not shipped with Rockbox by default.
+  \item \textbf{Voice Menus:}
+    This option turns on the Voice User Interface, which will read out menu items and settings as they are selected by the cursor.  In order for this to work, a voice file must be present in the \textbf{/.rockbox/lang/} directory on the \dap\.  Voice files are large (1.5MB) and are not shipped with Rockbox by default.
     The voice file is the name of the language for which it is made, followed by the extension .voice.  So for English, the file name would be \fname{english.voice}.
-    This option is on by default.  It will do nothing unless the appropriate .voice file is installed in the correct place on the \dap.
-    \begin{itemize}
-    \item \textbf{Limitations}
+    This option is on by default.  It will do nothing unless the appropriate .voice file is installed in the correct place on the \dap\.
+  
+    \textbf{Limitations}
       \begin{itemize}
       \item Setting the Sound Option \textbf{Channels} to ``karaoke'' may disable voice menus.
       \item Plugins and the wake up alarm do not support voice features.
       \end{itemize}
-  	\end{itemize}
-    
-  \item \textbf{Voice Directories}
-    This option turns on the speaking of directory names.  The \dap is not powerful enough to produce these voices in real time, so a number of options are available.
+  
+  \item \textbf{Voice Directories:}
+    This option turns on the speaking of directory names.  The \dap\ is not powerful enough to produce these voices in real time, so a number of options are available.
     \begin{itemize}
     \item \textbf{.talk mp3 clip: }
       Use special pre{}-recorded MP3 files (\fname{\_dirname.talk}) in each directory.  These must be generated in advance, and are typically produced synthetically using a text to speech engine on a PC.  If no such file exists, the output is as for the ``numbers'' option below.
@@ -26,8 +25,7 @@
       No attempt will be made to speak directory names.
     \end{itemize}
     
-  \item \textbf{Voice Filenames}
-    This option turns on the speaking of directory names.  The options provided are ``Spell'', ``Numbers'', and ``Off'' which function the same as for \textbf{Voice Directories} and ``.talk mp3 clip'', which functions as above except that the files are named with the same name as the music file (e.g. \fname{Punkadiddle.mp3 } would require a file called \textbf{Punkadiddle.mp3.talk}).
-\end{itemize}
+  \item \textbf{Voice Filenames:}
+    This option turns on the speaking of directory names.  The options provided are ``Spell'', ``Numbers'', and ``Off'' which function the same as for \textbf{Voice Directories} and ``.talk mp3 clip,'' which functions as above except that the files are named with the same name as the music file (e.g. \fname{Punkadiddle.mp3 } would require a file called \textbf{Punkadiddle.mp3.talk}).
+	\end{itemize}
 See \url{http://www.rockbox.org/twiki/bin/view/Main/VoiceHowto} for more details on configuring speech support in Rockbox.
-

@@ -1,10 +1,21 @@
   \subsection{\label{ref:Bookmarkconfigactual}Bookmarking}
-  
+  Bookmarks allow you to save your current position within a track so that you can return to it at a later time.
+
+	Bookmarks are saved on a per folder basis. In other words, all of the files in the same folder have their bookmarks stored together in the folder where the files are located. You can store multiple bookmarks for the same track.
   \begin{itemize}
-  \item \textbf{Bookmark on Stop}
-    Write a bookmark to the disk whenever the stop key is pressed.  If playback is stopped it can be resumed easily at a later time. The \textbf{Resume} function remembers your position in the most recently accessed track regardless of this setting.
-  \item \textbf{Load Last Bookmark}
-    When this is on, Rockbox automatically returns to the position of the last bookmark within a file when it is played.  If set to Ask, Rockbox will ask the user whether they want to start from the beginning or the bookmark.  When set to no, playback always starts from the beginning and the Bookmark file must be played or \textbf{Load Bookmark} selected from the \textbf{Bookmarks} submenu of the Main Menu while the file is playing.
-  \item \textbf{Maintain a list of Recently Used Bookmarks}
-    If this option is turned on, Rockbox will store a list of Bookmarks that have been accessed recently.  This is then accessible from the \textbf{Recent Bookmarks} option of the \textbf{Bookmarks} submenu of the Main Menu.
+  \item \textbf{Bookmark on Stop:  }
+  	This option controls whether Rockbox writes a bookmark to the disk when the STOP button is pressed.  The options are:
+  	\begin{itemize}
+  	\item \textbf{Ask:  }Causes a prompt to be displayed whenever you press STOP, asking if you wish to 'Create a bookmark?'
+  	\item \textbf{Yes:  }Turns on automatic bookmarking.
+  	\item \textbf{No:  }Turns off automatic bookmarking.
+  	\item \textbf{Ask - Recent Only:  }TODO
+  	\item \textbf{Yes - Recent Only:  }TODO
+		\end{itemize}
+		\textbf{Note:  }The \textbf{Resume} function remembers your position in the most recently accessed track regardless of how the \textbf{Bookmark on Stop} option is set.
+    
+  \item \textbf{Load Last Bookmark:}
+    When the \textbf{Load Last Bookmark} option is set to YES, Rockbox automatically returns to the position of the last bookmark within a file when that file is played. When the \textbf{Load Last Bookmark} option is set to ASK, Rockbox will give the user the option of starting from the beginning of the track of or from the bookmark. When the \textbf{Load Last Bookmark} option is set to NO, playback always starts from the beginning of the track, and the user must play the bookmark or use the \textbf{Load Bookmark} function in the Main Menu, while the file is playing, to resume at the bookmarked location.
+  \item \textbf{Maintain a list of Recently Used Bookmarks:}
+    If this option is set to YES, Rockbox will store a list of bookmarks that have been accessed recently.  This list of bookmarks may be accessed through the \textbf{Recent Bookmarks} option of the \textbf{Bookmarks} submenu of the Main Menu.  If this option is set to UNIQUTE ONLY, (TODO--what does this mean?).  If this option is set to NO, Rockbox will not store a list of recent bookmarks; instead, the user must navigate to the folder containing the bookmark and play the bookmark to load it.
   \end{itemize}
