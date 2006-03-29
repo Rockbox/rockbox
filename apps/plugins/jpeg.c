@@ -2075,7 +2075,7 @@ void cleanup(void *parameter)
 #define ZOOM_IN  100 /* return codes for below function */
 #define ZOOM_OUT 101
 
-int show_menu() /* return 1 to quit */
+int show_menu(void) /* return 1 to quit */
 {
     int m;
     int result;
