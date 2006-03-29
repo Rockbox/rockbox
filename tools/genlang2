@@ -486,6 +486,11 @@ for $i (0x8000 .. ($voiceid-1)) {
         
         $dest =~ s:\"$:\\0\":; # insert a \0 before the second quote
 
+        if(!$dest) {
+            # this is just to be on the safe side
+            $dest = '"\0"';
+        }
+
         printf CFILE ("    %s\n", $dest);
     }
 
