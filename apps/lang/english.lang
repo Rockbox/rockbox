@@ -3887,3 +3887,14 @@ eng: "Precut"
 voice: "Pre-cut"
 new:
 
+id: LANG_KEYBOARD_LOADED
+desc: shown when a keyboard has been loaded from the dir browser
+eng: "New Keyboard"
+voice: ""
+new:
+
+id: VOICE_EXT_KBD
+desc: spoken only, for file extension
+eng: ""
+voice: "keyboard"
+new:

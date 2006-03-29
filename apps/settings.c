@@ -916,6 +916,11 @@ int settings_save( void )
             MAX_FILENAME);
     i+= MAX_FILENAME;
 #endif
+#ifdef HAVE_LCD_BITMAP
+    strncpy((char *)&config_block[i], (char *)global_settings.kbd_file,
+            MAX_FILENAME);
+    i+= MAX_FILENAME;
+#endif
 
     if(save_config_buffer())
     {
@@ -1108,6 +1113,15 @@ void settings_apply(void)
     else
         font_reset();
 
+    if ( global_settings.kbd_file[0] &&
+         global_settings.kbd_file[0] != 0xff ) {
+        snprintf(buf, sizeof buf, ROCKBOX_DIR "/%s.kbd",
+                 global_settings.kbd_file);
+        load_kbd(buf);
+    }
+    else
+        load_kbd(NULL);
+
     lcd_scroll_step(global_settings.scroll_step);
     gui_list_screen_scroll_step(global_settings.screen_scroll_step);
     gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
@@ -1250,6 +1264,11 @@ void settings_load(int which)
 #endif
 #ifdef HAVE_LCD_COLOR
         strncpy((char *)global_settings.backdrop_file, (char *)&config_block[i],
+                MAX_FILENAME);
+        i+= MAX_FILENAME;
+#endif
+#ifdef HAVE_LCD_BITMAP
+        strncpy((char *)global_settings.kbd_file, (char *)&config_block[i],
                 MAX_FILENAME);
         i+= MAX_FILENAME;
 #endif
@@ -1425,6 +1444,12 @@ bool settings_load_config(const char* file)
                 set_file(value, (char *)global_settings.backdrop_file, MAX_FILENAME);
         }
 #endif
+#ifdef HAVE_LCD_BITMAP
+        else if (!strcasecmp(name, "keyboard")) {
+            if (!load_kbd(value))
+                set_file(value, (char *)global_settings.kbd_file, MAX_FILENAME);
+        }
+#endif
 
 
         /* check for scalar values, using the two tables */
@@ -1583,6 +1608,12 @@ bool settings_save_config(void)
                  global_settings.backdrop_file);
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+    if (global_settings.kbd_file[0] != 0)
+        fdprintf(fd, "keyboard: %s/%s.kbd\r\n", ROCKBOX_DIR,
+                 global_settings.kbd_file);
+#endif
+
     /* here's the action: write values to file, specified via table */
     save_cfg_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), fd);
     save_cfg_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), fd);
@@ -1665,6 +1696,9 @@ void settings_reset(void) {
       
     global_settings.fg_color = LCD_DEFAULT_FG;
     global_settings.bg_color = LCD_DEFAULT_BG;
+#endif
+#ifdef HAVE_LCD_BITMAP
+    global_settings.kbd_file[0] = '\0';
 #endif
 
 }

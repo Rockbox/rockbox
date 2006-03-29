@@ -110,6 +110,7 @@ const struct filetype filetypes[] = {
     { "rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP
     { "fnt", TREE_ATTR_FONT,Icon_Font, VOICE_EXT_FONT },
+    { "kbd", TREE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
 #endif
     { "bmark",TREE_ATTR_BMARK, Icon_Bookmark, VOICE_EXT_BMARK },
 #ifdef BOOTFILE_EXT

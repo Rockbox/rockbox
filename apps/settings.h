@@ -481,6 +481,10 @@ struct user_settings
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
 #endif
 #endif
+
+#ifdef HAVE_LCD_BITMAP
+    unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */
+#endif
 };
 
 enum optiontype { INT, BOOL };

@@ -241,6 +241,7 @@ struct tree_context {
 #define TREE_ATTR_MOD   0x0900 /* firmware file */
 #define TREE_ATTR_RWPS  0x1000 /* remote-wps config file */
 #define TREE_ATTR_BMP   0x1100 /* backdrop bmp file */
+#define TREE_ATTR_KBD   0x1200 /* keyboard file */
 #define TREE_ATTR_MASK  0xFF00 /* which bits tree.c uses for file types */
 
 void tree_get_filetypes(const struct filetype**, int*);

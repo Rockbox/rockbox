@@ -41,6 +41,9 @@
 #include "dircache.h"
 #include "splash.h"
 #include "yesno.h"
+#ifdef HAVE_LCD_BITMAP
+#include "keyboard.h"
+#endif
 
 #ifndef SIMULATOR
 static int boot_size = 0;
@@ -461,6 +464,12 @@ int ft_enter(struct tree_context* c)
             case TREE_ATTR_FONT:
                 font_load(buf);
                 set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
+                break;
+
+            case TREE_ATTR_KBD:
+                if (!load_kbd(buf))
+                    gui_syncsplash(HZ, true, str(LANG_KEYBOARD_LOADED));
+                set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
                 break;
 #endif
 

@@ -63,6 +63,7 @@ drivers/lcd-player.c
 #ifdef HAVE_LCD_BITMAP
 arabjoin.c
 bidi.c
+hangul.c
 #if LCD_DEPTH == 1
 drivers/lcd-recorder.c
 #elif LCD_DEPTH == 2

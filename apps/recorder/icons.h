@@ -56,6 +56,7 @@ enum icons_6x8 {
     Icon_Bookmark,
     Icon_Queued,
     Icon_Moving,
+    Icon_Keyboard,
     Icon6x8Last
 };
 
