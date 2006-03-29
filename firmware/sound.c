@@ -73,8 +73,6 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_TLV320)
     [SOUND_VOLUME]        = {"dB", 0,  1, -73,   6, -20, sound_set_volume},
-    [SOUND_BASS]          = {"dB", 0,  2,   0,  24,   0, sound_set_bass},
-    [SOUND_TREBLE]        = {"dB", 0,  2,   0,   6,   0, sound_set_treble},
 #elif defined(HAVE_WM8975)
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
@@ -432,9 +430,10 @@ int current_bass = 0;      /* -150..+150     0..+240 */
 
 static void set_prescaled_volume(void)
 {
-    int prescale;
+    int prescale = 0;
     int l, r;
 
+#ifndef HAVE_TLV320
     prescale = MAX(current_bass, current_treble);
     if (prescale < 0)
         prescale = 0;  /* no need to prescale if we don't boost
@@ -445,7 +444,8 @@ static void set_prescaled_volume(void)
      * instead (might cause clipping). */
     if (current_volume + prescale > VOLUME_MAX)
         prescale = VOLUME_MAX - current_volume;
-
+#endif
+    
 #if CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
 #elif defined(HAVE_UDA1380)
@@ -608,7 +608,8 @@ void sound_set_balance(int value)
     unsigned tmp = ((unsigned)(value * 127 / 100) & 0xff) << 8;
     mas_codec_writereg(0x11, tmp);
 #elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 || \
-      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731
+      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 || \
+      defined(HAVE_TLV320)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
@@ -617,6 +618,7 @@ void sound_set_balance(int value)
 #endif
 }
 
+#ifndef HAVE_TLV320
 void sound_set_bass(int value)
 {
     if(!audio_is_initialized)
@@ -666,6 +668,7 @@ void sound_set_treble(int value)
     (void)value;
 #endif    
 }
+#endif /* HAVE_TLV320 */
 
 void sound_set_channels(int value)
 {

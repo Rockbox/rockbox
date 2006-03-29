@@ -112,6 +112,7 @@ static bool balance(void)
                      SOUND_BALANCE);
 }
 
+#ifndef HAVE_TLV320
 static bool bass(void)
 {
     return set_sound(str(LANG_BASS), &global_settings.bass, SOUND_BASS);
@@ -121,6 +122,7 @@ static bool treble(void)
 {
     return set_sound(str(LANG_TREBLE), &global_settings.treble, SOUND_TREBLE);
 }
+#endif
 
 #if CONFIG_CODEC == SWCODEC
 static bool crossfeed(void)
@@ -404,8 +406,10 @@ bool sound_menu(void)
     bool result;
     static const struct menu_item items[] = {
         { ID2P(LANG_VOLUME), volume },
+#ifndef HAVE_TLV320
         { ID2P(LANG_BASS), bass },
         { ID2P(LANG_TREBLE), treble },
+#endif
         { ID2P(LANG_BALANCE), balance },
         { ID2P(LANG_CHANNEL_MENU), chanconf },
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
