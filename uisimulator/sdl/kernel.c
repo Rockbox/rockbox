@@ -59,7 +59,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 
     while(q->read == q->write && TIME_BEFORE( current_tick, timeout ))
     {
-        sleep(1);
+        sim_sleep(1);
     }
 
     if(q->read != q->write)
