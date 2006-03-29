@@ -11,7 +11,7 @@
 * (This is a real mess if it has to be coded in one single C file)
 *
 * File scrolling addition (C) 2005 Alexander Spyridakis
-* Copyright (C) 2004 Jörg Hohensohn aka [IDC]Dragon
+* Copyright (C) 2004 Jï¿½g Hohensohn aka [IDC]Dragon
 * Grayscale framework (C) 2004 Jens Arnold
 * Heavily borrowed from the IJG implementation (C) Thomas G. Lane
 * Small & fast downscaling IDCT (C) 2002 by Guido Vollbeding  JPEGclub.org
@@ -25,6 +25,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "playback_control.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
@@ -40,9 +41,9 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_OFF
 #define JPEG_NEXT BUTTON_F3
 #define JPEG_PREVIOUS BUTTON_F2
+#define JPEG_MENU BUTTON_OFF
 
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -53,9 +54,9 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_OFF
 #define JPEG_NEXT (BUTTON_MENU | BUTTON_RIGHT)
 #define JPEG_PREVIOUS (BUTTON_MENU | BUTTON_LEFT)
+#define JPEG_MENU BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -65,7 +66,6 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_OFF
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD)
 #define JPEG_NEXT BUTTON_ON
 #define JPEG_PREVIOUS BUTTON_REC
@@ -73,6 +73,7 @@ PLUGIN_HEADER
 #define JPEG_NEXT BUTTON_REC
 #define JPEG_PREVIOUS BUTTON_ON
 #endif
+#define JPEG_MENU BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define JPEG_ZOOM_IN BUTTON_SCROLL_FWD
@@ -81,8 +82,10 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_PLAY
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define JPEG_NEXT (BUTTON_SELECT | BUTTON_RIGHT)
+#define JPEG_MENU (BUTTON_SELECT | BUTTON_MENU)
+#define JPEG_NEXT_PRE (BUTTON_SELECT | BUTTON_RIGHT)
+#define JPEG_NEXT (BUTTON_SELECT | BUTTON_RIGHT | BUTTON_REL)
+#define JPEG_TOGGLE_SLIDESHOW (BUTTON_SELECT | BUTTON_RIGHT | BUTTON_REPEAT)
 #define JPEG_PREVIOUS (BUTTON_SELECT |BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
@@ -93,8 +96,10 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_POWER
-#define JPEG_NEXT BUTTON_PLAY
+#define JPEG_MENU BUTTON_POWER
+#define JPEG_NEXT_PRE BUTTON_PLAY
+#define JPEG_NEXT (BUTTON_PLAY|BUTTON_REL)
+#define JPEG_TOGGLE_SLIDESHOW (BUTTON_PLAY|BUTTON_REPEAT)
 #define JPEG_PREVIOUS BUTTON_REC
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
@@ -105,7 +110,7 @@ PLUGIN_HEADER
 #define JPEG_DOWN BUTTON_DOWN
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
-#define JPEG_QUIT BUTTON_A
+#define JPEG_MENU BUTTON_A
 #define JPEG_NEXT (BUTTON_POWER | BUTTON_RIGHT)
 #define JPEG_PREVIOUS (BUTTON_POWER | BUTTON_LEFT)
 
@@ -126,12 +131,12 @@ PLUGIN_HEADER
 #define MAX_X_SIZE LCD_WIDTH*8
 
 /* Min memory allowing us to use the plugin buffer
- * and thus not stopping the music 
+ * and thus not stopping the music
  * *Very* rough estimation:
  * Max 10 000 dir entries * 4bytes/entry (char **) = 40000 bytes
- * + 20k code size = 60 000 
+ * + 20k code size = 60 000
  * + 50k min for jpeg = 120 000
- */ 
+ */
 #define MIN_MEM 120000
 
 /* Headings */
@@ -151,7 +156,8 @@ static struct plugin_api* rb;
 #define INLINE static inline
 #define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
 
-
+static int slideshow_enabled = false;
+static int  button_timeout = HZ*5;
 
 /**************** begin JPEG code ********************/
 
@@ -1135,7 +1141,7 @@ void build_lut(struct jpeg* p_jpeg)
 
     for (i=0; i<4; i++)
         p_jpeg->store_pos[i] = i; /* default ordering */
-    
+
     /* assignments for the decoding of blocks */
     if (p_jpeg->frameheader[0].horizontal_sampling == 2
         && p_jpeg->frameheader[0].vertical_sampling == 1)
@@ -1276,7 +1282,7 @@ INLINE void check_bit_buffer(struct bitstream* pb, int nbits)
             pb->next_input_byte++;
         }
         pb->get_buffer = (pb->get_buffer << 8) | byte;
-        
+
         pb->bits_left += 16;
     }
 }
@@ -1570,11 +1576,11 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[3],
             p_byte[0] += skip_mcu[0]; /* unrolled for (i=0; i<3; i++) loop */
             p_byte[1] += skip_mcu[1];
             p_byte[2] += skip_mcu[2];
-            if (p_jpeg->restart_interval && --restart == 0) 
+            if (p_jpeg->restart_interval && --restart == 0)
             {   /* if a restart marker is due: */
                 restart = p_jpeg->restart_interval; /* count again */
                 search_restart(&bs); /* align the bitstream */
-                last_dc_val[0] = last_dc_val[1] = 
+                last_dc_val[0] = last_dc_val[1] =
                                  last_dc_val[2] = 0; /* reset decoder */
             }
         } /* for x */
@@ -1731,12 +1737,12 @@ int jpeg_decode(struct jpeg* p_jpeg, unsigned char* p_pixel[1], int downscale,
 
                 if (ci == 0)
                 {   /* only for Y component */
-                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti], 
+                    pf_idct(p_byte+store_offs[blkn], block, p_jpeg->qt_idct[ti],
                         skip_line);
                 }
             } /* for blkn */
             p_byte += skip_mcu;
-            if (p_jpeg->restart_interval && --restart == 0) 
+            if (p_jpeg->restart_interval && --restart == 0)
             {   /* if a restart marker is due: */
                 restart = p_jpeg->restart_interval; /* count again */
                 search_restart(&bs); /* align the bitstream */
@@ -1784,11 +1790,11 @@ char print[32]; /* use a common snprintf() buffer */
 unsigned char* buf; /* up to here currently used by image(s) */
 
 /* the remaining free part of the buffer for compressed+uncompressed images */
-unsigned char* buf_images; 
+unsigned char* buf_images;
 
 int buf_size, buf_images_size;
 /* the root of the images, hereafter are decompresed ones */
-unsigned char* buf_root; 
+unsigned char* buf_root;
 int root_size;
 
 int ds, ds_min, ds_max; /* downscaling and limits */
@@ -1834,7 +1840,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -1855,7 +1861,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
 
     dst = rb->lcd_framebuffer + LCD_WIDTH * y + x;
     dst_end = dst + LCD_WIDTH * height;
-    
+
     do
     {
         fb_data *dst_row = dst;
@@ -1880,7 +1886,7 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
             rc = RVFAC * v + ROUNDOFFS;
             gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
             bc = BUFAC * u + ROUNDOFFS;
-            
+
             do
             {
                 y = *ysrc++;
@@ -1947,11 +1953,11 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
             }
             while (dst_row < row_end);
         }
-        
+
         src_y++;
         dst += LCD_WIDTH;
     }
-    while (dst < dst_end);    
+    while (dst < dst_end);
 }
 #endif
 
@@ -1968,7 +1974,7 @@ bool jpg_ext(const char ext[])
        !rb->strcasecmp(ext,".jpe") ||
        !rb->strcasecmp(ext,".jpeg"))
             return true;
-    else 
+    else
             return false;
 }
 
@@ -1977,9 +1983,9 @@ void get_pic_list(void)
 {
     int i;
     long int str_len = 0;
-    char *pname; 
+    char *pname;
     tree = rb->tree_get_context();
-    
+
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
     file_pt = rb->plugin_get_buffer(&buf_size);
 #else
@@ -1989,17 +1995,17 @@ void get_pic_list(void)
     for(i = 0; i < tree->filesindir; i++)
     {
         if(jpg_ext(rb->strrchr(&tree->name_buffer[str_len],'.')))
-            file_pt[entries++] = &tree->name_buffer[str_len];            
+            file_pt[entries++] = &tree->name_buffer[str_len];
 
         str_len += rb->strlen(&tree->name_buffer[str_len]) + 1;
     }
-    
+
     rb->qsort(file_pt, entries, sizeof(char**), compare);
 
     /* Remove path and leave only the name.*/
     pname = rb->strrchr(np_file,'/');
     pname++;
-    
+
     /* Find Selected File. */
     for(i = 0; i < entries; i++)
         if(!rb->strcmp(file_pt[i], pname))
@@ -2010,7 +2016,7 @@ int change_filename(int direct)
 {
     int count = 0;
     direction = direct;
-    
+
     if(direct == DIR_PREV)
     {
         do
@@ -2021,21 +2027,21 @@ int change_filename(int direct)
             else
                 curfile--;
         }while(file_pt[curfile] == '\0' && count < entries);
-        /* we "erase" the file name if  we encounter 
+        /* we "erase" the file name if  we encounter
          * a non-supported file, so skip it now */
     }
     else /* DIR_NEXT/DIR_NONE */
     {
         do
         {
-            count++;    
+            count++;
             if(curfile == entries - 1)
                 curfile = 0;
             else
                 curfile++;
         }while(file_pt[curfile] == '\0' && count < entries);
     }
-    
+
     if(count == entries && file_pt[curfile] == '\0')
     {
         rb->splash(HZ,true,"No supported files");
@@ -2049,7 +2055,7 @@ int change_filename(int direct)
     else
         rb->strcpy(np_file, tree->currdir);
 
-    rb->strcat(np_file, file_pt[curfile]);   
+    rb->strcat(np_file, file_pt[curfile]);
 
     return PLUGIN_OTHER;
 }
@@ -2060,15 +2066,85 @@ void cleanup(void *parameter)
     (void)parameter;
 #ifdef USEGSLIB
     gray_show(false);
-#endif 
+#endif
 }
 
 #define VSCROLL (LCD_HEIGHT/8)
 #define HSCROLL (LCD_WIDTH/10)
-                             
+
 #define ZOOM_IN  100 /* return codes for below function */
 #define ZOOM_OUT 101
 
+int show_menu() /* return 1 to quit */
+{
+    int m;
+    int result;
+    static const struct menu_item items[] = {
+        { "Quit", NULL },
+        { "Toggle Slideshow Mode", NULL },
+        { "Change Slideshow Timeout", NULL },
+        { "Show Playback Menu", NULL },
+        { "Return", NULL },
+    };
+    static const struct opt_items slideshow[2] = {
+        {"Disable",NULL},
+        {"Enable",NULL},
+    };
+    static const struct opt_items timeout[12] = {
+        { "1 second", NULL },
+        { "2 seconds", NULL },
+        { "3 seconds", NULL },
+        { "4 seconds", NULL },
+        { "5 seconds", NULL },
+        { "6 seconds", NULL },
+        { "7 seconds", NULL },
+        { "8 seconds", NULL },
+        { "9 seconds", NULL },
+        { "10 seconds", NULL },
+        { "15 seconds", NULL },
+        { "20 seconds", NULL },
+    };
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                      NULL, NULL, NULL, NULL);
+    result=rb->menu_show(m);
+    switch (result)
+    {
+        case 0:
+            rb->menu_exit(m);
+            return 1;
+            break;
+        case 1: //toggle slideshow
+            rb->set_option("Toggle Slideshow", &slideshow_enabled, INT,
+                           slideshow , 2, NULL);
+            break;
+        case 2:
+            switch (button_timeout/HZ)
+            {
+                case 10: result = 9; break;
+                case 15: result = 10; break;
+                case 20: result = 11; break;
+                default: result = (button_timeout/HZ)-1; break;
+            }
+            rb->set_option("Slideshow Timeout", &result, INT,
+                           timeout , 12, NULL);
+            switch (result)
+            {
+                case 9: button_timeout = 10*HZ; break;
+                case 10: button_timeout = 15*HZ; break;
+                case 11: button_timeout = 20*HZ; break;
+                default: button_timeout = (result+1)*HZ; break;
+            }
+            break;
+        case 3:
+            playback_control(rb);
+            break;
+        case 4:
+            MYLCD(clear_display)();
+            break;
+    }
+    rb->menu_exit(m);
+    return 0;
+}
 /* interactively scroll around the image */
 int scroll_bmp(struct t_disp* pdisp)
 {
@@ -2079,13 +2155,15 @@ int scroll_bmp(struct t_disp* pdisp)
         int button;
         int move;
 
-        button = rb->button_get(true);
-        
+        if (slideshow_enabled)
+            button = rb->button_get_w_tmo(button_timeout);
+        else button = rb->button_get(true);
+
         switch(button)
         {
         case JPEG_LEFT:
             if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
-                return change_filename(DIR_PREV);                
+                return change_filename(DIR_PREV);
         case JPEG_LEFT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->x);
             if (move > 0)
@@ -2094,7 +2172,7 @@ int scroll_bmp(struct t_disp* pdisp)
                 pdisp->x -= move;
 #ifdef HAVE_LCD_COLOR
                 yuv_bitmap_part(
-                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y, 
+                    pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
                     pdisp->x, pdisp->y, pdisp->stride,
                     0, MAX(0, (LCD_HEIGHT-pdisp->height)/2), /* x, y */
                     move, MIN(LCD_HEIGHT, pdisp->height));   /* w, h */
@@ -2110,7 +2188,7 @@ int scroll_bmp(struct t_disp* pdisp)
 
         case JPEG_RIGHT:
             if (!(ds < ds_max) && entries > 0 && jpg.x_size <= MAX_X_SIZE)
-                return change_filename(DIR_NEXT);                
+                return change_filename(DIR_NEXT);
         case JPEG_RIGHT | BUTTON_REPEAT:
             move = MIN(HSCROLL, pdisp->width - pdisp->x - LCD_WIDTH);
             if (move > 0)
@@ -2180,17 +2258,26 @@ int scroll_bmp(struct t_disp* pdisp)
                 MYLCD_UPDATE();
             }
             break;
-            
-        case JPEG_NEXT:
+        case BUTTON_NONE:
+            if (!slideshow_enabled)
+                break;
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
-            
+        case JPEG_NEXT:
+#ifdef JPEG_NEXT_PRE
+            if (lastbutton != JPEG_NEXT_PRE)
+                break;
+#endif
+            if (entries > 0)
+                return change_filename(DIR_NEXT);
+            break;
+
         case JPEG_PREVIOUS:
             if (entries > 0)
                 return change_filename(DIR_PREV);
             break;
-            
+
         case JPEG_ZOOM_IN:
 #ifdef JPEG_ZOOM_PRE
             if (lastbutton != JPEG_ZOOM_PRE)
@@ -2207,9 +2294,25 @@ int scroll_bmp(struct t_disp* pdisp)
             return ZOOM_OUT;
             break;
 
-        case JPEG_QUIT:
-            return PLUGIN_OK;
-            
+        case JPEG_MENU:
+#ifdef USEGSLIB
+            gray_show(false); /* switch off grayscale overlay */
+#endif
+            if (show_menu() == 1)
+                return PLUGIN_OK;
+#ifdef USEGSLIB
+            gray_show(true); /* switch on grayscale overlay */
+#else
+            yuv_bitmap_part(
+                pdisp->bitmap, pdisp->csub_x, pdisp->csub_y,
+                pdisp->x, pdisp->y, pdisp->stride,
+                MAX(0, (LCD_WIDTH - pdisp->width) / 2),
+                MAX(0, (LCD_HEIGHT - pdisp->height) / 2),
+                MIN(LCD_WIDTH, pdisp->width),
+                MIN(LCD_HEIGHT, pdisp->height));
+            MYLCD_UPDATE();
+#endif
+            break;
         default:
             if (rb->default_event_handler_ex(button, cleanup, NULL)
                 == SYS_USB_CONNECTED)
@@ -2256,13 +2359,13 @@ int jpegmem(struct jpeg *p_jpg, int ds)
 int min_downscale(struct jpeg *p_jpg, int bufsize)
 {
     int downscale = 8;
-    
+
     if (jpegmem(p_jpg, 8) > bufsize)
         return 0; /* error, too large, even 1:8 doesn't fit */
-        
+
     while (downscale > 1 && jpegmem(p_jpg, downscale/2) <= bufsize)
         downscale /= 2;
-        
+
     return downscale;
 }
 
@@ -2271,13 +2374,13 @@ int min_downscale(struct jpeg *p_jpg, int bufsize)
 int max_downscale(struct jpeg *p_jpg)
 {
     int downscale = 1;
-    
+
     while (downscale < 8 && (p_jpg->x_size > LCD_WIDTH*downscale
                           || p_jpg->y_size > LCD_HEIGHT*downscale))
     {
         downscale *= 2;
     }
-    
+
     return downscale;
 }
 
@@ -2309,7 +2412,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
         buf = buf_root; /* start again from the beginning of the buffer */
         buf_size = root_size;
     }
-    
+
 #ifdef HAVE_LCD_COLOR
     if (p_jpg->blocks > 1) /* colour jpeg */
     {
@@ -2416,7 +2519,7 @@ int load_and_show(char* filename)
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
     {
-        rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);    
+        rb->snprintf(print,sizeof(print),"err opening %s:%d",filename,fd);
         rb->splash(HZ, true, print);
         return PLUGIN_ERROR;
     }
@@ -2430,8 +2533,8 @@ int load_and_show(char* filename)
 
     buf_root = buf; /* we can start the decompressed images behind it */
     root_size = buf_size;
-    
-    if (buf_size <= 0) 
+
+    if (buf_size <= 0)
     {
 #if PLUGIN_BUFFER_SIZE >= MIN_MEM
         if(plug_buf)
@@ -2448,9 +2551,9 @@ int load_and_show(char* filename)
             rb->lcd_puts(0,4,"Off: Quit.");
             rb->lcd_update();
             rb->lcd_setfont(FONT_UI);
-            
+
             rb->button_clear_queue();
-            
+
             while (1)
             {
                 int button = rb->button_get(true);
@@ -2458,14 +2561,14 @@ int load_and_show(char* filename)
                 {
                     case JPEG_ZOOM_IN:
                         plug_buf = false;
-                        buf_images = 
+                        buf_images =
                                 rb->plugin_get_audio_buffer(&buf_images_size);
                         /*try again this file, now using the audio buffer */
                         return PLUGIN_OTHER;
-                        
-                    case JPEG_QUIT:
+
+                    case JPEG_MENU:
                         return PLUGIN_OK;
-                        
+
                     case JPEG_LEFT:
                         if(entries>1)
                         {
@@ -2473,31 +2576,31 @@ int load_and_show(char* filename)
                             return change_filename(DIR_PREV);
                         }
                         break;
-                        
+
                     case JPEG_RIGHT:
                         if(entries>1)
                         {
                             rb->lcd_clear_display();
                             return change_filename(DIR_NEXT);
-                        }    
+                        }
                         break;
-                    default: 
+                    default:
                          if(rb->default_event_handler_ex(button, cleanup, NULL)
                                 == SYS_USB_CONNECTED)
                               return PLUGIN_USB_CONNECTED;
-                                    
+
                 }
             }
         }
         else
-#endif                
+#endif
         {
             rb->splash(HZ, true, "Out of Memory");
             rb->close(fd);
             return PLUGIN_ERROR;
         }
     }
-    
+
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
@@ -2507,7 +2610,7 @@ int load_and_show(char* filename)
     rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
     rb->lcd_puts(0, 0, print);
     rb->lcd_update();
-    
+
     rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
     rb->lcd_puts(0, 1, print);
     rb->lcd_update();
@@ -2518,20 +2621,20 @@ int load_and_show(char* filename)
     rb->snprintf(print, sizeof(print), "decoding markers");
     rb->lcd_puts(0, 2, print);
     rb->lcd_update();
-    
+
 
 
     rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
     /* process markers, unstuffing */
     status = process_markers(buf_jpeg, filesize, &jpg);
-    
+
     if (status < 0 || (status & (DQT | SOF0)) != (DQT | SOF0))
     {   /* bad format or minimum components not contained */
         rb->splash(HZ, true, "unsupported %d", status);
         file_pt[curfile] = '\0';
         return change_filename(direction);
     }
-    
+
     if (!(status & DHT)) /* if no Huffman table present: */
         default_huff_tbl(&jpg); /* use default */
     build_lut(&jpg); /* derive Huffman and other lookup-tables */
@@ -2548,7 +2651,7 @@ int load_and_show(char* filename)
         file_pt[curfile] = '\0';
         return change_filename(direction);
     }
-    
+
     ds = ds_max; /* initials setting */
     cx = jpg.x_size/ds/2; /* center the view */
     cy = jpg.y_size/ds/2;
@@ -2640,7 +2743,7 @@ int load_and_show(char* filename)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     rb = api;
-    
+
     int condition;
 #ifdef USEGSLIB
     int grayscales;
@@ -2648,12 +2751,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     rb->strcpy(np_file, parameter);
-    get_pic_list();    
-    
+    get_pic_list();
+
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
 #if CONFIG_CODEC == SWCODEC
     if(rb->pcm_is_playing())
-#else 
+#else
     if(rb->mp3_is_playing())
 #endif
     {
@@ -2686,7 +2789,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     buf_images = buf; buf_images_size = buf_size;
-    
+
     do
     {
         condition = load_and_show(np_file);
@@ -2696,7 +2799,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef USEGSLIB
     gray_release(); /* deinitialize */
 #endif
-    
+
     return condition;
 }
 
