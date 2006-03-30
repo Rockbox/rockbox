@@ -94,7 +94,7 @@ static bool remote_button_hold_only(void);
 int int_btn = BUTTON_NONE;
 #endif
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) && (!defined(APPLE_IPODMINI))
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) && !defined(IPOD_MINI)
 static void opto_i2c_init(void)
 {
     int i, curr_value;
@@ -222,11 +222,8 @@ void ipod_4g_button_int(void)
     CPU_HI_INT_EN = I2C_MASK;
 }
 #endif 
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (defined(APPLE_IPODMINI))
-/**
- * 
- * 
- */
+#if (CONFIG_KEYPAD == IPOD_3G_PAD) || defined(IPOD_MINI) 
+/* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
 void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 {
     int wheel_keycode = BUTTON_NONE;
@@ -274,7 +271,8 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
     prev_scroll = new_scroll;
 }
 #endif
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) && (defined(APPLE_IPODMINI))
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) && defined(IPOD_MINI)
+/* mini 1 only, mini 2G uses iPod 4G code */
 static int ipod_mini_button_read(void)
 {
     unsigned char source, wheel_source, state, wheel_state;
@@ -638,7 +636,7 @@ void button_init(void)
     /* nothing to initialize here */
 #elif CONFIG_KEYPAD == GMINI100_PAD
     /* nothing to initialize here */
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && (!defined(APPLE_IPODMINI))
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && !defined(IPOD_MINI)
     opto_i2c_init();
     /* hold button - enable as input */
     GPIOA_ENABLE |= 0x20;
@@ -652,7 +650,7 @@ void button_init(void)
     CPU_INT_EN = 0x40000000;
     CPU_HI_INT_EN = I2C_MASK;
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && (defined(APPLE_IPODMINI))
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) && defined(IPOD_MINI)
     /* iPod Mini G1 */
     /* buttons - enable as input */
     GPIOA_ENABLE |= 0x3f;

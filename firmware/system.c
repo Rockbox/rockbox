@@ -1143,7 +1143,7 @@ unsigned int ipod_hw_rev;
 extern void TIMER1(void);
 extern void TIMER2(void);
 
-#if defined(APPLE_IPODMINI)
+#if defined(IPOD_MINI) /* mini 1 only, mini 2G uses iPod 4G code */
 extern void ipod_mini_button_int(void);
 
 void irq(void)
