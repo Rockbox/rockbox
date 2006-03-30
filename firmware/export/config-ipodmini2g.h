@@ -1,12 +1,12 @@
 /*
- * This config file is for the Apple iPod Mini (1st Gen)
+ * This config file is for the Apple iPod Mini 2nd Gen
  */
 #define APPLE_IPODMINI 1
 
 #define IPOD_ARCH 1
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 9 /* TODO: change to 9 */
+#define MODEL_NUMBER 11 
 
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/

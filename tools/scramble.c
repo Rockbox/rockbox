@@ -183,6 +183,8 @@ int main (int argc, char** argv)
             modelnum = 9;
         else if(!strcmp(&argv[1][5], "iax5"))
             modelnum = 10;
+        else if(!strcmp(&argv[1][5], "mn2g"))
+            modelnum = 11;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

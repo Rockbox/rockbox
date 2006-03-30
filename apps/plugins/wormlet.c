@@ -109,6 +109,10 @@ PLUGIN_HEADER
 #define FOOD_SIZE 3
 #define ARGH_SIZE 4
 #define SPEED 14
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
+#define FOOD_SIZE 4
+#define ARGH_SIZE 5
+#define SPEED 10
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 #define FOOD_SIZE 4
 #define ARGH_SIZE 5

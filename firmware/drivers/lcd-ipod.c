@@ -76,20 +76,28 @@ static void lcd_wait_write(void)
 static void lcd_send_data(int data_lo, int data_hi)
 {
     lcd_wait_write();
-        outl(data_lo, IPOD_LCD_BASE + LCD_DATA);
-        lcd_wait_write();
-        outl(data_hi, IPOD_LCD_BASE + LCD_DATA);
+#ifdef IPOD_MINI2G
+    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
+    outl(data_hi | (data_lo << 8) | 0x760000, IPOD_LCD_BASE+8);
+#else
+    outl(data_lo, IPOD_LCD_BASE + LCD_DATA);
+    lcd_wait_write();
+    outl(data_hi, IPOD_LCD_BASE + LCD_DATA);
+#endif
 }
 
 /* send LCD command */
 static void lcd_prepare_cmd(int cmd)
 {
     lcd_wait_write();
-    
-        outl(0x0, IPOD_LCD_BASE + LCD_CMD);
-        lcd_wait_write();
-        outl(cmd, IPOD_LCD_BASE + LCD_CMD);
-    
+#ifdef IPOD_MINI2G
+    outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
+    outl(cmd | 0x740000, IPOD_LCD_BASE+8);
+#else
+    outl(0x0, IPOD_LCD_BASE + LCD_CMD);
+    lcd_wait_write();
+    outl(cmd, IPOD_LCD_BASE + LCD_CMD);
+#endif
 }
 
 /* send LCD command and data */
@@ -105,7 +113,8 @@ static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
  * LCD init 
  **/
 void lcd_init_device(void){
-#ifdef APPLE_IPODMINI
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    /* driver output control - 160x112 (ipod mini) */
     lcd_cmd_and_data(0x1, 0x0, 0xd);
 #else
     /* driver output control - 160x128 */

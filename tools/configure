@@ -465,9 +465,10 @@ toolsdir='\$(ROOTDIR)/tools'
   echo "15 - iPod Video"
   echo "16 - iPod 3G"
   echo "17 - iPod 4G (Grayscale)"
-  echo "18 - iPod Mini (1G/2G)"
+  echo "18 - iPod Mini (1G)"
   echo "19 - iriver iFP-790"
   echo "20 - Toshiba Gigabeat F"
+  echo "21 - iPod Mini 2G"
 
   target_id=`input`;
 
@@ -870,6 +871,25 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$gigabeatbitmaptools
     ;;
 
+   21)
+    archos="ipodmini2g"
+    target="-DIPOD_MINI2G"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add=mn2g"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
+    output="rockbox.ipod"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$ipodbitmaptools
+    ;;
+
    *)
     echo "Please select an actual target platform!"
     exit
@@ -925,7 +945,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini)
+          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"

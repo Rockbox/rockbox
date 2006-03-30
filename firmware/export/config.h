@@ -170,6 +170,8 @@
 #include "config-gigabeat.h"
 #elif defined(IPOD_MINI)
 #include "config-ipodmini.h"
+#elif defined(IPOD_MINI2G)
+#include "config-ipodmini2g.h"
 #else
 /* no known platform */
 #endif
