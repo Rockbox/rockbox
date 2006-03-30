@@ -177,9 +177,9 @@ void usb_enable(bool on)
     {
       /* The following code is copied from ipodlinux */
 #if defined(APPLE_IPODCOLOR) || defined(APPLE_IPOD3G) || \
-    defined(APPLE_IPOD4G) || defined(APPLE_IPODMINI)
+    defined(APPLE_IPOD4G) || defined(IPOD_MINI)
         unsigned char* storage_ptr = (unsigned char *)0x40017F00;
-#elif defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO)
+#elif defined(APPLE_IPODNANO) || defined(APPLE_IPODVIDEO) || defined(IPOD_MINI2G)
         unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
 #endif
         memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
