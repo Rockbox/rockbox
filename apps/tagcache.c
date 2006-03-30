@@ -32,6 +32,7 @@
 #include "lang.h"
 #include "tagcache.h"
 #include "buffer.h"
+#include "atoi.h"
 
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
@@ -50,8 +51,9 @@ static long tempbuf_left; /* Buffer space left. */
 static long tempbuf_pos;
 
 /* Tags we want to get sorted (loaded to the tempbuf). */
-static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, tag_title };
-static const int unique_tags[] = { tag_artist, tag_album, tag_genre };
+static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, tag_composer, tag_title };
+static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_composer };
+static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_bitrate };
 
 /* Queue commands. */
 #define Q_STOP_SCAN     0
@@ -63,15 +65,15 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre };
 #define TAGCACHE_FILE_MASTER  ROCKBOX_DIR "/tagcache_idx.tcd"
 #define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
 
+/* Tag Cache Header version 'TCHxx' */
+#define TAGCACHE_MAGIC  0x54434801
+
 /* Tag database structures. */
-#define TAGCACHE_MAGIC  0x01020317
 
 /* Variable-length tag entry in tag files. */
 struct tagfile_entry {
     short tag_length;
-#ifdef ROCKBOX_STRICT_ALIGN
-    short padding;
-#endif
+    short idx_id;
     char tag_data[0];
 };
 
@@ -118,6 +120,7 @@ struct tempbuf_id {
 
 struct tempbuf_searchidx {
     struct tempbuf_id *id;
+    long idx_id;
     char *str;
     int seek;
 };
@@ -128,6 +131,19 @@ static int cachefd = -1, filenametag_fd;
 static int total_entry_count = 0;
 static int data_size = 0;
 static int processed_dir_count;
+
+static bool is_numeric_tag(int type)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof(numeric_tags)/sizeof(numeric_tags[0])); i++)
+    {
+        if (type == numeric_tags[i])
+            return true;
+    }
+
+    return false;
+}
 
 #ifdef HAVE_TC_RAMCACHE
 static struct index_entry *find_entry_ram(const char *filename,
@@ -308,6 +324,50 @@ static struct index_entry *find_entry_disk(const char *filename, bool retrieve)
     return &idx;
 }
 
+long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
+{
+    struct tagcache_header tch;
+    struct index_entry idx;
+    int masterfd;
+    
+    if (!is_numeric_tag(tag))
+        return -1;
+    
+#ifdef HAVE_TC_RAMCACHE
+    if (tcs->ramsearch)
+    {
+        return hdr->indices[tcs->idx_id].tag_seek[tag];
+    }
+#endif
+    
+    masterfd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
+    
+    if (masterfd < 0)
+    {
+        logf("open fail");
+        return -2;
+    }
+    
+    if (read(masterfd, &tch, sizeof(struct tagcache_header)) !=
+        sizeof(struct tagcache_header) || tch.magic != TAGCACHE_MAGIC)
+    {
+        logf("header error");
+        return -3;
+    }
+    
+    lseek(masterfd, tcs->idx_id * sizeof(struct index_entry), SEEK_CUR);
+    if (read(masterfd, &idx, sizeof(struct index_entry)) !=
+        sizeof(struct index_entry))
+    {
+        logf("read error #3");
+        close(masterfd);
+        return -4;
+    }
+    close(masterfd);
+    
+    return idx.tag_seek[tag];
+}
+
 static bool build_lookup_list(struct tagcache_search *tcs)
 {
     struct tagcache_header header;
@@ -443,6 +503,9 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     else
 #endif
     {
+        if (is_numeric_tag(tcs->type))
+            return true;
+        
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tcs->type);
         tcs->fd = open(buf, O_RDONLY);
         if (tcs->fd < 0)
@@ -484,11 +547,15 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     if (!tcs->valid)
         return false;
         
-    if (tcs->fd < 0 
+    if (tcs->fd < 0 && !is_numeric_tag(tcs->type)
 #ifdef HAVE_TC_RAMCACHE
         && !tcs->ramsearch
 #endif
         )
+        return false;
+    
+    /* Searching not supported for numeric tags yet. */
+    if (is_numeric_tag(tcs->type))
         return false;
     
     /* Relative fetch. */
@@ -539,6 +606,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
         tcs->position += sizeof(struct tagfile_entry) + ep->tag_length;
         tcs->result = ep->tag_data;
         tcs->result_len = ep->tag_length;
+        tcs->idx_id = ep->idx_id;
 
         return true;
     }
@@ -571,6 +639,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     
     tcs->result = buf;
     tcs->result_len = entry.tag_length;
+    tcs->idx_id = entry.idx_id;
     
     return true;
 }
@@ -609,7 +678,7 @@ void tagcache_search_finish(struct tagcache_search *tcs)
 }
 
 #ifdef HAVE_TC_RAMCACHE
-struct tagfile_entry *get_tag(struct index_entry *entry, int tag)
+static struct tagfile_entry *get_tag(struct index_entry *entry, int tag)
 {
     return (struct tagfile_entry *)&hdr->tags[tag][entry->tag_seek[tag]];
 }
@@ -627,6 +696,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->artist = get_tag(entry, tag_artist)->tag_data;
     id3->album = get_tag(entry, tag_album)->tag_data;
     id3->genre_string = get_tag(entry, tag_genre)->tag_data;
+    id3->composer = get_tag(entry, tag_composer)->tag_data;
 
     return true;
 }
@@ -658,6 +728,7 @@ static void add_tagcache(const char *path)
     struct temp_file_entry entry;
     bool ret;
     int fd;
+    char tracknumfix[3];
     //uint32_t crcbuf[CRC_BUF_LEN];
 
     if (cachefd < 0)
@@ -689,6 +760,8 @@ static void add_tagcache(const char *path)
     }
 
     memset(&track, 0, sizeof(struct track_info));
+    memset(&entry, 0, sizeof(struct temp_file_entry));
+    memset(&tracknumfix, 0, sizeof(tracknumfix));
     ret = get_metadata(&track, fd, path, false);
     close(fd);
 
@@ -699,19 +772,51 @@ static void add_tagcache(const char *path)
     check_if_empty(&track.id3.artist);
     check_if_empty(&track.id3.album);
     check_if_empty(&track.id3.genre_string);
+    check_if_empty(&track.id3.composer);
     
     entry.tag_length[tag_filename] = strlen(path) + 1;
     entry.tag_length[tag_title] = strlen(track.id3.title) + 1;
     entry.tag_length[tag_artist] = strlen(track.id3.artist) + 1;
     entry.tag_length[tag_album] = strlen(track.id3.album) + 1;
     entry.tag_length[tag_genre] = strlen(track.id3.genre_string) + 1;
+    entry.tag_length[tag_composer] = strlen(track.id3.composer) + 1;
     
     entry.tag_offset[tag_filename] = 0;
     entry.tag_offset[tag_title] = entry.tag_offset[tag_filename] + entry.tag_length[tag_filename];
     entry.tag_offset[tag_artist] = entry.tag_offset[tag_title] + entry.tag_length[tag_title];
     entry.tag_offset[tag_album] = entry.tag_offset[tag_artist] + entry.tag_length[tag_artist];
     entry.tag_offset[tag_genre] = entry.tag_offset[tag_album] + entry.tag_length[tag_album];
-    entry.data_length = entry.tag_offset[tag_genre] + entry.tag_length[tag_genre];
+    entry.tag_offset[tag_composer] = entry.tag_offset[tag_genre] + entry.tag_length[tag_genre];
+    entry.data_length = entry.tag_offset[tag_composer] + entry.tag_length[tag_composer];
+    
+    /* Numeric tags */
+    entry.tag_offset[tag_year] = track.id3.year;
+    entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
+    entry.tag_offset[tag_length] = track.id3.length;
+    entry.tag_offset[tag_bitrate] = track.id3.bitrate;
+    
+    if (entry.tag_offset[tag_tracknumber] <= 0)
+    {
+        int start, i;
+        
+        for (start = 0; path[start] != '\0'; start++)
+            if (isdigit(path[start]))
+                break ;
+        
+        for (i = 0; i < (int)sizeof(tracknumfix)-1 
+             && path[start+i] != '\0'; i++)
+        {
+            if (isdigit(path[start+i]))
+                tracknumfix[i] = path[start+i];
+            else
+                break ;
+        }
+
+        if (tracknumfix[0] != '\0')
+            entry.tag_offset[tag_tracknumber] = atoi(tracknumfix);
+        else
+            entry.tag_offset[tag_tracknumber] = -1;
+    }
     
     write(cachefd, &entry, sizeof(struct temp_file_entry));
     write_item(path);
@@ -719,6 +824,7 @@ static void add_tagcache(const char *path)
     write_item(track.id3.artist);
     write_item(track.id3.album);
     write_item(track.id3.genre_string);
+    write_item(track.id3.composer);
     total_entry_count++;    
 }
 
@@ -730,12 +836,15 @@ static void remove_files(void)
     remove(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
+        if (is_numeric_tag(i))
+            continue;
+        
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, i);
         remove(buf);
     }
 }
 
-static bool tempbuf_insert(char *str, int id)
+static bool tempbuf_insert(char *str, int id, int idx_id)
 {
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     int len = strlen(str)+1;
@@ -759,6 +868,7 @@ static bool tempbuf_insert(char *str, int id)
 #endif
     index[tempbufidx].id->id = id;
     index[tempbufidx].id->next = NULL;
+    index[tempbufidx].idx_id = idx_id;
     tempbuf_pos += sizeof(struct tempbuf_id);
     
     index[tempbufidx].seek = -1;
@@ -810,7 +920,7 @@ static bool tempbuf_unique_insert(char *str, int id)
         }
     }
     
-    return tempbuf_insert(str, id);
+    return tempbuf_insert(str, id, -1);
 }
 
 static int compare(const void *p1, const void *p2)
@@ -845,6 +955,7 @@ static int tempbuf_sort(int fd)
         index[i].seek = lseek(fd, 0, SEEK_CUR);
         length = strlen(index[i].str) + 1;
         fe.tag_length = length;
+        fe.idx_id = index[i].idx_id;
         
 #ifdef ROCKBOX_STRICT_ALIGN
         /* Make sure the entry is long aligned. */
@@ -944,6 +1055,102 @@ static bool is_sorted_tag(int type)
     return false;
 }
 
+static bool build_numeric_index(int index_type, struct tagcache_header *h, int tmpfd)
+{
+    struct tagcache_header tch;
+    struct index_entry idx;
+    int masterfd;
+    int masterfd_pos;
+    long *databuf = (long *)tempbuf;
+    int max_entries;
+    int i;
+    
+    max_entries = tempbuf_size / sizeof(long);
+    
+    if (h->entry_count >= max_entries)
+    {
+        logf("not enough space!");
+        return false;
+    }
+        
+    logf("Building numeric index: %d", index_type);
+    
+    /* Walk through the temporary file. */
+    lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
+    for (i = 0; i < h->entry_count; i++)
+    {
+        struct temp_file_entry entry;
+            
+        if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
+            sizeof(struct temp_file_entry))
+        {
+            logf("read fail #1");
+            return false;
+        }
+
+        /* Insert data in buffer. */
+        databuf[i] = (long)entry.tag_offset[index_type];
+
+        /* Skip to next. */
+        lseek(tmpfd, entry.data_length, SEEK_CUR);
+    }
+    
+    /* Update the entries in index. */
+    masterfd = open(TAGCACHE_FILE_MASTER, O_RDWR);
+
+    if (masterfd < 0)
+    {
+        logf("No master file found!");
+        return false;
+    }
+    
+    if (read(masterfd, &tch, sizeof(struct tagcache_header)) !=
+        sizeof(struct tagcache_header) || tch.magic != TAGCACHE_MAGIC)
+    {
+        logf("header error");
+        close(masterfd);
+        return false;
+    }
+
+    masterfd_pos = lseek(masterfd, tch.entry_count * sizeof(struct index_entry),
+                         SEEK_CUR);
+    if (masterfd_pos == filesize(masterfd))
+    {
+        logf("we can't append!");
+        close(masterfd);
+        return false;
+    }
+
+    for (i = 0; i < h->entry_count; i++)
+    {
+        int loc = lseek(masterfd, 0, SEEK_CUR);
+        
+        if (read(masterfd, &idx, sizeof(struct index_entry)) !=
+            sizeof(struct index_entry))
+        {
+            logf("read fail #2");
+            close(masterfd);
+            return false;
+        }
+        
+        idx.tag_seek[index_type] = databuf[i];
+        
+        /* Write back the updated index. */
+        lseek(masterfd, loc, SEEK_SET);
+        if (write(masterfd, &idx, sizeof(struct index_entry)) !=
+            sizeof(struct index_entry))
+        {
+            logf("write fail");
+            close(masterfd);
+            return false;
+        }
+    }
+    
+    close(masterfd);
+    
+    return true;
+}
+    
 static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
 {
     int i;
@@ -1020,7 +1227,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * is saved so we can later reindex the master lookup
                  * table when the index gets resorted.
                  */
-                tempbuf_insert(buf, loc + TAGFILE_MAX_ENTRIES);
+                tempbuf_insert(buf, loc + TAGFILE_MAX_ENTRIES, entry.idx_id);
             }
         }
         else
@@ -1149,7 +1356,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             if (is_unique_tag(index_type))
                 error = !tempbuf_unique_insert(buf, i);
             else
-                error = !tempbuf_insert(buf, i);
+                error = !tempbuf_insert(buf, i, tch.entry_count + i);
             
             if (error)
             {
@@ -1268,6 +1475,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             /* Write to index file. */
             idx.tag_seek[index_type] = lseek(fd, 0, SEEK_CUR);
             fe.tag_length = entry.tag_length[index_type];
+            fe.idx_id = tch.entry_count + i;
             write(fd, &fe, sizeof(struct tagfile_entry));
             write(fd, buf, fe.tag_length);
             tempbufidx++;
@@ -1375,7 +1583,12 @@ static bool commit(void)
     /* Now create the index files. */
     for (i = 0; i < TAG_COUNT; i++)
     {
-        if (!build_index(i, &header, tmpfd))
+        if (is_numeric_tag(i))
+        {
+            build_numeric_index(i, &header, tmpfd);
+        }
+        
+        else if (!build_index(i, &header, tmpfd))
         {
             logf("tagcache failed init");
             remove_files();
@@ -1537,6 +1750,9 @@ static bool load_tagcache(void)
         struct tagfile_entry *fe;
         char buf[MAX_PATH];
 
+        if (is_numeric_tag(i))
+            continue ;
+        
         //p = ((void *)p+1);
         p = (char *)((long)p & ~0x03) + 0x04;
         hdr->tags[i] = p;
@@ -1854,7 +2070,7 @@ static void tagcache_thread(void)
 
 int tagcache_get_progress(void)
 {
-    int total_count = -1;
+    int total_count = processed_dir_count;
 
 #ifdef HAVE_DIRCACHE
     if (dircache_is_enabled())

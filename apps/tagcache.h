@@ -22,8 +22,10 @@
 #include "id3.h"
 
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
-    tag_filename/*, tag_checksum*/ };
-#define TAG_COUNT 5
+    tag_filename, tag_composer, tag_year, tag_tracknumber,
+    tag_bitrate, tag_length };
+
+#define TAG_COUNT 10
 
 #ifdef HAVE_DIRCACHE
 #define HAVE_TC_RAMCACHE 1
@@ -47,6 +49,7 @@ struct tagcache_search {
     int filter_count;
     int seek_list_count;
     int seek_pos;
+    int idx_id;
     long position;
     int entry_count;
     bool valid;
@@ -64,6 +67,7 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
 bool tagcache_get_next(struct tagcache_search *tcs);
 void tagcache_search_finish(struct tagcache_search *tcs);
+long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
 
 int tagcache_get_progress(void);
 #ifdef HAVE_TC_RAMCACHE

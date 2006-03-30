@@ -2130,6 +2130,8 @@ struct mp3entry* audio_current_track(void)
     if (track_count > 0 && cur_ti->taginfo_ready)
         return (struct mp3entry *)&cur_ti->id3;
 
+    memset(&temp_id3, 0, sizeof(struct mp3entry));
+    
     filename = playlist_peek(0);
     if (!filename)
         filename = "No file!";
@@ -2145,7 +2147,6 @@ struct mp3entry* audio_current_track(void)
     else
         p++;
 
-    memset(&temp_id3, 0, sizeof(struct mp3entry));
     strncpy(temp_id3.path, p, sizeof(temp_id3.path)-1);
     temp_id3.title = &temp_id3.path[0];
 

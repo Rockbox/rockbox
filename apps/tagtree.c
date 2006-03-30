@@ -38,8 +38,6 @@
 #include "keyboard.h"
 #include "gui/list.h"
 
-#define CHUNKED_NEXT   -2
-
 static int tagtree_play_folder(struct tree_context* c);
 static int tagtree_search(struct tree_context* c, char* string);
 
@@ -52,11 +50,20 @@ struct tagentry {
 
 static struct tagcache_search tcs;
 
+static int compare(const void *p1, const void *p2)
+{
+    struct tagentry *e1 = (struct tagentry *)p1;
+    struct tagentry *e2 = (struct tagentry *)p2;
+    
+    return strncasecmp(e1->name, e2->name, MAX_PATH);
+}
+
 int tagtree_load(struct tree_context* c)
 {
     int i;
     int namebufused = 0;
     struct tagentry *dptr = (struct tagentry *)c->dircache;
+    bool sort = false;
 
     int table = c->currtable;
     int extra = c->currextra;
@@ -153,18 +160,21 @@ int tagtree_load(struct tree_context* c)
             logf("artist4genres..");
             tagcache_search(&tcs, tag_artist);
             tagcache_search_add_filter(&tcs, tag_genre, extra);
+            sort = true;
             break;
     
         case albums4artist:
             logf("albums4artist..");
             tagcache_search(&tcs, tag_album);
             tagcache_search_add_filter(&tcs, tag_artist, extra);
+            sort = true;
             break;
 
         case songs4album:
             logf("songs4album..");
             tagcache_search(&tcs, tag_title);
             tagcache_search_add_filter(&tcs, tag_album, extra);
+            sort = true;
             if (extra2 > 0)
                 tagcache_search_add_filter(&tcs, tag_artist, extra2);
             break;
@@ -173,6 +183,7 @@ int tagtree_load(struct tree_context* c)
             logf("songs4artist..");
             tagcache_search(&tcs, tag_title);
             tagcache_search_add_filter(&tcs, tag_artist, extra);
+            sort = true;
             break;
 
         case chunked_next:
@@ -190,20 +201,37 @@ int tagtree_load(struct tree_context* c)
     while (tagcache_get_next(&tcs))
     {
         dptr->newtable = tcs.result_seek;
-        if (!tcs.ramsearch)
+        if (!tcs.ramsearch || table == songs4album)
         {
             dptr->name = &c->name_buffer[namebufused];
-            namebufused += tcs.result_len;
-            if (namebufused > c->name_buffer_size)
+            if (table == songs4album)
             {
-                logf("buffer full, 1 entry missed.");
-                c->dirfull = true;
-                break ;
+                snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
+                         tagcache_get_numeric(&tcs, tag_tracknumber), 
+                         tcs.result);
+                namebufused += strlen(dptr->name) + 1;
+                if (namebufused >= c->name_buffer_size)
+                {
+                    logf("buffer full, 1 entry missed.");
+                    c->dirfull = true;
+                    break ;
+                }
             }
-            strcpy(dptr->name, tcs.result);
+            else
+            {
+                namebufused += tcs.result_len;
+                if (namebufused >= c->name_buffer_size)
+                {
+                    logf("buffer full, 1 entry missed.");
+                    c->dirfull = true;
+                    break ;
+                }
+                strcpy(dptr->name, tcs.result);
+            }
         }
         else
             dptr->name = tcs.result;
+        
         dptr++;
         i++;
 
@@ -220,6 +248,9 @@ int tagtree_load(struct tree_context* c)
         
     }
 
+    if (sort)
+        qsort(c->dircache, i, c->dentry_size, compare);
+    
     if (c->dirfull)
     {
         dptr->name = "===>";
