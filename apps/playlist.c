@@ -1193,7 +1193,11 @@ static void playlist_thread(void)
             case SYS_TIMEOUT:
                 playlist = &current_playlist;
 
-                if (playlist->control_fd >= 0 && ata_disk_is_active())
+                if (playlist->control_fd >= 0
+# ifndef SIMULATOR
+                    && ata_disk_is_active()
+# endif
+                    )
                 {
                     if (playlist->num_cached > 0)
                         flush_cached_control(playlist);

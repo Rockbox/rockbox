@@ -32,9 +32,14 @@ struct travel_data {
     struct dircache_entry *first;
     struct dircache_entry *ce;
     struct dircache_entry *down_entry;
+#ifdef SIMULATOR
+    DIR *dir, *newdir;
+    struct dirent *entry;
+#else
     struct fat_dir *dir;
     struct fat_dir newdir;
     struct fat_direntry entry;
+#endif
     int pathpos;
 };
 

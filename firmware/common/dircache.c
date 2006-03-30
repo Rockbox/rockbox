@@ -19,7 +19,6 @@
 
 /* TODO:
    - Allow cache live updating while transparent rebuild is running.
-   - Fix this to work with simulator (opendir & readdir) again.
 */
 
 #include "config.h"
@@ -111,7 +110,8 @@ static struct dircache_entry* dircache_gen_next(struct dircache_entry *ce)
 {
     struct dircache_entry *next_entry;
 
-    next_entry = allocate_entry();
+    if ( (next_entry = allocate_entry()) == NULL)
+        return NULL;
     next_entry->up = ce->up;
     ce->next = next_entry;
     
@@ -126,7 +126,8 @@ static struct dircache_entry* dircache_gen_down(struct dircache_entry *ce)
 {
     struct dircache_entry *next_entry;
 
-    next_entry = allocate_entry();
+    if ( (next_entry = allocate_entry()) == NULL)
+        return NULL;
     next_entry->up = ce;
     ce->down = next_entry;
     
@@ -164,16 +165,27 @@ static bool check_event_queue(void)
  */
 static int dircache_scan(struct travel_data *td)
 {
+#ifdef SIMULATOR
+    while ( ( td->entry = readdir(td->dir) ) )
+#else
     while ( (fat_getnext(td->dir, &td->entry) >= 0) && (td->entry.name[0]))
+#endif
     {
-        if (thread_enabled)
+#ifdef SIMULATOR
+        if (!strcmp(".", td->entry->d_name) ||
+             !strcmp("..", td->entry->d_name))
         {
-            /* Stop if we got an external signal. */
-            if (check_event_queue())
-                return -6;
-            yield();
+            continue;
         }
-            
+        
+        td->ce->attribute = td->entry->attribute;
+        td->ce->name_len = MIN(254, strlen(td->entry->d_name)) + 1;
+        td->ce->d_name = ((char *)dircache_root+dircache_size);
+        td->ce->size = td->entry->size;
+        td->ce->wrtdate = td->entry->wrtdate;
+        td->ce->wrttime = td->entry->wrttime;
+        memcpy(td->ce->d_name, td->entry->d_name, td->ce->name_len);
+#else
         if (!strcmp(".", td->entry.name) ||
              !strcmp("..", td->entry.name))
         {
@@ -188,10 +200,15 @@ static int dircache_scan(struct travel_data *td)
         td->ce->wrtdate = td->entry.wrtdate;
         td->ce->wrttime = td->entry.wrttime;
         memcpy(td->ce->d_name, td->entry.name, td->ce->name_len);
+#endif
         dircache_size += td->ce->name_len;
         entry_count++;
         
+#ifdef SIMULATOR
+        if (td->entry->attribute & ATTR_DIRECTORY)
+#else
         if (td->entry.attr & FAT_ATTR_DIRECTORY)
+#endif
         {
             
             td->down_entry = dircache_gen_down(td->ce);
@@ -200,6 +217,16 @@ static int dircache_scan(struct travel_data *td)
             
             td->pathpos = strlen(dircache_cur_path);
             strncpy(&dircache_cur_path[td->pathpos], "/", MAX_PATH - td->pathpos - 1);
+#ifdef SIMULATOR
+            strncpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, MAX_PATH - td->pathpos - 2);
+            
+            td->newdir = opendir(dircache_cur_path);
+            if (td->newdir == NULL)
+            {
+                logf("Failed to opendir(): %s", dircache_cur_path);
+                return -3;
+            }
+#else
             strncpy(&dircache_cur_path[td->pathpos+1], td->entry.name, MAX_PATH - td->pathpos - 2);
 
             td->newdir = *td->dir;
@@ -208,6 +235,7 @@ static int dircache_scan(struct travel_data *td)
             {
                 return -3;
             }
+#endif
 
             td->ce = dircache_gen_next(td->ce);
             if (td->ce == NULL)
@@ -220,6 +248,16 @@ static int dircache_scan(struct travel_data *td)
         td->ce = dircache_gen_next(td->ce);
         if (td->ce == NULL)
             return -5;
+        
+        /* When simulator is used, it's only safe to yield here. */
+        if (thread_enabled)
+        {
+            /* Stop if we got an external signal. */
+            if (check_event_queue())
+                return -6;
+            yield();
+        }
+        
     }
 
     return 0;
@@ -228,7 +266,11 @@ static int dircache_scan(struct travel_data *td)
 /** 
  * Recursively scan the hard disk and build the cache.
  */
+#ifdef SIMULATOR
+static int dircache_travel(DIR *dir, struct dircache_entry *ce)
+#else
 static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
+#endif
 {
     int depth = 0;
     int result;
@@ -245,10 +287,15 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
             case 0: /* Leaving the current directory. */
                 /* Add the standard . and .. entries. */
                 ce = dir_recursion[depth].ce;
-                ce->attribute = FAT_ATTR_DIRECTORY;
                 ce->d_name = ".";
                 ce->name_len = 2;
+#ifdef SIMULATOR
+                closedir(dir_recursion[depth].dir);
+                ce->attribute = ATTR_DIRECTORY;
+#else
+                ce->attribute = FAT_ATTR_DIRECTORY;
                 ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
+#endif
                 ce->size = 0;
                 ce->down = dir_recursion[depth].first;
     
@@ -264,10 +311,14 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
                     logf("memory allocation error");
                     return -3;
                 }
+#ifdef SIMULATOR
+                ce->attribute = ATTR_DIRECTORY;
+#else
                 ce->attribute = FAT_ATTR_DIRECTORY;
+                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
+#endif
                 ce->d_name = "..";
                 ce->name_len = 3;
-                ce->startcluster = dir_recursion[depth].dir->file.firstcluster;
                 ce->size = 0;
                 ce->down = dir_recursion[depth].first;
     
@@ -280,8 +331,12 @@ static int dircache_travel(struct fat_dir *dir, struct dircache_entry *ce)
                     logf("Too deep directory structure");
                     return -2;
                 }
-                    
+            
+#ifdef SIMULATOR
+                dir_recursion[depth].dir = dir_recursion[depth-1].newdir;
+#else
                 dir_recursion[depth].dir = &dir_recursion[depth-1].newdir;
+#endif
                 dir_recursion[depth].first = dir_recursion[depth-1].down_entry;
                 dir_recursion[depth].ce = dir_recursion[depth-1].down_entry;
                 break ;
@@ -448,7 +503,11 @@ int dircache_save(const char *path)
  */
 static int dircache_do_rebuild(void)
 {
-    struct fat_dir dir;
+#ifdef SIMULATOR
+    DIR *pdir;
+#else
+    struct fat_dir dir, *pdir;
+#endif
     unsigned int start_tick;
     int i;
     
@@ -456,25 +515,27 @@ static int dircache_do_rebuild(void)
     start_tick = current_tick;
     dircache_initializing = true;
     
+#ifdef SIMULATOR
+    pdir = opendir("/");
+    if (pdir == NULL)
+    {
+        logf("Failed to open rootdir");
+        return -3;
+    }
+#else
     if ( fat_opendir(IF_MV2(volume,) &dir, 0, NULL) < 0 ) {
         logf("Failed opening root dir");
         dircache_initializing = false;
         return -3;
     }
-
-    //return -5;
-/*    dir = opendir("/");
-    if (dir == NULL)
-    {
-        logf("failed to open rootdir");
-        return -1;
-}*/
+    pdir = &dir;
+#endif
 
     memset(dircache_cur_path, 0, MAX_PATH);
     dircache_size = sizeof(struct dircache_entry);
 
     cpu_boost(true);
-    if (dircache_travel(&dir, dircache_root) < 0)
+    if (dircache_travel(pdir, dircache_root) < 0)
     {
         logf("dircache_travel failed");
         cpu_boost(false);
