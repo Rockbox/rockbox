@@ -37,6 +37,18 @@ extern void wmcodec_disable_recording(void);
 extern void wmcodec_set_recvol(int left, int right, int type);
 extern void wmcodec_set_monitor(int enable);
 
+/* Register addresses */
+#define LINVOL        0x00
+#define RINVOL        0x01
+#define LOUTVOL       0x02
+#define ROUTVOL       0x03
+#define DACCTRL       0x05
+#define PWRMGMT       0x06
+#define AINTFCE       0x07
+#define SAMPCTRL      0x08
+#define ACTIVECTRL    0x09
+#define RESET         0x0f
+
 /* Register settings for the supported samplerates: */
 #define WM8731L_8000HZ      0x4d
 #define WM8731L_32000HZ     0x59

@@ -43,17 +43,6 @@
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
-#define LINVOL        0x00
-#define RINVOL        0x01
-#define LOUTVOL       0x02
-#define ROUTVOL       0x03
-#define DACCTRL       0x05
-#define PWRMGMT       0x06
-#define AINTFCE       0x07
-#define SAMPCTRL      0x08
-#define ACTIVECTRL    0x09
-#define RESET         0x0f
-
 void wm8731_write(int reg, int data)
 {
     ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
