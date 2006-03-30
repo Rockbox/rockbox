@@ -943,7 +943,7 @@ new: "Förstärkning"
 
 id: LANG_RECORDING_LEFT
 desc: in the recording screen
-eng: "Gain Left"
+eng: "Gain L"
 voice: ""
 new: "Vänster"
 
@@ -955,7 +955,7 @@ new: "Kvalitet"
 
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
-eng: "Gain Right"
+eng: "Gain R"
 voice: ""
 new: "Höger"
 
@@ -3682,3 +3682,189 @@ desc: in the recording screen
 eng: "D"
 voice: "Digital Gain"
 new: "D"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: ""
+new: "Sidvis rullning"
+
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "Ljus vid klippning"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "Huvudenhet bara"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "Fjärrenhet bara"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "Huvud- och fjärrenhet"
+
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice: 
+new: "RGB"
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice: 
+new: "RGB: %02X%02X%02X"
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice: "Background Colour"
+new: "Bakgrundsfärg"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice: "Foreground Colour"
+new: "Förgrundsfärg"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice: "Reset Colours"
+new: "Återställ färger"
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: ""
+new: "Ej tillåten färg"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice: 
+new: "Sök i spellista"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new: "Söker... %d hittade (%s)"
+
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Party Mode"
+new: "Partyläge"
+
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Cut"
+new: "Klipp ut"
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Copy"
+new: "Kopiera"
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Paste"
+new: "Klistra in"
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice: "File or directory exists. Overwrite?"
+new: "Fil eller katalog finns. Skriv över?"
+
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "Pitch"
+new: "Tonläge"
+
+id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+desc: Backlight behaviour setting
+eng: "First keypress enables backlight only"
+voice: "First keypress enables backlight only"
+new: "Första knapptryck tänder bara belysning"
+
+id: LANG_ID3DB_GENRES
+desc: in tag cache
+eng: "Genres"
+voice: "Genres"
+new: "Genrer"
+
+id: LANG_TAGCACHE
+desc: in tag cache settings
+eng: "Tag cache"
+voice: "Tag cache"
+new: "Tagcache"
+
+id: LANG_TAGCACHE_INIT
+desc: while initializing tagcache on boot
+eng: "Committing tagcache"
+voice: 
+new: "Sparar tagcache"
+
+id: LANG_TAGCACHE_DISK
+desc: in tag cache settings
+eng: "Keep on disk"
+voice: "Keep on disk"
+new: "Behåll på disk"
+
+id: LANG_TAGCACHE_RAM
+desc: in tag cache settings
+eng: "Load to ram"
+voice: "Load to ram"
+new: "Ladda till RAM"
+
+id: LANG_TAGCACHE_FORCE_UPDATE
+desc: in tag cache settings
+eng: "Force tag cache update"
+voice: "Force tag cache update"
+new: "Tvinga uppdatering av tagcache"
+
+id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+desc: in tag cache settings
+eng: "Updating in background"
+voice: "Updating in background"
+new: "Uppdaterar i bakgrunden"
+
+id: LANG_EQUALIZER_PRECUT
+desc: in eq settings
+eng: "Precut"
+voice: "Pre-cut"
+new: "Förförstärkning"
+
+id: LANG_KEYBOARD_LOADED
+desc: shown when a keyboard has been loaded from the dir browser
+eng: "New Keyboard"
+voice: ""
+new: "Nytt tangentbord"
+
+id: VOICE_EXT_KBD
+desc: spoken only, for file extension
+eng: ""
+voice: "keyboard"
+new: ""
+
+id: LANG_TRACKSKIP
+desc: in crossfade settings
+eng: "Track Skip Only"
+voice: "Track Skip Only"
+new: "Vid manuellt byte"
