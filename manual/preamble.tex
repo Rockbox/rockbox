@@ -64,4 +64,35 @@
     \bigskip
     \noindent}
 
+% found on the internet, posting by Donald Arseneau
+% I may as well include my robust expandable definions, which can be
+% used in \edef or \write where the \def would not be executed:
+%
+% \if\blank --- checks if parameter is blank (Spaces count as blank)
+% \if\given --- checks if parameter is not blank: like \if\blank{#1}\else
+% \if\nil --- checks if parameter is null (spaces are NOT null)
+% use \if\given{ } ... \else ... \fi etc.
+%
+{\catcode`\!=8 % funny catcode so ! will be a delimiter
+\catcode`\Q=3 % funny catcode so Q will be a delimiter
+\long\gdef\given#1{88\fi\Ifbl@nk#1QQQ\empty!}
+\long\gdef\blank#1{88\fi\Ifbl@nk#1QQ..!}% if null or spaces
+\long\gdef\nil#1{\IfN@Ught#1* {#1}!}% if null
+\long\gdef\IfN@Ught#1 #2!{\blank{#2}}
+\long\gdef\Ifbl@nk#1#2Q#3!{\ifx#3}% same as above
+} 
+
+% add screenshot image.
+% Usage: \screenshot{filename}{caption}{label}
+% Note: use this only for screenshots!
+% Note: leave caption empty to supress it.
+\newcommand{\screenshot}[3]{
+  \begin{figure}[!ht]
+    \begin{center}
+      \includegraphics[width=4cm]{#1}
+      \if\blank{#3}\else{\label{#3}}\fi\if\blank{#2}\else{
+        \caption{#2}}\fi
+    \end{center}
+  \end{figure}
+}
 
