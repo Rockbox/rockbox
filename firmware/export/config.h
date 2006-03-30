@@ -179,7 +179,7 @@
 /* Enable the directory cache if we have plenty of RAM. */
 /* Cache is just temporarily disabled for simulator build.
  * Do the small fix in dircache.c to enable this. */
-#if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER) && !defined(SIMULATOR)
+#if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
 #define HAVE_DIRCACHE 1
 #endif
 
