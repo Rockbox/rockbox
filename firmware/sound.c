@@ -30,7 +30,7 @@
 #include "wm8975.h"
 #elif defined(HAVE_WM8758)
 #include "wm8758.h"
-#elif defined(HAVE_WM8731)
+#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
 #include "wm8731l.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
@@ -81,7 +81,7 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -58,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
-#elif defined(HAVE_WM8731)
+#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
@@ -380,7 +380,7 @@ static int tenthdb2mixer(int db)
         return -db * 2 / 5;
 }
 
-#elif defined(HAVE_WM8731) 
+#elif defined(HAVE_WM8731) || defined(HAVE_WM8721) 
 /* volume/balance/treble/bass interdependency */
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
@@ -416,9 +416,9 @@ static int tenthdb2mixer(int db)
 
 #endif
 
-#if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 || \
-    defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) || \
-    defined(HAVE_TLV320)
+#if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
+    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
+    || defined(HAVE_WM8721) || defined(HAVE_TLV320)
  /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
@@ -450,7 +450,8 @@ static void set_prescaled_volume(void)
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
 #elif defined(HAVE_UDA1380)
     uda1380_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
     wmcodec_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
 
@@ -476,7 +477,8 @@ static void set_prescaled_volume(void)
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380)
     uda1380_set_master_vol(tenthdb2master(l), tenthdb2master(r));
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
     wmcodec_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758)
     wmcodec_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
@@ -589,9 +591,9 @@ void sound_set_volume(int value)
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(value + 115) & 0xff) << 8;
     mas_codec_writereg(0x10, tmp);
-#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 || \
-      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 || \
-      defined(HAVE_TLV320)
+#elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
+   || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
+   || defined(HAVE_WM8721) || defined(HAVE_TLV320)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();                          
 #elif CONFIG_CPU == PNX0101
@@ -607,9 +609,9 @@ void sound_set_balance(int value)
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     unsigned tmp = ((unsigned)(value * 127 / 100) & 0xff) << 8;
     mas_codec_writereg(0x11, tmp);
-#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 || \
-      defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 || \
-      defined(HAVE_TLV320)
+#elif CONFIG_CODEC == MAS3507D || defined HAVE_UDA1380 \
+   || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
+   || defined(HAVE_WM8721) || defined(HAVE_TLV320)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101
@@ -634,7 +636,8 @@ void sound_set_bass(int value)
     uda1380_set_bass(value >> 1);
     current_bass = value * 10;
     set_prescaled_volume();
-#elif defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731
+#elif defined HAVE_WM8975 || defined HAVE_WM8758 \
+   || defined HAVE_WM8731 || defined(HAVE_WM8721)
     current_bass = value * 10;
     wmcodec_set_bass(value);
     set_prescaled_volume();
@@ -659,7 +662,8 @@ void sound_set_treble(int value)
     uda1380_set_treble(value >> 1);
     current_treble = value * 10;
     set_prescaled_volume();
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
     wmcodec_set_treble(value);
     current_treble = value * 10;
     set_prescaled_volume();

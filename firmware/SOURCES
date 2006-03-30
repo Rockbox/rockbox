@@ -183,7 +183,7 @@ drivers/uda1380.c
 drivers/wm8975.c
 #elif defined(HAVE_WM8758) && !defined(SIMULATOR)
 drivers/wm8758.c
-#elif defined(HAVE_WM8731) && !defined(SIMULATOR)
+#elif (defined(HAVE_WM8731) || defined(HAVE_WM8721)) && !defined(SIMULATOR)
 drivers/wm8731l.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
 drivers/tlv320.c

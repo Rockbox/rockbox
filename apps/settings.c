@@ -213,7 +213,8 @@ static const struct bit_entry rtc_bits[] =
 #elif defined HAVE_UDA1380
     {5, S_O(bass), 0, "bass", NULL }, /* 0..+24 */
     {3, S_O(treble), 0, "treble", NULL }, /* 0..+6 */
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
     {4 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -6..+9 */
     {4 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -6..+9 */
 #endif

@@ -89,6 +89,27 @@ static void codec_set_active(int active)
  */
 static void i2s_reset(void)
 {
+#if CONFIG_CPU == PP5020
+    /* I2S soft reset */
+    outl(inl(0x70002800) | 0x80000000, 0x70002800);
+    outl(inl(0x70002800) & ~0x80000000, 0x70002800);
+
+    /* BIT.FORMAT [11:10] = I2S (default) */
+    outl(inl(0x70002800) & ~0xc00, 0x70002800);
+    /* BIT.SIZE [9:8] = 16bit (default) */
+    outl(inl(0x70002800) & ~0x300, 0x70002800);
+
+    /* FIFO.FORMAT [6:4] = 32 bit LSB */
+    /* since BIT.SIZ < FIFO.FORMAT low 16 bits will be 0 */
+    outl(inl(0x70002800) | 0x30, 0x70002800);
+
+    /* RX_ATN_LVL=1 == when 12 slots full */
+    /* TX_ATN_LVL=1 == when 12 slots empty */
+    outl(inl(0x7000280c) | 0x33, 0x7000280c);
+
+    /* Rx.CLR = 1, TX.CLR = 1 */
+    outl(inl(0x7000280c) | 0x1100, 0x7000280c);
+#elif CONFIG_CPU == PP5002
     /* I2S device reset */
     outl(inl(0xcf005030) | 0x80, 0xcf005030);
     outl(inl(0xcf005030) & ~0x80, 0xcf005030);
@@ -102,6 +123,7 @@ static void i2s_reset(void)
 
     /* reset DAC and ADC fifo */
     outl(inl(0xc000251c) | 0x30000, 0xc000251c);
+#endif
 }
 
 /*
@@ -112,6 +134,27 @@ int wmcodec_init(void) {
     /* reset I2C */
     i2c_init();
 
+#if CONFIG_CPU == PP5020
+    /* normal outputs for CDI and I2S pin groups */
+    outl(inl(0x70000020) & ~0x300, 0x70000020);
+
+    /*mini2?*/
+    outl(inl(0x70000010) & ~0x3000000, 0x70000010);
+    /*mini2?*/
+
+    /* device reset */
+    outl(inl(0x60006004) | 0x800, 0x60006004);
+    outl(inl(0x60006004) & ~0x800, 0x60006004);
+
+    /* device enable */
+    outl(inl(0x6000600C) | 0x807, 0x6000600C);
+
+    /* enable external dev clock clocks */
+    outl(inl(0x6000600c) | 0x2, 0x6000600c);
+
+    /* external dev clock to 24MHz */
+    outl(inl(0x70000018) & ~0xc, 0x70000018);
+#else
     /* device reset */
     outl(inl(0xcf005030) | 0x80, 0xcf005030);
     outl(inl(0xcf005030) & ~0x80, 0xcf005030);
@@ -135,6 +178,7 @@ int wmcodec_init(void) {
     outl(inl(0xcf000008) | 0x8, 0xcf000008);
     outl(inl(0xcf000018) | 0x8, 0xcf000018);
     outl(inl(0xcf000028) & ~0x8, 0xcf000028);
+#endif
     
     return 0;
 }
@@ -142,7 +186,7 @@ int wmcodec_init(void) {
 /* Silently enable / disable audio output */
 void wmcodec_enable_output(bool enable)
 {
-    if (enable) 
+    if (enable)
     {
         /* reset the I2S controller into known state */
         i2s_reset();
@@ -151,9 +195,13 @@ void wmcodec_enable_output(bool enable)
 
         codec_set_active(0x0);
 
+#ifdef HAVE_WM8721
         /* DACSEL=1 */
-        /* BYPASS=1 */
+        wm8731_write(0x4, 0x10);
+#elif defined HAVE_WM8731
+        /* DACSEL=1, BYPASS=1 */
         wm8731_write(0x4, 0x18);
+#endif
     
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
         wm8731_write(PWRMGMT, 0x67);

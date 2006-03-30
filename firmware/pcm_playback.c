@@ -31,7 +31,7 @@
 #include "wm8758.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
-#elif defined(HAVE_WM8731)
+#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
 #include "wm8731l.h"
 #endif
 #include "system.h"
@@ -237,7 +237,8 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
 
 /* We need to unify this code with the uda1380 code as much as possible, but
    we will keep it separate during early development.
@@ -522,7 +523,8 @@ void pcm_mute(bool mute)
 {
 #ifdef HAVE_UDA1380
     uda1380_mute(mute);
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
     wmcodec_mute(mute);
 #elif defined(HAVE_TLV320)
     tlv320_mute(mute);
@@ -557,7 +559,8 @@ void pcm_play_pause(bool play)
                 EBU1CONFIG = EBU_DEFPARM;
 #endif
                 DCR0 |= DMA_EEXT | DMA_START;
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
                 /* Enable the FIFO and fill it */
 
                 enable_fiq();
@@ -616,7 +619,8 @@ void pcm_play_pause(bool play)
 #ifdef HAVE_SPDIF_OUT
             EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
 #endif  
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
 #if CONFIG_CPU == PP5020
             /* Disable the interrupt */
             IISCONFIG &= ~0x2;
@@ -672,7 +676,8 @@ void pcm_calculate_peaks(int *left, int *right)
 #ifdef CPU_COLDFIRE
         size_t samples = (BCR0 & 0xffffff) / 4;
         addr = (short *) (SAR0 & ~3);
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8731)
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
         size_t samples = p_size / 4;
         addr = p;
 #endif

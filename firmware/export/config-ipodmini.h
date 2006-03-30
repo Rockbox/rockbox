@@ -40,8 +40,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* Define this if you have the WM8975 audio codec */
-#define HAVE_WM8975
+/* Define this if you have the WM8721 audio codec */
+#define HAVE_WM8721 /* actually WM8731 but no recording */
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODMINI /* port controlled */
