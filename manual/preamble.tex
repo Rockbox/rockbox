@@ -41,17 +41,17 @@
 %\usepackage{url}
 %\urlstyle{same}
 
-\pagestyle{fancy}
-\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
-\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+% fancy header style adjustments
+%\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+%\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\renewcommand{\rightmark}[1]{\thechapter\ }
 \fancyhead{}
 \fancyfoot{}
-\fancyhead[RO]{\iffloatpage{}{\rightmark}}
-\fancyhead[LE]{\iffloatpage{}{\leftmark}}
-\fancyhead[LO,RE]{\iffloatpage{}{\raisebox{-3pt}}}
-\fancyfoot[RO,LE]{\iffloatpage{}{\thepage}}
+\fancyhead[L]{{\textsc{\leftmark}}}
+\fancyhead[R]{\iffloatpage{}{\thepage}}
+\fancyfoot[L]{\textsc{Rockbox users manual}}
+\fancyfoot[R]{\textsc{\playername}}
 
-\fancyfoot[CO,CE]{}
 \renewcommand{\headrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \setlength{\headheight}{18.5pt}
