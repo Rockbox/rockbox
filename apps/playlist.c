@@ -862,7 +862,7 @@ static int randomise_playlist(struct playlist_info* playlist,
 {
     int count;
     int candidate;
-    int store;
+    long store;
     unsigned int current = playlist->indices[playlist->index];
     
     /* seed 0 is used to identify sorted playlist for resume purposes */
@@ -885,7 +885,7 @@ static int randomise_playlist(struct playlist_info* playlist,
 #ifdef HAVE_DIRCACHE
         if (playlist->filenames)
         {
-            store = (int)playlist->filenames[candidate];
+            store = (long)playlist->filenames[candidate];
             playlist->filenames[candidate] = playlist->filenames[count];
             playlist->filenames[count] = (struct dircache_entry *)store;
         }
