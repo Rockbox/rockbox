@@ -451,35 +451,43 @@ static void pcmbuf_flush_fillpos(void)
 /**
  * Completely process the crossfade fade out effect with current pcm buffer.
  */
-static void crossfade_process_buffer(unsigned int fade_in_delay,
-        unsigned int fade_out_delay, size_t fade_out_rem)
+static void crossfade_process_buffer(size_t fade_in_delay,
+        size_t fade_out_delay, size_t fade_out_rem)
 {
-    size_t amount;
-    size_t pos;
-    short *buf;
-
-    /* Fade out the entire current buffer according to settings. */
-    amount = fade_out_rem;
-    pos = crossfade_pos + fade_out_delay*2;
-    
-    while (fade_out_rem > 0 && crossfade_mode == CFM_CROSSFADE)
+    if (crossfade_mode == CFM_CROSSFADE)
     {
-        size_t blocksize = MIN(8192, fade_out_rem);
-        int factor = (fade_out_rem<<8)/amount;
+        /* Fade out the specified amount of the already processed audio */
+        size_t total_fade_out = fade_out_rem;
+        short *buf = (short *)&audiobuffer[crossfade_pos + fade_out_delay * 2];
+        short *buf_end = (short *)guardbuf;
 
-        /* Prevent pcmbuffer from wrapping. */
-        if (pos >= pcmbuf_size) pos -= pcmbuf_size;
+        /* Wrap the starting position if needed */
+        if (buf >= buf_end) buf -= pcmbuf_size / 2;
 
-        blocksize = MIN((pcmbuf_size - pos)/2, blocksize);
-        buf = (short *)&audiobuffer[pos];
-        
-        fade_out_rem -= blocksize;
-        pos += blocksize * 2;
-        while (blocksize > 0)
+        while (fade_out_rem > 0)
         {
-            *buf = (*buf * factor) >> 8;
-            *buf++;
-            blocksize--;
+            /* Each 1/10 second of audio will have the same fade applied */
+            size_t block_rem = MIN(NATIVE_FREQUENCY * 2 / 10, fade_out_rem);
+            unsigned int factor = (fade_out_rem << 8) / total_fade_out;
+            short *block_end = buf + block_rem;
+            
+            fade_out_rem -= block_rem;
+
+            /* Fade this block */
+            while (buf < block_end)
+            {
+                /* Fade one sample */
+                *buf = (*buf * factor) >> 8;
+                buf++;
+
+                if (buf >= buf_end)
+                {
+                    /* Wrap the pcmbuffer */
+                    buf -= pcmbuf_size / 2;
+                    /* Wrap the end pointer to ensure proper termination */
+                    block_end -= pcmbuf_size / 2;
+                }
+            }
         }
     }
 
