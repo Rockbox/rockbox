@@ -293,6 +293,9 @@ int remove(const char* name)
         return fd * 10 - 1;
 
     file = &openfiles[fd];
+#ifdef HAVE_DIRCACHE
+    dircache_remove(name);
+#endif
     rc = fat_remove(&(file->fatfile));
     if ( rc < 0 ) {
         DEBUGF("Failed removing file: %d\n", rc);
@@ -301,9 +304,6 @@ int remove(const char* name)
     }
 
     file->size = 0;
-#ifdef HAVE_DIRCACHE
-    dircache_remove(name);
-#endif
 
     rc = close(fd);
     if (rc<0)
@@ -364,6 +364,10 @@ int rename(const char* path, const char* newpath)
         return - 5;
     
     file = &openfiles[fd];
+#ifdef HAVE_DIRCACHE
+    dircache_rename(path, newpath);
+#endif
+    
     rc = fat_rename(&file->fatfile, &dir->fatdir, nameptr,
                     file->size, file->attr);
 #ifdef HAVE_MULTIVOLUME
@@ -379,10 +383,6 @@ int rename(const char* path, const char* newpath)
         return rc * 10 - 7;
     }
 
-#ifdef HAVE_DIRCACHE
-    dircache_rename(path, newpath);
-#endif
-    
     rc = close(fd);
     if (rc<0) {
         errno = EIO;
