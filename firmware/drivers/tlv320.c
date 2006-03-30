@@ -81,7 +81,7 @@ void tlv320_init(void)
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16|DAIF_FOR_I2S);
     tlv320_set_headphone_vol(0, 0);
     tlv320_write_reg(REG_DIA, DIA_ACT);
-    tlv320_write_reg(REG_SRC, SRC_CLKIN);
+    tlv320_write_reg(REG_SRC, (8 << 2)); /* 44.1kHz */
 }
 
 /**

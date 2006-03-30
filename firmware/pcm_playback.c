@@ -118,20 +118,20 @@ void pcm_set_frequency(unsigned int frequency)
     switch(frequency)
     {
     case 11025:
-        pcm_freq = 0x4;
+        pcm_freq = 0x2;
 #ifdef HAVE_UDA1380
         uda1380_set_nsorder(3);
 #endif
         break;
     case 22050:
-        pcm_freq = 0x6;
+        pcm_freq = 0x4;
 #ifdef HAVE_UDA1380
         uda1380_set_nsorder(3);
 #endif
         break;
     case 44100:
     default:
-        pcm_freq = 0xC;
+        pcm_freq = 0x6;
 #ifdef HAVE_UDA1380
         uda1380_set_nsorder(5);
 #endif
