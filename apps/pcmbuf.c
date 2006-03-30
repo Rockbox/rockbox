@@ -116,10 +116,10 @@ static bool boost_mode;
 void pcmbuf_boost(bool state)
 {
     static bool boost_state = false;
-    
+
     if (crossfade_init || crossfade_active || boost_mode)
         return;
-        
+
     if (state != boost_state) {
         cpu_boost(state);
         boost_state = state;
@@ -138,7 +138,7 @@ void pcmbuf_set_boost_mode(bool state)
 /* This function has 2 major logical parts (separated by brackets both for
  * readability and variable scoping).  The first part performs the
  * operastions related to finishing off the last buffer we fed to the DMA.
- * The second part performs the operations involved in sending a new buffer 
+ * The second part performs the operations involved in sending a new buffer
  * to the DMA.  Finally the function checks the status of the buffer and
  * boosts if necessary */
 static void pcmbuf_callback(unsigned char** start, size_t* size) ICODE_ATTR;
@@ -267,7 +267,7 @@ bool pcmbuf_is_lowdata(void)
     if (!pcm_is_playing() || pcm_is_paused() ||
             crossfade_init || crossfade_active)
         return false;
-    
+
     /* 0.5 seconds of buffer is low data */
     return LOW_DATA(2);
 }
@@ -290,9 +290,9 @@ bool pcmbuf_crossfade_init(bool manual_skip)
         crossfade_mode = global_settings.crossfade_fade_out_mixmode
                 ? CFM_MIX : CFM_CROSSFADE;
     crossfade_init = true;
-    
+
     return true;
-    
+
 }
 
 void pcmbuf_play_stop(void)
@@ -303,7 +303,7 @@ void pcmbuf_play_stop(void)
     pcm_mute(true);
     pcm_play_stop();
     pcm_mute(false);
-    
+
     pcmbuf_unplayed_bytes = 0;
     pcmbuf_mix_used_bytes = 0;
     if (pcmbuf_read) {
@@ -316,7 +316,7 @@ void pcmbuf_play_stop(void)
     audiobuffer_free = pcmbuf_size;
     crossfade_init = false;
     crossfade_active = false;
-    
+
     pcmbuf_set_boost_mode(false);
     pcmbuf_boost(false);
 
@@ -340,7 +340,7 @@ int pcmbuf_descs(void) {
 size_t get_pcmbuf_descsize(void) {
     return pcmbuf_descsize;
 }
-    
+
 static void pcmbuf_init_pcmbuffers(void) {
     struct pcmbufdesc *next = pcmbuf_write;
     next++;
@@ -351,7 +351,7 @@ static void pcmbuf_init_pcmbuffers(void) {
         next++;
     }
 }
-        
+
 /* Initialize the pcmbuffer the structure looks like this:
  * ...CODECBUFFER|---------PCMBUF---------|GUARDBUF|DESCS| */
 void pcmbuf_init(size_t bufsize)
@@ -383,7 +383,7 @@ static void pcmbuf_flush_audio(void)
         pcmbuf_play_stop();
         return ;
     }
-    
+
     pcmbuf_boost(true);
     crossfade_mode = CFM_FLUSH;
     crossfade_init = true;
@@ -408,10 +408,10 @@ void pcmbuf_play_start(void)
         /** Prevent a very tiny pop from happening by muting audio
          *  until dma has been initialized. */
         pcm_mute(true);
-    
+
         last_chunksize = pcmbuf_read->size;
         pcmbuf_unplayed_bytes -= last_chunksize;
-        pcm_play_data(pcmbuf_callback, 
+        pcm_play_data(pcmbuf_callback,
                 (unsigned char *)pcmbuf_read->addr, last_chunksize);
 
         /* Now unmute the audio. */
@@ -470,7 +470,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
             size_t block_rem = MIN(NATIVE_FREQUENCY * 2 / 10, fade_out_rem);
             unsigned int factor = (fade_out_rem << 8) / total_fade_out;
             short *block_end = buf + block_rem;
-            
+
             fade_out_rem -= block_rem;
 
             /* Fade this block */
@@ -508,7 +508,7 @@ static void crossfade_start(void)
     size_t fade_out_rem = 0;
     unsigned int fade_out_delay = 0;
     unsigned fade_in_delay = 0;
-    
+
     crossfade_init = 0;
     /* Reject crossfade if less than .5s of data */
     if (LOW_DATA(2)) {
@@ -556,7 +556,7 @@ static void crossfade_start(void)
 
             fade_in_delay = NATIVE_FREQUENCY
                     * global_settings.crossfade_fade_in_delay * 2;
-        
+
             /* Decrease the fade out delay if necessary. */
             if (crossfade_rem < fade_out_rem + fade_out_delay)
                 fade_out_delay -=
@@ -568,16 +568,16 @@ static void crossfade_start(void)
             crossfade_fade_in_amount = 0;
             break ;
     }
-    
+
     if (crossfade_pos < crossfade_rem * 2)
         crossfade_pos += pcmbuf_size;
     crossfade_pos -= crossfade_rem*2;
-    
+
     if (crossfade_mode != CFM_FLUSH) {
         /* Process the fade out part of the crossfade. */
         crossfade_process_buffer(fade_in_delay, fade_out_delay, fade_out_rem);
     }
-    
+
 }
 
 /**
@@ -590,7 +590,7 @@ static void fade_insert(const short *inbuf, size_t length)
     int factor;
     unsigned int i, samples;
     short *buf;
-    
+
     factor = ((crossfade_fade_in_amount-crossfade_fade_in_rem)<<8)
         /crossfade_fade_in_amount;
 
@@ -600,7 +600,7 @@ static void fade_insert(const short *inbuf, size_t length)
         sleep(1);
     }
     audiobuffer_free -= length;
-    
+
     while (length > 0) {
         unsigned int audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
         /* Flush as needed */
@@ -609,14 +609,14 @@ static void fade_insert(const short *inbuf, size_t length)
             pcmbuf_flush_fillpos();
             audiobuffer_index = audiobuffer_pos + audiobuffer_fillpos;
         }
-        
+
         copy_n = MIN(length, pcmbuf_size - audiobuffer_index);
 
         buf = (short *)&audiobuffer[audiobuffer_index];
         samples = copy_n / 2;
         for (i = 0; i < samples; i++)
             buf[i] = (inbuf[i] * factor) >> 8;
-        
+
         inbuf += samples;
         audiobuffer_fillpos += copy_n;
         length -= copy_n;
@@ -632,7 +632,7 @@ static int crossfade(short *buf, const short *buf2, unsigned int length)
     unsigned int i;
     size_t size_insert = 0;
     int factor;
-    
+
     size = MIN(length, crossfade_rem);
     switch (crossfade_mode) {
         /* Fade in the current stream and mix it. */
@@ -640,9 +640,9 @@ static int crossfade(short *buf, const short *buf2, unsigned int length)
         case CFM_CROSSFADE:
             factor = ((crossfade_fade_in_amount-crossfade_fade_in_rem)<<8) /
                 crossfade_fade_in_amount;
-            
+
             for (i = 0; i < size; i++) {
-                buf[i] = MIN(32767, MAX(-32768, 
+                buf[i] = MIN(32767, MAX(-32768,
                             buf[i] + ((buf2[i] * factor) >> 8)));
             }
             break ;
@@ -670,7 +670,7 @@ static int crossfade(short *buf, const short *buf2, unsigned int length)
             fade_insert(&buf2[size], size_insert*2);
             crossfade_fade_in_rem -= size_insert;
         }
-        
+
         if (crossfade_fade_in_rem == 0)
             crossfade_active = false;
     }
@@ -726,7 +726,7 @@ static bool prepare_insert(size_t length)
             && pcm_is_playing())
             return false;
     }
-    
+
     /* Need to save PCMBUF_MIN_CHUNK to prevent wrapping overwriting */
     if (audiobuffer_free < length + PCMBUF_MIN_CHUNK && !crossfade_active)
     {
@@ -835,7 +835,7 @@ static inline short* get_mix_insert_pos(void) {
     /* Give at least 1/8s clearance here */
     size_t pcmbuf_mix_back_pos =
         pcmbuf_unplayed_bytes - NATIVE_FREQUENCY * 4 / 8;
-    
+
     if (audiobuffer_pos < pcmbuf_mix_back_pos)
         return (short *)&audiobuffer[pcmbuf_size +
             audiobuffer_pos - pcmbuf_mix_back_pos];
@@ -854,7 +854,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
     short *pcmbuf_end = (short *)guardbuf;
     bool playing = pcm_is_playing();
     size_t samples = NATIVE_FREQUENCY / 1000 * duration;
-    
+
     if (playing) {
         buf = get_mix_insert_pos();
     } else {
@@ -876,7 +876,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
             sample = *buf;
             *buf++ = MIN(MAX(sample - amplitude, -32768), 32767);
         }
-        
+
         if (++count >= interval)
         {
             count = 0;
@@ -914,7 +914,7 @@ void pcmbuf_mix(char *buf, size_t length)
 
     if (pcmbuf_mix_used_bytes == 0)
         pcmbuf_reset_mixpos();
-    
+
     pcmbuf_mix_used_bytes += length;
     length /= 2;
 

@@ -203,7 +203,7 @@ static const struct bit_entry rtc_bits[] =
     /* sound */
 #if CONFIG_CODEC == MAS3507D
     {8 | SIGNED, S_O(volume), -18, "volume", NULL }, /* -78...+18 */
-#else 
+#else
     {8 | SIGNED, S_O(volume), -25, "volume", NULL }, /* -100...+12 / -84...0 */
 #endif
     {8 | SIGNED, S_O(balance), 0, "balance", NULL }, /* -100...100 */
@@ -300,7 +300,7 @@ static const struct bit_entry rtc_bits[] =
 #endif
 
 #ifdef CONFIG_BACKLIGHT
-    {1, S_O(bl_filter_first_keypress), 
+    {1, S_O(bl_filter_first_keypress),
 #ifdef HAVE_LCD_COLOR
             true,
 #else
@@ -308,9 +308,9 @@ static const struct bit_entry rtc_bits[] =
 #endif
             "backlight filters first keypress", off_on },
 #ifdef HAVE_REMOTE_LCD
-    {1, S_O(remote_bl_filter_first_keypress), false, 
+    {1, S_O(remote_bl_filter_first_keypress), false,
             "backlight filters first remote keypress", off_on },
-#endif    
+#endif
 
 #endif
 
@@ -475,7 +475,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(replaygain_noclip), false, "replaygain noclip", off_on },
     {8 | SIGNED, S_O(replaygain_preamp), 0, "replaygain preamp", NULL },
     {2, S_O(beep), 0, "beep", "off,weak,moderate,strong" },
-    {2, S_O(crossfade), 0, "crossfade", "off,shuffle,always"},
+    {2, S_O(crossfade), 0, "crossfade", "off,shuffle,track skip,always"},
     {3, S_O(crossfade_fade_in_delay), 0, "crossfade fade in delay", NULL},
     {3, S_O(crossfade_fade_out_delay), 0, "crossfade fade out delay", NULL},
     {4, S_O(crossfade_fade_in_duration), 0, "crossfade fade in duration", NULL},
@@ -511,13 +511,13 @@ static const struct bit_entry hd_bits[] =
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-    {1, S_O(remote_caption_backlight), false, 
+    {1, S_O(remote_caption_backlight), false,
         "remote caption backlight", off_on },
 #endif
     {4, S_O(default_codepage), 0, "default codepage", "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256" },
-    
+
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {4, S_O(brightness), 9, "brightness", NULL }, 
+    {4, S_O(brightness), 9, "brightness", NULL },
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -565,8 +565,8 @@ static const struct bit_entry hd_bits[] =
 #endif /* CONFIG_BACKLIGHT */
 #endif /*HAVE_RECORDING*/
 #ifdef HAVE_LCD_COLOR
-    {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"}, 
-    {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"}, 
+    {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"},
+    {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"},
 #endif
 
 #ifdef HAVE_DIRCACHE
@@ -1148,7 +1148,7 @@ void settings_apply(void)
     dsp_set_crossfeed(global_settings.crossfeed);
 
     dsp_set_eq(global_settings.eq_enabled);
-    dsp_set_eq_precut(global_settings.eq_precut); 
+    dsp_set_eq_precut(global_settings.eq_precut);
     /* Update all EQ bands */
     for(i = 0; i < 5; i++) {
         dsp_set_eq_coefs(i);
@@ -1525,7 +1525,7 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
 #ifdef HAVE_LCD_COLOR
         else if (!strcasecmp(p_run->cfg_val, "rgb"))
         {
-            fdprintf(fd, "%s: %02x%02x%02x\r\n", p_run->cfg_name, 
+            fdprintf(fd, "%s: %02x%02x%02x\r\n", p_run->cfg_name,
                                                  (int)RGB_UNPACK_RED(value),
                                                  (int)RGB_UNPACK_GREEN(value),
                                                  (int)RGB_UNPACK_BLUE(value));
@@ -1693,7 +1693,7 @@ void settings_reset(void) {
     global_settings.lang_file[0] = '\0';
 #ifdef HAVE_LCD_COLOR
     global_settings.backdrop_file[0] = '\0';
-      
+
     global_settings.fg_color = LCD_DEFAULT_FG;
     global_settings.bg_color = LCD_DEFAULT_BG;
 #endif

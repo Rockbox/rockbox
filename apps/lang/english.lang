@@ -3898,3 +3898,9 @@ desc: spoken only, for file extension
 eng: ""
 voice: "keyboard"
 new:
+
+id: LANG_TRACKSKIP
+desc: in crossfade settings
+eng: "Track Skip Only"
+voice: "Track Skip Only"
+new:
