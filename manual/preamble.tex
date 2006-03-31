@@ -42,6 +42,7 @@
 \usepackage{longtable}
 \usepackage{url}
 \urlstyle{sf}
+\usepackage{marvosym}
 
 % fancy header style adjustments
 %\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
@@ -98,3 +99,19 @@
   \end{figure}
 }
 
+% command to display a note.
+% Usage: \note{text of your note}
+% Note: do NOT use \textbf or similar to emphasize text, use \emph!
+\newcommand{\note}[1]{
+  \noindent\\%
+  \textbf{Note:}\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}\ #1%
+  \newline
+}
+
+% command to display a warning.
+% Usage: \warn{text of your warning}
+% Note: do NOT use \textbf or similar to emphasize text!
+\newcommand{\warn}[1]{
+  \noindent\textbf{Warning:}\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}\ #1%
+  \newline
+}
