@@ -105,7 +105,6 @@ nim.c
 #endif /* HAVE_LCD_CHARCELLS */
 
 #if CONFIG_CODEC == SWCODEC        /* software codec platforms */
-iriverify.c
 mp3_encoder.c
 midi2wav.c
 wav2wv.c
@@ -115,5 +114,10 @@ alpine_cdc.c
 #endif
 splitedit.c
 #endif /* CONFIG_CODEC */
+
+/* Platform-specific plugins */
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+iriverify.c
+#endif
 
 #endif /* iFP7xx */
