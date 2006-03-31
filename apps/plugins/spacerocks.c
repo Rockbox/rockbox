@@ -74,7 +74,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE BUTTON_SELECT
 #define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define AST_PAUSE (BUTTON_SELECT | BUTTON_PLAY)
 #define AST_QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define AST_THRUST BUTTON_MENU
