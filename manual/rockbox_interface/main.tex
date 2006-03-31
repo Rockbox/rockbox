@@ -7,8 +7,8 @@
   \opt{h1xx}{\includegraphics[height=11.8cm]{rockbox_interface/images/h1xx-front.png}}
 \end{center}
 
-Throughout this manual, the buttons on the \dap\ are labelled according to the picture above.
-To turn on and shutdown your \dap, the following keys are used:
+Throughout this manual, the buttons on the \dap\ are labelled according to the
+picture above. To turn on and shutdown your \dap, the following keys are used:
 
 \begin{table}[h!]
   \begin{center}
@@ -30,12 +30,17 @@ To turn on and shutdown your \dap, the following keys are used:
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
 
 \opt{ondio,player,RECORDER_PAD}{
-  In the unlikely event of a software failure, a hardware power off can be performed by holding down STOP until the Jukebox power light goes off. This works for all models of Jukebox.
+  In the unlikely event of a software failure, a hardware power off can be
+  performed by holding down STOP until the Jukebox power light goes off. This
+  works for all models of Jukebox.
 }
 
 \section{\label{ref:file_browser}File Browser}
 \screenshot{rockbox_interface/images/ss-file-browser-\genericimg.png}{The file browser}{}
-The file browser helps you navigate through the files on your \dap, entering folders and executing the default action on each file. To help us differentiate files, each file format is displayed with an icon. You can select which file types are displayed (see page \pageref{ref:ShowFiles}).
+The file browser helps you navigate through the files on your \dap, entering
+folders and executing the default action on each file. To help us differentiate
+files, each file format is displayed with an icon. You can select which file
+types are displayed (see page \pageref{ref:ShowFiles}).
 
 \subsection{\label{ref:controls}Controls}
 \begin{table}[h!]
@@ -94,83 +99,127 @@ The file browser helps you navigate through the files on your \dap, entering fol
 }
 
 \subsection{\label{ref:Filemenu}\label{ref:PartIISectionFM}File Menu}
-  \screenshot{rockbox_interface/images/ss-file-menu-\genericimg.png}{The file menu}{}
+\screenshot{rockbox_interface/images/ss-file-menu-\genericimg.png}{The file menu}{}
 
-This menu operates on the file that was selected in the browser. It offers the following options:
+This menu operates on the file that was selected in the browser. It offers the
+following options:
 
-\begin{itemize}
-\item \textbf{Open with:} Runs a viewer plugin on the file. Normally the filetype of a file is detected and the appropriate plugin is run automatically when you press play on it.  Use this menu if for some reason you want to override the default action and select a viewer by hand.  See page \textmd{\pageref{ref:Viewersplugins}} for more details on viewers. For example, this would be used to view a text file with a non-standard extension, i.e. not ending with .txt.
-\item \textbf{Playlist:} Change to the Playlist submenu (see below).
-\item \textbf{Rename:} This function lets the user modify a file name.
-\item \textbf{Cut:} Copies the name of the currently selected file or directory to the clipboard and marks it to be 'cut'.
-\item \textbf{Copy:} Copies the name of the currently selected file or directory to the clipboard and marks it to be 'copied'.
-\item \textbf{Paste:} Only visible if a file or directory name is on the clipboard. When selected it will move or copy the clipboard to the current directory. 
-\item \textbf{Delete:} Only files can be deleted, not folders. Rockbox will ask for confirmation before deleting a file. Press PLAY to confirm deletion or any other key to cancel.
-\item \textbf{Delete Directory:} Deletes the folder pointed to by the cursor and all the files and folders contained in it.  Use with caution.
-\item \textbf{Create Directory:} Makes a new folder in the current folder on the disk.
-\end{itemize}
+\begin{description}
+\item [Open with:] 
+  Runs a viewer plugin on the file. Normally the filetype of a file is detected
+  and the appropriate plugin is run automatically when you press play on it.
+  Use this menu if for some reason you want to override the default action and
+  select a viewer by hand.  See page \textmd{\pageref{ref:Viewersplugins}} for
+  more details on viewers. For example, this would be used to view a text file
+  with a non-standard extension, i.e. not ending with .txt.
+\item [Playlist:]
+  Change to the Playlist submenu (see below).
+\item [Rename:]
+  This function lets the user modify a file name.
+\item [Cut:]
+  Copies the name of the currently selected file or directory to the clipboard
+  and marks it to be 'cut'.
+\item [Copy:]
+  Copies the name of the currently selected file or directory to the clipboard
+  and marks it to be 'copied'.
+\item [Paste:]
+  Only visible if a file or directory name is on the clipboard. When selected
+  it will move or copy the clipboard to the current directory.
+\item [Delete:]
+  Only files can be deleted, not folders. Rockbox will ask for confirmation
+  before deleting a file. Press PLAY to confirm deletion or any other key to
+  cancel.
+\item [Delete Directory:]
+  Deletes the folder pointed to by the cursor and all the files and folders
+  contained in it.  Use with caution.
+\item [Create Directory:]
+  Makes a new folder in the current folder on the disk.
+\end{description}
 
 \subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
-If the playlist submenu is invoked on a directory, it will act on all the files within that directory.  If invoked on a playlist it will act on all the files in that playlist. Otherwise it acts only on the current file.
-  \screenshot{rockbox_interface/images/ss-playlist-menu-112x64x1.png}{The playlist menu}{}
+\screenshot{rockbox_interface/images/ss-playlist-menu-112x64x1.png}{The playlist menu}{}
+If the playlist submenu is invoked on a directory, it will act on all the files
+within that directory.  If invoked on a playlist it will act on all the files
+in that playlist. Otherwise it acts only on the current file.
+
 This menu provides the following options:
 
-\begin{itemize}
-\item \textbf{Insert:} Add track(s) to playlist. If no other tracks have been inserted then the selected track will be added immediately after current playing track, otherwise they will be added to end of insertion list.
-\item \textbf{Insert next: }Add track(s) immediately after current playing track, no matter what else has been inserted.
-\item \textbf{Insert last: }Add track(s) to end of playlist.
-\item \textbf{Queue: } Queue is the same as Insert except queued tracks are deleted immediately from the playlist after they've been played. Also, queued tracks are not saved to the playlist file (see page \pageref{ref:playlistoptions}).
-\item \textbf{Queue next:} Queue track(s) immediately after current playing track.
-\item \textbf{Queue last: }Queue track(s) at end of playlist.
-\end{itemize}
+\begin{description}
+\item [Insert:]
+  Add track(s) to playlist. If no other tracks have been inserted then the
+  selected track will be added immediately after current playing track,
+  otherwise they will be added to end of insertion list.
+\item [Insert next:] 
+  Add track(s) immediately after current playing track, no matter what else has
+  been inserted.
+\item [Insert last:]
+  Add track(s) to end of playlist.
+\item [Queue:]
+  Queue is the same as Insert except queued tracks are deleted immediately from
+  the playlist after they've been played. Also, queued tracks are not saved to
+  the playlist file (see page \pageref{ref:playlistoptions}).
+\item [Queue next:]
+  Queue track(s) immediately after current playing track.
+\item [Queue last:]
+  Queue track(s) at end of playlist.
+\end{description}
 
-You can insert a track, directory or playlist even if nothing is currently playing. In this case, a new playlist is created with only the selected tracks and then play is started.\\
-\textbf{Note}: The dynamic playlist is saved so resume will restore it exactly as before shutdown.
+You can insert a track, directory or playlist even if nothing is currently
+playing. In this case, a new playlist is created with only the selected tracks
+and then play is started.\\
+\note{The dynamic playlist is saved so resume will restore it exactly as before shutdown.}
 
 \subsection{Virtual Keyboard}
-  \screenshot{rockbox_interface/images/ss-virtual-keyboard-112x64x1.png}{The virtual keyboard}{}
+\screenshot{rockbox_interface/images/ss-virtual-keyboard-112x64x1.png}{The virtual keyboard}{}
 This is the virtual keyboard that is used when entering file names in Rockbox.
 
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD,IPOD_4G_PAD}{
-\begin{center}
-  \begin{tabular}{@{}ll@{}}\toprule
-    \textbf{Key} & \textbf{Function} \\\midrule
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
-    \opt{IPOD_4G_PAD}{Please add correct keys} & Move about the virtual keyboard \\
-                                               & (moves the solid cursor) \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonLeft/\ButtonRight}
-    \opt{IPOD_4G_PAD}{Please add correct keys}
-    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Move about within the current file name \\
-                                                 & (moves the line cursor) \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
-    \opt{RECORDER_PAD}{\ButtonPlay}
-    \opt{IPOD_4G_PAD}{Please add correct keys}
-    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Inserts the currently selected keyboard letter \\
-                                                 & at the current filename cursor position \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
-    \opt{IPOD_4G_PAD}{Please add correct keys}
-    \opt{IAUDIO_X5_PAD}{Please add correct keys} & Exits the virtual keyboard without saving any changes \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
-    \opt{RECORDER_PAD}{\ButtonFOne} & SHIFT: Shifts between the upper case, \\
-                                    & lower case and accented keyboards \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{RECORDER_PAD}{\ButtonFTwo}
-    \opt{IPOD_4G_PAD}{Please add correct keys}
-    \opt{IAUDIO_X5_PAD}{Please add correct keys} & OK: Exits the virtual keyboard and saves any changer \\
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-    \opt{RECORDER_PAD}{\ButtonFThree}
-    \opt{IPOD_4G_PAD}{Please add correct keys}
-    \opt{IAUDIO_X5_PAD}{Please add correct keys} & DEL: Deletes the character before\\ 
-                                                 & the current filename cursor \\
-
-    \opt{SWCODEC}{
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Function} \\\midrule
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys} & Move about the virtual keyboard \\
+                                                 & (moves the solid cursor) \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonLeft/\ButtonRight}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Enters Morse input mode\\
-    }
-    \bottomrule
-  \end{tabular}
-\end{center}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Move about within the current file name \\
+                                                   & (moves the line cursor) \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{RECORDER_PAD}{\ButtonPlay}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Inserts the currently selected keyboard letter \\
+                                                   & at the current filename cursor position \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Exits the virtual keyboard without saving any changes \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
+      \opt{RECORDER_PAD}{\ButtonFOne} & SHIFT: Shifts between the upper case, \\
+                                      & lower case and accented keyboards \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{RECORDER_PAD}{\ButtonFTwo}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & OK: Exits the virtual keyboard and saves any changer \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+      \opt{RECORDER_PAD}{\ButtonFThree}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} & DEL: Deletes the character before\\ 
+                                                   & the current filename cursor \\
+
+      %
+      \opt{SWCODEC}{
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+        \opt{IPOD_4G_PAD}{Please add correct keys}
+        \opt{IAUDIO_X5_PAD}{Please add correct keys} & Enters Morse input mode\\
+      }
+      \bottomrule
+    \end{tabular}
+  \end{center}
 }
 
 \opt{ondio}{
@@ -200,20 +249,24 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
   \end{center}
 }
 \opt{player}{
-  The current filename is always listed on the first line of the display. The second line of the display can contain the character selection bar, as in the screenshot above, or  one of a number of other options.
-    \begin{center}
-      \begin{tabular}{@{}ll@{}}\toprule
-        \textbf{Key} & \textbf{Function} \\\midrule
-        \ButtonLeft/\ButtonRight & Moves the arrow to/from the filename \\
-                                 & and changes between the character bar \\
-                                 & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
-        \ButtonPlay/\ButtonStop & Varies (see below) \\
-        \ButtonMenu & Shift.  When the character selection bar is selected\\
-                    & this changes between upper case, lower case, \\
-                    & and accented letters. \\\bottomrule
-      \end{tabular}
-    \end{center}
-    The function of the PLAY and STOP buttons depends on what the arrow is pointing to, as follows.
+  The current filename is always listed on the first line of the display. The
+  second line of the display can contain the character selection bar, as in the
+  screenshot above, or  one of a number of other options.
+  \begin{center}
+    \begin{tabular}{@{}ll@{}}\toprule
+      \textbf{Key} & \textbf{Function} \\\midrule
+      \ButtonLeft/\ButtonRight & Moves the arrow to/from the filename \\
+                               & and changes between the character bar \\
+                               & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
+      \ButtonPlay/\ButtonStop & Varies (see below) \\
+      \ButtonMenu & Shift.  When the character selection bar is selected\\
+                  & this changes between upper case, lower case, \\
+                  & and accented letters. \\\bottomrule
+    \end{tabular}
+  \end{center}
+
+  The function of the \ButtonPlay\ and \ButtonStop\ buttons depends on what the
+  arrow is pointing to, as follows.
   
   \begin{table}[h!]
     \begin{center}
@@ -238,11 +291,13 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
 
 
 \section{\label{ref:WPS}While Playing Screen}
-The While Playing Screen (WPS) displays various pieces of information about the currently playing audio file:
+The While Playing Screen (WPS) displays various pieces of information about the
+currently playing audio file:
 %
 \opt{HAVE_LCD_BITMAP}{
   \begin{itemize}
-  \item Status bar: Battery level, charger status, volume, play mode, repeat mode, shuffle mode and clock.
+  \item Status bar: Battery level, charger status, volume, play mode, repeat mode,
+    shuffle mode and clock.
   \item Scrolling path+filename of the current song.
   \item The ID3 track name.
   \item The ID3 album name.
@@ -257,7 +312,8 @@ Notes:
 \opt{recorder,recorderv2fm,ondio}{
   \begin{itemize}
   \item The number of lines shown depends on the size of the font used.
-  \item The peak meter is only visible if you turn off the status bar or if using a small font that gives 8 or more display lines.
+  \item The peak meter is only visible if you turn off the status bar or if
+    using a small font that gives 8 or more display lines.
   \end{itemize}
 }
 %
@@ -267,7 +323,8 @@ Notes:
   \item Current{}-time Progress{}-indicator Left.
   \end{itemize}
   
-  See page \textmd{\pageref{ref:ConfiguringtheWPS}} for details of customising your WPS (While Playing Screen).
+  See page \textmd{\pageref{ref:ConfiguringtheWPS}} for details of customising
+  your WPS (While Playing Screen).
 }
 
 \subsection{\label{ref:WPS_Key_Controls}WPS Key Controls}
@@ -345,65 +402,96 @@ Notes:
 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:peak_meter}Peak Meter}
-  The peak meter can be displayed on the While Playing Screen and consists of several indicators.  For a picture of the peak meter, please see the  While Recording Screen on page \pageref{ref:Whilerecordingscreen}.
+  The peak meter can be displayed on the While Playing Screen and consists of
+  several indicators.  For a picture of the peak meter, please see the  While
+  Recording Screen on page \pageref{ref:Whilerecordingscreen}.
   
-  \begin{itemize}
-  \item \textbf{The bar: }
+  \begin{description}
+  \item [The bar:]
     This is the wide horizontal bar. It represents the current volume value.
-  \item \textbf{The peak indicator:} 
-    This is a little vertical line at the rightend of the bar. It indicates the peak volume value that occurred recently.
-  \item \textbf{The clip indicator: }
-    This is a little black block that is displayed at the very right of the scale when an overflow occurs. It usually doesn't show up during normal playback unless you play an audio file that is distorted heavily. If you encounter clipping while recording your recording will sound distorted. You should lower the gain. Note that the clip detection is not very precise. Clipping might occur without being indicated.
-  \item \textbf{The scale: }
-    Between the indicators of the right and left channel there are little dots. These dots represent important volume values. In linear mode each dot is a 10\% mark. In dbfs mode the dots represent the following values (from right to left): 0db, {}-3db, {}-6db, {}-9db, {}-12db, {}-18db, {}-24db, {}-30db, {}-40db, {}-50db, {}-60db.
-\end{itemize}
+  \item [The peak indicator:]
+    This is a little vertical line at the rightend of the bar. It indicates the
+    peak volume value that occurred recently.
+  \item [The clip indicator:]
+    This is a little black block that is displayed at the very right of the
+    scale when an overflow occurs. It usually doesn't show up during normal
+    playback unless you play an audio file that is distorted heavily. If you
+    encounter clipping while recording your recording will sound distorted. You
+    should lower the gain. Note that the clip detection is not very precise.
+    Clipping might occur without being indicated.
+  \item [The scale:]
+    Between the indicators of the right and left channel there are little dots.
+    These dots represent important volume values. In linear mode each dot is a
+    10\% mark. In dbfs mode the dots represent the following values (from right
+    to left): 0db, {}-3db, {}-6db, {}-9db, {}-12db, {}-18db, {}-24db, {}-30db,
+    {}-40db, {}-50db, {}-60db.
+  \end{description}
 }
 
 \subsection{\label{ref:ID3viewer}ID3 Viewer}
-  \screenshot{rockbox_interface/images/ss-id3-viewer-112x64x1.png}{The ID3 viewer}{}
-This screen is accessible from the WPS screen, and provides a detailed view of all the identity information about the current track. This info is known as meta data and is stored in audio file formats to keep information on artist, album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{Please correct this information}\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\ to move through the information.}
+\screenshot{rockbox_interface/images/ss-id3-viewer-112x64x1.png}{The ID3 viewer}{}
+This screen is accessible from the WPS screen, and provides a detailed view of
+all the identity information about the current track. This info is known as
+meta data and is stored in audio file formats to keep information on artist,
+album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{Please correct this information}}\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and select the id3-viewer from there.}\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\ to move through the information.}
 
 %********************QUICKSCREENS***********************************************
 \opt{RECORDER_PAD}{
-\section{\label{ref:QuickScreenMenus}Quick Screen Menus}
+  \section{\label{ref:QuickScreenMenus}Quick Screen Menus}
   \screenshot{rockbox_interface/images/ss-quick-screen-112x64x1.png}{The quick screen}{}
   \screenshot{rockbox_interface/images/ss-quick-screen2-112x64x1.png}{The quick screen}{}
-Rockbox handles function buttons in a different way to the Archos software. \ButtonFOne\ is always bound to the menu function, while \ButtonFTwo\ and \ButtonFThree\ enable two quick menus.
+  Rockbox handles function buttons in a different way to the Archos software.
+  \ButtonFOne\ is always bound to the menu function, while \ButtonFTwo\ and
+  \ButtonFThree\ enable two quick menus.
+  
+  \ButtonFTwo\ displays some browse and play settings which are likely to be
+  changed frequently. This settings are Shuffle mode, Repeat mode and the Show
+  files options
+  
+  Shuffle mode plays each track in the currently playing list in a random order
+  rather than in the order shown in the browser.
 
-\ButtonFTwo\ displays some browse and play settings which are likely to be changed frequently. This settings are Shuffle mode, Repeat mode and the Show files options
+  Repeat mode repeats either a single track (One) or the entire playlist (All).
 
-Shuffle mode plays each track in the currently playing list in a random order rather than in the order shown in the browser.
+  Show files determines what type files can be seen in the browser.  This can be
+  just MP3 files and directories (Music), Playlists, MP3 files and directories
+  (Playlists), any files that Rockbox supports (Supported) or all files on the
+  disk (All).
 
-Repeat mode repeats either a single track (One) or the entire playlist (All).
+  See page \pageref{ref:PlaybackOptions} for more information about these
+  settings.
 
-Show files determines what type files can be seen in the browser.  This can be just MP3 files and directories (Music), Playlists, MP3 files and directories  (Playlists), any files that Rockbox supports (Supported) or all files on the disk (All).
+  \begin{table}[h!]
+    \begin{center}
+      \begin{tabular}{@{}ll@{}}\toprule
+        \textbf{Key} & \textbf{Action} \\\midrule
+        \ButtonLeft & Controls Shuffle mode setting \\
+        \ButtonRight & Controls Repeat mode setting \\
+        \ButtonDown & Controls Show file setting \\\bottomrule
+      \end{tabular}
+    \end{center}
+  \end{table}
+  
+  \ButtonFThree\ controls frequently used display options.
+  
+  Scroll bar turns the display of the Scroll bar on the left of the screen on
+  or off.
+  
+  Status bar turns the status display at the top of the screen on or off. Upside
+  down inverts the screen so that the top of the display appears nearest to the
+  buttons.  This is sometimes useful when storing the \dap\ in a pocket.  Key
+  assignments swap over with the display orientation where it is logical for
+  them to do so.
 
-See page \pageref{ref:PlaybackOptions} for more information about these settings.
-
-\begin{table}[h!]
+  See page \pageref{ref:Displayoptions} for more information about these
+  settings.
+  
   \begin{center}
-    \begin{tabular}{@{}cc@{}}\toprule
+    \begin{tabular}{@{}ll@{}}\toprule
       \textbf{Key} & \textbf{Action} \\\midrule
-      \ButtonLeft & Controls Shuffle mode setting \\
-      \ButtonRight & Controls Repeat mode setting \\
-      \ButtonDown & Controls Show file setting \\\bottomrule
+      \ButtonLeft & Controls scroll bar display \\
+      \ButtonRight & Controls status bar display \\
+      \ButtonDown & Controls upside down screen setting \\\bottomrule
     \end{tabular}
   \end{center}
-\end{table}
-
-\ButtonFThree\ controls frequently used display options.
-
-Scroll bar turns the display of the Scroll bar on the left of the screen on or off.
-
-Status bar turns the status display at the top of the screen on or off. Upside down inverts the screen so that the top of the display appears nearest to the buttons.  This is sometimes useful when storing the \dap\ in a pocket.  Key assignments swap over with the display orientation where it is logical for them to do so.
-
-See page \pageref{ref:Displayoptions} for more information about these settings.
-\begin{center}
-  \begin{tabular}{@{}cc@{}}\toprule
-    \textbf{Key} & \textbf{Action} \\\midrule
-    \ButtonLeft & Controls scroll bar display \\
-    \ButtonRight & Controls status bar display \\
-    \ButtonDown & Controls upside down screen setting \\\bottomrule
-  \end{tabular}
-\end{center}
 }
