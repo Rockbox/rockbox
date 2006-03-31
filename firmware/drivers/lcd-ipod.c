@@ -31,13 +31,9 @@
 
 
 /* check if number of useconds has past */
-static int timer_check(int clock_start, int usecs)
+static inline bool timer_check(int clock_start, int usecs)
 {
-    if ( ((int)(USEC_TIMER - clock_start)) >= usecs ) {
-        return 1;
-    } else {
-        return 0;
-    }
+    return ((int)(USEC_TIMER - clock_start)) >= usecs;
 }
 
 
@@ -53,12 +49,29 @@ static int timer_check(int clock_start, int usecs)
 #define IPOD_LCD_BUSY_MASK       0x00008000
 #endif
 
-/* LCD command codes for HD66789R */
+/* LCD command codes for HD66753 */
 
 #define LCD_CMD  0x08
 #define LCD_DATA 0x10
 
-static unsigned int lcd_contrast = 0x6a;
+#define R_START_OSC             0x00
+#define R_DRV_OUTPUT_CONTROL    0x01
+#define R_DRV_WAVEFORM_CONTROL  0x02
+#define R_POWER_CONTROL         0x03
+#define R_CONTRAST_CONTROL      0x04
+#define R_ENTRY_MODE            0x05
+#define R_ROTATION              0x06
+#define R_DISPLAY_CONTROL       0x07
+#define R_CURSOR_CONTROL        0x08
+#define R_DOUBLE_HEIGHT_POS     0x09
+#define R_VERTICAL_SCROLL       0x0a
+#define R_VERTICAL_CURSOR_POS   0x0b
+#define R_HORIZONTAL_CURSOR_POS 0x0c
+#define R_RAM_WRITE_MASK        0x10
+#define R_RAM_ADDR_SET          0x11
+#define R_RAM_DATA              0x12
+
+static unsigned int lcd_contrast = 0x2a;
 
 
 /* wait for LCD with timeout */
@@ -73,16 +86,16 @@ static void lcd_wait_write(void)
 
 
 /* send LCD data */
-static void lcd_send_data(int data_lo, int data_hi)
+static void lcd_send_data(int data)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
     outl((inl(IPOD_LCD_BASE) & ~0x1f00000) | 0x1700000, IPOD_LCD_BASE);
-    outl(data_hi | (data_lo << 8) | 0x760000, IPOD_LCD_BASE+8);
+    outl(data | 0x760000, IPOD_LCD_BASE+8);
 #else
-    outl(data_lo, IPOD_LCD_BASE + LCD_DATA);
+    outl(data >> 8, IPOD_LCD_BASE + LCD_DATA);
     lcd_wait_write();
-    outl(data_hi, IPOD_LCD_BASE + LCD_DATA);
+    outl(data & 0xff, IPOD_LCD_BASE + LCD_DATA);
 #endif
 }
 
@@ -101,27 +114,23 @@ static void lcd_prepare_cmd(int cmd)
 }
 
 /* send LCD command and data */
-static void lcd_cmd_and_data(int cmd, int data_lo, int data_hi)
+static void lcd_cmd_and_data(int cmd, int data)
 {
     lcd_prepare_cmd(cmd);
-
-    lcd_send_data(data_lo, data_hi);
+    lcd_send_data(data);
 }
 
-/** 
- * 
- * LCD init 
- **/
+/* LCD init */
 void lcd_init_device(void){
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
     /* driver output control - 160x112 (ipod mini) */
-    lcd_cmd_and_data(0x1, 0x0, 0xd);
+    lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000d);
 #else
     /* driver output control - 160x128 */
-    lcd_cmd_and_data(0x1, 0x1, 0xf);
+    lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010f);
 #endif
 
-    lcd_cmd_and_data(0x5, 0x0, 0x10);
+    lcd_cmd_and_data(R_ENTRY_MODE, 0x0010);
 
 #ifdef APPLE_IPOD4G
     outl(inl(0x6000d004) | 0x4, 0x6000d004); /* B02 enable */
@@ -152,27 +161,22 @@ void lcd_blit(const unsigned char* data, int x, int by, int width,
 
 /*** hardware configuration ***/
 
-/* Update the display.
-   This must be called after all other LCD functions that change the display. */
-void lcd_update(void)
-{
-    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
-}
-
 /* Rockbox stores the contrast as 0..63 - we add 64 to it */
 void lcd_set_contrast(int val)
 {
     if (val < 0) val = 0;
     else if (val > 63) val = 63;
 
-    lcd_cmd_and_data(0x4, 0x4, val + 64);
+    lcd_cmd_and_data(R_CONTRAST_CONTROL, 0x400 | (val + 64));
     lcd_contrast = val;
 }
 
 void lcd_set_invert_display(bool yesno)
 {
-  /* TODO: Implement lcd_set_invert_display() */
-  (void)yesno;
+    if (yesno)
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0003);
+    else
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0001);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
@@ -184,59 +188,42 @@ void lcd_set_flip(bool yesno)
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int cursor_pos, xx;
-    int ny;
-    int sx = x, sy = y, mx = width, my = height;
+    int xmax, ymax;
 
-    /* only update the ipod if we are writing to the screen */
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (width <= 0)
+        return;
     
-    sx >>= 3;
-    //mx = (mx+7)>>3;
-    mx >>= 3;
+    ymax = y + height - 1;
+    if (ymax >= LCD_HEIGHT)
+        ymax = LCD_HEIGHT - 1;
 
-    cursor_pos = sx + (sy << 5);
+     /* writing is done in 16-bit units (8 pixels) */
+    xmax = (x + width - 1) >> 3;
+    x >>= 3;
+    width = xmax - x + 1;
 
-    for ( ny = sy; ny <= my; ny++ ) {
-        unsigned char * img_data;
+    for (; y <= ymax; y++) {
+        unsigned char *data, *data_end;
+        int ram_addr =  x | (y << 5);
+
+        lcd_cmd_and_data(R_RAM_ADDR_SET, ram_addr);
+        lcd_prepare_cmd(R_RAM_DATA);
         
-
-        // move the cursor
-        lcd_cmd_and_data(0x11, cursor_pos >> 8, cursor_pos & 0xff);
-
-        // setup for printing
-        lcd_prepare_cmd(0x12);
-
-        img_data = &lcd_framebuffer[ny][sx<<1];
-
-        // 160/8 -> 20 == loops 20 times
-        // make sure we loop at least once
-        for ( xx = sx; xx <= mx; xx++ ) {
-            // display a character
-            lcd_send_data(*(img_data+1), *img_data);
-
-            img_data += 2;
-        }
-
-        // update cursor pos counter
-        cursor_pos += 0x20;
+        data = &lcd_framebuffer[y][2*x];
+        data_end = data + 2 * width;
+        do {
+            int lowbyte = *data++;
+            lcd_send_data((*data++ << 8) | lowbyte);
+        } while (data < data_end);
     }
 }
 
-/** Switch on or off the backlight **/
-void lcd_enable (bool on){
-    int lcd_state;
-
-        lcd_state = inl(IPOD_LCD_BASE);
-    if (on){
-        lcd_state = lcd_state | 0x2;
-        outl(lcd_state, IPOD_LCD_BASE);
-        lcd_cmd_and_data(0x7, 0x0, 0x11);
-    }
-    else {
-        lcd_state = lcd_state & ~0x2;
-        outl(lcd_state, IPOD_LCD_BASE);
-        lcd_cmd_and_data(0x7, 0x0, 0x9);
-    }
+/* Update the display. */
+void lcd_update(void)
+{
+    lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
 }
 
 #else
