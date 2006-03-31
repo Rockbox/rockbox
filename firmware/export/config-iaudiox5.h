@@ -73,10 +73,16 @@
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
 
+/* define this if you have a real-time clock */
+#define CONFIG_RTC RTC_PCF50606
+
 #define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
+
+/* Virtual LED (icon) */
+#define CONFIG_LED LED_VIRTUAL
 
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0

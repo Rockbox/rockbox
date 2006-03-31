@@ -74,7 +74,9 @@ wormlet.c
 #endif
 
 #ifdef CONFIG_RTC 
+#if CONFIG_KEYPAD != IAUDIO_X5_PAD
 clock.c
+#endif
 #if CONFIG_KEYPAD == RECORDER_PAD  /* Recorder models only for now */
 calendar.c
 #endif
