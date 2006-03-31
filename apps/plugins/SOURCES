@@ -94,6 +94,8 @@ rockboy.c
 xobox.c
 #endif
 
+spacerocks.c
+
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
