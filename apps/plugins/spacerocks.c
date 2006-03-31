@@ -110,6 +110,7 @@ static struct plugin_api* rb; /* global api struct pointer */
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
       (CONFIG_KEYPAD == IAUDIO_X5_PAD) || \
+      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
   #define ENEMY_MISSILE_SURVIVAL_LENGTH 120
   #define MISSILE_SURVIVAL_LENGTH 80
