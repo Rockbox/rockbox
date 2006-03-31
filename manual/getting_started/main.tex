@@ -1,30 +1,61 @@
 \chapter{Getting started}
 \section{Welcome}
-This is the manual for Rockbox. Rockbox is an open source firmware replacement for a growing number of MP3 players. Rockbox aims to be considerably more functional and efficient than your device's stock firmware while remaining easy to use and customizable. Rockbox is written by users, for users. Not only is it free to use, it's also released under the GNU public license, which means that it will always remain free to both use and to change.
+This is the manual for Rockbox. Rockbox is an open source firmware replacement
+for a growing number of MP3 players. Rockbox aims to be considerably more
+functional and efficient than your device's stock firmware while remaining easy
+to use and customizable. Rockbox is written by users, for users. Not only is it
+free to use, it's also released under the GNU public license, which means that
+it will always remain free to both use and to change.
 
-Rockbox has been in development since 2001, and recieves new features, tweaks and fixes each day to provide you with the best possible experience on your MP3 player. A major goal of Rockbox is to be simple and easy to use, yet remain very customizable and configurable. We believe that you should never need to go through a series of menus for an action you perform frequently. We also believe that you should be able to configure almost anything about Rockbox you could want, pertaining to functionality. Another top priority of Rockbox is audio playback quality - Rockbox, for most models, includes a wider range of sound settings than that device's original firmware. A lot of work has been put into making Rockbox sound the best it can, and improvements are constantly being made. All models have access to a large number of plugins, including many games, applications, and graphical "demos". You can load different configurations quickly for different purposes (e.g. a large font for in your car, different sound settings for at home).Rockbox features a very wide range of languages, and all supported models also have the ability to talk to you - menus can be voiced and filenames spelled out or spoken.
+Rockbox has been in development since 2001, and recieves new features, tweaks
+and fixes each day to provide you with the best possible experience on your MP3
+player. A major goal of Rockbox is to be simple and easy to use, yet remain very
+customizable and configurable. We believe that you should never need to go
+through a series of menus for an action you perform frequently. We also believe
+that you should be able to configure almost anything about Rockbox you could
+want, pertaining to functionality. Another top priority of Rockbox is audio
+playback quality - Rockbox, for most models, includes a wider range of sound
+settings than that device's original firmware. A lot of work has been put into
+making Rockbox sound the best it can, and improvements are constantly being made.
+All models have access to a large number of plugins, including many games,
+applications, and graphical "demos". You can load different configurations
+quickly for different purposes (e.g. a large font for in your car, different
+sound settings for at home).Rockbox features a very wide range of languages, and
+all supported models also have the ability to talk to you - menus can be voiced
+and filenames spelled out or spoken.
 
 \section{Getting more help}
-This manual is intended to be a comprehensive introduction to the Rockbox software.  There is, however, more help available.  The Rockbox website at \url{http://www.rockbox.org/}contains very extensive documentation and guides written by members of the Rockbox community and this should be your first port of call when looking for further help.
+This manual is intended to be a comprehensive introduction to the Rockbox
+software.
+  There is, however, more help available.  The Rockbox website at
+\url{http://www.rockbox.org/} contains very extensive documentation and guides
+written by members of the Rockbox community and this should be your first port
+of call when looking for further help.
 
 \opt{player,recorder,recorderv2fm,ondio}{\input{getting_started/archos_choice}}
 \opt{h1xx,h300}{\input{getting_started/iriver_install}}
 
 \section{Downloading Rockbox}
-The latest release of the Rockbox software will always be available from \url{http://www.rockbox.org/download/}.  
+The latest release of the Rockbox software will always be available from
+\url{http://www.rockbox.org/download/}.
 \opt{MASCODEC}{
-Windows users may wish to download the self{}-extracting Windows installer, which works for all Jukebox models, but those wishing to install manually or using a different operating system should choose the .zip archive containing the firmware for their model of the Jukebox.
+  Windows users may wish to download the self{}-extracting Windows installer,
+  which works for all Jukebox models, but those wishing to install manually or
+  using a different operating system should choose the .zip archive containing
+  the firmware for their model of the Jukebox.
 }
 
-\section{Installing Rockbox}
+\section{Installing Rockbox}\label{sec:installing_rockbox}
 \opt{MASCODEC}{
-Using the Windows self installing executable to install Rockbox is the easiest
-method of installing the software on your Jukebox.  Simply follow the
-on{}-screen instructions and select the appropriate drive letter and Jukebox
-model when prompted.  You can use ``Add / Remove Programs'' to uninstall the
-software at a later date.
+  Using the Windows self installing executable to install Rockbox is the easiest
+  method of installing the software on your Jukebox.  Simply follow the
+  on{}-screen instructions and select the appropriate drive letter and Jukebox
+  model when prompted.  You can use ``Add / Remove Programs'' to uninstall the
+  software at a later date.
 }
-\textbf{INCLUDE INSTALL INSTRUCTIONS FOR IRIVERS, IPODS, IAUDIO HERE.}
+\opt{SWCODEC}{
+  \fixme{INCLUDE INSTALL INSTRUCTIONS FOR IRIVERS, IPODS, IAUDIO HERE.}
+}
 For non{}-Windows users and those wishing to install manually from the archive
 the procedure is still fairly simple.  Connect your \playername\ to the
 computer via USB as described in the manual that came with your \playername. On
@@ -33,15 +64,31 @@ Windows, the \playername\ drive will appear as a drive letter in your
 its contents to your \playername\ drive. You can do this using a program such
 as \url{http://www.info-zip.org/} or \url{http://www.winzip.org/}.
 
-You will need to unpack all of the files in the archive onto your hard disk. If this has been done correctly, you will have a file called \fname{\firmwarefilename} in the main folder of your \playername\ drive, and also a folder called /\fname{.rockbox}, which contains a number of system files used by the software.
+You will need to unpack all of the files in the archive onto your hard disk. If
+ this has been done correctly, you will have a file called 
+\fname{\firmwarefilename} in the main folder of your \playername\ drive, and
+also a folder called /\fname{.rockbox}, which contains a number of system files
+used by the software.
 
-\section{Enabling Speech Support (optional)}
-If you wish to use speech support you will also need a language file, available from \url{http://www.rockbox.org/twiki/bin/view/Main/VoiceFiles/}.  For the English language, the file is called \fname{english.voice}. When it has been downloaded, unpack this file and copy it into the \fname{lang} folder which is inside the /\fname{.rockbox} folder on your Jukebox. Voice menus are turned on by default. See page \pageref{ref:Voiceconfiguration} for details on voice settings.
+\section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
+If you wish to use speech support you will also need a language file, available
+from \url{http://www.rockbox.org/twiki/bin/view/Main/VoiceFiles/}.  For the
+English language, the file is called \fname{english.voice}. When it has been
+downloaded, unpack this file and copy it into the \fname{lang} folder which is
+inside the /\fname{.rockbox} folder on your Jukebox. Voice menus are turned on
+by default. See page \pageref{ref:Voiceconfiguration} for details on voice
+settings.
 
 
 \section{Running Rockbox}
-Remove your Jukebox from the computer's USB port. Unplug any connected power supply and turn the unit off. When you next turn the unit on, the Jukebox firmware will start to load, and then it will load Rockbox for you. When you see the Rockbox splash screen, Rockbox is loaded and ready for use.
+Remove your Jukebox from the computer's USB port. Unplug any connected power
+supply and turn the unit off. When you next turn the unit on, the Jukebox
+firmware will start to load, and then it will load Rockbox for you. When you see
+the Rockbox splash screen, Rockbox is loaded and ready for use.
 
 \section{Uninstalling Rockbox}
 If you would like to go back to using the original \playername\ software, then
-connect the \playername\ to your computer, and delete the \fname{\firmwarefilename} file. If you wish to clean up your disk, you may also wish to delete the \fname{.rockbox} folder and its contents. Turn the \playername\ off and on and the normal \playername\ software will load.
+connect the \playername\ to your computer, and delete the
+\fname{\firmwarefilename} file. If you wish to clean up your disk, you may also
+wish to delete the \fname{.rockbox} folder and its contents. Turn the
+\playername\ off and on and the normal \playername\ software will load.
