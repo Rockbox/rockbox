@@ -34,7 +34,7 @@
 #include "pcf50606.h" /* iRiver brightness */
 #endif
  
-#if (CONFIG_BACKLIGHT == BL_IRIVER_H300) || (CONFIG_BACKLIGHT == BL_IPOD3G)
+#if (CONFIG_BACKLIGHT == BL_IRIVER_H300)
 #include "lcd.h" /* for lcd_enable() */
 #endif
 #ifdef HAVE_REMOTE_LCD
@@ -91,7 +91,7 @@ static inline void __backlight_on(void)
     /* set port L07 on */
     outl(((0x100 | 1) << 7), 0x6000d12c);
 #elif CONFIG_BACKLIGHT==BL_IPOD3G
-    lcd_enable(true);
+    outl(inl(0xc0001000) | 0x02, 0xc0001000);
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_SET = 1;
 #endif
@@ -126,7 +126,7 @@ static inline void __backlight_off(void)
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_CLR = 1;
 #elif CONFIG_BACKLIGHT==BL_IPOD3G
-    lcd_enable(false);
+    outl(inl(0xc0001000) & ~0x02, 0xc0001000);
 #elif CONFIG_BACKLIGHT==BL_IPODMINI
     /* set port B03 off */
     outl(((0x100 | 0) << 3), 0x6000d824);
