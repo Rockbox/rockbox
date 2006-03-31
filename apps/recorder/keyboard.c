@@ -630,11 +630,8 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) /* right doubles as cursor_right in line_edit */
                 {
-                    if (hangul) {
+                    if (hangul)
                         hangul = false;
-                        hlead=hvowel=htail=0;
-                        break;
-                    }
                     if (editpos < len_utf8)
                     {
                         editpos++;
@@ -667,11 +664,8 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) /* left doubles as cursor_left in line_edit */
                 {
-                    if (hangul) {
+                    if (hangul)
                         hangul = false;
-                        hlead=hvowel=htail=0;
-                        break;
-                    }
                     if (editpos)
                     {
                         editpos--;
@@ -803,18 +797,16 @@ int kbd_input(char* text, int buflen)
 #ifdef KBD_MODES
                 if (line_edit) { /* select doubles as backspace in line_edit */
                     if (hangul) {
-                        if (htail != 0)
+                        if (htail)
                             htail = 0;
-                        else if (hvowel != 0)
+                        else if (hvowel)
                             hvowel = 0;
-                        else {
-                            hlead = 0;
+                        else
                             hangul = false;
-                        }
                     }
                     kbd_delchar(text, &editpos);
                     if (hangul) {
-                        if (hvowel != 0)
+                        if (hvowel)
                             ch = hangul_join(hlead, hvowel, htail);
                         else
                             ch = hlead;
@@ -833,59 +825,40 @@ int kbd_input(char* text, int buflen)
 
                     /* check for hangul input */
                     if (ch >= 0x3131 && ch <= 0x3163) {
-                        if (hangul) {
-                            if ((hvowel == 0) && (jamo_table[ch-0x3131][1] != 0)) {
-                                hvowel = ch;
-                                ch = hangul_join(hlead, hvowel, htail);
-                                kbd_delchar(text, &editpos);
-                            }
-                            else if ((htail == 0) && (hvowel != 0) && (jamo_table[ch-0x3131][2] != 0)) {
-                                htail = ch;
-                                /* combine into hangul */
-                                ch = hangul_join(hlead, hvowel, htail);
-                                kbd_delchar(text, &editpos);
-                            }
-                            else { /* invalid following char or hangul complete */
-                                /* check whether tail is actually lead of next char */
-                                if (htail != 0 && (jamo_table[htail-0x3131][0] != 0) 
-                                        && (jamo_table[ch-0x3131][1] != 0)) {
-                                    tmp = hangul_join(hlead, hvowel, 0);
-                                    kbd_delchar(text, &editpos);
-                                    kbd_inschar(text, buflen, &editpos, tmp);
-                                    hlead = htail;
-                                    hvowel = ch;
-                                    htail = 0;
-                                    ch = hangul_join(hlead, hvowel, htail);
-                                }
-                                else if (hlead != 0 && hvowel != 0) {
-                                    /* finish previous hangul */
-                                    tmp = hangul_join(hlead, hvowel, htail);
-                                    kbd_delchar(text, &editpos);
-                                    kbd_inschar(text, buflen, &editpos, tmp);
-                                    hlead=hvowel=htail=0;
-                                    /* start of new hangul? */
-                                    if (jamo_table[ch-0x3131][0] != 0) {
-                                        hlead = ch;
-                                    }
-                                    else
-                                        hangul = false;
-                                }
-                            }
-                        }
-                        else if (jamo_table[ch-0x3131][0] != 0) {
-                            hlead = ch;
+                        if (!hangul) {
+                            hlead=hvowel=htail=0;
                             hangul = true;
                         }
-                    }
-                    else if (hangul) {
-                        /* finish previous hangul */
-                        if (hlead != 0 && hvowel != 0) {
-                            tmp = hangul_join(hlead, hvowel, htail);
-                            kbd_delchar(text, &editpos);
-                            kbd_inschar(text, buflen, &editpos, tmp);
+                        if (!hvowel)
+                            hvowel = ch;
+                        else if (!htail)
+                            htail = ch;
+                        else { /* previous hangul complete */
+                            /* check whether tail is actually lead of next char */
+                            if ((tmp = hangul_join(htail, ch, 0)) != 0xfffd) {
+                                tmp = hangul_join(hlead, hvowel, 0);
+                                kbd_delchar(text, &editpos);
+                                kbd_inschar(text, buflen, &editpos, tmp);
+                                /* insert dummy char */
+                                kbd_inschar(text, buflen, &editpos, ' ');
+                                hlead = htail;
+                                hvowel = ch;
+                                htail = 0;
+                            } else {
+                                hvowel=htail=0;
+                                hlead = ch;
+                            }
                         }
+                        /* combine into hangul */
+                        if ((tmp = hangul_join(hlead, hvowel, htail)) != 0xfffd) {
+                            kbd_delchar(text, &editpos);
+                            ch = tmp;
+                        } else {
+                            hvowel=htail=0;
+                            hlead = ch;
+                        }
+                    } else {
                         hangul = false;
-                        hlead=hvowel=htail=0;
                     }
                     /* insert char */
                     kbd_inschar(text, buflen, &editpos, ch);
@@ -898,18 +871,16 @@ int kbd_input(char* text, int buflen)
             case KBD_BACKSPACE:
             case KBD_BACKSPACE | BUTTON_REPEAT:
                 if (hangul) {
-                    if (htail != 0)
+                    if (htail)
                         htail = 0;
-                    else if (hvowel != 0)
+                    else if (hvowel)
                         hvowel = 0;
-                    else {
-                        hlead = 0;
+                    else
                         hangul = false;
-                    }
                 }
                 kbd_delchar(text, &editpos);
                 if (hangul) {
-                    if (hvowel != 0)
+                    if (hvowel)
                         ch = hangul_join(hlead, hvowel, htail);
                     else
                         ch = hlead;
@@ -921,11 +892,8 @@ int kbd_input(char* text, int buflen)
 
             case KBD_CURSOR_RIGHT:
             case KBD_CURSOR_RIGHT | BUTTON_REPEAT:
-                if (hangul) {
+                if (hangul)
                     hangul = false;
-                    hlead=hvowel=htail=0;
-                    break;
-                }
                 if (editpos < len_utf8)
                 {
                     editpos++;
@@ -936,11 +904,8 @@ int kbd_input(char* text, int buflen)
 
             case KBD_CURSOR_LEFT:
             case KBD_CURSOR_LEFT | BUTTON_REPEAT:
-                if (hangul) {
+                if (hangul)
                     hangul = false;
-                    hlead=hvowel=htail=0;
-                    break;
-                }
                 if (editpos)
                 {
                     editpos--;
@@ -971,11 +936,9 @@ int kbd_input(char* text, int buflen)
                         break ;
                     }
 
-                    /* finish hangul char if necessary */
-                    if (hangul) {
+                    /* turn off hangul input */
+                    if (hangul)
                         hangul = false;
-                        hlead=hvowel=htail=0;
-                    }
 
                     kbd_inschar(text, buflen, &editpos, morse_alphabets[j]);
 
