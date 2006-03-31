@@ -158,6 +158,20 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define CENTER_LCD_X (LCD_WIDTH/2)
 #define CENTER_LCD_Y (LCD_HEIGHT/2)
 
+#ifdef HAVE_LCD_COLOR
+#define COL_MISSILE  LCD_RGBPACK(200,0,0)
+#define COL_PLAYER   LCD_RGBPACK(200,200,200)
+#define COL_STARS    LCD_WHITE
+#define COL_ASTEROID LCD_RGBPACK(150,95,0)
+#define COL_TEXT     LCD_RGBPACK(200,200,255)
+#define COL_ENEMY    LCD_RGBPACK(50,220,50)
+#define SET_FG       rb->lcd_set_foreground
+#define SET_BG       rb->lcd_set_background
+#else
+#define SET_FG(x)
+#define SET_BG(x)
+#endif
+
 enum asteroid_type
 {
     SMALL =  1,
@@ -548,6 +562,8 @@ void draw_and_move_enemy(void)
 {
     int enemy_x, enemy_y;
     struct Point *point;
+
+    SET_FG(COL_ENEMY);
     
     if(enemy_on_screen)
     {
@@ -920,6 +936,9 @@ void draw_and_move_missiles(void)
     
     struct Missile* missile;
     missile = missiles_array;
+
+    SET_FG(COL_MISSILE);
+    
     n = MAX_NUM_MISSILES;
     while(--n)
     {
@@ -999,6 +1018,8 @@ void draw_lives(void)
     int px = (LCD_WIDTH - num_lives*4 - 1);
     int py = (LCD_HEIGHT-4);
     
+    SET_FG(COL_PLAYER);
+
     n = num_lives;
     while(--n)
     {
@@ -1199,6 +1220,7 @@ void draw_and_move_ship(void)
 {
     int nxoffset = ship.position.x/SCALE;
     int nyoffset = ship.position.y/SCALE;
+    SET_FG(COL_PLAYER);
     if(!ship.explode_countdown)
     {
         if(!ship.waiting_for_space)
@@ -1271,6 +1293,8 @@ void drawstars()
     int n = NUM_STARS;
     
     p = stars;
+    SET_FG(COL_STARS);
+
     while(--n)
     {
         rb->lcd_drawpixel(p->x , p->y);
@@ -1287,7 +1311,9 @@ void draw_and_move_asteroids(void)
     struct Asteroid* asteroid;
     
     asteroid = asteroids_array;
-    n  = MAX_NUM_ASTEROIDS;
+    SET_FG(COL_ASTEROID);
+
+    n = MAX_NUM_ASTEROIDS;
     while(--n)
     {
         if(game_state != PAUSE_MODE)
@@ -1396,6 +1422,8 @@ enum plugin_status start_game(void)
     
     /*create stars once, and once only:*/
     create_stars();
+
+    SET_BG(LCD_BLACK);
     
     while(true)
     {
@@ -1408,6 +1436,7 @@ enum plugin_status start_game(void)
         {
             end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
             rb->lcd_clear_display();
+            SET_FG(COL_TEXT);
             switch(game_state)
             {
             case(ATTRACT_MODE):
