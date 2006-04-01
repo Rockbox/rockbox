@@ -137,7 +137,7 @@ static inline void __backlight_off(void)
 
 #if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
 
-const char backlight_timeout_value[19] =
+const signed char backlight_timeout_value[19] =
 {
     -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30, 45, 60, 90
 };
@@ -522,9 +522,10 @@ void backlight_off(void)
     queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
 }
 
+/* returns true when the backlight is on OR when it's set to always off */
 bool is_backlight_on(void)
 {
-    if (backlight_timer || !backlight_get_current_timeout())
+    if (backlight_timer || backlight_get_current_timeout() <= 0)
         return true;
     else
         return false;
@@ -615,9 +616,11 @@ int remote_backlight_get_current_timeout(void)
 #endif
 }
 
+/* returns true when the backlight is on OR when it's set to always off */
 bool is_remote_backlight_on(void)
 {
-    if (remote_backlight_timer != 0 || !remote_backlight_get_current_timeout())
+    if (remote_backlight_timer != 0 ||
+                    remote_backlight_get_current_timeout() <= 0)
         return true;
     else
         return false;

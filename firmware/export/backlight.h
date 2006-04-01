@@ -33,7 +33,7 @@ void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
 void backlight_set_timeout_plugged(int index);
-extern const char backlight_timeout_value[];
+extern const signed char backlight_timeout_value[];
 #else
 #define backlight_init()
 #endif
