@@ -33,7 +33,7 @@ voice: "Nachfragen"
 new: "Nachfragen"
 
 id: LANG_ALWAYS
-desc: (player) the jump scroll shall be done "always
+desc: used in various places
 eng: "Always"
 voice: "Immer"
 new: "Immer"
@@ -77,7 +77,7 @@ voice: ""
 new: "Abgebrochen"
 
 id: LANG_FAILED
-desc: Something failed. To be appended after above actions
+desc: Something failed. To be appended after actions
 eng: "Failed"
 voice: ""
 new: "fehlgeschlagen"
@@ -85,7 +85,7 @@ new: "fehlgeschlagen"
 ## main menu
 
 id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-desc: Text for the menu text to access the most recent bookmarks list
+desc: in the main menu
 eng: "Recent Bookmarks"
 voice: "Neueste Lesezeichen"
 new: "Neueste Lesezeichen"
@@ -103,19 +103,19 @@ voice: "Grundeinstellungen"
 new: "Grundeinstellungen"
 
 id: LANG_MANAGE_MENU
-desc: in the system sub menu
+desc: in the main menu
 eng: "Manage Settings"
 voice: "Konfigurationen verwalten"
 new: "Konfigurationen verwalten"
 
 id: LANG_CUSTOM_THEME
-desc: Custom themes menu
+desc: in the main menu
 eng: "Browse Themes"
 voice: "Zeige Themen"
 new: "Zeige Themen"
 
 id: LANG_FM_RADIO
-desc: in main menu
+desc: in the main menu
 eng: "FM Radio"
 voice: "UKW-Radio"
 new: "UKW-Radio"
@@ -127,13 +127,13 @@ voice: "Aufnahme"
 new: "Aufnahme"
 
 id: LANG_PLAYLIST_MENU
-desc: in main menu.
+desc: in the main menu
 eng: "Playlist Options"
 voice: "Abspielliste Optionen"
 new: "Playlist Optionen"
 
 id: LANG_PLUGINS
-desc: in main_menu()
+desc: in the main menu
 eng: "Browse Plugins"
 voice: "Zeige Zusatzprogramme"
 new: "Zeige Plugins"
@@ -285,7 +285,7 @@ voice: "MDB Form"
 new: "MDB Form"
 
 id: LANG_CROSSFEED
-desc: in the sound settings menu
+desc: in sound settings
 eng: "Crossfeed"
 voice: "Crossfeed"
 new: "Crossfeed"
@@ -445,43 +445,43 @@ new: "Aufnahmeeinstellungen"
 id: LANG_EQUALIZER_ENABLED
 desc: in the equalizer settings menu
 eng: "Enable EQ"
-voice: "Enable equalizer"
+voice: "Equalizer aktivieren"
 new: "EQ aktivieren"
 
 id: LANG_EQUALIZER_GRAPHICAL
 desc: in the equalizer settings menu
 eng: "Graphical EQ"
-voice: "Graphical equalizer"
+voice: "Grafischer Equalizer"
 new: "Grafischer EQ"
 
 id: LANG_EQUALIZER_PRECUT
 desc: in eq settings
 eng: "Precut"
-voice: "Pre-cut"
-new:
+voice: "Vorverstärkung"
+new: "Vorverstärkung"
 
 id: LANG_EQUALIZER_GAIN
 desc: in the equalizer settings menu
 eng: "Simple EQ Settings"
-voice: "Simple equalizer settings"
+voice: "Einfache Equalizer-Einstellungen"
 new: "Einfache EQ-Einstellungen"
 
 id: LANG_EQUALIZER_ADVANCED
 desc: in the equalizer settings menu
 eng: "Advanced EQ Settings"
-voice: "Advanced equalizer settings"
+voice: "Erweiterte Equalizer-Einstellungen"
 new: "Erweiterte EQ-Einstellungen"
 
 id: LANG_EQUALIZER_SAVE
 desc: in the equalizer settings menu
 eng: "Save EQ Preset"
-voice: "Save equalizer preset"
+voice: "Eualizer-Konfiguration speichern"
 new: "EQ-Konfiguration speichern"
 
 id: LANG_EQUALIZER_BROWSE
 desc: in the equalizer settings menu
 eng: "Browse EQ Presets"
-voice: "Browse equalizer presets"
+voice: "Zeige Eualizer-Konfigurationen"
 new: "Zeige EQ-Konfigurationen"
 
 id: LANG_EQUALIZER_EDIT_MODE
@@ -494,49 +494,49 @@ id: LANG_EQUALIZER_GAIN_ITEM
 desc: in the equalizer settings menu
 eng: "%d Hz Band Gain"
 voice: ""
-new: "%d Hz Band Verstärkung"
+new: "%d Hz-Band Verstärkung"
 
 id: LANG_EQUALIZER_BAND_LOW_SHELF
 desc: in the equalizer settings menu
 eng: "Low Shelf Filter"
-voice: "Low shelf filter"
-new: "Low Shelf-Filter"
+voice: "Tiefpass"
+new: "Tiefpass"
 
 id: LANG_EQUALIZER_BAND_PEAK
 desc: in the equalizer settings menu
 eng: "Peak Filter %d"
-voice: "Peak filter"
-new: "Peak-Filter %d"
+voice: "Bandfilter"
+new: "Bandfilter %d"
 
 id: LANG_EQUALIZER_BAND_HIGH_SHELF
 desc: in the equalizer settings menu
 eng: "High Shelf Filter"
-voice: "High shelf filter"
-new: "High Shelf-Filter"
+voice: "Hochpass"
+new: "Hochpass"
 
 id: LANG_EQUALIZER_BAND_CUTOFF
 desc: in the equalizer settings menu
 eng: "Cutoff Frequency"
-voice: "Cutoff Frequency"
+voice: "Grenzfrequenz"
 new: "Grenzfrequenz"
 
 id: LANG_EQUALIZER_BAND_CENTER
 desc: in the equalizer settings menu
 eng: "Center Frequency"
-voice: "Center frequency"
+voice: "Mittenfrequenz"
 new: "Mittenfrequenz"
 
 id: LANG_EQUALIZER_BAND_Q
 desc: in the equalizer settings menu
 eng: "Q"
-voice: "Q"
+voice: "Güte"
 new: "Güte"
 
 id: LANG_EQUALIZER_BAND_GAIN
 desc: in the equalizer settings menu
 eng: "Gain"
-voice: "Gain"
-new: "Anhebung"
+voice: "Verstärkung"
+new: "Verstärkung"
 
 ## playlist options
 
@@ -567,31 +567,31 @@ new: "Verzeichnisse rekursiv hinzufügen"
 id: LANG_WARN_ERASEDYNPLAYLIST_MENU
 desc: in playlist options menu, option to warn when erasing dynamic playlist
 eng: "Warn When Erasing Dynamic Playlist"
-voice "Warn When Erasing Dynamic Playlist"
+voice: "Warnen beim Löschen einer dynamischen Abspielliste"
 new: "Warnen beim Löschen einer dynamischen Playlist"
 
 ## info menu
 
 id: LANG_INFO_MENU
-desc: in the info sub menu
+desc: in the info menu
 eng: "Rockbox Info"
 voice: "Rockbox Info"
 new: "Rockbox Info"
 
 id: LANG_VERSION
-desc: in the main menu
+desc: in the info menu
 eng: "Version"
 voice: "Version"
 new: "Version"
 
 id: LANG_DEBUG
-desc: in the main menu
+desc: in the info menu
 eng: "Debug (Keep Out!)"
 voice: "Entwicklerbereich"
 new: "Entwicklerbereich"
 
 id: LANG_USB
-desc: in the main menu
+desc: in the info menu
 eng: "USB (Sim)"
 voice: ""
 new: "USB (sim)"
@@ -661,7 +661,7 @@ new: "Blenden bei Stop/Pause"
 id: LANG_PARTY_MODE
 desc: party mode
 eng: "Party Mode"
-voice: "Party Mode"
+voice: "Party-Modus"
 new: "Party-Modus"
 
 id: LANG_CROSSFADE
@@ -733,25 +733,25 @@ new: "Autom. Verzeichniswechsel"
 id: LANG_TAGCACHE
 desc: in tag cache settings
 eng: "Tag cache"
-voice: "Tag cache"
+voice: "Tag-Datenbank"
 new: "Tag-Datenbank"
 
 id: LANG_TAGCACHE_DISK
 desc: in tag cache settings
 eng: "Keep on disk"
-voice: "Keep on disk"
-new: "Auf Festplatte speichern"
+voice: "Von Festplatte lesen"
+new: "Von Festplatte lesen"
 
 id: LANG_TAGCACHE_RAM
 desc: in tag cache settings
 eng: "Load to ram"
-voice: "Load to ram"
+voice: "In Arbeitsspeicher laden"
 new: "In RAM laden"
 
 id: LANG_TAGCACHE_FORCE_UPDATE
 desc: in tag cache settings
 eng: "Force tag cache update"
-voice: "Force tag cache update"
+voice: "Tag-Datenbank aktualisieren"
 new: "Tag-Datenbank aktualisieren"
 
 id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
@@ -917,86 +917,86 @@ new: "Aussteuerungsanzeige"
 id: LANG_DEFAULT_CODEPAGE
 desc: default encoding used with id3 tags
 eng: "Default Codepage"
-voice: "Default codepage"
-new: "Zeichensatz-Voreinstellung"
+voice: "Standard-Zeichensatz"
+new: "Standard-Zeichensatz"
 
 id: LANG_CODEPAGE_LATIN1
 desc: in codepage setting menu
 eng: "Latin1 (ISO-8859-1)"
-voice: "Latin 1"
+voice: "Latein 1"
 new: "Latein1 (ISO-8859-1)"
 
 id: LANG_CODEPAGE_GREEK
 desc: in codepage setting menu
 eng: "Greek (ISO-8859-7)"
-voice: "Greek"
+voice: "Griechisch"
 new: "Griechisch (ISO-8859-7)"
 
 id: LANG_CODEPAGE_HEBREW
 desc: in codepage setting menu
 eng: "Hebrew (ISO-8859-8)"
-voice: "Hebrew"
+voice: "Hebräisch"
 new: "Hebräisch (ISO-8859-8)"
 
 id: LANG_CODEPAGE_RUSSIAN
 desc: in codepage setting menu
 eng: "Russian (CP1251)"
-voice: "Russian"
+voice: "Russisch"
 new: "Russisch (CP1251)"
 
 id: LANG_CODEPAGE_THAI
 desc: in codepage setting menu
 eng: "Thai (ISO-8859-11)"
-voice: "Thai"
+voice: "Thailändisch"
 new: "Thailändisch (ISO-8859-11)"
 
 id: LANG_CODEPAGE_ARABIC
 desc: in codepage setting menu
 eng: "Arabic (CP1256)"
-voice: "Arabic"
+voice: "Arabisch"
 new: "Arabisch (CP1256)"
 
 id: LANG_CODEPAGE_TURKISH
 desc: in codepage setting menu
 eng: "Turkish (ISO-8859-9)"
-voice: "Turkish"
+voice: "Türkisch"
 new: "Türkisch (ISO-8859-9)"
 
 id: LANG_CODEPAGE_LATIN_EXTENDED
 desc: in codepage setting menu
 eng: "Latin Extended (ISO-8859-2)"
-voice: "Latin extended"
+voice: "Latein Erweitert"
 new: "Latein Erweitert (ISO-8859-2)"
 
 id: LANG_CODEPAGE_JAPANESE
 desc: in codepage setting menu
 eng: "Japanese (SJIS)"
-voice: "Japanese"
+voice: "Japanisch"
 new: "Japanisch (SJIS)"
 
 id: LANG_CODEPAGE_SIMPLIFIED
 desc: in codepage setting menu
 eng: "Simp. Chinese (GB2312)"
-voice: "Simplified Chinese"
-new: "Einf. Chinesisch (GB2312)"
+voice: "Vereinfachtes Chinesisch"
+new: "Vereinf. Chinesisch (GB2312)"
 
 id: LANG_CODEPAGE_KOREAN
 desc: in codepage setting menu
 eng: "Korean (KSX1001)"
-voice: "Korean"
+voice: "Koreanisch"
 new: "Koreanisch (KSX1001)"
 
 id: LANG_CODEPAGE_TRADITIONAL
 desc: in codepage setting menu
 eng: "Trad. Chinese (BIG5)"
-voice: "Traditional Chinese"
+voice: "Traditionelles Chinesisch"
 new: "Trad. Chinesisch (BIG5)"
 
 id: LANG_CODEPAGE_UTF8
-decs: in codepage setting menu
+desc: in codepage setting menu
 eng: "Unicode (UTF-8)"
 voice: "Unicode"
-new:
+new: "Unicode (UTF-8)"
 
 ## system settings menu
 
@@ -1113,19 +1113,19 @@ voice: "Dateinamen"
 new: "Dateinamen"
 
 id: LANG_VOICE_NUMBER
-desc: talkbox" mode for files+directories
+desc: "talkbox" mode for files+directories
 eng: "Numbers"
 voice: "als Zahl"
 new: "als Zahl"
 
 id: LANG_VOICE_SPELL
-desc: talkbox" mode for files+directories
+desc: "talkbox" mode for files+directories
 eng: "Spell"
 voice: "buchstabieren"
 new: "buchstabieren"
 
 id: LANG_VOICE_DIR_HOVER
-desc: talkbox" mode for directories + files
+desc: "talkbox" mode for directories + files
 eng: ".talk mp3 clip"
 voice: "Sprachdatei"
 new: ".talk mp3 Datei"
@@ -1219,25 +1219,25 @@ new: "Trigger"
 id: LANG_CLIP_LIGHT
 desc: in record settings menu.
 eng: "Clipping light"
-voice: "Clipping light"
+voice: "Übersteuerungslicht"
 new: "Übersteuerungslicht"
 
 id: LANG_MAIN_UNIT
 desc: in record settings menu.
 eng: "Main unit only"
-voice: "Main unit only"
+voice: "Nur Gerät"
 new: "Nur Gerät"
 
 id: LANG_REMOTE_UNIT
 desc: in record settings menu.
 eng: "Remote unit only"
-voice: "Remote unit only"
+voice: "Nur Fernbedienung"
 new: "Nur Fernbedienung"
 
 id: LANG_REMOTE_MAIN
 desc: in record settings menu.
 eng: "Main and remote unit"
-voice: "Main and remote unit"
+voice: "Gerät und Fernbedienung"
 new: "Gerät und Fernbedienung"
 
 ## ffwd/rewind menu
@@ -1265,7 +1265,7 @@ new: "Überblenden aktivieren"
 id: LANG_TRACKSKIP
 desc: in crossfade settings
 eng: "Track Skip Only"
-voice: "Track Skip Only"
+voice: "Nur bei manuellem Titelwechsel"
 new: "Nur bei manuellem Titelwechsel"
 
 id: LANG_CROSSFADE_FADE_IN_DELAY
@@ -1383,7 +1383,7 @@ new: "Beleuchtung ausblenden"
 id: LANG_BRIGHTNESS
 desc: in settings_menu
 eng: "Brightness"
-voice: "Brightness"
+voice: "Helligkeit"
 new: "Helligkeit"
 
 id: LANG_CONTRAST
@@ -1395,7 +1395,7 @@ new: "Kontrast"
 id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
 desc: Backlight behaviour setting
 eng: "First keypress enables backlight only"
-voice: "First keypress enables backlight only"
+voice: "Erster Tastendruck aktiviert nur Beleuchtung"
 new: "1. Tastendruck aktiviert nur Beleuchtung"
 
 id: LANG_INVERT
@@ -1443,25 +1443,25 @@ new: "Balken(invertiert)"
 id: LANG_CLEAR_BACKDROP
 desc: text for LCD settings menu
 eng: "Clear backdrop"
-voice: "Clear backdrop"
+voice: "Hintergrund entfernen"
 new: "Hintergrund entfernen"
 
 id: LANG_BACKGROUND_COLOR
 desc: menu entry to set the background color
 eng: "Background Colour"
-voice: "Background Colour"
+voice: "Hintergrundfarbe"
 new: "Hintergrundfarbe"
 
 id: LANG_FOREGROUND_COLOR
 desc: menu entry to set the foreground color
 eng: "Foreground Colour"
-voice: "Foreground Colour"
+voice: "Vordergrundfarbe"
 new: "Vordergrundfarbe"
 
 id: LANG_RESET_COLORS
 desc: menu
 eng: "Reset Colours"
-voice: "Reset Colours"
+voice: "Farben zurücksetzen"
 new: "Farben zurücksetzen"
 
 id: LANG_REDUCE_TICKING
@@ -1515,7 +1515,7 @@ voice: "Sprung-Scrollen"
 new: "Sprung-Scrollen"
 
 id: LANG_ONE_TIME
-desc: (player) the jump scroll shall be done "one time
+desc: (player) the jump scroll shall be done "one time"
 eng: "One time"
 voice: "Einmalig"
 new: "Einmalig"
@@ -1529,20 +1529,20 @@ new: "Sprung-Scroll Verzögerung"
 id: LANG_SCREEN_SCROLL_VIEW
 desc: should lines scroll out of the screen
 eng: "Screen Scrolls Out Of View"
-voice: "Screen Scrolls Out Of View"
+voice: "Über Bildschirmrand scrollen"
 new: "Über Bildschirmrand scrollen"
 
 id: LANG_SCREEN_SCROLL_STEP
 desc: Pixels to advance per Screen scroll
 eng: "Screen Scroll Step Size"
-voice: "Screen Scroll Step Size"
-new: "Schrittweite beim Scrollen"
+voice: "Bildschirmscroll-Schrittweite"
+new: "Bildschirmscroll-Schrittweite"
 
 id: LANG_SCROLL_PAGINATED
 desc: jump to new page when scrolling
 eng: "Paged Scrolling"
-voice: "Paged scrolling"
-new: "Scrollen seitenweise"
+voice: "Seitenweise scrollen"
+new: "Seitenweise scrollen"
 
 #status-/scrollbar menu
 
@@ -1763,7 +1763,7 @@ voice: "Lesezeichen"
 new: "Lesezeichen"
 
 id: LANG_MENU_SHOW_ID3_INFO
-desc: Menu option to start id3 viewer
+desc: Menu option to start tag viewer
 eng: "Show ID3 Info"
 voice: "Zeige ID3 Info"
 new: "Zeige ID3 Info"
@@ -1789,19 +1789,19 @@ new: "Umbenennen"
 id: LANG_CUT
 desc: The verb/action Cut
 eng: "Cut"
-voice: "Cut"
+voice: "Ausschneiden"
 new: "Ausschneiden"
 
 id: LANG_COPY
 desc: The verb/action Copy
 eng: "Copy"
-voice: "Copy"
+voice: "Kopieren"
 new: "Kopieren"
 
 id: LANG_PASTE
 desc: The verb/action Paste
 eng: "Paste"
-voice: "Paste"
+voice: "Einfügen"
 new: "Einfügen"
 
 id: LANG_REALLY_OVERWRITE
@@ -1819,7 +1819,7 @@ new: "Löschen"
 id: LANG_SET_AS_BACKDROP
 desc: text for onplay menu entry
 eng: "Set as backdrop"
-voice: "Set as backdrop"
+voice: "Als Hintergrund setzen"
 new: "Als Hintergrund setzen"
 
 id: LANG_DELETE_DIR
@@ -1855,7 +1855,7 @@ new: "Verzeichnis anlegen"
 id: LANG_PITCH
 desc: "pitch" in the pitch screen
 eng: "Pitch"
-voice: "Pitch"
+voice: "Tempo"
 new: "Tempo"
 
 ## playlist context menu
@@ -1917,13 +1917,13 @@ new: "Warteschlange als Letzten"
 id: LANG_QUEUE_SHUFFLED
 desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
 eng: "Queue shuffled"
-voice: "Queue shuffled"
+voice: "Zufällig in Warteschlange"
 new: "Zufällig in Warteschlange"
 
 id: LANG_SEARCH_IN_PLAYLIST
 desc: in playlist menu.
 eng: "Search In Playlist"
-voice: "Search In Playlist"
+voice: "Abspielliste durchsuchen"
 new: "Playlist durchsuchen"
 
 id: LANG_PLAYLIST_SEARCH_MSG
@@ -2228,13 +2228,13 @@ id: LANG_RECORDING_GAIN_ANALOG
 desc: in the recording screen
 eng: "A"
 voice: ""
-new:
+new: "A"
 
 id: LANG_RECORDING_GAIN_DIGITAL
 desc: in the recording screen
 eng: "D"
 voice: ""
-new:
+new: "D"
 
 id: LANG_DISK_FULL
 desc: in recording screen
@@ -2353,14 +2353,14 @@ new: "Alarm ausgeschaltet"
 id: LANG_COLOR_RGB_LABELS
 desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
 eng: "RGB"
-voice:
-new:
+voice: 
+new: "RGB"
 
 id: LANG_COLOR_RGB_VALUE
 desc: in color screen
 eng: "RGB: %02X%02X%02X"
-voice:
-new:
+voice: 
+new: "RGB: %02X%02X%02X"
 
 id: LANG_COLOR_UNACCEPTABLE
 desc: splash when user selects an invalid colour
@@ -2371,37 +2371,37 @@ new: "Unzulässige Farbe"
 ## tag viewer
 
 id: LANG_ID3_TITLE
-desc: in wps
+desc: in tag viewer
 eng: "[Title]"
 voice: ""
 new: "[Titel]"
 
 id: LANG_ID3_ARTIST
-desc: in wps
+desc: in tag viewer
 eng: "[Artist]"
 voice: ""
 new: "[Künstler]"
 
 id: LANG_ID3_ALBUM
-desc: in wps
+desc: in tag viewer
 eng: "[Album]"
 voice: ""
 new: "[Album]"
 
 id: LANG_ID3_TRACKNUM
-desc: in wps
+desc: in tag viewer
 eng: "[Tracknum]"
 voice: ""
 new: "[Song Nr.]"
 
 id: LANG_ID3_GENRE
-desc: ID3 frame 'genre'
+desc: in tag viewer
 eng: "[Genre]"
 voice: ""
 new: "[Genre]"
 
 id: LANG_ID3_YEAR
-desc: ID3 info 'year'
+desc: in tag viewer
 eng: "[Year]"
 voice: ""
 new: "[Jahr]"
@@ -2413,13 +2413,13 @@ voice: ""
 new: "[Länge]"
 
 id: LANG_ID3_PLAYLIST
-desc: in wps
+desc: in tag viewer
 eng: "[Playlist]"
 voice: ""
 new: "[Playlist]"
 
 id: LANG_ID3_BITRATE
-desc: in wps
+desc: in tag viewer
 eng: "[Bitrate]"
 voice: ""
 new: "[Bitrate]"
@@ -2437,31 +2437,31 @@ voice: ""
 new: " (VBR)"
 
 id: LANG_ID3_FRECUENCY
-desc: in wps
+desc: in tag viewer
 eng: "[Frequency]"
 voice: ""
 new: "[Frequenz]"
 
 id: LANG_ID3_TRACK_GAIN
-desc: in browse_id3
+desc: in tag viewer
 eng: "[Track gain]"
 voice: ""
 new: "[Titellautstärke]"
 
 id: LANG_ID3_ALBUM_GAIN
-desc: in browse_id3
+desc: in tag viewer
 eng: "[Album gain]"
 voice: ""
 new: "[Albumlautstärke]"
 
 id: LANG_ID3_PATH
-desc: in wps
+desc: in tag viewer
 eng: "[Path]"
 voice: ""
 new: "[Pfad]"
 
 id: LANG_ID3_NO_INFO
-desc: ID3 info is missing
+desc: in tag viewer
 eng: "<No Info>"
 voice: ""
 new: "<keine Info>"
@@ -3155,8 +3155,8 @@ new: ""
 id: VOICE_EXT_KBD
 desc: spoken only, for file extension
 eng: ""
-voice: "keyboard"
-new:
+voice: "Tastatur"
+new: 
 
 ## playlist handling
 
@@ -3173,7 +3173,7 @@ voice: ""
 new: "Mische..."
 
 id: LANG_PLAYLIST_BUFFER_FULL
-desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+desc: in playlist.indices() when playlist is full
 eng: "Playlist Buffer Full"
 voice: ""
 new: "Playlist Puffer voll"
@@ -3223,7 +3223,7 @@ new: "Rekursiv?"
 id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
 desc: prompt shown when about to erase a modified dynamic playlist
 eng: "Erase dynamic playlist?"
-voice ""
+voice: 
 new: "Dynamische Playlist löschen?"
 
 id: LANG_NOTHING_TO_RESUME
@@ -3337,7 +3337,7 @@ voice: ""
 new: "Hinzu"
 
 id: LANG_FM_BUTTONBAR_RECORD
-desc: in main menu
+desc: in radio screen
 eng: "Record"
 voice: ""
 new: "Aufn."
@@ -3512,7 +3512,7 @@ id: LANG_ID3DB_GENRES
 desc: in tag cache
 eng: "Genres"
 voice: ""
-new:
+new: "Genres"
 
 id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
