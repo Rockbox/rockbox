@@ -60,69 +60,12 @@ Example ".ss" file, and one with a saved state:
 
 #ifdef HAVE_LCD_BITMAP
 
+#include "sudoku.h"
+#include "generator.h"
+
 PLUGIN_HEADER
 
-#define STATE_FILE        PLUGIN_DIR "/sudoku.state"
-#define GAMES_FILE        PLUGIN_DIR "/sudoku.levels"
-
-/* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define SUDOKU_BUTTON_QUIT BUTTON_OFF
-#define SUDOKU_BUTTON_UP BUTTON_UP
-#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
-#define SUDOKU_BUTTON_TOGGLE BUTTON_PLAY
-#define SUDOKU_BUTTON_MENU BUTTON_F1
-#define SUDOKU_BUTTON_POSSIBLE BUTTON_F2
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define SUDOKU_BUTTON_QUIT BUTTON_OFF
-#define SUDOKU_BUTTON_UP BUTTON_UP
-#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
-#define SUDOKU_BUTTON_ALTTOGGLE (BUTTON_MENU | BUTTON_DOWN)
-#define SUDOKU_BUTTON_TOGGLE_PRE BUTTON_MENU
-#define SUDOKU_BUTTON_TOGGLE (BUTTON_MENU | BUTTON_REL)
-#define SUDOKU_BUTTON_MENU_PRE BUTTON_MENU
-#define SUDOKU_BUTTON_MENU (BUTTON_MENU | BUTTON_REPEAT)
-#define SUDOKU_BUTTON_POSSIBLE (BUTTON_MENU | BUTTON_LEFT)
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define SUDOKU_BUTTON_QUIT BUTTON_OFF
-#define SUDOKU_BUTTON_UP BUTTON_UP
-#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
-#define SUDOKU_BUTTON_ALTTOGGLE BUTTON_ON
-#define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
-#define SUDOKU_BUTTON_MENU BUTTON_MODE
-#define SUDOKU_BUTTON_POSSIBLE BUTTON_REC
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define SUDOKU_BUTTON_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define SUDOKU_BUTTON_UP BUTTON_SCROLL_BACK
-#define SUDOKU_BUTTON_DOWN BUTTON_SCROLL_FWD
-#define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
-#define SUDOKU_BUTTON_MENU BUTTON_MENU
-#define SUDOKU_BUTTON_POSSIBLE (BUTTON_SELECT | BUTTON_LEFT)
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define SUDOKU_BUTTON_QUIT BUTTON_POWER
-#define SUDOKU_BUTTON_UP BUTTON_UP
-#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
-#define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
-#define SUDOKU_BUTTON_MENU BUTTON_PLAY
-#define SUDOKU_BUTTON_POSSIBLE BUTTON_REC
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define SUDOKU_BUTTON_QUIT BUTTON_A
-#define SUDOKU_BUTTON_UP BUTTON_UP
-#define SUDOKU_BUTTON_DOWN BUTTON_DOWN
-#define SUDOKU_BUTTON_TOGGLE BUTTON_SELECT
-#define SUDOKU_BUTTON_MENU BUTTON_MENU
-#define SUDOKU_BUTTON_POSSIBLE BUTTON_POWER
-
-#elif
-  #error SUDOKU: Unsupported keypad
-#endif
+struct plugin_api* rb;
 
 /* The bitmaps */
 extern const fb_data sudoku_normal[];
@@ -203,23 +146,6 @@ static unsigned char cellypos[9]={ 2, 19, 36, 54, 71, 88, 106, 123, 140 };
 #else
   #error SUDOKU: Unsupported LCD size
 #endif
-
-/* here is a global api struct pointer. while not strictly necessary,
-   it's nice not to have to pass the api pointer in all function calls
-   in the plugin */
-static struct plugin_api* rb;
-
-struct sudoku_state_t {
-  char filename[MAX_PATH];  /* Filename */
-  char startboard[9][9];    /* The initial state of the game */
-  char currentboard[9][9];  /* The current state of the game */
-  char savedboard[9][9];    /* Cached copy of saved state */
-  int x,y;                  /* Cursor position */
-  int editmode;             /* We are editing the start board */
-#ifdef SUDOKU_BUTTON_POSSIBLE 
-  short possiblevals[9][9];  /* possible values a cell could be, user sets them */
-#endif
-};
 
 /****** Solver routine by Tom Shackell <shackell@cs.york.ac.uk>
 
@@ -541,7 +467,6 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
 
     fd=rb->open(filename, O_RDONLY);
     if (fd < 0) {
-        rb->splash(HZ*2, true, "Can not open");
         LOGF("Invalid sudoku file: %s\n",filename);
         return(false);
     }
@@ -617,8 +542,8 @@ bool save_sudoku(struct sudoku_state_t* state)
     int fd;
     int r,c;
     int i;
-    char line[16];
-    char sep[16];
+    char line[13];
+    char sep[13];
 
     rb->memcpy(line,"...|...|...\r\n",13);
     rb->memcpy(sep,"-----------\r\n",13);
@@ -644,9 +569,9 @@ bool save_sudoku(struct sudoku_state_t* state)
                     i++;
                 }
             }
-            rb->write(fd,line,sizeof(line)-1);
+            rb->write(fd,line,sizeof(line));
             if ((r==2) || (r==5)) {
-                rb->write(fd,sep,sizeof(sep)-1);
+                rb->write(fd,sep,sizeof(sep));
             }
         }
         /* Add a blank line at end */
@@ -899,6 +824,23 @@ bool check_status(struct sudoku_state_t* state)
     return false;
 }
 
+void sudoku_generate(struct sudoku_state_t* state)
+{
+    char* difficulty;
+    char str[80];
+
+    clear_state(state);
+    display_board(state);
+    rb->splash(0, true, "Generating...");
+
+    sudoku_generate_board(state,&difficulty);
+
+    rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
+    display_board(state);
+    rb->splash(3*HZ, true, str);
+    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+}
+
 int sudoku_menu_cb(int key, int m)
 {
     (void)m;
@@ -932,7 +874,9 @@ bool sudoku_menu(struct sudoku_state_t* state)
         { "Reload", NULL },
         { "Clear", NULL },
         { "Solve", NULL },
+        { "Generate", NULL },
         { "New", NULL },
+        { "Quit", NULL },
     };
     
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -957,9 +901,19 @@ bool sudoku_menu(struct sudoku_state_t* state)
             sudoku_solve(state);
             break;
 
-        case 4: /* Create a new game manually */
+        case 4: /* Generate Game */
+            sudoku_generate(state);
+            break;
+
+        case 5: /* Create a new game manually */
             clear_state(state);
             state->editmode=1;
+            break;
+
+        case 6: /* Quit */
+            save_sudoku(state);
+            rb->menu_exit(m);
+            return true;
             break;
 
         default:
@@ -1010,7 +964,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     clear_state(&state);
 
     if (parameter==NULL) {
-        state.editmode=1;
+        /* We have been started as a plugin - try default sudoku.ss */
+        if (!load_sudoku(&state,GAME_FILE)) {
+            /* No previous game saved, generate one */
+            sudoku_generate(&state);
+        }
     } else {
         if (!load_sudoku(&state,(char*)parameter)) {
             rb->splash(HZ*2, true, "Load error");

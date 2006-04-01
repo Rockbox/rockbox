@@ -58,10 +58,6 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (LCD_WIDTH != 176) && (LCD_WIDTH != 138)
-/* These need adjusting for the iPod Nano and Mini */
-sudoku.c
-#endif
 #if (LCD_WIDTH != 240) && (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
 tetrox.c
 #endif
