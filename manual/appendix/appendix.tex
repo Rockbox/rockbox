@@ -4,20 +4,34 @@
 \begin{center}
 \begin{tabularx}{\textwidth}{llX}\toprule
 \textbf{Icon} & \textbf{File Type} & \textbf{Action} \\\midrule
-\includegraphics[width=0.37cm]{appendix/images/icon-directory.png} & Directory & The browser enters that directory \\
-\includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} & Audio file & Rockbox takes you to the WPS and starts playing the file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png} & .m3u & Rockbox loads the playlist and starts playing the first file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} & Rockbox firmware file &  ROLO will load the new firmware \\
-\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} & .wps & The new WPS display configuration will be loaded \\
-\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} & .lng & Loads a language file \\
-\includegraphics[width=0.37cm]{appendix/images/icon-text.png} & .txt & This will display the text file using Rockbox text browser plugin\\
-\includegraphics[width=0.37cm]{appendix/images/icon-config.png} & .cfg & The settings file will be loaded\\
-\includegraphics[width=0.37cm]{appendix/images/icon-font.png} & .fnt & This font will replace the current one\\
-\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} & .rock & Starts a Rockbox plugin\\
-\includegraphics[width=0.37cm]{appendix/images/icon-ucl.png} & .ucl & This Rockbox image will be flashed into the ROM \\
-\includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} & .ch8 & Play a Chip8 game \\
-\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} & .jpg & View a JPEG image \\
-\includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png} & .rvf & View a movie (Rockbox format)\\\bottomrule
+\includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
+  & Directory & The browser enters that directory \\
+\includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
+  & Audio file & Rockbox takes you to the WPS and starts playing the file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png} 
+  & .m3u & Rockbox loads the playlist and starts playing the first file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  & Rockbox firmware file &  ROLO will load the new firmware \\
+\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} 
+  & .wps & The new WPS display configuration will be loaded \\
+\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} 
+  & .lng & Loads a language file \\
+\includegraphics[width=0.37cm]{appendix/images/icon-text.png} 
+  & .txt & This will display the text file using Rockbox text browser plugin\\
+\includegraphics[width=0.37cm]{appendix/images/icon-config.png} 
+  & .cfg & The settings file will be loaded\\
+\includegraphics[width=0.37cm]{appendix/images/icon-font.png} 
+  & .fnt & This font will replace the current one\\
+\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} 
+  & .rock & Starts a Rockbox plugin\\
+\includegraphics[width=0.37cm]{appendix/images/icon-ucl.png} 
+  & .ucl & This Rockbox image will be flashed into the ROM \\
+\includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} 
+  & .ch8 & Play a Chip8 game \\
+\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} 
+  & .jpg & View a JPEG image \\
+\includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png} 
+  & .rvf & View a movie (Rockbox format)\\\bottomrule
 \end{tabularx}
 \end{center}
 
@@ -29,17 +43,18 @@
 
 \chapter{LCD Screen Sizes}
 \begin{center}
-  \begin{tabular}{@{}lll@{}}\toprule
+  \begin{tabularx}{.8\textwidth}{lXX}\toprule
     \textbf{Player} & \textbf{Main LCD Size} & \textbf{Remote LCD Size}\\\midrule
     iriver H1x0 & 160x128 & 128x64\\
     iriver H3x0 & 220x176 & 128x64\\
-    Archos Recorders & 112x64 & \\ 
-    Archos Ondio & 112x64 & \\
-    iPod Nano & 176x132 & \\
-    iPod 4G Color & 220x176 & \\
-    iPod 5G Video & 320x240 & \\
-    iAudio X5 & 160x128 & \\\bottomrule
-  \end{tabular}
+    Archos Recorders & 112x64 & (none)\\ 
+    Archos Ondio & 112x64 & (none)\\
+    iPod Nano & 176x132 & (none)\\
+    iPod 4G Color & 220x176 & (none)\\
+    iPod 5G Video & 320x240 & (none)\\
+    iAudio X5 & 160x128 & (none)\\
+    iPodMini 2G &138x110 & (none) \\\bottomrule
+  \end{tabularx}
 \end{center}
 
 
@@ -77,8 +92,10 @@ For open feature requests refer to
 \subsection{Rules for submitting a new feature request}
 
 \begin{enumerate}
-\item Check that the feature hasn't already been requested. Duplicates are really boring!
-\item Check that the feature hasn't already been implemented. Download the latest daily build and/or search the mail list archive.
+\item Check that the feature hasn't already been requested. 
+  Duplicates are really boring!
+\item Check that the feature hasn't already been implemented. 
+  Download the latest daily build and/or search the mail list archive.
 \item Check that the feature is possible to implement (see page \pageref{ref:NODO}).
 \end{enumerate}
 
@@ -91,29 +108,55 @@ cannot do. View it as the opposite of a TODO!
 \item Record to WAV (uncompressed) or MP3pro format!\\
 The recording hardware (the MAS) does not allow us to do this
 \item Crossfade between tracks!\\
- Crossfading would require two mp3 decoders, and we only have one. This is not possible.
+  Crossfading would require two mp3 decoders, and we only have one. 
+  This is not possible.
 \item Interfacing with other USB devices (like cameras) or 2 player games over USB\\
-The USB system demands that there is a master that talks to a slave. The Jukebox can only serve as a slave, as most other USB devices such as cameras can. Thus, without a master no communication between the slaves can take place. If that is not enough, we have no ways of actually controlling the communication performed over USB since the USB circuit in the Jukebox is strictly made for disk{}-access and does not allow us to play with it the way we'd need for any good communication to work.
+  The USB system demands that there is a master that talks to a slave. The 
+  Jukebox can only serve as a slave, as most other USB devices such as 
+  cameras can. Thus, without a master no communication between the slaves 
+  can take place. If that is not enough, we have no ways of actually 
+  controlling the communication performed over USB since the USB circuit 
+  in the Jukebox is strictly made for disk{}-access and does not allow us 
+  to play with it the way we'd need for any good communication to work.
 \item Support MP3pro, WMA or other sound format playback!\\
-The mp3{}-decoding hardware can only play MP3. We cannot make it play other sound formats.
-\item  Converting OGG{}-{\textgreater}MP3 \\
-The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed, but there is too little memory for OGG and we have no documentation on how to program the MAS' DSP. Doing the conversion with the CPU is impossible, since a 12MHz SH1 is far too slow for this daunting task.
+  The mp3{}-decoding hardware can only play MP3. We cannot make it play other 
+  sound formats.
+\item  Converting OGG $\rightarrow$ MP3 \\
+  The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed, but 
+  there is too little memory for OGG and we have no documentation on how to 
+  program the MAS' DSP. Doing the conversion with the CPU is impossible, since 
+  a 12MHz SH1 is far too slow for this daunting task.
 \item Archos Multimedia support!\\
-The Archos Multimedia is a completely different beast. It is an entirely different architecture, different CPU and upgrading the software is done a completely different way. We do not wish to venture into this.  Others may do so. We won't.
+  The Archos Multimedia is a completely different beast. It is an entirely 
+  different architecture, different CPU and upgrading the software is done 
+  a completely different way. We do not wish to venture into this.  Others 
+  may do so. We won't.
 \item Multi{}-band (or graphic) equaliser\\
-We cannot access information for that kind of visualisation from the MP3 decoding hardware.
-\item Support other filesystems than FAT32 (likeNTFS or ext2 or whatever)!\\
-No. Rockbox needs to support FAT32 since it can only start off a FAT32 partition (since that is the only way the ROM can load it), and adding support for more file systems will just take away valuable ram for unnecessary features. You can partition your Jukebox fine, just make sure the first one is FAT32 and then make the other ones whatever file system you want. Just don't expect Rockbox to understand them.
+  We cannot access information for that kind of visualisation from the MP3 
+  decoding hardware.
+\item Support other filesystems than FAT32 (like NTFS or ext2 or whatever)!\\
+  No. Rockbox needs to support FAT32 since it can only start off a FAT32 
+  partition (since that is the only way the ROM can load it), and adding 
+  support for more file systems will just take away valuable ram for 
+  unnecessary features. You can partition your Jukebox fine, just make sure 
+  the first one is FAT32 and then make the other ones whatever file system 
+  you want. Just don't expect Rockbox to understand them.
 \item Add scandisk{}-like features!\\
-It would be a very slow operation that would drain the batteries and take a lot of useful ram for something that is much better and faster done when connected to a host computer.
+  It would be a very slow operation that would drain the batteries and 
+  take a lot of useful ram for something that is much better and faster 
+  done when connected to a host computer.
 \item CBR recording!\\
-The MP3 encoding hardware does not allow this.
+  The MP3 encoding hardware does not allow this.
 \item Change tempo of a song without changing pitch!\\
- The MP3 decoding hardware does not allow this.
+  The MP3 decoding hardware does not allow this.
 \item Graphic frequency (spectrum analyser!)\\
-We can't access the audio waveform from the MP3 decoder so we can't analyse it. Even if we had access to it, the CPU would probably be too slow to perform the analysis anyway.
+  We can't access the audio waveform from the MP3 decoder so we can't analyse 
+  it. Even if we had access to it, the CPU would probably be too slow to 
+  perform the analysis anyway.
 \item Cool sound effects!\\
- Adding new sound effects requires reprogramming the MAS chip, and wecan't do that. The MAS chip is programmable, but we have no access to the chip documentation.
+  Adding new sound effects requires reprogramming the MAS chip, and we can't 
+  do that. The MAS chip is programmable, but we have no access to the chip 
+  documentation.
 \end{itemize}
 }
 
