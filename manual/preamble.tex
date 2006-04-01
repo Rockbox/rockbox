@@ -92,8 +92,10 @@
 \newcommand{\screenshot}[3]{
   \begin{figure}[!ht]
     \begin{center}
-      \includegraphics[width=4cm]{#1}
-      \if\blank{#3}\else{\label{#3}}\fi\if\blank{#2}\else{
+      \IfFileExists{#1}{\includegraphics[width=4cm]{#1}}{%
+        \typeout{Missing image: #1}%
+        \color{red}{\textbf{WARNING!} Image not found}}%
+      \if\blank{#3}\else{\label{#3}}\fi\if\blank{#2}\else{%
         \caption{#2}}\fi
     \end{center}
   \end{figure}
