@@ -60,6 +60,7 @@ Example ".ss" file, and one with a saved state:
 
 #ifdef HAVE_LCD_BITMAP
 
+#include <lib/playback_control.h>
 #include "sudoku.h"
 #include "generator.h"
 
@@ -870,6 +871,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
     int result;
 
     static const struct menu_item items[] = {
+        { "Audio Playback", NULL },
         { "Save", NULL },
         { "Reload", NULL },
         { "Clear", NULL },
@@ -886,31 +888,35 @@ bool sudoku_menu(struct sudoku_state_t* state)
 
     switch (result) {
         case 0: /* Save state */
+            playback_control(rb);
+            break;
+
+        case 1: /* Save state */
             save_sudoku(state);
             break;
 
-        case 1: /* Restore state */
+        case 2: /* Restore state */
             restore_state(state);
             break;
 
-        case 2: /* Clear all */
+        case 3: /* Clear all */
             clear_board(state);
             break;
 
-        case 3: /* Solve */
+        case 4: /* Solve */
             sudoku_solve(state);
             break;
 
-        case 4: /* Generate Game */
+        case 5: /* Generate Game */
             sudoku_generate(state);
             break;
 
-        case 5: /* Create a new game manually */
+        case 6: /* Create a new game manually */
             clear_state(state);
             state->editmode=1;
             break;
 
-        case 6: /* Quit */
+        case 7: /* Quit */
             save_sudoku(state);
             rb->menu_exit(m);
             return true;
