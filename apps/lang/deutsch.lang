@@ -475,13 +475,13 @@ new: "Erweiterte EQ-Einstellungen"
 id: LANG_EQUALIZER_SAVE
 desc: in the equalizer settings menu
 eng: "Save EQ Preset"
-voice: "Eualizer-Konfiguration speichern"
+voice: "Equalizer-Konfiguration speichern"
 new: "EQ-Konfiguration speichern"
 
 id: LANG_EQUALIZER_BROWSE
 desc: in the equalizer settings menu
 eng: "Browse EQ Presets"
-voice: "Zeige Eualizer-Konfigurationen"
+voice: "Zeige Equalizer-Konfigurationen"
 new: "Zeige EQ-Konfigurationen"
 
 id: LANG_EQUALIZER_EDIT_MODE
