@@ -36,7 +36,6 @@ static inline bool timer_check(int clock_start, int usecs)
     return ((int)(USEC_TIMER - clock_start)) >= usecs;
 }
 
-
 #if (CONFIG_LCD == LCD_IPOD2BPP)
 
 /*** hardware configuration ***/
@@ -63,16 +62,19 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_ROTATION              0x06
 #define R_DISPLAY_CONTROL       0x07
 #define R_CURSOR_CONTROL        0x08
-#define R_DOUBLE_HEIGHT_POS     0x09
-#define R_VERTICAL_SCROLL       0x0a
-#define R_VERTICAL_CURSOR_POS   0x0b
-#define R_HORIZONTAL_CURSOR_POS 0x0c
+#define R_HORIZONTAL_CURSOR_POS 0x0b
+#define R_VERTICAL_CURSOR_POS   0x0c
+#define R_1ST_SCR_DRV_POS       0x0d
+#define R_2ND_SCR_DRV_POS       0x0e
 #define R_RAM_WRITE_MASK        0x10
 #define R_RAM_ADDR_SET          0x11
 #define R_RAM_DATA              0x12
 
-static unsigned int lcd_contrast = 0x2a;
-
+/* needed for flip */
+static int addr_offset = 0;
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+static int pix_offset = 0;  
+#endif
 
 /* wait for LCD with timeout */
 static void lcd_wait_write(void)
@@ -86,7 +88,7 @@ static void lcd_wait_write(void)
 
 
 /* send LCD data */
-static void lcd_send_data(int data)
+static void lcd_send_data(unsigned data)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
@@ -100,7 +102,7 @@ static void lcd_send_data(int data)
 }
 
 /* send LCD command */
-static void lcd_prepare_cmd(int cmd)
+static void lcd_prepare_cmd(unsigned cmd)
 {
     lcd_wait_write();
 #ifdef IPOD_MINI2G
@@ -114,22 +116,17 @@ static void lcd_prepare_cmd(int cmd)
 }
 
 /* send LCD command and data */
-static void lcd_cmd_and_data(int cmd, int data)
+static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 {
     lcd_prepare_cmd(cmd);
     lcd_send_data(data);
 }
 
 /* LCD init */
-void lcd_init_device(void){
-#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-    /* driver output control - 160x112 (ipod mini) */
-    lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000d);
-#else
-    /* driver output control - 160x128 */
-    lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010f);
-#endif
-
+void lcd_init_device(void)
+{
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+    lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0010);
 
 #ifdef APPLE_IPOD4G
@@ -168,22 +165,46 @@ void lcd_set_contrast(int val)
     else if (val > 63) val = 63;
 
     lcd_cmd_and_data(R_CONTRAST_CONTROL, 0x400 | (val + 64));
-    lcd_contrast = val;
 }
 
 void lcd_set_invert_display(bool yesno)
 {
     if (yesno)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0003);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
     else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0001);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-  /* TODO: Implement lcd_set_flip() */
-  (void)yesno;
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    if (yesno) {
+         /* 160x112, inverse SEG & COM order */
+        lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x030d);
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8316);    /* 22..131 */
+        addr_offset = (22 << 5) | 3;
+        pix_offset = 6;
+    } else {
+        /* 160x112 */
+        lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000d); 
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x6d00);    /* 0..109 */
+        addr_offset = 0;
+        pix_offset = 0;
+    }
+#else
+    if (yesno) {
+        /* 160x128, inverse COM order */
+        lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x020f);
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8304);    /* 0..127 */
+        addr_offset = (4 << 5) | 1;
+    } else {
+        /* 160x128, inverse SEG order */
+        lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010f);
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x7f00);    /* 4..131 */
+        addr_offset = 0;
+    }
+#endif
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -199,6 +220,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (ymax >= LCD_HEIGHT)
         ymax = LCD_HEIGHT - 1;
 
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    x += pix_offset;
+#endif
      /* writing is done in 16-bit units (8 pixels) */
     xmax = (x + width - 1) >> 3;
     x >>= 3;
@@ -206,17 +230,32 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     for (; y <= ymax; y++) {
         unsigned char *data, *data_end;
-        int ram_addr =  x | (y << 5);
+        int ram_addr = (x | (y << 5)) + addr_offset;
 
         lcd_cmd_and_data(R_RAM_ADDR_SET, ram_addr);
         lcd_prepare_cmd(R_RAM_DATA);
-        
+
         data = &lcd_framebuffer[y][2*x];
         data_end = data + 2 * width;
-        do {
-            int lowbyte = *data++;
-            lcd_send_data((*data++ << 8) | lowbyte);
-        } while (data < data_end);
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+        if (pix_offset == 6) {
+            data -= 2;
+            data_end -= 1;
+            unsigned cur_word = *data++ >> 4;
+            do {
+                cur_word |= *data++ << 4;
+                cur_word |= *data++ << 12;
+                lcd_send_data(cur_word & 0xffff);
+                cur_word >>= 16;
+            } while (data < data_end);
+        } else
+#endif
+        {
+            do {
+                unsigned lowbyte = *data++;
+                lcd_send_data(lowbyte | (*data++ << 8));
+            } while (data < data_end);
+        }
     }
 }
 

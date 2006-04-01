@@ -21,6 +21,9 @@
 
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
 #define CONFIG_KEYPAD IPOD_4G_PAD
 
 /* Define this if you do software codec */
