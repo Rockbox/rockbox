@@ -1052,7 +1052,7 @@ bool browse_id3(void)
         line = draw_id3_item(line, top, LANG_ID3_YEAR, body);
 
         gui_wps_format_time(buf, sizeof(buf), id3->length);
-        line = draw_id3_item(line, top, LANG_ID3_LENGHT, buf);
+        line = draw_id3_item(line, top, LANG_ID3_LENGTH, buf);
 
         snprintf(buf, sizeof(buf), "%d/%d", playlist_get_display_index(),
             playlist_amount());
