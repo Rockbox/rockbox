@@ -103,15 +103,17 @@
 % Usage: \note{text of your note}
 % Note: do NOT use \textbf or similar to emphasize text, use \emph!
 \newcommand{\note}[1]{
-  \noindent\\%
-  \textbf{Note:}\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}\ #1%
-  \newline
+  \ifinner\else\par\noindent\fi
+  \textbf{Note:}\ %
+  \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}#1\par\fi%
 }
 
 % command to display a warning.
 % Usage: \warn{text of your warning}
 % Note: do NOT use \textbf or similar to emphasize text!
 \newcommand{\warn}[1]{
-  \noindent\textbf{Warning:}\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}\ #1%
-  \newline
+  \ifinner\else\par\noindent\fi
+  \textbf{Warning:\ }%
+  \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}#1\par\fi%
 }
+
