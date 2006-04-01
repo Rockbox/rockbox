@@ -58,6 +58,9 @@
 
 #define HAVE_UDA1380
 
+/* define this if you have recording possibility */
+#define HAVE_RECORDING 1
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */
@@ -70,9 +73,6 @@
 #define CONFIG_BATTERY BATT_LIPOL1300
 
 #define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
-
-/* define this if you have recording possibility */
-#define HAVE_RECORDING 1
 
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1

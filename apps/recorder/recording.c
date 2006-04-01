@@ -1537,7 +1537,83 @@ void audio_beep(int duration)
     /* dummy */
     (void)duration;
 }
-#endif
+
+#ifdef SIMULATOR
+/* stubs for recording sim */
+void audio_init_recording(void)
+{
+}
+
+void audio_close_recording(void)
+{
+}
+
+unsigned long audio_recorded_time(void)
+{
+    return 123;
+}
+
+unsigned long audio_num_recorded_bytes(void)
+{
+    return 5 * 1024 * 1024;
+}
+
+void audio_set_recording_options(int frequency, int quality,
+                                int source, int channel_mode,
+                                bool editable, int prerecord_time)
+{
+    frequency = frequency;
+    quality = quality;
+    source = source;
+    channel_mode = channel_mode;
+    editable = editable;
+    prerecord_time = prerecord_time;
+}
+
+void audio_set_recording_gain(int left, int right, int type)
+{
+    left = left;
+    right = right;
+    type = type;
+}
+
+void audio_stop_recording(void)
+{
+}
+
+void audio_pause_recording(void)
+{
+}
+
+void audio_resume_recording(void)
+{
+}
+
+void pcm_rec_get_peaks(int *left, int *right)
+{
+    if (left)
+        *left = 0;
+    if (right)
+        *right = 0;
+}
+
+void audio_record(const char *filename)
+{
+    filename = filename;
+}
+
+void audio_new_file(const char *filename)
+{
+    filename = filename;
+}
+
+unsigned long pcm_rec_status(void)
+{
+    return 0;
+}
+
+#endif /* #ifdef SIMULATOR */
+#endif /* #ifdef CONFIG_CODEC == SWCODEC */
 
 
 #endif /* HAVE_RECORDING */
