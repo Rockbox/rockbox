@@ -205,14 +205,15 @@ bool check_rockboxdir(void)
 {
     DIR *dir = opendir(ROCKBOX_DIR);
     if(!dir)
-    {
+    {   /* No need to localise this message.
+           If .rockbox is missing, it wouldn't work anyway */
         int i;
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, true, str(LANG_NO_ROCKBOX_DIR));
+        gui_syncsplash(HZ*2, true, "No .rockbox directory");
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
-        gui_syncsplash(HZ*2, true, str(LANG_INSTALLATION_INCOMPLETE));
+        gui_syncsplash(HZ*2, true, "Installation incomplete");
         return false;
     }
     closedir(dir);
@@ -331,22 +332,7 @@ static int update_dir(void)
         if(!id3db && (tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
-            /* dir full */
-            int i;
-            FOR_NB_SCREENS(i)
-            {
-                gui_textarea_clear(&screens[i]);
-#ifdef HAVE_LCD_CHARCELLS
-                screens[i].double_height(false);
-#endif
-                screens[i].clear_display();
-                screens[i].puts(0,0,str(LANG_SHOWDIR_ERROR_BUFFER));
-                screens[i].puts(0,1,str(LANG_SHOWDIR_ERROR_FULL));
-                gui_textarea_update(&screens[i]);
-            }
-            sleep(HZ*2);
-            FOR_NB_SCREENS(i)
-                gui_textarea_clear(&screens[i]);
+            gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);

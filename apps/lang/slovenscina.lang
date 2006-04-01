@@ -10,1721 +10,1481 @@
 # If you re-order things or remove entries, you must bump the binary language
 # file version number in both the 'binlang' tool and the language loader code.
 #
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-new: "Nastavitev zvoka"
 
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-new: "Splosne nastavitve"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Igre"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: "Demo"
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-new: "Info"
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-new: "Vizitka"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (Keep Out!)"
-new: "Debug (Ne uporabljaj!)"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (Sim)"
-new: "USB (Sim)"
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox Info:"
-new: "Rockbox Info:"
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%03dMB"
-new: "Buf: %d.%03dMB"
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%03dMB"
-new: "Buffer: %d.%03dMB"
-
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: "Baterije: %d%%%s"
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: "Baterije: %d%%%s"
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: Charging"
-new: "Polnenje baterij"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: "Leteci napis"
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: "Sneg"
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: "Tetris"
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: "Sokoban"
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: "Wormlet"
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: "Kaca"
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-new: "Nalagam..."
-
-# NO LONGER USED
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-new: "Pregled seznama..."
-
-# NO LONGER USED
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Igranje po seznamu..."
-
-id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
-eng: "Playlist"
-new: "Seznam skladb"
-
-id: LANG_PLAYINDICES_BUFFER
-desc: in playlist.indices() when playlist is full
-eng: "Buffer Full"
-new: "Seznam je poln"
-
-# NO LONGER USED
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d Files"
-new: "%d skladb"
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-new: "Napaka pri shranjevanju"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Batt. Low?"
-new: "Prazna baterija?"
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-new: "Napaka pri shranjevanju"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "Is Battery Low?"
-new: "Je baterija prazna?"
-
-id: LANG_TIME_SET
-desc: used in set_time()
-eng: "ON To Set"
-new: "ON Nastavi"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF To Revert"
-new: "OFF Preklici"
-
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: "Skrite datoteke"
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: "Prikazi"
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: "Skrij"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-new: "Kontrast"
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-new: "Nakljucno"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play Selected First"
-new: "Predvajaj najprej izbrane"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: "Zvocni filtri"
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-new: "Razporedi po obliki crk"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-new: "Nadaljuj"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-new: "Izkljuci"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "Ask"
-new: "Vprasaj"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-new: "Vklop"
-
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-new: "Osvetlitev ozadja"
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-new: "Preizkus hitrosti premikanja"
-
-id: LANG_DISCHARGE
-desc: DEPRECATED
-eng: ""
-new: ""
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-new: "Nastavi uro/datum"
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-new: "Upocasnitev diska"
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-new: "hitro previjanje - min stopnja"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-new: "hitro previjanje - pospesek"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-new: "Sledi seznamu skladb"
-
-# depreciated
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Bos res resetiral?"
- 
-# depreciated
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: ""
-new: "Play/Stop"
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are You Sure?"
-new: "Si preprican?"
-
-# depreciated
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: ""
-new: "Play=Sprejmi"
-
-# depreciated
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF=Odpovej"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-new: "Nastavljeno"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-new: "Pocisceno"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
-eng: "Canceled"
-new: "Odpovedano"
-
-id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-new: "Nacin razvrscanja"
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scroll"
-new: "Premikanje"
-
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset Settings"
-new: "Resetiraj nastavitve"
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-new: "Predvajanje"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-new: "Pogled datotek"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-new: "Zaslon"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-new: "Sistem"
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-new: "Glasnost"
-
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-new: "Nastavitev levo-desno"
-
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-new: "Nizki toni"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-new: "Visoki toni"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-new: "Glasnost"
-
-id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-new: "Podvajanje nizkih tonov"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV Decay Time"
-new: "AV zakasnitev"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-new: "Kanali"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel Configuration"
-new: "Nastavitev kanalov"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-new: "Stereo"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-new: "Mono"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-new: "Mono levo"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-new: "Mono desno"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-new: "Avtomatska glasnost"
-
-id: LANG_SHOWDIR_ERROR_BUFFER
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer"
-new: "Blazilni prostor"
-
-id: LANG_SHOWDIR_ERROR_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Is Full!"
-new: "Je poln!"
-
-id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
-new: "Nadaljujem?"
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: possible answers to resume question
-eng: "(PLAY/STOP)"
-new: "(PLAY/STOP)"
-
-# depreciated
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "Play = Da"
-
-# depreciated
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: ""
-new: "Drugo = Ne"
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Key Lock ON"
-new: "Zakleni gumbe"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Key Lock OFF"
-new: "Odkleni gumbe"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key Lock Is ON"
-new: "Gumbi so odklenjeni"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF" 
-new: "Gumbi so zaklenjeni"
-
-id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
-new: "Nemo predvajanje"
-
-id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: ""
-new: "Normalno predvajanje"
-
-id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute Is ON"
-new: "Nemo predvajanje"
-
-id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute Is OFF"
-new: "Normalno predvajanje"
-
-id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info-"
-new: "-ID3 Info-"
-
-id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen--"
-new: "--Zaslon--"
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-new: "[Naslov]"
-
-id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
-new: "<Brez naslova>"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-new: "[Avtor]"
-
-id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
-new: "<Brez avtorja>"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-new: "[Album]"
-
-id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
-new: "<Brez albuma>"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-new: "[Stevika skladbe]"
-
-id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
-new: "<Brez stevilke skladbe>"
-
-id: LANG_ID3_LENGHT
-desc: in wps
-eng: "[Length]"
-new: "[Dolzina]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-new: "[Seznam]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-new: "[Bitrate]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-new: "[Frekvenca]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[Path]"
-new: "[Pot]"
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch Up"
-new: "Zvisanje"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch Down"
-new: "Znizanje"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-new: "Premor"
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "Mode:"
-new: "Nacin:"
-
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: ""
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-new: "Stanje"
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-new: "Premikaj"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "Bar"
-new: "Drsnik"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End Of List"
-new: "Konec seznama"
-
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: "Pritisni ON"
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "End Of Song List"
-new: "Konec seznama"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: "Pritisni ON"
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Dosezene tocke:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Najvisje tocke: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Nov rekord!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Igra prekinjena"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] To Resume"
-new: "[PLAY] za nadaljevanje"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] To Quit"
-new: "[OFF] za konec"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Tezavnost - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - Slow, 9 - Fast)"
-new: "(1 - pocasi, 9 - hitro)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] To Start/Pause"
-new: "[PLAY] Zacetek/Premor"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: "Level"
-new: "Stopnja"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Premik"
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "ZMAGA JE TVOJA!!"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: "[OFF] To Stop"
-new: "[OFF] Konec igre"
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: "[F1] - Level"
-new: "[F1] - Stopnja"
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: "[F2] Same Level"
-new: "[F2] Ista stopnja"
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: "[F3] + Level"
-new: "[F3] + Stopnja"
-
-# Next ids are for Worlmet Game.
-# Lenght restrictions for score board strings (LANG_SB_XXX):
-# LCD_PROPFONTS: max 43 pixel
-# fix font: max 7 characters
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: "Len:%d"
-new: "Len:%d"
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: "Growing"
-new: "Growing"
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: "Hungry"
-new: "Hungry"
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: "Wormed"
-new: "Wormed"
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: "Argh"
-new: "Argh"
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: "Crashed"
-new: "Crashed"
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: "Hs: %d"
-new: "Hs: %d"
-
-# Length restrictions for wormlet config screen strings (LANG_CS_XXX)
-# They must fit on the entire screen - preferably with the
-# key names aligned right
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: "%d Players    UP/DN"
-new: "%d Players    UP/DN"
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: "%d Worms        L/R"
-new: "%d Worms        L/R"
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: "Remote Control F1"
-new: "Remote Control F1"
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: "No Rem. Control F1"
-new: "No Rem. Control F1"
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: "2 Key Control   F1"
-new: "2 Key Control   F1"
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: "4 Key Control   F1"
-new: "4 Key Control   F1"
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: "Out Of Control"
-new: "Out Of Control"
-
-# Wormlet game ids ended
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: "You Lose!"
-new: "Poraz!"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: "Rows - Level"
-new: "Vrstice - stopnja"
-
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-new: "Izkljucitev ob nedelovanju"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "New Language"
-new: "Nov jezik"
-
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-new: "Pokazi datoteke"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-new: "Glasba"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-new: "Samo podprte"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-new: "Vse"
+## general strings
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
+voice: ""
 new: "Da"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
+voice: ""
 new: "Ne"
 
-id: LANG_PM_MENU
-desc: in the display menu
-eng: "Peak Meter"
-new: "Graficni prikaz"
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+voice: ""
+new: "Vklop"
 
-id:   LANG_PM_RELEASE
-desc: in the peak meter menu
-eng: "Peak Release"
-new: "Sprostitev vrha"
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+voice: ""
+new: "Izkljuci"
 
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak Hold Time"
-new: "Zakasnitev vrha"
-
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip Hold Time"
-new: "Zadrzevanje klipa"
-
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "Eternal"
-new: "Neskoncno"
-
-id: LANG_PM_UNITS_PER_READ
-desc: in the peak meter menu
-eng: "Units Per Read"
-new: "Enot na branje"
-
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-new: "Osvetlitev pri napajanju"
-
-id: LANG_REPEAT
+id: LANG_RESUME_SETTING_ASK
 desc: in settings_menu
-eng: "Repeat"
-new: "Ponovitev"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-new: "Vse"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-new: "Eno"
-
-id: LANG_RESET_CONFIRM
-desc: confirm to reset settings
-eng: "PLAY=Reset"
-new: "PLAY=Preklici"
- 
-id: LANG_RESET_CANCEL
-desc: confirm to reset settings
-eng: "OFF=Cancel"
-new: "OFF=Odpovej"
-
-# NOTE: ignore this label.  It is no longer used/was an error.
-# We are aware of this and it will this instance will be removed in the future
-id: LANG_TETRIS_LEVEL
-
-id: LANG_TIMEFORMAT
-desc: select the time format of time in status bar
-eng: "Time Format"
-new: "Prikaz casa 12/24"
-
-id: LANG_12_HOUR_CLOCK
-desc: option for 12 hour clock
-eng: "12 Hour Clock"
-new: "12 urno"
-
-id: LANG_24_HOUR_CLOCK
-desc: option for 24 hour clock
-eng: "24 Hour Clock"
-new: "24 urno"
-
-id: LANG_WEEKDAY_SUNDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sun"
-new: "Ned"
-
-id: LANG_WEEKDAY_MONDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Mon"
-new: "Pon"
-
-id: LANG_WEEKDAY_TUESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Tue"
-new: "Tor"
-
-id: LANG_WEEKDAY_WEDNESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Wed"
-new: "Sre"
-
-id: LANG_WEEKDAY_THURSDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Thu"
-new: "Cet"
-
-id: LANG_WEEKDAY_FRIDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Fri"
-new: "Pet"
-
-id: LANG_WEEKDAY_SATURDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sat"
-new: "Sob"
-
-id: LANG_MONTH_JANUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jan"
-new: "Jan"
-
-id: LANG_MONTH_FEBRUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Feb"
-new: "Feb"
-
-id: LANG_MONTH_MARCH
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Mar"
-new: "Bar"
-
-id: LANG_MONTH_APRIL
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Apr"
-new: "Apr"
-
-id: LANG_MONTH_MAY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "May"
-new: "Maj"
-
-id: LANG_MONTH_JUNE
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jun"
-new: "Jun"
-
-id: LANG_MONTH_JULY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jul"
-new: "Jul"
-
-id: LANG_MONTH_AUGUST
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Aug"
-new: "Avg"
-
-id: LANG_MONTH_SEPTEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Sep"
-new: "Sep"
-
-id: LANG_MONTH_OCTOBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Oct"
-new: "Okt"
-
-id: LANG_MONTH_NOVEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Nov"
-new: "Nov"
-
-id: LANG_MONTH_DECEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Dec"
-new: "Dec"
-
-id: LANG_CUBE
-desc: the name of the cube demo in the demo menu
-eng: "Cube"
-new: "Kocka"
-
-id: LANG_OSCILLOGRAPH
-desc: the name of the oscillograph demo in the demo menu
-eng: "Oscillograph"
-new: "Oscilograf"
-
-id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-new: "Vrasaj enkrat"
-
-id: LANG_BATTERY_DISPLAY
-desc: Battery type title
-eng: "Battery Display"
-new: "Prikaz baterij"
-
-id: LANG_VOLUME_DISPLAY
-desc: Volume type title
-eng: "Volume Display"
-new: "Prikaz glasnosti"
-
-id: LANG_DISPLAY_GRAPHIC
-desc: Label for type of icon display
-eng: "Graphic"
-new: "Graficno"
-
-id: LANG_DISPLAY_NUMERIC
-desc: Label for type of icon display
-eng: "Numeric"
-new: "Stevilcno"
-
-id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-new: "Delovanje"
-
-id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-new: "Polno delovanje"
-
-id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-new: "Varcno delovanje"
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "Scale"
-new: "Lestvica"
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "Logarithmic(dB)"
-new: "Logaritmicna(dB)"
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "Linear(%)"
-new: "Linearna(%)"
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum Of Range"
-new: "Najmanjsa vrednost"
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum Of Range"
-new: "Najvecja vrednost"
-
-id: LANG_RECORDING
-desc: in the main menu
-eng: "Recording"
-new: "Snemanje"
-
-id: LANG_RECORDING_GAIN
-desc: in the recording screen
-eng: "Gain"
-new: "Jakost"
-
-id: LANG_RECORDING_LEFT
-desc: in the recording screen
-eng: "Left"
-new: "Levi kanal"
-
-id: LANG_RECORDING_RIGHT
-desc: in the recording screen
-eng: "Right"
-new: "Desni kanal"
-
-id: LANG_RECORDING_QUALITY
-desc: in the recording settings
-eng: "Quality"
-new: "Kakovost"
-
-id: LANG_RECORDING_FREQUENCY
-desc: in the recording settings
-eng: "Frequency"
-new: "Frekvenca"
-
-id: LANG_RECORDING_SOURCE
-desc: in the recording settings
-eng: "Source"
-new: "Vir snemanja"
-
-id: LANG_RECORDING_CHANNELS
-desc: in the recording settings
-eng: "Channels"
-new: "Kanali"
-
-id: LANG_RECORDING_SRC_MIC
-desc: in the recording settings
-eng: "Mic"
-new: "Mikrofon"
-
-id: LANG_RECORDING_SRC_LINE
-desc: in the recording settings
-eng: "Line In"
-new: "Analogni vhod"
-
-id: LANG_RECORDING_SRC_DIGITAL
-desc: in the recording settings
-eng: "Digital"
-new: "Digitalni vhod"
-
-id: LANG_RECORDING_SETTINGS
-desc: in the main menu
-eng: "Recording Settings"
-new: "Snemanje - nastavitve"
-
-id: LANG_DISK_STAT
-desc: disk size info
-eng: "Disk: %d.%dGB"
-new: "Disk: %d.%dGB"
-
-id: LANG_DISK_FREE_STAT
-desc: disk size info
-eng: "Free: %d.%dGB"
-new: "Prosto: %d.%dGB"
-
-id: LANG_POWEROFF
-desc: disk poweroff flag
-eng: "Disk Poweroff"
-new: "Izklop diska"
-
-id: LANG_FILTER_PLAYLIST
-desc: show only playlist
-eng: "Playlists"
-new: "Seznam skladb"
-
-id: LANG_BATTERY_TIME
-desc: battery level in % and estimated time remaining
-eng: "%d%% %dh %dm"
-new: "%d%% %dh %dm"
-
-id: LANG_SLEEP_TIMER
-desc: sleep timer setting
-eng: "Sleep Timer"
-new: "Nastavitev avtoizklopa"
-
-id: LANG_MP3BUFFER_MARGIN
-desc: MP3 buffer margin time
-eng: "Anti-Skip Buffer"
-new: "Anti-Skip Buffer"
-
-id: LANG_BIDIR_SCROLL
-desc: Bidirectional scroll limit
-eng: "Bidirectional Scroll Limit"
-new: "Omejitev dvosmernega pregleda"
-
-id: LANG_SCROLL_DELAY
-desc: Delay before scrolling
-eng: "Scroll Start Delay"
-new: "Zamik zacetka pregledovanja"
-
-id: LANG_SCROLL_STEP
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size"
-new: "Stopnja premika pri pregledovanju"
-
-id: LANG_SCROLL_STEP_EXAMPLE
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size Setting Example Text"
-new: "Test stopnje premika"
-
-id: LANG_SCROLL_SPEED
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-new: "Hitrost premikanja"
-
-id: LANG_TRICKLE_CHARGE
-desc: DEPRECATED
-eng: ""
-new: ""
-
-id: LANG_BATTERY_TOPOFF_CHARGE
-desc: in info display, shows that top off charge is running
-eng: "Battery: Top-Off Chg"
-new: "Baterije napolnjene"
-
-id: LANG_BATTERY_TRICKLE_CHARGE
-desc: in info display, shows that trickle charge is running
-eng: "Battery: Trickle Chg"
-new: "Trajno polnjene baterije"
-
-id: LANG_BATTERY_CAPACITY
-desc: in settings_menu
-eng: "Battery Capacity"
-new: "Velikost baterije"
-
-id: LANG_QUEUE_QUEUED
-desc: queued track name %s
-eng: "Queued: %s"
-new: "Uvrstitev: %s"
-
-id: LANG_QUEUE_TOTAL
-desc: number of queued tracks %d
-eng: "Total Queued: %d"
-new: "Cakajocih skladb: %d"
-
-id: LANG_QUEUE_FULL
-desc: queue buffer full
-eng: "Queue Buffer Full"
-new: "Seznam je poln"
+eng: "Ask"
+voice: ""
+new: "Vprasaj"
+
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always
+eng: "Always"
+voice: ""
+new: "Vedno"
+
+## general messages
 
 id: LANG_MENU_SETTING_CANCEL
 desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
+voice: ""
 new: "Odpovedano"
-
-id: LANG_MENU_SETTING_OK
-desc: Visual confirmation of changing a setting
-eng: "OK"
-new: "OK"
-
-id: LANG_PLAYER_ONPLAY_1
-desc: Line #1 of player ON+PLAY screen
-eng: "\x81 Queue"
-new: "\x81 Vrsta"
-
-id: LANG_PLAYER_ONPLAY_2
-desc: Line #2 of player ON+PLAY screen
-eng: "- Ren + Del"
-new: "- Ren + Del"
-
-id: LANG_QUEUE
-desc: The verb/action Queue
-eng: "Queue"
-new: "Vrsta"
-
-id: LANG_DELETE
-desc: The verb/action Delete
-eng: "Delete"
-new: "Brisi"
-
-id: LANG_REALLY_DELETE
-desc: Really Delete?
-eng: "Delete?"
-new: "Naj zbrisem?"
-
-id: LANG_DELETED
-desc: A file has beed deleted
-eng: "Deleted"
-new: "Zbrisano"
-
-id: LANG_RENAME
-desc: The verb/action Rename
-eng: "Rename"
-new: "Preimenovanje"
 
 id: LANG_FAILED
 desc: Something failed. To be appended after above actions
 eng: "Failed"
+voice: ""
 new: "Ni uspelo"
 
-id: LANG_ALARM_MOD_ALARM_MENU
-desc: The name of the additional entry in the main menu for the RTC alarm mod.
-eng: "Wake-Up Alarm"
-new: "Bujenje"
+## main menu
 
-id: LANG_ALARM_MOD_TIME
-desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm Time: %02d:%02d"
-new: "Cas bujenja: %02d:%02d"
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+voice: ""
+new: "Nastavitev zvoka"
 
-id: LANG_ALARM_MOD_TIME_TO_GO
-desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking Up In %d:%02d"
-new: "Bujenje cez %d:%02d"
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+voice: ""
+new: "Splosne nastavitve"
 
-id: LANG_ALARM_MOD_SHUTDOWN
-desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
-new: "Ugasanje...."
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+voice: ""
+new: "Snemanje"
 
-id: LANG_ALARM_MOD_ERROR
-desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm Time Is Too Soon!"
-new: "Cas bujenja ni pravilen!"
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+voice: ""
+new: "Moznosti seznama"
 
-id: LANG_ALARM_MOD_KEYS
-desc: Shown key functions in alarm menu (for the RTC alarm mod).
-eng: "PLAY=Set OFF=Cancel"
-new: "PLAY=nastavi OFF=Odpovej"
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+voice: ""
+new: "Info"
 
-id: LANG_CREATE_PLAYLIST
-desc: Menu option for creating a playlist
-eng: "Create Playlist"
-new: "Pripravi seznam skladb"
+## Sound settings
 
-id: LANG_CREATING
-desc: Screen feedback during playlist creation
-eng: "Creating"
-new: "Priprava"
-
-id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: Backspace alternative in player keyboard interaction
-eng: "Backspace"
-new: "Backspace"
-
-id: LANG_PLAYER_KEYBOARD_DELETE
-desc: Delete alternative in player keyboard interaction
-eng: "Delete"
-new: "Brisi"
-
-id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: Accept alternative in player keyboard interaction
-eng: "Accept"
-new: "Sprejmi"
-
-id: LANG_PLAYER_KEYBOARD_ABORT
-desc: Abort alternative in player keyboard interaction
-eng: "Abort"
-new: "Preklici"
-
-id: LANG_MENU_SHOW_ID3_INFO
-desc: Menu option to start id3 viewer
-eng: "Show ID3 Info"
-new: "Pokazi ID3 Info"
-
-id: LANG_ID3_GENRE
-desc: ID3 frame 'genre'
-eng: "[Genre]"
-new: "[Stil]"
-
-id: LANG_ID3_YEAR
-desc: ID3 info 'year'
-eng: "[Year]"
-new: "[Leto]"
-
-id: LANG_ID3_NO_INFO
-desc: ID3 info is missing
-eng: "<No Info>"
-new: "<Ni podatka>"
-
-id: LANG_RECORDING_TIME
-desc: Display of recorded time
-eng: "Time:"
-new: "Cas"
-
-id: LANG_RECORDING_SIZE
-desc: Display of recorded file size
-eng: "Size:"
-new: "Velikost:"
-
-id: LANG_CPU_SLEEP
-desc: in system_settings_menu() (removed)
-eng: ""
-new: ""
-
-id: LANG_SETTINGS_LOADED1
-desc: Feedback shown when a .cfg file is loaded
-eng: "Settings"
-new: "Nastavljanje"
-
-id: LANG_SETTINGS_LOADED2
-desc: Feedback shown when a .cfg file is loaded
-eng: "Loaded"
-new: "Nalozeno"
-
-id: LANG_FADE_ON_STOP
-desc: options menu to set fade on stop or pause
-eng: "Fade On Stop/Pause"
-new: "Pojemanje ob ustavljanju/odmoru"
-
-id: LANG_SOKOBAN_ON
-desc: how to undo move 
-eng: "[ON] To Undo"
-new: "[ON] Preklici zadnji ukaz"
-
-id: LANG_INVERT
-desc: in settings_menu
-eng: "LCD Mode"
-new: "LCD prikaz"
-
-id: LANG_CHANNEL_STEREO_NARROW_PLAYER
+id: LANG_VOLUME
 desc: in sound_settings
-eng: "St. Narrow"
-new: "Stereo-ozko"
+eng: "Volume"
+voice: ""
+new: "Glasnost"
 
-id: LANG_CHANNEL_STEREO_NARROW_RECORDER
+id: LANG_BASS
 desc: in sound_settings
-eng: "Stereo Narrow"
-new: "Stereo-ozko"
+eng: "Bass"
+voice: ""
+new: "Nizki toni"
 
-id: LANG_CHANNEL_STEREO_WIDE
+id: LANG_TREBLE
 desc: in sound_settings
-eng: "Stereo Wide"
-new: "Stereo-siroko"
+eng: "Treble"
+voice: ""
+new: "Visoki toni"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+voice: ""
+new: "Nastavitev levo-desno"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+voice: ""
+new: "Kanali"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel Configuration"
+voice: ""
+new: "Nastavitev kanalov"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+voice: ""
+new: "Stereo"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+voice: ""
+new: "Mono"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+voice: ""
+new: "Mono levo"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+voice: ""
+new: "Mono desno"
 
 id: LANG_CHANNEL_KARAOKE
 desc: in sound_settings
 eng: "Karaoke"
+voice: ""
 new: "Karaoke"
 
-id: LANG_SAVE_SETTINGS
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+voice: ""
+new: "Glasnost"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+voice: ""
+new: "Avtomatska glasnost"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV Decay Time"
+voice: ""
+new: "AV zakasnitev"
+
+## general settings menu
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+voice: ""
+new: "Predvajanje"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+voice: ""
+new: "Pogled datotek"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+voice: ""
+new: "Zaslon"
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+voice: ""
+new: "Sistem"
+
+## manage settings menu
+
+id: LANG_RESET
 desc: in system_settings_menu()
-eng: "Write .cfg file"
-new: "Zapisi .cfg"
+eng: "Reset Settings"
+voice: ""
+new: "Resetiraj nastavitve"
 
-id: LANG_SETTINGS_SAVED1
-desc: Feedback shown when a .cfg file is saved
-eng: "Settings"
-new: ".cfg zapisan"
-
-id: LANG_SETTINGS_SAVED2
-desc: Feedback shown when a .cfg file is saved
-eng: "Saved"
-new: "Shranjeno"
-
-id: LANG_VBRFIX_STOP_PLAY
-desc: Tells the user to stop the playback
-eng: "Stop the playback first"
-new: "Najprej ustavi prdvajanje"
-
-id: LANG_VBRFIX_NOT_VBR
-desc: Tells the user that the selected file is not a VBR file
-eng: "Not a VBR file"
-new: "To ni VBR datoteka"
-
-id: LANG_VBRFIX
-desc: The context menu entry
-eng: "Update VBR file"
-new: "Nadgradi VBR"
-
-id: LANG_INVERT_CURSOR
-desc: in settings_menu
-eng: "Line Selector"
-new: "Kurzor"
-
-id: LANG_RECORDING_EDITABLE
-desc: Editable recordings setting
-eng: "Independent frames"
-new: "Neodvisni okviri"
-
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Prikaz stanja"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new: "Drsnik"
-
-id: LANG_CAPTION_BACKLIGHT
-desc: in settings_menu
-eng: "Caption backlight"
-new: "Osvetlitev ozadja"
-
-id: LANG_INVERT_CURSOR_POINTER
-desc: in settings_menu
-eng: "Pointer"
-new: "Pointer"
-
-id: LANG_INVERT_CURSOR_BAR
-desc: in settings_menu
-eng: "Bar(Inverse)"
-new: "Negativni drsnik"
-
-id: LANG_INVERT_LCD_NORMAL
-desc: in settings_menu
-eng: "Normal"
-new: "Normalno"
-
-id: LANG_INVERT_LCD_INVERSE
-desc: in settings_menu
-eng: "Inverse"
-new: "Negativ"
-
-id: LANG_MAX_FILES_IN_DIR
-desc: in settings_menu
-eng: "Max files in dir browser"
-new: "Najvec datotek v brskalniku"
-
-id: LANG_MAX_FILES_IN_PLAYLIST
-desc: in settings_menu
-eng: "Max playlist size"
-new: "Skrajna velikost seznama"
-
-id: LANG_JUMP_SCROLL
-desc: (player) menu altarnative for jump scroll
-eng: "Jump scroll"
-new: "Skokovito premikanje"
-
-id: LANG_ONE_TIME
-desc: (player) the jump scroll shall be done "one time"
-eng: "One time"
-new: "En krat"
-
-id: LANG_ALWAYS
-desc: (player) the jump scroll shall be done "always"
-eng: "Always"
-new: "Vedno"
-
-id: LANG_JUMP_SCROLL_DELAY
-desc: (player) Delay before making a jump scroll
-eng: "Jump Scroll Delay"
-new: "Zakasnitev skoka"
-
-id: LANG_RECORD_TIMESPLIT
-desc: Prompt for record timer interval setting, in the record settings menu
-eng: "Time Split"
-new: "Razdelitev posnetka"
-
-id: LANG_RECORD_TIMESPLIT_REC
-decs: Display of record timer interval setting, on the record screen
-eng: "Split time:"
-new: "Razdelitev posnetka:"
-
-id: LANG_SHOW_ICONS
-desc: in settings_menu
-eng: "Show Icons"
-new: "Pokazi ikone"
-
-id: LANG_DISK_FULL
-desc: in recording screen
-eng: "The disk is full. Press OFF to continue."
-new: "Disk je poln. Pritisni OFF"
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are You Sure?"
+voice: ""
+new: "Si preprican?"
 
 id: LANG_CONFIRM_WITH_PLAY_RECORDER
 desc: Generic recorder string to use to confirm
 eng: "PLAY = Yes"
+voice: ""
 new: "PLAY = Da"
 
 id: LANG_CANCEL_WITH_ANY_RECORDER
 desc: Generic recorder string to use to cancel
 eng: "Any Other = No"
+voice: ""
 new: "Drugo = Ne"
 
-##
-## Strings used in the plugin loader:
-##
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+voice: ""
+new: "Nastavljeno"
 
-id: LANG_PLUGIN_CANT_OPEN
-desc: Plugin open error message
-eng: "Can't open %s"
-new: "Ne morem odpreti %s"
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+voice: ""
+new: "Pocisceno"
 
-id: LANG_READ_FAILED
-desc: There was an error reading a file
-eng: "Failed reading %s"
-new: "Napaka pri branju %s"
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+voice: ""
+new: "Odpovedano"
 
-id: LANG_PLUGIN_WRONG_MODEL
-desc: The plugin is not compatible with the archos model trying to run it
-eng: "Incompatible model"
-new:
+id: LANG_SAVE_SETTINGS
+desc: in system_settings_menu()
+eng: "Write .cfg file"
+voice: ""
+new: "Zapisi .cfg"
 
-id: LANG_PLUGIN_WRONG_VERSION
-desc: The plugin is not compatible with the rockbox version trying to run it
-eng: "Incompatible version"
-new: "Nekompatibilna razlicica"
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save Failed"
+voice: ""
+new: "Napaka pri shranjevanju"
 
-id: LANG_PLUGIN_ERROR
-desc: The plugin return an error code
-eng: "Plugin returned error"
-new: "Dodatek javlja napako"
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. Low?"
+voice: ""
+new: "Prazna baterija?"
 
-##
-## boot change detection
-##
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save Failed"
+voice: ""
+new: "Napaka pri shranjevanju"
 
-id: LANG_BOOT_CHANGED
-desc: File browser discovered the boot file was changed
-eng: "Boot changed"
-new: "Osnovna nastavitev spremenjena"
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is Battery Low?"
+voice: ""
+new: "Je baterija prazna?"
 
-id: LANG_REBOOT_NOW
-desc: Do you want to reboot?
-eng: "Reboot now?"
-new: "Ponovno zazenem?"
+## recording menu
 
-id: LANG_FLIPIT
-desc: in the games menu
-eng: "Flipit"
-new: "Flipit"
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording Settings"
+voice: ""
+new: "Snemanje - nastavitve"
 
-id: LANG_OTHELO
-desc: in the games menu
-eng: "Othelo"
-new: "Othelo"
+## equalizer menu
 
-id: LANG_SLIDING_PUZZLE
-desc: in the games menu
-eng: "Sliding Puzzle"
-new: "Sliding Puzzle"
+## playlist options
 
-id: LANG_STAR
-desc: in the games menu
-eng: "Star"
-new: "Star"
-
-id: LANG_QUEUE_LAST
-desc: in onplay menu.  queue a track/playlist at end of playlist.
-eng: "Queue last"
-new: "Razvrsti na konec"
-
-id: LANG_INSERT
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert"
-new: "Vstavi"
-
-id: LANG_INSERT_LAST
-desc: in onplay menu.  append a track/playlist into dynamic playlist.
-eng: "Insert last"
-new: "Vstavi na konec"
-
-id: LANG_QUEUE_FIRST
-desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-eng: "Queue next"
-new: "Uvrsti naslednjega"
-
-id: LANG_INSERT_FIRST
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert next"
-new: "Vstavi za tem"
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+voice: ""
+new: "Pripravi seznam skladb"
 
 id: LANG_SAVE_DYNAMIC_PLAYLIST
 desc: in playlist menu.
 eng: "Save Dynamic Playlist"
+voice: ""
 new: "Shrani seznam skladb"
 
-id: LANG_PLAYLIST_MENU
-desc: in main menu.
-eng: "Playlist Options"
-new: "Moznosti seznama"
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+voice: ""
+new: "Vstavi mape vzvratno"
+
+## info menu
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+voice: ""
+new: "Vizitka"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (Keep Out!)"
+voice: ""
+new: "Debug (Ne uporabljaj!)"
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (Sim)"
+voice: ""
+new: "USB (Sim)"
+
+## playback settings menu
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+voice: ""
+new: "Nakljucno"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+voice: ""
+new: "Ponovitev"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+voice: ""
+new: "Vse"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+voice: ""
+new: "Eno"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play Selected First"
+voice: ""
+new: "Predvajaj najprej izbrane"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+voice: ""
+new: "Nadaljuj"
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-Skip Buffer"
+voice: ""
+new: "Anti-Skip Buffer"
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+voice: ""
+new: "Pojemanje ob ustavljanju/odmoru"
+
+## file view menu
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+voice: ""
+new: "Razporedi po obliki crk"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show Files"
+voice: ""
+new: "Pokazi datoteke"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+voice: ""
+new: "Vse"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+voice: ""
+new: "Samo podprte"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+voice: ""
+new: "Glasba"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+voice: ""
+new: "Seznam skladb"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+voice: ""
+new: "Sledi seznamu skladb"
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+voice: ""
+new: "Pokazi ikone"
+
+## display settings menu
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll"
+voice: ""
+new: "Premikanje"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak Meter"
+voice: ""
+new: "Graficni prikaz"
+
+## system settings menu
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+voice: ""
+new: "Izkljucitev ob nedelovanju"
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep Timer"
+voice: ""
+new: "Nastavitev avtoizklopa"
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+voice: ""
+new: "Bujenje"
+
+## bookmarking settings menu
+
+## voice settings menu
+
+## recording settings menu
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+voice: ""
+new: "Kakovost"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+voice: ""
+new: "Frekvenca"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+voice: ""
+new: "Vir snemanja"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+voice: ""
+new: "Mikrofon"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+voice: ""
+new: "Analogni vhod"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+voice: ""
+new: "Digitalni vhod"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
+eng: "Channels"
+voice: ""
+new: "Kanali"
+
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+voice: ""
+new: "Neodvisni okviri"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+voice: ""
+new: "Razdelitev posnetka"
+
+## ffwd/rewind menu
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+voice: ""
+new: "hitro previjanje - min stopnja"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+voice: ""
+new: "hitro previjanje - pospesek"
+
+## crossfade menu
+
+## replaygain menu
+
+## LCD settings menu, also remote
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+voice: ""
+new: "Osvetlitev ozadja"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight On When Plugged"
+voice: ""
+new: "Osvetlitev pri napajanju"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+voice: ""
+new: "Osvetlitev ozadja"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+voice: ""
+new: "Kontrast"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "LCD Mode"
+voice: ""
+new: "LCD prikaz"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+voice: ""
+new: "Normalno"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+voice: ""
+new: "Negativ"
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Line Selector"
+voice: ""
+new: "Kurzor"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+voice: ""
+new: "Pointer"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+voice: ""
+new: "Negativni drsnik"
+
+## scrolling menu
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+voice: ""
+new: "Hitrost premikanja"
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+voice: ""
+new: "Preizkus hitrosti premikanja"
+
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+voice: ""
+new: "Zamik zacetka pregledovanja"
+
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+voice: ""
+new: "Stopnja premika pri pregledovanju"
+
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
+voice: ""
+new: "Test stopnje premika"
+
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+voice: ""
+new: "Omejitev dvosmernega pregleda"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+voice: ""
+new: "Skokovito premikanje"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time
+eng: "One time"
+voice: ""
+new: "En krat"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+voice: ""
+new: "Zakasnitev skoka"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+voice: ""
+new: "Drsnik"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+voice: ""
+new: "Prikaz stanja"
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+voice: ""
+new: "Prikaz glasnosti"
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+voice: ""
+new: "Prikaz baterij"
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+voice: ""
+new: "Graficno"
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+voice: ""
+new: "Stevilcno"
+
+## peakmeter menu
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak Release"
+voice: ""
+new: "Sprostitev vrha"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units Per Read"
+voice: ""
+new: "Enot na branje"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak Hold Time"
+voice: ""
+new: "Zakasnitev vrha"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip Hold Time"
+voice: ""
+new: "Zadrzevanje klipa"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "Eternal"
+voice: ""
+new: "Neskoncno"
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "Scale"
+voice: ""
+new: "Lestvica"
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "Logarithmic(dB)"
+voice: ""
+new: "Logaritmicna(dB)"
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "Linear(%)"
+voice: ""
+new: "Linearna(%)"
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum Of Range"
+voice: ""
+new: "Najmanjsa vrednost"
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum Of Range"
+voice: ""
+new: "Najvecja vrednost"
+
+## battery menu
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+voice: ""
+new: "Velikost baterije"
+
+## disk menu
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+voice: ""
+new: "Upocasnitev diska"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+voice: ""
+new: "Izklop diska"
+
+## time & date menu
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+voice: ""
+new: "Nastavi uro/datum"
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+voice: ""
+new: "Prikaz casa 12/24"
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 Hour Clock"
+voice: ""
+new: "12 urno"
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 Hour Clock"
+voice: ""
+new: "24 urno"
+
+## limits menu
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+voice: ""
+new: "Najvec datotek v brskalniku"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+voice: ""
+new: "Skrajna velikost seznama"
+
+## context menu (onplay menu)
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+voice: ""
+new: "Pokazi ID3 Info"
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+voice: ""
+new: "Preimenovanje"
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+voice: ""
+new: "Brisi"
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
+voice: ""
+new: "Naj zbrisem?"
+
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
+voice: ""
+new: "Zbrisano"
+
+## playlist context menu
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+voice: ""
+new: "Vstavi"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+voice: ""
+new: "Vstavi za tem"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+voice: ""
+new: "Vstavi na konec"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+voice: ""
+new: "Vrsta"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+voice: ""
+new: "Uvrsti naslednjega"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+voice: ""
+new: "Razvrsti na konec"
+
+## bookmark context menu
+
+## info screen
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox Info:"
+voice: ""
+new: "Rockbox Info:"
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%03dMB"
+voice: ""
+new: "Buf: %d.%03dMB"
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%03dMB"
+voice: ""
+new: "Buffer: %d.%03dMB"
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: Charging"
+voice: ""
+new: "Polnenje baterij"
+
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
+voice: ""
+new: "Baterije napolnjene"
+
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+voice: ""
+new: "Trajno polnjene baterije"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+voice: ""
+new: "%d%% %dh %dm"
+
+## pitch screen
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch Up"
+voice: ""
+new: "Zvisanje"
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch Down"
+voice: ""
+new: "Znizanje"
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+voice: ""
+new: "Premor"
+
+## quickscreens
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "Mode:"
+voice: ""
+new: "Nacin:"
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+voice: ""
+new: "Stanje"
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+voice: ""
+new: "Premikaj"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "Bar"
+voice: ""
+new: "Drsnik"
+
+## bookmark screen
+
+## set time screen
+
+id: LANG_TIME_SET
+desc: used in set_time()
+eng: "ON To Set"
+voice: ""
+new: "ON Nastavi"
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF To Revert"
+voice: ""
+new: "OFF Preklici"
+
+## while playing screen
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Key Lock ON"
+voice: ""
+new: "Zakleni gumbe"
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Key Lock OFF"
+voice: ""
+new: "Odkleni gumbe"
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key Lock Is ON"
+voice: ""
+new: "Gumbi so odklenjeni"
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key Lock Is OFF"
+voice: ""
+new: "Gumbi so zaklenjeni"
+
+## recording screen
+
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
+voice: ""
+new: "Cas"
+
+id: LANG_RECORD_TIMESPLIT_REC
+desc: 
+eng: "Split time:"
+voice: ""
+new: "Razdelitev posnetka:"
+
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
+voice: ""
+new: "Velikost:"
+
+id: LANG_RECORDING_GAIN
+desc: in the recording screen
+eng: "Gain"
+voice: ""
+new: "Jakost"
+
+id: LANG_RECORDING_LEFT
+desc: in the recording screen
+eng: "Left"
+voice: ""
+new: "Levi kanal"
+
+id: LANG_RECORDING_RIGHT
+desc: in the recording screen
+eng: "Right"
+voice: ""
+new: "Desni kanal"
+
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
+voice: ""
+new: "Disk je poln. Pritisni OFF"
+
+## recording trigger screen
+
+## alarm screen
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm Time: %02d:%02d"
+voice: ""
+new: "Cas bujenja: %02d:%02d"
+
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking Up In %d:%02d"
+voice: ""
+new: "Bujenje cez %d:%02d"
+
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Shutting Down..."
+voice: ""
+new: "Ugasanje...."
+
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm Time Is Too Soon!"
+voice: ""
+new: "Cas bujenja ni pravilen!"
+
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
+voice: ""
+new: "PLAY=nastavi OFF=Odpovej"
+
+## colour setting screen
+
+## tag viewer
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+voice: ""
+new: "[Naslov]"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+voice: ""
+new: "[Avtor]"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+voice: ""
+new: "[Album]"
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+voice: ""
+new: "[Stevika skladbe]"
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+voice: ""
+new: "[Stil]"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+voice: ""
+new: "[Leto]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+voice: ""
+new: "[Seznam]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+voice: ""
+new: "[Bitrate]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+voice: ""
+new: "[Frekvenca]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[Path]"
+voice: ""
+new: "[Pot]"
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<No Info>"
+voice: ""
+new: "<Ni podatka>"
+
+## weekdays
+
+id: LANG_WEEKDAY_SUNDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Sun"
+voice: ""
+new: "Ned"
+
+id: LANG_WEEKDAY_MONDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Mon"
+voice: ""
+new: "Pon"
+
+id: LANG_WEEKDAY_TUESDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Tue"
+voice: ""
+new: "Tor"
+
+id: LANG_WEEKDAY_WEDNESDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Wed"
+voice: ""
+new: "Sre"
+
+id: LANG_WEEKDAY_THURSDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Thu"
+voice: ""
+new: "Cet"
+
+id: LANG_WEEKDAY_FRIDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Fri"
+voice: ""
+new: "Pet"
+
+id: LANG_WEEKDAY_SATURDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Sat"
+voice: ""
+new: "Sob"
+
+## months
+
+id: LANG_MONTH_JANUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jan"
+voice: ""
+new: "Jan"
+
+id: LANG_MONTH_FEBRUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Feb"
+voice: ""
+new: "Feb"
+
+id: LANG_MONTH_MARCH
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Mar"
+voice: ""
+new: "Bar"
+
+id: LANG_MONTH_APRIL
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Apr"
+voice: ""
+new: "Apr"
+
+id: LANG_MONTH_MAY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "May"
+voice: ""
+new: "Maj"
+
+id: LANG_MONTH_JUNE
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jun"
+voice: ""
+new: "Jun"
+
+id: LANG_MONTH_JULY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jul"
+voice: ""
+new: "Jul"
+
+id: LANG_MONTH_AUGUST
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Aug"
+voice: ""
+new: "Avg"
+
+id: LANG_MONTH_SEPTEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Sep"
+voice: ""
+new: "Sep"
+
+id: LANG_MONTH_OCTOBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Oct"
+voice: ""
+new: "Okt"
+
+id: LANG_MONTH_NOVEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Nov"
+voice: ""
+new: "Nov"
+
+id: LANG_MONTH_DECEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Dec"
+voice: ""
+new: "Dec"
+
+## digits and units for voice, the order is important
+
+## units for voicing
+
+## chars for spelling
+
+## file/folder voicing
+
+## file extensions for voicing
+
+## playlist handling
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
+voice: ""
+new: "Nalagam..."
+
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
+voice: ""
+new: "Pregled seznama..."
+
+id: LANG_PLAYLIST_BUFFER_FULL
+desc: in playlist.indices() when playlist is full
+eng: "Playlist Buffer Full"
+voice: ""
+new: "Seznam skladb Seznam je poln"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End Of List"
+voice: ""
+new: "Konec seznama"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "End Of Song List"
+voice: ""
+new: "Konec seznama"
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+voice: ""
+new: "Priprava"
 
 id: LANG_PLAYLIST_INSERT_COUNT
 desc: splash number of tracks inserted
 eng: "Inserted %d tracks (%s)"
+voice: ""
 new: "Vstavljeno %d skladb (%s)"
 
 id: LANG_PLAYLIST_QUEUE_COUNT
 desc: splash number of tracks queued
 eng: "Queued %d tracks (%s)"
+voice: ""
 new: "Razvrsceno %d skladb (%s)"
 
 id: LANG_PLAYLIST_SAVE_COUNT
 desc: splash number of tracks saved
 eng: "Saved %d tracks (%s)"
+voice: ""
 new: "Shranjeno %d skladb (%s)"
 
-id: LANG_OFF_ABORT
-desc: Used on recorder models
-eng: "OFF to abort"
-new: "OFF za odpoved"
-
-id: LANG_STOP_ABORT
-desc: Used on player models
-eng: "STOP to abort"
-new: "STOP za odpoved"
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+voice: ""
+new: "Vzvratno?"
 
 id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
 desc: Playlist error
 eng: "Error updating playlist control file"
+voice: ""
 new: "Napaka pri pripravi seznama"
 
 id: LANG_PLAYLIST_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist file"
+voice: ""
 new: "Napaka pri dostopu do seznama"
 
 id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing playlist control file"
+voice: ""
 new: "Napaka pri dostopu do seznama"
 
 id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
 desc: Playlist error
 eng: "Error accessing directory"
+voice: ""
 new: "Napaka pri dostopu do mape"
 
 id: LANG_PLAYLIST_CONTROL_INVALID
 desc: Playlist resume error
 eng: "Playlist control file is invalid"
+voice: ""
 new: "Krmilna datotka seznama je pokvarjena"
 
-id: LANG_RECURSE_DIRECTORY
-desc: In playlist menu
-eng: "Recursively Insert Directories"
-new: "Vstavi mape vzvratno"
+## FM radio
 
-id: LANG_RECURSE_DIRECTORY_QUESTION
-desc: Asked from onplay screen
-eng: "Recursively?"
-new: "Vzvratno?"
+## dir/file browser
 
+id: LANG_SHOWDIR_BUFFER_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer Is Full!"
+voice: ""
+new: "Blazilni prostor Je poln!"
 
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "New Language"
+voice: ""
+new: "Nov jezik"
+
+id: LANG_SETTINGS_LOADED
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings Loaded"
+voice: ""
+new: "Nastavljanje Nalozeno"
+
+id: LANG_SETTINGS_SAVED
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings Saved"
+voice: ""
+new: ".cfg zapisan Shranjeno"
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+voice: ""
+new: "Osnovna nastavitev spremenjena"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+voice: ""
+new: "Ponovno zazenem?"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+voice: ""
+new: "OFF za odpoved"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+voice: ""
+new: "STOP za odpoved"
+
+## tag database browser
+
+## playlist viewer
+
+## plugin loader, filetypes
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+voice: ""
+new: "Ne morem odpreti %s"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+voice: ""
+new: "Napaka pri branju %s"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+voice: ""
+new: ""
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+voice: ""
+new: "Nekompatibilna razlicica"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+voice: ""
+new: "Dodatek javlja napako"
+
+## misc
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: possible answers to resume question
+eng: "(PLAY/STOP)"
+voice: ""
+new: "(PLAY/STOP)"

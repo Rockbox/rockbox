@@ -36,8 +36,6 @@ enum {
     UNIT_KHZ,     /* kHz */
     UNIT_DB,      /* dB, mandatory sign */
     UNIT_PERCENT, /* % */
-    UNIT_MB,      /* megabyte */
-    UNIT_GB,      /* gigabyte */
     UNIT_MAH,     /* milliAmp hours */
     UNIT_PIXEL,   /* pixels */
     UNIT_PER_SEC, /* per second */

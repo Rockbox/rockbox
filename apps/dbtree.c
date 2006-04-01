@@ -131,9 +131,7 @@ int db_load(struct tree_context* c)
             i = db_search(c, searchstring);
             c->dirlength = c->filesindir = i;
             if (c->dirfull) {
-                gui_syncsplash(HZ, true, (unsigned char *)"%s %s",
-                               str(LANG_SHOWDIR_ERROR_BUFFER),
-                               str(LANG_SHOWDIR_ERROR_FULL));
+                gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
                 c->dirfull = false;
             }
             else

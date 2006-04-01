@@ -677,8 +677,6 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_KHZ, 
         VOICE_DB, 
         VOICE_PERCENT,
-        VOICE_MEGABYTE,
-        VOICE_GIGABYTE,
         VOICE_MILLIAMPHOURS,
         VOICE_PIXEL,
         VOICE_PER_SEC,

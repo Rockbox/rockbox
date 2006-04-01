@@ -1,153 +1,23 @@
 
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-voice: "Opciones de sonido"
-new: "Opciones de Sonido"
+## general strings
 
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-voice: "Opciones generales"
-new: "Opciones Generales"
+id: LANG_SET_BOOL_YES
+desc: bool true representation
+eng: "Yes"
+voice: "Si"
+new: "Si"
 
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-voice: "Información"
-new: "Información"
+id: LANG_SET_BOOL_NO
+desc: bool false representation
+eng: "No"
+voice: "No"
+new: "No"
 
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-voice: "Versión"
-new: "Versión"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (Keep Out!)"
-voice: "Depuración (¡no tocar!)"
-new: "Depuración (¡no tocar!)"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (Sim)"
-voice: ""
-new: "USB (Simulado)"
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox Info:"
-voice: ""
-new: "Info. de rockbox:"
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%03dMB"
-voice: ""
-new: "Buf: %d.%03dMb"
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%03dMB"
-voice: ""
-new: "Buffer: %d.%03dMb" 
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: Charging"
-voice: ""
-new: "Batería: Cargando"
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-voice: ""
-new: "Cargando..."
-
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-voice: ""
-new: "Mezclando..."
-
-id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
-eng: "Playlist"
-voice: ""
-new: "El bufer de la" 
-
-id: LANG_PLAYINDICES_BUFFER
-desc: in playlist.indices() when playlist is full
-eng: "Buffer Full"
-voice: ""
-new: "lista esta lleno" 
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Fallo al salvar" 
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Partition?"
-voice: ""
-new: "Partición?" 
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Fallo al guardar" 
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "No partition?"
-voice: ""
-new: "¿No hay partición?" 
-
-id: LANG_TIME_SET
-desc: used in set_time()
-eng: "ON To Set"
-voice: ""
-new: "ON para cambiar"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF To Revert"
-voice: ""
-new: "OFF para cancelar"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-voice: "Contraste"
-new: "Contraste"
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-voice: "Aleatorio"
-new: "Aleatorio"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play Selected First"
-voice: "Reproducir primero la canción marcada"
-new: "Reproducir primero la canción marcada"
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-voice: "Sensible a May/minúsculas" 
-new: "Sensible a May/minúsculas" 
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-voice: "Continuar"
-new: "Continuar"
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+voice: "Activo"
+new: "Activo"
 
 id: LANG_OFF
 desc: Used in a lot of places
@@ -161,107 +31,247 @@ eng: "Ask"
 voice: "Preguntar"
 new: "Preguntar"
 
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-voice: "Activo"
-new: "Activo"
+id: LANG_ALWAYS
+desc: (player) the jump scroll shall be done "always
+eng: "Always"
+voice: "Siempre"
+new: "Siempre"
 
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-voice: "Iluminación"
-new: "Iluminación" 
+## general messages
 
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
+id: LANG_CONFIRM_SHUTDOWN
+desc: in shutdown screen
+eng: "Press OFF to shut down"
 voice: ""
-new: "Ejemplo de la velocidad de desplazamiento"
+new: "Pulsa OFF para apagar"
 
-id: LANG_DISCHARGE
-desc: DEPRECATED
-eng: ""
+id: LANG_SHUTTINGDOWN
+desc: in main menu
+eng: "Shutting down..."
 voice: ""
-new: ""
+new: "Apagando..."
 
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-voice: "Poner fecha y hora"
-new: "Poner Fecha/Hora"
+id: LANG_REMOVE_MMC
+desc: before acknowledging usb in case an MMC is inserted (Ondio)
+eng: "Please remove inserted MMC"
+voice: "Por favor retire la tarjeta MMC insertada"
+new: "Por favor retire la tarjeta MMC insertada"
 
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-voice: "Parada del disco duro"
-new: "Parada del disco duro"
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-voice: "Paso mínimo"
-new: "Paso mínimo FF/RW" 
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-voice: "Aceleración"
-new: "Aceleración FF/RW"  
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-voice: "Seguir lista de reproducción"
-new: "Seguir lista de repr."
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are You Sure?"
-voice: ""
-new: "¿Estás seguro?"  
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-voice: ""
-new: "Opciones"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-voice: ""
-new: "Borradas"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
+id: LANG_MENU_SETTING_CANCEL
+desc: Visual confirmation of canceling a changed setting
 eng: "Canceled"
 voice: ""
 new: "Cancelado"
 
-id: LANG_CASE_MENU
-desc: DEPRECATED
-eng: ""
+id: LANG_FAILED
+desc: Something failed. To be appended after above actions
+eng: "Failed"
 voice: ""
-new: 
+new: "Fallido"
 
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scrolling"
-voice: "Desplazamiento"
-new: "Desplazamiento"
+## main menu
 
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset Settings"
-voice: "Reiniciar opciones"
-new: "Reiniciar opciones"
+id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+desc: Text for the menu text to access the most recent bookmarks list
+eng: "Recent Bookmarks"
+voice: "Marcapáginas Recientes"
+new: "Marcapáginas Recientes"
+
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+voice: "Opciones de sonido"
+new: "Opciones de Sonido"
+
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+voice: "Opciones generales"
+new: "Opciones Generales"
+
+id: LANG_MANAGE_MENU
+desc: in the system sub menu
+eng: "Manage Settings"
+voice: "Gestionar opciones"
+new: "Gestionar Opciones"
+
+id: LANG_FM_RADIO
+desc: in main menu
+eng: "FM Radio"
+voice: "Radio FM"
+new: "Radio FM"
+
+id: LANG_RECORDING
+desc: in the main menu
+eng: "Recording"
+voice: "Grabación"
+new: "Grabación"
+
+id: LANG_PLAYLIST_MENU
+desc: in main menu.
+eng: "Playlist Options"
+voice: "Opciones de la Lista de Reproducción"
+new: "Opciones de la Lista de Reproducción"
+
+id: LANG_PLUGINS
+desc: in main_menu()
+eng: "Browse Plugins"
+voice: "Mostrar Plugins"
+new: "Mostrar Plugins"
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+voice: "Información"
+new: "Información"
+
+id: LANG_SHUTDOWN
+desc: in main menu
+eng: "Shut down"
+voice: "Apagar"
+new: "Apagar"
+
+## Sound settings
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+voice: "Volumen"
+new: "Volumen"
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+voice: "Graves"
+new: "Graves"
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+voice: "Agudos"
+new: "Agudos"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+voice: "Equilibrio"
+new: "Equilibrio"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+voice: "Canales"
+new: "Canales"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel Configuration"
+voice: ""
+new: "Configuración de canales"   "
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+voice: "Estéreo"
+new: "Estéreo"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+voice: "Mono"
+new: "Mono"
+
+id: LANG_CHANNEL_CUSTOM
+desc: in sound_settings
+eng: "Custom"
+voice: "Personalizado"
+new: "Personalizado"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+voice: "Mono Izquierdo"
+new: "Mono Izquierdo"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+voice: "Mono Derecho"
+new: "Mono Derecho"
+
+id: LANG_CHANNEL_KARAOKE
+desc: in sound_settings
+eng: "Karaoke"
+voice: "Karaoke"
+new: "Karaoke"
+
+id: LANG_STEREO_WIDTH
+desc: in sound_settings
+eng: "Stereo width"
+voice: "Amplitud estéreo"
+new: "Amplitud Estéreo"
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+voice: "Sonoridad"
+new: "Sonoridad"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+voice: "Auto Volumen"
+new: "Auto Volumen"
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV Decay Time"
+voice: ""
+new: "Tiempo de caída del AV"    "
+
+id: LANG_SUPERBASS
+desc: in sound settings
+eng: "Super bass"
+voice: "Super grave"
+new: "Super grave"
+
+id: LANG_MDB_ENABLE
+desc: in sound settings
+eng: "MDB Enable"
+voice: "Activar MDB"
+new: "Activar MDB"
+
+id: LANG_MDB_STRENGTH
+desc: in sound settings
+eng: "MDB Strength"
+voice: "Potencia MDB"
+new: "Potencia MDB"
+
+id: LANG_MDB_HARMONICS
+desc: in sound settings
+eng: "MDB Harmonics"
+voice: "Armónicos MDB"
+new: "Armónicos MDB"
+
+id: LANG_MDB_CENTER
+desc: in sound settings
+eng: "MDB Center frequency"
+voice: "Frecuencia central MDB"
+new: "Frecuencia central MDB"
+
+id: LANG_MDB_SHAPE
+desc: in sound settings
+eng: "MDB Shape"
+voice: "Forma de MDB"
+new: "Forma de MDB"
+
+## general settings menu
 
 id: LANG_PLAYBACK
 desc: in settings_menu()
 eng: "Playback"
 voice: "Reproducción"
-new: "Reproducción"    
+new: "Reproducción"    "
 
 id: LANG_FILE
 desc: in settings_menu()
@@ -281,251 +291,1103 @@ eng: "System"
 voice: "Sistema"
 new: "Sistema"
 
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-voice: "Volumen"
-new: "Volumen"
+id: LANG_BOOKMARK_SETTINGS
+desc: in general settings
+eng: "Bookmarking"
+voice: "Marcapáginas"
+new: "Marcapáginas"
 
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-voice: "Equilibrio"
-new: "Equilibrio" 
+id: LANG_LANGUAGE
+desc: in settings_menu
+eng: "Language"
+voice: "Idioma"
+new: "Idioma"
 
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-voice: "Graves"
-new: "Graves"
+id: LANG_VOICE
+desc: root of voice menu
+eng: "Voice"
+voice: "Voz"
+new: "Voz"
 
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-voice: "Agudos"
-new: "Agudos"
+## manage settings menu
 
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-voice: "Sonoridad"
-new: "Sonoridad"
+id: LANG_CUSTOM_CFG
+desc: in setting_menu()
+eng: "Browse .cfg files"
+voice: "Mostrar archivos de configuración"
+new: "Mostrar archivos .cfg"
 
-id: LANG_BBOOST
-desc: DEPRECATED
-eng: ""
+id: LANG_FIRMWARE
+desc: in the main menu
+eng: "Browse Firmwares"
+voice: "Mostrar Firmwares"
+new: "Mostrar Firmwares"
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset Settings"
+voice: "Reiniciar opciones"
+new: "Reiniciar opciones"
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are You Sure?"
 voice: ""
-new: 
+new: "¿Estás seguro?"  "
 
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV Decay Time"
+id: LANG_CONFIRM_WITH_PLAY_RECORDER
+desc: Generic recorder string to use to confirm
+eng: "PLAY = Yes"
 voice: ""
-new: "Tiempo de caída del AV"    
+new: "PLAY = SI"
 
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
+id: LANG_CANCEL_WITH_ANY_RECORDER
+desc: Generic recorder string to use to cancel
+eng: "Any Other = No"
+voice: ""
+new: "Otra Tecla = NO"
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+voice: ""
+new: "Opciones"
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+voice: ""
+new: "Borradas"
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+voice: ""
+new: "Cancelado"
+
+id: LANG_SAVE_SETTINGS
+desc: in system_settings_menu()
+eng: "Write .cfg file"
+voice: "Escribir archivo de configuración"
+new: "Escribir archivo .cfg"
+
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save Failed"
+voice: ""
+new: "Fallo al salvar"
+
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Partition?"
+voice: ""
+new: "Partición?"
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save Failed"
+voice: ""
+new: "Fallo al guardar"
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "No partition?"
+voice: ""
+new: "¿No hay partición?"
+
+## recording menu
+
+id: LANG_RECORDING_MENU
+desc: in the recording sub menu
+eng: "Recording screen"
+voice: "Pantalla de Grabación"
+new: "Pantalla de Grabación"
+
+id: LANG_RECORDING_SETTINGS
+desc: in the main menu
+eng: "Recording Settings"
+voice: "Opciones de Grabación"
+new: "Opciones de Grabación"
+
+## equalizer menu
+
+## playlist options
+
+id: LANG_CREATE_PLAYLIST
+desc: Menu option for creating a playlist
+eng: "Create Playlist"
+voice: "Crear lista de reproducción"
+new: "Crear Lista de Reproducción"
+
+id: LANG_VIEW_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "View Current Playlist"
+voice: "Ver Lista de Reproducción Actual"
+new: "Ver Lista de Reproducción Actual"
+
+id: LANG_SAVE_DYNAMIC_PLAYLIST
+desc: in playlist menu.
+eng: "Save Current Playlist"
+voice: "Guardar Lista de Reproducción Actual"
+new: "Guardar Lista de Reproducción Actual"
+
+id: LANG_RECURSE_DIRECTORY
+desc: In playlist menu
+eng: "Recursively Insert Directories"
+voice: "Añadir Directorios Recursivamente"
+new: "Añadir Directorios Recursivamente"
+
+## info menu
+
+id: LANG_INFO_MENU
+desc: in the info sub menu
+eng: "Rockbox Info"
+voice: "Información de Rockbox"
+new: "Info. de Rockbox"
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+voice: "Versión"
+new: "Versión"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (Keep Out!)"
+voice: "Depuración (¡no tocar!)"
+new: "Depuración (¡no tocar!)"
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (Sim)"
+voice: ""
+new: "USB (Simulado)"
+
+## playback settings menu
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+voice: "Aleatorio"
+new: "Aleatorio"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+voice: "Repetir"
+new: "Repetir"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+voice: "Todas"
+new: "Todas"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+voice: "Una"
+new: "Una"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play Selected First"
+voice: "Reproducir primero la canción marcada"
+new: "Reproducir primero la canción marcada"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+voice: "Continuar"
+new: "Continuar"
+
+id: LANG_WIND_MENU
+desc: in the playback sub menu
+eng: "FFwd/Rewind"
+voice: "Avance rápido y rebobinar"
+new: "Av.Rápido/Rebobinar"
+
+id: LANG_MP3BUFFER_MARGIN
+desc: MP3 buffer margin time
+eng: "Anti-Skip Buffer"
+voice: "Buffer Anti-salto"
+new: "Buffer Anti-salto"
+
+id: LANG_FADE_ON_STOP
+desc: options menu to set fade on stop or pause
+eng: "Fade On Stop/Pause"
+voice: "Silencio gradual al Parar y Pausar"
+new: "Silencio gradual al Parar/Pausar"
+
+id: LANG_ID3_ORDER
+desc: in playback settings screen
+eng: "ID3 tag priority"
+voice: "Prioridad etiqueta ID3"
+new: "Prioridad etiqueta ID3"
+
+id: LANG_ID3_V1_FIRST
+desc: in playback settings screen
+eng: "V1 then V2"
+voice: "Versión 1 y despues versión 2"
+new: "V1 y despues V2"
+
+id: LANG_ID3_V2_FIRST
+desc: in playback settings screen
+eng: "V2 then V1"
+voice: "Versión 2 y despues versión 1"
+new: "V2 y despues V1"
+
+## file view menu
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+voice: "Sensible a May/minúsculas"
+new: "Sensible a May/minúsculas"
+
+id: LANG_SORT_DIR
+desc: browser sorting setting
+eng: "Sort Directories"
+voice: "Ordenar directorios"
+new: "Ordenar directorios"
+
+id: LANG_SORT_FILE
+desc: browser sorting setting
+eng: "Sort Files"
+voice: "Ordenar archivos"
+new: "Ordenar archivos"
+
+id: LANG_SORT_ALPHA
+desc: browser sorting setting
+eng: "Alphabetical"
+voice: "Alfabético"
+new: "Alfabético"
+
+id: LANG_SORT_DATE
+desc: browser sorting setting
+eng: "by date"
+voice: "Por fecha"
+new: "Por fecha"
+
+id: LANG_SORT_DATE_REVERSE
+desc: browser sorting setting
+eng: "by newest date"
+voice: "más reciente"
+new: "más reciente"
+
+id: LANG_SORT_TYPE
+desc: browser sorting setting
+eng: "by type"
+voice: "por tipo"
+new: "por tipo"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show Files"
+voice: "Mostrar archivos"
+new: "Mostrar archivos"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+voice: "Todos"
+new: "Todos"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+voice: "Soportados"
+new: "soportados"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+voice: "Música"
+new: "Música"
+
+id: LANG_FILTER_PLAYLIST
+desc: show only playlist
+eng: "Playlists"
+voice: "Listas de reproducción"
+new: "Listas de reproducción"
+
+id: LANG_FILTER_ID3DB
+desc: show ID3 database
+eng: "ID3 database"
+voice: "Base de datos ID3"
+new: "Base de datos ID3"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+voice: "Seguir lista de reproducción"
+new: "Seguir lista de repr."
+
+id: LANG_SHOW_ICONS
+desc: in settings_menu
+eng: "Show Icons"
+voice: "Mostrar Iconos"
+new: "Mostrar Iconos"
+
+## display settings menu
+
+id: LANG_CUSTOM_FONT
+desc: in setting_menu()
+eng: "Browse Fonts"
+voice: "Mostrar fuentes"
+new: "Mostrar Fuentes"
+
+id: LANG_WHILE_PLAYING
+desc: in settings_menu()
+eng: "Browse .wps files"
+voice: "Mostrar archivos de pantalla de reproducción"
+new: "Mostrar archivos .wps"
+
+id: LANG_LCD_MENU
+desc: in the display sub menu
+eng: "LCD Settings"
+voice: "Opciones del LCD"
+new: "Opciones del LCD"
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scrolling"
+voice: "Desplazamiento"
+new: "Desplazamiento"
+
+id: LANG_BARS_MENU
+desc: in the display sub menu
+eng: "Status-/Scrollbar"
+voice: "Barras de Estado y desplazamiento"
+new: "Barras de Estado/Desplazamiento"
+
+id: LANG_PM_MENU
+desc: in the display menu
+eng: "Peak Meter"
+voice: "Analizador de espectro"
+new: "Analizador de espectro"
+
+## system settings menu
+
+id: LANG_BATTERY_MENU
+desc: in the system sub menu
+eng: "Battery"
+voice: "Batería"
+new: "Batería"
+
+id: LANG_DISK_MENU
+desc: in the system sub menu
+eng: "Disk"
+voice: "Disco"
+new: "Disco"
+
+id: LANG_TIME_MENU
+desc: in the system sub menu
+eng: "Time & Date"
+voice: "Fecha y Hora"
+new: "Fecha y Hora"
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+voice: "Auto apagado"
+new: "Auto apagado"
+
+id: LANG_SLEEP_TIMER
+desc: sleep timer setting
+eng: "Sleep Timer"
+voice: "Temporizador de apagado"
+new: "Temporizador apagado"
+
+id: LANG_ALARM_MOD_ALARM_MENU
+desc: The name of the additional entry in the main menu for the RTC alarm mod.
+eng: "Wake-Up Alarm"
+voice: "Alarma despertador"
+new: "Alarma despertador"
+
+id: LANG_LIMITS_MENU
+desc: in the system sub menu
+eng: "Limits"
+voice: "Límites"
+new: "Límites"
+
+id: LANG_LINE_IN
+desc: in settings_menu
+eng: "Line In"
+voice: "Entrada Analógica"
+new: "Analógica"
+
+id: LANG_CAR_ADAPTER_MODE
+desc: Displayed for setting car adapter mode to on/off
+eng: "Car Adapter Mode"
+voice: "Modo Adaptador de Coche"
+new: "Modo Adaptador de Coche"
+
+## bookmarking settings menu
+
+id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+desc: prompt for user to decide to create an bookmark
+eng: "Bookmark on Stop"
+voice: "Marcar página al Detener"
+new: "Marcar página al Detener"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+desc: Save in recent bookmarks only
+eng: "Yes - Recent only"
+voice: "Si - Sólo Recientes"
+new: "Si - Sólo Recientes"
+
+id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+desc: Save in recent bookmarks only
+eng: "Ask - Recent only"
+voice: "Preguntar - Sólo Recientes"
+new: "Preguntar - Sólo Recientes"
+
+id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark"
+voice: "Cargar último Marcapáginas"
+new: "Cargar último Marcapáginas"
+
+id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+desc: Configuration option to maintain a list of recent bookmarks
+eng: "Maintain a List of Recent Bookmarks?"
+voice: "¿Mantener una Lista de Marcapáginas Recientes?"
+new: "¿Mantener una Lista de Marcapáginas Recientes?"
+
+id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+desc: Save only on bookmark for each playlist in recent bookmarks
+eng: "Unique only"
+voice: "Sólo único"
+new: "Sólo único"
+
+## voice settings menu
+
+id: LANG_VOICE_MENU
+desc: item of voice menu, enable/disable the voice UI
+eng: "Voice Menus"
+voice: "Nombrar menus"
+new: "Nombrar menus"
+
+id: LANG_VOICE_DIR
+desc: item of voice menu, set the "talkbox" mode for directories
+eng: "Voice Directories"
+voice: "Nombrar directorios"
+new: "Nombrar directorios"
+
+id: LANG_VOICE_FILE
+desc: item of voice menu, set the voive mode for files
+eng: "Voice Filenames"
+voice: "Nombrar archivos"
+new: "Nombrar archivos"
+
+id: LANG_VOICE_NUMBER
+desc: talkbox" mode for files+directories
+eng: "Numbers"
+voice: "Numeros"
+new: "Números"
+
+id: LANG_VOICE_SPELL
+desc: talkbox" mode for files+directories
+eng: "Spell"
+voice: "Deletrear"
+new: "Deletrear"
+
+id: LANG_VOICE_DIR_HOVER
+desc: talkbox" mode for directories + files
+eng: ".talk mp3 clip"
+voice: "fichero mp3 .talk"
+new: "fichero mp3 .talk"
+
+## recording settings menu
+
+id: LANG_RECORDING_QUALITY
+desc: in the recording settings
+eng: "Quality"
+voice: "Calidad"
+new: "Calidad"
+
+id: LANG_RECORDING_FREQUENCY
+desc: in the recording settings
+eng: "Frequency"
+voice: "Frecuencia"
+new: "Frecuencia"
+
+id: LANG_RECORDING_SOURCE
+desc: in the recording settings
+eng: "Source"
+voice: "Fuente"
+new: "Fuente"
+
+id: LANG_RECORDING_SRC_MIC
+desc: in the recording settings
+eng: "Mic"
+voice: "Micrófono"
+new: "Micro"
+
+id: LANG_RECORDING_SRC_LINE
+desc: in the recording settings
+eng: "Line In"
+voice: "Analógica"
+new: "Analógica"
+
+id: LANG_RECORDING_SRC_DIGITAL
+desc: in the recording settings
+eng: "Digital"
+voice: "Digital"
+new: "Digital"
+
+id: LANG_RECORDING_CHANNELS
+desc: in the recording settings
 eng: "Channels"
 voice: "Canales"
 new: "Canales"
 
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel Configuration"
+id: LANG_RECORDING_EDITABLE
+desc: Editable recordings setting
+eng: "Independent frames"
+voice: "Marcos independientes"
+new: "Marcos independientes"
+
+id: LANG_RECORD_TIMESPLIT
+desc: Prompt for record timer interval setting, in the record settings menu
+eng: "Time Split"
+voice: "Separación por Tiempo"
+new: "Separación por Tiempo"
+
+id: LANG_RECORD_PRERECORD_TIME
+desc: in recording settings_menu
+eng: "Prerecord time"
+voice: "Tiempo de Pregrabación"
+new: "Tiempo de Pregrabación"
+
+id: LANG_RECORD_DIRECTORY
+desc: in recording settings_menu
+eng: "Directory"
+voice: "Directorio"
+new: "Directorio"
+
+id: LANG_RECORD_CURRENT_DIR
+desc: in recording directory options
+eng: "Current dir"
+voice: "Directorio Actual"
+new: "Directorio Actual"
+
+id: LANG_RECORD_STARTUP
+desc: Start Rockbox in Recording screen
+eng: "Show recording screen on startup"
+voice: "Mostrar pantalla de grabación al encender"
+new: "Mostrar pantalla de grabación al encender"
+
+## ffwd/rewind menu
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+voice: "Paso mínimo"
+new: "Paso mínimo FF/RW"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+voice: "Aceleración"
+new: "Aceleración FF/RW"  "
+
+## crossfade menu
+
+## replaygain menu
+
+## LCD settings menu, also remote
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+voice: "Iluminación"
+new: "Iluminación"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight On When Plugged"
+voice: "Iluminación estando enchufado"
+new: "Iluminación estando enchufado"
+
+id: LANG_CAPTION_BACKLIGHT
+desc: in settings_menu
+eng: "Caption backlight"
+voice: "Iluminacion al iniciar Canción"
+new: "Iluminación al iniciar Canción"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+voice: "Contraste"
+new: "Contraste"
+
+id: LANG_INVERT
+desc: in settings_menu
+eng: "LCD Mode"
+voice: "Modo LCD"
+new: "Modo LCD"
+
+id: LANG_INVERT_LCD_NORMAL
+desc: in settings_menu
+eng: "Normal"
+voice: "Normal"
+new: "Normal"
+
+id: LANG_INVERT_LCD_INVERSE
+desc: in settings_menu
+eng: "Inverse"
+voice: "Inverso"
+new: "Inverso"
+
+id: LANG_FLIP_DISPLAY
+desc: in settings_menu, option to turn display+buttos by 180 degreed
+eng: "Upside Down"
+voice: "Boca abajo"
+new: "Boca-abajo"
+
+id: LANG_INVERT_CURSOR
+desc: in settings_menu
+eng: "Line Selector"
+voice: "Selector de linea"
+new: "Selector de linea"
+
+id: LANG_INVERT_CURSOR_POINTER
+desc: in settings_menu
+eng: "Pointer"
+voice: "Puntero"
+new: "Puntero"
+
+id: LANG_INVERT_CURSOR_BAR
+desc: in settings_menu
+eng: "Bar(Inverse)"
+voice: "Barra inversa"
+new: "Barra(inversa)"
+
+## scrolling menu
+
+id: LANG_SCROLL_SPEED
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+voice: "Velocidad de Desplazamiento"
+new: "Velocidad de Desplazamiento"
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
 voice: ""
-new: "Configuración de canales"   
+new: "Ejemplo de la velocidad de desplazamiento"
 
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-voice: "Estéreo"
-new: "Estéreo"
+id: LANG_SCROLL_DELAY
+desc: Delay before scrolling
+eng: "Scroll Start Delay"
+voice: "Retraso del inicio del desplazamiento"
+new: "Retraso del inicio del desplaz."
 
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-voice: "Mono"
-new: "Mono"
+id: LANG_SCROLL_STEP
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size"
+voice: "Tamaño del paso de Desplazamiento"
+new: "Tamaño del paso de Desplaz."
 
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-voice: "Mono Izquierdo"
-new: "Mono Izquierdo"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-voice: "Mono Derecho"
-new: "Mono Derecho"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-voice: "Auto Volumen"
-new: "Auto Volumen"
-
-id: LANG_SHOWDIR_ERROR_BUFFER
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer"
+id: LANG_SCROLL_STEP_EXAMPLE
+desc: Pixels to advance per scroll
+eng: "Scroll Step Size Setting Example Text"
 voice: ""
-new: "Buffer de directorio"
+new: "Texto de ejemplo del tamaño de paso de desplazamiento"
 
-id: LANG_SHOWDIR_ERROR_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Is Full!"
+id: LANG_BIDIR_SCROLL
+desc: Bidirectional scroll limit
+eng: "Bidirectional Scroll Limit"
+voice: "Límite de desplazamiento bidireccional"
+new: "Límite de desplaz. bidireccional"
+
+id: LANG_JUMP_SCROLL
+desc: (player) menu altarnative for jump scroll
+eng: "Jump scroll"
+voice: "Salto de Desplazamiento"
+new: "Salto de Desplazamiento"
+
+id: LANG_ONE_TIME
+desc: (player) the jump scroll shall be done "one time
+eng: "One time"
+voice: "Una Vez"
+new: "Una Vez"
+
+id: LANG_JUMP_SCROLL_DELAY
+desc: (player) Delay before making a jump scroll
+eng: "Jump Scroll Delay"
+voice: "Retraso del Salto de Desplazamiento"
+new: "Retraso del Salto de Desplazamiento"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+voice: "Barra de desplazamiento"
+new: "Barra de Desplazamiento"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+voice: "Barra de estado"
+new: "Barra de Estado"
+
+id: LANG_BUTTON_BAR
+desc: in settings menu
+eng: "Button bar"
+voice: "Barra de Botones"
+new: "Barra de Botones"
+
+id: LANG_VOLUME_DISPLAY
+desc: Volume type title
+eng: "Volume Display"
+voice: "Mostrar volumen"
+new: "Mostrar volumen"
+
+id: LANG_BATTERY_DISPLAY
+desc: Battery type title
+eng: "Battery Display"
+voice: "Mostrar Batería"
+new: "Mostrar Batería"
+
+id: LANG_DISPLAY_GRAPHIC
+desc: Label for type of icon display
+eng: "Graphic"
+voice: "Gráfico"
+new: "Gráfico"
+
+id: LANG_DISPLAY_NUMERIC
+desc: Label for type of icon display
+eng: "Numeric"
+voice: "Numérico"
+new: "Numérico"
+
+## peakmeter menu
+
+id: LANG_PM_RELEASE
+desc: in the peak meter menu
+eng: "Peak Release"
+voice: "Caida del analizador"
+new: "Caida del analizador"
+
+id: LANG_PM_UNITS_PER_READ
+desc: in the peak meter menu
+eng: "Units Per Read"
+voice: "Unidades por lectura"
+new: "Unidades por lectura"
+
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak Hold Time"
+voice: "Permanencia del analizador"
+new: "Permanencia del analizador"
+
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip Hold Time"
+voice: "Permanencia de los recortes"
+new: "Permanencia de los recortes"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "Eternal"
+voice: "Eterno"
+new: "Eterno"
+
+id: LANG_PM_SCALE
+desc: in the peak meter menu
+eng: "Scale"
+voice: "Escala"
+new: "Escala"
+
+id: LANG_PM_DBFS
+desc: in the peak meter menu
+eng: "Logarithmic(dB)"
+voice: "Logarítmica decibelio"
+new: "Logarítmica(dB)"
+
+id: LANG_PM_LINEAR
+desc: in the peak meter menu
+eng: "Linear(%)"
+voice: "Porcentaje lineal"
+new: "Lineal(%)"
+
+id: LANG_PM_MIN
+desc: in the peak meter menu
+eng: "Minimum Of Range"
+voice: "Mínimo de rango"
+new: "Mínimo de rango"
+
+id: LANG_PM_MAX
+desc: in the peak meter menu
+eng: "Maximum Of Range"
+voice: "Máximo de rango"
+new: "Máximo de rango"
+
+## battery menu
+
+id: LANG_BATTERY_CAPACITY
+desc: in settings_menu
+eng: "Battery Capacity"
+voice: "Capacidad Batería"
+new: "Capacidad Batería"
+
+id: LANG_BATTERY_TYPE
+desc: in battery settings
+eng: "Battery Type"
+voice: "Tipo de batería"
+new: "Tipo de batería"
+
+id: LANG_BATTERY_TYPE_ALKALINE
+desc: in battery settings
+eng: "Alkaline"
+voice: "Alcalina"
+new: "Alcalina"
+
+id: LANG_BATTERY_TYPE_NIMH
+desc: in battery settings
+eng: "NiMH"
+voice: "Níquel hidruro de metal"
+new: "NiMH"
+
+## disk menu
+
+id: LANG_SPINDOWN
+desc: in settings_menu
+eng: "Disk Spindown"
+voice: "Parada del disco duro"
+new: "Parada del disco duro"
+
+id: LANG_POWEROFF
+desc: disk poweroff flag
+eng: "Disk Poweroff"
+voice: "Apagado del disco"
+new: "Apagado del disco"
+
+## time & date menu
+
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+voice: "Poner fecha y hora"
+new: "Poner Fecha/Hora"
+
+id: LANG_TIMEFORMAT
+desc: select the time format of time in status bar
+eng: "Time Format"
+voice: "Formato del reloj"
+new: "Formato del reloj"
+
+id: LANG_12_HOUR_CLOCK
+desc: option for 12 hour clock
+eng: "12 Hour Clock"
+voice: "Reloj 12 horas"
+new: "Reloj 12 horas"
+
+id: LANG_24_HOUR_CLOCK
+desc: option for 24 hour clock
+eng: "24 Hour Clock"
+voice: "Reloj 24 horas"
+new: "Reloj 24 horas"
+
+## limits menu
+
+id: LANG_MAX_FILES_IN_DIR
+desc: in settings_menu
+eng: "Max files in dir browser"
+voice: "Número maximo de archivos por directorio"
+new: "Max. Archivos por directorio"
+
+id: LANG_MAX_FILES_IN_PLAYLIST
+desc: in settings_menu
+eng: "Max playlist size"
+voice: "Tamaño maximo de Lista de Reproducción"
+new: "Tamaño maximo de Lista de Reproducción"
+
+## context menu (onplay menu)
+
+id: LANG_PLAYLIST
+desc: Used when you need to say playlist, also voiced
+eng: "Playlist"
+voice: "Lista de reproducción"
+new: "Lista de reproducción"
+
+id: LANG_BOOKMARK_MENU
+desc: Text on main menu to get to bookmark commands
+eng: "Bookmarks"
+voice: "Marcapáginas"
+new: "Marcapáginas"
+
+id: LANG_MENU_SHOW_ID3_INFO
+desc: Menu option to start id3 viewer
+eng: "Show ID3 Info"
+voice: "Mostrar Info ID3"
+new: "Mostrar Info ID3"
+
+id: LANG_RENAME
+desc: The verb/action Rename
+eng: "Rename"
+voice: "Renombrar"
+new: "Renombrar"
+
+id: LANG_DELETE
+desc: The verb/action Delete
+eng: "Delete"
+voice: "Borrar"
+new: "Borrar"
+
+id: LANG_DELETE_DIR
+desc: in on+play menu
+eng: "Delete directory"
+voice: "Borrar directorio"
+new: "Borrar directorio"
+
+id: LANG_REALLY_DELETE
+desc: Really Delete?
+eng: "Delete?"
 voice: ""
-new: "Completo!"   
+new: "¿Borrar?"
 
-id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
+id: LANG_DELETED
+desc: A file has beed deleted
+eng: "Deleted"
 voice: ""
-new: "Continuar?"
+new: "Borrado"
 
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: possible answers to resume question
-eng: "(PLAY/STOP)"
+id: LANG_ONPLAY_OPEN_WITH
+desc: Onplay open with
+eng: "Open with"
+voice: "Abrir con"
+new: "Abrir con"
+
+id: LANG_CREATE_DIR
+desc: in main menu
+eng: "Create directory"
+voice: "Crear directorio"
+new: "Crear Directorio"
+
+## playlist context menu
+
+id: LANG_VIEW
+desc: in on+play menu
+eng: "View"
+voice: "Ver"
+new: "Ver"
+
+id: LANG_INSERT
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert"
+voice: "Añadir"
+new: "Añadir"
+
+id: LANG_INSERT_FIRST
+desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+eng: "Insert next"
+voice: "Añadir como próxima"
+new: "Añadir como próxima"
+
+id: LANG_INSERT_LAST
+desc: in onplay menu.  append a track/playlist into dynamic playlist.
+eng: "Insert last"
+voice: "Añadir al final"
+new: "Añadir al final"
+
+id: LANG_QUEUE
+desc: The verb/action Queue
+eng: "Queue"
+voice: "Cola"
+new: "Cola"
+
+id: LANG_QUEUE_FIRST
+desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+eng: "Queue next"
+voice: "En cola como proxima"
+new: "En cola como proxima"
+
+id: LANG_QUEUE_LAST
+desc: in onplay menu.  queue a track/playlist at end of playlist.
+eng: "Queue last"
+voice: "En cola al final"
+new: "En cola al final"
+
+## bookmark context menu
+
+id: LANG_BOOKMARK_MENU_CREATE
+desc: Used off of the bookmark menu to create a bookmark
+eng: "Create Bookmark"
+voice: "Crear Marcapáginas"
+new: "Crear Marcapáginas"
+
+id: LANG_BOOKMARK_MENU_LIST
+desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+eng: "List Bookmarks"
+voice: "Listar Marcapáginas"
+new: "Listar Marcapáginas"
+
+## info screen
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox Info:"
 voice: ""
-new: "(PLAY/STOP)"
+new: "Info. de rockbox:"
 
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Key Lock ON"
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%03dMB"
 voice: ""
-new: "Teclas Bloq"
+new: "Buf: %d.%03dMb"
 
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Key Lock OFF"
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%03dMB"
 voice: ""
-new: "Tecl desblq"
+new: "Buffer: %d.%03dMb"
 
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key Lock Is ON"
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: Charging"
 voice: ""
-new: "Teclado Bloqueado"
+new: "Batería: Cargando"
 
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF"
+id: LANG_BATTERY_TOPOFF_CHARGE
+desc: in info display, shows that top off charge is running
+eng: "Battery: Top-Off Chg"
 voice: ""
-new: "Teclado Desbloqueado"
+new: "Batería: Top-Off Chg"
 
-id: LANG_MUTE_ON_PLAYER
-desc: DEPRECATED
+id: LANG_BATTERY_TRICKLE_CHARGE
+desc: in info display, shows that trickle charge is running
+eng: "Battery: Trickle Chg"
+voice: ""
+new: "Batería: Trickle Chg"
+
+id: LANG_BATTERY_TIME
+desc: battery level in % and estimated time remaining
+eng: "%d%% %dh %dm"
+voice: "Nivel de batería"
+new: "%d%% %dh %dm"
+
+id: LANG_DISK_SIZE_INFO
+desc: disk size info
+eng: "Disk:"
+voice: ""
+new: "Disco:"
+
+id: LANG_DISK_FREE_INFO
+desc: disk size info
+eng: "Free:"
+voice: "Espacio libre"
+new: "Libre:"
+
+id: VOICE_CURRENT_TIME
+desc: spoken only, for wall clock announce
 eng: ""
-voice: ""
-new: 
+voice: "Current time:"
+new: ""
 
-id: LANG_MUTE_OFF_PLAYER
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_MUTE_ON_RECORDER
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_MUTE_OFF_RECORDER
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_ID3_INFO
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_ID3_SCREEN
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-voice: ""
-new: "[Título]" 
-
-id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<No Title>"
-voice: ""
-new: "<sin título>"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-voice: ""
-new: "[Artista]"
-
-id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<No Artist>"
-voice: ""
-new: "<sin artista>"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-voice: ""
-new: "[Álbum]" 
-
-id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<No Album>"
-voice: ""
-new: "<sin álbum>" 
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-voice: ""
-new: "[Nº pista]"
-
-id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<No Tracknum>"
-voice: ""
-new: "<sin nº pista>" 
-
-id: LANG_ID3_LENGHT
-desc: in wps
-eng: "[Length]"
-voice: ""
-new: "[Tamaño]" 
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-voice: ""
-new: "[Lista de reprod.]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-voice: ""
-new: "[Bitrate]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-voice: ""
-new: "[Frecuencia]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[Path]"
-voice: ""
-new: "[Ruta]"
+## pitch screen
 
 id: LANG_PITCH_UP
 desc: in wps
@@ -544,6 +1406,8 @@ desc: in wps
 eng: "Pause"
 voice: ""
 new: "Pausa"
+
+## quickscreens
 
 id: LANG_F2_MODE
 desc: in wps F2 pressed
@@ -569,491 +1433,145 @@ eng: "Bar"
 voice: ""
 new: "Barra"
 
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End Of List"
+## bookmark screen
+
+id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+desc: From the auto-load screen, allows user to list all bookmarks
+eng: "Down = List"
 voice: ""
-new: "Fin de lista"
+new: "ABAJO = Listar"
 
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "End Of Song List"
+id: LANG_BOOKMARK_SELECT_EXIT
+desc: From the bookmark list screen, allows user to exit
+eng: "OFF = Exit"
 voice: ""
-new: "Fin de lista"
+new: "OFF = Salir"
 
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-voice: "Auto apagado"
-new: "Auto apagado"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "New Language"
+id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+desc: Used on the bookmark select window to label bookmark number
+eng: "Bookmark"
 voice: ""
-new: "nuevo idioma"
+new: "Marcapáginas"
 
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-voice: "Mostrar archivos"
-new: "Mostrar archivos"
+id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+desc: Used on the bookmark select window to label index number
+eng: "Index"
+voice: "Índice"
+new: "Índice"
 
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-voice: "Música"
-new: "Música"
+id: LANG_BOOKMARK_SELECT_TIME_TEXT
+desc: Used on the bookmark select window to label elapsed time
+eng: "Time"
+voice: "Tiempo"
+new: "Tiempo"
 
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-voice: "Soportados"
-new: "soportados"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-voice: "Todos"
-new: "Todos"
-
-id: LANG_SET_BOOL_YES
-desc: bool true representation
-eng: "Yes"
-voice: "Si"
-new: "Si"
-
-id: LANG_SET_BOOL_NO
-desc: bool false representation
-eng: "No"
-voice: "No"
-new: "No"
-
-id: LANG_PM_MENU
-desc: in the display menu
-eng: "Peak Meter"
-voice: "Analizador de espectro"
-new: "Analizador de espectro"
-
-id: LANG_PM_RELEASE
-desc: in the peak meter menu
-eng: "Peak Release"
-voice: "Caida del analizador"
-new: "Caida del analizador"
-
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak Hold Time"
-voice: "Permanencia del analizador"
-new: "Permanencia del analizador"
-
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip Hold Time"
-voice: "Permanencia de los recortes"
-new: "Permanencia de los recortes"
-
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "Eternal"
-voice: "Eterno"
-new: "Eterno"
-
-id: LANG_PM_UNITS_PER_READ
-desc: in the peak meter menu
-eng: "Units Per Read"
-voice: "Unidades por lectura"
-new: "Unidades por lectura"
-
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: "Iluminación estando enchufado"
-new: "Iluminación estando enchufado"
-
-id: LANG_REPEAT
-desc: in settings_menu
-eng: "Repeat"
-voice: "Repetir"
-new: "Repetir"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-voice: "Todas"
-new: "Todas"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-voice: "Una"
-new: "Una"
-
-id: LANG_WEEKDAY_THURSDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Thu"
+id: LANG_BOOKMARK_SELECT_PLAY
+desc: Used on the bookmark select window to indicated the play option
+eng: "PLAY = Select"
 voice: ""
-new: "Mar"
+new: "PLAY = Seleccionar"
 
-id: LANG_12_HOUR_CLOCK
-desc: option for 12 hour clock
-eng: "12 Hour Clock"
-voice: "Reloj 12 horas"
-new: "Reloj 12 horas"
-
-id: LANG_24_HOUR_CLOCK
-desc: option for 24 hour clock
-eng: "24 Hour Clock"
-voice: "Reloj 24 horas"
-new: "Reloj 24 horas"
-
-id: LANG_ALARM_MOD_ALARM_MENU
-desc: The name of the additional entry in the main menu for the RTC alarm mod.
-eng: "Wake-Up Alarm"
-voice: "Alarma despertador"
-new: "Alarma despertador"
-
-id: LANG_ALARM_MOD_ERROR
-desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm Time Is Too Soon!"
+id: LANG_BOOKMARK_SELECT_DELETE
+desc: Used on the bookmark select window to indicated the bookmark delete option
+eng: "ON+Play = Delete"
 voice: ""
-new: "Alarma demasiado temprano"
+new: "ON+PLAY = Borrar"
 
-id: LANG_ALARM_MOD_KEYS
-desc: Shown key functions in alarm menu (for the RTC alarm mod).
-eng: "PLAY=Set OFF=Cancel"
+id: LANG_BOOKMARK_AUTOLOAD_QUERY
+desc: prompt for user to decide to create a bookmark
+eng: "Load Last Bookmark?"
 voice: ""
-new: "PLAY=Acepta OFF=Cancela"
+new: "¿Cargar último Marcapáginas?"
 
-id: LANG_ALARM_MOD_SHUTDOWN
-desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Alarm Set"
+id: LANG_AUTO_BOOKMARK_QUERY
+desc: prompt for user to decide to create an bookmark
+eng: "Create a Bookmark?"
 voice: ""
-new: "Alarma Configurada"
+new: "¿Crear un marcapáginas?"
 
-id: LANG_ALARM_MOD_TIME
-desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm Time: %02d:%02d"
+id: LANG_BOOKMARK_CREATE_SUCCESS
+desc: Indicates bookmark was successfully created
+eng: "Bookmark Created"
 voice: ""
-new: "Hora de Alarma:  %02d:%02d"
+new: "Marcapáginas Creado"
 
-id: LANG_ALARM_MOD_TIME_TO_GO
-desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking Up In %d:%02d"
+id: LANG_BOOKMARK_CREATE_FAILURE
+desc: Indicates bookmark was not created
+eng: "Bookmark Failed!"
 voice: ""
-new: "Despertandose en %d:%02d"
+new: "Falló el Marcapáginas"
 
-id: LANG_BATTERY_CAPACITY
-desc: in settings_menu
-eng: "Battery Capacity"
-voice: "Capacidad Batería"
-new: "Capacidad Batería"
-
-id: LANG_BATTERY_DISPLAY
-desc: Battery type title
-eng: "Battery Display"
-voice: "Mostrar Batería"
-new: "Mostrar Batería"
-
-id: LANG_BATTERY_TIME
-desc: battery level in % and estimated time remaining
-eng: "%d%% %dh %dm"
-voice: "Nivel de batería"
-new: "%d%% %dh %dm"
-
-id: LANG_BATTERY_TOPOFF_CHARGE
-desc: in info display, shows that top off charge is running
-eng: "Battery: Top-Off Chg"
+id: LANG_BOOKMARK_LOAD_EMPTY
+desc: Indicates bookmark was empty
+eng: "Bookmark Empty"
 voice: ""
-new: "Batería: Top-Off Chg"
+new: "Marcapáginas Vacio"
 
-id: LANG_BATTERY_TRICKLE_CHARGE
-desc: in info display, shows that trickle charge is running
-eng: "Battery: Trickle Chg"
+## set time screen
+
+id: LANG_TIME_SET
+desc: used in set_time()
+eng: "ON To Set"
 voice: ""
-new: "Batería: Trickle Chg"
+new: "ON para cambiar"
 
-id: LANG_BIDIR_SCROLL
-desc: Bidirectional scroll limit
-eng: "Bidirectional Scroll Limit"
-voice: "Límite de desplazamiento bidireccional"
-new: "Límite de desplaz. bidireccional"
-
-id: LANG_CREATE_PLAYLIST
-desc: Menu option for creating a playlist
-eng: "Create Playlist"
-voice: "Crear lista de reproducción"
-new: "Crear Lista de Reproducción"
-
-id: LANG_CREATING
-desc: Screen feedback during playlist creation
-eng: "Creating"
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF To Revert"
 voice: ""
-new: "Creando"
+new: "OFF para cancelar"
 
-id: LANG_DELETE
-desc: The verb/action Delete
-eng: "Delete"
-voice: "Borrar"
-new: "Borrar"
+## while playing screen
 
-id: LANG_DELETED
-desc: A file has beed deleted
-eng: "Deleted"
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Key Lock ON"
 voice: ""
-new: "Borrado"
+new: "Teclas Bloq"
 
-id: LANG_DISK_FREE_STAT
-desc: DEPRECATED
-eng: ""
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Key Lock OFF"
 voice: ""
-new: 
+new: "Tecl desblq"
 
-id: LANG_DISK_STAT
-desc: DEPRECATED
-eng: ""
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key Lock Is ON"
 voice: ""
-new: 
+new: "Teclado Bloqueado"
 
-id: LANG_DISPLAY_GRAPHIC
-desc: Label for type of icon display
-eng: "Graphic"
-voice: "Gráfico"
-new: "Gráfico"
-
-id: LANG_DISPLAY_NUMERIC
-desc: Label for type of icon display
-eng: "Numeric"
-voice: "Numérico"
-new: "Numérico"
-
-id: LANG_FAILED
-desc: Something failed. To be appended after above actions
-eng: "Failed"
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key Lock Is OFF"
 voice: ""
-new: "Fallido"
+new: "Teclado Desbloqueado"
 
-id: LANG_FILTER_PLAYLIST
-desc: show only playlist
-eng: "Playlists"
-voice: "Listas de reproducción"
-new: "Listas de reproducción"
+## recording screen
 
-id: LANG_ID3_GENRE
-desc: ID3 frame 'genre'
-eng: "[Genre]"
+id: LANG_RECORDING_TIME
+desc: Display of recorded time
+eng: "Time:"
 voice: ""
-new: "[Género]"
+new: "Tiempo"
 
-id: LANG_ID3_NO_INFO
-desc: ID3 info is missing
-eng: "<No Info>"
+id: LANG_RECORD_TIMESPLIT_REC
+desc: Display of record timer interval setting, on the record screen
+eng: "Split time:"
 voice: ""
-new: "<sin info>"
+new: "Tiempo de Separación:"
 
-id: LANG_ID3_YEAR
-desc: ID3 info 'year'
-eng: "[Year]"
+id: LANG_RECORDING_SIZE
+desc: Display of recorded file size
+eng: "Size:"
 voice: ""
-new: "[Año]"
+new: "Tamaño:"
 
-id: LANG_MENU_SETTING_CANCEL
-desc: Visual confirmation of canceling a changed setting
-eng: "Canceled"
+id: LANG_RECORD_PRERECORD
+desc: in recording and radio screen
+eng: "Prerecording"
 voice: ""
-new: "Cancelado"
-
-id: LANG_MENU_SHOW_ID3_INFO
-desc: Menu option to start id3 viewer
-eng: "Show ID3 Info"
-voice: "Mostrar Info ID3"
-new: "Mostrar Info ID3"
-
-id: LANG_MONTH_APRIL
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Apr"
-voice: "Abril"
-new: "Abr" 
-
-id: LANG_MONTH_AUGUST
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Aug"
-voice: "Agosto"
-new: "Ago"
-
-id: LANG_MONTH_DECEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Dec"
-voice: "Diciembre"
-new: "Dic" 
-
-id: LANG_MONTH_FEBRUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Feb"
-voice: "Febrero"
-new: "Feb" 
-
-id: LANG_MONTH_JANUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jan"
-voice: "Enero"
-new: "Ene" 
-
-id: LANG_MONTH_JULY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jul"
-voice: "Julio"
-new: "Jul" 
-
-id: LANG_MONTH_JUNE
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jun"
-voice: "Junio"
-new: "Jun"
-
-id: LANG_MONTH_MARCH
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Mar"
-voice: "Marzo"
-new: "Mar"
-
-id: LANG_MONTH_MAY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "May"
-voice: "Mayo"
-new: "May"
-
-id: LANG_MONTH_NOVEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Nov"
-voice: "Noviembre"
-new: "Nov" 
-
-id: LANG_MONTH_OCTOBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Oct"
-voice: "Octubre"
-new: "Oct" 
-
-id: LANG_MONTH_SEPTEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Sep"
-voice: "Septiembre"
-new: "Sep" 
-
-id: LANG_MP3BUFFER_MARGIN
-desc: MP3 buffer margin time
-eng: "Anti-Skip Buffer"
-voice: "Buffer Anti-salto"
-new: "Buffer Anti-salto"
-
-id: LANG_PLAYER_KEYBOARD_ABORT
-desc: DEPRECATED
-eng: ""
-voice: ""
-new:
-
-id: LANG_PLAYER_KEYBOARD_ACCEPT
-desc: DEPRECATED
-eng: ""
-voice: ""
-new:
-
-id: LANG_PLAYER_KEYBOARD_BACKSPACE
-desc: DEPRECATED
-eng: ""
-voice: ""
-new:
-
-id: LANG_PLAYER_KEYBOARD_DELETE
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "Logarithmic(dB)"
-voice: "Logarítmica decibelio"
-new: "Logarítmica(dB)"
-
-id: LANG_PM_ENERGY_SAVER
-desc: in the peak meter menu
-eng: "Save Energy"
-voice: "Ahorrar energía"
-new: "Ahorrar energia"
-
-id: LANG_PM_HIGH_PERFORMANCE
-desc: in the peak meter menu
-eng: "High performance"
-voice: "Rendimiento elevado"
-new: "Rendimiento elevado"
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "Linear(%)"
-voice: "Porcentaje lineal"
-new: "Lineal(%)"
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum Of Range"
-voice: "Máximo de rango"
-new: "Máximo de rango"
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum Of Range"
-voice: "Mínimo de rango"
-new: "Mínimo de rango"
-
-id: LANG_PM_PERFORMANCE
-desc: in the peak meter menu
-eng: "Performance"
-voice: "Rendimiento"
-new: "Rendimiento"
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "Scale"
-voice: "Escala"
-new: "Escala"
-
-id: LANG_POWEROFF
-desc: disk poweroff flag
-eng: "Disk Poweroff"
-voice: "Apagado del disco"
-new: "Apagado del disco"
-
-id: LANG_QUEUE
-desc: The verb/action Queue
-eng: "Queue"
-voice: "Cola"
-new: "Cola" 
-
-id: LANG_REALLY_DELETE
-desc: Really Delete?
-eng: "Delete?"
-voice: ""
-new: "¿Borrar?" 
-
-id: LANG_RECORDING
-desc: in the main menu
-eng: "Recording"
-voice: "Grabación"
-new: "Grabación" 
-
-id: LANG_RECORDING_CHANNELS
-desc: in the recording settings
-eng: "Channels"
-voice: "Canales"
-new: "Canales"
-
-id: LANG_RECORDING_FREQUENCY
-desc: in the recording settings
-eng: "Frequency"
-voice: "Frecuencia"
-new: "Frecuencia" 
+new: "Pregrabación"
 
 id: LANG_RECORDING_GAIN
 desc: in the recording screen
@@ -1067,143 +1585,141 @@ eng: "Left"
 voice: ""
 new: "Izquierdo"
 
-id: LANG_RECORDING_QUALITY
-desc: in the recording settings
-eng: "Quality"
-voice: "Calidad"
-new: "Calidad"
-
 id: LANG_RECORDING_RIGHT
 desc: in the recording screen
 eng: "Right"
 voice: ""
-new: "Derecho" 
+new: "Derecho"
 
-id: LANG_RECORDING_SETTINGS
-desc: in the main menu
-eng: "Recording Settings"
-voice: "Opciones de Grabación"
-new: "Opciones de Grabación"
-
-id: LANG_RECORDING_SOURCE
-desc: in the recording settings
-eng: "Source"
-voice: "Fuente"
-new: "Fuente" 
-
-id: LANG_RECORDING_SRC_DIGITAL
-desc: in the recording settings
-eng: "Digital"
-voice: "Digital"
-new: "Digital" 
-
-id: LANG_RECORDING_SRC_LINE
-desc: in the recording settings
-eng: "Line In"
-voice: "Analógica"
-new: "Analógica" 
-
-id: LANG_RECORDING_SRC_MIC
-desc: in the recording settings
-eng: "Mic"
-voice: "Micrófono"
-new: "Micro"
-
-id: LANG_RENAME
-desc: The verb/action Rename
-eng: "Rename"
-voice: "Renombrar"
-new: "Renombrar" 
-
-id: LANG_RESET_CANCEL
-desc: confirm to reset settings
-eng: "OFF=Cancel"
+id: LANG_DISK_FULL
+desc: in recording screen
+eng: "The disk is full. Press OFF to continue."
 voice: ""
-new: "OFF=Cancela" 
+new: "Disco lleno. Pulsa OFF para continuar"
 
-id: LANG_RESET_CONFIRM
-desc: confirm to reset settings
-eng: "PLAY=Reset"
+## recording trigger screen
+
+## alarm screen
+
+id: LANG_ALARM_MOD_TIME
+desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+eng: "Alarm Time: %02d:%02d"
 voice: ""
-new: "PLAY=Reinicia" 
+new: "Hora de Alarma:  %02d:%02d"
 
-id: LANG_RESUME_SETTING_ASK_ONCE
-desc: in settings_menu
-eng: "Ask Once"
-voice: "Preguntar 1 vez"
-new: "Preguntar 1 vez" 
-
-id: LANG_SCROLL_DELAY
-desc: Delay before scrolling
-eng: "Scroll Start Delay"
-voice: "Retraso del inicio del desplazamiento"
-new: "Retraso del inicio del desplaz." 
-
-id: LANG_SCROLL_SPEED
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-voice: "Velocidad de Desplazamiento"
-new: "Velocidad de Desplazamiento"
-
-id: LANG_SCROLL_STEP
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size"
-voice: "Tamaño del paso de Desplazamiento"
-new: "Tamaño del paso de Desplaz."
-
-id: LANG_SCROLL_STEP_EXAMPLE
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size Setting Example Text"
+id: LANG_ALARM_MOD_TIME_TO_GO
+desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+eng: "Waking Up In %d:%02d"
 voice: ""
-new: "Texto de ejemplo del tamaño de paso de desplazamiento" 
+new: "Despertandose en %d:%02d"
 
-id: LANG_SLEEP_TIMER
-desc: sleep timer setting
-eng: "Sleep Timer"
-voice: "Temporizador de apagado"
-new: "Temporizador apagado" 
-
-id: LANG_TIMEFORMAT
-desc: select the time format of time in status bar
-eng: "Time Format"
-voice: "Formato del reloj"
-new: "Formato del reloj" 
-
-id: LANG_TRICKLE_CHARGE
-desc: DEPRECATED
-eng: ""
+id: LANG_ALARM_MOD_SHUTDOWN
+desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+eng: "Alarm Set"
 voice: ""
-new: ""
+new: "Alarma Configurada"
 
-id: LANG_VOLUME_DISPLAY
-desc: Volume type title
-eng: "Volume Display"
-voice: "Mostrar volumen"
-new: "Mostrar volumen"
-
-id: LANG_WEEKDAY_FRIDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Fri"
+id: LANG_ALARM_MOD_ERROR
+desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+eng: "Alarm Time Is Too Soon!"
 voice: ""
-new: "Vie"
+new: "Alarma demasiado temprano"
 
-id: LANG_WEEKDAY_MONDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Mon"
+id: LANG_ALARM_MOD_KEYS
+desc: Shown key functions in alarm menu (for the RTC alarm mod).
+eng: "PLAY=Set OFF=Cancel"
 voice: ""
-new: "Lun" 
+new: "PLAY=Acepta OFF=Cancela"
 
-id: LANG_WEEKDAY_SATURDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sat"
+id: LANG_ALARM_MOD_DISABLE
+desc: Announce that the RTC alarm has been turned off
+eng: "Alarm Disabled"
+voice: "Alarma Desactivada"
+new: "Alarma Desactivada"
+
+## colour setting screen
+
+## tag viewer
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
 voice: ""
-new: "Sab"
+new: "[Título]"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+voice: ""
+new: "[Artista]"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+voice: ""
+new: "[Álbum]"
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+voice: ""
+new: "[Nº pista]"
+
+id: LANG_ID3_GENRE
+desc: ID3 frame 'genre'
+eng: "[Genre]"
+voice: ""
+new: "[Género]"
+
+id: LANG_ID3_YEAR
+desc: ID3 info 'year'
+eng: "[Year]"
+voice: ""
+new: "[Año]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+voice: ""
+new: "[Lista de reprod.]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+voice: ""
+new: "[Bitrate]"
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+voice: ""
+new: "[Frecuencia]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[Path]"
+voice: ""
+new: "[Ruta]"
+
+id: LANG_ID3_NO_INFO
+desc: ID3 info is missing
+eng: "<No Info>"
+voice: ""
+new: "<sin info>"
+
+## weekdays
 
 id: LANG_WEEKDAY_SUNDAY
 desc: Maximum 3-letter abbreviation for weekday
 eng: "Sun"
 voice: ""
 new: "Dom"
+
+id: LANG_WEEKDAY_MONDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Mon"
+voice: ""
+new: "Lun"
 
 id: LANG_WEEKDAY_TUESDAY
 desc: Maximum 3-letter abbreviation for weekday
@@ -1217,880 +1733,122 @@ eng: "Wed"
 voice: ""
 new: "Mie"
 
-id: LANG_CHANNEL_KARAOKE
-desc: in sound_settings
-eng: "Karaoke"
-voice: "Karaoke"
-new: "Karaoke"
-
-id: LANG_CHANNEL_STEREO_NARROW_PLAYER
-desc: DEPRECATED
-eng: ""
+id: LANG_WEEKDAY_THURSDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Thu"
 voice: ""
-new: 
+new: "Mar"
 
-id: LANG_CHANNEL_STEREO_NARROW_RECORDER
-desc: DEPRECATED
-eng: ""
+id: LANG_WEEKDAY_FRIDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Fri"
 voice: ""
-new: 
+new: "Vie"
 
-id: LANG_CHANNEL_STEREO_WIDE
-desc: DEPRECATED
-eng: ""
+id: LANG_WEEKDAY_SATURDAY
+desc: Maximum 3-letter abbreviation for weekday
+eng: "Sat"
 voice: ""
-new: 
-
-id: LANG_FADE_ON_STOP
-desc: options menu to set fade on stop or pause
-eng: "Fade On Stop/Pause"
-voice: "Silencio gradual al Parar y Pausar"
-new: "Silencio gradual al Parar/Pausar"
-
-id: LANG_INVERT
-desc: in settings_menu
-eng: "LCD Mode"
-voice: "Modo LCD"
-new: "Modo LCD"
-
-id: LANG_RECORDING_SIZE
-desc: Display of recorded file size
-eng: "Size:"
-voice: ""
-new: "Tamaño:"
-
-id: LANG_RECORDING_TIME
-desc: Display of recorded time
-eng: "Time:"
-voice: ""
-new: "Tiempo"
-
-id: LANG_SAVE_SETTINGS
-desc: in system_settings_menu()
-eng: "Write .cfg file"
-voice: "Escribir archivo de configuración"
-new: "Escribir archivo .cfg"
-
-id: LANG_SETTINGS_LOADED1
-desc: Feedback shown when a .cfg file is loaded
-eng: "Settings"
-voice: ""
-new: "Opciones"
-
-id: LANG_SETTINGS_LOADED2
-desc: Feedback shown when a .cfg file is loaded
-eng: "Loaded"
-voice: ""
-new: "Cargadas" 
-
-id: LANG_SETTINGS_SAVED1
-desc: Feedback shown when a .cfg file is saved
-eng: "Settings"
-voice: ""
-new: "Opciones" 
-
-id: LANG_SETTINGS_SAVED2
-desc: Feedback shown when a .cfg file is saved
-eng: "Saved"
-voice: ""
-new: "Grabadas" 
-
-id: LANG_SOKOBAN_ON
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_VBRFIX_NOT_VBR
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_VBRFIX_STOP_PLAY
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_VBRFIX
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_INVERT_CURSOR
-desc: in settings_menu
-eng: "Line Selector"
-voice: "Selector de linea"
-new: "Selector de linea"
-
-id: LANG_RECORDING_EDITABLE
-desc: Editable recordings setting
-eng: "Independent frames"
-voice: "Marcos independientes"
-new: "Marcos independientes"
-
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-voice: "Barra de estado"
-new: "Barra de Estado"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-voice: "Barra de desplazamiento"
-new: "Barra de Desplazamiento"
-
-id: LANG_CAPTION_BACKLIGHT
-desc: in settings_menu
-eng: "Caption backlight"
-voice: "Iluminacion al iniciar Canción"
-new: "Iluminación al iniciar Canción"
-
-id: LANG_INVERT_CURSOR_POINTER
-desc: in settings_menu
-eng: "Pointer"
-voice: "Puntero"
-new: "Puntero"
-
-id: LANG_INVERT_CURSOR_BAR
-desc: in settings_menu
-eng: "Bar(Inverse)"
-voice: "Barra inversa"
-new: "Barra(inversa)"
-
-id: LANG_INVERT_LCD_NORMAL
-desc: in settings_menu
-eng: "Normal"
-voice: "Normal"
-new: "Normal"
-
-id: LANG_INVERT_LCD_INVERSE
-desc: in settings_menu
-eng: "Inverse"
-voice: "Inverso"
-new: "Inverso"
-
-id: LANG_ALWAYS
-desc: (player) the jump scroll shall be done "always"
-eng: "Always"
-voice: "Siempre"
-new: "Siempre"
-
-id: LANG_AUTO_BOOKMARK_QUERY
-desc: prompt for user to decide to create an bookmark
-eng: "Create a Bookmark?"
-voice: ""
-new: "¿Crear un marcapáginas?" 
-
-id: LANG_BARS_MENU
-desc: in the display sub menu
-eng: "Status-/Scrollbar"
-voice: "Barras de Estado y desplazamiento"
-new: "Barras de Estado/Desplazamiento"
-
-id: LANG_BATTERY_MENU
-desc: in the system sub menu
-eng: "Battery"
-voice: "Batería"
-new: "Batería" 
-
-id: LANG_BOOKMARK_AUTOLOAD_QUERY
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark?"
-voice: ""
-new: "¿Cargar último Marcapáginas?" 
-
-id: LANG_BOOKMARK_CREATE_FAILURE
-desc: Indicates bookmark was not created
-eng: "Bookmark Failed!"
-voice: ""
-new: "Falló el Marcapáginas"
-
-id: LANG_BOOKMARK_CREATE_SUCCESS
-desc: Indicates bookmark was successfully created
-eng: "Bookmark Created"
-voice: ""
-new: "Marcapáginas Creado"
-
-id: LANG_BOOKMARK_LOAD_EMPTY
-desc: Indicates bookmark was empty
-eng: "Bookmark Empty"
-voice: ""
-new: "Marcapáginas Vacio"
-
-id: LANG_BOOKMARK_MENU
-desc: Text on main menu to get to bookmark commands
-eng: "Bookmarks"
-voice: "Marcapáginas"
-new: "Marcapáginas"
-
-id: LANG_BOOKMARK_MENU_CREATE
-desc: Used off of the bookmark menu to create a bookmark
-eng: "Create Bookmark"
-voice: "Crear Marcapáginas"
-new: "Crear Marcapáginas" 
-
-id: LANG_BOOKMARK_MENU_LIST
-desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
-eng: "List Bookmarks"
-voice: "Listar Marcapáginas"
-new: "Listar Marcapáginas"
-
-id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-desc: Text for the menu text to access the most recent bookmarks list
-eng: "Recent Bookmarks"
-voice: "Marcapáginas Recientes"
-new: "Marcapáginas Recientes"
-
-id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-desc: Used on the bookmark select window to label bookmark number
-eng: "Bookmark"
-voice: ""
-new: "Marcapáginas"
-
-id: LANG_BOOKMARK_SELECT_DELETE
-desc: Used on the bookmark select window to indicated the bookmark delete option
-eng: "ON+Play = Delete"
-voice: ""
-new: "ON+PLAY = Borrar"
-
-id: LANG_BOOKMARK_SELECT_EXIT
-desc: From the bookmark list screen, allows user to exit
-eng: "OFF = Exit"
-voice: ""
-new: "OFF = Salir"
-
-id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-desc: Used on the bookmark select window to label index number
-eng: "Index"
-voice: "Índice"
-new: "Índice"
-
-id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-desc: From the auto-load screen, allows user to list all bookmarks
-eng: "Down = List"
-voice: ""
-new: "ABAJO = Listar"
-
-id: LANG_BOOKMARK_SELECT_PLAY
-desc: Used on the bookmark select window to indicated the play option
-eng: "PLAY = Select"
-voice: ""
-new: "PLAY = Seleccionar"
-
-id: LANG_BOOKMARK_SELECT_TIME_TEXT
-desc: Used on the bookmark select window to label elapsed time
-eng: "Time"
-voice: "Tiempo"
-new: "Tiempo" 
-
-id: LANG_BOOKMARK_SETTINGS
-desc: in general settings
-eng: "Bookmarking"
-voice: "Marcapáginas"
-new: "Marcapáginas"
-
-id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
-desc: prompt for user to decide to create an bookmark
-eng: "Bookmark on Stop"
-voice: "Marcar página al Detener"
-new: "Marcar página al Detener"
-
-id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark"
-voice: "Cargar último Marcapáginas"
-new: "Cargar último Marcapáginas"
-
-id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
-desc: Configuration option to maintain a list of recent bookmarks
-eng: "Maintain a List of Recent Bookmarks?"
-voice: "¿Mantener una Lista de Marcapáginas Recientes?"
-new: "¿Mantener una Lista de Marcapáginas Recientes?"
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
-desc: Save in recent bookmarks only
-eng: "Ask - Recent only"
-voice: "Preguntar - Sólo Recientes"
-new: "Preguntar - Sólo Recientes" 
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
-desc: Save in recent bookmarks only
-eng: "Yes - Recent only"
-voice: "Si - Sólo Recientes"
-new: "Si - Sólo Recientes"
-
-id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-desc: Save only on bookmark for each playlist in recent bookmarks
-eng: "Unique only"
-voice: "Sólo único"
-new: "Sólo único"
-
-id: LANG_BOOT_CHANGED
-desc: File browser discovered the boot file was changed
-eng: "Boot changed"
-voice: ""
-new: "Arranque Modificado"
-
-id: LANG_BUTTONBAR_MENU
-desc: in button bar
-eng: "Menu"
-voice: ""
-new: "Menu"
-
-id: LANG_CANCEL_WITH_ANY_RECORDER
-desc: Generic recorder string to use to cancel
-eng: "Any Other = No"
-voice: ""
-new: "Otra Tecla = NO"
-
-id: LANG_CAR_ADAPTER_MODE
-desc: Displayed for setting car adapter mode to on/off
-eng: "Car Adapter Mode"
-voice: "Modo Adaptador de Coche"
-new: "Modo Adaptador de Coche"
-
-id: LANG_CONFIRM_WITH_PLAY_RECORDER
-desc: Generic recorder string to use to confirm
-eng: "PLAY = Yes"
-voice: ""
-new: "PLAY = SI"
-
-id: LANG_CUSTOM_CFG
-desc: in setting_menu()
-eng: "Browse .cfg files"
-voice: "Mostrar archivos de configuración"
-new: "Mostrar archivos .cfg"
-
-id: LANG_CUSTOM_FONT
-desc: in setting_menu()
-eng: "Browse Fonts"
-voice: "Mostrar fuentes"
-new: "Mostrar Fuentes"
-
-id: LANG_DISK_FULL
-desc: in recording screen
-eng: "The disk is full. Press OFF to continue."
-voice: ""
-new: "Disco lleno. Pulsa OFF para continuar"
-
-id: LANG_DISK_MENU
-desc: in the system sub menu
-eng: "Disk"
-voice: "Disco"
-new: "Disco"
-
-id: LANG_FIRMWARE
-desc: in the main menu
-eng: "Browse Firmwares"
-voice: "Mostrar Firmwares"
-new: "Mostrar Firmwares"
-
-id: LANG_FLIP_DISPLAY
-desc: in settings_menu, option to turn display+buttos by 180 degreed
-eng: "Upside Down"
-voice: "Boca abajo"
-new: "Boca-abajo"
-
-id: LANG_FM_BUTTONBAR_PRESETS
-desc: in button bar
-eng: "Preset"
-voice: ""
-new: "Sintonia"
-
-id: LANG_FM_BUTTONBAR_RECORD
-desc: in main menu
-eng: "Record"
-voice: ""
-new: "Grabar"
-
-id: LANG_FM_DELETE_PRESET
-desc: in radio screen
-eng: "Remove preset"
-voice: ""
-new: "Eliminar Sintonia"
-
-id: LANG_FM_NO_FREE_PRESETS
-desc: in radio screen
-eng: "The preset list is full"
-voice: ""
-new: "Lista de Sintonias llena"
-
-id: LANG_FM_NO_PRESETS
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_FM_PRESET_SAVE_FAILED
-desc: in radio screen
-eng: "Preset save failed"
-voice: ""
-new: "Fallo al salvar Sintonia"
-
-id: LANG_FM_RADIO
-desc: in main menu
-eng: "FM Radio"
-voice: "Radio FM"
-new: "Radio FM"
-
-id: LANG_FM_SAVE_PRESET
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_FM_STATION
-desc: in radio screen
-eng: "Station: %d.%dMHz"
-voice: ""
-new: "Emisora: %d.%dMHz"
-
-id: LANG_INFO_MENU
-desc: in the info sub menu
-eng: "Rockbox Info"
-voice: "Información de Rockbox"
-new: "Info. de Rockbox"
-
-id: LANG_INSERT
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert"
-voice: "Añadir"
-new: "Añadir"
-
-id: LANG_INSERT_FIRST
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert next"
-voice: "Añadir como próxima"
-new: "Añadir como próxima"
-
-id: LANG_INSERT_LAST
-desc: in onplay menu.  append a track/playlist into dynamic playlist.
-eng: "Insert last"
-voice: "Añadir al final"
-new: "Añadir al final"
-
-id: LANG_JUMP_SCROLL
-desc: (player) menu altarnative for jump scroll
-eng: "Jump scroll"
-voice: "Salto de Desplazamiento"
-new: "Salto de Desplazamiento"
-
-id: LANG_JUMP_SCROLL_DELAY
-desc: (player) Delay before making a jump scroll
-eng: "Jump Scroll Delay"
-voice: "Retraso del Salto de Desplazamiento"
-new: "Retraso del Salto de Desplazamiento"
-
-id: LANG_LANGUAGE
-desc: in settings_menu
-eng: "Language"
-voice: "Idioma"
-new: "Idioma"
-
-id: LANG_LCD_MENU
-desc: in the display sub menu
-eng: "LCD Settings"
-voice: "Opciones del LCD"
-new: "Opciones del LCD"
-
-id: LANG_LIMITS_MENU
-desc: in the system sub menu
-eng: "Limits"
-voice: "Límites"
-new: "Límites"
-
-id: LANG_LINE_IN
-desc: in settings_menu
-eng: "Line In"
-voice: "Entrada Analógica"
-new: "Analógica"
-
-id: LANG_MANAGE_MENU
-desc: in the system sub menu
-eng: "Manage Settings"
-voice: "Gestionar opciones"
-new: "Gestionar Opciones"
-
-id: LANG_MAX_FILES_IN_DIR
-desc: in settings_menu
-eng: "Max files in dir browser"
-voice: "Número maximo de archivos por directorio"
-new: "Max. Archivos por directorio"
-
-id: LANG_MAX_FILES_IN_PLAYLIST
-desc: in settings_menu
-eng: "Max playlist size"
-voice: "Tamaño maximo de Lista de Reproducción"
-new: "Tamaño maximo de Lista de Reproducción"
-
-id: LANG_MOVE
-desc: The verb/action Move
-eng: "Move"
-voice: "Mover"
-new: "Mover"
-
-id: LANG_MOVE_FAILED
-desc: Error message displayed in playlist viewer
-eng: "Move failed"
-voice: ""
-new: "Fallo al mover"
-
-id: LANG_NO_FILES
-desc: in settings_menu
-eng: "No files"
-voice: ""
-new: "No hay archivos"
-
-id: LANG_OFF_ABORT
-desc: Used on recorder models
-eng: "OFF to abort"
-voice: ""
-new: "OFF para cancelar"
-
-id: LANG_ONE_TIME
-desc: (player) the jump scroll shall be done "one time"
-eng: "One time"
-voice: "Una Vez"
-new: "Una Vez"
-
-id: LANG_PLAYLIST_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing playlist file"
-voice: ""
-new: "Error al acceder a la Lista de Reproducción"
-
-id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing playlist control file"
-voice: ""
-new: "Error al acceder al archivo de control de Listas de Reproducción"
-
-id: LANG_PLAYLIST_CONTROL_INVALID
-desc: Playlist resume error
-eng: "Playlist control file is invalid"
-voice: ""
-new: "Archivo de Control de Listas de Reproducción inválido"
-
-id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-desc: Playlist error
-eng: "Error updating playlist control file"
-voice: ""
-new: "Error al Actualizar el Archivo de Control de Listas de Reproducción"
-
-id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing directory"
-voice: ""
-new: "Error al Acceder al Directorio"
-
-id: LANG_PLAYLIST_INSERT_COUNT
-desc: splash number of tracks inserted
-eng: "Inserted %d tracks (%s)"
-voice: ""
-new: "Añadidas %d Pistas (%s)"
-
-id: LANG_PLAYLIST_MENU
-desc: in main menu.
-eng: "Playlist Options"
-voice: "Opciones de la Lista de Reproducción"
-new: "Opciones de la Lista de Reproducción"
-
-id: LANG_PLAYLIST_QUEUE_COUNT
-desc: splash number of tracks queued
-eng: "Queued %d tracks (%s)"
-voice: ""
-new: "En cola %d Pistas (%s)"
-
-id: LANG_PLAYLIST_SAVE_COUNT
-desc: splash number of tracks saved
-eng: "Saved %d tracks (%s)"
-voice: ""
-new: "Guardadas %d Pistas (%s)"
-
-id: LANG_PLUGINS
-desc: in main_menu()
-eng: "Browse Plugins"
-voice: "Mostrar Plugins"
-new: "Mostrar Plugins"
-
-id: LANG_PLUGIN_CANT_OPEN
-desc: Plugin open error message
-eng: "Can't open %s"
-voice: ""
-new: "No se puede abrir %s"
-
-id: LANG_PLUGIN_ERROR
-desc: The plugin return an error code
-eng: "Plugin returned error"
-voice: ""
-new: "El Plugin devolvio un Error"
-
-id: LANG_PLUGIN_WRONG_MODEL
-desc: The plugin is not compatible with the archos model trying to run it
-eng: "Incompatible model"
-voice: ""
-new: "Modelo Incompatible"
-
-id: LANG_PLUGIN_WRONG_VERSION
-desc: The plugin is not compatible with the rockbox version trying to run it
-eng: "Incompatible version"
-voice: ""
-new: "Versión Incompatible"
-
-id: LANG_QUEUE_FIRST
-desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-eng: "Queue next"
-voice: "En cola como proxima"
-new: "En cola como proxima"
-
-id: LANG_QUEUE_LAST
-desc: in onplay menu.  queue a track/playlist at end of playlist.
-eng: "Queue last"
-voice: "En cola al final"
-new: "En cola al final"
-
-id: LANG_READ_FAILED
-desc: There was an error reading a file
-eng: "Failed reading %s"
-voice: ""
-new: "Fallo al cargar %s"
-
-id: LANG_REBOOT_NOW
-desc: Do you want to reboot?
-eng: "Reboot now?"
-voice: ""
-new: "Reiniciar ahora?"
-
-id: LANG_RECORDING_MENU
-desc: in the recording sub menu
-eng: "Recording screen"
-voice: "Pantalla de Grabación"
-new: "Pantalla de Grabación"
-
-id: LANG_RECORD_PRERECORD
-desc: in recording and radio screen
-eng: "Prerecording"
-voice: ""
-new: "Pregrabación"
-
-id: LANG_RECORD_PRERECORD_TIME
-desc: in recording settings_menu
-eng: "Prerecord time"
-voice: "Tiempo de Pregrabación"
-new: "Tiempo de Pregrabación"
-
-id: LANG_RECORD_TIMESPLIT
-desc: Prompt for record timer interval setting, in the record settings menu
-eng: "Time Split"
-voice: "Separación por Tiempo"
-new: "Separación por Tiempo"
-
-id: LANG_RECORD_TIMESPLIT_REC
-desc: Display of record timer interval setting, on the record screen
-eng: "Split time:"
-voice: ""
-new: "Tiempo de Separación:"
-
-id: LANG_RECURSE_DIRECTORY
-desc: In playlist menu
-eng: "Recursively Insert Directories"
-voice: "Añadir Directorios Recursivamente"
-new: "Añadir Directorios Recursivamente"
-
-id: LANG_RECURSE_DIRECTORY_QUESTION
-desc: Asked from onplay screen
-eng: "Recursively?"
-voice: ""
-new: "¿Recursivamente?"
-
-id: LANG_SAVE_DYNAMIC_PLAYLIST
-desc: in playlist menu.
-eng: "Save Current Playlist"
-voice: "Guardar Lista de Reproducción Actual"
-new: "Guardar Lista de Reproducción Actual"
-
-id: LANG_SHOW_ICONS
-desc: in settings_menu
-eng: "Show Icons"
-voice: "Mostrar Iconos"
-new: "Mostrar Iconos"
-
-id: LANG_STOP_ABORT
-desc: Used on player models
-eng: "STOP to abort"
-voice: ""
-new: "STOP para Cancelar"
-
-id: LANG_TIME_MENU
-desc: in the system sub menu
-eng: "Time & Date"
-voice: "Fecha y Hora"
-new: "Fecha y Hora"
-
-id: LANG_VIEW_DYNAMIC_PLAYLIST
-desc: in playlist menu.
-eng: "View Current Playlist"
-voice: "Ver Lista de Reproducción Actual"
-new: "Ver Lista de Reproducción Actual"
-
-id: LANG_WHILE_PLAYING
-desc: in settings_menu()
-eng: "Browse .wps files"
-voice: "Mostrar archivos de pantalla de reproducción"
-new: "Mostrar archivos .wps"
-
-id: LANG_WIND_MENU
-desc: in the playback sub menu
-eng: "FFwd/Rewind"
-voice: "Avance rápido y rebobinar"
-new: "Av.Rápido/Rebobinar"
-
-id: LANG_CREATE_DIR
-desc: in main menu
-eng: "Create directory"
-voice: "Crear directorio"
-new: "Crear Directorio"
-
-id: LANG_DISPLAY_FULL_PATH
-desc: track display options
-eng: "Full path"
-voice: "Ruta Completa"
-new: "Ruta Completa"
-
-id: LANG_DISPLAY_TRACK_NAME_ONLY
-desc: track display options
-eng: "Track name only"
-voice: "Sólo nombre de pista"
-new: "Sólo nombre de pista"
-
-id: LANG_FILE_OPTIONS
-desc: in playlist viewer on+play menu
-eng: "File Options"
-voice: "Opciones de Archivo"
-new: "Opciones de Archivo" 
-
-id: LANG_RECORD_CURRENT_DIR
-desc: in recording directory options
-eng: "Current dir"
-voice: "Directorio Actual"
-new: "Directorio Actual"
-
-id: LANG_RECORD_DIRECTORY
-desc: in recording settings_menu
-eng: "Directory"
-voice: "Directorio"
-new: "Directorio"
-
-id: LANG_REMOVE
-desc: in playlist viewer on+play menu
-eng: "Remove"
-voice: "Eliminar"
-new: "Eliminar"
-
-id: LANG_SHOW_INDICES
-desc: in playlist viewer menu
-eng: "Show Indices"
-voice: "Mostrar Índices"
-new: "Mostrar Índices"
-
-id: LANG_TRACK_DISPLAY
-desc: in playlist viewer on+play menu
-eng: "Track Display"
-voice: "Pantalla de Seguimiento"
-new: "Pantalla de Seguimiento"
-
-id: LANG_VIEW
-desc: in on+play menu
-eng: "View"
-voice: "Ver"
-new: "Ver"
-
-id: LANG_BUTTON_BAR
-desc: in settings menu
-eng: "Button bar"
-voice: "Barra de Botones"
-new: "Barra de Botones"
-
-id: LANG_DIRBROWSE_F1
-desc: in dir browser, F1 button bar text
-eng: "Menu"
-voice: ""
-new: "Menu"
-
-id: LANG_DIRBROWSE_F2
-desc: in dir browser, F2 button bar text
-eng: "Option"
-voice: ""
-new: "Opcion"
-
-id: LANG_DIRBROWSE_F3
-desc: in dir browser, F3 button bar text
-eng: "LCD"
-voice: ""
-new: "LCD" 
-
-id: VOICE_BILLION
+new: "Sab"
+
+## months
+
+id: LANG_MONTH_JANUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jan"
+voice: "Enero"
+new: "Ene"
+
+id: LANG_MONTH_FEBRUARY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Feb"
+voice: "Febrero"
+new: "Feb"
+
+id: LANG_MONTH_MARCH
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Mar"
+voice: "Marzo"
+new: "Mar"
+
+id: LANG_MONTH_APRIL
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Apr"
+voice: "Abril"
+new: "Abr"
+
+id: LANG_MONTH_MAY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "May"
+voice: "Mayo"
+new: "May"
+
+id: LANG_MONTH_JUNE
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jun"
+voice: "Junio"
+new: "Jun"
+
+id: LANG_MONTH_JULY
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Jul"
+voice: "Julio"
+new: "Jul"
+
+id: LANG_MONTH_AUGUST
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Aug"
+voice: "Agosto"
+new: "Ago"
+
+id: LANG_MONTH_SEPTEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Sep"
+voice: "Septiembre"
+new: "Sep"
+
+id: LANG_MONTH_OCTOBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Oct"
+voice: "Octubre"
+new: "Oct"
+
+id: LANG_MONTH_NOVEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Nov"
+voice: "Noviembre"
+new: "Nov"
+
+id: LANG_MONTH_DECEMBER
+desc: Maximum 3-letter abbreviation for monthname
+eng: "Dec"
+voice: "Diciembre"
+new: "Dic"
+
+## digits and units for voice, the order is important
+
+id: VOICE_ZERO
 desc: spoken only, for composing numbers
 eng: ""
-voice: "billón"
+voice: "0"
 new: ""
 
-id: VOICE_DB
-desc: spoken only, a unit postfix
-eng: ""
-voice: "decibelio"
-new: ""
-
-id: VOICE_EIGHT
+id: VOICE_ONE
 desc: spoken only, for composing numbers
 eng: ""
-voice: "8"
+voice: "1"
 new: ""
 
-id: VOICE_EIGHTEEN
+id: VOICE_TWO
 desc: spoken only, for composing numbers
 eng: ""
-voice: "18"
+voice: "2"
 new: ""
 
-id: VOICE_EIGHTY
+id: VOICE_THREE
 desc: spoken only, for composing numbers
 eng: ""
-voice: "80"
-new: ""
-
-id: VOICE_ELEVEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "11"
-new: ""
-
-id: VOICE_FIFE
-desc: spoken only, for composing numbers
-eng: ""
-voice: "5"
-new: ""
-
-id: VOICE_FIFTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "15"
-new: ""
-
-id: VOICE_FIFTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "50"
-new: ""
-
-id: VOICE_FORTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "40"
+voice: "3"
 new: ""
 
 id: VOICE_FOUR
@@ -2099,28 +1857,142 @@ eng: ""
 voice: "4"
 new: ""
 
+id: VOICE_FIFE
+desc: spoken only, for composing numbers
+eng: ""
+voice: "5"
+new: ""
+
+id: VOICE_SIX
+desc: spoken only, for composing numbers
+eng: ""
+voice: "6"
+new: ""
+
+id: VOICE_SEVEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "7"
+new: ""
+
+id: VOICE_EIGHT
+desc: spoken only, for composing numbers
+eng: ""
+voice: "8"
+new: ""
+
+id: VOICE_NINE
+desc: spoken only, for composing numbers
+eng: ""
+voice: "9"
+new: ""
+
+id: VOICE_TEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "10"
+new: ""
+
+id: VOICE_ELEVEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "11"
+new: ""
+
+id: VOICE_TWELVE
+desc: spoken only, for composing numbers
+eng: ""
+voice: "12"
+new: ""
+
+id: VOICE_THIRTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "13"
+new: ""
+
 id: VOICE_FOURTEEN
 desc: spoken only, for composing numbers
 eng: ""
 voice: "14"
 new: ""
 
-id: VOICE_GIGABYTE
-desc: DEPRECATED
+id: VOICE_FIFTEEN
+desc: spoken only, for composing numbers
 eng: ""
-voice: ""
-new: 
-
-id: VOICE_HOUR
-desc: spoken only, a unit postfix
-eng: ""
-voice: "hora"
+voice: "15"
 new: ""
 
-id: VOICE_HOURS
-desc: spoken only, a unit postfix
+id: VOICE_SIXTEEN
+desc: spoken only, for composing numbers
 eng: ""
-voice: "horas"
+voice: "16"
+new: ""
+
+id: VOICE_SEVENTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "17"
+new: ""
+
+id: VOICE_EIGHTEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "18"
+new: ""
+
+id: VOICE_NINETEEN
+desc: spoken only, for composing numbers
+eng: ""
+voice: "19"
+new: ""
+
+id: VOICE_TWENTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "20"
+new: ""
+
+id: VOICE_THIRTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "30"
+new: ""
+
+id: VOICE_FORTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "40"
+new: ""
+
+id: VOICE_FIFTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "50"
+new: ""
+
+id: VOICE_SIXTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "60"
+new: ""
+
+id: VOICE_SEVENTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "70"
+new: ""
+
+id: VOICE_EIGHTY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "80"
+new: ""
+
+id: VOICE_NINETY
+desc: spoken only, for composing numbers
+eng: ""
+voice: "90"
 new: ""
 
 id: VOICE_HUNDRED
@@ -2129,17 +2001,11 @@ eng: ""
 voice: "cientos"
 new: ""
 
-id: VOICE_KHZ
-desc: spoken only, a unit postfix
+id: VOICE_THOUSAND
+desc: spoken only, for composing numbers
 eng: ""
-voice: "kilohercio"
+voice: "mil"
 new: ""
-
-id: VOICE_MEGABYTE
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
 
 id: VOICE_MILLION
 desc: spoken only, for composing numbers
@@ -2147,16 +2013,42 @@ eng: ""
 voice: "millón"
 new: ""
 
-id: VOICE_MILLISECONDS
-desc: spoken only, a unit postfix
+id: VOICE_BILLION
+desc: spoken only, for composing numbers
 eng: ""
-voice: "milisegundos"
+voice: "billón"
 new: ""
 
 id: VOICE_MINUS
 desc: spoken only, for composing numbers
 eng: ""
 voice: "menos"
+new: ""
+
+id: VOICE_PLUS
+desc: spoken only, for composing numbers
+eng: ""
+voice: "más"
+new: ""
+
+## units for voicing
+
+id: VOICE_MILLISECONDS
+desc: spoken only, a unit postfix
+eng: ""
+voice: "milisegundos"
+new: ""
+
+id: VOICE_SECOND
+desc: spoken only, a unit postfix
+eng: ""
+voice: "segundo"
+new: ""
+
+id: VOICE_SECONDS
+desc: spoken only, a unit postfix
+eng: ""
+voice: "segundos"
 new: ""
 
 id: VOICE_MINUTE
@@ -2171,28 +2063,28 @@ eng: ""
 voice: "minutos"
 new: ""
 
-id: VOICE_NINE
-desc: spoken only, for composing numbers
+id: VOICE_HOUR
+desc: spoken only, a unit postfix
 eng: ""
-voice: "9"
+voice: "hora"
 new: ""
 
-id: VOICE_NINETEEN
-desc: spoken only, for composing numbers
+id: VOICE_HOURS
+desc: spoken only, a unit postfix
 eng: ""
-voice: "19"
+voice: "horas"
 new: ""
 
-id: VOICE_NINETY
-desc: spoken only, for composing numbers
+id: VOICE_KHZ
+desc: spoken only, a unit postfix
 eng: ""
-voice: "90"
+voice: "kilohercio"
 new: ""
 
-id: VOICE_ONE
-desc: spoken only, for composing numbers
+id: VOICE_DB
+desc: spoken only, a unit postfix
 eng: ""
-voice: "1"
+voice: "decibelio"
 new: ""
 
 id: VOICE_PERCENT
@@ -2201,118 +2093,22 @@ eng: ""
 voice: "por ciento"
 new: ""
 
-id: VOICE_PLUS
-desc: spoken only, for composing numbers
-eng: ""
-voice: "más"
-new: ""
-
-id: VOICE_POINT
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: VOICE_SECOND
+id: VOICE_MILLIAMPHOURS
 desc: spoken only, a unit postfix
 eng: ""
-voice: "segundo"
+voice: "mili-amperios hora"
 new: ""
 
-id: VOICE_SECONDS
+id: VOICE_PIXEL
 desc: spoken only, a unit postfix
 eng: ""
-voice: "segundos"
+voice: "pixel"
 new: ""
 
-id: VOICE_SEVEN
-desc: spoken only, for composing numbers
+id: VOICE_PER_SEC
+desc: spoken only, a unit postfix
 eng: ""
-voice: "7"
-new: ""
-
-id: VOICE_SEVENTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "17"
-new: ""
-
-id: VOICE_SEVENTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "70"
-new: ""
-
-id: VOICE_SIX
-desc: spoken only, for composing numbers
-eng: ""
-voice: "6"
-new: ""
-
-id: VOICE_SIXTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "16"
-new: ""
-
-id: VOICE_SIXTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "60"
-new: ""
-
-id: VOICE_TEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "10"
-new: ""
-
-id: VOICE_THIRTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: "13"
-new: ""
-
-id: VOICE_THIRTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "30"
-new: ""
-
-id: VOICE_THOUSAND
-desc: spoken only, for composing numbers
-eng: ""
-voice: "mil"
-new: ""
-
-id: VOICE_THREE
-desc: spoken only, for composing numbers
-eng: ""
-voice: "3"
-new: ""
-
-id: VOICE_TWELVE
-desc: spoken only, for composing numbers
-eng: ""
-voice: "12"
-new: ""
-
-id: VOICE_TWENTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: "20"
-new: ""
-
-id: VOICE_TWO
-desc: spoken only, for composing numbers
-eng: ""
-voice: "2"
-new: ""
-
-id: VOICE_ZERO
-desc: spoken only, for composing numbers
-eng: ""
-voice: "0"
+voice: "por segundo"
 new: ""
 
 id: VOICE_HERTZ
@@ -2321,287 +2117,37 @@ eng: ""
 voice: "hercio"
 new: ""
 
-id: VOICE_MILLIAMPHOURS
-desc: spoken only, a unit postfix
-eng: ""
-voice: "mili-amperios hora"
-new: ""
-
-id: VOICE_PER_SEC
-desc: spoken only, a unit postfix
-eng: ""
-voice: "por segundo"
-new: "" 
-
-id: VOICE_PIXEL
-desc: spoken only, a unit postfix
-eng: ""
-voice: "pixel"
-new: ""
-
-id: LANG_CHANNEL_CUSTOM
-desc: in sound_settings
-eng: "Custom"
-voice: "Personalizado"
-new: "Personalizado"
-
-id: LANG_CONFIRM_SHUTDOWN
-desc: in shutdown screen
-eng: "Press OFF to shut down"
+id: LANG_BYTE
+desc: a unit postfix
+eng: "B"
 voice: ""
-new: "Pulsa OFF para apagar"
+new: "B"
 
-id: LANG_DELETE_DIR
-desc: in on+play menu
-eng: "Delete directory"
-voice: "Borrar directorio"
-new: "Borrar directorio"
+id: LANG_KILOBYTE
+desc: a unit postfix, also voiced
+eng: "KB"
+voice: "kilobyte"
+new: "KB"
 
-id: LANG_FILETYPES_EXTENSION_FULL
-desc: Extension array full
-eng: "Extension array full"
-voice: ""
-new: "lista de extensiones completa"
+id: LANG_MEGABYTE
+desc: a unit postfix, also voiced
+eng: "MB"
+voice: "megabyte"
+new: "MB"
 
-id: LANG_FILETYPES_FULL
-desc: Filetype array full
-eng: "Filetype array full"
-voice: ""
-new: "lista de tipos de archivo completa"
+id: LANG_GIGABYTE
+desc: a unit postfix, also voiced
+eng: "GB"
+voice: "gigabyte"
+new: "GB"
 
-id: LANG_FILETYPES_PLUGIN_NAME_LONG
-desc: Viewer plugin name too long
-eng: "Plugin name too long"
-voice: ""
-new: "Nombre de Plugin muy largo"
+id: LANG_POINT
+desc: decimal separator for composing numbers
+eng: "."
+voice: "punto"
+new: "."
 
-id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-desc: Filetype string buffer empty
-eng: "Filetype string buffer empty"
-voice: ""
-new: "Buffer de la cadena de tipos de archivo vacia"
-
-id: LANG_FILTER_ID3DB
-desc: show ID3 database
-eng: "ID3 database"
-voice: "Base de datos ID3"
-new: "Base de datos ID3"
-
-id: LANG_FM_BUTTONBAR_ACTION
-desc: in radio screen
-eng: "Action"
-voice: ""
-new: "Acción"
-
-id: LANG_FM_BUTTONBAR_ADD
-desc: in radio screen
-eng: "Add"
-voice: ""
-new: "Añadir"
-
-id: LANG_FM_BUTTONBAR_EDIT
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_FM_BUTTONBAR_EXIT
-desc: in radio screen
-eng: "Exit"
-voice: ""
-new: "Salir"
-
-id: LANG_FM_EDIT_PRESET
-desc: in radio screen
-eng: "Edit preset"
-voice: ""
-new: "Edit presintonía"
-
-id: LANG_FM_MONO_MODE
-desc: in radio screen
-eng: "Force mono"
-voice: ""
-new: "Forzar mono"
-
-id: LANG_ID3_ORDER
-desc: in playback settings screen
-eng: "ID3 tag priority"
-voice: "Prioridad etiqueta ID3"
-new: "Prioridad etiqueta ID3"
-
-id: LANG_ID3_V1_FIRST
-desc: in playback settings screen
-eng: "V1 then V2"
-voice: "Versión 1 y despues versión 2"
-new: "V1 y despues V2"
-
-id: LANG_ID3_V2_FIRST
-desc: in playback settings screen
-eng: "V2 then V1"
-voice: "Versión 2 y despues versión 1"
-new: "V2 y despues V1"
-
-id: LANG_INSTALLATION_INCOMPLETE
-desc: in browse root
-eng: "Installation incomplete"
-voice: ""
-new: "Instalación incompleta"
-
-id: LANG_MDB_CENTER
-desc: in sound settings
-eng: "MDB Center frequency"
-voice: "Frecuencia central MDB"
-new: "Frecuencia central MDB"
-
-id: LANG_MDB_ENABLE
-desc: in sound settings
-eng: "MDB Enable"
-voice: "Activar MDB"
-new: "Activar MDB"
-
-id: LANG_MDB_HARMONICS
-desc: in sound settings
-eng: "MDB Harmonics"
-voice: "Armónicos MDB"
-new: "Armónicos MDB"
-
-id: LANG_MDB_SHAPE
-desc: in sound settings
-eng: "MDB Shape"
-voice: "Forma de MDB"
-new: "Forma de MDB"
-
-id: LANG_MDB_STRENGTH
-desc: in sound settings
-eng: "MDB Strength"
-voice: "Potencia MDB"
-new: "Potencia MDB"
-
-id: LANG_NO_ROCKBOX_DIR
-desc: in browse root
-eng: "No .rockbox directory"
-voice: ""
-new: "No existe directorio .rockbox"
-
-id: LANG_ONPLAY_OPEN_WITH
-desc: Onplay open with
-eng: "Open with"
-voice: "Abrir con"
-new: "Abrir con"
-
-id: LANG_REMOVE_MMC
-desc: before acknowledging usb in case an MMC is inserted (Ondio)
-eng: "Please remove inserted MMC"
-voice: "Por favor retire la tarjeta MMC insertada"
-new: "Por favor retire la tarjeta MMC insertada"
-
-id: LANG_SHUTDOWN
-desc: in main menu
-eng: "Shut down"
-voice: "Apagar"
-new: "Apagar"
-
-id: LANG_SHUTTINGDOWN
-desc: in main menu
-eng: "Shutting down..."
-voice: ""
-new: "Apagando..."
-
-id: LANG_SORT_ALPHA
-desc: browser sorting setting
-eng: "Alphabetical"
-voice: "Alfabético"
-new: "Alfabético"
-
-id: LANG_SORT_DATE
-desc: browser sorting setting
-eng: "by date"
-voice: "Por fecha"
-new: "Por fecha"
-
-id: LANG_SORT_DATE_REVERSE
-desc: browser sorting setting
-eng: "by newest date"
-voice: "más reciente"
-new: "más reciente"
-
-id: LANG_SORT_DIR
-desc: browser sorting setting
-eng: "Sort Directories"
-voice: "Ordenar directorios"
-new: "Ordenar directorios"
-
-id: LANG_SORT_FILE
-desc: browser sorting setting
-eng: "Sort Files"
-voice: "Ordenar archivos"
-new: "Ordenar archivos"
-
-id: LANG_SORT_TYPE
-desc: browser sorting setting
-eng: "by type"
-voice: "por tipo"
-new: "por tipo"
-
-id: LANG_STEREO_WIDTH
-desc: in sound_settings
-eng: "Stereo width"
-voice: "Amplitud estéreo"
-new: "Amplitud Estéreo"
-
-id: LANG_SUPERBASS
-desc: in sound settings
-eng: "Super bass"
-voice: "Super grave"
-new: "Super grave"
-
-id: LANG_VOICE
-desc: root of voice menu
-eng: "Voice"
-voice: "Voz"
-new: "Voz"
-
-id: LANG_VOICE_DIR
-desc: item of voice menu, set the "talkbox" mode for directories
-eng: "Voice Directories"
-voice: "Nombrar directorios"
-new: "Nombrar directorios"
-
-id: LANG_VOICE_DIR_ENTER
-desc: DEPRECATED
-eng: ""
-voice: ""
-new: 
-
-id: LANG_VOICE_DIR_HOVER
-desc: "talkbox" mode for directories + files
-eng: ".talk mp3 clip"
-voice: "fichero mp3 .talk"
-new: "fichero mp3 .talk"
-
-id: LANG_VOICE_FILE
-desc: item of voice menu, set the voive mode for files
-eng: "Voice Filenames"
-voice: "Nombrar archivos"
-new: "Nombrar archivos"
-
-id: LANG_VOICE_MENU
-desc: item of voice menu, enable/disable the voice UI
-eng: "Voice Menus"
-voice: "Nombrar menus"
-new: "Nombrar menus"
-
-id: LANG_VOICE_NUMBER
-desc: "talkbox" mode for files+directories
-eng: "Numbers"
-voice: "Numeros"
-new: "Números"
-
-id: LANG_VOICE_SPELL
-desc: "talkbox" mode for files+directories
-eng: "Spell"
-voice: "Deletrear"
-new: "Deletrear"
+## chars for spelling
 
 id: VOICE_CHAR_A
 desc: spoken only, for spelling
@@ -2759,82 +2305,10 @@ eng: ""
 voice: "Z"
 new: ""
 
-id: VOICE_CURRENT_TIME
-desc: spoken only, for wall clock announce
-eng: ""
-voice: "Current time:"
-new: ""
-
-id: VOICE_DIR
-desc: spoken only, prefix for directory number
-eng: ""
-voice: "folder"
-new: ""
-
 id: VOICE_DOT
 desc: spoken only, for spelling
 eng: ""
 voice: "punto"
-new: ""
-
-id: VOICE_EXT_AJZ
-desc: spoken only, for file extension
-eng: ""
-voice: "firmware"
-new: ""
-
-id: VOICE_EXT_BMARK
-desc: spoken only, for file extension and the word in general
-eng: ""
-voice: "marcapáginas"
-new: ""
-
-id: VOICE_EXT_CFG
-desc: spoken only, for file extension
-eng: ""
-voice: "configuración"
-new: ""
-
-id: VOICE_EXT_FONT
-desc: spoken only, for file extension
-eng: ""
-voice: "fuente"
-new: ""
-
-id: VOICE_EXT_MPA
-desc: spoken only, for file extension
-eng: ""
-voice: "audio"
-new: ""
-
-id: VOICE_EXT_ROCK
-desc: spoken only, for file extension
-eng: ""
-voice: "plugin"
-new: ""
-
-id: VOICE_EXT_TXT
-desc: spoken only, for file extension
-eng: ""
-voice: "text"
-new: ""
-
-id: VOICE_EXT_UCL
-desc: spoken only, for file extension
-eng: ""
-voice: "flash"
-new: ""
-
-id: VOICE_EXT_WPS
-desc: spoken only, for file extension
-eng: ""
-voice: "pantalla de reproduccion"
-new: ""
-
-id: VOICE_FILE
-desc: spoken only, prefix for file number
-eng: ""
-voice: "archivo"
 new: ""
 
 id: VOICE_PAUSE
@@ -2843,53 +2317,323 @@ eng: ""
 voice: " "
 new: ""
 
-id: LANG_BATTERY_TYPE
-desc: in battery settings
-eng: "Battery Type"
-voice: "Tipo de batería"
-new: "Tipo de batería"
+## file/folder voicing
 
-id: LANG_BATTERY_TYPE_ALKALINE
-desc: in battery settings
-eng: "Alkaline"
-voice: "Alcalina"
-new: "Alcalina"
+id: VOICE_FILE
+desc: spoken only, prefix for file number
+eng: ""
+voice: "archivo"
+new: ""
 
-id: LANG_BATTERY_TYPE_NIMH
-desc: in battery settings
-eng: "NiMH"
-voice: "Níquel hidruro de metal"
-new: "NiMH"
+id: VOICE_DIR
+desc: spoken only, prefix for directory number
+eng: ""
+voice: "folder"
+new: ""
 
-id: LANG_BYTE
-desc: a unit postfix
-eng: "B"
+## file extensions for voicing
+
+id: VOICE_EXT_MPA
+desc: spoken only, for file extension
+eng: ""
+voice: "audio"
+new: ""
+
+id: VOICE_EXT_CFG
+desc: spoken only, for file extension
+eng: ""
+voice: "configuración"
+new: ""
+
+id: VOICE_EXT_WPS
+desc: spoken only, for file extension
+eng: ""
+voice: "pantalla de reproduccion"
+new: ""
+
+id: VOICE_EXT_TXT
+desc: spoken only, for file extension
+eng: ""
+voice: "text"
+new: ""
+
+id: VOICE_EXT_ROCK
+desc: spoken only, for file extension
+eng: ""
+voice: "plugin"
+new: ""
+
+id: VOICE_EXT_FONT
+desc: spoken only, for file extension
+eng: ""
+voice: "fuente"
+new: ""
+
+id: VOICE_EXT_BMARK
+desc: spoken only, for file extension and the word in general
+eng: ""
+voice: "marcapáginas"
+new: ""
+
+id: VOICE_EXT_UCL
+desc: spoken only, for file extension
+eng: ""
+voice: "flash"
+new: ""
+
+id: VOICE_EXT_AJZ
+desc: spoken only, for file extension
+eng: ""
+voice: "firmware"
+new: ""
+
+## playlist handling
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
 voice: ""
-new: "B"
+new: "Cargando..."
 
-id: LANG_DISK_FREE_INFO
-desc: disk size info
-eng: "Free:"
-voice: "Espacio libre"
-new: "Libre:"
-
-id: LANG_DISK_SIZE_INFO
-desc: disk size info
-eng: "Disk:"
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
 voice: ""
-new: "Disco:"
+new: "Mezclando..."
 
-id: LANG_GIGABYTE
-desc: a unit postfix, also voiced
-eng: "GB"
-voice: "gigabyte"
-new: "GB"
-
-id: LANG_ID3DB_ALBUMS
-desc: ID3 virtual folder name
-eng: "Albums"
+id: LANG_PLAYLIST_BUFFER_FULL
+desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+eng: "Playlist Buffer Full"
 voice: ""
-new: "Discos"
+new: "El bufer de la"  lista esta lleno"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End Of List"
+voice: ""
+new: "Fin de lista"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "End Of Song List"
+voice: ""
+new: "Fin de lista"
+
+id: LANG_CREATING
+desc: Screen feedback during playlist creation
+eng: "Creating"
+voice: ""
+new: "Creando"
+
+id: LANG_PLAYLIST_INSERT_COUNT
+desc: splash number of tracks inserted
+eng: "Inserted %d tracks (%s)"
+voice: ""
+new: "Añadidas %d Pistas (%s)"
+
+id: LANG_PLAYLIST_QUEUE_COUNT
+desc: splash number of tracks queued
+eng: "Queued %d tracks (%s)"
+voice: ""
+new: "En cola %d Pistas (%s)"
+
+id: LANG_PLAYLIST_SAVE_COUNT
+desc: splash number of tracks saved
+eng: "Saved %d tracks (%s)"
+voice: ""
+new: "Guardadas %d Pistas (%s)"
+
+id: LANG_RECURSE_DIRECTORY_QUESTION
+desc: Asked from onplay screen
+eng: "Recursively?"
+voice: ""
+new: "¿Recursivamente?"
+
+id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+desc: Playlist error
+eng: "Error updating playlist control file"
+voice: ""
+new: "Error al Actualizar el Archivo de Control de Listas de Reproducción"
+
+id: LANG_PLAYLIST_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist file"
+voice: ""
+new: "Error al acceder a la Lista de Reproducción"
+
+id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing playlist control file"
+voice: ""
+new: "Error al acceder al archivo de control de Listas de Reproducción"
+
+id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+desc: Playlist error
+eng: "Error accessing directory"
+voice: ""
+new: "Error al Acceder al Directorio"
+
+id: LANG_PLAYLIST_CONTROL_INVALID
+desc: Playlist resume error
+eng: "Playlist control file is invalid"
+voice: ""
+new: "Archivo de Control de Listas de Reproducción inválido"
+
+## FM radio
+
+id: LANG_FM_STATION
+desc: in radio screen
+eng: "Station: %d.%dMHz"
+voice: ""
+new: "Emisora: %d.%dMHz"
+
+id: LANG_FM_NO_PRESETS
+desc: DEPRECATED
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_FM_EDIT_PRESET
+desc: in radio screen
+eng: "Edit preset"
+voice: ""
+new: "Edit presintonía"
+
+id: LANG_FM_DELETE_PRESET
+desc: in radio screen
+eng: "Remove preset"
+voice: ""
+new: "Eliminar Sintonia"
+
+id: LANG_FM_PRESET_SAVE_FAILED
+desc: in radio screen
+eng: "Preset save failed"
+voice: ""
+new: "Fallo al salvar Sintonia"
+
+id: LANG_FM_NO_FREE_PRESETS
+desc: in radio screen
+eng: "The preset list is full"
+voice: ""
+new: "Lista de Sintonias llena"
+
+id: LANG_BUTTONBAR_MENU
+desc: in button bar
+eng: "Menu"
+voice: ""
+new: "Menu"
+
+id: LANG_FM_BUTTONBAR_EXIT
+desc: in radio screen
+eng: "Exit"
+voice: ""
+new: "Salir"
+
+id: LANG_FM_BUTTONBAR_ACTION
+desc: in radio screen
+eng: "Action"
+voice: ""
+new: "Acción"
+
+id: LANG_FM_BUTTONBAR_PRESETS
+desc: in button bar
+eng: "Preset"
+voice: ""
+new: "Sintonia"
+
+id: LANG_FM_BUTTONBAR_ADD
+desc: in radio screen
+eng: "Add"
+voice: ""
+new: "Añadir"
+
+id: LANG_FM_BUTTONBAR_RECORD
+desc: in main menu
+eng: "Record"
+voice: ""
+new: "Grabar"
+
+id: LANG_FM_MONO_MODE
+desc: in radio screen
+eng: "Force mono"
+voice: ""
+new: "Forzar mono"
+
+## dir/file browser
+
+id: LANG_DIRBROWSE_F1
+desc: in dir browser, F1 button bar text
+eng: "Menu"
+voice: ""
+new: "Menu"
+
+id: LANG_DIRBROWSE_F2
+desc: in dir browser, F2 button bar text
+eng: "Option"
+voice: ""
+new: "Opcion"
+
+id: LANG_DIRBROWSE_F3
+desc: in dir browser, F3 button bar text
+eng: "LCD"
+voice: ""
+new: "LCD"
+
+id: LANG_SHOWDIR_BUFFER_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer Is Full!"
+voice: ""
+new: "Buffer de directorio Completo!"   "
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "New Language"
+voice: ""
+new: "nuevo idioma"
+
+id: LANG_SETTINGS_LOADED
+desc: Feedback shown when a .cfg file is loaded
+eng: "Settings Loaded"
+voice: ""
+new: "Opciones Cargadas"
+
+id: LANG_SETTINGS_SAVED
+desc: Feedback shown when a .cfg file is saved
+eng: "Settings Saved"
+voice: ""
+new: "Opciones"  Grabadas"
+
+id: LANG_BOOT_CHANGED
+desc: File browser discovered the boot file was changed
+eng: "Boot changed"
+voice: ""
+new: "Arranque Modificado"
+
+id: LANG_REBOOT_NOW
+desc: Do you want to reboot?
+eng: "Reboot now?"
+voice: ""
+new: "Reiniciar ahora?"
+
+id: LANG_OFF_ABORT
+desc: Used on recorder models
+eng: "OFF to abort"
+voice: ""
+new: "OFF para cancelar"
+
+id: LANG_STOP_ABORT
+desc: Used on player models
+eng: "STOP to abort"
+voice: ""
+new: "STOP para Cancelar"
+
+id: LANG_NO_FILES
+desc: in settings_menu
+eng: "No files"
+voice: ""
+new: "No hay archivos"
+
+## tag database browser
 
 id: LANG_ID3DB_ARTISTS
 desc: ID3 virtual folder name
@@ -2897,35 +2641,11 @@ eng: "Artists"
 voice: ""
 new: "Artistas"
 
-id: LANG_ID3DB_MATCHES
+id: LANG_ID3DB_ALBUMS
 desc: ID3 virtual folder name
-eng: "Found %d matches"
+eng: "Albums"
 voice: ""
-new: "Encontradas %d coincidencias"
-
-id: LANG_ID3DB_SEARCH
-desc: ID3 virtual folder name
-eng: "Search"
-voice: ""
-new: "Búsqueda"
-
-id: LANG_ID3DB_SEARCH_ALBUMS
-desc: ID3 virtual folder name
-eng: "Search Albums"
-voice: ""
-new: "Buscar Discos"
-
-id: LANG_ID3DB_SEARCH_ARTISTS
-desc: ID3 virtual folder name
-eng: "Search Artists"
-voice: ""
-new: "Buscar Artistas"
-
-id: LANG_ID3DB_SEARCH_SONGS
-desc: ID3 virtual folder name
-eng: "Search Songs"
-voice: ""
-new: "Buscar Canciones"
+new: "Discos"
 
 id: LANG_ID3DB_SONGS
 desc: ID3 virtual folder name
@@ -2933,23 +2653,35 @@ eng: "Songs"
 voice: ""
 new: "Canciones"
 
-id: LANG_KILOBYTE
-desc: a unit postfix, also voiced
-eng: "KB"
-voice: "kilobyte"
-new: "KB"
+id: LANG_ID3DB_SEARCH
+desc: ID3 virtual folder name
+eng: "Search"
+voice: ""
+new: "Búsqueda"
 
-id: LANG_MEGABYTE
-desc: a unit postfix, also voiced
-eng: "MB"
-voice: "megabyte"
-new: "MB"
+id: LANG_ID3DB_SEARCH_ARTISTS
+desc: ID3 virtual folder name
+eng: "Search Artists"
+voice: ""
+new: "Buscar Artistas"
 
-id: LANG_POINT
-desc: decimal separator for composing numbers
-eng: "."
-voice: "punto"
-new: "."
+id: LANG_ID3DB_SEARCH_ALBUMS
+desc: ID3 virtual folder name
+eng: "Search Albums"
+voice: ""
+new: "Buscar Discos"
+
+id: LANG_ID3DB_SEARCH_SONGS
+desc: ID3 virtual folder name
+eng: "Search Songs"
+voice: ""
+new: "Buscar Canciones"
+
+id: LANG_ID3DB_MATCHES
+desc: ID3 virtual folder name
+eng: "Found %d matches"
+voice: ""
+new: "Encontradas %d coincidencias"
 
 id: LANG_ID3DB_ALL_SONGS
 desc: ID3 virtual folder name
@@ -2957,20 +2689,116 @@ eng: "<All songs>"
 voice: ""
 new: "<Todas las Canciones>"
 
-id: LANG_PLAYLIST
-desc: Used when you need to say playlist, also voiced
-eng: "Playlist"
-voice: "Lista de reproducción"
-new: "Lista de reproducción"
+## playlist viewer
 
-id: LANG_RECORD_STARTUP
-desc: Start Rockbox in Recording screen
-eng: "Show recording screen on startup"
-voice: "Mostrar pantalla de grabación al encender"
-new: "Mostrar pantalla de grabación al encender"
+id: LANG_MOVE
+desc: The verb/action Move
+eng: "Move"
+voice: "Mover"
+new: "Mover"
 
-id: LANG_ALARM_MOD_DISABLE
-desc: Announce that the RTC alarm has been turned off
-eng: "Alarm Disabled"
-voice: "Alarma Desactivada"
-new: "Alarma Desactivada"
+id: LANG_MOVE_FAILED
+desc: Error message displayed in playlist viewer
+eng: "Move failed"
+voice: ""
+new: "Fallo al mover"
+
+id: LANG_SHOW_INDICES
+desc: in playlist viewer menu
+eng: "Show Indices"
+voice: "Mostrar Índices"
+new: "Mostrar Índices"
+
+id: LANG_TRACK_DISPLAY
+desc: in playlist viewer on+play menu
+eng: "Track Display"
+voice: "Pantalla de Seguimiento"
+new: "Pantalla de Seguimiento"
+
+id: LANG_DISPLAY_TRACK_NAME_ONLY
+desc: track display options
+eng: "Track name only"
+voice: "Sólo nombre de pista"
+new: "Sólo nombre de pista"
+
+id: LANG_DISPLAY_FULL_PATH
+desc: track display options
+eng: "Full path"
+voice: "Ruta Completa"
+new: "Ruta Completa"
+
+id: LANG_REMOVE
+desc: in playlist viewer on+play menu
+eng: "Remove"
+voice: "Eliminar"
+new: "Eliminar"
+
+id: LANG_FILE_OPTIONS
+desc: in playlist viewer on+play menu
+eng: "File Options"
+voice: "Opciones de Archivo"
+new: "Opciones de Archivo"
+
+## plugin loader, filetypes
+
+id: LANG_PLUGIN_CANT_OPEN
+desc: Plugin open error message
+eng: "Can't open %s"
+voice: ""
+new: "No se puede abrir %s"
+
+id: LANG_READ_FAILED
+desc: There was an error reading a file
+eng: "Failed reading %s"
+voice: ""
+new: "Fallo al cargar %s"
+
+id: LANG_PLUGIN_WRONG_MODEL
+desc: The plugin is not compatible with the archos model trying to run it
+eng: "Incompatible model"
+voice: ""
+new: "Modelo Incompatible"
+
+id: LANG_PLUGIN_WRONG_VERSION
+desc: The plugin is not compatible with the rockbox version trying to run it
+eng: "Incompatible version"
+voice: ""
+new: "Versión Incompatible"
+
+id: LANG_PLUGIN_ERROR
+desc: The plugin return an error code
+eng: "Plugin returned error"
+voice: ""
+new: "El Plugin devolvio un Error"
+
+id: LANG_FILETYPES_EXTENSION_FULL
+desc: Extension array full
+eng: "Extension array full"
+voice: ""
+new: "lista de extensiones completa"
+
+id: LANG_FILETYPES_FULL
+desc: Filetype array full
+eng: "Filetype array full"
+voice: ""
+new: "lista de tipos de archivo completa"
+
+id: LANG_FILETYPES_PLUGIN_NAME_LONG
+desc: Viewer plugin name too long
+eng: "Plugin name too long"
+voice: ""
+new: "Nombre de Plugin muy largo"
+
+id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+desc: Filetype string buffer empty
+eng: "Filetype string buffer empty"
+voice: ""
+new: "Buffer de la cadena de tipos de archivo vacia"
+
+## misc
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: possible answers to resume question
+eng: "(PLAY/STOP)"
+voice: ""
+new: "(PLAY/STOP)"

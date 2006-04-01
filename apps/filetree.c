@@ -437,13 +437,7 @@ int ft_enter(struct tree_context* c)
             case TREE_ATTR_CFG:
                 if (!settings_load_config(buf))
                     break;
-                lcd_clear_display();
-                lcd_puts(0,0,str(LANG_SETTINGS_LOADED1));
-                lcd_puts(0,1,str(LANG_SETTINGS_LOADED2));
-#ifdef HAVE_LCD_BITMAP
-                lcd_update();
-#endif
-                sleep(HZ/2);
+                gui_syncsplash(HZ, true, str(LANG_SETTINGS_LOADED));
                 break;
 
             case TREE_ATTR_BMARK:

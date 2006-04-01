@@ -1621,9 +1621,7 @@ static void display_playlist_count(int count, const unsigned char *fmt)
  */
 static void display_buffer_full(void)
 {
-    gui_syncsplash(HZ*2, true, (unsigned char *)"%s %s",
-                   str(LANG_PLAYINDICES_PLAYLIST),
-                   str(LANG_PLAYINDICES_BUFFER));
+    gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_BUFFER_FULL));
 }
 
 /*

@@ -43,7 +43,7 @@ open(ENG, "<$english") or die "Can't open $english";
 open(LANG, "<$input") or die "Can't open $input";
 open(OUTF, ">$output") or die "Can't open $output";
 
-my $langversion = 2;
+my $langversion = 3;
 
 binmode OUTF;
 
@@ -74,7 +74,7 @@ while(<ENG>) {
                     $idnum{$set{'id'}} = '_done_';
                     next;
                 }
-        
+
                 # Assign an ID number to this entry
                 $idnum{$set{'id'}}=$idnum;
                 $idnum++;

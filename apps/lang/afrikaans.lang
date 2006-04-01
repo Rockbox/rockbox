@@ -1,871 +1,723 @@
 # afrikaans.lang v1.0 2003.02.09 Rian van Staden
 
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-new: "Klank Opsies"
-
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-new: "Algemene Opsies"
-
-id: LANG_GAMES
-desc: in the main menu
-eng: "Games"
-new: "Spele"
-
-id: LANG_DEMOS
-desc: in the main menu
-eng: "Demos"
-new: 
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-new: "Inligting"
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-new: "Weergawe"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (keep out!)"
-new: "OntGogga"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (sim)"
-new: "USB"
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox Info:"
-new: "Inligting:"
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMB"
-new: 
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMB"
-new: 
-
-id: LANG_BATTERY_LEVEL_PLAYER
-desc: the battery level in percentage
-eng: "Batt: %d%%%s"
-new: 
-
-id: LANG_BATTERY_LEVEL_RECORDER
-desc: the battery level in percentage
-eng: "Battery: %d%%%s"
-new: 
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
-new: "Battery: laai"
-
-id: LANG_BOUNCE
-desc: in the demos menu
-eng: "Bounce"
-new: 
-
-id: LANG_SNOW
-desc: in the demos menu
-eng: "Snow"
-new: 
-
-id: LANG_TETRIS
-desc: in the games menu
-eng: "Tetris"
-new: 
-
-id: LANG_SOKOBAN
-desc: in the games menu
-eng: "Sokoban"
-new: 
-
-id: LANG_WORMLET
-desc: in the games menu
-eng: "Wormlet"
-new: 
-
-id: LANG_SNAKE
-desc: in the games menu
-eng: "Snake"
-new: 
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-new: "Laai..."
-
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-new: "Skommel..."
-
-id: LANG_PLAYLIST_PLAY
-desc: displayed on screen when start playing a playlist
-eng: "Playing..."
-new: "Speel..."
-
-id: LANG_PLAYINDICES_PLAYLIST
-desc: in playlist.indices() when playlist is full
-eng: "Playlist"
-new: "Speellys"
-
-id: LANG_PLAYINDICES_BUFFER
-desc: in playlist.indices() when playlist is full
-eng: "buffer full"
-new: "buffer vol"
-
-id: LANG_PLAYINDICES_AMOUNT
-desc: number of files in playlist
-eng: "%d files"
-new: "%d lêers"
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save failed"
-new: "Bêre gebreek"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Batt. low?"
-new: "Batt. leeg?"
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save failed"
-new: "Bêre gebreek"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "Is battery low?"
-new: "Battery leeg?"
-
-id: LANG_TIME_SET
-desc: 
-eng: "ON to set"
-new: "ON stel"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF to revert"
-new: "OFF kanselleer"
-
-id: LANG_HIDDEN
-desc: in settings_menu
-eng: ""
-new: ""
-
-id: LANG_HIDDEN_SHOW
-desc: in settings_menu 
-eng: ""
-new: ""
-
-id: LANG_HIDDEN_HIDE
-desc: in settings_menu
-eng: ""
-new: ""
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-new: "Kontras"
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-new: "Skommel"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play Selected First"
-new: "Speel Keuse Eerste"
-
-id: LANG_MP3FILTER
-desc: in settings_menu
-eng: ""
-new: ""
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-new: "Sorteer groot/klein"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-new: "Voort"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-new: "Af"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "Ask"
-new: "Vra"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-new: "Aan"
-
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-new: "Lig"
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-new: "Rol Spoed Opsie Voorbeeld 12345"
-
-id: LANG_DISCHARGE
-desc: DEPRECATED
-eng: ""
-new: ""
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-new: "Stel Tyd/Datum"
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-new: "Disk stoptyd"
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-new: "FF/RW Min Stap"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-new: "FF/RW versnelling"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-new: "Volg Speellys"
-
-id: LANG_RESET_ASK_PLAYER
-desc: confirm to reset settings
-eng: "Really?"
-new: "Seker?"
-
-id: LANG_RESET_CONFIRM_PLAYER
-desc: confirm to reset settings
-eng: "Play/Stop"
-new: "Speel/Stop"
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are you sure?"
-new: "Seker?"
-
-id: LANG_RESET_CONFIRM_RECORDER
-desc: confirm to reset settings
-eng: "PLAY = Yes"
-new: "PLAY = Ja"
-
-id: LANG_RESET_CANCEL_RECORDER
-desc: confirm to reset settings
-eng: "Any Other = No"
-new: "Ander = Nee"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-new: "Opsies"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-new: "Skoon"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
-eng: "Canceled"
-new: "Gekanselleer"
-
-id: LANG_CASE_MENU
-desc: in fileview_settings_menu()
-eng: "Sort Mode"
-new: "Sorteer modus"
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-new: "Rol Spoed"
-
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset settings"
-new: "Stel Opsies Terug"
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-new: "Speel"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-new: "Lêers"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-new: "Skerm"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-new: "Stelsel"
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-new: 
-
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-new: "Balans"
-
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-new: "Bas"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-new: "Hoog"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-new: "Luid"
-
-id: LANG_BBOOST
-desc: in sound settings
-eng: "Bass Boost"
-new: "Bas Versterker"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV Decay Time"
-new: "AV Terugloop"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-new: "Kanale"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel Configuration"
-new: "Kanaal Opsies"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-new: "Stereo"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-new: "Mono"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-new: "Mono Links"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-new: "Mono Regs"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-new: 
-
-id: LANG_SHOWDIR_ERROR_BUFFER
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer"
-new: "Buffer"
-
-id: LANG_SHOWDIR_ERROR_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "is full!"
-new: "is vol!!"
-
-id: LANG_RESUME_ASK
-desc: question asked at the begining when resume is on
-eng: "Resume?"
-new: "Hervat?"
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: possible answers to resume question
-eng: "(PLAY/STOP)"
-new: "(SPEEL/STOP)"
-
-id: LANG_RESUME_CONFIRM_RECORDER
-desc: possible answer to resume question
-eng: "PLAY = Yes"
-new: "PLAY = Ja"
-
-id: LANG_RESUME_CANCEL_RECORDER
-desc: possible answer to resume question
-eng: "Any Other = No"
-new: "Ander = Nee"
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Keylock ON"
-new: "Toetsblok AAN"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Keylock OFF"
-new: "Toetsblok AF"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key lock is ON"
-new: "Toetsblok is AAN"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
-new: "Toetsblok is AF"
-
-id: LANG_MUTE_ON_PLAYER
-desc: displayed when mute is on
-eng: "Mute ON"
-new: "Stil AAN"
-
-id: LANG_MUTE_OFF_PLAYER
-desc: displayed when mute is off
-eng: "Mute OFF"
-new: "Stil UIT"
-
-id: LANG_MUTE_ON_RECORDER
-desc: displayed when mute is on
-eng: "Mute is ON"
-new: "Stil is AAN"
-
-id: LANG_MUTE_OFF_RECORDER
-desc: displayed when mute is off
-eng: "Mute is OFF"
-new: "Stil is AF"
-
-id: LANG_ID3_INFO
-desc: in the browse_id3() function
-eng: "-ID3 Info- "
-new: "-ID3 Inligting- "
-
-id: LANG_ID3_SCREEN
-desc: in the browse_id3() function
-eng: "--Screen-- "
-new: "--Skerm-- "
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-new: "[Titel]"
-
-id: LANG_ID3_NO_TITLE
-desc: in wps when no title is avaible
-eng: "<no title>"
-new: "<geen titel>"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-new: "[Kunstenaar]"
-
-id: LANG_ID3_NO_ARTIST
-desc: in wps when no artist is avaible
-eng: "<no artist>"
-new: "<geen kunstenaar>"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-new: 
-
-id: LANG_ID3_NO_ALBUM
-desc: in wps when no album is avaible
-eng: "<no album>"
-new: "<geen album>"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-new: "[Liednommer]"
-
-id: LANG_ID3_NO_TRACKNUM
-desc: in wps if no track number is avaible
-eng: "<no tracknum>"
-new: "<geen liednommer>"
-
-id: LANG_ID3_LENGHT
-desc: in wps
-eng: "[Length]"
-new: "[Lengte]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-new: "[Speellys]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-new: 
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-new: "[Frekwensie]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[Path]"
-new: "[Pad]"
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch up"
-new: "Versnel"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch down"
-new: "Vertraag"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-new: "Pause"
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "mode:"
-new: "modus:"
-
-id: LANG_DIR_FILTER
-desc: in wps F2 pressed
-eng: ""
-new: 
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-new: 
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-new: "Rol"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "bar"
-new: "balk"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End of list"
-new: "Einde van lys"
-
-id: LANG_END_CONFIRM_PLAYER
-desc: when playlist has finished
-eng: ""
-new: 
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "End of song list"
-new: "Einde van die titellys"
-
-id: LANG_END_CONFIRM_RECORDER
-desc: when playlist has finished
-eng: ""
-new: 
-
-id: LANG_SNAKE_SCORE
-desc: when you die in snake game
-eng: "Your score:"
-new: "Jou telling:"
-
-id: LANG_SNAKE_HISCORE
-desc: high score in snake game
-eng: "High Score: %d"
-new: "Hoogste Telling: %d"
-
-id: LANG_SNAKE_HISCORE_NEW
-desc: new high score in snake game
-eng: "New High Score!"
-new: "Nuwe Hoogste Telling!"
-
-id: LANG_SNAKE_PAUSE
-desc: displayed when game is paused
-eng: "Game Paused"
-new: "Spel gepauseerd"
-
-id: LANG_SNAKE_RESUME
-desc: what to do to resume game
-eng: "[PLAY] to resume"
-new: "[PLAY] om verder te gaan"
-
-id: LANG_SNAKE_QUIT
-desc: how to quit game
-eng: "[OFF] to quit"
-new: "[OFF] om te stop"
-
-id: LANG_SNAKE_LEVEL
-desc: level of difficulty
-eng: "Level - %d"
-new: "Vlak - %d"
-
-id: LANG_SNAKE_RANGE
-desc: range of levels
-eng: "(1 - slow, 9 - fast)"
-new: "(1 - stadig, 9 - vinnig)"
-
-id: LANG_SNAKE_START
-desc: how to start or pause the game
-eng: "[PLAY] to start/pause"
-new: "[PLAY] om te begin/rus"
-
-id: LANG_SOKOBAN_LEVEL
-desc: must be smaller than 6 characters
-eng: "Level"
-new: "Vlak"
-
-id: LANG_SOKOBAN_MOVE
-desc: must be smaller than 6 characters
-eng: "Moves"
-new: "Skuiwe"
-
-id: LANG_SOKOBAN_WIN
-desc: displayed when you win 
-eng: "YOU WIN!!"
-new: "JY WEN !"
-
-id: LANG_SOKOBAN_QUIT
-desc: how to quit game
-eng: "[OFF] to stop"
-new: "[OFF] om te stop"
-
-id: LANG_SOKOBAN_F1
-desc: what does F1 do
-eng: "[F1] - level"
-new: "[F1] - vlak"
-
-id: LANG_SOKOBAN_F2
-desc: what does F2 do
-eng: "[F2] same level"
-new: "[F2] selfde vlak"
-
-id: LANG_SOKOBAN_F3
-desc: what does F3 do
-eng: "[F3] + level"
-new: "[F3] volgende vlak"
-
-id: LANG_WORMLET_LENGTH
-desc: wormlet game
-eng: "Len:%d"
-new: 
-
-id: LANG_WORMLET_GROWING
-desc: wormlet game 
-eng: "Growing"
-new: "Groei"
-
-id: LANG_WORMLET_HUNGRY
-desc: wormlet game
-eng: "Hungry"
-new: "Honger"
-
-id: LANG_WORMLET_WORMED
-desc: wormlet game
-eng: "Wormed"
-new: "GeWurm"
-
-id: LANG_WORMLET_ARGH
-desc: wormlet game
-eng: "Argh"
-new: "Eina!"
-
-id: LANG_WORMLET_CRASHED
-desc: wormlet game
-eng: "Crashed"
-new: "GeCrash"
-
-id: LANG_WORMLET_HIGHSCORE
-desc: wormlet game
-eng: "Hs: %d"
-new: "Hs: %d"
-
-id: LANG_WORMLET_PLAYERS
-desc: wormlet game
-eng: "%d Players    UP/DN"
-new: "%d Spelers    UP/DN"
-
-id: LANG_WORMLET_WORMS
-desc: wormlet game
-eng: "%d Worms        L/R"
-new: "%d Wurms        L/R"
-
-id: LANG_WORMLET_REMOTE_CTRL
-desc: wormlet game
-eng: "Remote control F1"
-new: "Afstandbeheer  F1"
-
-id: LANG_WORMLET_NO_REM_CTRL
-desc: wormlet game
-eng: "No rem. control F1"
-new: "Geen afstandb.  F1"
-
-id: LANG_WORMLET_2_KEY_CTRL
-desc: wormlet game
-eng: "2 key control   F1"
-new: "2 sleutel       F1"
-
-id: LANG_WORMLET_4_KEY_CTRL
-desc: wormlet game
-eng: "4 key control   F1"
-new: "4 sleutel       F1"
-
-id: LANG_WORMLET_NO_CONTROL
-desc: wormlet game
-eng: "Out of control"
-new: "Buite Beheer"
-
-id: LANG_TETRIS_LOSE
-desc: tetris game
-eng: "You lose!"
-new: "Jy verloor!"
-
-id: LANG_TETRIS_LEVEL
-desc: tetris game
-eng: "0 Rows - Level 0"
-new: "0 Rye  -  Vlak 0"
-
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-new: "Auto Krag Af"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "new language"
-new: "Nuwe Taal"
-
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-new: "Wys Lêers"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-new: "Musiek"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-new: "Ondersteunde"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-new: "Alle"
+## general strings
 
 id: LANG_SET_BOOL_YES
 desc: bool true representation
 eng: "Yes"
+voice: ""
 new: "Ja"
 
 id: LANG_SET_BOOL_NO
 desc: bool false representation
 eng: "No"
+voice: ""
 new: "Nee"
 
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip Hold Time"
-new: "Clip Vashou" 
+id: LANG_ON
+desc: Used in a lot of places
+eng: "On"
+voice: ""
+new: "Aan"
 
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "Eternal"
-new: "Altyd" 
+id: LANG_OFF
+desc: Used in a lot of places
+eng: "Off"
+voice: ""
+new: "Af"
+
+id: LANG_RESUME_SETTING_ASK
+desc: in settings_menu
+eng: "Ask"
+voice: ""
+new: "Vra"
+
+## general messages
+
+## main menu
+
+id: LANG_SOUND_SETTINGS
+desc: in the main menu
+eng: "Sound Settings"
+voice: ""
+new: "Klank Opsies"
+
+id: LANG_GENERAL_SETTINGS
+desc: in the main menu
+eng: "General Settings"
+voice: ""
+new: "Algemene Opsies"
+
+id: LANG_INFO
+desc: in the main menu
+eng: "Info"
+voice: ""
+new: "Inligting"
+
+## Sound settings
+
+id: LANG_VOLUME
+desc: in sound_settings
+eng: "Volume"
+voice: ""
+new: ""
+
+id: LANG_BASS
+desc: in sound_settings
+eng: "Bass"
+voice: ""
+new: "Bas"
+
+id: LANG_TREBLE
+desc: in sound_settings
+eng: "Treble"
+voice: ""
+new: "Hoog"
+
+id: LANG_BALANCE
+desc: in sound_settings
+eng: "Balance"
+voice: ""
+new: "Balans"
+
+id: LANG_CHANNEL_MENU
+desc: in sound_settings
+eng: "Channels"
+voice: ""
+new: "Kanale"
+
+id: LANG_CHANNEL
+desc: in sound_settings
+eng: "Channel Configuration"
+voice: ""
+new: "Kanaal Opsies"
+
+id: LANG_CHANNEL_STEREO
+desc: in sound_settings
+eng: "Stereo"
+voice: ""
+new: "Stereo"
+
+id: LANG_CHANNEL_MONO
+desc: in sound_settings
+eng: "Mono"
+voice: ""
+new: "Mono"
+
+id: LANG_CHANNEL_LEFT
+desc: in sound_settings
+eng: "Mono Left"
+voice: ""
+new: "Mono Links"
+
+id: LANG_CHANNEL_RIGHT
+desc: in sound_settings
+eng: "Mono Right"
+voice: ""
+new: "Mono Regs"
+
+id: LANG_LOUDNESS
+desc: in sound_settings
+eng: "Loudness"
+voice: ""
+new: "Luid"
+
+id: LANG_AUTOVOL
+desc: in sound_settings
+eng: "Auto Volume"
+voice: ""
+new: ""
+
+id: LANG_DECAY
+desc: in sound_settings
+eng: "AV Decay Time"
+voice: ""
+new: "AV Terugloop"
+
+## general settings menu
+
+id: LANG_PLAYBACK
+desc: in settings_menu()
+eng: "Playback"
+voice: ""
+new: "Speel"
+
+id: LANG_FILE
+desc: in settings_menu()
+eng: "File View"
+voice: ""
+new: "Lêers"
+
+id: LANG_DISPLAY
+desc: in settings_menu()
+eng: "Display"
+voice: ""
+new: "Skerm"
+
+id: LANG_SYSTEM
+desc: in settings_menu()
+eng: "System"
+voice: ""
+new: "Stelsel"
+
+## manage settings menu
+
+id: LANG_RESET
+desc: in system_settings_menu()
+eng: "Reset settings"
+voice: ""
+new: "Stel Opsies Terug"
+
+id: LANG_RESET_ASK_RECORDER
+desc: confirm to reset settings
+eng: "Are you sure?"
+voice: ""
+new: "Seker?"
+
+id: LANG_RESET_DONE_SETTING
+desc: visual confirmation after settings reset
+eng: "Settings"
+voice: ""
+new: "Opsies"
+
+id: LANG_RESET_DONE_CLEAR
+desc: visual confirmation after settings reset
+eng: "Cleared"
+voice: ""
+new: "Skoon"
+
+id: LANG_RESET_DONE_CANCEL
+desc: Visual confirmation of cancelation
+eng: "Canceled"
+voice: ""
+new: "Gekanselleer"
+
+id: LANG_SETTINGS_SAVE_PLAYER
+desc: displayed if save settings has failed
+eng: "Save failed"
+voice: ""
+new: "Bêre gebreek"
+
+id: LANG_SETTINGS_BATTERY_PLAYER
+desc: if save settings has failed
+eng: "Batt. low?"
+voice: ""
+new: "Batt. leeg?"
+
+id: LANG_SETTINGS_SAVE_RECORDER
+desc: displayed if save settings has failed
+eng: "Save failed"
+voice: ""
+new: "Bêre gebreek"
+
+id: LANG_SETTINGS_BATTERY_RECORDER
+desc: if save settings has failed
+eng: "Is battery low?"
+voice: ""
+new: "Battery leeg?"
+
+## recording menu
+
+## equalizer menu
+
+## playlist options
+
+## info menu
+
+id: LANG_VERSION
+desc: in the main menu
+eng: "Version"
+voice: ""
+new: "Weergawe"
+
+id: LANG_DEBUG
+desc: in the main menu
+eng: "Debug (keep out!)"
+voice: ""
+new: "OntGogga"
+
+id: LANG_USB
+desc: in the main menu
+eng: "USB (sim)"
+voice: ""
+new: "USB"
+
+## playback settings menu
+
+id: LANG_SHUFFLE
+desc: in settings_menu
+eng: "Shuffle"
+voice: ""
+new: "Skommel"
+
+id: LANG_REPEAT
+desc: in settings_menu
+eng: "Repeat"
+voice: ""
+new: "Herhaal"
+
+id: LANG_REPEAT_ALL
+desc: repeat playlist once all songs have completed
+eng: "All"
+voice: ""
+new: "Alles"
+
+id: LANG_REPEAT_ONE
+desc: repeat one song
+eng: "One"
+voice: ""
+new: "Een"
+
+id: LANG_PLAY_SELECTED
+desc: in settings_menu
+eng: "Play Selected First"
+voice: ""
+new: "Speel Keuse Eerste"
+
+id: LANG_RESUME
+desc: in settings_menu
+eng: "Resume"
+voice: ""
+new: "Voort"
+
+## file view menu
+
+id: LANG_SORT_CASE
+desc: in settings_menu
+eng: "Sort Case Sensitive"
+voice: ""
+new: "Sorteer groot/klein"
+
+id: LANG_FILTER
+desc: setting name for dir filter
+eng: "Show Files"
+voice: ""
+new: "Wys Lêers"
+
+id: LANG_FILTER_ALL
+desc: show all files
+eng: "All"
+voice: ""
+new: "Alle"
+
+id: LANG_FILTER_SUPPORTED
+desc: show all file types supported by Rockbox
+eng: "Supported"
+voice: ""
+new: "Ondersteunde"
+
+id: LANG_FILTER_MUSIC
+desc: show only music-related files
+eng: "Music"
+voice: ""
+new: "Musiek"
+
+id: LANG_FOLLOW
+desc: in settings_menu
+eng: "Follow Playlist"
+voice: ""
+new: "Volg Speellys"
+
+## display settings menu
+
+id: LANG_SCROLL_MENU
+desc: in display_settings_menu()
+eng: "Scroll Speed"
+voice: ""
+new: "Rol Spoed"
 
 id: LANG_PM_MENU
 desc: in the display menu
 eng: "Peak Meter"
-new: "Piek Meter" 
+voice: ""
+new: "Piek Meter"
 
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak Hold Time"
-new: "Pieke Vashou" 
+## system settings menu
+
+id: LANG_POWEROFF_IDLE
+desc: in settings_menu
+eng: "Idle Poweroff"
+voice: ""
+new: "Auto Krag Af"
+
+## bookmarking settings menu
+
+## voice settings menu
+
+## recording settings menu
+
+## ffwd/rewind menu
+
+id: LANG_FFRW_STEP
+desc: in settings_menu
+eng: "FF/RW Min Step"
+voice: ""
+new: "FF/RW Min Stap"
+
+id: LANG_FFRW_ACCEL
+desc: in settings_menu
+eng: "FF/RW Accel"
+voice: ""
+new: "FF/RW versnelling"
+
+## crossfade menu
+
+## replaygain menu
+
+## LCD settings menu, also remote
+
+id: LANG_BACKLIGHT
+desc: in settings_menu
+eng: "Backlight"
+voice: ""
+new: "Lig"
+
+id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+desc: in display_settings_menu
+eng: "Backlight On When Plugged"
+voice: ""
+new: "Beligting Tydens Laai"
+
+id: LANG_CONTRAST
+desc: in settings_menu
+eng: "Contrast"
+voice: ""
+new: "Kontras"
+
+## scrolling menu
+
+id: LANG_SCROLL
+desc: in settings_menu
+eng: "Scroll Speed Setting Example"
+voice: ""
+new: "Rol Spoed Opsie Voorbeeld 12345"
+
+id: LANG_SCROLL_BAR
+desc: display menu, F3 substitute
+eng: "Scroll Bar"
+voice: ""
+new: "Rol balk"
+
+id: LANG_STATUS_BAR
+desc: display menu, F3 substitute
+eng: "Status Bar"
+voice: ""
+new: "Status balk"
+
+## peakmeter menu
 
 id: LANG_PM_RELEASE
 desc: in the peak meter menu
 eng: "Peak Release"
+voice: ""
 new: "Piek Terugloop"
 
 id: LANG_PM_UNITS_PER_READ
 desc: in the peak meter menu
 eng: "Units Per Read"
-new: "Eenhede Per Keer"  
+voice: ""
+new: "Eenhede Per Keer"  "
 
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-new: "Beligting Tydens Laai"
+id: LANG_PM_PEAK_HOLD
+desc: in the peak meter menu
+eng: "Peak Hold Time"
+voice: ""
+new: "Pieke Vashou"
 
-id: LANG_REPEAT
+id: LANG_PM_CLIP_HOLD
+desc: in the peak meter menu
+eng: "Clip Hold Time"
+voice: ""
+new: "Clip Vashou"
+
+id: LANG_PM_ETERNAL
+desc: in the peak meter menu
+eng: "Eternal"
+voice: ""
+new: "Altyd"
+
+## battery menu
+
+## disk menu
+
+id: LANG_SPINDOWN
 desc: in settings_menu
-eng: "Repeat"
-new: "Herhaal" 
+eng: "Disk Spindown"
+voice: ""
+new: "Disk stoptyd"
 
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-new: "Alles" 
+## time & date menu
 
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-new: "Een"
+id: LANG_TIME
+desc: in settings_menu
+eng: "Set Time/Date"
+voice: ""
+new: "Stel Tyd/Datum"
 
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-new: "Status balk"
+## limits menu
 
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-new: "Rol balk"
+## context menu (onplay menu)
+
+## playlist context menu
+
+## bookmark context menu
+
+## info screen
+
+id: LANG_ROCKBOX_INFO
+desc: displayed topmost on the info screen
+eng: "Rockbox Info:"
+voice: ""
+new: "Inligting:"
+
+id: LANG_BUFFER_STAT_PLAYER
+desc: the buffer size player-screen width, %d MB %d fraction of MB
+eng: "Buf: %d.%02dMB"
+voice: ""
+new: ""
+
+id: LANG_BUFFER_STAT_RECORDER
+desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+eng: "Buffer: %d.%02dMB"
+voice: ""
+new: ""
+
+id: LANG_BATTERY_CHARGE
+desc: tells that the battery is charging, instead of battery level
+eng: "Battery: charging"
+voice: ""
+new: "Battery: laai"
+
+## pitch screen
+
+id: LANG_PITCH_UP
+desc: in wps
+eng: "Pitch up"
+voice: ""
+new: "Versnel"
+
+id: LANG_PITCH_DOWN
+desc: in wps
+eng: "Pitch down"
+voice: ""
+new: "Vertraag"
+
+id: LANG_PAUSE
+desc: in wps
+eng: "Pause"
+voice: ""
+new: "Pause"
+
+## quickscreens
+
+id: LANG_F2_MODE
+desc: in wps F2 pressed
+eng: "mode:"
+voice: ""
+new: "modus:"
+
+id: LANG_F3_STATUS
+desc: in wps F3 pressed
+eng: "Status"
+voice: ""
+new: ""
+
+id: LANG_F3_SCROLL
+desc: in wps F3 pressed
+eng: "Scroll"
+voice: ""
+new: "Rol"
+
+id: LANG_F3_BAR
+desc: in wps F3 pressed
+eng: "bar"
+voice: ""
+new: "balk"
+
+## bookmark screen
+
+## set time screen
+
+id: LANG_TIME_SET
+desc: 
+eng: "ON to set"
+voice: ""
+new: "ON stel"
+
+id: LANG_TIME_REVERT
+desc: used in set_time()
+eng: "OFF to revert"
+voice: ""
+new: "OFF kanselleer"
+
+## while playing screen
+
+id: LANG_KEYLOCK_ON_PLAYER
+desc: displayed when key lock is on
+eng: "Keylock ON"
+voice: ""
+new: "Toetsblok AAN"
+
+id: LANG_KEYLOCK_OFF_PLAYER
+desc: displayed when key lock is turned off
+eng: "Keylock OFF"
+voice: ""
+new: "Toetsblok AF"
+
+id: LANG_KEYLOCK_ON_RECORDER
+desc: displayed when key lock is on
+eng: "Key lock is ON"
+voice: ""
+new: "Toetsblok is AAN"
+
+id: LANG_KEYLOCK_OFF_RECORDER
+desc: displayed when key lock is turned off
+eng: "Key lock is OFF"
+voice: ""
+new: "Toetsblok is AF"
+
+## recording screen
+
+## recording trigger screen
+
+## alarm screen
+
+## colour setting screen
+
+## tag viewer
+
+id: LANG_ID3_TITLE
+desc: in wps
+eng: "[Title]"
+voice: ""
+new: "[Titel]"
+
+id: LANG_ID3_ARTIST
+desc: in wps 
+eng: "[Artist]"
+voice: ""
+new: "[Kunstenaar]"
+
+id: LANG_ID3_ALBUM
+desc: in wps
+eng: "[Album]"
+voice: ""
+new: ""
+
+id: LANG_ID3_TRACKNUM
+desc: in wps
+eng: "[Tracknum]"
+voice: ""
+new: "[Liednommer]"
+
+id: LANG_ID3_PLAYLIST
+desc: in wps
+eng: "[Playlist]"
+voice: ""
+new: "[Speellys]"
+
+id: LANG_ID3_BITRATE
+desc: in wps
+eng: "[Bitrate]"
+voice: ""
+new: ""
+
+id: LANG_ID3_FRECUENCY
+desc: in wps
+eng: "[Frequency]"
+voice: ""
+new: "[Frekwensie]"
+
+id: LANG_ID3_PATH
+desc: in wps
+eng: "[Path]"
+voice: ""
+new: "[Pad]"
+
+## weekdays
+
+## months
+
+## digits and units for voice, the order is important
+
+## units for voicing
+
+## chars for spelling
+
+## file/folder voicing
+
+## file extensions for voicing
+
+## playlist handling
+
+id: LANG_PLAYLIST_LOAD
+desc: displayed on screen while loading a playlist
+eng: "Loading..."
+voice: ""
+new: "Laai..."
+
+id: LANG_PLAYLIST_SHUFFLE
+desc: displayed on screen while shuffling a playlist
+eng: "Shuffling..."
+voice: ""
+new: "Skommel..."
+
+id: LANG_PLAYLIST_BUFFER_FULL
+desc: in playlist.indices() when playlist is full
+eng: "Playlist buffer full"
+voice: ""
+new: "Speellys buffer vol"
+
+id: LANG_END_PLAYLIST_PLAYER
+desc: when playlist has finished
+eng: "End of list"
+voice: ""
+new: "Einde van lys"
+
+id: LANG_END_PLAYLIST_RECORDER
+desc: when playlist has finished
+eng: "End of song list"
+voice: ""
+new: "Einde van die titellys"
+
+## FM radio
+
+## dir/file browser
+
+id: LANG_SHOWDIR_BUFFER_FULL
+desc: in showdir(), displayed on screen when you reach buffer limit
+eng: "Dir Buffer is full!"
+voice: ""
+new: "Buffer is vol!!"
+
+id: LANG_LANGUAGE_LOADED
+desc: shown when a language has been loaded from the dir browser
+eng: "new language"
+voice: ""
+new: "Nuwe Taal"
+
+id: LANG_SETTINGS_LOADED
+desc: 
+eng: ""
+voice: ""
+new: ""
+
+id: LANG_SETTINGS_SAVED
+desc: 
+eng: ""
+voice: ""
+new: ""
+
+## tag database browser
+
+## playlist viewer
+
+## plugin loader, filetypes
+
+## misc
+
+id: LANG_RESUME_CONFIRM_PLAYER
+desc: possible answers to resume question
+eng: "(PLAY/STOP)"
+voice: ""
+new: "(SPEEL/STOP)"

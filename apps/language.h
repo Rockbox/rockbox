@@ -22,7 +22,7 @@
 
 /* both these must match the two initial bytes in the binary lang file */
 #define LANGUAGE_COOKIE  0x1a
-#define LANGUAGE_VERSION 0x02
+#define LANGUAGE_VERSION 0x03
 
 /* Initialize language array with the builtin strings */
 void lang_init(void);

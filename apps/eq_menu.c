@@ -745,8 +745,7 @@ static bool eq_save_preset(void)
 
     close(fd);
 
-    gui_syncsplash(HZ, true, (unsigned char *)"%s %s", str(LANG_SETTINGS_SAVED1),
-           str(LANG_SETTINGS_SAVED2));
+    gui_syncsplash(HZ, true, str(LANG_SETTINGS_SAVED));
 
     return true;
 }
