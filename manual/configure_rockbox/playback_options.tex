@@ -1,36 +1,36 @@
-  \subsection{\label{ref:PlaybackOptions}Playback Options}
+\section{\label{ref:PlaybackOptions}Playback Options}
   The ``Playback Options'' submenu allows you to configure settings related to audio playback.
-  
+
   \begin{itemize}
   \item \textbf{Shuffle}
     Select shuffle ON/OFF. This alters how Rockbox will select which next song to play.
   \item \textbf{Repeat}
-    The ``Repeat'' setting is for configuring settings related to repeating of directories or playlists.  Repeat modes are Off/One/All/Shuffle: 
+    The ``Repeat'' setting is for configuring settings related to repeating of directories or playlists.  Repeat modes are Off/One/All/Shuffle:
     \begin{itemize}
     \item \textbf{Off:  }``Off'' means that the current directory or playlist will not repeat when it is finished.  (Note:  If you have the ``Auto change directory'' option set to ``Yes,'' Rockbox will move on to the next directory on your hard drive.  If the ``Auto change directory'' option is set to ``No,'' playback will stop when the current directory or playlist is finished.)
     \item\textbf{One:  }``One'' means repeat one track over and over.
     \item\textbf{All:  } ``All'' means that the current directory or playlist will repeat when it is finished.  (Note:  this option does \textbf{not} shuffle all files on your \dap.  Rockbox is playlist oriented. When you play a song, or a directory, or an album, Rockbox creates a playlist and plays it. Thus, to shuffle all songs on the player, you need to create a playlist of all songs on the player, and play that playlist with shuffle mode set to ``All.'')
     \item\textbf{Shuffle:  }``Shuffle'' means that when the current directory or playlist has finished playing, it will be shuffled and then repeated.
     \end{itemize}
-    
+
   \item \textbf{Play Selected First}
     This setting controls what happens when you select a file for playback while shuffle mode is on. If the Play Selected First setting is ``Yes,'' the file you selected will be played first. If this setting is ``No,'' a random file in the directory will be played first.
   \item \textbf{Resume}
     Rockbox can be configured to start playing automatically when you turn on the \dap.  If the resume function is set to start automatically playing, Rockbox will start at the point where you last turned off the \dap.  The options for the Resume function are:
     \begin{enumerate}
-    \item\textbf{Yes:  }``Yes'' means Rockbox will unconditionally try to resume. 
+    \item\textbf{Yes:  }``Yes'' means Rockbox will unconditionally try to resume.
     \item\textbf{No:  }``No'' means Rockbox will not resume. If resume is set to ``No,'' Rockbox will start in the File Browser.
     \end{enumerate}
     Note:  Earlier versions of Rockbox had an "Ask" setting, which would ask whether to resume when the jukebox was turned on. This setting has been eliminated because it was redundant. If resume is set to ``Yes'' simply on the \dap will resume from the point where the \dap was stopped before shutdown.
- 
+
   \item \textbf{FFwd/Rewind}
     How fast you want search (fastforward or rewind) to accelerate when you hold down the button. ``Off'' means no acceleration. ``2x/1s'' means double the search speed once every second the button is held. ``2x/5s'' means double the search speed once every 5 seconds the button is held.
 
   \item \textbf{Anti-skip Buffer}
   This setting allows you to control how much music is stored in the player's memory whilst playing a song, acting as a buffer against shock or playback problems.  The player transfers the selected amount of the forthcoming song into its memory at high speed whilst you are playing the song. It keeps a ``rolling'' buffer, which keeps feeding more of the forthcoming song into memory as it goes along. If the \dap is knocked, shaken or jogged heavily while Rockbox is trying to read the hard drive, Rockbox might not be able to read the drive.  Rockbox will retry over and over again until it succeeds, but may eventually reach the end of the memory buffer.  When that happens, Rockbox must stop playing and wait for more data from the disk, which causes your music to skip.  The anti-skip setting tells Rockbox how much extra buffer memory to spare to handle this situation.  This setting therefore allows you to reduce the chances of there being a gap or pause during playback of songs.
-  
-  \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7 seconds.}  
-  \opt{SWCODEC}{The anti-skip buffer can be set to various values between 5 seconds and 10 minutes.} 
+
+  \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7 seconds.}
+  \opt{SWCODEC}{The anti-skip buffer can be set to various values between 5 seconds and 10 minutes.}
 
   \textbf{Tip:  }Having a large anti-skip buffer tends to use more power, and may reduce your battery life. It is recommended to always use the lowest possible setting that allows correct and continuous playback.
 
@@ -39,7 +39,7 @@
 
   \item \textbf{Party Mode}
     The ``Party Mode'' enables unstoppable music playback.  When new songs are selected, they are added to the end of the current dynamic playlist instead of being played immediately.  The PLAY and STOP buttons are disabled.
-    
+
   \item \textbf{Fade On Stop/Pause}
     This setting enables and disables a fade effect when you pause or stop playing a song.  If the Fade on Stop/Pause option is set to ``Yes,'' your music will fade out when you press STOP or PAUSE, and fade in when you resume playback.
 
@@ -47,7 +47,7 @@
   \item \textbf{Crossfade}
     This setting enables a cross-fader. At the end of a song, the song will fade out as the next song fades in, creating a smooth transition between songs.  Options:
   \begin{itemize}
-    \item \textbf{Enable crossfade}	 If set to ``Off,'' crossfade is disabled. If set to ``Always,'' songs will always cross-fade into one another. If set to ``Shuffle,'' crossfade is enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.
+    \item \textbf{Enable crossfade}  If set to ``Off,'' crossfade is disabled. If set to ``Always,'' songs will always cross-fade into one another. If set to ``Shuffle,'' crossfade is enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.
     \item \textbf{Fade in delay} The ``fade in delay'' and ``fade out delay'' control the offset between when the first song starts to fade out and the second song starts to fade in.
     \item \textbf{Fade in duration}  The length of time, in seconds, that it takes your music to fade in.
     \item \textbf{Fade out delay}  The ``fade in delay'' and ``fade out delay'' control the offset between when the first song starts to fade out and the second song starts to fade in.
@@ -58,58 +58,23 @@
   }
   \opt{SWCODEC}{
   \item \textbf{replaygain}
-  This allows you to control the replaygain function. The purpose of replaygain is to adjust the volume of the music played so that all songs (or albums, depending on your settings) have the same apparent volume.  This prevents sudden changes in volume when changing between songs recorded at different volume levels. 
-  
+  This allows you to control the replaygain function. The purpose of replaygain is to adjust the volume of the music played so that all songs (or albums, depending on your settings) have the same apparent volume.  This prevents sudden changes in volume when changing between songs recorded at different volume levels.
+
   For replaygain to work, the songs must have been processed by a program that adds replaygain information as ID3 tags (or vorbis tags for certain formats).  Note that APEv2 tags are not currently supported.
-  
+
   Options for replaygain are:
-		\begin{itemize}
-		\item \textbf{Enable replaygain}  This turns on/off the replaygain function.
-		\item \textbf{Prevent clipping}  Avoid clipping of a song's waveform. If a song would clip during playback, the volume is lowered for that song. Replaygain information is needed for this to work.
-		\item \textbf{Replaygain type}  Choose the type of replaygain to apply:
-		  \begin{itemize}
-			\item \textbf{Album gain} 	Maintain a constant volume level between albums, but keep any intentional volume variations between songs in an album. (If album gain value is not available, uses track gain information).
-			\item \textbf{Track gain} 	Maintain a constant volume level between tracks.  If track gain value is not available, no replaygain is applied.
-		  \item \textbf{Track gain if shuffling} 	Maintains a constant volume between tracks if shuffle mode is selected.  Reverts to album mode if shuffle is off.
-		  \end{itemize}
-		\item \textbf{Pre-amp}  This allows you to adjust the volume when replaygain is applied. Replaygain often lowers the volume, sometimes quite much, so here you can compensate for that. Please note that a (large) positive pre-amp setting can cause clipping, unless prevent clipping is enabled.  The pre-amp can be set to any decibel (dB) value between -12dB and +12dB, in increments of 0.1 dB.
-		\end{itemize}
-  	}
+    \begin{itemize}
+    \item \textbf{Enable replaygain}  This turns on/off the replaygain function.
+    \item \textbf{Prevent clipping}  Avoid clipping of a song's waveform. If a song would clip during playback, the volume is lowered for that song. Replaygain information is needed for this to work.
+    \item \textbf{Replaygain type}  Choose the type of replaygain to apply:
+      \begin{itemize}
+      \item \textbf{Album gain}   Maintain a constant volume level between albums, but keep any intentional volume variations between songs in an album. (If album gain value is not available, uses track gain information).
+      \item \textbf{Track gain}   Maintain a constant volume level between tracks.  If track gain value is not available, no replaygain is applied.
+      \item \textbf{Track gain if shuffling}  Maintains a constant volume between tracks if shuffle mode is selected.  Reverts to album mode if shuffle is off.
+      \end{itemize}
+    \item \textbf{Pre-amp}  This allows you to adjust the volume when replaygain is applied. Replaygain often lowers the volume, sometimes quite much, so here you can compensate for that. Please note that a (large) positive pre-amp setting can cause clipping, unless prevent clipping is enabled.  The pre-amp can be set to any decibel (dB) value between -12dB and +12dB, in increments of 0.1 dB.
+    \end{itemize}
+    }
   \item \textbf{Party Mode}
     The ``Party Mode'' enables unstoppable music playback.  When new songs are selected, they are added to the end of the current dynamic playlist instead of being played immediately.  The PLAY and STOP buttons are disabled.
-    
-    \opt{SWCODEC}{
-    \item \textbf{Crossfade}
-      This setting enables a cross-fader. At the end of a song, the song will fade out as the next song fades in, creating a smooth transition between songs.  Options:
-      \begin{itemize}
-      \item \textbf{Enable crossfade}	 If set to ``Off,'' crossfade is disabled. If set to ``Always,'' songs will always cross-fade into one another. If set to ``Shuffle,'' crossfade is enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.
-      \item \textbf{Fade in delay} TODO find the place in the IRC logs where Slasheri explained this.
-      \item \textbf{Fade in duration}  The length of time, in seconds, that it takes your music to fade in.
-      \item \textbf{Fade out delay}  TODO find the place in the IRC logs where Slasheri explained this.
-      \item \textbf{Fade out duration}  The length of time, in seconds, that it takes your music to fade out.
-      \item \textbf{Fade out mode}  If set to ``Crossfade," one song will fade out and the next song will simultaneously fade in.  If set to ``Mix,'' the currently playing song will fade out according to the fade out settings, but the next song will simply start, without fading in.
-      \end{itemize}
-      \textbf{TIP} The crossfade setting is particularly effective when the player is set on shuffle.
-    }
-    \opt{SWCODEC}{
-    \item \textbf{replaygain}
-      This allows you to control the replaygain function. The purpose of replaygain is to adjust the volume of the music played so that all songs (or albums, depending on your settings) have the same apparent volume.  This prevents sudden changes in volume when changing between songs recorded at different volume levels. 
-      
-      For replaygain to work, the songs must have been processed by a program that adds replaygain information as ID3 tags (or vorbis tags for certain formats).  Note that APEv2 tags are not currently supported.
-      
-      Options for replaygain are:
-      \begin{itemize}
-      \item \textbf{Enable replaygain}  This turns on/off the replaygain function.
-      \item \textbf{Prevent clipping}  Avoid clipping of a song's waveform. If a song would clip during playback, the volume is lowered for that song. Replaygain information is needed for this to work.
-      \item \textbf{Replaygain type}  Choose the type of replaygain to apply:
-	\begin{itemize}
-	\item \textbf{Album gain} 	Maintain a constant volume level between albums, but keep any intentional volume variations between songs in an album. (If album gain value is not available, uses track gain information).
-	\item \textbf{Track gain} 	Maintain a constant volume level between tracks.  If track gain value is not available, no replaygain is applied.
-	\item \textbf{Track gain if shuffling} 	Maintains a constant volume between tracks if shuffle mode is selected.  Reverts to album mode if shuffle is off.
 	\end{itemize}
-      \item \textbf{Pre-amp}  This allows you to adjust the volume when replaygain is applied. Replaygain often lowers the volume, sometimes quite much, so here you can compensate for that. Please note that a (large) positive pre-amp setting can cause clipping, unless prevent clipping is enabled.  The pre-amp can be set to any decibel (dB) value between -12dB and +12dB, in increments of 0.1 dB.
-      \end{itemize}
-    }
-  \item \textbf{ID3 tag priority}
-    ID3 tags in an MP3 file contain information about the artist, title, album etc. of the track.  This option controls whether Rockbox uses the information from ID3v2 tags in preference to that from ID3v1 tags when both types of tag are present.
-  \end{itemize}

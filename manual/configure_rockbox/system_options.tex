@@ -1,10 +1,10 @@
-  \subsection{\label{ref:SystemOptions}System Options}
-  
+\section{\label{ref:SystemOptions}System Options}
+
   \begin{itemize}
   \item \textbf{Battery:  }
     Options relating to the batteries in the \dap.
     \begin{itemize}
-    \item \textbf{Battery Capacity:  }This setting can be used to tell Rockbox what capacity (in mAh) of battery is being used inside it. 
+    \item \textbf{Battery Capacity:  }This setting can be used to tell Rockbox what capacity (in mAh) of battery is being used inside it.
       \opt{player,recorder,recorderv2fm,ondio}{The default is 1500mAh for NiMH battery based units, and 2300mAh for LiOn battery based units, which is the capacity value for the standard batteries shipped with these units.}
       \opt{h1xx,h300}{The default is 1300mAh.}
       \opt{ipodnano,ipodcolor,ipodvideo}{TODO:  correct battery values for ipod platforms.}
@@ -18,10 +18,10 @@
         The \dap cannot be turned off while the charger is connected.  Therefore, trickle charge is needed to keep the batteries full after charging has completed. For more in depth information about charging see Battery FAQ in your \textbf{/.rockbox/docs }directory.
       }
     \end{itemize}
-    
+
   \item \textbf{Disk:  }
-    Options relating to the hard disk.  
-    
+    Options relating to the hard disk.
+
     \begin{itemize}
     \item \textbf{Disk Spindown:  }
       Rockbox has a timer that makes it spin down the hard disk after it is idle for a certain amount of time.  This setting controls the amount of time between the last user activity and the time that the disk spins down.  This idle time is only affected by user activity, like navigating through file browser. When the hard disk spins up to fill mp3 buffer, it automatically spins down afterwards.
@@ -30,97 +30,97 @@
         This setting controls whether the disk is powered off or only set to ``sleep'' when spun down. If this setting is YES, the disk will power off.  If set to NO, the disk will enter ``sleep'' mode.  Power off uses less power but takes longer to spin{}-up.}
       \item \textbf{Directory cache:  }  Rockbox has the ability to scan the contents of your drive in the background and save those contents to a cache in RAM.  The Directory Cache takes a small amount of memory away from Rockbox that would otherwise be used to buffer music, but it speeds up navigation by eliminating the slight pause between the time a navigation button is pressed and the time Rockbox responds.  Turning this setting ON activates the directory cache, and turning it OFF deactivates the directory cache.  Note:  the first time you set the directory cache to ON, Rockbox will take a few minutes to scan the drive and you will need to restart the player.  Thereafter, the directory cache will work in the background.  (TODO:  confirm that these last two sentences are true.)
     \end{itemize}
-    
+
     \opt{recorder,recorderv2fm,h3xx}{
     \item \textbf{Time and Date:}
       Time related menu options.
-      
+
       \begin{itemize}
       \item \textbf{Set Time/Date: }
         Set current time and date.
       \item \textbf{Time Format: }
-        Choose 12 or 24 Hour clock. 
+        Choose 12 or 24 Hour clock.
       \end{itemize}
     }
-    
+
   \item \textbf{\label{ref:idlepoweroff}Idle Poweroff:}
     Rockbox can be configured to turn off power after the unit has been idle for a defined number of minutes.  The \dap\ is idle when playback is stopped or paused. It is not idle while the USB or charger is connected, or while recording.
-    
+
   \item \textbf{Sleep Timer:}
-    This option lets you power off your \dap after playing for a given time. 		
+    This option lets you power off your \dap after playing for a given time.
     \opt{recorderv2fm}{This setting is reset on boot.  Using this option disables the \textbf{Wake up alarm} (see below).}
     \opt{recorderv2fm}{
     \item \textbf{Wake up alarm:}
       This option turns the \dap off and then starts it up again at the specified time.  This is most useful when combined with the ``resume'' setting in the ``Playback options'' menu is set to YES, so that the \dap wakes up and immediately starts playing music. Use LEFT and RIGHT to adjust the minutes setting, UP and DOWN to adjust the HOURS.  PLAY confirms the alarm and shuts your \dap down, and STOP cancels setting an alarm.  If the \dap is turned on again before the alarm occurs, the alarm will be canceled.  Using this option disables the \textbf{Sleep Timer} (see above).
     }
-    
+
   \item \textbf{Limits:}
     This submenu relates to limits in the Rockbox operating system.
-    
+
     \begin{itemize}
     \item \textbf{Max files in dir browser:}
       This setting controls the limit on the number of files that you can put in any particular directory in the file browser. You can configure the size to be between 50 and 10000 files in steps of 50 files. The default is 400.  Higher values will shorten the music buffer, so you should increase this setting \textbf{only} if you have directories with a large number of files.
-      
+
     \item \textbf{Max playlist size:}
       This setting controls the maximum size of a playlist. The playlist size can be between 1,000 and 20,000 files, in steps of 1000.  The default is 10,000.  Higher values will shorten the music buffer, so you should increase this setting \textbf{only} if you have very large playlists.\\
     \end{itemize}
-    
+
     \opt{player,recorder,recorderv2fm}{
     \item \textbf{Car Adapter Mode}
-      This option turns on and off the car ignition auto stop function. 
-      
-      When using the \dap in a car, car adapter mode automatically stops playback on the \dap when power (i.e. from cigarette lighter power adapter) to the external DC in jack is turned off.  If the Car Adaptor Mode is set to ON, Rockbox will pause playback when the external power off condition is detected.  Rockbox will then shutdown the \dap after the length of time set in the \textbf{Idle Poweroff} setting (see above).  If power to the DC in jack is turned back on before the \textbf{Idle Poweroff} function has shut the \dap off, playback will be resumed 5 seconds after the power is applied. This delay is to allow for the time while the car engine is being started. 
-      
+      This option turns on and off the car ignition auto stop function.
+
+      When using the \dap in a car, car adapter mode automatically stops playback on the \dap when power (i.e. from cigarette lighter power adapter) to the external DC in jack is turned off.  If the Car Adaptor Mode is set to ON, Rockbox will pause playback when the external power off condition is detected.  Rockbox will then shutdown the \dap after the length of time set in the \textbf{Idle Poweroff} setting (see above).  If power to the DC in jack is turned back on before the \textbf{Idle Poweroff} function has shut the \dap off, playback will be resumed 5 seconds after the power is applied. This delay is to allow for the time while the car engine is being started.
+
       Once the \dap is shut off either manually, or automatically with the \textbf{Idle Poweroff}function, it must be powered up manually to resume playback.
     }
     \opt{player}{
     \item \textbf{Line In (Player only)}
       This option activates the line in port on \dap Player, which is off by default.
-      
+
       This is useful for such applications as:
       \begin{itemize}
       \item Game boy {}-{\textgreater} \dap {}-{\textgreater} human
       \item laptop {}-{\textgreater} \dap {}-{\textgreater}human
-      \item LAN party computer {}-{\textgreater} \dap {}-{\textgreater} human 
+      \item LAN party computer {}-{\textgreater} \dap {}-{\textgreater} human
       \end{itemize}
     }
-    
+
   \item \textbf{Manage settings}
     This submenu deals with loading and saving settings.  \opt{MASCODEC}{This submenu also allows you to load or save different firmware versions.
     }
-    
+
     \begin{itemize}
     \item \textbf{Browse .cfg Files: }
       Opens the file browser in the \textbf{/.rockbox} directory and displays all .cfg (configuration) files.  Selecting a .cfg file will cause Rockbox to load that the settings contained in that file.  STOP will exit back to the menu. (TODO--proper button configurations for different platforms.)  See the \textbf{Write .cfg files} option on the Manage Settings menu for details of how to save and edit a configuration file.
 
-		\opt{MASCODEC}{
-    \item \textbf{Browse Firmwares:} 
-      This displays a list of firmware file in the \fname{/.rockbox} system directory.  
-			\opt{recorder,recorderv2fm}{  Firmware files have an extension of .ajz.}
-			\opt{player,ondio}{  Firmware files have an extension of .mod}
-      
+    \opt{MASCODEC}{
+    \item \textbf{Browse Firmwares:}
+      This displays a list of firmware file in the \fname{/.rockbox} system directory.
+      \opt{recorder,recorderv2fm}{  Firmware files have an extension of .ajz.}
+      \opt{player,ondio}{  Firmware files have an extension of .mod}
+
       Playing a firmware file loads it into memory.  Thus, it is possible to run the original Archos firmware or a different version of Rockbox from here assuming that you have the right files installed on your disk.  There's no need of any other file or directory to be installed to use this option; the firmware is resident in that one file.
       }
     \item \textbf{Reset Settings: }
       This wipes the saved settings in the \dap and resets all settings to their default values.
       \opt{h100, h300}{  \textbf{Note:  }  You can also reset all settings to their default values by turning off the \dap\, turning it back on, and pressing the REC button (TODO--proper button def) immediately after the \dap\ turns on.  (TODO:  check if this feature is available on other platforms.}
     \item \textbf{Write .cfg file: }
-			This option writes a Rockbox configuration file to your jukebox's hard disk. The configuration file has the ".cfg" extension and is used to store all of the user settings that are described throughout this manual.
+      This option writes a Rockbox configuration file to your jukebox's hard disk. The configuration file has the ".cfg" extension and is used to store all of the user settings that are described throughout this manual.
 
-			A configuration file may reside anywhere on the hard disk. Multiple configuration files are permitted. So, for example, you could have a car.cfg file for the settings that you use while playing your jukebox in your car, and a headphones.cfg file to store the settings that you use while listening to your jukebox through headphones.
+      A configuration file may reside anywhere on the hard disk. Multiple configuration files are permitted. So, for example, you could have a car.cfg file for the settings that you use while playing your jukebox in your car, and a headphones.cfg file to store the settings that you use while listening to your jukebox through headphones.
 
-			The Rockbox configuration file is a plain text file, so once you use the \textbf{Write .cfg file} option to create the file, you can edit the file on your computer using any text editor program. Configuration files use the following formatting rules:
+      The Rockbox configuration file is a plain text file, so once you use the \textbf{Write .cfg file} option to create the file, you can edit the file on your computer using any text editor program. Configuration files use the following formatting rules:
 
-			\begin{enumerate}   
-			\item Each setting must be on a separate line.
-			\item Each line has the format ``setting: value''. 
-			\item Values must be within the ranges specified in this manual for each setting.
-			\item Lines starting with \# are ignored. This lets you write comments into your configuration files.
-			\end{enumerate}
+      \begin{enumerate}
+      \item Each setting must be on a separate line.
+      \item Each line has the format ``setting: value''.
+      \item Values must be within the ranges specified in this manual for each setting.
+      \item Lines starting with \# are ignored. This lets you write comments into your configuration files.
+      \end{enumerate}
 
-			Configuration files may be loaded using the Browse .cfg files option on the Manage Settings menu.
+      Configuration files may be loaded using the Browse .cfg files option on the Manage Settings menu.
 
-			\textbf{Hint:  }Configuration files do not need to contain all of the Rockbox options.  You can create configuration files that change only certain settings. So, for example, let's say you typically use the \dap at one volume in the car, and another when using headphones.  Further, suppose you like to use an inverse LCD when you're in the car, and a regular LCD setting when you're using headphones.  You could create configuration files that control only the volume and LCD settings. Create a few different files with different settings, give each file a different name (such as car.cfg, headphones.cfg, etc.), and you can then use the \textbf{Browse .cfg files} option to quickly change settings.
+      \textbf{Hint:  }Configuration files do not need to contain all of the Rockbox options.  You can create configuration files that change only certain settings. So, for example, let's say you typically use the \dap at one volume in the car, and another when using headphones.  Further, suppose you like to use an inverse LCD when you're in the car, and a regular LCD setting when you're using headphones.  You could create configuration files that control only the volume and LCD settings. Create a few different files with different settings, give each file a different name (such as car.cfg, headphones.cfg, etc.), and you can then use the \textbf{Browse .cfg files} option to quickly change settings.
     \end{itemize}
-    
+
   \end{itemize}
