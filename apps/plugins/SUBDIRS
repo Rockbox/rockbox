@@ -1,0 +1,32 @@
+#ifndef IRIVER_IFP7XX_SERIES
+
+/* For all targets */
+databox
+
+/* For various targets... */
+#if (CONFIG_KEYPAD == RECORDER_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
+    defined(IPOD_COLOR) || \
+    defined(IPOD_VIDEO) || \
+    defined(TOSHIBA_GIGABEAT_F)
+rockboy
+#endif
+
+/* For all targets with a bitmap display */
+#ifdef HAVE_LCD_BITMAP
+chessbox
+#endif
+
+/* For all the colour targets and iriver H1x0 */
+#if defined(HAVE_LCD_COLOR) || defined(IRIVER_H100_SERIES)
+pacbox
+#endif
+
+/* For all the color targets apart from the Gigabeat */
+#if defined(HAVE_LCD_COLOR) && !defined(TOSHIBA_GIGABEAT_F)
+doom
+#endif
+
+
+#endif /* IRIVER_IFP7XX_SERIES */

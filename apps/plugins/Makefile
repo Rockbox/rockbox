@@ -48,6 +48,9 @@ DEPFILE = $(OBJDIR)/dep-plugins
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
 
+# This sets up 'SUBDIRS' based on the directories mentioned in SUBDIRS
+include $(TOOLSDIR)/makesubdirs.inc
+
 ROCKS := $(SRC:%.c=$(OBJDIR)/%.rock)
 SOURCES = $(SRC)
 ELFS := $(SRC:%.c=$(OBJDIR)/%.elf)
@@ -55,39 +58,6 @@ OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
 # as created by the cross-compiler for win32:
 DEFS := $(SRC:%.c=$(OBJDIR)/%.def)
 DIRS = .
-
-#######################################
-# Subdirs containing multi-file plugins
-
-#for all targets
-# SUBDIRS += searchengine databox
-SUBDIRS += databox
-
-#for any recorder, iRiver or iPod model
-ifneq (,$(strip $(foreach tgt,RECORDER IRIVER IPOD_COLOR IPOD_VIDEO GIGABEAT,$(findstring $(tgt),$(TARGET)))))
-ifneq (-DIRIVER_IFP7XX,$(TARGET))
-    SUBDIRS += rockboy
-endif
-endif
-
-# chessbox is too big to fit in the 32KB Archos plugin buffer, so we only
-# build for IRIVER and IPOD targets
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO IRIVER IPOD IAUDIO GIGABEAT,$(findstring $(tgt),$(TARGET)))))
-ifneq (-DIRIVER_IFP7XX,$(TARGET))
-    SUBDIRS += chessbox
-endif
-endif
-
-# For all the colour targets and iriver H1x0
-ifneq (,$(strip $(foreach tgt,IPOD_VIDEO IPOD_NANO IPOD_COLOR IRIVER \
-                  IAUDIO_X5 GIGABEAT,$(findstring $(tgt),$(TARGET)))))
-    SUBDIRS += pacbox
-endif
-
-# Build Doom for the H300 and color ipods
-ifneq (,$(strip $(foreach tgt, IRIVER_H300 IPOD_NANO IPOD_COLOR IPOD_VIDEO IAUDIO_X5,$(findstring $(tgt),$(TARGET)))))
-    SUBDIRS += doom
-endif
 
 .PHONY: $(SUBDIRS)
 all: $(BUILDDIR)/libplugin.a $(ROCKS) $(SUBDIRS) $(DEPFILE)
