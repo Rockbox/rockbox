@@ -290,6 +290,12 @@ eng: "Crossfeed"
 voice: "Crossfeed"
 new: "Crossfeed"
 
+id: LANG_EQUALIZER
+desc: in the sound settings menu
+eng: "Equalizer"
+voice: "Equalizer"
+new: "Equalizer"
+
 ## general settings menu
 
 id: LANG_PLAYBACK
@@ -436,6 +442,102 @@ new: "Aufnahmeeinstellungen"
 
 ## equalizer menu
 
+id: LANG_EQUALIZER_ENABLED
+desc: in the equalizer settings menu
+eng: "Enable EQ"
+voice: "Enable equalizer"
+new: "EQ aktivieren"
+
+id: LANG_EQUALIZER_GRAPHICAL
+desc: in the equalizer settings menu
+eng: "Graphical EQ"
+voice: "Graphical equalizer"
+new: "Grafischer EQ"
+
+id: LANG_EQUALIZER_PRECUT
+desc: in eq settings
+eng: "Precut"
+voice: "Pre-cut"
+new:
+
+id: LANG_EQUALIZER_GAIN
+desc: in the equalizer settings menu
+eng: "Simple EQ Settings"
+voice: "Simple equalizer settings"
+new: "Einfache EQ-Einstellungen"
+
+id: LANG_EQUALIZER_ADVANCED
+desc: in the equalizer settings menu
+eng: "Advanced EQ Settings"
+voice: "Advanced equalizer settings"
+new: "Erweiterte EQ-Einstellungen"
+
+id: LANG_EQUALIZER_SAVE
+desc: in the equalizer settings menu
+eng: "Save EQ Preset"
+voice: "Save equalizer preset"
+new: "EQ-Konfiguration speichern"
+
+id: LANG_EQUALIZER_BROWSE
+desc: in the equalizer settings menu
+eng: "Browse EQ Presets"
+voice: "Browse equalizer presets"
+new: "Zeige EQ-Konfigurationen"
+
+id: LANG_EQUALIZER_EDIT_MODE
+desc: in the equalizer settings menu
+eng: "Edit mode: %s"
+voice: ""
+new: "Editiermodus: %s"
+
+id: LANG_EQUALIZER_GAIN_ITEM
+desc: in the equalizer settings menu
+eng: "%d Hz Band Gain"
+voice: ""
+new: "%d Hz Band Verstärkung"
+
+id: LANG_EQUALIZER_BAND_LOW_SHELF
+desc: in the equalizer settings menu
+eng: "Low Shelf Filter"
+voice: "Low shelf filter"
+new: "Low Shelf-Filter"
+
+id: LANG_EQUALIZER_BAND_PEAK
+desc: in the equalizer settings menu
+eng: "Peak Filter %d"
+voice: "Peak filter"
+new: "Peak-Filter %d"
+
+id: LANG_EQUALIZER_BAND_HIGH_SHELF
+desc: in the equalizer settings menu
+eng: "High Shelf Filter"
+voice: "High shelf filter"
+new: "High Shelf-Filter"
+
+id: LANG_EQUALIZER_BAND_CUTOFF
+desc: in the equalizer settings menu
+eng: "Cutoff Frequency"
+voice: "Cutoff Frequency"
+new: "Grenzfrequenz"
+
+id: LANG_EQUALIZER_BAND_CENTER
+desc: in the equalizer settings menu
+eng: "Center Frequency"
+voice: "Center frequency"
+new: "Mittenfrequenz"
+
+id: LANG_EQUALIZER_BAND_Q
+desc: in the equalizer settings menu
+eng: "Q"
+voice: "Q"
+new: "Güte"
+
+id: LANG_EQUALIZER_BAND_GAIN
+desc: in the equalizer settings menu
+eng: "Gain"
+voice: "Gain"
+new: "Anhebung"
+
 ## playlist options
 
 id: LANG_CREATE_PLAYLIST
@@ -461,6 +563,12 @@ desc: In playlist menu
 eng: "Recursively Insert Directories"
 voice: "Verzeichnisse rekursiv hinzufügen"
 new: "Verzeichnisse rekursiv hinzufügen"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+desc: in playlist options menu, option to warn when erasing dynamic playlist
+eng: "Warn When Erasing Dynamic Playlist"
+voice "Warn When Erasing Dynamic Playlist"
+new: "Warnen beim Löschen einer dynamischen Playlist"
 
 ## info menu
 
@@ -550,6 +658,12 @@ eng: "Fade On Stop/Pause"
 voice: "Ausblenden bei Stop und Pause"
 new: "Blenden bei Stop/Pause"
 
+id: LANG_PARTY_MODE
+desc: party mode
+eng: "Party Mode"
+voice: "Party Mode"
+new: "Party-Modus"
+
 id: LANG_CROSSFADE
 desc: in playback settings
 eng: "Crossfade"
@@ -615,6 +729,42 @@ desc: in settings_menu. Should we allow move to next/prev folder from last/first
 eng: "Auto change directory"
 voice: "Automatischer Verzeichniswechsel"
 new: "Autom. Verzeichniswechsel"
+
+id: LANG_TAGCACHE
+desc: in tag cache settings
+eng: "Tag cache"
+voice: "Tag cache"
+new: "Tag-Datenbank"
+
+id: LANG_TAGCACHE_DISK
+desc: in tag cache settings
+eng: "Keep on disk"
+voice: "Keep on disk"
+new: "Auf Festplatte speichern"
+
+id: LANG_TAGCACHE_RAM
+desc: in tag cache settings
+eng: "Load to ram"
+voice: "Load to ram"
+new: "In RAM laden"
+
+id: LANG_TAGCACHE_FORCE_UPDATE
+desc: in tag cache settings
+eng: "Force tag cache update"
+voice: "Force tag cache update"
+new: "Tag-Datenbank aktualisieren"
+
+id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+desc: in tag cache settings
+eng: "Updating in background"
+voice: ""
+new: "Aktualisiere im Hintergrund..."
+
+id: LANG_TAGCACHE_INIT
+desc: while initializing tagcache on boot
+eng: "Committing tagcache"
+voice: ""
+new: "Erstelle Tag-Datenbank..."
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
@@ -763,6 +913,90 @@ desc: in the display menu
 eng: "Peak Meter"
 voice: "Aussteuerungsanzeige"
 new: "Aussteuerungsanzeige"
+
+id: LANG_DEFAULT_CODEPAGE
+desc: default encoding used with id3 tags
+eng: "Default Codepage"
+voice: "Default codepage"
+new: "Zeichensatz-Voreinstellung"
+
+id: LANG_CODEPAGE_LATIN1
+desc: in codepage setting menu
+eng: "Latin1 (ISO-8859-1)"
+voice: "Latin 1"
+new: "Latein1 (ISO-8859-1)"
+
+id: LANG_CODEPAGE_GREEK
+desc: in codepage setting menu
+eng: "Greek (ISO-8859-7)"
+voice: "Greek"
+new: "Griechisch (ISO-8859-7)"
+
+id: LANG_CODEPAGE_HEBREW
+desc: in codepage setting menu
+eng: "Hebrew (ISO-8859-8)"
+voice: "Hebrew"
+new: "Hebräisch (ISO-8859-8)"
+
+id: LANG_CODEPAGE_RUSSIAN
+desc: in codepage setting menu
+eng: "Russian (CP1251)"
+voice: "Russian"
+new: "Russisch (CP1251)"
+
+id: LANG_CODEPAGE_THAI
+desc: in codepage setting menu
+eng: "Thai (ISO-8859-11)"
+voice: "Thai"
+new: "Thailändisch (ISO-8859-11)"
+
+id: LANG_CODEPAGE_ARABIC
+desc: in codepage setting menu
+eng: "Arabic (CP1256)"
+voice: "Arabic"
+new: "Arabisch (CP1256)"
+
+id: LANG_CODEPAGE_TURKISH
+desc: in codepage setting menu
+eng: "Turkish (ISO-8859-9)"
+voice: "Turkish"
+new: "Türkisch (ISO-8859-9)"
+
+id: LANG_CODEPAGE_LATIN_EXTENDED
+desc: in codepage setting menu
+eng: "Latin Extended (ISO-8859-2)"
+voice: "Latin extended"
+new: "Latein Erweitert (ISO-8859-2)"
+
+id: LANG_CODEPAGE_JAPANESE
+desc: in codepage setting menu
+eng: "Japanese (SJIS)"
+voice: "Japanese"
+new: "Japanisch (SJIS)"
+
+id: LANG_CODEPAGE_SIMPLIFIED
+desc: in codepage setting menu
+eng: "Simp. Chinese (GB2312)"
+voice: "Simplified Chinese"
+new: "Einf. Chinesisch (GB2312)"
+
+id: LANG_CODEPAGE_KOREAN
+desc: in codepage setting menu
+eng: "Korean (KSX1001)"
+voice: "Korean"
+new: "Koreanisch (KSX1001)"
+
+id: LANG_CODEPAGE_TRADITIONAL
+desc: in codepage setting menu
+eng: "Trad. Chinese (BIG5)"
+voice: "Traditional Chinese"
+new: "Trad. Chinesisch (BIG5)"
+
+id: LANG_CODEPAGE_UTF8
+decs: in codepage setting menu
+eng: "Unicode (UTF-8)"
+voice: "Unicode"
+new:
 
 ## system settings menu
 
@@ -982,6 +1216,30 @@ eng: "Trigger"
 voice: "Trigger"
 new: "Trigger"
 
+id: LANG_CLIP_LIGHT
+desc: in record settings menu.
+eng: "Clipping light"
+voice: "Clipping light"
+new: "Übersteuerungslicht"
+
+id: LANG_MAIN_UNIT
+desc: in record settings menu.
+eng: "Main unit only"
+voice: "Main unit only"
+new: "Nur Gerät"
+
+id: LANG_REMOTE_UNIT
+desc: in record settings menu.
+eng: "Remote unit only"
+voice: "Remote unit only"
+new: "Nur Fernbedienung"
+
+id: LANG_REMOTE_MAIN
+desc: in record settings menu.
+eng: "Main and remote unit"
+voice: "Main and remote unit"
+new: "Gerät und Fernbedienung"
+
 ## ffwd/rewind menu
 
 id: LANG_FFRW_STEP
@@ -1003,6 +1261,12 @@ desc: in crossfade settings menu
 eng: "Enable crossfade"
 voice: "Überblenden aktivieren"
 new: "Überblenden aktivieren"
+
+id: LANG_TRACKSKIP
+desc: in crossfade settings
+eng: "Track Skip Only"
+voice: "Track Skip Only"
+new: "Nur bei manuellem Titelwechsel"
 
 id: LANG_CROSSFADE_FADE_IN_DELAY
 desc: in crossfade settings menu
@@ -1116,11 +1380,23 @@ eng: "Backlight fade out"
 voice: "Beleuchtung ausblenden"
 new: "Beleuchtung ausblenden"
 
+id: LANG_BRIGHTNESS
+desc: in settings_menu
+eng: "Brightness"
+voice: "Brightness"
+new: "Helligkeit"
+
 id: LANG_CONTRAST
 desc: in settings_menu
 eng: "Contrast"
 voice: "Kontrast"
 new: "Kontrast"
+
+id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+desc: Backlight behaviour setting
+eng: "First keypress enables backlight only"
+voice: "First keypress enables backlight only"
+new: "1. Tastendruck aktiviert nur Beleuchtung"
 
 id: LANG_INVERT
 desc: in settings_menu
@@ -1163,6 +1439,30 @@ desc: in settings_menu
 eng: "Bar(Inverse)"
 voice: "Balken"
 new: "Balken(invertiert)"
+
+id: LANG_CLEAR_BACKDROP
+desc: text for LCD settings menu
+eng: "Clear backdrop"
+voice: "Clear backdrop"
+new: "Hintergrund entfernen"
+
+id: LANG_BACKGROUND_COLOR
+desc: menu entry to set the background color
+eng: "Background Colour"
+voice: "Background Colour"
+new: "Hintergrundfarbe"
+
+id: LANG_FOREGROUND_COLOR
+desc: menu entry to set the foreground color
+eng: "Foreground Colour"
+voice: "Foreground Colour"
+new: "Vordergrundfarbe"
+
+id: LANG_RESET_COLORS
+desc: menu
+eng: "Reset Colours"
+voice: "Reset Colours"
+new: "Farben zurücksetzen"
 
 id: LANG_REDUCE_TICKING
 desc: in remote lcd settings menu
@@ -1225,6 +1525,26 @@ desc: (player) Delay before making a jump scroll
 eng: "Jump Scroll Delay"
 voice: "Sprung-Scroll Verzögerung"
 new: "Sprung-Scroll Verzögerung"
+
+id: LANG_SCREEN_SCROLL_VIEW
+desc: should lines scroll out of the screen
+eng: "Screen Scrolls Out Of View"
+voice: "Screen Scrolls Out Of View"
+new: "Über Bildschirmrand scrollen"
+
+id: LANG_SCREEN_SCROLL_STEP
+desc: Pixels to advance per Screen scroll
+eng: "Screen Scroll Step Size"
+voice: "Screen Scroll Step Size"
+new: "Schrittweite beim Scrollen"
+
+id: LANG_SCROLL_PAGINATED
+desc: jump to new page when scrolling
+eng: "Paged Scrolling"
+voice: "Paged scrolling"
+new: "Scrollen seitenweise"
+
+#status-/scrollbar menu
 
 id: LANG_SCROLL_BAR
 desc: display menu, F3 substitute
@@ -1466,11 +1786,41 @@ eng: "Rename"
 voice: "Umbenennen"
 new: "Umbenennen"
 
+id: LANG_CUT
+desc: The verb/action Cut
+eng: "Cut"
+voice: "Cut"
+new: "Ausschneiden"
+
+id: LANG_COPY
+desc: The verb/action Copy
+eng: "Copy"
+voice: "Copy"
+new: "Kopieren"
+
+id: LANG_PASTE
+desc: The verb/action Paste
+eng: "Paste"
+voice: "Paste"
+new: "Einfügen"
+
+id: LANG_REALLY_OVERWRITE
+desc: The verb/action Paste
+eng: "File/directory exists. Overwrite?"
+voice: ""
+new: "Datei/Verzeichnis existiert. Überschreiben?"
+
 id: LANG_DELETE
 desc: The verb/action Delete
 eng: "Delete"
 voice: "Löschen"
 new: "Löschen"
+
+id: LANG_SET_AS_BACKDROP
+desc: text for onplay menu entry
+eng: "Set as backdrop"
+voice: "Set as backdrop"
+new: "Als Hintergrund setzen"
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
@@ -1501,6 +1851,12 @@ desc: in main menu
 eng: "Create directory"
 voice: "Verzeichnis anlegen"
 new: "Verzeichnis anlegen"
+
+id: LANG_PITCH
+desc: "pitch" in the pitch screen
+eng: "Pitch"
+voice: "Pitch"
+new: "Tempo"
 
 ## playlist context menu
 
@@ -1557,6 +1913,24 @@ desc: in onplay menu.  queue a track/playlist at end of playlist.
 eng: "Queue last"
 voice: "Warteschlange als Letzten"
 new: "Warteschlange als Letzten"
+
+id: LANG_QUEUE_SHUFFLED
+desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+eng: "Queue shuffled"
+voice: "Queue shuffled"
+new: "Zufällig in Warteschlange"
+
+id: LANG_SEARCH_IN_PLAYLIST
+desc: in playlist menu.
+eng: "Search In Playlist"
+voice: "Search In Playlist"
+new: "Playlist durchsuchen"
+
+id: LANG_PLAYLIST_SEARCH_MSG
+desc: splash number of tracks inserted
+eng: "Searching... %d found (%s)"
+voice: ""
+new: "Suche... %d gefunden (%s)"
 
 ## bookmark context menu
 
@@ -1672,7 +2046,7 @@ id: LANG_F2_MODE
 desc: in wps F2 pressed
 eng: "Mode:"
 voice: ""
-new: "modus:"
+new: ":"
 
 id: LANG_F3_STATUS
 desc: in wps F3 pressed
@@ -1850,6 +2224,18 @@ eng: "Gain Right"
 voice: ""
 new: "V. Rechts"
 
+id: LANG_RECORDING_GAIN_ANALOG
+desc: in the recording screen
+eng: "A"
+voice: ""
+new:
+
+id: LANG_RECORDING_GAIN_DIGITAL
+desc: in the recording screen
+eng: "D"
+voice: ""
+new:
+
 id: LANG_DISK_FULL
 desc: in recording screen
 eng: "The disk is full. Press OFF to continue."
@@ -1964,6 +2350,24 @@ new: "Alarm ausgeschaltet"
 
 ## colour setting screen
 
+id: LANG_COLOR_RGB_LABELS
+desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+eng: "RGB"
+voice:
+new:
+
+id: LANG_COLOR_RGB_VALUE
+desc: in color screen
+eng: "RGB: %02X%02X%02X"
+voice:
+new:
+
+id: LANG_COLOR_UNACCEPTABLE
+desc: splash when user selects an invalid colour
+eng: "Invalid colour"
+voice: ""
+new: "Unzulässige Farbe"
+
 ## tag viewer
 
 id: LANG_ID3_TITLE
@@ -2001,6 +2405,12 @@ desc: ID3 info 'year'
 eng: "[Year]"
 voice: ""
 new: "[Jahr]"
+
+id: LANG_ID3_LENGTH
+desc: in tag viewer
+eng: "[Length]"
+voice: ""
+new: "[Länge]"
 
 id: LANG_ID3_PLAYLIST
 desc: in wps
@@ -2742,6 +3152,12 @@ eng: ""
 voice: "RWPS"
 new: ""
 
+id: VOICE_EXT_KBD
+desc: spoken only, for file extension
+eng: ""
+voice: "keyboard"
+new:
+
 ## playlist handling
 
 id: LANG_PLAYLIST_LOAD
@@ -2803,6 +3219,12 @@ desc: Asked from onplay screen
 eng: "Recursively?"
 voice: ""
 new: "Rekursiv?"
+
+id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+desc: prompt shown when about to erase a modified dynamic playlist
+eng: "Erase dynamic playlist?"
+voice ""
+new: "Dynamische Playlist löschen?"
 
 id: LANG_NOTHING_TO_RESUME
 desc: Error message displayed when resume button pressed but no playlist
@@ -3048,6 +3470,24 @@ eng: "No files"
 voice: "Keine Dateien"
 new: "Keine Dateien"
 
+id: LANG_BACKDROP_LOADED
+desc: text for splash to indicate a new backdrop has been loaded successfully
+eng: "Backdrop loaded"
+voice: ""
+new: "Hintergrund geladen"
+
+id: LANG_BACKDROP_FAILED
+desc: text for splash to indicate a failure to load a bitmap as backdrop
+eng: "Backdrop failed"
+voice: ""
+new: "Hintergrundfehler"
+
+id: LANG_KEYBOARD_LOADED
+desc: shown when a keyboard has been loaded from the dir browser
+eng: "New Keyboard"
+voice: ""
+new: "Neues Tastaturlayout"
+
 ## tag database browser
 
 id: LANG_ID3DB_ARTISTS
@@ -3067,6 +3507,12 @@ desc: ID3 virtual folder name
 eng: "Songs"
 voice: ""
 new: "Titel"
+
+id: LANG_ID3DB_GENRES
+desc: in tag cache
+eng: "Genres"
+voice: ""
+new:
 
 id: LANG_ID3DB_SEARCH
 desc: ID3 virtual folder name
