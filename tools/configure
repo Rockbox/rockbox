@@ -1001,6 +1001,9 @@ fi
               ;;
           h1??)
               archos="h1xx"
+              ;;
+          ipodmini2g)
+              archos="ipodmini"
               ;;        
           *)
               ;;
