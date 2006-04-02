@@ -119,6 +119,18 @@
 #define UI_LCD_WIDTH                160
 #define UI_LCD_HEIGHT               128
 
+#elif defined(IPOD_MINI) || defined(IPOD_MINI2G)
+#define UI_TITLE                    "iPod mini"
+#define UI_WIDTH                    191 /* width of GUI window */
+#define UI_HEIGHT                   365 /* height of GUI window */
+#define UI_LCD_BGCOLOR              100, 135, 100 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         223, 216, 255 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_POSX                 24 /* x position of lcd */
+#define UI_LCD_POSY                 17 /* y position of lcd */
+#define UI_LCD_WIDTH                138
+#define UI_LCD_HEIGHT               110
+
 #elif defined(IPOD_COLOR)
 #define UI_TITLE                    "iPod Color"
 #define UI_WIDTH                    261 /* width of GUI window */
