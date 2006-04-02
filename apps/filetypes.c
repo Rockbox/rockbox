@@ -44,7 +44,7 @@
 #if CONFIG_CODEC == SWCODEC
 #define MAX_FILETYPES 64
 #else
-#define MAX_FILETYPES 40
+#define MAX_FILETYPES 48
 #endif
 
 /* max exttypes (extensions stored here) */
