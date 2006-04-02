@@ -173,7 +173,7 @@ static struct index_entry *find_entry_ram(const char *filename,
     else
         i = 0;
     
-    for (; i < hdr->h.entry_count - last_pos; i++)
+    for (; i < hdr->h.entry_count; i++)
     {
         if (hdr->indices[i].tag_seek[tag_filename] == (long)dc)
         {
