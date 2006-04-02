@@ -49,6 +49,9 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODMINI /* port controlled */
 
+/* We can fade the backlight by using PWM */
+#define HAVE_BACKLIGHT_PWM_FADING
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */
