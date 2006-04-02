@@ -666,7 +666,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    rb->lcd_clear_display();
 
-//   systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
+   systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
    general_translucency = default_translucency;                    // phares
    D_DoomMain ();
 

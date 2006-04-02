@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.3  2006/04/02 01:52:44  kkurbjun
+ * Revision 1.4  2006/04/02 20:45:24  kkurbjun
+ * Properly ifdef H300 video code, fix commented line handling rockbox volume
+ *
+ * Revision 1.3  2006-04-02 01:52:44  kkurbjun
  * Update adds prboom's high resolution support, also makes the scaling for platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table code has been removed.  Also fixed a pallete bug.  Some graphic errors are present in menu and status bar.  Also updates some headers and output formatting.
  *
  * Revision 1.2  2006-03-28 17:20:49  christian
@@ -322,9 +325,10 @@ void I_UpdateNoBlit (void)
 
 void I_FinishUpdate (void)
 {
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#if defined(IRIVER_H300_SERIES) && !defined(SIMULATOR)
    /*
-      Lookup tables are no longer needed
+      Lookup tables are no longer needed (H300 specific, decreases timedemo
+      by about 500 tics)
    */
 
    // Start the write
@@ -391,7 +395,7 @@ void I_InitGraphics(void)
 
    printf("Starting Graphics engine\n");
 
-   /* Note: The other screens are initialized later */
+   /* Note: The other screens are allocated as needed */
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
