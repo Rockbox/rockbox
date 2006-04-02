@@ -66,6 +66,10 @@ Example ".ss" file, and one with a saved state:
 
 PLUGIN_HEADER
 
+/* here is a global api struct pointer. while not strictly necessary,
+   it's nice not to have to pass the api pointer in all function calls
+   in the plugin */
+
 struct plugin_api* rb;
 
 /* The bitmaps */
@@ -887,7 +891,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
     result=rb->menu_show(m);
 
     switch (result) {
-        case 0: /* Save state */
+        case 0: /* Audio playback */
             playback_control(rb);
             break;
 
@@ -991,10 +995,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(true);
 
         switch(button){
+#ifdef SUDOKU_BUTTON_QUIT
             /* Exit game */
             case SUDOKU_BUTTON_QUIT:
                 exit=1;
                 break;
+#endif
 
       /* Increment digit */
 #ifdef SUDOKU_BUTTON_ALTTOGGLE
@@ -1037,26 +1043,74 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 update_cell(&state,state.y,state.x);
                 break;
 
+#ifdef SUDOKU_BUTTON_TOGGLEBACK
+            case SUDOKU_BUTTON_TOGGLEBACK | BUTTON_REPEAT:
+                /* Slow down the repeat speed to 1/3 second */
+                if ((*rb->current_tick-ticks) < (HZ/3)) {
+                    break;
+                }
+
+            case SUDOKU_BUTTON_TOGGLEBACK:
+                /* Decrement digit */
+                ticks=*rb->current_tick;
+                if (state.editmode) {
+                    if (state.startboard[state.y][state.x]=='0') { 
+                        state.startboard[state.y][state.x]='9';
+                        state.currentboard[state.y][state.x]='9';
+                    } else {
+                        state.startboard[state.y][state.x]--;
+                        state.currentboard[state.y][state.x]--;
+                    }
+                } else {
+                    if (state.startboard[state.y][state.x]=='0') {
+                        if (state.currentboard[state.y][state.x]=='0') { 
+                            state.currentboard[state.y][state.x]='9';
+                        } else {
+                            state.currentboard[state.y][state.x]--;
+                        }
+                    }
+                }
+                update_cell(&state,state.y,state.x);
+                break;
+#endif
+
                 /* move cursor left */
-            case BUTTON_LEFT:
-            case (BUTTON_LEFT | BUTTON_REPEAT):
+            case SUDOKU_BUTTON_LEFT:
+            case (SUDOKU_BUTTON_LEFT | BUTTON_REPEAT):
                 if (state.x==0) {
+#ifndef SUDOKU_BUTTON_UP
+                    if (state.y==0) {
+                        move_cursor(&state,8,8);
+                    } else { 
+                        move_cursor(&state,8,state.y-1);
+                    }
+#else
                     move_cursor(&state,8,state.y);
+#endif
                 } else { 
                     move_cursor(&state,state.x-1,state.y);
                 }
                 break;
                 
                 /* move cursor right */
-            case BUTTON_RIGHT:
-            case (BUTTON_RIGHT | BUTTON_REPEAT):
+            case SUDOKU_BUTTON_RIGHT:
+            case (SUDOKU_BUTTON_RIGHT | BUTTON_REPEAT):
                 if (state.x==8) {
+#ifndef SUDOKU_BUTTON_DOWN
+                    if (state.y==8) {
+                        move_cursor(&state,0,0);
+                    } else { 
+                        move_cursor(&state,0,state.y+1);
+                    }
+#else
                     move_cursor(&state,0,state.y);
+#endif
                 } else { 
                     move_cursor(&state,state.x+1,state.y);
                 }
                 break;
 
+#ifdef SUDOKU_BUTTON_UP
                 /* move cursor up */
             case SUDOKU_BUTTON_UP:
             case (SUDOKU_BUTTON_UP | BUTTON_REPEAT):
@@ -1066,7 +1120,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     move_cursor(&state,state.x,state.y-1);
                 }
                 break;
+#endif
 
+#ifdef SUDOKU_BUTTON_DOWN
                 /* move cursor down */
             case SUDOKU_BUTTON_DOWN:
             case (SUDOKU_BUTTON_DOWN | BUTTON_REPEAT):
@@ -1076,6 +1132,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     move_cursor(&state,state.x,state.y+1);
                 }
                 break;
+#endif
 
             case SUDOKU_BUTTON_MENU:
 #ifdef SUDOKU_BUTTON_MENU_PRE
