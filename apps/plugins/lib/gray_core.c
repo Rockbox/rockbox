@@ -278,9 +278,9 @@ void gray_show(bool enable)
         gray_update();
 #else /* !SIMULATOR */
 #if CONFIG_LCD == LCD_SSD1815
-        _gray_rb->timer_register(1, NULL, CPU_FREQ / 67, 1, _timer_isr);
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 67, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_S1D15E06
-        _gray_rb->timer_register(1, NULL, CPU_FREQ / 70, 1, _timer_isr);
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 70, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
         /* TODO: implement for iFP */
         (void)_timer_isr;

@@ -923,7 +923,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #endif
 
     calc_period();
-    rb->timer_register(1, NULL, CPU_FREQ/1024, 1, timer_callback);
+    rb->timer_register(1, NULL, TIMER_FREQ/1024, 1, timer_callback);
     draw_display();
 
     /* main loop */

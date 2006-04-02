@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.2  2006/04/02 01:52:44  kkurbjun
+// Revision 1.3  2006/04/02 12:45:29  amiconn
+// Use TIMER_FREQ for timers in plugins. Fixes timer speed on iPod.
+//
+// Revision 1.2  2006-04-02 01:52:44  kkurbjun
 // Update adds prboom's high resolution support, also makes the scaling for platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table code has been removed.  Also fixed a pallete bug.  Some graphic errors are present in menu and status bar.  Also updates some headers and output formatting.
 //
 // Revision 1.1  2006-03-28 15:44:01  dave
@@ -84,7 +87,7 @@ int  I_GetTime (void)
 void I_Init (void)
 {
 #if (CONFIG_CPU != PP5020) && !defined(SIMULATOR)
-   rb->timer_register(1, NULL, CPU_FREQ/TICRATE, 1, doomtime);
+   rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime);
 #endif
    I_InitSound();
 }

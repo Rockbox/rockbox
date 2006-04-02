@@ -219,8 +219,8 @@ void timer_init(unsigned hz, unsigned to)
 {
     rb->memset(&gTimer, 0, sizeof(gTimer));
     
-    gTimer.transmit = FREQ / hz; /* time for bit transitions */
-    gTimer.timeout = FREQ / to; /* time for receive timeout */
+    gTimer.transmit = TIMER_FREQ / hz; /* time for bit transitions */
+    gTimer.timeout = TIMER_FREQ / to; /* time for receive timeout */
 }
 
 
