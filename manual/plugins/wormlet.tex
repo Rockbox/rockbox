@@ -1,160 +1,91 @@
 \subsection{Wormlet}
-  [Warning: Image ignored] % Unhandled or unsupported graphics:
-%\screenshot{images/rockbox-manual-img47.png}{Wormlet game}{}
-
-Wormlet is a multi{}-user multi{}-worm game on a multi{}-threaded
+\screenshot{plugins/images/ss-wormlet-\genericimg.png}{Wormlet game}{img:wormlet}
+Wormlet is a \opt{RECORDER_PAD}{multi{}-user }multi{}-worm game on a multi{}-threaded
 multi{}-functional Rockbox console. You navigate a hungry little worm.
 Help your worm to find food and to avoid poisoned argh{}-tiles. The
 goal is to turn your tiny worm into a big worm for as long as possible.
 
+\opt{RECORDER_PAD}{
 For 2{}-player games a remote control is not necessary but recommended.
-If you try to hold the Jukebox in the four hands of two players
+If you try to hold the \dap\ in the four hands of two players
 you'll find out why. Games with three players are only
-possible using a remote control.
+possible using a remote control.\\}
+
 
 {\bfseries
-Wormlet main menu controls:}
+Menu controls:}
 
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-KEY & ACTION \\\hline
-UP/DOWN & Selects number of players \\\hline
-LEFT/RIGHT & Controls number of worms on the game \\\hline
-F1 & Selects game mode. \\\hline
-\end{tabular}
-\end{center}
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    \ButtonLeft\ / \ButtonRight & Controls number of worms in the game\\
+    \opt{RECORDER_PAD}{
+        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+            {\ButtonUp\ / \ButtonDown}
+            \opt{IPOD_4G_PAD}{\ButtonMenu\ / \ButtonPlay} & Selects number of players\\
+        \ButtonFOne & Selects game mode.\\}\bottomrule
+    \end{tabular}
+    \end{center}
 \end{table}
+
+%The following table is only for the recorder version of the game, since the
+%other versions do not support either multi player or different control modes.
+%It is however prepared for the other targets should they ever support these
+%features. Also some other parts of the text is "opted" out for these targets.
 
 {\bfseries
 Game controls:}
 
-\begin{center}
-\begin{tabular}{|p{2.162cm}|p{1.67cm}|p{3.813cm}p{4.256cm}p{4.1000004cm}|}
-\hline
-{\centering\bfseries\itshape
-Players
-\par}
-&
-{\centering\bfseries\itshape
-MODES
-\par}
-&
-\multicolumn{1}{p{3.813cm}|}{{\centering\bfseries\itshape
-PLAYER 1
-\par}
-}&
-\multicolumn{1}{p{4.256cm}|}{{\centering\bfseries\itshape
-PLAYER 2
-\par}
-}&
-{\centering\bfseries\itshape
-PLAYER 3
-\par}
-\\\hline
-{\centering
-0
-\par}
-&
-{\centering
-Out of control
-\par}
-&
-\multicolumn{3}{p{12.569cm}|}{With no player taking part in the game all
-worms are out of control and steered by artificial stupidity.
-}\\\hline
-\multicolumn{1}{|p{2.162cm}}{{\centering
-1
-\par}
-}&
-\multicolumn{4}{p{14.439cm}}{\hspace*{-\tabcolsep}\begin{tabular}{|p{1.67cm}|p{3.813cm}|p{4.256cm}|p{4.1000004cm}|}
+\opt{RECORDER_PAD}{
+\renewcommand{\arraystretch}{1.8}
+\begin{tabularx}{\textwidth}{c X p{3cm} p{3cm} p{3cm}}\toprule
+\textbf{Players} & \textbf{Modes} & \textbf{Player 1} & \textbf{Player 2}
+                        & \textbf{Player 3}\\\midrule
+%
+0 & Out of control & \multicolumn{3}{p{9cm}}{With no player taking part in the
+    game all worms are out of control and steered by artificial stupidity.}\\
+%
+\multirow{2}{*}{1} & 2 key control & on \dap\ \ButtonLeft: turn left
+                        \ButtonRight: turn right & {}- & {}-\\
+                    & 4 key control & on \dap\ \ButtonLeft: turn  left
+                        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+                            {\ButtonUp}\opt{IPOD_4G_PAD}{\ButtonMenu}: turn up
+                            \ButtonRight: turn right
+                            \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+                            {\ButtonDown}\opt{IPOD_4G_PAD}{\ButtonPlay}: turn down & {}- & {}- \\
+%
+\multirow{2}{*}{2} & Remote control & on \dap\ \ButtonLeft: turn left
+                        \ButtonRight: turn right & on remote control VOL DOWN:
+                        turn left VOL UP: turn right & {}- \\
+                    & No remote control & on \dap\ \ButtonLeft: turn left
+                        \ButtonRight: turn right & on \dap\ \ButtonFTwo: turn
+                        left \ButtonFThree: turn right & {}- \\
+3 & Remote control & on \dap\ \ButtonLeft: turn left \ButtonRight: turn right
+                        & on remote control VOL DOWN: turn left VOL UP: turn
+                        right & on \dap\ \ButtonFTwo: turn left \ButtonFThree:
+                        turn right \\\bottomrule
+\end{tabularx}
+\renewcommand{\arraystretch}{1.0}
+}
 
-{\centering
-2 key control
-\par}
-&
-on Jukebox\newline
-LEFT: turn left\newline
-RIGHT: turn right
-&
-{}-
-&
-{}-
-\\\hline
-{\centering
-4 key control
-\par}
-&
-on Jukebox\newline
-LEFT: turn  left\newline
-UP: turn up\newline
-RIGHT: turn right\newline
-DOWN: turn down
-&
-{}-
-&
-{}-
-\\\hline
-\end{tabular}\hspace*{-\tabcolsep}
-}\\\cline{1-1}
-\multicolumn{1}{|p{2.162cm}}{{\centering
-2
-\par}
-}&
-\multicolumn{4}{p{14.439cm}}{\hspace*{-\tabcolsep}\begin{tabular}{|p{1.67cm}|p{3.813cm}|p{4.256cm}|p{4.1000004cm}|}
-
-{\centering
-Remote control
-\par}
-&
-on Jukebox\newline
-LEFT: turn left\newline
-RIGHT: turn right
-&
-on remote control\newline
-VOL DOWN: turn left\newline
-VOL UP: turn right
-&
-{}-
-\\\hline
-{\centering
-No remote control
-\par}
-&
-on Jukebox\newline
-LEFT: turn left\newline
-RIGHT: turn right
-&
-on Jukebox\newline
-F2: turn left\newline
-F3: turn right
-&
-{}-
-\\\hline
-\end{tabular}\hspace*{-\tabcolsep}
-}\\\cline{1-1}
-{\centering
-3
-\par}
-&
-{\centering
-Remote control
-\par}
-&
-\multicolumn{1}{p{3.813cm}|}{on Jukebox\newline
-LEFT: turn left\newline
-RIGHT: turn right
-}&
-\multicolumn{1}{p{4.256cm}|}{on remote control\newline
-VOL DOWN: turn left\newline
-VOL UP: turn right
-}&
-on Jukebox\newline
-F2: turn left\newline
-F3: turn right
-\\\hline
-\end{tabular}\end{center}
+\opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
+\begin{table}[ht!]
+    \begin{center}
+    \begin{tabular}{ll}\toprule
+    \textbf{Key} & \textbf{Action}\\\midrule
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonLeft} & Turn left\\
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonRight} & Turn right\\
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+        \opt{IPOD_4G_PAD}{\ButtonMenu} & Turn Up\\
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
+        \opt{IPOD_4G_PAD}{\ButtonPlay} & Turn Down\\\bottomrule
+    \end{tabular}
+    \end{center}
+\end{table}
+}
 
 \subsubsection{The game}
 Use the control keys of your worm to navigate around obstacles and find
@@ -190,18 +121,34 @@ doesn't survive.
 The game is over when all worms are dead. The longest worm wins the
 game. 
 \item \textbf{Pause the game}
-Press the PLAY key to pause the game. Hit PLAY again to resume the game.
+Press
+\opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+to pause the game. Hit
+\opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+again to resume the game.
 
 \item \textbf{Stop the game}
 There are two ways to stop a running game.
 
 \begin{itemize}
-\item If you want to quit Wormlet entirely simply hit the OFF button.
+\item If you want to quit Wormlet entirely simply hit
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}.
 The game will stop immediately and you will return to the game menu. 
-\item If you want to stop the game and still see the screen hit the ON
-button. This freezes the game. If you hit the ON button again a new
-game starts with the same configuration. To return to the games menu
-you can hit the OFF button. A stopped game can not be resumed. 
+\item If you want to stop the game and still see the screen hit 
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}
+\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}.
+This freezes the game. If you hit
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}
+\opt{IPOD_4G_PAD}{\ButtonSelect+ButtonPlay}.
+button again a new game starts with the same configuration. To return to the
+games menu you can hit
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}. A stopped game can not be resumed. 
 \end{itemize}
 \end{itemize}
 
@@ -239,9 +186,9 @@ can make the worm say ``Argh!'' it's your job to say ``Argh!'' aloud.
 
 \item \textbf{Wormed:}
 The worm tried to eat another worm or even itself.
-That's why it's dead now.  Making traps for other players with a worm is a good way to get them out of the game.
+That's why it's dead now.  Making traps for other players with a worm
+is a good way to get them out of the game.
 \end{itemize}
-
 
 \subsubsection{Hints}
 
@@ -249,19 +196,25 @@ That's why it's dead now.  Making traps for other players with a worm is a good 
 
 \item Initially you will be busy with controlling your worm. Try to
 avoid other worms and crawl far away from them. Wait until they curl up
-themselves and collect the food afterwards. Don't worry if the other worms grow longer than yours {}- you can catch up after they've died. 
+themselves and collect the food afterwards. Don't worry if the other
+worms grow longer than yours {}- you can catch up after they've died. 
 
 \item When you are more experienced watch the tactics of other worms.
 Those worms controlled by artificial stupidity head straight for the
 nearest piece of food. Let the other worm have its next piece of food
 and head for the food it would probably want next. Try to put yourself
-between the opponent and that food. From now on you can 'control' the other worm by blocking it. You could trap it by making a 1 pixel wide U{}-turn. You also could move from food to food and make sure you keep between your opponent and
-the food. So you can always reach it before your opponent. 
+between the opponent and that food. From now on you can 'control' the
+other worm by blocking it. You could trap it by making a 1 pixel wide
+U{}-turn. You also could move from food to food and make sure you keep
+between your opponent and the food. So you can always reach it before
+your opponent. 
 
-\item While playing the game the Jukebox can still play music. For
-single player game use any music you like. For berserk games with 2 players use hard rock and for 3 player games use heavy metal or X{}-Phobie
+\opt{RECORDER_PAD}{
+\item While playing the game the \dap\ can still play music. For
+single player game use any music you like. For berserk games with 2 players use
+hard rock and for 3 player games use heavy metal or X{}-Phobie
 (\url{http://www.x-phobie.de/}).
 Play fair and don't kick your opponent in the toe or
 poke him in the eye. That would be bad manners.
+}
 \end{itemize}
-
