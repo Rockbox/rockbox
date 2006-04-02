@@ -29,21 +29,14 @@
  *
  *-----------------------------------------------------------------------------*/
 
-#include "doomdef.h"
-
+#include "doomstat.h"
 #include "m_bbox.h"
-
 #include "i_system.h"
-
 #include "r_main.h"
+#include "r_segs.h"
 #include "r_plane.h"
 #include "r_things.h"
-
-// State.
-#include "doomstat.h"
-#include "r_state.h"
-#include "r_segs.h"
-#include "rockmacros.h"
+#include "r_bsp.h" // cph - sanity checking
 
 seg_t     *curline;
 side_t    *sidedef;
@@ -52,14 +45,19 @@ sector_t  *frontsector;
 sector_t  *backsector;
 drawseg_t *ds_p;
 
+// killough 4/7/98: indicates doors closed wrt automap bugfix:
+// cph - replaced by linedef rendering flags - int      doorclosed;
 
+// killough: New code which removes 2s linedef limit
 drawseg_t *drawsegs;
 unsigned  maxdrawsegs;
+// drawseg_t drawsegs[MAXDRAWSEGS];       // old code -- killough
 
 //
 // R_ClearDrawSegs
 //
-void R_ClearDrawSegs (void)
+
+void R_ClearDrawSegs(void)
 {
    ds_p = drawsegs;
 }
@@ -79,16 +77,24 @@ byte solidcol[SCREENWIDTH] IBSS_ATTR;
 void R_ClipWallSegment(int first, int last, boolean solid)
 {
    byte *p;
-   while (first < last) {
-      if (solidcol[first]) {
-         if (!(p = memchr(solidcol+first, 0, last-first))) return; // All solid
+   while (first < last)
+   {
+      if (solidcol[first])
+      {
+         if (!(p = memchr(solidcol+first, 0, last-first)))
+            return; // All solid
          first = p - solidcol;
-      } else {
+      }
+      else
+      {
          int to;
-         if (!(p = memchr(solidcol+first, 1, last-first))) to = last;
-         else to = p - solidcol;
+         if (!(p = memchr(solidcol+first, 1, last-first)))
+            to = last;
+         else
+            to = p - solidcol;
          R_StoreWallRange(first, to-1);
-         if (solid) {
+         if (solid)
+         {
             memset(solidcol+first,1,to-first);
          }
          first = to;
@@ -136,7 +142,8 @@ static void R_RecalcLineFlags(void)
          )
       )
       linedef->r_flags = RF_CLOSED;
-   else {
+   else
+   {
       // Reject empty lines used for triggers
       //  and special events.
       // Identical floor and ceiling on both sides,
@@ -151,17 +158,22 @@ static void R_RecalcLineFlags(void)
                       sizeof(frontsector->ceiling_xoffs) + sizeof(frontsector->ceiling_yoffs) +
                       sizeof(frontsector->ceilingpic) + sizeof(frontsector->floorpic) +
                       sizeof(frontsector->lightlevel) + sizeof(frontsector->floorlightsec) +
-                      sizeof(frontsector->ceilinglightsec))) {
-         linedef->r_flags = 0; return;
-      } else
+                      sizeof(frontsector->ceilinglightsec)))
+      {
+         linedef->r_flags = 0;
+         return;
+      }
+      else
          linedef->r_flags = RF_IGNORE;
    }
 
    /* cph - I'm too lazy to try and work with offsets in this */
-   if (curline->sidedef->rowoffset) return;
+   if (curline->sidedef->rowoffset)
+      return;
 
    /* Now decide on texture tiling */
-   if (linedef->flags & ML_TWOSIDED) {
+   if (linedef->flags & ML_TWOSIDED)
+   {
       int c;
 
       /* Does top texture need tiling */
@@ -173,7 +185,9 @@ static void R_RecalcLineFlags(void)
       if ((c = frontsector->floorheight - backsector->floorheight) > 0 &&
             (textureheight[texturetranslation[curline->sidedef->bottomtexture]] > c))
          linedef->r_flags |= RF_BOT_TILE;
-   } else {
+   }
+   else
+   {
       int c;
       /* Does middle texture need tiling */
       if ((c = frontsector->ceilingheight - frontsector->floorheight) > 0 &&
@@ -228,13 +242,17 @@ sector_t *R_FakeFlat(sector_t *sec, sector_t *tempsec,
          tempsec->floor_xoffs = s->floor_xoffs;
          tempsec->floor_yoffs = s->floor_yoffs;
 
-         if (underwater) {
-            if (s->ceilingpic == skyflatnum) {
+         if (underwater)
+         {
+            if (s->ceilingpic == skyflatnum)
+            {
                tempsec->floorheight   = tempsec->ceilingheight+1;
                tempsec->ceilingpic    = tempsec->floorpic;
                tempsec->ceiling_xoffs = tempsec->floor_xoffs;
                tempsec->ceiling_yoffs = tempsec->floor_yoffs;
-            } else {
+            }
+            else
+            {
                tempsec->ceilingpic    = s->ceilingpic;
                tempsec->ceiling_xoffs = s->ceiling_xoffs;
                tempsec->ceiling_yoffs = s->ceiling_yoffs;
@@ -384,7 +402,8 @@ static void R_AddLine (seg_t *line)
 
 static const int checkcoord[12][4] = // killough -- static const
    {
-      {3,0,2,1},
+      {
+         3,0,2,1},
       {3,0,2,0},
       {3,1,2,0},
       {0},
@@ -421,7 +440,8 @@ static boolean R_CheckBBox(const fixed_t *bspcoord)
 
    // cph - replaced old code, which was unclear and badly commented
    // Much more efficient code now
-   if ((signed)angle1 < (signed)angle2) { /* it's "behind" us */
+   if ((signed)angle1 < (signed)angle2)
+   { /* it's "behind" us */
       /* Either angle1 or angle2 is behind us, so it doesn't matter if we
        * change it to the corect sign
        */
@@ -431,10 +451,14 @@ static boolean R_CheckBBox(const fixed_t *bspcoord)
          angle2 = INT_MIN;
    }
 
-   if ((signed)angle2 >= (signed)clipangle) return false; // Both off left edge
-   if ((signed)angle1 <= -(signed)clipangle) return false; // Both off right edge
-   if ((signed)angle1 >= (signed)clipangle) angle1 = clipangle; // Clip at left edge
-   if ((signed)angle2 <= -(signed)clipangle) angle2 = 0-clipangle; // Clip at right edge
+   if ((signed)angle2 >= (signed)clipangle)
+      return false; // Both off left edge
+   if ((signed)angle1 <= -(signed)clipangle)
+      return false; // Both off right edge
+   if ((signed)angle1 >= (signed)clipangle)
+      angle1 = clipangle; // Clip at left edge
+   if ((signed)angle2 <= -(signed)clipangle)
+      angle2 = 0-clipangle; // Clip at right edge
 
    // Find the first clippost
    //  that touches the source post
@@ -450,7 +474,8 @@ static boolean R_CheckBBox(const fixed_t *bspcoord)
       if (sx1 == sx2)
          return false;
 
-      if (!memchr(solidcol+sx1, 0, sx2-sx1)) return false;
+      if (!memchr(solidcol+sx1, 0, sx2-sx1))
+         return false;
       // All columns it covers are already solidly covered
    }
 
@@ -477,6 +502,7 @@ static void R_Subsector(int num)
    int         ceilinglightlevel;    // killough 4/11/98
 
 #ifdef RANGECHECK
+
    if (num>=numsubsectors)
       I_Error ("R_Subsector: ss %i with numss = %i", num, numsubsectors);
 #endif
@@ -485,7 +511,7 @@ static void R_Subsector(int num)
    frontsector = sub->sector;
    count = sub->numlines;
    line = &segs[sub->firstline];
-//   sscount++;
+   //   sscount++;
 
    // killough 3/8/98, 4/4/98: Deep water / fake ceiling effect
    frontsector = R_FakeFlat(frontsector, &tempsec, &floorlightlevel,
@@ -497,8 +523,7 @@ static void R_Subsector(int num)
 
    floorplane = frontsector->floorheight < viewz || // killough 3/7/98
                 (frontsector->heightsec != -1 &&
-                sectors[frontsector->heightsec].ceilingpic == skyflatnum)
-               ?
+                 sectors[frontsector->heightsec].ceilingpic == skyflatnum) ?
                 R_FindPlane(frontsector->floorheight,
                             frontsector->floorpic == skyflatnum &&  // kilough 10/98
                             frontsector->sky & PL_SKYFLAT ? frontsector->sky :
@@ -511,8 +536,7 @@ static void R_Subsector(int num)
    ceilingplane = frontsector->ceilingheight > viewz ||
                   frontsector->ceilingpic == skyflatnum ||
                   (frontsector->heightsec != -1 &&
-                   sectors[frontsector->heightsec].floorpic == skyflatnum)
-                  ?
+                   sectors[frontsector->heightsec].floorpic == skyflatnum) ?
                   R_FindPlane(frontsector->ceilingheight,     // killough 3/8/98
                               frontsector->ceilingpic == skyflatnum &&  // kilough 10/98
                               frontsector->sky & PL_SKYFLAT ? frontsector->sky :

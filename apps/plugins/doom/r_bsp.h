@@ -29,7 +29,6 @@
  *
  *-----------------------------------------------------------------------------*/
 
-
 #ifndef __R_BSP__
 #define __R_BSP__
 
@@ -48,28 +47,17 @@ extern boolean  segtextured;
 extern boolean  markfloor;      /* false if the back side is the same plane */
 extern boolean  markceiling;
 
-//extern boolean  skymap;
-
 /* old code -- killough:
  * extern drawseg_t drawsegs[MAXDRAWSEGS];
  * new code -- killough: */
 extern drawseg_t *drawsegs;
 extern unsigned maxdrawsegs;
 
-extern drawseg_t* ds_p;
+extern drawseg_t *ds_p;
 
-/*extern lighttable_t** hscalelight;
-extern lighttable_t** vscalelight;
-extern lighttable_t** dscalelight;
-*/
-
-//typedef void (*drawfunc_t) (int start, int stop);
-
-
-// BSP?
-void R_ClearClipSegs (void);
-void R_ClearDrawSegs (void);
-void R_RenderBSPNode (int bspnum);
+void R_ClearClipSegs(void);
+void R_ClearDrawSegs(void);
+void R_RenderBSPNode(int bspnum);
 int R_DoorClosed(void);   /* killough 1/17/98 */
 
 /* killough 4/13/98: fake floors/ceilings for deep water / fake ceilings: */

@@ -44,7 +44,7 @@
 #include "m_swap.h"
 #include "rockmacros.h"
 // Each screen is [SCREENWIDTH*SCREENHEIGHT];
-byte *screens[6];
+byte *screens[6] IBSS_ATTR;
 int  dirtybox[4];
 
 /* jff 4/24/98 initialize this at runtime */
@@ -428,22 +428,22 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
    y -= SHORT(patch->topoffset);
    x -= SHORT(patch->leftoffset);
 
-   // CPhipps - auto-no-stretch if not high-res
-   if (flags & VPT_STRETCH)
-      if ((SCREENWIDTH==320) && (SCREENHEIGHT==200))
-         flags &= ~VPT_STRETCH;
+//   // CPhipps - auto-no-stretch if not high-res
+//   if (flags & VPT_STRETCH)
+//     if ((SCREENWIDTH==320) && (SCREENHEIGHT==200))
+//         flags &= ~VPT_STRETCH;
 
    // CPhipps - null translation pointer => no translation
    if (!trans)
       flags &= ~VPT_TRANS;
 
-   if (x<0
-         ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
-         || y<0
-         || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
-      // killough 1/19/98: improved error message:
-      I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB"
-              "Bad V_DrawMemPatch (flags=%u)", x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
+//   if (x<0
+//         ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
+//         || y<0
+//         || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
+//      // killough 1/19/98: improved error message:
+//      I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB"
+//              "Bad V_DrawMemPatch (flags=%u)", x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
 
    if (!(flags & VPT_STRETCH)) {
       unsigned int             col;

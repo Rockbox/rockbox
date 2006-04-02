@@ -629,35 +629,35 @@ void D_DoomMainSetup(void)
    else if (M_CheckParm ("-deathmatch"))
       deathmatch = 1;
 
-   printf("Welcome to Rockdoom");
+   printf("Welcome to Rockdoom\n");
 
    switch ( gamemode )
    {
    case retail:
-      printf ("The Ultimate DOOM Startup v%d.%d",DVERSION/100,DVERSION%100);
+      printf ("The Ultimate DOOM Startup v%d.%d\n",DVERSION/100,DVERSION%100);
       break;
    case shareware:
-      printf ("DOOM Shareware Startup v%d.%d",DVERSION/100,DVERSION%100);
+      printf ("DOOM Shareware Startup v%d.%d\n",DVERSION/100,DVERSION%100);
       break;
    case registered:
-      printf ("DOOM Registered Startup v%d.%d",DVERSION/100,DVERSION%100);
+      printf ("DOOM Registered Startup v%d.%d\n",DVERSION/100,DVERSION%100);
       break;
    case commercial:
       switch (gamemission)
       {
       case pack_plut:
-         printf ("DOOM 2: Plutonia Experiment v%d.%d",DVERSION/100,DVERSION%100);
+         printf ("DOOM 2: Plutonia Experiment v%d.%d\n",DVERSION/100,DVERSION%100);
          break;
       case pack_tnt:
-         printf ("DOOM 2: TNT - Evilution v%d.%d",DVERSION/100,DVERSION%100);
+         printf ("DOOM 2: TNT - Evilution v%d.%d\n",DVERSION/100,DVERSION%100);
          break;
       default:
-         printf ("DOOM 2: Hell on Earth v%d.%d",DVERSION/100,DVERSION%100);
+         printf ("DOOM 2: Hell on Earth v%d.%d\n",DVERSION/100,DVERSION%100);
          break;
       }
       break;
    default:
-      printf ("Public DOOM v%d.%d",DVERSION/100,DVERSION%100);
+      printf ("Public DOOM v%d.%d\n",DVERSION/100,DVERSION%100);
       break;
    }
 
@@ -745,14 +745,14 @@ void D_DoomMainSetup(void)
       int i;
 
       if ( gamemode == shareware)
-         I_Error("\nYou cannot -file with the shareware version. Register!");
+         I_Error("\nYou cannot -file with the shareware version. Register!\n");
 
       // Check for fake IWAD with right name,
       // but w/o all the lumps of the registered version.
       if (gamemode == registered)
          for (i = 0;i < 23; i++)
             if (W_CheckNumForName(name[i])<0)
-               I_Error("\nThis is not the registered version.");
+               I_Error("This is not the registered version.\n");
    }
 
    // Iff additonal PWAD files are used, print modified banner

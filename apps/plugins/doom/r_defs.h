@@ -1,24 +1,33 @@
-// Emacs style mode select   -*- C++ -*-
-//-----------------------------------------------------------------------------
-//
-// $Id$
-//
-// Copyright (C) 1993-1996 by id Software, Inc.
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// DESCRIPTION:
-//      Refresh/rendering module, shared data struct definitions.
-//
-//-----------------------------------------------------------------------------
+/* Emacs style mode select   -*- C++ -*-
+ *-----------------------------------------------------------------------------
+ *
+ *
+ *  PrBoom a Doom port merged with LxDoom and LSDLDoom
+ *  based on BOOM, a modified and improved DOOM engine
+ *  Copyright (C) 1999 by
+ *  id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
+ *  Copyright (C) 1999-2000 by
+ *  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
+ *
+ *  This program is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU General Public License
+ *  as published by the Free Software Foundation; either version 2
+ *  of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+ *  02111-1307, USA.
+ *
+ * DESCRIPTION:
+ *      Refresh/rendering module, shared data struct definitions.
+ *
+ *-----------------------------------------------------------------------------*/
 
 #ifndef __R_DEFS__
 #define __R_DEFS__
@@ -62,18 +71,16 @@
 typedef struct
 {
    fixed_t x, y;
-} vertex_t;
-
-
-// Forward of LineDefs, for Sectors.
-struct line_s;
+}
+vertex_t;
 
 // Each sector has a degenmobj_t in its center for sound origin purposes.
 typedef struct
 {
    thinker_t thinker;  // not used for anything
    fixed_t x, y, z;
-} degenmobj_t;
+}
+degenmobj_t;
 
 //
 // The SECTORS record, at runtime.
@@ -142,8 +149,8 @@ typedef struct
    short special;
    short oldspecial;      //jff 2/16/98 remembers if sector WAS secret (automap)
    short tag;
-   void* specialdata; // ROCKDOOM obsolete
-} sector_t;
+}
+sector_t;
 
 //
 // The SideDef.
@@ -164,7 +171,8 @@ typedef struct
 
    int special;
 
-} side_t;
+}
+side_t;
 
 //
 // Move clipping aid for LineDefs.
@@ -201,7 +209,8 @@ typedef struct line_s
       RF_IGNORE   = 8,     // Renderer can skip this line
       RF_CLOSED   =16,     // Line blocks view
    } r_flags;
-} line_t;
+}
+line_t;
 
 // phares 3/14/98
 //
@@ -228,7 +237,8 @@ typedef struct msecnode_s
    struct msecnode_s *m_sprev;  // prev msecnode_t for this sector
    struct msecnode_s *m_snext;  // next msecnode_t for this sector
    boolean visited; // killough 4/4/98, 4/7/98: used in search algorithms
-} msecnode_t;
+}
+msecnode_t;
 
 //
 // The LineSeg.
@@ -249,7 +259,8 @@ typedef struct
    // backsector is NULL for one sided lines
 
    sector_t *frontsector, *backsector;
-} seg_t;
+}
+seg_t;
 
 //
 // A SubSector.
@@ -263,7 +274,8 @@ typedef struct subsector_s
 {
    sector_t *sector;
    unsigned short numlines, firstline;
-} subsector_t;
+}
+subsector_t;
 
 //
 // BSP node.
@@ -273,14 +285,16 @@ typedef struct
    fixed_t  x,  y, dx, dy;        // Partition line.
    fixed_t bbox[2][4];            // Bounding box for each child.
    unsigned short children[2];    // If NF_SUBSECTOR its a subsector.
-} node_t;
+}
+node_t;
 
 // posts are runs of non masked source pixels
 typedef struct
 {
    byte topdelta; // -1 is the last post in a column
    byte length;   // length data bytes follows
-} post_t;
+}
+post_t;
 
 // column_t is a list of 0 or more post_t, (byte)-1 terminated
 typedef post_t column_t;
@@ -293,7 +307,8 @@ typedef post_t column_t;
 // Indeed, true color support is posibble
 //  precalculating 24bpp lightmap/colormap LUT.
 //  from darkening PLAYPAL to all black.
-// Could even us emore than 32 levels.
+// Could use even more than 32 levels.
+
 typedef byte lighttable_t;
 
 //
@@ -301,7 +316,7 @@ typedef byte lighttable_t;
 //
 typedef struct drawseg_s
 {
-   seg_t*  curline;
+   seg_t *curline;
    int   x1, x2;
    fixed_t  scale1, scale2, scalestep;
    int   silhouette;   // 0=none, 1=bottom, 2=top, 3=both
@@ -312,7 +327,8 @@ typedef struct drawseg_s
    //  all three adjusted so [x1] is first value.
    short  *sprtopclip, *sprbottomclip, *maskedtexturecol;
 
-} drawseg_t;
+}
+drawseg_t;
 
 //
 // Patches.
@@ -328,7 +344,8 @@ typedef struct
    short leftoffset;     // pixels to the left of origin
    short topoffset;      // pixels below the origin
    int columnofs[8];     // only [width] used
-} patch_t;
+}
+patch_t;
 
 // proff: Added for OpenGL
 typedef struct
@@ -336,7 +353,8 @@ typedef struct
    int width,height;
    int leftoffset,topoffset;
    int lumpnum;
-} patchnum_t;
+}
+patchnum_t;
 
 //
 // A vissprite_t is a thing that will be drawn during a refresh.
@@ -360,7 +378,8 @@ typedef struct vissprite_s
 
    // killough 3/27/98: height sector for underwater/fake ceiling support
    int heightsec;
-} vissprite_t;
+}
+vissprite_t;
 
 //
 // Sprites are patches with a special naming convention
@@ -390,7 +409,8 @@ typedef struct
    // Flip bit (1 = flip) to use for view angles 0-7.
    byte flip[8];
 
-} spriteframe_t;
+}
+spriteframe_t;
 
 //
 // A sprite definition:
@@ -401,7 +421,8 @@ typedef struct
 {
    int numframes;
    spriteframe_t *spriteframes;
-} spritedef_t;
+}
+spritedef_t;
 
 //
 // Now what is a visplane, anyway?
@@ -417,6 +438,7 @@ typedef struct visplane
    unsigned short pad2, pad3;    // killough 2/8/98, 4/25/98
    unsigned short bottom[SCREENWIDTH];
    unsigned short pad4;
-} visplane_t;
+}
+visplane_t;
 
 #endif

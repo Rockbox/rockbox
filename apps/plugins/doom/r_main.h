@@ -54,6 +54,8 @@ extern int      centery;
 extern fixed_t  centerxfrac;
 extern fixed_t  centeryfrac;
 extern fixed_t  projection;
+// proff 11/06/98: Added for high-res
+extern fixed_t  projectiony;
 extern int      validcount;
 extern int      linecount;
 extern int      loopcount;

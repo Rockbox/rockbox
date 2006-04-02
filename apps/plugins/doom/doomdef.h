@@ -92,8 +92,10 @@ typedef enum {
 #define MAX_SCREENWIDTH  1600
 #define MAX_SCREENHEIGHT 1200
 
-#define SCREENWIDTH  320
-#define SCREENHEIGHT 200
+#define SCREENWIDTH  LCD_WIDTH
+//#define SCREENWIDTH  320
+//#define SCREENHEIGHT 200
+#define SCREENHEIGHT LCD_HEIGHT
 
 // The maximum number of players, multiplayer/networking.
 #define MAXPLAYERS       4

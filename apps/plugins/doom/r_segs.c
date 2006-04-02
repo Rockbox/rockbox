@@ -95,18 +95,19 @@ static short    *maskedtexturecol;
 // rw_distance must be calculated first.
 //
 // killough 5/2/98: reformatted, cleaned up
-static fixed_t R_ScaleFromGlobalAngle (angle_t visangle)
-{
-   int   anglea = ANG90 + (visangle-viewangle);
-   int   angleb = ANG90 + (visangle-rw_normalangle);
-   int   sinea = finesine[anglea>>ANGLETOFINESHIFT];
-   int   sineb = finesine[angleb>>ANGLETOFINESHIFT];
-   fixed_t  num = FixedMul(projection,sineb);
-   int   den = FixedMul(rw_distance,sinea);
+// CPhipps - moved here from r_main.c
 
-   return den > num>>16 ? (num=FixedDiv (num, den)) > 64*FRACUNIT ?
-      64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT ;
+static fixed_t R_ScaleFromGlobalAngle(angle_t visangle)
+{
+   int     anglea = ANG90 + (visangle-viewangle);
+   int     angleb = ANG90 + (visangle-rw_normalangle);
+   int     den = FixedMul(rw_distance, finesine[anglea>>ANGLETOFINESHIFT]);
+   // proff 11/06/98: Changed for high-res
+   fixed_t num = FixedMul(projectiony, finesine[angleb>>ANGLETOFINESHIFT]);
+   return den > num>>16 ? (num = FixedDiv(num, den)) > 64*FRACUNIT ?
+       64*FRACUNIT : num < 256 ? 256 : num : 64*FRACUNIT;
 }
+
 //
 // R_RenderMaskedSegRange
 //
@@ -146,11 +147,12 @@ void R_RenderMaskedSegRange(drawseg_t *ds, int x1, int x2)
 
    // killough 4/13/98: get correct lightlevel for 2s normal textures
    lightnum = (R_FakeFlat(frontsector, &tempsec, NULL, NULL, false)
-                  ->lightlevel >> LIGHTSEGSHIFT)+extralight;
+               ->lightlevel >> LIGHTSEGSHIFT)+extralight;
 
    /* cph - ...what is this for? adding contrast to rooms?
     * It looks crap in outdoor areas */
-   if (fake_contrast) {
+   if (fake_contrast)
+   {
       if (curline->v1->y == curline->v2->y)
          lightnum--;
       else
@@ -402,8 +404,10 @@ static void R_RenderSegLoop (void)
          // cph - if we completely blocked further sight through this column,
          // add this info to the solid columns array for r_bsp.c
          if ((markceiling || markfloor) &&
-               (floorclip[rw_x] <= ceilingclip[rw_x] + 1)) {
-            solidcol[rw_x] = 1; didsolidcol = 1;
+               (floorclip[rw_x] <= ceilingclip[rw_x] + 1))
+         {
+            solidcol[rw_x] = 1;
+            didsolidcol = 1;
          }
 
          // save texturecol for backdrawing of masked mid texture
@@ -460,6 +464,7 @@ void R_StoreWallRange(const int start, const int stop)
 
 
 #ifdef RANGECHECK
+
    if (start >=viewwidth || start > stop)
       I_Error ("Bad R_RenderWallRange: %i to %i", start , stop);
 #endif
@@ -574,7 +579,8 @@ void R_StoreWallRange(const int start, const int stop)
       ds_p->sprtopclip = ds_p->sprbottomclip = NULL;
       ds_p->silhouette = 0;
 
-      if (linedef->r_flags & RF_CLOSED) { /* cph - closed 2S line e.g. door */
+      if (linedef->r_flags & RF_CLOSED)
+      { /* cph - closed 2S line e.g. door */
          // cph - killough's (outdated) comment follows - this deals with both
          // "automap fixes", his and mine
          // killough 1/17/98: this test is required if the fix
@@ -589,7 +595,9 @@ void R_StoreWallRange(const int start, const int stop)
          ds_p->sprtopclip = screenheightarray;
          ds_p->tsilheight = INT_MIN;
 
-      } else { /* not solid - old code */
+      }
+      else
+      { /* not solid - old code */
 
          if (frontsector->floorheight > backsector->floorheight)
          {
@@ -721,7 +729,8 @@ void R_StoreWallRange(const int start, const int stop)
 
          /* cph - ...what is this for? adding contrast to rooms?
           * It looks crap in outdoor areas */
-         if (fake_contrast) {
+         if (fake_contrast)
+         {
             if (curline->v1->y == curline->v2->y)
                lightnum--;
             else if (curline->v1->x == curline->v2->x)
@@ -778,14 +787,16 @@ void R_StoreWallRange(const int start, const int stop)
    }
 
    // render it
-   if (markceiling) {
+   if (markceiling)
+   {
       if (ceilingplane)   // killough 4/11/98: add NULL ptr checks
          ceilingplane = R_CheckPlane (ceilingplane, rw_x, rw_stopx-1);
       else
          markceiling = 0;
    }
 
-   if (markfloor) {
+   if (markfloor)
+   {
       if (floorplane)     // killough 4/11/98: add NULL ptr checks
          /* cph 2003/04/18  - ceilingplane and floorplane might be the same
           * visplane (e.g. if both skies); R_CheckPlane doesn't know about
@@ -805,12 +816,15 @@ void R_StoreWallRange(const int start, const int stop)
    R_RenderSegLoop();
 
    /* cph - if a column was made solid by this wall, we _must_ save full clipping info */
-   if (backsector && didsolidcol) {
-      if (!(ds_p->silhouette & SIL_BOTTOM)) {
+   if (backsector && didsolidcol)
+   {
+      if (!(ds_p->silhouette & SIL_BOTTOM))
+      {
          ds_p->silhouette |= SIL_BOTTOM;
          ds_p->bsilheight = backsector->floorheight;
       }
-      if (!(ds_p->silhouette & SIL_TOP)) {
+      if (!(ds_p->silhouette & SIL_TOP))
+      {
          ds_p->silhouette |= SIL_TOP;
          ds_p->tsilheight = backsector->ceilingheight;
       }

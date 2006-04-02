@@ -47,7 +47,8 @@ typedef struct
 {
    int originx, originy;  // Block origin, which has already accounted
    int patch;             // for the internal origin of the patch.
-} texpatch_t;
+}
+texpatch_t;
 
 //
 // Texture definition.
@@ -69,7 +70,8 @@ typedef struct
    short width, height;
    short patchcount;      // All the patches[patchcount] are drawn
    texpatch_t patches[1]; // back-to-front into the cached texture.
-} texture_t;
+}
+texture_t;
 
 // Retrieve column data for span blitting.
 const byte*

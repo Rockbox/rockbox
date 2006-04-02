@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.1  2006/03/28 15:44:01  dave
+// Revision 1.2  2006/04/02 01:52:44  kkurbjun
+// Update adds prboom's high resolution support, also makes the scaling for platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table code has been removed.  Also fixed a pallete bug.  Some graphic errors are present in menu and status bar.  Also updates some headers and output formatting.
+//
+// Revision 1.1  2006-03-28 15:44:01  dave
 // Patch #2969 - Doom!  Currently only working on the H300.
 //
 //
@@ -120,7 +123,7 @@ void I_Error (char *error, ...)
    vsnprintf(p_buf,sizeof(p_buf), error, ap);
    va_end(ap);
 
-   printf("%s",p_buf);
+   printf("%s\n",p_buf);
 
    // Shutdown. Here might be other errors.
    if (demorecording)

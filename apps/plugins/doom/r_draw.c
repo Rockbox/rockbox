@@ -41,12 +41,6 @@
 //#include "lprintf.h"
 #include "rockmacros.h"
 
-#define MAXWIDTH   1120
-#define MAXHEIGHT   832
-
-// status bar height at bottom of screen
-#define SBARHEIGHT  32
-
 //
 // All drawing to the view buffer is accomplished in this file.
 // The other refresh files only know about ccordinates,
@@ -113,9 +107,10 @@ void R_DrawColumn (void)
       return;
 
 #ifdef RANGECHECK
+
    if ((unsigned)dc_x >= SCREENWIDTH
-      || dc_yl < 0
-      || dc_yh >= SCREENHEIGHT)
+         || dc_yl < 0
+         || dc_yh >= SCREENHEIGHT)
       I_Error ("R_DrawColumn: %d to %d at %d", dc_yl, dc_yh, dc_x);
 #endif
 
@@ -127,6 +122,7 @@ void R_DrawColumn (void)
    // Determine scaling,
    // which is the only mapping to be done.
 #define  fracstep dc_iscale
+
    frac = dc_texturemid + (dc_yl-centery)*fracstep;
 
    // Inner loop that does the actual texture mapping,
@@ -135,21 +131,27 @@ void R_DrawColumn (void)
    //
    // killough 2/1/98: more performance tuning
 
-   if (dc_texheight == 128) {
+   if (dc_texheight == 128)
+   {
       while(count--)
       {
          *dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
          frac += fracstep;
          dest += SCREENWIDTH;
       }
-   } else if (dc_texheight == 0) {
+   }
+   else if (dc_texheight == 0)
+   {
       /* cph - another special case */
-      while (count--) {
+      while (count--)
+      {
          *dest = dc_colormap[dc_source[frac>>FRACBITS]];
          frac += fracstep;
          dest += SCREENWIDTH;
       }
-   } else {
+   }
+   else
+   {
       register unsigned heightmask = dc_texheight-1; // CPhipps - specify type
       if (! (dc_texheight & heightmask) )   // power of 2 -- killough
       {
@@ -167,7 +169,8 @@ void R_DrawColumn (void)
          heightmask <<= FRACBITS;
 
          if (frac < 0)
-            while ((frac += heightmask) <  0);
+            while ((frac += heightmask) <  0)
+               ;
          else
             while (frac >= (int)heightmask)
                frac -= heightmask;
@@ -215,6 +218,7 @@ void R_DrawTLColumn (void)
       return;
 
 #ifdef RANGECHECK
+
    if ((unsigned)dc_x >= (unsigned)SCREENWIDTH
          || dc_yl < 0
          || dc_yh >= SCREENHEIGHT)
@@ -227,6 +231,7 @@ void R_DrawTLColumn (void)
    // Determine scaling,
    //  which is the only mapping to be done.
 #define  fracstep dc_iscale
+
    frac = dc_texturemid + (dc_yl-centery)*fracstep;
 
    // Inner loop that does the actual texture mapping,
@@ -245,7 +250,8 @@ void R_DrawTLColumn (void)
          heightmask <<= FRACBITS;
 
          if (frac < 0)
-            while ((frac += heightmask) <  0);
+            while ((frac += heightmask) <  0)
+               ;
          else
             while (frac >= (int)heightmask)
                frac -= heightmask;
@@ -336,6 +342,7 @@ void R_DrawFuzzColumn(void)
       return;
 
 #ifdef RANGECHECK
+
    if ((unsigned) dc_x >= (unsigned)SCREENWIDTH
          || dc_yl < 0
          || (unsigned)dc_yh >= (unsigned)SCREENHEIGHT)
@@ -377,7 +384,8 @@ void R_DrawFuzzColumn(void)
       dest += SCREENWIDTH;
 
       frac += fracstep;
-   } while (count--);
+   }
+   while (count--);
 }
 
 //
@@ -404,6 +412,7 @@ void R_DrawTranslatedColumn (void)
       return;
 
 #ifdef RANGECHECK
+
    if ((unsigned)dc_x >= (unsigned)SCREENWIDTH
          || dc_yl < 0
          || (unsigned)dc_yh >= (unsigned)SCREENHEIGHT)
@@ -449,6 +458,7 @@ void R_InitTranslationTables (void)
 {
    int i, j;
 #define MAXTRANS 3
+
    byte transtocolour[MAXTRANS];
 
    // killough 5/2/98:
@@ -457,15 +467,20 @@ void R_InitTranslationTables (void)
    if (translationtables == NULL) // CPhipps - allow multiple calls
       translationtables = Z_Malloc(256*MAXTRANS, PU_STATIC, 0);
 
-   for (i=0; i<MAXTRANS; i++) transtocolour[i] = 255;
+   for (i=0; i<MAXTRANS; i++)
+      transtocolour[i] = 255;
 
-   for (i=0; i<MAXPLAYERS; i++) {
+   for (i=0; i<MAXPLAYERS; i++)
+   {
       byte wantcolour = mapcolor_plyr[i];
       playernumtotrans[i] = 0;
       if (wantcolour != 0x70) // Not green, would like translation
          for (j=0; j<MAXTRANS; j++)
-            if (transtocolour[j] == 255) {
-               transtocolour[j] = wantcolour; playernumtotrans[i] = j+1; break;
+            if (transtocolour[j] == 255)
+            {
+               transtocolour[j] = wantcolour;
+               playernumtotrans[i] = j+1;
+               break;
             }
    }
 

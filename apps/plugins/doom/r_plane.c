@@ -128,6 +128,7 @@ static void R_MapPlane(int y, int x1, int x2)
    unsigned index;
 
 #ifdef RANGECHECK
+
    if (x2 < x1 || x1<0 || x2>=viewwidth || (unsigned)y>(unsigned)viewheight)
       I_Error ("R_MapPlane: %i, %i at %i",x1,x2,y);
 #endif
@@ -295,10 +296,13 @@ visplane_t *R_CheckPlane(visplane_t *pl, int start, int stop)
    for (x=intrl ; x <= intrh && pl->top[x] == 0xffff; x++)
       ;
 
-   if (x > intrh) { /* Can use existing plane; extend range */
-      pl->minx = unionl; pl->maxx = unionh;
+   if (x > intrh)
+   { /* Can use existing plane; extend range */
+      pl->minx = unionl;
+      pl->maxx = unionh;
       return pl;
-   } else /* Cannot use existing plane; create a new one */
+   }
+   else /* Cannot use existing plane; create a new one */
       return R_DupPlane(pl,start,stop);
 }
 
@@ -323,8 +327,10 @@ static void R_MakeSpans(int x, int t1, int b1, int t2, int b2)
 static void R_DoDrawPlane(visplane_t *pl)
 {
    register int x;
-   if (pl->minx <= pl->maxx) {
-      if (pl->picnum == skyflatnum || pl->picnum & PL_SKYFLAT) { // sky flat
+   if (pl->minx <= pl->maxx)
+   {
+      if (pl->picnum == skyflatnum || pl->picnum & PL_SKYFLAT)
+      { // sky flat
          int texture;
          angle_t an, flip;
 
@@ -390,7 +396,9 @@ static void R_DoDrawPlane(visplane_t *pl)
                                        ANGLETOSKYSHIFT);
                colfunc();
             }
-      } else {     // regular flat
+      }
+      else
+      {     // regular flat
 
          int stop, light;
 

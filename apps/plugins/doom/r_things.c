@@ -52,7 +52,8 @@ typedef struct {
    int column;
    int topclip;
    int bottomclip;
-} maskdraw_t;
+}
+maskdraw_t;
 
 //
 // Sprite rotation 0 is facing the viewer,
@@ -63,6 +64,8 @@ typedef struct {
 //
 fixed_t  pspritescale;
 fixed_t  pspriteiscale;
+// proff 11/06/98: Added for high-res
+fixed_t pspriteyscale;
 
 static lighttable_t** spritelights;
 
@@ -95,33 +98,33 @@ static void R_InstallSpriteLump(int lump, unsigned frame,
                                 unsigned rotation, boolean flipped)
 {
 
-  if (frame >= MAX_SPRITE_FRAMES || rotation > 8)
-    I_Error("R_InstallSpriteLump: Bad frame characters in lump %i", lump);
+   if (frame >= MAX_SPRITE_FRAMES || rotation > 8)
+      I_Error("R_InstallSpriteLump: Bad frame characters in lump %i", lump);
 
    if ((int)frame > maxframe)
       maxframe = frame;
 
-  if (rotation == 0)
-    {    // the lump should be used for all rotations
+   if (rotation == 0)
+   {    // the lump should be used for all rotations
       int r;
       for (r=0 ; r<8 ; r++)
-        if (sprtemp[frame].lump[r]==-1)
-          {
+         if (sprtemp[frame].lump[r]==-1)
+         {
             sprtemp[frame].lump[r] = lump - firstspritelump;
             sprtemp[frame].flip[r] = (byte) flipped;
             sprtemp[frame].rotate = false; //jff 4/24/98 if any subbed, rotless
-          }
+         }
       return;
-    }
+   }
 
-  // the lump is only used for one rotation
+   // the lump is only used for one rotation
 
-  if (sprtemp[frame].lump[--rotation] == -1)
-    {
+   if (sprtemp[frame].lump[--rotation] == -1)
+   {
       sprtemp[frame].lump[rotation] = lump - firstspritelump;
       sprtemp[frame].flip[rotation] = (byte) flipped;
       sprtemp[frame].rotate = true; //jff 4/24/98 only change if rot used
-    }
+   }
 }
 
 //
@@ -152,110 +155,114 @@ static void R_InstallSpriteLump(int lump, unsigned frame,
 
 void R_InitSpriteDefs(const char * const * namelist)
 {
-  size_t numentries = lastspritelump-firstspritelump+1;
-  struct { int index, next; } *hash;
-  int i;
+   size_t numentries = lastspritelump-firstspritelump+1;
+   struct {
+      int index, next;
+   }
+   *hash;
+   int i;
 
-  if (!numentries || !*namelist)
-    return;
+   if (!numentries || !*namelist)
+      return;
 
-  // count the number of sprite names
-  for (i=0; namelist[i]; i++)
-    ;
+   // count the number of sprite names
+   for (i=0; namelist[i]; i++)
+      ;
 
-  numsprites = i;
+   numsprites = i;
 
-  sprites = Z_Malloc(numsprites *sizeof(*sprites), PU_STATIC, NULL);
+   sprites = Z_Malloc(numsprites *sizeof(*sprites), PU_STATIC, NULL);
 
-  // Create hash table based on just the first four letters of each sprite
-  // killough 1/31/98
+   // Create hash table based on just the first four letters of each sprite
+   // killough 1/31/98
 
-  hash = malloc(sizeof(*hash)*numentries); // allocate hash table
+   hash = malloc(sizeof(*hash)*numentries); // allocate hash table
 
-  for (i=0; (size_t)i<numentries; i++)             // initialize hash table as empty
-    hash[i].index = -1;
+   for (i=0; (size_t)i<numentries; i++)             // initialize hash table as empty
+      hash[i].index = -1;
 
-  for (i=0; (size_t)i<numentries; i++)             // Prepend each sprite to hash chain
-    {                                      // prepend so that later ones win
+   for (i=0; (size_t)i<numentries; i++)             // Prepend each sprite to hash chain
+   {                                      // prepend so that later ones win
       int j = R_SpriteNameHash(lumpinfo[i+firstspritelump].name) % numentries;
       hash[i].next = hash[j].index;
       hash[j].index = i;
-    }
+   }
 
-  // scan all the lump names for each of the names,
-  //  noting the highest frame letter.
+   // scan all the lump names for each of the names,
+   //  noting the highest frame letter.
 
-  for (i=0 ; i<numsprites ; i++)
-    {
+   for (i=0 ; i<numsprites ; i++)
+   {
       const char *spritename = namelist[i];
       int j = hash[R_SpriteNameHash(spritename) % numentries].index;
 
       if (j >= 0)
-        {
-          memset(sprtemp, -1, sizeof(sprtemp));
-          maxframe = -1;
-          do
+      {
+         memset(sprtemp, -1, sizeof(sprtemp));
+         maxframe = -1;
+         do
+         {
+            register lumpinfo_t *lump = lumpinfo + j + firstspritelump;
+
+            // Fast portable comparison -- killough
+            // (using int pointer cast is nonportable):
+
+            if (!((lump->name[0] ^ spritename[0]) |
+                  (lump->name[1] ^ spritename[1]) |
+                  (lump->name[2] ^ spritename[2]) |
+                  (lump->name[3] ^ spritename[3])))
             {
-              register lumpinfo_t *lump = lumpinfo + j + firstspritelump;
-
-              // Fast portable comparison -- killough
-              // (using int pointer cast is nonportable):
-
-              if (!((lump->name[0] ^ spritename[0]) |
-                    (lump->name[1] ^ spritename[1]) |
-                    (lump->name[2] ^ spritename[2]) |
-                    (lump->name[3] ^ spritename[3])))
-                {
+               R_InstallSpriteLump(j+firstspritelump,
+                                   lump->name[4] - 'A',
+                                   lump->name[5] - '0',
+                                   false);
+               if (lump->name[6])
                   R_InstallSpriteLump(j+firstspritelump,
-                                      lump->name[4] - 'A',
-                                      lump->name[5] - '0',
-                                      false);
-                  if (lump->name[6])
-                    R_InstallSpriteLump(j+firstspritelump,
-                                        lump->name[6] - 'A',
-                                        lump->name[7] - '0',
-                                        true);
-                }
+                                      lump->name[6] - 'A',
+                                      lump->name[7] - '0',
+                                      true);
             }
-          while ((j = hash[j].next) >= 0);
+         }
+         while ((j = hash[j].next) >= 0)
+            ;
 
-          // check the frames that were found for completeness
-          if ((sprites[i].numframes = ++maxframe))  // killough 1/31/98
-            {
-              int frame;
-              for (frame = 0; frame < maxframe; frame++)
-                switch ((int) sprtemp[frame].rotate)
+         // check the frames that were found for completeness
+         if ((sprites[i].numframes = ++maxframe))  // killough 1/31/98
+         {
+            int frame;
+            for (frame = 0; frame < maxframe; frame++)
+               switch ((int) sprtemp[frame].rotate)
+               {
+               case -1:
+                  // no rotations were found for that frame at all
+                  I_Error ("R_InitSprites: No patches found "
+                           "for %.8s frame %c", namelist[i], frame+'A');
+                  break;
+
+               case 0:
+                  // only the first rotation is needed
+                  break;
+
+               case 1:
+                  // must have all 8 frames
                   {
-                  case -1:
-                    // no rotations were found for that frame at all
-                    I_Error ("R_InitSprites: No patches found "
-                             "for %.8s frame %c", namelist[i], frame+'A');
-                    break;
-
-                  case 0:
-                    // only the first rotation is needed
-                    break;
-
-                  case 1:
-                    // must have all 8 frames
-                    {
-                      int rotation;
-                      for (rotation=0 ; rotation<8 ; rotation++)
+                     int rotation;
+                     for (rotation=0 ; rotation<8 ; rotation++)
                         if (sprtemp[frame].lump[rotation] == -1)
-                          I_Error ("R_InitSprites: Sprite %.8s frame %c "
-                                   "is missing rotations",
-                                   namelist[i], frame+'A');
-                      break;
-                    }
+                           I_Error ("R_InitSprites: Sprite %.8s frame %c "
+                                    "is missing rotations",
+                                    namelist[i], frame+'A');
+                     break;
                   }
-              // allocate space for the frames present and copy sprtemp to it
-              sprites[i].spriteframes =
-                Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
-              memcpy (sprites[i].spriteframes, sprtemp,
-                      maxframe*sizeof(spriteframe_t));
-            }
-        }
-    }
+               }
+            // allocate space for the frames present and copy sprtemp to it
+            sprites[i].spriteframes =
+               Z_Malloc (maxframe * sizeof(spriteframe_t), PU_STATIC, NULL);
+            memcpy (sprites[i].spriteframes, sprtemp,
+                    maxframe*sizeof(spriteframe_t));
+         }
+      }
+   }
    free(hash);             // free hash table
 }
 
@@ -313,13 +320,13 @@ fixed_t  sprtopscreen;
 
 void R_DrawMaskedColumn(const column_t *column)
 {
-  int     topscreen;
-  int     bottomscreen;
-  fixed_t basetexturemid = dc_texturemid;
+   int     topscreen;
+   int     bottomscreen;
+   fixed_t basetexturemid = dc_texturemid;
 
-  dc_texheight = 0; // killough 11/98
-  while (column->topdelta != 0xff)
-    {
+   dc_texheight = 0; // killough 11/98
+   while (column->topdelta != 0xff)
+   {
       // calculate unclipped screen coordinates for post
       topscreen = sprtopscreen + spryscale*column->topdelta;
       bottomscreen = topscreen + spryscale*column->length;
@@ -328,24 +335,24 @@ void R_DrawMaskedColumn(const column_t *column)
       dc_yh = (bottomscreen-1)>>FRACBITS;
 
       if (dc_yh >= mfloorclip[dc_x])
-        dc_yh = mfloorclip[dc_x]-1;
+         dc_yh = mfloorclip[dc_x]-1;
 
       if (dc_yl <= mceilingclip[dc_x])
-        dc_yl = mceilingclip[dc_x]+1;
+         dc_yl = mceilingclip[dc_x]+1;
 
       // killough 3/2/98, 3/27/98: Failsafe against overflow/crash:
       if (dc_yl <= dc_yh && dc_yh < viewheight)
-        {
-          dc_source = (byte *)column + 3;
-          dc_texturemid = basetexturemid - (column->topdelta<<FRACBITS);
+      {
+         dc_source = (byte *)column + 3;
+         dc_texturemid = basetexturemid - (column->topdelta<<FRACBITS);
 
-          // Drawn by either R_DrawColumn
-          //  or (SHADOW) R_DrawFuzzColumn.
-          colfunc ();
-        }
+         // Drawn by either R_DrawColumn
+         //  or (SHADOW) R_DrawFuzzColumn.
+         colfunc ();
+      }
       column = (const column_t *)(  (byte *)column + column->length + 4);
-    }
-  dc_texturemid = basetexturemid;
+   }
+   dc_texturemid = basetexturemid;
 }
 
 //
@@ -384,10 +391,10 @@ void R_DrawVisSprite(vissprite_t *vis, int x1, int x2)
          }
          else
             colfunc = R_DrawColumn;         // killough 3/14/98, 4/11/98
-            
+
 
    // proff 11/06/98: Changed for high-res
-   dc_iscale = D_abs(vis->xiscale);
+   dc_iscale = FixedDiv (FRACUNIT, vis->scale);
    dc_texturemid = vis->texturemid;
    frac = vis->startfrac;
    spryscale = vis->scale;
@@ -398,6 +405,7 @@ void R_DrawVisSprite(vissprite_t *vis, int x1, int x2)
       texturecolumn = frac>>FRACBITS;
 
 #ifdef RANGECHECK
+
       if (texturecolumn < 0 || texturecolumn >= SHORT(patch->width))
          I_Error ("R_DrawSpriteRange: Bad texturecolumn");
 #endif
@@ -428,8 +436,10 @@ void R_ProjectSprite (mobj_t* thing)
    boolean   flip;
    vissprite_t *vis;
 #ifndef GL_DOOM
+
    fixed_t   iscale;
 #endif
+
    int heightsec;      // killough 3/27/98
 
    // transform the origin point
@@ -457,6 +467,7 @@ void R_ProjectSprite (mobj_t* thing)
 
    // decide which patch to use for sprite relative to player
 #ifdef RANGECHECK
+
    if ((unsigned) thing->sprite >= (unsigned)numsprites)
       I_Error ("R_ProjectSprite: Invalid sprite number %i", thing->sprite);
 #endif
@@ -464,6 +475,7 @@ void R_ProjectSprite (mobj_t* thing)
    sprdef = &sprites[thing->sprite];
 
 #ifdef RANGECHECK
+
    if ((thing->frame&FF_FRAMEMASK) >= sprdef->numframes)
       I_Error ("R_ProjectSprite: Invalid sprite frame %i : %i", thing->sprite,
                thing->frame);
@@ -538,7 +550,7 @@ void R_ProjectSprite (mobj_t* thing)
 
    vis->mobjflags = thing->flags;
    // proff 11/06/98: Changed for high-res
-   vis->scale = xscale;
+   vis->scale = FixedDiv(projectiony, tz);
    vis->gx = thing->x;
    vis->gy = thing->y;
    vis->gz = thing->z;
@@ -634,6 +646,7 @@ void R_DrawPSprite (pspdef_t *psp)
    // decide which patch to use
 
 #ifdef RANGECHECK
+
    if ( (unsigned)psp->state->sprite >= (unsigned)numsprites)
       I_Error ("R_ProjectSprite: Invalid sprite number %i", psp->state->sprite);
 #endif
@@ -641,6 +654,7 @@ void R_DrawPSprite (pspdef_t *psp)
    sprdef = &sprites[psp->state->sprite];
 
 #ifdef RANGECHECK
+
    if ( (psp->state->frame & FF_FRAMEMASK)  >= sprdef->numframes)
       I_Error ("R_ProjectSprite: Invalid sprite frame %i : %li",
                psp->state->sprite, psp->state->frame);
@@ -677,7 +691,7 @@ void R_DrawPSprite (pspdef_t *psp)
    vis->x1 = x1 < 0 ? 0 : x1;
    vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;
    // proff 11/06/98: Added for high-res
-   vis->scale = pspritescale;
+   vis->scale = pspriteyscale;
 
    if (flip)
    {
@@ -760,7 +774,8 @@ static void msort(vissprite_t **s, vissprite_t **t, int n)
       msort(s2, t, n2);
 
       while ((*s1)->scale > (*s2)->scale ?
-             (*d++ = *s1++, --n1) : (*d++ = *s2++, --n2));
+             (*d++ = *s1++, --n1) : (*d++ = *s2++, --n2))
+         ;
 
       if (n2)
          bcopyp(d, s2, n2);
@@ -778,7 +793,8 @@ static void msort(vissprite_t **s, vissprite_t **t, int n)
          if (s[i-1]->scale < temp->scale)
          {
             int j = i;
-            while ((s[j] = s[j-1])->scale < temp->scale && --j);
+            while ((s[j] = s[j-1])->scale < temp->scale && --j)
+               ;
             s[j] = temp;
          }
       }
@@ -893,7 +909,8 @@ void R_DrawSprite (vissprite_t* spr)
       int phs = viewplayer->mo->subsector->sector->heightsec;
       if ((mh = sectors[spr->heightsec].floorheight) > spr->gz &&
             (h = centeryfrac - FixedMul(mh-=viewz, spr->scale)) >= 0 &&
-            (h >>= FRACBITS) < viewheight) {
+            (h >>= FRACBITS) < viewheight)
+      {
          if (mh <= 0 || (phs != -1 && viewz > sectors[phs].floorheight))
          {                          // clip bottom
             for (x=spr->x1 ; x<=spr->x2 ; x++)
@@ -909,7 +926,8 @@ void R_DrawSprite (vissprite_t* spr)
 
       if ((mh = sectors[spr->heightsec].ceilingheight) < spr->gzt &&
             (h = centeryfrac - FixedMul(mh-viewz, spr->scale)) >= 0 &&
-            (h >>= FRACBITS) < viewheight) {
+            (h >>= FRACBITS) < viewheight)
+      {
          if (phs != -1 && viewz >= sectors[phs].ceilingheight)
          {                         // clip bottom
             for (x=spr->x1 ; x<=spr->x2 ; x++)
@@ -927,7 +945,8 @@ void R_DrawSprite (vissprite_t* spr)
    // all clipping has been performed, so draw the sprite
    // check for unclipped columns
 
-   for (x = spr->x1 ; x<=spr->x2 ; x++) {
+   for (x = spr->x1 ; x<=spr->x2 ; x++)
+   {
       if (clipbot[x] == -2)
          clipbot[x] = viewheight;
 
@@ -953,7 +972,7 @@ void R_DrawMasked(void)
 
    // draw all vissprites back to front
 
-//   rendered_vissprites = num_vissprite;
+   //   rendered_vissprites = num_vissprite;
    for (i = num_vissprite ;--i>=0; )
       R_DrawSprite(vissprite_ptrs[i]);         // killough
 

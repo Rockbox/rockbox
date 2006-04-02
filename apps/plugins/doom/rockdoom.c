@@ -176,22 +176,6 @@ cont:
     }
     /* NOTREACHED */
 }
-#if 0
-   static char *tp=NULL;
-
-   if(string!=NULL)
-      tp=string;
-
-   while(*tp!=NULL)
-   {
-      if(*tp==*delimiters)
-         break;
-      tp++;
-   }
-   *tp=0;
-   return tp;
-}
-#endif
 
 inline void* memcpy(void* dst, const void* src, size_t size)
 {
@@ -415,7 +399,7 @@ int Dbuild_addons(struct opt_items *names)
    names[0].string=startpt;
    names[0].voice_id=0;
 
-   addons=opendir(GAMEBASE"Addons/");
+   addons=opendir(GAMEBASE"addons/");
    if(addons==NULL)
       return 1;
 
@@ -448,7 +432,7 @@ int Dbuild_demos(struct opt_items *names)
    names[0].string=startpt;
    names[0].voice_id=0;
 
-   demos=opendir(GAMEBASE"Demos/");
+   demos=opendir(GAMEBASE"demos/");
    if(demos==NULL)
       return 1;
 

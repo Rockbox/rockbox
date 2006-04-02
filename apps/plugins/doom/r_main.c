@@ -61,6 +61,8 @@ int centerx IBSS_ATTR;
 int centery IBSS_ATTR;
 fixed_t  centerxfrac, centeryfrac;
 fixed_t   projection;
+// proff 11/06/98: Added for high-res
+fixed_t  projectiony;
 fixed_t  viewx, viewy, viewz;
 angle_t  viewangle;
 fixed_t  viewcos, viewsin;
@@ -333,10 +335,17 @@ void R_ExecuteSetViewSize (void)
       scaledviewwidth = SCREENWIDTH;
       viewheight = SCREENHEIGHT;
    }
+   // proff 09/24/98: Added for high-res
+   else if (setblocks == 10)
+   {
+      scaledviewwidth = SCREENWIDTH;
+      viewheight = SCREENHEIGHT-ST_SCALED_HEIGHT;
+   }
    else
    {
-      scaledviewwidth = setblocks*32;
-      viewheight = (setblocks*168/10)&~7;
+      // proff 08/17/98: Changed for high-res
+      scaledviewwidth = setblocks*SCREENWIDTH/10;
+      viewheight = (setblocks*(SCREENHEIGHT-ST_SCALED_HEIGHT)/10) & ~7;
    }
 
    viewwidth = scaledviewwidth;
@@ -346,14 +355,19 @@ void R_ExecuteSetViewSize (void)
    centerxfrac = centerx<<FRACBITS;
    centeryfrac = centery<<FRACBITS;
    projection = centerxfrac;
+   // proff 11/06/98: Added for high-res
+   projectiony = ((SCREENHEIGHT * centerx * 320) / 200) / SCREENWIDTH * FRACUNIT;
 
    R_InitBuffer (scaledviewwidth, viewheight);
 
    R_InitTextureMapping();
 
    // psprite scales
-   pspritescale = FRACUNIT*viewwidth/SCREENWIDTH;
-   pspriteiscale = FRACUNIT*SCREENWIDTH/viewwidth;
+   // proff 08/17/98: Changed for high-res
+   pspritescale = FRACUNIT*viewwidth/320;
+   pspriteiscale = FRACUNIT*320/viewwidth;
+   // proff 11/06/98: Added for high-res
+   pspriteyscale = (((SCREENHEIGHT*viewwidth)/SCREENWIDTH) << FRACBITS) / 200;
 
    // thing clipping
    for (i=0 ; i<viewwidth ; i++)
@@ -363,7 +377,8 @@ void R_ExecuteSetViewSize (void)
    for (i=0 ; i<viewheight ; i++)
    {   // killough 5/2/98: reformatted
       fixed_t dy = D_abs(((i-viewheight/2)<<FRACBITS)+FRACUNIT/2);
-      yslope[i] = FixedDiv ( (viewwidth)/2*FRACUNIT, dy);
+      // proff 08/17/98: Changed for high-res
+      yslope[i] = FixedDiv(projectiony, dy);
    }
 
    for (i=0 ; i<viewwidth ; i++)
@@ -379,10 +394,7 @@ void R_ExecuteSetViewSize (void)
       int j, startmap = ((LIGHTLEVELS-1-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
       for (j=0 ; j<MAXLIGHTSCALE ; j++)
       {
-         // CPhipps - use 320 here instead of SCREENWIDTH, otherwise hires is
-         //           brighter than normal res
-         int scale = FixedDiv ((320/2*FRACUNIT), (j+1)<<LIGHTZSHIFT);
-         int t, level = startmap - (scale >>= LIGHTSCALESHIFT)/DISTMAP;
+         int t, level = startmap - j*320/viewwidth/DISTMAP;
 
          if (level < 0)
             level = 0;
@@ -410,12 +422,14 @@ void R_Init (void)
    // CPhipps - R_DrawColumn isn't constant anymore, so must
    //  initialise in code
    colfunc = R_DrawColumn;     // current column draw function
-   if (SCREENWIDTH<320)
-      I_Error("R_Init: Screenwidth(%d) < 320",SCREENWIDTH);
+//   if (SCREENWIDTH<320)
+//      I_Error("R_Init: Screenwidth(%d) < 320",SCREENWIDTH);
 #if 1
+
    printf("\nR_LoadTrigTables: ");
    R_LoadTrigTables();
 #endif
+
    printf("\nR_InitData: ");
    R_InitData();
    R_SetViewSize(screenblocks);

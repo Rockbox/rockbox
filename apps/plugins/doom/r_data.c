@@ -63,7 +63,8 @@ typedef struct
    short patch;
    short stepdir;         // unused in Doom but might be used in Phase 2 Boom
    short colormap;        // unused in Doom but might be used in Phase 2 Boom
-} PACKEDATTR mappatch_t;
+}
+PACKEDATTR mappatch_t;
 
 typedef struct
 {
@@ -74,7 +75,8 @@ typedef struct
    char       pad[4];       // unused in Doom but might be used in Boom Phase 2
    short      patchcount;
    mappatch_t patches[1];
-} PACKEDATTR maptexture_t;
+}
+PACKEDATTR maptexture_t;
 
 // A maptexturedef_t describes a rectangular texture, which is composed
 // of one or more mappatch_t structures that arrange graphic patches.
@@ -247,7 +249,8 @@ static void R_GenerateLookup(int texnum, int *const errors)
 
    struct {
       unsigned short patches, posts;
-   } *count = calloc(sizeof *count, texture->width);
+   }
+   *count = calloc(sizeof *count, texture->width);
 
    {
       int i = texture->patchcount;
@@ -300,9 +303,11 @@ static void R_GenerateLookup(int texnum, int *const errors)
          {
             //jff 8/3/98 use logical output routine
             printf("\nR_GenerateLookup: Column %d is without a patch in texture %s",
-                    x, texture->name);
-            if (errors) ++*errors;
-            else I_Error("R_GenerateLookup: Failed");
+                   x, texture->name);
+            if (errors)
+               ++*errors;
+            else
+               I_Error("R_GenerateLookup: Failed");
          }
          if (count[x].patches > 1)       // killough 4/9/98
          {
@@ -333,7 +338,8 @@ static void R_GenerateLookup(int texnum, int *const errors)
 const byte *R_GetColumn(int tex, int col)
 {
    const texture_t *texture = textures[tex];
-   if (!texture->columnlump) R_GenerateLookup(tex, NULL);
+   if (!texture->columnlump)
+      R_GenerateLookup(tex, NULL);
    {
       int lump = texture->columnlump[col &= texture->widthmask];
       int ofs  = texture->columnofs[col]; // cph - WARNING: must be after the above line
@@ -345,7 +351,8 @@ const byte *R_GetColumn(int tex, int col)
       if ((lump<=0) && (lastlump<=0))
          lump = lastlump; // cph - force equal
 
-      if (lump != lastlump) {
+      if (lump != lastlump)
+      {
          // cph - must change the cached lump
          if (lastlump>0)
             W_UnlockLumpNum(lastlump);
@@ -353,9 +360,11 @@ const byte *R_GetColumn(int tex, int col)
          if ((lastlump = lump) > 0)
             lastlumpdata = W_CacheLumpNum(lump);
 #ifdef RANGECHECK
+
          else
             lastlumpdata = NULL;
 #endif
+
       }
 
       if (lump > 0)
@@ -533,12 +542,13 @@ void R_InitTextures (void)
          {
             //jff 8/3/98 use logical output routine
             printf("\nR_InitTextures: Missing patch %d in texture %s",
-                    SHORT(mpatch->patch), texture->name); // killough 4/17/98
+                   SHORT(mpatch->patch), texture->name); // killough 4/17/98
             ++errors;
          }
       }
 
-      texture->columnofs = NULL; texture->columnlump = NULL;
+      texture->columnofs = NULL;
+      texture->columnlump = NULL;
 
       for (j=1; j*2 <= texture->width; j<<=1)
          ;
@@ -687,7 +697,8 @@ int R_ColormapNumForName(const char *name)
 struct _cache {
    unsigned char pct;
    unsigned char playpal[256];
-} cache;
+}
+cache;
 
 int tran_filter_pct = 66;       // filter percent
 
@@ -712,10 +723,10 @@ void R_InitTranMap(int progress)
       // Use cached translucency filter if it's available
 
       if ((cachefd<0) ? cachefd = open(GAMEBASE"tranmap.dat",O_WRONLY | O_CREAT) , 1 :
-          read(cachefd, &cache, sizeof(cache)) != sizeof(cache) ||
-          cache.pct != tran_filter_pct ||
-          memcmp(cache.playpal, playpal, sizeof cache.playpal) ||
-          read(cachefd, my_tranmap, 256*256) != 256*256 ) // killough 4/11/98
+            read(cachefd, &cache, sizeof(cache)) != sizeof(cache) ||
+            cache.pct != tran_filter_pct ||
+            memcmp(cache.playpal, playpal, sizeof cache.playpal) ||
+            read(cachefd, my_tranmap, 256*256) != 256*256 ) // killough 4/11/98
       {
 
          long *stackdeath=malloc(256*7*sizeof(long)); // This was a bunch of static varibles, way too big for rockbox
@@ -733,7 +744,7 @@ void R_InitTranMap(int progress)
          if (progress)
             printf("Please wait: Tranmap build");
          // First, convert playpal into long int type, and transpose array,
-             // for fast inner-loop calculations. Precompute tot array.
+         // for fast inner-loop calculations. Precompute tot array.
 
          {
             register int i = 255;
@@ -749,7 +760,8 @@ void R_InitTranMap(int progress)
                d += t*t;
                p -= 3;
                tot[i] = d << (TSC-1);
-            } while (--i>=0);
+            }
+            while (--i>=0);
          }
 
          // Next, compute all entries using minimum arithmetic.
@@ -775,9 +787,10 @@ void R_InitTranMap(int progress)
                   long best = LONG_MAX;
                   do
                      if ((err = tot[color] - pal[0][color]*r
-                           - pal[1][color]*g - pal[2][color]*b) < best)
+                                - pal[1][color]*g - pal[2][color]*b) < best)
                         best = err, *tp = color;
-                  while (--color >= 0);
+                  while (--color >= 0)
+                     ;
                }
             }
          }
@@ -886,78 +899,78 @@ int R_TextureNumForName(const char *name)  // const added -- killough
 
 void R_PrecacheLevel(void)
 {
-  register int i;
-  register byte *hitlist;
+   register int i;
+   register byte *hitlist;
 
-  if (demoplayback)
-    return;
+   if (demoplayback)
+      return;
 
-  {
-    size_t size = numflats > numsprites  ? numflats : numsprites;
-    hitlist = malloc((size_t)numtextures > size ? (unsigned)numtextures : size);
-  }
-  // Precache flats.
+   {
+      size_t size = numflats > numsprites  ? numflats : numsprites;
+      hitlist = malloc((size_t)numtextures > size ? (unsigned)numtextures : size);
+   }
+   // Precache flats.
 
-  memset(hitlist, 0, numflats);
+   memset(hitlist, 0, numflats);
 
-  for (i = numsectors; --i >= 0; )
-    hitlist[sectors[i].floorpic] = hitlist[sectors[i].ceilingpic] = 1;
+   for (i = numsectors; --i >= 0; )
+      hitlist[sectors[i].floorpic] = hitlist[sectors[i].ceilingpic] = 1;
 
-  for (i = numflats; --i >= 0; )
-    if (hitlist[i])
-      (W_CacheLumpNum)(firstflat + i, 0);
+   for (i = numflats; --i >= 0; )
+      if (hitlist[i])
+         (W_CacheLumpNum)(firstflat + i, 0);
 
-  // Precache textures.
+   // Precache textures.
 
-  memset(hitlist, 0, numtextures);
+   memset(hitlist, 0, numtextures);
 
-  for (i = numsides; --i >= 0;)
-    hitlist[sides[i].bottomtexture] =
-      hitlist[sides[i].toptexture] =
-      hitlist[sides[i].midtexture] = 1;
+   for (i = numsides; --i >= 0;)
+      hitlist[sides[i].bottomtexture] =
+         hitlist[sides[i].toptexture] =
+            hitlist[sides[i].midtexture] = 1;
 
-  // Sky texture is always present.
-  // Note that F_SKY1 is the name used to
-  //  indicate a sky floor/ceiling as a flat,
-  //  while the sky texture is stored like
-  //  a wall texture, with an episode dependend
-  //  name.
+   // Sky texture is always present.
+   // Note that F_SKY1 is the name used to
+   //  indicate a sky floor/ceiling as a flat,
+   //  while the sky texture is stored like
+   //  a wall texture, with an episode dependend
+   //  name.
 
-  hitlist[skytexture] = 1;
+   hitlist[skytexture] = 1;
 
-  for (i = numtextures; --i >= 0; )
-    if (hitlist[i])
+   for (i = numtextures; --i >= 0; )
+      if (hitlist[i])
       {
-        texture_t *texture = textures[i];
-        int j = texture->patchcount;
-        while (--j >= 0)
-          (W_CacheLumpNum)(texture->patches[j].patch, 0);
+         texture_t *texture = textures[i];
+         int j = texture->patchcount;
+         while (--j >= 0)
+            (W_CacheLumpNum)(texture->patches[j].patch, 0);
       }
 
-  // Precache sprites.
-  memset(hitlist, 0, numsprites);
+   // Precache sprites.
+   memset(hitlist, 0, numsprites);
 
-  {
-    thinker_t *th;
-    for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
-      if (th->function == P_MobjThinker)
-        hitlist[((mobj_t *)th)->sprite] = 1;
-  }
+   {
+      thinker_t *th;
+      for (th = thinkercap.next ; th != &thinkercap ; th=th->next)
+         if (th->function == P_MobjThinker)
+            hitlist[((mobj_t *)th)->sprite] = 1;
+   }
 
-  for (i=numsprites; --i >= 0;)
-    if (hitlist[i])
+   for (i=numsprites; --i >= 0;)
+      if (hitlist[i])
       {
-        int j = sprites[i].numframes;
-        while (--j >= 0)
-          {
+         int j = sprites[i].numframes;
+         while (--j >= 0)
+         {
             short *sflump = sprites[i].spriteframes[j].lump;
             int k = 7;
             do
-              (W_CacheLumpNum)(firstspritelump + sflump[k], 0);
+               (W_CacheLumpNum)(firstspritelump + sflump[k], 0);
             while (--k >= 0);
-          }
+         }
       }
-  free(hitlist);
+   free(hitlist);
 }
 
 // Proff - Added for OpenGL

@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.2  2006/03/28 17:20:49  christian
+ * Revision 1.3  2006/04/02 01:52:44  kkurbjun
+ * Update adds prboom's high resolution support, also makes the scaling for platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table code has been removed.  Also fixed a pallete bug.  Some graphic errors are present in menu and status bar.  Also updates some headers and output formatting.
+ *
+ * Revision 1.2  2006-03-28 17:20:49  christian
  * added good (tm) button mappings for x5, and added ifdef for HAS_BUTTON_HOLD
  *
  * Revision 1.1  2006-03-28 15:44:01  dave
@@ -40,50 +43,11 @@
 #include "doomdef.h"
 
 #include "rockmacros.h"
-
+#if defined(CPU_COLDFIRE)
+static char fastscreen[LCD_WIDTH*LCD_HEIGHT] IBSS_ATTR;
+#endif
 static fb_data palette[256] IBSS_ATTR;
 static fb_data *paldata=NULL;
-
-#if !defined(CPU_COLDFIRE) || defined(SIMULATOR)
-/*
-   This code is credit to the IDOOM port.  It is not used for the H300, but
-   serves as a good reference point for other targets.
-*/
-static fb_data * xtable  = 0;
-static fb_data * ytable1 = 0;
-static fb_data * ytable2 = 0;
-
-#define FLOOR4(a) \
- (( a >> 2) << 2)
-
-static int video_w, video_h;
-
-static void genscalexytable(void)
-{
-   // shall we use uint8_t intead of ints?
-   int y = video_h-1;
-   int x = video_w-1;
-   int i = 1 + (x>y?x:y);
-   xtable  = malloc(sizeof(int)*video_w );
-   ytable1 = malloc(sizeof(int)*video_h );
-   ytable2 = malloc(sizeof(int)*video_h );
-
-   while(i--)
-   {
-      if(y>=0)
-      {
-         ytable1[y] = ((y*SCREENHEIGHT) / video_h) * SCREENWIDTH;
-         ytable2[y] = y*video_w;
-         y--;
-      }
-      if(x>=0)
-      {
-         xtable[x] = (x*SCREENWIDTH) / video_w;
-         x--;
-      }
-   }
-}
-#endif
 
 //
 // I_ShutdownGraphics (NOT USED)
@@ -360,9 +324,7 @@ void I_FinishUpdate (void)
 {
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    /*
-      Faster screen update than the lookuptables -> I'm wasting 7 pixels of width
-      though.  This code also doesn't use the framebuffer so rockbox's drawing
-      functions will not work on top of the doom drawing.
+      Lookup tables are no longer needed
    */
 
    // Start the write
@@ -373,51 +335,27 @@ void I_FinishUpdate (void)
    unsigned char *screenptr=screens[0];
    int wcnt=0, hcnt=0;
 
-   *(volatile unsigned short *) 0xf0000002 = 0;
-   *(volatile unsigned short *) 0xf0000002 = 0;
-   *(volatile unsigned short *) 0xf0000002 = 0;
-
    while(hcnt<LCD_HEIGHT)
    {
-      while(wcnt<LCD_WIDTH-7)
+      while(wcnt<LCD_WIDTH)
       {
-         if((wcnt&0x01))
-            screenptr++; // Skip every so many pixels in Doom buffer
          *(volatile unsigned short *)0xf0000002 = palette[*screenptr];
          screenptr++;
          wcnt++;
       }
-      screenptr++;
-      // move on past those 7 pixels
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
-      *(volatile unsigned short *) 0xf0000002 = 0;
       wcnt=0;
       hcnt++;
-      if((hcnt&0x07)==0x07)
-         screenptr+=SCREENWIDTH; // Skip every 7th line
    }
 #else
-   // The IDOOM code for screen updates
    unsigned char paletteIndex;
    int x, y;
 
-   for (y = 0; y < video_h; y++)
+   for (y = 0; y < LCD_HEIGHT; y++)
    {
-      for (x = 0; x < video_w; x++)
+      for (x = 0; x < LCD_WIDTH; x++)
       {
-#if LCD_HEIGHT >= SCREENHEIGHT
-         paletteIndex = screens[0][((y*SCREENHEIGHT) / video_h) 
-                                   * SCREENWIDTH + x];
-         rb->lcd_framebuffer[y * video_w + x] = palette[paletteIndex];
-#else
-         paletteIndex = screens[0][ytable1[y] +xtable[x]];
-         rb->lcd_framebuffer[x + ytable2[y]] = palette[paletteIndex];
-#endif
+         paletteIndex = screens[0][y*SCREENWIDTH + x];
+         rb->lcd_framebuffer[y * LCD_WIDTH + x] = palette[paletteIndex];
       }
    }
    rb->lcd_update();
@@ -454,14 +392,12 @@ void I_InitGraphics(void)
    printf("Starting Graphics engine\n");
 
    /* Note: The other screens are initialized later */
-   screens[0] = malloc (SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned char));
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
+   screens[0] = fastscreen;
 #else
-
-   video_h = LCD_HEIGHT;
-   video_w = FLOOR4(LCD_WIDTH); // From IDOOM, the width has to be a multiple of 4
-   genscalexytable();
+   // Don't know if this will fit in other IRAMs
+   screens[0] = malloc (SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned char));
 #endif
 }
