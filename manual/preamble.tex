@@ -92,9 +92,15 @@
 \newcommand{\screenshot}[3]{
   \begin{figure}[!ht]
     \begin{center}
-      \IfFileExists{#1}{\includegraphics[width=4cm]{#1}}{%
-        \typeout{Missing image: #1}%
-        \color{red}{\textbf{WARNING!} Image not found}}%
+      \IfFileExists{#1-\genericimg.png}
+        {\includegraphics[width=4cm]{#1-\genericimg.png}}
+        {\IfFileExists{#1}
+          {\includegraphics[width=4cm]{#1}
+           \typeout{Warning: deprecated plain image name used}}%
+          {\typeout{Missing image: #1 (\genericimg)}%
+           \color{red}{\textbf{WARNING!} Image not found}%
+          }
+        }
       \if\blank{#3}\else{\label{#3}}\fi\if\blank{#2}\else{%
         \caption{#2}}\fi
     \end{center}
