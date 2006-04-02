@@ -44,6 +44,9 @@ Usage: genlang2 [options] <langv2 file>
     Specify which target you want the translations/phrases for. Required when
     -b or -p is used.
 
+ -o
+    Voice mode output. Outputs all id: and voice: lines for the given target!
+
  -v
     Enables verbose (debug) output.
 MOO
@@ -69,19 +72,20 @@ my $binary = $b;
 my $update = $u;
 
 my $english = $e;
+my $voiceout = $o;
 
-my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0);
+my $check = ($binary?1:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0);
 
 if($check > 1) {
-    print "Please use only one of -p, -u and -b\n";
+    print "Please use only one of -p, -u, -o and -b\n";
     exit;
 }
 if(!$check) {
-    print "Please use at least one of -p, -u and -b\n";
+    print "Please use at least one of -p, -u, -o and -b\n";
     exit;
 }
-if(($binary || $update) && !$english) {
-    print "Please use -e too when you use -b or -u\n";
+if(($binary || $update || $voiceout) && !$english) {
+    print "Please use -e too when you use -b, -o or -u\n";
     exit;
 }
 
@@ -98,7 +102,6 @@ my @idnum; # num to string array
 my %source; # id string to source phrase hash
 my %dest; # id string to dest phrase hash
 my %voice; # id string to voice phrase hash
-
 
 my $input = $ARGV[0];
 
@@ -163,6 +166,7 @@ sub voice {
     parsetarget("voice", \$voice, @_);
 }
 
+my %idmap;
 my %english;
 if($english) {
     # For the cases where the english file needs to be scanned/read, we do
@@ -170,7 +174,7 @@ if($english) {
     # -u it is convenient.
 
     my $idnum=0; # start with a true number
-    my %idmap;
+    my $vidnum=0x8000; # first voice id
     open(ENG, "<$english") || die "can't open $english";
     my @phrase;
     my $id;
@@ -194,14 +198,17 @@ if($english) {
 
         if($_ =~ /^ *id: ([^ \t\n]+)/i) {
             $id=$1;
-            # Skip voice-only entries
+            # voice-only entries get a difference range
             if($id =~ /^VOICE_/) {
-                next;
+                # Assign an ID number to this entry
+                $idmap{$id}=$vidnum;
+                $vidnum++;
             }
-
-            # Assign an ID number to this entry
-            $idmap{$id}=$idnum;
-            $idnum++;
+            else {
+                # Assign an ID number to this entry
+                $idmap{$id}=$idnum;
+                $idnum++;
+            }
         }
     }
     close(ENG);
@@ -324,7 +331,7 @@ while(<LANG>) {
                 if($dest =~ /^none\z/i) {
                     # "none" as dest means that this entire phrase is to be
                     # ignored
-                    print "dest is NONE!\n";
+                    #print "dest is NONE!\n";
                 }
                 else {
 
@@ -432,11 +439,11 @@ extern unsigned char *language_strings[];
 extern const unsigned char language_builtin[];
 
 /* The enum below contains all available strings */
-enum {
+enum \{
 MOO
     ;
 
-print CFILE <<MOO
+    print CFILE <<MOO
 /* This file was automaticly generated using genlang2, the strings come
    from "$input" */
    
@@ -445,21 +452,21 @@ print CFILE <<MOO
 unsigned char *language_strings[LANG_LAST_INDEX_IN_ARRAY];
 const unsigned char language_builtin[] =
 MOO
-    ;
+;
 
- # Output the ID names for the enum in the header file
-my $i;
-for $i (1 .. $idcount) {
-    my $name=$idnum[$i - 1]; # get the ID name
-
-    $name =~ s/\"//g; # cut off the quotes
-
-    printf HFILE ("    %s,\n", $name);
-}
+    # Output the ID names for the enum in the header file
+    my $i;
+    for $i (1 .. $idcount) {
+        my $name=$idnum[$i - 1]; # get the ID name
+        
+        $name =~ s/\"//g; # cut off the quotes
+        
+        printf HFILE ("    %s,\n", $name);
+    }
 
 # Output separation marker for last string ID and the upcoming voice IDs
 
-print HFILE <<MOO
+    print HFILE <<MOO
     LANG_LAST_INDEX_IN_ARRAY, /* this is not a string, this is a marker */
     /* --- below this follows voice-only strings --- */
     VOICEONLY_DELIMITER = 0x8000,
@@ -467,16 +474,16 @@ MOO
     ;
 
 # Output the ID names for the enum in the header file
-my $i;
-for $i (0x8000 .. ($voiceid-1)) {
-    my $name=$idnum[$i]; # get the ID name
+    my $i;
+    for $i (0x8000 .. ($voiceid-1)) {
+        my $name=$idnum[$i]; # get the ID name
+        
+        $name =~ s/\"//g; # cut off the quotes
+        
+        printf HFILE ("    %s,\n", $name);
+    }
 
-    $name =~ s/\"//g; # cut off the quotes
-
-    printf HFILE ("    %s,\n", $name);
-}
-
-# Output end of enum
+    # Output end of enum
     print HFILE "\n};\n/* end of generated enum list */\n";
 
     # Output the target phrases for the source file
@@ -495,11 +502,11 @@ for $i (0x8000 .. ($voiceid-1)) {
     }
 
 # Output end of string chunk
-print CFILE <<MOO
+    print CFILE <<MOO
 ;
 /* end of generated string list */
 MOO
-    ;
+;
 
     close(HFILE);
     close(CFILE);
@@ -533,6 +540,47 @@ elsif($binary) {
             }
         }
     }
+}
+elsif($voiceout) {
+    # voice output requested, display id: and voice: strings in a v1-like
+    # fashion
+
+    my @engl;
+
+    # This loops over the strings in the translated language file order
+    my @ids = ((0 .. ($idcount-1)));
+    push @ids, (0x8000 .. ($voiceid-1));
+
+    #for my $id (@ids) {
+    #    print "$id\n";
+    #}
+
+    for $i (@ids) {
+        my $name=$idnum[$i]; # get the ID
+        my $dest = $voice{$name}; # get the destination voice string
+
+        if($dest) {
+            $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
+
+            # Now, make sure we get the number from the english sort order:
+            $idnum = $idmap{$name};
+
+            $engl[$idnum] = $i;
+
+           # print "Input index $i output index $idnum\n";
+
+        }
+    }
+    for my $i (@ids) {
+
+        my $o = $engl[$i];
+
+        my $name=$idnum[$o]; # get the ID
+        my $dest = $voice{$name}; # get the destination voice string
+        
+        print "#$i\nid: $name\nvoice: $dest\n";
+    }
+    
 }
 
 
