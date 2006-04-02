@@ -235,7 +235,7 @@ static bool eq_gain_menu(void)
     int m, i;
     int *setting;
     bool result;
-    char gain_label[5][24];
+    char gain_label[5][32];
     static struct menu_item items[5] = {
         { NULL, eq_set_band0_gain },
         { NULL, eq_set_band1_gain },
