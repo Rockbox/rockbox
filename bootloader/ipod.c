@@ -193,7 +193,7 @@ static int key_pressed(void)
     unsigned char state;
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD
-#if defined(APPLE_IPODMINI)
+#ifdef IPOD_MINI /* mini 1G only */
     state = GPIOA_INPUT_VAL & 0x3f;
 #else
     state = opto_keypad_read();
