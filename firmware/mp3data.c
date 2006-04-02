@@ -118,6 +118,9 @@ static bool mp3headerinfo(struct mp3info *info, unsigned long header)
     int bitindex, freqindex;
 
     /* MPEG Audio Version */
+    if ((header & VERSION_MASK) >> 19 >= sizeof(version_table))
+        return false;
+    
     info->version = version_table[(header & VERSION_MASK) >> 19];
     if (info->version < 0)
         return false;
@@ -359,6 +362,14 @@ int get_mp3file_info(int fd, struct mp3info *info)
         return -2;
 
     /* OK, we have found a frame. Let's see if it has a Xing header */
+    if (info->frame_size-4 >= sizeof(frame))
+    {
+#if defined(DEBUG) || defined(SIMULATOR)
+        DEBUGF("Error: Invalid id3 header, frame_size: %d\n", info->frame_size);
+#endif
+        return -8;
+    }
+    
     if(read(fd, frame, info->frame_size-4) < 0)
         return -3;
 

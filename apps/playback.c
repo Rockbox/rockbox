@@ -2359,8 +2359,11 @@ static void mp3_set_elapsed(struct mp3entry* id3)
         }
     }
     else
+    {
         /* constant bitrate, use exact calculation */
-        id3->elapsed = id3->offset / (id3->bitrate / 8);
+        if (id3->bitrate != 0)
+            id3->elapsed = id3->offset / (id3->bitrate / 8);
+    }
 }
 
 /* Copied from mpeg.c. Should be moved somewhere else. */

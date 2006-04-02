@@ -629,7 +629,10 @@ void dsp_set_eq_coefs(int band)
     cutoff = 0xffffffff / NATIVE_FREQUENCY * (*setting++);
     q = ((*setting++) << 16) / 10;        /* 16.16 */
     gain = ((*setting++) << 16) / 10;     /* s15.16 */
-
+    
+    if (q == 0)
+        q = 1;
+    
     /* The coef functions assume the EMAC unit is in fractional mode */
     #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
     /* set emac unit for dsp processing, and save old macsr, we're running in
