@@ -21,7 +21,7 @@
 PLUGIN_HEADER
 
 static struct plugin_api* rb;
-static int files, dirs;
+static int files, dirs, musicfiles;
 static int lasttick;
 static bool abort;
 #ifdef HAVE_LCD_BITMAP
@@ -42,24 +42,53 @@ static int fontwidth, fontheight;
 #else
 #define STATS_STOP BUTTON_OFF
 #endif
+#ifdef HAVE_REMOTE_LCD
+#define STATS_STOP_REMOTE BUTTON_RC_STOP
+#endif
+
+/* TODO: Better get the exts from the filetypes var in tree.c */
+const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg",
+        "wav","flac","ac3","a52","mpc","wv","m4a","mp4","shn",
+        "aif","aiff"};
+
+void prn(const char *str, int y)
+{
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_putsxy(0,y,str);
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_putsxy(0,y,str);    
+#endif
+#else
+    rb->lcd_puts(0,y,str);   
+#endif
+}
 
 void update_screen(void)
 {
     char buf[15];
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_clear_display();
-    rb->lcd_putsxy(0,0,"Files:");
-    rb->lcd_putsxy(0,fontheight,"Dirs:");
-    rb->snprintf(buf, sizeof(buf), "%d", files);
-    rb->lcd_putsxy(fontwidth,0,buf);
-    rb->snprintf(buf, sizeof(buf), "%d", dirs);
-    rb->lcd_putsxy(fontwidth,fontheight,buf);
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_clear_display();
+#endif
+    
+    rb->snprintf(buf, sizeof(buf), "Files: %d", files);
+    prn(buf,0);
+
+    rb->snprintf(buf, sizeof(buf), "Music: %d", musicfiles);
+    prn(buf,fontheight);
+    
+    rb->snprintf(buf, sizeof(buf), "Dirs: %d", dirs);
+    prn(buf,fontheight*2);
     rb->lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    rb->lcd_remote_update();
+#endif
 #else
     rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
-    rb->lcd_puts(0,0,buf);
+    prn(buf,0);
     rb->snprintf(buf, sizeof(buf), "Dirs: %5d", dirs);
-    rb->lcd_puts(0,1,buf);
+    prn(buf,1);
 #endif
 }
 
@@ -82,17 +111,32 @@ void traversedir(char* location, char* name)
             {
                 if (entry->attribute & ATTR_DIRECTORY) {
                     traversedir(fullpath, entry->d_name);
-                    dirs += 1;
+                    dirs++;
                 }
-                else
-                    /* Might want to only count .mp3, .ogg etc. */
+                else {
+                    char *ptr = rb->strrchr(entry->d_name,'.'); 
                     files++;
+                    /* Might want to only count .mp3, .ogg etc. */
+                    if(ptr){
+                        unsigned i;
+                        ptr++;
+                        for(i=0;i<sizeof(music_exts)/sizeof(char*);i++)
+                            if(!rb->strcasecmp(ptr,music_exts[i])){
+                                musicfiles++; break;
+                            }
+                        
+                    }
+                }
             }
             if (*rb->current_tick - lasttick > (HZ/2)) {
                 update_screen();
                 lasttick = *rb->current_tick;
                 button = rb->button_get(false);
-                if (button == STATS_STOP) {
+                if (button == STATS_STOP
+#ifdef HAVE_REMOTE_LCD
+                    || button == STATS_STOP_REMOTE
+#endif
+                    ) {
                     abort = true;
                     break;
                 }
@@ -113,12 +157,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
     files = 0;
     dirs = 0;
+    musicfiles = 0;
     abort = false;
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_getstringsize("Files: ", &fontwidth, &fontheight);
 #endif
-    rb->splash(HZ, true, "Counting..");
+    rb->splash(HZ, true, "Counting...");
     update_screen();
     lasttick = *rb->current_tick;
 
@@ -128,11 +173,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_OK;
     }
     update_screen();
+#ifdef HAVE_REMOTE_LCD
+    rb->remote_backlight_on();
+#endif
+    rb->backlight_on();
     rb->splash(HZ, true, "Done");
     update_screen();
     button = rb->button_get(true);
     while (1) {
         switch (button) {
+#ifdef HAVE_REMOTE_LCD
+            case STATS_STOP_REMOTE:
+#endif
             case STATS_STOP:
                 return PLUGIN_OK;
                 break;
