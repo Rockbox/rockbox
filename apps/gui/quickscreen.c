@@ -45,44 +45,69 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
 
 void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
-    char buffer[30];
+    char buffer[30], line_text[40];
     const unsigned char *option;
     const unsigned char *title;
     const unsigned char *left_right_title;
-    char line_text[40];
+    int w;
+    bool statusbar = global_settings.statusbar;
 #ifdef HAS_BUTTONBAR
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
     display->setfont(FONT_SYSFIXED);
     left_right_title=(unsigned char *)qs->left_right_title;
+
     /* Displays the icons */
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1, 8, 7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], 1, 24, 7, 8);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1, 40, 7, 8);
 
     /* Displays the first line of text */
     option=(unsigned char *)option_select_get_text(qs->left_option, buffer,
                                                    sizeof buffer);
     title=(unsigned char *)qs->left_option->title;
     snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
-    display->puts_scroll(0, 0+!(global_settings.statusbar), line_text);
-    display->puts_scroll(3, 1+!(global_settings.statusbar), option);
+    display->puts_scroll(2, !statusbar, line_text);
+    display->puts_scroll(2, 1+!statusbar, option);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1, 8, 7, 8);
 
     /* Displays the second line of text */
-    option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
-                                                   sizeof buffer);
-    title=(unsigned char *)qs->bottom_option->title;
-    display->puts_scroll(0, 2+!(global_settings.statusbar), title);
-    display->puts_scroll(3, 3+!(global_settings.statusbar), option);
-
-    /* Displays the third line of text */
     option=(unsigned char *)option_select_get_text(qs->right_option, buffer,
                                                    sizeof buffer);
     title=(unsigned char *)qs->right_option->title;
     snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
-    display->puts_scroll(0, 4+!(global_settings.statusbar), line_text);
-    display->puts_scroll(3, 5+!(global_settings.statusbar), option);
+    display->getstringsize(line_text, &w, NULL);
+    if(w > LCD_WIDTH-8)
+    {
+        display->puts_scroll(2, 2+!statusbar, line_text);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1, 24, 7, 8);
+    }
+    else
+    {
+        display->putsxy(LCD_WIDTH-w-12, 24, line_text);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], LCD_WIDTH-8, 24, 7, 8);
+    }
+    display->getstringsize(option, &w, NULL);
+    if(w > LCD_WIDTH)
+        display->puts_scroll(0, 3+!statusbar, option);
+    else
+        display->putsxy(LCD_WIDTH-w-12, 32, option);
+
+    /* Displays the third line of text */
+    option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
+                                                   sizeof buffer);
+    title=(unsigned char *)qs->bottom_option->title;
+
+    display->getstringsize(title, &w, NULL);
+    if(w > LCD_WIDTH)
+        display->puts_scroll(0, 4+!statusbar, line_text);
+    else
+        display->putsxy(LCD_WIDTH/2-w/2, 40, title);
+
+    display->getstringsize(option, &w, NULL);
+    if(w > LCD_WIDTH)
+        display->puts_scroll(0, 5+!statusbar, option);
+    else
+        display->putsxy(LCD_WIDTH/2-w/2, 48, option);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], LCD_WIDTH/2-4, 56, 7, 8);
 
     gui_textarea_update(display);
     display->setfont(FONT_UI);
@@ -127,14 +152,18 @@ bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
             option_select_next(qs->right_option);
             return(true);
 
+#ifdef QUICKSCREEN_BOTTOM_INV
         case QUICKSCREEN_BOTTOM_INV :
         case QUICKSCREEN_BOTTOM_INV | BUTTON_REPEAT :
+#endif
 #ifdef QUICKSCREEN_RC_BOTTOM_INV
         case QUICKSCREEN_RC_BOTTOM_INV :
         case QUICKSCREEN_RC_BOTTOM_INV | BUTTON_REPEAT :
 #endif
+#if defined(QUICKSCREEN_RC_BOTTOM_INV) || defined(QUICKSCREEN_BOTTOM_INV)
             option_select_prev(qs->bottom_option);
             return(true);
+#endif
     }
     return(false);
 }

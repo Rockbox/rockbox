@@ -194,6 +194,7 @@
 #define WPS_BROWSE_PRE BUTTON_SELECT
 #define WPS_EXIT       (BUTTON_PLAY | BUTTON_REPEAT)
 #define WPS_CONTEXT    (BUTTON_SELECT | BUTTON_REPEAT)
+#define WPS_QUICK      (BUTTON_MENU | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 
@@ -342,7 +343,7 @@ struct wps_data
     int curr_subline[WPS_MAX_LINES];
     int progress_height;
     int progress_start;
-    int progress_end; 
+    int progress_end;
     bool wps_loaded;
     bool peak_meter_enabled;
 #ifdef HAVE_LCD_COLOR
@@ -381,7 +382,7 @@ struct wps_state
 void wps_state_init(void);
 
 /* change the ff/rew-status
-   if ff_rew = true then we are in skipping mode 
+   if ff_rew = true then we are in skipping mode
    else we are in normal mode */
 void wps_state_update_ff_rew(bool ff_rew);
 

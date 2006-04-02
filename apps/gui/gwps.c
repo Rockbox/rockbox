@@ -569,8 +569,9 @@ long gui_wps_show(void)
                 break;
 #endif
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) ||\
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
                 /* play settings */
             case WPS_QUICK:
 #ifdef WPS_RC_QUICK

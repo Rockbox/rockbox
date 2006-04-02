@@ -461,7 +461,8 @@ bool pitch_screen(void)
 #endif
 
 #if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD) ||\
+    (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define bool_to_int(b)\
     b?1:0
 #define int_to_bool(i)\
@@ -480,6 +481,12 @@ bool quick_screen_quick(int button_enter)
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
+    int old_x_margin, old_y_margin;
+
+    old_x_margin = lcd_getxmargin();
+    old_y_margin = lcd_getymargin();
+    lcd_setmargins(0, 0);
+
     static const struct opt_items left_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
@@ -541,6 +548,7 @@ bool quick_screen_quick(int button_enter)
         }
         settings_save();
     }
+    lcd_setmargins(old_x_margin, old_y_margin);
     return(res);
 }
 
@@ -563,6 +571,12 @@ bool quick_screen_f3(int button_enter)
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
+    int old_x_margin, old_y_margin;
+
+    old_x_margin = lcd_getxmargin();
+    old_y_margin = lcd_getymargin();
+    lcd_setmargins(0, 0);
+
     static const struct opt_items onoff_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
@@ -594,6 +608,7 @@ bool quick_screen_f3(int button_enter)
     res=gui_syncquickscreen_run(&qs, button_enter);
     if(!res)
         settings_save();
+    lcd_setmargins(old_x_margin, old_y_margin);
     return(res);
 }
 #endif /* BUTTON_F3 */
