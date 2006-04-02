@@ -45,6 +45,10 @@
 #include "keyboard.h"
 #endif
 
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#endif
+
 #ifndef SIMULATOR
 static int boot_size = 0;
 static int boot_cluster;
@@ -278,6 +282,9 @@ int ft_load(struct tree_context* c, const char* tempdir)
 #ifdef HAVE_REMOTE_LCD
             (*c->dirfilter == SHOW_RWPS && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_RWPS) ||
 #endif
+#ifdef CONFIG_TUNER
+            (*c->dirfilter == SHOW_FMR && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_FMR) ||
+#endif
             (*c->dirfilter == SHOW_CFG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_CFG) ||
             (*c->dirfilter == SHOW_LNG && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & TREE_ATTR_MASK) != TREE_ATTR_MOD) ||
@@ -417,6 +424,34 @@ int ft_enter(struct tree_context* c)
                     play = true;
                 }
                 break;
+
+#ifdef CONFIG_TUNER
+                /* fmr preset file */
+            case TREE_ATTR_FMR:
+            
+                /* Preset inside the default folder. */
+                if(!strncasecmp(FMPRESET_PATH, buf, strlen(FMPRESET_PATH)))
+                {
+                    set_file(buf, global_settings.fmr_file, MAX_FILENAME);
+                    radio_load_presets(global_settings.fmr_file);
+                    if(get_radio_status() != FMRADIO_PLAYING &&
+                        get_radio_status() != FMRADIO_PAUSED)
+                            radio_screen();
+                }
+                /* 
+                 * Preset outside default folder, we can choose such only
+                 * if we are out of the radio screen, so the check for the 
+                 * radio status isn't neccessary 
+                 */
+                else
+                {
+                    radio_load_presets(buf);
+                    radio_screen();
+                }
+                
+                break;
+#endif
+
 
                 /* wps config file */
             case TREE_ATTR_WPS:

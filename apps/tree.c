@@ -106,6 +106,9 @@ const struct filetype filetypes[] = {
 #ifdef HAVE_LCD_COLOR
     { "bmp", TREE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
 #endif
+#ifdef CONFIG_TUNER
+    { "fmr", TREE_ATTR_FMR, Icon_Preset, LANG_FMR },
+#endif
     { "lng", TREE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",TREE_ATTR_ROCK,Icon_Plugin, VOICE_EXT_ROCK },
 #ifdef HAVE_LCD_BITMAP

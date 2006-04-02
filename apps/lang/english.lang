@@ -3677,3 +3677,47 @@ desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
 new:
+
+id: LANG_FM_NO_PRESETS
+desc: error when preset list is empty
+eng: "No presets"
+voice: "No presets"
+new:
+
+id: LANG_FM_PRESET_LOAD
+desc: load preset list in fm radio
+eng: "Load Preset List"
+voice: "Load Preset List"
+new:
+
+id: LANG_FM_PRESET_SAVE
+desc: Save preset list in fm radio
+eng: "Save Preset List"
+voice: "Save Preset List"
+new:
+
+id: LANG_FM_PRESET_CLEAR
+desc: clear preset list in fm radio
+eng: "Clear Preset List"
+voice: "Clear Preset List"
+new:
+
+id: LANG_FMR
+desc: Used when you need to say Preset List, also voiced
+eng: "Preset List"
+voice: "Preset List"
+new:
+
+id: LANG_FM_FIRST_AUTOSCAN
+desc: When you run the radio without an fmr file in settings
+eng: "No Settings found, AutoScan?"
+voice: "No Settings found, AutoScan?"
+new:
+
+id: LANG_FM_SAVE_CHANGES
+desc: When you try to exit radio to confirm save
+eng: "Save Changes?"
+voice: "Save Changes?"
+new:
+
+

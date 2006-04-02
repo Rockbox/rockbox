@@ -77,6 +77,10 @@
 #include "backdrop.h"
 #endif
 
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#endif
+
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
 #endif
@@ -150,6 +154,7 @@ modified unless the header & checksum test fails.
 Rest of config block, only saved to disk:
 0x2C  start of 2nd bit-table
 ...
+0xA4  (char[20]) FMR Preset file
 0xB8  (char[20]) WPS file
 0xCC  (char[20]) Lang file
 0xE0  (char[20]) Font file
@@ -912,6 +917,13 @@ int settings_save( void )
             MAX_FILENAME);
     i+= MAX_FILENAME;
 #endif
+
+#ifdef CONFIG_TUNER
+    strncpy((char *)&config_block[i], (char *)global_settings.fmr_file,
+            MAX_FILENAME);
+    i+= MAX_FILENAME;
+#endif
+
 #ifdef HAVE_LCD_COLOR
     strncpy((char *)&config_block[i], (char *)global_settings.backdrop_file,
             MAX_FILENAME);
@@ -1263,6 +1275,13 @@ void settings_load(int which)
                 MAX_FILENAME);
         i+= MAX_FILENAME;
 #endif
+
+#ifdef CONFIG_TUNER
+        strncpy((char *)global_settings.fmr_file, (char *)&config_block[i],
+                MAX_FILENAME);
+        i+= MAX_FILENAME;
+#endif
+
 #ifdef HAVE_LCD_COLOR
         strncpy((char *)global_settings.backdrop_file, (char *)&config_block[i],
                 MAX_FILENAME);
@@ -1433,6 +1452,11 @@ bool settings_load_config(const char* file)
                 talk_init(); /* use voice of same language */
             }
         }
+#ifdef CONFIG_TUNER
+        else if (!strcasecmp(name, "fmr")) {
+            set_file(value, global_settings.fmr_file, MAX_FILENAME);
+        }
+#endif
 #ifdef HAVE_LCD_BITMAP
         else if (!strcasecmp(name, "font")) {
             if (font_load(value))
@@ -1580,9 +1604,9 @@ bool settings_save_config(void)
     }
 
     fdprintf(fd, "# .cfg file created by rockbox %s - "
-                 "http://www.rockbox.org\r\n#\r\n"
-                 "#\r\n# wps / language / font \r\n#\r\n", appsversion);
-
+                 "http://www.rockbox.org\r\n#\r\n#\r\n# wps / rwps / language"
+                 " / font / fmpreset / backdrop \r\n#\r\n", appsversion);
+                 
     if (global_settings.wps_file[0] != 0)
         fdprintf(fd, "wps: %s/%s.wps\r\n", WPS_DIR,
                  global_settings.wps_file);
@@ -1607,6 +1631,12 @@ bool settings_save_config(void)
     if (global_settings.backdrop_file[0] != 0)
         fdprintf(fd, "backdrop: %s/%s.bmp\r\n", BACKDROP_DIR,
                  global_settings.backdrop_file);
+#endif
+
+#ifdef CONFIG_TUNER
+    if (global_settings.fmr_file[0] != 0)
+        fdprintf(fd, "fmr: %s/%s.fmr\r\n", FMPRESET_PATH,
+                 global_settings.fmr_file);
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -1685,6 +1715,10 @@ void settings_reset(void) {
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
     global_settings.contrast    = lcd_default_contrast();
+    
+#ifdef CONFIG_TUNER
+    global_settings.fmr_file[0] = '\0';
+#endif
     global_settings.wps_file[0] = '\0';
 #ifdef HAVE_REMOTE_LCD
     global_settings.rwps_file[0] = '\0';

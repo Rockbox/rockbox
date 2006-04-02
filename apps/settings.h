@@ -291,6 +291,9 @@ struct user_settings
     int resume_seed;   /* shuffle seed (-1=no resume shuffle 0=sorted
                           >0=shuffled) */
 
+#ifdef CONFIG_TUNER
+    unsigned char fmr_file[MAX_FILENAME+1]; /* last fmr preset */
+#endif
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
@@ -571,7 +574,7 @@ enum
  *       must be added after NUM_FILTER_MODES. */
 enum { SHOW_ALL, SHOW_SUPPORTED, SHOW_MUSIC, SHOW_PLAYLIST, SHOW_ID3DB,
        NUM_FILTER_MODES,
-       SHOW_WPS, SHOW_RWPS, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
+       SHOW_WPS, SHOW_RWPS, SHOW_FMR, SHOW_CFG, SHOW_LNG, SHOW_MOD, SHOW_FONT, SHOW_PLUGINS};
 
 /* recursive dir insert options */
 enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };

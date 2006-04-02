@@ -18,12 +18,16 @@
  ****************************************************************************/
 #ifndef RADIO_H
 #define RADIO_H
+#define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
 #define FMRADIO_OFF     0
 #define FMRADIO_PLAYING 1
-#define FMRADIO_PAUSED  2
+#define FMRADIO_PLAYING_OUT  2
+#define FMRADIO_PAUSED  3
+#define FMRADIO_PAUSED_OUT  4
 
 #ifdef CONFIG_TUNER
+void radio_load_presets(char *filename);
 void radio_init(void);
 bool radio_screen(void);
 void radio_stop(void);
