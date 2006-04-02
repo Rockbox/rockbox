@@ -362,7 +362,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
         return -2;
 
     /* OK, we have found a frame. Let's see if it has a Xing header */
-    if (info->frame_size-4 >= sizeof(frame))
+    if (info->frame_size-4 >= (int)sizeof(frame))
     {
 #if defined(DEBUG) || defined(SIMULATOR)
         DEBUGF("Error: Invalid id3 header, frame_size: %d\n", info->frame_size);
