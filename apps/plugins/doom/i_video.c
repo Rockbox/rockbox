@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.8  2006/04/03 17:11:42  kkurbjun
+ * Revision 1.9  2006/04/03 20:03:02  kkurbjun
+ * Updates doom menu w/ new graphics, now requires rockdoom.wad: http://alamode.mines.edu/~kkurbjun/rockdoom.wad
+ *
+ * Revision 1.8  2006-04-03 17:11:42  kkurbjun
  * Finishing touches
  *
  * Revision 1.7  2006-04-03 16:30:12  kkurbjun
@@ -83,6 +86,7 @@ void I_ShutdownGraphics(void)
 #ifndef HAVE_LCD_COLOR
    gray_release();
 #endif
+   noprintf=0;
 }
 
 //

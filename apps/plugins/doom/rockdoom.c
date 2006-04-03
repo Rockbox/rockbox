@@ -314,12 +314,13 @@ bool Dhandle_ver (int dver)
 
 // This function builds up the basegame list for use in the options selection
 // it also sets the defaults for the argvlist
+// Now checking for rcokdoom.wad based on prboom.wad
 int Dbuild_base (struct opt_items *names)
 {
-   if ( fileexists(GAMEBASE"prboom.wad") )
+   if ( fileexists(GAMEBASE"rockdoom.wad") )
       return 0;
 
-   D_AddFile (GAMEBASE"prboom.wad", source_pwad);
+   D_AddFile (GAMEBASE"rockdoom.wad", source_pwad);
 
    int i=0;
    /* Doom Shareware */

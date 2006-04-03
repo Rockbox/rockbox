@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.2  2006/04/03 00:28:13  kkurbjun
+// Revision 1.3  2006/04/03 20:03:02  kkurbjun
+// Updates doom menu w/ new graphics, now requires rockdoom.wad: http://alamode.mines.edu/~kkurbjun/rockdoom.wad
+//
+// Revision 1.2  2006-04-03 00:28:13  kkurbjun
 // Fixes graphic errors in scaling code, note sure about the fix in hu_lib.c though.  I havn't seen any corrupted text but it may still need a proper fix.
 //
 // Revision 1.1  2006-03-28 15:44:01  dave
@@ -187,7 +190,7 @@ void M_ReadThis2(int choice);
 void M_QuitDOOM(int choice);
 
 void M_ChangeMessages(int choice);
-void M_ChangeSensitivity(int choice);
+void M_ChangeGamma(int choice);
 void M_SfxVol(int choice);
 void M_MusicVol(int choice);
 void M_SystemVol(int choice);
@@ -349,7 +352,7 @@ menuitem_t OptionsMenu[]=
       {1,"M_MESSG", M_ChangeMessages,'m'},
       {2,"M_SCRNSZ", M_SizeDisplay,'s'},
       {-1,"",0,0},
-      {2,"M_MSENS", M_ChangeSensitivity,'m'},
+      {2,"M_GAMMA", M_ChangeGamma,'m'},
       {-1,"",0,0},
       {1,"M_SVOL", M_Sound,'s'}
    };
@@ -429,7 +432,7 @@ menuitem_t SoundMenu[]=
       {-1,"",0,0}, //ROCKBOX
       {2,"M_MUSVOL",M_MusicVol,'m'},
       {-1,"",0,0}, //ROCKBOX
-      {2,"M_MUSVOL",M_SystemVol,'z'},
+      {2,"M_SYSVOL",M_SystemVol,'z'},
       {-1,"",0,0} //ROCKBOX
    };
 
@@ -1147,7 +1150,7 @@ void M_QuitDOOM(int choice)
 
 
 
-void M_ChangeSensitivity(int choice)
+void M_ChangeGamma(int choice)
 {
    switch(choice)
    {
