@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.3  2006/04/02 12:45:29  amiconn
+// Revision 1.4  2006/04/03 17:00:56  dave
+// Doom can't use the user timer at the same time as using the grayscale lib.
+//
+// Revision 1.3  2006-04-02 12:45:29  amiconn
 // Use TIMER_FREQ for timers in plugins. Fixes timer speed on iPod.
 //
 // Revision 1.2  2006-04-02 01:52:44  kkurbjun
@@ -50,7 +53,7 @@
 // I_GetTime
 // returns time in 1/35th second tics
 //
-#if (CONFIG_CPU != PP5020)
+#if (CONFIG_CPU != PP5020) && !defined(HAVE_LCD_COLOR)
 volatile unsigned int doomtimer=0;
 
 void doomtime(void)
@@ -61,7 +64,7 @@ void doomtime(void)
 
 int  I_GetTime (void)
 {
-#ifdef SIMULATOR
+#if defined(SIMULATOR) || !defined (HAVE_LCD_COLOR)
 #if HZ==100
    return ((7*(*rb->current_tick))/20);
 #else
@@ -86,7 +89,7 @@ int  I_GetTime (void)
 // The game is much slower now (in terms of game speed).
 void I_Init (void)
 {
-#if (CONFIG_CPU != PP5020) && !defined(SIMULATOR)
+#if (CONFIG_CPU != PP5020) && !defined(SIMULATOR) && defined(HAVE_LCD_COLOR)
    rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime);
 #endif
    I_InitSound();
