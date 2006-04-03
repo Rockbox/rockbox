@@ -3705,12 +3705,12 @@ new:
 id: LANG_FM_FIRST_AUTOSCAN
 desc: When you run the radio without an fmr file in settings
 eng: "No Settings found, AutoScan?"
-voice: "No Settings found, AutoScan?"
+voice: ""
 new:
 
 id: LANG_FM_SAVE_CHANGES
 desc: When you try to exit radio to confirm save
 eng: "Save Changes?"
-voice: "Save Changes?"
+voice: ""
 new:
 
