@@ -39,14 +39,30 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 #define SEEK_LIST_SIZE 50
 #define TAGCACHE_MAX_FILTERS 3
+#define TAGCACHE_MAX_CLAUSES 10
+
+enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
+    clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
+enum modifies { clause_mod_none, clause_mod_not };
+
+struct tagcache_search_clause
+{
+    int tag;
+    int type;
+    bool numeric;
+    long numeric_data;
+    char str[32];
+};
 
 struct tagcache_search {
     /* For internal use only. */
-    int fd;
+    int fd, masterfd;
     long seek_list[SEEK_LIST_SIZE];
     long filter_tag[TAGCACHE_MAX_FILTERS];
     long filter_seek[TAGCACHE_MAX_FILTERS];
     int filter_count;
+    struct tagcache_search_clause *clause[TAGCACHE_MAX_CLAUSES];
+    int clause_count;
     int seek_list_count;
     int seek_pos;
     int idx_id;
@@ -62,9 +78,12 @@ struct tagcache_search {
     long result_seek;
 };
 
+bool tagcache_is_numeric_tag(int type);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
+bool tagcache_search_add_clause(struct tagcache_search *tcs,
+                                struct tagcache_search_clause *clause);
 bool tagcache_get_next(struct tagcache_search *tcs);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);

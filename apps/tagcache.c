@@ -132,7 +132,7 @@ static int total_entry_count = 0;
 static int data_size = 0;
 static int processed_dir_count;
 
-static bool is_numeric_tag(int type)
+bool tagcache_is_numeric_tag(int type)
 {
     int i;
 
@@ -326,11 +326,9 @@ static struct index_entry *find_entry_disk(const char *filename, bool retrieve)
 
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
 {
-    struct tagcache_header tch;
     struct index_entry idx;
-    int masterfd;
     
-    if (!is_numeric_tag(tag))
+    if (!tagcache_is_numeric_tag(tag))
         return -1;
     
 #ifdef HAVE_TC_RAMCACHE
@@ -340,32 +338,46 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     }
 #endif
     
-    masterfd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
-    
-    if (masterfd < 0)
-    {
-        logf("open fail");
-        return -2;
-    }
-    
-    if (read(masterfd, &tch, sizeof(struct tagcache_header)) !=
-        sizeof(struct tagcache_header) || tch.magic != TAGCACHE_MAGIC)
-    {
-        logf("header error");
-        return -3;
-    }
-    
-    lseek(masterfd, tcs->idx_id * sizeof(struct index_entry), SEEK_CUR);
-    if (read(masterfd, &idx, sizeof(struct index_entry)) !=
+    lseek(tcs->masterfd, tcs->idx_id * sizeof(struct index_entry), SEEK_CUR);
+    if (read(tcs->masterfd, &idx, sizeof(struct index_entry)) !=
         sizeof(struct index_entry))
     {
         logf("read error #3");
-        close(masterfd);
         return -4;
     }
-    close(masterfd);
     
     return idx.tag_seek[tag];
+}
+
+static bool check_against_clause(long numeric, const char *str,
+                                 const struct tagcache_search_clause *clause)
+{
+    switch (clause->type)
+    {
+        case clause_is:
+            if (clause->numeric)
+                return numeric == clause->numeric_data;
+            else
+                return !strcasecmp(clause->str, str);
+        
+        case clause_gt:
+            return numeric > clause->numeric_data;
+        case clause_gteq:
+            return numeric >= clause->numeric_data;
+        case clause_lt:
+            return numeric < clause->numeric_data;
+        case clause_lteq:
+            return numeric <= clause->numeric_data;
+        
+        case clause_contains:
+            return (strcasestr(str, clause->str) != NULL);
+        case clause_begins_with:
+            return (strcasestr(str, clause->str) == str);
+        case clause_ends_with: /* Not supported yet */
+            return false;
+    }
+    
+    return false;
 }
 
 static bool build_lookup_list(struct tagcache_search *tcs)
@@ -382,7 +394,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     {
         int j;
 
-        for (i = tcs->seek_pos; i < hdr->h.entry_count - tcs->seek_pos; i++)
+        for (i = tcs->seek_pos; i < hdr->h.entry_count; i++)
         {
             if (tcs->seek_list_count == SEEK_LIST_SIZE)
                 break ;
@@ -395,6 +407,25 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             }
             
             if (j < tcs->filter_count)
+                continue ;
+            
+            for (j = 0; j < tcs->clause_count; j++)
+            {
+                int seek = hdr->indices[i].tag_seek[tcs->clause[j]->tag];
+                char *str = NULL;
+                struct tagfile_entry *entry;
+
+                if (!tagcache_is_numeric_tag(tcs->clause[j]->tag))
+                {
+                    entry = (struct tagfile_entry *)&hdr->tags[tcs->clause[j]->tag][seek];
+                    str = entry->tag_data;
+                }
+                
+                if (!check_against_clause(seek, str, tcs->clause[j]))
+                    break ;
+            }
+                                          
+            if (j < tcs->clause_count)
                 continue ;
             
             /* Add to the seek list if not already there. */
@@ -455,6 +486,26 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         if (i < tcs->filter_count)
             continue ;
         
+        /* Check for conditions. */
+        for (i = 0; i < tcs->clause_count; i++)
+        {
+            int seek = entry.tag_seek[tcs->clause[i]->tag];
+            char str[64];
+            
+            memset(str, 0, sizeof str);
+            if (!tagcache_is_numeric_tag(tcs->clause[i]->tag))
+            {
+                /* FIXME: Not yet implemented. */
+                // str = &hdr->tags[tcs->clause[i].tag][seek];
+            }
+            
+            if (!check_against_clause(seek, str, tcs->clause[i]))
+                break ;
+        }
+        
+        if (i < tcs->clause_count)
+            continue ;
+            
         /* Add to the seek list if not already there. */
         for (i = 0; i < tcs->seek_list_count; i++)
         {
@@ -484,6 +535,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     if (tcs->valid)
         tagcache_search_finish(tcs);
     
+    memset(tcs, 0, sizeof(struct tagcache_search));
     tcs->position = sizeof(struct tagcache_header);
     tcs->fd = -1;
     tcs->type = tag;
@@ -491,6 +543,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     tcs->seek_list_count = 0;
     tcs->filter_count = 0;
     tcs->valid = true;
+    tcs->masterfd = -1;
 
 #ifndef HAVE_TC_RAMCACHE
     tcs->ramsearch = false;
@@ -503,7 +556,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     else
 #endif
     {
-        if (is_numeric_tag(tcs->type))
+        if (tagcache_is_numeric_tag(tcs->type))
             return true;
         
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tcs->type);
@@ -519,6 +572,23 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
             sizeof(struct tagcache_header) || h.magic != TAGCACHE_MAGIC)
         {
             logf("incorrect header");
+            return false;
+        }
+        
+        tcs->masterfd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
+        
+        if (tcs->masterfd < 0)
+        {
+            logf("open fail");
+            return false;
+        }
+        
+        if (read(tcs->masterfd, &h, sizeof(struct tagcache_header)) !=
+            sizeof(struct tagcache_header) || h.magic != TAGCACHE_MAGIC)
+        {
+            logf("header error");
+            close(tcs->masterfd);
+            tcs->masterfd = -1;
             return false;
         }
     }
@@ -539,6 +609,21 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
     return true;
 }
 
+bool tagcache_search_add_clause(struct tagcache_search *tcs,
+                                struct tagcache_search_clause *clause)
+{
+    if (tcs->clause_count >= TAGCACHE_MAX_CLAUSES)
+    {
+        logf("Too many clauses");
+        return false;
+    }
+    
+    tcs->clause[tcs->clause_count] = clause;
+    tcs->clause_count++;
+    
+    return true;
+}
+
 bool tagcache_get_next(struct tagcache_search *tcs)
 {
     static char buf[MAX_PATH];
@@ -547,7 +632,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     if (!tcs->valid)
         return false;
         
-    if (tcs->fd < 0 && !is_numeric_tag(tcs->type)
+    if (tcs->fd < 0 && !tagcache_is_numeric_tag(tcs->type)
 #ifdef HAVE_TC_RAMCACHE
         && !tcs->ramsearch
 #endif
@@ -555,11 +640,11 @@ bool tagcache_get_next(struct tagcache_search *tcs)
         return false;
     
     /* Searching not supported for numeric tags yet. */
-    if (is_numeric_tag(tcs->type))
+    if (tagcache_is_numeric_tag(tcs->type))
         return false;
     
     /* Relative fetch. */
-    if (tcs->filter_count > 0)
+    if (tcs->filter_count > 0 || tcs->clause_count > 0)
     {
         /* Check for end of list. */
         if (tcs->seek_list_count == 0)
@@ -672,9 +757,16 @@ void tagcache_search_finish(struct tagcache_search *tcs)
     {
         close(tcs->fd);
         tcs->fd = -1;
-        tcs->ramsearch = false;
-        tcs->valid = false;
     }
+    
+    if (tcs->masterfd >= 0)
+    {
+        close(tcs->masterfd);
+        tcs->masterfd = -1;
+    }
+    
+    tcs->ramsearch = false;
+    tcs->valid = false;
 }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -846,7 +938,7 @@ static void remove_files(void)
     remove(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
-        if (is_numeric_tag(i))
+        if (tagcache_is_numeric_tag(i))
             continue;
         
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, i);
@@ -1593,7 +1685,7 @@ static bool commit(void)
     /* Now create the index files. */
     for (i = 0; i < TAG_COUNT; i++)
     {
-        if (is_numeric_tag(i))
+        if (tagcache_is_numeric_tag(i))
         {
             build_numeric_index(i, &header, tmpfd);
         }
@@ -1760,7 +1852,7 @@ static bool load_tagcache(void)
         struct tagfile_entry *fe;
         char buf[MAX_PATH];
 
-        if (is_numeric_tag(i))
+        if (tagcache_is_numeric_tag(i))
             continue ;
         
         //p = ((void *)p+1);
