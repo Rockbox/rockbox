@@ -728,9 +728,8 @@ static bool dirbrowse(void)
 
                     id3db = check_changed_id3mode(id3db);
                     reload_dir = true;
-                    break;
                 }
-
+                break;
 #endif
 
 #ifdef BUTTON_F3
