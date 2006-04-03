@@ -457,6 +457,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     unsigned int count = 0;
     bool store_index;
     unsigned char *p;
+    int result = 0;
 
     if(-1 == playlist->fd)
         playlist->fd = open(playlist->filename, O_RDONLY);
@@ -506,16 +507,18 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
                 if(*p != '#')
                 {
+                    if ( playlist->amount >= playlist->max_playlist_size ) {
+                        display_buffer_full();
+                        result = -1;
+                        goto exit;
+                    }
+
                     /* Store a new entry */
                     playlist->indices[ playlist->amount ] = i+count;
 #ifdef HAVE_DIRCACHE
                     if (playlist->filenames)
                         playlist->filenames[ playlist->amount ] = NULL;
 #endif
-                    if ( playlist->amount >= playlist->max_playlist_size ) {
-                        display_buffer_full();
-                        return -1;
-                    }
                     playlist->amount++;
                 }
             }
@@ -524,11 +527,12 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         i+= count;
     }
 
+exit:
 #ifdef HAVE_DIRCACHE
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
-    return 0;
+    return result;
 }
 
 /*
