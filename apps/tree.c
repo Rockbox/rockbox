@@ -364,11 +364,16 @@ static int update_dir(void)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
+    bool id3db = *tc.dirfilter == SHOW_ID3DB;
+    
     if (ft_load(&tc, dir) < 0)
         return;
     lastdir[0] = 0;
 
     ft_build_playlist(&tc, 0);
+
+    if (id3db)
+        tagtree_load(&tc);
 }
 
 /* Returns the current working directory and also writes cwd to buf if
