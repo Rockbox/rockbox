@@ -390,7 +390,7 @@ static void format_line(const struct playlist_entry* track, char* str,
 
     if (track->skipped)
         skipped = "(ERR) ";
-    
+
     if (global_settings.playlist_viewer_indices)
         /* Display playlist index */
         snprintf(str, len, "%d. %s%s", track->display_index, skipped, name);
@@ -537,7 +537,7 @@ static bool track_display(void)
         { STR(LANG_DISPLAY_FULL_PATH) }
     };
 
-    return set_option((char *)str(LANG_TRACK_DISPLAY), 
+    return set_option((char *)str(LANG_TRACK_DISPLAY),
                       &global_settings.playlist_viewer_track_display, INT, names, 2,
                       NULL);
 }
@@ -767,8 +767,11 @@ bool playlist_viewer_ex(char* filename)
                 gui_synclist_draw(&playlist_lists);
                 break;
             }
-
+#ifdef TREE_MENU_PRE
+            case TREE_MENU_PRE:
+#else
             case TREE_MENU:
+#endif
 #ifdef TREE_RC_MENU
             case TREE_RC_MENU:
 #endif
@@ -808,7 +811,7 @@ exit:
 char * playlist_search_callback_name(int selected_item, void * data, char *buffer)
 {
     int *found_indicies = (int*)data;
-    static struct playlist_track_info track;    
+    static struct playlist_track_info track;
     playlist_get_track_info(viewer.playlist,found_indicies[selected_item],&track);
     format_name(buffer,track.filename);
     return(buffer);
@@ -834,12 +837,12 @@ bool search_playlist(void)
     int button;
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
-    
+
     if (!playlist_viewer_init(&viewer, 0, false))
         return ret;
     if (kbd_input(search_str,sizeof(search_str)) == -1)
-        return ret; 
-    lcd_clear_display();  
+        return ret;
+    lcd_clear_display();
     playlist_count = playlist_amount_ex(viewer.playlist);
     for (i=0;(i<playlist_count)&&(found_indicies_count<MAX_PLAYLIST_ENTRIES);i++)
     {
