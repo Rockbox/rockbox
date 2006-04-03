@@ -3,10 +3,6 @@
 \usepackage{palatino}
 %\renewcommand{\familydefault}{\sfdefault}
 
-%Comment this out at release
-\usepackage{pdfdraftcopy}
-\draftstring{DRAFT VERSION}
-%\draftangle{45}
 \usepackage{tabularx}
 \usepackage{multirow}
 
@@ -43,6 +39,16 @@
 \usepackage{url}
 \urlstyle{sf}
 \usepackage{marvosym}
+
+% new \ifpdf to check if running in pdf mode. Helps for html generation.
+\newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
+
+% mark this ad draft version (only for pdflatex) -- comment this out at release
+\ifpdf
+  \usepackage{pdfdraftcopy}
+  \draftstring{DRAFT VERSION}
+%   \draftangle{45}
+\fi
 
 % fancy header style adjustments
 %\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
