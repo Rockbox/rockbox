@@ -226,7 +226,7 @@ new: "Karaoke"
 
 id: LANG_STEREO_WIDTH
 desc: in sound_settings
-eng: "Stereo width"
+eng: "Stereo Width"
 voice: "Stereobasisbreite"
 new: "Stereobasisbreite"
 
@@ -250,7 +250,7 @@ new: "AV-Trägheit"
 
 id: LANG_SUPERBASS
 desc: in sound settings
-eng: "Super bass"
+eng: "Super Bass"
 voice: "Superbass"
 new: "Superbass"
 
@@ -274,7 +274,7 @@ new: "MDB Obertöne"
 
 id: LANG_MDB_CENTER
 desc: in sound settings
-eng: "MDB Center frequency"
+eng: "MDB Center Frequency"
 voice: "MDB Mittenfrequenz"
 new: "MDB Mittenfrequenz"
 
@@ -430,7 +430,7 @@ new: "Keine Partition?"
 
 id: LANG_RECORDING_MENU
 desc: in the recording sub menu
-eng: "Recording screen"
+eng: "Recording Screen"
 voice: "Aufnahmemodus"
 new: "Aufnahmemodus"
 
@@ -636,13 +636,13 @@ new: "Gewählte zuerst wiedergeben"
 
 id: LANG_RESUME
 desc: in settings_menu
-eng: "Resume on startup"
+eng: "Resume on Startup"
 voice: "Beim Start fortsetzen"
 new: "Beim Start fortsetzen"
 
 id: LANG_WIND_MENU
 desc: in the playback sub menu
-eng: "FFwd/Rewind"
+eng: "Fast-Forward/Rewind"
 voice: "Vor- und Rücklauf"
 new: "FF/RW"
 
@@ -654,7 +654,7 @@ new: "Puffer vorzeitig füllen"
 
 id: LANG_FADE_ON_STOP
 desc: options menu to set fade on stop or pause
-eng: "Fade On Stop/Pause"
+eng: "Fade on Stop/Pause"
 voice: "Ausblenden bei Stop und Pause"
 new: "Blenden bei Stop/Pause"
 
@@ -678,7 +678,7 @@ new: "Lautstärkeanpassung"
 
 id: LANG_BEEP
 desc: in playback settings
-eng: "Beep volume"
+eng: "Beep Volume"
 voice: "Piep-Lautstärke"
 new: "Piep-Lautstärke"
 
@@ -702,13 +702,13 @@ new: "Laut"
 
 id: LANG_SPDIF_ENABLE
 desc: in playback settings menu. enable/disable the optical out
-eng: "Optical output"
+eng: "Optical Output"
 voice: "Optischer Ausgang"
 new: "Optischer Ausgang"
 
 id: LANG_ID3_ORDER
 desc: in playback settings screen
-eng: "ID3 tag priority"
+eng: "ID3 Tag Priority"
 voice: "Bevorzugtes ID3 Tag"
 new: "Bevorzugtes ID3 Tag"
 
@@ -726,31 +726,31 @@ new: "V2 vor V1"
 
 id: LANG_NEXT_FOLDER
 desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
-eng: "Auto change directory"
+eng: "Auto-Change Directory"
 voice: "Automatischer Verzeichniswechsel"
 new: "Autom. Verzeichniswechsel"
 
 id: LANG_TAGCACHE
 desc: in tag cache settings
-eng: "Tag cache"
+eng: "Tag Cache"
 voice: "Tag-Datenbank"
 new: "Tag-Datenbank"
 
 id: LANG_TAGCACHE_DISK
 desc: in tag cache settings
-eng: "Keep on disk"
+eng: "Keep on Disk"
 voice: "Von Festplatte lesen"
 new: "Von Festplatte lesen"
 
 id: LANG_TAGCACHE_RAM
 desc: in tag cache settings
-eng: "Load to ram"
+eng: "Load to RAM"
 voice: "In Arbeitsspeicher laden"
 new: "In RAM laden"
 
 id: LANG_TAGCACHE_FORCE_UPDATE
 desc: in tag cache settings
-eng: "Force tag cache update"
+eng: "Force Tag Cache Update"
 voice: "Tag-Datenbank aktualisieren"
 new: "Tag-Datenbank aktualisieren"
 
@@ -768,7 +768,7 @@ new: "Erstelle Tag-Datenbank..."
 
 id: LANG_RUNTIMEDB_ACTIVE
 desc: in settings_menu.
-eng: "Gather runtime data (experimental)"
+eng: "Gather Runtime Data (experimental)"
 voice: "Spielzeitdaten sammeln"
 new: "Spielzeitdaten sammeln (experimentell)"
 
@@ -800,19 +800,19 @@ new: "alphabetisch"
 
 id: LANG_SORT_DATE
 desc: browser sorting setting
-eng: "by date"
+eng: "By Date"
 voice: "nach Datum"
 new: "nach Datum"
 
 id: LANG_SORT_DATE_REVERSE
 desc: browser sorting setting
-eng: "by newest date"
+eng: "By Newest Date"
 voice: "nach neuestem Datum"
 new: "nach neuestem Datum"
 
 id: LANG_SORT_TYPE
 desc: browser sorting setting
-eng: "by type"
+eng: "By Type"
 voice: "nach Typ"
 new: "nach Typ"
 
@@ -847,8 +847,8 @@ voice: "Abspiellisten"
 new: "Playlisten"
 
 id: LANG_FILTER_ID3DB
-desc: show ID3 database
-eng: "ID3 database"
+desc: show ID3 Database
+eng: "ID3 Database"
 voice: "ID3-Datenbank"
 new: "ID3-Datenbank"
 
@@ -1176,7 +1176,7 @@ new: "Kanäle"
 
 id: LANG_RECORDING_EDITABLE
 desc: Editable recordings setting
-eng: "Independent frames"
+eng: "Independent Frames"
 voice: "Unabhängige mp3-Rahmen"
 new: "Unabhängige mp3-Frames"
 
@@ -1188,7 +1188,7 @@ new: "Zeitabhängiges Aufteilen"
 
 id: LANG_RECORD_PRERECORD_TIME
 desc: in recording settings_menu
-eng: "Prerecord time"
+eng: "Prerecord Time"
 voice: "Vorab-Aufnahme-Länge"
 new: "Vorab-Aufnahme-Länge"
 
@@ -1200,13 +1200,13 @@ new: "Verzeichnis"
 
 id: LANG_RECORD_CURRENT_DIR
 desc: in recording directory options
-eng: "Current dir"
+eng: "Current Directory"
 voice: "Aktuelles Verzeichnis"
 new: "Aktuelles Verzeichnis"
 
 id: LANG_RECORD_STARTUP
-desc: Start Rockbox in Recording screen
-eng: "Show recording screen on startup"
+desc: Start Rockbox in Recording Screen
+eng: "Show Recording Screen on Startup"
 voice: "Im Aufnahmemodus starten"
 new: "Im Aufnahmemodus starten"
 
@@ -1218,25 +1218,25 @@ new: "Trigger"
 
 id: LANG_CLIP_LIGHT
 desc: in record settings menu.
-eng: "Clipping light"
+eng: "Clipping Light"
 voice: "Übersteuerungslicht"
 new: "Übersteuerungslicht"
 
 id: LANG_MAIN_UNIT
 desc: in record settings menu.
-eng: "Main unit only"
+eng: "Main Unit Only"
 voice: "Nur Gerät"
 new: "Nur Gerät"
 
 id: LANG_REMOTE_UNIT
 desc: in record settings menu.
-eng: "Remote unit only"
+eng: "Remote Unit Only"
 voice: "Nur Fernbedienung"
 new: "Nur Fernbedienung"
 
 id: LANG_REMOTE_MAIN
 desc: in record settings menu.
-eng: "Main and remote unit"
+eng: "Main and Remote Unit"
 voice: "Gerät und Fernbedienung"
 new: "Gerät und Fernbedienung"
 
@@ -1258,7 +1258,7 @@ new: "FF/RW Beschleunigung"
 
 id: LANG_CROSSFADE_ENABLE
 desc: in crossfade settings menu
-eng: "Enable crossfade"
+eng: "Enable Crossfade"
 voice: "Überblenden aktivieren"
 new: "Überblenden aktivieren"
 
@@ -1270,31 +1270,31 @@ new: "Nur bei manuellem Titelwechsel"
 
 id: LANG_CROSSFADE_FADE_IN_DELAY
 desc: in crossfade settings menu
-eng: "Fade in delay"
+eng: "Fade-In Delay"
 voice: "Einblendverzögerung"
 new: "Einblendverzögerung"
 
 id: LANG_CROSSFADE_FADE_IN_DURATION
 desc: in crossfade settings menu
-eng: "Fade in duration"
+eng: "Fade-In Duration"
 voice: "Einblenddauer"
 new: "Einblenddauer"
 
 id: LANG_CROSSFADE_FADE_OUT_DELAY
 desc: in crossfade settings menu
-eng: "Fade out delay"
+eng: "Fade-Out Delay"
 voice: "Ausblendverzögerung"
 new: "Ausblendverzögerung"
 
 id: LANG_CROSSFADE_FADE_OUT_DURATION
 desc: in crossfade settings menu
-eng: "Fade out duration"
+eng: "Fade-Out Duration"
 voice: "Ausblenddauer"
 new: "Ausblenddauer"
 
 id: LANG_CROSSFADE_FADE_OUT_MODE
 desc: in crossfade settings menu
-eng: "Fade out mode"
+eng: "Fade-Out Mode"
 voice: "Ausblendmodus"
 new: "Ausblendmodus"
 
@@ -1308,37 +1308,37 @@ new: "Mischen"
 
 id: LANG_REPLAYGAIN_ENABLE
 desc: in replaygain
-eng: "Enable replaygain"
+eng: "Enable Replaygain"
 voice: "Lautstärkeanpassung aktivieren"
 new: "Lautstärkeanpassung aktivieren"
 
 id: LANG_REPLAYGAIN_NOCLIP
 desc: in replaygain
-eng: "Prevent clipping"
+eng: "Prevent Clipping"
 voice: "Übersteuerung verhindern"
 new: "Übersteuerung verhindern"
 
 id: LANG_REPLAYGAIN_MODE
 desc: in replaygain
-eng: "Replaygain type"
+eng: "Replaygain Type"
 voice: "Lautstärkeanpassungstyp"
 new: "Lautstärkeanpassungstyp"
 
 id: LANG_ALBUM_GAIN
 desc: in replaygain
-eng: "Album gain"
+eng: "Album Gain"
 voice: "Albumlautstärke"
 new: "Albumlautstärke"
 
 id: LANG_TRACK_GAIN
 desc: in replaygain
-eng: "Track gain"
+eng: "Track Gain"
 voice: "Titellautstärke"
 new: "Titellautstärke"
 
 id: LANG_SHUFFLE_GAIN
 desc: use track gain if shuffle mode is on, album gain otherwise
-eng: "Track gain if shuffling"
+eng: "Track Gain if Shuffling"
 voice: "Titellautstärke beim Mischen"
 new: "Titellautstärke beim Mischen"
 
@@ -1358,25 +1358,25 @@ new: "Beleuchtung"
 
 id: LANG_BACKLIGHT_ON_WHEN_CHARGING
 desc: in display_settings_menu, backlight timeout with charger connected
-eng: "Backlight When Plugged"
+eng: "Backlight (While Plugged In)"
 voice: "Beleuchtung bei Netzbetrieb"
-new: "Beleuchtung bei Netzbetrieb"
+new: "Beleuchtung (Netzbetrieb)"
 
 id: LANG_CAPTION_BACKLIGHT
 desc: in settings_menu
-eng: "Caption backlight"
+eng: "Caption Backlight"
 voice: "Beleuchtung an bei Titelwechsel"
 new: "Beleuchtung an bei Titelwechsel"
 
 id: LANG_BACKLIGHT_FADE_IN
 desc: in settings_menu
-eng: "Backlight fade in"
+eng: "Backlight Fade In"
 voice: "Beleuchtung einblenden"
 new: "Beleuchtung einblenden"
 
 id: LANG_BACKLIGHT_FADE_OUT
 desc: in settings_menu
-eng: "Backlight fade out"
+eng: "Backlight Fade Out"
 voice: "Beleuchtung ausblenden"
 new: "Beleuchtung ausblenden"
 
@@ -1394,7 +1394,7 @@ new: "Kontrast"
 
 id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
 desc: Backlight behaviour setting
-eng: "First keypress enables backlight only"
+eng: "First Keypress Enables Backlight Only"
 voice: "Erster Tastendruck aktiviert nur Beleuchtung"
 new: "1. Tastendruck aktiviert nur Beleuchtung"
 
@@ -1436,13 +1436,13 @@ new: "Zeiger"
 
 id: LANG_INVERT_CURSOR_BAR
 desc: in settings_menu
-eng: "Bar(Inverse)"
+eng: "Bar (Inverse)"
 voice: "Balken"
 new: "Balken(invertiert)"
 
 id: LANG_CLEAR_BACKDROP
 desc: text for LCD settings menu
-eng: "Clear backdrop"
+eng: "Clear Backdrop"
 voice: "Hintergrund entfernen"
 new: "Hintergrund entfernen"
 
@@ -1466,7 +1466,7 @@ new: "Farben zurücksetzen"
 
 id: LANG_REDUCE_TICKING
 desc: in remote lcd settings menu
-eng: "Reduce ticking"
+eng: "Reduce Ticking"
 voice: "Ticken verringern"
 new: "Ticken verringern"
 
@@ -1510,7 +1510,7 @@ new: "Bidirektionales Scroll-Limit"
 
 id: LANG_JUMP_SCROLL
 desc: (player) menu altarnative for jump scroll
-eng: "Jump scroll"
+eng: "Jump Scroll"
 voice: "Sprung-Scrollen"
 new: "Sprung-Scrollen"
 
@@ -1560,7 +1560,7 @@ new: "Statusleiste"
 
 id: LANG_BUTTON_BAR
 desc: in settings menu
-eng: "Button bar"
+eng: "Button Bar"
 voice: "Tastenleiste"
 new: "Tastenleiste"
 
@@ -1628,15 +1628,15 @@ new: "Skalierung"
 
 id: LANG_PM_DBFS
 desc: in the peak meter menu
-eng: "Logarithmic(dB)"
+eng: "Logarithmic (dB)"
 voice: "Logarithmisch Dezibel"
-new: "logarithmisch(dB)"
+new: "logarithmisch (dB)"
 
 id: LANG_PM_LINEAR
 desc: in the peak meter menu
-eng: "Linear(%)"
+eng: "Linear (%)"
 voice: "Linear Prozent"
-new: "linear(%)"
+new: "linear (%)"
 
 id: LANG_PM_MIN
 desc: in the peak meter menu
@@ -1692,7 +1692,7 @@ new: "HD ausschalten"
 
 id: LANG_DIRCACHE_ENABLE
 desc: in directory cache settings
-eng: "Directory cache"
+eng: "Directory Cache"
 voice: "Verzeichnispuffer"
 new: "Verzeichnispuffer"
 
@@ -1738,13 +1738,13 @@ new: "24 Std. Uhr"
 
 id: LANG_MAX_FILES_IN_DIR
 desc: in settings_menu
-eng: "Max files in dir browser"
+eng: "Max Files in Dir Browser"
 voice: "Maximale Anzahl Dateien in Verzeichnisanzeige"
 new: "Max Anzahl Dateien in Verzeichnisanzeige"
 
 id: LANG_MAX_FILES_IN_PLAYLIST
 desc: in settings_menu
-eng: "Max playlist size"
+eng: "Max Playlist Size"
 voice: "Maximale Länge Abspielliste"
 new: "Max Playlist-Länge"
 
@@ -1770,8 +1770,8 @@ new: "Zeige ID3 Info"
 
 id: LANG_MENU_SET_RATING
 desc: in wps context menu
-eng: "Set song rating"
-voice: "Set song rating"
+eng: "Set Song Rating"
+voice: "Titel bewerten"
 new: "Titel bewerten"
 
 id: LANG_RATING
@@ -1818,13 +1818,13 @@ new: "Löschen"
 
 id: LANG_SET_AS_BACKDROP
 desc: text for onplay menu entry
-eng: "Set as backdrop"
+eng: "Set As Backdrop"
 voice: "Als Hintergrund setzen"
 new: "Als Hintergrund setzen"
 
 id: LANG_DELETE_DIR
 desc: in on+play menu
-eng: "Delete directory"
+eng: "Delete Directory"
 voice: "Verzeichnis löschen"
 new: "Verzeichnis löschen"
 
@@ -1842,13 +1842,13 @@ new: "Gelöscht"
 
 id: LANG_ONPLAY_OPEN_WITH
 desc: Onplay open with
-eng: "Open with"
+eng: "Open With..."
 voice: "öffnen mit"
-new: "Öffnen mit"
+new: "Öffnen mit..."
 
 id: LANG_CREATE_DIR
 desc: in main menu
-eng: "Create directory"
+eng: "Create Directory"
 voice: "Verzeichnis anlegen"
 new: "Verzeichnis anlegen"
 
@@ -2170,13 +2170,13 @@ new: "Tastensperre AUS"
 
 id: LANG_KEYLOCK_ON_RECORDER
 desc: displayed when key lock is on
-eng: "Key Lock Is ON"
+eng: "Keylock is ON"
 voice: ""
 new: "Tastensperre ist AN"
 
 id: LANG_KEYLOCK_OFF_RECORDER
 desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF"
+eng: "Keylock is OFF"
 voice: ""
 new: "Tastensperre ist AUS"
 
@@ -2190,7 +2190,7 @@ new: "Zeit:"
 
 id: LANG_RECORD_TIMESPLIT_REC
 desc: Display of record timer interval setting, on the record screen
-eng: "Split time:"
+eng: "Split Time:"
 voice: ""
 new: "Teilen alle:"
 
@@ -2202,7 +2202,7 @@ new: "Größe:"
 
 id: LANG_RECORD_PRERECORD
 desc: in recording and radio screen
-eng: "Prerecording"
+eng: "Pre-Recording"
 voice: ""
 new: "Vorab-Aufnahme"
 
@@ -2264,7 +2264,7 @@ new: "Mehrfach"
 
 id: LANG_RECORD_START_THRESHOLD
 desc: in recording settings_menu
-eng: "Start above"
+eng: "Start Above"
 voice: ""
 new: "Starte oberhalb"
 
@@ -2276,7 +2276,7 @@ new: "für mindestens"
 
 id: LANG_RECORD_STOP_THRESHOLD
 desc: in recording settings_menu
-eng: "Stop below"
+eng: "Stop Below"
 voice: ""
 new: "Stoppe unterhalb"
 
@@ -2288,7 +2288,7 @@ new: "für mindestens"
 
 id: LANG_RECORD_STOP_GAP
 desc: in recording settings_menu
-eng: "Presplit gap"
+eng: "Presplit Gap"
 voice: ""
 new: "Aufnahme teilen nach"
 
@@ -2300,13 +2300,13 @@ new: "-unendl."
 
 id: LANG_RECORD_TRIG_IDLE
 desc: waiting for threshold
-eng: "Trigger idle"
+eng: "Trigger Idle"
 voice: ""
 new: "Trigger inaktiv"
 
 id: LANG_RECORD_TRIGGER_ACTIVE
 desc: 
-eng: "Trigger active"
+eng: "Trigger Active"
 voice: ""
 new: "Trigger aktiv"
 
@@ -2444,13 +2444,13 @@ new: "[Frequenz]"
 
 id: LANG_ID3_TRACK_GAIN
 desc: in tag viewer
-eng: "[Track gain]"
+eng: "[Track Gain]"
 voice: ""
 new: "[Titellautstärke]"
 
 id: LANG_ID3_ALBUM_GAIN
 desc: in tag viewer
-eng: "[Album gain]"
+eng: "[Album Gain]"
 voice: ""
 new: "[Albumlautstärke]"
 
@@ -3180,13 +3180,13 @@ new: "Playlist Puffer voll"
 
 id: LANG_END_PLAYLIST_PLAYER
 desc: when playlist has finished
-eng: "End Of List"
+eng: "End of List"
 voice: ""
 new: "Listenende"
 
 id: LANG_END_PLAYLIST_RECORDER
 desc: when playlist has finished
-eng: "End Of Song List"
+eng: "End of Song List"
 voice: ""
 new: "Playlist zu Ende"
 
@@ -3278,31 +3278,31 @@ new: "Keine Sender"
 
 id: LANG_FM_ADD_PRESET
 desc: in radio menu
-eng: "Add preset"
+eng: "Add Preset"
 voice: "Sender hinzufügen"
 new: "Sender hinzufügen"
 
 id: LANG_FM_EDIT_PRESET
 desc: in radio screen
-eng: "Edit preset"
+eng: "Edit Preset"
 voice: ""
 new: "Sender bearbeiten"
 
 id: LANG_FM_DELETE_PRESET
 desc: in radio screen
-eng: "Remove preset"
+eng: "Remove Preset"
 voice: ""
 new: "Sender entfernen"
 
 id: LANG_FM_PRESET_SAVE_FAILED
 desc: in radio screen
-eng: "Preset save failed"
+eng: "Preset Save Failed"
 voice: ""
 new: "Sender speichern fehlgeschlagen"
 
 id: LANG_FM_NO_FREE_PRESETS
 desc: in radio screen
-eng: "The preset list is full"
+eng: "The Preset List is Full"
 voice: ""
 new: "Die Senderliste ist voll"
 
@@ -3356,13 +3356,13 @@ new: "Anzeige eingefroren!"
 
 id: LANG_FM_SCAN_PRESETS
 desc: in radio menu
-eng: "Auto scan presets"
+eng: "Auto-Scan Presets"
 voice: "Automatische Sendersuche"
 new: "Automatische Sendersuche"
 
 id: LANG_FM_CLEAR_PRESETS
 desc: confirmation if presets can be cleared
-eng: "Clear current presets?"
+eng: "Clear Current Presets?"
 voice: ""
 new: "Alle Sender löschen?"
 
@@ -3418,7 +3418,7 @@ new: "LCD"
 
 id: LANG_SHOWDIR_BUFFER_FULL
 desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer Is Full!"
+eng: "Dir Buffer is Full!"
 voice: ""
 new: "Verzeichnispuffer ist voll!"
 
@@ -3472,13 +3472,13 @@ new: "Keine Dateien"
 
 id: LANG_BACKDROP_LOADED
 desc: text for splash to indicate a new backdrop has been loaded successfully
-eng: "Backdrop loaded"
+eng: "Backdrop Loaded"
 voice: ""
 new: "Hintergrund geladen"
 
 id: LANG_BACKDROP_FAILED
 desc: text for splash to indicate a failure to load a bitmap as backdrop
-eng: "Backdrop failed"
+eng: "Backdrop Failed"
 voice: ""
 new: "Hintergrundfehler"
 
@@ -3560,7 +3560,7 @@ new: "Verschieben"
 
 id: LANG_MOVE_FAILED
 desc: Error message displayed in playlist viewer
-eng: "Move failed"
+eng: "Move Failed"
 voice: ""
 new: "Verschieben fehlgeschlagen"
 
@@ -3578,13 +3578,13 @@ new: "Titelanzeige"
 
 id: LANG_DISPLAY_TRACK_NAME_ONLY
 desc: track display options
-eng: "Track name only"
+eng: "Track Name Only"
 voice: "Nur Titelbezeichnung"
 new: "Nur Titelbezeichnung"
 
 id: LANG_DISPLAY_FULL_PATH
 desc: track display options
-eng: "Full path"
+eng: "Full Path"
 voice: "Kompletter Pfad"
 new: "Kompletter Pfad"
 
@@ -3663,3 +3663,39 @@ desc: possible answers to resume question
 eng: "(PLAY/STOP)"
 voice: ""
 new: "(PLAY/STOP)"
+
+id: LANG_FM_PRESET_LOAD
+desc: load preset list in fm radio
+eng: "Load Preset List"
+voice: "Senderliste laden"
+new: "Senderliste laden"
+
+id: LANG_FM_PRESET_SAVE
+desc: Save preset list in fm radio
+eng: "Save Preset List"
+voice: "Senderliste speichern"
+new: "Senderliste speichern"
+
+id: LANG_FM_PRESET_CLEAR
+desc: clear preset list in fm radio
+eng: "Clear Preset List"
+voice: "Clear Preset List"
+new: "Senderliste löschen"
+
+id: LANG_FMR
+desc: Used when you need to say Preset List, also voiced
+eng: "Preset List"
+voice: "Preset List"
+new: "Senderliste"
+
+id: LANG_FM_FIRST_AUTOSCAN
+desc: When you run the radio without an fmr file in settings
+eng: "No Settings found, AutoScan?"
+voice: ""
+new: "Keine Sender gefunden, automatische Suche?"
+
+id: LANG_FM_SAVE_CHANGES
+desc: When you try to exit radio to confirm save
+eng: "Save Changes?"
+voice: ""
+new: "Änderungen speichern?"
