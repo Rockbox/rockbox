@@ -2309,6 +2309,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
                                  int timeout) {
     int button;
     int buttonres;
+    long start;
 
     button = rb->button_get_w_tmo(timeout);
     switch(button){
@@ -2337,8 +2338,10 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             break;
 
         case BUBBLES_START:  /* pause the game */
+            start = *rb->current_tick;
             rb->splash(1, true, "Paused");
             while(rb->button_get(true) != (BUBBLES_START));
+            bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);
             rb->lcd_update();
             break;
