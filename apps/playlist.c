@@ -2428,7 +2428,10 @@ int playlist_next(int steps)
             playlist->first_index = global_settings.resume_first_index = 0;
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
+#if CONFIG_CODEC != SWCODEC
             playlist_start(0, 0);
+#endif
+            playlist->index = 0;
             index = 0;
         }
         else if (playlist->in_ram && global_settings.next_folder)
