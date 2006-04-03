@@ -15,10 +15,8 @@ button, the number will then be added on the left.
 The column is stored seperatly for every cell on the board.
 These are \textbf{NOT} saved when saving the game.
 
-\begin{table}[ht!]
-    \begin{center}
-    \begin{tabular}{ll}\toprule
-    \textbf{Key} & \textbf{Action}\\\midrule
+\begin{table}
+    \begin{btnmap}{}{}
     Direction keys & Move the cursor\\
     \opt{recorder,recorderv2fm}{PLAY}
     \opt{ondio}{MODE (increment once) / MODE+DOWN (toggle repeat)}
@@ -33,9 +31,8 @@ These are \textbf{NOT} saved when saving the game.
     & Add / remove number to scratchpad\\
     \opt{recorder,recorderv2fm,h1xx,h300}{STOP}\opt{ondio}{OFF}
     \opt{ipodcolor,ipodnano}{SELECT} 
-    & Quit\\\bottomrule
-    \end{tabular}
-    \end{center}
+    & Quit\\
+    \end{btnmap}
 \end{table}
 
 Some places where can you can find .ss files:

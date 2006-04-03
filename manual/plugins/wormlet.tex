@@ -15,18 +15,15 @@ possible using a remote control.\\}
 {\bfseries
 Menu controls:}
 
-\begin{table}[ht!]
-    \begin{center}
-    \begin{tabular}{ll}\toprule
-    \textbf{Key} & \textbf{Action}\\\midrule
+\begin{table}
+    \begin{btnmap}{}{}
     \ButtonLeft\ / \ButtonRight & Controls number of worms in the game\\
     \opt{RECORDER_PAD}{
         \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
             {\ButtonUp\ / \ButtonDown}
             \opt{IPOD_4G_PAD}{\ButtonMenu\ / \ButtonPlay} & Selects number of players\\
         \ButtonFOne & Selects game mode.\\}\bottomrule
-    \end{tabular}
-    \end{center}
+    \end{btnmap}
 \end{table}
 
 %The following table is only for the recorder version of the game, since the
@@ -64,16 +61,14 @@ Game controls:}
 3 & Remote control & on \dap\ \ButtonLeft: turn left \ButtonRight: turn right
                         & on remote control VOL DOWN: turn left VOL UP: turn
                         right & on \dap\ \ButtonFTwo: turn left \ButtonFThree:
-                        turn right \\\bottomrule
+                        turn right \\
 \end{tabularx}
 \renewcommand{\arraystretch}{1.0}
 }
 
 \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
-\begin{table}[ht!]
-    \begin{center}
-    \begin{tabular}{ll}\toprule
-    \textbf{Key} & \textbf{Action}\\\midrule
+\begin{table}
+    \begin{btnmap}{}{}
     \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
         {\ButtonLeft} & Turn left\\
     \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
@@ -81,9 +76,8 @@ Game controls:}
     \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
         \opt{IPOD_4G_PAD}{\ButtonMenu} & Turn Up\\
     \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
-        \opt{IPOD_4G_PAD}{\ButtonPlay} & Turn Down\\\bottomrule
-    \end{tabular}
-    \end{center}
+        \opt{IPOD_4G_PAD}{\ButtonPlay} & Turn Down\\
+    \end{btnmap}
 \end{table}
 }
 
@@ -93,34 +87,33 @@ food. Worms do not stop moving except when dead. Dead worms are no fun.
 Be careful as your worm will try to eat anything that you steer it
 across. It won't distinguish whether it's edible or not.
 
-\begin{itemize}
-\item \textbf{Food}
+\begin{description}
+\item[Food.]
 The small square hollow pieces are food. Move the worm over a food tile
 to eat it. After eating the worm grows. Each time a piece of food has
 been eaten a new piece of food will pop up somewhere. Unfortunately for
 each new piece of food that appears two new ``argh'' pieces will
 appear, too.
-\item \textbf{Argh}
+\item[Argh.]
 An ``argh'' is a black square poisoned piece {}- slightly bigger than
 food {}- that makes a worm say ``Argh!'' when
 run into.  A worm that eats an ``argh'' is dead. Thus eating an
 ``argh'' must be avoided under any circumstances. ``Arghs'' have the
 annoying tendency to accumulate. 
-\item \textbf{Worms}
+\item[Worms.]
 Thou shall not eat worms. Neither other worms nor thyself. Eating worms
 is blasphemous cannibalism, not healthy and causes instant
 death. And it doesn't help anyway: the other worm
 isn't hurt by the bite. It will go on creeping happily
 and eat all the food you left on the table. 
-\item \textbf{Walls}
+\item[Walls.]
 Don't crash into the walls. Walls are not edible.
 Crashing a worm against a wall causes it a headache it
 doesn't survive. 
-\item \textbf{Game over}
-
+\item[Game over.]
 The game is over when all worms are dead. The longest worm wins the
 game. 
-\item \textbf{Pause the game}
+\item [Pause the game.]
 Press
 \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
@@ -129,7 +122,7 @@ to pause the game. Hit
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
 again to resume the game.
 
-\item \textbf{Stop the game}
+\item[Stop the game.]
 There are two ways to stop a running game.
 
 \begin{itemize}
@@ -150,7 +143,7 @@ games menu you can hit
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
 \opt{IPOD_4G_PAD}{\ButtonMenu+\ButtonSelect}. A stopped game can not be resumed. 
 \end{itemize}
-\end{itemize}
+\end{description}
 
 \subsubsection{The scoreboard}
 On the right side of the game field is the score board. For each worm it
@@ -158,37 +151,37 @@ displays its status and its length. The top most entry displays the
 state of worm 1, the second worm 2 and the third worm 3. When a worm
 dies it's entry on the score board turns black.
 
-\begin{itemize}
-\item \textbf{Len:}
+\begin{description}
+\item[Len:]
 Here the current length of the worm is displayed. When a worm is eating
 food it grows by one pixel for each step it moves. 
 
-\item \textbf{Hungry:}
+\item[Hungry:]
 That's the normal state of a worm. Worms are always
 hungry and want to eat. It's good to have a hungry
 worm since it means that your worm is alive. But it's
 better to get your worm growing. 
 
-\item \textbf{Growing:}
+\item[Growing:]
 When a worm has eaten a piece of food it starts growing. For each step
 it moves over food it can grow by one pixel. One piece of food lasts
 for 7 steps. After your worm has moved 7 steps the food is used up. If
 another piece of food is eaten while growing it will increase the size
 of the worm for another 7 steps. 
 
-\item \textbf{Crashed:}
+\item[Crashed:]
 This indicates that a worm has crashed against a wall.
 
-\item \textbf{Argh:}
+\item[Argh:]
 If the score board entry displays ``Argh!'' it
 means the worm is dead because it tried to eat an ``argh''. Until we
 can make the worm say ``Argh!'' it's your job to say ``Argh!'' aloud.
 
-\item \textbf{Wormed:}
+\item[Wormed:]
 The worm tried to eat another worm or even itself.
 That's why it's dead now.  Making traps for other players with a worm
 is a good way to get them out of the game.
-\end{itemize}
+\end{description}
 
 \subsubsection{Hints}
 

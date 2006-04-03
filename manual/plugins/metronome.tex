@@ -3,15 +3,20 @@ This plugin can be used as a metronome to keep time during music
 practice.  Adjust the tempo though the interface or by tapping it out
 on the appropriate button.
 
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{@{}ll@{}}\toprule
-\textbf{Key} & \textbf{Action}\\\midrule
-\opt{player,h1xx,h300}{Stop}\opt{recorder,recorderv2fm}{Off}\opt{ondio}{OnOff}\opt{ipodcolor,ipodnano}{Menu} & Exit plugin \\
-\opt{player,recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{Play}\opt{ondio}{Mode (hold: Stop)} & Start / Stop \\
-\opt{player,recorder,recorderv2fm}{On}\opt{ondio}{Mode (repeatedly)}\opt{h1xx,h300,ipodcolor,ipodnano}{Select} & Tap tempo \\
+\begin{table}
+\begin{btnmap}{}{}
+\opt{player,h1xx,h300}{Stop}\opt{recorder,recorderv2fm}{Off}
+\opt{ondio}{OnOff}\opt{ipodcolor,ipodnano}{Menu} 
+& Exit plugin \\
+\opt{player,recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{Play}
+\opt{ondio}{Mode (hold: Stop)} 
+& Start / Stop \\
+\opt{player,recorder,recorderv2fm}{On}\opt{ondio}{Mode (repeatedly)}
+\opt{h1xx,h300,ipodcolor,ipodnano}{Select} 
+& Tap tempo \\
 Left/Right & Adjust tempo \\
-\opt{player}{On+Left/Right}\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{Up/Down} & Adjust volume \\\bottomrule
-\end{tabular}
-\end{center}
+\opt{player}{On+Left/Right}
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{Up/Down} 
+& Adjust volume \\
+\end{btnmap}
 \end{table}

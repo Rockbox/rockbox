@@ -138,3 +138,28 @@
 \setcounter{bottomnumber}{2} % default: 1
 \setcounter{totalnumber}{5}  % default: 3
 
+% command to set the default table heading for button lists
+\newcommand{\btnhead}{\textbf{Key} & \textbf{Action} \\\midrule}
+
+% environment intended to be used with button maps
+% usage: \begin{btnmap}{caption}{label} Button & ButtonAction \\ \end{btnmap}
+% Note: this automatically sets the table lines.
+% Note: you *need* to terminate the last line with a linebreak \\
+% Note: you still need to enclose this with \begin{table} / \end{table}
+% Cheers for the usenet helping me building this up :)
+\newenvironment{btnmap}[2]{%
+  \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
+  \expandafter\renewcommand\expandafter*\csname endtabular*\endcsname{%
+    \bottomrule
+    \SavedEndTab%
+    \if\given{#1}\caption{#1}\fi%
+    \if\given{#2}\label{#2}\fi%
+    \endcenter%
+  }
+  \center
+\tabularx{.75\textwidth}{lX}\toprule % here is the table width defined
+  \btnhead
+}{%
+  \endtabularx
+}
+

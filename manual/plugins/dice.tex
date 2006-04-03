@@ -3,23 +3,25 @@ Dice is a simple dice rolling simulator. You can select number and type of dice
 to roll, it shows individual numbers as well as the total of the rolled
 dice.
 
-\begin{table}[ht!]
-    \begin{center}
-    \begin{tabular}{ll}\toprule
-    \textbf{Key} & \textbf{Action}\\\midrule
-    \ButtonLeft/\ButtonRight & Pick between type and number of dice\\
+\begin{table}
+    \begin{btnmap}{}{}
+    \ButtonLeft/\ButtonRight 
+        & Pick between type and number of dice\\
     \opt{PLAYER_PAD}{\ButtonPlay/\ButtonStop}
-        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
         {\ButtonUp/\ButtonDown}
-        \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
         & Select number of sides or number of dice\\
     \opt{PLAYER_PAD}{\ButtonOn}\opt{RECORDER_PAD}{\ButtonOn/\ButtonPlay}
-        \opt{ONDIO_PAD}{\ButtonMenu}\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn/\ButtonSelect}
-        \opt{IPOD_4G_PAD}{\ButtonSelect}\opt{IAUDIO_X5_PAD}{\ButtonSelect/\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}
+        {\ButtonOn/\ButtonSelect}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{\ButtonSelect/\ButtonPlay}
         & Roll dice\\
-    \opt{PLAYER_PAD}{\ButtonMenu}\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
-        {\ButtonOff}\opt{IPOD_4G_PAD}{Long press on \ButtonPlay}\opt{IAUDIO_x5_PAD}{\ButtonPower}
-        & Quit\\\bottomrule
-    \end{tabular}
-    \end{center}
+    \opt{PLAYER_PAD}{\ButtonMenu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{Long press on \ButtonPlay}
+    \opt{IAUDIO_x5_PAD}{\ButtonPower}
+        & Quit\\
+    \end{btnmap}
 \end{table}

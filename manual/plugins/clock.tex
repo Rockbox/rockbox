@@ -10,23 +10,19 @@ This is a fully featured analogue and digital clock program.
 
 \subsubsection{Key configuration}
 
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-KEY & ACTION \\\hline
-F1 & Help \\\hline
-F2 & Start / Stop stopwatch \\\hline
-F2 (Hold) & Reset stopwatch \\\hline
-F3 & Options \\\hline
-Play & Select clock mode \\\hline
-UP & Enable idle power off \\\hline
-DOWN & Disable idle power off \\\hline
-RIGHT & Enable backlight \\\hline
-LEFT & Disable backlight \\\hline
-OFF & Save settings to disk and exit \\\hline
-\end{tabular}
-\end{center}
+\begin{table}
+\begin{btnmap}{}{}
+F1 & Help \\
+F2 & Start / Stop stopwatch \\
+F2 (Hold) & Reset stopwatch \\
+F3 & Options \\
+Play & Select clock mode \\
+UP & Enable idle power off \\
+DOWN & Disable idle power off \\
+RIGHT & Enable backlight \\
+LEFT & Disable backlight \\
+OFF & Save settings to disk and exit \\
+\end{btnmap}
 \end{table}
 
 \subsubsection{Backlight configuration}
@@ -39,10 +35,10 @@ setting for Backlight will be restored.
 
 \subsubsection{Saving Settings}
 Settings are saved to disk when Clock is exited. They are saved to
-\textbf{/.rockbox/rocks/.clock\_settings''}. To reset your settings
+\fname{/.rockbox/rocks/.clock\_settings}. To reset your settings
 back to the defaults, simply navigate to this file using Rockbox,
 highlight it, and press the ON+PLAY keys to get the Delete option. This way you can feel free to experiment with the settings {}- and you could even load
-separate settings, say, one for your desk at home and one for in the car {}- by keeping two files in your \textbf{/.rockbox/rocks} folder such as
+separate settings, say, one for your desk at home and one for in the car {}- by keeping two files in your \fname{/.rockbox/rocks} folder such as
 ``h.clock\_settings'' and ``c.clock\_settings''. Simply remove the
 ``h'' for your home settings to go into effect, or add the ``h'' back and take off the ``c'' for your car settings.
 

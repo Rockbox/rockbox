@@ -5,39 +5,37 @@ on the gnuboy emulator. To start a game open a ROM file saved as .gb or
 .gbc in the file browser.\\
 
 \textbf{Default keys}
-\begin{table}[ht!]
-    \begin{center}
-    \begin{tabular}{cll}\toprule
-    \textbf{Key} & \textbf{Function}\\\midrule
-    \opt{recorder,recorderv2fm}{F1}\opt{h1xx}{PLAY}\opt{h300}{RECORD}& A button\\
-    \opt{recorder,recorderv2fm}{F2}\opt{h1xx}{STOP}\opt{h300}{A-B}& B button\\
-    \opt{recorder,recorderv2fm}{F3}\opt{h1xx}{RECORD}\opt{h300}{PLAY}& Start\\
-    \opt{recorder,recorderv2fm}{PLAY}\opt{h1xx}{SELECT}\opt{h300}{NAVI}& Select\\
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{recorder,recorderv2fm}{F1}\opt{h1xx}{PLAY}\opt{h300}{RECORD}
+    & A button\\
+    \opt{recorder,recorderv2fm}{F2}\opt{h1xx}{STOP}\opt{h300}{A-B}
+    & B button\\
+    \opt{recorder,recorderv2fm}{F3}\opt{h1xx}{RECORD}\opt{h300}{PLAY}
+    & Start\\
+    \opt{recorder,recorderv2fm}{PLAY}\opt{h1xx}{SELECT}\opt{h300}{NAVI}
+    & Select\\
     \opt{recorder,recorderv2fm}{MENU & Cycle display scaling modes\\}
-    \opt{recorder,recorderv2fm,h300}{STOP}\opt{h1xx}{A-B}& Open Rockboy menu\\\bottomrule
-    \end{tabular}
-    \end{center}
+    \opt{recorder,recorderv2fm,h300}{STOP}\opt{h1xx}{A-B}
+    & Open Rockboy menu\\
+    \end{btnmap}
 \end{table}
 
 \textbf{Rockboy menu}
-\begin{itemize}
-\item \textbf{Back to Game}
-Takes you back to the game.
-\item \textbf{Load State\ldots}
-Loads a previously saved state.
-\item \textbf{Save State\ldots}
-Saves your current state.
-\item \textbf{Options\ldots}
-    \begin{itemize}
-    \item \textbf{Frameskip}
+\begin{description}
+\item[Back to Game.] Takes you back to the game.
+\item[Load State\ldots] Loads a previously saved state.
+\item[Save State\ldots] Saves your current state.
+\item[Options\ldots]
+    \begin{description}
+    \item[Frameskip.]
     Change frameskip setting to improve speed.
-    \item \textbf{Sound ON/OFF}
+    \item[Sound ON/OFF.]
     Toggle sound.
-    \item \textbf{Stats ON/OFF}
+    \item[Stats ON/OFF.]
     Toggle showing fps and current frameskip.
-    \item \textbf{Set Keys (BUGGY)}
+    \item[Set Keys (BUGGY)]
     Select this option to set a new keymapping.
-    \end{itemize}
-\item \textbf{Quit RockBoy}
-Quits the Rockboy plugin.
-\end{itemize}
+    \end{description}
+\item[Quit RockBoy.] Quits the Rockboy plugin.
+\end{description}
