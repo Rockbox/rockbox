@@ -11,7 +11,7 @@
 #
 
 # binary version for the binary lang file
-my $langversion = 2; # 2 is the latest one used in the v1 format
+my $langversion = 3; # 3 was the latest one used in the v1 format
 
 # A note for future users and readers: The original v1 language system allowed
 # the build to create and use a different language than english built-in. We
