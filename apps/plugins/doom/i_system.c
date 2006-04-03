@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.4  2006/04/03 17:00:56  dave
+// Revision 1.5  2006/04/03 17:11:42  kkurbjun
+// Finishing touches
+//
+// Revision 1.4  2006-04-03 17:00:56  dave
 // Doom can't use the user timer at the same time as using the grayscale lib.
 //
 // Revision 1.3  2006-04-02 12:45:29  amiconn
@@ -134,9 +137,6 @@ void I_Error (char *error, ...)
    // Shutdown. Here might be other errors.
    if (demorecording)
       G_CheckDemoStatus();
-/*
-   I_ShutdownGraphics();
-*/
 
    I_Quit();
    rb->sleep(HZ*2);

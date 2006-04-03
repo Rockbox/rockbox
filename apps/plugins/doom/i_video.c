@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.7  2006/04/03 16:30:12  kkurbjun
+ * Revision 1.8  2006/04/03 17:11:42  kkurbjun
+ * Finishing touches
+ *
+ * Revision 1.7  2006-04-03 16:30:12  kkurbjun
  * Fix #if
  *
  * Revision 1.5  2006-04-03 08:51:08  bger
@@ -27,7 +30,11 @@
  * Properly ifdef H300 video code, fix commented line handling rockbox volume
  *
  * Revision 1.3  2006-04-02 01:52:44  kkurbjun
- * Update adds prboom's high resolution support, also makes the scaling for platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table code has been removed.  Also fixed a pallete bug.  Some graphic errors are present in menu and status bar.  Also updates some headers and output formatting.
+ * Update adds prboom's high resolution support, also makes the scaling for
+ * platforms w/ resolution less then 320x200 much nicer.  IDoom's lookup table
+ * code has been removed.  Also fixed a pallete bug.  Some graphic errors are
+ * present in menu and status bar.  Also updates some headers and output
+ * formatting.
  *
  * Revision 1.2  2006-03-28 17:20:49  christian
  * added good (tm) button mappings for x5, and added ifdef for HAS_BUTTON_HOLD
@@ -38,6 +45,7 @@
  *
  * DESCRIPTION:
  * DOOM graphics and buttons. H300 Port by Karl Kurbjun
+ *      H100 Port by Dave Chapman, Karl Kurbjun and Jens Arnold
  *      IPOD port by Dave Chapman and Paul Louden
  *      Additional work by Thom Johansen
  *
@@ -56,7 +64,7 @@
 
 #ifndef HAVE_LCD_COLOR
 #include "../lib/gray.h"
-static fb_data graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
 #endif
@@ -72,6 +80,9 @@ static fb_data *paldata=NULL;
 //
 void I_ShutdownGraphics(void)
 {
+#ifndef HAVE_LCD_COLOR
+   gray_release();
+#endif
 }
 
 //
@@ -313,7 +324,7 @@ static void I_UploadNewPalette(int pal)
       int b = gtable[pall[2]];
       pall+=3;
 #ifndef HAVE_LCD_COLOR
-      paldata[i]=(r+g+b)/3;
+      paldata[i]=(3*r+6*g+b)/10;
 #else
       paldata[i] = LCD_RGBPACK(r,g,b);
 #endif
@@ -421,6 +432,8 @@ void I_InitGraphics(void)
    firsttime = 0;
 
    printf("Starting Graphics engine\n");
+
+   noprintf=1;
 
    /* Note: The other screens are allocated as needed */
 

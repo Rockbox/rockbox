@@ -25,6 +25,7 @@
 #include "z_zone.h"
 
 extern struct plugin_api* rb;
+extern bool noprintf;
 
 /* libc functions */
 int printf(const char *fmt, ...);

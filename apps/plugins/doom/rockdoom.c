@@ -105,6 +105,8 @@ int my_close(int id)
 struct plugin_api* rb;
 #define MAXARGVS  100
 
+bool noprintf=0;  // Variable disables printf lcd updates to protect grayscale lib/direct lcd updates
+
 // Here is a hacked up printf command to get the output from the game.
 int printf(const char *fmt, ...)
 {
@@ -118,13 +120,15 @@ int printf(const char *fmt, ...)
    va_end(ap);
 
    rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
-   rb->lcd_update();
+   if (!noprintf)
+      rb->lcd_update();
 
    p_xtpt+=8;
    if(p_xtpt>LCD_HEIGHT-8)
    {
       p_xtpt=0;
-      rb->lcd_clear_display();
+      if (!noprintf)
+         rb->lcd_clear_display();
    }
    return 1;
 }
