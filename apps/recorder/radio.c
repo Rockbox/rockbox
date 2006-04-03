@@ -1086,8 +1086,8 @@ void radio_load_presets(char *filename)
                     if(f) /* For backwards compatibility */
                     {
                         presets[num_presets].frequency = f;
-                        strncpy(presets[num_presets].name, name, 27);
-                        presets[num_presets].name[27] = 0;
+                        strncpy(presets[num_presets].name, name, MAX_FMPRESET_LEN);
+                        presets[num_presets].name[MAX_FMPRESET_LEN] = 0;
                         num_presets++;
                     }
                 }
@@ -1119,15 +1119,15 @@ static void rebuild_preset_menu(void)
 
 bool radio_add_preset(void)
 {
-    char buf[27];
+    char buf[MAX_FMPRESET_LEN];
 
     if(num_presets < MAX_PRESETS)
     {
-        memset(buf, 0, 27);
+        memset(buf, 0, MAX_FMPRESET_LEN);
         
-        if (!kbd_input(buf, 27))
+        if (!kbd_input(buf, MAX_FMPRESET_LEN))
         {
-            buf[27] = 0;
+            buf[MAX_FMPRESET_LEN] = 0;
             strcpy(presets[num_presets].name, buf);
             presets[num_presets].frequency = curr_freq;
 #ifdef FM_PRESET_ADD  /* only for archos */         
@@ -1173,13 +1173,13 @@ static int handle_radio_presets_menu_cb(int key, int m)
 static bool radio_edit_preset(void)
 {
     int pos = menu_cursor(preset_menu);
-    char buf[27];
+    char buf[MAX_FMPRESET_LEN];
 
-    strncpy(buf, menu_description(preset_menu, pos), 27);
+    strncpy(buf, menu_description(preset_menu, pos), MAX_FMPRESET_LEN);
         
-    if (!kbd_input(buf, 27))
+    if (!kbd_input(buf, MAX_FMPRESET_LEN))
     {
-        buf[27] = 0;
+        buf[MAX_FMPRESET_LEN] = 0;
         strcpy(presets[pos].name, buf);
         presets_changed = true;
     }
@@ -1459,7 +1459,7 @@ static bool toggle_radio_mode(void)
 static bool scan_presets(void)
 {
     bool tuned = false, do_scan = true;
-    char buf[27];
+    char buf[MAX_FMPRESET_LEN];
     int freq, i;
     
     if(num_presets > 0) /* Do that to avoid 2 questions. */
@@ -1469,13 +1469,15 @@ static bool scan_presets(void)
     {
         curr_freq = MIN_FREQ;
         num_presets = 0;
+        memset(presets, 0, sizeof(presets));
         while(curr_freq <= MAX_FREQ)
         {
             if (num_presets >= MAX_PRESETS)
                 break;
 
             freq = curr_freq /100000;
-            snprintf(buf, 27, str(LANG_FM_SCANNING), freq/10, freq % 10);
+            snprintf(buf, MAX_FMPRESET_LEN, str(LANG_FM_SCANNING), 
+                            freq/10, freq % 10);
             gui_syncsplash(0, true, buf);
 
             /* Tune in and delay */
@@ -1491,7 +1493,8 @@ static bool scan_presets(void)
 
             /* add preset */
             if(tuned){
-                 snprintf(buf, 27, str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
+                 snprintf(buf, MAX_FMPRESET_LEN, 
+                    str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
                  strcpy(presets[num_presets].name,buf);
                  presets[num_presets].frequency = curr_freq;
                  num_presets++;

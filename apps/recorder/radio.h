@@ -34,10 +34,12 @@ void radio_stop(void);
 bool radio_hardware_present(void);
 int  get_radio_status(void);
 
+#define MAX_FMPRESET_LEN 27
+
 struct fmstation
 {
     int frequency; /* In Hz */
-    char name[28];
+    char name[MAX_FMPRESET_LEN+1];
 };
 
 #endif
