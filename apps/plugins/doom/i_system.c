@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.5  2006/04/03 17:11:42  kkurbjun
+// Revision 1.6  2006/04/03 17:32:46  dave
+// Clean up the (incorrect) #ifdef spaghetti for the timer.  We now have a user timer on the ipods, so we use it.
+//
+// Revision 1.5  2006-04-03 17:11:42  kkurbjun
 // Finishing touches
 //
 // Revision 1.4  2006-04-03 17:00:56  dave
@@ -56,7 +59,7 @@
 // I_GetTime
 // returns time in 1/35th second tics
 //
-#if (CONFIG_CPU != PP5020) && !defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
 volatile unsigned int doomtimer=0;
 
 void doomtime(void)
@@ -67,17 +70,13 @@ void doomtime(void)
 
 int  I_GetTime (void)
 {
-#if defined(SIMULATOR) || !defined (HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+   return doomtimer; 
+#else
 #if HZ==100
    return ((7*(*rb->current_tick))/20);
 #else
    #error FIX - I assumed HZ was 100
-#endif
-#else
-#if (CONFIG_CPU == PP5020)
-   return (USEC_TIMER * 7)/200000;
-#else
-   return doomtimer; 
 #endif
 #endif
 }
@@ -92,7 +91,7 @@ int  I_GetTime (void)
 // The game is much slower now (in terms of game speed).
 void I_Init (void)
 {
-#if (CONFIG_CPU != PP5020) && !defined(SIMULATOR) && defined(HAVE_LCD_COLOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
    rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime);
 #endif
    I_InitSound();
