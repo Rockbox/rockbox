@@ -36,6 +36,7 @@
 #define EDIT_FILENAME 1
 #define BUTTON_BROWSE 2
 #define BUTTON_PATCH 3
+#define WM_COMMANDDRIVEN 0x8000
 
 #define CTL_NUM 4
 
@@ -414,7 +415,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-    case WM_USER:
+    case WM_COMMANDDRIVEN:
         /* command line driven patch button */
         SetWindowText(controls[EDIT_FILENAME], (LPCTSTR)wParam);
         SendMessage(hwnd, WM_COMMAND, 0, (LPARAM)(controls[BUTTON_PATCH]) );
@@ -501,7 +502,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance,
     ShowWindow(window, command_show);
 
     if (argc > 1) {
-        SendMessage(window, WM_USER, (WPARAM)(argv[1]), 0);
+        SendMessage(window, WM_COMMANDDRIVEN, (WPARAM)(argv[1]), 0);
         SendMessage(window, WM_CLOSE, 0, 0);
     }
 
