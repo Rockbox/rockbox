@@ -957,7 +957,8 @@ void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     for (i = 0; i < db_scale_count; i++) {
         /* The x-coordinates of interesting scale mark points 
            have been calculated before */
-        display->drawpixel(scales->db_scale_lcd_coord[i], y + height / 2 - 1);
+        display->drawpixel(x + scales->db_scale_lcd_coord[i],
+                           y + height / 2 - 1);
     }
     
 #ifdef HAVE_RECORDING
