@@ -125,3 +125,10 @@
   \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}#1\par\fi%
 }
 
+% make table floats use "!htb" as default positioning 
+\makeatletter\renewcommand{\fps@table}{!htb}\makeatother
+% change defaults for floats on a page as we have a lot of small images
+\setcounter{topnumber}{3}    % default: 2
+\setcounter{bottomnumber}{2} % default: 1
+\setcounter{totalnumber}{5}  % default: 3
+
