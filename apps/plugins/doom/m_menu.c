@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.1  2006/03/28 15:44:01  dave
+// Revision 1.2  2006/04/03 00:28:13  kkurbjun
+// Fixes graphic errors in scaling code, note sure about the fix in hu_lib.c though.  I havn't seen any corrupted text but it may still need a proper fix.
+//
+// Revision 1.1  2006-03-28 15:44:01  dave
 // Patch #2969 - Doom!  Currently only working on the H300.
 //
 //
@@ -1326,7 +1329,7 @@ M_WriteText
       }
 
       w = SHORT (hu_font[c].width);
-      if (cx+w > SCREENWIDTH)
+      if (cx+w > 320)
          break;
       // proff/nicolas 09/20/98 -- changed for hi-res
       // CPhipps - patch drawing updated

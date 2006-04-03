@@ -219,6 +219,10 @@ void HUlib_drawTextLine
 //
 void HUlib_eraseTextLine(hu_textline_t* l)
 {
+// KK - If someone finds a use for this code, please fix it, I havn't seen the need
+//      And it's not written to take into account scaling.  Causing some nasty effects
+//      on smaller screens.
+#if 0
    int lh;
    int y;
    int yoffset;
@@ -243,8 +247,8 @@ void HUlib_eraseTextLine(hu_textline_t* l)
          }
       }
    }
-
    if (l->needsupdate) l->needsupdate--;
+#endif
 }
 
 ////////////////////////////////////////////////////////

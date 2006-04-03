@@ -630,7 +630,6 @@ void R_VideoErase(unsigned ofs, int count)
    memcpy(screens[0]+ofs, screens[1]+ofs, count);   // LFB copy.
 }
 
-
 //
 // R_DrawViewBorder
 // Draws the border around the view
@@ -668,7 +667,7 @@ void R_DrawViewBorder(void)
    }
 
    if ( viewheight >= ( SCREENHEIGHT - ST_SCALED_HEIGHT ))
-      return; // if high-res, donŽt go any further!
+      return; // if high-res, don't go any further!
 
    top = ((SCREENHEIGHT-ST_SCALED_HEIGHT)-viewheight)/2;
    side = (SCREENWIDTH-scaledviewwidth)/2;
