@@ -678,11 +678,16 @@ void tagcache_search_finish(struct tagcache_search *tcs)
 }
 
 #ifdef HAVE_TC_RAMCACHE
-static struct tagfile_entry *get_tag(struct index_entry *entry, int tag)
+static struct tagfile_entry *get_tag(const struct index_entry *entry, int tag)
 {
     return (struct tagfile_entry *)&hdr->tags[tag][entry->tag_seek[tag]];
 }
 
+static long get_tag_numeric(const struct index_entry *entry, int tag)
+{
+    return entry->tag_seek[tag];
+}
+    
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 {
     struct index_entry *entry;
@@ -697,6 +702,11 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     id3->album = get_tag(entry, tag_album)->tag_data;
     id3->genre_string = get_tag(entry, tag_genre)->tag_data;
     id3->composer = get_tag(entry, tag_composer)->tag_data;
+    id3->year = get_tag_numeric(entry, tag_year);
+    id3->tracknum = get_tag_numeric(entry, tag_tracknumber);
+    id3->bitrate = get_tag_numeric(entry, tag_bitrate);
+    if (id3->bitrate == 0)
+        id3->bitrate = 1;
 
     return true;
 }
