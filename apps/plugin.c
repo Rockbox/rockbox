@@ -52,6 +52,7 @@
 #include "sound.h"
 #include "database.h"
 #include "splash.h"
+#include "list.h"
 #if (CONFIG_CODEC == SWCODEC)
 #include "pcm_playback.h"
 #include "dsp.h"
@@ -412,6 +413,27 @@ static const struct plugin_api rockbox_api = {
 
     vsnprintf,
     memchr,
+    /* list */
+    gui_synclist_init,
+    gui_synclist_set_nb_items,
+    gui_synclist_set_icon_callback,
+    gui_synclist_get_nb_items,
+    gui_synclist_get_sel_pos,
+    gui_synclist_draw,
+    gui_synclist_select_item,
+    gui_synclist_select_next,
+    gui_synclist_select_previous,
+    gui_synclist_select_next_page,
+    gui_synclist_select_previous_page,
+    gui_synclist_add_item,
+    gui_synclist_del_item,
+    gui_synclist_limit_scroll,
+    gui_synclist_flash,
+#ifdef HAVE_LCD_BITMAP
+    gui_synclist_scroll_right,
+    gui_synclist_scroll_left,
+#endif
+    gui_synclist_do_button,
 };
 
 int plugin_load(const char* plugin, void* parameter)

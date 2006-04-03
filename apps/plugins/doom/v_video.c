@@ -44,7 +44,7 @@
 #include "m_swap.h"
 #include "rockmacros.h"
 // Each screen is [SCREENWIDTH*SCREENHEIGHT];
-byte *screens[6] IBSS_ATTR;
+byte *d_screens[6] IBSS_ATTR;
 int  dirtybox[4];
 
 /* jff 4/24/98 initialize this at runtime */
@@ -239,8 +239,8 @@ void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
 
    V_MarkRect (destx, desty, width, height);
 
-   src = screens[srcscrn]+SCREENWIDTH*srcy+srcx;
-   dest = screens[destscrn]+SCREENWIDTH*desty+destx;
+   src = d_screens[srcscrn]+SCREENWIDTH*srcy+srcx;
+   dest = d_screens[destscrn]+SCREENWIDTH*desty+destx;
 
    for ( ; height>0 ; height--)
    {
@@ -294,7 +294,7 @@ void V_DrawBlock(int x, int y, int scrn, int width, int height,
       if (!scrn)
          V_MarkRect (x, y, width, height);
 
-      dest = screens[scrn] + y*SCREENWIDTH+x;
+      dest = d_screens[scrn] + y*SCREENWIDTH+x;
       // x & y no longer needed
 
       while (height--) {
@@ -308,7 +308,7 @@ void V_DrawBlock(int x, int y, int scrn, int width, int height,
    } else {
       V_MarkRect (x, y, width, height);
 
-      dest = screens[scrn] + y*SCREENWIDTH+x;
+      dest = d_screens[scrn] + y*SCREENWIDTH+x;
 
       while (height--) {
          memcpy (dest, src, width);
@@ -369,7 +369,7 @@ void V_GetBlock(int x, int y, int scrn, int width, int height, byte *dest)
       I_Error ("V_GetBlock: Bad arguments");
 #endif
 
-   src = screens[scrn] + y*SCREENWIDTH+x;
+   src = d_screens[scrn] + y*SCREENWIDTH+x;
 
    while (height--)
    {
@@ -394,13 +394,13 @@ void V_Init (void)
 #define PREALLOCED_SCREENS 2
 
    // CPhipps - no point in "stick these in low dos memory on PCs" anymore
-   // Allocate the screens individually, so I_InitGraphics can release screens[0]
+   // Allocate the screens individually, so I_InitGraphics can release d_screens[0]
    //  if e.g. it wants a MitSHM buffer instead
 
    for (i=0 ; i<PREALLOCED_SCREENS ; i++)
-      screens[i] = calloc(SCREENWIDTH*SCREENHEIGHT, 1);
+      d_screens[i] = calloc(SCREENWIDTH*SCREENHEIGHT, 1);
    for (; i<4; i++) // Clear the rest (paranoia)
-      screens[i] = NULL;
+      d_screens[i] = NULL;
 }
 
 //
@@ -448,7 +448,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
    if (!(flags & VPT_STRETCH)) {
       unsigned int             col;
       const column_t *column;
-      byte           *desttop = screens[scrn]+y*SCREENWIDTH+x;
+      byte           *desttop = d_screens[scrn]+y*SCREENWIDTH+x;
       unsigned int    w = SHORT(patch->width);
 
       if (!scrn)
@@ -544,7 +544,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
          V_MarkRect ( stretchx, stretchy, (SHORT( patch->width ) * DX ) >> 16,
                       (SHORT( patch->height) * DY ) >> 16 );
 
-      desttop = screens[scrn] + stretchy * SCREENWIDTH +  stretchx;
+      desttop = d_screens[scrn] + stretchy * SCREENWIDTH +  stretchx;
 
       for ( col = 0; col <= w; x++, col+=DXI, desttop++ ) {
          const column_t *column;
@@ -640,11 +640,11 @@ byte *V_PatchToBlock(const char* name, int cm,
                      enum patch_translation_e flags,
                      unsigned short* width, unsigned short* height)
 {
-   byte          *oldscr = screens[1];
+   byte          *oldscr = d_screens[1];
    byte          *block;
    const patch_t *patch;
 
-   screens[1] = calloc(SCREENWIDTH*SCREENHEIGHT, 1);
+   d_screens[1] = calloc(SCREENWIDTH*SCREENHEIGHT, 1);
 
    patch = W_CacheLumpName(name);
    V_DrawMemPatch(SHORT(patch->leftoffset), SHORT(patch->topoffset),
@@ -662,8 +662,8 @@ byte *V_PatchToBlock(const char* name, int cm,
    V_GetBlock(0, 0, 1, *width, *height,
               block = malloc((long)(*width) * (*height)));
 
-   free(screens[1]);
-   screens[1] = oldscr;
+   free(d_screens[1]);
+   d_screens[1] = oldscr;
    return block;
 }
 #endif /* GL_DOOM */
@@ -691,7 +691,7 @@ void V_SetPalette(int pal)
 #ifndef GL_DOOM
 void V_FillRect(int scrn, int x, int y, int width, int height, byte colour)
 {
-   byte* dest = screens[scrn] + x + y*SCREENWIDTH;
+   byte* dest = d_screens[scrn] + x + y*SCREENWIDTH;
    while (height--) {
       memset(dest, colour, width);
       dest += SCREENWIDTH;

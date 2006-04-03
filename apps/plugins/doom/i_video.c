@@ -16,7 +16,11 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.4  2006/04/02 20:45:24  kkurbjun
+ * Revision 1.5  2006/04/03 08:51:08  bger
+ * Patch #4864 by Jonathan Gordon: text editor plugin, with some changes by me.
+ * Also correct a var clash between the rockbox's gui api and doom plugin
+ *
+ * Revision 1.4  2006-04-02 20:45:24  kkurbjun
  * Properly ifdef H300 video code, fix commented line handling rockbox volume
  *
  * Revision 1.3  2006-04-02 01:52:44  kkurbjun
@@ -336,7 +340,7 @@ void I_FinishUpdate (void)
    *(volatile unsigned short *) 0xf0000002 = 0;    // value
    *(volatile unsigned short *) 0xf0000000 = 0x22; // GRAM
 
-   unsigned char *screenptr=screens[0];
+   unsigned char *screenptr=d_screens[0];
    int wcnt=0, hcnt=0;
 
    while(hcnt<LCD_HEIGHT)
@@ -358,7 +362,7 @@ void I_FinishUpdate (void)
    {
       for (x = 0; x < LCD_WIDTH; x++)
       {
-         paletteIndex = screens[0][y*SCREENWIDTH + x];
+         paletteIndex = d_screens[0][y*SCREENWIDTH + x];
          rb->lcd_framebuffer[y * LCD_WIDTH + x] = palette[paletteIndex];
       }
    }
@@ -371,7 +375,7 @@ void I_FinishUpdate (void)
 //
 void I_ReadScreen (byte* scr)
 {
-   memcpy (scr, screens[0], SCREENWIDTH*SCREENHEIGHT);
+   memcpy (scr, d_screens[0], SCREENWIDTH*SCREENHEIGHT);
 }
 
 //
@@ -399,9 +403,9 @@ void I_InitGraphics(void)
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
-   screens[0] = fastscreen;
+   d_screens[0] = fastscreen;
 #else
    // Don't know if this will fit in other IRAMs
-   screens[0] = malloc (SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned char));
+   d_screens[0] = malloc (SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned char));
 #endif
 }

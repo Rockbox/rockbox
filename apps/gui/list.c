@@ -491,6 +491,14 @@ void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 #endif
     }
 }
+int gui_synclist_get_nb_items(struct gui_synclist * lists)
+{
+    return gui_list_get_nb_items(&((lists)->gui_list[0]));
+}
+int  gui_synclist_get_sel_pos(struct gui_synclist * lists)
+{
+    return gui_list_get_sel_pos(&((lists)->gui_list[0]));
+}
 void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback)
 {
     int i;

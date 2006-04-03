@@ -140,7 +140,7 @@ static int wipe_doMelt(int width, int height, int ticks)
    return done;
 }
 
-// CPhipps - modified to allocate and deallocate screens[2 to 3] as needed, saving memory
+// CPhipps - modified to allocate and deallocate d_screens[2 to 3] as needed, saving memory
 
 static int wipe_exitMelt(int width, int height, int ticks)
 {
@@ -152,20 +152,20 @@ static int wipe_exitMelt(int width, int height, int ticks)
    free(wipe_scr_end);
    // Paranoia
    y = NULL;
-   wipe_scr_start = wipe_scr_end = screens[SRC_SCR] = screens[DEST_SCR] = NULL;
+   wipe_scr_start = wipe_scr_end = d_screens[SRC_SCR] = d_screens[DEST_SCR] = NULL;
    return 0;
 }
 
 int wipe_StartScreen(int x, int y, int width, int height)
 {
-   wipe_scr_start = screens[SRC_SCR] = malloc(SCREENWIDTH * SCREENHEIGHT);
+   wipe_scr_start = d_screens[SRC_SCR] = malloc(SCREENWIDTH * SCREENHEIGHT);
    V_CopyRect(x, y, 0,       width, height, x, y, SRC_SCR, VPT_NONE ); // Copy start screen to buffer
    return 0;
 }
 
 int wipe_EndScreen(int x, int y, int width, int height)
 {
-   wipe_scr_end = screens[DEST_SCR] = malloc(SCREENWIDTH * SCREENHEIGHT);
+   wipe_scr_end = d_screens[DEST_SCR] = malloc(SCREENWIDTH * SCREENHEIGHT);
    V_CopyRect(x, y, 0,       width, height, x, y, DEST_SCR, VPT_NONE); // Copy end screen to buffer
    V_CopyRect(x, y, SRC_SCR, width, height, x, y, 0       , VPT_NONE); // restore start screen
    return 0;
@@ -180,7 +180,7 @@ int wipe_ScreenWipe(int x, int y, int width, int height, int ticks)
    if (!go)                                         // initial stuff
    {
       go = 1;
-      wipe_scr = screens[0];
+      wipe_scr = d_screens[0];
       wipe_initMelt(width, height, ticks);
    }
    V_MarkRect(0, 0, width, height);                 // do a piece of wipe-in

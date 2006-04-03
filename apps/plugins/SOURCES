@@ -26,6 +26,7 @@ wavplay.c
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
+text_editor.c
 
 #if CONFIG_LCD != LCD_IPOD2BPP     /* Plugins needing the grayscale lib */
 fire.c

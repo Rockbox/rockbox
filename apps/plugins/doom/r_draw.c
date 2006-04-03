@@ -573,7 +573,7 @@ void R_InitBuffer(int width, int height)
 
    viewwindowy = width==SCREENWIDTH ? 0 : (SCREENHEIGHT-(ST_SCALED_HEIGHT-1)-height)>>1;
 
-   topleft = screens[0] + viewwindowy*SCREENWIDTH + viewwindowx;
+   topleft = d_screens[0] + viewwindowy*SCREENWIDTH + viewwindowx;
 
    // Preclaculate all row offsets.
    // CPhipps - merge viewwindowx into here
@@ -627,7 +627,7 @@ void R_FillBackScreen (void)
 
 void R_VideoErase(unsigned ofs, int count)
 {
-   memcpy(screens[0]+ofs, screens[1]+ofs, count);   // LFB copy.
+   memcpy(d_screens[0]+ofs, d_screens[1]+ofs, count);   // LFB copy.
 }
 
 //

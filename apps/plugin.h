@@ -67,6 +67,7 @@
 #include "sound.h"
 #include "menu.h"
 #include "rbunicode.h"
+#include "list.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -102,7 +103,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 17
+#define PLUGIN_API_VERSION 18
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any 
@@ -483,6 +484,32 @@ struct plugin_api {
 
     int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
     void *(*memchr)(const void *s1, int c, size_t n);
+
+    /* list */
+    void (*gui_synclist_init)(struct gui_synclist * lists,
+            list_get_name callback_get_item_name,void * data);
+    void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
+    void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
+    int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
+    int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
+    void (*gui_synclist_draw)(struct gui_synclist * lists);
+    void (*gui_synclist_select_item)(struct gui_synclist * lists,
+    int item_number);
+    void (*gui_synclist_select_next)(struct gui_synclist * lists);
+    void (*gui_synclist_select_previous)(struct gui_synclist * lists);
+    void (*gui_synclist_select_next_page)(struct gui_synclist * lists,
+    enum screen_type screen);
+    void (*gui_synclist_select_previous_page)(struct gui_synclist * lists,
+    enum screen_type screen);
+    void (*gui_synclist_add_item)(struct gui_synclist * lists);
+    void (*gui_synclist_del_item)(struct gui_synclist * lists);
+    void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
+    void (*gui_synclist_flash)(struct gui_synclist * lists);
+#ifdef HAVE_LCD_BITMAP
+    void (*gui_synclist_scroll_right)(struct gui_synclist * lists);
+    void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
+#endif
+    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
 };
 
 /* plugin header */

@@ -337,13 +337,9 @@ extern void gui_synclist_init(
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
-#define gui_synclist_get_nb_items(lists) \
-    gui_list_get_nb_items(&((lists)->gui_list[0]))
+extern int gui_synclist_get_nb_items(struct gui_synclist * lists);
 
 extern int  gui_synclist_get_sel_pos(struct gui_synclist * lists);
-
-#define gui_synclist_get_sel_pos(lists) \
-    gui_list_get_sel_pos(&((lists)->gui_list[0]))
 
 extern void gui_synclist_draw(struct gui_synclist * lists);
 extern void gui_synclist_select_item(struct gui_synclist * lists,

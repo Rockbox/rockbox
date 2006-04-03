@@ -72,7 +72,7 @@ typedef enum
 
 #define CR_DEFAULT CR_RED   /* default value for out of range colors */
 
-extern byte      *screens[6];
+extern byte      *d_screens[6];
 extern int        dirtybox[4];
 extern const byte gammatable[5][256];
 extern int        usegamma;
@@ -173,11 +173,11 @@ void V_SetPalette(int pal);
 // CPhipps - function to plot a pixel
 
 #ifndef GL_DOOM
-#define V_PlotPixel(s,x,y,c) screens[s][x+SCREENWIDTH*y]=c
+#define V_PlotPixel(s,x,y,c) d_screens[s][x+SCREENWIDTH*y]=c
 #endif
 
-#define V_AllocScreen(scrn) screens[scrn] = malloc(SCREENWIDTH*SCREENHEIGHT)
-#define V_FreeScreen(scrn) free(screens[scrn]); screens[scrn] = NULL
+#define V_AllocScreen(scrn) d_screens[scrn] = malloc(SCREENWIDTH*SCREENHEIGHT)
+#define V_FreeScreen(scrn) free(d_screens[scrn]); d_screens[scrn] = NULL
 
 #ifdef GL_DOOM
 #include "gl_struct.h"
