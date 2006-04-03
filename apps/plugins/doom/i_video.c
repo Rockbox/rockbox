@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.5  2006/04/03 08:51:08  bger
+ * Revision 1.6  2006/04/03 16:13:15  kkurbjun
+ * Add grayscale lib for the H100's
+ *
+ * Revision 1.5  2006-04-03 08:51:08  bger
  * Patch #4864 by Jonathan Gordon: text editor plugin, with some changes by me.
  * Also correct a var clash between the rockbox's gui api and doom plugin
  *
@@ -50,7 +53,15 @@
 #include "doomdef.h"
 
 #include "rockmacros.h"
-#if defined(CPU_COLDFIRE)
+
+#ifndef HAVE_LCD_COLOR
+#include "../lib/gray.h"
+static fb_data graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static unsigned char *gbuf;
+static unsigned int gbuf_size = 0;
+#endif
+
+#if defined(CPU_COLDFIRE) 
 static char fastscreen[LCD_WIDTH*LCD_HEIGHT] IBSS_ATTR;
 #endif
 static fb_data palette[256] IBSS_ATTR;
@@ -301,7 +312,11 @@ static void I_UploadNewPalette(int pal)
       int g = gtable[pall[1]];
       int b = gtable[pall[2]];
       pall+=3;
+#ifndef HAVE_LCD_COLOR
+      paldata[i]=(r+g+b)/3;
+#else
       paldata[i] = LCD_RGBPACK(r,g,b);
+#endif
     }
 
     W_UnlockLumpNum(lump);
@@ -329,7 +344,7 @@ void I_UpdateNoBlit (void)
 
 void I_FinishUpdate (void)
 {
-#if defined(IRIVER_H300_SERIES) && !defined(SIMULATOR)
+#if defined(LCD_H300) && !defined(SIMULATOR)
    /*
       Lookup tables are no longer needed (H300 specific, decreases timedemo
       by about 500 tics)
@@ -363,10 +378,18 @@ void I_FinishUpdate (void)
       for (x = 0; x < LCD_WIDTH; x++)
       {
          paletteIndex = d_screens[0][y*SCREENWIDTH + x];
+#ifndef HAVE_LCD_COLOR
+         graybuffer[y * LCD_WIDTH + x]=palette[paletteIndex];
+#else
          rb->lcd_framebuffer[y * LCD_WIDTH + x] = palette[paletteIndex];
+#endif
       }
    }
+#ifndef HAVE_LCD_COLOR
+   gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#else
    rb->lcd_update();
+#endif
 #endif
 }
 
@@ -400,6 +423,13 @@ void I_InitGraphics(void)
    printf("Starting Graphics engine\n");
 
    /* Note: The other screens are allocated as needed */
+
+#ifndef HAVE_LCD_COLOR
+   gbuf=malloc(220000);  // give a bunch
+   gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8, 32, NULL);
+   /* switch on grayscale overlay */
+   gray_show(true);
+#endif
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
