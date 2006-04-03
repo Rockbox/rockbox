@@ -395,7 +395,7 @@ void R_InitTextures (void)
    const int  *maptex1, *maptex2;
    char name[9];
    int names_lump; // cph - new wad lump handling
-   const char *names; // cph -
+   const unsigned char *names; // cph -
    const char *name_p;// const*'s
    int  *patchlookup;
    int  totalwidth;
@@ -409,7 +409,7 @@ void R_InitTextures (void)
    // Load the patch names from pnames.lmp.
    name[8] = 0;
    names = W_CacheLumpNum(names_lump = W_GetNumForName("PNAMES"));
-   nummappatches = LONG(*((const int *)names));
+   nummappatches = (names[3]<<24)|(names[2]<<16)|(names[1]<<8)|names[0];
    name_p = names+4;
    patchlookup = malloc(nummappatches*sizeof(*patchlookup));  // killough
 
