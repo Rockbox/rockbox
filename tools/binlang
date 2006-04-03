@@ -8,7 +8,7 @@
 #                     \/            \/     \/    \/            \/ 
 # $Id$
 #
-# Copyright (C) 2002 by Daniel Stenberg <daniel@haxx.se>
+# Copyright (C) 2002, 2006 by Daniel Stenberg <daniel@haxx.se>
 #
 # All files in this archive are subject to the GNU General Public License.
 # See the file COPYING in the source tree root for full license agreement.
@@ -18,130 +18,8 @@
 #
 ############################################################################
 
-if(!$ARGV[0] || !$ARGV[1] || !$ARGV[2]) {
-    print <<MOO
-Usage: binlang <english file> <language file> <output file>
-
-Generate a binary language file.
+print <<MOO
+The tool formerly known as 'binlang' is no longer used. We now use
+genlang2 with the -b option to generate binary language files.
 MOO
 ;
-    exit;
-}
-
-if($ARGV[0] eq "-v") {
-    shift @ARGV;
-    $debug=1;
-}
-
-my $english = $ARGV[0];
-my $input = $ARGV[1];
-my $output = $ARGV[2];
-
-my $idnum=0;
-
-open(ENG, "<$english") or die "Can't open $english";
-open(LANG, "<$input") or die "Can't open $input";
-open(OUTF, ">$output") or die "Can't open $output";
-
-my $langversion = 3;
-
-binmode OUTF;
-
-printf OUTF ("\x1a%c", $langversion); # magic lang file header
-
-#
-# We scan the english file to get the correct order of the id numbers
-#
-my $idnum=0; # start with a true number
-while(<ENG>) {
-    if($_ =~ / *\#/) {
-        # comment
-        next;
-    }
-    # get rid of DOS newlines
-    $_ =~ s/\r//g;
-    if($_ =~ /^ *([a-z]+): *(.*)/) {
-        ($var, $value) = ($1, $2);
-        $set{$var} = $value;
-
-        # "new" is always the last one, so now we have them all
-        if($var eq "new") {
-            $value = $set{'eng'};
-            
-            if($value =~ s/^\"(.*)\"\s*$/$1/g) {
-                # Skip voice-only entries
-                if($set{'id'} =~ /^VOICE_/) {
-                    $idnum{$set{'id'}} = '_done_';
-                    next;
-                }
-
-                # Assign an ID number to this entry
-                $idnum{$set{'id'}}=$idnum;
-                $idnum++;
-            }
-            undef %set;
-        }
-    }
-}
-close(ENG);
-
-while(<LANG>) {
-    if($_ =~ /^ *\#/) {
-        # comment
-        next;
-    }
-    # get rid of DOS newlines
-    $_ =~ s/\r//g;
-    if($_ =~ /^ *([a-z]+): *(.*)/) {
-        ($var, $value) = ($1, $2);
-
-        $set{$var} = $value;
-
-        # "new" is always the last one, so now we have them all
-        if($var eq "new") {
-            $idnum = $idnum{$set{'id'}};
-                
-            # Skip already processed entries (like voice-only ones)
-            next if($idnum eq '_done_');
-
-            if(!$value) {
-                # if not set, get the english version
-                $value = $set{'eng'};
-            }
-
-            if($value =~ s/^\"(.*)\"\s*$/$1/g) {
-                if($idnum eq "") {
-                    warn "Found no ".$set{'id'}." in english file!\n";
-                }
-                else {
-                    $idnum{$set{'id'}} = '_done_';
-
-                    printf OUTF ("%c%c%s\x00",
-                                  ($idnum>>8), ($idnum&0xff),
-                                  $value);
-                    if($debug) {
-                        printf("%02x => %s\n", $idnum, $value);
-                    }
-                }
-            }
-            else {
-                warn "String for ".$set{'id'}." misses quotes\n";
-            }
-
-            undef %set;
-        }
-
-    }
-
-}
-close(LANG);
-
-close(OUTF);
-
-foreach $k (keys(%idnum))
-{
-   if($idnum{$k} ne '_done_')
-   {
-      warn "Missing ID in $input: $k\n";
-   }
-}

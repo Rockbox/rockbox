@@ -1,1196 +1,2534 @@
-
-## general strings
-
-id: LANG_SET_BOOL_YES
-desc: bool true representation
-eng: "Yes"
-voice: ""
-new: "Da"
-
-id: LANG_SET_BOOL_NO
-desc: bool false representation
-eng: "No"
-voice: ""
-new: "Nu"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-voice: ""
-new: "Deschis"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-voice: ""
-new: "Închis"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "Ask"
-voice: ""
-new: "Cerere"
-
-## general messages
-
-id: LANG_MENU_SETTING_CANCEL
-desc: Visual confirmation of canceling a changed setting
-eng: "Canceled"
-voice: ""
-new: "Anulat"
-
-id: LANG_FAILED
-desc: Something failed. To be appended after above actions
-eng: "Failed"
-voice: ""
-new: "Esec"
-
-## main menu
-
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-voice: ""
-new: "Sunet"
-
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-voice: ""
-new: "Reglaje"
-
-id: LANG_RECORDING
-desc: in the main menu
-eng: "Recording"
-voice: ""
-new: "Inregistrare"
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-voice: ""
-new: "Informatii"
-
-## Sound settings
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-voice: ""
-new: "Volum"
-
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-voice: ""
-new: "Grave"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-voice: ""
-new: "Înalte"
-
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-voice: ""
-new: "Balans"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-voice: ""
-new: "Canale"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel Configuration"
-voice: ""
-new: "Configurare canale"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-voice: ""
-new: "Stereo"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-voice: ""
-new: "Mono"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-voice: ""
-new: "Mono Stânga"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-voice: ""
-new: "Mono Dreapta"
-
-id: LANG_CHANNEL_KARAOKE
-desc: in sound_settings
-eng: "Karaoke"
-voice: ""
-new: "Karaoke"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-voice: ""
-new: "Optimizare de grave (Loudness)"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-voice: ""
-new: "Volum automat"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV Decay Time"
-voice: ""
-new: "AV decalaj de referinta"
-
-## general settings menu
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-voice: ""
-new: "Reglaje play"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-voice: ""
-new: "Optiuni fisier"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-voice: ""
-new: "Mod de afisare"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-voice: ""
-new: "Optiuni sistem"
-
-## manage settings menu
-
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset Settings"
-voice: ""
-new: "Reinitializare setari"
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are You Sure?"
-voice: ""
-new: "Esti sigur(a)?"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-voice: ""
-new: "Reglaje"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-voice: ""
-new: "Setari sterse"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
-eng: "Canceled"
-voice: ""
-new: "Anulat"
-
-id: LANG_SAVE_SETTINGS
-desc: in system_settings_menu()
-eng: "Write .cfg file"
-voice: ""
-new: "Salvare configuratie"
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Eroare"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Batt. Low?"
-voice: ""
-new: "Baterie pe terminate?"
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Eroare de salvare"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "Is Battery Low?"
-voice: ""
-new: "Baterie pe terminate?"
-
-## recording menu
-
-id: LANG_RECORDING_SETTINGS
-desc: in the main menu
-eng: "Recording Settings"
-voice: ""
-new: "Optiuni inregistrare"
-
-## equalizer menu
-
-## playlist options
-
-id: LANG_CREATE_PLAYLIST
-desc: Menu option for creating a playlist
-eng: "Create Playlist"
-voice: ""
-new: "Creare playlist"
-
-## info menu
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-voice: ""
-new: "Versiune"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (Keep Out!)"
-voice: ""
-new: "Debug (Atentie !)"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (Sim)"
-voice: ""
-new: "USB (Sim)"
-
-## playback settings menu
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-voice: ""
-new: "Aleator"
-
-id: LANG_REPEAT
-desc: in settings_menu
-eng: "Repeat"
-voice: ""
-new: "In bucla"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-voice: ""
-new: "Toate"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-voice: ""
-new: "O melodie"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play Selected First"
-voice: ""
-new: "Canta fisierul ales primul"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-voice: ""
-new: "Continuare"
-
-id: LANG_MP3BUFFER_MARGIN
-desc: MP3 buffer margin time
-eng: "Anti-Skip Buffer"
-voice: ""
-new: "Memorie anti-soc"
-
-id: LANG_FADE_ON_STOP
-desc: options menu to set fade on stop or pause
-eng: "Fade On Stop/Pause"
-voice: ""
-new: "Atenuare sunet la oprire/pauza"
-
-## file view menu
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-voice: ""
-new: "Sortare senzitiva"
-
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-voice: ""
-new: "Fisiere"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-voice: ""
-new: "Toate fisierele sunt vizibile"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-voice: ""
-new: "Doar fisierele cunoscute"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-voice: ""
-new: "Doar fisierele muzicale"
-
-id: LANG_FILTER_PLAYLIST
-desc: show only playlist
-eng: "Playlists"
-voice: ""
-new: "Playlist-uri"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-voice: ""
-new: "Foloseste playlist"
-
-## display settings menu
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scroll"
-voice: ""
-new: "Viteza de defilare"
-
-id: LANG_PM_MENU
-desc: in the display menu
-eng: "Peak Meter"
-voice: ""
-new: "Vu-metru"
-
-## system settings menu
-
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-voice: ""
-new: "Oprire, ca urmare a inactivitatii"
-
-id: LANG_SLEEP_TIMER
-desc: sleep timer setting
-eng: "Sleep Timer"
-voice: ""
-new: "Numaratoare inversa"
-
-id: LANG_ALARM_MOD_ALARM_MENU
-desc: The name of the additional entry in the main menu for the RTC alarm mod.
-eng: "Wake-Up Alarm"
-voice: ""
-new: "Alarma"
-
-## bookmarking settings menu
-
-## voice settings menu
-
-## recording settings menu
-
-id: LANG_RECORDING_QUALITY
-desc: in the recording settings
-eng: "Quality"
-voice: ""
-new: "Calitatea inregistrarii"
-
-id: LANG_RECORDING_FREQUENCY
-desc: in the recording settings
-eng: "Frequency"
-voice: ""
-new: "Frecventa sunet"
-
-id: LANG_RECORDING_SOURCE
-desc: in the recording settings
-eng: "Source"
-voice: ""
-new: "Sursa inregistrare"
-
-id: LANG_RECORDING_SRC_MIC
-desc: in the recording settings
-eng: "Mic"
-voice: ""
-new: "Microfon intern"
-
-id: LANG_RECORDING_SRC_LINE
-desc: in the recording settings
-eng: "Line In"
-voice: ""
-new: "Intrare analogica"
-
-id: LANG_RECORDING_SRC_DIGITAL
-desc: in the recording settings
-eng: "Digital"
-voice: ""
-new: "Semnal digital"
-
-id: LANG_RECORDING_CHANNELS
-desc: in the recording settings
-eng: "Channels"
-voice: ""
-new: "Canale"
-
-## ffwd/rewind menu
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-voice: ""
-new: "Pas minim derulare"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-voice: ""
-new: "Acceleratie derulare"
-
-## crossfade menu
-
-## replaygain menu
-
-## LCD settings menu, also remote
-
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-voice: ""
-new: "Lumina afisor"
-
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: ""
-new: "Lumina afisor pe durata incarcarii bateriei"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-voice: ""
-new: "Contrast"
-
-id: LANG_INVERT
-desc: in settings_menu
-eng: "Invert"
-voice: ""
-new: "Inversare"
-
-## scrolling menu
-
-id: LANG_SCROLL_SPEED
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-voice: ""
-new: "Viteza de defilare"
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-voice: ""
-new: "Exemplu de viteza de defilare"
-
-id: LANG_SCROLL_DELAY
-desc: Delay before scrolling
-eng: "Scroll Start Delay"
-voice: ""
-new: "Pauza inainte de inceputul defilarii"
-
-id: LANG_SCROLL_STEP
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size"
-voice: ""
-new: "Pas de defilare"
-
-id: LANG_SCROLL_STEP_EXAMPLE
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size Setting Example Text"
-voice: ""
-new: "Exemplu de defilare pentru testarea pasilor"
-
-id: LANG_BIDIR_SCROLL
-desc: Bidirectional scroll limit
-eng: "Bidirectional Scroll Limit"
-voice: ""
-new: "Limita de defilare bidirectionala"
-
-id: LANG_VOLUME_DISPLAY
-desc: Volume type title
-eng: "Volume Display"
-voice: ""
-new: "Afisaj volum"
-
-id: LANG_BATTERY_DISPLAY
-desc: Battery type title
-eng: "Battery Display"
-voice: ""
-new: "Afisaj baterie"
-
-id: LANG_DISPLAY_GRAPHIC
-desc: Label for type of icon display
-eng: "Graphic"
-voice: ""
-new: "Grafic"
-
-id: LANG_DISPLAY_NUMERIC
-desc: Label for type of icon display
-eng: "Numeric"
-voice: ""
-new: "Numeric"
-
-## peakmeter menu
-
-id: LANG_PM_RELEASE
-desc: in the peak meter menu
-eng: "Peak Release"
-voice: ""
-new: "Rata de variatie a indicatorului"
-
-id: LANG_PM_UNITS_PER_READ
-desc: in the peak meter menu
-eng: "Units Per Read"
-voice: ""
-new: "Unitati de masura"
-
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak Hold Time"
-voice: ""
-new: "Persistenta indicatorului"
-
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip Hold Time"
-voice: ""
-new: "Persistenta marcajului"
-
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "Eternal"
-voice: ""
-new: "Continu"
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "dBfs <-> Linear"
-voice: ""
-new: "dBfs <-> liniar"
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "dBfs"
-voice: ""
-new: "dBfs"
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "Linear"
-voice: ""
-new: "Liniar"
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum Of Range"
-voice: ""
-new: "Minimum de spectru"
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum Of Range"
-voice: ""
-new: "Maximum de spectru"
-
-## battery menu
-
-id: LANG_BATTERY_CAPACITY
-desc: in settings_menu
-eng: "Battery Capacity"
-voice: ""
-new: "Capacitate baterie"
-
-## disk menu
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-voice: ""
-new: "Oprire disc"
-
-id: LANG_POWEROFF
-desc: disk poweroff flag
-eng: "Disk Poweroff"
-voice: ""
-new: "Oprire disc"
-
-## time & date menu
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-voice: ""
-new: "Reglaj Ora/Data"
-
-id: LANG_TIMEFORMAT
-desc: select the time format of time in status bar
-eng: "Time Format"
-voice: ""
-new: "Format ceas"
-
-id: LANG_12_HOUR_CLOCK
-desc: option for 12 hour clock
-eng: "12 Hour Clock"
-voice: ""
-new: "Ceas AM/PM"
-
-id: LANG_24_HOUR_CLOCK
-desc: option for 24 hour clock
-eng: "24 Hour Clock"
-voice: ""
-new: "Ceas 24h"
-
-## limits menu
-
-## context menu (onplay menu)
-
-id: LANG_MENU_SHOW_ID3_INFO
-desc: Menu option to start id3 viewer
-eng: "Show ID3 Info"
-voice: ""
-new: "Info ID3"
-
-id: LANG_RENAME
-desc: The verb/action Rename
-eng: "Rename"
-voice: ""
-new: "Redenumire"
-
-id: LANG_DELETE
-desc: The verb/action Delete
-eng: "Delete"
-voice: ""
-new: "Stergere"
-
-id: LANG_REALLY_DELETE
-desc: Really Delete?
-eng: "Delete?"
-voice: ""
-new: "Sterg?"
-
-id: LANG_DELETED
-desc: A file has beed deleted
-eng: "Deleted"
-voice: ""
-new: "Sters"
-
-## playlist context menu
-
-id: LANG_QUEUE
-desc: The verb/action Queue
-eng: "Queue"
-voice: ""
-new: "Queue"
-
-## bookmark context menu
-
-## info screen
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox Info:"
-voice: ""
-new: "Rockbox: "
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%03dMB"
-voice: ""
-new: "Tmp: %d.%03dMo"
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%03dMB"
-voice: ""
-new: "Buffer: %d.%03dMo"
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: Charging"
-voice: ""
-new: "Bateria se încarca"
-
-id: LANG_BATTERY_TOPOFF_CHARGE
-desc: in info display, shows that top off charge is running
-eng: "Battery: Top-Off Chg"
-voice: ""
-new: "Nivel maxim de incarcare"
-
-id: LANG_BATTERY_TRICKLE_CHARGE
-desc: in info display, shows that trickle charge is running
-eng: "Battery: Trickle Chg"
-voice: ""
-new: "Baterie: Incarcare persistenta"
-
-id: LANG_BATTERY_TIME
-desc: battery level in % and estimated time remaining
-eng: "%d%% %dh %dm"
-voice: ""
-new: "%d%% %dh %dm"
-
-## pitch screen
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch Up"
-voice: ""
-new: "Viteza +"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch Down"
-voice: ""
-new: "Viteza -"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-voice: ""
-new: "Pauza"
-
-## quickscreens
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "Mode:"
-voice: ""
-new: "Mod:"
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-voice: ""
-new: "Stare"
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-voice: ""
-new: "Defilare"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "Bar"
-voice: ""
-new: "Bara"
-
-## bookmark screen
-
-## set time screen
-
-id: LANG_TIME_SET
-desc: used in set_time()
-eng: "ON To Set"
-voice: ""
-new: "ON pentru validare"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF To Revert"
-voice: ""
-new: "OFF pentru anulare"
-
-## while playing screen
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Key Lock ON"
-voice: ""
-new: "Taste blocate"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Key Lock OFF"
-voice: ""
-new: "Taste deblocate"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key Lock Is ON"
-voice: ""
-new: "Tastele sunt blocate"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF"
-voice: ""
-new: "Tastele sunt deblocate"
-
-## recording screen
-
-id: LANG_RECORDING_TIME
-desc: Display of recorded time
-eng: "Time:"
-voice: ""
-new: "Durata:"
-
-id: LANG_RECORDING_SIZE
-desc: Display of recorded file size
-eng: "Size:"
-voice: ""
-new: "Dimensiune:"
-
-id: LANG_RECORDING_GAIN
-desc: in the recording screen
-eng: "Gain"
-voice: ""
-new: "Castig"
-
-id: LANG_RECORDING_LEFT
-desc: in the recording screen
-eng: "Left"
-voice: ""
-new: "Stanga"
-
-id: LANG_RECORDING_RIGHT
-desc: in the recording screen
-eng: "Right"
-voice: ""
-new: "Dreapta"
-
-## recording trigger screen
-
-## alarm screen
-
-id: LANG_ALARM_MOD_TIME
-desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm Time: %02d:%02d"
-voice: ""
-new: "Alarma: %02d:%02d"
-
-id: LANG_ALARM_MOD_TIME_TO_GO
-desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking Up In %d:%02d"
-voice: ""
-new: "Alarma în %d:%02d"
-
-id: LANG_ALARM_MOD_SHUTDOWN
-desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
-voice: ""
-new: "Oprire..."
-
-id: LANG_ALARM_MOD_ERROR
-desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm Time Is Too Soon!"
-voice: ""
-new: "Alarma e prea devreme!"
-
-id: LANG_ALARM_MOD_KEYS
-desc: Shown key functions in alarm menu (for the RTC alarm mod).
-eng: "PLAY=Set OFF=Cancel"
-voice: ""
-new: "PLAY=OK OFF=KO"
-
-## colour setting screen
-
-## tag viewer
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-voice: ""
-new: "[Titlu]"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-voice: ""
-new: "[Artist]"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-voice: ""
-new: "[Album]"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-voice: ""
-new: "[Nr de pista]"
-
-id: LANG_ID3_GENRE
-desc: ID3 frame 'genre'
-eng: "[Genre]"
-voice: ""
-new: "[Gen]"
-
-id: LANG_ID3_YEAR
-desc: ID3 info 'year'
-eng: "[Year]"
-voice: ""
-new: "[An]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-voice: ""
-new: "[Lista muzicala]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-voice: ""
-new: "[Rata de codaj]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-voice: ""
-new: "[Frecventa]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[Path]"
-voice: ""
-new: "[Path]"
-
-id: LANG_ID3_NO_INFO
-desc: ID3 info is missing
-eng: "<No Info>"
-voice: ""
-new: "<informatie indisponibila>"
-
-## weekdays
-
-id: LANG_WEEKDAY_SUNDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sun"
-voice: ""
-new: "Dum"
-
-id: LANG_WEEKDAY_MONDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Mon"
-voice: ""
-new: "Lun"
-
-id: LANG_WEEKDAY_TUESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Tue"
-voice: ""
-new: "Mar"
-
-id: LANG_WEEKDAY_WEDNESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Wed"
-voice: ""
-new: "Mie"
-
-id: LANG_WEEKDAY_THURSDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Thu"
-voice: ""
-new: "Joi"
-
-id: LANG_WEEKDAY_FRIDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Fri"
-voice: ""
-new: "Vin"
-
-id: LANG_WEEKDAY_SATURDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sat"
-voice: ""
-new: "Sam"
-
-## months
-
-id: LANG_MONTH_JANUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jan"
-voice: ""
-new: "Ian"
-
-id: LANG_MONTH_FEBRUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Feb"
-voice: ""
-new: "Feb"
-
-id: LANG_MONTH_MARCH
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Mar"
-voice: ""
-new: "Mar"
-
-id: LANG_MONTH_APRIL
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Apr"
-voice: ""
-new: "Apr"
-
-id: LANG_MONTH_MAY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "May"
-voice: ""
-new: "Mai"
-
-id: LANG_MONTH_JUNE
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jun"
-voice: ""
-new: "Iun"
-
-id: LANG_MONTH_JULY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jul"
-voice: ""
-new: "Iul"
-
-id: LANG_MONTH_AUGUST
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Aug"
-voice: ""
-new: "Aug"
-
-id: LANG_MONTH_SEPTEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Sep"
-voice: ""
-new: "Sep"
-
-id: LANG_MONTH_OCTOBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Oct"
-voice: ""
-new: "Oct"
-
-id: LANG_MONTH_NOVEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Nov"
-voice: ""
-new: "Nov"
-
-id: LANG_MONTH_DECEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Dec"
-voice: ""
-new: "Dec"
-
-## digits and units for voice, the order is important
-
-## units for voicing
-
-## chars for spelling
-
-## file/folder voicing
-
-## file extensions for voicing
-
-## playlist handling
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-voice: ""
-new: "Încarcare..."
-
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-voice: ""
-new: "Amestec..."
-
-id: LANG_PLAYLIST_BUFFER_FULL
-desc: in playlist.indices() when playlist is full
-eng: "Playlist Buffer Full"
-voice: ""
-new: "Playlist Buffer plin"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End Of List"
-voice: ""
-new: "Sfârsit de lista"
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "End Of Song List"
-voice: ""
-new: "Sfârsitul listei"
-
-id: LANG_CREATING
-desc: Screen feedback during playlist creation
-eng: "Creating"
-voice: ""
-new: "Creare"
-
-## FM radio
-
-## dir/file browser
-
-id: LANG_SHOWDIR_BUFFER_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer Is Full!"
-voice: ""
-new: "Buffer director Plin !"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "New Language"
-voice: ""
-new: "Limba romana"
-
-id: LANG_SETTINGS_LOADED
-desc: Feedback shown when a .cfg file is loaded
-eng: "Settings Loaded"
-voice: ""
-new: "Configuratii Salvat"
-
-id: LANG_SETTINGS_SAVED
-desc: Feedback shown when a .cfg file is saved
-eng: "Settings Saved"
-voice: ""
-new: "Configuratie Salvat"
-
-## tag database browser
-
-## playlist viewer
-
-## plugin loader, filetypes
-
-## misc
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: possible answers to resume question
-eng: "(PLAY/STOP)"
-voice: ""
-new: "(PLAY/STOP)"
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "Da"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "Nu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "Deschis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "Închis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_SETTING_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "Cerere"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SETTING_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Anulat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after above actions
+  user:
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "Esec"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Sound Settings"
+  </source>
+  <dest>
+    *: "Sunet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "General Settings"
+  </source>
+  <dest>
+    *: "Reglaje"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording"
+  </source>
+  <dest>
+    *: "Inregistrare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO
+  desc: in the main menu
+  user:
+  <source>
+    *: "Info"
+  </source>
+  <dest>
+    *: "Informatii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Volume"
+  </source>
+  <dest>
+    *: "Volum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Bass"
+  </source>
+  <dest>
+    *: "Grave"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Treble"
+  </source>
+  <dest>
+    *: "Înalte"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "Balans"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MENU
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Canale"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "Configurare canale"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Mono"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Left"
+  </source>
+  <dest>
+    *: "Mono Stânga"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Right"
+  </source>
+  <dest>
+    *: "Mono Dreapta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Karaoke"
+  </source>
+  <dest>
+    *: "Karaoke"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Loudness"
+  </source>
+  <dest>
+    *: "Optimizare de grave (Loudness)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Auto Volume"
+  </source>
+  <dest>
+    *: "Volum automat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user:
+  <source>
+    *: "AV Decay Time"
+  </source>
+  <dest>
+    *: "AV decalaj de referinta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Playback"
+  </source>
+  <dest>
+    *: "Reglaje play"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "File View"
+  </source>
+  <dest>
+    *: "Optiuni fisier"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Display"
+  </source>
+  <dest>
+    *: "Mod de afisare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSTEM
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "System"
+  </source>
+  <dest>
+    *: "Optiuni sistem"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Reset Settings"
+  </source>
+  <dest>
+    *: "Reinitializare setari"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK_RECORDER
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "Esti sigur(a)?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_SETTING
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Reglaje"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Cleared"
+  </source>
+  <dest>
+    *: "Setari sterse"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CANCEL
+  desc: Visual confirmation of cancelation
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Anulat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Write .cfg file"
+  </source>
+  <dest>
+    *: "Salvare configuratie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_PLAYER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Eroare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_PLAYER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Batt. Low?"
+  </source>
+  <dest>
+    *: "Baterie pe terminate?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_RECORDER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Eroare de salvare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_RECORDER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Is Battery Low?"
+  </source>
+  <dest>
+    *: "Baterie pe terminate?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording Settings"
+  </source>
+  <dest>
+    *: "Optiuni inregistrare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user:
+  <source>
+    *: "Create Playlist"
+  </source>
+  <dest>
+    *: "Creare playlist"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERSION
+  desc: in the main menu
+  user:
+  <source>
+    *: "Version"
+  </source>
+  <dest>
+    *: "Versiune"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the main menu
+  user:
+  <source>
+    *: "Debug (Keep Out!)"
+  </source>
+  <dest>
+    *: "Debug (Atentie !)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB
+  desc: in the main menu
+  user:
+  <source>
+    *: "USB (Sim)"
+  </source>
+  <dest>
+    *: "USB (Sim)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "Aleator"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "In bucla"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Toate"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "O melodie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Play Selected First"
+  </source>
+  <dest>
+    *: "Canta fisierul ales primul"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Continuare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MP3BUFFER_MARGIN
+  desc: MP3 buffer margin time
+  user:
+  <source>
+    *: "Anti-Skip Buffer"
+  </source>
+  <dest>
+    *: "Memorie anti-soc"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user:
+  <source>
+    *: "Fade On Stop/Pause"
+  </source>
+  <dest>
+    *: "Atenuare sunet la oprire/pauza"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Sort Case Sensitive"
+  </source>
+  <dest>
+    *: "Sortare senzitiva"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show Files"
+  </source>
+  <dest>
+    *: "Fisiere"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ALL
+  desc: show all files
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Toate fisierele sunt vizibile"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "Doar fisierele cunoscute"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "Doar fisierele muzicale"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_PLAYLIST
+  desc: show only playlist
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "Playlist-uri"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Follow Playlist"
+  </source>
+  <dest>
+    *: "Foloseste playlist"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll"
+  </source>
+  <dest>
+    *: "Viteza de defilare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user:
+  <source>
+    *: "Peak Meter"
+  </source>
+  <dest>
+    *: "Vu-metru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Idle Poweroff"
+  </source>
+  <dest>
+    *: "Oprire, ca urmare a inactivitatii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER
+  desc: sleep timer setting
+  user:
+  <source>
+    *: "Sleep Timer"
+  </source>
+  <dest>
+    *: "Numaratoare inversa"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: "Alarma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Quality"
+  </source>
+  <dest>
+    *: "Calitatea inregistrarii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Frequency"
+  </source>
+  <dest>
+    *: "Frecventa sunet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Source"
+  </source>
+  <dest>
+    *: "Sursa inregistrare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Mic"
+  </source>
+  <dest>
+    *: "Microfon intern"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_LINE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Intrare analogica"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Digital"
+  </source>
+  <dest>
+    *: "Semnal digital"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Canale"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Min Step"
+  </source>
+  <dest>
+    *: "Pas minim derulare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Accel"
+  </source>
+  <dest>
+    *: "Acceleratie derulare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight"
+  </source>
+  <dest>
+    *: "Lumina afisor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu
+  user:
+  <source>
+    *: "Backlight On When Plugged"
+  </source>
+  <dest>
+    *: "Lumina afisor pe durata incarcarii bateriei"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Contrast"
+  </source>
+  <dest>
+    *: "Contrast"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Invert"
+  </source>
+  <dest>
+    *: "Inversare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_SPEED
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll Speed"
+  </source>
+  <dest>
+    *: "Viteza de defilare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Scroll Speed Setting Example"
+  </source>
+  <dest>
+    *: "Exemplu de viteza de defilare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_DELAY
+  desc: Delay before scrolling
+  user:
+  <source>
+    *: "Scroll Start Delay"
+  </source>
+  <dest>
+    *: "Pauza inainte de inceputul defilarii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size"
+  </source>
+  <dest>
+    *: "Pas de defilare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP_EXAMPLE
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size Setting Example Text"
+  </source>
+  <dest>
+    *: "Exemplu de defilare pentru testarea pasilor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BIDIR_SCROLL
+  desc: Bidirectional scroll limit
+  user:
+  <source>
+    *: "Bidirectional Scroll Limit"
+  </source>
+  <dest>
+    *: "Limita de defilare bidirectionala"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user:
+  <source>
+    *: "Volume Display"
+  </source>
+  <dest>
+    *: "Afisaj volum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user:
+  <source>
+    *: "Battery Display"
+  </source>
+  <dest>
+    *: "Afisaj baterie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Graphic"
+  </source>
+  <dest>
+    *: "Grafic"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Numeric"
+  </source>
+  <dest>
+    *: "Numeric"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Release"
+  </source>
+  <dest>
+    *: "Rata de variatie a indicatorului"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Units Per Read"
+  </source>
+  <dest>
+    *: "Unitati de masura"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Hold Time"
+  </source>
+  <dest>
+    *: "Persistenta indicatorului"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Clip Hold Time"
+  </source>
+  <dest>
+    *: "Persistenta marcajului"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Eternal"
+  </source>
+  <dest>
+    *: "Continu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "dBfs <-> Linear"
+  </source>
+  <dest>
+    *: "dBfs <-> liniar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "dBfs"
+  </source>
+  <dest>
+    *: "dBfs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Linear"
+  </source>
+  <dest>
+    *: "Liniar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Minimum Of Range"
+  </source>
+  <dest>
+    *: "Minimum de spectru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Maximum Of Range"
+  </source>
+  <dest>
+    *: "Maximum de spectru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CAPACITY
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Battery Capacity"
+  </source>
+  <dest>
+    *: "Capacitate baterie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Disk Spindown"
+  </source>
+  <dest>
+    *: "Oprire disc"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF
+  desc: disk poweroff flag
+  user:
+  <source>
+    *: "Disk Poweroff"
+  </source>
+  <dest>
+    *: "Oprire disc"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Set Time/Date"
+  </source>
+  <dest>
+    *: "Reglaj Ora/Data"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user:
+  <source>
+    *: "Time Format"
+  </source>
+  <dest>
+    *: "Format ceas"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user:
+  <source>
+    *: "12 Hour Clock"
+  </source>
+  <dest>
+    *: "Ceas AM/PM"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user:
+  <source>
+    *: "24 Hour Clock"
+  </source>
+  <dest>
+    *: "Ceas 24h"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start id3 viewer
+  user:
+  <source>
+    *: "Show ID3 Info"
+  </source>
+  <dest>
+    *: "Info ID3"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user:
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "Redenumire"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE
+  desc: The verb/action Delete
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Stergere"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_DELETE
+  desc: Really Delete?
+  user:
+  <source>
+    *: "Delete?"
+  </source>
+  <dest>
+    *: "Sterg?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user:
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "Sters"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE
+  desc: The verb/action Queue
+  user:
+  <source>
+    *: "Queue"
+  </source>
+  <dest>
+    *: "Queue"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_INFO
+  desc: displayed topmost on the info screen
+  user:
+  <source>
+    *: "Rockbox Info:"
+  </source>
+  <dest>
+    *: "Rockbox: "
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_PLAYER
+  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Tmp: %d.%03dMo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_RECORDER
+  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Buffer: %d.%03dMo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CHARGE
+  desc: tells that the battery is charging, instead of battery level
+  user:
+  <source>
+    *: "Battery: Charging"
+  </source>
+  <dest>
+    *: "Bateria se încarca"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TOPOFF_CHARGE
+  desc: in info display, shows that top off charge is running
+  user:
+  <source>
+    *: "Battery: Top-Off Chg"
+  </source>
+  <dest>
+    *: "Nivel maxim de incarcare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TRICKLE_CHARGE
+  desc: in info display, shows that trickle charge is running
+  user:
+  <source>
+    *: "Battery: Trickle Chg"
+  </source>
+  <dest>
+    *: "Baterie: Incarcare persistenta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TIME
+  desc: battery level in % and estimated time remaining
+  user:
+  <source>
+    *: "%d%% %dh %dm"
+  </source>
+  <dest>
+    *: "%d%% %dh %dm"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Up"
+  </source>
+  <dest>
+    *: "Viteza +"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Down"
+  </source>
+  <dest>
+    *: "Viteza -"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps
+  user:
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pauza"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F2_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Mod:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_STATUS
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Status"
+  </source>
+  <dest>
+    *: "Stare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_SCROLL
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Scroll"
+  </source>
+  <dest>
+    *: "Defilare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_BAR
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Bar"
+  </source>
+  <dest>
+    *: "Bara"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET
+  desc: used in set_time()
+  user:
+  <source>
+    *: "ON To Set"
+  </source>
+  <dest>
+    *: "ON pentru validare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user:
+  <source>
+    *: "OFF To Revert"
+  </source>
+  <dest>
+    *: "OFF pentru anulare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_PLAYER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key Lock ON"
+  </source>
+  <dest>
+    *: "Taste blocate"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_PLAYER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key Lock OFF"
+  </source>
+  <dest>
+    *: "Taste deblocate"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_RECORDER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key Lock Is ON"
+  </source>
+  <dest>
+    *: "Tastele sunt blocate"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_RECORDER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key Lock Is OFF"
+  </source>
+  <dest>
+    *: "Tastele sunt deblocate"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: "Time:"
+  </source>
+  <dest>
+    *: "Durata:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: "Size:"
+  </source>
+  <dest>
+    *: "Dimensiune:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Castig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Stanga"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Dreapta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Alarm Time: %02d:%02d"
+  </source>
+  <dest>
+    *: "Alarma: %02d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Waking Up In %d:%02d"
+  </source>
+  <dest>
+    *: "Alarma în %d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Shutting Down..."
+  </source>
+  <dest>
+    *: "Oprire..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Alarm Time Is Too Soon!"
+  </source>
+  <dest>
+    *: "Alarma e prea devreme!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user:
+  <source>
+    *: "PLAY=Set OFF=Cancel"
+  </source>
+  <dest>
+    *: "PLAY=OK OFF=KO"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TITLE
+  desc: in wps
+  user:
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Titlu]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ARTIST
+  desc: in wps 
+  user:
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artist]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACKNUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Nr de pista]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GENRE
+  desc: ID3 frame 'genre'
+  user:
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Gen]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_YEAR
+  desc: ID3 info 'year'
+  user:
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[An]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PLAYLIST
+  desc: in wps
+  user:
+  <source>
+    *: "[Playlist]"
+  </source>
+  <dest>
+    *: "[Lista muzicala]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in wps
+  user:
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Rata de codaj]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_FRECUENCY
+  desc: in wps
+  user:
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frecventa]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PATH
+  desc: in wps
+  user:
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Path]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_NO_INFO
+  desc: ID3 info is missing
+  user:
+  <source>
+    *: "<No Info>"
+  </source>
+  <dest>
+    *: "<informatie indisponibila>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sun"
+  </source>
+  <dest>
+    *: "Dum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_MONDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Mon"
+  </source>
+  <dest>
+    *: "Lun"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Tue"
+  </source>
+  <dest>
+    *: "Mar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Wed"
+  </source>
+  <dest>
+    *: "Mie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Thu"
+  </source>
+  <dest>
+    *: "Joi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Fri"
+  </source>
+  <dest>
+    *: "Vin"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sat"
+  </source>
+  <dest>
+    *: "Sam"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jan"
+  </source>
+  <dest>
+    *: "Ian"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Feb"
+  </source>
+  <dest>
+    *: "Feb"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Mar"
+  </source>
+  <dest>
+    *: "Mar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_APRIL
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Apr"
+  </source>
+  <dest>
+    *: "Apr"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MAY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "May"
+  </source>
+  <dest>
+    *: "Mai"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jun"
+  </source>
+  <dest>
+    *: "Iun"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JULY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jul"
+  </source>
+  <dest>
+    *: "Iul"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Aug"
+  </source>
+  <dest>
+    *: "Aug"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Sep"
+  </source>
+  <dest>
+    *: "Sep"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Oct"
+  </source>
+  <dest>
+    *: "Oct"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Nov"
+  </source>
+  <dest>
+    *: "Nov"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Dec"
+  </source>
+  <dest>
+    *: "Dec"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_LOAD
+  desc: displayed on screen while loading a playlist
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Încarcare..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: displayed on screen while shuffling a playlist
+  user:
+  <source>
+    *: "Shuffling..."
+  </source>
+  <dest>
+    *: "Amestec..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_BUFFER_FULL
+  desc: in playlist.indices() when playlist is full
+  user:
+  <source>
+    *: "Playlist Buffer Full"
+  </source>
+  <dest>
+    *: "Playlist Buffer plin"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_PLAYER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End Of List"
+  </source>
+  <dest>
+    *: "Sfârsit de lista"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_RECORDER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End Of Song List"
+  </source>
+  <dest>
+    *: "Sfârsitul listei"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATING
+  desc: Screen feedback during playlist creation
+  user:
+  <source>
+    *: "Creating"
+  </source>
+  <dest>
+    *: "Creare"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOWDIR_BUFFER_FULL
+  desc: in showdir(), displayed on screen when you reach buffer limit
+  user:
+  <source>
+    *: "Dir Buffer Is Full!"
+  </source>
+  <dest>
+    *: "Buffer director Plin !"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Language"
+  </source>
+  <dest>
+    *: "Limba romana"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_LOADED
+  desc: Feedback shown when a .cfg file is loaded
+  user:
+  <source>
+    *: "Settings Loaded"
+  </source>
+  <dest>
+    *: "Configuratii Salvat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVED
+  desc: Feedback shown when a .cfg file is saved
+  user:
+  <source>
+    *: "Settings Saved"
+  </source>
+  <dest>
+    *: "Configuratie Salvat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_CONFIRM_PLAYER
+  desc: possible answers to resume question
+  user:
+  <source>
+    *: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

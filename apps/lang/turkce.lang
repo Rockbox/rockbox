@@ -1,908 +1,1862 @@
-
-## general strings
-
-id: LANG_SET_BOOL_YES
-desc: bool true representation
-eng: "Yes"
-voice: ""
-new: "Evet"
-
-id: LANG_SET_BOOL_NO
-desc: bool false representation
-eng: "No"
-voice: ""
-new: "Hayir"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-voice: ""
-new: "Acik"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-voice: ""
-new: "Kapali"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "ask"
-voice: ""
-new: "sor"
-
-## general messages
-
-## main menu
-
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-voice: ""
-new: "Ses Ayarlari"
-
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-voice: ""
-new: "Genel Ayarlar"
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-voice: ""
-new: "Bilgi"
-
-## Sound settings
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-voice: ""
-new: "Ses"
-
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-voice: ""
-new: "Bas"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-voice: ""
-new: "Tiz"
-
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-voice: ""
-new: "Ses dengesi"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-voice: ""
-new: "Kanallar"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel configuration"
-voice: ""
-new: "Kanal ayari"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-voice: ""
-new: "Stereo"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-voice: ""
-new: "Mono"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-voice: ""
-new: "Mono Sol"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-voice: ""
-new: "Mono Sag"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-voice: ""
-new: "Yukseklik"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-voice: ""
-new: "Otomatik Ses"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV decay time"
-voice: ""
-new: "AV sönüm zamani"
-
-## general settings menu
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-voice: ""
-new: "Çalma"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-voice: ""
-new: "Dosya Gorunumu"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-voice: ""
-new: "Ekran"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-voice: ""
-new: "Sistem"
-
-## manage settings menu
-
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset settings"
-voice: ""
-new: "Ayarlari basa dondur"
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are you sure?"
-voice: ""
-new: "Emin misiniz?"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-voice: ""
-new: "Ayarlar"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-voice: ""
-new: "Temizlendi"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
-eng: "Canceled"
-voice: ""
-new: "Iptal edildi"
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save failed"
-voice: ""
-new: "Saklama basarisiz"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Batt. low?"
-voice: ""
-new: "Pil zayif?"
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save failed"
-voice: ""
-new: "Saklama basarisiz"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "Is battery low?"
-voice: ""
-new: "Pil zayif mi?"
-
-## recording menu
-
-## equalizer menu
-
-## playlist options
-
-## info menu
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-voice: ""
-new: "Surum"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (keep out!)"
-voice: ""
-new: "Hata Arindirma (Uzak durun!)"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (sim)"
-voice: ""
-new: "USB (sim)"
-
-## playback settings menu
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-voice: ""
-new: "Karistir"
-
-id: LANG_REPEAT
-desc: in settings_menu
-eng: "Repeat"
-voice: ""
-new: "Tekrarla"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-voice: ""
-new: "Hepsini"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-voice: ""
-new: "Calani"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play selected first"
-voice: ""
-new: "Secileni once cal"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-voice: ""
-new: "Kaldigi yerden devam et"
-
-## file view menu
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-voice: ""
-new: "Buyuk Kucuk Harf Sirasi"
-
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show files"
-voice: ""
-new: "Gosterilecek Dosyalar"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-voice: ""
-new: "Hepsi"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-voice: ""
-new: "Desteklenen"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-voice: ""
-new: "Muzik"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-voice: ""
-new: "Listeyi Takip Et"
-
-## display settings menu
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-voice: ""
-new: "Kayma Hizi"
-
-id: LANG_PM_MENU
-desc: in the display menu
-eng: "Peak meter"
-voice: ""
-new: "Ses Duzeyi Gosterimi"
-
-## system settings menu
-
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-voice: ""
-new: "Otomatik Kapanma"
-
-## bookmarking settings menu
-
-## voice settings menu
-
-## recording settings menu
-
-## ffwd/rewind menu
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-voice: ""
-new: "FF/RW Min Adim"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-voice: ""
-new: "FF/RW Ivme"
-
-## crossfade menu
-
-## replaygain menu
-
-## LCD settings menu, also remote
-
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-voice: ""
-new: "LCD Isigi"
-
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight on when charging"
-voice: ""
-new: "LCD isigi sarj sirasinda acik"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-voice: ""
-new: "Kontrast"
-
-## scrolling menu
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-voice: ""
-new: "Kayma Hizi Ayari Ornegi"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-voice: ""
-new: "Kaydirma cubugu"
-
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-voice: ""
-new: "Durum cubugu"
-
-id: LANG_VOLUME_DISPLAY
-desc: Volume type title
-eng: "Volume Display"
-voice: ""
-new: "Ses Seviyesi Gosterimi"
-
-id: LANG_BATTERY_DISPLAY
-desc: Battery type title
-eng: "Battery Display"
-voice: ""
-new: "Pil Gosterimi"
-
-id: LANG_DISPLAY_GRAPHIC
-desc: Label for type of icon display
-eng: "Graphic"
-voice: ""
-new: "Grafik"
-
-id: LANG_DISPLAY_NUMERIC
-desc: Label for type of icon display
-eng: "Numeric"
-voice: ""
-new: "Sayisal"
-
-## peakmeter menu
-
-id: LANG_PM_RELEASE
-desc: in the peak meter menu
-eng: "Peak release"
-voice: ""
-new: "Tepe noktasi birakma"
-
-id: LANG_PM_UNITS_PER_READ
-desc: in the peak meter menu
-eng: "Units per read"
-voice: ""
-new: "birim/okuma"
-
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak hold time"
-voice: ""
-new: "Tepe noktasi kalis suresi"
-
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip hold time"
-voice: ""
-new: "Parca kalis suresi"
-
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "eternal"
-voice: ""
-new: "sonsuz"
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "dBfs <-> linear"
-voice: ""
-new: "dBfs <-> dogrusal"
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "dBfs"
-voice: ""
-new: "dBfs"
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "linear"
-voice: ""
-new: "dogrusal"
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum of range"
-voice: ""
-new: "En dusuk aralik"
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum of range"
-voice: ""
-new: "En yuksek aralik"
-
-## battery menu
-
-## disk menu
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-voice: ""
-new: "Disk Donusu"
-
-## time & date menu
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-voice: ""
-new: "Zaman/Tarih ayarla"
-
-id: LANG_TIMEFORMAT
-desc: select the time format of time in status bar
-eng: "Time Format"
-voice: ""
-new: "Saat Formati"
-
-id: LANG_12_HOUR_CLOCK
-desc: option for 12 hour clock
-eng: "12 hour clock"
-voice: ""
-new: "12 saate gore"
-
-id: LANG_24_HOUR_CLOCK
-desc: option for 24 hour clock
-eng: "24 hour clock"
-voice: ""
-new: "24 saate gore"
-
-## limits menu
-
-## context menu (onplay menu)
-
-## playlist context menu
-
-## bookmark context menu
-
-## info screen
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox info:"
-voice: ""
-new: "Rockbox bilgi:"
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%02dMb"
-voice: ""
-new: "Tmp: %d.%02dMb"
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%02dMb"
-voice: ""
-new: "Tampon: %d.%02dMb"
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: charging"
-voice: ""
-new: "Pil: Sarj Oluyor"
-
-## pitch screen
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch up"
-voice: ""
-new: "Hizlandir"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch down"
-voice: ""
-new: "Yavaslat"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-voice: ""
-new: "Durdur"
-
-## quickscreens
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "mode:"
-voice: ""
-new: "mod:"
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-voice: ""
-new: "Durum"
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-voice: ""
-new: "Kaydirma"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "bar"
-voice: ""
-new: "cubugu"
-
-## bookmark screen
-
-## set time screen
-
-id: LANG_TIME_SET
-desc: used in set_time()
-eng: "ON to set"
-voice: ""
-new: "Ayar icin ON"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF to revert"
-voice: ""
-new: "Iptal icin OFF"
-
-## while playing screen
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Keylock ON"
-voice: ""
-new: "Tus Kilidi ACIK"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Keylock OFF"
-voice: ""
-new: "Tus Kilidi KAPALI"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key lock is ON"
-voice: ""
-new: "Tus Kilidi ACIK"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key lock is OFF"
-voice: ""
-new: "Tus Kilidi KAPALI"
-
-## recording screen
-
-## recording trigger screen
-
-## alarm screen
-
-## colour setting screen
-
-## tag viewer
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-voice: ""
-new: "[Adi]"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-voice: ""
-new: "[Sanatci]"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-voice: ""
-new: "[Album]"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-voice: ""
-new: "[Sarki no]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-voice: ""
-new: "[Sarki Listesi]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-voice: ""
-new: "[Bitrate]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-voice: ""
-new: "[Frekans]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[PATH]"
-voice: ""
-new: "[YOL]"
-
-## weekdays
-
-id: LANG_WEEKDAY_SUNDAY
-desc: abbreviation for weekday
-eng: "Sun"
-voice: ""
-new: "Paz"
-
-id: LANG_WEEKDAY_MONDAY
-desc: abbreviation for weekday
-eng: "Mon"
-voice: ""
-new: "Pzt"
-
-id: LANG_WEEKDAY_TUESDAY
-desc: abbreviation for weekday
-eng: "Tue"
-voice: ""
-new: "Sal"
-
-id: LANG_WEEKDAY_WEDNESDAY
-desc: abbreviation for weekday
-eng: "Wed"
-voice: ""
-new: "Çar"
-
-id: LANG_WEEKDAY_THURSDAY
-desc: abbreviation for weekday
-eng: "Thu"
-voice: ""
-new: "Per"
-
-id: LANG_WEEKDAY_FRIDAY
-desc: abbreviation for weekday
-eng: "Fri"
-voice: ""
-new: "Cum"
-
-id: LANG_WEEKDAY_SATURDAY
-desc: abbreviation for weekday
-eng: "Sat"
-voice: ""
-new: "Cmt"
-
-## months
-
-id: LANG_MONTH_JANUARY
-desc: abbreviation for monthname
-eng: "Jan"
-voice: ""
-new: "Oca"
-
-id: LANG_MONTH_FEBRUARY
-desc: abbreviation for monthname
-eng: "Feb"
-voice: ""
-new: "Sub"
-
-id: LANG_MONTH_MARCH
-desc: abbreviation for monthname
-eng: "Mar"
-voice: ""
-new: "Mar"
-
-id: LANG_MONTH_APRIL
-desc: abbreviation for monthname
-eng: "Apr"
-voice: ""
-new: "Nis"
-
-id: LANG_MONTH_MAY
-desc: abbreviation for monthname
-eng: "May"
-voice: ""
-new: "May"
-
-id: LANG_MONTH_JUNE
-desc: abbreviation for monthname
-eng: "Jun"
-voice: ""
-new: "Haz"
-
-id: LANG_MONTH_JULY
-desc: abbreviation for monthname
-eng: "Jul"
-voice: ""
-new: "Tem"
-
-id: LANG_MONTH_AUGUST
-desc: abbreviation for monthname
-eng: "Aug"
-voice: ""
-new: "Agu"
-
-id: LANG_MONTH_SEPTEMBER
-desc: abbreviation for monthname
-eng: "Sep"
-voice: ""
-new: "Eyl"
-
-id: LANG_MONTH_OCTOBER
-desc: abbreviation for monthname
-eng: "Oct"
-voice: ""
-new: "Eki"
-
-id: LANG_MONTH_NOVEMBER
-desc: abbreviation for monthname
-eng: "Nov"
-voice: ""
-new: "Kas"
-
-id: LANG_MONTH_DECEMBER
-desc: abbreviation for monthname
-eng: "Dec"
-voice: ""
-new: "Ara"
-
-## digits and units for voice, the order is important
-
-## units for voicing
-
-## chars for spelling
-
-## file/folder voicing
-
-## file extensions for voicing
-
-## playlist handling
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-voice: ""
-new: "Yukluyor..."
-
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-voice: ""
-new: "Karistiriyor..."
-
-id: LANG_PLAYLIST_BUFFER_FULL
-desc: in playlist.indices() when playlist is full
-eng: "Playlist buffer full"
-voice: ""
-new: "SarkiListesi tampon dolu"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End of list"
-voice: ""
-new: "Liste sonu"
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "<End of song list>"
-voice: ""
-new: "<Sarki listesi sonu>"
-
-## FM radio
-
-## dir/file browser
-
-id: LANG_SHOWDIR_BUFFER_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer is full!"
-voice: ""
-new: "Dir Tamponu dolu!"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "new language"
-voice: ""
-new: "yeni dil"
-
-id: LANG_SETTINGS_LOADED
-desc: 
-eng: ""
-voice: ""
-new: ""
-
-id: LANG_SETTINGS_SAVED
-desc: 
-eng: ""
-voice: ""
-new: ""
-
-## tag database browser
-
-## playlist viewer
-
-## plugin loader, filetypes
-
-## misc
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
-eng: "(PLAY/STOP)"
-voice: ""
-new: "(ÇAL/DUR)"
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "Evet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "Hayir"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "Acik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "Kapali"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_SETTING_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "ask"
+  </source>
+  <dest>
+    *: "sor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Sound Settings"
+  </source>
+  <dest>
+    *: "Ses Ayarlari"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "General Settings"
+  </source>
+  <dest>
+    *: "Genel Ayarlar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO
+  desc: in the main menu
+  user:
+  <source>
+    *: "Info"
+  </source>
+  <dest>
+    *: "Bilgi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Volume"
+  </source>
+  <dest>
+    *: "Ses"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Bass"
+  </source>
+  <dest>
+    *: "Bas"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Treble"
+  </source>
+  <dest>
+    *: "Tiz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "Ses dengesi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MENU
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Kanallar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channel configuration"
+  </source>
+  <dest>
+    *: "Kanal ayari"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Mono"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Left"
+  </source>
+  <dest>
+    *: "Mono Sol"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Right"
+  </source>
+  <dest>
+    *: "Mono Sag"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Loudness"
+  </source>
+  <dest>
+    *: "Yukseklik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Auto Volume"
+  </source>
+  <dest>
+    *: "Otomatik Ses"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user:
+  <source>
+    *: "AV decay time"
+  </source>
+  <dest>
+    *: "AV sönüm zamani"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Playback"
+  </source>
+  <dest>
+    *: "Çalma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "File View"
+  </source>
+  <dest>
+    *: "Dosya Gorunumu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Display"
+  </source>
+  <dest>
+    *: "Ekran"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSTEM
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "System"
+  </source>
+  <dest>
+    *: "Sistem"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Reset settings"
+  </source>
+  <dest>
+    *: "Ayarlari basa dondur"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK_RECORDER
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are you sure?"
+  </source>
+  <dest>
+    *: "Emin misiniz?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_SETTING
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Ayarlar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Cleared"
+  </source>
+  <dest>
+    *: "Temizlendi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CANCEL
+  desc: Visual confirmation of cancelation
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Iptal edildi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_PLAYER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save failed"
+  </source>
+  <dest>
+    *: "Saklama basarisiz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_PLAYER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Batt. low?"
+  </source>
+  <dest>
+    *: "Pil zayif?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_RECORDER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save failed"
+  </source>
+  <dest>
+    *: "Saklama basarisiz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_RECORDER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Is battery low?"
+  </source>
+  <dest>
+    *: "Pil zayif mi?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERSION
+  desc: in the main menu
+  user:
+  <source>
+    *: "Version"
+  </source>
+  <dest>
+    *: "Surum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the main menu
+  user:
+  <source>
+    *: "Debug (keep out!)"
+  </source>
+  <dest>
+    *: "Hata Arindirma (Uzak durun!)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB
+  desc: in the main menu
+  user:
+  <source>
+    *: "USB (sim)"
+  </source>
+  <dest>
+    *: "USB (sim)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "Karistir"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Tekrarla"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Hepsini"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "Calani"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Play selected first"
+  </source>
+  <dest>
+    *: "Secileni once cal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Kaldigi yerden devam et"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Sort Case Sensitive"
+  </source>
+  <dest>
+    *: "Buyuk Kucuk Harf Sirasi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show files"
+  </source>
+  <dest>
+    *: "Gosterilecek Dosyalar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ALL
+  desc: show all files
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Hepsi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "Desteklenen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "Muzik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Follow Playlist"
+  </source>
+  <dest>
+    *: "Listeyi Takip Et"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll Speed"
+  </source>
+  <dest>
+    *: "Kayma Hizi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user:
+  <source>
+    *: "Peak meter"
+  </source>
+  <dest>
+    *: "Ses Duzeyi Gosterimi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Idle Poweroff"
+  </source>
+  <dest>
+    *: "Otomatik Kapanma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Min Step"
+  </source>
+  <dest>
+    *: "FF/RW Min Adim"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Accel"
+  </source>
+  <dest>
+    *: "FF/RW Ivme"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight"
+  </source>
+  <dest>
+    *: "LCD Isigi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu
+  user:
+  <source>
+    *: "Backlight on when charging"
+  </source>
+  <dest>
+    *: "LCD isigi sarj sirasinda acik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Contrast"
+  </source>
+  <dest>
+    *: "Kontrast"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Scroll Speed Setting Example"
+  </source>
+  <dest>
+    *: "Kayma Hizi Ayari Ornegi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Scroll Bar"
+  </source>
+  <dest>
+    *: "Kaydirma cubugu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Status Bar"
+  </source>
+  <dest>
+    *: "Durum cubugu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user:
+  <source>
+    *: "Volume Display"
+  </source>
+  <dest>
+    *: "Ses Seviyesi Gosterimi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user:
+  <source>
+    *: "Battery Display"
+  </source>
+  <dest>
+    *: "Pil Gosterimi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Graphic"
+  </source>
+  <dest>
+    *: "Grafik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Numeric"
+  </source>
+  <dest>
+    *: "Sayisal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak release"
+  </source>
+  <dest>
+    *: "Tepe noktasi birakma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Units per read"
+  </source>
+  <dest>
+    *: "birim/okuma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak hold time"
+  </source>
+  <dest>
+    *: "Tepe noktasi kalis suresi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Clip hold time"
+  </source>
+  <dest>
+    *: "Parca kalis suresi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "eternal"
+  </source>
+  <dest>
+    *: "sonsuz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "dBfs <-> linear"
+  </source>
+  <dest>
+    *: "dBfs <-> dogrusal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "dBfs"
+  </source>
+  <dest>
+    *: "dBfs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "linear"
+  </source>
+  <dest>
+    *: "dogrusal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Minimum of range"
+  </source>
+  <dest>
+    *: "En dusuk aralik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Maximum of range"
+  </source>
+  <dest>
+    *: "En yuksek aralik"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Disk Spindown"
+  </source>
+  <dest>
+    *: "Disk Donusu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Set Time/Date"
+  </source>
+  <dest>
+    *: "Zaman/Tarih ayarla"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user:
+  <source>
+    *: "Time Format"
+  </source>
+  <dest>
+    *: "Saat Formati"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user:
+  <source>
+    *: "12 hour clock"
+  </source>
+  <dest>
+    *: "12 saate gore"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user:
+  <source>
+    *: "24 hour clock"
+  </source>
+  <dest>
+    *: "24 saate gore"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_INFO
+  desc: displayed topmost on the info screen
+  user:
+  <source>
+    *: "Rockbox info:"
+  </source>
+  <dest>
+    *: "Rockbox bilgi:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_PLAYER
+  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buf: %d.%02dMb"
+  </source>
+  <dest>
+    *: "Tmp: %d.%02dMb"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_RECORDER
+  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%02dMb"
+  </source>
+  <dest>
+    *: "Tampon: %d.%02dMb"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CHARGE
+  desc: tells that the battery is charging, instead of battery level
+  user:
+  <source>
+    *: "Battery: charging"
+  </source>
+  <dest>
+    *: "Pil: Sarj Oluyor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch up"
+  </source>
+  <dest>
+    *: "Hizlandir"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch down"
+  </source>
+  <dest>
+    *: "Yavaslat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps
+  user:
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Durdur"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F2_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: "mode:"
+  </source>
+  <dest>
+    *: "mod:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_STATUS
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Status"
+  </source>
+  <dest>
+    *: "Durum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_SCROLL
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Scroll"
+  </source>
+  <dest>
+    *: "Kaydirma"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_BAR
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "bar"
+  </source>
+  <dest>
+    *: "cubugu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET
+  desc: used in set_time()
+  user:
+  <source>
+    *: "ON to set"
+  </source>
+  <dest>
+    *: "Ayar icin ON"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user:
+  <source>
+    *: "OFF to revert"
+  </source>
+  <dest>
+    *: "Iptal icin OFF"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_PLAYER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Keylock ON"
+  </source>
+  <dest>
+    *: "Tus Kilidi ACIK"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_PLAYER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Keylock OFF"
+  </source>
+  <dest>
+    *: "Tus Kilidi KAPALI"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_RECORDER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key lock is ON"
+  </source>
+  <dest>
+    *: "Tus Kilidi ACIK"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_RECORDER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key lock is OFF"
+  </source>
+  <dest>
+    *: "Tus Kilidi KAPALI"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TITLE
+  desc: in wps
+  user:
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Adi]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ARTIST
+  desc: in wps 
+  user:
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Sanatci]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACKNUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Sarki no]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PLAYLIST
+  desc: in wps
+  user:
+  <source>
+    *: "[Playlist]"
+  </source>
+  <dest>
+    *: "[Sarki Listesi]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in wps
+  user:
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrate]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_FRECUENCY
+  desc: in wps
+  user:
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frekans]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PATH
+  desc: in wps
+  user:
+  <source>
+    *: "[PATH]"
+  </source>
+  <dest>
+    *: "[YOL]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Sun"
+  </source>
+  <dest>
+    *: "Paz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_MONDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Mon"
+  </source>
+  <dest>
+    *: "Pzt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Tue"
+  </source>
+  <dest>
+    *: "Sal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Wed"
+  </source>
+  <dest>
+    *: "Çar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Thu"
+  </source>
+  <dest>
+    *: "Per"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Fri"
+  </source>
+  <dest>
+    *: "Cum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: abbreviation for weekday
+  user:
+  <source>
+    *: "Sat"
+  </source>
+  <dest>
+    *: "Cmt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Jan"
+  </source>
+  <dest>
+    *: "Oca"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Feb"
+  </source>
+  <dest>
+    *: "Sub"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Mar"
+  </source>
+  <dest>
+    *: "Mar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_APRIL
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Apr"
+  </source>
+  <dest>
+    *: "Nis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MAY
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "May"
+  </source>
+  <dest>
+    *: "May"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Jun"
+  </source>
+  <dest>
+    *: "Haz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JULY
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Jul"
+  </source>
+  <dest>
+    *: "Tem"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Aug"
+  </source>
+  <dest>
+    *: "Agu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Sep"
+  </source>
+  <dest>
+    *: "Eyl"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Oct"
+  </source>
+  <dest>
+    *: "Eki"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Nov"
+  </source>
+  <dest>
+    *: "Kas"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: abbreviation for monthname
+  user:
+  <source>
+    *: "Dec"
+  </source>
+  <dest>
+    *: "Ara"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_LOAD
+  desc: displayed on screen while loading a playlist
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Yukluyor..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: displayed on screen while shuffling a playlist
+  user:
+  <source>
+    *: "Shuffling..."
+  </source>
+  <dest>
+    *: "Karistiriyor..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_BUFFER_FULL
+  desc: in playlist.indices() when playlist is full
+  user:
+  <source>
+    *: "Playlist buffer full"
+  </source>
+  <dest>
+    *: "SarkiListesi tampon dolu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_PLAYER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End of list"
+  </source>
+  <dest>
+    *: "Liste sonu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_RECORDER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "<End of song list>"
+  </source>
+  <dest>
+    *: "<Sarki listesi sonu>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOWDIR_BUFFER_FULL
+  desc: in showdir(), displayed on screen when you reach buffer limit
+  user:
+  <source>
+    *: "Dir Buffer is full!"
+  </source>
+  <dest>
+    *: "Dir Tamponu dolu!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user:
+  <source>
+    *: "new language"
+  </source>
+  <dest>
+    *: "yeni dil"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_LOADED
+  desc: 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVED
+  desc: 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_CONFIRM_PLAYER
+  desc: posible answers to resume question
+  user:
+  <source>
+    *: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "(ÇAL/DUR)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

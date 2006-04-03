@@ -17,6 +17,7 @@ my $output="rockbox.zip";
 my $verbose;
 my $exe;
 my $target;
+my $archos;
 
 while(1) {
     if($ARGV[0] eq "-r") {
@@ -31,6 +32,12 @@ while(1) {
         shift @ARGV;    
     }
 
+    elsif($ARGV[0] eq "-t") {
+        # The target name as used in ARCHOS in the root makefile
+        $archos=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
     elsif($ARGV[0] eq "-o") {
         $output=$ARGV[1];
         shift @ARGV;
@@ -72,8 +79,8 @@ sub buildlangs {
     for(@files) {
         my $output = $_;
         $output =~ s/(.*)\.lang/$1.lng/;
-        print "lang $_\n" if($verbose);
-        system ("$ROOT/tools/binlang $dir/english.lang $dir/$_ $outputlang/$output >/dev/null 2>&1");
+        print "$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_\n" if($verbose);
+        system ("$ROOT/tools/genlang -e=$dir/english.lang -t=$archos -b=$outputlang/$output $dir/$_ >/dev/null 2>&1");
     }
 }
 

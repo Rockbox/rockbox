@@ -1171,6 +1171,8 @@ sed > Makefile \
 
 ifndef V
 SILENT=@
+else
+VERBOSEOPT=-v
 endif
 
 export ROOTDIR=@ROOTDIR@
@@ -1255,7 +1257,7 @@ tags:
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
 zip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 7zip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)

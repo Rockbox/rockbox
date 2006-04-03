@@ -187,15 +187,10 @@ $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 
 include $(TOOLSDIR)/make.inc
 
-$(OBJDIR)/build.lang: lang/$(LANGUAGE).lang $(TOOLSDIR)/uplang
-	@echo "UPLANG"
-	@mkdir -p `dirname $@`
-	@perl $(TOOLSDIR)/uplang lang/english.lang $< > $@
-
-$(OBJDIR)/lang.o: $(OBJDIR)/build.lang $(TOOLSDIR)/genlang
+$(OBJDIR)/lang.o: lang/$(LANGUAGE).lang
 	@echo "GENLANG"
 	@mkdir -p `dirname $@`
-	@perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang $<
+	$(SILENT)perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS) $<
 	@echo "CC lang.c"
 	@$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 

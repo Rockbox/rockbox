@@ -1,2655 +1,5936 @@
-# $Id: wallisertitsch.lang,v 1.101 2004/03/06 12:44:33 vicentinimartin
-
-## general strings
-
-id: LANG_SET_BOOL_YES
-desc: bool true representation
-eng: "Yes"
-voice: ""
-new: "Ja"
-
-id: LANG_SET_BOOL_NO
-desc: bool false representation
-eng: "No"
-voice: ""
-new: "Nei"
-
-id: LANG_ON
-desc: Used in a lot of places
-eng: "On"
-voice: ""
-new: "A"
-
-id: LANG_OFF
-desc: Used in a lot of places
-eng: "Off"
-voice: ""
-new: "Üs"
-
-id: LANG_RESUME_SETTING_ASK
-desc: in settings_menu
-eng: "Ask"
-voice: ""
-new: "Naafrägu"
-
-id: LANG_ALWAYS
-desc: (player) the jump scroll shall be done "always
-eng: "Always"
-voice: ""
-new: "immer"
-
-## general messages
-
-id: LANG_CONFIRM_SHUTDOWN
-desc: in shutdown screen
-eng: "Press OFF to shut down"
-voice: ""
-new: "OFF fer Üszschaltu"
-
-id: LANG_SHUTTINGDOWN
-desc: in main menu
-eng: "Shutting down..."
-voice: ""
-new: "am Üsschaltu..."
-
-id: LANG_REMOVE_MMC
-desc: before acknowledging usb in case an MMC is inserted (Ondio)
-eng: "Please remove inserted MMC"
-voice: ""
-new: "Bitte MMC üsanäh"
-
-id: LANG_MENU_SETTING_CANCEL
-desc: Visual confirmation of canceling a changed setting
-eng: "Canceled"
-voice: ""
-new: "Abgibrochu"
-
-id: LANG_FAILED
-desc: Something failed. To be appended after above actions
-eng: "Failed"
-voice: ""
-new: "gschitrut"
-
-## main menu
-
-id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-desc: Text for the menu text to access the most recent bookmarks list
-eng: "Recent Bookmarks"
-voice: ""
-new: "nöüschti Läsezeichu"
-
-id: LANG_SOUND_SETTINGS
-desc: in the main menu
-eng: "Sound Settings"
-voice: ""
-new: "Klangischtellige"
-
-id: LANG_GENERAL_SETTINGS
-desc: in the main menu
-eng: "General Settings"
-voice: ""
-new: "Grundischtellige"
-
-id: LANG_MANAGE_MENU
-desc: in the system sub menu
-eng: "Manage Settings"
-voice: ""
-new: "Konfiguratione verwaltu"
-
-id: LANG_FM_RADIO
-desc: in main menu
-eng: "FM Radio"
-voice: ""
-new: "FM Radio"
-
-id: LANG_RECORDING
-desc: in the main menu
-eng: "Recording"
-voice: ""
-new: "Üfnahm"
-
-id: LANG_PLAYLIST_MENU
-desc: in main menu.
-eng: "Playlist Options"
-voice: ""
-new: "Abschpillischta Optione"
-
-id: LANG_PLUGINS
-desc: in main_menu()
-eng: "Browse Plugins"
-voice: ""
-new: "Plugins"
-
-id: LANG_INFO
-desc: in the main menu
-eng: "Info"
-voice: ""
-new: "Informazione"
-
-id: LANG_SHUTDOWN
-desc: in main menu
-eng: "Shut down"
-voice: ""
-new: "Üsschaltu"
-
-## Sound settings
-
-id: LANG_VOLUME
-desc: in sound_settings
-eng: "Volume"
-voice: ""
-new: "Lütschterchi"
-
-id: LANG_BASS
-desc: in sound_settings
-eng: "Bass"
-voice: ""
-new: "Bass"
-
-id: LANG_TREBLE
-desc: in sound_settings
-eng: "Treble"
-voice: ""
-new: "Heechine"
-
-id: LANG_BALANCE
-desc: in sound_settings
-eng: "Balance"
-voice: ""
-new: "Balance"
-
-id: LANG_CHANNEL_MENU
-desc: in sound_settings
-eng: "Channels"
-voice: ""
-new: "Kanäl"
-
-id: LANG_CHANNEL
-desc: in sound_settings
-eng: "Channel Configuration"
-voice: ""
-new: "Kanalischtellig"
-
-id: LANG_CHANNEL_STEREO
-desc: in sound_settings
-eng: "Stereo"
-voice: ""
-new: "Stereo"
-
-id: LANG_CHANNEL_MONO
-desc: in sound_settings
-eng: "Mono"
-voice: ""
-new: "Mono"
-
-id: LANG_CHANNEL_LEFT
-desc: in sound_settings
-eng: "Mono Left"
-voice: ""
-new: "Mono Lings"
-
-id: LANG_CHANNEL_RIGHT
-desc: in sound_settings
-eng: "Mono Right"
-voice: ""
-new: "Mono Rächts"
-
-id: LANG_CHANNEL_KARAOKE
-desc: in sound_settings
-eng: "Karaoke"
-voice: ""
-new: "Karaoke"
-
-id: LANG_LOUDNESS
-desc: in sound_settings
-eng: "Loudness"
-voice: ""
-new: "Verschterchig"
-
-id: LANG_AUTOVOL
-desc: in sound_settings
-eng: "Auto Volume"
-voice: ""
-new: "Autom. Lütschterchi"
-
-id: LANG_DECAY
-desc: in sound_settings
-eng: "AV Decay Time"
-voice: ""
-new: "AV Trägheit"
-
-id: LANG_SUPERBASS
-desc: in sound settings
-eng: "Super bass"
-voice: ""
-new: "Superbass"
-
-id: LANG_MDB_ENABLE
-desc: in sound settings
-eng: "MDB Enable"
-voice: ""
-new: "MDB aktivieru"
-
-id: LANG_MDB_STRENGTH
-desc: in sound settings
-eng: "MDB Strength"
-voice: ""
-new: "MDB Sterchi"
-
-id: LANG_MDB_HARMONICS
-desc: in sound settings
-eng: "MDB Harmonics"
-voice: ""
-new: "MDB Oberteen"
-
-id: LANG_MDB_CENTER
-desc: in sound settings
-eng: "MDB Center frequency"
-voice: ""
-new: "MDB Mittufrequänz"
-
-id: LANG_MDB_SHAPE
-desc: in sound settings
-eng: "MDB Shape"
-voice: ""
-new: "MDB Form"
-
-## general settings menu
-
-id: LANG_PLAYBACK
-desc: in settings_menu()
-eng: "Playback"
-voice: ""
-new: "Wiedergaab"
-
-id: LANG_FILE
-desc: in settings_menu()
-eng: "File View"
-voice: ""
-new: "Datiiasicht"
-
-id: LANG_DISPLAY
-desc: in settings_menu()
-eng: "Display"
-voice: ""
-new: "Azeig"
-
-id: LANG_SYSTEM
-desc: in settings_menu()
-eng: "System"
-voice: ""
-new: "Syschtem"
-
-id: LANG_BOOKMARK_SETTINGS
-desc: in general settings
-eng: "Bookmarking"
-voice: ""
-new: "Läsezeichu"
-
-id: LANG_LANGUAGE
-desc: in settings_menu
-eng: "Language"
-voice: ""
-new: "Spraach"
-
-id: LANG_VOICE
-desc: root of voice menu
-eng: "Voice"
-voice: ""
-new: "Spraachüsgab"
-
-## manage settings menu
-
-id: LANG_CUSTOM_CFG
-desc: in setting_menu()
-eng: "Browse .cfg files"
-voice: ""
-new: ".cfg Datije"
-
-id: LANG_FIRMWARE
-desc: in the main menu
-eng: "Browse Firmwares"
-voice: ""
-new: "Firmwares"
-
-id: LANG_RESET
-desc: in system_settings_menu()
-eng: "Reset Settings"
-voice: ""
-new: "Ischtellige zruggsetzu"
-
-id: LANG_RESET_ASK_RECORDER
-desc: confirm to reset settings
-eng: "Are You Sure?"
-voice: ""
-new: "Bisch sicher?"
-
-id: LANG_CONFIRM_WITH_PLAY_RECORDER
-desc: Generic recorder string to use to confirm
-eng: "PLAY = Yes"
-voice: ""
-new: "PLAY = Ja"
-
-id: LANG_CANCEL_WITH_ANY_RECORDER
-desc: Generic recorder string to use to cancel
-eng: "Any Other = No"
-voice: ""
-new: "Andri = Nei"
-
-id: LANG_RESET_DONE_SETTING
-desc: visual confirmation after settings reset
-eng: "Settings"
-voice: ""
-new: "Ischtellige"
-
-id: LANG_RESET_DONE_CLEAR
-desc: visual confirmation after settings reset
-eng: "Cleared"
-voice: ""
-new: "Glescht"
-
-id: LANG_RESET_DONE_CANCEL
-desc: Visual confirmation of cancelation
-eng: "Canceled"
-voice: ""
-new: "Abgibrochu"
-
-id: LANG_SAVE_SETTINGS
-desc: in system_settings_menu()
-eng: "Write .cfg file"
-voice: ""
-new: "Sichre .cfg Datii"
-
-id: LANG_SETTINGS_SAVE_PLAYER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Spiicherfähler"
-
-id: LANG_SETTINGS_BATTERY_PLAYER
-desc: if save settings has failed
-eng: "Partition?"
-voice: ""
-new: "Akku läär?"
-
-id: LANG_SETTINGS_SAVE_RECORDER
-desc: displayed if save settings has failed
-eng: "Save Failed"
-voice: ""
-new: "Spiicherfähler"
-
-id: LANG_SETTINGS_BATTERY_RECORDER
-desc: if save settings has failed
-eng: "No partition?"
-voice: ""
-new: "Akku läär?"
-
-## recording menu
-
-id: LANG_RECORDING_MENU
-desc: in the recording sub menu
-eng: "Start Recording"
-voice: ""
-new: "Üfnahm startu"
-
-id: LANG_RECORDING_SETTINGS
-desc: in the main menu
-eng: "Recording Settings"
-voice: ""
-new: "Üfnahmeischtellige"
-
-## equalizer menu
-
-## playlist options
-
-id: LANG_CREATE_PLAYLIST
-desc: Menu option for creating a playlist
-eng: "Create Playlist"
-voice: ""
-new: "Abschpillischta Erschtellu"
-
-id: LANG_VIEW_DYNAMIC_PLAYLIST
-desc: in playlist menu.
-eng: "View Current Playlist"
-voice: ""
-new: "zeig aktuelli Abschpillischta"
-
-id: LANG_SAVE_DYNAMIC_PLAYLIST
-desc: in playlist menu.
-eng: "Save Current Playlist"
-voice: ""
-new: "aktuelli Abschpillischta schpichru"
-
-id: LANG_RECURSE_DIRECTORY
-desc: In playlist menu
-eng: "Recursively Insert Directories"
-voice: ""
-new: "Verzeichnis rekursiv ifiegu"
-
-## info menu
-
-id: LANG_INFO_MENU
-desc: in the info sub menu
-eng: "Rockbox Info"
-voice: ""
-new: "Rockbox Info"
-
-id: LANG_VERSION
-desc: in the main menu
-eng: "Version"
-voice: ""
-new: "Version"
-
-id: LANG_DEBUG
-desc: in the main menu
-eng: "Debug (Keep Out!)"
-voice: ""
-new: "Entwicklerbiriich"
-
-id: LANG_USB
-desc: in the main menu
-eng: "USB (Sim)"
-voice: ""
-new: "USB (Sim)"
-
-## playback settings menu
-
-id: LANG_SHUFFLE
-desc: in settings_menu
-eng: "Shuffle"
-voice: ""
-new: "Züefall"
-
-id: LANG_REPEAT
-desc: in settings_menu
-eng: "Repeat"
-voice: ""
-new: "Wiederholig"
-
-id: LANG_REPEAT_ALL
-desc: repeat playlist once all songs have completed
-eng: "All"
-voice: ""
-new: "Alli"
-
-id: LANG_REPEAT_ONE
-desc: repeat one song
-eng: "One"
-voice: ""
-new: "Eis"
-
-id: LANG_PLAY_SELECTED
-desc: in settings_menu
-eng: "Play Selected First"
-voice: ""
-new: "Gwählts zersch abschpilu"
-
-id: LANG_RESUME
-desc: in settings_menu
-eng: "Resume"
-voice: ""
-new: "Fortsetzu"
-
-id: LANG_WIND_MENU
-desc: in the playback sub menu
-eng: "FFwd/Rewind"
-voice: ""
-new: "FF/RW"
-
-id: LANG_MP3BUFFER_MARGIN
-desc: MP3 buffer margin time
-eng: "Anti-Skip Buffer"
-voice: ""
-new: "Puffer zum vorüs fillu"
-
-id: LANG_FADE_ON_STOP
-desc: options menu to set fade on stop or pause
-eng: "Fade On Stop/Pause"
-voice: ""
-new: "Uberblendu bi Stop/Pause"
-
-id: LANG_ID3_ORDER
-desc: in playback settings screen
-eng: "ID3 tag priority"
-voice: ""
-new: "Bivorzugte ID3 tag"
-
-id: LANG_ID3_V1_FIRST
-desc: in playback settings screen
-eng: "V1 then V2"
-voice: ""
-new: "V1 vor V2"
-
-id: LANG_ID3_V2_FIRST
-desc: in playback settings screen
-eng: "V2 then V1"
-voice: ""
-new: "V2 vor V1"
-
-## file view menu
-
-id: LANG_SORT_CASE
-desc: in settings_menu
-eng: "Sort Case Sensitive"
-voice: ""
-new: "Sortieru Gross-/Chliischriibig"
-
-id: LANG_SORT_DIR
-desc: browser sorting setting
-eng: "Sort Directories"
-voice: ""
-new: "Verzeichnis sortieru"
-
-id: LANG_SORT_FILE
-desc: browser sorting setting
-eng: "Sort Files"
-voice: ""
-new: "Datije sortieru"
-
-id: LANG_SORT_ALPHA
-desc: browser sorting setting
-eng: "Alphabetical"
-voice: ""
-new: "aphabetisch"
-
-id: LANG_SORT_DATE
-desc: browser sorting setting
-eng: "by date"
-voice: ""
-new: "nach Datum"
-
-id: LANG_SORT_DATE_REVERSE
-desc: browser sorting setting
-eng: "by newest date"
-voice: ""
-new: "nach nöüschtum Datum"
-
-id: LANG_SORT_TYPE
-desc: browser sorting setting
-eng: "by type"
-voice: ""
-new: "nach Typ"
-
-id: LANG_FILTER
-desc: setting name for dir filter
-eng: "Show Files"
-voice: ""
-new: "Datiifilter"
-
-id: LANG_FILTER_ALL
-desc: show all files
-eng: "All"
-voice: ""
-new: "Alli"
-
-id: LANG_FILTER_SUPPORTED
-desc: show all file types supported by Rockbox
-eng: "Supported"
-voice: ""
-new: "Unnerschtützti"
-
-id: LANG_FILTER_MUSIC
-desc: show only music-related files
-eng: "Music"
-voice: ""
-new: "Müsig"
-
-id: LANG_FILTER_PLAYLIST
-desc: show only playlist
-eng: "Playlists"
-voice: ""
-new: "Liederlischta"
-
-id: LANG_FOLLOW
-desc: in settings_menu
-eng: "Follow Playlist"
-voice: ""
-new: "aktuellum Titel naagah"
-
-id: LANG_SHOW_ICONS
-desc: in settings_menu
-eng: "Show Icons"
-voice: ""
-new: "Icons azeigu"
-
-## display settings menu
-
-id: LANG_CUSTOM_FONT
-desc: in setting_menu()
-eng: "Browse Fonts"
-voice: ""
-new: "Schrifte"
-
-id: LANG_WHILE_PLAYING
-desc: in settings_menu()
-eng: "Browse .wps files"
-voice: ""
-new: ".wps Datije"
-
-id: LANG_LCD_MENU
-desc: in the display sub menu
-eng: "LCD Settings"
-voice: ""
-new: "LCD Ischtellige"
-
-id: LANG_SCROLL_MENU
-desc: in display_settings_menu()
-eng: "Scrolling"
-voice: ""
-new: "Scroll-Ischtellige"
-
-id: LANG_BARS_MENU
-desc: in the display sub menu
-eng: "Status-/Scrollbar"
-voice: ""
-new: "Status-/Scrollliischta"
-
-id: LANG_PM_MENU
-desc: in the display menu
-eng: "Peak Meter"
-voice: ""
-new: "Üsstiirigsazeig"
-
-## system settings menu
-
-id: LANG_BATTERY_MENU
-desc: in the system sub menu
-eng: "Battery"
-voice: ""
-new: "Akku"
-
-id: LANG_DISK_MENU
-desc: in the system sub menu
-eng: "Disk"
-voice: ""
-new: "Feschtplatta"
-
-id: LANG_TIME_MENU
-desc: in the system sub menu
-eng: "Time & Date"
-voice: ""
-new: "Zit & Datum"
-
-id: LANG_POWEROFF_IDLE
-desc: in settings_menu
-eng: "Idle Poweroff"
-voice: ""
-new: "automatischus Üsschaltu"
-
-id: LANG_SLEEP_TIMER
-desc: sleep timer setting
-eng: "Sleep Timer"
-voice: ""
-new: "Ischlaaftimer"
-
-id: LANG_ALARM_MOD_ALARM_MENU
-desc: The name of the additional entry in the main menu for the RTC alarm mod.
-eng: "Wake-Up Alarm"
-voice: ""
-new: "Wecker"
-
-id: LANG_LIMITS_MENU
-desc: in the system sub menu
-eng: "Limits"
-voice: ""
-new: "Grenzwärta"
-
-id: LANG_LINE_IN
-desc: in settings_menu
-eng: "Line In"
-voice: ""
-new: "Line In"
-
-id: LANG_CAR_ADAPTER_MODE
-desc: Displayed for setting car adapter mode to on/off
-eng: "Car Adapter Mode"
-voice: ""
-new: "Autoadapter Modus"
-
-## bookmarking settings menu
-
-id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
-desc: prompt for user to decide to create an bookmark
-eng: "Bookmark on Stop"
-voice: ""
-new: "Bim Stoppu Läsezeichu erschtellu"
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
-desc: Save in recent bookmarks only
-eng: "Yes - Recent only"
-voice: ""
-new: "Ja - nur znöüschta"
-
-id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
-desc: Save in recent bookmarks only
-eng: "Ask - Recent only"
-voice: ""
-new: "Frägu - Nur znöüschta"
-
-id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark"
-voice: ""
-new: "letschts Läsezeichu ladu"
-
-id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
-desc: Configuration option to maintain a list of recent bookmarks
-eng: "Maintain a List of Recent Bookmarks?"
-voice: ""
-new: "Lischta mit zletscht gibrüchte Läsezeichu verwaltu?"
-
-id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-desc: Save only on bookmark for each playlist in recent bookmarks
-eng: "Unique only"
-voice: ""
-new: "nur verschidni"
-
-## voice settings menu
-
-id: LANG_VOICE_MENU
-desc: item of voice menu, enable/disable the voice UI
-eng: "Voice Menus"
-voice: ""
-new: "Mönüs"
-
-id: LANG_VOICE_DIR
-desc: item of voice menu, set the "talkbox" mode for directories
-eng: "Voice Directories"
-voice: ""
-new: "Verzeichnis"
-
-id: LANG_VOICE_FILE
-desc: item of voice menu, set the voive mode for files
-eng: "Voice Filenames"
-voice: ""
-new: "Datiiname"
-
-id: LANG_VOICE_NUMBER
-desc: talkbox" mode for files+directories
-eng: "Numbers"
-voice: ""
-new: "Zahle"
-
-id: LANG_VOICE_SPELL
-desc: talkbox" mode for files+directories
-eng: "Spell"
-voice: ""
-new: "büechschtabieru"
-
-id: LANG_VOICE_DIR_HOVER
-desc: talkbox" mode for directories + files
-eng: ".talk mp3 clip"
-voice: ""
-new: ".talk mp3 Datii"
-
-## recording settings menu
-
-id: LANG_RECORDING_QUALITY
-desc: in the recording settings
-eng: "Quality"
-voice: ""
-new: "Qualität"
-
-id: LANG_RECORDING_FREQUENCY
-desc: in the recording settings
-eng: "Frequency"
-voice: ""
-new: "Frequänz"
-
-id: LANG_RECORDING_SOURCE
-desc: in the recording settings
-eng: "Source"
-voice: ""
-new: "Quella"
-
-id: LANG_RECORDING_SRC_MIC
-desc: in the recording settings
-eng: "Mic"
-voice: ""
-new: "Mikrofon"
-
-id: LANG_RECORDING_SRC_LINE
-desc: in the recording settings
-eng: "Line In"
-voice: ""
-new: "Analog"
-
-id: LANG_RECORDING_SRC_DIGITAL
-desc: in the recording settings
-eng: "Digital"
-voice: ""
-new: "Digital"
-
-id: LANG_RECORDING_CHANNELS
-desc: in the recording settings
-eng: "Channels"
-voice: ""
-new: "Kanal"
-
-id: LANG_RECORDING_EDITABLE
-desc: Editable recordings setting
-eng: "Independent frames"
-voice: ""
-new: "unabhängigi Frames"
-
-id: LANG_RECORD_TIMESPLIT
-desc: Prompt for record timer interval setting, in the record settings menu
-eng: "Time Split"
-voice: ""
-new: "Üfnahm teilu"
-
-id: LANG_RECORD_PRERECORD_TIME
-desc: in recording settings_menu
-eng: "Prerecord time"
-voice: ""
-new: "Vorüsüfnahmezit"
-
-id: LANG_RECORD_DIRECTORY
-desc: in recording settings_menu
-eng: "Directory"
-voice: ""
-new: "Verzeichnis"
-
-id: LANG_RECORD_CURRENT_DIR
-desc: in recording directory options
-eng: "Current dir"
-voice: ""
-new: "aktuells Verzeichnis"
-
-## ffwd/rewind menu
-
-id: LANG_FFRW_STEP
-desc: in settings_menu
-eng: "FF/RW Min Step"
-voice: ""
-new: "FF/RW min. Schritt"
-
-id: LANG_FFRW_ACCEL
-desc: in settings_menu
-eng: "FF/RW Accel"
-voice: ""
-new: "FF/RW Bischleunigung"
-
-## crossfade menu
-
-## replaygain menu
-
-## LCD settings menu, also remote
-
-id: LANG_BACKLIGHT
-desc: in settings_menu
-eng: "Backlight"
-voice: ""
-new: "Bilüüchtig"
-
-id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-desc: in display_settings_menu
-eng: "Backlight On When Plugged"
-voice: ""
-new: "Bilüüchtig a bim Netzbitrieb"
-
-id: LANG_CAPTION_BACKLIGHT
-desc: in settings_menu
-eng: "Caption backlight"
-voice: ""
-new: "Bilüüchtig a bim Titelwägsel"
-
-id: LANG_CONTRAST
-desc: in settings_menu
-eng: "Contrast"
-voice: ""
-new: "Kontrascht"
-
-id: LANG_INVERT
-desc: in settings_menu
-eng: "LCD Mode"
-voice: ""
-new: "LCD Modus"
-
-id: LANG_INVERT_LCD_NORMAL
-desc: in settings_menu
-eng: "Normal"
-voice: ""
-new: "normal"
-
-id: LANG_INVERT_LCD_INVERSE
-desc: in settings_menu
-eng: "Inverse"
-voice: ""
-new: "invertiert"
-
-id: LANG_FLIP_DISPLAY
-desc: in settings_menu, option to turn display+buttos by 180 degreed
-eng: "Upside Down"
-voice: ""
-new: "umgidräht"
-
-id: LANG_INVERT_CURSOR
-desc: in settings_menu
-eng: "Line Selector"
-voice: ""
-new: "Ziiluüswahl"
-
-id: LANG_INVERT_CURSOR_POINTER
-desc: in settings_menu
-eng: "Pointer"
-voice: ""
-new: "Zeiger"
-
-id: LANG_INVERT_CURSOR_BAR
-desc: in settings_menu
-eng: "Bar(Inverse)"
-voice: ""
-new: "Balku (invertieru)"
-
-## scrolling menu
-
-id: LANG_SCROLL_SPEED
-desc: in display_settings_menu()
-eng: "Scroll Speed"
-voice: ""
-new: "Scroll-Gschwindigkeit"
-
-id: LANG_SCROLL
-desc: in settings_menu
-eng: "Scroll Speed Setting Example"
-voice: ""
-new: "Biispiltext fer dScrollgschwindigkeit"
-
-id: LANG_SCROLL_DELAY
-desc: Delay before scrolling
-eng: "Scroll Start Delay"
-voice: ""
-new: "Scroll-Startverzögrig"
-
-id: LANG_SCROLL_STEP
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size"
-voice: ""
-new: "Schrittwiti"
-
-id: LANG_SCROLL_STEP_EXAMPLE
-desc: Pixels to advance per scroll
-eng: "Scroll Step Size Setting Example Text"
-voice: ""
-new: "Das isch en Biischpiltext fer dSchrittwiti"
-
-id: LANG_BIDIR_SCROLL
-desc: Bidirectional scroll limit
-eng: "Bidirectional Scroll Limit"
-voice: ""
-new: "Beidsitigs Scroll-Limit"
-
-id: LANG_JUMP_SCROLL
-desc: (player) menu altarnative for jump scroll
-eng: "Jump scroll"
-voice: ""
-new: "Gump-Scroll"
-
-id: LANG_ONE_TIME
-desc: (player) the jump scroll shall be done "one time
-eng: "One time"
-voice: ""
-new: "eis Mal"
-
-id: LANG_JUMP_SCROLL_DELAY
-desc: (player) Delay before making a jump scroll
-eng: "Jump Scroll Delay"
-voice: ""
-new: "Gumpverzögrig"
-
-id: LANG_SCROLL_BAR
-desc: display menu, F3 substitute
-eng: "Scroll Bar"
-voice: ""
-new: "Scrolliischta"
-
-id: LANG_STATUS_BAR
-desc: display menu, F3 substitute
-eng: "Status Bar"
-voice: ""
-new: "Statusliischta"
-
-id: LANG_BUTTON_BAR
-desc: in settings menu
-eng: "Button bar"
-voice: ""
-new: "Taschtuliischta"
-
-id: LANG_VOLUME_DISPLAY
-desc: Volume type title
-eng: "Volume Display"
-voice: ""
-new: "Lütschterchiazeig"
-
-id: LANG_BATTERY_DISPLAY
-desc: Battery type title
-eng: "Battery Display"
-voice: ""
-new: "Akku Azeig"
-
-id: LANG_DISPLAY_GRAPHIC
-desc: Label for type of icon display
-eng: "Graphic"
-voice: ""
-new: "grafisch"
-
-id: LANG_DISPLAY_NUMERIC
-desc: Label for type of icon display
-eng: "Numeric"
-voice: ""
-new: "numerisch"
-
-## peakmeter menu
-
-id: LANG_PM_RELEASE
-desc: in the peak meter menu
-eng: "Peak Release"
-voice: ""
-new: "Gschw. bim Abfallu"
-
-id: LANG_PM_UNITS_PER_READ
-desc: in the peak meter menu
-eng: "Units Per Read"
-voice: ""
-new: "Einheite pro Mässig"
-
-id: LANG_PM_PEAK_HOLD
-desc: in the peak meter menu
-eng: "Peak Hold Time"
-voice: ""
-new: "Üsstiirig Haltezit"
-
-id: LANG_PM_CLIP_HOLD
-desc: in the peak meter menu
-eng: "Clip Hold Time"
-voice: ""
-new: "Uberstiirig Haltezit"
-
-id: LANG_PM_ETERNAL
-desc: in the peak meter menu
-eng: "Eternal"
-voice: ""
-new: "Ewig"
-
-id: LANG_PM_SCALE
-desc: in the peak meter menu
-eng: "Scale"
-voice: ""
-new: "Skalierig"
-
-id: LANG_PM_DBFS
-desc: in the peak meter menu
-eng: "Logarithmic(dB)"
-voice: ""
-new: "logarithmisch (dB)"
-
-id: LANG_PM_LINEAR
-desc: in the peak meter menu
-eng: "Linear(%)"
-voice: ""
-new: "linear (%)"
-
-id: LANG_PM_MIN
-desc: in the peak meter menu
-eng: "Minimum Of Range"
-voice: ""
-new: "chlinschte Wärt"
-
-id: LANG_PM_MAX
-desc: in the peak meter menu
-eng: "Maximum Of Range"
-voice: ""
-new: "greeschte Wärt"
-
-## battery menu
-
-id: LANG_BATTERY_CAPACITY
-desc: in settings_menu
-eng: "Battery Capacity"
-voice: ""
-new: "Akku: Kapazität"
-
-## disk menu
-
-id: LANG_SPINDOWN
-desc: in settings_menu
-eng: "Disk Spindown"
-voice: ""
-new: "HDD Motor-Üsschaltzit"
-
-id: LANG_POWEROFF
-desc: disk poweroff flag
-eng: "Disk Poweroff"
-voice: ""
-new: "HDD Üsschaltbifähl brüüchu"
-
-## time & date menu
-
-id: LANG_TIME
-desc: in settings_menu
-eng: "Set Time/Date"
-voice: ""
-new: "Zit/Datum setzu"
-
-id: LANG_TIMEFORMAT
-desc: select the time format of time in status bar
-eng: "Time Format"
-voice: ""
-new: "Zitformat"
-
-id: LANG_12_HOUR_CLOCK
-desc: option for 12 hour clock
-eng: "12 Hour Clock"
-voice: ""
-new: "12 Std. Ühr"
-
-id: LANG_24_HOUR_CLOCK
-desc: option for 24 hour clock
-eng: "24 Hour Clock"
-voice: ""
-new: "24 Std. Ühr"
-
-## limits menu
-
-id: LANG_MAX_FILES_IN_DIR
-desc: in settings_menu
-eng: "Max files in dir browser"
-voice: ""
-new: "max. Azahl Datije im Browser"
-
-id: LANG_MAX_FILES_IN_PLAYLIST
-desc: in settings_menu
-eng: "Max playlist size"
-voice: ""
-new: "max. gressi Abschpillischta"
-
-## context menu (onplay menu)
-
-id: LANG_BOOKMARK_MENU
-desc: Text on main menu to get to bookmark commands
-eng: "Bookmarks"
-voice: ""
-new: "Läsezeichu"
-
-id: LANG_MENU_SHOW_ID3_INFO
-desc: Menu option to start id3 viewer
-eng: "Show ID3 Info"
-voice: ""
-new: "Zeig ID3 Info"
-
-id: LANG_RENAME
-desc: The verb/action Rename
-eng: "Rename"
-voice: ""
-new: "Umbinennu"
-
-id: LANG_DELETE
-desc: The verb/action Delete
-eng: "Delete"
-voice: ""
-new: "Leschu"
-
-id: LANG_DELETE_DIR
-desc: in on+play menu
-eng: "Delete directory"
-voice: ""
-new: "Verzeichnis leschu"
-
-id: LANG_REALLY_DELETE
-desc: Really Delete?
-eng: "Delete?"
-voice: ""
-new: "Leschu?"
-
-id: LANG_DELETED
-desc: A file has beed deleted
-eng: "Deleted"
-voice: ""
-new: "Glescht"
-
-id: LANG_ONPLAY_OPEN_WITH
-desc: Onplay open with
-eng: "Open with"
-voice: ""
-new: "Öffnu mit"
-
-id: LANG_CREATE_DIR
-desc: in main menu
-eng: "Create directory"
-voice: ""
-new: "Verzeichnis erschtellu"
-
-## playlist context menu
-
-id: LANG_VIEW
-desc: in on+play menu
-eng: "View"
-voice: ""
-new: "Azeigu"
-
-id: LANG_INSERT
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert"
-voice: ""
-new: "Ifiegu"
-
-id: LANG_INSERT_FIRST
-desc: in onplay menu.  insert a track/playlist into dynamic playlist.
-eng: "Insert next"
-voice: ""
-new: "Ifiegu als negschts"
-
-id: LANG_INSERT_LAST
-desc: in onplay menu.  append a track/playlist into dynamic playlist.
-eng: "Insert last"
-voice: ""
-new: "Ifiegu als letschts"
-
-id: LANG_QUEUE
-desc: The verb/action Queue
-eng: "Queue"
-voice: ""
-new: "An dLischta aheichu"
-
-id: LANG_QUEUE_FIRST
-desc: in onplay menu.  queue a track/playlist into dynamic playlist.
-eng: "Queue next"
-voice: ""
-new: "Warteschlanga als negschts"
-
-id: LANG_QUEUE_LAST
-desc: in onplay menu.  queue a track/playlist at end of playlist.
-eng: "Queue last"
-voice: ""
-new: "Warteschlanga als letschts"
-
-## bookmark context menu
-
-id: LANG_BOOKMARK_MENU_CREATE
-desc: Used off of the bookmark menu to create a bookmark
-eng: "Create Bookmark"
-voice: ""
-new: "Läsezeichu erschtellu"
-
-id: LANG_BOOKMARK_MENU_LIST
-desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
-eng: "List Bookmarks"
-voice: ""
-new: "Läsezeichu üflischtu"
-
-## info screen
-
-id: LANG_ROCKBOX_INFO
-desc: displayed topmost on the info screen
-eng: "Rockbox Info:"
-voice: ""
-new: "Rockbox Info:"
-
-id: LANG_BUFFER_STAT_PLAYER
-desc: the buffer size player-screen width, %d MB %d fraction of MB
-eng: "Buf: %d.%03dMB"
-voice: ""
-new: "Puf: %d.%03dMB"
-
-id: LANG_BUFFER_STAT_RECORDER
-desc: the buffer size recorder-screen width, %d MB %d fraction of MB
-eng: "Buffer: %d.%03dMB"
-voice: ""
-new: "Puffer: %d.%03dMB"
-
-id: LANG_BATTERY_CHARGE
-desc: tells that the battery is charging, instead of battery level
-eng: "Battery: Charging"
-voice: ""
-new: "Akku: Üfladu"
-
-id: LANG_BATTERY_TOPOFF_CHARGE
-desc: in info display, shows that top off charge is running
-eng: "Battery: Top-Off Chg"
-voice: ""
-new: "Akku: Ubergangsladu"
-
-id: LANG_BATTERY_TRICKLE_CHARGE
-desc: in info display, shows that trickle charge is running
-eng: "Battery: Trickle Chg"
-voice: ""
-new: "Akku: Erhaltladu"
-
-id: LANG_BATTERY_TIME
-desc: battery level in % and estimated time remaining
-eng: "%d%% %dh %dm"
-voice: ""
-new: "%d%% %d Std %d Min"
-
-id: VOICE_CURRENT_TIME
-desc: spoken only, for wall clock announce
-eng: ""
-voice: ""
-new: ""
-
-## pitch screen
-
-id: LANG_PITCH_UP
-desc: in wps
-eng: "Pitch Up"
-voice: ""
-new: "schnäller"
-
-id: LANG_PITCH_DOWN
-desc: in wps
-eng: "Pitch Down"
-voice: ""
-new: "langsamer"
-
-id: LANG_PAUSE
-desc: in wps
-eng: "Pause"
-voice: ""
-new: "Pause"
-
-## quickscreens
-
-id: LANG_F2_MODE
-desc: in wps F2 pressed
-eng: "Mode:"
-voice: ""
-new: "Modus:"
-
-id: LANG_F3_STATUS
-desc: in wps F3 pressed
-eng: "Status"
-voice: ""
-new: "Status-"
-
-id: LANG_F3_SCROLL
-desc: in wps F3 pressed
-eng: "Scroll"
-voice: ""
-new: "Scroll-"
-
-id: LANG_F3_BAR
-desc: in wps F3 pressed
-eng: "Bar"
-voice: ""
-new: "Azeig:"
-
-## bookmark screen
-
-id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
-desc: From the auto-load screen, allows user to list all bookmarks
-eng: "Down = List"
-voice: ""
-new: "Embri = Lischta"
-
-id: LANG_BOOKMARK_SELECT_EXIT
-desc: From the bookmark list screen, allows user to exit
-eng: "OFF = Exit"
-voice: ""
-new: "OFF = Biendu"
-
-id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
-desc: Used on the bookmark select window to label bookmark number
-eng: "Bookmark"
-voice: ""
-new: "Läsezeichu"
-
-id: LANG_BOOKMARK_SELECT_INDEX_TEXT
-desc: Used on the bookmark select window to label index number
-eng: "Index"
-voice: ""
-new: "Index"
-
-id: LANG_BOOKMARK_SELECT_TIME_TEXT
-desc: Used on the bookmark select window to label elapsed time
-eng: "Time"
-voice: ""
-new: "Zit"
-
-id: LANG_BOOKMARK_SELECT_PLAY
-desc: Used on the bookmark select window to indicated the play option
-eng: "PLAY = Select"
-voice: ""
-new: "PLAY = üswählu"
-
-id: LANG_BOOKMARK_SELECT_DELETE
-desc: Used on the bookmark select window to indicated the bookmark delete option
-eng: "ON+Play = Delete"
-voice: ""
-new: "ON+PLAY = leschu"
-
-id: LANG_BOOKMARK_AUTOLOAD_QUERY
-desc: prompt for user to decide to create a bookmark
-eng: "Load Last Bookmark?"
-voice: ""
-new: "zletscht Läsezeichu ladu?"
-
-id: LANG_AUTO_BOOKMARK_QUERY
-desc: prompt for user to decide to create an bookmark
-eng: "Create a Bookmark?"
-voice: ""
-new: "Läsezeichu erschtellu?"
-
-id: LANG_BOOKMARK_CREATE_SUCCESS
-desc: Indicates bookmark was successfully created
-eng: "Bookmark Created"
-voice: ""
-new: "Läsezeichu erschtellt"
-
-id: LANG_BOOKMARK_CREATE_FAILURE
-desc: Indicates bookmark was not created
-eng: "Bookmark Failed!"
-voice: ""
-new: "Fähler bim Erschtellu fam Läsezeichu"
-
-id: LANG_BOOKMARK_LOAD_EMPTY
-desc: Indicates bookmark was empty
-eng: "Bookmark Empty"
-voice: ""
-new: "kei Läsezeichu"
-
-## set time screen
-
-id: LANG_TIME_SET
-desc: used in set_time()
-eng: "ON To Set"
-voice: ""
-new: "ON = spiichru"
-
-id: LANG_TIME_REVERT
-desc: used in set_time()
-eng: "OFF To Revert"
-voice: ""
-new: "OFF = abbrächu"
-
-## while playing screen
-
-id: LANG_KEYLOCK_ON_PLAYER
-desc: displayed when key lock is on
-eng: "Key Lock ON"
-voice: ""
-new: "Schperri A"
-
-id: LANG_KEYLOCK_OFF_PLAYER
-desc: displayed when key lock is turned off
-eng: "Key Lock OFF"
-voice: ""
-new: "Schperri Üs"
-
-id: LANG_KEYLOCK_ON_RECORDER
-desc: displayed when key lock is on
-eng: "Key Lock Is ON"
-voice: ""
-new: "Schperri isch A"
-
-id: LANG_KEYLOCK_OFF_RECORDER
-desc: displayed when key lock is turned off
-eng: "Key Lock Is OFF"
-voice: ""
-new: "Schperri isch Üs"
-
-## recording screen
-
-id: LANG_RECORDING_TIME
-desc: Display of recorded time
-eng: "Time:"
-voice: ""
-new: "Zit:"
-
-id: LANG_RECORD_TIMESPLIT_REC
-desc: 
-eng: "Split time:"
-voice: ""
-new: "Üfnahm teilu:"
-
-id: LANG_RECORDING_SIZE
-desc: Display of recorded file size
-eng: "Size:"
-voice: ""
-new: "Greessi:"
-
-id: LANG_RECORD_PRERECORD
-desc: in recording and radio screen
-eng: "Prerecording"
-voice: ""
-new: "Vorüsüfnahm"
-
-id: LANG_RECORDING_GAIN
-desc: in the recording screen
-eng: "Gain"
-voice: ""
-new: "Verst"
-
-id: LANG_RECORDING_LEFT
-desc: in the recording screen
-eng: "Left"
-voice: ""
-new: "Lings"
-
-id: LANG_RECORDING_RIGHT
-desc: in the recording screen
-eng: "Right"
-voice: ""
-new: "Rächts"
-
-id: LANG_DISK_FULL
-desc: in recording screen
-eng: "The disk is full. Press OFF to continue."
-voice: ""
-new: "Feschtplatta isch voll. Drick OFF."
-
-## recording trigger screen
-
-## alarm screen
-
-id: LANG_ALARM_MOD_TIME
-desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
-eng: "Alarm Time: %02d:%02d"
-voice: ""
-new: "Weckzit: %02d:%02d"
-
-id: LANG_ALARM_MOD_TIME_TO_GO
-desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
-eng: "Waking Up In %d:%02d"
-voice: ""
-new: "Üfwachu in %d:%02d"
-
-id: LANG_ALARM_MOD_SHUTDOWN
-desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
-eng: "Shutting Down..."
-voice: ""
-new: "Schaltu üs..."
-
-id: LANG_ALARM_MOD_ERROR
-desc: The text that tells that the time is incorrect (for the RTC alarm mod).
-eng: "Alarm Time Is Too Soon!"
-voice: ""
-new: "Weckzit isch zfrüeh"
-
-id: LANG_ALARM_MOD_KEYS
-desc: Shown key functions in alarm menu (for the RTC alarm mod).
-eng: "PLAY=Set OFF=Cancel"
-voice: ""
-new: "PLAY=Ok OFF=Abbrächu"
-
-## colour setting screen
-
-## tag viewer
-
-id: LANG_ID3_TITLE
-desc: in wps
-eng: "[Title]"
-voice: ""
-new: "[Titel]"
-
-id: LANG_ID3_ARTIST
-desc: in wps 
-eng: "[Artist]"
-voice: ""
-new: "[Künschtler]"
-
-id: LANG_ID3_ALBUM
-desc: in wps
-eng: "[Album]"
-voice: ""
-new: "[Album]"
-
-id: LANG_ID3_TRACKNUM
-desc: in wps
-eng: "[Tracknum]"
-voice: ""
-new: "[Lied Nr.]"
-
-id: LANG_ID3_GENRE
-desc: ID3 frame 'genre'
-eng: "[Genre]"
-voice: ""
-new: "[Stil]"
-
-id: LANG_ID3_YEAR
-desc: ID3 info 'year'
-eng: "[Year]"
-voice: ""
-new: "[Jahr]"
-
-id: LANG_ID3_PLAYLIST
-desc: in wps
-eng: "[Playlist]"
-voice: ""
-new: "[Liederlischta]"
-
-id: LANG_ID3_BITRATE
-desc: in wps
-eng: "[Bitrate]"
-voice: ""
-new: "[Bitrata]"
-
-id: LANG_ID3_FRECUENCY
-desc: in wps
-eng: "[Frequency]"
-voice: ""
-new: "[Frequänz]"
-
-id: LANG_ID3_PATH
-desc: in wps
-eng: "[Path]"
-voice: ""
-new: "[Pfad]"
-
-id: LANG_ID3_NO_INFO
-desc: ID3 info is missing
-eng: "<No Info>"
-voice: ""
-new: "<kei Info>"
-
-## weekdays
-
-id: LANG_WEEKDAY_SUNDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sun"
-voice: ""
-new: "Sun"
-
-id: LANG_WEEKDAY_MONDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Mon"
-voice: ""
-new: "Män"
-
-id: LANG_WEEKDAY_TUESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Tue"
-voice: ""
-new: "Zii"
-
-id: LANG_WEEKDAY_WEDNESDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Wed"
-voice: ""
-new: "Mit"
-
-id: LANG_WEEKDAY_THURSDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Thu"
-voice: ""
-new: "Don"
-
-id: LANG_WEEKDAY_FRIDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Fri"
-voice: ""
-new: "Fri"
-
-id: LANG_WEEKDAY_SATURDAY
-desc: Maximum 3-letter abbreviation for weekday
-eng: "Sat"
-voice: ""
-new: "Sam"
-
-## months
-
-id: LANG_MONTH_JANUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jan"
-voice: ""
-new: "Jan"
-
-id: LANG_MONTH_FEBRUARY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Feb"
-voice: ""
-new: "Feb"
-
-id: LANG_MONTH_MARCH
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Mar"
-voice: ""
-new: "Mär"
-
-id: LANG_MONTH_APRIL
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Apr"
-voice: ""
-new: "Apr"
-
-id: LANG_MONTH_MAY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "May"
-voice: ""
-new: "Mai"
-
-id: LANG_MONTH_JUNE
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jun"
-voice: ""
-new: "Jun"
-
-id: LANG_MONTH_JULY
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Jul"
-voice: ""
-new: "Jul"
-
-id: LANG_MONTH_AUGUST
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Aug"
-voice: ""
-new: "Öüg"
-
-id: LANG_MONTH_SEPTEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Sep"
-voice: ""
-new: "Sep"
-
-id: LANG_MONTH_OCTOBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Oct"
-voice: ""
-new: "Okt"
-
-id: LANG_MONTH_NOVEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Nov"
-voice: ""
-new: "Nov"
-
-id: LANG_MONTH_DECEMBER
-desc: Maximum 3-letter abbreviation for monthname
-eng: "Dec"
-voice: ""
-new: "Dez"
-
-## digits and units for voice, the order is important
-
-id: VOICE_ZERO
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_ONE
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_TWO
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_THREE
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FOUR
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FIFE
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SIX
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SEVEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EIGHT
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_NINE
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_TEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_ELEVEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_TWELVE
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_THIRTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FOURTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FIFTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SIXTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SEVENTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EIGHTEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_NINETEEN
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_TWENTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_THIRTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FORTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_FIFTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SIXTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SEVENTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EIGHTY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_NINETY
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_HUNDRED
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_THOUSAND
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_MILLION
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_BILLION
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_MINUS
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_PLUS
-desc: spoken only, for composing numbers
-eng: ""
-voice: ""
-new: ""
-
-## units for voicing
-
-id: VOICE_MILLISECONDS
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SECOND
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_SECONDS
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_MINUTE
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_MINUTES
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_HOUR
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_HOURS
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_KHZ
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_DB
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_PERCENT
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_MILLIAMPHOURS
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_PIXEL
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_PER_SEC
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_HERTZ
-desc: spoken only, a unit postfix
-eng: ""
-voice: ""
-new: ""
-
-## chars for spelling
-
-id: VOICE_CHAR_A
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_B
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_C
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_D
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_E
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_F
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_G
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_H
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_I
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_J
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_K
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_L
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_M
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_N
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_O
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_P
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_Q
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_R
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_S
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_T
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_U
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_V
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_W
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_X
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_Y
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_CHAR_Z
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_DOT
-desc: spoken only, for spelling
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_PAUSE
-desc: spoken only, for spelling, a split second of silence (difficult to author)
-eng: ""
-voice: ""
-new: ""
-
-## file/folder voicing
-
-id: VOICE_FILE
-desc: spoken only, prefix for file number
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_DIR
-desc: spoken only, prefix for directory number
-eng: ""
-voice: ""
-new: ""
-
-## file extensions for voicing
-
-id: VOICE_EXT_MPA
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_CFG
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_WPS
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_TXT
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_ROCK
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_FONT
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_BMARK
-desc: spoken only, for file extension and the word in general
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_UCL
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-id: VOICE_EXT_AJZ
-desc: spoken only, for file extension
-eng: ""
-voice: ""
-new: ""
-
-## playlist handling
-
-id: LANG_PLAYLIST_LOAD
-desc: displayed on screen while loading a playlist
-eng: "Loading..."
-voice: ""
-new: "Ladu..."
-
-id: LANG_PLAYLIST_SHUFFLE
-desc: displayed on screen while shuffling a playlist
-eng: "Shuffling..."
-voice: ""
-new: "Mischlu..."
-
-id: LANG_PLAYLIST_BUFFER_FULL
-desc: in playlist.indices() when playlist is full
-eng: "Playlist Buffer Full"
-voice: ""
-new: "Liederlischta Puffer voll"
-
-id: LANG_END_PLAYLIST_PLAYER
-desc: when playlist has finished
-eng: "End Of List"
-voice: ""
-new: "Lischtuendi"
-
-id: LANG_END_PLAYLIST_RECORDER
-desc: when playlist has finished
-eng: "End Of Song List"
-voice: ""
-new: "Lischtuendi"
-
-id: LANG_CREATING
-desc: Screen feedback during playlist creation
-eng: "Creating"
-voice: ""
-new: "Am Zämuschtellu"
-
-id: LANG_PLAYLIST_INSERT_COUNT
-desc: splash number of tracks inserted
-eng: "Inserted %d tracks (%s)"
-voice: ""
-new: "%d Lieder igfiegt (%s)"
-
-id: LANG_PLAYLIST_QUEUE_COUNT
-desc: splash number of tracks queued
-eng: "Queued %d tracks (%s)"
-voice: ""
-new: "%d Lieder agheicht (%s)"
-
-id: LANG_PLAYLIST_SAVE_COUNT
-desc: splash number of tracks saved
-eng: "Saved %d tracks (%s)"
-voice: ""
-new: "%d Lieder abgspiichrut (%s)"
-
-id: LANG_RECURSE_DIRECTORY_QUESTION
-desc: Asked from onplay screen
-eng: "Recursively?"
-voice: ""
-new: "Rekursiv?"
-
-id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
-desc: Playlist error
-eng: "Error updating playlist control file"
-voice: ""
-new: "Fähler: Aktualisierig Abschpillischta-Kontrolldatii"
-
-id: LANG_PLAYLIST_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing playlist file"
-voice: ""
-new: "Fähler: Züegriff Abschpillischta"
-
-id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing playlist control file"
-voice: ""
-new: "Fähler: Züegriff Abschpillischta-Kontrolldatii"
-
-id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
-desc: Playlist error
-eng: "Error accessing directory"
-voice: ""
-new: "Fähler: Verzeichniszüegriff"
-
-id: LANG_PLAYLIST_CONTROL_INVALID
-desc: Playlist resume error
-eng: "Playlist control file is invalid"
-voice: ""
-new: "Abschpillischta-Kontrolldatii isch ungültig"
-
-## FM radio
-
-id: LANG_FM_STATION
-desc: in radio screen
-eng: "Station: %d.%dMHz"
-voice: ""
-new: "Sender: %d.%dMHz"
-
-id: LANG_FM_NO_PRESETS
-desc: in radio screen
-eng: "The preset list is empty"
-voice: ""
-new: "Senderlischta läär"
-
-id: LANG_FM_EDIT_PRESET
-desc: in radio screen
-eng: "Edit preset"
-voice: ""
-new: "Sender biarbeitu"
-
-id: LANG_FM_DELETE_PRESET
-desc: in radio screen
-eng: "Remove preset"
-voice: ""
-new: "Sender leschu"
-
-id: LANG_FM_PRESET_SAVE_FAILED
-desc: in radio screen
-eng: "Preset save failed"
-voice: ""
-new: "Fähler bim spiichru"
-
-id: LANG_FM_NO_FREE_PRESETS
-desc: in radio screen
-eng: "The preset list is full"
-voice: ""
-new: "Senderlischta isch voll"
-
-id: LANG_BUTTONBAR_MENU
-desc: in button bar
-eng: "Menu"
-voice: ""
-new: "Mönü"
-
-id: LANG_FM_BUTTONBAR_EXIT
-desc: in radio screen
-eng: "Exit"
-voice: ""
-new: "Exit"
-
-id: LANG_FM_BUTTONBAR_ACTION
-desc: in radio screen
-eng: "Action"
-voice: ""
-new: "Aktion"
-
-id: LANG_FM_BUTTONBAR_PRESETS
-desc: in button bar
-eng: "Preset"
-voice: ""
-new: "Sender"
-
-id: LANG_FM_BUTTONBAR_ADD
-desc: in radio screen
-eng: "Add"
-voice: ""
-new: "Derzüe"
-
-id: LANG_FM_BUTTONBAR_RECORD
-desc: in main menu
-eng: "Record"
-voice: ""
-new: "Üfnäh"
-
-id: LANG_FM_MONO_MODE
-desc: in radio screen
-eng: "Force mono"
-voice: ""
-new: "Mono erzwingu"
-
-## dir/file browser
-
-id: LANG_DIRBROWSE_F1
-desc: in dir browser, F1 button bar text
-eng: "Menu"
-voice: ""
-new: "Mönü"
-
-id: LANG_DIRBROWSE_F2
-desc: in dir browser, F2 button bar text
-eng: "Option"
-voice: ""
-new: "Option"
-
-id: LANG_DIRBROWSE_F3
-desc: in dir browser, F3 button bar text
-eng: "LCD"
-voice: ""
-new: "LCD"
-
-id: LANG_SHOWDIR_BUFFER_FULL
-desc: in showdir(), displayed on screen when you reach buffer limit
-eng: "Dir Buffer Is Full!"
-voice: ""
-new: "Verzeichnispuffer isch voll!"
-
-id: LANG_LANGUAGE_LOADED
-desc: shown when a language has been loaded from the dir browser
-eng: "New Language"
-voice: ""
-new: "Nöiji Spraach"
-
-id: LANG_SETTINGS_LOADED
-desc: Feedback shown when a .cfg file is loaded
-eng: "Settings Loaded"
-voice: ""
-new: "Ischtellige gladu"
-
-id: LANG_SETTINGS_SAVED
-desc: Feedback shown when a .cfg file is saved
-eng: "Settings Saved"
-voice: ""
-new: "Ischtellige gschpiichrut"
-
-id: LANG_BOOT_CHANGED
-desc: File browser discovered the boot file was changed
-eng: "Boot changed"
-voice: ""
-new: "Boot gändrut"
-
-id: LANG_REBOOT_NOW
-desc: Do you want to reboot?
-eng: "Reboot now?"
-voice: ""
-new: "jetz nöü bootu?"
-
-id: LANG_OFF_ABORT
-desc: Used on recorder models
-eng: "OFF to abort"
-voice: ""
-new: "Off fer abzbrächu"
-
-id: LANG_STOP_ABORT
-desc: Used on player models
-eng: "STOP to abort"
-voice: ""
-new: "STOP fer abzbrächu"
-
-id: LANG_NO_FILES
-desc: in settings_menu
-eng: "No files"
-voice: ""
-new: "kei Datije"
-
-## tag database browser
-
-## playlist viewer
-
-id: LANG_MOVE
-desc: The verb/action Move
-eng: "Move"
-voice: ""
-new: "verschiebu"
-
-id: LANG_MOVE_FAILED
-desc: Error message displayed in playlist viewer
-eng: "Move failed"
-voice: ""
-new: "Fähler bim verschiebu"
-
-id: LANG_SHOW_INDICES
-desc: in playlist viewer menu
-eng: "Show Indices"
-voice: ""
-new: "Zeig Indizes"
-
-id: LANG_TRACK_DISPLAY
-desc: in playlist viewer on+play menu
-eng: "Track Display"
-voice: ""
-new: "Titelazeig"
-
-id: LANG_DISPLAY_TRACK_NAME_ONLY
-desc: track display options
-eng: "Track name only"
-voice: ""
-new: "Nur Titelnamu"
-
-id: LANG_DISPLAY_FULL_PATH
-desc: track display options
-eng: "Full path"
-voice: ""
-new: "ganze Pfad"
-
-id: LANG_REMOVE
-desc: in playlist viewer on+play menu
-eng: "Remove"
-voice: ""
-new: "leschu"
-
-id: LANG_FILE_OPTIONS
-desc: in playlist viewer on+play menu
-eng: "File Options"
-voice: ""
-new: "Datiioptione"
-
-## plugin loader, filetypes
-
-id: LANG_PLUGIN_CANT_OPEN
-desc: Plugin open error message
-eng: "Can't open %s"
-voice: ""
-new: "Cha %s nit üftüe"
-
-id: LANG_READ_FAILED
-desc: There was an error reading a file
-eng: "Failed reading %s"
-voice: ""
-new: "Fähler bim läsu fa %s"
-
-id: LANG_PLUGIN_WRONG_MODEL
-desc: The plugin is not compatible with the archos model trying to run it
-eng: "Incompatible model"
-voice: ""
-new: "nit kompatibels Modell"
-
-id: LANG_PLUGIN_WRONG_VERSION
-desc: The plugin is not compatible with the rockbox version trying to run it
-eng: "Incompatible version"
-voice: ""
-new: "nit kompatibli Version"
-
-id: LANG_PLUGIN_ERROR
-desc: The plugin return an error code
-eng: "Plugin returned error"
-voice: ""
-new: "Plugin mäldut Fähler"
-
-id: LANG_FILETYPES_EXTENSION_FULL
-desc: Extension array full
-eng: "Extension array full"
-voice: ""
-new: "Erwitrigslischta voll"
-
-id: LANG_FILETYPES_FULL
-desc: Filetype array full
-eng: "Filetype array full"
-voice: ""
-new: "Datiitypulischta voll"
-
-id: LANG_FILETYPES_PLUGIN_NAME_LONG
-desc: Viewer plugin name too long
-eng: "Plugin name too long"
-voice: ""
-new: "Plugin-Namu z'lenge"
-
-id: LANG_FILETYPES_STRING_BUFFER_EMPTY
-desc: Filetype string buffer empty
-eng: "Filetype string buffer empty"
-voice: ""
-new: "Datiitypu-Zeichubuffer läär"
-
-## misc
-
-id: LANG_RESUME_CONFIRM_PLAYER
-desc: posible answers to resume question
-eng: "(PLAY/STOP)"
-voice: ""
-new: "(PLAY/STOP)"
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "Ja"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "Nei"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "Üs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_SETTING_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "Naafrägu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS
+  desc: (player) the jump scroll shall be done "always
+  user:
+  <source>
+    *: "Always"
+  </source>
+  <dest>
+    *: "immer"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_SHUTDOWN
+  desc: in shutdown screen
+  user:
+  <source>
+    *: "Press OFF to shut down"
+  </source>
+  <dest>
+    *: "OFF fer Üszschaltu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTTINGDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: "Shutting down..."
+  </source>
+  <dest>
+    *: "am Üsschaltu..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_MMC
+  desc: before acknowledging usb in case an MMC is inserted (Ondio)
+  user:
+  <source>
+    *: "Please remove inserted MMC"
+  </source>
+  <dest>
+    *: "Bitte MMC üsanäh"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SETTING_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Abgibrochu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after above actions
+  user:
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "gschitrut"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+  desc: Text for the menu text to access the most recent bookmarks list
+  user:
+  <source>
+    *: "Recent Bookmarks"
+  </source>
+  <dest>
+    *: "nöüschti Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Sound Settings"
+  </source>
+  <dest>
+    *: "Klangischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "General Settings"
+  </source>
+  <dest>
+    *: "Grundischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MANAGE_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Manage Settings"
+  </source>
+  <dest>
+    *: "Konfiguratione verwaltu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RADIO
+  desc: in main menu
+  user:
+  <source>
+    *: "FM Radio"
+  </source>
+  <dest>
+    *: "FM Radio"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording"
+  </source>
+  <dest>
+    *: "Üfnahm"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_MENU
+  desc: in main menu.
+  user:
+  <source>
+    *: "Playlist Options"
+  </source>
+  <dest>
+    *: "Abschpillischta Optione"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGINS
+  desc: in main_menu()
+  user:
+  <source>
+    *: "Browse Plugins"
+  </source>
+  <dest>
+    *: "Plugins"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO
+  desc: in the main menu
+  user:
+  <source>
+    *: "Info"
+  </source>
+  <dest>
+    *: "Informazione"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: "Shut down"
+  </source>
+  <dest>
+    *: "Üsschaltu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Volume"
+  </source>
+  <dest>
+    *: "Lütschterchi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Bass"
+  </source>
+  <dest>
+    *: "Bass"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Treble"
+  </source>
+  <dest>
+    *: "Heechine"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "Balance"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MENU
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Kanäl"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "Kanalischtellig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Mono"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Left"
+  </source>
+  <dest>
+    *: "Mono Lings"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Right"
+  </source>
+  <dest>
+    *: "Mono Rächts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Karaoke"
+  </source>
+  <dest>
+    *: "Karaoke"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Loudness"
+  </source>
+  <dest>
+    *: "Verschterchig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Auto Volume"
+  </source>
+  <dest>
+    *: "Autom. Lütschterchi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user:
+  <source>
+    *: "AV Decay Time"
+  </source>
+  <dest>
+    *: "AV Trägheit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SUPERBASS
+  desc: in sound settings
+  user:
+  <source>
+    *: "Super bass"
+  </source>
+  <dest>
+    *: "Superbass"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_ENABLE
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Enable"
+  </source>
+  <dest>
+    *: "MDB aktivieru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_STRENGTH
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Strength"
+  </source>
+  <dest>
+    *: "MDB Sterchi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_HARMONICS
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Harmonics"
+  </source>
+  <dest>
+    *: "MDB Oberteen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_CENTER
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Center frequency"
+  </source>
+  <dest>
+    *: "MDB Mittufrequänz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_SHAPE
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Shape"
+  </source>
+  <dest>
+    *: "MDB Form"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Playback"
+  </source>
+  <dest>
+    *: "Wiedergaab"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "File View"
+  </source>
+  <dest>
+    *: "Datiiasicht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Display"
+  </source>
+  <dest>
+    *: "Azeig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSTEM
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "System"
+  </source>
+  <dest>
+    *: "Syschtem"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS
+  desc: in general settings
+  user:
+  <source>
+    *: "Bookmarking"
+  </source>
+  <dest>
+    *: "Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Language"
+  </source>
+  <dest>
+    *: "Spraach"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE
+  desc: root of voice menu
+  user:
+  <source>
+    *: "Voice"
+  </source>
+  <dest>
+    *: "Spraachüsgab"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user:
+  <source>
+    *: "Browse .cfg files"
+  </source>
+  <dest>
+    *: ".cfg Datije"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FIRMWARE
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Firmwares"
+  </source>
+  <dest>
+    *: "Firmwares"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Reset Settings"
+  </source>
+  <dest>
+    *: "Ischtellige zruggsetzu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK_RECORDER
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "Bisch sicher?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_PLAY_RECORDER
+  desc: Generic recorder string to use to confirm
+  user:
+  <source>
+    *: "PLAY = Yes"
+  </source>
+  <dest>
+    *: "PLAY = Ja"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY_RECORDER
+  desc: Generic recorder string to use to cancel
+  user:
+  <source>
+    *: "Any Other = No"
+  </source>
+  <dest>
+    *: "Andri = Nei"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_SETTING
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Ischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Cleared"
+  </source>
+  <dest>
+    *: "Glescht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CANCEL
+  desc: Visual confirmation of cancelation
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Abgibrochu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Write .cfg file"
+  </source>
+  <dest>
+    *: "Sichre .cfg Datii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_PLAYER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Spiicherfähler"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_PLAYER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Partition?"
+  </source>
+  <dest>
+    *: "Akku läär?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_RECORDER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Spiicherfähler"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_RECORDER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "No partition?"
+  </source>
+  <dest>
+    *: "Akku läär?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MENU
+  desc: in the recording sub menu
+  user:
+  <source>
+    *: "Start Recording"
+  </source>
+  <dest>
+    *: "Üfnahm startu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording Settings"
+  </source>
+  <dest>
+    *: "Üfnahmeischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user:
+  <source>
+    *: "Create Playlist"
+  </source>
+  <dest>
+    *: "Abschpillischta Erschtellu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "View Current Playlist"
+  </source>
+  <dest>
+    *: "zeig aktuelli Abschpillischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Save Current Playlist"
+  </source>
+  <dest>
+    *: "aktuelli Abschpillischta schpichru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY
+  desc: In playlist menu
+  user:
+  <source>
+    *: "Recursively Insert Directories"
+  </source>
+  <dest>
+    *: "Verzeichnis rekursiv ifiegu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO_MENU
+  desc: in the info sub menu
+  user:
+  <source>
+    *: "Rockbox Info"
+  </source>
+  <dest>
+    *: "Rockbox Info"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERSION
+  desc: in the main menu
+  user:
+  <source>
+    *: "Version"
+  </source>
+  <dest>
+    *: "Version"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the main menu
+  user:
+  <source>
+    *: "Debug (Keep Out!)"
+  </source>
+  <dest>
+    *: "Entwicklerbiriich"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB
+  desc: in the main menu
+  user:
+  <source>
+    *: "USB (Sim)"
+  </source>
+  <dest>
+    *: "USB (Sim)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "Züefall"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Wiederholig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Alli"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "Eis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Play Selected First"
+  </source>
+  <dest>
+    *: "Gwählts zersch abschpilu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Resume"
+  </source>
+  <dest>
+    *: "Fortsetzu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WIND_MENU
+  desc: in the playback sub menu
+  user:
+  <source>
+    *: "FFwd/Rewind"
+  </source>
+  <dest>
+    *: "FF/RW"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MP3BUFFER_MARGIN
+  desc: MP3 buffer margin time
+  user:
+  <source>
+    *: "Anti-Skip Buffer"
+  </source>
+  <dest>
+    *: "Puffer zum vorüs fillu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user:
+  <source>
+    *: "Fade On Stop/Pause"
+  </source>
+  <dest>
+    *: "Uberblendu bi Stop/Pause"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ORDER
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "ID3 tag priority"
+  </source>
+  <dest>
+    *: "Bivorzugte ID3 tag"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V1_FIRST
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "V1 then V2"
+  </source>
+  <dest>
+    *: "V1 vor V2"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V2_FIRST
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "V2 then V1"
+  </source>
+  <dest>
+    *: "V2 vor V1"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Sort Case Sensitive"
+  </source>
+  <dest>
+    *: "Sortieru Gross-/Chliischriibig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Directories"
+  </source>
+  <dest>
+    *: "Verzeichnis sortieru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Files"
+  </source>
+  <dest>
+    *: "Datije sortieru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALPHA
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Alphabetical"
+  </source>
+  <dest>
+    *: "aphabetisch"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "by date"
+  </source>
+  <dest>
+    *: "nach Datum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE_REVERSE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "by newest date"
+  </source>
+  <dest>
+    *: "nach nöüschtum Datum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "by type"
+  </source>
+  <dest>
+    *: "nach Typ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show Files"
+  </source>
+  <dest>
+    *: "Datiifilter"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ALL
+  desc: show all files
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Alli"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "Unnerschtützti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "Müsig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_PLAYLIST
+  desc: show only playlist
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "Liederlischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Follow Playlist"
+  </source>
+  <dest>
+    *: "aktuellum Titel naagah"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ICONS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Icons"
+  </source>
+  <dest>
+    *: "Icons azeigu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_FONT
+  desc: in setting_menu()
+  user:
+  <source>
+    *: "Browse Fonts"
+  </source>
+  <dest>
+    *: "Schrifte"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .wps files"
+  </source>
+  <dest>
+    *: ".wps Datije"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "LCD Settings"
+  </source>
+  <dest>
+    *: "LCD Ischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scrolling"
+  </source>
+  <dest>
+    *: "Scroll-Ischtellige"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BARS_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "Status-/Scrollbar"
+  </source>
+  <dest>
+    *: "Status-/Scrollliischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user:
+  <source>
+    *: "Peak Meter"
+  </source>
+  <dest>
+    *: "Üsstiirigsazeig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Battery"
+  </source>
+  <dest>
+    *: "Akku"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Disk"
+  </source>
+  <dest>
+    *: "Feschtplatta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Time & Date"
+  </source>
+  <dest>
+    *: "Zit & Datum"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Idle Poweroff"
+  </source>
+  <dest>
+    *: "automatischus Üsschaltu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER
+  desc: sleep timer setting
+  user:
+  <source>
+    *: "Sleep Timer"
+  </source>
+  <dest>
+    *: "Ischlaaftimer"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: "Wecker"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITS_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Limits"
+  </source>
+  <dest>
+    *: "Grenzwärta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINE_IN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Line In"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE
+  desc: Displayed for setting car adapter mode to on/off
+  user:
+  <source>
+    *: "Car Adapter Mode"
+  </source>
+  <dest>
+    *: "Autoadapter Modus"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Bookmark on Stop"
+  </source>
+  <dest>
+    *: "Bim Stoppu Läsezeichu erschtellu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Yes - Recent only"
+  </source>
+  <dest>
+    *: "Ja - nur znöüschta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Ask - Recent only"
+  </source>
+  <dest>
+    *: "Frägu - Nur znöüschta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+  desc: prompt for user to decide to create a bookmark
+  user:
+  <source>
+    *: "Load Last Bookmark"
+  </source>
+  <dest>
+    *: "letschts Läsezeichu ladu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+  desc: Configuration option to maintain a list of recent bookmarks
+  user:
+  <source>
+    *: "Maintain a List of Recent Bookmarks?"
+  </source>
+  <dest>
+    *: "Lischta mit zletscht gibrüchte Läsezeichu verwaltu?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+  desc: Save only on bookmark for each playlist in recent bookmarks
+  user:
+  <source>
+    *: "Unique only"
+  </source>
+  <dest>
+    *: "nur verschidni"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user:
+  <source>
+    *: "Voice Menus"
+  </source>
+  <dest>
+    *: "Mönüs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR
+  desc: item of voice menu, set the "talkbox" mode for directories
+  user:
+  <source>
+    *: "Voice Directories"
+  </source>
+  <dest>
+    *: "Verzeichnis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE
+  desc: item of voice menu, set the voive mode for files
+  user:
+  <source>
+    *: "Voice Filenames"
+  </source>
+  <dest>
+    *: "Datiiname"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_NUMBER
+  desc: talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Numbers"
+  </source>
+  <dest>
+    *: "Zahle"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_SPELL
+  desc: talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Spell"
+  </source>
+  <dest>
+    *: "büechschtabieru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_HOVER
+  desc: talkbox" mode for directories + files
+  user:
+  <source>
+    *: ".talk mp3 clip"
+  </source>
+  <dest>
+    *: ".talk mp3 Datii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Quality"
+  </source>
+  <dest>
+    *: "Qualität"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Frequency"
+  </source>
+  <dest>
+    *: "Frequänz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Source"
+  </source>
+  <dest>
+    *: "Quella"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Mic"
+  </source>
+  <dest>
+    *: "Mikrofon"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_LINE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Analog"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Digital"
+  </source>
+  <dest>
+    *: "Digital"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Kanal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user:
+  <source>
+    *: "Independent frames"
+  </source>
+  <dest>
+    *: "unabhängigi Frames"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Prompt for record timer interval setting, in the record settings menu
+  user:
+  <source>
+    *: "Time Split"
+  </source>
+  <dest>
+    *: "Üfnahm teilu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD_TIME
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Prerecord time"
+  </source>
+  <dest>
+    *: "Vorüsüfnahmezit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_DIRECTORY
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Verzeichnis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_CURRENT_DIR
+  desc: in recording directory options
+  user:
+  <source>
+    *: "Current dir"
+  </source>
+  <dest>
+    *: "aktuells Verzeichnis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Min Step"
+  </source>
+  <dest>
+    *: "FF/RW min. Schritt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Accel"
+  </source>
+  <dest>
+    *: "FF/RW Bischleunigung"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight"
+  </source>
+  <dest>
+    *: "Bilüüchtig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu
+  user:
+  <source>
+    *: "Backlight On When Plugged"
+  </source>
+  <dest>
+    *: "Bilüüchtig a bim Netzbitrieb"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAPTION_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Caption backlight"
+  </source>
+  <dest>
+    *: "Bilüüchtig a bim Titelwägsel"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Contrast"
+  </source>
+  <dest>
+    *: "Kontrascht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "LCD Mode"
+  </source>
+  <dest>
+    *: "LCD Modus"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_NORMAL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "normal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Inverse"
+  </source>
+  <dest>
+    *: "invertiert"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  user:
+  <source>
+    *: "Upside Down"
+  </source>
+  <dest>
+    *: "umgidräht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Line Selector"
+  </source>
+  <dest>
+    *: "Ziiluüswahl"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Pointer"
+  </source>
+  <dest>
+    *: "Zeiger"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Bar(Inverse)"
+  </source>
+  <dest>
+    *: "Balku (invertieru)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_SPEED
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll Speed"
+  </source>
+  <dest>
+    *: "Scroll-Gschwindigkeit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Scroll Speed Setting Example"
+  </source>
+  <dest>
+    *: "Biispiltext fer dScrollgschwindigkeit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_DELAY
+  desc: Delay before scrolling
+  user:
+  <source>
+    *: "Scroll Start Delay"
+  </source>
+  <dest>
+    *: "Scroll-Startverzögrig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size"
+  </source>
+  <dest>
+    *: "Schrittwiti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP_EXAMPLE
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size Setting Example Text"
+  </source>
+  <dest>
+    *: "Das isch en Biischpiltext fer dSchrittwiti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BIDIR_SCROLL
+  desc: Bidirectional scroll limit
+  user:
+  <source>
+    *: "Bidirectional Scroll Limit"
+  </source>
+  <dest>
+    *: "Beidsitigs Scroll-Limit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL
+  desc: (player) menu altarnative for jump scroll
+  user:
+  <source>
+    *: "Jump scroll"
+  </source>
+  <dest>
+    *: "Gump-Scroll"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONE_TIME
+  desc: (player) the jump scroll shall be done "one time
+  user:
+  <source>
+    *: "One time"
+  </source>
+  <dest>
+    *: "eis Mal"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL_DELAY
+  desc: (player) Delay before making a jump scroll
+  user:
+  <source>
+    *: "Jump Scroll Delay"
+  </source>
+  <dest>
+    *: "Gumpverzögrig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Scroll Bar"
+  </source>
+  <dest>
+    *: "Scrolliischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Status Bar"
+  </source>
+  <dest>
+    *: "Statusliischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTON_BAR
+  desc: in settings menu
+  user:
+  <source>
+    *: "Button bar"
+  </source>
+  <dest>
+    *: "Taschtuliischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user:
+  <source>
+    *: "Volume Display"
+  </source>
+  <dest>
+    *: "Lütschterchiazeig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user:
+  <source>
+    *: "Battery Display"
+  </source>
+  <dest>
+    *: "Akku Azeig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Graphic"
+  </source>
+  <dest>
+    *: "grafisch"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Numeric"
+  </source>
+  <dest>
+    *: "numerisch"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Release"
+  </source>
+  <dest>
+    *: "Gschw. bim Abfallu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Units Per Read"
+  </source>
+  <dest>
+    *: "Einheite pro Mässig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Hold Time"
+  </source>
+  <dest>
+    *: "Üsstiirig Haltezit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Clip Hold Time"
+  </source>
+  <dest>
+    *: "Uberstiirig Haltezit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Eternal"
+  </source>
+  <dest>
+    *: "Ewig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Scale"
+  </source>
+  <dest>
+    *: "Skalierig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Logarithmic(dB)"
+  </source>
+  <dest>
+    *: "logarithmisch (dB)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Linear(%)"
+  </source>
+  <dest>
+    *: "linear (%)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Minimum Of Range"
+  </source>
+  <dest>
+    *: "chlinschte Wärt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Maximum Of Range"
+  </source>
+  <dest>
+    *: "greeschte Wärt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CAPACITY
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Battery Capacity"
+  </source>
+  <dest>
+    *: "Akku: Kapazität"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Disk Spindown"
+  </source>
+  <dest>
+    *: "HDD Motor-Üsschaltzit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF
+  desc: disk poweroff flag
+  user:
+  <source>
+    *: "Disk Poweroff"
+  </source>
+  <dest>
+    *: "HDD Üsschaltbifähl brüüchu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Set Time/Date"
+  </source>
+  <dest>
+    *: "Zit/Datum setzu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user:
+  <source>
+    *: "Time Format"
+  </source>
+  <dest>
+    *: "Zitformat"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user:
+  <source>
+    *: "12 Hour Clock"
+  </source>
+  <dest>
+    *: "12 Std. Ühr"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user:
+  <source>
+    *: "24 Hour Clock"
+  </source>
+  <dest>
+    *: "24 Std. Ühr"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_DIR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max files in dir browser"
+  </source>
+  <dest>
+    *: "max. Azahl Datije im Browser"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_PLAYLIST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max playlist size"
+  </source>
+  <dest>
+    *: "max. gressi Abschpillischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU
+  desc: Text on main menu to get to bookmark commands
+  user:
+  <source>
+    *: "Bookmarks"
+  </source>
+  <dest>
+    *: "Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start id3 viewer
+  user:
+  <source>
+    *: "Show ID3 Info"
+  </source>
+  <dest>
+    *: "Zeig ID3 Info"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user:
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "Umbinennu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE
+  desc: The verb/action Delete
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Leschu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE_DIR
+  desc: in on+play menu
+  user:
+  <source>
+    *: "Delete directory"
+  </source>
+  <dest>
+    *: "Verzeichnis leschu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_DELETE
+  desc: Really Delete?
+  user:
+  <source>
+    *: "Delete?"
+  </source>
+  <dest>
+    *: "Leschu?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user:
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "Glescht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_OPEN_WITH
+  desc: Onplay open with
+  user:
+  <source>
+    *: "Open with"
+  </source>
+  <dest>
+    *: "Öffnu mit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_DIR
+  desc: in main menu
+  user:
+  <source>
+    *: "Create directory"
+  </source>
+  <dest>
+    *: "Verzeichnis erschtellu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW
+  desc: in on+play menu
+  user:
+  <source>
+    *: "View"
+  </source>
+  <dest>
+    *: "Azeigu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert"
+  </source>
+  <dest>
+    *: "Ifiegu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_FIRST
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert next"
+  </source>
+  <dest>
+    *: "Ifiegu als negschts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST
+  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert last"
+  </source>
+  <dest>
+    *: "Ifiegu als letschts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE
+  desc: The verb/action Queue
+  user:
+  <source>
+    *: "Queue"
+  </source>
+  <dest>
+    *: "An dLischta aheichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_FIRST
+  desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Queue next"
+  </source>
+  <dest>
+    *: "Warteschlanga als negschts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST
+  desc: in onplay menu.  queue a track/playlist at end of playlist.
+  user:
+  <source>
+    *: "Queue last"
+  </source>
+  <dest>
+    *: "Warteschlanga als letschts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_CREATE
+  desc: Used off of the bookmark menu to create a bookmark
+  user:
+  <source>
+    *: "Create Bookmark"
+  </source>
+  <dest>
+    *: "Läsezeichu erschtellu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_LIST
+  desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+  user:
+  <source>
+    *: "List Bookmarks"
+  </source>
+  <dest>
+    *: "Läsezeichu üflischtu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_INFO
+  desc: displayed topmost on the info screen
+  user:
+  <source>
+    *: "Rockbox Info:"
+  </source>
+  <dest>
+    *: "Rockbox Info:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_PLAYER
+  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Puf: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_RECORDER
+  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Puffer: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CHARGE
+  desc: tells that the battery is charging, instead of battery level
+  user:
+  <source>
+    *: "Battery: Charging"
+  </source>
+  <dest>
+    *: "Akku: Üfladu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TOPOFF_CHARGE
+  desc: in info display, shows that top off charge is running
+  user:
+  <source>
+    *: "Battery: Top-Off Chg"
+  </source>
+  <dest>
+    *: "Akku: Ubergangsladu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TRICKLE_CHARGE
+  desc: in info display, shows that trickle charge is running
+  user:
+  <source>
+    *: "Battery: Trickle Chg"
+  </source>
+  <dest>
+    *: "Akku: Erhaltladu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TIME
+  desc: battery level in % and estimated time remaining
+  user:
+  <source>
+    *: "%d%% %dh %dm"
+  </source>
+  <dest>
+    *: "%d%% %d Std %d Min"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CURRENT_TIME
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Up"
+  </source>
+  <dest>
+    *: "schnäller"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Down"
+  </source>
+  <dest>
+    *: "langsamer"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps
+  user:
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F2_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Modus:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_STATUS
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Status"
+  </source>
+  <dest>
+    *: "Status-"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_SCROLL
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Scroll"
+  </source>
+  <dest>
+    *: "Scroll-"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_BAR
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Bar"
+  </source>
+  <dest>
+    *: "Azeig:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+  desc: From the auto-load screen, allows user to list all bookmarks
+  user:
+  <source>
+    *: "Down = List"
+  </source>
+  <dest>
+    *: "Embri = Lischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_EXIT
+  desc: From the bookmark list screen, allows user to exit
+  user:
+  <source>
+    *: "OFF = Exit"
+  </source>
+  <dest>
+    *: "OFF = Biendu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+  desc: Used on the bookmark select window to label bookmark number
+  user:
+  <source>
+    *: "Bookmark"
+  </source>
+  <dest>
+    *: "Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+  desc: Used on the bookmark select window to label index number
+  user:
+  <source>
+    *: "Index"
+  </source>
+  <dest>
+    *: "Index"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_TIME_TEXT
+  desc: Used on the bookmark select window to label elapsed time
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Zit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_PLAY
+  desc: Used on the bookmark select window to indicated the play option
+  user:
+  <source>
+    *: "PLAY = Select"
+  </source>
+  <dest>
+    *: "PLAY = üswählu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_DELETE
+  desc: Used on the bookmark select window to indicated the bookmark delete option
+  user:
+  <source>
+    *: "ON+Play = Delete"
+  </source>
+  <dest>
+    *: "ON+PLAY = leschu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_AUTOLOAD_QUERY
+  desc: prompt for user to decide to create a bookmark
+  user:
+  <source>
+    *: "Load Last Bookmark?"
+  </source>
+  <dest>
+    *: "zletscht Läsezeichu ladu?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_BOOKMARK_QUERY
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Create a Bookmark?"
+  </source>
+  <dest>
+    *: "Läsezeichu erschtellu?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_SUCCESS
+  desc: Indicates bookmark was successfully created
+  user:
+  <source>
+    *: "Bookmark Created"
+  </source>
+  <dest>
+    *: "Läsezeichu erschtellt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_FAILURE
+  desc: Indicates bookmark was not created
+  user:
+  <source>
+    *: "Bookmark Failed!"
+  </source>
+  <dest>
+    *: "Fähler bim Erschtellu fam Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_LOAD_EMPTY
+  desc: Indicates bookmark was empty
+  user:
+  <source>
+    *: "Bookmark Empty"
+  </source>
+  <dest>
+    *: "kei Läsezeichu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET
+  desc: used in set_time()
+  user:
+  <source>
+    *: "ON To Set"
+  </source>
+  <dest>
+    *: "ON = spiichru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user:
+  <source>
+    *: "OFF To Revert"
+  </source>
+  <dest>
+    *: "OFF = abbrächu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_PLAYER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key Lock ON"
+  </source>
+  <dest>
+    *: "Schperri A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_PLAYER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key Lock OFF"
+  </source>
+  <dest>
+    *: "Schperri Üs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_RECORDER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key Lock Is ON"
+  </source>
+  <dest>
+    *: "Schperri isch A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_RECORDER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key Lock Is OFF"
+  </source>
+  <dest>
+    *: "Schperri isch Üs"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: "Time:"
+  </source>
+  <dest>
+    *: "Zit:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT_REC
+  desc: 
+  user:
+  <source>
+    *: "Split time:"
+  </source>
+  <dest>
+    *: "Üfnahm teilu:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: "Size:"
+  </source>
+  <dest>
+    *: "Greessi:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user:
+  <source>
+    *: "Prerecording"
+  </source>
+  <dest>
+    *: "Vorüsüfnahm"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Verst"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Left"
+  </source>
+  <dest>
+    *: "Lings"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Right"
+  </source>
+  <dest>
+    *: "Rächts"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FULL
+  desc: in recording screen
+  user:
+  <source>
+    *: "The disk is full. Press OFF to continue."
+  </source>
+  <dest>
+    *: "Feschtplatta isch voll. Drick OFF."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Alarm Time: %02d:%02d"
+  </source>
+  <dest>
+    *: "Weckzit: %02d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Waking Up In %d:%02d"
+  </source>
+  <dest>
+    *: "Üfwachu in %d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Shutting Down..."
+  </source>
+  <dest>
+    *: "Schaltu üs..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Alarm Time Is Too Soon!"
+  </source>
+  <dest>
+    *: "Weckzit isch zfrüeh"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user:
+  <source>
+    *: "PLAY=Set OFF=Cancel"
+  </source>
+  <dest>
+    *: "PLAY=Ok OFF=Abbrächu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TITLE
+  desc: in wps
+  user:
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Titel]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ARTIST
+  desc: in wps 
+  user:
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Künschtler]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACKNUM
+  desc: in wps
+  user:
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Lied Nr.]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GENRE
+  desc: ID3 frame 'genre'
+  user:
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Stil]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_YEAR
+  desc: ID3 info 'year'
+  user:
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Jahr]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PLAYLIST
+  desc: in wps
+  user:
+  <source>
+    *: "[Playlist]"
+  </source>
+  <dest>
+    *: "[Liederlischta]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in wps
+  user:
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrata]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_FRECUENCY
+  desc: in wps
+  user:
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frequänz]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PATH
+  desc: in wps
+  user:
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Pfad]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_NO_INFO
+  desc: ID3 info is missing
+  user:
+  <source>
+    *: "<No Info>"
+  </source>
+  <dest>
+    *: "<kei Info>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sun"
+  </source>
+  <dest>
+    *: "Sun"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_MONDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Mon"
+  </source>
+  <dest>
+    *: "Män"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Tue"
+  </source>
+  <dest>
+    *: "Zii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Wed"
+  </source>
+  <dest>
+    *: "Mit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Thu"
+  </source>
+  <dest>
+    *: "Don"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Fri"
+  </source>
+  <dest>
+    *: "Fri"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sat"
+  </source>
+  <dest>
+    *: "Sam"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jan"
+  </source>
+  <dest>
+    *: "Jan"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Feb"
+  </source>
+  <dest>
+    *: "Feb"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Mar"
+  </source>
+  <dest>
+    *: "Mär"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_APRIL
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Apr"
+  </source>
+  <dest>
+    *: "Apr"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MAY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "May"
+  </source>
+  <dest>
+    *: "Mai"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jun"
+  </source>
+  <dest>
+    *: "Jun"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JULY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jul"
+  </source>
+  <dest>
+    *: "Jul"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Aug"
+  </source>
+  <dest>
+    *: "Öüg"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Sep"
+  </source>
+  <dest>
+    *: "Sep"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Oct"
+  </source>
+  <dest>
+    *: "Okt"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Nov"
+  </source>
+  <dest>
+    *: "Nov"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Dec"
+  </source>
+  <dest>
+    *: "Dez"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ZERO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ELEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWELVE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOURTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FORTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HUNDRED
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THOUSAND
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLISECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECOND
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTE
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTES
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOUR
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KHZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DB
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PERCENT
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLIAMPHOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PIXEL
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HERTZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_A
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_B
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_C
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_D
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_E
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_F
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_G
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_H
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_I
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_J
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_K
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_L
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_M
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_N
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_O
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_P
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Q
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_R
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_S
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_T
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_U
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_V
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_W
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_X
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Y
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Z
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DOT
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAUSE
+  desc: spoken only, for spelling, a split second of silence (difficult to author)
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FILE
+  desc: spoken only, prefix for file number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DIR
+  desc: spoken only, prefix for directory number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_MPA
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CFG
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_TXT
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_ROCK
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FONT
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_BMARK
+  desc: spoken only, for file extension and the word in general
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_UCL
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_AJZ
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_LOAD
+  desc: displayed on screen while loading a playlist
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Ladu..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: displayed on screen while shuffling a playlist
+  user:
+  <source>
+    *: "Shuffling..."
+  </source>
+  <dest>
+    *: "Mischlu..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_BUFFER_FULL
+  desc: in playlist.indices() when playlist is full
+  user:
+  <source>
+    *: "Playlist Buffer Full"
+  </source>
+  <dest>
+    *: "Liederlischta Puffer voll"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_PLAYER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End Of List"
+  </source>
+  <dest>
+    *: "Lischtuendi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_RECORDER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End Of Song List"
+  </source>
+  <dest>
+    *: "Lischtuendi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATING
+  desc: Screen feedback during playlist creation
+  user:
+  <source>
+    *: "Creating"
+  </source>
+  <dest>
+    *: "Am Zämuschtellu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_INSERT_COUNT
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Inserted %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d Lieder igfiegt (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_QUEUE_COUNT
+  desc: splash number of tracks queued
+  user:
+  <source>
+    *: "Queued %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d Lieder agheicht (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SAVE_COUNT
+  desc: splash number of tracks saved
+  user:
+  <source>
+    *: "Saved %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d Lieder abgspiichrut (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY_QUESTION
+  desc: Asked from onplay screen
+  user:
+  <source>
+    *: "Recursively?"
+  </source>
+  <dest>
+    *: "Rekursiv?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error updating playlist control file"
+  </source>
+  <dest>
+    *: "Fähler: Aktualisierig Abschpillischta-Kontrolldatii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist file"
+  </source>
+  <dest>
+    *: "Fähler: Züegriff Abschpillischta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist control file"
+  </source>
+  <dest>
+    *: "Fähler: Züegriff Abschpillischta-Kontrolldatii"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing directory"
+  </source>
+  <dest>
+    *: "Fähler: Verzeichniszüegriff"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_INVALID
+  desc: Playlist resume error
+  user:
+  <source>
+    *: "Playlist control file is invalid"
+  </source>
+  <dest>
+    *: "Abschpillischta-Kontrolldatii isch ungültig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION
+  desc: in radio screen
+  user:
+  <source>
+    *: "Station: %d.%dMHz"
+  </source>
+  <dest>
+    *: "Sender: %d.%dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_PRESETS
+  desc: in radio screen
+  user:
+  <source>
+    *: "The preset list is empty"
+  </source>
+  <dest>
+    *: "Senderlischta läär"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EDIT_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: "Edit preset"
+  </source>
+  <dest>
+    *: "Sender biarbeitu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DELETE_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: "Remove preset"
+  </source>
+  <dest>
+    *: "Sender leschu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE_FAILED
+  desc: in radio screen
+  user:
+  <source>
+    *: "Preset save failed"
+  </source>
+  <dest>
+    *: "Fähler bim spiichru"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_FREE_PRESETS
+  desc: in radio screen
+  user:
+  <source>
+    *: "The preset list is full"
+  </source>
+  <dest>
+    *: "Senderlischta isch voll"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user:
+  <source>
+    *: "Menu"
+  </source>
+  <dest>
+    *: "Mönü"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user:
+  <source>
+    *: "Exit"
+  </source>
+  <dest>
+    *: "Exit"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ACTION
+  desc: in radio screen
+  user:
+  <source>
+    *: "Action"
+  </source>
+  <dest>
+    *: "Aktion"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_PRESETS
+  desc: in button bar
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Sender"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user:
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Derzüe"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in main menu
+  user:
+  <source>
+    *: "Record"
+  </source>
+  <dest>
+    *: "Üfnäh"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MONO_MODE
+  desc: in radio screen
+  user:
+  <source>
+    *: "Force mono"
+  </source>
+  <dest>
+    *: "Mono erzwingu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F1
+  desc: in dir browser, F1 button bar text
+  user:
+  <source>
+    *: "Menu"
+  </source>
+  <dest>
+    *: "Mönü"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F2
+  desc: in dir browser, F2 button bar text
+  user:
+  <source>
+    *: "Option"
+  </source>
+  <dest>
+    *: "Option"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F3
+  desc: in dir browser, F3 button bar text
+  user:
+  <source>
+    *: "LCD"
+  </source>
+  <dest>
+    *: "LCD"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOWDIR_BUFFER_FULL
+  desc: in showdir(), displayed on screen when you reach buffer limit
+  user:
+  <source>
+    *: "Dir Buffer Is Full!"
+  </source>
+  <dest>
+    *: "Verzeichnispuffer isch voll!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Language"
+  </source>
+  <dest>
+    *: "Nöiji Spraach"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_LOADED
+  desc: Feedback shown when a .cfg file is loaded
+  user:
+  <source>
+    *: "Settings Loaded"
+  </source>
+  <dest>
+    *: "Ischtellige gladu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVED
+  desc: Feedback shown when a .cfg file is saved
+  user:
+  <source>
+    *: "Settings Saved"
+  </source>
+  <dest>
+    *: "Ischtellige gschpiichrut"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOT_CHANGED
+  desc: File browser discovered the boot file was changed
+  user:
+  <source>
+    *: "Boot changed"
+  </source>
+  <dest>
+    *: "Boot gändrut"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBOOT_NOW
+  desc: Do you want to reboot?
+  user:
+  <source>
+    *: "Reboot now?"
+  </source>
+  <dest>
+    *: "jetz nöü bootu?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF_ABORT
+  desc: Used on recorder models
+  user:
+  <source>
+    *: "OFF to abort"
+  </source>
+  <dest>
+    *: "Off fer abzbrächu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_ABORT
+  desc: Used on player models
+  user:
+  <source>
+    *: "STOP to abort"
+  </source>
+  <dest>
+    *: "STOP fer abzbrächu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_FILES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "No files"
+  </source>
+  <dest>
+    *: "kei Datije"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE
+  desc: The verb/action Move
+  user:
+  <source>
+    *: "Move"
+  </source>
+  <dest>
+    *: "verschiebu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_FAILED
+  desc: Error message displayed in playlist viewer
+  user:
+  <source>
+    *: "Move failed"
+  </source>
+  <dest>
+    *: "Fähler bim verschiebu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_INDICES
+  desc: in playlist viewer menu
+  user:
+  <source>
+    *: "Show Indices"
+  </source>
+  <dest>
+    *: "Zeig Indizes"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_DISPLAY
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Track Display"
+  </source>
+  <dest>
+    *: "Titelazeig"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TRACK_NAME_ONLY
+  desc: track display options
+  user:
+  <source>
+    *: "Track name only"
+  </source>
+  <dest>
+    *: "Nur Titelnamu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FULL_PATH
+  desc: track display options
+  user:
+  <source>
+    *: "Full path"
+  </source>
+  <dest>
+    *: "ganze Pfad"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Remove"
+  </source>
+  <dest>
+    *: "leschu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_OPTIONS
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "File Options"
+  </source>
+  <dest>
+    *: "Datiioptione"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_CANT_OPEN
+  desc: Plugin open error message
+  user:
+  <source>
+    *: "Can't open %s"
+  </source>
+  <dest>
+    *: "Cha %s nit üftüe"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_READ_FAILED
+  desc: There was an error reading a file
+  user:
+  <source>
+    *: "Failed reading %s"
+  </source>
+  <dest>
+    *: "Fähler bim läsu fa %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_MODEL
+  desc: The plugin is not compatible with the archos model trying to run it
+  user:
+  <source>
+    *: "Incompatible model"
+  </source>
+  <dest>
+    *: "nit kompatibels Modell"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_VERSION
+  desc: The plugin is not compatible with the rockbox version trying to run it
+  user:
+  <source>
+    *: "Incompatible version"
+  </source>
+  <dest>
+    *: "nit kompatibli Version"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_ERROR
+  desc: The plugin return an error code
+  user:
+  <source>
+    *: "Plugin returned error"
+  </source>
+  <dest>
+    *: "Plugin mäldut Fähler"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_EXTENSION_FULL
+  desc: Extension array full
+  user:
+  <source>
+    *: "Extension array full"
+  </source>
+  <dest>
+    *: "Erwitrigslischta voll"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_FULL
+  desc: Filetype array full
+  user:
+  <source>
+    *: "Filetype array full"
+  </source>
+  <dest>
+    *: "Datiitypulischta voll"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_PLUGIN_NAME_LONG
+  desc: Viewer plugin name too long
+  user:
+  <source>
+    *: "Plugin name too long"
+  </source>
+  <dest>
+    *: "Plugin-Namu z'lenge"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+  desc: Filetype string buffer empty
+  user:
+  <source>
+    *: "Filetype string buffer empty"
+  </source>
+  <dest>
+    *: "Datiitypu-Zeichubuffer läär"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_CONFIRM_PLAYER
+  desc: posible answers to resume question
+  user:
+  <source>
+    *: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
