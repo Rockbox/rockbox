@@ -1260,11 +1260,11 @@ zip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 7zip:
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 tar:
 	\$(SILENT)rm -f rockbox.tar
-	\$(SILENT)\$(TOOLSDIR)/buildzip.pl -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -o "rockbox.tar" -z "tar --no-recursion -uf" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
 bzip2: tar
 	\$(SILENT)bzip2 -f9 rockbox.tar
