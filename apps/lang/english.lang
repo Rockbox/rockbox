@@ -3678,12 +3678,6 @@ eng: "(PLAY/STOP)"
 voice: ""
 new:
 
-id: LANG_FM_NO_PRESETS
-desc: error when preset list is empty
-eng: "No presets"
-voice: "No presets"
-new:
-
 id: LANG_FM_PRESET_LOAD
 desc: load preset list in fm radio
 eng: "Load Preset List"
@@ -3719,5 +3713,4 @@ desc: When you try to exit radio to confirm save
 eng: "Save Changes?"
 voice: "Save Changes?"
 new:
-
 
