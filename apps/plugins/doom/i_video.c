@@ -16,8 +16,8 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.6  2006/04/03 16:13:15  kkurbjun
- * Add grayscale lib for the H100's
+ * Revision 1.7  2006/04/03 16:30:12  kkurbjun
+ * Fix #if
  *
  * Revision 1.5  2006-04-03 08:51:08  bger
  * Patch #4864 by Jonathan Gordon: text editor plugin, with some changes by me.
@@ -344,7 +344,7 @@ void I_UpdateNoBlit (void)
 
 void I_FinishUpdate (void)
 {
-#if defined(LCD_H300) && !defined(SIMULATOR)
+#if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
    /*
       Lookup tables are no longer needed (H300 specific, decreases timedemo
       by about 500 tics)
