@@ -70,10 +70,6 @@ static bool timer_set(long cycles, bool start)
     (void)start;
 #endif
 
-#ifdef CPU_COLDFIRE
-    cycles >>= 1; /* the coldfire timer works on busclk == cpuclk/2 */
-#endif
-
 /* Don't do this on ipods, we don't know if these platforms have prescaler
    capabilities on the timer we use. */
 #if CONFIG_CPU != PP5020 && CONFIG_CPU != PP5002
