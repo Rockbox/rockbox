@@ -170,7 +170,7 @@ void save_changes(int overwrite)
     int fd;
     int i;
 
-    if (!filename[0] || overwrite)
+    if (!filename[0] || !overwrite)
     {
         rb->strcpy(filename,"/");
         rb->kbd_input(filename,1024);
