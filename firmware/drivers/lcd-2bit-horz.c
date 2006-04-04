@@ -46,7 +46,7 @@ static const unsigned char dibits[16] ICONST_ATTR = {
 };
 
 static const unsigned char pixmask[4] ICONST_ATTR = {
-    0x03, 0x0C, 0x30, 0xC0
+    0xC0, 0x30, 0x0C, 0x03
 };
 
 static unsigned fg_pattern IDATA_ATTR = 0xFF; /* initially black */
@@ -381,8 +381,8 @@ void lcd_hline(int x1, int x2, int y)
     bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y][x1>>2];
     nx    = x2 - (x1 & ~3);
-    mask  = 0xFFu << (2 * (x1 & 3));
-    mask_right = 0xFFu >> (2 * (~nx & 3));
+    mask  = 0xFFu >> (2 * (x1 & 3));
+    mask_right = 0xFFu << (2 * (~nx & 3));
     
     for (; nx >= 4; nx -= 4)
     {
@@ -479,8 +479,8 @@ void lcd_fillrect(int x, int y, int width, int height)
     bfunc = lcd_blockfuncs[drawmode];
     dst   = &lcd_framebuffer[y][x>>2];
     nx    = width - 1 + (x & 3);
-    mask  = 0xFFu << (2 * (x & 3));
-    mask_right = 0xFFu >> (2 * (~nx & 3));
+    mask  = 0xFFu >> (2 * (x & 3));
+    mask_right = 0xFFu << (2 * (~nx & 3));
     
     for (; nx >= 4; nx -= 4)
     {
@@ -515,9 +515,7 @@ void lcd_fillrect(int x, int y, int width, int height)
  * at top.
  * The bytes are stored in row-major order, with byte 0 being top left,
  * byte 1 2nd from left etc. The first row of bytes defines pixel row
- * 0, the second row defines pixel row 1 etc.
- *
- * This is similar to the internal lcd hw format. */
+ * 0, the second row defines pixel row 1 etc. */
 
 /* Draw a partial monochrome bitmap */
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
@@ -602,7 +600,7 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
  *
  * A bitmap contains two bits for every pixel. 00 = white, 01 = light grey,
  * 10 = dark grey, 11 = black. Bits within a byte are arranged horizontally,
- * LSB at the left.
+ * MSB at the left.
  * The bytes are stored in row-major order, with byte 0 being top left,
  * byte 1 2nd from left etc. Each row of bytes defines one pixel row.
  *
@@ -651,8 +649,8 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     shift = x & 3;
     nx    = width - 1 + shift + src_x;
 
-    mask   = 0xFFu << (2 * (shift + src_x));
-    mask_right = 0xFFu >> (2 * (~nx & 3));
+    mask   = 0xFF00u >> (2 * (shift + src_x));
+    mask_right = 0xFFu << (2 * (~nx & 3));
     
     shift *= 2;
     dst_end = dst + height * LCD_FBWIDTH;
@@ -660,26 +658,25 @@ void lcd_bitmap_part(const unsigned char *src, int src_x, int src_y,
     {
         const unsigned char *src_row = src;
         unsigned char *dst_row = dst;
-        unsigned mask_row = mask;
+        unsigned mask_row = mask >> 8;
         unsigned data = 0;
         
         for (x = nx; x >= 4; x -= 4)
         {
-            data |= *src_row++ << shift;
+            data = (data << 8) | *src_row++;
             
             if (mask_row & 0xFF)
             {
-                setblock(dst_row, mask_row, data);
+                setblock(dst_row, mask_row, data >> shift);
                 mask_row = 0xFF;
             }
             else
-                mask_row >>= 8;
+                mask_row = mask;
 
             dst_row++;
-            data >>= 8;
         }
-        data |= *src_row << shift;
-        setblock(dst_row, mask_row & mask_right, data);
+        data = (data << 8) | *src_row;
+        setblock(dst_row, mask_row & mask_right, data >> shift);
 
         src += stride;
         dst += LCD_FBWIDTH;

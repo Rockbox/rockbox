@@ -402,7 +402,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             for (col = 0; col < width; col++)
             {
                 (*dest)[row * dst_w + (col/4)] |=
-                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (~col & 3));
+                       (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
             }
         break;
     }
