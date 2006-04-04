@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.4  2006/04/04 23:13:50  kkurbjun
+// Revision 1.5  2006/04/04 23:58:37  kkurbjun
+// Make savegame strings more informative
+//
+// Revision 1.4  2006-04-04 23:13:50  kkurbjun
 // Fix up configurable keys, edit exit string, more work needs to be done on menu keys
 //
 // Revision 1.3  2006-04-03 20:03:02  kkurbjun
@@ -649,8 +652,12 @@ void M_SaveSelect(int choice)
    saveStringEnter = 1;
 
    saveSlot = choice;
-   snprintf(savegamestrings[choice], sizeof(savegamestrings[choice]), "Mysave%d", choice);
-//   strcpy(saveOldString,savegamestrings[choice]);
+   snprintf(savegamestrings[choice], sizeof(savegamestrings[choice]), 
+      (gamemode==shareware||gamemode==registered||gamemode==retail) ? 
+      mapnames[(gameepisode-1)*9+gamemap-1]  : (gamemission==doom2)     ?
+      mapnames2[gamemap-1] : (gamemission==pack_plut) ?
+      mapnamesp[gamemap-1] : (gamemission==pack_tnt)  ?
+      mapnamest[gamemap-1] : "Unknown Location", choice);
    if (!strcmp(savegamestrings[choice],EMPTYSTRING))
       savegamestrings[choice][0] = 0;
    saveCharIndex = strlen(savegamestrings[choice]);
