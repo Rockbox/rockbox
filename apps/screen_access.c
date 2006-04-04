@@ -153,8 +153,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->invertscroll=&lcd_invertscroll;
             screen->puts_offset=&lcd_puts_offset;
             screen->puts_style_offset=&lcd_puts_style_offset;
-            screen->puts_scroll_style=&lcd_puts_scroll_offset;
-            screen->puts_scroll_offset=&lcd_puts_scroll_style;
+            screen->puts_scroll_style=&lcd_puts_scroll_style;
+            screen->puts_scroll_offset=&lcd_puts_scroll_offset;
             screen->puts_scroll_style_offset=&lcd_puts_scroll_style_offset;
 #endif /* HAVE_LCD_BITMAP */
 
