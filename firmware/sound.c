@@ -304,7 +304,7 @@ static int tenthdb2master(int db)
     /* 0101111 == mute  (0x2f) */
 
     if (db < VOLUME_MIN) {
-        return 0x0;
+        return 0x2f;
     } else {
         return((db/10)+73+0x30);
     }
