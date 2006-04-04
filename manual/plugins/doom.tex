@@ -1,0 +1,57 @@
+% $Id$ %
+\subsection{Doom}
+\screenshot{plugins/images/ss-doom}{Doom}{}
+This is the famous Doom game.
+
+\subsubsection{Getting started}
+For the game to run you need \fname{.wad} game files located in
+\fname{/games/doom/} on your player. Create the directory and save the
+following files there:
+\begin{description}
+\item[rockdoom.wad] The Rockbox \fname{.wad}, based on \fname{prboom.wad}
+from prboom-2.2.6
+\item[Your wad files] Copy all Doom wads you wish to play into that directory.
+\end{description}
+The needed files can be found at
+\url{http://www.rockbox.org/twiki/bin/view/Main/PluginDoom}
+
+To play addon wads create the \fname{addons} directory within doom. 
+Place wad files in this directory. Currently doom only supports 10 addons 
+in the directory.
+
+\subsubsection{Playing the game}
+After installation of the \fname{wad} files is complete you can start the
+game.
+\fixme{more description is needed}
+
+\begin{table}
+\begin{btnmap}{}{}
+\opt{h1xx,h300}{\ButtonUp}
+\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonMenu}
+& Move Forward \\
+\opt{h1xx,h300}{\ButtonDown}
+\opt{ipod4g,ipodcolor,ipodvideo}{na}
+& Down \\
+\opt{h1xx,h300}{\ButtonLeft}
+\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
+& Turn Left \\
+\opt{h1xx,h300}{\ButtonRight}
+\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
+& Turn Right \\
+\opt{h1xx,h300}{\ButtonRec}
+\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonPlay}
+& Shoot \\
+\opt{h1xx,h300}{\ButtonMode}
+\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonMenu}
+& Open \\
+\opt{h1xx,h300}{\ButtonOff}
+\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{Hold switch}}
+& Escape \\
+\opt{h1xx,h300}{\ButtonSelect}
+\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
+& Enter \\
+\opt{h1xx,h300}{\ButtonOn}
+\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonSelect}
+& Change Weapon \\
+\end{btnmap}
+\end{table}
