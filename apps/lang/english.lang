@@ -8394,3 +8394,17 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixels"
+  </dest>
+  <voice>
+    *: "pixels"
+  </voice>
+</phrase>

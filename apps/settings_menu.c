@@ -860,14 +860,14 @@ static bool screen_scroll(void)
 
 static bool screen_scroll_step(void)
 {
-    return set_int(str(LANG_SCREEN_SCROLL_STEP), "pixels", UNIT_PIXEL,
+    return set_int(str(LANG_SCREEN_SCROLL_STEP), str(LANG_PIXELS), UNIT_PIXEL,
                    &global_settings.screen_scroll_step,
                    &gui_list_screen_scroll_step, 1, 1, LCD_WIDTH, NULL );
 }
 
 static bool scroll_step(void)
 {
-    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), "pixels", UNIT_PIXEL,
+    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), str(LANG_PIXELS), UNIT_PIXEL,
                    &global_settings.scroll_step,
                    &lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
 }
