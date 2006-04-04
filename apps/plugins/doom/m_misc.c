@@ -355,10 +355,10 @@ default_t defaults[] =
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move forward
       {"key_down",        {&key_down, NULL},           {KEY_DOWNARROW, NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move backward
-/*      {"key_menu_right",  {&key_menu_right, NULL},     {KEY_RIGHTARROW, NULL},// phares 3/7/98
+      {"key_menu_right",  {&key_menu_right, NULL},     {KEY_RIGHTARROW, NULL},// phares 3/7/98
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move right in a menu  //     |
-      {"key_menu_left",   {&key_menu_left, NULL},      {KEY_LEFTARROW} ,//     V
-       0,MAX_KEY,def_key,ss_keys, NULL}, // key to move left in a menu
+      {"key_menu_left",   {&key_menu_left, NULL},      {KEY_LEFTARROW, NULL} ,//     V
+       0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move left in a menu
       {"key_menu_up",     {&key_menu_up, NULL},        {KEY_UPARROW,NULL}   ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move up in a menu
       {"key_menu_down",   {&key_menu_down, NULL},      {KEY_DOWNARROW, NULL} ,
@@ -369,7 +369,7 @@ default_t defaults[] =
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to leave a menu      ,   // phares 3/7/98
       {"key_menu_enter",  {&key_menu_enter, NULL},     {KEY_ENTER, NULL}     ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to select from menu
-*/
+
       {"key_strafeleft",  {&key_strafeleft, NULL},     {',', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to strafe left
       {"key_straferight", {&key_straferight, NULL},    {'.', NULL},
@@ -414,7 +414,7 @@ default_t defaults[] =
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to enter a chat message
       {"key_backspace",   {&key_backspace, NULL},      {KEY_BACKSPACE, NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // backspace key
-      {"key_enter",       {&key_enter, NULL},          {KEY_ENTER, NULL},
+      {"key_enter",       {&key_enter, NULL},          {0, NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to select from menu or see last message
       {"key_map",         {&key_map, NULL},            {KEY_TAB, NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to toggle automap display

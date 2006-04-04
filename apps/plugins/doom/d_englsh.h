@@ -67,7 +67,7 @@
 #define ENDGAME     "are you sure you want to end the game?\n\n"PRESSYN
 #define RESTARTLEVEL "restart the level?\n\n"PRESSYN
 
-#define DOSY        "(press y to quit)"
+#define DOSY        "(press select to quit)"
 
 #define DETAILHI    "High detail"
 #define DETAILLO    "Low detail"

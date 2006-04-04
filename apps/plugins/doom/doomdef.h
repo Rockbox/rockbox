@@ -218,8 +218,8 @@ typedef enum {
 #define KEY_UPARROW        0xad
 #define KEY_DOWNARROW      0xaf
 #define KEY_ESCAPE         0x1B
-#define KEY_ENTER          0x0D
-#define KEY_TAB            0x09
+#define KEY_ENTER          0x60     // Changed due to button reconfig - 0x0D
+#define KEY_TAB            0x61     // Changed due to button reconfig - 0x09
 #define KEY_F1          (0x80+0x3b)
 #define KEY_F2          (0x80+0x3c)
 #define KEY_F3          (0x80+0x3d)

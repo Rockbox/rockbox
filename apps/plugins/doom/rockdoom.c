@@ -482,6 +482,7 @@ int translatekey(int key)
             return 'w';
          case 9:
             return KEY_ENTER;
+         case 10:
          default:
             return 0;
       }
@@ -510,6 +511,7 @@ int translatekey(int key)
             return 8;
          case KEY_ENTER:
             return 9;
+         case KEY_F9:
          default:
             return 0;
       }
@@ -547,6 +549,7 @@ int Oset_keys()
       { "Game Open", NULL },
       { "Game Strafe", NULL },
       { "Game Weapon", NULL },
+      { "Game Automap", NULL },
    };
 
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -601,8 +604,14 @@ int Oset_keys()
 
          case 7:
             key_weapon=translatekey(key_weapon);
-            rb->set_option(items[6].desc, &key_weapon, INT, doomkeys, numdoomkeys, NULL );
+            rb->set_option(items[7].desc, &key_weapon, INT, doomkeys, numdoomkeys, NULL );
             key_weapon=translatekey(key_weapon);
+            break;
+
+         case 8:
+            key_map=translatekey(key_map);
+            rb->set_option(items[8].desc, &key_map, INT, doomkeys, numdoomkeys, NULL );
+            key_map=translatekey(key_map);
             break;
 
          default:

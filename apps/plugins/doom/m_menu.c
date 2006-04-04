@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.3  2006/04/03 20:03:02  kkurbjun
+// Revision 1.4  2006/04/04 23:13:50  kkurbjun
+// Fix up configurable keys, edit exit string, more work needs to be done on menu keys
+//
+// Revision 1.3  2006-04-03 20:03:02  kkurbjun
 // Updates doom menu w/ new graphics, now requires rockdoom.wad: http://alamode.mines.edu/~kkurbjun/rockdoom.wad
 //
 // Revision 1.2  2006-04-03 00:28:13  kkurbjun
@@ -928,7 +931,7 @@ void M_DrawEpisode(void)
 
 void M_VerifyNightmare(int ch)
 {
-   if (ch != KEY_ENTER)
+   if (ch != key_menu_enter)
       return;
 
    G_DeferedInitNew(nightmare,epi+1,1);
@@ -1030,7 +1033,7 @@ void M_ChangeMessages(int choice)
 //
 void M_EndGameResponse(int ch)
 {
-   if (ch != KEY_ENTER)
+   if (ch != key_menu_enter)
       return;
 
    // killough 5/26/98: make endgame quit if recording or playing back demo
@@ -1118,7 +1121,7 @@ int     quitsounds2[8] =
 
 void M_QuitResponse(int ch)
 {
-   if (ch != KEY_ENTER)
+   if (ch != key_menu_enter)
       return;
    if (!netgame)
    {
@@ -1391,7 +1394,7 @@ boolean M_Responder (event_t* ev)
 
       if (ev->data1&1)
       {
-         ch = KEY_ENTER;
+         ch = key_menu_enter;
          joywait = I_GetTime() + 5;
       }
       if (ev->data1&2)
@@ -1435,7 +1438,7 @@ boolean M_Responder (event_t* ev)
 
          if (ev->data1&1)
          {
-            ch = KEY_ENTER;
+            ch = key_menu_enter;
             mousewait = I_GetTime() + 15;
          }
 
@@ -1501,7 +1504,7 @@ boolean M_Responder (event_t* ev)
    if (messageToPrint)
    {
       if (messageNeedsInput == true &&
-            !(ch == ' ' || ch == 'n' || ch == KEY_ENTER || ch == KEY_ESCAPE))
+            !(ch == ' ' || ch == 'n' || ch == key_menu_enter || ch == key_menu_escape))
          return false;
 
       menuactive = messageLastMenuActive;
@@ -1566,7 +1569,7 @@ boolean M_Responder (event_t* ev)
    // Pop-up menu?
    if (!menuactive)
    {
-      if (ch == KEY_ESCAPE)
+      if (ch == key_menu_escape)
       {
          M_StartControlPanel ();
          S_StartSound(NULL,sfx_swtchn);
