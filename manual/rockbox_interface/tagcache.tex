@@ -1,0 +1,49 @@
+% $Id$ %
+\section{Tag Cache\label{ref:tagcache}} 
+
+\subsection{Introduction}
+Tag Cache is Rockbox's music database system. Using the information 
+contained in the tags (ID3v1, ID3v2, Vorbis Comments, Apev2, etc.) in your 
+audio files, Rockbox builds and maintains a database of the music files on 
+your player and allows you to browse them by Artist, Album and Genre.
+
+\subsection{Using Tag Cache}
+Before you use the Tag Cache for the first time, you need to tell Rockbox to
+create the database from your music files. This typically takes around 
+5 -- 10 minutes and you can continue listening to music normally whilst 
+this is happenning. You can even shut down your player and resume the 
+database building process next time you turn it on.
+To force the initial database to be built, go to the main menu, then 
+General Settings $\rightarrow$ Playback $\rightarrow$ Force tag cache update.
+
+The Tag Cache database can either be kept on disk (to save memory), or 
+loaded into RAM (for fast browsing). This configuration option can be 
+found in General Settings $\rightarrow$ Playback $\rightarrow$ Tag cache.
+Once the database has been built, you can browse your music using this 
+database. To use the database change the show mode by changing the General Settings $\rightarrow$ File view $\rightarrow$ Show files option to 
+``ID3 database''. This disables the File Browser and instead of the file
+browser you will now access the database.
+
+\note{You may need to increase the value of the ``Max files in dir browser''
+setting (General Settings $\rightarrow$ System $\rightarrow$ Limits) 
+in order to view long lists of tracks in the ID3 database browser.}
+
+\begin{table}
+\begin{center}
+  \begin{tabularx}{.75\textwidth}{XX}
+  \toprule
+  Supported Tags   & Unsupported Tags \\ 
+  \midrule
+  Artist           & Comment \\
+  Album            & Performer\\
+  Bitrate          & \\
+  Composer         & \\
+  Genre            & \\
+  Length           & \\
+  Title            & \\
+  Track Number     & \\
+  \bottomrule
+  \end{tabularx}
+\end{center}
+\end{table}
+
