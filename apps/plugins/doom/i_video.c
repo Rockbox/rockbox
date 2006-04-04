@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.10  2006/04/04 12:00:53  dave
+ * Revision 1.11  2006/04/04 19:39:31  amiconn
+ * Doom on H1x0: Don't waste memory, the grayscale lib doesn't need that much, but properly tell the lib how much memory it may use.
+ *
+ * Revision 1.10  2006-04-04 12:00:53  dave
  * iPod: Make the hold switch bring up the in-game menu.
  *
  * Revision 1.9  2006-04-03 20:03:02  kkurbjun
@@ -72,7 +75,7 @@
 #include "../lib/gray.h"
 static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
 static unsigned char *gbuf;
-static unsigned int gbuf_size = 0;
+#define GRAYBUFSIZE (LCD_WIDTH*LCD_HEIGHT*4+200)
 #endif
 
 #if defined(CPU_COLDFIRE) 
@@ -451,8 +454,8 @@ void I_InitGraphics(void)
    /* Note: The other screens are allocated as needed */
 
 #ifndef HAVE_LCD_COLOR
-   gbuf=malloc(220000);  // give a bunch
-   gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8, 32, NULL);
+   gbuf=malloc(GRAYBUFSIZE);
+   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT/8, 32, NULL);
    /* switch on grayscale overlay */
    gray_show(true);
 #endif
