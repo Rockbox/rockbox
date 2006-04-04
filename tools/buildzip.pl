@@ -170,6 +170,8 @@ sub buildzip {
     }
     close VIEWERS;
     
+    `cp $ROOT/apps/tagnavi.config .rockbox/`;
+      
     if($notplayer) {
         `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/`; # sokoban levels
         `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/`; # snake2 levels

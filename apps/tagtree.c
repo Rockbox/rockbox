@@ -37,9 +37,15 @@
 #include "playlist.h"
 #include "keyboard.h"
 #include "gui/list.h"
+#include "buffer.h"
+#include "atoi.h"
+
+#define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
 static int tagtree_play_folder(struct tree_context* c);
-static int tagtree_search(struct tree_context* c, char* string);
+
+static const int numeric_tags[] = { tag_year, tag_length, tag_bitrate, tag_tracknumber };
+static const int string_tags[] = { tag_artist, tag_title, tag_album, tag_composer, tag_genre };
 
 static char searchstring[32];
 struct tagentry {
@@ -47,6 +53,241 @@ struct tagentry {
     int newtable;
     int extraseek;
 };
+
+#define MAX_TAGS 5
+
+struct search_instruction {
+    char name[64];
+    int tagorder[MAX_TAGS];
+    int tagorder_count;
+    struct tagcache_search_clause clause[MAX_TAGS][TAGCACHE_MAX_CLAUSES];
+    int clause_count[MAX_TAGS];
+    int result_seek[MAX_TAGS];
+};
+
+static struct search_instruction *si, *csi;
+static int si_count = 0;
+static const char *strp;
+
+static int get_token_str(char *buf, int size)
+{
+    /* Find the start. */
+    while (*strp != '"' && *strp != '\0')
+        strp++;
+
+    if (*strp == '\0' || *(++strp) == '\0')
+        return -1;
+    
+    /* Read the data. */
+    while (*strp != '"' && *strp != '\0' && --size > 0)
+        *(buf++) = *(strp++);
+    
+    *buf = '\0';
+    if (*strp != '"')
+        return -2;
+    
+    strp++;
+    
+    return 0;
+}
+
+#define MATCH(tag,str1,str2,settag) \
+    if (!strcasecmp(str1, str2)) { \
+        *tag = settag; \
+        return 1; \
+    }
+
+static int get_tag(int *tag)
+{
+    char buf[32];
+    int i;
+    
+    /* Find the start. */
+    while (*strp == ' ' && *strp != '\0')
+        strp++;
+    
+    if (*strp == '\0')
+        return 0;
+    
+    for (i = 0; i < (int)sizeof(buf)-1; i++)
+    {
+        if (*strp == '\0' || *strp == ' ')
+            break ;
+        buf[i] = *strp;
+        strp++;
+    }
+    buf[i] = '\0';
+    
+    MATCH(tag, buf, "artist", tag_artist);
+    MATCH(tag, buf, "song", tag_title);
+    MATCH(tag, buf, "album", tag_album);
+    MATCH(tag, buf, "genre", tag_genre);
+    MATCH(tag, buf, "composer", tag_composer);
+    MATCH(tag, buf, "year", tag_year);
+    MATCH(tag, buf, "length", tag_length);
+    MATCH(tag, buf, "tracknum", tag_tracknumber);
+    MATCH(tag, buf, "bitrate", tag_bitrate);
+    
+    logf("NO MATCH: %s\n", buf);
+    if (buf[0] == '?')
+        return 0;
+    
+    return -1;
+}
+
+static int get_clause(int *condition)
+{
+    char buf[4];
+    int i;
+    
+    /* Find the start. */
+    while (*strp == ' ' && *strp != '\0')
+        strp++;
+    
+    if (*strp == '\0')
+        return 0;
+    
+    for (i = 0; i < (int)sizeof(buf)-1; i++)
+    {
+        if (*strp == '\0' || *strp == ' ')
+            break ;
+        buf[i] = *strp;
+        strp++;
+    }
+    buf[i] = '\0';
+    
+    MATCH(condition, buf, "=", clause_is);
+    MATCH(condition, buf, ">", clause_gt);
+    MATCH(condition, buf, ">=", clause_gteq);
+    MATCH(condition, buf, "<", clause_lt);
+    MATCH(condition, buf, "<=", clause_lteq);
+    MATCH(condition, buf, "~", clause_contains);
+    MATCH(condition, buf, "^", clause_begins_with);
+    MATCH(condition, buf, "$", clause_ends_with);
+    
+    return 0;
+}
+
+static bool add_clause(struct search_instruction *inst,
+                       int tag, int type, const char *str)
+{
+    int len = strlen(str);
+    struct tagcache_search_clause *clause;
+    
+    if (inst->clause_count[inst->tagorder_count] >= TAGCACHE_MAX_CLAUSES)
+    {
+        logf("Too many clauses");
+        return false;
+    }
+    
+    clause = &inst->clause[inst->tagorder_count]
+        [inst->clause_count[inst->tagorder_count]];
+    if (len >= (int)sizeof(clause->str) - 1)
+    {
+        logf("Too long str in condition");
+        return false;
+    }
+    
+    clause->tag = tag;
+    clause->type = type;
+    if (len == 0)
+        clause->input = true;
+    else
+        clause->input = false;
+    
+    if (tagcache_is_numeric_tag(tag))
+    {
+        clause->numeric = true;
+        clause->numeric_data = atoi(str);
+    }
+    else
+    {
+        clause->numeric = false;
+        strcpy(clause->str, str);
+    }
+    
+    inst->clause_count[inst->tagorder_count]++;
+    
+    return true;
+}
+
+static int get_condition(struct search_instruction *inst)
+{
+    int tag;
+    int condition;
+    char buf[32];
+    
+    switch (*strp)
+    {
+        case '?':
+        case ' ':
+        case '&':
+            strp++;
+            return 1;
+        case ':':
+            strp++;
+        case '\0':
+            return 0;
+    }
+
+    if (get_tag(&tag) <= 0)
+        return -1;
+    
+    if (get_clause(&condition) <= 0)
+        return -2;
+    
+    if (get_token_str(buf, sizeof buf) < 0)
+        return -3;
+    
+    logf("got clause: %d/%d [%s]", tag, condition, buf);
+    add_clause(inst, tag, condition, buf);
+    
+    return 1;
+}
+
+/* example search:
+ * "Best" artist ? year >= "2000" & title !^ "crap" & genre = "good genre" \
+ *      : album  ? year >= "2000" : songs
+ * ^  begins with
+ * *  contains
+ * $  ends with
+ */
+
+static bool parse_search(struct search_instruction *inst, const char *str)
+{
+    int ret;
+    
+    memset(inst, 0, sizeof(struct search_instruction));
+    strp = str;
+    
+    if (get_token_str(inst->name, sizeof inst->name) < 0)
+    {
+        logf("No name found.");
+        return false;
+    }
+    
+    while (inst->tagorder_count < MAX_TAGS)
+    {
+        ret = get_tag(&inst->tagorder[inst->tagorder_count]);
+        if (ret < 0) 
+        {
+            logf("Parse error #1");
+            return false;
+        }
+        
+        if (ret == 0)
+            break ;
+        
+        logf("tag: %d", inst->tagorder[inst->tagorder_count]);
+        
+        while (get_condition(inst) > 0) ;
+
+        inst->tagorder_count++;
+    }
+    
+    return true;
+}
+
 
 static struct tagcache_search tcs;
 
@@ -58,6 +299,64 @@ static int compare(const void *p1, const void *p2)
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
+void tagtree_init(void)
+{
+    int fd;
+    char buf[256];
+    int pos = 0;
+    
+    si_count = 0;
+    
+    fd = open(FILE_SEARCH_INSTRUCTIONS, O_RDONLY);
+    if (fd < 0)
+    {
+        logf("Search instruction file not found.");
+        return ;
+    }
+    
+    si = (struct search_instruction *)(((long)audiobuf & ~0x03) + 0x04);
+    
+    while ( 1 )
+    {
+        char *p;
+        char *next = NULL;
+        int rc;
+        
+        rc = read(fd, &buf[pos], sizeof(buf)-pos-1);
+        if (rc >= 0)
+            buf[pos+rc] = '\0';
+        
+        if ( (p = strchr(buf, '\r')) != NULL)
+        {
+            *p = '\0';
+            next = ++p;
+        }
+        else
+            p = buf;
+        
+        if ( (p = strchr(p, '\n')) != NULL)
+        {
+            *p = '\0';
+            next = ++p;
+        }
+        
+        if (!parse_search(si + si_count, buf))
+            break;
+        si_count++;
+        
+        if (next)
+        {
+            pos = sizeof(buf) - ((long)next - (long)buf) - 1;
+            memmove(buf, next, pos);
+        }
+        else
+            break ;
+    }
+    close(fd);
+    
+    audiobuf += sizeof(struct search_instruction) * si_count + 4;
+}
+
 int tagtree_load(struct tree_context* c)
 {
     int i;
@@ -67,8 +366,7 @@ int tagtree_load(struct tree_context* c)
 
     int table = c->currtable;
     int extra = c->currextra;
-    int extra2 = c->currextra2;
-
+    
     c->dentry_size = sizeof(struct tagentry);
 
     if (!table)
@@ -83,107 +381,34 @@ int tagtree_load(struct tree_context* c)
 
     switch (table) {
         case root: {
-            static const int tables[] = {allartists, allalbums, allgenres, allsongs,
-                                         search };
-            unsigned char* labels[] = { str(LANG_ID3DB_ARTISTS),
-                                        str(LANG_ID3DB_ALBUMS),
-                                        str(LANG_ID3DB_GENRES),
-                                        str(LANG_ID3DB_SONGS),
-                                        str(LANG_ID3DB_SEARCH)};
-
-            for (i = 0; i < 5; i++) {
-                dptr->name = &c->name_buffer[namebufused];
-                dptr->newtable = tables[i];
-                strcpy(dptr->name, (char *)labels[i]);
-                namebufused += strlen(dptr->name) + 1;
+            for (i = 0; i < si_count; i++)
+            {
+                dptr->name = (si+i)->name;
+                dptr->newtable = navibrowse;
+                dptr->extraseek = i;
                 dptr++;
             }
             c->dirlength = c->filesindir = i;
-            return i;
-        }
-
-        case search: {
-            static const int tables[] = {searchartists,
-                                         searchalbums,
-                                         searchsongs};
-            unsigned char* labels[] = { str(LANG_ID3DB_SEARCH_ARTISTS),
-                                        str(LANG_ID3DB_SEARCH_ALBUMS),
-                                        str(LANG_ID3DB_SEARCH_SONGS)};
             
-            for (i = 0; i < 3; i++) {
-                dptr->name = &c->name_buffer[namebufused];
-                dptr->newtable = tables[i];
-                strcpy(dptr->name, (char *)labels[i]);
-                namebufused += strlen(dptr->name) + 1;
-                dptr++;
-            }
-            c->dirlength = c->filesindir = i;
-            return i;
+            return c->dirlength;
         }
 
-        case searchartists:
-        case searchalbums:
-        case searchsongs:
-            i = tagtree_search(c, searchstring);
-            c->dirlength = c->filesindir = i;
-            if (c->dirfull) {
-                gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
-                c->dirfull = false;
+        case navibrowse:
+            logf("navibrowse...");
+            tagcache_search(&tcs, csi->tagorder[extra]);
+            for (i = 0; i < extra; i++)
+            {
+                tagcache_search_add_filter(&tcs, csi->tagorder[i], csi->result_seek[i]);
+                sort = true;
             }
-            else
-                gui_syncsplash(HZ, true, str(LANG_ID3DB_MATCHES), i);
-            return i;
-
-        case allsongs:
-            logf("songs..");
-            tagcache_search(&tcs, tag_title);
+        
+            for (i = 0; i < csi->clause_count[extra]; i++)
+            {
+                tagcache_search_add_clause(&tcs, &csi->clause[extra][i]);
+                sort = true;
+            }
             break;
-
-        case allgenres:
-            logf("genres..");
-            tagcache_search(&tcs, tag_genre);
-            break;
-
-        case allalbums:
-            logf("albums..");
-            tagcache_search(&tcs, tag_album);
-            break;
-
-        case allartists:
-            logf("artists..");
-            tagcache_search(&tcs, tag_artist);
-            break;
-
-        case artist4genres:
-            logf("artist4genres..");
-            tagcache_search(&tcs, tag_artist);
-            tagcache_search_add_filter(&tcs, tag_genre, extra);
-            sort = true;
-            break;
-    
-        case albums4artist:
-            logf("albums4artist..");
-            tagcache_search(&tcs, tag_album);
-            tagcache_search_add_filter(&tcs, tag_artist, extra);
-            sort = true;
-            break;
-
-        case songs4album:
-            logf("songs4album..");
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_album, extra);
-            sort = true;
-            if (extra2 > 0)
-                tagcache_search_add_filter(&tcs, tag_artist, extra2);
-            break;
-
-        case songs4artist:
-            logf("songs4artist..");
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_artist, extra);
-            sort = true;
-            break;
-
+        
         case chunked_next:
             logf("chunked next...");
             break;
@@ -199,10 +424,10 @@ int tagtree_load(struct tree_context* c)
     while (tagcache_get_next(&tcs))
     {
         dptr->newtable = tcs.result_seek;
-        if (!tcs.ramsearch || table == songs4album)
+        if (!tcs.ramsearch || csi->tagorder[extra] == tag_title)
         {
             dptr->name = &c->name_buffer[namebufused];
-            if (table == songs4album)
+            if (csi->tagorder[extra] == tag_title)
             {
                 snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
                          tagcache_get_numeric(&tcs, tag_tracknumber), 
@@ -264,54 +489,6 @@ int tagtree_load(struct tree_context* c)
     return i;
 }
 
-static int tagtree_search(struct tree_context* c, char* string)
-{
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
-    int hits = 0;
-    int namebufused = 0;
-
-    switch (c->currtable) {
-        case searchartists:
-            tagcache_search(&tcs, tag_artist);
-            break;
-
-        case searchalbums:
-            tagcache_search(&tcs, tag_album);
-            break;
-
-        case searchsongs:
-            tagcache_search(&tcs, tag_title);
-            break;
-
-        default:
-            logf("Invalid table %d\n", c->currtable);
-            return 0;
-    }
-
-    while (tagcache_get_next(&tcs))
-    {
-        if (!strcasestr(tcs.result, string))
-            continue ;
-
-        if (!tcs.ramsearch)
-        {
-            dptr->name = &c->name_buffer[namebufused];
-            namebufused += tcs.result_len;
-            strcpy(dptr->name, tcs.result);
-        }
-        else
-            dptr->name = tcs.result;
-        
-        dptr->newtable = tcs.result_seek;
-        dptr++;
-        hits++;
-    }
-
-    tagcache_search_finish(&tcs);
-
-    return hits;
-}
-
 int tagtree_enter(struct tree_context* c)
 {
     int rc = 0;
@@ -343,53 +520,55 @@ int tagtree_enter(struct tree_context* c)
         case root:
             c->currtable = newextra;
             c->currextra = newextra;
+            if (newextra == navibrowse)
+            {
+                int i, j;
+                
+                csi = si+dptr->extraseek;
+                c->currextra = 0;
+                
+                /* Read input as necessary. */
+                for (i = 0; i < csi->tagorder_count; i++)
+                {
+                    for (j = 0; j < csi->clause_count[i]; j++)
+                    {
+                        if (!csi->clause[i][j].input)
+                            continue;
+                        
+                        rc = kbd_input(searchstring, sizeof(searchstring));
+                        if (rc == -1 || !searchstring[0])
+                        {
+                            c->dirlevel--;
+                            break;
+                        }
+                        
+                        if (csi->clause[i][j].numeric)
+                            csi->clause[i][j].numeric_data = atoi(searchstring);
+                        else
+                            strncpy(csi->clause[i][j].str, searchstring,
+                                    sizeof(csi->clause[i][j].str)-1);
+                    }
+                }
+                
+            }
             break;
 
-        case allartists:
-        case searchartists:
-            c->currtable = albums4artist;
-            c->currextra = newextra;
-            break;
-
-        case allgenres:
-            c->currtable = artist4genres;
-            c->currextra = newextra;
+        case navibrowse:
+            csi->result_seek[c->currextra] = newextra;
+            if (c->currextra < csi->tagorder_count-1)
+            {
+                c->currextra++;
+                break;
+            }
+        
+            c->dirlevel--;
+            if (csi->tagorder[c->currextra] == tag_title)
+            {
+                if (tagtree_play_folder(c) >= 0)
+                    rc = 2;
+            }
             break;
         
-        case artist4genres:
-            c->currtable = albums4artist;
-            c->currextra = newextra;
-            break;
-            
-        case allalbums:
-            c->currtable = songs4album;
-            c->currextra = newextra;
-            c->currextra2 = -1;
-            break;
-        case albums4artist:
-        case searchalbums:
-            c->currtable = songs4album;
-            c->currextra2 = c->currextra;
-            c->currextra = newextra;
-            break;
-
-        case allsongs:
-        case songs4album:
-        case songs4artist:
-        case searchsongs:
-            c->dirlevel--;
-            if (tagtree_play_folder(c) >= 0)
-                rc = 2;
-            break;
-
-        case search:
-            rc = kbd_input(searchstring, sizeof(searchstring));
-            if (rc == -1 || !searchstring[0])
-                c->dirlevel--;
-            else
-                c->currtable = newextra;
-            break;
-
         default:
             c->dirlevel--;
             break;
@@ -545,11 +724,11 @@ int   tagtree_get_icon(struct tree_context* c)
 
     switch (c->currtable)
     {
-        case allsongs:
-        case songs4album:
-        case songs4artist:
-        case searchsongs:
-            icon = Icon_Audio;
+        case navibrowse:
+            if (csi->tagorder[c->currextra] == tag_title)
+                icon = Icon_Audio;
+            else
+                icon = Icon_Folder;
             break;
 
         default:

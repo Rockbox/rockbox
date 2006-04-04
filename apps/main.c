@@ -61,6 +61,7 @@
 #include "database.h"
 #include "dircache.h"
 #include "tagcache.h"
+#include "tagtree.h"
 #include "lang.h"
 #include "string.h"
 #include "splash.h"
@@ -152,6 +153,7 @@ void init_tagcache(void)
 #endif
     
     tagcache_init();
+    tagtree_init();
 
 #ifdef HAVE_LCD_BITMAP
     /* Clean the text when we are done. */

@@ -50,6 +50,7 @@ struct tagcache_search_clause
     int tag;
     int type;
     bool numeric;
+    bool input;
     long numeric_data;
     char str[32];
 };

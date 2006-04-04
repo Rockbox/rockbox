@@ -767,10 +767,9 @@ static bool dirbrowse(void)
                     {
                         switch (tc.currtable)
                         {
-                            case allsongs:
-                            case songs4album:
-                            case songs4artist:
-                            case searchsongs:
+                            case navibrowse:
+                                if (tc.currextra != tag_title)
+                                    break;
                                 attr=TREE_ATTR_MPA;
                                 tagtree_get_filename(&tc, buf, sizeof(buf));
                                 break;

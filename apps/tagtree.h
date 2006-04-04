@@ -22,11 +22,11 @@
 #include "tagcache.h"
 #include "tree.h"
 
-enum table { invalid, root, allsongs, allalbums, allartists, allgenres,
-             albums4artist, songs4album, songs4artist, artist4genres,
-             search, searchartists, searchalbums, searchsongs,
-             chunked_next };
+enum table { 
+    invalid, root, navibrowse,
+    chunked_next };
 
+void tagtree_init(void);
 int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);
