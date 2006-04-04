@@ -1059,7 +1059,7 @@ static int col_limit(int col)
 }
 
 
-bool exit=false;
+bool done=false;
 int col = 0;
 
 static void show_menu(void)
@@ -1077,7 +1077,7 @@ static void show_menu(void)
 		{
 			case 0:
 				viewer_exit(NULL);
-				exit = true;
+				done = true;
 			   	break;
 			case 1:
 				playback_control(rb);
@@ -1114,7 +1114,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     viewer_draw(col);
 
-	while (!exit) {
+	while (!done) {
         button = rb->button_get(true);
         switch (button) {
             case VIEWER_MENU:
