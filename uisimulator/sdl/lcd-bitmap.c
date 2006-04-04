@@ -41,7 +41,7 @@ static unsigned long get_lcd_pixel(int x, int y)
     return ((lcd_framebuffer[y/8][x] >> (y & 7)) & 1);
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    return ((lcd_framebuffer[y][x/4] >> (2 * (x & 3))) & 3);
+    return ((lcd_framebuffer[y][x/4] >> (2 * (~x & 3))) & 3);
 #else
     return ((lcd_framebuffer[y/4][x] >> (2 * (y & 3))) & 3);
 #endif
