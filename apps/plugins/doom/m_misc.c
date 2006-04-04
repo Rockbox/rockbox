@@ -351,7 +351,7 @@ default_t defaults[] =
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to turn right
       {"key_left",        {&key_left, NULL},           {KEY_LEFTARROW, NULL} ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to turn left
-      {"key_up",          {&key_up, NULL},             {KEY_RCTRL, NULL}   ,
+      {"key_up",          {&key_up, NULL},             {KEY_UPARROW, NULL}   ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move forward
       {"key_down",        {&key_down, NULL},           {KEY_DOWNARROW, NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to move backward
@@ -375,11 +375,11 @@ default_t defaults[] =
       {"key_straferight", {&key_straferight, NULL},    {'.', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to strafe right
 
-      {"key_fire",        {&key_fire, NULL},           {' ', NULL}     ,
+      {"key_fire",        {&key_fire, NULL},           {KEY_RCTRL, NULL}     ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // duh
-      {"key_use",         {&key_use, NULL},            {KEY_DOWNARROW, NULL},
+      {"key_use",         {&key_use, NULL},            {' ', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to open a door, use a switch
-      {"key_strafe",      {&key_strafe, NULL},         {'w', NULL}      ,
+      {"key_strafe",      {&key_strafe, NULL},         {'s', NULL}      ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to use with arrows to strafe
       {"key_speed",       {&key_speed, NULL},          {KEY_RSHIFT, NULL}    ,
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to run
@@ -459,7 +459,7 @@ default_t defaults[] =
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to chat with player 3
       {"key_chatplayer4", {&destination_keys[3], NULL}, {'r', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to chat with player 4
-      {"key_weapon",{&key_weapon, NULL},    {KEY_UPARROW, NULL},
+      {"key_weapon",{&key_weapon, NULL},    {'w', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to toggle between two most preferred weapons with ammo
       {"key_weapontoggle",{&key_weapontoggle, NULL},    {'0', NULL},
        0,MAX_KEY,def_key,ss_keys, 0, 0}, // key to toggle between two most preferred weapons with ammo
