@@ -75,21 +75,22 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     title=(unsigned char *)qs->right_option->title;
     snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
     display->getstringsize(line_text, &w, NULL);
-    if(w > LCD_WIDTH-8)
+    if(w > display->width - 8)
     {
         display->puts_scroll(2, 2+!statusbar, line_text);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1, 24, 7, 8);
     }
     else
     {
-        display->putsxy(LCD_WIDTH-w-12, 24, line_text);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], LCD_WIDTH-8, 24, 7, 8);
+        display->putsxy(display->width - w - 12, 24, line_text);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+                        display->width - 8, 24, 7, 8);
     }
     display->getstringsize(option, &w, NULL);
-    if(w > LCD_WIDTH)
+    if(w > display->width)
         display->puts_scroll(0, 3+!statusbar, option);
     else
-        display->putsxy(LCD_WIDTH-w-12, 32, option);
+        display->putsxy(display->width -w-12, 32, option);
 
     /* Displays the third line of text */
     option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
@@ -97,17 +98,17 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     title=(unsigned char *)qs->bottom_option->title;
 
     display->getstringsize(title, &w, NULL);
-    if(w > LCD_WIDTH)
+    if(w > display->width)
         display->puts_scroll(0, 4+!statusbar, line_text);
     else
-        display->putsxy(LCD_WIDTH/2-w/2, 40, title);
+        display->putsxy(display->width/2-w/2, 40, title);
 
     display->getstringsize(option, &w, NULL);
-    if(w > LCD_WIDTH)
+    if(w > display->width)
         display->puts_scroll(0, 5+!statusbar, option);
     else
-        display->putsxy(LCD_WIDTH/2-w/2, 48, option);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], LCD_WIDTH/2-4, 56, 7, 8);
+        display->putsxy(display->width/2-w/2, 48, option);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], display->width/2-4, 56, 7, 8);
 
     gui_textarea_update(display);
     display->setfont(FONT_UI);
