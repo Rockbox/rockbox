@@ -1046,6 +1046,9 @@ void shutdown_hw(void)
 #elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
     wmcodec_close();
 #endif
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+    backlight_set_fade_out(0);
+#endif
     backlight_off();
 #if defined(IPOD_ARCH) && defined(HAVE_LCD_COLOR)
     /* Clear the screen and backdrop to
