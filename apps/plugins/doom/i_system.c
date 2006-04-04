@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.6  2006/04/03 17:32:46  dave
+// Revision 1.7  2006/04/04 11:16:44  dave
+// Correct the #ifdef logic for timer_unregister() and add a comment describing why we need to surround the use of the user timer with #ifdefs
+//
+// Revision 1.6  2006-04-03 17:32:46  dave
 // Clean up the (incorrect) #ifdef spaghetti for the timer.  We now have a user timer on the ipods, so we use it.
 //
 // Revision 1.5  2006-04-03 17:11:42  kkurbjun
@@ -59,6 +62,14 @@
 // I_GetTime
 // returns time in 1/35th second tics
 //
+
+/* NOTE: 
+
+   The user timer is used to generate a 35Hz tick for Doom.  But it
+   is unavailable for the grayscale targets (it's used by the grayscale
+   lib) and is not implemented in the simulator - so we have to
+   approximate it using current_tick.
+*/
 #if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
 volatile unsigned int doomtimer=0;
 
@@ -106,7 +117,7 @@ void I_Quit (void)
    I_ShutdownSound();
    I_ShutdownMusic();
    I_ShutdownGraphics();
-#if (CONFIG_CPU != PP5020) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
    rb->timer_unregister();
 #endif
    doomexit=1;
