@@ -15,17 +15,18 @@ settings may therefore not be saved unless the \dap\ is shut down safely
 
 \section{Navigating the Main Menu}
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
-  \begin{center}
-    \begin{tabularx}{\textwidth}{lX}\toprule
-      \textbf{Key} & \textbf{Action} \\\midrule
+  \begin{table}
+    \begin{btnmap}{}{}
       \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
       \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp} 
-      & Moves up in the menu. Inside a setting, increases the value or 
+      & Moves up in the menu.\\
+      & Inside a setting, increases the value or
         chooses next option \\
       %
       \opt{IPOD_4G_PAD}{\ButtonScrollBack}
       \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} 
-      & Moves down in the menu. Inside a setting, decreases the value or 
+      & Moves down in the menu.\\
+      & Inside a setting, decreases the value or
         chooses previous option \\
       %
       \opt{RECORDER_PAD}{\ButtonPlay/\ButtonRight}
@@ -36,27 +37,24 @@ settings may therefore not be saved unless the \dap\ is shut down safely
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff/\ButtonLeft}
       \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft} 
       & Exits menu, setting or moves to parent menu\\
-      \bottomrule
-    \end{tabularx}
-  \end{center}
+    \end{btnmap}
+  \end{table}
 }
 \opt{PLAYER_PAD}{
-  \begin{center}
-    \begin{tabularx}{\textwidth}{lX}\toprule
-      \textbf{Key} & \textbf{Action} \\\midrule
+  \begin{table}
+    \begin{btnmap}{}{}
       %
-      \ButtonLeft  & Selects previous option in the menu. Inside an setting, 
-                     decreases the value or chooses previous option \\
+      \ButtonLeft  & Selects previous option in the menu.\\
+                   & Inside an setting, decreases the value or chooses previous option \\
       %
-      \ButtonRight & Selects next option in the menu. Inside an setting 
-                     increases the value or chooses next option \\
+      \ButtonRight & Selects next option in the menu.\\
+                   & Inside an setting increases the value or chooses next option \\
       %
       \ButtonPlay  & Selects item \\
       %
-      \ButtonStop  & Exit menu, setting or moves to parent menu. \\
-      \bottomrule
-    \end{tabularx}
-  \end{center}
+      \ButtonStop  & Exit menu, setting or moves to parent menu.\\
+    \end{btnmap}
+  \end{table}
 }
 
 \section {Recent Bookmarks}
@@ -64,9 +62,9 @@ settings may therefore not be saved unless the \dap\ is shut down safely
   {The list bookmarks screen}{}
 If the ``save a list of recently created bookmarks'' option is enabled 
 then you can view a list of several recent bookmarks here and select one to 
-jump straight to that track.  This option is off by default. See page 
-\pageref{ref:Bookmarkconfigactual} for more details on configuring bookmarking
-in Rockbox.
+jump straight to that track. See page \pageref{ref:Bookmarkconfigactual} 
+for more details on configuring bookmarking in Rockbox.
+\note{This option is off by default.}
 
 \section{Sound Settings}
 The Sound Settings menu offers a selection of sound properties you may 
@@ -85,37 +83,41 @@ browse the hard drive for alternate firmwares, and finally to reset your
 \fixme{TODO: check and enhance the above text}
 
 \section{Browse Themes}
-Within Rockbox it is possible to load a ``Theme'' - a collection of configuration 
-settings coupled with a WPS (While Playing Screen).  This sets not only the WPS 
-file, but also other relevant options such as the correct font to use.
+Within Rockbox it is possible to load a ``Theme'' -- a collection of 
+configuration settings coupled with a WPS (While Playing Screen).  
+This sets not only the WPS file, but also other relevant options such as 
+the correct font or forground/background colours to use.
 
 Selecting this option will list all of the currently installed Themes on the 
 \dap\, \ButtonRight\ will load the chosen theme and apply it.
 \fixme{TODO: check and enhance the above text}
       
 \opt{CONFIG_TUNER}{
-  \section{\label{ref:FMradio}FM Radio \opt{ondio}{ - OndioFM Only}}  
-  \screenshot{main_menu/images/ss-fm-radio-screen}%
-    {The FM radio screen}{}
+  \section{\label{ref:FMradio}FM Radio \opt{ondio}{(OndioFM Only)}}  
+  \opt{x5}{\note{Not Implemented on X5 yet}}
+
+  \screenshot{main_menu/images/ss-fm-radio-screen}{The FM radio screen}{}
   
-  \opt{recorderv2fm,ondio}{
-    This menu option switches to the radio screen.
-    
+  This menu option switches to the radio screen.
+  \opt{h1xx,h300,x5}{
+  The FM radio has the ability \opt{HAVE_RECORDING}{to record and } to
+  remember station frequency settings (presets).
+  \note{This option is not \emph{currently} enabled on the X5} }
+
+  \opt{recorderv2fm,ondio}{   
     The keys are:
-    \begin{table}[h!]
-      \begin{center}
-        \begin{tabularx}{\textwidth}{lX}\toprule
-          \textbf{Button}   & \textbf{Function} \\\midrule
+    \begin{table}
+      \begin{btnmap}{}{}
           \ButtonLeft, \ButtonRight 
           & Change frequency in 0.1 MHz steps.\\
-          & For automatic station seek, hold \ButtonLeft/\ButtonRight\ 
+          & For automatic station seek, hold \ButtonLeft/\ButtonRight\ %
             for a little longer. \\
           %
           \ButtonUp, \ButtonDown    
           & Change volume \\
           %
           \opt{RECORDER_PAD}{
-            \ButtonPlay      & \textbf{(EXPERIMENTAL)}\\
+            \ButtonPlay      & \emph{(EXPERIMENTAL)}\\
             & freezes all screen updates.May enhance radio reception
               in some cases.\\
             %
@@ -123,20 +125,16 @@ Selecting this option will list all of the currently installed Themes on the
           \opt{RECORDER_PAD}{\ButtonOn}\opt{ONDIO_PAD}{FixMe}
           & Leave the radio screen with the radio playing \\
           %
-          \ButtonOff         & Back to main menu \\\bottomrule
-        \end{tabularx}
-      \end{center}
+          \ButtonOff         & Back to Main Menu.\\
+       \end{btnmap}
     \end{table}
   }
   
   \opt{h1xx,h300,x5}{
-    This menu option switches to the radio screen.
     
     The keys are:
-    \begin{table}[h!]
-      \begin{center}
-        \begin{tabularx}{\textwidth}{lX}\toprule
-          \textbf{Button} & \textbf{Function} \\\midrule
+    \begin{table}
+      \begin{btnmap}{}{}
           \ButtonLeft, \ButtonRight & Change frequency in 0.1 MHz steps. \\
           Hold \ButtonLeft, \ButtonRight 
                              & Seeks to next station or preset\\
@@ -145,11 +143,11 @@ Selecting this option will list all of the currently installed Themes on the
                              & Change volume \\
           %
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-          \opt{IAUDIO_X5_PAD}{FixMe}
+          \opt{IAUDIO_X5_PAD}{\fixme{TBD}}
                              & Mutes radio playback \\
           %
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOn}
-          \opt{IAUDIO_X5_PAD}{FixMe}
+          \opt{IAUDIO_X5_PAD}{\fixme{TBD}}
           & Switches between SCAN and PRESET mode.\\
           %
           \ButtonSelect      & Opens a list of radio presets. You can view 
@@ -158,22 +156,18 @@ Selecting this option will list all of the currently installed Themes on the
           Hold \ButtonSelect & Displays the FM radio settings menu.\\
           %
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-          \opt{IAUDIO_X5_PAD}{FixMe}
+          \opt{IAUDIO_X5_PAD}{\fixme{TBD}}
           %
                              & Keeps radio playing and returns to the main
                                menu. You can then press OFF/STOP to browse 
                                the file tree while listening to the radio\\
           %
           \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-          \opt{IAUDIO_X5_PAD}{FixMe}
-                             & Stops the radio and returns to main menu \\\bottomrule
-        \end{tabularx}
-      \end{center}
+          \opt{IAUDIO_X5_PAD}{\fixme{TBD}}
+                             & Stops the radio and returns to Main Menu.\\
+       \end{btnmap}
     \end{table}
   }
-  
-The FM radio has the ability \opt{HAVE_RECORDING}{to record and } to
-remember station frequency settings (presets).
   
   \begin{description}
     
@@ -188,15 +182,15 @@ remember station frequency settings (presets).
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{``Add preset''}
     Enter the name (maximum number of characters is 32). 
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Press \ButtonOn\ to save.}
-    \opt{IAUDIO_X5_PAD}{Press FixMe to save.}
+    \opt{IAUDIO_X5_PAD}{Press \fixme{TBD} to save.}
     
   \item[Selecting a preset:]
     \opt{ONDIO_PAD,RECORDER_PAD}
        {         
-         Press \opt{RECORDER_PAD}{\ButtonFTwo}\opt{ONDIO_PAD}{(FixMe)} 
+         Press \opt{RECORDER_PAD}{\ButtonFTwo}\opt{ONDIO_PAD}{\fixme{FixMe}}
          to go to the preset list. Use \ButtonUp\ and \ButtonDown\ to 
          move the cursor and then press 
-         \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{(Insert Correct Key)} 
+         \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\fixme{FixMe}}
          to select. Use \ButtonLeft\ to leave the preset without selecting
          anything.
        }
@@ -210,7 +204,7 @@ remember station frequency settings (presets).
             
   \item[Removing a preset:]
      \opt{ONDIO_PAD,RECORDER_PAD}{
-        Press \opt{RECORDER_PAD}{\ButtonFOne}\opt{ONDIO_PAD}{(Insert Correct Key)}
+        Press \opt{RECORDER_PAD}{\ButtonFOne}\opt{ONDIO_PAD}{\fixme{FixMe}}
         to go to the menu, then select ``Remove preset''.
       }
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
@@ -233,32 +227,31 @@ remember station frequency settings (presets).
 }
 
 \opt{HAVE_RECORDING}{
+
   \section{\label{ref:Recording}Recording}
+  \opt{x5}{\note{Not Implemented on X5 yet}}
   \subsection{\label{ref:Whilerecordingscreen}While Recording Screen}
-  \screenshot{main_menu/images/ss-while-recording-screen}%
-    {The while recording screen}{}
+  \screenshot{main_menu/images/ss-while-recording-screen}{The while recording screen}{}
   Entering the ``Recording'' option in the Main menu launches the recording 
-application. The screen shows the time elapsed and the size of the file being 
-recorded. A peak meter is present to allow you set Gain correctly. 
-\opt{MASCODEC}{The frequency, channels and quality} 
-\opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
+    application. The screen shows the time elapsed and the size of the file being 
+    recorded. A peak meter is present to allow you set Gain correctly.
+  \opt{MASCODEC}{The frequency, channels and quality}
+  \opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
   
   The controls for this screen are:
   
-  \begin{table}[htb!]
-    \begin{center}
-      \begin{tabularx}{\textwidth}{lX}\toprule
-        \textbf{Button} & \textbf{Function} \\\midrule
+    \begin{table}
+      \begin{btnmap}{}{}
         \ButtonLeft & Decreases Gain \\
         %
         \ButtonRight & Increases Gain \\
         %
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-        \opt{ONDIO_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{FixMe} & Starts recording.  \\
+        \opt{ONDIO_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{FixMe}} & Starts recording.  \\
         & While recording: button closes the current file and opens a new one.\\
         %
         \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff} 
-        \opt{ONDIO_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{FixMe} & Exits Recording Screen.\\
+        \opt{ONDIO_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{FixMe}} & Exits Recording Screen.\\
         & While recording: Stop recording \\
         %
         \opt{RECORDER_PAD}{\ButtonFOne}
@@ -281,14 +274,12 @@ recorded. A peak meter is present to allow you set Gain correctly.
           & Quick/hold works as for {\ButtonFTwo}. \\
           & While recording: Start a new recording file \\
         }
-        \bottomrule
-      \end{tabularx}
-    \end{center}
+      \end{btnmap}
   \end{table}
   
   \subsection{\label{ref:Recordingsettings}Recording Settings}
-  \screenshot{main_menu/images/ss-recording-settings}%
-    {The recording settings screen}{}
+  \screenshot{main_menu/images/ss-recording-settings}{The recording settings screen}{}
+  
   \opt{MASCODEC}{
     \begin{description}
     \item[Quality:]
@@ -305,8 +296,8 @@ recorded. A peak meter is present to allow you set Gain correctly.
     
     \begin{table}[h!]
       \begin{center}
-        \begin{tabularx}{\textwidth}{lX}\toprule
-          \textbf{Frequency} & \textbf{Bitrate}  (Kbit/s) {}- quality 0$\rightarrow$7 \\\midrule
+        \begin{tabularx}{0.75\textwidth}{lX}\toprule
+          \emph{Frequency} & \emph{Bitrate} (Kbit/s) -- quality 0$\rightarrow$7 \\\midrule
           44100Hz stereo        & 75, 80, 90, 100, 120, 140, 160, 170 \\
           22050Hz stereo        & 39, 41, 45, 50,  60,  80,  110, 130 \\
           44100Hz mono          & 65, 68, 73, 80,  90,  105, 125, 140 \\
@@ -315,25 +306,28 @@ recorded. A peak meter is present to allow you set Gain correctly.
       \end{center}
     \end{table}
   }
+  
   \begin{description}
   \item[Frequency:]
-    Choose the recording frequency (sample rate) -- 48kHz, 44.1kHz, 32kHz 
-    (MPEG version 1), and 24kHz, 22.05kHz, 16kHz (MPEG version 2) are available.
-    Higher sample rates use up more disk space, but give better sound quality. 
+    Choose the recording frequency (sample rate) -- 48kHz, 44.1kHz, 32kHz and
+    24kHz, 22.05kHz, 16kHz are available. Higher sample rates use up more disk
+    space, but give better sound quality.
     This setting determines which frequency range can accurately be reproduced
-    during playback. Lower frequencies produce smaller files, for two reasons.
-    The amount of data to be compressed is smaller and the data is easier to
-    compress, since higher frequencies are not present. 
-    \opt{MASCODEC}{The frequency setting also determines which version 
-      of the MPEG standard sound is recorded using.}
+    during playback, Lower frequencies produce smaller files.
+    \opt{MASCODEC}{
+     The frequency setting also determines which version of the MPEG standard 
+     the sound is recorded using:\\
+     MPEG v1 for 48, 44.1 and 32\\
+     MPEG v2 for 24, 22.05 and 16\\
+    }
     
   \item[Source:]
-    Choose the source of the recording. This can be microphone, line in, 
-    \fixme{or SPDIF (digital). -- show this only when device has digital in!} 
-    \opt{CONFIG_TUNER}{For recording from the radio see page 
-       \pageref{ref:FMradio}.}
+    Choose the source of the recording. This can be 
+    \opt{recorder,recorderv2fm,h1xx}{SPDIF (digital),} microphone or line in.
+    \opt{CONFIG_TUNER}{For recording from the radio see page \pageref{ref:FMradio}.}
     
-    \note{You cannot change the sample rate for digital recordings.}
+    \opt{recorder,recorderv2fm,h100}
+        {\note{You cannot change the sample rate for digital recordings.}}
     
   \item[Channels:]
     This allows you to select mono or stereo recording. Please note that 
@@ -341,7 +335,7 @@ recorded. A peak meter is present to allow you set Gain correctly.
     are usually somewhat smaller than stereo.
     
   \item[Independent Frames:]
-    The independent frames option tells the \dap to encode with the bit
+    The independent frames option tells the \dap\ to encode with the bit
     reservoir disabled, so the frames are independent of each other. This
     makes a file easier to edit.
     
@@ -352,7 +346,7 @@ recorded. A peak meter is present to allow you set Gain correctly.
     \newline
     The splits are seamless (frame accurate), no audio is lost at the split 
     point. The break between recordings is only the time required to stop
-    and restart the recording, on the order of 2-4 seconds.
+    and restart the recording, on the order of 2 -- 4 seconds.
     \newline
     Options (hours:minutes between splits): off, 24:00, 18:00, 12:00, 10:00, 
     8:00, 6:00, 4:00, 2:00, 1:20 (80 minute CD), 1:14 (74 minute  CD), 1:00, 
@@ -363,7 +357,7 @@ recorded. A peak meter is present to allow you set Gain correctly.
     is pressed, the recording will begin from that number of seconds earlier.
     This is useful for ensuring that a recording begins before a cue that is
     being waited for.\\
-    Options: Off, 1-30 seconds
+    Options: Off, 1 -- 30 seconds
     
   \item[Directory:]
     Allows changing the location where the recorded files are saved. The
@@ -381,7 +375,7 @@ recorded. A peak meter is present to allow you set Gain correctly.
 }
  
 \section{\label{ref:playlistoptions}Playlist Options}
-This menu allows you to work with playlists. Playlists can either be created
+  This menu allows you to work with playlists. Playlists can either be created
 automatically by playing a file in a directory directly, which will cause all 
 of the files in that directory to be placed in the playlist, or they can be
 created by hand using the File Menu (see page \pageref{ref:Filemenu}) or using 
@@ -402,19 +396,19 @@ from where you currently are.
 specified file. If no path is provided then playlist is saved to current 
 directory (see page \pageref{ref:Playlistsubmenu}).
   
-\item[Recursively Insert Directories:]
+\item[Recursively Insert Directories.]
   If set to ON then when you insert/queue a directory in Dynamic Playlist, 
 all subdirectories will also be inserted. If set to ASK then you are prompted 
 about recursive insertion when inserting a directory.
 \end{description}
 
 \section{Browse Plugins}
-With this option you can load and run various plugins that have been 
+  With this option you can load and run various plugins that have been
 written for Rockbox.A detailed description of the different plugins begins 
 on page \pageref{ref:plugins}.
 
 \section{\label{ref:Info}Info}
-This option shows RAM buffer size, battery voltage level and estimated time 
+  This option shows RAM buffer size, battery voltage level and estimated time
 remaining, disk total space and disk free space.
 \opt{player}{Use the MINUS and PLUS keys to step through several 
 pages of information.}
@@ -423,18 +417,18 @@ pages of information.}
 \item[Rockbox Info:]
   Displays some basic system information.  This is, from top to bottom, 
 the amount of memory Rockbox has available for storing music (the buffer),
- battery status, hard disk size and the amount of free space on the disk.
+battery status, hard disk size and the amount of free space on the disk.
   
 \item[Version:]
   Software version and credits display.
   
 \item[Debug (Keep Out!):]
-  This submenu is intended to be used \emph{only} by Rockbox developers. 
+  This submenu is intended to be used \emph{only} by Rockbox developers.
   It shows hardware, disk, battery status and a lot of other information.  
-  It is not recommended that users access this menu unless instructed to do 
-  so in the course of fixing a problem with Rockbox.  In particular the 
-  ``Dump ROM Contents'', ``View/clear RTC RAM'' and ``Screenshot'' and 
-  ``Sound test'' functions should be treated with care.
+  \warn{It is not recommended that users access this menu unless instructed to
+  do so in the course of fixing a problem with Rockbox. If you think you've 
+  messed up your settings by use of this menu please try to reset \emph{all} 
+  settings before asking for help.}
 \end{description}
 
 \opt{player}{
@@ -445,4 +439,16 @@ the amount of memory Rockbox has available for storing music (the buffer),
   of hard disk corruption otherwise.) See page \pageref{ref:Safeshutdown}
   for more details.
 }
+
+\section{Quick Menu}
+  Whilst not strictly part of the main menu, it is worth noting that a few
+  of the more commonly used settings are available from the ''Quick Menu".
+  This screen is accessed by holding the \fixme{check this setting!}
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+  and it allows rapid access to the Shuffle and Repeat Modes 
+  (Page \pageref{ref:PlaybackOptions})
+  and the Show Files options (Page \pageref{ref:ShowFiles}).
+  
 
