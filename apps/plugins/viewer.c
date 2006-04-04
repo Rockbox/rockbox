@@ -19,6 +19,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include <ctype.h>
+#include "playback_control.h"
 
 PLUGIN_HEADER
 
@@ -60,7 +61,7 @@ PLUGIN_HEADER
 
 /* Recorder keys */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define VIEWER_QUIT BUTTON_OFF
+#define VIEWER_MENU BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -77,7 +78,7 @@ PLUGIN_HEADER
 
 /* Ondio keys */
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define VIEWER_QUIT BUTTON_OFF
+#define VIEWER_MENU BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -90,7 +91,7 @@ PLUGIN_HEADER
 
 /* Player keys */
 #elif CONFIG_KEYPAD == PLAYER_PAD
-#define VIEWER_QUIT BUTTON_STOP
+#define VIEWER_MENU BUTTON_STOP
 #define VIEWER_PAGE_UP BUTTON_LEFT
 #define VIEWER_PAGE_DOWN BUTTON_RIGHT
 #define VIEWER_SCREEN_LEFT (BUTTON_MENU | BUTTON_LEFT)
@@ -102,7 +103,7 @@ PLUGIN_HEADER
 /* iRiver H1x0 && H3x0 keys */
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define VIEWER_QUIT BUTTON_OFF
+#define VIEWER_MENU BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -120,7 +121,7 @@ PLUGIN_HEADER
 /* iPods with the 4G pad */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define VIEWER_QUIT BUTTON_MENU
+#define VIEWER_MENU BUTTON_MENU
 #define VIEWER_PAGE_UP BUTTON_SCROLL_BACK
 #define VIEWER_PAGE_DOWN BUTTON_SCROLL_FWD
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -133,7 +134,7 @@ PLUGIN_HEADER
 
 /* iFP7xx keys */
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define VIEWER_QUIT BUTTON_PLAY
+#define VIEWER_MENU BUTTON_PLAY
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -144,7 +145,7 @@ PLUGIN_HEADER
 
 /* iAudio X5 keys */
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define VIEWER_QUIT BUTTON_POWER
+#define VIEWER_MENU BUTTON_POWER
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -155,7 +156,7 @@ PLUGIN_HEADER
 
 /* iAudio X5 keys */
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define VIEWER_QUIT BUTTON_A
+#define VIEWER_MENU BUTTON_A
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
@@ -1057,11 +1058,42 @@ static int col_limit(int col)
     return col;
 }
 
+
+bool exit=false;
+int col = 0;
+
+static void show_menu(void)
+	{
+		int m;
+		int result;
+		static const struct menu_item items[] = {
+			{"Quit", NULL },
+			{"Show Playback menu", NULL },
+			{"Return", NULL },
+		};
+		m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+		result=rb->menu_show(m);
+		switch (result)
+		{
+			case 0:
+				viewer_exit(NULL);
+				exit = true;
+			   	break;
+			case 1:
+				playback_control(rb);
+				break;
+			case 2:
+				rb->menu_exit(m);
+				viewer_draw(col);
+				break;
+		}
+	viewer_draw(col);
+	}
+
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
-    bool exit=false;
+
     int button;
-    int col = 0;
     int i;
     int ok;
 
@@ -1082,14 +1114,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     viewer_draw(col);
 
-    while (!exit) {
+	while (!exit) {
         button = rb->button_get(true);
         switch (button) {
-
-            case VIEWER_QUIT:
-                viewer_exit(NULL);
-                exit = true;
-                break;
+            case VIEWER_MENU:
+				show_menu();
+	    		break;
 
             case VIEWER_MODE_WRAP:
                 /* Word-wrap mode: WRAP or CHOP */
@@ -1297,3 +1327,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     }
     return PLUGIN_OK;
 }
+
