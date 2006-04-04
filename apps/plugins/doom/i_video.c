@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.9  2006/04/03 20:03:02  kkurbjun
+ * Revision 1.10  2006/04/04 12:00:53  dave
+ * iPod: Make the hold switch bring up the in-game menu.
+ *
+ * Revision 1.9  2006-04-03 20:03:02  kkurbjun
  * Updates doom menu w/ new graphics, now requires rockdoom.wad: http://alamode.mines.edu/~kkurbjun/rockdoom.wad
  *
  * Revision 1.8  2006-04-03 17:11:42  kkurbjun
@@ -160,7 +163,13 @@ int getkey(event_t * event)
          event->type = ev_keyup;
          hswitch=0;
       }
+#if CONFIG_KEYPAD == IPOD_4G_PAD
+      /* Bring up the menu */
+      event->data1=KEY_ESCAPE;
+#else
+      /* Enable run */
       event->data1=KEY_RSHIFT;
+#endif
       D_PostEvent(event);
    }
    holdbutton=rb->button_hold();
