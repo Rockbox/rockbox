@@ -423,7 +423,6 @@ int Dbuild_addons(struct opt_items *names)
    return i;
 }
 
-
 int Dbuild_demos(struct opt_items *names)
 {
    int i=1;
@@ -456,8 +455,165 @@ int Dbuild_demos(struct opt_items *names)
    return i;
 }
 
-void Oset_keys()
+// This key configuration code is not the cleanest or the most efficient, but it works
+int translatekey(int key)
 {
+   if (key<31)
+   {
+      switch(key)
+      {
+         case 0:
+            return 0;
+         case 1:
+            return KEY_RIGHTARROW;
+         case 2:
+            return KEY_LEFTARROW;
+         case 3:
+            return KEY_UPARROW;
+         case 4:
+            return KEY_DOWNARROW;
+         case 5:
+            return KEY_RCTRL;
+         case 6:
+            return ' ';
+         case 7:
+            return KEY_ESCAPE;
+         case 8:
+            return 'w';
+         case 9:
+            return KEY_ENTER;
+         default:
+            return 0;
+      }
+   }
+   else
+   {
+      switch(key)
+      {
+         case 0:
+            return 0;
+         case KEY_RIGHTARROW:
+            return 1;
+         case KEY_LEFTARROW:
+            return 2;
+         case KEY_UPARROW:
+            return 3;
+         case KEY_DOWNARROW:
+            return 4;
+         case KEY_RCTRL:
+            return 5;
+         case ' ':
+            return 6;
+         case KEY_ESCAPE:
+            return 7;
+         case 'w':
+            return 8;
+         case KEY_ENTER:
+            return 9;
+         default:
+            return 0;
+      }
+   }
+}
+
+// I havn't added configurable keys for enter or escape because this requires some modification to
+// m_menu.c which hasn't been done yet.
+
+int Oset_keys()
+{
+   int m, result;
+   int menuquit=0;
+
+   static const struct opt_items doomkeys[] = {
+      { "Unmapped", NULL },
+      { "Key Right", NULL },
+      { "Key Left", NULL },
+      { "Key Up", NULL },
+      { "Key Down", NULL },
+      { "Key Record", NULL },
+      { "Key Mode", NULL },
+      { "Key Off", NULL },
+      { "Key On", NULL },
+      { "Key Select", NULL },
+   };
+   int numdoomkeys=sizeof(doomkeys) / sizeof(*doomkeys);
+
+   static const struct menu_item items[] = {
+      { "Game Right", NULL },
+      { "Game Left", NULL },
+      { "Game Up", NULL },
+      { "Game Down", NULL },
+      { "Game Shoot", NULL },
+      { "Game Open", NULL },
+      { "Game Strafe", NULL },
+      { "Game Weapon", NULL },
+   };
+
+   m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                doom_menu_cb, NULL, NULL, NULL);
+
+   while(!menuquit)
+   {
+      result=rb->menu_show(m);
+      switch (result)
+      {
+         case 0:
+            key_right=translatekey(key_right);
+            rb->set_option(items[0].desc, &key_right, INT, doomkeys, numdoomkeys, NULL );
+            key_right=translatekey(key_right);
+            break;
+
+         case 1:
+            key_left=translatekey(key_left);
+            rb->set_option(items[1].desc, &key_left, INT, doomkeys, numdoomkeys, NULL );
+            key_left=translatekey(key_left);
+            break;
+
+         case 2:
+            key_up=translatekey(key_up);
+            rb->set_option(items[2].desc, &key_up, INT, doomkeys, numdoomkeys, NULL );
+            key_up=translatekey(key_up);
+            break;
+
+         case 3:
+            key_down=translatekey(key_down);
+            rb->set_option(items[3].desc, &key_down, INT, doomkeys, numdoomkeys, NULL );
+            key_down=translatekey(key_down);
+            break;
+
+         case 4:
+            key_fire=translatekey(key_fire);
+            rb->set_option(items[4].desc, &key_fire, INT, doomkeys, numdoomkeys, NULL );
+            key_fire=translatekey(key_fire);
+            break;
+
+         case 5:
+            key_use=translatekey(key_use);
+            rb->set_option(items[5].desc, &key_use, INT, doomkeys, numdoomkeys, NULL );
+            key_use=translatekey(key_use);
+            break;
+
+         case 6:
+            key_strafe=translatekey(key_strafe);
+            rb->set_option(items[6].desc, &key_strafe, INT, doomkeys, numdoomkeys, NULL );
+            key_strafe=translatekey(key_strafe);
+            break;
+
+         case 7:
+            key_weapon=translatekey(key_weapon);
+            rb->set_option(items[6].desc, &key_weapon, INT, doomkeys, numdoomkeys, NULL );
+            key_weapon=translatekey(key_weapon);
+            break;
+
+         default:
+            menuquit=1;
+            break;
+      }
+   }
+
+   rb->menu_exit(m);
+
+   return (1);
 }
 
 static const struct opt_items onoff[2] = {
@@ -476,7 +632,7 @@ static bool Doptions()
 
    static const struct menu_item items[] = {
       { "Sound", NULL },
-      { "Set Keys(not working)", NULL },
+      { "Set Keys", NULL },
       { "Timedemo", NULL },
       { "Player Bobbing", NULL },
       { "Weapon Recoil", NULL },
@@ -585,8 +741,8 @@ int doom_menu()
             //Daddons(numadd);
             break;
 
-         case 2: /* Demo's */
-            rb->set_option("Demo's", &argvlist.demonum, INT, demolmp, numdemos, NULL );
+         case 2: /* Demos */
+            rb->set_option("Demos", &argvlist.demonum, INT, demolmp, numdemos, NULL );
             break;
 
          case 3: /* Options */
