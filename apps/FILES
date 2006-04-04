@@ -26,6 +26,7 @@ plugins/viewers.config
 plugins/snake2.levels
 SOURCES
 plugins/SOURCES
+plugins/SUBDIRS
 plugins/lib/SOURCES
 plugins/rockboy/*.[ch]
 plugins/rockboy/Makefile
@@ -41,10 +42,16 @@ plugins/databox/*.[ch]
 plugins/chessbox/Makefile
 plugins/chessbox/*.lds
 plugins/chessbox/*.[ch]
+plugins/doom/Makefile
+plugins/doom/Changelog
+plugins/doom/*.[ch]
 plugins/pacbox/Makefile
 plugins/pacbox/SOURCES
 plugins/pacbox/readme.txt
 plugins/pacbox/*.[chS]
+plugins/sudoku/Makefile
+plugins/sudoku/SOURCES
+plugins/sudoku/*.[ch]
 plugins/midi/*.[ch]
 codecs/SOURCES
 codecs/*.[ch]
