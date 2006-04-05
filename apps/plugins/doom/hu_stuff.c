@@ -768,15 +768,15 @@ void HU_Start(void)
 
    // initialize the automaps coordinate widget
    //jff 3/3/98 split coordstr widget into 3 parts
-   snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %-5d",0); //jff 2/22/98 added z
+   snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %d",0); //jff 2/22/98 added z
    s = hud_coordstrx;
    while (*s)
       HUlib_addCharToTextLine(&w_coordx, *(s++));
-   snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %-5d",0); //jff 3/3/98 split x,y,z
+   snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %d",0); //jff 3/3/98 split x,y,z
    s = hud_coordstry;
    while (*s)
       HUlib_addCharToTextLine(&w_coordy, *(s++));
-   snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %-5d",0); //jff 3/3/98 split x,y,z
+   snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %d",0); //jff 3/3/98 split x,y,z
    s = hud_coordstrz;
    while (*s)
       HUlib_addCharToTextLine(&w_coordz, *(s++));
@@ -915,7 +915,7 @@ void HU_Drawer(void)
 
       //jff 2/16/98 output new coord display
       // x-coord
-      snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %-5d", (plr->mo->x)>>FRACBITS);
+      snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %d", (plr->mo->x)>>FRACBITS);
       HUlib_clearTextLine(&w_coordx);
       s = hud_coordstrx;
       while (*s)
@@ -924,7 +924,7 @@ void HU_Drawer(void)
 
       //jff 3/3/98 split coord display into x,y,z lines
       // y-coord
-      snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %-5d", (plr->mo->y)>>FRACBITS);
+      snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %d", (plr->mo->y)>>FRACBITS);
       HUlib_clearTextLine(&w_coordy);
       s = hud_coordstry;
       while (*s)
@@ -934,7 +934,7 @@ void HU_Drawer(void)
       //jff 3/3/98 split coord display into x,y,z lines
       //jff 2/22/98 added z
       // z-coord
-      snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %-5d", (plr->mo->z)>>FRACBITS);
+      snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %d", (plr->mo->z)>>FRACBITS);
       HUlib_clearTextLine(&w_coordz);
       s = hud_coordstrz;
       while (*s)
