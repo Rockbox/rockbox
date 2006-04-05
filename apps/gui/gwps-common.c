@@ -722,7 +722,7 @@ static char* get_tag(struct wps_data* wps_data,
             break;
 
 #if (CONFIG_CODEC == SWCODEC)
-        case 's': /* Sound (DSP) Settings */
+        case 'S': /* DSP/Equalizer/Sound settings */
             switch (tag[1])
             {
                 case 'p': /* pitch */
