@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.11  2006/04/04 19:39:31  amiconn
+ * Revision 1.12  2006/04/05 06:37:37  kkurbjun
+ * Fix finale text and try and prevent some data corruption due to the scaling code.  Also allows the non-standard GP32 mods to work with some bounds checking.  More comments are in v_video.c
+ *
+ * Revision 1.11  2006-04-04 19:39:31  amiconn
  * Doom on H1x0: Don't waste memory, the grayscale lib doesn't need that much, but properly tell the lib how much memory it may use.
  *
  * Revision 1.10  2006-04-04 12:00:53  dave
@@ -79,7 +82,7 @@ static unsigned char *gbuf;
 #endif
 
 #if defined(CPU_COLDFIRE) 
-static char fastscreen[LCD_WIDTH*LCD_HEIGHT] IBSS_ATTR;
+static char fastscreen[(LCD_WIDTH+1)*LCD_HEIGHT] IBSS_ATTR;
 #endif
 static fb_data palette[256] IBSS_ATTR;
 static fb_data *paldata=NULL;
@@ -465,6 +468,6 @@ void I_InitGraphics(void)
    d_screens[0] = fastscreen;
 #else
    // Don't know if this will fit in other IRAMs
-   d_screens[0] = malloc (SCREENWIDTH * SCREENHEIGHT * sizeof(unsigned char));
+   d_screens[0] = malloc ((SCREENWIDTH+1) * SCREENHEIGHT * sizeof(unsigned char));
 #endif
 }

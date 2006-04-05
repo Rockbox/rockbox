@@ -527,7 +527,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
 
       byte *desttop;
       int   col;
-      int   w = (SHORT( patch->width ) << 16) - 1; // CPhipps - -1 for faster flipping
+      int   w = (SHORT( patch->width ) << 16) -1; // CPhipps - -1 for faster flipping
       int   stretchx, stretchy;
       int   DX  = (SCREENWIDTH<<16)  / 320;
       int   DXI = (320<<16)          / SCREENWIDTH;
@@ -558,6 +558,17 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
             register byte       *dest = desttop + (( column->topdelta * DY ) >> 16 ) * SCREENWIDTH;
             register int         count  = ( column->length * DY ) >> 16;
             register int         srccol = 0x8000;
+
+            count = (count>SCREENHEIGHT)?SCREENHEIGHT:count;  // Bounds checking allows those messed up
+                                                              // GP32 mods to work (they're using patch->
+                                                              // height values of 240, this code cuts off
+                                                              // thier bottom few pixels
+
+            // NOTE: This scaling code does not work correctly on at least the H300's, this can be seen
+            // in the intro graphic along the left side, the pixels are not correct.  A more blatant
+            // example is the bunnyscroller at the end of retail doom episode 3.  I've added one extra
+            // width to d_screens[0] and this seemed to stop the freeze at the end of the game.  This
+            // needs to be fixed properly.
 
             if (flags & VPT_TRANS)
                while (count--) {

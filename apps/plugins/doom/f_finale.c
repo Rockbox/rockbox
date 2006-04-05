@@ -304,7 +304,7 @@ void F_TextWrite (void)
          }
 
          w = SHORT (hu_font[c].width);
-         if (cx+w > SCREENWIDTH)
+         if (cx+w > 320)
             break;
          // CPhipps - patch drawing updated
          V_DrawNumPatch(cx, cy, 0, hu_font[c].lumpnum, CR_DEFAULT, VPT_STRETCH);
@@ -638,7 +638,7 @@ static void F_BunnyScroll (void)
       laststage = stage;
    }
 
-   snprintf (name,sizeof(name), "END%i",stage);
+   snprintf (name,sizeof(name), "END%d",stage);
    // CPhipps - patch drawing updated
    V_DrawNamePatch((320-13*8)/2, (200-8*8)/2, 0, name, CR_DEFAULT, VPT_STRETCH);
 }
