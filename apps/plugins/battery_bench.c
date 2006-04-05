@@ -442,8 +442,13 @@ int main(void)
     
     rb->queue_init(&thread_q); /* put the thread's queue in the bcast list */
     rb->memset(&s_thread, 0, sizeof(s_thread)); /* zero the struct */
-    s_thread.id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), "Battery Benchmark");
+    if((s_thread.id = rb->create_thread(thread, thread_stack,
+        sizeof(thread_stack), "Battery Benchmark"))<0)
+    {
+        rb->splash(HZ,true,"Cannot create thread!");
+        return PLUGIN_ERROR;
+    }
+            
     rb->plugin_tsr(exit_tsr);
     
     return PLUGIN_OK;

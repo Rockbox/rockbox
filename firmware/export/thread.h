@@ -22,9 +22,9 @@
 #include <stdbool.h>
 
 #if CONFIG_CODEC == SWCODEC
-#define MAXTHREADS	14
+#define MAXTHREADS	16
 #else
-#define MAXTHREADS  9
+#define MAXTHREADS  11
 #endif
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
