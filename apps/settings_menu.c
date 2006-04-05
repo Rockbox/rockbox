@@ -1283,7 +1283,7 @@ static bool codepage_setting(void)
         { STR(LANG_CODEPAGE_LATIN1)          },
         { STR(LANG_CODEPAGE_GREEK)           },
         { STR(LANG_CODEPAGE_HEBREW)          },
-        { STR(LANG_CODEPAGE_RUSSIAN)         },
+        { STR(LANG_CODEPAGE_CYRILLIC)        },
         { STR(LANG_CODEPAGE_THAI)            },
         { STR(LANG_CODEPAGE_ARABIC)          },
         { STR(LANG_CODEPAGE_TURKISH)         },

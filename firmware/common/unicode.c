@@ -123,7 +123,7 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
             switch (cp) {
                 case 0x01: /* Greek (ISO-8859-7) */
                 case 0x02: /* Hebrew (ISO-8859-8) */
-                case 0x03: /* Russian (CP1251) */
+                case 0x03: /* Cyrillic (CP1251) */
                 case 0x04: /* Thai (ISO-8859-11) */
                 case 0x05: /* Arabic (CP1256) */
                 case 0x06: /* Turkish (ISO-8859-9) */

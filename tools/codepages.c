@@ -62,7 +62,7 @@ unsigned short iso_decode(unsigned char *latin1, int cp, int count)
             }
             break;
 
-        case 0x03: /* Russian (CP1251) */
+        case 0x03: /* Cyrillic (CP1251) */
             while (count--) {
                 /* first convert to unicode */
                 if (*latin1 < 0x80)

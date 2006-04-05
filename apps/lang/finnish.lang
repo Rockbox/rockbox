@@ -2113,11 +2113,11 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CODEPAGE_RUSSIAN
+  id: LANG_CODEPAGE_CYRILLIC
   desc: in codepage setting menu
   user:
   <source>
-    *: "Russian (CP1251)"
+    *: "Cyrillic (CP1251)"
   </source>
   <dest>
     *: "Venäläinen (CP1251)"
