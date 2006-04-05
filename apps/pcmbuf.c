@@ -835,44 +835,52 @@ static inline short* get_mix_insert_pos(void) {
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
 {
     unsigned int count = 0, i = 0;
-    bool state = false;
     unsigned int interval = NATIVE_FREQUENCY / frequency;
+    long sample;
     short *buf;
     short *pcmbuf_end = (short *)guardbuf;
-    bool playing = pcm_is_playing();
     size_t samples = NATIVE_FREQUENCY / 1000 * duration;
 
-    if (playing) {
-        buf = get_mix_insert_pos();
-    } else {
-        buf = (short *)audiobuffer;
-    }
-    while (i++ < samples)
+    if (pcm_is_playing())
     {
-        long sample = *buf;
-        if (state) {
-            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
-            if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
-            sample = *buf;
-            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
-        } else {
-            *buf++ = MIN(MAX(sample - amplitude, -32768), 32767);
-            if (buf > pcmbuf_end)
-                buf = (short *)audiobuffer;
-            sample = *buf;
-            *buf++ = MIN(MAX(sample - amplitude, -32768), 32767);
-        }
-
-        if (++count >= interval)
+        buf = get_mix_insert_pos();
+        while (i++ < samples)
         {
-            count = 0;
-            state = !state;
+            sample = *buf;
+            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
+            sample = *buf;
+            *buf++ = MIN(MAX(sample + amplitude, -32768), 32767);
+
+            /* Toggle square wav side */
+            if (++count >= interval)
+            {
+                count = 0;
+                amplitude = -amplitude;
+            }
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
         }
-        if (buf > pcmbuf_end)
-            buf = (short *)audiobuffer;
     }
-    if (!playing) {
+    else
+    {
+        buf = (short *)audiobuffer;
+        while (i++ < samples)
+        {
+            *buf++ = amplitude;
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
+            *buf++ = amplitude;
+
+            if (++count >= interval)
+            {
+                count = 0;
+                amplitude = -amplitude;
+            }
+            if (buf > pcmbuf_end)
+                buf = (short *)audiobuffer;
+        }
         pcm_play_data(NULL, (unsigned char *)audiobuffer, samples * 4);
     }
 }
