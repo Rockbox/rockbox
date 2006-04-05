@@ -2394,8 +2394,8 @@ bool ffwd_rew(int button)
             case WPS_RC_PREV:
             case WPS_RC_NEXT:
 #endif
-                audio_ff_rewind(wps_state.id3->elapsed+ff_rewind_count);
                 wps_state.id3->elapsed = wps_state.id3->elapsed+ff_rewind_count;
+                audio_ff_rewind(wps_state.id3->elapsed);
                 ff_rewind_count = 0;
                 wps_state.ff_rewind = false;
                 status_set_ffmode(0);
