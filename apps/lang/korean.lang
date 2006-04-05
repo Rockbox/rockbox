@@ -2033,7 +2033,7 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Cyrillic (CP1251)"
+    *: "Russian (CP1251)"
   </source>
   <dest>
     *: "러시아어 (CP1251)"

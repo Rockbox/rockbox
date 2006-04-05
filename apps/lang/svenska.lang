@@ -2131,7 +2131,7 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Cyrillic (CP1251)"
+    *: "Russian (CP1251)"
   </source>
   <dest>
     *: "Ryska (CP1251)"
