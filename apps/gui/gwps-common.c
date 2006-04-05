@@ -51,6 +51,7 @@
 #ifdef HAVE_LCD_COLOR
 #include "backdrop.h"
 #endif
+#include "dsp.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 static bool draw_player_progress(struct gui_wps *gwps);
@@ -719,6 +720,19 @@ static char* get_tag(struct wps_data* wps_data,
 
             }
             break;
+
+#if (CONFIG_CODEC == SWCODEC)
+        case 's': /* Sound (DSP) Settings */
+            switch (tag[1])
+            {
+                case 'p': /* pitch */
+                    *intval = sound_get_pitch();
+                    snprintf(buf, buf_size, "%d.%d",
+                            *intval / 10, *intval % 10);
+                    return buf;
+            }
+            break;
+#endif
             
         case 'm':
             switch (tag[1])
