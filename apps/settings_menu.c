@@ -827,7 +827,7 @@ static void sleep_timer_set(int minutes)
 
 static bool sleep_timer(void)
 {
-    int minutes = get_sleep_timer() / 60;
+    int minutes = (get_sleep_timer() + 59) / 60; /* round up */
 
     return set_int(str(LANG_SLEEP_TIMER), "", UNIT_MIN, &minutes,
         &sleep_timer_set, 5, 0, 300, sleep_timer_formatter);

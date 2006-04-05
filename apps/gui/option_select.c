@@ -78,13 +78,15 @@ void option_select_prev(struct option_select * opt)
 {
     if(opt->option - opt->step < opt->min_value)
     {
-        if(!opt->limit_loop)
-        {
-            if(opt->option==opt->min_value)
-                opt->option=opt->max_value-1;
-            else
-                opt->option=opt->min_value;
-        }
+        /* the dissimilarity to option_select_next() arises from the 
+         * sleep timer problem (bug #5000 and #5001): 
+         * there we have min=0, step = 5 but the value itself might
+         * not be a multiple of 5 -- as time elapsed;
+         * We need to be able to set timer to 0 (= Off) nevertheless. */
+        if(opt->option!=opt->min_value)
+            opt->option=opt->min_value;
+        else if(!opt->limit_loop)
+            opt->option=opt->max_value-1;
     }
     else
         opt->option-=opt->step;
