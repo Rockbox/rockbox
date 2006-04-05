@@ -30,6 +30,12 @@
  */
 #define BOOK_INIT_MAXSIZE   3072
 
+/* Max value in static_codebook.dim we expect to find in _book_unquantize.
+ * Used to avoid some temporary allocations. Again, enough for some test 
+ * files...
+ */
+#define BOOK_DIM_MAX        4
+ 
 /**** pack/unpack helpers ******************************************/
 int _ilog(unsigned int v){
   int ret=0;
@@ -189,13 +195,19 @@ ogg_int32_t *_book_unquantize(const static_codebook *b,int n,int *sparsemap,
 			      int *maxpoint){
   long j,k,count=0;
   if(b->maptype==1 || b->maptype==2){
+    /* Static buffer to avoid temporary calloc, which Rockbox (currently) 
+     * doesn't handle well 
+     */
+    static int rp_buffer[BOOK_INIT_MAXSIZE*BOOK_DIM_MAX];
     int quantvals;
     int minpoint,delpoint;
     ogg_int32_t mindel=_float32_unpack(b->q_min,&minpoint);
     ogg_int32_t delta=_float32_unpack(b->q_delta,&delpoint);
     ogg_int32_t *r=(ogg_int32_t *)_ogg_calloc(n*b->dim,sizeof(*r));
-    int *rp=(int *)_ogg_calloc(n*b->dim,sizeof(*rp));
+    /* int *rp=(int *)_ogg_calloc(n*b->dim,sizeof(*rp)); */
+    int* rp=rp_buffer;
 
+    memset(rp, 0, n*b->dim*sizeof(*rp));
     *maxpoint=minpoint;
 
     /* maptype 1 and 2 both use a quantized value vector, but
@@ -282,7 +294,7 @@ ogg_int32_t *_book_unquantize(const static_codebook *b,int n,int *sparsemap,
       if(rp[j]<*maxpoint)
 	r[j]>>=*maxpoint-rp[j];
 	    
-    _ogg_free(rp);
+    /* _ogg_free(rp); */
     return(r);
   }
   return(NULL);
@@ -364,7 +376,9 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
     /* ogg_uint32_t **codep=(ogg_uint32_t **)alloca(sizeof(*codep)*n); */
     ogg_uint32_t **codep=codep_buffer;
 
-    if (n > BOOK_INIT_MAXSIZE)
+    /* We have buffers for these sizes */
+    if ((n>BOOK_INIT_MAXSIZE) 
+      || (n*s->dim>BOOK_INIT_MAXSIZE*BOOK_DIM_MAX))
       goto err_out;
 
     if(codes==NULL)goto err_out;
@@ -376,7 +390,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     qsort(codep,n,sizeof(*codep),sort32a);
 
-    /*sortindex=(int *)alloca(n*sizeof(*sortindex));*/
+    /* sortindex=(int *)alloca(n*sizeof(*sortindex)); */
     sortindex=sortindex_buffer;
     c->codelist=(ogg_uint32_t *)_ogg_malloc(n*sizeof(*c->codelist));
     /* the index is a reverse index */
