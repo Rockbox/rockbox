@@ -71,7 +71,6 @@ void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
 void audio_ff_rewind(long newtime);
-void audio_seamless_seek(long newtime);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
 struct mp3entry* audio_next_track(void);

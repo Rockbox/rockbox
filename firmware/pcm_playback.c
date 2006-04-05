@@ -638,7 +638,7 @@ void pcm_play_pause(bool play)
             /* nothing yet */
 #endif
         }
-    }
+    } /* pcm_playing && needs_change */
 }
 
 bool pcm_is_playing(void) {

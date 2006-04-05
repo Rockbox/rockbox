@@ -70,6 +70,7 @@
 static volatile bool audio_codec_loaded;
 static volatile bool voice_codec_loaded;
 static volatile bool playing;
+static volatile bool seeking;
 
 #define CODEC_VORBIS   "/.rockbox/codecs/vorbis.codec"
 #define CODEC_MPA_L3   "/.rockbox/codecs/mpa.codec"
@@ -102,7 +103,6 @@ enum {
     Q_AUDIO_TRACK_CHANGED,
     Q_AUDIO_DIR_NEXT,
     Q_AUDIO_DIR_PREV,
-    Q_AUDIO_SEAMLESS_SEEK,
     Q_AUDIO_POSTINIT,
 
     Q_CODEC_LOAD,
@@ -679,7 +679,12 @@ off_t codec_mp3_get_filepos_callback(int newtime)
 void codec_seek_complete_callback(void)
 {
     /* assume we're called from non-voice codec, as they shouldn't seek */
+    if (pcm_is_paused()) {
+        /* If this is not a seamless seek, clear the buffer */
+        pcmbuf_play_stop();
+    }
     ci.seek_time = 0;
+    seeking = false;
 }
 
 bool codec_seek_buffer_callback(size_t newpos)
@@ -1329,10 +1334,10 @@ static void audio_clear_track_entries(bool buffered_only)
 static void stop_codec_flush(void)
 {
     ci.stop_codec = true;
-    pcmbuf_play_stop();
+    pcmbuf_pause(true);
     while (audio_codec_loaded)
         yield();
-    pcmbuf_play_stop();
+    pcmbuf_pause(false);
 }
 
 static void audio_stop_playback(bool resume)
@@ -1343,7 +1348,6 @@ static void audio_stop_playback(bool resume)
     playing = false;
     filling = false;
     stop_codec_flush();
-    pcmbuf_pause(false);
     if (current_fd >= 0) {
         close(current_fd);
         current_fd = -1;
@@ -1768,11 +1772,11 @@ static void initiate_track_change(int peek_index)
 {
     /* Detect if disk is spinning or already loading. */
     if (filling || ci.reload_codec || !audio_codec_loaded) {
-        if (pcmbuf_is_crossfade_enabled())
+        if (pcmbuf_is_crossfade_enabled()) {
             pcmbuf_crossfade_init(true);
-        else
-            pcmbuf_play_stop();
-        ci.stop_codec = true;
+            ci.stop_codec = true;
+        } else
+            stop_codec_flush();
         queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
     } else {
         new_track = peek_index;
@@ -1836,10 +1840,6 @@ void audio_thread(void)
                 play_pending = false;
                 last_tick = current_tick;
 
-                /* Do not start crossfading if audio is paused. */
-                if (pcm_is_paused())
-                    pcmbuf_play_stop();
-
 #ifdef CONFIG_TUNER
                 /* check if radio is playing */
                 if (get_radio_status() != FMRADIO_OFF) {
@@ -1848,6 +1848,7 @@ void audio_thread(void)
 #endif
 
                 logf("starting...");
+
                 playing = true;
                 ci.stop_codec = true;
                 ci.reload_codec = false;
@@ -1898,19 +1899,13 @@ void audio_thread(void)
             case Q_AUDIO_FF_REWIND:
                 if (!playing)
                     break ;
-                pcmbuf_play_stop();
-                ci.seek_time = (long)ev.data+1;
-                break ;
-
-            case Q_AUDIO_SEAMLESS_SEEK:
-                if (!playing)
-                    break ;
                 ci.seek_time = (long)ev.data+1;
                 break ;
 
             case Q_AUDIO_DIR_NEXT:
                 logf("audio_dir_next");
                 playlist_end = false;
+                /* pcmbuf_beep may or may not be safe on audio thread */
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_dir_change(1);
@@ -1919,6 +1914,7 @@ void audio_thread(void)
             case Q_AUDIO_DIR_PREV:
                 logf("audio_dir_prev");
                 playlist_end = false;
+                /* pcmbuf_beep may or may not be safe on audio thread */
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_dir_change(-1);
@@ -2009,6 +2005,9 @@ void codec_thread(void)
                 break ;
 #endif
         }
+
+        if (ci.stop_codec && pcm_is_paused())
+            pcmbuf_play_stop();
 
         audio_codec_loaded = false;
 
@@ -2191,7 +2190,6 @@ void audio_play(long offset)
     else
     {
         stop_codec_flush();
-        pcmbuf_play_stop();
     }
 
     queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
@@ -2268,14 +2266,14 @@ void audio_prev_dir(void)
 
 void audio_ff_rewind(long newpos)
 {
-    logf("rewind: %d", newpos);
+    logf("ff/rewind: %d", newpos);
+    seeking = true;
     queue_post(&audio_queue, Q_AUDIO_FF_REWIND, (int *)newpos);
-}
-
-void audio_seamless_seek(long newpos)
-{
-    logf("seamless_seek: %d", newpos);
-    queue_post(&audio_queue, Q_AUDIO_SEAMLESS_SEEK, (int *)newpos);
+    /* This is a hack, the correct solution is to report back to
+     * the caller when the seek is complete. */
+    while (seeking) {
+        yield();
+    }
 }
 
 void audio_flush_and_reload_tracks(void)

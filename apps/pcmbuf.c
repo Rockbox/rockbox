@@ -61,8 +61,6 @@ static bool crossfade_init IDATA_ATTR;
 static size_t crossfade_pos IDATA_ATTR;
 static size_t crossfade_rem IDATA_ATTR;
 
-static struct mutex pcmbuf_mutex IDATA_ATTR;
-
 /* Crossfade modes. If CFM_CROSSFADE is selected, normal
  * crossfader will activate. Selecting CFM_FLUSH is a special
  * operation that only overwrites the pcm buffer without crossfading.
@@ -297,7 +295,6 @@ bool pcmbuf_crossfade_init(bool manual_skip)
 
 void pcmbuf_play_stop(void)
 {
-    mutex_lock(&pcmbuf_mutex);
     /** Prevent a very tiny pop from happening by muting audio
      *  until dma has been initialized. */
     pcm_mute(true);
@@ -320,7 +317,6 @@ void pcmbuf_play_stop(void)
     pcmbuf_set_boost_mode(false);
     pcmbuf_boost(false);
 
-    mutex_unlock(&pcmbuf_mutex);
 }
 
 int pcmbuf_used_descs(void) {
@@ -356,7 +352,6 @@ static void pcmbuf_init_pcmbuffers(void) {
  * ...CODECBUFFER|---------PCMBUF---------|GUARDBUF|DESCS| */
 void pcmbuf_init(size_t bufsize)
 {
-    mutex_init(&pcmbuf_mutex);
     pcmbuf_size = bufsize;
     pcmbuf_descsize = pcmbuf_descs()*sizeof(struct pcmbufdesc);
     audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) -
@@ -401,8 +396,6 @@ void pcmbuf_pause(bool pause) {
 /* Force playback. */
 void pcmbuf_play_start(void)
 {
-    mutex_lock(&pcmbuf_mutex);
-
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
     {
         /** Prevent a very tiny pop from happening by muting audio
@@ -417,8 +410,6 @@ void pcmbuf_play_start(void)
         /* Now unmute the audio. */
         pcm_mute(false);
     }
-
-    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**
@@ -426,8 +417,6 @@ void pcmbuf_play_start(void)
  */
 static void pcmbuf_flush_fillpos(void)
 {
-    mutex_lock(&pcmbuf_mutex);
-
     if (audiobuffer_fillpos) {
         /* Never use the last buffer descriptor */
         while (pcmbuf_write == pcmbuf_write_end) {
@@ -444,8 +433,6 @@ static void pcmbuf_flush_fillpos(void)
         }
         pcmbuf_add_chunk();
     }
-
-    mutex_unlock(&pcmbuf_mutex);
 }
 
 /**

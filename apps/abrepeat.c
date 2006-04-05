@@ -111,13 +111,13 @@ reasonable amount of time for the typical user to react */
 
 void ab_jump_to_A_marker(void)
 {
-#if (CONFIG_CODEC == SWCODEC)
-    audio_seamless_seek(ab_A_marker);
-#else
+#if (CONFIG_CODEC != SWCODEC)
     bool paused = (audio_status() & AUDIO_STATUS_PAUSE) != 0;
     if ( ! paused )
         audio_pause();
+#endif
     audio_ff_rewind(ab_A_marker);
+#if (CONFIG_CODEC != SWCODEC)
     if ( ! paused )
         audio_resume();
 #endif
