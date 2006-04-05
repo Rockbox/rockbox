@@ -66,7 +66,7 @@ static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_b
 #define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
 
 /* Tag Cache Header version 'TCHxx' */
-#define TAGCACHE_MAGIC  0x54434801
+#define TAGCACHE_MAGIC  0x54434802
 
 /* Tag database structures. */
 
@@ -815,7 +815,7 @@ static inline void write_item(const char *item)
 inline void check_if_empty(char **tag)
 {
     if (tag == NULL || *tag == NULL || *tag[0] == '\0')
-        *tag = "Unknown";
+        *tag = "<Untagged>";
 }
 
 #define CRC_BUF_LEN 8
@@ -831,6 +831,7 @@ static void add_tagcache(const char *path)
     bool ret;
     int fd;
     char tracknumfix[3];
+    char *genrestr;
     //uint32_t crcbuf[CRC_BUF_LEN];
 
     if (cachefd < 0)
@@ -870,17 +871,19 @@ static void add_tagcache(const char *path)
     if (!ret)
         return ;
 
+    genrestr = id3_get_genre(&track.id3);
+    
     check_if_empty(&track.id3.title);
     check_if_empty(&track.id3.artist);
     check_if_empty(&track.id3.album);
-    check_if_empty(&track.id3.genre_string);
+    check_if_empty(&genrestr);
     check_if_empty(&track.id3.composer);
     
     entry.tag_length[tag_filename] = strlen(path) + 1;
     entry.tag_length[tag_title] = strlen(track.id3.title) + 1;
     entry.tag_length[tag_artist] = strlen(track.id3.artist) + 1;
     entry.tag_length[tag_album] = strlen(track.id3.album) + 1;
-    entry.tag_length[tag_genre] = strlen(track.id3.genre_string) + 1;
+    entry.tag_length[tag_genre] = strlen(genrestr) + 1;
     entry.tag_length[tag_composer] = strlen(track.id3.composer) + 1;
     
     entry.tag_offset[tag_filename] = 0;
@@ -899,21 +902,22 @@ static void add_tagcache(const char *path)
     
     if (entry.tag_offset[tag_tracknumber] <= 0)
     {
-        int start, i;
+        const char *p = strrchr(path, '.');
         
-        for (start = 0; path[start] != '\0'; start++)
-            if (isdigit(path[start]))
-                break ;
+        if (p == NULL)
+            p = &path[strlen(path)-1];
         
-        for (i = 0; i < (int)sizeof(tracknumfix)-1 
-             && path[start+i] != '\0'; i++)
+        while (*p != '/')
         {
-            if (isdigit(path[start+i]))
-                tracknumfix[i] = path[start+i];
-            else
-                break ;
+            if (isdigit(*p) && isdigit(*(p-1)))
+            {
+                tracknumfix[1] = *p--;
+                tracknumfix[0] = *p;
+                break;
+            }
+            p--;
         }
-
+        
         if (tracknumfix[0] != '\0')
             entry.tag_offset[tag_tracknumber] = atoi(tracknumfix);
         else
@@ -925,7 +929,7 @@ static void add_tagcache(const char *path)
     write_item(track.id3.title);
     write_item(track.id3.artist);
     write_item(track.id3.album);
-    write_item(track.id3.genre_string);
+    write_item(genrestr);
     write_item(track.id3.composer);
     total_entry_count++;    
 }

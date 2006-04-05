@@ -426,12 +426,16 @@ int tagtree_load(struct tree_context* c)
         dptr->newtable = tcs.result_seek;
         if (!tcs.ramsearch || csi->tagorder[extra] == tag_title)
         {
+            int tracknum = -1;
+            
             dptr->name = &c->name_buffer[namebufused];
             if (csi->tagorder[extra] == tag_title)
+                tracknum = tagcache_get_numeric(&tcs, tag_tracknumber);
+            
+            if (tracknum > 0)
             {
                 snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
-                         tagcache_get_numeric(&tcs, tag_tracknumber), 
-                         tcs.result);
+                         tracknum, tcs.result);
                 namebufused += strlen(dptr->name) + 1;
                 if (namebufused >= c->name_buffer_size)
                 {
@@ -518,8 +522,8 @@ int tagtree_enter(struct tree_context* c)
 
     switch (c->currtable) {
         case root:
-            c->currtable = newextra;
             c->currextra = newextra;
+        
             if (newextra == navibrowse)
             {
                 int i, j;
@@ -539,7 +543,7 @@ int tagtree_enter(struct tree_context* c)
                         if (rc == -1 || !searchstring[0])
                         {
                             c->dirlevel--;
-                            break;
+                            return 0;
                         }
                         
                         if (csi->clause[i][j].numeric)
@@ -549,8 +553,9 @@ int tagtree_enter(struct tree_context* c)
                                     sizeof(csi->clause[i][j].str)-1);
                     }
                 }
-                
             }
+        
+            c->currtable = newextra;
             break;
 
         case navibrowse:
