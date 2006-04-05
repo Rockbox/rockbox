@@ -1,0 +1,38 @@
+\subsection{Text Editor}
+This plugin allows you to view and edit simple text documents on your DAP.
+You can view files by using \textbf{Open with} from the
+\textbf{File Menu} (see page \pageref{ref:Filemenu}).
+
+\subsubsection{Usage}
+If you start the Text Editor from the plugin browser you will be greeted with
+a blank screen. When started from the \textbf{Open with} menu item your file 
+should be shown on the screen. You can now edit the file.
+The Text Editor is line base. This means you can edit one line at a time using
+the virtual keyboard.
+
+\begin{itemize}
+  \item Move the selection bar to the line you want to edit.
+  \item Edit the highlighted text line or insert a new one using the Item Menu.
+  \item When finished editing exit the Text Editor. You'll be shown a list of
+        save options. 
+\end{itemize}
+\note{When you haven't changed the file the Text Editor will quit immediately.}
+
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect} 
+    & Edit Line / Select Character\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}\opt{IAUDIO_X5_PAD}{\ButtonPower} 
+    & Exit / Abort Editing\\
+    \opt{RECORDER_PAD}{\ButtonFOne}\opt{ONDIO_PAD}{Hold \ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}\opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay} 
+    & Show Item Menu / Accept Line\\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{\ButtonLeft}
+    & Delete Line / Delete Character\\
+    \end{btnmap}
+\end{table}
+
