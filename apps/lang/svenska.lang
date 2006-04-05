@@ -70,7 +70,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -104,7 +104,7 @@
     *: "Press OFF to shut down"
   </source>
   <dest>
-    *: "Tryck på AV för att avsluta"
+    *: "Tryck AV för att stänga av"
   </dest>
   <voice>
     *: ""
@@ -146,7 +146,7 @@
     *: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "Var vänlig ta bort instucken MMC"
+    *: "Var vänlig ta bort MMC-kort"
   </dest>
   <voice>
     *: "Please remove multimedia card"
@@ -168,7 +168,7 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -182,7 +182,7 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
@@ -224,7 +224,7 @@
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
@@ -238,7 +238,7 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_THEME
-  desc: Custom themes menu
+  desc: in the main menu
   user:
   <source>
     *: "Browse Themes"
@@ -252,7 +252,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
@@ -280,7 +280,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
@@ -294,7 +294,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
@@ -328,7 +328,7 @@
     *: "Shut down"
   </source>
   <dest>
-    *: "Avsluta"
+    *: "Stäng av"
   </dest>
   <voice>
     *: "Shut down"
@@ -507,7 +507,7 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Stereobredd"
@@ -563,7 +563,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
     *: "Superbas"
@@ -594,7 +594,7 @@
     *: "MDB Strength"
   </source>
   <dest>
-    *: "MDB Styrka"
+    *: "MDB-styrka"
   </dest>
   <voice>
     *: "MDB Strength"
@@ -608,7 +608,7 @@
     *: "MDB Harmonics"
   </source>
   <dest>
-    *: "MDB Övertoner"
+    *: "MDB-övertoner"
   </dest>
   <voice>
     *: "MDB Harmonics"
@@ -619,10 +619,10 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
-    *: "MDB Mittfrekvens"
+    *: "MDB-mittfrekvens"
   </dest>
   <voice>
     *: "MDB Center frequency"
@@ -636,7 +636,7 @@
     *: "MDB Shape"
   </source>
   <dest>
-    *: "MDB Form"
+    *: "MDB-form"
   </dest>
   <voice>
     *: "MDB Shape"
@@ -644,7 +644,7 @@
 </phrase>
 <phrase>
   id: LANG_CROSSFEED
-  desc: in the sound settings menu
+  desc: in sound settings
   user:
   <source>
     *: "Crossfeed"
@@ -969,7 +969,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Inspelningsskärm"
@@ -1288,7 +1288,7 @@
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
@@ -1302,7 +1302,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1316,7 +1316,7 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
@@ -1330,7 +1330,7 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1431,7 +1431,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </source>
   <dest>
     *: "Återuppta vid start"
@@ -1445,7 +1445,7 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
     *: "Snabbspolning"
@@ -1473,7 +1473,7 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
     *: "Tona bort vid stopp/paus"
@@ -1529,7 +1529,7 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep volume"
+    *: "Beep Volume"
   </source>
   <dest>
     *: "Pipvolym"
@@ -1585,7 +1585,7 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical output"
+    *: "Optical Output"
   </source>
   <dest>
     *: "Optisk utgång"
@@ -1599,7 +1599,7 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
     *: "ID3-prioritet"
@@ -1641,7 +1641,7 @@
   desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user:
   <source>
-    *: "Auto change directory"
+    *: "Auto-Change Directory"
   </source>
   <dest>
     *: "Byt katalog automatiskt"
@@ -1655,7 +1655,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Tag cache"
+    *: "Tag Cache"
   </source>
   <dest>
     *: "Tagcache"
@@ -1669,7 +1669,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Keep on disk"
+    *: "Keep on Disk"
   </source>
   <dest>
     *: "Behåll på disk"
@@ -1683,7 +1683,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Load to ram"
+    *: "Load to RAM"
   </source>
   <dest>
     *: "Ladda till RAM"
@@ -1697,7 +1697,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force tag cache update"
+    *: "Force Tag Cache Update"
   </source>
   <dest>
     *: "Tvinga uppdatering av tagcache"
@@ -1739,7 +1739,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data (experimental)"
   </source>
   <dest>
     *: "Samla kördata (experimentell)"
@@ -1809,7 +1809,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
     *: "på datum"
@@ -1823,7 +1823,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
     *: "på senaste datum"
@@ -1837,7 +1837,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
     *: "på typ"
@@ -1918,10 +1918,10 @@
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
     *: "ID3-databas"
@@ -2520,7 +2520,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -2534,7 +2534,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -2548,7 +2548,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -2663,7 +2663,7 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
     *: "Oberoende ramar"
@@ -2691,7 +2691,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Förinspelningstid"
@@ -2719,7 +2719,7 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
     *: "Aktuell katalog"
@@ -2730,10 +2730,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
     *: "Visa inspelningsskärm vid start"
@@ -2761,7 +2761,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Clipping light"
+    *: "Clipping Light"
   </source>
   <dest>
     *: "Ljus vid klippning"
@@ -2775,7 +2775,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main unit only"
+    *: "Main Unit Only"
   </source>
   <dest>
     *: "Huvudenhet bara"
@@ -2789,7 +2789,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Remote unit only"
+    *: "Remote Unit Only"
   </source>
   <dest>
     *: "Fjärrenhet bara"
@@ -2803,7 +2803,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main and remote unit"
+    *: "Main and Remote Unit"
   </source>
   <dest>
     *: "Huvud- och fjärrenhet"
@@ -2845,7 +2845,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Enable crossfade"
+    *: "Enable Crossfade"
   </source>
   <dest>
     *: "Aktivera korstoning"
@@ -2873,7 +2873,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in delay"
+    *: "Fade-In Delay"
   </source>
   <dest>
     *: "Intoningsfördröjning"
@@ -2887,7 +2887,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in duration"
+    *: "Fade-In Duration"
   </source>
   <dest>
     *: "Intoningslängd"
@@ -2901,7 +2901,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out delay"
+    *: "Fade-Out Delay"
   </source>
   <dest>
     *: "Uttoningsfördröjning"
@@ -2915,7 +2915,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out duration"
+    *: "Fade-Out Duration"
   </source>
   <dest>
     *: "Uttoningslängd"
@@ -2929,7 +2929,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out mode"
+    *: "Fade-Out Mode"
   </source>
   <dest>
     *: "Uttoningsläge"
@@ -2946,7 +2946,7 @@
     *: "Mix"
   </source>
   <dest>
-    *: "Blanda"
+    *: "Mixa"
   </dest>
   <voice>
     *: "Mix"
@@ -2957,7 +2957,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </source>
   <dest>
     *: "Aktivera volymutjämning"
@@ -2971,7 +2971,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
     *: "Förhindra klippning"
@@ -2985,7 +2985,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
     *: "Volymutjämningstyp"
@@ -2999,7 +2999,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
     *: "Per album"
@@ -3013,7 +3013,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
     *: "Per spår"
@@ -3027,7 +3027,7 @@
   desc: use track gain if shuffle mode is on, album gain otherwise
   user:
   <source>
-    *: "Track gain if shuffling"
+    *: "Track Gain if Shuffling"
   </source>
   <dest>
     *: "Spårvolymutjämning vid blandning"
@@ -3069,10 +3069,10 @@
   desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Laddningsbelysning"
+    *: "Belysning vid laddning"
   </dest>
   <voice>
     *: "Backlight When Plugged"
@@ -3083,10 +3083,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
-    *: "Spårbytesbelysning"
+    *: "Belysning vid spårbyte"
   </dest>
   <voice>
     *: "Caption backlight"
@@ -3097,7 +3097,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </source>
   <dest>
     *: "Tona in belysning"
@@ -3111,7 +3111,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </source>
   <dest>
     *: "Tona ut belysning"
@@ -3153,7 +3153,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First keypress enables backlight only"
+    *: "First Keypress Enables Backlight Only"
   </source>
   <dest>
     *: "Första knapptryck tänder bara belysning"
@@ -3251,7 +3251,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar(Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
     *: "Inverterad rad"
@@ -3265,7 +3265,7 @@
   desc: text for LCD settings menu
   user:
   <source>
-    *: "Clear backdrop"
+    *: "Clear Backdrop"
   </source>
   <dest>
     *: "Rensa bakgrund"
@@ -3321,7 +3321,7 @@
   desc: in remote lcd settings menu
   user:
   <source>
-    *: "Reduce ticking"
+    *: "Reduce Ticking"
   </source>
   <dest>
     *: "Reducera tickande"
@@ -3352,7 +3352,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Exempel på rullningshastighet"
+    *: "Exempel för att sätta rullningshastighet"
   </dest>
   <voice>
     *: ""
@@ -3419,7 +3419,7 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
     *: "Hopprullning"
@@ -3430,7 +3430,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
@@ -3531,7 +3531,7 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Knapprad"
@@ -3685,7 +3685,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
     *: "Logaritmisk (dB)"
@@ -3699,7 +3699,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
     *: "Linjär (%)"
@@ -3825,7 +3825,7 @@
   desc: in directory cache settings
   user:
   <source>
-    *: "Directory cache"
+    *: "Directory Cache"
   </source>
   <dest>
     *: "Katalogcache"
@@ -3856,7 +3856,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Skannar disken..."
+    *: "Söker igenom disken..."
   </dest>
   <voice>
     *: ""
@@ -3923,7 +3923,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
     *: "Max filer i kataloglista"
@@ -3937,7 +3937,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
     *: "Max filer i spellista"
@@ -3976,7 +3976,7 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
@@ -3993,7 +3993,7 @@
   desc: in wps context menu
   user:
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
     *: "Värdera sången"
@@ -4105,7 +4105,7 @@
   desc: text for onplay menu entry
   user:
   <source>
-    *: "Set as backdrop"
+    *: "Set As Backdrop"
   </source>
   <dest>
     *: "Använd som bakgrund"
@@ -4119,7 +4119,7 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
     *: "Ta bort katalog"
@@ -4161,10 +4161,10 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "Öppna med"
+    *: "Öppna med..."
   </dest>
   <voice>
     *: "open with"
@@ -4175,7 +4175,7 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
     *: "Skapa katalog"
@@ -4186,7 +4186,7 @@
 </phrase>
 <phrase>
   id: LANG_PITCH
-  desc: pitch" in the pitch screen
+  desc: "pitch" in the pitch screen
   user:
   <source>
     *: "Pitch"
@@ -4430,7 +4430,7 @@
     *: "Buffer: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffert: %d.%03dMB"
+    *: "Buffert: %d.%03d MB"
   </dest>
   <voice>
     *: ""
@@ -4458,7 +4458,7 @@
     *: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "Batteri: Top-Off-laddning"
+    *: "Batteri: Top-off-laddning"
   </dest>
   <voice>
     *: ""
@@ -4808,7 +4808,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Kan inte skapa bokmärke!"
+    *: "Kan inte skapa bokmärke"
   </dest>
   <voice>
     *: ""
@@ -4836,7 +4836,7 @@
     *: "ON To Set"
   </source>
   <dest>
-    *: "PÅ för att ställa"
+    *: "PÅ = Ställ klocka"
   </dest>
   <voice>
     *: ""
@@ -4850,7 +4850,7 @@
     *: "OFF To Revert"
   </source>
   <dest>
-    *: "AV för att återgå"
+    *: "AV = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -4889,7 +4889,7 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
     *: "Knapplåset är på"
@@ -4903,7 +4903,7 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
     *: "Knapplåset är av"
@@ -4931,7 +4931,7 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
     *: "Tidsdelning:"
@@ -4959,7 +4959,7 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Förinspelning"
@@ -4987,7 +4987,7 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain L"
+    *: "Gain Left"
   </source>
   <dest>
     *: "Vänster"
@@ -5001,7 +5001,7 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain R"
+    *: "Gain Right"
   </source>
   <dest>
     *: "Höger"
@@ -5099,7 +5099,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start above"
+    *: "Start Above"
   </source>
   <dest>
     *: "Börja över"
@@ -5127,7 +5127,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop below"
+    *: "Stop Below"
   </source>
   <dest>
     *: "Sluta under"
@@ -5155,7 +5155,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit gap"
+    *: "Presplit Gap"
   </source>
   <dest>
     *: "Avbrott innan delning"
@@ -5183,7 +5183,7 @@
   desc: waiting for threshold
   user:
   <source>
-    *: "Trigger idle"
+    *: "Trigger Idle"
   </source>
   <dest>
     *: "Ingen start"
@@ -5197,7 +5197,7 @@
   desc: 
   user:
   <source>
-    *: "Trigger active"
+    *: "Trigger Active"
   </source>
   <dest>
     *: "Start aktiverad"
@@ -5256,7 +5256,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Väckning om för kort tid!"
+    *: "Väckning om för kort tid"
   </dest>
   <voice>
     *: ""
@@ -5270,7 +5270,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "PLAY=Sätt OFF=Avbryt"
+    *: "SPELA=Sätt AV=Avbryt"
   </dest>
   <voice>
     *: ""
@@ -5334,7 +5334,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -5348,7 +5348,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -5362,7 +5362,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -5376,7 +5376,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
@@ -5390,7 +5390,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -5404,7 +5404,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -5418,7 +5418,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
@@ -5432,7 +5432,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
@@ -5474,7 +5474,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -5488,10 +5488,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Track gain]"
+    *: "[Track Gain]"
   </source>
   <dest>
     *: "[Spårvolymutjämning]"
@@ -5502,10 +5502,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Album gain]"
+    *: "[Album Gain]"
   </source>
   <dest>
     *: "[Albumvolymutjämning]"
@@ -5516,7 +5516,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -5530,7 +5530,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
@@ -7154,13 +7154,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Spellista Full buffert"
+    *: "Full spellistebuffert"
   </dest>
   <voice>
     *: "Playlist "
@@ -7171,7 +7171,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
     *: "Listan slut"
@@ -7185,7 +7185,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
     *: "Slut på spellistan"
@@ -7300,7 +7300,7 @@
     *: "Error updating playlist control file"
   </source>
   <dest>
-    *: "Fel vid uppdatering av filen för spellistekontroll"
+    *: "Kan ej upppdatera filen för spellistekontroll"
   </dest>
   <voice>
     *: ""
@@ -7395,7 +7395,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Add preset"
+    *: "Add Preset"
   </source>
   <dest>
     *: "Addera förinställning"
@@ -7409,7 +7409,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
     *: "Redigera förinställningar"
@@ -7423,7 +7423,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
     *: "Ta bort förinställning"
@@ -7437,7 +7437,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
     *: "Kan inte spara förinställningar"
@@ -7451,10 +7451,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
-    *: "Listan med förinställningar är full"
+    *: "Full förinställningslista"
   </dest>
   <voice>
     *: ""
@@ -7532,7 +7532,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -7577,7 +7577,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Auto scan presets"
+    *: "Auto-Scan Presets"
   </source>
   <dest>
     *: "Sök förinställnignar"
@@ -7591,7 +7591,7 @@
   desc: confirmation if presets can be cleared
   user:
   <source>
-    *: "Clear current presets?"
+    *: "Clear Current Presets?"
   </source>
   <dest>
     *: "Ta bort förinställningar?"
@@ -7608,7 +7608,7 @@
     *: "Scanning %d.%01dMHz"
   </source>
   <dest>
-    *: "Söker vid %d.1d MHz"
+    *: "Söker vid %d.%01d MHz"
   </dest>
   <voice>
     *: ""
@@ -7622,7 +7622,7 @@
     *: "%d.%01dMHz"
   </source>
   <dest>
-    *: "%d.%1d MHz"
+    *: "%d.%01d MHz"
   </dest>
   <voice>
     *: ""
@@ -7717,10 +7717,10 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Katalogbufferten är full!"
+    *: "Full katalogbuffert"
   </dest>
   <voice>
     *: ""
@@ -7804,7 +7804,7 @@
     *: "OFF to abort"
   </source>
   <dest>
-    *: "AV för avbryt"
+    *: "AV = avbryt"
   </dest>
   <voice>
     *: ""
@@ -7818,7 +7818,7 @@
     *: "STOP to abort"
   </source>
   <dest>
-    *: "STANNA för avbryt"
+    *: "STOPP = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -7843,7 +7843,7 @@
   desc: text for splash to indicate a new backdrop has been loaded successfully
   user:
   <source>
-    *: "Backdrop loaded"
+    *: "Backdrop Loaded"
   </source>
   <dest>
     *: "Bakgrund laddad"
@@ -7857,7 +7857,7 @@
   desc: text for splash to indicate a failure to load a bitmap as backdrop
   user:
   <source>
-    *: "Backdrop failed"
+    *: "Backdrop Failed"
   </source>
   <dest>
     *: "Bakgrund misslyckades"
@@ -8000,7 +8000,7 @@
     *: "Found %d matches"
   </source>
   <dest>
-    *: "Fann %d träffar"
+    *: "Hittade %d träffar"
   </dest>
   <voice>
     *: ""
@@ -8039,7 +8039,7 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+    *: "Move Failed"
   </source>
   <dest>
     *: "Kan inte flytta"
@@ -8081,7 +8081,7 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
     *: "Endast spårnamnet"
@@ -8095,7 +8095,7 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
     *: "Hela sökvägen"
@@ -8210,7 +8210,7 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "Tillägssamlingen är full"
+    *: "Full filändelselista"
   </dest>
   <voice>
     *: ""
@@ -8224,7 +8224,7 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Filtypssamlingen är full"
+    *: "Full filtypslista"
   </dest>
   <voice>
     *: ""
@@ -8252,7 +8252,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Strängbufferten för filtyper är tom"
+    *: "Tom strängbuffert för filtyper"
   </dest>
   <voice>
     *: ""
@@ -8270,5 +8270,117 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Längd]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Läs förinställningar"
+  </dest>
+  <voice>
+    *: "Load Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Spara förinställningar"
+  </dest>
+  <voice>
+    *: "Save Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Töm förinställningar"
+  </dest>
+  <voice>
+    *: "Clear Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Förinställningar"
+  </dest>
+  <voice>
+    *: "Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Inga förinställningar hittades. Starta sökning?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Spara ändringar?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixlar"
+  </dest>
+  <voice>
+    *: "pixels"
   </voice>
 </phrase>
