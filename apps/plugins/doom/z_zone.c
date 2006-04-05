@@ -630,25 +630,9 @@ void *(Z_Calloc)(size_t n1, size_t n2, int tag, void **user
                  , const char *file, int line
 #endif
                 )
-{  void* s;
-
-   /* The ARM version of memset doesn't correctly return a pointer
-      to the memory address being set, so we have to do this the long
-      way...  Revert this when the ARM memset is fixed.
-
-    */
-
-#if 1
-   if (n1*=n2) {
-       s = (Z_Malloc)(n1,tag,user DA(file,line));
-       memset(s, 0, n1);
-       return s;
-   } else {
-       return NULL;
-   }
-#else
-   return (n1*=n2) ? memset((Z_Malloc)(n1, tag, user DA(file, line)), 0, n1) : NULL;
-#endif
+{
+   return 
+      (n1*=n2) ? memset((Z_Malloc)(n1, tag, user DA(file, line)), 0, n1) : NULL;
 }
 
 char *(Z_Strdup)(const char *s, int tag, void **user
