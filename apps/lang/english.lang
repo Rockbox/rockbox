@@ -2278,7 +2278,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"

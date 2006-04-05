@@ -2134,10 +2134,10 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Russisch (CP1251)"
+    *: "Kyrillisch (CP1251)"
   </dest>
   <voice>
-    *: "Russisch"
+    *: "Kyrillisch"
   </voice>
 </phrase>
 <phrase>
@@ -8368,5 +8368,19 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "Pixel"
+  </dest>
+  <voice>
+    *: "Pixel"
   </voice>
 </phrase>
