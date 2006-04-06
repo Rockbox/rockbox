@@ -76,6 +76,11 @@ static int addr_offset;
 static int pix_offset;
 #endif
 
+static const unsigned char dibits[16] ICONST_ATTR = {
+    0x00, 0x03, 0x0C, 0x0F, 0x30, 0x33, 0x3C, 0x3F,
+    0xC0, 0xC3, 0xCC, 0xCF, 0xF0, 0xF3, 0xFC, 0xFF
+};
+
 /* wait for LCD with timeout */
 static inline void lcd_wait_write(void)
 {
@@ -139,23 +144,6 @@ void lcd_init_device(void)
 #endif
 }
 
-/*** update functions ***/
-/* srccopy bitblt, opcode is currently ignored*/
-
-/* Performance function that works with an external buffer
-   note that x and bwidtht are in 8-pixel units! */
-void lcd_blit(const unsigned char* data, int x, int by, int width,
-              int bheight, int stride)
-{
-    /* TODO implement this on iPod  */
-    (void)data;
-    (void)x;
-    (void)by;
-    (void)width;
-    (void)bheight;
-    (void)stride;
-}
-
 /*** hardware configuration ***/
 
 /* Rockbox stores the contrast as 0..63 - we add 64 to it */
@@ -183,8 +171,8 @@ void lcd_set_flip(bool yesno)
          /* 168x112, inverse COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x020d);
         lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8316);    /* 22..131 */
-        addr_offset = (22 << 5) | (20 - 3);
-        pix_offset = 6;
+        addr_offset = (22 << 5) | (20 - 4);
+        pix_offset = -2;
     } else {
         /* 168x112,  inverse SEG order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x010d);
@@ -205,6 +193,28 @@ void lcd_set_flip(bool yesno)
         addr_offset = 20;
     }
 #endif
+}
+
+/*** update functions ***/
+
+/* Performance function that works with an external buffer
+   note that x, bwidtht and stride are in 8-pixel units! */
+void lcd_blit(const unsigned char* data, int bx, int y, int bwidth,
+              int height, int stride)
+{
+    const unsigned char *src, *src_end;
+
+    while (height--) {
+        src = data;
+        src_end = data + bwidth;
+        lcd_cmd_and_data(R_RAM_ADDR_SET, (y++ << 5) + addr_offset - bx);
+        lcd_prepare_cmd(R_RAM_DATA);
+        do {
+            unsigned byte = *src++;
+            lcd_send_data((dibits[byte>>4] << 8) | dibits[byte&0x0f]);
+        } while (src < src_end);
+        data += stride;
+    }
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
@@ -230,23 +240,20 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     for (; y <= ymax; y++) {
         unsigned char *data, *data_end;
-        int ram_addr = (y << 5) + addr_offset - x;
 
-        lcd_cmd_and_data(R_RAM_ADDR_SET, ram_addr);
+        lcd_cmd_and_data(R_RAM_ADDR_SET, (y << 5) + addr_offset - x);
         lcd_prepare_cmd(R_RAM_DATA);
 
         data = &lcd_framebuffer[y][2*x];
         data_end = data + 2 * width;
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-        if (pix_offset == 6) {
-            data -= 2;
-            data_end -= 1;
+        if (pix_offset == -2) {
             unsigned cur_word = *data++;
             do {
                 cur_word = (cur_word << 8) | *data++;
                 cur_word = (cur_word << 8) | *data++;
                 lcd_send_data((cur_word >> 4) & 0xffff);
-            } while (data < data_end);
+            } while (data <= data_end);
         } else
 #endif
         {
