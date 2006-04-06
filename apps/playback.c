@@ -93,16 +93,13 @@ enum {
     Q_AUDIO_PLAY = 1,
     Q_AUDIO_STOP,
     Q_AUDIO_PAUSE,
-    Q_AUDIO_RESUME,
-    Q_AUDIO_NEXT,
-    Q_AUDIO_PREV,
+    Q_AUDIO_SKIP,
     Q_AUDIO_FF_REWIND,
     Q_AUDIO_FLUSH_RELOAD,
     Q_AUDIO_CODEC_DONE,
     Q_AUDIO_FLUSH,
     Q_AUDIO_TRACK_CHANGED,
-    Q_AUDIO_DIR_NEXT,
-    Q_AUDIO_DIR_PREV,
+    Q_AUDIO_DIR_SKIP,
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 
@@ -815,18 +812,24 @@ static void pcmbuf_track_changed_callback(void)
 static bool yield_codecs(void)
 {
     yield();
+    if (!queue_empty(&audio_queue))
+        return true;
+
     /* This indicates that we are in the initial buffer fill mode, or the
      * playback recently skipped */
     if (!pcm_is_playing() && !pcm_is_paused())
+    {
         sleep(5);
+        if (!queue_empty(&audio_queue))
+            return true;
+    }
     
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && !filebuf_is_lowdata())
     {
         sleep(1);
-        if (!queue_empty(&audio_queue)) {
+        if (!queue_empty(&audio_queue))
             return true;
-        }
     }
     return false;
 }
@@ -1894,28 +1897,15 @@ void audio_thread(void)
 
             case Q_AUDIO_PAUSE:
                 logf("audio_pause");
-                pcmbuf_pause(true);
-                paused = true;
+                pcmbuf_pause((bool)ev.data);
+                paused = (bool)ev.data;
                 break ;
 
-            case Q_AUDIO_RESUME:
-                logf("audio_resume");
-                pcmbuf_pause(false);
-                paused = false;
-                break ;
-
-            case Q_AUDIO_NEXT:
-                logf("audio_next");
+            case Q_AUDIO_SKIP:
+                logf("audio_skip");
                 last_tick = current_tick;
                 playlist_end = false;
-                initiate_track_change(1);
-                break ;
-
-            case Q_AUDIO_PREV:
-                logf("audio_prev");
-                last_tick = current_tick;
-                playlist_end = false;
-                initiate_track_change(-1);
+                initiate_track_change((int)ev.data);
                 break;
 
             case Q_AUDIO_FF_REWIND:
@@ -1924,22 +1914,12 @@ void audio_thread(void)
                 ci.seek_time = (long)ev.data+1;
                 break ;
 
-            case Q_AUDIO_DIR_NEXT:
-                logf("audio_dir_next");
+            case Q_AUDIO_DIR_SKIP:
+                logf("audio_dir_skip");
                 playlist_end = false;
-                /* pcmbuf_beep may or may not be safe on audio thread */
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-                initiate_dir_change(1);
-                break;
-
-            case Q_AUDIO_DIR_PREV:
-                logf("audio_dir_prev");
-                playlist_end = false;
-                /* pcmbuf_beep may or may not be safe on audio thread */
-                if (global_settings.beep)
-                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-                initiate_dir_change(-1);
+                initiate_dir_change((int)ev.data);
                 break;
 
             case Q_AUDIO_FLUSH:
@@ -2232,12 +2212,12 @@ bool mp3_pause_done(void)
 
 void audio_pause(void)
 {
-    queue_post(&audio_queue, Q_AUDIO_PAUSE, 0);
+    queue_post(&audio_queue, Q_AUDIO_PAUSE, (void *)true);
 }
 
 void audio_resume(void)
 {
-    queue_post(&audio_queue, Q_AUDIO_RESUME, 0);
+    queue_post(&audio_queue, Q_AUDIO_PAUSE, (void *)false);
 }
 
 void audio_next(void)
@@ -2255,7 +2235,7 @@ void audio_next(void)
     if (mutex_bufferfill.locked)
         cur_ti->taginfo_ready = false;
 
-    queue_post(&audio_queue, Q_AUDIO_NEXT, 0);
+    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
 }
 
 void audio_prev(void)
@@ -2273,17 +2253,17 @@ void audio_prev(void)
     if (mutex_bufferfill.locked)
         cur_ti->taginfo_ready = false;
 
-    queue_post(&audio_queue, Q_AUDIO_PREV, 0);
+    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
 }
 
 void audio_next_dir(void)
 {
-    queue_post(&audio_queue, Q_AUDIO_DIR_NEXT, 0);
+    queue_post(&audio_queue, Q_AUDIO_DIR_SKIP, (void *)1);
 }
 
 void audio_prev_dir(void)
 {
-    queue_post(&audio_queue, Q_AUDIO_DIR_PREV, 0);
+    queue_post(&audio_queue, Q_AUDIO_DIR_SKIP, (void *)-1);
 }
 
 void audio_pre_ff_rewind(void) {
