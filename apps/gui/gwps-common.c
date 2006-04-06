@@ -2347,7 +2347,11 @@ bool ffwd_rew(int button)
                           wps_state.id3 && wps_state.id3->length )
                     {
                         if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                            audio_pre_ff_rewind();
+#else
                             audio_pause();
+#endif
 #if CONFIG_KEYPAD == PLAYER_PAD
                         FOR_NB_SCREENS(i)
                             gui_wps[i].display->stop_scroll();
@@ -2399,8 +2403,10 @@ bool ffwd_rew(int button)
                 ff_rewind_count = 0;
                 wps_state.ff_rewind = false;
                 status_set_ffmode(0);
+#if (CONFIG_CODEC != SWCODEC)
                 if (!wps_state.paused)
                     audio_resume();
+#endif
 #ifdef HAVE_LCD_CHARCELLS
                 gui_wps_display();
 #endif

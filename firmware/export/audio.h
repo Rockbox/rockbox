@@ -70,6 +70,7 @@ void audio_resume(void);
 void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
+void audio_pre_ff_rewind(void); /* SWCODEC only */
 void audio_ff_rewind(long newtime);
 void audio_flush_and_reload_tracks(void);
 struct mp3entry* audio_current_track(void);
