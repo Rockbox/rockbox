@@ -636,6 +636,8 @@ byte *V_PatchToBlock(const char* name, int cm,
                      enum patch_translation_e flags,
                      unsigned short* width, unsigned short* height)
 {
+   (void)cm;
+   (void)flags;
    byte          *oldscr = d_screens[1];
    byte          *block;
    const patch_t *patch;
