@@ -222,7 +222,7 @@ void ipod_4g_button_int(void)
     CPU_HI_INT_EN = I2C_MASK;
 }
 #endif 
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || defined(IPOD_MINI) 
+#if (CONFIG_KEYPAD == IPOD_3G_PAD) || defined(IPOD_MINI)
 /* iPod 3G and mini 1G, mini 2G uses iPod 4G code */
 void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 {
@@ -393,8 +393,8 @@ static int ipod_3g_button_read(void)
 
     return btn;
 }
+#endif
 
-#endif 
 static void button_tick(void)
 {
     static int tick = 0;
@@ -482,10 +482,9 @@ static void button_tick(void)
 #ifdef HAVE_SW_POWEROFF
                             if ((btn == POWEROFF_BUTTON
 #ifdef BUTTON_RC_STOP
-                                        || btn == BUTTON_RC_STOP) &&
-#else
-                                        ) &&
+                                        || btn == BUTTON_RC_STOP
 #endif
+                                        ) &&
 #if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                                     !charger_inserted() &&
 #endif
@@ -836,14 +835,12 @@ static int button_read(void)
 {
     int btn = BUTTON_NONE;
     int retval;
-
     int data;
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD)\
-     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     static bool hold_button = false;
     static bool remote_hold_button = false;
+    static int last_button_val= 0xff;
 
     /* light handling */
     if (hold_button && !button_hold())
@@ -862,136 +859,146 @@ static int button_read(void)
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
-#if CONFIG_KEYPAD == IRIVER_H100_PAD        
-        if (data < 0x80)
-            if (data < 0x30)
-                if (data < 0x18)
-                    btn = BUTTON_SELECT;
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
+        if ((data < 0xf0) && ((unsigned)(data - last_button_val + 1) <= 2))
+        {
+            if (data < 0x80)
+                if (data < 0x30)
+                    if (data < 0x18)
+                        btn = BUTTON_SELECT;
+                    else
+                        btn = BUTTON_UP;
                 else
-                    btn = BUTTON_UP;
+                    if (data < 0x50)
+                        btn = BUTTON_LEFT;
+                    else
+                        btn = BUTTON_DOWN;
             else
-                if (data < 0x50)
-                    btn = BUTTON_LEFT;
+                if (data < 0xb0)
+                    if (data < 0xa0)
+                        btn = BUTTON_RIGHT;
+                    else
+                        btn = BUTTON_OFF;
                 else
-                    btn = BUTTON_DOWN;
-        else
-            if (data < 0xb0)
-                if (data < 0xa0)
-                    btn = BUTTON_RIGHT;
-                else
-                    btn = BUTTON_OFF;
-            else
-                if (data < 0xd0)
-                    btn = BUTTON_MODE;
-                else
-                    if (data < 0xf0)
+                    if (data < 0xd0)
+                        btn = BUTTON_MODE;
+                    else
                         btn = BUTTON_REC;
+        }
 #else /* H300 */
-        if (data < 0x54)
-            if (data < 0x30)
-                if (data < 0x10)
-                    btn = BUTTON_SELECT;
+        if ((data < 0xba) && ((unsigned)(data - last_button_val + 1) <= 2))
+        {
+            if (data < 0x54)
+                if (data < 0x30)
+                    if (data < 0x10)
+                        btn = BUTTON_SELECT;
+                    else
+                        btn = BUTTON_UP;
                 else
-                    btn = BUTTON_UP;
+                    btn = BUTTON_LEFT;
             else
-                btn = BUTTON_LEFT;
-        else
-            if (data < 0x98)
-                if (data < 0x76)
-                    btn = BUTTON_DOWN;
+                if (data < 0x98)
+                    if (data < 0x76)
+                        btn = BUTTON_DOWN;
+                    else
+                        btn = BUTTON_RIGHT;
                 else
-                    btn = BUTTON_RIGHT;
-            else
-                if(data < 0xba)
                     btn = BUTTON_OFF;
- 
+        }
 #endif
+        last_button_val = data;
     }
-    
+
     /* remote buttons */
     if (!remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
-        switch(remote_type())
+        switch (remote_type())
         {
             case REMOTETYPE_H100_LCD:
-                if (data < 0x73)
-                    if (data < 0x3f)
-                        if (data < 0x25)
-                            if(data < 0x0c)
-                                btn = BUTTON_RC_STOP;
+                if (data < 0xf5)
+                {
+                    if (data < 0x73)
+                        if (data < 0x3f)
+                            if (data < 0x25)
+                                if(data < 0x0c)
+                                    btn |= BUTTON_RC_STOP;
+                                else
+                                    btn |= BUTTON_RC_VOL_DOWN;
                             else
-                                btn = BUTTON_RC_VOL_DOWN;
+                                btn |= BUTTON_RC_MODE;
                         else
-                            btn = BUTTON_RC_MODE;
-                    else
-                        if (data < 0x5a)
-                            btn = BUTTON_RC_VOL_UP;
-                        else
-                            btn = BUTTON_RC_BITRATE;
-                else
-                    if (data < 0xa8)
-                        if (data < 0x8c)
-                            btn = BUTTON_RC_REC;
-                        else
-                            btn = BUTTON_RC_SOURCE;
-                    else
-                        if (data < 0xdf)
-                            if(data < 0xc5)
-                                btn = BUTTON_RC_FF;
+                            if (data < 0x5a)
+                                btn |= BUTTON_RC_VOL_UP;
                             else
-                                btn = BUTTON_RC_MENU;
+                                btn |= BUTTON_RC_BITRATE;
+                    else
+                        if (data < 0xa8)
+                            if (data < 0x8c)
+                                btn |= BUTTON_RC_REC;
+                            else
+                                btn |= BUTTON_RC_SOURCE;
                         else
-                            if (data < 0xf5)
-                                btn = BUTTON_RC_REW;
+                            if (data < 0xdf)
+                                if(data < 0xc5)
+                                    btn |= BUTTON_RC_FF;
+                                else
+                                    btn |= BUTTON_RC_MENU;
+                            else
+                                btn |= BUTTON_RC_REW;
+                }
                 break;
-            case REMOTETYPE_H300_LCD:  
-                 if (data < 0x73)
-                    if (data < 0x42)
-                        if (data < 0x27)
-                            if(data < 0x0c)
-                                btn = BUTTON_RC_VOL_DOWN;
+            case REMOTETYPE_H300_LCD:
+                if (data < 0xf5)
+                {
+                    if (data < 0x73)
+                        if (data < 0x42)
+                            if (data < 0x27)
+                                if(data < 0x0c)
+                                    btn |= BUTTON_RC_VOL_DOWN;
+                                else
+                                    btn |= BUTTON_RC_FF;
                             else
-                                btn = BUTTON_RC_FF;
+                                btn |= BUTTON_RC_STOP;
                         else
-                            btn = BUTTON_RC_STOP;
-                    else
-                        if (data < 0x5b)
-                            btn = BUTTON_RC_MODE;
-                        else
-                            btn = BUTTON_RC_REC;
-                else
-                    if (data < 0xab)
-                        if (data < 0x8e)
-                            btn = BUTTON_RC_ON;
-                        else
-                            btn = BUTTON_RC_BITRATE;
-                    else
-                        if (data < 0xde)
-                            if(data < 0xc5)
-                                btn = BUTTON_RC_SOURCE;
+                            if (data < 0x5b)
+                                btn |= BUTTON_RC_MODE;
                             else
-                                btn = BUTTON_RC_VOL_UP;
+                                btn |= BUTTON_RC_REC;
+                    else
+                        if (data < 0xab)
+                            if (data < 0x8e)
+                                btn |= BUTTON_RC_ON;
+                            else
+                                btn |= BUTTON_RC_BITRATE;
                         else
-                            if (data < 0xf5)
-                                btn = BUTTON_RC_REW;
+                            if (data < 0xde)
+                                if(data < 0xc5)
+                                    btn |= BUTTON_RC_SOURCE;
+                                else
+                                    btn |= BUTTON_RC_VOL_UP;
+                            else
+                                btn |= BUTTON_RC_REW;
+                }
                 break;
             case REMOTETYPE_H300_NONLCD:
-                if(data<0x7d)
-                    if(data<0x25)
-                        btn = BUTTON_RC_FF;
+                if (data < 0xf1)
+                {
+                    if (data < 0x7d)
+                        if (data < 0x25)
+                            btn |= BUTTON_RC_FF;
+                        else
+                            btn |= BUTTON_RC_REW;
                     else
-                        btn = BUTTON_RC_REW;
-                else
-                    if(data<0xd5)
-                        btn = BUTTON_RC_VOL_DOWN;
-                    else
-                        if(data<0xf1) /* 0xff no button pressed */
-                            btn = BUTTON_RC_VOL_UP;
+                        if (data < 0xd5)
+                            btn |= BUTTON_RC_VOL_DOWN;
+                        else
+                            btn |= BUTTON_RC_VOL_UP;
+                }
                 break;
         }
     }
-    
+
     /* special buttons */
 #if CONFIG_KEYPAD == IRIVER_H300_PAD
     if (!hold_button)
@@ -1020,7 +1027,6 @@ static int button_read(void)
         }
    
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-
     static bool hold_button = false;
 
     /* light handling */
@@ -1032,67 +1038,56 @@ static int button_read(void)
 
     /* normal buttons */
     if (!button_hold())
-    {
+    {          
         data = adc_read(ADC_BUTTONS);
-        
-        if (data < 0x151)
-            if (data < 0xc7)
-                if (data < 0x41)
-                    btn = BUTTON_LEFT;
+        if (data < 0x35c)
+        {
+            if (data < 0x151)
+                if (data < 0xc7)
+                    if (data < 0x41)
+                        btn = BUTTON_LEFT;
+                    else
+                        btn = BUTTON_RIGHT;
                 else
-                    btn = BUTTON_RIGHT;
+                    btn = BUTTON_SELECT;
             else
-                btn = BUTTON_SELECT;
-        else
-            if (data < 0x268)
-                if (data < 0x1d7)
-                    btn = BUTTON_UP;
+                if (data < 0x268)
+                    if (data < 0x1d7)
+                        btn = BUTTON_UP;
+                    else
+                        btn = BUTTON_DOWN;
                 else
-                    btn = BUTTON_DOWN;
-            else
-                if (data < 0x2f9)
-                    btn = BUTTON_EQ;
-                else
-                    if (data < 0x35c)
+                    if (data < 0x2f9)
+                        btn = BUTTON_EQ;
+                    else
                         btn = BUTTON_MODE;
+        }
+
+        if (adc_read(ADC_BUTTON_PLAY) < 0x64)
+            btn |= BUTTON_PLAY;
     }
-    
-    if (!button_hold() && (adc_read(ADC_BUTTON_PLAY) < 0x64))
-        btn |= BUTTON_PLAY;
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
-
-#ifdef HAVE_FMADC
-    if ( adc_read(ADC_BUTTON_ON) < 512 )
-        btn |= BUTTON_ON;
-    if ( adc_read(ADC_BUTTON_OFF) > 512 )
-        btn |= BUTTON_OFF;
-#else
-    /* check port B pins for ON and OFF */
-    data = PBDR;
-    if ((data & 0x0100) == 0)
-        btn |= BUTTON_ON;
-    if ((data & 0x0010) == 0)
-        btn |= BUTTON_OFF;
+#ifndef HAVE_FMADC
+    static int off_button_count = 0;
 #endif
 
     /* check F1..F3 and UP */
     data = adc_read(ADC_BUTTON_ROW1);
-    
     if (data >= LEVEL1)
     {
         if (data >= LEVEL3)
             if (data >= LEVEL4)
-                btn |= BUTTON_F3;
+                btn = BUTTON_F3;
             else
-                btn |= BUTTON_UP;
+                btn = BUTTON_UP;
         else
             if (data >= LEVEL2)
-                btn |= BUTTON_F2;
+                btn = BUTTON_F2;
             else
-                btn |= BUTTON_F1;
+                btn = BUTTON_F1;
     }
-    
+
     /* Some units have mushy keypads, so pressing UP also activates
        the Left/Right buttons. Let's combat that by skipping the AN5
        checks when UP is pressed. */
@@ -1100,7 +1095,6 @@ static int button_read(void)
     {
         /* check DOWN, PLAY, LEFT, RIGHT */
         data = adc_read(ADC_BUTTON_ROW2);
-
         if (data >= LEVEL1)
         {
             if (data >= LEVEL3)
@@ -1116,11 +1110,33 @@ static int button_read(void)
         }
     }
 
-#elif CONFIG_KEYPAD == PLAYER_PAD
+#ifdef HAVE_FMADC
+    if ( adc_read(ADC_BUTTON_ON) < 512 )
+        btn |= BUTTON_ON;
+    if ( adc_read(ADC_BUTTON_OFF) > 512 )
+        btn |= BUTTON_OFF;
+#else
+    /* check port B pins for ON and OFF */
+    data = PBDR;
+    if ((data & 0x0100) == 0)
+        btn |= BUTTON_ON;
 
+    if ((data & 0x0010) == 0)
+    {
+        /* When the batteries are low, the low-battery shutdown logic causes
+         * spurious OFF events due to voltage fluctuation on some units.
+         * Only accept OFF when read several times in sequence. */
+        if (++off_button_count > 3)
+            btn |= BUTTON_OFF;
+    }
+    else
+        off_button_count = 0;
+#endif
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
     /* buttons are active low */
     if (adc_read(0) < 0x180)
-        btn |= BUTTON_LEFT;
+        btn = BUTTON_LEFT;
     if (adc_read(1) < 0x180)
         btn |= BUTTON_MENU;
     if(adc_read(2) < 0x180)
@@ -1136,46 +1152,54 @@ static int button_read(void)
         btn |= BUTTON_STOP;
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
+    /* Check the 4 direction keys */
+    data = adc_read(ADC_BUTTON_ROW1);
+    if (data >= LEVEL1)
+    {
+        if (data >= LEVEL3)
+            if (data >= LEVEL4)
+                btn = BUTTON_LEFT;
+            else
+                btn = BUTTON_RIGHT;
+        else
+            if (data >= LEVEL2)
+                btn = BUTTON_UP;
+            else
+                btn = BUTTON_DOWN;
+    }
 
     if(adc_read(ADC_BUTTON_OPTION) > 0x200) /* active high */
         btn |= BUTTON_MENU;
     if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
         btn |= BUTTON_OFF;
 
-    /* Check the 4 direction keys */
-    data = adc_read(ADC_BUTTON_ROW1);
-
-    if (data >= LEVEL1)
-    {
-        if (data >= LEVEL3)
-            if (data >= LEVEL4)
-                btn |= BUTTON_LEFT;
-            else
-                btn |= BUTTON_RIGHT;
-        else
-            if (data >= LEVEL2)
-                btn |= BUTTON_UP;
-            else
-                btn |= BUTTON_DOWN;
-    }            
-
 #elif CONFIG_KEYPAD == GMINI100_PAD
+    data = adc_read(7);
+    if (data < 0x38a)
+    {
+        if (data < 0x1c5)
+            if (data < 0xe3)
+                btn = BUTTON_LEFT;
+            else
+                btn = BUTTON_DOWN;
+        else
+            if (data < 0x2a2)
+                btn = BUTTON_RIGHT;
+            else
+                btn = BUTTON_UP;
+    }
 
-    if (adc_read(7) < 0xE3)
-        btn |= BUTTON_LEFT;
-    else if (adc_read(7) < 0x1c5)
-        btn |= BUTTON_DOWN;
-    else if (adc_read(7) < 0x2a2)
-        btn |= BUTTON_RIGHT;
-    else if (adc_read(7) < 0x38a)
-        btn |= BUTTON_UP;
-
-    if (adc_read(6) < 0x233)
-        btn |= BUTTON_OFF;
-    else if (adc_read(6) < 0x288)
-        btn |= BUTTON_PLAY;
-    else if (adc_read(6) < 0x355)
-        btn |= BUTTON_MENU;
+    data = adc_read(6);
+    if (data < 0x355)
+    {
+        if (data < 0x288)
+            if (data < 0x233)
+                btn |= BUTTON_OFF;
+            else
+                btn |= BUTTON_PLAY;
+        else
+            btn |= BUTTON_MENU;
+    }
 
     data = P7;
     if (data & 0x01)
@@ -1185,6 +1209,7 @@ static int button_read(void)
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD)
     (void)data;
     btn = ipod_3g_button_read();
@@ -1200,27 +1225,29 @@ static int button_read(void)
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
-        if(data < 0x7c)
-            if(data < 0x42)
-                btn = BUTTON_LEFT;
+        if (data < 0xf0)
+        {
+            if(data < 0x7c)
+                if(data < 0x42)
+                    btn = BUTTON_LEFT;
+                else
+                    if(data < 0x62)
+                        btn = BUTTON_RIGHT;
+                    else
+                        btn = BUTTON_SELECT;
             else
-                if(data < 0x62)
-                    btn = BUTTON_RIGHT;
+                if(data < 0xb6)
+                    if(data < 0x98)
+                        btn = BUTTON_REC;
+                    else
+                        btn = BUTTON_PLAY;
                 else
-                    btn = BUTTON_SELECT;
-        else
-            if(data < 0xb6)
-                if(data < 0x98)
-                    btn = BUTTON_REC;
-                else
-                    btn = BUTTON_PLAY;
-            else
-                if(data < 0xd3)
-                    btn = BUTTON_DOWN;
-                else
-                    if(data < 0xf0)
+                    if(data < 0xd3)
+                        btn = BUTTON_DOWN;
+                    else
                         btn = BUTTON_UP;
-    }    
+        }
+    }
 
     /* remote buttons */
     data = adc_scan(ADC_REMOTE);
@@ -1229,28 +1256,30 @@ static int button_read(void)
 
     if(!remote_hold_button)
     {
-        if(data < 0x7a)
-            if(data < 0x41)
-                btn = BUTTON_RC_REW;
+        if (data < 0xee)
+        {
+            if(data < 0x7a)
+                if(data < 0x41)
+                    btn |= BUTTON_RC_REW;
+                else
+                    if(data < 0x61)
+                        btn |= BUTTON_RC_FF;
+                    else
+                        btn |= BUTTON_RC_MODE;
             else
-                if(data < 0x61)
-                    btn = BUTTON_RC_FF;
+                if(data < 0xb4)
+                    if(data < 0x96)
+                        btn |= BUTTON_RC_REC;
+                    else
+                        btn |= BUTTON_RC_MENU;
                 else
-                    btn = BUTTON_RC_MODE;
-        else
-            if(data < 0xb4)
-                if(data < 0x96)
-                    btn = BUTTON_RC_REC;
-                else
-                    btn = BUTTON_RC_MENU;
-            else
-                if(data < 0xd1)
-                    btn = BUTTON_RC_VOL_UP;
-                else
-                    if(data < 0xee)
-                        btn = BUTTON_RC_VOL_DOWN;
+                    if(data < 0xd1)
+                        btn |= BUTTON_RC_VOL_UP;
+                    else
+                        btn |= BUTTON_RC_VOL_DOWN;
+        }
     }
-    
+
     data = GPIO_READ;
     if (!(data & 0x04000000))
         btn |= BUTTON_POWER;
@@ -1259,7 +1288,6 @@ static int button_read(void)
         btn |= BUTTON_RC_PLAY;
 
 #endif /* CONFIG_KEYPAD */
-
 
 #ifdef HAVE_LCD_BITMAP
     if (btn && flipped)
