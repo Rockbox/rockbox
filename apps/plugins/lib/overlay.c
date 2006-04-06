@@ -85,7 +85,6 @@ enum plugin_status run_overlay(struct plugin_api* rb, void* parameter,
         rb->splash(2*HZ, true, "%s overlay doesn't fit into memory.", name);
         return PLUGIN_ERROR;
     }
-    rb->memset(header.load_addr, 0, header.end_addr - header.load_addr);
 
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
@@ -101,6 +100,10 @@ enum plugin_status run_overlay(struct plugin_api* rb, void* parameter,
         rb->splash(2*HZ, true, "Reading %s overlay failed.", name);
         return PLUGIN_ERROR;
     }
+    /* Zero out bss area */
+    rb->memset(header.load_addr + readsize, 0,
+               header.end_addr - (header.load_addr + readsize));
+
     return header.entry_point(rb, parameter);
 }
 #endif

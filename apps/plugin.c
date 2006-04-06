@@ -490,8 +490,6 @@ int plugin_load(const char* plugin, void* parameter)
         gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_CANT_OPEN), plugin);
         return fd;
     }
-    /* zero out plugin buffer to ensure a properly zeroed bss area */
-    memset(pluginbuf, 0, PLUGIN_BUFFER_SIZE);
 
     readsize = read(fd, pluginbuf, PLUGIN_BUFFER_SIZE);
     close(fd);
@@ -516,6 +514,9 @@ int plugin_load(const char* plugin, void* parameter)
         return -1;
     }
     plugin_size = hdr->end_addr - pluginbuf;
+
+    /* zero out bss area only, above guards end of pluginbuf */
+    memset(pluginbuf + readsize, 0, plugin_size - readsize);
 #endif
 
     plugin_loaded = true;
