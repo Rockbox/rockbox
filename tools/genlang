@@ -294,7 +294,7 @@ my $voiceid=0x8000; # counter for voice-only ID numbers
 # Now start the scanning of the selected language string
 #
 
-open(LANG, "<$input");
+open(LANG, "<$input") || die "couldn't read language file named $input\n";
 my @phrase;
 while(<LANG>) {
 
@@ -329,15 +329,31 @@ while(<LANG>) {
                 my $idnum;
 
                 if($dest =~ /^none\z/i) {
-                    # "none" as dest means that this entire phrase is to be
-                    # ignored
-                    #print "dest is NONE!\n";
+                    # "none" as dest (without quotes) means that this entire
+                    # phrase is to be ignored
                 }
                 else {
+                    # allow the keyword 'deprecated' to be used on dest and
+                    # voice strings to mark that as deprecated. It will then
+                    # be replaced with "".
+
+                    $dest =~ s/^deprecate(|d)\z/\"\"/i;
+                    $voice =~ s/^deprecate(|d)\z/\"\"/i;
 
                     # Use the ID name to figure out which id number range we
                     # should use for this phrase. Voice-only strings are
                     # separated.
+
+                    # basic syntax error alerts
+                    if($dest != /^\"/) {
+                        print STDERR "dest around line $line lacks quotes!\n";
+                    }
+                    if($src != /^\"/) {
+                        print STDERR "source around line $line lacks quotes!\n";
+                    }
+                    if($voice != /^\"/) {
+                        print STDERR "voice around line $line lacks quotes!\n";
+                    }
 
                     if($idstr =~ /^VOICE/) {
                         $idnum = $voiceid++;
@@ -420,8 +436,10 @@ if($update) {
 if($prefix) {
     # We create a .c and .h file
 
-    open(HFILE, ">$prefix.h");
-    open(CFILE, ">$prefix.c");
+    open(HFILE, ">$prefix.h") ||
+        die "couldn't create file $prefix.h\n";
+    open(CFILE, ">$prefix.c") ||
+        die "couldn't create file $prefix.c\n";        
 
     print HFILE <<MOO
 /* This file was automatically generated using genlang2 */
