@@ -70,8 +70,8 @@ void xlcd_scroll_left(int count)
             for (bx = 0; bx < blocklen; bx++)
             {
                 --row_addr;
-                data = (data << 8) | *row_addr;
-                *row_addr = data >> bitcount;
+                data = (data >> 8) | (*row_addr << bitcount);
+                *row_addr = data;
             }
             addr += LCD_FBWIDTH;
         }
@@ -124,8 +124,8 @@ void xlcd_scroll_right(int count)
 
             for (bx = 0; bx < blocklen; bx++)
             {
-                data = (data >> 8) | (*row_addr << bitcount);
-                *row_addr = data;
+                data = (data << 8) | *row_addr;
+                *row_addr = data >> bitcount;
                 row_addr++;
             }
             addr += LCD_FBWIDTH;
