@@ -74,6 +74,9 @@
 
 #define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
 
+/* Define if we have a hardware defect that causes ticking on the audio line */
+#define HAVE_REMOTE_LCD_TICKING
+
 /* Define this if the platform can charge batteries */
 #define HAVE_CHARGING 1
 
