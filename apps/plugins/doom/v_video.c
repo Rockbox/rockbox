@@ -188,13 +188,11 @@ void V_InitColorTranslation(void)
 // upper left origin and height and width dirty to minimize
 // the amount of screen update necessary. No return.
 //
-#ifndef GL_DOOM
 void V_MarkRect(int x, int y, int width, int height)
 {
    M_AddToBox(dirtybox, x, y);
    M_AddToBox(dirtybox, x+width-1, y+height-1);
 }
-#endif /* GL_DOOM */
 
 //
 // V_CopyRect
@@ -208,7 +206,6 @@ void V_MarkRect(int x, int y, int width, int height)
 //
 // No return.
 //
-#ifndef GL_DOOM
 void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
                 int height, int destx, int desty, int destscrn,
                 enum patch_translation_e flags)
@@ -249,7 +246,6 @@ void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
       dest += SCREENWIDTH;
    }
 }
-#endif /* GL_DOOM */
 
 //
 // V_DrawBlock
@@ -266,7 +262,6 @@ void V_CopyRect(int srcx, int srcy, int srcscrn, int width,
 // CPhipps - modified  to take the patch translation flags. For now, only stretching is
 //  implemented, to support highres in the menus
 //
-#ifndef GL_DOOM
 void V_DrawBlock(int x, int y, int scrn, int width, int height,
                  const byte *src, enum patch_translation_e flags)
 {
@@ -317,7 +312,6 @@ void V_DrawBlock(int x, int y, int scrn, int width, int height,
       }
    }
 }
-#endif /* GL_DOOM */
 
 /*
  * V_DrawBackground tiles a 64x64 patch over the entire screen, providing the
@@ -325,7 +319,6 @@ void V_DrawBlock(int x, int y, int scrn, int width, int height,
  * cphipps - used to have M_DrawBackground, but that was used the framebuffer
  * directly, so this is my code from the equivalent function in f_finale.c
  */
-#ifndef GL_DOOM
 void V_DrawBackground(const char* flatname, int scrn)
 {
    /* erase the entire screen to a tiled background */
@@ -344,7 +337,6 @@ void V_DrawBackground(const char* flatname, int scrn)
                     ((SCREENHEIGHT-y) < 64) ? (SCREENHEIGHT-y) : 64, x, y, scrn, VPT_NONE);
    W_UnlockLumpNum(lump);
 }
-#endif
 
 //
 // V_GetBlock
@@ -356,7 +348,6 @@ void V_DrawBackground(const char* flatname, int scrn)
 // No return
 //
 
-#ifndef GL_DOOM
 void V_GetBlock(int x, int y, int scrn, int width, int height, byte *dest)
 {
    byte *src;
@@ -378,7 +369,6 @@ void V_GetBlock(int x, int y, int scrn, int width, int height, byte *dest)
       dest += width;
    }
 }
-#endif /* GL_DOOM */
 
 //
 // V_Init
@@ -415,7 +405,6 @@ void V_Init (void)
 // (indeed, laziness of the people who wrote the 'clones' of the original V_DrawPatch
 //  means that their inner loops weren't so well optimised, so merging code may even speed them).
 //
-#ifndef GL_DOOM
 void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
                     int cm, enum patch_translation_e flags)
 {
@@ -437,13 +426,15 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
    if (!trans)
       flags &= ~VPT_TRANS;
 
-//   if (x<0
-//         ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
-//         || y<0
-//         || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
-//      // killough 1/19/98: improved error message:
-//      I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB"
-//              "Bad V_DrawMemPatch (flags=%u)", x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
+#ifdef RANGECHECK
+   if (x<0
+         ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
+         || y<0
+         || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
+      // killough 1/19/98: improved error message:
+      I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB Bad V_DrawMemPatch (flags=%u)",
+         x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
+#endif
 
    if (!(flags & VPT_STRETCH)) {
       unsigned int             col;
@@ -546,6 +537,10 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
 
       desttop = d_screens[scrn] + stretchy * SCREENWIDTH +  stretchx;
 
+      // Clamp down the screenwidth
+      if(w>>16>=319)
+         w=(SCREENWIDTH-1)*DXI;
+
       for ( col = 0; col <= w; x++, col+=DXI, desttop++ ) {
          const column_t *column;
          {
@@ -564,12 +559,6 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
                                                               // height values of 240, this code cuts off
                                                               // thier bottom few pixels
 
-            // NOTE: This scaling code does not work correctly on at least the H300's, this can be seen
-            // in the intro graphic along the left side, the pixels are not correct.  A more blatant
-            // example is the bunnyscroller at the end of retail doom episode 3.  I've added one extra
-            // width to d_screens[0] and this seemed to stop the freeze at the end of the game.  This
-            // needs to be fixed properly.
-
             if (flags & VPT_TRANS)
                while (count--) {
                   *dest  =  trans[source[srccol>>16]];
@@ -587,7 +576,6 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
       }
    }
 }
-#endif // GL_DOOM
 
 // CPhipps - some simple, useful wrappers for that function, for drawing patches from wads
 
@@ -595,7 +583,6 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
 // static inline; other compilers have different behaviour.
 // This inline is _only_ for the function below
 
-#ifndef GL_DOOM
 #ifdef __GNUC__
 inline
 #endif
@@ -606,7 +593,6 @@ void V_DrawNumPatch(int x, int y, int scrn, int lump,
                   cm, flags);
    W_UnlockLumpNum(lump);
 }
-#endif // GL_DOOM
 
 /* cph -
  * V_NamePatchWidth - returns width of a patch.
@@ -646,7 +632,6 @@ int V_NamePatchHeight(const char* name)
 // Returns a simple bitmap which contains the patch. See-through parts of the
 // patch will be undefined (in fact black for now)
 
-#ifndef GL_DOOM
 byte *V_PatchToBlock(const char* name, int cm,
                      enum patch_translation_e flags,
                      unsigned short* width, unsigned short* height)
@@ -658,8 +643,10 @@ byte *V_PatchToBlock(const char* name, int cm,
    d_screens[1] = calloc(SCREENWIDTH*SCREENHEIGHT, 1);
 
    patch = W_CacheLumpName(name);
-   V_DrawMemPatch(SHORT(patch->leftoffset), SHORT(patch->topoffset),
-                  1, patch, cm, flags);
+// One of those odd things that don't seem to have a purpose other then rangechecking
+//  On screens smaller than 320X200 this line causes problems.
+//   V_DrawMemPatch(SHORT(patch->leftoffset), SHORT(patch->topoffset),
+//                  1, patch, cm, flags);
 
 #ifdef RANGECHECK
    if (flags & VPT_STRETCH)
@@ -677,7 +664,6 @@ byte *V_PatchToBlock(const char* name, int cm,
    d_screens[1] = oldscr;
    return block;
 }
-#endif /* GL_DOOM */
 
 //
 // V_SetPalette
@@ -687,19 +673,13 @@ byte *V_PatchToBlock(const char* name, int cm,
 
 void V_SetPalette(int pal)
 {
-#ifndef GL_DOOM
    I_SetPalette(pal);
-#else
-   // proff 11/99: update the palette
-   gld_SetPalette(pal);
-#endif
 }
 
 //
 // V_FillRect
 //
 // CPhipps - New function to fill a rectangle with a given colour
-#ifndef GL_DOOM
 void V_FillRect(int scrn, int x, int y, int width, int height, byte colour)
 {
    byte* dest = d_screens[scrn] + x + y*SCREENWIDTH;
@@ -708,4 +688,3 @@ void V_FillRect(int scrn, int x, int y, int width, int height, byte colour)
       dest += SCREENWIDTH;
    }
 }
-#endif

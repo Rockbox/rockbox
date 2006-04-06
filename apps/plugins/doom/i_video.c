@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.12  2006/04/05 06:37:37  kkurbjun
+ * Revision 1.13  2006/04/06 21:31:49  kkurbjun
+ * Scaling code fixed by clamping down the width to a max of SCREENWIDTH.  Removed some #ifdefs for glprboom
+ *
+ * Revision 1.12  2006-04-05 06:37:37  kkurbjun
  * Fix finale text and try and prevent some data corruption due to the scaling code.  Also allows the non-standard GP32 mods to work with some bounds checking.  More comments are in v_video.c
  *
  * Revision 1.11  2006-04-04 19:39:31  amiconn
@@ -82,7 +85,7 @@ static unsigned char *gbuf;
 #endif
 
 #if defined(CPU_COLDFIRE) 
-static char fastscreen[(LCD_WIDTH+1)*LCD_HEIGHT] IBSS_ATTR;
+static char fastscreen[(LCD_WIDTH)*LCD_HEIGHT] IBSS_ATTR;
 #endif
 static fb_data palette[256] IBSS_ATTR;
 static fb_data *paldata=NULL;
@@ -468,6 +471,6 @@ void I_InitGraphics(void)
    d_screens[0] = fastscreen;
 #else
    // Don't know if this will fit in other IRAMs
-   d_screens[0] = malloc ((SCREENWIDTH+1) * SCREENHEIGHT * sizeof(unsigned char));
+   d_screens[0] = malloc ((SCREENWIDTH) * SCREENHEIGHT * sizeof(unsigned char));
 #endif
 }
