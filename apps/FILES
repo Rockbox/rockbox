@@ -1,6 +1,7 @@
 FILES
 Makefile
 *.[chS]
+tagnavi.config
 gui/*.[ch]
 recorder/*.[ch]
 player/*.[ch]
