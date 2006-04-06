@@ -289,9 +289,9 @@ static long convert_gain(long gain)
         /* Don't allow unreasonably low or high gain changes. 
          * Our math code can't handle it properly anyway. :)
          */
-        if (gain < (-23 * FP_ONE))
+        if (gain < (-48 * FP_ONE))
         {
-            gain = -23 * FP_ONE;
+            gain = -48 * FP_ONE;
         }
     
         if (gain > (17 * FP_ONE))
