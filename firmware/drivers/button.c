@@ -58,16 +58,13 @@ static bool remote_filter_first_keypress;
 #endif
 #endif
 
-/* how often we check to see if a button is pressed */
-#define POLL_FREQUENCY    HZ/100
-
-/* how long until repeat kicks in */
+/* how long until repeat kicks in, in ticks */
 #define REPEAT_START      30
 
-/* the speed repeat starts at */
+/* the speed repeat starts at, in ticks */
 #define REPEAT_INTERVAL_START   16
 
-/* speed repeat finishes at */
+/* speed repeat finishes at, in ticks */
 #define REPEAT_INTERVAL_FINISH  5
 
 /* the power-off button and number of repeated keys before shutting off */
@@ -397,7 +394,6 @@ static int ipod_3g_button_read(void)
 
 static void button_tick(void)
 {
-    static int tick = 0;
     static int count = 0;
     static int repeat_speed = REPEAT_INTERVAL_START;
     static int repeat_count = 0;
@@ -422,165 +418,153 @@ static void button_tick(void)
     }
 #endif
 
-    /* only poll every X ticks */
-    if ( ++tick >= POLL_FREQUENCY )
+    btn = button_read();
+
+    /* Find out if a key has been released */
+    diff = btn ^ lastbtn;
+    if(diff && (btn & diff) == 0)
     {
-        btn = button_read();
-
-        /* Find out if a key has been released */
-        diff = btn ^ lastbtn;
-        if(diff && (btn & diff) == 0)
-        {
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
-            if(diff & BUTTON_REMOTE)
-                if(!skip_remote_release)
-                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
-                else
-                    skip_remote_release = false;
+        if(diff & BUTTON_REMOTE)
+            if(!skip_remote_release)
+                queue_post(&button_queue, BUTTON_REL | diff, NULL);
             else
-#endif
-                if(!skip_release)
-                    queue_post(&button_queue, BUTTON_REL | diff, NULL);
-                else
-                    skip_release = false;
-#else
-            queue_post(&button_queue, BUTTON_REL | diff, NULL);
-#endif
-        }
+                skip_remote_release = false;
         else
+#endif
+            if(!skip_release)
+                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+            else
+                skip_release = false;
+#else
+        queue_post(&button_queue, BUTTON_REL | diff, NULL);
+#endif
+    }
+    else
+    {
+        if ( btn )
         {
-            if ( btn )
+            /* normal keypress */
+            if ( btn != lastbtn )
             {
-                /* normal keypress */
-                if ( btn != lastbtn )
+                post = true;
+                repeat = false;
+                repeat_speed = REPEAT_INTERVAL_START;
+            }
+            else /* repeat? */
+            {
+                if ( repeat )
                 {
-                    post = true;
-                    repeat = false;
-                    repeat_speed = REPEAT_INTERVAL_START;
-
-                }
-                else /* repeat? */
-                {
-                    if ( repeat )
-                    {
-                        if (!post)
-                            count--;
-                        if (count == 0) {
-                            post = true;
-                            /* yes we have repeat */
+                    if (!post)
+                        count--;
+                    if (count == 0) {
+                        post = true;
+                        /* yes we have repeat */
+                        if (repeat_speed > REPEAT_INTERVAL_FINISH)
                             repeat_speed--;
-                            if (repeat_speed < REPEAT_INTERVAL_FINISH)
-                                repeat_speed = REPEAT_INTERVAL_FINISH;
-                            count = repeat_speed;
+                        count = repeat_speed;
 
-                            repeat_count++;
+                        repeat_count++;
 
-                            /* Send a SYS_POWEROFF event if we have a device
-                               which doesn't shut down easily with the OFF
-                               key */
+                        /* Send a SYS_POWEROFF event if we have a device
+                           which doesn't shut down easily with the OFF
+                           key */
 #ifdef HAVE_SW_POWEROFF
-                            if ((btn == POWEROFF_BUTTON
+                        if ((btn == POWEROFF_BUTTON
 #ifdef BUTTON_RC_STOP
-                                        || btn == BUTTON_RC_STOP
+                                    || btn == BUTTON_RC_STOP
 #endif
-                                        ) &&
+                                    ) &&
 #if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-                                    !charger_inserted() &&
+                                !charger_inserted() &&
 #endif
-                                    repeat_count > POWEROFF_COUNT)
-                            {
-                                /* Tell the main thread that it's time to
-                                   power off */
-                                sys_poweroff();
-
-                                /* Safety net for players without hardware
-                                   poweroff */
-                                if(repeat_count > POWEROFF_COUNT * 10)
-                                    power_off();
-                            }
-#endif
-                        }
-                    }
-                    else
-                    {
-                        if (count++ > REPEAT_START)
+                                repeat_count > POWEROFF_COUNT)
                         {
-                            post = true;
-                            repeat = true;
-                            repeat_count = 0;
-                            /* initial repeat */
-                            count = REPEAT_INTERVAL_START;
+                            /* Tell the main thread that it's time to
+                               power off */
+                            sys_poweroff();
+
+                            /* Safety net for players without hardware
+                               poweroff */
+                            if(repeat_count > POWEROFF_COUNT * 10)
+                                power_off();
                         }
+#endif
                     }
                 }
-                if ( post )
+                else
                 {
-                    if (repeat)
+                    if (count++ > REPEAT_START)
                     {
-                        if (queue_empty(&button_queue))
-                        {
-                            queue_post(
-                                    &button_queue, BUTTON_REPEAT | btn, NULL);
-#ifdef CONFIG_BACKLIGHT
-#ifdef HAVE_REMOTE_LCD
-                            if(btn & BUTTON_REMOTE)
-                            {
-                                if(skip_remote_release)
-                                    skip_remote_release = false;
-                            }
-                            else
-#endif                                    
-                                if(skip_release)
-                                    skip_release = false;
-#endif
-                            post = false;
-                        }
+                        post = true;
+                        repeat = true;
+                        repeat_count = 0;
+                        /* initial repeat */
+                        count = REPEAT_INTERVAL_START;
                     }
-                    else
+                }
+            }
+            if ( post )
+            {
+                if (repeat)
+                {
+                    /* Only post repeat events if the queue is empty,
+                     * to avoid afterscroll effects. */
+                    if (queue_empty(&button_queue))
                     {
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
-                        if (btn & BUTTON_REMOTE) {
-                            if (!remote_filter_first_keypress || is_remote_backlight_on()
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-                               ||(remote_type()==REMOTETYPE_H300_NONLCD)
+                        skip_remote_release = false;
 #endif
-                                            )
-                                queue_post(&button_queue, btn, NULL);
-                            else
-                                skip_remote_release = true;
-                        }
-                        else
-#endif                                    
-                            if (!filter_first_keypress || is_backlight_on())
-                                queue_post(&button_queue, btn, NULL);
-                            else
-                                skip_release = true;
-#else /* no backlight, nothing to skip */
-                        queue_post(&button_queue, btn, NULL);
+                        skip_release = false;
 #endif
                         post = false;
                     }
+                }
+                else
+                {
+#ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
-                    if(btn & BUTTON_REMOTE)
-                        remote_backlight_on();
+                    if (btn & BUTTON_REMOTE) {
+                        if (!remote_filter_first_keypress || is_remote_backlight_on()
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+                           || (remote_type()==REMOTETYPE_H300_NONLCD)
+#endif
+                            )
+                            queue_post(&button_queue, btn, NULL);
+                        else
+                            skip_remote_release = true;
+                    }
                     else
 #endif
-                        backlight_on();
-
-                    reset_poweroff_timer();
+                        if (!filter_first_keypress || is_backlight_on())
+                            queue_post(&button_queue, btn, NULL);
+                        else
+                            skip_release = true;
+#else /* no backlight, nothing to skip */
+                    queue_post(&button_queue, btn, NULL);
+#endif
+                    post = false;
                 }
-            }
-            else
-            {
-                repeat = false;
-                count = 0;
+#ifdef HAVE_REMOTE_LCD
+                if(btn & BUTTON_REMOTE)
+                    remote_backlight_on();
+                else
+#endif
+                    backlight_on();
+
+                reset_poweroff_timer();
             }
         }
-        lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
-        tick = 0;
+        else
+        {
+            repeat = false;
+            count = 0;
+        }
     }
+    lastbtn = btn & ~(BUTTON_REL | BUTTON_REPEAT);
 }
 
 long button_get(bool block)
