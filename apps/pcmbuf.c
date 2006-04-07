@@ -873,6 +873,7 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
                 buf = (short *)audiobuffer;
             *buf++ = amplitude;
 
+            /* Toggle square wav side */
             if (++count >= interval)
             {
                 count = 0;
