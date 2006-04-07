@@ -94,7 +94,9 @@ enum {
     Q_AUDIO_STOP,
     Q_AUDIO_PAUSE,
     Q_AUDIO_SKIP,
+    Q_AUDIO_PRE_FF_REWIND,
     Q_AUDIO_FF_REWIND,
+    Q_AUDIO_SEEK_COMPLETE,
     Q_AUDIO_FLUSH_RELOAD,
     Q_AUDIO_CODEC_DONE,
     Q_AUDIO_FLUSH,
@@ -684,15 +686,8 @@ off_t codec_mp3_get_filepos_callback(int newtime)
 
 void codec_seek_complete_callback(void)
 {
-    /* assume we're called from non-voice codec, as they shouldn't seek */
-    if (pcm_is_paused()) {
-        /* If this is not a seamless seek, clear the buffer */
-        pcmbuf_play_stop();
-        /* If playback was not 'deliberately' paused, unpause now */
-        if (!paused)
-            pcmbuf_pause(false);
-    }
     ci.seek_time = 0;
+    queue_post(&audio_queue, Q_AUDIO_SEEK_COMPLETE, 0);
 }
 
 bool codec_seek_buffer_callback(size_t newpos)
@@ -1877,11 +1872,27 @@ void audio_thread(void)
                 initiate_track_change((long)ev.data);
                 break;
 
+            case Q_AUDIO_PRE_FF_REWIND:
+                if (!playing)
+                    break;
+                pcmbuf_pause(true);
+                break;
+
             case Q_AUDIO_FF_REWIND:
                 if (!playing)
                     break ;
                 ci.seek_time = (long)ev.data+1;
                 break ;
+
+            case Q_AUDIO_SEEK_COMPLETE:
+                if (pcm_is_paused()) {
+                    /* If this is not a seamless seek, clear the buffer */
+                    pcmbuf_play_stop();
+                    /* If playback was not 'deliberately' paused, unpause now */
+                    if (!paused)
+                        pcmbuf_pause(false);
+                }
+                break;
 
             case Q_AUDIO_DIR_SKIP:
                 logf("audio_dir_skip");
@@ -2237,7 +2248,7 @@ void audio_prev_dir(void)
 
 void audio_pre_ff_rewind(void) {
     logf("pre ff/rewind");
-    pcmbuf_pause(true);
+    queue_post(&audio_queue, Q_AUDIO_PRE_FF_REWIND, 0);
 }
 
 void audio_ff_rewind(long newpos)
