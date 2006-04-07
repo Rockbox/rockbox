@@ -806,24 +806,13 @@ static void pcmbuf_track_changed_callback(void)
 static bool yield_codecs(void)
 {
     yield();
-    if (!queue_empty(&audio_queue))
-        return true;
+    if (!queue_empty(&audio_queue)) return true;
 
-    /* This indicates that we are in the initial buffer fill mode, or the
-     * playback recently skipped */
-    if (!pcm_is_playing() && !pcm_is_paused())
-    {
-        sleep(5);
-        if (!queue_empty(&audio_queue))
-            return true;
-    }
-    
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && !filebuf_is_lowdata())
     {
         sleep(1);
-        if (!queue_empty(&audio_queue))
-            return true;
+        if (!queue_empty(&audio_queue)) return true;
     }
     return false;
 }
@@ -889,13 +878,7 @@ static void audio_read_file(void)
         tracks[track_widx].codecsize = 0;
 
     while (tracks[track_widx].filerem > 0) {
-        /* Let the codec process until it is out of the danger zone, or there
-         * is an event to handle.  In the latter case, break this fill cycle
-         * immediately */
-        if (yield_codecs())
-            break;
-
-        if (fill_bytesleft == 0)
+        if (fill_bytesleft <= 0)
             break ;
 
         /* copy_n is the largest chunk that is safe to read */
@@ -918,6 +901,12 @@ static void audio_read_file(void)
         tracks[track_widx].filepos += rc;
         filebufused += rc;
         fill_bytesleft -= rc;
+
+        /* Let the codec process until it is out of the danger zone, or there
+         * is an event to handle.  In the latter case, break this fill cycle
+         * immediately */
+        if (yield_codecs())
+            break;
     }
 
     if (tracks[track_widx].filerem == 0) {
@@ -1051,7 +1040,7 @@ static bool loadcodec(bool start_play)
 
     size = filesize(fd);
     /* Never load a partial codec */
-    if (fill_bytesleft < size + conf_watermark) {
+    if (filebuflen - filebufused < size + conf_watermark) {
         logf("Not enough space");
         /* Set codectype back to zero to indicate no codec was loaded. */
         tracks[track_widx].id3.codectype = 0;
@@ -1063,11 +1052,6 @@ static bool loadcodec(bool start_play)
     mutex_lock(&mutex_bufferfill);
     i = 0;
     while (i < size) {
-        /* FIXME: This will spin around pretty quickly, but still requires
-         * full read of the codec when an event is posted to the audio
-         * queue during this loop */
-        yield_codecs();
-
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
         rc = read(fd, &filebuf[buf_widx], copy_n);
         if (rc < 0)
@@ -1078,6 +1062,11 @@ static bool loadcodec(bool start_play)
         if (buf_widx >= filebuflen)
             buf_widx -= filebuflen;
         i += rc;
+
+        /* FIXME: This will spin around pretty quickly, but still requires
+         * full read of the codec when an event is posted to the audio
+         * queue during this loop */
+        yield_codecs();
     }
     mutex_unlock(&mutex_bufferfill);
 
@@ -1407,6 +1396,8 @@ static void initialize_buffer_fill(bool start_play)
 {
     int cur_idx, i;
 
+    fill_bytesleft = filebuflen - filebufused;
+
     /* Initialize only once; do not truncate the tracks. */
     if (filling)
         return ;
@@ -1418,9 +1409,6 @@ static void initialize_buffer_fill(bool start_play)
 
     if (!start_play) {
         cur_ti->start_pos = ci.curpos;
-        /* FIXME: Should be recalculated more often than once per fill cycle.
-         * This way we only fill up to the read point when filling started. */
-        fill_bytesleft = filebuflen - filebufused;
 
         /* Calculate real track count after throwing away old tracks. */
         cur_idx = track_ridx;
@@ -1442,8 +1430,6 @@ static void initialize_buffer_fill(bool start_play)
 
         /* Mark all buffered entries null (not metadata for next track). */
         audio_clear_track_entries(true);
-    } else {
-        fill_bytesleft = AUDIO_DEFAULT_FIRST_LIMIT;
     }
 
     filling = true;
