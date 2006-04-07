@@ -1317,7 +1317,6 @@ static void stop_codec_flush(void)
 
 static void audio_stop_playback(bool resume)
 {
-    logf("stop_playback:%d", resume);
     if (playing)
         playlist_update_resume_info(resume ? audio_current_track() : NULL);
     playing = false;
@@ -1832,6 +1831,7 @@ void audio_thread(void)
                 break ;
 
             case Q_AUDIO_STOP:
+                logf("stop");
                 audio_stop_playback(true);
                 break ;
 
@@ -1851,16 +1851,19 @@ void audio_thread(void)
             case Q_AUDIO_PRE_FF_REWIND:
                 if (!playing)
                     break;
+                logf("pre_ff_rewind");
                 pcmbuf_pause(true);
                 break;
 
             case Q_AUDIO_FF_REWIND:
                 if (!playing)
                     break ;
+                logf("ff_rewind");
                 ci.seek_time = (long)ev.data+1;
                 break ;
 
             case Q_AUDIO_SEEK_COMPLETE:
+                logf("seek_complete");
                 if (pcm_is_paused()) {
                     /* If this is not a seamless seek, clear the buffer */
                     pcmbuf_play_stop();
@@ -2223,13 +2226,11 @@ void audio_prev_dir(void)
 }
 
 void audio_pre_ff_rewind(void) {
-    logf("pre ff/rewind");
     queue_post(&audio_queue, Q_AUDIO_PRE_FF_REWIND, 0);
 }
 
 void audio_ff_rewind(long newpos)
 {
-    logf("ff/rewind: %d", newpos);
     queue_post(&audio_queue, Q_AUDIO_FF_REWIND, (int *)newpos);
 }
 
