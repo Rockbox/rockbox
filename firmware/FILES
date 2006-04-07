@@ -12,3 +12,4 @@ SOURCES
 decompressor/Makefile
 decompressor/*.[chS]
 decompressor/*.lds
+target/coldfire/iaudio/x5/*.[ch]
