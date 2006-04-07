@@ -162,6 +162,24 @@ PLUGIN_HEADER
 #define MENU_BUTTON_TEXT "NAVI"
 #define COUNTER_BUTTON_TEXT "PLAY"
 
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+
+#define COUNTER_TOGGLE_BUTTON (BUTTON_PLAY|BUTTON_REL)
+#define COUNTER_RESET_BUTTON (BUTTON_PLAY|BUTTON_REPEAT)
+#define MENU_BUTTON BUTTON_SELECT
+#define EXIT_BUTTON BUTTON_POWER
+#define MOVE_UP_BUTTON BUTTON_UP
+#define MOVE_DOWN_BUTTON BUTTON_DOWN
+#define CHANGE_UP_BUTTON BUTTON_RIGHT
+#define CHANGE_DOWN_BUTTON BUTTON_LEFT
+
+#define YESTEXT "Select"
+#define NAVI_BUTTON_TEXT_LEFT "LEFT"
+#define NAVI_BUTTON_TEXT_RIGHT "RIGHT"
+#define EXIT_BUTTON_TEXT "POWER"
+#define MENU_BUTTON_TEXT "SELECT"
+#define COUNTER_BUTTON_TEXT "PLAY"
+
 #endif
 
 /************
@@ -2694,36 +2712,37 @@ void counter_settings(void)
                 else
                 {
                     if(cursorpos == 3)
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_hour < 9)
                             target_hour++;
                         else
                             target_hour = 0;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_hour > 0)
                             target_hour--;
                         else
                           target_hour = 9;
 #endif
                     else if(cursorpos == 4)
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_minute < 59)
                             target_minute++;
                         else
                           target_minute = 0;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_minute > 0)
                             target_minute--;
                         else
                           target_minute = 59;
 #endif
                     else
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_second < 59)
                             target_second++;
                         else
                           target_second = 0;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_second > 0)
                             target_second--;
                         else
@@ -2742,36 +2761,36 @@ void counter_settings(void)
                 else
                 {
                     if(cursorpos == 3)
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_hour > 0)
                             target_hour--;
                         else
                             target_hour = 9;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_hour < 9)
                             target_hour++;
                         else
                           target_hour = 0;
 #endif
                     else if(cursorpos == 4)
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_minute > 0)
                             target_minute--;
                         else
                           target_minute = 59;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_minute < 59)
                             target_minute++;
                         else
                           target_minute = 0;
 #endif
                     else
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IPOD_3G_PAD) && (CONFIG_KEYPAD != IPOD_4G_PAD)
                         if(target_second > 0)
                             target_second--;
                         else
                           target_second = 59;
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#else
                         if(target_second < 59)
                             target_second++;
                         else
