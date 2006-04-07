@@ -1905,7 +1905,7 @@ void audio_thread(void)
                 logf("audio_skip");
                 last_tick = current_tick;
                 playlist_end = false;
-                initiate_track_change((int)ev.data);
+                initiate_track_change((long)ev.data);
                 break;
 
             case Q_AUDIO_FF_REWIND:
@@ -1919,7 +1919,7 @@ void audio_thread(void)
                 playlist_end = false;
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-                initiate_dir_change((int)ev.data);
+                initiate_dir_change((long)ev.data);
                 break;
 
             case Q_AUDIO_FLUSH:
