@@ -1224,11 +1224,27 @@ void set_cpu_frequency(long frequency)
 
     /* Clock frequency = (24/8)*postmult */
     outl(0xaa020000 | 8 | (postmult << 8), 0x60006034);
+
     /* Wait for PLL relock? */
     udelay(2000);
 
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
+
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI)
+    /* We don't know why the timer interrupt gets disabled on the PP5020
+       based ipods, but without the following line, the 4Gs will freeze
+       when CPU frequency changing is enabled.  
+
+       Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
+       elsewhere to enable interrupts) doesn't work, we need "|=".
+
+       It's not needed on the PP5021 and PP5022 ipods.
+    */
+
+    /* unmask interrupt source */
+    CPU_INT_EN |= TIMER1_MASK;
+#endif
 }
 #elif !defined(BOOTLOADER)
 void ipod_set_cpu_frequency(void)
