@@ -1363,16 +1363,11 @@ static void audio_play_start(size_t offset)
     buf_widx = 0;
     filebufused = 0;
     
-    /* Initialize buffer fill */
-    pcmbuf_set_boost_mode(true);
-    fill_bytesleft = AUDIO_DEFAULT_FIRST_LIMIT;
-    filling = true;
     last_peek_offset = -1;
 
     if (offset == 0) parameter = -1;
     else parameter = offset;
 
-    /* Request initial buffer fill */
     queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, (void *)parameter);
 }
 
@@ -1408,7 +1403,7 @@ static void generate_postbuffer_events(void)
     }
 }
 
-static void initialize_buffer_fill(void)
+static void initialize_buffer_fill(bool start_play)
 {
     int cur_idx, i;
 
@@ -1419,48 +1414,50 @@ static void initialize_buffer_fill(void)
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
 
-    cur_ti->start_pos = ci.curpos;
-
     pcmbuf_set_boost_mode(true);
+
+    if (!start_play) {
+        cur_ti->start_pos = ci.curpos;
+        /* FIXME: Should be recalculated more often than once per fill cycle.
+         * This way we only fill up to the read point when filling started. */
+        fill_bytesleft = filebuflen - filebufused;
+
+        /* Calculate real track count after throwing away old tracks. */
+        cur_idx = track_ridx;
+        for (i = 0; i < track_count; i++) {
+            if (cur_idx == track_widx)
+                break ;
+
+            if (++cur_idx >= MAX_TRACK)
+                cur_idx = 0;
+        }
+
+        track_count = i;
+        if (tracks[track_widx].filesize == 0) {
+            if (--track_widx < 0)
+                track_widx = MAX_TRACK - 1;
+        } else {
+            track_count++;
+        }
+
+        /* Mark all buffered entries null (not metadata for next track). */
+        audio_clear_track_entries(true);
+    } else {
+        fill_bytesleft = AUDIO_DEFAULT_FIRST_LIMIT;
+    }
 
     filling = true;
 
-    /* FIXME: This should be recalculated more often than once per fill cycle.
-     * This way we only fill up to the read point when filling started. */
-    fill_bytesleft = filebuflen - filebufused;
-
-    /* Calculate real track count after throwing away old tracks. */
-    cur_idx = track_ridx;
-    for (i = 0; i < track_count; i++) {
-        if (cur_idx == track_widx)
-            break ;
-
-        if (++cur_idx >= MAX_TRACK)
-            cur_idx = 0;
-    }
-
-    track_count = i;
-    if (tracks[track_widx].filesize == 0) {
-        if (--track_widx < 0)
-            track_widx = MAX_TRACK - 1;
-    } else {
-        track_count++;
-    }
-
-    /* Mark all buffered entries null (not metadata for next track). */
-    audio_clear_track_entries(true);
 }
 
-static void audio_fill_file_buffer(long parameter)
+static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
-    size_t offset = parameter < 0?0:parameter;
-    bool start_play = (bool)parameter;
-    if (!filling)
+    if (!filling && !start_play)
         if (ci.stop_codec || ci.reload_codec || playlist_end)
             return;
 
     mutex_lock(&mutex_bufferfill);
-    initialize_buffer_fill();
+    initialize_buffer_fill(start_play);
     mutex_unlock(&mutex_bufferfill);
 
     /* If we have a partially buffered track, continue loading, otherwise
@@ -1805,12 +1802,12 @@ void audio_thread(void)
             }
         }
         else
-            queue_wait(&audio_queue, &ev);
+            queue_wait_w_tmo(&audio_queue, &ev, HZ);
 
 
         switch (ev.id) {
             case Q_AUDIO_FILL_BUFFER:
-                audio_fill_file_buffer((long)ev.data);
+                audio_fill_file_buffer((bool)ev.data,abs((long)ev.data));
                 break;
             case Q_AUDIO_PLAY:
                 /* Don't start playing immediately if user is skipping tracks
@@ -1845,14 +1842,7 @@ void audio_thread(void)
                     yield();
 
                 audio_play_start((size_t)ev.data);
-                playlist_update_resume_info(audio_current_track());
 
-                /* If there are no tracks in the playlist, then the playlist
-                   was empty or none of the filenames were valid.  No point
-                   in playing an empty playlist. */
-                if (playlist_amount() == 0) {
-                    audio_stop_playback(false);
-                }
                 break ;
 
             case Q_AUDIO_STOP:
