@@ -20,6 +20,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
+#include "playback_control.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -180,7 +181,8 @@ enum menu_result {
     MRES_RESUME,
     MRES_SCORES,
     MRES_HELP,
-    MRES_QUIT
+    MRES_QUIT,
+    MRES_PLAYBACK
 };
 
 /* menu commands */
@@ -208,8 +210,9 @@ struct jewels_menu {
          {"High Scores", MRES_SCORES},
          {"Help",        MRES_HELP},
          {"Quit",        MRES_QUIT}}},
-    {"Menu", true, 0, 3,
-        {{"Resume Game", MRES_RESUME},
+    {"Menu", true, 0, 4,
+        {{"Audio Playback", MRES_PLAYBACK },
+         {"Resume Game", MRES_RESUME},
          {"Save Game",   MRES_SAVE},
          {"End Game",    MRES_QUIT}}}
 };
@@ -1278,6 +1281,11 @@ static int jewels_main(struct game_context* bj) {
                     inmenu = false;
                     selected = false;
                     continue;
+
+                case MRES_PLAYBACK:
+                    playback_control(rb);
+                    inmenu = false;
+                    break;
 
                 case MRES_SAVE:
                     rb->splash(HZ, true, "Saving game...");
