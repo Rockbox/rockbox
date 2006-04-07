@@ -1753,7 +1753,7 @@ void audio_invalidate_tracks(void)
     read_next_metadata();
 }
 
-static void initiate_track_change(int peek_index)
+static void initiate_track_change(long peek_index)
 {
     /* Detect if disk is spinning or already loading. */
     if (filling || ci.reload_codec || !audio_codec_loaded) {
@@ -1771,7 +1771,7 @@ static void initiate_track_change(int peek_index)
     codec_track_changed();
 }
 
-static void initiate_dir_change(int direction)
+static void initiate_dir_change(long direction)
 {
     if(!playlist_next_dir(direction))
         return;
@@ -1849,7 +1849,7 @@ void audio_thread(void)
                 while (audio_codec_loaded)
                     yield();
 
-                audio_play_start((long)ev.data);
+                audio_play_start((size_t)ev.data);
                 playlist_update_resume_info(audio_current_track());
 
                 /* If there are no tracks in the playlist, then the playlist
@@ -1874,7 +1874,7 @@ void audio_thread(void)
                 logf("audio_skip");
                 last_tick = current_tick;
                 playlist_end = false;
-                initiate_track_change((int)ev.data);
+                initiate_track_change((long)ev.data);
                 break;
 
             case Q_AUDIO_FF_REWIND:
@@ -1888,7 +1888,7 @@ void audio_thread(void)
                 playlist_end = false;
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-                initiate_dir_change((int)ev.data);
+                initiate_dir_change((long)ev.data);
                 break;
 
             case Q_AUDIO_FLUSH:
