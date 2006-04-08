@@ -363,6 +363,7 @@ int tagtree_load(struct tree_context* c)
     int namebufused = 0;
     struct tagentry *dptr = (struct tagentry *)c->dircache;
     bool sort = false;
+    int last_tick;
 
     int table = c->currtable;
     int extra = c->currextra;
@@ -395,6 +396,12 @@ int tagtree_load(struct tree_context* c)
 
         case navibrowse:
             logf("navibrowse...");
+#ifdef HAVE_TC_RAMCACHE
+            if (!tagcache_is_ramcache())
+#endif
+                gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),
+                               0, csi->name);
+    
             tagcache_search(&tcs, csi->tagorder[extra]);
             for (i = 0; i < extra; i++)
             {
@@ -421,6 +428,7 @@ int tagtree_load(struct tree_context* c)
     i = 0;
     namebufused = 0;
     c->dirfull = false;
+    last_tick = current_tick;
     while (tagcache_get_next(&tcs))
     {
         dptr->newtable = tcs.result_seek;
@@ -473,6 +481,19 @@ int tagtree_load(struct tree_context* c)
             break ;
         }
         
+        if (!tcs.ramsearch && current_tick - last_tick > HZ/2)
+        {
+            gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), i,
+#if CONFIG_KEYPAD == PLAYER_PAD
+                           str(LANG_STOP_ABORT)
+#else
+                           str(LANG_OFF_ABORT)
+#endif
+                           );
+            if (SETTINGS_CANCEL == button_get(false))
+                break ;
+            last_tick = current_tick;
+        }
     }
 
     if (sort)
