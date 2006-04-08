@@ -1353,7 +1353,7 @@ bool view_battery(void)
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
 #else /* !HAVE_CHARGE_CTRL */
-#if defined APPLE_IPODNANO || defined APPLE_IPODVIDEO 
+#if defined IPOD_NANO || defined IPOD_VIDEO 
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
                 int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
                 int dock     = (GPIOA_INPUT_VAL & 0x10)?true:false;

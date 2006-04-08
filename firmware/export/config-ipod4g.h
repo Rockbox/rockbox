@@ -1,8 +1,6 @@
 /*
  * This config file is for the Apple iPod Color/Photo
  */
-#define APPLE_IPOD4G 1
-
 #define IPOD_ARCH 1
 
 /* For Rolo and boot loader */

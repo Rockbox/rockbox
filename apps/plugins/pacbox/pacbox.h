@@ -106,7 +106,7 @@
 /* How many video frames (out of a possible 60) we display each second.
    NOTE: pacbox.c assumes this is an integer divisor of 60
  */
-#ifdef APPLE_IPOD_NANO
+#ifdef IPOD_NANO
 /* The Nano can manage full-speed at 30fps (1 in 2 frames) */
 #define FPS 30
 #else

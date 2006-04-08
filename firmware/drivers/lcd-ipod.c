@@ -134,7 +134,7 @@ void lcd_init_device(void)
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
 
-#ifdef APPLE_IPOD4G
+#ifdef IPOD_4G
     outl(inl(0x6000d004) | 0x4, 0x6000d004); /* B02 enable */
     outl(inl(0x6000d004) | 0x8, 0x6000d004); /* B03 enable */
     outl(inl(0x70000084) | 0x2000000, 0x70000084); /* D01 enable */
@@ -184,12 +184,12 @@ void lcd_set_flip(bool yesno)
     if (yesno) {
         /* 168x128, inverse SEG & COM order */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x030f);
-        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8304);    /* 0..127 */
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x8304);    /* 4..131 */
         addr_offset = (4 << 5) | (20 - 1);
     } else {
         /* 168x128 */
         lcd_cmd_and_data(R_DRV_OUTPUT_CONTROL, 0x000f);
-        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x7f00);    /* 4..131 */
+        lcd_cmd_and_data(R_1ST_SCR_DRV_POS, 0x7f00);    /* 0..127 */
         addr_offset = 20;
     }
 #endif

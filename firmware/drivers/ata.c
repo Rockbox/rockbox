@@ -1452,7 +1452,7 @@ void ata_poweroff(bool enable)
 
 bool ata_disk_is_active(void)
 {
-#ifdef APPLE_IPODNANO
+#ifdef IPOD_NANO
     return false;
 #else
     return !sleeping;
@@ -1465,7 +1465,7 @@ static int ata_perform_sleep(void)
 
     /* ATA sleep is currently broken on Nano, and will hang all subsequent
      accesses, so disable until we find a cure. */
-#ifndef APPLE_IPODNANO 
+#ifndef IPOD_NANO 
     mutex_lock(&ata_mtx);
 
     SET_REG(ATA_SELECT, ata_device);

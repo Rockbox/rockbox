@@ -1,8 +1,6 @@
 /*
  * This config file is for the Apple iPod 3g
  */
-#define APPLE_IPOD3G 1
-
 #define IPOD_ARCH 1
 
 /* For Rolo and boot loader */

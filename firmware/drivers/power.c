@@ -123,7 +123,7 @@ bool charger_inserted(void)
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
-#elif defined(APPLE_IPODVIDEO)
+#elif defined(IPOD_VIDEO)
     return (GPIOL_INPUT_VAL & 0x08)?false:true;
 #elif defined(IPOD_ARCH)
     /* This needs filling in for other ipods. */
@@ -158,7 +158,7 @@ bool charging_state(void) {
     return charger_inserted();
 #elif defined(IRIVER_H300_SERIES)
     return (GPIO_READ & 0x00800000)?true:false;
-#elif defined(APPLE_IPODVIDEO)
+#elif defined(IPOD_VIDEO)
     return (GPIOB_INPUT_VAL & 0x01)?false:true;
 #endif
 }
