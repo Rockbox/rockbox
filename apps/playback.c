@@ -314,7 +314,7 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
             while ((dest = pcmbuf_request_buffer(est_output_size,
                             &output_size)) == NULL) {
                 sleep(1);
-                if (ci.reload_codec || ci.stop_codec)
+                if (ci.seek_time || ci.reload_codec || ci.stop_codec)
                     return true;
             }
         }
