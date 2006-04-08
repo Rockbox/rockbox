@@ -1281,7 +1281,7 @@ static int add_dir_entry(struct fat_dir* dir,
                 entries_found = 0;
 
                 /* check that our intended shortname doesn't already exist */
-                if (!strncmp(shortname, buf + i * DIR_ENTRY_SIZE, 12)) {
+                if (!strncmp(shortname, buf + i * DIR_ENTRY_SIZE, 11)) {
                     /* shortname exists already, make a new one */
                     randomize_dos_name(shortname);
                     LDEBUGF("Duplicate shortname, changing to %s\n",
