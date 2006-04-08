@@ -1,3 +1,4 @@
+% $Id$ %
 \section{\label{ref:PlaybackOptions}Playback Options}
   The ``Playback Options'' submenu allows you to configure settings related to audio playback.
   \begin{description}
@@ -9,18 +10,18 @@
       \begin{description}
         %
         \item[Off: ]The current directory or playlist will not repeat 
-          when it is finished.\\
-          \note{Note: If you have the ``Auto change directory'' option set to ``Yes,'' 
+          when it is finished.
+          \note{If you have the ``Auto change directory'' option set to ``Yes'', 
           Rockbox will move on to the next directory on your hard drive.  If the ``Auto 
-          change directory'' option is set to ``No,'' playback will stop when the current 
+          change directory'' option is set to ``No'', playback will stop when the current 
           directory or playlist is finished.}
         %
-        \item[All: ]The current directory or playlist will repeat when it is finished.\\
-          \note{Note:  this option does \emph{not} shuffle all files on your \dap. 
+        \item[All: ]The current directory or playlist will repeat when it is finished.
+          \note{This option does \emph{not} shuffle all files on your \dap. 
           Rockbox is playlist oriented. When you play a song, or a directory, or an album, 
           Rockbox creates a playlist and plays it. Thus, to shuffle all songs on the \dap, 
           you need to create a playlist of all songs on the player, and play that playlist 
-          with shuffle mode set to ``All.''}
+          with shuffle mode set to ``All''.}
         %
         \item[One: ]Repeat one track over and over.
         %
@@ -28,7 +29,8 @@
           will be shuffled and then repeated.
         %
         \item[A--B: ]Repeats between two user defined point within a track, typically
-          used by musicians when attempting to learn a piece of music.\\
+          used by musicians when attempting to learn a piece of music.
+
           This option is more complicated to use that the others as the \dap\ must first be 
           placed into A--B repeat mode and then the start and end points defined.\\
               \fixme{
@@ -39,19 +41,19 @@
 
     \item[Play Selected First: ]This setting controls what happens when you select a file 
       for playback while shuffle mode is on. If the Play Selected First setting is 
-      ``Yes,'' the file you selected will be played first. If this setting is ``No,'' 
+      ``Yes'', the file you selected will be played first. If this setting is ``No'', 
       a random file in the directory will be played first.
    
     \item[Resume: ]Rockbox can be configured to start playing automatically when you turn 
       on the \dap. If the resume function is set to start automatically playing, Rockbox 
       will start at the point where you last turned off the \dap.  The options for the 
-      Resume function are:\\
-      \begin{enumerate}
+      Resume function are:
+      \begin{description}
         \item[Yes: ]Rockbox will unconditionally try to resume.
         \item[No:  ]Rockbox will not resume. 
         \emph{If resume is set to ``No,'' Rockbox will start in the File Browser.}
-      \end{enumerate}
-      \note{Note:  Earlier versions of Rockbox had an "Ask" setting, which would ask whether 
+      \end{description}
+      \note{Earlier versions of Rockbox had an ``Ask'' setting, which would ask whether 
       to resume when the jukebox was turned on. This setting has been eliminated because it 
       was redundant. If resume is set to ``Yes'' pressing 
       \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{FixMe}}
@@ -78,17 +80,20 @@
       reduce the chances of there being a gap or pause during playback of songs.
 
     \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7 seconds.}
-    \opt{SWCODEC}{The anti-skip buffer can be set to various values between 5 seconds and 10 minutes.}
+    \opt{SWCODEC}{The anti-skip buffer can be set to various values between 
+      5 seconds and 10 minutes.}
 
-    \emph{Tip: }Having a large anti-skip buffer tends to use more power, and may reduce your 
+    \note{Having a large anti-skip buffer tends to use more power, and may reduce your 
       battery life. It is recommended to always use the lowest possible setting that allows 
-      correct and continuous playback.
+      correct and continuous playback.}
 
     \item[Fade On Stop/Pause: ]Enables and disables a fade effect when you pause or stop 
       playing a song.  If the Fade on Stop/Pause option is set to ``Yes,'' your music will 
-      fade out when you press \fixme{STOP} or \fixme{PAUSE}, and fade in when you resume playback.
+      fade out when you press \fixme{STOP} or \fixme{PAUSE}, and fade in when
+      you resume playback.
 
-    \item[Party Mode: ]Enables unstoppable music playback.  When new songs are selected, they are 
+    \item[Party Mode: ]Enables unstoppable music playback.  When new songs are
+      selected, they are 
       added to the end of the current dynamic playlist instead of being played immediately.  
       The \fixme{PLAY} and \fixme{STOP} buttons are disabled.
 
@@ -117,48 +122,55 @@
         %
       \item[Fade Out Duration: ]The length of time, in seconds, that it takes your music to fade out.
         %
-      \item[Fade Out Mode: ]If set to ``Crossfade," one song will fade out and the next song will 
+      \item[Fade Out Mode: ]If set to ``Crossfade'', one song will fade out and the next song will 
         simultaneously fade in.  If set to ``Mix,'' the currently playing song will fade out 
         according to the fade out settings, but the next song will simply start, without fading in.
     \end{description}
   
-    \emph{TIP:} The crossfade setting is particularly effective when the player is set on shuffle.
+    \note{The crossfade setting is particularly effective when the player is set on shuffle.}
     }
   
     \opt{SWCODEC}{
-      \item[Replaygain: ]This allows you to control the replaygain function. The purpose of replaygain 
-        is to adjust the volume of the music played so that all songs (or albums, depending on your 
-        settings) have the same apparent volume.  This prevents sudden changes in volume when changing 
-        between songs recorded at different volume levels.\\
-
-        For replaygain to work, the songs must have been processed by a program that adds replaygain 
-        information as ID3 tags (or vorbis tags for certain formats).  Note that APEv2 tags are not 
-        currently supported.
+      \item[Replaygain: ]This allows you to control the replaygain function.
+        The purpose of replaygain is to adjust the volume of the music played 
+        so that all songs (or albums, depending on your settings) have the 
+        same apparent volume.  This prevents sudden changes in volume when 
+        changing between songs recorded at different volume levels.
+        For replaygain to work, the songs must have been processed by a program
+        that adds replaygain information to the ID3 tags (vorbis tags 
+        respectively).
+        \note{APEv2 tags are not currently supported.}
 
         Options for replaygain are:
         \begin{description}
           \item[Enable Replaygain: ]This turns on/off the replaygain function.
             %
-          \item[Prevent Clipping: ]Avoid clipping of a song's waveform. If a song would clip during 
-            playback, the volume is lowered for that song. Replaygain information is needed for this to work.
+          \item[Prevent Clipping: ]Avoid clipping of a song's waveform.
+            If a song would clip during playback, the volume is lowered for 
+            that song. Replaygain information is needed for this to work.
             %
           \item[Replaygain type: ]Choose the type of replaygain to apply:
             \begin{description}
-              \item[Album Gain: ]Maintain a constant volume level between albums, but keep any intentional 
-                volume variations between songs in an album. (If album gain value is not available, uses track 
-                gain information).
+              \item[Album Gain: ]Maintain a constant volume level between 
+                albums, but keep any intentional volume variations between 
+                songs in an album. (If album gain value is not available,
+                uses track gain information).
                 %
-              \item[Track Gain: ]Maintain a constant volume level between tracks. If track gain value is not 
-                available, no replaygain is applied.
+              \item[Track Gain: ]Maintain a constant volume level between 
+                tracks. If track gain value is not available, no replaygain 
+                is applied.
                 %
-              \item[Track Gain if Shuffling: ]Maintains a constant volume between tracks if shuffle mode is 
-                selected. Reverts to album mode if shuffle is off.
+              \item[Track Gain if Shuffling: ]Maintains a constant volume 
+                between tracks if shuffle mode is selected. Reverts to album
+                mode if shuffle is off.
             \end{description}
             %
-          \item[Pre-Amp: ]This allows you to adjust the volume when replaygain is applied. Replaygain often 
-            lowers the volume, sometimes quite much, so here you can compensate for that. Please note that a 
-            (large) positive pre-amp setting can cause clipping, unless prevent clipping is enabled.  The 
-            pre-amp can be set to any decibel (dB) value between -12dB and +12dB, in increments of 0.1 dB.
+          \item[Pre-Amp: ]This allows you to adjust the volume when replaygain
+            is applied. Replaygain often lowers the volume, sometimes quite
+            much, so here you can compensate for that. Please note that a 
+            (large) positive pre-amp setting can cause clipping, unless 
+            prevent clipping is enabled.  The pre-amp can be set to any 
+            decibel (dB) value between -12dB and +12dB, in increments of 0.1{}dB.
         \end{description}
         }
     }
