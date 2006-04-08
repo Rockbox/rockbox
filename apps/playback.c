@@ -96,7 +96,6 @@ enum {
     Q_AUDIO_SKIP,
     Q_AUDIO_PRE_FF_REWIND,
     Q_AUDIO_FF_REWIND,
-    Q_AUDIO_SEEK_COMPLETE,
     Q_AUDIO_FLUSH_RELOAD,
     Q_AUDIO_CODEC_DONE,
     Q_AUDIO_FLUSH,
@@ -151,6 +150,7 @@ static void (*voice_getmore)(unsigned char** start, int* size);
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling;
+static volatile bool filling_initial;
 
 volatile int current_codec;
 extern unsigned char codecbuf[];
@@ -686,8 +686,15 @@ off_t codec_mp3_get_filepos_callback(int newtime)
 
 void codec_seek_complete_callback(void)
 {
+    logf("seek_complete");
+    if (pcm_is_paused()) {
+        /* If this is not a seamless seek, clear the buffer */
+        pcmbuf_play_stop();
+        /* If playback was not 'deliberately' paused, unpause now */
+        if (!paused)
+            pcmbuf_pause(false);
+    }
     ci.seek_time = 0;
-    queue_post(&audio_queue, Q_AUDIO_SEEK_COMPLETE, 0);
 }
 
 bool codec_seek_buffer_callback(size_t newpos)
@@ -918,6 +925,9 @@ static void audio_read_file(void)
             track_widx = 0;
         }
         tracks[track_widx].filesize = 0;
+        /* If this is an initial fill, stop after one track is complete */
+        if (filling_initial)
+            fill_bytesleft = 0;
     } else {
         logf("Partially buf:%d", tracks[track_widx].available);
     }
@@ -1395,7 +1405,11 @@ static void initialize_buffer_fill(bool start_play)
 {
     int cur_idx, i;
 
-    fill_bytesleft = filebuflen - filebufused;
+    if (!filling_initial && !start_play)
+    {
+        fill_bytesleft = filebuflen - filebufused;
+        cur_ti->start_pos = ci.curpos;
+    }
 
     /* Initialize only once; do not truncate the tracks. */
     if (filling)
@@ -1407,8 +1421,6 @@ static void initialize_buffer_fill(bool start_play)
     pcmbuf_set_boost_mode(true);
 
     if (!start_play) {
-        cur_ti->start_pos = ci.curpos;
-
         /* Calculate real track count after throwing away old tracks. */
         cur_idx = track_ridx;
         for (i = 0; i < track_count; i++) {
@@ -1429,6 +1441,11 @@ static void initialize_buffer_fill(bool start_play)
 
         /* Mark all buffered entries null (not metadata for next track). */
         audio_clear_track_entries(true);
+    }
+    else
+    {
+        filling_initial = true;
+        fill_bytesleft = filebuflen >> 2;
     }
 
     filling = true;
@@ -1460,6 +1477,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
 
         generate_postbuffer_events();
         filling = false;
+        filling_initial = false;
         pcmbuf_set_boost_mode(false);
 
 #ifndef SIMULATOR
@@ -1861,17 +1879,6 @@ void audio_thread(void)
                 logf("ff_rewind");
                 ci.seek_time = (long)ev.data+1;
                 break ;
-
-            case Q_AUDIO_SEEK_COMPLETE:
-                logf("seek_complete");
-                if (pcm_is_paused()) {
-                    /* If this is not a seamless seek, clear the buffer */
-                    pcmbuf_play_stop();
-                    /* If playback was not 'deliberately' paused, unpause now */
-                    if (!paused)
-                        pcmbuf_pause(false);
-                }
-                break;
 
             case Q_AUDIO_DIR_SKIP:
                 logf("audio_dir_skip");
