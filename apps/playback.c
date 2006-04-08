@@ -1211,9 +1211,6 @@ static bool audio_load_track(int offset, bool start_play, int peek_offset)
     /* Load the codec. */
     tracks[track_widx].codecbuf = &filebuf[buf_widx];
     if (!loadcodec(start_play)) {
-        /* We should not use gui_syncplash from audio thread! */
-        snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
-        gui_syncsplash(HZ*2, true, msgbuf);
         close(current_fd);
         current_fd = -1;
 
@@ -1224,6 +1221,10 @@ static bool audio_load_track(int offset, bool start_play, int peek_offset)
 
         /* Try skipping to next track if there is space. */
         if (fill_bytesleft > 0) {
+            /* This is an error condition unless the fill_bytesleft is 0 */
+            snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
+            /* We should not use gui_syncplash from audio thread! */
+            gui_syncsplash(HZ*2, true, msgbuf);
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, peek_offset);
             goto peek_again;
