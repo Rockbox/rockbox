@@ -58,6 +58,7 @@ struct tagcache_search_clause
 struct tagcache_search {
     /* For internal use only. */
     int fd, masterfd;
+    int idxfd[TAG_COUNT];
     long seek_list[SEEK_LIST_SIZE];
     long filter_tag[TAGCACHE_MAX_FILTERS];
     long filter_seek[TAGCACHE_MAX_FILTERS];

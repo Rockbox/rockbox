@@ -489,14 +489,23 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         /* Check for conditions. */
         for (i = 0; i < tcs->clause_count; i++)
         {
+            struct tagfile_entry tfe;
             int seek = entry.tag_seek[tcs->clause[i]->tag];
             char str[64];
             
             memset(str, 0, sizeof str);
             if (!tagcache_is_numeric_tag(tcs->clause[i]->tag))
             {
-                /* FIXME: Not yet implemented. */
-                // str = &hdr->tags[tcs->clause[i].tag][seek];
+                int fd = tcs->idxfd[tcs->clause[i]->tag];
+                lseek(fd, seek, SEEK_SET);
+                read(fd, &tfe, sizeof(struct tagfile_entry));
+                if (tfe.tag_length >= (int)sizeof(str))
+                {
+                    logf("Too long tag read!");
+                    break ;
+                }
+
+                read(fd, str, tfe.tag_length);
             }
             
             if (!check_against_clause(seek, str, tcs->clause[i]))
@@ -531,6 +540,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header h;
     char buf[MAX_PATH];
+    int i;
 
     if (tcs->valid)
         tagcache_search_finish(tcs);
@@ -544,6 +554,9 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     tcs->filter_count = 0;
     tcs->valid = true;
     tcs->masterfd = -1;
+
+    for (i = 0; i < TAG_COUNT; i++)
+        tcs->idxfd[i] = -1;
 
 #ifndef HAVE_TC_RAMCACHE
     tcs->ramsearch = false;
@@ -567,6 +580,8 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
             return false;
         }
 
+        tcs->idxfd[tcs->type] = tcs->fd;
+        
         /* Check the header. */
         if (read(tcs->fd, &h, sizeof(struct tagcache_header)) !=
             sizeof(struct tagcache_header) || h.magic != TAGCACHE_MAGIC)
@@ -616,6 +631,14 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
     {
         logf("Too many clauses");
         return false;
+    }
+
+    if (!tagcache_is_numeric_tag(clause->tag) && tcs->idxfd[clause->tag] < 0)
+    {
+        char buf[MAX_PATH];
+
+        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, clause->tag);        
+        tcs->idxfd[clause->tag] = open(buf, O_RDONLY);
     }
     
     tcs->clause[tcs->clause_count] = clause;
@@ -753,16 +776,28 @@ void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
 
 void tagcache_search_finish(struct tagcache_search *tcs)
 {
+    int i;
+    
     if (tcs->fd >= 0)
     {
         close(tcs->fd);
         tcs->fd = -1;
+        tcs->idxfd[tcs->type] = -1;
     }
     
     if (tcs->masterfd >= 0)
     {
         close(tcs->masterfd);
         tcs->masterfd = -1;
+    }
+
+    for (i = 0; i < TAG_COUNT; i++)
+    {
+        if (tcs->idxfd[i] >= 0)
+        {
+            close(tcs->idxfd[i]);
+            tcs->idxfd[i] = -1;
+        }
     }
     
     tcs->ramsearch = false;
