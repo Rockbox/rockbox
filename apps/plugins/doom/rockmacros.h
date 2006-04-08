@@ -91,4 +91,13 @@ inline void* memcpy(void* dst, const void* src, size_t size);
 #define NO_PREDEFINED_LUMPS
 #define TABLES_AS_LUMPS // This frees up alot of space in the plugin buffer
 //#define FANCY_MENU  // This is a call to allow load_main_backdrop to run in doom
+
+#define MAKE_FOURCC(a,b,c,d) (uint32_t)((((a)<<24)|((b)<<16)|((c)<<8)|(d)))
+
+/* Config file magic - increment the version number whenever the settings
+   structure changes.
+ */
+#define DOOM_CONFIG_MAGIC     MAKE_FOURCC('D','O','O','M')
+#define DOOM_CONFIG_VERSION   1
+
 #endif

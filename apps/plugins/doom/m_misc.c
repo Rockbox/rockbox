@@ -797,10 +797,15 @@ int numdefaults;
 void M_SaveDefaults (void)
 {
    int i,fd;
+   uint32_t magic = DOOM_CONFIG_MAGIC;
+   uint32_t ver = DOOM_CONFIG_VERSION;
 
    fd = open (GAMEBASE"default.dfg", O_WRONLY|O_CREAT|O_TRUNC);
    if (fd<0)
       return; // can't write the file, but don't complain
+
+   write(fd,&magic,sizeof(magic));
+   write(fd,&ver,sizeof(ver));
 
    for (i=0 ; i<numdefaults ; i++)
       if(defaults[i].location.pi)
@@ -833,7 +838,9 @@ struct default_s *M_LookupDefault(const char *name)
 
 void M_LoadDefaults (void)
 {
-     int   i;
+   int i;
+   uint32_t magic = 0;
+   uint32_t ver;
    int fd;
      // set everything to base values
 
@@ -848,6 +855,18 @@ void M_LoadDefaults (void)
    fd = open (GAMEBASE"default.dfg", O_RDONLY);
    if (fd<0)
       return; // don't have anything to read
+
+   read(fd,&magic,sizeof(magic));
+   if (magic != DOOM_CONFIG_MAGIC) {
+      close(fd);
+      return;
+   }
+
+   read(fd,&ver,sizeof(ver));
+   if (ver != DOOM_CONFIG_VERSION) {
+      close(fd);
+      return;
+   }
 
    for (i=0 ; i<numdefaults ; i++)
       if(defaults[i].location.pi)
