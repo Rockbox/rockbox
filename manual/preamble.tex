@@ -9,13 +9,25 @@
 \usepackage{float}
 \floatstyle{ruled}
 
-\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
+\usepackage{hyperref}
+
 \usepackage{xspace}
 \usepackage{optional}
 
 \input{platform/\platform.tex}
 
 \newcommand{\playername}{\playerman\ \playertype}
+
+\hypersetup{% add some values to the pdf properties
+  colorlinks = true,
+  pdfstartview = FitV,
+  linkcolor = blue,
+  citecolor = blue,
+  urlcolor = blue,
+  pdftitle = {Rockbox user manual},
+  pdfauthor = {The Rockbox Team},
+  pdfsubject = {Rockbox user manual for \playername}
+}
 
 \newcommand{\fname}[1]{\textbf{#1}}
 \newcommand{\tabeltc}[1]{{\centering #1 \par}}
