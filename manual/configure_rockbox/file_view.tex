@@ -1,29 +1,53 @@
+% $Id$ %
 \section{File View}
-  The File View menu deals with options relating to how the File Browser displays files.
-  
-  \begin{itemize}
-  \item \textbf{Sort Case Sensitive:  }
-    If this option is set to YES, all files that start with upper case letters will be listed first, followed by all files that begin with lower case letters.  If this option is set to NO, then case will be ignored when sorting files.
-  \item \textbf{Sort Directories}
-    This option controls how Rockbox sorts folders.  The default is to sort them alphabetically. ``By date'' sorts them with the oldest folder first.  ``By newest date'' sorts them with the newest folder first.
+  The File View menu deals with options relating to how the File Browser 
+  displays files.
+  %
+  \begin{description}
+  \item[Sort Case Sensitive:]
+    If this option is set to ``Yes'', all files that start with upper case 
+    letters will be listed first, followed by all files that begin with lower 
+    case letters.  If this option is set to NO, then case will be ignored when 
+    sorting files.
+  \item[Sort Directories:]
+    This option controls how Rockbox sorts folders.  The default is to sort 
+    them alphabetically. ``By date'' sorts them with the oldest folder first. 
+    ``By newest date'' sorts them with the newest folder first.
     
-  \item \textbf{Sort Files:  }
-    This option controls how Rockbox sorts files.  All of the options for "Sort Directories" are available in this option.  In addition, there is a ``By type'' option which sorts files alphabetically by their type (such as .mp3) then alphabetically within each type.
+  \item[Sort Files:]
+    This option controls how Rockbox sorts files.  All of the options for 
+    ``Sort Directories'' are available in this option.  In addition, there 
+    is a ``By type'' option which sorts files alphabetically by their type 
+    (such as .mp3) then alphabetically within each type.
     
-  \item \textbf{\label{ref:ShowFiles}Show Files:  }
-    This option controls which files are displayed in the File Browser:
+  \item[\label{ref:ShowFiles}Show Files:]
+    This option controls which files are displayed in the File Browser.
+    %
+    \begin{description}
+    \item[Music:] The File Browser displays only folders, \fname{.m3u} files 
+      and the supported \emph{audio} file formats.  Extensions are stripped.  
+      Files and directories starting with \fname{.} or with the ``hidden'' 
+      flag set are hidden.
+    \item[Playlists:] The File Browser displays only directories and playlists,
+      for simplified navigation.
+    \item[Supported:] The File Browser displays all directories and files 
+      supported by Rockbox (see page \pageref{ref:Supportedfileformats}).  
+      Files and directories starting with \fname{.} or with the ``hidden'' 
+      flag set are hidden.
+    \item[All:] The File Browser displays all files and directories. 
+      Extensions are shown. No files or directories are hidden.
+    \end{description}
     
-    \begin{itemize}
-    \item \textbf{Music: }The File Browser displays only folders, .m3u files and the supported \emph{audio} file formats.  Extensions are stripped.  Files and directories starting with . or with the ``hidden'' flag set are hidden.
-    \item \textbf{Playlists:  }The File Browser displays only directories and playlists, for simplified navigation.
-    \item \textbf{Supported:  }The File Browser displays all directories and files supported by Rockbox (see page \pageref{ref:Supportedfileformats}).  Files and directories starting with . or with the ``hidden'' flag set are hidden.
-    \item \textbf{All:  }The File Browser displays all files and directories. Extensions are shown. No files or directories are hidden.
-    \end{itemize}
+  \item[Follow Playlist:]
+    This option determine what directory the File Browser displays first.  
+    If Follow Playlist is set to YES, when you enter the File Browser from 
+    the WPS, you will find yourself in the same directory as the currently 
+    playing file.  If Follow Playlist is set to NO, when you enter the File 
+    Browser from the WPS, you will find yourself in the directory you were 
+    in when you last left the File Browser.
     
-  \item \textbf{Follow Playlist}
-    This option determine what directory the File Browser displays first.  If Follow Playlist is set to YES, when you enter the File Browser from the WPS, you will find yourself in the same directory as the currently playing file.  If Follow Playlist is set to NO, when you enter the File Browser from the WPS, you will find yourself in the directory you were in when you last left the File Browser.  
-    
-  \item \textbf{Show Icons}
-    Rockbox has the ability to display an icon to the left of the file in the File Browser.  For details of these icons, please see page \pageref{ref:Supportedfileformats}.
-  \end{itemize}
-   
+  \item[Show Icons:]
+    Rockbox has the ability to display an icon to the left of the file 
+    in the File Browser.  For details of these icons, please see page 
+    \pageref{ref:Supportedfileformats}.
+  \end{description}

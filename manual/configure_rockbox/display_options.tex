@@ -1,119 +1,224 @@
+% $Id$ %
 \section{\label{ref:Displayoptions}Display Options}
   
-  \begin{itemize}
-  \item \textbf{Browse fonts:  }
-    Browse the fonts that reside in your \fname{/.rockbox} directory. Selecting one will activate it. See page \pageref{ref:Loadingfonts} for further details about fonts.
+  \begin{description}
+  \item[Browse fonts:]
+    Browse the fonts that reside in your \fname{/.rockbox/fonts} directory. 
+    Selecting one will activate it. See page \pageref{ref:Loadingfonts} 
+    for further details about fonts.
     
-  \item \textbf{Browse WPS files:  }
-    Opens the File Browser in the \fname{/.rockbox} directory and displays all .wps files. Selecting one will activate it, stop will exit back to the menu.  For further information about the WPS see page \pageref{ref:WPS}. For information about editing a .wps file see page \pageref{ref:ConfiguringtheWPS}.
+  \item[Browse WPS files:]
+    Opens the File Browser in the \fname{/.rockbox/wps} directory and displays 
+    all \fname{.wps} files. Selecting one will activate it, stop will exit 
+    back to the menu.  For further information about the WPS see page 
+    \pageref{ref:WPS}. For information about editing a .wps file see 
+    page \pageref{ref:ConfiguringtheWPS}.
     
-  \item \textbf{LCD Settings:  }
+  \item[LCD Settings:]
     This submenu contains settings that relate to the display of the \dap.
-    \begin{itemize}
-    \item \textbf{Backlight:  }
-    The amount of time the backlight shines after a key press. If set to OFF, the backlight will not light when a button is pressed. If set to ON, the backlight will never shut off. If set to a time (1 to 90 seconds), the backlight will stay lit for that amount of time after a button press. 
-    \item \textbf{Backlight on When Plugged:  }
-    The amount of time the backlight shines after a key press when the \dap\ is plugged into the charger. If set to OFF, the backlight will not light when a button is pressed. If set to ON, the backlight will never shut off. If set to a time (1 to 90 seconds), the backlight will stay lit for that amount of time after a button press. 
-    \item \textbf{Caption Backlight:} This option turns the backlight on for 25 seconds either side of the start of a new track so that the display can be read to see song information.
+    \begin{description}
+    \item[Backlight:]
+    The amount of time the backlight shines after a key press. If set to 
+    ``Off'', the backlight will not light when a button is pressed. If 
+    set to ``On'', the backlight will never shut off. If set to a time 
+    (1 to 90 seconds), the backlight will stay lit for that amount of time 
+    after a button press.
+    \item[Backlight on When Plugged:]
+    This setting is equivalent to the Backlight setting except it applies when
+    the \dap\ is plugged into the charger. 
+    \item[Caption Backlight:] 
+    This option turns the backlight on for 25 seconds either side of the 
+    start of a new track so that the display can be read to see song information.
     \opt{h1xx,ipodnano,ipodcolour,ipodvideo}{
-    \item \textbf{Backlight fade in:} 
-		The amount of time that the backlight will take to fade from off to on after a button is pressed. If set to OFF the backlight will turn on immediately, with no fade in. Can also be set to 500ms, 1s or 2s.
-    \item \textbf{Backlight fade out:} 
-    The amount of time that the backlight will take to fade from on to off after a button is pressed. If set to "Off" the backlight will turn off immediately, with no fade out. Can also be set to 500kms, 1s, 2s, 3s, 4s, 5s or 10s.
+      \item[Backlight fade in:]
+      The amount of time that the backlight will take to fade from off to on 
+      after a button is pressed. If set to ``Off'' the backlight will turn on 
+      immediately, with no fade in. Can also be set to 500ms, 1s or 2s.
+      \item[Backlight fade out:]
+      Like Backlight fade in, this controls the amount of time that the 
+      backlight will take to fade from on to off after a button is pressed. 
+      If set to ``Off'' the backlight will turn off immediately, with no fade 
+      out. Other valid values: 500ms, 1s, 2s, 3s, 4s, 5s or 10s.
     }
-    \item \textbf{Brightness:}
-    	Changes the contrast of your LCD display.
-    \item \textbf{First keypress enables backlight on:}
-    	This controls what happens when you press a button while the backlight is turned off.  If this setting is set to YES, the first keypress will light up the backlight, but have no other effect.  If this setting is set to NO, the first keypress will light up the backlight \textbf{and} engage the function of the key that is pressed.
-    \item \textbf{Contrast:} Changes the contrast of your LCD display. \textbf{Warning:} Setting the contrast too dark or too light can make it hard to find this menu option again!
+    \item[First Keypress Enables Backlight Only:]
+    With this option enabled the first keypress while the backlight is turned 
+    off will only turn the backlight on without having any other effect. When
+    disabled the first keypress will \emph{also} perform its appropriate action.
+    \item[Brightness:]
+      Changes the brightness of your LCD display.
+    \item[Contrast:] 
+    Changes the contrast of your LCD display. 
+    \warn{Setting the contrast too dark or too light can make it hard to 
+      find this menu option again!}
     \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolour,ipodvideo}{
-    \item \textbf{LCD Mode}: This setting lets you invert the whole screen, so now you get a black background and light text and graphics.
-      }
-    \item \textbf{Upside Down: }Displays the screen so that the top of the display is nearest the buttons.  This is sometimes useful when carrying the \dap\ in a pocket for easy access to the headphone socket.
-    \item \textbf{Line Selector: }This option allows you to select whether the line selector is a bar of inverted text (``Bar (inverse)'' option) or a small arrow to the left of the menu text (``Pointer'' option).  The default is Bar (inverse).
-    \opt{SWCODEC}{
-    \item \textbf{Clear Backdrop:  }Rockbox allows you to select bitmap pictures to use as backdrops.  These backdrops are set in the File Context Menu.  (TODO:  find reference).  This option allows you to clear the backdrops that you set.
-    	}
+      \item[LCD Mode:] 
+      This setting lets you invert the whole screen, so now you get a 
+      black background and light text and graphics.
+    }
+    \item[Upside Down:]
+    Displays the screen so that the top of the display is nearest the buttons.
+    This is sometimes useful when carrying the \dap\ in a pocket for easy 
+    access to the headphone socket.
+    \item[Line Selector:]
+    This option allows you to select whether the line selector is a bar 
+    of inverted text (``Bar (inverse)'' option) or a small arrow to the 
+    left of the menu text (``Pointer'' option).  The default is 
+    ``Bar (inverse)''.
+    \opt{h300,ipodcolor,ipodvideo,x5}{
+      \item[Clear Backdrop:]
+      Rockbox allows you to select bitmap pictures to use as backdrops.  
+      These backdrops are set in the File Context Menu. \fixme{reference!}
+      This option allows you to clear the backdrops that you set.
+    }
     \opt{h300,ipodnano,ipodcolour,ipodvideo}{
-    \item \textbf{Set Background Colour:  }Sets the background colour for the LCD display.
-    \item \textbf{Set Foreground Colour:  }Sets the foreground colour for the LCD display.
-    \item \textbf{Reset Colours:  }Resets the LCD display to Rockbox's default colours.
-			}
-    \end{itemize}
-  
+    \item[Set Background Colour:] 
+      Sets the background colour for the LCD display.
+    \item[Set Foreground Colour:] 
+      Sets the foreground colour for the LCD display.
+    \item[Reset Colours:] 
+      Resets the LCD display to Rockbox's default colours.
+    }
+    \end{description}
+%
   \opt{h1xx,h300,x5}{
-    \item \textbf{Remote-LCD Settings}
+    \item[Remote-LCD Settings:]
     This submenu contains settings that relate to the display of the \dap.
-    	\begin{itemize}
-	    \item \textbf{Backlight:  }
-  	  	The amount of time the remote backlight shines after a key press. If set to OFF, the remote backlight will not light when a button is pressed. If set to ON, the remote backlight will never shut off. If set to a time (1 to 90 seconds), the remote backlight will stay lit for that amount of time after a button press. 
-    	\item \textbf{Backlight on When Plugged:  }
-    		The amount of time the remote backlight shines after a key press when the \dap\ is plugged into the charger. If set to OFF, the remote backlight will not light when a button is pressed. If set to ON, the remote backlight will never shut off. If set to a time (1 to 90 seconds), the remote backlight will stay lit for that amount of time after a button press. 
-    	\item \textbf{Caption Backlight:  }
-    		This option turns the backlight on for 25 seconds either side of the start of a new track so that the display can be read to see song information.
-    	\opt{h1xx,ipodnano,ipodcolour,ipodvideo}{
-    		\item \textbf{First keypress enables backlight on:}
-    			This controls what happens when you press a button on your remote while the backlight is turned off.  If this setting is set to YES, the first keypress will light up the remote backlight, but have no other effect.  If this setting is set to NO, the first keypress will light up the remote backlight \textbf{and} engage the function of the key that is pressed.
-    		\item \textbf{Contrast:} 
-    			Changes the contrast of your remote's LCD display. \textbf{Warning:} Setting the contrast too dark or too light can make it hard to find this menu option again!
-    		\item \textbf{LCD Mode}: 
-    			This setting lets you invert the whole screen, so now you get a black background and light text and graphics.
-    		\item \textbf{Upside Down: }
-    			Displays the screen so that the top of the display is nearest the buttons.  This is sometimes useful when carrying the \dap\ in a pocket for easy access to the headphone socket.
-			 		}
-		\end{itemize}
+      \begin{description}
+      \item[Backlight:]
+        Similar to the main unit backlight this option controls the backlight
+        timeout for the remote control. The remote backlight is independent
+        from the main unit backlight.
+      \item[Backlight on When Plugged:]
+        This controls the backlight when the \dap\ is plugged into the charger.
+      \item[Caption Backlight:]
+        This option turns the backlight on for 25 seconds either side of the 
+        start of a new track so that the display can be read to see song 
+        information.
+      \opt{h1xx,ipodnano,ipodcolour,ipodvideo}{
+        \item[First Keypress Enables Backlight Only:]
+          This controls what happens when you press a button on your remote 
+          while the backlight is turned off.  Like for the main unit, if this 
+          setting is set to ``Yes'', the first keypress will light up the 
+          remote backlight, but have no other effect.  If set to ``No'', 
+          the first keypress will light up the remote backlight 
+          \emph{and} engage the function of the key that is pressed.
+       \item[Contrast:]
+         Changes the contrast of your remote's LCD display. 
+         \warn{Setting the contrast too dark or too light can make it hard to 
+           find this menu option again!}
+       \item[LCD Mode:]
+         This setting lets you invert the whole screen, so now you get a 
+         black background and light text and graphics.
+       \item[Upside Down:]
+         Displays the screen so that the top of the display is nearest 
+         the buttons.  This is sometimes useful when carrying the \dap\ in a 
+         pocket for easy access to the headphone socket.
+      }
+    \end{description}
 		}
-  \item \textbf{Scrolling}
-    This feature controls how text will scroll in Rockbox. You can configure the following parameters:
-    \begin{itemize}
-    \item \textbf{Scroll Speed:  }
+  \item[Scrolling]
+    This feature controls how text will scroll in Rockbox. You can configure 
+    the following parameters:
+    \begin{description}
+    \item[Scroll Speed:]
       Controls how many times per second the scrolling text moves a step.
-    \item \textbf{Scroll StartDelay:  } 
-      Controls how many milliseconds Rockbox should wait before a new text begins scrolling.
+    \item[Scroll StartDelay:]
+      Controls how many milliseconds Rockbox should wait before a new 
+      text begins scrolling.
       \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolour,ipodvideo}{
-      \item \textbf{Scroll Step Size:}
+      \item[Scroll Step Size:]
         Controls how many pixels the text scroll should move for each step.
       }
-    \item \textbf{Bidirectional Scroll Limit: }
-      Rockbox has two different scroll methods, always scrolling the text to the left, and when the line has ended, beginning again at the start, or moving to the left until you can read the end of the line, and scroll right until you see the beginning again. Rockbox chooses which method it should use, depending of how much it has to scroll left. This setting lets you tell Rockbox where that limit is, expressed in percentage of line length.
-    \item \textbf{Screen Scrolls Out of View: }TODO
-    \item \textbf{Screen Scroll Step Size: }TODO
-    \item \textbf{Paged Scrolling:  }TODO
-    \end{itemize}
-    
+    \item[Bidirectional Scroll Limit:]
+      Rockbox has two different scroll methods: always scrolling the text 
+      to the left and when the line has ended beginning again at the start, 
+      or moving to the left until you can read the end of the line and scroll 
+      right until you see the beginning again. Rockbox chooses which method 
+      it should use depending of how much it has to scroll left. This setting 
+      lets you tell Rockbox where that limit is, expressed in percentage of 
+      line length.
+    \item[Screen Scrolls Out of View:] \fixme{tbd}
+    \item[Screen Scroll Step Size:] \fixme{tbd}
+    \item[Paged Scrolling:] \fixme{tbd}
+    \end{description}
+    %
     \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolour,ipodvideo}{
-    \item \textbf{Status/Scrollbar}
+    \item[Status/Scrollbar:]
       Settings related to on screen status display and the scrollbar.
-      \begin{itemize}
-      \item \textbf{Scroll Bar: }Enables or disables the scroll bar at the left.
-      \item \textbf{Status Bar: }Enables or disables the status bar at the upper side.
+      \begin{description}
+      \item[Scroll Bar:] Enables or disables the scroll bar at the left.
+      \item[Status Bar:] Enables or disables the status bar at the upper side.
       \opt{RECORDER_PAD}{
-       \item \textbf{Button Bar:} Enables or disables the button bar prompts for the F keys at the bottom of the screen.
+       \item[Button Bar:] Enables or disables the button bar prompts for the 
+         ``F''-keys at the bottom of the screen.
       }
-      \item \textbf{Volume Display:  }Controls whether the volume is displayed as a graphic or a numeric value on the Status Bar.  If you select a numeric display, volume is displayed in decibels.  (TODO cross-reference to volume setting.)
-      \item \textbf{Battery Display: }Controls whether the battery charge status is displayed as a graphic or numerical percentage value on the Status Bar.
-      \end{itemize}
+      \item[Volume Display:] Controls whether the volume is displayed as a 
+        graphic or a numeric value on the Status Bar.  If you select a numeric 
+        display, volume is displayed in decibels.  
+        \fixme{cross-reference to volume setting.}
+      \item[Battery Display:] Controls whether the battery charge status is 
+        displayed as a graphic or numerical percentage value on the Status Bar.
+      \end{description}
     }
-    
+    %
     \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodnano,ipodcolour,ipodvideo}{
-    \item \textbf{Peak Meter}
-      The peak meter can be configured with a number of parameters. (For a description of the peak meter see page \pageref{ref:Peakmeter}.)
-      
-      \begin{itemize}
-      \item \textbf{Peak Release:  }
-        This determines how fast the bar shrinks when the music becomes softer. Lower values make the peak meter look smoother.
-      \item \textbf{Peak Hold Time:  } 
-        Specifies the time after which the peak indicator will reset.  For example, if you set this value to 5s, the peak indicator displays the loudest volume value that occurred within the last 5 seconds.  Larger values are useful if you want to find the peak level of a song, which might be of interest when copying music from the \dap via the analogue output to some other recording device.
-      \item \textbf{Clip Hold Time:  }
-        The number of seconds that the clipping indicator will be visible after clipping is detected.
-      \item \textbf{Performance:  }
-        In high performance mode, the peak meter is updated as often as possible. This reduces the chance of missing a peak value, making the peak meter more precise. In energy save mode, the peak meter is updated just often enough to look fluid.  This reduces the load on the CPU and thus saves a little bit of energy.  If you crave every second of runtime for your \dap\ or simply use the peak meter as a screen effect, the use of energy save mode is recommended.  If you want to use the peak meter as a measuring instrument you'll want to use high performance mode.  (TODO:  determine which platforms support this feature.)
-      \item \textbf{Scale:  }
-        Select whether the peak meter displays linear or logarithmic values.  The human ear perceives loudness on a logarithmic scale.  If the Scale setting is set to ``Logarithmic(dB)'' scale, the volume values are scaled logarithmically.  The volume meters of digital audio devices usually are scaled this way.  On the other hand, if you are interested in the power level that is applied to your headphones you should choose ``linear'' display.  This setting cannot be displayed in units like volts or watts because such units depend on your headphones.
-      \item \textbf{Minimum and maximum range:  } 
-        These two options define the full value range that the peak meter displays. Recommended values for the ``Logarithmic(dB)'' setting are {}-40 dB for minimum and 0 dB for maximum. Recommended values for ``linear'' display are 0 and 100\%. Note that {}-40 dB is approximately 1\% in linear value, but if you change the minimum setting in linear mode slightly and then change to the dB scale, there will be a large change. You can use these values for 'zooming' into the peak meter.
-      \end{itemize}
+    \item[Peak Meter:]
+      The peak meter can be configured with a number of parameters. 
+      (For a description of the peak meter see page \pageref{ref:Peakmeter}.)
+      \begin{description}
+      \item[Peak Release:]
+        This determines how fast the bar shrinks when the music becomes 
+        softer. Lower values make the peak meter look smoother.
+      \item[Peak Hold Time:]
+        Specifies the time after which the peak indicator will reset.  
+        For example, if you set this value to 5s, the peak indicator displays 
+        the loudest volume value that occurred within the last 5 seconds.  
+        Larger values are useful if you want to find the peak level of a song, 
+        which might be of interest when copying music from the \dap via the 
+        analogue output to some other recording device.
+      \item[Clip Hold Time:]
+        The number of seconds that the clipping indicator will be visible 
+        after clipping is detected.
+      \item[Performance:]
+        In high performance mode, the peak meter is updated as often as 
+        possible. This reduces the chance of missing a peak value, making 
+        the peak meter more precise. In energy save mode, the peak meter is 
+        updated just often enough to look fluid.  This reduces the load on 
+        the CPU and thus saves a little bit of energy.  If you crave every 
+        second of runtime for your \dap\ or simply use the peak meter as a 
+        screen effect, the use of energy save mode is recommended.  If you 
+        want to use the peak meter as a measuring instrument you'll want to 
+        use high performance mode.  
+        \fixme{TODO:  determine which platforms support this feature.}
+      \item[Scale:]
+        Select whether the peak meter displays linear or logarithmic values. 
+        The human ear perceives loudness on a logarithmic scale.  If the 
+        Scale setting is set to ``Logarithmic (dB)'' scale, the volume values 
+        are scaled logarithmically.  The volume meters of digital audio 
+        devices usually are scaled this way.  On the other hand, if you 
+        are interested in the power level that is applied to your headphones 
+        you should choose ``linear'' display.  This setting cannot be 
+        displayed in units like volts or watts because such units depend 
+        on your headphones.
+      \item[Minimum and maximum range:]
+        These two options define the full value range that the peak meter 
+        displays. Recommended values for the ``Logarithmic (dB)'' setting 
+        are {}-40 dB for minimum and 0 dB for maximum. Recommended values 
+        for ``linear'' display are 0 and 100\%. Note that {}-40 dB is 
+        approximately 1\% in linear value, but if you change the minimum 
+        setting in linear mode slightly and then change to the dB scale, 
+        there will be a large change. You can use these values for `zooming' 
+        into the peak meter.
+      \end{description}
     }
-	\item \textbf{Default Codepage:  }(TODO).
-  \end{itemize}
-  
+    \item[Default Codepage:]
+      A codepage describes the way extended characters that aren't available
+      within the ASCII character set are encoded. ID3v1 tags don't have a 
+      codepage encoding contained so Rockbox needs to know what encoding has
+      been used when generating these tags. This should be ``ISO-8859-1'' but
+      to support languages outside Western Europe most applications use
+      the setting of your operating system instead. If your operating system
+      uses a different codepage and you're getting garbled extended characters
+      you should adjust this settings. In most cases sticking to 
+      ``ISO-8859-1'' would be sufficient.
+  \end{description}
