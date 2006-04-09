@@ -2453,7 +2453,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
 
     /* the actual decoding */
     time = *rb->current_tick;
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
     status = jpeg_decode(p_jpg, p_disp->bitmap, ds, cb_progess);
     rb->cpu_boost(false);

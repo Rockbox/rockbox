@@ -299,7 +299,7 @@ void cleanup(void *parameter)
 {
     (void)parameter;
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
@@ -338,7 +338,7 @@ int main(void)
     }
 #endif
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
 #ifndef HAVE_LCD_COLOR

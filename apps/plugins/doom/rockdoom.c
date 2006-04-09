@@ -784,7 +784,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb = api;
    (void)parameter;
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(true);
 #endif
 
@@ -853,7 +853,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    rb->splash(HZ, true, "Bye");
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(false);
 #endif
 

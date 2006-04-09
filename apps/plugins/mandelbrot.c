@@ -491,7 +491,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* main loop */
     while (true) {
         if (redraw > REDRAW_NONE) {
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
 #endif
             if (redraw == REDRAW_FULL) {
@@ -504,7 +504,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             else
                 calc_mandelbrot_low_prec();
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(false);
 #endif
             px_min = 0;

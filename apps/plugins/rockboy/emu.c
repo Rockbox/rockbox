@@ -71,7 +71,7 @@ void emu_run(void)
 
 	vid_begin();
 	lcd_begin();
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
 	rb->cpu_boost(true);
 #endif
 	while(!shut)
@@ -123,7 +123,7 @@ void emu_run(void)
 
 	}
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
 }

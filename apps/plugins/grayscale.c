@@ -190,7 +190,7 @@ int main(void)
     rb->lcd_puts(0, 0, pbuf);
     rb->lcd_update();
 
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
     gray_show(true);          /* switch on greyscale overlay */
@@ -252,7 +252,7 @@ int main(void)
                  time / 100, time % 100);
     rb->lcd_puts(0, 0, pbuf);
     gray_deferred_lcd_update();       /* schedule an lcd_update() */
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
 
