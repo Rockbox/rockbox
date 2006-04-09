@@ -61,6 +61,45 @@ jewels.220x176x16.bmp
 jewels.320x240x16.bmp
 #endif
 
+/* Snake2 */
+#if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
+snake2_header1.320x240x16.bmp
+snake2_header2.320x240x16.bmp
+snake2_left.320x240x16.bmp
+snake2_right.320x240x16.bmp
+snake2_bottom.320x240x16.bmp
+#elif (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 192) && (LCD_DEPTH >= 16)
+snake2_header1.240x320x16.bmp
+snake2_header2.240x320x16.bmp
+snake2_left.240x320x16.bmp
+snake2_right.240x320x16.bmp
+snake2_bottom.240x320x16.bmp
+#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH >= 16)
+snake2_header1.220x176x16.bmp
+snake2_header2.220x176x16.bmp
+snake2_left.220x176x16.bmp
+snake2_right.220x176x16.bmp
+snake2_bottom.220x176x16.bmp
+#elif (LCD_WIDTH >= 176) && (LCD_HEIGHT >= 132) && (LCD_DEPTH >= 16)
+snake2_header1.176x132x16.bmp
+snake2_header2.176x132x16.bmp
+snake2_left.176x132x16.bmp
+snake2_right.176x132x16.bmp
+snake2_bottom.176x132x16.bmp
+#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 16)
+snake2_header1.160x128x16.bmp
+snake2_header2.160x128x16.bmp
+snake2_left.160x128x16.bmp
+snake2_right.160x128x16.bmp
+snake2_bottom.160x128x16.bmp
+#elif (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128) && (LCD_DEPTH >= 1)
+snake2_header1.160x128x2.bmp
+snake2_header2.160x128x2.bmp
+snake2_left.160x128x2.bmp
+snake2_right.160x128x2.bmp
+snake2_bottom.160x128x2.bmp
+#endif
+
 /* Solitaire */
 #ifdef HAVE_LCD_COLOR
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
