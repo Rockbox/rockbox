@@ -211,7 +211,6 @@ bool dbg_audio_thread(void)
 extern size_t audiobuffer_free;
 extern int filebuflen;
 extern int filebufused;
-extern int track_count;
 
 static unsigned int ticks, boost_ticks;
 
@@ -276,7 +275,7 @@ bool dbg_audio_thread(void)
                   filebufused, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "track count: %2d", track_count);
+        snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count());
         lcd_puts(0, line++, buf);
 
         snprintf(buf, sizeof(buf), "cpu freq: %3dMHz",
