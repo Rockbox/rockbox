@@ -382,9 +382,7 @@ static bool check_against_clause(long numeric, const char *str,
 
 static bool build_lookup_list(struct tagcache_search *tcs)
 {
-    struct tagcache_header header;
     struct index_entry entry;
-    int masterfd;
     int i;
     
     tcs->seek_list_count = 0;
@@ -399,6 +397,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             if (tcs->seek_list_count == SEEK_LIST_SIZE)
                 break ;
 
+            /* Go through all filters.. */
             for (j = 0; j < tcs->filter_count; j++)
             {
                 if (hdr->indices[i].tag_seek[tcs->filter_tag[j]] !=
@@ -408,7 +407,8 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             
             if (j < tcs->filter_count)
                 continue ;
-            
+
+            /* Go through all conditional clauses. */
             for (j = 0; j < tcs->clause_count; j++)
             {
                 int seek = hdr->indices[i].tag_seek[tcs->clause[j]->tag];
@@ -450,31 +450,16 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     }
 #endif
     
-    masterfd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
-    if (masterfd < 0)
-    {
-        logf("cannot open master index");
-        return false;
-    }
-        
-    /* Load the header. */
-    if (read(masterfd, &header, sizeof(struct tagcache_header)) !=
-        sizeof(struct tagcache_header) || header.magic != TAGCACHE_MAGIC)
-    {
-        logf("read error");
-        close(masterfd);
-        return false;
-    }
-
-    lseek(masterfd, tcs->seek_pos * sizeof(struct index_entry) +
+    lseek(tcs->masterfd, tcs->seek_pos * sizeof(struct index_entry) +
             sizeof(struct tagcache_header), SEEK_SET);
     
-    while (read(masterfd, &entry, sizeof(struct index_entry)) ==
+    while (read(tcs->masterfd, &entry, sizeof(struct index_entry)) ==
            sizeof(struct index_entry))
     {
         if (tcs->seek_list_count == SEEK_LIST_SIZE)
             break ;
 
+        /* Go through all filters.. */
         for (i = 0; i < tcs->filter_count; i++)
         {
             if (entry.tag_seek[tcs->filter_tag[i]] != tcs->filter_seek[i])
@@ -531,7 +516,6 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         }
         
     }
-    close(masterfd);
 
     return tcs->seek_list_count > 0;
 }
