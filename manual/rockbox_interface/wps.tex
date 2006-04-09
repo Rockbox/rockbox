@@ -1,0 +1,265 @@
+% $Id$ %
+\section{\label{ref:WPS}While Playing Screen}
+The While Playing Screen (WPS) displays various pieces of information about the
+currently playing audio file.
+%
+\opt{HAVE_LCD_BITMAP}{%
+  The apperance of the WPS can be configured using wps configuration files.
+  The items shown depend on your configuration -- all item can be turned on
+  or off independently. Refer to \pageref{ref:wps_tags} for details on how
+  to change the display of the WPS.
+  \begin{itemize}
+  \item Status bar: The Status bar shows Battery level, charger status, 
+    volume, play mode, repeat mode, shuffle mode\opt{CONFIG_RTC}{ and clock}.
+    In contrast to all other item the status bar is always at the top of
+    the screen.
+  \item (Scrolling) path and filename of the current song.
+  \item The ID3 track name.
+  \item The ID3 album name.
+  \item The ID3 artist name.
+  \item Bit rate. VBR files display average bitrate and ``(avg)''
+  \item Elapsed and total time.
+  \item A slidebar progress meter representing where in the song you are.
+  \item Peak meter.
+  \end{itemize}
+}
+\opt{recorder,recorderv2fm,ondio}{
+  \note{
+  \begin{itemize}
+  \item The number of lines shown depends on the size of the font used.
+  \item The peak meter is only visible if you turn off the status bar or if
+    using a small font that gives 8 or more display lines.
+  \end{itemize}
+  }
+}
+%
+\opt{player}{
+  \note{
+  \begin{itemize}
+  \item Playlist index/Playlist size: Artist {}- Title.
+  \item Current{}-time Progress{}-indicator Left.
+  \end{itemize}
+  }
+}
+
+See page \pageref{ref:ConfiguringtheWPS} for details of customising
+your WPS (While Playing Screen).
+
+
+\subsection{\label{ref:WPS_Key_Controls}WPS Key Controls}
+
+\begin{table}
+  \begin{btnmap}{}{}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight/\ButtonLeft} 
+      & Volume up/down \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonLeft}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Go to beginning of track, or if pressed while in the first seconds of a track,
+        go to previous track. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonLeft}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Rewind in track \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Go to next track. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Fast forward in track. \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{IPOD_4G_PAD,IAUDIO_X5_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonPlay}
+      \opt{ONDIO_PAD}{\ButtonOff} 
+      & Toggle play/pause \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{ONDIO_PAD}{\ButtonMenu}
+      \opt{RECORDER_PAD,PLAYER_PAD}{\ButtonOn}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Go to file browser \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonSelect}
+      \opt{ONDIO_PAD}{Hold \ButtonMenu}
+      \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Enter WPS context menu \\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOn}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{n/a}
+      \opt{ONDIO_PAD}{In WPS context menu}
+      & Show pitch setting screen \\
+      %
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+      \opt{ONDIO_PAD}{Hold \ButtonOff}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{PLAYER_PAD}{\ButtonStop}
+      & Stop playback \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{RECORDER_PAD}{\ButtonFOne}
+      \opt{PLAYER_PAD,ONDIO_PAD}{\ButtonMenu}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      & Go to Main menu \\
+      %
+      %These actions need definitions for the other targets
+      \opt{RECORDER_PAD}{
+        \ButtonFTwo & Toggles Play/browse quick menu \\
+        \ButtonFThree & Toggles Display quick menu \\
+        \ButtonFOne+\ButtonDown & Key lock on/off \\
+        \ButtonFOne+\ButtonPlay & Mute on/off \\
+        \ButtonFOne+\ButtonOn & Enter ID3 viewer \\
+      }
+      \opt{PLAYER_PAD}{
+        \ButtonMenu+\ButtonStop & Key lock on/off \\
+        \ButtonMenu+\ButtonPlay & Mute on/off \\
+        \ButtonMenu+\ButtonOn & Enter ID3 viewer \\
+      }
+    \end{btnmap}
+\end{table}
+
+
+\opt{HAVE_LCD_BITMAP}{
+  \subsection{\label{ref:peak_meter}Peak Meter}
+  The peak meter can be displayed on the While Playing Screen and consists of
+  several indicators.  For a picture of the peak meter, please see the  While
+  Recording Screen on page \pageref{ref:Whilerecordingscreen}.
+  
+  \begin{description}
+  \item [The bar:]
+    This is the wide horizontal bar. It represents the current volume value.
+  \item [The peak indicator:]
+    This is a little vertical line at the rightend of the bar. It indicates the
+    peak volume value that occurred recently.
+  \item [The clip indicator:]
+    This is a little black block that is displayed at the very right of the
+    scale when an overflow occurs. It usually doesn't show up during normal
+    playback unless you play an audio file that is distorted heavily. If you
+    encounter clipping while recording your recording will sound distorted. You
+    should lower the gain. Note that the clip detection is not very precise.
+    Clipping might occur without being indicated.
+  \item [The scale:]
+    Between the indicators of the right and left channel there are little dots.
+    These dots represent important volume values. In linear mode each dot is a
+    10\% mark. In dbfs mode the dots represent the following values (from right
+    to left): 0db, {}-3db, {}-6db, {}-9db, {}-12db, {}-18db, {}-24db, {}-30db,
+    {}-40db, {}-50db, {}-60db.
+  \end{description}
+}
+\subsection{\label{sec:quickscreens}Quickscreens}
+
+\subsubsection{\label{sec:contextmenu}Context Menu}
+Like the context menu for the file browser this context menu allows you
+to quickly access some often used functions.
+\opt{SWCODEC}{These include the ID3 Viewer and the pitch screen.}
+
+\opt{SWCODEC}{
+  \subsubsection{\label{sec:pitchscreen}Pitch Screen}
+  The Pitch Screen allows you to quickly change the pitch of your \dap. The
+  pitch value can be adjusted between 50\% and 200\%.
+  \begin{table}
+  \begin{btnmap}{}{}
+      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonUp/\ButtonDown}
+      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      & Increase / Decrease Pitch by 0.1\% \\
+      %
+      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonLeft/\ButtonRight}
+      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      & Increase / Decrease Pitch by 2.0\% \\
+      %
+      \opt{RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\fixme{\ButtonOn+\ButtonStop}}
+      \opt{h1xx,h300}{\ButtonOn+\ButtonOff}
+      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      & Reset Pitch to 100\% \\
+      %
+      \opt{RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonStop}
+      \opt{h1xx,h300}{\ButtonOff}
+      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      & Leave Pitch screen \\
+      %
+  \end{btnmap}
+  \end{table}
+}
+
+\subsubsection{\label{ref:ID3viewer}ID3 Viewer}
+\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
+This screen is accessible from the WPS screen, and provides a detailed view of
+all the identity information about the current track. This info is known as
+meta data and is stored in audio file formats to keep information on artist,
+album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to 
+access the WPS context menu, and select the id3-viewer from there.}
+\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}
+\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}
+\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{Please correct this information}}
+\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and 
+  select the id3-viewer from there.}
+\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
+  to move through the information.}
+
+%********************QUICKSCREENS***********************************************
+\opt{RECORDER_PAD}{
+  \section{\label{ref:QuickScreenMenus}Quick Screen Menus}
+  \screenshot{rockbox_interface/images/ss-quick-screen-112x64x1.png}{The quick screen}{}
+  \screenshot{rockbox_interface/images/ss-quick-screen2-112x64x1.png}{The quick screen}{}
+  Rockbox handles function buttons in a different way to the Archos software.
+  \ButtonFOne\ is always bound to the menu function, while \ButtonFTwo\ and
+  \ButtonFThree\ enable two quick menus.
+  
+  \ButtonFTwo\ displays some browse and play settings which are likely to be
+  changed frequently. This settings are Shuffle mode, Repeat mode and the Show
+  files options
+  
+  Shuffle mode plays each track in the currently playing list in a random order
+  rather than in the order shown in the browser.
+
+  Repeat mode repeats either a single track (One) or the entire playlist (All).
+
+  Show files determines what type files can be seen in the browser.  This can be
+  just MP3 files and directories (Music), Playlists, MP3 files and directories
+  (Playlists), any files that Rockbox supports (Supported) or all files on the
+  disk (All).
+
+  See page \pageref{ref:PlaybackOptions} for more information about these
+  settings.
+
+  \begin{table}
+      \begin{btnmap}{}{}
+        \ButtonLeft & Controls Shuffle mode setting \\
+        \ButtonRight & Controls Repeat mode setting \\
+        \ButtonDown & Controls Show file setting \\
+      \end{btnmap}
+  \end{table}
+  
+  \ButtonFThree\ controls frequently used display options.
+  
+  Scroll bar turns the display of the Scroll bar on the left of the screen on
+  or off.
+  
+  Status bar turns the status display at the top of the screen on or off. Upside
+  down inverts the screen so that the top of the display appears nearest to the
+  buttons.  This is sometimes useful when storing the \dap\ in a pocket.  Key
+  assignments swap over with the display orientation where it is logical for
+  them to do so.
+
+  See page \pageref{ref:Displayoptions} for more information about these
+  settings.
+  
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ButtonLeft & Controls scroll bar display \\
+      \ButtonRight & Controls status bar display \\
+      \ButtonDown & Controls upside down screen setting \\
+    \end{btnmap}
+  \end{table}
+}
