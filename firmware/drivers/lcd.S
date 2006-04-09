@@ -267,7 +267,7 @@ _lcd_write_data:
     shll    r1          
     mov.b   r0,@r3      
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
 
     negc    r2,r0       
     mov.b   r0,@r3      
@@ -385,29 +385,41 @@ lcd_write_data:
     add.l   %a0,%d0         /* -> end address */
     lea.l   0xf0000002,%a1  /* LCD data port */
     
-    moveq.l #31,%d1
+    move.l  %a0,%d1
+    btst.l  #1,%d1          /* already longword aligned? */
+    beq.b   .word1_end      /* yes: skip initial word copy */
+    
+    move.w  (%a0)+,(%a1)    /* transfer initial word */
+
+.word1_end:                 /* now longword aligned */
+    moveq.l #28,%d1
     add.l   %a0,%d1
     and.l   #0xFFFFFFF0,%d1 /* %d1 = first line bound + 16 */
     cmp.l   %d1,%d0         /* at least one full line to send? */
-    blo.b   .words2_loop    /* no: skip to word loop */
-    
+    blo.b   .long2_start    /* no: skip to trailing longword handling */
+
+    lea.l   (-16,%sp),%sp   /* free up some registers */
+    movem.l %d2-%d4/%a2,(%sp)
+
     subq.l  #8,%d1
     subq.l  #8,%d1          /* %d1 = first line bound */
 
-    cmp.l   %a0,%d1         /* any leading words? */
-    bls.b   .words1_end     /* no: skip leading word loop */
+    cmp.l   %a0,%d1         /* any leading longwords? */
+    bls.b   .long1_end      /* no: skip leading long loop */
     
-.words1_loop:
-    move.w  (%a0)+,(%a1)    /* transfer word */
+.long1_loop:
+    move.l  (%a0)+,%d2      /* read longword */
+    swap    %d2             /* send data to LCD in correct order...*/
+    move.w  %d2,(%a1)
+    swap    %d2
+    move.w  %d2,(%a1)
     cmp.l   %a0,%d1         /* run %a0 up to first line bound */
-    bhi.b   .words1_loop
+    bhi.b   .long1_loop
     
-.words1_end:
-    lea.l   (-16,%sp),%sp   /* free up some registers */
-    movem.l %d2-%d4/%a2,(%sp)
+.long1_end:
     move.l  %d0,%a2
-    lea.l   (-15,%a2),%a2   /* %a2 = end address - 15 (one line/pass) */
-    
+    lea.l   (-14,%a2),%a2   /* %a2 = end address - 14 (one line/pass) */
+
     /* burst-optimised line transfers */
 .line_loop:
     movem.l (%a0),%d1-%d4   /* burst-read line */
@@ -433,15 +445,25 @@ lcd_write_data:
     
     movem.l (%sp),%d2-%d4/%a2
     lea.l   (16,%sp),%sp    /* restore registers */
+
+.long2_start:
+    subq.l  #2,%d0          /* account for handling 2 words per loop */
+    cmp.l   %a0,%d0         /* any (trailing longwords? */
+    bls.b   .long2_end      /* no: skip trailing longword loop */
+
+.long2_loop:
+    move.l  (%a0)+,%d1      /* read longword */
+    swap    %d1             /* send data to LCD in correct order */
+    move.w  %d1,(%a1)
+    swap    %d1
+    move.w  %d1,(%a1)
+    cmp.l   %a0,%d0         /* run %a0 up to last long bound */
+    bhi.b   .long2_loop
     
-    cmp.l   %a0,%d0         /* any trailing words? */
-    bls.b   .words2_end     /* no: get otta here */
+.long2_end:
+    blo.b   .word2_end      /* no final word: skip */
+    move.w  (%a0)+,(%a1)    /* transfer final word */
 
-.words2_loop:
-    move.w  (%a0)+,(%a1)    /* transfer word */
-    cmp.l   %a0,%d0         /* run %a0 up to end address */
-    bhi.b   .words2_loop
-
-.words2_end:
+.word2_end:
     rts
 #endif
