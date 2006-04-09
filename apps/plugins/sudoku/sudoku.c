@@ -838,7 +838,13 @@ void sudoku_generate(struct sudoku_state_t* state)
     display_board(state);
     rb->splash(0, true, "Generating...");
 
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(true);
+#endif
     sudoku_generate_board(state,&difficulty);
+#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+    rb->cpu_boost(false);
+#endif
 
     rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
     display_board(state);
