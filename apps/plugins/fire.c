@@ -298,8 +298,8 @@ static inline void fire_draw(void)
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
 #ifndef HAVE_LCD_COLOR
@@ -338,7 +338,7 @@ int main(void)
     }
 #endif
 
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
 #endif
 #ifndef HAVE_LCD_COLOR
