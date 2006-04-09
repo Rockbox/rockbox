@@ -1,3 +1,4 @@
+% $Id$ %
 \chapter{\label{ref:rockbox_interface}The Rockbox interface}
 \section{Your \dap}
 \begin{center}
@@ -10,22 +11,22 @@
 Throughout this manual, the buttons on the \dap\ are labelled according to the
 picture above. To turn on and shutdown your \dap, the following keys are used:
 
-\begin{table}[h!]
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Action} \\\midrule
+\begin{table}
+    \begin{btnmap}{}{}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
       \opt{IPOD_4G_PAD}{\ButtonMenu\ or \ButtonSelect}
-      \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn\ for 2{}-3s}
-      \opt{IAUDIO_X5_PAD}{\ButtonPower} & Start Rockbox\\
+      \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}
+        {Hold \ButtonOn\ for 2{}-3s}
+      \opt{IAUDIO_X5_PAD}{\ButtonPower} 
+      & Start Rockbox\\
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOff}
       \opt{IPOD_4G_PAD}{Hold \ButtonPlay}
       \opt{ONDIO_PAD,recorderv2fm}{Hold \ButtonOff}
       \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}
       \opt{PLAYER_PAD}{From the Main Menu, select \textbf{Shutdown}}
-      \opt{IAUDIO_X5_PAD}{Hold \ButtonPower} & Shutdown Rockbox\\\bottomrule
-    \end{tabular}
-  \end{center}
+      \opt{IAUDIO_X5_PAD}{Hold \ButtonPower}
+      & Shutdown Rockbox\\
+    \end{btnmap}
 \end{table}
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
 
@@ -48,44 +49,50 @@ types are displayed (see page \pageref{ref:ShowFiles}).
 }
 
 \subsection{\label{ref:controls}Controls}
-\begin{table}[h!]
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Function} \\\midrule
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonUp/\ButtonDown}
+\begin{table}
+    \begin{btnmap}{}{}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp/\ButtonDown}
       \opt{PLAYER_PAD}{\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd} & Go to previous/next item in list.\\
-                                                            & If you are on the first/last entry, \\
-                                                            & the cursor will wrap to the last/first entry.\\
+      \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd} 
+         & Go to previous/next item in list. If you are on the first/last 
+           entry, the cursor will wrap to the last/first entry.\\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonUp/\ButtonDown}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
+        {\ButtonOn+\ButtonUp/\ButtonDown}
       \opt{PLAYER_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
-      \opt{ONDIO_PAD}{n/a} & Move one page up/down on the list.\\
+      \opt{ONDIO_PAD}{n/a}
+      & Move one page up/down on the list.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft}
-      \opt{PLAYER_PAD}{\ButtonStop} & Go to the parent directory. \\
+      \opt{PLAYER_PAD}{\ButtonStop} 
+      & Go to the parent directory. \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonRight/\ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+        {\ButtonRight/\ButtonSelect}
       \opt{PLAYER_PAD}{\ButtonPlay}
       \opt{ONDIO_PAD}{\ButtonRight}
-      \opt{RECORDER_PAD}{\ButtonRight/\ButtonPlay} & Executes an action. \\
-                                                   & Depending on the file type, that action may vary. \\
-                                                   & (See page \pageref{ref:Filemenu}) \\
+      \opt{RECORDER_PAD}{\ButtonRight/\ButtonPlay}
+      & Executes an action. Depending on the file type, that action may vary.
+        (See page \pageref{ref:Filemenu}) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
       \opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonPlay}
-      \opt{ONDIO_PAD}{Short press on \ButtonMenu} & If there is a MP3 playing, \\
-                                                  & returns to the While Playing Screen (WPS) \\
-                                                  & without stopping playback.  \\
+      \opt{ONDIO_PAD}{Short press on \ButtonMenu} 
+      & If there is a MP3 playing, returns to the While Playing Screen (WPS)
+        without stopping playback.  \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+        {Hold \ButtonSelect}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonPlay/\ButtonOn+\ButtonPlay}
-      \opt{ONDIO_PAD}{Hold \ButtonRight} & Enters the File Menu\\
+      \opt{ONDIO_PAD}{Hold \ButtonRight} 
+      & Enter the File Menu\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{RECORDER_PAD}{\ButtonFOne}
       \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD}{\ButtonMenu}
-      \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay} & Enters the Main Menu \\
+      \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
+      & Enter the Main Menu \\
       %
       \opt{RECORDER_PAD}{
         \ButtonFTwo & Switches to the Browse/Play Quick Menu \\
@@ -93,9 +100,7 @@ types are displayed (see page \pageref{ref:ShowFiles}).
         \ButtonFThree & Switches to the Display Quick Menu \\ 
         %
       }
-      \bottomrule
-    \end{tabular}
-  \end{center}
+    \end{btnmap}
 \end{table}
 
 \opt{RECORDER_PAD}{
@@ -179,103 +184,105 @@ and then play is started.\\
 This is the virtual keyboard that is used when entering file names in Rockbox.
 
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD,IPOD_4G_PAD}{
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Function} \\\midrule
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD}{Please add correct keys} & Move about the virtual keyboard \\
-                                                 & (moves the solid cursor) \\
-      %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOn+\ButtonLeft/\ButtonRight}
+    \begin{table}
+    \begin{btnmap}{}{}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}
+        {\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Move about within the current file name \\
-                                                   & (moves the line cursor) \\
+      & Move about the virtual keyboard (moves the solid cursor) \\
+      %
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
+        {\ButtonOn+\ButtonLeft/\ButtonRight}
+      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      & Move about within the current file name (moves the line cursor) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
       \opt{RECORDER_PAD}{\ButtonPlay}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Inserts the currently selected keyboard letter \\
-                                                   & at the current filename cursor position \\
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      & Inserts the currently selected keyboard letter at the current
+        filename cursor position \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & Exits the virtual keyboard without saving any changes \\
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      & Exits the virtual keyboard without saving any changes \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
-      \opt{RECORDER_PAD}{\ButtonFOne} & SHIFT: Shifts between the upper case, \\
-                                      & lower case and accented keyboards \\
+      \opt{RECORDER_PAD}{\ButtonFOne}
+      & SHIFT: Shifts between the upper case, lower case and accented keyboards \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
       \opt{RECORDER_PAD}{\ButtonFTwo}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & OK: Exits the virtual keyboard and saves any changer \\
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      & OK: Exits the virtual keyboard and saves any changer \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
       \opt{RECORDER_PAD}{\ButtonFThree}
       \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} & DEL: Deletes the character before\\ 
-                                                   & the current filename cursor \\
-
+      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      & DEL: Deletes the character before the current filename cursor \\
       %
       \opt{SWCODEC}{
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
         \opt{IPOD_4G_PAD}{Please add correct keys}
-        \opt{IAUDIO_X5_PAD}{Please add correct keys} & Enters Morse input mode\\
+        \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+        & Enters Morse input mode\\
       }
-      \bottomrule
-    \end{tabular}
-  \end{center}
+    \end{btnmap}
+  \end{table}
 }
 
 \opt{ondio}{
   \textbf{Picker area}
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Function} \\\midrule
-      \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight & Move about the virtual keyboard\\
-                                                     & (moves the solid cursor) \\
-                                                     & If you move out of the picker area\\
-                                                     & with \ButtonUp/\ButtonDown,\\
-                                                     & you get to the line edit mode\\
-      \ButtonMenu & Selects the letter underneath the cursor \\
-      Long press on \ButtonMenu & Accepts the currently selected letter\\
-      \ButtonOff & Aborts the currently selected letter\\\bottomrule
-    \end{tabular}
-  \end{center}
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight
+        & Move about the virtual keyboard (moves the solid cursor).
+          If you move out of the picker area with \ButtonUp/\ButtonDown,
+          you get to the line edit mode. \\
+      \ButtonMenu 
+        & Selects the letter underneath the cursor. \\
+      Long press on \ButtonMenu 
+       & Accepts the currently selected letter\\
+      \ButtonOff 
+       & Aborts the currently selected letter\\
+    \end{btnmap}
+  \end{table}
   \textbf{Line edit mode}
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Function}\\\midrule
+  \begin{table}
+    \begin{btnmap}{}{}
       \ButtonLeft/\ButtonRight & Move left and right\\
       \ButtonMenu & Deletes the letter to the left of the cursor\\
       Long press on \ButtonMenu & Accepts the deletion\\
-      \ButtonUp/\ButtonDown & Returns to the picker area\\\bottomrule
-    \end{tabular}
-  \end{center}
+      \ButtonUp/\ButtonDown & Returns to the picker area\\
+    \end{btnmap}
+  \end{table}
 }
 \opt{player}{
   The current filename is always listed on the first line of the display. The
   second line of the display can contain the character selection bar, as in the
   screenshot above, or  one of a number of other options.
-  \begin{center}
-    \begin{tabular}{@{}ll@{}}\toprule
-      \textbf{Key} & \textbf{Function} \\\midrule
+  \begin{table}
+    \begin{btnmap}{}{}
       \ButtonLeft/\ButtonRight & Moves the arrow to/from the filename \\
                                & and changes between the character bar \\
                                & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
       \ButtonPlay/\ButtonStop & Varies (see below) \\
       \ButtonMenu & Shift.  When the character selection bar is selected\\
                   & this changes between upper case, lower case, \\
-                  & and accented letters. \\\bottomrule
-    \end{tabular}
-  \end{center}
+                  & and accented letters. \\
+    \end{btnmap}
+  \end{table}
 
   The function of the \ButtonPlay\ and \ButtonStop\ buttons depends on what the
   arrow is pointing to, as follows.
   
-  \begin{table}[h!]
-    \begin{center}
-      \begin{tabular}{@{}ll@{}}\toprule
+  \begin{table}
+      \begin{center}
+      \begin{tabularx}{.75\textwidth}{lX}
         \textbf{Selected option} & \textbf{Play/Stop function} \\\midrule
         filename & Moves the cursor left (\ButtonStop) \\
                  & or right (\ButtonPlay) within the filename \\
@@ -289,7 +296,7 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
                & saves any changes \\
         ABORT & \ButtonPlay exits the virtual keyboard and \\
               & discards any changes \\\bottomrule
-      \end{tabular}
+      \end{tabularx}
     \end{center}
   \end{table}
 }
