@@ -1870,12 +1870,12 @@ void audio_thread(void)
                 break ;
 
             case Q_AUDIO_STOP:
-                logf("stop");
+                logf("audio_stop");
                 audio_stop_playback(true);
                 break ;
 
             case Q_AUDIO_PAUSE:
-                logf("audio_pause");
+                logf("audio_%s",ev.data?"pause":"resume");
                 pcmbuf_pause((bool)ev.data);
                 paused = (bool)ev.data;
                 break ;
@@ -2000,8 +2000,9 @@ void codec_thread(void)
 #endif
         }
 
-        if (ci.stop_codec && pcm_is_paused())
-            pcmbuf_play_stop();
+        if (audio_codec_loaded)
+            if (ci.stop_codec && pcm_is_paused())
+                pcmbuf_play_stop();
 
         audio_codec_loaded = false;
 
@@ -2010,7 +2011,6 @@ void codec_thread(void)
         case Q_CODEC_LOAD:
             if (status != CODEC_OK) {
                 logf("Codec failure");
-                // audio_stop_playback();
                 ci.reload_codec = false;
                 gui_syncsplash(HZ*2, true, "Codec failure");
             } else {
@@ -2019,8 +2019,6 @@ void codec_thread(void)
 
             if (playing && !ci.stop_codec)
                 audio_change_track();
-
-            // queue_post(&audio_queue, Q_AUDIO_CODEC_DONE, (void *)status);
         }
     }
 }
@@ -2148,13 +2146,13 @@ struct mp3entry* audio_current_track(void)
 
 struct mp3entry* audio_next_track(void)
 {
-    int next_idx = track_ridx + 1;
+    int next_idx = track_ridx;
 
     if (!have_tracks())
         return NULL;
 
-    if (next_idx >= MAX_TRACK)
-        next_idx = 0;
+    if (++next_idx >= MAX_TRACK)
+        next_idx -= MAX_TRACK;
 
     if (!tracks[next_idx].taginfo_ready)
         return NULL;
@@ -2191,7 +2189,6 @@ void audio_play(long offset)
 
 void audio_stop(void)
 {
-    logf("audio_stop");
     queue_post(&audio_queue, Q_AUDIO_STOP, 0);
     while (playing || audio_codec_loaded)
         yield();
@@ -2212,32 +2209,27 @@ void audio_resume(void)
     queue_post(&audio_queue, Q_AUDIO_PAUSE, (void *)false);
 }
 
-void audio_next(void)
-{
+static void audio_skip(long count) {
     /* Prevent UI lag and update the WPS immediately. */
     if (global_settings.beep)
         pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-    if (!playlist_check(1))
+    if (!playlist_check(count))
         return ;
-    playlist_next(1);
+    playlist_next(count);
     track_changed = true;
 
-    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
+    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)count);
+}
+
+void audio_next(void)
+{
+    audio_skip(1);
 }
 
 void audio_prev(void)
 {
-    /* Prevent UI lag and update the WPS immediately. */
-    if (global_settings.beep)
-        pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-
-    if (!playlist_check(-1))
-        return ;
-    playlist_next(-1);
-    track_changed = true;
-
-    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
+    audio_skip(-1);
 }
 
 void audio_next_dir(void)
@@ -2250,7 +2242,8 @@ void audio_prev_dir(void)
     queue_post(&audio_queue, Q_AUDIO_DIR_SKIP, (void *)-1);
 }
 
-void audio_pre_ff_rewind(void) {
+void audio_pre_ff_rewind(void)
+{
     queue_post(&audio_queue, Q_AUDIO_PRE_FF_REWIND, 0);
 }
 
