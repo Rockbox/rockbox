@@ -9,7 +9,7 @@ must catch it with the paddle. Look out for the bad ones.\\
 \subsubsection{Specials}
 \begin{table}
     \begin{center}
-    \begin{tabular}{cll}\toprule
+    \begin{tabularx}{.75\textwidth}{clX}\toprule
     \textbf{Displayed} & \textbf{Name} & \textbf{Description}\\\midrule
     N & Normal & Returns paddle to normal.\\
     D & Die & Ball dies; lose a life.\\
@@ -18,18 +18,20 @@ must catch it with the paddle. Look out for the bad ones.\\
     G & Glue & Ball sticks to paddle each time it hits.\\
     B & Ball & Immediately fires another ball.\\
     FL & Flip & Flip left / right movement.\\\bottomrule
-    \end{tabular}
+    \end{tabularx}
     \end{center}
 \end{table}
 
 \begin{table}
     \begin{btnmap}{}{}
     \ButtonLeft\ / \ButtonRight & Moves the paddle\\
-    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu}
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
-        & Release the ball / Fire\\
+    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+    & Release the ball / Fire\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-        \opt{IPOD_4G_PAD}{\ButtonMenu}\opt{IAUDIO_X5_PAD}{\ButtonPower}
-        & Open menu / Quit\\
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Open menu / Quit\\
     \end{btnmap}
 \end{table}
