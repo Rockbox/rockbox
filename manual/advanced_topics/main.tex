@@ -7,27 +7,26 @@ Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}
   Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the \dap\ 
-  and ``play'' them in the directory browser or select \textbf{General Settings
-  {\textgreater} Fonts} from the Main Menu.
-
+  and ``play'' them in the directory browser or select 
+  \emph{General Settings $\rightarrow$ Fonts} from the Main Menu.
   If you want a font to be loaded automatically every time you start up,
   it must be located in the \fname{/.rockbox } folder and the file name
   must be at most 24 characters long.
-
-  Any BDF font file up to 16 pixels high should be usable with Rockbox. To
-  convert from .bdf to .fnt, use the \fname{convbdf} tool. This tool can be
-  found in the tools directory of the Rockbox source code.
+  \warn{Advanced Users Only: Any BDF font file up to 16 pixels high should 
+  be usable with Rockbox. To convert from .bdf to .fnt, use the \fname{convbdf} 
+  tool. This tool can be found in the tools directory of the Rockbox source 
+  code.}
 }
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
-Rockbox can load language files at runtime. Simply copy the .lng file (do not
-use the .lang file) to the \dap\ and ``play'' it in the Rockbox directory
-browser or select \textbf{General Settings $\rightarrow$ Languages }from the
-Main Menu.
+Rockbox can load language files at runtime. Simply copy the .lng file 
+\emph{(do not use the .lang file)} to the \dap\ and ``play'' it in the 
+Rockbox directory browser or select \emph{General Settings $\rightarrow$ 
+Languages }from the Main Menu.
 
-If you want a language to be loaded automatically every time you start up, it
-must be located in the \fname{/.rockbox }folder and the file name must be a
-maximum of 24 characters long.
+\note{If you want a language to be loaded automatically every time you start 
+up, it must be located in the \fname{/.rockbox }folder and the file name must 
+be a maximum of 24 characters long.}
 
 Rockbox supports many different languages. You can get .lng files at
 \url{http://www.rockbox.org/lang/}.
@@ -39,27 +38,31 @@ file find the instructions on the Rockbox website:
 
 \section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
 
-\subsection{Description / General Info}
+\subsection{WPS -- General Info}
 
-\begin{itemize}
-\item The Custom While Playing Screen (WPS) display is used as a means to customise the WPS to the user's likings.
-\item After editing the .wps file, ``play'' it to make it take effect.
-\item All characters not preceded by \% are displayed as typed.
-\item Lines beginning with \# are comments and will be ignored.
-\item Maximum file size used is \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{1600}
-\opt{player}{400} 
-bytes. If you have a bigger WPS file, only the first part of it will be loaded and used.
-\end{itemize}
+\begin{description}
+\item[Description: ] The WPS or While Playing Screen is the name used to describe 
+the information displayed on the \dap\'s screen whilst an audio track is
+being played. The default WPS is a relatively simple screen displaying
+Track name, Artist, Album etc. in the default font as a purely text based
+layout. There are a number of WPS files included in Rockbox, and you can 
+load one of these at anytime by selecting it\dots\\
+\emph{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}\\
+\opt{h1xx,h300}{There is a related option to browse .rwps files for \dap\'s
+with LCD remote controls installed.  This will load a similar WPS screen
+for the remote but with usually a simpler and more concise layout.}
 
-\subsection{File Location}
-Custom WPS files may be located anywhere on the drive. The only restriction is
-that they must end in .wps. When you ``play'' a .wps file, it will be used for
-future WPS screens. If the ``played'' .wps file is located in the
-\fname{/.rockbox} folder, it will be remembered and used after reboot. 
-The .wps filename must be no more than 24 characters long for it to be
+\note{``Playing'' a wps from the file browser has the same effect.}
+
+\item [File Location: ]Custom WPS files may be located anywhere on the drive. 
+The only restriction is that they must end in .wps. When you ``play'' a .wps 
+file, it will be used for future WPS screens, and if the ``played'' .wps file is 
+located in the \fname{/.rockbox} folder, it will be remembered and used after 
+reboot. The .wps filename must be no more than 24 characters long for it to be
 remembered.
+\end{description}
 
-\subsection{How To Create A .wps File}
+\subsection{\label{ref:CreateYourOwnWPS}WPS -- Build Your Own}
 Quite simply, enter the WPS code in your favourite text editor, Notepad on
 Windows works fine. When you save it, instead of saving it as a .txt file, save
 it as a .wps file. Example: Instead of \fname{Rockbox.txt}, save the file as
@@ -69,16 +72,26 @@ done in most editors, for example Notepad in Windows 2000 or XP (but not in
 9x/ME) can do this. See appendix \ref{ref:wps_tags} for all the tags that are
 available.
 
+\begin{description}
+  \item All characters not preceded by \% are displayed as typed.
+  \item Lines beginning with \# are comments and will be ignored.
+  \item Maximum file size used is 
+      \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{1600}
+      \opt{player}{400} bytes.\\
+      If you have a bigger WPS file, only the first part of it will be 
+      loaded and used.
+\end{description}
+
 \subsubsection{Conditional Tags}
 
-\textbf{If/else}\\
+\emph{If/else}\\
 
 Syntax: \%?xx{\textless}true{\textbar}false{\textgreater}\\
 
 If the tag specified by ``xx'' has a value, the text between the ``{\textless}'' and the ``{\textbar}'' is displayed (the true part), else the text between the ``{\textbar}'' and the ``{\textgreater}'' is displayed (the false part).
 The else part is optional, so the ``{\textbar}'' does not have to be specified if no else part is desired. The conditionals nest, so the text in the if and else part can contain all \% commands, including conditionals.
 
-\textbf{Enumerations}\\
+\emph{Enumerations}\\
 
 Syntax: \%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}\\
 
@@ -89,11 +102,11 @@ Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textba
 The last else part is optional, and will be displayed if the tag has no value. The WPS parser will always display the last part if the tag has no value, or if the list of alternatives is too short. 
 
 \subsubsection{Next Song info}
-You can display information about the next song {}- the song that is
+You can display information about the next song -- the song that is
 about to play after the one currently playing (unless you change the
 plan).
 
-If you use the upper{}-case versions of the
+If you use the upper--case versions of the
 three tags: F, I and D, they will instead refer to the next song
 instead of the current one. Example: \%Ig is the genre name used in the
 next song and \%Ff is the mp3 frequency. 
@@ -163,15 +176,17 @@ a subline can be skipped (not displayed) when that condition is met.
 
 
 \subsubsection{Using Images}
-You can have as many as 52 images in your WPS. There are two ways of 
+You can have as many as 52 images in your WPS. There are various ways of 
 displaying images:
 \begin{enumerate}
   \item Load and always show the image, using the \%x tag
   \item Preload the image with \%xl and show it with \%xd. This way you can 
         have your images displayed conditionally.
-  \item Load an image and show as backdrop using the \%X tag. The image must 
-        be of the same exact dimensions as your display. (Currently only
-        supported on color targets).
+  \opt{h300,x5,ipodcolor,ipodvideo}{
+  \item On colour screen targets only... Load an image and show as backdrop 
+        using the \%X tag. The image must be of the same exact dimensions as 
+	your display.
+  }
 \end{enumerate}
 Example:
 \begin{verbatim}

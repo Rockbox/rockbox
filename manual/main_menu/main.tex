@@ -1,3 +1,4 @@
+% $Id$ %
 \chapter{The Main Menu}
 
 \section{Introducing the Main Menu}
@@ -83,29 +84,43 @@ browse the hard drive for alternate firmwares, and finally to reset your
 \fixme{TODO: check and enhance the above text}
 
 \section{Browse Themes}
-Within Rockbox it is possible to load a ``Theme'' -- a collection of 
-configuration settings coupled with a WPS (While Playing Screen).  
-This sets not only the WPS file, but also other relevant options such as 
-the correct font or forground/background colours to use.
+This option will display all the currently installed themes on the \dap, 
+press \ButtonRight\ to load the chosen theme and apply it.
 
-Selecting this option will list all of the currently installed Themes on the 
-\dap\, \ButtonRight\ will load the chosen theme and apply it.
-\fixme{TODO: check and enhance the above text}
+A Theme is basically a configuration file, stored in a specific directory, 
+that typically changes the WPS 
+\opt{h1xx,h300,x5}{and remote WPS}, font used and on some platforms
+additional information such as background image and text colours.
+
+There are a number of such themes that ship with Rockbox, and if none of
+these suit your needs, many more can be downloaded from 
+\url{www.rockbox.org/twiki/bin/view/Main/\opt{RECORDER_PAD}{/WpsArchos}
+\opt{h1xx}{WpsIriverH100}\opt{h300,ipodcolor}{WpsIriverH300}
+\opt{ipodvideo}{WpsIpod5g}\opt{ipodnano}{WpsIpodNano}
+\opt{ipodmini}{WpsIpodMini}\opt{x5}{WpsIaudioX5}}. 
+Some of the downloads from this site will actually be standalone WPS files, 
+others will be full-blown themes. 
+
+\note{Themes do not have to be purely visual.  It is quite possible to create
+a theme that switches between audio configurations for use in the car, with
+headphones and when connected to an external amplifier.  See the section on 
+``Making Your Own Settings File'' on page \pageref{ref:CreateYourOwnWPS} 
+for more details. 
+}
+
       
 \opt{CONFIG_TUNER}{
   \section{\label{ref:FMradio}FM Radio \opt{ondio}{(OndioFM Only)}}  
-  \opt{x5}{\note{Not Implemented on X5 yet}}
+  \opt{x5}{\note{Not currently Implemented on X5}}
 
   \screenshot{main_menu/images/ss-fm-radio-screen}{The FM radio screen}{}
   
   This menu option switches to the radio screen.
-  \opt{h1xx,h300,x5}{
+  
   The FM radio has the ability \opt{HAVE_RECORDING}{to record and } to
   remember station frequency settings (presets).
-  \note{This option is not \emph{currently} enabled on the X5} }
 
   \opt{recorderv2fm,ondio}{   
-    The keys are:
     \begin{table}
       \begin{btnmap}{}{}
           \ButtonLeft, \ButtonRight 
@@ -120,19 +135,18 @@ Selecting this option will list all of the currently installed Themes on the
             \ButtonPlay      & \emph{(EXPERIMENTAL)}\\
             & freezes all screen updates.May enhance radio reception
               in some cases.\\
-            %
           }
-          \opt{RECORDER_PAD}{\ButtonOn}\opt{ONDIO_PAD}{FixMe}
+          \opt{RECORDER_PAD}{\ButtonOn}\opt{ONDIO_PAD}{\ButtonOff}
           & Leave the radio screen with the radio playing \\
           %
-          \ButtonOff         & Back to Main Menu.\\
+	   \opt{RECORDER_PAD}{\ButtonOff}\opt{ONDIO_PAD}{hold \ButtonOff}
+          & Back to Main Menu.\\
        \end{btnmap}
     \end{table}
   }
+  \fixme{Add Radio recording and Preset keys to FM Recorder and Ondio FM}
   
   \opt{h1xx,h300,x5}{
-    
-    The keys are:
     \begin{table}
       \begin{btnmap}{}{}
           \ButtonLeft, \ButtonRight & Change frequency in 0.1 MHz steps. \\
@@ -364,7 +378,8 @@ Selecting this option will list all of the currently installed Themes on the
     default location is \fname{/recordings}.
     
   \item[Show recording screen on startup:]
-    If set to yes, the \dap\ will start up with the while recording screen showing.\\
+    If set to yes, the \dap\ will start up with the while recording screen 
+    showing.\\
     Options: Yes, No\\
     
   \item[Clipping Light:]
@@ -396,15 +411,22 @@ from where you currently are.
 specified file. If no path is provided then playlist is saved to current 
 directory (see page \pageref{ref:Playlistsubmenu}).
   
-\item[Recursively Insert Directories.]
+\item[Recursively Insert Directories: ]
   If set to ON then when you insert/queue a directory in Dynamic Playlist, 
 all subdirectories will also be inserted. If set to ASK then you are prompted 
 about recursive insertion when inserting a directory.
+  Options: Off, Ask, On
+
+\item[Warn When Erasing Dynamic Playlist: ]
+  \fixme{some information about this function....}
+  Options: Yes, No
 \end{description}
 
 \section{Browse Plugins}
   With this option you can load and run various plugins that have been
-written for Rockbox.A detailed description of the different plugins begins 
+written for Rockbox. There are a wide variety of these supplied with
+Rockbox, including several games, some impressive demo's and a number of
+utilities. A detailed description of the different plugins begins 
 on page \pageref{ref:plugins}.
 
 \section{\label{ref:Info}Info}
@@ -440,15 +462,17 @@ battery status, hard disk size and the amount of free space on the disk.
   for more details.
 }
 
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{
 \section{Quick Menu}
   Whilst not strictly part of the main menu, it is worth noting that a few
   of the more commonly used settings are available from the ''Quick Menu".
-  This screen is accessed by holding the \fixme{check this setting!}
-    \opt{RECORDER_PAD}{\ButtonFOne}
-    \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
-  and it allows rapid access to the Shuffle and Repeat Modes 
+  This screen is accessed by holding the 
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+   key, and it allows rapid access to the Shuffle and Repeat Modes 
   (Page \pageref{ref:PlaybackOptions})
   and the Show Files options (Page \pageref{ref:ShowFiles}).
-  
+}
 
