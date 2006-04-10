@@ -580,7 +580,7 @@ int system_memory_guard(int newmode)
 }
 
 #ifndef TARGET_TREE
-#ifdef IRIVER_H100
+#if MEM < 32
 #define MAX_REFRESH_TIMER     59
 #define NORMAL_REFRESH_TIMER  21
 #define DEFAULT_REFRESH_TIMER 4
