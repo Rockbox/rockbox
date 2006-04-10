@@ -43,6 +43,8 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8975
 
+#define AB_REPEAT_ENABLE 1
+
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPOD4G /* port controlled */
 

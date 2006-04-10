@@ -43,6 +43,8 @@
 /* Define this if you have the WM8758 audio codec */
 #define HAVE_WM8758
 
+#define AB_REPEAT_ENABLE 1
+
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */
 

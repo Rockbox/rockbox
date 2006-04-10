@@ -44,6 +44,8 @@
 /* Define this if you have the WM8721 audio codec */
 #define HAVE_WM8721 /* actually WM8731 but no recording */
 
+#define AB_REPEAT_ENABLE 1
+
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODMINI /* port controlled */
 
