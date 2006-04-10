@@ -43,7 +43,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
     clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
-enum modifies { clause_mod_none, clause_mod_not };
+enum modifiers { clause_mod_none, clause_mod_not };
 
 struct tagcache_search_clause
 {
@@ -81,12 +81,16 @@ struct tagcache_search {
 };
 
 bool tagcache_is_numeric_tag(int type);
+bool tagcache_is_unique_tag(int type);
+bool tagcache_is_sorted_tag(int type);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause);
 bool tagcache_get_next(struct tagcache_search *tcs);
+bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
+                       char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
 

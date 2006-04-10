@@ -44,9 +44,6 @@
 
 static int tagtree_play_folder(struct tree_context* c);
 
-static const int numeric_tags[] = { tag_year, tag_length, tag_bitrate, tag_tracknumber };
-static const int string_tags[] = { tag_artist, tag_title, tag_album, tag_composer, tag_genre };
-
 static char searchstring[32];
 struct tagentry {
     char *name;
@@ -702,32 +699,43 @@ static int tagtree_play_folder(struct tree_context* c)
 {
     struct tagentry *entry = (struct tagentry *)c->dircache;
     int i;
+    char buf[MAX_PATH];
+    int last_tick = 0;
 
-    if (playlist_create(NULL, NULL) < 0) {
+    if (playlist_create(NULL, NULL) < 0)
+    {
         logf("Failed creating playlist\n");
         return -1;
     }
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     cpu_boost(true);
-#endif
-
-    for (i=0; i < c->filesindir; i++) {
-        tagcache_search(&tcs, tag_filename);
-        tagcache_search_add_filter(&tcs, tag_title, entry[i].newtable);
-
-        if (!tagcache_get_next(&tcs))
+    tagcache_search(&tcs, tag_filename);
+    for (i=0; i < c->filesindir; i++)
+    {
+        if (current_tick - last_tick > HZ/2)
         {
-            tagcache_search_finish(&tcs);
-            continue ;
-        }
-        playlist_insert_track(NULL, tcs.result, PLAYLIST_INSERT, false);
-        tagcache_search_finish(&tcs);
-    }
-
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    cpu_boost(false);
+            gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), i,
+#if CONFIG_KEYPAD == PLAYER_PAD
+                           str(LANG_STOP_ABORT)
+#else
+                           str(LANG_OFF_ABORT)
 #endif
+                           );
+            if (SETTINGS_CANCEL == button_get(false))
+                break ;
+            last_tick = current_tick;
+        }
+        
+        if (!tagcache_retrieve(&tcs, entry[i].newtable, 
+                               buf, sizeof buf))
+        {
+            continue;
+        }
+
+        playlist_insert_track(NULL, buf, PLAYLIST_INSERT, false);
+    }
+    tagcache_search_finish(&tcs);
+    cpu_boost(false);
     
     if (global_settings.playlist_shuffle)
         c->selected_item = playlist_shuffle(current_tick, c->selected_item);
@@ -738,6 +746,13 @@ static int tagtree_play_folder(struct tree_context* c)
     playlist_start(c->selected_item,0);
 
     return 0;
+}
+
+char* tagtree_get_entryname(struct tree_context *c, int id)
+{
+    char **buf = c->dircache;
+
+    return buf[id * (c->dentry_size/sizeof(int))];
 }
 
 #ifdef HAVE_LCD_BITMAP

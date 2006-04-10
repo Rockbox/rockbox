@@ -52,7 +52,11 @@ static long tempbuf_pos;
 
 /* Tags we want to get sorted (loaded to the tempbuf). */
 static const int sorted_tags[] = { tag_artist, tag_album, tag_genre, tag_composer, tag_title };
+
+/* Uniqued tags (we can use these tags with filters and conditional clauses). */
 static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_composer };
+
+/* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_bitrate };
 
 /* Queue commands. */
@@ -139,6 +143,32 @@ bool tagcache_is_numeric_tag(int type)
     for (i = 0; i < (int)(sizeof(numeric_tags)/sizeof(numeric_tags[0])); i++)
     {
         if (type == numeric_tags[i])
+            return true;
+    }
+
+    return false;
+}
+
+bool tagcache_is_unique_tag(int type)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof(unique_tags)/sizeof(unique_tags[0])); i++)
+    {
+        if (type == unique_tags[i])
+            return true;
+    }
+
+    return false;
+}
+
+bool tagcache_is_sorted_tag(int type)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0])); i++)
+    {
+        if (type == sorted_tags[i])
             return true;
     }
 
@@ -324,21 +354,20 @@ static struct index_entry *find_entry_disk(const char *filename, bool retrieve)
     return &idx;
 }
 
-long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
+static long tagcache_get_seek(const struct tagcache_search *tcs, 
+                              int tag, int idxid)
 {
     struct index_entry idx;
-    
-    if (!tagcache_is_numeric_tag(tag))
-        return -1;
     
 #ifdef HAVE_TC_RAMCACHE
     if (tcs->ramsearch)
     {
-        return hdr->indices[tcs->idx_id].tag_seek[tag];
+        return hdr->indices[idxid].tag_seek[tag];
     }
 #endif
     
-    lseek(tcs->masterfd, tcs->idx_id * sizeof(struct index_entry), SEEK_CUR);
+    lseek(tcs->masterfd, idxid * sizeof(struct index_entry) 
+          + sizeof(struct tagcache_header), SEEK_SET);
     if (read(tcs->masterfd, &idx, sizeof(struct index_entry)) !=
         sizeof(struct index_entry))
     {
@@ -347,6 +376,15 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     }
     
     return idx.tag_seek[tag];
+}
+
+long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
+{
+    
+    if (!tagcache_is_numeric_tag(tag))
+        return -1;
+    
+    return tagcache_get_seek(tcs, tag, tcs->idx_id);
 }
 
 static bool check_against_clause(long numeric, const char *str,
@@ -520,6 +558,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     return tcs->seek_list_count > 0;
 }
 
+        
 bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header h;
@@ -601,6 +640,9 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
     if (tcs->filter_count == TAGCACHE_MAX_FILTERS)
         return false;
 
+    if (!tagcache_is_unique_tag(tag) || tagcache_is_numeric_tag(tag))
+        return false;
+    
     tcs->filter_tag[tcs->filter_count] = tag;
     tcs->filter_seek[tcs->filter_count] = seek;
     tcs->filter_count++;
@@ -699,6 +741,9 @@ bool tagcache_get_next(struct tagcache_search *tcs)
         tcs->result = ep->tag_data;
         tcs->result_len = ep->tag_length;
         tcs->idx_id = ep->idx_id;
+        
+        if (!tagcache_is_unique_tag(tcs->type))
+            tcs->result_seek = tcs->idx_id;
 
         return true;
     }
@@ -732,6 +777,61 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     tcs->result = buf;
     tcs->result_len = entry.tag_length;
     tcs->idx_id = entry.idx_id;
+    if (!tagcache_is_unique_tag(tcs->type))
+        tcs->result_seek = tcs->idx_id;
+
+    return true;
+}
+
+bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
+                       char *buf, long size)
+{
+    struct tagfile_entry tfe;
+    long seek;
+    
+    seek = tagcache_get_seek(tcs, tcs->type, idxid);
+    if (seek < 0)
+    {
+        logf("Retrieve failed");
+        return false;
+    }
+    
+    if (tcs->idxfd[tcs->type] < 0)
+    {
+        char fn[MAX_PATH];
+
+        snprintf(fn, sizeof fn, TAGCACHE_FILE_INDEX, tcs->type);
+        tcs->idxfd[tcs->type] = open(fn, O_RDONLY);
+    }
+    
+    if (tcs->idxfd[tcs->type] < 0)
+    {
+        logf("File not open!");
+        return false;
+    }
+    
+    lseek(tcs->idxfd[tcs->type], seek, SEEK_SET);
+    if (read(tcs->idxfd[tcs->type], &tfe, sizeof(struct tagfile_entry)) !=
+        sizeof(struct tagfile_entry))
+    {
+        logf("read error");
+        return false;
+    }
+    
+    if (tfe.tag_length >= size)
+    {
+        logf("too small buffer");
+        return false;
+    }
+    
+    if (read(tcs->idxfd[tcs->type], buf, tfe.tag_length) !=
+        tfe.tag_length)
+    {
+        logf("read error #2");
+        return false;
+    }
+    
+    buf[tfe.tag_length] = '\0';
     
     return true;
 }
@@ -1154,32 +1254,6 @@ static int tempbuf_find_location(int id)
     return entry->seek;
 }
 
-static bool is_unique_tag(int type)
-{
-    int i;
-
-    for (i = 0; i < (int)(sizeof(unique_tags)/sizeof(unique_tags[0])); i++)
-    {
-        if (type == unique_tags[i])
-            return true;
-    }
-
-    return false;
-}
-
-static bool is_sorted_tag(int type)
-{
-    int i;
-
-    for (i = 0; i < (int)(sizeof(sorted_tags)/sizeof(sorted_tags[0])); i++)
-    {
-        if (type == sorted_tags[i])
-            return true;
-    }
-
-    return false;
-}
-
 static bool build_numeric_index(int index_type, struct tagcache_header *h, int tmpfd)
 {
     struct tagcache_header tch;
@@ -1318,7 +1392,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * it entirely into memory so we can resort it later for use with
          * chunked browsing.
          */
-        if (is_sorted_tag(index_type))
+        if (tagcache_is_sorted_tag(index_type))
         {
             for (i = 0; i < tch.entry_count; i++)
             {
@@ -1445,7 +1519,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
      * Load new unique tags in memory to be sorted later and added
      * to the master lookup file.
      */
-    if (is_sorted_tag(index_type))
+    if (tagcache_is_sorted_tag(index_type))
     {
         lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
         /* h is the header of the temporary file containing new tags. */
@@ -1478,7 +1552,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 goto error_exit;
             }
             
-            if (is_unique_tag(index_type))
+            if (tagcache_is_unique_tag(index_type))
                 error = !tempbuf_unique_insert(buf, i);
             else
                 error = !tempbuf_insert(buf, i, tch.entry_count + i);
@@ -1563,7 +1637,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         }
 
         /* Read entry headers. */
-        if (!is_sorted_tag(index_type))
+        if (!tagcache_is_sorted_tag(index_type))
         {
             struct temp_file_entry entry;
             struct tagfile_entry fe;
@@ -1634,7 +1708,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
     }
 
     /* Finally write the uniqued tag index file. */
-    if (is_sorted_tag(index_type))
+    if (tagcache_is_sorted_tag(index_type))
     {
         tch.magic = TAGCACHE_MAGIC;
         tch.entry_count = tempbufidx;

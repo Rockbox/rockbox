@@ -169,8 +169,9 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
     if (id3db) {
-        char **buf = local_tc->dircache;
-        name = buf[selected_item * (local_tc->dentry_size/sizeof(int))];
+        return tagtree_get_entryname(&tc, selected_item);
+        //char **buf = local_tc->dircache;
+        //name = buf[selected_item * (local_tc->dentry_size/sizeof(int))];
     }
     else {
         struct entry* dc = local_tc->dircache;
