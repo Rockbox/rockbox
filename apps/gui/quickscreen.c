@@ -18,7 +18,8 @@
  ****************************************************************************/
 
 #include "quickscreen.h"
-#ifdef HAS_QUICKSCREEN
+
+#ifdef HAVE_QUICKSCREEN
 
 #include <stdio.h>
 #include "system.h"
@@ -83,7 +84,7 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
     else
     {
         display->putsxy(display->width - w - 12, 24, line_text);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
                         display->width - 8, 24, 7, 8);
     }
     display->getstringsize(option, &w, NULL);
@@ -217,5 +218,5 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     }
 }
 
-#endif /* HAS_QUICKSCREEN */
+#endif /* HAVE_QUICKSCREEN */
 

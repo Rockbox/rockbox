@@ -15,6 +15,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you have access to the quickscreen */
+#define HAVE_QUICKSCREEN
+
 /* LCD dimensions */
 #define LCD_WIDTH  220
 #define LCD_HEIGHT 176

@@ -18,14 +18,11 @@
  ****************************************************************************/
 #include "button.h"
 #include "config.h"
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
-    (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD) ||\
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
+
+#ifdef HAVE_QUICKSCREEN
 
 #ifndef _GUI_QUICKSCREEN_H_
 #define _GUI_QUICKSCREEN_H_
-
-#define HAS_QUICKSCREEN
 
 #include "option_select.h"
 #include "screen_access.h"
@@ -33,17 +30,14 @@
 #define QUICKSCREEN_LEFT        BUTTON_LEFT
 #define QUICKSCREEN_RIGHT       BUTTON_RIGHT
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD) ||\
-    (CONFIG_KEYPAD == RECORDER_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD)
 #define QUICKSCREEN_BOTTOM     BUTTON_DOWN
 #define QUICKSCREEN_BOTTOM_INV BUTTON_UP
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define QUICKSCREEN_BOTTOM     BUTTON_PLAY
-#define QUICKSCREEN_QUIT  BUTTON_MENU
-#define QUICKSCREEN_QUIT2 BUTTON_SELECT
-#endif
-
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define QUICKSCREEN_QUIT       BUTTON_F3
+#define QUICKSCREEN_QUIT2      BUTTON_OFF
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define QUICKSCREEN_BOTTOM     BUTTON_DOWN
+#define QUICKSCREEN_BOTTOM_INV BUTTON_UP
 #define QUICKSCREEN_QUIT  BUTTON_MODE
 #define QUICKSCREEN_QUIT2 BUTTON_OFF
 #define QUICKSCREEN_RC_QUIT     BUTTON_RC_MODE
@@ -53,7 +47,14 @@
 #define QUICKSCREEN_RC_BOTTOM_INV  BUTTON_RC_VOL_UP
 #define QUICKSCREEN_RC_RIGHT       BUTTON_RC_FF
 #endif
-
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+#define QUICKSCREEN_BOTTOM BUTTON_PLAY
+#define QUICKSCREEN_QUIT   BUTTON_MENU
+#define QUICKSCREEN_QUIT2  BUTTON_SELECT
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define QUICKSCREEN_BOTTOM BUTTON_DOWN
+#define QUICKSCREEN_QUIT   BUTTON_REC
+#define QUICKSCREEN_QUIT2  BUTTON_POWER
 #endif
 
 struct gui_quickscreen;
@@ -118,4 +119,4 @@ void gui_syncquickscreen_draw(struct gui_quickscreen * qs);
 bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter);
 
 #endif /*_GUI_QUICK_SCREEN_H_*/
-#endif /* CONFIG_KEYPAD */
+#endif /* HAVE_QUICKSCREEN */

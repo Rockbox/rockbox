@@ -15,6 +15,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you have access to the quickscreen */
+#define HAVE_QUICKSCREEN
+
 /* LCD dimensions */
 #define LCD_WIDTH  320
 #define LCD_HEIGHT 240
@@ -53,7 +56,7 @@
 
 #ifndef SIMULATOR
 
-/* The Nano actually has a PP5021 - but it's register compatible with 
+/* The Nano actually has a PP5021 - but it's register compatible with
    the 5020 so Rockbox doesn't care. */
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020

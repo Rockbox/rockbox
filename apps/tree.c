@@ -365,7 +365,7 @@ static int update_dir(void)
 void resume_directory(const char *dir)
 {
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
-    
+
     if (ft_load(&tc, dir) < 0)
         return;
     lastdir[0] = 0;
@@ -460,7 +460,7 @@ void set_current_file(char *path)
     }
 
     strcpy(lastfile, name);
-    
+
     /* undefined item selected */
     tc.selected_item = -1;
 
@@ -641,7 +641,7 @@ static bool dirbrowse(void)
                     }
 #if defined(HAVE_CHARGING) && \
     (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
-                    else { 
+                    else {
                         if (!charger_inserted()) {
                             if(shutdown_screen())
                                 reload_dir = true;
@@ -719,7 +719,7 @@ static bool dirbrowse(void)
                 }
                 break;
 
-#ifdef TREE_QUICK
+#ifdef HAVE_QUICKSCREEN
             case TREE_QUICK:
 #ifdef TREE_RC_QUICK
             case TREE_RC_QUICK:
@@ -905,7 +905,7 @@ static bool dirbrowse(void)
                 lastextra = -1;
                 reload_root = false;
             }
-            
+
             if (! reload_dir )
             {
                 gui_synclist_select_item(&tree_lists, 0);
@@ -1073,7 +1073,7 @@ static bool add_dir(char* dirname, int len, int fd)
                             plsize++;
                             if(TIME_AFTER(current_tick, pltick+HZ/4)) {
                                 pltick = current_tick;
-                                
+
                                 snprintf(buf, sizeof buf, "%d", plsize);
 #ifdef HAVE_LCD_BITMAP
                                 FOR_NB_SCREENS(i)
@@ -1117,7 +1117,7 @@ bool create_playlist(void)
     char filename[MAX_PATH];
 
     pltick = current_tick;
-    
+
     snprintf(filename, sizeof filename, "%s.m3u",
              tc.currdir[1] ? tc.currdir : "/root");
     FOR_NB_SCREENS(i)

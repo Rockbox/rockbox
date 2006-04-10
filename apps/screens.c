@@ -460,9 +460,8 @@ bool pitch_screen(void)
 }
 #endif
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IRIVER_H100_PAD) ||\
-    (CONFIG_KEYPAD == IRIVER_H300_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD) ||\
-    (CONFIG_KEYPAD == IPOD_3G_PAD)
+#ifdef HAVE_QUICKSCREEN
+
 #define bool_to_int(b)\
     b?1:0
 #define int_to_bool(i)\

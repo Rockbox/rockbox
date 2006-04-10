@@ -12,6 +12,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you have access to the quickscreen */
+#define HAVE_QUICKSCREEN
+
 /* LCD dimensions */
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128

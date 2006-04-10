@@ -15,6 +15,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you have access to the quickscreen */
+#define HAVE_QUICKSCREEN
+
 /* LCD dimensions */
 #define LCD_WIDTH  176
 #define LCD_HEIGHT 132
@@ -53,7 +56,7 @@
 
 #ifndef SIMULATOR
 
-/* The Nano actually has a PP5021 - but it's register compatible with 
+/* The Nano actually has a PP5021 - but it's register compatible with
    the 5020 so Rockbox doesn't care. */
 /* Define this if you have a PortalPlayer PP5020 */
 #define CONFIG_CPU PP5020
@@ -64,7 +67,7 @@
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIPOL1300
 
-#define BATTERY_SCALE_FACTOR 5865 
+#define BATTERY_SCALE_FACTOR 5865
 
 /* Define this if the platform can charge batteries */
 //#define HAVE_CHARGING 1
