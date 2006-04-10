@@ -1,18 +1,37 @@
 \subsection{Chessbox}
 \screenshot{plugins/images/ss-chessbox}{Chessbox}{img:chessbox}
-Chessbox is a chess game with computer AI. The chess engine is a port of GNU Chess 2 by John Stanback.\\
+Chessbox is a chess game with computer AI. The chess engine is a port of 
+GNU Chess 2 by John Stanback.
+When you quit the game the current state will be saved and restored when
+you resume the game. 
 
-\textbf{Keys}
+\subsubsection{Keys}
 \begin{table}
     \begin{btnmap}{}{}
-    Direction keys & Move the cursor\\
-    \opt{recorder,recorderv2fm}{PLAY}\opt{ondio}{short press on MODE}\opt{h1xx,ipodcolor,ipodnano}{SELECT}\opt{h300}{NAVI}
+    Direction keys 
+    & Move the cursor\\
+    \opt{recorder,recorderv2fm}{\ButtonPlay}
+    \opt{ondio}{short press on \ButtonMenu}
+    \opt{h1xx,h300,ipodcolor,ipodnano}{\ButtonSelect}
     & Select / Move piece\\
-    \opt{recorder,recorderv2fm}{F1}\opt{ondio}{MODE+OFF}\opt{h1xx,h300}{A-B}\opt{ipodcolor,ipodnano}{SELECT+RIGHT}
+    \opt{recorder,recorderv2fm}{\ButtonFOne}
+    \opt{ondio}{\ButtonMenu+\ButtonOff}
+    \opt{h1xx,h300}{\ButtonMode}
+    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonRight}
     & Change level\\
-    \opt{recorder,recorderv2fm}{MENU}\opt{ondio}{long press on MODE}\opt{h1xx,h300}{PLAY}\opt{ipodcolor,ipodnano}{SELECT+PLAY}
+    \opt{recorder,recorderv2fm}{\ButtonOn}
+    \opt{ondio}{long press on \ButtonMenu}
+    \opt{h1xx,h300}{\ButtonOn}
+    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonPlay}
     & Force play\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{STOP}\opt{ondio}{OFF}\opt{ipodcolor,ipodnano}{SELECT+MENU}
+    \opt{recorder,recorder2fm}{n/a}
+    \opt{ondio}{n/a}
+    \opt{h1xx,h300}{\ButtonRec}
+    \opt{x5}{\ButtonSelect}
+    & Restart Game\\
+    \opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOff}
+    \opt{ondio}{\ButtonOff}
+    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonMenu}
     & Quit\\
     \end{btnmap}
 \end{table}
