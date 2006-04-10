@@ -1481,28 +1481,31 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
 
     initialize_buffer_fill(start_play);
 
-    /* If we have a partially buffered track, continue loading, otherwise
-     * load a new track */
+    /* If we have a partially buffered track, continue loading,
+     * otherwise load a new track */
     if (tracks[track_widx].filesize > 0)
         audio_read_file();
     else if (!audio_load_track(offset, start_play, last_peek_offset + 1))
         fill_bytesleft = 0;
 
-    /* If we're done buffering */
-    if (fill_bytesleft <= 0)
+    /* Read next unbuffered track's metadata as soon as playback begins */
+    if (pcm_is_playing() || fill_bytesleft <= 0)
     {
-        /* Read next unbuffered track's metadata as necessary. */
         read_next_metadata();
 
-        generate_postbuffer_events();
-        filling = false;
-        filling_initial = false;
-        pcmbuf_set_boost_mode(false);
+        /* If we're done buffering */
+        if (fill_bytesleft <= 0)
+        {
+            generate_postbuffer_events();
+            filling = false;
+            filling_initial = false;
+            pcmbuf_set_boost_mode(false);
 
 #ifndef SIMULATOR
-        if (playing)
-            ata_sleep();
+            if (playing)
+                ata_sleep();
 #endif
+        }
     }
 }
 
