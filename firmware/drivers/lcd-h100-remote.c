@@ -61,17 +61,6 @@
 #define RS_LO      and_l(~0x00010000, &GPIO_OUT)
 #define RS_HI      or_l(0x00010000, &GPIO_OUT)
 
-/* delay loop */
-#ifdef HAVE_REMOTE_LCD_TICKING
-#define DELAY_DEFAULT   do { int _x = 0; for (_x = 0;_x < 2;_x++); } while (0)
-#define DELAY_EMIREDUCE do { int _x = cpu_frequency >> 21; while (_x--); } \
-                            while (0)
-#define DELAY   do { if (emireduce) DELAY_EMIREDUCE; \
-                    else DELAY_DEFAULT; } while (0)
-#else
-#define DELAY   do { int _x = 0; for (_x = 0;_x < 3;_x++); } while (0)
-#endif
-
 #define SCROLLABLE_LINES 13
 
 /*** globals ***/
@@ -83,12 +72,18 @@ static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
+
 #ifndef SIMULATOR
 static int xoffset; /* needed for flip */
+
+/* timeout counter for deasserting /CS after access, <0 means not counting */
+static int cs_countdown IDATA_ATTR = 0;
+#define CS_TIMEOUT (HZ/10)
 
 #ifdef HAVE_REMOTE_LCD_TICKING
 /* If set to true, will prevent "ticking" to headphones. */
 static bool emireduce = false;
+static int byte_delay = 172;
 #endif
 
 /* remote hotplug */
@@ -122,210 +117,237 @@ static const char scroll_tick_table[16] = {
 /*** driver routines ***/
 
 #ifndef SIMULATOR
-void lcd_remote_write_command(int cmd)
+
+#ifdef HAVE_REMOTE_LCD_TICKING
+static inline void _byte_delay(void)
 {
-    int i;
-    
-    RS_LO;
-    CS_LO;
-    
-    for (i = 8; i > 0; i--)
-    {
-        if (cmd & 0x80)
-            DATA_HI;
-        else
-            DATA_LO;
-        
-        CLK_HI;
-        cmd <<= 1;
-        DELAY;
-        
-        CLK_LO;
-    }
-    
-    CS_HI;
+    asm (
+        "move.l  %[dly],%%d0     \n"
+    "1:                          \n"
+        "subq.l  #1,%%d0         \n"
+        "bhi.s   1b              \n"
+        : /* outputs */
+        : /* inputs */
+        [dly]"d"(byte_delay)
+        : /* clobbers */
+        "d0"
+    );
+}
+#endif /* HAVE_REMOTE_LCD_TICKING */
+
+/* Standard low-level byte writer */
+static inline void _write_byte(unsigned data)
+{
+    asm volatile (
+        "moveq.l #8,%%d1           \n" /* bit counter */
+
+    "2:                            \n"
+        "tst.b   %[data]           \n" /* MSB of data set? */
+        "bpl.s   1f                \n"
+        "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
+        ".word   0x51fa            \n" /* trapf.w - shadow next insn */
+    "1:                            \n"
+        "and.l   %[dlo],(%[gpi1])  \n" /* reset data bit */
+        "eor.l   %[cbit],(%[gpio]) \n" /* set clock bit */
+        "eor.l   %[cbit],(%[gpio]) \n" /* reset clock bit */
+        "lsl.l   #1,%[data]        \n" /* data <<= 1 */
+
+        "subq.l  #1,%%d1           \n"
+        "bne.s   2b                \n"
+
+        "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
+        : /* outputs */
+        [data]"+d"(data)
+        : /* inputs */
+        [gpio]"a"(&GPIO_OUT),
+        [cbit]"d"(0x10000000),
+        [gpi1]"a"(&GPIO1_OUT),
+        [dhi] "d"(0x00040000),
+        [dlo] "d"(~0x00040000)
+        : /* clobbers */
+        "d1"
+    );
 }
 
-void lcd_remote_write_data(const unsigned char* p_bytes, int count)
+/* Unrolled fast low-level byte writer. Don't use with high CPU clock. */
+static inline void _write_unrolled(unsigned data)
 {
-    int i, j;
-    int data;
-    
-    RS_HI;
+    asm volatile (
+        "move.w  %%sr,%%d4       \n" /* get current interrupt level */
+        "move.w  #0x2700,%%sr    \n" /* disable interrupts */
+
+        "move.l  #0x00040000,%%d1\n" /* precalculate port values */
+        "move.l  %%d1,%%d0       \n" /* for setting and resetting */
+        "or.l    (%[gpi1]),%%d1  \n" /* the data bit */
+        "eor.l   %%d1,%%d0       \n"
+
+        "move.l  #0x10000000,%%d3\n" /* precalculate port values */
+        "move.l  %%d3,%%d2       \n" /* for setting and resetting */
+        "or.l    (%[gpio]),%%d3  \n" /* the clock bit */
+        "eor.l   %%d3,%%d2       \n"
+
+        "tst.b   %[data]         \n" /* MSB of data set? */
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
+        ".word   0x51fa          \n" /* trapf.w - shadow next insn */
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n" /* reset data bit */
+        "move.l  %%d3,(%[gpio])  \n" /* set clock bit */
+        "move.l  %%d2,(%[gpio])  \n" /* reset clock bit */
+        "lsl.l   #1,%[data]      \n" /* data <<= 1 */
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]      \n"
+
+        "tst.b   %[data]         \n"
+        "bpl.s   1f              \n"
+        "move.l  %%d1,(%[gpi1])  \n"
+        ".word   0x51fa          \n"
+    "1:                          \n"
+        "move.l  %%d0,(%[gpi1])  \n"
+        "move.l  %%d3,(%[gpio])  \n"
+        "move.l  %%d2,(%[gpio])  \n"
+
+        "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
+        "move.w  %%d4,%%sr       \n" /* reenable interrupts */
+        : /* outputs */
+        [data]"+d"(data)
+        : /* inputs */
+        [gpio]"a"(&GPIO_OUT),
+        [gpi1]"a"(&GPIO1_OUT)
+        : /* clobbers */
+        "d0", "d1", "d2", "d3", "d4"
+    );
+}
+
+void lcd_remote_write_command(int cmd)
+{
+    cs_countdown = 0;
+    RS_LO;
     CS_LO;
 
-    /* This is safe as long as lcd_remote_write_data() isn't called from within
-     * an ISR. */
-    if (cpu_frequency > 20000000)
-    {
-        for (i = count; i > 0; i--)
-        {
-            data = *p_bytes++;
-        
-            for (j = 8; j > 0; j--)
-            {
-                if (data & 0x80)
-                    DATA_HI;
-                else
-                    DATA_LO;
-            
-                CLK_HI;
-                data <<= 1;
-                DELAY;
-                
-                CLK_LO;
-            }
-        }
-    }
-    else
-    {
-        for (i = count; i > 0; i--)
-        {
-            asm (
-                "move.w  %%sr,%%d4       \n" /* get current interrupt level */
-                "move.w  #0x2700,%%sr    \n" /* disable interrupts */
+    _write_byte(cmd);
+#ifdef HAVE_REMOTE_LCD_TICKING
+    if (emireduce)
+        _byte_delay();
+#endif
 
-                "move.l  #0x00040000,%%d1\n" /* precalculate port values */
-                "move.l  %%d1,%%d0       \n" /* for setting and resetting */
-                "or.l    (%[gpi1]),%%d1  \n" /* the data bit */
-                "eor.l   %%d1,%%d0       \n"
-
-                "move.l  #0x10000000,%%d3\n" /* precalculate port values */
-                "move.l  %%d3,%%d2       \n" /* for setting and resetting */
-                "or.l    (%[gpio]),%%d3  \n" /* the clock bit */
-                "eor.l   %%d3,%%d2       \n"
-
-                "tst.b   %[data]         \n" /* MSB of data set? */
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n" /* reset data bit */
-                ".word   0x51fa          \n" /* trapf.w - shadow next insn */
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
-                "move.l  %%d3,(%[gpio])  \n" /* set clock bit */
-                "lsl.l   #1,%[data]      \n" /* data <<= 1 */
-                "move.l  %%d2,(%[gpio])  \n" /* reset clock bit */
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "tst.b   %[data]         \n"
-                "bmi.s   1f              \n"
-                "move.l  %%d0,(%[gpi1])  \n"
-                ".word   0x51fa          \n"
-            "1:                          \n"
-                "move.l  %%d1,(%[gpi1])  \n"
-                "move.l  %%d3,(%[gpio])  \n"
-                "lsl.l   #1,%[data]      \n"
-                "move.l  %%d2,(%[gpio])  \n"
-
-                "move.w  %%d4,%%sr       \n" /* reenable interrupts */
-                : /* outputs */
-                : /* inputs */
-                [data]"d"(*p_bytes++),
-                [gpio]"a"(&GPIO_OUT),
-                [gpi1]"a"(&GPIO1_OUT)
-                : /* clobbers */
-                "d0", "d1", "d2", "d3", "d4"
-            );
-        }
-    }
-
-    CS_HI;
+    cs_countdown = CS_TIMEOUT;
 }
 
 void lcd_remote_write_command_ex(int cmd, int data)
 {
-    int i;
-
+    cs_countdown = 0;
     RS_LO;
     CS_LO;
-    
-    for (i = 8; i > 0; i--)
+
+#ifdef HAVE_REMOTE_LCD_TICKING
+    if (emireduce)
     {
-        if (cmd & 0x80)
-            DATA_HI;
-        else
-            DATA_LO;
-        
-        CLK_HI;
-        cmd <<= 1;
-        DELAY;
-        
-        CLK_LO;
+        _write_byte(cmd);
+        _byte_delay();
+        _write_byte(data);
+        _byte_delay();
     }
-    
-    for (i = 8; i > 0; i--)
+    else
+#endif
     {
-        if (data & 0x80)
-            DATA_HI;
-        else
-            DATA_LO;
-        
-        CLK_HI;
-        data <<= 1;
-        DELAY;
-        
-        CLK_LO;
+        _write_byte(cmd);
+        _write_byte(data);
     }
-    
-    CS_HI;
+
+    cs_countdown = CS_TIMEOUT;
+}
+
+void lcd_remote_write_data(const unsigned char* p_bytes, int count) ICODE_ATTR;
+void lcd_remote_write_data(const unsigned char* p_bytes, int count)
+{
+    const unsigned char *p_end = p_bytes + count;
+
+    cs_countdown = 0;
+    RS_HI;
+    CS_LO;
+
+    /* This is safe as long as lcd_remote_write_data() isn't called from within
+     * an ISR. */    
+    if (cpu_frequency < 20000000)
+    {
+        while (p_bytes < p_end)
+            _write_unrolled(*p_bytes++);
+    }
+    else
+    {
+#ifdef HAVE_REMOTE_LCD_TICKING
+        if (emireduce)
+            while (p_bytes < p_end)
+            {
+                _write_byte(*p_bytes++);
+                _byte_delay();
+            }
+        else
+#endif
+            while (p_bytes < p_end)
+                _write_byte(*p_bytes++);
+    }
+
+    cs_countdown = CS_TIMEOUT;
 }
 #endif /* !SIMULATOR */
 
@@ -482,6 +504,12 @@ static void remote_tick(void)
             }
         }
     }
+
+    /* handle chip select timeout */
+    if (cs_countdown >= 0)
+        cs_countdown--;
+    if (cs_countdown == 0)
+        CS_HI;
 }
 #endif /* !SIMULATOR */
 
@@ -535,6 +563,11 @@ void lcd_remote_update(void)
     
     if (!remote_initialized)
         return;
+      
+#ifdef HAVE_REMOTE_LCD_TICKING
+    /* adjust byte delay for emi reduction */
+    byte_delay = (cpu_frequency >> 18) - 30;
+#endif
 
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_REMOTE_HEIGHT/8; y++)
@@ -565,7 +598,12 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
         return; /* nothing left to do, 0 is harmful to lcd_write_data() */
     if(ymax >= LCD_REMOTE_HEIGHT/8)
         ymax = LCD_REMOTE_HEIGHT/8-1;
-        
+
+#ifdef HAVE_REMOTE_LCD_TICKING
+    /* adjust byte delay for emi reduction */
+    byte_delay = (cpu_frequency >> 18) - 30;
+#endif
+
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
