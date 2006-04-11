@@ -1024,7 +1024,7 @@ void strip_id3v1_tag(void)
         if(found)
         {
             /* Skip id3v1 tag */
-            logf("Skipping ID3v1 tag\n");
+            logf("Skipping ID3v1 tag");
             if (buf_widx < 128)
                 buf_widx += filebuflen;
             buf_widx -= 128;
@@ -1440,7 +1440,7 @@ static void audio_clear_track_entries(bool clear_unbuffered)
     int cur_idx = track_widx;
     int last_idx = -1;
     
-    logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, buffered_only);
+    logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
     /* Loop over all tracks from write-to-read */
     while (1) {
         if (++cur_idx >= MAX_TRACK)
@@ -1538,7 +1538,8 @@ static void generate_postbuffer_events(void)
         cur_idx = track_ridx;
         while (1) {
             if (!tracks[cur_idx].event_sent) {
-                if (last_idx >= 0) {
+                if (last_idx >= 0 && !tracks[last_idx].event_sent)
+                {
                     /* Mark the event 'sent' even if we don't really send one */
                     tracks[last_idx].event_sent = true;
                     if (track_buffer_callback)
@@ -1552,7 +1553,8 @@ static void generate_postbuffer_events(void)
                 cur_idx -= MAX_TRACK;
         }
 
-        if (last_idx >= 0) {
+        if (last_idx >= 0 && !tracks[last_idx].event_sent)
+        {
             tracks[last_idx].event_sent = true;
             if (track_buffer_callback)
                 track_buffer_callback(&tracks[last_idx].id3, true);
