@@ -327,12 +327,11 @@ unsigned char const pretab[22] = {
  * table for requantization
  *
  * rq_table[x].mantissa * 2^(rq_table[x].exponent) = x^(4/3)
+ *
+ * format rq_table: bit31-27=exponent bit26-0=mantissa
  */
 static
-struct fixedfloat {
-  unsigned long mantissa  : 27;
-  unsigned short exponent :  5;
-} const rq_table[8207] = {
+unsigned long const rq_table[8207] = {
 # include "rq_table.dat"
 };
 
@@ -342,8 +341,7 @@ struct fixedfloat {
  *
  * root_table[3 + x] = 2^(x/4)
  */
-static
-mad_fixed_t const root_table[7] = {
+mad_fixed_t const root_table[7] ICONST_ATTR = {
   MAD_F(0x09837f05) /* 2^(-3/4) == 0.59460355750136 */,
   MAD_F(0x0b504f33) /* 2^(-2/4) == 0.70710678118655 */,
   MAD_F(0x0d744fcd) /* 2^(-1/4) == 0.84089641525371 */,
@@ -361,16 +359,14 @@ mad_fixed_t const root_table[7] = {
  * cs[i] =    1 / sqrt(1 + c[i]^2)
  * ca[i] = c[i] / sqrt(1 + c[i]^2)
  */
-static
-mad_fixed_t const cs[8] = {
+mad_fixed_t const cs[8] ICONST_ATTR = {
   +MAD_F(0x0db84a81) /* +0.857492926 */, +MAD_F(0x0e1b9d7f) /* +0.881741997 */,
   +MAD_F(0x0f31adcf) /* +0.949628649 */, +MAD_F(0x0fbba815) /* +0.983314592 */,
   +MAD_F(0x0feda417) /* +0.995517816 */, +MAD_F(0x0ffc8fc8) /* +0.999160558 */,
   +MAD_F(0x0fff964c) /* +0.999899195 */, +MAD_F(0x0ffff8d3) /* +0.999993155 */
 };
 
-static
-mad_fixed_t const ca[8] = {
+mad_fixed_t const ca[8] ICONST_ATTR = {
   -MAD_F(0x083b5fe7) /* -0.514495755 */, -MAD_F(0x078c36d2) /* -0.471731969 */,
   -MAD_F(0x05039814) /* -0.313377454 */, -MAD_F(0x02e91dd1) /* -0.181913200 */,
   -MAD_F(0x0183603a) /* -0.094574193 */, -MAD_F(0x00a7cb87) /* -0.040965583 */,
@@ -881,14 +877,15 @@ mad_fixed_t III_requantize(unsigned int value, signed int exp)
 {
   mad_fixed_t requantized;
   signed int frac;
-  struct fixedfloat const *power;
+  unsigned long power;
 
   frac = exp % 4;  /* assumes sign(frac) == sign(exp) */
   exp /= 4;
 
-  power = &rq_table[value];
-  requantized = power->mantissa;
-  exp += power->exponent;
+  /* format rq_table: bit31-27=exponent bit26-0=mantissa */
+  power = rq_table[value];
+  requantized = power & 0x07ffffff;
+  exp += power >> 27;
 
   if (exp < 0) {
     if (-exp >= (signed int) (sizeof(mad_fixed_t) * CHAR_BIT)) {
@@ -963,7 +960,7 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
     unsigned int region, rcount;
     struct hufftable const *entry;
     union huffpair const *table;
-    unsigned int linbits, startbits, big_values, reqhits;
+    unsigned int linbits, startbits, big_values;
     mad_fixed_t reqcache[16];
 
     sfbound = xrptr + *sfbwidth++;
@@ -979,7 +976,9 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 
     expptr  = &exponents[0];
     exp     = *expptr++;
-    reqhits = 0;
+
+    /* clear cache */
+    memset(reqcache, 0, sizeof(reqcache));
 
     big_values = channel->big_values;
 
@@ -1010,7 +1009,7 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 
 	if (exp != *expptr) {
 	  exp = *expptr;
-	  reqhits = 0;
+	  memset(reqcache, 0, sizeof(reqcache));
 	}
 
 	++expptr;
@@ -1063,12 +1062,10 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 	  goto x_final;
 
 	default:
-	  if (reqhits & (1 << value))
+	  if (reqcache[value])
 	    requantized = reqcache[value];
-	  else {
-	    reqhits |= (1 << value);
+	  else
 	    requantized = reqcache[value] = III_requantize(value, exp);
-	  }
 
 	x_final:
 	  xrptr[0] = MASK1BIT(bitcache, cachesz--) ?
@@ -1098,12 +1095,10 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 	  goto y_final;
 
 	default:
-	  if (reqhits & (1 << value))
+	  if (reqcache[value])
 	    requantized = reqcache[value];
-	  else {
-	    reqhits |= (1 << value);
+	  else
 	    requantized = reqcache[value] = III_requantize(value, exp);
-	  }
 
 	y_final:
 	  xrptr[1] = MASK1BIT(bitcache, cachesz--) ?
@@ -1118,12 +1113,10 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 	if (value == 0)
 	  xrptr[0] = 0;
 	else {
-	  if (reqhits & (1 << value))
+	  if (reqcache[value])
 	    requantized = reqcache[value];
-	  else {
-	    reqhits |= (1 << value);
+	  else
 	    requantized = reqcache[value] = III_requantize(value, exp);
-	  }
 
 	  xrptr[0] = MASK1BIT(bitcache, cachesz--) ?
 	    -requantized : requantized;
@@ -1136,12 +1129,10 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 	if (value == 0)
 	  xrptr[1] = 0;
 	else {
-	  if (reqhits & (1 << value))
+	  if (reqcache[value])
 	    requantized = reqcache[value];
-	  else {
-	    reqhits |= (1 << value);
+	  else
 	    requantized = reqcache[value] = III_requantize(value, exp);
-	  }
 
 	  xrptr[1] = MASK1BIT(bitcache, cachesz--) ?
 	    -requantized : requantized;
@@ -1257,12 +1248,7 @@ enum mad_error III_huffdecode(struct mad_bitptr *ptr, mad_fixed_t xr[576],
 # endif
 
   /* rzero */
-  while (xrptr < &xr[576]) {
-    xrptr[0] = 0;
-    xrptr[1] = 0;
-
-    xrptr += 2;
-  }
+  memset(xrptr, 0, (char*)&xr[576] - (char*)xrptr);
 
   return MAD_ERROR_NONE;
 }
