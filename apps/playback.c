@@ -135,12 +135,14 @@ static const char audio_thread_name[] = "audio";
 
 /* Codec thread. */
 static struct event_queue codec_queue;
-static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
+static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
+IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
 
 /* Voice codec thread. */
 static struct event_queue voice_codec_queue;
-static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
+static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
+IBSS_ATTR;
 static const char voice_codec_thread_name[] = "voice codec";
 
 static struct mutex mutex_codecthread;
@@ -233,13 +235,6 @@ static void initialize_buffer_fill(bool start_play, bool short_fill);
 static void audio_fill_file_buffer(
         bool start_play, bool short_fill, size_t offset);
 
-#ifdef TIME_CODEC
-bool is_filling(void)
-{
-    return filling;
-}
-#endif
-
 static void swap_codec(void)
 {
     int my_codec = current_codec;
@@ -303,9 +298,7 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
     src[1] = ch2;
 
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
-    {
         length *= 2;    /* Length is per channel */
-    }
 
     while (length > 0) {
         long est_output_size = dsp_output_size(length);
@@ -333,14 +326,14 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
         input_size = dsp_input_size(output_size);
 
         if (input_size <= 0) {
-            DEBUGF("Warning: dsp_input_size(%ld=dsp_output_size(%ld))=%ld <= 0\n",
-                   output_size, length, input_size);
-            /* this cannot happen */
+            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld<=0\n",
+                    output_size, length, input_size);
+            /* If this happens, then some samples have been lost */
             break;
         }
 
         if ((size_t)input_size > length) {
-            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld > %ld\n",
+            DEBUGF("Error: dsp_input_size(%ld=dsp_output_size(%ld))=%ld>%ld\n",
                    output_size, length, input_size, length);
             input_size = length;
         }
@@ -367,9 +360,8 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
                     if ((pcmbuf_usage() < 10)
                         || pcmbuf_mix_usage() > 70)
                         swap_codec();
-                } else {
+                } else
                     pcmbuf_write_complete(output_size);
-                }
                 break ;
         }
 
@@ -382,8 +374,7 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
 bool codec_pcmbuf_insert_callback(const char *buf, size_t length)
 {
     /* TODO: The audiobuffer API should probably be updated, and be based on
-     *       pcmbuf_insert_split().
-     */
+     *       pcmbuf_insert_split().  */
     long real_length = length;
 
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
@@ -430,12 +421,11 @@ void codec_set_elapsed_callback(unsigned int value)
 #endif
     latency = pcmbuf_get_latency();
 
-    if (value < latency) {
+    if (value < latency)
         cur_ti->id3.elapsed = 0;
-    } else if (value - latency > cur_ti->id3.elapsed
-            || value - latency < cur_ti->id3.elapsed - 2) {
+    else if (value - latency > cur_ti->id3.elapsed ||
+            value - latency < cur_ti->id3.elapsed - 2)
         cur_ti->id3.elapsed = value - latency;
-    }
 }
 
 void codec_set_offset_callback(size_t value)
@@ -448,11 +438,10 @@ void codec_set_offset_callback(size_t value)
 
     latency = pcmbuf_get_latency() * cur_ti->id3.bitrate / 8;
 
-    if (value < latency) {
+    if (value < latency)
         cur_ti->id3.offset = 0;
-    } else {
+    else
         cur_ti->id3.offset = value - latency;
-    }
 }
 
 static bool filebuf_is_lowdata(void)
@@ -555,9 +544,7 @@ void* voice_request_data(size_t *realsize, size_t reqsize)
         yield();
         if (audio_codec_loaded && (pcmbuf_usage() < 30
             || !voice_is_playing || voicebuf == NULL))
-        {
             swap_codec();
-        }
         else if (!voice_is_playing)
         {
             voice_boost_cpu(false);
@@ -567,9 +554,7 @@ void* voice_request_data(size_t *realsize, size_t reqsize)
         }
 
         if (voice_remaining)
-        {
             voice_is_playing = true;
-        }
         else if (voice_getmore != NULL)
         {
             voice_getmore((unsigned char **)&voicebuf, (int *)&voice_remaining);
@@ -597,9 +582,8 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     size_t short_n, copy_n, buf_rem;
 
     /* Voice codec. */
-    if (current_codec == CODEC_IDX_VOICE) {
+    if (current_codec == CODEC_IDX_VOICE)
         return voice_request_data(realsize, reqsize);
-    }
 
     if (!playing) {
         *realsize = 0;
@@ -717,9 +701,7 @@ static void audio_check_new_track(long direction)
     audio_update_trackinfo();
 
     if (tracks[track_ridx].filesize == 0)
-    {
         audio_rebuffer();
-    }
     else
     {
         if (direction > 0)
@@ -762,6 +744,7 @@ static void audio_check_new_track(long direction)
             else
                 buffer_wind_backward(req_size);
         }
+        else { logf("Impossible lack of direction"); }
     }
     mutex_unlock(&mutex_interthread);
 }
@@ -818,7 +801,6 @@ static void rebuffer_and_seek(size_t newpos)
 void codec_advance_buffer_callback(size_t amount)
 {
     if (current_codec == CODEC_IDX_VOICE) {
-        //logf("voice ad.buf:%d", amount);
         amount = MIN(amount, voice_remaining);
         voicebuf += amount;
         voice_remaining -= amount;
@@ -961,9 +943,7 @@ static void codec_configure_callback(int setting, void *value)
         break ;
 
     default:
-        if (!dsp_configure(setting, value)) {
-            logf("Illegal key: %d", setting);
-        }
+        if (!dsp_configure(setting, value)) { logf("Illegal key:%d", setting); }
     }
 }
 
@@ -1024,29 +1004,29 @@ void strip_id3v1_tag(void)
 
     if (filebufused >= 128)
     {
-        if (buf_widx < 128)
-            tagptr = filebuflen + buf_widx - 128;
-        else
-            tagptr = buf_widx - 128;
+        tagptr = buf_widx;
+        if (tagptr < 128)
+            tagptr += filebuflen;
+        tagptr -= 128;
 
         for(i = 0;i < 3;i++)
         {
-            if(tagptr >= filebuflen)
-                tagptr -= filebuflen;
-
             if(filebuf[tagptr] != tag[i])
             {
                 found = false;
                 break;
             }
 
-            tagptr++;
+            if(++tagptr >= filebuflen)
+                tagptr -= filebuflen;
         }
 
         if(found)
         {
             /* Skip id3v1 tag */
             logf("Skipping ID3v1 tag\n");
+            if (buf_widx < 128)
+                buf_widx += filebuflen;
             buf_widx -= 128;
             tracks[track_widx].available -= 128;
             filebufused -= 128;
@@ -1061,6 +1041,7 @@ static void audio_read_file(void)
 
     /* If we're called and no file is open, this is an error */
     if (current_fd < 0) {
+        logf("audio_read_file fd < 0");
         /* Stop this buffer cycle immediately */
         fill_bytesleft = 0;
         /* Give some hope of miraculous recovery by forcing a track reload */
@@ -1108,17 +1089,15 @@ static void audio_read_file(void)
         strip_id3v1_tag();
         close(current_fd);
         current_fd = -1;
-        if (++track_widx >= MAX_TRACK) {
+        if (++track_widx >= MAX_TRACK)
             track_widx = 0;
-        }
+
         tracks[track_widx].filesize = 0;
         /* If we're short filling, and have at least twice the watermark
          * of data, stop filling after this track */
         if (filling_short && filebufused > conf_watermark * 2)
             fill_bytesleft = 0;
-    } else {
-        logf("Partially buf:%d", tracks[track_widx].available);
-    }
+    } else { logf("Partially buf:%d", tracks[track_widx].available); }
 }
 
 static void codec_discard_codec_callback(void)
@@ -1448,9 +1427,8 @@ static bool audio_load_track(int offset, bool start_play)
 
     }
     
-    if (start_play) {
+    if (start_play)
         codec_track_changed();
-    }
 
     audio_read_file();
 
@@ -1588,11 +1566,9 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
         filling_short = true;
         fill_bytesleft = filebuflen >> 2;
     }
+    /* Recalculate remaining bytes to buffer */
     else if (!filling_short)
-    {
-        /* Recalculate remaining bytes to buffer */
         fill_bytesleft = filebuflen - filebufused;
-    }
 
     /* Don't initialize if we're already initialized */
     if (filling)
@@ -1607,7 +1583,6 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
     playlist_update_resume_info(audio_current_track());
 
     filling = true;
-
 }
 
 static void audio_fill_file_buffer(
@@ -1660,9 +1635,7 @@ static void track_skip_done(void)
     }
     /* Gapless playback. */
     else
-    {
         pcmbuf_set_event_handler(pcmbuf_track_changed_callback);
-    }
 }
 
 static bool skip_next_track(void)
@@ -1735,9 +1708,7 @@ bool codec_request_next_track_callback(void)
             return false;
     }
     else
-    {
         skip_previous_track();
-    }
     
     /* Check if the next codec is the same file. */
     if (get_codec_base_type(prev_ti->id3.codectype) ==
@@ -2203,9 +2174,7 @@ void audio_play(long offset)
         pcmbuf_crossfade_init(true);
     }
     else
-    {
         stop_codec_flush();
-    }
 
     queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
 }
@@ -2315,12 +2284,8 @@ static void mp3_set_elapsed(struct mp3entry* id3)
 
             /* find wich percent we're at */
             for (i=0; i<100; i++ )
-            {
                 if ( id3->offset < id3->toc[i] * (id3->filesize / 256) )
-                {
                     break;
-                }
-            }
 
             i--;
             if (i < 0)
@@ -2329,13 +2294,9 @@ static void mp3_set_elapsed(struct mp3entry* id3)
             relpos = id3->toc[i];
 
             if (i < 99)
-            {
                 nextpos = id3->toc[i+1];
-            }
             else
-            {
                 nextpos = 256;
-            }
 
             remainder = id3->offset - (relpos * (id3->filesize / 256));
 
@@ -2406,21 +2367,16 @@ int mp3_get_file_pos(void)
     else if (id3->bitrate)
         pos = id3->elapsed * (id3->bitrate / 8);
     else
-    {
         return -1;
-    }
 
+    /* Don't seek right to the end of the file so that we can
+       transition properly to the next song */
     if (pos >= (int)(id3->filesize - id3->id3v1len))
-    {
-        /* Don't seek right to the end of the file so that we can
-           transition properly to the next song */
         pos = id3->filesize - id3->id3v1len - 1;
-    }
+    /* skip past id3v2 tag and other leading garbage */
     else if (pos < (int)id3->first_frame_offset)
-    {
-        /* skip past id3v2 tag and other leading garbage */
         pos = id3->first_frame_offset;
-    }
+
     return pos;
 }
 
@@ -2458,10 +2414,8 @@ void audio_set_crossfade(int enable)
         offset = cur_ti->id3.offset;
 
     if (enable)
-    {
         seconds = global_settings.crossfade_fade_out_delay
                 + global_settings.crossfade_fade_out_duration;
-    }
 
     /* Buffer has to be at least 2s long. */
     seconds += 2;
