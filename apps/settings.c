@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 39
+#define CONFIG_BLOCK_VERSION 40 
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -488,6 +488,10 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(crossfade_fade_out_duration), 0, "crossfade fade out duration", NULL},
     {1, S_O(crossfade_fade_out_mixmode), 0, "crossfade fade out mode", "crossfade,mix"},
     {1, S_O(crossfeed), false, "crossfeed", off_on },
+    {6, S_O(crossfeed_direct_gain), 15, "crossfeed direct gain", NULL },
+    {7, S_O(crossfeed_cross_gain), 60, "crossfeed cross gain", NULL },
+    {8, S_O(crossfeed_hf_attenuation), 160, "crossfeed hf attenuation", NULL },
+    {11, S_O(crossfeed_hf_cutoff), 700, "crossfeed hf cutoff", NULL },
 #endif
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },
@@ -538,6 +542,7 @@ static const struct bit_entry hd_bits[] =
         "warn when erasing dynamic playlist", off_on },
 #if CONFIG_CODEC == SWCODEC
     {1, S_O(eq_enabled), false, "eq enabled", off_on },
+    {8, S_O(eq_precut), 0, "eq precut", NULL },
     /* 0..32768 Hz */
     {15, S_O(eq_band0_cutoff), 60, "eq band 0 cutoff", NULL },
     {15, S_O(eq_band1_cutoff), 200, "eq band 1 cutoff", NULL },
@@ -577,10 +582,6 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_DIRCACHE
     {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
-#endif
-
-#if (CONFIG_CODEC == SWCODEC)
-    {8, S_O(eq_precut), 0, "eq precut", NULL },
 #endif
 
     /* If values are just added to the end, no need to bump the version. */
@@ -1159,6 +1160,11 @@ void settings_apply(void)
     audio_set_crossfade(global_settings.crossfade);
     dsp_set_replaygain(true);
     dsp_set_crossfeed(global_settings.crossfeed);
+    dsp_set_crossfeed_direct_gain(global_settings.crossfeed_direct_gain);
+    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+                                   global_settings.crossfeed_cross_gain
+                                   + global_settings.crossfeed_hf_attenuation,
+                                   global_settings.crossfeed_hf_cutoff);
 
     dsp_set_eq(global_settings.eq_enabled);
     dsp_set_eq_precut(global_settings.eq_precut);

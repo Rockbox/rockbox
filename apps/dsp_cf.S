@@ -17,15 +17,6 @@
  *
  ****************************************************************************/
 
-    .section .idata,"aw",@progbits
-crossfeed_coefs:    
-    .long 0x4CCCCCCD    | LOW
-    .long 0x33333333    | LOW_COMP
-    .long -0x66666666   | HIGH_NEG
-    .long 0x66666666    | HIGH_COMP
-    .long 0x0CCCCCCD    | ATT
-    .long 0x73333333    | ATT_COMP
-
     .section .text
     .global apply_crossfeed 
 apply_crossfeed:
@@ -36,68 +27,57 @@ apply_crossfeed:
     move.l (44+8, %sp), %d7             | d7 = count
 
     lea.l crossfeed_data, %a1
-    lea.l crossfeed_coefs, %a6
-    lea.l (16, %a1), %a0                | a0 = &delay[0][0]
-    movem.l (%a1), %d0-%d3              | fetch filter history samples
-    move.l (120, %a1), %d4              | fetch delay line index
-    move.l (%a4), %d5                   | d5 = left sample
-    move.l (%a5), %d6                   | d6 = right sample
-    move.l (%a6)+, %a1                  | a1 = LOW value
-    move.l (%a6)+, %a2                  | a2 = LOW_COMP value
+    lea.l (8*4, %a1), %a0               | a0 = &delay[0][0]
+    move.l (%a1)+, %a6                  | a6 = direct gain
+    movem.l (3*4, %a1), %d0-%d3         | fetch filter history samples
+    move.l (33*4, %a1), %d4             | fetch delay line index
+    movem.l (%a1), %a1-%a3              | load filter coefs
+    move.l %d4, %d5
+    lsl.l #3, %d5
+    add.l %d5, %a0                      | point a0 to current delay position
+|    lea.l (%d4*4, %a0), %a0
+|    lea.l (%d4*4, %a0), %a0             | point a0 to current delay position
     /* Register usage in loop:
-     * a0 = &delay[0][0], a1 & a2 = coefs, a3 = temp storage,
-     * a4 = src[0], a5 = src[1], a6 = &crossfeed_coefs[0],
-     * d0 = low_left, d1 = low_right,
-     * d2 = high_left, d3 = high_right,
+     * a0 = &delay[index][0], a1..a3 = b0, b1, a1 (filter coefs),
+     * a4 = src[0], a5 = src[1], a6 = direct gain,
+     * d0..d3 = history
      * d4 = delay line index,
-     * d5 = src[0][i], d6 = src[1][i].
+     * d5,d6 = temp.
      * d7 = count
      */
 .cfloop:
-    | LOW*low_left + LOW_COMP*left
-    mac.l %a1, %d0, %acc0 
-    mac.l %a2, %d5, %acc0
-    | LOW*low_right + LOW_COMP*right
-    mac.l %a1, %d1, (%a6)+, %a1, %acc1  | a1 = HIGH_NEG
-    mac.l %a2, %d6, (%a6)+, %a2, %acc1  | a2 = HIGH_COMP
-    movclr.l %acc0, %d0                 | get low_left
-    movclr.l %acc1, %d1                 | get low_right
-    | HIGH_NEG*high_left + HIGH_COMP*left
-    mac.l %a1, %d2, %acc0
-    mac.l %a2, %d5, %acc0
-    | HIGH_NEG*high_right + HIGH_COMP*right
-    mac.l %a1, %d3, (%a6)+, %a1, %acc1  | a1 = ATT
-    mac.l %a2, %d6, (%a6)+, %a2, %acc1  | a2 = ATT_COMP
-    lea.l (-6*4, %a6), %a6              | coef = &coefs[0]
-    move.l (%a0, %d4*4), %a3            | a3 = delay[0][idx]
-    move.l (52, %a0, %d4*4), %d5        | d5 = delay[1][idx]
-    movclr.l %acc0, %d2                 | get high_left
-    movclr.l %acc1, %d3                 | get high_right
-    | ATT*delay_r + ATT_COMP*high_left
-    mac.l %a1, %d5, (4, %a4), %d5, %acc0 | d5 = src[0][i+1]
-    mac.l %a2, %d2, (4, %a5), %d6, %acc0 | d6 = src[1][i+1]
-    | ATT*delay_l + ATT_COMP*high_right
-    mac.l %a1, %a3, (%a6)+, %a1, %acc1   | a1 = LOW
-    mac.l %a2, %d3, (%a6)+, %a2, %acc1   | a2 = LOW_COMP
-        
-    | save crossfed samples to output
-    movclr.l %acc0, %a3
-    move.l %a3, (%a4)+                  | src[0][i++] = out_l
-    movclr.l %acc1, %a3
-    move.l %a3, (%a5)+                  | src[1][i++] = out_r
-    move.l %d0, (%a0, %d4*4)            | delay[0][index] = low_left
-    move.l %d1, (52, %a0, %d4*4)        | delay[1][index] = low_right */
-    addq.l #1, %d4                      | index++ */
-    cmp.l #13, %d4                      | if (index >= 13) {
+    mac.l %a2, %d0, (4, %a0), %d0, %acc0 | acc = b1*dr[n - 1] d0 = dr[n]
+    mac.l %a1, %d0, %acc0               | acc += b0*dr[n]
+    mac.l %a3, %d1, (%a4), %d5, %acc0   | acc += a1*y_l[n - 1], load left input
+    move.l %acc0, %d1                   | get filtered delayed sample
+    mac.l %a6, %d5, %acc0               | acc += gain*x_l[n]
+    movclr.l %acc0, %d6
+    move.l %d6, (%a4)+                  | write result
+
+    mac.l %a2, %d2, (%a0), %d2, %acc0   | acc = b1*dl[n - 1], d2 = dl[n]
+    move.l %d5, (%a0)+                  | save left input to delay line
+    mac.l %a1, %d2, %acc0               | acc += b0*dl[n]
+    mac.l %a3, %d3, (%a5), %d5, %acc0   | acc += a1*y_r[n - 1], load right input
+    move.l %acc0, %d3                   | get filtered delayed sample
+    mac.l %a6, %d5, %acc0               | acc += gain*x_r[n]
+    move.l %d5, (%a0)+                  | save right input to delay line
+    movclr.l %acc0, %d6
+    move.l %d6, (%a5)+                  | write result
+
+    addq.l #1, %d4                      | index++
+    moveq.l #13, %d6
+    cmp.l %d6, %d4                      | wrap index to 0 if it overflows
     jlt .nowrap
-    clr.l %d4                           |     index = 0
-.nowrap:                                | }
+    moveq.l #13*8, %d4
+    sub.l %d4, %a0                      | wrap back delay line ptr as well
+    clr.l %d4
+.nowrap:
     subq.l #1, %d7
     jne .cfloop
     | save data back to struct
-    lea.l crossfeed_data, %a1
+    lea.l crossfeed_data + 4*4, %a1
     movem.l %d0-%d3, (%a1)
-    move.l %d4, (120, %a1)
+    move.l %d4, (30*4, %a1)
     movem.l (%sp), %d2-%d7/%a2-%a6
     lea.l (44, %sp), %sp
     rts

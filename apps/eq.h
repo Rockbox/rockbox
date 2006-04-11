@@ -33,6 +33,7 @@ struct eqfilter {
     int32_t history[2][4];
 };
 
+void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c);
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c);

@@ -47,15 +47,6 @@
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
 #define DEFAULT_REPLAYGAIN  0x01000000
 
-/* These are the constants for the filters in the crossfeed */
-
-#define ATT 0x0CCCCCCDL /* 0.1 */
-#define ATT_COMP 0x73333333L /* 0.9 */
-#define LOW  0x4CCCCCCDL /* 0.6 */
-#define LOW_COMP 0x33333333L /* 0.4 */
-#define HIGH_NEG -0x66666666L /* -0.2 (not unsigned!) */
-#define HIGH_COMP 0x66666666L /* 0.8 */
-
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
 /* Multiply two S.31 fractional integers and return the sign bit and the
@@ -209,10 +200,11 @@ struct dither_data
 
 struct crossfeed_data
 {
-    int32_t lowpass[2];
-    int32_t highpass[2];
-    int32_t delay[2][13];
-    int index;
+    int32_t gain;       /* Direct path gain */
+    int32_t coefs[3];   /* Coefficients for the shelving filter */
+    int32_t history[4]; /* Format is x[n - 1], y[n - 1] for both channels */
+    int32_t delay[13][2];
+    int index;          /* Current index into the delay line */
 };
 
 /* Current setup is one lowshelf filters, three peaking filters and one
@@ -522,71 +514,71 @@ static long dither_sample(int32_t sample, int32_t bias, int32_t mask,
     return output;
 }
 
+void dsp_set_crossfeed(bool enable)
+{
+    dsp->crossfeed_enabled = enable;
+}
+
+void dsp_set_crossfeed_direct_gain(int gain)
+{
+    /* Work around bug in get_replaygain_int which returns 0 for 0 dB */
+    if (gain == 0)
+        crossfeed_data.gain = 0x7fffffff;
+    else
+        crossfeed_data.gain = get_replaygain_int(gain * -10) << 7;
+}
+
+void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
+{
+    long g1 = get_replaygain_int(lf_gain * -10) << 3;
+    long g2 = get_replaygain_int(hf_gain * -10) << 3;
+
+    filter_bishelf_coefs(0xffffffff/NATIVE_FREQUENCY*cutoff, g1, g2,
+                         crossfeed_data.coefs);
+}
+
 /* Applies crossfeed to the stereo signal in src.
  * Crossfeed is a process where listening over speakers is simulated. This
  * is good for old hard panned stereo records, which might be quite fatiguing
  * to listen to on headphones with no crossfeed.
  */
 #ifndef DSP_HAVE_ASM_CROSSFEED
-static void apply_crossfeed(int32_t* src[], int count)
+void apply_crossfeed(int32_t* src[], int count)
 {
-    int32_t a; /* accumulator */
-
-    int32_t low_left = crossfeed_data.lowpass[0];
-    int32_t low_right = crossfeed_data.lowpass[1];
-    int32_t high_left = crossfeed_data.highpass[0];
-    int32_t high_right = crossfeed_data.highpass[1];
-    unsigned int index = crossfeed_data.index;
-
+    int32_t *hist_l = &crossfeed_data.history[0];
+    int32_t *hist_r = &crossfeed_data.history[2];
+    int32_t *delay = &crossfeed_data.delay[0][0];
+    int32_t *coefs = &crossfeed_data.coefs[0];
+    int32_t gain = crossfeed_data.gain;
+    int di = crossfeed_data.index;
+    
+    int32_t acc;
     int32_t left, right;
-
-    int32_t* delay_l = crossfeed_data.delay[0];
-    int32_t* delay_r = crossfeed_data.delay[1];
-
     int i;
-
-    for (i = 0; i < count; i++)
-    {
-        /* use a low-pass filter on the signal */
+    
+    for (i = 0; i < count; i++) {
         left = src[0][i];
         right = src[1][i];
-
-        ACC_INIT(a, LOW, low_left); ACC(a, LOW_COMP, left);
-        low_left = GET_ACC(a);
-
-        ACC_INIT(a, LOW, low_right); ACC(a, LOW_COMP, right);
-        low_right = GET_ACC(a);
-
-        /* use a high-pass filter on the signal */
-
-        ACC_INIT(a, HIGH_NEG, high_left); ACC(a, HIGH_COMP, left);
-        high_left = GET_ACC(a);
-
-        ACC_INIT(a, HIGH_NEG, high_right); ACC(a, HIGH_COMP, right);
-        high_right = GET_ACC(a);
-
-        /* New data is the high-passed signal + delayed and attenuated 
-         * low-passed signal from the other channel */
-
-        ACC_INIT(a, ATT, delay_r[index]); ACC(a, ATT_COMP, high_left);
-        src[0][i] = GET_ACC(a);
-
-        ACC_INIT(a, ATT, delay_l[index]); ACC(a, ATT_COMP, high_right);
-        src[1][i] = GET_ACC(a);
-
-        /* Store the low-passed signal in the ringbuffer */
-
-        delay_l[index] = low_left;
-        delay_r[index] = low_right;
-
-        index = (index + 1) % 13;
+        
+        ACC_INIT(acc, delay[di*2], coefs[0]);
+        ACC(acc, hist_l[0], coefs[1]);
+        ACC(acc, hist_l[1], coefs[2]);
+        hist_l[1] = GET_ACC(acc) << 0;
+        hist_l[0] = delay[di*2];
+        ACC_INIT(acc, delay[di*2 + 1], coefs[0]);
+        ACC(acc, hist_r[0], coefs[1]);
+        ACC(acc, hist_r[1], coefs[2]);
+        hist_r[1] = GET_ACC(acc) << 0;
+        hist_r[0] = delay[di*2 + 1];
+        delay[di*2] = left;
+        delay[di*2 + 1] = right;
+        src[0][i] = FRACMUL(left, gain) + hist_r[1];
+        src[1][i] = FRACMUL(right, gain) + hist_l[1];
+        
+        if (++di > 12)
+            di = 0;
     }
-
-    crossfeed_data.index = index;
-    crossfeed_data.lowpass[0] = low_left;
-    crossfeed_data.lowpass[1] = low_right;
-    crossfeed_data.highpass[0] = high_left;
-    crossfeed_data.highpass[1] = high_right;
+    crossfeed_data.index = di;
 }
 #endif
 
@@ -633,13 +625,8 @@ void dsp_set_eq_coefs(int band)
     if (q == 0)
         q = 1;
     
-    /* The coef functions assume the EMAC unit is in fractional mode */
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-    /* set emac unit for dsp processing, and save old macsr, we're running in
-       codec thread context at this point, so can't clobber it */
-    unsigned long old_macsr = coldfire_get_macsr();
-    coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
-    #endif
+    /* NOTE: The coef functions assume the EMAC unit is in fractional mode,
+       which it should be, since we're executed from the main thread. */
 
     /* Assume a band is disabled if the gain is zero */
     if (gain == 0) {
@@ -654,11 +641,6 @@ void dsp_set_eq_coefs(int band)
 
         eq_data.enabled[band] = 1;
     }
-
-    #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-    /* set old macsr again */
-    coldfire_set_macsr(old_macsr);
-    #endif
 }
 
 /* Apply EQ filters to those bands that have got it switched on. */
@@ -1066,13 +1048,6 @@ bool dsp_configure(int setting, void *value)
     }
 
     return 1;
-}
-
-void dsp_set_crossfeed(bool enable)
-{
-    if (enable)
-        memset(&crossfeed_data, 0, sizeof(crossfeed_data));
-    dsp->crossfeed_enabled = enable;
 }
 
 void dsp_set_replaygain(bool always)

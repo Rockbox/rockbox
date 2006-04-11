@@ -417,7 +417,13 @@ struct user_settings
                                shuffle is on, album gain otherwise */
     int  replaygain_preamp; /* scale replaygained tracks by this */
     int  beep;              /* system beep volume when changing tracks etc. */
-    bool crossfeed;         /* enable crossfeed */
+    
+    /* Crossfeed settings */
+    bool crossfeed;                             /* enable crossfeed */
+    unsigned int crossfeed_direct_gain;         /* - dB x 10 */
+    unsigned int crossfeed_cross_gain;          /* - dB x 10 */
+    unsigned int crossfeed_hf_attenuation;      /* - dB x 10 */
+    unsigned int crossfeed_hf_cutoff;           /* Frequency in Hz */
 #endif
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */

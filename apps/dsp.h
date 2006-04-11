@@ -54,6 +54,8 @@ int dsp_stereo_mode(void);
 bool dsp_configure(int setting, void *value);
 void dsp_set_replaygain(bool always);
 void dsp_set_crossfeed(bool enable);
+void dsp_set_crossfeed_direct_gain(int gain);
+void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff);
 void dsp_set_eq(bool enable);
 void dsp_set_eq_precut(int precut);
 void dsp_set_eq_coefs(int band);

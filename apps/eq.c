@@ -187,6 +187,34 @@ static long dbtoA(long db)
     return (dbtoatab[pos] << 16) + frac*diff;
 }
 
+/* Calculate first order shelving filter coefficients.
+   cutoff is a value from 0 to 0x80000000, where 0 represents 0 hz and
+   0x80000000 represents nyquist (samplerate/2).
+   ad is gain at 0 hz, and an is gain at Nyquist frequency. Both are s3.27
+   format. 
+   c is a pointer where the coefs will be stored. The coefs are s0.31 format.
+   Note that the filter is not compatible with the eq_filter routine.
+ */
+void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
+{
+    const long one = 1 << 27;
+    long a0, a1;
+    long b0, b1;
+    long s, cs;
+    s = fsincos(cutoff, &cs) >> 4;
+    cs = one + (cs >> 4);
+
+    /* For max A = 4 (24 dB) */
+    b0 = (FRACMUL(an, cs) << 4) + (FRACMUL(ad, s) << 4);
+    b1 = (FRACMUL(ad, s) << 4) - (FRACMUL(an, cs) << 4);
+    a0 = s + cs;
+    a1 = s - cs;
+
+    c[0] = DIV64(b0, a0, 31);
+    c[1] = DIV64(b1, a0, 31);
+    c[2] = -DIV64(a1, a0, 31);
+}
+
 /* Calculate second order section peaking filter coefficients.
    cutoff is a value from 0 to 0x80000000, where 0 represents 0 hz and
    0x80000000 represents nyquist (samplerate/2).

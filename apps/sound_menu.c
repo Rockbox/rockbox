@@ -125,7 +125,14 @@ static bool treble(void)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-static bool crossfeed(void)
+static void crossfeed_format(char* buffer, int buffer_size, int value,
+    const char* unit)
+{
+    snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
+        value / 10, value % 10, unit);
+}
+
+static bool crossfeed_enabled(void)
 {
     bool result = set_bool_options(str(LANG_CROSSFEED),
                                    &global_settings.crossfeed,
@@ -134,6 +141,75 @@ static bool crossfeed(void)
                                    NULL);
 
     dsp_set_crossfeed(global_settings.crossfeed);
+
+    return result;
+}
+
+static bool crossfeed_direct_gain(void)
+{
+    return set_int(str(LANG_CROSSFEED_DIRECT_GAIN), str(LANG_UNIT_DB),
+        UNIT_DB, &global_settings.crossfeed_direct_gain,
+        &dsp_set_crossfeed_direct_gain, 5, 0, 60, crossfeed_format);
+}
+
+static void crossfeed_cross_gain_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(val,
+        val + global_settings.crossfeed_hf_attenuation,
+        global_settings.crossfeed_hf_cutoff);
+}
+
+static bool crossfeed_cross_gain(void)
+{
+    return set_int(str(LANG_CROSSFEED_CROSS_GAIN), str(LANG_UNIT_DB),
+        UNIT_DB, &global_settings.crossfeed_cross_gain,
+        &crossfeed_cross_gain_helper, 5, 30, 120, crossfeed_format);
+}
+
+static void crossfeed_hf_att_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+        global_settings.crossfeed_cross_gain + val,
+        global_settings.crossfeed_hf_cutoff);
+}
+
+static bool crossfeed_hf_attenuation(void)
+{
+    return set_int(str(LANG_CROSSFEED_HF_ATTENUATION), str(LANG_UNIT_DB),
+        UNIT_DB, &global_settings.crossfeed_hf_attenuation,
+        &crossfeed_hf_att_helper, 5, 60, 240, crossfeed_format);
+}
+
+static void crossfeed_hf_cutoff_helper(int val)
+{
+    dsp_set_crossfeed_cross_params(global_settings.crossfeed_cross_gain,
+        global_settings.crossfeed_cross_gain + global_settings.crossfeed_hf_attenuation, val);
+}
+
+static bool crossfeed_hf_cutoff(void)
+{
+    return set_int(str(LANG_CROSSFEED_HF_CUTOFF), str(LANG_UNIT_HERTZ),
+        UNIT_HERTZ, &global_settings.crossfeed_hf_cutoff, &crossfeed_hf_cutoff_helper, 100, 500, 2000, 
+        NULL);
+}
+
+static bool crossfeed_menu(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_CROSSFEED), crossfeed_enabled },
+        { ID2P(LANG_CROSSFEED_DIRECT_GAIN), crossfeed_direct_gain },
+        { ID2P(LANG_CROSSFEED_CROSS_GAIN), crossfeed_cross_gain },
+        { ID2P(LANG_CROSSFEED_HF_ATTENUATION), crossfeed_hf_attenuation },
+        { ID2P(LANG_CROSSFEED_HF_CUTOFF), crossfeed_hf_cutoff },
+    };
+
+    m=menu_init(items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
     return result;
 }
 #endif
@@ -414,7 +490,7 @@ bool sound_menu(void)
         { ID2P(LANG_CHANNEL_MENU), chanconf },
         { ID2P(LANG_STEREO_WIDTH), stereo_width },
 #if CONFIG_CODEC == SWCODEC
-        { ID2P(LANG_CROSSFEED), crossfeed },
+        { ID2P(LANG_CROSSFEED), crossfeed_menu },
         { ID2P(LANG_EQUALIZER), eq_menu },
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
