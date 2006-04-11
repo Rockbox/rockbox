@@ -1112,7 +1112,8 @@ static void audio_read_file(void)
             track_widx = 0;
         }
         tracks[track_widx].filesize = 0;
-        /* If this is an initial fill, stop after one track is complete */
+        /* If we're short filling, and have at least twice the watermark
+         * of data, stop filling after this track */
         if (filling_short && filebufused > conf_watermark * 2)
             fill_bytesleft = 0;
     } else {
