@@ -1327,7 +1327,6 @@ static bool audio_load_track(int offset, bool start_play)
         current_fd = -1;
     }
 
-    /* TODO: BLOW: Need help on what playlist_skip_entry() does */
     last_peek_offset++;
     peek_again:
     logf("Buffering track:%d/%d", track_widx, track_ridx);
