@@ -30,7 +30,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define IRAMSIZE 0xc000
 #elif defined(IAUDIO_X5)
 #define DRAMORIG 0x31000000
-#define IRAMORIG 0x1000c000
+#define IRAMORIG 0x10014000
 #define IRAMSIZE 0xc000
 #elif defined(ARCH_IPOD)
 #define DRAMORIG 0x00000000

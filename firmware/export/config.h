@@ -229,4 +229,9 @@
 #define IBSS_ATTR
 #endif
 
+#ifndef IRAM_LCDFRAMEBUFFER
+/* if the LCD framebuffer has not been moved to IRAM, define it empty here */
+#define IRAM_LCDFRAMEBUFFER
+#endif
+
 #endif

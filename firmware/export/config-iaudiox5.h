@@ -23,6 +23,8 @@
 #define LCD_DEPTH  16   /* pseudo 262.144 colors */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
+#define IRAM_LCDFRAMEBUFFER IDATA_ATTR /* put the lcd frame buffer in IRAM */
+
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
 #define LCD_REMOTE_HEIGHT 64
