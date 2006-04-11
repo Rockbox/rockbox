@@ -259,6 +259,59 @@ extern const fb_data brickmania_bricks[];
 #define STRINGPOS_navi 100
 #define STRINGPOS_flipsides 100
 
+/* iPod Mini */
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
+/* The time (in ms) for one iteration through the game loop - decrease this
+   to speed up the game - note that current_tick is (currently) only accurate
+   to 10ms.
+*/
+#define CYCLETIME 50
+
+#define PAD_WIDTH 30
+#define PAD_HEIGHT 5
+#define PAD_POS_Y LCD_HEIGHT - 5
+#define BRICK_HEIGHT 7
+#define BRICK_WIDTH 13
+#define BALL 5
+#define HALFBALL 3
+#define LEFTMARGIN 4
+#define TOPMARGIN 10
+
+#define BMPHEIGHT_start 16
+#define BMPWIDTH_start 88
+
+#define BMPHEIGHT_resume 14
+#define BMPWIDTH_resume 78
+
+#define BMPHEIGHT_help 15
+#define BMPWIDTH_help 30
+
+#define BMPHEIGHT_quit 17
+#define BMPWIDTH_quit 30
+
+#define BMPHEIGHT_powerup 6
+#define BMPWIDTH_powerup 10
+
+#define BMPHEIGHT_menu 45
+#define BMPWIDTH_menu 160
+
+#define BMPXOFS_start 28
+#define BMPYOFS_start 41
+#define BMPXOFS_resume 33
+#define BMPYOFS_resume 58
+#define BMPXOFS_help 56
+#define BMPYOFS_help 74
+#define BMPXOFS_quit 56
+#define BMPYOFS_quit 90
+#define HIGHSCORE_XPOS 76
+#define HIGHSCORE_YPOS 22
+
+#define STRINGPOS_finsh 54
+#define STRINGPOS_congrats 44
+#define STRINGPOS_navi 44
+#define STRINGPOS_flipsides 44
+
+
 #elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 /* The time (in ms) for one iteration through the game loop - decrease this
    to speed up the game - note that current_tick is (currently) only accurate

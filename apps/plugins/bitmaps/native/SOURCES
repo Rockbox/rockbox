@@ -148,9 +148,14 @@ brickmania_sel_start.220x176x16.bmp
 brickmania_start.220x176x16.bmp
 brickmania_break.220x176x16.bmp
 
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
+#elif (((LCD_WIDTH == 160) && (LCD_HEIGHT == 128)) || \
+       ((LCD_WIDTH == 138) && (LCD_HEIGHT == 110))) && (LCD_DEPTH == 2)
 brickmania_ball.160x128x2.bmp
+#if (LCD_WIDTH == 160)
 brickmania_bricks.160x128x2.bmp
+#else
+brickmania_bricks.138x110x2.bmp
+#endif
 brickmania_gameover.160x128x2.bmp
 brickmania_help.160x128x2.bmp
 brickmania_menu_bg.160x128x2.bmp
@@ -215,6 +220,8 @@ tetrox_background.176x132x16.bmp
 tetrox_background.160x128x16.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
 tetrox_background.160x128x2.bmp
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 2)
+tetrox_background.138x110x2.bmp
 #endif
 
 

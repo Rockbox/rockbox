@@ -39,8 +39,8 @@ bounce.c
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 128)
 bubbles.c
 #endif 
-#if (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
-/* These need adjusting for the Mini's and iRiver if'p screen */
+#if LCD_WIDTH != 128
+/* These need adjusting for the iRiver if'p screen */
 brickmania.c
 #endif
 calculator.c
@@ -59,7 +59,7 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (LCD_WIDTH != 240) && (LCD_WIDTH != 138) && (LCD_WIDTH != 128)
+#if (LCD_WIDTH != 240) && (LCD_WIDTH != 128)
 tetrox.c
 #endif
 #if CONFIG_LCD == LCD_SSD1815
