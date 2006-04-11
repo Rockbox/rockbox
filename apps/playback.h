@@ -38,14 +38,17 @@ struct track_info {
     struct mp3entry id3;       /* TAG metadata */
     char *codecbuf;            /* Pointer to codec buffer */
     size_t codecsize;          /* Codec length in bytes */
-    
+    bool has_codec;            /* Does this track have a codec on the buffer */
+
     size_t filerem;            /* Remaining bytes of file NOT in buffer */
     size_t filesize;           /* File total length */
     size_t start_pos;          /* Position to first bytes of file in buffer */
     volatile size_t available; /* Available bytes to read from buffer */
+
     bool taginfo_ready;        /* Is metadata read */
     int playlist_offset;       /* File location in playlist */
-    bool event_sent;           /* Has event callback functions been called? */
+
+    bool event_sent;           /* Was this track's buffered event sent */
 };
 
 /* Functions */

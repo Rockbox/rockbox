@@ -85,7 +85,7 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 6
+#define CODEC_API_VERSION 7
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -286,6 +286,8 @@ struct codec_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
+
+    void (*discard_codec)(void);
 
 };
 

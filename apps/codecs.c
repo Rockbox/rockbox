@@ -210,6 +210,8 @@ struct codec_api ci = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+    NULL, /* discard_codec */
+
 };
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
@@ -230,6 +232,7 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
         if (size - copy_n > 0) {
             memcpy(&codecbuf[copy_n], ptr2, size - copy_n);
         }
+        api->discard_codec();
     }
     hdr = (struct codec_header *)codecbuf;
         
