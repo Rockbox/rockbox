@@ -66,6 +66,9 @@ bool logfdisplay(void)
              0
 #endif
              :LCD_WIDTH)/w;
+
+    if (columns > MAX_LOGF_ENTRY)
+        columns = MAX_LOGF_ENTRY;
             
     if(!lines)
         return false;
