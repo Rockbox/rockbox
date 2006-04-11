@@ -2,19 +2,27 @@
 \screenshot{plugins/images/ss-rockblox}{Rockblox plugin}%
 {img:rockblox}
 
-This well{}-known game will probably be familiar. The aim of the game is
+This well-known game will probably be familiar. The aim of the game is
 to complete rows with the given pieces (blocks). Pieces can be rotated
 to make them fit into the rows.  Once you complete a row, it gets
 cleared, but if the blocks reach the top row then you lose.
 
-The controls for this game (with the Jukebox turned so that the buttons
-are to the right of the screen) are:
+As this game is played with the Jukebox turned so that the buttons
+are to the right of the screen, the controls may seem a little confusing:
 
 \begin{table}
-\begin{btnmap}{}{}
-UP & Rotate piece \\
-LEFT/RIGHT & Move piece to the left/right \\
-DOWN & Move faster the piece downwards \\
-OFF & Exit Rockblox\\
-\end{btnmap}
+  \begin{btnmap}{}{}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}%
+      {\ButtonUp\ and \ButtonDown} 
+    \opt{IPOD_4G_Pad}%
+      {\ButtonScrollFwd\ and \ButtonScrollback} & Move block Left/Right \\
+    \ButtonRight & Rotate piece \\
+    \ButtonLeft & Move the piece downwards faster \\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}%
+      {\ButtonOff}
+    \opt{IAUDIO_X5_PAD}
+      {\fixme{TBD}}
+    \opt{IPOD_4G_Pad}%
+      {\Buttonmenu}  & Exit Rockblox\\
+  \end{btnmap}
 \end{table}

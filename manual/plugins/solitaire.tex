@@ -1,9 +1,56 @@
 \subsection{Solitaire}
 \screenshot{plugins/images/ss-solitaire}{Klondike solitaire}{fig:solitaire}
 
-This is the classic Klondike solitaire game
-for Rockbox.  Select \emph{help} from the game menu to get an
-explanation of what the keys do.  Rules for Klondike solitaire are
-available from \url{http://www.solitairecentral.com/rules/klondike.html}.
+This is the classic Klondike solitaire game for Rockbox.
+This is probably the best-known solitaire in the world. Many people 
+don't even realize that other games exist. Though the name may not 
+be familiar, the game itself certainly is. This is due in no small 
+part to Microsoft's inclusion of the the game in every version of 
+Windows. Though popular, the odds of winning are rather low, perhaps 
+one in thirty hands.
+
+For the full set of rules to the game, and other facinating information
+visit\\
+\url{http://www.solitairecentral.com/rules/klondike.html}
+
+\begin{table}
+  \begin{btnmap}{}{}
+    \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}
+      {\ButtonLeft, \ButtonRight, \ButtonUp\ and \ButtonDown}
+    \opt{IPOD_4G_PAD}{\fixme{tbd}}
+    & Move Cursor around.\\
+    %
+    \opt{RECORDER_PAD}{\ButtonOn}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+    \opt{AUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{TBD}}
+    \opt{ONDIO_PAD}{\ButtonMenu} %
+      & Select cards, move cards, reveal hidden cards...\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{AUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{TBD}}
+    \opt{ONDIO_PAD}{Hold \ButtonMenu} %
+      & If a card was selected -- unselect it, else\\
+      & Draw 3 new cards from the remains stack\\
+    %
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn + \ButtonLeft}
+    \opt{AUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{TBD}}
+    \opt{ONDIO_PAD}{Hold \ButtonLeft} %
+      & Put the card from the top of the remains stack on top of the cursor\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonSelect}
+    \opt{AUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{TBD}}
+    \opt{ONDIO_PAD}{Hold \ButtonRight} %
+      & Put the card under the cursor on one of the 4 final colour stacks.\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn + \ButtonRight}
+    \opt{AUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{TBD}}
+    \opt{ONDIO_PAD}{Hold \ButtonUp} %
+      & Put the card on top of the remains stack on one of the final colour stacks.\\
+  \end{btnmap}
+ \end{table}
 
 

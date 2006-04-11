@@ -2,15 +2,34 @@
 \screenshot{plugins/images/ss-sliding}{Sliding puzzle}{img:slidingpuzzle}
 
 The classic sliding puzzle game.  Rearrange the pieces so that you can
-see the whole picture.
+see the whole picture, or switch to number tiles if you like it a little easier
 
 Key controls:
 
 \begin{table}
-\begin{btnmap}{}{}
-UP/DOWN/LEFT/RIGHT & Moves \\
-F1 & Shuffle \\
-F2 & Change the picture \\
-OFF & Stop the game \\
-\end{btnmap}
+  \begin{btnmap}{}{}
+  \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}
+    {\ButtonLeft, \ButtonRight, \ButtonUp\ and \ButtonDown}
+  \opt{IPOD_4G_PAD}{\fixme{tbd}}
+  & Move Tile \\
+  %
+  \opt{RECORDER_PAD}{\ButtonFOne}
+  \opt{ONDIO_PAD}{Hold \ButtonMenu}
+  \opt{h1xx,h300}{\ButtonSelect} 
+  \opt{x5}{\fixme{TBD}}
+  \opt{IPOD_4G_PAD}{\fixme{TBD}} 
+  & Shuffle \\
+  %
+  \opt{RECORDER_PAD}{\ButtonFTwo}
+  \opt{ONDIO_PAD}{\ButtonMenu}
+  \opt{h1xx,h300}{\ButtonOn} 
+  \opt{x5}{\fixme{TBD}}
+  \opt{IPOD_4G_PAD}{\fixme{TBD}} 
+  & Change between picture and numbered tiles \\
+  %
+  \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+  \opt{x5}{\fixme{TBD}}
+  \opt{IPOD_4G_PAD}{\fixme{TBD}} 
+  & Stop the game \\
+  \end{btnmap}
 \end{table}
