@@ -1590,17 +1590,11 @@ static void initialize_buffer_fill(bool start_play)
         /* Recalculate remaining bytes to buffer, but always leave extra
          * data for the currently playing codec to seek back into */
         size_t buf_bytesleft = filebuflen - filebufused;
+        size_t subtract =
+            MIN(MIN(AUDIO_REBUFFER_GUESS_SIZE, ci.curpos), buf_bytesleft);
 
-        if (buf_bytesleft > AUDIO_REBUFFER_GUESS_SIZE)
-            fill_bytesleft = buf_bytesleft - AUDIO_REBUFFER_GUESS_SIZE;
-        else
-            fill_bytesleft = 0;
-
-        if (ci.curpos > AUDIO_REBUFFER_GUESS_SIZE)
-            tracks[track_ridx].start_pos =
-                ci.curpos - AUDIO_REBUFFER_GUESS_SIZE;
-        else
-            tracks[track_ridx].start_pos = 0;
+        fill_bytesleft = buf_bytesleft - subtract;
+        tracks[track_ridx].start_pos = ci.curpos - subtract;
     }
 
     logf("Starting buffer fill");
