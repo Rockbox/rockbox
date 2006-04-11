@@ -78,12 +78,12 @@ PLUGIN_HEADER
 #define JEWELS_CANCEL BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define JEWELS_UP         BUTTON_UP
-#define JEWELS_DOWN       BUTTON_DOWN
-#define JEWELS_LEFT       BUTTON_LEFT
-#define JEWELS_RIGHT      BUTTON_RIGHT
-#define JEWELS_SELECT     BUTTON_SELECT
-#define JEWELS_CANCEL     BUTTON_A
+#define JEWELS_UP     BUTTON_UP
+#define JEWELS_DOWN   BUTTON_DOWN
+#define JEWELS_LEFT   BUTTON_LEFT
+#define JEWELS_RIGHT  BUTTON_RIGHT
+#define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_A
 
 #else
     #error JEWELS: Unsupported keypad
@@ -96,8 +96,9 @@ PLUGIN_HEADER
 #define YOFS 0
 #define NUM_SCORES 10
 
-/* use 22x22 tiles (H300, iPod Color) */
-#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
+/* use 22x22 tiles (H300, iPod Color, Gigabeat) */
+#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || \
+      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
 #define TILE_WIDTH  22
 #define TILE_HEIGHT 22
 #define YOFS 0
@@ -1285,6 +1286,7 @@ static int jewels_main(struct game_context* bj) {
                 case MRES_PLAYBACK:
                     playback_control(rb);
                     inmenu = false;
+                    selected = false;
                     break;
 
                 case MRES_SAVE:
@@ -1305,12 +1307,14 @@ static int jewels_main(struct game_context* bj) {
         switch(button){
             case JEWELS_LEFT:             /* move cursor left */
             case (JEWELS_LEFT|BUTTON_REPEAT):
-                if(selected) {
-                    bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
-                    selected = false;
-                    if (!jewels_movesavail(bj)) return BJ_LOSE;
-                } else {
-                    x = (x+BJ_WIDTH-1)%BJ_WIDTH;
+                if(!inmenu) {
+                    if(selected) {
+                        bj->score += jewels_swapjewels(bj, x, y, SWAP_LEFT);
+                        selected = false;
+                        if (!jewels_movesavail(bj)) return BJ_LOSE;
+                    } else {
+                        x = (x+BJ_WIDTH-1)%BJ_WIDTH;
+                    }
                 }
                 break;
 
