@@ -140,7 +140,6 @@ static const char codec_thread_name[] = "codec";
 
 /* Voice codec thread. */
 static struct event_queue voice_codec_queue;
-/* Not enough IRAM for this. */
 static long voice_codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)] IBSS_ATTR;
 static const char voice_codec_thread_name[] = "voice codec";
 
@@ -309,7 +308,6 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
 
     while (length > 0) {
         long est_output_size = dsp_output_size(length);
-        /* This will prevent old audio from playing when skipping tracks. */
         if (current_codec == CODEC_IDX_VOICE) {
             while ((dest = pcmbuf_request_voice_buffer(est_output_size,
                             &output_size, audio_codec_loaded)) == NULL)
@@ -317,6 +315,7 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
         }
         else
         {
+            /* Prevent audio from a previous position from hitting the buffer */
             if (ci.reload_codec || ci.stop_codec)
                 return true;
 
@@ -653,10 +652,11 @@ static void buffer_wind_backward(size_t rewind)
     /* Check and handle buffer wrapping */
     if (rewind > buf_ridx)
         buf_ridx += filebuflen;
+    /* Rewind the buffer to the beginning of the target track (or its codec) */
     buf_ridx -= rewind;
     filebufused += rewind;
 
-    /* Rewind the track to its beginning */
+    /* Rewind the old track to its beginning */
     prev_ti->available = prev_ti->filesize - prev_ti->filerem;
     /* Reset to the beginning of the new track */
     cur_ti->available = cur_ti->filesize;
