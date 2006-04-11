@@ -1983,7 +1983,7 @@ void codec_thread(void)
                         yield();
                     /* This must be set to prevent an infinite loop */
                     ci.stop_codec = true;
-                    queue_post(&codec_queue, Q_AUDIO_STOP, 0);
+                    queue_post(&codec_queue, Q_AUDIO_PLAY, 0);
                     break ;
                 }
 
