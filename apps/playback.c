@@ -1085,7 +1085,7 @@ static void audio_read_file(void)
     }
 
     if (tracks[track_widx].filerem == 0) {
-        logf("Finished buf.");
+        logf("Finished buf:%dB", tracks[track_widx].filesize);
         strip_id3v1_tag();
         close(current_fd);
         current_fd = -1;
@@ -1097,7 +1097,10 @@ static void audio_read_file(void)
          * of data, stop filling after this track */
         if (filling_short && filebufused > conf_watermark * 2)
             fill_bytesleft = 0;
-    } else { logf("Partially buf:%d", tracks[track_widx].available); }
+    } else {
+        logf("Partially buf:%dB",
+                tracks[track_widx].filesize - tracks[track_widx].filerem);
+    }
 }
 
 static void codec_discard_codec_callback(void)
@@ -1430,6 +1433,7 @@ static bool audio_load_track(int offset, bool start_play)
     if (start_play)
         codec_track_changed();
 
+    logf("arf:%s", trackname);
     audio_read_file();
 
     return true;
@@ -1599,24 +1603,20 @@ static void audio_fill_file_buffer(
     else if (!audio_load_track(offset, start_play))
         fill_bytesleft = 0;
 
-    /* Read next unbuffered track's metadata as soon as playback begins */
-    if (pcm_is_playing() || fill_bytesleft == 0)
+    /* If we're done buffering */
+    if (fill_bytesleft == 0)
     {
         read_next_metadata();
 
-        /* If we're done buffering */
-        if (fill_bytesleft == 0)
-        {
-            generate_postbuffer_events();
-            filling = false;
-            filling_short = false;
-            pcmbuf_set_boost_mode(false);
+        generate_postbuffer_events();
+        filling = false;
+        filling_short = false;
+        pcmbuf_set_boost_mode(false);
 
 #ifndef SIMULATOR
-            if (playing)
-                ata_sleep();
+        if (playing)
+            ata_sleep();
 #endif
-        }
     }
 }
 
