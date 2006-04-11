@@ -1504,8 +1504,8 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
 
         /* One A52 frame contains 6 blocks, each containing 256 samples */
-        totalsamples = (track->filesize / track->id3.bytesperframe) * 6 * 256;
-        track->id3.length = (totalsamples / track->id3.frequency) * 1000;
+        totalsamples = track->id3.filesize / track->id3.bytesperframe * 6 * 256;
+        track->id3.length = totalsamples / track->id3.frequency * 1000;
         break;
 
     case AFMT_ALAC:
