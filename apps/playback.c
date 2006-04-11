@@ -1520,7 +1520,7 @@ static void audio_stop_playback(bool resume)
     }
 
     /* Mark all entries null. */
-    audio_clear_track_entries(true);
+    memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
 }
 
 static void audio_play_start(size_t offset)
@@ -1593,11 +1593,11 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
         fill_bytesleft = filebuflen - filebufused;
     }
 
-    audio_clear_track_entries(start_play);
-
     /* Don't initialize if we're already initialized */
     if (filling)
         return ;
+
+    audio_clear_track_entries(start_play);
 
     logf("Starting buffer fill");
     pcmbuf_set_boost_mode(true);
@@ -1934,6 +1934,7 @@ void audio_thread(void)
                 playlist_update_resume_info(audio_current_track());
                 pcmbuf_set_position_callback(NULL);
                 track_changed = true;
+                audio_clear_track_entries(false);
                 break ;
 
             case Q_AUDIO_CODEC_DONE:
