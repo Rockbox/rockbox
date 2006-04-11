@@ -1591,7 +1591,7 @@ static void initialize_buffer_fill(bool start_play)
          * data for the currently playing codec to seek back into */
         size_t buf_bytesleft = filebuflen - filebufused;
         size_t subtract =
-            MIN(MIN(AUDIO_REBUFFER_GUESS_SIZE, ci.curpos), buf_bytesleft);
+            MIN(MIN(AUDIO_REBUFFER_GUESS_SIZE, (unsigned)ci.curpos), buf_bytesleft);
 
         fill_bytesleft = buf_bytesleft - subtract;
         tracks[track_ridx].start_pos = ci.curpos - subtract;
