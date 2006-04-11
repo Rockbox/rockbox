@@ -52,9 +52,10 @@
 #define QUICKSCREEN_QUIT   BUTTON_MENU
 #define QUICKSCREEN_QUIT2  BUTTON_SELECT
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define QUICKSCREEN_BOTTOM BUTTON_DOWN
-#define QUICKSCREEN_QUIT   BUTTON_REC
-#define QUICKSCREEN_QUIT2  BUTTON_POWER
+#define QUICKSCREEN_BOTTOM     BUTTON_DOWN
+#define QUICKSCREEN_BOTTOM_INV BUTTON_UP
+#define QUICKSCREEN_QUIT       BUTTON_REC
+#define QUICKSCREEN_QUIT2      BUTTON_POWER
 #endif
 
 struct gui_quickscreen;
@@ -69,7 +70,6 @@ struct gui_quickscreen
     struct option_select *left_option;
     struct option_select *bottom_option;
     struct option_select *right_option;
-    char * left_right_title;
     quickscreen_callback *callback;
 };
 
@@ -87,7 +87,6 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
                           struct option_select *left_option,
                           struct option_select *bottom_option,
                           struct option_select *right_option,
-                          char * left_right_title,
                           quickscreen_callback *callback);
 /*
  * Draws the quickscreen on a given screen

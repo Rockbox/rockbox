@@ -525,7 +525,7 @@ bool quick_screen_quick(int button_enter)
                              sizeof(right_items)/sizeof(struct opt_items));
 
     gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
-                         (char *)str(LANG_F2_MODE), &quick_screen_quick_apply);
+                         &quick_screen_quick_apply);
     oldrepeat=global_settings.repeat_mode;
     oldshuffle=global_settings.playlist_shuffle;
     res=gui_syncquickscreen_run(&qs, button_enter);
@@ -588,7 +588,7 @@ bool quick_screen_f3(int button_enter)
     struct gui_quickscreen qs;
 
     option_select_init_items(&left_option,
-                             str(LANG_F3_SCROLL),
+                             str(LANG_SCROLL_BAR),
                              bool_to_int(global_settings.scrollbar),
                              onoff_items,
                              2);
@@ -598,12 +598,12 @@ bool quick_screen_f3(int button_enter)
                              yesno_items,
                              2);
     option_select_init_items(&right_option,
-                             str(LANG_F3_STATUS),
+                             str(LANG_STATUS_BAR),
                              bool_to_int(global_settings.statusbar),
                              onoff_items,
                              2);
     gui_quickscreen_init(&qs, &left_option, &bottom_option, &right_option,
-                         str(LANG_F3_BAR), &quick_screen_f3_apply);
+                         &quick_screen_f3_apply);
     res=gui_syncquickscreen_run(&qs, button_enter);
     if(!res)
         settings_save();

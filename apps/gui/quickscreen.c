@@ -34,64 +34,64 @@ void gui_quickscreen_init(struct gui_quickscreen * qs,
                           struct option_select *left_option,
                           struct option_select *bottom_option,
                           struct option_select *right_option,
-                          char * left_right_title,
                           quickscreen_callback callback)
 {
     qs->left_option=left_option;
     qs->bottom_option=bottom_option;
     qs->right_option=right_option;
-    qs->left_right_title=left_right_title;
     qs->callback=callback;
 }
 
 void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 {
-    char buffer[30], line_text[40];
+    #define PUTS_CENTER (display->height/2/font_h)
+    #define PUTS_BOTTOM (display->height/font_h)
+    #define PUTSXY_CENTER (display->height/2)
+    #define PUTSXY_BOTTOM (display->height)
+
+    char buffer[30];
     const unsigned char *option;
     const unsigned char *title;
-    const unsigned char *left_right_title;
-    int w;
+    int w, font_h;
     bool statusbar = global_settings.statusbar;
 #ifdef HAS_BUTTONBAR
     display->has_buttonbar=false;
 #endif
     gui_textarea_clear(display);
     display->setfont(FONT_SYSFIXED);
-    left_right_title=(unsigned char *)qs->left_right_title;
-
-    /* Displays the icons */
+    display->getstringsize("A", NULL, &font_h);
 
     /* Displays the first line of text */
     option=(unsigned char *)option_select_get_text(qs->left_option, buffer,
                                                    sizeof buffer);
     title=(unsigned char *)qs->left_option->title;
-    snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
-    display->puts_scroll(2, !statusbar, line_text);
-    display->puts_scroll(2, 1+!statusbar, option);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1, 8, 7, 8);
+    display->puts_scroll(2, PUTS_CENTER-4+!statusbar, title);
+    display->puts_scroll(2, PUTS_CENTER-3+!statusbar, option);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 1,
+                         PUTSXY_CENTER-(font_h*3), 7, 8);
 
     /* Displays the second line of text */
     option=(unsigned char *)option_select_get_text(qs->right_option, buffer,
                                                    sizeof buffer);
     title=(unsigned char *)qs->right_option->title;
-    snprintf(line_text, sizeof(line_text), "%s %s", title, left_right_title);
-    display->getstringsize(line_text, &w, NULL);
+    display->getstringsize(title, &w, NULL);
     if(w > display->width - 8)
     {
-        display->puts_scroll(2, 2+!statusbar, line_text);
-        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1, 24, 7, 8);
+        display->puts_scroll(2, PUTS_CENTER-2+!statusbar, title);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 1,
+                             PUTSXY_CENTER-font_h, 7, 8);
     }
     else
     {
-        display->putsxy(display->width - w - 12, 24, line_text);
+        display->putsxy(display->width - w - 12, PUTSXY_CENTER-font_h, title);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                        display->width - 8, 24, 7, 8);
+                        display->width - 8, PUTSXY_CENTER-font_h, 7, 8);
     }
     display->getstringsize(option, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, 3+!statusbar, option);
+        display->puts_scroll(0, PUTS_CENTER-1+!statusbar, option);
     else
-        display->putsxy(display->width -w-12, 32, option);
+        display->putsxy(display->width -w-12, PUTSXY_CENTER, option);
 
     /* Displays the third line of text */
     option=(unsigned char *)option_select_get_text(qs->bottom_option, buffer,
@@ -100,16 +100,17 @@ void gui_quickscreen_draw(struct gui_quickscreen * qs, struct screen * display)
 
     display->getstringsize(title, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, 4+!statusbar, line_text);
+        display->puts_scroll(0, PUTS_BOTTOM-4+!statusbar, title);
     else
-        display->putsxy(display->width/2-w/2, 40, title);
+        display->putsxy(display->width/2-w/2, PUTSXY_BOTTOM-(font_h*3), title);
 
     display->getstringsize(option, &w, NULL);
     if(w > display->width)
-        display->puts_scroll(0, 5+!statusbar, option);
+        display->puts_scroll(0, PUTS_BOTTOM-3+!statusbar, option);
     else
-        display->putsxy(display->width/2-w/2, 48, option);
-    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], display->width/2-4, 56, 7, 8);
+        display->putsxy(display->width/2-w/2, PUTSXY_BOTTOM-(font_h*2), option);
+    display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow], display->width/2-4,
+                         PUTSXY_BOTTOM-font_h, 7, 8);
 
     gui_textarea_update(display);
     display->setfont(FONT_UI);
