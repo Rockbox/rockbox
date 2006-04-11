@@ -1063,7 +1063,7 @@ static void audio_read_file(void)
     }
 
     while (tracks[track_widx].filerem > 0) {
-        if (fill_bytesleft <= 0)
+        if (fill_bytesleft == 0)
             break ;
 
         /* copy_n is the largest chunk that is safe to read */
@@ -1083,8 +1083,12 @@ static void audio_read_file(void)
             buf_widx -= filebuflen;
         tracks[track_widx].available += rc;
         tracks[track_widx].filerem -= rc;
+
         filebufused += rc;
-        fill_bytesleft -= rc;
+        if (fill_bytesleft > (unsigned)rc)
+            fill_bytesleft -= rc;
+        else
+            fill_bytesleft = 0;
 
         /* Let the codec process until it is out of the danger zone, or there
          * is an event to handle.  In the latter case, break this fill cycle
@@ -1226,10 +1230,8 @@ static bool loadcodec(bool start_play)
 
     size = filesize(fd);
     /* Never load a partial codec */
-    if (filebuflen - filebufused < size + conf_watermark) {
+    if (filebuflen - filebufused < size + AUDIO_REBUFFER_GUESS_SIZE) {
         logf("Not enough space");
-        /* Set codectype back to zero to indicate no codec was loaded. */
-        tracks[track_widx].id3.codectype = 0;
         fill_bytesleft = 0;
         close(fd);
         return false;
@@ -1370,13 +1372,14 @@ static bool audio_load_track(int offset, bool start_play)
     if (!tracks[track_widx].taginfo_ready) {
         if (!get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) {
             logf("Metadata error:%s!",trackname);
+            /* Set filesize to zero to indicate no file was loaded. */
             tracks[track_widx].filesize = 0;
             tracks[track_widx].filerem = 0;
-            tracks[track_widx].taginfo_ready = false;
             close(current_fd);
             current_fd = -1;
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, last_peek_offset);
+            tracks[track_widx].taginfo_ready = false;
             goto peek_again;
         }
         track_changed = true;
@@ -1385,13 +1388,11 @@ static bool audio_load_track(int offset, bool start_play)
     /* Load the codec. */
     tracks[track_widx].codecbuf = &filebuf[buf_widx];
     if (!loadcodec(start_play)) {
-        close(current_fd);
-        current_fd = -1;
-
         /* Set filesize to zero to indicate no file was loaded. */
         tracks[track_widx].filesize = 0;
         tracks[track_widx].filerem = 0;
-        tracks[track_widx].taginfo_ready = false;
+        close(current_fd);
+        current_fd = -1;
 
         /* Try skipping to next track if there is space. */
         if (fill_bytesleft > 0) {
@@ -1401,6 +1402,7 @@ static bool audio_load_track(int offset, bool start_play)
             gui_syncsplash(HZ*2, true, msgbuf);
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, last_peek_offset);
+            tracks[track_widx].taginfo_ready = false;
             goto peek_again;
         }
         return false;
@@ -1626,12 +1628,12 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         fill_bytesleft = 0;
 
     /* Read next unbuffered track's metadata as soon as playback begins */
-    if (pcm_is_playing() || fill_bytesleft <= 0)
+    if (pcm_is_playing() || fill_bytesleft == 0)
     {
         read_next_metadata();
 
         /* If we're done buffering */
-        if (fill_bytesleft <= 0)
+        if (fill_bytesleft == 0)
         {
             generate_postbuffer_events();
             filling = false;
