@@ -155,7 +155,7 @@ static void (*voice_getmore)(unsigned char** start, int* size);
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling;
-static volatile bool filling_initial;
+static volatile bool filling_short;
 
 volatile int current_codec;
 extern unsigned char codecbuf[];
@@ -228,9 +228,10 @@ static bool v1first = false;
 static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
-static void audio_clear_track_entries(bool buffered_only);
-static void initialize_buffer_fill(bool start_play);
-static void audio_fill_file_buffer(bool start_play, size_t offset);
+static void audio_clear_track_entries(bool clear_unbuffered);
+static void initialize_buffer_fill(bool start_play, bool short_fill);
+static void audio_fill_file_buffer(
+        bool start_play, bool short_fill, size_t offset);
 
 #ifdef TIME_CODEC
 bool is_filling(void)
@@ -704,7 +705,7 @@ static void audio_rebuffer(void)
     /* Fill the buffer */
     last_peek_offset = -1;
     tracks[track_ridx].filesize = 0;
-    audio_fill_file_buffer(false, 0);
+    audio_fill_file_buffer(false, true, 0);
 }
 
 static void audio_check_new_track(long direction)
@@ -799,7 +800,12 @@ static void rebuffer_and_seek(size_t newpos)
     track_widx = track_ridx;
 
     last_peek_offset = 0;
-    initialize_buffer_fill(false);
+    initialize_buffer_fill(false, true);
+
+    if (newpos > AUDIO_REBUFFER_GUESS_SIZE)
+        cur_ti->start_pos = newpos - AUDIO_REBUFFER_GUESS_SIZE;
+    else
+        cur_ti->start_pos = 0;
 
     cur_ti->filerem = cur_ti->filesize - cur_ti->start_pos;
     cur_ti->available = 0;
@@ -1107,7 +1113,7 @@ static void audio_read_file(void)
         }
         tracks[track_widx].filesize = 0;
         /* If this is an initial fill, stop after one track is complete */
-        if (filling_initial)
+        if (filling_short && filebufused > conf_watermark * 2)
             fill_bytesleft = 0;
     } else {
         logf("Partially buf:%d", tracks[track_widx].available);
@@ -1450,7 +1456,7 @@ static bool audio_load_track(int offset, bool start_play)
     return true;
 }
 
-static void audio_clear_track_entries(bool buffered_only)
+static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
     int last_idx = -1;
@@ -1476,7 +1482,7 @@ static void audio_clear_track_entries(bool buffered_only)
                 memset(&tracks[last_idx], 0, sizeof(struct track_info));
             }
             last_idx = cur_idx;
-        } else if (!buffered_only)
+        } else if (clear_unbuffered)
             memset(&tracks[cur_idx], 0, sizeof(struct track_info));
     }
 
@@ -1514,7 +1520,7 @@ static void audio_stop_playback(bool resume)
     }
 
     /* Mark all entries null. */
-    audio_clear_track_entries(false);
+    audio_clear_track_entries(true);
 }
 
 static void audio_play_start(size_t offset)
@@ -1575,33 +1581,26 @@ static void generate_postbuffer_events(void)
     }
 }
 
-static void initialize_buffer_fill(bool start_play)
+static void initialize_buffer_fill(bool start_play, bool short_fill)
 {
-    /* Initialize only once; do not truncate the tracks. */
+    if (short_fill) {
+        filling_short = true;
+        fill_bytesleft = filebuflen >> 2;
+    }
+    else if (!filling_short)
+    {
+        /* Recalculate remaining bytes to buffer */
+        fill_bytesleft = filebuflen - filebufused;
+    }
+
+    audio_clear_track_entries(start_play);
+
+    /* Don't initialize if we're already initialized */
     if (filling)
         return ;
 
-    if (start_play) {
-        filling_initial = true;
-        fill_bytesleft = filebuflen >> 2;
-    }
-    else if (!filling_initial)
-    {
-        /* Recalculate remaining bytes to buffer, but always leave extra
-         * data for the currently playing codec to seek back into */
-        size_t buf_bytesleft = filebuflen - filebufused;
-        size_t subtract =
-            MIN(MIN(AUDIO_REBUFFER_GUESS_SIZE, (unsigned)ci.curpos), buf_bytesleft);
-
-        fill_bytesleft = buf_bytesleft - subtract;
-        tracks[track_ridx].start_pos = ci.curpos - subtract;
-    }
-
     logf("Starting buffer fill");
     pcmbuf_set_boost_mode(true);
-
-    /* Mark all buffered entries null (not metadata for next track). */
-    audio_clear_track_entries(!start_play);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
@@ -1610,9 +1609,10 @@ static void initialize_buffer_fill(bool start_play)
 
 }
 
-static void audio_fill_file_buffer(bool start_play, size_t offset)
+static void audio_fill_file_buffer(
+        bool start_play, bool short_fill, size_t offset)
 {
-    initialize_buffer_fill(start_play);
+    initialize_buffer_fill(start_play, short_fill);
 
     /* If we have a partially buffered track, continue loading,
      * otherwise load a new track */
@@ -1631,7 +1631,7 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         {
             generate_postbuffer_events();
             filling = false;
-            filling_initial = false;
+            filling_short = false;
             pcmbuf_set_boost_mode(false);
 
 #ifndef SIMULATOR
@@ -1764,7 +1764,7 @@ void audio_invalidate_tracks(void)
 
         track_widx = track_ridx;
 
-        audio_clear_track_entries(false);
+        audio_clear_track_entries(true);
 
         /* If the current track is fully buffered, advance the write pointer */
         if (tracks[track_widx].filerem == 0)
@@ -1829,11 +1829,15 @@ void audio_thread(void)
 
         switch (ev.id) {
             case Q_AUDIO_FILL_BUFFER:
-                if (!filling && !(bool)ev.data)
-                    if (ci.stop_codec || ci.reload_codec || playlist_end)
-                        break;
-                audio_fill_file_buffer((bool)ev.data, abs((long)ev.data));
-                break;
+                {
+                    bool start_play = (bool)ev.data;
+                    if (!filling && !start_play)
+                        if (ci.stop_codec || ci.reload_codec || playlist_end)
+                            break;
+                    audio_fill_file_buffer(
+                            start_play, start_play, abs((long)ev.data));
+                    break;
+                }
             case Q_AUDIO_PLAY:
                 /* Don't start playing immediately if user is skipping tracks
                  * fast to prevent UI lag. */
