@@ -77,7 +77,7 @@ extern bool simulate_usb(void);
 
 bool show_info(void)
 {
-    char s[32], s1[32];
+    char s[64], s1[32];
     long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
     int integer, decimal;
     bool done = false;
