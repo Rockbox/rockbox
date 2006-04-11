@@ -23,7 +23,11 @@
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define FPS_QUIT BUTTON_MENU
 #else
+#ifdef BUTTON_OFF
 #define FPS_QUIT BUTTON_OFF
+#else
+#define FPS_QUIT BUTTON_POWER
+#endif
 #endif
 
 PLUGIN_HEADER
