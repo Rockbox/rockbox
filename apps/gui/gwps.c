@@ -435,12 +435,18 @@ long gui_wps_show(void)
                 }
                 else {
                     if (!wps_state.paused)
+#if (CONFIG_CODEC == SWCODEC)
+                        audio_pre_ff_rewind();
+#else
                         audio_pause();
+#endif
 
                     audio_ff_rewind(0);
 
+#if (CONFIG_CODEC != SWCODEC)
                     if (!wps_state.paused)
                         audio_resume();
+#endif
                 }
                 break;
 
