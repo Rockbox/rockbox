@@ -188,7 +188,7 @@ as a negative number. Volume can be adjusted from a
   speakers, but you also hear reflections of that sound as the sound waves
   bounce off of walls, floors, ceilings, etc. These reflections reach your
   ears slightly after the direct sound. 
-    
+
   The human ear and brain are very good at interpreting the timing differences
   between direct sounds and reflected sounds and using that information to
   identify the direction that the sound is coming from.  On the other hand,
@@ -201,7 +201,39 @@ as a negative number. Volume can be adjusted from a
   The crossfeed function uses an algorithm to feed a delayed and filtered
   portion of the signal from the right channel into the left channel and vice
   versa in order to simulate the spatial cues that the ear and brain receive
-  when listening to non-headphone sources. The result is a better stereo image.
+  when listening to a set of loudspeakers placed in front of the listener. The
+  result is a more natural stereo image that can be especially appreciated in
+  older rock and jazz records, where one instrument is often hard-panned to just
+  one of the speakers. Many people will find such records tiring to listen to
+  using earphones and no crossfeed effect.
+
+  Crossfeed has the following settings.
+  \begin{description}
+  \item[Crossfeed:]
+    Selects whether the crossfeed effect is to be enabled or not.
+  \item[Direct Gain:]
+    How much the level of the audio that travels the direct path from a speaker
+    to the corresponding ear is supposed to be decreased.
+  \item[Cross Gain:]
+    How much the level of the audio that travels the cross path from a speaker
+    to the opposite ear is to be decreased.
+  \item[High-Frequency Attenuation:]
+    How much the upper frequencies of the cross path audio will be dampened.
+    Note that the total level of the higher frequencies will be a combination
+    of both this setting and the \emph{Cross Gain} setting.
+  \item[High-Frequency Cutoff]
+    Decides at which frequency the cross path audio will start to be cut
+    by the amount described by the \emph{High-Frequency Attenuation} setting.
+  \end{description}
+  
+  Most users will find the default settings to yield satisfactory results, but
+  for the more adventurous user the settings can be fine-tuned to provide a
+  virtual speaker placement suited to ones preference.
+  % TODO: adapt the guidelines for crossfeed settings found here?
+  % http://www.ohl.to/interests-in-audio/crossfeed-and-eq-for-headphones/ 
+
+  Beware that the crossfeed function is capable of making the audio distort
+  if you choose settings which result in a too high output level.
 }
   
 \opt{SWCODEC}{
