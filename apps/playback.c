@@ -648,12 +648,8 @@ static void buffer_wind_forward(void)
         buf_ridx -= filebuflen;
 }
 
-static void buffer_wind_backward(bool need_codec)
+static void buffer_wind_backward(size_t rewind)
 {
-    /* Rewind the buffer to the beginning of the new track */
-    size_t rewind = ci.curpos + prev_ti->codecsize + cur_ti->filesize;
-    if (need_codec)
-        rewind += cur_ti->codecsize;
     /* Check and handle buffer wrapping */
     if (rewind > buf_ridx)
         buf_ridx += filebuflen;
@@ -731,8 +727,7 @@ static void audio_check_new_track(long direction)
         {
             /* This is how much 'back' data must remain uncleared for us
              * to safely backup to the beginning of the previous track */
-            size_t req_size =
-                ci.curpos + prev_ti->codecsize + tracks[track_ridx].filesize;
+            size_t req_size = ci.curpos + prev_ti->codecsize + cur_ti->filesize;
             /* This is the amount of 'back' data available on the buffer */
             size_t buf_back = buf_ridx;
             if (buf_back < buf_widx)
@@ -759,12 +754,12 @@ static void audio_check_new_track(long direction)
                     else
                     {
                         cur_ti->has_codec = true;
-                        buffer_wind_backward(true);
+                        buffer_wind_backward(req_size);
                     }
                 }
             }
             else
-                buffer_wind_backward(false);
+                buffer_wind_backward(req_size);
         }
     }
     mutex_unlock(&mutex_interthread);
@@ -1117,11 +1112,13 @@ static void audio_read_file(void)
 
 static void codec_discard_codec_callback(void)
 {
-    tracks[track_ridx].has_codec = false;
-    filebufused -= tracks[track_ridx].codecsize;
-    buf_ridx += tracks[track_ridx].codecsize;
-    if (buf_ridx >= filebuflen)
-        buf_ridx -= filebuflen;
+    if (tracks[track_ridx].has_codec) {
+        tracks[track_ridx].has_codec = false;
+        filebufused -= tracks[track_ridx].codecsize;
+        buf_ridx += tracks[track_ridx].codecsize;
+        if (buf_ridx >= filebuflen)
+            buf_ridx -= filebuflen;
+    }
 }
 
 static bool loadcodec(bool start_play)
@@ -1747,18 +1744,19 @@ bool codec_request_next_track_callback(void)
     }
     
     /* Check if the next codec is the same file. */
-    if (get_codec_base_type(prev_ti->id3.codectype) !=
+    if (get_codec_base_type(prev_ti->id3.codectype) ==
         get_codec_base_type(cur_ti->id3.codectype))
+    {
+        logf("New track loaded");
+        ci.reload_codec = false;
+        codec_discard_codec_callback();
+        return true;
+    }
+    else
     {
         logf("New codec:%d/%d", cur_ti->id3.codectype, prev_ti->id3.codectype);
         ci.reload_codec = true;
         return false;
-    }
-    else
-    {
-        logf("New track loaded");
-        ci.reload_codec = false;
-        return true;
     }
 }
 
@@ -1979,7 +1977,7 @@ void codec_thread(void)
 
             case Q_CODEC_LOAD:
                 logf("Codec start");
-                if (!cur_ti->has_codec) {
+                if (!tracks[track_ridx].has_codec) {
                     logf("Codec slot is empty!");
                     /* Wait for the pcm buffer to go empty */
                     while (pcm_is_playing())
@@ -1991,12 +1989,13 @@ void codec_thread(void)
                 }
 
                 ci.stop_codec = false;
-                wrap = (size_t)&filebuf[filebuflen] - (size_t)cur_ti->codecbuf;
+                wrap = (size_t)&filebuf[filebuflen] -
+                    (size_t)tracks[track_ridx].codecbuf;
                 audio_codec_loaded = true;
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
-                status = codec_load_ram(cur_ti->codecbuf, cur_ti->codecsize,
-                                        &filebuf[0], wrap, &ci);
+                status = codec_load_ram(tracks[track_ridx].codecbuf,
+                        tracks[track_ridx].codecsize, &filebuf[0], wrap, &ci);
                 mutex_unlock(&mutex_codecthread);
                 break ;
 
