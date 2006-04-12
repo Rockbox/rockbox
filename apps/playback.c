@@ -775,10 +775,6 @@ static void rebuffer_and_seek(size_t newpos)
     filebufused = 0;
     buf_ridx = buf_widx = 0;
 
-    /* Make sure we are reading the cur_ti */
-    while (&tracks[track_ridx] != cur_ti)
-        if (--track_ridx < 0)
-            track_ridx += MAX_TRACK;
     /* Write to the now current track */
     track_widx = track_ridx;
 
@@ -814,7 +810,6 @@ void codec_advance_buffer_callback(size_t amount)
     while (amount > cur_ti->available && filling)
         sleep(1);
 
-    /* This should not happen */
     if (amount > cur_ti->available) {
         mutex_lock(&mutex_interthread);
         queue_post(&audio_queue,
@@ -1571,10 +1566,14 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
     if (short_fill) {
         filling_short = true;
         fill_bytesleft = filebuflen >> 2;
+        cur_ti->start_pos = ci.curpos;
     }
     /* Recalculate remaining bytes to buffer */
     else if (!filling_short)
+    {
         fill_bytesleft = filebuflen - filebufused;
+        cur_ti->start_pos = ci.curpos;
+    }
 
     /* Don't initialize if we're already initialized */
     if (filling)
