@@ -656,7 +656,6 @@ static void audio_update_trackinfo(void)
     ci.curpos = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
-    track_changed = true;
 }
 
 static int get_codec_base_type(int type)
@@ -1354,7 +1353,12 @@ static bool audio_load_track(int offset, bool start_play)
 
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) {
-        if (!get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) {
+        if (get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) {
+            if (start_play) {
+                playlist_update_resume_info(audio_current_track());
+                track_changed = true;
+            }
+        } else {
             logf("Metadata error:%s!",trackname);
             /* Set filesize to zero to indicate no file was loaded. */
             tracks[track_widx].filesize = 0;
@@ -1366,7 +1370,7 @@ static bool audio_load_track(int offset, bool start_play)
             tracks[track_widx].taginfo_ready = false;
             goto peek_again;
         }
-        track_changed = true;
+
     }
 
     /* Load the codec. */
@@ -1425,9 +1429,6 @@ static bool audio_load_track(int offset, bool start_play)
 
     }
     
-    if (start_play)
-        codec_track_changed();
-
     logf("arf:%s", trackname);
     audio_read_file();
 
