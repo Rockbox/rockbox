@@ -150,18 +150,21 @@ int tick_remove_task(void (*f)(void))
     return -1;
 }
 
-/* TODO: Implement mutexes for win32 */
+/* Very simple mutex simulation - won't work with pre-emptive
+   multitasking, but is better than nothing at all */
 void mutex_init(struct mutex *m)
 {
-    (void)m;
+    m->locked = false;
 }
 
 void mutex_lock(struct mutex *m)
 {
-    (void)m;
+    while(m->locked)
+        switch_thread();
+    m->locked = true;
 }
 
 void mutex_unlock(struct mutex *m)
 {
-    (void)m;
+    m->locked = false;
 }
