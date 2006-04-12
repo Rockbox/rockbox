@@ -100,6 +100,8 @@ bool tagcache_is_ramcache(void);
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 #endif
 void tagcache_init(void);
+bool tagcache_is_initialized(void);
+int tagcache_get_commit_step(void);
 void tagcache_start_scan(void);
 void tagcache_stop_scan(void);
 bool tagcache_force_update(void);

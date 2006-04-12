@@ -59,6 +59,12 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_compose
 /* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_bitrate };
 
+/* When thread initialization and memory allocation has been made. */
+static bool tagcache_init_done = false;
+
+/* Progress indicator while committing the cache. */
+static int init_step;
+
 /* Queue commands. */
 #define Q_STOP_SCAN     0
 #define Q_START_SCAN    1
@@ -1780,8 +1786,10 @@ static bool commit(void)
     logf("commit %d entries...", header.entry_count);
     
     /* Now create the index files. */
+    init_step = 0;
     for (i = 0; i < TAG_COUNT; i++)
     {
+        init_step++;
         if (tagcache_is_numeric_tag(i))
         {
             build_numeric_index(i, &header, tmpfd);
@@ -1791,11 +1799,13 @@ static bool commit(void)
         {
             logf("tagcache failed init");
             remove_files();
+            init_step = 0;
             return false;
         }
     }
     
     close(tmpfd);
+    init_step = 0;
     
     /* Update the master index headers. */
     masterfd = open(TAGCACHE_FILE_MASTER, O_RDWR);
@@ -2221,6 +2231,20 @@ static void tagcache_thread(void)
     struct event ev;
     bool check_done = false;
 
+    /* If the previous cache build/update was interrupted, commit
+     * the changes first. */
+    cpu_boost(true);
+    allocate_tempbuf();
+    commit();
+    free_tempbuf();
+    cpu_boost(false);
+    
+#ifdef HAVE_TC_RAMCACHE
+    /* Allocate space for the tagcache if found on disk. */
+    allocate_tagcache();
+#endif
+    tagcache_init_done = true;
+    
     while (1)
     {
         queue_wait_w_tmo(&tagcache_queue, &ev, HZ);
@@ -2316,22 +2340,20 @@ bool tagcache_is_ramcache(void)
 
 void tagcache_init(void)
 {
-    /* If the previous cache build/update was interrupted, commit
-     * the changes first. */
-    cpu_boost(true);
-    allocate_tempbuf();
-    commit();
-    free_tempbuf();
-    cpu_boost(false);
-    
-#ifdef HAVE_TC_RAMCACHE
-    /* Allocate space for the tagcache if found on disk. */
-    allocate_tagcache();
-#endif
-    
+    tagcache_init_done = false;
+    init_step = 0;
     queue_init(&tagcache_queue);
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), tagcache_thread_name);
 }
 
+bool tagcache_is_initialized(void)
+{
+    return tagcache_init_done;
+}
+    
+int tagcache_get_commit_step(void)
+{
+    return init_step;
+}
 

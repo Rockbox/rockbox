@@ -144,15 +144,32 @@ void init_tagcache(void)
 {
 #ifdef HAVE_LCD_BITMAP
     int font_w, font_h;
-    
-    /* Print "Scanning disk..." to the display. */
-    lcd_getstringsize("A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_TAGCACHE_INIT))*font_w)/2),
-                LCD_HEIGHT-font_h*3, str(LANG_TAGCACHE_INIT));
-    lcd_update();
 #endif
     
     tagcache_init();
+    
+    while (!tagcache_is_initialized())
+    {
+#ifdef HAVE_LCD_BITMAP
+        char buf[64];
+        int ret;
+        
+        ret = tagcache_get_commit_step();
+        if (ret > 0)
+        {
+            snprintf(buf, sizeof buf, "%s [%d/%d]",
+                     str(LANG_TAGCACHE_INIT), ret, TAG_COUNT);
+            
+            /* Print "Scanning disk..." to the display. */
+            lcd_getstringsize("A", &font_w, &font_h);
+            lcd_putsxy((LCD_WIDTH/2) - ((strlen(buf)*font_w)/2),
+                   LCD_HEIGHT-font_h*3, buf);
+            lcd_update();
+        }
+#endif
+        sleep(HZ/4);
+    }
+    
     tagtree_init();
 
 #ifdef HAVE_LCD_BITMAP
@@ -377,9 +394,9 @@ void init(void)
 
     
     init_dircache();
-    init_tagcache();
     gui_sync_wps_init();
     settings_apply();
+    init_tagcache();
 
     status_init();
     playlist_init();
