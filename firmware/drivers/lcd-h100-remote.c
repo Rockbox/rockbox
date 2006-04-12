@@ -142,23 +142,22 @@ static inline void _write_byte(unsigned data)
         "moveq.l #8,%%d1           \n" /* bit counter */
 
     "2:                            \n"
-        "tst.b   %[data]           \n" /* MSB of data set? */
-        "bpl.s   1f                \n"
+        "lsl.l   #1,%[data]        \n" /* data <<= 1, MSB of data set? */
+        "bcc.s   1f                \n"
         "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
         ".word   0x51fa            \n" /* trapf.w - shadow next insn */
     "1:                            \n"
         "and.l   %[dlo],(%[gpi1])  \n" /* reset data bit */
         "eor.l   %[cbit],(%[gpio]) \n" /* set clock bit */
         "eor.l   %[cbit],(%[gpio]) \n" /* reset clock bit */
-        "lsl.l   #1,%[data]        \n" /* data <<= 1 */
 
         "subq.l  #1,%%d1           \n"
         "bne.s   2b                \n"
 
         "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
         : /* outputs */
-        [data]"+d"(data)
         : /* inputs */
+        [data]"d"(data << 24),
         [gpio]"a"(&GPIO_OUT),
         [cbit]"d"(0x10000000),
         [gpi1]"a"(&GPIO1_OUT),
@@ -186,78 +185,71 @@ static inline void _write_unrolled(unsigned data)
         "or.l    (%[gpio]),%%d3  \n" /* the clock bit */
         "eor.l   %%d3,%%d2       \n"
 
-        "tst.b   %[data]         \n" /* MSB of data set? */
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n" /* data <<= 1, MSB of data set? */
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
         ".word   0x51fa          \n" /* trapf.w - shadow next insn */
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n" /* reset data bit */
         "move.l  %%d3,(%[gpio])  \n" /* set clock bit */
         "move.l  %%d2,(%[gpio])  \n" /* reset clock bit */
-        "lsl.l   #1,%[data]      \n" /* data <<= 1 */
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
         "move.l  %%d0,(%[gpi1])  \n"
         "move.l  %%d3,(%[gpio])  \n"
         "move.l  %%d2,(%[gpio])  \n"
-        "lsl.l   #1,%[data]      \n"
 
-        "tst.b   %[data]         \n"
-        "bpl.s   1f              \n"
+        "lsl.l   #1,%[data]      \n"
+        "bcc.s   1f              \n"
         "move.l  %%d1,(%[gpi1])  \n"
         ".word   0x51fa          \n"
     "1:                          \n"
@@ -268,8 +260,8 @@ static inline void _write_unrolled(unsigned data)
         "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
         "move.w  %%d4,%%sr       \n" /* reenable interrupts */
         : /* outputs */
-        [data]"+d"(data)
         : /* inputs */
+        [data]"d"(data << 24),
         [gpio]"a"(&GPIO_OUT),
         [gpi1]"a"(&GPIO1_OUT)
         : /* clobbers */
