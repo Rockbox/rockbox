@@ -654,6 +654,7 @@ static void audio_update_trackinfo(void)
     cur_ti->id3.offset = 0;
     ci.id3 = (struct mp3entry *)&cur_ti->id3;
     ci.curpos = 0;
+    ci.seek_time = 0;
     cur_ti->start_pos = 0;
     ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
 }
