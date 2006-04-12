@@ -451,7 +451,7 @@ static bool filebuf_is_lowdata(void)
 
 static bool have_tracks(void)
 {
-    return track_ridx != track_widx || tracks[track_ridx].filesize;
+    return track_ridx != track_widx || cur_ti->filesize;
 }
 
 static bool have_free_tracks(void)
@@ -687,7 +687,7 @@ static void audio_rebuffer(void)
     queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
     /* Fill the buffer */
     last_peek_offset = -1;
-    tracks[track_ridx].filesize = 0;
+    cur_ti->filesize = 0;
     audio_fill_file_buffer(false, true, 0);
 }
 
@@ -699,7 +699,7 @@ static void audio_check_new_track(long direction)
 
     audio_update_trackinfo();
 
-    if (tracks[track_ridx].filesize == 0)
+    if (cur_ti->filesize == 0)
         audio_rebuffer();
     else
     {
@@ -1099,10 +1099,10 @@ static void audio_read_file(void)
 
 static void codec_discard_codec_callback(void)
 {
-    if (tracks[track_ridx].has_codec) {
-        tracks[track_ridx].has_codec = false;
-        filebufused -= tracks[track_ridx].codecsize;
-        buf_ridx += tracks[track_ridx].codecsize;
+    if (cur_ti->has_codec) {
+        cur_ti->has_codec = false;
+        filebufused -= cur_ti->codecsize;
+        buf_ridx += cur_ti->codecsize;
         if (buf_ridx >= filebuflen)
             buf_ridx -= filebuflen;
     }
@@ -1951,7 +1951,7 @@ void codec_thread(void)
 
             case Q_CODEC_LOAD:
                 logf("Codec start");
-                if (!tracks[track_ridx].has_codec) {
+                if (!cur_ti->has_codec) {
                     logf("Codec slot is empty!");
                     /* Wait for the pcm buffer to go empty */
                     while (pcm_is_playing())
@@ -1963,13 +1963,12 @@ void codec_thread(void)
                 }
 
                 ci.stop_codec = false;
-                wrap = (size_t)&filebuf[filebuflen] -
-                    (size_t)tracks[track_ridx].codecbuf;
+                wrap = (size_t)&filebuf[filebuflen] - (size_t)cur_ti->codecbuf;
                 audio_codec_loaded = true;
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
-                status = codec_load_ram(tracks[track_ridx].codecbuf,
-                        tracks[track_ridx].codecsize, &filebuf[0], wrap, &ci);
+                status = codec_load_ram(cur_ti->codecbuf, cur_ti->codecsize,
+                        &filebuf[0], wrap, &ci);
                 mutex_unlock(&mutex_codecthread);
                 break ;
 
