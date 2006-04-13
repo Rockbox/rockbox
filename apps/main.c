@@ -157,6 +157,7 @@ void init_tagcache(void)
         ret = tagcache_get_commit_step();
         if (ret > 0)
         {
+            lcd_setfont(FONT_SYSFIXED);
             snprintf(buf, sizeof buf, "%s [%d/%d]",
                      str(LANG_TAGCACHE_INIT), ret, TAG_COUNT);
             
