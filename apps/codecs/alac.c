@@ -136,7 +136,7 @@ enum codec_status codec_start(struct codec_api* api)
     rb->yield();
     samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, rb->yield);
 
-    /* Advance codec buffer - unless we did a read */
+    /* Advance codec buffer n bytes */
     ci->advance_buffer(n);
 
     /* Output the audio */
