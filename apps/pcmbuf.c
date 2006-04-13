@@ -109,26 +109,17 @@ static void pcmbuf_flush_audio(void);
 static void pcmbuf_under_watermark(void);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)
-static bool boost_mode;
-
 void pcmbuf_boost(bool state)
 {
     static bool boost_state = false;
 
-    if (crossfade_init || crossfade_active || boost_mode)
+    if (crossfade_init || crossfade_active)
         return;
 
     if (state != boost_state) {
         cpu_boost(state);
         boost_state = state;
     }
-}
-
-void pcmbuf_set_boost_mode(bool state)
-{
-    if (state)
-        pcmbuf_boost(true);
-    boost_mode = state;
 }
 #endif
 
@@ -314,7 +305,6 @@ void pcmbuf_play_stop(void)
     crossfade_init = false;
     crossfade_active = false;
 
-    pcmbuf_set_boost_mode(false);
     pcmbuf_boost(false);
 
 }

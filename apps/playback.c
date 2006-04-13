@@ -664,6 +664,8 @@ static bool buffer_wind_forward(bool require_codec,
     /* Then collect all data from tracks in between them */
     amount += buffer_count_tracks(old_track_ridx, new_track_ridx);
 
+    logf("bwf:%ldB",amount);
+
     /* Wind the buffer to the beginning of the target track or its codec */
     buf_ridx += amount;
     filebufused -= amount;
@@ -684,7 +686,7 @@ static bool buffer_wind_backward(bool require_codec,
     /* Start with the previously playing track's data and our data */
     size_t amount = ci.curpos;
 
-    /* If we're not just resetting the current_track */
+    /* If we're not just resetting the current track */
     if (new_track_ridx != old_track_ridx)
     {
         /* Need to wind to before the old track's codec and our filesize */
@@ -716,6 +718,8 @@ static bool buffer_wind_backward(bool require_codec,
     /* Do we have space to make this skip? */
     if (amount > buf_back)
         return false;
+
+    logf("bwb:%ldB",amount);
 
     /* Check and handle buffer wrapping */
     if (amount > buf_ridx)
@@ -795,8 +799,9 @@ static void audio_check_new_track(bool require_codec)
     else if (track_ridx < 0)
         track_ridx += MAX_TRACK;
 
-    /* Move to the new track */
+    /* Save the old track */
     prev_ti = cur_ti;
+    /* Move to the new track */
     cur_ti = &tracks[track_ridx];
 
     track_changed = manual_skip;
@@ -805,8 +810,7 @@ static void audio_check_new_track(bool require_codec)
     if (new_track >= track_count || new_track <= track_count - MAX_TRACK)
         audio_rebuffer();
     /* If the target track is clearly not in memory */
-    else if (tracks[track_ridx].filesize == 0 ||
-            !tracks[track_ridx].taginfo_ready)
+    else if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
         audio_rebuffer();
     /* The track may be in memory, see if it really is */
     else if (new_track > 0)
@@ -844,7 +848,7 @@ static void audio_check_new_track(bool require_codec)
         }
         else
         {
-            tracks[track_ridx].taginfo_ready = false;
+            cur_ti->taginfo_ready = false;
             audio_rebuffer();
         }
     }
@@ -1213,6 +1217,16 @@ static void codec_discard_codec_callback(void)
         if (buf_ridx >= filebuflen)
             buf_ridx -= filebuflen;
     }
+    /* Check if a buffer desync has happened, and log it */
+    if (buf_ridx != cur_ti->buf_idx)
+    {
+        logf("Buf off:%d/%d", buf_ridx, cur_ti->buf_idx);
+        buf_ridx = cur_ti->buf_idx;
+        filebufused = track_widx;
+        if (track_widx < track_ridx)
+            filebufused += filebuflen;
+        filebufused -= track_ridx;
+    }
 }
 
 static bool loadcodec(bool start_play)
@@ -1283,10 +1297,11 @@ static bool loadcodec(bool start_play)
     if (start_play)
     {
         /* Load the codec directly from disk and save some memory. */
-        cur_ti = &tracks[track_widx];
+        track_ridx = track_widx;
+        cur_ti = &tracks[track_ridx];
         ci.filesize = cur_ti->filesize;
-        ci.id3 = (struct mp3entry *)&cur_ti->id3;
-        ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
+        ci.id3 = &cur_ti->id3;
+        ci.taginfo_ready = &cur_ti->taginfo_ready;
         ci.curpos = 0;
         playing = true;
         logf("Starting codec");
@@ -1535,7 +1550,8 @@ static bool audio_load_track(int offset, bool start_play)
 
     }
     
-    logf("arf:%s", trackname);
+    logf("alt:%s", trackname);
+    tracks[track_widx].buf_idx = buf_widx;
     audio_read_file();
 
     return true;
@@ -1599,7 +1615,6 @@ static void audio_stop_playback(void)
     filling = false;
     paused = false;
     stop_codec_flush();
-    pcmbuf_set_boost_mode(false);
     if (current_fd >= 0) {
         close(current_fd);
         current_fd = -1;
@@ -1704,11 +1719,10 @@ static void initialize_buffer_fill(bool clear_tracks, bool short_fill)
     if (filling)
         return ;
 
+    logf("Starting buffer fill");
+
     if (clear_tracks)
         audio_clear_track_entries(false);
-
-    logf("Starting buffer fill");
-    pcmbuf_set_boost_mode(true);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
@@ -1736,7 +1750,6 @@ static void audio_fill_file_buffer(
         generate_postbuffer_events();
         filling = false;
         filling_short = false;
-        pcmbuf_set_boost_mode(false);
 
 #ifndef SIMULATOR
         if (playing)
@@ -2080,7 +2093,8 @@ static void reset_buffer(void)
     iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
 #endif
     dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
-    dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+    dram_buf[1] =
+        (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
 
 }
 

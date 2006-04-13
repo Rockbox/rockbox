@@ -40,6 +40,7 @@ struct track_info {
     size_t codecsize;          /* Codec length in bytes */
     bool has_codec;            /* Does this track have a codec on the buffer */
 
+    size_t buf_idx;            /* Pointer to the track's buffer */
     size_t filerem;            /* Remaining bytes of file NOT in buffer */
     size_t filesize;           /* File total length */
     size_t start_pos;          /* Position to first bytes of file in buffer */
