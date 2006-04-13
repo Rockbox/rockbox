@@ -18,6 +18,12 @@
  ****************************************************************************/
 
 /* TODO: Check for a possibly broken codepath on a rapid skip, stop event */
+/* TODO: Can use the track changed callback to detect end of track and seek
+ * in the previous track until this happens */
+/* Design: we have prev_ti already, have a conditional for what type of seek
+ * to do on a seek request, if it is a previous track seek, skip previous,
+ * and in the request_next_track callback set the offset up the same way that
+ * starting from an offset works. */
 
 #include <stdio.h>
 #include <string.h>
@@ -734,16 +740,16 @@ static bool buffer_wind_backward(bool require_codec,
     return true;
 }
 
-static void audio_update_trackinfo(int cur_idx)
+static void audio_update_trackinfo(void)
 {
     logf("sk2:%s",playlist_peek(0));
-    ci.filesize = tracks[cur_idx].filesize;
-    tracks[cur_idx].id3.elapsed = 0;
-    tracks[cur_idx].id3.offset = 0;
-    ci.id3 = &tracks[cur_idx].id3;
+    ci.filesize = cur_ti->filesize;
+    cur_ti->id3.elapsed = 0;
+    cur_ti->id3.offset = 0;
+    ci.id3 = &cur_ti->id3;
     ci.curpos = 0;
     ci.seek_time = 0;
-    ci.taginfo_ready = &tracks[cur_idx].taginfo_ready;
+    ci.taginfo_ready = &cur_ti->taginfo_ready;
 }
 
 static void audio_rebuffer(void)
@@ -853,7 +859,7 @@ static void audio_check_new_track(bool require_codec)
         }
     }
 
-    audio_update_trackinfo(track_ridx);
+    audio_update_trackinfo();
 buffer_done:
     new_track = 0;
     mutex_unlock(&mutex_interthread);
@@ -1222,12 +1228,19 @@ static void codec_discard_codec_callback(void)
     /* Check if a buffer desync has happened, and log it */
     if (buf_ridx != cur_ti->buf_idx)
     {
-        logf("Buf off:%d/%d", buf_ridx, cur_ti->buf_idx);
-        buf_ridx = cur_ti->buf_idx;
+        int offset = cur_ti->buf_idx - buf_ridx;
+        size_t new_used = filebufused - offset;
+        logf("Buf off :%d=%d-%d", offset, cur_ti->buf_idx, buf_ridx);
+        buf_ridx += offset;
+        /* Reset the buffer used amount based on the read and write pointers */
         filebufused = track_widx;
         if (track_widx < track_ridx)
             filebufused += filebuflen;
         filebufused -= track_ridx;
+        /* If that was not the same amount as the track was off, log it */
+        if (new_used != filebufused) {
+            logf("Used off:%d",filebufused - new_used);
+        }
     }
 }
 
@@ -1799,8 +1812,10 @@ static bool load_next_track(bool require_codec) {
         manual_skip = true;
     
     mutex_lock(&mutex_interthread);
+    cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, (void *)require_codec);
     mutex_lock(&mutex_interthread);
+    cpu_boost(false);
     if (ci.stop_codec)
         return false;
     mutex_unlock(&mutex_interthread);
