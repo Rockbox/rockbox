@@ -58,7 +58,7 @@ int creat(const char *pathname, mode_t mode)
     return open(pathname, O_WRONLY|O_CREAT|O_TRUNC);
 }
 
-int open(const char* pathname, int flags)
+static int open_internal(const char* pathname, int flags, bool use_cache)
 {
     DIR* dir;
     struct dirent* entry;
@@ -67,7 +67,10 @@ int open(const char* pathname, int flags)
     char* name;
     struct filedesc* file = NULL;
     int rc;
-
+#ifndef HAVE_DIRCACHE
+    (void)use_cache;
+#endif
+    
     LDEBUGF("open(\"%s\",%d)\n",pathname,flags);
 
     if ( pathname[0] != '/' ) {
@@ -100,7 +103,7 @@ int open(const char* pathname, int flags)
     file->busy = true;
 
 #ifdef HAVE_DIRCACHE
-    if (dircache_is_enabled() && !file->write)
+    if (dircache_is_enabled() && !file->write && use_cache)
     {
         const struct dircache_entry *ce;
         
@@ -221,6 +224,12 @@ int open(const char* pathname, int flags)
     return fd;
 }
 
+int open(const char* pathname, int flags)
+{
+    /* By default, use the dircache if available. */
+    return open_internal(pathname, flags, true);
+}
+
 int close(int fd)
 {
     struct filedesc* file = &openfiles[fd];
@@ -288,7 +297,8 @@ int remove(const char* name)
 {
     int rc;
     struct filedesc* file;
-    int fd = open(name, O_WRONLY);
+    /* Can't use dircache now, because we need to access the fat structures. */
+    int fd = open_internal(name, O_WRONLY, false);
     if ( fd < 0 )
         return fd * 10 - 1;
 
@@ -331,7 +341,7 @@ int rename(const char* path, const char* newpath)
     }
     close(fd);
 
-    fd = open(path, O_RDONLY);
+    fd = open_internal(path, O_RDONLY, false);
     if ( fd < 0 ) {
         errno = EIO;
         return fd * 10 - 2;
