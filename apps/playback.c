@@ -231,7 +231,7 @@ static void mp3_set_elapsed(struct mp3entry* id3);
 int mp3_get_file_pos(void);
 
 static void audio_clear_track_entries(bool clear_unbuffered);
-static void initialize_buffer_fill(bool start_play, bool short_fill);
+static void initialize_buffer_fill(bool clear_tracks, bool short_fill);
 static void audio_fill_file_buffer(
         bool start_play, bool short_fill, size_t offset);
 
@@ -779,7 +779,7 @@ static void rebuffer_and_seek(size_t newpos)
     track_widx = track_ridx;
 
     last_peek_offset = 0;
-    initialize_buffer_fill(false, true);
+    initialize_buffer_fill(true, true);
 
     if (newpos > AUDIO_REBUFFER_GUESS_SIZE)
         cur_ti->start_pos = newpos - AUDIO_REBUFFER_GUESS_SIZE;
@@ -1505,7 +1505,26 @@ static void audio_stop_playback(bool resume)
 
 static void audio_play_start(size_t offset)
 {
-    long parameter;
+#ifdef CONFIG_TUNER
+    /* check if radio is playing */
+    if (get_radio_status() != FMRADIO_OFF)
+        radio_stop();
+#endif
+
+    /* Wait for any previously playing audio to flush */
+    if (audio_codec_loaded)
+    {
+        playing = false;
+        queue_empty(&codec_queue);
+        stop_codec_flush();
+    }
+
+    track_changed = true;
+    playlist_end = false;
+
+    playing = true;
+    ci.reload_codec = false;
+    ci.seek_time = 0;
 
     if (current_fd >= 0) {
         close(current_fd);
@@ -1517,14 +1536,12 @@ static void audio_play_start(size_t offset)
     buf_ridx = buf_widx = 0;
     filebufused = 0;
 
-    memset(&tracks[0], 0, sizeof(struct track_info));
+    /* Mark all entries null. */
+    memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
     
     last_peek_offset = -1;
 
-    if (offset == 0) parameter = -1;
-    else parameter = offset;
-
-    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, (void *)parameter);
+    audio_fill_file_buffer(true, true, offset);
 }
 
 /* Send callback events to notify about new tracks. */
@@ -1563,7 +1580,7 @@ static void generate_postbuffer_events(void)
     }
 }
 
-static void initialize_buffer_fill(bool start_play, bool short_fill)
+static void initialize_buffer_fill(bool clear_tracks, bool short_fill)
 {
     if (short_fill) {
         filling_short = true;
@@ -1581,7 +1598,8 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
     if (filling)
         return ;
 
-    audio_clear_track_entries(start_play);
+    if (clear_tracks)
+        audio_clear_track_entries(false);
 
     logf("Starting buffer fill");
     pcmbuf_set_boost_mode(true);
@@ -1595,7 +1613,7 @@ static void initialize_buffer_fill(bool start_play, bool short_fill)
 static void audio_fill_file_buffer(
         bool start_play, bool short_fill, size_t offset)
 {
-    initialize_buffer_fill(start_play, short_fill);
+    initialize_buffer_fill(!start_play, short_fill);
 
     /* If we have a partially buffered track, continue loading,
      * otherwise load a new track */
@@ -1773,30 +1791,16 @@ static void initiate_dir_change(long direction)
 void audio_thread(void)
 {
     struct event ev;
-    int last_tick = 0;
-    bool play_pending = false;
 
     /* At first initialize audio system in background. */
     playback_init();
 
     while (1) {
-        if (play_pending)
+        if (filling)
         {
             queue_wait_w_tmo(&audio_queue, &ev, 0);
             if (ev.id == SYS_TIMEOUT)
-            {
-                ev.id = Q_AUDIO_PLAY;
-                ev.data = 0;
-            }
-        }
-        else if (filling)
-        {
-            queue_wait_w_tmo(&audio_queue, &ev, 0);
-            if (ev.id == SYS_TIMEOUT)
-            {
                 ev.id = Q_AUDIO_FILL_BUFFER;
-                ev.data = (void *)0;
-            }
         }
         else
             queue_wait_w_tmo(&audio_queue, &ev, HZ);
@@ -1804,48 +1808,15 @@ void audio_thread(void)
 
         switch (ev.id) {
             case Q_AUDIO_FILL_BUFFER:
-                {
-                    bool start_play = (bool)ev.data;
-                    if (!filling && !start_play)
-                        if (ci.stop_codec || ci.reload_codec || playlist_end)
-                            break;
-                    audio_fill_file_buffer(
-                            start_play, start_play, abs((long)ev.data));
-                    break;
-                }
+                if (!filling)
+                    if (!playing || playlist_end || ci.stop_codec)
+                        break;
+                audio_fill_file_buffer(false, false, 0);
+                break;
+
             case Q_AUDIO_PLAY:
-                /* Don't start playing immediately if user is skipping tracks
-                 * fast to prevent UI lag. */
-                last_peek_offset = 0;
-                track_changed = true;
-                playlist_end = false;
-                if (current_tick - last_tick < HZ/2)
-                {
-                    play_pending = true;
-                    break ;
-                }
-                play_pending = false;
-                last_tick = current_tick;
-
-#ifdef CONFIG_TUNER
-                /* check if radio is playing */
-                if (get_radio_status() != FMRADIO_OFF) {
-                    radio_stop();
-                }
-#endif
-
                 logf("starting...");
-
-                playing = true;
-                ci.stop_codec = true;
-                ci.reload_codec = false;
-                ci.seek_time = 0;
-
-                while (audio_codec_loaded)
-                    yield();
-
                 audio_play_start((size_t)ev.data);
-
                 break ;
 
             case Q_AUDIO_STOP:
@@ -1861,7 +1832,6 @@ void audio_thread(void)
 
             case Q_AUDIO_SKIP:
                 logf("audio_skip");
-                last_tick = current_tick;
                 playlist_end = false;
                 initiate_track_change((long)ev.data);
                 break;
