@@ -1292,9 +1292,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Lets use the default font */
     rb->lcd_setfont(FONT_SYSFIXED);
+
 #ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(LCD_WHITE);
 #endif
+
     load_all_levels();
 
     if (num_levels == 0) {
