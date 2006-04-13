@@ -730,15 +730,16 @@ static bool buffer_wind_backward(bool require_codec,
     return true;
 }
 
-static void audio_update_trackinfo(void)
+static void audio_update_trackinfo(int cur_idx)
 {
-    ci.filesize = cur_ti->filesize;
-    cur_ti->id3.elapsed = 0;
-    cur_ti->id3.offset = 0;
-    ci.id3 = (struct mp3entry *)&cur_ti->id3;
+    logf("sk2:%s",playlist_peek(0));
+    ci.filesize = tracks[cur_idx].filesize;
+    tracks[cur_idx].id3.elapsed = 0;
+    tracks[cur_idx].id3.offset = 0;
+    ci.id3 = &tracks[cur_idx].id3;
     ci.curpos = 0;
     ci.seek_time = 0;
-    ci.taginfo_ready = (bool *)&cur_ti->taginfo_ready;
+    ci.taginfo_ready = &tracks[cur_idx].taginfo_ready;
 }
 
 static void audio_rebuffer(void)
@@ -848,7 +849,7 @@ static void audio_check_new_track(bool require_codec)
         }
     }
 
-    audio_update_trackinfo();
+    audio_update_trackinfo(track_ridx);
 buffer_done:
     new_track = 0;
     mutex_unlock(&mutex_interthread);
@@ -1444,7 +1445,6 @@ static bool audio_load_track(int offset, bool start_play)
     tracks[track_widx].filerem = size;
     tracks[track_widx].filesize = size;
     tracks[track_widx].available = 0;
-    tracks[track_widx].playlist_offset = last_peek_offset;
 
     /* Set default values */
     if (start_play) {
@@ -1465,7 +1465,7 @@ static bool audio_load_track(int offset, bool start_play)
                 track_changed = true;
             }
         } else {
-            logf("Metadata error:%s!",trackname);
+            logf("mde:%s!",trackname);
             /* Set filesize to zero to indicate no file was loaded. */
             tracks[track_widx].filesize = 0;
             tracks[track_widx].filerem = 0;
@@ -1591,14 +1591,15 @@ static void stop_codec_flush(void)
     pcmbuf_pause(paused);
 }
 
-static void audio_stop_playback(bool resume)
+static void audio_stop_playback(void)
 {
     if (playing)
-        playlist_update_resume_info(resume ? audio_current_track() : NULL);
+        playlist_update_resume_info(audio_current_track());
     playing = false;
     filling = false;
     paused = false;
     stop_codec_flush();
+    pcmbuf_set_boost_mode(false);
     if (current_fd >= 0) {
         close(current_fd);
         current_fd = -1;
@@ -1900,7 +1901,7 @@ void audio_thread(void)
 
             case Q_AUDIO_STOP:
                 logf("audio_stop");
-                audio_stop_playback(true);
+                audio_stop_playback();
                 break ;
 
             case Q_AUDIO_PAUSE:
@@ -1961,7 +1962,7 @@ void audio_thread(void)
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 logf("USB: Audio core");
-                audio_stop_playback(true);
+                audio_stop_playback();
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&audio_queue);
                 break ;
@@ -2097,7 +2098,7 @@ void voice_codec_thread(void)
         switch (ev.id) {
             case Q_CODEC_LOAD_DISK:
                 logf("Loading voice codec");
-                audio_stop_playback(true);
+                audio_stop_playback();
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_VOICE;
                 dsp_configure(DSP_RESET, 0);
@@ -2111,7 +2112,7 @@ void voice_codec_thread(void)
                 status = codec_load_file((char *)ev.data, &ci_voice);
 
                 logf("Voice codec finished");
-                audio_stop_playback(true);
+                audio_stop_playback();
                 mutex_unlock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
                 voice_codec_loaded = false;
@@ -2467,7 +2468,7 @@ void audio_set_crossfade(int enable)
         return ;
 
     /* Playback has to be stopped before changing the buffer size. */
-    audio_stop_playback(true);
+    audio_stop_playback();
 
     /* Re-initialize audio system. */
     if (was_playing)

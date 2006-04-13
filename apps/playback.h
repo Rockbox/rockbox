@@ -46,7 +46,6 @@ struct track_info {
     volatile size_t available; /* Available bytes to read from buffer */
 
     bool taginfo_ready;        /* Is metadata read */
-    int playlist_offset;       /* File location in playlist */
 
     bool event_sent;           /* Was this track's buffered event sent */
 };
