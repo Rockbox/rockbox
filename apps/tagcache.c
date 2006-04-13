@@ -802,6 +802,26 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
         return false;
     }
     
+#ifdef HAVE_TC_RAMCACHE
+    if (tcs->ramsearch)
+    {
+        if (tcs->type == tag_filename)
+        {
+            dircache_copy_path((struct dircache_entry *)seek,
+                                buf, size);
+        }
+        else
+        {
+            struct tagfile_entry *ep;
+            
+            ep = (struct tagfile_entry *)&hdr->tags[tcs->type][seek];
+            strncpy(buf, ep->tag_data, size-1);
+        }
+        
+        return true;
+    }
+#endif
+        
     if (tcs->idxfd[tcs->type] < 0)
     {
         char fn[MAX_PATH];
