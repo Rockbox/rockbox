@@ -418,15 +418,14 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
    x -= SHORT(patch->leftoffset);
 
 //   // CPhipps - auto-no-stretch if not high-res
-//   if (flags & VPT_STRETCH)
-//     if ((SCREENWIDTH==320) && (SCREENHEIGHT==200))
-//         flags &= ~VPT_STRETCH;
+   if (flags & VPT_STRETCH)
+     if ((SCREENWIDTH==320) && (SCREENHEIGHT==200))
+         flags &= ~VPT_STRETCH;
 
    // CPhipps - null translation pointer => no translation
    if (!trans)
       flags &= ~VPT_TRANS;
 
-#ifdef RANGECHECK
    if (x<0
          ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
          || y<0
@@ -434,7 +433,6 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
       // killough 1/19/98: improved error message:
       I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB Bad V_DrawMemPatch (flags=%u)",
          x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
-#endif
 
    if (!(flags & VPT_STRETCH)) {
       unsigned int             col;
