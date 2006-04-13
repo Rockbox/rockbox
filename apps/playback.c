@@ -1134,6 +1134,7 @@ void strip_id3v1_tag(void)
                 buf_widx += filebuflen;
             buf_widx -= 128;
             tracks[track_widx].available -= 128;
+            tracks[track_widx].filesize -= 128;
             filebufused -= 128;
         }
     }
@@ -1191,9 +1192,10 @@ static void audio_read_file(void)
 
     if (tracks[track_widx].filerem == 0) {
         logf("Finished buf:%dB", tracks[track_widx].filesize);
-        strip_id3v1_tag();
         close(current_fd);
         current_fd = -1;
+        strip_id3v1_tag();
+
         if (++track_widx >= MAX_TRACK)
             track_widx = 0;
 
