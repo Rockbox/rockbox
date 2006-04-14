@@ -645,14 +645,16 @@ size_t buffer_count_tracks(int from_track, int to_track) {
 
     from_track++;
 
-    while (from_track < to_track || need_wrap)
+    while (1)
     {
-        amount += tracks[from_track].codecsize + tracks[from_track].filesize;
         if (++from_track >= MAX_TRACK)
         {
             from_track -= MAX_TRACK;
             need_wrap = false;
         }
+        if (from_track < to_track || need_wrap)
+            break;
+        amount += tracks[from_track].codecsize + tracks[from_track].filesize;
     }
     return amount;
 }
@@ -818,7 +820,10 @@ static void audio_check_new_track(bool require_codec)
 
     /* If it is not safe to even skip this many track entries */
     if (new_track >= track_count || new_track <= track_count - MAX_TRACK)
+    {
+        cur_ti->taginfo_ready = false;
         audio_rebuffer();
+    }
     /* If the target track is clearly not in memory */
     else if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
         audio_rebuffer();
@@ -2190,7 +2195,7 @@ struct mp3entry* audio_current_track(void)
     else if (cur_idx < 0)
         cur_idx += MAX_TRACK;
 
-    if (have_tracks()  && tracks[cur_idx].taginfo_ready)
+    if (tracks[cur_idx].taginfo_ready)
         return &tracks[cur_idx].id3;
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
