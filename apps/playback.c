@@ -789,11 +789,17 @@ static void audio_check_new_track(bool require_codec)
     if (!playlist_check(new_track))
     {
         if (new_track >= 0)
+        {
             queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
+            return;
+        }
         /* Find the beginning backward if the user over-skips it */
         while (!playlist_check(++new_track))
             if (new_track >= 0)
+            {
                 queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
+                return;
+            }
     }
     /* Update the playlist */
     last_peek_offset -= new_track;
