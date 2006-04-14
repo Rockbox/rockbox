@@ -677,6 +677,9 @@ static bool buffer_wind_forward(bool require_codec,
 
     logf("bwf:%ldB",amount);
 
+    if (amount > filebufused)
+        return false;
+
     /* Wind the buffer to the beginning of the target track or its codec */
     buf_ridx += amount;
     filebufused -= amount;
@@ -959,6 +962,7 @@ void codec_advance_buffer_callback(size_t amount)
     codec_set_offset_callback(ci.curpos);
 }
 
+/* Unused as of today 2006, 04/14, will be removed for 3.0 */
 void codec_advance_buffer_loc_callback(void *ptr)
 {
     size_t amount;
@@ -1174,7 +1178,7 @@ static void audio_read_file(void)
 
     /* If we're called and no file is open, this is an error */
     if (current_fd < 0) {
-        logf("audio_read_file fd < 0");
+        logf("Zero fd in arf");
         /* Stop this buffer cycle immediately */
         fill_bytesleft = 0;
         /* Give some hope of miraculous recovery by forcing a track reload */
@@ -1189,6 +1193,7 @@ static void audio_read_file(void)
         /* copy_n is the largest chunk that is safe to read */
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
         copy_n = MIN(copy_n, fill_bytesleft);
+
         /* rc is the actual amount read */
         rc = read(current_fd, &filebuf[buf_widx], copy_n);
 
