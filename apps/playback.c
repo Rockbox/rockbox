@@ -653,7 +653,7 @@ size_t buffer_count_tracks(int from_track, int to_track) {
             from_track -= MAX_TRACK;
             need_wrap = false;
         }
-        if (from_track < to_track || need_wrap)
+        if (from_track >= to_track && !need_wrap)
             break;
         amount += tracks[from_track].codecsize + tracks[from_track].filesize;
     }
