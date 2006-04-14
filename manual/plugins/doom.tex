@@ -19,11 +19,54 @@ To play addon wads create the \fname{addons} directory within doom.
 Place wad files in this directory. Currently doom only supports 10 addons 
 in the directory.
 
-\subsubsection{Playing the game}
-After installation of the \fname{wad} files is complete you can start the
-game.
-\fixme{more description is needed}
+A free alternative for Doom 2 is FreeDoom (\url{http://freedoom.sourceforge.net}).
+This can be used in place of \fname{doom2.wad}, or it may be used as an addon in 
+Doom, by placing it in the \fname{addons} directory.
 
+\subsubsection{Menus}
+\begin{description}
+  \item[Rockdoom Menu: ] The Rockdoom menu is shown when Doom is first launched.  
+This is the only time it can be accessed (before starting the game).  To re-adjust 
+Rockdoom options, you will need to quit your current game and restart the plugin.
+  \item[Main Menu: ]
+  The Doom plugin has a main menu, which is brought up before a game is started. It 
+  has the following entries:
+  
+  \emph{Game } Select which (official) wad to launch\\
+  \emph{Addon } Select which unofficial addon wad to launch (From /games/doom/addons directory)\\
+  \emph{Demos } Select which demo file to play on game start\\
+  \emph{Options } Configure low-level Doom options\\
+  \emph{Play Game } Launch the wad/addon/Demo chosen%\\
+  
+  \item[Options Menu: ]This menu has the following options:
+  
+  \emph{Sound } Enable or Disable sound in Doom\\
+  \emph{Set Keys }  Change the game key configuration\\
+  \emph{Time Demo } Run a timed demo, to test game speed on a player (Only runs on Doom Shareware)\\
+  \emph{Player Bobbing } Enable or Disable player up/Down movement\\
+  \emph{Translucency } Enable or Disable sprite translucency (Fireballs, Plasma...)\\
+  \emph{Fake Contrast} Enable or Disable modified game lighting%\\
+
+  \item[InGame Main Menu: ]This menu can only be accessed from within a running game, and is displayed by  \opt{h1xx,h300}{pressing \ButtonOff}\opt{IPOD_4G_PAD}{flipping your hold switch a couple of times}
+
+  \emph{New Game } Start a new game\\
+  \emph{Options } In game options\\
+  \emph{Load Game } Load a saved game\\
+  \emph{Save Game } Save the current game\\
+  \emph{Quit } Quit the game%\\
+
+  \item[InGame Options Menu: ]This menu has the folloing options:
+  
+  \emph{End Game } Ends the current game\\
+  \emph{Messages }  Enable or Disable in game messages\\
+  \emph{Screen Size } Shrink or Enlarge the displayed portion of the game\\
+  \emph{Gamma } Change the brightness (Gamma) of the game\\
+  \emph{Sound Volume } Change the sound, music and system volume%\\
+  \note{In game music is not currently supported}
+
+\end{description}
+
+\subsubsection{Keys}
 \begin{table}
 \begin{btnmap}{}{}
 \opt{h1xx,h300}{\ButtonUp}
@@ -55,3 +98,8 @@ game.
 & Change Weapon \\
 \end{btnmap}
 \end{table}
+
+\subsubsection{Playing the game}
+After installation of the \fname{wad} files is complete you can start the
+game.
+\fixme{more description is needed}
