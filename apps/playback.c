@@ -646,8 +646,6 @@ size_t buffer_count_tracks(int from_track, int to_track) {
     size_t amount = 0;
     bool need_wrap = to_track < from_track;
 
-    from_track++;
-
     while (1)
     {
         if (++from_track >= MAX_TRACK)
