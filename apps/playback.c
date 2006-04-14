@@ -119,6 +119,7 @@ enum {
     Q_AUDIO_FILL_BUFFER,
 
     Q_CODEC_REQUEST_COMPLETE,
+    Q_CODEC_REQUEST_FAILED,
 
     Q_CODEC_LOAD,
     Q_CODEC_LOAD_DISK,
@@ -788,17 +789,11 @@ static void audio_check_new_track(bool require_codec)
     if (!playlist_check(new_track))
     {
         if (new_track >= 0)
-        {
-            ci.stop_codec = true;
-            queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
-        }
+            queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
         /* Find the beginning backward if the user over-skips it */
         while (!playlist_check(++new_track))
             if (new_track >= 0)
-            {
-                ci.stop_codec = true;
-                queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
-            }
+                queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
     }
     /* Update the playlist */
     last_peek_offset -= new_track;
@@ -885,7 +880,7 @@ static void rebuffer_and_seek(size_t newpos)
     fd = open(trackname, O_RDONLY);
     if (fd < 0) {
         logf("Open failed!");
-        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
+        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
         return;
     }
     if (current_fd >= 0)
@@ -940,7 +935,17 @@ void codec_advance_buffer_callback(size_t amount)
         queue_post(&audio_queue,
                 Q_AUDIO_REBUFFER_SEEK, (void *)(ci.curpos + amount));
         queue_wait(&codec_callback_queue, &ev);
-        return ;
+        switch (ev.id)
+        {
+            case Q_CODEC_REQUEST_FAILED:
+                ci.stop_codec = true;
+            case Q_CODEC_REQUEST_COMPLETE:
+                return;
+            default:
+                logf("Bad event on ccq");
+                ci.stop_codec = true;
+                return;
+        }
     }
 
     advance_buffer_counters(amount);
@@ -1011,7 +1016,17 @@ bool codec_seek_buffer_callback(size_t newpos)
         struct event ev;
         queue_post(&audio_queue, Q_AUDIO_REBUFFER_SEEK, (void *)newpos);
         queue_wait(&codec_callback_queue, &ev);
-        return true;
+        switch (ev.id)
+        {
+            case Q_CODEC_REQUEST_COMPLETE:
+                return true;
+            case Q_CODEC_REQUEST_FAILED:
+                ci.stop_codec = true;
+                return false;
+            default:
+                logf("Bad event on ccq");
+                return false;
+        }
     }
 
     /* Seeking inside buffer space. */
@@ -1817,12 +1832,19 @@ static bool load_next_track(bool require_codec) {
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, (void *)require_codec);
     queue_wait(&codec_callback_queue, &ev);
     cpu_boost(false);
-    if (ci.stop_codec)
-        return false;
-    
-    track_skip_done(manual_skip);
-    
-    return true;
+    switch (ev.id)
+    {
+        case Q_CODEC_REQUEST_COMPLETE:
+            track_skip_done(manual_skip);
+            return true;
+        case Q_CODEC_REQUEST_FAILED:
+            ci.stop_codec = true;
+            return false;
+        default:
+            logf("Bad event on ccq");
+            ci.stop_codec = true;
+            return false;
+    }
 }
 
 static bool codec_request_next_track_callback(void)
@@ -2640,7 +2662,8 @@ void audio_preinit(void)
     queue_init(&audio_queue);
     queue_init(&codec_queue);
     queue_init(&voice_codec_queue);
-    queue_init(&codec_callback_queue);
+    /* clear, not init to create a private queue */
+    queue_clear(&codec_callback_queue);
 
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
