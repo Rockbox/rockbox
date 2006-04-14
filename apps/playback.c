@@ -118,6 +118,8 @@ enum {
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 
+    Q_CODEC_REQUEST_COMPLETE,
+
     Q_CODEC_LOAD,
     Q_CODEC_LOAD_DISK,
 };
@@ -154,7 +156,7 @@ IBSS_ATTR;
 static const char voice_codec_thread_name[] = "voice codec";
 
 static struct mutex mutex_codecthread;
-static struct mutex mutex_interthread;
+static struct event_queue codec_callback_queue;
 
 static struct mp3entry id3_voice;
 
@@ -788,14 +790,14 @@ static void audio_check_new_track(bool require_codec)
         if (new_track >= 0)
         {
             ci.stop_codec = true;
-            goto buffer_done;
+            queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
         }
         /* Find the beginning backward if the user over-skips it */
         while (!playlist_check(++new_track))
             if (new_track >= 0)
             {
                 ci.stop_codec = true;
-                goto buffer_done;
+                queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
             }
     }
     /* Update the playlist */
@@ -869,8 +871,7 @@ static void audio_check_new_track(bool require_codec)
     }
 
     audio_update_trackinfo();
-buffer_done:
-    mutex_unlock(&mutex_interthread);
+    queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
 }
 
 static void rebuffer_and_seek(size_t newpos)
@@ -884,7 +885,7 @@ static void rebuffer_and_seek(size_t newpos)
     fd = open(trackname, O_RDONLY);
     if (fd < 0) {
         logf("Open failed!");
-        mutex_unlock(&mutex_interthread);
+        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
         return;
     }
     if (current_fd >= 0)
@@ -915,7 +916,7 @@ static void rebuffer_and_seek(size_t newpos)
 
     lseek(current_fd, cur_ti->start_pos, SEEK_SET);
 
-    mutex_unlock(&mutex_interthread);
+    queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
 }
 
 void codec_advance_buffer_callback(size_t amount)
@@ -935,11 +936,10 @@ void codec_advance_buffer_callback(size_t amount)
         sleep(1);
 
     if (amount > cur_ti->available) {
-        mutex_lock(&mutex_interthread);
+        struct event ev;
         queue_post(&audio_queue,
                 Q_AUDIO_REBUFFER_SEEK, (void *)(ci.curpos + amount));
-        mutex_lock(&mutex_interthread);
-        mutex_unlock(&mutex_interthread);
+        queue_wait(&codec_callback_queue, &ev);
         return ;
     }
 
@@ -1008,10 +1008,9 @@ bool codec_seek_buffer_callback(size_t newpos)
     /* We need to reload the song. */
     if (newpos < cur_ti->start_pos)
     {
-        mutex_lock(&mutex_interthread);
+        struct event ev;
         queue_post(&audio_queue, Q_AUDIO_REBUFFER_SEEK, (void *)newpos);
-        mutex_lock(&mutex_interthread);
-        mutex_unlock(&mutex_interthread);
+        queue_wait(&codec_callback_queue, &ev);
         return true;
     }
 
@@ -1798,6 +1797,8 @@ static void track_skip_done(bool was_manual)
 }
 
 static bool load_next_track(bool require_codec) {
+    struct event ev;
+
 #ifdef AB_REPEAT_ENABLE
     ab_end_of_track_report();
 #endif
@@ -1812,14 +1813,12 @@ static bool load_next_track(bool require_codec) {
     else
         manual_skip = true;
     
-    mutex_lock(&mutex_interthread);
     cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, (void *)require_codec);
-    mutex_lock(&mutex_interthread);
+    queue_wait(&codec_callback_queue, &ev);
     cpu_boost(false);
     if (ci.stop_codec)
         return false;
-    mutex_unlock(&mutex_interthread);
     
     track_skip_done(manual_skip);
     
@@ -2637,11 +2636,11 @@ void audio_preinit(void)
     cur_ti = &tracks[0];
 
     mutex_init(&mutex_codecthread);
-    mutex_init(&mutex_interthread);
 
     queue_init(&audio_queue);
     queue_init(&codec_queue);
     queue_init(&voice_codec_queue);
+    queue_init(&codec_callback_queue);
 
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
                   audio_thread_name);
