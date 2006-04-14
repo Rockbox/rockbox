@@ -24,6 +24,8 @@
  * to do on a seek request, if it is a previous track seek, skip previous,
  * and in the request_next_track callback set the offset up the same way that
  * starting from an offset works. */
+/* This is also necesary to prevent the problem with buffer overwriting on
+ * automatic track changes */
 
 #include <stdio.h>
 #include <string.h>
@@ -1761,7 +1763,8 @@ static void initialize_buffer_fill(bool clear_tracks, bool short_fill)
     else if (!filling_short)
     {
         fill_bytesleft = filebuflen - filebufused;
-        cur_ti->start_pos = ci.curpos;
+        if (buf_ridx > cur_ti->buf_idx)
+            cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
     }
 
     /* Don't initialize if we're already initialized */
