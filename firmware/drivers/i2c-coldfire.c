@@ -54,9 +54,9 @@ void i2c_init(void)
     or_l(0x03000000, &GPIO1_FUNCTION);
 #endif
     
-    /* I2C Clock divisor = 576 => 119.952 MHz / 2 / 576 = 104.125 kHz */
-    MFDR = 0x14;
-    MFDR2 = 0x14;
+    /* I2C Clock divisor = 160 => 124.1556 MHz / 2 / 160 = 388.08 kHz */
+    MFDR = 0x0d;
+    MFDR2 = 0x0d;
 
 #ifdef IAUDIO_X5
     MBCR = IEN;  /* Enable interface */
