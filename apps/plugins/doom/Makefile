@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.2  2006/03/29 21:16:45  kkurbjun
+# Revision 1.3  2006/04/14 21:07:56  kkurbjun
+# Start of profiling support for doom.
+#
+# Revision 1.2  2006-03-29 21:16:45  kkurbjun
 # Use rockbox endian defines
 #
 # Revision 1.1  2006-03-28 15:44:01  dave
@@ -15,7 +18,7 @@ INCLUDES = -I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN \
- -Wno-strict-prototypes -O2
+ -Wno-strict-prototypes -O2 $(PROFILE_OPTS)
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))

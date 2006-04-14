@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.7  2006/04/04 11:16:44  dave
+// Revision 1.8  2006/04/14 21:07:55  kkurbjun
+// Start of profiling support for doom.
+//
+// Revision 1.7  2006-04-04 11:16:44  dave
 // Correct the #ifdef logic for timer_unregister() and add a comment describing why we need to surround the use of the user timer with #ifdefs
 //
 // Revision 1.6  2006-04-03 17:32:46  dave
@@ -60,17 +63,17 @@
 
 //
 // I_GetTime
-// returns time in 1/35th second tics
+// returns time in 1/70th second tics
 //
 
 /* NOTE: 
 
-   The user timer is used to generate a 35Hz tick for Doom.  But it
+   The user timer is used to generate a 70Hz tick for Doom.  But it
    is unavailable for the grayscale targets (it's used by the grayscale
    lib) and is not implemented in the simulator - so we have to
    approximate it using current_tick.
 */
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
 volatile unsigned int doomtimer=0;
 
 void doomtime(void)
@@ -81,8 +84,8 @@ void doomtime(void)
 
 int  I_GetTime (void)
 {
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-   return doomtimer; 
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
+   return doomtimer;
 #else
 #if HZ==100
    return ((7*(*rb->current_tick))/20);
@@ -102,7 +105,7 @@ int  I_GetTime (void)
 // The game is much slower now (in terms of game speed).
 void I_Init (void)
 {
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
    rb->timer_register(1, NULL, TIMER_FREQ/TICRATE, 1, doomtime);
 #endif
    I_InitSound();
@@ -117,7 +120,7 @@ void I_Quit (void)
    I_ShutdownSound();
    I_ShutdownMusic();
    I_ShutdownGraphics();
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR) && !defined(RB_PROFILE)
    rb->timer_unregister();
 #endif
    doomexit=1;

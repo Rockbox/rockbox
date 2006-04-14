@@ -838,7 +838,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    systemvol= rb->global_settings->volume-rb->global_settings->volume%((rb->sound_max(SOUND_VOLUME)-rb->sound_min(SOUND_VOLUME))/15);
    general_translucency = default_translucency;                    // phares
+
+#ifdef RB_PROFILE
+   rb->profile_thread();
+#endif
+
    D_DoomMain ();
+
+#ifdef RB_PROFILE
+   rb->profstop();
+#endif
 
    M_SaveDefaults ();
 
