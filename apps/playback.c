@@ -892,7 +892,7 @@ static void rebuffer_and_seek(size_t newpos)
 
     /* Clear codec buffer. */
     filebufused = 0;
-    buf_ridx = buf_widx = 0;
+    buf_ridx = buf_widx = cur_ti->buf_idx + newpos;
 
     /* Write to the now current track */
     track_widx = track_ridx;
@@ -1113,39 +1113,32 @@ void strip_id3v1_tag(void)
 {
     int i;
     static const unsigned char tag[] = "TAG";
-    size_t tagptr;
-    bool found = true;
+    size_t tag_idx;
+    size_t cur_idx;
 
-    if (filebufused >= 128)
+    tag_idx = buf_widx;
+    if (tag_idx < 128)
+        tag_idx += filebuflen;
+    tag_idx -= 128;
+
+    if (filebufused > 128 && tag_idx > buf_ridx)
     {
-        tagptr = buf_widx;
-        if (tagptr < 128)
-            tagptr += filebuflen;
-        tagptr -= 128;
-
+        cur_idx = tag_idx;
         for(i = 0;i < 3;i++)
         {
-            if(filebuf[tagptr] != tag[i])
-            {
-                found = false;
-                break;
-            }
+            if(filebuf[cur_idx] != tag[i])
+                return;
 
-            if(++tagptr >= filebuflen)
-                tagptr -= filebuflen;
+            if(++cur_idx >= filebuflen)
+                cur_idx -= filebuflen;
         }
 
-        if(found)
-        {
-            /* Skip id3v1 tag */
-            logf("Skipping ID3v1 tag");
-            if (buf_widx < 128)
-                buf_widx += filebuflen;
-            buf_widx -= 128;
-            tracks[track_widx].available -= 128;
-            tracks[track_widx].filesize -= 128;
-            filebufused -= 128;
-        }
+        /* Skip id3v1 tag */
+        logf("Skipping ID3v1 tag");
+        buf_widx = tag_idx;
+        tracks[track_widx].available -= 128;
+        tracks[track_widx].filesize -= 128;
+        filebufused -= 128;
     }
 }
 
