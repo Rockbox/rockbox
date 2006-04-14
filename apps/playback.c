@@ -778,6 +778,7 @@ static void audio_check_new_track(bool require_codec)
 {
     int track_count = audio_track_count();
     int old_track_ridx = track_ridx;
+    bool forward;
 
     /* If the playlist isn't that big */
     if (!playlist_check(new_track))
@@ -805,6 +806,9 @@ static void audio_check_new_track(bool require_codec)
     else if (track_ridx < 0)
         track_ridx += MAX_TRACK;
 
+    forward = new_track > 0;
+    new_track = 0;
+
     /* Save the old track */
     prev_ti = cur_ti;
     /* Move to the new track */
@@ -819,7 +823,7 @@ static void audio_check_new_track(bool require_codec)
     else if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
         audio_rebuffer();
     /* The track may be in memory, see if it really is */
-    else if (new_track > 0)
+    else if (forward)
     {
         if (!buffer_wind_forward(require_codec, track_ridx, old_track_ridx))
             audio_rebuffer();
@@ -861,7 +865,6 @@ static void audio_check_new_track(bool require_codec)
 
     audio_update_trackinfo();
 buffer_done:
-    new_track = 0;
     mutex_unlock(&mutex_interthread);
 }
 
