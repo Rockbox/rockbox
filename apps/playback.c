@@ -1669,12 +1669,8 @@ static void audio_play_start(size_t offset)
 #endif
 
     /* Wait for any previously playing audio to flush */
-    if (audio_codec_loaded)
-    {
-        playing = false;
-        queue_empty(&codec_queue);
+    while (audio_codec_loaded)
         stop_codec_flush();
-    }
 
     track_changed = true;
     playlist_end = false;
@@ -1924,6 +1920,7 @@ static void initiate_dir_change(long direction)
     if(!playlist_next_dir(direction))
         return;
 
+    ci.reload_codec = true;
     queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
 }
 
@@ -2081,6 +2078,7 @@ void codec_thread(void)
                         swap_codec();
                     sleep(1);
                 }
+                queue_clear(&codec_queue);
                 logf("USB: Audio codec");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&codec_queue);
@@ -2089,7 +2087,7 @@ void codec_thread(void)
         }
 
         if (audio_codec_loaded)
-            if (ci.stop_codec && pcm_is_paused())
+            if (!playing && ci.stop_codec)
                 pcmbuf_play_stop();
 
         audio_codec_loaded = false;

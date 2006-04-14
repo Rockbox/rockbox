@@ -380,7 +380,7 @@ void pcmbuf_pause(bool pause) {
     pcm_play_pause(!pause);
     if (!pause)
         pcm_mute(false);
-    pcmbuf_boost(!pause);
+    pcmbuf_boost(!pause && pcm_is_playing());
 }
 
 /* Force playback. */
