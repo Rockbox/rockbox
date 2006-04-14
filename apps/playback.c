@@ -1371,7 +1371,7 @@ static bool loadcodec(bool start_play)
 
     size = filesize(fd);
     /* Never load a partial codec */
-    if (filebuflen - filebufused < size + AUDIO_REBUFFER_GUESS_SIZE) {
+    if (filebuflen - filebufused < size) {
         logf("Not enough space");
         fill_bytesleft = 0;
         close(fd);
@@ -1466,6 +1466,7 @@ static bool audio_load_track(int offset, bool start_play)
 
     if (current_fd >= 0)
     {
+        logf("Nonzero fd in alt");
         close(current_fd);
         current_fd = -1;
     }
@@ -1533,6 +1534,19 @@ static bool audio_load_track(int offset, bool start_play)
     /* Load the codec. */
     tracks[track_widx].codecbuf = &filebuf[buf_widx];
     if (!loadcodec(start_play)) {
+
+        if (tracks[track_widx].codecsize)
+        {
+            /* Must undo the buffer write of the partial codec */
+            logf("Partial codec loaded");
+            fill_bytesleft += tracks[track_widx].codecsize;
+            filebufused -= tracks[track_widx].codecsize;
+            if (buf_widx < tracks[track_widx].codecsize)
+                buf_widx += filebuflen;
+            buf_widx -= tracks[track_widx].codecsize;
+            tracks[track_widx].codecsize = 0;
+        }
+
         /* Set filesize to zero to indicate no file was loaded. */
         tracks[track_widx].filesize = 0;
         tracks[track_widx].filerem = 0;
