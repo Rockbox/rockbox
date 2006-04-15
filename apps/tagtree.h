@@ -22,15 +22,19 @@
 #include "tagcache.h"
 #include "tree.h"
 
-enum table { 
-    invalid, root, navibrowse,
-    chunked_next };
+enum table { invalid, root, navibrowse };
+
+struct tagentry {
+    char *name;
+    int newtable;
+    int extraseek;
+};
 
 void tagtree_init(void);
 int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);
-char* tagtree_get_entryname(struct tree_context *c, int id);
+struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
 #ifdef HAVE_LCD_BITMAP
 const char* tagtree_get_icon(struct tree_context* c);
 #else

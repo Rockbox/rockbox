@@ -168,12 +168,12 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
     int attr=0;
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
-    if (id3db) {
-        return tagtree_get_entryname(&tc, selected_item);
-        //char **buf = local_tc->dircache;
-        //name = buf[selected_item * (local_tc->dentry_size/sizeof(int))];
+    if (id3db)
+    {
+        return tagtree_get_entry(&tc, selected_item)->name;
     }
-    else {
+    else 
+    {
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
         name = e->name;

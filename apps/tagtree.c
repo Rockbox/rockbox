@@ -45,12 +45,6 @@
 static int tagtree_play_folder(struct tree_context* c);
 
 static char searchstring[32];
-struct tagentry {
-    char *name;
-    int newtable;
-    int extraseek;
-};
-
 #define MAX_TAGS 5
 
 struct search_instruction {
@@ -65,6 +59,9 @@ struct search_instruction {
 static struct search_instruction *si, *csi;
 static int si_count = 0;
 static const char *strp;
+
+static int current_offset;
+static int current_entry_count;
 
 static int get_token_str(char *buf, int size)
 {
@@ -354,16 +351,162 @@ void tagtree_init(void)
     audiobuf += sizeof(struct search_instruction) * si_count + 4;
 }
 
+bool show_search_progress(bool init, int count)
+{
+    static int last_tick = 0;
+    
+    if (init)
+    {
+        last_tick = current_tick;
+        return true;
+    }
+    
+    if (current_tick - last_tick > HZ/2)
+    {
+        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), count,
+#if CONFIG_KEYPAD == PLAYER_PAD
+                       str(LANG_STOP_ABORT)
+#else
+                       str(LANG_OFF_ABORT)
+#endif
+                       );
+        if (SETTINGS_CANCEL == button_get(false))
+            return false;
+        last_tick = current_tick;
+    }
+    
+    return true;
+}
+
+int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs, 
+                     int offset, bool init)
+{
+    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    int i;
+    int namebufused = 0;
+    int total_count = 0;
+    int extra = c->currextra;
+    bool sort = false;
+    
+    if (init
+#ifdef HAVE_TC_RAMCACHE
+        && !tagcache_is_ramcache()
+#endif
+        )
+    {
+        show_search_progress(true, 0);
+        gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),
+                       0, csi->name);
+    }
+    
+    tagcache_search(tcs, csi->tagorder[extra]);
+    for (i = 0; i < extra; i++)
+    {
+        tagcache_search_add_filter(tcs, csi->tagorder[i], csi->result_seek[i]);
+        sort = true;
+    }
+    
+    for (i = 0; i < csi->clause_count[extra]; i++)
+    {
+        tagcache_search_add_clause(tcs, &csi->clause[extra][i]);
+        sort = true;
+    }
+    
+    current_offset = offset;
+    current_entry_count = 0;
+    c->dirfull = false;
+    while (tagcache_get_next(tcs))
+    {
+        if (total_count++ < offset)
+            continue;
+        
+        dptr->newtable = tcs->result_seek;
+        if (!tcs->ramsearch || csi->tagorder[extra] == tag_title)
+        {
+            int tracknum = -1;
+            
+            dptr->name = &c->name_buffer[namebufused];
+            if (csi->tagorder[extra] == tag_title)
+                tracknum = tagcache_get_numeric(tcs, tag_tracknumber);
+            
+            if (tracknum > 0)
+            {
+                snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
+                         tracknum, tcs->result);
+                namebufused += strlen(dptr->name) + 1;
+                if (namebufused >= c->name_buffer_size)
+                {
+                    logf("chunk mode #1: %d", current_entry_count);
+                    c->dirfull = true;
+                    sort = false;
+                    break ;
+                }
+            }
+            else
+            {
+                namebufused += tcs->result_len;
+                if (namebufused >= c->name_buffer_size)
+                {
+                    logf("chunk mode #2: %d", current_entry_count);
+                    c->dirfull = true;
+                    sort = false;
+                    break ;
+                }
+                strcpy(dptr->name, tcs->result);
+            }
+        }
+        else
+            dptr->name = tcs->result;
+        
+        dptr++;
+        current_entry_count++;
+
+        if (current_entry_count >= global_settings.max_files_in_dir)
+        {
+            logf("chunk mode #3: %d", current_entry_count);
+            c->dirfull = true;
+            sort = false;
+            break ;
+        }
+        
+        if (init && !tcs->ramsearch)
+        {
+            if (!show_search_progress(false, i))
+            {
+                tagcache_search_finish(tcs);
+                return current_entry_count;
+            }
+        }
+    }
+    
+    if (sort)
+        qsort(c->dircache, current_entry_count, c->dentry_size, compare);
+    
+    if (!init)
+    {
+        tagcache_search_finish(tcs);
+        return current_entry_count;
+    }
+    
+    while (tagcache_get_next(tcs))
+    {
+        if (!tcs->ramsearch)
+        {
+            if (!show_search_progress(false, total_count))
+                break;
+        }
+        total_count++;
+    }
+    
+    tagcache_search_finish(tcs);
+    return total_count;
+}
+
 int tagtree_load(struct tree_context* c)
 {
     int i;
-    int namebufused = 0;
     struct tagentry *dptr = (struct tagentry *)c->dircache;
-    bool sort = false;
-    int last_tick;
-
     int table = c->currtable;
-    int extra = c->currextra;
     
     c->dentry_size = sizeof(struct tagentry);
 
@@ -373,9 +516,6 @@ int tagtree_load(struct tree_context* c)
         table = root;
         c->currtable = table;
     }
-
-    if (c->dirfull)
-        table = chunked_next;
 
     switch (table) {
         case root: {
@@ -387,125 +527,24 @@ int tagtree_load(struct tree_context* c)
                 dptr++;
             }
             c->dirlength = c->filesindir = i;
+            current_offset = 0;
+            current_entry_count = i;
             
             return c->dirlength;
         }
 
         case navibrowse:
             logf("navibrowse...");
-#ifdef HAVE_TC_RAMCACHE
-            if (!tagcache_is_ramcache())
-#endif
-                gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG),
-                               0, csi->name);
-    
-            tagcache_search(&tcs, csi->tagorder[extra]);
-            for (i = 0; i < extra; i++)
-            {
-                tagcache_search_add_filter(&tcs, csi->tagorder[i], csi->result_seek[i]);
-                sort = true;
-            }
-        
-            for (i = 0; i < csi->clause_count[extra]; i++)
-            {
-                tagcache_search_add_clause(&tcs, &csi->clause[extra][i]);
-                sort = true;
-            }
+            i = retrieve_entries(c, &tcs, 0, true);
             break;
         
-        case chunked_next:
-            logf("chunked next...");
-            break;
-
         default:
             logf("Unsupported table %d\n", table);
             return -1;
     }
     
-    i = 0;
-    namebufused = 0;
-    c->dirfull = false;
-    last_tick = current_tick;
-    while (tagcache_get_next(&tcs))
-    {
-        dptr->newtable = tcs.result_seek;
-        if (!tcs.ramsearch || csi->tagorder[extra] == tag_title)
-        {
-            int tracknum = -1;
-            
-            dptr->name = &c->name_buffer[namebufused];
-            if (csi->tagorder[extra] == tag_title)
-                tracknum = tagcache_get_numeric(&tcs, tag_tracknumber);
-            
-            if (tracknum > 0)
-            {
-                snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
-                         tracknum, tcs.result);
-                namebufused += strlen(dptr->name) + 1;
-                if (namebufused >= c->name_buffer_size)
-                {
-                    logf("buffer full, 1 entry missed.");
-                    c->dirfull = true;
-                    break ;
-                }
-            }
-            else
-            {
-                namebufused += tcs.result_len;
-                if (namebufused >= c->name_buffer_size)
-                {
-                    logf("buffer full, 1 entry missed.");
-                    c->dirfull = true;
-                    break ;
-                }
-                strcpy(dptr->name, tcs.result);
-            }
-        }
-        else
-            dptr->name = tcs.result;
-        
-        dptr++;
-        i++;
 
-        /**
-         * Estimate when we are running out of space so we can stop
-         * and enabled chunked browsing without missing entries.
-         */
-        if (i >= global_settings.max_files_in_dir - 1
-            || namebufused + 200 > c->name_buffer_size)
-        {
-            c->dirfull = true;
-            break ;
-        }
-        
-        if (!tcs.ramsearch && current_tick - last_tick > HZ/2)
-        {
-            gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), i,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                           str(LANG_STOP_ABORT)
-#else
-                           str(LANG_OFF_ABORT)
-#endif
-                           );
-            if (SETTINGS_CANCEL == button_get(false))
-                break ;
-            last_tick = current_tick;
-        }
-    }
-
-    if (sort)
-        qsort(c->dircache, i, c->dentry_size, compare);
-    
-    if (c->dirfull)
-    {
-        dptr->name = "===>";
-        dptr->newtable = chunked_next;
-        dptr++;
-        i++;
-    }
-    else
-        tagcache_search_finish(&tcs);
-    
+    /* The _total_ numer of entries available. */
     c->dirlength = c->filesindir = i;
     
     return i;
@@ -514,17 +553,10 @@ int tagtree_load(struct tree_context* c)
 int tagtree_enter(struct tree_context* c)
 {
     int rc = 0;
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    struct tagentry *dptr;
     int newextra;
 
-    dptr += c->selected_item;
-    
-    if (dptr->newtable == chunked_next)
-    {
-        c->selected_item=0;
-        gui_synclist_select_item(&tree_lists, c->selected_item);
-        return 0;
-    }
+    dptr = tagtree_get_entry(c, c->selected_item);
     
     c->dirfull = false;
     newextra = dptr->newtable;
@@ -618,9 +650,9 @@ void tagtree_exit(struct tree_context* c)
 
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 {
-    struct tagentry *entry = (struct tagentry *)c->dircache;
+    struct tagentry *entry;
     
-    entry += c->selected_item;
+    entry = tagtree_get_entry(c, c->selected_item);
 
     tagcache_search(&tcs, tag_filename);
     tagcache_search_add_filter(&tcs, tag_title, entry->newtable);
@@ -636,71 +668,11 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     
     return 0;
 }
-
-#if 0
-bool tagtree_rename_tag(struct tree_context *c, const char *newtext)
-{
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
-    int extra, extra2;
-    int type;
-    
-    dptr += c->selected_item;
-    extra = dptr->newtable;
-    extra2 = dptr->extraseek;
-
-    switch (c->currtable) {
-        case allgenres:
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_genre, extra);
-            type = tag_genre;
-            break;
-
-        case allalbums:
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_album, extra);
-            type = tag_album;
-            break;
-
-        case allartists:
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_artist, extra);
-            type = tag_artist;
-            break;
-
-        case artist4genres:
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_genre, extra);
-            type = tag_artist;
-            break;
-    
-        case albums4artist:
-            tagcache_search(&tcs, tag_title);
-            tagcache_search_add_filter(&tcs, tag_album, extra);
-            tagcache_search_add_filter(&tcs, tag_artist, extra2);
-            type = tag_album;
-            break;
-
-        default:
-            logf("wrong table");
-            return false;
-    }
-
-    while (tagcache_get_next(&tcs))
-    {
-        // tagcache_modify(&tcs, type, newtext);
-    }
-    
-    tagcache_search_finish(&tcs);
-    return true;
-}
-#endif
    
 static int tagtree_play_folder(struct tree_context* c)
 {
-    struct tagentry *entry = (struct tagentry *)c->dircache;
     int i;
     char buf[MAX_PATH];
-    int last_tick = 0;
 
     if (playlist_create(NULL, NULL) < 0)
     {
@@ -712,21 +684,10 @@ static int tagtree_play_folder(struct tree_context* c)
     tagcache_search(&tcs, tag_filename);
     for (i=0; i < c->filesindir; i++)
     {
-        if (current_tick - last_tick > HZ/2)
-        {
-            gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), i,
-#if CONFIG_KEYPAD == PLAYER_PAD
-                           str(LANG_STOP_ABORT)
-#else
-                           str(LANG_OFF_ABORT)
-#endif
-                           );
-            if (SETTINGS_CANCEL == button_get(false))
-                break ;
-            last_tick = current_tick;
-        }
+        if (!show_search_progress(false, i))
+            break;
         
-        if (!tagcache_retrieve(&tcs, entry[i].newtable, 
+        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->newtable, 
                                buf, sizeof buf))
         {
             continue;
@@ -748,11 +709,19 @@ static int tagtree_play_folder(struct tree_context* c)
     return 0;
 }
 
-char* tagtree_get_entryname(struct tree_context *c, int id)
+struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
 {
-    char **buf = c->dircache;
-
-    return buf[id * (c->dentry_size/sizeof(int))];
+    struct tagentry *entry = (struct tagentry *)c->dircache;
+    int realid = id - current_offset;
+    
+    /* Load the next chunk if necessary. */
+    if (realid >= current_entry_count || realid < 0)
+    {
+        retrieve_entries(c, &tcs, MAX(0, id - (current_entry_count / 2)), false);
+        realid = id - current_offset;
+    }
+    
+    return &entry[realid];
 }
 
 #ifdef HAVE_LCD_BITMAP
