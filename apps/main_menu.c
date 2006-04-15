@@ -159,7 +159,7 @@ bool show_info(void)
             snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_RECORDER),
                      integer, decimal);
 #endif
-            lcd_puts(0, y++, (unsigned char *)s);
+            lcd_puts_scroll(0, y++, (unsigned char *)s);
 
 #ifdef HAVE_CHARGE_CTRL
             if (charge_state == 1)
@@ -175,7 +175,7 @@ bool show_info(void)
                          battery_time() / 60, battery_time() % 60);
             else
                 strncpy(s, "(n/a)", sizeof(s));
-            lcd_puts(0, y++, (unsigned char *)s);
+            lcd_puts_scroll(0, y++, (unsigned char *)s);
         }
 
         if (state & 2) {
@@ -188,7 +188,7 @@ bool show_info(void)
             output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
 #endif
-            lcd_puts(0, y++, (unsigned char *)s);
+            lcd_puts_scroll(0, y++, (unsigned char *)s);
 
 #ifdef HAVE_MULTIVOLUME
             if (size2) {
@@ -196,12 +196,12 @@ bool show_info(void)
                 output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
                 snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
-                lcd_puts(0, y++, (unsigned char *)s);
+                lcd_puts_scroll(0, y++, (unsigned char *)s);
             }
 #else
             output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
-            lcd_puts(0, y++, (unsigned char *)s);
+            lcd_puts_scroll(0, y++, (unsigned char *)s);
 #endif
         }
         lcd_update();
