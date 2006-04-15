@@ -522,8 +522,9 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
 
     /* Let the disk buffer catch fill until enough data is available */
     while (copy_n > cur_ti->available) {
-        queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-        yield();
+        if (!filling)
+            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+        sleep(1);
         if (ci.stop_codec || ci.new_track)
             return 0;
     }
@@ -604,8 +605,9 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     }
 
     while (copy_n > cur_ti->available) {
-        queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
-        yield();
+        if (!filling)
+            queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
+        sleep(1);
         if (ci.stop_codec || ci.new_track) {
             *realsize = 0;
             return NULL;
@@ -1927,7 +1929,6 @@ static void initiate_track_change(long direction)
 {
     playlist_end = false;
     ci.new_track += direction;
-    track_changed = true;
 }
 
 static void initiate_dir_change(long direction)
@@ -2101,8 +2102,12 @@ void codec_thread(void)
         }
 
         if (audio_codec_loaded)
-            if (!playing && ci.stop_codec)
-                pcmbuf_play_stop();
+            if (ci.stop_codec)
+            {
+                status = CODEC_OK;
+                if (!playing)
+                    pcmbuf_play_stop();
+            }
 
         audio_codec_loaded = false;
 
