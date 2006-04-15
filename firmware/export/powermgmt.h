@@ -19,24 +19,6 @@
 #ifndef _POWERMGMT_H_
 #define _POWERMGMT_H_
 
-#if CONFIG_BATTERY == BATT_LIION2200 /* FM Recorder, LiIon */
-#define BATTERY_CAPACITY_MIN 2200
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
-#define BATTERY_TYPES_COUNT      1
-#elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
-#define BATTERY_CAPACITY_MIN 500
-#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable in settings */
-#define BATTERY_TYPES_COUNT      2   /* Alkalines or NiMH */
-#elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
-#define BATTERY_CAPACITY_MIN 1300
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
-#define BATTERY_TYPES_COUNT      1
-#else /* Recorder, NiMH */
-#define BATTERY_CAPACITY_MIN 1500
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable in settings */
-#define BATTERY_TYPES_COUNT      1
-#endif
-
 #define POWER_HISTORY_LEN 2*60   /* 2 hours of samples, one per minute */
 
 #define CHARGE_END_SHORTD  6     /* stop when N minutes have passed with

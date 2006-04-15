@@ -31,9 +31,11 @@
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_3AAA
-
-/* Battery scale factor (average from 3 Ondios) */
-#define BATTERY_SCALE_FACTOR 4735
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
+#define BATTERY_SCALE_FACTOR 4735 /* average from 3 Ondios */
 
 /* Define this if you control power on PB5 (instead of the OFF button) */
 #define HAVE_POWEROFF_ON_PB5

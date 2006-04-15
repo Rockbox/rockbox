@@ -915,7 +915,7 @@ static bool battery_capacity(void)
 {
     return set_int(str(LANG_BATTERY_CAPACITY), "mAh", UNIT_MAH,
                    &global_settings.battery_capacity,
-                   &set_battery_capacity, 50, BATTERY_CAPACITY_MIN,
+                   &set_battery_capacity, BATTERY_CAPACITY_INC, BATTERY_CAPACITY_MIN,
                    BATTERY_CAPACITY_MAX, NULL );
 }
 

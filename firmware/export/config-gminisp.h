@@ -36,6 +36,10 @@
 
 /* Type of mobile power, FIXME: probably different, make new type */
 #define CONFIG_BATTERY BATT_LIION2200
+#define BATTERY_CAPACITY_MIN 2200 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 6465
 /* chosen values at random -- jyp */
 

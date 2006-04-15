@@ -73,7 +73,10 @@
 #define CONFIG_I2C I2C_COLDFIRE
 
 #define CONFIG_BATTERY BATT_LIPOL1300
-
+#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
 
 /* Define if we have a hardware defect that causes ticking on the audio line */

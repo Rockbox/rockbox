@@ -60,7 +60,10 @@
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_LIION2200
-
+#define BATTERY_CAPACITY_MIN 2200 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
 /* Battery scale factor (guessed, seems to be 1,25 * value from recorder) */
 #define BATTERY_SCALE_FACTOR 8081
 

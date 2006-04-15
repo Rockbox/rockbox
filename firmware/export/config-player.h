@@ -40,8 +40,10 @@
 
 /* Type of mobile power */
 #define CONFIG_BATTERY BATT_4AA_NIMH
-
-/* Battery scale factor (?) */
+#define BATTERY_CAPACITY_MIN 1500 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 6546
 
 /* Define this if you must discharge the data line by driving it low
