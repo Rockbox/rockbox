@@ -18,7 +18,7 @@ endif
 
 LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-chessbox
-SRC = chessbox.c gnuchess.c
+SRC = chessbox.c gnuchess.c opening.c
 
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)

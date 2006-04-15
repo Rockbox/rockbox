@@ -27,6 +27,7 @@
 #include "plugin.h"
 
 #include "gnuchess.h"
+#include "opening.h"
 
 #include <ctype.h>
 
@@ -96,6 +97,7 @@ short PieceList[2][16],PieceCnt[2],atak[2][64],PawnCnt[2][8];
 short castld[2],kingmoved[2],mtl[2],pmtl[2],emtl[2],hung[2];
 short c1,c2,*atk1,*atk2,*PC1,*PC2,EnemyKing;
 short mate,post,opponent,computer,Sdepth,Awindow,Bwindow,dither;
+bool withbook ;
 long ResponseTime,ExtraTime,Level,et,et0,time0,cputimer,ft;
 long NodeCnt,evrate,ETnodes,EvalNodes,HashCnt;
 short quit,reverse,bothsides,hashflag,InChk,player,force,easy,beep;
@@ -107,7 +109,6 @@ short Pscore[maxdepth],Tscore[maxdepth],Threat[maxdepth];
 struct GameRec GameList[240];
 short GameCnt,Game50,epsquare,lpost,rcptr,contempt;
 short MaxSearchDepth,Xscore;
-struct BookEntry *Book;
 struct TimeControlRec TimeControl;
 short TCflag,TCmoves,TCminutes,OperatorTime;
 short otherside[3]={1,0,2};
@@ -1051,8 +1052,8 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
     TrPnt[1] = 0; root = &Tree[0];
     MoveList(side,1);
     for (i = TrPnt[1]; i < TrPnt[2]; i++) pick(i,TrPnt[2]-1);
-    /*if (Book != NULL) OpeningBook();*/
-    if (Book != NULL) timeout = true;
+    if (withbook) OpeningBook();
+    if (withbook) timeout = true;
     NodeCnt = ETnodes = EvalNodes = HashCnt = 0;
     Zscore = 0; zwndw = 20;
   }
@@ -1103,7 +1104,7 @@ static short i,alpha,beta,score,tempb,tempc,tempsf,tempst,xside,rpt;
   score = root->score;
   if (rpt >= 2 || score < -12000) root->flags |= draw;
   if (iop == 2) return(0);
-  if (Book == NULL) hint = PrVar[2];
+  if (!withbook) hint = PrVar[2];
   ElapsedTime(1);
 
   if (score > -9999 && rpt <= 2)
@@ -1148,36 +1149,38 @@ void OpeningBook()
 */
 
 {
-short j,pnt;
-unsigned short m,*mp;
-unsigned r,r0;
-struct BookEntry *p;
+  short j,pnt;
+  unsigned short m;
+  unsigned r,r0;
+  int o_c=0 , m_c=0 ;
 
-  rb->srand((unsigned)time0);
-  r0 = m = 0;
-  p = Book;
-  while (p != NULL)
-    {
-      mp = p->mv;
-      for (j = 0; j <= GameCnt; j++)
-        if (GameList[j].gmove != *(mp++)) break;
-      if (j > GameCnt)
-        if ((r=rb->rand()) > r0)
-          {
-            r0 = r; m = *mp;
-            hint = *(++mp);
+  rb->srand ( *rb->current_tick ) ;
+  r0 = 0;
+  m = 0;
+  while ( o_c < MAX_OPENING )  {
+      m_c = 0 ;
+      for (j = 0; j <= GameCnt; j++) {
+        if ( GameList[j].gmove != OBook[o_c][m_c] ) break;
+        m_c++;
+      }
+      /* I added ( m != OBook[o_c][m_c] ) trying to get more random games */
+      if ( ( j > GameCnt ) && ( m != OBook[o_c][m_c] ) ) {
+          r=rb->rand();
+          if ( r > r0 ) {
+                  r0 = r; m = OBook[o_c][m_c];
+                  hint = OBook[o_c][m_c+1];
           }
-      p = p->next;
+      }
+      o_c++;
     }
-    
+
   for (pnt = TrPnt[1]; pnt < TrPnt[2]; pnt++)
     if ((Tree[pnt].f<<8) + Tree[pnt].t == m) Tree[pnt].score = 0;
   pick(TrPnt[1],TrPnt[2]-1);
-  if (Tree[TrPnt[1]].score < 0) Book = NULL;
+  if (Tree[TrPnt[1]].score < 0) withbook = false;
 }
 
 
-  /*if (post) ShowCurrentMove(pnt,node->f,node->t);\*/
 #define UpdateSearchStatus \
 {\
   if (pnt > TrPnt[1])\
@@ -2329,7 +2332,7 @@ void NewGame()  {
   /*time0 = time((long *)0);*/
   time0 = *(rb->current_tick) / HZ ;
   ElapsedTime(1);
-  /*GetOpenings();*/
+  withbook = true;
 }
 
 /* ---- Initialize variables and reset board ---- */
@@ -2344,7 +2347,6 @@ void GNUChess_Initialize ( void ) {
   TCflag = true;
   NewGame();
   MaxSearchDepth = 29 ; 
-  /* remember to GetOpenings */
 }
 
 void algbr(f,t,flag)

@@ -24,6 +24,7 @@
 #ifdef HAVE_LCD_BITMAP
 
 #include "gnuchess.h"
+#include "opening.h"
 
 /* type definitions */
 struct cb_command {
@@ -249,20 +250,16 @@ static void cb_drawboard (void) {
     }
     
     /* draw board limits */
-    if ( LCD_WIDTH > TILE_WIDTH*8 ) {
-        rb->lcd_set_drawmode ( DRMODE_FG );
-        rb->lcd_drawline ( XOFS - 1 , YOFS ,
-                           XOFS - 1 , YOFS + TILE_HEIGHT*8 );
-        rb->lcd_drawline ( XOFS + 8*TILE_WIDTH , YOFS ,
-                           XOFS + 8*TILE_WIDTH , YOFS + TILE_HEIGHT*8 );
-    }
-    if ( LCD_HEIGHT > TILE_HEIGHT*8 ) {
-        rb->lcd_set_drawmode ( DRMODE_FG );
-        rb->lcd_drawline ( XOFS , YOFS - 1 ,
-                           XOFS + TILE_WIDTH*8 , YOFS - 1 );
-        rb->lcd_drawline ( XOFS , YOFS + TILE_HEIGHT*8  ,
-                           XOFS + 8*TILE_WIDTH , YOFS + TILE_HEIGHT*8 );
-    }
+#if (LCD_WIDTH > TILE_WIDTH*8) && (LCD_HEIGHT > TILE_HEIGHT*8)
+    rb->lcd_drawrect(XOFS - 1, YOFS - 1, TILE_WIDTH*8 + 2, TILE_HEIGHT*8 + 2);
+#elif LCD_WIDTH > TILE_WIDTH*8
+    rb->lcd_vline(XOFS - 1, 0, LCD_HEIGHT - 1);
+    rb->lcd_vline(XOFS + 8*TILE_WIDTH, 0, LCD_HEIGHT - 1);
+#elif LCD_HEIGHT > TILE_HEIGHT*8
+    rb->lcd_hline(0, LCD_WIDTH - 1, YOFS - 1);
+    rb->lcd_hline(0, LCD_WIDTH - 1, YOFS + TILE_HEIGHT*8);
+#endif
+
     rb->lcd_update();
 }
 
@@ -273,6 +270,7 @@ void cb_switch ( short x , short y ) {
                        YOFS + ( 7 - y )*TILE_HEIGHT +1 ,
                        TILE_WIDTH-2 , TILE_HEIGHT-2 );
     rb->lcd_update();
+    rb->lcd_set_drawmode ( DRMODE_SOLID );
 }
 
 /* ---- callback for capturing interaction while thinking ---- */
@@ -370,6 +368,7 @@ void cb_saveposition ( void ) {
     rb->write(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
     rb->write(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
 
+    rb->write(fd, &(withbook), sizeof(withbook));
     rb->write(fd, &(Level), sizeof(Level));
     rb->write(fd, &(TCflag), sizeof(TCflag));
     rb->write(fd, &(OperatorTime), sizeof(OperatorTime));
@@ -421,6 +420,7 @@ void cb_restoreposition ( void ) {
         rb->read(fd, &(kingmoved[white]), sizeof(kingmoved[white]));
         rb->read(fd, &(kingmoved[black]), sizeof(kingmoved[black]));
 
+        rb->read(fd, &(withbook), sizeof(withbook));
         rb->read(fd, &(Level), sizeof(Level));
         rb->read(fd, &(TCflag), sizeof(TCflag));
         rb->read(fd, &(OperatorTime), sizeof(OperatorTime));

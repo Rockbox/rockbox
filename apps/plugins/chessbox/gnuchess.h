@@ -35,6 +35,7 @@ extern short mate,opponent,computer,Sdepth;
 extern short locn[8][8];
 extern short board[64];
 extern short color[64];
+extern bool withbook;
 extern long Level;
 extern short TCflag,TCmoves,TCminutes;
 extern short timeout;
