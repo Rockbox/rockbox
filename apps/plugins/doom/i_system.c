@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.8  2006/04/14 21:07:55  kkurbjun
+// Revision 1.9  2006/04/15 22:08:36  kkurbjun
+// Slight code cleanups, fixed sound parameter - now it saves.  Old configurations will be reset.
+//
+// Revision 1.8  2006-04-14 21:07:55  kkurbjun
 // Start of profiling support for doom.
 //
 // Revision 1.7  2006-04-04 11:16:44  dave
@@ -114,7 +117,7 @@ void I_Init (void)
 //
 // I_Quit
 //
-extern boolean doomexit;
+
 void I_Quit (void)
 {
    I_ShutdownSound();

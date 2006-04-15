@@ -660,6 +660,7 @@ static bool Doptions()
          case 0: /* Sound */
             nosfxparm=!nosfxparm; // Have to invert it before setting
             rb->set_option("Sound", &nosfxparm, INT, onoff, 2, NULL );
+            nosfxparm=!nosfxparm;
             break;
 
          case 1: /* Keys */
@@ -783,6 +784,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
    rb = api;
    (void)parameter;
+
+   doomexit=0;
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(true);

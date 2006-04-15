@@ -291,6 +291,7 @@ default_t defaults[] =
       {"pitched_sounds",{&pitched_sounds, NULL},{0, NULL},0,1, // killough 2/21/98
        def_bool,ss_none, 0, 0}, // enables variable pitch in sound effects (from id's original code)
 //      {"samplerate",{&snd_samplerate, NULL},{22050, NULL},11025,48000, def_int,ss_none, 0, 0},
+      {"nosfxparm",{(void *)&nosfxparm, NULL},{0, NULL},0,1, def_bool,ss_none, 0, 0},
       {"sfx_volume",{&snd_SfxVolume, NULL},{8, NULL},0,15, def_int,ss_none, 0, 0},
       {"music_volume",{&snd_MusicVolume, NULL},{8, NULL},0,15, def_int,ss_none, 0, 0},
       {"mus_pause_opt",{&mus_pause_opt, NULL},{2, NULL},0,2, // CPhipps - music pausing

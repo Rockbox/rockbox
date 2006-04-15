@@ -26,6 +26,7 @@
 
 extern struct plugin_api* rb;
 extern bool noprintf;
+extern bool doomexit;
 
 /* libc functions */
 int printf(const char *fmt, ...);
@@ -98,6 +99,6 @@ inline void* memcpy(void* dst, const void* src, size_t size);
    structure changes.
  */
 #define DOOM_CONFIG_MAGIC     MAKE_FOURCC('D','O','O','M')
-#define DOOM_CONFIG_VERSION   1
+#define DOOM_CONFIG_VERSION   2
 
 #endif

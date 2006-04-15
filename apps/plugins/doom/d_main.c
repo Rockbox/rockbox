@@ -81,11 +81,10 @@ boolean fastparm;       // working -fast
 
 boolean singletics = false; // debug flag to cancel adaptiveness
 
-boolean doomexit;
+bool doomexit;
 
 //jff 1/22/98 parms for disabling music and sound
-boolean nosfxparm;
-boolean nomusicparm;
+boolean nomusicparm=0;
 
 //jff 4/18/98
 extern boolean inhelpscreens;
@@ -154,7 +153,6 @@ static void D_Wipe(void)
       wipestart = nowtime;
 
       done = wipe_ScreenWipe(0,0,SCREENWIDTH,SCREENHEIGHT,tics);
-      I_UpdateNoBlit();
       M_Drawer();                   // menu is drawn even on top of wipes
       I_FinishUpdate();             // page flip or blit buffer
    }
@@ -173,10 +171,10 @@ extern int     showMessages;
 
 void D_Display (void)
 {
-   static boolean isborderstate        = false;
-   static boolean borderwillneedredraw = false;
-   static  boolean  inhelpscreensstate = false;
-   static  gamestate_t  oldgamestate = -1;
+   static boolean isborderstate        IDATA_ATTR= false;
+   static boolean borderwillneedredraw IDATA_ATTR= false;
+   static  boolean  inhelpscreensstate IDATA_ATTR= false;
+   static  gamestate_t  oldgamestate IDATA_ATTR= -1;
    boolean wipe;
    boolean viewactive = false, isborder = false;
 
@@ -306,9 +304,6 @@ static void D_DoomLoop (void)
 
    while (!doomexit)
    {
-      // frame syncronous IO operations
-      //I_StartFrame ();
-
       // process one or more tics
       if (singletics)
       {
@@ -331,8 +326,7 @@ static void D_DoomLoop (void)
       // Update display, next frame, with current state.
       D_Display();
 
-      // Sound mixing for the buffer is snychronous.
-//      I_UpdateSound();
+      // Give the system some time
       rb->yield();
    }
 }

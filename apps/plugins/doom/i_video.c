@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.13  2006/04/06 21:31:49  kkurbjun
+ * Revision 1.14  2006/04/15 22:08:36  kkurbjun
+ * Slight code cleanups, fixed sound parameter - now it saves.  Old configurations will be reset.
+ *
+ * Revision 1.13  2006-04-06 21:31:49  kkurbjun
  * Scaling code fixed by clamping down the width to a max of SCREENWIDTH.  Removed some #ifdefs for glprboom
  *
  * Revision 1.12  2006-04-05 06:37:37  kkurbjun
@@ -102,20 +105,6 @@ void I_ShutdownGraphics(void)
 }
 
 //
-// I_StartFrame (NOT USED)
-//
-void I_StartFrame (void)
-{
-}
-
-//
-// I_GetEvent (NOT USED)
-//
-void I_GetEvent(void)
-{
-}
-
-//
 // I_StartTic
 //
 
@@ -150,36 +139,37 @@ void I_GetEvent(void)
 #define DOOMBUTTON_WEAPON  BUTTON_ON
 #endif
 
-int getkey(event_t * event)
+inline void getkey()
 {
+   event_t event;
    // Same button handling as rockboy
-   static unsigned int oldbuttonstate = 0, newbuttonstate=0;
+   static unsigned int oldbuttonstate IDATA_ATTR = 0, newbuttonstate IDATA_ATTR=0 ;
 
-   static int released, pressed;
+   static int released IBSS_ATTR, pressed IBSS_ATTR;
 
 #ifdef HAS_BUTTON_HOLD
-   static unsigned int holdbutton=0;
-   static int hswitch=0;
+   static unsigned int holdbutton IDATA_ATTR=0;
+   static int hswitch IDATA_ATTR=0;
    if (rb->button_hold()&~holdbutton)
    {
       if(hswitch==0)
       {
-         event->type = ev_keydown;
+         event.type = ev_keydown;
          hswitch=1;
       }
       else
       {
-         event->type = ev_keyup;
+         event.type = ev_keyup;
          hswitch=0;
       }
 #if CONFIG_KEYPAD == IPOD_4G_PAD
       /* Bring up the menu */
-      event->data1=KEY_ESCAPE;
+      event.data1=KEY_ESCAPE;
 #else
       /* Enable run */
-      event->data1=KEY_RSHIFT;
+      event.data1=KEY_RSHIFT;
 #endif
-      D_PostEvent(event);
+      D_PostEvent(&event);
    }
    holdbutton=rb->button_hold();
 #endif
@@ -190,128 +180,123 @@ int getkey(event_t * event)
    oldbuttonstate = newbuttonstate;
    if(released)
    {
-      event->type = ev_keyup;
+      event.type = ev_keyup;
       if(released & DOOMBUTTON_LEFT)
       {
-         event->data1=KEY_LEFTARROW;
-         D_PostEvent(event);
+         event.data1=KEY_LEFTARROW;
+         D_PostEvent(&event);
       }
       if(released & DOOMBUTTON_RIGHT)
       {
-         event->data1=KEY_RIGHTARROW;
-         D_PostEvent(event);
+         event.data1=KEY_RIGHTARROW;
+         D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_DOWN
       if(released & DOOMBUTTON_DOWN)
       {
-         event->data1=KEY_DOWNARROW;
-         D_PostEvent(event);
+         event.data1=KEY_DOWNARROW;
+         D_PostEvent(&event);
       }
 #endif
       if(released & DOOMBUTTON_UP)
       {
-         event->data1=KEY_UPARROW;
-         D_PostEvent(event);
+         event.data1=KEY_UPARROW;
+         D_PostEvent(&event);
       }
       if(released & DOOMBUTTON_SHOOT)
       {
-         event->data1=KEY_RCTRL;
-         D_PostEvent(event);
+         event.data1=KEY_RCTRL;
+         D_PostEvent(&event);
       }
       if(released & DOOMBUTTON_OPEN)
       {
-         event->data1=' ';
-         D_PostEvent(event);
+         event.data1=' ';
+         D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_ESC
       if(released & DOOMBUTTON_ESC)
       {
-         event->data1=KEY_ESCAPE;
-         D_PostEvent(event);
+         event.data1=KEY_ESCAPE;
+         D_PostEvent(&event);
       }
 #endif
 #ifdef DOOMBUTTON_ENTER
       if(released & DOOMBUTTON_ENTER)
       {
-         event->data1=KEY_ENTER;
-         D_PostEvent(event);
+         event.data1=KEY_ENTER;
+         D_PostEvent(&event);
       }
 #endif
 #ifdef DOOMBUTTON_WEAPON
       if(released & DOOMBUTTON_WEAPON)
       {
-         event->data1 ='w';
-         D_PostEvent(event);
+         event.data1 ='w';
+         D_PostEvent(&event);
       }
 #endif
    }
    if(pressed)
    {
-      event->type = ev_keydown;
+      event.type = ev_keydown;
       if(pressed & DOOMBUTTON_LEFT)
       {
-         event->data1=KEY_LEFTARROW;
-         D_PostEvent(event);
+         event.data1=KEY_LEFTARROW;
+         D_PostEvent(&event);
       }
       if(pressed & DOOMBUTTON_RIGHT)
       {
-         event->data1=KEY_RIGHTARROW;
-         D_PostEvent(event);
+         event.data1=KEY_RIGHTARROW;
+         D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_DOWN
       if(pressed & DOOMBUTTON_DOWN)
       {
-         event->data1=KEY_DOWNARROW;
-         D_PostEvent(event);
+         event.data1=KEY_DOWNARROW;
+         D_PostEvent(&event);
       }
 #endif
       if(pressed & DOOMBUTTON_UP)
       {
-         event->data1=KEY_UPARROW;
-         D_PostEvent(event);
+         event.data1=KEY_UPARROW;
+         D_PostEvent(&event);
       }
       if(pressed & DOOMBUTTON_SHOOT)
       {
-         event->data1=KEY_RCTRL;
-         D_PostEvent(event);
+         event.data1=KEY_RCTRL;
+         D_PostEvent(&event);
       }
       if(pressed & DOOMBUTTON_OPEN)
       {
-         event->data1=' ';
-         D_PostEvent(event);
+         event.data1=' ';
+         D_PostEvent(&event);
       }
 #ifdef DOOMBUTTON_ESC
       if(pressed & DOOMBUTTON_ESC)
       {
-         event->data1=KEY_ESCAPE;
-         D_PostEvent(event);
+         event.data1=KEY_ESCAPE;
+         D_PostEvent(&event);
       }
 #endif
 #ifdef DOOMBUTTON_ENTER
       if(pressed & DOOMBUTTON_ENTER)
       {
-         event->data1=KEY_ENTER;
-         D_PostEvent(event);
+         event.data1=KEY_ENTER;
+         D_PostEvent(&event);
       }
 #endif
 #ifdef DOOMBUTTON_WEAPON
       if(pressed & DOOMBUTTON_WEAPON)
       {
-         event->data1='w';
-         D_PostEvent(event);
+         event.data1='w';
+         D_PostEvent(&event);
       }
 #endif
    }
-   if(pressed || released)
-      return 1;
-   else
-      return 0;
 }
 
-event_t event;
-void I_StartTic (void)
+inline void I_StartTic (void)
 {
-   getkey(&event);
+   getkey();
 }
 
 
@@ -362,13 +347,6 @@ static void I_UploadNewPalette(int pal)
       pal, num_pals);
 #endif
    memcpy(palette,paldata+256*pal,256*sizeof(fb_data));
-}
-
-//
-// I_UpdateNoBlit
-//
-void I_UpdateNoBlit (void)
-{
 }
 
 //
@@ -447,12 +425,6 @@ void I_SetPalette (int pal)
 //
 void I_InitGraphics(void)
 {
-   static int  firsttime=1;
-
-   if (!firsttime)
-      return;
-   firsttime = 0;
-
    printf("Starting Graphics engine\n");
 
    noprintf=1;
