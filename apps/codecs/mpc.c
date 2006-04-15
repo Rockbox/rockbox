@@ -164,7 +164,7 @@ next_track:
             ci->seek_complete();
         }
         #endif
-        if (ci->stop_codec || ci->reload_codec)
+        if (ci->stop_codec || ci->new_track)
             break;
 
         status = mpc_decoder_decode(&decoder, sample_buffer, NULL, NULL);

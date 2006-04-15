@@ -275,7 +275,7 @@ enum codec_status codec_start(struct codec_api* api)
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
         ci->yield();
-        if (ci->stop_codec || ci->reload_codec) {
+        if (ci->stop_codec || ci->new_track) {
             break;
         }
 

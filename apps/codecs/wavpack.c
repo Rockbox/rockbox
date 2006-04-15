@@ -129,12 +129,12 @@ enum codec_status codec_start(struct codec_api* api)
 
         nsamples = WavpackUnpackSamples (wpc, temp_buffer, BUFFER_SIZE / nchans);  
 
-        if (!nsamples || ci->stop_codec || ci->reload_codec)
+        if (!nsamples || ci->stop_codec || ci->new_track)
             break;
 
         ci->yield ();
 
-        if (ci->stop_codec || ci->reload_codec)
+        if (ci->stop_codec || ci->new_track)
             break;
 
         while (!ci->pcmbuf_insert ((char *) temp_buffer, nsamples * nchans * 4))

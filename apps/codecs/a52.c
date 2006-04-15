@@ -164,7 +164,7 @@ next_track:
     /* The main decoding loop */
     samplesdone = 0;
     while (1) {
-        if (ci->stop_codec || ci->reload_codec)
+        if (ci->stop_codec || ci->new_track)
             break;
 
         if (ci->seek_time) {

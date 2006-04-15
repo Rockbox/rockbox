@@ -432,7 +432,7 @@ next_track:
 
     while (!endofstream) {
         ci->yield();
-        if (ci->stop_codec || ci->reload_codec) {
+        if (ci->stop_codec || ci->new_track) {
             break;
         }
 

@@ -73,22 +73,23 @@ struct codec_api ci = {
     NULL, /* id3 */
     NULL, /* taginfo_ready */
     false, /* stop_codec */
-    false, /* reload_codec */
+    0, /* new_track */
     0, /* seek_time */
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
+    NULL, /* get_codec_memory */
+    NULL, /* pcmbuf_insert */
+    NULL, /* pcmbuf_insert_split */
+    NULL, /* set_elapsed */
+    NULL, /* read_filebuf */
+    NULL, /* request_buffer */
+    NULL, /* advance_buffer */
+    NULL, /* advance_buffer_loc */
+    NULL, /* seek_buffer */
+    NULL, /* seek_complete */
+    NULL, /* mp3_get_filepos */
+    NULL, /* request_next_track */
+    NULL, /* discard_codec */
+    NULL, /* set_offset */
+    NULL, /* configure */
     
     gui_syncsplash,
 
@@ -209,8 +210,6 @@ struct codec_api ci = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
-    NULL, /* discard_codec */
 
 };
 

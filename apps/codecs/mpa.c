@@ -155,7 +155,7 @@ enum codec_status codec_start(struct codec_api *api)
         int framelength;
 
         ci->yield();
-        if (ci->stop_codec || ci->reload_codec)
+        if (ci->stop_codec || ci->new_track)
             break;
     
         if (ci->seek_time) {

@@ -85,12 +85,12 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 7
+#define CODEC_API_VERSION 8
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 6
+#define CODEC_MIN_API_VERSION 8
 
 /* codec return codes */
 enum codec_status {
@@ -115,11 +115,11 @@ struct codec_api {
     bool *taginfo_ready;      /* Is metadata read */
     
     /* Codec should periodically check if stop_codec is set to true.
-       In case it's, codec must return with PLUGIN_OK status immediately. */
+       In case it is, codec must return immediately */
     bool stop_codec;
-    /* Codec should periodically check if reload_codec is set to true.
-       In case it's, codec should reload itself without exiting. */
-    bool reload_codec;
+    /* Codec should periodically check if new_track is non zero.
+       When it is, the codec should request a new track. */
+    int new_track;
     /* If seek_time != 0, codec should seek to that song position (in ms)
        if codec supports seeking. */
     long seek_time;
@@ -155,6 +155,8 @@ struct codec_api {
        track is available and changed. If return value is false,
        codec should exit immediately with PLUGIN_OK status. */
     bool (*request_next_track)(void);
+    /* Free the buffer area of the current codec after its loaded */
+    void (*discard_codec)(void);
     
     void (*set_offset)(size_t value);
     /* Configure different codec buffer parameters. */
@@ -286,8 +288,6 @@ struct codec_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
-
-    void (*discard_codec)(void);
 
 };
 

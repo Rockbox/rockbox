@@ -68,7 +68,7 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(29));
 
-    next_track:
+next_track:
 
     if (codec_init(api)) {
         LOGF("FAAD: Error initialising codec\n");
@@ -122,7 +122,7 @@ enum codec_status codec_start(struct codec_api* api)
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
         rb->yield();
-        if (ci->stop_codec || ci->reload_codec) {
+        if (ci->stop_codec || ci->new_track) {
             break;
         }
 

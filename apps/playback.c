@@ -222,9 +222,7 @@ static bool playlist_end = false;
 extern struct codec_api ci;
 extern struct codec_api ci_voice;
 
-/* When we change a song and buffer is not in filling state, this
-   variable keeps information about whether to go a next/previous track. */
-static volatile int new_track;
+/* Was the skip being executed manual or automatic? */
 static volatile bool manual_skip;
 
 /* Callback function to call when current track has really changed. */
@@ -324,13 +322,13 @@ bool codec_pcmbuf_insert_split_callback(const void *ch1, const void *ch2,
         else
         {
             /* Prevent audio from a previous position from hitting the buffer */
-            if (ci.reload_codec || ci.stop_codec)
+            if (ci.new_track || ci.stop_codec)
                 return true;
 
             while ((dest = pcmbuf_request_buffer(est_output_size,
                             &output_size)) == NULL) {
                 sleep(1);
-                if (ci.seek_time || ci.reload_codec || ci.stop_codec)
+                if (ci.seek_time || ci.new_track || ci.stop_codec)
                     return true;
             }
         }
@@ -526,7 +524,7 @@ size_t codec_filebuf_callback(void *ptr, size_t size)
     while (copy_n > cur_ti->available) {
         queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
         yield();
-        if (ci.stop_codec || ci.reload_codec)
+        if (ci.stop_codec || ci.new_track)
             return 0;
     }
 
@@ -608,7 +606,7 @@ void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     while (copy_n > cur_ti->available) {
         queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
         yield();
-        if (ci.stop_codec || ci.reload_codec) {
+        if (ci.stop_codec || ci.new_track) {
             *realsize = 0;
             return NULL;
         }
@@ -789,33 +787,33 @@ static void audio_check_new_track(bool require_codec)
     bool forward;
 
     /* If the playlist isn't that big */
-    if (!playlist_check(new_track))
+    if (!playlist_check(ci.new_track))
     {
-        if (new_track >= 0)
+        if (ci.new_track >= 0)
         {
             queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
             return;
         }
         /* Find the beginning backward if the user over-skips it */
-        while (!playlist_check(++new_track))
-            if (new_track >= 0)
+        while (!playlist_check(++ci.new_track))
+            if (ci.new_track >= 0)
             {
                 queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
                 return;
             }
     }
     /* Update the playlist */
-    last_peek_offset -= new_track;
-    playlist_next(new_track);
+    last_peek_offset -= ci.new_track;
+    playlist_next(ci.new_track);
 
-    track_ridx+=new_track;
+    track_ridx+=ci.new_track;
     if (track_ridx >= MAX_TRACK)
         track_ridx -= MAX_TRACK;
     else if (track_ridx < 0)
         track_ridx += MAX_TRACK;
 
-    forward = new_track > 0;
-    new_track = 0;
+    forward = ci.new_track > 0;
+    ci.new_track = 0;
 
     /* Save the old track */
     prev_ti = cur_ti;
@@ -825,7 +823,7 @@ static void audio_check_new_track(bool require_codec)
     track_changed = manual_skip;
 
     /* If it is not safe to even skip this many track entries */
-    if (new_track >= track_count || new_track <= track_count - MAX_TRACK)
+    if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
     {
         cur_ti->taginfo_ready = false;
         audio_rebuffer();
@@ -1695,7 +1693,7 @@ static void audio_play_start(size_t offset)
     playlist_end = false;
 
     playing = true;
-    ci.reload_codec = false;
+    ci.new_track = 0;
     ci.seek_time = 0;
 
     if (current_fd >= 0) {
@@ -1842,9 +1840,9 @@ static bool load_next_track(bool require_codec) {
 
     logf("Request new track");
 
-    if (new_track == 0)
+    if (ci.new_track == 0)
     {
-        new_track++;
+        ci.new_track++;
         manual_skip = false;
     }
     else
@@ -1889,14 +1887,12 @@ static bool codec_request_next_track_callback(void)
         get_codec_base_type(cur_ti->id3.codectype))
     {
         logf("New track loaded");
-        ci.reload_codec = false;
         codec_discard_codec_callback();
         return true;
     }
     else
     {
         logf("New codec:%d/%d", cur_ti->id3.codectype, prev_ti->id3.codectype);
-        ci.reload_codec = true;
         return false;
     }
 }
@@ -1930,8 +1926,7 @@ void audio_invalidate_tracks(void)
 static void initiate_track_change(long direction)
 {
     playlist_end = false;
-    new_track += direction;
-    ci.reload_codec = true;
+    ci.new_track += direction;
     track_changed = true;
 }
 
@@ -1940,7 +1935,6 @@ static void initiate_dir_change(long direction)
     if(!playlist_next_dir(direction))
         return;
 
-    ci.reload_codec = true;
     queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
 }
 
@@ -2116,7 +2110,7 @@ void codec_thread(void)
             case Q_CODEC_LOAD_DISK:
             case Q_CODEC_LOAD:
                 if (playing) {
-                    if (new_track || ci.reload_codec || status == CODEC_OK) {
+                    if (ci.new_track || status == CODEC_OK) {
                         logf("Codec finished");
                         if (ci.stop_codec)
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
@@ -2133,7 +2127,6 @@ void codec_thread(void)
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                     }
                 }
-                ci.reload_codec = false;
         }
     }
 }
@@ -2233,7 +2226,7 @@ struct mp3entry* audio_current_track(void)
     const char *filename;
     const char *p;
     static struct mp3entry temp_id3;
-    int cur_idx = track_ridx + new_track;
+    int cur_idx = track_ridx + ci.new_track;
 
     if (cur_idx >= MAX_TRACK)
         cur_idx += MAX_TRACK;
@@ -2245,7 +2238,7 @@ struct mp3entry* audio_current_track(void)
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
     
-    filename = playlist_peek(new_track);
+    filename = playlist_peek(ci.new_track);
     if (!filename)
         filename = "No file!";
 

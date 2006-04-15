@@ -207,7 +207,7 @@ next_track:
     eof = 0;
     while (!eof) {
         rb->yield();
-        if (rb->stop_codec || rb->reload_codec)
+        if (rb->stop_codec || rb->new_track)
             break;
 
         if (rb->seek_time) {

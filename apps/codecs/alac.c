@@ -101,7 +101,7 @@ enum codec_status codec_start(struct codec_api* api)
   /* The main decoding loop */
   while (i < demux_res.num_sample_byte_sizes) {
     rb->yield();
-    if (ci->stop_codec || ci->reload_codec) {
+    if (ci->stop_codec || ci->new_track) {
       break;
     }
 

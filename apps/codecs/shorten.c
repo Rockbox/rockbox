@@ -123,7 +123,7 @@ seek_start:
     buf = ci->request_buffer(&bytesleft, MAX_BUFFER_SIZE);
     while (bytesleft) {
         ci->yield();
-        if (ci->stop_codec || ci->reload_codec) {
+        if (ci->stop_codec || ci->new_track) {
             break;
         }
 
