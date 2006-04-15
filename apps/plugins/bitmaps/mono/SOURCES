@@ -5,6 +5,8 @@
 bubbles_bubble.160x128x1.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
 bubbles_bubble.160x128x1.bmp
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
+bubbles_bubble.138x110x1.bmp
 #elif ((LCD_WIDTH == 220) && (LCD_HEIGHT == 176)) || \
       ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320))
 bubbles_bubble.220x176x1.bmp

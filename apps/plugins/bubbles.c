@@ -144,6 +144,15 @@ PLUGIN_HEADER
 #define ROW_INDENT 6
 #define MAX_FPS    30
 
+/* 10x10 bubbles (iPod Mini) */
+#elif (LCD_HEIGHT == 110) && (LCD_WIDTH == 138)
+#define BUBBLE_SZ  10
+#define EMBLEM_SZ  6
+#define XOFS       33
+#define ROW_HEIGHT 8
+#define ROW_INDENT 6
+#define MAX_FPS    30
+
 #else
     #error BUBBLES: Unsupported LCD type
 #endif
@@ -2436,10 +2445,18 @@ static int bubbles(struct game_context* bb) {
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,
                          bb->highlevel+1);
             rb->lcd_puts(0, 10, str);
+#if LCD_HEIGHT > 110
             rb->lcd_puts(0, 12, "High Score:");
+#else 
+            rb->lcd_puts(0, 11, "High Score:");
+#endif
             rb->snprintf(str, 30, "%d, Lvl %d",
                          bb->highscores[0].score, bb->highscores[0].level);
+#if LCD_HEIGHT > 110
             rb->lcd_puts(2, 13, str);
+#else 
+            rb->lcd_puts(2, 12, str);
+#endif
         } else {
             /* show high scores */
             rb->snprintf(str, 12, "%s", "High Scores");
