@@ -90,6 +90,7 @@ PLUGIN_HEADER
 #define CB_RIGHT   BUTTON_RIGHT
 #define CB_PLAY    BUTTON_ON
 #define CB_LEVEL   BUTTON_F1
+#define CB_RESTART BUTTON_F3
 #define CB_QUIT    BUTTON_OFF
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -102,6 +103,7 @@ PLUGIN_HEADER
 #define CB_PLAY_PRE BUTTON_MENU
 #define CB_PLAY    (BUTTON_MENU|BUTTON_REPEAT)
 #define CB_LEVEL   (BUTTON_MENU|BUTTON_OFF)
+#define CB_RESTART (BUTTON_MENU|BUTTON_LEFT)
 #define CB_QUIT    BUTTON_OFF
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
@@ -130,6 +132,10 @@ PLUGIN_HEADER
 #elif (LCD_HEIGHT >= 128) && (LCD_WIDTH >= 128)
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
+/* use 13x13 tiles */
+#elif (LCD_HEIGHT >= 104) && (LCD_WIDTH >= 104)
+#define TILE_WIDTH  13
+#define TILE_HEIGHT 13
 /* use 10x8 tiles , only for the archoses */
 #elif (LCD_HEIGHT == 64) && (LCD_WIDTH == 112)
 #define TILE_WIDTH  10
