@@ -351,7 +351,6 @@ int ft_enter(struct tree_context* c)
         bool play = false;
         int start_index=0;
 
-        gui_syncsplash(0, true, str(LANG_WAIT));
         switch ( file->attr & TREE_ATTR_MASK ) {
             case TREE_ATTR_M3U:
                 if (global_settings.party_mode) {
@@ -361,6 +360,8 @@ int ft_enter(struct tree_context* c)
 
                 if (bookmark_autoload(buf))
                     break;
+
+                gui_syncsplash(0, true, str(LANG_WAIT));
 
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
@@ -388,10 +389,12 @@ int ft_enter(struct tree_context* c)
                 if (bookmark_autoload(c->currdir))
                     break;
 
+                gui_syncsplash(0, true, str(LANG_WAIT));
+
                 /* about to create a new current playlist...
                    allow user to cancel the operation */
-                if (global_settings.warnon_erase_dynplaylist && 
-                    !global_settings.party_mode && 
+                if (global_settings.warnon_erase_dynplaylist &&
+                    !global_settings.party_mode &&
                     playlist_modified(NULL))
                 {
                     char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
@@ -428,7 +431,9 @@ int ft_enter(struct tree_context* c)
 #ifdef CONFIG_TUNER
                 /* fmr preset file */
             case TREE_ATTR_FMR:
-            
+
+                gui_syncsplash(0, true, str(LANG_WAIT));
+
                 /* Preset inside the default folder. */
                 if(!strncasecmp(FMPRESET_PATH, buf, strlen(FMPRESET_PATH)))
                 {
@@ -438,23 +443,24 @@ int ft_enter(struct tree_context* c)
                         get_radio_status() != FMRADIO_PAUSED)
                             radio_screen();
                 }
-                /* 
+                /*
                  * Preset outside default folder, we can choose such only
-                 * if we are out of the radio screen, so the check for the 
-                 * radio status isn't neccessary 
+                 * if we are out of the radio screen, so the check for the
+                 * radio status isn't neccessary
                  */
                 else
                 {
                     radio_load_presets(buf);
                     radio_screen();
                 }
-                
+
                 break;
 #endif
 
 
                 /* wps config file */
             case TREE_ATTR_WPS:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 wps_data_load(gui_wps[0].data, buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);
@@ -463,6 +469,7 @@ int ft_enter(struct tree_context* c)
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case TREE_ATTR_RWPS:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 wps_data_load(gui_wps[1].data, buf, true);
                 set_file(buf, (char *)global_settings.rwps_file,
                          MAX_FILENAME);
@@ -470,17 +477,20 @@ int ft_enter(struct tree_context* c)
 #endif
 
             case TREE_ATTR_CFG:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 if (!settings_load_config(buf))
                     break;
                 gui_syncsplash(HZ, true, str(LANG_SETTINGS_LOADED));
                 break;
 
             case TREE_ATTR_BMARK:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 bookmark_load(buf, false);
                 reload_dir = true;
                 break;
 
             case TREE_ATTR_LNG:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 if(!lang_load(buf)) {
                     set_file(buf, (char *)global_settings.lang_file,
                              MAX_FILENAME);
@@ -491,11 +501,13 @@ int ft_enter(struct tree_context* c)
 
 #ifdef HAVE_LCD_BITMAP
             case TREE_ATTR_FONT:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 font_load(buf);
                 set_file(buf, (char *)global_settings.font_file, MAX_FILENAME);
                 break;
 
             case TREE_ATTR_KBD:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 if (!load_kbd(buf))
                     gui_syncsplash(HZ, true, str(LANG_KEYBOARD_LOADED));
                 set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
@@ -505,6 +517,7 @@ int ft_enter(struct tree_context* c)
 #ifndef SIMULATOR
                 /* firmware file */
             case TREE_ATTR_MOD:
+                gui_syncsplash(0, true, str(LANG_WAIT));
                 rolo_load(buf);
                 break;
 #endif
@@ -515,6 +528,8 @@ int ft_enter(struct tree_context* c)
                     gui_syncsplash(HZ, true, str(LANG_PARTY_MODE));
                     break;
                 }
+
+                gui_syncsplash(0, true, str(LANG_WAIT));
 
                 if (plugin_load(buf,NULL) == PLUGIN_USB_CONNECTED)
                 {
@@ -535,7 +550,7 @@ int ft_enter(struct tree_context* c)
                     gui_syncsplash(HZ, true, str(LANG_PARTY_MODE));
                     break;
                 }
-                
+
                 plugin = filetype_get_plugin(file);
                 if (plugin)
                 {
