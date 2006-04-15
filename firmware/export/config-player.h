@@ -23,6 +23,8 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_PA14_LO /* port PA14, low active */
 
+#define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */

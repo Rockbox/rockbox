@@ -38,6 +38,8 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_RTC /* on I2C controlled RTC port */
 
+#define BATTERY_CAPACITY_DEFAULT 1500 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a SH7034 */

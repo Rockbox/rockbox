@@ -54,6 +54,8 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
+#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* The Nano actually has a PP5021 - but it's register compatible with

@@ -42,6 +42,8 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8751
 
+#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */

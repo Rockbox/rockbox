@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 40 
+#define CONFIG_BLOCK_VERSION 40
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -273,7 +273,7 @@ static const struct bit_entry rtc_bits[] =
     {14, S_O(max_files_in_dir), 400,
         "max files in dir", NULL }, /* 50...10000 */
     /* battery */
-    {12, S_O(battery_capacity), BATTERY_CAPACITY_MIN, "battery capacity",
+    {12, S_O(battery_capacity), BATTERY_CAPACITY_DEFAULT, "battery capacity",
          NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,
                      500...1500 for Alkaline */
 #ifdef HAVE_CHARGING
@@ -1612,7 +1612,7 @@ bool settings_save_config(void)
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n#\r\n#\r\n# wps / rwps / language"
                  " / font / fmpreset / backdrop \r\n#\r\n", appsversion);
-                 
+
     if (global_settings.wps_file[0] != 0)
         fdprintf(fd, "wps: %s/%s.wps\r\n", WPS_DIR,
                  global_settings.wps_file);
@@ -1721,7 +1721,7 @@ void settings_reset(void) {
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
     global_settings.contrast    = lcd_default_contrast();
-    
+
 #ifdef CONFIG_TUNER
     global_settings.fmr_file[0] = '\0';
 #endif

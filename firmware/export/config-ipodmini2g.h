@@ -55,6 +55,8 @@
 /* We can fade the backlight by using PWM */
 #define HAVE_BACKLIGHT_PWM_FADING
 
+#define BATTERY_CAPACITY_DEFAULT 400 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */

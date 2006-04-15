@@ -58,6 +58,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
+#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+
 #define AB_REPEAT_ENABLE 1
 
 #define CONFIG_TUNER TEA5767

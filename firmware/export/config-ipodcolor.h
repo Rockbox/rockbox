@@ -51,6 +51,8 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPOD4G /* port controlled */
 
+#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */

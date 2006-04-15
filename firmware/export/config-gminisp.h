@@ -21,6 +21,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
+#define BATTERY_CAPACITY_DEFAULT 2200 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a TCC730 (CalmRISC16) */

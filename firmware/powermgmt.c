@@ -185,7 +185,7 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
-    { 450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 } 
+    { 450, 481, 491, 497, 503, 507, 512, 514, 517, 525, 540 }
                                             /* orig. values: ...,528,560 */
 #endif
 };
@@ -197,7 +197,7 @@ charger_input_state_type charger_input_state IDATA_ATTR;
 static const short percent_to_volt_charge[11] =
 {
 #if CONFIG_BATTERY == BATT_LIPOL1300
-    /* Calibrated for 1900 mAh Ionity battery (estimated 90% charge when 
+    /* Calibrated for 1900 mAh Ionity battery (estimated 90% charge when
      entering in trickle-charging). We will never reach 100%. */
     340, 390, 394, 399, 400, 404, 407, 413, 417, 422, 426
 #else
@@ -243,11 +243,11 @@ int pid_i = 0;                      /* PID integral term */
  */
 static unsigned int battery_centivolts;/* filtered battery voltage, centvolts */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
-#define BATT_AVE_SAMPLES	32  /* filter constant / @ 2Hz sample rate */
+#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
 
 /* battery level (0-100%) of this minute, updated once per minute */
 static int battery_percent  = -1;
-static int battery_capacity = BATTERY_CAPACITY_MIN; /* default value, mAH */
+static int battery_capacity = BATTERY_CAPACITY_DEFAULT; /* default value, mAh */
 static int battery_type     = 0;
 
 /* Power history: power_history[0] is the newest sample */
@@ -348,7 +348,7 @@ static int voltage_to_percent(int voltage, const short* table)
     else
         if (voltage >= table[10])
             return 100;
-        else {    
+        else {
             /* search nearest value */
             int i = 0;
             while ((i < 10) && (table[i+1] < voltage))
@@ -405,7 +405,7 @@ static void battery_status_update(void)
     else
 #endif
     {
-        powermgmt_est_runningtime_min = level * battery_capacity / 100 
+        powermgmt_est_runningtime_min = level * battery_capacity / 100
                                       * 60 / runcurrent();
     }
 }
@@ -515,7 +515,7 @@ static int runcurrent(void)
 
 /* Check to see whether or not we've received an alarm in the last second */
 #ifdef HAVE_ALARM_MOD
-static void power_thread_rtc_process(void) 
+static void power_thread_rtc_process(void)
 {
     if (rtc_check_alarm_flag()) {
         rtc_enable_alarm(false);
@@ -592,7 +592,7 @@ static void power_thread_sleep(int ticks)
                 }
                 break;
         }
-        
+
 #endif /* HAVE_CHARGE_STATE */
 
         small_ticks = MIN(HZ/2, ticks);
@@ -674,7 +674,7 @@ static void power_thread(void)
 
     /* initialize the voltages for the exponential filter */
 
-    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR * 
+    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR *
         BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
@@ -682,7 +682,7 @@ static void power_thread(void)
     fd      = -1;
     wrcount = 0;
 #endif
-            
+
     while (1)
     {
         /* rotate the power history */
@@ -690,7 +690,7 @@ static void power_thread(void)
         phps = phpd - 1;
         for (i = 0; i < POWER_HISTORY_LEN-1; i++)
             *phpd-- = *phps--;
-        
+
         /* insert new value at the start, in centivolts 8-) */
         power_history[0] = battery_centivolts;
 
@@ -732,7 +732,7 @@ static void power_thread(void)
                 } else {
                     charge_state = TOPOFF;
                     target_voltage = TOPOFF_VOLTAGE;
-                } 
+                }
             } else {
                 /*
                  * Start the charger full strength
@@ -743,8 +743,8 @@ static void power_thread(void)
                 if (charge_max_time_idle > i) {
                     charge_max_time_idle = i;
                 }
-                charge_max_time_now = charge_max_time_idle; 
-                
+                charge_max_time_now = charge_max_time_idle;
+
                 snprintf(power_message, POWER_MESSAGE_LEN,
                          "ChgAt %d%% max %dm", battery_level(),
                          charge_max_time_now);
@@ -895,7 +895,7 @@ static void power_thread(void)
              * plugged in, but it doesn't appear to be necessary and will
              * generate more heat [gvb].
              */
-            
+
             pid_p = target_voltage - battery_centivolts;
             if((pid_p > PID_DEADZONE) || (pid_p < -PID_DEADZONE))
                 pid_p = pid_p * PID_PCONST;
@@ -980,7 +980,7 @@ static void power_thread(void)
                 }
             }
             if(fd >= 0) {
-                snprintf(debug_message, DEBUG_MESSAGE_LEN, 
+                snprintf(debug_message, DEBUG_MESSAGE_LEN,
                         "%d, %d, %d, %d, %d, %d, %d, %d\n",
                     powermgmt_last_cycle_startstop_min, battery_centivolts,
                     battery_percent, charger_input_state, charge_state,
@@ -1002,7 +1002,7 @@ void powermgmt_init(void)
 {
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
-    
+
     create_thread(power_thread, power_stack, sizeof(power_stack),
                   power_thread_name);
 }
@@ -1015,12 +1015,12 @@ void sys_poweroff(void)
     /* If the main thread fails to shut down the system, we will force a
        power off after an 8 second timeout */
     shutdown_timeout = HZ*8;
-    
+
     queue_post(&button_queue, SYS_POWEROFF, NULL);
 }
 
 /* Various hardware housekeeping tasks relating to shutting down the jukebox */
-void shutdown_hw(void) 
+void shutdown_hw(void)
 {
 #ifndef SIMULATOR
 #if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
