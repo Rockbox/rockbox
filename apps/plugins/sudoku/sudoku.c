@@ -77,7 +77,8 @@ extern const fb_data sudoku_normal[];
 extern const fb_data sudoku_start[];
 extern const fb_data sudoku_inverse[];
 
-#if (LCD_HEIGHT==128) && (LCD_WIDTH==160)
+#if ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
+    ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
 /* For iriver H1x0 - 160x128, 9 cells @ 12x12 with 14 border lines*/
 
 /* Internal dimensions of a cell */

@@ -16,8 +16,8 @@ rockboy
 /* For all targets with a bitmap display */
 #ifdef HAVE_LCD_BITMAP
 chessbox
-#if (LCD_WIDTH != 176) && (LCD_WIDTH != 138)
-/* This needs adjusting for the iPod Nano and Mini */
+#if (LCD_WIDTH != 138)
+/* This needs adjusting for the iPod Mini */
 sudoku
 #endif
 #endif
