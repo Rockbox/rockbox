@@ -62,7 +62,7 @@
 //  Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
 //  that is submitted to the audio device.
-signed short mixbuffer[MIXBUFFERSIZE];
+signed short *mixbuffer=NULL;
 
 typedef struct {
    // SFX id of the playing sound effect.
@@ -515,6 +515,9 @@ void I_InitSound()
    }
 
    printf( " pre-cached all sound data\n");
+
+   if(mixbuffer==NULL)
+      mixbuffer=malloc(sizeof(short)*MIXBUFFERSIZE);
 
    // Now initialize mixbuffer with zero.
    for ( i = 0; i< MIXBUFFERSIZE; i++ )
