@@ -824,7 +824,8 @@ static int button_read(void)
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     static bool hold_button = false;
     static bool remote_hold_button = false;
-    static int last_button_val= 0xff;
+    static int prev_data = 0xff;
+    static int last_valid = 0xff;
 
     /* light handling */
     if (hold_button && !button_hold())
@@ -843,8 +844,16 @@ static int button_read(void)
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
+
+        /* ADC debouncing: Only accept new reading if it's
+         * stable (+/-1). Use latest stable value otherwise. */
+        if ((unsigned)(data - prev_data + 1) <= 2)
+            last_valid = data;
+        prev_data = data;
+        data = last_valid;
+
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
-        if ((data < 0xf0) && ((unsigned)(data - last_button_val + 1) <= 2))
+        if (data < 0xf0)
         {
             if (data < 0x80)
                 if (data < 0x30)
@@ -870,7 +879,7 @@ static int button_read(void)
                         btn = BUTTON_REC;
         }
 #else /* H300 */
-        if ((data < 0xba) && ((unsigned)(data - last_button_val + 1) <= 2))
+        if (data < 0xba)
         {
             if (data < 0x54)
                 if (data < 0x30)
@@ -890,7 +899,6 @@ static int button_read(void)
                     btn = BUTTON_OFF;
         }
 #endif
-        last_button_val = data;
     }
 
     /* remote buttons */
