@@ -312,6 +312,7 @@ int system_memory_guard(int newmode)
     return 0;
 }
 #elif defined(CPU_COLDFIRE)
+#include "pcf50606.h"
 
 #define default_interrupt(name) \
   extern __attribute__((weak,alias("UIE"))) void name (void)
