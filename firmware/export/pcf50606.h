@@ -20,6 +20,7 @@
 #define PCF50606_H
 
 void pcf50606_init(void);
+void pcf50606_i2c_recalc_delay(int cpu_clock);
 int pcf50606_write_multiple(int address, const unsigned char* buf, int count);
 int pcf50606_write(int address, unsigned char val);
 int pcf50606_read_multiple(int address, unsigned char* buf, int count);

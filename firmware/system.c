@@ -594,6 +594,13 @@ int system_memory_guard(int newmode)
 #define DEFAULT_REFRESH_TIMER 1
 #endif
 
+#ifdef IRIVER_H300_SERIES
+#define RECALC_DELAYS(f) \
+        pcf50606_i2c_recalc_delay(f)
+#else
+#define RECALC_DELAYS(f)
+#endif
+
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
 {
@@ -604,6 +611,7 @@ void set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
+        RECALC_DELAYS(CPUFREQ_MAX);
         PLLCR = 0x11c56005;
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
         CSCR1 = 0x00000980; /* LCD: 2 wait states */
@@ -615,12 +623,13 @@ void set_cpu_frequency(long frequency)
         IDECONFIG1 = 0x106000 | (5 << 10); /* BUFEN2 enable + CS2Pre/CS2Post */
         IDECONFIG2 = 0x40000 | (1 << 8); /* TA enable + CS2wait */
         break;
-        
+
     case CPUFREQ_NORMAL:
         DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, false);
+        RECALC_DELAYS(CPUFREQ_NORMAL);
         PLLCR = 0x13c5e005;
         CSCR0 = 0x00000580; /* Flash: 1 wait state */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
@@ -637,6 +646,7 @@ void set_cpu_frequency(long frequency)
               /* Refresh timer for bypass frequency */
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
+        RECALC_DELAYS(CPUFREQ_DEFAULT);
         PLLCR = 0x10c00200; /* Power down PLL, but keep CLSEL and CRSEL */
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */

@@ -27,123 +27,373 @@
 
 /* TODO: merge all bit-banged I2C into a generic I2C driver */
 
+#define USE_ASM
 
-#define SDA_LO     and_l(~0x00002000, &GPIO1_OUT)
-#define SDA_HI      or_l( 0x00002000, &GPIO1_OUT)
-#define SDA_INPUT  and_l(~0x00002000, &GPIO1_ENABLE)
-#define SDA_OUTPUT  or_l( 0x00002000, &GPIO1_ENABLE)
 #define SDA             ( 0x00002000 & GPIO1_READ)
+#define SDA_LO_OUT  or_l( 0x00002000, &GPIO1_ENABLE)
+#define SDA_HI_IN  and_l(~0x00002000, &GPIO1_ENABLE)
 
-/* SCL is GPIO, 3 */
-#define SCL_INPUT  and_l(~0x00001000, &GPIO_ENABLE)
-#define SCL_OUTPUT  or_l( 0x00001000, &GPIO_ENABLE)
-#define SCL_LO     and_l(~0x00001000, &GPIO_OUT)
-#define SCL_HI      SCL_INPUT;while(!SCL){};or_l(0x1000, &GPIO_OUT);SCL_OUTPUT
 #define SCL             ( 0x00001000 & GPIO_READ)
+#define SCL_LO_OUT  or_l( 0x00001000, &GPIO_ENABLE)
+#define SCL_HI_IN   and_l(~0x00001000, &GPIO_ENABLE); while(!SCL);
 
-/* delay loop to achieve 400kHz at 120MHz CPU frequency */
-#define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
+#define DELAY                           \
+    asm (                               \
+        "move.l  %[dly],%%d0 \n"        \
+    "1:                      \n"        \
+        "subq.l  #1,%%d0     \n"        \
+        "bhi.s   1b          \n"        \
+        : : [dly]"d"(i2c_delay) : "d0" );
 
-static void pcf50606_i2c_start(void)
+static int i2c_delay IDATA_ATTR = 44;
+
+void pcf50606_i2c_recalc_delay(int cpu_clock)
 {
-    SDA_OUTPUT;
-    SCL_OUTPUT;
-    SDA_HI;
-    SCL_HI;
-    DELAY;
-    SDA_LO;
-    DELAY;
-    SCL_LO;
+    i2c_delay = MAX(cpu_clock / (400000*2*3) - 7, 1);
 }
 
-static void pcf50606_i2c_stop(void)
+static inline void pcf50606_i2c_start(void)
 {
-   SDA_LO;
-   SCL_HI;
-   DELAY;
-   SDA_HI;
+#ifdef USE_ASM
+    asm (
+        "not.l   %[sdab]             \n" /* SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
+
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "or.l    %[sdab],(8,%[gpi1]) \n" /* SDA_LO_OUT */
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "or.l    %[sclb],(8,%[gpio]) \n" /* SCL_LO_OUT */
+        : /* outputs */
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay)
+        : /* clobbers */
+        "d0"
+    );
+#else
+    SDA_HI_IN;
+    SCL_HI_IN;
+    DELAY;
+    SDA_LO_OUT;
+    DELAY;
+    SCL_LO_OUT;
+#endif
 }
 
-
-static void pcf50606_i2c_ack(bool ack)
+static inline void pcf50606_i2c_stop(void)
 {
-    SCL_LO;      /* Set the clock low */
+#ifdef USE_ASM
+    asm (
+        "or.l    %[sdab],(8,%[gpi1]) \n" /* SDA_LO_OUT */
+
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "not.l   %[sdab]             \n" /* SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
+        : /* outputs */
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay)
+        : /* clobbers */
+        "d0"
+    );
+#else
+    SDA_LO_OUT;
+    SCL_HI_IN;
+    DELAY;
+    SDA_HI_IN;
+#endif
+}
+
+static inline void pcf50606_i2c_ack(bool ack)
+{
+#ifdef USE_ASM
+    asm (
+        "tst.b   %[ack]              \n" /* if (!ack) */
+        "bne.s   1f                  \n"
+
+        "not.l   %[sdab]             \n" /*   SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
+        ".word   0x51fb              \n" /* trapf.l : else */
+    "1:                              \n"
+        "or.l    %[sdab],(8,%[gpi1]) \n" /*   SDA_LO_OUT */
+
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "or.l    %[sclb],(8,%[gpio]) \n" /* SCL_LO_OUT */
+        : /* outputs */
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay),
+        [ack] "d"(ack)
+        : /* clobbers */
+        "d0"
+    );
+#else
     if(ack)
-        SDA_LO;
+        SDA_LO_OUT;
     else
-        SDA_HI;
+        SDA_HI_IN;
 
-    SCL_HI;
+    SCL_HI_IN;
 
     DELAY;
-    SCL_OUTPUT;
-    SCL_LO;
+    SCL_LO_OUT;
+#endif
 }
 
-static int pcf50606_i2c_getack(void)
+static inline bool pcf50606_i2c_getack(void)
 {
-    int ret = 1;
+    bool ret;
 
-    SDA_INPUT;   /* And set to input */
-    DELAY;
-    SCL_HI;
+#ifdef USE_ASM
+    asm (
+        "not.l   %[sdab]             \n" /* SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
 
-    if (SDA)
-        /* ack failed */
-        ret = 0;
-    
-    SCL_OUTPUT;
-    SCL_LO;
-    SDA_HI;
-    SDA_OUTPUT;
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  (%[gpi1]),%%d0      \n" /* ret = !SDA */
+        "btst.l  #13,%%d0            \n"
+        "seq.b   %[ret]              \n"
+
+        "or.l    %[sclb],(8,%[gpio]) \n" /* SCL_LO_OUT */
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+        : /* outputs */
+        [ret]"=&r"(ret)
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay)
+        : /* clobbers */
+        "d0"
+    );
+#else
+    SDA_HI_IN;
     DELAY;
+    SCL_HI_IN;
+
+    ret = !SDA;
+
+    SCL_LO_OUT;
+    DELAY;
+#endif
 
     return ret;
 }
 
 static void pcf50606_i2c_outb(unsigned char byte)
 {
-   int i;
+#ifdef USE_ASM
+    asm volatile (
+        "moveq.l #24,%%d0            \n" /* byte <<= 24 */
+        "lsl.l   %%d0,%[byte]        \n"
+        "moveq.l #8,%%d1             \n" /* i = 8 */
+        
+    "2:                              \n" /* do */
+        "lsl.l   #1,%[byte]          \n" /* if ((byte <<= 1) carry) */
+        "bcc.s   1f                  \n"
 
-   /* clock out each bit, MSB first */
-   for ( i=0x80; i; i>>=1 ) {
-      if ( i & byte )
-      {
-         SDA_HI;
-      }
-      else
-      {
-         SDA_LO;
-      }
-      DELAY;
-      SCL_HI;
-      DELAY;
-      SCL_LO;
-   }
+        "not.l   %[sdab]             \n" /*   SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
+        ".word   0x51fb              \n" /* trapf.l; else */
+    "1:                              \n"
+        "or.l    %[sdab],(8,%[gpi1]) \n" /*   SDA_LO_OUT */
 
-   SDA_HI;
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "or.l    %[sclb],(8,%[gpio]) \n" /* SCL_LO_OUT */
+
+        "subq.l  #1,%%d1             \n" /* i-- */
+        "bne.s   2b                  \n" /* while (i != 0) */
+        : /* outputs */
+        [byte]"+d"(byte)
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay)
+        : /* clobbers */
+        "d0", "d1"
+    );
+#else
+    int i;
+
+    /* clock out each bit, MSB first */
+    for ( i=0x80; i; i>>=1 )   
+    {
+        if ( i & byte )
+            SDA_HI_IN;
+        else
+            SDA_LO_OUT;
+        DELAY;
+        SCL_HI_IN;
+        DELAY;
+        SCL_LO_OUT;
+    }
+#endif
 }
 
 static unsigned char pcf50606_i2c_inb(bool ack)
 {
-   int i;
-   unsigned char byte = 0;
+    unsigned char byte = 0;
 
-   /* clock in each bit, MSB first */
-   for ( i=0x80; i; i>>=1 ) {
-       SDA_INPUT;   /* And set to input */
-       SCL_HI;
-       DELAY;
-       if ( SDA )
-           byte |= i;
-       SCL_LO;
-       DELAY;
-       SDA_OUTPUT;
-   }
+#ifdef USE_ASM
+    asm (
+        "not.l   %[sdab]             \n" /* SDA_HI_IN */
+        "and.l   %[sdab],(8,%[gpi1]) \n"
+        "not.l   %[sdab]             \n"
 
-   pcf50606_i2c_ack(ack);
+        "moveq.l #8,%%d1             \n" /* i = 8 */
+        "clr.l   %[byte]             \n" /* byte = 0 */
+        
+    "2:                              \n" /* do */
+        "not.l   %[sclb]             \n" /* SCL_HI_IN */
+        "and.l   %[sclb],(8,%[gpio]) \n"
+        "not.l   %[sclb]             \n"
+    "1:                              \n"
+        "move.l  (%[gpio]),%%d0      \n"
+        "btst.l  #12,%%d0            \n"
+        "beq.s   1b                  \n"
+
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "lsl.l   #1,%[byte]          \n" /* byte <<= 1 */
+        "move.l  (%[gpi1]),%%d0      \n" /* if (SDA) */
+        "btst.l  #13,%%d0            \n"
+        "beq.s   1f                  \n"
+        "addq.l  #1,%[byte]          \n" /*   byte++ */
+    "1:                              \n"
+
+        "or.l    %[sclb],(8,%[gpio]) \n" /* SCL_LO_OUT */
+    
+        "move.l  %[dly],%%d0         \n" /* DELAY */
+    "1:                              \n"
+        "subq.l  #1,%%d0             \n"
+        "bhi.s   1b                  \n"
+
+        "subq.l  #1,%%d1             \n" /* i-- */
+        "bne.s   2b                  \n" /* while (i != 0) */
+        : /* outputs */
+        [byte]"=&d"(byte)
+        : /* inputs */
+        [gpio]"a"(&GPIO_READ),
+        [sclb]"d"(0x00001000),
+        [gpi1]"a"(&GPIO1_READ),
+        [sdab]"d"(0x00002000),
+        [dly] "d"(i2c_delay)
+        : /* clobbers */
+        "d0", "d1"
+    );
+#else
+    int i;
+
+    /* clock in each bit, MSB first */
+    SDA_HI_IN;
+    for ( i=0x80; i; i>>=1 )
+    {
+        SCL_HI_IN;
+        DELAY;
+        if ( SDA )
+            byte |= i;
+        SCL_LO_OUT;
+        DELAY;
+    }
+#endif
+
+    pcf50606_i2c_ack(ack);
    
-   return byte;
+    return byte;
 }
 
 int pcf50606_i2c_write(int address, const unsigned char* buf, int count)
@@ -270,12 +520,12 @@ static void set_voltages(void)
 void pcf50606_init(void)
 {
     /* Bit banged I2C */
-    or_l(0x00002000, &GPIO1_OUT);
-    or_l(0x00001000, &GPIO_OUT);
-    or_l(0x00002000, &GPIO1_ENABLE);
-    or_l(0x00001000, &GPIO_ENABLE);
     or_l(0x00002000, &GPIO1_FUNCTION);
     or_l(0x00001000, &GPIO_FUNCTION);
+    and_l(~0x00002000, &GPIO1_OUT);
+    and_l(~0x00001000, &GPIO_OUT);
+    and_l(~0x00002000, &GPIO1_ENABLE);
+    and_l(~0x00001000, &GPIO_ENABLE);
 
     set_voltages();
 
