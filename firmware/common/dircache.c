@@ -567,6 +567,7 @@ static int dircache_do_rebuild(void)
         audiobuf += (long)((dircache_size & ~0x03) + 0x04);
         audiobuf += DIRCACHE_RESERVE;
         allocated_size = dircache_size + DIRCACHE_RESERVE;
+        reserve_used = 0;
     }
     
     return 1;
@@ -612,27 +613,20 @@ static void dircache_thread(void)
  */
 int dircache_build(int last_size)
 {
-    if (dircache_initialized)
+    if (dircache_initialized || thread_enabled)
         return -3;
 
-    while (thread_enabled)
-        sleep(1);
-        
     logf("Building directory cache");
     if (dircache_size > 0)
     {
-        allocated_size = dircache_size + (DIRCACHE_RESERVE-reserve_used);
         thread_enabled = true;
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
-    else
-    {
-        dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
-        dircache_size = 0;
-    }
+    
+    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
 
-    if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT)
+    if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
         
@@ -647,6 +641,23 @@ int dircache_build(int last_size)
 
     /* Start a non-transparent rebuild. */
     return dircache_do_rebuild();
+}
+
+/**
+ * Steal the allocated dircache buffer and disable dircache.
+ */
+void* dircache_steal_buffer(long *size)
+{
+    dircache_disable();
+    if (dircache_size == 0)
+    {
+        *size = 0;
+        return NULL;
+    }
+    
+    *size = dircache_size + (DIRCACHE_RESERVE-reserve_used);
+    
+    return dircache_root;
 }
 
 /**

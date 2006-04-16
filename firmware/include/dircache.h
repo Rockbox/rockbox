@@ -83,6 +83,7 @@ void dircache_init(void);
 int dircache_load(const char *path);
 int dircache_save(const char *path);
 int dircache_build(int last_size);
+void* dircache_steal_buffer(long *size);
 bool dircache_is_enabled(void);
 int dircache_get_entry_count(void);
 int dircache_get_cache_size(void);

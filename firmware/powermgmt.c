@@ -1019,6 +1019,12 @@ void sys_poweroff(void)
     queue_post(&button_queue, SYS_POWEROFF, NULL);
 }
 
+void cancel_shutdown(void)
+{
+    logf("sys_cancel_shutdown()");
+    shutdown_timeout = 0;
+}
+
 /* Various hardware housekeeping tasks relating to shutting down the jukebox */
 void shutdown_hw(void)
 {

@@ -44,6 +44,7 @@
 #include "version.h"
 #include "font.h"
 #include "splash.h"
+#include "tagcache.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -487,6 +488,13 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     (void)parameter;
     exit(0);
 #else
+    if (tagcache_get_commit_step() > 0)
+    {
+        cancel_shutdown();
+        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+        return false;
+    }
+    
 #if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif

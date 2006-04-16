@@ -399,7 +399,9 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
                        0, csi->name);
     }
     
-    tagcache_search(tcs, csi->tagorder[extra]);
+    if (!tagcache_search(tcs, csi->tagorder[extra]))
+        return -1;
+    
     for (i = 0; i < extra; i++)
     {
         tagcache_search_add_filter(tcs, csi->tagorder[i], csi->result_seek[i]);
@@ -502,10 +504,29 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     return total_count;
 }
 
+static int load_root(struct tree_context *c)
+{
+    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    int i;
+    
+    c->currtable = root;
+    for (i = 0; i < si_count; i++)
+    {
+        dptr->name = (si+i)->name;
+        dptr->newtable = navibrowse;
+        dptr->extraseek = i;
+        dptr++;
+    }
+    
+    current_offset = 0;
+    current_entry_count = i;
+    
+    return i;
+}
+
 int tagtree_load(struct tree_context* c)
 {
-    int i;
-    struct tagentry *dptr = (struct tagentry *)c->dircache;
+    int count;
     int table = c->currtable;
     
     c->dentry_size = sizeof(struct tagentry);
@@ -517,25 +538,15 @@ int tagtree_load(struct tree_context* c)
         c->currtable = table;
     }
 
-    switch (table) {
-        case root: {
-            for (i = 0; i < si_count; i++)
-            {
-                dptr->name = (si+i)->name;
-                dptr->newtable = navibrowse;
-                dptr->extraseek = i;
-                dptr++;
-            }
-            c->dirlength = c->filesindir = i;
-            current_offset = 0;
-            current_entry_count = i;
-            
-            return c->dirlength;
-        }
+    switch (table) 
+    {
+        case root:
+            count = load_root(c);
+            break;
 
         case navibrowse:
             logf("navibrowse...");
-            i = retrieve_entries(c, &tcs, 0, true);
+            count = retrieve_entries(c, &tcs, 0, true);
             break;
         
         default:
@@ -543,11 +554,17 @@ int tagtree_load(struct tree_context* c)
             return -1;
     }
     
+    if (count < 0)
+    {
+        c->dirlevel = 0;
+        count = load_root(c);
+        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+    }
 
     /* The _total_ numer of entries available. */
-    c->dirlength = c->filesindir = i;
+    c->dirlength = c->filesindir = count;
     
-    return i;
+    return count;
 }
 
 int tagtree_enter(struct tree_context* c)
@@ -654,13 +671,15 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     
     entry = tagtree_get_entry(c, c->selected_item);
 
-    tagcache_search(&tcs, tag_filename);
+    if (!tagcache_search(&tcs, tag_filename))
+        return -1;
+
     tagcache_search_add_filter(&tcs, tag_title, entry->newtable);
     
     if (!tagcache_get_next(&tcs))
     {
         tagcache_search_finish(&tcs);
-        return -1;
+        return -2;
     }
 
     strncpy(buf, tcs.result, buflen-1);
@@ -681,7 +700,12 @@ static int tagtree_play_folder(struct tree_context* c)
     }
 
     cpu_boost(true);
-    tagcache_search(&tcs, tag_filename);
+    if (!tagcache_search(&tcs, tag_filename))
+    {
+        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+        return -1;
+    }
+    
     for (i=0; i < c->filesindir; i++)
     {
         if (!show_search_progress(false, i))
@@ -717,7 +741,11 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
-        retrieve_entries(c, &tcs, MAX(0, id - (current_entry_count / 2)), false);
+        if (retrieve_entries(c, &tcs, MAX(0, id - (current_entry_count / 2)), 
+                             false) < 0)
+        {
+            return NULL;
+        }
         realid = id - current_offset;
     }
     

@@ -78,6 +78,8 @@ static int init_step;
 /* Tag Cache Header version 'TCHxx' */
 #define TAGCACHE_MAGIC  0x54434802
 
+#define TAGCACHE_RESERVE 32768
+
 /* Tag database structures. */
 
 /* Variable-length tag entry in tag files. */
@@ -575,6 +577,9 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
         tagcache_search_finish(tcs);
     
     memset(tcs, 0, sizeof(struct tagcache_search));
+    if (tagcache_get_commit_step() > 0)
+        return false;
+    
     tcs->position = sizeof(struct tagcache_header);
     tcs->fd = -1;
     tcs->type = tag;
@@ -1453,6 +1458,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * table when the index gets resorted.
                  */
                 tempbuf_insert(buf, loc + TAGFILE_MAX_ENTRIES, entry.idx_id);
+                yield();
             }
         }
         else
@@ -1592,6 +1598,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             /* Skip to next. */
             lseek(tmpfd, entry.data_length - entry.tag_offset[index_type] -
                     entry.tag_length[index_type], SEEK_CUR);
+            yield();
         }
 
         /* Sort the buffer data and write it to the index file. */
@@ -1634,6 +1641,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 error = true;
                 goto error_exit;
             }
+            yield();
         }
     }
 
@@ -1730,7 +1738,8 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             error = true;
             break ;
         }
-
+        
+        yield();
     }
 
     /* Finally write the uniqued tag index file. */
@@ -1796,6 +1805,25 @@ static bool commit(void)
         return true;
     }
 
+    /* Try to steal every buffer we can :) */
+#ifdef HAVE_TC_RAMCACHE
+    if (tempbuf_size == 0 && tagcache_size > 0)
+    {
+        ramcache = false;
+        tempbuf = (char *)(hdr + 1);
+        tempbuf_size = tagcache_size - sizeof(struct ramcache_header);
+    }
+#endif
+    
+#ifdef HAVE_DIRCACHE
+    if (tempbuf_size == 0)
+    {
+        /* Try to steal the dircache buffer. */
+        tempbuf = dircache_steal_buffer(&tempbuf_size);
+    }
+#endif    
+    
+    /* And finally fail if there are no buffers available. */
     if (tempbuf_size == 0)
     {
         logf("delaying commit until next boot");
@@ -1855,6 +1883,17 @@ static bool commit(void)
     logf("tagcache committed");
     remove(TAGCACHE_FILE_TEMP);
     
+#ifdef HAVE_DIRCACHE
+    /* Rebuild the dircache, if we stole the buffer. */
+    dircache_build(0);
+#endif
+
+#ifdef HAVE_TC_RAMCACHE
+    /* Reload tagcache. */
+    if (tagcache_size > 0 && !ramcache)
+        tagcache_start_scan();
+#endif
+    
     return true;
 }
 
@@ -1912,7 +1951,7 @@ static bool allocate_tagcache(void)
      * Now calculate the required cache size plus 
      * some extra space for alignment fixes. 
      */
-    tagcache_size = hdr->h.datasize + 128 +
+    tagcache_size = hdr->h.datasize + 128 + TAGCACHE_RESERVE +
         sizeof(struct index_entry) * hdr->h.entry_count +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
     logf("tagcache: %d bytes allocated.", tagcache_size);
@@ -1932,8 +1971,8 @@ static bool load_tagcache(void)
     int i;
 
     /* We really need the dircache for this. */
-    while (!dircache_is_enabled())
-        sleep(HZ);
+    if (!dircache_is_enabled())
+        return false;
 
     logf("loading tagcache to ram...");
     
@@ -1941,6 +1980,14 @@ static bool load_tagcache(void)
     if (fd < 0)
     {
         logf("tagcache open failed");
+        return false;
+    }
+    
+    if (read(fd, &hdr->h, sizeof(struct tagcache_header))
+        != sizeof(struct tagcache_header)
+        || hdr->h.magic != TAGCACHE_MAGIC)
+    {
+        logf("incorrect header");
         return false;
     }
 
@@ -2252,17 +2299,13 @@ static void tagcache_thread(void)
     bool check_done = false;
 
     /* If the previous cache build/update was interrupted, commit
-     * the changes first. */
+     * the changes first in foreground. */
     cpu_boost(true);
     allocate_tempbuf();
     commit();
     free_tempbuf();
     cpu_boost(false);
     
-#ifdef HAVE_TC_RAMCACHE
-    /* Allocate space for the tagcache if found on disk. */
-    allocate_tagcache();
-#endif
     tagcache_init_done = true;
     
     while (1)
@@ -2288,7 +2331,7 @@ static void tagcache_thread(void)
                 if (!ramcache && global_settings.tagcache_ram)
                     load_ramcache();
     
-                if (global_settings.tagcache_ram)
+                if (ramcache)
                     build_tagcache();
                 
                 check_done = true;
@@ -2303,6 +2346,7 @@ static void tagcache_thread(void)
                 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
+                logf("USB: TagCache");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 usb_wait_for_disconnect(&tagcache_queue);
                 break ;
@@ -2322,7 +2366,7 @@ int tagcache_get_progress(void)
     }
     else
     {
-        if (hdr)
+        if (hdr && ramcache)
             total_count = hdr->h.entry_count;
     }
 #endif
@@ -2362,6 +2406,12 @@ void tagcache_init(void)
 {
     tagcache_init_done = false;
     init_step = 0;
+    
+#ifdef HAVE_TC_RAMCACHE
+    /* Allocate space for the tagcache if found on disk. */
+    allocate_tagcache();
+#endif
+    
     queue_init(&tagcache_queue);
     create_thread(tagcache_thread, tagcache_stack,
                   sizeof(tagcache_stack), tagcache_thread_name);

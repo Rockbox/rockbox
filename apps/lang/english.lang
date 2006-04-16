@@ -8474,3 +8474,16 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Tagcache is not ready"
+  </dest>
+  <voice>
+    *: "Tagcache is not ready"
+  </voice>
+</phrase>
