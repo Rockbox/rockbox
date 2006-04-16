@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.5  2006/04/04 23:58:37  kkurbjun
+// Revision 1.6  2006/04/16 23:14:04  kkurbjun
+// Fix run so that it stays enabled across level loads.  Removed some unused code and added some back in for hopeful future use.
+//
+// Revision 1.5  2006-04-04 23:58:37  kkurbjun
 // Make savegame strings more informative
 //
 // Revision 1.4  2006-04-04 23:13:50  kkurbjun
@@ -1532,21 +1535,15 @@ boolean M_Responder (event_t* ev)
 */
    // F-Keys
    if (!menuactive)
+   {
+      if (ch == key_autorun)      // Autorun                          //  V
+      {
+         autorun = !autorun;
+         return true;
+      }
+
       switch(ch)
       {
-      case KEY_MINUS:         // Screen size down
-         if ((automapmode & am_active) || chat_on)
-            return false;
-         M_SizeDisplay(0);
-         S_StartSound(NULL,sfx_stnmov);
-         return true;
-
-      case KEY_EQUALS:        // Screen size up
-         if ((automapmode & am_active) || chat_on)
-            return false;
-         M_SizeDisplay(1);
-         S_StartSound(NULL,sfx_stnmov);
-         return true;
 /*
       case KEY_F1:            // Help key
          M_StartControlPanel ();
@@ -1571,6 +1568,7 @@ boolean M_Responder (event_t* ev)
          return true;
 */
       }
+   }
 
 
    // Pop-up menu?

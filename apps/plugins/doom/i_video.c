@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.14  2006/04/15 22:08:36  kkurbjun
+ * Revision 1.15  2006/04/16 23:14:04  kkurbjun
+ * Fix run so that it stays enabled across level loads.  Removed some unused code and added some back in for hopeful future use.
+ *
+ * Revision 1.14  2006-04-15 22:08:36  kkurbjun
  * Slight code cleanups, fixed sound parameter - now it saves.  Old configurations will be reset.
  *
  * Revision 1.13  2006-04-06 21:31:49  kkurbjun
@@ -167,7 +170,7 @@ inline void getkey()
       event.data1=KEY_ESCAPE;
 #else
       /* Enable run */
-      event.data1=KEY_RSHIFT;
+      event.data1=KEY_CAPSLOCK;
 #endif
       D_PostEvent(&event);
    }
