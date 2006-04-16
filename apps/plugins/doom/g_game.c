@@ -667,6 +667,7 @@ boolean G_Responder (event_t* ev)
    //
    // killough 11/98: don't autorepeat spy mode switch
 
+#if 0
    if (ev->data1 == key_spy && netgame && (demoplayback || !deathmatch) &&
          gamestate == GS_LEVEL)
    {
@@ -686,6 +687,7 @@ boolean G_Responder (event_t* ev)
       }
       return true;
    }
+#endif
 
    // any other key pops up menu if in demos
    //
@@ -1183,6 +1185,8 @@ void G_DoReborn (int playernum)
 {
    if (!netgame)
       gameaction = ga_loadlevel; // reload the level from scratch
+   (void)playernum;
+#if 0
    else
    {      // respawn at the start
       int i;
@@ -1217,6 +1221,7 @@ void G_DoReborn (int playernum)
       }
       P_SpawnPlayer (&playerstarts[playernum]);
    }
+#endif
 }
 
 // DOOM Par Times
