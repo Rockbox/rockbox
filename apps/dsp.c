@@ -209,7 +209,7 @@ struct crossfeed_data
 
 /* Current setup is one lowshelf filters, three peaking filters and one
    highshelf filter. Varying the number of shelving filters make no sense,
-   but adding peaking filters are possible. */
+   but adding peaking filters is possible. */
 struct eq_state {
     char enabled[5];    /* Flags for active filters */
     struct eqfilter filters[5];
@@ -342,8 +342,8 @@ static void resampler_set_delta(int frequency)
         frequency * 65536LL / NATIVE_FREQUENCY;
 }
 
-/* Linear resampling that introduces a one sample delay, because of our
- * inability to look into the future at the end of a frame.
+/* Linear interpolation resampling that introduces a one sample delay because
+ * of our inability to look into the future at the end of a frame.
  */
 
 /* TODO: we really should have a separate set of resample functions for both
@@ -551,33 +551,40 @@ void apply_crossfeed(int32_t* src[], int count)
     int32_t *coefs = &crossfeed_data.coefs[0];
     int32_t gain = crossfeed_data.gain;
     int di = crossfeed_data.index;
-    
+ 
     int32_t acc;
     int32_t left, right;
     int i;
-    
+
     for (i = 0; i < count; i++) {
         left = src[0][i];
         right = src[1][i];
-        
+
+        /* Filter delayed sample from left speaker */
         ACC_INIT(acc, delay[di*2], coefs[0]);
         ACC(acc, hist_l[0], coefs[1]);
         ACC(acc, hist_l[1], coefs[2]);
-        hist_l[1] = GET_ACC(acc) << 0;
+        /* Save filter history for left speaker */
+        hist_l[1] = GET_ACC(acc);
         hist_l[0] = delay[di*2];
+        /* Filter delayed sample from right speaker */
         ACC_INIT(acc, delay[di*2 + 1], coefs[0]);
         ACC(acc, hist_r[0], coefs[1]);
         ACC(acc, hist_r[1], coefs[2]);
-        hist_r[1] = GET_ACC(acc) << 0;
+        /* Save filter history for right speaker */
+        hist_r[1] = GET_ACC(acc);
         hist_r[0] = delay[di*2 + 1];
         delay[di*2] = left;
         delay[di*2 + 1] = right;
+        /* Now add the attenuated direct sound and write to outputs */
         src[0][i] = FRACMUL(left, gain) + hist_r[1];
         src[1][i] = FRACMUL(right, gain) + hist_l[1];
-        
+ 
+        /* Wrap delay line index if bigger than delay line size */
         if (++di > 12)
             di = 0;
     }
+    /* Write back local copies of data we've modified */
     crossfeed_data.index = di;
 }
 #endif
