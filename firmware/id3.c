@@ -1013,6 +1013,40 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
     return false;
 }
 
+void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
+{
+    long offset;
+    if (orig > dest)
+        offset = - ((size_t)orig - (size_t)dest);
+    else
+        offset = (size_t)dest - (size_t)orig;
+
+    if (entry->title)
+        entry->title += offset;
+    if (entry->artist)
+        entry->artist += offset;
+    if (entry->album)
+        entry->album += offset;
+    if (entry->genre_string)
+        entry->genre_string += offset;
+    if (entry->track_string)
+        entry->track_string += offset;
+    if (entry->year_string)
+        entry->year_string += offset;
+    if (entry->composer)
+        entry->composer += offset;
+    if (entry->track_gain_string)
+        entry->track_gain_string += offset;
+    if (entry->album_gain_string)
+        entry->album_gain_string += offset;
+}
+
+void copy_mp3entry(struct mp3entry *dest, struct mp3entry *orig)
+{
+    memcpy(dest, orig, sizeof(struct mp3entry));
+    adjust_mp3entry(dest, dest, orig);
+}
+
 #ifdef DEBUG_STANDALONE
 
 char *secs2str(int ms)
