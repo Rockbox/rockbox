@@ -95,8 +95,8 @@ typedef struct
 
 #define MAXANIMS 32                   // no longer a strict limit -- killough
 
-static anim_t*  lastanim;
-static anim_t*  anims;                // new structure w/o limits -- killough
+anim_t*  lastanim;
+ anim_t*  anims;                // new structure w/o limits -- killough
 static size_t maxanims;
 
 // killough 3/7/98: Initialize generalized scrolling

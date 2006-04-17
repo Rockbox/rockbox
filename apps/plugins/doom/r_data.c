@@ -897,10 +897,36 @@ int R_TextureNumForName(const char *name)  // const added -- killough
 // to avoid using alloca(), and to improve performance.
 // cph - new wad lump handling, calls cache functions but acquires no locks
 
+// Structures from p_spec.c
+// Used to fully cache animations in the level -> avoids stalls on Hard Drive Systems
+typedef struct
+{
+   boolean     istexture;
+   int         picnum;
+   int         basepic;
+   int         numpics;
+   int         speed;
+
+} anim_t;
+extern anim_t*  anims;
+extern anim_t*  lastanim;
+
+anim_t * isAnim(int flatnum, boolean texcheck)
+{
+   anim_t *checkf;
+   for(checkf=anims; checkf<lastanim; checkf++)
+   {
+      if((flatnum>=checkf->basepic || flatnum<=checkf->numpics)&&checkf->istexture==texcheck)
+         return checkf;
+   }
+   return 0;
+}
+
 void R_PrecacheLevel(void)
 {
-   register int i;
+   register int i, j;
    register byte *hitlist;
+   anim_t *cacheanim;
 
    if (demoplayback)
       return;
@@ -916,6 +942,14 @@ void R_PrecacheLevel(void)
    for (i = numsectors; --i >= 0; )
       hitlist[sectors[i].floorpic] = hitlist[sectors[i].ceilingpic] = 1;
 
+   // If flat is an animation, load those too
+   // Definately not the most efficient, but better then stalls in game
+   for(i=0; i<numflats; i++)
+      if(hitlist[i])
+         if((cacheanim=isAnim(i,0)))
+            for(j=0; j<cacheanim->numpics; j++)
+               hitlist[cacheanim->basepic+j]=1;
+
    for (i = numflats; --i >= 0; )
       if (hitlist[i])
          (W_CacheLumpNum)(firstflat + i, 0);
@@ -928,6 +962,14 @@ void R_PrecacheLevel(void)
       hitlist[sides[i].bottomtexture] =
          hitlist[sides[i].toptexture] =
             hitlist[sides[i].midtexture] = 1;
+
+   // If texture is an animation, load those too
+   // Definately not the most efficient, but better then stalls in game
+   for(i=0; i<numsides; i++)
+      if(hitlist[i])
+         if((cacheanim=isAnim(i,1)))
+            for(j=0; j<cacheanim->numpics; j++)
+               hitlist[cacheanim->basepic+j]=1;
 
    // Sky texture is always present.
    // Note that F_SKY1 is the name used to

@@ -494,7 +494,7 @@ int W_LumpLength (int lump)
 // Loads the lump into the given buffer,
 //  which must be >= W_LumpLength().
 //
-
+#undef DEBUGCACHE
 void W_ReadLump(int lump, void *dest)
 {
    lumpinfo_t *l = lumpinfo + lump;
@@ -511,6 +511,11 @@ void W_ReadLump(int lump, void *dest)
 #endif
    {
       int c;
+
+#if DEBUGCACHE
+      if(gamestate==GS_LEVEL)
+         printf("Loading %s\n", lumpinfo[lump].name);
+#endif
 
       // killough 1/31/98: Reload hack (-wart) removed
 
