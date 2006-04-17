@@ -17,6 +17,8 @@
  *
  ****************************************************************************/
 
+/* TODO: Fast codecs seem to cause badness on track skipping (stop, old audio,
+ * then new audio).  Investigate the CFL_FLUSH mode used for all track skips */
 /* TODO: Check for a possibly broken codepath on a rapid skip, stop event */
 /* TODO: Can use the track changed callback to detect end of track and seek
  * in the previous track until this happens */
@@ -745,7 +747,6 @@ static bool buffer_wind_backward(int new_track_ridx, int old_track_ridx) {
 
 static void audio_update_trackinfo(void)
 {
-    logf("sk2:%s",playlist_peek(0));
     ci.filesize = cur_ti->filesize;
     cur_ti->id3.elapsed = 0;
     cur_ti->id3.offset = 0;
@@ -1834,10 +1835,7 @@ static bool load_next_track(void) {
         manual_skip = false;
     }
     else
-    {
         manual_skip = true;
-        pcmbuf_play_stop();
-    }
     
     cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
@@ -2586,6 +2584,7 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
+#if (ROCKBOX_HAS_LOGF == 1)
 void test_buffer_event(struct mp3entry *id3, bool last_track)
 {
     (void)id3;
@@ -2602,6 +2601,15 @@ void test_unbuffer_event(struct mp3entry *id3, bool last_track)
     logf("ube:%d%s", last_track, id3->path);
 }
 
+void test_track_changed_event(struct mp3entry *id3)
+{
+    (void)id3;
+
+    logf("tce:%s", id3->artist);
+    logf("tce:%s", id3->album);
+}
+#endif
+
 static void playback_init(void)
 {
     static bool voicetagtrue = true;
@@ -2615,8 +2623,11 @@ static void playback_init(void)
     pcm_rec_mux(0);
 #endif
 
+#if (ROCKBOX_HAS_LOGF == 1)
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
+    audio_set_track_changed_event(test_track_changed_event);
+#endif
 
     /* Initialize codec api. */
     ci.read_filebuf = codec_filebuf_callback;
