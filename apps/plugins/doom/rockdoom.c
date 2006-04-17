@@ -240,8 +240,8 @@ const unsigned char wads_builtin[7][30] =
 };
 
 int namemap[7];
-static struct opt_items *addons;
-static struct opt_items *demolmp;
+static struct menu_item *addons;
+static struct menu_item *demolmp;
 char addon[200];
 // This sets up the base game and builds up myargv/c
 bool Dhandle_ver (int dver)
@@ -297,14 +297,14 @@ bool Dhandle_ver (int dver)
 
    if(argvlist.addonnum)
    {
-      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum].string);
+      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum].desc);
       D_AddFile(addon,source_pwad);
       modifiedgame = true; 
    }
 
    if(argvlist.demonum)
    {
-      snprintf(addon, sizeof(addon),"%s%s", GAMEBASE"demos/", demolmp[argvlist.demonum].string);
+      snprintf(addon, sizeof(addon),"%s%s", GAMEBASE"demos/", demolmp[argvlist.demonum].desc);
       D_AddFile(addon, source_lmp);
       G_DeferedPlayDemo(addon);
       singledemo = true;          // quit after one demo
@@ -391,6 +391,7 @@ int Dbuild_base (struct opt_items *names)
    return i;
 }
 
+#if 0
 // This is a general function that takes in an opt_items structure and makes a list
 // of files within it based on matching the string stringmatch to the files.
 int Dbuild_filelist(struct opt_items **names, char *firstentry, char *directory, char *stringmatch)
@@ -434,6 +435,58 @@ int Dbuild_filelist(struct opt_items **names, char *firstentry, char *directory,
          strcpy(startpt,dptr->d_name);
          temp[i].string=startpt;
          temp[i].voice_id=0;
+         i++;
+      }
+   }
+   closedir(filedir);
+   *names=temp;
+   return i;
+}
+#endif
+
+// This is a general function that takes in an menu_item structure and makes a list
+// of files within it based on matching the string stringmatch to the files.
+int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory, char *stringmatch)
+{
+   int            i=0;
+   DIR            *filedir;
+   struct dirent  *dptr;
+   char           *startpt;
+   struct menu_item *temp;
+
+   filedir=opendir(directory);
+
+   if(filedir==NULL)
+   {
+      temp=malloc(sizeof(struct opt_items));
+      temp[0].desc=firstentry;
+      temp[0].function=0;
+      *names=temp;
+      return 1;
+   }
+
+   // Get the total number of entries
+   while((dptr=rb->readdir(filedir)))
+      i++;
+
+   // Reset the directory
+   closedir(filedir);
+   filedir=opendir(directory);
+
+   i++;
+   temp=malloc(i*sizeof(struct opt_items));
+   temp[0].desc=firstentry;
+   temp[0].function=0;
+   i=1;
+
+   while((dptr=rb->readdir(filedir)))
+   {
+      if(rb->strcasestr(dptr->d_name, stringmatch))
+      {
+         startpt=malloc(strlen(dptr->d_name)*sizeof(char));
+         strcpy(startpt,dptr->d_name);
+         temp[i].desc=startpt;
+         temp[i].function=0;
          i++;
       }
    }
@@ -612,15 +665,15 @@ int Oset_keys()
    return (1);
 }
 
-static const struct opt_items onoff[2] = {
-   { "Off", NULL },
-   { "On", NULL },
-};
-
 extern int fake_contrast;
 
 static bool Doptions()
 {
+   static const struct opt_items onoff[2] = {
+      { "Off", NULL },
+      { "On", NULL },
+   };
+
    int m, result;
    int menuquit=0;
 
@@ -688,6 +741,19 @@ static bool Doptions()
    return (1);
 }
 
+int menuchoice(struct menu_item *menu, int items)
+{
+   int m, result;
+   
+   m = rb->menu_init(menu, items,doom_menu_cb, NULL, NULL, NULL);
+
+   result= rb->menu_show(m);
+   rb->menu_exit(m);
+   if(result<items && result>=0)
+      return result;
+   return 0;
+}
+
 //
 // Doom Menu
 //
@@ -712,13 +778,13 @@ int doom_menu()
 
    if( (status=Dbuild_base(names)) == 0 ) // Build up the base wad files (select last added file)
    {
-      rb->splash(HZ, true, "Sorry, you have no base wads");
+      rb->splash(HZ, true, "Missing Base WAD!");
       return -1;
    }
 
-   int numadd=Dbuild_filelist(&addons, "No Addons", GAMEBASE"addons/", ".WAD" );
+   int numadd=Dbuild_filelistm(&addons, "No Addon", GAMEBASE"addons/", ".WAD" );
 
-   int numdemos=Dbuild_filelist(&demolmp, "No Demos", GAMEBASE"demos/", ".LMP" );
+   int numdemos=Dbuild_filelistm(&demolmp, "No Demo", GAMEBASE"demos/", ".LMP" );
 
    argvlist.demonum=0;
    argvlist.addonnum=0;
@@ -733,15 +799,15 @@ int doom_menu()
       result=rb->menu_show(m);
       switch (result) {
          case 0: /* Game picker */
-            rb->set_option("Base Game", &gamever, INT, names, status, NULL );
+            rb->set_option("Game WAD", &gamever, INT, names, status, NULL );
             break;
 
          case 1: /* Addon picker */
-            rb->set_option("Select Addon", &argvlist.addonnum, INT, addons, numadd, NULL );
+            argvlist.addonnum=menuchoice(addons,numadd);
             break;
 
          case 2: /* Demos */
-            rb->set_option("Demos", &argvlist.demonum, INT, demolmp, numdemos, NULL );
+            argvlist.demonum=menuchoice(demolmp,numdemos);
             break;
 
          case 3: /* Options */
