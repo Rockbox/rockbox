@@ -45,7 +45,7 @@
 #define NATIVE_DEPTH        16
 #define SAMPLE_BUF_SIZE     256
 #define RESAMPLE_BUF_SIZE   (256 * 4)   /* Enough for 11,025 Hz -> 44,100 Hz*/
-#define DEFAULT_REPLAYGAIN  0x01000000
+#define DEFAULT_GAIN        0x01000000
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
 
@@ -174,7 +174,7 @@ struct dsp_config
     long album_gain;
     long track_peak;
     long album_peak;
-    long replaygain;    /* Note that this is in S8.23 format. */
+    long replaygain;
     int sample_depth;
     int sample_bytes;
     int stereo_mode;
@@ -183,7 +183,8 @@ struct dsp_config
     bool new_gain;
     bool crossfeed_enabled;
     bool eq_enabled;
-    long eq_precut;     /* Note that this is in S8.23 format. */
+    long eq_precut;
+    long gain;          /* Note that this is in S8.23 format. */
 };
 
 struct resample_data
@@ -589,6 +590,31 @@ void apply_crossfeed(int32_t* src[], int count)
 }
 #endif
 
+/* Combine all gains to a global gain. */
+static void set_gain(void)
+{
+    dsp->gain = DEFAULT_GAIN;
+    
+    if (dsp->replaygain)
+    {
+        dsp->gain = dsp->replaygain;
+    }
+    
+    if (dsp->eq_enabled && dsp->eq_precut)
+    {
+        dsp->gain = (long) (((int64_t) dsp->gain * dsp->eq_precut) >> 24);
+    }
+    
+    if (dsp->gain == DEFAULT_GAIN)
+    {
+        dsp->gain = 0;
+    }
+    else
+    {
+        dsp->gain >>= 1;
+    }
+}
+
 /**
  * Use to enable the equalizer.
  *
@@ -606,8 +632,8 @@ void dsp_set_eq(bool enable)
  */
 void dsp_set_eq_precut(int precut)
 {
-    /* Needs to be in s8.23 format amplitude for apply_gain() */
-    dsp->eq_precut = get_replaygain_int(precut * -10) >> 1;
+    dsp->eq_precut = get_replaygain_int(precut * -10);
+    set_gain();
 }
 
 /**
@@ -678,51 +704,38 @@ static void eq_process(int32_t **x, unsigned num)
  */
 static void apply_gain(int32_t* _src[], int _count)
 {
-    int32_t** src = _src;
-    int count = _count;
-    int32_t* s0 = src[0];
-    int32_t* s1 = src[1];
-    long gain = 0;
-    int32_t s;
-    int i;
-    int32_t *d;
-
-    if (dsp->replaygain)
+    if (dsp->gain)
     {
-        gain = dsp->replaygain;
-    }
-
-    if (dsp->eq_enabled)
-    {
-        gain += dsp->eq_precut; /* FIXME: This isn't that easy right? */
-    }
-
-    /* Don't bother if the gain is zero */
-    if (gain == 0)
-    {
-        return;
-    }
-
-    if (s0 != s1)
-    {
-        d = &sample_buf[SAMPLE_BUF_SIZE / 2];
-        src[1] = d;
-        s = *s1++;
-
+        int32_t** src = _src;
+        int count = _count;
+        int32_t* s0 = src[0];
+        int32_t* s1 = src[1];
+        long gain = dsp->gain;
+        int32_t s;
+        int i;
+        int32_t *d;
+    
+        if (s0 != s1)
+        {
+            d = &sample_buf[SAMPLE_BUF_SIZE / 2];
+            src[1] = d;
+            s = *s1++;
+    
+            for (i = 0; i < count; i++)
+                FRACMUL_8_LOOP(s, gain, s1, d);
+        }
+        else
+        {
+            src[1] = &sample_buf[0];
+        }
+    
+        d = &sample_buf[0];
+        src[0] = d;
+        s = *s0++;
+    
         for (i = 0; i < count; i++)
-            FRACMUL_8_LOOP(s, gain, s1, d);
+            FRACMUL_8_LOOP(s, gain, s0, d);
     }
-    else
-    {
-        src[1] = &sample_buf[0];
-    }
-
-    d = &sample_buf[0];
-    src[0] = d;
-    s = *s0++;
-
-    for (i = 0; i < count; i++)
-        FRACMUL_8_LOOP(s, gain, s0, d);
 }
 
 void channels_set(int value)
@@ -1093,16 +1106,16 @@ void dsp_set_replaygain(bool always)
             if (gain == 0)
             {
                 /* So that noclip can work even with no gain information. */
-                gain = DEFAULT_REPLAYGAIN;
+                gain = DEFAULT_GAIN;
             }
 
             if (global_settings.replaygain_noclip && (peak != 0)
-                && ((((int64_t) gain * peak) >> 24) >= DEFAULT_REPLAYGAIN))
+                && ((((int64_t) gain * peak) >> 24) >= DEFAULT_GAIN))
             {
-                gain = (((int64_t) DEFAULT_REPLAYGAIN << 24) / peak);
+                gain = (((int64_t) DEFAULT_GAIN << 24) / peak);
             }
 
-            if (gain == DEFAULT_REPLAYGAIN)
+            if (gain == DEFAULT_GAIN)
             {
                 /* Nothing to do, disable processing. */
                 gain = 0;
@@ -1111,6 +1124,7 @@ void dsp_set_replaygain(bool always)
         }
 
         /* Store in S8.23 format to simplify calculations. */
-        dsp->replaygain = gain >> 1;
+        dsp->replaygain = gain;
+        set_gain();
     }
 }
