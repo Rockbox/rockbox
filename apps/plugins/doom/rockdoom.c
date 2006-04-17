@@ -240,7 +240,7 @@ const unsigned char wads_builtin[7][30] =
 };
 
 int namemap[7];
-char *addonfiles[10];
+static struct opt_items addons[10];
 static struct opt_items demolmp[11];
 char addon[200];
 // This sets up the base game and builds up myargv/c
@@ -297,7 +297,7 @@ bool Dhandle_ver (int dver)
 
    if(argvlist.addonnum)
    {
-      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addonfiles[argvlist.addonnum]);
+      snprintf(addon,sizeof(addon),"%s%s", GAMEBASE"addons/", addons[argvlist.addonnum].string);
       D_AddFile(addon,source_pwad);
       modifiedgame = true; 
    }
@@ -391,35 +391,35 @@ int Dbuild_base (struct opt_items *names)
    return i;
 }
 
-int Dbuild_addons(struct opt_items *names)
+int Dbuild_addons(struct opt_items *names, char *firstentry, char *directory, char *stringmatch)
 {
    int i=1;
 
-   DIR *addons;
+   DIR *addondir;
    struct   dirent   *dptr;
    char *startpt;
 
-   startpt=malloc(strlen("No Addon")*sizeof(char)); // Add this on to allow for no addon to be played
-   strcpy(startpt,"No Addon");
-   names[0].string=startpt;
+//   startpt=malloc(strlen("No Addon")*sizeof(char)); // Add this on to allow for no addon to be played
+//   strcpy(startpt,"No Addon");
+   names[0].string=firstentry;
    names[0].voice_id=0;
 
-   addons=opendir(GAMEBASE"addons/");
-   if(addons==NULL)
+   addondir=opendir(directory);
+   if(addondir==NULL)
       return 1;
 
-   while((dptr=rb->readdir(addons)) && i<10)
+   while((dptr=rb->readdir(addondir)) && i<10)
    {
-      if(rb->strcasestr(dptr->d_name, ".WAD"))
+      if(rb->strcasestr(dptr->d_name, stringmatch))
       {
-         addonfiles[i]=malloc(strlen(dptr->d_name)*sizeof(char));
-         strcpy(addonfiles[i],dptr->d_name);
-         names[i].string=addonfiles[i];
+         startpt=malloc(strlen(dptr->d_name)*sizeof(char));
+         strcpy(startpt,dptr->d_name);
+         names[i].string=startpt;
          names[i].voice_id=0;
          i++;
       }
    }
-   closedir(addons);
+   closedir(addondir);
    return i;
 }
 
@@ -630,8 +630,6 @@ static const struct opt_items onoff[2] = {
    { "On", NULL },
 };
 
-static struct opt_items addons[10];
-
 extern int fake_contrast;
 
 static bool Doptions()
@@ -647,6 +645,7 @@ static bool Doptions()
       { "Weapon Recoil", NULL },
       { "Translucency", NULL },
       { "Fake Contrast", NULL },
+      { "Always Run", NULL },
    };
 
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -659,7 +658,7 @@ static bool Doptions()
       {
          case 0: /* Sound */
             nosfxparm=!nosfxparm; // Have to invert it before setting
-            rb->set_option("Sound", &nosfxparm, INT, onoff, 2, NULL );
+            rb->set_option(items[0].desc, &nosfxparm, INT, onoff, 2, NULL );
             nosfxparm=!nosfxparm;
             break;
 
@@ -668,23 +667,27 @@ static bool Doptions()
             break;
 
          case 2: /* Timedemo */
-            rb->set_option("Timedemo", &argvlist.timedemo, INT, onoff, 2, NULL );
+            rb->set_option(items[2].desc, &argvlist.timedemo, INT, onoff, 2, NULL );
             break;
 
          case 3: /* Player Bobbing */
-            rb->set_option("Player Bobbing", &default_player_bobbing, INT, onoff, 2, NULL );
+            rb->set_option(items[3].desc, &default_player_bobbing, INT, onoff, 2, NULL );
             break;
 
          case 4: /* Weapon Recoil */
-            rb->set_option("Weapon Recoil", &default_weapon_recoil, INT, onoff, 2, NULL );
+            rb->set_option(items[4].desc, &default_weapon_recoil, INT, onoff, 2, NULL );
             break;
 
          case 5: /* Translucency */
-            rb->set_option("Translucency", &default_translucency, INT, onoff, 2, NULL );
+            rb->set_option(items[5].desc, &default_translucency, INT, onoff, 2, NULL );
             break;
 
          case 6: /* Fake Contrast */
-            rb->set_option("Fake Contrast", &fake_contrast, INT, onoff, 2, NULL );
+            rb->set_option(items[6].desc, &fake_contrast, INT, onoff, 2, NULL );
+            break;
+
+         case 7: /* Fake Contrast */
+            rb->set_option(items[7].desc, &autorun, INT, onoff, 2, NULL );
             break;
 
          default:
@@ -726,7 +729,7 @@ int doom_menu()
       return -1;
    }
 
-   int numadd=Dbuild_addons(addons);
+   int numadd=Dbuild_addons(addons, "No Addons", GAMEBASE"addons/", ".WAD" );
 
    int numdemos=Dbuild_demos(demolmp);
    argvlist.demonum=0;
@@ -748,7 +751,6 @@ int doom_menu()
 
          case 1: /* Addon picker */
             rb->set_option("Select Addon", &argvlist.addonnum, INT, addons, numadd, NULL );
-            //Daddons(numadd);
             break;
 
          case 2: /* Demos */
@@ -816,12 +818,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #ifdef FANCY_MENU
    rb->lcd_setfont(FONT_UI);
-   rb->lcd_putsxy(5,LCD_HEIGHT-20, "RockDoom v0.90");
+   rb->lcd_putsxy(5,LCD_HEIGHT-20, "Welcome to RockDoom");
    rb->lcd_update();
    rb->sleep(HZ*2);
    rb->lcd_setfont(0);
 #else
-   rb->splash(HZ*2, true, "RockDoom v0.90");
+   rb->splash(HZ*2, true, "Welcome to RockDoom");
 #endif
 
    myargv = malloc(sizeof(char *)*MAXARGVS);
@@ -856,14 +858,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    I_Quit(); // Make SURE everything was closed out right
 
-   printf("There were still: %d files open", fpoint);
+   printf("There were still: %d files open\n", fpoint);
    while(fpoint>0)
    {
       rb->close(filearray[fpoint]);
       fpoint--;
    }
 
-   rb->splash(HZ, true, "Bye");
+//   rb->splash(HZ, true, "Bye");
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(false);
