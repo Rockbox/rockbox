@@ -1035,10 +1035,12 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
         entry->year_string += offset;
     if (entry->composer)
         entry->composer += offset;
+#if CONFIG_CODEC == SWCODEC
     if (entry->track_gain_string)
         entry->track_gain_string += offset;
     if (entry->album_gain_string)
         entry->album_gain_string += offset;
+#endif
 }
 
 void copy_mp3entry(struct mp3entry *dest, struct mp3entry *orig)
