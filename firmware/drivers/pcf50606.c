@@ -227,7 +227,7 @@ static inline bool pcf50606_i2c_getack(void)
         "subq.l  #1,%%d0             \n"
         "bhi.s   1b                  \n"
         : /* outputs */
-        [ret]"=&r"(ret)
+        [ret]"=&d"(ret)
         : /* inputs */
         [gpio]"a"(&GPIO_READ),
         [sclb]"d"(0x00001000),
