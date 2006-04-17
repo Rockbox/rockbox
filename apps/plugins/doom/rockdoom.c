@@ -240,8 +240,8 @@ const unsigned char wads_builtin[7][30] =
 };
 
 int namemap[7];
-static struct opt_items addons[10];
-static struct opt_items demolmp[11];
+static struct opt_items *addons;
+static struct opt_items *demolmp;
 char addon[200];
 // This sets up the base game and builds up myargv/c
 bool Dhandle_ver (int dver)
@@ -391,67 +391,54 @@ int Dbuild_base (struct opt_items *names)
    return i;
 }
 
-int Dbuild_addons(struct opt_items *names, char *firstentry, char *directory, char *stringmatch)
+// This is a general function that takes in an opt_items structure and makes a list
+// of files within it based on matching the string stringmatch to the files.
+int Dbuild_filelist(struct opt_items **names, char *firstentry, char *directory, char *stringmatch)
 {
-   int i=1;
+   int            i=0;
+   DIR            *filedir;
+   struct dirent  *dptr;
+   char           *startpt;
+   struct opt_items *temp;
 
-   DIR *addondir;
-   struct   dirent   *dptr;
-   char *startpt;
+   filedir=opendir(directory);
 
-//   startpt=malloc(strlen("No Addon")*sizeof(char)); // Add this on to allow for no addon to be played
-//   strcpy(startpt,"No Addon");
-   names[0].string=firstentry;
-   names[0].voice_id=0;
-
-   addondir=opendir(directory);
-   if(addondir==NULL)
+   if(filedir==NULL)
+   {
+      temp=malloc(sizeof(struct opt_items));
+      temp[0].string=firstentry;
+      temp[0].voice_id=0;
+      *names=temp;
       return 1;
+   }
 
-   while((dptr=rb->readdir(addondir)) && i<10)
+   // Get the total number of entries
+   while((dptr=rb->readdir(filedir)))
+      i++;
+
+   // Reset the directory
+   closedir(filedir);
+   filedir=opendir(directory);
+
+   i++;
+   temp=malloc(i*sizeof(struct opt_items));
+   temp[0].string=firstentry;
+   temp[0].voice_id=0;
+   i=1;
+
+   while((dptr=rb->readdir(filedir)))
    {
       if(rb->strcasestr(dptr->d_name, stringmatch))
       {
          startpt=malloc(strlen(dptr->d_name)*sizeof(char));
          strcpy(startpt,dptr->d_name);
-         names[i].string=startpt;
-         names[i].voice_id=0;
+         temp[i].string=startpt;
+         temp[i].voice_id=0;
          i++;
       }
    }
-   closedir(addondir);
-   return i;
-}
-
-int Dbuild_demos(struct opt_items *names)
-{
-   int i=1;
-
-   DIR *demos;
-   struct   dirent   *dptr;
-   char *startpt;
-
-   startpt=malloc(strlen("No Demo")*sizeof(char)); // Add this on to allow for no demo to be played
-   strcpy(startpt,"No Demo");
-   names[0].string=startpt;
-   names[0].voice_id=0;
-
-   demos=opendir(GAMEBASE"demos/");
-   if(demos==NULL)
-      return 1;
-
-   while((dptr=rb->readdir(demos)) && i<11)
-   {
-      if(rb->strcasestr(dptr->d_name, ".LMP"))
-      {
-         startpt=malloc(strlen(dptr->d_name)*sizeof(char));
-         strcpy(startpt,dptr->d_name);
-         names[i].string=startpt;
-         names[i].voice_id=0;
-         i++;
-      }
-   }
-   closedir(demos);
+   closedir(filedir);
+   *names=temp;
    return i;
 }
 
@@ -729,11 +716,11 @@ int doom_menu()
       return -1;
    }
 
-   int numadd=Dbuild_addons(addons, "No Addons", GAMEBASE"addons/", ".WAD" );
+   int numadd=Dbuild_filelist(&addons, "No Addons", GAMEBASE"addons/", ".WAD" );
 
-   int numdemos=Dbuild_demos(demolmp);
+   int numdemos=Dbuild_filelist(&demolmp, "No Demos", GAMEBASE"demos/", ".LMP" );
+
    argvlist.demonum=0;
-
    argvlist.addonnum=0;
 
    gamever=status-1;
@@ -810,7 +797,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    // We're using doom's memory management since it implements a proper free (and re-uses the memory)
    // and now with prboom's code: realloc and calloc
-   printf ("Z_Init: Init zone memory allocation daemon. \n");
+   printf ("Z_Init: Init zone memory allocation daemon.\n");
    Z_Init ();
 
    printf ("M_LoadDefaults: Load system defaults.\n");
@@ -826,10 +813,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->splash(HZ*2, true, "Welcome to RockDoom");
 #endif
 
-   myargv = malloc(sizeof(char *)*MAXARGVS);
-   memset(myargv,0,sizeof(char *)*MAXARGVS);
-   myargv[0]="doom.rock";
-   myargc=1;
+   myargv =0;
+   myargc=0;
 
    int result=doom_menu();
 
@@ -864,8 +849,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
       rb->close(filearray[fpoint]);
       fpoint--;
    }
-
-//   rb->splash(HZ, true, "Bye");
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(false);
