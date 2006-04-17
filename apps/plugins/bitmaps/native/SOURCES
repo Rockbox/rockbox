@@ -1,10 +1,12 @@
 #ifdef HAVE_LCD_BITMAP
 
 /* Bubbles */
-#if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
-bubbles_emblem.160x128x2.bmp
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+bubbles_emblem.112x64x1.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
 bubbles_emblem.138x110x2.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
+bubbles_emblem.160x128x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && defined(HAVE_LCD_COLOR)
 bubbles_emblem.160x128x16.bmp
 bubbles_left.160x128x16.bmp

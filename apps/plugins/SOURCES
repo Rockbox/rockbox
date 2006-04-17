@@ -36,9 +36,7 @@ plasma.c
 #endif
 
 bounce.c
-#if ((LCD_WIDTH >= 138) && (LCD_HEIGHT >= 110))
 bubbles.c
-#endif 
 #if LCD_WIDTH != 128
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c

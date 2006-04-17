@@ -1,7 +1,9 @@
 #ifdef HAVE_LCD_BITMAP
 
 /* Bubbles */
-#if (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+bubbles_bubble.112x64x1.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 bubbles_bubble.160x128x1.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
 bubbles_bubble.160x128x1.bmp
