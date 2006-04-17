@@ -55,7 +55,11 @@
 #define BUFMUL                  4
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
 
+#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define SAMPLERATE  44100  // 44100 22050 11025
+#else
 #define SAMPLERATE  11025  // 44100 22050 11025
+#endif
 #define SAMPLESIZE  2      // 16bit
 
 // The global mixing buffer.
