@@ -778,8 +778,8 @@ int doom_menu()
 
    if( (status=Dbuild_base(names)) == 0 ) // Build up the base wad files (select last added file)
    {
-      rb->splash(HZ, true, "Missing Base WAD!");
-      return -1;
+      rb->splash(HZ*2, true, "Missing Base WAD!");
+      return -2;
    }
 
    int numadd=Dbuild_filelistm(&addons, "No Addon", GAMEBASE"addons/", ".WAD" );
@@ -882,9 +882,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    myargv =0;
    myargc=0;
 
-   int result=doom_menu();
+   rb->lcd_clear_display();
 
-   if( result == -1) return PLUGIN_OK; // No base wads found or quit was selected
+   int result = doom_menu();
+   if( result == -1 ) return PLUGIN_OK; // Quit was selected
+   else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads
 
    Dhandle_ver( namemap[ result ] );
 
