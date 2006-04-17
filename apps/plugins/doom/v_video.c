@@ -417,7 +417,7 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
    y -= SHORT(patch->topoffset);
    x -= SHORT(patch->leftoffset);
 
-//   // CPhipps - auto-no-stretch if not high-res
+   // CPhipps - auto-no-stretch if not high-res
    if (flags & VPT_STRETCH)
      if ((SCREENWIDTH==320) && (SCREENHEIGHT==200))
          flags &= ~VPT_STRETCH;
@@ -430,9 +430,12 @@ void V_DrawMemPatch(int x, int y, int scrn, const patch_t *patch,
          ||x+SHORT(patch->width) > ((flags & VPT_STRETCH) ? 320 : SCREENWIDTH)
          || y<0
          || y+SHORT(patch->height) > ((flags & VPT_STRETCH) ? 200 :  SCREENHEIGHT))
+   {
+      rb->splash(HZ*2, true, "This wad does not follow standard doom graphics!");
       // killough 1/19/98: improved error message:
       I_Error("V_DrawMemPatch: Patch (%d,%d)-(%d,%d) exceeds LFB Bad V_DrawMemPatch (flags=%u)",
          x, y, x+SHORT(patch->width), y+SHORT(patch->height), flags);
+   }
 
    if (!(flags & VPT_STRETCH)) {
       unsigned int             col;
