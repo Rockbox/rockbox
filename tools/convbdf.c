@@ -503,7 +503,7 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
             }
             continue;
         }
-        if (strequal(buf, "BITMAP")) {
+        if (strequal(buf, "BITMAP") || strequal(buf, "BITMAP ")) {
             bitmap_t *ch_bitmap = pf->bits + ofs;
             int ch_words;
 
@@ -585,15 +585,12 @@ int bdf_read_bitmaps(FILE *fp, struct font* pf)
     /* set max width*/
     pf->maxwidth = maxwidth;
 
-    /* change unused offset/width values to default char values*/
+    /* change unused width values to default char values*/
     for (i=0; i<pf->size; ++i) {
         int defchar = pf->defaultchar - pf->firstchar;
 
-        if (pf->offset[i] == (unsigned int)-1) {
-            pf->offset[i] = pf->offset[defchar];
-            pf->offrot[i] = pf->offrot[defchar];
+        if (pf->offset[i] == (unsigned int)-1)
             pf->width[i] = pf->width[defchar];
-        }
     }
 
     /* determine whether font doesn't require encode table*/
@@ -767,7 +764,6 @@ int gen_c_source(struct font* pf, char *path)
 {
     FILE *ofp;
     int i, ofr = 0;
-    int did_defaultchar = 0;
     int did_syncmsg = 0;
     time_t t = time(0);
     bitmap_t *ofs = pf->bits;
@@ -823,22 +819,14 @@ int gen_c_source(struct font* pf, char *path)
         int bitcount = 0;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
         int height = pf->height;
-        bitmap_t *bits = pf->bits + (pf->offset? pf->offset[i]: (height * i));
+        bitmap_t *bits;
         bitmap_t bitvalue;
 
-        /*
-         * Generate bitmap bits only if not this index isn't
-         * the default character in encode map, or the default
-         * character hasn't been generated yet.
-         */
-        if (pf->offset && 
-            (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
-            if (did_defaultchar) {
-                pf->offrot[i] = pf->offrot[pf->defaultchar-pf->firstchar];
-                continue;
-            }
-            did_defaultchar = 1;
-        }
+        /* Skip missing glyphs */
+        if (pf->offset && (pf->offset[i] == (unsigned int)-1))
+            continue;
+
+        bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
 
         fprintf(ofp, "\n/* Character %d (0x%02x):\n   width %d",
                 i+pf->firstchar, i+pf->firstchar, width);
@@ -888,7 +876,7 @@ int gen_c_source(struct font* pf, char *path)
             for (x=0; x<width; x++) {
                 fprintf(ofp, "0x%02x, ", bytemap[ix]);
                 ix++;
-            }	
+            }
             fprintf(ofp, "\n");
           }
 
@@ -904,7 +892,7 @@ int gen_c_source(struct font* pf, char *path)
                 fprintf(stderr, "Warning: found encoding values in non-sorted order (not an error).\n");
                 did_syncmsg = 1;
             }
-        }	
+        }
 #endif
     }
     fprintf(ofp, "};\n\n");
@@ -914,13 +902,18 @@ int gen_c_source(struct font* pf, char *path)
         fprintf(ofp, "/* Character->glyph mapping. */\n"
                 "static const unsigned short _sysfont_offset[] = {\n");
 
-        for (i=0; i<pf->size; ++i)
+        for (i=0; i<pf->size; ++i) {
+            if (pf->offset[i] == (unsigned int)-1) {
+                pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
+                pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
+            }
             fprintf(ofp, "  %ld,\t/* (0x%02x) */\n", 
 #ifdef ROTATE
                     pf->offrot[i], i+pf->firstchar);
 #else
                     pf->offset[i], i+pf->firstchar);
 #endif
+        }
         fprintf(ofp, "};\n\n");
     }
 
@@ -999,7 +992,7 @@ static int writestr(FILE *fp, char *str, int count)
 static int writestrpad(FILE *fp, char *str, int totlen)
 {
     int ret;
-	
+
     while (str && *str && totlen > 0) {
         if (*str) {
             ret = putc(*str++, fp);
@@ -1016,7 +1009,6 @@ int gen_fnt_file(struct font* pf, char *path)
 {
     FILE *ofp;
     int i;
-    int did_defaultchar = 0;
 #ifdef ROTATE
     int ofr = 0;
 #endif
@@ -1053,19 +1045,16 @@ int gen_fnt_file(struct font* pf, char *path)
 #ifdef ROTATE
     for (i=0; i<pf->size; ++i)
     {
-        bitmap_t* bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
+        bitmap_t* bits;
         int width = pf->width ? pf->width[i] : pf->maxwidth;
         int size;  
         unsigned char bytemap[256];
-  
-        if (pf->offset && 
-            (pf->offset[i] == pf->offset[pf->defaultchar-pf->firstchar])) {
-            if (did_defaultchar) {
-                pf->offrot[i] = pf->offrot[pf->defaultchar-pf->firstchar];
-                continue;
-            }
-            did_defaultchar = 1;
-        }
+
+        /* Skip missing glyphs */
+        if (pf->offset && (pf->offset[i] == (unsigned int)-1))
+            continue;
+
+        bits = pf->bits + (pf->offset? pf->offset[i]: (pf->height * i));
 
         size = rotleft(bytemap, bits, width, pf->height);
         writestr(ofp, (char *)bytemap, size);
@@ -1092,6 +1081,9 @@ int gen_fnt_file(struct font* pf, char *path)
     {
         for (i=0; i<pf->size; ++i)
         {
+            if (pf->offset[i] == (unsigned int)-1) {
+                pf->offrot[i] = pf->offrot[pf->defaultchar - pf->firstchar];
+            }
             if ( pf->bits_size < 0xFFDB )
                 writeshort(ofp, pf->offrot[i]);
             else
@@ -1109,8 +1101,12 @@ int gen_fnt_file(struct font* pf, char *path)
         writeshort(ofp, 0);		/* pad to 32-bit boundary*/
 
     if (pf->offset)
-        for (i=0; i<pf->size; ++i)
+        for (i=0; i<pf->size; ++i) {
+            if (pf->offset[i] == (unsigned int)-1) {
+                pf->offset[i] = pf->offset[pf->defaultchar - pf->firstchar];
+            }
             writeint(ofp, pf->offset[i]);
+        }
 
     if (pf->width)
         for (i=0; i<pf->size; ++i)
