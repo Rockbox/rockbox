@@ -31,15 +31,37 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define HAVE_TC_RAMCACHE 1
 #endif
 
-/* Allow a little drift to the filename ordering. */
+/* Allow a little drift to the filename ordering (should not be too high/low). */
 #define POS_HISTORY_COUNT 4
+
+/* How much to pre-load entries while committing to prevent seeking. */
+#define IDX_BUF_DEPTH 64
+
+/* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
+#define TAGCACHE_MAGIC  0x54434803
+
+/* How much to allocate extra space for ramcache. */
+#define TAGCACHE_RESERVE 32768
 
 /* How many entries we can create in one tag file (for sorting). */
 #define TAGFILE_MAX_ENTRIES  20000
 
+/* How many entries to fetch to the seek table at once while searching. */
 #define SEEK_LIST_SIZE 50
+
+/* Always strict align entries for best performance and binary compatability. */
+#define TAGCACHE_STRICT_ALIGN 1
+
 #define TAGCACHE_MAX_FILTERS 3
 #define TAGCACHE_MAX_CLAUSES 10
+
+/* Tag database files. */
+#define TAGCACHE_FILE_TEMP    ROCKBOX_DIR "/tagcache_tmp.tcd"
+#define TAGCACHE_FILE_MASTER  ROCKBOX_DIR "/tagcache_idx.tcd"
+#define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
+
+/* Flags */
+#define FLAG_DELETED    0x0001
 
 enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
     clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };

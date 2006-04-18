@@ -5,6 +5,7 @@ logf.c
 backlight.c
 buffer.c
 common/atoi.c
+common/crc32.c
 common/ctype.c
 #ifndef SIMULATOR
 common/dir.c

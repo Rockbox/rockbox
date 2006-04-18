@@ -33,6 +33,7 @@
 #include "tagcache.h"
 #include "buffer.h"
 #include "atoi.h"
+#include "crc32.h"
 
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
@@ -66,19 +67,12 @@ static bool tagcache_init_done = false;
 static int init_step;
 
 /* Queue commands. */
-#define Q_STOP_SCAN     0
-#define Q_START_SCAN    1
-#define Q_FORCE_UPDATE  2
+enum tagcache_queue {
+    Q_STOP_SCAN = 0,
+    Q_START_SCAN,
+    Q_FORCE_UPDATE,
+};
 
-/* Tag database files. */
-#define TAGCACHE_FILE_TEMP    ROCKBOX_DIR "/tagcache_tmp.tcd"
-#define TAGCACHE_FILE_MASTER  ROCKBOX_DIR "/tagcache_idx.tcd"
-#define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
-
-/* Tag Cache Header version 'TCHxx' */
-#define TAGCACHE_MAGIC  0x54434802
-
-#define TAGCACHE_RESERVE 32768
 
 /* Tag database structures. */
 
@@ -92,6 +86,7 @@ struct tagfile_entry {
 /* Fixed-size tag entry in master db index. */
 struct index_entry {
     long tag_seek[TAG_COUNT];
+    long flag;
 };
 
 /* Header is the same in every file. */
@@ -868,6 +863,19 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
 }
 
 #if 0
+
+static bool tagcache_delete(const char *filename)
+{
+    struct index_entry *entry;
+    
+    entry = find_entry_disk(filename, true);
+    if (entry == NULL)
+    {
+        logf("not found: %s", filename);
+        return false;
+    }
+}
+
 void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
 {
     struct tagentry *entry;
@@ -1111,7 +1119,7 @@ static bool tempbuf_insert(char *str, int id, int idx_id)
         return false;
     
     index[tempbufidx].id = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
-#ifdef ROCKBOX_STRICT_ALIGN
+#ifdef TAGCACHE_STRICT_ALIGN
     /* Make sure the entry is long aligned. */
     if ((long)index[tempbufidx].id & 0x03)
     {
@@ -1141,41 +1149,51 @@ static bool tempbuf_unique_insert(char *str, int id)
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     struct tempbuf_id *idp;
     int i;
+    unsigned crc32;
+    unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
     
-    /* Check if string already exists. */
+    crc32 = crc_32(str, strlen(str), 0xffffffff);
+    
+    /* Check if the crc does not exist -> entry does not exist for sure. */
     for (i = 0; i < tempbufidx; i++)
     {
-        if (!strcasecmp(str, index[i].str))
+        if (*(crcbuf--) == crc32)
         {
-            tempbuf_left -= sizeof(struct tempbuf_id);
-            if (tempbuf_left - 4 < 0)
-                return false;
-            
-            idp = index[i].id;
-            while (idp->next != NULL)
-                idp = idp->next;
-            
-            idp->next = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
-#ifdef ROCKBOX_STRICT_ALIGN
-            /* Make sure the entry is long aligned. */
-            if ((long)idp->next & 0x03)
+            if (!strcasecmp(str, index[i].str))
             {
-                int fix = 4 - ((long)idp->next & 0x03);
-                tempbuf_left -= fix;
-                tempbuf_pos += fix;
-                idp->next = (struct tempbuf_id *)((
-                        (long)idp->next & ~0x03) + 0x04);
-            }
+                tempbuf_left -= sizeof(struct tempbuf_id);
+                if (tempbuf_left - 4 < 0)
+                    return false;
+                
+                idp = index[i].id;
+                while (idp->next != NULL)
+                    idp = idp->next;
+                
+                idp->next = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
+#if TAGCACHE_STRICT_ALIGN
+                /* Make sure the entry is long aligned. */
+                if ((long)idp->next & 0x03)
+                {
+                    int fix = 4 - ((long)idp->next & 0x03);
+                    tempbuf_left -= fix;
+                    tempbuf_pos += fix;
+                    idp->next = (struct tempbuf_id *)
+                        (((long)idp->next & ~0x03) + 0x04);
+                }
 #endif
-            idp = idp->next;
-            idp->id = id;
-            idp->next = NULL;
-            tempbuf_pos += sizeof(struct tempbuf_id);
-            
-            return true;
+                idp = idp->next;
+                idp->id = id;
+                idp->next = NULL;
+                tempbuf_pos += sizeof(struct tempbuf_id);
+                
+                return true;
+            }
         }
     }
     
+    /* Insert and quit. */
+    *crcbuf = crc32;
+    tempbuf_left -= 4;
     return tempbuf_insert(str, id, -1);
 }
 
@@ -1200,7 +1218,7 @@ static int tempbuf_sort(int fd)
     struct tagfile_entry fe;
     int i;
     int length;
-#ifdef ROCKBOX_STRICT_ALIGN
+#ifdef TAGCACHE_STRICT_ALIGN
     int fix;
 #endif
     
@@ -1213,7 +1231,7 @@ static int tempbuf_sort(int fd)
         fe.tag_length = length;
         fe.idx_id = index[i].idx_id;
         
-#ifdef ROCKBOX_STRICT_ALIGN
+#ifdef TAGCACHE_STRICT_ALIGN
         /* Make sure the entry is long aligned. */
         if (index[i].seek & 0x03)
         {
@@ -1241,7 +1259,7 @@ static int tempbuf_sort(int fd)
             return -2;
         }
         
-#ifdef ROCKBOX_STRICT_ALIGN
+#ifdef TAGCACHE_STRICT_ALIGN
         /* Write some padding. */
         if (fix)
             write(fd, "XXX", fix);
@@ -1251,15 +1269,21 @@ static int tempbuf_sort(int fd)
     return i;
 }
     
-
-static struct tempbuf_searchidx* tempbuf_locate(int id)
+inline static struct tempbuf_searchidx* tempbuf_locate(int id)
 {
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     struct tempbuf_id *idp;
+    static int last_id = 0;
     int i;
     
+    try_again:
+    
+    if (last_id >= tempbufidx)
+        last_id = 0;
+    
     /* Check if string already exists. */
-    for (i = 0; i < tempbufidx; i++)
+    /* FIXME: This check is extremely slow, O(n^2) */
+    for (i = last_id; i < tempbufidx; i++)
     {
         idp = index[i].id;
         while (idp != NULL)
@@ -1270,11 +1294,14 @@ static struct tempbuf_searchidx* tempbuf_locate(int id)
         }
     }
     
+    if (last_id)
+        goto try_again;
+    
     return NULL;
 }
 
 
-static int tempbuf_find_location(int id)
+inline static int tempbuf_find_location(int id)
 {
     struct tempbuf_searchidx *entry;
 
@@ -1380,12 +1407,13 @@ static bool build_numeric_index(int index_type, struct tagcache_header *h, int t
     
     return true;
 }
-    
+
 static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
 {
     int i;
     struct tagcache_header tch;
-    struct index_entry idx;
+    struct index_entry idxbuf[IDX_BUF_DEPTH];
+    int idxbuf_pos;
     char buf[MAX_PATH];
     int fd = -1, masterfd;
     bool error = false;
@@ -1425,6 +1453,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
          */
         if (tagcache_is_sorted_tag(index_type))
         {
+            logf("loading tags...");
             for (i = 0; i < tch.entry_count; i++)
             {
                 struct tagfile_entry entry;
@@ -1460,6 +1489,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 tempbuf_insert(buf, loc + TAGFILE_MAX_ENTRIES, entry.idx_id);
                 yield();
             }
+            logf("done");
         }
         else
             tempbufidx = tch.entry_count;
@@ -1555,6 +1585,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
     {
         lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
         /* h is the header of the temporary file containing new tags. */
+        logf("inserting new tags...");
         for (i = 0; i < h->entry_count; i++)
         {
             struct temp_file_entry entry;
@@ -1600,6 +1631,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     entry.tag_length[index_type], SEEK_CUR);
             yield();
         }
+        logf("done");
 
         /* Sort the buffer data and write it to the index file. */
         lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
@@ -1611,128 +1643,146 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         /**
          * Now update all indexes in the master lookup file.
          */
+        logf("updating indices...");
         lseek(masterfd, sizeof(struct tagcache_header), SEEK_SET);
-        for (i = 0; i < tch.entry_count; i++)
+        for (i = 0; i < tch.entry_count; i += idxbuf_pos)
         {
+            int j;
             int loc = lseek(masterfd, 0, SEEK_CUR);
-
-            if (read(masterfd, &idx, sizeof(struct index_entry)) !=
-                sizeof(struct index_entry))
+            
+            idxbuf_pos = MIN(tch.entry_count - i, IDX_BUF_DEPTH);
+            
+            if (read(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+                (int)sizeof(struct index_entry)*idxbuf_pos)
             {
                 logf("read fail #2");
                 error = true;
                 goto error_exit ;
             }
-            idx.tag_seek[index_type] = tempbuf_find_location(
-                    idx.tag_seek[index_type]+TAGFILE_MAX_ENTRIES);
-            if (idx.tag_seek[index_type] < 0)
-            {
-                logf("update error: %d/%d", i, tch.entry_count);
-                error = true;
-                goto error_exit;
-            }
-
-            /* Write back the updated index. */
             lseek(masterfd, loc, SEEK_SET);
-            if (write(masterfd, &idx, sizeof(struct index_entry)) !=
-                sizeof(struct index_entry))
+            
+            for (j = 0; j < idxbuf_pos; j++)
+            {
+                idxbuf[j].tag_seek[index_type] = tempbuf_find_location(
+                    idxbuf[j].tag_seek[index_type]+TAGFILE_MAX_ENTRIES);
+                
+                if (idxbuf[j].tag_seek[index_type] < 0)
+                {
+                    logf("update error: %d/%d", i+j, tch.entry_count);
+                    error = true;
+                    goto error_exit;
+                }
+                yield();
+            }
+            
+            /* Write back the updated index. */
+            if (write(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+                (int)sizeof(struct index_entry)*idxbuf_pos)
             {
                 logf("write fail");
                 error = true;
                 goto error_exit;
             }
-            yield();
         }
+        logf("done");
     }
 
     /**
      * Walk through the temporary file containing the new tags.
      */
     // build_normal_index(h, tmpfd, masterfd, idx);
+    logf("updating new indices...");
     lseek(masterfd, masterfd_pos, SEEK_SET);
     lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
     lseek(fd, 0, SEEK_END);
-    for (i = 0; i < h->entry_count; i++)
+    for (i = 0; i < h->entry_count; i += idxbuf_pos)
     {
+        int j;
+        
+        idxbuf_pos = MIN(h->entry_count - i, IDX_BUF_DEPTH);
         if (init)
         {
-            memset(&idx, 0, sizeof(struct index_entry));
+            memset(idxbuf, 0, sizeof(struct index_entry)*IDX_BUF_DEPTH);
         }
         else
         {
-            if (read(masterfd, &idx, sizeof(struct index_entry)) !=
-                sizeof(struct index_entry))
+            int loc = lseek(masterfd, 0, SEEK_CUR);
+            
+            if (read(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+                (int)sizeof(struct index_entry)*idxbuf_pos)
             {
                 logf("read fail #2");
                 error = true;
                 break ;
             }
-            lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
+            lseek(masterfd, loc, SEEK_SET);
         }
 
         /* Read entry headers. */
-        if (!tagcache_is_sorted_tag(index_type))
+        for (j = 0; j < idxbuf_pos; j++)
         {
-            struct temp_file_entry entry;
-            struct tagfile_entry fe;
-            
-            if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
-                sizeof(struct temp_file_entry))
+            if (!tagcache_is_sorted_tag(index_type))
             {
-                logf("read fail #1");
-                error = true;
-                break ;
-            }
+                struct temp_file_entry entry;
+                struct tagfile_entry fe;
+                
+                if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
+                    sizeof(struct temp_file_entry))
+                {
+                    logf("read fail #1");
+                    error = true;
+                    break ;
+                }
+                
+                /* Read data. */
+                if (entry.tag_length[index_type] >= (int)sizeof(buf))
+                {
+                    logf("too long entry!");
+                    logf("length=%d", entry.tag_length[index_type]);
+                    logf("pos=0x%02x", lseek(tmpfd, 0, SEEK_CUR));
+                    error = true;
+                    break ;
+                }
+                
+                lseek(tmpfd, entry.tag_offset[index_type], SEEK_CUR);
+                if (read(tmpfd, buf, entry.tag_length[index_type]) !=
+                    entry.tag_length[index_type])
+                {
+                    logf("read fail #3");
+                    logf("offset=0x%02x", entry.tag_offset[index_type]);
+                    logf("length=0x%02x", entry.tag_length[index_type]);
+                    error = true;
+                    break ;
+                }
 
-            /* Read data. */
-            if (entry.tag_length[index_type] >= (int)sizeof(buf))
+                /* Write to index file. */
+                idxbuf[j].tag_seek[index_type] = lseek(fd, 0, SEEK_CUR);
+                fe.tag_length = entry.tag_length[index_type];
+                fe.idx_id = tch.entry_count + i + j;
+                write(fd, &fe, sizeof(struct tagfile_entry));
+                write(fd, buf, fe.tag_length);
+                tempbufidx++;
+
+                /* Skip to next. */
+                lseek(tmpfd, entry.data_length - entry.tag_offset[index_type] -
+                      entry.tag_length[index_type], SEEK_CUR);
+            }
+            else
             {
-                logf("too long entry!");
-                logf("length=%d", entry.tag_length[index_type]);
-                logf("pos=0x%02x", lseek(tmpfd, 0, SEEK_CUR));
-                error = true;
-                break ;
+                /* Locate the correct entry from the sorted array. */
+                idxbuf[j].tag_seek[index_type] = tempbuf_find_location(i + j);
+                if (idxbuf[j].tag_seek[index_type] < 0)
+                {
+                    logf("entry not found (%d)");
+                    error = true;
+                    break ;
+                }
             }
-
-            lseek(tmpfd, entry.tag_offset[index_type], SEEK_CUR);
-            if (read(tmpfd, buf, entry.tag_length[index_type]) !=
-                entry.tag_length[index_type])
-            {
-                logf("read fail #3");
-                logf("offset=0x%02x", entry.tag_offset[index_type]);
-                logf("length=0x%02x", entry.tag_length[index_type]);
-                error = true;
-                break ;
-            }
-
-            /* Write to index file. */
-            idx.tag_seek[index_type] = lseek(fd, 0, SEEK_CUR);
-            fe.tag_length = entry.tag_length[index_type];
-            fe.idx_id = tch.entry_count + i;
-            write(fd, &fe, sizeof(struct tagfile_entry));
-            write(fd, buf, fe.tag_length);
-            tempbufidx++;
-
-            /* Skip to next. */
-           lseek(tmpfd, entry.data_length - entry.tag_offset[index_type] -
-                 entry.tag_length[index_type], SEEK_CUR);
         }
-        else
-        {
-            /* Locate the correct entry from the sorted array. */
-            idx.tag_seek[index_type] = tempbuf_find_location(i);
-            if (idx.tag_seek[index_type] < 0)
-            {
-                logf("entry not found (%d)");
-                error = true;
-                break ;
-            }
-        }
-
 
         /* Write index. */
-        if (write(masterfd, &idx, sizeof(struct index_entry)) !=
-            sizeof(struct index_entry))
+        if (write(masterfd, idxbuf, sizeof(struct index_entry)*idxbuf_pos) !=
+            (int)sizeof(struct index_entry)*idxbuf_pos)
         {
             logf("tagcache: write fail #4");
             error = true;
@@ -1741,7 +1791,8 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         
         yield();
     }
-
+    logf("done");
+    
     /* Finally write the uniqued tag index file. */
     if (tagcache_is_sorted_tag(index_type))
     {
