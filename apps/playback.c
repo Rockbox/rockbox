@@ -1017,7 +1017,7 @@ void codec_seek_complete_callback(void)
         if (!paused)
             pcmbuf_pause(false);
     }
-    queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
+    ci.seek_time = 0;
 }
 
 bool codec_seek_buffer_callback(size_t newpos)
@@ -2015,8 +2015,6 @@ void audio_thread(void)
                     break ;
                 logf("ff_rewind");
                 ci.seek_time = (long)ev.data+1;
-                queue_wait(&codec_callback_queue, &ev);
-                ci.seek_time = 0;
                 break ;
 
             case Q_AUDIO_REBUFFER_SEEK:
