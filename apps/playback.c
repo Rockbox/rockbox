@@ -1651,8 +1651,12 @@ static void stop_codec_flush(void)
 
 static void audio_stop_playback(void)
 {
+    /* If we were playing, save resume information */
     if (playing)
-        playlist_update_resume_info(audio_current_track());
+    {
+        /* Save the current playing spot, or NULL if the playlist has ended */
+        playlist_update_resume_info(playlist_end?NULL:audio_current_track());
+    }
     playing = false;
     filling = false;
     paused = false;
