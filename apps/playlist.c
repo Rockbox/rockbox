@@ -688,17 +688,17 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     int result = 0;
     int num_files = 0;
     int i;
-    int dirfilter = global_settings.dirfilter;
     struct entry *files;
     struct tree_context* tc = tree_get_context();
+    int dirfilter = *(tc->dirfilter);
 
     /* use the tree browser dircache to load files */
-    global_settings.dirfilter = SHOW_ALL;
+    *(tc->dirfilter) = SHOW_ALL;
 
     if (ft_load(tc, dirname) < 0)
     {
         gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
-        global_settings.dirfilter = dirfilter;
+        *(tc->dirfilter) = dirfilter;
         return -1;
     }
 
@@ -788,7 +788,7 @@ static int add_directory_to_playlist(struct playlist_info* playlist,
     }
 
     /* restore dirfilter */
-    global_settings.dirfilter = dirfilter;
+    *(tc->dirfilter) = dirfilter;
 
     return result;
 }
@@ -1349,11 +1349,11 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
 {
     struct playlist_info* playlist = &current_playlist;
     int result = -1;
-    int dirfilter = global_settings.dirfilter;
     int sort_dir = global_settings.sort_dir;
     char *start_dir = NULL;
     bool exit = false;
     struct tree_context* tc = tree_get_context();
+    int dirfilter = *(tc->dirfilter);
 
     if (recursion){
        /* start with root */
@@ -1366,7 +1366,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     }
 
     /* use the tree browser dircache to load files */
-    global_settings.dirfilter = SHOW_ALL;
+    *(tc->dirfilter) = SHOW_ALL;
 
     /* sort in another direction if previous dir is requested */
     if(!is_forward){
@@ -1443,7 +1443,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     reload_directory();
 
     /* restore dirfilter & sort_dir */
-    global_settings.dirfilter = dirfilter;
+    *(tc->dirfilter) = dirfilter;
     global_settings.sort_dir = sort_dir;
 
     /* special case if nothing found: try start searching again from root */
