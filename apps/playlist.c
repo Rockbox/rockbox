@@ -602,20 +602,25 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             break;
         case PLAYLIST_INSERT_SHUFFLED:
         {
-            int offset;
-            int n = playlist->amount -
-                rotate_index(playlist, playlist->index);
-            
-            if (n > 0)
-                offset = rand() % n;
+            if (playlist->amount > 0)
+            {
+                int offset;
+                int n = playlist->amount -
+                    rotate_index(playlist, playlist->index);
+                
+                if (n > 0)
+                    offset = rand() % n;
+                else
+                    offset = 0;
+                
+                position = playlist->index + offset + 1;
+                if (position >= playlist->amount)
+                    position -= playlist->amount;
+                
+                insert_position = position;
+            }
             else
-                offset = 0;
-
-            position = playlist->index + offset + 1;
-            if (position >= playlist->amount)
-                position -= playlist->amount;
-
-            insert_position = position;
+                position = insert_position = 0;
             break;
         }
     }
