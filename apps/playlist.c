@@ -2542,7 +2542,9 @@ bool playlist_next_dir(int direction)
             ft_build_playlist(tree_get_context(), 0);
             if (global_settings.playlist_shuffle)
                  playlist_shuffle(current_tick, -1);
+#if (CONFIG_CODEC != SWCODEC)
             playlist_start(0,0);
+#endif
             result = true;
         }
         else

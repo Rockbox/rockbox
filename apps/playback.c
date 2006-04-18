@@ -225,7 +225,8 @@ extern struct codec_api ci;
 extern struct codec_api ci_voice;
 
 /* Was the skip being executed manual or automatic? */
-static volatile bool manual_skip;
+static bool manual_skip;
+static bool dir_skip = false;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct mp3entry *id3);
@@ -784,6 +785,23 @@ static void audio_check_new_track(void)
     int old_track_ridx = track_ridx;
     bool forward;
 
+    if (dir_skip)
+    {
+        dir_skip = false;
+        if (playlist_next_dir(ci.new_track))
+        {
+            ci.new_track = 0;
+            cur_ti->taginfo_ready = false;
+            audio_rebuffer();
+            goto skip_done;
+        }
+        else
+        {
+            queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
+            return;
+        }
+    }
+
     /* If the playlist isn't that big */
     if (!playlist_check(ci.new_track))
     {
@@ -825,12 +843,18 @@ static void audio_check_new_track(void)
     {
         cur_ti->taginfo_ready = false;
         audio_rebuffer();
+        goto skip_done;
     }
+
     /* If the target track is clearly not in memory */
-    else if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
+    if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
+    {
         audio_rebuffer();
+        goto skip_done;
+    }
+
     /* The track may be in memory, see if it really is */
-    else if (forward)
+    if (forward)
     {
         if (!buffer_wind_forward(track_ridx, old_track_ridx))
             audio_rebuffer();
@@ -869,6 +893,7 @@ static void audio_check_new_track(void)
         }
     }
 
+skip_done:
     audio_update_trackinfo();
     queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
 }
@@ -1678,7 +1703,7 @@ static void audio_play_start(size_t offset)
         radio_stop();
 #endif
 
-    /* Wait for any previously playing audio to flush */
+    /* Wait for any previously playing audio to flush - TODO: Not necessary? */
     while (audio_codec_loaded)
         stop_codec_flush();
 
@@ -1927,10 +1952,9 @@ static void initiate_track_change(long direction)
 
 static void initiate_dir_change(long direction)
 {
-    if(!playlist_next_dir(direction))
-        return;
-
-    queue_post(&audio_queue, Q_AUDIO_PLAY, 0);
+    playlist_end = false;
+    dir_skip = true;
+    ci.new_track = direction;
 }
 
 void audio_thread(void)
