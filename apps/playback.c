@@ -1876,6 +1876,7 @@ static bool load_next_track(void) {
             track_skip_done(manual_skip);
             return true;
         case Q_CODEC_REQUEST_FAILED:
+            ci.new_track = 0;
             ci.stop_codec = true;
             return false;
         default:
