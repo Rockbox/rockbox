@@ -1852,6 +1852,9 @@ static void track_skip_done(bool was_manual)
 static bool load_next_track(void) {
     struct event ev;
 
+    if (ci.seek_time)
+        codec_seek_complete_callback();
+
 #ifdef AB_REPEAT_ENABLE
     ab_end_of_track_report();
 #endif
