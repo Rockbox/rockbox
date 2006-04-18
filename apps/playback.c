@@ -1765,7 +1765,7 @@ static void initialize_buffer_fill(bool clear_tracks, bool short_fill)
     logf("Starting buffer fill");
 
     if (clear_tracks)
-        audio_clear_track_entries(false);
+        audio_clear_track_entries(short_fill);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
