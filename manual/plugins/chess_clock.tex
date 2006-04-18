@@ -8,15 +8,31 @@ in any kind of game with up to ten players.
 
 \subsubsection{Setup}
 
+\begin{table}
+  \begin{btnmap}{}{}
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRight/\ButtonLeft}
+    \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd}
+      & Increase / Decrease displayed Value\\
+    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonRight}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+      & Move to next screen\\
+    \opt{PLAYER_PAD}{\ButtonStop}
+    \opt{ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+      & Move to next screen\\
+  \end{btnmap}
+\end{table}
+
 \begin{itemize}
-\item First enter the number of players (1{}-10) (press  PLAY to
-continue). 
-\item Then set the total game time in mm:ss (press PLAY to continue,
-STOP to go back). 
-\item Then the maximum round time is entered.  For example, this could
-be used  to play Scrabble for a maximum of 15 minutes each, with each
-round taking no longer than one minute. (press  PLAY to continue). 
-\item Done. Player 1 starts in paused mode. So press PLAY to start.
+  \item First enter the number of players (1--10)
+  \item Then set the total game time in mm:ss
+  \item Then the maximum round time is entered.  For example, this could
+  be used to play Scrabble for a maximum of 15 minutes each, with each
+  round taking no longer than one minute.
+  \item Done. Player 1 starts in paused mode.
 \end{itemize}
 
 \subsubsection{While playing}
@@ -27,26 +43,38 @@ time left if different).
 Keys are as follows:
 
 \begin{table}
-\begin{btnmap}{}{}
-\opt{player}{On}\opt{recorder,recorderv2fm}{Off}\opt{ondio}{OnOff}
-\opt{h1xx,h300,ipodcolor,ipodnano}{Select} 
-& Exit plugin \\
-\opt{player}{Stop}\opt{recorder,recorderv2fm,Ondio}{Left}
-\opt{h1xx,h300,ipodcolor,ipodnano}{Stop} 
-& Restart round for the player \\
-\opt{player,h1xx,h300,ipodcolor,ipodnano,recorder,recorderv2fm}{Play}
-\opt{Ondio}{Right} 
-& Pausing the time (press again to continue) \\
-\opt{player,h1xx,h300,ipodcolor,ipodnano}{Right}
-\opt{ondio,recorder,recorderv2fm}{Up} 
-& Switch to next player \\
-\opt{player,h1xx,h300,ipodcolor,ipodnano}{Left}
-\opt{ondio,recorder,recorderv2fm}{Down} 
-& Switch to previous player \\
-\opt{player}{Menu}\opt{recorder,recorderv2fm}{F1}
-\opt{ondio}{Mode}\opt{h1xx,h300,ipodcolor,ipodnano}{Rec} 
-& Exit plugin \\
-\end{btnmap}
+  \begin{btnmap}{}{}
+    \opt{PLAYER_PAD}{\ButtonOn}
+    \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD}{\ButtonPlay}
+      & Exit plugin \\
+    \opt{PLAYER_PAD}{\ButtonStop}
+    \opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+      & Restart round for the current player \\
+    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonRight}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+      & Pause the time (press again to continue) \\
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRight}
+    \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonUp}
+    \opt{IPOD_4G_PAD}{\ButtonScrollBack}
+      & Switch to next player \\
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft}
+    \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
+      & Switch to previous player \\
+    \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+      & Delete current player %
+      \opt{PLAYER_PAD,RECORDER_PAD}{(\ButtonPlay\ to confirm.)}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{(\ButtonOn\ to confirm.)}
+      \opt{ONDIO_PAD}{(\ButtonRight\ to confirm.)}
+      \opt{IPOD_4G_PAD}{(\ButtonSelect\ to confirm.)}\\
+  \end{btnmap}
 \end{table}
 From the menu it is possible to delete a player, modify the round time
 for the current player or set the total time for the game. 

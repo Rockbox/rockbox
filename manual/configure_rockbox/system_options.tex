@@ -58,9 +58,9 @@
       pressed and the time Rockbox responds.  Turning this setting ON activates
       the directory cache, and turning it OFF deactivates the directory cache.
       \note{The first time you set the directory cache to ON, Rockbox will
-      take a few minutes to scan the drive and you will need to restart the
-      player. Thereafter, the directory cache will work in the background.
-      (\fixme{Confirm that these last two sentences are true.}}
+      request a reboot of the \dap\ and upon restarting take a few minutes to 
+      scan the drive. Thereafter, the directory cache will work in the 
+      background.}
   \end{description}
 
 \opt{CONFIG_RTC}{
@@ -147,7 +147,7 @@ This submenu relates to limits in the Rockbox operating system.
   \end{description}
 }
 
-\subsection{Manage settings}
+\subsection{\label{ref:ManageSettings}Manage settings}
 This submenu deals with loading and saving settings. 
 \opt{MASCODEC}{This submenu also allows you to load or save different
 firmware versions.}
@@ -156,14 +156,14 @@ firmware versions.}
     \item [Browse .cfg Files: ]Opens the file browser in the 
     \fname{/.rockbox} directory and displays all .cfg (configuration) files.
     Selecting a .cfg file will cause Rockbox to load that the settings
-    contained in that file.  STOP will exit back to the menu. 
-    \fixme{(TODO--proper button configurations for different platforms.)}
+    contained in that file. Pressing \ButtonLeft\ will exit back to the menu. 
     See the \emph{Write .cfg files} option on the Manage Settings menu for
     details of how to save and edit a configuration file.
     %
-    \opt{MASCODEC}{
     \item [Browse Firmwares: ]This displays a list of firmware file in
-    the \fname{/.rockbox} system directory. 
+    the \fname{/.rockbox} system directory. %
+    \opt{SWCODEC}{This is legacy item, and is depreciated.}
+    \opt{MASCODEC}{ 
     \opt{recorder,recorderv2fm}{Firmware files have an extension of .ajz.}
     \opt{player,ondio}{  Firmware files have an extension of .mod}
     Playing a firmware file loads it into memory.  Thus, it is possible to
