@@ -314,6 +314,14 @@ static bool playlist_options(void)
             args[i].position = PLAYLIST_INSERT;
             args[i].queue = false;
             i++;
+
+            if (selected_file_attr & ATTR_DIRECTORY)
+            {
+                items[i].desc = ID2P(LANG_INSERT_SHUFFLED);
+                args[i].position = PLAYLIST_INSERT_SHUFFLED;
+                args[i].queue = false;
+                i++;
+            }
         }
     }
 

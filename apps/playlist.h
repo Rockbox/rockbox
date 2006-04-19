@@ -90,6 +90,7 @@ struct playlist_info
                               inserted tracks?                      */
     bool deleted;        /* have any tracks been deleted?           */
     int num_inserted_tracks; /* number of tracks inserted           */
+    bool started;       /* has playlist been started?               */
 
     /* cache of playlist control commands waiting to be flushed to
        to disk                                                      */

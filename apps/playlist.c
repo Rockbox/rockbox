@@ -223,6 +223,7 @@ static void empty_playlist(struct playlist_info* playlist, bool resume)
     playlist->shuffle_modified = false;
     playlist->deleted = false;
     playlist->num_inserted_tracks = 0;
+    playlist->started = false;
 
     playlist->num_cached = 0;
     playlist->pending_control_sync = false;
@@ -602,7 +603,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             break;
         case PLAYLIST_INSERT_SHUFFLED:
         {
-            if (playlist->amount > 0)
+            if (playlist->started)
             {
                 int offset;
                 int n = playlist->amount -
@@ -620,7 +621,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
                 insert_position = position;
             }
             else
-                position = insert_position = 0;
+                position = insert_position = (rand() % (playlist->amount+1));
             break;
         }
     }
@@ -639,11 +640,12 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     }
     
     /* update stored indices if needed */
-    if (playlist->amount > 0 && insert_position <= playlist->index)
+    if (playlist->amount > 0 && insert_position <= playlist->index &&
+        playlist->started)
         playlist->index++;
 
     if (playlist->amount > 0 && insert_position <= playlist->first_index &&
-        position != PLAYLIST_PREPEND)
+        position != PLAYLIST_PREPEND && playlist->started)
     {
         playlist->first_index++;
 
@@ -2312,6 +2314,8 @@ int playlist_start(int start_index, int offset)
     talk_buffer_steal(); /* will use the mp3 buffer */
 #endif
     audio_play(offset);
+
+    playlist->started = true;
 
     return 0;
 }
