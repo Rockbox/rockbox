@@ -58,37 +58,44 @@ as a negative number. Volume can be adjusted from a
   \begin{center}
   \begin{tabularx}{\textwidth}{lX}\toprule
       \textbf{Setting} & \textbf{Description} \\\midrule
+        Stereo
+        & Do not mix the signal. \\
+        %
+        Mono 
+        & Mix both channels down to mono and send the mixed signal back to
+          both. \\
+        %
+        Custom
+        & Allows you to manually specify a stereo width with the
+          \emph{Stereo Width} setting described later in the manual. \\
+        %
         Mono Left
         & Plays the left channel in both stereo channels. \\
         %
         Mono Right
         & Plays the right channel in both stereo channels. \\
         %
-        Mono 
-        & Mix both channels down to mono and send the mixed signal back to both. \\
-        %
-        Stereo
-        & Do not mix the signal. \\
-        %
-        Stereo Narrow
-        & Mixes small amounts of the opposite channel into the left and right
-          channels, thus making the sound seem closer together. \\
-        %
-        Stereo Wide 
-        & Elements of one channel that are present in the opposite channel
-          are removed from the latter.  This results in the sound seeming
-          further apart. \\
-        %
         Karaoke
         & Removes all sound that is the same in both channels. Since most
           vocals are recorded in this way to make the artist sound central,
           this often (but not always) has the effect of removing the voice
-          track from a song. \\
+          track from a song. This setting also very often has other undesirable
+          effects on the sound.  \\
         \bottomrule
   \end{tabularx}
   \end{center}
   \end{table}
       
+\section{Stereo Width}
+  Stereo width will allow you to manually specify the effect that is applied
+  when the \emph{Channels} setting is set to \emph{Custom}.
+  All values below 100\% will progressively mix the contents of one channel into
+  the other. This has the effect of gradually centering the stereo image, until
+  you have mono sound at 0\%. Values above 100\% will progressively remove
+  components in one channel that is also present in the other. This has the
+  effect of widening the stereo field. A value of 100\% will leave the stereo
+  field unaltered.
+
 \opt{recorder,recorderv2fm}{
   \section{Loudness}
   Loudness is an effect which emphasises bass and treble.  This makes the
