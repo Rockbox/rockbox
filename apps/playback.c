@@ -122,6 +122,7 @@ enum {
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 
+    Q_CODEC_REQUEST_PENDING,
     Q_CODEC_REQUEST_COMPLETE,
     Q_CODEC_REQUEST_FAILED,
 
@@ -760,6 +761,9 @@ static void audio_update_trackinfo(void)
 static void audio_rebuffer(void)
 {
     logf("Forcing rebuffer");
+    /* Notify the codec that this will take a while */
+    if (!filling)
+        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_PENDING, 0);
     /* Stop in progress fill, and clear open file descriptor */
     close(current_fd);
     current_fd = -1;
@@ -1871,7 +1875,13 @@ static bool load_next_track(void) {
     
     cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
-    queue_wait(&codec_callback_queue, &ev);
+    while (1) {
+        queue_wait(&codec_callback_queue, &ev);
+        if (ev.id == Q_CODEC_REQUEST_PENDING)
+            pcmbuf_play_stop();
+        else
+            break;
+    }
     cpu_boost(false);
     switch (ev.id)
     {
