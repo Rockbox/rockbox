@@ -112,15 +112,15 @@ static int get_tag(int *tag)
     }
     buf[i] = '\0';
     
-    MATCH(tag, buf, "artist", tag_artist);
-    MATCH(tag, buf, "song", tag_title);
     MATCH(tag, buf, "album", tag_album);
-    MATCH(tag, buf, "genre", tag_genre);
-    MATCH(tag, buf, "composer", tag_composer);
-    MATCH(tag, buf, "year", tag_year);
-    MATCH(tag, buf, "length", tag_length);
-    MATCH(tag, buf, "tracknum", tag_tracknumber);
+    MATCH(tag, buf, "artist", tag_artist);
     MATCH(tag, buf, "bitrate", tag_bitrate);
+    MATCH(tag, buf, "composer", tag_composer);
+    MATCH(tag, buf, "genre", tag_genre);
+    MATCH(tag, buf, "length", tag_length);
+    MATCH(tag, buf, "title", tag_title);
+    MATCH(tag, buf, "tracknum", tag_tracknumber);
+    MATCH(tag, buf, "year", tag_year);
     
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
@@ -151,6 +151,7 @@ static int get_clause(int *condition)
     buf[i] = '\0';
     
     MATCH(condition, buf, "=", clause_is);
+    MATCH(condition, buf, "==", clause_is);
     MATCH(condition, buf, ">", clause_gt);
     MATCH(condition, buf, ">=", clause_gteq);
     MATCH(condition, buf, "<", clause_lt);
@@ -386,6 +387,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int namebufused = 0;
     int total_count = 0;
     int extra = c->currextra;
+    int tag;
     bool sort = false;
     
     if (init
@@ -399,7 +401,15 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
                        0, csi->name);
     }
     
-    if (!tagcache_search(tcs, csi->tagorder[extra]))
+    if (c->currtable == allsubentries)
+    {
+        tag = tag_title;
+        extra--;
+    }
+    else
+        tag = csi->tagorder[extra];
+
+    if (!tagcache_search(tcs, tag))
         return -1;
     
     for (i = 0; i < extra; i++)
@@ -417,19 +427,37 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     current_offset = offset;
     current_entry_count = 0;
     c->dirfull = false;
+    
+    if (tag != tag_title)
+    {
+        if (offset == 0)
+        {
+            dptr->newtable = allsubentries;
+            dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
+            dptr++;
+            current_entry_count++;
+        }
+        total_count++;
+    }
+    
     while (tagcache_get_next(tcs))
     {
         if (total_count++ < offset)
             continue;
         
-        dptr->newtable = tcs->result_seek;
-        if (!tcs->ramsearch || csi->tagorder[extra] == tag_title)
+        dptr->newtable = navibrowse;
+        dptr->extraseek = tcs->result_seek;
+        if (!tcs->ramsearch || tag == tag_title)
         {
             int tracknum = -1;
             
             dptr->name = &c->name_buffer[namebufused];
-            if (csi->tagorder[extra] == tag_title)
-                tracknum = tagcache_get_numeric(tcs, tag_tracknumber);
+            if (tag == tag_title)
+            {
+                dptr->newtable = playtrack;
+                if (c->currtable != allsubentries && c->dirlevel > 1)
+                    tracknum = tagcache_get_numeric(tcs, tag_tracknumber);
+            }
             
             if (tracknum > 0)
             {
@@ -544,6 +572,7 @@ int tagtree_load(struct tree_context* c)
             count = load_root(c);
             break;
 
+        case allsubentries:
         case navibrowse:
             logf("navibrowse...");
             count = retrieve_entries(c, &tcs, 0, true);
@@ -572,11 +601,13 @@ int tagtree_enter(struct tree_context* c)
     int rc = 0;
     struct tagentry *dptr;
     int newextra;
+    int seek;
 
     dptr = tagtree_get_entry(c, c->selected_item);
     
     c->dirfull = false;
     newextra = dptr->newtable;
+    seek = dptr->extraseek;
 
     if (c->dirlevel >= MAX_DIR_LEVELS)
         return 0;
@@ -595,7 +626,7 @@ int tagtree_enter(struct tree_context* c)
             {
                 int i, j;
                 
-                csi = si+dptr->extraseek;
+                csi = si+seek;
                 c->currextra = 0;
                 
                 /* Read input as necessary. */
@@ -621,30 +652,33 @@ int tagtree_enter(struct tree_context* c)
                     }
                 }
             }
-        
             c->currtable = newextra;
+        
             break;
 
         case navibrowse:
-            csi->result_seek[c->currextra] = newextra;
-            if (c->currextra < csi->tagorder_count-1)
+        case allsubentries:
+            if (newextra == playtrack)
             {
-                c->currextra++;
-                break;
-            }
-        
-            c->dirlevel--;
-            if (csi->tagorder[c->currextra] == tag_title)
-            {
+                c->dirlevel--;
                 if (tagtree_play_folder(c) >= 0)
                     rc = 2;
+                break;
             }
+
+            c->currtable = newextra;
+            csi->result_seek[c->currextra] = seek;
+            if (c->currextra < csi->tagorder_count-1)
+                c->currextra++;
+            else
+                c->dirlevel--;
             break;
         
         default:
             c->dirlevel--;
             break;
     }
+    
     c->selected_item=0;
     gui_synclist_select_item(&tree_lists, c->selected_item);
 
@@ -674,7 +708,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     if (!tagcache_search(&tcs, tag_filename))
         return -1;
 
-    tagcache_search_add_filter(&tcs, tag_title, entry->newtable);
+    tagcache_search_add_filter(&tcs, tag_title, entry->extraseek);
     
     if (!tagcache_get_next(&tcs))
     {
@@ -711,7 +745,7 @@ static int tagtree_play_folder(struct tree_context* c)
         if (!show_search_progress(false, i))
             break;
         
-        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->newtable, 
+        if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek, 
                                buf, sizeof buf))
         {
             continue;
@@ -769,6 +803,10 @@ int   tagtree_get_icon(struct tree_context* c)
                 icon = Icon_Folder;
             break;
 
+        case allsubentries:
+            icon = Icon_Audio;
+            break;
+        
         default:
             icon = Icon_Folder;
             break;

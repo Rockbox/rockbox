@@ -22,7 +22,7 @@
 #include "tagcache.h"
 #include "tree.h"
 
-enum table { invalid, root, navibrowse };
+enum table { root = 1, navibrowse, allsubentries, playtrack };
 
 struct tagentry {
     char *name;

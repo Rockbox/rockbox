@@ -310,14 +310,14 @@ while(<LANG>) {
 
     my $ll = $_;
 
-   # print "M: $m\n";
+    # print "M: $m\n";
 
     push @phrase, $ll;
 
     # this is an XML-lookalike tag
-    if(/ *<([^>]*)>/) {
-        my $part = $1;
-        #print "P: $part\n";
+    if (/^(<|[^\"<]+<)([^>]*)>/) {
+        my $part = $2;
+        # print "P: $part\n";
 
         if($part =~ /^\//) {
             # this was a closing tag
@@ -409,7 +409,7 @@ while(<LANG>) {
         # This is an opening (sub) tag
 
         push @m, $m; # store old value
-        $m = $1;
+        $m = $part;
         next;
     }
 
