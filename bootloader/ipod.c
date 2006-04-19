@@ -103,7 +103,7 @@ static void memmove16(void *dest, const void *src, unsigned count)
     }
 }
 
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#if CONFIG_KEYPAD == IPOD_4G_PAD && !defined(IPOD_MINI)
 /* check if number of seconds has past */
 int timer_check(int clock_start, unsigned int usecs)
 {
@@ -195,13 +195,17 @@ static int key_pressed(void)
 #if CONFIG_KEYPAD == IPOD_4G_PAD
 #ifdef IPOD_MINI /* mini 1G only */
     state = GPIOA_INPUT_VAL & 0x3f;
+    if ((state & 0x10) == 0) return BUTTON_LEFT;
+    if ((state & 0x2) == 0) return BUTTON_MENU;
+    if ((state & 0x4) == 0) return BUTTON_PLAY;
+    if ((state & 0x8) == 0) return BUTTON_RIGHT;
 #else
     state = opto_keypad_read();
-#endif
     if ((state & 0x4) == 0) return BUTTON_LEFT;
     if ((state & 0x10) == 0) return BUTTON_MENU;
     if ((state & 0x8) == 0) return BUTTON_PLAY;
     if ((state & 0x2) == 0) return BUTTON_RIGHT;
+#endif
 #elif CONFIG_KEYPAD == IPOD_3G_PAD
     state = inb(0xcf000030);
     if (((state & 0x20) == 0)) return BUTTON_HOLD; /* hold on */

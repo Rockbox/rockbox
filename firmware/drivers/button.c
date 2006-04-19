@@ -225,6 +225,8 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 {
     int wheel_keycode = BUTTON_NONE;
     static int prev_scroll = -1;
+    static int direction = 0;
+    static int count = 0;
     static int scroll_state[4][4] = {
         {0, 1, -1, 0},
         {-1, 0, 0, 1},
@@ -235,32 +237,39 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
     if ( prev_scroll == -1 ) {
         prev_scroll = new_scroll;
     }
+    else if (direction != scroll_state[prev_scroll][new_scroll]) {
+        direction = scroll_state[prev_scroll][new_scroll];
+        count = 0;
+    }
     else if (!was_hold) {
-        switch (scroll_state[prev_scroll][new_scroll]) {
-            case 1:
-                if (reverse) {
-                    /* 'r' keypress */
-                    wheel_keycode = BUTTON_SCROLL_FWD;
-                }
-                else {
-                    /* 'l' keypress */
-                    wheel_keycode = BUTTON_SCROLL_BACK;
-                }
-                break;
-            case -1:
-                if (reverse) {
-                    /* 'l' keypress */
-                    wheel_keycode = BUTTON_SCROLL_BACK;
-                }
-                else {
-                    /* 'r' keypress */
-                    wheel_keycode = BUTTON_SCROLL_FWD;
-                }
-                break;
-            default:
-                /* only happens if we get out of sync */
-                break;
-
+        backlight_on();
+        if (++count == 6) { /* reduce sensitivity */
+            count = 0;
+            switch (direction) {
+                case 1:
+                    if (reverse) {
+                        /* 'r' keypress */
+                        wheel_keycode = BUTTON_SCROLL_FWD;
+                    }
+                    else {
+                        /* 'l' keypress */
+                        wheel_keycode = BUTTON_SCROLL_BACK;
+                    }
+                    break;
+                case -1:
+                    if (reverse) {
+                        /* 'l' keypress */
+                        wheel_keycode = BUTTON_SCROLL_BACK;
+                    }
+                    else {
+                        /* 'r' keypress */
+                        wheel_keycode = BUTTON_SCROLL_FWD;
+                    }
+                    break;
+                default:
+                    /* only happens if we get out of sync */
+                    break;
+            }
         }
     }
     if (wheel_keycode != BUTTON_NONE)
@@ -273,13 +282,12 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
 static int ipod_mini_button_read(void)
 {
     unsigned char source, wheel_source, state, wheel_state;
+    static bool was_hold = false;
     int btn = BUTTON_NONE;
 
-    /*
-     * we need some delay for mini, cause hold generates several interrupts,
-     * some of them delayed
-     */
-    udelay(250);
+    /* The ipodlinux source had a udelay(250) here, but testing has shown that
+       it is not needed - tested on mini 1g. */
+    /* udelay(250);*/
 
     /* get source(s) of interupt */
     source = GPIOA_INT_STAT & 0x3f;
@@ -297,20 +305,26 @@ static int ipod_mini_button_read(void)
     GPIOA_INT_LEV = ~state;
     GPIOB_INT_LEV = ~wheel_state;
 
-    if (source & 0x1)
-        btn |= BUTTON_SELECT;
-    if (source & 0x2)
-        btn |= BUTTON_MENU;
-    if (source & 0x4)
-        btn |= BUTTON_PLAY;
-    if (source & 0x8)
-        btn |= BUTTON_RIGHT;
-    if (source & 0x10)
-        btn |= BUTTON_LEFT;
+    /* hold switch causes all outputs to go low    */
+    /* we shouldn't interpret these as key presses */
+    if ((state & 0x20)) {
+        if (!(state & 0x1))
+            btn |= BUTTON_SELECT;
+        if (!(state & 0x2))
+            btn |= BUTTON_MENU;
+        if (!(state & 0x4))
+            btn |= BUTTON_PLAY;
+        if (!(state & 0x8))
+            btn |= BUTTON_RIGHT;
+        if (!(state & 0x10))
+            btn |= BUTTON_LEFT;
 
-    if (wheel_source & 0x30) {
-        handle_scroll_wheel((wheel_state & 0x30) >> 4, 0, 1);
+        if (wheel_source & 0x30) {
+            handle_scroll_wheel((wheel_state & 0x30) >> 4, was_hold, 1);
+        }
     }
+
+    was_hold = button_hold();
 
     /* ack any active interrupts */
     if (source)
@@ -645,8 +659,8 @@ void button_init(void)
     GPIOA_INT_LEV = ~(GPIOA_INPUT_VAL & 0x3f);
     GPIOA_INT_CLR = GPIOA_INT_STAT & 0x3f;
     /* scroll wheel - set interrupt levels */
-    GPIOB_INT_LEV = ~(GPIOB_INPUT_VAL & 0x3f);
-    GPIOB_INT_CLR = GPIOB_INT_STAT & 0x3f;
+    GPIOB_INT_LEV = ~(GPIOB_INPUT_VAL & 0x30);
+    GPIOB_INT_CLR = GPIOB_INT_STAT & 0x30;
     /* enable interrupts */
     GPIOA_INT_EN = 0x3f;
     GPIOB_INT_EN = 0x30;
