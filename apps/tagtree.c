@@ -284,7 +284,7 @@ static bool parse_search(struct search_instruction *inst, const char *str)
 }
 
 
-static struct tagcache_search tcs;
+static struct tagcache_search tcs, tcs2;
 
 static int compare(const void *p1, const void *p2)
 {
@@ -386,6 +386,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int i;
     int namebufused = 0;
     int total_count = 0;
+    int special_entry_count = 0;
     int extra = c->currextra;
     int tag;
     bool sort = false;
@@ -437,8 +438,10 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             dptr++;
             current_entry_count++;
         }
-        total_count++;
+        special_entry_count++;
     }
+    
+    total_count += special_entry_count;
     
     while (tagcache_get_next(tcs))
     {
@@ -510,7 +513,9 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     }
     
     if (sort)
-        qsort(c->dircache, current_entry_count, c->dentry_size, compare);
+        qsort(c->dircache + special_entry_count * c->dentry_size,
+              current_entry_count - special_entry_count,
+              c->dentry_size, compare);
     
     if (!init)
     {
@@ -694,9 +699,6 @@ void tagtree_exit(struct tree_context* c)
     c->currtable = c->table_history[c->dirlevel];
     c->currextra = c->extra_history[c->dirlevel];
     c->firstpos  = c->pos_history[c->dirlevel];
-
-    /* Just to be sure when chunked browsing is used. */
-    tagcache_search_finish(&tcs);
 }
 
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
@@ -775,9 +777,10 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
-        if (retrieve_entries(c, &tcs, MAX(0, id - (current_entry_count / 2)), 
+        if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)), 
                              false) < 0)
         {
+            logf("retrieve failed");
             return NULL;
         }
         realid = id - current_offset;

@@ -365,6 +365,9 @@ static long tagcache_get_seek(const struct tagcache_search *tcs,
 #ifdef HAVE_TC_RAMCACHE
     if (tcs->ramsearch)
     {
+        if (hdr->indices[idxid].flag & FLAG_DELETED)
+            return false;
+        
         return hdr->indices[idxid].tag_seek[tag];
     }
 #endif
@@ -437,7 +440,11 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         {
             if (tcs->seek_list_count == SEEK_LIST_SIZE)
                 break ;
-
+            
+            /* Skip deleted files. */
+            if (hdr->indices[i].flag & FLAG_DELETED)
+                continue;
+            
             /* Go through all filters.. */
             for (j = 0; j < tcs->filter_count; j++)
             {
@@ -2145,6 +2152,8 @@ static bool load_tagcache(void)
                 {
                     logf("Entry no longer valid.");
                     logf("-> %s", buf);
+                    /* FIXME: Properly delete the entry. */
+                    hdr->indices[hdr->entry_count[i]].flag |= FLAG_DELETED;
                     continue ;
                 }
 
@@ -2408,7 +2417,7 @@ static void tagcache_thread(void)
 
 int tagcache_get_progress(void)
 {
-    int total_count = processed_dir_count;
+    int total_count = -1;
 
 #ifdef HAVE_DIRCACHE
     if (dircache_is_enabled())
@@ -2428,6 +2437,11 @@ int tagcache_get_progress(void)
     return processed_dir_count * 100 / total_count;
 }
 
+int tagcache_get_processes_entrycount(void)
+{
+    return processed_dir_count;
+}
+    
 void tagcache_start_scan(void)
 {
     queue_post(&tagcache_queue, Q_START_SCAN, 0);
