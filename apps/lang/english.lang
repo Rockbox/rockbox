@@ -8487,3 +8487,17 @@
     *: "Tagcache is not ready"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<All tracks>"
+  </dest>
+  <voice>
+    *: "All tracks"
+  </voice>
+</phrase>
