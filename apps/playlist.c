@@ -1771,9 +1771,12 @@ static int update_control(struct playlist_info* playlist,
  */
 static void sync_control(struct playlist_info* playlist, bool force)
 {
-    (void) force;
 #ifdef HAVE_DIRCACHE
-    if (force)
+    if (playlist->started && force)
+#else
+    (void) force;
+
+    if (playlist->started)
 #endif
     {
         if (playlist->pending_control_sync)
@@ -2310,12 +2313,14 @@ int playlist_start(int start_index, int offset)
     struct playlist_info* playlist = &current_playlist;
 
     playlist->index = start_index;
+
 #if CONFIG_CODEC != SWCODEC
     talk_buffer_steal(); /* will use the mp3 buffer */
 #endif
-    audio_play(offset);
 
     playlist->started = true;
+    sync_control(playlist, false);
+    audio_play(offset);
 
     return 0;
 }
@@ -2701,6 +2706,7 @@ int playlist_set_current(struct playlist_info* playlist)
     current_playlist.fd = playlist->fd;
 
     close(playlist->control_fd);
+    close(current_playlist.control_fd);
     remove(current_playlist.control_filename);
     if (rename(playlist->control_filename,
             current_playlist.control_filename) < 0)
