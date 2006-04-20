@@ -747,6 +747,14 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "bra     .wa_end     \n"
         "nop                 \n"
 
+        /* References to C library routines used in the precalc block */
+        ".align  2           \n"
+    ".ashlsi3:               \n"  /* C library routine: */
+        ".long   ___ashlsi3  \n"  /* shift r4 left by r5, result in r0 */
+    ".lshrsi3:               \n"  /* C library routine: */
+        ".long   ___lshrsi3  \n"  /* shift r4 right by r5, result in r0 */
+        /* both routines preserve r4, destroy r5 and take ~16 cycles */
+
     ".wa_sloop:              \n"  /** short loop (nothing to keep) **/
         "shlr    r1          \n"  /* rotate lsb of pattern 1 to t bit */
         "rotcl   r0          \n"  /* rotate t bit into r0 */
@@ -898,7 +906,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "bhi.b   .wa_floop   \n"  /* no: loop */
 
         "bra.b   .wa_end     \n"
-        
+
     ".wa_sstart:             \n"
         "move.l  %%a0,%[mask]\n"  /* mask isn't needed here, reuse reg */
 
@@ -951,18 +959,6 @@ static void _writearray(unsigned char *address, const unsigned char *src,
 #endif
 }
 
-#if CONFIG_CPU == SH7034
-/* References to C library routines used in _writearray() */
-asm (
-    ".align  2           \n"
-".ashlsi3:               \n"  /* C library routine: */
-    ".long   ___ashlsi3  \n"  /* shift r4 left by r5, return in r0 */
-".lshrsi3:               \n"  /* C library routine: */
-    ".long   ___lshrsi3  \n"  /* shift r4 right by r5, return in r0 */
-    /* both routines preserve r4, destroy r5 and take ~16 cycles */
-);
-#endif
-
 /* Draw a partial greyscale bitmap, canonical format */
 void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                               int stride, int x, int y, int width, int height)
@@ -975,7 +971,7 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= _gray_info.width)
         || (y >= _gray_info.height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {

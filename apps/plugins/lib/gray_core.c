@@ -509,6 +509,14 @@ void gray_update_rect(int x, int y, int width, int height)
                     "bra     .ur_end     \n"
                     "nop                 \n"
 
+                    /* References to C library routines used in the precalc block */
+                    ".align  2           \n"
+                ".ashlsi3:               \n"  /* C library routine: */
+                    ".long   ___ashlsi3  \n"  /* shift r4 left by r5, res. in r0 */
+                ".lshrsi3:               \n"  /* C library routine: */
+                    ".long   ___lshrsi3  \n"  /* shift r4 right by r5, res. in r0 */
+                    /* both routines preserve r4, destroy r5 and take ~16 cycles */
+
                 ".ur_sloop:              \n"  /** short loop (nothing to keep) **/
                     "shlr    r1          \n"  /* rotate lsb of pattern 1 to t bit */
                     "rotcl   r0          \n"  /* rotate t bit into r0 */
@@ -740,18 +748,6 @@ void gray_update_rect(int x, int y, int width, int height)
         dst += _gray_info.width;
     }
 }
-#if CONFIG_CPU == SH7034
-/* References to C library routines used in gray_update_rect() */
-asm (
-    ".align  2           \n"
-".ashlsi3:               \n"  /* C library routine: */
-    ".long   ___ashlsi3  \n"  /* shift r4 left by r5, return in r0 */
-".lshrsi3:               \n"  /* C library routine: */
-    ".long   ___lshrsi3  \n"  /* shift r4 right by r5, return in r0 */
-    /* both routines preserve r4, destroy r5 and take ~16 cycles */
-);
-#endif /* CONFIG_CPU == SH7034 */
-
 #endif /* !SIMULATOR */
 
 /* Update the whole greyscale overlay */
