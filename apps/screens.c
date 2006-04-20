@@ -476,11 +476,11 @@ void quick_screen_quick_apply(struct gui_quickscreen *qs)
 
 bool quick_screen_quick(int button_enter)
 {
-    bool res, oldrepeat, oldshuffle;
+    bool res, oldshuffle;
     struct option_select left_option;
     struct option_select bottom_option;
     struct option_select right_option;
-    int old_x_margin, old_y_margin;
+    int oldrepeat, old_x_margin, old_y_margin;
 
     old_x_margin = lcd_getxmargin();
     old_y_margin = lcd_getymargin();
