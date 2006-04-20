@@ -272,7 +272,7 @@ void handle_scroll_wheel(int new_scroll, int was_hold, int reverse)
             }
         }
     }
-    if (wheel_keycode != BUTTON_NONE)
+    if (wheel_keycode != BUTTON_NONE && queue_empty(&button_queue))
         queue_post(&button_queue, wheel_keycode, NULL);
     prev_scroll = new_scroll;
 }
