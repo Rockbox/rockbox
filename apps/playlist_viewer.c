@@ -412,7 +412,7 @@ static bool update_playlist(bool force)
     {
         /* Reload tracks */
         viewer.num_tracks = nb_tracks;
-        if (viewer.num_tracks < 0)
+        if (viewer.num_tracks <= 0)
             return false;
         playlist_buffer_load_entries_screen(&viewer.buffer, FORWARD);
         if (viewer.buffer.num_loaded <= 0)
@@ -457,16 +457,21 @@ static int onplay_menu(int index)
                 playlist_delete(viewer.playlist, current_track->index);
                 if (current)
                 {
-                    /* Start playing new track except if it's the last track
-                       in the playlist and repeat mode is disabled */
-                    current_track=
-                        playlist_buffer_get_track(&viewer.buffer, index);
-                    if (current_track->display_index != viewer.num_tracks ||
-                        global_settings.repeat_mode == REPEAT_ALL)
+                    if (playlist_amount_ex(viewer.playlist) <= 0)
+                        audio_stop();
+                    else
                     {
-                        talk_buffer_steal(); /* will use the mp3 buffer */
-                        audio_play(0);
-                        viewer.current_playing_track = -1;
+                       /* Start playing new track except if it's the lasttrack
+                          track in the playlist and repeat mode is disabled */
+                        current_track =
+                            playlist_buffer_get_track(&viewer.buffer, index);
+                        if (current_track->display_index!=viewer.num_tracks ||
+                            global_settings.repeat_mode == REPEAT_ALL)
+                        {
+                            talk_buffer_steal(); /* will use the mp3 buffer */
+                            audio_play(0);
+                            viewer.current_playing_track = -1;
+                        }
                     }
                 }
                 ret = 1;
