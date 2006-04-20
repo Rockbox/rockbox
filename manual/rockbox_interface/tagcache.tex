@@ -20,14 +20,32 @@ The Tag Cache database can either be kept on disk (to save memory), or
 loaded into RAM (for fast browsing). This configuration option can be 
 found in General Settings $\rightarrow$ Playback $\rightarrow$ Tag cache.
 Once the database has been built, you can browse your music using this 
-database. To use the database change the show mode by changing the General Settings $\rightarrow$ File view $\rightarrow$ Show files option to 
+database. To use the database change the show mode by changing the 
+General Settings $\rightarrow$ File view $\rightarrow$ Show files option to 
 ``ID3 database''. This disables the File Browser and instead of the file
 browser you will now access the database.
+%
+\begin{description}
+\item[Keeping Tag Cache on disk.] This does not require extra RAM for the
+Tag Cache and speeds up the boot process, but is slower when accessing.
+\item[Keeping Tag Cache on disk with Dircache enabled.] With Dircache
+enabled updating of the database is much faster. Also updates can be
+committed in background immediately.
+\item[Loading Tag Cache to RAM.] The fastest mode is when loading Tag Cache
+to RAM. New files are automatically detected and Tag Cache will get updated.
+Use this for the fastest browsing and searching without any waiting.
+\note{To use the RAM mode, first you have to turn on 
+Directory Cache in General Settings $\rightarrow$ System $\rightarrow$ 
+Disk $\rightarrow$ Directory Cache.}
+\end{description}
 
 \note{You may need to increase the value of the ``Max files in dir browser''
 setting (General Settings $\rightarrow$ System $\rightarrow$ Limits) 
-in order to view long lists of tracks in the ID3 database browser.}
-
+in order to view long lists of tracks in the ID3 database browser.\\
+There is no option to turn off Tag Cache completely. If you don't want
+to use it just don't do the initial build of the database and don't load it
+to RAM.}
+%
 \begin{table}
 \begin{center}
   \begin{tabularx}{.75\textwidth}{XX}
