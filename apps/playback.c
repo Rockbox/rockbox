@@ -2353,6 +2353,7 @@ void audio_play(long offset)
     else
         stop_codec_flush();
 
+    playing = true;
     queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
 }
 
