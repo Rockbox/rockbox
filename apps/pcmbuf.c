@@ -107,6 +107,7 @@ static bool low_latency_mode = false;
 
 static void pcmbuf_flush_audio(void);
 static void pcmbuf_under_watermark(void);
+static bool pcmbuf_flush_fillpos(void);
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)
 void pcmbuf_boost(bool state)
@@ -152,6 +153,7 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
         pcmbuf_write_end = pcmbuf_current;
     }
 
+process_new_buffer:
     {
         /* Send the new buffer to the pcm */
         struct pcmbufdesc *pcmbuf_new = pcmbuf_read;
@@ -167,6 +169,10 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
         }
         else
         {
+            /* There may be more data waiting to flush, try to use it */
+            if (pcmbuf_flush_fillpos())
+                goto process_new_buffer;
+                
             /* No more buffers */
             last_chunksize = 0;
             *realsize = 0;
@@ -405,7 +411,7 @@ void pcmbuf_play_start(void)
 /**
  * Commit samples waiting to the pcm buffer.
  */
-static void pcmbuf_flush_fillpos(void)
+static bool pcmbuf_flush_fillpos(void)
 {
     if (audiobuffer_fillpos) {
         /* Never use the last buffer descriptor */
@@ -422,7 +428,9 @@ static void pcmbuf_flush_fillpos(void)
             sleep(PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY * 4) / 5);
         }
         pcmbuf_add_chunk();
+        return true;
     }
+    return false;
 }
 
 /**
@@ -486,7 +494,7 @@ static void crossfade_start(void)
     unsigned int fade_out_delay = 0;
     unsigned fade_in_delay = 0;
 
-    crossfade_init = 0;
+    crossfade_init = false;
     /* Reject crossfade if less than .5s of data */
     if (LOW_DATA(2)) {
         logf("crossfade rejected");
@@ -693,9 +701,6 @@ static void flush_crossfade(const char *buf, size_t length) {
 
 static bool prepare_insert(size_t length)
 {
-    if (crossfade_init)
-        crossfade_start();
-
     if (low_latency_mode)
     {
         /* 1/4s latency. */
@@ -729,6 +734,9 @@ static bool prepare_insert(size_t length)
 
 void* pcmbuf_request_buffer(size_t length, size_t *realsize)
 {
+    if (crossfade_init)
+        crossfade_start();
+
     if (crossfade_active) {
         *realsize = MIN(length, PCMBUF_FADE_CHUNK);
         return &guardbuf[0];
@@ -778,10 +786,8 @@ bool pcmbuf_is_crossfade_active(void)
 
 void pcmbuf_write_complete(size_t length)
 {
-    if (crossfade_active) {
-        length = MIN(length, PCMBUF_FADE_CHUNK);
-        flush_crossfade(&guardbuf[0],length);
-    }
+    if (crossfade_active)
+        flush_crossfade(guardbuf, length);
     else
     {
         audiobuffer_free -= length;
@@ -798,7 +804,7 @@ bool pcmbuf_insert_buffer(const char *buf, size_t length)
         return false;
 
     if (crossfade_active) {
-        flush_crossfade(buf,length);
+        flush_crossfade(buf, length);
     }
     else
     {
