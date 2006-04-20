@@ -941,6 +941,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
     /** We need to re-check the song names from disk because qsort can't
      * sort two arrays at once :/
      * FIXME: Please implement a better way to do this. */
+    memset(playlist->filenames, 0, playlist->max_playlist_size * sizeof(int));
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
