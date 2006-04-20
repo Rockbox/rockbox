@@ -47,15 +47,15 @@ inline static int FixedMul( int a, int b )
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
    // Code contributed by Thom Johansen
    register int result;
-   asm volatile (
+   asm (
       "mac.l   %[x],%[y],%%acc0  \n"   /* multiply */
       "move.l  %[y],%%d2         \n"
       "mulu.l  %[x],%%d2         \n"   /* get lower half, avoid emac stall */
       "movclr.l %%acc0,%[result] \n"   /* get higher half */
-      "moveq.l #15,%%d1          \n"
-      "asl.l   %%d1,%[result]    \n"   /* hi <<= 15, plus one free */
-      "moveq.l #16,%%d1          \n"
-      "lsr.l   %%d1,%%d2         \n"   /* (unsigned)lo >>= 16 */
+      "asl.l   #8,%[result]      \n"   /* hi <<= 15, plus one free */
+      "asl.l   #7,%[result]      \n"   /* hi <<= 15, plus one free */
+      "lsr.l   #8,%%d2           \n"   /* (unsigned)lo >>= 16 */
+      "lsr.l   #8,%%d2           \n"   /* (unsigned)lo >>= 16 */
       "or.l    %%d2 ,%[result]   \n"   /* combine result */
    : /* outputs */
       [result]"=&d"(result)
@@ -63,7 +63,7 @@ inline static int FixedMul( int a, int b )
       [x] "d" (a),
       [y] "d" (b)
    : /* clobbers */
-      "d1", "d2"
+      "d2"
    );
    return result;
 #else

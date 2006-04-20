@@ -526,16 +526,48 @@ byte *ds_source IBSS_ATTR;
 
 void R_DrawSpan (void)
 {
-   register unsigned count,xfrac = ds_xfrac,yfrac = ds_yfrac;
+#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+   // only slightly faster
+   asm volatile (
+      "tst %[count]                             \n"
+      "beq endspanloop                          \n"
+      "clr.l %%d4                               \n"
+      "spanloop:                                \n"
+      "move.l %[xfrac], %%d1                    \n"
+      "move.l %[yfrac], %%d2                    \n"
+      "lsr.l #8,%%d1                            \n"
+      "lsr.l #8,%%d2                            \n"
+      "lsr.l #8,%%d1                            \n"
+      "lsr.l #2,%%d2                            \n"
+      "and.l #63,%%d1                           \n"
+      "and.l #4032,%%d2                         \n"
+      "or.l %%d2, %%d1                          \n"
+      "move.b (%[source], %%d1), %%d4           \n"
+      "add.l %[ds_xstep], %[xfrac]              \n"
+      "add.l %[ds_ystep], %[yfrac]              \n"
+      "move.b (%[colormap],%%d4.l), (%[dest])+  \n"
+      "subq.l #1, %[count]                      \n"
+      "bne spanloop                             \n"
+      "endspanloop:                             \n"
+   : /* outputs */
+   : /* inputs */
+      [count] "d" (ds_x2-ds_x1+1),
+      [xfrac] "d" (ds_xfrac),
+      [yfrac] "d" (ds_yfrac),
+      [source] "a" (ds_source),
+      [colormap] "a" (ds_colormap),
+      [dest] "a" (topleft+ds_y*SCREENWIDTH +ds_x1),
+      [ds_xstep] "d" (ds_xstep),
+      [ds_ystep] "d" (ds_ystep)
+   : /* clobbers */
+      "d1", "d2", "d4"
+   );
+#else
+   register unsigned count = ds_x2 - ds_x1 + 1,xfrac = ds_xfrac,yfrac = ds_yfrac;
 
-   byte *source;
-   byte *colormap;
-   byte *dest;
-
-   source = ds_source;
-   colormap = ds_colormap;
-   dest = topleft + ds_y*SCREENWIDTH + ds_x1;
-   count = ds_x2 - ds_x1 + 1;
+   register byte *source = ds_source;
+   register byte *colormap = ds_colormap;
+   register byte *dest = topleft + ds_y*SCREENWIDTH + ds_x1;
 
    while (count)
    {
@@ -550,6 +582,7 @@ void R_DrawSpan (void)
       *dest++ = colormap[source[spot]];
       count--;
    }
+#endif
 }
 
 //

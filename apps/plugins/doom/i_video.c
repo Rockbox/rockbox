@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.15  2006/04/16 23:14:04  kkurbjun
+ * Revision 1.16  2006/04/20 19:39:56  kkurbjun
+ * Optimizations for doom: coldfire asm drawspan routine = not much, fixed point multiply changes = not much, H300 asm lcd update = some, IRAM sound updates and simplifications = more
+ *
+ * Revision 1.15  2006-04-16 23:14:04  kkurbjun
  * Fix run so that it stays enabled across level loads.  Removed some unused code and added some back in for hopeful future use.
  *
  * Revision 1.14  2006-04-15 22:08:36  kkurbjun
@@ -359,10 +362,43 @@ static void I_UploadNewPalette(int pal)
 void I_FinishUpdate (void)
 {
 #if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
-   /*
-      Lookup tables are no longer needed (H300 specific, decreases timedemo
-      by about 500 tics)
-   */
+
+#if 1
+   /* ASM screen update (drops 600 tics (100 asm)) */
+   asm (
+      "move.w #33,(%[LCD])    \n" /* Setup the LCD controller */
+      "clr.w (%[LCD2])        \n"
+      "move.w #34,(%[LCD])    \n" /* End LCD controller setup */
+      "move.l #220,%%d2       \n"
+      "move.l #176,%%d3       \n"
+      "clr.l %%d1             \n"
+      "widthloop:             \n"
+      "move.b (%[screenptr])+, %%d1             \n" /* Unrolled by 5 */
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b (%[screenptr])+, %%d1             \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b (%[screenptr])+, %%d1             \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b (%[screenptr])+, %%d1             \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b (%[screenptr])+, %%d1             \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "subq.l #5,%%d2         \n"
+      "bne widthloop          \n"
+      "move.w #220,%%d2       \n"
+      "subq.l #1,%%d3         \n"
+      "bne widthloop          \n"
+   : /* outputs */
+   : /* inputs */
+      [screenptr] "a" (d_screens[0]),
+      [palette]   "a" (palette),
+      [LCD]       "a" (0xf0000000),
+      [LCD2]      "a" (0xf0000002)
+   : /* clobbers */
+      "d1", "d2", "d3"
+   );
+#else
+   /* C version of above (drops 500 tics) */
 
    // Start the write
    *(volatile unsigned short *) 0xf0000000 = 0x21; // register
@@ -383,6 +419,8 @@ void I_FinishUpdate (void)
       wcnt=0;
       hcnt++;
    }
+#endif
+
 #else
    unsigned char paletteIndex;
    int x, y;

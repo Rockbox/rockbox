@@ -48,11 +48,11 @@
 //  mixing buffer, and the samplerate of the raw data.
 
 // Needed for calling the actual sound output.
-#define SAMPLECOUNT  512
+#define SAMPLECOUNT     512
 
-#define NUM_CHANNELS  16
+#define NUM_CHANNELS    16
 // It is 2 for 16bit, and 2 for two channels.
-#define BUFMUL                  4
+#define BUFMUL          2
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
 
 #if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -66,7 +66,7 @@
 //  Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
 //  that is submitted to the audio device.
-signed short *mixbuffer=NULL;
+signed short mixbuffer[MIXBUFFERSIZE] IBSS_ATTR;
 
 typedef struct {
    // SFX id of the playing sound effect.
@@ -91,7 +91,7 @@ typedef struct {
    int *rightvol_lookup;
 } channel_info_t;
 
-channel_info_t channelinfo[NUM_CHANNELS];
+channel_info_t channelinfo[NUM_CHANNELS] IBSS_ATTR;
 
 int *vol_lookup; // Volume lookups.
 
@@ -355,13 +355,6 @@ int I_SoundIsPlaying(int handle)
 // This function currently supports only 16bit.
 //
 
-bool swap=0;
-bool lastswap=1;
-   // Pointers in global mixbuffer, left, right, end.
-   signed short*  leftout;
-   signed short*  rightout;
-   signed short*  leftend;
-
 void I_UpdateSound( void )
 {
    // Mix current sound data.
@@ -370,25 +363,26 @@ void I_UpdateSound( void )
    register int  dl;
    register int  dr;
 
+   // Pointers in global mixbuffer, left, right, end.
+   signed short*  leftout;
+   signed short*  rightout;
+   signed short*  leftend;
+
    // Step in mixbuffer, left and right, thus two.
    int    step;
 
    // Mixing channel index.
    int    chan;
 
-   if(lastswap==swap)
-      return;
-   lastswap=swap;
-
    // Left and right channel
    //  are in global mixbuffer, alternating.
-   leftout = (swap ? mixbuffer : mixbuffer + SAMPLECOUNT*2);
-   rightout = (swap ? mixbuffer : mixbuffer + SAMPLECOUNT*2)+1;
+   leftout = mixbuffer;
+   rightout = mixbuffer +1;
    step = 2;
 
    // Determine end, for left channel only
    //  (right channel is implicit).
-   leftend = (swap ? mixbuffer : mixbuffer + SAMPLECOUNT*2) + SAMPLECOUNT*step;
+   leftend = mixbuffer + SAMPLECOUNT*step;
 
    // Mix sounds into the mixing buffer.
    // Loop over step*SAMPLECOUNT,
@@ -467,15 +461,10 @@ void I_UpdateSound( void )
 
 void get_more(unsigned char** start, size_t* size)
 {
-   // This code works fine, the only problem is that doom runs slower then the sound
-   // updates (sometimes).  This code forces the update if the sound hasn't been
-   // remixed.
-   if(lastswap!=swap)
-      I_UpdateSound(); // Force sound update (We don't want stutters)
+   I_UpdateSound(); // Force sound update
 
-   *start = (unsigned char*)((swap ? mixbuffer : mixbuffer + SAMPLECOUNT*2));
+   *start = (unsigned char*)(mixbuffer);
    *size = SAMPLECOUNT*2*sizeof(short);
-   swap=!swap;
 }
 
 
@@ -519,9 +508,6 @@ void I_InitSound()
    }
 
    printf( " pre-cached all sound data\n");
-
-   if(mixbuffer==NULL)
-      mixbuffer=malloc(sizeof(short)*MIXBUFFERSIZE);
 
    // Now initialize mixbuffer with zero.
    for ( i = 0; i< MIXBUFFERSIZE; i++ )
