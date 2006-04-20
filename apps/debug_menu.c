@@ -947,7 +947,7 @@ bool dbg_ports(void)
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
     int adc_buttons, adc_remote, adc_battery;
-#ifdef IRIVER
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     int adc_remotedetect;
 #endif
     char buf[128];
@@ -993,7 +993,7 @@ bool dbg_ports(void)
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote = adc_read(ADC_REMOTE);
         adc_battery = adc_read(ADC_BATTERY);
-#ifdef IRIVER
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         adc_remotedetect = adc_read(ADC_REMOTEDETECT);
 #endif
         
@@ -1003,7 +1003,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
-#ifdef IRIVER
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x", adc_remotedetect);
         lcd_puts(0, line++, buf);
 #endif
@@ -1016,7 +1016,7 @@ bool dbg_ports(void)
                  battery_level());
         lcd_puts(0, line++, buf);
         
-#ifdef IRIVER
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "remotetype:: %d", remote_type());
         lcd_puts(0, line++, buf);
 #endif
