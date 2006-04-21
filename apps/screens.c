@@ -52,6 +52,7 @@
 #include "screen_access.h"
 #include "quickscreen.h"
 #include "logo.h"
+#include "pcmbuf.h"
 
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -407,7 +408,7 @@ bool pitch_screen(void)
 
     lcd_setfont(FONT_SYSFIXED);
 #if CONFIG_CODEC == SWCODEC
-    pcmbuf_set_low_latency(false);
+    pcmbuf_set_low_latency(true);
 #endif
 
     while (!exit)
