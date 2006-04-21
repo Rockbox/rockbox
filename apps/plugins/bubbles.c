@@ -182,7 +182,7 @@ PLUGIN_HEADER
 #define EMBLEM_HEIGHT  6
 #define XOFS          33
 #define ROW_HEIGHT     8
-#define ROW_INDENT     6
+#define ROW_INDENT     5
 #define MAX_FPS       30
 
 /* 8x7 bubbles (Archos recorder, Ondio) */
