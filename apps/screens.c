@@ -349,94 +349,127 @@ int charging_screen(void)
 /* returns:
    0 if no key was pressed
    1 if USB was connected */
+
+void pitch_screen_draw(int pitch)
+{
+    unsigned char* ptr;
+    unsigned char buf[32];
+    int w, h;
+
+    lcd_clear_display();
+
+    /* UP: Pitch Up */
+    ptr = str(LANG_PITCH_UP);
+    lcd_getstringsize(ptr,&w,&h);
+    lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
+    lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                    LCD_WIDTH/2 - 3, h, 7, 8);
+
+    /* DOWN: Pitch Down */
+    ptr = str(LANG_PITCH_DOWN);
+    lcd_getstringsize(ptr,&w,&h);
+    lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+    lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*2, 7, 8);
+
+    /* RIGHT: +2% */
+    ptr = "+2%";
+    lcd_getstringsize(ptr,&w,&h);
+    lcd_putsxy(LCD_WIDTH-w, (LCD_HEIGHT-h)/2, ptr);
+    lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                    LCD_WIDTH-w-8, (LCD_HEIGHT-h)/2, 7, 8);
+
+    /* LEFT: -2% */
+    ptr = "-2%";
+    lcd_getstringsize(ptr,&w,&h);
+    lcd_putsxy(0, (LCD_HEIGHT-h)/2, ptr);
+    lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+                    w+1, (LCD_HEIGHT-h)/2, 7, 8);
+
+    /* "Pitch" */
+    snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
+    lcd_getstringsize(buf,&w,&h);
+    lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT/2)-h, buf);
+    /* "XX.X%" */
+    snprintf((char *)buf, sizeof(buf), "%d.%d%%",
+             pitch / 10, pitch % 10 );
+    lcd_getstringsize(buf,&w,&h);
+    lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT/2, buf);
+
+    lcd_update();
+}
+
 bool pitch_screen(void)
 {
     int button;
     int pitch = sound_get_pitch();
     bool exit = false;
 
-    while (!exit) {
-        unsigned char* ptr;
-        unsigned char buf[32];
-        int w, h;
+    lcd_setfont(FONT_SYSFIXED);
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(false);
+#endif
 
-        lcd_clear_display();
-        lcd_setfont(FONT_SYSFIXED);
+    while (!exit)
+    {
+        pitch_screen_draw(pitch);
 
-        /* UP: +0.1% */
-        ptr = "+0.1%";
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                        LCD_WIDTH/2 - 3, h, 7, 8);
-
-        /* DOWN: -0.1% */
-        ptr = "-0.1%";
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*2, 7, 8);
-
-        /* RIGHT: +2% */
-        ptr = "+2%";
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy(LCD_WIDTH-w, (LCD_HEIGHT-h)/2, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                        LCD_WIDTH-w-8, (LCD_HEIGHT-h)/2, 7, 8);
-
-        /* LEFT: -2% */
-        ptr = "-2%";
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy(0, (LCD_HEIGHT-h)/2, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                        w+1, (LCD_HEIGHT-h)/2, 7, 8);
-
-        /* "Pitch" */
-        snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
-        lcd_getstringsize(buf,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT/2)-h, buf);
-        /* "XX.X%" */
-        snprintf((char *)buf, sizeof(buf), "%d.%d%%",
-                 pitch / 10, pitch % 10 );
-        lcd_getstringsize(buf,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT/2, buf);
-
-        lcd_update();
-
-        /* use lastbutton, so the main loop can decide whether to
-           exit to browser or not */
         button = button_get(true);
         switch (button) {
             case PITCH_UP:
-            case PITCH_UP | BUTTON_REPEAT:
                 if ( pitch < 2000 )
                     pitch++;
                 sound_set_pitch(pitch);
                 break;
 
+            case PITCH_UP | BUTTON_REPEAT:
+                if ( pitch < 1990 )
+                    pitch += 10;
+                sound_set_pitch(pitch);
+                break;
+
             case PITCH_DOWN:
-            case PITCH_DOWN | BUTTON_REPEAT:
                 if ( pitch > 500 )
                     pitch--;
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_RIGHT:
-            case PITCH_RIGHT | BUTTON_REPEAT:
-                if ( pitch < 1980 )
-                    pitch += 20;
-                else
-                    pitch = 2000;
+            case PITCH_DOWN | BUTTON_REPEAT:
+                if ( pitch > 510 )
+                    pitch -= 10;
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_LEFT:
-            case PITCH_LEFT | BUTTON_REPEAT:
-                if ( pitch > 520 )
+            case PITCH_RIGHT:
+                if ( pitch < 1980 )
+                {
+                    pitch += 20;
+                    sound_set_pitch(pitch);
+
+                    pitch_screen_draw(pitch);
+
+                    while(button != (PITCH_RIGHT|BUTTON_REL))
+                        button = button_get(true);
+
                     pitch -= 20;
-                else
-                    pitch = 500;
-                sound_set_pitch(pitch);
+                    sound_set_pitch(pitch);
+                }
+                break;
+
+            case PITCH_LEFT:
+                if ( pitch > 520 )
+                {
+                    pitch -= 20;
+                    sound_set_pitch(pitch);
+
+                    pitch_screen_draw(pitch);
+
+                    while(button != (PITCH_LEFT|BUTTON_REL))
+                        button = button_get(true);;
+
+                    pitch += 20;
+                    sound_set_pitch(pitch);
+                }
                 break;
 
             case PITCH_RESET:
@@ -454,7 +487,9 @@ bool pitch_screen(void)
                 break;
         }
     }
-
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(false);
+#endif
     lcd_setfont(FONT_UI);
     return 0;
 }

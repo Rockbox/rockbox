@@ -612,7 +612,8 @@ long gui_wps_show(void)
                 /* pitch screen */
 #if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
     || CONFIG_KEYPAD == IRIVER_H300_PAD
-            case BUTTON_ON | BUTTON_REPEAT:
+            case BUTTON_ON | BUTTON_UP:
+            case BUTTON_ON | BUTTON_DOWN:
 #ifdef HAVE_LCD_COLOR
                 lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
 #endif
