@@ -20,6 +20,7 @@
 /* TODO: Fast codecs seem to cause badness on track skipping (stop, old audio,
  * then new audio).  Investigate the CFL_FLUSH mode used for all track skips */
 /* TODO: Check for a possibly broken codepath on a rapid skip, stop event */
+/* TODO: same in reverse ^^ */
 /* TODO: Can use the track changed callback to detect end of track and seek
  * in the previous track until this happens */
 /* Design: we have prev_ti already, have a conditional for what type of seek
