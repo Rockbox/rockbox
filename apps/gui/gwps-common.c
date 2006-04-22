@@ -84,10 +84,11 @@ static char* skip_utf8_bom(char* buf)
 static int get_image_id(int c)
 {
     if(c >= 'a' && c <= 'z')
-        c -= 'a';
-    if(c >= 'A' && c <= 'Z')
-        c = c - 'A' + 26;
-    return c;
+        return c - 'a';
+    else if(c >= 'A' && c <= 'Z')
+        return c - 'A' + 26;
+    else
+        return -1;
 }
 #endif
     
@@ -287,6 +288,10 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
                     {
                         /* get filename */
                         pos = strchr(ptr, '|');
+
+                        if (pos == NULL)
+                            return false;
+
                         if ((pos - ptr) <
                             (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
                         {
