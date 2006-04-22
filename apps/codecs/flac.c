@@ -224,7 +224,7 @@ enum codec_status codec_start(struct codec_api* api)
 {
     int8_t *buf;
     FLACContext fc;
-    uint32_t samplesdone;
+    uint32_t samplesdone = 0;
     uint32_t elapsedtime;
     size_t bytesleft;
     int consumed;
@@ -244,7 +244,6 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(FLAC_OUTPUT_DEPTH-1));
@@ -260,7 +259,7 @@ enum codec_status codec_start(struct codec_api* api)
     if (!flac_init(&fc,ci->id3->first_frame_offset)) {
         LOGF("FLAC: Error initialising codec\n");
         retval = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     while (!*ci->taginfo_ready)
@@ -292,7 +291,7 @@ enum codec_status codec_start(struct codec_api* api)
                              bytesleft,ci->yield)) < 0) {
              LOGF("FLAC: Frame %d, error %d\n",frame,res);
              retval = CODEC_ERROR;
-             goto exit;
+             goto done;
         }
         consumed=fc.gb.index/8;
         frame++;
@@ -312,12 +311,14 @@ enum codec_status codec_start(struct codec_api* api)
 
         buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     }
+    retval = CODEC_OK;
+
+done:
     LOGF("FLAC: Decoded %d samples\n",samplesdone);
 
     if (ci->request_next_track())
         goto next_track;
 
-    retval = CODEC_OK;
 exit:
     return retval;
 }

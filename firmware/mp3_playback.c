@@ -629,11 +629,6 @@ void mp3_shutdown(void)
     /* a dummy */
 }
 
-void mp3_play_stop(void)
-{
-    /* a dummy */
-}
-
 void mp3_play_pause(bool play)
 {
     /* a dummy */

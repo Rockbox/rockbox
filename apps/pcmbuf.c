@@ -48,7 +48,8 @@ static size_t audiobuffer_pos IDATA_ATTR;
 size_t audiobuffer_free IDATA_ATTR;
 /* Amount audiobuffer_pos will be increased.*/
 static size_t audiobuffer_fillpos IDATA_ATTR;
-static char *guardbuf IDATA_ATTR;
+static char *fadebuf IDATA_ATTR;
+static char *voicebuf IDATA_ATTR;
 
 static void (*pcmbuf_event_handler)(void) IDATA_ATTR;
 static void (*position_callback)(size_t size) IDATA_ATTR;
@@ -93,9 +94,9 @@ static struct pcmbufdesc *pcmbuf_write IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_write_end IDATA_ATTR;
 static size_t last_chunksize IDATA_ATTR;
 static size_t pcmbuf_unplayed_bytes IDATA_ATTR;
-static size_t pcmbuf_mix_used_bytes IDATA_ATTR;
 static size_t pcmbuf_watermark IDATA_ATTR;
-static short *mixpos IDATA_ATTR;
+static struct pcmbufdesc *pcmbuf_mix_chunk IDATA_ATTR;
+static size_t pcmbuf_mix_sample IDATA_ATTR;
 static bool low_latency_mode = false;
 
 /* Helpful macros for use in conditionals this assumes some of the above
@@ -151,6 +152,10 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
         /* Put the finished buffer back into circulation */
         pcmbuf_write_end->link = pcmbuf_current;
         pcmbuf_write_end = pcmbuf_current;
+
+        /* If we've read through the mix chunk while it's still mixing there */
+        if (pcmbuf_current == pcmbuf_mix_chunk)
+            pcmbuf_mix_chunk = NULL;
     }
 
 process_new_buffer:
@@ -162,9 +167,10 @@ process_new_buffer:
         if(pcmbuf_new)
         {
             size_t current_size = pcmbuf_new->size;
+
             pcmbuf_unplayed_bytes -= current_size;
-            *realsize = current_size;
             last_chunksize = current_size;
+            *realsize = current_size;
             *realstart = pcmbuf_new->addr;
         }
         else
@@ -219,14 +225,10 @@ static inline void pcmbuf_add_chunk(void)
 
     /* Update bytes counters */
     pcmbuf_unplayed_bytes += size;
-    if (pcmbuf_mix_used_bytes > size)
-        pcmbuf_mix_used_bytes -= size;
-    else
-        pcmbuf_mix_used_bytes = 0;
 
     audiobuffer_pos += size;
     if (audiobuffer_pos >= pcmbuf_size)
-        audiobuffer_pos = 0;
+        audiobuffer_pos -= pcmbuf_size;
 
     audiobuffer_fillpos = 0;
 }
@@ -299,7 +301,7 @@ void pcmbuf_play_stop(void)
     pcm_mute(false);
 
     pcmbuf_unplayed_bytes = 0;
-    pcmbuf_mix_used_bytes = 0;
+    pcmbuf_mix_chunk = NULL;
     if (pcmbuf_read) {
         pcmbuf_write_end->link = pcmbuf_read;
         pcmbuf_write_end = pcmbuf_read_end;
@@ -351,9 +353,10 @@ void pcmbuf_init(size_t bufsize)
     pcmbuf_size = bufsize;
     pcmbuf_descsize = pcmbuf_descs()*sizeof(struct pcmbufdesc);
     audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) -
-        (pcmbuf_size + PCMBUF_FADE_CHUNK + pcmbuf_descsize)];
-    guardbuf = &audiobuffer[pcmbuf_size];
-    pcmbuf_write = (struct pcmbufdesc *)(&guardbuf[PCMBUF_FADE_CHUNK]);
+        (pcmbuf_size + PCMBUF_MIX_CHUNK * 2 + pcmbuf_descsize)];
+    fadebuf = &audiobuffer[pcmbuf_size];
+    voicebuf = &fadebuf[PCMBUF_MIX_CHUNK];
+    pcmbuf_write = (struct pcmbufdesc *)(&voicebuf[PCMBUF_MIX_CHUNK]);
     pcmbuf_init_pcmbuffers();
     position_callback = NULL;
     pcmbuf_event_handler = NULL;
@@ -444,7 +447,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
         /* Fade out the specified amount of the already processed audio */
         size_t total_fade_out = fade_out_rem;
         short *buf = (short *)&audiobuffer[crossfade_pos + fade_out_delay * 2];
-        short *buf_end = (short *)guardbuf;
+        short *buf_end = (short *)fadebuf;
 
         /* Wrap the starting position if needed */
         if (buf >= buf_end) buf -= pcmbuf_size / 2;
@@ -738,8 +741,8 @@ void* pcmbuf_request_buffer(size_t length, size_t *realsize)
         crossfade_start();
 
     if (crossfade_active) {
-        *realsize = MIN(length, PCMBUF_FADE_CHUNK);
-        return &guardbuf[0];
+        *realsize = MIN(length, PCMBUF_MIX_CHUNK);
+        return fadebuf;
     }
     else
     {
@@ -772,8 +775,16 @@ void* pcmbuf_request_voice_buffer(size_t length, size_t *realsize, bool mix)
 {
     if (mix)
     {
-        *realsize = MIN(length, PCMBUF_FADE_CHUNK);
-        return &guardbuf[0];
+        if (pcmbuf_mix_chunk || pcmbuf_read->link)
+        {
+            *realsize = MIN(length, PCMBUF_MIX_CHUNK);
+            return voicebuf;
+        }
+        else
+        {
+            *realsize = 0;
+            return NULL;
+        }
     }
     else
         return pcmbuf_request_buffer(length, realsize);
@@ -787,7 +798,7 @@ bool pcmbuf_is_crossfade_active(void)
 void pcmbuf_write_complete(size_t length)
 {
     if (crossfade_active)
-        flush_crossfade(guardbuf, length);
+        flush_crossfade(fadebuf, length);
     else
     {
         audiobuffer_free -= length;
@@ -814,16 +825,16 @@ bool pcmbuf_insert_buffer(const char *buf, size_t length)
 }
 
 /* Get a pointer to where to mix immediate audio */
-static inline short* get_mix_insert_pos(void) {
-    /* Give at least 1/8s clearance here */
-    size_t pcmbuf_mix_back_pos =
-        pcmbuf_unplayed_bytes - NATIVE_FREQUENCY * 4 / 8;
+static inline short* get_mix_insert_buf(void) {
+    if (pcmbuf_read->link)
+    {
+        /* Get the next chunk */
+        char *pcmbuf_mix_buf = pcmbuf_read->link->addr;
 
-    if (audiobuffer_pos < pcmbuf_mix_back_pos)
-        return (short *)&audiobuffer[pcmbuf_size +
-            audiobuffer_pos - pcmbuf_mix_back_pos];
-    else
-        return (short *)&audiobuffer[audiobuffer_pos - pcmbuf_mix_back_pos];
+        /* Give at least 1/8s clearance. TODO: Check size here? */
+        return (short *)&pcmbuf_mix_buf[NATIVE_FREQUENCY * 4 / 8];
+    }
+    return NULL;
 }
 
 /* Generates a constant square wave sound with a given frequency
@@ -834,12 +845,12 @@ void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude)
     unsigned int interval = NATIVE_FREQUENCY / frequency;
     long sample;
     short *buf;
-    short *pcmbuf_end = (short *)guardbuf;
+    short *pcmbuf_end = (short *)fadebuf;
     size_t samples = NATIVE_FREQUENCY / 1000 * duration;
 
     if (pcm_is_playing())
     {
-        buf = get_mix_insert_pos();
+        buf = get_mix_insert_buf();
         while (i++ < samples)
         {
             sample = *buf;
@@ -888,35 +899,56 @@ int pcmbuf_usage(void)
     return pcmbuf_unplayed_bytes * 100 / pcmbuf_size;
 }
 
-int pcmbuf_mix_usage(void)
+int pcmbuf_mix_free(void)
 {
-    return pcmbuf_mix_used_bytes * 100 / pcmbuf_unplayed_bytes;
+    if (pcmbuf_mix_chunk)
+    {
+        size_t my_mix_end =
+            (size_t)&((short *)pcmbuf_mix_chunk->addr)[pcmbuf_mix_sample];
+        size_t my_write_pos = (size_t)&audiobuffer[audiobuffer_pos];
+        if (my_write_pos < my_mix_end)
+            my_write_pos += pcmbuf_size;
+        return (my_write_pos - my_mix_end) * 100 / pcmbuf_unplayed_bytes;
+    }
+    return 100;
 }
 
-void pcmbuf_reset_mixpos(void)
+/* This function does  not check for writing over the current main insertion
+ * point of the pcm buffer (audiobuffer_fillpos) so that must be checked by
+ * the caller */
+void pcmbuf_mix_voice(size_t length)
 {
-    mixpos = get_mix_insert_pos();
-    pcmbuf_mix_used_bytes = 0;
-}
+    short *ibuf = (short *)voicebuf;
+    short *obuf;
+    size_t chunk_samples;
 
-void pcmbuf_mix(char *buf, size_t length)
-{
-    short *ibuf = (short *)buf;
-    short *pcmbuf_end = (short *)guardbuf;
+    if (!pcmbuf_mix_chunk && pcmbuf_read)
+    {
+        pcmbuf_mix_chunk = pcmbuf_read->link;
+        /* Start 1/8s into the next chunk */
+        pcmbuf_mix_sample = NATIVE_FREQUENCY * 4 / 16;
+    }
+    if (!pcmbuf_mix_chunk)
+        return;
 
-    if (pcmbuf_mix_used_bytes == 0)
-        pcmbuf_reset_mixpos();
+    obuf = (short *)pcmbuf_mix_chunk->addr;
+    chunk_samples = pcmbuf_mix_chunk->size / 2;
 
-    pcmbuf_mix_used_bytes += length;
     length /= 2;
 
     while (length-- > 0) {
         long sample = *ibuf++;
-        sample += *mixpos >> 2;
-        *mixpos++ = MIN(MAX(sample, -32768), 32767);
-
-        if (mixpos >= pcmbuf_end)
-            mixpos = (short *)audiobuffer;
+        if (pcmbuf_mix_sample >= chunk_samples)
+        {
+            pcmbuf_mix_chunk = pcmbuf_mix_chunk->link;
+            if (!pcmbuf_mix_chunk)
+                return;
+            pcmbuf_mix_sample = 0;
+            obuf = pcmbuf_mix_chunk->addr;
+            chunk_samples = pcmbuf_mix_chunk->size / 2;
+        }
+        sample += obuf[pcmbuf_mix_sample];
+        obuf[pcmbuf_mix_sample++] = MIN(MAX(sample, -32768), 32767);
     }
 }
 

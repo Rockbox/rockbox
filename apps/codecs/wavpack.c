@@ -75,7 +75,6 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
         
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
     codec_set_replaygain(ci->id3);
    
@@ -84,7 +83,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     if (!wpc) {
         retval = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     bps = WavpackGetBytesPerSample (wpc);
@@ -143,11 +142,12 @@ enum codec_status codec_start(struct codec_api* api)
         ci->set_elapsed (WavpackGetSampleIndex (wpc) / sr_100 * 10);
         ci->yield ();
     }
+    retval = CODEC_OK;
 
+done:
     if (ci->request_next_track())
         goto next_track;
 
-    retval = CODEC_OK;
 exit:
     return retval;
 }

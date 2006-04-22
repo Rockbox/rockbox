@@ -63,7 +63,6 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(SHN_OUTPUT_DEPTH-1));
@@ -146,7 +145,7 @@ seek_start:
  
         if (res == FN_ERROR) {
             LOGF("Shorten: shorten_decode_frames error (%d)\n", samplesdone);
-            return CODEC_ERROR;
+            break;
         } else {
             /* Insert decoded samples in pcmbuf */
             if (nsamples) {

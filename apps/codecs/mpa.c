@@ -91,7 +91,7 @@ void init_mad(void)
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api *api)
 {
-    int status = CODEC_OK;
+    int status;
     size_t size;
     int file_end;
     int frame_skip;      /* samples to skip current frame */
@@ -110,7 +110,6 @@ enum codec_status codec_start(struct codec_api *api)
 
     /* Create a decoder instance */
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(MAD_F_FRACBITS));
     ci->configure(DSP_SET_CLIP_MIN, (int *)-MAD_F_ONE);
@@ -122,6 +121,7 @@ enum codec_status codec_start(struct codec_api *api)
      * for gapless playback.
      * Reinitializing seems to be necessary to avoid playback quircks when seeking. */
     next_track:
+    status = CODEC_OK;
         
     init_mad();
 
@@ -171,7 +171,7 @@ enum codec_status codec_start(struct codec_api *api)
                     ci->id3->first_frame_offset;
 
             if (!ci->seek_buffer(newpos))
-                goto next_track;
+                break;
             ci->seek_complete();
             init_mad();
         }
@@ -192,7 +192,7 @@ enum codec_status codec_start(struct codec_api *api)
                     break;
         
                 /* Fill the buffer */
-                if (stream.next_frame)
+                if (stream.next_frame && stream.next_frame != stream.this_frame)
                     ci->advance_buffer_loc((void *)stream.next_frame);
                 else
                     ci->advance_buffer(size);

@@ -141,7 +141,6 @@ enum codec_status codec_start(struct codec_api *api)
     ci->memset(iedata, 0, iend - iedata);
     #endif
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
@@ -185,9 +184,11 @@ next_track:
         a52_decode_data(filebuf, filebuf + n);
         ci->advance_buffer(n);
     }
+    retval = CODEC_OK;
+
     if (ci->request_next_track())
         goto next_track;
-    retval = CODEC_OK;
+
 exit:
     a52_free(state);
     return retval;

@@ -90,7 +90,6 @@ enum codec_status codec_start(struct codec_api *api)
     ci->memset(iedata, 0, iend - iedata);
     #endif
     
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(28));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
@@ -113,7 +112,7 @@ next_track:
     mpc_streaminfo_init(&info);
     if (mpc_streaminfo_read(&info, &reader) != ERROR_CODE_OK) {
         retval = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     frequency = info.sample_freq;
     ci->configure(DSP_SET_FREQUENCY, (long *)(long)info.sample_freq);
@@ -127,7 +126,7 @@ next_track:
         ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_MONO);
     else {
        retval = CODEC_ERROR;
-       goto exit;
+       goto done;
     }
     
     codec_set_replaygain(ci->id3);
@@ -135,7 +134,7 @@ next_track:
     mpc_decoder_setup(&decoder, &reader);
     if (!mpc_decoder_initialize(&decoder, &info)) {
         retval = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     /* This is the decoding loop. */
@@ -171,7 +170,7 @@ next_track:
         ci->yield();
         if (status == (unsigned)(-1)) { /* decode error */
             retval = CODEC_ERROR;
-            goto exit;
+            goto done;
         } else {
             while (!ci->pcmbuf_insert_split(sample_buffer,
                                             sample_buffer + MPC_FRAME_LENGTH,
@@ -181,11 +180,12 @@ next_track:
             ci->set_elapsed(samplesdone/(frequency/1000));
         }
     } while (status != 0);
-    
+    retval = CODEC_OK;
+
+done:
     if (ci->request_next_track())
         goto next_track;
 
-    retval = CODEC_OK;
 exit:
     return retval;
 }

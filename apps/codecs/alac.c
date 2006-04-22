@@ -64,7 +64,6 @@ enum codec_status codec_start(struct codec_api* api)
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
-  ci->configure(CODEC_DSP_ENABLE, (bool *)true);
   ci->configure(DSP_DITHER, (bool *)false);
   ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
   ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(ALAC_OUTPUT_DEPTH-1));
@@ -89,7 +88,7 @@ enum codec_status codec_start(struct codec_api* api)
   if (!qtmovie_read(&input_stream, &demux_res)) {
     LOGF("ALAC: Error initialising file\n");
     retval = CODEC_ERROR;
-    goto exit;
+    goto done;
   }
 
   /* initialise the sound converter */
@@ -121,7 +120,7 @@ enum codec_status codec_start(struct codec_api* api)
                          &sample_byte_size)) {
       LOGF("ALAC: Error in get_sample_info\n");
       retval = CODEC_ERROR;
-      goto exit;
+      goto done;
     }
 
     /* Request the required number of bytes from the input buffer */
@@ -129,7 +128,7 @@ enum codec_status codec_start(struct codec_api* api)
     buffer=ci->request_buffer(&n,sample_byte_size);
     if (n!=sample_byte_size) {
         retval = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     /* Decode one block - returned samples will be host-endian */
@@ -156,13 +155,14 @@ enum codec_status codec_start(struct codec_api* api)
 
     i++;
   }
+  retval = CODEC_OK;
 
+done:
   LOGF("ALAC: Decoded %d samples\n",samplesdone);
 
   if (ci->request_next_track())
    goto next_track;
 
-  retval = CODEC_OK;
 exit:
   return retval;
 }

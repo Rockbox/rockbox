@@ -98,11 +98,11 @@ next_track:
     buf = ci->request_buffer(&n, 1024);
     if (n < 44) {
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if ((memcmp(buf, "FORM", 4) != 0) || (memcmp(&buf[8], "AIFF", 4) != 0)) {
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     buf += 12;
@@ -117,7 +117,7 @@ next_track:
             if (i != 18) {
                 DEBUGF("CODEC_ERROR: 'COMM' chunk size=%lu != 18\n", i);
                 i = CODEC_ERROR;
-                goto exit;
+                goto done;
             }
             /* num_channels */
             num_channels = ((buf[8]<<8)|buf[9]);
@@ -130,7 +130,7 @@ next_track:
             if (buf[16] != 0x40) {
                 DEBUGF("CODEC_ERROR: weird sampling rate (no @)\n", i);
                 i = CODEC_ERROR;
-                goto exit;
+                goto done;
             }
             sample_rate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21])+1;
             sample_rate = sample_rate >> (16 + 14 - buf[17]);
@@ -140,7 +140,7 @@ next_track:
             if (sample_size == 0) {
                 DEBUGF("CODEC_ERROR: unsupported chunk order\n");
                 i = CODEC_ERROR;
-                goto exit;
+                goto done;
             }
             /* offset2snd */
             offset2snd = ((buf[8]<<8)|buf[9]);
@@ -161,7 +161,7 @@ next_track:
         if (n < (i + 8)) {
             DEBUGF("CODEC_ERROR: AIFF header size > 1024\n");
             i = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
         n -= i + 8;
     } /* while 'SSND' */
@@ -169,21 +169,20 @@ next_track:
     if (num_channels == 0) {
         DEBUGF("CODEC_ERROR: 'COMM' chunk not found or 0-channels file\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if (numbytes == 0) {
         DEBUGF("CODEC_ERROR: 'SSND' chunk not found or has zero length\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if (sample_size > 24) {
         DEBUGF("CODEC_ERROR: PCM with more than 24 bits per sample "
                "is unsupported\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
 
@@ -194,7 +193,7 @@ next_track:
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels unsupported\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     firstblockposn = 1024 - n;
@@ -277,11 +276,12 @@ next_track:
 
         ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
     }
+    i = CODEC_OK;
 
+done:
     if (ci->request_next_track())
         goto next_track;
 
-    i = CODEC_OK;
 exit:
     return i;
 }

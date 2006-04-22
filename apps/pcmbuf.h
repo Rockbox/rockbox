@@ -27,7 +27,7 @@
                                      non-fatal) */
 #define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
                                      this to the DMA */
-#define PCMBUF_FADE_CHUNK    8192 /* This is the maximum size of one packet
+#define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet
                                      for mixing (crossfade or voice) */
 
 /* Returns true if the buffer needs to change size */
@@ -64,10 +64,9 @@ bool pcmbuf_is_crossfade_enabled(void);
 void pcmbuf_crossfade_enable(bool on_off);
 
 int pcmbuf_usage(void);
-int pcmbuf_mix_usage(void);
+int pcmbuf_mix_free(void);
 void pcmbuf_beep(unsigned int frequency, size_t duration, int amplitude);
-void pcmbuf_reset_mixpos(void);
-void pcmbuf_mix(char *buf, size_t length);
+void pcmbuf_mix_voice(size_t length);
 
 int pcmbuf_used_descs(void);
 int pcmbuf_descs(void);

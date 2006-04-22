@@ -63,7 +63,6 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(29));
@@ -88,7 +87,7 @@ next_track:
     if (!qtmovie_read(&input_stream, &demux_res)) {
         LOGF("FAAD: Error initialising file\n");
         err = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     /* initialise the sound converter */
@@ -98,7 +97,7 @@ next_track:
     if (!hDecoder) {
         LOGF("FAAD: Error opening decoder\n");
         err = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(hDecoder);
@@ -112,7 +111,7 @@ next_track:
     if (err) {
         LOGF("FAAD: Error initialising decoder: %d, type=%d\n", err,hDecoder->object_type);
         err = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     ci->id3->frequency=s;
@@ -142,7 +141,7 @@ next_track:
                              &sample_byte_size)) {
             LOGF("AAC: Error in get_sample_info\n");
             err = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
 
         /* Request the required number of bytes from the input buffer */
@@ -156,7 +155,7 @@ next_track:
         if (frameInfo.error > 0) {
              LOGF("FAAD: decoding error \"%s\"\n", NeAACDecGetErrorMessage(frameInfo.error));
              err = CODEC_ERROR;
-             goto exit;
+             goto done;
         }
 
         /* Get the number of decoded samples */
@@ -182,13 +181,14 @@ next_track:
 
         i++;
     }
+    err = CODEC_OK;
 
+done:
     LOGF("AAC: Decoded %d samples\n",samplesdone);
 
     if (ci->request_next_track())
         goto next_track;
 
-    err = CODEC_OK;
 exit:
     return err;
 }

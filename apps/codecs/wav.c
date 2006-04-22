@@ -242,7 +242,6 @@ enum codec_status codec_start(struct codec_api *api)
     ci->memset(iedata, 0, iend - iedata);
 #endif
 
-    ci->configure(CODEC_DSP_ENABLE, (bool *)true);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
@@ -261,11 +260,11 @@ next_track:
     buf = ci->request_buffer(&n, 1024);
     if (n < 44) {
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if ((memcmp(buf, "RIFF", 4) != 0) || (memcmp(&buf[8], "WAVE", 4) != 0)) {
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     buf += 12;
@@ -281,7 +280,7 @@ next_track:
             if (i < 16) {
                 DEBUGF("CODEC_ERROR: 'fmt ' chunk size=%lu < 16\n", i);
                 i = CODEC_ERROR;
-                goto exit;
+                goto done;
             }
             /* wFormatTag */
             formattag=buf[8]|(buf[9]<<8);
@@ -309,7 +308,7 @@ next_track:
                         DEBUGF("CODEC_ERROR: dvi_adpcm is missing "
                                "SamplesPerBlock value\n");
                         i = CODEC_ERROR;
-                        goto exit;
+                        goto done;
                     }
                     samplesperblock = buf[26]|(buf[27]<<8);
                 } else if (formattag == WAVE_FORMAT_EXTENSIBLE) {
@@ -317,7 +316,7 @@ next_track:
                         DEBUGF("CODEC_ERROR: WAVE_FORMAT_EXTENSIBLE is "
                                "missing extension\n");
                         i = CODEC_ERROR;
-                        goto exit;
+                        goto done;
                     }
                     /* wValidBitsPerSample */
                     bitspersample = buf[26]|(buf[27]<<8);
@@ -344,7 +343,7 @@ next_track:
         if (n < (i + 8)) {
             DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
             i = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
         n -= i + 8;
     }
@@ -352,12 +351,12 @@ next_track:
     if (channels == 0) {
         DEBUGF("CODEC_ERROR: 'fmt ' chunk not found or 0-channels file\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if (numbytes == 0) {
         DEBUGF("CODEC_ERROR: 'data' chunk not found or has zero-length\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if (formattag != WAVE_FORMAT_PCM && totalsamples == 0) {
         /* This is non-fatal for some formats */
@@ -368,7 +367,7 @@ next_track:
         if (bitspersample != 8) {
             DEBUGF("CODEC_ERROR: alaw and mulaw must have 8 bitspersample\n");
             i = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
         bytespersample = channels;
     }
@@ -376,13 +375,13 @@ next_track:
         && bitspersample != 4 && bitspersample != 3) {
         DEBUGF("CODEC_ERROR: dvi_adpcm must have 3 or 4 bitspersample\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
     if (formattag == WAVE_FORMAT_PCM && bitspersample > 32) {
         DEBUGF("CODEC_ERROR: pcm with more than 32 bitspersample "
                "is unsupported\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
@@ -393,7 +392,7 @@ next_track:
     } else {
         DEBUGF("CODEC_ERROR: more than 2 channels\n");
         i = CODEC_ERROR;
-        goto exit;
+        goto done;
     }
 
     if (totalsamples == 0) {
@@ -406,7 +405,7 @@ next_track:
         } else {
             DEBUGF("CODEC_ERROR: cannot compute totalsamples\n");
             i = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
     }
 
@@ -505,14 +504,14 @@ next_track:
                                      samples + i*samplesperblock*channels,
                                      &decodedsize) != CODEC_OK) {
                     i = CODEC_ERROR;
-                    goto exit;
+                    goto done;
                 }
             }
             bufsize = nblocks*samplesperblock*channels*4;
         } else {
             DEBUGF("CODEC_ERROR: unsupported format %x\n", formattag);
             i = CODEC_ERROR;
-            goto exit;
+            goto done;
         }
 
         while (!ci->pcmbuf_insert((char *)samples, bufsize))
@@ -524,11 +523,12 @@ next_track:
             endofstream = 1;
         ci->set_elapsed(bytesdone*1000LL/avgbytespersec);
     }
+    i = CODEC_OK;
 
+done:
     if (ci->request_next_track())
         goto next_track;
 
-    i = CODEC_OK;
 exit:
     return i;
 }
