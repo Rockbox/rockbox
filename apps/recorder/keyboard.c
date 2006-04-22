@@ -151,20 +151,6 @@
 #define KBD_UP BUTTON_UP
 #define KBD_DOWN BUTTON_DOWN
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-
-/* TODO: Check keyboard mappings */
-
-#define KBD_MODES /* iAudio X5 uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_MENU
-#define KBD_DONE BUTTON_PLAY
-#define KBD_ABORT BUTTON_REC
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 
 /* TODO: Check keyboard mappings */
@@ -182,7 +168,7 @@
 #endif
 
 #if (LCD_WIDTH >= 160) && (LCD_HEIGHT >= 96)
-static const unsigned char * default_kbd = 
+static const unsigned char * default_kbd =
     "ABCDEFG abcdefg !?\" @#$%+'\n"
     "HIJKLMN hijklmn 789 &_()-`\n"
     "OPQRSTU opqrstu 456 §|{}/<\n"
@@ -192,7 +178,7 @@ static const unsigned char * default_kbd =
     "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ ¯±×÷¡¿µ·\n"
     "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨";
 #else
-static const unsigned char * default_kbd = 
+static const unsigned char * default_kbd =
     "ABCDEFG !?\" @#$%+'\n"
     "HIJKLMN 789 &_()-`\n"
     "OPQRSTU 456 §|{}/<\n"
@@ -215,7 +201,7 @@ static int nchars = 0;
 
 #ifdef KBD_MORSE_INPUT
 /* FIXME: We should put this to a configuration file. */
-static const char *morse_alphabets = 
+static const char *morse_alphabets =
     "abcdefghijklmnopqrstuvwxyz1234567890,.?-@ ";
 static const unsigned char morse_codes[] = {
     0x05,0x18,0x1a,0x0c,0x02,0x12,0x0e,0x10,0x04,0x17,0x0d,0x14,0x07,
@@ -265,7 +251,7 @@ int load_kbd(unsigned char* filename)
         }
 
         utf8decode(buf, &kbd_buf[i]);
-        if (kbd_buf[i] != 0xFEFF && kbd_buf[i] != '\n' && 
+        if (kbd_buf[i] != 0xFEFF && kbd_buf[i] != '\n' &&
             kbd_buf[i] != '\r') /*skip BOM & newlines */
             i++;
     }
@@ -355,6 +341,7 @@ int kbd_input(char* text, int buflen)
     bool redraw = true;
     unsigned char *utf8;
     const unsigned char *p;
+    int cur_blink = current_tick;
 #ifdef KBD_MORSE_INPUT
     bool morse_reading = false;
     unsigned char morse_code = 0;
@@ -490,7 +477,7 @@ int kbd_input(char* text, int buflen)
                         else
                             lcd_fillrect(x + j*4, y + 3, 1, 2);
                     }
-                    
+
                     x += w * 5 - 3;
                     if (x >= LCD_WIDTH - (w*6))
                     {
@@ -547,9 +534,11 @@ int kbd_input(char* text, int buflen)
 
             /* cursor */
             i = (curpos + 1) * text_w;
-            lcd_vline(i, main_y, main_y + font_h);
+            if(cur_blink%125 > 50)
+                lcd_vline(i, main_y, main_y + font_h-1);
             if (hangul) /* draw underbar */
                 lcd_hline(curpos*text_w, (curpos+1)*text_w, main_y+font_h-1);
+            cur_blink = current_tick;
 
 #ifdef HAS_BUTTONBAR
             /* draw the status bar */
@@ -566,6 +555,14 @@ int kbd_input(char* text, int buflen)
                 lcd_fillrect(font_w * x, statusbar_size + font_h * y, font_w, font_h);
                 lcd_set_drawmode(DRMODE_SOLID);
             }
+#ifdef KBD_MODES
+            else
+            {
+                lcd_set_drawmode(DRMODE_COMPLEMENT);
+                lcd_fillrect(0, main_y - keyboard_margin + 2, LCD_WIDTH, font_h+2);
+                lcd_set_drawmode(DRMODE_SOLID);
+            }
+#endif
 
             gui_syncstatusbar_draw(&statusbars, true);
             lcd_update();
@@ -574,7 +571,7 @@ int kbd_input(char* text, int buflen)
         /* The default action is to redraw */
         redraw = true;
 
-        button = button_get_w_tmo(HZ/2);
+        button = button_get(false);
 #ifdef KBD_MORSE_INPUT
         if (morse_mode)
         {
@@ -585,7 +582,7 @@ int kbd_input(char* text, int buflen)
                 button = KBD_CURSOR_RIGHT;
         }
 #endif
-        
+
         switch ( button ) {
 
             case KBD_ABORT:
@@ -641,7 +638,7 @@ int kbd_input(char* text, int buflen)
                 }
                 else
 #endif
-                {   
+                {
                     if (++x == max_chars) {
                         x = 0;
 #if !defined(KBD_PAGE_FLIP)
@@ -771,10 +768,10 @@ int kbd_input(char* text, int buflen)
                     if ((current_tick - morse_tick) > HZ/5)
                         morse_code |= 0x01;
                 }
-                
+
                 break;
 #endif
-                
+
             case KBD_SELECT:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
@@ -788,7 +785,7 @@ int kbd_input(char* text, int buflen)
                     break;
                 }
 #endif
-                
+
                 /* inserts the selected char */
 #ifdef KBD_SELECT_PRE
                 if (lastbutton != KBD_SELECT_PRE)
@@ -917,7 +914,6 @@ int kbd_input(char* text, int buflen)
 
             case BUTTON_NONE:
                 gui_syncstatusbar_draw(&statusbars, false);
-                redraw = false;
 #ifdef KBD_MORSE_INPUT
                 if (morse_reading)
                 {
