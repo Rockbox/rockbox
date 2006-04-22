@@ -2662,7 +2662,7 @@ void audio_set_crossfade(int enable)
 {
     size_t size;
     bool was_playing = playing;
-    int offset = 0;
+    size_t offset = 0;
     int seconds = 1;
 
     if (!filebuf)
