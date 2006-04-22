@@ -338,10 +338,9 @@ int kbd_input(char* text, int buflen)
     int statusbar_size = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
     unsigned short ch, tmp, hlead = 0, hvowel = 0, htail = 0;
     bool hangul = false;
-    bool redraw = true;
     unsigned char *utf8;
     const unsigned char *p;
-    int cur_blink = current_tick;
+    bool cur_blink = true;
 #ifdef KBD_MORSE_INPUT
     bool morse_reading = false;
     unsigned char morse_code = 0;
@@ -448,130 +447,125 @@ int kbd_input(char* text, int buflen)
     {
         len_utf8 = utf8length(text);
 
-        if(redraw)
-        {
-            lcd_clear_display();
+        lcd_clear_display();
 
 #ifdef KBD_MORSE_INPUT
-            if (morse_mode)
+        if (morse_mode)
+        {
+            lcd_setfont(FONT_SYSFIXED); /* Draw morse code screen with sysfont */
+            w = 6; /* sysfixed font width */
+            x = 0;
+            y = statusbar_size;
+            buf[1] = '\0';
+            /* Draw morse code table with code descriptions. */
+            for (i = 0; morse_alphabets[i] != '\0'; i++)
             {
-                lcd_setfont(FONT_SYSFIXED); /* Draw morse code screen with sysfont */
-                w = 6; /* sysfixed font width */
-                x = 0;
-                y = statusbar_size;
-                buf[1] = '\0';
-                /* Draw morse code table with code descriptions. */
-                for (i = 0; morse_alphabets[i] != '\0'; i++)
+                buf[0] = morse_alphabets[i];
+                lcd_putsxy(x, y, buf);
+
+                for (j = 0; (morse_codes[i] >> j) > 0x01; j++) ;
+                morse_len = j;
+
+                x += w + 3;
+                for (j = 0; j < morse_len; j++)
                 {
-                    buf[0] = morse_alphabets[i];
-                    lcd_putsxy(x, y, buf);
+                    if ((morse_codes[i] >> (morse_len-j-1)) & 0x01)
+                        lcd_fillrect(x + j*4, y + 2, 3, 4);
+                    else
+                        lcd_fillrect(x + j*4, y + 3, 1, 2);
+                }
 
-                    for (j = 0; (morse_codes[i] >> j) > 0x01; j++) ;
-                    morse_len = j;
-
-                    x += w + 3;
-                    for (j = 0; j < morse_len; j++)
-                    {
-                        if ((morse_codes[i] >> (morse_len-j-1)) & 0x01)
-                            lcd_fillrect(x + j*4, y + 2, 3, 4);
-                        else
-                            lcd_fillrect(x + j*4, y + 3, 1, 2);
-                    }
-
-                    x += w * 5 - 3;
-                    if (x >= LCD_WIDTH - (w*6))
-                    {
-                        x = 0;
-                        y += 8; /* sysfixed font height */
-                    }
+                x += w * 5 - 3;
+                if (x >= LCD_WIDTH - (w*6))
+                {
+                    x = 0;
+                    y += 8; /* sysfixed font height */
                 }
             }
-            else
+        }
+        else
 #endif
-            {
-                /* draw page */
-                lcd_setfont(curfont);
-                k = page*max_chars*lines;
-                for (i=j=0; j < lines && k < nchars; k++) {
-                    utf8 = utf8encode(kbd_buf[k], outline);
-                    *utf8 = 0;
-                    lcd_getstringsize(outline, &w, NULL);
-                    lcd_putsxy(i*font_w + (font_w-w)/2, j*font_h + statusbar_size, outline);
-                    if (++i == max_chars) {
-                        i = 0;
-                        j++;
-                    }
-                }
-            }
-
-            /* separator */
-            lcd_hline(0, LCD_WIDTH - 1, main_y - keyboard_margin);
-
-            /* write out the text */
+        {
+            /* draw page */
             lcd_setfont(curfont);
-            i=j=0;
-            curpos = MIN(editpos, max_chars_text - MIN(len_utf8 - editpos, 2));
-            leftpos = editpos - curpos;
-            utf8 = text + utf8seek(text, leftpos);
-
-            while (*utf8 && i < max_chars_text) {
-                outline[j++] = *utf8++;
-                if ((*utf8 & MASK) != COMP) {
-                    outline[j] = 0;
-                    j=0;
-                    i++;
-                    lcd_getstringsize(outline, &w, NULL);
-                    lcd_putsxy(i*text_w + (text_w-w)/2, main_y, outline);
+            k = page*max_chars*lines;
+            for (i=j=0; j < lines && k < nchars; k++) {
+                utf8 = utf8encode(kbd_buf[k], outline);
+                *utf8 = 0;
+                lcd_getstringsize(outline, &w, NULL);
+                lcd_putsxy(i*font_w + (font_w-w)/2, j*font_h + statusbar_size, outline);
+                if (++i == max_chars) {
+                    i = 0;
+                    j++;
                 }
             }
-
-            if (leftpos) {
-                lcd_getstringsize("<", &w, NULL);
-                lcd_putsxy(text_w - w, main_y, "<");
-            }
-            if (len_utf8 - leftpos > max_chars_text)
-                lcd_putsxy(LCD_WIDTH - text_w, main_y, ">");
-
-            /* cursor */
-            i = (curpos + 1) * text_w;
-            if(cur_blink%125 > 50)
-                lcd_vline(i, main_y, main_y + font_h-1);
-            if (hangul) /* draw underbar */
-                lcd_hline(curpos*text_w, (curpos+1)*text_w, main_y+font_h-1);
-            cur_blink = current_tick;
-
-#ifdef HAS_BUTTONBAR
-            /* draw the status bar */
-            gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
-            gui_buttonbar_draw(&buttonbar);
-#endif
-
-#ifdef KBD_MODES
-            if (!line_edit)
-#endif
-            {
-                /* highlight the key that has focus */
-                lcd_set_drawmode(DRMODE_COMPLEMENT);
-                lcd_fillrect(font_w * x, statusbar_size + font_h * y, font_w, font_h);
-                lcd_set_drawmode(DRMODE_SOLID);
-            }
-#ifdef KBD_MODES
-            else
-            {
-                lcd_set_drawmode(DRMODE_COMPLEMENT);
-                lcd_fillrect(0, main_y - keyboard_margin + 2, LCD_WIDTH, font_h+2);
-                lcd_set_drawmode(DRMODE_SOLID);
-            }
-#endif
-
-            gui_syncstatusbar_draw(&statusbars, true);
-            lcd_update();
         }
 
-        /* The default action is to redraw */
-        redraw = true;
+        /* separator */
+        lcd_hline(0, LCD_WIDTH - 1, main_y - keyboard_margin);
 
-        button = button_get(false);
+        /* write out the text */
+        lcd_setfont(curfont);
+        i=j=0;
+        curpos = MIN(editpos, max_chars_text - MIN(len_utf8 - editpos, 2));
+        leftpos = editpos - curpos;
+        utf8 = text + utf8seek(text, leftpos);
+
+        while (*utf8 && i < max_chars_text) {
+            outline[j++] = *utf8++;
+            if ((*utf8 & MASK) != COMP) {
+                outline[j] = 0;
+                j=0;
+                i++;
+                lcd_getstringsize(outline, &w, NULL);
+                lcd_putsxy(i*text_w + (text_w-w)/2, main_y, outline);
+            }
+        }
+
+        if (leftpos) {
+            lcd_getstringsize("<", &w, NULL);
+            lcd_putsxy(text_w - w, main_y, "<");
+        }
+        if (len_utf8 - leftpos > max_chars_text)
+            lcd_putsxy(LCD_WIDTH - text_w, main_y, ">");
+
+        /* cursor */
+        i = (curpos + 1) * text_w;
+        if (cur_blink)
+            lcd_vline(i, main_y, main_y + font_h-1);
+        cur_blink = !cur_blink;
+
+        if (hangul) /* draw underbar */
+            lcd_hline(curpos*text_w, (curpos+1)*text_w, main_y+font_h-1);
+
+#ifdef HAS_BUTTONBAR
+        /* draw the button bar */
+        gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
+        gui_buttonbar_draw(&buttonbar);
+#endif
+
+#ifdef KBD_MODES
+        if (!line_edit)
+#endif
+        {
+            /* highlight the key that has focus */
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect(font_w * x, statusbar_size + font_h * y, font_w, font_h);
+            lcd_set_drawmode(DRMODE_SOLID);
+        }
+#ifdef KBD_MODES
+        else
+        {
+            lcd_set_drawmode(DRMODE_COMPLEMENT);
+            lcd_fillrect(0, main_y - keyboard_margin + 2, LCD_WIDTH, font_h+2);
+            lcd_set_drawmode(DRMODE_SOLID);
+        }
+#endif
+
+        gui_syncstatusbar_draw(&statusbars, true);
+        lcd_update();
+
+        button = button_get_w_tmo(HZ/2);
 #ifdef KBD_MORSE_INPUT
         if (morse_mode)
         {
@@ -940,7 +934,6 @@ int kbd_input(char* text, int buflen)
 
                     if (global_settings.talk_menu) /* voice UI? */
                         talk_spell(text, false);   /* speak revised text */
-                    redraw = true;
                 }
 #endif
 
@@ -953,7 +946,10 @@ int kbd_input(char* text, int buflen)
 
         }
         if (button != BUTTON_NONE)
+        {
             lastbutton = button;
+            cur_blink = true;
+        }
     }
 #ifdef HAS_BUTTONBAR
     global_settings.buttonbar=buttonbar_config;
