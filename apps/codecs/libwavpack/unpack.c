@@ -128,7 +128,7 @@ int read_decorr_weights (WavpackStream *wps, WavpackMetadata *wpmd)
     signed char *byteptr = wpmd->data;
     struct decorr_pass *dpp;
 
-    if (!(wps->wphdr.flags & MONO_FLAG))
+    if (!(wps->wphdr.flags & MONO_DATA))
         termcnt /= 2;
 
     if (termcnt > wps->num_terms)
@@ -140,7 +140,7 @@ int read_decorr_weights (WavpackStream *wps, WavpackMetadata *wpmd)
     while (--dpp >= wps->decorr_passes && termcnt--) {
         dpp->weight_A = restore_weight (*byteptr++);
 
-        if (!(wps->wphdr.flags & MONO_FLAG))
+        if (!(wps->wphdr.flags & MONO_DATA))
             dpp->weight_B = restore_weight (*byteptr++);
     }
 
@@ -170,7 +170,7 @@ int read_decorr_samples (WavpackStream *wps, WavpackMetadata *wpmd)
     if (wps->wphdr.version == 0x402 && (wps->wphdr.flags & HYBRID_FLAG)) {
         byteptr += 2;
 
-        if (!(wps->wphdr.flags & MONO_FLAG))
+        if (!(wps->wphdr.flags & MONO_DATA))
             byteptr += 2;
     }
 
@@ -180,7 +180,7 @@ int read_decorr_samples (WavpackStream *wps, WavpackMetadata *wpmd)
             dpp->samples_A [1] = exp2s ((short)(byteptr [2] + (byteptr [3] << 8)));
             byteptr += 4;
 
-            if (!(wps->wphdr.flags & MONO_FLAG)) {
+            if (!(wps->wphdr.flags & MONO_DATA)) {
                 dpp->samples_B [0] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
                 dpp->samples_B [1] = exp2s ((short)(byteptr [2] + (byteptr [3] << 8)));
                 byteptr += 4;
@@ -198,7 +198,7 @@ int read_decorr_samples (WavpackStream *wps, WavpackMetadata *wpmd)
                 dpp->samples_A [m] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
                 byteptr += 2;
 
-                if (!(wps->wphdr.flags & MONO_FLAG)) {
+                if (!(wps->wphdr.flags & MONO_DATA)) {
                     dpp->samples_B [m] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
                     byteptr += 2;
                 }
@@ -322,7 +322,7 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
 
     ///////////////////// handle version 4 mono data /////////////////////////
 
-    if (flags & MONO_FLAG) {
+    if (flags & MONO_DATA) {
         eptr = buffer + sample_count;
         i = get_words (buffer, sample_count, flags, &wps->w, &wps->wvbits);
 
@@ -394,8 +394,19 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
     fixup_samples (wps, buffer, i);
 
     if (flags & FLOAT_DATA)
-        float_normalize (buffer, (flags & MONO_FLAG) ? i : i * 2,
+        float_normalize (buffer, (flags & MONO_DATA) ? i : i * 2,
             127 - wps->float_norm_exp + wpc->norm_offset);
+
+    if (flags & FALSE_STEREO) {
+        int32_t *dptr = buffer + i * 2;
+        int32_t *sptr = buffer + i;
+        int32_t c = i;
+
+        while (c--) {
+            *--dptr = *--sptr;
+            *--dptr = *sptr;
+        }
+    }
 
     wps->sample_index += i;
     wps->crc = crc;
@@ -695,12 +706,12 @@ static void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_
     shift += 21 - (flags & BYTES_STORED) * 8;   // this provides RockBox with 28-bit (+sign)
 
     if (flags & FLOAT_DATA) {
-        float_values (wps, buffer, (flags & MONO_FLAG) ? sample_count : sample_count * 2);
+        float_values (wps, buffer, (flags & MONO_DATA) ? sample_count : sample_count * 2);
         return;
     }
 
     if (flags & INT32_DATA) {
-        uint32_t count = (flags & MONO_FLAG) ? sample_count : sample_count * 2;
+        uint32_t count = (flags & MONO_DATA) ? sample_count : sample_count * 2;
         int sent_bits = wps->int32_sent_bits, zeros = wps->int32_zeros;
         int ones = wps->int32_ones, dups = wps->int32_dups;
         int32_t *dptr = buffer;
@@ -721,7 +732,7 @@ static void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_
     }
 
     if (shift > 0) {
-        if (!(flags & MONO_FLAG))
+        if (!(flags & MONO_DATA))
             sample_count *= 2;
 
         while (sample_count--)
@@ -730,7 +741,7 @@ static void fixup_samples (WavpackStream *wps, int32_t *buffer, uint32_t sample_
     else if (shift < 0) {
         shift = -shift;
 
-        if (!(flags & MONO_FLAG))
+        if (!(flags & MONO_DATA))
             sample_count *= 2;
 
         while (sample_count--)

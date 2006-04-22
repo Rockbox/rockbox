@@ -151,14 +151,14 @@ int read_entropy_vars (WavpackStream *wps, WavpackMetadata *wpmd)
 {
     uchar *byteptr = wpmd->data;
 
-    if (wpmd->byte_length != ((wps->wphdr.flags & MONO_FLAG) ? 6 : 12))
+    if (wpmd->byte_length != ((wps->wphdr.flags & MONO_DATA) ? 6 : 12))
         return FALSE;
 
     wps->w.c [0].median [0] = exp2s (byteptr [0] + (byteptr [1] << 8));
     wps->w.c [0].median [1] = exp2s (byteptr [2] + (byteptr [3] << 8));
     wps->w.c [0].median [2] = exp2s (byteptr [4] + (byteptr [5] << 8));
 
-    if (!(wps->wphdr.flags & MONO_FLAG)) {
+    if (!(wps->wphdr.flags & MONO_DATA)) {
         wps->w.c [1].median [0] = exp2s (byteptr [6] + (byteptr [7] << 8));
         wps->w.c [1].median [1] = exp2s (byteptr [8] + (byteptr [9] << 8));
         wps->w.c [1].median [2] = exp2s (byteptr [10] + (byteptr [11] << 8));
@@ -215,7 +215,7 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
         wps->w.c [0].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
         byteptr += 2;
 
-        if (!(wps->wphdr.flags & MONO_FLAG)) {
+        if (!(wps->wphdr.flags & MONO_DATA)) {
             wps->w.c [1].slow_level = exp2s (byteptr [0] + (byteptr [1] << 8));
             byteptr += 2;
         }
@@ -224,7 +224,7 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
     wps->w.bitrate_acc [0] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
     byteptr += 2;
 
-    if (!(wps->wphdr.flags & MONO_FLAG)) {
+    if (!(wps->wphdr.flags & MONO_DATA)) {
         wps->w.bitrate_acc [1] = (int32_t)(byteptr [0] + (byteptr [1] << 8)) << 16;
         byteptr += 2;
     }
@@ -233,7 +233,7 @@ int read_hybrid_profile (WavpackStream *wps, WavpackMetadata *wpmd)
         wps->w.bitrate_delta [0] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
         byteptr += 2;
 
-        if (!(wps->wphdr.flags & MONO_FLAG)) {
+        if (!(wps->wphdr.flags & MONO_DATA)) {
             wps->w.bitrate_delta [1] = exp2s ((short)(byteptr [0] + (byteptr [1] << 8)));
             byteptr += 2;
         }
@@ -257,7 +257,7 @@ void update_error_limit (struct words_data *w, uint32_t flags)
 {
     int bitrate_0 = (w->bitrate_acc [0] += w->bitrate_delta [0]) >> 16;
 
-    if (flags & MONO_FLAG) {
+    if (flags & MONO_DATA) {
         if (flags & HYBRID_BITRATE) {
             int slow_log_0 = (w->c [0].slow_level + SLO) >> SLS;
 
@@ -326,13 +326,13 @@ int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
     register struct entropy_data *c = w->c;
     int csamples;
 
-    if (!(flags & MONO_FLAG))
+    if (!(flags & MONO_DATA))
         nsamples *= 2;
 
     for (csamples = 0; csamples < nsamples; ++csamples) {
         uint32_t ones_count, low, mid, high;
 
-        if (!(flags & MONO_FLAG))
+        if (!(flags & MONO_DATA))
             c = w->c + (csamples & 1);
 
         if (!(w->c [0].median [0] & ~1) && !w->holding_zero && !w->holding_one && !(w->c [1].median [0] & ~1)) {
@@ -435,7 +435,7 @@ int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
             w->holding_zero = ~w->holding_one & 1;
         }
 
-        if ((flags & HYBRID_FLAG) && ((flags & MONO_FLAG) || !(csamples & 1)))
+        if ((flags & HYBRID_FLAG) && ((flags & MONO_DATA) || !(csamples & 1)))
             update_error_limit (w, flags);
 
         if (ones_count == 0) {
@@ -484,7 +484,7 @@ int32_t get_words (int32_t *buffer, int nsamples, uint32_t flags,
             c->slow_level = c->slow_level - ((c->slow_level + SLO) >> SLS) + mylog2 (mid);
     }
 
-    return (flags & MONO_FLAG) ? csamples : (csamples / 2);
+    return (flags & MONO_DATA) ? csamples : (csamples / 2);
 }
 
 // Read a single unsigned value from the specified bitstream with a value
