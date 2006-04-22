@@ -181,7 +181,7 @@ enum codec_status codec_start(struct codec_api *api)
             inputbuffer = ci->request_buffer(&size, INPUT_CHUNK_SIZE);
             if (size == 0 || inputbuffer == NULL)
                 break;
-            mad_stream_buffer(&stream, (unsigned char *)inputbuffer, size);
+            mad_stream_buffer(&stream, (unsigned char *)inputbuffer, size + 8);
         }
     
         if (mad_frame_decode(&frame, &stream)) {
@@ -192,7 +192,7 @@ enum codec_status codec_start(struct codec_api *api)
                     break;
         
                 /* Fill the buffer */
-                if (stream.next_frame && stream.next_frame != stream.this_frame)
+                if (stream.next_frame)
                     ci->advance_buffer_loc((void *)stream.next_frame);
                 else
                     ci->advance_buffer(size);
