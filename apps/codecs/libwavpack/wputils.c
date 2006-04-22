@@ -69,10 +69,9 @@ WavpackContext *WavpackOpenFileInput (read_stream infile, char *error)
             return NULL;
         }
 
-        if ((wps->wphdr.flags & UNKNOWN_FLAGS) || wps->wphdr.version < MIN_STREAM_VERS ||
-            wps->wphdr.version > MAX_STREAM_VERS) {
-                strcpy_loc (error, "invalid WavPack file!");
-                return NULL;
+        if ((wps->wphdr.flags & UNKNOWN_FLAGS) || wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
+            strcpy_loc (error, "invalid WavPack file!");
+            return NULL;
         }
 
         if (wps->wphdr.block_samples && wps->wphdr.total_samples != (uint32_t) -1)
@@ -171,7 +170,7 @@ uint32_t WavpackUnpackSamples (WavpackContext *wpc, int32_t *buffer, uint32_t sa
                 if (bcount == (uint32_t) -1)
                     break;
 
-                if (wps->wphdr.version < MIN_STREAM_VERS || wps->wphdr.version > MAX_STREAM_VERS) {
+                if (wps->wphdr.version < 0x402 || wps->wphdr.version > 0x40f) {
                     strcpy_loc (wpc->error_message, "invalid WavPack file!");
                     break;
                 }
@@ -342,8 +341,7 @@ static uint32_t read_next_header (read_stream infile, WavpackHeader *wphdr)
         sp = buffer;
 
         if (*sp++ == 'w' && *sp == 'v' && *++sp == 'p' && *++sp == 'k' &&
-            !(*++sp & 1) && sp [2] < 16 && !sp [3] && sp [5] == 4 &&
-            sp [4] >= (MIN_STREAM_VERS & 0xff) && sp [4] <= (MAX_STREAM_VERS & 0xff)) {
+            !(*++sp & 1) && sp [2] < 16 && !sp [3] && sp [5] == 4 && sp [4] >= 2 && sp [4] <= 0xf) {
                 memcpy (wphdr, buffer, sizeof (*wphdr));
                 little_endian_to_native (wphdr, WavpackHeaderFormat);
                 return bytes_skipped;
@@ -454,7 +452,7 @@ int WavpackSetConfiguration (WavpackContext *wpc, WavpackConfig *config, uint32_
     memcpy (wps->wphdr.ckID, "wvpk", 4);
     wps->wphdr.ckSize = sizeof (WavpackHeader) - 8;
     wps->wphdr.total_samples = wpc->total_samples;
-    wps->wphdr.version = CUR_STREAM_VERS;
+    wps->wphdr.version = 0x403;
     wps->wphdr.flags = flags;
 
     pack_init (wpc);

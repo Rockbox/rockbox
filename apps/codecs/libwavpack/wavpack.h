@@ -76,18 +76,10 @@ typedef struct {
 #define SRATE_LSB       23
 #define SRATE_MASK      (0xfL << SRATE_LSB)
 
-#define FALSE_STEREO    0x40000000      // block is stereo, but data is mono
-
 #define IGNORED_FLAGS   0x18000000      // reserved, but ignore if encountered
 #define NEW_SHAPING     0x20000000      // use IIR filter for negative shaping
-#define UNKNOWN_FLAGS   0x80000000      // also reserved, but refuse decode if
+#define UNKNOWN_FLAGS   0xC0000000      // also reserved, but refuse decode if
                                         //  encountered
-
-#define MONO_DATA (MONO_FLAG | FALSE_STEREO)
-
-#define MIN_STREAM_VERS     0x402       // lowest stream version we'll decode
-#define MAX_STREAM_VERS     0x410       // highest stream version we'll decode
-#define CUR_STREAM_VERS     0x403       // stream version we are writing now
 
 //////////////////////////// WavPack Metadata /////////////////////////////////
 
@@ -434,6 +426,5 @@ void WavpackAddWrapper (WavpackContext *wpc, void *data, uint32_t bcount);
 int WavpackStartBlock (WavpackContext *wpc, uchar *begin, uchar *end);
 int WavpackPackSamples (WavpackContext *wpc, int32_t *sample_buffer, uint32_t sample_count);
 uint32_t WavpackFinishBlock (WavpackContext *wpc);
-void WavpackUpdateNumSamples (WavpackContext *wpc, void *first_block);
-void *WavpackGetWrapperLocation (void *first_block);
+
 
