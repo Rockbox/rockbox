@@ -34,6 +34,8 @@ struct mad_synth synth IBSS_ATTR;
 void abort(void) {
 }
 
+/* These extra 8 bytes fake-added to each read make mad decode the last frame */
+#define MAD_BUFFER_GUARD   8
 #define INPUT_CHUNK_SIZE   8192
 
 mad_fixed_t mad_frame_overlap[2][32][18] IBSS_ATTR;
@@ -181,7 +183,8 @@ enum codec_status codec_start(struct codec_api *api)
             inputbuffer = ci->request_buffer(&size, INPUT_CHUNK_SIZE);
             if (size == 0 || inputbuffer == NULL)
                 break;
-            mad_stream_buffer(&stream, (unsigned char *)inputbuffer, size + 8);
+            mad_stream_buffer(&stream, (unsigned char *)inputbuffer,
+                    size + MAD_BUFFER_GUARD);
         }
     
         if (mad_frame_decode(&frame, &stream)) {
