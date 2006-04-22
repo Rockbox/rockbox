@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.16  2006/04/20 19:39:56  kkurbjun
+ * Revision 1.17  2006/04/22 03:48:15  kkurbjun
+ * Better video update, add options to startup menu, change default screensize
+ *
+ * Revision 1.16  2006-04-20 19:39:56  kkurbjun
  * Optimizations for doom: coldfire asm drawspan routine = not much, fixed point multiply changes = not much, H300 asm lcd update = some, IRAM sound updates and simplifications = more
  *
  * Revision 1.15  2006-04-16 23:14:04  kkurbjun
@@ -148,14 +151,14 @@ void I_ShutdownGraphics(void)
 inline void getkey()
 {
    event_t event;
-   // Same button handling as rockboy
-   static unsigned int oldbuttonstate IDATA_ATTR = 0, newbuttonstate IDATA_ATTR=0 ;
+   /* Same button handling as rockboy */
+   static unsigned int oldbuttonstate IDATA_ATTR = 0;
 
-   static int released IBSS_ATTR, pressed IBSS_ATTR;
+   unsigned int released, pressed, newbuttonstate;
 
 #ifdef HAS_BUTTON_HOLD
    static unsigned int holdbutton IDATA_ATTR=0;
-   static int hswitch IDATA_ATTR=0;
+   static bool hswitch IDATA_ATTR=0;
    if (rb->button_hold()&~holdbutton)
    {
       if(hswitch==0)
@@ -181,6 +184,8 @@ inline void getkey()
 #endif
 
    newbuttonstate = rb->button_status();
+   if(newbuttonstate==oldbuttonstate) /* Don't continue, nothing left to do */
+      return;
    released = ~newbuttonstate & oldbuttonstate;
    pressed = newbuttonstate & ~oldbuttonstate;
    oldbuttonstate = newbuttonstate;
@@ -355,6 +360,7 @@ static void I_UploadNewPalette(int pal)
    memcpy(palette,paldata+256*pal,256*sizeof(fb_data));
 }
 
+
 //
 // I_FinishUpdate
 //
@@ -369,24 +375,28 @@ void I_FinishUpdate (void)
       "move.w #33,(%[LCD])    \n" /* Setup the LCD controller */
       "clr.w (%[LCD2])        \n"
       "move.w #34,(%[LCD])    \n" /* End LCD controller setup */
-      "move.l #220,%%d2       \n"
-      "move.l #176,%%d3       \n"
-      "clr.l %%d1             \n"
+      "move.l #220,%%d0       \n"
+      "move.l #176,%%d1       \n"
+      "clr.l %%d3             \n"
+      "clr.l %%d2             \n"
       "widthloop:             \n"
-      "move.b (%[screenptr])+, %%d1             \n" /* Unrolled by 5 */
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b (%[screenptr])+, %%d1             \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b (%[screenptr])+, %%d1             \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b (%[screenptr])+, %%d1             \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "move.b (%[screenptr])+, %%d1             \n"
-      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
-      "subq.l #5,%%d2         \n"
+      "move.l (%[screenptr])+, %%d2             \n"
+      "swap.w %%d2                              \n"
+      "move.w %%d2, %%d3                        \n"
+      "lsr.l #8,%%d3                            \n"
+      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
+      "move.b %%d2,%%d3                         \n"
+      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
+      "swap.w %%d2                              \n"
+      "move.w %%d2, %%d3                        \n"
+      "lsr.l #8,%%d3                            \n"
+      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
+      "move.b %%d2,%%d3                         \n"
+      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
+      "subq.l #4,%%d0         \n"
       "bne widthloop          \n"
-      "move.w #220,%%d2       \n"
-      "subq.l #1,%%d3         \n"
+      "move.w #220,%%d0       \n"
+      "subq.l #1,%%d1         \n"
       "bne widthloop          \n"
    : /* outputs */
    : /* inputs */
@@ -395,7 +405,7 @@ void I_FinishUpdate (void)
       [LCD]       "a" (0xf0000000),
       [LCD2]      "a" (0xf0000002)
    : /* clobbers */
-      "d1", "d2", "d3"
+      "d0", "d1", "d2", "d3"
    );
 #else
    /* C version of above (drops 500 tics) */

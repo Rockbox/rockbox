@@ -32,6 +32,7 @@
 
 #ifndef __SOUNDS__
 #define __SOUNDS__
+#include "rockmacros.h"
 
 //
 // SoundFX struct.

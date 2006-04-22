@@ -35,6 +35,8 @@
 #include "rockmacros.h"
 #include "doomstat.h"
 #include "i_system.h"
+#include "hu_stuff.h"
+#include "st_stuff.h"
 
 PLUGIN_HEADER
 
@@ -686,6 +688,8 @@ static bool Doptions()
       { "Translucency", NULL },
       { "Fake Contrast", NULL },
       { "Always Run", NULL },
+      { "Headsup Display", NULL },
+      { "Statusbar Always Red", NULL },
    };
 
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -726,8 +730,16 @@ static bool Doptions()
             rb->set_option(items[6].desc, &fake_contrast, INT, onoff, 2, NULL );
             break;
 
-         case 7: /* Fake Contrast */
+         case 7: /* Always Run */
             rb->set_option(items[7].desc, &autorun, INT, onoff, 2, NULL );
+            break;
+
+         case 8: /* Headsup Display */
+            rb->set_option(items[8].desc, &hud_displayed, INT, onoff, 2, NULL );
+            break;
+
+         case 9: /* Statusbar always red */
+            rb->set_option(items[9].desc, &sts_always_red, INT, onoff, 2, NULL );
             break;
 
          default:
