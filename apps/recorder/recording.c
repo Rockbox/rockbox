@@ -115,7 +115,9 @@
 #define REC_RC_NEXT BUTTON_RC_FF
 #define REC_RC_PREV BUTTON_RC_REW
 #define REC_RC_SETTINGS BUTTON_RC_MODE
-#endif
+#endif     
+
+#define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
@@ -645,7 +647,7 @@ bool recording_screen(void)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(0, 8 + h*2, h*2);
+        button = peak_meter_draw_get_btn(0, 8 + h*2, h * PM_HEIGHT);
 
         if (last_audio_stat != audio_stat)
         {
@@ -1069,12 +1071,13 @@ bool recording_screen(void)
             if (global_settings.invert_cursor && (pos++ == cursor))
             {
                 FOR_NB_SCREENS(i)
-                    screens[i].puts_style_offset(0, 4, buf, STYLE_INVERT,0);
+                    screens[i].puts_style_offset(0, 2+PM_HEIGHT, buf,
+                                                 STYLE_INVERT,0);
             }
             else
             {
                 FOR_NB_SCREENS(i)
-                    screens[i].puts(0, 4, buf);
+                    screens[i].puts(0, 2+PM_HEIGHT, buf);
             }                
 
             if(global_settings.rec_source == SOURCE_MIC)
@@ -1116,12 +1119,13 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 5, buf, STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, 3+PM_HEIGHT, buf,
+                                                     STYLE_INVERT,0);
                 }
                 else
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts(0, 5, buf);
+                        screens[i].puts(0, 3+PM_HEIGHT, buf);
                 }
             }
             else if(global_settings.rec_source == SOURCE_LINE)
@@ -1167,12 +1171,13 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 5, buf, STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, 3+PM_HEIGHT, buf,
+                                                     STYLE_INVERT,0);
                 }
                 else
                 {
                      FOR_NB_SCREENS(i)
-                         screens[i].puts(0, 5, buf);
+                         screens[i].puts(0, 3+PM_HEIGHT, buf);
                 }                
 
 #ifdef HAVE_UDA1380
@@ -1204,12 +1209,13 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 6, buf, STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, 4+PM_HEIGHT, buf,
+                                                     STYLE_INVERT,0);
                 }
                 else
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts(0, 6, buf);
+                        screens[i].puts(0, 4+PM_HEIGHT, buf);
                 }                
             }
 
@@ -1218,25 +1224,30 @@ bool recording_screen(void)
                 {
                     case 1:
                         FOR_NB_SCREENS(i)
-                            screen_put_cursorxy(&screens[i], 0, 5, true);
+                            screen_put_cursorxy(&screens[i], 0,
+                                                3+PM_HEIGHT, true);
 
                         if(global_settings.rec_source != SOURCE_MIC)
                         {
                             FOR_NB_SCREENS(i)
-                                screen_put_cursorxy(&screens[i], 0, 6, true);
-                        }               
+                                screen_put_cursorxy(&screens[i], 0, 
+                                                    4+PM_HEIGHT, true);
+                        }
                     break;
                     case 2:
                         FOR_NB_SCREENS(i)
-                            screen_put_cursorxy(&screens[i], 0, 5, true);
+                            screen_put_cursorxy(&screens[i], 0, 
+                                                3+PM_HEIGHT, true);
                     break;
                     case 3:
                         FOR_NB_SCREENS(i)
-                            screen_put_cursorxy(&screens[i], 0, 6, true);
+                            screen_put_cursorxy(&screens[i], 0, 
+                                                4+PM_HEIGHT, true);
                     break;
                     default:
                         FOR_NB_SCREENS(i)
-                            screen_put_cursorxy(&screens[i], 0, 4, true);
+                            screen_put_cursorxy(&screens[i], 0, 
+                                                2+PM_HEIGHT, true);
                 }
             }
             
@@ -1245,14 +1256,14 @@ bool recording_screen(void)
                      global_settings.rec_channels?
                      str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO));
 
-            /* Main screen only for this info */
-            lcd_puts(0, 8, buf);
+            FOR_NB_SCREENS(i)
+                screens[i].puts(0, 5+PM_HEIGHT, buf);
 
             gui_syncstatusbar_draw(&statusbars, true);
 
             FOR_NB_SCREENS(i)
             {
-                peak_meter_screen(&screens[i], 0, 8 + h*2, h*2);
+                peak_meter_screen(&screens[i], 0, 8 + h*2, h*PM_HEIGHT);
                 screens[i].update();                
             }
 
