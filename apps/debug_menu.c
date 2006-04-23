@@ -208,7 +208,6 @@ bool dbg_audio_thread(void)
     return false;
 }
 #else /* CONFIG_CODEC == SWCODEC */
-extern size_t audiobuffer_free;
 extern size_t filebuflen;
 /* This is a size_t, but call it a long so it puts a - when it's bad. */
 extern long filebufused;
@@ -260,12 +259,12 @@ bool dbg_audio_thread(void)
         lcd_clear_display();
 
         snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld",
-                 bufsize-audiobuffer_free, bufsize);
+                 bufsize-pcmbuf_free(), bufsize);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
         scrollbar(0, line*8, LCD_WIDTH, 6, bufsize, 0,
-                  bufsize-audiobuffer_free, HORIZONTAL);
+                  bufsize-pcmbuf_free(), HORIZONTAL);
         line++;
 
         snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", filebufused, filebuflen);

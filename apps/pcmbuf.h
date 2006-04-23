@@ -21,10 +21,6 @@
 
 #define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
                                      on the pcm buffer */
-#define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of
-                                     chunks on the pcm buffer (or we run out
-                                     of buffer descriptors, which is
-                                     non-fatal) */
 #define PCMBUF_MIN_CHUNK     4096 /* We try to never feed a chunk smaller than
                                      this to the DMA */
 #define PCMBUF_MIX_CHUNK     8192 /* This is the maximum size of one packet
@@ -54,9 +50,9 @@ void pcmbuf_play_start(void);
 bool pcmbuf_crossfade_init(bool manual_skip);
 void pcmbuf_set_event_handler(void (*callback)(void));
 void pcmbuf_set_position_callback(void (*callback)(size_t size));
+size_t pcmbuf_free(void);
 unsigned int pcmbuf_get_latency(void);
 void pcmbuf_set_low_latency(bool state);
-bool pcmbuf_insert_buffer(const char *buf, size_t length);
 void pcmbuf_write_complete(size_t length);
 void* pcmbuf_request_buffer(size_t length, size_t *realsize);
 void* pcmbuf_request_voice_buffer(size_t length, size_t *realsize, bool mix);
