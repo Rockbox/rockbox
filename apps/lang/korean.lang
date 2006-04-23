@@ -4384,7 +4384,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "검색중... 현재 %d개 찾음 (%s)"
+    *: "검색중... %d개 검색됨 (%s)"
   </dest>
   <voice>
     *: ""
@@ -7394,7 +7394,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "재생목록 제어 파일이 유효하지 않음"
+    *: "재생목록 제어 파일이 유효하지 않습니다."
   </dest>
   <voice>
     *: ""
@@ -8472,5 +8472,32 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "태그 캐시가 준비되지 않았습니다."
+  </dest>
+  <voice>
+    *: "태그 캐시가 준비되지 않았습니다."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "모든 음악"
+  </dest>
+  <voice>
+    *: "모든 음악"
   </voice>
 </phrase>
