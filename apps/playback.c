@@ -1784,6 +1784,11 @@ static void stop_codec_flush(void)
     pcmbuf_pause(true);
     while (audio_codec_loaded)
         yield();
+    /* If the audio codec is not loaded any more, and the audio is still
+     * playing, it is now and _only_ now safe to call this function from the
+     * audio thread */
+    if (pcm_is_playing())
+        pcmbuf_play_stop();
     pcmbuf_pause(paused);
 }
 
