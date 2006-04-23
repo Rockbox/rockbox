@@ -947,7 +947,7 @@ void pcmbuf_mix_voice(size_t length)
             obuf = pcmbuf_mix_chunk->addr;
             chunk_samples = pcmbuf_mix_chunk->size / 2;
         }
-        sample += obuf[pcmbuf_mix_sample];
+        sample += obuf[pcmbuf_mix_sample] >> 2;
         obuf[pcmbuf_mix_sample++] = MIN(MAX(sample, -32768), 32767);
     }
 }
