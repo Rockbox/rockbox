@@ -2471,8 +2471,7 @@ int playlist_next(int steps)
 #if CONFIG_CODEC != SWCODEC
                         playlist_start(0, 0);
 #endif
-                        playlist->index = 0;
-                        index = 0;
+                        playlist->index = index = 0;
                     }
                 }
             }
@@ -2486,8 +2485,10 @@ int playlist_next(int steps)
                         ft_build_playlist(tree_get_context(), 0);
                         if (global_settings.playlist_shuffle)
                             playlist_shuffle(current_tick, -1);
-                        playlist_start(current_playlist.amount-1,0);
-                        index = current_playlist.amount-1;
+#if CONFIG_CODEC != SWCODEC
+                        playlist_start(current_playlist.amount-1, 0);
+#endif
+                        playlist->index = index = current_playlist.amount - 1;
                     }
                 }
             }
