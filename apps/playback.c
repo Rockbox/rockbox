@@ -1640,10 +1640,9 @@ static bool audio_load_track(int offset, bool start_play)
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) {
         if (get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) {
-            if (start_play) {
+            track_changed = true;
+            if (start_play)
                 playlist_update_resume_info(audio_current_track());
-                track_changed = true;
-            }
         } else {
             logf("mde:%s!",trackname);
             /* Set filesize to zero to indicate no file was loaded. */
@@ -1936,7 +1935,7 @@ static void track_skip_done(bool was_manual)
     if (was_manual)
     {
         pcmbuf_crossfade_init(true);
-        codec_track_changed();
+        queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
     }
     /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
