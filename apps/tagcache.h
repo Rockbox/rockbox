@@ -38,13 +38,22 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x54434803
+#define TAGCACHE_MAGIC  0x54434804
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
 
 /* How many entries we can create in one tag file (for sorting). */
-#define TAGFILE_MAX_ENTRIES  20000
+#define TAGFILE_MAX_ENTRIES  10000
+
+/** 
+ * Define how long one entry must be at least (longer -> less memory at commit).
+ * Must be at least 4 bytes in length for correct alignment. 
+ */
+#define TAGFILE_ENTRY_CHUNK_LENGTH   8
+
+/* Used to guess the necessary buffer size at commit. */
+#define TAGFILE_ENTRY_AVG_LENGTH   16
 
 /* How many entries to fetch to the seek table at once while searching. */
 #define SEEK_LIST_SIZE 50
@@ -66,6 +75,17 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
     clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
 enum modifiers { clause_mod_none, clause_mod_not };
+
+struct tagcache_stat {
+    bool initialized;        /* Is tagcache currently busy? */
+    bool ramcache;           /* Is tagcache loaded in ram? */
+    bool commit_delayed;     /* Has commit been delayed until next reboot? */
+    int  commit_step;        /* Commit progress */
+    int  ramcache_allocated; /* Has ram been allocated for ramcache? */
+    int  ramcache_used;      /* How much ram has been really used */
+    int  progress;           /* Current progress of disk scan */
+    int  processed_entries;  /* Scanned disk entries so far */
+};
 
 struct tagcache_search_clause
 {
@@ -116,14 +136,15 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
 
-int tagcache_get_progress(void);
+struct tagcache_stat* tagcache_get_stat(void);
+int tagcache_get_commit_step(void);
+
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 #endif
 void tagcache_init(void);
 bool tagcache_is_initialized(void);
-int tagcache_get_commit_step(void);
 void tagcache_start_scan(void);
 void tagcache_stop_scan(void);
 bool tagcache_force_update(void);

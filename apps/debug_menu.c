@@ -1883,6 +1883,7 @@ static bool dbg_tagcache_info(void)
     bool done = false;
     int line;
     char buf[32];
+    struct tagcache_stat *stat;
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -1892,8 +1893,21 @@ static bool dbg_tagcache_info(void)
         line = 0;
         
         lcd_clear_display();
-        snprintf(buf, sizeof(buf), "Current progress: %d%%", 
-                 tagcache_get_progress());
+        stat = tagcache_get_stat();
+        snprintf(buf, sizeof(buf), "Busy: %s", stat->initialized ? "No" : "Yes"); 
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "RAM Cache: %s", stat->ramcache ? "Yes" : "No"); 
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "RAM: %d/%d B", 
+                 stat->ramcache_used, stat->ramcache_allocated); 
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Progress: %d%% (%d entries)", 
+                 stat->progress, stat->processed_entries);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Commit step: %d", stat->commit_step); 
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "Commit delayed: %s", 
+                 stat->commit_delayed ? "Yes" : "No"); 
         lcd_puts(0, line++, buf);
 
         lcd_update();

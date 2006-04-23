@@ -60,11 +60,8 @@ static const int unique_tags[] = { tag_artist, tag_album, tag_genre, tag_compose
 /* Numeric tags (we can use these tags with conditional clauses). */
 static const int numeric_tags[] = { tag_year, tag_tracknumber, tag_length, tag_bitrate };
 
-/* When thread initialization and memory allocation has been made. */
-static bool tagcache_init_done = false;
-
-/* Progress indicator while committing the cache. */
-static int init_step;
+/* Status information of the tagcache. */
+static struct tagcache_stat stat;
 
 /* Queue commands. */
 enum tagcache_queue {
@@ -106,8 +103,6 @@ struct ramcache_header {
 };
 
 static struct ramcache_header *hdr;
-static bool ramcache = false;
-static long tagcache_size = 0;
 #endif
 
 /** 
@@ -120,18 +115,22 @@ struct temp_file_entry {
     long data_length;
 };
 
-struct tempbuf_id {
-    int id;
-    struct tempbuf_id *next;
+struct tempbuf_id_list {
+    long id;
+    struct tempbuf_id_list *next;
 };
 
 struct tempbuf_searchidx {
-    struct tempbuf_id *id;
     long idx_id;
     char *str;
     int seek;
+    struct tempbuf_id_list idlist;
 };
 
+#define LOOKUP_BUF_DEPTH  (TAGFILE_MAX_ENTRIES*2 \
+    * (TAGFILE_ENTRY_AVG_LENGTH/TAGFILE_ENTRY_CHUNK_LENGTH))
+
+struct tempbuf_searchidx **lookup;
 
 /* Used when building the temporary file. */
 static int cachefd = -1, filenametag_fd;
@@ -187,7 +186,7 @@ static struct index_entry *find_entry_ram(const char *filename,
     int i;
     
     /* Check if we tagcache is loaded into ram. */
-    if (!ramcache)
+    if (!stat.ramcache)
         return NULL;
 
     if (dc == NULL)
@@ -579,7 +578,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
         tagcache_search_finish(tcs);
     
     memset(tcs, 0, sizeof(struct tagcache_search));
-    if (tagcache_get_commit_step() > 0)
+    if (stat.commit_step > 0)
         return false;
     
     tcs->position = sizeof(struct tagcache_header);
@@ -597,7 +596,7 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
 #ifndef HAVE_TC_RAMCACHE
     tcs->ramsearch = false;
 #else
-    tcs->ramsearch = ramcache;
+    tcs->ramsearch = stat.ramcache;
     if (tcs->ramsearch)
     {
         tcs->entry_count = hdr->entry_count[tcs->type];
@@ -951,7 +950,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     
     /* Find the corresponding entry in tagcache. */
     entry = find_entry_ram(filename, NULL);
-    if (entry == NULL || !ramcache)
+    if (entry == NULL || !stat.ramcache)
         return false;
     
     id3->title = get_tag(entry, tag_title)->tag_data;
@@ -1008,7 +1007,7 @@ static void add_tagcache(const char *path)
     
     /* Check if the file is already cached. */
 #ifdef HAVE_TC_RAMCACHE
-    if (ramcache)
+    if (stat.ramcache)
     {
         if (find_entry_ram(path, dc))
             return ;
@@ -1115,33 +1114,58 @@ static void remove_files(void)
     }
 }
 
-static bool tempbuf_insert(char *str, int id, int idx_id)
+static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
 {
     struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
     int len = strlen(str)+1;
+    int i;
+    unsigned crc32;
+    unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
+    char buf[MAX_PATH];
+    
+    for (i = 0; str[i] != '\0' && i < (int)sizeof(buf)-1; i++)
+        buf[i] = tolower(str[i]);
+    buf[i] = '\0';
+    
+    crc32 = crc_32(buf, i, 0xffffffff);
+    
+    if (unique)
+    {
+        /* Check if the crc does not exist -> entry does not exist for sure. */
+        for (i = 0; i < tempbufidx; i++)
+        {
+            if (crcbuf[-i] != crc32)
+                continue;
+            
+            if (!strcasecmp(str, index[i].str))
+            {
+                if (id >= 0 && id < LOOKUP_BUF_DEPTH)
+                    lookup[id] = &index[i];
+                
+                return true;
+            }
+        }
+    }
+    
+    /* Insert to CRC buffer. */
+    crcbuf[-tempbufidx] = crc32;
+    tempbuf_left -= 4;
     
     /* Insert it to the buffer. */
-    tempbuf_left -= len + sizeof(struct tempbuf_id);
+    tempbuf_left -= len;
     if (tempbuf_left - 4 < 0 || tempbufidx >= TAGFILE_MAX_ENTRIES-1)
         return false;
     
-    index[tempbufidx].id = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
-#ifdef TAGCACHE_STRICT_ALIGN
-    /* Make sure the entry is long aligned. */
-    if ((long)index[tempbufidx].id & 0x03)
+    if (id >= 0 && id < LOOKUP_BUF_DEPTH)
     {
-        int fix = 4 - ((long)index[tempbufidx].id & 0x03);
-        tempbuf_left -= fix;
-        tempbuf_pos += fix;
-        index[tempbufidx].id = (struct tempbuf_id *)((
-                (long)index[tempbufidx].id & ~0x03) + 0x04);
+        lookup[id] = &index[tempbufidx];
+        index[tempbufidx].idlist.id = id;
     }
-#endif
-    index[tempbufidx].id->id = id;
-    index[tempbufidx].id->next = NULL;
-    index[tempbufidx].idx_id = idx_id;
-    tempbuf_pos += sizeof(struct tempbuf_id);
+    else
+        index[tempbufidx].idlist.id = -1;
     
+    index[tempbufidx].idlist.next = NULL;
+    index[tempbufidx].idx_id = idx_id;
     index[tempbufidx].seek = -1;
     index[tempbufidx].str = &tempbuf[tempbuf_pos];
     memcpy(index[tempbufidx].str, str, len);
@@ -1149,59 +1173,6 @@ static bool tempbuf_insert(char *str, int id, int idx_id)
     tempbufidx++;
     
     return true;
-}
-
-static bool tempbuf_unique_insert(char *str, int id)
-{
-    struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
-    struct tempbuf_id *idp;
-    int i;
-    unsigned crc32;
-    unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
-    
-    crc32 = crc_32(str, strlen(str), 0xffffffff);
-    
-    /* Check if the crc does not exist -> entry does not exist for sure. */
-    for (i = 0; i < tempbufidx; i++)
-    {
-        if (*(crcbuf--) == crc32)
-        {
-            if (!strcasecmp(str, index[i].str))
-            {
-                tempbuf_left -= sizeof(struct tempbuf_id);
-                if (tempbuf_left - 4 < 0)
-                    return false;
-                
-                idp = index[i].id;
-                while (idp->next != NULL)
-                    idp = idp->next;
-                
-                idp->next = (struct tempbuf_id *)&tempbuf[tempbuf_pos];
-#if TAGCACHE_STRICT_ALIGN
-                /* Make sure the entry is long aligned. */
-                if ((long)idp->next & 0x03)
-                {
-                    int fix = 4 - ((long)idp->next & 0x03);
-                    tempbuf_left -= fix;
-                    tempbuf_pos += fix;
-                    idp->next = (struct tempbuf_id *)
-                        (((long)idp->next & ~0x03) + 0x04);
-                }
-#endif
-                idp = idp->next;
-                idp->id = id;
-                idp->next = NULL;
-                tempbuf_pos += sizeof(struct tempbuf_id);
-                
-                return true;
-            }
-        }
-    }
-    
-    /* Insert and quit. */
-    *crcbuf = crc32;
-    tempbuf_left -= 4;
-    return tempbuf_insert(str, id, -1);
 }
 
 static int compare(const void *p1, const void *p2)
@@ -1225,18 +1196,68 @@ static int tempbuf_sort(int fd)
     struct tagfile_entry fe;
     int i;
     int length;
-#ifdef TAGCACHE_STRICT_ALIGN
-    int fix;
-#endif
+    
+    /* Generate reverse lookup entries. */
+    for (i = 0; i < LOOKUP_BUF_DEPTH; i++)
+    {
+        struct tempbuf_id_list *idlist;
+        
+        if (!lookup[i])
+            continue;
+        
+        if (lookup[i]->idlist.id == i)
+            continue;
+        
+        idlist = &lookup[i]->idlist;
+        while (idlist->next != NULL)
+            idlist = idlist->next;
+        
+        tempbuf_left -= sizeof(struct tempbuf_id_list);
+        if (tempbuf_left - 4 < 0)
+            return -1;
+        
+        idlist->next = (struct tempbuf_id_list *)&tempbuf[tempbuf_pos];
+        if (tempbuf_pos & 0x03)
+        {
+            tempbuf_pos = (tempbuf_pos & ~0x03) + 0x04;
+            tempbuf_left -= 3;
+            idlist->next = (struct tempbuf_id_list *)&tempbuf[tempbuf_pos];
+        }
+        tempbuf_pos += sizeof(struct tempbuf_id_list);
+        
+        idlist = idlist->next;
+        idlist->id = i;
+        idlist->next = NULL;
+    }
     
     qsort(index, tempbufidx, sizeof(struct tempbuf_searchidx), compare);
-
+    memset(lookup, 0, LOOKUP_BUF_DEPTH * sizeof(struct tempbuf_searchidx **));
+    
     for (i = 0; i < tempbufidx; i++)
     {
+        struct tempbuf_id_list *idlist = &index[i].idlist;
+        
+        /* Fix the lookup list. */
+        while (idlist != NULL)
+        {
+            if (idlist->id >= 0)
+                lookup[idlist->id] = &index[i];
+            idlist = idlist->next;
+        }
+        
         index[i].seek = lseek(fd, 0, SEEK_CUR);
         length = strlen(index[i].str) + 1;
         fe.tag_length = length;
         fe.idx_id = index[i].idx_id;
+        
+        /* Check the chunk alignment. */
+        if ((fe.tag_length + sizeof(struct tagfile_entry)) 
+            % TAGFILE_ENTRY_CHUNK_LENGTH)
+        {
+            fe.tag_length += TAGFILE_ENTRY_CHUNK_LENGTH - 
+                ((fe.tag_length + sizeof(struct tagfile_entry)) 
+                 % TAGFILE_ENTRY_CHUNK_LENGTH);
+        }
         
 #ifdef TAGCACHE_STRICT_ALIGN
         /* Make sure the entry is long aligned. */
@@ -1245,12 +1266,6 @@ static int tempbuf_sort(int fd)
             logf("tempbuf_sort: alignment error!");
             return -3;
         }
-        
-        fix = (sizeof(struct tagfile_entry) + length) & 0x03;
-        if (fix)
-            fix = 4-fix;
-        
-        fe.tag_length += fix;
 #endif
         
         if (write(fd, &fe, sizeof(struct tagfile_entry)) !=
@@ -1266,11 +1281,9 @@ static int tempbuf_sort(int fd)
             return -2;
         }
         
-#ifdef TAGCACHE_STRICT_ALIGN
         /* Write some padding. */
-        if (fix)
-            write(fd, "XXX", fix);
-#endif
+        if (fe.tag_length - length > 0)
+            write(fd, "XXXXXXXX", fe.tag_length - length);
     }
 
     return i;
@@ -1278,33 +1291,10 @@ static int tempbuf_sort(int fd)
     
 inline static struct tempbuf_searchidx* tempbuf_locate(int id)
 {
-    struct tempbuf_searchidx *index = (struct tempbuf_searchidx *)tempbuf;
-    struct tempbuf_id *idp;
-    static int last_id = 0;
-    int i;
+    if (id < 0 || id >= LOOKUP_BUF_DEPTH)
+        return NULL;
     
-    try_again:
-    
-    if (last_id >= tempbufidx)
-        last_id = 0;
-    
-    /* Check if string already exists. */
-    /* FIXME: This check is extremely slow, O(n^2) */
-    for (i = last_id; i < tempbufidx; i++)
-    {
-        idp = index[i].id;
-        while (idp != NULL)
-        {
-            if (idp->id == id)
-                return &index[i];
-            idp = idp->next;
-        }
-    }
-    
-    if (last_id)
-        goto try_again;
-    
-    return NULL;
+    return lookup[id];
 }
 
 
@@ -1415,7 +1405,13 @@ static bool build_numeric_index(int index_type, struct tagcache_header *h, int t
     return true;
 }
 
-static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
+/**
+ * Return values:
+ *     > 0   success
+ *    == 0   temporary failure
+ *     < 0   fatal error
+ */
+static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
 {
     int i;
     struct tagcache_header tch;
@@ -1431,13 +1427,18 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
     
     tempbufidx = 0;
     tempbuf_pos = TAGFILE_MAX_ENTRIES * sizeof(struct tempbuf_searchidx);
-    tempbuf_left = tempbuf_size - tempbuf_pos;
-    if (tempbuf_left < 0)
+    memset(tempbuf+tempbuf_pos, 0, LOOKUP_BUF_DEPTH * sizeof(void **));
+    tempbuf_pos += LOOKUP_BUF_DEPTH * sizeof(void **);
+    tempbuf_left = tempbuf_size - tempbuf_pos - 8;
+    if (tempbuf_left - TAGFILE_ENTRY_AVG_LENGTH * TAGFILE_MAX_ENTRIES < 0)
     {
         logf("Buffer way too small!");
-        return false;
+        return 0;
     }
 
+    lookup = (struct tempbuf_searchidx **)
+        (tempbuf + sizeof(struct tempbuf_searchidx)*TAGFILE_MAX_ENTRIES);
+    
     /* Open the index file, which contains the tag names. */
     snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
     fd = open(buf, O_RDWR);
@@ -1450,7 +1451,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         {
             logf("header error");
             close(fd);
-            return false;
+            return -2;
         }
 
         /**
@@ -1471,21 +1472,21 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 {
                     logf("read error");
                     close(fd);
-                    return false;
+                    return -2;
                 }
                 
                 if (entry.tag_length >= (int)sizeof(buf))
                 {
                     logf("too long tag");
                     close(fd);
-                    return false;
+                    return -2;
                 }
                 
                 if (read(fd, buf, entry.tag_length) != entry.tag_length)
                 {
                     logf("read error #2");
                     close(fd);
-                    return false;
+                    return -2;
                 }
 
                 /**
@@ -1493,7 +1494,8 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * is saved so we can later reindex the master lookup
                  * table when the index gets resorted.
                  */
-                tempbuf_insert(buf, loc + TAGFILE_MAX_ENTRIES, entry.idx_id);
+                tempbuf_insert(buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH 
+                               + TAGFILE_MAX_ENTRIES, entry.idx_id, false);
                 yield();
             }
             logf("done");
@@ -1511,7 +1513,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         if (fd < 0)
         {
             logf("%s open fail", buf);
-            return false;
+            return -2;
         }
         
         tch.magic = TAGCACHE_MAGIC;
@@ -1523,7 +1525,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         {
             logf("header write failed");
             close(fd);
-            return false;
+            return -2;
         }
     }
 
@@ -1540,7 +1542,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
         {
             logf("Failure to create index file");
             close(fd);
-            return false;
+            return -2;
         }
 
         /* Write the header (write real values later). */
@@ -1565,7 +1567,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             logf("header error");
             close(fd);
             close(masterfd);
-            return false;
+            return -2;
         }
 
         /**
@@ -1623,9 +1625,9 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
             
             if (tagcache_is_unique_tag(index_type))
-                error = !tempbuf_unique_insert(buf, i);
+                error = !tempbuf_insert(buf, i, -1, true);
             else
-                error = !tempbuf_insert(buf, i, tch.entry_count + i);
+                error = !tempbuf_insert(buf, i, tch.entry_count + i, false);
             
             if (error)
             {
@@ -1671,7 +1673,8 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
             for (j = 0; j < idxbuf_pos; j++)
             {
                 idxbuf[j].tag_seek[index_type] = tempbuf_find_location(
-                    idxbuf[j].tag_seek[index_type]+TAGFILE_MAX_ENTRIES);
+                    idxbuf[j].tag_seek[index_type]/TAGFILE_ENTRY_CHUNK_LENGTH
+                    + TAGFILE_MAX_ENTRIES);
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
@@ -1679,6 +1682,7 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     error = true;
                     goto error_exit;
                 }
+                
                 yield();
             }
             
@@ -1800,30 +1804,24 @@ static bool build_index(int index_type, struct tagcache_header *h, int tmpfd)
     }
     logf("done");
     
-    /* Finally write the uniqued tag index file. */
-    if (tagcache_is_sorted_tag(index_type))
-    {
-        tch.magic = TAGCACHE_MAGIC;
-        tch.entry_count = tempbufidx;
-        tch.datasize = lseek(fd, 0, SEEK_END) - sizeof(struct tagcache_header);
-        lseek(fd, 0, SEEK_SET);
-        write(fd, &tch, sizeof(struct tagcache_header));
-    }
-    else
-    {
-        tch.magic = TAGCACHE_MAGIC;
-        tch.entry_count = tempbufidx;
-        tch.datasize = lseek(fd, 0, SEEK_CUR) - sizeof(struct tagcache_header);
-        lseek(fd, 0, SEEK_SET);
-        write(fd, &tch, sizeof(struct tagcache_header));
-    }
+    /* Finally write the header. */
+    tch.magic = TAGCACHE_MAGIC;
+    tch.entry_count = tempbufidx;
+    tch.datasize = lseek(fd, 0, SEEK_END) - sizeof(struct tagcache_header);
+    lseek(fd, 0, SEEK_SET);
+    write(fd, &tch, sizeof(struct tagcache_header));
     
+    if (index_type != tag_filename)
+        h->datasize += tch.datasize;
     error_exit:
     
     close(fd);
     close(masterfd);
 
-    return !error;
+    if (error)
+        return -2;
+    
+    return 1;
 }
 
 static bool commit(void)
@@ -1865,11 +1863,11 @@ static bool commit(void)
 
     /* Try to steal every buffer we can :) */
 #ifdef HAVE_TC_RAMCACHE
-    if (tempbuf_size == 0 && tagcache_size > 0)
+    if (tempbuf_size == 0 && stat.ramcache_allocated > 0)
     {
-        ramcache = false;
+        stat.ramcache = false;
         tempbuf = (char *)(hdr + 1);
-        tempbuf_size = tagcache_size - sizeof(struct ramcache_header);
+        tempbuf_size = stat.ramcache_allocated - sizeof(struct ramcache_header);
     }
 #endif
     
@@ -1885,6 +1883,7 @@ static bool commit(void)
     if (tempbuf_size == 0)
     {
         logf("delaying commit until next boot");
+        stat.commit_delayed = true;
         close(tmpfd);
         return false;
     }
@@ -1892,26 +1891,36 @@ static bool commit(void)
     logf("commit %d entries...", header.entry_count);
     
     /* Now create the index files. */
-    init_step = 0;
+    stat.commit_step = 0;
+    header.datasize = 0;
+    stat.commit_delayed = false;
+    
     for (i = 0; i < TAG_COUNT; i++)
     {
-        init_step++;
+        int ret;
+        
+        stat.commit_step++;
         if (tagcache_is_numeric_tag(i))
         {
             build_numeric_index(i, &header, tmpfd);
+            continue;
         }
         
-        else if (!build_index(i, &header, tmpfd))
+        ret = build_index(i, &header, tmpfd);
+        if (ret <= 0)
         {
             logf("tagcache failed init");
-            remove_files();
-            init_step = 0;
+            if (ret < 0)
+                remove_files();
+            else
+                stat.commit_delayed = true;
+            stat.commit_step = 0;
             return false;
         }
     }
     
     close(tmpfd);
-    init_step = 0;
+    stat.commit_step = 0;
     
     /* Update the master index headers. */
     masterfd = open(TAGCACHE_FILE_MASTER, O_RDWR);
@@ -1932,7 +1941,8 @@ static bool commit(void)
     }
 
     header.entry_count += header_old.entry_count;
-    header.datasize += header_old.datasize;
+    /* Datasize has been recalculated. */
+    // header.datasize += header_old.datasize;
 
     lseek(masterfd, 0, SEEK_SET);
     write(masterfd, &header, sizeof(struct tagcache_header));
@@ -1948,7 +1958,7 @@ static bool commit(void)
 
 #ifdef HAVE_TC_RAMCACHE
     /* Reload tagcache. */
-    if (tagcache_size > 0 && !ramcache)
+    if (stat.ramcache_allocated > 0 && !stat.ramcache)
         tagcache_start_scan();
 #endif
     
@@ -2009,12 +2019,12 @@ static bool allocate_tagcache(void)
      * Now calculate the required cache size plus 
      * some extra space for alignment fixes. 
      */
-    tagcache_size = hdr->h.datasize + 128 + TAGCACHE_RESERVE +
+    stat.ramcache_allocated = hdr->h.datasize + 128 + TAGCACHE_RESERVE +
         sizeof(struct index_entry) * hdr->h.entry_count +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
-    logf("tagcache: %d bytes allocated.", tagcache_size);
+    logf("tagcache: %d bytes allocated.", stat.ramcache_allocated);
     logf("at: 0x%04x", audiobuf);
-    audiobuf += (long)((tagcache_size & ~0x03) + 0x04);
+    audiobuf += (long)((stat.ramcache_allocated & ~0x03) + 0x04);
 
     return true;
 }
@@ -2022,7 +2032,7 @@ static bool allocate_tagcache(void)
 static bool load_tagcache(void)
 {
     struct tagcache_header *tch;
-    long bytesleft = tagcache_size;
+    long bytesleft = stat.ramcache_allocated;
     struct index_entry *idx;
     int rc, fd;
     char *p;
@@ -2065,7 +2075,7 @@ static bool load_tagcache(void)
         }
     
         bytesleft -= sizeof(struct index_entry);
-        if (bytesleft < 0 || ((long)idx - (long)hdr->indices) >= tagcache_size)
+        if (bytesleft < 0 || ((long)idx - (long)hdr->indices) >= stat.ramcache_allocated)
         {
             logf("too big tagcache.");
             close(fd);
@@ -2189,6 +2199,7 @@ static bool load_tagcache(void)
         close(fd);
     }
     
+    stat.ramcache_used = stat.ramcache_allocated - bytesleft;
     logf("tagcache loaded into ram!");
 
     return true;
@@ -2341,9 +2352,9 @@ static void load_ramcache(void)
     cpu_boost(true);
     
     /* At first we should load the cache (if exists). */
-    ramcache = load_tagcache();
+    stat.ramcache = load_tagcache();
 
-    if (!ramcache)
+    if (!stat.ramcache)
     {
         hdr = NULL;
         remove_files();
@@ -2364,9 +2375,16 @@ static void tagcache_thread(void)
     allocate_tempbuf();
     commit();
     free_tempbuf();
+    
+#ifdef HAVE_TC_RAMCACHE
+    /* Allocate space for the tagcache if found on disk. */
+    if (global_settings.tagcache_ram)
+        allocate_tagcache();
+#endif
+    
     cpu_boost(false);
     
-    tagcache_init_done = true;
+    stat.initialized = true;
     
     while (1)
     {
@@ -2388,10 +2406,10 @@ static void tagcache_thread(void)
                 if (check_done || !dircache_is_enabled())
                     break ;
                 
-                if (!ramcache && global_settings.tagcache_ram)
+                if (!stat.ramcache && global_settings.tagcache_ram)
                     load_ramcache();
     
-                if (ramcache)
+                if (stat.ramcache)
                     build_tagcache();
                 
                 check_done = true;
@@ -2415,7 +2433,7 @@ static void tagcache_thread(void)
     }
 }
 
-int tagcache_get_progress(void)
+static int get_progress(void)
 {
     int total_count = -1;
 
@@ -2426,7 +2444,7 @@ int tagcache_get_progress(void)
     }
     else
     {
-        if (hdr && ramcache)
+        if (hdr && stat.ramcache)
             total_count = hdr->h.entry_count;
     }
 #endif
@@ -2437,9 +2455,12 @@ int tagcache_get_progress(void)
     return processed_dir_count * 100 / total_count;
 }
 
-int tagcache_get_processes_entrycount(void)
+struct tagcache_stat* tagcache_get_stat(void)
 {
-    return processed_dir_count;
+    stat.progress = get_progress();
+    stat.processed_entries = processed_dir_count;
+    
+    return &stat;
 }
     
 void tagcache_start_scan(void)
@@ -2463,19 +2484,15 @@ void tagcache_stop_scan(void)
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void)
 {
-    return ramcache;
+    return stat.ramcache;
 }
 #endif
 
+
 void tagcache_init(void)
 {
-    tagcache_init_done = false;
-    init_step = 0;
-    
-#ifdef HAVE_TC_RAMCACHE
-    /* Allocate space for the tagcache if found on disk. */
-    allocate_tagcache();
-#endif
+    stat.initialized = false;
+    stat.commit_step = 0;
     
     queue_init(&tagcache_queue);
     create_thread(tagcache_thread, tagcache_stack,
@@ -2484,11 +2501,11 @@ void tagcache_init(void)
 
 bool tagcache_is_initialized(void)
 {
-    return tagcache_init_done;
+    return stat.initialized;
 }
     
 int tagcache_get_commit_step(void)
 {
-    return init_step;
+    return stat.commit_step;
 }
 
