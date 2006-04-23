@@ -236,7 +236,7 @@ extern struct codec_api ci;
 extern struct codec_api ci_voice;
 
 /* Was the skip being executed manual or automatic? */
-static bool manual_skip;
+static bool automatic_skip;
 static bool dir_skip = false;
 
 /* Callback function to call when current track has really changed. */
@@ -946,7 +946,7 @@ static void audio_check_new_track(void)
     /* Move to the new track */
     cur_ti = &tracks[track_ridx];
 
-    track_changed = manual_skip;
+    track_changed = !automatic_skip;
 
     /* If it is not safe to even skip this many track entries */
     if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
@@ -1248,15 +1248,15 @@ void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 
 static void codec_track_changed(void)
 {
+    automatic_skip = false;
     track_changed = true;
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
 
 static void pcmbuf_track_changed_callback(void)
 {
-    track_changed = true;
     pcmbuf_set_position_callback(NULL);
-    queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
+    codec_track_changed();
 }
 
 /* Yield to codecs for as long as possible if they are in need of data
@@ -1967,18 +1967,18 @@ static bool load_next_track(void) {
     if (ci.new_track == 0)
     {
         ci.new_track++;
-        manual_skip = false;
+        automatic_skip = true;
     }
-    else
-        manual_skip = true;
     
     cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
     while (1) {
         queue_wait(&codec_callback_queue, &ev);
         if (ev.id == Q_CODEC_REQUEST_PENDING)
-            if (manual_skip)
+        {
+            if (!automatic_skip)
                 pcmbuf_play_stop();
+        }
         else
             break;
     }
@@ -1986,7 +1986,7 @@ static bool load_next_track(void) {
     switch (ev.id)
     {
         case Q_CODEC_REQUEST_COMPLETE:
-            track_skip_done(manual_skip);
+            track_skip_done(!automatic_skip);
             return true;
         case Q_CODEC_REQUEST_FAILED:
             ci.new_track = 0;
