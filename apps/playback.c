@@ -1977,7 +1977,8 @@ static bool load_next_track(void) {
     while (1) {
         queue_wait(&codec_callback_queue, &ev);
         if (ev.id == Q_CODEC_REQUEST_PENDING)
-            pcmbuf_play_stop();
+            if (manual_skip)
+                pcmbuf_play_stop();
         else
             break;
     }
