@@ -17,10 +17,9 @@
  *
  ****************************************************************************/
 
-/* TODO: Fast codecs seem to cause badness on track skipping (stop, old audio,
- * then new audio).  Investigate the CFL_FLUSH mode used for all track skips */
 /* TODO: Check for a possibly broken codepath on a rapid skip, stop event */
 /* TODO: same in reverse ^^ */
+/* TODO: Also play, stop ^^ */
 /* TODO: Can use the track changed callback to detect end of track and seek
  * in the previous track until this happens */
 /* Design: we have prev_ti already, have a conditional for what type of seek
@@ -488,12 +487,14 @@ static void voice_set_elapsed_callback(unsigned int value)
 static void codec_set_elapsed_callback(unsigned int value)
 {
     unsigned int latency;
+    if (ci.seek_time)
+        return;
 
 #ifdef AB_REPEAT_ENABLE
     ab_position_report(value);
 #endif
-    latency = pcmbuf_get_latency();
 
+    latency = pcmbuf_get_latency();
     if (value < latency)
         cur_ti->id3.elapsed = 0;
     else if (value - latency > cur_ti->id3.elapsed ||
@@ -508,7 +509,11 @@ static void voice_set_offset_callback(size_t value)
 
 static void codec_set_offset_callback(size_t value)
 {
-    unsigned int latency = pcmbuf_get_latency() * cur_ti->id3.bitrate / 8;
+    unsigned int latency;
+    if (ci.seek_time)
+        return;
+
+    latency = pcmbuf_get_latency() * cur_ti->id3.bitrate / 8;
     if (value < latency)
         cur_ti->id3.offset = 0;
     else
@@ -859,7 +864,6 @@ static void audio_update_trackinfo(void)
     cur_ti->id3.offset = 0;
     ci.id3 = &cur_ti->id3;
     ci.curpos = 0;
-    ci.seek_time = 0;
     ci.taginfo_ready = &cur_ti->taginfo_ready;
 }
 
