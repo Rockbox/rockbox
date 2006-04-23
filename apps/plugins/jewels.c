@@ -26,7 +26,7 @@
 
 PLUGIN_HEADER
 
-/* button definitions, every keypad must only have directions & select */
+/* button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define JEWELS_UP     BUTTON_UP
 #define JEWELS_DOWN   BUTTON_DOWN
@@ -60,6 +60,7 @@ PLUGIN_HEADER
 #define JEWELS_PREV   BUTTON_SCROLL_BACK
 #define JEWELS_NEXT   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
+#define JEWELS_CANCEL BUTTON_SELECT|BUTTON_MENU
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -1406,12 +1407,9 @@ static int jewels_main(struct game_context* bj) {
                 if(!inmenu) inmenu = true;
                 break;
 
-#ifdef JEWELS_CANCEL
-            case JEWELS_CANCEL:           /* toggle menu */
-                inmenu = !inmenu;
-                selected = false;
+            case JEWELS_CANCEL:           /* end game */
+                return BJ_END;
                 break;
-#endif
 
             default:
                 if(rb->default_event_handler_ex(button, jewels_callback,
