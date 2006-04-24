@@ -1577,7 +1577,6 @@ static bool read_next_metadata(void)
         if (tracks[next_idx].id3.album)
             lcd_getstringsize(tracks[next_idx].id3.album, NULL, NULL);
     }
-    track_changed = true;
     close(fd);
 
     return status;
@@ -1644,9 +1643,10 @@ static bool audio_load_track(int offset, bool start_play)
     /* Get track metadata if we don't already have it. */
     if (!tracks[track_widx].taginfo_ready) {
         if (get_metadata(&tracks[track_widx],current_fd,trackname,v1first)) {
-            track_changed = true;
-            if (start_play)
+            if (start_play) {
+                track_changed = true;
                 playlist_update_resume_info(audio_current_track());
+            }
         } else {
             logf("mde:%s!",trackname);
             /* Set filesize to zero to indicate no file was loaded. */
@@ -1914,6 +1914,8 @@ static void initialize_buffer_fill(bool clear_tracks)
 
 static void audio_fill_file_buffer(bool start_play, size_t offset)
 {
+    bool had_next_track = audio_next_track() != NULL;
+
     initialize_buffer_fill(!start_play);
 
     /* If we have a partially buffered track, continue loading,
@@ -1922,6 +1924,9 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
         audio_read_file();
     else if (!audio_load_track(offset, start_play))
         fill_bytesleft = 0;
+
+    if (!had_next_track && audio_next_track())
+        track_changed = true;
 
     /* If we're done buffering */
     if (fill_bytesleft == 0)
