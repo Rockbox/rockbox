@@ -527,6 +527,7 @@ static void crossfade_start(void)
      * has not yet been sent to the DMA */
     crossfade_rem = pcmbuf_unplayed_bytes;
     crossfade_chunk = pcmbuf_read->link;
+    crossfade_sample = 0;
 
     /* Get fade out delay from settings. */
     fade_out_delay =
@@ -890,9 +891,6 @@ int pcmbuf_mix_free(void)
     return 100;
 }
 
-/* This function does  not check for writing over the current main insertion
- * point of the pcm buffer (audiobuffer_fillpos) so that must be checked by
- * the caller */
 void pcmbuf_mix_voice(size_t length)
 {
     short *ibuf = (short *)voicebuf;
