@@ -455,6 +455,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
         struct pcmbufdesc *fade_out_chunk = crossfade_chunk;
 
         /* Find the right chunk to start fading out */
+        fade_out_delay += crossfade_sample * 2;
         while (fade_out_delay >= fade_out_chunk->size)
         {
             fade_out_delay -= fade_out_chunk->size;
@@ -491,6 +492,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
     }
 
     /* Find the right chunk and sample to start fading in */
+    fade_in_delay += crossfade_sample * 2;
     while (fade_in_delay >= crossfade_chunk->size)
     {
         fade_in_delay -= crossfade_chunk->size;
