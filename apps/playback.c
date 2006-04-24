@@ -1955,8 +1955,8 @@ static void track_skip_done(bool was_manual)
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
              && global_settings.crossfade != 2)
     {
-            pcmbuf_crossfade_init(false);
-            codec_track_changed();
+        pcmbuf_crossfade_init(false);
+        codec_track_changed();
     }
     /* Gapless playback. */
     else
@@ -2357,6 +2357,8 @@ void voice_init(void)
     {
         logf("Terminating voice codec");
         remove_thread(voice_thread_num);
+        if (current_codec == CODEC_IDX_VOICE)
+            mutex_unlock(&mutex_codecthread);
         queue_delete(&voice_codec_queue);
         voice_thread_num = -1;
         voice_codec_loaded = false;
