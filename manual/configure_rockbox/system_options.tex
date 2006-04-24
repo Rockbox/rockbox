@@ -4,17 +4,17 @@
     Options relating to the batteries in the \dap.
   \begin{description}
     \item [Battery Capacity: ]This setting can be used to tell Rockbox what
-    capacity (in mAh) of battery is being used inside it.% 
+    capacity (in mAh) of battery is being used inside it.
     \opt{player,recorder,recorderv2fm,ondio}{The default is 1500mAh 
       for NiMH battery based units, and 2300mAh for LiOn battery based units,
-      which is the capacity value for the standard batteries shipped with these units.}
-    \opt{h1xx,h300}{The default is 1300mAh.}
-    \opt{ipodmini}{The standard battery is 400mAh (1G) or 630mAh (2G).}
-    \opt{ipodcolor}{The standard battery is 700 mAh.}
-    \opt{ipodnano,ipodvideo}{The value of the standard battery is currently unknown.}
+      which is the capacity value for the standard batteries shipped with these units.}%
+    \opt{h1xx,h300}{The default is 1300mAh.}%
+    \opt{ipodmini}{The standard battery is 40mAh (1G) or 630mAh (2G).}%
+    \opt{ipodcolor}{The standard battery is 700 mAh.}%
+    \opt{ipodnano,ipodvideo}{The value of the standard battery is currently unknown.}%
     \opt{IPOD_4G_PAD}{This value is fairly meaningless in the iPod family at
-      present, and work is ongoing into finding a better way to determine battery life.}
-    % 
+      present, and work is ongoing into finding a better way to determine battery life.}%
+    \ % 
     Rockbox uses this value to estimate remaining battery life for the status 
     bar and WPS, setting it to the wrong value does not actually change the
     amount of time the battery will last, it only effects the accuracy of the
@@ -147,7 +147,7 @@ This submenu relates to limits in the Rockbox operating system.
   \end{description}
 }
 
-\subsection{\label{ref:ManageSettings}Manage settings}
+\subsection{\label{sec:manage_settings}Manage settings}
 This submenu deals with loading and saving settings. 
 \opt{MASCODEC}{This submenu also allows you to load or save different
 firmware versions.}
