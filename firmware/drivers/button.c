@@ -1212,11 +1212,29 @@ static int button_read(void)
         btn |= BUTTON_ON;
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
+    static bool hold_button = false;
+
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    hold_button = button_hold();
+
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
     btn = int_btn;
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD)
+    static bool hold_button = false;
+
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    hold_button = button_hold();
+
     (void)data;
     btn = ipod_3g_button_read();
 
@@ -1224,6 +1242,13 @@ static int button_read(void)
     static bool hold_button = false;
     static bool remote_hold_button = false;
 
+    /* light handling */
+    if (hold_button && !button_hold())
+    {
+        backlight_on();
+    }
+    /* TODO: add light handling for the remote */
+    
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
 
