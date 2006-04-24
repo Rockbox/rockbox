@@ -87,10 +87,13 @@ static int byte_delay = 172;
 #endif
 
 /* remote hotplug */
-static int countdown;  /* for remote plugging debounce */
-static bool last_remote_status = false;
-static bool init_remote = false;  /* scroll thread should init lcd */
+static struct event_queue remote_scroll_queue;
+#define REMOTE_INIT_LCD   1
+#define REMOTE_DEINIT_LCD 2
+
 static bool remote_initialized = false;
+static int _remote_type = 0;
+
 /* cached settings values */
 static bool cached_invert = false;
 static bool cached_flip = false;
@@ -409,6 +412,7 @@ void lcd_remote_set_flip(bool yesno)
 /* The actual LCD init */
 static void remote_lcd_init(void)
 {
+    CS_HI;
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
@@ -434,8 +438,6 @@ static void remote_lcd_init(void)
     lcd_remote_set_invert_display(cached_invert);
 }
 
-static int _remote_type = 0;
-
 int remote_type(void)
 {
     return _remote_type;
@@ -444,55 +446,67 @@ int remote_type(void)
 /* Monitor remote hotswap */
 static void remote_tick(void)
 {
+    static bool last_status = false;
+    static int countdown = 0;
+    static int init_delay = 0;
     bool current_status;
     int val;
     int level;
 
     current_status = ((GPIO_READ & 0x40000000) == 0);
     /* Only report when the status has changed */
-    if (current_status != last_remote_status)
+    if (current_status != last_status)
     {
-        last_remote_status = current_status;
-        countdown = current_status ? HZ : 1;
+        last_status = current_status;
+        countdown = current_status ? 20*HZ : 1;
     }
     else
     {
         /* Count down until it gets negative */
         if (countdown >= 0)
             countdown--;
-
-        if (countdown == 0)
+            
+        if (current_status)
         {
-            if (current_status)
+            if (!(countdown % 8))
             {
-                /* Determine which type of remote it is.
-                   The number 8 is just a fudge factor. */
+                /* Determine which type of remote it is */
                 level = set_irq_level(HIGHEST_IRQ_LEVEL);
                 val = adc_scan(ADC_REMOTEDETECT);
                 set_irq_level(level);
-                if (val < ADCVAL_H300_LCD_REMOTE_HOLD)
-                    if (val < ADCVAL_H300_LCD_REMOTE)
-                        _remote_type = REMOTETYPE_H300_LCD;  /* hold off */
-                    else
-                        if (val < ADCVAL_H100_LCD_REMOTE)
-                            _remote_type = REMOTETYPE_H100_LCD;  /* hold off */
+                
+                if (val < ADCVAL_H100_LCD_REMOTE_HOLD)
+                {
+                    if (val < ADCVAL_H100_LCD_REMOTE)
+                        if (val < ADCVAL_H300_LCD_REMOTE)
+                            _remote_type = REMOTETYPE_H300_LCD;  /* hold off */
                         else
-                            _remote_type = REMOTETYPE_H300_LCD;  /* hold on */
-                else
-                    if (val < ADCVAL_H100_LCD_REMOTE_HOLD)
-                        _remote_type = REMOTETYPE_H100_LCD;  /* hold on, or no remote */
+                            _remote_type = REMOTETYPE_H100_LCD;  /* hold off */
                     else
-                        _remote_type = REMOTETYPE_H300_NONLCD;  /* hold doesn't matter */
+                        if (val < ADCVAL_H300_LCD_REMOTE_HOLD)
+                            _remote_type = REMOTETYPE_H300_LCD;  /* hold on */
+                        else
+                            _remote_type = REMOTETYPE_H100_LCD;  /* hold on */
 
-                init_remote = true;
-                /* request init in scroll_thread */
+                    if (--init_delay <= 0)
+                    {
+                        queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
+                        init_delay = 6;
+                    }
+                }
+                else
+                {
+                    _remote_type = REMOTETYPE_H300_NONLCD; /* hold on or off */
+                }
             }
-            else
+        }
+        else
+        {
+            if (countdown == 0)
             {
-                CLK_LO;
-                CS_HI;
-                remote_initialized = false;
                 _remote_type = 0;
+
+                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
             }
         }
     }
@@ -539,6 +553,7 @@ void lcd_remote_init(void)
 #endif
     lcd_remote_clear_display();
 
+    queue_clear(&remote_scroll_queue); /* no queue_init() -- private queue */
     tick_add_task(remote_tick);
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name);
@@ -1330,22 +1345,41 @@ static void scroll_thread(void)
 {
     struct font* pf;
     struct scrollinfo* s;
+    long next_tick = current_tick;
+    long delay = 0;
     int index;
     int xpos, ypos;
     int lastmode;
+#ifndef SIMULATOR
+    struct event ev;
+#endif
 
     /* initialize scroll struct array */
     scrolling_lines = 0;
 
     while ( 1 ) {
 
-#ifndef SIMULATOR
-        if (init_remote)   /* request to initialize the remote lcd */
+#ifdef SIMULATOR
+        sleep(delay);
+#else
+        queue_wait_w_tmo(&remote_scroll_queue, &ev, delay);
+        switch (ev.id)
         {
-            init_remote = false; /* clear request */
-            remote_lcd_init();
-            lcd_remote_update();
+            case REMOTE_INIT_LCD:
+                remote_lcd_init();
+                lcd_remote_update();
+                break;
+                
+            case REMOTE_DEINIT_LCD:
+                CLK_LO;
+                CS_HI;
+                remote_initialized = false;
+                break;
         }
+
+        delay = next_tick - current_tick - 1;
+        if (delay >= 0)
+            continue;
 #endif
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
@@ -1395,7 +1429,13 @@ static void scroll_thread(void)
             lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
 
-        sleep(scroll_ticks);
+        next_tick += scroll_ticks;
+        delay = next_tick - current_tick - 1;
+        if (delay < 0)
+        {
+            next_tick = current_tick + 1;
+            delay = 0;
+        }
     }
 }
 
