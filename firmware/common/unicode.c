@@ -62,8 +62,7 @@ int load_cp_table(int cp)
         return 0;
     }
 
-    tablesize = lseek(file, 0, SEEK_END) / 2;
-    lseek(file, 0, SEEK_SET);
+    tablesize = filesize(file) / 2;
 
     if (tablesize > MAX_CP_TABLE_SIZE) {
         DEBUGF("Invalid codepage file: %s.cp\n", filename[table-1]);

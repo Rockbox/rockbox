@@ -283,7 +283,7 @@ struct font* font_load_cached(struct font* pf)
 /* read and load font into incore font structure*/
 struct font* font_load(const char *path)
 {
-    int filesize;
+    int size;
     struct font* pf = &font_ui;
 
     /* save loaded glyphs */
@@ -302,8 +302,7 @@ struct font* font_load(const char *path)
     }
 
     /* Check file size */
-    filesize = lseek(fnt_file, 0, SEEK_END);
-    lseek(fnt_file, 0, SEEK_SET);
+    size = filesize(fnt_file);
 
     font_reset();
 
@@ -312,7 +311,7 @@ struct font* font_load(const char *path)
     fileptr = freeptr;
 
 
-    if (filesize > MAX_FONT_SIZE)
+    if (size > MAX_FONT_SIZE)
     {
         read(fnt_file, fileptr, FONT_HEADER_SIZE);
         eofptr = fileptr + FONT_HEADER_SIZE;
@@ -334,7 +333,7 @@ struct font* font_load(const char *path)
     else
     {
         read(fnt_file, fileptr, MAX_FONT_SIZE);
-        eofptr = fileptr + filesize;
+        eofptr = fileptr + size;
         close(fnt_file);
         fnt_file = -1;
 
