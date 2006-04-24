@@ -488,6 +488,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     (void)parameter;
     exit(0);
 #else
+    int i;
+
     if (tagcache_get_commit_step() > 0)
     {
         cancel_shutdown();
@@ -499,7 +501,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     if(!charger_inserted())
 #endif
     {
-        lcd_clear_display();
+        FOR_NB_SCREENS(i)
+            screens[i].clear_display();
         gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
         if (callback != NULL)
             callback(parameter);
