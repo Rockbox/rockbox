@@ -107,7 +107,7 @@ int read_bmp_file(char* filename,
                   int format)
 {
     struct Fileheader fh;
-    int width, height, PaddedWidth, PaddedHeight;
+    int width, height, PaddedWidth, PaddedHeight, dst_width;
     int fd, row, col, ret;
     struct rgb_quad palette[256];
     int invert_pixel = 0;
@@ -187,21 +187,29 @@ int read_bmp_file(char* filename,
     /* PaddedHeight is for rockbox format. */
     if(format == FORMAT_MONO) {
         PaddedHeight = (height + 7) / 8;
-        totalsize = PaddedHeight * width;
+        dst_width = width;
+        totalsize = PaddedHeight * dst_width;
     } else {
 #if LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
         PaddedHeight = (height + 3) / 4;
+        dst_width = width;
 #else
         PaddedHeight = height;
+        dst_width = (width + 3) / 4;
 #endif
-        totalsize = PaddedHeight * width * sizeof(fb_data);
+#else
+        PaddedHeight = height;
+        dst_width = width;
+#endif
+        totalsize = PaddedHeight * dst_width * sizeof(fb_data);
     }
 
     /* Check if this fits the buffer */
     
     if (totalsize > maxsize) {
         DEBUGF("error - Bitmap is too large to fit the supplied buffer: "
-               "%d bytes.\n", (PaddedHeight * width));
+               "%d bytes.\n", (PaddedHeight * dst_width));
         close(fd);
         return -7;
     }
@@ -269,20 +277,29 @@ int read_bmp_file(char* filename,
                     }
                 }
 #if LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
             } else {
                 /* Mono -> 2gray (iriver H1xx) */
                 for (col = 0; col < width; col++) {
-                    ret = brightness(palette[getpix(col, bmpbuf)]);
+                    ret = getpix(col, bmpbuf) ^ invert_pixel;
                     
-                    if (ret > 96) {
-                        bitmap[width * ((height - row - 1) / 8) + col]
-                            &= ~ 1 << ((height - row - 1) % 8);
-                    } else {
-                        bitmap[width * ((height - row - 1) / 8) + col]
-                            |= 1 << ((height - row - 1) % 8);
-                    }
+                    if (ret)
+                        dest[((height - row - 1)/4) * width + col] |=
+                            0xC0 >> (2 * (~(height - row - 1) & 3));
                 }
             }
+#else
+            } else {
+                /* Mono -> 2gray (ipod) */
+                for (col = 0; col < width; col++) {
+                    ret = getpix(col, bmpbuf) ^ invert_pixel;
+                    
+                    if (ret)
+                        dest[(height - row - 1) * dst_width + col/4] |=
+                            0xC0 >> (2 * (col & 3));
+                }
+            }
+#endif
 #elif LCD_DEPTH == 16
             } else {
                 /* Mono -> RGB16 */
@@ -317,6 +334,7 @@ int read_bmp_file(char* filename,
                     p++;
                 }
 #if LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
             } else {
                 /* 8-bit RGB24 palette -> 2gray (iriver H1xx) */
                 for (col = 0; col < width; col++) {
@@ -328,6 +346,19 @@ int read_bmp_file(char* filename,
                     p++;
                 }
             }
+#else
+            } else {
+                /* 8-bit RGB24 palette -> 2gray (ipod) */
+                for (col = 0; col < width; col++) {
+                    struct rgb_quad rgb = palette[*p];
+                    ret = brightness(rgb);
+
+                    dest[(height - row - 1) * dst_width + col/4] |=
+                        (~ret & 0xC0) >> (2 * (col & 3));
+                    p++;
+                }
+            }
+#endif
 #elif LCD_DEPTH == 16
             } else {
                 /* 8-bit RGB24 palette -> RGB16 */
@@ -364,6 +395,7 @@ int read_bmp_file(char* filename,
                     p += 3;
                 }
 #if LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
             } else {
                 /* RGB24 -> 2gray (iriver H1xx) */
                 for (col = 0; col < width; col++) {
@@ -378,6 +410,22 @@ int read_bmp_file(char* filename,
                     p += 3;
                 }
             }
+#else
+            } else {
+                /* RGB24 -> 2gray (ipod) */
+                for (col = 0; col < width; col++) {
+                    struct rgb_quad rgb;
+                    rgb.red = p[2];
+                    rgb.green = p[1];
+                    rgb.blue = p[0];
+                    ret = brightness(rgb);
+
+                    dest[(height - row - 1) * dst_width + col/4] |=
+                        (~ret & 0xC0) >> (2 * (col & 3));
+                    p += 3;
+                }
+            }
+#endif
 #elif LCD_DEPTH == 16
             } else {
                 /* RGB24 -> RGB16 */
