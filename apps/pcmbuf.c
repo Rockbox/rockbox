@@ -83,25 +83,13 @@ static struct pcmbufdesc *pcmbuf_read_end IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_write IDATA_ATTR;
 static struct pcmbufdesc *pcmbuf_write_end IDATA_ATTR;
 static size_t last_chunksize IDATA_ATTR;
-/* 
-static inline size_t pcmbuf_unplayed_bytes(void)
-{
-    size_t bytes = 0;
-    if (pcmbuf_read)
-    {
-        struct pcmbufdesc *pcmbuf_chunk = pcmbuf_read;
-        do
-        {
-            bytes += pcmbuf_chunk->size;
-            pcmbuf_chunk = pcmbuf_chunk->link;
-        } while (pcmbuf_chunk);
-    }
-    return bytes;
-} */
+
 static size_t pcmbuf_unplayed_bytes IDATA_ATTR;
 static size_t pcmbuf_watermark IDATA_ATTR;
+
 static struct pcmbufdesc *pcmbuf_mix_chunk IDATA_ATTR;
 static size_t pcmbuf_mix_sample IDATA_ATTR;
+
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
 
