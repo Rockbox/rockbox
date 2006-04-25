@@ -44,11 +44,15 @@ enum {
 };
 
 /// Big/little endian 32 bit byte swapping routine.
+/* Use our Rockbox (maybe) optimised swap routine instead */
+#define mpc_swap32(x) swap32(x)
+#if 0
 static __inline
 mpc_uint32_t mpc_swap32(mpc_uint32_t val) {
     return (((val & 0xff000000) >> 24) | ((val & 0x00ff0000) >> 8) |
             ((val & 0x0000ff00) <<  8) | ((val & 0x000000ff) << 24));
 }
+#endif
 
 /// Searches for a ID3v2-tag and reads the length (in bytes) of it.
 /// \param reader supplying raw stream data
