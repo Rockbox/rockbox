@@ -63,8 +63,7 @@ mpc_bool_t canseek_impl(void *data)
     return true;
 }
 
-/* temporary, we probably have better use for iram than this */
-MPC_SAMPLE_FORMAT sample_buffer[MPC_FRAME_LENGTH*2] IBSS_ATTR;
+MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
 
 #ifdef USE_IRAM
 extern char iramcopy[];
