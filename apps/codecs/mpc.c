@@ -83,7 +83,7 @@ enum codec_status codec_start(struct codec_api *api)
     unsigned status;
     mpc_reader reader;
     mpc_streaminfo info;
-    int retval;
+    int retval = CODEC_OK;
     
     #ifdef USE_IRAM 
     ci->memcpy(iramstart, iramcopy, iramend - iramstart);
