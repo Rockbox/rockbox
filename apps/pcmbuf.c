@@ -470,7 +470,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
         while (fade_out_rem > 0)
         {
             /* Each 1/10 second of audio will have the same fade applied */
-            size_t block_rem = MIN(NATIVE_FREQUENCY * 2 / 10, fade_out_rem);
+            size_t block_rem = MIN(NATIVE_FREQUENCY * 4 / 10, fade_out_rem);
             int factor = (fade_out_rem << 8) / total_fade_out;
 
             fade_out_rem -= block_rem;
@@ -483,7 +483,7 @@ static void crossfade_process_buffer(size_t fade_in_delay,
                 int sample = buf[fade_out_sample];
                 buf[fade_out_sample++] = (sample * factor) >> 8;
 
-                block_rem--;
+                block_rem -= 2;
                 /* Move to the next chunk as needed */
                 if (fade_out_sample * 2 >= fade_out_chunk->size)
                 {
