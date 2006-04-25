@@ -142,10 +142,10 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
         pcmbuf_write_end->link = pcmbuf_current;
         pcmbuf_write_end = pcmbuf_current;
 
-        /* If we've read up to the mix chunk while it's still mixing there */
+        /* If we've read over the mix chunk while it's still mixing there */
         if (pcmbuf_current == pcmbuf_mix_chunk)
             pcmbuf_mix_chunk = NULL;
-        /* If we've read up to the crossfade chunk while it's still fading */
+        /* If we've read over the crossfade chunk while it's still fading */
         if (pcmbuf_current == crossfade_chunk)
             crossfade_chunk = NULL;
     }
@@ -677,6 +677,10 @@ static void flush_crossfade(char *buf, size_t length)
                 fade_rem = crossfade_fade_mix(factor, buf, fade_rem);
                 length -= fade_total - fade_rem;
                 buf += fade_total - fade_rem;
+                if (!length)
+                    return;
+                if (!fade_rem)
+                    goto fade_done;
             }
 
             samples = fade_rem / 2;
@@ -690,23 +694,21 @@ static void flush_crossfade(char *buf, size_t length)
             }
         }
 
+fade_done:
         if (crossfade_chunk)
         {
             /* Mix the data */
             size_t mix_total = length;
             length = crossfade_mix(buf, length);
             buf += mix_total - length;
+            if (!length)
+                return;
         }
-        else if (!crossfade_fade_in_rem)
-            crossfade_active = false;
 
-        if (length)
-        {
-            /* Flush samples to the buffer */
-            while (!prepare_insert(length))
-                sleep(1);
-            pcmbuf_flush_buffer(buf, length);
-        }
+        /* Flush samples to the buffer */
+        while (!prepare_insert(length))
+            sleep(1);
+        pcmbuf_flush_buffer(buf, length);
     }
 
 }
@@ -806,7 +808,11 @@ bool pcmbuf_is_crossfade_active(void)
 void pcmbuf_write_complete(size_t length)
 {
     if (crossfade_active)
+    {
         flush_crossfade(fadebuf, length);
+        if (!(crossfade_fade_in_rem || crossfade_chunk))
+            crossfade_active = false;
+    }
     else
     {
         audiobuffer_fillpos += length;
@@ -818,14 +824,16 @@ void pcmbuf_write_complete(size_t length)
 
 bool pcmbuf_insert_buffer(char *buf, size_t length)
 {
-    if (!prepare_insert(length))
-        return false;
-
-    if (crossfade_active) {
+    if (crossfade_active)
+    {
         flush_crossfade(buf, length);
+        if (!(crossfade_fade_in_rem || crossfade_chunk))
+            crossfade_active = false;
     }
     else
     {
+        if (!prepare_insert(length))
+            return false;
         pcmbuf_flush_buffer(buf, length);
     }
     return true;
