@@ -700,10 +700,13 @@ static void flush_crossfade(char *buf, size_t length)
         else if (!crossfade_fade_in_rem)
             crossfade_active = false;
 
-        /* Flush samples to the buffer */
-        while (!prepare_insert(length))
-            sleep(1);
-        pcmbuf_flush_buffer(buf, length);
+        if (length)
+        {
+            /* Flush samples to the buffer */
+            while (!prepare_insert(length))
+                sleep(1);
+            pcmbuf_flush_buffer(buf, length);
+        }
     }
 
 }
