@@ -65,7 +65,7 @@ static void (*position_callback)(size_t size) IDATA_ATTR;
 
 /* Crossfade related state */
 static bool crossfade_enabled;
-static bool crossfade_mix;
+static bool crossfade_mode;
 static bool crossfade_active IDATA_ATTR;
 static bool crossfade_init IDATA_ATTR;
 
@@ -100,6 +100,7 @@ static bool pcmbuf_flush;
 #define LOW_DATA(quarter_secs) \
     (pcmbuf_unplayed_bytes < NATIVE_FREQUENCY * quarter_secs)
 
+static bool prepare_insert(size_t length);
 static void pcmbuf_under_watermark(void);
 static bool pcmbuf_flush_fillpos(void);
 
@@ -308,7 +309,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
     pcmbuf_boost(true);
 
     /* Don't enable mix mode when skipping tracks manually. */
-    crossfade_mix = manual_skip && global_settings.crossfade_fade_out_mixmode;
+    crossfade_mode = manual_skip && global_settings.crossfade_fade_out_mixmode;
     crossfade_init = true;
 
     return true;
@@ -450,7 +451,7 @@ static bool pcmbuf_flush_fillpos(void)
 static void crossfade_process_buffer(size_t fade_in_delay,
         size_t fade_out_delay, size_t fade_out_rem)
 {
-    if (!crossfade_mix)
+    if (!crossfade_mode)
     {
         /* Fade out the specified amount of the already processed audio */
         size_t total_fade_out = fade_out_rem;
@@ -577,33 +578,59 @@ static void crossfade_start(void)
     crossfade_process_buffer(fade_in_delay, fade_out_delay, fade_out_rem);
 }
 
-static size_t fade_mix(int factor, const char *buf, size_t fade_rem)
+/* Returns the number of bytes _NOT_ mixed */
+static size_t crossfade_fade_mix(int factor, const char *buf, size_t fade_rem)
 {
     const short *input_buf = (const short *)buf;
-    size_t samples = 0;
     short *output_buf = (short *)(crossfade_chunk->addr);
     short *chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
     output_buf = &output_buf[crossfade_sample];
 
-    fade_rem /= 2;
-    while (samples < fade_rem)
+    while (fade_rem)
     {
         int sample = *input_buf++;
         sample = ((sample * factor) >> 8) + *output_buf;
         *output_buf++ = MIN(32767, MAX(-32768, sample));
-        samples++;
+        fade_rem -= 2;
 
         if (output_buf >= chunk_end)
         {
             crossfade_chunk = crossfade_chunk->link;
             if (!crossfade_chunk)
-                return samples * 2;
+                return fade_rem;
             output_buf = (short *)(crossfade_chunk->addr);
             chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
         }
     }
     crossfade_sample = (size_t)(output_buf - (short *)(crossfade_chunk->addr));
-    return samples * 2;
+    return 0;
+}
+
+/* Returns the number of bytes _NOT_ mixed */
+static size_t crossfade_mix(const char *buf, size_t length)
+{
+    const short *input_buf = (const short *)buf;
+    short *output_buf = (short *)(crossfade_chunk->addr);
+    short *chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+    output_buf = &output_buf[crossfade_sample];
+
+    while (length)
+    {
+        int sample = *input_buf++ + *output_buf;
+        *output_buf++ = MIN(32767, MAX(-32768, sample));
+        length -= 2;
+
+        if (output_buf >= chunk_end)
+        {
+            crossfade_chunk = crossfade_chunk->link;
+            if (!crossfade_chunk)
+                return length;
+            output_buf = (short *)(crossfade_chunk->addr);
+            chunk_end = (short *)((size_t)output_buf + crossfade_chunk->size);
+        }
+    }
+    crossfade_sample = (size_t)(output_buf - (short *)(crossfade_chunk->addr));
+    return 0;
 }
 
 static void pcmbuf_flush_buffer(const char *buf, size_t length)
@@ -626,33 +653,35 @@ static void pcmbuf_flush_buffer(const char *buf, size_t length)
 
 static void flush_crossfade(char *buf, size_t length)
 {
-    if (length && crossfade_fade_in_rem)
+    if (length)
     {
-        int factor = ((crossfade_fade_in_total - crossfade_fade_in_rem) << 8) /
-            crossfade_fade_in_total;
-        /* Bytes to fade */
-        size_t fade_rem = MIN(length, crossfade_fade_in_rem);
-        crossfade_fade_in_rem -= fade_rem;
-
-        if (crossfade_chunk)
-        {
-            /* Mix the data */
-            size_t complete = fade_mix(factor, buf, fade_rem);
-            length -= complete;
-            buf += complete;
-            fade_rem -= complete;
-            /* If there is still fading to be done */
-            if (fade_rem)
-                goto mix_done;
-        }
-        else
+        if (crossfade_fade_in_rem)
         {
             size_t samples;
             short *input_buf;
-mix_done:
-            /* Fade samples in place */
+
+            /* Fade factor for this packet */
+            int factor =
+                ((crossfade_fade_in_total - crossfade_fade_in_rem) << 8) /
+                crossfade_fade_in_total;
+            /* Bytes to fade */
+            size_t fade_rem = MIN(length, crossfade_fade_in_rem);
+
+            /* We _will_ fade this many bytes */
+            crossfade_fade_in_rem -= fade_rem;
+
+            if (crossfade_chunk)
+            {
+                /* Mix the data */
+                size_t fade_total = fade_rem;
+                fade_rem = crossfade_fade_mix(factor, buf, fade_rem);
+                length -= fade_total - fade_rem;
+                buf += fade_total - fade_rem;
+            }
+
             samples = fade_rem / 2;
             input_buf = (short *)buf;
+            /* Fade remaining samples in place */
             while (samples)
             {
                 int sample = *input_buf;
@@ -660,21 +689,23 @@ mix_done:
                 samples--;
             }
         }
-    }
 
-    if (length)
-    {
-        /* Flush samples to the buffer */
-        while (pcmbuf_free() < length)
+        if (crossfade_chunk)
         {
-            pcmbuf_boost(false);
-            sleep(1);
+            /* Mix the data */
+            size_t mix_total = length;
+            length = crossfade_mix(buf, length);
+            buf += mix_total - length;
         }
+        else if (!crossfade_fade_in_rem)
+            crossfade_active = false;
+
+        /* Flush samples to the buffer */
+        while (!prepare_insert(length))
+            sleep(1);
         pcmbuf_flush_buffer(buf, length);
     }
 
-    if (!crossfade_fade_in_rem)
-        crossfade_active = false;
 }
 
 static bool prepare_insert(size_t length)
@@ -688,7 +719,7 @@ static bool prepare_insert(size_t length)
     }
 
     /* Need to save PCMBUF_MIN_CHUNK to prevent wrapping overwriting */
-    if (pcmbuf_free() < length + PCMBUF_MIN_CHUNK && !crossfade_active)
+    if (pcmbuf_free() < length + PCMBUF_MIN_CHUNK)
     {
         pcmbuf_boost(false);
         return false;
@@ -697,7 +728,6 @@ static bool prepare_insert(size_t length)
     if (!pcm_is_playing())
     {
         pcmbuf_boost(true);
-        crossfade_active = false;
         /* Pre-buffer 1s. */
         if (!LOW_DATA(4))
         {
