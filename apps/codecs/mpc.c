@@ -168,6 +168,8 @@ next_track:
 
         status = mpc_decoder_decode(&decoder, sample_buffer, NULL, NULL);
         ci->yield();
+        if (status == 0) /* end of file reached */
+            goto done;
         if (status == (unsigned)(-1)) { /* decode error */
             retval = CODEC_ERROR;
             goto done;
