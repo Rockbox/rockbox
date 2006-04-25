@@ -147,7 +147,7 @@ static void pcmbuf_callback(unsigned char** start, size_t* size)
             pcmbuf_mix_chunk = NULL;
         /* If we've read over the crossfade chunk while it's still fading */
         if (pcmbuf_current == crossfade_chunk)
-            crossfade_chunk = NULL;
+            crossfade_chunk = pcmbuf_read;
     }
 
 process_new_buffer:
