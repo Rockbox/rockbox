@@ -219,6 +219,10 @@ void IRQ3(void) /* PA15: MAS demand IRQ */
     else
 #endif
         postpone_dma_tick();
+
+    /* Workaround for sh-elf-gcc 3.3.x bug with -O2 or -Os and ISRs
+     * (invalid cross-jump optimisation) */
+    asm volatile ("");
 }
 #endif /* #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 
