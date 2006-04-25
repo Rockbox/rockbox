@@ -322,7 +322,8 @@ static bool voice_pcmbuf_insert_split_callback(
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
         length *= 2;    /* Length is per channel */
 
-    do {
+    while (length)
+    {
         long est_output_size = dsp_output_size(length);
         while ((dest = pcmbuf_request_voice_buffer(est_output_size,
                         &output_size, playing)) == NULL)
@@ -359,9 +360,7 @@ static bool voice_pcmbuf_insert_split_callback(
             pcmbuf_write_complete(output_size);
 
         length -= input_size;
-
-    } while (length > 0);
-
+    }
 
     return true;
 }
@@ -380,7 +379,8 @@ static bool codec_pcmbuf_insert_split_callback(
     if (dsp_stereo_mode() == STEREO_NONINTERLEAVED)
         length *= 2;    /* Length is per channel */
 
-    do {
+    while (length)
+    {
         long est_output_size = dsp_output_size(length);
         /* Prevent audio from a previous track from playing */
         if (ci.new_track || ci.stop_codec)
@@ -418,8 +418,7 @@ static bool codec_pcmbuf_insert_split_callback(
             swap_codec();
 
         length -= input_size;
-
-    } while (length > 0);
+    }
 
     return true;
 }
