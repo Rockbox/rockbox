@@ -228,6 +228,7 @@ bool dbg_audio_thread(void)
     int button;
     int line;
     bool done = false;
+    size_t bufused;
     size_t bufsize = pcmbuf_get_bufsize();
     int pcmbufdescs = pcmbuf_descs();
 
@@ -258,13 +259,13 @@ bool dbg_audio_thread(void)
         
         lcd_clear_display();
 
-        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld",
-                 bufsize-pcmbuf_free(), bufsize);
+        bufused = bufsize - pcmbuf_free();
+
+        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld", bufused, bufsize);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*8, LCD_WIDTH, 6, bufsize, 0,
-                  bufsize-pcmbuf_free(), HORIZONTAL);
+        scrollbar(0, line*8, LCD_WIDTH, 6, bufsize, 0, bufused, HORIZONTAL);
         line++;
 
         snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", filebufused, filebuflen);
