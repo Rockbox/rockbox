@@ -1223,13 +1223,47 @@ bool save_preset_list(void)
 {   
     if(num_presets != 0)
     { 
+        bool bad_file_name = true;
+
         if(!opendir(FMPRESET_PATH)) /* Check if there is preset folder */
             mkdir(FMPRESET_PATH, 0); 
     
-        create_numbered_filename(filepreset, FMPRESET_PATH, "preset", ".fmr", 2);
-    
-        if (!kbd_input(filepreset, sizeof(filepreset)))
-           radio_save_presets();
+        create_numbered_filename(filepreset,FMPRESET_PATH,"preset",".fmr",2);
+
+        while(bad_file_name)
+        {
+            if(!kbd_input(filepreset, sizeof(filepreset)))
+            {
+                /* check the name: max MAX_FILENAME (20) chars */
+                char* p2;
+                char* p1;
+                int len;
+                p1 = strrchr(filepreset, '/');
+                p2 = p1;
+                while((p1) && (*p2) && (*p2 != '.'))
+                    p2++;
+                len = (int)(p2-p1) - 1;
+                if((!p1) || (len > MAX_FILENAME) || (len == 0))
+                {
+                    /* no slash, too long or too short */
+                    gui_syncsplash(HZ,true,str(LANG_INVALID_FILENAME));                    
+                }
+                else
+                {
+                    /* add correct extension (easier to always write)
+                       at this point, p2 points to 0 or the extension dot */
+                    *p2 = '\0';
+                    strcat(filepreset,".fmr");
+                    bad_file_name = false;
+                    radio_save_presets();
+                }
+            }
+            else
+            {
+                /* user aborted */
+                return false;
+            }
+        }
     }
     else
         gui_syncsplash(HZ,true,str(LANG_FM_NO_PRESETS));

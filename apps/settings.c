@@ -1316,10 +1316,11 @@ void set_file(char* filename, char* setting, int maxlen)
 
     len = strlen(fptr);
     ptr = fptr + len;
-    while (*ptr != '.') {
+    while ((*ptr != '.') && (ptr != fptr)) {
         extlen++;
         ptr--;
     }
+    if(ptr == fptr) extlen = 0;
 
     if (strncasecmp(ROCKBOX_DIR, filename ,strlen(ROCKBOX_DIR)) ||
         (len-extlen > maxlen))

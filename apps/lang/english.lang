@@ -8501,3 +8501,17 @@
     *: "All tracks"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Invalid Filename!"
+  </dest>
+  <voice>
+    *: "Invalid Filename"
+  </voice>
+</phrase>
