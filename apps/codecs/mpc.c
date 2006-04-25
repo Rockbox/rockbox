@@ -155,8 +155,8 @@ next_track:
         /* Seek to start of track handler. This is the only case that isn't slow
            as hell, and needs to be supported for the back button to function as
            wanted. */
-        if (ci->seek_time == 1) {
-            if (mpc_decoder_seek_sample(&decoder, 0)) {
+        if (ci->seek_time) {
+            if (ci->seek_time == 1 && mpc_decoder_seek_sample(&decoder, 0)) {
                 samplesdone = 0;
                 ci->set_elapsed(0);
             }
