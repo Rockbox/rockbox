@@ -103,10 +103,12 @@
 
 % add screenshot image.
 % Usage: \screenshot{filename}{caption}{label}
+% By using the 'H' (HERE) placement, the screenshots are placed where
+% we want them.
 % Note: use this only for screenshots!
 % Note: leave caption empty to supress it.
 \newcommand{\screenshot}[3]{
-  \begin{figure}[!ht]
+  \begin{figure}[H]
     \begin{center}
       \IfFileExists{#1-\genericimg.png}
         {\includegraphics[width=4cm]{#1-\genericimg.png}}
@@ -141,8 +143,8 @@
   \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}#1\par\fi%
 }
 
-% make table floats use "!htb" as default positioning 
-\makeatletter\renewcommand{\fps@table}{!htb}\makeatother
+% make table floats use "H" (as for screenshots) as default positioning
+\makeatletter\renewcommand{\fps@table}{H}\makeatother
 % change defaults for floats on a page as we have a lot of small images
 \setcounter{topnumber}{3}    % default: 2
 \setcounter{bottomnumber}{2} % default: 1
