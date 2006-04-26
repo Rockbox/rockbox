@@ -961,6 +961,7 @@ static void audio_check_new_track(void)
     /* If it is not safe to even skip this many track entries */
     if (ci.new_track >= track_count || ci.new_track <= track_count - MAX_TRACK)
     {
+        ci.new_track = 0;
         cur_ti->taginfo_ready = false;
         audio_rebuffer();
         goto skip_done;
