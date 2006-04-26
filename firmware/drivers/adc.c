@@ -60,7 +60,7 @@ static void adc_tick(void)
     ADCSR = ADCSR_ADST | ADCSR_ADIE | ADCSR_SCAN | 3;
 }
 
-#pragma interrupt
+void ADITI(void) __attribute__((interrupt_handler));
 void ADITI(void)
 {
     if(ADCSR & ADCSR_ADF)

@@ -766,7 +766,7 @@ int main(void)
 
 
 
-#pragma interrupt
+void IRQ6(void) __attribute__((interrupt_handler));
 
 void IRQ6(void)
 
@@ -778,7 +778,7 @@ void IRQ6(void)
 
 
 
-#pragma interrupt
+void DEI3(void) __attribute__((interrupt_handler));
 
 void DEI3(void)
 
@@ -922,7 +922,7 @@ static void mas_poll_start(unsigned int interval_in_ms)
 
 
 
-#pragma interrupt
+void IMIA1(void) __attribute__((interrupt_handler));
 
 void IMIA1(void)
 
