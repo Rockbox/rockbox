@@ -104,22 +104,24 @@
       Options:
     \begin{description}
       \item[Enable Crossfade: ]If set to ``Off,'' crossfade is disabled. If set to ``Always,'' 
-        songs will always cross-fade into one another. If set to ``Shuffle,'' crossfade is 
-        enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.
+        songs will always crossfade into one another. If set to ``Shuffle,'' crossfade is 
+        enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.  If set to
+        track skip only, tracks will only crossfade when you manually change tracks.
         %
-      \item[Fade In Delay: ]The ``fade in delay'' and ``fade out delay'' control the offset 
-        between when the first song starts to fade out and the second song starts to fade in.
+      \item[Fade In Delay: ]The ``fade in delay'' is the length of time between when the crossfade
+        process begins and when the new track begins to fade in.
         %
       \item[Fade In Duration: ]The length of time, in seconds, that it takes your music to fade in.
         %
-      \item[Fade Out Delay: ]The ``fade in delay'' and ``fade out delay'' control the offset 
-        between when the first song starts to fade out and the second song starts to fade in.
+      \item[Fade Out Delay: ]The ``fade out delay'' is the length of time between when the crossfade
+        process begins and when the old track begins to fade out.
         %
       \item[Fade Out Duration: ]The length of time, in seconds, that it takes your music to fade out.
         %
       \item[Fade Out Mode: ]If set to ``Crossfade'', one song will fade out and the next song will 
-        simultaneously fade in.  If set to ``Mix,'' the currently playing song will fade out 
-        according to the fade out settings, but the next song will simply start, without fading in.
+        simultaneously fade in.  If set to ``Mix,'' the ending song will continue to play as normal
+        until its end, while the starting song will fade in from under it.  ``Mix'' mode is not
+        used for manual track skips, even if it is selected here.
     \end{description}
   
     \note{The crossfade setting is particularly effective when the player is set on shuffle.}
