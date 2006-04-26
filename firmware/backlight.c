@@ -64,6 +64,7 @@ static inline void __backlight_on(void)
     and_l(~0x00020000, &GPIO1_OUT);
 #elif CONFIG_BACKLIGHT == BL_IRIVER_H300
     lcd_enable(true);
+    sleep(HZ/100); /* lcd needs time - avoid flashing for dark screens */
     or_l(0x00020000, &GPIO1_OUT);    
 #elif CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
