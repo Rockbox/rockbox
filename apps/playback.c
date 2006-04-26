@@ -940,7 +940,10 @@ static void audio_check_new_track(void)
     playlist_next(ci.new_track);
 
     if (new_playlist)
+    {
         ci.new_track = 1;
+        new_playlist = false;
+    }
 
     track_ridx+=ci.new_track;
     if (track_ridx >= MAX_TRACK)
@@ -2094,6 +2097,9 @@ static void audio_new_playlist(void)
         cur_ti->filerem = 0;
         close(current_fd);
         current_fd = -1;
+
+        /* Mark the current track as invalid to prevent skipping back to it */
+        cur_ti->taginfo_ready = false;
 
         /* Invalidate the buffer other than the playing track */
         filebufused = cur_ti->available;
