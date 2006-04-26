@@ -119,6 +119,7 @@ enum {
     Q_AUDIO_FLUSH,
     Q_AUDIO_TRACK_CHANGED,
     Q_AUDIO_DIR_SKIP,
+    Q_AUDIO_NEW_PLAYLIST,
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
 
@@ -237,6 +238,7 @@ extern struct codec_api ci_voice;
 /* Was the skip being executed manual or automatic? */
 static bool automatic_skip;
 static bool dir_skip = false;
+static bool new_playlist = false;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct mp3entry *id3);
@@ -258,7 +260,8 @@ static int mp3_get_file_pos(void);
 static void audio_clear_track_entries(
         bool clear_buffered, bool clear_unbuffered);
 static void initialize_buffer_fill(bool clear_tracks);
-static void audio_fill_file_buffer(bool start_play, size_t offset);
+static void audio_fill_file_buffer(
+        bool start_play, bool rebuffer, size_t offset);
 
 static void swap_codec(void)
 {
@@ -883,13 +886,11 @@ static void audio_rebuffer(void)
     audio_clear_track_entries(false, true);
     filebufused = 0;
 
-    /* Cause the buffer fill to return as soon as the codec is loaded */
-    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
     /* Fill the buffer */
     last_peek_offset = -1;
     cur_ti->filesize = 0;
     cur_ti->start_pos = 0;
-    audio_fill_file_buffer(false, 0);
+    audio_fill_file_buffer(false, true, 0);
 }
 
 static void audio_check_new_track(void)
@@ -915,6 +916,9 @@ static void audio_check_new_track(void)
         }
     }
 
+    if (new_playlist)
+        ci.new_track = 0;
+
     /* If the playlist isn't that big */
     if (!playlist_check(ci.new_track))
     {
@@ -935,14 +939,14 @@ static void audio_check_new_track(void)
     last_peek_offset -= ci.new_track;
     playlist_next(ci.new_track);
 
+    if (new_playlist)
+        ci.new_track = 1;
+
     track_ridx+=ci.new_track;
     if (track_ridx >= MAX_TRACK)
         track_ridx -= MAX_TRACK;
     else if (track_ridx < 0)
         track_ridx += MAX_TRACK;
-
-    forward = ci.new_track > 0;
-    ci.new_track = 0;
 
     /* Save the old track */
     prev_ti = cur_ti;
@@ -958,6 +962,9 @@ static void audio_check_new_track(void)
         audio_rebuffer();
         goto skip_done;
     }
+
+    forward = ci.new_track > 0;
+    ci.new_track = 0;
 
     /* If the target track is clearly not in memory */
     if (cur_ti->filesize == 0 || !cur_ti->taginfo_ready)
@@ -1313,7 +1320,7 @@ static void strip_id3v1_tag(void)
     }
 }
 
-static void audio_read_file(void)
+static void audio_read_file(bool quick)
 {
     size_t copy_n;
     int rc;
@@ -1360,7 +1367,7 @@ static void audio_read_file(void)
         /* Let the codec process until it is out of the danger zone, or there
          * is an event to handle.  In the latter case, break this fill cycle
          * immediately */
-        if (yield_codecs())
+        if (quick || yield_codecs())
             break;
     }
 
@@ -1581,7 +1588,7 @@ static bool read_next_metadata(void)
     return status;
 }
 
-static bool audio_load_track(int offset, bool start_play)
+static bool audio_load_track(int offset, bool start_play, bool rebuffer)
 {
     char *trackname;
     off_t size;
@@ -1732,7 +1739,8 @@ static bool audio_load_track(int offset, bool start_play)
     
     logf("alt:%s", trackname);
     tracks[track_widx].buf_idx = buf_widx;
-    audio_read_file();
+
+    audio_read_file(rebuffer);
 
     return true;
 }
@@ -1851,7 +1859,7 @@ static void audio_play_start(size_t offset)
     
     last_peek_offset = -1;
 
-    audio_fill_file_buffer(true, offset);
+    audio_fill_file_buffer(true, false, offset);
 }
 
 /* Send callback events to notify about new tracks. */
@@ -1911,7 +1919,8 @@ static void initialize_buffer_fill(bool clear_tracks)
     filling = true;
 }
 
-static void audio_fill_file_buffer(bool start_play, size_t offset)
+static void audio_fill_file_buffer(
+        bool start_play, bool rebuffer, size_t offset)
 {
     bool had_next_track = audio_next_track() != NULL;
 
@@ -1920,8 +1929,8 @@ static void audio_fill_file_buffer(bool start_play, size_t offset)
     /* If we have a partially buffered track, continue loading,
      * otherwise load a new track */
     if (tracks[track_widx].filesize > 0)
-        audio_read_file();
-    else if (!audio_load_track(offset, start_play))
+        audio_read_file(false);
+    else if (!audio_load_track(offset, start_play, rebuffer))
         fill_bytesleft = 0;
 
     if (!had_next_track && audio_next_track())
@@ -2048,11 +2057,10 @@ static bool codec_request_next_track_callback(void)
 void audio_invalidate_tracks(void)
 {
     if (have_tracks()) {
-        playlist_end = false;
         last_peek_offset = 0;
 
+        playlist_end = false;
         track_widx = track_ridx;
-
         audio_clear_track_entries(true, true);
 
         /* If the current track is fully buffered, advance the write pointer */
@@ -2068,6 +2076,35 @@ void audio_invalidate_tracks(void)
 
         read_next_metadata();
     }
+}
+
+static void audio_new_playlist(void)
+{
+    /* Prepare to start a new fill from the beginning of the playlist */
+    last_peek_offset = -1;
+    if (have_tracks()) {
+        playlist_end = false;
+        track_widx = track_ridx;
+        audio_clear_track_entries(true, true);
+
+        if (++track_widx >= MAX_TRACK)
+            track_widx -= MAX_TRACK;
+
+        /* Stop reading the current track */
+        cur_ti->filerem = 0;
+        close(current_fd);
+        current_fd = -1;
+
+        /* Invalidate the buffer other than the playing track */
+        filebufused = cur_ti->available;
+        buf_widx = buf_ridx + cur_ti->available;
+        if (buf_widx >= filebuflen)
+            buf_widx -= filebuflen;
+    }
+    /* Signal the codec to initiate a track change forward */
+    new_playlist = true;
+    ci.new_track = 1;
+    audio_fill_file_buffer(false, true, 0);
 }
 
 static void initiate_track_change(long direction)
@@ -2105,7 +2142,7 @@ void audio_thread(void)
                 if (!filling)
                     if (!playing || playlist_end || ci.stop_codec)
                         break;
-                audio_fill_file_buffer(false, 0);
+                audio_fill_file_buffer(false, false, 0);
                 break;
 
             case Q_AUDIO_PLAY:
@@ -2159,6 +2196,11 @@ void audio_thread(void)
                 if (global_settings.beep)
                     pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 initiate_dir_change((long)ev.data);
+                break;
+
+            case Q_AUDIO_NEW_PLAYLIST:
+                logf("new_playlist");
+                audio_new_playlist();
                 break;
 
             case Q_AUDIO_FLUSH:
@@ -2441,17 +2483,13 @@ bool audio_has_changed_track(void)
 void audio_play(long offset)
 {
     logf("audio_play");
-    if (pcmbuf_is_crossfade_enabled())
-    {
-        ci.stop_codec = true;
-        sleep(1);
-        pcmbuf_crossfade_init(true);
-    }
+    if (playing)
+        queue_post(&audio_queue, Q_AUDIO_NEW_PLAYLIST, 0);
     else
-        stop_codec_flush();
-
-    playing = true;
-    queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
+    {
+        playing = true;
+        queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
+    }
 }
 
 void audio_stop(void)
