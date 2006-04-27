@@ -23,9 +23,8 @@
 # define LIBMAD_BIT_H
 
 struct mad_bitptr {
-  unsigned char const *byte;
-  unsigned short cache;
-  unsigned short left;
+  unsigned long *ptr;
+  unsigned long readbit;
 };
 
 void mad_bit_init(struct mad_bitptr *, unsigned char const *);
@@ -35,7 +34,7 @@ void mad_bit_init(struct mad_bitptr *, unsigned char const *);
 unsigned int mad_bit_length(struct mad_bitptr const *,
 			    struct mad_bitptr const *);
 
-# define mad_bit_bitsleft(bitptr)  ((bitptr)->left)
+unsigned char mad_bit_bitsleft(struct mad_bitptr const *bitptr);
 unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *);
 
 void mad_bit_skip(struct mad_bitptr *, unsigned int);

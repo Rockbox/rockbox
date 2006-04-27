@@ -87,9 +87,8 @@ unsigned short const crc_table[256] = {
  */
 void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
 {
-  bitptr->byte  = byte;
-  bitptr->cache = 0;
-  bitptr->left  = CHAR_BIT;
+  bitptr->ptr     = (unsigned long*)((long)byte & ~3);
+  bitptr->readbit = ((unsigned long)byte & 3) << 3;
 }
 
 /*
@@ -99,17 +98,20 @@ void mad_bit_init(struct mad_bitptr *bitptr, unsigned char const *byte)
 unsigned int mad_bit_length(struct mad_bitptr const *begin,
 			    struct mad_bitptr const *end)
 {
-  return begin->left +
-    CHAR_BIT * (end->byte - (begin->byte + 1)) + (CHAR_BIT - end->left);
+  return end->readbit - begin->readbit;
 }
 
+unsigned char mad_bit_bitsleft(struct mad_bitptr const *bitptr)
+{
+  return 8 - (bitptr->readbit & 7);
+}
 /*
  * NAME:	bit->nextbyte()
  * DESCRIPTION:	return pointer to next unprocessed byte
  */
 unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)
 {
-  return bitptr->left == CHAR_BIT ? bitptr->byte : bitptr->byte + 1;
+  return (unsigned char const*)bitptr->ptr + ((bitptr->readbit + 7) >> 3);
 }
 
 /*
@@ -118,60 +120,43 @@ unsigned char const *mad_bit_nextbyte(struct mad_bitptr const *bitptr)
  */
 void mad_bit_skip(struct mad_bitptr *bitptr, unsigned int len)
 {
-  bitptr->byte += len / CHAR_BIT;
-  bitptr->left -= len % CHAR_BIT;
-
-  if (bitptr->left > CHAR_BIT) {
-    bitptr->byte++;
-    bitptr->left += CHAR_BIT;
-  }
-
-  if (bitptr->left < CHAR_BIT)
-    bitptr->cache = *bitptr->byte;
+  bitptr->readbit += len;
 }
 
 /*
  * NAME:	bit->read()
  * DESCRIPTION:	read an arbitrary number of bits and return their UIMSBF value
  */
+unsigned long bmask[] ICONST_ATTR =
+{ 0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f,
+  0x0000003f, 0x0000007f, 0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff,
+  0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff, 0x0000ffff, 0x0001ffff,
+  0x0003ffff, 0x0007ffff, 0x000fffff, 0x001fffff, 0x003fffff, 0x007fffff,
+  0x00ffffff, 0x01ffffff, 0x03ffffff, 0x07ffffff, 0x0fffffff, 0x1fffffff,
+  0x3fffffff, 0x7fffffff, 0xffffffff };
+unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len) ICODE_ATTR;
 unsigned long mad_bit_read(struct mad_bitptr *bitptr, unsigned int len)
 {
-  register unsigned long value;
+  unsigned long *curr = &bitptr->ptr[bitptr->readbit>>5];
 
-  if (bitptr->left == CHAR_BIT)
-    bitptr->cache = *bitptr->byte;
+  if(len)
+  {
+    if((bitptr->readbit ^ (bitptr->readbit + len - 1)) < 32)
+    {
+      bitptr->readbit += len;
 
-  if (len < bitptr->left) {
-    value = (bitptr->cache & ((1 << bitptr->left) - 1)) >>
-      (bitptr->left - len);
-    bitptr->left -= len;
+      return (betoh32(curr[0]) >> (-bitptr->readbit & 31)) & bmask[len];
+    }
+    else
+    {
+      bitptr->readbit += len;
 
-    return value;
+      return ((betoh32(curr[0]) << ( bitptr->readbit & 31))
+            + (betoh32(curr[1]) >> (-bitptr->readbit & 31))) & bmask[len];
+    }
   }
 
-  /* remaining bits in current byte */
-
-  value = bitptr->cache & ((1 << bitptr->left) - 1);
-  len  -= bitptr->left;
-
-  bitptr->byte++;
-  bitptr->left = CHAR_BIT;
-
-  /* more bytes */
-
-  while (len >= CHAR_BIT) {
-    value = (value << CHAR_BIT) | *bitptr->byte++;
-    len  -= CHAR_BIT;
-  }
-
-  if (len > 0) {
-    bitptr->cache = *bitptr->byte;
-
-    value = (value << len) | (bitptr->cache >> (CHAR_BIT - len));
-    bitptr->left -= len;
-  }
-
-  return value;
+  return 0;
 }
 
 # if 0

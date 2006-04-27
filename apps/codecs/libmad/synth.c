@@ -580,35 +580,138 @@ static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
 {
-  unsigned int phase, ch, s, sb, pe, po;
-  mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
+  unsigned int phase, ch, s, sb, p;
+  mad_fixed_t *pcm, (*filter)[2][2][16][8];
   mad_fixed_t const (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
-  mad_fixed_t const (*Dptr)[32];
-  mad_fixed64hi_t hi;
+  mad_fixed_t const (*D0ptr)[32];
+  mad_fixed_t const (*D1ptr)[32];
+  mad_fixed64hi_t hi0, hi1;
 
   for (ch = 0; ch < nch; ++ch) {
     sbsample = &frame->sbsample[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
-    pcm1     = synth->pcm.samples[ch];
+    pcm      = synth->pcm.samples[ch];
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
 	    (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
-      pe = phase & ~1;
-      po = ((phase - 1) & 0xf) | 1;
+      p = (phase - 1) & 0xf;
 
       /* calculate 32 samples */
-
       fe = &(*filter)[0][ phase & 1][0];
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      Dptr = &D[0];
+      D0ptr = (void*)&D[0][ p];
+      D1ptr = (void*)&D[0][-p];
 
-      asm volatile(
+      if(s & 1)
+      {
+        asm volatile(
+        "movem.l (%1), %%d0-%%d7\n\t"
+        "move.l 4(%2), %%a5\n\t"
+        "msac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d7, %%a5,   (%2), %%a5, %%acc0\n\t"
+        
+        "movem.l (%3), %%d0-%%d7\n\t"
+        "mac.l  %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d7, %%a5,               %%acc0\n\t"
+        "movclr.l %%acc0, %0\n\t"
+        : "=r" (hi0) : "a" (*fx), "a" (*D0ptr), "a" (*fe)
+        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+        pcm[0] = hi0 << 3; /* shift result to libmad's fixed point format */
+        pcm   += 16;
+
+        for (sb = 15; sb; sb--, fo++) {
+	  ++fe;
+	  ++D0ptr;
+	  ++D1ptr;
+
+	  /* D[32 - sb][i] == -D[sb][31 - i] */
+          asm volatile (
+          "movem.l (%0), %%d0-%%d7\n\t"
+          "move.l 4(%2), %%a5\n\t"
+          "msac.l %%d0, %%a5,  60(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d1, %%a5,  52(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d2, %%a5,  44(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d3, %%a5,  36(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d4, %%a5,  28(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d5, %%a5,  20(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d6, %%a5,  12(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d7, %%a5, 112(%3), %%a5, %%acc0\n\t"
+          "mac.l  %%d7, %%a5, 104(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d6, %%a5,  96(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d5, %%a5,  88(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d4, %%a5,  80(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d3, %%a5,  72(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d2, %%a5,  64(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d1, %%a5, 120(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d0, %%a5,   8(%2), %%a5, %%acc1\n\t"
+          "movem.l (%1), %%d0-%%d7\n\t"
+          "mac.l  %%d7, %%a5,  16(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d6, %%a5,  24(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d5, %%a5,  32(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d4, %%a5,  40(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d3, %%a5,  48(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d2, %%a5,  56(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d1, %%a5,    (%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d0, %%a5,  60(%3), %%a5, %%acc0\n\t"
+          "mac.l  %%d0, %%a5,  68(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d1, %%a5,  76(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d2, %%a5,  84(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d3, %%a5,  92(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d4, %%a5, 100(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d5, %%a5, 108(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d6, %%a5, 116(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d7, %%a5,                %%acc1\n\t"
+          : : "a" (*fo), "a" (*fe), "a" (*D0ptr), "a" (*D1ptr)
+          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+          asm volatile(
+          "movclr.l %%acc0, %0\n\t"
+          "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
+
+	  pcm[-sb] = hi0 << 3;
+	  pcm[ sb] = hi1 << 3;
+        }
+
+        ++D0ptr;
+        asm volatile(
+        "movem.l (%1), %%d0-%%d7\n\t"
+        "move.l 4(%2), %%a5\n\t"
+        "mac.l %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d7, %%a5,               %%acc0\n\t"
+        "movclr.l %%acc0, %0\n\t"
+        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr) 
+        : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
+
+        pcm[0] = -(hi0 << 3);
+      }
+      else
+      {
+        asm volatile(
         "movem.l (%1), %%d0-%%d7\n\t"
         "move.l (%2), %%a5\n\t"
         "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
@@ -617,127 +720,80 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
         "msac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
         "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
-        "msac.l %%d7, %%a5, (%4), %%a5, %%acc0\n\t"
+        "msac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
+        "msac.l %%d7, %%a5,  4(%2), %%a5, %%acc0\n\t"
         
         "movem.l (%3), %%d0-%%d7\n\t"
-        "mac.l %%d0, %%a5, 56(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d1, %%a5, 48(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d2, %%a5, 40(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d3, %%a5, 32(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d4, %%a5, 24(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d5, %%a5, 16(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d6, %%a5, 8(%4), %%a5, %%acc0\n\t"
-        "mac.l %%d7, %%a5, %%acc0\n\t"
+        "mac.l  %%d0, %%a5, 60(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d1, %%a5, 52(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d2, %%a5, 44(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d3, %%a5, 36(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d4, %%a5, 28(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d5, %%a5, 20(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d6, %%a5, 12(%2), %%a5, %%acc0\n\t"
+        "mac.l  %%d7, %%a5,               %%acc0\n\t"
         "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi) 
-        : "a" (*fx), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
+        : "=r" (hi0) : "a" (*fx), "a" (*D0ptr), "a" (*fe)
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-      *pcm1++ = hi << 3; /* shift result to libmad's fixed point format */
+        pcm[0] = hi0 << 3; /* shift result to libmad's fixed point format */
+        pcm   += 16;
 
-      pcm2 = pcm1 + 30;
+        for (sb = 15; sb; sb--, fo++) {
+	  ++fe;
+	  ++D0ptr;
+	  ++D1ptr;
 
-      for (sb = 1; sb < 16; ++sb) {
-	++fe;
-	++Dptr;
-
-	/* D[32 - sb][i] == -D[sb][31 - i] */
-#if __GNUC__ >= 4
-        /* GCC 4.0.1 can't find a suitable register here if all of d0-d7
-         * are clobbered, so use fewer registers. It does mean two extra 
-         * movem instructions, but should have no additional performance 
-         * impact (like not being able to use burst mode for the movem).
-         */
-        asm volatile (
-          "movem.l (%1), %%d0-%%d3\n\t"
+	  /* D[32 - sb][i] == -D[sb][31 - i] */
+          asm volatile (
+          "movem.l (%0), %%d0-%%d7\n\t"
           "move.l (%2), %%a5\n\t"
-          "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
-          "movem.l 16(%1), %%d0-%%d3\n\t"
-          "msac.l %%d0, %%a5, 24(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d1, %%a5, 16(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d2, %%a5, 8(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d3, %%a5, 8(%4), %%a5, %%acc0\n\t"
-        
-          "movem.l 16(%3), %%d0-%%d3\n\t"
-          "mac.l %%d3, %%a5, 16(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d2, %%a5, 24(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d1, %%a5, 32(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d0, %%a5, 40(%4), %%a5, %%acc0\n\t"
-          "movem.l (%3), %%d0-%%d3\n\t"
-          "mac.l %%d3, %%a5, 48(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d2, %%a5, 56(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d1, %%a5, (%4), %%a5, %%acc0\n\t"
-          "mac.l %%d0, %%a5, %%acc0\n\t"
-          "movclr.l %%acc0, %0\n\t"
-          : "=r" (hi) 
-          : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
-          : "d0", "d1", "d2", "d3", "a5");
-#else
-        asm volatile (
+          "msac.l %%d0, %%a5,  56(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d1, %%a5,  48(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d2, %%a5,  40(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d3, %%a5,  32(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d4, %%a5,  24(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d5, %%a5,  16(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d6, %%a5,   8(%2), %%a5, %%acc0\n\t"
+          "msac.l %%d7, %%a5, 116(%3), %%a5, %%acc0\n\t"
+          "mac.l  %%d7, %%a5, 108(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d6, %%a5, 100(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d5, %%a5,  92(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d4, %%a5,  84(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d3, %%a5,  76(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d2, %%a5,  68(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d1, %%a5,  60(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d0, %%a5,  12(%2), %%a5, %%acc1\n\t"
           "movem.l (%1), %%d0-%%d7\n\t"
-          "move.l (%2), %%a5\n\t"
-          "msac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d1, %%a5, 48(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d2, %%a5, 40(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
-          "msac.l %%d7, %%a5, 8(%4), %%a5, %%acc0\n\t"
-        
-          "movem.l (%3), %%d0-%%d7\n\t"
-          "mac.l %%d7, %%a5, 16(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d6, %%a5, 24(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d5, %%a5, 32(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d4, %%a5, 40(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d3, %%a5, 48(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d2, %%a5, 56(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d1, %%a5, (%4), %%a5, %%acc0\n\t"
-          "mac.l %%d0, %%a5, %%acc0\n\t"
-          "movclr.l %%acc0, %0\n\t"
-          : "=r" (hi) 
-          : "a" (*fo), "a" (*Dptr + po), "a" (*fe), "a" (*Dptr + pe) 
+          "mac.l  %%d7, %%a5,  20(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d6, %%a5,  28(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d5, %%a5,  36(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d4, %%a5,  44(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d3, %%a5,  52(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d2, %%a5,  60(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d1, %%a5,   4(%2), %%a5, %%acc0\n\t"
+          "mac.l  %%d0, %%a5, 120(%3), %%a5, %%acc0\n\t"
+          "mac.l  %%d0, %%a5,  64(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d1, %%a5,  72(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d2, %%a5,  80(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d3, %%a5,  88(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d4, %%a5,  96(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d5, %%a5, 104(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d6, %%a5, 112(%3), %%a5, %%acc1\n\t"
+          "mac.l  %%d7, %%a5,                %%acc1\n\t"
+          : : "a" (*fo), "a" (*fe), "a" (*D0ptr), "a" (*D1ptr)
           : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-#endif
-	*pcm1++ = hi << 3;
-        
+
+          asm volatile(
+          "movclr.l %%acc0, %0\n\t"
+          "movclr.l %%acc1, %1\n\t"  : "=d" (hi0), "=d" (hi1) );
+
+	  pcm[-sb] = hi0 << 3;
+	  pcm[ sb] = hi1 << 3;
+        }
+
+        ++D0ptr;
         asm volatile(
-          "movem.l (%1), %%d0-%%d7\n\t"
-          "move.l 60(%2), %%a5\n\t"
-          "mac.l %%d0, %%a5, 68(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d1, %%a5, 76(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d2, %%a5, 84(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d3, %%a5, 92(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d4, %%a5, 100(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d5, %%a5, 108(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d6, %%a5, 116(%2), %%a5, %%acc0\n\t"
-          "mac.l %%d7, %%a5, 116(%4), %%a5, %%acc0\n\t"
-       
-          "movem.l (%3), %%d0-%%d7\n\t"
-          "mac.l %%d7, %%a5, 108(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d6, %%a5, 100(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d5, %%a5, 92(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d4, %%a5, 84(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d3, %%a5, 76(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d2, %%a5, 68(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d1, %%a5, 60(%4), %%a5, %%acc0\n\t"
-          "mac.l %%d0, %%a5, %%acc0\n\t"
-          "movclr.l %%acc0, %0\n\t"
-          : "=r" (hi) 
-          : "a" (*fe), "a" (*Dptr - pe), "a" (*fo), "a" (*Dptr - po) 
-          : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
-
-	*pcm2-- = hi << 3;
-
-	++fo;
-      }
-
-      ++Dptr;
-      asm volatile(
         "movem.l (%1), %%d0-%%d7\n\t"
         "move.l (%2), %%a5\n\t"
         "mac.l %%d0, %%a5, 56(%2), %%a5, %%acc0\n\t"
@@ -746,15 +802,15 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
         "mac.l %%d3, %%a5, 32(%2), %%a5, %%acc0\n\t"
         "mac.l %%d4, %%a5, 24(%2), %%a5, %%acc0\n\t"
         "mac.l %%d5, %%a5, 16(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d6, %%a5, 8(%2), %%a5, %%acc0\n\t"
-        "mac.l %%d7, %%a5, %%acc0\n\t"
+        "mac.l %%d6, %%a5,  8(%2), %%a5, %%acc0\n\t"
+        "mac.l %%d7, %%a5,               %%acc0\n\t"
         "movclr.l %%acc0, %0\n\t"
-        : "=r" (hi) : "a" (*fo), "a" (*Dptr + po) 
+        : "=r" (hi0) : "a" (*fo), "a" (*D0ptr) 
         : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5");
 
-      *pcm1 = -(hi << 3);
-      pcm1 += 16;
-
+        pcm[0] = -(hi0 << 3);
+      }
+      pcm  += 16;
       phase = (phase + 1) % 16;
     }
   }
@@ -766,129 +822,200 @@ static
 void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
 		unsigned int nch, unsigned int ns)
 {
-  unsigned int phase, ch, s, sb, pe, po;
-  mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
+  int          p;
+  unsigned int phase, ch, s, sb;
+  mad_fixed_t *pcm, (*filter)[2][2][16][8];
   mad_fixed_t const (*sbsample)[36][32];
-  register mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
-  register mad_fixed_t const (*Dptr)[32], *ptr;
-  register mad_fixed64hi_t hi;
-  register mad_fixed64lo_t lo;
+  mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
+  mad_fixed_t const (*D0ptr)[32], *ptr;
+  mad_fixed_t const (*D1ptr)[32];
+  mad_fixed64hi_t hi;
+  mad_fixed64lo_t lo;
 
   for (ch = 0; ch < nch; ++ch) {
     sbsample = &frame->sbsample[ch];
     filter   = &synth->filter[ch];
     phase    = synth->phase;
-    pcm1     = synth->pcm.samples[ch];
+    pcm      = synth->pcm.samples[ch];
 
     for (s = 0; s < ns; ++s) {
       dct32((*sbsample)[s], phase >> 1,
 	    (*filter)[0][phase & 1], (*filter)[1][phase & 1]);
 
-      pe = phase & ~1;
-      po = ((phase - 1) & 0xf) | 1;
+      p = (phase - 1) & 0xf;
 
       /* calculate 32 samples */
-
       fe = &(*filter)[0][ phase & 1][0];
       fx = &(*filter)[0][~phase & 1][0];
       fo = &(*filter)[1][~phase & 1][0];
 
-      Dptr = &D[0];
+      D0ptr = (void*)&D[0][ p];
+      D1ptr = (void*)&D[0][-p];
 
-      ptr = *Dptr + po;
-      ML0(hi, lo, (*fx)[0], ptr[ 0]);
-      MLA(hi, lo, (*fx)[1], ptr[14]);
-      MLA(hi, lo, (*fx)[2], ptr[12]);
-      MLA(hi, lo, (*fx)[3], ptr[10]);
-      MLA(hi, lo, (*fx)[4], ptr[ 8]);
-      MLA(hi, lo, (*fx)[5], ptr[ 6]);
-      MLA(hi, lo, (*fx)[6], ptr[ 4]);
-      MLA(hi, lo, (*fx)[7], ptr[ 2]);
-      MLN(hi, lo);
+      if(s & 1)
+      {
+        ptr = *D0ptr;
+        ML0(hi, lo, (*fx)[0], ptr[ 1]);
+        MLA(hi, lo, (*fx)[1], ptr[15]);
+        MLA(hi, lo, (*fx)[2], ptr[13]);
+        MLA(hi, lo, (*fx)[3], ptr[11]);
+        MLA(hi, lo, (*fx)[4], ptr[ 9]);
+        MLA(hi, lo, (*fx)[5], ptr[ 7]);
+        MLA(hi, lo, (*fx)[6], ptr[ 5]);
+        MLA(hi, lo, (*fx)[7], ptr[ 3]);
+        MLN(hi, lo);
+        MLA(hi, lo, (*fe)[0], ptr[ 0]);
+        MLA(hi, lo, (*fe)[1], ptr[14]);
+        MLA(hi, lo, (*fe)[2], ptr[12]);
+        MLA(hi, lo, (*fe)[3], ptr[10]);
+        MLA(hi, lo, (*fe)[4], ptr[ 8]);
+        MLA(hi, lo, (*fe)[5], ptr[ 6]);
+        MLA(hi, lo, (*fe)[6], ptr[ 4]);
+        MLA(hi, lo, (*fe)[7], ptr[ 2]);
+        pcm[0] = SHIFT(MLZ(hi, lo));
+        pcm   += 16;
 
-      ptr = *Dptr + pe;
-      MLA(hi, lo, (*fe)[0], ptr[ 0]);
-      MLA(hi, lo, (*fe)[1], ptr[14]);
-      MLA(hi, lo, (*fe)[2], ptr[12]);
-      MLA(hi, lo, (*fe)[3], ptr[10]);
-      MLA(hi, lo, (*fe)[4], ptr[ 8]);
-      MLA(hi, lo, (*fe)[5], ptr[ 6]);
-      MLA(hi, lo, (*fe)[6], ptr[ 4]);
-      MLA(hi, lo, (*fe)[7], ptr[ 2]);
+        for (sb = 15; sb; sb--, fo++)
+        {
+	  ++fe;
+	  ++D0ptr;
+	  ++D1ptr;
 
-      *pcm1++ = SHIFT(MLZ(hi, lo));
+	  /* D[32 - sb][i] == -D[sb][31 - i] */
+	  ptr = *D0ptr;
+	  ML0(hi, lo, (*fo)[0], ptr[ 1]);
+	  MLA(hi, lo, (*fo)[1], ptr[15]);
+	  MLA(hi, lo, (*fo)[2], ptr[13]);
+	  MLA(hi, lo, (*fo)[3], ptr[11]);
+	  MLA(hi, lo, (*fo)[4], ptr[ 9]);
+	  MLA(hi, lo, (*fo)[5], ptr[ 7]);
+	  MLA(hi, lo, (*fo)[6], ptr[ 5]);
+	  MLA(hi, lo, (*fo)[7], ptr[ 3]);
+	  MLN(hi, lo);
+	  MLA(hi, lo, (*fe)[7], ptr[ 2]);
+	  MLA(hi, lo, (*fe)[6], ptr[ 4]);
+	  MLA(hi, lo, (*fe)[5], ptr[ 6]);
+	  MLA(hi, lo, (*fe)[4], ptr[ 8]);
+	  MLA(hi, lo, (*fe)[3], ptr[10]);
+	  MLA(hi, lo, (*fe)[2], ptr[12]);
+	  MLA(hi, lo, (*fe)[1], ptr[14]);
+	  MLA(hi, lo, (*fe)[0], ptr[ 0]);
+	  pcm[-sb] = SHIFT(MLZ(hi, lo));
 
-      pcm2 = pcm1 + 30;
+	  ptr = *D1ptr;
+	  ML0(hi, lo, (*fe)[0], ptr[31 - 16]);
+	  MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
+	  MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
+	  MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
+	  MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
+	  MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
+	  MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
+	  MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
+          MLA(hi, lo, (*fo)[7], ptr[31 -  3]);
+	  MLA(hi, lo, (*fo)[6], ptr[31 -  5]);
+	  MLA(hi, lo, (*fo)[5], ptr[31 -  7]);
+	  MLA(hi, lo, (*fo)[4], ptr[31 -  9]);
+	  MLA(hi, lo, (*fo)[3], ptr[31 - 11]);
+	  MLA(hi, lo, (*fo)[2], ptr[31 - 13]);
+	  MLA(hi, lo, (*fo)[1], ptr[31 - 15]);
+	  MLA(hi, lo, (*fo)[0], ptr[31 -  1]);
+	  pcm[sb] = SHIFT(MLZ(hi, lo));
+        }
 
-      for (sb = 1; sb < 16; ++sb) {
-	++fe;
-	++Dptr;
+        ptr = *(D0ptr + 1);
+        ML0(hi, lo, (*fo)[0], ptr[ 1]);
+        MLA(hi, lo, (*fo)[1], ptr[15]);
+        MLA(hi, lo, (*fo)[2], ptr[13]);
+        MLA(hi, lo, (*fo)[3], ptr[11]);
+        MLA(hi, lo, (*fo)[4], ptr[ 9]);
+        MLA(hi, lo, (*fo)[5], ptr[ 7]);
+        MLA(hi, lo, (*fo)[6], ptr[ 5]);
+        MLA(hi, lo, (*fo)[7], ptr[ 3]);
+        pcm[0] = SHIFT(-MLZ(hi, lo));
+      }
+      else
+      {
+        ptr = *D0ptr;
+        ML0(hi, lo, (*fx)[0], ptr[ 0]);
+        MLA(hi, lo, (*fx)[1], ptr[14]);
+        MLA(hi, lo, (*fx)[2], ptr[12]);
+        MLA(hi, lo, (*fx)[3], ptr[10]);
+        MLA(hi, lo, (*fx)[4], ptr[ 8]);
+        MLA(hi, lo, (*fx)[5], ptr[ 6]);
+        MLA(hi, lo, (*fx)[6], ptr[ 4]);
+        MLA(hi, lo, (*fx)[7], ptr[ 2]);
+        MLN(hi, lo);
+        MLA(hi, lo, (*fe)[0], ptr[ 1]);
+        MLA(hi, lo, (*fe)[1], ptr[15]);
+        MLA(hi, lo, (*fe)[2], ptr[13]);
+        MLA(hi, lo, (*fe)[3], ptr[11]);
+        MLA(hi, lo, (*fe)[4], ptr[ 9]);
+        MLA(hi, lo, (*fe)[5], ptr[ 7]);
+        MLA(hi, lo, (*fe)[6], ptr[ 5]);
+        MLA(hi, lo, (*fe)[7], ptr[ 3]);
+        pcm[0] = SHIFT(MLZ(hi, lo));
+        pcm   += 16;
 
-	/* D[32 - sb][i] == -D[sb][31 - i] */
+        for (sb = 15; sb; sb--, fo++)
+        {
+	  ++fe;
+	  ++D0ptr;
+	  ++D1ptr;
 
-	ptr = *Dptr + po;
-	ML0(hi, lo, (*fo)[0], ptr[ 0]);
-	MLA(hi, lo, (*fo)[1], ptr[14]);
-	MLA(hi, lo, (*fo)[2], ptr[12]);
-	MLA(hi, lo, (*fo)[3], ptr[10]);
-	MLA(hi, lo, (*fo)[4], ptr[ 8]);
-	MLA(hi, lo, (*fo)[5], ptr[ 6]);
-	MLA(hi, lo, (*fo)[6], ptr[ 4]);
-	MLA(hi, lo, (*fo)[7], ptr[ 2]);
-	MLN(hi, lo);
+	  /* D[32 - sb][i] == -D[sb][31 - i] */
+	  ptr = *D0ptr;
+	  ML0(hi, lo, (*fo)[0], ptr[ 0]);
+	  MLA(hi, lo, (*fo)[1], ptr[14]);
+	  MLA(hi, lo, (*fo)[2], ptr[12]);
+	  MLA(hi, lo, (*fo)[3], ptr[10]);
+	  MLA(hi, lo, (*fo)[4], ptr[ 8]);
+	  MLA(hi, lo, (*fo)[5], ptr[ 6]);
+	  MLA(hi, lo, (*fo)[6], ptr[ 4]);
+	  MLA(hi, lo, (*fo)[7], ptr[ 2]);
+	  MLN(hi, lo);
+	  MLA(hi, lo, (*fe)[7], ptr[ 3]);
+	  MLA(hi, lo, (*fe)[6], ptr[ 5]);
+	  MLA(hi, lo, (*fe)[5], ptr[ 7]);
+	  MLA(hi, lo, (*fe)[4], ptr[ 9]);
+	  MLA(hi, lo, (*fe)[3], ptr[11]);
+	  MLA(hi, lo, (*fe)[2], ptr[13]);
+	  MLA(hi, lo, (*fe)[1], ptr[15]);
+	  MLA(hi, lo, (*fe)[0], ptr[ 1]);
+	  pcm[-sb] = SHIFT(MLZ(hi, lo));
 
-	ptr = *Dptr + pe;
-	MLA(hi, lo, (*fe)[7], ptr[ 2]);
-	MLA(hi, lo, (*fe)[6], ptr[ 4]);
-	MLA(hi, lo, (*fe)[5], ptr[ 6]);
-	MLA(hi, lo, (*fe)[4], ptr[ 8]);
-	MLA(hi, lo, (*fe)[3], ptr[10]);
-	MLA(hi, lo, (*fe)[2], ptr[12]);
-	MLA(hi, lo, (*fe)[1], ptr[14]);
-	MLA(hi, lo, (*fe)[0], ptr[ 0]);
+	  ptr = *D1ptr;
+	  ML0(hi, lo, (*fe)[0], ptr[31 -  1]);
+	  MLA(hi, lo, (*fe)[1], ptr[31 - 15]);
+	  MLA(hi, lo, (*fe)[2], ptr[31 - 13]);
+	  MLA(hi, lo, (*fe)[3], ptr[31 - 11]);
+	  MLA(hi, lo, (*fe)[4], ptr[31 -  9]);
+	  MLA(hi, lo, (*fe)[5], ptr[31 -  7]);
+	  MLA(hi, lo, (*fe)[6], ptr[31 -  5]);
+	  MLA(hi, lo, (*fe)[7], ptr[31 -  3]);
+	  MLA(hi, lo, (*fo)[7], ptr[31 -  2]);
+	  MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
+	  MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
+	  MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
+	  MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
+	  MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
+	  MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
+	  MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
+	  pcm[sb] = SHIFT(MLZ(hi, lo));
+        }
 
-	*pcm1++ = SHIFT(MLZ(hi, lo));
-
-	ptr = *Dptr - pe;
-	ML0(hi, lo, (*fe)[0], ptr[31 - 16]);
-	MLA(hi, lo, (*fe)[1], ptr[31 - 14]);
-	MLA(hi, lo, (*fe)[2], ptr[31 - 12]);
-	MLA(hi, lo, (*fe)[3], ptr[31 - 10]);
-	MLA(hi, lo, (*fe)[4], ptr[31 -  8]);
-	MLA(hi, lo, (*fe)[5], ptr[31 -  6]);
-	MLA(hi, lo, (*fe)[6], ptr[31 -  4]);
-	MLA(hi, lo, (*fe)[7], ptr[31 -  2]);
-
-	ptr = *Dptr - po;
-	MLA(hi, lo, (*fo)[7], ptr[31 -  2]);
-	MLA(hi, lo, (*fo)[6], ptr[31 -  4]);
-	MLA(hi, lo, (*fo)[5], ptr[31 -  6]);
-	MLA(hi, lo, (*fo)[4], ptr[31 -  8]);
-	MLA(hi, lo, (*fo)[3], ptr[31 - 10]);
-	MLA(hi, lo, (*fo)[2], ptr[31 - 12]);
-	MLA(hi, lo, (*fo)[1], ptr[31 - 14]);
-	MLA(hi, lo, (*fo)[0], ptr[31 - 16]);
-
-	*pcm2-- = SHIFT(MLZ(hi, lo));
-
-	++fo;
+        ptr = *(D0ptr + 1);
+        ML0(hi, lo, (*fo)[0], ptr[ 0]);
+        MLA(hi, lo, (*fo)[1], ptr[14]);
+        MLA(hi, lo, (*fo)[2], ptr[12]);
+        MLA(hi, lo, (*fo)[3], ptr[10]);
+        MLA(hi, lo, (*fo)[4], ptr[ 8]);
+        MLA(hi, lo, (*fo)[5], ptr[ 6]);
+        MLA(hi, lo, (*fo)[6], ptr[ 4]);
+        MLA(hi, lo, (*fo)[7], ptr[ 2]);
+        pcm[0] = SHIFT(-MLZ(hi, lo));
       }
 
-      ++Dptr;
-
-      ptr = *Dptr + po;
-      ML0(hi, lo, (*fo)[0], ptr[ 0]);
-      MLA(hi, lo, (*fo)[1], ptr[14]);
-      MLA(hi, lo, (*fo)[2], ptr[12]);
-      MLA(hi, lo, (*fo)[3], ptr[10]);
-      MLA(hi, lo, (*fo)[4], ptr[ 8]);
-      MLA(hi, lo, (*fo)[5], ptr[ 6]);
-      MLA(hi, lo, (*fo)[6], ptr[ 4]);
-      MLA(hi, lo, (*fo)[7], ptr[ 2]);
-
-      *pcm1 = SHIFT(-MLZ(hi, lo));
-      pcm1 += 16;
-
+      pcm  += 16;
       phase = (phase + 1) % 16;
     }
   }
