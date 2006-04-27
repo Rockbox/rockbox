@@ -117,7 +117,7 @@
     *: "Loading..."
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1307,7 +1307,7 @@
     *: "Warn When Erasing Dynamic Playlist"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5087,7 +5087,7 @@
     *: "Trigger"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5101,7 +5101,7 @@
     *: "Once"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5115,7 +5115,7 @@
     *: "Repeat"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5129,7 +5129,7 @@
     *: "Start Above"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5143,7 +5143,7 @@
     *: "for at least"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5157,7 +5157,7 @@
     *: "Stop Below"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5171,7 +5171,7 @@
     *: "for at least"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5185,7 +5185,7 @@
     *: "Presplit Gap"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5199,7 +5199,7 @@
     *: "-inf"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5213,7 +5213,7 @@
     *: "Trigger Idle"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5227,7 +5227,7 @@
     *: "Trigger Active"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5325,7 +5325,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5339,7 +5339,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7313,7 +7313,7 @@
     *: "Erase dynamic playlist?"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7663,7 +7663,7 @@
     *: "%d.%01dMHz"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
