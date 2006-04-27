@@ -58,7 +58,7 @@ extern "C" {
 
 enum {
     MPC_FRAME_LENGTH = (36 * 32),    /// samples per mpc frame
-    MPC_DECODER_BUFFER_LENGTH = 4 * MPC_FRAME_LENGTH /// required buffer size for decoder
+    MPC_DECODER_BUFFER_LENGTH = 2 * MPC_FRAME_LENGTH /// required buffer size for decoder
 };
 
 // error codes

@@ -67,7 +67,7 @@ typedef struct mpc_decoder_t {
     mpc_uint32_t  Zaehler; /// actual index within read-buffer
 
     mpc_uint32_t  samples_to_skip;
-
+    mpc_uint32_t  last_block_samples;
     mpc_uint32_t  FwdJumpInfo;
     mpc_uint32_t  ActDecodePos;
     

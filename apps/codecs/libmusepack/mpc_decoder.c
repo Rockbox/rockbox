@@ -351,6 +351,21 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
 
     mpc_uint32_t  FrameBitCnt = 0;
 
+    // output the last part of the last frame here, if needed
+    if (d->last_block_samples > 0) {
+        output_frame_length = d->last_block_samples;
+        d->last_block_samples = 0; // it's going to be handled now, so reset it 
+        if (!d->TrueGaplessPresent) {
+            mpc_decoder_reset_y(d);
+        } else {
+            mpc_decoder_bitstream_read(d, 20);
+            mpc_decoder_read_bitstream_sv7(d);
+            mpc_decoder_requantisierung(d, d->Max_Band);
+        }
+        mpc_decoder_synthese_filter_float(d, buffer);
+        return output_frame_length;
+    }
+    
     if (d->DecodedFrames >= d->OverallFrames) {
         return (mpc_uint32_t)(-1);                           // end of file -> abort decoding
     }
@@ -403,19 +418,10 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
 
         // additional FilterDecay samples are needed for decay of synthesis filter
         if (MPC_DECODER_SYNTH_DELAY + mod_block >= MPC_FRAME_LENGTH) {
-            if (!d->TrueGaplessPresent) {
-                mpc_decoder_reset_y(d);
-            } else {
-                mpc_decoder_bitstream_read(d, 20);
-                mpc_decoder_read_bitstream_sv7(d);
-                mpc_decoder_requantisierung(d, d->Max_Band);
-            }
-
-            mpc_decoder_synthese_filter_float(d, buffer + 2304);
-
-            output_frame_length = MPC_FRAME_LENGTH + FilterDecay;
+            // this variable will be checked for at the top of the function
+            d->last_block_samples = FilterDecay;
         }
-        else {                              // there are only FilterDecay samples needed for this frame
+        else { // there are only FilterDecay samples needed for this frame
             output_frame_length = FilterDecay;
         }
     }
@@ -1173,6 +1179,7 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   d->OverallFrames = 0;
   d->DecodedFrames = 0;
   d->TrueGaplessPresent = 0;
+  d->last_block_samples = 0;
   d->WordsRead = 0;
   d->Max_Band = 0;
   d->SampleRate = 0;
