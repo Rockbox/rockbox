@@ -344,15 +344,19 @@ while(<LANG>) {
                     # should use for this phrase. Voice-only strings are
                     # separated.
 
-                    # basic syntax error alerts
-                    if($dest != /^\"/) {
-                        print STDERR "dest around line $line lacks quotes!\n";
+                    # basic syntax error alerts, if there are no quotes we
+                    # will assume an empty string was intended
+                    if($dest !~ /^\"/) {
+                        print STDERR "Warning: dest before line $line lacks quotes!\n";
+                        $dest='""';
                     }
-                    if($src != /^\"/) {
-                        print STDERR "source around line $line lacks quotes!\n";
+                    if($src !~ /^\"/) {
+                        print STDERR "Warning: source before line $line lacks quotes!\n";
+                        $src='""';
                     }
-                    if($voice != /^\"/) {
-                        print STDERR "voice around line $line lacks quotes!\n";
+                    if($voice !~ /^\"/) {
+                        print STDERR "Warning: voice before line $line lacks quotes!\n";
+                        $voice='""';
                     }
 
                     if($idstr =~ /^VOICE/) {
