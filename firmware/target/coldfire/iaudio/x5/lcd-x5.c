@@ -108,15 +108,14 @@ inline void lcd_begin_write_gram(void)
 inline void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
 inline void lcd_write_data(const unsigned short* p_bytes, int count)
 {
-    /* Ok, by doing 32bit reads we gain a tad bit so I decided to leave this
-       code in for now, even though when called with an odd 'count' we will
-       actually output one pixel "too many". */
-
     unsigned int tmp;
     unsigned int *ptr = (unsigned int *)p_bytes;
+    bool extra;
 
-    if(count&1)
-        count++;
+    /* if there's on odd number of pixels, remmber this and output the
+       trailing pixel after the loop */
+    extra = (count&1)?true:false;
+
     count >>= 1;
     while(count--) {
         tmp = *ptr++;
@@ -124,6 +123,12 @@ inline void lcd_write_data(const unsigned short* p_bytes, int count)
         *(volatile unsigned short *)0xf0008002 = tmp>>15;
         *(volatile unsigned short *)0xf0008002 = high8to9[(tmp >> 8)&255];
         *(volatile unsigned short *)0xf0008002 = tmp<<1;
+    }
+    if(extra) {
+        /* the final "spare" pixel */
+        unsigned short read = *(unsigned short *)ptr;
+        *(volatile unsigned short *)0xf0008002 = high8to9[read >> 8];
+        *(volatile unsigned short *)0xf0008002 = read<<1;
     }
 }
 
