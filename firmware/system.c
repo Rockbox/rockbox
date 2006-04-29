@@ -683,17 +683,15 @@ static const char* const irqname[] = {
     "ParityEr","A/D conv","","","Watchdog","DRAMRefr"
 };
 
-
-/* Vector table & UIE block. 
- * Handled in asm because gcc 4.x doesn't allow weak aliases to symbols
- * defined in an asm block -- silly.
- * Reset vectors (0..3) are handled in crt0.S */
-
 #define RESERVE_INTERRUPT(number) "\t.long\t_UIE" #number "\n"
 #define DEFAULT_INTERRUPT(name, number)  "\t.weak\t_" #name \
                           "\n\t.set\t_" #name ",_UIE" #number \
                           "\n\t.long\t_" #name "\n"
 
+/* Vector table. 
+ * Handled in asm because gcc 4.x doesn't allow weak aliases to symbols
+ * defined in an asm block -- silly.
+ * Reset vectors (0..3) are handled in crt0.S */
 asm (
     ".section\t.vectors,\"aw\",@progbits\n"
     DEFAULT_INTERRUPT (GII,      4)
@@ -802,8 +800,72 @@ asm (
     DEFAULT_INTERRUPT (TEI1,   107)
     RESERVE_INTERRUPT (        108)
     DEFAULT_INTERRUPT (ADITI,  109)
-
     "\t.text\n"
+);
+
+extern void UIE0(void); /* needed for calculating the UIE number */
+
+void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
+{
+#if CONFIG_LED == LED_REAL
+    bool state = true;
+#endif
+    unsigned int n;
+    char str[32];
+
+    asm volatile ("sts\tpr,%0" : "=r"(n));
+    
+    /* clear screen */
+    lcd_clear_display ();
+#ifdef HAVE_LCD_BITMAP
+    lcd_setfont(FONT_SYSFIXED);
+#endif
+    /* output exception */
+    n = (n - (unsigned)UIE0 - 4)>>2; /* get exception or interrupt number */
+    snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
+    lcd_puts(0,0,str);
+    snprintf(str,sizeof(str),"at %08x",pc);
+    lcd_puts(0,1,str);
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_update ();
+#endif
+
+    while (1)
+    {
+#if CONFIG_LED == LED_REAL
+        volatile int i;
+        led (state);
+        state = !state;
+        
+        for (i = 0; i < 240000; ++i);
+#endif
+
+        /* try to restart firmware if ON is pressed */
+#if CONFIG_KEYPAD == PLAYER_PAD
+        if (!(PADRL & 0x20))
+#elif CONFIG_KEYPAD == RECORDER_PAD
+#ifdef HAVE_FMADC
+        if (!(PCDR & 0x0008))
+#else
+        if (!(PBDRH & 0x01))
+#endif
+#elif CONFIG_KEYPAD == ONDIO_PAD
+        if (!(PCDR & 0x0008))
+#endif
+        {   
+            /* enable the watchguard timer, but don't service it */
+            RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
+            TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
+        }
+    }
+}
+
+/* UIE# block. 
+ * Keep directly after UIE() to let it go into the same section as UIE().
+ * Otherwise there will be displacement overflows with sectioned compilation
+ * (bootbox) */
+asm (
     "_UIE0:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE1:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE2:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
@@ -915,64 +977,6 @@ asm (
     "_UIE108:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
     "_UIE109:\tbsr\t_UIE\n\tmov.l\t@r15+,r4\n"
 );
-
-extern void UIE0(void); /* needed for calculating the UIE number */
-
-void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
-{
-#if CONFIG_LED == LED_REAL
-    bool state = true;
-#endif
-    unsigned int n;
-    char str[32];
-
-    asm volatile ("sts\tpr,%0" : "=r"(n));
-    
-    /* clear screen */
-    lcd_clear_display ();
-#ifdef HAVE_LCD_BITMAP
-    lcd_setfont(FONT_SYSFIXED);
-#endif
-    /* output exception */
-    n = (n - (unsigned)UIE0 - 4)>>2; /* get exception or interrupt number */
-    snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
-    lcd_puts(0,0,str);
-    snprintf(str,sizeof(str),"at %08x",pc);
-    lcd_puts(0,1,str);
-
-#ifdef HAVE_LCD_BITMAP
-    lcd_update ();
-#endif
-
-    while (1)
-    {
-#if CONFIG_LED == LED_REAL
-        volatile int i;
-        led (state);
-        state = !state;
-        
-        for (i = 0; i < 240000; ++i);
-#endif
-
-        /* try to restart firmware if ON is pressed */
-#if CONFIG_KEYPAD == PLAYER_PAD
-        if (!(PADRL & 0x20))
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#ifdef HAVE_FMADC
-        if (!(PCDR & 0x0008))
-#else
-        if (!(PBDRH & 0x01))
-#endif
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        if (!(PCDR & 0x0008))
-#endif
-        {   
-            /* enable the watchguard timer, but don't service it */
-            RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
-            TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
-        }
-    }
-}
 
 void system_init(void)
 {
