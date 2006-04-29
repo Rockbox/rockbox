@@ -78,6 +78,15 @@ Width: 220
 </wps>
 
 <wps>
+Name: boxes-320x240c.wps
+Author: Zakk Roberts (after Christi Scarborough and Magnus Westerlund)
+Font: rockbox_default.fnt
+Statusbar: on
+Height: 240
+Width: 320
+</wps>
+
+<wps>
 Name: boxes-112x64.wps
 Author: Christi Scarborough (after Magnus Westerlund)
 Font: rockbox_default.fnt
