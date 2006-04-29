@@ -38,7 +38,9 @@
 
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 
-/* asm reading + writing */
+/* asm optimised read & write loops */
+
+#define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
 
 #define ATA_IOBASE      0x20000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
@@ -80,7 +82,7 @@
 
 #elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 
-/* don't use sh7034 assembler routines */
+/* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 
@@ -128,6 +130,10 @@
 
 #elif CONFIG_CPU == SH7034
 
+/* asm optimised read & write loops */
+
+#define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
+
 #define SWAP_WORDS
 
 #define ATA_IOBASE      0x06100100
@@ -172,6 +178,7 @@
 
 #elif CONFIG_CPU == TCC730
 
+/* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 
@@ -269,7 +276,7 @@ int ide_read_register(int reg) {
 
 #elif defined(TOSHIBA_GIGABEAT_F)
 
-/* don't use sh7034 assembler routines */
+/* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
 
@@ -309,6 +316,10 @@ int ide_read_register(int reg) {
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
 
+#endif
+
+#ifndef NOINLINE_ATTR
+#define NOINLINE_ATTR
 #endif
 
 #define ATA_FEATURE     ATA_ERROR
@@ -436,7 +447,8 @@ static int wait_for_end_of_transfer(void)
  * controller & cpu internal memory.
  */
 /* the tight loop of ata_read_sectors(), to avoid the whole in IRAM */
-static void copy_read_sectors(unsigned char* buf, int wordcount) ICODE_ATTR;
+static void copy_read_sectors(unsigned char* buf, int wordcount)
+                              ICODE_ATTR NOINLINE_ATTR;
 static void copy_read_sectors(unsigned char* buf, int wordcount)
 {
 #ifdef PREFER_C_READING
@@ -472,7 +484,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 #endif
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
-#else
+#else /* !PREFER_C_READING */
 #if CONFIG_CPU == TCC730
     int sectorcount = wordcount / 0x100;
     do {
@@ -483,17 +495,16 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         sectorcount--;
     } while (sectorcount > 0);
 #elif defined(CPU_COLDFIRE)
+    unsigned char* bufend = buf + 2 * wordcount;
     /* coldfire asm reading, utilising line bursts */
     /* this assumes there is at least one full line to copy */
-    asm (
-        "add.l   %[wcnt],%[wcnt] \n" /* wordcount -> bytecount */
-        "add.l   %[buf],%[wcnt]  \n" /* bytecount -> bufend */
+    asm volatile (
         "move.l  %[buf],%%d0     \n"
         "btst.l  #0,%%d0         \n" /* 16-bit aligned? */
         "jeq     .aligned        \n" /* yes, do word copy */
 
         /* not 16-bit aligned */
-        "subq.l  #1,%[wcnt]      \n" /* last byte is done unconditionally */
+        "subq.l  #1,%[end]       \n" /* last byte is done unconditionally */
         "moveq.l #24,%%d1        \n" /* preload shift count */
 
         "move.w  (%[ata]),%%d2   \n" /* load initial word */
@@ -531,7 +542,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "bhi.b   .loop_u_l1      \n"
 
     ".end_u_l1:                  \n"
-        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+        "lea.l   (-14,%[end]),%[end] \n" /* adjust end addr. to 16 bytes/pass */
 
     ".loop_u_line:               \n"
         "move.w  (%[ata]),%%d3   \n" /* load 1st word */
@@ -565,11 +576,11 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "movem.l %%d2-%%d5,(%[buf])  \n"  /* store line */
         "lea.l   (16,%[buf]),%[buf]  \n"
         "move.l  %%d6,%%d2       \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last line bound */
         "bhi.b   .loop_u_line    \n"
 
-        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
-        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "lea.l   (12,%[end]),%[end]  \n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[end]   \n" /* any trailing longwords? */
         "bls.b   .end_u_l2       \n" /* no: skip loop */
 
     ".loop_u_l2:                 \n"
@@ -582,12 +593,12 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "or.l    %%d3,%%d2       \n" /* combine old low byte with new top 3 bytes */
         "move.l  %%d2,(%[buf])+  \n" /* store as long */
         "move.l  %%d4,%%d2       \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last long bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last long bound */
         "bhi.b   .loop_u_l2      \n"
         
     ".end_u_l2:                  \n"
-        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
-        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "addq.l  #2,%[end]       \n" /* back to final end address */
+        "cmp.l   %[buf],%[end]   \n" /* one word left? */
         "bls.b   .end_u_w2       \n"
 
         "swap    %%d2            \n" /* move old word to upper 16 bits */
@@ -623,7 +634,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "bhi.b   .loop_a_l1      \n"
 
     ".end_a_l1:                  \n"
-        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+        "lea.l   (-14,%[end]),%[end] \n" /* adjust end addr. to 16 bytes/pass */
 
     ".loop_a_line:               \n"
         "move.w  (%[ata]),%%d0   \n" /* load 1st word */
@@ -640,11 +651,11 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "move.w  (%[ata]),%%d3   \n" /* load 8th word */
         "movem.l %%d0-%%d3,(%[buf])  \n"  /* store line */
         "lea.l   (16,%[buf]),%[buf]  \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last line bound */
         "bhi.b   .loop_a_line    \n"
         
-        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
-        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "lea.l   (12,%[end]),%[end]  \n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[end]   \n" /* any trailing longwords? */
         "bls.b   .end_a_l2       \n" /* no: skip loop */
 
     ".loop_a_l2:                 \n"
@@ -652,12 +663,12 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         "swap    %%d1            \n" /* move it to upper 16 bits */
         "move.w  (%[ata]),%%d1   \n" /* read second word */
         "move.l  %%d1,(%[buf])+  \n" /* store as long */
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last long bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last long bound */
         "bhi.b   .loop_a_l2      \n"
         
     ".end_a_l2:                  \n"
-        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
-        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "addq.l  #2,%[end]       \n" /* back to final end address */
+        "cmp.l   %[buf],%[end]   \n" /* one word left? */
         "bls.b   .end_a_w2       \n"
 
         "move.w  (%[ata]),(%[buf])+  \n"  /* copy final word */
@@ -666,110 +677,106 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
 
     ".exit:                      \n"
         : /* outputs */
+        [buf]"+a"(buf),
+        [end]"+a"(bufend)
         : /* inputs */
-        [buf] "a"(buf),
-        [wcnt]"a"(wordcount),
-        [ata] "a"(&ATA_DATA)
+        [ata]"a"(&ATA_DATA)
         : /*trashed */
         "d0", "d1", "d2", "d3", "d4", "d5", "d6"
     );
 #else
     /* SH1 turbo-charged assembler reading */
     /* this assumes wordcount to be a multiple of 4 */
-    asm (
-        "add     %1,%1       \n"  /* wordcount -> bytecount */
-        "add     %0,%1       \n"  /* bytecount -> bufend */
-        "mov     %0,r0       \n"
-        "tst     #1,r0       \n"  /* 16-bit aligned ? */
-        "bt      .aligned    \n"  /* yes, do word copy */
+    asm volatile (
+        "mov     %[buf],r0       \n"
+        "tst     #1,r0           \n"  /* 16-bit aligned ? */
+        "bt      .aligned        \n"  /* yes, do word copy */
 
         /* not 16-bit aligned */
-        "mov     #-1,r3      \n"  /* prepare a bit mask for high byte */
-        "shll8   r3          \n"  /* r3 = 0xFFFFFF00 */
+        "mov     #-1,r3          \n"  /* prepare a bit mask for high byte */
+        "shll8   r3              \n"  /* r3 = 0xFFFFFF00 */
 
-        "mov.w   @%2,r2      \n"  /* read first word (1st round) */
-        "add     #-12,%1     \n"  /* adjust end address for offsets */
-        "mov.b   r2,@%0      \n"  /* store low byte of first word */
-        "bra     .start4_b   \n"  /* jump into loop after next instr. */
-        "add     #-5,%0      \n"  /* adjust for dest. offsets; now even */
+        "mov.w   @%[ata],r2      \n"  /* read first word (1st round) */
+        "mov.b   r2,@%[buf]      \n"  /* store low byte of first word */
+        "bra     .start4_b       \n"  /* jump into loop after next instr. */
+        "add     #-5,%[buf]      \n"  /* adjust for dest. offsets; now even */
 
-        ".align  2           \n"
-    ".loop4_b:               \n"  /* main loop: copy 4 words in a row */
-        "mov.w   @%2,r2      \n"  /* read first word (2+ round) */
-        "and     r3,r1       \n"  /* get high byte of fourth word (2+ round) */
-        "extu.b  r2,r0       \n"  /* get low byte of first word (2+ round) */
-        "or      r1,r0       \n"  /* combine with high byte of fourth word */
-        "mov.w   r0,@(4,%0)  \n"  /* store at buf[4] */
-        "nop                 \n"  /* maintain alignment */
-    ".start4_b:              \n"
-        "mov.w   @%2,r1      \n"  /* read second word */
-        "and     r3,r2       \n"  /* get high byte of first word */
-        "extu.b  r1,r0       \n"  /* get low byte of second word */
-        "or      r2,r0       \n"  /* combine with high byte of first word */
-        "mov.w   r0,@(6,%0)  \n"  /* store at buf[6] */
-        "add     #8,%0       \n"  /* buf += 8 */
-        "mov.w   @%2,r2      \n"  /* read third word */
-        "and     r3,r1       \n"  /* get high byte of second word */
-        "extu.b  r2,r0       \n"  /* get low byte of third word */
-        "or      r1,r0       \n"  /* combine with high byte of second word */
-        "mov.w   r0,@%0      \n"  /* store at buf[0] */
-        "cmp/hi  %0,%1       \n"  /* check for end */
-        "mov.w   @%2,r1      \n"  /* read fourth word */
-        "and     r3,r2       \n"  /* get high byte of third word */
-        "extu.b  r1,r0       \n"  /* get low byte of fourth word */
-        "or      r2,r0       \n"  /* combine with high byte of third word */
-        "mov.w   r0,@(2,%0)  \n"  /* store at buf[2] */
-        "bt      .loop4_b    \n"
+        ".align  2               \n"
+    ".loop4_b:                   \n"  /* main loop: copy 4 words in a row */
+        "mov.w   @%[ata],r2      \n"  /* read first word (2+ round) */
+        "and     r3,r1           \n"  /* get high byte of fourth word (2+ round) */
+        "extu.b  r2,r0           \n"  /* get low byte of first word (2+ round) */
+        "or      r1,r0           \n"  /* combine with high byte of fourth word */
+        "mov.w   r0,@(4,%[buf])  \n"  /* store at buf[4] */
+        "nop                     \n"  /* maintain alignment */
+    ".start4_b:                  \n"
+        "mov.w   @%[ata],r1      \n"  /* read second word */
+        "and     r3,r2           \n"  /* get high byte of first word */
+        "extu.b  r1,r0           \n"  /* get low byte of second word */
+        "or      r2,r0           \n"  /* combine with high byte of first word */
+        "mov.w   r0,@(6,%[buf])  \n"  /* store at buf[6] */
+        "add     #8,%[buf]       \n"  /* buf += 8 */
+        "mov.w   @%[ata],r2      \n"  /* read third word */
+        "and     r3,r1           \n"  /* get high byte of second word */
+        "extu.b  r2,r0           \n"  /* get low byte of third word */
+        "or      r1,r0           \n"  /* combine with high byte of second word */
+        "mov.w   r0,@%[buf]      \n"  /* store at buf[0] */
+        "cmp/hi  %[buf],%[end]   \n"  /* check for end */
+        "mov.w   @%[ata],r1      \n"  /* read fourth word */
+        "and     r3,r2           \n"  /* get high byte of third word */
+        "extu.b  r1,r0           \n"  /* get low byte of fourth word */
+        "or      r2,r0           \n"  /* combine with high byte of third word */
+        "mov.w   r0,@(2,%[buf])  \n"  /* store at buf[2] */
+        "bt      .loop4_b        \n"
         /* 24 instructions for 4 copies, takes 30 clock cycles (4 wait) */
         /* avg. 7.5 cycles per word - 86% faster */
 
-        "swap.b  r1,r0       \n"  /* get high byte of last word */
-        "bra     .exit       \n"
-        "mov.b   r0,@(4,%0)  \n"  /* and store it */
+        "swap.b  r1,r0           \n"  /* get high byte of last word */
+        "bra     .exit           \n"
+        "mov.b   r0,@(4,%[buf])  \n"  /* and store it */
 
-        ".align  2           \n"
         /* 16-bit aligned, loop(read and store word) */
-    ".aligned:               \n"
-        "mov.w   @%2,r2      \n"  /* read first word (1st round) */
-        "add     #-12,%1     \n"  /* adjust end address for offsets */
-        "bra     .start4_w   \n"  /* jump into loop after next instr. */
-        "add     #-6,%0      \n"  /* adjust for destination offsets */
+    ".aligned:                   \n"
+        "mov.w   @%[ata],r2      \n"  /* read first word (1st round) */
+        "bra     .start4_w       \n"  /* jump into loop after next instr. */
+        "add     #-6,%[buf]      \n"  /* adjust for destination offsets */
 
-    ".loop4_w:               \n"  /* main loop: copy 4 words in a row */
-        "mov.w   @%2,r2      \n"  /* read first word (2+ round) */
-        "swap.b  r1,r0       \n"  /* swap fourth word (2+ round) */
-        "mov.w   r0,@(4,%0)  \n"  /* store fourth word (2+ round) */
-        "nop                 \n"  /* maintain alignment */
-    ".start4_w:              \n"
-        "mov.w   @%2,r1      \n"  /* read second word */
-        "swap.b  r2,r0       \n"  /* swap first word */
-        "mov.w   r0,@(6,%0)  \n"  /* store first word in buf[6] */
-        "add     #8,%0       \n"  /* buf += 8 */
-        "mov.w   @%2,r2      \n"  /* read third word */
-        "swap.b  r1,r0       \n"  /* swap second word */
-        "mov.w   r0,@%0      \n"  /* store second word in buf[0] */
-        "cmp/hi  %0,%1       \n"  /* check for end */
-        "mov.w   @%2,r1      \n"  /* read fourth word */
-        "swap.b  r2,r0       \n"  /* swap third word */
-        "mov.w   r0,@(2,%0)  \n"  /* store third word */
-        "bt      .loop4_w    \n"
+        ".align  2               \n"
+    ".loop4_w:                   \n"  /* main loop: copy 4 words in a row */
+        "mov.w   @%[ata],r2      \n"  /* read first word (2+ round) */
+        "swap.b  r1,r0           \n"  /* swap fourth word (2+ round) */
+        "mov.w   r0,@(4,%[buf])  \n"  /* store fourth word (2+ round) */
+        "nop                     \n"  /* maintain alignment */
+    ".start4_w:                  \n"
+        "mov.w   @%[ata],r1      \n"  /* read second word */
+        "swap.b  r2,r0           \n"  /* swap first word */
+        "mov.w   r0,@(6,%[buf])  \n"  /* store first word in buf[6] */
+        "add     #8,%[buf]       \n"  /* buf += 8 */
+        "mov.w   @%[ata],r2      \n"  /* read third word */
+        "swap.b  r1,r0           \n"  /* swap second word */
+        "mov.w   r0,@%[buf]      \n"  /* store second word in buf[0] */
+        "cmp/hi  %[buf],%[end]   \n"  /* check for end */
+        "mov.w   @%[ata],r1      \n"  /* read fourth word */
+        "swap.b  r2,r0           \n"  /* swap third word */
+        "mov.w   r0,@(2,%[buf])  \n"  /* store third word */
+        "bt      .loop4_w        \n"
         /* 16 instructions for 4 copies, takes 22 clock cycles (4 wait) */
         /* avg. 5.5 cycles per word - 118% faster */
 
-        "swap.b  r1,r0       \n"  /* swap fourth word (last round) */
-        "mov.w   r0,@(4,%0)  \n"  /* and store it */
+        "swap.b  r1,r0           \n"  /* swap fourth word (last round) */
+        "mov.w   r0,@(4,%[buf])  \n"  /* and store it */
 
-    ".exit:                  \n"
+    ".exit:                      \n"
         : /* outputs */
+        [buf]"+r"(buf)
         : /* inputs */
-        /* %0 */ "r"(buf),
-        /* %1 */ "r"(wordcount),
-        /* %2 */ "r"(&ATA_DATA)
+        [end]"r"(buf + 2 * wordcount - 12), /* adjusted for offsets */
+        [ata]"r"(&ATA_DATA)
         : /*trashed */
         "r0","r1","r2","r3"
     );
-#endif
-#endif
+#endif /* CPU */
+#endif /* !PREFER_C_READING */
 }
 
 #if CONFIG_LED == LED_REAL
@@ -938,9 +945,8 @@ int ata_read_sectors(IF_MV2(int drive,)
 }
 
 /* the tight loop of ata_write_sectors(), to avoid the whole in IRAM */
-static void copy_write_sectors(const unsigned char* buf,
-                               int wordcount) ICODE_ATTR;
-
+static void copy_write_sectors(const unsigned char* buf, int wordcount) 
+                               ICODE_ATTR NOINLINE_ATTR;
 static void copy_write_sectors(const unsigned char* buf, int wordcount)
 {
 #ifdef PREFER_C_WRITING
@@ -979,18 +985,17 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 #endif
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
-#else
+#else /* !PREFER_C_WRITING */
 #ifdef CPU_COLDFIRE
+    const unsigned char* bufend = buf + 2 * wordcount;
     /* coldfire asm writing, utilising line bursts */
-    asm (
-        "add.l   %[wcnt],%[wcnt] \n" /* wordcount -> bytecount */
-        "add.l   %[buf],%[wcnt]  \n" /* bytecount -> bufend */
+    asm volatile (
         "move.l  %[buf],%%d0     \n"
         "btst.l  #0,%%d0         \n" /* 16-bit aligned? */
         "jeq     .w_aligned      \n" /* yes, do word copy */
 
         /* not 16-bit aligned */
-        "subq.l  #1,%[wcnt]      \n" /* last byte is done unconditionally */
+        "subq.l  #1,%[end]       \n" /* last byte is done unconditionally */
         "moveq.l #24,%%d1        \n" /* preload shift count */
 
         "move.b  (%[buf])+,%%d2  \n"
@@ -1026,7 +1031,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "bhi.b   .w_loop_u_l1    \n"
 
     ".w_end_u_l1:                \n"
-        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+        "lea.l   (-14,%[end]),%[end] \n" /* adjust end addr. to 16 bytes/pass */
 
     ".w_loop_u_line:             \n"
         "movem.l (%[buf]),%%d3-%%d6  \n"
@@ -1064,11 +1069,11 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "swap    %%d5            \n"
         "move.w  %%d5,(%[ata])   \n"
         "move.l  %%d6,%%d2       \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last line bound */
         "bhi.b   .w_loop_u_line  \n"
 
-        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
-        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "lea.l   (12,%[end]),%[end]  \n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[end]   \n" /* any trailing longwords? */
         "bls.b   .w_end_u_l2     \n" /* no: skip loop */
 
     ".w_loop_u_l2:               \n"
@@ -1082,12 +1087,12 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "swap    %%d2            \n"
         "move.w  %%d2,(%[ata])   \n"
         "move.l  %%d4,%%d2       \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to first line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to first line bound */
         "bhi.b   .w_loop_u_l2    \n"
 
     ".w_end_u_l2:                \n"
-        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
-        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "addq.l  #2,%[end]       \n" /* back to final end address */
+        "cmp.l   %[buf],%[end]   \n" /* one word left? */
         "bls.b   .w_end_u_w2     \n"
 
         "swap    %%d2            \n"
@@ -1100,7 +1105,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "lsl.l   #8,%%d2         \n"
         "move.b  (%[buf])+,%%d2  \n"
         "move.w  %%d2,(%[ata])   \n"
-        "bra.b    .w_exit         \n"
+        "bra.b    .w_exit        \n"
 
         /* 16-bit aligned */
     ".w_aligned:                 \n"
@@ -1126,7 +1131,7 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "bhi.b   .w_loop_a_l1    \n"
 
     ".w_end_a_l1:                \n"
-        "lea.l   (-14,%[wcnt]),%[wcnt]   \n" /* adjust end addr. to 16 bytes/pass */
+        "lea.l   (-14,%[end]),%[end] \n" /* adjust end addr. to 16 bytes/pass */
 
     ".w_loop_a_line:             \n"
         "movem.l (%[buf]),%%d0-%%d3  \n"
@@ -1147,11 +1152,11 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "move.w  %%d3,(%[ata])   \n"
         "swap    %%d3            \n"
         "move.w  %%d3,(%[ata])   \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to last line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to last line bound */
         "bhi.b   .w_loop_a_line  \n"
         
-        "lea.l   (12,%[wcnt]),%[wcnt]\n"  /* readjust for longword loop */
-        "cmp.l   %[buf],%[wcnt]  \n" /* any trailing longwords? */
+        "lea.l   (12,%[end]),%[end]  \n"  /* readjust for longword loop */
+        "cmp.l   %[buf],%[end]   \n" /* any trailing longwords? */
         "bls.b   .w_end_a_l2     \n" /* no: skip loop */
 
     ".w_loop_a_l2:               \n"
@@ -1160,12 +1165,12 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
         "move.w  %%d1,(%[ata])   \n"
         "swap    %%d1            \n"
         "move.w  %%d1,(%[ata])   \n"
-        "cmp.l   %[buf],%[wcnt]  \n" /* run up to first line bound */
+        "cmp.l   %[buf],%[end]   \n" /* run up to first line bound */
         "bhi.b   .w_loop_a_l2    \n"
 
     ".w_end_a_l2:                \n"
-        "addq.l  #2,%[wcnt]      \n" /* back to final end address */
-        "cmp.l   %[buf],%[wcnt]  \n" /* one word left? */
+        "addq.l  #2,%[end]       \n" /* back to final end address */
+        "cmp.l   %[buf],%[end]   \n" /* one word left? */
         "bls.b   .w_end_a_w2     \n"
 
         "move.w  (%[buf])+,(%[ata])  \n"  /* copy final word */
@@ -1174,10 +1179,10 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
 
     ".w_exit:                    \n"
         : /* outputs */
+        [buf]"+a"(buf),
+        [end]"+a"(bufend)
         : /* inputs */
-        [buf] "a"(buf),
-        [wcnt]"a"(wordcount),
-        [ata] "a"(&ATA_DATA)
+        [ata]"a"(&ATA_DATA)
         : /*trashed */
         "d0", "d1", "d2", "d3", "d4", "d5", "d6"
     );
@@ -1191,82 +1196,78 @@ static void copy_write_sectors(const unsigned char* buf, int wordcount)
  * - writing profits from warp mode
  * Both of these add up to have writing faster than the more unrolled reading.
  */
-    asm (
-        "add     %1,%1       \n"  /* wordcount -> bytecount */
-        "add     %0,%1       \n"  /* bytecount -> bufend */
-        "mov     %0,r0       \n"
-        "tst     #1,r0       \n"  /* 16-bit aligned ? */
-        "bt      .w_aligned  \n"  /* yes, do word copy */
+    asm volatile (
+        "mov     %[buf],r0       \n"
+        "tst     #1,r0           \n"  /* 16-bit aligned ? */
+        "bt      .w_aligned      \n"  /* yes, do word copy */
 
         /* not 16-bit aligned */
-        "mov     #-1,r6      \n"  /* prepare a bit mask for high byte */
-        "shll8   r6          \n"  /* r6 = 0xFFFFFF00 */
+        "mov     #-1,r6          \n"  /* prepare a bit mask for high byte */
+        "shll8   r6              \n"  /* r6 = 0xFFFFFF00 */
 
-        "mov.b   @%0+,r2     \n"  /* load (initial old second) first byte */
-        "add     #-4,%1      \n"  /* adjust end address for early check */
-        "mov.w   @%0+,r3     \n"  /* load (initial) first word */
-        "bra     .w_start2_b \n"
-        "extu.b  r2,r0       \n"  /* extend unsigned */
+        "mov.b   @%[buf]+,r2     \n"  /* load (initial old second) first byte */
+        "mov.w   @%[buf]+,r3     \n"  /* load (initial) first word */
+        "bra     .w_start2_b     \n"
+        "extu.b  r2,r0           \n"  /* extend unsigned */
 
-        ".align  2           \n"
-    ".w_loop2_b:             \n"  /* main loop: copy 2 words in a row */
-        "mov.w   @%0+,r3     \n"  /* load first word (2+ round) */
-        "extu.b  r2,r0       \n"  /* put away low byte of second word (2+ round) */
-        "and     r6,r2       \n"  /* get high byte of second word (2+ round) */
-        "or      r1,r2       \n"  /* combine with low byte of old first word */
-        "mov.w   r2,@%2      \n"  /* write that */
-    ".w_start2_b:            \n"
-        "cmp/hi  %0,%1       \n"  /* check for end */
-        "mov.w   @%0+,r2     \n"  /* load second word */
-        "extu.b  r3,r1       \n"  /* put away low byte of first word */
-        "and     r6,r3       \n"  /* get high byte of first word */
-        "or      r0,r3       \n"  /* combine with high byte of old second word */
-        "mov.w   r3,@%2      \n"  /* write that */
-        "bt      .w_loop2_b  \n"
+        ".align  2               \n"
+    ".w_loop2_b:                 \n"  /* main loop: copy 2 words in a row */
+        "mov.w   @%[buf]+,r3     \n"  /* load first word (2+ round) */
+        "extu.b  r2,r0           \n"  /* put away low byte of second word (2+ round) */
+        "and     r6,r2           \n"  /* get high byte of second word (2+ round) */
+        "or      r1,r2           \n"  /* combine with low byte of old first word */
+        "mov.w   r2,@%[ata]      \n"  /* write that */
+    ".w_start2_b:                \n"
+        "cmp/hi  %[buf],%[end]   \n"  /* check for end */
+        "mov.w   @%[buf]+,r2     \n"  /* load second word */
+        "extu.b  r3,r1           \n"  /* put away low byte of first word */
+        "and     r6,r3           \n"  /* get high byte of first word */
+        "or      r0,r3           \n"  /* combine with high byte of old second word */
+        "mov.w   r3,@%[ata]      \n"  /* write that */
+        "bt      .w_loop2_b      \n"
         /* 12 instructions for 2 copies, takes 14 clock cycles */
         /* avg. 7 cycles per word - 85% faster */
 
         /* the loop "overreads" 1 byte past the buffer end, however, the last */
         /* byte is not written to disk */
-        "and     r6,r2       \n"  /* get high byte of last word */
-        "or      r1,r2       \n"  /* combine with low byte of old first word */
-        "bra     .w_exit     \n"
-        "mov.w   r2,@%2      \n"  /* write last word */
+        "and     r6,r2           \n"  /* get high byte of last word */
+        "or      r1,r2           \n"  /* combine with low byte of old first word */
+        "bra     .w_exit         \n"
+        "mov.w   r2,@%[ata]      \n"  /* write last word */
 
         /* 16-bit aligned, loop(load and write word) */
-    ".w_aligned:             \n"
-        "mov.w   @%0+,r2     \n"  /* load first word (1st round) */
-        "bra     .w_start2_w \n"  /* jump into loop after next instr. */
-        "add     #-4,%1      \n"  /* adjust end address for early check */
+    ".w_aligned:                 \n"
+        "bra     .w_start2_w     \n"  /* jump into loop after next instr. */
+        "mov.w   @%[buf]+,r2     \n"  /* load first word (1st round) */
 
-        ".align  2           \n"
-    ".w_loop2_w:             \n"  /* main loop: copy 2 words in a row */
-        "mov.w   @%0+,r2     \n"  /* load first word (2+ round) */
-        "swap.b  r1,r0       \n"  /* swap second word (2+ round) */
-        "mov.w   r0,@%2      \n"  /* write second word (2+ round) */
-    ".w_start2_w:            \n"
-        "cmp/hi  %0,%1       \n"  /* check for end */
-        "mov.w   @%0+,r1     \n"  /* load second word */
-        "swap.b  r2,r0       \n"  /* swap first word */
-        "mov.w   r0,@%2      \n"  /* write first word */
-        "bt      .w_loop2_w  \n"
+        ".align  2               \n"
+    ".w_loop2_w:                 \n"  /* main loop: copy 2 words in a row */
+        "mov.w   @%[buf]+,r2     \n"  /* load first word (2+ round) */
+        "swap.b  r1,r0           \n"  /* swap second word (2+ round) */
+        "mov.w   r0,@%[ata]      \n"  /* write second word (2+ round) */
+    ".w_start2_w:                \n"
+        "cmp/hi  %[buf],%[end]   \n"  /* check for end */
+        "mov.w   @%[buf]+,r1     \n"  /* load second word */
+        "swap.b  r2,r0           \n"  /* swap first word */
+        "mov.w   r0,@%[ata]      \n"  /* write first word */
+        "bt      .w_loop2_w      \n"
         /* 8 instructions for 2 copies, takes 10 clock cycles */
         /* avg. 5 cycles per word - 100% faster */
 
-        "swap.b  r1,r0       \n"  /* swap second word (last round) */
-        "mov.w   r0,@%2      \n"  /* and write it */
+        "swap.b  r1,r0           \n"  /* swap second word (last round) */
+        "mov.w   r0,@%[ata]      \n"  /* and write it */
 
-    ".w_exit:                \n"
+    ".w_exit:                    \n"
         : /* outputs */
+        [buf]"+r"(buf)
         : /* inputs */
-        /* %0 */ "r"(buf),
-        /* %1 */ "r"(wordcount),
-        /* %2 */ "r"(&ATA_DATA)
+        [end]"r"(buf + 2 * wordcount - 4), /* adjusted for earl check */
+        [ata]"r"(&ATA_DATA)
         : /*trashed */
         "r0","r1","r2","r3","r6"
     );
-#endif
-#endif
+#endif /* CPU */
+#endif /* !PREFER_C_WRITING */
 }
 
 int ata_write_sectors(IF_MV2(int drive,)
