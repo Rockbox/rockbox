@@ -744,7 +744,12 @@ long gui_wps_show(void)
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
+                {
+#ifdef HAVE_LCD_COLOR
+                    lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+#endif
                     return SYS_USB_CONNECTED;
+                }
                 update_track = true;
                 break;
         }
