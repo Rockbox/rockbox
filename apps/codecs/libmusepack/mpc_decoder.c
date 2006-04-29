@@ -435,8 +435,12 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
             output_frame_length -= d->samples_to_skip;
             memmove(
                 buffer, 
-                buffer + d->samples_to_skip * 2, 
-                output_frame_length * 2 * sizeof (MPC_SAMPLE_FORMAT));
+                buffer + d->samples_to_skip, 
+                output_frame_length * sizeof (MPC_SAMPLE_FORMAT));
+            memmove(
+                buffer + MPC_FRAME_LENGTH, 
+                buffer + MPC_FRAME_LENGTH + d->samples_to_skip, 
+                output_frame_length * sizeof (MPC_SAMPLE_FORMAT));
             d->samples_to_skip = 0;
         }
     }
