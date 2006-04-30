@@ -552,7 +552,12 @@ bool recording_screen(void)
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
+
+#ifndef SIMULATOR
     audio_init_recording(talk_get_bufsize());
+#else
+    audio_init_recording(0);
+#endif
 
     sound_set_volume(global_settings.volume);
 
