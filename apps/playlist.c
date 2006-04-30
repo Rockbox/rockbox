@@ -1928,6 +1928,8 @@ int playlist_resume(void)
         return -1;
     }
 
+    playlist->started = true;
+
     while (1)
     {
         int result = 0;
