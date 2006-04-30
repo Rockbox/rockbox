@@ -650,7 +650,7 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Korstoning"
+    *: "Korsmixa"
   </dest>
   <voice>
     *: "Crossfeed"
@@ -1028,7 +1028,7 @@
     *: "Precut"
   </source>
   <dest>
-    *: "Förförstärkning"
+    *: "Dämpning"
   </dest>
   <voice>
     *: "Pre-cut"
@@ -1560,7 +1560,7 @@
     *: "Moderate"
   </source>
   <dest>
-    *: "Medel"
+    *: "Mellan"
   </dest>
   <voice>
     *: "Moderate"
@@ -1658,7 +1658,7 @@
     *: "Tag Cache"
   </source>
   <dest>
-    *: "Tagcache"
+    *: "Taggcache"
   </dest>
   <voice>
     *: "Tag cache"
@@ -1700,7 +1700,7 @@
     *: "Force Tag Cache Update"
   </source>
   <dest>
-    *: "Tvinga uppdatering av tagcache"
+    *: "Tvinga uppdatering av taggcache"
   </dest>
   <voice>
     *: "Force tag cache update"
@@ -1728,7 +1728,7 @@
     *: "Committing tagcache"
   </source>
   <dest>
-    *: "Sparar tagcache"
+    *: "Sparar taggcache"
   </dest>
   <voice>
     *: ""
@@ -2131,10 +2131,10 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Russian (CP1251)"
+    *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Ryska (CP1251)"
+    *: "Krylliska (CP1251)"
   </dest>
   <voice>
     *: ""
@@ -2254,7 +2254,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -3618,7 +3618,7 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "Toppåtergång"
+    *: "enheter per läsning"
   </dest>
   <voice>
     *: "Units Per Read"
@@ -7370,7 +7370,7 @@
     *: "Station: %d.%dMHz"
   </source>
   <dest>
-    *: "Kanal: %d.%dMHz"
+    *: "Kanal: %d.%d MHz"
   </dest>
   <voice>
     *: ""
@@ -7384,7 +7384,7 @@
     *: "No presets"
   </source>
   <dest>
-    *: "Inga förinställningar"
+    *: "Ingen kanallista"
   </dest>
   <voice>
     *: ""
@@ -7398,7 +7398,7 @@
     *: "Add Preset"
   </source>
   <dest>
-    *: "Addera förinställning"
+    *: "Lägg till kanal"
   </dest>
   <voice>
     *: "Add preset"
@@ -7412,7 +7412,7 @@
     *: "Edit Preset"
   </source>
   <dest>
-    *: "Redigera förinställningar"
+    *: "Redigera kanal"
   </dest>
   <voice>
     *: ""
@@ -7426,7 +7426,7 @@
     *: "Remove Preset"
   </source>
   <dest>
-    *: "Ta bort förinställning"
+    *: "Ta bort kanal"
   </dest>
   <voice>
     *: ""
@@ -7440,7 +7440,7 @@
     *: "Preset Save Failed"
   </source>
   <dest>
-    *: "Kan inte spara förinställningar"
+    *: "Kan inte spara kanallista"
   </dest>
   <voice>
     *: ""
@@ -7454,7 +7454,7 @@
     *: "The Preset List is Full"
   </source>
   <dest>
-    *: "Full förinställningslista"
+    *: "Full kanallista"
   </dest>
   <voice>
     *: ""
@@ -7496,7 +7496,7 @@
     *: "Action"
   </source>
   <dest>
-    *: "Sätt igång"
+    *: "Ändra"
   </dest>
   <voice>
     *: ""
@@ -7510,7 +7510,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Förinställning"
+    *: "Kanal"
   </dest>
   <voice>
     *: ""
@@ -7524,7 +7524,7 @@
     *: "Add"
   </source>
   <dest>
-    *: "Addera"
+    *: "Ny"
   </dest>
   <voice>
     *: ""
@@ -7538,7 +7538,7 @@
     *: "Record"
   </source>
   <dest>
-    *: "Spela in"
+    *: "Spe.in"
   </dest>
   <voice>
     *: ""
@@ -7580,7 +7580,7 @@
     *: "Auto-Scan Presets"
   </source>
   <dest>
-    *: "Sök förinställnignar"
+    *: "Sök kanaler"
   </dest>
   <voice>
     *: "Auto scan presets"
@@ -7594,7 +7594,7 @@
     *: "Clear Current Presets?"
   </source>
   <dest>
-    *: "Ta bort förinställningar?"
+    *: "Rensa kanallistan?"
   </dest>
   <voice>
     *: ""
@@ -7650,7 +7650,7 @@
     *: "Scan"
   </source>
   <dest>
-    *: "Sökning"
+    *: "Sök"
   </dest>
   <voice>
     *: ""
@@ -7664,7 +7664,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Förinställning"
+    *: "Kanaler"
   </dest>
   <voice>
     *: ""
@@ -7692,7 +7692,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Alternativ"
+    *: "Alt."
   </dest>
   <voice>
     *: ""
@@ -8294,7 +8294,7 @@
     *: "Load Preset List"
   </source>
   <dest>
-    *: "Läs förinställningar"
+    *: "Läs kanallista"
   </dest>
   <voice>
     *: "Load Preset List"
@@ -8308,7 +8308,7 @@
     *: "Save Preset List"
   </source>
   <dest>
-    *: "Spara förinställningar"
+    *: "Spara kanallista"
   </dest>
   <voice>
     *: "Save Preset List"
@@ -8322,7 +8322,7 @@
     *: "Clear Preset List"
   </source>
   <dest>
-    *: "Töm förinställningar"
+    *: "Rensa kanallista"
   </dest>
   <voice>
     *: "Clear Preset List"
@@ -8336,7 +8336,7 @@
     *: "Preset List"
   </source>
   <dest>
-    *: "Förinställningar"
+    *: "Kanallista"
   </dest>
   <voice>
     *: "Preset List"
@@ -8350,7 +8350,7 @@
     *: "No Settings found, AutoScan?"
   </source>
   <dest>
-    *: "Inga förinställningar hittades. Starta sökning?"
+    *: "Inga kanaler hittades. Starta sökning?"
   </dest>
   <voice>
     *: ""
@@ -8382,5 +8382,114 @@
   </dest>
   <voice>
     *: "pixels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Alla spår>"
+  </dest>
+  <voice>
+    *: "All tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Taggcachen är inte klar"
+  </dest>
+  <voice>
+    *: "Tagcache is not ready"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Högfrekvensgräns"
+  </dest>
+  <voice>
+    *: "High-frequency cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Korsdämpning"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Högfrekvensdämpning"
+  </dest>
+  <voice>
+    *: "High-frequency attenuation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direkt dämpning"
+  </dest>
+  <voice>
+    *: "Direct gain"
+  </voice>
+</phrase>
+###
+### This phrase below was not present in the translated file
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Ogiltigt filnamn"
+  </dest>
+  <voice>
+    *: "Invalid Filename"
   </voice>
 </phrase>
