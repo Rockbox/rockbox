@@ -1904,15 +1904,19 @@ static void generate_postbuffer_events(void)
 
 static void initialize_buffer_fill(bool clear_tracks)
 {
-    fill_bytesleft = filebuflen - filebufused;
-    if (buf_ridx > cur_ti->buf_idx)
-        cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
-
     /* Don't initialize if we're already initialized */
     if (filling)
         return ;
 
     logf("Starting buffer fill");
+
+    fill_bytesleft = filebuflen - filebufused;
+    /* TODO: This doesn't look right, and might explain some problems with
+     *       seeking in large files (to offsets larger than filebuflen).
+     *       And what about buffer wraps?
+     */
+    if (buf_ridx > cur_ti->buf_idx)
+        cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
 
     if (clear_tracks)
         audio_clear_track_entries(true, false);
