@@ -1212,7 +1212,11 @@ static void playlist_thread(void)
                     )
                 {
                     if (playlist->num_cached > 0)
+                    {
+                        mutex_lock(&playlist->control_mutex);
                         flush_cached_control(playlist);
+                        mutex_unlock(&playlist->control_mutex);
+                    }
 
                     sync_control(playlist, true);
                 }
