@@ -1233,12 +1233,12 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
 
             /* Check if the file is at the same spot in the directory,
                else search for it */
-            if ((strcmp(strrchr(playlist_peek(index) + 1,'/') + 1,
+            if ((strcmp(strrchr(playlist_peek(index),'/') + 1,
                         filename)))
             {
                 for ( i=0; i < playlist_amount(); i++ )
                 {
-                    if ((strcmp(strrchr(playlist_peek(i) + 1,'/') + 1,
+                    if ((strcmp(strrchr(playlist_peek(i),'/') + 1,
                                 filename)) == 0)
                         break;
                 }
