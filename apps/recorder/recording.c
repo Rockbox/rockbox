@@ -320,11 +320,11 @@ static void trigger_listener(int trigger_status)
         case TRIG_GO:
             if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
             {
-              talk_buffer_steal(); /* we use the mp3 buffer */
-              audio_record(rec_create_filename(path_buffer));
+                talk_buffer_steal(); /* we use the mp3 buffer */
+                audio_record(rec_create_filename(path_buffer));
 
-              /* give control to mpeg thread so that it can start recording */
-              yield(); yield(); yield();
+                /* give control to mpeg thread so that it can start recording*/
+                yield(); yield(); yield();
             }
 
             /* if we're already recording this is a retrigger */
@@ -567,7 +567,9 @@ bool recording_screen(void)
 #endif
     peak_meter_enabled = true;
 
+#if CONFIG_CODEC != SWCODEC
     if (global_settings.rec_prerecord_time)
+#endif
         talk_buffer_steal(); /* will use the mp3 buffer */
 
     audio_set_recording_options(global_settings.rec_frequency,
@@ -905,7 +907,9 @@ bool recording_screen(void)
                     }
                     settings_save();
 
+#if CONFIG_CODEC != SWCODEC
                     if (global_settings.rec_prerecord_time)
+#endif
                         talk_buffer_steal(); /* will use the mp3 buffer */
 
                     audio_set_recording_options(global_settings.rec_frequency,

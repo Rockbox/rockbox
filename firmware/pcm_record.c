@@ -820,8 +820,8 @@ static void pcmrec_init(void)
     is_paused = false;
     is_error = false;
 
-    rec_buffer = (unsigned char*)(((unsigned long)audiobuf) & ~3);
-    buffer_size = (long)audiobufend - (long)audiobuf - 16;
+    rec_buffer = (unsigned char*)(((unsigned long)audiobuf + talk_get_bufsize()) & ~3);
+    buffer_size = (long)audiobufend - (long)audiobuf - talk_get_bufsize() - 16;
     
     logf("buf size: %d kb", buffer_size/1024);
     
