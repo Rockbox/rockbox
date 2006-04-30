@@ -89,6 +89,7 @@
 #define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
 #define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
 #define KBD_SELECT_PRE BUTTON_MENU
+#define KBD_DONE_PRE BUTTON_MENU
 #define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
 #define KBD_ABORT BUTTON_OFF
 #define KBD_LEFT BUTTON_LEFT
@@ -102,6 +103,7 @@
 #define KBD_SELECT (BUTTON_PLAY | BUTTON_REL)
 #define KBD_SELECT_PRE BUTTON_PLAY
 #define KBD_PAGE_FLIP BUTTON_ON
+#define KBD_DONE_PRE BUTTON_PLAY
 #define KBD_DONE (BUTTON_PLAY | BUTTON_REPEAT)
 #define KBD_ABORT BUTTON_OFF
 #define KBD_BACKSPACE (BUTTON_MENU | BUTTON_PLAY)
@@ -115,9 +117,9 @@
 #define KBD_MODES /* iPod uses 2 modes, picker and line edit */
 #define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
 #define KBD_SELECT_PRE BUTTON_SELECT
+#define KBD_DONE_PRE BUTTON_SELECT
 #define KBD_DONE (BUTTON_SELECT | BUTTON_REPEAT)
 #define KBD_ABORT BUTTON_MENU
-
 #define KBD_LEFT BUTTON_LEFT
 #define KBD_RIGHT BUTTON_RIGHT
 #define KBD_UP BUTTON_SCROLL_BACK
