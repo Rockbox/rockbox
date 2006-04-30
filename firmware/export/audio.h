@@ -87,7 +87,7 @@ void audio_beep(int duration);
 void audio_init_playback(void);
 
 /* audio recording functions */
-void audio_init_recording(void);
+void audio_init_recording(unsigned int buffer_offset);
 void audio_close_recording(void);
 void audio_record(const char *filename);
 void audio_stop_recording(void);

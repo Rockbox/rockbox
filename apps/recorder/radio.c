@@ -366,7 +366,7 @@ bool radio_screen(void)
         audio_stop();
         
 #if CONFIG_CODEC != SWCODEC
-    audio_init_recording();
+    audio_init_recording(talk_get_bufsize());
 
     sound_settings_apply();
     /* Yes, we use the D/A for monitoring */

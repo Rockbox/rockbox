@@ -82,6 +82,7 @@ static short peak_left, peak_right;
 
 #define GET_CHUNK(x)               (short*)(&rec_buffer[CHUNK_SIZE*(x)])
 
+static unsigned int rec_buffer_offset;
 static unsigned char *rec_buffer;  /* Circular recording buffer */
 static int num_chunks;             /* Number of chunks available in rec_buffer */
 
@@ -136,8 +137,9 @@ void pcm_rec_init(void)
  * - Prepare for DMA transfers
  */
  
-void audio_init_recording(void)
+void audio_init_recording(unsigned int buffer_offset)
 {
+    rec_buffer_offset = buffer_offset;
     init_done = false;
     queue_post(&pcmrec_queue, PCMREC_INIT, 0);
     
@@ -820,8 +822,8 @@ static void pcmrec_init(void)
     is_paused = false;
     is_error = false;
 
-    rec_buffer = (unsigned char*)(((unsigned long)audiobuf + talk_get_bufsize()) & ~3);
-    buffer_size = (long)audiobufend - (long)audiobuf - talk_get_bufsize() - 16;
+    rec_buffer = (unsigned char*)(((unsigned long)audiobuf + rec_buffer_offset) & ~3);
+    buffer_size = (long)audiobufend - (long)audiobuf - rec_buffer_offset - 16;
     
     logf("buf size: %d kb", buffer_size/1024);
     
