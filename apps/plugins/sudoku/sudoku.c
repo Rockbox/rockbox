@@ -350,7 +350,9 @@ static bool spawn_option(Sudoku* sud, Stats* stats, const Options* options,
 static bool solve(Sudoku* sud, Stats* stats, const Options* options)
 {
     while (true){
-        int x, y, i, num;
+        int x = 0;
+        int y = 0;
+        int i, num;
         int places[SIZE];
         
         if (scan(sud, &x, &y, &num, places)){
