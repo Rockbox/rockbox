@@ -1265,10 +1265,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 #endif
+
+#ifdef VIEWER_QUIT
             case VIEWER_QUIT:
                 viewer_exit(NULL);
                 done = true;
                 break;
+#endif
 
             default:
                 if (rb->default_event_handler_ex(button, viewer_exit, NULL)
