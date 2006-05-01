@@ -1070,6 +1070,27 @@ else
 
 fi
 
+# check the compiler for SH platforms
+if test "$CC" = "sh-elf-gcc"; then
+  if test "$gccnum" -lt "400"; then 
+    echo "WARNING: Consider upgrading your compiler to the 4.0.X series!"
+    echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
+  else
+    # figure out patch status
+    gccpatch=`$CC --version`;
+
+    if { echo $gccpatch | grep "rockbox" >/dev/null 2>&1; } then
+      echo "gcc $gccver is rockbox patched"
+      # then convert -O to -Os to get smaller binaries!
+      CCOPTS=`echo $CCOPTS | sed 's/ -O / -Os /'`
+    else
+      echo "WARNING: You use an unpatched gcc compiler: $gccver"
+      echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
+    fi
+  fi
+fi
+
+
 if test "X$ccache" = "Xyes"; then
   CC="ccache $CC"
 fi
