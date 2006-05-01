@@ -357,6 +357,8 @@ findmoves( void )
 {
     int i;
 
+    rb->yield();
+
     idx_possible = 0;
     for( i = 0 ; i < 9 ; ++i )
     {
@@ -392,6 +394,9 @@ void
 pairs( int el, int (*idx_fn)( int, int ) )
 {
     int i, j, k, mask, idx;
+
+    rb->yield();
+
     for( i = 0 ; i < 8 ; ++i )
         if( 7 == digits[ i ] ) /* 2 digits unknown */
             for( j = i + 1 ; j < 9 ; ++j )
@@ -419,6 +424,8 @@ exmask( int mask, int block, int el, int (*idx_fn)( int, int ) )
 {
     int i, idx;
 
+    rb->yield();
+
     for( i = 0 ; i < 9 ; ++i )
     {
         idx = (*idx_fn)( el, i );
@@ -433,6 +440,8 @@ void
 exblock( int block, int el, int (*idx_fn)( int, int ) )
 {
     int i, idx, mask;
+
+    rb->yield();
 
     /* By assumption, all unknown squares in the block appear in the
      * same row/column, so to construct a mask for these squares, it
@@ -454,6 +463,8 @@ void
 block( int el )
 {
     int i, idx = 0, row, col;
+
+    rb->yield();
 
     /* Find first unknown square */
     for( i = 0 ; i < 9 && !IS_EMPTY( idx = idx_block( el, i ) ) ; ++i )
@@ -486,6 +497,8 @@ void
 common( int el )
 {
     int i, idx, row, col, digit, mask;
+
+    rb->yield();
 
     for( digit = 1 ; digit <= 9 ; ++digit )
     {
@@ -524,6 +537,8 @@ void
 position2( int el )
 {
     int digit, digit2, i, mask, mask2, posn, count, idx;
+
+    rb->yield();
 
     /* Calculate positions of each digit within block */
     for( digit = 1 ; digit <= 9 ; ++digit )
@@ -574,6 +589,8 @@ allmoves( void )
 {
     int i, n;
 
+    rb->yield();
+
     n = findmoves( );
     if( 0 < n )
         return n;
@@ -618,6 +635,8 @@ int
 findhints( void )
 {
     int i, n, mutated = 0;
+
+    rb->yield();
 
     n = findmoves( );
     if( n < 2 )
@@ -687,6 +706,8 @@ deterministic( void )
 {
     int i, n;
 
+    rb->yield();
+
     n = allmoves( );
     while( 0 < n )
     {
@@ -720,6 +741,9 @@ int
 choice( void )
 {
     int i, n;
+
+    rb->yield();
+
     for( n = i = 0 ; i < 81 ; ++i )
         if( IS_EMPTY( i ) )
         {
@@ -746,6 +770,8 @@ static
 int
 choose( int idx, int digit )
 {
+    rb->yield();
+
     for( ; digit <= 9 ; ++digit )
         if( !DISALLOWED( idx, digit ) )
         {
@@ -769,6 +795,8 @@ int
 backtrack( void )
 {
     int digit, idx;
+
+    rb->yield();
 
     for( ; 0 <= --idx_history ; )
         if( history[ idx_history ] & CHOICE )
@@ -795,6 +823,8 @@ int
 solve( void )
 {
     int idx;
+
+    rb->yield();
 
     while( 1 )
     {
@@ -869,6 +899,8 @@ char *
 classify( void )
 {
     int i, score;
+
+    rb->yield();
 
     pass = 0;
     clear_moves( );
@@ -1049,8 +1081,12 @@ start:
     for( i = 0 ; i < len_tmplt ; ++i )
         fill( tmplt[ i ], digits[ i % 9 ] );
 
+    rb->yield();
+
     if( 0 != solve( ) || idx_history < 81 )
         goto start;
+
+    rb->yield();
 
     for( i = 0 ; i < len_tmplt ; ++i )
         board[ tmplt[ i ] ] |= FIXED;
