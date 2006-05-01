@@ -556,7 +556,7 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
     long comment_size;
     long remaining = 0;
     long last_serial = 0;
-    long serial;
+    long serial, r;
     int segments;
     int i;
     bool eof = false;
@@ -652,7 +652,7 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
 
     while (!eof) 
     {
-        long r = read(fd, &buf[remaining], MAX_PATH - remaining);
+        r = read(fd, &buf[remaining], MAX_PATH - remaining);
         
         if (r <= 0) 
         {
@@ -666,7 +666,7 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
         /* Inefficient (but simple) search */
         i = 0;
         
-        while (i < (remaining - 5)) 
+        while (i < (remaining - 3)) 
         {
             if ((buf[i] == 'O') && (memcmp(&buf[i], "OggS", 4) == 0))
             {
@@ -677,8 +677,11 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
                      */
                      id3->samples = get_long(&buf[i + 6]);
                      last_serial = get_long(&buf[i + 14]);
-                     /* We can discard the rest of the buffer */
-                     remaining = 0;
+
+                    /* If this page is very small the beginning of the next
+                     * header could be in buffer. Jump near end of this header
+                     * and continue */
+                    i += 27;
                 } 
                 else 
                 {
@@ -691,16 +694,20 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
             }
         }
 
-        if (i < (remaining - 5)) 
+        if (i < remaining) 
         {
-            /* Move OggS to start of buffer. */
-            while (i >0)
+            /* Move the remaining bytes to start of buffer.
+             * Reuse var 'segments' as it is no longer needed */
+            segments = 0;
+            while (i < remaining)
             {
-                buf[i--] = buf[remaining--];
+                buf[segments++] = buf[i++];
             }
+            remaining = segments;
         }
         else
         {
+            /* Discard the rest of the buffer */
             remaining = 0;
         }
     }
