@@ -739,6 +739,9 @@ long gui_wps_show(void)
 
             case SYS_POWEROFF:
                 bookmark_autobookmark();
+#ifdef HAVE_LCD_COLOR
+                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+#endif
                 default_event_handler(SYS_POWEROFF);
                 break;
 
