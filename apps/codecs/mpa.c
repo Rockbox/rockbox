@@ -97,6 +97,11 @@ enum codec_status codec_start(struct codec_api *api)
     int frame_skip;      /* samples to skip current frame */
     int samples_to_skip; /* samples to skip in total for this file (at start) */
     char *inputbuffer;
+    /* If we know the position isn't exact (i.e., we have seeked to a
+     * position that isn't the start of the file), we can't reliably do 
+     * end-of-file trimming for gapless playback.
+     */
+    bool exact_position = true;
 
     ci = api;
 
@@ -147,6 +152,7 @@ enum codec_status codec_start(struct codec_api *api)
     }
 
     samplesdone = ((int64_t)ci->id3->elapsed) * current_frequency / 1000;
+    exact_position = samplesdone == 0;
     samples_to_skip = start_skip;
     recalc_samplecount();
     
@@ -163,12 +169,12 @@ enum codec_status codec_start(struct codec_api *api)
         
             samplesdone = ((int64_t) (ci->seek_time - 1)) 
                 * current_frequency / 1000;
+            exact_position = samplesdone == 0;
 
             if (ci->seek_time-1 == 0)
-                newpos = 0;
+                newpos = ci->id3->first_frame_offset;
             else
-                newpos = ci->mp3_get_filepos(ci->seek_time-1) +
-                    ci->id3->first_frame_offset;
+                newpos = ci->mp3_get_filepos(ci->seek_time-1);
 
             if (!ci->seek_buffer(newpos))
                 break;
@@ -230,7 +236,7 @@ enum codec_status codec_start(struct codec_api *api)
        
         framelength = synth.pcm.length - frame_skip;
         
-        if (stop_skip > 0) {
+        if (exact_position && (stop_skip > 0)) {
             int64_t max = samplecount - samplesdone;
             
             if (max < 0) max = 0;
