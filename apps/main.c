@@ -224,14 +224,18 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
+
 #if CONFIG_CODEC == SWCODEC
     audio_preinit();
 #endif
-    audio_init();
-    button_clear_queue(); /* Empty the keyboard buffer */
+
+    /* audio_init must to know the size of voice buffer so init voice first */
 #if CONFIG_CODEC == SWCODEC
     talk_init();
 #endif
+
+    audio_init();
+    button_clear_queue(); /* Empty the keyboard buffer */
 }
 
 #else
@@ -419,11 +423,15 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
+
+     /* audio_init must to know the size of voice buffer so init voice first */
+    talk_init();
+
     audio_init();
 #if (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)) && !defined(SIMULATOR)
     pcm_rec_init();
 #endif
-    talk_init();
+
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);
 
