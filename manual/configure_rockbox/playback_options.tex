@@ -61,7 +61,7 @@
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
       on the \dap\ will resume from the point where the \dap\ was stopped before shutdown.
 
-    \item[FFwd/Rewind: ]How fast you want search (fast forward or rewind) to accelerate 
+    \item[Fast-Forward/Rewind: ]How fast you want search (fast forward or rewind) to accelerate 
       when you hold down the button. ``Off'' means no acceleration. ``2x/1s'' means double 
       the search speed once every second the button is held. ``2x/5s'' means double the 
       search speed once every 5 seconds the button is held.
@@ -171,4 +171,18 @@
         \end{description}
         }
     }
- \end{description}
+    \item[Auto Change Directory: ]Control what Rockbox does when it reaches the end
+      of a directory.  If Auto Change Directory is set to ``Yes,'' Rockbox will 
+      continue to the next directory.  If ``Auto Change Directory'' is set to ``No,''
+      playback will stop at the end of the current directory.
+      \note{You must have the ``Repeat'' option set to ``No'' for Auto Change Directory
+      to function properly.}
+      %
+    \item[Tag Cache: ]This option allows you to control whether the Tag Cache is stored
+      in RAM or on disk.  See page \pageref{ref:tagcache} for more information about using
+      the Tag Cache.
+			%
+    \item[Force Tag Cache Update: ]This option will update the Tag Cache in the background.  
+      See page \pageref{ref:tagcache} for more information about using the Tag Cache.
+			%
+	\end{description}
