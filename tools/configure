@@ -1082,7 +1082,7 @@ if test "$CC" = "sh-elf-gcc"; then
     if { echo $gccpatch | grep "rockbox" >/dev/null 2>&1; } then
       echo "gcc $gccver is rockbox patched"
       # then convert -O to -Os to get smaller binaries!
-      CCOPTS=`echo $CCOPTS | sed 's/ -O / -Os /'`
+      GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
     else
       echo "WARNING: You use an unpatched gcc compiler: $gccver"
       echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
