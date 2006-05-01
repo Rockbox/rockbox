@@ -23,7 +23,7 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE   "/.rockbox/viewers/viewer.dat"
+#define SETTINGS_FILE   "/.rockbox/viewers/viewer.cfg"
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
@@ -55,22 +55,19 @@ PLUGIN_HEADER
 
 /* Is a scrollbar called for on the current screen? */
 #define NEED_SCROLLBAR() \
- ((!(ONE_SCREEN_FITS_ALL())) && (scrollbar_mode[view_mode]==SB_ON))
+ ((!(ONE_SCREEN_FITS_ALL())) && (prefs.scrollbar_mode==SB_ON))
 
 /* variable button definitions */
 
 /* Recorder keys */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define VIEWER_MENU BUTTON_OFF
+#define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP BUTTON_F1
-#define VIEWER_MODE_LINE BUTTON_F2
-#define VIEWER_MODE_WIDTH BUTTON_F3
-#define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_F1)
-#define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_F3)
+#define VIEWER_MENU BUTTON_F1
+#define VIEWER_AUTOSCROLL BUTTON_PLAY
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
@@ -78,151 +75,128 @@ PLUGIN_HEADER
 
 /* Ondio keys */
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define VIEWER_MENU BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_MENU | BUTTON_LEFT)
-#define VIEWER_MODE_LINE (BUTTON_MENU | BUTTON_UP)
-#define VIEWER_MODE_WIDTH (BUTTON_MENU | BUTTON_RIGHT)
-#define VIEWER_MODE_PAGE (BUTTON_MENU | BUTTON_DOWN)
-#define VIEWER_MODE_SCROLLBAR (BUTTON_MENU | BUTTON_OFF)
+#define VIEWER_MENU BUTTON_OFF
+#define VIEWER_AUTOSCROLL BUTTON_MENU
 
 /* Player keys */
 #elif CONFIG_KEYPAD == PLAYER_PAD
-#define VIEWER_MENU BUTTON_STOP
+#define VIEWER_QUIT BUTTON_STOP
 #define VIEWER_PAGE_UP BUTTON_LEFT
 #define VIEWER_PAGE_DOWN BUTTON_RIGHT
-#define VIEWER_SCREEN_LEFT (BUTTON_MENU | BUTTON_LEFT)
-#define VIEWER_SCREEN_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
-#define VIEWER_MODE_WRAP (BUTTON_ON | BUTTON_LEFT)
-#define VIEWER_MODE_LINE (BUTTON_ON | BUTTON_MENU | BUTTON_RIGHT)
-#define VIEWER_MODE_WIDTH (BUTTON_ON | BUTTON_RIGHT)
+#define VIEWER_MENU BUTTON_MENU
+#define VIEWER_AUTOSCROLL BUTTON_ON
 
 /* iRiver H1x0 && H3x0 keys */
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define VIEWER_MENU BUTTON_OFF
+#define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP BUTTON_REC
-#define VIEWER_MODE_LINE BUTTON_MODE
-#define VIEWER_MODE_WIDTH BUTTON_SELECT
-#define VIEWER_MODE_PAGE (BUTTON_ON | BUTTON_MODE)
-#define VIEWER_MODE_SCROLLBAR (BUTTON_ON | BUTTON_REC)
+#define VIEWER_MENU BUTTON_MODE
+#define VIEWER_AUTOSCROLL BUTTON_SELECT
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
-#define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
-#define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
 /* iPods with the 4G pad */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
+#define VIEWER_QUIT_PRE BUTTON_SELECT
+#define VIEWER_QUIT (BUTTON_SELECT | BUTTON_MENU)
 #define VIEWER_MENU BUTTON_MENU
+#define VIEWER_AUTOSCROLL BUTTON_PLAY
 #define VIEWER_PAGE_UP BUTTON_SCROLL_BACK
 #define VIEWER_PAGE_DOWN BUTTON_SCROLL_FWD
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_SELECT | BUTTON_LEFT)
-#define VIEWER_MODE_LINE (BUTTON_SELECT | BUTTON_PLAY)
-#define VIEWER_MODE_WIDTH (BUTTON_SELECT | BUTTON_RIGHT)
-#define VIEWER_MODE_PAGE (BUTTON_SELECT | BUTTON_LEFT | BUTTON_MENU)
-#define VIEWER_MODE_SCROLLBAR (BUTTON_SELECT | BUTTON_LEFT | BUTTON_RIGHT)
 
 /* iFP7xx keys */
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define VIEWER_MENU BUTTON_PLAY
+#define VIEWER_QUIT BUTTON_PLAY
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_EQ | BUTTON_REL)
-#define VIEWER_MODE_LINE (BUTTON_EQ | BUTTON_REPEAT)
-#define VIEWER_MODE_WIDTH BUTTON_MODE
+#define VIEWER_MENU BUTTON_MODE
+#define VIEWER_AUTOSCROLL BUTTON_SELECT
 
 /* iAudio X5 keys */
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define VIEWER_MENU BUTTON_POWER
+#define VIEWER_QUIT BUTTON_POWER
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_PLAY | BUTTON_REL)
-#define VIEWER_MODE_LINE (BUTTON_PLAY | BUTTON_REPEAT)
-#define VIEWER_MODE_WIDTH BUTTON_SELECT
+#define VIEWER_MENU BUTTON_SELECT
+#define VIEWER_AUTOSCROLL BUTTON_PLAY
 
-/* iAudio X5 keys */
+/* GIGABEAT keys */
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define VIEWER_MENU BUTTON_A
+#define VIEWER_QUIT BUTTON_POWER
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MODE_WRAP (BUTTON_POWER | BUTTON_REL)
-#define VIEWER_MODE_LINE (BUTTON_POWER | BUTTON_REPEAT)
-#define VIEWER_MODE_WIDTH BUTTON_MENU
+#define VIEWER_MENU BUTTON_MENU
+#define VIEWER_AUTOSCROLL BUTTON_A
 
 #endif
 
-enum {
-    WRAP=0,
-    CHOP,
-    WORD_MODES
-} word_mode = 0;
-static unsigned char *word_mode_str[] = {"wrap", "chop", "words"};
+struct preferences {
+    enum {
+        WRAP=0,
+        CHOP,
+        WORD_MODES
+    } word_mode;
 
-enum {
-    NORMAL=0,
-    JOIN,
+    enum {
+        NORMAL=0,
+        JOIN,
 #ifdef HAVE_LCD_BITMAP
-    REFLOW, /* Makes no sense for the player */
+        REFLOW, /* Makes no sense for the player */
 #endif
-    EXPAND,
-    LINE_MODES,
+        EXPAND,
+        LINE_MODES,
 #ifndef HAVE_LCD_BITMAP
-    REFLOW  /* Sorting it behind LINE_MODES effectively disables it. */
+        REFLOW  /* Sorting it behind LINE_MODES effectively disables it. */
 #endif
-} line_mode = 0;
+    } line_mode;
 
-static unsigned char *line_mode_str[] = {
-    [NORMAL] = "normal", [JOIN] = "join",       [REFLOW] = "reflow",
-    [EXPAND] = "expand", [LINE_MODES] = "lines"
-};
-
-enum {
-    NARROW=0,
-    WIDE,
-    VIEW_MODES
-} view_mode = 0;
-static unsigned char *view_mode_str[] = {"narrow", "wide", "view"};
+    enum {
+        NARROW=0,
+        WIDE,
+        VIEW_MODES
+    } view_mode;
 
 #ifdef HAVE_LCD_BITMAP
-enum {
-    SB_OFF=0,
-    SB_ON,
-    SCROLLBAR_MODES
-} scrollbar_mode[VIEW_MODES] = {SB_OFF, SB_ON};
-#ifdef VIEWER_MODE_SCROLLBAR
-static unsigned char *scrollbar_mode_str[] = {"off", "on", "scrollbar"};
-#endif
+    enum {
+        SB_OFF=0,
+        SB_ON,
+        SCROLLBAR_MODES
+    } scrollbar_mode;
+    bool need_scrollbar;
 
-static bool need_scrollbar;
+    enum {
+        NO_OVERLAP=0,
+        OVERLAP,
+        PAGE_MODES
+    } page_mode;
 
+#endif /* HAVE_LCD_BITMAP */
 
-enum {
-    NO_OVERLAP=0,
-    OVERLAP,
-    PAGE_MODES
-} page_mode = 0;
+    enum {
+        PAGE=0,
+        LINE,
+        SCROLL_MODES
+    } scroll_mode;
 
-#ifdef VIEWER_MODE_PAGE
-static unsigned char *page_mode_str[] = {"don't overlap", "overlap", "pages"};
-#endif
-
-#endif
+    int autoscroll_speed;
+} prefs;
 
 static unsigned char buffer[BUFFER_SIZE + 1];
 static unsigned char line_break[] = {0,0x20,'-',9,0xB,0xC};
@@ -244,6 +218,9 @@ static unsigned char *next_line_ptr;
 static struct plugin_api* rb;
 
 static unsigned char glyph_width[256];
+
+bool done = false;
+int col = 0;
 
 #define ADVANCE_COUNTERS(c) do { width += glyph_width[c]; k++; } while(0)
 #define LINE_IS_FULL ((k>MAX_COLUMNS-1) || (width > draw_columns))
@@ -284,7 +261,7 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
 {
     int i, j, k;
 
-    k = (line_mode==JOIN) || (line_mode==REFLOW) ? 0:1;
+    k = (prefs.line_mode==JOIN) || (prefs.line_mode==REFLOW) ? 0:1;
 
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
@@ -307,16 +284,16 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
     if BUFFER_OOB(cur_line)
         return NULL;
 
-    if (view_mode == WIDE) {
+    if (prefs.view_mode == WIDE) {
         search_len = MAX_WIDTH;
     }
-    else {   /* view_mode == NARROW */
+    else {   /* prefs.view_mode == NARROW */
         search_len = crop_at_width(cur_line) - cur_line;
     }
 
     size = BUFFER_OOB(cur_line+search_len) ? buffer_end-cur_line : search_len;
 
-    if ((line_mode == JOIN) || (line_mode == REFLOW)) {
+    if ((prefs.line_mode == JOIN) || (prefs.line_mode == REFLOW)) {
         /* Need to scan ahead and possibly increase search_len and size,
          or possibly set next_line at second hard return in a row. */
         next_line = NULL;
@@ -332,7 +309,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
             c = cur_line[j];
             switch (c) {
                 case ' ':
-                    if (line_mode == REFLOW) {
+                    if (prefs.line_mode == REFLOW) {
                         if (newlines > 0) {
                             size = j;
                             next_line = cur_line + size;
@@ -363,7 +340,7 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
                     break;
 
                 default:
-                    if (line_mode==JOIN || newlines>0) {
+                    if (prefs.line_mode==JOIN || newlines>0) {
                         while (spaces) {
                             spaces--;
                             ADVANCE_COUNTERS(' ');
@@ -398,20 +375,20 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
 
     if (next_line == NULL)
         if (size == search_len) {
-            if (word_mode == WRAP)  /* Find last space */
+            if (prefs.word_mode == WRAP)  /* Find last space */
                 next_line = find_last_space(cur_line, size);
 
             if (next_line == NULL)
                 next_line = crop_at_width(cur_line);
             else
-                if (word_mode == WRAP)
+                if (prefs.word_mode == WRAP)
                     for (i=0;
                     i<WRAP_TRIM && isspace(next_line[0]) && !BUFFER_OOB(next_line);
                     i++)
                         next_line++;
         }
 
-    if (line_mode == EXPAND)
+    if (prefs.line_mode == EXPAND)
         if (!BUFFER_OOB(next_line))  /* Not Null & not out of bounds */
             if (next_line[0] == 0)
                 if (next_line != cur_line)
@@ -458,7 +435,7 @@ static unsigned char* find_prev_line(const unsigned char* cur_line)
      points from where they wrap when scrolling down.
        If buffer is at top of file, start at top of buffer. */
 
-    if ((line_mode == JOIN) || (line_mode == REFLOW))
+    if ((prefs.line_mode == JOIN) || (prefs.line_mode == REFLOW))
         prev_line = p = NULL;
     else
         prev_line = p = find_last_feed(buffer, cur_line-buffer-1);
@@ -537,7 +514,7 @@ static int read_and_synch(int direction)
         rb->memcpy(MID_SECTOR, TOP_SECTOR, SMALL_BLOCK_SIZE);
     }
     else /* down */ {
-        if (view_mode == WIDE) {
+        if (prefs.view_mode == WIDE) {
             /* WIDE mode needs more buffer so we have to read smaller blocks */
             move_size = SMALL_BLOCK_SIZE;
             offset = LARGE_BLOCK_SIZE;
@@ -573,6 +550,12 @@ static void viewer_scroll_up(void)
         screen_top_ptr = p;
 }
 
+static void viewer_scroll_down(void)
+{
+    if (next_screen_ptr != NULL)
+        screen_top_ptr = next_line_ptr;
+}
+
 #ifdef HAVE_LCD_BITMAP
 static void viewer_scrollbar(void) {
     int w, h, items, min_shown, max_shown;
@@ -586,7 +569,7 @@ static void viewer_scrollbar(void) {
     else
         max_shown = min_shown + (next_screen_ptr - screen_top_ptr);
 
-    rb->scrollbar(0, 0, w-1, LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
+    rb->scrollbar(0, 0, w-2, LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
 }
 #endif
 
@@ -603,11 +586,10 @@ static void viewer_draw(int col)
     int len;
     unsigned char *endptr;
 
-
     /* If col==-1 do all calculations but don't display */
     if (col != -1) {
 #ifdef HAVE_LCD_BITMAP
-        left_col = need_scrollbar? 1:0;
+        left_col = prefs.need_scrollbar? 1:0;
 #else
         left_col = 0;
 #endif
@@ -653,10 +635,10 @@ static void viewer_draw(int col)
         }
         line_len = line_end - line_begin;
 
-        if (line_mode == JOIN) {
+        if (prefs.line_mode == JOIN) {
             if (line_begin[0] == 0) {
                 line_begin++;
-                if (word_mode == CHOP)
+                if (prefs.word_mode == CHOP)
                     line_end++;
                 else
                     line_len--;
@@ -696,10 +678,10 @@ static void viewer_draw(int col)
                     rb->lcd_puts(left_col, i, utf8_buffer);
                 }
         }
-        else if (line_mode == REFLOW) {
+        else if (prefs.line_mode == REFLOW) {
             if (line_begin[0] == 0) {
                 line_begin++;
-                if (word_mode == CHOP)
+                if (prefs.word_mode == CHOP)
                     line_end++;
                 else
                     line_len--;
@@ -713,7 +695,7 @@ static void viewer_draw(int col)
                     switch (c) {
                         case ' ':
                         case 0:
-                            if ((j==0) && (word_mode==WRAP))
+                            if ((j==0) && (prefs.word_mode==WRAP))
                                 /* special case: indent the paragraph,
                                  * don't count spaces */
                                 indent_spaces = par_indent_spaces;
@@ -759,7 +741,7 @@ static void viewer_draw(int col)
                 switch (c) {
                     case ' ':
                     case 0:
-                        if (j==0 && word_mode==WRAP) { /* indent paragraph */
+                        if (j==0 && prefs.word_mode==WRAP) { /* indent paragraph */
                             for (j=0; j<par_indent_spaces; j++)
                                 scratch_buffer[k++] = ' ';
                             j=0;
@@ -788,7 +770,7 @@ static void viewer_draw(int col)
                     rb->lcd_puts(left_col, i, utf8_buffer);
                 }
         }
-        else { /* line_mode != JOIN && line_mode != REFLOW */
+        else { /* prefs.line_mode != JOIN && prefs.line_mode != REFLOW */
             if (col != -1)
                 if (line_len > col) {
                     c = line_end[0];
@@ -812,9 +794,9 @@ static void viewer_draw(int col)
         next_screen_ptr = NULL;
 
 #ifdef HAVE_LCD_BITMAP
-    next_screen_to_draw_ptr = page_mode==OVERLAP? line_begin: next_screen_ptr;
+    next_screen_to_draw_ptr = prefs.page_mode==OVERLAP? line_begin: next_screen_ptr;
 
-    if (need_scrollbar)
+    if (prefs.need_scrollbar)
         viewer_scrollbar();
 
     if (col != -1)
@@ -834,6 +816,7 @@ static void viewer_top(void)
     fill_buffer(0, buffer, BUFFER_SIZE);
 }
 
+#ifdef HAVE_LCD_BITMAP
 static void viewer_bottom(void)
 {
     /* Read bottom of file into buffer
@@ -855,13 +838,12 @@ static void viewer_bottom(void)
     fill_buffer(last_sectors, buffer, BUFFER_SIZE);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static void init_need_scrollbar(void) {
     /* Call viewer_draw in quiet mode to initialize next_screen_ptr,
      and thus ONE_SCREEN_FITS_ALL(), and thus NEED_SCROLLBAR() */
     viewer_draw(-1);
-    need_scrollbar = NEED_SCROLLBAR();
-    draw_columns = need_scrollbar? display_columns-glyph_width['o'] : display_columns;
+    prefs.need_scrollbar = NEED_SCROLLBAR();
+    draw_columns = prefs.need_scrollbar? display_columns-glyph_width['o'] : display_columns;
     par_indent_spaces = draw_columns/(5*glyph_width[' ']);
 }
 #else
@@ -875,6 +857,7 @@ static bool viewer_init(void)
     struct font *pf;
 
     pf = rb->font_get(FONT_UI);
+
     if (pf->width != NULL)
     {   /* variable pitch font -- fill structure from font width data */
         ch = pf->defaultchar - pf->firstchar;
@@ -896,18 +879,6 @@ static bool viewer_init(void)
     par_indent_spaces = 2;
     rb->memset(glyph_width, 1, 256);
 #endif
-    /*********************
-    * (Could re-initialize settings here, if you
-    *   wanted viewer to start the same way every time)
-    word_mode = WRAP;
-    line_mode = NORMAL;
-    view_mode = NARROW;
-#ifdef HAVE_LCD_BITMAP
-    page_mode = NO_OVERLAP;
-    scrollbar_mode[NARROW] = SB_OFF;
-    scrollbar_mode[WIDE] = SB_ON;
-#endif
-    **********************/
 
     fd = rb->open(file_name, O_RDONLY);
     if (fd==-1)
@@ -924,118 +895,63 @@ static bool viewer_init(void)
       init file_pos, buffer_end, screen_top_ptr */
     viewer_top();
 
-    /* Init need_scrollbar value */
+    /* Init prefs.need_scrollbar value */
     init_need_scrollbar();
 
     return true;
 }
 
-/* in the viewer settings file, the line format is:
- * - file name (variable length)
- * - settings  (fixed length strings appended, EOL included)
- */
-typedef struct {
-        char word_mode[2], line_mode[2], view_mode[2];
-        char file_pos[11], screen_top_ptr[11];
-#ifdef HAVE_LCD_BITMAP
-        char scrollbar_mode[VIEW_MODES][2], page_mode[2];
-#endif
-        char EOL;
-} viewer_settings_string;
-
-static void viewer_load_settings(void)
+static void viewer_reset_settings(void)
 {
-    int settings_fd, file_name_len, req_line_len, line_len;
-    char line[1024];
+    prefs.word_mode = WRAP;
+    prefs.line_mode = NORMAL;
+    prefs.view_mode = NARROW;
+    prefs.scroll_mode = PAGE;
+#ifdef HAVE_LCD_BITMAP
+    prefs.page_mode = NO_OVERLAP;
+    prefs.scrollbar_mode = SB_OFF;
+#endif
+}
+
+static void viewer_load_settings(void) /* same name as global, but not the same file.. */
+{
+    int settings_fd;
 
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
-    if (settings_fd < 0) return;
-
-    file_name_len = rb->strlen(file_name);
-    req_line_len = file_name_len + sizeof(viewer_settings_string);
-    while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
-        if ((line_len == req_line_len) &&
-                (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
-            /* found a match, load stored values */
-            viewer_settings_string *prefs = (void*) &line[file_name_len];
-
-#ifdef HAVE_LCD_BITMAP
-            /* view mode will be initialized later anyways */
-            for (view_mode=0; view_mode<VIEW_MODES; ++view_mode)
-                scrollbar_mode[view_mode] =
-                        rb->atoi(prefs->scrollbar_mode[view_mode]);
-
-            page_mode = rb->atoi(prefs->page_mode);
-#endif
-
-            word_mode = rb->atoi(prefs->word_mode);
-            line_mode = rb->atoi(prefs->line_mode);
-            view_mode = rb->atoi(prefs->view_mode);
-
-            init_need_scrollbar();
-            /* the following settings are safety checked
-             * (file may have changed on disk)
-             */
-            file_pos = rb->atoi(prefs->file_pos); /* should be atol() */
-            if (file_pos > file_size) {
-                    file_pos = 0;
-                    break;
-            }
-            buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
-
-            screen_top_ptr = buffer + rb->atoi(prefs->screen_top_ptr);
-            if (BUFFER_OOB(screen_top_ptr)) {
-                    screen_top_ptr = buffer;
-                    break;
-            }
-        }
+    if (settings_fd < 0)
+    {
+        rb->splash(HZ*2, true, "No Settings File");
+        return;
     }
+    if (rb->filesize(settings_fd) != sizeof(struct preferences))
+    {
+        rb->splash(HZ*2, true, "Settings File Invalid");
+        return;
+    }
+
+    rb->read(settings_fd, &prefs, sizeof(struct preferences));
     rb->close(settings_fd);
+
+    init_need_scrollbar();
+
+    file_pos=0;
+    buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
+
+    screen_top_ptr = buffer;
+    if (BUFFER_OOB(screen_top_ptr)) {
+        screen_top_ptr = buffer;
+    }
 
     fill_buffer(file_pos, buffer, BUFFER_SIZE);
 }
 
-static void viewer_save_settings(void)
+static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
-    int settings_fd, file_name_len, req_line_len, line_len;
-    char line[1024];
-    viewer_settings_string prefs;
+    int settings_fd;
 
-    settings_fd=rb->open(SETTINGS_FILE, O_RDWR | O_CREAT);
-    DEBUGF("SETTINGS_FILE: %d\n", settings_fd);
-    if (settings_fd < 0) return;
+    settings_fd = rb->creat(SETTINGS_FILE, O_WRONLY); /* create the settings file */
 
-    file_name_len = rb->strlen(file_name);
-    req_line_len = file_name_len + sizeof(viewer_settings_string);
-    while ((line_len = rb->read_line(settings_fd, line, sizeof(line))) > 0) {
-        if ((line_len == req_line_len) &&
-                (rb->strncasecmp(line, file_name, file_name_len) == 0)) {
-            /* found a match, reposition file pointer to overwrite this line */
-            rb->lseek(settings_fd, -line_len, SEEK_CUR);
-            break;
-        }
-    }
-
-    /* fill structure in order to prevent overwriting with 0s (snprintf
-     * intentionally overflows so that no terminating NULLs are written
-     * to disk). */
-    rb->snprintf(prefs.word_mode, 3, "%2d", word_mode);
-    rb->snprintf(prefs.line_mode, 3, "%2d", line_mode);
-    rb->snprintf(prefs.view_mode, 3, "%2d", view_mode);
-    rb->snprintf(prefs.file_pos, 12, "%11d", file_pos);
-    rb->snprintf(prefs.screen_top_ptr, 12, "%11d", screen_top_ptr-buffer);
-#ifdef HAVE_LCD_BITMAP
-    /* view_mode is not needed anymore */
-    for (view_mode=0; view_mode<VIEW_MODES; ++view_mode)
-        rb->snprintf(prefs.scrollbar_mode[view_mode], 3,
-                        "%2d", scrollbar_mode[view_mode]);
-
-    rb->snprintf(prefs.page_mode, 3, "%2d", page_mode);
-#endif
-    prefs.EOL = '\n';
-
-    rb->write(settings_fd, file_name, file_name_len);
-    rb->write(settings_fd, &prefs, sizeof(prefs));
+    rb->write (settings_fd, &prefs, sizeof(struct preferences));
     rb->close(settings_fd);
 }
 
@@ -1047,6 +963,7 @@ static void viewer_exit(void *parameter)
     rb->close(fd);
 }
 
+#ifdef HAVE_LCD_BITMAP
 static int col_limit(int col)
 {
     if (col < 0)
@@ -1057,45 +974,155 @@ static int col_limit(int col)
 
     return col;
 }
+#endif
 
+static void change_options_menu(void)
+{
+    int m, result;
+    bool done = false;
 
-bool done=false;
-int col = 0;
+    static const struct menu_item items[] = {
+        {"Word Wrap", NULL },
+        {"Line Mode", NULL },
+        {"Wide View", NULL },
+        {"Overlap Pages", NULL },
+        {"Scroll Mode", NULL},
+#ifdef HAVE_LCD_BITMAP
+        {"Show Scrollbar", NULL },
+#endif
+        {"Auto-Scroll Speed", NULL },
+    };
+    static const struct opt_items opt_word_mode[2] = {
+        {"On",NULL},{"Off (Chop Words)",NULL},
+    };
+#ifdef HAVE_LCD_BITMAP
+    static const struct opt_items opt_line_mode[4] = {
+        {"Normal",NULL},{"Join Lines",NULL},
+        {"Reflow Lines",NULL},{"Expand Lines",NULL},
+#else
+    static const struct opt_items opt_line_mode[3] = {
+        {"Normal",NULL},{"Join Lines",NULL},
+        {"Expand Lines",NULL},
+#endif
+    };
+    static const struct opt_items opt_view_mode[2] = {
+        {"No (Narrow)",NULL},{"Yes",NULL}
+    };
+    static const struct opt_items opt_scroll_mode[2] = {
+        {"Scroll by Page",NULL},{"Scroll by Line",NULL}
+    };
+#ifdef HAVE_LCD_BITMAP
+    static const struct opt_items opt_scrollbar_mode[2] = {
+        {"Off",NULL},{"On",NULL}
+    };
+    static const struct opt_items opt_page_mode[2] = {
+        {"No",NULL},{"Yes",NULL}
+    };
+#endif
+    static const struct opt_items opt_autoscroll_speed[10] = {
+        { "1", NULL },{ "2", NULL },{ "3", NULL },{ "4", NULL },{ "5", NULL },
+        { "6", NULL },{ "7", NULL },{ "8", NULL },{ "9", NULL },{ "10", NULL }
+    };
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                      NULL, NULL, NULL, NULL);
+
+    while(!done)
+    {
+        result=rb->menu_show(m);
+        switch (result)
+        {
+            case MENU_SELECTED_EXIT:
+                done = true;
+                break;
+
+            case 0: /* word mode */
+                rb->set_option("Word Wrap", &prefs.word_mode, INT,
+                            opt_word_mode , 2, NULL);
+                break;
+            case 1: /* line mode */
+                rb->set_option("Line Mode", &prefs.line_mode, INT, opt_line_mode,
+                            sizeof(opt_line_mode) / sizeof(*opt_line_mode), NULL);
+                break;
+            case 2: /* view mode */
+                rb->set_option("Wide View", &prefs.view_mode, INT,
+                            opt_view_mode , 2, NULL);
+                break;
+#ifdef HAVE_LCD_BITMAP
+            case 3:
+                rb->set_option("Overlap Pages", &prefs.page_mode, INT,
+                            opt_page_mode , 2, NULL);
+                break;
+#endif
+            case 4:
+                rb->set_option("Scroll Mode", &prefs.scroll_mode, INT,
+                               opt_scroll_mode , 2, NULL);
+                break;
+    #ifdef HAVE_LCD_BITMAP
+            case 5:
+                rb->set_option("Show Scrollbar", &prefs.scrollbar_mode, INT,
+                            opt_scrollbar_mode , 2, NULL);
+                /* Show-scrollbar mode for current view-width mode */
+                if (!(ONE_SCREEN_FITS_ALL())) {
+                    if (prefs.scrollbar_mode == true)
+                        init_need_scrollbar();
+                }
+                break;
+    #endif
+            case 6:
+                rb->set_option("Auto-Scroll Speed", &prefs.autoscroll_speed, INT,
+                            opt_autoscroll_speed, sizeof(opt_autoscroll_speed) /
+                            sizeof(*opt_autoscroll_speed), NULL);
+                break;
+        } /* switch() */
+    }
+    rb->menu_exit(m);
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_setmargins(0,0);
+#endif
+}
 
 static void show_menu(void)
-	{
-		int m;
-		int result;
-		static const struct menu_item items[] = {
-			{"Quit", NULL },
-			{"Show Playback menu", NULL },
-			{"Return", NULL },
-		};
-		m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
-		result=rb->menu_show(m);
-		switch (result)
-		{
-			case 0:
-				viewer_exit(NULL);
-				done = true;
-			   	break;
-			case 1:
-				playback_control(rb);
-				break;
-			case 2:
-				rb->menu_exit(m);
-				viewer_draw(col);
-				break;
-		}
-	viewer_draw(col);
-	}
+{
+    int m;
+    int result;
+    static const struct menu_item items[] = {
+        {"Quit", NULL },
+        {"Viewer Options", NULL },
+        {"Show Playback Menu", NULL },
+        {"Return", NULL },
+    };
+
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);
+    result=rb->menu_show(m);
+    switch (result)
+    {
+        case 0: /* quit */
+            rb->splash(1, true, "Saving Settings");
+            rb->menu_exit(m);
+            viewer_exit(NULL);
+            done = true;
+            break;
+        case 1: /* change settings */
+            change_options_menu();
+            break;
+        case 2: /* playback control */
+            playback_control(rb);
+            break;
+        case 3: /* return */
+            break;
+    }
+    rb->menu_exit(m);
+#ifdef HAVE_LCD_BITMAP
+    rb->lcd_setmargins(0,0);
+#endif
+    viewer_draw(col);
+}
 
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
-
-    int button;
-    int i;
-    int ok;
+    int button, i, ok;
+    bool autoscroll = false;
+    int old_tick = *rb->current_tick;
 
     rb = api;
 
@@ -1110,175 +1137,95 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         return PLUGIN_OK;
     }
 
-    viewer_load_settings();
+    viewer_reset_settings(); /* load defaults first */
+    viewer_load_settings(); /* .. then try to load from disk */
 
     viewer_draw(col);
 
-	while (!done) {
-        button = rb->button_get(true);
+    while (!done) {
+
+        if(autoscroll)
+        {
+            if(old_tick <= *rb->current_tick - (110-prefs.autoscroll_speed*10))
+            {
+                viewer_scroll_down();
+                viewer_draw(col);
+                old_tick = *rb->current_tick;
+            }
+        }
+
+        button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:
-				show_menu();
-	    		break;
-
-            case VIEWER_MODE_WRAP:
-                /* Word-wrap mode: WRAP or CHOP */
-                if (++word_mode == WORD_MODES)
-                    word_mode = 0;
-
-                init_need_scrollbar();
-
-                viewer_draw(col);
-
-                rb->splash(HZ, true, "%s %s",
-                           word_mode_str[word_mode],
-                           word_mode_str[WORD_MODES]);
-
-                viewer_draw(col);
+                show_menu();
                 break;
 
-            case VIEWER_MODE_LINE:
-                /* Line-paragraph mode: NORMAL, JOIN, REFLOW or EXPAND */
-                if (++line_mode == LINE_MODES)
-                    line_mode = 0;
-
-                if (view_mode == WIDE) {
-                    if (line_mode == JOIN)
-                        if (++line_mode == LINE_MODES)
-                            line_mode = 0;
-                    if (line_mode == REFLOW)
-                        if (++line_mode == LINE_MODES)
-                            line_mode = 0;
-                }
-
-                init_need_scrollbar();
-
-                viewer_draw(col);
-
-                rb->splash(HZ, true, "%s %s",
-                           line_mode_str[line_mode],
-                           line_mode_str[LINE_MODES]);
-
-                viewer_draw(col);
-                break;
-
-            case VIEWER_MODE_WIDTH:
-                /* View-width mode: NARROW or WIDE */
-                if ((line_mode == JOIN) || (line_mode == REFLOW))
-                    rb->splash(HZ, true, "(no %s %s)",
-                               view_mode_str[WIDE],
-                               line_mode_str[line_mode]);
-                else
-                    if (++view_mode == VIEW_MODES)
-                        view_mode = 0;
-
-                col = 0;
-
-                /***** Could do this after change of word-wrap mode
-                * and after change of view-width mode, to normalize
-                * view:
-                if (screen_top_ptr > buffer + BUFFER_SIZE/2) {
-                    screen_top_ptr = find_prev_line(screen_top_ptr);
-                    screen_top_ptr = find_next_line(screen_top_ptr);
-                }
-                else {
-                    screen_top_ptr = find_next_line(screen_top_ptr);
-                    screen_top_ptr = find_prev_line(screen_top_ptr);
-                }
-                ***********/
-
-                init_need_scrollbar();
-
-                viewer_draw(col);
-
-                rb->splash(HZ, true, "%s %s",
-                           view_mode_str[view_mode],
-                           view_mode_str[VIEW_MODES]);
-
-                viewer_draw(col);
+            case VIEWER_AUTOSCROLL:
+                autoscroll = !autoscroll;
                 break;
 
             case VIEWER_PAGE_UP:
             case VIEWER_PAGE_UP | BUTTON_REPEAT:
-                /* Page up */
+                if (prefs.scroll_mode == PAGE)
+                {
+                    /* Page up */
 #ifdef HAVE_LCD_BITMAP
-                for (i = page_mode==OVERLAP? 1:0; i < display_lines; i++)
+                    for (i = prefs.page_mode==OVERLAP? 1:0; i < display_lines; i++)
 #else
-                for (i = 0; i < display_lines; i++)
+                    for (i = 0; i < display_lines; i++)
 #endif
+                        viewer_scroll_up();
+                }
+                else
                     viewer_scroll_up();
-
+                old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
 
             case VIEWER_PAGE_DOWN:
             case VIEWER_PAGE_DOWN | BUTTON_REPEAT:
-                /* Page down */
-                if (next_screen_ptr != NULL)
-                    screen_top_ptr = next_screen_to_draw_ptr;
-
+                if (prefs.scroll_mode == PAGE)
+                {
+                    /* Page down */
+                    if (next_screen_ptr != NULL)
+                        screen_top_ptr = next_screen_to_draw_ptr;
+                }
+                else
+                    viewer_scroll_down();
+                old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
 
+#ifdef VIEWER_SCREEN_LEFT
             case VIEWER_SCREEN_LEFT:
             case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
-                if (view_mode == WIDE) {
+                if (prefs.view_mode == WIDE) {
                     /* Screen left */
                     col -= draw_columns/glyph_width['o'];
                     col = col_limit(col);
                 }
-                else {   /* view_mode == NARROW */
+                else {   /* prefs.view_mode == NARROW */
                     /* Top of file */
                     viewer_top();
                 }
 
                 viewer_draw(col);
                 break;
+#endif
 
+#ifdef VIEWER_SCREEN_LEFT
             case VIEWER_SCREEN_RIGHT:
             case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
-                if (view_mode == WIDE) {
+                if (prefs.view_mode == WIDE) {
                     /* Screen right */
                     col += draw_columns/glyph_width['o'];
                     col = col_limit(col);
                 }
-                else {   /* view_mode == NARROW */
+                else {   /* prefs.view_mode == NARROW */
                     /* Bottom of file */
                     viewer_bottom();
                 }
 
-                viewer_draw(col);
-                break;
-
-#ifdef VIEWER_MODE_PAGE
-            case VIEWER_MODE_PAGE:
-                /* Page-overlap mode */
-                if (++page_mode == PAGE_MODES)
-                    page_mode = 0;
-
-                rb->splash(HZ, true, "%s %s",
-                           page_mode_str[page_mode],
-                           page_mode_str[PAGE_MODES]);
-
-                viewer_draw(col);
-                break;
-#endif
-#ifdef VIEWER_MODE_SCROLLBAR
-            case VIEWER_MODE_SCROLLBAR:
-                /* Show-scrollbar mode for current view-width mode */
-                if (!(ONE_SCREEN_FITS_ALL())) {
-                    if (++scrollbar_mode[view_mode] == SCROLLBAR_MODES)
-                        scrollbar_mode[view_mode] = 0;
-
-                    init_need_scrollbar();
-                    viewer_draw(col);
-
-                    rb->splash(HZ, true, "%s %s (%s %s)",
-                               scrollbar_mode_str[SCROLLBAR_MODES],
-                               scrollbar_mode_str[scrollbar_mode[view_mode]],
-                               view_mode_str[view_mode],
-                               view_mode_str[VIEW_MODES]);
-                }
                 viewer_draw(col);
                 break;
 #endif
@@ -1288,6 +1235,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_LINE_UP | BUTTON_REPEAT:
                 /* Scroll up one line */
                 viewer_scroll_up();
+                old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
 
@@ -1296,7 +1244,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 /* Scroll down one line */
                 if (next_screen_ptr != NULL)
                     screen_top_ptr = next_line_ptr;
-
+                old_tick = *rb->current_tick;
                 viewer_draw(col);
                 break;
 #endif
@@ -1317,6 +1265,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 #endif
+            case VIEWER_QUIT:
+                viewer_exit(NULL);
+                done = true;
+                break;
 
             default:
                 if (rb->default_event_handler_ex(button, viewer_exit, NULL)

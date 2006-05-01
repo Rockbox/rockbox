@@ -106,7 +106,7 @@
 #define PLUGIN_API_VERSION 18
 
 /* update this to latest version if a change to the api struct breaks
-   backwards compatibility (and please take the opportunity to sort in any 
+   backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
 #define PLUGIN_MIN_API_VERSION 14
 
@@ -233,7 +233,7 @@ struct plugin_api {
     long (*button_get_w_tmo)(int ticks);
     int (*button_status)(void);
     void (*button_clear_queue)(void);
-#ifdef HAS_BUTTON_HOLD  
+#ifdef HAS_BUTTON_HOLD
     bool (*button_hold)(void);
 #endif
 
@@ -255,7 +255,7 @@ struct plugin_api {
     void (*ata_sleep)(void);
     bool (*ata_disk_is_active)(void);
 #endif
-    
+
     /* dir */
     DIR* (*PREFIX(opendir))(const char* name);
     int (*PREFIX(closedir))(DIR* dir);
@@ -376,7 +376,7 @@ struct plugin_api {
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
     (CONFIG_CODEC == SWCODEC)
-    void (*sound_set_pitch)(int pitch);        
+    void (*sound_set_pitch)(int pitch);
 #endif
 
     /* MAS communication */
@@ -408,8 +408,8 @@ struct plugin_api {
     void (*menu_insert)(int menu, int position, char *desc, bool (*function) (void));
     void (*menu_set_cursor)(int menu, int position);
 
-    bool (*set_option)(const char* string, void* variable, 
-                       enum optiontype type, const struct opt_items* options, 
+    bool (*set_option)(const char* string, void* variable,
+                       enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));
 
 
@@ -473,7 +473,7 @@ struct plugin_api {
     struct tree_context* (*tree_get_context)(void);
 
     /* new stuff at the end, sort into place next time
-       the API gets incompatible */     
+       the API gets incompatible */
     bool (*set_sound)(const unsigned char * string,
                       int* variable, int setting);
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
@@ -510,6 +510,10 @@ struct plugin_api {
     void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
 #endif
     unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
+
+#ifdef HAVE_LCD_BITMAP
+    void (*lcd_setmargins)(int x, int y);
+#endif
 };
 
 /* plugin header */

@@ -182,7 +182,7 @@ static const struct plugin_api rockbox_api = {
     button_get_w_tmo,
     button_status,
     button_clear_queue,
-#ifdef HAS_BUTTON_HOLD 
+#ifdef HAS_BUTTON_HOLD
     button_hold,
 #endif
 
@@ -202,7 +202,7 @@ static const struct plugin_api rockbox_api = {
     settings_parseline,
 #ifndef SIMULATOR
     ata_sleep,
-	ata_disk_is_active,
+    ata_disk_is_active,
 #endif
 
     /* dir */
@@ -290,7 +290,7 @@ static const struct plugin_api rockbox_api = {
     bitswap,
 #endif
 #if CONFIG_CODEC == SWCODEC
-    pcm_play_data,    
+    pcm_play_data,
     pcm_play_stop,
     pcm_set_frequency,
     pcm_is_playing,
@@ -357,7 +357,7 @@ static const struct plugin_api rockbox_api = {
     battery_level_safe,
     battery_time,
 #ifndef SIMULATOR
-	battery_voltage,
+    battery_voltage,
 #endif
 #ifdef HAVE_CHARGING
     charger_inserted,
@@ -434,6 +434,10 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_scroll_left,
 #endif
     gui_synclist_do_button,
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_setmargins,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -553,7 +557,7 @@ int plugin_load(const char* plugin, void* parameter)
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
-    lcd_set_drawinfo(DRMODE_SOLID, global_settings.fg_color, 
+    lcd_set_drawinfo(DRMODE_SOLID, global_settings.fg_color,
                                    global_settings.bg_color);
 #else
     lcd_set_drawinfo(DRMODE_SOLID, LCD_DEFAULT_FG, LCD_DEFAULT_BG);
@@ -607,7 +611,7 @@ void* plugin_get_buffer(int* buffer_size)
     {
         if (plugin_size >= PLUGIN_BUFFER_SIZE)
             return NULL;
-        
+
         *buffer_size = PLUGIN_BUFFER_SIZE-plugin_size;
         buffer_pos = plugin_size;
     }
@@ -620,7 +624,7 @@ void* plugin_get_buffer(int* buffer_size)
     return &pluginbuf[buffer_pos];
 }
 
-/* Returns a pointer to the mp3 buffer. 
+/* Returns a pointer to the mp3 buffer.
    Playback gets stopped, to avoid conflicts. */
 void* plugin_get_audio_buffer(int* buffer_size)
 {
@@ -631,7 +635,7 @@ void* plugin_get_audio_buffer(int* buffer_size)
 }
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
-   runs from timer or own thread. The callback is registered to later 
+   runs from timer or own thread. The callback is registered to later
    instruct it to free its resources before a new plugin gets loaded. */
 void plugin_tsr(void (*exit_callback)(void))
 {
