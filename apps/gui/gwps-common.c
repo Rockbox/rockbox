@@ -2053,8 +2053,9 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
 
-        if ((state->id3->elapsed < 1000) ||
-            ((state->id3->length - state->id3->elapsed) < (unsigned)n))
+        if (((state->id3->elapsed < 1000) ||
+            ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+            (state->paused == false))
             backlight_on();
     }
 #endif
@@ -2069,8 +2070,9 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
         if ( n < 1000 )
             n = 5000; /* use 5s if backlight is always on or off */
 
-        if ((state->id3->elapsed < 1000) ||
-            ((state->id3->length - state->id3->elapsed) < (unsigned)n))
+        if (((state->id3->elapsed < 1000) ||
+            ((state->id3->length - state->id3->elapsed) < (unsigned)n)) &&
+            (state->paused == false))
             remote_backlight_on();
     }
 #endif
