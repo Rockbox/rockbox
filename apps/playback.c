@@ -146,7 +146,11 @@ enum {
 #endif
 #define CODEC_IRAM_SIZE     0xc000
 
+#ifndef SIMULATOR
 extern bool audio_is_initialized;
+#else
+static bool audio_is_initialized = false;
+#endif
 
 /* Buffer control thread. */
 static struct event_queue audio_queue;
@@ -2726,7 +2730,7 @@ void audio_set_buffer_margin(int setting)
 void audio_set_crossfade(int enable)
 {
     size_t size;
-    bool was_playing = playing;
+    bool was_playing = (playing && audio_is_initialized);
     size_t offset = 0;
     int seconds = 1;
 
@@ -2885,10 +2889,9 @@ static void playback_init(void)
 
     filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
 
-    /* FIXME: This call will infinite loop if called on the audio thread
-     * while playing, fortunately this is an init call so that should be
-     * impossible. */
     audio_set_crossfade(global_settings.crossfade);
+
+    audio_is_initialized = true;
 
     sound_settings_apply();
 }
