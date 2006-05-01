@@ -99,7 +99,7 @@ nim.c
 
 #if CONFIG_CODEC == SWCODEC        /* software codec platforms */
 mp3_encoder.c
-midi2wav.c
+midiplay.c
 wav2wv.c
 #else                              /* hardware codec platforms */
 #ifndef HAVE_MMC                   /* not for Ondio, has no remote control pin */

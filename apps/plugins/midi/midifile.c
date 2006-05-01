@@ -26,7 +26,7 @@ void bail(const char *);
 
 struct MIDIfile * loadFile(char * filename)
 {
-    struct MIDIfile * mf;
+    struct MIDIfile * mfload;
     int file = rb->open (filename, O_RDONLY);
 
     if(file==-1)
@@ -34,15 +34,15 @@ struct MIDIfile * loadFile(char * filename)
         bail("Could not open file\n");
     }
 
-    mf = (struct MIDIfile*)allocate(sizeof(struct MIDIfile));
+    mfload = (struct MIDIfile*)malloc(sizeof(struct MIDIfile));
 
-    if(mf==NULL)
+    if(mfload==NULL)
     {
         rb->close(file);
         bail("Could not allocate memory for MIDIfile struct\n");
     }
 
-    rb->memset(mf, 0, sizeof(struct MIDIfile));
+    rb->memset(mfload, 0, sizeof(struct MIDIfile));
 
     if(readID(file) != ID_MTHD)
     {
@@ -62,32 +62,32 @@ struct MIDIfile * loadFile(char * filename)
         bail("MIDI file type not supported");
     }
 
-    mf->numTracks = readTwoBytes(file);
-    mf->div = readTwoBytes(file);
+    mfload->numTracks = readTwoBytes(file);
+    mfload->div = readTwoBytes(file);
 
     int track=0;
 
-    printf("\nnumTracks=%d  div=%d\nBegin reading track data\n", mf->numTracks, mf->div);
+    printf("\nnumTracks=%d  div=%d\nBegin reading track data\n", mfload->numTracks, mfload->div);
 
 
-    while(! eof(file) && track < mf->numTracks)
+    while(! eof(file) && track < mfload->numTracks)
     {
         unsigned char id = readID(file);
 
 
         if(id == ID_EOF)
         {
-            if(mf->numTracks != track)
+            if(mfload->numTracks != track)
             {
-                printf("\nError: file claims to have %d tracks.\n       I only see %d here.\n",     mf->numTracks, track);
-                mf->numTracks = track;
+                printf("\nError: file claims to have %d tracks.\n       I only see %d here.\n",     mfload->numTracks, track);
+                mfload->numTracks = track;
             }
-            return mf;
+            return mfload;
         }
 
         if(id == ID_MTRK)
         {
-            mf->tracks[track] = readTrack(file);
+            mfload->tracks[track] = readTrack(file);
             //exit(0);
             track++;
         } else
@@ -98,16 +98,16 @@ struct MIDIfile * loadFile(char * filename)
                 readChar(file);
         }
     }
-    return mf;
+    return mfload;
 
 }
 
 
-int rStatus = 0;
-
 /* Returns 0 if done, 1 if keep going */
 int readEvent(int file, void * dest)
 {
+
+    static int rStatus = 0;
     struct Event dummy;
     struct Event * ev = (struct Event *) dest;
 
@@ -131,7 +131,7 @@ int readEvent(int file, void * dest)
             if(dest != NULL)
             {
                 ev->evData = readData(file, ev->len);
-                printf("\nDATA: <%s>", ev->evData);
+/*                printf("\nDATA: <%s>", ev->evData); */
             }
             else
             {
@@ -173,11 +173,9 @@ int readEvent(int file, void * dest)
     return 1;
 }
 
-
-
 struct Track * readTrack(int file)
 {
-    struct Track * trk = (struct Track *)allocate(sizeof(struct Track));
+    struct Track * trk = (struct Track *)malloc(sizeof(struct Track));
     rb->memset(trk, 0, sizeof(struct Track));
 
     trk->size = readFourBytes(file);
@@ -194,7 +192,7 @@ struct Track * readTrack(int file)
     rb->lseek(file, pos, SEEK_SET);
 
     int trackSize = (numEvents+1) * sizeof(struct Event);
-    void * dataPtr = allocate(trackSize);
+    void * dataPtr = malloc(trackSize);
     trk->dataBlock = dataPtr;
 
     numEvents=0;

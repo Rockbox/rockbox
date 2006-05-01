@@ -31,11 +31,11 @@ unsigned int readDWord(int file)
 
 struct GWaveform * loadWaveform(int file)
 {
-    struct GWaveform * wav = (struct GWaveform *)allocate(sizeof(struct GWaveform));
+    struct GWaveform * wav = (struct GWaveform *)malloc(sizeof(struct GWaveform));
     rb->memset(wav, 0, sizeof(struct GWaveform));
 
     wav->name=readData(file, 7);
-    printf("\nWAVE NAME = [%s]", wav->name);
+/*    printf("\nWAVE NAME = [%s]", wav->name); */
     wav->fractions=readChar(file);
     wav->wavSize=readDWord(file);
     wav->startLoop=readDWord(file);
@@ -62,7 +62,7 @@ struct GWaveform * loadWaveform(int file)
 
     wav->scaleFreq=readWord(file);
     wav->scaleFactor=readWord(file);
-    printf("\nScaleFreq = %d   ScaleFactor = %d   RootFreq = %d", wav->scaleFreq, wav->scaleFactor, wav->rootFreq);
+/*    printf("\nScaleFreq = %d   ScaleFactor = %d   RootFreq = %d", wav->scaleFreq, wav->scaleFactor, wav->rootFreq); */
     wav->res=readData(file, 36);
     wav->data=readData(file, wav->wavSize);
 
@@ -137,7 +137,7 @@ int selectWaveform(struct GPatch * pat, int midiNote)
 
 struct GPatch * gusload(char * filename)
 {
-    struct GPatch * gp = (struct GPatch *)allocate(sizeof(struct GPatch));
+    struct GPatch * gp = (struct GPatch *)malloc(sizeof(struct GPatch));
     rb->memset(gp, 0, sizeof(struct GPatch));
 
     int file = rb->open(filename, O_RDONLY);
@@ -175,15 +175,15 @@ struct GPatch * gusload(char * filename)
     gp->layerRes=readData(file,40);
 
 
-    printf("\nFILE: %s", filename);
-    printf("\nlayerSamples=%d", gp->numWaves);
+/*    printf("\nFILE: %s", filename); */
+/*    printf("\nlayerSamples=%d", gp->numWaves); */
 
     int a=0;
     for(a=0; a<gp->numWaves; a++)
         gp->waveforms[a] = loadWaveform(file);
 
 
-    printf("\nPrecomputing note table");
+/*    printf("\nPrecomputing note table"); */
 
     for(a=0; a<128; a++)
     {

@@ -104,8 +104,9 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
 
             if( (getEvent(mf->tracks[a], ts)->status & 0xF0) == MIDI_PRGM)
             {
-                if(patchUsed[getEvent(mf->tracks[a], ts)->d1]==0)
+/*                if(patchUsed[getEvent(mf->tracks[a], ts)->d1]==0)
                     printf("\nI need to load patch %d.", getEvent(mf->tracks[a], ts)->d1);
+*/
                 patchUsed[getEvent(mf->tracks[a], ts)->d1]=1;
             }
         }
@@ -124,13 +125,14 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the right patches as needed    */
     int c = 0;
     rb->snprintf(name, 40, "");
+    printf("\nLoading instruments");
     for(a=0; a<128; a++)
     {
         while(readChar(file)!=' ' && !eof(file));
         readTextBlock(file, name);
 
         rb->snprintf(fn, 40, "/.rockbox/patchset/%s.pat", name);
-        printf("\nLOADING: <%s> ", fn);
+/*        printf("\nLOADING: <%s> ", fn); */
 
         if(patchUsed[a]==1)
         {
@@ -155,6 +157,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     /* Scan our config file and load the drum data  */
     int idx=0;
     char number[30];
+    printf("\nLoading drums");
     while(!eof(file))
     {
         readTextBlock(file, number);
@@ -168,7 +171,6 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
         if(drumUsed[idx]==1)
         {
             drumSet[idx]=gusload(fn);
-
             if(drumSet[idx] == NULL)    /* Error loading patch */
                 return -1;
         }
@@ -180,32 +182,14 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     return 0;
 }
 
-
-
-int currentVoice IDATA_ATTR;
-struct SynthObject * so IDATA_ATTR;
-struct GWaveform * wf IDATA_ATTR;
-int s IDATA_ATTR;
-short s1 IDATA_ATTR;
-short s2 IDATA_ATTR;
-short sample IDATA_ATTR;    /* For synthSample */
-unsigned int cpShifted IDATA_ATTR;
-
-unsigned char b1 IDATA_ATTR;
-unsigned char b2 IDATA_ATTR;
-
-
-inline int getSample(int s)
+inline short getSample(int s,struct GWaveform * wf )
 {
     /* Sign conversion moved to guspat.c */
     /* 8bit conversion NOT YET IMPLEMENTED in guspat.c */
     return ((short *) wf->data)[s];
 }
 
-
-
-
-inline void setPoint(struct SynthObject * so, int pt)
+void setPoint(struct SynthObject * so, int pt)
 {
     if(so->ch==9) /* Drums, no ADSR */
     {
@@ -227,7 +211,7 @@ inline void setPoint(struct SynthObject * so, int pt)
 
     so->curPoint = pt;
 
-    int r=0;
+    int r;
     int rate = so->wf->envRate[pt];
 
     r=3-((rate>>6) & 0x3);      /* Some blatant Timidity code for rate conversion... */
@@ -243,15 +227,17 @@ inline void setPoint(struct SynthObject * so, int pt)
      * default this to 10, and maybe later have an option to set it to 9
      * for longer decays.
      */
-    so->curRate = r<<10;
+    so->curRate = r<<11;
 
     /*
      * Do this here because the patches assume a 44100 sampling rate
      * We've halved our sampling rate, ergo the ADSR code will be
      * called half the time. Ergo, double the rate to keep stuff
      * sounding right.
+     *
+     * Or just move the 1 up one line to optimize a tiny bit.
      */
-    so->curRate = so->curRate << 1;
+/*    so->curRate = so->curRate << 1;*/
 
 
     so->targetOffset = so->wf->envOffset[pt]<<(20);
@@ -270,9 +256,14 @@ inline void stopVoice(struct SynthObject * so)
 }
 
 
-inline signed short int synthVoice(void)
+signed short int synthVoice(struct SynthObject * so)
 {
-    so = &voices[currentVoice];
+    struct GWaveform * wf;
+    register int s;
+    register unsigned int cpShifted;
+    register short s1;
+    register short s2;
+
     wf = so->wf;
 
 
@@ -288,7 +279,7 @@ inline signed short int synthVoice(void)
         stopVoice(so);
     }
 
-        s2 = getSample((cpShifted)+1);
+    s2 = getSample((cpShifted)+1, wf);
 
         /* LOOP_REVERSE|LOOP_PINGPONG  = 24  */
     if((wf->mode & (24)) && so->loopState == STATE_LOOPING && (cpShifted <= (wf->startLoop)))
@@ -297,8 +288,9 @@ inline signed short int synthVoice(void)
         {
             so->cp = (wf->endLoop)<<10; //Was 10
             cpShifted = wf->endLoop;
-            s2=getSample((cpShifted));
-            } else
+            s2=getSample((cpShifted), wf);
+        }
+        else
             {
                 so->delta = -so->delta;
             so->loopDir = LOOPDIR_FORWARD;
@@ -312,8 +304,9 @@ inline signed short int synthVoice(void)
         {
             so->cp = (wf->startLoop)<<10; //Was 10
             cpShifted = wf->startLoop;
-            s2=getSample((cpShifted));
-        } else
+            s2=getSample((cpShifted), wf);
+        }
+        else
         {
             so->delta = -so->delta;
             so->loopDir = LOOPDIR_REVERSE;
@@ -321,7 +314,7 @@ inline signed short int synthVoice(void)
     }
 
     /* Better, working, linear interpolation    */
-    s1=getSample((cpShifted));              //\|/ Was 1023)) >> 10
+    s1=getSample((cpShifted), wf);              //\|/ Was 1023)) >> 10
     s = s1 + ((signed)((s2 - s1) * (so->cp & 1023))>>10);   //Was 10
 
 
@@ -381,17 +374,25 @@ inline signed short int synthVoice(void)
 
 inline void synthSample(int * mixL, int * mixR)
 {
-    *mixL = 0;
-    *mixR = 0;
-    for(currentVoice=0; currentVoice<MAX_VOICES; currentVoice++)
+   register int dL=0;
+   register int dR=0;
+   register short sample=0;
+   register struct SynthObject *voicept=voices;
+   struct SynthObject *lastvoice=&voices[MAX_VOICES];
+
+    while(voicept!=lastvoice)
     {
-        if(voices[currentVoice].isUsed==1)
+        if(voicept->isUsed==1)
         {
-            sample = synthVoice();
-            *mixL += (sample*chPanLeft[voices[currentVoice].ch])>>7;
-            *mixR += (sample*chPanRight[voices[currentVoice].ch])>>7;
+            sample = synthVoice(voicept);
+            dL += (sample*chPanLeft[voicept->ch])>>7;
+            dR += (sample*chPanRight[voicept->ch])>>7;
         }
+        voicept++;
     }
+
+   *mixL=dL;
+   *mixR=dR;
 
     /* TODO: Automatic Gain Control, anyone? */
     /* Or, should this be implemented on the DSP's output volume instead? */

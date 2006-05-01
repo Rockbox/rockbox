@@ -63,11 +63,11 @@
 extern struct plugin_api * rb;
 
 
-int chVol[16] IDATA_ATTR;       /* Channel volume                */
-int chPanLeft[16] IDATA_ATTR;   /* Channel panning               */
-int chPanRight[16] IDATA_ATTR;
-int chPat[16];                  /* Channel patch                 */
-int chPW[16];                   /* Channel pitch wheel, MSB only */
+int chVol[16] IBSS_ATTR;       /* Channel volume                */
+int chPanLeft[16] IBSS_ATTR;   /* Channel panning               */
+int chPanRight[16] IBSS_ATTR;
+int chPat[16] IBSS_ATTR;                  /* Channel patch                 */
+int chPW[16] IBSS_ATTR;                   /* Channel pitch wheel, MSB only */
 
 
 struct GPatch * gusload(char *);
@@ -128,12 +128,9 @@ struct SynthObject
     int curPoint;
 };
 
-struct SynthObject voices[MAX_VOICES] IDATA_ATTR;
-
-
+struct SynthObject voices[MAX_VOICES] IBSS_ATTR;
 
 void sendEvent(struct Event * ev);
-int tick(struct MIDIfile * mf);
 inline void setPoint(struct SynthObject * so, int pt);
 struct Event * getEvent(struct Track * tr, int evNum);
 int readTwoBytes(int file);
@@ -196,8 +193,11 @@ void *alloc(int size)
     offset += size + 4;
     totalSize -= size + 4;
     return ret;
-}*/
-void * allocate(int size)
+}
+*/
+
+#define malloc(n) my_malloc(n)
+void * my_malloc(int size)
 {
     return alloc(size);
 }
@@ -211,7 +211,7 @@ unsigned char readChar(int file)
 
 unsigned char * readData(int file, int len)
 {
-    unsigned char * dat = allocate(len);
+    unsigned char * dat = malloc(len);
     rb->read(file, dat, len);
     return dat;
 }
@@ -226,7 +226,29 @@ int eof(int fd)
     return size+1 == rb->lseek(fd, 0, SEEK_CUR);
 }
 
-void printf(char *fmt, ...) {fmt=fmt; }
+// Here is a hacked up printf command to get the output from the game.
+int printf(const char *fmt, ...)
+{
+   static int p_xtpt;
+   char p_buf[50];
+   bool ok;
+   va_list ap;
+
+   va_start(ap, fmt);
+   ok = rb->vsnprintf(p_buf,sizeof(p_buf), fmt, ap);
+   va_end(ap);
+
+   rb->lcd_putsxy(1,p_xtpt, (unsigned char *)p_buf);
+   rb->lcd_update();
+
+   p_xtpt+=8;
+   if(p_xtpt>LCD_HEIGHT-8)
+   {
+      p_xtpt=0;
+      rb->lcd_clear_display();
+   }
+   return 1;
+}
 
 void exit(int code)
 {
