@@ -65,6 +65,12 @@
 #define PSSC   0x18
 #define PWROKM 0x19
 #define PWROKS 0x1a
+#define D1REGC1 0x24
+  #define VOUT_3000mV 0xf5
+  #define VOUT_3300mV 0xf8
+#define D2REGC1 0x25
+#define D3REGC1 0x26
+
 
 int pcf50605_read(int address)
 {
@@ -101,3 +107,10 @@ void pcf50605_standby_mode(void)
     pcf50605_write(OOCC1, GOSTDBY | CHGWAK | EXTONWAK);
 }
 
+void pcf50605_init(void)
+{
+    /* The following values were taken from the ipodlinux kernel source */
+    pcf50605_write(D1REGC1, VOUT_3000mV); /* Unknown */
+    pcf50605_write(D2REGC1, VOUT_3300mV); /* Dock Connector pin 17 */
+    pcf50605_write(D3REGC1, VOUT_3000mV); /* Unknown */
+}

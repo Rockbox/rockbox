@@ -85,7 +85,7 @@ void power_init(void)
 #endif
 #endif
 #elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
-    /* TODO: Implement power_init() */
+    pcf50605_init();
 #else
 #ifdef HAVE_POWEROFF_ON_PB5
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
