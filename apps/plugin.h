@@ -103,7 +103,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 19
+#define PLUGIN_API_VERSION 20
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -514,6 +514,7 @@ struct plugin_api {
 #ifdef HAVE_LCD_BITMAP
     void (*lcd_setmargins)(int x, int y);
 #endif
+    int (*utf8seek)(const unsigned char* utf8, int offset);
 };
 
 /* plugin header */
