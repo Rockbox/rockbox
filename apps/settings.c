@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 40
+#define CONFIG_BLOCK_VERSION 41
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -220,8 +220,8 @@ static const struct bit_entry rtc_bits[] =
     {3, S_O(treble), 0, "treble", NULL }, /* 0..+6 */
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721)
-    {4 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -6..+9 */
-    {4 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -6..+9 */
+    {5 | SIGNED, S_O(bass), 0, "bass", NULL }, /* -6..+9 */
+    {5 | SIGNED, S_O(treble), 0, "treble", NULL }, /* -6..+9 */
 #endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     {5, S_O(loudness), 0, "loudness", NULL }, /* 0...17 */
