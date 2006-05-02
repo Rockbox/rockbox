@@ -2498,10 +2498,13 @@ bool audio_has_changed_track(void)
 void audio_play(long offset)
 {
     logf("audio_play");
-    if (playing)
+    if (playing && offset <= 0)
         queue_post(&audio_queue, Q_AUDIO_NEW_PLAYLIST, 0);
     else
     {
+        if (playing)
+            audio_stop();
+
         playing = true;
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
     }
