@@ -935,7 +935,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     lcd_setfont(FONT_SYSFIXED);
 #endif
     /* output exception */
-    n = (n - (unsigned)UIE4 - 20)>>2; /* get exception or interrupt number */
+    n = (n - (unsigned)UIE4 + 12)>>2; /* get exception or interrupt number */
     snprintf(str,sizeof(str),"I%02x:%s",n,irqname[n]);
     lcd_puts(0,0,str);
     snprintf(str,sizeof(str),"at %08x",pc);
