@@ -127,6 +127,7 @@ struct SynthObject
     int note, vol, ch, isUsed;
     int curRate, curOffset, targetOffset;
     int curPoint;
+    signed short int volscale;
 };
 
 struct SynthObject voices[MAX_VOICES] IBSS_ATTR;

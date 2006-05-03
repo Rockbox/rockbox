@@ -16,6 +16,7 @@
  *
  ****************************************************************************/
 
+void setVolScale(int a);
 
 extern struct plugin_api * rb;
 
@@ -24,8 +25,14 @@ long tempo=375000;
 
 inline void setVol(int ch, int vol)
 {
-//    printf("\nvolume[%d]  %d ==> %d", ch, chVol[ch], vol);
+    int a=0;
     chVol[ch]=vol;
+
+    /* If channel volume changes, we need to recalculate the volume scale */
+    /* factor for all voices active on this channel                       */
+    for(a=0; a<MAX_VOICES; a++)
+        if(voices[a].ch == ch)
+            setVolScale(a);
 }
 
 inline void setPan(int ch, int pan)
@@ -111,25 +118,13 @@ long pitchTbl[] ICONST_ATTR={
    72901,72934,72967,72999,73032,73065,73098,73131,73164,73197,73230,73264,
    73297,73330,73363,73396,73429,73462,73495,73528
 };
-/*
-void findDelta(struct SynthObject * so, int ch, int note)
-{
-
-    struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
-    so->wf=wf;                  // \|/ was 10
-    so->delta = (((gustable[note]<<10) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
-    so->delta = (so->delta * pitchTbl[chPW[ch]])>> 16;
-}
-*/
-
 
 void findDelta(struct SynthObject * so, int ch, int note)
 {
 
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
-    so->wf=wf;                  // \|/ was 10
-
-    unsigned long delta= 0 ;
+    so->wf=wf;
+    unsigned long delta= 0; /* More percision- extra bit - not so off-key as before */
 
     delta = (((gustable[note]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
     delta = (delta * pitchTbl[chPW[ch]])>> 16;
@@ -139,7 +134,6 @@ void findDelta(struct SynthObject * so, int ch, int note)
 
 inline void setPW(int ch, int msb, int lsb)
 {
-//    printf("\npitchw[%d]  %d ==> %d", ch, chPW[ch], msb);
     chPW[ch] = msb<<2|lsb>>5;
 
     int a=0;
@@ -152,16 +146,26 @@ inline void setPW(int ch, int msb, int lsb)
     }
 }
 
+
+/* Sets the volume scaling by channel volume and note volume */
+/* This way we can do the multiplication/indexing once per   */
+/* MIDI event at the most, instead of once per sample.       */
+void setVolScale(int a)
+{
+    struct SynthObject * so = &voices[a];
+    so->volscale = ((signed short int)so->vol*(signed short int)chVol[so->ch]);
+}
+
 void pressNote(int ch, int note, int vol)
 {
     static int lastKill = 0;
-//Silences all channels but one, for easy debugging, for me.
+/* Silences all channels but one, for easy debugging, for me. */
 /*
     if(ch == 0) return;
     if(ch == 1) return;
     if(ch == 2) return;
     if(ch == 3) return;
-//  if(ch == 4) return;
+    if(ch == 4) return;
     if(ch == 5) return;
     if(ch == 6) return;
     if(ch == 7) return;
@@ -203,6 +207,7 @@ void pressNote(int ch, int note, int vol)
     voices[a].state=STATE_ATTACK;
     voices[a].decay=255;
 
+    setVolScale(a);
 
     voices[a].loopState=STATE_NONLOOPING;
     voices[a].loopDir = LOOPDIR_FORWARD;
@@ -304,9 +309,7 @@ void sendEvent(struct Event * ev)
 
     if((ev->status & 0xF0) == MIDI_PRGM)
     {
-        if((ev->status & 0x0F) == 9)
-            printf("\nNOT PATCHING: Someone tried patching Channel 9 onto something?");
-        else
+        if((ev->status & 0x0F) != 9)
             setPatch(ev->status & 0x0F, ev->d1);
     }
 }
@@ -351,7 +354,7 @@ int tick(void)
                     if(e->d1 == 0x51)
                     {
                         tempo = (((short)e->evData[0])<<16)|(((short)e->evData[1])<<8)|(e->evData[2]);
-                        printf("\nMeta-Event: Tempo Set = %d", tempo);
+/*                        printf("\nMeta-Event: Tempo Set = %d", tempo); */
                         bpm=mf->div*1000000/tempo;
                         numberOfSamples=SAMPLE_RATE/bpm;
 

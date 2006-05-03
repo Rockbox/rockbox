@@ -22,7 +22,7 @@ PLUGIN_HEADER
 
 #define FRACTSIZE 10
 #define SAMPLE_RATE 22050  // 44100 22050 11025
-#define MAX_VOICES 12   // Note: 24 midi channels is the minimum general midi
+#define MAX_VOICES 13   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
 #define BUF_SIZE 512
 #define NBUF   2

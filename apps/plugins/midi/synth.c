@@ -255,7 +255,6 @@ inline void stopVoice(struct SynthObject * so)
 
 }
 
-
 signed short int synthVoice(struct SynthObject * so)
 {
     struct GWaveform * wf;
@@ -362,14 +361,19 @@ signed short int synthVoice(struct SynthObject * so)
 
     if(so->state == STATE_RAMPDOWN)
     {
-        so->decay--;
-        if(so->decay == 0)
+        so->decay-=5;
+        if(so->decay < 5)
             so->isUsed=0;
         s = (s * so->decay) >> 8;
     }
 
-    return s*((signed short int)so->vol*(signed short int)chVol[so->ch])>>14;
+    /* Scaling by channel volume and note volume is done in sequencer.c */
+    /* That saves us some multiplication and pointer operations         */
+    return s*so->volscale>>14;
 }
+
+
+
 
 
 inline void synthSample(int * mixL, int * mixR)
