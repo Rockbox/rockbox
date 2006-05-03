@@ -187,7 +187,7 @@ INLINE unsigned range_limit(int value)
         "spl.b   %[v]        \n"  /* yes: set low byte to appropriate boundary */
     "1:                      \n"
         : /* outputs */
-        [v]"+r"(value)
+        [v]"+d"(value)
     );
     return value;
 #elif defined(CPU_ARM)
