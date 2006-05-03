@@ -9,7 +9,7 @@
 \end{center}
 
 Throughout this manual, the buttons on the \dap\ are labelled according to the
-picture above. To turn on and shutdown your \dap, the following keys are used:
+picture above. To turn on and shut down your \dap, the following keys are used:
 
 \begin{table}
     \begin{btnmap}{}{}
@@ -40,15 +40,23 @@ picture above. To turn on and shutdown your \dap, the following keys are used:
 
 \section{\label{ref:file_browser}File Browser}
 \screenshot{rockbox_interface/images/ss-file-browser}{The file browser}{}
-The file browser helps you navigate through the files on your \dap, entering
-folders and executing the default action on each file. To help us differentiate
-files, each file format is displayed with an icon. You can select which file
-types are displayed (see page \pageref{ref:ShowFiles}).
-\note{When Tag Cache is enabled you will access the Tag Cache browser instead
-  of the File Browser. With Tag Cache you will be able accessing your music 
-  using a database but won't be able doing any file manipulations.
-  Read more about Tag Cache in Section \ref{ref:tagcache}.
-}
+Rockbox lets you browse your music in either of two ways. The ``File Browser'' 
+lets you navigate through the files and folders on your \dap, entering folders
+and executing the default action on each file. To help differentiate files,
+each file format is displayed with an icon. 
+
+The ``Tag Cache Browser,'' on the other hand, allows you to navigate through 
+the music on your player using categories like album, artist, genre, etc.  
+
+You can select whether to browse using the File Browser or the Tag Cache Browser by
+adjusting the \setting{Show Files} setting.  If you choose the File Browser, the 
+\setting{Show Files} setting also lets you select what types of files you wish to 
+view.  See page \pageref{ref:ShowFiles} for more information on the \setting{Show 
+Files} setting.
+
+\note{The File Browser allows you to manipulate your files in ways that are not
+available within the Tag Cache Browser.  Read more about Tag Cache in Section 
+\ref{ref:tagcache}.  The remainder of this section deals with the File Browser.}
 
 \subsection{\label{ref:controls}Controls}
 \begin{table}
@@ -111,21 +119,27 @@ types are displayed (see page \pageref{ref:ShowFiles}).
 }
 
 \subsection{\label{ref:Filemenu}\label{ref:PartIISectionFM}File Menu}
-\screenshot{rockbox_interface/images/ss-file-menu}{The file menu}{}
+\screenshot{rockbox_interface/images/ss-file-menu}{The File Menu}{}
 
-This menu operates on the file that was selected in the browser. It offers the
-following options:
+The File Menu allows you to perform certain operations on files or folders.
+To access the File Menu, position the selector over a file or folder and 
+	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+		{hold the \ButtonSelect\ button.}
+	\opt{RECORDER_PAD,PLAYER_PAD}{press the \ButtonPlay/\ButtonOn+\ButtonPlay\ 
+	  buttons.}
+  \opt{ONDIO_PAD}{hold the \ButtonRight\ button.}
+  
+\note{The File Menu is a context sensitive menu.  If the File Menu is 
+invoked on a file, it will display options available for files.  If the 
+File Menu is invoked on a folder or directory, it will display options
+for directories.}
+
+The File Menu contains the following options (unless otherwise noted, each
+option pertains both to files and directories):
 
 \begin{description}
-\item [Open with:] 
-  Runs a viewer plugin on the file. Normally the filetype of a file is detected
-  and the appropriate plugin is run automatically when you press play on it.
-  Use this menu if for some reason you want to override the default action and
-  select a viewer by hand.  See page \textmd{\pageref{ref:Viewersplugins}} for
-  more details on viewers. For example, this would be used to view a text file
-  with a non-standard extension, i.e. not ending with .txt.
 \item [Playlist:]
-  Change to the Playlist submenu (see below).
+  Enters to the Playlist Submenu (see below).
 \item [Rename:]
   This function lets the user modify a file name.
 \item [Cut:]
@@ -138,23 +152,38 @@ following options:
   Only visible if a file or directory name is on the clipboard. When selected
   it will move or copy the clipboard to the current directory.
 \item [Delete:]
-  Only files can be deleted, not folders. Rockbox will ask for confirmation
-  before deleting a file. Press PLAY to confirm deletion or any other key to
-  cancel.
+  Deletes the currently selected file.  This option applies only to files, and
+  not to directories.  Rockbox will ask for confirmation before deleting a file.
+  Press
+  	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_VIDEO_PAD}
+      {\ButtonSelect}
+    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonRight}
+ to confirm deletion or any other key to cancel.
 \item [Delete Directory:]
-  Deletes the folder pointed to by the cursor and all the files and folders
-  contained in it.  Use with caution.
+  Deletes the currently selected directory and all of the files and folders
+  contained in the selected directory.  Deleted directories cannot be recovered.
+  Use this feature with caution!
+\item [Open with:] 
+  Runs a viewer plugin on the file. Normally, when a file is selected in Rockbox,
+  Rockbox automatically detects the file type and runs the appropriate plugin.
+  The ``Open With'' function can be used to override the default action and
+  select a viewer by hand.  For example, this function can be used to view a text file
+  even if the file has a non-standard extension (i.e., the file has an extension
+  of something other than ``.txt'').  See page \textmd{\pageref{ref:Viewersplugins}} 
+  for more details on viewers.
 \item [Create Directory:]
   Makes a new folder in the current folder on the disk.
 \end{description}
 
 \subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
-\screenshot{rockbox_interface/images/ss-playlist-menu}{The playlist menu}{}
-If the playlist submenu is invoked on a directory, it will act on all the files
-within that directory.  If invoked on a playlist it will act on all the files
-in that playlist. Otherwise it acts only on the current file.
-
-This menu provides the following options:
+\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
+The Playlist Submenu allows you to put tracks into a ``dynamic playlist''.
+If there is no music currently playing, Rockbox will create a new dynamic playlist
+and put the selected track(s) into the playlist.  If there is music currently playing,
+Rockbox will put the selected track(s) into the current playlist.  The place in which
+the newly selected tracks are added to the playlist is determined by the following
+options:
 
 \begin{description}
 \item [Insert:]
@@ -176,10 +205,30 @@ This menu provides the following options:
   Queue track(s) at end of playlist.
 \end{description}
 
-You can insert a track, directory or playlist even if nothing is currently
-playing. In this case, a new playlist is created with only the selected tracks
-and then play is started.\\
-\note{The dynamic playlist is saved so resume will restore it exactly as before shutdown.}
+The Playlist Submenu can be used to add either single tracks or entire directories
+to a playlist. If the Playlist Submenu is invoked on a single track, it will put 
+only that track into the playlist.  On the other hand, if the Playlist Submenu 
+is invoked on a directory, Rockbox adds all of the tracks in that directory to 
+the playlist.  
+
+\note{You can control whether or not Rockbox includes the contents of subdirectories
+when adding an entire directory to a playlists.   Set the \setting{Main Menu 
+$\rightarrow$ Playlist Options $\rightarrow$ Recusively Insert Directories} setting to 
+\setting{Yes} if you would like Rockbox to include tracks in subdirectories as well as tracks
+in the currently-selected directory.}
+
+If you want to have Rockbox create a playlist of a whole folder (to play an entire 
+album, for example), use the File Browser to select the song. When a single song is 
+selected from the File Browser, Rockbox will automatically create a playlist with all
+songs in the current folder. However, if you want to play only a single song and then
+stop, stop playback, navigate to the song you want to play, and use the \setting{Playlist
+$\rightarrow$ Insert} function to select the song.
+
+Dynamic playlists are saved so resume will restore them exactly as they were before
+shutdown.
+
+\note{To view, save or reshuffle the current dynamic playlist, use the 
+\setting{Playlist Options} setting in the WPS Context Menu.}
 
 \subsection{Virtual Keyboard}
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
