@@ -66,8 +66,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_setfont(0);
 
 #ifdef USE_IRAM
-    printf("\nied = %d", iedata);
-    printf("\nied = %d", iend);
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
     rb->memset(iedata, 0, iend - iedata);
 #endif
