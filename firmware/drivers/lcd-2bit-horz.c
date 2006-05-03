@@ -710,7 +710,8 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
 
         bits = font_get_bits(pf, ch);
 
-        lcd_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs, pf->height);
+        lcd_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
+                             pf->height);
         
         x += width - ofs;
         ofs = 0;
@@ -762,7 +763,7 @@ void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
-    lcd_fillrect(xpos + w, ypos, LCD_WIDTH - (xpos + w), h);
+    lcd_fillrect(xpos + w - offset, ypos, LCD_WIDTH - (xpos + w - offset), h);
     drawmode = lastmode;
 }
 

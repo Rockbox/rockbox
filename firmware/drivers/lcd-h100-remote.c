@@ -1207,7 +1207,8 @@ void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset)
 
 /* put a string at a given char position, style, and pixel position,
  * skipping first offset pixel columns */
-void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int style, int offset)
+void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
+                                  int style, int offset)
 {
     int xpos,ypos,w,h;
     int lastmode = drawmode;
@@ -1225,7 +1226,8 @@ void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int st
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_remote_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
-    lcd_remote_fillrect(xpos + w, ypos, LCD_REMOTE_WIDTH - (xpos + w), h);
+    lcd_remote_fillrect(xpos + w - offset, ypos,
+                        LCD_REMOTE_WIDTH - (xpos + w - offset), h);
     drawmode = lastmode;
 }
 
