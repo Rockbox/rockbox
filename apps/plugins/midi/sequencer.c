@@ -111,7 +111,7 @@ long pitchTbl[] ICONST_ATTR={
    72901,72934,72967,72999,73032,73065,73098,73131,73164,73197,73230,73264,
    73297,73330,73363,73396,73429,73462,73495,73528
 };
-
+/*
 void findDelta(struct SynthObject * so, int ch, int note)
 {
 
@@ -119,6 +119,22 @@ void findDelta(struct SynthObject * so, int ch, int note)
     so->wf=wf;                  // \|/ was 10
     so->delta = (((gustable[note]<<10) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
     so->delta = (so->delta * pitchTbl[chPW[ch]])>> 16;
+}
+*/
+
+
+void findDelta(struct SynthObject * so, int ch, int note)
+{
+
+    struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
+    so->wf=wf;                  // \|/ was 10
+
+    unsigned long delta= 0 ;
+
+    delta = (((gustable[note]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
+    delta = (delta * pitchTbl[chPW[ch]])>> 16;
+
+    so->delta = delta;
 }
 
 inline void setPW(int ch, int msb, int lsb)

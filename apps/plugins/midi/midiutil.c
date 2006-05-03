@@ -62,6 +62,7 @@
 
 extern struct plugin_api * rb;
 
+int printf(const char *fmt, ...);
 
 int chVol[16] IBSS_ATTR;       /* Channel volume                */
 int chPanLeft[16] IBSS_ATTR;   /* Channel panning               */
@@ -156,6 +157,15 @@ void *alloc(int size)
 
     if (size + 4 > totalSize)
     {
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        printf("\nMALLOC BARF");
+        /* We've made our point. */
+
         return NULL;
     }
 
@@ -229,7 +239,7 @@ int eof(int fd)
 // Here is a hacked up printf command to get the output from the game.
 int printf(const char *fmt, ...)
 {
-   static int p_xtpt;
+   static int p_xtpt = 0;
    char p_buf[50];
    bool ok;
    va_list ap;

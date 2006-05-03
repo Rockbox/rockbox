@@ -67,7 +67,8 @@ struct MIDIfile * loadFile(char * filename)
 
     int track=0;
 
-    printf("\nnumTracks=%d  div=%d\nBegin reading track data\n", mfload->numTracks, mfload->div);
+    printf("\nFile has %d tracks.", mfload->numTracks);
+    printf("Time division=%d\n", mfload->div);
 
 
     while(! eof(file) && track < mfload->numTracks)
@@ -79,7 +80,7 @@ struct MIDIfile * loadFile(char * filename)
         {
             if(mfload->numTracks != track)
             {
-                printf("\nError: file claims to have %d tracks.\n       I only see %d here.\n",     mfload->numTracks, track);
+                printf("\nError: file claims to have %d tracks.\n I only see %d here.\n",     mfload->numTracks, track);
                 mfload->numTracks = track;
             }
             return mfload;
@@ -88,7 +89,6 @@ struct MIDIfile * loadFile(char * filename)
         if(id == ID_MTRK)
         {
             mfload->tracks[track] = readTrack(file);
-            //exit(0);
             track++;
         } else
         {
@@ -98,16 +98,19 @@ struct MIDIfile * loadFile(char * filename)
                 readChar(file);
         }
     }
+
+    rb->close(file);
     return mfload;
 
 }
 
+/* Global again. Not static. What if track 1 ends on a running status event
+ * and then track 2 starts loading */
 
+int rStatus = 0;
 /* Returns 0 if done, 1 if keep going */
 int readEvent(int file, void * dest)
 {
-
-    static int rStatus = 0;
     struct Event dummy;
     struct Event * ev = (struct Event *) dest;
 
@@ -136,7 +139,7 @@ int readEvent(int file, void * dest)
             else
             {
                 /*
-                 * Don't allocate anything, just see how much it would tale
+                 * Don't allocate anything, just see how much it would take
                  * To make memory usage efficient
                  */
                 unsigned int a=0;
@@ -201,7 +204,7 @@ struct Track * readTrack(int file)
     {
         if(trackSize < dataPtr-trk->dataBlock)
         {
-            printf("\nTrack parser memory out of  bounds");
+            printf("\nTrack parser memory out of bounds");
             exit(1);
         }
         dataPtr+=sizeof(struct Event);

@@ -272,7 +272,7 @@ signed short int synthVoice(struct SynthObject * so)
         so->cp += so->delta;
     }
 
-    cpShifted = so->cp >> 10;   //Was 10
+    cpShifted = so->cp >> FRACTSIZE;   //Was 10
 
     if( (cpShifted > (wf->numSamples) && (so->state != STATE_RAMPDOWN)))
     {
@@ -286,7 +286,7 @@ signed short int synthVoice(struct SynthObject * so)
     {
         if(wf->mode & LOOP_REVERSE)
         {
-            so->cp = (wf->endLoop)<<10; //Was 10
+            so->cp = (wf->endLoop)<<FRACTSIZE; //Was 10
             cpShifted = wf->endLoop;
             s2=getSample((cpShifted), wf);
         }
@@ -302,7 +302,7 @@ signed short int synthVoice(struct SynthObject * so)
         so->loopState = STATE_LOOPING;
         if((wf->mode & (24)) == 0)
         {
-            so->cp = (wf->startLoop)<<10; //Was 10
+            so->cp = (wf->startLoop)<<FRACTSIZE; //Was 10
             cpShifted = wf->startLoop;
             s2=getSample((cpShifted), wf);
         }
@@ -315,8 +315,8 @@ signed short int synthVoice(struct SynthObject * so)
 
     /* Better, working, linear interpolation    */
     s1=getSample((cpShifted), wf);              //\|/ Was 1023)) >> 10
-    s = s1 + ((signed)((s2 - s1) * (so->cp & 1023))>>10);   //Was 10
-
+//    s = s1 + ((signed)((s2 - s1) * (so->cp & (1023)))>>10);   //Was 10
+    s = s1 + ((signed)((s2 - s1) * (so->cp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);   //Was 10
 
 /* ADSR COMMENT WOULD GO FROM HERE.........*/
 

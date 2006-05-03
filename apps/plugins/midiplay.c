@@ -20,6 +20,7 @@
 
 PLUGIN_HEADER
 
+#define FRACTSIZE 10
 #define SAMPLE_RATE 22050  // 44100 22050 11025
 #define MAX_VOICES 12   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
@@ -54,50 +55,54 @@ extern char iend[];
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-   rb = api;
+    int retval = 0;
+    rb = api;
 
-   if(parameter == NULL)
-   {
-      rb->splash(HZ*2, true, " Play .MID file ");
-      return PLUGIN_OK;
-   }
-   rb->lcd_setfont(0);
+    if(parameter == NULL)
+    {
+        rb->splash(HZ*2, true, " Play .MID file ");
+        return PLUGIN_OK;
+    }
+    rb->lcd_setfont(0);
 
 #ifdef USE_IRAM
-   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-   rb->memset(iedata, 0, iend - iedata);
+    printf("\nied = %d", iedata);
+    printf("\nied = %d", iend);
+    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+    rb->memset(iedata, 0, iend - iedata);
 #endif
 
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-   rb->cpu_boost(true);
+    rb->cpu_boost(true);
 #endif
 
-   printf("\n%s", parameter);
-/*   rb->splash(HZ, true, parameter); */
+    printf("\n%s", parameter);
+    /*   rb->splash(HZ, true, parameter); */
 
 #ifdef RB_PROFILE
-   rb->profile_thread();
+    rb->profile_thread();
 #endif
 
-   if(midimain(parameter) == -1)
-      return PLUGIN_ERROR;
+    retval = midimain(parameter);
 
 #ifdef RB_PROFILE
-   rb->profstop();
+    rb->profstop();
 #endif
 
 #ifndef SIMULATOR
-   rb->pcm_play_stop();
-   rb->pcm_set_frequency(44100); // 44100
+    rb->pcm_play_stop();
+    rb->pcm_set_frequency(44100); // 44100
 #endif
 
 #if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
-   rb->cpu_boost(false);
+    rb->cpu_boost(false);
 #endif
 
-   rb->splash(HZ, true, "FINISHED PLAYING");
+    rb->splash(HZ, true, "FINISHED PLAYING");
 
-   return PLUGIN_OK;
+    if(retval == -1)
+        return PLUGIN_ERROR;
+    return PLUGIN_OK;
 }
 
 bool swap=0;
@@ -138,80 +143,73 @@ inline void synthbuf(void)
 void get_more(unsigned char** start, size_t* size)
 {
 #ifndef SYNC
-   if(lastswap!=swap)
-   {
-      printf("Buffer miss!"); // Comment out the printf to make missses less noticable.
-/*
-        int a=0;
-        for(a=0; a<MAX_VOICES; a++)
-        {
-            voices[a].isUsed=0;
-        }
-*/
+    if(lastswap!=swap)
+    {
+        printf("Buffer miss!"); // Comment out the printf to make missses less noticable.
     }
 
 #else
-   synthbuf();  // For some reason midiplayer crashes when an update is forced
+    synthbuf();  // For some reason midiplayer crashes when an update is forced
 #endif
 
-   *size = BUF_SIZE*sizeof(short);
+    *size = BUF_SIZE*sizeof(short);
 #ifndef SYNC
-   *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
-   swap=!swap;
+    *start = (unsigned char*)((swap ? gmbuf : gmbuf + BUF_SIZE));
+    swap=!swap;
 #else
-   *start = (unsigned char*)(gmbuf);
+    *start = (unsigned char*)(gmbuf);
 #endif
 }
 
 int midimain(void * filename)
 {
-   int button;
+    int button;
 
-/*   rb->splash(HZ/5, true, "LOADING MIDI"); */
-   printf("\nLoading file");
-   mf= loadFile(filename);
+    /*   rb->splash(HZ/5, true, "LOADING MIDI"); */
+    printf("\nLoading file");
+    mf= loadFile(filename);
 
-/*   rb->splash(HZ/5, true, "LOADING PATCHES"); */
-   if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
-      return -1;
+    /*   rb->splash(HZ/5, true, "LOADING PATCHES"); */
+    if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
+        return -1;
 
 #ifndef SIMULATOR
-   rb->pcm_play_stop();
-   rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
+    rb->pcm_play_stop();
+    rb->pcm_set_frequency(SAMPLE_RATE); // 44100 22050 11025
 #endif
 
-   /*
-    * tick() will do one MIDI clock tick. Then, there's a loop here that
-    * will generate the right number of samples per MIDI tick. The whole
-    * MIDI playback is timed in terms of this value.. there are no forced
-    * delays or anything. It just produces enough samples for each tick, and
-    * the playback of these samples is what makes the timings right.
-    *
-    * This seems to work quite well.
-    */
+    /*
+        * tick() will do one MIDI clock tick. Then, there's a loop here that
+        * will generate the right number of samples per MIDI tick. The whole
+        * MIDI playback is timed in terms of this value.. there are no forced
+        * delays or anything. It just produces enough samples for each tick, and
+        * the playback of these samples is what makes the timings right.
+        *
+        * This seems to work quite well. On a laptop, anyway.
+        */
 
-   printf("\nOkay, starting sequencing");
+    printf("\nOkay, starting sequencing");
 
-   bpm=mf->div*1000000/tempo;
-   numberOfSamples=SAMPLE_RATE/bpm;
+    bpm=mf->div*1000000/tempo;
+    numberOfSamples=SAMPLE_RATE/bpm;
 
-   tick();
+    tick();
 
-   synthbuf();
+    synthbuf();
 #ifndef SIMULATOR
-   rb->pcm_play_data(&get_more, NULL, 0);
+    rb->pcm_play_data(&get_more, NULL, 0);
 #endif
 
-   button=rb->button_status();
+    button=rb->button_status();
 
-   while(!quit)
-   {
-#ifndef SYNC
-      synthbuf();
-#endif
-      rb->yield();
-      if(rb->button_status()!=button) quit=1;
-   }
+    while(!quit)
+    {
+    #ifndef SYNC
+        synthbuf();
+    #endif
+        rb->yield();
+        if(rb->button_status()!=button) quit=1;
+    }
 
-   return 0;
+    return 0;
 }
