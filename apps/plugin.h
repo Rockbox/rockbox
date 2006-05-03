@@ -68,6 +68,7 @@
 #include "menu.h"
 #include "rbunicode.h"
 #include "list.h"
+#include "talk.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -103,7 +104,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 20
+#define PLUGIN_API_VERSION 21
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -515,6 +516,10 @@ struct plugin_api {
     void (*lcd_setmargins)(int x, int y);
 #endif
     int (*utf8seek)(const unsigned char* utf8, int offset);
+
+    bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
+                    int* variable, void (*function)(int), int step, int min,
+                    int max, void (*formatter)(char*, int, int, const char*) );
 };
 
 /* plugin header */

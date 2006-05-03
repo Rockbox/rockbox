@@ -439,6 +439,8 @@ static const struct plugin_api rockbox_api = {
     lcd_setmargins,
 #endif
     utf8seek,
+    
+    set_int,
 };
 
 int plugin_load(const char* plugin, void* parameter)

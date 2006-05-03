@@ -75,20 +75,24 @@ PLUGIN_HEADER
 
 /* Ondio keys */
 #elif CONFIG_KEYPAD == ONDIO_PAD
+#define VIEWER_QUIT BUTTON_OFF
 #define VIEWER_PAGE_UP BUTTON_UP
 #define VIEWER_PAGE_DOWN BUTTON_DOWN
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
-#define VIEWER_MENU BUTTON_OFF
-#define VIEWER_AUTOSCROLL BUTTON_MENU
+#define VIEWER_MENU (BUTTON_MENU|BUTTON_REPEAT)
+#define VIEWER_AUTOSCROLL_PRE BUTTON_MENU
+#define VIEWER_AUTOSCROLL (BUTTON_MENU|BUTTON_REL)
 
 /* Player keys */
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define VIEWER_QUIT BUTTON_STOP
 #define VIEWER_PAGE_UP BUTTON_LEFT
 #define VIEWER_PAGE_DOWN BUTTON_RIGHT
+#define VIEWER_SCREEN_LEFT (BUTTON_ON|BUTTON_LEFT)
+#define VIEWER_SCREEN_RIGHT (BUTTON_ON|BUTTON_RIGHT)
 #define VIEWER_MENU BUTTON_MENU
-#define VIEWER_AUTOSCROLL BUTTON_ON
+#define VIEWER_AUTOSCROLL BUTTON_PLAY
 
 /* iRiver H1x0 && H3x0 keys */
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
@@ -102,18 +106,20 @@ PLUGIN_HEADER
 #define VIEWER_AUTOSCROLL BUTTON_SELECT
 #define VIEWER_LINE_UP (BUTTON_ON | BUTTON_UP)
 #define VIEWER_LINE_DOWN (BUTTON_ON | BUTTON_DOWN)
+#define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
+#define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
 /* iPods with the 4G pad */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define VIEWER_QUIT_PRE BUTTON_SELECT
 #define VIEWER_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define VIEWER_MENU BUTTON_MENU
-#define VIEWER_AUTOSCROLL BUTTON_PLAY
 #define VIEWER_PAGE_UP BUTTON_SCROLL_BACK
 #define VIEWER_PAGE_DOWN BUTTON_SCROLL_FWD
 #define VIEWER_SCREEN_LEFT BUTTON_LEFT
 #define VIEWER_SCREEN_RIGHT BUTTON_RIGHT
+#define VIEWER_MENU BUTTON_MENU
+#define VIEWER_AUTOSCROLL BUTTON_PLAY
 
 /* iFP7xx keys */
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
@@ -151,48 +157,36 @@ struct preferences {
     enum {
         WRAP=0,
         CHOP,
-        WORD_MODES
     } word_mode;
 
     enum {
         NORMAL=0,
         JOIN,
-#ifdef HAVE_LCD_BITMAP
-        REFLOW, /* Makes no sense for the player */
-#endif
         EXPAND,
-        LINE_MODES,
-#ifndef HAVE_LCD_BITMAP
-        REFLOW  /* Sorting it behind LINE_MODES effectively disables it. */
-#endif
+        REFLOW, /* won't be set on charcell LCD, must be last */
     } line_mode;
 
     enum {
         NARROW=0,
         WIDE,
-        VIEW_MODES
     } view_mode;
 
 #ifdef HAVE_LCD_BITMAP
     enum {
         SB_OFF=0,
         SB_ON,
-        SCROLLBAR_MODES
     } scrollbar_mode;
     bool need_scrollbar;
 
     enum {
         NO_OVERLAP=0,
         OVERLAP,
-        PAGE_MODES
     } page_mode;
-
 #endif /* HAVE_LCD_BITMAP */
 
     enum {
         PAGE=0,
         LINE,
-        SCROLL_MODES
     } scroll_mode;
 
     int autoscroll_speed;
@@ -816,7 +810,6 @@ static void viewer_top(void)
     fill_buffer(0, buffer, BUFFER_SIZE);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static void viewer_bottom(void)
 {
     /* Read bottom of file into buffer
@@ -838,6 +831,7 @@ static void viewer_bottom(void)
     fill_buffer(last_sectors, buffer, BUFFER_SIZE);
 }
 
+#ifdef HAVE_LCD_BITMAP
 static void init_need_scrollbar(void) {
     /* Call viewer_draw in quiet mode to initialize next_screen_ptr,
      and thus ONE_SCREEN_FITS_ALL(), and thus NEED_SCROLLBAR() */
@@ -911,6 +905,7 @@ static void viewer_reset_settings(void)
     prefs.page_mode = NO_OVERLAP;
     prefs.scrollbar_mode = SB_OFF;
 #endif
+    prefs.autoscroll_speed = 1;
 }
 
 static void viewer_load_settings(void) /* same name as global, but not the same file.. */
@@ -963,7 +958,6 @@ static void viewer_exit(void *parameter)
     rb->close(fd);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static int col_limit(int col)
 {
     if (col < 0)
@@ -974,114 +968,120 @@ static int col_limit(int col)
 
     return col;
 }
+
+/* settings helper functions */
+
+static bool word_wrap_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"On",               NULL},
+        {"Off (Chop Words)", NULL},
+    };
+
+    return rb->set_option("Word Wrap", &prefs.word_mode, INT,
+                          names, 2, NULL);
+}
+
+static bool line_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Normal",       NULL},
+        {"Join Lines",   NULL},
+        {"Expand Lines", NULL},
+#ifdef HAVE_LCD_BITMAP
+        {"Reflow Lines", NULL},
+#endif
+    };
+
+    return rb->set_option("Line Mode", &prefs.line_mode, INT, names,
+                          sizeof(names) / sizeof(names[0]), NULL);
+}
+
+static bool view_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No (Narrow)", NULL},
+        {"Yes",         NULL},
+    };
+
+    return rb->set_option("Wide View", &prefs.view_mode, INT,
+                           names , 2, NULL);
+}
+
+static bool scroll_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Scroll by Page", NULL},
+        {"Scroll by Line", NULL},
+    };
+
+    return rb->set_option("Scroll Mode", &prefs.scroll_mode, INT,
+                          names, 2, NULL);
+}
+
+#ifdef HAVE_LCD_BITMAP
+static bool page_mode_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"No",  NULL},
+        {"Yes", NULL},
+    };
+
+    return rb->set_option("Overlap Pages", &prefs.page_mode, INT,
+                           names, 2, NULL);
+}
+
+static bool scrollbar_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"Off", NULL},
+        {"On",  NULL}
+    };
+
+    return rb->set_option("Show Scrollbar", &prefs.scrollbar_mode, INT,
+                           names, 2, NULL);
+}
 #endif
 
-static void change_options_menu(void)
+static bool autoscroll_speed_setting(void)
 {
-    int m, result;
-    bool done = false;
+    return rb->set_int("Auto-scroll Speed", "", UNIT_INT, 
+                       &prefs.autoscroll_speed, NULL, 1, 1, 10, NULL);
+}
+
+static bool viewer_options_menu(void)
+{
+    int m;
+    bool result;
 
     static const struct menu_item items[] = {
-        {"Word Wrap", NULL },
-        {"Line Mode", NULL },
-        {"Wide View", NULL },
-        {"Overlap Pages", NULL },
-        {"Scroll Mode", NULL},
+        {"Word Wrap",         word_wrap_setting },
+        {"Line Mode",         line_mode_setting },
+        {"Wide View",         view_mode_setting },
 #ifdef HAVE_LCD_BITMAP
-        {"Show Scrollbar", NULL },
+        {"Show Scrollbar",    scrollbar_setting },
+        {"Overlap Pages",     page_mode_setting },
 #endif
-        {"Auto-Scroll Speed", NULL },
-    };
-    static const struct opt_items opt_word_mode[2] = {
-        {"On",NULL},{"Off (Chop Words)",NULL},
-    };
-#ifdef HAVE_LCD_BITMAP
-    static const struct opt_items opt_line_mode[4] = {
-        {"Normal",NULL},{"Join Lines",NULL},
-        {"Reflow Lines",NULL},{"Expand Lines",NULL},
-#else
-    static const struct opt_items opt_line_mode[3] = {
-        {"Normal",NULL},{"Join Lines",NULL},
-        {"Expand Lines",NULL},
-#endif
-    };
-    static const struct opt_items opt_view_mode[2] = {
-        {"No (Narrow)",NULL},{"Yes",NULL}
-    };
-    static const struct opt_items opt_scroll_mode[2] = {
-        {"Scroll by Page",NULL},{"Scroll by Line",NULL}
-    };
-#ifdef HAVE_LCD_BITMAP
-    static const struct opt_items opt_scrollbar_mode[2] = {
-        {"Off",NULL},{"On",NULL}
-    };
-    static const struct opt_items opt_page_mode[2] = {
-        {"No",NULL},{"Yes",NULL}
-    };
-#endif
-    static const struct opt_items opt_autoscroll_speed[10] = {
-        { "1", NULL },{ "2", NULL },{ "3", NULL },{ "4", NULL },{ "5", NULL },
-        { "6", NULL },{ "7", NULL },{ "8", NULL },{ "9", NULL },{ "10", NULL }
+        {"Scroll Mode",       scroll_mode_setting},
+        {"Auto-Scroll Speed", autoscroll_speed_setting },
     };
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
 
-    while(!done)
-    {
-        result=rb->menu_show(m);
-        switch (result)
-        {
-            case MENU_SELECTED_EXIT:
-                done = true;
-                break;
-
-            case 0: /* word mode */
-                rb->set_option("Word Wrap", &prefs.word_mode, INT,
-                            opt_word_mode , 2, NULL);
-                break;
-            case 1: /* line mode */
-                rb->set_option("Line Mode", &prefs.line_mode, INT, opt_line_mode,
-                            sizeof(opt_line_mode) / sizeof(*opt_line_mode), NULL);
-                break;
-            case 2: /* view mode */
-                rb->set_option("Wide View", &prefs.view_mode, INT,
-                            opt_view_mode , 2, NULL);
-                break;
-#ifdef HAVE_LCD_BITMAP
-            case 3:
-                rb->set_option("Overlap Pages", &prefs.page_mode, INT,
-                            opt_page_mode , 2, NULL);
-                break;
-#endif
-            case 4:
-                rb->set_option("Scroll Mode", &prefs.scroll_mode, INT,
-                               opt_scroll_mode , 2, NULL);
-                break;
-    #ifdef HAVE_LCD_BITMAP
-            case 5:
-                rb->set_option("Show Scrollbar", &prefs.scrollbar_mode, INT,
-                            opt_scrollbar_mode , 2, NULL);
-                /* Show-scrollbar mode for current view-width mode */
-                if (!(ONE_SCREEN_FITS_ALL())) {
-                    if (prefs.scrollbar_mode == true)
-                        init_need_scrollbar();
-                }
-                break;
-    #endif
-            case 6:
-                rb->set_option("Auto-Scroll Speed", &prefs.autoscroll_speed, INT,
-                            opt_autoscroll_speed, sizeof(opt_autoscroll_speed) /
-                            sizeof(*opt_autoscroll_speed), NULL);
-                break;
-        } /* switch() */
-    }
+    result = rb->menu_run(m);
     rb->menu_exit(m);
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setmargins(0,0);
+
+    /* Show-scrollbar mode for current view-width mode */
+    if (!ONE_SCREEN_FITS_ALL())
+        if (prefs.scrollbar_mode == true)
+            init_need_scrollbar();
 #endif
+    return result;
 }
 
-static void show_menu(void)
+static void viewer_menu(void)
 {
     int m;
     int result;
@@ -1103,7 +1103,7 @@ static void show_menu(void)
             done = true;
             break;
         case 1: /* change settings */
-            change_options_menu();
+            done = viewer_options_menu();
             break;
         case 2: /* playback control */
             playback_control(rb);
@@ -1121,6 +1121,7 @@ static void show_menu(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* file)
 {
     int button, i, ok;
+    int lastbutton = BUTTON_NONE;
     bool autoscroll = false;
     int old_tick = *rb->current_tick;
 
@@ -1157,10 +1158,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
         button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:
-                show_menu();
+                viewer_menu();
                 break;
 
             case VIEWER_AUTOSCROLL:
+#ifdef VIEWER_AUTOSCROLL_PRE
+                if (lastbutton != VIEWER_AUTOSCROLL_PRE)
+                    break;
+#endif
                 autoscroll = !autoscroll;
                 break;
 
@@ -1196,7 +1201,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 viewer_draw(col);
                 break;
 
-#ifdef VIEWER_SCREEN_LEFT
             case VIEWER_SCREEN_LEFT:
             case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
@@ -1211,9 +1215,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
                 viewer_draw(col);
                 break;
-#endif
 
-#ifdef VIEWER_SCREEN_LEFT
             case VIEWER_SCREEN_RIGHT:
             case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
@@ -1228,7 +1230,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
                 viewer_draw(col);
                 break;
-#endif
 
 #ifdef VIEWER_LINE_UP
             case VIEWER_LINE_UP:
@@ -1266,12 +1267,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 #endif
 
-#ifdef VIEWER_QUIT
             case VIEWER_QUIT:
                 viewer_exit(NULL);
                 done = true;
                 break;
-#endif
 
             default:
                 if (rb->default_event_handler_ex(button, viewer_exit, NULL)
@@ -1279,6 +1278,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                     return PLUGIN_USB_CONNECTED;
                 break;
         }
+        if (button != BUTTON_NONE)
+            lastbutton = button;
     }
     return PLUGIN_OK;
 }
