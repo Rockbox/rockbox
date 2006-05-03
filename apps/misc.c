@@ -367,15 +367,9 @@ void screen_dump(void)
             for (bx = LCD_WIDTH/4; bx > 0; bx--)
             {
                 unsigned src_byte = *src++;
-                unsigned tmp;
                 
-                tmp = src_byte & 3;
-                src_byte >>= 2;
-                *dst++ = (tmp << 4) | (src_byte & 3);
-                src_byte >>= 2;
-                tmp = src_byte & 3;
-                src_byte >>= 2;
-                *dst++ = (tmp << 4) | (src_byte & 3);
+                *dst++ = ((src_byte >> 2) & 0x30) | ((src_byte >> 4) & 0x03);
+                *dst++ = ((src_byte << 2) & 0x30) | (src_byte & 0x03);
             }
 
             write(fh, line_block, sizeof(line_block));
