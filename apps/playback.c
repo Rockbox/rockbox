@@ -1817,7 +1817,8 @@ static void audio_stop_playback(void)
     if (playing)
     {
         /* Save the current playing spot, or NULL if the playlist has ended */
-        playlist_update_resume_info(playlist_end?NULL:audio_current_track());
+        playlist_update_resume_info(
+            (playlist_end && ci.stop_codec)?NULL:audio_current_track());
     }
     filebufused = 0;
     playing = false;
