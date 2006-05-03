@@ -2125,8 +2125,11 @@ static void audio_new_playlist(void)
 
 static void initiate_track_change(long direction)
 {
-    playlist_end = false;
-    ci.new_track += direction;
+    if (playlist_check(direction))
+    {
+        playlist_end = false;
+        ci.new_track += direction;
+    }
 }
 
 static void initiate_dir_change(long direction)
