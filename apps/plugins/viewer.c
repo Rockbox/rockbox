@@ -1123,9 +1123,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
     int button, i, ok;
     int lastbutton = BUTTON_NONE;
     bool autoscroll = false;
-    int old_tick = *rb->current_tick;
+    long old_tick;
 
     rb = api;
+    old_tick = *rb->current_tick;
 
     if (!file)
         return PLUGIN_ERROR;
