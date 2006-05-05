@@ -301,6 +301,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
     if (LOW_DATA(6) || !pcmbuf_is_crossfade_enabled() || low_latency_mode)
     {
         pcmbuf_boost(true);
+        pcmbuf_flush_fillpos();
         pcmbuf_flush = true;
         return false;
     }
