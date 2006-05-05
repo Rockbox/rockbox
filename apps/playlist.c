@@ -1020,13 +1020,15 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
     if (playlist == NULL)
         playlist = &current_playlist;
     
-    index = rotate_index(playlist, playlist->index);
-    /* We should also skip already skipped entries before the entry to be skipepd. */
-    index += calculate_step_count(playlist, steps);
-    if (index < 0 || index >= playlist->amount)
-        return ;
-    
-    index = (index+playlist->first_index) % playlist->amount;
+    /* need to account for already skipped tracks */
+    steps = calculate_step_count(playlist, steps);
+
+    index = playlist->index + steps;
+    if (index < 0)
+        index += playlist->amount;
+    else if (index >= playlist->amount)
+        index -= playlist->amount;
+
     playlist->indices[index] |= PLAYLIST_SKIPPED;
 }
 
