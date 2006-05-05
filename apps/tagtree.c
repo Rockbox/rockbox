@@ -710,15 +710,12 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     if (!tagcache_search(&tcs, tag_filename))
         return -1;
 
-    tagcache_search_add_filter(&tcs, tag_title, entry->extraseek);
-    
-    if (!tagcache_get_next(&tcs))
+    if (!tagcache_retrieve(&tcs, entry->extraseek, buf, buflen))
     {
         tagcache_search_finish(&tcs);
         return -2;
     }
 
-    strncpy(buf, tcs.result, buflen-1);
     tagcache_search_finish(&tcs);
     
     return 0;
@@ -789,34 +786,52 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     return &entry[realid];
 }
 
+int tagtree_get_attr(struct tree_context* c)
+{
+    int attr = -1;
+    switch (c->currtable)
+    {
+        case navibrowse:
+            if (csi->tagorder[c->currextra] == tag_title)
+                attr = TREE_ATTR_MPA;
+            else
+                attr = ATTR_DIRECTORY;
+            break;
+
+        case allsubentries:
+            attr = TREE_ATTR_MPA;
+            break;
+        
+        default:
+            attr = ATTR_DIRECTORY;
+            break;
+    }
+
+    return attr;
+}
+
 #ifdef HAVE_LCD_BITMAP
-const char* tagtree_get_icon(struct tree_context* c)
+const unsigned char* tagtree_get_icon(struct tree_context* c)
 #else
 int   tagtree_get_icon(struct tree_context* c)
 #endif
 {
     int icon;
 
-    switch (c->currtable)
+    switch (tagtree_get_attr(c))
     {
-        case navibrowse:
-            if (csi->tagorder[c->currextra] == tag_title)
-                icon = Icon_Audio;
-            else
-                icon = Icon_Folder;
-            break;
-
-        case allsubentries:
+        case TREE_ATTR_MPA:
             icon = Icon_Audio;
             break;
-        
+
+        case ATTR_DIRECTORY:
         default:
             icon = Icon_Folder;
             break;
     }
 
 #ifdef HAVE_LCD_BITMAP
-    return (char *)bitmap_icons_6x8[icon];
+    return bitmap_icons_6x8[icon];
 #else
     return icon;
 #endif

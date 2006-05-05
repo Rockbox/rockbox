@@ -35,12 +35,12 @@ int tagtree_enter(struct tree_context* c);
 void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);
 struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
+int tagtree_get_attr(struct tree_context* c);
 #ifdef HAVE_LCD_BITMAP
-const char* tagtree_get_icon(struct tree_context* c);
+const unsigned char* tagtree_get_icon(struct tree_context* c);
 #else
 int   tagtree_get_icon(struct tree_context* c);
 #endif
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen);
 
 #endif
-

@@ -766,14 +766,10 @@ static bool dirbrowse(void)
                 else {
                     if (id3db)
                     {
-                        switch (tc.currtable)
+                        if (tagtree_get_attr(&tc) == TREE_ATTR_MPA)
                         {
-                            case navibrowse:
-                                if (tc.currextra != tag_title)
-                                    break;
-                                attr=TREE_ATTR_MPA;
-                                tagtree_get_filename(&tc, buf, sizeof(buf));
-                                break;
+                            attr = TREE_ATTR_MPA;
+                            tagtree_get_filename(&tc, buf, sizeof(buf));
                         }
                     }
                     else
