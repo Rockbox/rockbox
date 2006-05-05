@@ -974,8 +974,8 @@ static int col_limit(int col)
 static bool word_wrap_setting(void)
 {
     static const struct opt_items names[] = {
-        {"On",               NULL},
-        {"Off (Chop Words)", NULL},
+        {"On",               -1},
+        {"Off (Chop Words)", -1},
     };
 
     return rb->set_option("Word Wrap", &prefs.word_mode, INT,
@@ -985,11 +985,11 @@ static bool word_wrap_setting(void)
 static bool line_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Normal",       NULL},
-        {"Join Lines",   NULL},
-        {"Expand Lines", NULL},
+        {"Normal",       -1},
+        {"Join Lines",   -1},
+        {"Expand Lines", -1},
 #ifdef HAVE_LCD_BITMAP
-        {"Reflow Lines", NULL},
+        {"Reflow Lines", -1},
 #endif
     };
 
@@ -1000,8 +1000,8 @@ static bool line_mode_setting(void)
 static bool view_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"No (Narrow)", NULL},
-        {"Yes",         NULL},
+        {"No (Narrow)", -1},
+        {"Yes",         -1},
     };
 
     return rb->set_option("Wide View", &prefs.view_mode, INT,
@@ -1011,8 +1011,8 @@ static bool view_mode_setting(void)
 static bool scroll_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Scroll by Page", NULL},
-        {"Scroll by Line", NULL},
+        {"Scroll by Page", -1},
+        {"Scroll by Line", -1},
     };
 
     return rb->set_option("Scroll Mode", &prefs.scroll_mode, INT,
@@ -1023,8 +1023,8 @@ static bool scroll_mode_setting(void)
 static bool page_mode_setting(void)
 {
     static const struct opt_items names[] = {
-        {"No",  NULL},
-        {"Yes", NULL},
+        {"No",  -1},
+        {"Yes", -1},
     };
 
     return rb->set_option("Overlap Pages", &prefs.page_mode, INT,
@@ -1034,8 +1034,8 @@ static bool page_mode_setting(void)
 static bool scrollbar_setting(void)
 {
     static const struct opt_items names[] = {
-        {"Off", NULL},
-        {"On",  NULL}
+        {"Off", -1},
+        {"On",  -1}
     };
 
     return rb->set_option("Show Scrollbar", &prefs.scrollbar_mode, INT,
