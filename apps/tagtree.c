@@ -774,7 +774,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
-        if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)), 
+        if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)),
                              false) < 0)
         {
             logf("retrieve failed");
@@ -816,19 +816,10 @@ const unsigned char* tagtree_get_icon(struct tree_context* c)
 int   tagtree_get_icon(struct tree_context* c)
 #endif
 {
-    int icon;
+    int icon = Icon_Folder;
 
-    switch (tagtree_get_attr(c))
-    {
-        case TREE_ATTR_MPA:
-            icon = Icon_Audio;
-            break;
-
-        case ATTR_DIRECTORY:
-        default:
-            icon = Icon_Folder;
-            break;
-    }
+    if (tagtree_get_attr(c) == TREE_ATTR_MPA)
+        icon = Icon_Audio;
 
 #ifdef HAVE_LCD_BITMAP
     return bitmap_icons_6x8[icon];
