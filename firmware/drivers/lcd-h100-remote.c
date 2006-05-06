@@ -1210,7 +1210,7 @@ void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset)
 void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int offset)
 {
-    int xpos,ypos,w,h;
+    int xpos,ypos,w,h,xrect;
     int lastmode = drawmode;
 
     /* make sure scrolling is turned off on the line we are updating */
@@ -1226,8 +1226,8 @@ void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
                (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
     lcd_remote_putsxyofs(xpos, ypos, offset, str);
     drawmode ^= DRMODE_INVERSEVID;
-    lcd_remote_fillrect(xpos + w - offset, ypos,
-                        LCD_REMOTE_WIDTH - (xpos + w - offset), h);
+    xrect = xpos + MAX(w - offset, 0);
+    lcd_remote_fillrect(xrect, ypos, LCD_REMOTE_WIDTH - xrect, h);
     drawmode = lastmode;
 }
 
