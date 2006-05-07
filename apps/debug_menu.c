@@ -531,6 +531,27 @@ bool dbg_hw_info(void)
         if(button == SETTINGS_CANCEL)
             return false;
     }
+#elif CONFIG_CPU == PP5020
+    char buf[32];
+    int button;
+
+    lcd_setmargins(0, 0);
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_clear_display();
+
+    lcd_puts(0, 0, "[Hardware info]");
+    
+    snprintf(buf, sizeof(buf), "HW rev: 0x%08x", ipod_hw_rev);
+    lcd_puts(0, 1, buf);
+
+    lcd_update();
+
+    while(1)
+    {
+        button = button_get(true);
+        if(button == SETTINGS_CANCEL)
+            return false;
+    }
 #endif /* CONFIG_CPU */
     return false;
 }
@@ -1025,50 +1046,35 @@ bool dbg_ports(void)
         gpio_a = GPIOA_INPUT_VAL;
         gpio_b = GPIOB_INPUT_VAL;
         gpio_c = GPIOC_INPUT_VAL;
-        gpio_d = GPIOD_INPUT_VAL;
 
-        line = 0;
-        snprintf(buf, sizeof(buf), "IPOD version: 0x%08x", ipod_hw_rev);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_A:       %02x", gpio_a);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_B:       %02x", gpio_b);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_C:       %02x", gpio_c);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_D:       %02x", gpio_d);
-        lcd_puts(0, line++, buf);
-        line++;
-
-        gpio_e = GPIOE_INPUT_VAL;
-        gpio_f = GPIOF_INPUT_VAL;
         gpio_g = GPIOG_INPUT_VAL;
         gpio_h = GPIOH_INPUT_VAL;
+        gpio_i = GPIOI_INPUT_VAL;
 
-        snprintf(buf, sizeof(buf), "GPIO_E:       %02x", gpio_e);
+        line = 0;
+        snprintf(buf, sizeof(buf), "GPIO_A: %02x  GPIO_G: %02x", gpio_a, gpio_g);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_F:       %02x", gpio_f);
+        snprintf(buf, sizeof(buf), "GPIO_B: %02x  GPIO_H: %02x", gpio_b, gpio_h);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_G:       %02x", gpio_g);
-        lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_H:       %02x", gpio_h);
+        snprintf(buf, sizeof(buf), "GPIO_C: %02x  GPIO_I: %02x", gpio_c, gpio_i);
         lcd_puts(0, line++, buf);
         line++;
 
-        gpio_i = GPIOI_INPUT_VAL;
+        gpio_d = GPIOD_INPUT_VAL;
+        gpio_e = GPIOE_INPUT_VAL;
+        gpio_f = GPIOF_INPUT_VAL;
+
         gpio_j = GPIOJ_INPUT_VAL;
         gpio_k = GPIOK_INPUT_VAL;
         gpio_l = GPIOL_INPUT_VAL;
 
-        snprintf(buf, sizeof(buf), "GPIO_I:       %02x", gpio_i);
+        snprintf(buf, sizeof(buf), "GPIO_D: %02x  GPIO_J: %02x", gpio_d, gpio_j);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_J:       %02x", gpio_j);
+        snprintf(buf, sizeof(buf), "GPIO_E: %02x  GPIO_K: %02x", gpio_e, gpio_k);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_K:       %02x", gpio_k);
+        snprintf(buf, sizeof(buf), "GPIO_F: %02x  GPIO_L: %02x", gpio_f, gpio_l);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_L:       %02x", gpio_l);
-        lcd_puts(0, line++, buf);
-      
+
         lcd_update();
         button = button_get_w_tmo(HZ/10);
 
