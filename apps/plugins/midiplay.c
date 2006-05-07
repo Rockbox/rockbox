@@ -20,6 +20,48 @@
 
 PLUGIN_HEADER
 
+
+/* variable button definitions */
+#if CONFIG_KEYPAD == RECORDER_PAD
+#define BTN_QUIT     BUTTON_OFF
+#define BTN_RIGHT    BUTTON_RIGHT
+#define BTN_UP       BUTTON_UP
+#define BTN_DOWN     BUTTON_DOWN
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define BTN_QUIT         BUTTON_OFF
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define BTN_QUIT         BUTTON_OFF
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define BTN_QUIT         (BUTTON_SELECT | BUTTON_MENU)
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_SCROLL_FWD
+#define BTN_DOWN         BUTTON_SCROLL_BACK
+
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_VOL_UP
+#define BTN_DOWN         BUTTON_VOL_DOWN
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+#endif
+
+
+
 #define FRACTSIZE 10
 #define SAMPLE_RATE 22050  // 44100 22050 11025
 #define MAX_VOICES 14   // Note: 24 midi channels is the minimum general midi
@@ -220,8 +262,8 @@ int midimain(void * filename)
         /* Code taken from Oscilloscope plugin */
         switch(rb->button_get(false))
         {
-                case BUTTON_UP:
-                case BUTTON_UP | BUTTON_REPEAT:
+                case BTN_UP:
+                case BTN_UP | BUTTON_REPEAT:
                     vol = rb->global_settings->volume;
                     if (vol < rb->sound_max(SOUND_VOLUME))
                     {
@@ -231,8 +273,8 @@ int midimain(void * filename)
                     }
                     break;
 
-                case BUTTON_DOWN:
-                case BUTTON_DOWN | BUTTON_REPEAT:
+                case BTN_DOWN:
+                case BTN_DOWN | BUTTON_REPEAT:
                     vol = rb->global_settings->volume;
                     if (vol > rb->sound_min(SOUND_VOLUME))
                     {
@@ -242,7 +284,7 @@ int midimain(void * filename)
                     }
                     break;
 
-                case BUTTON_RIGHT:
+                case BTN_RIGHT:
                 {
                     /* Skip 3 seconds */
                     /* Should skip length be retrieved from the RB settings? */
@@ -254,7 +296,7 @@ int midimain(void * filename)
                     break;
                 }
 
-                case BUTTON_OFF:
+                case BTN_QUIT:
                     quit=1;
         }
 
