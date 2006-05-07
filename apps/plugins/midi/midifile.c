@@ -68,8 +68,6 @@ struct MIDIfile * loadFile(char * filename)
     int track=0;
 
     printf("\nFile has %d tracks.", mfload->numTracks);
-    printf("Time division=%d\n", mfload->div);
-
 
     while(! eof(file) && track < mfload->numTracks)
     {

@@ -103,19 +103,20 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
                 drumUsed[getEvent(mf->tracks[a], ts)->d1]=1;
 
             if( (getEvent(mf->tracks[a], ts)->status & 0xF0) == MIDI_PRGM)
-            {
-/*                if(patchUsed[getEvent(mf->tracks[a], ts)->d1]==0)
-                    printf("\nI need to load patch %d.", getEvent(mf->tracks[a], ts)->d1);
-*/
                 patchUsed[getEvent(mf->tracks[a], ts)->d1]=1;
-            }
         }
     }
 
     int file = rb->open(filename, O_RDONLY);
-    if(file == -1)
+    if(file < 0)
     {
-        rb->splash(HZ*2, true, "Bad patch config.\nDid you install the patchset?");
+        printf("\n");
+        printf("\nNo MIDI patchset found.");
+        printf("\nPlease install the instruments.");
+        printf("\nSee Rockbox page for more info.");
+
+        rb->splash(HZ*2, true, "No Instruments");
+        rb->splash(HZ*2, true, "No Instruments");
         return -1;
     }
 
@@ -148,7 +149,7 @@ int initSynth(struct MIDIfile * mf, char * filename, char * drumConfig)
     rb->close(file);
 
     file = rb->open(drumConfig, O_RDONLY);
-    if(file == -1)
+    if(file < 0)
     {
         rb->splash(HZ*2, true, "Bad drum config.\nDid you install the patchset?");
         return -1;

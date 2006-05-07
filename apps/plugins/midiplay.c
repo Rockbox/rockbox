@@ -22,7 +22,7 @@ PLUGIN_HEADER
 
 #define FRACTSIZE 10
 #define SAMPLE_RATE 22050  // 44100 22050 11025
-#define MAX_VOICES 13   // Note: 24 midi channels is the minimum general midi
+#define MAX_VOICES 14   // Note: 24 midi channels is the minimum general midi
                          // spec implementation
 #define BUF_SIZE 512
 #define NBUF   2
@@ -161,13 +161,12 @@ void get_more(unsigned char** start, size_t* size)
 
 int midimain(void * filename)
 {
-    int button;
-
-    /*   rb->splash(HZ/5, true, "LOADING MIDI"); */
+    int notesUsed = 0;
+    int a=0;
     printf("\nLoading file");
     mf= loadFile(filename);
 
-    /*   rb->splash(HZ/5, true, "LOADING PATCHES"); */
+
     if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
         return -1;
 
@@ -191,14 +190,25 @@ int midimain(void * filename)
     bpm=mf->div*1000000/tempo;
     numberOfSamples=SAMPLE_RATE/bpm;
 
-    tick();
+
+
+    /* Skip over any junk in the beginning of the file, so start playing */
+    /* after the first note event */
+    do
+    {
+        notesUsed = 0;
+        for(a=0; a<MAX_VOICES; a++)
+            if(voices[a].isUsed == 1)
+                notesUsed++;
+        tick();
+    } while(notesUsed == 0);
 
     synthbuf();
 #ifndef SIMULATOR
     rb->pcm_play_data(&get_more, NULL, 0);
 #endif
 
-    button=rb->button_status();
+    int vol=0;
 
     while(!quit)
     {
@@ -206,7 +216,49 @@ int midimain(void * filename)
         synthbuf();
     #endif
         rb->yield();
-        if(rb->button_status()!=button) quit=1;
+
+        /* Code taken from Oscilloscope plugin */
+        switch(rb->button_get(false))
+        {
+                case BUTTON_UP:
+                case BUTTON_UP | BUTTON_REPEAT:
+                    vol = rb->global_settings->volume;
+                    if (vol < rb->sound_max(SOUND_VOLUME))
+                    {
+                        vol++;
+                        rb->sound_set(SOUND_VOLUME, vol);
+                        rb->global_settings->volume = vol;
+                    }
+                    break;
+
+                case BUTTON_DOWN:
+                case BUTTON_DOWN | BUTTON_REPEAT:
+                    vol = rb->global_settings->volume;
+                    if (vol > rb->sound_min(SOUND_VOLUME))
+                    {
+                        vol--;
+                        rb->sound_set(SOUND_VOLUME, vol);
+                        rb->global_settings->volume = vol;
+                    }
+                    break;
+
+                case BUTTON_RIGHT:
+                {
+                    /* Skip 3 seconds */
+                    /* Should skip length be retrieved from the RB settings? */
+                    int samp = 3*SAMPLE_RATE;
+                    int tickCount = samp / numberOfSamples;
+                    int a=0;
+                    for(a=0; a<tickCount; a++)
+                        tick();
+                    break;
+                }
+
+                case BUTTON_OFF:
+                    quit=1;
+        }
+
+
     }
 
     return 0;
