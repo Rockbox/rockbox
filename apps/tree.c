@@ -808,7 +808,21 @@ static bool dirbrowse(void)
                     TIME_AFTER(current_tick, thumbnail_time))
                 {   /* a delayed hovering thumbnail is due now */
                     int res;
-                    if (dircache[lasti].attr & ATTR_DIRECTORY)
+                    int attr;
+                    char* name;
+
+                    if (id3db)
+                    {
+                        attr = tagtree_get_attr(&tc);
+                        name = tagtree_get_entry(&tc, lasti)->name;
+                    }
+                    else
+                    {
+                        attr = dircache[lasti].attr;
+                        name = dircache[lasti].name;
+                    }
+
+                    if (attr & ATTR_DIRECTORY)
                     {
                         DEBUGF("Playing directory thumbnail: %s", currdir);
                         res = ft_play_dirname(lasti);
@@ -821,11 +835,11 @@ static bool dirbrowse(void)
                     else
                     {
                         DEBUGF("Playing file thumbnail: %s/%s%s\n",
-                               currdir, dircache[lasti].name,
+                               currdir, name,
                                file_thumbnail_ext);
                         /* no fallback necessary, we knew in advance
                            that the file exists */
-                        ft_play_filename(currdir, dircache[lasti].name);
+                        ft_play_filename(currdir, name);
                     }
                     thumbnail_time = -1; /* job done */
                 }
@@ -939,12 +953,26 @@ static bool dirbrowse(void)
             if ( numentries > 0 ) {
                 /* Voice the file if changed */
                 if(lasti != tc.selected_item || restore) {
+                    int attr;
+                    char* name;
+
                     lasti = tc.selected_item;
                     thumbnail_time = -1; /* Cancel whatever we were
                                             about to say */
 
+                    if (id3db)
+                    {
+                        attr = tagtree_get_attr(&tc);
+                        name = tagtree_get_entry(&tc, tc.selected_item)->name;
+                    }
+                    else
+                    {
+                        attr = dircache[tc.selected_item].attr;
+                        name = dircache[tc.selected_item].name;
+                    }
+
                     /* Directory? */
-                    if (dircache[tc.selected_item].attr & ATTR_DIRECTORY)
+                    if (attr & ATTR_DIRECTORY)
                     {
                         /* play directory thumbnail */
                         switch (global_settings.talk_dir) {
@@ -954,8 +982,7 @@ static bool dirbrowse(void)
                                 break;
 
                             case 2: /* dirs spelled */
-                                talk_spell(dircache[tc.selected_item].name,
-                                           false);
+                                talk_spell(name, false);
                                 break;
 
                             case 3: /* thumbnail clip */
@@ -974,25 +1001,21 @@ static bool dirbrowse(void)
                             case 1: /* files as numbers */
                                 ft_play_filenumber(
                                     tc.selected_item-tc.dirsindir+1,
-                                    dircache[tc.selected_item].attr &
-                                    TREE_ATTR_MASK);
+                                    attr & TREE_ATTR_MASK);
                                 break;
 
                             case 2: /* files spelled */
-                                talk_spell(dircache[tc.selected_item].name,
-                                           false);
+                                talk_spell(name, false);
                                 break;
 
                             case 3: /* thumbnail clip */
                                 /* "schedule" a thumbnail, to have a little
                                    delay */
-                                if (dircache[tc.selected_item].attr &
-                                    TREE_ATTR_THUMBNAIL)
+                                if (attr & TREE_ATTR_THUMBNAIL)
                                     thumbnail_time = current_tick + HOVER_DELAY;
                                 else
                                     /* spell the number as fallback */
-                                    talk_spell(dircache[tc.selected_item].name,
-                                               false);
+                                    talk_spell(name, false);
                                 break;
 
                             default:
