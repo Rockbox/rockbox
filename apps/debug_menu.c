@@ -52,6 +52,7 @@
 #include "dircache.h"
 #include "tagcache.h"
 #include "lcd-remote.h"
+#include "crc32.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -301,41 +302,6 @@ bool dbg_audio_thread(void)
 #endif /* CONFIG_CODEC */
 #endif /* HAVE_LCD_BITMAP */
 
-/* Tool function to calculate a CRC16 across some buffer */
-unsigned short crc_16(const unsigned char* buf, unsigned len)
-{
-    /* CCITT standard polynomial 0x1021 */
-    static const unsigned short crc16_lookup[16] = 
-    {   /* lookup table for 4 bits at a time is affordable */
-        0x0000, 0x1021, 0x2042, 0x3063, 
-        0x4084, 0x50A5, 0x60C6, 0x70E7, 
-        0x8108, 0x9129, 0xA14A, 0xB16B, 
-        0xC18C, 0xD1AD, 0xE1CE, 0xF1EF
-    };
-    unsigned short crc16 = 0xFFFF; /* initialise to 0xFFFF (CCITT specification) */
-    unsigned t;
-    unsigned char byte;
-
-    while (len--)
-    {   
-        byte = *buf++; /* get one byte of data */
-
-        /* upper nibble of our data */
-        t = crc16 >> 12; /* extract the 4 most significant bits */
-        t ^= byte >> 4; /* XOR in 4 bits of the data into the extracted bits */
-        crc16 <<= 4; /* shift the CRC Register left 4 bits */     
-        crc16 ^= crc16_lookup[t]; /* do the table lookup and XOR the result */
-
-        /* lower nibble of our data */
-        t = crc16 >> 12; /* extract the 4 most significant bits */
-        t ^= byte & 0x0F; /* XOR in 4 bits of the data into the extracted bits */
-        crc16 <<= 4; /* shift the CRC Register left 4 bits */     
-        crc16 ^= crc16_lookup[t]; /* do the table lookup and XOR the result */
-    }
-
-    return crc16;
-}
-
 
 #if CONFIG_CPU == TCC730
 static unsigned flash_word_temp __attribute__ ((section (".idata")));
@@ -444,7 +410,7 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
-    unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
+    unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
 
@@ -474,7 +440,7 @@ bool dbg_hw_info(void)
     if (has_bootrom)  /* if ROM and Flash different */
     {
         /* calculate CRC16 checksum of boot ROM */
-        rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+        rom_crc = crc_32((unsigned char*)0x0000, 64*1024, 0xffffffff);
     }
 
     system_memory_guard(oldmode);  /* re-enable memory guard */
@@ -505,9 +471,10 @@ bool dbg_hw_info(void)
 
     if (has_bootrom)
     {
-        snprintf(buf, 32-3, "ROM CRC: 0x%04x", rom_crc);
-        if (rom_crc == 0x222F) /* known Version 1 */
-            strcat(buf, " V1");
+        if (rom_crc == 0x56DBA4EE) /* known Version 1 */
+            snprintf(buf, 32, "Boot ROM: V1");
+        else
+            snprintf(buf, 32, "ROMcrc: 0x%08x", rom_crc);
     }
     else
     {
@@ -578,7 +545,7 @@ bool dbg_hw_info(void)
     int rom_version = *(unsigned short*)0x20000fe;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
-    unsigned rom_crc = 0xFFFF; /* CRC16 of the boot ROM */
+    unsigned rom_crc = 0xffffffff; /* CRC32 of the boot ROM */
     bool has_bootrom; /* flag for boot ROM present */
     int oldmode;  /* saved memory guard mode */
 
@@ -599,7 +566,7 @@ bool dbg_hw_info(void)
     if (has_bootrom)  /* if ROM and Flash different */
     {
         /* calculate CRC16 checksum of boot ROM */
-        rom_crc = crc_16((unsigned char*)0x0000, 64*1024);
+        rom_crc = crc_32((unsigned char*)0x0000, 64*1024, 0xffffffff);
     }
     
     system_memory_guard(oldmode);  /* re-enable memory guard */
@@ -634,7 +601,15 @@ bool dbg_hw_info(void)
                 break;
             case 5:
                 if (has_bootrom)
-                    snprintf(buf, 32, "RomCRC:%04x", rom_crc);
+                {
+                    if (rom_crc == 0x56DBA4EE) /* known Version 1 */
+                        snprintf(buf, 32, "BootROM: V1");
+                    else if (rom_crc == 0x358099E8) 
+                        snprintf(buf, 32, "BootROM: V2");
+                        /* alternative boot ROM found in one single player so far */
+                    else
+                        snprintf(buf, 32, "R: %08x", rom_crc);
+                }
                 else
                     snprintf(buf, 32, "BootROM: no");
         }
