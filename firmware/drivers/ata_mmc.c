@@ -583,12 +583,12 @@ static int receive_block(unsigned char *inbuf, int size, long timeout)
     SCR1 = 0;                     /* disable serial */
     SSR1 = 0;                     /* clear all flags */
     
-    /* setup DMA channel 2 */
-    CHCR2 = 0;                    /* disable */
-    SAR2 = RDR1_ADDR;
-    DAR2 = (unsigned long) inbuf;
-    DTCR2 = size;
-    CHCR2 = 0x4601;               /* fixed source address, RXI1, enable */
+    /* setup DMA channel 0 */
+    CHCR0 = 0;                    /* disable */
+    SAR0 = RDR1_ADDR;
+    DAR0 = (unsigned long) inbuf;
+    DTCR0 = size;
+    CHCR0 = 0x4601;               /* fixed source address, RXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_RE|SCI_RIE);      /* kick off DMA */
     
@@ -600,7 +600,7 @@ static int receive_block(unsigned char *inbuf, int size, long timeout)
     bg_copy_swap();
     yield();                      /* be nice */
 
-    while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
+    while (!(CHCR0 & 0x0002));    /* wait for end of DMA */
     while (!(SSR1 & SCI_ORER));   /* wait for the trailing bytes */
     SCR1 = 0;
     serial_mode = SER_DISABLED;
@@ -625,19 +625,19 @@ static int send_block(int size, unsigned char start_token, long timeout)
     SCR1 = 0;                     /* disable serial */
     SSR1 = 0;                     /* clear all flags */
 
-    /* setup DMA channel 2 */
-    CHCR2 = 0;                    /* disable */
-    SAR2 = (unsigned long)(curbuf + 1);
-    DAR2 = TDR1_ADDR;
-    DTCR2 = size + 3;             /* start token + block + dummy crc */
-    CHCR2 = 0x1701;               /* fixed dest. address, TXI1, enable */
+    /* setup DMA channel 0 */
+    CHCR0 = 0;                    /* disable */
+    SAR0 = (unsigned long)(curbuf + 1);
+    DAR0 = TDR1_ADDR;
+    DTCR0 = size + 3;             /* start token + block + dummy crc */
+    CHCR0 = 0x1701;               /* fixed dest. address, TXI1, enable */
     DMAOR = 0x0001;
     SCR1 = (SCI_TE|SCI_TIE);      /* kick off DMA */
 
     bg_copy_swap();
     yield();                      /* be nice */
 
-    while (!(CHCR2 & 0x0002));    /* wait for end of DMA */
+    while (!(CHCR0 & 0x0002));    /* wait for end of DMA */
     while (!(SSR1 & SCI_TEND));   /* wait for end of transfer */
     SCR1 = 0;
     serial_mode = SER_DISABLED;
