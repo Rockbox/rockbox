@@ -353,7 +353,7 @@ int pcmbuf_used_descs(void) {
 }
 
 int pcmbuf_descs(void) {
-    return pcmbuf_size / PCMBUF_TARGET_CHUNK;
+    return pcmbuf_size / PCMBUF_MINAVG_CHUNK;
 }
 
 size_t get_pcmbuf_descsize(void) {
