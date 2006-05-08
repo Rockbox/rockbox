@@ -39,12 +39,14 @@ conditionals to show alternate information in preference to assuming.
 \section{File Info}
   \begin{tagmap}{}{}
     \%fb & File Bitrate (in kbps)\\
-    \%fc & File Codec (e.g. ``MP3'' or ``FLAC'')\\
-         & This tag can also be used in a conditional tag,\\
-         & \%?fc{\textless}mp1{\textbar}mp2{\textbar}mp3{\textbar}wav%
-           {\textbar}vorbis{\textbar}flac{\textbar}mpc{\textbar}a52%
-           {\textbar}wavpack{\textbar}unknown{\textgreater}\\ %
-         & The codec order is as follows: MP1, MP2, MP3, WAV, Ogg Vorbis (OGG),%
+    \%fc & File Codec (e.g. ``MP3'' or ``FLAC''). %
+           This tag can also be used in a conditional tag, %
+           \%?fc{\textless}mp1\-{\textbar}mp2\-{\textbar}mp3\-{\textbar}wav\-%
+           {\textbar}vorbis\-{\textbar}flac\-{\textbar}mpc\-{\textbar}a52\-%
+           {\textbar}wavpack\-{\textbar}alac\-{\textbar}aac\-{\textbar}shn\-%
+           {\textbar}aiff\-%
+           {\textbar}unknown{\textgreater}. %
+           The codec order is as follows: MP1, MP2, MP3, WAV, Ogg Vorbis (OGG),%
            FLAC, MPC, AC3, WavPack (WV), ALAC, AAC, Shorten (SHN), AIFF\\
     \%ff & File Frequency (in Hz)\\
     \%fm & File Name\\
