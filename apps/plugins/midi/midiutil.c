@@ -24,6 +24,8 @@
 #define ID_MTHD     1
 #define ID_MTRK     2
 #define ID_EOF      3
+#define ID_RIFF     4
+
 
 //MIDI Commands
 #define MIDI_NOTE_OFF   128

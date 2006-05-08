@@ -208,6 +208,11 @@ int midimain(void * filename)
     printf("\nLoading file");
     mf= loadFile(filename);
 
+    if(mf == NULL)
+    {
+        printf("\nError loading file.");
+        return -1;
+    }
 
     if (initSynth(mf, "/.rockbox/patchset/patchset.cfg", "/.rockbox/patchset/drums.cfg") == -1)
         return -1;

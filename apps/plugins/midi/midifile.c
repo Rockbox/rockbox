@@ -22,7 +22,6 @@ extern struct plugin_api * rb;
 
 struct Track * readTrack(int file);
 int readID(int file);
-void bail(const char *);
 
 struct MIDIfile * loadFile(char * filename)
 {
@@ -31,7 +30,8 @@ struct MIDIfile * loadFile(char * filename)
 
     if(file==-1)
     {
-        bail("Could not open file\n");
+        printf("Could not open file\n");
+        return NULL;
     }
 
     mfload = (struct MIDIfile*)malloc(sizeof(struct MIDIfile));
@@ -39,27 +39,48 @@ struct MIDIfile * loadFile(char * filename)
     if(mfload==NULL)
     {
         rb->close(file);
-        bail("Could not allocate memory for MIDIfile struct\n");
+        printf("Could not allocate memory for MIDIfile struct\n");
+        return NULL;
     }
 
     rb->memset(mfload, 0, sizeof(struct MIDIfile));
 
-    if(readID(file) != ID_MTHD)
+    int fileID = readID(file);
+    if(fileID != ID_MTHD)
     {
-        rb->close(file);
-        bail("Invalid file header chunk.");
+        if(fileID == ID_RIFF)
+        {
+            printf("\nDetected RMID file");
+            printf("\nLooking for MThd header");
+            char dummy[17];
+            rb->read(file, &dummy, 16);
+            if(readID(file) != ID_MTHD)
+            {
+                rb->close(file);
+                printf("Invalid MIDI header within RIFF.");
+                return NULL;
+            }
+
+        } else
+        {
+            rb->close(file);
+            printf("Invalid file header chunk.");
+            return NULL;
+        }
     }
 
     if(readFourBytes(file)!=6)
     {
         rb->close(file);
-        bail("Header chunk size invalid.");
+        printf("Header chunk size invalid.");
+        return NULL;
     }
 
     if(readTwoBytes(file)==2)
     {
         rb->close(file);
-        bail("MIDI file type not supported");
+        printf("MIDI file type 2 not supported");
+        return NULL;
     }
 
     mfload->numTracks = readTwoBytes(file);
@@ -231,6 +252,8 @@ int readID(int file)
         return ID_MTHD;
     if(rb->strcmp(id, "MTrk")==0)
         return ID_MTRK;
+    if(rb->strcmp(id, "RIFF")==0)
+        return ID_RIFF;
     return ID_UNKNOWN;
 }
 
@@ -294,9 +317,5 @@ void unloadFile(struct MIDIfile * mf)
     free(mf);   //Unload the main struct
 }
 */
-void bail(const char * err)
-{
-    rb->splash(HZ*3, true, err);
-    exit(0);
-}
+
 
