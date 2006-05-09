@@ -1210,6 +1210,7 @@ static int jewels_main(struct game_context* bj) {
         switch(button){
 #ifdef JEWELS_SCROLLWHEEL
             case JEWELS_PREV:
+            case (JEWELS_PREV|BUTTON_REPEAT):
 #endif
             case JEWELS_UP:
             case (JEWELS_UP|BUTTON_REPEAT):
@@ -1218,6 +1219,7 @@ static int jewels_main(struct game_context* bj) {
 
 #ifdef JEWELS_SCROLLWHEEL
             case JEWELS_NEXT:
+            case (JEWELS_NEXT|BUTTON_REPEAT):
 #endif
             case JEWELS_DOWN:
             case (JEWELS_DOWN|BUTTON_REPEAT):
