@@ -51,66 +51,54 @@ your WPS (While Playing Screen).
 \begin{table}
   \begin{btnmap}{}{}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
+      \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
       \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight/\ButtonLeft} 
       & Volume up/down \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonLeft}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD}{\ButtonLeft}
       & Go to beginning of track, or if pressed while in the first seconds of a track,
         go to previous track. \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonLeft}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD}{Hold \ButtonLeft}
       & Rewind in track \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonRight}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD}{\ButtonRight}
       & Go to next track. \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD}{Hold \ButtonRight}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,ONDIO_PAD,RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD}{Hold \ButtonRight}
       & Fast forward in track. \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-      \opt{IPOD_4G_PAD,IAUDIO_X5_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonPlay}
-      \opt{ONDIO_PAD}{\ButtonOff} 
+      \opt{IPOD_4G_PAD,IAUDIO_X5_PAD,RECORDER_PAD,PLAYER_PAD,IPOD_4G_PAD}{\ButtonPlay}
       & Toggle play/pause \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
       \opt{ONDIO_PAD}{\ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{\ButtonOn}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
       & Go to file browser \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
       \opt{ONDIO_PAD}{Hold \ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
       & Enter WPS context menu \\
       %
-      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOn}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
-      \opt{PLAYER_PAD}{n/a}
-      \opt{ONDIO_PAD}{In WPS context menu}
-      & Show pitch setting screen \\
+      \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
+      Hold \ButtonOn
+      & Show pitch setting screen \\}
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
       \opt{ONDIO_PAD}{Hold \ButtonOff}
       \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
+      \opt{IPOD_4G_PAD}{Hold \ButtonPlay}
       \opt{PLAYER_PAD}{\ButtonStop}
       & Stop playback \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
       \opt{RECORDER_PAD}{\ButtonFOne}
-      \opt{PLAYER_PAD,ONDIO_PAD}{\ButtonMenu}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys}
-      \opt{IPOD_4G_PAD}{Please add correct keys} 
+      \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
+      \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
       & Go to Main menu \\
       %
       %These actions need definitions for the other targets
@@ -162,47 +150,39 @@ your WPS (While Playing Screen).
 \subsubsection{\label{sec:contextmenu}Context Menu}
 Like the context menu for the file browser this context menu allows you
 to quickly access some often used functions.
-\opt{SWCODEC}{These include the ID3 Viewer and the pitch screen.}
+\opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,x5}{
+These include the ID3 Viewer and the pitch screen.}
 
-\opt{SWCODEC}{
   \subsubsection{\label{sec:pitchscreen}Pitch Screen}
   The Pitch Screen allows you to quickly change the pitch of your \dap. The
-  pitch value can be adjusted between 50\% and 200\%. To access the pitch screen
-  just ``change'' the pitch from the WPS with
-  \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonUp/\ButtonDown}
-  \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
-  while holding the
-  \opt{RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonPlay}
-  \opt{h1xx,h300}{\ButtonOn}
-  \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
-  button down.
+  pitch value can be adjusted between 50\% and 200\%.
   \begin{table}
   \begin{btnmap}{}{}
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonUp/\ButtonDown}
-      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,x5}{\ButtonUp/\ButtonDown}
+      \opt{IPOD_4G_PAD}{Short \ButtonScrollFwd/\ButtonScrollBack}
       & Increase / Decrease Pitch by 0.1\% \\
       %
-      hold
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonUp/\ButtonDown}
-      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
-      & Increase / Decrease Pitch by 2.0\% \\
+      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,x5}{hold \ButtonUp/\ButtonDown}
+      \opt{IPOD_4G_PAD}{Long \ButtonScrollFwd/\ButtonScrollBack}
+      & Increase / Decrease Pitch by 1\% \\
       %
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
-      & temporarily Increase / Decrease Pitch by 2.0\% \\
+      \ButtonLeft/\ButtonRight
+      & Temporarily Increase / Decrease Pitch by 2.0\% \\
       %
-      \opt{RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\fixme{\ButtonOn+\ButtonStop}}
-      \opt{h1xx,h300}{\ButtonOn+\ButtonOff}
-      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      \opt{ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
+      \opt{h1xx,h300,RECORDER_PAD}{\ButtonOn}
+      \opt{x5}{\ButtonPower}
       & Reset Pitch to 100\% \\
       %
-      \opt{RECORDER_PAD,ONDIO_PAD,PLAYER_PAD}{\ButtonStop}
-      \opt{h1xx,h300}{\ButtonOff}
-      \opt{IPOD_4G_PAD,x5}{\fixme{tbd}}
+      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+      \opt{IPOD_4G_PAD}{\ButtonSelect}
+      \opt{x5}{\ButtonPlay}
       & Leave Pitch screen \\
       %
   \end{btnmap}
   \end{table}
+  \opt{RECORDER_PAD,ONDIO_PAD}{
+  \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
 }
 
 \subsubsection{\label{ref:ID3viewer}ID3 Viewer}

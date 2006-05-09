@@ -2,9 +2,9 @@
 \screenshot{plugins/images/ss-sudoku}{Sudoku}{fig:sudoku}
 To play Sudoku you need sudoku games stored as .ss files (see links below).
 Once you have your .ss file just open it in the normal file browser to start playing.
-You can create and save your own grids under the "New" menu option.
+You can create and save your own grids under the \setting{New} menu option.
 Press the menu button when you have finished and enter the full path
-to save to including the .ss extension (e.g. /sudoku/new.ss).
+to save to including the .ss extension (e.g. \fname{/sudoku/new.ss}).
 
 \textbf{The thing on the left (AKA the scratchpad)}\\
 When you play sudoku on paper most people like to mark numbers in
@@ -13,25 +13,39 @@ This can be done with the column on the left. Change the number
 under the cursor to a number which might be valid and press the scratchpad
 button, the number will then be added on the left.
 The column is stored seperatly for every cell on the board.
-These are \textbf{NOT} saved when saving the game.
+These are \emph{NOT} saved when saving the game.
 
 \begin{table}
     \begin{btnmap}{}{}
-    Direction keys & Move the cursor\\
-    \opt{recorder,recorderv2fm}{PLAY}
-    \opt{ondio}{MODE (increment once) / MODE+DOWN (toggle repeat)}
-    \opt{h1xx}{SELECT / PLAY}\opt{h300}{NAVI / PLAY}
-    \opt{ipodcolor}{SELECT} 
-    & Increment  number under the cursor\\
-    \opt{recorder,recorderv2fm}{F1}\opt{ondio}{Long press on MODE}\opt{h1xx,h300}{A-B}
-    \opt{ipodcolor}{MENU} 
+
+    \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}{Direction keys}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack} 
+    & Move the cursor\\
+    %
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{h1xx,h300}{\ButtonSelect/\ButtonOn}
+    \opt{IPOD_4G_PAD}{\ButtonLeft/\ButtonRight} 
+    & Change number under the cursor\\
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{Long press on \ButtonMenu}
+    \opt{h1xx,h300}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{x5}{\ButtonPlay} 
     & Open Menu\\
-    \opt{recorder,recorderv2fm}{F2}\opt{ondio}{MODE+LEFT}
-    \opt{h1xx,h300}{RECORD}\opt{ipodcolor}{SELECT+LEFT} 
-    & Add / remove number to scratchpad\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{STOP}\opt{ondio}{OFF}
-    \opt{ipodcolor,ipodnano}{SELECT} 
+    %
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{h1xx,h300,x5}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{\ButtonPlay} 
+    & Add/Remove number to scratchpad\\
+    %
+    \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300}{\ButtonOff}
+    \opt{x5}{\ButtonPower}
+    \opt{IPOD_4G_PAD}{Menu $\rightarrow$ Quit}
     & Quit\\
+    %
     \end{btnmap}
 \end{table}
 

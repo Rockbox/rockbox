@@ -234,51 +234,44 @@ shutdown.
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
 This is the virtual keyboard that is used when entering file names in Rockbox.
 
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD,IPOD_4G_PAD}{
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{
     \begin{table}
     \begin{btnmap}{}{}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}
-        {\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
+        {\ButtonUp/\ButtonDown\\ButtonLeft/\ButtonRight}
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {\ButtonOn+\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
       \opt{IAUDIO_X5_PAD}{Please add correct keys} 
       & Move about within the current file name (moves the line cursor) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
       \opt{RECORDER_PAD}{\ButtonPlay}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
       \opt{IAUDIO_X5_PAD}{Please add correct keys} 
       & Inserts the currently selected keyboard letter at the current
         filename cursor position \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
       \opt{IAUDIO_X5_PAD}{Please add correct keys} 
       & Exits the virtual keyboard without saving any changes \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{n/a}
       \opt{RECORDER_PAD}{\ButtonFOne}
       & SHIFT: Shifts between the upper case, lower case and accented keyboards \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
       \opt{RECORDER_PAD}{\ButtonFTwo}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
       \opt{IAUDIO_X5_PAD}{Please add correct keys} 
-      & OK: Exits the virtual keyboard and saves any changer \\
+      & OK: Exits the virtual keyboard and saves any changes \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
       \opt{RECORDER_PAD}{\ButtonFThree}
-      \opt{IPOD_4G_PAD}{Please add correct keys}
       \opt{IAUDIO_X5_PAD}{Please add correct keys} 
       & DEL: Deletes the character before the current filename cursor \\
       %
       \opt{SWCODEC}{
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-        \opt{IPOD_4G_PAD}{Please add correct keys}
         \opt{IAUDIO_X5_PAD}{Please add correct keys} 
         & Enters Morse input mode\\
       }
@@ -286,6 +279,32 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
   \end{table}
 }
 
+\opt{IPOD_4G_PAD}{
+  \textbf{Picker area}
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ButtonScrollFwd/\ButtonScrollBack & Move about the virtual keyboard \\
+      \ButtonLeft/\ButtonRight		 & (moves the solid cursor).
+          If you move out of the picker area with \ButtonScrollFwd/\ButtonScrollBack,
+          you get to the line edit mode. \\
+      \ButtonSelect 
+        & Inserts the currently selected keyboard letter at the current
+          filename cursor position \\
+      Hold \ButtonSelect
+      	& OK: Exits the virtual keyboard and saves any changes \\
+      \ButtonMenu
+        & Exits the virtual keyboard without saving any changes\\
+    \end{btnmap}
+  \end{table}
+  \textbf{Line edit mode}
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ButtonLeft/\ButtonRight & Move left and right\\
+      \ButtonSelect & Deletes the letter to the left of the cursor\\
+      \ButtonScrollFwd/\ButtonScrollBack & Returns to the picker area\\
+    \end{btnmap}
+  \end{table}
+}
 \opt{ondio}{
   \textbf{Picker area}
   \begin{table}
@@ -311,8 +330,7 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
       \ButtonUp/\ButtonDown & Returns to the picker area\\
     \end{btnmap}
   \end{table}
-}
-\opt{player}{
+}\opt{player}{
   The current filename is always listed on the first line of the display. The
   second line of the display can contain the character selection bar, as in the
   screenshot above, or  one of a number of other options.
