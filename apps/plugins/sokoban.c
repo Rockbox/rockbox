@@ -99,12 +99,13 @@ PLUGIN_HEADER
 #endif
 
 #ifdef HAVE_LCD_COLOR
-#define WALL_COLOR         LCD_RGBPACK(16,20,180)     /* Color of the walls */
-#define FREE_TARGET_COLOR  LCD_RGBPACK(251,158,25)    /* Color of a 'target' without a block on top */
-#define USED_TARGET_COLOR  LCD_RGBPACK(255,255,255)   /* Color of a 'target' with a block on top */
-#define FREE_BLOCK_COLOR   LCD_RGBPACK(22,130,53)     /* Color of a block when it's not on a 'target' */
-#define USED_BLOCK_COLOR   LCD_RGBPACK(22,130,53)     /* Color of a block when it is on a 'target' */
-#define CHAR_COLOR         LCD_BLACK                  /* Color of the 'character' */
+#define WALL_COLOR         LCD_RGBPACK(16,20,180)   /* Color of the walls */
+#define FREE_TARGET_COLOR  LCD_RGBPACK(251,158,25)  /* Color of a 'target' without a block on top */
+#define USED_TARGET_COLOR  LCD_RGBPACK(255,255,255) /* Color of a 'target' with a block on top */
+#define FREE_BLOCK_COLOR   LCD_RGBPACK(22,130,53)   /* Color of a block when it's not on a 'target' */
+#define USED_BLOCK_COLOR   LCD_RGBPACK(22,130,53)   /* Color of a block when it is on a 'target' */
+#define CHAR_COLOR         LCD_BLACK                /* Color of the 'character' */
+#define BG_COLOR           LCD_RGBPACK(181,199,231) /* Background color. Default Rockbox light blue. */
 
 #elif LCD_DEPTH > 1
 #define MEDIUM_GRAY LCD_BRIGHTNESS(127)
@@ -122,8 +123,8 @@ static void init_boards(void);
 static void update_screen(void);
 static bool sokoban_loop(void);
 
-/* The Location, Undo and LevelInfo structs are OO-flavored.  
- * (oooh!-flavored as Schnueff puts it.)  It makes more you have to know, 
+/* The Location, Undo and LevelInfo structs are OO-flavored.
+ * (oooh!-flavored as Schnueff puts it.)  It makes more you have to know,
  * but the overall data layout becomes more manageable. */
 
 /* We use the same three values in 2 structs.  Makeing them a struct
@@ -193,7 +194,7 @@ static void undo(void)
 
     /* Update board info */
     undo = &undo_info.history[undo_info.current];
-    
+
     rb->memcpy(&current_info.level, &undo->level, sizeof(undo->level));
     rb->memcpy(&current_info.player, &undo->location[0], sizeof(undo->location[0]));
 
@@ -218,7 +219,7 @@ static void undo(void)
     } else {
         undo_info.current--;
     }
-    
+
     undo_info.count--;
 
     return;
@@ -235,7 +236,7 @@ static void add_undo(int button)
         return;
 
     if (undo_info.count != 0) {
-        if (undo_info.current < (MAX_UNDOS - 1)) 
+        if (undo_info.current < (MAX_UNDOS - 1))
             undo_info.current++;
         else
             undo_info.current = 0;
@@ -250,8 +251,8 @@ static void add_undo(int button)
     /* Store our player info */
     rb->memcpy(&undo->location[0], &current_info.player, sizeof(undo->location[0]));
 
-    /* Now we need to store upto 2 blocks that may be affected.  
-     * If player.spot is NULL, then there is no info stored 
+    /* Now we need to store upto 2 blocks that may be affected.
+     * If player.spot is NULL, then there is no info stored
      * for that block */
 
     row = current_info.player.row;
@@ -264,13 +265,13 @@ static void add_undo(int button)
         switch (button) {
         case BUTTON_LEFT:
             col--;
-            if (col < 0) 
+            if (col < 0)
                 storable = false;
             break;
 
         case BUTTON_RIGHT:
             col++;
-            if (col >= COLS) 
+            if (col >= COLS)
                 storable = false;
             break;
 
@@ -279,7 +280,7 @@ static void add_undo(int button)
             if (row < 0)
                 storable = false;
             break;
-            
+
         case SOKOBAN_DOWN:
             row++;
             if (row >= ROWS)
@@ -299,7 +300,7 @@ static void add_undo(int button)
         }
     }
 
-    if (undo_info.count < MAX_UNDOS) 
+    if (undo_info.count < MAX_UNDOS)
         undo_info.count++;
 }
 
@@ -313,13 +314,13 @@ static void init_boards(void)
     current_info.player.spot = ' ';
     current_info.max_level = 0;
     current_info.loaded_level = 0;
-  
+
     buffered_boards.low = 0;
 
     init_undo();
 }
 
-static int read_levels(int initialize_count) 
+static int read_levels(int initialize_count)
 {
     int fd = 0;
     int len;
@@ -333,15 +334,15 @@ static int read_levels(int initialize_count)
         endpoint = current_info.level.level - MAX_BUFFERED_BOARDS;
 
     if (endpoint < 0) endpoint = 0;
-   
+
     buffered_boards.low = endpoint;
     endpoint += MAX_BUFFERED_BOARDS;
- 
+
     if ((fd = rb->open(LEVELS_FILE, O_RDONLY)) < 0) {
         rb->splash(0, true, "Unable to open %s", LEVELS_FILE);
         return -1;
     }
- 
+
     do {
         len = rb->read_line(fd, buffer, sizeof(buffer));
         if (len >= 3) {
@@ -380,7 +381,7 @@ static int read_levels(int initialize_count)
     }
     return 0;
 }
- 
+
 /* return non-zero on error */
 static void load_level(void)
 {
@@ -388,7 +389,7 @@ static void load_level(void)
     int r = 0;
     int index = current_info.level.level - buffered_boards.low - 1;
     struct Board *level;
-    
+
     if (index < 0 || index >= MAX_BUFFERED_BOARDS) {
         read_levels(false);
         index=index<0?MAX_BUFFERED_BOARDS-1:0;
@@ -403,7 +404,7 @@ static void load_level(void)
     for (r = 0; r < ROWS; r++) {
         for (c = 0; c < COLS; c++) {
             current_info.board[r][c] = level->spaces[r][c];
-            
+
             if (current_info.board[r][c] == '.')
                 current_info.level.boxes_to_go++;
 
@@ -416,7 +417,7 @@ static void load_level(void)
 }
 #define STAT_WIDTH (LCD_WIDTH-(COLS * magnify))
 
-static void update_screen(void) 
+static void update_screen(void)
 {
     int b = 0, c = 0;
     int rows = 0, cols = 0;
@@ -429,7 +430,7 @@ static void update_screen(void)
 #else
     int magnify = 4;
 #endif
-    
+
     /* load the board to the screen */
     for (rows=0 ; rows < ROWS ; rows++) {
         for (cols = 0 ; cols < COLS ; cols++) {
@@ -488,16 +489,16 @@ static void update_screen(void)
 #endif
                     rb->lcd_drawline(c, b+middle, c+max, b+middle);
                     rb->lcd_drawline(c+middle, b, c+middle, b+max-ldelta);
-                    rb->lcd_drawline(c+max-middle, b, 
+                    rb->lcd_drawline(c+max-middle, b,
                                      c+max-middle, b+max-ldelta);
                     rb->lcd_drawline(c+middle, b+max-ldelta,
                                      c+middle-ldelta, b+max);
-                    rb->lcd_drawline(c+max-middle, b+max-ldelta, 
+                    rb->lcd_drawline(c+max-middle, b+max-ldelta,
                                      c+max-middle+ldelta, b+max);
                 }
                 break;
 
-            case '%': /* this is a box on a home spot */ 
+            case '%': /* this is a box on a home spot */
 
 #ifdef HAVE_LCD_COLOR
                 rb->lcd_set_foreground(USED_BLOCK_COLOR);
@@ -549,7 +550,7 @@ static bool sokoban_loop(void)
     current_info.level.level = 1;
 
     load_level();
-    update_screen(); 
+    update_screen();
 
     while (1) {
         moved = true;
@@ -561,10 +562,13 @@ static bool sokoban_loop(void)
 
         add_undo(button);
 
-        switch(button) 
+        switch(button)
         {
             case SOKOBAN_QUIT:
                 /* get out of here */
+#ifdef HAVE_LCD_COLOR /* reset background color */
+                rb->lcd_set_background(rb->global_settings->bg_color);
+#endif
                 return PLUGIN_OK;
 
             case SOKOBAN_UNDO:
@@ -877,7 +881,7 @@ static bool sokoban_loop(void)
                 moved = false;
                 break;
         }
-        
+
         if (button != BUTTON_NONE)
             lastbutton = button;
 
@@ -898,7 +902,7 @@ static bool sokoban_loop(void)
 
             if (current_info.level.level > current_info.max_level) {
                 /* Center "You WIN!!" on all screen sizes */
-                rb->lcd_putsxy(LCD_WIDTH/2 - 27,(LCD_HEIGHT/2) - 4 , 
+                rb->lcd_putsxy(LCD_WIDTH/2 - 27,(LCD_HEIGHT/2) - 4 ,
                                "You WIN!!");
 
                 rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -934,9 +938,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)(parameter);
     rb = api;
-    
+
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_getstringsize(SOKOBAN_TITLE, &w, &h);
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(BG_COLOR);
+#endif
 
     /* Get horizontel centering for text */
     len = w;
