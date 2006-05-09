@@ -909,6 +909,7 @@ static void audio_check_new_track(void)
         if (playlist_next_dir(ci.new_track))
         {
             ci.new_track = 0;
+            memset(&cur_ti->id3, 0, sizeof(struct mp3entry));
             cur_ti->taginfo_ready = false;
             audio_rebuffer();
             goto skip_done;
