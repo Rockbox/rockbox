@@ -85,7 +85,7 @@ static void dma_start(const void *addr, size_t size)
 #endif
 
     /* Set up DMA transfer  */
-    SAR0 = ((unsigned long)addr); /* Source address */
+    SAR0 = (unsigned long)addr;   /* Source address */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
     BCR0 = size;                  /* Bytes to transfer */
 
@@ -95,7 +95,7 @@ static void dma_start(const void *addr, size_t size)
 #ifdef HAVE_SPDIF_OUT
     EBU1CONFIG = EBU_DEFPARM;
 #endif
-    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_SINC | DMA_START;
+    DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_SINC | (3 << 20) | DMA_START;
 }
 
 /* Stops the DMA transfer and interrupt */
