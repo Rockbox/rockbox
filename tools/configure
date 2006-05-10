@@ -1277,8 +1277,14 @@ tags:
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins tags
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR)/plugins/lib tags
 
+fontzip:
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 1 -o rockbox-fonts.zip \$(TARGET) \$(BINARY)
+
 zip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
+
+fullzip:
+	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
 
 7zip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -o "rockbox.7z" -z "7za a" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
@@ -1303,10 +1309,12 @@ help:
 	@echo "clean     - cleans a build directory (not tools)"
 	@echo "veryclean - cleans the build and tools directories"
 	@echo "manual    - builds a manual"
-	@echo "zip       - creates a rockbox.zip of your build"
-	@echo "gzip      - creates a rockbox.tar.gz of your build"
-	@echo "bzip2     - creates a rockbox.tar.bz2 of your build"
-	@echo "7zip      - creates a rockbox.7z of your build"
+	@echo "fullzip   - creates a rockbox.zip of your build with fonts"
+	@echo "zip       - creates a rockbox.zip of your build (no fonts)"
+	@echo "gzip      - creates a rockbox.tar.gz of your build (no fonts)"
+	@echo "bzip2     - creates a rockbox.tar.bz2 of your build (no fonts)"
+	@echo "7zip      - creates a rockbox.7z of your build (no fonts)"
+	@echo "fontzip   - creates rockbox-fonts.zip"
 	@echo "tools     - builds the tools only"
 	@echo "install   - installs your build (for simulator builds only)" 
 

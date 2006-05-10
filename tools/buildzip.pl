@@ -10,14 +10,13 @@
 
 $ROOT="..";
 
-
-
 my $ziptool="zip";
 my $output="rockbox.zip";
 my $verbose;
 my $exe;
 my $target;
 my $archos;
+my $incfonts;
 
 while(1) {
     if($ARGV[0] eq "-r") {
@@ -40,6 +39,11 @@ while(1) {
     }
     elsif($ARGV[0] eq "-o") {
         $output=$ARGV[1];
+        shift @ARGV;
+        shift @ARGV;    
+    }
+    elsif($ARGV[0] eq "-f") {
+        $incfonts=$ARGV[1]; # 0 - no fonts, 1 - fonts only 2 - fonts and package
         shift @ARGV;
         shift @ARGV;    
     }
@@ -85,12 +89,37 @@ sub buildlangs {
 }
 
 sub buildzip {
-    my ($zip, $image, $notplayer)=@_;
+    my ($zip, $image, $notplayer, $fonts)=@_;
 
     # remove old traces
     `rm -rf .rockbox`;
 
     mkdir ".rockbox", 0777;
+
+    if($fonts) {
+        mkdir ".rockbox/fonts", 0777;
+
+        opendir(DIR, "$ROOT/fonts") || die "can't open dir fonts";
+        my @fonts = grep { /\.bdf$/ && -f "$ROOT/fonts/$_" } readdir(DIR);
+        closedir DIR;
+
+        for(@fonts) {
+            my $f = $_;
+
+            print "FONT: $f\n" if($verbose);
+            my $o = $f;
+            $o =~ s/\.bdf/\.fnt/;
+            my $cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
+            print "CMD: $cmd\n" if($verbose);
+            `$cmd`;
+            
+        }
+        if($fonts < 2) {
+          # fonts-only package, return
+          return;
+        }
+    }
+
     mkdir ".rockbox/langs", 0777;
     mkdir ".rockbox/rocks", 0777;
     if($notplayer) {
@@ -175,25 +204,6 @@ sub buildzip {
     if($notplayer) {
         `cp $ROOT/apps/plugins/sokoban.levels .rockbox/rocks/`; # sokoban levels
         `cp $ROOT/apps/plugins/snake2.levels .rockbox/rocks/`; # snake2 levels
-
-        mkdir ".rockbox/fonts", 0777;
-
-        opendir(DIR, "$ROOT/fonts") || die "can't open dir fonts";
-        my @fonts = grep { /\.bdf$/ && -f "$ROOT/fonts/$_" } readdir(DIR);
-        closedir DIR;
-
-        for(@fonts) {
-            my $f = $_;
-
-            print "FONT: $f\n" if($verbose);
-            my $o = $f;
-            $o =~ s/\.bdf/\.fnt/;
-            my $cmd ="$ROOT/tools/convbdf -f -o \".rockbox/fonts/$o\" \"$ROOT/fonts/$f\" >/dev/null 2>&1";
-            print "CMD: $cmd\n" if($verbose);
-            `$cmd`;
-            
-        }
-
     }
 
     if($image) {
@@ -231,15 +241,6 @@ sub buildzip {
 
     buildlangs(".rockbox/langs");
 
-    `rm -f $zip`;
-    `find .rockbox | xargs $ziptool $zip >/dev/null`;
-
-    if($image) {
-        `$ziptool $zip $image`;
-    }
-
-    # remove the .rockbox afterwards
-    `rm -rf .rockbox`;
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
@@ -253,11 +254,29 @@ $shortdate=sprintf("%02d%02d%02d", $year%100,$mon, $mday);
 
 # made once for all targets
 sub runone {
-    my ($type, $target)=@_;
+    my ($type, $target, $fonts)=@_;
 
-    # build a full install zip file 
+    # build a full install .rockbox directory
     buildzip($output, $target,
-             ($type eq "player")?0:1);
+             ($type eq "player")?0:1, $fonts);
+
+    # create a zip file from the .rockbox dfir
+
+    `rm -f $output`;
+    if($verbose) {
+      print "find .rockbox | xargs $ziptool $output >/dev/null\n";
+    }
+    `find .rockbox | xargs $ziptool $output >/dev/null`;
+
+    if($target && ($fonts > 1)) {
+        if($verbose) {
+            print "$ziptool $output $target\n";
+        }
+        `$ziptool $output $target`;
+    }
+
+    # remove the .rockbox afterwards
+    `rm -rf .rockbox`;
 };
 
 if(!$exe) {
@@ -281,9 +300,9 @@ elsif($exe =~ /rockboxui/) {
 }
 
 if($target =~ /player/i) {
-    runone("player", $exe);
+    runone("player", $exe, 0);
 }
 else {
-    runone("recorder", $exe);
+    runone("recorder", $exe, $incfonts);
 }
 
