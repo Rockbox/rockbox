@@ -1,10 +1,10 @@
 WPSLIST
 *.wps
 wpsbuild.pl
-ipodVOL.*/*.bmp
-boxes.*/*.bmp
-marquee.*/*.bmp
-DancePuffDuo.*/*.bmp
-engineeer2.*/*.bmp
-iAmp.*/*.bmp
-zezayer.*/*.bmp
+ipodVOL/*.bmp
+boxes/*.bmp
+marquee/*.bmp
+DancePuffDuo/*.bmp
+engineeer2/*.bmp
+iAmp/*.bmp
+zezayer/*.bmp
