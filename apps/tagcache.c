@@ -523,7 +523,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         {
             struct tagfile_entry tfe;
             int seek = entry.tag_seek[tcs->clause[i]->tag];
-            char str[64];
+            char str[256];
             
             memset(str, 0, sizeof str);
             if (!tagcache_is_numeric_tag(tcs->clause[i]->tag))
