@@ -832,7 +832,7 @@
     *: "PLAY = Yes"
   </source>
   <dest>
-    *: "[MENU]:はい"
+    *: "[再生]:はい"
   </dest>
   <voice>
     *: ""
