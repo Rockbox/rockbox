@@ -1,0 +1,67 @@
+%x|a|bg-220x176.bmp|0|0|
+%xl|b|Stp.bmp|102|0|
+%xl|c|Ply.bmp|102|0|
+%xl|d|Pse.bmp|102|0|
+%xl|e|FF.bmp|102|0|
+%xl|f|RW.bmp|102|0|
+%xl|g|RptA.bmp|205|0|
+%xl|h|Rpt1.bmp|205|0|
+%xl|i|RptS.bmp|205|0|
+%xl|j|Shf.bmp|192|0|
+%xl|k|Pow.bmp|5|157|
+%xl|l|Bat0.bmp|0|157|
+%xl|m|Bat1.bmp|0|157|
+%xl|n|Bat2.bmp|0|157|
+%xl|o|Bat3.bmp|0|157|
+%xl|p|Bat4.bmp|0|157|
+%xl|q|DP1.bmp|180|90|
+%xl|r|DP2.bmp|180|90|
+%xl|s|DP3.bmp|180|90|
+%xl|t|DP4.bmp|180|90|
+%xl|u|DP1.bmp|14|90|
+%xl|v|DP2.bmp|14|90|
+%xl|w|DP3.bmp|14|90|
+%xl|x|DP4.bmp|14|90|
+%xl|y|HoldM.bmp|45|0|
+%xl|z|HoldR.bmp|56|0|
+%xl|A|Rat0.bmp|64|90|
+%xl|B|Rat1.bmp|64|90|
+%xl|C|Rat2.bmp|64|90|
+%xl|D|Rat3.bmp|64|90|
+%xl|E|Rat4.bmp|64|90|
+%xl|F|Rat5.bmp|64|90|
+%xl|G|Rat6.bmp|64|90|
+%xl|H|Rat7.bmp|64|90|
+%xl|I|Rat8.bmp|64|90|
+%xl|J|Rat9.bmp|64|90|
+%xl|K|Rat10.bmp|64|90|
+%xl|L|mp1.bmp|100|90|
+%xl|M|mp2.bmp|100|90|
+%xl|N|mp3.bmp|100|90|
+%xl|O|wav.bmp|100|90|
+%xl|P|ogg.bmp|100|90|
+%xl|Q|flac.bmp|100|90|
+%xl|R|mpc.bmp|100|90|
+%xl|S|ac3.bmp|100|90|
+%xl|T|wv.bmp|100|90|
+%xl|U|alac.bmp|100|90|
+%xl|V|aac.bmp|100|90|
+%xl|W|shn.bmp|100|90|
+%xl|X|aiff.bmp|100|90|
+%xl|Y|Unk.bmp|100|90|
+%xl|Z|A-B.bmp|145|0|
+%wd
+%al   %pv%?mh<%xdy|>%?mr<%xdz|>%ac%?mp<%xdb|%xdc|%xdd|%xde|%xdf>%?mm<|%xdg|%xdh|%xdi|%xdZ>%?ps<%xdj|>
+
+%ac%s%?in<%in. |>%?it<%it|%fn>
+%ac%s%?ia<%ia|%d2>
+%ac%s%?id<%id|%d1>
+%ac%s%t2%?ig<%ig|> %?iy<(%iy)|>
+
+%?rr<%xdA|%xdB|%xdC|%xdD|%xdE|%xdF|%xdG|%xdH|%xdI|%xdJ|%xdK>%?fc<%xdL|%xdM|%xdN|%xdO|%xdP|%xdQ|%xdR|%xdS|%xdT|%xdU|%xdV|%xdW|%xdX|%xdY>
+%t0.2%xdw%xdq%ac%pc/%pt;%t0.2%xdx%xdr%ac%pc/%pt;%t0.2%xdw%xdq%ac%pc/%pt;%t0.2%xdx%xdr%ac%pc/%pt;%t0.2%xdu%xds%ac%pc/%pt;%t0.2%xdv%xdt%ac%pc/%pt;%t0.2%xdu%xds%ac%pc/%pt;%t0.2%xdv%xdt%ac%pc/%pt
+%pb
+%ac%s%?In<%In. |>%?It<%It - |%Fn >%?Id<%Id |%D1 >
+
+%?bp<%xdk|%?bl<%xdl|%xdm|%xdn|%xdo|%xdp>>%?bt<     %bt>%ar%?pp<[%pp/%pe]>
+

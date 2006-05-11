@@ -28,7 +28,7 @@ my $wpslist=$ARGV[0];
 
 my $target = $ARGV[1];
 my $cppdef = $target;
-my @depthlist = ( 16, 8, 4, 2, 1 );
+
 
 if(!$wpslist) {
     print "Usage: wpsbuilds.pl <WPSLIST> <target>\n",
@@ -48,7 +48,6 @@ sub getlcdsizes {
 #ifdef HAVE_REMOTE_LCD
 Height: LCD_REMOTE_HEIGHT
 Width: LCD_REMOTE_WIDTH
-Depth: LCD_REMOTE_DEPTH
 #endif
 STOP
 ;
@@ -56,11 +55,8 @@ STOP
     else {
     print GCC <<STOP
 \#include "config.h"
-#ifdef HAVE_LCD_BITMAP
 Height: LCD_HEIGHT
 Width: LCD_WIDTH
-Depth: LCD_DEPTH
-#endif
 STOP
 ;
 }
@@ -80,17 +76,14 @@ STOP
         elsif($_ =~ /^Width: (\d*)/) {
             $width = $1;
         }
-        elsif($_ =~ /^Depth: (\d*)/) {
-            $depth = $1;
-        }
-        if($height && $width && $depth) {
+        if($height && $width) {
             last;
         }
     }
     close(GETSIZE);
     unlink("gcctemp");
 
-    return ($height, $width, $depth);
+    return ($height, $width);
 }
 
 sub mkdirs {        
@@ -102,9 +95,8 @@ sub mkdirs {
     if( -d ".rockbox/wps/$wpsdir") {
         #print STDERR "wpsbuild warning: directory wps/$wpsdir already exists!\n";
     }
-    else
-    {
-       mkdir ".rockbox/wps/$wpsdir", 0777;
+    else {
+        mkdir ".rockbox/wps/$wpsdir", 0777;
     }
 }
 
@@ -112,40 +104,19 @@ sub copywps {
     # we assume that we copy the WPS files from the same dir the WPSLIST
     # file is located in
     my $dir;
-    my @filelist;
-    my $file;
 
     if($wpslist =~ /(.*)WPSLIST/) {
         $dir = $1;
-#        system("cp $dir/$wps .rockbox/wps/");
-        # print "$req_t_wps $req_g_wps\n";
+        my $wpsdir = $wps;
+        $wpsdir =~ s/\.(r|)wps//;
+        system("cp $dir/$wps .rockbox/wps/");
 
-        if (-e "$dir/$req_t_wps" ) {
-	    system("cp $dir/$req_t_wps .rockbox/wps/$wps");
-
-	} elsif (-e "$dir/$req_g_wps") {
-	    system("cp $dir/$req_g_wps .rockbox/wps/$wps");
-
-           open(WPSFILE, "$dir/$req_g_wps");
-           while (<WPSFILE>) {
-              $filelist[$#filelist + 1] = $1 if (/\|([^|]*?.bmp)\|/);
-           }
-           close(WPSFILE);
-
-           if (-e "$dir/$wpsdir") {
-              foreach $file (@filelist) {
-                  system("cp $dir/$wps_prefix/$file .rockbox/wps/$wps_prefix/");
-              }
-           } 
-           else {
-               print STDERR "beep, no dir to copy WPS from!\n";
-           }
-         
-       } else {
-           print STDERR "Skipping $wps - no matching resolution.\n";
-       }
-    } else {
-        print STDERR "No source directory!\n";
+        if (-e "$dir/$wpsdir") {
+           system("cp $dir/$wpsdir/*.bmp .rockbox/wps/$wpsdir/");
+        }
+    }
+    else {
+        print STDERR "beep, no dir to copy WPS from!\n";
     }
 }
 
@@ -184,11 +155,10 @@ MOO
 }
 
 # Get the LCD sizes first
-my ($main_height, $main_width, $main_depth) = getlcdsizes();
-my ($remote_height, $remote_width, $remote_depth) = getlcdsizes(1);
+my ($main_height, $main_width) = getlcdsizes();
+my ($remote_height, $remote_width) = getlcdsizes(1);
 
-#print "LCD: ${main_height}x${main_width}x${main_depth}\n";
-$has_remote = true if ($remote_height && $remote_width && remote_depth);
+$has_remote = true if ($remote_height && $remote_width);
 
 open(WPS, "<$wpslist");
 while(<WPS>) {
@@ -200,62 +170,36 @@ while(<WPS>) {
     if($l =~ /^ *<(r|)wps>/i) {
         $isrwps = $1;
         $within = 1;
-        # undef is a unary operator (!)
-        undef $wps;
-        undef $wps_prefix;
-        undef $rwps;
-        undef $width; 
-        undef $height;
-        undef $font;
-        undef $statusbar;
-        undef $author;
-        undef $req_g_wps;
-	undef $req_t_wps;
         next;
     }
     if($within) {
         if($l =~ /^ *<\/${isrwps}wps>/i) {
             # Get the required width and height
-            my ($rheight, $rwidth, $rdepth);
+            my ($rheight, $rwidth);
             if($isrwps) {
-                ($rheight, $rwidth, $rdepth) = 
-                         ($remote_height, $remote_width, $remote_depth);
+                ($rheight, $rwidth) = ($remote_height, $remote_width);
             }
             else {
-                ($rheight, $rwidth, $rdepth) = 
-                         ($main_height, $main_width, $main_depth);
+                ($rheight, $rwidth) = ($main_height, $main_width);
             }
 
             if(!$rheight || !$rwidth) {
-                #printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
+                printf STDERR "wpsbuild notice: No %sLCD size, skipping $wps\n",
                 $isrwps?"remote ":"";
-                $within = 0;
                 next;
             }
-            $wpslist =~ /(.*)WPSLIST/;
-            my $wpsdir = $1;
-	    # If this WPS installable on this platform, one of the following
-	    # two files will be present
-	    foreach $d (@depthlist) {
-                next if ($d > $rdepth); 
-
-    	        $req_g_wps = $wps_prefix . "." .  $rwidth . "x" . $rheight
-                     . "x" . $d . ".wps";
-		last if (-e "$wpsdir/$req_g_wps"); 
-            } 
-            $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
             #print "LCD: $wps wants $height x $width\n";
             #print "LCD: is $rheight x $rwidth\n";
 
-            #print "gwps: $wpsdir/$req_g_wps" . "\n";
-            if (-e "$wpsdir/$req_g_wps" || -e "$wpsdir/$req_t_wps" ) { 
+            if(($height <= $rheight) && ($width <= $rwidth)) {
                 #
                 # The target model has an LCD that is suitable for this
                 # WPS
                 #
                 #print "Size requirement is fine!\n";
-                mkdirs() if (-e "$wpsdir/$req_g_wps");
+
+                mkdirs();
                 if(!$isrwps) {
                     # We only make .cfg files for <wps> sections:
                     buildcfg();
@@ -263,17 +207,16 @@ while(<WPS>) {
                 copywps();
             }
             else {
-                #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) "; 
-		print "Skip $wps due to size restraints\n";
+                #print "Skip $wps due to size restraints\n";
             }
             $within = 0;
+
+            undef $wps, $rwps, $width, $height, $font, $statusbar, $author;
         }
         elsif($l =~ /^Name: (.*)/i) {
             # Note that in the case this is within <rwps>, $wps will contain the
             # name of the rwps. Use $isrwps to figure out what type it is.
-            $wps = $wps_prefix = $1;
-            $wps_prefix =~ s/\.(r|)wps//;
-            # print $wps_prefix . "\n";
+            $wps = $1;
         }
         elsif($l =~ /^RWPS: (.*)/i) {
             $rwps = $1;
@@ -296,4 +239,4 @@ while(<WPS>) {
     }
 }
 
-close(WPS);
+close(WPS)
