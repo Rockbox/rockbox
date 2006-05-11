@@ -577,7 +577,7 @@ bool recording_screen(void)
 #endif
         talk_buffer_steal(); /* will use the mp3 buffer */
 
-#ifdef HAVE_SPDIF_POWER
+#if defined(HAVE_SPDIF_POWER) && !defined(SIMULATOR)
     /* Tell recording whether we want S/PDIF power enabled at all times */
     audio_set_spdif_power_setting(global_settings.spdif_enable);
 #endif
@@ -1266,14 +1266,14 @@ bool recording_screen(void)
                 }
             }
 /* Can't measure S/PDIF sample rate on Archos yet */
-#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN)
+#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
             if (global_settings.rec_source == SOURCE_SPDIF)
                 snprintf(spdif_sfreq, 8, "%dHz", audio_get_spdif_sample_rate());
 #else
             (void)spdif_sfreq;
 #endif
             snprintf(buf, 32, "%s %s",
-#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN)
+#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
                      global_settings.rec_source == SOURCE_SPDIF ?
                      spdif_sfreq :
 #endif
