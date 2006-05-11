@@ -35,6 +35,7 @@ PLUGIN_HEADER
 #define TOP_SECTOR     buffer
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
+#define SCROLLBAR_WIDTH     6
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
@@ -171,6 +172,23 @@ struct preferences {
         WIDE,
     } view_mode;
 
+    enum {
+        ISO_8859_1=0,
+        ISO_8859_7,
+        ISO_8859_8,
+        CP1251,
+        ISO_8859_11,
+        ISO_8859_6,
+        ISO_8859_9,
+        ISO_8859_2,
+        SJIS,
+        GB2312,
+        KSX1001,
+        BIG5,
+        UTF8,
+        ENCODINGS
+    } encoding; /* FIXME: What should default encoding be? */
+
 #ifdef HAVE_LCD_BITMAP
     enum {
         SB_OFF=0,
@@ -193,7 +211,7 @@ struct preferences {
 } prefs;
 
 static unsigned char buffer[BUFFER_SIZE + 1];
-static unsigned char line_break[] = {0,0x20,'-',9,0xB,0xC};
+static unsigned char line_break[] = {0,0x20,9,0xB,0xC,'-'};
 static int display_columns; /* number of (pixel) columns on the display */
 static int display_lines; /* number of lines on the display */
 static int draw_columns; /* number of (pixel) columns available for text */
@@ -210,23 +228,60 @@ static unsigned char *next_screen_ptr;
 static unsigned char *next_screen_to_draw_ptr;
 static unsigned char *next_line_ptr;
 static struct plugin_api* rb;
+#ifdef HAVE_LCD_BITMAP
+static struct font *pf;
+#endif
 
-static unsigned char glyph_width[256];
+int glyph_width(int ch)
+{
+    if (ch == 0)
+        ch = ' ';
+
+#ifdef HAVE_LCD_BITMAP
+    return rb->font_get_width(pf, ch);
+#else
+    return 1;
+#endif
+}
+
+unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
+{
+    unsigned char utf8_tmp[6];
+    int count;
+
+    if (prefs.encoding == UTF8)
+        return (unsigned char*)rb->utf8decode(str, ch);
+
+    count = BUFFER_OOB(str+2)? 1:2;
+    rb->iso_decode(str, utf8_tmp, prefs.encoding, count);
+    rb->utf8decode(utf8_tmp, ch);
+
+    if ((prefs.encoding == SJIS && *str > 0xA0 && *str < 0xE0) || prefs.encoding < SJIS)
+        return (unsigned char*)str+1;
+    else
+        return (unsigned char*)str+2;
+}
 
 bool done = false;
 int col = 0;
 
-#define ADVANCE_COUNTERS(c) do { width += glyph_width[c]; k++; } while(0)
+#define ADVANCE_COUNTERS(c) do { width += glyph_width(c); k++; } while(0)
 #define LINE_IS_FULL ((k>MAX_COLUMNS-1) || (width > draw_columns))
 static unsigned char* crop_at_width(const unsigned char* p)
 {
     int k,width;
+    unsigned short ch;
+    const unsigned char *oldp = p;
 
     k=width=0;
-    while (!LINE_IS_FULL)
-        ADVANCE_COUNTERS(p[k]);
 
-    return (unsigned char*) p+k-1;
+    while (!LINE_IS_FULL) {
+        oldp = p;
+        p = get_ucs(p, &ch);
+        ADVANCE_COUNTERS(ch);
+    }
+
+    return (unsigned char*)oldp;
 }
 
 static unsigned char* find_first_feed(const unsigned char* p, int size)
@@ -256,6 +311,11 @@ static unsigned char* find_last_space(const unsigned char* p, int size)
     int i, j, k;
 
     k = (prefs.line_mode==JOIN) || (prefs.line_mode==REFLOW) ? 0:1;
+
+    if (!BUFFER_OOB(&p[size]))
+        for (j=k; j < ((int) sizeof(line_break)) - 1; j++)
+            if (p[size] == line_break[j])
+                return (unsigned char*) p+size;
 
     for (i=size-1; i>=0; i--)
         for (j=k; j < (int) sizeof(line_break); j++)
@@ -394,8 +454,8 @@ static unsigned char* find_next_line(const unsigned char* cur_line, bool *is_sho
      the hyphen on current line (won't apply in WIDE mode,
      since it's guarenteed there won't be room). */
     if (!BUFFER_OOB(next_line))  /* Not Null & not out of bounds */
-        if (next_line[0] == 0 ||
-        (next_line[0] == '-' && next_line-cur_line < draw_columns))
+        if (next_line[0] == 0)/* ||
+        (next_line[0] == '-' && next_line-cur_line < draw_columns)) */
             next_line++;
 
     if (BUFFER_OOB(next_line))
@@ -552,9 +612,8 @@ static void viewer_scroll_down(void)
 
 #ifdef HAVE_LCD_BITMAP
 static void viewer_scrollbar(void) {
-    int w, h, items, min_shown, max_shown;
+    int items, min_shown, max_shown;
 
-    rb->lcd_getstringsize("o", &w, &h);
     items = (int) file_size;  /* (SH1 int is same as long) */
     min_shown = (int) file_pos + (screen_top_ptr - buffer);
 
@@ -563,27 +622,28 @@ static void viewer_scrollbar(void) {
     else
         max_shown = min_shown + (next_screen_ptr - screen_top_ptr);
 
-    rb->scrollbar(0, 0, w-2, LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
+    rb->scrollbar(0, 0, SCROLLBAR_WIDTH-1, LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
 }
 #endif
 
 static void viewer_draw(int col)
 {
-    int i, j, k, line_len, resynch_move, spaces, left_col=0;
+    int i, j, k, line_len, line_width, resynch_move, spaces, left_col=0;
     int width, extra_spaces, indent_spaces, spaces_per_word;
     bool multiple_spacing, line_is_short;
+    unsigned short ch;
+    unsigned char *str, *oldstr;
     unsigned char *line_begin;
     unsigned char *line_end;
     unsigned char c;
     unsigned char scratch_buffer[MAX_COLUMNS + 1];
     unsigned char utf8_buffer[MAX_COLUMNS*4 + 1];
-    int len;
     unsigned char *endptr;
 
     /* If col==-1 do all calculations but don't display */
     if (col != -1) {
 #ifdef HAVE_LCD_BITMAP
-        left_col = prefs.need_scrollbar? 1:0;
+        left_col = prefs.need_scrollbar? SCROLLBAR_WIDTH:0;
 #else
         left_col = 0;
 #endif
@@ -629,6 +689,20 @@ static void viewer_draw(int col)
         }
         line_len = line_end - line_begin;
 
+        /* calculate line_len */
+        str = oldstr = line_begin;
+        j = -1;
+        while (str < line_end) {
+            oldstr = str;
+            str = crop_at_width(str);
+            j++;
+        }
+        line_width = j*draw_columns;
+        while (oldstr < line_end) {
+            oldstr = get_ucs(oldstr, &ch);
+            line_width += glyph_width(ch);
+        }
+
         if (prefs.line_mode == JOIN) {
             if (line_begin[0] == 0) {
                 line_begin++;
@@ -661,16 +735,12 @@ static void viewer_draw(int col)
                         break;
                 }
             }
-
-            if (col != -1)
-                if (k > col) {
-                    scratch_buffer[k] = 0;
-                    endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                            -1, k-col);
-                    *endptr = 0;
-                    len = rb->utf8length(utf8_buffer);
-                    rb->lcd_puts(left_col, i, utf8_buffer);
-                }
+            if (col != -1) {
+                scratch_buffer[k] = 0;
+                endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
+                                        prefs.encoding, k-col);
+                *endptr = 0;
+            }
         }
         else if (prefs.line_mode == REFLOW) {
             if (line_begin[0] == 0) {
@@ -684,12 +754,13 @@ static void viewer_draw(int col)
             indent_spaces = 0;
             if (!line_is_short) {
                 multiple_spacing = false;
-                for (j=width=spaces=0; j < line_len; j++) {
-                    c = line_begin[j];
-                    switch (c) {
+                width=spaces=0;
+                for (str = line_begin; str < line_end; ) {
+                    str = get_ucs(str, &ch);
+                    switch (ch) {
                         case ' ':
                         case 0:
-                            if ((j==0) && (prefs.word_mode==WRAP))
+                            if ((str == line_begin) && (prefs.word_mode==WRAP))
                                 /* special case: indent the paragraph,
                                  * don't count spaces */
                                 indent_spaces = par_indent_spaces;
@@ -699,8 +770,7 @@ static void viewer_draw(int col)
                             break;
                         default:
                             multiple_spacing = false;
-                            width += glyph_width[c];
-                            k++;
+                            width += glyph_width(ch);
                             break;
                     }
                 }
@@ -708,7 +778,7 @@ static void viewer_draw(int col)
 
                 if (spaces) {
                     /* total number of spaces to insert between words */
-                    extra_spaces = (draw_columns-width) / glyph_width[' ']
+                    extra_spaces = (draw_columns-width)/glyph_width(' ')
                             - indent_spaces;
                     /* number of spaces between each word*/
                     spaces_per_word = extra_spaces / spaces;
@@ -754,31 +824,41 @@ static void viewer_draw(int col)
                 }
             }
 
-            if (col != -1)
-                if (k > col) {
-                    scratch_buffer[k] = 0;
-                    endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                            -1, k-col);
-                    *endptr = 0;
-                    len = rb->utf8length(utf8_buffer);
-                    rb->lcd_puts(left_col, i, utf8_buffer);
-                }
+            if (col != -1) {
+                scratch_buffer[k] = 0;
+                endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
+                                        prefs.encoding, k-col);
+                *endptr = 0;
+            }
         }
         else { /* prefs.line_mode != JOIN && prefs.line_mode != REFLOW */
             if (col != -1)
-                if (line_len > col) {
-                    c = line_end[0];
-                    line_end[0] = 0;
-                    endptr = rb->iso_decode(line_begin + col, utf8_buffer,
-                                            -1, line_end-line_begin);
+                if (line_width > col) {
+                    str = oldstr = line_begin;
+                    k = col;
+                    while (k > draw_columns) {
+                        str = crop_at_width(str);
+                        k -= draw_columns;
+                    }
+                    width = 0;
+                    while (width <= k) {
+                        oldstr = str;
+                        str = get_ucs(str, &ch);
+                        width += glyph_width(ch);
+                    }
+                    endptr = rb->iso_decode(oldstr, utf8_buffer,
+                                            prefs.encoding, line_end-oldstr);
                     *endptr = 0;
-                    len = rb->utf8length(utf8_buffer);
-                    rb->lcd_puts(left_col, i, utf8_buffer);
-                    line_end[0] = c;
                 }
         }
-        if (line_len > max_line_len)
-            max_line_len = line_len;
+        if (col != -1 && line_width > col)
+#ifdef HAVE_LCD_BITMAP
+            rb->lcd_putsxy(left_col, i*pf->height, utf8_buffer);
+#else
+            rb->lcd_puts(left_col, i, utf8_buffer);
+#endif
+        if (line_width > max_line_len)
+            max_line_len = line_width;
 
         if (i == 0)
             next_line_ptr = line_end;
@@ -837,8 +917,8 @@ static void init_need_scrollbar(void) {
      and thus ONE_SCREEN_FITS_ALL(), and thus NEED_SCROLLBAR() */
     viewer_draw(-1);
     prefs.need_scrollbar = NEED_SCROLLBAR();
-    draw_columns = prefs.need_scrollbar? display_columns-glyph_width['o'] : display_columns;
-    par_indent_spaces = draw_columns/(5*glyph_width[' ']);
+    draw_columns = prefs.need_scrollbar? display_columns-SCROLLBAR_WIDTH : display_columns;
+    par_indent_spaces = draw_columns/(5*glyph_width(' '));
 }
 #else
 #define init_need_scrollbar()
@@ -847,22 +927,8 @@ static void init_need_scrollbar(void) {
 static bool viewer_init(void)
 {
 #ifdef HAVE_LCD_BITMAP
-    int idx, ch;
-    struct font *pf;
 
     pf = rb->font_get(FONT_UI);
-
-    if (pf->width != NULL)
-    {   /* variable pitch font -- fill structure from font width data */
-        ch = pf->defaultchar - pf->firstchar;
-        rb->memset(glyph_width, pf->width[ch], 256);
-        idx = pf->firstchar;
-        rb->memcpy(&glyph_width[idx], pf->width, pf->size);
-        idx += pf->size;
-        rb->memset(&glyph_width[idx], pf->width[ch], 256-idx);
-    }
-    else /* fixed pitch font -- same width for all glyphs */
-        rb->memset(glyph_width, pf->maxwidth, 256);
 
     display_lines = LCD_HEIGHT / pf->height;
     display_columns = LCD_WIDTH;
@@ -871,7 +937,6 @@ static bool viewer_init(void)
     display_lines = 2;
     draw_columns = display_columns = 11;
     par_indent_spaces = 2;
-    rb->memset(glyph_width, 1, 256);
 #endif
 
     fd = rb->open(file_name, O_RDONLY);
@@ -884,6 +949,9 @@ static bool viewer_init(void)
 
     /* Init mac_text value used in processing buffer */
     mac_text = false;
+
+    /* Set codepage to system default */
+    prefs.encoding = rb->global_settings->default_codepage;
 
     /* Read top of file into buffer;
       init file_pos, buffer_end, screen_top_ptr */
@@ -963,13 +1031,35 @@ static int col_limit(int col)
     if (col < 0)
         col = 0;
     else
-        if (col > max_line_len - 2)
-            col = max_line_len - 2;
+        if (col > max_line_len - 2*glyph_width('o'))
+            col = max_line_len - 2*glyph_width('o');
 
     return col;
 }
 
 /* settings helper functions */
+
+static bool encoding_setting(void)
+{
+    static const struct opt_items names[] = {
+        {"ISO-8859-1",  -1},
+        {"ISO-8859-7",  -1},
+        {"ISO-8859-8",  -1},
+        {"CP1251",      -1},
+        {"ISO-8859-11", -1},
+        {"ISO-8859-6",  -1},
+        {"ISO-8859-9",  -1},
+        {"ISO-8859-2",  -1},
+        {"SJIS",        -1},
+        {"GB-2312",     -1},
+        {"KSX-1001",    -1},
+        {"BIG5",        -1},
+        {"UTF-8",       -1},
+    };
+
+    return rb->set_option("Encoding", &prefs.encoding, INT, names,
+                          sizeof(names) / sizeof(names[0]), NULL);
+}
 
 static bool word_wrap_setting(void)
 {
@@ -1055,6 +1145,7 @@ static bool viewer_options_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
+        {"Encoding",          encoding_setting },
         {"Word Wrap",         word_wrap_setting },
         {"Line Mode",         line_mode_setting },
         {"Wide View",         view_mode_setting },
@@ -1206,7 +1297,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_SCREEN_LEFT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Screen left */
-                    col -= draw_columns/glyph_width['o'];
+                    col -= draw_columns;
                     col = col_limit(col);
                 }
                 else {   /* prefs.view_mode == NARROW */
@@ -1221,7 +1312,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_SCREEN_RIGHT | BUTTON_REPEAT:
                 if (prefs.view_mode == WIDE) {
                     /* Screen right */
-                    col += draw_columns/glyph_width['o'];
+                    col += draw_columns;
                     col = col_limit(col);
                 }
                 else {   /* prefs.view_mode == NARROW */
@@ -1254,7 +1345,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_COLUMN_LEFT:
             case VIEWER_COLUMN_LEFT | BUTTON_REPEAT:
                 /* Scroll left one column */
-                col--;
+                col -= glyph_width('o');
                 col = col_limit(col);
                 viewer_draw(col);
                 break;
@@ -1262,7 +1353,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
             case VIEWER_COLUMN_RIGHT:
             case VIEWER_COLUMN_RIGHT | BUTTON_REPEAT:
                 /* Scroll right one column */
-                col++;
+                col += glyph_width('o');
                 col = col_limit(col);
                 viewer_draw(col);
                 break;
