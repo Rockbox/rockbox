@@ -120,6 +120,9 @@
 
 #endif
 
+/* Define this for S/PDIF input available */
+#define HAVE_SPDIF_IN
+
 /* Define this for S/PDIF output available */
 #define HAVE_SPDIF_OUT
 

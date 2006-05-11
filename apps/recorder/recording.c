@@ -577,6 +577,11 @@ bool recording_screen(void)
 #endif
         talk_buffer_steal(); /* will use the mp3 buffer */
 
+#ifdef HAVE_SPDIF_POWER
+    /* Tell recording whether we want S/PDIF power enabled at all times */
+    audio_set_spdif_power_setting(global_settings.spdif_enable);
+#endif
+
     audio_set_recording_options(global_settings.rec_frequency,
                                global_settings.rec_quality,
                                global_settings.rec_source,
@@ -1011,6 +1016,7 @@ bool recording_screen(void)
             unsigned int dseconds, dhours, dminutes;
             unsigned long num_recorded_bytes;
             int pos = 0;
+            char spdif_sfreq[8];
 
             update_countdown = 5;
             last_seconds = seconds;
@@ -1259,12 +1265,21 @@ bool recording_screen(void)
                                                 2+PM_HEIGHT, true);
                 }
             }
-            
+/* Can't measure S/PDIF sample rate on Archos yet */
+#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN)
+            if (global_settings.rec_source == SOURCE_SPDIF)
+                snprintf(spdif_sfreq, 8, "%dHz", audio_get_spdif_sample_rate());
+#else
+            (void)spdif_sfreq;
+#endif
             snprintf(buf, 32, "%s %s",
+#if CONFIG_CODEC != MAS3587F && defined(HAVE_SPDIF_IN)
+                     global_settings.rec_source == SOURCE_SPDIF ?
+                     spdif_sfreq :
+#endif
                      freq_str[global_settings.rec_frequency],
-                     global_settings.rec_channels?
-                     str(LANG_CHANNEL_MONO):str(LANG_CHANNEL_STEREO));
-
+                     global_settings.rec_channels ?
+                     str(LANG_CHANNEL_MONO) : str(LANG_CHANNEL_STEREO));
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, 5+PM_HEIGHT, buf);
 

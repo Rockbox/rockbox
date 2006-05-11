@@ -100,6 +100,8 @@ void audio_set_recording_options(int frequency, int quality,
 void audio_set_recording_gain(int left, int right, int type);
 unsigned long audio_recorded_time(void);
 unsigned long audio_num_recorded_bytes(void);
+void audio_set_spdif_power_setting(bool on);
+unsigned long audio_get_spdif_sample_rate(void);
 
 
 

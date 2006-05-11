@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 41
+#define CONFIG_BLOCK_VERSION 42
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -504,7 +504,11 @@ static const struct bit_entry hd_bits[] =
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
     {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
     {4, S_O(rec_mic_gain), 4, "rec mic gain", NULL },
+#ifdef HAVE_SPDIF_IN
+    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
+#else
     {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
+#endif
     {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
         "rec frequency", "44,48,32,22,24,16" },
     {4, S_O(rec_left_gain), 2, /* 0dB */

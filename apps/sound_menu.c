@@ -302,6 +302,8 @@ static bool recsource(void)
                       sizeof(names)/sizeof(struct opt_items), NULL );
 }
 
+/* To be removed when we add support for sample rates and channel settings */
+#ifndef HAVE_UDA1380
 static bool recfrequency(void)
 {
     static const struct opt_items names[] = {
@@ -327,12 +329,11 @@ static bool recchannels(void)
                       &global_settings.rec_channels, INT,
                       names, 2, NULL );
 }
+#endif
 
+#if CONFIG_CODEC == MAS3587F
 static bool recquality(void)
 {
-#ifdef HAVE_UDA1380
-     (void)recquality();
-#endif
     return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
                    &global_settings.rec_quality, 
                    NULL, 1, 0, 7, NULL );
@@ -343,7 +344,7 @@ static bool receditable(void)
     return set_bool(str(LANG_RECORDING_EDITABLE),
                     &global_settings.rec_editable);
 }
-
+#endif
 
 static bool rectimesplit(void)
 {
@@ -901,20 +902,29 @@ bool recording_menu(bool no_source)
     struct menu_item items[13];
     bool result;
 
-#ifndef HAVE_UDA1380
+#if CONFIG_CODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
     items[i++].function = recquality;
 #endif
+/* We don't support frequency selection for UDA1380 yet. Let it just stay at
+   the default 44100 Hz. */
+#ifndef HAVE_UDA1380
     items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
     items[i++].function = recfrequency;
+#endif
     if(!no_source) {
         items[i].desc = ID2P(LANG_RECORDING_SOURCE);
         items[i++].function = recsource;
     }
+/* We don't support other configurations than stereo yet either */
+#ifndef HAVE_UDA1380
     items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
     items[i++].function = recchannels;
+#endif
+#if CONFIG_CODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
+#endif
     items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);
     items[i++].function = rectimesplit;
     items[i].desc = ID2P(LANG_RECORD_PRERECORD_TIME);

@@ -30,6 +30,7 @@
 
 #include "cpu.h"
 #include "i2c.h"
+#include "power.h"
 #include "uda1380.h"
 #include "system.h"
 #include "usb.h"
@@ -61,6 +62,8 @@ static volatile int error_count;                /* Number of DMA errors */
 static long record_start_time;                  /* Value of current_tick when recording was started */
 static long pause_start_time;                   /* Value of current_tick when pause was started */
 static volatile int buffered_chunks;            /* number of valid chunks in buffer */
+static unsigned int sample_rate; /* Sample rate at time of recording start */
+static int rec_source;           /* Current recording source */
 
 static int wav_file;
 static char recording_filename[MAX_PATH];
@@ -193,51 +196,144 @@ unsigned long audio_num_recorded_bytes(void)
     return 0;
 }
 
+#ifdef HAVE_SPDIF_IN
+/* Only the last six of these are standard rates, but all sample rates are
+ * possible, so we support some other common ones as well.
+ */
+static unsigned long spdif_sample_rates[] = {
+    8000, 11025, 12000, 16000, 22050, 24000,
+    32000, 44100, 48000, 64000, 88200, 96000
+};
+
+/* Return SPDIF sample rate. Since we base our reading on the actual SPDIF
+ * sample rate (which might be a bit inaccurate), we round off to the closest
+ * sample rate that is supported by SPDIF.
+ */
+unsigned long audio_get_spdif_sample_rate(void)
+{
+    int i = 0;
+    unsigned long measured_rate;
+    const int upper_bound = sizeof(spdif_sample_rates)/sizeof(long) - 1;
+    
+    /* The following formula is specified in MCF5249 user's manual section
+     * 17.6.1. The 3*(1 << 13) part will need changing if the setup of the
+     * PHASECONFIG register is ever changed. The 128 divide is because of the
+     * fact that the SPDIF clock is the sample rate times 128.
+     */
+    measured_rate = (unsigned long)((unsigned long long)FREQMEAS*CPU_FREQ/
+                                               ((1 << 15)*3*(1 << 13))/128);
+    /* Find which SPDIF sample rate we're closest to. */
+    while (spdif_sample_rates[i] < measured_rate && i < upper_bound) ++i;
+    if (i > 0 && i < upper_bound)
+    {
+        long diff1 = measured_rate - spdif_sample_rates[i - 1];
+        long diff2 = spdif_sample_rates[i] - measured_rate;
+
+        if (diff2 > diff1) --i;
+    }
+    return spdif_sample_rates[i];
+}
+#endif
+
+#ifdef HAVE_SPDIF_POWER
+static bool spdif_power_setting;
+
+void audio_set_spdif_power_setting(bool on)
+{
+    spdif_power_setting = on;
+}
+#endif
 
 /**
  * Sets the audio source 
  * 
  * This functions starts feeding the CPU with audio data over the I2S bus
  *
- * @param source 0=mic, 1=line-in, (todo: 2=spdif)
+ * @param source 0=mic, 1=line-in, 2=spdif
  */
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time)
 {
     /* TODO: */
-    (void)frequency;
     (void)quality;
     (void)channel_mode;
     (void)editable;
 
-    /* WARNING: calculation below uses fixed frequency! */
+    /* NOTE: Coldfire UDA based recording does not yet support anything other
+     * than 44.1kHz sampling rate, so we limit it to that case here now. SPDIF
+     * based recording will overwrite this value with the proper sample rate in
+     * audio_record(), and will not be affected by this.
+     */
+    frequency = 44100;   
     pre_record_ticks = prerecord_time * HZ;
-    pre_record_chunks = ((44100 * prerecord_time * 4)/CHUNK_SIZE)+1;
+    pre_record_chunks = ((frequency * prerecord_time * 4)/CHUNK_SIZE)+1;
     if(pre_record_chunks >= (num_chunks-250))
     {
         /* we can't prerecord more than our buffersize minus treshold to write to disk! */
         pre_record_chunks = num_chunks-250;
         /* don't forget to recalculate that time! */
-        pre_record_ticks = ((pre_record_chunks * CHUNK_SIZE)/(4*44100)) * HZ;
+        pre_record_ticks = ((pre_record_chunks * CHUNK_SIZE)/(4*frequency)) * HZ;
     }
     
     //logf("pcmrec: src=%d", source);
 
+    rec_source = source;
+#ifdef HAVE_SPDIF_POWER
+    /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
+       both optical in and out is controlled by the same power source, which is
+       the case on H1x0. */
+    spdif_power_enable((source == 2) || spdif_power_setting);
+#endif
     switch (source)
     {
         /* mic */
         case 0: 
+            /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
+            DATAINCONTROL = 0xc020;
             uda1380_enable_recording(true); 
         break;
 
         /* line-in */
         case 1: 
+            /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
+            DATAINCONTROL = 0xc020;
             uda1380_enable_recording(false); 
         break;
+#ifdef HAVE_SPDIF_IN        
+        /* SPDIF */
+        case 2:
+            /* Int. when 6 samples in FIFO. PDIR2 source = ebu1RcvData */
+            DATAINCONTROL = 0xc038;
+            EBU1CONFIG = 0; /* Normal operation, source is EBU in 1 */
+            /* We can't use the EBU clock to drive the IIS interface, so we
+             * need to use the clock the UDA provides, which is 44.1kHz as of
+             * now. This is the reason S/PDIF monitoring distorts for all other
+             * sample rates. Enable record to enable clock gen.
+             */
+            uda1380_enable_recording(true); 
+        break;
+#endif
     }    
-    
+
+    sample_rate = frequency;
+
+#ifdef HAVE_SPDIF_IN    
+    /* Turn on UDA based monitoring when UDA is used as input. */
+    if (source == 2) {
+        uda1380_set_monitor(false);
+        IIS2CONFIG = 0x800; /* Reset before reprogram */
+        /* SCLK follow IIS1 (UDA clock), TXSRC = EBU1rcv, 64 bclk/wclk */
+        IIS2CONFIG = (8 << 12) | (7 << 8) | (4 << 2);
+    }
+    else
+    {
+        uda1380_set_monitor(true);
+        IIS2CONFIG = 0x800; /* Stop the S/PDIF monitoring if it's active */
+    }
+#else
     uda1380_set_monitor(true);
+#endif
 }
 
 
@@ -271,6 +367,11 @@ void audio_record(const char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 
+#ifdef HAVE_SPDIF_IN
+    if (rec_source == 2)
+        sample_rate = audio_get_spdif_sample_rate();
+#endif
+    
     record_done = false;
     queue_post(&pcmrec_queue, PCMREC_START, 0);
     
@@ -381,7 +482,7 @@ void pcm_rec_get_peaks(int *left, int *right)
  *
  */
 
-static void pcmrec_callback(bool flush) __attribute__ ((section (".icode")));
+static void pcmrec_callback(bool flush) ICODE_ATTR;
 static void pcmrec_callback(bool flush)
 {
     int num_ready, num_free, num_new;
@@ -493,6 +594,10 @@ static void pcmrec_dma_start(void)
     /* Start the DMA transfer.. */
     DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_START;
 
+#ifdef HAVE_SPDIF_IN
+    INTERRUPTCLEAR = 0x03c00000;
+#endif
+
     /* pre-recording: buffer count */
     buffered_chunks = 0;
 
@@ -512,14 +617,36 @@ void DMA1(void)
     {
         DCR1 = 0;   /* Stop DMA transfer */
         error_count++;
-        is_recording = false;
 
         logf("dma1 err: 0x%x", res);
-        
-        /* Flush recorded data to disk and stop recording */
-        queue_post(&pcmrec_queue, PCMREC_STOP, NULL);
 
-    } else 
+        DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
+        BCR1 = CHUNK_SIZE;
+        DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_START;
+    } 
+#ifdef HAVE_SPDIF_IN
+    else if ((rec_source == 2) && (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
+    {
+        INTERRUPTCLEAR = 0x03c00000;
+        error_count++;
+
+        logf("spdif err");
+
+        if (is_stopping)
+        {
+            DCR1 = 0;   /* Stop DMA transfer */
+            is_stopping = false;
+
+            logf("dma1 stopping");
+        }
+        else
+        {
+            DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
+            BCR1 = CHUNK_SIZE;
+        }
+    }
+#endif
+    else
     {
         write_index++;
         if (write_index >= num_chunks)
@@ -535,15 +662,16 @@ void DMA1(void)
             is_stopping = false;
 
             logf("dma1 stopping");
-
-        } else if (write_index == read_index)
+        }
+        else if (write_index == read_index)
         {
             DCR1 = 0;   /* Stop DMA transfer */
             is_recording = false;
 
             logf("dma1 overrun");
 
-        } else
+        }
+        else
         {
             DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
             BCR1 = CHUNK_SIZE;
@@ -560,10 +688,11 @@ static int start_wave(void)
     unsigned char header[44] = 
     {
         'R','I','F','F',0,0,0,0,'W','A','V','E','f','m','t',' ',
-        0x10,0,0,0,1,0,2,0,0x44,0xac,0,0,0x10,0xb1,2,0,
+        0x10,0,0,0,1,0,2,0,0,0,0,0,0,0,0,0,
         4,0,0x10,0,'d','a','t','a',0,0,0,0
     };
-
+    unsigned long avg_bytes_per_sec;
+    
     wav_file = open(recording_filename, O_RDWR|O_CREAT|O_TRUNC);
     if (wav_file < 0)
     {
@@ -572,7 +701,18 @@ static int start_wave(void)
         is_error = true;
         return -1;
     }
-
+    /* Now set the sample rate field of the WAV header to what it should be */
+    header[24] = (unsigned char)(sample_rate & 0xff);
+    header[25] = (unsigned char)(sample_rate >> 8);
+    header[26] = (unsigned char)(sample_rate >> 16);
+    header[27] = (unsigned char)(sample_rate >> 24);
+    /* And then the average bytes per second field */
+    avg_bytes_per_sec = sample_rate*4; /* Hard coded to 16 bit stereo */
+    header[28] = (unsigned char)(avg_bytes_per_sec & 0xff);
+    header[29] = (unsigned char)(avg_bytes_per_sec >> 8);
+    header[30] = (unsigned char)(avg_bytes_per_sec >> 16);
+    header[31] = (unsigned char)(avg_bytes_per_sec >> 24);
+   
     if (sizeof(header) != write(wav_file, header, sizeof(header)))
     {
         close(wav_file);
@@ -634,7 +774,7 @@ static void pcmrec_start(void)
     {
         /* not enough good chunks available - limit pre-record time */
         pre_chunks = buffered_chunks;
-        pre_ticks = ((buffered_chunks * CHUNK_SIZE)/(4*44100)) * HZ;
+        pre_ticks = ((buffered_chunks * CHUNK_SIZE)/(4*sample_rate)) * HZ;
     }
     record_start_time = current_tick - pre_ticks;
 
@@ -792,7 +932,6 @@ static void pcmrec_resume(void)
     logf("pcmrec_resume done");
 }
 
-
 /**
  * audio_init_recording calls this function using PCMREC_INIT
  * 
@@ -834,7 +973,6 @@ static void pcmrec_init(void)
     IIS1CONFIG = 0x800;             /* Stop any playback                              */
     AUDIOGLOB |= 0x180;             /* IIS1 fifo auto sync = on, PDIR2 auto sync = on */
     DATAINCONTROL = 0xc000;         /* Generate Interrupt when 6 samples in fifo      */
-    DATAINCONTROL |= 0x20;          /* PDIR2 source = IIS1recv                        */
 
     DIVR1 = 55;                     /* DMA1 is mapped into vector 55 in system.c      */
     DMACONFIG = 1;                  /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
@@ -842,6 +980,9 @@ static void pcmrec_init(void)
     ICR7 = 0x1c;                    /* Enable interrupt at level 7, priority 0 */
     IMR &= ~(1<<15);                /* bit 15 is DMA1 */
 
+#ifdef HAVE_SPDIF_IN
+    PHASECONFIG = 0x34;             /* Gain = 3*2^13, source = EBUIN */
+#endif
     pcmrec_dma_start();
 
     init_done = 1;
@@ -851,10 +992,15 @@ static void pcmrec_close(void)
 {
     uda1380_disable_recording();
 
+#ifdef HAVE_SPDIF_POWER
+    spdif_power_enable(spdif_power_setting);
+#endif
     DMAROUTE = (DMAROUTE & 0xffff00ff);
     ICR7 = 0x00;     /* Disable interrupt */
     IMR |= (1<<15);  /* bit 15 is DMA1 */
 
+    /* Reset PDIR2 data flow */
+    DATAINCONTROL = 0x200;
     close_done = true;
 }
 
