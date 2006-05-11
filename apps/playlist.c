@@ -1652,6 +1652,9 @@ static int flush_cached_control(struct playlist_info* playlist)
     int result = 0;
     int i;
 
+    if (!playlist->num_cached)
+        return 0;
+
     lseek(playlist->control_fd, 0, SEEK_END);
 
     for (i=0; i<playlist->num_cached; i++)
@@ -1714,12 +1717,9 @@ static int flush_cached_control(struct playlist_info* playlist)
         result = 0;
     }
     else
-        result = -1;
-
-    if (result < 0)
     {
+        result = -1;
         gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_CONTROL_UPDATE_ERROR));
-        return result;
     }
 
     return result;
