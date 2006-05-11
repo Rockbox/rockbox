@@ -268,7 +268,7 @@ sub runone {
     }
     `find .rockbox | xargs $ziptool $output >/dev/null`;
 
-    if($target && ($fonts > 1)) {
+    if($target && ($fonts != 1)) {
         if($verbose) {
             print "$ziptool $output $target\n";
         }
