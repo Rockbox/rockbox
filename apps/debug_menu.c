@@ -718,7 +718,6 @@ bool dbg_partitions(void)
 bool dbg_spdif(void)
 {
     char buf[128];
-    int button;
     int line;
     unsigned int control;
     int x;
@@ -727,12 +726,17 @@ bool dbg_spdif(void)
     int generation;
     unsigned int interruptstat;
     bool valnogood, symbolerr, parityerr;
+    bool done = false;
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
+#ifdef HAVE_SPDIF_POWER
+    spdif_power_enable(true); /* We need SPDIF power for both sending & receiving */
+#endif
+    PHASECONFIG = 0x34;       /* Gain = 3*2^13, source = EBUIN */
 
-    while(1)
+    while (!done)
     {
         line = 0;
 
@@ -855,21 +859,29 @@ bool dbg_spdif(void)
         }
         snprintf(buf, sizeof(buf), "Frequency: %d (%s)", x, s);
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 2) & 3;
         snprintf(buf, sizeof(buf), "Clock accuracy: %d", x);
         lcd_puts(0, line++, buf);
+        line++;
         
-        lcd_update();
-        button = button_get_w_tmo(HZ/10);
+        snprintf(buf, sizeof(buf), "Measured freq: %ldHz",
+                (long)((long long)FREQMEAS*CPU_FREQ/((1 << 15)*3*(1 << 13))/128));
+        lcd_puts(0, line++, buf);
 
-        switch(button)
+        lcd_update();
+
+        switch (button_get_w_tmo(HZ/10))
         {
-        case SETTINGS_CANCEL:
-        case SETTINGS_OK2:
-                return false;
+            case SETTINGS_CANCEL:
+            case SETTINGS_OK2:
+                done = true;
+                break;
         }
     }
+#ifdef HAVE_SPDIF_POWER
+    spdif_power_enable(global_settings.spdif_enable);
+#endif
 
     return false;
 }
