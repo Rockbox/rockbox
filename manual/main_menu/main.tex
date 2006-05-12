@@ -3,13 +3,19 @@
 
 \section{Introducing the Main Menu}
 \screenshot{main_menu/images/ss-main-menu}{The main menu}{}
-This is the screen from which the rest of the Rockbox functions can be 
+The \setting{Main Menu} is the screen from which the rest of the Rockbox functions can be 
 accessed. It is used for a variety of functions, which are detailed below. 
-All options in Rockbox can be controlled via this menu.
+All options in Rockbox can be controlled via the \setting{Main Menu}.
 
-All settings are persistently stored on the unit. However, Rockbox does 
-not spin up the disk solely for the purpose of saving settings, but instead 
-will save them when it spins up the disk the next time, for example when 
+To enter the \setting{Main Menu}, 
+	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{press the \ButtonMode\ button.}
+  \opt{RECORDER_PAD}{press the \ButtonFOne\ button.}
+  \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD}{press the \ButtonMenu\ button.}
+  \opt{IAUDIO_X5_PAD}{hold the \ButtonPlay\ button.}
+
+All settings are stored on the unit. However, Rockbox does not spin up 
+the disk solely for the purpose of saving settings.  Instead, Rockbox will
+save settings when it spins up the disk the next time, for example when 
 refilling the MP3 buffer or navigating through the file browser. Changes to 
 settings may therefore not be saved unless the \dap\ is shut down safely 
 (see page \pageref{ref:Safeshutdown}).
@@ -18,13 +24,13 @@ settings may therefore not be saved unless the \dap\ is shut down safely
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
-      \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
+      \opt{IPOD_4G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollFwd}
       \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp} 
       & Moves up in the menu.\\
       & Inside a setting, increases the value or
         chooses next option \\
       %
-      \opt{IPOD_4G_PAD}{\ButtonScrollBack}
+      \opt{IPOD_4G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollBack}
       \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} 
       & Moves down in the menu.\\
       & Inside a setting, decreases the value or
@@ -32,11 +38,11 @@ settings may therefore not be saved unless the \dap\ is shut down safely
       %
       \opt{RECORDER_PAD}{\ButtonPlay/\ButtonRight}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect/\ButtonRight}
-      \opt{ONDIO_PAD,IPOD_4G_PAD}{\ButtonRight} 
+      \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_VIDEO_PAD}{\ButtonRight} 
       & Selects option \\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff/\ButtonLeft}
-      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft} 
+      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_VIDEO_PAD}{\ButtonLeft} 
       & Exits menu, setting or moves to parent menu\\
     \end{btnmap}
   \end{table}
@@ -61,38 +67,38 @@ settings may therefore not be saved unless the \dap\ is shut down safely
 \section {Recent Bookmarks}
 \screenshot{main_menu/images/ss-list-bookmarks}%
   {The list bookmarks screen}{}
-If the ``save a list of recently created bookmarks'' option is enabled 
+If the \setting{Save a list of recently created bookmarks} option is enabled 
 then you can view a list of several recent bookmarks here and select one to 
 jump straight to that track. See page \pageref{ref:Bookmarkconfigactual} 
 for more details on configuring bookmarking in Rockbox.
 \note{This option is off by default.}
 
 \section{Sound Settings}
-The Sound Settings menu offers a selection of sound properties you may 
+The \setting{Sound Settings} menu offers a selection of sound properties you may 
 change to customize your listening experience.  The details of this menu are 
 covered in detail starting on page \pageref{ref:configure_rockbox_sound}. 
 
 \section{General Settings}
-The General Settings menu allows you to customize the way Rockbox looks and 
-the way it plays music.  The details of this menu are covered in detail 
+The \setting{General Settings} menu allows you to customize the way Rockbox looks 
+and the way it plays music.  The details of this menu are covered in detail 
 starting on page \pageref{ref:configure_rockbox_general}.
 
 \section{Manage Settings}
-This option allows the saving and re-loading of user configuration settings, 
-browse the hard drive for alternate firmwares, and finally to reset your 
-\dap\ back to initial configuration. The details of this menu are covered in detail 
-starting on page \pageref{ref:ManageSetting}.
+The \setting{Manage Settings} option allows the saving and re-loading of user 
+configuration settings, browse the hard drive for alternate firmwares, and finally
+to reset your \dap\ back to initial configuration. The details of this menu are 
+covered in detail starting on page \pageref{ref:ManageSetting}.
 
 \section{Browse Themes}
 This option will display all the currently installed themes on the \dap, 
 press \ButtonRight\ to load the chosen theme and apply it.
 
-A Theme is basically a configuration file, stored in a specific directory, 
+A theme is basically a configuration file, stored in a specific directory, 
 that typically changes the WPS 
 \opt{h1xx,h300,x5}{and remote WPS}, font used and on some platforms
 additional information such as background image and text colours.
 
-There are a number of such themes that ship with Rockbox, and if none of
+There are a number of themes that ship with Rockbox.  If none of
 these suit your needs, many more can be downloaded from 
 \url{www.rockbox.org/twiki/bin/view/Main/\opt{RECORDER_PAD}{/WpsArchos}
 \opt{h1xx}{WpsIriverH100}\opt{h300,ipodcolor}{WpsIriverH300}
@@ -393,9 +399,9 @@ for more details.
   This menu allows you to work with playlists. Playlists can either be created
 automatically by playing a file in a directory directly, which will cause all 
 of the files in that directory to be placed in the playlist, or they can be
-created by hand using the File Menu (see page \pageref{ref:Filemenu}) or using 
-the Playlist Options menu.  Both  automatic and manually created playlists 
-can be edited using this menu.
+created by hand using the \setting{File Menu} (see page \pageref{ref:Filemenu}) 
+or using the \setting{Playlist Options} menu.  Both  automatic and manually 
+created playlists can be edited using this menu.
 
 \begin{description}
 \item[Create Playlist:]
@@ -412,20 +418,21 @@ specified file. If no path is provided then playlist is saved to current
 directory (see page \pageref{ref:Playlistsubmenu}).
   
 \item[Recursively Insert Directories: ]
-  If set to ON then when you insert/queue a directory in Dynamic Playlist, 
-all subdirectories will also be inserted. If set to ASK then you are prompted 
-about recursive insertion when inserting a directory.
-  Options: Off, Ask, On
+  If set to \setting{On}, then when a directory is inserted or queued into a 
+  dynamic playlist, all subdirectories will also be inserted. If set to \setting{Ask},
+  Rockbox will prompt the user about whether to include subdirectories.
+  Options: \setting{Off}, \setting{Ask}, \setting{On}
 
 \item[Warn When Erasing Dynamic Playlist: ]
-  \fixme{some information about this function....}
-  Options: Yes, No
+  If set to \setting{Yes}, Rockbox will provide a warning if the user attempts to
+  take an action that will cause Rockbox to erase the current dynamic playlist.
+  Options: \setting{Yes}, \setting{No}
 \end{description}
 
 \section{Browse Plugins}
   With this option you can load and run various plugins that have been
 written for Rockbox. There are a wide variety of these supplied with
-Rockbox, including several games, some impressive demo's and a number of
+Rockbox, including several games, some impressive demos and a number of
 utilities. A detailed description of the different plugins begins 
 on page \pageref{ref:plugins}.
 
@@ -446,9 +453,9 @@ battery status, hard disk size and the amount of free space on the disk.
   
 \item[Debug (Keep Out!):]
   This submenu is intended to be used \emph{only} by Rockbox developers.
-  It shows hardware, disk, battery status and a lot of other information.  
+  It shows hardware, disk, battery status and other technical information.  
   \warn{It is not recommended that users access this menu unless instructed to
-  do so in the course of fixing a problem with Rockbox. If you think you've 
+  do so in the course of fixing a problem with Rockbox. If you think you have 
   messed up your settings by use of this menu please try to reset \emph{all} 
   settings before asking for help.}
 \end{description}
@@ -457,22 +464,23 @@ battery status, hard disk size and the amount of free space on the disk.
   \section{Shutdown}
   This menu option saves the Rockbox configuration and turns off the hard 
   drive before shutting down the machine. For maximum safety this procedure 
-  is recommended when turning off the Jukebox. (There is a very small risk
+  is recommended when turning off the \dap. (There is a very small risk
   of hard disk corruption otherwise.) See page \pageref{ref:Safeshutdown}
   for more details.
 }
 
-\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD,IPOD_VIDEO_PAD}
+{
 \section{Quick Menu}
-  Whilst not strictly part of the main menu, it is worth noting that a few
-  of the more commonly used settings are available from the ''Quick Menu".
-  This screen is accessed by holding the 
+  Whilst not strictly part of the \setting{Main Menu}, it is worth noting that a few
+  of the more commonly used settings are available from the \setting{Quick Menu}.
+  The \setting{Quick Menu} screen is accessed by holding the 
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IPOD_4G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD}{\ButtonRec}
-   key, and it allows rapid access to the Shuffle and Repeat Modes 
+   key, and it allows rapid access to the \setting{Shuffle} and \setting{Repeat} modes 
   (Page \pageref{ref:PlaybackOptions})
-  and the Show Files options (Page \pageref{ref:ShowFiles}).
+  and the \setting{Show Files} option (Page \pageref{ref:ShowFiles}).
 }
 

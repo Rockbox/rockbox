@@ -76,13 +76,13 @@ your WPS (While Playing Screen).
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
       \opt{ONDIO_PAD}{\ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{\ButtonOn}
-      & Go to file browser \\
+      & Go to File Browser \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
       \opt{ONDIO_PAD}{Hold \ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn}
       \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
-      & Enter WPS context menu \\
+      & Enter WPS Context Menu \\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
       Hold \ButtonOn
@@ -95,10 +95,10 @@ your WPS (While Playing Screen).
       \opt{PLAYER_PAD}{\ButtonStop}
       & Stop playback \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{RECORDER_PAD}{\ButtonFOne}
-      \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
-      \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
+      \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
       & Go to Main menu \\
       %
       %These actions need definitions for the other targets
@@ -132,11 +132,12 @@ your WPS (While Playing Screen).
     peak volume value that occurred recently.
   \item [The clip indicator:]
     This is a little black block that is displayed at the very right of the
-    scale when an overflow occurs. It usually doesn't show up during normal
+    scale when an overflow occurs. It usually does not show up during normal
     playback unless you play an audio file that is distorted heavily. If you
-    encounter clipping while recording your recording will sound distorted. You
-    should lower the gain. Note that the clip detection is not very precise.
-    Clipping might occur without being indicated.
+    encounter clipping while recording, your recording will sound distorted. You
+    should lower the gain. 
+    \note{Note that the clip detection is not very precise.
+     Clipping might occur without being indicated.}
   \item [The scale:]
     Between the indicators of the right and left channel there are little dots.
     These dots represent important volume values. In linear mode each dot is a
@@ -145,11 +146,11 @@ your WPS (While Playing Screen).
     {}-40db, {}-50db, {}-60db.
   \end{description}
 }
-\subsection{\label{sec:quickscreens}Quickscreens}
+\subsection{\label{sec:quickscreens}WPS Quick Screens}
 
-\subsubsection{\label{sec:contextmenu}Context Menu}
-Like the context menu for the file browser this context menu allows you
-to quickly access some often used functions.
+\subsubsection{\label{sec:contextmenu}The WPS Context Menu}
+Like the context menu for the File Browser, the \setting{WPS Context Menu} 
+	allows you to quickly access some often used functions.
 \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,x5}{
 These include the ID3 Viewer and the pitch screen.}
 

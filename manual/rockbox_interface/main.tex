@@ -40,23 +40,24 @@ picture above. To turn on and shut down your \dap, the following keys are used:
 
 \section{\label{ref:file_browser}File Browser}
 \screenshot{rockbox_interface/images/ss-file-browser}{The file browser}{}
-Rockbox lets you browse your music in either of two ways. The ``File Browser'' 
-lets you navigate through the files and folders on your \dap, entering folders
-and executing the default action on each file. To help differentiate files,
-each file format is displayed with an icon. 
+Rockbox lets you browse your music in either of two ways. The 
+\setting{File Browser} lets you navigate through the files and folders on 
+your \dap, entering folders and executing the default action on each file.
+To help differentiate files, each file format is displayed with an icon. 
 
-The ``Tag Cache Browser,'' on the other hand, allows you to navigate through 
-the music on your player using categories like album, artist, genre, etc.  
+The \setting{Tag Cache Browser}, on the other hand, allows you to navigate 
+through the music on your player using categories like album, artist, genre, etc.  
 
-You can select whether to browse using the File Browser or the Tag Cache Browser by
-adjusting the \setting{Show Files} setting.  If you choose the File Browser, the 
-\setting{Show Files} setting also lets you select what types of files you wish to 
-view.  See page \pageref{ref:ShowFiles} for more information on the \setting{Show 
-Files} setting.
+You can select whether to browse using the \setting{File Browser} or the 
+\setting{Tag Cache Browser} by adjusting the \setting{Show Files} setting.  
+If you choose the \setting{File Browser}, the \setting{Show Files} setting also 
+lets you select what types of files you wish to view.  See page 
+\pageref{ref:ShowFiles} for more information on the \setting{Show Files} setting.
 
-\note{The File Browser allows you to manipulate your files in ways that are not
-available within the Tag Cache Browser.  Read more about Tag Cache in Section 
-\ref{ref:tagcache}.  The remainder of this section deals with the File Browser.}
+\note{The \setting{File Browser} allows you to manipulate your files in ways that 
+are not available within the \setting{Tag Cache Browser}.  Read more about 
+\setting{Tag Cache} in Section \ref{ref:tagcache}.  The remainder of this section
+deals with the \setting{File Browser}.}
 
 \subsection{\label{ref:controls}Controls}
 \begin{table}
@@ -100,7 +101,7 @@ available within the Tag Cache Browser.  Read more about Tag Cache in Section
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{RECORDER_PAD}{\ButtonFOne}
-      \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD}{\ButtonMenu}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
       \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
       & Enter the Main Menu \\
       %
@@ -121,25 +122,26 @@ available within the Tag Cache Browser.  Read more about Tag Cache in Section
 \subsection{\label{ref:Filemenu}\label{ref:PartIISectionFM}File Menu}
 \screenshot{rockbox_interface/images/ss-file-menu}{The File Menu}{}
 
-The File Menu allows you to perform certain operations on files or folders.
-To access the File Menu, position the selector over a file or folder and 
+The \setting{File Menu} allows you to perform certain operations on files or 
+folders.  To access the \setting{File Menu}, position the selector over a file 
+or folder and 
 	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
 		{hold the \ButtonSelect\ button.}
 	\opt{RECORDER_PAD,PLAYER_PAD}{press the \ButtonPlay/\ButtonOn+\ButtonPlay\ 
 	  buttons.}
   \opt{ONDIO_PAD}{hold the \ButtonRight\ button.}
   
-\note{The File Menu is a context sensitive menu.  If the File Menu is 
-invoked on a file, it will display options available for files.  If the 
-File Menu is invoked on a folder or directory, it will display options
-for directories.}
+\note{The \setting{File Menu} is a context sensitive menu.  If the 
+\setting{File Menu} is invoked on a file, it will display options available 
+for files.  If the \setting{File Menu} is invoked on a folder or directory, 
+it will display options for directories.}
 
-The File Menu contains the following options (unless otherwise noted, each
-option pertains both to files and directories):
+The \setting{File Menu} contains the following options (unless otherwise noted, 
+each option pertains both to files and directories):
 
 \begin{description}
 \item [Playlist:]
-  Enters to the Playlist Submenu (see below).
+  Enters the \setting{Playlist Submenu} (see below).
 \item [Rename:]
   This function lets the user modify a file name.
 \item [Cut:]
@@ -167,7 +169,7 @@ option pertains both to files and directories):
 \item [Open with:] 
   Runs a viewer plugin on the file. Normally, when a file is selected in Rockbox,
   Rockbox automatically detects the file type and runs the appropriate plugin.
-  The ``Open With'' function can be used to override the default action and
+  The \setting{Open With} function can be used to override the default action and
   select a viewer by hand.  For example, this function can be used to view a text file
   even if the file has a non-standard extension (i.e., the file has an extension
   of something other than ``.txt'').  See page \textmd{\pageref{ref:Viewersplugins}} 
@@ -178,7 +180,7 @@ option pertains both to files and directories):
 
 \subsection{\label{ref:Playlistsubmenu}Playlist Submenu}
 \screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
-The Playlist Submenu allows you to put tracks into a ``dynamic playlist''.
+The \setting{Playlist Submenu} allows you to put tracks into a ``dynamic playlist''.
 If there is no music currently playing, Rockbox will create a new dynamic playlist
 and put the selected track(s) into the playlist.  If there is music currently playing,
 Rockbox will put the selected track(s) into the current playlist.  The place in which
@@ -205,24 +207,24 @@ options:
   Queue track(s) at end of playlist.
 \end{description}
 
-The Playlist Submenu can be used to add either single tracks or entire directories
-to a playlist. If the Playlist Submenu is invoked on a single track, it will put 
-only that track into the playlist.  On the other hand, if the Playlist Submenu 
-is invoked on a directory, Rockbox adds all of the tracks in that directory to 
-the playlist.  
+The \setting{Playlist Submenu} can be used to add either single tracks or 
+entire directories to a playlist. If the \setting{Playlist Submenu} is 
+invoked on a single track, it will put only that track into the playlist.  
+On the other hand, if the \setting{Playlist Submenu} is invoked on a 
+directory, Rockbox adds all of the tracks in that directory to the playlist.  
 
 \note{You can control whether or not Rockbox includes the contents of subdirectories
-when adding an entire directory to a playlists.   Set the \setting{Main Menu 
+when adding an entire directory to a playlists.  Set the \setting{Main Menu 
 $\rightarrow$ Playlist Options $\rightarrow$ Recusively Insert Directories} setting to 
 \setting{Yes} if you would like Rockbox to include tracks in subdirectories as well as tracks
 in the currently-selected directory.}
 
 If you want to have Rockbox create a playlist of a whole folder (to play an entire 
-album, for example), use the File Browser to select the song. When a single song is 
-selected from the File Browser, Rockbox will automatically create a playlist with all
-songs in the current folder. However, if you want to play only a single song and then
-stop, stop playback, navigate to the song you want to play, and use the \setting{Playlist
-$\rightarrow$ Insert} function to select the song.
+album, for example), use the \setting{File Browser} to select the song. When a single 
+song is selected from the \setting{File Browser}, Rockbox will automatically create a 
+playlist with all songs in the current folder. However, if you want to play only a single 
+song and then stop, stop playback, navigate to the song you want to play, and use the 
+\setting{Playlist $\rightarrow$ Insert} function to select the song.
 
 Dynamic playlists are saved so resume will restore them exactly as they were before
 shutdown.
