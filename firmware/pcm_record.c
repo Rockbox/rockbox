@@ -305,8 +305,13 @@ void audio_set_recording_options(int frequency, int quality,
         case 2:
             /* Int. when 6 samples in FIFO. PDIR2 source = ebu1RcvData */
             DATAINCONTROL = 0xc038;
+#ifdef HAVE_SPDIF_POWER
+            EBU1CONFIG = spdif_power_setting ? (1 << 2) : 0;
+            /* Input source is EBUin1, Feed-through monitoring if desired */
+#else
             EBU1CONFIG = (1 << 2);
-            /* Input source is EBUin1, Feed-through to output for monitoring */
+            /* Input source is EBUin1, Feed-through monitoring */
+#endif
             uda1380_disable_recording();
         break;
 #endif
