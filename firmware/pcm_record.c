@@ -80,10 +80,10 @@ static short peak_left, peak_right;
     Total buffer size:     32 MB / 176 KB/s = 181s before writing to disk
 */
 
-#define CHUNK_SIZE                 8192  /* Multiple of 4 */
-#define WRITE_THRESHOLD            250   /* (2 MB) Write when this many chunks (or less) until buffer full */
+#define CHUNK_SIZE       8192  /* Multiple of 4 */
+#define WRITE_THRESHOLD  250   /* (2 MB) Write when this many chunks (or less) until buffer full */
 
-#define GET_CHUNK(x)               (short*)(&rec_buffer[CHUNK_SIZE*(x)])
+#define GET_CHUNK(x)     (short*)(&rec_buffer[CHUNK_SIZE*(x)])
 
 static unsigned int rec_buffer_offset;
 static unsigned char *rec_buffer;  /* Circular recording buffer */
@@ -305,34 +305,36 @@ void audio_set_recording_options(int frequency, int quality,
         case 2:
             /* Int. when 6 samples in FIFO. PDIR2 source = ebu1RcvData */
             DATAINCONTROL = 0xc038;
-            EBU1CONFIG = 0; /* Normal operation, source is EBU in 1 */
-            /* We can't use the EBU clock to drive the IIS interface, so we
-             * need to use the clock the UDA provides, which is 44.1kHz as of
-             * now. This is the reason S/PDIF monitoring distorts for all other
-             * sample rates. Enable record to enable clock gen.
-             */
-            uda1380_enable_recording(true); 
+            EBU1CONFIG = (1 << 2);
+            /* Input source is EBUin1, Feed-through to output for monitoring */
+            uda1380_disable_recording();
         break;
 #endif
     }    
 
     sample_rate = frequency;
 
-#ifdef HAVE_SPDIF_IN    
-    /* Turn on UDA based monitoring when UDA is used as input. */
+    /* Monitoring: route the signals through the coldfire audio interface. */
+
+    IIS2CONFIG = 0x800; /* Reset before reprogram */
+#ifdef HAVE_SPDIF_IN
     if (source == 2) {
-        uda1380_set_monitor(false);
-        IIS2CONFIG = 0x800; /* Reset before reprogram */
-        /* SCLK follow IIS1 (UDA clock), TXSRC = EBU1rcv, 64 bclk/wclk */
-        IIS2CONFIG = (8 << 12) | (7 << 8) | (4 << 2);
+        /* SCLK2 = Audioclk/4 (can't use EBUin clock), TXSRC = EBU1rcv, 64 bclk/wclk */
+        IIS2CONFIG = (6 << 12) | (7 << 8) | (4 << 2);
+        /* S/PDIF feed-through already configured */
     }
     else
     {
-        uda1380_set_monitor(true);
-        IIS2CONFIG = 0x800; /* Stop the S/PDIF monitoring if it's active */
+        /* SCLK2 follow IIS1 (UDA clock), TXSRC = IIS1rcv, 64 bclk/wclk */
+        IIS2CONFIG = (8 << 12) | (4 << 8) | (4 << 2);
+        
+        EBU1CONFIG = 0x800; /* Reset before reprogram */
+        /* SCLK2, TXSRC = IIS1recv, validity, normal operation */
+        EBU1CONFIG = (7 << 12) | (4 << 8) | (1 << 5) | (5 << 2);
     }
 #else
-    uda1380_set_monitor(true);
+    /* SCLK2 follow IIS1 (UDA clock), TXSRC = IIS1rcv, 64 bclk/wclk */
+    IIS2CONFIG = (8 << 12) | (4 << 8) | (4 << 2);
 #endif
 }
 
