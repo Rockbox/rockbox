@@ -2230,7 +2230,9 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                     &cached_buf[entrypos]) ) {
 
                     /* don't return volume id entry */
-                    if ( entry->attr == FAT_ATTR_VOLUME_ID )
+                    if ( (entry->attr &
+                          (FAT_ATTR_VOLUME_ID|FAT_ATTR_DIRECTORY))
+                         == FAT_ATTR_VOLUME_ID)
                         continue;
 
                     /* replace shortname with longname? */
