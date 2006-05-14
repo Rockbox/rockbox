@@ -65,7 +65,7 @@ static void (*position_callback)(size_t size) IDATA_ATTR;
 
 /* Crossfade related state */
 static bool crossfade_enabled;
-static bool crossfade_mode;
+static bool crossfade_mixmode;
 static bool crossfade_active IDATA_ATTR;
 static bool crossfade_init IDATA_ATTR;
 
@@ -310,7 +310,11 @@ bool pcmbuf_crossfade_init(bool manual_skip)
     pcmbuf_boost(true);
 
     /* Don't enable mix mode when skipping tracks manually. */
-    crossfade_mode = manual_skip && global_settings.crossfade_fade_out_mixmode;
+    if (manual_skip)
+        crossfade_mixmode = false;
+    else
+        crossfade_mixmode = global_settings.crossfade_fade_out_mixmode;
+    
     crossfade_init = true;
 
     return true;
@@ -452,7 +456,7 @@ static bool pcmbuf_flush_fillpos(void)
 static void crossfade_process_buffer(size_t fade_in_delay,
         size_t fade_out_delay, size_t fade_out_rem)
 {
-    if (!crossfade_mode)
+    if (!crossfade_mixmode)
     {
         /* Fade out the specified amount of the already processed audio */
         size_t total_fade_out = fade_out_rem;
