@@ -35,7 +35,6 @@
 
 #define AUDIO_GAIN_LINEIN    0
 #define AUDIO_GAIN_MIC       1
-#define AUDIO_GAIN_DECIMATOR 2   /* for UDA1380 */
 
 
 struct audio_debug

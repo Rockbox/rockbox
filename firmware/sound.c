@@ -108,11 +108,9 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  15,   8, NULL},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2, NULL},
 #elif defined(HAVE_UDA1380)
-    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,   8,   8, NULL},
-    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,   8,   8, NULL},
-    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,  15,   2, NULL},
-    [SOUND_DECIMATOR_LEFT_GAIN] = {"dB", 1,  1,-128,  48,   0, NULL},
-    [SOUND_DECIMATOR_RIGHT_GAIN]= {"dB", 1,  1,-128,  48,   0, NULL},
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
 #endif
 };
 
@@ -894,19 +892,11 @@ int sound_val2phys(int setting, int value)
     {
         case SOUND_LEFT_GAIN:
         case SOUND_RIGHT_GAIN:
-            result = value * 30;        /* (24/8) *10 */
-            break;
-
         case SOUND_MIC_GAIN:
-            result = value * 20;        /* (30/15) *10 */
-            break;
-            
-        case SOUND_DECIMATOR_LEFT_GAIN:
-        case SOUND_DECIMATOR_RIGHT_GAIN:
-            result = value * 5;         /* (1/2) *10 */
+            result = value * 5;         /* (1/2) * 10 */
             break;
 
-       default:
+        default:
             result = value;
             break;
     }

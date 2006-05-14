@@ -41,10 +41,6 @@ enum {
     SOUND_RIGHT_GAIN,
     SOUND_MIC_GAIN,
 #endif
-#if defined(HAVE_UDA1380)
-    SOUND_DECIMATOR_LEFT_GAIN,
-    SOUND_DECIMATOR_RIGHT_GAIN,
-#endif
 };
 
 enum {

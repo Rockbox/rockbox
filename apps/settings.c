@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 42
+#define CONFIG_BLOCK_VERSION 43
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -342,20 +342,47 @@ static const struct bit_entry hd_bits[] =
 #ifdef CONFIG_BACKLIGHT
     {1, S_O(caption_backlight), false, "caption backlight", off_on },
 #endif
-    {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
-#ifdef HAVE_LCD_BITMAP
-#if LCD_WIDTH > 127
-    {8, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...160 */
-#else
-    {7, S_O(scroll_step), 6, "scroll step", NULL }, /* 1...112 */
+#ifdef HAVE_REMOTE_LCD
+    {1, S_O(remote_caption_backlight), false,
+        "remote caption backlight", off_on },
 #endif
-#endif /* HAVE_LCD_BITMAP */
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    {4, S_O(brightness), 9, "brightness", NULL },
+#endif
+#ifdef HAVE_BACKLIGHT_PWM_FADING
+    /* backlight fading */
+    {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
+    {3, S_O(backlight_fade_out), 3, "backlight fade out",
+        "off,500ms,1s,2s,3s,4s,5s,10s"},
+#endif
+
+    {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
     {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
     {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */
+#ifdef HAVE_LCD_BITMAP
+    {1, S_O(offset_out_of_view), false, "Screen Scrolls Out Of View", off_on },
+#if LCD_WIDTH > 255
+    {9, S_O(scroll_step), 6, "scroll step", NULL },
+    {9, S_O(screen_scroll_step), 16, "screen scroll step", NULL },
+#elif LCD_WIDTH > 127
+    {8, S_O(scroll_step), 6, "scroll step", NULL },
+    {8, S_O(screen_scroll_step), 16, "screen scroll step", NULL },
+#else
+    {7, S_O(scroll_step), 6, "scroll step", NULL },
+    {7, S_O(screen_scroll_step), 16, "screen scroll step", NULL },
+#endif
+#endif /* HAVE_LCD_BITMAP */
 #ifdef HAVE_LCD_CHARCELLS
     {3, S_O(jump_scroll), 0, "jump scroll", NULL }, /* 0...5 */
     {8, S_O(jump_scroll_delay), 50, "jump scroll delay", NULL }, /* 0...250 */
 #endif
+    {1, S_O(scroll_paginated), false, "scroll paginated", off_on },
+
+#ifdef HAVE_LCD_COLOR
+    {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"},
+    {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"},
+#endif
+
     /* more playback */
     {1, S_O(play_selected), true, "play selected", off_on },
     {1, S_O(fade_on_stop), true, "volume fade", off_on },
@@ -375,6 +402,7 @@ static const struct bit_entry hd_bits[] =
 #endif
     {8, S_O(disk_spindown), 5, "disk spindown", NULL },
 #endif /* HAVE_MMC */
+
     /* browser */
     {3, S_O(dirfilter), SHOW_SUPPORTED,
         "show files", "all,supported,music,playlists,id3 database" },
@@ -406,29 +434,6 @@ static const struct bit_entry hd_bits[] =
     {7, S_O(peak_meter_min), 60, "peak meter min", NULL }, /* 0...100 */
     {7, S_O(peak_meter_max), 0, "peak meter max", NULL }, /* 0...100 */
 #endif
-#if CONFIG_CODEC == MAS3587F
-    /* recording */
-    {1, S_O(rec_editable), false, "editable recordings", off_on },
-    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
-        "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
-    {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
-    {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
-    {3, S_O(rec_quality), 5, "rec quality", NULL },
-#ifdef HAVE_SPDIF_IN
-    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
-#else
-    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
-#endif
-    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
-        "rec frequency", "44,48,32,22,24,16" },
-    {4, S_O(rec_left_gain), 2, /* 0dB */
-        "rec left gain", NULL }, /* 0...15 */
-    {4, S_O(rec_right_gain), 2, /* 0dB */
-        "rec right gain", NULL }, /* 0...15 */
-    {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
-    {1, S_O(rec_directory), 0, /* rec_base_directory */
-        "rec directory", REC_BASE_DIR ",current" },
-#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     {7, S_O(mdb_strength), 0, "mdb strength", NULL},
     {7, S_O(mdb_harmonics), 0, "mdb harmonics", NULL},
@@ -449,7 +454,37 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(id3_v1_first), 0, "id3 tag priority", "v2-v1,v1-v2"},
 
 #ifdef HAVE_RECORDING
+    /* recording */
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
+    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
+        "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
+    {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
+#ifdef HAVE_SPDIF_IN
+    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
+#else
+    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
+#endif
+    {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
+    {1, S_O(rec_directory), 0, /* rec_base_directory */
+        "rec directory", REC_BASE_DIR ",current" },
+#ifdef CONFIG_BACKLIGHT
+    {2, S_O(cliplight), 0, "cliplight", "off,main,both,remote" },
+#endif 
+#if CONFIG_CODEC == MAS3587F
+    {4, S_O(rec_mic_gain), 8, "rec mic gain", NULL },
+    {4, S_O(rec_left_gain), 2 /* 0dB */, "rec left gain", NULL }, /* 0...15 */
+    {4, S_O(rec_right_gain), 2 /* 0dB */, "rec right gain", NULL }, /* 0...15 */
+    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
+        "rec frequency", "44,48,32,22,24,16" },
+    {1, S_O(rec_editable), false, "editable recordings", off_on },
+    {3, S_O(rec_quality), 5, "rec quality", NULL },
+#elif defined(HAVE_UDA1380)
+    {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
+    {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
+    {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
+        "rec frequency", "44,48,32,22,24,16" },
+#endif
 
     /* values for the trigger */
     {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},
@@ -458,14 +493,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_stop_postrec), 2, "trigger stop postrec", trig_durations_conf},
     {4, S_O(rec_stop_gap), 1, "trigger min gap", trig_durations_conf},
     {4, S_O(rec_trigger_mode ), 0, "trigger mode", "off,once,repeat"},
-#endif
-
-#ifdef HAVE_BACKLIGHT_PWM_FADING
-    /* backlight fading */
-    {2, S_O(backlight_fade_in), 1, "backlight fade in", "off,500ms,1s,2s"},
-    {3, S_O(backlight_fade_out), 3, "backlight fade out",
-        "off,500ms,1s,2s,3s,4s,5s,10s"},
-#endif
+#endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_POWER
     {1, S_O(spdif_enable), false, "spdif enable", off_on},
@@ -492,59 +520,8 @@ static const struct bit_entry hd_bits[] =
     {7, S_O(crossfeed_cross_gain), 60, "crossfeed cross gain", NULL },
     {8, S_O(crossfeed_hf_attenuation), 160, "crossfeed hf attenuation", NULL },
     {11, S_O(crossfeed_hf_cutoff), 700, "crossfeed hf cutoff", NULL },
-#endif
-#ifdef HAVE_DIRCACHE
-    {1, S_O(dircache), false, "dircache", off_on },
-    {22, S_O(dircache_size), 0, NULL, NULL },
-#endif
 
-#if defined(HAVE_UDA1380)
-    /* recording settings for iriver */
-    {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
-        "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
-    {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
-    {4, S_O(rec_mic_gain), 4, "rec mic gain", NULL },
-#ifdef HAVE_SPDIF_IN
-    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
-#else
-    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
-#endif
-    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
-        "rec frequency", "44,48,32,22,24,16" },
-    {4, S_O(rec_left_gain), 2, /* 0dB */
-        "rec left gain", NULL }, /* 0...15 */
-    {4, S_O(rec_right_gain), 2, /* 0dB */
-        "rec right gain", NULL }, /* 0...15 */
-    {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
-    {1, S_O(rec_directory), 0, /* rec_base_directory */
-        "rec directory", REC_BASE_DIR ",current" },
-    {8|SIGNED, S_O(rec_linein_decimator_left_gain),  0, /* 0dB */
-        "line in decimator left gain", NULL }, /* -128...48 */
-    {8|SIGNED, S_O(rec_linein_decimator_right_gain), 0, /* 0dB */
-        "line in decimator right gain", NULL }, /* -128...48 */
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-    {1, S_O(remote_caption_backlight), false,
-        "remote caption backlight", off_on },
-#endif
-    {4, S_O(default_codepage), 0, "default codepage", "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256" },
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {4, S_O(brightness), 9, "brightness", NULL },
-#endif
-
-#ifdef HAVE_LCD_BITMAP
-    {1, S_O(offset_out_of_view), false, "Screen Scrolls Out Of View", off_on },
-#if LCD_WIDTH > 127
-    {8, S_O(screen_scroll_step), 16, "screen scroll step", NULL }, /* 1...160 */
-#else
-    {7, S_O(screen_scroll_step), 16, "screen scroll step", NULL }, /* 1...112 */
-#endif
-#endif /* HAVE_LCD_BITMAP */
-    {1, S_O(warnon_erase_dynplaylist), false,
-        "warn when erasing dynamic playlist", off_on },
-#if CONFIG_CODEC == SWCODEC
+    /* equalizer */
     {1, S_O(eq_enabled), false, "eq enabled", off_on },
     {8, S_O(eq_precut), 0, "eq precut", NULL },
     /* 0..32768 Hz */
@@ -566,27 +543,18 @@ static const struct bit_entry hd_bits[] =
     {9|SIGNED, S_O(eq_band3_gain), 0, "eq band 3 gain", NULL },
     {9|SIGNED, S_O(eq_band4_gain), 0, "eq band 4 gain", NULL },
 #endif
-#if defined(HAVE_UDA1380) /* PLEASE merge this with the other UDA1380 define
-                             when bumping the settings version number PLEASE */
-    {8|SIGNED, S_O(rec_mic_decimator_left_gain),  0, /* 0dB */
-        "mic decimator left gain", NULL }, /* -128...48 */
-    {8|SIGNED, S_O(rec_mic_decimator_right_gain), 0, /* 0dB */
-        "mic decimator right gain", NULL }, /* -128...48 */
-#endif
-    {1, S_O(scroll_paginated), false, "scroll paginated", off_on },
-#ifdef HAVE_RECORDING
-#ifdef CONFIG_BACKLIGHT
-    {2, S_O(cliplight), 0, "cliplight", "off,main,both,remote" },
-#endif /* CONFIG_BACKLIGHT */
-#endif /*HAVE_RECORDING*/
-#ifdef HAVE_LCD_COLOR
-    {LCD_DEPTH,S_O(fg_color),LCD_DEFAULT_FG,"foreground color","rgb"},
-    {LCD_DEPTH,S_O(bg_color),LCD_DEFAULT_BG,"background color","rgb"},
-#endif
 
 #ifdef HAVE_DIRCACHE
+    {1, S_O(dircache), false, "dircache", off_on },
+    {22, S_O(dircache_size), 0, NULL, NULL },
     {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
 #endif
+
+    {4, S_O(default_codepage), 0, "default codepage",
+        "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256" },
+
+    {1, S_O(warnon_erase_dynplaylist), false,
+        "warn when erasing dynamic playlist", off_on },
 
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */

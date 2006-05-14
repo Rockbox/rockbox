@@ -29,6 +29,7 @@
 #include "file.h"
 #include "buffer.h"
 #include "audio.h"
+#include "logf.h"
 
 #include "i2c-coldfire.h"
 #include "uda1380.h"
@@ -255,27 +256,37 @@ void uda1380_disable_recording(void)
 /**
  * Set recording gain and volume
  * 
- * type:                    params:        ranges:
- * AUDIO_GAIN_MIC           left              0 .. 15 ->   0 .. 30 dB gain
- * AUDIO_GAIN_LINEIN        left & right      0 ..  8 ->   0 .. 24 dB gain
- * AUDIO_GAIN_DECIMATOR     left & right   -128 .. 48 -> -64 .. 24 dB gain
+ * type:                params:        ranges:
+ * AUDIO_GAIN_MIC:      left           -128 .. 108 -> -64 .. 54 dB gain
+ * AUDIO_GAIN_LINEIN    left & right   -128 ..  96 -> -64 .. 48 dB gain
  *
  * Note: For all types the value 0 gives 0 dB gain.
  */
 void uda1380_set_recvol(int left, int right, int type)
 {
+    int left_ag, right_ag;
+
     switch (type)
     {
-        case AUDIO_GAIN_MIC: 
-            uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) | VGA_GAIN(left));
+        case AUDIO_GAIN_MIC:
+            left_ag = MIN(MAX(0, left / 4), 15);
+            left -= left_ag * 4;
+            uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) 
+                                        | VGA_GAIN(left_ag));
+            uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(left));
+            logf("Mic: %dA/%dD", left_ag, left);
         break;
         
         case AUDIO_GAIN_LINEIN:
-            uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK) | PGA_GAINL(left) | PGA_GAINR(right));
-        break;
-        
-        case AUDIO_GAIN_DECIMATOR:
+            left_ag = MIN(MAX(0, left / 6), 8);
+            left -= left_ag * 6;
+            right_ag = MIN(MAX(0, right / 6), 8);
+            right -= right_ag * 6;
+            uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK)
+                                        | PGA_GAINL(left_ag) | PGA_GAINR(right_ag));
             uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(right));
+            logf("Line L: %dA/%dD", left_ag, left);
+            logf("Line R: %dA/%dD", right_ag, right);
         break;
     }
 }

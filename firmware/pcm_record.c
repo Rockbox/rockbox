@@ -348,12 +348,11 @@ void audio_set_recording_options(int frequency, int quality,
  * Note that microphone is mono, only left value is used 
  * See uda1380_set_recvol() for exact ranges.
  *
- * @param type   0=line-in (radio), 1=mic, 2=ADC
+ * @param type   0=line-in (radio), 1=mic
  * 
  */
 void audio_set_recording_gain(int left, int right, int type)
 {
-    //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
     uda1380_set_recvol(left, right, type);
 }
 

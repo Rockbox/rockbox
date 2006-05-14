@@ -229,12 +229,6 @@ struct user_settings
     int rec_mic_gain; /* 0-15 */
     int rec_left_gain; /* 0-15 */
     int rec_right_gain; /* 0-15 */
-#ifdef HAVE_UDA1380
-    int rec_linein_decimator_left_gain; /* -128 .. 48 */
-    int rec_linein_decimator_right_gain; /* -128 .. 48 */
-    int rec_mic_decimator_left_gain; /* -128 .. 48 */
-    int rec_mic_decimator_right_gain; /* -128 .. 48 */
-#endif    
     bool rec_editable; /* true means that the bit reservoir is off */
 
     /* note: timesplit setting is not saved */

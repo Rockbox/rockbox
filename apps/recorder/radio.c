@@ -385,18 +385,16 @@ bool radio_screen(void)
                                global_settings.rec_prerecord_time);
 
     
-    audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                            sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
 #else
     peak_meter_enabled = false;
     uda1380_enable_recording(false);
-    uda1380_set_recvol(10, 10, AUDIO_GAIN_DECIMATOR);
-    uda1380_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
     uda1380_set_monitor(true);
 
     /* Set the input multiplexer to FM */
     pcm_rec_mux(1);
 #endif
+    audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                            sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
 #endif
 
     curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
