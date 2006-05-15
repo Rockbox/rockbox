@@ -89,7 +89,7 @@ static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
-static int filehandle; /* global, so the MMC variant can keep the file open */
+static int filehandle = -1; /* global, so the MMC variant can keep the file open */
 static unsigned char* p_silence; /* VOICE_PAUSE clip, used for termination */
 static long silence_len; /* length of the VOICE_PAUSE clip */
 static unsigned char* p_lastclip; /* address of latest clip, for silence add */
@@ -466,6 +466,14 @@ void talk_init(void)
         return;
     }
 
+#ifdef HAVE_MMC
+    if (filehandle >= 0) /* MMC: An old voice file might still be open */
+    {
+        close(filehandle);
+        filehandle = -1;
+    }
+#endif
+
     talk_initialized = true;
     strncpy((char *) last_lang, (char *)global_settings.lang_file,
         MAX_FILENAME);
@@ -475,14 +483,10 @@ void talk_init(void)
 #endif
     reset_state(); /* use this for most of our inits */
 
-#ifdef HAVE_MMC
-    load_voicefile(); /* load the tables right away */
-    has_voicefile = (p_voicefile != NULL);
-#else
     filehandle = open_voicefile();
     has_voicefile = (filehandle >= 0); /* test if we can open it */
     voicefile_size = 0;
-    
+
     if (has_voicefile)
     {
         voicefile_size = filesize(filehandle);
@@ -492,8 +496,6 @@ void talk_init(void)
         close(filehandle); /* close again, this was just to detect presence */
         filehandle = -1;
     }
-#endif
-
 }
 
 
