@@ -17,8 +17,7 @@
 # A <wps> section can thus mention a "preferred" rwps file to load when that
 # theme is loaded.
 #
-# All sections should list what their smallest LCD size requirements are and
-# what font and status bar setting they "like".
+# All sections should list what font and status bar setting they "like".
 
 <wps>
 # Name of the WPS _including_ extension
