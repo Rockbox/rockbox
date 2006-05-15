@@ -77,6 +77,22 @@ extern const fb_data sudoku_normal[];
 extern const fb_data sudoku_start[];
 extern const fb_data sudoku_inverse[];
 
+/* Default game - used to initialise sudoku.ss if it doesn't exist. */
+static const char default_game[9][9] =
+{
+    { '0','1','0',  '3','0','7', '0','0','4' },
+    { '0','0','0',  '0','6','0', '1','0','2' },
+    { '0','0','0',  '0','8','0', '5','6','0' },
+
+    { '0','6','0',  '0','0','0', '0','2','9' },
+    { '0','0','0',  '5','0','3', '0','0','0' },
+    { '7','9','0',  '0','0','0', '0','3','0' },
+
+    { '0','8','5',  '0','3','0', '0','0','0' },
+    { '1','0','2',  '0','7','0', '0','0','0' },
+    { '0','0','0',  '4','0','8', '0','5','0' },
+};
+
 #if ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
     ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
 /* For iriver H1x0 - 160x128, 9 cells @ 12x12 with 14 border lines*/
@@ -440,12 +456,31 @@ void sudoku_solve(struct sudoku_state_t* state)
     return;
 }
 
+void default_state(struct sudoku_state_t* state)
+{
+    int r,c;
+
+    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+    for (r=0;r<9;r++) {
+        for (c=0;c<9;c++) {
+            state->startboard[r][c]=default_game[r][c];
+            state->currentboard[r][c]=default_game[r][c];
+#ifdef SUDOKU_BUTTON_POSSIBLE 
+            state->possiblevals[r][c]=0;
+#endif
+        }
+    }
+
+    state->x=0;
+    state->y=0;
+    state->editmode=0;
+}
 
 void clear_state(struct sudoku_state_t* state)
 {
     int r,c;
 
-    state->filename[0]=0;
+    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
     for (r=0;r<9;r++) {
         for (c=0;c<9;c++) {
             state->startboard[r][c]='0';
@@ -459,6 +494,65 @@ void clear_state(struct sudoku_state_t* state)
     state->x=0;
     state->y=0;
     state->editmode=0;
+}
+
+/* Check the status of the board, assuming a change at the cursor location */
+bool check_status(struct sudoku_state_t* state)
+{
+    int check[9];
+    int r,c;
+    int r1,c1;
+    int cell;
+
+    /* First, check the column */
+    for (cell=0;cell<9;cell++) {
+        check[cell]=0;
+    }
+    for (r=0;r<9;r++) {
+        cell=state->currentboard[r][state->x];
+        if (cell!='0') {
+            if (check[cell-'1']==1) {
+                return true;
+            }
+            check[cell-'1']=1;
+        }
+    }
+
+    /* Second, check the row */  
+    for (cell=0;cell<9;cell++) {
+        check[cell]=0;
+    }
+    for (c=0;c<9;c++) {
+        cell=state->currentboard[state->y][c];
+        if (cell!='0') {
+            if (check[cell-'1']==1) {
+                return true;
+            }
+            check[cell-'1']=1;
+        }
+    }
+
+    /* Finally, check the 3x3 sub-grid */
+    for (cell=0;cell<9;cell++) {
+        check[cell]=0;
+    }
+    r1=(state->y/3)*3;
+    c1=(state->x/3)*3;
+    for (r=r1;r<r1+3;r++) {
+        for (c=c1;c<c1+3;c++) {
+            cell=state->currentboard[r][c];
+            if (cell!='0') {
+                if (check[cell-'1']==1) {
+                    return true;
+                }
+                check[cell-'1']=1;
+            }
+        }
+    }
+
+    /* We passed all the checks :) */
+
+    return false;
 }
 
 /* Load game - only ".ss" is officially supported, but any sensible
@@ -539,6 +633,15 @@ bool load_sudoku(struct sudoku_state_t* state, char* filename)
         i++;
     }
 
+    /* Check that the board is valid - we need to check every row/column
+       individually, so we check the diagonal from top-left to bottom-right */
+    for (state->x = 0; state->x < 9; state->x++) {
+        state->y = state->x;
+        if (check_status(state)) return false;
+    }
+    state->x = 0;
+    state->y = 0;
+
     /* Save a copy of the saved state - so we can reload without using the
        disk */
     rb->memcpy(state->savedboard,state->currentboard,81);
@@ -553,6 +656,7 @@ bool save_sudoku(struct sudoku_state_t* state)
     char line[13];
     char sep[13];
 
+    rb->splash(0, true, "Saving...");
     rb->memcpy(line,"...|...|...\r\n",13);
     rb->memcpy(sep,"-----------\r\n",13);
 
@@ -773,88 +877,38 @@ void display_board(struct sudoku_state_t* state)
     rb->lcd_update();
 }
 
-/* Check the status of the board, assuming a change at the cursor location */
-bool check_status(struct sudoku_state_t* state)
-{
-    int check[9];
-    int r,c;
-    int r1,c1;
-    int cell;
-
-    /* First, check the column */
-    for (cell=0;cell<9;cell++) {
-        check[cell]=0;
-    }
-    for (r=0;r<9;r++) {
-        cell=state->currentboard[r][state->x];
-        if (cell!='0') {
-            if (check[cell-'1']==1) {
-                return true;
-            }
-            check[cell-'1']=1;
-        }
-    }
-
-    /* Second, check the row */  
-    for (cell=0;cell<9;cell++) {
-        check[cell]=0;
-    }
-    for (c=0;c<9;c++) {
-        cell=state->currentboard[state->y][c];
-        if (cell!='0') {
-            if (check[cell-'1']==1) {
-                return true;
-            }
-            check[cell-'1']=1;
-        }
-    }
-
-    /* Finally, check the 3x3 sub-grid */
-    for (cell=0;cell<9;cell++) {
-        check[cell]=0;
-    }
-    r1=(state->y/3)*3;
-    c1=(state->x/3)*3;
-    for (r=r1;r<r1+3;r++) {
-        for (c=c1;c<c1+3;c++) {
-            cell=state->currentboard[r][c];
-            if (cell!='0') {
-                if (check[cell-'1']==1) {
-                    return true;
-                }
-                check[cell-'1']=1;
-            }
-        }
-    }
-
-    /* We passed all the checks :) */
-
-    return false;
-}
-
-void sudoku_generate(struct sudoku_state_t* state)
+bool sudoku_generate(struct sudoku_state_t* state)
 {
     char* difficulty;
     char str[80];
+    bool res;
+    struct sudoku_state_t new_state;
 
-    clear_state(state);
-    display_board(state);
+    clear_state(&new_state);
+    display_board(&new_state);
     rb->splash(0, true, "Generating...");
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
 
-    sudoku_generate_board(state,&difficulty);
+    res = sudoku_generate_board(&new_state,&difficulty);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
 
-    rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
-    display_board(state);
-    rb->splash(3*HZ, true, str);
-    rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+    if (res) {
+        rb->memcpy(state,&new_state,sizeof(new_state));
+        rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
+        display_board(state);
+        rb->splash(3*HZ, true, str);
+        rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
+    } else {
+        display_board(&new_state);
+        rb->splash(2*HZ, true, "Aborted");
+    }
+    return res;
 }
 
 int sudoku_menu_cb(int key, int m)
@@ -946,6 +1000,44 @@ bool sudoku_menu(struct sudoku_state_t* state)
     return (result==MENU_ATTACHED_USB);
 }
 
+/* Menu used when user is in edit mode - i.e. creating a new game manually */
+int sudoku_edit_menu(struct sudoku_state_t* state)
+{
+    int m;
+    int result;
+
+    static const struct menu_item items[] = {
+        { "Save as", NULL },
+        { "Quit", NULL },
+    };
+    
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                      sudoku_menu_cb, NULL, NULL, NULL);
+
+    result=rb->menu_show(m);
+
+    switch (result) {
+        case 0: /* Save new game */
+            rb->kbd_input(state->filename,MAX_PATH);
+            if (save_sudoku(state)) {
+                state->editmode=0;
+            } else {
+                rb->splash(HZ*2, true, "Save failed");
+            }
+            break;
+
+        case 1: /* Quit */
+            break;
+
+        default:
+            break;
+    }
+
+    rb->menu_exit(m);
+
+    return result;
+}
+
 void move_cursor(struct sudoku_state_t* state, int newx, int newy)
 {
     int oldx, oldy;
@@ -975,6 +1067,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     bool exit;
     int button;
     int lastbutton = BUTTON_NONE;
+    int res;
     long ticks;
     struct sudoku_state_t state;
 
@@ -987,8 +1080,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (parameter==NULL) {
         /* We have been started as a plugin - try default sudoku.ss */
         if (!load_sudoku(&state,GAME_FILE)) {
-            /* No previous game saved, generate one */
-            sudoku_generate(&state);
+            /* No previous game saved, use the default */
+            default_state(&state);
         }
     } else {
         if (!load_sudoku(&state,(char*)parameter)) {
@@ -1009,7 +1102,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef SUDOKU_BUTTON_QUIT
             /* Exit game */
             case SUDOKU_BUTTON_QUIT:
-                exit=1;
+                if (check_status(&state)) {
+                    rb->splash(HZ*2, true, "Illegal move!");
+                    /* Ignore any button presses during the splash */
+                    rb->button_clear_queue();
+                } else {
+                    save_sudoku(&state);
+                    exit=1;
+                }
                 break;
 #endif
 
@@ -1047,7 +1147,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                         if (state.currentboard[state.y][state.x]=='9') { 
                             state.currentboard[state.y][state.x]='0';
                         } else {
-              state.currentboard[state.y][state.x]++;
+                            state.currentboard[state.y][state.x]++;
                         }
                     }
                 }
@@ -1157,11 +1257,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                     rb->button_clear_queue();
                 } else {
                     if (state.editmode) {
-                        rb->kbd_input(state.filename,MAX_PATH);
-                        if (save_sudoku(&state)) {
-                            state.editmode=0;
-                        } else {
-                            rb->splash(HZ*2, true, "Save failed");
+                        res = sudoku_edit_menu(&state);
+                        if (res == MENU_ATTACHED_USB) {
+                            return PLUGIN_USB_CONNECTED;
+                        } else if (res == 1) { /* Quit */
+                            return PLUGIN_OK;
                         }
                     } else {
                         if (sudoku_menu(&state)) {

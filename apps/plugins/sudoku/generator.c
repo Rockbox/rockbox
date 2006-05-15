@@ -1056,9 +1056,14 @@ select_template( void )
     init_template( i );
 }
 
+static bool check_buttons(void)
+{
+    int button = rb->button_get(false);
+    return (button && (!(button & BUTTON_REL)) && (!(button & BUTTON_REPEAT)));
+}
 
 static
-void
+bool
 generate( void )
 {
     static int digits[ 9 ];
@@ -1066,6 +1071,10 @@ generate( void )
     int i;
 
 start:
+    /* Allow the user to abort generation by pressing any button */
+    if (check_buttons())
+        return false;
+
     for( i = 0 ; i < 9 ; ++i )
         digits[ i ] = i + 1;
 
@@ -1081,10 +1090,18 @@ start:
     for( i = 0 ; i < len_tmplt ; ++i )
         fill( tmplt[ i ], digits[ i % 9 ] );
 
+    /* Allow the user to abort generation by pressing any button */
+    if (check_buttons())
+        return false;
+
     rb->yield();
 
     if( 0 != solve( ) || idx_history < 81 )
         goto start;
+
+    /* Allow the user to abort generation by pressing any button */
+    if (check_buttons())
+        return false;
 
     rb->yield();
 
@@ -1105,6 +1122,8 @@ start:
         goto start;
 
     clear_moves( );
+
+    return true;
 }
 
 bool sudoku_generate_board(struct sudoku_state_t* state, char** difficulty)
@@ -1113,7 +1132,12 @@ bool sudoku_generate_board(struct sudoku_state_t* state, char** difficulty)
 
     rb->srand(*rb->current_tick);
 
-    generate();
+    rb->button_clear_queue();
+
+    if (!generate()) {
+        /* User has aborted with a button press */
+        return false;
+    }
 
     i=0;
     for (r=0;r<9;r++) {
