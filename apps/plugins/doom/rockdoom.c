@@ -859,6 +859,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
 #ifdef USE_IRAM
+   /* We need to stop audio playback in order to use IRAM */
+   rb->audio_stop();
+
    memcpy(iramstart, iramcopy, iramend-iramstart);
    memset(iedata, 0, iend - iedata);
 #endif
