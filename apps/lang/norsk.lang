@@ -70,7 +70,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -168,13 +168,13 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
   </source>
   <dest>
-    *: "mislykket"
+    *: "Mislykket"
   </dest>
   <voice>
     *: ""
@@ -182,13 +182,13 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Siste bokmerker"
+    *: "Nyeste bokmerker"
   </dest>
   <voice>
     *: "Recent Bookmarks"
@@ -224,13 +224,13 @@
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Styr innstillinger"
+    *: "Behandle innstillinger"
   </dest>
   <voice>
     *: "Manage Settings"
@@ -238,7 +238,7 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_THEME
-  desc: Custom themes menu
+  desc: in the main menu
   user:
   <source>
     *: "Browse Themes"
@@ -252,7 +252,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
@@ -280,7 +280,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
@@ -294,13 +294,13 @@
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
   </source>
   <dest>
-    *: "Bla igjennom plugin-er"
+    *: "Bla igjennom instikkprogram"
   </dest>
   <voice>
     *: "Browse Plugins"
@@ -507,7 +507,7 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Stereobredde"
@@ -563,7 +563,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
     *: "Super-bass"
@@ -619,7 +619,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
     *: "MDB-senterfrekvens"
@@ -644,7 +644,7 @@
 </phrase>
 <phrase>
   id: LANG_CROSSFEED
-  desc: in the sound settings menu
+  desc: in sound settings
   user:
   <source>
     *: "Crossfeed"
@@ -955,7 +955,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Innspillingskjerm"
@@ -1028,7 +1028,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Sett inn kataloger rekursivt"
+    *: "Sett inn mappeer rekursivt"
   </dest>
   <voice>
     *: "Recursively Insert Directories"
@@ -1036,7 +1036,7 @@
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
@@ -1050,7 +1050,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1064,7 +1064,7 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
@@ -1078,7 +1078,7 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1179,7 +1179,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </source>
   <dest>
     *: "Start avspilling ved oppstart"
@@ -1193,7 +1193,7 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
     *: "Spol forover/bakover"
@@ -1221,7 +1221,7 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
     *: "Fade ut ved stopp/pause"
@@ -1238,7 +1238,7 @@
     *: "Crossfade"
   </source>
   <dest>
-    *: "Kryssfade"
+    *: "Overtoning"
   </dest>
   <voice>
     *: "Crossfade"
@@ -1252,7 +1252,7 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "Avspillingsnivå"
   </dest>
   <voice>
     *: "Replaygain"
@@ -1263,7 +1263,7 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep volume"
+    *: "Beep Volume"
   </source>
   <dest>
     *: "Pip-volum"
@@ -1319,7 +1319,7 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical output"
+    *: "Optical Output"
   </source>
   <dest>
     *: "Optisk utgang"
@@ -1333,10 +1333,10 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "ID3-data-prioritet"
+    *: "ID3-lappprioritet"
   </dest>
   <voice>
     *: "ID3 tag priority"
@@ -1375,10 +1375,10 @@
   desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user:
   <source>
-    *: "Auto change directory"
+    *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Bytt katalog automatisk"
+    *: "Bytt mappe automatisk"
   </dest>
   <voice>
     *: "Auto change directory"
@@ -1389,7 +1389,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data (experimental)"
   </source>
   <dest>
     *: "Samle bruksdata (eksperimentelt)"
@@ -1420,7 +1420,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Sortere kataloger"
+    *: "Sortere mapper"
   </dest>
   <voice>
     *: "sort directories"
@@ -1459,10 +1459,10 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
-    *: "etter dato"
+    *: "Etter dato"
   </dest>
   <voice>
     *: "by date"
@@ -1473,10 +1473,10 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
-    *: "etter nyeste dato"
+    *: "Etter nyeste dato"
   </dest>
   <voice>
     *: "by newest date"
@@ -1487,10 +1487,10 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
-    *: "etter type"
+    *: "Etter type"
   </dest>
   <voice>
     *: "by type"
@@ -1568,13 +1568,13 @@
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
-    *: "ID3-database"
+    *: "Spordatabase"
   </dest>
   <voice>
     *: "ID3 database"
@@ -1781,10 +1781,10 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Russian (CP1251)"
+    *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Russisk (CP1251)"
+   *: "Cyrillisk (CP1251)"
   </dest>
   <voice>
     *: ""
@@ -1904,7 +1904,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -2148,7 +2148,7 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Uttale katalognavn"
+    *: "Uttale mappenavn"
   </dest>
   <voice>
     *: "Voice Directories"
@@ -2170,7 +2170,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -2184,7 +2184,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -2198,7 +2198,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -2313,7 +2313,7 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
     *: "Uavhengige rammer"
@@ -2341,7 +2341,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Forinnspillingstid"
@@ -2358,7 +2358,7 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Katalog"
+    *: "Mappe"
   </dest>
   <voice>
     *: "Directory"
@@ -2369,10 +2369,10 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
-    *: "Nåværende katalog"
+    *: "Nåværende mappe"
   </dest>
   <voice>
     *: "Current directory"
@@ -2380,10 +2380,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
     *: "Vis innspillingsskjerm ved oppstart"
@@ -2439,10 +2439,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Enable crossfade"
+    *: "Enable Crossfade"
   </source>
   <dest>
-    *: "Slå på kryssfading"
+    *: "Slå på overtoning"
   </dest>
   <voice>
     *: "Enable crossfade"
@@ -2453,10 +2453,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in delay"
+    *: "Fade-In Delay"
   </source>
   <dest>
-    *: "Fade inn-forsinkelse"
+    *: "Inntoningsforsinkelse"
   </dest>
   <voice>
     *: "Fade in delay"
@@ -2467,10 +2467,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in duration"
+    *: "Fade-In Duration"
   </source>
   <dest>
-    *: "Fade inn-lengde"
+    *: "Inntoningslengde"
   </dest>
   <voice>
     *: "Fade in duration"
@@ -2481,10 +2481,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out delay"
+    *: "Fade-Out Delay"
   </source>
   <dest>
-    *: "Fade ut-forsinkelse"
+    *: "Uttoningsforsinkelse"
   </dest>
   <voice>
     *: "Fade out delay"
@@ -2495,10 +2495,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out duration"
+    *: "Fade-Out Duration"
   </source>
   <dest>
-    *: "Fade ut-lengde"
+    *: "Uttoningslengde"
   </dest>
   <voice>
     *: "Fade out duration"
@@ -2509,10 +2509,10 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out mode"
+    *: "Fade-Out Mode"
   </source>
   <dest>
-    *: "Fade ut-modus"
+    *: "Uttoningsmodus"
   </dest>
   <voice>
     *: "Fade out mode"
@@ -2537,10 +2537,10 @@
   desc: in replaygain
   user:
   <source>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </source>
   <dest>
-    *: "Slå på replaygain"
+    *: "Slå på avspillingsnivå"
   </dest>
   <voice>
     *: "Enable replaygain"
@@ -2551,7 +2551,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
     *: "Forhindre forvrengning"
@@ -2565,10 +2565,10 @@
   desc: in replaygain
   user:
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain-type"
+    *: "Avspillingsnivåtype"
   </dest>
   <voice>
     *: "Replaygain type"
@@ -2579,7 +2579,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
     *: "Albumnivå"
@@ -2593,7 +2593,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
     *: "Spornivå"
@@ -2607,10 +2607,10 @@
   desc: use track gain if shuffle mode is on, album gain otherwise
   user:
   <source>
-    *: "Track gain if shuffling"
+    *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Spornivå hvis omstokket"
+    *: "Bruk spornivå bare i omstokket modus"
   </dest>
   <voice>
     *: "Track gain if shuffling"
@@ -2649,10 +2649,10 @@
   desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Skjermlys ved tilkoblet strøm"
+    *: "Skjermlys (Når strøm er koblet til)"
   </dest>
   <voice>
     *: "Backlight When Plugged"
@@ -2663,7 +2663,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
     *: "Skjermlys ved sangbytte"
@@ -2677,10 +2677,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </source>
   <dest>
-    *: "Blend inn skjermlys"
+    *: "Ton inn skjermlys"
   </dest>
   <voice>
     *: "Backlight fade in"
@@ -2691,10 +2691,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </source>
   <dest>
-    *: "Blend ut skjermlys"
+    *: "Ton ut skjermlys"
   </dest>
   <voice>
     *: "Backlight fade out"
@@ -2817,10 +2817,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar(Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Felt(invers)"
+    *: "Felt(Invers)"
   </dest>
   <voice>
     *: "Inverse Bar"
@@ -2831,10 +2831,10 @@
   desc: in remote lcd settings menu
   user:
   <source>
-    *: "Reduce ticking"
+    *: "Reduce Ticking"
   </source>
   <dest>
-    *: "Reduser tikking"
+    *: "Minsk tikking"
   </dest>
   <voice>
     *: "Reduce ticking"
@@ -2929,7 +2929,7 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
     *: "Hopprulling"
@@ -2940,7 +2940,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
@@ -2999,7 +2999,7 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Knappefelt"
@@ -3153,10 +3153,10 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
-    *: "Logaritmisk(dB)"
+    *: "Logaritmisk (dB)"
   </dest>
   <voice>
     *: "Logarithmic decibel"
@@ -3167,10 +3167,10 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
-    *: "Lineær(%)"
+    *: "Lineær (%)"
   </dest>
   <voice>
     *: "Linear percent"
@@ -3293,10 +3293,10 @@
   desc: in directory cache settings
   user:
   <source>
-    *: "Directory cache"
+    *: "Directory Cache"
   </source>
   <dest>
-    *: "Forhåndsles katalogstruktur"
+    *: "Forhåndsles mappestruktur"
   </dest>
   <voice>
     *: "Directory cache"
@@ -3324,7 +3324,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Leser katalogstruktur..."
+    *: "Leser mappestruktur..."
   </dest>
   <voice>
     *: ""
@@ -3391,10 +3391,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Maks. filer i filliste"
+    *: "Største antall filer i filliste"
   </dest>
   <voice>
     *: "Max files in directory browser"
@@ -3405,10 +3405,10 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Maks. spillelistestørrelse"
+    *: "Største spillelistestørrelse"
   </dest>
   <voice>
     *: "Max playlist size"
@@ -3444,7 +3444,6 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
   user:
   <source>
     *: "Show ID3 Info"
@@ -3461,7 +3460,7 @@
   desc: in wps context menu
   user:
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
     *: "Sett sangbedømmelse"
@@ -3492,7 +3491,7 @@
     *: "Rename"
   </source>
   <dest>
-    *: "Endre navn"
+    *: "Gi nytt navn"
   </dest>
   <voice>
     *: "Rename"
@@ -3517,10 +3516,10 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
-    *: "Slett katalog"
+    *: "Slett mappe"
   </dest>
   <voice>
     *: "delete directory"
@@ -3559,10 +3558,10 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "Åpne med"
+    *: "Åpne med..."
   </dest>
   <voice>
     *: "open with"
@@ -3573,10 +3572,10 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
-    *: "Lag katalog"
+    *: "Lag mappe"
   </dest>
   <voice>
     *: "Create directory"
@@ -3786,7 +3785,7 @@
     *: "Battery: Charging"
   </source>
   <dest>
-    *: "Batteri: lader"
+    *: "Batteri: ader"
   </dest>
   <voice>
     *: ""
@@ -4231,7 +4230,7 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
     *: "Tastelås er PÅ"
@@ -4245,7 +4244,7 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
     *: "Tastelås er AV"
@@ -4273,7 +4272,7 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
     *: "Tidsdeling:"
@@ -4301,7 +4300,7 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Forinnspilling"
@@ -4332,7 +4331,7 @@
     *: "Gain Left"
   </source>
   <dest>
-    *: "Forsterkning venstre"
+    *: "Nivå venstre"
   </dest>
   <voice>
     *: ""
@@ -4346,7 +4345,7 @@
     *: "Gain Right"
   </source>
   <dest>
-    *: "Forsterkning høyre"
+    *: "Nivå venstre"
   </dest>
   <voice>
     *: ""
@@ -4413,7 +4412,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start above"
+    *: "Start Above"
   </source>
   <dest>
     *: "Start over"
@@ -4441,10 +4440,10 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop below"
+    *: "Stop Below"
   </source>
   <dest>
-    *: "Start under"
+    *: "Stopp under"
   </dest>
   <voice>
     *: ""
@@ -4469,10 +4468,10 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit gap"
+    *: "Presplit Gap"
   </source>
   <dest>
-    *: "Førsplitt-mellomrom"
+    *: "Førsplittingsmellomrom"
   </dest>
   <voice>
     *: ""
@@ -4497,7 +4496,7 @@
   desc: waiting for threshold
   user:
   <source>
-    *: "Trigger idle"
+    *: "Trigger Idle"
   </source>
   <dest>
     *: "Utløser venter"
@@ -4511,7 +4510,7 @@
   desc: 
   user:
   <source>
-    *: "Trigger active"
+    *: "Trigger Active"
   </source>
   <dest>
     *: "Utløser aktiv"
@@ -4584,7 +4583,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "PLAY=Sett AV=Avbryt"
+    *: "SPILL=Sett AV=Avbryt"
   </dest>
   <voice>
     *: ""
@@ -4606,7 +4605,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -4620,7 +4619,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -4634,7 +4633,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -4648,13 +4647,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Spornum]"
+    *: "[Spornummer]"
   </dest>
   <voice>
     *: ""
@@ -4662,7 +4661,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -4676,7 +4675,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -4690,7 +4689,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
@@ -4704,7 +4703,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
@@ -4746,7 +4745,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -4760,10 +4759,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Track gain]"
+    *: "[Track Gain]"
   </source>
   <dest>
     *: "[Spornivå]"
@@ -4774,10 +4773,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Album gain]"
+    *: "[Album Gain]"
   </source>
   <dest>
     *: "[Albumnivå]"
@@ -4788,7 +4787,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -4802,13 +4801,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
   </source>
   <dest>
-    *: "<Ingen info>"
+    *: "<Ingen informasjon>"
   </dest>
   <voice>
     *: ""
@@ -6412,13 +6411,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Spilleliste Full buffer"
+    *: "Spillelistebufferet er fullt"
   </dest>
   <voice>
     *: ""
@@ -6429,10 +6428,10 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
-    *: "Liste ferdig"
+    *: "Listen er ferdig"
   </dest>
   <voice>
     *: ""
@@ -6443,7 +6442,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
     *: "Spillelisten er ferdig"
@@ -6558,7 +6557,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Feil under aksessering av spillelistefil"
+    *: "Problemer med tilgang til spillelistefilen"
   </dest>
   <voice>
     *: ""
@@ -6572,7 +6571,7 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Feil under aksessering av spillelistekontrollfil"
+    *: "Problemer med tilgang til spillelistekontrollfilen"
   </dest>
   <voice>
     *: ""
@@ -6586,7 +6585,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Feil under aksessering av kagalog"
+    *: "Problemer med tilgang til mappe
   </dest>
   <voice>
     *: ""
@@ -6600,7 +6599,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Spillelistekontrollfil er ugyldig"
+    *: "Spillelistekontrollfilen er ugyldig"
   </dest>
   <voice>
     *: ""
@@ -6639,7 +6638,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Add preset"
+    *: "Add Preset"
   </source>
   <dest>
     *: "Legg til kanalinnstilling"
@@ -6653,10 +6652,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
-    *: "Editere kanalinnstilling"
+    *: "Rediger kanalinnstilling"
   </dest>
   <voice>
     *: ""
@@ -6667,7 +6666,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
     *: "Fjern forhåndsinnstilling"
@@ -6681,10 +6680,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
-    *: "Lagring av kanalinnstilling feilet"
+    *: "Kunne ikke lagre kanalinstilling"
   </dest>
   <voice>
     *: ""
@@ -6695,7 +6694,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
     *: "Kanalinnstillingslisten er full"
@@ -6776,7 +6775,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -6821,7 +6820,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Auto scan presets"
+    *: "Auto-Scan Presets"
   </source>
   <dest>
     *: "Autosøk kanalinnstillinger"
@@ -6835,10 +6834,10 @@
   desc: confirmation if presets can be cleared
   user:
   <source>
-    *: "Clear current presets?"
+    *: "Clear Current Presets?"
   </source>
   <dest>
-    *: "Fjern nåværende kanalinnstilling?"
+    *: "Fjern nåværende kanalinnstillinger?"
   </dest>
   <voice>
     *: ""
@@ -6961,10 +6960,10 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Katalogbuffer er full!"
+    *: "mappeffereret full!"
   </dest>
   <voice>
     *: ""
@@ -6992,7 +6991,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Innstillinger Lastet"
+    *: "Innstillingene var lastet"
   </dest>
   <voice>
     *: ""
@@ -7006,7 +7005,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Innstillinger Lagret"
+    *: "Innstillingene var lagret"
   </dest>
   <voice>
     *: ""
@@ -7227,10 +7226,10 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+    *: "Move Failed"
   </source>
   <dest>
-    *: "Flytt feilet"
+    *: "Kunne ikke flytte"
   </dest>
   <voice>
     *: ""
@@ -7269,7 +7268,7 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
     *: "Kun spornavn"
@@ -7283,7 +7282,7 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
     *: "Full sti"
@@ -7426,7 +7425,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Plugin-navn for langt"
+    *: "Plugin-navnet er for langt"
   </dest>
   <voice>
     *: ""
@@ -7440,7 +7439,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Filtypestrengbuffer tom"
+    *: "Filtypestrengbuffer er tomt"
   </dest>
   <voice>
     *: ""
@@ -7454,9 +7453,1026 @@
     *: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "(PLAY/STOP)"
+    *: "(SPILL/STOPP)"
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Lagre endringer?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Avanserte lydbalanseinstillinger"
+  </dest>
+  <voice>
+    *: "Advanced equalizer settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Advar når den dynamiske spillelisten slettes"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Oppdaterer spordatabase"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Grafisk lydbalanse"
+  </dest>
+  <voice>
+    *: "Graphical equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: "Clear Backdrop"
+  </source>
+  <dest>
+    *: "Rens bakgrunn"
+  </dest>
+  <voice>
+    *: "Clear Backdrop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Bakgrunnsfarge"
+  </dest>
+  <voice>
+    *: "Background Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Q"
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Legg til tilfeldig i køen"
+  </dest>
+  <voice>
+    *: "Queue shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Lim inn"
+  </dest>
+  <voice>
+    *: "Paste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Forhåndskutting"
+  </dest>
+  <voice>
+    *: "Pre-cut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Keep on Disk"
+  </source>
+  <dest>
+    *: "Behold på disken"
+  </dest>
+  <voice>
+    *: "Keep on Disk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Slett dynamisk spilleliste?"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Forgrunnsfarge"
+  </dest>
+  <voice>
+    *: "Foreground Colour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Det første tastetrykket slår bare på lyset"
+  </dest>
+  <voice>
+    *: "First Keypress Enables Backlight Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Hovedenhet og fjernkontroll"
+  </dest>
+  <voice>
+    *: "Main and remote unit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "piksler"
+  </dest>
+  <voice>
+    *: "pixels"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "keyboard"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Lagre lydbalanseinnstilling"
+  </dest>
+  <voice>
+    *: "Save equalizer preset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Bare hovedenheten"
+  </dest>
+  <voice>
+    *: "Main unit only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Last forhåndsinstillingsliste"
+  </dest>
+  <voice>
+    *: "Load Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Last inn i RAMmen"
+  </dest>
+  <voice>
+    *: "Load to RAM"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Kopier"
+  </dest>
+  <voice>
+    *: "Copy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Pitsj"
+  </dest>
+  <voice>
+    *: "Pitch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Skjermrullingstrinnstørrelse"
+  </dest>
+  <voice>
+    *: "Screen Scroll Step Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Siderulling"
+  </dest>
+  <voice>
+    *: "Paged scrolling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Høyfrekvensavkutting"
+  </dest>
+  <voice>
+    *: "High-frequency cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Forhåndsstillingsliste"
+  </dest>
+  <voice>
+    *: "Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Skal skjermen kunne rulle ut av syne"
+  </dest>
+  <voice>
+    *: "Screen Scrolls Out Of View"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Ugyldig farge"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Force Tag Cache Update"
+  </source>
+  <dest>
+    *: "Tving oppdatering av spordatabase"
+  </dest>
+  <voice>
+    *: "Force Tag Cache Update"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_DIGITAL
+  desc: in the recording screen
+  user:
+  <source>
+    *: "D"
+  </source>
+  <dest>
+    *: "D"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Lengde]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Sjangre"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Søk i spillelisten"
+  </dest>
+  <voice>
+    *: "Search In Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Festmodus"
+  </dest>
+  <voice>
+    *: "Party Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: "Backdrop Failed"
+  </source>
+  <dest>
+    *: "Kunne ikke laste inn bakgrunnsbilde"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Bare fjernkontroll"
+  </dest>
+  <voice>
+    *: "Remote unit only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Fila/Mappa finnes. Skriv over?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Avkuttingsfrekvens"
+  </dest>
+  <voice>
+    *: "Cutoff Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Klippelys"
+  </dest>
+  <voice>
+    *: "Clipping Light"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Gå tilbake til standardfarger"
+  </dest>
+  <voice>
+    *: "Reset Colours"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Fant ikke noe oppsett, autoskann?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "RGB"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Søker... %d funnet (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "Nivå for %d Hz båndet "
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Bare ved sporbytte"
+  </dest>
+  <voice>
+    *: "Track Skip Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Center Frequency"
+  </source>
+  <dest>
+    *: "Midtfrekvens"
+  </dest>
+  <voice>
+    *: "Center frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Slett forhåndsvisningsliste"
+  </dest>
+  <voice>
+    *: "Clear Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Nytt tastatur"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Spordatabase"
+  </dest>
+  <voice>
+    *: "Tag Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Overtoningsnivå"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Nivå"
+  </dest>
+  <voice>
+    *: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Lagre forhåndsvalg"
+  </dest>
+  <voice>
+    *: "Save Preset List"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: 
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Enkle lydbalanseinnstillinger"
+  </dest>
+  <voice>
+    *: "Simple equalizer settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Lavhyllefilter"
+  </dest>
+  <voice>
+    *: "Low shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Redigeringsmodus Edit mode: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Høyfrekvensdemping"
+  </dest>
+  <voice>
+    *: "High-frequency attenuation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Bruk lydbalanse"
+  </dest>
+  <voice>
+    *: "Enable equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Klipp ut"
+  </dest>
+  <voice>
+    *: "Cut"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "Høyhyllefilter"
+  </dest>
+  <voice>
+    *: "High shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Bla igjennom lydbalanseforhåndsvalg"
+  </dest>
+  <voice>
+    *: "Browse equalizer presets"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Lydbalanse"
+  </dest>
+  <voice>
+    *: "Equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_ANALOG
+  desc: in the recording screen
+  user:
+  <source>
+    *: "A"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: "Lastet bakgrunnsbilde"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: "Set As Backdrop"
+  </source>
+  <dest>
+    *: "Bruk som bakgrunn"
+  </dest>
+  <voice>
+    *: "Set As Backdrop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direktenivå"
+  </dest>
+  <voice>
+    *: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Tindfilter %d"
+  </dest>
+  <voice>
+    *: "Peak filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Updaterer i bakgrunnen"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Alle spor>"
+  </dest>
+  <voice>
+    *: "All tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Sportdatabasen er ikke klar"
+  </dest>
+  <voice>
+    *: "Tagcache is not ready"
   </voice>
 </phrase>
