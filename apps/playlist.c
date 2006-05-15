@@ -2835,10 +2835,14 @@ int playlist_insert_directory(struct playlist_info* playlist,
 
     display_playlist_count(count, count_str);
 
+    cpu_boost(true);
+
     result = add_directory_to_playlist(playlist, dirname, &position, queue,
         &count, recurse);
 
     sync_control(playlist, false);
+
+    cpu_boost(false);
 
     display_playlist_count(count, count_str);
 
@@ -2900,6 +2904,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     display_playlist_count(count, count_str);
 
+    cpu_boost(true);
+
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
         /* user abort */
@@ -2956,6 +2962,8 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
         *temp_ptr = '/';
 
     sync_control(playlist, false);
+
+    cpu_boost(false);
 
     display_playlist_count(count, count_str);
 
@@ -3302,6 +3310,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
     display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));
 
+    cpu_boost(true);
+
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
     {
@@ -3392,6 +3402,8 @@ int playlist_save(struct playlist_info* playlist, char *filename)
        mutex_unlock(&playlist->control_mutex);
 
     }
+
+    cpu_boost(false);
 
     return result;
 }
