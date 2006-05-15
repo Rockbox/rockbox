@@ -132,7 +132,12 @@ sub copywps {
            }
            close(WPSFILE);
 
-           if (-e "$dir/$wpsdir") {
+           if (-e "$dir/$wps_prefix/$req_g") {
+              foreach $file (@filelist) {
+                  system("cp $dir/$wps_prefix/$req_g/$file .rockbox/wps/$wps_prefix/");
+              }
+           } 
+           elsif (-e "$dir/$wps_prefix") {
               foreach $file (@filelist) {
                   system("cp $dir/$wps_prefix/$file .rockbox/wps/$wps_prefix/");
               }
@@ -239,8 +244,9 @@ while(<WPS>) {
 	    foreach $d (@depthlist) {
                 next if ($d > $rdepth); 
 
-    	        $req_g_wps = $wps_prefix . "." .  $rwidth . "x" . $rheight
-                     . "x" . $d . ".wps";
+    	        $req_g = $rwidth . "x" . $rheight . "x" . $d;
+
+    	        $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
 		last if (-e "$wpsdir/$req_g_wps"); 
             } 
             $req_t_wps = $wps_prefix . ".txt" . ".wps";
