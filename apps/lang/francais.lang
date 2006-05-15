@@ -13,7 +13,7 @@
 #    Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005,Avr 2006 
+#    Nov 2005, Avr 2006, Mai 2006
 
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -1062,7 +1062,7 @@
     *: "Options EQ Simples"
   </dest>
   <voice>
-    *: "Options EQ simples"
+    *: "Options equaliseur simples"
   </voice>
 </phrase>
 <phrase>
@@ -1076,7 +1076,7 @@
     *: "Options EQ Avancées"
   </dest>
   <voice>
-    *: "Options EQ avancées"
+    *: "Options equaliseur avancées"
   </voice>
 </phrase>
 <phrase>
@@ -1090,7 +1090,7 @@
     *: "Sauvegarder Config. EQ"
   </dest>
   <voice>
-    *: "Sauvegarder la configuration EQ"
+    *: "Sauvegarder la configuration equaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1104,7 +1104,7 @@
     *: "Sélectionner une Config. EQ"
   </dest>
   <voice>
-    *: "Sélectionner une configuration EQ"
+    *: "Sélectionner une configuration equaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1272,7 +1272,7 @@
     *: "Enregistrer la Liste Courante"
   </dest>
   <voice>
-    *: "Enregistrer liste de lecture courante"
+    *: "Enregistrer la liste de lecture courante"
   </voice>
 </phrase>
 <phrase>
@@ -1524,7 +1524,7 @@
     *: "Fondu-Enchaîné"
   </dest>
   <voice>
-    *: "Fondu-Enchaîné"
+    *: "Fondu-enchaîné"
   </voice>
 </phrase>
 <phrase>
@@ -1745,7 +1745,7 @@
     *: "Committing tagcache"
   </source>
   <dest>
-    *: "Ecriture TagCache"
+    *: "Ecriture CacheTag"
   </dest>
   <voice>
     *: ""
@@ -1944,7 +1944,7 @@
     *: "Base de Données Tags"
   </dest>
   <voice>
-    *: "base de données des Tags"
+    *: "Base de données des tags"
   </voice>
 </phrase>
 <phrase>
@@ -2476,7 +2476,7 @@
     *: "Maintenir Liste des Derniers Signets?"
   </dest>
   <voice>
-    *: "Maintenir une Liste des derniers signets?"
+    *: "Maintenir une liste des derniers signets?"
   </voice>
 </phrase>
 <phrase>
@@ -2658,7 +2658,7 @@
     *: "Entrée/Sortie Numérique"
   </dest>
   <voice>
-    *: "Entrée Sortie numérique"
+    *: "Entrée et sortie numérique"
   </voice>
 </phrase>
 <phrase>
@@ -3050,7 +3050,7 @@
     *: "Gain par Piste quand Lecture Aléatoire"
   </dest>
   <voice>
-    *: "Gain par piste quand lecture aléatoire "
+    *: "Gain par piste quand lecture aléatoire"
   </voice>
 </phrase>
 <phrase>
@@ -3400,7 +3400,7 @@
     *: "Taille du Pas de Défilement"
   </dest>
   <voice>
-    *: "Taille du Pas de défilement"
+    *: "Taille du pas de défilement"
   </voice>
 </phrase>
 <phrase>
@@ -3708,7 +3708,7 @@
     *: "Logarithmique (dB)"
   </dest>
   <voice>
-    *: "Logarithmique en décibels"
+    *: "Logarithmique, en décibels"
   </voice>
 </phrase>
 <phrase>
@@ -3722,7 +3722,7 @@
     *: "Linéaire (%)"
   </dest>
   <voice>
-    *: "linéaire en pour cent"
+    *: "linéaire, en pour cent"
   </voice>
 </phrase>
 <phrase>
@@ -4097,7 +4097,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fichier ou Dossier Existant. Écraser?"
+    *: "Fichier ou Dossier Existant. Ecraser?"
   </dest>
   <voice>
     *: ""
@@ -5494,10 +5494,10 @@
   desc: in browse_id3
   user:
   <source>
-    *: "(VBR)"
+    *: " (VBR)"
   </source>
   <dest>
-    *: "(VBR)"
+    *: " (VBR)"
   </dest>
   <voice>
     *: ""
@@ -6242,7 +6242,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cent"
+    *: "Cent"
   </voice>
 </phrase>
 <phrase>
@@ -6256,7 +6256,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mille"
+    *: "Mille"
   </voice>
 </phrase>
 <phrase>
@@ -6270,7 +6270,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "Million"
   </voice>
 </phrase>
 <phrase>
@@ -6279,12 +6279,12 @@
   user:
   <source>
     *: ""
-  </source>
+  </source> 
   <dest>
     *: ""
   </dest>
   <voice>
-    *: "milliard"
+    *: "Milliard"
   </voice>
 </phrase>
 <phrase>
@@ -6298,7 +6298,7 @@
     *: ""
   </dest>
   <voice>
-    *: "moins"
+    *: "Moins"
   </voice>
 </phrase>
 <phrase>
@@ -6312,7 +6312,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "Plus"
   </voice>
 </phrase>
 <phrase>
@@ -6326,7 +6326,7 @@
     *: ""
   </dest>
   <voice>
-    *: "millième de seconde"
+    *: "Millième de seconde"
   </voice>
 </phrase>
 <phrase>
@@ -6340,7 +6340,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconde"
+    *: "Seconde"
   </voice>
 </phrase>
 <phrase>
@@ -6354,7 +6354,7 @@
     *: ""
   </dest>
   <voice>
-    *: "secondes"
+    *: "Secondes"
   </voice>
 </phrase>
 <phrase>
@@ -6368,7 +6368,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "Minute"
   </voice>
 </phrase>
 <phrase>
@@ -6382,7 +6382,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "Minutes"
   </voice>
 </phrase>
 <phrase>
@@ -6396,7 +6396,7 @@
     *: ""
   </dest>
   <voice>
-    *: "heure"
+    *: "Heure"
   </voice>
 </phrase>
 <phrase>
@@ -6410,7 +6410,7 @@
     *: ""
   </dest>
   <voice>
-    *: "heures"
+    *: "Heures"
   </voice>
 </phrase>
 <phrase>
@@ -6424,7 +6424,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "Kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -6438,7 +6438,7 @@
     *: ""
   </dest>
   <voice>
-    *: "décibel"
+    *: "Décibel"
   </voice>
 </phrase>
 <phrase>
@@ -6452,7 +6452,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pour cent"
+    *: "Pour cent"
   </voice>
 </phrase>
 <phrase>
@@ -6466,7 +6466,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-ampères par heure"
+    *: "Milli-ampères par heure"
   </voice>
 </phrase>
 <phrase>
@@ -6480,7 +6480,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "Pixel"
   </voice>
 </phrase>
 <phrase>
@@ -6494,7 +6494,7 @@
     *: ""
   </dest>
   <voice>
-    *: "par seconde"
+    *: "Par seconde"
   </voice>
 </phrase>
 <phrase>
@@ -6508,7 +6508,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "Hertz"
   </voice>
 </phrase>
 <phrase>
@@ -6522,7 +6522,7 @@
     *: "B"
   </dest>
   <voice>
-    *: "byte"
+    *: "Byte"
   </voice>
 </phrase>
 <phrase>
@@ -6536,7 +6536,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "Kilobyte"
   </voice>
 </phrase>
 <phrase>
@@ -6550,7 +6550,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "Megabyte"
   </voice>
 </phrase>
 <phrase>
@@ -6564,7 +6564,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "Gigabyte"
   </voice>
 </phrase>
 <phrase>
@@ -6578,7 +6578,7 @@
     *: "."
   </dest>
   <voice>
-    *: "point"
+    *: "Point"
   </voice>
 </phrase>
 <phrase>
@@ -6956,7 +6956,7 @@
     *: ""
   </dest>
   <voice>
-    *: "point"
+    *: "Point"
   </voice>
 </phrase>
 <phrase>
@@ -6984,7 +6984,7 @@
     *: ""
   </dest>
   <voice>
-    *: "fichier"
+    *: "Fichier"
   </voice>
 </phrase>
 <phrase>
@@ -6998,7 +6998,7 @@
     *: ""
   </dest>
   <voice>
-    *: "répertoire"
+    *: "Répertoire"
   </voice>
 </phrase>
 <phrase>
@@ -7012,7 +7012,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "Audio"
   </voice>
 </phrase>
 <phrase>
@@ -7026,7 +7026,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "Configuration"
   </voice>
 </phrase>
 <phrase>
@@ -7040,7 +7040,7 @@
     *: ""
   </dest>
   <voice>
-    *: "fichier de config. écran de lecture"
+    *: "Fichier de config. écran de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -7054,7 +7054,7 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: "Text"
   </voice>
 </phrase>
 <phrase>
@@ -7068,7 +7068,7 @@
     *: ""
   </dest>
   <voice>
-    *: "extension"
+    *: "Extension"
   </voice>
 </phrase>
 <phrase>
@@ -7082,7 +7082,7 @@
     *: ""
   </dest>
   <voice>
-    *: "police"
+    *: "Police"
   </voice>
 </phrase>
 <phrase>
@@ -7096,7 +7096,7 @@
     *: ""
   </dest>
   <voice>
-    *: "signet"
+    *: "Signet"
   </voice>
 </phrase>
 <phrase>
@@ -7110,7 +7110,7 @@
     *: ""
   </dest>
   <voice>
-    *: "flash"
+    *: "Flash"
   </voice>
 </phrase>
 <phrase>
@@ -7124,7 +7124,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "Firmware"
   </voice>
 </phrase>
 <phrase>
@@ -7138,7 +7138,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Fichier Config. écran de lecture de la télécommande"
+    *: "Fichier config. écran de lecture de la télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -8465,5 +8465,46 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "CacheTag n'est pas Prêt"
+  </dest>
+  <voice>
+    *: "CacheTag n'est pas prêt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Toutes les Pistes>"
+  </dest>
+  <voice>
+    *: "Toutes les pistes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Nom de Fichier Invalide!"
+  </dest>
+  <voice>
+    *: "Nom de fichier invalide"
   </voice>
 </phrase>
