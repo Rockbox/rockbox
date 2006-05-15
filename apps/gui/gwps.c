@@ -369,7 +369,8 @@ long gui_wps_show(void)
             case WPS_FFWD:
                 if (global_settings.party_mode)
                     break;
-#ifdef WPS_NEXT_DIR
+
+#ifdef HAVE_DIR_NAVIGATION
                 if (current_tick - right_lastclick < HZ)
                 {
                     audio_next_dir();
@@ -377,13 +378,15 @@ long gui_wps_show(void)
                     break;
                 }
 #endif
+
 #ifdef WPS_RC_REW
             case WPS_RC_REW:
 #endif
             case WPS_REW:
                 if (global_settings.party_mode)
                     break;
-#ifdef WPS_PREV_DIR
+
+#ifdef HAVE_DIR_NAVIGATION
                 if (current_tick - left_lastclick < HZ)
                 {
                     audio_prev_dir();
@@ -391,6 +394,7 @@ long gui_wps_show(void)
                     break;
                 }
 #endif
+
                 ffwd_rew(button);
                 break;
 
