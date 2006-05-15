@@ -2007,6 +2007,7 @@ static bool load_next_track(void) {
     {
         ci.new_track++;
         automatic_skip = true;
+        playlist_end = false;
     }
     
     cpu_boost(true);
@@ -2030,6 +2031,8 @@ static bool load_next_track(void) {
         case Q_CODEC_REQUEST_FAILED:
             ci.new_track = 0;
             ci.stop_codec = true;
+            if (automatic_skip)
+                playlist_end = true;
             return false;
         default:
             logf("Bad event on ccq");
