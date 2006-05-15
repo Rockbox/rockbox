@@ -70,7 +70,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -93,7 +93,7 @@
     *: "Ladataan..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -107,7 +107,7 @@
     *: "Paina OFF sammuttaaksesi"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -121,7 +121,7 @@
     *: "Sammutetaan..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -135,7 +135,7 @@
     *: "Jatketaan toistoa..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -149,7 +149,7 @@
     *: "Poista muistikortti"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -163,12 +163,12 @@
     *: "Peruutettu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -177,12 +177,12 @@
     *: "epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
@@ -224,7 +224,7 @@
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+##desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
@@ -238,7 +238,7 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_THEME
-  desc: Custom themes menu
+  desc: in the main menu
   user:
   <source>
     *: "Browse Themes"
@@ -252,7 +252,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
@@ -280,7 +280,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
@@ -294,7 +294,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
@@ -415,7 +415,7 @@
     *: "Kanavien asetukset"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -507,7 +507,7 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Stereoäänen leveys"
@@ -555,7 +555,7 @@
     *: "AV-laskuaika"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -563,7 +563,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
     *: "Superbasso"
@@ -619,7 +619,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
     *: "MDB-keskitaajuus"
@@ -644,7 +644,7 @@
 </phrase>
 <phrase>
   id: LANG_CROSSFEED
-  desc: in the sound settings menu
+  desc: in sound settings
   user:
   <source>
     *: "Crossfeed"
@@ -821,7 +821,7 @@
     *: "Oletko varma?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -835,7 +835,7 @@
     *: "PLAY = Kyllä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -849,7 +849,7 @@
     *: "Muu = Ei"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -863,7 +863,7 @@
     *: "Asetukset"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -877,7 +877,7 @@
     *: "nollattu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -891,7 +891,7 @@
     *: "peruutettu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -919,7 +919,7 @@
     *: "Tallennus epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -933,7 +933,7 @@
     *: "Osio?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -947,7 +947,7 @@
     *: "Tallennus epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -961,7 +961,7 @@
     *: "Ei osiota?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -969,7 +969,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Nauhoitusnäyttö"
@@ -1087,7 +1087,7 @@
     *: "Muokkaustila: %s"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1101,7 +1101,7 @@
     *: "%d Hz taajuusvahvistus"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1115,7 +1115,7 @@
     *: "Alhainen hyllysuodatin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1129,7 +1129,7 @@
     *: "Huippusuodatin %d"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1143,7 +1143,7 @@
     *: "Korkea hyllysuodatin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1274,7 +1274,7 @@
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
@@ -1288,7 +1288,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1302,7 +1302,7 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
@@ -1316,7 +1316,7 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1325,7 +1325,7 @@
     *: "USB (Sim)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1417,7 +1417,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </source>
   <dest>
     *: "Jatka toistoa käynnistettäessä"
@@ -1431,7 +1431,7 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
     *: "Pikakelaus eteen/taakse"
@@ -1459,7 +1459,7 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
     *: "Häivytä ääni pysäytettäessä"
@@ -1515,7 +1515,7 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep volume"
+    *: "Beep Volume"
   </source>
   <dest>
     *: "Piippauksen voimakkuus"
@@ -1571,7 +1571,7 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical output"
+    *: "Optical Output"
   </source>
   <dest>
     *: "Optinen ulostulo"
@@ -1585,7 +1585,7 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
     *: "ID3-prioriteetit"
@@ -1627,7 +1627,7 @@
   desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user:
   <source>
-    *: "Auto change directory"
+    *: "Auto-Change Directory"
   </source>
   <dest>
     *: "Vaihda hakemistoa automaattisesti"
@@ -1641,7 +1641,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Tag cache"
+    *: "Tag Cache"
   </source>
   <dest>
     *: "ID3 Tag-välimuisti"
@@ -1655,7 +1655,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Keep on disk"
+    *: "Keep on Disk"
   </source>
   <dest>
     *: "Säilytä levyllä"
@@ -1669,7 +1669,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Load to ram"
+    *: "Load to RAM"
   </source>
   <dest>
     *: "Lataa muistiin"
@@ -1683,7 +1683,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force tag cache update"
+    *: "Force Tag Cache Update"
   </source>
   <dest>
     *: "Pakota ID3 Tag-välimuistin päivitys"
@@ -1703,7 +1703,7 @@
     *: "Päivitetään taustalla"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1717,7 +1717,7 @@
     *: "Luodaan ID3 Tag-välimuistia"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -1725,7 +1725,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data (experimental)"
   </source>
   <dest>
     *: "Kerää soittotilastoja (koekäytössä)"
@@ -1795,7 +1795,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
     *: "päiväyksen mukaan"
@@ -1809,7 +1809,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
     *: "uusimman mukaan"
@@ -1823,7 +1823,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
     *: "tyypin mukaan"
@@ -1904,10 +1904,10 @@
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
     *: "ID3-tietokanta"
@@ -2113,7 +2113,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CODEPAGE_CYRILLIC
+  id: LANG_CODEPAGE_RUSSIAN
   desc: in codepage setting menu
   user:
   <source>
@@ -2506,7 +2506,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -2520,7 +2520,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -2534,7 +2534,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -2649,7 +2649,7 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
     *: "Riippumattomat kehykset"
@@ -2677,7 +2677,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Esinauhoitusaika"
@@ -2705,7 +2705,7 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
     *: "Nyk. hakemisto"
@@ -2716,10 +2716,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
     *: "Näytä nauhoitusruutu käynnistyksessä"
@@ -2747,7 +2747,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Clipping light"
+    *: "Clipping Light"
   </source>
   <dest>
     *: "Taustavalo leikkautumisessa"
@@ -2761,7 +2761,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main unit only"
+    *: "Main Unit Only"
   </source>
   <dest>
     *: "Vain soittimessa"
@@ -2775,7 +2775,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Remote unit only"
+    *: "Remote Unit Only"
   </source>
   <dest>
     *: "Vain kaukosäätimessä"
@@ -2789,7 +2789,7 @@
   desc: in record settings menu.
   user:
   <source>
-    *: "Main and remote unit"
+    *: "Main and Remote Unit"
   </source>
   <dest>
     *: "Molemmissa"
@@ -2831,7 +2831,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Enable crossfade"
+    *: "Enable Crossfade"
   </source>
   <dest>
     *: "Aktivoi ristivaihto"
@@ -2845,7 +2845,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in delay"
+    *: "Fade-In Delay"
   </source>
   <dest>
     *: "Sisäänhäivytyksen viive"
@@ -2859,7 +2859,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in duration"
+    *: "Fade-In Duration"
   </source>
   <dest>
     *: "Sisäänhäivytyksen kesto"
@@ -2873,7 +2873,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out delay"
+    *: "Fade-Out Delay"
   </source>
   <dest>
     *: "Poishäivytyksen viive"
@@ -2887,7 +2887,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out duration"
+    *: "Fade-Out Duration"
   </source>
   <dest>
     *: "Poishäivytyksen kesto"
@@ -2901,7 +2901,7 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out mode"
+    *: "Fade-Out Mode"
   </source>
   <dest>
     *: "Poishäivytyksen tyyli"
@@ -2929,7 +2929,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </source>
   <dest>
     *: "Ota käyttöön soittovahvistus"
@@ -2943,7 +2943,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
     *: "Estä leikkautuminen"
@@ -2957,7 +2957,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
     *: "Soittovahvistuksen tyyppi"
@@ -2971,7 +2971,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
     *: "Albumivahvistus"
@@ -2985,7 +2985,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
     *: "Kappalevahvistus"
@@ -2999,7 +2999,7 @@
   desc: use track gain if shuffle mode is on, album gain otherwise
   user:
   <source>
-    *: "Track gain if shuffling"
+    *: "Track Gain if Shuffling"
   </source>
   <dest>
     *: "Kappalevahvistus sekoitettaessa"
@@ -3041,7 +3041,7 @@
   desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
     *: "Taustavalo verkkovirralla"
@@ -3055,7 +3055,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
     *: "Korosta seloste"
@@ -3069,7 +3069,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </source>
   <dest>
     *: "Taustavalon sisäänhäivytys"
@@ -3083,7 +3083,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </source>
   <dest>
     *: "Taustavalon poishäivytys"
@@ -3125,7 +3125,7 @@
   desc: Backlight behaviour setting
   user:
   <source>
-    *: "First keypress enables backlight only"
+    *: "First Keypress Enables Backlight Only"
   </source>
   <dest>
     *: "Ensimmäinen näppäinpainallus aktivoi taustavalon"
@@ -3223,7 +3223,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar(Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
     *: "Palkki(Käänteinen)"
@@ -3237,13 +3237,13 @@
   desc: text for LCD settings menu
   user:
   <source>
-    *: "Clear backdrop"
+    *: "Clear Backdrop"
   </source>
   <dest>
     *: "Taustakuva pois käytöstä"
   </dest>
   <voice>
-    *: "Taustakuva pois k�yt�st�"
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -3293,7 +3293,7 @@
   desc: in remote lcd settings menu
   user:
   <source>
-    *: "Reduce ticking"
+    *: "Reduce Ticking"
   </source>
   <dest>
     *: "Vähennä kaukosäätimen audiosignaalin häiriöitä"
@@ -3327,7 +3327,7 @@
     *: "Vieritysnopeusasetuksen esimerkki"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -3369,7 +3369,7 @@
     *: "Vierityksen askelkoon esimerkkiteksti"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -3391,7 +3391,7 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
     *: "Hyppivä vieritys"
@@ -3402,7 +3402,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
@@ -3503,7 +3503,7 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Painikepalkki"
@@ -3657,7 +3657,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
     *: "Logaritminen(dB)"
@@ -3671,7 +3671,7 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
     *: "Lineaarinen(%)"
@@ -3797,7 +3797,7 @@
   desc: in directory cache settings
   user:
   <source>
-    *: "Directory cache"
+    *: "Directory Cache"
   </source>
   <dest>
     *: "Hakemistopuun lataus muistiin"
@@ -3817,7 +3817,7 @@
     *: "Käynnistä laite uudelleen"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -3831,7 +3831,7 @@
     *: "Ladataan hakemistopuu..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -3895,7 +3895,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
     *: "Hakemistoselaimessa tiedostoja enintään"
@@ -3909,7 +3909,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
     *: "Soittolistan maksimikoko"
@@ -3948,7 +3948,7 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
@@ -3965,7 +3965,7 @@
   desc: in wps context menu
   user:
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
     *: "Pisteytä kappale"
@@ -3985,7 +3985,7 @@
     *: "Luokittelu:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4055,7 +4055,7 @@
     *: "Tiedosto/hakemisto on jo olemassa. Korvataanko?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4077,13 +4077,13 @@
   desc: text for onplay menu entry
   user:
   <source>
-    *: "Set as backdrop"
+    *: "Set As Backdrop"
   </source>
   <dest>
     *: "Aseta taustakuvaksi"
   </dest>
   <voice>
-    *: "Aseta taustakuvaksi"
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4091,7 +4091,7 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
     *: "Poista hakemisto"
@@ -4111,7 +4111,7 @@
     *: "Poistetaanko?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4125,7 +4125,7 @@
     *: "Poistettu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4133,7 +4133,7 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
     *: "Avaa..."
@@ -4147,7 +4147,7 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
     *: "Luo hakemisto"
@@ -4158,7 +4158,7 @@
 </phrase>
 <phrase>
   id: LANG_PITCH
-  desc: pitch" in the pitch screen
+  desc: "pitch" in the pitch screen
   user:
   <source>
     *: "Pitch"
@@ -4335,7 +4335,7 @@
     *: "Etsitään... %d löytyi (%s)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4377,7 +4377,7 @@
     *: "Rockbox-info:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4391,7 +4391,7 @@
     *: "Buf: %d.%03d Mt"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4405,7 +4405,7 @@
     *: "Puskuri: %d.%03d Mt"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4419,7 +4419,7 @@
     *: "Akku: Latautuu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4433,7 +4433,7 @@
     *: "Akku: huippulataus"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4447,7 +4447,7 @@
     *: "Akku: ylläpitolataus"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4475,7 +4475,7 @@
     *: "Levy:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4525,10 +4525,10 @@
   desc: spoken only, for wall clock announce
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "Aika:"
@@ -4545,7 +4545,7 @@
     *: "Nosta äänenkorkeutta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4559,7 +4559,7 @@
     *: "Laske äänenkorkeutta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4573,7 +4573,7 @@
     *: "Tauko"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4587,7 +4587,7 @@
     *: "Tila:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4601,7 +4601,7 @@
     *: "Tila"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4615,7 +4615,7 @@
     *: "Selaa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4629,7 +4629,7 @@
     *: "Palkki"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4643,7 +4643,7 @@
     *: "Alas = Lista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4657,7 +4657,7 @@
     *: "OFF = Poistu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4671,7 +4671,7 @@
     *: "Kirjanmerkki"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4713,7 +4713,7 @@
     *: "PLAY = Valitse"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4727,7 +4727,7 @@
     *: "ON+PLAY = Poista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4741,7 +4741,7 @@
     *: "Avataanko edellinen kirjanmerkki?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4755,7 +4755,7 @@
     *: "Luodaanko kirjanmerkki?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4769,7 +4769,7 @@
     *: "Kirjanmerkki luotu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4783,7 +4783,7 @@
     *: "Kirjanmerkki epäonnistui!"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4797,7 +4797,7 @@
     *: "Tyhjä kirjanmerkki"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4811,7 +4811,7 @@
     *: "ON asettaa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4825,7 +4825,7 @@
     *: "OFF peruuttaa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4839,7 +4839,7 @@
     *: "Näppäinlukko päällä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4853,7 +4853,7 @@
     *: "Näppäinlukko pois"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4861,13 +4861,13 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
     *: "Näppäinlukko päällä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4875,13 +4875,13 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
     *: "Näppäinlukko pois"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4895,7 +4895,7 @@
     *: "Aika:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4903,13 +4903,13 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
     *: "Katkaisu:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4923,7 +4923,7 @@
     *: "Koko:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4931,13 +4931,13 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Esinauhoitus"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4951,7 +4951,7 @@
     *: "Vahvistus"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4959,13 +4959,13 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain L"
+    *: "Gain Left"
   </source>
   <dest>
     *: "Vahvistus (vasen)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -4973,13 +4973,13 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Gain R"
+    *: "Gain Right"
   </source>
   <dest>
     *: "Vahvistus (oikea)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5021,7 +5021,7 @@
     *: "Levy on täynnä. Paina OFF jatkaaksesi."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5035,7 +5035,7 @@
     *: "Käynnistin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5049,7 +5049,7 @@
     *: "Kerran"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5063,7 +5063,7 @@
     *: "Toista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5071,13 +5071,13 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start above"
+    *: "Start Above"
   </source>
   <dest>
     *: "Aloita ennen"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5091,7 +5091,7 @@
     *: "ainakin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5099,13 +5099,13 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop below"
+    *: "Stop Below"
   </source>
   <dest>
     *: "Lopeta jälkeen"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5119,7 +5119,7 @@
     *: "ainakin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5127,13 +5127,13 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit gap"
+    *: "Presplit Gap"
   </source>
   <dest>
     *: "Katkoa edeltävä väli"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5147,7 +5147,7 @@
     *: "-inf"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5155,13 +5155,13 @@
   desc: waiting for threshold
   user:
   <source>
-    *: "Trigger idle"
+    *: "Trigger Idle"
   </source>
   <dest>
     *: "Tyhjäkäynnistin"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5169,13 +5169,13 @@
   desc: 
   user:
   <source>
-    *: "Trigger active"
+    *: "Trigger Active"
   </source>
   <dest>
     *: "Käynnistin aktiivinen"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5189,7 +5189,7 @@
     *: "Herätysaika: %02d:%02d"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5203,7 +5203,7 @@
     *: "Herätys %d:%02d kuluttua"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5217,7 +5217,7 @@
     *: "Herätys asetettu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5231,7 +5231,7 @@
     *: "Herätysaika liian pian!"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5245,7 +5245,7 @@
     *: "PLAY=Aseta OFF=Peruuta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5259,7 +5259,7 @@
     *: "Herätys pois"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5273,7 +5273,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5287,7 +5287,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5301,12 +5301,12 @@
     *: "Väri ei kelpaa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -5315,12 +5315,12 @@
     *: "[Kappale]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -5329,12 +5329,12 @@
     *: "[Esittäjä]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -5343,12 +5343,12 @@
     *: "[Albumi]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
@@ -5357,12 +5357,12 @@
     *: "[Raidan nro]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -5371,12 +5371,12 @@
     *: "[Tyylilaji]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -5385,12 +5385,12 @@
     *: "[Vuosi]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
@@ -5399,12 +5399,12 @@
     *: "[Soittolista]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
@@ -5413,7 +5413,7 @@
     *: "[Bittinopeus]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5427,7 +5427,7 @@
     *: "dB"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5441,12 +5441,12 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -5455,15 +5455,15 @@
     *: "[Näytteenottotaajuus]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Track gain]"
+    *: "[Track Gain]"
   </source>
   <dest>
     *: "[Kappalevahvistus]"
@@ -5474,10 +5474,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Album gain]"
+    *: "[Album Gain]"
   </source>
   <dest>
     *: "[Albumivahvistus]"
@@ -5488,7 +5488,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -5497,12 +5497,12 @@
     *: "[Polku]"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
@@ -5511,7 +5511,7 @@
     *: "<Puuttuu>"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5525,7 +5525,7 @@
     *: "Su"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5539,7 +5539,7 @@
     *: "Ma"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5553,7 +5553,7 @@
     *: "Ti"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5567,7 +5567,7 @@
     *: "Ke"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5581,7 +5581,7 @@
     *: "To"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5595,7 +5595,7 @@
     *: "Pe"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5609,7 +5609,7 @@
     *: "La"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -5785,10 +5785,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "0"
@@ -5799,10 +5799,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "1"
@@ -5813,10 +5813,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "2"
@@ -5827,10 +5827,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "3"
@@ -5841,10 +5841,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "4"
@@ -5855,10 +5855,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "5"
@@ -5869,10 +5869,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "6"
@@ -5883,10 +5883,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "7"
@@ -5897,10 +5897,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "8"
@@ -5911,10 +5911,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "9"
@@ -5925,10 +5925,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "10"
@@ -5939,10 +5939,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "11"
@@ -5953,10 +5953,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "12"
@@ -5967,10 +5967,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "13"
@@ -5981,10 +5981,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "14"
@@ -5995,10 +5995,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "15"
@@ -6009,10 +6009,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "16"
@@ -6023,10 +6023,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "17"
@@ -6037,10 +6037,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "18"
@@ -6051,10 +6051,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "19"
@@ -6065,10 +6065,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "20"
@@ -6079,10 +6079,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "30"
@@ -6093,10 +6093,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "40"
@@ -6107,10 +6107,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "50"
@@ -6121,10 +6121,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "60"
@@ -6135,10 +6135,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "70"
@@ -6149,10 +6149,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "80"
@@ -6163,10 +6163,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "90"
@@ -6177,10 +6177,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "100"
@@ -6191,10 +6191,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "1000"
@@ -6205,10 +6205,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "1000000"
@@ -6219,10 +6219,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "1000000000000"
@@ -6233,10 +6233,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "miinus"
@@ -6247,10 +6247,10 @@
   desc: spoken only, for composing numbers
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "plus"
@@ -6261,10 +6261,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "millisekuntia"
@@ -6275,10 +6275,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "sekunti"
@@ -6289,10 +6289,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "sekuntia"
@@ -6303,10 +6303,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "minuutti"
@@ -6317,10 +6317,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "minuuttia"
@@ -6331,10 +6331,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "tunti"
@@ -6345,10 +6345,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "tuntia"
@@ -6359,10 +6359,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "kilohertsi�"
@@ -6373,10 +6373,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "desibeli�"
@@ -6387,10 +6387,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "prosenttia"
@@ -6401,10 +6401,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "milliampeerituntia"
@@ -6415,10 +6415,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "pikseli�"
@@ -6429,10 +6429,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "sekunnissa"
@@ -6443,10 +6443,10 @@
   desc: spoken only, a unit postfix
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "hertsi�"
@@ -6527,10 +6527,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "A"
@@ -6541,10 +6541,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "B"
@@ -6555,10 +6555,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "C"
@@ -6569,10 +6569,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "D"
@@ -6583,10 +6583,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "E"
@@ -6597,10 +6597,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�ff"
@@ -6611,10 +6611,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "G"
@@ -6625,10 +6625,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "H"
@@ -6639,10 +6639,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "I"
@@ -6653,10 +6653,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "J"
@@ -6667,10 +6667,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "K"
@@ -6681,10 +6681,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�ll"
@@ -6695,10 +6695,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�mm"
@@ -6709,10 +6709,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�nn"
@@ -6723,10 +6723,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "O"
@@ -6737,10 +6737,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "P"
@@ -6751,10 +6751,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "Q"
@@ -6765,10 +6765,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�rr"
@@ -6779,10 +6779,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�ss"
@@ -6793,10 +6793,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "T"
@@ -6807,10 +6807,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "U"
@@ -6821,10 +6821,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "V"
@@ -6835,10 +6835,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "tuplavee"
@@ -6849,10 +6849,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "�ks"
@@ -6863,10 +6863,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "Y"
@@ -6877,10 +6877,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "Z"
@@ -6891,10 +6891,10 @@
   desc: spoken only, for spelling
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "piste"
@@ -6905,10 +6905,10 @@
   desc: spoken only, for spelling, a split second of silence (difficult to author)
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: " "
@@ -6919,10 +6919,10 @@
   desc: spoken only, prefix for file number
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "tiedosto"
@@ -6933,10 +6933,10 @@
   desc: spoken only, prefix for directory number
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "kansio"
@@ -6947,10 +6947,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "audio"
@@ -6961,10 +6961,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "asetukset"
@@ -6975,10 +6975,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "soitton�ytt�"
@@ -6989,10 +6989,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "teksti"
@@ -7003,10 +7003,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "lis�osa"
@@ -7017,10 +7017,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "fontti"
@@ -7031,10 +7031,10 @@
   desc: spoken only, for file extension and the word in general
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "kirjanmerkki"
@@ -7045,10 +7045,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "flash"
@@ -7059,10 +7059,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "laiteohjelmisto"
@@ -7073,10 +7073,10 @@
   desc: spoken only, for file extension
   user:
   <source>
-    *: ""
+    *:
   </source>
   <dest>
-    *: ""
+    *:
   </dest>
   <voice>
     *: "Kaukos��timen soitton�ytt�"
@@ -7093,7 +7093,7 @@
     *: "Ladataan..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7107,12 +7107,12 @@
     *: "Sekoitetaan..."
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
@@ -7121,7 +7121,7 @@
     *: "Soittolista Puskuri täynnä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7129,13 +7129,13 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
     *: "Listan loppu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7143,13 +7143,13 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
     *: "Kappalelistan loppu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7163,7 +7163,7 @@
     *: "Luodaan"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7177,7 +7177,7 @@
     *: "Lisätty %d kappaletta (%s)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7191,7 +7191,7 @@
     *: "Jonoon lisätty %d kappaletta (%s)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7205,7 +7205,7 @@
     *: "Tallennettu %d kappaletta (%s)"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7219,7 +7219,7 @@
     *: "Myös alihakemistot?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7233,7 +7233,7 @@
     *: "Tyhjennetäänkö soittolista?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7247,7 +7247,7 @@
     *: "Tyhjä soittolista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7261,7 +7261,7 @@
     *: "Virhe päivitettäessä soittolistan ohjaustiedostoa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7275,7 +7275,7 @@
     *: "Virhe luettaessa soittolistaa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7289,7 +7289,7 @@
     *: "Virhe luettaessa soittolistan ohjaustiedostoa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7303,7 +7303,7 @@
     *: "Virhe luettaessa hakemistoa"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7317,7 +7317,7 @@
     *: "Soittolistan ohjaustiedosto vahingoittunut"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7331,7 +7331,7 @@
     *: "Asema: %d.%d MHz"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7345,7 +7345,7 @@
     *: "Ei esivalintoja"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7353,7 +7353,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Add preset"
+    *: "Add Preset"
   </source>
   <dest>
     *: "Lisää esivalinta"
@@ -7367,7 +7367,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
     *: "Muokkaa esivalintaa"
@@ -7381,7 +7381,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
     *: "Poista esivalinta"
@@ -7395,13 +7395,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
     *: "Esivalinnan tallennus epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7409,13 +7409,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
     *: "Esivalintalista täynnä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7429,7 +7429,7 @@
     *: "Valikko"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7443,7 +7443,7 @@
     *: "Poistu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7457,7 +7457,7 @@
     *: "Toiminto"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7471,7 +7471,7 @@
     *: "Esivalinta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7485,12 +7485,12 @@
     *: "Lisää"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -7527,7 +7527,7 @@
     *: "Näytön päivitys keskeytetty!"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7535,7 +7535,7 @@
   desc: in radio menu
   user:
   <source>
-    *: "Auto scan presets"
+    *: "Auto-Scan Presets"
   </source>
   <dest>
     *: "Automaattinen kanavahaku"
@@ -7549,13 +7549,13 @@
   desc: confirmation if presets can be cleared
   user:
   <source>
-    *: "Clear current presets?"
+    *: "Clear Current Presets?"
   </source>
   <dest>
     *: "Poistetaanko esivalinnat?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7569,7 +7569,7 @@
     *: "Skannataan %d.%01d MHz"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7583,7 +7583,7 @@
     *: "%d.%01d MHz"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7597,7 +7597,7 @@
     *: "Tila:"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7611,7 +7611,7 @@
     *: "Vapaa taajuusvalinta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7625,7 +7625,7 @@
     *: "Esivalinta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7639,7 +7639,7 @@
     *: "Valikko"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7653,7 +7653,7 @@
     *: "Valinta"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7667,7 +7667,7 @@
     *: "LCD"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7675,13 +7675,13 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Hakemistopuskuri on täynnä!"
+    *: "Hakemistopuskuri täynnä!"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7695,7 +7695,7 @@
     *: "Uusi kieli"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7709,7 +7709,7 @@
     *: "Asetukset ladattu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7723,7 +7723,7 @@
     *: "Asetukset tallennettu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7737,7 +7737,7 @@
     *: "Käynnistystiedosto muuttunut"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7751,7 +7751,7 @@
     *: "Käynnistetäänkö uudelleen?"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7765,7 +7765,7 @@
     *: "OFF keskeyttää"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7779,7 +7779,7 @@
     *: "STOP keskeyttää"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7793,7 +7793,7 @@
     *: "Ei tiedostoja"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7801,13 +7801,13 @@
   desc: text for splash to indicate a new backdrop has been loaded successfully
   user:
   <source>
-    *: "Backdrop loaded"
+    *: "Backdrop Loaded"
   </source>
   <dest>
     *: "Taustakuva ladattu"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7815,13 +7815,13 @@
   desc: text for splash to indicate a failure to load a bitmap as backdrop
   user:
   <source>
-    *: "Backdrop failed"
+    *: "Backdrop Failed"
   </source>
   <dest>
     *: "Taustakuvan lataus epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7835,7 +7835,7 @@
     *: "Esittäjät"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7849,7 +7849,7 @@
     *: "Albumit"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7863,7 +7863,7 @@
     *: "Kappaleet"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7891,7 +7891,7 @@
     *: "Etsi"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7905,7 +7905,7 @@
     *: "Etsi artisteista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7919,7 +7919,7 @@
     *: "Etsi albumeista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7933,7 +7933,7 @@
     *: "Etsi kappaleista"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7947,7 +7947,7 @@
     *: "Löytyi %d kpl"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7961,7 +7961,7 @@
     *: "<Kaikki kappaleet>"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -7983,13 +7983,14 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+### The <source> section differs from the english!
+    *: "Move Failed"
   </source>
   <dest>
     *: "Siirto epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8025,7 +8026,7 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
     *: "Vain kappale"
@@ -8039,7 +8040,7 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
     *: "Koko polku"
@@ -8087,7 +8088,7 @@
     *: "Ei voitu avata %s"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8101,7 +8102,7 @@
     *: "%s:n lukeminen epäonnistui"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8115,7 +8116,7 @@
     *: "Yhteensopimaton malli"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8129,7 +8130,7 @@
     *: "Yhteensopimaton versio"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8143,7 +8144,7 @@
     *: "Lisäosa palautti virheen"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8157,7 +8158,7 @@
     *: "Tiedostotarkennetaulukko täynnä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8171,7 +8172,7 @@
     *: "Tiedostotyyppitaulukko täynnä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8185,7 +8186,7 @@
     *: "Lisäosan nimi on liian pitkä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8199,7 +8200,7 @@
     *: "Tiedostotyypin merkkijonopuskuri tyhjä"
   </dest>
   <voice>
-    *: ""
+    *:
   </voice>
 </phrase>
 <phrase>
@@ -8213,6 +8214,160 @@
     *: "(PLAY/STOP)"
   </dest>
   <voice>
-    *: ""
+    *:
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Tallennetaanko muutokset?"
+  </dest>
+  <voice>
+    *:
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Esikatkaisu"
+  </dest>
+  <voice>
+    *: "Esikatkaisu"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *:
+  </source>
+  <dest>
+    *:
+  </dest>
+  <voice>
+    *: "n�pp�imist�"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Lataa esivalintalista"
+  </dest>
+  <voice>
+    *: "Lataa esivalintalista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Esivalintalista"
+  </dest>
+  <voice>
+    *: "Esivalintalista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Pituus]"
+  </dest>
+  <voice>
+    *:
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Asetuksia ei lÖytynyt. Etsitäänk� kanavia?"
+  </dest>
+  <voice>
+    *:
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Vain kappaleohitus"
+  </dest>
+  <voice>
+    *: "Vain kappaleohitus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Tyhjennä esivalintalista"
+  </dest>
+  <voice>
+    *: "Tyhjenn� esivalintalista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Uusi näppäimistÖ"
+  </dest>
+  <voice>
+    *:
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Tallenna esivalintalista"
+  </dest>
+  <voice>
+    *: "Tallenna esivalintalista"
   </voice>
 </phrase>
