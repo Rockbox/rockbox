@@ -249,6 +249,9 @@ int close(int fd)
         rc = fsync(fd);
         if (rc < 0)
             return rc * 10 - 3;
+#ifdef HAVE_DIRCACHE
+        dircache_update_filesize(fd, file->size, file->fatfile.firstcluster);
+#endif
     }
 
     file->busy = false;
