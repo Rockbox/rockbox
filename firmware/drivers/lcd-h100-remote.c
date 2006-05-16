@@ -1364,7 +1364,11 @@ static void scroll_thread(void)
 #ifdef SIMULATOR
         sleep(delay);
 #else
-        queue_wait_w_tmo(&remote_scroll_queue, &ev, delay);
+        if (remote_initialized)
+            queue_wait_w_tmo(&remote_scroll_queue, &ev, delay);
+        else
+            queue_wait(&remote_scroll_queue, &ev);
+
         switch (ev.id)
         {
             case REMOTE_INIT_LCD:
