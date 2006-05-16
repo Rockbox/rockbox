@@ -60,7 +60,6 @@ PLUGIN_HEADER
 #define JEWELS_PREV   BUTTON_SCROLL_BACK
 #define JEWELS_NEXT   BUTTON_SCROLL_FWD
 #define JEWELS_SELECT BUTTON_SELECT
-#define JEWELS_CANCEL BUTTON_SELECT|BUTTON_MENU
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define JEWELS_UP     BUTTON_UP
@@ -149,10 +148,11 @@ PLUGIN_HEADER
 #define SAVE_FILE  PLUGIN_DIR "/jewels.save"
 
 /* final game return status */
-#define BJ_END  3
-#define BJ_USB  2
-#define BJ_QUIT 1
-#define BJ_LOSE 0
+#define BJ_QUIT_FROM_GAME 4
+#define BJ_END            3
+#define BJ_USB            2
+#define BJ_QUIT           1
+#define BJ_LOSE           0
 
 /* swap directions */
 #define SWAP_UP    0
@@ -184,7 +184,8 @@ enum menu_result {
     MRES_SCORES,
     MRES_HELP,
     MRES_QUIT,
-    MRES_PLAYBACK
+    MRES_PLAYBACK,
+    MRES_EXIT
 };
 
 /* menu commands */
@@ -212,11 +213,12 @@ struct jewels_menu {
          {"High Scores", MRES_SCORES},
          {"Help",        MRES_HELP},
          {"Quit",        MRES_QUIT}}},
-    {"Menu", true, 0, 4,
+    {"Menu", true, 0, 5,
         {{"Audio Playback", MRES_PLAYBACK },
          {"Resume Game", MRES_RESUME},
          {"Save Game",   MRES_SAVE},
-         {"End Game",    MRES_QUIT}}}
+         {"End Game",    MRES_QUIT},
+         {"Exit Jewels", MRES_EXIT}}}
 };
 
 /* global rockbox api */
@@ -1301,6 +1303,9 @@ static int jewels_main(struct game_context* bj) {
                 case MRES_QUIT:
                     return BJ_END;
 
+                case MRES_EXIT:
+                    return BJ_QUIT_FROM_GAME;
+
                 default:
                     break;
             }
@@ -1409,9 +1414,11 @@ static int jewels_main(struct game_context* bj) {
                 if(!inmenu) inmenu = true;
                 break;
 
+#ifdef JEWELS_CANCEL
             case JEWELS_CANCEL:           /* end game */
                 return BJ_END;
                 break;
+#endif
 
             default:
                 if(rb->default_event_handler_ex(button, jewels_callback,
@@ -1464,6 +1471,20 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                 return PLUGIN_USB_CONNECTED;
 
             case BJ_QUIT:
+                if(bj.dirty) {
+                    rb->splash(HZ, true, "Saving high scores...");
+                    jewels_savescores(&bj);
+                }
+                exit = true;
+                break;
+
+            case BJ_QUIT_FROM_GAME:
+                if(!bj.resume) {
+                    if((position = jewels_recordscore(&bj))) {
+                        rb->snprintf(str, 19, "New high score #%d!", position);
+                        rb->splash(HZ*2, true, str);
+                    }
+                }
                 if(bj.dirty) {
                     rb->splash(HZ, true, "Saving high scores...");
                     jewels_savescores(&bj);
