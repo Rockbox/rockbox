@@ -889,7 +889,11 @@ static bool dirbrowse(void)
             if (gui_wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
 #ifdef HAVE_LCD_COLOR
-            lcd_set_backdrop(old_backdrop);
+            /* check if the backdrop hasn't been cleared */
+            if(global_settings.backdrop_file[0])
+                lcd_set_backdrop(old_backdrop);
+            else
+                lcd_set_backdrop(NULL);
 #endif
 #ifdef HAVE_HOTSWAP
             else

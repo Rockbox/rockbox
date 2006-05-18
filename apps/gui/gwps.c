@@ -106,9 +106,16 @@ long gui_wps_show(void)
     }
 #ifdef HAVE_LCD_COLOR
     gui_wps[SCREEN_MAIN].data->old_backdrop = lcd_get_backdrop();
-    if (gui_wps[SCREEN_MAIN].data->has_backdrop) {
+    if (gui_wps[SCREEN_MAIN].data->has_backdrop)
+    {
         lcd_set_backdrop(&wps_backdrop[0][0]);
     }
+    else
+    {
+        /* wps has no backdrop, so clear it in case we're switching wps */
+        lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+    }
+
 #endif
 #endif
 
@@ -555,6 +562,9 @@ long gui_wps_show(void)
                 if (main_menu())
                     return true;
 #ifdef HAVE_LCD_COLOR
+                if(global_settings.backdrop_file[0] == 0)
+                    gui_wps[SCREEN_MAIN].data->old_backdrop = NULL;
+
                 if (gui_wps[SCREEN_MAIN].data->has_backdrop)
                     lcd_set_backdrop(&wps_backdrop[0][0]);
 #endif
