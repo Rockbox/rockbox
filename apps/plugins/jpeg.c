@@ -1970,6 +1970,8 @@ static int compare(const void* p1, const void* p2)
 
 bool jpg_ext(const char ext[])
 {
+    if(!ext)
+        return false;
     if(!rb->strcasecmp(ext,".jpg") ||
        !rb->strcasecmp(ext,".jpe") ||
        !rb->strcasecmp(ext,".jpeg"))
