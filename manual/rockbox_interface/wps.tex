@@ -76,13 +76,13 @@ your WPS (While Playing Screen).
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
       \opt{ONDIO_PAD}{\ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{\ButtonOn}
-      & Go to File Browser \\
+      & Return to the \setting{File Browser} \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{Hold \ButtonSelect}
       \opt{ONDIO_PAD}{Hold \ButtonMenu}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonOn}
       \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
-      & Enter WPS Context Menu \\
+      & Enter the \setting{WPS Context Menu} \\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
       Hold \ButtonOn
@@ -148,15 +148,42 @@ your WPS (While Playing Screen).
     {}-40db, {}-50db, {}-60db.
   \end{description}
 }
-\subsection{\label{sec:quickscreens}WPS Quick Screens}
+\subsection{\label{sec:contextmenu}The WPS Context Menu}
+	Like the context menu for the \setting{File Browser}, the \setting{WPS Context Menu} 
+	allows you quick access to some often used functions:
 
-\subsubsection{\label{sec:contextmenu}The WPS Context Menu}
-Like the context menu for the File Browser, the \setting{WPS Context Menu} 
-	allows you to quickly access some often used functions.
-\opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD,x5}{
-These include the ID3 Viewer and the pitch screen.}
+	\subsubsection{Sound Settings}
+	This is a shortchut to the \setting{Sound Settings Menu}, where you can configure volume,
+	bass, treble, and other settings affecting the sound of your music.  See page
+	\pageref{ref:configure_rockbox_sound} for more information.
+	
+	\subsubsection{Playlist}
+	The \setting{Playlist} submenu allows you to view, save, search and reshuffle the current 
+	playlist.
+	
+	\subsubsection{Bookmarks}
+	This allows you to create a bookmark in the currently-playing track.
 
-  \subsubsection{\label{sec:pitchscreen}Pitch Screen}
+	\subsubsection{\label{ref:ID3viewer}ID3 Viewer}
+	\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
+	This screen is accessible from the WPS screen, and provides a detailed view of
+	all the identity information about the current track. This info is known as
+	meta data and is stored in audio file formats to keep information on artist,
+	album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to 
+	access the WPS context menu, and select the id3-viewer from there.}
+	\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}
+	\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}
+	\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{Please correct this information}}
+	\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and 
+	  select the id3-viewer from there.}
+	\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
+	  to move through the information.}
+	
+	\subsubsection{Open With...}
+	This \setting{Open With} function is the same as the \setting{Open With} function
+	in the \setting{File Context Menu}.
+	
+	\subsubsection{\label{sec:pitchscreen}Pitch Screen}
   The Pitch Screen allows you to quickly change the pitch of your \dap. The
   pitch value can be adjusted between 50\% and 200\%.
   \begin{table}
@@ -188,20 +215,6 @@ These include the ID3 Viewer and the pitch screen.}
   \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
 }
 
-\subsubsection{\label{ref:ID3viewer}ID3 Viewer}
-\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
-This screen is accessible from the WPS screen, and provides a detailed view of
-all the identity information about the current track. This info is known as
-meta data and is stored in audio file formats to keep information on artist,
-album etc. To access this screen, \opt{h1xx,h300}{hold \ButtonSelect\ to 
-access the WPS context menu, and select the id3-viewer from there.}
-\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}
-\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}
-\opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\fixme{Please correct this information}}
-\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu, and 
-  select the id3-viewer from there.}
-\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
-  to move through the information.}
 
 %********************QUICKSCREENS***********************************************
 \opt{RECORDER_PAD}{
