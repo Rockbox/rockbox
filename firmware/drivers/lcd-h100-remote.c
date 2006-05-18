@@ -73,6 +73,8 @@ static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
 
+#define LCD_REMOTE_DEFAULT_CONTRAST 42;
+
 #ifndef SIMULATOR
 static int xoffset; /* needed for flip */
 
@@ -94,7 +96,6 @@ static struct event_queue remote_scroll_queue;
 static bool remote_initialized = false;
 static int _remote_type = 0;
 
-#define LCD_REMOTE_DEFAULT_CONTRAST 42;
 /* cached settings values */
 static bool cached_invert = false;
 static bool cached_flip = false;
