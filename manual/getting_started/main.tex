@@ -32,18 +32,6 @@ software. There is, however, more help available.  The Rockbox website at
 written by members of the Rockbox community and this should be your first port
 of call when looking for further help.
 
-\opt{h1xx,h300}{\input{getting_started/iriver_install}}
-
-\section{Downloading Rockbox}
-The latest release of the Rockbox software will always be available from
-\url{http://www.rockbox.org/download/}.
-\opt{MASCODEC}{
-  Windows users may wish to download the self-extracting Windows installer,
-  which works for all Jukebox models, but those wishing to install manually or
-  using a different operating system should choose the .zip archive containing
-  the firmware for their model of the Jukebox.
-}
-
 \section{Installing Rockbox}\label{sec:installing_rockbox}
 \opt{MASCODEC}{
   \subsection{Using the windows installer}
@@ -58,33 +46,40 @@ The latest release of the Rockbox software will always be available from
   the procedure is still fairly simple.
 }
 \opt{SWCODEC}{
-  \subsection{Installing the bootloader}
-  Installing the bootloader is the trickiest part of the installation.
-  \fixme{add note for other OS as windows. Point to the appropriate wiki page}
-  Due to legal reasons the Rockbox project can not provide ready-to-use flash
-  images. Instead, you need to get an original firmware from your \dap s
-  manufacturer homepage and modify it to include the rockbox bootloader.
-  \fixme{include further bootloader install instructions: iriver, ipod, iaudio}
-  \fixme{add something about the bootloader, esp. the bootloader usb mode}
+There are two separate components of Rockbox that need to be installed in order
+to run Rockbox.
+\begin{enumerate}
+\item The Rockbox bootloader. This is the component of Rockbox that is installed
+  to the flash memory of your \playerman. The bootloader is the program that tells
+  your \dap\ how to boot and load other components of Rockbox.
+\item The Rockbox firmware. Unlike the \playerman\ firmware, which runs entirely
+  from flash memory, most of the Rockbox code is contained in the build that
+  resides on your jukebox's hard drive. This makes it easy to update Rockbox. The
+  build contain a file named \firmwarefilename\ and a directory called
+  \fname{.rockbox} which are located in the root directory of your  hard drive.
+\end{enumerate}
+\opt{h1xx,h300}{\input{getting_started/iriver_install}}
+   
   \subsection{Installing the firmware}
   After installing the bootloader the installation becomes fairly easy.
 }
-  Connect your \playername\ to the
-computer via USB as described in the manual that came with your \playername. On
-Windows, the \playername\ drive will appear as a drive letter in your
-``My Computer'' folder. Take the file that you downloaded above, and unpack
-its contents to your \playername\ drive. You can do this using a program such
-as \url{http://www.info-zip.org/} or \url{http://www.winzip.org/}.
 
-You will need to unpack all of the files in the archive onto your hard disk. If
- this has been done correctly, you will have a file called 
+Connect your \playername\ to the computer via USB as described in the 
+manual that came with your \playername. On Windows, the \playername\ drive 
+will appear as a drive letter in your ``My Computer'' folder. Take the file 
+that you downloaded above, and unpack its contents to your \playername\ drive.
+You can do this using a program such as \url{http://www.info-zip.org/} or 
+\url{http://www.winzip.org/}.
+
+You will need to unpack all of the files in the archive onto your hard disk. If 
+this has been done correctly, you will have a file called 
 \fname{\firmwarefilename} in the main folder of your \playername\ drive, and
 also a folder called /\fname{.rockbox}, which contains a number of system files
 used by the software.
 \note{Please note that the firmware folder starts with a leading dot. You may
 experience problems when trying to create such folders when using Windows.
-Directly unzipping to your \dap's drive works flawlessly, only Windows'
-explorer is limited handling with such files.}
+Directly unzipping to your \dap's drive works flawlessly; it is only Windows'
+Explorer that is limited in handling such files.}
 
 \section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
 If you wish to use speech support you will also need a language file, available
@@ -94,7 +89,6 @@ downloaded, unpack this file and copy it into the \fname{lang} folder which is
 inside the /\fname{.rockbox} folder on your Jukebox. Voice menus are turned on
 by default. See page \pageref{ref:Voiceconfiguration} for details on voice
 settings.
-
 
 \section{Running Rockbox}
 Remove your Jukebox from the computer's USB port. Unplug any connected power
@@ -109,3 +103,12 @@ connect the \playername\ to your computer, and delete the
 wish to delete the \fname{.rockbox} folder and its contents. Turn the
 \playername\ off and on and the normal \playername\ software will load.
 
+\section{Updating Rockbox}
+The latest release of the Rockbox software will always be available from
+\url{http://www.rockbox.org/download/}.
+\opt{MASCODEC}{
+  Windows users may wish to download the self-extracting Windows installer,
+  which works for all Jukebox models, but those wishing to install manually or
+  using a different operating system should choose the .zip archive containing
+  the firmware for their model of the Jukebox.
+}
