@@ -94,10 +94,11 @@ static struct event_queue remote_scroll_queue;
 static bool remote_initialized = false;
 static int _remote_type = 0;
 
+#define LCD_REMOTE_DEFAULT_CONTRAST 42;
 /* cached settings values */
 static bool cached_invert = false;
 static bool cached_flip = false;
-static int cached_contrast = 32;
+static int cached_contrast = LCD_REMOTE_DEFAULT_CONTRAST;
 #endif
 
 /* scrolling */
@@ -350,7 +351,7 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
 
 int lcd_remote_default_contrast(void)
 {
-    return 32;
+    return LCD_REMOTE_DEFAULT_CONTRAST;
 }
 
 #ifndef SIMULATOR

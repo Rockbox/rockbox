@@ -1694,6 +1694,9 @@ void settings_reset(void) {
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
     global_settings.contrast    = lcd_default_contrast();
+#ifdef HAVE_LCD_REMOTE
+    global_settings.remote_contrast = lcd_remote_default_contrast();
+#endif
 
 #ifdef CONFIG_TUNER
     global_settings.fmr_file[0] = '\0';
