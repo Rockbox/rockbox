@@ -185,4 +185,13 @@ extern void screen_access_init(void);
  */
 extern struct screen screens[NB_SCREENS];
 
+
+/*
+ * Functions to apply LCD settings across all screens
+ */
+void screen_lcd_scroll_speed(int speed);
+void screen_lcd_scroll_delay(int ms);
+void screen_lcd_scroll_step(int pixels);
+
+
 #endif /*_SCREEN_ACCESS_H_*/

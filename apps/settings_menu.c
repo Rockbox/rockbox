@@ -55,6 +55,7 @@
 #include "yesno.h"
 #include "list.h"
 #include "color_picker.h"
+#include "screen_access.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -837,7 +838,7 @@ static bool scroll_speed(void)
 {
     return set_int(str(LANG_SCROLL), "", UNIT_INT,
                    &global_settings.scroll_speed,
-                   &lcd_scroll_speed, 1, 0, 15, NULL );
+                   &screen_lcd_scroll_speed, 1, 0, 15, NULL );
 }
 
 static bool scroll_delay(void)
@@ -845,7 +846,7 @@ static bool scroll_delay(void)
     int dummy = global_settings.scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
                      &dummy,
-                     &lcd_scroll_delay, 100, 0, 2500, NULL );
+                     &screen_lcd_scroll_delay, 100, 0, 2500, NULL );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
 }
@@ -869,7 +870,7 @@ static bool scroll_step(void)
 {
     return set_int(str(LANG_SCROLL_STEP_EXAMPLE), str(LANG_PIXELS), UNIT_PIXEL,
                    &global_settings.scroll_step,
-                   &lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
+                   &screen_lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
 }
 #endif
 
