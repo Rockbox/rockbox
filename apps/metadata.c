@@ -643,7 +643,8 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
      * by ('O','g','g','S',0) and retrieve totalsamples.
      */
 
-    if (lseek(fd, -64 * 1024, SEEK_END) < 0)  /* A page is always < 64 kB */
+    /* A page is always < 64 kB */
+    if (lseek(fd, -(MIN(64 * 1024, id3->filesize)), SEEK_END) < 0)
     {
         return false;
     }
