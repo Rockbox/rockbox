@@ -83,13 +83,11 @@ PLUGIN_HEADER
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_MENU (BUTTON_SELECT | BUTTON_MENU)
-#define JPEG_NEXT_PRE (BUTTON_SELECT | BUTTON_RIGHT)
-#define JPEG_NEXT (BUTTON_SELECT | BUTTON_RIGHT | BUTTON_REL)
-#define JPEG_TOGGLE_SLIDESHOW (BUTTON_SELECT | BUTTON_RIGHT | BUTTON_REPEAT)
-#define JPEG_PREVIOUS (BUTTON_SELECT |BUTTON_LEFT)
+#define JPEG_NEXT (BUTTON_SELECT | BUTTON_RIGHT)
+#define JPEG_PREVIOUS (BUTTON_SELECT | BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define JPEG_ZOOM_IN_PRE BUTTON_SELECT
+#define JPEG_ZOOM_PRE BUTTON_SELECT
 #define JPEG_ZOOM_IN (BUTTON_SELECT | BUTTON_REL)
 #define JPEG_ZOOM_OUT (BUTTON_SELECT | BUTTON_REPEAT)
 #define JPEG_UP BUTTON_UP
@@ -97,13 +95,11 @@ PLUGIN_HEADER
 #define JPEG_LEFT BUTTON_LEFT
 #define JPEG_RIGHT BUTTON_RIGHT
 #define JPEG_MENU BUTTON_POWER
-#define JPEG_NEXT_PRE BUTTON_PLAY
-#define JPEG_NEXT (BUTTON_PLAY|BUTTON_REL)
-#define JPEG_TOGGLE_SLIDESHOW (BUTTON_PLAY|BUTTON_REPEAT)
+#define JPEG_NEXT BUTTON_PLAY
 #define JPEG_PREVIOUS BUTTON_REC
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define JPEG_ZOOM_IN_PRE BUTTON_MENU
+#define JPEG_ZOOM_PRE BUTTON_MENU
 #define JPEG_ZOOM_IN (BUTTON_MENU | BUTTON_REL)
 #define JPEG_ZOOM_OUT (BUTTON_MENU | BUTTON_REPEAT)
 #define JPEG_UP BUTTON_UP
@@ -2267,10 +2263,6 @@ int scroll_bmp(struct t_disp* pdisp)
                 return change_filename(DIR_NEXT);
             break;
         case JPEG_NEXT:
-#ifdef JPEG_NEXT_PRE
-            if (lastbutton != JPEG_NEXT_PRE)
-                break;
-#endif
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
@@ -2756,11 +2748,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     get_pic_list();
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
-#if CONFIG_CODEC == SWCODEC
-    if(rb->pcm_is_playing())
-#else
-    if(rb->mp3_is_playing())
-#endif
+    if(rb->audio_status())
     {
         buf = rb->plugin_get_buffer(&buf_size) +
              (entries * sizeof(char**));
