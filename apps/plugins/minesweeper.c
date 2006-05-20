@@ -19,12 +19,6 @@
 
 /*****************************************************************************
 Mine Sweeper by dionoea
-
-use arrow keys to move cursor
-use ON or F2 to clear a tile
-use PLAY or F1 to put a flag on a tile
-use F3 to see how many mines are left (supposing all your flags are correct)
-
 *****************************************************************************/
 
 #include "plugin.h"
@@ -50,6 +44,8 @@ PLUGIN_HEADER
 #define MINESWP_DISCOVER BUTTON_ON
 #define MINESWP_DISCOVER2 BUTTON_F2
 #define MINESWP_INFO BUTTON_F3
+#define MINESWP_RIGHT (BUTTON_F1 | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_F1 | BUTTON_LEFT)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define MINESWP_UP BUTTON_UP
@@ -60,6 +56,8 @@ PLUGIN_HEADER
 #define MINESWP_TOGGLE (BUTTON_MENU | BUTTON_REL)
 #define MINESWP_DISCOVER (BUTTON_MENU | BUTTON_REPEAT)
 #define MINESWP_INFO (BUTTON_MENU | BUTTON_OFF)
+#define MINESWP_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_MENU | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -67,9 +65,11 @@ PLUGIN_HEADER
 #define MINESWP_DOWN BUTTON_DOWN
 #define MINESWP_QUIT BUTTON_OFF
 #define MINESWP_START BUTTON_SELECT
-#define MINESWP_TOGGLE BUTTON_SELECT
-#define MINESWP_DISCOVER BUTTON_ON
+#define MINESWP_TOGGLE BUTTON_ON
+#define MINESWP_DISCOVER BUTTON_SELECT
 #define MINESWP_INFO BUTTON_MODE
+#define MINESWP_RIGHT (BUTTON_ON | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_ON | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
@@ -80,6 +80,8 @@ PLUGIN_HEADER
 #define MINESWP_TOGGLE BUTTON_PLAY
 #define MINESWP_DISCOVER (BUTTON_SELECT | BUTTON_PLAY)
 #define MINESWP_INFO (BUTTON_SELECT | BUTTON_MENU)
+#define MINESWP_RIGHT (BUTTON_SELECT | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_SELECT | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define MINESWP_UP BUTTON_UP
@@ -89,15 +91,19 @@ PLUGIN_HEADER
 #define MINESWP_TOGGLE BUTTON_PLAY
 #define MINESWP_DISCOVER BUTTON_SELECT
 #define MINESWP_INFO (BUTTON_REC | BUTTON_PLAY)
+#define MINESWP_RIGHT (BUTTON_PLAY | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_PLAY | BUTTON_LEFT)
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 #define MINESWP_UP BUTTON_UP
 #define MINESWP_DOWN BUTTON_DOWN
 #define MINESWP_QUIT BUTTON_A
 #define MINESWP_START BUTTON_SELECT
-#define MINESWP_TOGGLE BUTTON_SELECT
-#define MINESWP_DISCOVER BUTTON_POWER
+#define MINESWP_TOGGLE BUTTON_POWER
+#define MINESWP_DISCOVER BUTTON_SELECT
 #define MINESWP_INFO BUTTON_MENU
+#define MINESWP_RIGHT (BUTTON_SELECT | BUTTON_RIGHT)
+#define MINESWP_LEFT (BUTTON_SELECT | BUTTON_LEFT)
 
 #endif
 
@@ -109,7 +115,7 @@ static struct plugin_api* rb;
 
 /* define how numbers are displayed (that way we don't have to */
 /* worry about fonts) */
-static unsigned char num[9][8] = {
+static unsigned char num[10][8] = {
     /*reading the sprites:
       on screen f123
                 4567
@@ -203,6 +209,16 @@ static unsigned char num[9][8] = {
      0x28, /* ..O..O.. */
      0x00, /* ...OO... */
      0x00},/* ........ */
+     /* mine */
+    {0x00, /* ........ */
+     0x00, /* ........ */
+     0x18, /* ...OO... */
+     0x3c, /* ..OOOO.. */
+     0x3c, /* ..OOOO.. */
+     0x18, /* ...OO... */
+     0x00, /* ........ */
+     0x00},/* ........ */
+
 };
 
 /* the tile struct
@@ -222,49 +238,109 @@ typedef struct tile {
 int height = LCD_HEIGHT/8;
 int width = LCD_WIDTH/8;
 
-/* the minefield */
+/* The Minefield. Caution it is defined as Y, X! Not the opposite. */
 tile minefield[LCD_HEIGHT/8][LCD_WIDTH/8];
 
 /* total number of mines on the game */
 int mine_num = 0;
 
-/* discovers the tile when player clears one of them */
-/* a chain reaction (of discovery) occurs if tile has no mines */
-/* as neighbors */
-void discover(int, int);
-void discover(int x, int y){
+/* percentage of mines on minefield used durring generation */
+int p=16;
 
-    if(x<0) return;
-    if(y<0) return;
-    if(x>width-1) return;
-    if(y>height-1) return;
-    if(minefield[y][x].known) return;
+/* number of tiles left on the game */
+int tiles_left;
 
-    minefield[y][x].known = 1;
-    if(minefield[y][x].neighbors == 0){
-        discover(x-1,y-1);
-        discover(x,y-1);
-        discover(x+1,y-1);
-        discover(x+1,y);
-        discover(x+1,y+1);
-        discover(x,y+1);
-        discover(x-1,y+1);
-        discover(x-1,y);
-    }
-    return;
+/* Because mines are set after the first move... */
+bool no_mines = true;
+
+/* We need a stack (created on discover()) for the cascade algorithm. */
+int stack_pos = 0;
+
+/* Functions to center the board on screen. */
+int c_height(void){
+    return LCD_HEIGHT/16 - height/2;
 }
 
+int c_width(void){
+    return LCD_WIDTH/16 - width/2;
+}
 
-/* init not mine related elements of the mine field */
+void push (int *stack, int y, int x){
+
+    if(stack_pos <= height*width){
+        stack_pos++;
+        stack[stack_pos] = y;
+        stack_pos++;
+        stack[stack_pos] = x;
+    }
+}
+
+/* Unveil tiles and push them to stack if they are empty. */
+void unveil(int *stack, int y, int x){
+    
+    if(x < c_width() || y < c_height() || x > c_width() + width-1
+       || y > c_height() + height-1 || minefield[y][x].known
+       || minefield[y][x].mine || minefield[y][x].flag) return;
+        
+    if(minefield[y][x].neighbors == 0){
+        minefield[y][x].known = 1;
+        push(stack, y, x);
+    } else
+        minefield[y][x].known = 1;
+}
+
+void discover(int y, int x){
+    
+    int stack[height*width];
+    
+    /* Selected tile. */
+    if(x < c_width() || y < c_height() || x > c_width() + width-1
+       || y > c_height() + height-1 || minefield[y][x].known
+       || minefield[y][x].mine || minefield[y][x].flag) return;
+                
+    minefield[y][x].known = 1;
+    /* Exit if the tile is not empty. (no mines nearby) */
+    if(minefield[y][x].neighbors) return;
+    
+    push(stack, y, x);
+        
+    /* Scan all nearby tiles. If we meet a tile with a number we just unveil
+       it. If we meet an empty tile, we push the location in stack. For each
+       location in stack we do the same thing. (scan again all nearby tiles) */
+    while(stack_pos){
+        /* Retrieve x, y from stack. */
+        x = stack[stack_pos];
+        y = stack[stack_pos-1];
+        
+        /* Pop. */
+        if(stack_pos > 0) stack_pos -= 2;
+        else rb->splash(HZ,true,"ERROR");
+            
+        unveil(stack, y-1, x-1);
+        unveil(stack, y-1, x);
+        unveil(stack, y-1, x+1);
+        unveil(stack, y, x+1);
+        unveil(stack, y+1, x+1);
+        unveil(stack, y+1, x);
+        unveil(stack, y+1, x-1);
+        unveil(stack, y, x-1);
+    }    
+}
+
+/* Reset the whole board for a new game. */
 void minesweeper_init(void){
     int i,j;
 
-    for(i=0;i<height;i++){
-        for(j=0;j<width;j++){
+    for(i=0;i<LCD_HEIGHT/8;i++){
+        for(j=0;j<LCD_WIDTH/8;j++){
             minefield[i][j].known = 0;
             minefield[i][j].flag = 0;
+            minefield[i][j].mine = 0;
+            minefield[i][j].neighbors = 0;
         }
     }
+    no_mines = true;
+    tiles_left = width*height;
 }
 
 
@@ -275,8 +351,8 @@ void minesweeper_putmines(int p, int x, int y){
     int i,j;
 
     mine_num = 0;
-    for(i=0;i<height;i++){
-        for(j=0;j<width;j++){
+    for(i=c_height();i<c_height() + height;i++){
+        for(j=c_width();j<c_width() + width;j++){
             if(rb->rand()%100<p && !(y==i && x==j)){
                 minefield[i][j].mine = 1;
                 mine_num++;
@@ -286,31 +362,73 @@ void minesweeper_putmines(int p, int x, int y){
             minefield[i][j].neighbors = 0;
         }
     }
-
+            
     /* we need to compute the neighbor element for each tile */
-    for(i=0;i<height;i++){
-        for(j=0;j<width;j++){
+    for(i=c_height();i<c_height() + height;i++){
+        for(j=c_width();j<c_width() + width;j++){
             if(i>0){
                 if(j>0)
                     minefield[i][j].neighbors += minefield[i-1][j-1].mine;
                 minefield[i][j].neighbors += minefield[i-1][j].mine;
-                if(j<width-1)
+                if(j<c_width() + width-1)
                     minefield[i][j].neighbors += minefield[i-1][j+1].mine;
             }
             if(j>0)
                 minefield[i][j].neighbors += minefield[i][j-1].mine;
-            if(j<width-1)
+            if(j<c_width() + width-1)
                 minefield[i][j].neighbors += minefield[i][j+1].mine;
-            if(i<height-1){
+            if(i<c_height() + height-1){
                 if(j>0)
                     minefield[i][j].neighbors += minefield[i+1][j-1].mine;
                 minefield[i][j].neighbors += minefield[i+1][j].mine;
-                if(j<width-1)
+                if(j<c_width() + width-1)
                     minefield[i][j].neighbors += minefield[i+1][j+1].mine;
             }
         }
     }
+    
+    no_mines = false;
+    /* In case the user is lucky and there are no mines positioned. */
+    if(!mine_num && height*width != 1) minesweeper_putmines(p, x, y);
 }
+
+/* A function that will uncover all the board, when the user wins or loses.
+   can easily be expanded, (just a call assigned to a button) as a solver. */
+void mine_show(void){
+    int i, j, button;
+            
+    for(i=c_height();i<c_height() + height;i++){
+        for(j=c_width();j<c_width() + width;j++){
+#if LCD_DEPTH > 1
+            rb->lcd_set_foreground(LCD_DARKGRAY);
+            rb->lcd_drawrect(j*8,i*8,8,8);
+            rb->lcd_set_foreground(LCD_BLACK);
+#else
+            rb->lcd_drawrect(j*8,i*8,8,8);
+#endif
+            if(!minefield[i][j].known){
+                if(minefield[i][j].mine){
+                    rb->lcd_set_drawmode(DRMODE_FG);
+                    rb->lcd_mono_bitmap(num[9], j*8,i*8,8,8);
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                } else if(minefield[i][j].neighbors){
+                    rb->lcd_set_drawmode(DRMODE_FG);
+                    rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],
+                                                        j*8,i*8,8,8);
+                    rb->lcd_set_drawmode(DRMODE_SOLID);
+                }
+            }
+        }
+    }
+    rb->lcd_update();
+    
+    bool k = true;
+    while(k){
+        button = rb->button_get_w_tmo(HZ/10);
+        if(button !=  BUTTON_NONE && !(button & BUTTON_REL)) k = false;
+    }
+}
+
 
 /* the big and ugly function that is the game */
 int minesweeper(void)
@@ -318,15 +436,9 @@ int minesweeper(void)
     int i,j;
     int button;
     int lastbutton = BUTTON_NONE;
-
+    
     /* the cursor coordinates */
-    int x=0,y=0;
-
-    /* number of tiles left on the game */
-    int tiles_left=width*height;
-
-    /* percentage of mines on minefield used durring generation */
-    int p=16;
+    int x=0, y=0;
 
     /* a usefull string for snprintf */
     char str[30];
@@ -351,26 +463,46 @@ int minesweeper(void)
 #elif CONFIG_KEYPAD == IRIVER_H100_PAD
         rb->lcd_puts(0,6,"SELECT to start");
 #endif
-
         rb->lcd_update();
-
 
         button = rb->button_get(true);
         switch(button){
             case MINESWP_DOWN:
+            case (MINESWP_DOWN | BUTTON_REPEAT):
                 p = (p + 98)%100;
+                /* Don't let the user play without mines. */
+                if(!p) p = 98;
                 break;
 
             case MINESWP_UP:
+            case (MINESWP_UP | BUTTON_REPEAT):
                 p = (p + 2)%100;
+                /* Don't let the user play without mines. */
+                if(!p) p = 2;
                 break;
 
             case BUTTON_RIGHT:
+            case (BUTTON_RIGHT | BUTTON_REPEAT):
                 height = height%(LCD_HEIGHT/8)+1;
                 break;
 
             case BUTTON_LEFT:
+            case (BUTTON_LEFT | BUTTON_REPEAT):
                 width = width%(LCD_WIDTH/8)+1;
+                break;
+                
+            case MINESWP_RIGHT:
+            case (MINESWP_RIGHT | BUTTON_REPEAT):
+                height--;
+                if(height < 1) height = LCD_HEIGHT/8;
+                if(height > LCD_HEIGHT) height = 1;
+                break;
+
+            case MINESWP_LEFT:
+            case (MINESWP_LEFT | BUTTON_REPEAT):
+                width--;
+                if(width < 1) width = LCD_WIDTH/8;
+                if(width > LCD_WIDTH) width = 1;
                 break;
 
             case MINESWP_START:/* start playing */
@@ -395,6 +527,8 @@ int minesweeper(void)
     ********************/
 
     minesweeper_init();
+    x = c_width();
+    y = c_height();
 
     /**********************
     *        play         *
@@ -406,8 +540,8 @@ int minesweeper(void)
         rb->lcd_clear_display();
 
         /*display the mine field */
-        for(i=0;i<height;i++){
-            for(j=0;j<width;j++){
+        for(i=c_height();i<c_height() + height;i++){
+            for(j=c_width();j<c_width() + width;j++){
 #if LCD_DEPTH > 1
                 rb->lcd_set_foreground(LCD_DARKGRAY);
                 rb->lcd_drawrect(j*8,i*8,8,8);
@@ -416,11 +550,10 @@ int minesweeper(void)
                 rb->lcd_drawrect(j*8,i*8,8,8);
 #endif
                 if(minefield[i][j].known){
-                    if(minefield[i][j].mine){
-                        rb->lcd_putsxy(j*8+1,i*8+1,"b");
-                    } else if(minefield[i][j].neighbors){
+                    if(minefield[i][j].neighbors){
                         rb->lcd_set_drawmode(DRMODE_FG);
-                        rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],j*8,i*8,8,8);
+                        rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],
+                                                              j*8,i*8,8,8);
                         rb->lcd_set_drawmode(DRMODE_SOLID);
                     }
                 } else if(minefield[i][j].flag) {
@@ -451,29 +584,33 @@ int minesweeper(void)
             /* quit minesweeper (you really shouldn't use this button ...) */
             case MINESWP_QUIT:
                 return MINESWEEPER_QUIT;
-
+                                                
                 /* move cursor left */
             case BUTTON_LEFT:
             case (BUTTON_LEFT | BUTTON_REPEAT):
-                x = (x + width - 1)%width;
+                if(x<=c_width()) x = width + c_width();
+                x = x-1;
                 break;
 
                 /* move cursor right */
             case BUTTON_RIGHT:
             case (BUTTON_RIGHT | BUTTON_REPEAT):
-                x = (x + 1)%width;
+                if(x>=width + c_width() - 1) x = c_width() - 1;
+                x = x+1;
                 break;
 
                 /* move cursor down */
             case MINESWP_DOWN:
             case (MINESWP_DOWN | BUTTON_REPEAT):
-                y = (y + 1)%height;
+                if(y>=height + c_height() - 1) y = c_height() - 1;
+                y = y+1;
                 break;
 
                 /* move cursor up */
             case MINESWP_UP:
             case (MINESWP_UP | BUTTON_REPEAT):
-                y = (y + height - 1)%height;
+                if(y<=c_height()) y = height + c_height();
+                y = y-1;
                 break;
 
                 /* discover a tile (and it's neighbors if .neighbors == 0) */
@@ -484,14 +621,17 @@ int minesweeper(void)
                 if(minefield[y][x].flag) break;
                 /* we put the mines on the first "click" so that you don't */
                 /* lose on the first "click" */
-                if(tiles_left == width*height) minesweeper_putmines(p,x,y);
-                discover(x,y);
+                if(tiles_left == width*height && no_mines)
+                    minesweeper_putmines(p,x,y);
+                                
+                discover(y, x);
+                
                 if(minefield[y][x].mine){
                     return MINESWEEPER_LOSE;
                 }
                 tiles_left = 0;
-                for(i=0;i<height;i++){
-                    for(j=0;j<width;j++){
+                for(i=c_height();i<c_height() + height;i++){
+                    for(j=c_width();j<c_width() + width;j++){
                          if(minefield[i][j].known == 0) tiles_left++;
                     }
                 }
@@ -515,13 +655,16 @@ int minesweeper(void)
                 /* show how many mines you think you have found and how many */
                 /* there really are on the game */
             case MINESWP_INFO:
+                if(no_mines) break;
                 tiles_left = 0;
-                for(i=0;i<height;i++){
-                    for(j=0;j<width;j++){
-                         if(minefield[i][j].flag) tiles_left++;
+                for(i=c_height();i<c_height() + height;i++){
+                    for(j=c_width();j<c_width() + width;j++){
+                         if(minefield[i][j].flag && !minefield[i][j].known)
+                            tiles_left++;
                     }
                 }
-                rb->splash(HZ*2, true, "You found %d mines out of %d", tiles_left, mine_num);
+                rb->splash(HZ*2, true, "You found %d mines out of %d",
+                                                 tiles_left, mine_num);
                 break;
 
             default:
@@ -547,11 +690,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     while(!exit) {
         switch(minesweeper()){
             case MINESWEEPER_WIN:
-                rb->splash(HZ*2, true, "You Win :)");
+                rb->splash(HZ*2, true, "You Won! Press a key");
+                rb->lcd_clear_display();
+                mine_show();
                 break;
 
             case MINESWEEPER_LOSE:
-                rb->splash(HZ*2, true, "You Lose :(");
+                rb->splash(HZ*2, true, "You Lost! Press a key");
+                rb->lcd_clear_display();
+                mine_show();
                 break;
 
             case MINESWEEPER_USB:
