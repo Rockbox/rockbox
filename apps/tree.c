@@ -75,6 +75,10 @@
 #include "widgets.h"
 #endif
 
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
+
 /* a table for the know file types */
 const struct filetype filetypes[] = {
     { "mp3", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
@@ -877,23 +881,14 @@ static bool dirbrowse(void)
         if (start_wps && audio_status() )
         {
             int i;
-#ifdef HAVE_LCD_COLOR
-            fb_data* old_backdrop;
-#endif
 
             FOR_NB_SCREENS(i)
                 screens[i].stop_scroll();
-#ifdef HAVE_LCD_COLOR
-            old_backdrop = lcd_get_backdrop();
-#endif
+
             if (gui_wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
 #ifdef HAVE_LCD_COLOR
-            /* check if the backdrop hasn't been cleared */
-            if(global_settings.backdrop_file[0])
-                lcd_set_backdrop(old_backdrop);
-            else
-                lcd_set_backdrop(NULL);
+            show_main_backdrop();
 #endif
 #ifdef HAVE_HOTSWAP
             else

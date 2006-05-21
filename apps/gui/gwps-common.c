@@ -146,44 +146,31 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
         case 'X':
             /* Backdrop image - must be the same size as the LCD */
         {
-            int ret = 0;
-            struct bitmap bm;
             char *ptr = buf+2;
             char *pos = NULL;
             char imgname[MAX_PATH];
 
             /* format: %X|filename.bmp| */
+
+            /* get filename */
+            pos = strchr(ptr, '|');
+            if ((pos - ptr) <
+                (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
             {
-                /* get filename */
-                pos = strchr(ptr, '|');
-                if ((pos - ptr) <
-                    (int)sizeof(imgname)-ROCKBOX_DIR_LEN-2)
-                {
-                    memcpy(imgname, bmpdir, bmpdirlen);
-                    imgname[bmpdirlen] = '/';
-                    memcpy(&imgname[bmpdirlen+1],
-                           ptr, pos - ptr);
-                    imgname[bmpdirlen+1+pos-ptr] = 0;
-                }
-                else
-                    /* filename too long */
-                    imgname[0] = 0;
-
-                ptr = pos+1;
-
-                /* load the image */
-                bm.data=(char*)&wps_backdrop[0][0];
-                ret = read_bmp_file(imgname, &bm,
-                                    sizeof(wps_backdrop), FORMAT_NATIVE);
-
-                if ((ret > 0) && (bm.width == LCD_WIDTH) 
-                              && (bm.height == LCD_HEIGHT)) {
-                    data->has_backdrop=true;
-                    return true;
-                } else {
-                    return false;
-                }
+                memcpy(imgname, bmpdir, bmpdirlen);
+                imgname[bmpdirlen] = '/';
+                memcpy(&imgname[bmpdirlen+1],
+                        ptr, pos - ptr);
+                imgname[bmpdirlen+1+pos-ptr] = 0;
             }
+            else
+            {
+                /* filename too long */
+                imgname[0] = 0;
+            }
+
+            /* load the image */
+            return load_wps_backdrop(imgname);
         }
 
         break;
@@ -2460,6 +2447,9 @@ bool gui_wps_display(void)
                     if(i == 0)
                     {
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_LCD_COLOR
+                        unload_wps_backdrop();
+#endif
                         wps_data_load(gui_wps[i].data,
                                       "%s%?it<%?in<%in. |>%it|%fn>\n"
                                       "%s%?ia<%ia|%?d2<%d2|(root)>>\n"

@@ -25,14 +25,20 @@
 #include "lcd.h"
 #include "bmp.h"
 #include "backdrop.h"
-
-#ifdef HAVE_LCD_COLOR
+/*
 extern fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH];
 extern fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH];
-#endif
+*/
 
 bool load_main_backdrop(char* filename);
+bool load_wps_backdrop(char* filename);
 
-#endif
+void unload_main_backdrop(void);
+void unload_wps_backdrop(void);
 
-#endif
+void show_main_backdrop(void);
+void show_wps_backdrop(void);
+
+#endif /* HAVE_LCD_COLOR */
+
+#endif /* _BACKDROP_H */

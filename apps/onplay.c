@@ -433,22 +433,13 @@ static bool delete_dir(void)
 #ifdef HAVE_LCD_COLOR
 static bool set_backdrop(void)
 {
-    struct bitmap bm;
-    int ret;
-
     /* load the image */
-    bm.data=(char*)&main_backdrop[0][0];
-    ret = read_bmp_file(selected_file, &bm,
-                        sizeof(main_backdrop), FORMAT_NATIVE);
-
-    if ((ret > 0) && (bm.width == LCD_WIDTH)
-                  && (bm.height == LCD_HEIGHT)) {
-        lcd_set_backdrop(&main_backdrop[0][0]);
+    if(load_main_backdrop(selected_file)) {
         gui_syncsplash(HZ, true, str(LANG_BACKDROP_LOADED));
         set_file(selected_file, (char *)global_settings.backdrop_file, MAX_FILENAME);
+        show_main_backdrop();
         return true;
     } else {
-        lcd_set_backdrop(NULL);
         gui_syncsplash(HZ, true, str(LANG_BACKDROP_FAILED));
         return false;
     }

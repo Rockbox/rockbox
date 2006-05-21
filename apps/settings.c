@@ -1055,6 +1055,9 @@ void settings_apply(void)
         global_settings.peak_meter_clip_hold);
 #endif
 
+#ifdef HAVE_LCD_COLOR
+    unload_wps_backdrop();
+#endif
     if ( global_settings.wps_file[0] &&
          global_settings.wps_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, WPS_DIR "/%s.wps",
@@ -1062,18 +1065,21 @@ void settings_apply(void)
         wps_data_load(gui_wps[0].data, buf, true);
     }
     else
+    {
         wps_data_init(gui_wps[0].data);
+    }
 
 #ifdef HAVE_LCD_COLOR
     if ( global_settings.backdrop_file[0] &&
          global_settings.backdrop_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
                  global_settings.backdrop_file);
-
         load_main_backdrop(buf);
     } else {
-        lcd_set_backdrop(NULL);
+        unload_main_backdrop();
     }
+    show_main_backdrop();
+
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
 #endif
@@ -1415,6 +1421,9 @@ bool settings_load_config(const char* file)
 
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
+#ifdef HAVE_LCD_COLOR
+            unload_wps_backdrop();
+#endif
             if (wps_data_load(gui_wps[0].data, value, true))
                 set_file(value, (char *)global_settings.wps_file, MAX_FILENAME);
         }
@@ -1444,8 +1453,10 @@ bool settings_load_config(const char* file)
 #endif
 #ifdef HAVE_LCD_COLOR
         else if (!strcasecmp(name, "backdrop")) {
-            if (load_main_backdrop(value))
+            if (load_main_backdrop(value)) {
                 set_file(value, (char *)global_settings.backdrop_file, MAX_FILENAME);
+                show_main_backdrop();
+            }
         }
 #endif
 #ifdef HAVE_LCD_BITMAP

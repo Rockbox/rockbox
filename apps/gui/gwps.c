@@ -105,18 +105,8 @@ long gui_wps_show(void)
         gui_wps_set_margin(&gui_wps[i]);
     }
 #ifdef HAVE_LCD_COLOR
-    gui_wps[SCREEN_MAIN].data->old_backdrop = lcd_get_backdrop();
-    if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-    {
-        lcd_set_backdrop(&wps_backdrop[0][0]);
-    }
-    else
-    {
-        /* wps has no backdrop, so clear it in case we're switching wps */
-        lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
-    }
-
-#endif
+    show_wps_backdrop();
+#endif /* HAVE_LCD_COLOR */
 #endif
 
 #ifdef AB_REPEAT_ENABLE
@@ -241,12 +231,11 @@ long gui_wps_show(void)
             case WPS_RC_CONTEXT:
 #endif
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
 #ifdef HAVE_LCD_COLOR
-                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-                    lcd_set_backdrop(&wps_backdrop[0][0]);
+                show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -557,16 +546,12 @@ long gui_wps_show(void)
                     gui_wps[i].display->stop_scroll();
 
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 if (main_menu())
                     return true;
 #ifdef HAVE_LCD_COLOR
-                if(global_settings.backdrop_file[0] == 0)
-                    gui_wps[SCREEN_MAIN].data->old_backdrop = NULL;
-
-                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-                    lcd_set_backdrop(&wps_backdrop[0][0]);
+                show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -596,13 +581,12 @@ long gui_wps_show(void)
             case WPS_RC_QUICK:
 #endif
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
-                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-                    lcd_set_backdrop(&wps_backdrop[0][0]);
+                show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -629,13 +613,12 @@ long gui_wps_show(void)
             case BUTTON_ON | BUTTON_UP:
             case BUTTON_ON | BUTTON_DOWN:
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
-                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-                    lcd_set_backdrop(&wps_backdrop[0][0]);
+                show_wps_backdrop();
 #endif
                 restore = true;
                 break;
@@ -730,12 +713,11 @@ long gui_wps_show(void)
 #ifdef WPS_ID3
             case WPS_ID3:
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 browse_id3();
 #ifdef HAVE_LCD_COLOR
-                if (gui_wps[SCREEN_MAIN].data->has_backdrop)
-                    lcd_set_backdrop(&wps_backdrop[0][0]);
+                show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
@@ -754,19 +736,14 @@ long gui_wps_show(void)
             case SYS_POWEROFF:
                 bookmark_autobookmark();
 #ifdef HAVE_LCD_COLOR
-                lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
+                show_main_backdrop();
 #endif
                 default_event_handler(SYS_POWEROFF);
                 break;
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
-                {
-#ifdef HAVE_LCD_COLOR
-                    lcd_set_backdrop(gui_wps[SCREEN_MAIN].data->old_backdrop);
-#endif
                     return SYS_USB_CONNECTED;
-                }
                 update_track = true;
                 break;
         }
@@ -887,9 +864,6 @@ void wps_data_init(struct wps_data *wps_data)
     wps_data->format_buffer[0] = '\0';
     wps_data->wps_loaded = false;
     wps_data->peak_meter_enabled = false;
-#ifdef HAVE_LCD_COLOR
-    wps_data->has_backdrop = false;
-#endif
 }
 
 static void wps_reset(struct wps_data *data)
@@ -1075,4 +1049,7 @@ void gui_sync_wps_init(void)
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
+#ifdef HAVE_LCD_COLOR
+    unload_wps_backdrop();
+#endif
 }

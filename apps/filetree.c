@@ -53,6 +53,11 @@
 static int boot_size = 0;
 static int boot_cluster;
 #endif
+
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
+
 extern bool boot_changed;
 
 int ft_build_playlist(struct tree_context* c, int start_index)
@@ -461,6 +466,9 @@ int ft_enter(struct tree_context* c)
                 /* wps config file */
             case TREE_ATTR_WPS:
                 gui_syncsplash(0, true, str(LANG_WAIT));
+#ifdef HAVE_LCD_COLOR
+                unload_wps_backdrop();
+#endif
                 wps_data_load(gui_wps[0].data, buf, true);
                 set_file(buf, (char *)global_settings.wps_file,
                          MAX_FILENAME);

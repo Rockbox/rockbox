@@ -78,6 +78,10 @@ void dac_line_in(bool enable);
 #include "dsp.h"
 #endif
 
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
+
 #ifdef HAVE_CHARGING
 static bool car_adapter_mode(void)
 {
@@ -323,7 +327,8 @@ static bool invert_cursor(void)
 static bool clear_main_backdrop(void)
 {
     global_settings.backdrop_file[0]=0;
-    lcd_set_backdrop(NULL);
+    unload_main_backdrop();
+    show_main_backdrop();
     return false;
 }
 

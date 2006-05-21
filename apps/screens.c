@@ -64,6 +64,10 @@
 #include "dsp.h"
 #endif
 
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
+
 #ifdef HAVE_LCD_BITMAP
 #define SCROLLBAR_WIDTH  6
 #endif
@@ -74,6 +78,9 @@ void usb_screen(void)
     /* nothing here! */
 #else
     int i;
+#ifdef HAVE_LCD_COLOR
+    show_main_backdrop();
+#endif
     FOR_NB_SCREENS(i) {
         screens[i].backlight_on();
         gui_logo_draw(&usb_logos[i], &screens[i]);
