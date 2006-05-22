@@ -8515,3 +8515,17 @@
     *: "Invalid Filename"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Remote Scrolling Options"
+  </dest>
+  <voice>
+    *: "Remote Scrolling Options"
+  </voice>
+</phrase>

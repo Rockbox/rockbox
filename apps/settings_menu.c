@@ -55,7 +55,6 @@
 #include "yesno.h"
 #include "list.h"
 #include "color_picker.h"
-#include "screen_access.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -840,10 +839,10 @@ static bool sleep_timer(void)
 }
 
 static bool scroll_speed(void)
-{
+{   
     return set_int(str(LANG_SCROLL), "", UNIT_INT,
                    &global_settings.scroll_speed,
-                   &screen_lcd_scroll_speed, 1, 0, 15, NULL );
+                   &lcd_scroll_speed, 1, 0, 15, NULL );
 }
 
 static bool scroll_delay(void)
@@ -851,10 +850,36 @@ static bool scroll_delay(void)
     int dummy = global_settings.scroll_delay * (HZ/10);
     int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
                      &dummy,
-                     &screen_lcd_scroll_delay, 100, 0, 2500, NULL );
+                     &lcd_scroll_delay, 100, 0, 2500, NULL );
     global_settings.scroll_delay = dummy / (HZ/10);
     return rc;
 }
+
+#ifdef HAVE_REMOTE_LCD
+static bool remote_scroll_speed(void)
+{
+    return set_int(str(LANG_SCROLL), "", UNIT_INT,
+                   &global_settings.remote_scroll_speed,
+                   &lcd_remote_scroll_speed, 1, 0, 15, NULL );
+}
+
+static bool remote_scroll_step(void)
+{
+    return set_int(str(LANG_SCROLL_STEP_EXAMPLE), str(LANG_PIXELS), UNIT_PIXEL,
+                   &global_settings.remote_scroll_step,
+                   &lcd_remote_scroll_step, 1, 1, LCD_WIDTH, NULL );
+}
+
+static bool remote_scroll_delay(void)
+{
+    int dummy = global_settings.remote_scroll_delay * (HZ/10);
+    int rc = set_int(str(LANG_SCROLL_DELAY), "ms", UNIT_MS,
+                     &dummy,
+                     &lcd_remote_scroll_delay, 100, 0, 2500, NULL );
+    global_settings.remote_scroll_delay = dummy / (HZ/10);
+    return rc;
+}
+#endif
 
 #ifdef HAVE_LCD_BITMAP
 static bool screen_scroll(void)
@@ -875,7 +900,7 @@ static bool scroll_step(void)
 {
     return set_int(str(LANG_SCROLL_STEP_EXAMPLE), str(LANG_PIXELS), UNIT_PIXEL,
                    &global_settings.scroll_step,
-                   &screen_lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
+                   &lcd_scroll_step, 1, 1, LCD_WIDTH, NULL );
 }
 #endif
 
@@ -1645,6 +1670,25 @@ static bool fileview_settings_menu(void)
     return result;
 }
 
+#ifdef HAVE_REMOTE_LCD
+static bool remote_scroll_sets(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_SCROLL_SPEED),        remote_scroll_speed },
+        { ID2P(LANG_SCROLL_DELAY),        remote_scroll_delay },
+        { ID2P(LANG_SCROLL_STEP),         remote_scroll_step  },
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+#endif
 
 static bool scroll_settings_menu(void)
 {
@@ -1656,6 +1700,9 @@ static bool scroll_settings_menu(void)
         { ID2P(LANG_SCROLL_DELAY),        scroll_delay       },
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_SCROLL_STEP),         scroll_step        },
+#endif
+#ifdef HAVE_REMOTE_LCD
+        { ID2P(LANG_REMOTE_SCROLL_SETS),  remote_scroll_sets },
 #endif
         { ID2P(LANG_BIDIR_SCROLL),        bidir_limit        },
 #ifdef HAVE_LCD_CHARCELLS

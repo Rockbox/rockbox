@@ -301,7 +301,6 @@ struct user_settings
     int volume_type;   /* how volume is displayed: 0=graphic, 1=percent */
     int battery_display; /* how battery is displayed: 0=graphic, 1=percent */
     int timeformat;    /* time format: 0=24 hour clock, 1=12 hour clock */
-    int scroll_speed;  /* long texts scrolling speed: 1-30 */
     bool playlist_shuffle;
     bool play_selected; /* Plays selected file even in shuffle mode */
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
@@ -333,11 +332,18 @@ struct user_settings
 
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */
-
+    
+    int scroll_speed;  /* long texts scrolling speed: 1-30 */
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int scroll_step;   /* pixels to advance per update */
-#ifdef HAVE_LCD_BITMAP 
+#ifdef HAVE_REMOTE_LCD
+    int remote_scroll_speed;  /* long texts scrolling speed: 1-30 */
+    int remote_scroll_delay;  /* delay (in 1/10s) before starting scroll */
+    int remote_scroll_step;   /* pixels to advance per update */
+#endif
+
+#ifdef HAVE_LCD_BITMAP
     bool offset_out_of_view;
     int screen_scroll_step;
 #endif

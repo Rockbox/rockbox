@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 43
+#define CONFIG_BLOCK_VERSION 44
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -359,6 +359,13 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(scroll_speed), 9, "scroll speed", NULL }, /* 0...15 */
     {8, S_O(scroll_delay), 100, "scroll delay", NULL }, /* 0...250 */
     {8, S_O(bidir_limit), 50, "bidir limit", NULL }, /* 0...200 */
+    
+#ifdef HAVE_REMOTE_LCD
+    {4, S_O(remote_scroll_speed), 9, "remote scroll speed", NULL }, /* 0...15 */
+    {8, S_O(remote_scroll_step), 6, "remote scroll step", NULL }, /* 1...160 */
+    {8, S_O(remote_scroll_delay), 100, "remote scroll delay", NULL }, /* 0...250 */
+#endif
+
 #ifdef HAVE_LCD_BITMAP
     {1, S_O(offset_out_of_view), false, "Screen Scrolls Out Of View", off_on },
 #if LCD_WIDTH > 255
@@ -1004,9 +1011,9 @@ void settings_apply(void)
     lcd_remote_set_contrast(global_settings.remote_contrast);
     lcd_remote_set_invert_display(global_settings.remote_invert);
     lcd_remote_set_flip(global_settings.remote_flip_display);
-    lcd_remote_scroll_speed(global_settings.scroll_speed);
-    lcd_remote_scroll_step(global_settings.scroll_step);
-    lcd_remote_scroll_delay(global_settings.scroll_delay * (HZ/10));
+    lcd_remote_scroll_speed(global_settings.remote_scroll_speed);
+    lcd_remote_scroll_step(global_settings.remote_scroll_step);
+    lcd_remote_scroll_delay(global_settings.remote_scroll_delay * (HZ/10));
 #ifdef HAVE_REMOTE_LCD_TICKING
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif

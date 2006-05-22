@@ -147,6 +147,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->drawline=&lcd_drawline;
             screen->vline=&lcd_vline;
             screen->hline=&lcd_hline;
+            screen->scroll_speed=&lcd_scroll_speed; 	 
+            screen->scroll_delay=&lcd_scroll_delay;            
             screen->scroll_step=&lcd_scroll_step;
             screen->invertscroll=&lcd_invertscroll;
             screen->puts_offset=&lcd_puts_offset;
@@ -173,8 +175,6 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->init=&lcd_init;
             screen->puts_scroll=&lcd_puts_scroll;
             screen->stop_scroll=&lcd_stop_scroll;
-            screen->scroll_speed=&lcd_scroll_speed;
-            screen->scroll_delay=&lcd_scroll_delay;
             screen->clear_display=&lcd_clear_display;
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
             screen->update=&lcd_update;
@@ -207,26 +207,3 @@ void screen_access_init(void)
     FOR_NB_SCREENS(i)
         screen_init(&screens[i], i);
 }
-
-void screen_lcd_scroll_speed(int speed)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        screens[i].scroll_speed(speed);
-}
-
-void screen_lcd_scroll_delay(int ms)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        screens[i].scroll_delay(ms);
-}
-
-#ifdef HAVE_LCD_BITMAP
-void screen_lcd_scroll_step(int pixels)
-{
-    int i;
-    FOR_NB_SCREENS(i)
-        screens[i].scroll_step(pixels);
-}
-#endif
