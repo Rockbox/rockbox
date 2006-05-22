@@ -138,7 +138,7 @@ PLUGIN_HEADER
 
 #ifdef HAVE_LCD_BITMAP
 
-#define DIST (10*LCD_HEIGHT/16)
+#define DIST (10 * MIN(LCD_HEIGHT, LCD_WIDTH) / 16)
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
 

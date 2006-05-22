@@ -99,6 +99,19 @@ PLUGIN_HEADER
 #define PLAYERS_TEXT "Up/Down"
 #define WORMS_TEXT "Left/Right"
 
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+
+#define BTN_DIR_UP BUTTON_UP
+#define BTN_DIR_DOWN BUTTON_DOWN
+#define BTN_DIR_LEFT BUTTON_LEFT
+#define BTN_DIR_RIGHT BUTTON_RIGHT
+#define BTN_STARTPAUSE BUTTON_SELECT
+#define BTN_QUIT BUTTON_A
+#define BTN_STOPRESET BUTTON_POWER
+
+#define PLAYERS_TEXT "Up/Down"
+#define WORMS_TEXT "Left/Right"
+
 #endif
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
@@ -127,6 +140,11 @@ PLUGIN_HEADER
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#define FOOD_SIZE 7
+#define ARGH_SIZE 8
+#define SPEED 4
+#define MAX_WORM_SEGMENTS 512
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
 #define FOOD_SIZE 7
 #define ARGH_SIZE 8
 #define SPEED 4
