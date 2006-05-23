@@ -97,19 +97,19 @@ PLUGIN_HEADER
 #define BOARD_Y (LCD_HEIGHT-BOARD_H*CUBE_SIZE)/2
 
 #ifdef HAVE_LCD_COLOR
-#define CLR_RED  LCD_RGBPACK(255,0,0)       /* used to imply danger */
-#define CLR_BLUE LCD_RGBPACK(0,0,128)       /* used for menu selection */
-#define CLR_CYAN LCD_RGBPACK(125, 145, 180) /* used for frame and filling */
-#define PLR_COL  LCD_WHITE                  /* color used for the player */
+#define CLR_RED  LCD_RGBPACK(255,0,0)         /* used to imply danger */
+#define CLR_BLUE LCD_RGBPACK(0,0,128)         /* used for menu selection */
+#define CLR_LTBLUE LCD_RGBPACK(125, 145, 180) /* used for frame and filling */
+#define PLR_COL  LCD_WHITE                    /* color used for the player */
 #else
-#define CLR_RED  LCD_DARKGRAY   /* used to imply danger */
-#define CLR_BLUE LCD_BLACK      /* used for menu selection */
-#define CLR_CYAN LCD_LIGHTGRAY  /* used for frame and filling */
-#define PLR_COL  LCD_BLACK      /* color used for the player */
+#define CLR_RED  LCD_DARKGRAY     /* used to imply danger */
+#define CLR_BLUE LCD_BLACK        /* used for menu selection */
+#define CLR_LTBLUE LCD_LIGHTGRAY  /* used for frame and filling */
+#define PLR_COL  LCD_BLACK        /* color used for the player */
 #endif
 
 #define EMPTIED LCD_BLACK       /* empty spot */
-#define FILLED  CLR_CYAN        /* filled spot */
+#define FILLED  CLR_LTBLUE      /* filled spot */
 #define TRAIL   CLR_RED         /* the red trail of the player */
 #define QIX     LCD_WHITE
 #define UNCHECKED 0
@@ -319,7 +319,7 @@ static void refresh_board (void)
                               CUBE_SIZE, CUBE_SIZE);
         }
     rb->lcd_set_foreground (LCD_BLACK);
-    rb->lcd_set_background (CLR_CYAN);
+    rb->lcd_set_background (CLR_LTBLUE);
     rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
     rb->lcd_putsxy (BOARD_X, BOARD_Y, str);
     rb->snprintf (str, sizeof (str), "%d%%", percentage ());
@@ -470,6 +470,8 @@ static void complete_trail (int fill)
                     }
                 }
      }
+
+     rb->button_clear_queue();
 }
 
 /* returns the color the real pixel(x,y) on the lcd is pointing at */
@@ -762,15 +764,19 @@ static int xobox_loop (void)
         button = rb->button_get_w_tmo (true);
         switch (button) {
             case UP:
+            case UP|BUTTON_REPEAT:
                 player.move = MOVE_UP;
                 break;
             case DOWN:
+            case DOWN|BUTTON_REPEAT:
                 player.move = MOVE_DN;
                 break;
             case LEFT:
+            case LEFT|BUTTON_REPEAT:
                 player.move = MOVE_LT;
                 break;
             case RIGHT:
+            case RIGHT|BUTTON_REPEAT:
                 player.move = MOVE_RT;
                 break;
             case PAUSE:
