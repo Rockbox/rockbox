@@ -64,9 +64,7 @@ tetrox.c
 video.c
 #endif
 vu_meter.c
-#if CONFIG_KEYPAD != IPOD_3G_PAD
 wormlet.c
-#endif
 
 #ifdef CONFIG_RTC 
 clock.c
