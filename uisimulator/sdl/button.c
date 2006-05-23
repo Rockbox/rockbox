@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "uisdl.h"
+#include "lcd-charcell.h"
 #include "config.h"
 #include "button.h"
 #include "kernel.h"
@@ -153,7 +154,6 @@ void button_event(int key, bool pressed)
 #endif
         break;
 
-#ifdef HAVE_LCD_BITMAP
     case SDLK_KP0:
     case SDLK_F5:
         if(pressed)
@@ -162,7 +162,6 @@ void button_event(int key, bool pressed)
             return;
         }
         break;
-#endif
 
     case SDLK_KP_PERIOD:
     case SDLK_INSERT:

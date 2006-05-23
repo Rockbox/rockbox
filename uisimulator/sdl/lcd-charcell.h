@@ -23,7 +23,10 @@
 #include "lcd.h"
 #include "SDL.h"
 
+#ifdef HAVE_LCD_CHARCELLS
 void sim_lcd_init(void);
+void screen_dump(void);
+#endif
 
 #endif /* #ifndef __LCDCHARCELL_H__ */
 
