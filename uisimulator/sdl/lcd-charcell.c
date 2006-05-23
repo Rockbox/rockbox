@@ -21,6 +21,8 @@
 #include "lcd.h"
 #include "misc.h"
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "lcd-playersim.h"
 #include "uisdl.h"
@@ -28,8 +30,6 @@
 
 /* extern functions, needed for screendump() */
 extern int sim_creat(const char *name, mode_t mode);
-extern ssize_t write(int fd, const void *buf, size_t count);
-extern int close(int fd);
 
 SDL_Surface* lcd_surface;
 SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
@@ -184,7 +184,7 @@ void screen_dump(void)
     create_numbered_filename(filename, "", "dump_", ".bmp", 4);
     DEBUGF("screen_dump\n");
 
-    fd = sim_creat(filename, 1 /*O_WRONLY*/);
+    fd = sim_creat(filename, O_WRONLY);
     if (fd < 0)
         return;
 
