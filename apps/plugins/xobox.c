@@ -39,10 +39,12 @@ PLUGIN_HEADER
 #define RIGHT BUTTON_RIGHT
 #define PAUSE BUTTON_SELECT
 #define SELECT BUTTON_SELECT
+#define MENU_UP BUTTON_SCROLL_FWD
+#define MENU_DOWN BUTTON_SCROLL_BACK
 #define UP BUTTON_MENU
 #define DOWN BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD 
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 
 #define QUIT BUTTON_POWER
 #define LEFT BUTTON_LEFT
@@ -95,10 +97,10 @@ PLUGIN_HEADER
 #define BOARD_Y (LCD_HEIGHT-BOARD_H*CUBE_SIZE)/2
 
 #ifdef HAVE_LCD_COLOR
-#define CLR_RED  LCD_RGBPACK(255,0,0)   /* used to imply danger */
-#define CLR_BLUE LCD_RGBPACK(0,0,128)   /* used for menu selection */
-#define CLR_CYAN LCD_RGBPACK(0,128,128) /* used for frame and filling */
-#define PLR_COL  LCD_WHITE              /* color used for the player */
+#define CLR_RED  LCD_RGBPACK(255,0,0)       /* used to imply danger */
+#define CLR_BLUE LCD_RGBPACK(0,0,128)       /* used for menu selection */
+#define CLR_CYAN LCD_RGBPACK(125, 145, 180) /* used for frame and filling */
+#define PLR_COL  LCD_WHITE                  /* color used for the player */
 #else
 #define CLR_RED  LCD_DARKGRAY   /* used to imply danger */
 #define CLR_BLUE LCD_BLACK      /* used for menu selection */
@@ -194,7 +196,7 @@ static bool push (struct pos *p)
 static void emptyStack (void)
 {
     stackPointer = 0;
-    /* int x, y; 
+    /* int x, y;
        while(pop(&x, &y)); */
 }
 
@@ -454,7 +456,7 @@ static void complete_trail (int fill)
             boardcopy[div (qixes[i].y - BOARD_Y, CUBE_SIZE)][div
                                                              (qixes[i].x - BOARD_X,
                                                               CUBE_SIZE)] = QIX;
-    
+
         for (j = 1; j < BOARD_H - 1; j++)
             for (i = 0; i < BOARD_W - 0; i++)
                 if (board[j][i] != FILLED) {
@@ -653,6 +655,10 @@ static inline void move_board (void)
             /* start drawing */
             player.drawing = true;
             board[newj][newi] = TRAIL;
+        /* if the block after next is empty and we're moving onto filled, stop */
+        } else if ((board[newj][newi] == FILLED)
+                   && (board[newj + newj-player.j][newi + newi-player.i] == EMPTIED)) {
+            player.move = MOVE_NO;
         }
         player.i = newi;
         player.j = newj;
@@ -665,7 +671,7 @@ static inline void move_board (void)
             player.level++;
         init_board ();
         refresh_board ();
-        rb->splash (HZ * 2, true, "READY?");
+        rb->splash (HZ * 2, true, "Ready?");
     }
 }
 
@@ -675,32 +681,46 @@ static inline void move_board (void)
 #define MENU_QUIT  1
 static int game_menu (void)
 {
-    static char menu[MAIN_MENU_SIZE][15] = { 
+    static char menu[MAIN_MENU_SIZE][15] = {
         "Start New Game",
         "Quit"
     };
 
     int button, selection = 0, sw, sh, i;
     bool quit = false;
-    rb->lcd_getstringsize ("A", NULL, &sh);
-    rb->lcd_getstringsize ("XOBOX", &sw, NULL);
+
+    rb->lcd_setfont(FONT_UI);
+    rb->lcd_getstringsize("A", &sw, &sh);
+    if(sw*20 > LCD_WIDTH || sh*4 > LCD_HEIGHT)
+        rb->lcd_setfont(FONT_SYSFIXED);
+
+    rb->lcd_getstringsize ("XOBOX", &sw, &sh);
     sh++;
     rb->lcd_set_background (LCD_WHITE);
+    rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_clear_display ();
     rb->lcd_putsxy (LCD_WIDTH / 2 - sw / 2, 2, "XOBOX");
     while (!quit) {
         for (i = 0; i < MAIN_MENU_SIZE; i++) {
             rb->lcd_set_foreground ((i == selection ? LCD_WHITE : LCD_BLACK));
             rb->lcd_set_background ((i == selection ? CLR_BLUE : LCD_WHITE));
-            rb->lcd_putsxy (9, sh + 4 + i * sh, menu[i]);
+            rb->lcd_putsxy (10, sh + 4 + i * sh, menu[i]);
         }
         rb->lcd_update ();
         button = rb->button_get (true);
         switch (button) {
+#ifdef MENU_UP
+            case MENU_UP:
+#else
             case UP:
+#endif
                 selection = (selection + MAIN_MENU_SIZE - 1) % MAIN_MENU_SIZE;
                 break;
+#ifdef MENU_UP
+            case MENU_DOWN:
+#else
             case DOWN:
+#endif
                 selection = (selection + 1) % MAIN_MENU_SIZE;
                 break;
             case SELECT:
@@ -724,9 +744,10 @@ static void init_game (void)
     player.lives = 3;
     player.gameover = false;
     player.drawing = false;
+    rb->lcd_setfont(FONT_SYSFIXED);
     init_board ();
     refresh_board ();
-    rb->splash (HZ * 2, true, "READY?");
+    rb->splash (HZ * 2, true, "Ready?");
 }
 
 /* general keypad handler loop */
@@ -755,11 +776,14 @@ static int xobox_loop (void)
             case PAUSE:
                 pause = !pause;
                 if (pause)
-                    rb->splash (HZ, true, "PAUSED");
+                    rb->splash (HZ, true, "Paused");
                 break;
             case QUIT:
-                quit = true;
-                return PLUGIN_OK;
+                ret = game_menu ();
+                if (ret == MENU_START)
+                    init_game ();
+                else
+                    quit = true;
                 break;
             default:
                 if (rb->default_event_handler (button) == SYS_USB_CONNECTED)
@@ -771,7 +795,7 @@ static int xobox_loop (void)
             refresh_board ();
         }
         if (player.gameover) {
-            rb->splash (HZ, true, "GAME OVER");
+            rb->splash (HZ, true, "Game Over!");
             ret = game_menu ();
             if (ret == MENU_START)
                 init_game ();
@@ -791,8 +815,7 @@ static int xobox_loop (void)
 /* plugin main procedure */
 enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
 {
-    int ret;
-
+    int ret = PLUGIN_OK;
 
     (void) parameter;
     rb = api;
@@ -803,8 +826,6 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout (1);
 
-    ret = PLUGIN_OK;
-    
     randomize ();
     if (game_menu () == MENU_START) {
         init_game ();
