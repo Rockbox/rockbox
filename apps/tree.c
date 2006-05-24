@@ -887,13 +887,13 @@ static bool dirbrowse(void)
 
             if (gui_wps_show() == SYS_USB_CONNECTED)
                 reload_dir = true;
-#ifdef HAVE_LCD_COLOR
-            show_main_backdrop();
-#endif
 #ifdef HAVE_HOTSWAP
             else
                 if (!id3db) /* Try reload to catch 'no longer valid' case. */
                     reload_dir = true;
+#endif
+#ifdef HAVE_LCD_COLOR
+            show_main_backdrop();
 #endif
             id3db = check_changed_id3mode(id3db);
             restore = true;
