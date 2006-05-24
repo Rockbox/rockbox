@@ -142,44 +142,35 @@ void init_dircache(void)
 
 void init_tagcache(void)
 {
-#ifdef HAVE_LCD_BITMAP
-    int font_w, font_h;
-#endif
-    
+    bool clear = false;
+
     tagcache_init();
     
     while (!tagcache_is_initialized())
     {
-#ifdef HAVE_LCD_BITMAP
-        char buf[64];
-        int ret;
-        
-        ret = tagcache_get_commit_step();
+#ifdef HAVE_LCD_CHARCELLS
+        char buf[32];
+#endif
+        int ret = tagcache_get_commit_step();
+
         if (ret > 0)
         {
-            lcd_setfont(FONT_SYSFIXED);
-            snprintf(buf, sizeof buf, "%s [%d/%d]",
-                     str(LANG_TAGCACHE_INIT), ret, TAG_COUNT);
-            
-            /* Print "Scanning disk..." to the display. */
-            lcd_getstringsize("A", &font_w, &font_h);
-            lcd_putsxy((LCD_WIDTH/2) - ((strlen(buf)*font_w)/2),
-                   LCD_HEIGHT-font_h*3, buf);
-            lcd_update();
-        }
+#ifdef HAVE_LCD_BITMAP
+            gui_syncsplash(0, true, "%s [%d/%d]",
+                                    str(LANG_TAGCACHE_INIT), ret, TAG_COUNT);
+#else
+            lcd_double_height(false);
+            snprintf(buf, sizeof(buf), " TC [%d/%d]", ret, TAG_COUNT);
+            lcd_puts(0, 1, buf);
 #endif
+            clear = true;
+        }
         sleep(HZ/4);
     }
-    
     tagtree_init();
 
-#ifdef HAVE_LCD_BITMAP
-    /* Clean the text when we are done. */
-    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
-    lcd_set_drawmode(DRMODE_SOLID);
-    lcd_update();
-#endif
+    if (clear)
+        show_logo();
 }
 
 #ifdef SIMULATOR
