@@ -525,10 +525,6 @@ bool quick_screen_quick(int button_enter)
     struct option_select right_option;
     int oldrepeat, old_x_margin, old_y_margin;
 
-    old_x_margin = lcd_getxmargin();
-    old_y_margin = lcd_getymargin();
-    lcd_setmargins(0, 0);
-
     static const struct opt_items left_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
@@ -550,6 +546,10 @@ bool quick_screen_quick(int button_enter)
 #endif
     };
     struct gui_quickscreen qs;
+
+    old_x_margin = lcd_getxmargin();
+    old_y_margin = lcd_getymargin();
+    lcd_setmargins(0, 0);
 
     option_select_init_items(&left_option,
                              (char *)str(LANG_SHUFFLE),
@@ -615,10 +615,6 @@ bool quick_screen_f3(int button_enter)
     struct option_select right_option;
     int old_x_margin, old_y_margin;
 
-    old_x_margin = lcd_getxmargin();
-    old_y_margin = lcd_getymargin();
-    lcd_setmargins(0, 0);
-
     static const struct opt_items onoff_items[] = {
         [0]={ STR(LANG_OFF) },
         [1]={ STR(LANG_ON) }
@@ -629,6 +625,10 @@ bool quick_screen_f3(int button_enter)
     };
 
     struct gui_quickscreen qs;
+
+    old_x_margin = lcd_getxmargin();
+    old_y_margin = lcd_getymargin();
+    lcd_setmargins(0, 0);
 
     option_select_init_items(&left_option,
                              str(LANG_SCROLL_BAR),
