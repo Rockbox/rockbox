@@ -395,7 +395,7 @@ void minesweeper_putmines(int p, int x, int y){
 /* A function that will uncover all the board, when the user wins or loses.
    can easily be expanded, (just a call assigned to a button) as a solver. */
 void mine_show(void){
-    int i, j, button;
+    int i, j;
             
     for(i=c_height();i<c_height() + height;i++){
         for(j=c_width();j<c_width() + width;j++){
@@ -423,9 +423,11 @@ void mine_show(void){
     rb->lcd_update();
     
     bool k = true;
+    int button = BUTTON_NONE;
     while(k){
         button = rb->button_get_w_tmo(HZ/10);
-        if(button !=  BUTTON_NONE && !(button & BUTTON_REL)) k = false;
+        if(button !=  BUTTON_NONE && !(button & BUTTON_REL) && 
+                                     !(button & BUTTON_REPEAT)) k = false;
     }
 }
 
@@ -690,13 +692,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     while(!exit) {
         switch(minesweeper()){
             case MINESWEEPER_WIN:
-                rb->splash(HZ*2, true, "You Won! Press a key");
+                rb->splash(HZ*2, true, "You Win! Press a key");
                 rb->lcd_clear_display();
                 mine_show();
                 break;
 
             case MINESWEEPER_LOSE:
-                rb->splash(HZ*2, true, "You Lost! Press a key");
+                rb->splash(HZ*2, true, "You Lose! Press a key");
                 rb->lcd_clear_display();
                 mine_show();
                 break;
