@@ -2799,7 +2799,7 @@ void mpeg_id3_options(bool _v1first)
    v1first = _v1first;
 }
 
-#if (ROCKBOX_HAS_LOGF == 1)
+#ifdef ROCKBOX_HAS_LOGF
 void test_buffer_event(struct mp3entry *id3, bool last_track)
 {
     (void)id3;
@@ -2837,7 +2837,7 @@ static void playback_init(void)
     pcm_rec_mux(0);
 #endif
 
-#if (ROCKBOX_HAS_LOGF == 1)
+#ifdef ROCKBOX_HAS_LOGF
     audio_set_track_buffer_event(test_buffer_event);
     audio_set_track_unbuffer_event(test_unbuffer_event);
     audio_set_track_changed_event(test_track_changed_event);
