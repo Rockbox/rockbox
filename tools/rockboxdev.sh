@@ -69,6 +69,8 @@ case $arch in
   [Ss])
     target="sh-elf"
     gccver="4.0.3"
+    gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
+    gccpatch="gcc-4.0.3-rockbox-1.diff"
     ;;
   [Mm])
     target="m68k-elf"
@@ -93,6 +95,9 @@ bindir="$prefix/$target/bin"
 echo "Summary:"
 echo "Target: $target"
 echo "gcc $gccver"
+if test -n "$gccpatch"; then
+  echo "gcc patch $gccpatch"
+fi
 echo "binutils $binutils"
 echo "install in $prefix/$target"
 echo ""
@@ -111,6 +116,13 @@ else
   getfile gcc-$gccver.tar.bz2 ftp://ftp.gnu.org/pub/gnu/gcc/gcc-$gccver
 fi
 
+if test -n "$gccpatch"; then
+  if test -f "$dlwhere/$gccpatch"; then
+    echo "$gccpatch already downloaded"
+  else
+    getfile "$gccpatch" "$gccurl"
+  fi
+fi
 
 mkdir build-rbdev
 cd build-rbdev
@@ -118,6 +130,11 @@ echo "extracting binutils"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
 echo "extracting gcc"
 tar xf $dlwhere/gcc-$gccver.tar.bz2
+
+if test -n "$gccpatch"; then
+  echo "applying gcc patch"
+  patch -p0 < "$dlwhere/$gccpatch"
+fi
 
 mkdir build-binu
 cd build-binu
