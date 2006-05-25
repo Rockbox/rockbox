@@ -236,6 +236,7 @@ bool show_info(void)
                 break;
 #endif
 
+#ifndef SIMULATOR
 #ifdef SETTINGS_ACCEPT
             case SETTINGS_ACCEPT:
 #else
@@ -249,6 +250,7 @@ bool show_info(void)
 #endif
                 new_info = true;
                 break;
+#endif
 
             default:
                 if (default_event_handler(key) == SYS_USB_CONNECTED)
