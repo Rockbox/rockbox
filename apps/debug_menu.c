@@ -1780,6 +1780,7 @@ static bool dbg_disk_info(void)
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
+            case SETTINGS_OK:
             case SETTINGS_CANCEL:
                 done = true;
                 break;
@@ -1792,17 +1793,6 @@ static bool dbg_disk_info(void)
             case SETTINGS_INC:
                 if (++page > max_page)
                     page = 0;
-                break;
-
-            case SETTINGS_OK:
-                if (page == 3) {
-                    audio_stop(); /* stop playback, to avoid disk access */
-                    lcd_clear_display();
-                    lcd_puts(0,0,"Scanning");
-                    lcd_puts(0,1,"disk...");
-                    lcd_update();
-                    fat_recalc_free(IF_MV(0));
-                }
                 break;
         }
         lcd_stop_scroll();

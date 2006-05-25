@@ -50,13 +50,10 @@
 #include "logfdisp.h"
 #include "plugin.h"
 #include "filetypes.h"
+#include "splash.h"
 
 #ifdef HAVE_RECORDING
 #include "recording.h"
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-#include "lcd-remote.h"
 #endif
 
 bool show_credits(void)
@@ -78,16 +75,17 @@ extern bool simulate_usb(void);
 bool show_info(void)
 {
     char s[64], s1[32];
-    long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
-    int integer, decimal;
-    bool done = false;
-    int key;
-    int state = 1;
     unsigned long size, free;
+    long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
+    int key;
+    bool done = false;
+    bool new_info = true;
 #ifdef HAVE_MULTIVOLUME
     char s2[32];
-    unsigned long size2 = 0;
-    unsigned long free2 = 0;
+    unsigned long size2, free2;
+#endif
+#ifdef HAVE_LCD_CHARCELLS
+    int page = 0;
 #endif
 
     const unsigned char *kbyte_units[] = {
@@ -95,63 +93,73 @@ bool show_info(void)
         ID2P(LANG_MEGABYTE),
         ID2P(LANG_GIGABYTE)
     };
+    
+    while (!done)
+    {
+        int y=0;
 
-    fat_size( IF_MV2(0,) &size, &free );
+        if (new_info)
+        {
+            fat_size( IF_MV2(0,) &size, &free );
 #ifdef HAVE_MULTIVOLUME
-    if (fat_ismounted(1))
-        fat_size( 1, &size2, &free2 );
+            if (fat_ismounted(1))
+                fat_size( 1, &size2, &free2 );
+            else
+                size2 = 0;
 #endif
 
-    if (global_settings.talk_menu)
-    {   /* say whatever is reasonable, no real connection to the screen */
-        bool enqueue = false; /* enqueue all but the first */
-        if (battery_level() >= 0)
-        {
-            talk_id(LANG_BATTERY_TIME, enqueue);
-            enqueue = true;
-            talk_value(battery_level(), UNIT_PERCENT, true);
-        }
+            if (global_settings.talk_menu)
+            {   /* say whatever is reasonable, no real connection to the screen */
+                bool enqueue = false; /* enqueue all but the first */
+                if (battery_level() >= 0)
+                {
+                    talk_id(LANG_BATTERY_TIME, enqueue);
+                    enqueue = true;
+                    talk_value(battery_level(), UNIT_PERCENT, true);
+                }
 
-        talk_id(LANG_DISK_FREE_INFO, enqueue);
+                talk_id(LANG_DISK_FREE_INFO, enqueue);
 #ifdef HAVE_MULTIVOLUME
-        talk_id(LANG_DISK_NAME_INTERNAL, true);
-        output_dyn_value(NULL, 0, free, kbyte_units, true);
-        if (size2)
-        {
-            talk_id(LANG_DISK_NAME_MMC, true);
-            output_dyn_value(NULL, 0, free2, kbyte_units, true);
-        }
+                talk_id(LANG_DISK_NAME_INTERNAL, true);
+                output_dyn_value(NULL, 0, free, kbyte_units, true);
+                if (size2)
+                {
+                    talk_id(LANG_DISK_NAME_MMC, true);
+                    output_dyn_value(NULL, 0, free2, kbyte_units, true);
+                }
 #else
-        output_dyn_value(NULL, 0, free, kbyte_units, true); /* NULL == talk */
+                output_dyn_value(NULL, 0, free, kbyte_units, true);
 #endif
 
 #ifdef CONFIG_RTC
-        {
-            struct tm* tm = get_time();
-            talk_id(VOICE_CURRENT_TIME, true);
-            talk_value(tm->tm_hour, UNIT_HOUR, true);
-            talk_value(tm->tm_min, UNIT_MIN, true);
-            talk_value(tm->tm_sec, UNIT_SEC, true);
-            talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
-            talk_number(tm->tm_mday, true);
-            talk_number(1900 + tm->tm_year, true);
-        }
+                {
+                    struct tm* tm = get_time();
+                    talk_id(VOICE_CURRENT_TIME, true);
+                    talk_value(tm->tm_hour, UNIT_HOUR, true);
+                    talk_value(tm->tm_min, UNIT_MIN, true);
+                    talk_value(tm->tm_sec, UNIT_SEC, true);
+                    talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
+                    talk_number(tm->tm_mday, true);
+                    talk_number(1900 + tm->tm_year, true);
+                }
 #endif
-    }
+            }
+            new_info = false;
+        }
 
-    while(!done)
-    {
-        int y=0;
         lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
         lcd_puts(0, y++, str(LANG_ROCKBOX_INFO));
         y++;
-        state = 3;
 #endif
 
-        if (state & 1) {
-            integer = buflen / 1000;
-            decimal = buflen % 1000;
+#ifdef HAVE_LCD_CHARCELLS
+        if (page == 0)
+#endif
+        {
+            int integer = buflen / 1000;
+            int decimal = buflen % 1000;
+
 #ifdef HAVE_LCD_CHARCELLS
             snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_PLAYER),
                      integer, decimal);
@@ -178,19 +186,17 @@ bool show_info(void)
             lcd_puts_scroll(0, y++, (unsigned char *)s);
         }
 
-        if (state & 2) {
+#ifdef HAVE_LCD_CHARCELLS
+        if (page == 1)
+#endif
+        {
 #ifdef HAVE_MULTIVOLUME
             output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
             snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
-#else
-            output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
-            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
-#endif
             lcd_puts_scroll(0, y++, (unsigned char *)s);
 
-#ifdef HAVE_MULTIVOLUME
             if (size2) {
                 output_dyn_value(s1, sizeof s1, free2, kbyte_units, true);
                 output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
@@ -199,11 +205,16 @@ bool show_info(void)
                 lcd_puts_scroll(0, y++, (unsigned char *)s);
             }
 #else
+            output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
+            snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
+            lcd_puts_scroll(0, y++, (unsigned char *)s);
+
             output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
             lcd_puts_scroll(0, y++, (unsigned char *)s);
 #endif
         }
+
         lcd_update();
 
         /* Wait for a key to be pushed */
@@ -218,18 +229,31 @@ bool show_info(void)
                 done = true;
                 break;
 
+#ifdef HAVE_LCD_CHARCELLS
             case SETTINGS_INC:
             case SETTINGS_DEC:
-                if (state == 1)
-                    state = 2;
-                else
-                    state = 1;
+                page = (page == 0) ? 1 : 0;
+                break;
+#endif
+
+#ifdef SETTINGS_ACCEPT
+            case SETTINGS_ACCEPT:
+#else
+            case SETTINGS_INC: /* Ondio */
+#endif
+                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                fat_recalc_free(IF_MV(0));
+#ifdef HAVE_MULTIVOLUME
+                if (fat_ismounted(1))
+                    fat_recalc_free(1);
+#endif
+                new_info = true;
                 break;
 
-           default:
-               if(default_event_handler(key) == SYS_USB_CONNECTED)
-                   return true;
-               break;
+            default:
+                if (default_event_handler(key) == SYS_USB_CONNECTED)
+                    return true;
+                break;
         }
     }
 

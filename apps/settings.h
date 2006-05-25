@@ -74,6 +74,7 @@
 #define SETTINGS_OK      BUTTON_PLAY
 #define SETTINGS_CANCEL  BUTTON_STOP
 #define SETTINGS_CANCEL2 BUTTON_MENU
+#define SETTINGS_ACCEPT  BUTTON_ON
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define SETTINGS_INC     BUTTON_UP
@@ -332,7 +333,7 @@ struct user_settings
 
     int runtime;       /* current runtime since last charge */
     int topruntime;    /* top known runtime */
-    
+
     int scroll_speed;  /* long texts scrolling speed: 1-30 */
     int bidir_limit;   /* bidir scroll length limit */
     int scroll_delay;  /* delay (in 1/10s) before starting scroll */
