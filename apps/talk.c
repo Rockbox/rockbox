@@ -603,7 +603,7 @@ int talk_file(const char* filename, bool enqueue)
    but not necessarily for other languages (e.g. german) */
 int talk_number(long n, bool enqueue)
 {
-    int level = 0; /* mille count */
+    int level = 2; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
 #if CONFIG_CODEC != SWCODEC
@@ -657,9 +657,9 @@ int talk_number(long n, bool enqueue)
  
             /* add billion, million, thousand */
             if (mil)
-                talk_id(VOICE_BILLION + level, true);
+                talk_id(VOICE_THOUSAND + level, true);
         }
-        level++;
+        level--;
     }
 
     return 0;
