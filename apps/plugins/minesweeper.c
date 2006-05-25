@@ -395,7 +395,7 @@ void minesweeper_putmines(int p, int x, int y){
 /* A function that will uncover all the board, when the user wins or loses.
    can easily be expanded, (just a call assigned to a button) as a solver. */
 void mine_show(void){
-    int i, j;
+    int i, j, button;
             
     for(i=c_height();i<c_height() + height;i++){
         for(j=c_width();j<c_width() + width;j++){
@@ -422,13 +422,9 @@ void mine_show(void){
     }
     rb->lcd_update();
     
-    bool k = true;
-    int button = BUTTON_NONE;
-    while(k){
-        button = rb->button_get_w_tmo(HZ/10);
-        if(button !=  BUTTON_NONE && !(button & BUTTON_REL) && 
-                                     !(button & BUTTON_REPEAT)) k = false;
-    }
+    do
+        button = rb->button_get(true);
+    while ((button == BUTTON_NONE) || (button & (BUTTON_REL|BUTTON_REPEAT)));
 }
 
 
@@ -438,7 +434,7 @@ int minesweeper(void)
     int i,j;
     int button;
     int lastbutton = BUTTON_NONE;
-    
+
     /* the cursor coordinates */
     int x=0, y=0;
 
