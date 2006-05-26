@@ -70,7 +70,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -149,7 +149,7 @@
     *: "Verwijder ingestoken MMC AUB"
   </dest>
   <voice>
-    *: "Verwijder omgestoken multimedia kaart AUB"
+    *: "Verwijder ingestoken multimedia kaart AUB"
   </voice>
 </phrase>
 <phrase>
@@ -168,7 +168,7 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -182,7 +182,7 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
@@ -202,10 +202,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Geluids Instellingen"
+    *: "Geluids instellingen"
   </dest>
   <voice>
-    *: "Geluids Instellingen"
+    *: "Geluids instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -216,15 +216,15 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Algemene Instellingen"
+    *: "Algemene instellingen"
   </dest>
   <voice>
-    *: "Algemene Instellingen"
+    *: "Algemene instellingen"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
@@ -238,30 +238,30 @@
 </phrase>
 <phrase>
   id: LANG_CUSTOM_THEME
-  desc: Custom themes menu
+  desc: in the main menu
   user:
   <source>
     *: "Browse Themes"
   </source>
   <dest>
-    *: "Doorzoek Thema's"
+    *: "Blader door thema's"
   </dest>
   <voice>
-    *: "Browse Themes"
+    *: "Blader door thema's"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
   </source>
   <dest>
-    *: "FM Radio"
+    *: "FM radio"
   </dest>
   <voice>
-    *: "FM Radio"
+    *: "FM radio"
   </voice>
 </phrase>
 <phrase>
@@ -280,27 +280,27 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
   </source>
   <dest>
-    *: "Speellijst Opties"
+    *: "Speellijst opties"
   </dest>
   <voice>
-    *: "Speellijst Oties"
+    *: "Speellijst opties"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
   </source>
   <dest>
-    *: "Plugins"
+    *: "Blader door plugins"
   </dest>
   <voice>
     *: "Plugins"
@@ -412,10 +412,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Kanaal Configuratie"
+    *: "Kanaal configuratie"
   </dest>
   <voice>
-    *: "Kanaal Configuratie"
+    *: "Kanaal configuratie"
   </voice>
 </phrase>
 <phrase>
@@ -468,10 +468,10 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Mono Links"
+    *: "Mono links"
   </dest>
   <voice>
-    *: "Mono Links"
+    *: "Mono links"
   </voice>
 </phrase>
 <phrase>
@@ -482,10 +482,10 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Mono Rechts"
+    *: "Mono rechts"
   </dest>
   <voice>
-    *: "Mono Rechts"
+    *: "Mono rechts"
   </voice>
 </phrase>
 <phrase>
@@ -507,7 +507,7 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Stereo breedte"
@@ -538,10 +538,10 @@
     *: "Auto Volume"
   </source>
   <dest>
-    *: "Auto Volume"
+    *: "Auto volume"
   </dest>
   <voice>
-    *: "Auto Volume"
+    *: "Auto volume"
   </voice>
 </phrase>
 <phrase>
@@ -552,7 +552,7 @@
     *: "AV Decay Time"
   </source>
   <dest>
-    *: "AV Terugloop"
+    *: "AV terugloop"
   </dest>
   <voice>
     *: ""
@@ -563,7 +563,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
     *: "Super bass"
@@ -580,10 +580,10 @@
     *: "MDB Enable"
   </source>
   <dest>
-    *: "MDB Aan"
+    *: "MDB aan"
   </dest>
   <voice>
-    *: "MDB Aan"
+    *: "MDB aan"
   </voice>
 </phrase>
 <phrase>
@@ -594,10 +594,10 @@
     *: "MDB Strength"
   </source>
   <dest>
-    *: "MDB Sterkte"
+    *: "MDB sterkte"
   </dest>
   <voice>
-    *: "MDB Sterkte"
+    *: "MDB sterkte"
   </voice>
 </phrase>
 <phrase>
@@ -619,13 +619,13 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
-    *: "MDB balans frequentie"
+    *: "MDB center frequentie"
   </dest>
   <voice>
-    *: "MDB balans frequentie"
+    *: "MDB center frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -644,7 +644,7 @@
 </phrase>
 <phrase>
   id: LANG_CROSSFEED
-  desc: in the sound settings menu
+  desc: in sound settings
   user:
   <source>
     *: "Crossfeed"
@@ -734,7 +734,7 @@
     *: "Bookmarking"
   </source>
   <dest>
-    *: "Bladwijzers maken"
+    *: "Bladwijzer maken"
   </dest>
   <voice>
     *: "Bladwijzer maken"
@@ -776,10 +776,10 @@
     *: "Browse .cfg files"
   </source>
   <dest>
-    *: "Zoek configuratie bestanden"
+    *: "Blader door configuratie bestanden"
   </dest>
   <voice>
-    *: "Zoek configuration bestanden"
+    *: "Blader door configuratie bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -790,10 +790,10 @@
     *: "Browse Firmwares"
   </source>
   <dest>
-    *: "Firmwares"
+    *: "Blader door firmwares"
   </dest>
   <voice>
-    *: "Firmwares"
+    *: "Blader door firmwares"
   </voice>
 </phrase>
 <phrase>
@@ -804,10 +804,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Instellingen resetten"
+    *: "Terugstellen"
   </dest>
   <voice>
-    *: "Instelling resetten"
+    *: "Terugstellen"
   </voice>
 </phrase>
 <phrase>
@@ -902,10 +902,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Schrijf .cfg Bestand"
+    *: "Schrijf configuratie bestand"
   </dest>
   <voice>
-    *: "Schrijf .cfg Bestand"
+    *: "Schrijf configuratie bestand"
   </voice>
 </phrase>
 <phrase>
@@ -916,7 +916,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Opslaan Mislukt"
+    *: "Opslaan mislukt"
   </dest>
   <voice>
     *: ""
@@ -944,7 +944,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Opslaan Mislukt"
+    *: "Opslaan mislukt"
   </dest>
   <voice>
     *: ""
@@ -958,7 +958,7 @@
     *: "No partition?"
   </source>
   <dest>
-    *: "Geen Partitie?"
+    *: "Geen partitie?"
   </dest>
   <voice>
     *: ""
@@ -969,7 +969,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Opname scherm"
@@ -986,10 +986,10 @@
     *: "Recording Settings"
   </source>
   <dest>
-    *: "Opname Instellingen"
+    *: "Opname instellingen"
   </dest>
   <voice>
-    *: "Opname Instellingen"
+    *: "Opname instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -1000,10 +1000,10 @@
     *: "Enable EQ"
   </source>
   <dest>
-    *: "EQ Aanzetten"
+    *: "EQ aanzetten"
   </dest>
   <voice>
-    *: "Enable EQ"
+    *: "EQ aanzetten"
   </voice>
 </phrase>
 <phrase>
@@ -1017,7 +1017,7 @@
     *: "Grafische EQ"
   </dest>
   <voice>
-    *: "Graphical EQ"
+    *: "Grafische EQ"
   </voice>
 </phrase>
 <phrase>
@@ -1031,7 +1031,7 @@
     *: "Eenvoudige EQ instellingen"
   </dest>
   <voice>
-    *: "Simple EQ Settings"
+    *: "Eenvoudige EQ instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -1045,7 +1045,7 @@
     *: "Geavanceerde EQ instellingen"
   </dest>
   <voice>
-    *: "Advanced EQ Settings"
+    *: "Geavanceerde EQ instellingen"
   </voice>
 </phrase>
 <phrase>
@@ -1059,7 +1059,7 @@
     *: "EQ voorkeuze bewaren"
   </dest>
   <voice>
-    *: "Save EQ Preset"
+    *: "EQ voorkeuze bewaren"
   </voice>
 </phrase>
 <phrase>
@@ -1073,7 +1073,7 @@
     *: "Doorzoek EQ voorkeuzes"
   </dest>
   <voice>
-    *: "Browse EQ Presets"
+    *: "Doorzoek EQ voorkeuzes"
   </voice>
 </phrase>
 <phrase>
@@ -1084,7 +1084,7 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Editeer mode: %s"
+    *: "Bewerk modus: %s"
   </dest>
   <voice>
     *: ""
@@ -1098,7 +1098,7 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz Band Versterking"
+    *: "%d Hz band Versterking"
   </dest>
   <voice>
     *: ""
@@ -1157,7 +1157,7 @@
     *: "Afsnij frequentie"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: "Afsnij frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -1168,10 +1168,10 @@
     *: "Center Frequency"
   </source>
   <dest>
-    *: "Center frequentie"
+    *: "Midden frequentie"
   </dest>
   <voice>
-    *: "Center frequency"
+    *: "Midden frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -1210,10 +1210,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Afspeellijst Maken"
+    *: "Speellijst maken"
   </dest>
   <voice>
-    *: "Afspeellijst Maken"
+    *: "Speellijst maken"
   </voice>
 </phrase>
 <phrase>
@@ -1224,10 +1224,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Toon Huidige  Speellijst"
+    *: "Toon huidige  speellijst"
   </dest>
   <voice>
-    *: "Toon Huidige Speellijst"
+    *: "Toon huidige speellijst"
   </voice>
 </phrase>
 <phrase>
@@ -1238,10 +1238,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Sla Huidige Speellijst Op"
+    *: "Sla huidige speellijst op"
   </dest>
   <voice>
-    *: "Sla Huidige Speellijst Op"
+    *: "Sla huidige speellijst op"
   </voice>
 </phrase>
 <phrase>
@@ -1252,10 +1252,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Voeg Ook Subdirectories in"
+    *: "Voeg ook subdirectories in"
   </dest>
   <voice>
-    *: "Voeg Ook Subdirectories in"
+    *: "Voeg ook subdirectories in"
   </voice>
 </phrase>
 <phrase>
@@ -1274,21 +1274,21 @@
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Rockbox Info"
+    *: "Rockbox informatie"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Rockbox informatie"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1302,21 +1302,21 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Debug (afblijven!)"
+    *: "Debug (Uitblijven!)"
   </dest>
   <voice>
-    *: "Debug, (afblijven!)"
+    *: "Debug, (Uitblijven!)"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1406,10 +1406,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Speel Geselecteerde Eerst"
+    *: "Speel geselecteerde eerst"
   </dest>
   <voice>
-    *: "Speel Geselecteerde Eerst"
+    *: "Speel geselecteerde eerst"
   </voice>
 </phrase>
 <phrase>
@@ -1417,7 +1417,7 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </source>
   <dest>
     *: "Vervolg bij opstarten"
@@ -1431,13 +1431,13 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Vooruit en acheruit spoelen"
+    *: "Snel voor- en achteruit spoelen"
   </dest>
   <voice>
-    *: "Vooruit en achteruit spoelen"
+    *: "Snel voor- en achteruit spoelen"
   </voice>
 </phrase>
 <phrase>
@@ -1448,10 +1448,10 @@
     *: "Anti-Skip Buffer"
   </source>
   <dest>
-    *: "Overslaan Buffer"
+    *: "Overslaan buffer"
   </dest>
   <voice>
-    *: "Overslaan Buffer"
+    *: "Overslaan buffer"
   </voice>
 </phrase>
 <phrase>
@@ -1459,13 +1459,13 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Fade Bij Stop/Pauze"
+    *: "Vloei bij Stop/Pauze"
   </dest>
   <voice>
-    *: "Fade Bij Stop en Pauze"
+    *: "Vloei bij Stop en Pauze"
   </voice>
 </phrase>
 <phrase>
@@ -1476,10 +1476,10 @@
     *: "Crossfade"
   </source>
   <dest>
-    *: "Crossfade"
+    *: "Overvloei"
   </dest>
   <voice>
-    *: "Crossfade"
+    *: "Overvloei"
   </voice>
 </phrase>
 <phrase>
@@ -1501,7 +1501,7 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep volume"
+    *: "Beep Volume"
   </source>
   <dest>
     *: "Piep volume"
@@ -1557,7 +1557,7 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical output"
+    *: "Optical Output"
   </source>
   <dest>
     *: "Optische uitgang"
@@ -1571,7 +1571,7 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
     *: "ID3 label prioriteid"
@@ -1610,16 +1610,16 @@
 </phrase>
 <phrase>
   id: LANG_NEXT_FOLDER
-  desc: in settings_menu.  Should we move to next folder when current one ends
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user:
   <source>
-    *: "Move to Next Folder"
+    *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Ga naar volgende map"
+    *: "Automatisch naar volgende map"
   </dest>
   <voice>
-    *: "Ga naar volgende map"
+    *: "Automatisch naar volgende map"
   </voice>
 </phrase>
 <phrase>
@@ -1627,7 +1627,7 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data (experimental)"
   </source>
   <dest>
     *: "Verzamel runtime data"
@@ -1644,10 +1644,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Sorteer hoofd en kleine letters apart"
+    *: "Sorteer op hoofd en kleine letters"
   </dest>
   <voice>
-    *: "Sorteer hoofd en kleine letters apart"
+    *: "Sorteer op hoofd en kleine letters"
   </voice>
 </phrase>
 <phrase>
@@ -1697,7 +1697,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
     *: "Op datum"
@@ -1711,7 +1711,7 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
     *: "op nieuwste datum"
@@ -1725,13 +1725,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
-    *: "op type"
+    *: "Op type"
   </dest>
   <voice>
-    *: "op type"
+    *: "Op type"
   </voice>
 </phrase>
 <phrase>
@@ -1742,10 +1742,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Toon Bestanden"
+    *: "Toon bestanden"
   </dest>
   <voice>
-    *: "Toon Bestanden"
+    *: "Toon bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -1806,10 +1806,10 @@
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
     *: "ID3 gegevens bestand"
@@ -1826,10 +1826,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Volg Speellijst"
+    *: "Volg speellijst"
   </dest>
   <voice>
-    *: "Volg Speellijst"
+    *: "Volg speellijst"
   </voice>
 </phrase>
 <phrase>
@@ -1840,10 +1840,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Toon Ikonen"
+    *: "Toon ikonen"
   </dest>
   <voice>
-    *: "Toon Ikonen"
+    *: "Toon ikonen"
   </voice>
 </phrase>
 <phrase>
@@ -1854,10 +1854,10 @@
     *: "Browse Fonts"
   </source>
   <dest>
-    *: "Lettertypes"
+    *: "Blader door lettertypes"
   </dest>
   <voice>
-    *: "Lettertypes"
+    *: "Blader door lettertypes"
   </voice>
 </phrase>
 <phrase>
@@ -1868,10 +1868,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "Afspeelscherm"
+    *: "Blader door .wps bestanden"
   </dest>
   <voice>
-    *: "Afspeelscherm"
+    *: "Blader door .wps bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -1882,10 +1882,10 @@
     *: "Browse .rwps files"
   </source>
   <dest>
-    *: "Doorzoek .rwps bestanden"
+    *: "Blader door .rwps bestanden"
   </dest>
   <voice>
-    *: "Browse remote while-playing-screen files"
+    *: "Blader door .rwps bestanden"
   </voice>
 </phrase>
 <phrase>
@@ -1938,7 +1938,7 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Status-/Scrollbalk"
+    *: "Status/Scrollbalk"
   </dest>
   <voice>
     *: "Status en Scrollbalk"
@@ -1952,10 +1952,10 @@
     *: "Peak Meter"
   </source>
   <dest>
-    *: "Piek Meter"
+    *: "Piek meter"
   </dest>
   <voice>
-    *: "Piek Meter"
+    *: "Piek meter"
   </voice>
 </phrase>
 <phrase>
@@ -1980,7 +1980,7 @@
     *: "Latin1 (ISO-8859-1)"
   </source>
   <dest>
-    *: "Latin1 (ISO-8859-1)"
+    *: "Latijns1 (ISO-8859-1)"
   </dest>
   <voice>
     *: ""
@@ -1994,7 +1994,7 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "Greek (ISO-8859-7)"
+    *: "Grieks (ISO-8859-7)"
   </dest>
   <voice>
     *: ""
@@ -2008,7 +2008,7 @@
     *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: "Hebrew (ISO-8859-8)"
+    *: "Hebreeuws (ISO-8859-8)"
   </dest>
   <voice>
     *: ""
@@ -2019,10 +2019,10 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Russian (CP1251)"
+    *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Cyrillic (CP1251)"
+    *: "Cyrillisch (CP1251)"
   </dest>
   <voice>
     *: ""
@@ -2036,7 +2036,7 @@
     *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "Thai (ISO-8859-11)"
+    *: "Thais (ISO-8859-11)"
   </dest>
   <voice>
     *: ""
@@ -2050,7 +2050,7 @@
     *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: "Arabic (CP1256)"
+    *: "Arabisch (CP1256)"
   </dest>
   <voice>
     *: ""
@@ -2064,7 +2064,7 @@
     *: "Turkish (ISO-8859-9)"
   </source>
   <dest>
-    *: "Turkish (ISO-8859-9)"
+    *: "Turks (ISO-8859-9)"
   </dest>
   <voice>
     *: ""
@@ -2078,7 +2078,7 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latin Extended (ISO-8859-2)"
+    *: "Latijns Uitgebreid (ISO-8859-2)"
   </dest>
   <voice>
     *: ""
@@ -2092,7 +2092,7 @@
     *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: "Japanese (SJIS)"
+    *: "Japans (SJIS)"
   </dest>
   <voice>
     *: ""
@@ -2106,7 +2106,7 @@
     *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinees (GB2312)"
   </dest>
   <voice>
     *: ""
@@ -2120,7 +2120,7 @@
     *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: "Korean (KSX1001)"
+    *: "Koreaans (KSX1001)"
   </dest>
   <voice>
     *: ""
@@ -2134,7 +2134,7 @@
     *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinees (BIG5)"
   </dest>
   <voice>
     *: ""
@@ -2142,7 +2142,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -2232,10 +2232,10 @@
     *: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "Inschakeltijd"
+    *: "Alarm klok"
   </dest>
   <voice>
-    *: "Inschakeltijd"
+    *: "Alarm klok"
   </voice>
 </phrase>
 <phrase>
@@ -2274,10 +2274,10 @@
     *: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Auto Adaptor Modus"
+    *: "Auto adaptor modus"
   </dest>
   <voice>
-    *: "Auto Adaptor Modus"
+    *: "Auto adaptor modus"
   </voice>
 </phrase>
 <phrase>
@@ -2344,10 +2344,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Onderhoud lijst recente bladwijzers?"
+    *: "Onderhoud lijst met recente bladwijzers?"
   </dest>
   <voice>
-    *: "Ondergoud lijst recente bladwijzers?"
+    *: "Onderhoud lijst met recente bladwijzers?"
   </voice>
 </phrase>
 <phrase>
@@ -2386,10 +2386,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Spraakm mappen"
+    *: "Spreek mappen"
   </dest>
   <voice>
-    *: "Spraak mappen"
+    *: "Spreek mappen"
   </voice>
 </phrase>
 <phrase>
@@ -2400,15 +2400,15 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Spraak Bestanden"
+    *: "Spraak bestanden"
   </dest>
   <voice>
-    *: "Spraak Bestanden"
+    *: "Spraak bestanden"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -2422,7 +2422,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -2436,7 +2436,7 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -2512,10 +2512,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Lijn In"
+    *: "Analoge ingang"
   </dest>
   <voice>
-    *: "Lijn In"
+    *: "Analoge ingang"
   </voice>
 </phrase>
 <phrase>
@@ -2551,7 +2551,7 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
     *: "Onafhankelijke frames"
@@ -2568,10 +2568,10 @@
     *: "Time Split"
   </source>
   <dest>
-    *: "Tijdsdeel"
+    *: "Tijd split"
   </dest>
   <voice>
-    *: "Tijdsdeel"
+    *: "Tijd split"
   </voice>
 </phrase>
 <phrase>
@@ -2579,7 +2579,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Bufferopname tijd"
@@ -2607,7 +2607,7 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
     *: "Huidige map"
@@ -2618,10 +2618,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
     *: "Opname scherm bij opstarten"
@@ -2652,10 +2652,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "FF/RW Min Stap"
+    *: "SV/SA min Stap"
   </dest>
   <voice>
-    *: "Minimale stapgroote"
+    *: "Snel voor en achteruit minimale stapgroote"
   </voice>
 </phrase>
 <phrase>
@@ -2666,10 +2666,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "FF/RW versnelling"
+    *: "SV/SA versnelling"
   </dest>
   <voice>
-    *: "Acceleratie"
+    *: "Snel voor en achteruit versnelling"
   </voice>
 </phrase>
 <phrase>
@@ -2677,13 +2677,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Enable crossfade"
+    *: "Enable Crossfade"
   </source>
   <dest>
     *: "Zet overvloeiing aan"
   </dest>
   <voice>
-    *: "Enable crossfade"
+    *: "Zet overvloeiing aan"
   </voice>
 </phrase>
 <phrase>
@@ -2691,13 +2691,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in delay"
+    *: "Fade-In Delay"
   </source>
   <dest>
     *: "Invloei vertraging"
   </dest>
   <voice>
-    *: "Fade in delay"
+    *: "Invloei vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2705,13 +2705,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade in duration"
+    *: "Fade-In Duration"
   </source>
   <dest>
     *: "Invloei duur"
   </dest>
   <voice>
-    *: "Fade in duration"
+    *: "Invloei duur"
   </voice>
 </phrase>
 <phrase>
@@ -2719,13 +2719,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out delay"
+    *: "Fade-Out Delay"
   </source>
   <dest>
     *: "Uitvloei vertraging"
   </dest>
   <voice>
-    *: "Fade out delay"
+    *: "Uitvloei vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -2733,13 +2733,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out duration"
+    *: "Fade-Out Duration"
   </source>
   <dest>
     *: "Uitvloei duur"
   </dest>
   <voice>
-    *: "Fade out duration"
+    *: "Uitvloei duur"
   </voice>
 </phrase>
 <phrase>
@@ -2747,13 +2747,13 @@
   desc: in crossfade settings menu
   user:
   <source>
-    *: "Fade out mode"
+    *: "Fade-Out Mode"
   </source>
   <dest>
-    *: "Overvloei mode"
+    *: "Overvloei modus"
   </dest>
   <voice>
-    *: "Fade out mode"
+    *: "Overvloei modus"
   </voice>
 </phrase>
 <phrase>
@@ -2775,7 +2775,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </source>
   <dest>
     *: "Zet replaygain aan"
@@ -2789,13 +2789,13 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Voorkom clipping"
+    *: "Voorkom clippen"
   </dest>
   <voice>
-    *: "Vookom clipping"
+    *: "Voorkom clippen"
   </voice>
 </phrase>
 <phrase>
@@ -2803,7 +2803,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
     *: "Replaygain type"
@@ -2817,7 +2817,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
     *: "Album gain"
@@ -2831,7 +2831,7 @@
   desc: in replaygain
   user:
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
     *: "Track gain"
@@ -2845,18 +2845,18 @@
   desc: use track gain if shuffle mode is on, album gain otherwise
   user:
   <source>
-    *: "Track gain if shuffling"
+    *: "Track Gain if Shuffling"
   </source>
   <dest>
     *: "Track gain tijdens schudden"
   </dest>
   <voice>
-    *: "Track gain if shuffling"
+    *: "Track gain tijdens schudden"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_PREAMP
-  desc: in browse_id3
+  desc: in replaygain settings
   user:
   <source>
     *: "Pre-amp"
@@ -2884,16 +2884,16 @@
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu
+  desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight On When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Verlichting Tijdens Opladen"
+    *: "Verlichting tijdens opladen"
   </dest>
   <voice>
-    *: "Verlichting Tijdens Opladen"
+    *: "Verlichting tijdens opladen"
   </voice>
 </phrase>
 <phrase>
@@ -2901,13 +2901,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
-    *: "Backlight Flits"
+    *: "Verlichting flits"
   </dest>
   <voice>
-    *: "Backlight Flits"
+    *: "Verlichting flits"
   </voice>
 </phrase>
 <phrase>
@@ -2915,13 +2915,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </source>
   <dest>
-    *: "Backlight fade in"
+    *: "Verlichting invloei"
   </dest>
   <voice>
-    *: "Backlight fade in"
+    *: "Verlichting invloei"
   </voice>
 </phrase>
 <phrase>
@@ -2929,13 +2929,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </source>
   <dest>
-    *: "Backlight fade uit"
+    *: "Verlichting uitvloei"
   </dest>
   <voice>
-    *: "Backlight fade uit"
+    *: "Verlichting uitvloei"
   </voice>
 </phrase>
 <phrase>
@@ -2949,7 +2949,7 @@
     *: "Helderheid"
   </dest>
   <voice>
-    *: "Brightness"
+    *: "Helderheid"
   </voice>
 </phrase>
 <phrase>
@@ -3024,27 +3024,27 @@
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR
-  desc: DEPRECATED
+  desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: "Line Selector"
   </source>
   <dest>
-    *: ""
+    *: "Lijn aanwijzer"
   </dest>
   <voice>
-    *: ""
+    *: "Lijn aanwijzer"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR_POINTER
-  desc: DEPRECATED
+  desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: "Pointer"
   </source>
   <dest>
-    *: ""
+    *: "Aanwijzer"
   </dest>
   <voice>
     *: ""
@@ -3052,13 +3052,13 @@
 </phrase>
 <phrase>
   id: LANG_INVERT_CURSOR_BAR
-  desc: DEPRECATED
+  desc: in settings_menu
   user:
   <source>
-    *: ""
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: ""
+    *: "Staaf (geinverteerd)"
   </dest>
   <voice>
     *: ""
@@ -3069,13 +3069,13 @@
   desc: text for LCD settings menu
   user:
   <source>
-    *: "Clear backdrop"
+    *: "Clear Backdrop"
   </source>
   <dest>
     *: "Achtergrond wissen"
   </dest>
   <voice>
-    *: "Clear backdrop"
+    *: "Achtergrond wissen"
   </voice>
 </phrase>
 <phrase>
@@ -3083,13 +3083,13 @@
   desc: in remote lcd settings menu
   user:
   <source>
-    *: "Reduce ticking"
+    *: "Reduce Ticking"
   </source>
   <dest>
     *: "Reduceer tikken"
   </dest>
   <voice>
-    *: "Reduce ticking"
+    *: "Reduceer tikken"
   </voice>
 </phrase>
 <phrase>
@@ -3100,10 +3100,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Scroll Snelheid"
+    *: "Scroll snelheid"
   </dest>
   <voice>
-    *: "Scroll Snelheid"
+    *: "Scroll snelheid"
   </voice>
 </phrase>
 <phrase>
@@ -3114,7 +3114,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Scrollsnelheid voorbeeld"
+    *: "Voorbeeld scrollsnelheid"
   </dest>
   <voice>
     *: ""
@@ -3128,10 +3128,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Scroll Start Vertraging"
+    *: "Scroll start vertraging"
   </dest>
   <voice>
-    *: "Scroll Start Vertraging"
+    *: "Scroll start vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -3142,10 +3142,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Scroll Stapgrootte"
+    *: "Scroll stapgrootte"
   </dest>
   <voice>
-    *: "Scroll Stapgrootte"
+    *: "Scroll stapgrootte"
   </voice>
 </phrase>
 <phrase>
@@ -3156,7 +3156,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Scroll Stapgrootte Instelling Voorbeeld Text"
+    *: "Voorbeeld scroll stapgrootte text"
   </dest>
   <voice>
     *: ""
@@ -3170,10 +3170,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Tweerichting Scroll Limiet"
+    *: "Tweerichting scroll limiet"
   </dest>
   <voice>
-    *: "Tweerichting Scroll limiet"
+    *: "Tweerichting scroll limiet"
   </voice>
 </phrase>
 <phrase>
@@ -3181,27 +3181,27 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
-    *: "Spring Scroll"
+    *: "Spring scroll"
   </dest>
   <voice>
-    *: "Spring Scroll"
+    *: "Spring scroll"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
   </source>
   <dest>
-    *: "Een Keer"
+    *: "Een keer"
   </dest>
   <voice>
-    *: "Een Keer"
+    *: "Een keer"
   </voice>
 </phrase>
 <phrase>
@@ -3212,10 +3212,10 @@
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Vertraging"
+    *: "Spring scroll vertraging"
   </dest>
   <voice>
-    *: "Vertraging"
+    *: "Spring scroll vertraging"
   </voice>
 </phrase>
 <phrase>
@@ -3229,7 +3229,7 @@
     *: "Scherm shuift uit beeld"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "Scherm shuift uit beeld"
   </voice>
 </phrase>
 <phrase>
@@ -3240,10 +3240,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Scherm schuif stap"
+    *: "Scherm scrol stap groote"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Scherm scrol stap groote"
   </voice>
 </phrase>
 <phrase>
@@ -3254,10 +3254,10 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Scroll Balk"
+    *: "Scroll balk"
   </dest>
   <voice>
-    *: "Scroll Balk"
+    *: "Scroll balk"
   </voice>
 </phrase>
 <phrase>
@@ -3268,10 +3268,10 @@
     *: "Status Bar"
   </source>
   <dest>
-    *: "Status Balk"
+    *: "Status balk"
   </dest>
   <voice>
-    *: "Status Balk"
+    *: "Status balk"
   </voice>
 </phrase>
 <phrase>
@@ -3279,13 +3279,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Knoppen balk"
   </dest>
   <voice>
-    *: "Knoppen Balk"
+    *: "Knoppen balk"
   </voice>
 </phrase>
 <phrase>
@@ -3310,10 +3310,10 @@
     *: "Battery Display"
   </source>
   <dest>
-    *: "Batterij Tonen Als"
+    *: "Batterij tonen als"
   </dest>
   <voice>
-    *: "Batterij Tonen Als"
+    *: "Batterij tonen als"
   </voice>
 </phrase>
 <phrase>
@@ -3352,10 +3352,10 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "Piek Terugloop"
+    *: "Piek terugloop"
   </dest>
   <voice>
-    *: "Peak Terugloop"
+    *: "Piek terugloop"
   </voice>
 </phrase>
 <phrase>
@@ -3366,10 +3366,10 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "Eenheden Per Keer"
+    *: "Eenheden per keer"
   </dest>
   <voice>
-    *: "Eenheden Per Keer"
+    *: "Eenheden per keer"
   </voice>
 </phrase>
 <phrase>
@@ -3380,10 +3380,10 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Pieken Vasthoud Tijd"
+    *: "Piek vasthoud tijd"
   </dest>
   <voice>
-    *: "Peak Vasthoud Tijd"
+    *: "Piek vasthoud tijd"
   </voice>
 </phrase>
 <phrase>
@@ -3394,10 +3394,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Clip Vasthouden"
+    *: "Clip vasthouden"
   </dest>
   <voice>
-    *: "Clip Vasthouden"
+    *: "Clip vasthouden"
   </voice>
 </phrase>
 <phrase>
@@ -3408,10 +3408,10 @@
     *: "Eternal"
   </source>
   <dest>
-    *: "Altijd"
+    *: "Oneindig"
   </dest>
   <voice>
-    *: "Altijd"
+    *: "Oneindig"
   </voice>
 </phrase>
 <phrase>
@@ -3433,10 +3433,10 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
-    *: "Logaritmisch(dB)"
+    *: "Logaritmisch (dB)"
   </dest>
   <voice>
     *: "Logarithmisch decibel"
@@ -3447,10 +3447,10 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
-    *: "Lineair(%)"
+    *: "Lineair (%)"
   </dest>
   <voice>
     *: "Lineair percentage"
@@ -3464,10 +3464,10 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "Minimaal Bereik"
+    *: "Minimaal bereik"
   </dest>
   <voice>
-    *: "Minimaal Bereik"
+    *: "Minimaal bereik"
   </voice>
 </phrase>
 <phrase>
@@ -3478,10 +3478,10 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "Maximaal Bereik"
+    *: "Maximaal bereik"
   </dest>
   <voice>
-    *: "Maximaal Bereik"
+    *: "Maximaal bereik"
   </voice>
 </phrase>
 <phrase>
@@ -3492,10 +3492,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Batterij Capaciteit"
+    *: "Batterij capaciteit"
   </dest>
   <voice>
-    *: "Batterij Capaciteit"
+    *: "Batterij capaciteit"
   </voice>
 </phrase>
 <phrase>
@@ -3506,7 +3506,7 @@
     *: "Battery Type"
   </source>
   <dest>
-    *: "Batterij Type"
+    *: "Batterij type"
   </dest>
   <voice>
     *: "Batterij type"
@@ -3551,7 +3551,7 @@
     *: "Schijf stoptijd"
   </dest>
   <voice>
-    *: "Schijf Stoptijd"
+    *: "Schijf stoptijd"
   </voice>
 </phrase>
 <phrase>
@@ -3562,10 +3562,10 @@
     *: "Disk Poweroff"
   </source>
   <dest>
-    *: "Disk Uitschakelen"
+    *: "Schijf uitschakelen"
   </dest>
   <voice>
-    *: "Disk Uitschakelen"
+    *: "Schijf uitschakelen"
   </voice>
 </phrase>
 <phrase>
@@ -3573,13 +3573,13 @@
   desc: in directory cache settings
   user:
   <source>
-    *: "Directory cache"
+    *: "Directory Cache"
   </source>
   <dest>
-    *: "Folder buffer"
+    *: "Map buffer"
   </dest>
   <voice>
-    *: "Directory cache"
+    *: "Map buffer"
   </voice>
 </phrase>
 <phrase>
@@ -3590,7 +3590,7 @@
     *: "Please reboot to enable the cache"
   </source>
   <dest>
-    *: "Herstart om Folder Buffer te activeren"
+    *: "Herstart om folder buffer te activeren"
   </dest>
   <voice>
     *: ""
@@ -3618,10 +3618,10 @@
     *: "Set Time/Date"
   </source>
   <dest>
-    *: "Stel Tijd/Datum in"
+    *: "Stel datum/tijd in"
   </dest>
   <voice>
-    *: "Stel Tijd/Datum in"
+    *: "Stel datum/tijd in"
   </voice>
 </phrase>
 <phrase>
@@ -3632,10 +3632,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Tijds Aanduiding"
+    *: "Tijds aanduiding"
   </dest>
   <voice>
-    *: "Tijds Aanduiding"
+    *: "Tijds aanduiding"
   </voice>
 </phrase>
 <phrase>
@@ -3671,13 +3671,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Max Aantal Betanden In Browser"
+    *: "Max aantal bestanden in bladerscherm"
   </dest>
   <voice>
-    *: "Max Aantal Bestanden In Browser"
+    *: "Max aantal bestanden in bladerscherm"
   </voice>
 </phrase>
 <phrase>
@@ -3685,13 +3685,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max Speellijst Grootte"
+    *: "Max speellijst grootte"
   </dest>
   <voice>
-    *: "Max Speellijst Grootte"
+    *: "Max speellijst grootte"
   </voice>
 </phrase>
 <phrase>
@@ -3724,16 +3724,16 @@
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Toon ID3 Info"
+    *: "Toon ID3 info"
   </dest>
   <voice>
-    *: "Toon ID3 Info"
+    *: "Toon ID3 info"
   </voice>
 </phrase>
 <phrase>
@@ -3741,7 +3741,7 @@
   desc: in wps context menu
   user:
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
     *: "Nummer beoordeling"
@@ -3797,13 +3797,13 @@
   desc: text for onplay menu entry
   user:
   <source>
-    *: "Set as backdrop"
+    *: "Set As Backdrop"
   </source>
   <dest>
     *: "Kies als achtergrond"
   </dest>
   <voice>
-    *: "Set as backdrop"
+    *: "Kies als achtergrond"
   </voice>
 </phrase>
 <phrase>
@@ -3811,7 +3811,7 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
     *: "Verwijder map"
@@ -3853,13 +3853,13 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "Open met"
+    *: "Openen met"
   </dest>
   <voice>
-    *: "Open met"
+    *: "Openen met"
   </voice>
 </phrase>
 <phrase>
@@ -3867,7 +3867,7 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
     *: "Maak map"
@@ -3926,10 +3926,10 @@
     *: "Insert next"
   </source>
   <dest>
-    *: "Voeg Volgende In"
+    *: "Voeg in als volgende"
   </dest>
   <voice>
-    *: "Voeg Volgende In"
+    *: "Voeg in als volgende"
   </voice>
 </phrase>
 <phrase>
@@ -3940,10 +3940,10 @@
     *: "Insert last"
   </source>
   <dest>
-    *: "Voeg Als Laatste In"
+    *: "Voeg in als laatste"
   </dest>
   <voice>
-    *: "Voeg Als Laatste In"
+    *: "Voeg in als laatste"
   </voice>
 </phrase>
 <phrase>
@@ -3968,10 +3968,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Wachtrij"
+    *: "In wachtrij"
   </dest>
   <voice>
-    *: "Wachtrij"
+    *: "In wachtrij"
   </voice>
 </phrase>
 <phrase>
@@ -3982,10 +3982,10 @@
     *: "Queue next"
   </source>
   <dest>
-    *: "Volgende In Wachtrij"
+    *: "Volgende in wachtrij"
   </dest>
   <voice>
-    *: "Volgende In Wachtrij"
+    *: "Volgende in wachtrij"
   </voice>
 </phrase>
 <phrase>
@@ -4010,10 +4010,10 @@
     *: "Queue shuffled"
   </source>
   <dest>
-    *: "Lijst schudden"
+    *: "In wachtrij geschud"
   </dest>
   <voice>
-    *: "Queue shuffled"
+    *: "In wachtrij geschud"
   </voice>
 </phrase>
 <phrase>
@@ -4139,7 +4139,7 @@
     *: "%d%% %du %dm"
   </dest>
   <voice>
-    *: "Batterij Niveau"
+    *: "Batterij niveau"
   </voice>
 </phrase>
 <phrase>
@@ -4349,7 +4349,7 @@
     *: "Bladwijzer"
   </dest>
   <voice>
-    *: "Badwijzer"
+    *: "Bladwijzer"
   </voice>
 </phrase>
 <phrase>
@@ -4539,7 +4539,7 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
     *: "Toetsvergrendeling is AAN"
@@ -4553,7 +4553,7 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
     *: "Toetsvergrendeling is UIT"
@@ -4581,7 +4581,7 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
     *: "Splits tijd:"
@@ -4609,7 +4609,7 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Bufferopname"
@@ -4637,10 +4637,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Left"
+    *: "Gain Left"
   </source>
   <dest>
-    *: "Links"
+    *: "Gain links"
   </dest>
   <voice>
     *: ""
@@ -4651,10 +4651,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Right"
+    *: "Gain Right"
   </source>
   <dest>
-    *: "Rechts"
+    *: "Gain rechts"
   </dest>
   <voice>
     *: ""
@@ -4749,7 +4749,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start above"
+    *: "Start Above"
   </source>
   <dest>
     *: "Begin boven"
@@ -4777,7 +4777,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop below"
+    *: "Stop Below"
   </source>
   <dest>
     *: "Stop onder"
@@ -4805,10 +4805,10 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit gap"
+    *: "Presplit Gap"
   </source>
   <dest>
-    *: "Presplit gap"
+    *: "Voor splits gat"
   </dest>
   <voice>
     *: ""
@@ -4833,10 +4833,10 @@
   desc: waiting for threshold
   user:
   <source>
-    *: "Trigger idle"
+    *: "Trigger Idle"
   </source>
   <dest>
-    *: "Trigger idle"
+    *: "Trigger inactief"
   </dest>
   <voice>
     *: ""
@@ -4847,10 +4847,10 @@
   desc: 
   user:
   <source>
-    *: "Trigger active"
+    *: "Trigger Active"
   </source>
   <dest>
-    *: "Trigger active"
+    *: "Trigger actief"
   </dest>
   <voice>
     *: ""
@@ -4906,10 +4906,10 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Inschakel tijd is te snel"
+    *: "Inschakel tijd te dichtbij"
   </dest>
   <voice>
-    *: ""
+    *: "Inschakel tijd te dichtbij"
   </voice>
 </phrase>
 <phrase>
@@ -4920,7 +4920,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "PLAY=Set OFF=Afbreken"
+    *: "PLAY=Stel in OFF=Afbreken"
   </dest>
   <voice>
     *: ""
@@ -4942,7 +4942,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -4956,7 +4956,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -4970,7 +4970,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -4984,7 +4984,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
@@ -4998,7 +4998,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -5012,7 +5012,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -5026,7 +5026,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
@@ -5040,7 +5040,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
@@ -5082,7 +5082,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -5096,10 +5096,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Track gain]"
+    *: "[Track Gain]"
   </source>
   <dest>
     *: "[Track gain]"
@@ -5110,10 +5110,10 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Album gain]"
+    *: "[Album Gain]"
   </source>
   <dest>
     *: "[Album gain]"
@@ -5124,7 +5124,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -5138,7 +5138,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
@@ -6715,7 +6715,7 @@
     *: ""
   </dest>
   <voice>
-    *: "remote while-playing-screen"
+    *: "Afstand bediening tijdens spelen scherm"
   </voice>
 </phrase>
 <phrase>
@@ -6748,7 +6748,7 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
@@ -6765,7 +6765,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
     *: "Einde van de lijst"
@@ -6779,7 +6779,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
     *: "Einde van de titellijst"
@@ -6972,13 +6972,13 @@
 </phrase>
 <phrase>
   id: LANG_FM_NO_PRESETS
-  desc: DEPRECATED
+  desc: error when preset list is empty
   user:
   <source>
-    *: ""
+    *: "No presets"
   </source>
   <dest>
-    *: ""
+    *: "Geen voorkeuzes"
   </dest>
   <voice>
     *: ""
@@ -6989,13 +6989,13 @@
   desc: in radio menu
   user:
   <source>
-    *: "Add preset"
+    *: "Add Preset"
   </source>
   <dest>
     *: "Voorkeuze toevoegen"
   </dest>
   <voice>
-    *: "Add preset"
+    *: "Voorkeuze toevoegen"
   </voice>
 </phrase>
 <phrase>
@@ -7003,13 +7003,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
-    *: "Bewerk voorkeur"
+    *: "Bewerk voorkeuze"
   </dest>
   <voice>
-    *: "Bewerk voorkeur"
+    *: "Bewerk voorkeuze"
   </voice>
 </phrase>
 <phrase>
@@ -7017,13 +7017,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
     *: "Verwijder voorkeuze"
   </dest>
   <voice>
-    *: ""
+    *: "Verwijder voorkeuze"
   </voice>
 </phrase>
 <phrase>
@@ -7031,7 +7031,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
     *: "Opslaan voorkeuze mislukt"
@@ -7045,7 +7045,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
     *: "De voorkeuze lijst is vol"
@@ -7126,7 +7126,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -7171,13 +7171,13 @@
   desc: in radio menu
   user:
   <source>
-    *: "Auto scan presets"
+    *: "Auto-Scan Presets"
   </source>
   <dest>
     *: "Automatische voorkeuzes"
   </dest>
   <voice>
-    *: "Auto scan presets"
+    *: "Automatische voorkeuzes"
   </voice>
 </phrase>
 <phrase>
@@ -7185,7 +7185,7 @@
   desc: confirmation if presets can be cleared
   user:
   <source>
-    *: "Clear current presets?"
+    *: "Clear Current Presets?"
   </source>
   <dest>
     *: "Voorkeuzes wissen?"
@@ -7311,7 +7311,7 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
     *: "Map Buffer Is Vol!"
@@ -7342,7 +7342,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Instellingen Geladen"
+    *: "Instellingen geladen"
   </dest>
   <voice>
     *: ""
@@ -7356,7 +7356,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Instellingen Opgeslagen"
+    *: "Instellingen opgeslagen"
   </dest>
   <voice>
     *: ""
@@ -7437,13 +7437,13 @@
   desc: text for splash to indicate a new backdrop has been loaded successfully
   user:
   <source>
-    *: "Backdrop loaded"
+    *: "Backdrop Loaded"
   </source>
   <dest>
     *: "Achtergrond geladen"
   </dest>
   <voice>
-    *: "Backdrop loaded"
+    *: "Achtergrond geladen"
   </voice>
 </phrase>
 <phrase>
@@ -7451,13 +7451,13 @@
   desc: text for splash to indicate a failure to load a bitmap as backdrop
   user:
   <source>
-    *: "Backdrop failed"
+    *: "Backdrop Failed"
   </source>
   <dest>
     *: "Achtergrond laden mislukt"
   </dest>
   <voice>
-    *: "Backdrop failed"
+    *: "Achtergrond laden mislukt"
   </voice>
 </phrase>
 <phrase>
@@ -7605,7 +7605,7 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+    *: "Move Failed"
   </source>
   <dest>
     *: "Verplaatsen mislukt"
@@ -7647,7 +7647,7 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
     *: "Enkel track naam"
@@ -7661,7 +7661,7 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
     *: "Volledig pad"
@@ -7833,6 +7833,673 @@
   </source>
   <dest>
     *: "(START/STOP)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Verandering opslaan?"
+  </dest>
+  <voice>
+    *: "Verandering opslaan?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Tagcache opslaan"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Alle tracks>"
+  </dest>
+  <voice>
+    *: "Alle tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Achtergrond kleur"
+  </dest>
+  <voice>
+    *: "Achtergrond kleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Plakken"
+  </dest>
+  <voice>
+    *: "Plakken"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Voorsnijden"
+  </dest>
+  <voice>
+    *: "Voorsnijden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Keep on Disk"
+  </source>
+  <dest>
+    *: "Bewaar op schijf"
+  </dest>
+  <voice>
+    *: "Bewaar op schijf"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Tagcache niet klaar"
+  </dest>
+  <voice>
+    *: "Tagcache niet klaar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Voorgrond kleur"
+  </dest>
+  <voice>
+    *: "Voorgrond kleur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Eerste aanraking activeert verlichting"
+  </dest>
+  <voice>
+    *: "Eerste aanraking activeert verlichting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Speler en afstandsbediening"
+  </dest>
+  <voice>
+    *: "Speler en afstandsbediening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixels"
+  </dest>
+  <voice>
+    *: "pixels"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "toetsenbord"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Enkel speler"
+  </dest>
+  <voice>
+    *: "Enkel speler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Laad voorkeuze lijst"
+  </dest>
+  <voice>
+    *: "Laad voorkeuze lijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Laad in RAM"
+  </dest>
+  <voice>
+    *: "Laad in RAM"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Scroll opties afstandsbediening"
+  </dest>
+  <voice>
+    *: "Scroll opties afstandsbediening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Kopieer"
+  </dest>
+  <voice>
+    *: "Kopieer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Pitch"
+  </dest>
+  <voice>
+    *: "Pitch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Pagina scrollen"
+  </dest>
+  <voice>
+    *: "Pagina scrollen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Hoge afsnijfrequentie"
+  </dest>
+  <voice>
+    *: "Hoge afsnijfrequentie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Voorkeuze lijst"
+  </dest>
+  <voice>
+    *: "Voorkeuze lijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Verkeerde kleur"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Force Tag Cache Update"
+  </source>
+  <dest>
+    *: "Forceer verniewing Tag Cache"
+  </dest>
+  <voice>
+    *: "Forceer verniewing Tag Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Lengte]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Genres"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Foute bestandsnaam!"
+  </dest>
+  <voice>
+    *: "Foute bestandsnaam!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Zoek in speellijst"
+  </dest>
+  <voice>
+    *: "Zoek in speellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Feest modus"
+  </dest>
+  <voice>
+    *: "Feest modus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Alleen afstandsbediening"
+  </dest>
+  <voice>
+    *: "Alleen afstandsbediening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Bestand/map bestaat. Overschrijven?"
+  </dest>
+  <voice>
+    *: "Bestand/map bestaat. Overschrijven?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Clipping licht"
+  </dest>
+  <voice>
+    *: "Clipping licht"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Kleuren terugstellen"
+  </dest>
+  <voice>
+    *: "Kleuren terugstellen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Geen voorkeuze gevonden, zoeken?"
+  </dest>
+  <voice>
+    *: "Geen voorkeuze gevonden, zoeken?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "RGB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Zoeken... %d gevonden (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Alleen track overslaan"
+  </dest>
+  <voice>
+    *: "Alleen track overslaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Verwijder voorkeuze lijst"
+  </dest>
+  <voice>
+    *: "Verwijder voorkeuze lijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Nieuw toetsenbord"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Tag Cache"
+  </dest>
+  <voice>
+    *: "Tag Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Cross gain"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Sla voorkeuze lijst op"
+  </dest>
+  <voice>
+    *: "Sla voorkeuze lijst op"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Hoge frequentie vermindering"
+  </dest>
+  <voice>
+    *: "Hoge frequentie vermindering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Snijden"
+  </dest>
+  <voice>
+    *: "Snijden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direct gain"
+  </dest>
+  <voice>
+    *: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Vernieuwt op de achtergrond"
   </dest>
   <voice>
     *: ""
