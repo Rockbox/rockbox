@@ -1,4 +1,4 @@
-#             __________               __   ___.
+﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -6279,7 +6279,7 @@
   user:
   <source>
     *: ""
-  </source> 
+  </source> 
   <dest>
     *: ""
   </dest>
@@ -8508,3 +8508,16 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Nom de fichier invalide"
   </voice>
 </phrase>
+ id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Options de Défilement Télécommande"
+  </dest>
+  <voice>
+    *: "Options de défilement de la télécommande"
+  </voice>
+</phrase>   
