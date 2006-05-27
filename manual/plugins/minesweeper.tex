@@ -1,9 +1,16 @@
 \subsection{Minesweeper}
 \screenshot{plugins/images/ss-minesweeper}{Minesweeper plugin}{img:minesweeper}
 
-The classic game of minesweeper.  Use the UP and DOWN keys to select the
-required percentage of mines to set the difficulty then press the MENU
-key to begin.
+The classic game of minesweeper.  Use 
+\opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}{the \ButtonUp\ and \ButtonDown\ keys}
+\opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack }
+to select the required percentage of mines to set the difficulty 
+then press the 
+\opt{RECORDER_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{h1xx,h300}{\ButtonSelect}
+\opt{IPOD_4G_PAD}{\ButtonSelect}
+\opt{x5}{\ButtonRec}key to begin.
 
 The aim of the game is to uncover all of the squares on the board.  If a
 mine is uncovered then the game is over.  If a mine is not uncovered,
@@ -14,10 +21,33 @@ the location of a mine, it can be tagged to avoid accidentally
 ``stepping'' on it.
 
 \begin{table}
-\begin{btnmap}{}{}
-UP/DOWN/LEFT/RIGHT & Move the cursor across the minefield \\
-PLAY / F1 & Toggle flag on / off \\
-MENU / F2 & Reveal the contents of the current square \\
-STOP & Exit the game \\
+ \begin{btnmap}{}{}
+  \opt{IPOD_4G_PAD}{\ButtonMenu/\ButtonPlay/\ButtonLeft/\ButtonRight}
+  \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+  & Move the cursor across the minefield \\
+  %
+  \opt{RECORDER_PAD}{\ButtonFOne}
+  \opt{ONDIO_PAD}{\ButtonMenu}
+  \opt{h1xx,h300}{\ButtonOn}
+  \opt{IPOD_4G_PAD,x5}{\ButtonPlay} 
+  & Toggle flag on / off \\
+  %
+  \opt{RECORDER_PAD}{\ButtonFTwo}
+  \opt{ONDIO_PAD}{Hold \ButtonMenu}
+  \opt{h1xx,h300,x5}{\ButtonSelect}
+  \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
+  & Reveal the contents of the current square \\
+  %
+  \opt{RECORDER_PAD}{\ButtonFThree}
+  \opt{ONDIO_PAD}{Hold \ButtonMenu+\ButtonOff}
+  \opt{h1xx,h300}{\ButtonMode}
+  \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+  \opt{x5}{\ButtonRec+\ButtonPlay}
+  & Display the current game status \\
+  %
+  \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300}{\ButtonOff}
+  \opt{x5}{\ButtonPower}
+  \opt{IPOD_4G_PAD}{\ButtonMenu}
+  & Exit the game \\
 \end{btnmap}
 \end{table}
