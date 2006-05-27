@@ -1427,7 +1427,6 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     
     tempbufidx = 0;
     tempbuf_pos = TAGFILE_MAX_ENTRIES * sizeof(struct tempbuf_searchidx);
-    memset(tempbuf+tempbuf_pos, 0, LOOKUP_BUF_DEPTH * sizeof(void **));
     tempbuf_pos += LOOKUP_BUF_DEPTH * sizeof(void **);
     tempbuf_left = tempbuf_size - tempbuf_pos - 8;
     if (tempbuf_left - TAGFILE_ENTRY_AVG_LENGTH * TAGFILE_MAX_ENTRIES < 0)
@@ -1438,6 +1437,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
 
     lookup = (struct tempbuf_searchidx **)
         (tempbuf + sizeof(struct tempbuf_searchidx)*TAGFILE_MAX_ENTRIES);
+    memset(lookup, 0, LOOKUP_BUF_DEPTH * sizeof(void **));
     
     /* Open the index file, which contains the tag names. */
     snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
@@ -2024,7 +2024,7 @@ static bool allocate_tagcache(void)
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
     logf("tagcache: %d bytes allocated.", stat.ramcache_allocated);
     logf("at: 0x%04x", audiobuf);
-    audiobuf += (long)((stat.ramcache_allocated & ~0x03) + 0x04);
+    audiobuf += (long)((stat.ramcache_allocated & ~0x03) + 128);
 
     return true;
 }

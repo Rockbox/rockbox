@@ -106,33 +106,25 @@ void init_dircache(void)
     int font_w, font_h;
     int result;
     char buf[32];
+    bool clear = false;
     
     dircache_init();
     if (global_settings.dircache)
     {
-        /* Print "Scanning disk..." to the display. */
-        lcd_getstringsize("A", &font_w, &font_h);
-        lcd_putsxy((LCD_WIDTH/2) - ((strlen(str(LANG_DIRCACHE_BUILDING))*font_w)/2),
-                    LCD_HEIGHT-font_h*3, str(LANG_DIRCACHE_BUILDING));
-        lcd_update();
-
+        if (global_settings.dircache_size == 0)
+        {
+            gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+            clear = true;
+        }
+        
         result = dircache_build(global_settings.dircache_size);
         if (result < 0)
+            gui_syncsplash(0, true, "Failed! Result: %d", result);
+        
+        if (clear)
         {
-            snprintf(buf, sizeof(buf),
-                     "Failed! Result: %d",
-                     result);
-            lcd_getstringsize("A", &font_w, &font_h);
-            lcd_putsxy((LCD_WIDTH/2) - ((strlen(buf)*font_w)/2),
-                        LCD_HEIGHT-font_h*2, buf);
-        }
-        else
-        {
-            /* Clean the text when we are done. */
-            lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            lcd_fillrect(0, LCD_HEIGHT-font_h*3, LCD_WIDTH, font_h);
-            lcd_set_drawmode(DRMODE_SOLID);
-            lcd_update();
+            backlight_on();
+            show_logo();
         }
     }
 }
@@ -170,7 +162,10 @@ void init_tagcache(void)
     tagtree_init();
 
     if (clear)
+    {
+        backlight_on();
         show_logo();
+    }
 }
 
 #ifdef SIMULATOR
@@ -389,9 +384,9 @@ void init(void)
         settings_load(SETTINGS_ALL);
 
     
-    init_dircache();
     gui_sync_wps_init();
     settings_apply();
+    init_dircache();
     init_tagcache();
 
     status_init();
