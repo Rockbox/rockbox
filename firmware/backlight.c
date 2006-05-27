@@ -660,6 +660,10 @@ void backlight_set_brightness(int val)
 {
     /* set H300 brightness by changing the PWM
        accepts 0..15 but note that 0 and 1 give a black display! */
+
+    /* disable IRQs while bitbanging */
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
     val &= 0x0F;
     if(val<MIN_BRIGHTNESS_SETTING)
         val=MIN_BRIGHTNESS_SETTING;
@@ -669,9 +673,6 @@ void backlight_set_brightness(int val)
 
     /* enable PWM */
     val |= 0x01;
-
-    /* disable IRQs while bitbanging */
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     pcf50606_write(0x35, val);
 
