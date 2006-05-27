@@ -86,6 +86,23 @@ case $arch in
     ;;
 esac
 
+# Verify download directory or create it
+if test -d "$dlwhere"; then
+  if test -w "$dlwhere"; then
+    echo "Download directory $dlwhere seems to exist and is writable"
+  else
+    echo "$dlwhere exists, but doesn't seem to be writable for you"
+    exit
+  fi
+else
+  mkdir $dlwhere
+  if test $? -ne 0; then
+    echo "$dlwhere is missing and we failed to create it!"
+    exit
+  fi
+  echo "$dlwhere has been created to store downloads in"
+fi
+
 if test -d build-rbdev; then
   echo "you have a build-rbdev dir already, please remove and rerun"
   exit
