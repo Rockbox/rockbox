@@ -1,3 +1,15 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+#
+# Greek language file, for all platforms and targets.
+# 
+# Basic translation by Tony Motakis Martch 2005
+# Extended translation and voice UI by Alexander Spyridakis (XavierGr) May 2006
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -9,7 +21,7 @@
     *: "Ναι"
   </dest>
   <voice>
-    *: "Yes"
+    *: "Ναι"
   </voice>
 </phrase>
 <phrase>
@@ -23,7 +35,7 @@
     *: "Όχι"
   </dest>
   <voice>
-    *: "No"
+    *: "Όχι"
   </voice>
 </phrase>
 <phrase>
@@ -34,10 +46,10 @@
     *: "On"
   </source>
   <dest>
-    *: "Ενεργοποιημένο"
+    *: "Ενεργό"
   </dest>
   <voice>
-    *: "On"
+    *: "Ενεργό"
   </voice>
 </phrase>
 <phrase>
@@ -48,10 +60,10 @@
     *: "Off"
   </source>
   <dest>
-    *: "Απενεργοποιημένο"
+    *: "Ανενεργό"
   </dest>
   <voice>
-    *: "Off"
+    *: "Ανενεργό"
   </voice>
 </phrase>
 <phrase>
@@ -62,15 +74,15 @@
     *: "Ask"
   </source>
   <dest>
-    *: "Με Ερώτηση"
+    *: "Με ερώτηση"
   </dest>
   <voice>
-    *: "Ask"
+    *: "Με ερώτηση"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -79,7 +91,7 @@
     *: "Πάντα"
   </dest>
   <voice>
-    *: "Always"
+    *: "Πάντα"
   </voice>
 </phrase>
 <phrase>
@@ -90,7 +102,7 @@
     *: "Press OFF to shut down"
   </source>
   <dest>
-    *: "Απενεργοποίηση για τερματισμό"
+    *: "OFF για τερματισμό"
   </dest>
   <voice>
     *: ""
@@ -118,10 +130,10 @@
     *: "Restarting playback..."
   </source>
   <dest>
-    *: "Επανεκκίνηση αναπαραγωγής"
+    *: "Επανεκκίνηση αναπαραγωγής..."
   </dest>
   <voice>
-    *: "Restarting playback..."
+    *: "Επανεκκίνηση αναπαραγωγής..."
   </voice>
 </phrase>
 <phrase>
@@ -135,7 +147,7 @@
     *: "Παρακαλώ αφαιρέστε την κάρτα MMC"
   </dest>
   <voice>
-    *: "Please remove multimedia card"
+    *: "Παρακαλώ αφαιρέστε την κάρτα MMC"
   </voice>
 </phrase>
 <phrase>
@@ -154,7 +166,7 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -168,16 +180,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Πρόσφατοι Σελιδοδείκτες"
+    *: "Πρόσφατοι σελιδοδείκτες"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "Πρόσφατοι σελιδοδείκτες"
   </voice>
 </phrase>
 <phrase>
@@ -188,10 +200,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Επιλογές Ήχου"
+    *: "Επιλογές ήχου"
   </dest>
   <voice>
-    *: "Sound Settings"
+    *: "Επιλογές ήχου"
   </voice>
 </phrase>
 <phrase>
@@ -202,29 +214,29 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Γενικές Επιλογές"
+    *: "Γενικές επιλογές"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "Γενικές επιλογές"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Διαχείριση Ρυθμίσεων"
+    *: "Διαχείριση ρυθμίσεων"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Διαχείριση ρυθμίσεων"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
@@ -233,7 +245,7 @@
     *: "Ραδιόφωνο FM"
   </dest>
   <voice>
-    *: "FM Radio"
+    *: "Ραδιόφωνο FM"
   </voice>
 </phrase>
 <phrase>
@@ -247,26 +259,26 @@
     *: "Ηχογράφηση"
   </dest>
   <voice>
-    *: "Recording"
+    *: "Ηχογράφηση"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
   </source>
   <dest>
-    *: "Επιλογές Λίστας Αναπαραγωγής"
+    *: "Επιλογές λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "Playlist Options"
+    *: "Επιλογές λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
@@ -275,7 +287,7 @@
     *: "Περιήγηση Plugins"
   </dest>
   <voice>
-    *: "Browse Plugins"
+    *: "Περιήγηση πλαγκίνς"
   </voice>
 </phrase>
 <phrase>
@@ -289,7 +301,7 @@
     *: "Πληροφορίες"
   </dest>
   <voice>
-    *: "Info"
+    *: "Πληροφορίες"
   </voice>
 </phrase>
 <phrase>
@@ -303,7 +315,7 @@
     *: "Τερματισμός"
   </dest>
   <voice>
-    *: "Shut down"
+    *: "Τερματισμός"
   </voice>
 </phrase>
 <phrase>
@@ -317,7 +329,7 @@
     *: "Ένταση"
   </dest>
   <voice>
-    *: "Volume"
+    *: "Ένταση"
   </voice>
 </phrase>
 <phrase>
@@ -328,10 +340,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Χαμηλές συχνότητες"
+    *: "Μπάσα"
   </dest>
   <voice>
-    *: "Bass"
+    *: "Μπάσα"
   </voice>
 </phrase>
 <phrase>
@@ -342,10 +354,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Υψηλές Συχνότητες"
+    *: "Πρίμα"
   </dest>
   <voice>
-    *: "Treble"
+    *: "Πρίμα"
   </voice>
 </phrase>
 <phrase>
@@ -359,7 +371,7 @@
     *: "Αναλογία Α/Δ καναλιού"
   </dest>
   <voice>
-    *: "Balance"
+    *: "Αναλογία αριστερού και δεξιού καναλιού"
   </voice>
 </phrase>
 <phrase>
@@ -373,7 +385,7 @@
     *: "Κανάλια"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Κανάλια"
   </voice>
 </phrase>
 <phrase>
@@ -398,10 +410,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Στερεοφωνικά"
+    *: "Στερεοφωνικό"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "Στερεοφωνικό"
   </voice>
 </phrase>
 <phrase>
@@ -412,10 +424,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Μονοφωνικά"
+    *: "Μονοφωνικό"
   </dest>
   <voice>
-    *: "Mono"
+    *: "Μονοφωνικό"
   </voice>
 </phrase>
 <phrase>
@@ -429,7 +441,7 @@
     *: "Προσαρμογή"
   </dest>
   <voice>
-    *: "Custom"
+    *: "Προσαρμογή"
   </voice>
 </phrase>
 <phrase>
@@ -440,10 +452,10 @@
     *: "Mono Left"
   </source>
   <dest>
-    *: "Μονοφωνικά (αριστερό)"
+    *: "Μονοφωνικό (αριστερό)"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "Μονοφωνικό (αριστερό)"
   </voice>
 </phrase>
 <phrase>
@@ -454,10 +466,10 @@
     *: "Mono Right"
   </source>
   <dest>
-    *: "Μονοφωνικά (δεξί)"
+    *: "Μονοφωνικό (δεξί)"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "Μονοφωνικό (δεξί)"
   </voice>
 </phrase>
 <phrase>
@@ -471,7 +483,7 @@
     *: "Καραόκε"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "Καραόκε"
   </voice>
 </phrase>
 <phrase>
@@ -479,13 +491,13 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Στερεοφωνικό εύρος"
   </dest>
   <voice>
-    *: "Stereo width"
+    *: "Στερεοφωνικό εύρος"
   </voice>
 </phrase>
 <phrase>
@@ -496,10 +508,10 @@
     *: "Loudness"
   </source>
   <dest>
-    *: "Όγκος Ήχου"
+    *: "Όγκος ήχου"
   </dest>
   <voice>
-    *: "Loudness"
+    *: "Όγκος ήχου"
   </voice>
 </phrase>
 <phrase>
@@ -513,7 +525,7 @@
     *: "Αυτόματη ένταση"
   </dest>
   <voice>
-    *: "Auto Volume"
+    *: "Αυτόματη ένταση"
   </voice>
 </phrase>
 <phrase>
@@ -524,7 +536,7 @@
     *: "AV Decay Time"
   </source>
   <dest>
-    *: "AV Χρόνος Εξασθένησης"
+    *: "Χρόνος εξασθένησης AV"
   </dest>
   <voice>
     *: ""
@@ -535,13 +547,13 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
-    *: "Υπέρ χαμηλές"
+    *: "Υπέρ μπάσα"
   </dest>
   <voice>
-    *: "Super bass"
+    *: "Υπέρ μπάσα"
   </voice>
 </phrase>
 <phrase>
@@ -552,10 +564,10 @@
     *: "MDB Enable"
   </source>
   <dest>
-    *: "Ενεργοποίηση MDB"
+    *: "Ενεργό MDB"
   </dest>
   <voice>
-    *: "MDB Enable"
+    *: "Ενεργό MDB"
   </voice>
 </phrase>
 <phrase>
@@ -569,7 +581,7 @@
     *: "Ισχύς MDB"
   </dest>
   <voice>
-    *: "MDB Strength"
+    *: "Ισχύς MDB"
   </voice>
 </phrase>
 <phrase>
@@ -583,7 +595,7 @@
     *: "Αρμονικά MDB"
   </dest>
   <voice>
-    *: "MDB Harmonics"
+    *: "Αρμονικά MDB"
   </voice>
 </phrase>
 <phrase>
@@ -591,13 +603,13 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
     *: "Κεντρική Συχνότητα MDB"
   </dest>
   <voice>
-    *: "MDB Center frequency"
+    *: "Κεντρική Συχνότητα MDB"
   </voice>
 </phrase>
 <phrase>
@@ -611,7 +623,7 @@
     *: "Σχήμα MDB"
   </dest>
   <voice>
-    *: "MDB Shape"
+    *: "Σχήμα MDB"
   </voice>
 </phrase>
 <phrase>
@@ -625,7 +637,7 @@
     *: "Αναπαραγωγή"
   </dest>
   <voice>
-    *: "Playback"
+    *: "Αναπαραγωγή"
   </voice>
 </phrase>
 <phrase>
@@ -636,10 +648,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Εμφάνιση Αρχείων"
+    *: "Εμφάνιση αρχείων"
   </dest>
   <voice>
-    *: "File View"
+    *: "Εμφάνιση αρχείων"
   </voice>
 </phrase>
 <phrase>
@@ -653,7 +665,7 @@
     *: "Οθόνη"
   </dest>
   <voice>
-    *: "Display"
+    *: "Οθόνη"
   </voice>
 </phrase>
 <phrase>
@@ -667,7 +679,7 @@
     *: "Σύστημα"
   </dest>
   <voice>
-    *: "System"
+    *: "Σύστημα"
   </voice>
 </phrase>
 <phrase>
@@ -681,7 +693,7 @@
     *: "Σελιδοδείκτες"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Σελιδοδείκτες"
   </voice>
 </phrase>
 <phrase>
@@ -695,7 +707,7 @@
     *: "Γλώσσα"
   </dest>
   <voice>
-    *: "Language"
+    *: "Γλώσσα"
   </voice>
 </phrase>
 <phrase>
@@ -709,7 +721,7 @@
     *: "Φωνή"
   </dest>
   <voice>
-    *: "Voice"
+    *: "Φωνή"
   </voice>
 </phrase>
 <phrase>
@@ -723,7 +735,7 @@
     *: "Περιήγηση αρχείων .cfg"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "Περιήγηση αρχείων ρύθμισης"
   </voice>
 </phrase>
 <phrase>
@@ -737,7 +749,7 @@
     *: "Περιήγηση Firmwares"
   </dest>
   <voice>
-    *: "Browse Firmwares"
+    *: "Περιήγηση φιρμγουέαρς"
   </voice>
 </phrase>
 <phrase>
@@ -748,10 +760,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Επαναφορά Ρυθμίσεων"
+    *: "Επαναφορά ρυθμίσεων"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "Επαναφορά ρυθμίσεων"
   </voice>
 </phrase>
 <phrase>
@@ -762,7 +774,7 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "Επιβεβαίωση;"
+    *: "Είστε σίγουρος;"
   </dest>
   <voice>
     *: ""
@@ -776,7 +788,7 @@
     *: "PLAY = Yes"
   </source>
   <dest>
-    *: "Αναπαραγωγή = Ναί"
+    *: "PLAY = Ναί"
   </dest>
   <voice>
     *: ""
@@ -790,7 +802,7 @@
     *: "Any Other = No"
   </source>
   <dest>
-    *: "Οποιοδήποτε ’λλο = Όχι"
+    *: "Οποιοδήποτε άλλο = Όχι"
   </dest>
   <voice>
     *: ""
@@ -832,7 +844,7 @@
     *: "Canceled"
   </source>
   <dest>
-    *: "Ακύρωθηκε"
+    *: "Ακυρώθηκε"
   </dest>
   <voice>
     *: ""
@@ -846,10 +858,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Εγγραφή Αρχείου Ρυθμίσεων"
+    *: "Εγγραφή αρχείου .cfg"
   </dest>
   <voice>
-    *: "Write configuration file"
+    *: "Εγγραφή αρχείου ρυθμίσεων"
   </voice>
 </phrase>
 <phrase>
@@ -913,13 +925,13 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Οθόνη ηχογράφησης"
   </dest>
   <voice>
-    *: "Recording screen"
+    *: "Οθόνη ηχογράφησης"
   </voice>
 </phrase>
 <phrase>
@@ -930,10 +942,10 @@
     *: "Recording Settings"
   </source>
   <dest>
-    *: "Ρυθμίσεις Ηχογράφησης"
+    *: "Ρυθμίσεις ηχογράφησης"
   </dest>
   <voice>
-    *: "Recording Settings"
+    *: "Ρυθμίσεις ηχογράφησης"
   </voice>
 </phrase>
 <phrase>
@@ -944,10 +956,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Δημιουργία Λίστας Αναπαραγωγής"
+    *: "Δημιουργία λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Δημιουργία λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -958,10 +970,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "Προβολή Τρέχουσας Λίστας Αναπαραγωγής"
+    *: "Προβολή τρέχουσας λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Προβολή τρέχουσας λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -972,10 +984,10 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Αποθήκευση Τρέχουσας Λίστας Αναπαραγωγής"
+    *: "Αποθήκευση τρέχουσας λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Αποθήκευση τρέχουσας λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -986,15 +998,15 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Αναδρομική εισαγωγή υποκαταλόγων"
+    *: "Αναδρομική εισαγωγή φακέλων"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Αναδρομική εισαγωγή φακέλων"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
@@ -1003,12 +1015,12 @@
     *: "Πληροφορίες για το Rockbox"
   </dest>
   <voice>
-    *: "Rockbox Info"
+    *: "Πληροφορίες για το ροκ μποξ..."
   </voice>
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1017,26 +1029,26 @@
     *: "Έκδοση"
   </dest>
   <voice>
-    *: "Version"
+    *: "Έκδοση"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Debug (Μη Πλησιάζετε!)"
+    *: "Debug (Μην πλησιάζετε!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "Ντηι μπάγκ, μην πλησιάζετε!"
   </voice>
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1059,7 +1071,7 @@
     *: "Ανακατεμένα"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "Ανακατεμένα"
   </voice>
 </phrase>
 <phrase>
@@ -1073,7 +1085,7 @@
     *: "Επανάληψη"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "Επανάληψη"
   </voice>
 </phrase>
 <phrase>
@@ -1087,7 +1099,7 @@
     *: "Όλα"
   </dest>
   <voice>
-    *: "All"
+    *: "Όλα"
   </voice>
 </phrase>
 <phrase>
@@ -1101,7 +1113,7 @@
     *: "Ένα"
   </dest>
   <voice>
-    *: "One"
+    *: "Ένα"
   </voice>
 </phrase>
 <phrase>
@@ -1115,7 +1127,7 @@
     *: "Α-Β"
   </dest>
   <voice>
-    *: "A-B"
+    *: "Άλφα-Βήτα"
   </voice>
 </phrase>
 <phrase>
@@ -1126,10 +1138,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Αναπαραγωγή Επιλεγμένου Πρώτα"
+    *: "Αναπαραγωγή επιλεγμένου πρώτα"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "Αναπαραγωγή επιλεγμένου πρώτα"
   </voice>
 </phrase>
 <phrase>
@@ -1137,13 +1149,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </source>
   <dest>
-    *: "Συνέχεια"
+    *: "Συνέχεια στην εκκίνηση"
   </dest>
   <voice>
-    *: "Resume on startup"
+    *: "Συνέχεια στην εκκίνηση"
   </voice>
 </phrase>
 <phrase>
@@ -1151,13 +1163,13 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "FFwd/Rewind"
+    *: "Προώθηση μπροστά/πίσω"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "Προώθηση μπροστά και πίσω"
   </voice>
 </phrase>
 <phrase>
@@ -1168,10 +1180,10 @@
     *: "Anti-Skip Buffer"
   </source>
   <dest>
-    *: "Anti-Skip Buffer"
+    *: "Μνήμη περιορισμού αναπήδησης"
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "Μνήμη περιορισμού αναπήδησης"
   </voice>
 </phrase>
 <phrase>
@@ -1179,13 +1191,13 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Ομαλή Συνέχιση Αναπαραγωγής"
+    *: "Ομαλή συνέχιση αναπαραγωγής"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "Ομαλή συνέχιση αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -1196,10 +1208,10 @@
     *: "Crossfade"
   </source>
   <dest>
-    *: "Crossfade"
+    *: "Ομαλή εναλλαγή"
   </dest>
   <voice>
-    *: "Crossfade"
+    *: "Ομαλή εναλλαγή"
   </voice>
 </phrase>
 <phrase>
@@ -1213,7 +1225,7 @@
     *: "Replaygain"
   </dest>
   <voice>
-    *: ""
+    *: "Ριπλέι γκέιν"
   </voice>
 </phrase>
 <phrase>
@@ -1221,13 +1233,13 @@
   desc: in playback settings
   user:
   <source>
-    *: "Beep volume"
+    *: "Beep Volume"
   </source>
   <dest>
     *: "Ένταση ηχητικού σήματος"
   </dest>
   <voice>
-    *: ""
+    *: "Ένταση ηχητικού σήματος"
   </voice>
 </phrase>
 <phrase>
@@ -1277,13 +1289,13 @@
   desc: in playback settings menu. enable/disable the optical out
   user:
   <source>
-    *: "Optical output"
+    *: "Optical Output"
   </source>
   <dest>
     *: "Οπτική έξοδος"
   </dest>
   <voice>
-    *: "Optical output"
+    *: "Οπτική έξοδος"
   </voice>
 </phrase>
 <phrase>
@@ -1291,13 +1303,13 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
     *: "Προτεραιότητα πεδίων ID3"
   </dest>
   <voice>
-    *: "ID3 tag priority"
+    *: "Προτεραιότητα πεδίων άι ντί 3"
   </voice>
 </phrase>
 <phrase>
@@ -1308,10 +1320,10 @@
     *: "V1 then V2"
   </source>
   <dest>
-    *: "V1 προ του V2"
+    *: "V1 προ της V2"
   </dest>
   <voice>
-    *: "Version 1 then version 2"
+    *: "Έκδοση 1 προ της Έκδοσης 2"
   </voice>
 </phrase>
 <phrase>
@@ -1322,24 +1334,24 @@
     *: "V2 then V1"
   </source>
   <dest>
-    *: "V2 προ του V1"
+    *: "V2 προ της V1"
   </dest>
   <voice>
-    *: "Version 2 then version 1"
+    *: "Έκδοση 2 προ της Έκδοσης 1"
   </voice>
 </phrase>
 <phrase>
   id: LANG_NEXT_FOLDER
-  desc: in settings_menu.  Should we move to next folder when current one ends
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user:
   <source>
-    *: "Move to Next Folder"
+    *: "Auto-Change Directory"
   </source>
   <dest>
     *: "Μετακίνηση στον επόμενο φάκελο"
   </dest>
   <voice>
-    *: "Move to Next Folder"
+    *: "Μετακίνηση στον επόμενο φάκελο"
   </voice>
 </phrase>
 <phrase>
@@ -1347,13 +1359,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Gather runtime data (experimental)"
+    *: "Gather Runtime Data (experimental)"
   </source>
   <dest>
-    *: "Συγκέντρωση δεδομένων χρόνου αναπαραγωγής"
+    *: "Συγκέντρωση δεδομένων χρόνου αναπαραγωγής (πειραματικό)"
   </dest>
   <voice>
-    *: "Gather runtime data"
+    *: "Συγκέντρωση δεδομένων χρόνου αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -1367,7 +1379,7 @@
     *: "Ταξινόμηση κατά Πεζά/Κεφαλαία"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "Ταξινόμηση κατά πεζά, η κεφαλαία,"
   </voice>
 </phrase>
 <phrase>
@@ -1378,10 +1390,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Ταξινόμηση Καταλόγων"
+    *: "Ταξινόμηση φακέλων"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "Ταξινόμηση φακέλων"
   </voice>
 </phrase>
 <phrase>
@@ -1392,10 +1404,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Ταξινόμηση Αρχείων"
+    *: "Ταξινόμηση αρχείων"
   </dest>
   <voice>
-    *: "sort files"
+    *: "Ταξινόμηση αρχείων"
   </voice>
 </phrase>
 <phrase>
@@ -1409,7 +1421,7 @@
     *: "Αλφαβητικά"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Αλφαβητικά"
   </voice>
 </phrase>
 <phrase>
@@ -1417,13 +1429,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
     *: "Κατα ημερομηνία"
   </dest>
   <voice>
-    *: "by date"
+    *: "Κατα ημερομηνία"
   </voice>
 </phrase>
 <phrase>
@@ -1431,13 +1443,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
     *: "Κατα νεότερα"
   </dest>
   <voice>
-    *: "by newest date"
+    *: "Κατα νεότερα"
   </voice>
 </phrase>
 <phrase>
@@ -1445,13 +1457,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
     *: "Κατα τύπο"
   </dest>
   <voice>
-    *: "by type"
+    *: "Κατα τύπο"
   </voice>
 </phrase>
 <phrase>
@@ -1465,7 +1477,7 @@
     *: "Εμφάνιση αρχείων"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "Εμφάνιση αρχείων"
   </voice>
 </phrase>
 <phrase>
@@ -1479,7 +1491,7 @@
     *: "Όλα"
   </dest>
   <voice>
-    *: "All"
+    *: "Όλα"
   </voice>
 </phrase>
 <phrase>
@@ -1493,7 +1505,7 @@
     *: "Υποστηριζόμενα"
   </dest>
   <voice>
-    *: "Supported"
+    *: "Υποστηριζόμενα"
   </voice>
 </phrase>
 <phrase>
@@ -1507,7 +1519,7 @@
     *: "Μουσικής"
   </dest>
   <voice>
-    *: "Music"
+    *: "Μουσικής"
   </voice>
 </phrase>
 <phrase>
@@ -1518,24 +1530,24 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Λίστες Αναπαραγωγής"
+    *: "Λίστες αναπαραγωγής"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "Λίστες αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
-    *: "Βάση ID3"
+    *: "Βάση δεδομένων ID3"
   </dest>
   <voice>
-    *: "ID3 database"
+    *: "Βάση δεδομένων άι ντί 3"
   </voice>
 </phrase>
 <phrase>
@@ -1546,10 +1558,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Παρακολούθηση Λίστας Αναπαραγωγής"
+    *: "Παρακολούθηση λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "Παρακολούθηση λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -1560,10 +1572,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Εμφάνιση Εικονιδίων"
+    *: "Εμφάνιση εικονιδίων"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Εμφάνιση εικονιδίων"
   </voice>
 </phrase>
 <phrase>
@@ -1574,10 +1586,10 @@
     *: "Browse Fonts"
   </source>
   <dest>
-    *: "Περιήγηση Γραμματοσειρών"
+    *: "Περιήγηση γραμματοσειρών"
   </dest>
   <voice>
-    *: "Browse Fonts"
+    *: "Περιήγηση γραμματοσειρών"
   </voice>
 </phrase>
 <phrase>
@@ -1591,7 +1603,7 @@
     *: "Περιήγηση αρχείων .wps"
   </dest>
   <voice>
-    *: "Browse while-playing-screen files"
+    *: "Περιήγηση αρχείων γουάιλ πλέινγκ σκρίν"
   </voice>
 </phrase>
 <phrase>
@@ -1605,7 +1617,7 @@
     *: "Ρυθμίσεις LCD"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "Ρυθμίσεις LCD"
   </voice>
 </phrase>
 <phrase>
@@ -1619,7 +1631,7 @@
     *: "Επιλογές LCD-Χειριστηρίου"
   </dest>
   <voice>
-    *: ""
+    *: "Επιλογές LCD-Χειριστηρίου"
   </voice>
 </phrase>
 <phrase>
@@ -1630,10 +1642,10 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "Ταχύτητα Κύλισης"
+    *: "Επιλογές κύλισης"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "Επιλογές κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -1644,10 +1656,10 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Κατάσταση-/Μπάρα κύλισης"
+    *: "Μπάρα κατάστασης/κύλισης"
   </dest>
   <voice>
-    *: "Status- and Scrollbar"
+    *: "Μπάρα κατάστασης και κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -1658,10 +1670,10 @@
     *: "Peak Meter"
   </source>
   <dest>
-    *: "Μετρητής Μεγίστων"
+    *: "Μετρητής μέγιστων"
   </dest>
   <voice>
-    *: "Peak Meter"
+    *: "Μετρητής μέγιστων"
   </voice>
 </phrase>
 <phrase>
@@ -1675,7 +1687,7 @@
     *: "Μπαταρία"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Μπαταρία"
   </voice>
 </phrase>
 <phrase>
@@ -1689,7 +1701,7 @@
     *: "Δίσκος"
   </dest>
   <voice>
-    *: "Disk"
+    *: "Δίσκος"
   </voice>
 </phrase>
 <phrase>
@@ -1703,7 +1715,7 @@
     *: "Ώρα & ημερομηνία"
   </dest>
   <voice>
-    *: "Time and Date"
+    *: "Ώρα και ημερομηνία"
   </voice>
 </phrase>
 <phrase>
@@ -1714,10 +1726,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Σβήσιμο Όταν Ανενεργό"
+    *: "Σβήσιμο κατά την αδράνεια"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "Σβήσιμο κατά την αδράνεια"
   </voice>
 </phrase>
 <phrase>
@@ -1728,10 +1740,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Χρονοδιακόπτης"
+    *: "Χρονοδιακόπτης ύπνου"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Χρονοδιακόπτης ύπνου"
   </voice>
 </phrase>
 <phrase>
@@ -1745,7 +1757,7 @@
     *: "Αφύπνιση"
   </dest>
   <voice>
-    *: "Wake-Up Alarm"
+    *: "Αφύπνιση"
   </voice>
 </phrase>
 <phrase>
@@ -1759,7 +1771,7 @@
     *: "Περιορισμοί"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Περιορισμοί"
   </voice>
 </phrase>
 <phrase>
@@ -1770,10 +1782,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Είσοδος"
+    *: "Eίσοδος"
   </dest>
   <voice>
-    *: "Line In"
+    *: "Eίσοδος"
   </voice>
 </phrase>
 <phrase>
@@ -1784,10 +1796,10 @@
     *: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Mode Υποδοχής Αυτοκινήτου"
+    *: "Κατάσταση υποδοχής αυτοκινήτου"
   </dest>
   <voice>
-    *: "Car Adapter Mode"
+    *: "Κατάσταση υποδοχής αυτοκινήτου"
   </voice>
 </phrase>
 <phrase>
@@ -1798,10 +1810,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Σελιδοδείκτης κατα την διακοπή"
+    *: "Σελιδοδείκτης κατά την διακοπή"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Σελιδοδείκτης κατά την διακοπή"
   </voice>
 </phrase>
 <phrase>
@@ -1815,7 +1827,7 @@
     *: "Ναι - Μόνο πρόσφατοι"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Ναι - Μόνο πρόσφατοι"
   </voice>
 </phrase>
 <phrase>
@@ -1829,7 +1841,7 @@
     *: "Με ερώτηση - Μόνο πρόσφατοι"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Με ερώτηση - Μόνο πρόσφατοι"
   </voice>
 </phrase>
 <phrase>
@@ -1840,10 +1852,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Φόρτωση τελευταίου σελιδοδείκτη"
+    *: "Άνοιγμα τελευταίου σελιδοδείκτη"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "Άνοιγμα τελευταίου σελιδοδείκτη"
   </voice>
 </phrase>
 <phrase>
@@ -1857,7 +1869,7 @@
     *: "Διατήρηση λίστας προσφάτων σελιδοδεικτών;"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Διατήρηση λίστας προσφάτων σελιδοδεικτών;"
   </voice>
 </phrase>
 <phrase>
@@ -1871,7 +1883,7 @@
     *: "Μοναδικοί μόνο"
   </dest>
   <voice>
-    *: "Unique only"
+    *: "Μοναδικοί μόνο"
   </voice>
 </phrase>
 <phrase>
@@ -1882,10 +1894,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Φωνητικά Μενού"
+    *: "Φωνητικά μενού"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "Φωνητικά μενού"
   </voice>
 </phrase>
 <phrase>
@@ -1896,10 +1908,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Φωνητικοί Κατάλογοι"
+    *: "Φωνητικοί φάκελοι"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Φωνητικοί φάκελοι"
   </voice>
 </phrase>
 <phrase>
@@ -1910,15 +1922,15 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Φωνητικά Αρχεία"
+    *: "Φωνητικά αρχεία"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "Φωνητικά αρχεία"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -1927,12 +1939,12 @@
     *: "Αριθμοί"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Αριθμοί"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -1941,12 +1953,12 @@
     *: "Συλλαβισμός"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Συλλαβισμός"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
@@ -1955,7 +1967,7 @@
     *: ".talk αρχείο mp3"
   </dest>
   <voice>
-    *: "talk mp3 clip"
+    *: "τόκ αρχείο mp3"
   </voice>
 </phrase>
 <phrase>
@@ -1969,7 +1981,7 @@
     *: "Ποιότητα"
   </dest>
   <voice>
-    *: "Quality"
+    *: "Ποι-ότητα"
   </voice>
 </phrase>
 <phrase>
@@ -1983,7 +1995,7 @@
     *: "Συχνότητα"
   </dest>
   <voice>
-    *: "Frequency"
+    *: "Συχνότητα"
   </voice>
 </phrase>
 <phrase>
@@ -1997,7 +2009,7 @@
     *: "Πηγή"
   </dest>
   <voice>
-    *: "Source"
+    *: "Πηγή"
   </voice>
 </phrase>
 <phrase>
@@ -2011,7 +2023,7 @@
     *: "Μικρόφωνο"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Μικρόφωνο"
   </voice>
 </phrase>
 <phrase>
@@ -2022,10 +2034,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Αναλογική Είσοδος"
+    *: "Αναλογική είσοδος"
   </dest>
   <voice>
-    *: "Line In"
+    *: "Αναλογική είσοδος"
   </voice>
 </phrase>
 <phrase>
@@ -2036,10 +2048,10 @@
     *: "Digital"
   </source>
   <dest>
-    *: "Ψηφιακή Είσοδος"
+    *: "Ψηφιακή είσοδος"
   </dest>
   <voice>
-    *: "Digital"
+    *: "Ψηφιακή είσοδος"
   </voice>
 </phrase>
 <phrase>
@@ -2053,7 +2065,7 @@
     *: "Κανάλια"
   </dest>
   <voice>
-    *: "Channels"
+    *: "Κανάλια"
   </voice>
 </phrase>
 <phrase>
@@ -2061,13 +2073,13 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
-    *: "Ανεξάρτητα Καρέ"
+    *: "Ανεξάρτητα καρέ"
   </dest>
   <voice>
-    *: "Independent frames"
+    *: "Ανεξάρτητα καρέ"
   </voice>
 </phrase>
 <phrase>
@@ -2078,10 +2090,10 @@
     *: "Time Split"
   </source>
   <dest>
-    *: "Αποκοπή Χρόνου"
+    *: "Διαχωρισμός στο χρόνο"
   </dest>
   <voice>
-    *: "Time Split"
+    *: "Διαχωρισμός στο χρόνο"
   </voice>
 </phrase>
 <phrase>
@@ -2089,13 +2101,13 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Χρόνος προηχογράφησης"
   </dest>
   <voice>
-    *: "Pre-Record time"
+    *: "Χρόνος προηχογράφησης"
   </voice>
 </phrase>
 <phrase>
@@ -2106,10 +2118,10 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Κατάλογος"
+    *: "Φάκελος"
   </dest>
   <voice>
-    *: "Directory"
+    *: "Φάκελος"
   </voice>
 </phrase>
 <phrase>
@@ -2117,27 +2129,27 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
-    *: "Τρέχον κατάλογος"
+    *: "Τρέχον φάκελος"
   </dest>
   <voice>
-    *: "Current directory"
+    *: "Τρέχον φάκελος"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
-    *: "Εμφάνιση ηχογράφησης κατα την εκκίνηση"
+    *: "Εμφάνιση της οθόνης ηχογράφησης στην εκκίνηση"
   </dest>
   <voice>
-    *: "Show recording screen on startup"
+    *: "Εμφάνιση της οθόνης ηχογράφησης στην εκκίνηση"
   </voice>
 </phrase>
 <phrase>
@@ -2148,10 +2160,10 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Ενεργοποίηση"
+    *: "Πυροδότης"
   </dest>
   <voice>
-    *: ""
+    *: "Πυροδότης"
   </voice>
 </phrase>
 <phrase>
@@ -2162,10 +2174,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "FF/RW Ελάχιστο Βήμα"
+    *: "Ελάχιστο βήμα Μπροστά/Πίσω"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "Ελάχιστο βήμα μπροστά και πίσω"
   </voice>
 </phrase>
 <phrase>
@@ -2176,10 +2188,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "FF/RW Επιτάχυνση"
+    *: "Επιτάχυνση Μπροστά/Πίσω"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "Επιτάχυνση μπροστά και πίσω"
   </voice>
 </phrase>
 <phrase>
@@ -2193,7 +2205,7 @@
     *: "Μίξη"
   </dest>
   <voice>
-    *: "Mix"
+    *: "Μίξη"
   </voice>
 </phrase>
 <phrase>
@@ -2201,13 +2213,13 @@
   desc: in replaygain
   user:
   <source>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </source>
   <dest>
     *: "Ενεργοποίηση Replaygain"
   </dest>
   <voice>
-    *: ""
+    *: "Ενεργοποίηση ριπλέι γκέιν"
   </voice>
 </phrase>
 <phrase>
@@ -2215,13 +2227,13 @@
   desc: in replaygain
   user:
   <source>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
     *: "Αποφυγή ψαλιδίσματος (clipping)"
   </dest>
   <voice>
-    *: ""
+    *: "Αποφυγή ψαλιδίσματος"
   </voice>
 </phrase>
 <phrase>
@@ -2229,13 +2241,13 @@
   desc: in replaygain
   user:
   <source>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </source>
   <dest>
     *: "Τύπος Replaygain"
   </dest>
   <voice>
-    *: ""
+    *: "Τύπος ριπλέι γκέιν"
   </voice>
 </phrase>
 <phrase>
@@ -2243,13 +2255,13 @@
   desc: in replaygain
   user:
   <source>
-    *: "Album gain"
+    *: "Album Gain"
   </source>
   <dest>
-    *: "Replaygain ’λμπουμ"
+    *: "Ενίσχυση άλμπουμ"
   </dest>
   <voice>
-    *: ""
+    *: "Ενίσχυση άλμπουμ"
   </voice>
 </phrase>
 <phrase>
@@ -2257,18 +2269,18 @@
   desc: in replaygain
   user:
   <source>
-    *: "Track gain"
+    *: "Track Gain"
   </source>
   <dest>
-    *: "Replaygain κομματιού"
+    *: "Ενίσχυση κομματιού"
   </dest>
   <voice>
-    *: ""
+    *: "Ενίσχυση κομματιού"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REPLAYGAIN_PREAMP
-  desc: in browse_id3
+  desc: in replaygain settings
   user:
   <source>
     *: "Pre-amp"
@@ -2277,7 +2289,7 @@
     *: "Προ-ενίσχυση"
   </dest>
   <voice>
-    *: ""
+    *: "Προ-ενίσχυση"
   </voice>
 </phrase>
 <phrase>
@@ -2291,21 +2303,21 @@
     *: "Φωτισμός"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "Φωτισμός"
   </voice>
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu
+  desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight On When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Φωτισμός Ενεργοποιημένος σε Σύνδεση"
+    *: "Ενεργοποιημένος φωτισμός κατά τη σύνδεση"
   </dest>
   <voice>
-    *: "Backlight On When Plugged"
+    *: "Ενεργοποιημένος φωτισμός κατά τη σύνδεση"
   </voice>
 </phrase>
 <phrase>
@@ -2313,13 +2325,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
-    *: "Φωτισμός Λεζάντας"
+    *: "Φωτισμός στην αλλαγή κομματιού"
   </dest>
   <voice>
-    *: "Caption backlight"
+    *: "Φωτισμός στην αλλαγή κομματιού"
   </voice>
 </phrase>
 <phrase>
@@ -2327,13 +2339,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </source>
   <dest>
     *: "Σταδιακή ενεργοποίηση φωτισμού"
   </dest>
   <voice>
-    *: "Backlight fade in"
+    *: "Σταδιακή ενεργοποίηση φωτισμού"
   </voice>
 </phrase>
 <phrase>
@@ -2341,13 +2353,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </source>
   <dest>
     *: "Σταδιακή απενεργοποίηση φωτισμού"
   </dest>
   <voice>
-    *: "Backlight fade out"
+    *: "Σταδιακή απενεργοποίηση φωτισμού"
   </voice>
 </phrase>
 <phrase>
@@ -2361,7 +2373,7 @@
     *: "Αντίθεση"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "Αντίθεση"
   </voice>
 </phrase>
 <phrase>
@@ -2375,7 +2387,7 @@
     *: "Κατάσταση LCD"
   </dest>
   <voice>
-    *: "LCD Mode"
+    *: "Κατάσταση LCD"
   </voice>
 </phrase>
 <phrase>
@@ -2389,7 +2401,7 @@
     *: "Κανονικά"
   </dest>
   <voice>
-    *: "Normal"
+    *: "Κανονικά"
   </voice>
 </phrase>
 <phrase>
@@ -2400,10 +2412,10 @@
     *: "Inverse"
   </source>
   <dest>
-    *: "Αντεστραμένα"
+    *: "Ανεστραμμένα"
   </dest>
   <voice>
-    *: "Inverse"
+    *: "Ανεστραμμένα"
   </voice>
 </phrase>
 <phrase>
@@ -2417,7 +2429,7 @@
     *: "Ανάποδα"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: "Ανάποδα"
   </voice>
 </phrase>
 <phrase>
@@ -2428,10 +2440,10 @@
     *: "Line Selector"
   </source>
   <dest>
-    *: "Επιλογή Γραμμής"
+    *: "Επιλογέας γραμμής"
   </dest>
   <voice>
-    *: "Line Selector"
+    *: "Επιλογέας γραμμής"
   </voice>
 </phrase>
 <phrase>
@@ -2445,7 +2457,7 @@
     *: "Δείκτης"
   </dest>
   <voice>
-    *: "Pointer"
+    *: "Δείκτης"
   </voice>
 </phrase>
 <phrase>
@@ -2453,13 +2465,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar(Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Αντεστραμένη Μπάρα"
+    *: "Αντεστραμένη μπάρα"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: "Αντεστραμένη μπάρα"
   </voice>
 </phrase>
 <phrase>
@@ -2470,10 +2482,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Ταχύτητα Κύλισης"
+    *: "Ταχύτητα κύλισης"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "Ταχύτητα κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -2484,7 +2496,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Παράδειγμα Ταχύτητας Κύλισης"
+    *: "Παράδειγμα ταχύτητας κύλισης"
   </dest>
   <voice>
     *: ""
@@ -2498,10 +2510,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Καθυστέρηση Κύλισης"
+    *: "Καθυστέρηση κύλισης"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Καθύστέρηση κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -2512,10 +2524,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Βήμα Κύλισης"
+    *: "Βήμα κύλισης"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Βήμα κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -2526,7 +2538,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Παράδειγμα Βήματος Κύλισης"
+    *: "Παράδειγμα βήματος κύλισης"
   </dest>
   <voice>
     *: ""
@@ -2540,10 +2552,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Όριο Αμφικατευθυντικής Κύλισης"
+    *: "Όριο αμφικατευθυντικής κύλισης"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Όριο αμφικατευθυντικής κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -2551,27 +2563,27 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
-    *: "Κύλιση Μεταπήδησης"
+    *: "Κύλιση μεταπήδησης"
   </dest>
   <voice>
-    *: "Jump scroll"
+    *: "Κύλιση μεταπήδησης"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
   </source>
   <dest>
-    *: "Μια Φορά"
+    *: "Μια φορά"
   </dest>
   <voice>
-    *: "One time"
+    *: "Μια φορά"
   </voice>
 </phrase>
 <phrase>
@@ -2582,10 +2594,10 @@
     *: "Jump Scroll Delay"
   </source>
   <dest>
-    *: "Καθυστέρηση Κύλισης Μεταπήδησης"
+    *: "Καθυστέρηση κύλισης μεταπήδησης"
   </dest>
   <voice>
-    *: "Jump Scroll Delay"
+    *: "Καθύστέρηση κύλισης μεταπήδησης"
   </voice>
 </phrase>
 <phrase>
@@ -2596,10 +2608,10 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "Μπάρα Κύλισης"
+    *: "Μπάρα κύλισης"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: "Μπάρα κύλισης"
   </voice>
 </phrase>
 <phrase>
@@ -2610,10 +2622,10 @@
     *: "Status Bar"
   </source>
   <dest>
-    *: "Μπάρα Κατάστασης"
+    *: "Μπάρα κατάστασης"
   </dest>
   <voice>
-    *: "Status Bar"
+    *: "Μπάρα κατάστασης"
   </voice>
 </phrase>
 <phrase>
@@ -2621,13 +2633,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Μπάρα κουμπιών"
   </dest>
   <voice>
-    *: "Button bar"
+    *: "Μπάρα κουμπιών"
   </voice>
 </phrase>
 <phrase>
@@ -2638,10 +2650,10 @@
     *: "Volume Display"
   </source>
   <dest>
-    *: "Ενδειξη Έντασης"
+    *: "Ενδειξη έντασης"
   </dest>
   <voice>
-    *: "Volume Display"
+    *: "Ενδειξη έντασης"
   </voice>
 </phrase>
 <phrase>
@@ -2652,10 +2664,10 @@
     *: "Battery Display"
   </source>
   <dest>
-    *: "Ενδειξη Μπαταρίας"
+    *: "Ενδειξη μπαταρίας"
   </dest>
   <voice>
-    *: "Battery Display"
+    *: "Ενδειξη μπαταρίας"
   </voice>
 </phrase>
 <phrase>
@@ -2669,7 +2681,7 @@
     *: "Γραφική"
   </dest>
   <voice>
-    *: "Graphic"
+    *: "Γραφική"
   </voice>
 </phrase>
 <phrase>
@@ -2683,7 +2695,7 @@
     *: "Αριθμητική"
   </dest>
   <voice>
-    *: "Numeric"
+    *: "Αριθμητική"
   </voice>
 </phrase>
 <phrase>
@@ -2694,10 +2706,10 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "Απελευθέρωση Μεγίστου"
+    *: "Απελευθέρωση μέγιστου"
   </dest>
   <voice>
-    *: "Peak Release"
+    *: "Απελευθέρωση μέγιστου"
   </voice>
 </phrase>
 <phrase>
@@ -2708,10 +2720,10 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "Μονάδες Ανα Ανάγνωση"
+    *: "Μονάδες ανά ανάγνωση"
   </dest>
   <voice>
-    *: "Units Per Read"
+    *: "Μονάδες ανά ανάγνωση"
   </voice>
 </phrase>
 <phrase>
@@ -2722,10 +2734,10 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Χρόνος Κράτησης Μεγίστου"
+    *: "Χρόνος κράτησης μέγιστου"
   </dest>
   <voice>
-    *: "Peak Hold Time"
+    *: "Χρόνος κράτησης μέγιστου"
   </voice>
 </phrase>
 <phrase>
@@ -2736,10 +2748,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Χρόνος Κράτησης Clip"
+    *: "Χρόνος κράτησης ψαλιδίσματος"
   </dest>
   <voice>
-    *: "Clip Hold Time"
+    *: "Χρόνος κράτησης ψαλιδίσματος"
   </voice>
 </phrase>
 <phrase>
@@ -2753,7 +2765,7 @@
     *: "Ατέρμονα"
   </dest>
   <voice>
-    *: "Eternal"
+    *: "Ατέρμονα"
   </voice>
 </phrase>
 <phrase>
@@ -2764,10 +2776,10 @@
     *: "Scale"
   </source>
   <dest>
-    *: "Κλιμάκωση"
+    *: "Κλίμακα"
   </dest>
   <voice>
-    *: "Scale"
+    *: "Κλίμακα"
   </voice>
 </phrase>
 <phrase>
@@ -2775,13 +2787,13 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
     *: "Λογαριθμική (dB)"
   </dest>
   <voice>
-    *: "Logarithmic decibel"
+    *: "Λογαριθμική, ντεσιμπέλ,"
   </voice>
 </phrase>
 <phrase>
@@ -2789,13 +2801,13 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
     *: "Γραμμική (%)"
   </dest>
   <voice>
-    *: "Linear percent"
+    *: "Γραμμική, επί τοις εκατό"
   </voice>
 </phrase>
 <phrase>
@@ -2806,10 +2818,10 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "Ελάχιστο Εύρος"
+    *: "Ελάχιστο εύρος"
   </dest>
   <voice>
-    *: "Minimum Of Range"
+    *: "Ελάχιστο εύρος"
   </voice>
 </phrase>
 <phrase>
@@ -2820,10 +2832,10 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "Μέγιστο Εύρος"
+    *: "Μέγιστο εύρος"
   </dest>
   <voice>
-    *: "Maximum Of Range"
+    *: "Μέγιστο εύρος"
   </voice>
 </phrase>
 <phrase>
@@ -2834,10 +2846,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Χωρητικότητα Μπαταρίας"
+    *: "Χωρητικότητα μπαταρίας"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "Χωρητικότητα μπαταρίας"
   </voice>
 </phrase>
 <phrase>
@@ -2848,10 +2860,10 @@
     *: "Battery Type"
   </source>
   <dest>
-    *: "Τύπος Μπαταρίας"
+    *: "Τύπος μπαταρίας"
   </dest>
   <voice>
-    *: "Battery type"
+    *: "Τύπος μπαταρίας"
   </voice>
 </phrase>
 <phrase>
@@ -2865,7 +2877,7 @@
     *: "Αλκαλικές"
   </dest>
   <voice>
-    *: "Alkaline"
+    *: "Αλκαλικές"
   </voice>
 </phrase>
 <phrase>
@@ -2876,10 +2888,10 @@
     *: "NiMH"
   </source>
   <dest>
-    *: "Νικελίου Υβριδίων Μετάλλου"
+    *: "Νικελίου υβριδίων μετάλλου"
   </dest>
   <voice>
-    *: "Nickel metal hydride"
+    *: "Νικελίου υβριδίων μετάλλου"
   </voice>
 </phrase>
 <phrase>
@@ -2890,10 +2902,10 @@
     *: "Disk Spindown"
   </source>
   <dest>
-    *: "Διακοπή Περιστροφής Δίσκου"
+    *: "Διακοπή περιστροφής δίσκου"
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "Διακοπή περιστροφής δίσκου"
   </voice>
 </phrase>
 <phrase>
@@ -2904,10 +2916,10 @@
     *: "Disk Poweroff"
   </source>
   <dest>
-    *: "Διακοπή Λειτουργίας Δίσκου"
+    *: "Διακοπή λειτουργίας δίσκου"
   </dest>
   <voice>
-    *: "Disk Poweroff"
+    *: "Διακοπή λειτουργίας δίσκου"
   </voice>
 </phrase>
 <phrase>
@@ -2921,7 +2933,7 @@
     *: "Ορισμός Ώρας/Ημερομηνίας"
   </dest>
   <voice>
-    *: "Set Time and Date"
+    *: "Ορισμός Ώρας και Ημερομηνίας"
   </voice>
 </phrase>
 <phrase>
@@ -2932,10 +2944,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Είδος Ρολογίού"
+    *: "Μορφή ώρας"
   </dest>
   <voice>
-    *: "Time Format"
+    *: "Μορφή ώρας"
   </voice>
 </phrase>
 <phrase>
@@ -2946,10 +2958,10 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "Δωδεκάωρο Ρολόι"
+    *: "12 ώρες"
   </dest>
   <voice>
-    *: "12 Hour Clock"
+    *: "δώδεκα άωρο"
   </voice>
 </phrase>
 <phrase>
@@ -2960,10 +2972,10 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "Εικοσιτετράωρο Ρολόι"
+    *: "24 ώρες"
   </dest>
   <voice>
-    *: "24 Hour Clock"
+    *: "είκοσι τετράωρο"
   </voice>
 </phrase>
 <phrase>
@@ -2971,13 +2983,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Όριο Αρχείων στον Περιηγητή"
+    *: "Όριο αρχείων περιηγητή"
   </dest>
   <voice>
-    *: "Max files in directory browser"
+    *: "Όριο αρχείων περιηγητή"
   </voice>
 </phrase>
 <phrase>
@@ -2985,13 +2997,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Όριο Λίστας Αναπαραγωγής"
+    *: "Όριο λίστας αναπαραγωγής"
   </dest>
   <voice>
-    *: "Max playlist size"
+    *: "Όριο λίστας αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -3002,10 +3014,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Λίστα Αναπαραγωγής"
+    *: "Λίστα αναπαραγωγής"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Λίστα αναπαραγωγής"
   </voice>
 </phrase>
 <phrase>
@@ -3019,21 +3031,21 @@
     *: "Σελιδοδείκτες"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "Σελιδοδείκτες"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Εμφάνιση Πληροφοριών ID3"
+    *: "Εμφάνιση πληροφοριών ID3"
   </dest>
   <voice>
-    *: "Show ID3 Info"
+    *: "Εμφάνιση πληροφοριών άι ντί 3"
   </voice>
 </phrase>
 <phrase>
@@ -3041,13 +3053,13 @@
   desc: in wps context menu
   user:
   <source>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </source>
   <dest>
-    *: "Θέστε εκτίμηση κομματιού"
+    *: "Εκτίμηση κομματιού"
   </dest>
   <voice>
-    *: "Set song rating"
+    *: "Εκτίμηση κομματιού"
   </voice>
 </phrase>
 <phrase>
@@ -3075,7 +3087,7 @@
     *: "Μετονομασία"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Μετονομασία"
   </voice>
 </phrase>
 <phrase>
@@ -3089,7 +3101,7 @@
     *: "Διαγραφή"
   </dest>
   <voice>
-    *: "Delete"
+    *: "Διαγραφή"
   </voice>
 </phrase>
 <phrase>
@@ -3097,13 +3109,13 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
-    *: "Διαγραφή καταλόγου"
+    *: "Διαγραφή φακέλου"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "Διαγραφή φακέλου"
   </voice>
 </phrase>
 <phrase>
@@ -3139,13 +3151,13 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "’νοιγμα με"
+    *: "Άνοιγμα με"
   </dest>
   <voice>
-    *: "open with"
+    *: "Άνοιγμα με"
   </voice>
 </phrase>
 <phrase>
@@ -3153,13 +3165,13 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
-    *: "Δημιουργία καταλόγου"
+    *: "Δημιουργία φακέλου"
   </dest>
   <voice>
-    *: "Create directory"
+    *: "Δημιουργία φακέλου"
   </voice>
 </phrase>
 <phrase>
@@ -3173,7 +3185,7 @@
     *: "Προβολή"
   </dest>
   <voice>
-    *: "View"
+    *: Προβολή"
   </voice>
 </phrase>
 <phrase>
@@ -3187,7 +3199,7 @@
     *: "Ανακάτεμα ξανά"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "Ανακάτεμα ξανά"
   </voice>
 </phrase>
 <phrase>
@@ -3201,7 +3213,7 @@
     *: "Εισαγωγή"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Εισαγωγή"
   </voice>
 </phrase>
 <phrase>
@@ -3212,10 +3224,10 @@
     *: "Insert next"
   </source>
   <dest>
-    *: "Εισαγωγή κειμένου"
+    *: "Εισαγωγή επόμενου"
   </dest>
   <voice>
-    *: "Insert next"
+    *: "Εισαγωγή επόμενου"
   </voice>
 </phrase>
 <phrase>
@@ -3229,7 +3241,7 @@
     *: "Εισαγωγή τελευταίου"
   </dest>
   <voice>
-    *: "Insert last"
+    *: "Εισαγωγή τελευταίου"
   </voice>
 </phrase>
 <phrase>
@@ -3240,10 +3252,10 @@
     *: "Insert shuffled"
   </source>
   <dest>
-    *: "Εισαγωγή ως ανακατεμένο"
+    *: "Τυχαία εισαγωγή"
   </dest>
   <voice>
-    *: "Insert shuffled"
+    *: "Τυχαία εισαγωγή"
   </voice>
 </phrase>
 <phrase>
@@ -3254,10 +3266,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Ουρά"
+    *: "Εισαγωγή στην ουρά"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Εισαγωγή στην ουρά"
   </voice>
 </phrase>
 <phrase>
@@ -3271,7 +3283,7 @@
     *: "Επόμενο στην ουρά"
   </dest>
   <voice>
-    *: "Queue next"
+    *: "Επόμενο στην ουρά"
   </voice>
 </phrase>
 <phrase>
@@ -3285,7 +3297,7 @@
     *: "Τελευταίο στην ουρά"
   </dest>
   <voice>
-    *: "Queue last"
+    *: "Τελευταίο στην ουρά"
   </voice>
 </phrase>
 <phrase>
@@ -3299,7 +3311,7 @@
     *: "Δημιουργία σελιδοδείκτη"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "Δημιουργία σελιδοδείκτη"
   </voice>
 </phrase>
 <phrase>
@@ -3310,10 +3322,10 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Εμφάνιση Σελιδοδεικτών"
+    *: "Εμφάνιση σελιδοδεικτών"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "Εμφάνιση σελιδοδεικτών"
   </voice>
 </phrase>
 <phrase>
@@ -3352,7 +3364,7 @@
     *: "Buffer: %d.%03dMB"
   </source>
   <dest>
-    *: "Buffer: %d.%03dMB"
+    *: "Μήμη: %d.%03dMB"
   </dest>
   <voice>
     *: ""
@@ -3380,7 +3392,7 @@
     *: "Battery: Top-Off Chg"
   </source>
   <dest>
-    *: "Μπαταρία: Top-Off Φόρτιση"
+    *: "Μπαταρία: Μέγιστη φόρτιση"
   </dest>
   <voice>
     *: ""
@@ -3394,7 +3406,7 @@
     *: "Battery: Trickle Chg"
   </source>
   <dest>
-    *: "Μπαταρία: Trickle Φόρτιση"
+    *: "Μπαταρία: Βραδεία φόρτιση"
   </dest>
   <voice>
     *: ""
@@ -3411,7 +3423,7 @@
     *: "%d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Επίπεδο μπαταρίας"
   </voice>
 </phrase>
 <phrase>
@@ -3439,7 +3451,7 @@
     *: "Ελεύθερα:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Ελεύθερος χώρος"
   </voice>
 </phrase>
 <phrase>
@@ -3453,7 +3465,7 @@
     *: "Εσωτ."
   </dest>
   <voice>
-    *: "Internal"
+    *: "Εσωτερικός"
   </voice>
 </phrase>
 <phrase>
@@ -3467,7 +3479,7 @@
     *: "MMC"
   </dest>
   <voice>
-    *: "Multimedia card"
+    *: "Κάρτα πολυμέσων"
   </voice>
 </phrase>
 <phrase>
@@ -3481,7 +3493,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Current time:"
+    *: "Τρέχουσα ώρα:"
   </voice>
 </phrase>
 <phrase>
@@ -3492,7 +3504,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "Επιτάχυνση"
+    *: "Όξυνση"
   </dest>
   <voice>
     *: ""
@@ -3506,7 +3518,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "Επιβράδυνση"
+    *: "Βάρυνση"
   </dest>
   <voice>
     *: ""
@@ -3604,7 +3616,7 @@
     *: "OFF = Exit"
   </source>
   <dest>
-    *: "Απενεργοποίηση = Έξοδος"
+    *: "OFF = Έξοδος"
   </dest>
   <voice>
     *: ""
@@ -3635,7 +3647,7 @@
     *: "Ευρετήριο"
   </dest>
   <voice>
-    *: "Index"
+    *: "Ευρετήριο"
   </voice>
 </phrase>
 <phrase>
@@ -3649,7 +3661,7 @@
     *: "Χρόνος"
   </dest>
   <voice>
-    *: "Time"
+    *: "Χρόνος"
   </voice>
 </phrase>
 <phrase>
@@ -3660,7 +3672,7 @@
     *: "PLAY = Select"
   </source>
   <dest>
-    *: "Αναπαραγωγή = Επιλογή"
+    *: "PLAY = Επιλογή"
   </dest>
   <voice>
     *: ""
@@ -3674,7 +3686,7 @@
     *: "ON+Play = Delete"
   </source>
   <dest>
-    *: "Ενεργοποίηση+Αναπαραγωγή = Διαγραφή"
+    *: "ON+PLAY = Διαγραφή"
   </dest>
   <voice>
     *: ""
@@ -3716,7 +3728,7 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Σελιδοδείκτης Δημιουργήθηκε!"
+    *: "Σελιδοδείκτης δημιουργήθηκε!"
   </dest>
   <voice>
     *: ""
@@ -3730,7 +3742,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Δημιουργία Σελιδοδείκτη Απέτυχε!"
+    *: "Δημιουργία σελιδοδείκτη απέτυχε!"
   </dest>
   <voice>
     *: ""
@@ -3744,7 +3756,7 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Σελιδοδείκτης ’δειος"
+    *: "Σελιδοδείκτης άδειος"
   </dest>
   <voice>
     *: ""
@@ -3772,7 +3784,7 @@
     *: "OFF To Revert"
   </source>
   <dest>
-    *: "OFF για Αναστροφή"
+    *: "OFF για αναστροφή"
   </dest>
   <voice>
     *: ""
@@ -3786,7 +3798,7 @@
     *: "Key Lock ON"
   </source>
   <dest>
-    *: "Πλήκτρα Κλειδωμένα"
+    *: "Πλήκτρα κλειδωμένα"
   </dest>
   <voice>
     *: ""
@@ -3800,7 +3812,7 @@
     *: "Key Lock OFF"
   </source>
   <dest>
-    *: "Πλήκτρα Ξεκλείδωτα"
+    *: "Πλήκτρα ξεκλείδωτα"
   </dest>
   <voice>
     *: ""
@@ -3811,10 +3823,10 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
-    *: "Πλήκτρα Κλειδωμένα"
+    *: "Κλείδωμα πληκτρολογίου ενεργό"
   </dest>
   <voice>
     *: ""
@@ -3825,10 +3837,10 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
-    *: "Πλήκτρα Ξεκλείδωτα"
+    *: "Κλείδωμα πληκτρολογίου ανενεργό"
   </dest>
   <voice>
     *: ""
@@ -3853,10 +3865,10 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
-    *: "Χρόνος Αποκοπής:"
+    *: "Χρόνος διαχωρισμού:"
   </dest>
   <voice>
     *: ""
@@ -3881,7 +3893,7 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Προηχογράφηση"
@@ -3909,10 +3921,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Left"
+    *: "Gain Left"
   </source>
   <dest>
-    *: "Αριστερό"
+    *: "Ενίσχυση αριστερού"
   </dest>
   <voice>
     *: ""
@@ -3923,10 +3935,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Right"
+    *: "Gain Right"
   </source>
   <dest>
-    *: "Δεξί"
+    *: "Ενίσχυση δεξιού"
   </dest>
   <voice>
     *: ""
@@ -3940,7 +3952,7 @@
     *: "The disk is full. Press OFF to continue."
   </source>
   <dest>
-    *: "Ο δίσκος είναι γεμάτος. Πατήστε Απενεργοποίηση για συνέχεια"
+    *: "Ο δίσκος είναι γεμάτος. Πατήστε OFF για συνέχεια"
   </dest>
   <voice>
     *: ""
@@ -3954,7 +3966,7 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Ενεργοποίηση"
+    *: "Πυροδότης"
   </dest>
   <voice>
     *: ""
@@ -3993,7 +4005,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Start above"
+    *: "Start Above"
   </source>
   <dest>
     *: "Έναρξη από πάνω"
@@ -4021,10 +4033,10 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Stop below"
+    *: "Stop Below"
   </source>
   <dest>
-    *: "Διακοπή στο τέλος"
+    *: "Διακοπή από κάτω"
   </dest>
   <voice>
     *: ""
@@ -4049,7 +4061,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Presplit gap"
+    *: "Presplit Gap"
   </source>
   <dest>
     *: "Κενό διαχώρισης"
@@ -4077,10 +4089,10 @@
   desc: waiting for threshold
   user:
   <source>
-    *: "Trigger idle"
+    *: "Trigger Idle"
   </source>
   <dest>
-    *: "Ενεργοποίηση ελεύθερη"
+    *: "Πυροδότης ανενεργός"
   </dest>
   <voice>
     *: ""
@@ -4091,10 +4103,10 @@
   desc: 
   user:
   <source>
-    *: "Trigger active"
+    *: "Trigger Active"
   </source>
   <dest>
-    *: "Ενεργοποίηση ενεργή"
+    *: "Πυροδότης ενεργός"
   </dest>
   <voice>
     *: ""
@@ -4108,7 +4120,7 @@
     *: "Alarm Time: %02d:%02d"
   </source>
   <dest>
-    *: "Ώρα Αφύπνισης: %02d:%02d"
+    *: "Ώρα αφύπνισης: %02d:%02d"
   </dest>
   <voice>
     *: ""
@@ -4136,7 +4148,7 @@
     *: "Alarm Set"
   </source>
   <dest>
-    *: "Ορίστηκε Αφύπνιση"
+    *: "Ορίστηκε αφύπνιση"
   </dest>
   <voice>
     *: ""
@@ -4150,7 +4162,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Αφύπνιση Υπερβολικά Νωρίς!"
+    *: "Χρόνος αφύπνισης υπερβολικά νωρίς!"
   </dest>
   <voice>
     *: ""
@@ -4164,7 +4176,7 @@
     *: "PLAY=Set OFF=Cancel"
   </source>
   <dest>
-    *: "Αναπαραγωγή=Όρισε Απενεργοποίηση=Ακύρωση"
+    *: "PLAY=Όρισε ΟFF=Ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -4178,15 +4190,15 @@
     *: "Alarm Disabled"
   </source>
   <dest>
-    *: "Αφύπνιση Ανενεργή"
+    *: "Αφύπνιση ανενεργή"
   </dest>
   <voice>
-    *: "Alarm Disabled"
+    *: "Αφύπνιση ανενεργή"
   </voice>
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -4200,7 +4212,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -4214,13 +4226,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
   </source>
   <dest>
-    *: "[’λμπουμ]"
+    *: "[Άλμπουμ]"
   </dest>
   <voice>
     *: ""
@@ -4228,13 +4240,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Αριθμός Κομματιού]"
+    *: "[Αριθμός κομματιού]"
   </dest>
   <voice>
     *: ""
@@ -4242,7 +4254,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -4256,7 +4268,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -4270,13 +4282,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
   </source>
   <dest>
-    *: "[Λίστα Αναπαραγωγής]"
+    *: "[Λίστα αναπαραγωγής]"
   </dest>
   <voice>
     *: ""
@@ -4284,13 +4296,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Ρυμός Διαμεταγωγής]"
+    *: "[Ρυθμός Bit]"
   </dest>
   <voice>
     *: ""
@@ -4326,7 +4338,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -4340,13 +4352,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACK_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Track gain]"
+    *: "[Track Gain]"
   </source>
   <dest>
-    *: "[Replaygain κομματιού]"
+    *: "[Ενίσχυση κομματιού]"
   </dest>
   <voice>
     *: ""
@@ -4354,13 +4366,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM_GAIN
-  desc: in browse_id3
+  desc: in tag viewer
   user:
   <source>
-    *: "[Album gain]"
+    *: "[Album Gain]"
   </source>
   <dest>
-    *: "[Replaygain ’λμπουμ]"
+    *: "[Ενίσχυση άλμπουμ]"
   </dest>
   <voice>
     *: ""
@@ -4368,7 +4380,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -4382,13 +4394,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
   </source>
   <dest>
-    *: "<Δεν Υπάρχουν Πληροφορίες>"
+    *: "<Χωρίς πληροφορίες>"
   </dest>
   <voice>
     *: ""
@@ -4503,7 +4515,7 @@
     *: "Ιαν"
   </dest>
   <voice>
-    *: "January"
+    *: "Ιανουάριος"
   </voice>
 </phrase>
 <phrase>
@@ -4517,7 +4529,7 @@
     *: "Φεβ"
   </dest>
   <voice>
-    *: "February"
+    *: "Φεβρουάριος"
   </voice>
 </phrase>
 <phrase>
@@ -4531,7 +4543,7 @@
     *: "Μάρ"
   </dest>
   <voice>
-    *: "March"
+    *: "Μάρτιος"
   </voice>
 </phrase>
 <phrase>
@@ -4545,7 +4557,7 @@
     *: "Απρ"
   </dest>
   <voice>
-    *: "April"
+    *: "Απρίλιος"
   </voice>
 </phrase>
 <phrase>
@@ -4559,7 +4571,7 @@
     *: "Μάι"
   </dest>
   <voice>
-    *: "May"
+    *: "Μάιος"
   </voice>
 </phrase>
 <phrase>
@@ -4570,10 +4582,10 @@
     *: "Jun"
   </source>
   <dest>
-    *: "Ιου"
+    *: "Ιού"
   </dest>
   <voice>
-    *: "June"
+    *: "Ιούνιος"
   </voice>
 </phrase>
 <phrase>
@@ -4584,10 +4596,10 @@
     *: "Jul"
   </source>
   <dest>
-    *: "Ιού"
+    *: "Ιολ"
   </dest>
   <voice>
-    *: "July"
+    *: "Ιούλιος"
   </voice>
 </phrase>
 <phrase>
@@ -4601,7 +4613,7 @@
     *: "Αύγ"
   </dest>
   <voice>
-    *: "August"
+    *: "Αύγουστος"
   </voice>
 </phrase>
 <phrase>
@@ -4615,7 +4627,7 @@
     *: "Σεπ"
   </dest>
   <voice>
-    *: "September"
+    *: "Σεπτέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4629,7 +4641,7 @@
     *: "Οκτ"
   </dest>
   <voice>
-    *: "October"
+    *: "Οκτώβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4643,7 +4655,7 @@
     *: "Νοέ"
   </dest>
   <voice>
-    *: "November"
+    *: "Νοέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -4657,7 +4669,7 @@
     *: "Δεκ"
   </dest>
   <voice>
-    *: "December"
+    *: "Δεκέμβριος"
   </voice>
 </phrase>
 <phrase>
@@ -5063,7 +5075,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "εκατό"
   </voice>
 </phrase>
 <phrase>
@@ -5077,7 +5089,7 @@
     *: ""
   </dest>
   <voice>
-    *: "thousand"
+    *: "χίλια"
   </voice>
 </phrase>
 <phrase>
@@ -5091,7 +5103,7 @@
     *: ""
   </dest>
   <voice>
-    *: "million"
+    *: "εκατομμύριο"
   </voice>
 </phrase>
 <phrase>
@@ -5105,7 +5117,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "δισεκατομμύριο"
   </voice>
 </phrase>
 <phrase>
@@ -5119,7 +5131,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "πλην"
   </voice>
 </phrase>
 <phrase>
@@ -5133,7 +5145,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "συν"
   </voice>
 </phrase>
 <phrase>
@@ -5147,7 +5159,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "μίλι δευτερόλεπτα"
   </voice>
 </phrase>
 <phrase>
@@ -5161,7 +5173,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "δευτερόλεπτο"
   </voice>
 </phrase>
 <phrase>
@@ -5175,7 +5187,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "δευτερόλεπτα"
   </voice>
 </phrase>
 <phrase>
@@ -5189,7 +5201,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "λεπτό"
   </voice>
 </phrase>
 <phrase>
@@ -5203,7 +5215,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "λεπτά"
   </voice>
 </phrase>
 <phrase>
@@ -5217,7 +5229,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "ώρα"
   </voice>
 </phrase>
 <phrase>
@@ -5231,7 +5243,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hours"
+    *: "ώρες"
   </voice>
 </phrase>
 <phrase>
@@ -5245,7 +5257,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohertz"
+    *: "κίλο χέρτζ"
   </voice>
 </phrase>
 <phrase>
@@ -5259,7 +5271,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "ντεσιμπέλ,"
   </voice>
 </phrase>
 <phrase>
@@ -5273,7 +5285,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "τοις εκατό"
   </voice>
 </phrase>
 <phrase>
@@ -5287,7 +5299,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "μίλιαμ περώρες"
   </voice>
 </phrase>
 <phrase>
@@ -5301,7 +5313,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "πίξελ"
   </voice>
 </phrase>
 <phrase>
@@ -5315,7 +5327,7 @@
     *: ""
   </dest>
   <voice>
-    *: "per second"
+    *: "ανά δευτερόλεπτο"
   </voice>
 </phrase>
 <phrase>
@@ -5329,7 +5341,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "χέρτζ,"
   </voice>
 </phrase>
 <phrase>
@@ -5357,7 +5369,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "κίλο μπάιτ"
   </voice>
 </phrase>
 <phrase>
@@ -5371,7 +5383,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "μέγκα μπάιτ"
   </voice>
 </phrase>
 <phrase>
@@ -5385,7 +5397,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "γίγκα μπάιτ"
   </voice>
 </phrase>
 <phrase>
@@ -5399,7 +5411,7 @@
     *: ","
   </dest>
   <voice>
-    *: "point"
+    *: "κόμμα"
   </voice>
 </phrase>
 <phrase>
@@ -5413,7 +5425,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A"
+    *: "A."
   </voice>
 </phrase>
 <phrase>
@@ -5427,7 +5439,7 @@
     *: ""
   </dest>
   <voice>
-    *: "B"
+    *: "B."
   </voice>
 </phrase>
 <phrase>
@@ -5441,7 +5453,7 @@
     *: ""
   </dest>
   <voice>
-    *: "C"
+    *: "C."
   </voice>
 </phrase>
 <phrase>
@@ -5455,7 +5467,7 @@
     *: ""
   </dest>
   <voice>
-    *: "D"
+    *: "D."
   </voice>
 </phrase>
 <phrase>
@@ -5469,7 +5481,7 @@
     *: ""
   </dest>
   <voice>
-    *: "E"
+    *: "E."
   </voice>
 </phrase>
 <phrase>
@@ -5483,7 +5495,7 @@
     *: ""
   </dest>
   <voice>
-    *: "F"
+    *: "F."
   </voice>
 </phrase>
 <phrase>
@@ -5497,7 +5509,7 @@
     *: ""
   </dest>
   <voice>
-    *: "G"
+    *: "G."
   </voice>
 </phrase>
 <phrase>
@@ -5511,7 +5523,7 @@
     *: ""
   </dest>
   <voice>
-    *: "H"
+    *: "H."
   </voice>
 </phrase>
 <phrase>
@@ -5525,7 +5537,7 @@
     *: ""
   </dest>
   <voice>
-    *: "I"
+    *: "I."
   </voice>
 </phrase>
 <phrase>
@@ -5539,7 +5551,7 @@
     *: ""
   </dest>
   <voice>
-    *: "J"
+    *: "J."
   </voice>
 </phrase>
 <phrase>
@@ -5553,7 +5565,7 @@
     *: ""
   </dest>
   <voice>
-    *: "K"
+    *: "K."
   </voice>
 </phrase>
 <phrase>
@@ -5567,7 +5579,7 @@
     *: ""
   </dest>
   <voice>
-    *: "L"
+    *: "L."
   </voice>
 </phrase>
 <phrase>
@@ -5581,7 +5593,7 @@
     *: ""
   </dest>
   <voice>
-    *: "M"
+    *: "M."
   </voice>
 </phrase>
 <phrase>
@@ -5595,7 +5607,7 @@
     *: ""
   </dest>
   <voice>
-    *: "N"
+    *: "N."
   </voice>
 </phrase>
 <phrase>
@@ -5609,7 +5621,7 @@
     *: ""
   </dest>
   <voice>
-    *: "O"
+    *: "O."
   </voice>
 </phrase>
 <phrase>
@@ -5623,7 +5635,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P"
+    *: "P."
   </voice>
 </phrase>
 <phrase>
@@ -5637,7 +5649,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Q"
+    *: "Q."
   </voice>
 </phrase>
 <phrase>
@@ -5651,7 +5663,7 @@
     *: ""
   </dest>
   <voice>
-    *: "R"
+    *: "R."
   </voice>
 </phrase>
 <phrase>
@@ -5665,7 +5677,7 @@
     *: ""
   </dest>
   <voice>
-    *: "S"
+    *: "S."
   </voice>
 </phrase>
 <phrase>
@@ -5679,7 +5691,7 @@
     *: ""
   </dest>
   <voice>
-    *: "T"
+    *: "T."
   </voice>
 </phrase>
 <phrase>
@@ -5693,7 +5705,7 @@
     *: ""
   </dest>
   <voice>
-    *: "U"
+    *: "U."
   </voice>
 </phrase>
 <phrase>
@@ -5707,7 +5719,7 @@
     *: ""
   </dest>
   <voice>
-    *: "V"
+    *: "V."
   </voice>
 </phrase>
 <phrase>
@@ -5721,7 +5733,7 @@
     *: ""
   </dest>
   <voice>
-    *: "W"
+    *: "W."
   </voice>
 </phrase>
 <phrase>
@@ -5735,7 +5747,7 @@
     *: ""
   </dest>
   <voice>
-    *: "X"
+    *: "X."
   </voice>
 </phrase>
 <phrase>
@@ -5749,7 +5761,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Y"
+    *: "Y."
   </voice>
 </phrase>
 <phrase>
@@ -5763,7 +5775,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Z"
+    *: "Z."
   </voice>
 </phrase>
 <phrase>
@@ -5777,7 +5789,7 @@
     *: ""
   </dest>
   <voice>
-    *: "dot"
+    *: "τελεία"
   </voice>
 </phrase>
 <phrase>
@@ -5805,7 +5817,7 @@
     *: ""
   </dest>
   <voice>
-    *: "file"
+    *: "αρχείο"
   </voice>
 </phrase>
 <phrase>
@@ -5819,7 +5831,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "φάκελος"
   </voice>
 </phrase>
 <phrase>
@@ -5833,7 +5845,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "ήχου"
   </voice>
 </phrase>
 <phrase>
@@ -5847,7 +5859,7 @@
     *: ""
   </dest>
   <voice>
-    *: "configuration"
+    *: "ρυθμίσεων"
   </voice>
 </phrase>
 <phrase>
@@ -5861,7 +5873,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "γουάιλ πλέινγκ σκρίν"
   </voice>
 </phrase>
 <phrase>
@@ -5875,7 +5887,7 @@
     *: ""
   </dest>
   <voice>
-    *: "text"
+    *: "κειμένου"
   </voice>
 </phrase>
 <phrase>
@@ -5889,7 +5901,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plugin"
+    *: "πλαγκίν"
   </voice>
 </phrase>
 <phrase>
@@ -5903,7 +5915,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "γραμματοσειράς"
   </voice>
 </phrase>
 <phrase>
@@ -5917,7 +5929,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bookmark"
+    *: "σελιδοδείκτη"
   </voice>
 </phrase>
 <phrase>
@@ -5931,7 +5943,7 @@
     *: ""
   </dest>
   <voice>
-    *: "flash"
+    *: "φλάς"
   </voice>
 </phrase>
 <phrase>
@@ -5945,7 +5957,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "φιρμγουέαρ"
   </voice>
 </phrase>
 <phrase>
@@ -5978,13 +5990,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "Λίστα Αναπαραγωγής Μνήμη Buffer Γεμάτη"
+    *: "Μνήμη λίστας αναπαραγωγής γεμάτη"
   </dest>
   <voice>
     *: ""
@@ -5995,7 +6007,7 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
     *: "Τέλος λίστας"
@@ -6009,10 +6021,10 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
-    *: "Τέλος Λίστας Κομματιών"
+    *: "Τέλος λίστας κομματιών"
   </dest>
   <voice>
     *: ""
@@ -6152,7 +6164,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Σφάλμα πρόσβασης καταλόγου"
+    *: "Σφάλμα πρόσβασης φακέλου"
   </dest>
   <voice>
     *: ""
@@ -6166,7 +6178,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "’κυρο αρχείο ελέγχου λίστας αναπαραγωγής"
+    *: "Άκυρο αρχείο ελέγχου λίστας αναπαραγωγής"
   </dest>
   <voice>
     *: ""
@@ -6188,13 +6200,13 @@
 </phrase>
 <phrase>
   id: LANG_FM_NO_PRESETS
-  desc: DEPRECATED
+  desc: error when preset list is empty
   user:
   <source>
-    *: ""
+    *: "No presets"
   </source>
   <dest>
-    *: ""
+    *: "Δεν υπάρχουν προεπιλογές"
   </dest>
   <voice>
     *: ""
@@ -6205,7 +6217,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
     *: "Επεξεργασία προεπιλογής"
@@ -6219,7 +6231,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
     *: "Αφαίρεση προεπιλογής"
@@ -6233,7 +6245,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
     *: "Αποθήκευση προεπιλογών απέτυχε"
@@ -6247,7 +6259,7 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
     *: "Λίστα προεπιλογών γεμάτη"
@@ -6306,7 +6318,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Προεπιλεγμένα"
+    *: "Προεπιλογή"
   </dest>
   <voice>
     *: ""
@@ -6328,7 +6340,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -6348,10 +6360,10 @@
     *: "Force mono"
   </source>
   <dest>
-    *: "Εξανάγκασε μονοφωνικό"
+    *: "Εξαναγκασμός μονοφωνικού ήχου"
   </dest>
   <voice>
-    *: ""
+    *: "Εξαναγκασμός μονοφωνικού ήχου"
   </voice>
 </phrase>
 <phrase>
@@ -6401,10 +6413,10 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Buffer φακέλων Γεμάτο!"
+    *: "Μνήμη φακέλων γεμάτη!"
   </dest>
   <voice>
     *: ""
@@ -6446,7 +6458,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Ρυθμίσεις Αποθηκεύθηκε"
+    *: "Ρυθμίσεις αποθηκεύθηκαν"
   </dest>
   <voice>
     *: ""
@@ -6488,7 +6500,7 @@
     *: "OFF to abort"
   </source>
   <dest>
-    *: "Απενεργοποίηση για ακύρωση"
+    *: "OFF για ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -6502,7 +6514,7 @@
     *: "STOP to abort"
   </source>
   <dest>
-    *: "Διακοπή για ακύρωση"
+    *: "STOP για ακύρωση"
   </dest>
   <voice>
     *: ""
@@ -6544,7 +6556,7 @@
     *: "Albums"
   </source>
   <dest>
-    *: "’λμπουμς"
+    *: "Άλμπουμς"
   </dest>
   <voice>
     *: ""
@@ -6586,7 +6598,7 @@
     *: "Search Artists"
   </source>
   <dest>
-    *: "Αναζήτηση Καλλιτέχνη"
+    *: "Αναζήτηση καλλιτέχνη"
   </dest>
   <voice>
     *: ""
@@ -6600,7 +6612,7 @@
     *: "Search Albums"
   </source>
   <dest>
-    *: "Αναζήτηση ’λμπουμ"
+    *: "Αναζήτηση άλμπουμ"
   </dest>
   <voice>
     *: ""
@@ -6614,7 +6626,7 @@
     *: "Search Songs"
   </source>
   <dest>
-    *: "Αναζήτηση Κομματιού"
+    *: "Αναζήτηση κομματιού"
   </dest>
   <voice>
     *: ""
@@ -6659,7 +6671,7 @@
     *: "Μετακίνηση"
   </dest>
   <voice>
-    *: "Move"
+    *: "Μετακίνηση"
   </voice>
 </phrase>
 <phrase>
@@ -6667,7 +6679,7 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+    *: "Move Failed"
   </source>
   <dest>
     *: "Μετακίνηση απέτυχε"
@@ -6684,10 +6696,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Προβολή Indices"
+    *: "Προβολή δεικτών"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Προβολή δεικτών"
   </voice>
 </phrase>
 <phrase>
@@ -6698,10 +6710,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Προβολή Κομματιών"
+    *: "Προβολή κομματιών"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Προβολή κομματιών"
   </voice>
 </phrase>
 <phrase>
@@ -6709,13 +6721,13 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
     *: "Όνομα κομματιού μόνο"
   </dest>
   <voice>
-    *: "Track name only"
+    *: "Όνομα κομματιού μόνο"
   </voice>
 </phrase>
 <phrase>
@@ -6723,13 +6735,13 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
-    *: "Πλήρες μονοπάτι"
+    *: "Πλήρης θέση"
   </dest>
   <voice>
-    *: "Full path"
+    *: "Πλήρης θέση"
   </voice>
 </phrase>
 <phrase>
@@ -6743,7 +6755,7 @@
     *: "Αφαίρεση"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Αφαίρεση"
   </voice>
 </phrase>
 <phrase>
@@ -6754,10 +6766,10 @@
     *: "File Options"
   </source>
   <dest>
-    *: "Επιλογές Αρχείων"
+    *: "Επιλογές αρχείων"
   </dest>
   <voice>
-    *: "File Options"
+    *: "Επιλογές αρχείων"
   </voice>
 </phrase>
 <phrase>
@@ -6796,7 +6808,7 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "Ασύμβατο μοντέλο"
+    *: "Μη σύμβατο μοντέλο"
   </dest>
   <voice>
     *: ""
@@ -6810,7 +6822,7 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "Ασύμβατη έκδοση"
+    *: "Μη σύμβατη έκδοση"
   </dest>
   <voice>
     *: ""
@@ -6866,7 +6878,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Όνομα plugin υπερμέγεθες "
+    *: "Όνομα plugin πολύ μεγάλο"
   </dest>
   <voice>
     *: ""
@@ -6880,7 +6892,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Buffer είδους αρχείου άδειο"
+    *: "Μνήμη τύπων αρχείων άδεια"
   </dest>
   <voice>
     *: ""
@@ -6894,7 +6906,1612 @@
     *: "(PLAY/STOP)"
   </source>
   <dest>
-    *: "(Αναπαραγωγή/Διακοπή)"
+    *: "(PLAY/STOP)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Αποθήκευση αλλαγών;"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Προηγμένες ρυθμίσεις EQ"
+  </dest>
+  <voice>
+    *: "Προηγμένες ρυθμίσεις ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Προειδοποίηση πριν τη διαγραφή της δυναμικής λίστας αναπαραγωγής"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Δέσμευση βάσης δεδομένων"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Όλα τα κομμάτια>"
+  </dest>
+  <voice>
+    *: "Όλα τα κομμάτια"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Γραφικό EQ"
+  </dest>
+  <voice>
+    *: "Γραφικό ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: "Clear Backdrop"
+  </source>
+  <dest>
+    *: "Καθαρισμός φόντου"
+  </dest>
+  <voice>
+    *: "Καθαρισμός φόντου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Περιήγηση θεμάτων"
+  </dest>
+  <voice>
+    *: "Περιήγηση θεμάτων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_TUNE_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Τύπος:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .rwps files"
+  </source>
+  <dest>
+    *: "Περιήγηση αρχείων .rwps"
+  </dest>
+  <voice>
+    *: "Περιήγηση αρχείων γουάιλ πλέινγκ σκρίν χειριστηρίου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user:
+  <source>
+    *: "%d.%01dMHz"
+  </source>
+  <dest>
+    *: "%d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Enable Crossfade"
+  </source>
+  <dest>
+    *: "Ενεργοποίηση ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Ενεργοποίηση ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Χρώμα φόντου"
+  </dest>
+  <voice>
+    *: "Χρώμα φόντου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Οκτάβα"
+  </dest>
+  <voice>
+    *: "Οκτάβα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Εισαγωγή στην ουρά ανακατεμένο"
+  </dest>
+  <voice>
+    *: "Εισαγωγή στην ουρά ανακατεμένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user:
+  <source>
+    *: "Reduce Ticking"
+  </source>
+  <dest>
+    *: "Μείωση τικ"
+  </dest>
+  <voice>
+    *: "Μείωση τικ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: "Ταϊλανδικά, (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: "Ταϊλανδικά,"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Επικόλληση"
+  </dest>
+  <voice>
+    *: "Επικόλληση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Προ-αποκοπή"
+  </dest>
+  <voice>
+    *: "Προ-αποκοπή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Keep on Disk"
+  </source>
+  <dest>
+    *: "Διατήρηση στον δίσκο"
+  </dest>
+  <voice>
+    *: "Διατήρηση στον δίσκο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: "Ιαπωνικά (SJIS)"
+  </dest>
+  <voice>
+    *: "Ιαπωνικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: "Εβραϊκά (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: "Εβραϊκά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Διαγραφή δυναμικής λίστας αναπαραγωγής;"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Η βάση δεδομένων δεν είναι έτοιμη"
+  </dest>
+  <voice>
+    *: "Η βάση δεδομένων δεν είναι έτοιμη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: "Κορεάτικα (KSX1001)"
+  </dest>
+  <voice>
+    *: "Κορεάτικα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Τούρκικα (ISO-8859-9)"
+  </dest>
+  <voice>
+    *: "Τούρκικα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Χρώμα προσκήνιου"
+  </dest>
+  <voice>
+    *: "Χρώμα προσκήνιου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: "Απλ. Κινέζικα (GB2312)"
+  </dest>
+  <voice>
+    *: "Απλοποιημένα Κινέζικα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Πρώτο πάτημα ενεργοποιεί μόνο τον φωτισμό"
+  </dest>
+  <voice>
+    *: "Πρώτο πάτημα ενεργοποιεί μόνο τον φωτισμό"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Κεντρική συσκευή και χειριστήριο"
+  </dest>
+  <voice>
+    *: "Κεντρική συσκευή και χειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "πίξελς"
+  </dest>
+  <voice>
+    *: "πίξελς"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Πληκτρολόγιο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Brightness"
+  </source>
+  <dest>
+    *: "Φωτεινότητα "
+  </dest>
+  <voice>
+    *: "Φωτεινότητα "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Αποθήκευση προεπιλογών EQ"
+  </dest>
+  <voice>
+    *: "Αποθήκευση προεπιλογών ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Κεντρική συσκευή μόνο"
+  </dest>
+  <voice>
+    *: "Κεντρική συσκευή μόνο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Άνοιγμα λίστας προεπιλογών"
+  </dest>
+  <voice>
+    *: "Άνοιγμα λίστας προεπιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Φόρτωση στη RAM"
+  </dest>
+  <voice>
+    *: "Φόρτωση στη ράμ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user:
+  <source>
+    *: "Crossfeed"
+  </source>
+  <dest>
+    *: "Μίξη καναλιών"
+  </dest>
+  <voice>
+    *: "Μίξη καναλιών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Ελληνικά (ISO-8859-7)"
+  </dest>
+  <voice>
+    *: "Ελληνικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Επιλογές κύλισης χειριστηρίου"
+  </dest>
+  <voice>
+    *: "Επιλογές κύλισης χειριστηρίου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: "Παραδ. Κινέζικα (BIG5)"
+  </dest>
+  <voice>
+    *: "Παραδοσιακά Κινέζικα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Αντιγραφή"
+  </dest>
+  <voice>
+    *: "Αντιγραφή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user:
+  <source>
+    *: "Scanning %d.%01dMHz"
+  </source>
+  <dest>
+    *: "Αναζήτηση %d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user:
+  <source>
+    *: "Screen frozen!"
+  </source>
+  <dest>
+    *: "Οθόνη παγωμένη!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Οξύτητα "
+  </dest>
+  <voice>
+    *: "Οξύτητα "
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Μέγεθος προώθησης πίξελ ανά οθόνη"
+  </dest>
+  <voice>
+    *: "Μέγεθος προώθησης πίξελ ανά οθόνη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Scan"
+  </source>
+  <dest>
+    *: "Αναζήτηση"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Κυριλλικά (CP1251)"
+  </dest>
+  <voice>
+    *: "Κυριλλικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Κύλιση ανά σελίδα"
+  </dest>
+  <voice>
+    *: "Κύλιση ανά σελίδα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Αποκοπή υψηλής συχνότητας"
+  </dest>
+  <voice>
+    *: "Αποκοπή υψηλής συχνότητας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Λίστα προεπιλογών"
+  </dest>
+  <voice>
+    *: "Λίστα προεπιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: "Καθυστέρηση ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Καθύστέρηση ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unicode (UTF-8)"
+  </dest>
+  <voice>
+    *: "Γιούνι κόουντ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Κύλιση εκτός ορίων οθόνης"
+  </dest>
+  <voice>
+    *: "Κύλιση εκτός ορίων οθόνης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Άκυρο χρώμα"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Force Tag Cache Update"
+  </source>
+  <dest>
+    *: "Ενημέρωση βάσης δεδομένων"
+  </dest>
+  <voice>
+    *: "Ενημέρωση βάσης δεδομένων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_DIGITAL
+  desc: in the recording screen
+  user:
+  <source>
+    *: "D"
+  </source>
+  <dest>
+    *: "D"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Μήκος]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Είδη"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Άκυρο όνομα αρχείου!"
+  </dest>
+  <voice>
+    *: "Άκυρο όνομα αρχείου!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Αναζήτηση στην λίστα αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Αναζήτηση στην λίστα αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Κατάσταση Πάρτυ"
+  </dest>
+  <voice>
+    *: "Κατάσταση Πάρτυ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: "Backdrop Failed"
+  </source>
+  <dest>
+    *: "Αποτυχία φόντου"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Χειριστήριο μόνο"
+  </dest>
+  <voice>
+    *: "Χειριστήριο μόνο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Το αρχείο/φάκελος υπάρχει ήδη. Να αντικατασταθεί;"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Συχνότητα αποκοπής"
+  </dest>
+  <voice>
+    *: "Συχνότητα αποκοπής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Φόρτωση..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_BUILDING
+  desc: when booting up and rebuilding the cache
+  user:
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "Σάρωση δίσκου..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Φωτισμός ψαλιδίσματος"
+  </dest>
+  <voice>
+    *: "Φωτισμός ψαλιδίσματος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Επαναφορά προεπιλεγμένων χρωμάτων"
+  </dest>
+  <voice>
+    *: "Επαναφορά προεπιλεγμένων χρωμάτων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Duration"
+  </source>
+  <dest>
+    *: "Διάρκεια εισόδου ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Διάρκεια εισόδου ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: "Διάρκεια εξόδου ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Διάρκεια εξόδου ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Δεν βρέθηκαν ρυθμίσεις, αυτόματη αναζήτηση;"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "ΚΠΜ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user:
+  <source>
+    *: "Directory Cache"
+  </source>
+  <dest>
+    *: "Δομή φακέλων στη μνήμη"
+  </dest>
+  <voice>
+    *: "Δομή φακέλων στη μνήμη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Αναζήτηση... %d found (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "%d Hz Ενίσχυση ζώνης"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Στην αλλαγή κομματιών μόνο"
+  </dest>
+  <voice>
+    *: "Στην αλλαγή κομματιών μόνο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Center Frequency"
+  </source>
+  <dest>
+    *: "Κεντρική συχνότητα"
+  </dest>
+  <voice>
+    *: "Κεντρική συχνότητα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Καθαρισμός λίστας προεπιλογών"
+  </dest>
+  <voice>
+    *: "Καθαρισμός λίστας προεπιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Νέο πληκτρολόγιο"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Εκτεταμένα λατινικά (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "Εκτεταμένα λατινικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Βάση δεδομένων"
+  </dest>
+  <voice>
+    *: "Βάση δεδομένων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user:
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Ενίσχυση κομματιού εάν είναι ανακατεμένα"
+  </dest>
+  <voice>
+    *: "Ενίσχυση κομματιού εάν είναι ανακατεμένα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Λατινικά1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: "Λατινικά 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Ενίσχυση μίξης καναλιών"
+  </dest>
+  <voice>  
+    *: "Ενίσχυση μίξης καναλιών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Ενίσχυση"
+  </dest>
+  <voice>
+    *: "Ενίσχυση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: "Αραβικά (CP1256)"
+  </dest>
+  <voice>
+    *: "Αραβικά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Αποθήκευση λίστας προεπιλογών"
+  </dest>
+  <voice>
+    *: "Αποθήκευση λίστας προεπιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "ΚΠΜ: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Απλές ρυθμίσεις EQ"
+  </dest>
+  <voice>
+    *: "Απλές ρυθμίσεις ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Φίλτρο χαμηλού επιπέδου"
+  </dest>
+  <voice>
+    *: "Φίλτρο χαμηλού επιπέδου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user:
+  <source>
+    *: "Add Preset"
+  </source>
+  <dest>
+    *: "Προσθήκη προεπιλογής"
+  </dest>
+  <voice>
+    *: "Προσθήκη προεπιλογής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Τρόπος επεξεργασίας: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Απόσβεση υψηλής συχνότητας"
+  </dest>
+  <voice>
+    *: "Απόσβεση υψηλής συχνότητας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Ενεργοποίηση EQ"
+  </dest>
+  <voice>
+    *: "Ενεργοποίηση ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Αποκοπή"
+  </dest>
+  <voice>
+    *: "Αποκοπή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "Φίλτρο υψηλού επιπέδου"
+  </dest>
+  <voice>
+    *: "Φίλτρο υψηλού επιπέδου"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "γουάιλ πλέινγκ σκρίν χειριστηρίου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_PRESET_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Προεπιλογή"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user:
+  <source>
+    *: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: "Αυτόματη αναζήτηση προεπιλογών"
+  </dest>
+  <voice>
+    *: "Αυτόματη αναζήτηση προεπιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Περιήγηση προεπιλογών EQ"
+  </dest>
+  <voice>
+    *: "Περιήγηση προεπιλογών ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user:
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Προεπιλεγμένη κωδικοποίηση"
+  </dest>
+  <voice>
+    *: "Προεπιλεγμένη κωδικοποίηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: "Τρόπος εξόδου ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Τρόπος εξόδου ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Equalizer"
+  </dest>
+  <voice>
+    *: "ικουαλάιζερ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_ANALOG
+  desc: in the recording screen
+  user:
+  <source>
+    *: "A"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: "Το φόντο άλλαξε"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: "Set As Backdrop"
+  </source>
+  <dest>
+    *: "Χρησιμοποίηση ως φόντο"
+  </dest>
+  <voice>
+    *: "Χρησιμοποίηση ως φόντο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Άμεση ενίσχυση"
+  </dest>
+  <voice>
+    *: "Άμεση ενίσχυση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_REBOOT
+  desc: when activating directory cache
+  user:
+  <source>
+    *: "Please reboot to enable the cache"
+  </source>
+  <dest>
+    *: "Παρακαλώ επανεκινήστε για να ενεργοποιήσετε τα δομή φακέλων στη μνήμη"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: "Καθαρισμός τρεχόντων προεπιλογών;"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Φίλτρο κορυφής %d"
+  </dest>
+  <voice>
+    *: "Φίλτρο κορυφής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Delay"
+  </source>
+  <dest>
+    *: "Καθυστέρηση εισόδου ομαλής εναλλαγής"
+  </dest>
+  <voice>
+    *: "Καθύστέρηση εισόδου ομαλής εναλλαγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Ανανεώνεται στο παρασκήνιο"
   </dest>
   <voice>
     *: ""
