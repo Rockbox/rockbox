@@ -103,9 +103,7 @@ void app_main(void)
 #ifdef HAVE_DIRCACHE
 void init_dircache(void)
 {
-    int font_w, font_h;
     int result;
-    char buf[32];
     bool clear = false;
     
     dircache_init();
