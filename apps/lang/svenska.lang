@@ -8477,8 +8477,6 @@
     *: "Direct gain"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_INVALID_FILENAME
   desc: "invalid filename entered" error message
@@ -8491,5 +8489,19 @@
   </dest>
   <voice>
     *: "Invalid Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Rullning på fjärrenhet"
+  </dest>
+  <voice>
+    *: "Remote Scrolling Options"
   </voice>
 </phrase>
