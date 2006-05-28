@@ -1495,7 +1495,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * table when the index gets resorted.
                  */
                 tempbuf_insert(buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH 
-                               + TAGFILE_MAX_ENTRIES, entry.idx_id, false);
+                               + TAGFILE_MAX_ENTRIES, entry.idx_id,
+                               tagcache_is_unique_tag(index_type));
                 yield();
             }
             logf("done");
@@ -1813,6 +1814,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     
     if (index_type != tag_filename)
         h->datasize += tch.datasize;
+    logf("s:%d/%d/%d", index_type, tch.datasize, h->datasize);
     error_exit:
     
     close(fd);
@@ -1862,22 +1864,24 @@ static bool commit(void)
     }
 
     /* Try to steal every buffer we can :) */
-#ifdef HAVE_TC_RAMCACHE
-    if (tempbuf_size == 0 && stat.ramcache_allocated > 0)
-    {
-        stat.ramcache = false;
-        tempbuf = (char *)(hdr + 1);
-        tempbuf_size = stat.ramcache_allocated - sizeof(struct ramcache_header);
-    }
-#endif
-    
 #ifdef HAVE_DIRCACHE
     if (tempbuf_size == 0)
     {
         /* Try to steal the dircache buffer. */
         tempbuf = dircache_steal_buffer(&tempbuf_size);
+        tempbuf_size &= ~0x03;
     }
 #endif    
+    
+#ifdef HAVE_TC_RAMCACHE
+    if (tempbuf_size == 0 && stat.ramcache_allocated > 0)
+    {
+        stat.ramcache = false;
+        tempbuf = (char *)(hdr + 1);
+        tempbuf_size = stat.ramcache_allocated - sizeof(struct ramcache_header) - 128;
+        tempbuf_size &= ~0x03;
+    }
+#endif
     
     /* And finally fail if there are no buffers available. */
     if (tempbuf_size == 0)
@@ -1909,6 +1913,7 @@ static bool commit(void)
         ret = build_index(i, &header, tmpfd);
         if (ret <= 0)
         {
+            close(tmpfd);
             logf("tagcache failed init");
             if (ret < 0)
                 remove_files();
@@ -2176,7 +2181,9 @@ static bool load_tagcache(void)
             bytesleft -= sizeof(struct tagfile_entry) + fe->tag_length;
             if (bytesleft < 0)
             {
-                logf("too big tagcache.");
+                logf("too big tagcache #2");
+                logf("tl: %d", fe->tag_length);
+                logf("bl: %d", bytesleft);
                 close(fd);
                 return false;
             }
