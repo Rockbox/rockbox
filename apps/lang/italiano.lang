@@ -244,10 +244,10 @@
     *: "Browse Themes"
   </source>
   <dest>
-    *: "Elenca Temi"
+    *: "Scegli Tema"
   </dest>
   <voice>
-    *: "Elenca temi"
+    *: "Scegli Tema"
   </voice>
 </phrase>
 <phrase>
@@ -289,7 +289,7 @@
     *: "Opzioni Playlist"
   </dest>
   <voice>
-    *: "Opzioni Pleylist"
+    *: "Opzioni Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -300,10 +300,10 @@
     *: "Browse Plugins"
   </source>
   <dest>
-    *: "Avvia plugins"
+    *: "Scegli Plugin"
   </dest>
   <voice>
-    *: "Avvia plaghin"
+    *: "Scegli Plugin"
   </voice>
 </phrase>
 <phrase>
@@ -594,10 +594,10 @@
     *: "MDB Strength"
   </source>
   <dest>
-    *: "Intensità MDB"
+    *: "Intensita' MDB"
   </dest>
   <voice>
-    *: "Intensità MDB"
+    *: "Intensita' MDB"
   </voice>
 </phrase>
 <phrase>
@@ -692,10 +692,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Visualizzazione file"
+    *: "Visualizza file"
   </dest>
   <voice>
-    *: "Visualizzazione fail"
+    *: "Visualizza file"
   </voice>
 </phrase>
 <phrase>
@@ -709,7 +709,7 @@
     *: "Display"
   </dest>
   <voice>
-    *: "Displey"
+    *: "Display"
   </voice>
 </phrase>
 <phrase>
@@ -776,10 +776,10 @@
     *: "Browse .cfg files"
   </source>
   <dest>
-    *: "Scegli file configurazione"
+    *: "Carica file .cfg"
   </dest>
   <voice>
-    *: "Scegli fail di configurazione"
+    *: "Carica file di configurazione"
   </voice>
 </phrase>
 <phrase>
@@ -790,10 +790,10 @@
     *: "Browse Firmwares"
   </source>
   <dest>
-    *: "Elenco firmware"
+    *: "Scegli Firmware"
   </dest>
   <voice>
-    *: "Elenco Firmwares"
+    *: "Scegli Firmware"
   </voice>
 </phrase>
 <phrase>
@@ -905,7 +905,7 @@
     *: "Scrivi file .cfg"
   </dest>
   <voice>
-    *: "Scrivi Fail di Configurazione"
+    *: "Scrivi File di Configurazione"
   </voice>
 </phrase>
 <phrase>
@@ -1070,10 +1070,10 @@
     *: "Browse EQ Presets"
   </source>
   <dest>
-    *: "Visualizza Programmazioni Equalizzatore"
+    *: "Carica Programmazioni Equalizzatore"
   </dest>
   <voice>
-    *: "Visualizza Programmazioni Equalizzatore"
+    *: "Carica Programmazioni Equalizzatore"
   </voice>
 </phrase>
 <phrase>
@@ -1112,10 +1112,10 @@
     *: "Low Shelf Filter"
   </source>
   <dest>
-    *: "Low Shelf Filter"
+    *: "Filtro Low Shelf"
   </dest>
   <voice>
-    *: ""
+    *: "Filtro Low Shelf"
   </voice>
 </phrase>
 <phrase>
@@ -1140,10 +1140,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "High Shelf Filter"
+    *: "Filtro High Shelf"
   </dest>
   <voice>
-    *: ""
+    *: "Filtro High Shelf"
   </voice>
 </phrase>
 <phrase>
@@ -1213,7 +1213,7 @@
     *: "Crea playlist"
   </dest>
   <voice>
-    *: "Crea Pleylist"
+    *: "Crea Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -1227,7 +1227,7 @@
     *: "Visualizza playlist corrente"
   </dest>
   <voice>
-    *: "Visualizza Pleylist Corrente"
+    *: "Visualizza Playlist Corrente"
   </voice>
 </phrase>
 <phrase>
@@ -1241,7 +1241,7 @@
     *: "Salva playlist corrente"
   </dest>
   <voice>
-    *: "Salva Pleylist Corrente"
+    *: "Salva Playlist Corrente"
   </voice>
 </phrase>
 <phrase>
@@ -1409,7 +1409,7 @@
     *: "Suona per primo il file selezionato"
   </dest>
   <voice>
-    *: "Suona per primo il fail selezionato"
+    *: "Suona per primo il file selezionato"
   </voice>
 </phrase>
 <phrase>
@@ -1490,10 +1490,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "ReplayGain"
+    *: "Replaygain"
   </dest>
   <voice>
-    *: "Ripleyghein"
+    *: "Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -1507,7 +1507,7 @@
     *: "Volume Beep"
   </dest>
   <voice>
-    *: "Volume bip"
+    *: "Volume beep"
   </voice>
 </phrase>
 <phrase>
@@ -1574,10 +1574,10 @@
     *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "Priorità info ID3"
+    *: "Priorita' info ID3"
   </dest>
   <voice>
-    *: "Priorità ID3 tag"
+    *: "Priorita' ID3 tag"
   </voice>
 </phrase>
 <phrase>
@@ -1675,7 +1675,7 @@
     *: "Ordine file"
   </dest>
   <voice>
-    *: "Ordine fail"
+    *: "Ordine file"
   </voice>
 </phrase>
 <phrase>
@@ -1714,10 +1714,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "Dal più recente"
+    *: "Dal piu' recente"
   </dest>
   <voice>
-    *: "dal più recente"
+    *: "dal piu' recente"
   </voice>
 </phrase>
 <phrase>
@@ -1745,7 +1745,7 @@
     *: "Mostra files"
   </dest>
   <voice>
-    *: "Mostra Fail"
+    *: "Mostra File"
   </voice>
 </phrase>
 <phrase>
@@ -1801,7 +1801,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: "Pleylist"
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -1829,7 +1829,7 @@
     *: "Segui playlist"
   </dest>
   <voice>
-    *: "Segui Pleylist"
+    *: "Segui Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -1857,7 +1857,7 @@
     *: "Scegli carattere"
   </dest>
   <voice>
-    *: "Fonts"
+    *: "Scegli carattere"
   </voice>
 </phrase>
 <phrase>
@@ -1871,7 +1871,7 @@
     *: "Scegli file .wps"
   </dest>
   <voice>
-    *: "Scegli fail schermata di riproduzione"
+    *: "Scegli file schermata di riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -1882,10 +1882,10 @@
     *: "Browse .rwps files"
   </source>
   <dest>
-    *: "Elenca file schermata di riproduzione per telecomando"
+    *: "Scegli file .rwps"
   </dest>
   <voice>
-    *: "Elenca file schermata di riproduzione per telecomando"
+    *: "Scegli file schermata di riproduzione per telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -1983,7 +1983,7 @@
     *: "Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: "Latin 1"
+    *: "Latin1"
   </voice>
 </phrase>
 <phrase>
@@ -2095,7 +2095,7 @@
     *: "Cinese Sempl. (GB2312)"
   </dest>
   <voice>
-    *: "Cinese semplificato"
+    *: "Cinese Semplificato"
   </voice>
 </phrase>
 <phrase>
@@ -2190,10 +2190,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Spegnimento per inattività"
+    *: "Spegnimento per inattivita'"
   </dest>
   <voice>
-    *: "Spegnimento per Inattività"
+    *: "Spegnimento per Inattivita'"
   </voice>
 </phrase>
 <phrase>
@@ -2260,10 +2260,10 @@
     *: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Modalità adattatore auto"
+    *: "Modalita' adattatore auto"
   </dest>
   <voice>
-    *: "Modalità Adattatore Auto"
+    *: "Modalita' Adattatore Auto"
   </voice>
 </phrase>
 <phrase>
@@ -2274,7 +2274,7 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Crea un segnalibro allo stop"
+    *: "Segnalibro allo stop"
   </dest>
   <voice>
     *: "Segnalibro Allo Stop""
@@ -2358,10 +2358,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Pronuncia menù"
+    *: "Pronuncia menu'"
   </dest>
   <voice>
-    *: "Pronuncia Menù"
+    *: "Pronuncia Menu'"
   </voice>
 </phrase>
 <phrase>
@@ -2389,7 +2389,7 @@
     *: "Pronuncia nomi file"
   </dest>
   <voice>
-    *: "Pronuncia nomi dei fail"
+    *: "Pronuncia nomi dei file"
   </voice>
 </phrase>
 <phrase>
@@ -2442,10 +2442,10 @@
     *: "Quality"
   </source>
   <dest>
-    *: "Qualità"
+    *: "Qualita'"
   </dest>
   <voice>
-    *: "Qualità"
+    *: "Qualita'"
   </voice>
 </phrase>
 <phrase>
@@ -2736,10 +2736,10 @@
     *: "Fade-Out Mode"
   </source>
   <dest>
-    *: "Modalità fade out"
+    *: "Modalita' fade out"
   </dest>
   <voice>
-    *: "Modalità fade out"
+    *: "Modalita' fade out"
   </voice>
 </phrase>
 <phrase>
@@ -2750,10 +2750,10 @@
     *: "Mix"
   </source>
   <dest>
-    *: "Mescola (Mix)"
+    *: "Mix"
   </dest>
   <voice>
-    *: "Mescola"
+    *: "Mix"
   </voice>
 </phrase>
 <phrase>
@@ -2764,10 +2764,10 @@
     *: "Enable Replaygain"
   </source>
   <dest>
-    *: "Abilita ReplayGain"
+    *: "Abilita Replaygain"
   </dest>
   <voice>
-    *: "Abilita ReplayGain"
+    *: "Abilita Replaygaintn"
   </voice>
 </phrase>
 <phrase>
@@ -2778,10 +2778,10 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Non consentire distorsione"
+    *: "Previene distorsione"
   </dest>
   <voice>
-    *: "Non consentire distorsione"
+    *: "Previene distorsione"
   </voice>
 </phrase>
 <phrase>
@@ -2792,10 +2792,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Tipo ReplayGain"
+    *: "Tipo Replaygain"
   </dest>
   <voice>
-    *: "Tipo ReplayGain"
+    *: "Tipo Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2932,10 +2932,10 @@
     *: "Brightness"
   </source>
   <dest>
-    *: "Luminosità"
+    *: "Luminosita'"
   </dest>
   <voice>
-    *: "Luminosità"
+    *: "Luminosita'"
   </voice>
 </phrase>
 <phrase>
@@ -3005,7 +3005,7 @@
     *: "Capovolgi display"
   </dest>
   <voice>
-    *: "Capovolgi Displey"
+    *: "Capovolgi Display"
   </voice>
 </phrase>
 <phrase>
@@ -3086,10 +3086,10 @@
     *: "Scroll Speed"
   </source>
   <dest>
-    *: "Velocità scorrimento"
+    *: "Velocita' scorrimento"
   </dest>
   <voice>
-    *: "Velocità Scorrimento"
+    *: "Velocita' Scorrimento"
   </voice>
 </phrase>
 <phrase>
@@ -3100,7 +3100,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Esempio velocità scorrimento impostata"
+    *: "Esempio velocita' scorrimento impostata"
   </dest>
   <voice>
     *: ""
@@ -3352,10 +3352,10 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "Unità per lettura"
+    *: "Unita' per lettura"
   </dest>
   <voice>
-    *: "Unità per lettura"
+    *: "Unita' per lettura"
   </voice>
 </phrase>
 <phrase>
@@ -3478,10 +3478,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Capacità batteria"
+    *: "Capacita' batteria"
   </dest>
   <voice>
-    *: "Capacità Batteria"
+    *: "Capacita' Batteria"
   </voice>
 </phrase>
 <phrase>
@@ -3663,7 +3663,7 @@
     *: "Massimo numero di files nelle cartelle"
   </dest>
   <voice>
-    *: "Massimo numero di fail nelle cartelle"
+    *: "Massimo numero di file nelle cartelle"
   </voice>
 </phrase>
 <phrase>
@@ -3677,7 +3677,7 @@
     *: "Dimensione massima playlist"
   </dest>
   <voice>
-    *: "Dimensione massima pleylist"
+    *: "Dimensione massima playlist"
   </voice>
 </phrase>
 <phrase>
@@ -3691,7 +3691,7 @@
     *: "Playlist"
   </dest>
   <voice>
-    *: "Pleylist"
+    *: "Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -4220,7 +4220,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "Tono giù"
+    *: "Tono giu'"
   </dest>
   <voice>
     *: ""
@@ -4892,7 +4892,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "L'orario impostato è troppo vicino!"
+    *: "L'orario impostato e' troppo vicino!"
   </dest>
   <voice>
     *: ""
@@ -5875,7 +5875,7 @@
     *: ""
   </dest>
   <voice>
-    *: "più"
+    *: "piu'"
   </voice>
 </phrase>
 <phrase>
@@ -6547,7 +6547,7 @@
     *: ""
   </dest>
   <voice>
-    *: "fail"
+    *: "file"
   </voice>
 </phrase>
 <phrase>
@@ -6645,7 +6645,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "carattere"
   </voice>
 </phrase>
 <phrase>
@@ -7009,7 +7009,7 @@
     *: "Cancella stazione"
   </dest>
   <voice>
-    *: ""
+    *: "Cancella stazione"
   </voice>
 </phrase>
 <phrase>
@@ -7034,7 +7034,7 @@
     *: "The Preset List is Full"
   </source>
   <dest>
-    *: "La lista delle stazioni è piena"
+    *: "La lista delle stazioni e' piena"
   </dest>
   <voice>
     *: ""
@@ -7048,7 +7048,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menù"
+    *: "Menu'"
   </dest>
   <voice>
     *: ""
@@ -7230,7 +7230,7 @@
     *: "Scan"
   </source>
   <dest>
-    *: "Modalità Scan"
+    *: "Modalita' Scan"
   </dest>
   <voice>
     *: ""
@@ -7244,7 +7244,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Modalità preselezione"
+    *: "Modalita' preselezione"
   </dest>
   <voice>
     *: ""
@@ -7258,7 +7258,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menù"
+    *: "Menu'"
   </dest>
   <voice>
     *: ""
@@ -7300,7 +7300,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Il buffer directory è pieno!"
+    *: "Il buffer cartella e' pieno!"
   </dest>
   <voice>
     *: ""
@@ -7681,7 +7681,7 @@
     *: "Opzioni file"
   </dest>
   <voice>
-    *: "Opzioni Fail"
+    *: "Opzioni File"
   </voice>
 </phrase>
 <phrase>
@@ -7748,7 +7748,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Il plugin ha ritornato un errore"
+    *: "Il plugin ha restituito un errore"
   </dest>
   <voice>
     *: ""
@@ -7944,10 +7944,10 @@
     *: "Main and Remote Unit"
   </source>
   <dest>
-    *: "Unità principale e telecomando"
+    *: "Unita' principale e telecomando"
   </dest>
   <voice>
-    *: "Unità principale e telecomando"
+    *: "Unita' principale e telecomando"
   </voice>
 </phrase>
 <phrase>
@@ -7972,10 +7972,10 @@
     *: "Main Unit Only"
   </source>
   <dest>
-    *: "Solo unità principale"
+    *: "Solo unita' principale"
   </dest>
   <voice>
-    *: "Solo unità principale"
+    *: "Solo unita' principale"
   </voice>
 </phrase>
 <phrase>
@@ -8028,10 +8028,10 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "Velocità"
+    *: "Velocita'"
   </dest>
   <voice>
-    *: "Velocità"
+    *: "Velocita'"
   </voice>
 </phrase>
 <phrase>
@@ -8129,7 +8129,7 @@
     *: "Ricerca nella playlist"
   </dest>
   <voice>
-    *: "Ricerca nella pleilist"
+    *: "Ricerca nella playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8382,5 +8382,126 @@
   </dest>
   <voice>
     *: "Cirillico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Taglio alta frequenza"
+  </dest>
+  <voice>
+    *: "Taglio alta frequenza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Guadagno incrociato"
+  </dest>
+  <voice>  
+    *: "Guadagno incrociato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Attenuazione alta frequenza"
+  </dest>
+  <voice>
+    *: "Attenuazione alta frequenza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Guadagno diretto"
+  </dest>
+  <voice>
+    *: "Guadagno diretto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Cache delle Tag non pronta"
+  </dest>
+  <voice>
+    *: "Cache delle Tag non pronta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Tutte le tracce>"
+  </dest>
+  <voice>
+    *: "Tutte le tracce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Nome file non valido!"
+  </dest>
+  <voice>
+    *: "Nome file non valido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Opzioni di scorrimento per telecomando"
+  </dest>
+  <voice>
+    *: "Opzioni di scorrimento per telecomando"
   </voice>
 </phrase>

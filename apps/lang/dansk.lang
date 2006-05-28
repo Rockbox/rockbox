@@ -1,3 +1,25 @@
+# Rockbox danish language file
+# Translated by:
+# - Rune Wiinberg
+# - Jakob Givoni
+# - Jonas Häggqvist
+#
+# Try to follow the guidelines from http://www.sslug.dk/locale/ Specifically
+# try to avoid english words at (almost) all costs.
+# 
+# Local conventions:
+# "Settings" is removed from translations used in the menu since it's all
+# settings there ("Sound Settings > Lyd").
+# No excessive capitals ("Håndter opsætning" - not "Håndter Opsætning")
+#
+# Strings that need attention:
+# - LANG_CROSSFEED_HF_CUTOFF
+# - LANG_CROSSFEED_CROSS_GAIN
+# - LANG_CROSSFEED_HF_ATTENUATION
+# - LANG_CROSSFEED_DIRECT_GAIN
+# - LANG_EQUALIZER_BAND_LOW_SHELF
+# - LANG_EQUALIZER_BAND_HIGH_SHELF
+# - All strings with "Equalizer" in them.
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -1781,10 +1803,10 @@
   desc: in codepage setting menu
   user:
   <source>
-    *: "Russian (CP1251)"
+    *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Russisk (CP1251)"
+    *: "Kyrillisk (CP1251)"
   </dest>
   <voice>
     *: ""
@@ -1904,7 +1926,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -2176,10 +2198,10 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Numre"
+    *: "Sange"
   </dest>
   <voice>
-    *: "Numre"
+    *: "Sange"
   </voice>
 </phrase>
 <phrase>
@@ -2582,10 +2604,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album lydstyrke"
+    *: "Lydstyrke pr. album"
   </dest>
   <voice>
-    *: "Album lydstyrke"
+    *: "Lydstyrke per album"
   </voice>
 </phrase>
 <phrase>
@@ -2596,10 +2618,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Sang lydstyrke"
+    *: "Lydstyrke pr. sang"
   </dest>
   <voice>
-    *: "Sang lydstyrke"
+    *: "Lydstyrke per sang"
   </voice>
 </phrase>
 <phrase>
@@ -2610,10 +2632,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Lydstyrkekontrol ved tilfældig afspilning"
+    *: "Lydstyrkekontrol pr. sang ved tilfældig afspilning"
   </dest>
   <voice>
-    *: "Lydstyrkekontrol ved tilfældig afspilning"
+    *: "Lydstyrkekontrol per sang ved tilfældig afspilning"
   </voice>
 </phrase>
 <phrase>
@@ -6474,7 +6496,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Har indsat %d numre (%s)"
+    *: "Har indsat %d sange (%s)"
   </dest>
   <voice>
     *: ""
@@ -6488,7 +6510,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Har sat %d numre i kø (%s)"
+    *: "Har sat %d sange i kø (%s)"
   </dest>
   <voice>
     *: ""
@@ -6502,7 +6524,7 @@
     *: "Saved %d tracks (%s)"
   </source>
   <dest>
-    *: "Har gemt %d numre (%s)"
+    *: "Har gemt %d sange (%s)"
   </dest>
   <voice>
     *: ""
@@ -7258,10 +7280,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Nummer skærm"
+    *: "Sang visning"
   </dest>
   <voice>
-    *: "Nummer skærm"
+    *: "Sang visning"
   </voice>
 </phrase>
 <phrase>
@@ -8368,5 +8390,140 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Alle sange>"
+  </dest>
+  <voice>
+    *: "Alle sange"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Tagcache ikke klar"
+  </dest>
+  <voice>
+    *: "Tagcache er ikke klar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixels"
+  </dest>
+  <voice>
+    *: "pixels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Rulning på fjernbetjening"
+  </dest>
+  <voice>
+    *: "Rulning på fjernbetjening"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "High-Frequency Cutoff"
+  </dest>
+  <voice>
+    *: "High-frequency cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Ugyldigt filnavn"
+  </dest>
+  <voice>
+    *: "Ugyldigt filnavn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Cross Gain"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "High-Frequency Attenuation"
+  </dest>
+  <voice>
+    *: "High-frequency attenuation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direct Gain"
+  </dest>
+  <voice>
+    *: "Direct gain"
   </voice>
 </phrase>
