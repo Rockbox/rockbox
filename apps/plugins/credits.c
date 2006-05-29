@@ -35,6 +35,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     (void)parameter;
     rb = api;
 
+    rb->backlight_set_timeout(1);
+
     rb->show_logo();
 #ifdef HAVE_LCD_CHARCELLS
     rb->lcd_double_height(false);
@@ -50,15 +52,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     roll_credits();
 
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
     return PLUGIN_OK;
 }
 
 #ifdef HAVE_LCD_CHARCELLS
+
 void roll_credits(void)
 {
     int numnames = sizeof(credits)/sizeof(char*);
     int curr_name = 0;
-    int curr_len = rb->utf8length(credits[0]);
+    int curr_len = utf8length(credits[0]);
     int curr_index = 0;
     int curr_line = 0;
     int name, len, new_len, line, x;
@@ -77,7 +82,7 @@ void roll_credits(void)
             int x2;
 
             if (x < 0)
-                rb->lcd_puts(0, line, credits[name] + rb->utf8seek(credits[name], -x));
+                rb->lcd_puts(0, line, credits[name] + utf8seek(credits[name], -x));
             else
                 rb->lcd_puts(x, line, credits[name]);
 
@@ -90,7 +95,7 @@ void roll_credits(void)
             if ((unsigned)x2 < 11)
                 rb->lcd_putc(x2, line, '*');
 
-            new_len = rb->utf8length(credits[name]);
+            new_len = utf8length(credits[name]);
             x += MAX(len/2 + 2, len - new_len/2 + 1);
             len = new_len;
         }
@@ -102,67 +107,181 @@ void roll_credits(void)
         {
             if (++curr_name >= numnames)
                 break;
-            new_len = rb->utf8length(credits[curr_name]);
+            new_len = utf8length(credits[curr_name]);
             curr_index -= MAX(curr_len/2 + 2, curr_len - new_len/2 + 1);
             curr_len = new_len;
             curr_line ^= 1;
         }
     }
 }
-#else
 
-static int minisin[]={
-#if 1
-    1, 2, 2, 3, 3, 3, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0
 #else
-    1, 2, 3, 4, 4, 4, 3, 2, 1, 0, 0, -1, -1, -1, 0, 0,
-#endif
-};
 
 void roll_credits(void)
 {
-    int i;
-    int line = 0;
-    int numnames = sizeof(credits)/sizeof(char*);
-    char buffer[40];
+#if (CONFIG_KEYPAD == RECORDER_PAD)
+    #define PAUSE_TIME 1.2
+    #define ANIM_SPEED 35
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+    #define PAUSE_TIME 0
+    #define ANIM_SPEED 100
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+    #define PAUSE_TIME 0
+    #define ANIM_SPEED 35
+#else
+    #define PAUSE_TIME 1
+    #define ANIM_SPEED 40
+#endif
 
-    int y=LCD_HEIGHT;
+    #define NUM_VISIBLE_LINES (LCD_HEIGHT/font_h - 1)
+    #define CREDITS_TARGETPOS ((LCD_WIDTH/2)-(credits_w/2))
 
-    int height;
-    int width;
-    int sinstep=0;
+    int i=0, j=0, namepos=0, offset_dummy, btn;
+    int name_w, name_h, name_targetpos=1, font_h;
+    int credits_w, credits_pos;
+    int numnames = (sizeof(credits)/sizeof(char*));
+    char name[40], elapsednames[20];
 
     rb->lcd_setfont(FONT_UI);
+    rb->lcd_clear_display();
+    rb->lcd_update();
 
-    rb->lcd_getstringsize((unsigned char *)"A", &width, &height);
+    rb->lcd_getstringsize("A", NULL, &font_h);
 
-    while(1) {
-        rb->lcd_clear_display();
-        for ( i=0; i <= (LCD_HEIGHT-y)/height; i++ )
-            rb->lcd_putsxy(0, i*height+y,
-                           (unsigned char *)(line+i<numnames?credits[line+i]:""));
-        rb->snprintf(buffer, sizeof(buffer), " [Credits] %2d/%2d  ",
-                 line+1, numnames);
+    /* snprintf "credits" text, and save the width and height */
+    rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d",
+                 j+1, numnames);
+    rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
+
+    /* fly in "credits" text from the left */
+    for(credits_pos = 0 - credits_w; credits_pos <= CREDITS_TARGETPOS;
+        credits_pos += (CREDITS_TARGETPOS-credits_pos + 14) / 7)
+    {
         rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        rb->lcd_fillrect(0, 0, LCD_WIDTH, height);
+        rb->lcd_fillrect(0, 0, LCD_WIDTH, font_h);
         rb->lcd_set_drawmode(DRMODE_SOLID);
-        rb->lcd_putsxy(0, 0, (unsigned char *)buffer);
-        rb->lcd_update();
+        rb->lcd_putsxy(credits_pos, 0, elapsednames);
+        rb->lcd_update_rect(0, 0, LCD_WIDTH, font_h);
+        rb->sleep(HZ/ANIM_SPEED);
+    }
 
-        if (rb->button_get_w_tmo(HZ/20) & BUTTON_REL)
-            return;
+    /* first screen's worth of lines fly in */
+    for(i=0; i<NUM_VISIBLE_LINES; i++)
+    {
+        rb->snprintf(name, sizeof(name), "%s", credits[i]);
+        rb->lcd_getstringsize(name, &name_w, &name_h);
 
-        y-= minisin[sinstep];
-        sinstep++;
-        sinstep &= 0x0f; /* wrap */
+        rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d",
+                     i+1, numnames);
+        rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
+        rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
 
-        if(y<0) {
-            line++;
-            if(line >= numnames)
-                break;
-            y+=height;
+        for(namepos = 0-name_w; namepos <= name_targetpos;
+            namepos += (name_targetpos - namepos + 14) / 7)
+        {
+            rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            rb->lcd_fillrect(0, font_h*(i+1), LCD_WIDTH, font_h); /* clear any trails left behind */
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+            rb->lcd_putsxy(namepos, font_h*(i+1), name);
+            rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
+            rb->lcd_update_rect(CREDITS_TARGETPOS, 0, credits_w, font_h);
+
+            /* exit on keypress */
+            btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
+            if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+                return;
         }
+    }
+    j+=i;
 
+    /* pause for a bit if needed */
+    btn = rb->button_get_w_tmo(HZ*PAUSE_TIME); /* exit on keypress */
+    if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+        return;
+
+    /* now begin looping the in-out animation */
+    while(j < numnames)
+    {
+        /* just a screen's worth at a time */
+        for(i=0; i<NUM_VISIBLE_LINES; i++)
+        {
+            if(j+i >= numnames)
+                break;
+
+            offset_dummy=1;
+
+            rb->snprintf(name, sizeof(name), "%s", credits[j+i-NUM_VISIBLE_LINES]);
+            rb->lcd_getstringsize(name, &name_w, &name_h);
+
+            /* fly out an existing line.. */
+            while(namepos<LCD_WIDTH+offset_dummy)
+            {
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_fillrect(0, font_h*(i+1), LCD_WIDTH, font_h); /* clear trails */
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+                rb->lcd_putsxy(namepos, font_h*(i+1), name);
+                rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
+
+                /* exit on keypress */
+                btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
+                if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+                    return;
+
+                namepos += offset_dummy;
+                offset_dummy++;
+            }
+
+            rb->snprintf(name, sizeof(name), "%s", credits[j+i]);
+            rb->lcd_getstringsize(name, &name_w, &name_h);
+
+            rb->snprintf(elapsednames, sizeof(elapsednames), "[Credits] %d/%d",
+                         j+i+1, numnames);
+            rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
+            rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
+
+            for(namepos = 0-name_w; namepos <= name_targetpos;
+                namepos += (name_targetpos - namepos + 14) / 7)
+            {
+                rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+                rb->lcd_fillrect(0, font_h*(i+1), LCD_WIDTH, font_h);
+                rb->lcd_set_drawmode(DRMODE_SOLID);
+                rb->lcd_putsxy(namepos, font_h*(i+1), name);
+                rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
+                rb->lcd_update_rect(CREDITS_TARGETPOS, 0, credits_w, font_h);
+
+                /* exit on keypress */
+                btn = rb->button_get_w_tmo(HZ/ANIM_SPEED);
+                if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+                    return;
+            }
+
+            namepos = name_targetpos;
+
+            /* ..and repeat. */
+        }
+        j+=i;
+
+        btn = rb->button_get_w_tmo(HZ*PAUSE_TIME); /* exit on keypress */
+        if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+            return;
+    }
+
+    btn = rb->button_get_w_tmo(HZ); /* exit on keypress */
+    if (btn !=  BUTTON_NONE && !(btn & BUTTON_REL))
+        return;
+
+    offset_dummy = 1;
+
+    /* now make the text exit to the right */
+    for(credits_pos = (LCD_WIDTH/2)-(credits_w/2); credits_pos <= LCD_WIDTH+offset_dummy;
+        credits_pos += offset_dummy, offset_dummy++)
+    {
+        rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        rb->lcd_fillrect(0, 0, LCD_WIDTH, font_h);
+        rb->lcd_set_drawmode(DRMODE_SOLID);
+        rb->lcd_putsxy(credits_pos, 0, elapsednames);
+        rb->lcd_update();
     }
 }
+
 #endif
