@@ -58,7 +58,43 @@ getfile() {
 
 }
 
-echo "Pick target arch:"
+###########################################################################
+# Verify download directory or create it
+if test -d "$dlwhere"; then
+  if ! test -w "$dlwhere"; then
+    echo "$dlwhere exists, but doesn't seem to be writable for you"
+    exit
+  fi
+else
+  mkdir $dlwhere
+  if test $? -ne 0; then
+    echo "$dlwhere is missing and we failed to create it!"
+    exit
+  fi
+  echo "$dlwhere has been created to store downloads in"
+fi
+
+echo "Download directory: $dlwhere (edit script to change dir)"
+echo "Install prefix: $prefix/[target] (edit script to change dir)"
+
+###########################################################################
+# Verify that we can write in the prefix dir, as otherwise we will hardly
+# be able to install there!
+if test ! -w $prefix; then
+  echo "WARNING: this script is set to install in $prefix but has no"
+  echo "WARNING: write permission to do so!"
+fi
+
+
+###########################################################################
+# If there's already a build dir, we don't overwrite it
+if test -d build-rbdev; then
+  echo "you have a build-rbdev dir already, please remove and rerun"
+  exit
+fi
+
+echo ""
+echo "Select target arch:"
 echo "s. sh"
 echo "m. m68k"
 echo "a. arm"
@@ -86,30 +122,8 @@ case $arch in
     ;;
 esac
 
-# Verify download directory or create it
-if test -d "$dlwhere"; then
-  if test -w "$dlwhere"; then
-    echo "Download directory $dlwhere seems to exist and is writable"
-  else
-    echo "$dlwhere exists, but doesn't seem to be writable for you"
-    exit
-  fi
-else
-  mkdir $dlwhere
-  if test $? -ne 0; then
-    echo "$dlwhere is missing and we failed to create it!"
-    exit
-  fi
-  echo "$dlwhere has been created to store downloads in"
-fi
-
-if test -d build-rbdev; then
-  echo "you have a build-rbdev dir already, please remove and rerun"
-  exit
-fi
-
 bindir="$prefix/$target/bin"
-echo "Summary:"
+echo "== Summary =="
 echo "Target: $target"
 echo "gcc $gccver"
 if test -n "$gccpatch"; then
@@ -117,9 +131,12 @@ if test -n "$gccpatch"; then
 fi
 echo "binutils $binutils"
 echo "install in $prefix/$target"
-echo ""
-echo "Set your PATH to point to $bindir"
 
+echo "when complete, make your PATH include $bindir"
+
+echo ""
+echo "press ENTER to start"
+read input
 
 if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
   echo "binutils $binutils already downloaded"
@@ -169,3 +186,5 @@ make
 make install
 
 echo "done"
+echo ""
+echo "Set your PATH to point to $bindir"
