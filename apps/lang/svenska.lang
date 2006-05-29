@@ -2358,7 +2358,7 @@
     *: "Limits"
   </source>
   <dest>
-    *: "Gränser"
+    *: "Begränsningar"
   </dest>
   <voice>
     *: "Limits"
@@ -2414,7 +2414,7 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Ja - Bara nya"
+    *: "Ja - bara nya"
   </dest>
   <voice>
     *: "Yes - Recent only"
@@ -2470,7 +2470,7 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "Bara unika"
+    *: "Endast unika"
   </dest>
   <voice>
     *: "Unique only"
@@ -2554,7 +2554,7 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Spela MP3-klipp"
+    *: "Spela mp3-klipp"
   </dest>
   <voice>
     *: "talk mp3 clip"
@@ -2778,7 +2778,7 @@
     *: "Main Unit Only"
   </source>
   <dest>
-    *: "Huvudenhet bara"
+    *: "Huvudenhet endast"
   </dest>
   <voice>
     *: "Main unit only"
@@ -2792,7 +2792,7 @@
     *: "Remote Unit Only"
   </source>
   <dest>
-    *: "Fjärrenhet bara"
+    *: "Fjärrenhet endast"
   </dest>
   <voice>
     *: "Remote unit only"
@@ -3156,7 +3156,7 @@
     *: "First Keypress Enables Backlight Only"
   </source>
   <dest>
-    *: "Första knapptryck tänder bara belysning"
+    *: "Första knapptryck tänder endast belysning"
   </dest>
   <voice>
     *: "First keypress enables backlight only"
@@ -3870,7 +3870,7 @@
     *: "Set Time/Date"
   </source>
   <dest>
-    *: "Ställ tid och datum"
+    *: "Bestäm tid och datum"
   </dest>
   <voice>
     *: "Set Time and Date"
@@ -4080,7 +4080,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fil eller katalog finns. Skriv över?"
+    *: "Fil eller katalog existerar. Skriv över?"
   </dest>
   <voice>
     *: "File or directory exists. Overwrite?"
