@@ -839,7 +839,7 @@ static bool sleep_timer(void)
 }
 
 static bool scroll_speed(void)
-{   
+{
     return set_int(str(LANG_SCROLL), "", UNIT_INT,
                    &global_settings.scroll_speed,
                    &lcd_scroll_speed, 1, 0, 15, NULL );
@@ -1293,21 +1293,6 @@ static bool next_folder(void)
     return set_bool( str(LANG_NEXT_FOLDER), &global_settings.next_folder );
 }
 
-static bool runtimedb(void)
-{
-    bool rc;
-//    bool old = global_settings.runtimedb;
-
-    rc = set_bool( str(LANG_RUNTIMEDB_ACTIVE),
-                           &global_settings.runtimedb );
-/*    if (old && !global_settings.runtimedb)
-        rundb_shutdown();
-    if (!old && global_settings.runtimedb)
-        rundb_init();
-*/
-    return rc;
-}
-
 static bool codepage_setting(void)
 {
     static const struct opt_items names[] = {
@@ -1571,12 +1556,7 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_SPDIF_ENABLE), spdif },
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
-        { ID2P(LANG_NEXT_FOLDER), next_folder },
-#ifdef HAVE_DIRCACHE
-        { ID2P(LANG_TAGCACHE), tagcache_ram },
-#endif
-        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_force_update },
-        { ID2P(LANG_RUNTIMEDB_ACTIVE), runtimedb },
+        { ID2P(LANG_NEXT_FOLDER), next_folder }
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;
@@ -1655,12 +1635,16 @@ static bool fileview_settings_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-        { ID2P(LANG_SORT_CASE),    sort_case           },
-        { ID2P(LANG_SORT_DIR),     sort_dir            },
-        { ID2P(LANG_SORT_FILE),    sort_file           },
-        { ID2P(LANG_FILTER),       dir_filter          },
-        { ID2P(LANG_FOLLOW),       browse_current      },
-        { ID2P(LANG_SHOW_ICONS),   show_icons          },
+        { ID2P(LANG_SORT_CASE),             sort_case             },
+        { ID2P(LANG_SORT_DIR),              sort_dir              },
+        { ID2P(LANG_SORT_FILE),             sort_file             },
+        { ID2P(LANG_FILTER),                dir_filter            },
+        { ID2P(LANG_FOLLOW),                browse_current        },
+        { ID2P(LANG_SHOW_ICONS),            show_icons            },
+#ifdef HAVE_DIRCACHE
+        { ID2P(LANG_TAGCACHE),              tagcache_ram          },
+#endif
+        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_force_update },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
