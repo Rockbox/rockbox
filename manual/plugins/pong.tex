@@ -4,20 +4,29 @@ Pong is a simple two player ``tennis game''. Whenever a player misses the ball t
 
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{recorder,recorderv2fm}{F1}\opt{ondio}{LEFT}\opt{h1xx,h300}{UP}
-    \opt{ipodcolor,ipodnano}{MENU} 
+    \opt{RECORDER_PAD}{\ButtonFOne}
+	\opt{ONDIO_PAD}{\ButtonLeft}
+	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+    \opt{IPOD_4G_PAD}{\ButtonMenu} 
     & Left player up\\
-    \opt{recorder,recorderv2fm,ipodcolor,ipodnano}{LEFT}
-    \opt{ondio}{MODE}\opt{h1xx,h300}{DOWN} 
+    \opt{RECORDER_PAD,IPOD_4G_PAD}{\ButtonLeft}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} 
     & Left player down\\
-    \opt{recorder,recorderv2fm}{F3}\opt{ondio}{UP}
-    \opt{h1xx,h300}{PLAY}\opt{ipodcolor,ipodnano}{RIGHT} 
+    \opt{RECORDER_PAD}{\ButtonFThree}
+	\opt{ONDIO_PAD}{\ButtonUp}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+	\opt{IPOD_4G_PAD}{\ButtonRight}
+	\opt{IAUDIO_X5_PAD}{\ButtonRec}
     & Right player up\\
-    \opt{recorder,recorderv2fm}{RIGHT}\opt{ondio}{DOWN}
-    \opt{h1xx,h300}{A-B}\opt{ipodcolor,ipodnano}{PLAY} 
+    \opt{RECORDER_PAD}{\ButtonRight}
+	\opt{ONDIO_PAD}{\ButtonDown}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+	\opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay} 
     & Right player down\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{STOP}\opt{ondio}{OFF}
-    \opt{ipodcolor,ipodnano}{SELECT} 
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+	\opt{IAUDIO_X5_PAD}{\ButtonPower}
     & Quit\\
     \end{btnmap}
 \end{table}
