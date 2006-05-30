@@ -2250,10 +2250,9 @@ int playlist_resume(void)
                     randomise_playlist(playlist, global_settings.resume_seed,
                         false, true);
                 }
-
-                playlist->first_index = global_settings.resume_first_index;
             }
 
+            playlist->first_index = global_settings.resume_first_index;
             break;
         }
     }
