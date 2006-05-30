@@ -68,7 +68,7 @@ int init(void)
 #endif
 
     /* create a big dummy file */
-    f = rb->creat("/battery.dummy", 0);
+    f = rb->creat("/battery.dummy", O_WRONLY);
     if (f<0) {
         rb->splash(HZ, true, "Can't create /battery.dummy");
         return -1;

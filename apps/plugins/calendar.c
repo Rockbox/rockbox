@@ -316,7 +316,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
 {
     int fp,fq;
     fp = rb->open("/.rockbox/.memo",O_RDONLY | O_CREAT);
-    fq = rb->creat("/.rockbox/~temp", 0);
+    fq = rb->creat("/.rockbox/~temp", O_WRONLY);
     if ( (fq != -1) && (fp != -1) )
     {
         int i;
@@ -345,7 +345,7 @@ static bool save_memo(int changed, bool new_mod, struct shown *shown)
             rb->write(fq,temp,1);
         }
         rb->close(fp);
-        fp = rb->creat("/.rockbox/.memo", 0);
+        fp = rb->creat("/.rockbox/.memo", O_WRONLY);
         rb->lseek(fp, 0, SEEK_SET);
         rb->lseek(fq, 0, SEEK_SET);
         for (i = 0; i < rb->filesize(fq); i++)

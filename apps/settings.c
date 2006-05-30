@@ -1588,7 +1588,7 @@ bool settings_save_config(void)
     /* allow user to modify filename */
     while (true) {
         if (!kbd_input(filename, sizeof filename)) {
-            fd = creat(filename,0);
+            fd = creat(filename, O_WRONLY);
             if (fd < 0)
                 gui_syncsplash(HZ, true, str(LANG_FAILED));
             else
