@@ -16,9 +16,8 @@
       present, and work is ongoing into finding a better way to determine battery life.}%
     \ % 
     Rockbox uses this value to estimate remaining battery life for the status 
-    bar and WPS, setting it to the wrong value does not actually change the
-    amount of time the battery will last, it only effects the accuracy of the
-    battery life display on screen.
+    bar and WPS. Changing this setting has no effect whatsoever on actual battery life.
+    This setting affects only the the accuracy of the battery life display on screen.
    
   \end{description}
 
@@ -36,18 +35,19 @@
       \item [Disk Poweroff: ]This setting controls whether the disk is powered
       off or only set to ``sleep'' when spun down. If this setting is YES,
       the disk will power off.  If set to NO, the disk will enter ``sleep''
-      mode.  Power off uses less power but takes longer to spin-up.
+      mode.  Power off uses less power but takes slightly longer to spin-up.
     }
     \item [Directory cache: ]Rockbox has the ability to scan the contents of
       your drive in the background and save those contents to a cache in RAM.
       The Directory Cache takes a small amount of memory away from Rockbox
       that would otherwise be used to buffer music, but it speeds up navigation
       by eliminating the slight pause between the time a navigation button is
-      pressed and the time Rockbox responds.  Turning this setting ON activates
-      the directory cache, and turning it OFF deactivates the directory cache.
-      \note{The first time you set the directory cache to ON, Rockbox will
-      request a reboot of the \dap\ and upon restarting take a few minutes to 
-      scan the drive. Thereafter, the directory cache will work in the 
+      pressed and the time Rockbox responds.  Turning this setting \setting{On}
+      activates the directory cache, and turning it OFF deactivates the 
+      directory cache.
+      \note{The first time you set the directory cache to \setting{On}, 
+      Rockbox will request a reboot of the \dap\ and upon restarting take a few
+      minutes to scan the drive. Thereafter, the directory cache will work in the 
       background.}
   \end{description}
 
@@ -70,18 +70,18 @@
     \item [Sleep Timer: ]This option lets you power off your \dap\ after
     playing for a given time.
     \opt{recorderv2fm}{This setting is reset on boot. Using this option
-    disables the \emph{Wake up alarm} (see below).}
+    disables the \setting{Wake up alarm} (see below).}
     \opt{recorderv2fm}{
       \item [Wake up alarm: ]This option turns the \dap\ off and then starts
       it up again at the specified time. This is most useful when combined
-      with the ``resume'' setting in the ``Playback options'' menu is set to
-      YES, so that the \dap\ wakes up and immediately starts playing music.
-      Use \ButtonLeft\ and \ButtonRight\ to adjust the minutes setting,
-      \ButtonUp\ and \ButtonDown\ to adjust the HOURS. \ButtonPlay\ confirms
-      the alarm and shuts your \dap\ down, and \ButtonOff cancels setting an
-      alarm.  If the \dap\ is turned on again before the alarm occurs, the alarm
-      will be canceled. Using this option disables the \emph{Sleep Timer}
-      (see above).
+      with the \setting{resume} setting in the \setting{Playback Options} 
+      menu is set to \setting{Yes}, so that the \dap\ wakes up and immediately
+      starts playing music.  Use \ButtonLeft\ and \ButtonRight\ to adjust the 
+      minutes setting, \ButtonUp\ and \ButtonDown\ to adjust the HOURS. 
+      \ButtonPlay\ confirms the alarm and shuts your \dap\ down, and \ButtonOff 
+      cancels setting an alarm.  If the \dap\ is turned on again before the 
+      alarm occurs, the alarm will be canceled. Using this option disables 
+      the \setting{Sleep Timer}(see above).
     }
   \end{description}
 
@@ -104,14 +104,16 @@ This submenu relates to limits in the Rockbox operating system.
   
 \opt{player,recorder,recorderv2fm}{
 \subsection{Car Adapter Mode}
-      This option turns on and off the car ignition auto stop function.
+      This option turns \setting{On} and \setting{Off} the car ignition 
+      auto stop function.
   \begin{description}
   \item [Car Adaptor Mode: ]When using the \dap\ in a car, car adapter mode
   automatically stops playback on the \dap\ when power (i.e. from cigarette
   lighter power adapter) to the external DC in jack is turned off. If the Car
-  Adaptor Mode is set to ON, Rockbox will pause playback when the external
-  power off condition is detected. Rockbox will then shutdown the \dap\ after
-  the length of time set in the \emph{Idle Poweroff} setting (see above).
+  Adaptor Mode is set to \setting{On}, Rockbox will pause playback when the 
+  external power off condition is detected. Rockbox will then shutdown the 
+  \dap\ after the length of time set in the \setting{Idle Poweroff} setting 
+  (see above).
   If power to the DC in jack is turned back on before the \emph{Idle Poweroff}
   function has shut the \dap\ off, playback will be resumed 5 seconds after
   the power is applied. This delay is to allow for the time while the car
@@ -145,7 +147,7 @@ firmware versions.}
     \fname{/.rockbox} directory and displays all .cfg (configuration) files.
     Selecting a .cfg file will cause Rockbox to load that the settings
     contained in that file. Pressing \ButtonLeft\ will exit back to the menu. 
-    See the \emph{Write .cfg files} option on the Manage Settings menu for
+    See the \setting{Write .cfg files} option on the Manage Settings menu for
     details of how to save and edit a configuration file.
     %
     \item [Browse Firmwares: ]This displays a list of firmware file in
@@ -157,7 +159,7 @@ firmware versions.}
     Playing a firmware file loads it into memory.  Thus, it is possible to
     run the original Archos firmware or a different version of Rockbox
     from here assuming that you have the right files installed on your
-    disk.  There's no need of any other file or directory to be installed
+    disk.  There is no need for any other file or directory to be installed
     to use this option; the firmware is resident in that one file.
     }
     \item [Reset Settings: ]This wipes the saved settings in the \dap\ and
@@ -167,17 +169,17 @@ firmware versions.}
       the \ButtonRec button immediately after the \dap\ turns on.}
     }
     \item [Write .cfg file: ]This option writes a Rockbox configuration file
-    to your jukebox's hard disk. The configuration file has the \fname{.cfg}
+    to your \daps\ hard disk. The configuration file has the \fname{.cfg}
     extension and is used to store all of the user settings that are described
     throughout this manual.
     A configuration file may reside anywhere on the hard disk. Multiple
     configuration files are permitted. So, for example, you could have 
     a \fname{car.cfg} file for the settings that you use while playing your
-    jukebox in your car, and a headphones.cfg file to store the settings that
-    you use while listening to your jukebox through headphones.
+    jukebox in your car, and a \fname{headphones.cfg} file to store the 
+    settings that you use while listening to your \dap\ through headphones.
 
     The Rockbox configuration file is a plain text file, so once you use the
-    \emph{Write .cfg file} option to create the file, you can edit the file
+    \setting{Write .cfg file} option to create the file, you can edit the file
     on your computer using any text editor program. Configuration files use
     the following formatting rules:
     %
@@ -190,19 +192,19 @@ firmware versions.}
             into your configuration files.
       \end{enumerate}
 
-      Configuration files may be loaded using the Browse .cfg files option
-      on the Manage Settings menu.
+      Configuration files may be loaded using the \setting{Browse .cfg files}
+      option on the \setting{Manage Settings} menu.
 
     \note{Configuration files do not need to contain all of the Rockbox 
       options.  You can create configuration files that change only certain
-      settings. So, for example, let's say you typically use the \dap at one
+      settings. So, for example, supppose you typically use the \dap at one
       volume in the car, and another when using headphones.  Further,
       suppose you like to use an inverse LCD when you're in the car, and
       a regular LCD setting when you're using headphones.  You could create
       configuration files that control only the volume and LCD settings.
       Create a few different files with different settings, give each file
-      a different name (such as car.cfg, headphones.cfg, etc.), and you
-      can then use the \emph{Browse .cfg files} option to quickly change
-      settings.}
+      a different name (such as \fname{car.cfg}, \fname{headphones.cfg},
+      etc.), and you can then use the \setting{Browse .cfg files} option 
+      to quickly change settings.}
   \end{description}
 
