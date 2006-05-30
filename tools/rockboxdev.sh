@@ -173,7 +173,7 @@ fi
 echo "extracting binutils"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
 echo "extracting gcc"
-tar xf $dlwhere/gcc-$gccver.tar.bz2
+tar xjf $dlwhere/gcc-$gccver.tar.bz2
 
 if test -n "$gccpatch"; then
   echo "applying gcc patch"
