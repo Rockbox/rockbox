@@ -1832,6 +1832,10 @@ static bool commit(void)
     int i, len, rc;
     int tmpfd;
     int masterfd;
+#ifdef HAVE_DIRCACHE
+    bool dircache_buffer_stolen = false;
+#endif
+    bool local_allocation = false;
     
     logf("committing tagcache");
     
@@ -1864,12 +1868,18 @@ static bool commit(void)
     }
 
     /* Try to steal every buffer we can :) */
+    if (tempbuf_size == 0)
+        local_allocation = true;
+    
 #ifdef HAVE_DIRCACHE
     if (tempbuf_size == 0)
     {
         /* Try to steal the dircache buffer. */
         tempbuf = dircache_steal_buffer(&tempbuf_size);
         tempbuf_size &= ~0x03;
+        
+        if (tempbuf_size > 0)
+            dircache_buffer_stolen = true;
     }
 #endif    
     
@@ -1956,9 +1966,16 @@ static bool commit(void)
     logf("tagcache committed");
     remove(TAGCACHE_FILE_TEMP);
     
+    if (local_allocation)
+    {
+        tempbuf = NULL;
+        tempbuf_size = 0;
+    }
+    
 #ifdef HAVE_DIRCACHE
     /* Rebuild the dircache, if we stole the buffer. */
-    dircache_build(0);
+    if (dircache_buffer_stolen)
+        dircache_build(0);
 #endif
 
 #ifdef HAVE_TC_RAMCACHE

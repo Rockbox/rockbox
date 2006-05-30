@@ -37,12 +37,11 @@
 #include "kernel.h"
 #include "usb.h"
 #include "file.h"
+#include "buffer.h"
 
 /* Queue commands. */
 #define DIRCACHE_BUILD 1
 #define DIRCACHE_STOP  2
-
-extern char *audiobuf;
 
 #define MAX_OPEN_DIRS 8
 DIRCACHED opendirs[MAX_OPEN_DIRS];
@@ -667,6 +666,8 @@ void* dircache_steal_buffer(long *size)
 void dircache_init(void)
 {
     int i;
+    
+    dircache_initialized = false;
     
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
