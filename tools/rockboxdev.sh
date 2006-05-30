@@ -10,8 +10,9 @@ dlwhere="$HOME/tmp"
 # exists.
 prefix="/usr/local"
 
-# The binutils version to use
-binutils="2.16.1"
+# This directory is used to extract all files and to build everything in. It
+# must not exist before this script is invoked (as a security measure).
+builddir="$HOME/build-rbdev"
 
 ##############################################################################
 
@@ -76,6 +77,7 @@ fi
 
 echo "Download directory: $dlwhere (edit script to change dir)"
 echo "Install prefix: $prefix/[target] (edit script to change dir)"
+echo "Build dir: $builddir (edit script to change dir)"
 
 ###########################################################################
 # Verify that we can write in the prefix dir, as otherwise we will hardly
@@ -88,23 +90,26 @@ fi
 
 ###########################################################################
 # If there's already a build dir, we don't overwrite it
-if test -d build-rbdev; then
-  echo "you have a build-rbdev dir already, please remove and rerun"
+if test -d $builddir; then
+  echo "you have a $builddir dir already, please remove and rerun"
   exit
 fi
 
-echo ""
-echo "Select target arch:"
-echo "s. sh"
-echo "m. m68k"
-echo "a. arm"
+cleardir () {
+  # $1 is the name of the build dir
+  # delete the build dirs and the source dirs
+  rm -rf $1/build-gcc $1/build-binu $1/gcc* $1/binutils*
+}
 
-arch=`input`
+buildone () {
 
-case $arch in
+gccpatch="" # default is no gcc patch
+gccver="4.0.3" # default gcc version
+binutils="2.16.1" # The binutils version to use
+
+case $1 in
   [Ss])
     target="sh-elf"
-    gccver="4.0.3"
     gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
     gccpatch="gcc-4.0.3-rockbox-1.diff"
     ;;
@@ -114,7 +119,6 @@ case $arch in
     ;;
   [Aa])
     target="arm-elf"
-    gccver="4.0.3"
     ;;
   *)
     echo "unsupported"
@@ -123,20 +127,28 @@ case $arch in
 esac
 
 bindir="$prefix/$target/bin"
-echo "== Summary =="
-echo "Target: $target"
-echo "gcc $gccver"
-if test -n "$gccpatch"; then
-  echo "gcc patch $gccpatch"
+if test -n $pathadd; then
+  pathadd="$pathadd:$bindir"
+else
+  pathadd="$bindir"
 fi
-echo "binutils $binutils"
-echo "install in $prefix/$target"
 
-echo "when complete, make your PATH include $bindir"
+mkdir $builddir
+cd $builddir
 
-echo ""
-echo "press ENTER to start"
-read input
+summary="summary-$1"
+
+echo "== Summary ==" > $summary
+echo "Target: $target" >> $summary
+echo "gcc $gccver" >> $summary
+if test -n "$gccpatch"; then
+  echo "gcc patch $gccpatch" >> $summary
+fi
+echo "binutils $binutils" >> $summary
+echo "install in $prefix/$target" >> $summary
+echo "when complete, make your PATH include $bindir" >> $summary
+
+cat $summary
 
 if test -f "$dlwhere/binutils-$binutils.tar.bz2"; then
   echo "binutils $binutils already downloaded"
@@ -158,8 +170,6 @@ if test -n "$gccpatch"; then
   fi
 fi
 
-mkdir build-rbdev
-cd build-rbdev
 echo "extracting binutils"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
 echo "extracting gcc"
@@ -175,16 +185,59 @@ cd build-binu
 ../binutils-$binutils/configure --target=$target --prefix=$prefix/$target
 make
 make install
+cd .. # get out of build-binu
 PATH="${PATH}:$bindir"
 SHELL=/bin/sh # seems to be needed by the gcc build in some cases
 
-cd ../
 mkdir build-gcc
 cd build-gcc
 ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c
 make
 make install
+cd .. # get out of build-gcc
+cd .. # get out of $builddir
+
+  # end of buildone() function
+}
+
+echo ""
+echo "Select target arch:"
+echo "s   - sh"
+echo "m   - m68k"
+echo "a   - arm"
+echo "all - all three compilers"
+
+arch=`input`
+
+case $arch in
+  [Ss])
+    buildone $arch
+    ;;
+  [Mm])
+    buildone $arch
+    ;;
+  [Aa])
+    buildone $arch
+    ;;
+  all)
+    echo "build ALL compilers!"
+    buildone s
+    cleardir $builddir
+
+    buildone m
+    cleardir $builddir
+
+    buildone a
+
+    # show the summaries:
+    cat $builddir/summary-*
+    ;;
+  *)
+    echo "unsupported architecture option"
+    exit
+    ;;
+esac
 
 echo "done"
 echo ""
-echo "Set your PATH to point to $bindir"
+echo "Make your PATH include $pathadd"
