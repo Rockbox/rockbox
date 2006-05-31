@@ -433,6 +433,8 @@ bool pitch_screen(void)
             case PITCH_UP | BUTTON_REPEAT:
                 if ( pitch < 1990 )
                     pitch += 10;
+                else
+                    pitch = 2000;
                 sound_set_pitch(pitch);
                 break;
 
@@ -445,6 +447,8 @@ bool pitch_screen(void)
             case PITCH_DOWN | BUTTON_REPEAT:
                 if ( pitch > 510 )
                     pitch -= 10;
+                else
+                    pitch = 500;
                 sound_set_pitch(pitch);
                 break;
 
