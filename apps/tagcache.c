@@ -1879,7 +1879,10 @@ static bool commit(void)
         tempbuf_size &= ~0x03;
         
         if (tempbuf_size > 0)
+        {
             dircache_buffer_stolen = true;
+            stat.ramcache = false;
+        }
     }
 #endif    
     
