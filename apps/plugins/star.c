@@ -48,11 +48,11 @@ PLUGIN_HEADER
 #define STAR_TILE_SIZE   6
 
 /* values of object in the board */
-#define STAR_VOID       '.' 
-#define STAR_WALL       '*' 
-#define STAR_STAR       'o' 
-#define STAR_BALL       'X' 
-#define STAR_BLOCK      'x' 
+#define STAR_VOID       '.'
+#define STAR_WALL       '*'
+#define STAR_STAR       'o'
+#define STAR_BALL       'X'
+#define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
 #define STAR_SLEEP      1
@@ -102,10 +102,10 @@ PLUGIN_HEADER
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
 #define STAR_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define STAR_UP   BUTTON_SCROLL_BACK
-#define STAR_DOWN BUTTON_SCROLL_FWD
-#define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
-#define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
+#define STAR_UP   BUTTON_MENU
+#define STAR_DOWN BUTTON_PLAY
+#define STAR_TOGGLE_CONTROL_PRE BUTTON_SELECT
+#define STAR_TOGGLE_CONTROL (BUTTON_SELECT | BUTTON_REL)
 #define STAR_LEVEL_UP (BUTTON_SELECT | BUTTON_RIGHT)
 #define STAR_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_PLAY)
@@ -193,7 +193,7 @@ static int char_height = -1;
 static struct plugin_api* rb;
 
 /* this arrays contains a group of levels loaded into memory */
-static unsigned char* levels = 
+static unsigned char* levels =
 "****************\n"
 "*X**........o*x*\n"
 "*..........o.***\n"
@@ -476,7 +476,7 @@ static void star_display_text(char *str, bool waitkey)
                     case STAR_DOWN:
                         go_on = true;
                         break;
-                        
+
                     default:
                         if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
                         {
@@ -495,7 +495,7 @@ static void star_display_text(char *str, bool waitkey)
  * Do a pretty transition from one level to another.
  */
 static void star_transition_update(void)
-{ 
+{
     int center_x = LCD_WIDTH / 2;
     int lcd_demi_width = LCD_WIDTH / 2;
     int center_y = LCD_HEIGHT / 2;
@@ -638,7 +638,7 @@ static int star_run_game(void)
             {
                 case STAR_QUIT:
                     return 0;
-                
+
                 case BUTTON_LEFT:
                     move_x = -1;
                     break;
@@ -826,11 +826,11 @@ static int star_menu(void)
             case STAR_UP:
                 if (menu_y > 0)
                     move_y = -1;
-                break; 
+                break;
             case STAR_DOWN:
                 if (menu_y < 3)
                     move_y = 1;
-                break; 
+                break;
 
             case STAR_MENU_RUN:
 #ifdef STAR_MENU_RUN3
@@ -875,7 +875,7 @@ static int star_menu(void)
                 }
                 if (usb_detected)
                     return PLUGIN_USB_CONNECTED;
-                break; 
+                break;
 
             default:
                 if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
