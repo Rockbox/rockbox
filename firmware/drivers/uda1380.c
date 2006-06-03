@@ -265,7 +265,7 @@ void uda1380_disable_recording(void)
 void uda1380_set_recvol(int left, int right, int type)
 {
     int left_ag, right_ag;
-    int old_irq_level;
+    /*int old_irq_level;*/
 
     switch (type)
     {
@@ -273,11 +273,11 @@ void uda1380_set_recvol(int left, int right, int type)
             left_ag = MIN(MAX(0, left / 4), 15);
             left -= left_ag * 4;
             /* allow nothing in between the two calls */
-            old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+            /*old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);*/
             uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) 
                                         | VGA_GAIN(left_ag));
             uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(left));
-            set_irq_level(old_irq_level);
+            /*set_irq_level(old_irq_level);*/
             logf("Mic: %dA/%dD", left_ag, left);
         break;
         
@@ -287,11 +287,11 @@ void uda1380_set_recvol(int left, int right, int type)
             right_ag = MIN(MAX(0, right / 6), 8);
             right -= right_ag * 6;
             /* allow nothing in between the two calls */
-            old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+            /*old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);*/
             uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK)
                                         | PGA_GAINL(left_ag) | PGA_GAINR(right_ag));
             uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(right));
-            set_irq_level(old_irq_level);
+            /*set_irq_level(old_irq_level);*/
             logf("Line L: %dA/%dD", left_ag, left);
             logf("Line R: %dA/%dD", right_ag, right);
         break;
