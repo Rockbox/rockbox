@@ -265,8 +265,9 @@ unsigned char* get_ucs(const unsigned char* str, unsigned short* ch)
 bool done = false;
 int col = 0;
 
-#define ADVANCE_COUNTERS(c) do { width += glyph_width(c); k++; } while(0)
-#define LINE_IS_FULL ((k>MAX_COLUMNS-1) || (width > draw_columns))
+#define ADVANCE_COUNTERS(c) { width += glyph_width(c); k++; }
+#define LINE_IS_FULL ((k<MAX_COLUMNS-1) ||( width > draw_columns))
+#define LINE_IS_NOT_FULL ((k<MAX_COLUMNS-1) &&( width < draw_columns))
 static unsigned char* crop_at_width(const unsigned char* p)
 {
     int k,width;
@@ -275,7 +276,7 @@ static unsigned char* crop_at_width(const unsigned char* p)
 
     k=width=0;
 
-    while (!LINE_IS_FULL) {
+    while (LINE_IS_NOT_FULL) {
         oldp = p;
         p = get_ucs(p, &ch);
         ADVANCE_COUNTERS(ch);
@@ -738,7 +739,7 @@ static void viewer_draw(int col)
             if (col != -1) {
                 scratch_buffer[k] = 0;
                 endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                        prefs.encoding, k-col);
+                                        prefs.encoding, draw_columns/glyph_width('a'));
                 *endptr = 0;
             }
         }
@@ -836,18 +837,26 @@ static void viewer_draw(int col)
                 if (line_width > col) {
                     str = oldstr = line_begin;
                     k = col;
-                    while (k > draw_columns) {
+                    while (k > 0) {
                         str = crop_at_width(str);
-                        k -= draw_columns;
+                        k-=draw_columns;
                     }
+
+                    oldstr=line_begin=str;
+                    
                     width = 0;
-                    while (width <= k) {
-                        oldstr = str;
-                        str = get_ucs(str, &ch);
+                    while( (width<draw_columns) && (oldstr<line_end) )
+                    {
+                        oldstr = get_ucs(oldstr, &ch);
                         width += glyph_width(ch);
                     }
-                    endptr = rb->iso_decode(oldstr, utf8_buffer,
-                                            prefs.encoding, line_end-oldstr);
+
+                    if(prefs.view_mode==WIDE)
+                        endptr = rb->iso_decode(line_begin, utf8_buffer,
+                                            prefs.encoding, oldstr-line_begin);
+                    else
+                        endptr = rb->iso_decode(line_begin, utf8_buffer,
+                                            prefs.encoding, line_end-line_begin);
                     *endptr = 0;
                 }
         }
