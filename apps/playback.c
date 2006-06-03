@@ -964,6 +964,9 @@ static void audio_check_new_track(void)
     /* Move to the new track */
     cur_ti = &tracks[track_ridx];
 
+    if (automatic_skip)
+        playlist_end = false;
+
     track_changed = !automatic_skip;
 
     /* If it is not safe to even skip this many track entries */
@@ -2007,7 +2010,6 @@ static bool load_next_track(void) {
     {
         ci.new_track++;
         automatic_skip = true;
-        playlist_end = false;
     }
     
     cpu_boost(true);
@@ -2031,8 +2033,6 @@ static bool load_next_track(void) {
         case Q_CODEC_REQUEST_FAILED:
             ci.new_track = 0;
             ci.stop_codec = true;
-            if (automatic_skip)
-                playlist_end = true;
             return false;
         default:
             logf("Bad event on ccq");
