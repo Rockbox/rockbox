@@ -6,41 +6,86 @@
 Clock
 \par}
 
-This is a fully featured analogue and digital clock program.  
+This is a fully featured analogue and digital clock plugin.  
 
 \subsubsection{Key configuration}
 
 \begin{table}
 \begin{btnmap}{}{}
-F1 & Help \\
-F2 & Start / Stop stopwatch \\
-F2 (Hold) & Reset stopwatch \\
-F3 & Options \\
-Play & Select clock mode \\
-UP & Enable idle power off \\
-DOWN & Disable idle power off \\
-RIGHT & Enable backlight \\
-LEFT & Disable backlight \\
-OFF & Save settings to disk and exit \\
+    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    & Start / Stop Counter \\
+    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    (Hold) & Reset Counter \\
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IPOD_4G_PAD,IAUDIO_X5_PAD,IRIVER_H300_PAD}{\ButtonSelect}
+    & Main Menu \\
+    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Save Settings (if enabled) and Exit \\
 \end{btnmap}
 \end{table}
 
-\subsubsection{Backlight configuration}
-If RIGHT or LEFT is not pressed during clock operation (with the
-exception of at the Help/Options/Mode Selector/Credit screens) then the
-backlight timeout will remain your Rockbox default setting (example, 15
-seconds). If RIGHT or LEFT is pressed, Clock will set the backlight to
-ON or OFF, respectively. When Clock is exited, your default Rockbox
-setting for Backlight will be restored. 
+\textbf{Clock Menu}
+\begin{description}
+\item[View Clock] Exits the menu and returns to the current clock mode display.
+\item[Mode Selector] Opens a menu from which you can select a clock mode to view.
+\item[Counter Settings] Opens a menu from which you can adjust settings pertaining to the counter.
+\item[Mode Settings] Opens a menu from which you can adjust settings pertaining to the current clock mode.
+\item[General Settings]
+    \begin{description}
+    \item[Reset Settings]
+    Reset all settings to their default values.
+    \item[Save Settings]
+    Save all settings to disk.
+    \item[Show Counter]
+    Toggle Counter display.
+    \item[Save]
+    Choose whether to disable automatic saving, saving to disk on exit, or saving to disk every settings change.
+    \item[Backlight]
+    Choose whether to disable the backlight, use the user's timeout setting, or keep the backlight on.
+    \item[Idle Poweroff]
+    Toggle Idle Poweroff.
+    \note{This setting is not saved to disk.}
+    \end{description}
+\item[Help] Opens a brief help screen with key mappings and functionality.
+\item[Credits] Displays a credits roll.
+\end{description}
 
-\subsubsection{Saving Settings}
-Settings are saved to disk when Clock is exited. They are saved to
-\fname{/.rockbox/rocks/.clock\_settings}. To reset your settings
-back to the defaults, simply navigate to this file using Rockbox,
-highlight it, and press the ON+PLAY keys to get the Delete option. This way you can feel free to experiment with the settings {}- and you could even load
-separate settings, say, one for your desk at home and one for in the car {}- by keeping two files in your \fname{/.rockbox/rocks} folder such as
-``h.clock\_settings'' and ``c.clock\_settings''. Simply remove the
-``h'' for your home settings to go into effect, or add the ``h'' back and take off the ``c'' for your car settings.
+\subsubsection{Analog mode}
+Small, round, analog clock is displayed in the middle of the LCD.
+Time readout, if enabled, is displayed at the upper left.
+If Time readout is in 12-hour (``12h'') mode, AM or PM will be displayed at the upper right.
+The Date readout, if enabled, is displayed at the lower left.
+The Counter, if enabled, is displayed at the lower right.
+The second hand, if enabled, is displayed along with the hour and minute hands.
+Digit display, if enabled, places ``12'', ``3'', ``6'', and ``9'' around the face of the clock in their respective positions. 
 
-In the future, loading different settings will probably be made easier
-through a built{}-in settings file loader in Clock. 
+\subsubsection{Digital mode}
+An imitation of an LCD, this mode shows a Clock comprised of digital ``segments''.
+The Date readout, if enabled, is displayed at the bottom, center.
+The Second readout, if in ``Text'' mode, is displayed at the top, center; if in ``Bar'' mode, is displayed as a progress bar at the top of the LCD; if in ``Invert'' mode, will invert the LCD left-to-right as the seconds pass (a fully-inverted LCD means the entire minute has passed).
+The Counter, if displayed, is shown at the upper left.
+The Blinking Colon, if enabled, blinks the colon once every second.
+12-hour mode, if enabled, will display the time in a 12-hour format.
+
+\subsubsection{LCD mode}
+Based on the Digital Mode, the LCD mode is another imitation of an LCD.
+The settings available in this mode are exactly the same as Digital Mode, but they are independent of Digital Mode.
+For example, you can have the Date Readout enabled in Digital Mode and disabled in LCD Mode.
+
+\subsubsection{Fullscreen}
+A Fullscreen clock is displayed. Show Border, if enabled, will draw a small box at every hour position (1 through 12).
+Invert Seconds, if enabled, will invert the LCD as the seconds pass.
+Second Hand, if enabled, will draw a second hand among the hour and minute hands.
+
+\subsubsection{Binary mode}
+This mode shows a Binary clock.
+The hour is displayed on the top line, the minute is displayed on the middle line, and the seconds are on the last line.
+Circle mode, if enabled, draws empty and full circles, instead of zeros and ones.
+For help on reading binary, please visit: \url{http://en.wikipedia.org/wiki/Binary_numeral_system}
+
+\subsubsection{Plain mode}
+This mode shows a ``plain'' clock in large text that takes up nearly the whole LCD.
