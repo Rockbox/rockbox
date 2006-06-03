@@ -25,8 +25,10 @@ SDL_Surface* lcd_surface;
 int lcd_backlight_val;
 
 #if LCD_DEPTH <= 8
-SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
+#ifdef CONFIG_BACKLIGHT
 SDL_Color lcd_backlight_color_zero = {UI_LCD_BGCOLORLIGHT, 0};
+#endif
+SDL_Color lcd_color_zero = {UI_LCD_BGCOLOR, 0};
 SDL_Color lcd_color_max  = {0, 0, 0, 0};
 #endif
 
@@ -116,8 +118,13 @@ void sim_lcd_init(void)
 #endif
 
 #if LCD_DEPTH <= 8
+#ifdef CONFIG_BACKLIGHT
     sdl_set_gradient(lcd_surface, &lcd_backlight_color_zero, &lcd_color_max,
                      0, (1<<LCD_DEPTH));
+#else
+    sdl_set_gradient(lcd_surface, &lcd_color_zero, &lcd_color_max, 0, 
+                     (1<<LCD_DEPTH));
+#endif
 #endif
 }
 
