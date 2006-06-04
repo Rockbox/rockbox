@@ -104,7 +104,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 21
+#define PLUGIN_API_VERSION 22
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -520,6 +520,7 @@ struct plugin_api {
     bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
                     int* variable, void (*function)(int), int step, int min,
                     int max, void (*formatter)(char*, int, int, const char*) );
+    void (*reload_directory)(void);
 };
 
 /* plugin header */

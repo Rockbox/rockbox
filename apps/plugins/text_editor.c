@@ -223,6 +223,10 @@ void save_changes(int overwrite)
         return;
     }
 
+    if (!overwrite)
+        /* current directory may have changed */
+        rb->reload_directory();
+
     rb->lcd_clear_display();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(1);

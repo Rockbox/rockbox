@@ -441,6 +441,7 @@ static const struct plugin_api rockbox_api = {
     utf8seek,
     
     set_int,
+    reload_directory,
 };
 
 int plugin_load(const char* plugin, void* parameter)

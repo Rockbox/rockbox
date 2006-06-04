@@ -689,6 +689,7 @@ bool save_sudoku(struct sudoku_state_t* state)
         /* Add a blank line at end */
         rb->write(fd,"\r\n",2);
         rb->close(fd);
+        rb->reload_directory();
         /* Save a copy of the saved state - so we can reload without
            using the disk */
         rb->memcpy(state->savedboard,state->currentboard,81);
