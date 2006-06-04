@@ -27,8 +27,11 @@
     This setting is equivalent to the Backlight setting except it applies when
     the \dap\ is plugged into the charger. 
     \item[Caption Backlight:] 
-    This option turns the backlight on for 25 seconds either side of the 
-    start of a new track so that the display can be read to see song information.
+    This option turns on the backlight a number of seconds before the start
+    of a new track, and keeps it on for the same number of seconds after the
+    beginning so that the display can be read to see song information. The
+    amount of time is determined by the value of the backlight timeout
+    setting, but is no less than 5 seconds.
     \opt{h1xx,ipodnano,ipodcolour,ipodvideo}{
       \item[Backlight fade in:]
       The amount of time that the backlight will take to fade from off to on 
@@ -44,8 +47,10 @@
     With this option enabled the first keypress while the backlight is turned 
     off will only turn the backlight on without having any other effect. When
     disabled the first keypress will \emph{also} perform its appropriate action.
-    \item[Brightness:]
-      Changes the brightness of your LCD display.
+    \opt{h300}{
+      \item[Brightness:]
+        Changes the brightness of your LCD display.
+    }
     \item[Contrast:] 
     Changes the contrast of your LCD display. 
     \warn{Setting the contrast too dark or too light can make it hard to 
@@ -91,9 +96,11 @@
       \item[Backlight on When Plugged:]
         This controls the backlight when the \dap\ is plugged into the charger.
       \item[Caption Backlight:]
-        This option turns the backlight on for 25 seconds either side of the 
-        start of a new track so that the display can be read to see song 
-        information.
+      This option turns on the backlight a number of seconds before the start
+      of a new track, and keeps it on for the same number of seconds after the
+      beginning so that the display can be read to see song information. The
+      amount of time is determined by the value of the backlight timeout 
+      setting, but is no less than 5 seconds. 
       \opt{h1xx,ipodnano,ipodcolour,ipodvideo}{
         \item[First Keypress Enables Backlight Only:]
           This controls what happens when you press a button on your remote 
