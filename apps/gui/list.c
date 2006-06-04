@@ -667,6 +667,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_PGUP | BUTTON_REPEAT:
             gui_synclist_select_previous_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
+            yield();
             return LIST_NEXT;
 #endif
 
@@ -676,6 +677,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGUP | BUTTON_REPEAT:
             gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
+            yield();
             return LIST_NEXT;
 #endif
 
@@ -685,6 +687,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_PGDN | BUTTON_REPEAT:
             gui_synclist_select_next_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
+            yield();
             return LIST_PREV;
 #endif
 
@@ -694,6 +697,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGDN | BUTTON_REPEAT:
             gui_synclist_select_next_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
+            yield();
             return LIST_PREV;
 #endif
     }
