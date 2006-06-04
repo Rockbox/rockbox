@@ -12,11 +12,21 @@ could not otherwise reach. The block cannot take ``o''s.
 
 \begin{table}
   \begin{btnmap}{}{}
+    \ButtonLeft
+        & Move Left\\
+    \ButtonRight
+        & Move Right\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+        & Move Up\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonPlay}
+        & Move Down\\ 
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
     \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
-        & Switch control\\
+        & Switch between circle and square\\
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode+\ButtonLeft}
