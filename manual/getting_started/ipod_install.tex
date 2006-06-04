@@ -1,21 +1,25 @@
+% $Id$ %
 \subsection{Installing the bootloader}
+\warn{These instructions are preliminary! Please check the wiki for up-to-date
+and improved installation instructions!}
+
   Installing the bootloader is the trickiest part of the installation.
   The process is different depending on your operating system, but before
   starting, connect the \dap\ to the computer using either an USB \fixme{or
   Firewire?} cable. Next, create a folder on the computer's harddrive and
   download the following file to that folder:
-\opt{ipodvideo}{\url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-video.bin}}
-\opt{ipodnano}{\url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-nano.bin}}
-\opt{ipodmini}{\url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-mini1g.bin} or \url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-mini1g.bin} depending on which generation your \dap\ is.\fixme{Describe how to identify 1/2G}}
-\opt{ipodcolor}{\url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-color.bin}}
-\opt{ipod4g}{\url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/bootloader-4g.bin}}
+  \opt{ipodvideo}{\wikilink{IpodInstallation/bootloader-video.bin}}
+  \opt{ipodnano}{\wikilink{IpodInstallation/bootloader-nano.bin}}
+  \opt{ipodmini}{\wikilink{IpodInstallation/bootloader-mini1g.bin} or 
+    \wikilink{IpodInstallation/bootloader-mini1g.bin} depending on which
+    generation your \dap\ is.\fixme{Describe how to identify 1/2G}}
+  \opt{ipodcolor}{\wikilink{IpodInstallation/bootloader-color.bin}}
+  \opt{ipod4g}{\wikilink{IpodInstallation/bootloader-4g.bin}}
 
   When that is done, proceed to the section below that matches the operating
   system on the computer.
-
   \note{These instructions all require you to have administrator rights
   on your computer, regardless of the operating system.}
-  
   \note{Rockbox only works on FAT32 partitions (called Windows formatted by
     Apple). So if your \dap\ is Mac formatted (HFS+), you should first convert
     it to FAT32. Information on how to do this can be found on the Rockbox
@@ -26,12 +30,9 @@
   \item Download the following two programs and save them in the folder just
     created. These programs will be used in the next steps:
     \begin{itemize}
-      \item \url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/ipodpatcher.exe}
-      \item \url{http://www.rockbox.org/twiki/pub/Main/IpodInstallation/ipod_fw.exe}
+      \item \wikilink{IpodInstallation/ipodpatcher.exe}
+      \item \wikilink{IpodInstallation/ipod_fw.exe}
     \end{itemize}
-    \fixme{Is this needed?}
-    These two programs are both licensed under the GPL, just like Rockbox
-    itself. The source can be downloaded from the Rockbox website.
   \item Locate the \dap\ by opening a commandprompt, change directory to the
     folder you created and run the following commands:
     \begin{verbatim}
@@ -58,10 +59,10 @@
     ipodpatcher -r N bootpartition.bin
     \end{verbatim}
 \opt{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware: \fixme{Formatting broken. Let's cause a break.}
+  \item Similarly, extract the Broadcom firmware: 
+  \fixme{Formatting broken. Let's cause a break.}
 }
 \optv{ipodvideo}{\verb|ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin|}
-
     \begin{verbatim}
     ipod_fw -g GEN -o rockboot.bin -i apple_os.bin bootloader-GEN.bin
     \end{verbatim}
@@ -72,21 +73,19 @@
     \end{verbatim}
 \end{enumerate}
 
-Now, proceed to \fixme{insert ref?} Installing the firmware.
+Now you can proceed installing the firmware itself.
 
 \subsubsection{Mac OS X users}
 \begin{enumerate}
   \item Download the following two programs and save them in the folder just
     created. These programs will be used in the next steps:
     \begin{itemize}
-      \item \url{http://www.rockbox.org/twiki/pub/Main/IpodInstallationFromMacOSX/diskdump}
-      \item \url{http://www.rockbox.org/twiki/pub/Main/IpodInstallationFromMacOSX/ipod_fw}
+      \item \wikilink{IpodInstallationFromMacOSX/diskdump}
+      \item \wikilink{IpodInstallationFromMacOSX/ipod_fw}
     \end{itemize}
     Start a Terminal and type navigate into the folder you created. Before
     you can continue, you need to ensure that Mac OS knows that the
-    \begin{verbatim}
-    	ipod_fw
-    \end{verbatim}
+    \fname{ipod\_fw}
     and diskdump files you downloaded are executable programs. To do this,
     type the following command:
     \begin{verbatim}
@@ -117,7 +116,8 @@ Now, proceed to \fixme{insert ref?} Installing the firmware.
     \begin{verbatim}
     ./diskdump -r /dev/disk1 bootpartition.bin
     \end{verbatim}
-    \note{You should keep a safe backup of this \fname{bootpartition.bin} file                                                                                                for use if you ever wish to either upgrade the Rockbox bootloader or
+    \note{You should keep a safe backup of this \fname{bootpartition.bin} file
+      for use if you ever wish to either upgrade the Rockbox bootloader or
       uninstall Rockbox from your iPod
     }
   \item Extract the Apple firmware from this partition image:
@@ -125,12 +125,14 @@ Now, proceed to \fixme{insert ref?} Installing the firmware.
     ./ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{verbatim}
 \opt{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware: \fixme{Formatting broken. Let's cause a break.}
+  \item Similarly, extract the Broadcom firmware: 
+  \fixme{Formatting broken. Let's cause a break.}
 }
 \optv{ipodvideo}{\verb|./ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin|}
 
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware \fixme{Substitute GEN with your \daps\ generation: color,video,nano,4g,mini1g,mini2g}:
+    firmware \fixme{Substitute GEN with your \daps\ generation:
+    color,video,nano,4g,mini1g,mini2g}:
     \begin{verbatim}
     ./ipod_fw -g GEN -o rockbox.bin -i apple_os.bin bootloader-GEN.bin
     \end{verbatim}
@@ -142,7 +144,7 @@ Now, proceed to \fixme{insert ref?} Installing the firmware.
     \end{verbatim}
 \end{enumerate}
 
-Now, proceed to \fixme{insert ref?} Installing the firmware.
+Now, proceed with installing the firmware itself.
 
 \subsubsection{Linux users}
 \begin{enumerate}
@@ -195,7 +197,8 @@ Device Boot      Start         End      Blocks   Id  System
     \begin{verbatim}
     dd if=/dev/sdb1 of=bootpartition.bin
     \end{verbatim}
-    \note{You should keep a safe backup of this \fname{bootpartition.bin} file                                                                                                for use if you ever wish to either upgrade the Rockbox bootloader or
+    \note{You should keep a safe backup of this \fname{bootpartition.bin} file
+      for use if you ever wish to either upgrade the Rockbox bootloader or
       uninstall Rockbox from your iPod
     }
   \item Extract the Apple firmware from this partition image:
@@ -203,12 +206,14 @@ Device Boot      Start         End      Blocks   Id  System
     ./ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{verbatim}
 \opt{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware: \fixme{Formatting broken. Let's cause a break.}
+  \item Similarly, extract the Broadcom firmware: 
+  \fixme{Formatting broken. Let's cause a break.}
 }
 \optv{ipodvideo}{\verb|./ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin|}
 
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware \fixme{Substitute GEN with your \daps\  generation: color,video,nano,4g,mini1g,mini2g}:
+    firmware \fixme{Substitute GEN with your \daps\  generation: 
+    color,video,nano,4g,mini1g,mini2g}:
     \begin{verbatim}
     ./ipod_fw -g GEN -o rockbox.bin -i apple_os.bin bootloader-GEN.bin
     \end{verbatim}
@@ -218,5 +223,5 @@ Device Boot      Start         End      Blocks   Id  System
     dd if=rockboot.bin of=/dev/sdb1
     \end{verbatim}
 \end{enumerate}
+Now you can install the firmware itself.
 
-Now, proceed to \fixme{insert ref?} Installing the firmware.
