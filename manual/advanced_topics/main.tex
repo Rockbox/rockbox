@@ -188,19 +188,22 @@ displaying images:
 	your display.
   }
 \end{enumerate}
-Example:
-\begin{verbatim}
-%X|background.bmp|
-%x|a|static_icon.bmp|50|50|
-%xl|b|rep_off.bmp|16|64|
-%xl|c|rep_all.bmp|16|64|
-%xl|d|rep_one.bmp|16|64|
-%xl|e|rep_shuffle.bmp|16|64|
-%?mm<%xdb|%xdc|%xdd|%xde>
-\end{verbatim}
-This example loads and displays a background image, and preloads four other
-images at the same x and y position. Which image to display is determined by
-the \%mm tag (the repeat mode).
+
+Example:\\
+\opt{HAVE_LCD_COLOR}{
+  \config{\%X|background.bmp|}\\
+}
+\config{
+  \%x|a|static\_icon.bmp|50|50|\\
+  \%xl|b|rep\_off.bmp|16|64|\\
+  \%xl|c|rep\_all.bmp|16|64|\\
+  \%xl|d|rep\_one.bmp|16|64|\\
+  \%xl|e|rep\_shuffle.bmp|16|64|\\
+  \%?mm<\%xdb|\%xdc|\%xdd|\%xde>\\
+}
+\opt{HAVE_LCD_COLOR}{This example loads and displays a background image.} Four
+images at the same x and y position are preloaded. Which image to display is 
+determined by the \%mm tag (the repeat mode).
 
 \subsubsection{Example File}
 \begin{verbatim}
