@@ -410,11 +410,19 @@ next_track:
     }
 
     firstblockposn = 1024 - n;
-    ci->advance_buffer(firstblockposn);
+    
+    if (ci->id3->offset > (uint32_t) firstblockposn) {
+        /* Round down to previous block */
+        uint32_t offset = ci->id3->offset - ci->id3->offset % blockalign;
+
+        ci->advance_buffer(offset);
+        bytesdone = offset - firstblockposn;
+    } else {
+        ci->advance_buffer(firstblockposn);
+        bytesdone = 0;
+    }
 
     /* The main decoder loop */
-    bytesdone = 0;
-    ci->set_elapsed(0);
     endofstream = 0;
     /* chunksize is computed so that one chunk is about 1/50s.
      * this make 4096 for 44.1kHz 16bits stereo.

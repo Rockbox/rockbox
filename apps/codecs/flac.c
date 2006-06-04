@@ -193,12 +193,12 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
 */
 bool flac_seek(FLACContext* fc, uint32_t newsample) {
   uint32_t offset;
-  int i;
 
   if (nseekpoints==0) {
-      offset=0;
+      /* No seekpoints = no seeking */
+      return false;
   } else {
-      i=nseekpoints-1;
+      int i=nseekpoints-1;
       while ((i > 0) && (seekpoints[i].sample > newsample)) {
           i--;
       }
@@ -210,13 +210,33 @@ bool flac_seek(FLACContext* fc, uint32_t newsample) {
       }
   }
 
-  offset+=fc->metadatalength;
+  return ci->seek_buffer(offset+fc->metadatalength);
+}
 
-  if (ci->seek_buffer(offset)) {
-      return true;
-  } else {
+/* A very simple seek implementation - seek to the seekpoint before
+   the target offset.
+
+   This needs to be improved to seek with greater accuracy
+*/
+bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
+  if (nseekpoints==0) {
+      /* No seekpoints = no seeking */
       return false;
+  } else {
+      offset-=fc->metadatalength;
+      int i=nseekpoints-1;
+      while ((i > 0) && (seekpoints[i].offset > offset)) {
+          i--;
+      }
+
+      if ((i==0) && (seekpoints[i].offset > offset)) {
+          offset=0;
+      } else {
+          offset=seekpoints[i].offset;
+      }
   }
+
+  return ci->seek_buffer(offset+fc->metadatalength);
 }
 
 /* this is the codec entry point */
@@ -249,6 +269,9 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(FLAC_OUTPUT_DEPTH-1));
 
     next_track:
+        
+    /* Need to save offset for later use (cleared indirectly by flac_init) */
+    samplesdone=ci->id3->offset;
 
     if (codec_init(api)) {
         LOGF("FLAC: Error initialising codec\n");
@@ -262,14 +285,18 @@ enum codec_status codec_start(struct codec_api* api)
         goto done;
     }
 
-    while (!*ci->taginfo_ready)
-        ci->yield();
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
     
     ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
     codec_set_replaygain(ci->id3);
 
+    if (samplesdone) {
+        flac_seek_offset(&fc, samplesdone);
+        samplesdone=0;
+    }
+
     /* The main decoding loop */
-    samplesdone=0;
     frame=0;
     buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
     while (bytesleft) {
