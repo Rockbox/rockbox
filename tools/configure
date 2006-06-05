@@ -996,9 +996,6 @@ fi
           recorderv2)
               archos="recorderv2fm"
               ;;
-          ondio??)
-              archos="ondio"
-              ;;
           h1??)
               archos="h1xx"
               ;;
