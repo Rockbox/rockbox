@@ -1,0 +1,8521 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+#    Esperanto Rockbox Translation
+#    By Marc-André Moreau (aghaster@hotmail.com)
+#    Original Release: 04/06/06
+#    Last Update: 04/06/06
+#    If updates or corrections are needed, message me.
+#    Se vi trovas erarojn, sendu mesaĝon al mi.
+
+<phrase>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "Jes"
+  </dest>
+  <voice>
+    *: "Jes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "Ne"
+  </dest>
+  <voice>
+    *: "Ne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "Jes"
+  </dest>
+  <voice>
+    *: "Jes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "Ne"
+  </dest>
+  <voice>
+    *: "Ne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_SETTING_ASK
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Ask"
+  </source>
+  <dest>
+    *: "Demandi"
+  </dest>
+  <voice>
+    *: "Demandi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS
+  desc: used in various places
+  user:
+  <source>
+    *: "Always"
+  </source>
+  <dest>
+    *: "Ĉiam"
+  </dest>
+  <voice>
+    *: "Ĉiam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Ŝarganta..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_SHUTDOWN
+  desc: in shutdown screen
+  user:
+  <source>
+    *: "Press OFF to shut down"
+  </source>
+  <dest>
+    *: "Pesu OFF por malŝalti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTTINGDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: "Shutting down..."
+  </source>
+  <dest>
+    *: "Malŝaltanta..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTARTING_PLAYBACK
+  desc: splash screen displayed when pcm buffer size is changed
+  user:
+  <source>
+    *: "Restarting playback..."
+  </source>
+  <dest>
+    *: "Restartanta la legon..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE_MMC
+  desc: before acknowledging usb in case an MMC is inserted (Ondio)
+  user:
+  <source>
+    *: "Please remove inserted MMC"
+  </source>
+  <dest>
+    *: "Retiru enmetata MMCan karton"
+  </dest>
+  <voice>
+    *: "Retiru enmetata MMCan karton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SETTING_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Malvalidigita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after actions
+  user:
+  <source>
+    *: "Failed"
+  </source>
+  <dest>
+    *: "Malsukcesita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recent Bookmarks"
+  </source>
+  <dest>
+    *: "Ĵusa Legosignoj"
+  </dest>
+  <voice>
+    *: "Ĵusa Legosignoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Sound Settings"
+  </source>
+  <dest>
+    *: "Sonaj Agordaĵoj"
+  </dest>
+  <voice>
+    *: "Sonaj Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "General Settings"
+  </source>
+  <dest>
+    *: "Ĝeneralaj Agordaĵoj"
+  </dest>
+  <voice>
+    *: "Ĝeneralaj Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MANAGE_MENU
+  desc: in the main menu
+  user:
+  <source>
+    *: "Manage Settings"
+  </source>
+  <dest>
+    *: "Administri Agordaĵojn"
+  </dest>
+  <voice>
+    *: "Administri Agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Foliumi Temojn"
+  </dest>
+  <voice>
+    *: "Foliumi Temojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_RADIO
+  desc: in the main menu
+  user:
+  <source>
+    *: "FM Radio"
+  </source>
+  <dest>
+    *: "FMa Radio"
+  </dest>
+  <voice>
+    *: "FMa Radio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording"
+  </source>
+  <dest>
+    *: "Rikordanta"
+  </dest>
+  <voice>
+    *: "Rikordanta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_MENU
+  desc: in the main menu
+  user:
+  <source>
+    *: "Playlist Options"
+  </source>
+  <dest>
+    *: "Leglista Opcioj"
+  </dest>
+  <voice>
+    *: "Leglista Opcioj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGINS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Plugins"
+  </source>
+  <dest>
+    *: "Foliumi Kromprogramojn"
+  </dest>
+  <voice>
+    *: "Foliumi Kromprogramojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO
+  desc: in the main menu
+  user:
+  <source>
+    *: "Info"
+  </source>
+  <dest>
+    *: "Informoj"
+  </dest>
+  <voice>
+    *: "Informoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUTDOWN
+  desc: in main menu
+  user:
+  <source>
+    *: "Shut down"
+  </source>
+  <dest>
+    *: "Malŝalti"
+  </dest>
+  <voice>
+    *: "Malŝalti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Volume"
+  </source>
+  <dest>
+    *: "Volumeno"
+  </dest>
+  <voice>
+    *: "Volumeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BASS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Bass"
+  </source>
+  <dest>
+    *: "Baso"
+  </dest>
+  <voice>
+    *: "Baso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Treble"
+  </source>
+  <dest>
+    *: "Akuto"
+  </dest>
+  <voice>
+    *: "Akuto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Balance"
+  </source>
+  <dest>
+    *: "Saldo"
+  </dest>
+  <voice>
+    *: "Saldo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MENU
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Kanaloj"
+  </dest>
+  <voice>
+    *: "Kanaloj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Channel Configuration"
+  </source>
+  <dest>
+    *: "Kanala Formo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereofonia"
+  </dest>
+  <voice>
+    *: "Stereofonia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Monofonia"
+  </dest>
+  <voice>
+    *: "Monofonia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_CUSTOM
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Custom"
+  </source>
+  <dest>
+    *: "Laŭplaĉiga"
+  </dest>
+  <voice>
+    *: "Laŭplaĉiga"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Left"
+  </source>
+  <dest>
+    *: "Maldekstra Monofonia"
+  </dest>
+  <voice>
+    *: "Maldekstra Monofonia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono Right"
+  </source>
+  <dest>
+    *: "Dekstra Monofonia"
+  </dest>
+  <voice>
+    *: "Dekstra Monofonia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Karaoke"
+  </source>
+  <dest>
+    *: "Karaokeo"
+  </dest>
+  <voice>
+    *: "Karaokeo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STEREO_WIDTH
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo Width"
+  </source>
+  <dest>
+    *: "Stereofonia Larĝo"
+  </dest>
+  <voice>
+    *: "Stereofonia Larĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Loudness"
+  </source>
+  <dest>
+    *: "Laŭto"
+  </dest>
+  <voice>
+    *: "Laŭto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Auto Volume"
+  </source>
+  <dest>
+    *: "Aŭtomata Volumeno"
+  </dest>
+  <voice>
+    *: "Aŭtomata Volumeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user:
+  <source>
+    *: "AV Decay Time"
+  </source>
+  <dest>
+    *: "Averaĝa Kadukiĝa Tempo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SUPERBASS
+  desc: in sound settings
+  user:
+  <source>
+    *: "Super Bass"
+  </source>
+  <dest>
+    *: "Supra Baso"
+  </dest>
+  <voice>
+    *: "Supra Baso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_ENABLE
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Enable"
+  </source>
+  <dest>
+    *: "MDB Ebligi"
+  </dest>
+  <voice>
+    *: "MDB Ebligi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_STRENGTH
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Strength"
+  </source>
+  <dest>
+    *: "MDB Forto"
+  </dest>
+  <voice>
+    *: "MDB Forto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_HARMONICS
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Harmonics"
+  </source>
+  <dest>
+    *: "MDB Harmonoj"
+  </dest>
+  <voice>
+    *: "MDB Harmonoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_CENTER
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Center Frequency"
+  </source>
+  <dest>
+    *: "MDB Centra Frekvenco"
+  </dest>
+  <voice>
+    *: "MDB Center Frekvenco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MDB_SHAPE
+  desc: in sound settings
+  user:
+  <source>
+    *: "MDB Shape"
+  </source>
+  <dest>
+    *: "MDB Formo"
+  </dest>
+  <voice>
+    *: "MDB Formo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user:
+  <source>
+    *: "Crossfeed"
+  </source>
+  <dest>
+    *: "Transmikso"
+  </dest>
+  <voice>
+    *: "Transmikso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Egalilo"
+  </dest>
+  <voice>
+    *: "Egalilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Playback"
+  </source>
+  <dest>
+    *: "Lego"
+  </dest>
+  <voice>
+    *: "Lego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "File View"
+  </source>
+  <dest>
+    *: "Foliumilo"
+  </dest>
+  <voice>
+    *: "Foliumilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Display"
+  </source>
+  <dest>
+    *: "Vidigo"
+  </dest>
+  <voice>
+    *: "Vidigo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSTEM
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "System"
+  </source>
+  <dest>
+    *: "Sistemo"
+  </dest>
+  <voice>
+    *: "Sistemo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS
+  desc: in general settings
+  user:
+  <source>
+    *: "Bookmarking"
+  </source>
+  <dest>
+    *: "Legosignoj"
+  </dest>
+  <voice>
+    *: "Legosignoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Language"
+  </source>
+  <dest>
+    *: "Lingvo"
+  </dest>
+  <voice>
+    *: "Lingvo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE
+  desc: root of voice menu
+  user:
+  <source>
+    *: "Voice"
+  </source>
+  <dest>
+    *: "Voĉo"
+  </dest>
+  <voice>
+    *: "Voĉo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user:
+  <source>
+    *: "Browse .cfg files"
+  </source>
+  <dest>
+    *: "Foliumi .cfg dosierojn"
+  </dest>
+  <voice>
+    *: "Foliumi formoj dosierojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FIRMWARE
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Firmwares"
+  </source>
+  <dest>
+    *: "Foliumi Firmvarojn"
+  </dest>
+  <voice>
+    *: "Foliumi Firmvarojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Reset Settings"
+  </source>
+  <dest>
+    *: "Refari Agordaĵojn"
+  </dest>
+  <voice>
+    *: "Refari Agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_ASK_RECORDER
+  desc: confirm to reset settings
+  user:
+  <source>
+    *: "Are You Sure?"
+  </source>
+  <dest>
+    *: "Ĉu vi estas certa?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONFIRM_WITH_PLAY_RECORDER
+  desc: Generic recorder string to use to confirm
+  user:
+  <source>
+    *: "PLAY = Yes"
+  </source>
+  <dest>
+    *: "LEGI = Jes"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_WITH_ANY_RECORDER
+  desc: Generic recorder string to use to cancel
+  user:
+  <source>
+    *: "Any Other = No"
+  </source>
+  <dest>
+    *: "Alia Ajn = Ne"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_SETTING
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Settings"
+  </source>
+  <dest>
+    *: "Agordaĵoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user:
+  <source>
+    *: "Cleared"
+  </source>
+  <dest>
+    *: "Agordaĵoj Rekomencvalorizita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_DONE_CANCEL
+  desc: Visual confirmation of cancelation
+  user:
+  <source>
+    *: "Canceled"
+  </source>
+  <dest>
+    *: "Malvalidigita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user:
+  <source>
+    *: "Write .cfg file"
+  </source>
+  <dest>
+    *: "Surdiskigu nunan agordaĵojn"
+  </dest>
+  <voice>
+    *: "Surdiskigu nunan agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_PLAYER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Surdiskigo Malsukcesis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_PLAYER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "Partition?"
+  </source>
+  <dest>
+    *: "Apartigi?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVE_RECORDER
+  desc: displayed if save settings has failed
+  user:
+  <source>
+    *: "Save Failed"
+  </source>
+  <dest>
+    *: "Surdiskigo Malsukcesis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_BATTERY_RECORDER
+  desc: if save settings has failed
+  user:
+  <source>
+    *: "No partition?"
+  </source>
+  <dest>
+    *: "Neniu apartigo?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_MENU
+  desc: in the recording sub menu
+  user:
+  <source>
+    *: "Recording Screen"
+  </source>
+  <dest>
+    *: "Rikordanta Ekrano"
+  </dest>
+  <voice>
+    *: "Rikordanta Ekrano"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SETTINGS
+  desc: in the main menu
+  user:
+  <source>
+    *: "Recording Settings"
+  </source>
+  <dest>
+    *: "Registranta Agordaĵojn"
+  </dest>
+  <voice>
+    *: "Registranta Agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Ebligi EQ"
+  </dest>
+  <voice>
+    *: "Ebligi egalilon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Grafika EQ"
+  </dest>
+  <voice>
+    *: "Grafika egalilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Antaŭtranĉo"
+  </dest>
+  <voice>
+    *: "Antaŭtranĉo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Simpla EQ Agordaĵoj"
+  </dest>
+  <voice>
+    *: "Simpla egalilo Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Progresinta EQ Agordaĵoj"
+  </dest>
+  <voice>
+    *: "Progresinta EQ Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Surdiskigi EQ Agordaĵojn"
+  </dest>
+  <voice>
+    *: "Surdiskigi egalilon Agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Foliumi EQ Agordaĵojn"
+  </dest>
+  <voice>
+    *: "Foliumi EQ Agordaĵojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Eldona Reĝimo: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "%d Hz Strio Gajno"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Malakuta Filtrilo"
+  </dest>
+  <voice>
+    *: "Malakuta Filtrilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Pinta Filtrilo %d"
+  </dest>
+  <voice>
+    *: "Pinta filtrilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "Akuta Filtrilo"
+  </dest>
+  <voice>
+    *: "Akuta Filtrilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Tranĉa Frekvenco"
+  </dest>
+  <voice>
+    *: "Tranĉa Frekvenco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Center Frequency"
+  </source>
+  <dest>
+    *: "Centro Frekvenco"
+  </dest>
+  <voice>
+    *: "Centro Frekvenco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Q"
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Gajno"
+  </dest>
+  <voice>
+    *: "Gajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_PLAYLIST
+  desc: Menu option for creating a playlist
+  user:
+  <source>
+    *: "Create Playlist"
+  </source>
+  <dest>
+    *: "Krei Legliston"
+  </dest>
+  <voice>
+    *: "Krei Legliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "View Current Playlist"
+  </source>
+  <dest>
+    *: "Vidi Nunan Legliston"
+  </dest>
+  <voice>
+    *: "Vidi Nunan Legliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_DYNAMIC_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Save Current Playlist"
+  </source>
+  <dest>
+    *: "Surdiskigi Nunan Legliston"
+  </dest>
+  <voice>
+    *: "Surdiskigi Nunan Legliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY
+  desc: In playlist menu
+  user:
+  <source>
+    *: "Recursively Insert Directories"
+  </source>
+  <dest>
+    *: "Rikure Enŝovi Dosierujojn"
+  </dest>
+  <voice>
+    *: "Rikure Enŝovi Dosierujojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Avertu Antaŭ Forpreni Dinamikan Legliston"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INFO_MENU
+  desc: in the info menu
+  user:
+  <source>
+    *: "Rockbox Info"
+  </source>
+  <dest>
+    *: "Rockbox Informoj"
+  </dest>
+  <voice>
+    *: "Rockbox Informoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VERSION
+  desc: in the info menu
+  user:
+  <source>
+    *: "Version"
+  </source>
+  <dest>
+    *: "Versio"
+  </dest>
+  <voice>
+    *: "Versio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEBUG
+  desc: in the info menu
+  user:
+  <source>
+    *: "Debug (Keep Out!)"
+  </source>
+  <dest>
+    *: "Erarserĉilo (Atentu!)"
+  </dest>
+  <voice>
+    *: "Erarserĉilo, atentu!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB
+  desc: in the info menu
+  user:
+  <source>
+    *: "USB (Sim)"
+  </source>
+  <dest>
+    *: "USB (Sim)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "Miksata"
+  </dest>
+  <voice>
+    *: "Miksata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Ripeti"
+  </dest>
+  <voice>
+    *: "Ripeti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Ĉiuj"
+  </dest>
+  <voice>
+    *: "Ĉiuj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "Unu"
+  </dest>
+  <voice>
+    *: "Unu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_AB
+  desc: repeat one song
+  user:
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "A-B"
+  </dest>
+  <voice>
+    *: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Play Selected First"
+  </source>
+  <dest>
+    *: "Ludu Selektita Unue"
+  </dest>
+  <voice>
+    *: "Ludu Selektita Unue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Resume on Startup"
+  </source>
+  <dest>
+    *: "Aŭtomata Lega Rekomenco Dum Starto"
+  </dest>
+  <voice>
+    *: "Aŭtomata Lega Rekomenco Dum Starto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WIND_MENU
+  desc: in the playback sub menu
+  user:
+  <source>
+    *: "Fast-Forward/Rewind"
+  </source>
+  <dest>
+    *: "Rapidantaŭen/Rapidmalantaŭen"
+  </dest>
+  <voice>
+    *: "Rapidantaŭen aŭ Rapidantaŭen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MP3BUFFER_MARGIN
+  desc: MP3 buffer margin time
+  user:
+  <source>
+    *: "Anti-Skip Buffer"
+  </source>
+  <dest>
+    *: "Anti-Salta Bufro"
+  </dest>
+  <voice>
+    *: "Anti-Salta Bufro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user:
+  <source>
+    *: "Fade on Stop/Pause"
+  </source>
+  <dest>
+    *: "Fadu dum Stopo/Paŭzo"
+  </dest>
+  <voice>
+    *: "Fadu dum Stopo/Paŭzo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Festa Reĝimo"
+  </dest>
+  <voice>
+    *: "Festa Reĝimo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE
+  desc: in playback settings
+  user:
+  <source>
+    *: "Crossfade"
+  </source>
+  <dest>
+    *: "Transfado"
+  </dest>
+  <voice>
+    *: "Transfado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain"
+  </source>
+  <dest>
+    *: "Reluda Gajno"
+  </dest>
+  <voice>
+    *: "Reluda Gajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BEEP
+  desc: in playback settings
+  user:
+  <source>
+    *: "Beep Volume"
+  </source>
+  <dest>
+    *: "Bipa Volumeno"
+  </dest>
+  <voice>
+    *: "Bipa Volumeno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEAK
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Weak"
+  </source>
+  <dest>
+    *: "Malforta"
+  </dest>
+  <voice>
+    *: "Malforta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODERATE
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Moderate"
+  </source>
+  <dest>
+    *: "Meza"
+  </dest>
+  <voice>
+    *: "Meza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRONG
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Strong"
+  </source>
+  <dest>
+    *: "Forta"
+  </dest>
+  <voice>
+    *: "Forta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPDIF_ENABLE
+  desc: in playback settings menu. enable/disable the optical out
+  user:
+  <source>
+    *: "Optical Output"
+  </source>
+  <dest>
+    *: "Cifereca Eligo"
+  </dest>
+  <voice>
+    *: "Cifereca Eligo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ORDER
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "ID3 Tag Priority"
+  </source>
+  <dest>
+    *: "ID3a Etikedo Prioritato"
+  </dest>
+  <voice>
+    *: "ID3a Etikedo Prioritato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V1_FIRST
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "V1 then V2"
+  </source>
+  <dest>
+    *: "V1 poste V2"
+  </dest>
+  <voice>
+    *: "Versio unu poste versio du"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_V2_FIRST
+  desc: in playback settings screen
+  user:
+  <source>
+    *: "V2 then V1"
+  </source>
+  <dest>
+    *: "V2 poste V1"
+  </dest>
+  <voice>
+    *: "Versio du poste versio unu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_FOLDER
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+  user:
+  <source>
+    *: "Auto-Change Directory"
+  </source>
+  <dest>
+    *: "Aŭtomata Dosierujo Ŝanĝo"
+  </dest>
+  <voice>
+    *: "Aŭtomata Dosierujo Ŝanĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Etikedo de Kaŝmemoro"
+  </dest>
+  <voice>
+    *: "Etikedo de Kaŝmemoro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Keep on Disk"
+  </source>
+  <dest>
+    *: "Ŝargi el Durdisko"
+  </dest>
+  <voice>
+    *: "Ŝargi el Durdisko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Ŝargi al Ĉefmemoron"
+  </dest>
+  <voice>
+    *: "Ŝargi al Ĉefmemoron"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Force Tag Cache Update"
+  </source>
+  <dest>
+    *: "Devigi Aktualigon de Etikedo Kaŝmemoro"
+  </dest>
+  <voice>
+    *: "Devigi Aktualigon de Etikedo Kaŝmemoro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Fona Aktualigo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Surdiskiganta Kaŝmemoron de Etikedo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNTIMEDB_ACTIVE
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Gather Runtime Data (experimental)"
+  </source>
+  <dest>
+    *: "Kolekti Rultempan Datumon (Eksperimenta)"
+  </dest>
+  <voice>
+    *: "Kolekti Rultempan Datumon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Sort Case Sensitive"
+  </source>
+  <dest>
+    *: "Ordigi Usklecodistinga"
+  </dest>
+  <voice>
+    *: "Ordigi Usklecodistinga"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Directories"
+  </source>
+  <dest>
+    *: "Ordigi Dosierujojn"
+  </dest>
+  <voice>
+    *: "Ordigi Dosierujojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Sort Files"
+  </source>
+  <dest>
+    *: "Ordigi Dosierojn"
+  </dest>
+  <voice>
+    *: "Ordigi Dosierojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALPHA
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "Alphabetical"
+  </source>
+  <dest>
+    *: "Alfabete"
+  </dest>
+  <voice>
+    *: "Alfabete"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Date"
+  </source>
+  <dest>
+    *: "Date"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_DATE_REVERSE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Newest Date"
+  </source>
+  <dest>
+    *: "Freŝdate"
+  </dest>
+  <voice>
+    *: "Freŝdate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user:
+  <source>
+    *: "By Type"
+  </source>
+  <dest>
+    *: "Tipe"
+  </dest>
+  <voice>
+    *: "Tipe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show Files"
+  </source>
+  <dest>
+    *: "Montri Dosierojn"
+  </dest>
+  <voice>
+    *: "Montri Dosierojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ALL
+  desc: show all files
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Ĉiuj"
+  </dest>
+  <voice>
+    *: "Ĉiuj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "Subtenata"
+  </dest>
+  <voice>
+    *: "Subtenata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "Muziko"
+  </dest>
+  <voice>
+    *: "Muziko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_PLAYLIST
+  desc: show only playlist
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "Leglistoj"
+  </dest>
+  <voice>
+    *: "Leglistoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_ID3DB
+  desc: show ID3 Database
+  user:
+  <source>
+    *: "ID3 Database"
+  </source>
+  <dest>
+    *: "ID3a Datumbazo"
+  </dest>
+  <voice>
+    *: "ID3a Datumbazo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Follow Playlist"
+  </source>
+  <dest>
+    *: "Laŭ Leglisto"
+  </dest>
+  <voice>
+    *: "Laŭ Leglisto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ICONS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Icons"
+  </source>
+  <dest>
+    *: "Montri Piktogramojn"
+  </dest>
+  <voice>
+    *: "Montri Piktogramojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_FONT
+  desc: in setting_menu()
+  user:
+  <source>
+    *: "Browse Fonts"
+  </source>
+  <dest>
+    *: "Foliumi Tiparojn"
+  </dest>
+  <voice>
+    *: "Foliumi Tiparojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .wps files"
+  </source>
+  <dest>
+    *: "Foliumi .wps dosierojn"
+  </dest>
+  <voice>
+    *: "Foliumi dum-legi-ekrana dosierojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .rwps files"
+  </source>
+  <dest>
+    *: "Foliumi .rwps dosierojn"
+  </dest>
+  <voice>
+    *: "Foliumi fora dum-legi-ekrana dosierojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "LCD Settings"
+  </source>
+  <dest>
+    *: "LCD Agordaĵoj"
+  </dest>
+  <voice>
+    *: "LCD Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_REMOTE_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "Remote-LCD Settings"
+  </source>
+  <dest>
+    *: "Fora-LCD Agordaĵoj"
+  </dest>
+  <voice>
+    *: "Fora-LCD Agordaĵoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scrolling"
+  </source>
+  <dest>
+    *: "Rulumo"
+  </dest>
+  <voice>
+    *: "Rulumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BARS_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "Status-/Scrollbar"
+  </source>
+  <dest>
+    *: "Stato-/Rulumskalo"
+  </dest>
+  <voice>
+    *: "Stato kaj Rulumskalo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user:
+  <source>
+    *: "Peak Meter"
+  </source>
+  <dest>
+    *: "Pintoskalo"
+  </dest>
+  <voice>
+    *: "Pintoskalo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user:
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Aŭtomata Kodopaĝo"
+  </dest>
+  <voice>
+    *: "Aŭtomata Kodopaĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Latino1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: "Latino 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Greko (ISO-8859-7)"
+  </dest>
+  <voice>
+    *: "Greko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: "Hebreo (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: "Hebreo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Cirilo (CP1251)"
+  </dest>
+  <voice>
+    *: "Cirilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: "Tajo (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: "Tajo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: "Arabo (CP1256)"
+  </dest>
+  <voice>
+    *: "Arabo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Turko(ISO-8859-9)"
+  </dest>
+  <voice>
+    *: "Turko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Latino Ampleksa (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "Latino Ampleksa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: "Japano (SJIS)"
+  </dest>
+  <voice>
+    *: "Japano"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: "Simpligata Ĉino (GB2312)"
+  </dest>
+  <voice>
+    *: "Simpligata Ĉino"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: "Koreujo (KSX1001)"
+  </dest>
+  <voice>
+    *: "Koreujo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: "Tradicia Ĉino (BIG5)"
+  </dest>
+  <voice>
+    *: "Tradicia Ĉino"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unikodo (UTF-8)"
+  </dest>
+  <voice>
+    *: "Unikodo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Battery"
+  </source>
+  <dest>
+    *: "Baterio"
+  </dest>
+  <voice>
+    *: "Baterio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Disk"
+  </source>
+  <dest>
+    *: "Durdisko"
+  </dest>
+  <voice>
+    *: "Durdisko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Time & Date"
+  </source>
+  <dest>
+    *: "Tempo kaj Dato"
+  </dest>
+  <voice>
+    *: "Tempo kaj Dato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Idle Poweroff"
+  </source>
+  <dest>
+    *: "Malŝalti pro Neaktivo"
+  </dest>
+  <voice>
+    *: "Malŝalti pro Neaktivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER
+  desc: sleep timer setting
+  user:
+  <source>
+    *: "Sleep Timer"
+  </source>
+  <dest>
+    *: "Malŝalta Horloĝo"
+  </dest>
+  <voice>
+    *: "Malŝalta Horloĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Wake-Up Alarm"
+  </source>
+  <dest>
+    *: "Vekalarmo"
+  </dest>
+  <voice>
+    *: "Vekalarmo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMITS_MENU
+  desc: in the system sub menu
+  user:
+  <source>
+    *: "Limits"
+  </source>
+  <dest>
+    *: "Limoj"
+  </dest>
+  <voice>
+    *: "Limoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LINE_IN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Analoga Enigaĵo"
+  </dest>
+  <voice>
+    *: "Analoga Enigaĵo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE
+  desc: Displayed for setting car adapter mode to on/off
+  user:
+  <source>
+    *: "Car Adapter Mode"
+  </source>
+  <dest>
+    *: "Aŭtomobilo Adaptinto Reĝimo"
+  </dest>
+  <voice>
+    *: "Aŭtomobilo Adaptinto Reĝimo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Bookmark on Stop"
+  </source>
+  <dest>
+    *: "Legosigni dum Stopo"
+  </dest>
+  <voice>
+    *: "Legosigni dum Stopo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Yes - Recent only"
+  </source>
+  <dest>
+    *: "Jes - Nur freŝa"
+  </dest>
+  <voice>
+    *: "Jes - Nur freŝa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user:
+  <source>
+    *: "Ask - Recent only"
+  </source>
+  <dest>
+    *: "Demandi - Nur freŝa"
+  </dest>
+  <voice>
+    *: "Demandi - Nur freŝa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+  desc: prompt for user to decide to create a bookmark
+  user:
+  <source>
+    *: "Load Last Bookmark"
+  </source>
+  <dest>
+    *: "Ŝargi Lastan Legosignon"
+  </dest>
+  <voice>
+    *: "Ŝargi Lastan Legosignon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+  desc: Configuration option to maintain a list of recent bookmarks
+  user:
+  <source>
+    *: "Maintain a List of Recent Bookmarks?"
+  </source>
+  <dest>
+    *: "Konservi Listo da Freŝaj Legosignoj?"
+  </dest>
+  <voice>
+    *: "Konservi Listo da Freŝaj Legosignoj?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+  desc: Save only on bookmark for each playlist in recent bookmarks
+  user:
+  <source>
+    *: "Unique only"
+  </source>
+  <dest>
+    *: "Nur unika"
+  </dest>
+  <voice>
+    *: "Nur unika"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user:
+  <source>
+    *: "Voice Menus"
+  </source>
+  <dest>
+    *: "Voĉaj Menuoj"
+  </dest>
+  <voice>
+    *: "Voĉaj Menuoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR
+  desc: item of voice menu, set the "talkbox" mode for directories
+  user:
+  <source>
+    *: "Voice Directories"
+  </source>
+  <dest>
+    *: "Voĉaj Dosierujoj"
+  </dest>
+  <voice>
+    *: "Voĉaj Dosierujoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_FILE
+  desc: item of voice menu, set the voive mode for files
+  user:
+  <source>
+    *: "Voice Filenames"
+  </source>
+  <dest>
+    *: "Voĉaj Dosiernomoj"
+  </dest>
+  <voice>
+    *: "Voĉaj Dosiernomoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_NUMBER
+  desc: "talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Numbers"
+  </source>
+  <dest>
+    *: "Nombroj"
+  </dest>
+  <voice>
+    *: "Nombroj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_SPELL
+  desc: "talkbox" mode for files+directories
+  user:
+  <source>
+    *: "Spell"
+  </source>
+  <dest>
+    *: "Literumi"
+  </dest>
+  <voice>
+    *: "Literumi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICE_DIR_HOVER
+  desc: "talkbox" mode for directories + files
+  user:
+  <source>
+    *: ".talk mp3 clip"
+  </source>
+  <dest>
+    *: ".talk mp3 tondaĵo"
+  </dest>
+  <voice>
+    *: "talk mp3 tondaĵo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Quality"
+  </source>
+  <dest>
+    *: "Eco"
+  </dest>
+  <voice>
+    *: "Eco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Frequency"
+  </source>
+  <dest>
+    *: "Frekvenco"
+  </dest>
+  <voice>
+    *: "Frekvenco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Source"
+  </source>
+  <dest>
+    *: "Fonto"
+  </dest>
+  <voice>
+    *: "Fonto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Mic"
+  </source>
+  <dest>
+    *: "Mikrofono"
+  </dest>
+  <voice>
+    *: "Mikrofono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_LINE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Analoga Enigaĵo"
+  </dest>
+  <voice>
+    *: "Analoga Enigaĵo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Digital"
+  </source>
+  <dest>
+    *: "Cifereca"
+  </dest>
+  <voice>
+    *: "Cifereca"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Kanaloj"
+  </dest>
+  <voice>
+    *: "Kanaloj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user:
+  <source>
+    *: "Independent Frames"
+  </source>
+  <dest>
+    *: "Sendependaj Kadroj"
+  </dest>
+  <voice>
+    *: "Sendependaj Kadroj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Prompt for record timer interval setting, in the record settings menu
+  user:
+  <source>
+    *: "Time Split"
+  </source>
+  <dest>
+    *: "Fenda Tempo"
+  </dest>
+  <voice>
+    *: "Fenda Tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD_TIME
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Prerecord Time"
+  </source>
+  <dest>
+    *: "Antaŭ-Registra Tempo"
+  </dest>
+  <voice>
+    *: "Antaŭ-Registra Tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_DIRECTORY
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Directory"
+  </source>
+  <dest>
+    *: "Dosierujoj"
+  </dest>
+  <voice>
+    *: "Dosierujoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_CURRENT_DIR
+  desc: in recording directory options
+  user:
+  <source>
+    *: "Current Directory"
+  </source>
+  <dest>
+    *: "Nuna Dosierujo"
+  </dest>
+  <voice>
+    *: "Nuna Dosierujo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STARTUP
+  desc: Start Rockbox in Recording Screen
+  user:
+  <source>
+    *: "Show Recording Screen on Startup"
+  </source>
+  <dest>
+    *: "Montri Registranta Ekranon dum Komenco"
+  </dest>
+  <voice>
+    *: "Montri Registranta Ekranon dum Komenco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Trigger"
+  </source>
+  <dest>
+    *: "Ekkaŭzo"
+  </dest>
+  <voice>
+    *: "Ekkaŭzo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Sinkroniga Lumo"
+  </dest>
+  <voice>
+    *: "Sinkroniga Lumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Nur ĉefa unito"
+  </dest>
+  <voice>
+    *: "Nur ĉefa unito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Nur fona unito"
+  </dest>
+  <voice>
+    *: "Nur fona unito"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Ĉefa kaj Fona Unitoj"
+  </dest>
+  <voice>
+    *: "Ĉefa kaj Fona Unitoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Min Step"
+  </source>
+  <dest>
+    *: "Rapidantaŭen/Rapidmalantaŭen Minimumo Ŝtupo"
+  </dest>
+  <voice>
+    *: "Rapidantaŭen/Rapidmalantaŭen Minimumo Ŝtupo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "FF/RW Accel"
+  </source>
+  <dest>
+    *: "Rapidantaŭen/Rapidmalantaŭen Akceliĝo"
+  </dest>
+  <voice>
+    *: "Rapidantaŭen/Rapidmalantaŭen Akceliĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Enable Crossfade"
+  </source>
+  <dest>
+    *: "Ebligi Transfadon"
+  </dest>
+  <voice>
+    *: "Ebligi Transfadon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Nur por transsalti kanton"
+  </dest>
+  <voice>
+    *: "Nur por transsalti kanton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Delay"
+  </source>
+  <dest>
+    *: "Alfada Malfruiĝo"
+  </dest>
+  <voice>
+    *: "Alfada Malfruiĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Duration"
+  </source>
+  <dest>
+    *: "Alfada Daŭro"
+  </dest>
+  <voice>
+    *: "Alfada Daŭro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: "Elfada Malfruiĝo"
+  </dest>
+  <voice>
+    *: "Elfada Malfruiĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: "Elfada Daŭro"
+  </dest>
+  <voice>
+    *: "Elfada Daŭro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: "Elfada Reĝimo"
+  </dest>
+  <voice>
+    *: "Elfada Reĝimo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIX
+  desc: in playback settings, crossfade option
+  user:
+  <source>
+    *: "Mix"
+  </source>
+  <dest>
+    *: "Mikso"
+  </dest>
+  <voice>
+    *: "Mikso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_ENABLE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Enable Replaygain"
+  </source>
+  <dest>
+    *: "Ebligi Legagajno"
+  </dest>
+  <voice>
+    *: "Ebligi Legagajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_NOCLIP
+  desc: in replaygain
+  user:
+  <source>
+    *: "Prevent Clipping"
+  </source>
+  <dest>
+    *: "Preventi Tromoduladon"
+  </dest>
+  <voice>
+    *: "Preventi Tromoduladon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_MODE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain Type"
+  </source>
+  <dest>
+    *: "Legagajna Tipo"
+  </dest>
+  <voice>
+    *: "Legagajna Tipo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Album Gain"
+  </source>
+  <dest>
+    *: "Albuma Gajno"
+  </dest>
+  <voice>
+    *: "Albuma Gajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Track Gain"
+  </source>
+  <dest>
+    *: "Kanto Gajno"
+  </dest>
+  <voice>
+    *: "Kanto Gajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user:
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Kanto Gajno Kiam Miksanta"
+  </dest>
+  <voice>
+    *: "Kanto Gajno Kiam Miksanta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_PREAMP
+  desc: in replaygain settings
+  user:
+  <source>
+    *: "Pre-amp"
+  </source>
+  <dest>
+    *: "Antaŭamplifilo"
+  </dest>
+  <voice>
+    *: "Antaŭamplifilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight"
+  </source>
+  <dest>
+    *: "Malantaŭa lumo"
+  </dest>
+  <voice>
+    *: "Malantaŭa lumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu, backlight timeout with charger connected
+  user:
+  <source>
+    *: "Backlight (While Plugged In)"
+  </source>
+  <dest>
+    *: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
+  </dest>
+  <voice>
+    *: "Malantaŭa Lumo (Kiam Elektre Ŝarĝanta)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAPTION_BACKLIGHT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Caption Backlight"
+  </source>
+  <dest>
+    *: "Malantaŭa Lumo Kiam Ŝanĝanta Kanton"
+  </dest>
+  <voice>
+    *: "Malantaŭa Lumo Kiam Ŝanĝanta Kanton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_IN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight Fade In"
+  </source>
+  <dest>
+    *: "Malantaŭa Lumo Alfado"
+  </dest>
+  <voice>
+    *: "Malantaŭa Lumo Alfado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_OUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight Fade Out"
+  </source>
+  <dest>
+    *: "Malantaŭa Lumo Elfado"
+  </dest>
+  <voice>
+    *: "Malantaŭa Lumo Elfado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Brightness"
+  </source>
+  <dest>
+    *: "Heleco"
+  </dest>
+  <voice>
+    *: "Heleco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Contrast"
+  </source>
+  <dest>
+    *: "Kontrasto"
+  </dest>
+  <voice>
+    *: "Kontrasto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Unua Klavpeso Ebligas Nur Malantaŭan Lumon"
+  </dest>
+  <voice>
+    *: "Unua Klavpeso Ebligas Nur Malantaŭan Lumon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "LCD Mode"
+  </source>
+  <dest>
+    *: "LCDa Reĝimo"
+  </dest>
+  <voice>
+    *: "LCDa Reĝimo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_NORMAL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normale"
+  </dest>
+  <voice>
+    *: "Normale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Inverse"
+  </source>
+  <dest>
+    *: "Inverse"
+  </dest>
+  <voice>
+    *: "Inverse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  user:
+  <source>
+    *: "Upside Down"
+  </source>
+  <dest>
+    *: "180-Gradoja Rotacio"
+  </dest>
+  <voice>
+    *: "180-Gradoja Rotacio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Line Selector"
+  </source>
+  <dest>
+    *: "Linio Elektilo"
+  </dest>
+  <voice>
+    *: "Linio Elektilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Pointer"
+  </source>
+  <dest>
+    *: "Pintigo"
+  </dest>
+  <voice>
+    *: "Pintigo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Bar (Inverse)"
+  </source>
+  <dest>
+    *: "Substreka Linio"
+  </dest>
+  <voice>
+    *: "Substreka Linio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: "Clear Backdrop"
+  </source>
+  <dest>
+    *: "Viŝi Fonon"
+  </dest>
+  <voice>
+    *: "Viŝi Fonon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Fona Koloro"
+  </dest>
+  <voice>
+    *: "Fona Koloro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Malfona Koloro"
+  </dest>
+  <voice>
+    *: "Malfona Koloro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Reŝargi Kolorojn"
+  </dest>
+  <voice>
+    *: "Reŝargi Kolorojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user:
+  <source>
+    *: "Reduce Ticking"
+  </source>
+  <dest>
+    *: "Redukti Tiktakon"
+  </dest>
+  <voice>
+    *: "Redukti Tiktakon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_SPEED
+  desc: in display_settings_menu()
+  user:
+  <source>
+    *: "Scroll Speed"
+  </source>
+  <dest>
+    *: "Ruluma Rapido"
+  </dest>
+  <voice>
+    *: "Ruluma Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Scroll Speed Setting Example"
+  </source>
+  <dest>
+    *: "Ruluma Rapido Agordaĵo Ekzemplo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_DELAY
+  desc: Delay before scrolling
+  user:
+  <source>
+    *: "Scroll Start Delay"
+  </source>
+  <dest>
+    *: "Ruluma Starto Malfruiĝo"
+  </dest>
+  <voice>
+    *: "Ruluma Starto Malfruiĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size"
+  </source>
+  <dest>
+    *: "Ruluma Ŝtupo Grando"
+  </dest>
+  <voice>
+    *: "Ruluma Ŝtupo Grando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_STEP_EXAMPLE
+  desc: Pixels to advance per scroll
+  user:
+  <source>
+    *: "Scroll Step Size Setting Example Text"
+  </source>
+  <dest>
+    *: "Ruluma Ŝtupo Grando Agordaĵo Ekzemplo Teksto"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BIDIR_SCROLL
+  desc: Bidirectional scroll limit
+  user:
+  <source>
+    *: "Bidirectional Scroll Limit"
+  </source>
+  <dest>
+    *: "Dudirekta Ruluma Limo"
+  </dest>
+  <voice>
+    *: "Dudirekta Ruluma Limo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL
+  desc: (player) menu altarnative for jump scroll
+  user:
+  <source>
+    *: "Jump Scroll"
+  </source>
+  <dest>
+    *: "Saltanta Rulumo"
+  </dest>
+  <voice>
+    *: "Saltanta Rulumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONE_TIME
+  desc: (player) the jump scroll shall be done "one time"
+  user:
+  <source>
+    *: "One time"
+  </source>
+  <dest>
+    *: "Unu Fojo"
+  </dest>
+  <voice>
+    *: "Unu Fojo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_JUMP_SCROLL_DELAY
+  desc: (player) Delay before making a jump scroll
+  user:
+  <source>
+    *: "Jump Scroll Delay"
+  </source>
+  <dest>
+    *: "Saltanta Rulumo Malfruiĝo"
+  </dest>
+  <voice>
+    *: "Saltanta Rulumo Malfruiĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Ekrano Rulumas Ekster Vido"
+  </dest>
+  <voice>
+    *: "Ekrano Rulumas Ekster Vido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Ekrana Rulumo Ŝtupo Grando"
+  </dest>
+  <voice>
+    *: "Ekrana Rulumo Ŝtupo Grando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Paĝe Rulumo"
+  </dest>
+  <voice>
+    *: "Paĝe Rulumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Scroll Bar"
+  </source>
+  <dest>
+    *: "Rulumskalo"
+  </dest>
+  <voice>
+    *: "Rulumskalo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Status Bar"
+  </source>
+  <dest>
+    *: "Stata Superstreko"
+  </dest>
+  <voice>
+    *: "Stata Superstreko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTON_BAR
+  desc: in settings menu
+  user:
+  <source>
+    *: "Button Bar"
+  </source>
+  <dest>
+    *: "Superstreka Butono"
+  </dest>
+  <voice>
+    *: "Superstreka Butono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user:
+  <source>
+    *: "Volume Display"
+  </source>
+  <dest>
+    *: "Volumeno Vidigo"
+  </dest>
+  <voice>
+    *: "Volumeno Vidigo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user:
+  <source>
+    *: "Battery Display"
+  </source>
+  <dest>
+    *: "Baterio Vidigo"
+  </dest>
+  <voice>
+    *: "Baterio Vidigo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Graphic"
+  </source>
+  <dest>
+    *: "Grafike"
+  </dest>
+  <voice>
+    *: "Grafike"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user:
+  <source>
+    *: "Numeric"
+  </source>
+  <dest>
+    *: "Cifere"
+  </dest>
+  <voice>
+    *: "Cifere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Release"
+  </source>
+  <dest>
+    *: "Pinta Laso"
+  </dest>
+  <voice>
+    *: "Pinta Laso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_UNITS_PER_READ
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Units Per Read"
+  </source>
+  <dest>
+    *: "Unitoj Por Mezuro"
+  </dest>
+  <voice>
+    *: "Unitoj Por Mezuro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Peak Hold Time"
+  </source>
+  <dest>
+    *: "Pinta Persisto"
+  </dest>
+  <voice>
+    *: "Pinta Persisto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Clip Hold Time"
+  </source>
+  <dest>
+    *: "Maksimuma Pinta Persisto"
+  </dest>
+  <voice>
+    *: "Maksimuma Pinta Persisto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Eternal"
+  </source>
+  <dest>
+    *: "Eterna"
+  </dest>
+  <voice>
+    *: "Eterna"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Scale"
+  </source>
+  <dest>
+    *: "Skalo"
+  </dest>
+  <voice>
+    *: "Skalo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Logarithmic (dB)"
+  </source>
+  <dest>
+    *: "Logaritme (dB)"
+  </dest>
+  <voice>
+    *: "Logaritme (Decibelo)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Linear (%)"
+  </source>
+  <dest>
+    *: "Linie (%)"
+  </dest>
+  <voice>
+    *: "Linie percento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Minimum Of Range"
+  </source>
+  <dest>
+    *: "Ampleksa Minimumo"
+  </dest>
+  <voice>
+    *: "Ampleksa Minimumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user:
+  <source>
+    *: "Maximum Of Range"
+  </source>
+  <dest>
+    *: "Ampleksa Maksimumo"
+  </dest>
+  <voice>
+    *: "Ampleksa Maksimumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CAPACITY
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Battery Capacity"
+  </source>
+  <dest>
+    *: "Bateria Kapablo"
+  </dest>
+  <voice>
+    *: "Bateria Kapablo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE
+  desc: in battery settings
+  user:
+  <source>
+    *: "Battery Type"
+  </source>
+  <dest>
+    *: "Bateria Tipo"
+  </dest>
+  <voice>
+    *: "Bateria Tipo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_ALKALINE
+  desc: in battery settings
+  user:
+  <source>
+    *: "Alkaline"
+  </source>
+  <dest>
+    *: "Alkala"
+  </dest>
+  <voice>
+    *: "Alkala"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TYPE_NIMH
+  desc: in battery settings
+  user:
+  <source>
+    *: "NiMH"
+  </source>
+  <dest>
+    *: "Nikelo Metalo Hidrido"
+  </dest>
+  <voice>
+    *: "Nikelo Metalo Hidrido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Disk Spindown"
+  </source>
+  <dest>
+    *: "Durdisko Dormo"
+  </dest>
+  <voice>
+    *: "Durdisko Dormo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POWEROFF
+  desc: disk poweroff flag
+  user:
+  <source>
+    *: "Disk Poweroff"
+  </source>
+  <dest>
+    *: "Durdisko Malŝalto"
+  </dest>
+  <voice>
+    *: "Durdisko Malŝalto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user:
+  <source>
+    *: "Directory Cache"
+  </source>
+  <dest>
+    *: "Doseriuja kaŝmemoro"
+  </dest>
+  <voice>
+    *: "Doseriuja kaŝmemoro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_REBOOT
+  desc: when activating directory cache
+  user:
+  <source>
+    *: "Please reboot to enable the cache"
+  </source>
+  <dest>
+    *: "Restartu por ebligi la kaŝmemoron"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_BUILDING
+  desc: when booting up and rebuilding the cache
+  user:
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "Skananta durdisko..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Set Time/Date"
+  </source>
+  <dest>
+    *: "Agordi Horon/Daton"
+  </dest>
+  <voice>
+    *: "Agordi Horon/Daton"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user:
+  <source>
+    *: "Time Format"
+  </source>
+  <dest>
+    *: "Horo Formato"
+  </dest>
+  <voice>
+    *: "Horo Formato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user:
+  <source>
+    *: "12 Hour Clock"
+  </source>
+  <dest>
+    *: "12-Hora Horloĝo"
+  </dest>
+  <voice>
+    *: "Dekduhora Horloĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user:
+  <source>
+    *: "24 Hour Clock"
+  </source>
+  <dest>
+    *: "24-hora Horloĝo"
+  </dest>
+  <voice>
+    *: "Dudekkvarhora Horloĝo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_DIR
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max Files in Dir Browser"
+  </source>
+  <dest>
+    *: "Maximumo Dosieroj en Dosierujo Foliumo"
+  </dest>
+  <voice>
+    *: "Maximumo Dosieroj en Dosierujo Foliumo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAX_FILES_IN_PLAYLIST
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Max Playlist Size"
+  </source>
+  <dest>
+    *: "Maximumo Leglisto Grando"
+  </dest>
+  <voice>
+    *: "Maximumo Leglisto Grando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user:
+  <source>
+    *: "Playlist"
+  </source>
+  <dest>
+    *: "Leglisto"
+  </dest>
+  <voice>
+    *: "Leglisto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU
+  desc: Text on main menu to get to bookmark commands
+  user:
+  <source>
+    *: "Bookmarks"
+  </source>
+  <dest>
+    *: "Legosignoj"
+  </dest>
+  <voice>
+    *: "Legosignoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SHOW_ID3_INFO
+  desc: Menu option to start tag viewer
+  user:
+  <source>
+    *: "Show ID3 Info"
+  </source>
+  <dest>
+    *: "Montri ID3an Informojn"
+  </dest>
+  <voice>
+    *: "Montri ID3an Informojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SET_RATING
+  desc: in wps context menu
+  user:
+  <source>
+    *: "Set Song Rating"
+  </source>
+  <dest>
+    *: "Agordi Kanton Klasaĵon"
+  </dest>
+  <voice>
+    *: "Agordi Kanton Klasaĵon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RATING
+  desc: in set_rating
+  user:
+  <source>
+    *: "Klasaĵo:"
+  </source>
+  <dest>
+    *: "Klasaĵo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RENAME
+  desc: The verb/action Rename
+  user:
+  <source>
+    *: "Rename"
+  </source>
+  <dest>
+    *: "Renomi"
+  </dest>
+  <voice>
+    *: "Renomi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Enpoŝigi"
+  </dest>
+  <voice>
+    *: "Enpoŝigi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Kopii"
+  </dest>
+  <voice>
+    *: "Kopii"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Elpoŝigi"
+  </dest>
+  <voice>
+    *: "Elpoŝigi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Dosiero/Dosierujo ekzistas. Superskribi?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE
+  desc: The verb/action Delete
+  user:
+  <source>
+    *: "Delete"
+  </source>
+  <dest>
+    *: "Forpreni"
+  </dest>
+  <voice>
+    *: "Forpreni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: "Set As Backdrop"
+  </source>
+  <dest>
+    *: "Uzi kiel Fono"
+  </dest>
+  <voice>
+    *: "Uzi kiel Fono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETE_DIR
+  desc: in on+play menu
+  user:
+  <source>
+    *: "Delete Directory"
+  </source>
+  <dest>
+    *: "Forpreni Dosierujon"
+  </dest>
+  <voice>
+    *: "Forpreni Dosierujon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_DELETE
+  desc: Really Delete?
+  user:
+  <source>
+    *: "Delete?"
+  </source>
+  <dest>
+    *: "Forpreni?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DELETED
+  desc: A file has beed deleted
+  user:
+  <source>
+    *: "Deleted"
+  </source>
+  <dest>
+    *: "Forprenita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ONPLAY_OPEN_WITH
+  desc: Onplay open with
+  user:
+  <source>
+    *: "Open With..."
+  </source>
+  <dest>
+    *: "Malfermi Per..."
+  </dest>
+  <voice>
+    *: "Malfermi Per"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATE_DIR
+  desc: in main menu
+  user:
+  <source>
+    *: "Create Directory"
+  </source>
+  <dest>
+    *: "Krei Dosierujon"
+  </dest>
+  <voice>
+    *: "Krei Dosierujon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Lega Rapido"
+  </dest>
+  <voice>
+    *: "Lega Rapido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIEW
+  desc: in on+play menu
+  user:
+  <source>
+    *: "View"
+  </source>
+  <dest>
+    *: "Vidigo"
+  </dest>
+  <voice>
+    *: "Vidigo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_PLAYLIST
+  desc: in playlist menu, reshuffles the order in which songs are played
+  user:
+  <source>
+    *: "Reshuffle"
+  </source>
+  <dest>
+    *: "Remiksi"
+  </dest>
+  <voice>
+    *: "Remiksi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert"
+  </source>
+  <dest>
+    *: "Enmeti"
+  </dest>
+  <voice>
+    *: "Enmeti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_FIRST
+  desc: in onplay menu.  insert a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert next"
+  </source>
+  <dest>
+    *: "Enmeti postan"
+  </dest>
+  <voice>
+    *: "Enmeti postan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST
+  desc: in onplay menu.  append a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Insert last"
+  </source>
+  <dest>
+    *: "Enmeti lastan"
+  </dest>
+  <voice>
+    *: "Enmeti lastan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_SHUFFLED
+  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Insert shuffled"
+  </source>
+  <dest>
+    *: "Enmeti miksatan"
+  </dest>
+  <voice>
+    *: "Enmeti miksatan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE
+  desc: The verb/action Queue
+  user:
+  <source>
+    *: "Queue"
+  </source>
+  <dest>
+    *: "Atendovici"
+  </dest>
+  <voice>
+    *: "Queue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_FIRST
+  desc: in onplay menu.  queue a track/playlist into dynamic playlist.
+  user:
+  <source>
+    *: "Queue next"
+  </source>
+  <dest>
+    *: "Atendovici postan"
+  </dest>
+  <voice>
+    *: "Atendovici postan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST
+  desc: in onplay menu.  queue a track/playlist at end of playlist.
+  user:
+  <source>
+    *: "Queue last"
+  </source>
+  <dest>
+    *: "Atendovici lastan"
+  </dest>
+  <voice>
+    *: "Atendovici lastan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Atendovici miksatan"
+  </dest>
+  <voice>
+    *: "Atendovici miksatan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Serĉi En Leglisto"
+  </dest>
+  <voice>
+    *: "Serĉi En Leglisto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Serĉanta... %d trovita (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_CREATE
+  desc: Used off of the bookmark menu to create a bookmark
+  user:
+  <source>
+    *: "Create Bookmark"
+  </source>
+  <dest>
+    *: "Krei Legosignon"
+  </dest>
+  <voice>
+    *: "Krei Legosignon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_MENU_LIST
+  desc: Used off of the bookmark menu to list available bookmarks for the currently playing directory or M3U
+  user:
+  <source>
+    *: "List Bookmarks"
+  </source>
+  <dest>
+    *: "Listi Legosignojn"
+  </dest>
+  <voice>
+    *: "Listi Legosignojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ROCKBOX_INFO
+  desc: displayed topmost on the info screen
+  user:
+  <source>
+    *: "Rockbox Info:"
+  </source>
+  <dest>
+    *: "Rockbox Informoj:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_PLAYER
+  desc: the buffer size player-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buf: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Buf: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUFFER_STAT_RECORDER
+  desc: the buffer size recorder-screen width, %d MB %d fraction of MB
+  user:
+  <source>
+    *: "Buffer: %d.%03dMB"
+  </source>
+  <dest>
+    *: "Bufro: %d.%03dMB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_CHARGE
+  desc: tells that the battery is charging, instead of battery level
+  user:
+  <source>
+    *: "Battery: Charging"
+  </source>
+  <dest>
+    *: "Baterio: Ŝarĝanta..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TOPOFF_CHARGE
+  desc: in info display, shows that top off charge is running
+  user:
+  <source>
+    *: "Battery: Top-Off Chg"
+  </source>
+  <dest>
+    *: "Baterio: Maximuma Ŝarĝo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TRICKLE_CHARGE
+  desc: in info display, shows that trickle charge is running
+  user:
+  <source>
+    *: "Battery: Trickle Chg"
+  </source>
+  <dest>
+    *: "Baterio: Persistanta Ŝarĝo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BATTERY_TIME
+  desc: battery level in % and estimated time remaining
+  user:
+  <source>
+    *: "%d%% %dh %dm"
+  </source>
+  <dest>
+    *: "%d%% %dh %dm"
+  </dest>
+  <voice>
+    *: "Baterio nivelo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_SIZE_INFO
+  desc: disk size info
+  user:
+  <source>
+    *: "Disk:"
+  </source>
+  <dest>
+    *: "Durdisko:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FREE_INFO
+  desc: disk size info
+  user:
+  <source>
+    *: "Free:"
+  </source>
+  <dest>
+    *: "Libera:"
+  </dest>
+  <voice>
+    *: "Libera durdiska memoro:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_INTERNAL
+  desc: in info menu; name for internal disk with multivolume (keep short!)
+  user:
+  <source>
+    *: "Int:"
+  </source>
+  <dest>
+    *: "Int:"
+  </dest>
+  <voice>
+    *: "Interna"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_MMC
+  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  user:
+  <source>
+    *: "MMC:"
+  </source>
+  <dest>
+    *: "MMC:"
+  </dest>
+  <voice>
+    *: "Aŭdvida karto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CURRENT_TIME
+  desc: spoken only, for wall clock announce
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Nuna Tempo:"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Up"
+  </source>
+  <dest>
+    *: "Tonalten"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Down"
+  </source>
+  <dest>
+    *: "Tonmalalten"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE
+  desc: in wps
+  user:
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Paŭzo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F2_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Reĝimo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_STATUS
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Status"
+  </source>
+  <dest>
+    *: "Statuto"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_SCROLL
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Scroll"
+  </source>
+  <dest>
+    *: "Rulumi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_F3_BAR
+  desc: in wps F3 pressed
+  user:
+  <source>
+    *: "Bar"
+  </source>
+  <dest>
+    *: "Streko"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_LIST_BOOKMARKS
+  desc: From the auto-load screen, allows user to list all bookmarks
+  user:
+  <source>
+    *: "Down = List"
+  </source>
+  <dest>
+    *: "Malalto = Listo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_EXIT
+  desc: From the bookmark list screen, allows user to exit
+  user:
+  <source>
+    *: "OFF = Exit"
+  </source>
+  <dest>
+    *: "OFF = Eliri"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK_TEXT
+  desc: Used on the bookmark select window to label bookmark number
+  user:
+  <source>
+    *: "Bookmark"
+  </source>
+  <dest>
+    *: "Legosigno"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_INDEX_TEXT
+  desc: Used on the bookmark select window to label index number
+  user:
+  <source>
+    *: "Index"
+  </source>
+  <dest>
+    *: "Indekso"
+  </dest>
+  <voice>
+    *: "Indekso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_TIME_TEXT
+  desc: Used on the bookmark select window to label elapsed time
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tempo"
+  </dest>
+  <voice>
+    *: "Tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_PLAY
+  desc: Used on the bookmark select window to indicated the play option
+  user:
+  <source>
+    *: "PLAY = Select"
+  </source>
+  <dest>
+    *: "LEGI = Elekti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SELECT_DELETE
+  desc: Used on the bookmark select window to indicated the bookmark delete option
+  user:
+  <source>
+    *: "ON+Play = Delete"
+  </source>
+  <dest>
+    *: "ON+LEGI = Elpreni"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_AUTOLOAD_QUERY
+  desc: prompt for user to decide to create a bookmark
+  user:
+  <source>
+    *: "Load Last Bookmark?"
+  </source>
+  <dest>
+    *: "Ŝarĝi Lastan Legosignon?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_BOOKMARK_QUERY
+  desc: prompt for user to decide to create an bookmark
+  user:
+  <source>
+    *: "Create a Bookmark?"
+  </source>
+  <dest>
+    *: "Krei Legosignon?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_SUCCESS
+  desc: Indicates bookmark was successfully created
+  user:
+  <source>
+    *: "Bookmark Created"
+  </source>
+  <dest>
+    *: "Legosigno Kreita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_CREATE_FAILURE
+  desc: Indicates bookmark was not created
+  user:
+  <source>
+    *: "Bookmark Failed!"
+  </source>
+  <dest>
+    *: "Legosigno Kreo Malsukcesis!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_LOAD_EMPTY
+  desc: Indicates bookmark was empty
+  user:
+  <source>
+    *: "Bookmark Empty"
+  </source>
+  <dest>
+    *: "Legosigno Malplena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_SET
+  desc: used in set_time()
+  user:
+  <source>
+    *: "ON To Set"
+  </source>
+  <dest>
+    *: "ON Por Validigi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user:
+  <source>
+    *: "OFF To Revert"
+  </source>
+  <dest>
+    *: "OFF Por Malvalidigi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_PLAYER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Key Lock ON"
+  </source>
+  <dest>
+    *: "Klava Bloko Ebligata"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_PLAYER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Key Lock OFF"
+  </source>
+  <dest>
+    *: "Klava Bloko Malebligata"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_ON_RECORDER
+  desc: displayed when key lock is on
+  user:
+  <source>
+    *: "Keylock is ON"
+  </source>
+  <dest>
+    *: "Klava Bloko Ebligita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYLOCK_OFF_RECORDER
+  desc: displayed when key lock is turned off
+  user:
+  <source>
+    *: "Keylock is OFF"
+  </source>
+  <dest>
+    *: "Klava Bloko Malebligita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: "Time:"
+  </source>
+  <dest>
+    *: "Tempo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: "Split Time:"
+  </source>
+  <dest>
+    *: "Tranĉa Tempo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: "Size:"
+  </source>
+  <dest>
+    *: "Grando:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_PRERECORD
+  desc: in recording and radio screen
+  user:
+  <source>
+    *: "Pre-Recording"
+  </source>
+  <dest>
+    *: "Pra-Rikordo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Gajno"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_LEFT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain Left"
+  </source>
+  <dest>
+    *: "Maldekstra Gajno"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain Right"
+  </source>
+  <dest>
+    *: "Desktra Gajno"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_ANALOG
+  desc: in the recording screen
+  user:
+  <source>
+    *: "A"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_DIGITAL
+  desc: in the recording screen
+  user:
+  <source>
+    *: "D"
+  </source>
+  <dest>
+    *: "D"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_FULL
+  desc: in recording screen
+  user:
+  <source>
+    *: "The disk is full. Press OFF to continue."
+  </source>
+  <dest>
+    *: "Durdisko plena. Pesu OFF por kontinui."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_MODE
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Trigger"
+  </source>
+  <dest>
+    *: "Lanĉilo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_NOREARM
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Once"
+  </source>
+  <dest>
+    *: "Unufoje"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_REARM
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Ripeti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_START_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Start Above"
+  </source>
+  <dest>
+    *: "Komenci Supere"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_MIN_DURATION
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "for at least"
+  </source>
+  <dest>
+    *: "Por almenaŭ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Stop Below"
+  </source>
+  <dest>
+    *: "Stopi Sube"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_POSTREC
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "for at least"
+  </source>
+  <dest>
+    *: "Por almenaŭ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_GAP
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Presplit Gap"
+  </source>
+  <dest>
+    *: "Antaŭsplita Ŝtupo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DB_INF
+  desc: -inf db for values below measurement
+  user:
+  <source>
+    *: "-inf"
+  </source>
+  <dest>
+    *: "-inf"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_IDLE
+  desc: waiting for threshold
+  user:
+  <source>
+    *: "Trigger Idle"
+  </source>
+  <dest>
+    *: "Malaktiva Lanĉilo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_ACTIVE
+  desc: 
+  user:
+  <source>
+    *: "Trigger Active"
+  </source>
+  <dest>
+    *: "Aktiva Lanĉilo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Alarm Time: %02d:%02d"
+  </source>
+  <dest>
+    *: "Alarmo Tempo: %02d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user:
+  <source>
+    *: "Waking Up In %d:%02d"
+  </source>
+  <dest>
+    *: "Vekonta Je %d:%02d"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Alarm Set"
+  </source>
+  <dest>
+    *: "Alarmo Aktiva"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user:
+  <source>
+    *: "Alarm Time Is Too Soon!"
+  </source>
+  <dest>
+    *: "Alarma Tempo Estas Tro Frua!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user:
+  <source>
+    *: "PLAY=Set OFF=Cancel"
+  </source>
+  <dest>
+    *: "LEGI=Validigi OFF=Malvalidigi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALARM_MOD_DISABLE
+  desc: Announce that the RTC alarm has been turned off
+  user:
+  <source>
+    *: "Alarm Disabled"
+  </source>
+  <dest>
+    *: "Alarmo Malaktivigita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "RGB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Malvalida koloro"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TITLE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Titolo]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ARTIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artisto]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Albumo]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACKNUM
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Kanta Numero]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_GENRE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Ĝenro]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_YEAR
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Jaro]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Longo]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PLAYLIST
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Playlist]"
+  </source>
+  <dest>
+    *: "[Leglisto]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_BITRATE
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitfrekvenco]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_DB
+  desc: in browse_id3
+  user:
+  <source>
+    *: "dB"
+  </source>
+  <dest>
+    *: "dB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_VBR
+  desc: in browse_id3
+  user:
+  <source>
+    *: " (VBR)"
+  </source>
+  <dest>
+    *: " (VBR)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_FRECUENCY
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frekvenco]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACK_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Track Gain]"
+  </source>
+  <dest>
+    *: "[Kanta Gajno]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Gain]"
+  </source>
+  <dest>
+    *: "[Albumo Gajno]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_PATH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Vojo]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_NO_INFO
+  desc: in tag viewer
+  user:
+  <source>
+    *: "<No Info>"
+  </source>
+  <dest>
+    *: "<Sen Informoj>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sun"
+  </source>
+  <dest>
+    *: "Dim"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_MONDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Mon"
+  </source>
+  <dest>
+    *: "Lun"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Tue"
+  </source>
+  <dest>
+    *: "Mar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Wed"
+  </source>
+  <dest>
+    *: "Mer"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Thu"
+  </source>
+  <dest>
+    *: "Ĵaŭ"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Fri"
+  </source>
+  <dest>
+    *: "Ven"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user:
+  <source>
+    *: "Sat"
+  </source>
+  <dest>
+    *: "Sab"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jan"
+  </source>
+  <dest>
+    *: "Jan"
+  </dest>
+  <voice>
+    *: "Januaro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Feb"
+  </source>
+  <dest>
+    *: "Feb"
+  </dest>
+  <voice>
+    *: "Februaro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Mar"
+  </source>
+  <dest>
+    *: "Mar"
+  </dest>
+  <voice>
+    *: "Marso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_APRIL
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Apr"
+  </source>
+  <dest>
+    *: "Apr"
+  </dest>
+  <voice>
+    *: "Aprilo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_MAY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "May"
+  </source>
+  <dest>
+    *: "Maj"
+  </dest>
+  <voice>
+    *: "Majo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jun"
+  </source>
+  <dest>
+    *: "Jun"
+  </dest>
+  <voice>
+    *: "Junio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_JULY
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Jul"
+  </source>
+  <dest>
+    *: "Jul"
+  </dest>
+  <voice>
+    *: "Julio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Aug"
+  </source>
+  <dest>
+    *: "Aŭg"
+  </dest>
+  <voice>
+    *: "Aŭgusto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Sep"
+  </source>
+  <dest>
+    *: "Sep"
+  </dest>
+  <voice>
+    *: "Septembro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Oct"
+  </source>
+  <dest>
+    *: "Okt"
+  </dest>
+  <voice>
+    *: "Oktobro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Nov"
+  </source>
+  <dest>
+    *: "Nov"
+  </dest>
+  <voice>
+    *: "Novembro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user:
+  <source>
+    *: "Dec"
+  </source>
+  <dest>
+    *: "Dec"
+  </dest>
+  <voice>
+    *: "Decembro"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ZERO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "0"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "1"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "2"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "3"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "4"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "5"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "6"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "7"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "8"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "9"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "10"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ELEVEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "11"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWELVE
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "12"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "13"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOURTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "14"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "15"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "16"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "17"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "18"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETEEN
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "19"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "20"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THIRTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "30"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FORTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "40"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIFTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "50"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIXTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "60"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVENTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "70"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHTY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "80"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINETY
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "90"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HUNDRED
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "cent"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THOUSAND
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "mil"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "miliono"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BILLION
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "miliardo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "minus"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLUS
+  desc: spoken only, for composing numbers
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "plus"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLISECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "milisekundoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECOND
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "sekundo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SECONDS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "sekundoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTE
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "minuto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MINUTES
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "minutoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOUR
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "horo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "horoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KHZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilohercoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DB
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "decibelo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PERCENT
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "procento"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MILLIAMPHOURS
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "miliampero en horoj"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PIXEL
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "rastrumero"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "en sekundo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_HERTZ
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "herco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BYTE
+  desc: a unit postfix
+  user:
+  <source>
+    *: "B"
+  </source>
+  <dest>
+    *: "B"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KILOBYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "KB"
+  </source>
+  <dest>
+    *: "KB"
+  </dest>
+  <voice>
+    *: "kilobajto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEGABYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "MB"
+  </source>
+  <dest>
+    *: "MB"
+  </dest>
+  <voice>
+    *: "megabajto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIGABYTE
+  desc: a unit postfix, also voiced
+  user:
+  <source>
+    *: "GB"
+  </source>
+  <dest>
+    *: "GB"
+  </dest>
+  <voice>
+    *: "gigabajto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_POINT
+  desc: decimal separator for composing numbers
+  user:
+  <source>
+    *: "."
+  </source>
+  <dest>
+    *: "."
+  </dest>
+  <voice>
+    *: "poento"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_A
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "A"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_B
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "B"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_C
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "C"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_D
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "D"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_E
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "E"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_F
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "F"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_G
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "G"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_H
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "H"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_I
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "I"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_J
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "J"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_K
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "K"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_L
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "L"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_M
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "M"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_N
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "N"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_O
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "O"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_P
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "P"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Q
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_R
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "R"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_S
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "S"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_T
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "T"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_U
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "U"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_V
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "V"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_W
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "W"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_X
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "X"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Y
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Y"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHAR_Z
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Z"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DOT
+  desc: spoken only, for spelling
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "punkto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAUSE
+  desc: spoken only, for spelling, a split second of silence (difficult to author)
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: " "
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FILE
+  desc: spoken only, prefix for file number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "dosiero"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_DIR
+  desc: spoken only, prefix for directory number
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "dosierujo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_MPA
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "sono"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_CFG
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "agordaro"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_WPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "dum-legi-ekrano"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_TXT
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "teksto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_ROCK
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kromprogramo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_FONT
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "tiparo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_BMARK
+  desc: spoken only, for file extension and the word in general
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "legosigno"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_UCL
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "ekbrilo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_AJZ
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "firmvaro"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "fora dum-legi-ekrano"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "klavaro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_LOAD
+  desc: displayed on screen while loading a playlist
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Ŝarĝanta..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SHUFFLE
+  desc: displayed on screen while shuffling a playlist
+  user:
+  <source>
+    *: "Shuffling..."
+  </source>
+  <dest>
+    *: "Miksanta..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_BUFFER_FULL
+  desc: in playlist.indices() when playlist is full
+  user:
+  <source>
+    *: "Playlist Buffer Full"
+  </source>
+  <dest>
+    *: "Leglista Bufro Plena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_PLAYER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End of List"
+  </source>
+  <dest>
+    *: "Fino da Listo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_END_PLAYLIST_RECORDER
+  desc: when playlist has finished
+  user:
+  <source>
+    *: "End of Song List"
+  </source>
+  <dest>
+    *: "Fino da Kantlisto"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CREATING
+  desc: Screen feedback during playlist creation
+  user:
+  <source>
+    *: "Creating"
+  </source>
+  <dest>
+    *: "Kreanta"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_INSERT_COUNT
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Inserted %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d kantoj (%s) enmenitaj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_QUEUE_COUNT
+  desc: splash number of tracks queued
+  user:
+  <source>
+    *: "Queued %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d kantoj (%s) atendovicitaj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SAVE_COUNT
+  desc: splash number of tracks saved
+  user:
+  <source>
+    *: "Saved %d tracks (%s)"
+  </source>
+  <dest>
+    *: "%d kantoj (%s) savitaj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECURSE_DIRECTORY_QUESTION
+  desc: Asked from onplay screen
+  user:
+  <source>
+    *: "Recursively?"
+  </source>
+  <dest>
+    *: "Rikure?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "Forpreni dinamikan legliston?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOTHING_TO_RESUME
+  desc: Error message displayed when resume button pressed but no playlist
+  user:
+  <source>
+    *: "Nothing to resume"
+  </source>
+  <dest>
+    *: "Nenio por rekomenci"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_UPDATE_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error updating playlist control file"
+  </source>
+  <dest>
+    *: "Eraro dum ĝisdatiganta leglistan kontroldosieron"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist file"
+  </source>
+  <dest>
+    *: "Eraro dum leganta leglistan dosieron"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing playlist control file"
+  </source>
+  <dest>
+    *: "Eraro dum leganta leglistan kontroldosieron"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR
+  desc: Playlist error
+  user:
+  <source>
+    *: "Error accessing directory"
+  </source>
+  <dest>
+    *: "Eraro dum leganta dosierujon"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CONTROL_INVALID
+  desc: Playlist resume error
+  user:
+  <source>
+    *: "Playlist control file is invalid"
+  </source>
+  <dest>
+    *: "Leglista kontroldosiero estas invalida"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_STATION
+  desc: in radio screen
+  user:
+  <source>
+    *: "Station: %d.%dMHz"
+  </source>
+  <dest>
+    *: "Stacio: %d.%dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_PRESETS
+  desc: error when preset list is empty
+  user:
+  <source>
+    *: "No presets"
+  </source>
+  <dest>
+    *: "Neniu stacio"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user:
+  <source>
+    *: "Add Preset"
+  </source>
+  <dest>
+    *: "Almeti Stacion"
+  </dest>
+  <voice>
+    *: "Almeti Stacion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EDIT_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: "Edit Preset"
+  </source>
+  <dest>
+    *: "Agordi Stacion"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DELETE_PRESET
+  desc: in radio screen
+  user:
+  <source>
+    *: "Remove Preset"
+  </source>
+  <dest>
+    *: "Forpreni Stacion"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE_FAILED
+  desc: in radio screen
+  user:
+  <source>
+    *: "Preset Save Failed"
+  </source>
+  <dest>
+    *: "Stacio Konservo Malsukcesis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_NO_FREE_PRESETS
+  desc: in radio screen
+  user:
+  <source>
+    *: "The Preset List is Full"
+  </source>
+  <dest>
+    *: "La Stacia Listo Estas Plena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user:
+  <source>
+    *: "Menu"
+  </source>
+  <dest>
+    *: "Menuo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user:
+  <source>
+    *: "Exit"
+  </source>
+  <dest>
+    *: "Eliri"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ACTION
+  desc: in radio screen
+  user:
+  <source>
+    *: "Action"
+  </source>
+  <dest>
+    *: "Ago"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_PRESETS
+  desc: in button bar
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Stacioj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user:
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Almeti"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in radio screen
+  user:
+  <source>
+    *: "Record"
+  </source>
+  <dest>
+    *: "Rikordi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_MONO_MODE
+  desc: in radio screen
+  user:
+  <source>
+    *: "Force mono"
+  </source>
+  <dest>
+    *: "Divigi monofonie"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user:
+  <source>
+    *: "Screen frozen!"
+  </source>
+  <dest>
+    *: "Ekrano blokita!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user:
+  <source>
+    *: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: "Aŭtomata Stacio Skano"
+  </dest>
+  <voice>
+    *: "Aŭtomata Stacio Skano"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: "Senrubigi Nunajn Staciojn?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user:
+  <source>
+    *: "Scanning %d.%01dMHz"
+  </source>
+  <dest>
+    *: "Skananta %d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user:
+  <source>
+    *: "%d.%01dMHz"
+  </source>
+  <dest>
+    *: "%d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_TUNE_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Reĝimo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Scan"
+  </source>
+  <dest>
+    *: "Skani"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_PRESET_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Stacioj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F1
+  desc: in dir browser, F1 button bar text
+  user:
+  <source>
+    *: "Menu"
+  </source>
+  <dest>
+    *: "Menuo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F2
+  desc: in dir browser, F2 button bar text
+  user:
+  <source>
+    *: "Option"
+  </source>
+  <dest>
+    *: "Opcio"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRBROWSE_F3
+  desc: in dir browser, F3 button bar text
+  user:
+  <source>
+    *: "LCD"
+  </source>
+  <dest>
+    *: "LCD"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOWDIR_BUFFER_FULL
+  desc: in showdir(), displayed on screen when you reach buffer limit
+  user:
+  <source>
+    *: "Dir Buffer is Full!"
+  </source>
+  <dest>
+    *: "Dosieruja Bufro Estas Plena!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Language"
+  </source>
+  <dest>
+    *: "Nova Lingvo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_LOADED
+  desc: Feedback shown when a .cfg file is loaded
+  user:
+  <source>
+    *: "Settings Loaded"
+  </source>
+  <dest>
+    *: "Agordoj Ŝarĝita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SETTINGS_SAVED
+  desc: Feedback shown when a .cfg file is saved
+  user:
+  <source>
+    *: "Settings Saved"
+  </source>
+  <dest>
+    *: "Agordoj Registrita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOT_CHANGED
+  desc: File browser discovered the boot file was changed
+  user:
+  <source>
+    *: "Boot changed"
+  </source>
+  <dest>
+    *: "Startigo ŝanĝita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBOOT_NOW
+  desc: Do you want to reboot?
+  user:
+  <source>
+    *: "Reboot now?"
+  </source>
+  <dest>
+    *: "Reŝargi nun?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OFF_ABORT
+  desc: Used on recorder models
+  user:
+  <source>
+    *: "OFF to abort"
+  </source>
+  <dest>
+    *: "OFF por malfari"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_ABORT
+  desc: Used on player models
+  user:
+  <source>
+    *: "STOP to abort"
+  </source>
+  <dest>
+    *: "STOP por malfari"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_FILES
+  desc: in settings_menu
+  user:
+  <source>
+    *: "No files"
+  </source>
+  <dest>
+    *: "Neniu dosiero"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: "Fono Ŝarĝita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: "Backdrop Failed"
+  </source>
+  <dest>
+    *: "Fono Ŝarĝo Malsukcesis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Nova Klavaro"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_ARTISTS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Artists"
+  </source>
+  <dest>
+    *: "Artistoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_ALBUMS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Albums"
+  </source>
+  <dest>
+    *: "Albumoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_SONGS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Songs"
+  </source>
+  <dest>
+    *: "Kantoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Ĝenroj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_SEARCH
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Search"
+  </source>
+  <dest>
+    *: "Serĉi"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_SEARCH_ARTISTS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Search Artists"
+  </source>
+  <dest>
+    *: "Serĉi Artistoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_SEARCH_ALBUMS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Search Albums"
+  </source>
+  <dest>
+    *: "Serĉi Albumoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_SEARCH_SONGS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Search Songs"
+  </source>
+  <dest>
+    *: "Serĉi Kantoj"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_MATCHES
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "Found %d matches"
+  </source>
+  <dest>
+    *: "%d kongruoj trovita"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_ALL_SONGS
+  desc: ID3 virtual folder name
+  user:
+  <source>
+    *: "<All songs>"
+  </source>
+  <dest>
+    *: "<Ĉiuj kantoj>"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE
+  desc: The verb/action Move
+  user:
+  <source>
+    *: "Move"
+  </source>
+  <dest>
+    *: "Movi"
+  </dest>
+  <voice>
+    *: "Movi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_FAILED
+  desc: Error message displayed in playlist viewer
+  user:
+  <source>
+    *: "Move Failed"
+  </source>
+  <dest>
+    *: "Movo Malsukcesis"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_INDICES
+  desc: in playlist viewer menu
+  user:
+  <source>
+    *: "Show Indices"
+  </source>
+  <dest>
+    *: "Malkaŝi Indices"
+  </dest>
+  <voice>
+    *: "Malkaŝi Indicojn"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_DISPLAY
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Track Display"
+  </source>
+  <dest>
+    *: "Kanto Vigido"
+  </dest>
+  <voice>
+    *: "Kanto Vigido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_TRACK_NAME_ONLY
+  desc: track display options
+  user:
+  <source>
+    *: "Track Name Only"
+  </source>
+  <dest>
+    *: "Nur Kanto Nomo"
+  </dest>
+  <voice>
+    *: "Nur Kanto Nomo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FULL_PATH
+  desc: track display options
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Absoluta Vojo"
+  </dest>
+  <voice>
+    *: "Full Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOVE
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "Remove"
+  </source>
+  <dest>
+    *: "Forpreni"
+  </dest>
+  <voice>
+    *: "Forpreni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_OPTIONS
+  desc: in playlist viewer on+play menu
+  user:
+  <source>
+    *: "File Options"
+  </source>
+  <dest>
+    *: "Dosieraj Opcioj"
+  </dest>
+  <voice>
+    *: "Dosieraj Opcioj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_CANT_OPEN
+  desc: Plugin open error message
+  user:
+  <source>
+    *: "Can't open %s"
+  </source>
+  <dest>
+    *: "Ne ebla malfermi %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_READ_FAILED
+  desc: There was an error reading a file
+  user:
+  <source>
+    *: "Failed reading %s"
+  </source>
+  <dest>
+    *: "Malsukcesis leganta %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_MODEL
+  desc: The plugin is not compatible with the archos model trying to run it
+  user:
+  <source>
+    *: "Incompatible model"
+  </source>
+  <dest>
+    *: "Nekongrua modelo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_WRONG_VERSION
+  desc: The plugin is not compatible with the rockbox version trying to run it
+  user:
+  <source>
+    *: "Incompatible version"
+  </source>
+  <dest>
+    *: "Nekongrua versio"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLUGIN_ERROR
+  desc: The plugin return an error code
+  user:
+  <source>
+    *: "Plugin returned error"
+  </source>
+  <dest>
+    *: "Kromprogramo eraris"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_EXTENSION_FULL
+  desc: Extension array full
+  user:
+  <source>
+    *: "Extension array full"
+  </source>
+  <dest>
+    *: "Etenda tabelo plena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_FULL
+  desc: Filetype array full
+  user:
+  <source>
+    *: "Filetype array full"
+  </source>
+  <dest>
+    *: "Dosiertipa tabelo plena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_PLUGIN_NAME_LONG
+  desc: Viewer plugin name too long
+  user:
+  <source>
+    *: "Plugin name too long"
+  </source>
+  <dest>
+    *: "Kromprogramo nomo tro longa"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILETYPES_STRING_BUFFER_EMPTY
+  desc: Filetype string buffer empty
+  user:
+  <source>
+    *: "Dosiertipo ĉena bufro malplena"
+  </source>
+  <dest>
+    *: "Dosiertipo ĉena bufro malplena"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_CONFIRM_PLAYER
+  desc: possible answers to resume question
+  user:
+  <source>
+    *: "(PLAY/STOP)"
+  </source>
+  <dest>
+    *: "(LEGI/STOPI)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Ŝarĝi Staciliston"
+  </dest>
+  <voice>
+    *: "Ŝarĝi Staciliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Savi Staciliston"
+  </dest>
+  <voice>
+    *: "Savi Staciliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Senrubigi Staciliston"
+  </dest>
+  <voice>
+    *: "Senrubigi Staciliston"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Listo da Stacioj"
+  </dest>
+  <voice>
+    *: "Listo da Stacioj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "Neniu Agordoj Trovita, Skani?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "Savi Ŝanĝojn?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "rastrumeroj"
+  </dest>
+  <voice>
+    *: "rastrumeroj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Rekta Gajno"
+  </dest>
+  <voice>
+    *: "Rekta Gajno"
+  </voice>
+</phrase>   
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Transgajno"
+  </dest>
+  <voice>  
+    *: "Transgajno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Alta-Frekvenco Atenuo"
+  </dest>
+  <voice>
+    *: "Alta-Frekvenco Atenuo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Alta-Frekvenco Supertranĉo"
+  </dest>
+  <voice>
+    *: "Alta-Frekvenco Supertranĉo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Etikedo kaŝmemero estas malpreta"
+  </dest>
+  <voice>
+    *: "Etikedo kaŝmemero estas malpreta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Ĉiuj kantoj>"
+  </dest>
+  <voice>
+    *: "Ĉiuj kantoj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Invalida Dosiernomo!"
+  </dest>
+  <voice>
+    *: "Invalida Dosiernomo!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Fora Rulumo Opcioj"
+  </dest>
+  <voice>
+    *: "Fora Rulumo Opcioj"
+  </voice>
+</phrase>
