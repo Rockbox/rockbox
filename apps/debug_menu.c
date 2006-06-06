@@ -1334,8 +1334,8 @@ bool view_battery(void)
                 snprintf(buf, 30, "External: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 2, buf);
 #endif
-#ifdef HAVE_CHARGING
-#ifdef HAVE_CHARGE_CTRL
+#ifdef CONFIG_CHARGING
+#if CONFIG_CHARGING == CHARGING_CONTROL
                 snprintf(buf, 30, "Chgr: %s %s", 
                          charger_inserted() ? "present" : "absent",
                          charger_enabled ? "on" : "off");
@@ -1345,8 +1345,8 @@ bool view_battery(void)
                 snprintf(buf, 30, "long delta: %d", long_delta);
                 lcd_puts(0, 6, buf);
                 lcd_puts(0, 7, power_message);
-#else /* !HAVE_CHARGE_CTRL */
-#if defined IPOD_NANO || defined IPOD_VIDEO 
+#else /* CONFIG_CHARGING != CHARGING_CONTROL */
+#if defined IPOD_NANO || defined IPOD_VIDEO
                 int usb_pwr  = (GPIOL_INPUT_VAL & 0x10)?true:false;
                 int ext_pwr  = (GPIOL_INPUT_VAL & 0x08)?false:true;
                 int dock     = (GPIOA_INPUT_VAL & 0x10)?true:false;
@@ -1373,8 +1373,8 @@ bool view_battery(void)
                          charger_inserted() ? "present" : "absent");
                 lcd_puts(0, 3, buf);
 #endif
-#endif /* !HAVE_CHARGE_CTRL */
-#endif /* HAVE_CHARGING */
+#endif /* CONFIG_CHARGING != CHARGING_CONTROL */
+#endif /* CONFIG_CHARGING */
                 break;
                 
             case 2: /* voltage deltas: */
@@ -1393,7 +1393,7 @@ bool view_battery(void)
             case 3: /* remaining time estimation: */
                 lcd_clear_display();
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
                 snprintf(buf, 30, "charge_state: %d", charge_state);
                 lcd_puts(0, 0, buf);
 
@@ -1408,7 +1408,7 @@ bool view_battery(void)
 
                 snprintf(buf, 30, "Trickle sec: %d/60", trickle_sec);
                 lcd_puts(0, 4, buf);
-#endif /* HAVE_CHARGE_CTRL */
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
                 snprintf(buf, 30, "Last PwrHist: %d.%02d V",
                     power_history[0] / 100,
@@ -1465,7 +1465,7 @@ static bool view_runtime(void)
 #endif
 
         if (state & 1) {
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
             if (charger_inserted()
 #ifdef HAVE_USB_POWER
                     || usb_powered()

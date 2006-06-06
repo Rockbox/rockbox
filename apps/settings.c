@@ -243,7 +243,7 @@ static const struct bit_entry rtc_bits[] =
     {6, S_O(contrast), 40, "contrast", NULL },
 #ifdef CONFIG_BACKLIGHT
     {5, S_O(backlight_timeout), 5, "backlight timeout", backlight_times_conf },
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     {5, S_O(backlight_timeout_plugged), 11, "backlight timeout plugged",
         backlight_times_conf },
 #endif
@@ -276,7 +276,7 @@ static const struct bit_entry rtc_bits[] =
     {12, S_O(battery_capacity), BATTERY_CAPACITY_DEFAULT, "battery capacity",
          NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,
                      500...1500 for Alkaline */
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     {1, S_O(car_adapter_mode), false, "car adapter mode", off_on },
 #endif
     /* tuner */
@@ -296,7 +296,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
     {5, S_O(remote_backlight_timeout), 5, "remote backlight timeout",
         backlight_times_conf },
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     {5, S_O(remote_backlight_timeout_plugged), 11,
         "remote backlight timeout plugged", backlight_times_conf },
 #endif
@@ -1018,13 +1018,13 @@ void settings_apply(void)
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif
     remote_backlight_set_timeout(global_settings.remote_backlight_timeout);
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     remote_backlight_set_timeout_plugged(global_settings.remote_backlight_timeout_plugged);
 #endif
 #endif
 #ifdef CONFIG_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     backlight_set_timeout_plugged(global_settings.backlight_timeout_plugged);
 #endif
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)

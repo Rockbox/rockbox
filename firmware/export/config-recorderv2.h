@@ -90,8 +90,8 @@
 /* How to detect USB */
 #define USB_FMRECORDERSTYLE 1
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x12010 for behind original Archos */

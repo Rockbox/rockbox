@@ -81,7 +81,7 @@ void dac_line_in(bool enable);
 #include "backdrop.h"
 #endif
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 static bool car_adapter_mode(void)
 {
     return set_bool( str(LANG_CAR_ADAPTER_MODE),
@@ -177,7 +177,7 @@ static bool caption_backlight(void)
                      &global_settings.caption_backlight);
 }
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 static bool backlight_timer_plugged(void)
 {
     return set_option((char *)str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
@@ -248,7 +248,7 @@ static bool remote_backlight_timer(void)
                       remote_backlight_set_timeout );
 }
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 static bool remote_backlight_timer_plugged(void)
 {
     return set_option((char *)str(LANG_BACKLIGHT_ON_WHEN_CHARGING),
@@ -1715,7 +1715,7 @@ static bool lcd_settings_menu(void)
     static const struct menu_item items[] = {
 #ifdef CONFIG_BACKLIGHT
         { ID2P(LANG_BACKLIGHT),       backlight_timer },
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_timer_plugged },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
@@ -1763,7 +1763,7 @@ static bool lcd_remote_settings_menu(void)
 
     static const struct menu_item items[] = {
         { ID2P(LANG_BACKLIGHT),       remote_backlight_timer },
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING),
                                       remote_backlight_timer_plugged },
 #endif
@@ -1860,9 +1860,7 @@ static bool battery_settings_menu(void)
         { ID2P(LANG_BATTERY_TYPE),     battery_type },
 #endif
 #else
-#ifndef HAVE_CHARGE_CTRL
         { "Dummy", NULL }, /* to have an entry at all, in the simulator */
-#endif
 #endif
     };
 
@@ -1975,7 +1973,7 @@ static bool system_settings_menu(void)
 #if CONFIG_CODEC == MAS3507D
         { ID2P(LANG_LINE_IN),          line_in                },
 #endif
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
         { ID2P(LANG_CAR_ADAPTER_MODE), car_adapter_mode       },
 #endif
     };

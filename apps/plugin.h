@@ -421,9 +421,9 @@ struct plugin_api {
 #ifndef SIMULATOR
     unsigned int (*battery_voltage)(void);
 #endif
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     bool (*charger_inserted)(void);
-# ifdef HAVE_CHARGE_STATE
+# if CONFIG_CHARGING == CHARGING_MONITOR
     bool (*charging_state)(void);
 # endif
 #endif

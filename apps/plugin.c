@@ -58,7 +58,7 @@
 #include "dsp.h"
 #endif
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 #include "power.h"
 #endif
 
@@ -359,9 +359,9 @@ static const struct plugin_api rockbox_api = {
 #ifndef SIMULATOR
     battery_voltage,
 #endif
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     charger_inserted,
-# ifdef HAVE_CHARGE_STATE
+# if CONFIG_CHARGING == CHARGING_MONITOR
     charging_state,
 # endif
 #endif

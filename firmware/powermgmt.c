@@ -64,7 +64,7 @@
  * in it (one sample per minute).  This is only for very low level debug.
  */
 #undef  DEBUG_FILE
-#if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
+#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
 #include "file.h"
 #define DEBUG_FILE_NAME   "/powermgmt.csv"
 #define DEBUG_MESSAGE_LEN 133
@@ -190,7 +190,7 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #endif
 };
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 charger_input_state_type charger_input_state IDATA_ATTR;
 
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
@@ -207,15 +207,13 @@ static const short percent_to_volt_charge[11] =
     476, 544, 551, 556, 561, 564, 566, 576, 582, 584, 585 /* NiMH */
 #endif
 };
-#endif /* HAVE_CHARGING */
+#endif /* CONFIG_CHARGING */
 
-#if defined(HAVE_CHARGE_CTRL) || \
-    CONFIG_BATTERY == BATT_LIION2200 || \
-    defined(HAVE_CHARGE_STATE)
+#if CONFIG_CHARGING >= CHARGING_MONITOR
 charge_state_type charge_state;     /* charging mode */
 #endif
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 int long_delta;                     /* long term delta battery voltage */
 int short_delta;                    /* short term delta battery voltage */
 bool disk_activity_last_cycle = false;         /* flag set to aid charger time
@@ -235,7 +233,7 @@ int trickle_sec = 0;                           /* how many seconds should the
                                                   charging? */
 int pid_p = 0;                      /* PID proportional term */
 int pid_i = 0;                      /* PID integral term */
-#endif /* HAVE_CHARGE_CTRL */
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
 /*
  * Average battery voltage and charger voltage, filtered via a digital
@@ -366,7 +364,7 @@ static void battery_status_update(void)
 {
     int level;
 
-#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)
+#if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == DISCHARGING) {
         level = voltage_to_percent(battery_centivolts,
                 percent_to_volt_discharge[battery_type]);
@@ -397,7 +395,7 @@ static void battery_status_update(void)
     /* calculate estimated remaining running time */
     /* discharging: remaining running time */
     /* charging:    remaining charging time */
-#if defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)
+#if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == CHARGING) {
         powermgmt_est_runningtime_min = (100 - level) * battery_capacity / 100
                                       * 60 / (CURRENT_MAX_CHG - runcurrent());
@@ -425,7 +423,7 @@ static void handle_auto_poweroff(void)
     long timeout = poweroff_idle_timeout_value[poweroff_timeout]*60*HZ;
     int  audio_stat = audio_status();
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     /*
      * Inhibit shutdown as long as the charger is plugged in.  If it is
      * unplugged, wait for a timeout period and then shut down.
@@ -458,7 +456,7 @@ static void handle_auto_poweroff(void)
             if(TIME_AFTER(current_tick, sleeptimer_endtick))
             {
                 audio_stop();
-#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                 if((charger_input_state == CHARGER) ||
                    (charger_input_state == CHARGER_PLUGGED))
                 {
@@ -538,7 +536,7 @@ static void power_thread_sleep(int ticks)
 
     while (ticks > 0) {
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
         /*
          * Detect charger plugged/unplugged transitions.  On a plugged or
          * unplugged event, we return immediately, run once through the main
@@ -577,7 +575,7 @@ static void power_thread_sleep(int ticks)
             }
         }
 #endif
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
         switch (charger_input_state) {
             case CHARGER_UNPLUGGED:
             case NO_CHARGER:
@@ -593,7 +591,7 @@ static void power_thread_sleep(int ticks)
                 break;
         }
 
-#endif /* HAVE_CHARGE_STATE */
+#endif /* CONFIG_CHARGING == CHARGING_MONITOR */
 
         small_ticks = MIN(HZ/2, ticks);
         sleep(small_ticks);
@@ -628,13 +626,13 @@ static void power_thread_sleep(int ticks)
             battery_status_update();
 
         }
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
         if (ata_disk_is_active()) {
             /* flag hdd use for charging calculation */
             disk_activity_last_cycle = true;
         }
 #endif
-#if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
+#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
         /*
          * If we have a lot of pending writes or if the disk is spining,
          * fsync the debug log file.
@@ -660,7 +658,7 @@ static void power_thread(void)
 {
     int i;
     short *phps, *phpd;         /* power history rotation pointers */
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
     unsigned int target_voltage = TRICKLE_VOLTAGE;    /* desired topoff/trickle
                                        * voltage level */
     int charge_max_time_idle = 0;     /* max. charging duration, calculated at
@@ -678,7 +676,7 @@ static void power_thread(void)
         BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
-#if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
+#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
     fd      = -1;
     wrcount = 0;
 #endif
@@ -694,25 +692,7 @@ static void power_thread(void)
         /* insert new value at the start, in centivolts 8-) */
         power_history[0] = battery_centivolts;
 
-#if CONFIG_BATTERY == BATT_LIION2200
-        /* We use the information from the ADC_EXT_POWER ADC channel, which
-           tells us the charging current from the LTC1734. When DC is
-           connected (either via the external adapter, or via USB), we try
-           to determine if it is actively charging or only maintaining the
-           charge. My tests show that ADC readings below about 0x80 means
-           that the LTC1734 is only maintaining the charge. */
-        if(charger_inserted()) {
-            if(adc_read(ADC_EXT_POWER) < 0x80) {
-                charge_state = TRICKLE;
-            } else {
-                charge_state = CHARGING;
-            }
-        } else {
-            charge_state = DISCHARGING;
-        }
-#endif /* # if CONFIG_BATTERY == BATT_LIION2200 */
-
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
         if (charger_input_state == CHARGER_PLUGGED) {
             pid_p = 0;
             pid_i = 0;
@@ -876,7 +856,7 @@ static void power_thread(void)
                 }
             }
         }
-        else if (charge_state > CHARGING)  /* top off or trickle */
+        else if (charge_state != DISCHARGING)  /* top off or trickle */
         {
             /*
              *Time to switch from topoff to trickle?
@@ -946,11 +926,11 @@ static void power_thread(void)
             snprintf(power_message, POWER_MESSAGE_LEN, "Charger: discharge");
         }
 
-#endif /* end HAVE_CHARGE_CTRL */
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
         /* sleep for a minute */
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
         if(trickle_sec > 0) {
             charger_enable(true);
             power_thread_sleep(HZ * trickle_sec);
@@ -962,7 +942,7 @@ static void power_thread(void)
         power_thread_sleep(HZ * 60);
 #endif
 
-#if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
+#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
         if(usb_inserted()) {
             if(fd >= 0) {
                 /* It is probably too late to close the file but we can try...*/
@@ -992,7 +972,7 @@ static void power_thread(void)
 #endif
         handle_auto_poweroff();
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
         powermgmt_last_cycle_startstop_min++;
 #endif
     }
@@ -1029,7 +1009,7 @@ void cancel_shutdown(void)
 void shutdown_hw(void)
 {
 #ifndef SIMULATOR
-#if defined(DEBUG_FILE) && defined(HAVE_CHARGE_CTRL)
+#if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
     if(fd >= 0) {
         close(fd);
         fd = -1;

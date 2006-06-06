@@ -128,14 +128,14 @@ void exit_tsr(void)
 /* use long for aligning */
 unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 
-#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+#if defined(CONFIG_CHARGING) || defined(HAVE_USB_POWER)
 unsigned int charge_state(void)
 {
     unsigned int ret = 0;
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
     if(rb->charger_inserted())
         ret = BIT_CHARGER;
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
     if(rb->charging_state())
         ret |= BIT_CHARGING;
 #endif
@@ -154,7 +154,7 @@ void thread(void)
     int fd, buffelements, tick = 1, i = 0, skipped = 0, exit = 0;
     int fst = 0, lst = 0; /* first and last skipped tick */
     unsigned int last_voltage = 0;
-#if  defined(HAVE_CHARGING) || defined(HAVE_USB_POWER) 
+#if  defined(CONFIG_CHARGING) || defined(HAVE_USB_POWER) 
     unsigned int last_state = 0;
 #endif    
     long sleep_time;
@@ -202,9 +202,9 @@ void thread(void)
                          rb->fdprintf(fd,
                                 "%02d:%02d:%02d,  %05d,     %03d%%,     "
                                 "%02d:%02d,           %04d,     %04d"
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
                                 ",  %c"
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
                                 ",  %c"
 #endif
 #endif
@@ -215,7 +215,7 @@ void thread(void)
                                 
                                 HMS(secs), secs, bat[j].level,
                                 bat[j].eta / 60, bat[j].eta % 60, 
-#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+#if defined(CONFIG_CHARGING) || defined(HAVE_USB_POWER)
                                 (bat[j].voltage & 
                                  (~(BIT_CHARGER|BIT_CHARGING|BIT_USB_POWER)))
                                 *10,
@@ -223,9 +223,9 @@ void thread(void)
                                 bat[j].voltage * 10,
 #endif
                                 temp + 1 + (j-i)
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
                                 ,(bat[j].voltage & BIT_CHARGER)?'A':'-' 
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
                                 ,(bat[j].voltage & BIT_CHARGING)?'C':'-'
 #endif
 #endif
@@ -260,7 +260,7 @@ void thread(void)
                 timeflag = true;
             
             if(last_voltage != (current_voltage=rb->battery_voltage())
-#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+#if defined(CONFIG_CHARGING) || defined(HAVE_USB_POWER)
                 || last_state != charge_state()
 #endif
                             )
@@ -280,7 +280,7 @@ void thread(void)
                 bat[i].level = rb->battery_level();
                 bat[i].eta = rb->battery_time();
                 last_voltage = bat[i].voltage = current_voltage;
-#if defined(HAVE_CHARGING) || defined(HAVE_USB_POWER)
+#if defined(CONFIG_CHARGING) || defined(HAVE_USB_POWER)
                 bat[i].voltage |= last_state = charge_state();
 #endif                
                 i++;
@@ -421,10 +421,10 @@ int main(void)
                 "Battery type: %d mAh      Buffer Entries: %d\n"
                 "  Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:,"
                 "  M/DA:"
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
                 ", C:"
 #endif
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
                 ", S:"
 #endif
 #ifdef HAVE_USB_POWER

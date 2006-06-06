@@ -107,37 +107,73 @@ struct gui_syncstatusbar statusbars;
 
 void gui_statusbar_init(struct gui_statusbar * bar)
 {
-    bar->last_volume = -1000; /* -1000 means "first update ever" */
-    bar->battery_icon_switch_tick = 0;
-    bar->animated_level = 0;
+    bar->redraw_volume = true;
+    bar->volume_icon_switch_tick = bar->battery_icon_switch_tick = current_tick;
 }
 
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 {
     struct screen * display = bar->display;
-#ifdef CONFIG_RTC
-    struct tm* tm; /* For Time */
-#endif /* CONFIG_RTC */
 
 #ifdef HAVE_LCD_CHARCELLS
-    int vol;
+    int val;
     (void)force_redraw; /* players always "redraw" */
 #endif /* HAVE_LCD_CHARCELLS */
 
-    bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
-#ifdef HAVE_CHARGING
-    bar->info.inserted = (charger_input_state == CHARGER);
-#endif
     bar->info.battlevel = battery_level();
-    bar->info.battery_safe = battery_level_safe();
+#ifdef HAVE_USB_POWER
+    bar->info.usb_power = usb_powered();
+#endif
+#ifdef CONFIG_CHARGING
+    bar->info.inserted = (charger_input_state == CHARGER);
+    if (bar->info.inserted)
+    {
+        bar->info.battery_state = true;
 
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+
+        /* zero battery run time if charging */
+        if (charge_state > DISCHARGING)
+            lasttime = current_tick;
+
+        /* animate battery if charging */
+        if ((charge_state == DISCHARGING) || (charge_state == TRICKLE))
+        {
+            bar->info.batt_charge_step = -1;
+        }
+        else
+        {
+#else
+        lasttime = current_tick;
+        {
+#endif
+            /* animate in (max.) 4 steps, starting near the current charge level */
+            if (TIME_AFTER(current_tick, bar->battery_icon_switch_tick)) 
+            {
+                if (++bar->info.batt_charge_step > 3)
+                    bar->info.batt_charge_step = bar->info.battlevel / 34;
+                bar->battery_icon_switch_tick = current_tick + HZ;
+            }
+        }
+    }
+    else
+#endif
+    {
+        bar->info.batt_charge_step = -1;
+        if (battery_level_safe())
+            bar->info.battery_state = true;
+        else
+            /* blink battery if level is low */
+            if (TIME_AFTER(current_tick, bar->battery_icon_switch_tick) &&
+               (bar->info.battlevel > -1))
+            {
+                bar->info.battery_state = !bar->info.battery_state;
+                bar->battery_icon_switch_tick = current_tick + HZ;
+            }
+    }
+
+    bar->info.volume = sound_val2phys(SOUND_VOLUME, global_settings.volume);
 #ifdef HAVE_LCD_BITMAP
-#ifdef CONFIG_RTC
-    tm = get_time();
-    bar->info.hour = tm->tm_hour;
-    bar->info.minute = tm->tm_min;
-#endif /* CONFIG_RTC */
-
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
     bar->info.keylock = button_hold();
@@ -149,24 +185,25 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
     bar->info.repeat = global_settings.repeat_mode;
     bar->info.playmode = current_playmode();
+
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     if(!display->has_disk_led)
         bar->info.led = led_read(HZ/2); /* delay should match polling interval */
 #endif
-
-#ifdef HAVE_USB_POWER
-    bar->info.usb_power = usb_powered();
-#endif /* HAVE_USB_POWER */
+#ifdef CONFIG_RTC
+    {
+        struct tm* tm = get_time();
+        bar->info.hour = tm->tm_hour;
+        bar->info.minute = tm->tm_min;
+    }
+#endif /* CONFIG_RTC */
 
     /* only redraw if forced to, or info has changed */
-    if (force_redraw ||
-        bar->info.inserted ||
-        !bar->info.battery_safe ||
-        bar->info.redraw_volume ||
+    if (force_redraw || bar->redraw_volume ||
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        display->fillrect(0,0,display->width,8);
+        display->fillrect(0, 0, display->width, STATUSBAR_HEIGHT);
         display->set_drawmode(DRMODE_SOLID);
 
 #else
@@ -175,65 +212,10 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
     {
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_CHARGING
-        if (bar->info.inserted) {
-            battery_state = true;
-#if defined(HAVE_CHARGE_CTRL) || \
-    defined(HAVE_CHARGE_STATE) || \
-    CONFIG_BATTERY == BATT_LIION2200
-            /* zero battery run time if charging */
-            if (charge_state > DISCHARGING) {
-                lasttime = current_tick;
-            }
-
-            /* animate battery if charging */
-            if ((charge_state == CHARGING)
-#ifdef HAVE_CHARGE_CTRL
-                    || (charge_state == TOPOFF)
-#endif
-                ) {
-#else
-            lasttime = current_tick;
-            {
-#endif
-                /* animate in three steps (34% per step for a better look) */
-#ifndef HAVE_CHARGE_STATE
-                bar->info.battlevel = 0;
-#endif
-                if(TIME_AFTER(current_tick, bar->battery_icon_switch_tick)) {
-                    if (bar->animated_level == 100)
-                    {
-                        bar->animated_level = bar->info.battlevel;
-                    }
-                    else
-                    {
-                        bar->animated_level += 34;
-                        if (bar->animated_level > 100)
-                            bar->animated_level = 100;
-                    }
-                    bar->battery_icon_switch_tick = current_tick + HZ;
-                }
-            }
-        }
-        else
-#endif /* HAVE_CHARGING */
-        {
-            bar->animated_level = 0;
-            if (bar->info.battery_safe)
-                battery_state = true;
-            else {
-                /* blink battery if level is low */
-                if(TIME_AFTER(current_tick, bar->battery_icon_switch_tick) &&
-                   (bar->info.battlevel > -1)) {
-                    bar->battery_icon_switch_tick = current_tick+HZ;
-                    battery_state = !battery_state;
-                }
-            }
-        }
 #ifdef HAVE_LCD_BITMAP
-        if (battery_state)
+        if (bar->info.battery_state)
             gui_statusbar_icon_battery(display, bar->info.battlevel, 
-                                       bar->animated_level);
+                                       bar->info.batt_charge_step);
 #ifdef HAVE_USB_POWER
         if (bar->info.usb_power)
             display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
@@ -243,14 +225,15 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
         else
 #endif /* HAVE_USB_POWER */
         /* draw power plug if charging */
+#ifdef CONFIG_CHARGING
         if (bar->info.inserted)
             display->mono_bitmap(bitmap_icons_7x8[Icon_Plug],
                                     STATUSBAR_PLUG_X_POS,
                                     STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                     STATUSBAR_HEIGHT);
+#endif
 
-        bar->info.redraw_volume = gui_statusbar_icon_volume(bar,
-                                                bar->info.volume);
+        bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
         gui_statusbar_icon_play_state(display, current_playmode() +
                                                 Icon_Play);
 
@@ -292,20 +275,24 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 
 
 #ifdef HAVE_LCD_CHARCELLS
-    if (bar->info.battlevel > -1)
-        display->icon(ICON_BATTERY, battery_state);
-    display->icon(ICON_BATTERY_1, bar->info.battlevel > 25);
-    display->icon(ICON_BATTERY_2, bar->info.battlevel > 50);
-    display->icon(ICON_BATTERY_3, bar->info.battlevel > 75);
+    display->icon(ICON_BATTERY, bar->info.battery_state);
+    
+    if (bar->info.batt_charge_step > -1)
+        val = bar->info.batt_charge_step;
+    else
+        val = (bar->info.battlevel * 3 + 50) / 100;
+    display->icon(ICON_BATTERY_1, val >= 1);
+    display->icon(ICON_BATTERY_2, val >= 2);
+    display->icon(ICON_BATTERY_3, val >= 3);
 
-    vol = 100 * (bar->info.volume - sound_min(SOUND_VOLUME))
+    val = 10 * (bar->info.volume - sound_min(SOUND_VOLUME))
            / (sound_max(SOUND_VOLUME) - sound_min(SOUND_VOLUME));
     display->icon(ICON_VOLUME, true);
-    display->icon(ICON_VOLUME_1, vol > 10);
-    display->icon(ICON_VOLUME_2, vol > 30);
-    display->icon(ICON_VOLUME_3, vol > 50);
-    display->icon(ICON_VOLUME_4, vol > 70);
-    display->icon(ICON_VOLUME_5, vol > 90);
+    display->icon(ICON_VOLUME_1, val >= 1);
+    display->icon(ICON_VOLUME_2, val >= 3);
+    display->icon(ICON_VOLUME_3, val >= 5);
+    display->icon(ICON_VOLUME_4, val >= 7);
+    display->icon(ICON_VOLUME_5, val >= 9);
 
     display->icon(ICON_PLAY, current_playmode() == STATUS_PLAY);
     display->icon(ICON_PAUSE, current_playmode() == STATUS_PAUSE);
@@ -326,40 +313,41 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
  * Print battery icon to status bar
  */
 void gui_statusbar_icon_battery(struct screen * display, int percent, 
-                                int animated_percent)
+                                int batt_charge_step)
 {
     int fill, endfill;
     char buffer[5];
     unsigned int width, height;
 #if LCD_DEPTH > 1
-    unsigned int prevfg = LCD_DEFAULT_FG;
+    unsigned int prevfg = 0;
 #endif
 
-    /* fill battery */
-    fill = percent;
-    if (fill < 0)
-        fill = 0;
-    if (fill > 100)
-        fill = 100;
+#ifdef CONFIG_CHARGING
+    if (batt_charge_step >= 0)
+    {
+        fill = percent * (STATUSBAR_BATTERY_WIDTH-3) / 100;
+        endfill = 34 * batt_charge_step * (STATUSBAR_BATTERY_WIDTH-3) / 100;
+    }
+    else
+#else
+    (void)batt_charge_step;
+#endif
+    {
+        fill = endfill = (percent * (STATUSBAR_BATTERY_WIDTH-3) + 50) / 100;
+    }
 
-    endfill = animated_percent;
-    if (endfill < 0)
-        endfill = 0;
-    if (endfill > 100)
-        endfill = 100;
-    
-#if (defined(HAVE_CHARGE_CTRL) || defined(HAVE_CHARGE_STATE)) && \
-    !defined(SIMULATOR) /* Certain charge controlled targets */
+#if CONFIG_CHARGING == CHARGING_MONITOR && !defined(SIMULATOR) 
+    /* Certain charge controlled targets */
     /* show graphical animation when charging instead of numbers */
     if ((global_settings.battery_display) &&
-        (charge_state != 1) &&
+        (charge_state != CHARGING) &&
         (percent > -1)) {
 #else /* all others */
     if (global_settings.battery_display && (percent > -1)) {
 #endif
         /* Numeric display */
         display->setfont(FONT_SYSFIXED);
-        snprintf(buffer, sizeof(buffer), "%3d", fill);
+        snprintf(buffer, sizeof(buffer), "%3d", percent);
         display->getstringsize(buffer, &width, &height);
         if (height <= STATUSBAR_HEIGHT)
             display->putsxy(STATUSBAR_BATTERY_X_POS
@@ -374,7 +362,6 @@ void gui_statusbar_icon_battery(struct screen * display, int percent,
         display->vline(STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
                        STATUSBAR_Y_POS + 4);
 
-        fill = fill * 15 / 100;
         display->fillrect(STATUSBAR_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1,
                           fill, 5);
 #if LCD_DEPTH > 1
@@ -384,9 +371,8 @@ void gui_statusbar_icon_battery(struct screen * display, int percent,
             display->set_foreground(LCD_DARKGRAY);
         }
 #endif
-        endfill = endfill * 15 / 100 - fill;
-        display->fillrect(STATUSBAR_BATTERY_X_POS + 1 + fill, 
-                          STATUSBAR_Y_POS + 1, endfill, 5);
+        display->fillrect(STATUSBAR_BATTERY_X_POS + 1 + fill,
+                          STATUSBAR_Y_POS + 1, endfill - fill, 5);
 #if LCD_DEPTH > 1
         if (display->depth > 1)
             display->set_foreground(prevfg);
@@ -507,6 +493,7 @@ void gui_statusbar_icon_lock(struct screen * display)
                          STATUSBAR_LOCKM_WIDTH, STATUSBAR_HEIGHT);
 }
 
+#ifdef HAS_REMOTE_BUTTON_HOLD
 /*
  * Print remote lock when remote hold is enabled
  */
@@ -516,6 +503,7 @@ void gui_statusbar_icon_lock_remote(struct screen * display)
                          STATUSBAR_LOCKR_X_POS, STATUSBAR_Y_POS,
                          STATUSBAR_LOCKR_WIDTH, STATUSBAR_HEIGHT);
 }
+#endif
 
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
 /*

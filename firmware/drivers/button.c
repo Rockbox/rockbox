@@ -490,7 +490,7 @@ static void button_tick(void)
                                     || btn == BUTTON_RC_STOP
 #endif
                                     ) &&
-#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
                                 !charger_inserted() &&
 #endif
                                 repeat_count > POWEROFF_COUNT)
@@ -1248,7 +1248,7 @@ static int button_read(void)
         backlight_on();
     }
     /* TODO: add light handling for the remote */
-    
+
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
 

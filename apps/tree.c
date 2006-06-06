@@ -644,7 +644,7 @@ static bool dirbrowse(void)
                         if (!global_settings.party_mode)
                             audio_stop();
                     }
-#if defined(HAVE_CHARGING) && \
+#if defined(CONFIG_CHARGING) && \
     (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
                     else {
                         if (!charger_inserted()) {
@@ -658,7 +658,7 @@ static bool dirbrowse(void)
 #endif
                 }
                 break;
-#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
                     charging_splash();

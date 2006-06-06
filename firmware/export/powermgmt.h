@@ -28,7 +28,7 @@
 
 #ifndef SIMULATOR
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 #define START_TOPOFF_CHG    85  /* Battery % to start at top-off */
 #define START_TRICKLE_CHG   95  /* Battery % to start at trickle */
 
@@ -59,23 +59,21 @@ extern int pid_p;                /* PID proportional term */
 extern int pid_i;                /* PID integral term */
 extern int trickle_sec;          /* trickle charge: How many seconds per minute are we charging actually? */
 
-#endif /* HAVE_CHARGE_CTRL */
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
-#if defined(HAVE_CHARGE_CTRL) || \
-    (CONFIG_BATTERY == BATT_LIION2200) || \
-    defined(HAVE_CHARGE_STATE)
-typedef enum {
-    DISCHARGING,
-    CHARGING,
-    TOPOFF,
-    TRICKLE
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+typedef enum {       /* sorted by increasing charging current */
+    DISCHARGING = 0, 
+    TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
+    TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
+    CHARGING         /* Can occur for all CONFIG_CHARGING options */
 } charge_state_type;
 
 /* tells what the charger is doing */
 extern charge_state_type charge_state;
-#endif /* defined(HAVE_CHARGE_CTRL) || (CONFIG_BATTERY == BATT_LIION2200) */
+#endif /* CONFIG_CHARGING >= CHARGING_MONITOR */
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 /*
  * Flag that the charger has been plugged in/removed: this is set for exactly
  * one time through the power loop when the charger has been plugged in.

@@ -19,12 +19,12 @@
 #ifndef _POWER_H_
 #define _POWER_H_
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 extern bool charger_enabled;
 void charger_enable(bool on);
 #endif
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 bool charger_inserted(void);
 #endif
 
@@ -35,7 +35,7 @@ void ide_power_enable(bool on);
 
 void power_init(void);
 
-# ifdef HAVE_CHARGE_STATE
+# if CONFIG_CHARGING == CHARGING_MONITOR
 bool charging_state(void);
 # endif
 

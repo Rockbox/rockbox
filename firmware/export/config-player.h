@@ -67,8 +67,8 @@
 /* How to detect USB */
 #define USB_PLAYERSTYLE 1
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
+/* Hardware controlled charging */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0xD010 for behind original Archos */

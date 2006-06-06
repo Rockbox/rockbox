@@ -68,6 +68,11 @@
 #define BATT_3AAA       1000 /* Ondio */
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
 
+/* CONFIG_CHARGING */
+#define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
+#define CHARGING_MONITOR 2 /* Hardware controlled charging with monitoring */
+#define CHARGING_CONTROL 3 /* Software controlled charging */
+
 /* CONFIG_LCD */
 #define LCD_GMINI100  0
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */

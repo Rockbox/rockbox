@@ -84,11 +84,9 @@
 /* Define if we have a hardware defect that causes ticking on the audio line */
 #define HAVE_REMOTE_LCD_TICKING
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
-
-/* For units with a hardware charger that reports charge state */
-#define HAVE_CHARGE_STATE 1
+/* Hardware controlled charging */
+//#define CONFIG_CHARGING CHARGING_SIMPLE
+#define CONFIG_CHARGING CHARGING_MONITOR /* FIXME: remove that once monitoring is fixed properly */
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING

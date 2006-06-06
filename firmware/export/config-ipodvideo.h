@@ -74,13 +74,11 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 5865
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* define this if the hardware can be powered off while charging */
 //#define HAVE_POWEROFF_WHILE_CHARGING
-
-#define HAVE_CHARGE_STATE 1
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000

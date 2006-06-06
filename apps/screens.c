@@ -149,7 +149,7 @@ unsigned short adc_read(int channel)
 }
 #endif
 
-#if defined(HAVE_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
+#if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 
 #ifdef HAVE_LCD_BITMAP
 void charging_display_info(bool animate)
@@ -178,16 +178,16 @@ void charging_display_info(bool animate)
         lcd_puts(0, 7, buf);
     }
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 
     snprintf(buf, 32, "Charge mode:");
     lcd_puts(0, 2, buf);
 
-    if (charge_state == 1)
+    if (charge_state == CHARGING)
         snprintf(buf, 32, str(LANG_BATTERY_CHARGE));
-    else if (charge_state == 2)
+    else if (charge_state == TOPOFF)
         snprintf(buf, 32, str(LANG_BATTERY_TOPOFF_CHARGE));
-    else if (charge_state == 3)
+    else if (charge_state == TRICKLE)
         snprintf(buf, 32, str(LANG_BATTERY_TRICKLE_CHARGE));
     else
         snprintf(buf, 32, "not charging");
@@ -195,7 +195,7 @@ void charging_display_info(bool animate)
     lcd_puts(0, 3, buf);
     if (!charger_enabled)
         animate = false;
-#endif /* HAVE_CHARGE_CTRL */
+#endif /* CONFIG_CHARGING == CHARGING_CONTROL */
 
 
     /* middle part */
@@ -351,7 +351,7 @@ int charging_screen(void)
 #endif
     return rc;
 }
-#endif /* HAVE_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
+#endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
 #if (CONFIG_KEYPAD != PLAYER_PAD)
 /* returns:
@@ -660,7 +660,7 @@ bool quick_screen_f3(int button_enter)
 #endif /* BUTTON_F3 */
 #endif /* CONFIG_KEYPAD in (RECORDER_PAD |IRIVER_H100_PAD | IRIVER_H300_PAD) */
 
-#if defined(HAVE_CHARGING) || defined(SIMULATOR)
+#if defined(CONFIG_CHARGING) || defined(SIMULATOR)
 void charging_splash(void)
 {
     gui_syncsplash(2*HZ, true, (unsigned char *)str(LANG_BATTERY_CHARGE));

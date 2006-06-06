@@ -49,12 +49,6 @@
 
 enum playmode ff_mode;
 
-long switch_tick;
-bool battery_state = true;
-#ifdef HAVE_CHARGING
-int battery_charge_step = 0;
-#endif
-
 void status_init(void)
 {
     ff_mode = 0;

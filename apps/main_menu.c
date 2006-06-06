@@ -169,12 +169,12 @@ bool show_info(void)
 #endif
             lcd_puts_scroll(0, y++, (unsigned char *)s);
 
-#ifdef HAVE_CHARGE_CTRL
-            if (charge_state == 1)
+#if CONFIG_CHARGING == CHARGING_CONTROL
+            if (charge_state == CHARGING)
                 snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_CHARGE));
-            else if (charge_state == 2)
+            else if (charge_state == TOPOFF)
                 snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TOPOFF_CHARGE));
-            else if (charge_state == 3)
+            else if (charge_state == TRICKLE)
                 snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_TRICKLE_CHARGE));
             else
 #endif

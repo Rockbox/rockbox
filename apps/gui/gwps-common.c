@@ -823,7 +823,7 @@ static char* get_tag(struct wps_data* wps_data,
                     }
                 }
                 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
                 case 'p': /* External power plugged in? */
                 {
                     if(charger_input_state==CHARGER)
@@ -832,9 +832,7 @@ static char* get_tag(struct wps_data* wps_data,
                         return NULL;
                 }
 #endif
-#if defined(HAVE_CHARGE_CTRL) || \
-    defined (HAVE_CHARGE_STATE) || \
-    CONFIG_BATTERY == BATT_LIION2200
+#if CONFIG_CHARGING >= CHARGING_MONITOR
                 case 'c': /* Charging */
                 {
                     if (charge_state == CHARGING || charge_state == TOPOFF) {

@@ -29,7 +29,7 @@
 #include "pcf50606.h"
 #include "usb.h"
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 bool charger_enabled;
 #endif
 
@@ -92,7 +92,7 @@ void power_init(void)
     or_b(0x20, &PBIORL); 
     or_b(0x20, &PBDRL);  /* hold power */
 #endif
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
     or_b(0x20, &PBIORL); /* Set charging control bit to output */
     charger_enable(false); /* Default to charger OFF */
@@ -106,7 +106,7 @@ void power_init(void)
 }
 
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 bool charger_inserted(void)
 {     
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
@@ -115,7 +115,7 @@ bool charger_inserted(void)
     return (P7 & 0x80) == 0;
 #elif defined(IAUDIO_X5)
     return (GPIO1_READ & 0x01000000)?true:false;
-#elif defined(HAVE_CHARGE_CTRL)
+#elif CONFIG_CHARGING == CHARGING_CONTROL
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
 #elif defined (HAVE_FMADC)
@@ -133,9 +133,9 @@ bool charger_inserted(void)
     return (PADR & 1) == 0;
 #endif
 }
-#endif /* HAVE_CHARGING */
+#endif /* CONFIG_CHARGING */
 
-#ifdef HAVE_CHARGE_CTRL
+#if CONFIG_CHARGING == CHARGING_CONTROL
 void charger_enable(bool on)
 {
     if(on)
@@ -151,14 +151,22 @@ void charger_enable(bool on)
 }
 #endif
 
-#ifdef HAVE_CHARGE_STATE
+#if CONFIG_CHARGING == CHARGING_MONITOR
 /* Returns true if the unit is charging the batteries. */
 bool charging_state(void) {
-#if defined(IRIVER_H100_SERIES)
+#if CONFIG_BATTERY == BATT_LIION2200
+  /* We use the information from the ADC_EXT_POWER ADC channel, which
+    tells us the charging current from the LTC1734. When DC is
+    connected (either via the external adapter, or via USB), we try
+    to determine if it is actively charging or only maintaining the
+    charge. My tests show that ADC readings below about 0x80 means
+    that the LTC1734 is only maintaining the charge. */
+    return adc_read(ADC_EXT_POWER) >= 0x80;
+#elif defined(IRIVER_H100_SERIES) /* FIXME */
     return charger_inserted();
-#elif defined(IRIVER_H300_SERIES)
+#elif defined IRIVER_H300_SERIES
     return (GPIO_READ & 0x00800000)?true:false;
-#elif defined(IPOD_VIDEO)
+#elif defined IPOD_VIDEO
     return (GPIOB_INPUT_VAL & 0x01)?false:true;
 #endif
 }

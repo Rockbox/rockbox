@@ -65,7 +65,7 @@ int show_logo(void)
     return 0;
 }
 
-#ifdef HAVE_CHARGING
+#ifdef CONFIG_CHARGING
 /*
 bool backlight_get_on_when_charging(void)
 {
@@ -83,12 +83,12 @@ void charging_screen(void)
 
     do
     {
-#ifdef HAVE_CHARGE_CTRL
-        if (charge_state == 1)
+#if CONFIG_CHARGING == CHARGING_CONTROL
+        if (charge_state == CHARGING)
             msg = "charging";
-        else if (charge_state == 2)
+        else if (charge_state == TOPOFF)
             msg = "topoff charge";
-        else if (charge_state == 3)
+        else if (charge_state == TRICKLE)
             msg = "trickle charge";
         else
             msg = "not charging";
@@ -130,7 +130,7 @@ void charging_screen(void)
         }
     } while (1);
 }
-#endif /* HAVE_CHARGING */
+#endif /* CONFIG_CHARGING */
 
 /* prompt user to plug USB and fix a problem */
 void prompt_usb(const char* msg1, const char* msg2)
@@ -172,7 +172,7 @@ void main(void)
     button_init();
     powermgmt_init();
 
-#if defined(HAVE_CHARGING) && (CONFIG_CPU == SH7034)
+#if defined(CONFIG_CHARGING) && (CONFIG_CPU == SH7034)
     if (charger_inserted()
 #ifdef ATA_POWER_PLAYERSTYLE
         && !ide_powered() /* relies on probing result from bootloader */

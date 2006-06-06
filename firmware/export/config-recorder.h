@@ -45,9 +45,6 @@
 /* Define this if you have a SH7034 */
 #define CONFIG_CPU SH7034
 
-/* Define this if you have charging control */
-#define HAVE_CHARGE_CTRL
-
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
 
@@ -80,8 +77,8 @@
 /* How to detect USB */
 #define USB_RECORDERSTYLE 1
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
+/* Software controlled charging */
+#define CONFIG_CHARGING CHARGING_CONTROL
 
 /* The start address index for ROM builds */
 /* #define ROM_START 0x11010 for behind original Archos */

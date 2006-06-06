@@ -21,12 +21,6 @@
 
 extern enum playmode ff_mode;
 
-extern long switch_tick;
-extern bool battery_state;
-#ifdef HAVE_CHARGING
-extern int battery_charge_step;
-#endif
-
 #if defined(HAVE_LCD_CHARCELLS)
 extern bool record;
 extern bool audio;

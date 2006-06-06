@@ -45,8 +45,8 @@
 #define BATTERY_SCALE_FACTOR 6465
 /* chosen values at random -- jyp */
 
-/* Define this if the platform can charge batteries */
-#define HAVE_CHARGING 1
+/* Hardware controlled charging? FIXME */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 #define CPU_FREQ 30000000
 /* approximate value (and false in general since freq is variable) */
