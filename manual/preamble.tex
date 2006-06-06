@@ -213,3 +213,16 @@
 %        with "WebHome" being the wiki page name
 \newcommand{\wikilink}[1]{\url{http://www.rockbox.org/twiki/bin/view/Main/#1}}
 
+% define environment "code" based on fancyvrb.
+% use it to set code the user should type / see on his screen.
+% Note: the first 4 characters of each line will be stripped,
+%       requiring everything to be indendet by exactly _4_ spaces!
+%       This is intended to make the LaTeX sources more readable.
+% Note: when using the code environment you need to use optv instead of opt!
+\DefineVerbatimEnvironment{code}{Verbatim}%
+  {numbers=left,frame=lines,%
+   gobble=4,fontsize=\footnotesize,xleftmargin=10pt,%
+   label=\textnormal{\textsc{Code}},%
+   commandchars=\\\{\}%
+   }
+
