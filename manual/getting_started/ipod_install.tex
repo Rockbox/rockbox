@@ -64,10 +64,40 @@ for the next daily builds.}
   \item Similarly, extract the Broadcom firmware:
     \begin{code}
     ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin
-    ipod_fw -g \emph{GEN} -o rockboot.bin -i apple_os.bin bootloader-\emph{GEN}.bin
     \end{code}
 }
-  \item
+  \item Merge the Rockbox bootloader you downloaded previously with the Apple
+    firmware:
+\optv{ipodnano}{
+    \begin{code}
+    ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
+    \end{code}
+}
+\optv{ipodvideo}{
+    \begin{code}
+    ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-video.bin
+    \end{code}
+}
+\optv{ipodmini}{
+    \begin{code}
+    ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini1g.bin
+    \end{code}
+    Or, if you have a 2G mini:
+    \begin{code}
+    ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini2g.bin
+    \end{code}
+}
+\optv{ipodcolor}{
+    \begin{code}
+    ipod_fw -g color -o rockboot.bin -i apple_os.bin bootloader-color.bin
+    \end{code}
+}
+\optv{ipod4g}{
+    \begin{code}
+    ipod_fw -g 4g -o rockboot.bin -i apple_os.bin bootloader-4g.bin
+    \end{code}
+}
+\item
     Install the Rockbox-enabled firmware:
     \begin{code}
     ipodpatcher -w \emph{N} rockboot.bin
@@ -129,11 +159,36 @@ Now you can proceed installing the firmware itself.
     \end{code}
 }
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware \fixme{Substitute GEN with your \daps{} generation:
-    color,video,nano,4g,mini1g,mini2g}:
+    firmware:
+\optv{ipodnano}{
     \begin{code}
-    ./ipod_fw -g \emph{GEN} -o rockbox.bin -i apple_os.bin bootloader-\emph{GEN}.bin
+    ./ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
     \end{code}
+}
+\optv{ipodvideo}{
+    \begin{code}
+    ./ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-video.bin
+    \end{code}
+}
+\optv{ipodmini}{
+    \begin{code}
+    ./ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini1g.bin
+    \end{code}
+    Or, if you have a 2G Mini:
+    \begin{code}
+    ./ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini2g.bin
+    \end{code}
+}
+\optv{ipodcolor}{
+    \begin{code}
+    ./ipod_fw -g color -o rockboot.bin -i apple_os.bin bootloader-color.bin
+    \end{code}
+}
+\optv{ipod4g}{
+    \begin{code}
+    ./ipod_fw -g 4g -o rockboot.bin -i apple_os.bin bootloader-4g.bin
+    \end{code}
+}
   \item
     Install the Rockbox-enabled firmware:
     \note{The last part of the location is left out.}
@@ -207,11 +262,36 @@ Now, proceed with installing the firmware itself.
 }
 
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware \fixme{Substitute \emph{GEN} with your \daps{}  generation: 
-    color,video,nano,4g,mini1g,mini2g}:
+    firmware: 
+\optv{ipodnano}{
     \begin{code}
-    ./ipod_fw -g \emph{GEN} -o rockbox.bin -i apple_os.bin bootloader-\emph{GEN}.bin
+    ./ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
     \end{code}
+}
+\optv{ipodvideo}{
+    \begin{code}
+    ./ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-video.bin
+    \end{code}
+}
+\optv{ipodmini}{
+    \begin{code}
+    ./ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini1g.bin
+    \end{code}
+    Or, if you have a 2G Mini:
+    \begin{code}
+    ./ipod_fw -g mini -o rockboot.bin -i apple_os.bin bootloader-mini2g.bin
+    \end{code}
+}
+\optv{ipodcolor}{
+    \begin{code}
+    ./ipod_fw -g color -o rockboot.bin -i apple_os.bin bootloader-color.bin
+    \end{code}
+}
+\optv{ipod4g}{
+    \begin{code}
+    ./ipod_fw -g 4g -o rockboot.bin -i apple_os.bin bootloader-4g.bin
+    \end{code}
+}
   \item
     Install the Rockbox-enabled firmware:
     \begin{code}
