@@ -17,38 +17,38 @@ loaded, run and then exited, which returns control to Rockbox.  Music
 will carry on playing whilst plugins are being run.
 
 \section{Games}
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}
+\opt{HAVE_LCD_BITMAP}
     {See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor}{, Rockboy on page
-    \pageref{ref:Rockboy} and Sudoku on page \pageref{ref:Sudoku}}.}
+    \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodvideo}
+    {and Rockboy on page \pageref{ref:Rockboy}}.}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/brickmania.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/bubbles.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/chessbox.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/chessbox.tex}}
 
 \opt{h1xx,h300,ipodcolor,ipodnano,ipodvideo}{\input{plugins/doom.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/flipit.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/flipit.tex}}
 
 \opt{player}{\input{plugins/jackpot.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/jewels.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/jewels.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD,x5}{\input{plugins/minesweeper.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/minesweeper.tex}}
 
 \opt{player}{\input{plugins/nim.tex}}
 
-\opt{h1xx,h300,ipodcolor,ipodnano}{\input{plugins/pacbox.tex}}
+\opt{h1xx,HAVE_LCD_COLOR}{\input{plugins/pacbox.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/pong.tex}}
 
- \opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/rockblox.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/rockblox.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/sliding.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/sliding.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/snake.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/snake.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/snake2.tex}}
 
@@ -60,15 +60,17 @@ will carry on playing whilst plugins are being run.
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/star.tex}}
 
+\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipod4g,ipodcolor,ipodnano,ipodvideo,x5}{\input{plugins/sudoku.tex}}
+
 \opt{HAVE_LCD_BITMAP}{\input{plugins/tetrox.tex}}
 
 \opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/wormlet.tex}}
 
-\opt{h1xx,h300,IPOD_4G_PAD}{\input{plugins/xobox.tex}}
+\opt{SWCODEC}{\input{plugins/xobox.tex}}
 
 \section{Demos}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/bounce.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/bounce.tex}}
 
 {\input{plugins/credits.tex}}
 
@@ -80,19 +82,19 @@ will carry on playing whilst plugins are being run.
 
 {\input{plugins/logo.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipod4g,ipodcolor,ipodnano,ipodvideo}{\input{plugins/mandelbrot.tex}}
+\opt{recorder,recorderv2fm,ondio,h1xx,HAVE_LCD_COLOR}{\input{plugins/mandelbrot.tex}}
 
-\opt{player,recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/mosaic.tex}}
+{\input{plugins/mosaic.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/oscilloscope.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/oscilloscope.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/plasma.tex}}
 
-\opt{player,recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/snow.tex}}
+{\input{plugins/snow.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/starfield.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,IPOD_4G_PAD}{\input{plugins/vumeter.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/vumeter.tex}}
 
 \section{\label{ref:Viewersplugins}Viewers}
 
@@ -103,7 +105,7 @@ the associated file.  Viewers are stored in the
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/chip8emulator.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano,ipodvideo}{\input{plugins/jpegviewer.tex}}
+\opt{recorder,recorderv2fm,ondio,h1xx,HAVE_LCD_COLOR}{\input{plugins/jpegviewer.tex}}
 
 \opt{recorder,recorderv2fm,ondio}{\input{plugins/movieplayer.tex}}
 
@@ -114,8 +116,6 @@ the associated file.  Viewers are stored in the
 {\input{plugins/search.tex}}
 
 {\input{plugins/sort.tex}}
-
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipod4g,ipodcolor,ipodnano,ipodvideo}{\input{plugins/sudoku.tex}}
 
 {\input{plugins/text_viewer.tex}}
 

@@ -11,17 +11,25 @@ and the meter scale can be changed.
 
 \begin{table}
 \begin{btnmap}{}{}
-\opt{recorder,recorderv2fm}{OFF}\opt{ondio}{ON/OFF}
-\opt{h1xx,h300}{Stop}\opt{ipodcolor,ipodnano}{Unknown} 
-& Save settings and quit \\
-\opt{recorder,recorderv2fm}{ON}\opt{ondio}{MODE}
-\opt{h1xx,h300}{Play}\opt{ipodcolor,ipodnano}{Unknown} 
-& Help \\
-\opt{recorder,recorderv2fm}{F1}\opt{ondio}{HOLD MODE}
-\opt{h1xx,h300,ipodcolor,ipodnano}{Unknown} 
-& Settings \\
-UP & Raise Volume \\
-DOWN & Lower Volume \\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD}{\ButtonMenu}
+\opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Save settings and quit\\
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    & Help\\
+\opt{RECORDER_PAD}{\ButtonFOne}
+\opt{ONDIO_PAD}{Hold \ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+    & Settings\\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+{\ButtonUp}
+\opt{IPOD_4G_PAD}{\ButtonScrollFwd}
+    & Raise Volume\\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+{\ButtonDown}
+\opt{IPOD_4G_PAD}{\ButtonScrollBack}
+    & Lower Volume\\
 \end{btnmap}
 \end{table}
-
