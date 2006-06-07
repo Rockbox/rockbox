@@ -46,8 +46,9 @@ the information displayed on the \daps\ screen whilst an audio track is
 being played. The default WPS is a relatively simple screen displaying
 Track name, Artist, Album etc. in the default font as a purely text based
 layout. There are a number of WPS files included in Rockbox, and you can 
-load one of these at anytime by selecting it\dots\\
-\setting{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}\\
+load one of these at anytime by selecting it in
+\setting{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}.
+
 \opt{h1xx,h300}{There is a related option to browse \fname{.rwps} files for 
   \daps\ with LCD remote controls installed.  This will load a similar WPS 
   screen for the remote but with usually a simpler and more concise layout.}
@@ -72,21 +73,21 @@ encoding. This can be done in most editors, for example Notepad in Windows 2000
 or XP (but not in 9x/ME) can do this. See appendix \ref{ref:wps_tags} for all 
 the tags that are available.
 
-\begin{description}
+\begin{itemize}
   \item All characters not preceded by \% are displayed as typed.
   \item Lines beginning with \# are comments and will be ignored.
   \item Maximum file size used is 
       \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{1600}
-      \opt{player}{400} bytes.\\
+      \opt{player}{400} bytes.
       If you have a bigger WPS file, only the first part of it will be 
       loaded and used.
-\end{description}
+\end{itemize}
 
 \subsubsection{Conditional Tags}
 
 \begin{description}
 \item[If/else: ]
-Syntax: \config{\%?xx{\textless}true{\textbar}false{\textgreater}}\\
+Syntax: \config{\%?xx{\textless}true{\textbar}false{\textgreater}}
 
 If the tag specified by ``\config{xx}'' has a value, the text between the 
 ``\config{{\textless}}'' and the ``\config{{\textbar}}'' is displayed (the true
@@ -97,11 +98,10 @@ specified if no else part is desired. The conditionals nest, so the text in the
 if and else part can contain all \config{\%} commands, including conditionals.
 
 \item[Enumerations: ]
-Syntax: \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}}\\
+Syntax: \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}\dots{\textbar}else{\textgreater}}
 
 For tags with multiple values, like Play status, the conditional can hold a 
 list of alternatives, one for each value the tag can have.
-
 Example enumeration: 
 \begin{example}
     \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}
@@ -117,12 +117,12 @@ You can display information about the next song -- the song that is
 about to play after the one currently playing (unless you change the
 plan).
 
-If you use the upper--case versions of the
+If you use the upper-case versions of the
 three tags: \config{F}, \config{I} and \config{D}, they will instead refer to 
 the next song instead of the current one. Example: \config{\%Ig} is the genre 
 name used in the next song and \config{\%Ff} is the mp3 frequency.
 
-\note{The next song information WILL NOT be available at all
+\note{The next song information \emph{will not} be available at all
 times, but will most likely be available at the end of a song. We
 suggest you use the conditional display tag a lot when displaying
 information about the next song!}
@@ -141,20 +141,18 @@ time (in seconds and optional tenths of a second) for the subline to be
 displayed. 
 
 Subline related special characters and tags: 
-
-\config{;}  : Split items on a line into separate sublines
-
-\config{\%t}  : Set the subline display time. The
+\begin{description}
+\item[;] Split items on a line into separate sublines
+\item[\%t] Set the subline display time. The
 '\config{\%t}' is followed by either integer
 seconds (\config{\%t5}), or seconds and tenths of a second (\config{\%t3.5}).
+\end{description}
 
 Each alternating subline can still be optionally scrolled while it is
 being displayed, and scrollable formats can be displayed on the same
 line with non{}-scrollable formats (such as track elapsed time) as long
 as they are separated into different sublines.
-
 Example subline definition:
-
 \begin{example}
      %s%t4%ia;%s%it;%t3%pc %pr : Display id3 artist for 4 seconds,
                                  Display id3 title for 2 seconds,
@@ -165,29 +163,24 @@ Example subline definition:
 
 Conditionals can be used with sublines to display a different set and/or number
 of sublines on the line depending on the evaluation of the conditional.
-
 Example subline with conditionals:
-
 \begin{example}
     %?it{\textless}%t8%s%it{\textbar}%s%fn{\textgreater};%?ia{\textless}%t3%s%ia{\textbar}%t0{\textgreater}\\
 \end{example}
 
 The format above will do two different things depending if ID3 tags are 
 present. If the ID3 artist and title are present:
-
-Display id3 title for 8 seconds,\\
-
-Display id3 artist for 3 seconds,\\
-
-repeat...\\
-
-If the ID3 artist and title are not present:\\
-
-Display the filename continuously.\\
-
+\begin{itemize}
+\item Display id3 title for 8 seconds,
+\item Display id3 artist for 3 seconds,
+\item repeat\dots
+\end{itemize}
+If the ID3 artist and title are not present:
+\begin{itemize}
+\item Display the filename continuously.
+\end{itemize}
 Note that by using a subline display time of 0 in one branch of a conditional,
 a subline can be skipped (not displayed) when that condition is met. 
-
 
 \subsubsection{Using Images}
 You can have as many as 52 images in your WPS. There are various ways of 
@@ -205,27 +198,27 @@ displaying images:
 \optv{HAVE_LCD_COLOR}{
   Example on background image use:
   \begin{example}
-    %X|background.bmp|\\
+    %X|background.bmp|
   \end{example}
   The image with filename \fname{background.bmp} is loaded and used in the WPS.
 }
 
 Example on bitmap preloading and use:
 \begin{example}
-    \%x|a|static\_icon.bmp|50|50|\\
-    \%xl|b|rep\_off.bmp|16|64|\\
-    \%xl|c|rep\_all.bmp|16|64|\\
-    \%xl|d|rep\_one.bmp|16|64|\\
-    \%xl|e|rep\_shuffle.bmp|16|64|\\
-    \%?mm<%xdb|%xdc|%xdd|%xde>\\
+    %x|a|static_icon.bmp|50|50|
+    %xl|b|rep\_off.bmp|16|64|
+    %xl|c|rep\_all.bmp|16|64|
+    %xl|d|rep\_one.bmp|16|64|
+    %xl|e|rep\_shuffle.bmp|16|64|
+    %?mm<%xdb|%xdc|%xdd|%xde>
 \end{example}
 Four images at the same x and y position are preloaded in the example. Which 
 image to display is determined by the \config{\%mm} tag (the repeat mode).
 
 \subsubsection{Example File}
 \begin{example}
-    \%s\%?in<\%in - >\%?it<\%it|\%fn> \%?ia<[\%ia\%?id<, \%id>]> 
-    \%pb\%pc/\%pt
+    %s%?in<%in - >%?it<%it|%fn> %?ia<[%ia%?id<, %id>]> 
+    %pb%pc/%pt
 \end{example}
 That is, ``tracknum -- title [artist, album]'', where most fields are only
 displayed if available. Could also be rendered as ``filename'' or ``tracknum --
