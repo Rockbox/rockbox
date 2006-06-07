@@ -945,7 +945,12 @@ static void audio_check_new_track(void)
     }
     /* Update the playlist */
     last_peek_offset -= ci.new_track;
-    playlist_next(ci.new_track);
+
+    if (playlist_next(ci.new_track) < 0)
+    {
+        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_FAILED, 0);
+        return;
+    }
 
     if (new_playlist)
     {
