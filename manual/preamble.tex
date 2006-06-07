@@ -28,7 +28,7 @@
   pdfsubject = {Rockbox user manual for \playername}
 }
 
-\newcommand{\fname}[1]{\textbf{#1}}
+\newcommand{\fname}[1]{\texttt{#1}}
 \newcommand{\tabeltc}[1]{{\centering #1 \par}}
 \newcommand{\tabelth}[1]{{\centering \textbf{\textit{#1}} \par}}
 
@@ -76,12 +76,12 @@
 \setlength{\headheight}{18.5pt}
 \newcounter{example}[chapter]
 
-\newenvironment{example}
-    {\stepcounter{example}\paragraph{Example \theexample:}}
-    {\hfill$\Box$
+%% \newenvironment{example}
+%%     {\stepcounter{example}\paragraph{Example \theexample:}}
+%%     {\hfill$\Box$
     
-    \bigskip
-    \noindent}
+%%     \bigskip
+%%     \noindent}
 
 % found on the internet, posting by Donald Arseneau
 % I may as well include my robust expandable definions, which can be
@@ -220,9 +220,22 @@
 %       This is intended to make the LaTeX sources more readable.
 % Note: when using the code environment you need to use optv instead of opt!
 \DefineVerbatimEnvironment{code}{Verbatim}%
-  {numbers=left,frame=lines,%
+  {framerule=0.4pt, framesep=1ex,numbers=left,frame=lines,%
    gobble=4,fontsize=\footnotesize,xleftmargin=10pt,%
    label=\textnormal{\textsc{Code}},%
+   commandchars=\\\{\}%
+   }
+
+% define environment "example" based on fancyvrb.
+% use it to set example code the user should type / see on his screen.
+% Note: the first 4 characters of each line will be stripped,
+%       requiring everything to be indendet by exactly _4_ spaces!
+%       This is intended to make the LaTeX sources more readable.
+% Note: when using the example environment you need to use optv instead of opt!
+\DefineVerbatimEnvironment{example}{Verbatim}%
+  {commentchar=!,framerule=0.4pt, framesep=1ex,frame=lines,%
+   fontsize=\footnotesize,xleftmargin=10pt,%
+   label=\textnormal{\textsc{Example}},%
    commandchars=\\\{\}%
    }
 

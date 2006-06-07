@@ -6,26 +6,25 @@ Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of 
 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}
-  Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the \dap\ 
-  and ``play'' them in the directory browser or select 
-  \emph{General Settings $\rightarrow$ Fonts} from the Main Menu.
+  Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the 
+  \dap\ and ``play'' them in the directory browser or select 
+  \setting{General Settings $\rightarrow$ Fonts} from the Main Menu.
   If you want a font to be loaded automatically every time you start up,
-  it must be located in the \fname{/.rockbox } folder and the file name
+  it must be located in the \fname{/.rockbox } folder and the filename
   must be at most 24 characters long.
   \warn{Advanced Users Only: Any BDF font file up to 16 pixels high should 
-  be usable with Rockbox. To convert from .bdf to .fnt, use the \fname{convbdf} 
-  tool. This tool can be found in the tools directory of the Rockbox source 
-  code.}
+    be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use the \fname{convbdf} tool. This tool can be found in the \fname{tools} directory 
+    of the Rockbox source code.}
 }
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
-Rockbox can load language files at runtime. Simply copy the .lng file 
+Rockbox can load language files at runtime. Simply copy the \fname{.lng} file 
 \emph{(do not use the .lang file)} to the \dap\ and ``play'' it in the 
-Rockbox directory browser or select \emph{General Settings $\rightarrow$ 
+Rockbox directory browser or select \setting{General Settings $\rightarrow$ 
 Languages }from the Main Menu.
 
 \note{If you want a language to be loaded automatically every time you start 
-up, it must be located in the \fname{/.rockbox }folder and the file name must 
+up, it must be located in the \fname{/.rockbox }folder and the filename must 
 be a maximum of 24 characters long.}
 
 If your language is not yet supported and you want to write your own language
@@ -38,35 +37,35 @@ file find the instructions on the Rockbox website:
 
 \begin{description}
 \item[Description: ] The WPS or While Playing Screen is the name used to describe 
-the information displayed on the \dap\'s screen whilst an audio track is
+the information displayed on the \daps\ screen whilst an audio track is
 being played. The default WPS is a relatively simple screen displaying
 Track name, Artist, Album etc. in the default font as a purely text based
 layout. There are a number of WPS files included in Rockbox, and you can 
 load one of these at anytime by selecting it\dots\\
-\emph{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}\\
-\opt{h1xx,h300}{There is a related option to browse .rwps files for \dap\'s
-with LCD remote controls installed.  This will load a similar WPS screen
-for the remote but with usually a simpler and more concise layout.}
+\setting{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}\\
+\opt{h1xx,h300}{There is a related option to browse \fname{.rwps} files for 
+  \daps\ with LCD remote controls installed.  This will load a similar WPS 
+  screen for the remote but with usually a simpler and more concise layout.}
 
-\note{``Playing'' a wps from the file browser has the same effect.}
+\note{``Playing'' a \fname{.wps} from the file browser has the same effect.}
 
 \item [File Location: ]Custom WPS files may be located anywhere on the drive. 
-The only restriction is that they must end in .wps. When you ``play'' a .wps 
-file, it will be used for future WPS screens, and if the ``played'' .wps file is 
-located in the \fname{/.rockbox} folder, it will be remembered and used after 
-reboot. The .wps filename must be no more than 24 characters long for it to be
-remembered.
+The only restriction is that they must end in \fname{.wps}. When you ``play''
+a \fname{.wps} file, it will be used for future WPS screens, and if the 
+``played'' \fname{.wps} file is located in the \fname{/.rockbox} folder, it 
+will be remembered and used after reboot. The \fname{.wps} filename must be no 
+more than 24 characters long for it to be remembered.
 \end{description}
 
 \subsection{\label{ref:CreateYourOwnWPS}WPS -- Build Your Own}
 Quite simply, enter the WPS code in your favourite text editor, Notepad on
-Windows works fine. When you save it, instead of saving it as a .txt file, save
-it as a .wps file. Example: Instead of \fname{Rockbox.txt}, save the file as
-\fname{Rockbox.wps}. To make sure non english characters display correctly in
-your WPS you must save the .wps file with UTF-8 character encoding. This can be
-done in most editors, for example Notepad in Windows 2000 or XP (but not in
-9x/ME) can do this. See appendix \ref{ref:wps_tags} for all the tags that are
-available.
+Windows works fine. When you save it, instead of saving it as a \fname{.txt} 
+file, save it as a \fname{.wps} file. Example: Instead of \fname{Rockbox.txt}, 
+save the file as \fname{Rockbox.wps}. To make sure non english characters 
+display correctly in your WPS you must save the .wps file with UTF-8 character 
+encoding. This can be done in most editors, for example Notepad in Windows 2000
+or XP (but not in 9x/ME) can do this. See appendix \ref{ref:wps_tags} for all 
+the tags that are available.
 
 \begin{description}
   \item All characters not preceded by \% are displayed as typed.
@@ -80,15 +79,14 @@ available.
 
 \subsubsection{Conditional Tags}
 
-\emph{If/else}\\
-
+\begin{description}
+\item[If/else: ]
 Syntax: \%?xx{\textless}true{\textbar}false{\textgreater}\\
 
 If the tag specified by ``xx'' has a value, the text between the ``{\textless}'' and the ``{\textbar}'' is displayed (the true part), else the text between the ``{\textbar}'' and the ``{\textgreater}'' is displayed (the false part).
 The else part is optional, so the ``{\textbar}'' does not have to be specified if no else part is desired. The conditionals nest, so the text in the if and else part can contain all \% commands, including conditionals.
 
-\emph{Enumerations}\\
-
+\item[Enumerations: ]
 Syntax: \%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}\\
 
 For tags with multiple values, like Play status, the conditional can hold a list of alternatives, one for each value the tag can have.
@@ -96,6 +94,7 @@ For tags with multiple values, like Play status, the conditional can hold a list
 Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}\\
 
 The last else part is optional, and will be displayed if the tag has no value. The WPS parser will always display the last part if the tag has no value, or if the list of alternatives is too short. 
+\end{description}
 
 \subsubsection{Next Song info}
 You can display information about the next song -- the song that is
@@ -107,10 +106,10 @@ three tags: F, I and D, they will instead refer to the next song
 instead of the current one. Example: \%Ig is the genre name used in the
 next song and \%Ff is the mp3 frequency. 
 
-Take note that the next song information WILL NOT be available at all
+\note{The next song information WILL NOT be available at all
 times, but will most likely be available at the end of a song. We
 suggest you use the conditional display tag a lot when displaying
-information about the next song! 
+information about the next song!}
 
 \subsubsection{Alternating sublines}
 
@@ -141,19 +140,21 @@ as they are separated into different sublines.
 
 Example subline definition:
 
-\begin{verbatim}
+\begin{example}
   %s%t4%ia;%s%it;%t3%pc %pr : Display id3 artist for 4 seconds,
                               Display id3 title for 2 seconds,
                               Display current and remaining track time
                               for 3 seconds,
                               repeat...
-\end{verbatim}
+\end{example}
 
 Conditionals can be used with sublines to display a different set and/or number of sublines on the line depending on the evaluation of the conditional.
 
 Example subline with conditionals:
 
-\%?it{\textless}\%t8\%s\%it{\textbar}\%s\%fn{\textgreater};\%?ia{\textless}\%t3\%s\%ia{\textbar}\%t0{\textgreater}\\
+\begin{example}
+  %?it{\textless}%t8%s%it{\textbar}%s%fn{\textgreater};%?ia{\textless}%t3%s%ia{\textbar}%t0{\textgreater}\\
+\end{example}
 
 The format above will do two different things depending if ID3 tags are present. If the ID3 artist and title are present:
 
@@ -178,68 +179,60 @@ displaying images:
   \item Load and always show the image, using the \%x tag
   \item Preload the image with \%xl and show it with \%xd. This way you can 
         have your images displayed conditionally.
-  \opt{h300,x5,ipodcolor,ipodvideo}{
-  \item On colour screen targets only... Load an image and show as backdrop 
-        using the \%X tag. The image must be of the same exact dimensions as 
-	your display.
+  \opt{HAVE_LCD_COLOR}{
+  \item Load an image and show as backdrop using the \%X tag. The image must be
+        of the same exact dimensions as your display.
   }
 \end{enumerate}
 
-Example:\\
-\opt{HAVE_LCD_COLOR}{
-  \config{\%X|background.bmp|}\\
+\optv{HAVE_LCD_COLOR}{
+  Example on background image use:
+  \begin{example}
+    %X|background.bmp|\\
+  \end{example}
+  The image with filename \fname{background.bmp} is loaded and used in the WPS.
 }
-\config{
+
+Example on bitmap preloading and use:
+\begin{example}
   \%x|a|static\_icon.bmp|50|50|\\
   \%xl|b|rep\_off.bmp|16|64|\\
   \%xl|c|rep\_all.bmp|16|64|\\
   \%xl|d|rep\_one.bmp|16|64|\\
   \%xl|e|rep\_shuffle.bmp|16|64|\\
-  \%?mm<\%xdb|\%xdc|\%xdd|\%xde>\\
-}
-\opt{HAVE_LCD_COLOR}{This example loads and displays a background image.} Four
-images at the same x and y position are preloaded. Which image to display is 
-determined by the \%mm tag (the repeat mode).
+  \%?mm<%xdb|%xdc|%xdd|%xde>\\
+\end{example}
+Four images at the same x and y position are preloaded in the example. Which 
+image to display is determined by the \%mm tag (the repeat mode).
 
 \subsubsection{Example File}
-\begin{verbatim}
-%s%?in<%in - >%?it<%it|%fn> %?ia<[%ia%?id<, %id>]>
-%pb%pc/%pt
-\end{verbatim}
+\begin{example}
+  \%s\%?in<\%in - >\%?it<\%it|\%fn> \%?ia<[\%ia\%?id<, \%id>]> 
+  \%pb\%pc/\%pt
+\end{example}
 That is, ``tracknum -- title [artist, album]'', where most fields are only
 displayed if available. Could also be rendered as ``filename'' or ``tracknum --
 title [artist]''.
 
-\subsubsection{Default}
-If you haven't selected a .wps file in the \fname{/.rockbox} directory, you get
-the hard coded layout. The default WPS screen is:
-\fixme{do we really want to include the default wps in a users manual?}
-\opt{player}{
-%\begin{verbatim}
-  %s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d2> - %?id<%id|%d1>
-  %pc%?ps<*|/>%pt
-%\end{verbatim}
-}
-
-\opt{HAVE_LCD_BITMAP}{
+%\opt{HAVE_LCD_BITMAP}{
 %  \begin{verbatim}
-    %s%?it<%?in<%in. |>%it|%fn>
-    %s%?ia<%ia|%?d2<%d2|(root)>>
-    %s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>
-  
-    %al%pc/%pt%ar[%pp:%pe]
-    %fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
-    %pb
-    %pm
- % \end{verbatim}
-}
+%    %s%?it<%?in<%in. |>%it|%fn>
+%    %s%?ia<%ia|%?d2<%d2|(root)>>
+%    %s%?id<%id|%?d1<%d1|(root)>> %?iy<(%iy)|>
+%  
+%    %al%pc/%pt%ar[%pp:%pe]
+%    %fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
+%    %pb
+%    %pm
+% % \end{verbatim}
+%}
 
 \section{\label{ref:SettingsFile}Making your own settings file}
-A .cfg file is used to load settings from a plain text file. A .cfg file may
-reside anywhere on the hard disk. The only restriction is that the filename
-must end in .cfg
+A \fname{.cfg} file is used to load settings from a plain text file. A 
+\fname{.cfg} file may reside anywhere on the hard disk. The only restriction is
+that the filename must end in \fname{.cfg}
 
-Hint: Use the ``Write .cfg file'' feature \textbf({Main Menu$\rightarrow$
+Hint: Use the \setting{Write .cfg file} feature (\setting{Main Menu$\rightarrow$
 General Settings}) to save the current settings, then use a text editor to
 customize the settings file. See appendix \ref{ref:config_file_options} 
 for the full reference of available options.
@@ -253,7 +246,7 @@ for the full reference of available options.
 \end{itemize}
 
 \subsection{Example File}
-\begin{verbatim}
+\begin{example}
   volume: 70
   bass: 11
   treble: 12
@@ -263,7 +256,7 @@ for the full reference of available options.
   show files: supported
   wps: /.rockbox/car.wps
   lang: /.rockbox/afrikaans.lng
-\end{verbatim}
+\end{example}
 
 \section{\label{ref:PartISection1}Differences between binaries}
 There are 3 different types of firmware binaries from Rockbox website: 
@@ -293,23 +286,22 @@ eat also some more time.}
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
 \opt{player,recorder,recorderv2fm,ondio}{
-When your Jukebox powers on, it loads the Archos firmware in ROM, which
-automatically checks your Jukebox hard disk's root folder for a file
-named \fname{archos.mod} (on the player version) or
-\fname{ajbrec.ajz} (on the recorder version). Note that Archos
-firmware can only read the first ten characters of each file name in
-this process, so don't rename your old firmware files with names like
-archos.mod.old and so on, because it's possible that the Jukebox will
-load a file other than the one you intended.
+  When your \dap\ powers on, it loads the Archos firmware in ROM, which
+  automatically checks your Jukebox hard disk's root folder for a file named 
+  \firmwarefilename. Note that Archos firmware can only read the first 
+  ten characters of each filename in this process, so don't rename your old 
+  firmware files with names like \firmwarefilename.\fname{old} and so on, 
+  because it's possible that the \dap\ will load a file other than the one you 
+  intended.
 }
 
 \section{\label{ref:using_rolo}Using ROLO (Rockbox loader)}
 Rockbox is able to load and start another firmware file without rebooting. 
-You just press PLAY on an 
-\opt{recorder,recorderv2fm,ondio}{.ajz}
-\opt{player}{.mod}\opt{h1xx,h300}{.iriver}
-\opt{ipodnano,ipodvideo,ipodnano}{.ipod} 
-file. This can be used to test new firmware versions without deleting your
+You just press PLAY on an%
+\opt{recorder,recorderv2fm,ondio}{\fname{.ajz}}
+\opt{player}{.mod}\opt{h1xx,h300}{\fname{.iriver}}
+\opt{ipodnano,ipodvideo,ipodnano}{\fname{.ipod}}%
+-file. This can be used to test new firmware versions without deleting your
 current version.
 
 \opt{recorder,recorderv2fm,ondio}{\input{advanced_topics/archos-flashing.tex}}
