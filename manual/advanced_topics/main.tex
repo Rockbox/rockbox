@@ -2,7 +2,11 @@
 
 \section{\label{ref:CustomisingUI}Customising the userinterface}
 \subsection{\label{ref:GettingExtras}Getting Extras (Fonts, Languages)}
-Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of different languages. Rockbox comes with several fonts and languages already included. If new fonts have been created, then they will be found in the font package at \url{http://www.rockbox.org/daily.shtml}. The latest \fname{.lng} files are always included in the daily Rockbox builds.
+Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of
+different languages. Rockbox comes with several fonts and languages already 
+included. If new fonts have been created, then they will be found in the font 
+package at \url{http://www.rockbox.org/daily.shtml}. The latest \fname{.lng} 
+files are always included in the daily Rockbox builds.
 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}
@@ -13,8 +17,9 @@ Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of 
   it must be located in the \fname{/.rockbox } folder and the filename
   must be at most 24 characters long.
   \warn{Advanced Users Only: Any BDF font file up to 16 pixels high should 
-    be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use the \fname{convbdf} tool. This tool can be found in the \fname{tools} directory 
-    of the Rockbox source code.}
+    be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use 
+    the \fname{convbdf} tool. This tool can be found in the \fname{tools} 
+    directory of the Rockbox source code.}
 }
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
@@ -81,19 +86,30 @@ the tags that are available.
 
 \begin{description}
 \item[If/else: ]
-Syntax: \%?xx{\textless}true{\textbar}false{\textgreater}\\
+Syntax: \config{\%?xx{\textless}true{\textbar}false{\textgreater}}\\
 
-If the tag specified by ``xx'' has a value, the text between the ``{\textless}'' and the ``{\textbar}'' is displayed (the true part), else the text between the ``{\textbar}'' and the ``{\textgreater}'' is displayed (the false part).
-The else part is optional, so the ``{\textbar}'' does not have to be specified if no else part is desired. The conditionals nest, so the text in the if and else part can contain all \% commands, including conditionals.
+If the tag specified by ``\config{xx}'' has a value, the text between the 
+``\config{{\textless}}'' and the ``\config{{\textbar}}'' is displayed (the true
+part), else the text between the ``\config{{\textbar}}'' and the 
+``\config{{\textgreater}}'' is displayed (the false part).
+The else part is optional, so the ``\config{{\textbar}}'' does not have to be 
+specified if no else part is desired. The conditionals nest, so the text in the
+if and else part can contain all \config{\%} commands, including conditionals.
 
 \item[Enumerations: ]
-Syntax: \%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}\\
+Syntax: \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}...{\textbar}else{\textgreater}}\\
 
-For tags with multiple values, like Play status, the conditional can hold a list of alternatives, one for each value the tag can have.
+For tags with multiple values, like Play status, the conditional can hold a 
+list of alternatives, one for each value the tag can have.
 
-Example: \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}\\
+Example enumeration: 
+\begin{example}
+    \%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}Ffwd{\textbar}Rew{\textgreater}
+\end{example}
 
-The last else part is optional, and will be displayed if the tag has no value. The WPS parser will always display the last part if the tag has no value, or if the list of alternatives is too short. 
+The last else part is optional, and will be displayed if the tag has no value. 
+The WPS parser will always display the last part if the tag has no value, or if
+the list of alternatives is too short.
 \end{description}
 
 \subsubsection{Next Song info}
@@ -102,9 +118,9 @@ about to play after the one currently playing (unless you change the
 plan).
 
 If you use the upper--case versions of the
-three tags: F, I and D, they will instead refer to the next song
-instead of the current one. Example: \%Ig is the genre name used in the
-next song and \%Ff is the mp3 frequency. 
+three tags: \config{F}, \config{I} and \config{D}, they will instead refer to 
+the next song instead of the current one. Example: \config{\%Ig} is the genre 
+name used in the next song and \config{\%Ff} is the mp3 frequency.
 
 \note{The next song information WILL NOT be available at all
 times, but will most likely be available at the end of a song. We
@@ -113,25 +129,24 @@ information about the next song!}
 
 \subsubsection{Alternating sublines}
 
-It is possible to group items on each line into 2 or more groups or
-``sublines''. Each subline will be displayed
-in succession on the line for a specified time, alternating
-continuously through each defined subline. 
+It is possible to group items on each line into 2 or more groups or 
+``sublines''. Each subline will be displayed in succession on the line for a 
+specified time, alternating continuously through each defined subline.
 
 Items on a line are broken into sublines with the semicolon
-';' character. The display time for
+'\config{;}' character. The display time for
 each subline defaults to 2 seconds unless modified by using the
-'\%t' tag to specify an alternate
+'\config{\%t}' tag to specify an alternate
 time (in seconds and optional tenths of a second) for the subline to be
 displayed. 
 
 Subline related special characters and tags: 
 
-;  : Split items on a line into separate sublines
+\config{;}  : Split items on a line into separate sublines
 
-\%t  : Set the subline display time. The
-'\%t' is followed by either integer
-seconds (\%t5), or seconds and tenths of a second (\%t3.5).
+\config{\%t}  : Set the subline display time. The
+'\config{\%t}' is followed by either integer
+seconds (\config{\%t5}), or seconds and tenths of a second (\config{\%t3.5}).
 
 Each alternating subline can still be optionally scrolled while it is
 being displayed, and scrollable formats can be displayed on the same
@@ -148,7 +163,8 @@ Example subline definition:
                                  repeat...
 \end{example}
 
-Conditionals can be used with sublines to display a different set and/or number of sublines on the line depending on the evaluation of the conditional.
+Conditionals can be used with sublines to display a different set and/or number
+of sublines on the line depending on the evaluation of the conditional.
 
 Example subline with conditionals:
 
@@ -156,7 +172,8 @@ Example subline with conditionals:
     %?it{\textless}%t8%s%it{\textbar}%s%fn{\textgreater};%?ia{\textless}%t3%s%ia{\textbar}%t0{\textgreater}\\
 \end{example}
 
-The format above will do two different things depending if ID3 tags are present. If the ID3 artist and title are present:
+The format above will do two different things depending if ID3 tags are 
+present. If the ID3 artist and title are present:
 
 Display id3 title for 8 seconds,\\
 
@@ -176,12 +193,12 @@ a subline can be skipped (not displayed) when that condition is met.
 You can have as many as 52 images in your WPS. There are various ways of 
 displaying images:
 \begin{enumerate}
-  \item Load and always show the image, using the \%x tag
-  \item Preload the image with \%xl and show it with \%xd. This way you can 
-        have your images displayed conditionally.
+  \item Load and always show the image, using the \config{\%x} tag
+  \item Preload the image with \config{\%xl} and show it with \config{\%xd}. 
+    This way you can have your images displayed conditionally.
   \opt{HAVE_LCD_COLOR}{
-  \item Load an image and show as backdrop using the \%X tag. The image must be
-        of the same exact dimensions as your display.
+  \item Load an image and show as backdrop using the \config{\%X} tag. The 
+    image must be of the same exact dimensions as your display.
   }
 \end{enumerate}
 
@@ -203,7 +220,7 @@ Example on bitmap preloading and use:
     \%?mm<%xdb|%xdc|%xdd|%xde>\\
 \end{example}
 Four images at the same x and y position are preloaded in the example. Which 
-image to display is determined by the \%mm tag (the repeat mode).
+image to display is determined by the \config{\%mm} tag (the repeat mode).
 
 \subsubsection{Example File}
 \begin{example}
@@ -240,13 +257,14 @@ for the full reference of available options.
 \subsection{Format Rules}
 
 \begin{itemize}
-\item Format: \verb+setting: value+
+\item Format: \config{setting: value}
 \item Each setting must be on a separate line.
-\item Lines starting with \# are ignored.
+\item Lines starting with \config{\#} are ignored.
 \end{itemize}
 
-\subsection{Example File}
+Example of a configuration file:
 \begin{example}
+    # Example configuration file
     volume: 70
     bass: 11
     treble: 12
