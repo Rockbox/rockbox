@@ -141,11 +141,11 @@ as they are separated into different sublines.
 Example subline definition:
 
 \begin{example}
-  %s%t4%ia;%s%it;%t3%pc %pr : Display id3 artist for 4 seconds,
-                              Display id3 title for 2 seconds,
-                              Display current and remaining track time
-                              for 3 seconds,
-                              repeat...
+     %s%t4%ia;%s%it;%t3%pc %pr : Display id3 artist for 4 seconds,
+                                 Display id3 title for 2 seconds,
+                                 Display current and remaining track time
+                                 for 3 seconds,
+                                 repeat...
 \end{example}
 
 Conditionals can be used with sublines to display a different set and/or number of sublines on the line depending on the evaluation of the conditional.
@@ -153,7 +153,7 @@ Conditionals can be used with sublines to display a different set and/or number 
 Example subline with conditionals:
 
 \begin{example}
-  %?it{\textless}%t8%s%it{\textbar}%s%fn{\textgreater};%?ia{\textless}%t3%s%ia{\textbar}%t0{\textgreater}\\
+    %?it{\textless}%t8%s%it{\textbar}%s%fn{\textgreater};%?ia{\textless}%t3%s%ia{\textbar}%t0{\textgreater}\\
 \end{example}
 
 The format above will do two different things depending if ID3 tags are present. If the ID3 artist and title are present:
@@ -195,20 +195,20 @@ displaying images:
 
 Example on bitmap preloading and use:
 \begin{example}
-  \%x|a|static\_icon.bmp|50|50|\\
-  \%xl|b|rep\_off.bmp|16|64|\\
-  \%xl|c|rep\_all.bmp|16|64|\\
-  \%xl|d|rep\_one.bmp|16|64|\\
-  \%xl|e|rep\_shuffle.bmp|16|64|\\
-  \%?mm<%xdb|%xdc|%xdd|%xde>\\
+    \%x|a|static\_icon.bmp|50|50|\\
+    \%xl|b|rep\_off.bmp|16|64|\\
+    \%xl|c|rep\_all.bmp|16|64|\\
+    \%xl|d|rep\_one.bmp|16|64|\\
+    \%xl|e|rep\_shuffle.bmp|16|64|\\
+    \%?mm<%xdb|%xdc|%xdd|%xde>\\
 \end{example}
 Four images at the same x and y position are preloaded in the example. Which 
 image to display is determined by the \%mm tag (the repeat mode).
 
 \subsubsection{Example File}
 \begin{example}
-  \%s\%?in<\%in - >\%?it<\%it|\%fn> \%?ia<[\%ia\%?id<, \%id>]> 
-  \%pb\%pc/\%pt
+    \%s\%?in<\%in - >\%?it<\%it|\%fn> \%?ia<[\%ia\%?id<, \%id>]> 
+    \%pb\%pc/\%pt
 \end{example}
 That is, ``tracknum -- title [artist, album]'', where most fields are only
 displayed if available. Could also be rendered as ``filename'' or ``tracknum --
@@ -247,15 +247,15 @@ for the full reference of available options.
 
 \subsection{Example File}
 \begin{example}
-  volume: 70
-  bass: 11
-  treble: 12
-  balance: 0
-  time format: 12hour
-  volume display: numeric
-  show files: supported
-  wps: /.rockbox/car.wps
-  lang: /.rockbox/afrikaans.lng
+    volume: 70
+    bass: 11
+    treble: 12
+    balance: 0
+    time format: 12hour
+    volume display: numeric
+    show files: supported
+    wps: /.rockbox/car.wps
+    lang: /.rockbox/afrikaans.lng
 \end{example}
 
 \section{\label{ref:PartISection1}Differences between binaries}
