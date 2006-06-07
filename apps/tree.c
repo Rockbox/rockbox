@@ -303,7 +303,8 @@ static int update_dir(void)
     if (id3db) {
         if (tc.currtable != lasttable ||
             tc.currextra != lastextra ||
-            tc.firstpos  != lastfirstpos)
+            tc.firstpos  != lastfirstpos ||
+            reload_dir)
         {
             if (tagtree_load(&tc) < 0)
                 return -1;
