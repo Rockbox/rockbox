@@ -49,6 +49,7 @@
 \usepackage{url}
 \urlstyle{sf}
 \usepackage{marvosym}
+\usepackage{ifthen}
 
 % new \ifpdf to check if running in pdf mode. Helps for html generation.
 \newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
@@ -239,3 +240,12 @@
    commandchars=\\\{\}%
    }
 
+
+% Use the nopt command to exclude a certain defined feature from a sectio
+% Example:
+% \nopt{ondio}{This text will be excluded for ondios}
+\newcommand{\optnvalue}{0}
+ \newcommand{\nopt}[2]{%
+   \renewcommand{\optnvalue}{0}\opt{#1}{\renewcommand{\optnvalue}{1}}%
+   \ifthenelse{\optnvalue > 0}{}{#2}
+ }

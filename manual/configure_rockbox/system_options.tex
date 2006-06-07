@@ -25,12 +25,14 @@
     Options relating to the hard disk.
 
   \begin{description}
+    \nopt{ondio}{
     \item [Disk Spindown: ]Rockbox has a timer that makes it spin down the
       hard disk after it is idle for a certain amount of time. This setting
       controls the amount of time between the last user activity and the time
       that the disk spins down. This idle time is only affected by user
       activity, like navigating through file browser. When the hard disk spins
       up to fill mp3 buffer, it automatically spins down afterwards.
+    }
     \opt{recorder,h1xx,h300}{
       \item [Disk Poweroff: ]This setting controls whether the disk is powered
       off or only set to ``sleep'' when spun down. If this setting is YES,
