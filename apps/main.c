@@ -246,6 +246,7 @@ void init(void)
 
     power_init();
 
+    set_irq_level(0);
     lcd_init();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
@@ -254,7 +255,6 @@ void init(void)
     show_logo();
     lang_init();
 
-    set_irq_level(0);
 #ifdef DEBUG
     debug_init();
 #else
