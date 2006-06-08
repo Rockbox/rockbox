@@ -100,6 +100,8 @@ void panicf( const char *fmt, ...)
         /* try to restart firmware if ON is pressed */
 #ifdef IRIVER_H100_SERIES
         if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
+#elif IRIVER_H300_SERIES
+        if ((GPIO1_READ & 0x22) == 0) /* check for ON button and !hold */
 #elif CONFIG_CPU == SH7034
 #if CONFIG_KEYPAD == PLAYER_PAD
         if (!(PADRL & 0x20))
