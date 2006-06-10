@@ -1730,6 +1730,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
 
     if (offset > 0) {
         switch (tracks[track_widx].id3.codectype) {
+        case AFMT_MPA_L1:
         case AFMT_MPA_L2:
         case AFMT_MPA_L3:
             lseek(current_fd, offset, SEEK_SET);
