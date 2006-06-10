@@ -188,30 +188,6 @@ inline void* memcpy(void* dst, const void* src, size_t size)
    return rb->memcpy(dst, src, size);
 }
 
-// From suduku
-int doom_menu_cb(int key, int m)
-{
-    (void)m;
-    switch(key)
-    {
-#ifdef MENU_ENTER2
-    case MENU_ENTER2:
-#endif
-    case MENU_ENTER:
-        key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
-        break;
-
-#ifdef MENU_ENTER2
-    case MENU_ENTER2 | BUTTON_REL:
-#endif
-    case MENU_ENTER | BUTTON_REL:
-        key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
-        break;
-    }
-
-    return key;
-}
-
 struct argvlist
 {
    int timedemo;        // 1 says there's a timedemo
@@ -393,59 +369,6 @@ int Dbuild_base (struct opt_items *names)
    return i;
 }
 
-#if 0
-// This is a general function that takes in an opt_items structure and makes a list
-// of files within it based on matching the string stringmatch to the files.
-int Dbuild_filelist(struct opt_items **names, char *firstentry, char *directory, char *stringmatch)
-{
-   int            i=0;
-   DIR            *filedir;
-   struct dirent  *dptr;
-   char           *startpt;
-   struct opt_items *temp;
-
-   filedir=opendir(directory);
-
-   if(filedir==NULL)
-   {
-      temp=malloc(sizeof(struct opt_items));
-      temp[0].string=firstentry;
-      temp[0].voice_id=0;
-      *names=temp;
-      return 1;
-   }
-
-   // Get the total number of entries
-   while((dptr=rb->readdir(filedir)))
-      i++;
-
-   // Reset the directory
-   closedir(filedir);
-   filedir=opendir(directory);
-
-   i++;
-   temp=malloc(i*sizeof(struct opt_items));
-   temp[0].string=firstentry;
-   temp[0].voice_id=0;
-   i=1;
-
-   while((dptr=rb->readdir(filedir)))
-   {
-      if(rb->strcasestr(dptr->d_name, stringmatch))
-      {
-         startpt=malloc(strlen(dptr->d_name)*sizeof(char));
-         strcpy(startpt,dptr->d_name);
-         temp[i].string=startpt;
-         temp[i].voice_id=0;
-         i++;
-      }
-   }
-   closedir(filedir);
-   *names=temp;
-   return i;
-}
-#endif
-
 // This is a general function that takes in an menu_item structure and makes a list
 // of files within it based on matching the string stringmatch to the files.
 int Dbuild_filelistm(struct menu_item **names, char *firstentry, char *directory, char *stringmatch)
@@ -595,7 +518,7 @@ int Oset_keys()
    };
 
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                doom_menu_cb, NULL, NULL, NULL);
+                NULL, NULL, NULL, NULL);
 
    while(!menuquit)
    {
@@ -693,7 +616,7 @@ static bool Doptions()
    };
 
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                doom_menu_cb, NULL, NULL, NULL);
+                NULL, NULL, NULL, NULL);
 
    while(!menuquit)
    {
@@ -757,7 +680,7 @@ int menuchoice(struct menu_item *menu, int items)
 {
    int m, result;
    
-   m = rb->menu_init(menu, items,doom_menu_cb, NULL, NULL, NULL);
+   m = rb->menu_init(menu, items,NULL, NULL, NULL, NULL);
 
    result= rb->menu_show(m);
    rb->menu_exit(m);
@@ -803,8 +726,12 @@ int doom_menu()
 
    gamever=status-1;
 
+    /* Clean out the button Queue */
+    while (rb->button_get(false) != BUTTON_NONE) 
+        rb->yield();
+
    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                doom_menu_cb, NULL, NULL, NULL);
+                NULL, NULL, NULL, NULL);
 
    while(!menuquit)
    {
