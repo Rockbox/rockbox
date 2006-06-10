@@ -105,7 +105,7 @@ extern const fb_data sokoban_tiles[];
 #ifdef HAVE_LCD_COLOR
 #define BG_COLOR           LCD_RGBPACK(181,199,231) /* Background color. Default Rockbox light blue. */
 
-#elif LCD_DEPTH > 1
+#elif LCD_DEPTH >= 2
 #define MEDIUM_GRAY LCD_BRIGHTNESS(127)
 #endif
 
@@ -443,7 +443,7 @@ static void update_screen(void)
                 break;
 
             case '#': /* this is a wall */
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 1*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -458,7 +458,7 @@ static void update_screen(void)
                 break;
 
             case '.': /* this is a home location */
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 4*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -468,7 +468,7 @@ static void update_screen(void)
                 break;
 
             case '$': /* this is a box */
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 2*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -478,7 +478,7 @@ static void update_screen(void)
 
             case '@': /* this is you */
                 {
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
                   rb->lcd_bitmap_part( sokoban_tiles, 0, 5*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -499,7 +499,7 @@ static void update_screen(void)
 
             case '%': /* this is a box on a home spot */
 
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 3*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -509,7 +509,7 @@ static void update_screen(void)
 #endif
                 break;
 
-#if LCD_DEPTH >= 1
+#if LCD_DEPTH >= 2
             default:
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 0*magnify, magnify,
                                     c, b, magnify, magnify );
