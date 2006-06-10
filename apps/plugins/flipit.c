@@ -94,6 +94,8 @@ static int toggle[20];
 static int cursor_pos, moves;
 static char s[5];
 
+#if LCD_DEPTH >= 2
+
 #ifdef HAVE_LCD_COLOR
 
 #if LCD_HEIGHT >= 200
@@ -102,6 +104,16 @@ static char s[5];
 #define tksize 40
 #else
 #define tksize 30
+#endif
+
+#else
+
+#if LCD_WIDTH >= 150
+#define tksize 30
+#else
+#define tksize 20
+#endif
+
 #endif
 
 extern const fb_data flipit_tokens[];
@@ -145,7 +157,7 @@ static unsigned char cursor_pic[32] = {
 
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p) {
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH >= 2
     rb->lcd_bitmap_part( flipit_tokens, 0, spots[p]*tksize, tksize,
                          (p%5)*tksize+GRID_LEFT, (p/5)*tksize+GRID_TOP,
                          tksize, tksize );
@@ -159,11 +171,26 @@ static void draw_spot(int p) {
 
 /* draw the cursor at the current cursor position */
 static void draw_cursor(void) {
-#if HAVE_LCD_COLOR
+
+#ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap_transparent_part( flipit_tokens, 0, 2*tksize, tksize,
                                (cursor_pos%5)*tksize+GRID_LEFT,
                                (cursor_pos/5)*tksize+GRID_TOP,
                                tksize, tksize );
+#elif LCD_DEPTH >= 2
+/* grayscale doesn't have transparent bitmap ... */
+    int i,j;
+    i = ( cursor_pos%5 )*tksize;
+    j = ( cursor_pos/5 )*tksize;
+    rb->lcd_set_drawmode( DRMODE_SOLID );
+    rb->lcd_drawline( i+GRID_LEFT, j+GRID_TOP,
+                      i+tksize-1+GRID_LEFT, j+GRID_TOP );
+    rb->lcd_drawline( i+GRID_LEFT, j+tksize-1+GRID_TOP,
+                      i+tksize-1+GRID_LEFT, j+tksize-1+GRID_TOP );
+    rb->lcd_drawline( i+GRID_LEFT, j+GRID_TOP,
+                      i+GRID_LEFT, j+tksize-1+GRID_TOP );
+    rb->lcd_drawline( i+tksize-1+GRID_LEFT, j+GRID_TOP,
+                      i+tksize-1+GRID_LEFT, j+tksize-1+GRID_TOP );
 #else
     int i,j;
     i = (cursor_pos%5)*16;
@@ -179,7 +206,7 @@ static void draw_cursor(void) {
 
 /* clear the cursor where it is */
 static void clear_cursor(void) {
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH >= 2
     draw_spot( cursor_pos );
 #else
     int i,j;
@@ -355,7 +382,7 @@ static bool flipit_loop(void) {
                 /* toggle the pieces */
                 if (!flipit_finished()) {
                     flipit_toggle();
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 2
                     draw_cursor();
 #endif
                     rb->lcd_update();

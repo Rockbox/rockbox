@@ -127,6 +127,12 @@ flipit_tokens.40x40.bmp
 #else
 flipit_tokens.30x30.bmp
 #endif
+#elif LCD_DEPTH >= 2
+#if LCD_WIDTH >= 150
+flipit_tokens.30x30x2.bmp
+#else
+flipit_tokens.20x20x2.bmp
+#endif
 #endif
 
 /* Star */
