@@ -103,12 +103,6 @@ extern const fb_data sokoban_tiles[];
 #endif
 
 #ifdef HAVE_LCD_COLOR
-#define WALL_COLOR         LCD_RGBPACK(16,20,180)   /* Color of the walls */
-#define FREE_TARGET_COLOR  LCD_RGBPACK(251,158,25)  /* Color of a 'target' without a block on top */
-#define USED_TARGET_COLOR  LCD_RGBPACK(255,255,255) /* Color of a 'target' with a block on top */
-#define FREE_BLOCK_COLOR   LCD_RGBPACK(22,130,53)   /* Color of a block when it's not on a 'target' */
-#define USED_BLOCK_COLOR   LCD_RGBPACK(22,130,53)   /* Color of a block when it is on a 'target' */
-#define CHAR_COLOR         LCD_BLACK                /* Color of the 'character' */
 #define BG_COLOR           LCD_RGBPACK(181,199,231) /* Background color. Default Rockbox light blue. */
 
 #elif LCD_DEPTH > 1
