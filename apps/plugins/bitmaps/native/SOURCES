@@ -116,6 +116,8 @@ sokoban_tiles.9x9.bmp
 /* LCD_HEIGHT >= 128 */
 sokoban_tiles.6x6.bmp
 #endif
+#elif LCD_DEPTH >= 2
+sokoban_tiles.6x6x2.bmp
 #endif
 
 /* Flip it */

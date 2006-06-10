@@ -24,7 +24,7 @@
 
 PLUGIN_HEADER
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 2
 extern const fb_data sokoban_tiles[];
 #endif
 
@@ -426,7 +426,7 @@ static void update_screen(void)
     int magnify = 14;
 #elif LCD_HEIGHT >= 176 /* h3x0, ipod color/photo */
     int magnify = 9;
-#elif LCD_HEIGHT >= 128 /* h1x0, ipod nano */
+#elif LCD_HEIGHT >= 110 /* h1x0, ipod nano, ipod mini */
     int magnify = 6;
 #else /* other */
     int magnify = 4;
@@ -443,13 +443,9 @@ static void update_screen(void)
                 break;
 
             case '#': /* this is a wall */
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 1*magnify, magnify,
                                     c, b, magnify, magnify );
-#elif LCD_DEPTH > 1
-                rb->lcd_set_foreground(MEDIUM_GRAY);
-                rb->lcd_fillrect(c, b, magnify, magnify);
-                rb->lcd_set_foreground(LCD_BLACK);
 #else
                 {
                     int i, j;
@@ -462,7 +458,7 @@ static void update_screen(void)
                 break;
 
             case '.': /* this is a home location */
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 4*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -472,7 +468,7 @@ static void update_screen(void)
                 break;
 
             case '$': /* this is a box */
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 2*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -482,7 +478,7 @@ static void update_screen(void)
 
             case '@': /* this is you */
                 {
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
                   rb->lcd_bitmap_part( sokoban_tiles, 0, 5*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -503,7 +499,7 @@ static void update_screen(void)
 
             case '%': /* this is a box on a home spot */
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 3*magnify, magnify,
                                     c, b, magnify, magnify );
 #else
@@ -513,7 +509,7 @@ static void update_screen(void)
 #endif
                 break;
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH >= 1
             default:
                 rb->lcd_bitmap_part( sokoban_tiles, 0, 0*magnify, magnify,
                                     c, b, magnify, magnify );
