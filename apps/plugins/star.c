@@ -613,7 +613,7 @@ static int star_load_level(int current_level)
                                          STAR_TILE_SIZE, STAR_TILE_SIZE);
 #else
 #   define DRAW_TILE( a )                                                    \
-                    rb->lcd_mono_bitmap ( a # bmp,                           \
+                    rb->lcd_mono_bitmap ( a ## _bmp,                          \
                                          STAR_OFFSET_X + x * STAR_TILE_SIZE, \
                                          STAR_OFFSET_Y + y * STAR_TILE_SIZE, \
                                          STAR_TILE_SIZE, STAR_TILE_SIZE);
