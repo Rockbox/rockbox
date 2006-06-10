@@ -106,6 +106,40 @@ snake2_right.160x128x2.bmp
 snake2_bottom.160x128x2.bmp
 #endif
 
+/* Sokoban*/
+#ifdef HAVE_LCD_COLOR
+#if LCD_HEIGHT >= 240
+sokoban_tiles.14x14.bmp
+#elif LCD_HEIGHT >= 176
+sokoban_tiles.9x9.bmp
+#else
+/* LCD_HEIGHT >= 128 */
+sokoban_tiles.6x6.bmp
+#endif
+#endif
+
+/* Flip it */
+#ifdef HAVE_LCD_COLOR
+#if LCD_HEIGHT >= 200
+flipit_tokens.50x50.bmp
+#elif LCD_HEIGHT >= 160
+flipit_tokens.40x40.bmp
+#else
+flipit_tokens.30x30.bmp
+#endif
+#endif
+
+/* Star */
+#ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH >= 320
+star_tiles.20x20.bmp
+#elif LCD_WIDTH >= 220
+star_tiles.13x13.bmp
+#else
+star_tiles.10x10.bmp
+#endif
+#endif
+
 /* Solitaire */
 #ifdef HAVE_LCD_COLOR
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
