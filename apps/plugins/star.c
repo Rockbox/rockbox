@@ -37,15 +37,8 @@ PLUGIN_HEADER
 #define STAR_WIDTH      16
 #define STAR_HEIGHT      9
 
-/* left and top margin */
-#define STAR_OFFSET_X    8
-#define STAR_OFFSET_Y    0
-
 /* number of level */
 #define STAR_LEVEL_COUNT 20
-
-/* size of a tile */
-#define STAR_TILE_SIZE   6
 
 /* values of object in the board */
 #define STAR_VOID       '.'
@@ -155,6 +148,38 @@ static int control;
 /* the current board */
 static char board[STAR_HEIGHT][STAR_WIDTH];
 
+#ifdef HAVE_LCD_COLOR
+
+extern const fb_data star_tiles[];
+
+/* size of a tile */
+#if LCD_WIDTH >= 320
+#  define STAR_TILE_SIZE 20
+#elif LCD_WIDTH >= 220
+#  define STAR_TILE_SIZE 13
+#else
+#  define STAR_TILE_SIZE 10
+#endif
+
+/* left and top margin */
+#define STAR_OFFSET_X ( ( LCD_WIDTH - STAR_WIDTH * STAR_TILE_SIZE ) / 2 )
+#define STAR_OFFSET_Y ( ( LCD_HEIGHT - ( STAR_HEIGHT + 1 ) * STAR_TILE_SIZE ) / 2 )
+
+#define wall 0
+#define space 1
+#define block 2
+#define star 3
+#define ball 4
+
+#else
+
+/* left and top margin */
+#define STAR_OFFSET_X    8
+#define STAR_OFFSET_Y    0
+
+/* size of a tile */
+#define STAR_TILE_SIZE   6
+
 /* bitmap of the wall */
 static unsigned char wall_bmp[STAR_TILE_SIZE]
     = {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55};
@@ -170,6 +195,8 @@ static unsigned char ball_bmp[STAR_TILE_SIZE]
 /* bitmap of the block */
 static unsigned char block_bmp[STAR_TILE_SIZE]
     = {0x00, 0x1e, 0x1e, 0x1e, 0x1e, 0x00};
+
+#endif
 
 /* bitmap of the arrow animation */
 static unsigned char arrow_bmp[4][7] =
@@ -523,13 +550,26 @@ static void star_transition_update(void)
  */
 static void star_display_board_info(void)
 {
-    int label_offset_y = label_offset_y = LCD_HEIGHT - char_height;
+    int label_offset_y = label_offset_y = LCD_HEIGHT - char_height - ( STAR_TILE_SIZE - char_height ) / 2 ;
     char str_info[32];
 
     rb->snprintf(str_info, sizeof(str_info), "L:%02d    S:%02d   C:",
                  current_level, star_count);
     rb->lcd_putsxy(0, label_offset_y, str_info);
 
+#if HAVE_LCD_COLOR
+    if( control == STAR_CONTROL_BALL )
+            rb->lcd_bitmap_part( star_tiles, 0,
+                                 ball*STAR_TILE_SIZE, STAR_TILE_SIZE,
+                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1,
+                                 STAR_TILE_SIZE, STAR_TILE_SIZE);
+    else
+            rb->lcd_bitmap_part( star_tiles, 0,
+                                 block*STAR_TILE_SIZE, STAR_TILE_SIZE,
+                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1,
+                                 STAR_TILE_SIZE, STAR_TILE_SIZE);
+    rb->lcd_update_rect(0, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1, LCD_WIDTH, STAR_TILE_SIZE );
+#else
     if (control == STAR_CONTROL_BALL)
         rb->lcd_mono_bitmap (ball_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
                              STAR_TILE_SIZE);
@@ -538,6 +578,8 @@ static void star_display_board_info(void)
                              STAR_TILE_SIZE);
 
     rb->lcd_update_rect(0, label_offset_y, LCD_WIDTH, char_height);
+#endif
+
 }
 
 
@@ -562,41 +604,46 @@ static int star_load_level(int current_level)
             board[y][x] = *ptr_tab;
             switch (*ptr_tab)
             {
+#if HAVE_LCD_COLOR
+#   define DRAW_TILE( a )                                                    \
+                    rb->lcd_bitmap_part( star_tiles, 0,                     \
+                                         a*STAR_TILE_SIZE, STAR_TILE_SIZE,   \
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE, \
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE, \
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+#else
+#   define DRAW_TILE( a )                                                    \
+                    rb->lcd_mono_bitmap ( a # bmp,                           \
+                                         STAR_OFFSET_X + x * STAR_TILE_SIZE, \
+                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE, \
+                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+#endif
                 case STAR_VOID:
+#ifdef HAVE_LCD_COLOR
+                    DRAW_TILE( space );
+#endif
                     break;
 
                 case STAR_WALL:
-                    rb->lcd_mono_bitmap (wall_bmp,
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    DRAW_TILE( wall );
                     break;
 
                 case STAR_STAR:
-                    rb->lcd_mono_bitmap (star_bmp,
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    DRAW_TILE( star );
                     star_count++;
                     break;
 
                 case STAR_BALL:
                     ball_x = x;
                     ball_y = y;
-                    rb->lcd_mono_bitmap (ball_bmp,
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    DRAW_TILE( ball );
                     break;
 
 
                 case STAR_BLOCK:
                     block_x = x;
                     block_y = y;
-                    rb->lcd_mono_bitmap (block_bmp,
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE,
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE,
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    DRAW_TILE( block );
                     break;
             }
             ptr_tab++;
@@ -709,18 +756,35 @@ static int star_run_game(void)
                     || board[ball_y + move_y][ball_x + move_x] == STAR_STAR))
 
             {
-                for (i = 0 ; i < 7 ; i++)
+                for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
                 {
+#if HAVE_LCD_COLOR
+                    rb->lcd_bitmap_part(
+                        star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
+                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE,
+                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE,
+                        STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_bitmap_part(
+                        star_tiles, 0, ball * STAR_TILE_SIZE, STAR_TILE_SIZE,
+                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
+                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
+                        STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_update_rect(
+                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * (i>0?i-1:0),
+                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * (i>0?i-1:0),
+                        STAR_TILE_SIZE+(i>0?0:1), STAR_TILE_SIZE+(i>0?0:1));
+#else
                     rb->lcd_mono_bitmap(
                         ball_bmp,
                         STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
-
                     rb->lcd_update_rect(
                         STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+#endif
+
                     rb->sleep(STAR_SLEEP);
                 }
                 ball_x += move_x;
@@ -741,18 +805,34 @@ static int star_run_game(void)
             board[block_y][block_x] = STAR_VOID;
             while (board[block_y + move_y][block_x + move_x] == STAR_VOID)
             {
-                for (i = 0 ; i < 7 ; i++)
+                for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
                 {
+#if HAVE_LCD_COLOR
+                    rb->lcd_bitmap_part(
+                        star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
+                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE,
+                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE,
+                        STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_bitmap_part(
+                        star_tiles, 0, block * STAR_TILE_SIZE, STAR_TILE_SIZE,
+                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
+                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
+                        STAR_TILE_SIZE, STAR_TILE_SIZE);
+                    rb->lcd_update_rect(
+                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * (i>0?i-1:0),
+                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * (i>0?i-1:0),
+                        STAR_TILE_SIZE+(i>0?0:1), STAR_TILE_SIZE+(i>0?0:1));
+#else
                     rb->lcd_mono_bitmap(
                         block_bmp,
                         STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
-
                     rb->lcd_update_rect(
                         STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
                         STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
+#endif
 
                     rb->sleep(STAR_SLEEP);
                 }
@@ -911,6 +991,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_setfont(FONT_SYSFIXED);
     if (char_width == -1)
         rb->lcd_getstringsize("a", &char_width, &char_height);
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background( LCD_BLACK );
+    rb->lcd_set_foreground( LCD_WHITE );
+#endif
 
     /* display choice menu */
     return star_menu();

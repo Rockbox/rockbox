@@ -24,6 +24,10 @@
 
 PLUGIN_HEADER
 
+#ifdef HAVE_LCD_COLOR
+extern const fb_data sokoban_tiles[];
+#endif
+
 #define SOKOBAN_TITLE       "Sokoban"
 #define SOKOBAN_TITLE_FONT  2
 
@@ -33,7 +37,7 @@ PLUGIN_HEADER
 #define COLS                20
 /* Use all but 8k of the plugin buffer for board data */
 #define SOKOBAN_LEVEL_SIZE  (ROWS*COLS)
-#define MAX_BUFFERED_BOARDS (PLUGIN_BUFFER_SIZE - 0x2000)/SOKOBAN_LEVEL_SIZE
+#define MAX_BUFFERED_BOARDS (PLUGIN_BUFFER_SIZE - 0x3000)/SOKOBAN_LEVEL_SIZE
 #define MAX_UNDOS           5
 
 /* variable button definitions */
@@ -423,11 +427,14 @@ static void update_screen(void)
     int rows = 0, cols = 0;
     char s[25];
 
-#if LCD_HEIGHT == 128        /* magnify is the number of pixels for each block */
-    int magnify = 6;         /* 6 on h1x0, 9 on h3x0, and 4 on everything else */
-#elif LCD_HEIGHT >= 176
+/* magnify is the number of pixels for each block */
+#if LCD_HEIGHT >= 240 /* ipod 5g */
+    int magnify = 14;
+#elif LCD_HEIGHT >= 176 /* h3x0, ipod color/photo */
     int magnify = 9;
-#else
+#elif LCD_HEIGHT >= 128 /* h1x0, ipod nano */
+    int magnify = 6;
+#else /* other */
     int magnify = 4;
 #endif
 
@@ -443,9 +450,8 @@ static void update_screen(void)
 
             case '#': /* this is a wall */
 #if HAVE_LCD_COLOR
-                rb->lcd_set_foreground(WALL_COLOR);
-                rb->lcd_fillrect(c, b, magnify, magnify);
-                rb->lcd_set_foreground(LCD_BLACK);
+                rb->lcd_bitmap_part( sokoban_tiles, 0, 1*magnify, magnify,
+                                    c, b, magnify, magnify );
 #elif LCD_DEPTH > 1
                 rb->lcd_set_foreground(MEDIUM_GRAY);
                 rb->lcd_fillrect(c, b, magnify, magnify);
@@ -463,9 +469,8 @@ static void update_screen(void)
 
             case '.': /* this is a home location */
 #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(FREE_TARGET_COLOR);
-                rb->lcd_fillrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
-                                 magnify/2);
+                rb->lcd_bitmap_part( sokoban_tiles, 0, 4*magnify, magnify,
+                                    c, b, magnify, magnify );
 #else
                 rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
                                  magnify/2);
@@ -474,19 +479,22 @@ static void update_screen(void)
 
             case '$': /* this is a box */
 #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(FREE_BLOCK_COLOR);
-#endif
+                rb->lcd_bitmap_part( sokoban_tiles, 0, 2*magnify, magnify,
+                                    c, b, magnify, magnify );
+#else
                 rb->lcd_drawrect(c, b, magnify, magnify);  /* Free boxes are not filled in */
+#endif
                 break;
 
             case '@': /* this is you */
                 {
+#ifdef HAVE_LCD_COLOR
+                  rb->lcd_bitmap_part( sokoban_tiles, 0, 5*magnify, magnify,
+                                    c, b, magnify, magnify );
+#else
                     int max = magnify - 1;
                     int middle = max / 2;
                     int ldelta = (middle + 1) / 2;
-#ifdef HAVE_LCD_COLOR
-                    rb->lcd_set_foreground(CHAR_COLOR);
-#endif
                     rb->lcd_drawline(c, b+middle, c+max, b+middle);
                     rb->lcd_drawline(c+middle, b, c+middle, b+max-ldelta);
                     rb->lcd_drawline(c+max-middle, b,
@@ -495,26 +503,27 @@ static void update_screen(void)
                                      c+middle-ldelta, b+max);
                     rb->lcd_drawline(c+max-middle, b+max-ldelta,
                                      c+max-middle+ldelta, b+max);
+#endif
                 }
                 break;
 
             case '%': /* this is a box on a home spot */
 
 #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(USED_BLOCK_COLOR);
-                rb->lcd_fillrect(c, b, magnify, magnify);
+                rb->lcd_bitmap_part( sokoban_tiles, 0, 3*magnify, magnify,
+                                    c, b, magnify, magnify );
 #else
                 rb->lcd_drawrect(c, b, magnify, magnify);
-#endif
-#ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(USED_TARGET_COLOR);
-                rb->lcd_fillrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
-                                 magnify/2);
-#else
                 rb->lcd_drawrect(c+(magnify/2)-1, b+(magnify/2)-1, magnify/2,
                                  magnify/2);
 #endif
                 break;
+
+#ifdef HAVE_LCD_COLOR
+            default:
+                rb->lcd_bitmap_part( sokoban_tiles, 0, 0*magnify, magnify,
+                                    c, b, magnify, magnify );
+#endif
             }
         }
     }
