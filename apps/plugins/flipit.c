@@ -93,7 +93,25 @@ static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
 static char s[5];
+
+#ifdef HAVE_LCD_COLOR
+
+#if LCD_HEIGHT >= 200
+#define tksize 50
+#elif LCD_HEIGHT >=160
+#define tksize 40
+#else
+#define tksize 30
+#endif
+
+extern const fb_data flipit_tokens[];
+
+#else
+
 static char *ptr;
+
+#define tksize 16
+
 static unsigned char spot_pic[2][28] = {
     { 0xe0, 0xf8, 0xfc, 0xfe, 0xfe, 0xff, 0xff,
       0xff, 0xff, 0xfe, 0xfe, 0xfc, 0xf8, 0xe0,
@@ -109,18 +127,44 @@ static unsigned char cursor_pic[32] = {
     0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0xaa,
     0x55, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80,
     0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xaa };
+#endif
+
+#define INFO_WIDTH 32
+
+#if LCD_WIDTH - 5*tksize - INFO_WIDTH < 0
+#  define INFO_UNDER
+#  undef INFO_WIDTH
+#  define INFO_WIDTH 60
+#  define GRID_LEFT ((LCD_WIDTH-5*tksize)/2)
+#  define GRID_TOP 0
+#else
+#  define GRID_LEFT 0
+#  define GRID_TOP ((LCD_HEIGHT-4*tksize)/2)
+#endif
 
 
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p) {
+#if HAVE_LCD_COLOR
+    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p]*tksize, tksize,
+                         (p%5)*tksize+GRID_LEFT, (p/5)*tksize+GRID_TOP,
+                         tksize, tksize );
+#else
     ptr = spot_pic[spots[p]];
     rb->lcd_mono_bitmap (ptr, (p%5)*16+1, (p/5)*16+1, 14, 8);
     ptr += 14;
     rb->lcd_mono_bitmap (ptr, (p%5)*16+1, (p/5)*16+9, 14, 6);
+#endif
 }
 
 /* draw the cursor at the current cursor position */
 static void draw_cursor(void) {
+#if HAVE_LCD_COLOR
+    rb->lcd_bitmap_transparent_part( flipit_tokens, 0, 2*tksize, tksize,
+                               (cursor_pos%5)*tksize+GRID_LEFT,
+                               (cursor_pos/5)*tksize+GRID_TOP,
+                               tksize, tksize );
+#else
     int i,j;
     i = (cursor_pos%5)*16;
     j = (cursor_pos/5)*16;
@@ -130,10 +174,14 @@ static void draw_cursor(void) {
     ptr += 16;
     rb->lcd_mono_bitmap (ptr, i, j+8, 16, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+#endif
 }
 
 /* clear the cursor where it is */
 static void clear_cursor(void) {
+#if HAVE_LCD_COLOR
+    draw_spot( cursor_pos );
+#else
     int i,j;
     i = (cursor_pos%5)*16;
     j = (cursor_pos/5)*16;
@@ -143,6 +191,39 @@ static void clear_cursor(void) {
     rb->lcd_drawline(i, j, i, j+15);
     rb->lcd_drawline(i+15, j, i+15, j+15);
     rb->lcd_set_drawmode(DRMODE_SOLID);
+#endif
+}
+
+/* draw the info panel ... duh */
+static void draw_info_panel(void)
+{
+#ifdef INFO_UNDER
+#   define HEIGHT ( LCD_HEIGHT - 4*tksize )
+#   define LEFT ( ( LCD_WIDTH - INFO_WIDTH ) / 2 )
+#   define TOP ( LCD_HEIGHT - HEIGHT )
+#else
+#   define HEIGHT 64
+#   define LEFT ( LCD_WIDTH - (LCD_WIDTH- 5*tksize-INFO_WIDTH)/2 - INFO_WIDTH )
+#   define TOP ( ( LCD_HEIGHT - HEIGHT ) / 2 )
+#endif
+    rb->lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
+    rb->lcd_fillrect( LEFT, TOP, INFO_WIDTH, HEIGHT );
+    rb->lcd_set_drawmode( DRMODE_SOLID );
+    rb->lcd_drawrect( LEFT, TOP, INFO_WIDTH, HEIGHT );
+#ifdef INFO_UNDER
+    rb->lcd_putsxy( LEFT+1, TOP+1, "Flips" );
+#else
+    rb->lcd_putsxy( LEFT+1, TOP+10, "Flips" );
+#endif
+    rb->snprintf( s, sizeof(s), "%d", moves );
+#ifdef INFO_UNDER
+    rb->lcd_putsxy( LEFT+32, TOP+1, s );
+#else
+    rb->lcd_putsxy( LEFT+1, TOP+20, s );
+#endif
+#   undef HEIGHT
+#   undef LEFT
+#   undef TOP
 }
 
 /* check if the puzzle is finished */
@@ -177,8 +258,9 @@ static void flipit_toggle(void) {
         draw_spot(cursor_pos+5);
     }
     moves++;
-    rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+
+    draw_info_panel();
+
     if (flipit_finished())
         clear_cursor();
 }
@@ -187,7 +269,8 @@ static void flipit_toggle(void) {
 static void move_cursor(int x, int y) {
     if (!(flipit_finished())) {
         clear_cursor();
-        cursor_pos += (x+5*y);
+        cursor_pos =     ( x + 5 + cursor_pos%5 )%5
+                     + ( ( y + 4 + cursor_pos/5 )%4 )*5;
         draw_cursor();
     }
     rb->lcd_update();
@@ -198,8 +281,6 @@ static void flipit_init(void) {
     int i;
     rb->lcd_clear_display();
     moves = 0;
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
     for (i=0; i<20; i++) {
         spots[i]=1;
         toggle[i]=1;
@@ -214,13 +295,7 @@ static void flipit_init(void) {
     cursor_pos = 0;
     draw_cursor();
     moves = 0;
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_fillrect(80, 0, 32, 64);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
-    rb->snprintf(s, sizeof(s), "%d", moves);
-    rb->lcd_putsxy(85, 20, s);
+    draw_info_panel();
     rb->lcd_update();
 }
 
@@ -237,7 +312,7 @@ static bool flipit_loop(void) {
             case FLIPIT_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;
-    
+
             case FLIPIT_SHUFFLE:
                 /* mix up the pieces */
                 flipit_init();
@@ -250,8 +325,8 @@ static bool flipit_loop(void) {
                         if (!toggle[i]) {
                             clear_cursor();
                             cursor_pos = i;
-                            draw_cursor();
                             flipit_toggle();
+                            draw_cursor();
                             rb->lcd_update();
                             rb->sleep(HZ*2/3);
                         }
@@ -264,8 +339,8 @@ static bool flipit_loop(void) {
                         if (!toggle[i]) {
                             clear_cursor();
                             cursor_pos = i;
-                            draw_cursor();
                             flipit_toggle();
+                            draw_cursor();
                             rb->lcd_update();
                             break;
                         }
@@ -280,28 +355,27 @@ static bool flipit_loop(void) {
                 /* toggle the pieces */
                 if (!flipit_finished()) {
                     flipit_toggle();
+#ifdef HAVE_LCD_COLOR
+                    draw_cursor();
+#endif
                     rb->lcd_update();
                 }
                 break;
 
             case BUTTON_LEFT:
-                if ((cursor_pos%5)>0)
-                    move_cursor(-1, 0);
+                move_cursor(-1, 0);
                 break;
 
             case BUTTON_RIGHT:
-                if ((cursor_pos%5)<4)
-                    move_cursor(1, 0);
+                move_cursor(1, 0);
                 break;
 
             case FLIPIT_UP:
-                if ((cursor_pos/5)>0)
-                    move_cursor(0, -1);
+                move_cursor(0, -1);
                 break;
 
             case FLIPIT_DOWN:
-                if ((cursor_pos/5)<3)
-                    move_cursor(0, 1);
+                move_cursor(0, 1);
                 break;
 
             default:
@@ -321,6 +395,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)parameter;
     rb = api;
+
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_WHITE);
+#endif
 
     /* print title */
     rb->lcd_getstringsize("FlipIt!", &w, &h);
@@ -364,8 +442,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->button_get_w_tmo(HZ*3);
 
     rb->lcd_clear_display();
-    rb->lcd_drawrect(80, 0, 32, 64);
-    rb->lcd_putsxy(81, 10, "Flips");
+    draw_info_panel();
     for (i=0; i<20; i++) {
         spots[i]=1;
         draw_spot(i);
