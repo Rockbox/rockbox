@@ -48,7 +48,11 @@ PLUGIN_HEADER
 #define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
-#define STAR_SLEEP      1
+#ifdef HAVE_LCD_COLOR
+#define STAR_SLEEP ;
+#else
+#define STAR_SLEEP rb->sleep(1);
+#endif
 
 /* value of ball and block control */
 #define STAR_CONTROL_BALL  0
@@ -540,7 +544,7 @@ static void star_transition_update(void)
         }
         rb->lcd_update_rect(center_x - x, center_y - y,
             x * 2, y * 2);
-        rb->sleep(STAR_SLEEP);
+        STAR_SLEEP
     }
     rb->lcd_update();
 }
@@ -785,7 +789,7 @@ static int star_run_game(void)
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
 #endif
 
-                    rb->sleep(STAR_SLEEP);
+                    STAR_SLEEP
                 }
                 ball_x += move_x;
                 ball_y += move_y;
@@ -834,7 +838,7 @@ static int star_run_game(void)
                         STAR_TILE_SIZE, STAR_TILE_SIZE);
 #endif
 
-                    rb->sleep(STAR_SLEEP);
+                    STAR_SLEEP
                 }
                 block_x += move_x;
                 block_y += move_y;
@@ -895,7 +899,7 @@ static int star_menu(void)
         rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
                             2, menu_offset_y + menu_y * char_height, 7, 8);
         rb->lcd_update_rect (2, menu_offset_y + menu_y * 8, 8, 8);
-        rb->sleep(STAR_SLEEP);
+        STAR_SLEEP
         anim_state++;
 
         key = rb->button_get(false);
@@ -972,7 +976,7 @@ static int star_menu(void)
                                 2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8);
             rb->lcd_update_rect(2, 30, 8, 4 * 8);
             anim_state++;
-            rb->sleep(STAR_SLEEP);
+            STAR_SLEEP
         }
             rb->lcd_set_drawmode(DRMODE_SOLID);
         menu_y += move_y;
