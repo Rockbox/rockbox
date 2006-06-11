@@ -8508,6 +8508,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Nom de fichier invalide"
   </voice>
 </phrase>
+<phrase>
  id: LANG_REMOTE_SCROLL_SETS
   desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
   user:
