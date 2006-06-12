@@ -659,6 +659,7 @@ bool playlist_viewer_ex(char* filename)
             gui_synclist_set_nb_items(&playlist_lists, viewer.num_tracks);
             /* Abort move on playlist change */
             viewer.move_track = -1;
+            gui_synclist_draw(&playlist_lists);
         }
 
         /* Timeout so we can determine if play status has changed */
