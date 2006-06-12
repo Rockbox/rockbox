@@ -112,7 +112,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->memset(iedata, 0, iend - iedata);
 #endif
 
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
 #endif
 
@@ -134,7 +134,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->pcm_set_frequency(44100); // 44100
 #endif
 
-#if !defined(SIMULATOR) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
+#if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
 #endif
 
