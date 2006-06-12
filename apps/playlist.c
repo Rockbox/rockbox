@@ -566,8 +566,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     switch (position)
     {
         case PLAYLIST_PREPEND:
-            insert_position = playlist->first_index;
-            flags = PLAYLIST_INSERT_TYPE_PREPEND;
+            position = insert_position = playlist->first_index;
             break;
         case PLAYLIST_INSERT:
             /* if there are already inserted tracks then add track to end of
@@ -595,11 +594,9 @@ static int add_track_to_playlist(struct playlist_info* playlist,
             break;
         case PLAYLIST_INSERT_LAST:
             if (playlist->first_index > 0)
-                insert_position = playlist->first_index;
+                position = insert_position = playlist->first_index;
             else
-                insert_position = playlist->amount;
-
-            flags = PLAYLIST_INSERT_TYPE_APPEND;
+                position = insert_position = playlist->amount;
             break;
         case PLAYLIST_INSERT_SHUFFLED:
         {
