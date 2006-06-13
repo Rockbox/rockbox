@@ -171,8 +171,8 @@ void uda1380_reset(void)
 {
 #ifdef IRIVER_H300_SERIES
     int mask = set_irq_level(HIGHEST_IRQ_LEVEL);
-    pcf50606_write(0x3b, 0x00);
-    pcf50606_write(0x3b, 0x07);
+    pcf50606_write(0x3b, 0x00);  /* GPOOD2 high Z */
+    pcf50606_write(0x3b, 0x07);  /* GPOOD2 low */
     set_irq_level(mask);
 #else
     /* RESET signal */
