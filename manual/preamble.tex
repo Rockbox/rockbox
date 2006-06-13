@@ -70,7 +70,7 @@
 \fancyhead[L]{{\textsc{\leftmark}}}
 \fancyhead[R]{\iffloatpage{}{\thepage}}
 \fancyfoot[L]{\textsc{The Rockbox manual}}
-\fancyfoot[R]{\textsc{\playername}}
+\fancyfoot[R]{\textsc{\playerman{} \playertype}}
 
 \renewcommand{\headrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
@@ -221,7 +221,7 @@
 %       This is intended to make the LaTeX sources more readable.
 % Note: when using the code environment you need to use optv instead of opt!
 \DefineVerbatimEnvironment{code}{Verbatim}%
-  {framerule=0.4pt, framesep=1ex,numbers=left,frame=lines,%
+  {framerule=0.4pt, framesep=1ex,numbers=left,frame=lines,%stepnumber=5,%
    gobble=4,fontsize=\footnotesize,xleftmargin=10pt,%
    label=\textnormal{\textsc{Code}},%
    commandchars=\\\{\}%
