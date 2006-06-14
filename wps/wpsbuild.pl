@@ -121,10 +121,10 @@ sub copywps {
         # print "$req_t_wps $req_g_wps\n";
 
         if (-e "$dir/$req_t_wps" ) {
-	    system("cp $dir/$req_t_wps .rockbox/wps/$wps");
+          system("cp $dir/$req_t_wps .rockbox/wps/$wps");
 
-	} elsif (-e "$dir/$req_g_wps") {
-	    system("cp $dir/$req_g_wps .rockbox/wps/$wps");
+        } elsif (-e "$dir/$req_g_wps") {
+           system("cp $dir/$req_g_wps .rockbox/wps/$wps");
 
            open(WPSFILE, "$dir/$req_g_wps");
            while (<WPSFILE>) {
@@ -215,7 +215,7 @@ while(<WPS>) {
         undef $statusbar;
         undef $author;
         undef $req_g_wps;
-	undef $req_t_wps;
+        undef $req_t_wps;
         next;
     }
     if($within) {
@@ -239,15 +239,15 @@ while(<WPS>) {
             }
             $wpslist =~ /(.*)WPSLIST/;
             my $wpsdir = $1;
-	    # If this WPS installable on this platform, one of the following
-	    # two files will be present
-	    foreach $d (@depthlist) {
+        # If this WPS installable on this platform, one of the following
+        # two files will be present
+        foreach $d (@depthlist) {
                 next if ($d > $rdepth); 
 
-    	        $req_g = $rwidth . "x" . $rheight . "x" . $d;
+                $req_g = $rwidth . "x" . $rheight . "x" . $d;
 
-    	        $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
-		last if (-e "$wpsdir/$req_g_wps"); 
+                $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
+                last if (-e "$wpsdir/$req_g_wps"); 
             } 
             $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
@@ -270,7 +270,7 @@ while(<WPS>) {
             }
             else {
                 #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) "; 
-		print "Skip $wps due to size restraints\n";
+                print "Skip $wps due to size restraints\n";
             }
             $within = 0;
         }
@@ -294,6 +294,9 @@ while(<WPS>) {
             $height = $1;
         }
         elsif($l =~ /^Font: (.*)/i) {
+            $font = $1;
+        }
+        elsif($l =~ /^Font\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $font = $1;
         }
         elsif($l =~ /^Statusbar: (.*)/i) {
