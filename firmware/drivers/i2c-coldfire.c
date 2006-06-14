@@ -120,10 +120,7 @@ int i2c_write_byte(int device, unsigned char data)
 
     /* Wait for bus busy */
     while (!(regs[O_MBSR] & IBB) && count < MAX_LOOP)
-    {
-        yield();
         count++;
-    }
 
     if (count >= MAX_LOOP)
         return -1;
@@ -132,10 +129,7 @@ int i2c_write_byte(int device, unsigned char data)
 
     /* Wait for interrupt flag */
     while (!(regs[O_MBSR] & IFF) && count < MAX_LOOP)
-    {
-        yield();
         count++;
-    }
 
     if (count >= MAX_LOOP)
         return -2;
@@ -160,10 +154,7 @@ int i2c_gen_start(int device)
 
     /* Wait for bus to become free */
     while ((regs[O_MBSR] & IBB) && (count < MAX_LOOP))
-    {
-        yield();
         count++;
-    }
 
     if (count >= MAX_LOOP)
         return -1;

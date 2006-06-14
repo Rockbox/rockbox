@@ -41,8 +41,8 @@
 
 int uda1380_write_reg(unsigned char reg, unsigned short value);
 unsigned short uda1380_regs[0x30];
-short uda1380_balance;
-short uda1380_volume;
+short recgain_mic;
+short recgain_line;
 
 /* Definition of a playback configuration to start with */
 
@@ -51,13 +51,20 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
    REG_0,          EN_DAC | EN_INT | EN_DEC | SYSCLK_256FS | WSPLL_25_50,
    REG_I2S,        I2S_IFMT_IIS,
-   REG_PWR,        PON_BIAS,                                       /* PON_HP & PON_DAC is enabled later */
-   REG_AMIX,       AMIX_RIGHT(0x3f) | AMIX_LEFT(0x3f),             /* 00=max, 3f=mute */
-   REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20), /* 00=max, ff=mute */
-   REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),           /* 00=max, ff=mute */
-   REG_EQ,         EQ_MODE_MAX,                                    /* Bass and tremble = 0 dB */
-   REG_MUTE,       MUTE_MASTER | MUTE_CH2,                         /* Mute everything to start with */
-   REG_MIX_CTL,    MIX_CTL_MIX,                                    /* Enable mixer */
+   REG_PWR,        PON_BIAS,
+                   /* PON_HP & PON_DAC is enabled later */
+   REG_AMIX,       AMIX_RIGHT(0x3f) | AMIX_LEFT(0x3f),
+                   /* 00=max, 3f=mute */
+   REG_MASTER_VOL, MASTER_VOL_LEFT(0x20) | MASTER_VOL_RIGHT(0x20),
+                   /* 00=max, ff=mute */
+   REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),
+                   /* 00=max, ff=mute */
+   REG_EQ,         EQ_MODE_MAX,
+                   /* Bass and tremble = 0 dB */
+   REG_MUTE,       MUTE_MASTER | MUTE_CH2,
+                   /* Mute everything to start with */
+   REG_MIX_CTL,    MIX_CTL_MIX,
+                   /* Enable mixer */
    REG_DEC_VOL,    0,
    REG_PGA,        MUTE_ADC,
    REG_ADC,        SKIP_DCFIL,
@@ -110,7 +117,8 @@ int uda1380_set_mixer_vol(int channel1, int channel2)
  */
 void uda1380_set_bass(int value)
 {
-    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~BASS_MASK) | BASSL(value) | BASSR(value));
+    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~BASS_MASK)
+                              | BASSL(value) | BASSR(value));
 }
 
 /**
@@ -118,7 +126,8 @@ void uda1380_set_bass(int value)
  */
 void uda1380_set_treble(int value)
 {
-    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~TREBLE_MASK) | TREBLEL(value) | TREBLER(value));
+    uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~TREBLE_MASK)
+                              | TREBLEL(value) | TREBLER(value));
 }
 
 /**
@@ -187,12 +196,13 @@ void uda1380_reset(void)
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
+    recgain_mic = 0;
+    recgain_line = 0;
+
     uda1380_reset();
     
     if (uda1380_set_regs() == -1)
         return -1;
-    uda1380_balance = 0;
-    uda1380_volume = 0x20; /* Taken from uda1380_defaults */
 
     return 0;
 }
@@ -222,14 +232,19 @@ void uda1380_enable_recording(bool source_mic)
 
     if (source_mic)
     {
+        /* VGA_GAIN: 0=0 dB, F=30dB */
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_LNA | PON_ADCL);
-        uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & VGA_GAIN_MASK) | SEL_LNA | SEL_MIC | EN_DCFIL);   /* VGA_GAIN: 0=0 dB, F=30dB */
+        uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & VGA_GAIN_MASK)
+                                   | SEL_LNA | SEL_MIC | EN_DCFIL);
         uda1380_write_reg(REG_PGA, 0);
     } else
     {
-        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PGAL | PON_ADCL | PON_PGAR | PON_ADCR);
+        /* PGA_GAIN: 0=0 dB, F=24dB */
+        uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PGAL | PON_ADCL
+                                   | PON_PGAR | PON_ADCR);
         uda1380_write_reg(REG_ADC, EN_DCFIL);
-        uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & PGA_GAIN_MASK) | PGA_GAINL(0) | PGA_GAINR(0)); /* PGA_GAIN: 0=0 dB, F=24dB */
+        uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & PGA_GAIN_MASK)
+                                   | PGA_GAINL(0) | PGA_GAINR(0));
     }
 
     sleep(HZ/8);
@@ -248,7 +263,9 @@ void uda1380_disable_recording(void)
     sleep(HZ/8);
     
     uda1380_write_reg(REG_I2S, I2S_IFMT_IIS);
-    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~(PON_LNA | PON_ADCL | PON_ADCR | PON_PGAL | PON_PGAR));
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~(PON_LNA | PON_ADCL
+                                                         | PON_ADCR | PON_PGAL
+                                                         | PON_PGAR));
     uda1380_write_reg(REG_0,   uda1380_regs[REG_0] & ~EN_ADC);
     uda1380_write_reg(REG_ADC, SKIP_DCFIL);
 }
@@ -260,41 +277,89 @@ void uda1380_disable_recording(void)
  * AUDIO_GAIN_MIC:      left           -128 .. 108 -> -64 .. 54 dB gain
  * AUDIO_GAIN_LINEIN    left & right   -128 ..  96 -> -64 .. 48 dB gain
  *
- * Note: For all types the value 0 gives 0 dB gain.
+ * Note: - For all types the value 0 gives 0 dB gain.
+ *       - order of setting both values determines if the small glitch will
+           be a peak or a dip. The small glitch is caused by the time between
+           setting the two gains
  */
 void uda1380_set_recvol(int left, int right, int type)
 {
     int left_ag, right_ag;
-    /*int old_irq_level;*/
 
     switch (type)
     {
         case AUDIO_GAIN_MIC:
             left_ag = MIN(MAX(0, left / 4), 15);
             left -= left_ag * 4;
-            /* allow nothing in between the two calls */
-            /*old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);*/
-            uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & ~VGA_GAIN_MASK) 
-                                        | VGA_GAIN(left_ag));
-            uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(left));
-            /*set_irq_level(old_irq_level);*/
+
+            if(left < recgain_mic)
+            {
+                uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left)
+                                                   | DEC_VOLR(left));
+                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] 
+                                               & ~VGA_GAIN_MASK) 
+                                            | VGA_GAIN(left_ag));
+            }
+            else
+            {
+                uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] 
+                                               & ~VGA_GAIN_MASK) 
+                                            | VGA_GAIN(left_ag));
+                uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) 
+                                                   | DEC_VOLR(left));
+            }
+            recgain_mic = left;
             logf("Mic: %dA/%dD", left_ag, left);
-        break;
+            break;
         
         case AUDIO_GAIN_LINEIN:
             left_ag = MIN(MAX(0, left / 6), 8);
             left -= left_ag * 6;
             right_ag = MIN(MAX(0, right / 6), 8);
             right -= right_ag * 6;
-            /* allow nothing in between the two calls */
-            /*old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);*/
-            uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK)
-                                        | PGA_GAINL(left_ag) | PGA_GAINR(right_ag));
-            uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left) | DEC_VOLR(right));
-            /*set_irq_level(old_irq_level);*/
+
+            if(left < recgain_line)
+            {
+                /* for this order we can combine both registers,
+                    making the glitch even smaller */
+                unsigned char data[6];
+                unsigned short value_dec;
+                unsigned short value_pga;
+                value_dec = DEC_VOLL(left) | DEC_VOLR(right);
+                value_pga = (uda1380_regs[REG_PGA] & ~PGA_GAIN_MASK)
+                                | PGA_GAINL(left_ag) | PGA_GAINR(right_ag);
+
+                data[0] = UDA1380_ADDR;
+                data[1] = REG_DEC_VOL;
+                data[2] = value_dec >> 8;
+                data[3] = value_dec & 0xff;
+                data[4] = value_pga >> 8;
+                data[5] = value_pga & 0xff;
+
+                if (i2c_write(1, data, 6) != 6)
+                {
+                    DEBUGF("uda1380 error reg=combi rec gain");
+                }
+                else
+                {
+                    uda1380_regs[REG_DEC_VOL] = value_dec;
+                    uda1380_regs[REG_PGA] = value_pga;
+                }
+            }
+            else
+            {
+                uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] 
+                                               & ~PGA_GAIN_MASK)
+                                            | PGA_GAINL(left_ag)
+                                            | PGA_GAINR(right_ag));
+                uda1380_write_reg(REG_DEC_VOL, DEC_VOLL(left)
+                                                   | DEC_VOLR(right));
+            }
+
+            recgain_line = left;
             logf("Line L: %dA/%dD", left_ag, left);
             logf("Line R: %dA/%dD", right_ag, right);
-        break;
+            break;
     }
 }
 
@@ -311,16 +376,19 @@ void uda1380_set_monitor(int enable)
         uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] | MUTE_CH2);
 }
 
-/* Change the order of the noise chaper, 5th order is recommended above 32kHz */
+/* Change the order of the noise chaper,
+   5th order is recommended above 32kHz */
 void uda1380_set_nsorder(int order)
 {
     switch(order)
     {
     case 5:
-        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL] | MIX_CTL_SEL_NS);
+        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL]
+                                       | MIX_CTL_SEL_NS);
         break;
     case 3:
     default:
-        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL] & ~MIX_CTL_SEL_NS);
+        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL]
+                                       & ~MIX_CTL_SEL_NS);
     }
 }
