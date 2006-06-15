@@ -3642,10 +3642,10 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "단위/읽기"
+    *: "단위 마다 읽기"
   </dest>
   <voice>
-    *: "단위/읽기"
+    *: "단위 마다 읽기"
   </voice>
 </phrase>
 <phrase>
@@ -7254,7 +7254,7 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "d개의 음악 추가 (%s)"
+    *: "%d개의 음악 추가 (%s)"
   </dest>
   <voice>
     *: ""
@@ -7268,7 +7268,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: ""%d개의 음악 예약 (%s)"
+    *: "%d개의 음악 예약 (%s)"
   </dest>
   <voice>
     *: ""
@@ -8501,3 +8501,31 @@
     *: "모든 음악"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "잘못된 파일명입니다!"
+  </dest>
+  <voice>
+    *: "잘못된 파일명입니다"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "리모컨 문자 흐름 설정"
+  </dest>
+  <voice>
+    *: "리모컨 문자 흐름 설정"
+  </voice>
+</phrase>   
