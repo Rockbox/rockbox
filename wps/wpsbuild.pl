@@ -248,6 +248,13 @@ while(<WPS>) {
 
                 $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
                 last if (-e "$wpsdir/$req_g_wps"); 
+
+                if ($isrwps) {
+                    $req_g = $req_g . "." . $main_width . "x" . $main_height . "x" . "$main_depth";
+
+                    $req_g_wps = $wps_prefix . "." . $req_g . ".wps";
+                    last if (-e "$wpsdir/$req_g_wps"); 
+                }
             } 
             $req_t_wps = $wps_prefix . ".txt" . ".wps";
 
@@ -282,6 +289,9 @@ while(<WPS>) {
             # print $wps_prefix . "\n";
         }
         elsif($l =~ /^RWPS: (.*)/i) {
+            $rwps = $1;
+        }
+        elsif($l =~ /^RWPS\.${main_width}x${main_height}x$main_depth: (.*)/i) {
             $rwps = $1;
         }
         elsif($l =~ /^Author: (.*)/i) {
