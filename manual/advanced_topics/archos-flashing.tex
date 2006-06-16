@@ -253,7 +253,7 @@ ROM content, differentiation comes later by flash content. Rockbox identifies
 this boot ROM with a CRC value of 0x222F in the hardware info screen. \opt{recorder,recorderv2fm}{Some recorders have the boot ROM disabled (it might be unprogrammed) and start directly from a flash mirror at address zero. They need the new 
   \_norom firmware that has a slightly different bootloader.}
 Without a boot ROM  there is no UART boot safety net. To compensate for that as 
-much as possible the MiniMon monitor is included, it starts with \opt{recorder,recorderv2fm}{\ButtonFThree+\ButtonOn}\opt{ondio}{\ButtonRight+\ButtonMenu}\opt{player}{\ButtonRight+\ButtonOn}.
+much as possible the MiniMon monitor is included, it starts with \opt{recorder,recorderv2fm}{\ButtonFThree+\ButtonOn}\opt{ondio}{\ButtonRight+\ButtonOff}\opt{player}{\ButtonRight+\ButtonOn}.
 Using that the box can be reprogrammed via serial if the first 2000 bytes of the
 flash are OK.
 
