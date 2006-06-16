@@ -110,6 +110,9 @@
 
 #define USB_IRIVERSTYLE
 
+/* USB On-the-go */
+#define CONFIG_USBOTG USBOTG_ISP1362
+
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 

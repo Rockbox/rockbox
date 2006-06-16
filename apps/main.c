@@ -88,6 +88,10 @@
 #include "lcd-remote.h"
 #endif
 
+#if CONFIG_USBOTG == USBOTG_ISP1362
+#include "isp1362.h"
+#endif
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 const char appsversion[]=APPSVERSION;
@@ -276,6 +280,9 @@ void init(void)
     adc_init();
     
     usb_init();
+#if CONFIG_USBOTG == USBOTG_ISP1362
+    isp1362_init();
+#endif
 
     backlight_init();
 

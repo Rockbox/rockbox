@@ -203,6 +203,10 @@ sound.c
 common/sscanf.c
 usb_serial.c
 #endif
+#if CONFIG_USBOTG == USBOTG_ISP1362
+drivers/isp1362.c
+#endif
+
 
 #ifndef SIMULATOR
 #ifdef IAUDIO_X5

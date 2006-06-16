@@ -531,7 +531,7 @@ irq_handler:
     /* Chip select 1 - LCD controller */
     move.l  #0xf0000000,%d0 /* CSAR1 - Base = 0xf0000000 */
     move.l  %d0,(0x08c,%a0)
-    moveq.l #0x1,%d0      /* CSMR1 - 64K */
+    moveq.l #0x1,%d0        /* CSMR1 - 64K */
     move.l  %d0,(0x090,%a0)
     move.l  #0x00000180,%d0 /* CSCR1 - no wait states, 16 bits, no bursts */
     move.l  %d0,(0x094,%a0)
@@ -545,7 +545,16 @@ irq_handler:
     move.l  %d0,(0x0a0,%a0) /* NOTE:  I'm not sure about the wait states.
                                We have to be careful with the access times,
                                since IORDY isn't connected to the HDD. */
-        
+
+#if CONFIG_USBOTG == USBOTG_ISP1362
+    /* Chip select 3 - USBOTG controller */
+    move.l  #0xc0000000,%d0 /* CSAR3 - Base = 0xc0000000 */
+    move.l  %d0,(0x0a4,%a0)
+    moveq.l #0x1,%d0        /* CSMR3 - 64K */
+    move.l  %d0,(0x0a8,%a0)
+    move.l  #0x00000180,%d0 /* CSCR3 - no wait states, 16 bits, no bursts */
+    move.l  %d0,(0x0ac,%a0)
+#endif
 
 #ifdef BOOTLOADER
     /* The cookie is not reset. This must mean that the boot loader

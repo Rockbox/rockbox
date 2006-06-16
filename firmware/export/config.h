@@ -122,6 +122,7 @@
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
+/* else                   HW controlled LED (iRiver H1x0) */
 
 /* CONFIG_FLASH */
 #define FLASH_IFP7XX 1
@@ -132,7 +133,8 @@
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
 
-/* else                   HW controlled LED (iRiver H1x0) */
+/* USB On-the-go */
+#define USBOTG_ISP1362 1362
 
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
