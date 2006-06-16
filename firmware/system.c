@@ -624,7 +624,7 @@ void set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_MAX_MULT, true);
         DCR = (0x8200 | MAX_REFRESH_TIMER);          /* Refresh timer */
         cpu_frequency = CPUFREQ_MAX;
-        IDECONFIG1 = 0x10100000 | (3 << 13) | (5 << 10);
+        IDECONFIG1 = 0x10100000 | (1 << 13) | (2 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (2 << 8); /* TA enable + CS2wait */
         break;
@@ -646,7 +646,7 @@ void set_cpu_frequency(long frequency)
         timers_adjust_prescale(CPUFREQ_NORMAL_MULT, true);
         DCR = (0x8000 | NORMAL_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_NORMAL;
-        IDECONFIG1 = 0x10100000 | (3 << 13) | (5 << 10);
+        IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
         break;
@@ -664,7 +664,7 @@ void set_cpu_frequency(long frequency)
 #endif
         DCR = (0x8000 | DEFAULT_REFRESH_TIMER);       /* Refresh timer */
         cpu_frequency = CPUFREQ_DEFAULT;
-        IDECONFIG1 = 0x10100000 | (3 << 13) | (1 << 10);
+        IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
         break;
