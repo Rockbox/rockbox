@@ -307,13 +307,16 @@ int sim_fsync(int fd)
 #include <dlfcn.h>
 #endif
 
+#define TEMP_CODEC_FILE "archos/_temp_codec%d.dll"
+
 void *sim_codec_load_ram(char* codecptr, int size,
         void* ptr2, int bufwrap, void **pd)
 {
     void *hdr;
-    const char *path = "archos/_temp_codec.dll";
+    char path[MAX_PATH];
     int fd;
     int copy_n;
+    static int codec_count = 0;
 #ifdef WIN32
     char buf[256];
 #endif
@@ -322,6 +325,12 @@ void *sim_codec_load_ram(char* codecptr, int size,
 
     /* We have to create the dynamic link library file from ram
        so we could simulate the codec loading. */
+
+    sprintf(path, TEMP_CODEC_FILE, codec_count);
+
+    /* if voice is enabled, two codecs may be loaded at same time */
+    if (!codec_count)
+        codec_count++;
 
 #ifdef WIN32
     fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
