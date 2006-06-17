@@ -1,8 +1,8 @@
 %wd
 
 %t1 %?mp<%al%pp/%pe%ar-:--/-:--|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt>;%t1 %?mp<%al%pp/%pe%ar-:--/-:--|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe|%al%pp/%pe%ar%pc/%pt|%al%pp/%pe%ar%pc/%pt>
-%s%?d2<%?ia<%ac%ia|%ac%d2>|%?ia<%ac%ia|%acUnknown Artist>>
-%s%?in<%?it<%ac%in - %it|%ac%in - %fm>|%?it<%ac%pp - %it|%ac%pp - %fm>>
+%s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
+%s%ac%?in<%in - |%pp - >%?it<%it|%fn>
 
 %xl|A|bat0-s.bmp|109|2|
 %xl|B|bat1-s.bmp|109|2|
