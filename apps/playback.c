@@ -647,7 +647,8 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 
         switch (ev.id) {
             case Q_AUDIO_PLAY:
-                swap_codec();
+                if (playing)
+                    swap_codec();
                 break;
 
             case Q_VOICE_STOP:
