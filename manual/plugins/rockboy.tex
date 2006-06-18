@@ -1,22 +1,30 @@
 \subsection{\label{ref:Rockboy}Rockboy}
 \screenshot{plugins/images/ss-rockboy}{Rockboy}{img:rockboy}
-Rockboy is a Nintendo Game Boy and Game Boy Color emulator for Rockbox based
-on the gnuboy emulator. To start a game open a ROM file saved as .gb or
-.gbc in the file browser.\\
+Rockboy is a Nintendo Game Boy and Game Boy Color emulator for Rockbox based on
+the gnuboy emulator. To start a game open a ROM file saved as \fname{.gb} or
+\fname{.gbc} in the file browser.\\
 
 \textbf{Default keys}
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{recorder,recorderv2fm}{F1}\opt{h1xx}{PLAY}\opt{h300}{RECORD}
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{IRIVER_H100_PAD}{\ButtonOn}
+    \opt{IRIVER_H300_PAD}{\ButtonRec}
     & A button\\
-    \opt{recorder,recorderv2fm}{F2}\opt{h1xx}{STOP}\opt{h300}{A-B}
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IRIVER_H100_PAD}{\ButtonOff}
+    \opt{IRIVER_H300_PAD}{\ButtonMode}
     & B button\\
-    \opt{recorder,recorderv2fm}{F3}\opt{h1xx}{RECORD}\opt{h300}{PLAY}
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{IRIVER_H100_PAD}{\ButtonRec}
+    \opt{IRIVER_H300_PAD}{\ButtonOn}
     & Start\\
-    \opt{recorder,recorderv2fm}{PLAY}\opt{h1xx}{SELECT}\opt{h300}{NAVI}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
     & Select\\
-    \opt{recorder,recorderv2fm}{MENU & Cycle display scaling modes\\}
-    \opt{recorder,recorderv2fm,h300}{STOP}\opt{h1xx}{A-B}
+    \opt{RECORDER_PAD}{\ButtonOn & Cycle display scaling modes\\}
+    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IRIVER_H100_PAD}{\ButtonMode}
     & Open Rockboy menu\\
     \end{btnmap}
 \end{table}

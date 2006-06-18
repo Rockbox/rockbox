@@ -1,16 +1,41 @@
 \subsection{Mandelbrot}
-\screenshot{plugins/images/ss-mandelbrot}{Mandelbrot}%
-{img:mandelbrot}
-
-This is another demonstration using the grayscale engine.  It draws fractal images from the Mandelbrot set.
-
+\screenshot{plugins/images/ss-mandelbrot}{Mandelbrot}{img:mandelbrot}
+This demonstration draws fractal images from the Mandelbrot set
+\opt{archos,h1xx}{using the greyscale engine}.
 \begin{table}
 \begin{btnmap}{}{}
-Arrow keys & Move about the image \\
-PLAY & Zoom in \\
-OFF & Quit \\
-F1 & Increase iteration depth (more detail) \\
-F2 & Decrease iteration depth (less detail) \\
-F3 & Reset and return to the default image \\
+Arrow keys & Move about the image\\
+\opt{RECORDER_PAD}{\ButtonPlay}
+\opt{ONDIO_PAD}{\ButtonMenu\ / \ButtonMenu+\ButtonUp}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+\opt{IPOD_4G_PAD}{\ButtonScrollFwd}
+& Zoom in\\
+\opt{RECORDER_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+\opt{IPOD_4G_PAD}{\ButtonScrollBack}
+\opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
+& Zoom out\\
+\opt{RECORDER_PAD}{\ButtonFOne}
+\opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonLeft}
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft}
+\opt{IAUDIO_X5_PAD}{\ButtonPlay+\ButtonLeft}
+& Decrease iteration depth (less detail)\\
+\opt{RECORDER_PAD}{\ButtonFTwo}
+\opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonRight}
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonRight}
+\opt{IAUDIO_X5_PAD}{\ButtonPlay+\ButtonRight}
+& Increase iteration depth (more detail)\\
+\opt{RECORDER_PAD}{\ButtonFThree}
+\opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRec}
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
+& Reset and return to the default image\\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+\opt{IAUDIO_X5_PAD}{\ButtonPower}
+& Quit\\
 \end{btnmap}
 \end{table}
