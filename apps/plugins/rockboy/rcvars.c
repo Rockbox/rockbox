@@ -1,25 +1,11 @@
-
-
-
-
-#include <string.h>
 #include "rockmacros.h"
 
 #include "defs.h"
 #include "rc.h"
 
-
-
-
-
-
 static rcvar_t rcvars[150];
 
 static int nvars;
-
-
-
-
 
 void rc_export(rcvar_t *v)
 {
@@ -223,11 +209,3 @@ char *rc_getstr(char *name)
 {
 	return rc_getstr_n(rc_findvar(name));
 }
-
-
-
-
-
-
-
-

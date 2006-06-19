@@ -276,15 +276,3 @@ static const byte daa_carry_table[64] ICONST_ATTR =
 	FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC,
 	FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, FC, 00, FC,
 };
-
-
-
-
-
-
-
-
-
-
-
-

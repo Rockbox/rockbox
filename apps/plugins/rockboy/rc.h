@@ -1,10 +1,5 @@
-
-
-
 #ifndef __RC_H__
 #define __RC_H__
-
-
 
 typedef enum rctype
 {
@@ -65,7 +60,3 @@ void rc_dokey(int key, int st);
 int rc_command(char *line);
 
 #endif
-
-
-
-

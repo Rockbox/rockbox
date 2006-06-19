@@ -51,11 +51,3 @@ int ev_getevent(event_t *ev)
 	}
 	return 1;
 }
-
-
-
-
-
-
-
-

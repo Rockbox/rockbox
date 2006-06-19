@@ -1,5 +1,3 @@
-
-
 #include "rockmacros.h"
 
 #include "defs.h"
@@ -7,6 +5,7 @@
 #include "cpu-gb.h"
 #include "regs.h"
 #include "lcd-gb.h"
+#include "fb.h"
 
 
 #define C (cpu.lcdc)
@@ -141,10 +140,11 @@ void lcdc_trans(void)
 			stat_trigger();
 			break;
 		case 2:
-			lcd_refreshline();
-			stat_change(3);
-			C += 86;
-			break;
+            if (fb.enabled)
+                lcd_refreshline();
+            stat_change(3);
+            C += 86;
+            break;
 		case 3:
 			stat_change(0);
 			if (hw.hdma & 0x80)

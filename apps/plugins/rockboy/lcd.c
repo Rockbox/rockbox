@@ -1,5 +1,3 @@
-
-
 #include "rockmacros.h"
 #include "defs.h"
 #include "regs.h"
@@ -101,9 +99,6 @@ fb_data *vdest;
 #else
 #define MEMCPY8(d, s) memcpy((d), (s), 8)
 #endif
-
-
-
 
 #ifndef ASM_UPDATEPATPIX
 void updatepatpix(void)
@@ -901,10 +896,11 @@ void spr_scan(void)
 //    if (sprdebug) for (i = 0; i < NS; i++) BUF[i<<1] = 36;
 }
 
-
-
-
-
+// Scaling defines
+#define DX  ((LCD_WIDTH<<16)    /   160)
+#define DXI ((160<<16)          /   LCD_WIDTH)
+#define DY  ((LCD_HEIGHT<<16)   /   144)
+#define DYI ((144<<16)          /   LCD_HEIGHT)
 
 void lcd_begin(void)
 {
@@ -913,23 +909,70 @@ void lcd_begin(void)
         if (rgb332) pal_set332();
         else pal_expire();
     }
-    while (scale * 160 > fb.w || scale * 144 > fb.h) scale--; */
-   if(options.fullscreen)
-      vdest = fb.ptr;
-   else
-      vdest = fb.ptr + ((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2);
+*/
+
+    if(options.fullscreen)
+        vdest = fb.ptr;
+    else
+        vdest=fb.ptr+((LCD_HEIGHT-144)/2)*LCD_WIDTH + ((LCD_WIDTH-160)/2);
 
     WY = R_WY;
 }
 
-char frameout[25];
+int SCALEWL IDATA_ATTR=DY;
+int SCALEWS IDATA_ATTR=DYI;
+int SCALEHL IDATA_ATTR=DY;
+int SCALEHS IDATA_ATTR=DYI;
+int swidth IDATA_ATTR=(160*DY)>>16;
+int sremain IDATA_ATTR=LCD_WIDTH-((160*DY)>>16);
+
+void setvidmode(int mode)
+{
+    switch(mode)
+    {
+        case 1: /* Full screen scale */
+            SCALEWL=DX;
+            SCALEWS=DXI;
+            SCALEHL=DY;
+            SCALEHS=DYI;
+            break;
+        case 2: /* Maintain Ratio */
+            if (DY<DX)
+            {
+                SCALEWL=DY;
+                SCALEWS=DYI;
+                SCALEHL=DY;
+                SCALEHS=DYI;
+            }
+            else
+            {
+                SCALEWL=DX;
+                SCALEWS=DXI;
+                SCALEHL=DX;
+                SCALEHS=DXI;
+            }
+            break;
+        default: /* No Scaling (or fullscreen for smaller screens) */
+#if LCD_WIDTH>160 
+            SCALEWL=1<<16;
+            SCALEWS=1<<16;
+            SCALEHL=1<<16;
+            SCALEHS=1<<16;
+#else
+            SCALEWL=DX;
+            SCALEWS=DXI;
+            SCALEHL=DY;
+            SCALEHS=DYI;
+#endif
+    }
+    swidth=(160*SCALEWL)>>16;
+    sremain=LCD_WIDTH-swidth;
+}
+
+
+char frameout[30];
 void lcd_refreshline(void)
 {
-#if LCD_HEIGHT>=144
-   int cnt=0, two;
-#endif
-
-    if (!fb.enabled) return;
     if(!insync) {
         if(R_LY!=0)
             return;
@@ -990,44 +1033,51 @@ void lcd_refreshline(void)
         recolor(BUF+WX, 0x04, 160-WX);
     }
     spr_scan();
+
+#if !defined(HAVE_LCD_COLOR)
 #if LCD_DEPTH == 1
     if (scanline_ind == 7)
 #elif LCD_DEPTH == 2
     if (scanline_ind == 3)
 #endif
     {
-#if LCD_HEIGHT < 144
         if(fb.mode!=3)
             vid_update(L);
         else
             vid_update(L-((int)(L/9)));
 #else
+    {
+    /*  Universial Scaling pulled from PrBoom and modified for rockboy  */
+    /*  Needs some thought for screens smaller than the gameboy though */
 
-   for(two=0;two<( (options.showstats ? (L&0x07)==0x05 : (L&0x07)==0x05 || (L&0x0F)==0x08) && options.fullscreen)+1;two++)
-   {
-      while (cnt < 160)
-      {
-         *vdest++ = scan.pal2[scan.buf[cnt++]];
-         if( ((cnt&0x03)==0x03 || (cnt&0x07)==0x06) && options.fullscreen ) *vdest++ = scan.pal2[scan.buf[cnt]];
-      }
+    static int hpt IDATA_ATTR=0x8000;
 
-      if(!options.fullscreen)
-            vdest+=(LCD_WIDTH-160);
-      cnt=0;
-   }
+    while((hpt>>16)<L+1)
+    {
+        hpt+=SCALEHS;
+        register unsigned int srcpt=0x8000;
+        register unsigned int wcount=swidth;
+        register unsigned int remain=sremain;
+        while(wcount--)
+        {
+            *vdest++ = scan.pal2[scan.buf[srcpt>>16]];
+            srcpt+=SCALEWS;
+        }
+        vdest+=remain;
+    }
 
-   if(L==143)
-   {
-      if(options.showstats) {
-         snprintf(frameout,sizeof(frameout),"FPS: %d \t %d ",options.fps, options.frameskip);
-         if(options.fullscreen) rb->lcd_putsxy(0,166,frameout);
-         else rb->lcd_putsxy((LCD_WIDTH-160)/2,(LCD_HEIGHT-144)/2,frameout);
-      }
-      if(options.fullscreen)
-         rb->lcd_update();
-      else
-         rb->lcd_update_rect( (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144 );
-   }
+    if(L==143)
+    {
+        if(options.showstats)
+        {
+            snprintf(frameout,sizeof(frameout),"FPS: %d Frameskip: %d ",options.fps, options.frameskip);
+            rb->lcd_putsxy(0,LCD_HEIGHT-10,frameout);
+        }
+
+        hpt=0x8000;
+        rb->lcd_update();
+    }
+
 #endif
     }
 #if LCD_DEPTH == 1

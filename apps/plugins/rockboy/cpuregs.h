@@ -1,5 +1,3 @@
-
-
 #ifndef __CPUREGS_H__
 
 #define __CPUREGS_H__

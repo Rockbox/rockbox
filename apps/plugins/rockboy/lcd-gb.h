@@ -65,7 +65,7 @@ void spr_enum(void) ICODE_ATTR;
 void spr_scan(void) ICODE_ATTR;
 void lcd_begin(void) ICODE_ATTR;
 void lcd_refreshline(void) ICODE_ATTR;
-void pal_write(int i, byte b);
+void pal_write(int i, byte b) ICODE_ATTR;
 void pal_write_dmg(int i, int mapnum, byte d) ICODE_ATTR;
 void vram_write(int a, byte b) ICODE_ATTR;
 void vram_dirty(void) ICODE_ATTR;

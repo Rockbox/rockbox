@@ -1,5 +1,3 @@
-
-
 #ifndef __SOUND_H__
 #define __SOUND_H__
 
@@ -16,14 +14,12 @@ struct sndchan
 	int envol, endir;
 };
 
-
 struct snd
 {
 	int rate;
 	struct sndchan ch[4];
 	byte wave[16];
 };
-
 
 extern struct snd snd;
 
@@ -33,15 +29,14 @@ extern struct snd snd;
 #endif
 
 byte sound_read(byte r) ICODE_ATTR;
-void sound_write(byte r, byte b)ICODE_ATTR;
-void sound_dirty(void)ICODE_ATTR;
+void sound_write(byte r, byte b) ICODE_ATTR;
+void sound_dirty(void) ICODE_ATTR;
 void sound_off(void);
 void sound_reset(void);
-void sound_mix(void)ICODE_ATTR;
+void sound_mix(void) ICODE_ATTR;
 void s1_init(void);
 void s2_init(void);
 void s3_init(void);
 void s4_init(void);
 
 #endif
-	

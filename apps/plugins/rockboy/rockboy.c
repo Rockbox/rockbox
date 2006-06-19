@@ -47,6 +47,8 @@ void die(char *message, ...)
     errormsg=message;
 }
 
+struct options options IBSS_ATTR;
+
 void *audio_bufferbase;
 void *audio_bufferpointer;
 unsigned int audio_buffer_free;
@@ -76,7 +78,10 @@ void setmallocpos(void *pointer)
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
 
-void setoptions (void) {
+void setvidmode(int);
+
+void setoptions (void)
+{
    int fd;
    DIR* dir;
    char optionsave[sizeof(savedir)+sizeof(optionname)];
@@ -144,6 +149,8 @@ void setoptions (void) {
    else
       read(fd,&options, sizeof(options));
 
+    setvidmode(options.fullscreen);
+
    close(fd);
 }
 
@@ -166,6 +173,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     rb->lcd_setfont(0);
+
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_clear_display();
 
     if (!parameter) {
         rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");

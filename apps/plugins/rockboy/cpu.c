@@ -1,6 +1,3 @@
-
-
-
 #include "rockmacros.h"
 #include "defs.h"
 #include "regs.h"
@@ -382,8 +379,8 @@ int cpu_emulate(int cycles)
 	byte op, cbop;
 	int clen;
 	static union reg acc;
-	static byte b;
-	static word w;
+	static byte b IBSS_ATTR;
+	static word w IBSS_ATTR;
 
 	i = cycles;
 next:

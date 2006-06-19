@@ -14,7 +14,7 @@
 
 const byte himask[256];
 
-const byte hi_rmap[256]  ICONST_ATTR =
+const byte hi_rmap[256] =
 {
 	0, 0, R, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S,
@@ -26,7 +26,7 @@ const byte hi_rmap[256]  ICONST_ATTR =
 	C, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-const byte hi_wmap[256]  ICONST_ATTR =
+const byte hi_wmap[256] =
 {
 	R, R, R, R, R, R, R, R, R, R, R, R, R, R, R, R,
 	S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S,

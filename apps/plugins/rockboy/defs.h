@@ -1,6 +1,3 @@
-
-
-
 #ifndef __DEFS_H__
 #define __DEFS_H__
 
@@ -13,7 +10,6 @@
 #define LO 1
 #define HI 0
 #endif
-
 
 typedef unsigned char byte;
 
@@ -29,8 +25,4 @@ typedef un16 word;
 typedef word addr;
 
 
-
-
-
 #endif
-

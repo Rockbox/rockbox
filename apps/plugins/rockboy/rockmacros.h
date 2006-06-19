@@ -105,7 +105,7 @@ void* memcpy(void* dst, const void* src, size_t size);
 struct options {
    int A, B, START, SELECT, MENU;
    int frameskip, fps, maxskip;
-   bool sound, fullscreen, showstats;
+   int sound, fullscreen, showstats;
 };
 
 extern struct options options;

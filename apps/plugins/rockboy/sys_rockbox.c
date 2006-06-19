@@ -185,7 +185,8 @@ void vid_init(void)
 #endif
 }
 
-#if LCD_HEIGHT<144
+#if !defined(HAVE_LCD_COLOR)
+/* Color targets are handled in lcd.c */
 fb_data *frameb;
 void vid_update(int scanline) 
 { 
