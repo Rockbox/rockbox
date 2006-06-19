@@ -174,11 +174,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(0);
 
+#if defined(HAVE_LCD_COLOR)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
+#endif
+
     rb->lcd_clear_display();
 
-    if (!parameter) {
+    if (!parameter)
+    {
         rb->splash(HZ*3, true, "Play gameboy ROM file! (.gb/.gbc)");
         return PLUGIN_OK;
     }
@@ -204,14 +208,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* rb->lcd_clear_display(); */
     gnuboy_main(parameter);
 
-    if(shut&&!cleanshut) {
+    if(shut&&!cleanshut)
+    {
         rb->splash(HZ/2, true, errormsg);
         return PLUGIN_ERROR;
     }
     pcm_close();
     rb->splash(HZ/2, true, "Shutting down");
 
-   savesettings();
+    savesettings();
 
     cleanup();
 
