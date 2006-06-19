@@ -47,7 +47,7 @@ void die(char *message, ...)
     errormsg=message;
 }
 
-struct options options IBSS_ATTR;
+struct options options;
 
 void *audio_bufferbase;
 void *audio_bufferpointer;
@@ -77,8 +77,6 @@ void setmallocpos(void *pointer)
     audio_bufferpointer = pointer;
     audio_buffer_free = audio_bufferpointer - audio_bufferbase;
 }
-
-void setvidmode(int);
 
 void setoptions (void)
 {
@@ -149,9 +147,7 @@ void setoptions (void)
    else
       read(fd,&options, sizeof(options));
 
-    setvidmode(options.fullscreen);
-
-   close(fd);
+    close(fd);
 }
 
 void savesettings(void)
@@ -195,7 +191,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         < audio_buffer_free)
         audio_buffer_free = plugin_start_addr - (unsigned char *)audio_bufferbase;
 #endif
-   setoptions();
+    setoptions();
 #ifdef USE_IRAM
     memcpy(iramstart, iramcopy, iramend-iramstart);
     memset(iedata, 0, iend - iedata);

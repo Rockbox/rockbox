@@ -25,8 +25,6 @@
 #define MENU_BUTTON_RIGHT BUTTON_RIGHT
 #endif
 
-void setvidmode(int);
-
 /* load/save state function declarations */
 static void do_opt_menu(void);
 static void do_slot_menu(bool is_load);

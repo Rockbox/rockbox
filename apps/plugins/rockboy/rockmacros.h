@@ -45,6 +45,7 @@ void ev_poll(void);
 int do_user_menu(void);
 void loadstate(int fd);
 void savestate(int fd);
+void setvidmode(int mode);
 #define USER_MENU_QUIT -2
 
 /* Disable ICODE for the ARMs */

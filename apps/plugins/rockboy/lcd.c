@@ -919,12 +919,12 @@ void lcd_begin(void)
     WY = R_WY;
 }
 
-int SCALEWL IDATA_ATTR=DY;
-int SCALEWS IDATA_ATTR=DYI;
-int SCALEHL IDATA_ATTR=DY;
-int SCALEHS IDATA_ATTR=DYI;
-int swidth IDATA_ATTR=(160*DY)>>16;
-int sremain IDATA_ATTR=LCD_WIDTH-((160*DY)>>16);
+int SCALEWL IDATA_ATTR=1<<16;
+int SCALEWS IDATA_ATTR=1<<16;
+int SCALEHL IDATA_ATTR=1<<16;
+int SCALEHS IDATA_ATTR=1<<16;
+int swidth IDATA_ATTR=160;
+int sremain IDATA_ATTR=LCD_WIDTH-160;
 
 void setvidmode(int mode)
 {
@@ -968,7 +968,6 @@ void setvidmode(int mode)
     swidth=(160*SCALEWL)>>16;
     sremain=LCD_WIDTH-swidth;
 }
-
 
 char frameout[30];
 void lcd_refreshline(void)

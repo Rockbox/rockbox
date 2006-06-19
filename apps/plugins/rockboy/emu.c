@@ -51,6 +51,7 @@ void emu_run(void)
     int framesin=0,frames=0,timeten=*rb->current_tick, timehun=*rb->current_tick;
 //	int delay;
 
+    setvidmode(options.fullscreen);
     vid_begin();
     lcd_begin();
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
