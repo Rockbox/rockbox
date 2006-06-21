@@ -222,10 +222,12 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                  STATUSBAR_PLUG_X_POS,
                                  STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                  STATUSBAR_HEIGHT);
-        else
 #endif /* HAVE_USB_POWER */
-        /* draw power plug if charging */
 #ifdef CONFIG_CHARGING
+#ifdef HAVE_USB_POWER
+        else
+#endif
+        /* draw power plug if charging */
         if (bar->info.inserted)
             display->mono_bitmap(bitmap_icons_7x8[Icon_Plug],
                                     STATUSBAR_PLUG_X_POS,
@@ -234,8 +236,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #endif
 
         bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
-        gui_statusbar_icon_play_state(display, current_playmode() +
-                                                Icon_Play);
+        gui_statusbar_icon_play_state(display, current_playmode() + Icon_Play);
 
         switch (bar->info.repeat) {
 #if (AB_REPEAT_ENABLE == 1)
