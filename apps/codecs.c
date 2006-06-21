@@ -248,6 +248,8 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     void *pd;
     
     hdr = sim_codec_load_ram(codecptr, size, ptr2, bufwrap, &pd);
+    api->discard_codec();
+
     if (pd == NULL)
         return CODEC_ERROR;
 
