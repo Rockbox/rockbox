@@ -1836,6 +1836,11 @@ static void audio_stop_playback(void)
         playlist_update_resume_info(
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
     }
+
+    if (voice_is_playing)
+        while (voice_is_playing || !queue_empty(&voice_codec_queue))
+            yield();
+
     filebufused = 0;
     playing = false;
     filling = false;
