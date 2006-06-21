@@ -21,7 +21,7 @@
 /* Define this if you have a MAS3539F */
 #define CONFIG_CODEC MAS3539F
 
-#define BATTERY_CAPACITY_DEFAULT 500 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 
 #ifndef SIMULATOR
 
