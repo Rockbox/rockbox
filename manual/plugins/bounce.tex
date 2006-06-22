@@ -1,19 +1,27 @@
 \subsection{Bounce}
 \screenshot{plugins/images/ss-bounce}{Bounce}{img:bounce}
-
-This demo is of the word ``Rockbox'' bouncing across the screen.  There
-is also an analogue clock on the Recorder platform.  (The Ondio does
-not have clock support.)
-
-Key controls for this demo are:
+This demo is of the word ``Rockbox'' bouncing across the screen.
+\opt{CONFIG_RTC}{There is also an analogue clock in the background.}
+In \setting{Scroll mode} the bouncing text is replaced by a different one
+scrolling from right to left.
 
 \begin{table}
 \begin{btnmap}{}{}
-F1/F2/F3 & Enters Bounce configuration options \\
-UP/DOWN & Moves to next/previous option \\
-LEFT/RIGHT & Increases/decreases option value \\
-ON & Changes to Scroll mode \\
-OFF & Exits bounce demo\\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+    {\ButtonUp\ /\ \ButtonDown}
+\opt{IPOD_4G_PAD}{\ButtonScrollBack\ /\ \ButtonScrollFwd}
+& Moves to next/previous option\\
+\ButtonLeft\ /\ \ButtonRight
+& Increases/decreases option value\\
+\opt{RECORDER_PAD}{\ButtonOn}
+\opt{ONDIO_PAD}{\ButtonMenu}
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+\opt{IAUDIO_X5_PAD}{\ButtonPlay}
+& Toggles Scroll mode\\
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+\opt{IPOD_4G_PAD}{\ButtonMenu}
+\opt{IAUDIO_X5_PAD}{\ButtonPower}
+& Exits bounce demo\\
 \end{btnmap}
 \end{table}
 
