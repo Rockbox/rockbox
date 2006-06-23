@@ -58,6 +58,13 @@
 #define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
 #define EQ_BTN_EXIT         BUTTON_OFF
 
+#define EQ_BTN_RC_PREV_BAND     BUTTON_RC_REW
+#define EQ_BTN_RC_NEXT_BAND     BUTTON_RC_FF
+#define EQ_BTN_RC_DECREMENT     BUTTON_RC_SOURCE
+#define EQ_BTN_RC_INCREMENT     BUTTON_RC_BITRATE
+#define EQ_BTN_RC_CHANGE_MODE   BUTTON_RC_MENU
+#define EQ_BTN_RC_EXIT          BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
@@ -452,6 +459,40 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     screen->set_drawmode(DRMODE_SOLID);
     screen->putsxy(current_x, y + 2, separator);
     current_x += separator_width;
+#ifdef HAVE_REMOTE_LCD
+    if (screen->screen_type == SCREEN_REMOTE) {
+        if (mode == GAIN) {
+            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_GAIN));
+            screen->getstringsize(str(LANG_EQUALIZER_BAND_GAIN), &w, &h);
+        } else if (mode == CUTOFF) {
+            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_CUTOFF));
+            screen->getstringsize(str(LANG_EQUALIZER_BAND_CUTOFF), &w, &h);
+        } else {
+            screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_Q));
+            screen->getstringsize(str(LANG_EQUALIZER_BAND_Q), &w, &h);
+        }
+
+        /* Draw horizontal slider. Reuse scrollbar for this */
+        gui_scrollbar_draw(screen, x + 3, y + h + 3, width - 6, slider_height, steps,
+                           min_item, max_item, HORIZONTAL);
+    
+        /* Print out cutoff part */
+        snprintf(buf, sizeof(buf), "%sGain     %s%2d.%ddB",mode==GAIN?" > ":"   ", gain < 0 ? "-" : " ",
+                 abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR);
+        screen->getstringsize(buf, &w, &h);
+        y = 3*h;
+        screen->putsxy(0, y, buf);
+        /* Print out cutoff part */
+        snprintf(buf, sizeof(buf),  "%sCutoff   %5dHz",mode==CUTOFF?" > ":"   ", cutoff);
+        y += h;
+        screen->putsxy(0, y, buf);
+        snprintf(buf, sizeof(buf), "%sQ setting %d.%d Q",mode==Q?" > ":"   ", q / EQ_USER_DIVISOR,
+                 q % EQ_USER_DIVISOR);
+        y += h;
+        screen->putsxy(0, y, buf);
+        return y;
+    }
+#endif
     
     /* Print out gain part of status line */
     snprintf(buf, sizeof(buf), "%s%2d.%ddB", gain < 0 ? "-" : " ",
@@ -514,11 +555,14 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
 {
     int i, gain, q, cutoff;
     int height = 2; /* Two pixel margin */
-    int slider_width = screens[SCREEN_MAIN].width - 4; /* two pixel margin on each side */
+    int slider_width[NB_SCREENS];
     int *setting = &global_settings.eq_band0_cutoff;
     enum eq_type type;
 
-    for( i = 0; i < 5; ++i) {
+    FOR_NB_SCREENS(i)
+        slider_width[i] = screens[i].width - 4; /* two pixel margin on each side */  
+    
+    for (i=0; i<5; i++) {
         cutoff = *setting++;
         q = *setting++;
         gain = *setting++;
@@ -530,10 +574,14 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
         } else {
             type = PEAK;
         }
-
         height += draw_eq_slider(&(screens[SCREEN_MAIN]), 2, height,
-            slider_width, cutoff, q, gain, i == current_band, mode, type);
-
+                      slider_width[SCREEN_MAIN], cutoff, q, gain, 
+                      i == current_band, mode, type);
+#ifdef HAVE_REMOTE_LCD
+        if (i == current_band)
+            draw_eq_slider(&(screens[SCREEN_REMOTE]), 2, 0,
+                      slider_width[SCREEN_REMOTE], cutoff, q, gain,1, mode, type);
+#endif
         /* add a margin */
         height += 2;
     }
@@ -553,9 +601,12 @@ bool eq_menu_graphical(void)
     enum eq_slider_mode mode;
     enum eq_type current_type;
     char buf[24];
+    int i;
 
-    screens[SCREEN_MAIN].setfont(FONT_SYSFIXED);
-    screens[SCREEN_MAIN].clear_display();
+    FOR_NB_SCREENS(i) {
+        screens[i].setfont(FONT_SYSFIXED);
+        screens[i].clear_display();
+    }
     
     /* Start off editing gain on the first band */
     mode = GAIN;
@@ -563,11 +614,13 @@ bool eq_menu_graphical(void)
     current_band = 0;
     
     while (!exit_request) {
-        /* Clear the screen. The drawing routines expect this */
-        screens[SCREEN_MAIN].clear_display();
         
-        /* Draw equalizer band details */
-        y = draw_eq_sliders(current_band, mode);
+        FOR_NB_SCREENS(i) {
+            /* Clear the screen. The drawing routines expect this */
+            screens[i].clear_display();        
+            /* Draw equalizer band details */
+            y = draw_eq_sliders(current_band, mode);
+        }
 
         /* Set pointer to the band data currently editable */
         if (mode == GAIN) {
@@ -617,13 +670,19 @@ bool eq_menu_graphical(void)
             screens[SCREEN_MAIN].putsxy(2, y, buf);
         }
 
-        screens[SCREEN_MAIN].update();
+        FOR_NB_SCREENS(i) {
+            screens[i].update();
+        }
         
         button = button_get(true);
 
         switch (button) {
         case EQ_BTN_DECREMENT:
         case EQ_BTN_DECREMENT | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_DECREMENT
+        case EQ_BTN_RC_DECREMENT:
+        case EQ_BTN_RC_DECREMENT | BUTTON_REPEAT:
+#endif
             *(setting) -= step;
             has_changed = true;
             if (*(setting) < min)
@@ -632,6 +691,10 @@ bool eq_menu_graphical(void)
 
         case EQ_BTN_INCREMENT:
         case EQ_BTN_INCREMENT | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_INCREMENT
+        case EQ_BTN_RC_INCREMENT:
+        case EQ_BTN_RC_INCREMENT | BUTTON_REPEAT:
+#endif
             *(setting) += step;
             has_changed = true;
             if (*(setting) > max)
@@ -658,6 +721,10 @@ bool eq_menu_graphical(void)
 
         case EQ_BTN_PREV_BAND:
         case EQ_BTN_PREV_BAND | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_PREV_BAND
+        case EQ_BTN_RC_PREV_BAND:
+        case EQ_BTN_RC_PREV_BAND | BUTTON_REPEAT:
+#endif
             current_band--;
             if (current_band < 0)
                 current_band = 4; /* wrap around */
@@ -665,6 +732,10 @@ bool eq_menu_graphical(void)
 
         case EQ_BTN_NEXT_BAND:
         case EQ_BTN_NEXT_BAND | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_NEXT_BAND
+        case EQ_BTN_RC_NEXT_BAND:
+        case EQ_BTN_RC_NEXT_BAND | BUTTON_REPEAT:
+#endif
             current_band++;
             if (current_band > 4)
                 current_band = 0; /* wrap around */
@@ -672,6 +743,10 @@ bool eq_menu_graphical(void)
 
         case EQ_BTN_CHANGE_MODE:
         case EQ_BTN_CHANGE_MODE | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_CHANGE_MODE
+        case EQ_BTN_RC_CHANGE_MODE:
+        case EQ_BTN_RC_CHANGE_MODE | BUTTON_REPEAT:
+#endif
             mode++;
             if (mode > Q)
                 mode = GAIN; /* wrap around */
@@ -679,6 +754,10 @@ bool eq_menu_graphical(void)
 
         case EQ_BTN_EXIT:
         case EQ_BTN_EXIT | BUTTON_REPEAT:
+#ifdef EQ_BTN_RC_EXIT
+        case EQ_BTN_RC_EXIT:
+        case EQ_BTN_RC_EXIT | BUTTON_REPEAT:
+#endif
             exit_request = true;
             result = false;
             break;
@@ -699,9 +778,10 @@ bool eq_menu_graphical(void)
     }
 
     /* Reset screen settings */
-    screens[SCREEN_MAIN].setfont(FONT_UI);
-    screens[SCREEN_MAIN].clear_display();
-    
+    FOR_NB_SCREENS(i) {
+        screens[i].setfont(FONT_UI);
+        screens[i].clear_display();
+    }
     return result;
 }
 
