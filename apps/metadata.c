@@ -829,71 +829,84 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
     int read_bytes;
     int i;
 
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
-        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+    /* get RIFF chunk header */
+    if ((lseek(fd, 0, SEEK_SET) < 0)
+        || ((read_bytes = read(fd, buf, 12)) < 12))
     {
         return false;
     }
-    
+
     if ((memcmp(buf, "RIFF",4) != 0)
         || (memcmp(&buf[8], "WAVE", 4) !=0 ))
     {
         return false;
     }
 
-    buf += 12;
-    read_bytes -= 12;
-
-    while ((numbytes == 0) && (read_bytes >= 8)) 
+    /* iterate over WAVE chunks until 'data' chunk */
+    while (true)
     {
+        /* get chunk header */
+        if ((read_bytes = read(fd, buf, 8)) < 8)
+            return false;
+
         /* chunkSize */
         i = get_long(&buf[4]);
-        
+
         if (memcmp(buf, "fmt ", 4) == 0)
         {
+            /* get rest of chunk */
+            if ((read_bytes = read(fd, buf, 16)) < 16)
+                return false;
+
+            i -= 16;
+
             /* skipping wFormatTag */
             /* wChannels */
-            channels = buf[10] | (buf[11] << 8);
+            channels = buf[2] | (buf[3] << 8);
             /* dwSamplesPerSec */
-            id3->frequency = get_long(&buf[12]);
+            id3->frequency = get_long(&buf[4]);
             /* dwAvgBytesPerSec */
-            id3->bitrate = (get_long(&buf[16]) * 8) / 1000;
+            id3->bitrate = (get_long(&buf[8]) * 8) / 1000;
             /* skipping wBlockAlign */
             /* wBitsPerSample */
-            bitspersample = buf[22] | (buf[23] << 8);
+            bitspersample = buf[14] | (buf[15] << 8);
         }
-        else if (memcmp(buf, "data", 4) == 0) 
+        else if (memcmp(buf, "data", 4) == 0)
         {
             numbytes = i;
+            break;
         }
-        else if (memcmp(buf, "fact", 4) == 0) 
+        else if (memcmp(buf, "fact", 4) == 0)
         {
             /* dwSampleLength */
-            if (i >= 4) 
+            if (i >= 4)
             {
-                totalsamples = get_long(&buf[8]);
+                /* get rest of chunk */
+                if ((read_bytes = read(fd, buf, 2)) < 2)
+                    return false;
+
+                i -= 2;
+                totalsamples = get_long(buf);
             }
         }
-     
-        /* go to next chunk (even chunk sizes must be padded) */
+
+        /* seek to next chunk (even chunk sizes must be padded) */
         if (i & 0x01)
-        {
             i++;
-        }
-     
-        buf += i + 8;
-        read_bytes -= i + 8;
+
+        if(lseek(fd, i, SEEK_CUR) < 0)
+            return false;
     }
 
-    if ((numbytes == 0) || (channels == 0)) 
+    if ((numbytes == 0) || (channels == 0))
     {
         return false;
     }
- 
-    if (totalsamples == 0) 
+
+    if (totalsamples == 0)
     {
         /* for PCM only */
-        totalsamples = numbytes 
+        totalsamples = numbytes
             / ((((bitspersample - 1) / 8) + 1) * channels);
     }
 
@@ -905,7 +918,6 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
 
     return true;
 }
-
 
 static bool get_m4a_metadata(int fd, struct mp3entry* id3)
 {

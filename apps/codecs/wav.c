@@ -256,9 +256,9 @@ next_track:
     while (!*ci->taginfo_ready)
         ci->yield();
     
-    /* assume the WAV header is less than 1024 bytes */
-    buf = ci->request_buffer(&n, 1024);
-    if (n < 44) {
+    /* get RIFF chunk header */
+    buf = ci->request_buffer(&n, 12);
+    if (n < 12) {
         i = CODEC_ERROR;
         goto done;
     }
@@ -267,13 +267,24 @@ next_track:
         goto done;
     }
 
-    buf += 12;
-    n -= 12;
+    /* advance to first WAVE chunk */
+    ci->advance_buffer(12);
+
+    firstblockposn = 12;
     bitspersample = 0;
     numbytes = 0;
     totalsamples = 0;
-    /* read until the data chunk, which should be last */
-    while (numbytes == 0 && n >= 8) {
+
+    /* iterate over WAVE chunks until the 'data' chunk, which should be after the 'fmt ' chunk */
+    while (true) {
+        /* get WAVE chunk header */
+        buf = ci->request_buffer(&n, 1024);
+        if (n < 8) {
+            /* no more chunks, 'data' chunk must not have been found */
+            i = CODEC_ERROR;
+            goto done;
+        }
+
         /* chunkSize */
         i = (buf[4]|(buf[5]<<8)|(buf[6]<<16)|(buf[7]<<24));
         if (memcmp(buf, "fmt ", 4) == 0) {
@@ -327,7 +338,10 @@ next_track:
             }
         } else if (memcmp(buf, "data", 4) == 0) {
             numbytes = i;
-            i = 0; /* advance to the beginning of data */
+            /* advance to start of data */
+            ci->advance_buffer(8);
+            firstblockposn += 8;
+            break;
         } else if (memcmp(buf, "fact", 4) == 0) {
             /* dwSampleLength */
             if (i >= 4)
@@ -336,16 +350,12 @@ next_track:
             DEBUGF("unknown WAVE chunk: '%c%c%c%c', size=%lu\n",
                    buf[0], buf[1], buf[2], buf[3], i);
         }
+
         /* go to next chunk (even chunk sizes must be padded) */
         if (i & 0x01)
             i++;
-        buf += i + 8;
-        if (n < (i + 8)) {
-            DEBUGF("CODEC_ERROR: WAVE header size > 1024\n");
-            i = CODEC_ERROR;
-            goto done;
-        }
-        n -= i + 8;
+        ci->advance_buffer(i+8);
+        firstblockposn += i + 8;
     }
 
     if (channels == 0) {
@@ -409,16 +419,15 @@ next_track:
         }
     }
 
-    firstblockposn = 1024 - n;
-    
+    /* make sure we're at the correct offset */
     if (ci->id3->offset > (uint32_t) firstblockposn) {
         /* Round down to previous block */
         uint32_t offset = ci->id3->offset - ci->id3->offset % blockalign;
 
-        ci->advance_buffer(offset);
+        ci->advance_buffer(offset-firstblockposn);
         bytesdone = offset - firstblockposn;
     } else {
-        ci->advance_buffer(firstblockposn);
+        /* already where we need to be */
         bytesdone = 0;
     }
 
