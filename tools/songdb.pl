@@ -299,7 +299,6 @@ sub dodir {
     }
 }
 
-use_mp3_utf8(1);
 dodir($dir);
 print "\n";
 
