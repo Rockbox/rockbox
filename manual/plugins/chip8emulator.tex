@@ -1,7 +1,7 @@
 \subsection{\label{ref:Chip8emulator}Chip{}-8 Emulator}
 Chip8 is a kind of assembly language for a long-gone architecture.
 This plugin runs games written using the chip8 instructions.
-Just press PLAY on a .ch8 file to start a game.
+To start a game open a \fname{.ch8} file in the \setting{File Browser}
 
 There are lots of tiny Chip8 games (usually only about 256 bytes to a
 couple of KB) which were made popular by the HP48
@@ -12,35 +12,44 @@ graphics.
 The only problem is that they are based on a 4x4 keyboard, but since most
 games do not use all of the buttons, this can easily be worked around.
 
-To do this, one may put a ``.c8k'' file with the same name as the
-original program which contains new key mappings (for BLINKY.ch8, one
-writes a BLINKY.c8k file).
-That c8k file contains 16 characters
-describing the mapping from the Chip8 keyboard to the default key
+To do this, one may put a \fname{``.c8k''} file with the same name as the
+original program which contains new key mappings (for \fname{BLINKY.ch8}, one
+writes a \fname{BLINKY.c8k} file). That \fname{.c8k} file contains 16
+characters describing the mapping from the Chip8 keyboard to the default key
 mapping (that way, several Chip8 keys can be pressed using only one
 Rockbox key). For example, a file containing the single line:\\\\
 \textbf{0122458469ABCDEF}\\\\
 would correspond to the following non-default mappings:\\\\
-3 $\rightarrow$ 2\hspace{1cm} 6 $\rightarrow$ 8\hspace{1cm} 7 $\rightarrow$ 4\hspace{1cm} 8 $\rightarrow$ 6\\\\
+3 $\rightarrow$ 2\hspace{1cm} 6 $\rightarrow$ 8\hspace{1cm} 7 $\rightarrow$
+4\hspace{1cm} 8 $\rightarrow$ 6\\\\
 Default keymappings:
 \begin{table}
   \begin{center}
   \begin{footnotesize}
-    \begin{tabular}{@{}*{16}{@{\hspace{1mm}}c@{\hspace{1mm}}|}@{\hspace{1mm}}c@{}}\toprule
-       \textbf{Chip8 key} & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & A & B & C & D & E & F\\
+    \begin{tabular}{@{}*{17}{@{\hspace{1mm}}c@{\hspace{1mm}}|}@{\hspace{1mm}}
+            c@{}}\toprule
+       \textbf{Chip8 key} & Off & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & A & B
+            & C & D & E & F\\
        \textbf{Key} &
-       \opt{recorder,recorderv2fm}{& F1 & UP & F3 & LEFT & PLAY & RIGHT & F2 & DOWN & ON & & & & & &}
-       \opt{ondio}{& & UP & & LEFT & MODE & RIGHT & & DOWN & & & & & & &}
-       \opt{h1xx}{& & UP & & LEFT & SELECT & RIGHT & & DOWN & & & & & & &}
-       \opt{h300}{& & UP & & LEFT & NAVI & RIGHT & & DOWN & & & & & & &}
-       \opt{ipodcolor,ipodnano}{& & Scroll back & & LEFT & PLAY & RIGHT & & Scroll forward& & & & & & &}
+       \opt{RECORDER_PAD}{\ButtonOff & & \ButtonFOne & \ButtonUp &
+            \ButtonFThree & \ButtonLeft & \ButtonPlay & \ButtonRight &
+            \ButtonFTwo & \ButtonDown & \ButtonOn & & & & & &}
+       \opt{ONDIO_PAD}{\ButtonOff & & & \ButtonUp & & \ButtonLeft & \ButtonMenu
+            & \ButtonRight & & \ButtonDown & & & & & & &}
+       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff & & \ButtonUp & &
+            \ButtonLeft & \ButtonSelect & \ButtonRight & & \ButtonDown & & & &
+            & & &}
+       \opt{IPOD_4G_PAD}{\ButtonMenu & & & \ButtonScrollBack & & \ButtonLeft &
+            \ButtonPlay & \ButtonRight & & \ButtonScrollFwd & & & & & & &}
+       \opt{IAUDIO_X5_PAD}{\ButtonPower & & & \ButtonUp & & \ButtonLeft &
+            \ButtonSelect & \ButtonRight & & \ButtonDown & & & & & & &}
        \\\bottomrule
     \end{tabular}
     \end{footnotesize}
   \end{center}
 \end{table}
 
-Some places where can you can find .ch8 files:
+Some places where can you can find \fname{.ch8} files:
 \begin{itemize}
 \item The PluginChip8 page on www.rockbox.org has several attached:
 \url{http://www.rockbox.org/twiki/bin/view/Main/PluginChip8}
