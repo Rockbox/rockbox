@@ -1,3 +1,11 @@
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+# $Id$
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -8382,5 +8390,112 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Magas frekvencia levágás"
+  </dest>
+  <voice>
+    *: "High-frequency cutoff"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Módosítás mértéke"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Magas frekvencia enyhítés"
+  </dest>
+  <voice>
+    *: "High-frequency attenuation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Közvetlen módosítás"
+  </dest>
+  <voice>
+    *: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "A címke adatbázis még nincs készen"
+  </dest>
+  <voice>
+    *: "Tagcache is not ready"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Minden szám>"
+  </dest>
+  <voice>
+    *: "All tracks"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Rossz fájlnév!"
+  </dest>
+  <voice>
+    *: "Invalid Filename"
   </voice>
 </phrase>
