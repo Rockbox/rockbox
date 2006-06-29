@@ -1,19 +1,19 @@
+% $Id$ %
 \subsection{Minesweeper}
 \screenshot{plugins/images/ss-minesweeper}{Minesweeper plugin}{img:minesweeper}
-
-The classic game of minesweeper.  Use 
-\opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}{the \ButtonUp\ and \ButtonDown\ keys}
+The classic game of minesweeper. Use 
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+    {the \ButtonUp\ and \ButtonDown\ keys}
 \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack }
 to select the required percentage of mines to set the difficulty 
 then press the 
 \opt{RECORDER_PAD}{\ButtonOn}
 \opt{ONDIO_PAD}{\ButtonMenu}
-\opt{h1xx,h300}{\ButtonSelect}
-\opt{IPOD_4G_PAD}{\ButtonSelect}
-\opt{x5}{\ButtonRec}key to begin.
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+\opt{IAUDIO_X5_PAD}{\ButtonRec}key to begin.
 
 The aim of the game is to uncover all of the squares on the board.  If a
-mine is uncovered then the game is over.  If a mine is not uncovered,
+mine is uncovered then the game is over. If a mine is not uncovered,
 then the number of mines adjacent to the current square is revealed. 
 The aim is to use the information you are given to work out where the
 mines are and avoid them.  When the player is certain that they know
@@ -23,30 +23,31 @@ the location of a mine, it can be tagged to avoid accidentally
 \begin{table}
  \begin{btnmap}{}{}
   \opt{IPOD_4G_PAD}{\ButtonMenu/\ButtonPlay/\ButtonLeft/\ButtonRight}
-  \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300,x5}{\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+  \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
   & Move the cursor across the minefield \\
   %
   \opt{RECORDER_PAD}{\ButtonFOne}
   \opt{ONDIO_PAD}{\ButtonMenu}
-  \opt{h1xx,h300}{\ButtonOn}
-  \opt{IPOD_4G_PAD,x5}{\ButtonPlay} 
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+  \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay} 
   & Toggle flag on / off \\
   %
   \opt{RECORDER_PAD}{\ButtonFTwo}
   \opt{ONDIO_PAD}{Hold \ButtonMenu}
-  \opt{h1xx,h300,x5}{\ButtonSelect}
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
   \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
   & Reveal the contents of the current square \\
   %
   \opt{RECORDER_PAD}{\ButtonFThree}
   \opt{ONDIO_PAD}{Hold \ButtonMenu+\ButtonOff}
-  \opt{h1xx,h300}{\ButtonMode}
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
   \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
-  \opt{x5}{\ButtonRec+\ButtonPlay}
+  \opt{IAUDIO_X5_PAD}{\ButtonRec+\ButtonPlay}
   & Display the current game status \\
   %
-  \opt{RECORDER_PAD,ONDIO_PAD,h1xx,h300}{\ButtonOff}
-  \opt{x5}{\ButtonPower}
+  \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+  \opt{IAUDIO_X5_PAD}{\ButtonPower}
   \opt{IPOD_4G_PAD}{\ButtonMenu}
   & Exit the game \\
 \end{btnmap}
