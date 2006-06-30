@@ -181,6 +181,7 @@ PLUGIN_HEADER
 #define SNAKE2_PLAYPAUSE BUTTON_ON
 #define SNAKE2_PLAYPAUSE_TEXT "Play"
 
+#define SNAKE2_RC_QUIT  BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define SNAKE2_UP   BUTTON_MENU
@@ -1134,6 +1135,9 @@ void game (void)
                  if (dir != EAST) set_direction(WEST);
                  break;
 
+#ifdef SNAKE2_RC_QUIT
+             case SNAKE2_RC_QUIT:
+#endif
              case SNAKE2_QUIT:
                  dead=1;
                  return;

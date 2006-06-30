@@ -63,6 +63,9 @@ PLUGIN_HEADER
 #define STOPWATCH_LAP_TIMER BUTTON_ON
 #define STOPWATCH_SCROLL_UP BUTTON_RIGHT
 #define STOPWATCH_SCROLL_DOWN BUTTON_LEFT
+
+#define STOPWATCH_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define STOPWATCH_QUIT BUTTON_MENU
@@ -200,6 +203,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         {
 
             /* exit */
+#ifdef STOPWATCH_RC_QUIT
+            case STOPWATCH_RC_QUIT:
+#endif
             case STOPWATCH_QUIT:
                   done = true;
                   break;

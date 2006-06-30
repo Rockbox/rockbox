@@ -71,6 +71,8 @@ PLUGIN_HEADER
 #define MINESWP_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 #define MINESWP_LEFT (BUTTON_ON | BUTTON_LEFT)
 
+#define MINESWP_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define MINESWP_UP BUTTON_SCROLL_BACK
@@ -506,7 +508,9 @@ int minesweeper(void)
             case MINESWP_START:/* start playing */
                 i = 1;
                 break;
-
+#ifdef MINESWP_RC_QUIT
+            case MINESWP_RC_QUIT:
+#endif
             case MINESWP_QUIT:/* quit program */
                 return MINESWEEPER_QUIT;
 
@@ -580,6 +584,9 @@ int minesweeper(void)
         button = rb->button_get(true);
         switch(button){
             /* quit minesweeper (you really shouldn't use this button ...) */
+#ifdef MINESWP_RC_QUIT
+            case MINESWP_RC_QUIT:
+#endif
             case MINESWP_QUIT:
                 return MINESWEEPER_QUIT;
                                                 

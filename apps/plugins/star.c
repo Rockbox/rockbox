@@ -95,6 +95,7 @@ PLUGIN_HEADER
 #define STAR_LEVEL_REPEAT (BUTTON_MODE | BUTTON_UP)
 #define STAR_MENU_RUN BUTTON_RIGHT
 
+#define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
@@ -687,6 +688,9 @@ static int star_run_game(void)
             key = rb->button_get(true);
             switch (key)
             {
+#ifdef STAR_RC_QUIT
+                case STAR_RC_QUIT:
+#endif
                 case STAR_QUIT:
                     return 0;
 
@@ -905,6 +909,9 @@ static int star_menu(void)
         key = rb->button_get(false);
         switch (key)
         {
+#ifdef STAR_RC_QUIT
+            case STAR_RC_QUIT:
+#endif
             case STAR_QUIT:
                 return PLUGIN_OK;
             case STAR_UP:

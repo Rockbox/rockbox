@@ -64,6 +64,8 @@ PLUGIN_HEADER
 #define BUBBLES_SELECT BUTTON_SELECT
 #define BUBBLES_RESUME BUTTON_MODE
 
+#define BUBBLES_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define BUBBLES_LEFT   BUTTON_SCROLL_BACK
 #define BUBBLES_RIGHT  BUTTON_SCROLL_FWD
@@ -2407,7 +2409,9 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
                 return BB_END;
             }
             break;
-
+#ifdef BUBBLES_RC_QUIT
+        case BUBBLES_RC_QUIT:
+#endif
         case BUBBLES_QUIT:   /* end the game */
             return BB_END;
 
@@ -2534,7 +2538,9 @@ static int bubbles(struct game_context* bb) {
                 bb->level = startlevel;
                 startgame = true;
                 break;
-
+#ifdef BUBBLES_RC_QUIT
+            case BUBBLES_RC_QUIT:
+#endif
             case BUBBLES_QUIT:   /* quit program */
                 if(showscores) {
                     showscores = false;

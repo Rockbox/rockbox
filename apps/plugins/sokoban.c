@@ -70,6 +70,8 @@ extern const fb_data sokoban_tiles[];
 #define SOKOBAN_LEVEL_DOWN BUTTON_REC
 #define SOKOBAN_LEVEL_REPEAT BUTTON_SELECT
 
+#define SOKOBAN_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define SOKOBAN_UP BUTTON_MENU
@@ -563,6 +565,9 @@ static bool sokoban_loop(void)
 
         switch(button)
         {
+#ifdef SOKOBAN_RC_QUIT
+            case SOKOBAN_RC_QUIT:
+#endif
             case SOKOBAN_QUIT:
                 /* get out of here */
 #ifdef HAVE_LCD_COLOR /* reset background color */

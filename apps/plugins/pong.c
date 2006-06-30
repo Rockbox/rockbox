@@ -57,6 +57,7 @@ PLUGIN_HEADER
 #define PONG_LEFT_DOWN BUTTON_DOWN
 #define PONG_RIGHT_UP BUTTON_ON
 #define PONG_RIGHT_DOWN BUTTON_MODE
+#define PONG_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
@@ -298,7 +299,11 @@ int keys(struct pong *p)
     while(end > *rb->current_tick) {
         key = rb->button_get_w_tmo(end - *rb->current_tick);
 
-        if(key & PONG_QUIT)
+        if(key & PONG_QUIT
+#ifdef PONG_RC_QUIT
+           || key & PONG_RC_QUIT
+#endif
+        )
             return 0; /* exit game NOW */
 
         if(key & PONG_LEFT_DOWN) /* player left goes down */

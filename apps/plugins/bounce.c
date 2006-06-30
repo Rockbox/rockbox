@@ -52,6 +52,8 @@ PLUGIN_HEADER
 #define BOUNCE_QUIT (BUTTON_OFF | BUTTON_REL)
 #define BOUNCE_MODE (BUTTON_SELECT | BUTTON_REL)
 
+#define BOUNCE_RC_QUIT (BUTTON_RC_STOP | BUTTON_REL)
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define BOUNCE_UP   BUTTON_SCROLL_BACK
@@ -337,15 +339,19 @@ static int scrollit(void)
     while(1)
     {
         b = rb->button_get_w_tmo(HZ/10);
-        if ( b == BOUNCE_QUIT )
-            return 0;
-
-        if ( b == BOUNCE_MODE )
-            return 1;
-
-        if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
-            return -1;
-
+        switch(b)
+        {
+#ifdef BOUNCE_RC_QUIT
+            case BOUNCE_RC_QUIT :
+#endif
+            case BOUNCE_QUIT :
+                return 0;
+            case BOUNCE_MODE : 
+                return 1;
+            default:
+                if ( rb->default_event_handler(b) == SYS_USB_CONNECTED )
+                    return -1;
+        }
         rb->lcd_clear_display();
 
         for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {

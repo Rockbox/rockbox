@@ -87,6 +87,8 @@ use stop to exit
 #define DICE_BUTTON_LEFT       BUTTON_LEFT
 #define DICE_BUTTON_RIGHT      BUTTON_RIGHT
 
+#define DICE_BUTTON_RC_OFF     BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define DICE_BUTTON_UP         BUTTON_SCROLL_FWD
 #define DICE_BUTTON_DOWN       BUTTON_SCROLL_BACK
@@ -205,7 +207,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
                     print_dice(dice, total);
                 }
                 break;
-
+#ifdef DICE_BUTTON_RC_OFF
+            case DICE_BUTTON_RC_OFF:
+#endif
             case DICE_BUTTON_OFF:
                 selected = EXIT;
                 break;

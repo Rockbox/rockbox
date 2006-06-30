@@ -52,6 +52,8 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE_PRE BUTTON_SELECT
 #define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
 
+#define FLIPIT_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
@@ -336,6 +338,9 @@ static bool flipit_loop(void) {
     while(true) {
         button = rb->button_get(true);
         switch (button) {
+#ifdef FLIPIT_RC_QUIT
+            case FLIPIT_RC_QUIT:
+#endif
             case FLIPIT_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;

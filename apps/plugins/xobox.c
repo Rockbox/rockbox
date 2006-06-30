@@ -31,6 +31,8 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define SELECT BUTTON_SELECT
 
+#define RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
 
@@ -729,6 +731,9 @@ static int game_menu (void)
             case RIGHT:
                 quit = true;
                 break;
+#ifdef RC_QUIT
+            case RC_QUIT:
+#endif
             case QUIT:
                 selection = MENU_QUIT;
                 quit = true;

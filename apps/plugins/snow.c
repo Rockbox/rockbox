@@ -47,6 +47,9 @@ PLUGIN_HEADER
 #define SNOW_QUIT BUTTON_A
 #else
 #define SNOW_QUIT BUTTON_OFF
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define SNOW_RC_QUIT BUTTON_RC_STOP
+#endif
 #endif
 
 static short particles[NUM_PARTICLES][2];
@@ -189,7 +192,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         
         button = rb->button_get(false);
 
-        if (button == SNOW_QUIT)
+        if (button == SNOW_QUIT
+#ifdef SNOW_RC_QUIT
+        || button == SNOW_RC_QUIT
+#endif
+        )
         {
 #ifdef HAVE_LCD_CHARCELLS
             pgfx_release();

@@ -155,6 +155,8 @@ PLUGIN_HEADER
 #define CHANGE_UP_BUTTON BUTTON_RIGHT
 #define CHANGE_DOWN_BUTTON BUTTON_LEFT
 
+#define EXIT_RC_BUTTON BUTTON_RC_STOP
+
 #define YESTEXT "Select/Navi"
 #define NAVI_BUTTON_TEXT_LEFT "LEFT"
 #define NAVI_BUTTON_TEXT_RIGHT "RIGHT"
@@ -1778,6 +1780,9 @@ bool help_screen(void)
 
         switch(rb->button_get_w_tmo(HZ/4))
         {
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
+#endif
             case EXIT_BUTTON:
                 done = true;
                 break;
@@ -2061,7 +2066,9 @@ void settings_screen(void)
             case CHANGE_UP_BUTTON:
                 change_setting(cursorpos-1, 1, false);
                 break;
-
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON:
             case MENU_BUTTON:
                 done = true;
@@ -2107,6 +2114,9 @@ void confirm_reset(void)
 #endif
             case CHANGE_DOWN_BUTTON:
             case CHANGE_UP_BUTTON:
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON:
                 ask_reset_done = true;
                 break;
@@ -2148,6 +2158,9 @@ void general_settings(void)
 
         switch(rb->button_get_w_tmo(HZ/4))
         {
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON:
             case MENU_BUTTON:
                 if(settings.general[general_savesetting] == 2)
@@ -2495,6 +2508,9 @@ void select_mode(void)
                 done = true;
                 break;
 
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON:
             case CHANGE_DOWN_BUTTON:
                 done = true;
@@ -2825,6 +2841,9 @@ void counter_settings(void)
                 }
                 break;
 
+#ifdef EXIT_RC_BUTTON
+                case EXIT_RC_BUTTON
+#endif
                 case EXIT_BUTTON:
                 current = counting_up;
                 if(current != original)
@@ -2947,6 +2966,9 @@ void main_menu(void)
                 }
                 break;
 
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON:
             case CHANGE_DOWN_BUTTON:
 #ifdef ALT_MENU_BUTTON
@@ -3065,6 +3087,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get_w_tmo(HZ/10);
         switch (button)
         {
+#ifdef EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON
+#endif
             case EXIT_BUTTON: /* save and exit */
                 cleanup(NULL);
                 return PLUGIN_OK;

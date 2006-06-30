@@ -55,6 +55,8 @@ PLUGIN_HEADER
 #define SNAKE_DOWN BUTTON_DOWN
 #define SNAKE_PLAYPAUSE BUTTON_ON
 
+#define SNAKE_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define SNAKE_QUIT (BUTTON_SELECT|BUTTON_MENU)
@@ -219,6 +221,9 @@ void game_pause (void) {
     while (1) {
         button=rb->button_get(true);
         switch (button) {
+#ifdef SNAKE_RC_QUIT
+            case SNAKE_RC_QUIT:
+#endif
             case SNAKE_QUIT:
                 dead=1;
                 return;
@@ -275,6 +280,9 @@ void game (void) {
              case BUTTON_LEFT:
                  if (dir!=1) dir=3;
                  break;
+#ifdef SNAKE_RC_QUIT
+             case SNAKE_RC_QUIT:
+#endif
              case SNAKE_QUIT:
                  dead=1;
                  return;
@@ -336,6 +344,9 @@ void game_init(void) {
                 if (level>1)
                     level--;
                 break;
+#ifdef SNAKE_RC_QUIT
+            case SNAKE_RC_QUIT:
+#endif
             case SNAKE_QUIT:
                 dead=1;
                 return;

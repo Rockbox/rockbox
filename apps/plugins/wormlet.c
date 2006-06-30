@@ -83,6 +83,8 @@ PLUGIN_HEADER
 #define BTN_QUIT (BUTTON_SELECT|BUTTON_MENU)
 #define BTN_STOPRESET (BUTTON_SELECT|BUTTON_PLAY)
 
+#define BTN_RC_QUIT BUTTON_RC_STOP
+
 #define PLAYERS_TEXT "Menu/Play"
 #define WORMS_TEXT "Left/Right"
 
@@ -1487,6 +1489,9 @@ static int run(void)
                 else
                     paused = true;
                 break;
+#ifdef BTN_RC_QUIT
+            case BTN_RC_QUIT:
+#endif
             case BTN_QUIT:
                 return 2;  /* back to menu */
                 break;

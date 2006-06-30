@@ -40,6 +40,8 @@ PLUGIN_HEADER
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
+#define BTN_RC_QUIT      BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define BTN_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define BTN_RIGHT        BUTTON_RIGHT
@@ -300,7 +302,9 @@ int midimain(void * filename)
                         tick();
                     break;
                 }
-
+#ifdef BTN_RC_QUIT
+                case BTN_RC_QUIT:
+#endif
                 case BTN_QUIT:
                     quit=1;
         }

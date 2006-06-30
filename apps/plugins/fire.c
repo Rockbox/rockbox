@@ -49,6 +49,8 @@ static unsigned char draw_buffer[8*LCD_WIDTH];
 #define FIRE_INCREASE_MULT BUTTON_UP
 #define FIRE_DECREASE_MULT BUTTON_DOWN
 
+#define FIRE_RC_QUIT BUTTON_RC_STOP
+
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #define FIRE_QUIT BUTTON_OFF
 #define FIRE_SWITCH_FLAMES_TYPE BUTTON_ON
@@ -357,6 +359,9 @@ int main(void)
 
         switch(button)
         {
+#ifdef FIRE_RC_QUIT
+            case FIRE_RC_QUIT :
+#endif
             case(FIRE_QUIT):
                 cleanup(NULL);
                 return PLUGIN_OK;

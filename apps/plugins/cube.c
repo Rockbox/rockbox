@@ -82,6 +82,7 @@ PLUGIN_HEADER
 #define CUBE_PAUSE         (BUTTON_ON | BUTTON_REL)
 #define CUBE_HIGHSPEED     BUTTON_SELECT
 
+#define CUBE_RC_QUIT       BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define CUBE_QUIT          BUTTON_MENU
@@ -773,6 +774,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 t_disp = DISP_TIME;
                 break;
 
+#ifdef CUBE_RC_QUIT
+            case CUBE_RC_QUIT:
+#endif
             case CUBE_QUIT:
                 exit = true;
                 break;

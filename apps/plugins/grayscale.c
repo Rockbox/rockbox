@@ -51,6 +51,8 @@ PLUGIN_HEADER
 #define GRAYSCALE_RIGHT BUTTON_RIGHT
 #define GRAYSCALE_OFF BUTTON_OFF
 
+#define GRAYSCALE_RC_OFF BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define GRAYSCALE_SHIFT (BUTTON_SELECT | BUTTON_REL)
 #define GRAYSCALE_UP BUTTON_MENU
@@ -315,7 +317,9 @@ int main(void)
                 gray_scroll_down(scroll_amount);  /* scroll down */
                 gray_update();
                 break;
-
+#ifdef GRAYSCALE_RC_OFF
+            case GRAYSCALE_RC_OFF:
+#endif
             case GRAYSCALE_OFF:
 
                 cleanup(NULL);

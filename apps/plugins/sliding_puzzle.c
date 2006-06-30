@@ -45,6 +45,8 @@ PLUGIN_HEADER
 #define PUZZLE_SHUFFLE BUTTON_SELECT
 #define PUZZLE_PICTURE BUTTON_ON
 
+#define PUZZLE_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define PUZZLE_QUIT    (BUTTON_SELECT | BUTTON_MENU)
@@ -291,6 +293,9 @@ static int puzzle_loop(void)
     while(true) {
         button = rb->button_get(true);
         switch (button) {
+#ifdef PUZZLE_RC_QUIT
+            case PUZZLE_RC_QUIT:
+#endif
             case PUZZLE_QUIT:
                 /* get out of here */
                 return PLUGIN_OK;

@@ -58,6 +58,8 @@ PLUGIN_HEADER
 #define VUMETER_UP BUTTON_UP
 #define VUMETER_DOWN BUTTON_DOWN
 
+#define VUMETER_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define VUMETER_QUIT BUTTON_MENU
@@ -521,6 +523,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
         button = rb->button_get_w_tmo(1);
         switch (button)
         {
+#ifdef VUMETER_RC_QUIT
+            case VUMETER_RC_QUIT:
+#endif
             case VUMETER_QUIT:
                 save_settings();
                 return PLUGIN_OK;

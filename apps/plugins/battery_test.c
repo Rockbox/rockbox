@@ -41,6 +41,7 @@ PLUGIN_HEADER
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BATTERY_TEST_QUIT BUTTON_OFF
+#define BATTERY_TEST_RC_QUIT BUTTON_RC_STOP
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define BATTERY_TEST_QUIT BUTTON_PLAY
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -123,7 +124,11 @@ enum plugin_status loop(void)
         rb->button_clear_queue();
         button = rb->button_get_w_tmo(HZ * buffersize / 16000 - HZ*10);
 
-        if (button == BATTERY_TEST_QUIT)
+        if (button == BATTERY_TEST_QUIT
+#ifdef BATTERY_TEST_RC_QUIT
+         || button == BATTERY_TEST_RC_QUIT
+#endif
+         )
             return PLUGIN_OK;
 
         if (rb->default_event_handler(button) == SYS_USB_CONNECTED)

@@ -134,6 +134,8 @@ PLUGIN_HEADER
 #define CALCULATOR_OPERATORS BUTTON_MODE
 #define CALCULATOR_CLEAR BUTTON_REC
 
+#define CALCULATOR_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
@@ -1402,6 +1404,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             case CALCULATOR_DOWN | BUTTON_REPEAT:
                 moveButton();
                 break;
+#ifdef CALCULATOR_RC_QUIT
+            case CALCULATOR_RC_QUIT:
+#endif
             case CALCULATOR_QUIT:
                 calStatus = cal_exit;
                 printResult();

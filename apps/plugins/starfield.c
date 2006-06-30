@@ -51,6 +51,10 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define STARFIELD_DECREASE_ZMOVE BUTTON_DOWN
 #define STARFIELD_INCREASE_NB_STARS BUTTON_RIGHT
 #define STARFIELD_DECREASE_NB_STARS BUTTON_LEFT
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define STARFIELD_RC_QUIT BUTTON_RC_STOP
+#endif
+
 #endif
 
 #define LCD_CENTER_X (LCD_WIDTH/2)
@@ -252,6 +256,9 @@ int plugin_main(void)
                 starfield_del_stars(&starfield, STARFIELD_INCREASE_STEP);
                 t_disp=MSG_DISP_TIME;
                 break;
+#ifdef STARFIELD_RC_QUIT
+            case STARFIELD_RC_QUIT:
+#endif
             case(STARFIELD_QUIT):
             case(SYS_USB_CONNECTED):
                 rb->backlight_set_timeout(rb->global_settings->backlight_timeout);

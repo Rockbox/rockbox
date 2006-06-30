@@ -110,6 +110,8 @@ PLUGIN_HEADER
 #define VIEWER_COLUMN_LEFT (BUTTON_ON | BUTTON_LEFT)
 #define VIEWER_COLUMN_RIGHT (BUTTON_ON | BUTTON_RIGHT)
 
+#define VIEWER_RC_QUIT BUTTON_RC_STOP
+
 /* iPods with the 4G pad */
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
@@ -1368,6 +1370,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
 #endif
 
+#ifdef VIEWER_RC_QUIT
+            case VIEWER_RC_QUIT:
+#endif
             case VIEWER_QUIT:
                 viewer_exit(NULL);
                 done = true;

@@ -73,6 +73,8 @@ PLUGIN_HEADER
 #define CB_RESTART BUTTON_REC
 #define CB_QUIT    BUTTON_OFF
 
+#define CB_RC_QUIT BUTTON_RC_STOP
+
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define CB_SELECT  BUTTON_SELECT
 #define CB_UP      BUTTON_UP
@@ -280,6 +282,9 @@ void cb_wt_callback ( void ) {
     wt_command = COMMAND_NOP;
     button = rb->button_get(false);
     switch (button) {
+#ifdef CB_RC_QUIT
+        case CB_RC_QUIT:
+#endif
         case CB_QUIT:
             wt_command = COMMAND_QUIT;
             timeout = true;
@@ -486,6 +491,9 @@ struct cb_command cb_getcommand (void) {
     while ( true ) {
         button = rb->button_get(true);
         switch (button) {
+#ifdef CB_RC_QUIT
+            case CB_RC_QUIT:
+#endif
             case CB_QUIT:
                 result.type = COMMAND_QUIT;
                 return result;

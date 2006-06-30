@@ -35,6 +35,8 @@
 #define TEXT_EDITOR_DELETE BUTTON_REC
 #define TEXT_EDITOR_ITEM_MENU BUTTON_MODE
 
+#define TEXT_EDITOR_RC_CANCEL BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define TEXT_EDITOR_SELECT_PRE    BUTTON_SELECT
 #define TEXT_EDITOR_SELECT ( BUTTON_SELECT | BUTTON_REL)
@@ -461,6 +463,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef TEXT_EDITOR_CANCEL_PRE
                 if (last_button != TEXT_EDITOR_CANCEL_PRE)
                     break;
+#endif
+#ifdef TEXT_EDITOR_RC_CANCEL
+            case TEXT_EDITOR_RC_CANCEL:
 #endif
                 if (changed)
                 {

@@ -53,6 +53,8 @@ PLUGIN_HEADER
 #define MOSAIQUE_SPEED BUTTON_MODE
 #define MOSAIQUE_RESTART BUTTON_ON
 
+#define MOSAIQUE_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define MOSAIQUE_QUIT BUTTON_MENU
@@ -136,6 +138,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(false);
         switch (button)
         {
+#ifdef MOSAIQUE_RC_QUIT
+            case MOSAIQUE_RC_QUIT:
+#endif
             case MOSAIQUE_QUIT:
                 MYLCD(set_drawmode)(DRMODE_SOLID);
 #ifdef HAVE_LCD_CHARCELLS

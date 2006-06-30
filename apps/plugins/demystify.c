@@ -51,6 +51,10 @@ PLUGIN_HEADER
 #define DEMYSTIFY_REMOVE_POLYGON BUTTON_DOWN
 #define DEMYSTIFY_INCREASE_SPEED BUTTON_RIGHT
 #define DEMYSTIFY_DECREASE_SPEED BUTTON_LEFT
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define DEMYSTIFY_RC_QUIT BUTTON_RC_STOP
+#endif
 #endif
 
 #define DEFAULT_WAIT_TIME 3
@@ -315,6 +319,9 @@ int plugin_main(void)
         button = rb->button_get(false);
         switch(button)
         {
+#ifdef DEMYSTIFY_RC_QUIT
+            case DEMYSTIFY_RC_QUIT :
+#endif
             case (DEMYSTIFY_QUIT):
                 cleanup(NULL);
                 return PLUGIN_OK;

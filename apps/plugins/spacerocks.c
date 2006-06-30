@@ -65,6 +65,8 @@ static struct plugin_api* rb; /* global api struct pointer */
 #define AST_FIRE BUTTON_SELECT
 #define AST_FIRE_REP BUTTON_SELECT | BUTTON_REPEAT
 
+#define AST_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define AST_PAUSE BUTTON_PLAY
 #define AST_QUIT BUTTON_POWER
@@ -1531,7 +1533,10 @@ enum plugin_status start_game(void)
                 else if(game_state == PAUSE_MODE)
                     game_state = PLAY_MODE;
                 break;  
-                
+
+#ifdef AST_RC_QUIT
+            case AST_RC_QUIT:
+#endif
             case(AST_QUIT):
                 if(game_state == ATTRACT_MODE)
                     return PLUGIN_OK;

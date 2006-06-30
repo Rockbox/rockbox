@@ -74,6 +74,7 @@ PLUGIN_HEADER
 #define JPEG_PREVIOUS BUTTON_ON
 #endif
 #define JPEG_MENU BUTTON_OFF
+#define JPEG_RC_MENU BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define JPEG_ZOOM_IN BUTTON_SCROLL_FWD
@@ -2287,7 +2288,9 @@ int scroll_bmp(struct t_disp* pdisp)
 #endif
             return ZOOM_OUT;
             break;
-
+#ifdef JPEG_RC_MENU
+        case JPEG_RC_MENU:
+#endif
         case JPEG_MENU:
 #ifdef USEGSLIB
             gray_show(false); /* switch off grayscale overlay */
@@ -2559,7 +2562,9 @@ int load_and_show(char* filename)
                                 rb->plugin_get_audio_buffer(&buf_images_size);
                         /*try again this file, now using the audio buffer */
                         return PLUGIN_OTHER;
-
+#ifdef JPEG_RC_MENU
+                    case JPEG_RC_MENU:
+#endif
                     case JPEG_MENU:
                         return PLUGIN_OK;
 

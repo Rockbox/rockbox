@@ -66,6 +66,8 @@ PLUGIN_HEADER
 #define MANDELBROT_MAXITER_DEC (BUTTON_ON | BUTTON_LEFT)
 #define MANDELBROT_RESET BUTTON_REC
 
+#define MANDELBROT_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define MANDELBROT_QUIT (BUTTON_SELECT | BUTTON_MENU)
@@ -516,6 +518,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         button = rb->button_get(true);
         switch (button) {
+#ifdef MANDELBROT_RC_QUIT
+        case MANDELBROT_RC_QUIT:
+#endif
         case MANDELBROT_QUIT:
 #ifdef USEGSLIB
             gray_release();

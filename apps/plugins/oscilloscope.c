@@ -62,6 +62,7 @@ PLUGIN_HEADER
 #define OSCILLOSCOPE_VOL_UP       BUTTON_UP
 #define OSCILLOSCOPE_VOL_DOWN     BUTTON_DOWN
 
+#define OSCILLOSCOPE_RC_QUIT      BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define OSCILLOSCOPE_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define OSCILLOSCOPE_DRAWMODE     (BUTTON_SELECT | BUTTON_PLAY)
@@ -583,6 +584,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         button = rb->button_get(paused);
         switch (button)
         {
+#ifdef OSCILLOSCOPE_RC_QUIT
+            case OSCILLOSCOPE_RC_QUIT:
+#endif
             case OSCILLOSCOPE_QUIT:
                 exit = true;
                 break;

@@ -51,6 +51,7 @@ PLUGIN_HEADER
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_OFF
 
+#define JEWELS_RC_CANCEL BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define JEWELS_SCROLLWHEEL
 #define JEWELS_UP     BUTTON_MENU
@@ -1234,6 +1235,9 @@ static int jewels_main(struct game_context* bj) {
                 break;
 
 #ifdef JEWELS_CANCEL
+#ifdef JEWELS_RC_CANCEL
+            case JEWELS_RC_CANCEL:
+#endif
             case JEWELS_CANCEL:
                 return BJ_QUIT;
 #endif
@@ -1415,6 +1419,9 @@ static int jewels_main(struct game_context* bj) {
                 break;
 
 #ifdef JEWELS_CANCEL
+#ifdef JEWELS_RC_CANCEL
+            case JEWELS_RC_CANCEL:
+#endif
             case JEWELS_CANCEL:           /* end game */
                 return BJ_END;
                 break;

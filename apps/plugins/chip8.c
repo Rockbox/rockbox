@@ -976,6 +976,8 @@ STATIC void chip8 (void)
 #define CHIP8_KEY6 BUTTON_RIGHT
 #define CHIP8_KEY8 BUTTON_DOWN
 
+#define CHIP8_RC_OFF BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define CHIP8_OFF  BUTTON_MENU
@@ -1106,6 +1108,9 @@ static void chip8_keyboard(void)
     int button = rb->button_get(false);
     switch (button)
     {
+#ifdef CHIP8_RC_OFF
+    case CHIP8_RC_OFF:
+#endif
     case CHIP8_OFF:                                      /* Abort Emulator */
         chip8_running = 0;
         break;

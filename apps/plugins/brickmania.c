@@ -32,6 +32,8 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+#define RC_QUIT BUTTON_RC_STOP
+
 /* Only iPod have scroll events */
 #define SCROLL_FWD(x) (0)
 #define SCROLL_BACK(x) (0)
@@ -971,6 +973,9 @@ int game_menu(int when)
                     return 3;
                 }
                 break;
+#ifdef RC_QUIT
+            case RC_QUIT:
+#endif
             case QUIT:
                 return 3;
                 break;
@@ -1062,6 +1067,9 @@ int help(int when)
 
         button=rb->button_get(true);
         switch (button) {
+#ifdef RC_QUIT
+            case RC_QUIT:
+#endif
             case QUIT:
                 switch (game_menu(when)) {
                     case 0:
@@ -1810,6 +1818,9 @@ int game_loop(void)
                         con_game=0;
                     }
                     break;
+#ifdef RC_QUIT
+                case RC_QUIT:
+#endif
                 case QUIT:
                     switch(game_menu(1)) {
                         case 0:

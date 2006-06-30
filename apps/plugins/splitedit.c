@@ -56,7 +56,7 @@ PLUGIN_HEADER
 #define SPLITEDIT_SPEED150 (BUTTON_REC | BUTTON_RIGHT)
 #define SPLITEDIT_MENU_RUN BUTTON_RIGHT
 
-
+#define SPLITEDIT_RC_QUIT BUTTON_RC_STOP
 #endif
 
 #define BMPHEIGHT 7
@@ -593,7 +593,11 @@ static int copy_file(
 
         button = rb->button_get(false);
 
-        if (button == SPLITEDIT_QUIT) {
+        if (button == SPLITEDIT_QUIT
+#ifdef SPLITEDIT_RC_QUIT
+            || button == SPLITEDIT_RC_QUIT:
+#endif
+        ) {
             rb->splash(0, true, "Aborting copy.");
             rb->button_get(true);
             rb->button_get(true);
@@ -887,7 +891,9 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
             }
             break;
-
+#ifdef SPLITEDIT_RC_QUIT
+        case SPLITEDIT_RC_QUIT:
+#endif
         case SPLITEDIT_QUIT:
             exit_request = true;
             break;
@@ -1171,6 +1177,9 @@ unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 update_icons();
                 break;
 
+#ifdef SPLITEDIT_RC_QUIT
+            case SPLITEDIT_RC_QUIT:
+#endif
             case SPLITEDIT_QUIT:
                 exit_request = true;
                 break;

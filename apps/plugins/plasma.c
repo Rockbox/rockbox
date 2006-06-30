@@ -67,6 +67,9 @@ static int plasma_frequency;
 #define PLASMA_QUIT BUTTON_OFF
 #define PLASMA_INCREASE_FREQUENCY BUTTON_UP
 #define PLASMA_DECREASE_FREQUENCY BUTTON_DOWN
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define PLASMA_RC_QUIT            BUTTON_RC_STOP
+#endif
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -283,6 +286,9 @@ int main(void)
 
         switch(button)
         {
+#ifdef PLASMA_RC_QUIT
+            case PLASMA_RC_QUIT:
+#endif
             case(PLASMA_QUIT):
                 cleanup(NULL);
                 return PLUGIN_OK;

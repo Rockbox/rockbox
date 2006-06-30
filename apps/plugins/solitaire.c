@@ -109,6 +109,8 @@ static struct plugin_api* rb;
 #define SOL_OPT BUTTON_ON
 #define SOL_REM BUTTON_REC
 
+#define SOL_RC_QUIT BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 #define SOL_QUIT (BUTTON_SELECT | BUTTON_MENU)
@@ -463,7 +465,9 @@ int solitaire_help(void){
 #endif
                 rb->splash(HZ*2, true, HELP_SOL_REM2CUR);
                 break;
-
+#ifdef SOL_RC_QUIT
+            case SOL_RC_QUIT:
+#endif
             case SOL_QUIT:
                 return HELP_QUIT;
 
@@ -599,6 +603,10 @@ int solitaire_menu(unsigned char when_n)
 #ifdef SOL_OPT
             case SOL_OPT:
                 return MENU_OPT;
+#endif
+
+#ifdef SOL_RC_QUIT
+            case SOL_RC_QUIT:
 #endif
             case SOL_QUIT:
                 return MENU_QUIT;
@@ -1460,6 +1468,9 @@ int solitaire(void){
                 break;
 
             /* Show the menu */
+#ifdef SOL_RC_QUIT
+            case SOL_RC_QUIT:
+#endif
             case SOL_QUIT:
 #if LCD_DEPTH>1 
                 rb->lcd_set_background(LCD_DEFAULT_BG);
