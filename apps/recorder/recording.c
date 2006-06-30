@@ -360,11 +360,9 @@ bool recording_screen(void)
     /* Set peak meter to recording mode */
     peak_meter_playback(false);
 
-#ifdef HAVE_SPDIF_IN
-#ifndef SIMULATOR
-if (global_settings.rec_source == SOURCE_SPDIF)
-    cpu_boost(true);
-#endif
+#if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
+    if (global_settings.rec_source == SOURCE_SPDIF)
+        cpu_boost(true);
 #endif
 
 #else
@@ -1015,11 +1013,9 @@ if (global_settings.rec_source == SOURCE_SPDIF)
     audio_stop_recording(); 
     audio_close_recording();
 
-#ifdef HAVE_SPDIF_IN
-#ifndef SIMULATOR
-if (global_settings.rec_source == SOURCE_SPDIF)
-    cpu_boost(false);
-#endif
+#if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
+    if (global_settings.rec_source == SOURCE_SPDIF)
+        cpu_boost(false);
 #endif
 
 #else
