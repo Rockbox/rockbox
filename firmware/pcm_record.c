@@ -47,6 +47,7 @@
 #include "pcm_playback.h"
 #include "pcm_record.h"
 
+extern int boost_counter; /* used for boost check */
 
 /***************************************************************************/
 
@@ -552,12 +553,19 @@ static void pcmrec_callback(bool flush)
     
     if (num_free <= WRITE_THRESHOLD || flush)
     {
+        bool must_boost = (boost_counter ? false : true);
+
         logf("writing: %d (%d)", num_ready, flush);
         
+        if(must_boost)
+            cpu_boost(true);
+
         for (i=0; i<num_ready; i++)
         {
             if (write(wav_file, GET_CHUNK(read_index), CHUNK_SIZE) != CHUNK_SIZE)
             {
+                if(must_boost)
+                    cpu_boost(false);
                 logf("pcmrec: write err");
                 pcmrec_dma_stop();
                 return;
@@ -570,6 +578,9 @@ static void pcmrec_callback(bool flush)
                 read_index = 0;
             yield();
         }
+
+        if(must_boost)
+            cpu_boost(false);
 
         /* sync file */
         fsync(wav_file);

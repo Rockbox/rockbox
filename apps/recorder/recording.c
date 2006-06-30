@@ -137,7 +137,7 @@ bool f3_rec_screen(void);
 #define REC_FILE_ENDING ".mp3"
 #endif
 
-#define MAX_FILE_SIZE 0x7FF00000 /* 2 GB - 1 MB */
+#define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
 const char* const freq_str[6] =
 {
@@ -359,7 +359,12 @@ bool recording_screen(void)
     audio_stop();
     /* Set peak meter to recording mode */
     peak_meter_playback(false);
+
+#ifdef HAVE_SPDIF_IN
+if (global_settings.rec_source == SOURCE_SPDIF)
     cpu_boost(true);
+#endif
+
 #else
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
@@ -1007,7 +1012,12 @@ bool recording_screen(void)
 #if CONFIG_CODEC == SWCODEC        
     audio_stop_recording(); 
     audio_close_recording();
+
+#ifdef HAVE_SPDIF_IN
+if (global_settings.rec_source == SOURCE_SPDIF)
     cpu_boost(false);
+#endif
+
 #else
     audio_init_playback();
 #endif
