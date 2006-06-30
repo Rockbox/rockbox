@@ -49,10 +49,10 @@ static int strip_volume(const char* name, char* namecopy)
     int volume = 0;
     const char *temp = name;
     
-    while (*temp && strchr("/", *temp))  /* skip all leading slashes */
+    while (*temp == '/')          /* skip all leading slashes */
         ++temp;
         
-    if (*temp && !strncmp(temp, vol_names, VOL_ENUM_POS)) 
+    if (*temp && !strncmp(temp, vol_names, VOL_ENUM_POS))
     {
         temp += VOL_ENUM_POS;     /* behind special name */
         volume = atoi(temp);      /* number is following */
