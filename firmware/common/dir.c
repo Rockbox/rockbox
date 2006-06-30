@@ -47,17 +47,20 @@ static const char* vol_names = "<HD%d>";
 static int strip_volume(const char* name, char* namecopy)
 {
     int volume = 0;
-
-    if (name[1] == vol_names[0] ) /* a '<' quickly identifies our volumes */
+    const char *temp = name;
+    
+    while (*temp && strchr("/", *temp))  /* skip all leading slashes */
+        ++temp;
+        
+    if (*temp && !strncmp(temp, vol_names, VOL_ENUM_POS)) 
     {
-        const char* temp;
-        temp = name + 1 + VOL_ENUM_POS; /* behind '/' and special name */
-        volume = atoi(temp); /* number is following */
+        temp += VOL_ENUM_POS;     /* behind special name */
+        volume = atoi(temp);      /* number is following */
         temp = strchr(temp, '/'); /* search for slash behind */
         if (temp != NULL)
-            name = temp; /* use the part behind the volume */
+            name = temp;          /* use the part behind the volume */
         else
-            name = "/"; /* else this must be the root dir */
+            name = "/";           /* else this must be the root dir */
     }
 
     strncpy(namecopy, name, MAX_PATH);
