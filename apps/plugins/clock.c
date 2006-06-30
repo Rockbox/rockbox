@@ -2067,7 +2067,7 @@ void settings_screen(void)
                 change_setting(cursorpos-1, 1, false);
                 break;
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON:
             case MENU_BUTTON:
@@ -2115,7 +2115,7 @@ void confirm_reset(void)
             case CHANGE_DOWN_BUTTON:
             case CHANGE_UP_BUTTON:
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON:
                 ask_reset_done = true;
@@ -2159,7 +2159,7 @@ void general_settings(void)
         switch(rb->button_get_w_tmo(HZ/4))
         {
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON:
             case MENU_BUTTON:
@@ -2509,7 +2509,7 @@ void select_mode(void)
                 break;
 
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON:
             case CHANGE_DOWN_BUTTON:
@@ -2842,7 +2842,7 @@ void counter_settings(void)
                 break;
 
 #ifdef EXIT_RC_BUTTON
-                case EXIT_RC_BUTTON
+                case EXIT_RC_BUTTON:
 #endif
                 case EXIT_BUTTON:
                 current = counting_up;
@@ -2967,7 +2967,7 @@ void main_menu(void)
                 break;
 
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON:
             case CHANGE_DOWN_BUTTON:
@@ -3088,7 +3088,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         switch (button)
         {
 #ifdef EXIT_RC_BUTTON
-            case EXIT_RC_BUTTON
+            case EXIT_RC_BUTTON:
 #endif
             case EXIT_BUTTON: /* save and exit */
                 cleanup(NULL);
