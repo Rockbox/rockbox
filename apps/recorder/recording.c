@@ -361,8 +361,10 @@ bool recording_screen(void)
     peak_meter_playback(false);
 
 #ifdef HAVE_SPDIF_IN
+#ifndef SIMULATOR
 if (global_settings.rec_source == SOURCE_SPDIF)
     cpu_boost(true);
+#endif
 #endif
 
 #else
@@ -1014,8 +1016,10 @@ if (global_settings.rec_source == SOURCE_SPDIF)
     audio_close_recording();
 
 #ifdef HAVE_SPDIF_IN
+#ifndef SIMULATOR
 if (global_settings.rec_source == SOURCE_SPDIF)
     cpu_boost(false);
+#endif
 #endif
 
 #else
