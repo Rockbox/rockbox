@@ -54,6 +54,10 @@ PLUGIN_HEADER
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define DEMYSTIFY_RC_QUIT BUTTON_RC_STOP
+#define DEMYSTIFY_RC_ADD_POLYGON BUTTON_RC_BITRATE
+#define DEMYSTIFY_RC_REMOVE_POLYGON BUTTON_RC_SOURCE
+#define DEMYSTIFY_RC_INCREASE_SPEED BUTTON_RC_VOL_UP
+#define DEMYSTIFY_RC_DECREASE_SPEED BUTTON_RC_VOL_DOWN
 #endif
 #endif
 
@@ -103,13 +107,13 @@ struct polygon
 /*
  * Generates a random polygon (which fits the screen size though)
  */
-void polygon_init(struct polygon * polygon)
+void polygon_init(struct polygon * polygon, struct screen * display)
 {
     int i;
     for(i=0;i<NB_POINTS;++i)
     {
-        polygon->points[i].x=(rb->rand() % (LCD_WIDTH));
-        polygon->points[i].y=(rb->rand() % (LCD_HEIGHT));
+        polygon->points[i].x=(rb->rand() % (display->width));
+        polygon->points[i].y=(rb->rand() % (display->height));
     }
 }
 
@@ -117,15 +121,15 @@ void polygon_init(struct polygon * polygon)
  * Draw the given polygon onto the screen
  */
 
-void polygon_draw(struct polygon * polygon)
+void polygon_draw(struct polygon * polygon, struct screen * display)
 {
     int i;
     for(i=0;i<NB_POINTS-1;++i)
     {
-        rb->lcd_drawline(polygon->points[i].x, polygon->points[i].y,
+        display->drawline(polygon->points[i].x, polygon->points[i].y,
                          polygon->points[i+1].x, polygon->points[i+1].y);
     }
-    rb->lcd_drawline(polygon->points[0].x, polygon->points[0].y,
+    display->drawline(polygon->points[0].x, polygon->points[0].y,
                      polygon->points[NB_POINTS-1].x,
                      polygon->points[NB_POINTS-1].y);
 }
@@ -154,7 +158,7 @@ void polygon_move_init(struct polygon_move * polygon_move)
  * Update the given polygon's position according to the given informations in
  * polygon_move (polygon_move may be updated)
  */
-void polygon_update(struct polygon *polygon, struct polygon_move *polygon_move)
+void polygon_update(struct polygon *polygon, struct screen * display, struct polygon_move *polygon_move)
 {
     int i, x, y, step;
     for(i=0;i<NB_POINTS;++i)
@@ -167,9 +171,9 @@ void polygon_update(struct polygon *polygon, struct polygon_move *polygon_move)
             x=1;
             polygon_move->move_steps[i].x=get_new_step(step);
         }
-        else if(x>=LCD_WIDTH)
+        else if(x>=display->width)
         {
-            x=LCD_WIDTH-1;
+            x=display->width-1;
             polygon_move->move_steps[i].x=get_new_step(step);
         }
         polygon->points[i].x=x;
@@ -182,9 +186,9 @@ void polygon_update(struct polygon *polygon, struct polygon_move *polygon_move)
             y=1;
             polygon_move->move_steps[i].y=get_new_step(step);
         }
-        else if(y>=LCD_HEIGHT)
+        else if(y>=display->height)
         {
-            y=LCD_HEIGHT-1;
+            y=display->height-1;
             polygon_move->move_steps[i].y=get_new_step(step);
         }
         polygon->points[i].y=y;
@@ -243,30 +247,25 @@ struct polygon * fifo_pop(struct polygon_fifo * fifo)
  * Drawing stuffs
  */
 
-void polygons_draw(struct polygon_fifo * polygons)
+void polygons_draw(struct polygon_fifo * polygons, struct screen * display)
 {
     int i, j;
     for(i=0, j=polygons->fifo_tail;i<polygons->nb_items;++i, ++j)
     {
         if(j>=MAX_POLYGONS)
             j=0;
-        polygon_draw(&(polygons->tab[j]));
+        polygon_draw(&(polygons->tab[j]), display);
     }
 }
-
-
-
-static struct polygon_fifo polygons;
-static struct polygon_move move; /* This describes the movement of the leading
-                                    polygon, the others just follow */
-static struct polygon leading_polygon;
-
 
 void cleanup(void *parameter)
 {
     (void)parameter;
-    
-    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+
+    rb->screens[SCREEN_MAIN]->backlight_set_timeout(rb->global_settings->backlight_timeout);
+#if NB_SCREENS==2
+    rb->screens[SCREEN_REMOTE]->backlight_set_timeout(rb->global_settings->remote_backlight_timeout);
+#endif
 }
 
 /*
@@ -278,37 +277,46 @@ int plugin_main(void)
     int button;
     int sleep_time=DEFAULT_WAIT_TIME;
     int nb_wanted_polygons=DEFAULT_NB_POLYGONS;
-
-    fifo_init(&polygons);
-    polygon_move_init(&move);
-    polygon_init(&leading_polygon);
-
+    int i;
+    struct polygon_fifo polygons[NB_SCREENS];
+    struct polygon_move move[NB_SCREENS]; /* This describes the movement of the leading
+                                             polygon, the others just follow */
+    struct polygon leading_polygon[NB_SCREENS];
+    FOR_NB_SCREENS(i)
+    {
+        fifo_init(&polygons[i]);
+        polygon_move_init(&move[i]);
+        polygon_init(&leading_polygon[i], rb->screens[i]);
+    }
     while (true)
     {
-        if(polygons.nb_items>nb_wanted_polygons)
-        {   /* We have too many polygons, we must drop some of them */
-            fifo_pop(&polygons);
+        FOR_NB_SCREENS(i)
+        {
+            struct screen * display=rb->screens[i];
+            if(polygons[i].nb_items>nb_wanted_polygons)
+            {   /* We have too many polygons, we must drop some of them */
+                fifo_pop(&polygons[i]);
+            }
+            if(nb_wanted_polygons==polygons[i].nb_items)
+            {   /* We have the good number of polygons, we can safely drop 
+                the last one to add the new one later */
+                fifo_pop(&polygons[i]);
+            }
+            fifo_push(&polygons[i], &leading_polygon[i]);
+
+            /*
+            * Then we update the leading polygon for the next round acording to
+            * current move (the move may be altered in case of sreen border 
+            * collision)
+            */
+            polygon_update(&leading_polygon[i], display, &move[i]);
+
+            /* Now the drawing part */
+
+            display->clear_display();
+            polygons_draw(&polygons[i], display);
+            display->update();
         }
-        if(nb_wanted_polygons==polygons.nb_items)
-        {   /* We have the good number of polygons, we can safely drop the last
-               one to add the new one later */
-            fifo_pop(&polygons);
-        }
-        fifo_push(&polygons, &leading_polygon);
-
-        /*
-         * Then we update the leading polygon for the next round acording to
-         * current move (the move may be altered in case of sreen border 
-         * collision)
-         */
-        polygon_update(&leading_polygon, &move);
-
-        /* Now the drawing part */
-
-        rb->lcd_clear_display();
-        polygons_draw(&polygons);
-        rb->lcd_update();
-
         /* Speed handling*/
         if (sleep_time<0)/* full speed */
             rb->yield();
@@ -322,26 +330,37 @@ int plugin_main(void)
 #ifdef DEMYSTIFY_RC_QUIT
             case DEMYSTIFY_RC_QUIT :
 #endif
-            case (DEMYSTIFY_QUIT):
+            case DEMYSTIFY_QUIT:
                 cleanup(NULL);
                 return PLUGIN_OK;
-
-            case (DEMYSTIFY_ADD_POLYGON):
+#ifdef DEMYSTIFY_RC_ADD_POLYGON
+            case DEMYSTIFY_RC_ADD_POLYGON:
+#endif
+            case DEMYSTIFY_ADD_POLYGON:
                 if(nb_wanted_polygons<MAX_POLYGONS)
                     ++nb_wanted_polygons;
                 break;
 
-            case (DEMYSTIFY_REMOVE_POLYGON):
+#ifdef DEMYSTIFY_RC_REMOVE_POLYGON
+            case DEMYSTIFY_RC_REMOVE_POLYGON:
+#endif
+            case DEMYSTIFY_REMOVE_POLYGON:
                 if(nb_wanted_polygons>MIN_POLYGONS)
                     --nb_wanted_polygons;
                 break;
 
-            case (DEMYSTIFY_INCREASE_SPEED):
+#ifdef DEMYSTIFY_RC_INCREASE_SPEED
+            case DEMYSTIFY_RC_INCREASE_SPEED:
+#endif
+            case DEMYSTIFY_INCREASE_SPEED:
                 if(sleep_time>=0)
                     --sleep_time;
                 break;
 
-            case (DEMYSTIFY_DECREASE_SPEED):
+#ifdef DEMYSTIFY_RC_DECREASE_SPEED
+            case DEMYSTIFY_RC_DECREASE_SPEED:
+#endif
+            case DEMYSTIFY_DECREASE_SPEED:
                 ++sleep_time;
                 break;
 
@@ -363,8 +382,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api; /* copy to global api pointer */
     (void)parameter;
     if (rb->global_settings->backlight_timeout > 0)
-        rb->backlight_set_timeout(1);/* keep the light on */
-
+    {
+        int i;
+        FOR_NB_SCREENS(i)
+            rb->screens[i]->backlight_set_timeout(1);/* keep the light on */
+    }
     ret = plugin_main();
 
     return ret;

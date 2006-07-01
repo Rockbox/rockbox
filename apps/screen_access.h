@@ -127,6 +127,8 @@ struct screen
 #endif
     void (*backlight_on)(void);
     void (*backlight_off)(void);
+    bool (*is_backlight_on)(void);
+    void (*backlight_set_timeout)(int index);
     void (*puts)(int x, int y, const unsigned char *str);
 };
 

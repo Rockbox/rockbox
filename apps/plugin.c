@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -442,6 +442,12 @@ static const struct plugin_api rockbox_api = {
     
     set_int,
     reload_directory,
+    set_bool,
+#if NB_SCREENS == 2
+    {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
+#else
+    {&screens[SCREEN_MAIN]},
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

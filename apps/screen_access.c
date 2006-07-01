@@ -100,6 +100,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->puts=&lcd_remote_puts;
             screen->backlight_on=&remote_backlight_on;
             screen->backlight_off=&remote_backlight_off;
+            screen->is_backlight_on=&is_remote_backlight_on;
+            screen->backlight_set_timeout=&remote_backlight_set_timeout;
             break;
 #endif /* HAVE_REMOTE_LCD */
 
@@ -182,6 +184,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->puts=&lcd_puts;
             screen->backlight_on=&backlight_on;
             screen->backlight_off=&backlight_off;
+            screen->is_backlight_on=&is_backlight_on;
+            screen->backlight_set_timeout=&backlight_set_timeout;
             break;
     }
     screen->screen_type=screen_type;

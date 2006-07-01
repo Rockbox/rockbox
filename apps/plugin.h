@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -104,7 +104,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 22
+#define PLUGIN_API_VERSION 23
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -521,6 +521,8 @@ struct plugin_api {
                     int* variable, void (*function)(int), int step, int min,
                     int max, void (*formatter)(char*, int, int, const char*) );
     void (*reload_directory)(void);
+    bool (*set_bool)(const char* string, bool* variable );
+    struct screen* screens[NB_SCREENS];
 };
 
 /* plugin header */
