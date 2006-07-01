@@ -351,8 +351,6 @@ static int update_dir(void)
         tc.selected_item=tc.filesindir-1;
 
     gui_synclist_select_item(&tree_lists, tc.selected_item);
-    gui_synclist_draw(&tree_lists);
-    gui_syncstatusbar_draw(&statusbars, true);
 #ifdef HAS_BUTTONBAR
     if (global_settings.buttonbar) {
         if (*tc.dirfilter < NUM_FILTER_MODES)
@@ -364,6 +362,8 @@ static int update_dir(void)
         gui_buttonbar_draw(&tree_buttonbar);
     }
 #endif
+    gui_synclist_draw(&tree_lists);
+    gui_syncstatusbar_draw(&statusbars, true);
     return tc.filesindir;
 }
 
