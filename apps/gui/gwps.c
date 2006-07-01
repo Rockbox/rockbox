@@ -601,9 +601,19 @@ long gui_wps_show(void)
                 /* screen settings */
 #ifdef BUTTON_F3
             case BUTTON_F3:
+#ifdef HAVE_LCD_COLOR
+                show_main_backdrop();
+#endif
                 if (quick_screen_f3(button))
                     return SYS_USB_CONNECTED;
+#ifdef HAVE_LCD_BITMAP
+                FOR_NB_SCREENS(i)
+                {
+                    gui_wps_set_margin(&gui_wps[i]);
+                }
+#endif
                 restore = true;
+                lastbutton = 0;
                 break;
 #endif
 
