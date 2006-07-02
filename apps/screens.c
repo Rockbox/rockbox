@@ -53,6 +53,7 @@
 #include "quickscreen.h"
 #include "logo.h"
 #include "pcmbuf.h"
+#include "list.h"
 
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -1006,189 +1007,127 @@ bool shutdown_screen(void)
 }
 #endif
 
-int draw_id3_item(int line, int top, int header, const char* body)
-{
-    if (line >= top)
-    {
-#if defined(HAVE_LCD_BITMAP)
-        const int rows = LCD_HEIGHT / font_get(FONT_UI)->height;
-#else
-        const int rows = 2;
-#endif
-        int y = line - top;
-
-        if (y < rows)
-        {
-            lcd_puts(0, y, str(header));
-        }
-
-        if (++y < rows)
-        {
-            lcd_puts_scroll(0, y,
-                body ? (const unsigned char*) body : str(LANG_ID3_NO_INFO));
-        }
-    }
-
-    return line + 2;
-}
-
 #if CONFIG_CODEC == SWCODEC
 #define ID3_ITEMS   13
 #else
 #define ID3_ITEMS   11
 #endif
 
+char * id3_get_info(int selected_item, void* data, char *buffer)
+{
+    struct mp3entry* id3 =(struct mp3entry*)data;
+    int info_no=selected_item/2;
+    DEBUGF("%d : %d\n",info_no, selected_item);
+    if(!(selected_item%2))
+    {/* header */
+        int headers[]=
+        {
+            LANG_ID3_TITLE,
+            LANG_ID3_ARTIST,
+            LANG_ID3_ALBUM,
+            LANG_ID3_TRACKNUM,
+            LANG_ID3_GENRE,
+            LANG_ID3_YEAR,
+            LANG_ID3_LENGTH,
+            LANG_ID3_PLAYLIST,
+            LANG_ID3_BITRATE,
+            LANG_ID3_FRECUENCY,
+#if CONFIG_CODEC == SWCODEC
+            LANG_ID3_TRACK_GAIN,
+            LANG_ID3_ALBUM_GAIN,
+#endif
+            LANG_ID3_PATH,
+        };
+        return( str(headers[info_no]));
+    }
+    else
+    {/* data */
+
+        char * info=NULL;
+        switch(info_no)
+        {
+            case 0:/*LANG_ID3_TITLE*/
+                info=id3->title;
+                break;
+            case 1:/*LANG_ID3_ARTIST*/
+                info=id3->artist;
+                break;
+            case 2:/*LANG_ID3_ALBUM*/
+                info=id3->album;
+                break;
+            case 3:/*LANG_ID3_TRACKNUM*/
+                if (id3->track_string)
+                    info = id3->track_string;
+                else if (id3->tracknum)
+                {
+                    snprintf(buffer, MAX_PATH, "%d", id3->tracknum);
+                    info = buffer;
+                }
+                break;
+            case 4:/*LANG_ID3_GENRE*/
+                info = id3_get_genre(id3);
+                break;
+            case 5:/*LANG_ID3_YEAR*/
+                if (id3->year_string)
+                    info = id3->year_string;
+                else if (id3->year)
+                {
+                    snprintf(buffer, MAX_PATH, "%d", id3->year);
+                    info = buffer;
+                }
+                break;
+            case 6:/*LANG_ID3_LENGTH*/
+                gui_wps_format_time(buffer, MAX_PATH, id3->length);
+                info=buffer;
+                break;
+            case 7:/*LANG_ID3_PLAYLIST*/
+                snprintf(buffer, MAX_PATH, "%d/%d", playlist_get_display_index(),
+            playlist_amount());
+                info=buffer;
+                break;
+            case 8:/*LANG_ID3_BITRATE*/
+                snprintf(buffer, MAX_PATH, "%d kbps%s", id3->bitrate,
+            id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
+                info=buffer;
+                break;
+            case 9:/*LANG_ID3_FRECUENCY*/
+                snprintf(buffer, MAX_PATH, "%ld Hz", id3->frequency);
+                info=buffer;
+                break;
+#if CONFIG_CODEC == SWCODEC
+            case 10:/*LANG_ID3_TRACK_GAIN*/
+                info=id3->track_gain_string;
+                break;
+            case 11:/*LANG_ID3_ALBUM_GAIN*/
+                info=id3->album_gain_string;
+                break;
+            case 12:/*LANG_ID3_PATH*/
+#else
+            case 10:/*LANG_ID3_PATH*/
+#endif
+                info=id3->path;
+                break;
+        }
+        if(info==NULL)
+            return(str(LANG_ID3_NO_INFO));
+        return(info);
+    }
+}
+
 bool browse_id3(void)
 {
-    char buf[64];
-    const struct mp3entry* id3 = audio_current_track();
-#if defined(HAVE_LCD_BITMAP)
-    const int y_margin = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-    const int line_height = font_get(FONT_UI)->height;
-    const int rows = (LCD_HEIGHT - y_margin) / line_height;
-    const bool show_scrollbar = global_settings.scrollbar
-        && (ID3_ITEMS * 2 > rows);
-#else
-    const int rows = 2;
-#endif
-    const int top_max = (ID3_ITEMS * 2) - (rows & ~1);
-    int top = 0;
-    int button;
-    bool exit = false;
+    struct gui_synclist id3_lists;
+    struct mp3entry* id3 = audio_current_track();
+    int key;
 
-    if (!id3 || (!(audio_status() & AUDIO_STATUS_PLAY)))
-    {
-        return false;
-    }
-
-#if defined(HAVE_LCD_BITMAP)
-    lcd_setmargins(show_scrollbar ? SCROLLBAR_WIDTH : 0, y_margin);
-#endif
-
-    while (!exit)
-    {
-        int line = 0;
-        int old_top = top;
-        char* body;
-
-        lcd_clear_display();
-        gui_syncstatusbar_draw(&statusbars, true);
-        line = draw_id3_item(line, top, LANG_ID3_TITLE,  id3->title);
-        line = draw_id3_item(line, top, LANG_ID3_ARTIST, id3->artist);
-        line = draw_id3_item(line, top, LANG_ID3_ALBUM,  id3->album);
-
-        if (id3->track_string)
-        {
-            body = id3->track_string;
-        }
-        else if (id3->tracknum)
-        {
-            snprintf(buf, sizeof(buf), "%d", id3->tracknum);
-            body = buf;
-        }
-        else
-        {
-            body = NULL;
-        }
-
-        line = draw_id3_item(line, top, LANG_ID3_TRACKNUM, body);
-
-        body = id3->genre_string ? id3->genre_string : id3_get_genre(id3);
-        line = draw_id3_item(line, top, LANG_ID3_GENRE, body);
-
-        if (id3->year_string)
-        {
-            body = id3->year_string;
-        }
-        else if (id3->year)
-        {
-            snprintf(buf, sizeof(buf), "%d", id3->year);
-            body = buf;
-        }
-        else
-        {
-            body = NULL;
-        }
-
-        line = draw_id3_item(line, top, LANG_ID3_YEAR, body);
-
-        gui_wps_format_time(buf, sizeof(buf), id3->length);
-        line = draw_id3_item(line, top, LANG_ID3_LENGTH, buf);
-
-        snprintf(buf, sizeof(buf), "%d/%d", playlist_get_display_index(),
-            playlist_amount());
-        line = draw_id3_item(line, top, LANG_ID3_PLAYLIST, buf);
-
-        snprintf(buf, sizeof(buf), "%d kbps%s", id3->bitrate,
-            id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
-        line = draw_id3_item(line, top, LANG_ID3_BITRATE, buf);
-
-        snprintf(buf, sizeof(buf), "%ld Hz", id3->frequency);
-        line = draw_id3_item(line, top, LANG_ID3_FRECUENCY, buf);
-
-#if CONFIG_CODEC == SWCODEC
-        line = draw_id3_item(line, top, LANG_ID3_TRACK_GAIN,
-            id3->track_gain_string);
-
-        line = draw_id3_item(line, top, LANG_ID3_ALBUM_GAIN,
-            id3->album_gain_string);
-#endif
-
-        line = draw_id3_item(line, top, LANG_ID3_PATH, id3->path);
-
-#if defined(HAVE_LCD_BITMAP)
-        if (show_scrollbar)
-        {
-            scrollbar(0, y_margin, SCROLLBAR_WIDTH - 1, rows * line_height,
-                ID3_ITEMS * 2 + (rows & 1), top, top + rows, VERTICAL);
-        }
-#endif
-
-        while (!exit && (top == old_top))
-        {
-            gui_syncstatusbar_draw(&statusbars, false);
-            lcd_update();
-            button = button_get_w_tmo(HZ / 2);
-
-            switch(button)
-            {
-            /* It makes more sense to have the keys mapped "backwards" when
-             * scrolling a list on the archos studios/players and the ipod.
-             */
-#if defined(HAVE_LCD_BITMAP) && !(CONFIG_KEYPAD == IPOD_4G_PAD)
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
-#else
-            case SETTINGS_DEC:
-#endif
-                if (top > 0)
-                {
-                    top -= 2;
-                }
-                else if (!(button & BUTTON_REPEAT))
-                {
-                    top = top_max;
-                }
-
-                break;
-
-#if defined(HAVE_LCD_BITMAP) && !(CONFIG_KEYPAD == IPOD_4G_PAD)
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
-#else
-            case SETTINGS_INC:
-#endif
-                if (top < top_max)
-                {
-                    top += 2;
-                }
-                else if (!(button & BUTTON_REPEAT))
-                {
-                    top = 0;
-                }
-
-                break;
-
+    gui_synclist_init(&id3_lists, &id3_get_info, id3, true, 2);
+    gui_synclist_set_nb_items(&id3_lists, ID3_ITEMS*2);
+    gui_synclist_draw(&id3_lists);
+    while (true) {
+        key = button_get_w_tmo(HZ/2);
+        /* If moved, "say" the entry under the cursor */
+        gui_synclist_do_button(&id3_lists, key);
+        switch( key ) {
 #ifdef SETTINGS_OK2
             case SETTINGS_OK2:
 #endif
@@ -1196,22 +1135,16 @@ bool browse_id3(void)
                 lcd_stop_scroll();
                 /* Eat release event */
                 button_get(true);
-                exit = true;
-                break;
+                return(false);
 
             default:
-                if (default_event_handler(button) == SYS_USB_CONNECTED)
-                {
+                if (default_event_handler(key) == SYS_USB_CONNECTED)
                     return true;
-                }
-
-                break;
-            }
         }
+        gui_syncstatusbar_draw(&statusbars, false);
     }
-
-    return false;
 }
+
 
 bool set_rating(void)
 {

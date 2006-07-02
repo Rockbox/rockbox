@@ -5469,7 +5469,7 @@
     *: "[Bitrate]"
   </source>
   <dest>
-    *: "[Fréquence]"
+    *: "[Débit binaire]"
   </dest>
   <voice>
     *: ""
@@ -5511,7 +5511,7 @@
     *: "[Frequency]"
   </source>
   <dest>
-    *: "[Fréquence]"
+    *: "[Échantillonnage]"
   </dest>
   <voice>
     *: ""

@@ -621,7 +621,7 @@ bool playlist_viewer_ex(char* filename)
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
 
-    gui_synclist_init(&playlist_lists, playlist_callback_name, &viewer);
+    gui_synclist_init(&playlist_lists, playlist_callback_name, &viewer, false, 1);
     gui_synclist_set_icon_callback(&playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
@@ -873,7 +873,7 @@ bool search_playlist(void)
     }
     backlight_on();
     gui_synclist_init(&playlist_lists, playlist_search_callback_name,
-                                found_indicies);
+                                found_indicies, false, 1);
     gui_synclist_set_icon_callback(&playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_search_callback_icons:NULL);

@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Bjï¿½n Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -488,7 +488,8 @@ struct plugin_api {
 
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
-            list_get_name callback_get_item_name,void * data);
+            list_get_name callback_get_item_name,void * data,
+            bool scroll_all,int selected_size);
     void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
     void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
     int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);

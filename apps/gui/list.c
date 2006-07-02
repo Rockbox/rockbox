@@ -47,7 +47,9 @@ static bool offset_out_of_view = false;
 
 void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
-    void * data
+    void * data,
+    bool scroll_all,
+    int selected_size
     )
 {
     gui_list->callback_get_item_icon = NULL;
@@ -62,6 +64,8 @@ void gui_list_init(struct gui_list * gui_list,
 #ifdef HAVE_LCD_BITMAP
     gui_list->offset_position = 0;
 #endif
+    gui_list->scroll_all=scroll_all;
+    gui_list->selected_size=selected_size;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -212,8 +216,8 @@ void gui_list_draw(struct gui_list * gui_list)
                     item_offset = gui_list->offset_position;
 
 #endif
-        if(current_item == gui_list->selected_item) {
-            /* The selected item must be displayed scrolling */
+        if(current_item >= gui_list->selected_item && current_item < gui_list->selected_item+gui_list->selected_size)
+        {/* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)/* Display inverted-line-style*/
                 /* if text got out of view */
@@ -237,11 +241,22 @@ void gui_list_draw(struct gui_list * gui_list)
         }
         else
         {/* normal item */
+            if(gui_list->scroll_all)
+            {
 #ifdef HAVE_LCD_BITMAP
-            display->puts_offset(0, i, entry_name,item_offset);
+                display->puts_scroll_offset(0, i, entry_name,item_offset);
 #else
-            display->puts(text_pos, i, entry_name);
+                display->puts_scroll(text_pos, i, entry_name);
 #endif
+            }
+            else
+            {
+#ifdef HAVE_LCD_BITMAP
+                display->puts_offset(0, i, entry_name,item_offset);
+#else
+                display->puts(text_pos, i, entry_name);
+#endif
+            }
         }
         /* Icons display */
         if(draw_icons)
@@ -280,29 +295,26 @@ void gui_list_select_item(struct gui_list * gui_list, int item_number)
 
 void gui_list_select_next(struct gui_list * gui_list)
 {
-    int item_pos;
-    int end_item;
-
-    if( gui_list->selected_item == gui_list->nb_items-1 )
+    if( gui_list->selected_item+gui_list->selected_size >= gui_list->nb_items )
     {
         if(gui_list->limit_scroll)
             return;
-        gui_list->selected_item++;
         /* we have already reached the bottom of the list */
         gui_list->selected_item = 0;
         gui_list->start_item = 0;
     }
     else
     {
+        gui_list->selected_item+=gui_list->selected_size;
         int nb_lines = gui_list->display->nb_lines;
-        gui_list->selected_item++;
-        item_pos = gui_list->selected_item - gui_list->start_item;
-        end_item = gui_list->start_item + nb_lines;
+        int item_pos = gui_list->selected_item - gui_list->start_item;
+        int end_item = gui_list->start_item + nb_lines;
+
         if (global_settings.scroll_paginated)
         {
             /* When we reach the bottom of the list
              * we jump to a new page if there are more items*/
-            if( item_pos > nb_lines-1 && end_item < gui_list->nb_items )
+            if( item_pos > nb_lines-gui_list->selected_size && end_item < gui_list->nb_items )
             {
                 gui_list->start_item = gui_list->selected_item;
                 if ( gui_list->start_item > gui_list->nb_items-nb_lines )
@@ -315,22 +327,21 @@ void gui_list_select_next(struct gui_list * gui_list)
              * (nb_lines-SCROLL_LIMIT)
              * and when we are not in the last part of the list*/
             if( item_pos > nb_lines-SCROLL_LIMIT && end_item < gui_list->nb_items )
-                gui_list->start_item++;
+                gui_list->start_item+=gui_list->selected_size;
         }
     }
 }
 
 void gui_list_select_previous(struct gui_list * gui_list)
 {
-    if( gui_list->selected_item == 0 )
+    if( gui_list->selected_item-gui_list->selected_size < 0 )
     {
         int nb_lines = gui_list->display->nb_lines;
         if(gui_list->limit_scroll)
             return;
-        gui_list->selected_item--;
         /* we have aleady reached the top of the list */
         int start;
-        gui_list->selected_item = gui_list->nb_items-1;
+        gui_list->selected_item = gui_list->nb_items-gui_list->selected_size;
         start = gui_list->nb_items-nb_lines;
         if( start < 0 )
             gui_list->start_item = 0;
@@ -341,31 +352,31 @@ void gui_list_select_previous(struct gui_list * gui_list)
     {
         int item_pos;
         int nb_lines = gui_list->display->nb_lines;
-        gui_list->selected_item--;
+        gui_list->selected_item-=gui_list->selected_size;
         item_pos = gui_list->selected_item - gui_list->start_item;
         if (global_settings.scroll_paginated)
         {
             /* When we reach the top of the list
              * we jump to a new page if there are more items*/
-            if( item_pos < 0 && gui_list->start_item > 0 )
-                gui_list->start_item = gui_list->selected_item-nb_lines+1;
-            if( gui_list->start_item < 0 )
-                gui_list->start_item = 0;
+            if( item_pos < 0)
+                gui_list->start_item = gui_list->selected_item-nb_lines+gui_list->selected_size;
         }
         else
         {
             /* we start scrolling vertically when reaching the line
              * (nb_lines-SCROLL_LIMIT)
              * and when we are not in the last part of the list*/
-            if( item_pos < SCROLL_LIMIT-1 && gui_list->start_item > 0 )
-                gui_list->start_item--;
+            if( item_pos < SCROLL_LIMIT-1)
+                gui_list->start_item-=gui_list->selected_size;
         }
+        if( gui_list->start_item < 0 )
+            gui_list->start_item = 0;
     }
 }
 
 void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
 {
-    if(gui_list->selected_item == gui_list->nb_items-1)
+    if(gui_list->selected_item == gui_list->nb_items-gui_list->selected_size)
     {
         if(gui_list->limit_scroll)
             return;
@@ -373,6 +384,7 @@ void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
+        nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item += nb_lines;
         if(gui_list->selected_item > gui_list->nb_items-1)
             gui_list->selected_item = gui_list->nb_items-1;
@@ -386,10 +398,11 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
     {
         if(gui_list->limit_scroll)
             return;
-        gui_list->selected_item = gui_list->nb_items - 1;
+        gui_list->selected_item = gui_list->nb_items - gui_list->selected_size;
     }
     else
     {
+        nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item -= nb_lines;
         if(gui_list->selected_item < 0)
             gui_list->selected_item = 0;
@@ -467,7 +480,9 @@ void gui_list_screen_scroll_out_of_view(bool enable)
 void gui_synclist_init(
     struct gui_synclist * lists,
     list_get_name callback_get_item_name,
-    void * data
+    void * data,
+    bool scroll_all,
+    int selected_size
     )
 {
     int i;
@@ -475,7 +490,7 @@ void gui_synclist_init(
     {
         gui_list_init(&(lists->gui_list[i]),
                       callback_get_item_name,
-                      data);
+                      data, scroll_all, selected_size);
         gui_list_set_display(&(lists->gui_list[i]), &(screens[i]));
     }
 }
@@ -641,9 +656,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGRIGHT:
         case LIST_RC_PGRIGHT | BUTTON_REPEAT:
 #endif
-        gui_synclist_scroll_right(lists);
-        gui_synclist_draw(lists);
-        return true;
+            gui_synclist_scroll_right(lists);
+            gui_synclist_draw(lists);
+            return true;
 #endif
 
 #ifdef LIST_PGLEFT
@@ -653,9 +668,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
         case LIST_RC_PGLEFT:
         case LIST_RC_PGLEFT | BUTTON_REPEAT:
 #endif
-        gui_synclist_scroll_left(lists);
-        gui_synclist_draw(lists);
-        return true;
+            gui_synclist_scroll_left(lists);
+            gui_synclist_draw(lists);
+            return true;
 #endif
 
 /* for pgup / pgdown, we are obliged to have a different behaviour depending on the screen

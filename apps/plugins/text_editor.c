@@ -245,7 +245,7 @@ void save_changes(int overwrite)
 
 void setup_lists(struct gui_synclist *lists, int sel)
 {
-    rb->gui_synclist_init(lists,list_get_name_cb,0);
+    rb->gui_synclist_init(lists,list_get_name_cb,0, false, 1);
     rb->gui_synclist_set_icon_callback(lists,NULL);
     rb->gui_synclist_set_nb_items(lists,line_count);
     rb->gui_synclist_limit_scroll(lists,true);

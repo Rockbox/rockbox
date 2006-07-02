@@ -147,6 +147,11 @@ struct gui_list
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
     bool limit_scroll;
+    /* wether the text of the whole items of the list have to be
+     * scrolled or only for the selected item */
+    bool scroll_all;
+    /* the number of lines that are selected at the same time */
+    int selected_size;
     /* The data that will be passed to the callback function YOU implement */
     void * data;
 };
@@ -162,7 +167,9 @@ struct gui_list
  */
 extern void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
-    void * data
+    void * data,
+    bool scroll_all,
+    int selected_size
     );
 
 /*
@@ -329,7 +336,9 @@ struct gui_synclist
 extern void gui_synclist_init(
     struct gui_synclist * lists,
     list_get_name callback_get_item_name,
-    void * data
+    void * data,
+    bool scroll_all,
+    int selected_size
     );
 extern void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items);
 extern void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback);
