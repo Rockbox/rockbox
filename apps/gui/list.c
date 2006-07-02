@@ -658,7 +658,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_PGRIGHT;
 #endif
 
 #ifdef LIST_PGLEFT
@@ -670,7 +670,7 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 #endif
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
-            return true;
+            return LIST_PGLEFT;
 #endif
 
 /* for pgup / pgdown, we are obliged to have a different behaviour depending on the screen

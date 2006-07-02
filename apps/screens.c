@@ -1017,7 +1017,6 @@ char * id3_get_info(int selected_item, void* data, char *buffer)
 {
     struct mp3entry* id3 =(struct mp3entry*)data;
     int info_no=selected_item/2;
-    DEBUGF("%d : %d\n",info_no, selected_item);
     if(!(selected_item%2))
     {/* header */
         int headers[]=
@@ -1125,22 +1124,8 @@ bool browse_id3(void)
     gui_synclist_draw(&id3_lists);
     while (true) {
         key = button_get_w_tmo(HZ/2);
-        /* If moved, "say" the entry under the cursor */
-        gui_synclist_do_button(&id3_lists, key);
-        switch( key ) {
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-            case SETTINGS_CANCEL:
-                lcd_stop_scroll();
-                /* Eat release event */
-                button_get(true);
-                return(false);
-
-            default:
-                if (default_event_handler(key) == SYS_USB_CONNECTED)
-                    return true;
-        }
+        if(key!=BUTTON_NONE && !(key&BUTTON_REL) && !gui_synclist_do_button(&id3_lists, key))
+            return(default_event_handler(key) == SYS_USB_CONNECTED);
         gui_syncstatusbar_draw(&statusbars, false);
     }
 }
