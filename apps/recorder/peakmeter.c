@@ -139,17 +139,17 @@ static const long clip_time_out[] = {
 /* precalculated peak values that represent magical
    dBfs values. Used to draw the scale */
 static const int db_scale_src_values[DB_SCALE_SRC_VALUES_SIZE] = {
-    32752, /*   0 db */
-    22784, /* - 3 db */
-    14256, /* - 6 db */
-    11752, /* - 9 db */
-    9256,  /* -12 db */
-    4256,  /* -18 db */
-    2186,  /* -24 db */
-    1186,  /* -30 db */
-    373,   /* -40 db */
-    102,   /* -50 db */
-    33,    /* -60 db */
+    32736, /*   0 db */
+    22752, /* - 3 db */
+    16640, /* - 6 db */
+    11648, /* - 9 db */
+    8320,  /* -12 db */
+    4364,  /* -18 db */
+    2064,  /* -24 db */
+    1194,  /* -30 db */
+    363,   /* -40 db */
+    101,   /* -50 db */
+    34,    /* -60 db */
     0,     /* -inf   */
 };
 
@@ -160,17 +160,19 @@ static int db_scale_count = DB_SCALE_SRC_VALUES_SIZE;
  * @param int sample - The input value 
  *                    Make sure that 0 <= value < SAMPLE_RANGE
  *
- * @return int - The 2 digit fixed comma result of the euation
+ * @return int - The 2 digit fixed point result of the euation
  *               20 * log (sample / SAMPLE_RANGE) + 90
- *               Output range is 0-8961 (that is 0,0 - 89,6 dB).
+ *               Output range is 0-9000 (that is 0.0 - 90.0 dB).
  *               Normally 0dB is full scale, here it is shifted +90dB.
  *               The calculation is based on the results of a linear
  *               approximation tool written specifically for this problem
- *               by Andreas Zwirtes (radhard@gmx.de). The result hat an
+ *               by Andreas Zwirtes (radhard@gmx.de). The result has an
  *               accurracy of better than 2%. It is highly runtime optimized,
  *               the cascading if-clauses do an successive approximation on
  *               the input value. This avoids big lookup-tables and
  *               for-loops.
+ *               Improved by Jvo Studer for errors < 0.2dB for critical
+ *               range of -12dB to 0dB (78.0 to 90.0dB).
  */
 
 int calc_db (int isample) 
@@ -180,81 +182,69 @@ int calc_db (int isample)
     long m;
     int istart;
 
-    /* Range 1-4 */
-    if (isample < 119) {
+    if (isample < 2308) { /* Range 1-5 */
 
-        /* Range 1-2 */
-        if (isample < 5) {
+        if (isample < 115) { /* Range 1-3 */
 
-            /* Range 1 */
-            if (isample < 1) {
-                istart = 0;
-                n = 0;
-                m = 5900;
-            }
+            if (isample < 24) {
 
-            /* Range 2 */
-            else {
-                istart = 1;
-                n = 59;
+                if (isample < 5) {
+                    istart = 1; /* Range 1 */
+                    n = 98;
                 m = 34950;
             }
-        }
-
-        /* Range 3-4 */
         else {
-
-            /* Range 3 */
-            if (isample < 24) {
-                istart = 5;
-                n = 1457;
+                    istart = 5; /* Range 2 */
+                    n = 1496;
                 m = 7168;
             }
-
-            /* Range 4 */
+            }
             else {
-                istart = 24;
-                n = 2819;
-                m = 1464;
+                istart = 24;  /* Range 3 */
+                n = 2858;
+                m = 1498;
+            }
+        }
+        else { /* Range 4-5 */
+
+            if (isample < 534) {
+                istart = 114; /* Range 4 */
+                n = 4207;
+                m = 319;
+            }
+            else {
+                istart = 588; /* Range 5 */
+                n = 5583;
+                m = 69;
             }
         }
     }
 
-    /* Range 5-8 */
-    else {
+    else {  /* Range 6-9 */
 
-        /* Range 5-6 */
-        if (isample < 2918) {
+        if (isample < 12932) {
 
-            /* Range 5 */
-            if (isample < 592) {
-                istart = 119;
-                n = 4210;
-                m = 295;
+            if (isample < 6394) {
+                istart = 2608; /* Range 6 */
+                n = 6832;
+                m = 21;
             }
-
-            /* Range 6 */
             else {
-                istart = 592;
-                n = 5605;
-                m = 60;
+                istart = 7000; /* Range 7 */
+                n = 7682;
+                m = 9;
             }
         }
-
-        /* Range 7-8 */
         else {
 
-            /* Range 7 */
-            if (isample < 15352) {
-                istart = 2918;
-                n = 7001;
-                m = 12;
+            if (isample < 22450) {
+                istart = 13000; /* Range 8 */
+                n = 8219;
+                m = 5;
             }
-
-            /* Range 8 */
             else {
-                istart = 15352;
-                n = 8439;
+                istart = 22636; /* Range 9 */
+                n = 8697;
                 m = 3;
             }
         }
