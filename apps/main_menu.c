@@ -153,8 +153,10 @@ bool show_info(void)
             screens[i].clear_display();
 #ifdef HAVE_LCD_BITMAP
             screens[i].puts(0, y, str(LANG_ROCKBOX_INFO));
+#endif
         }
-        y = y + 2;
+#ifdef HAVE_LCD_BITMAP
+        y += 2;
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -229,8 +231,10 @@ bool show_info(void)
 #endif
         }
 
+#if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
         FOR_NB_SCREENS(i)
                 screens[i].update();
+#endif
 
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
