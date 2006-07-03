@@ -1074,10 +1074,12 @@ static void rebuffer_and_seek(size_t newpos)
     last_peek_offset = 0;
     initialize_buffer_fill(true);
 
-    if (newpos > AUDIO_REBUFFER_GUESS_SIZE)
+    if (newpos > AUDIO_REBUFFER_GUESS_SIZE) {
+        buf_ridx += AUDIO_REBUFFER_GUESS_SIZE;
         cur_ti->start_pos = newpos - AUDIO_REBUFFER_GUESS_SIZE;
-    else
+    } else {
         cur_ti->start_pos = 0;
+    }
 
     cur_ti->filerem = cur_ti->filesize - cur_ti->start_pos;
     cur_ti->available = 0;
