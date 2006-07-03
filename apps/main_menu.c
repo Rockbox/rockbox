@@ -78,6 +78,7 @@ bool show_info(void)
     unsigned long size, free;
     long buflen = ((audiobufend - audiobuf) * 2) / 2097;  /* avoid overflow */
     int key;
+    int i;
     bool done = false;
     bool new_info = true;
 #ifdef HAVE_MULTIVOLUME
@@ -147,10 +148,13 @@ bool show_info(void)
             new_info = false;
         }
 
-        lcd_clear_display();
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
 #ifdef HAVE_LCD_BITMAP
-        lcd_puts(0, y++, str(LANG_ROCKBOX_INFO));
-        y++;
+            screens[i].puts(0, y, str(LANG_ROCKBOX_INFO));
+        }
+        y = y + 2;
 #endif
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -167,8 +171,9 @@ bool show_info(void)
             snprintf(s, sizeof(s), (char *)str(LANG_BUFFER_STAT_RECORDER),
                      integer, decimal);
 #endif
-            lcd_puts_scroll(0, y++, (unsigned char *)s);
-
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s);
+            y++;
 #if CONFIG_CHARGING == CHARGING_CONTROL
             if (charge_state == CHARGING)
                 snprintf(s, sizeof(s), (char *)str(LANG_BATTERY_CHARGE));
@@ -183,7 +188,9 @@ bool show_info(void)
                          battery_time() / 60, battery_time() % 60);
             else
                 strncpy(s, "(n/a)", sizeof(s));
-            lcd_puts_scroll(0, y++, (unsigned char *)s);
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s); 
+            y++;
         }
 
 #ifdef HAVE_LCD_CHARCELLS
@@ -195,35 +202,52 @@ bool show_info(void)
             output_dyn_value(s2, sizeof s2, size, kbyte_units, true);
             snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_INTERNAL),
                      s1, s2);
-            lcd_puts_scroll(0, y++, (unsigned char *)s);
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s);
+            y++;
 
             if (size2) {
                 output_dyn_value(s1, sizeof s1, free2, kbyte_units, true);
                 output_dyn_value(s2, sizeof s2, size2, kbyte_units, true);
                 snprintf(s, sizeof s, "%s %s/%s", str(LANG_DISK_NAME_MMC),
                          s1, s2);
-                lcd_puts_scroll(0, y++, (unsigned char *)s);
+                FOR_NB_SCREENS(i)
+                    screens[i].puts_scroll(0, y, (unsigned char *)s);
+                y++;
             }
 #else
             output_dyn_value(s1, sizeof s1, size, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_SIZE_INFO), s1);
-            lcd_puts_scroll(0, y++, (unsigned char *)s);
-
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s);
+            y++;
             output_dyn_value(s1, sizeof s1, free, kbyte_units, true);
             snprintf(s, sizeof s, SIZE_FMT, str(LANG_DISK_FREE_INFO), s1);
-            lcd_puts_scroll(0, y++, (unsigned char *)s);
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0, y, (unsigned char *)s);
+            y++;
 #endif
         }
 
-        lcd_update();
+        FOR_NB_SCREENS(i)
+                screens[i].update();
 
         /* Wait for a key to be pushed */
         key = button_get_w_tmo(HZ*5);
         switch(key) {
 
             case SETTINGS_OK:
+#ifdef SETTINGS_RC_OK
+            case SETTINGS_RC_OK:
+#endif
 #ifdef SETTINGS_OK2
             case SETTINGS_OK2:
+#endif
+#ifdef SETTINGS_RC_OK2
+            case SETTINGS_RC_OK2:
+#endif
+#ifdef SETTINGS_RC_CANCEL
+            case SETTINGS_RC_CANCEL:
 #endif
             case SETTINGS_CANCEL:
                 done = true;
@@ -232,11 +256,20 @@ bool show_info(void)
 #ifdef HAVE_LCD_CHARCELLS
             case SETTINGS_INC:
             case SETTINGS_DEC:
+#ifdef SETTINGS_RC_INC
+            case SETTINGS_RC_INC:
+#endif
+#ifdef SETTINGS_RC_DEC
+            case SETTINGS_RC_DEC:
+#endif
                 page = (page == 0) ? 1 : 0;
                 break;
 #endif
 
 #ifndef SIMULATOR
+#ifdef SETTINGS_RC_ACCEPT
+            case SETTINGS_RC_ACCEPT:
+#endif
 #ifdef SETTINGS_ACCEPT
             case SETTINGS_ACCEPT:
 #else
