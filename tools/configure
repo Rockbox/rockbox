@@ -1262,7 +1262,7 @@ clean:
 	\$(SILENT)echo Cleaning build directory
 	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
-                  @ARCHOSROM@ @FLASHFILE@ UI256.bmp
+                  @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
