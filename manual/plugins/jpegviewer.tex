@@ -1,51 +1,51 @@
+% $Id$ %
 \subsection{JPEG viewer}
-Open a .jpg file in the file browser to view it\opt{recorder,recorderv2fm,ondio,h1xx}
-{ contents using Rockbox's greyscale library}. 
+Open a JPEG file in the \setting{File Browser} to view it
+\opt{recorder,recorderv2fm,ondio,h1xx}{ using Rockbox's greyscale library}.
 \note{When an audio file is playing the size of the image is limited as 
-the decoding process needs to share memory with audio tracks. To be able viewing
-bigger file you may need to stop playback.}
-
-\fixme{use btnmap here -- make this table break more nicely}
+the decoding process needs to share memory with audio tracks. To be able to
+view a bigger file you may need to stop playback.}
 \begin{table}
-\begin{center}
-    \begin{tabularx}{.8\textwidth}{lX}\toprule
-    \btnhead
-    \opt{recorder,recorderv2fm,h1xx,h300}{\ButtonUp\ / \ButtonDown\ / }
-      \ButtonLeft\ / \ButtonRight
+\begin{btnmap}{}{}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp\ / \ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonMenu\ / \ButtonPlay}
+        / \ButtonLeft\ / \ButtonRight
     & Move around in zoomed in image\\
-    \opt{recorder,recorderv2fm}{\ButtonPlay}
-    \opt{ondio}{\ButtonMenu}
-    \opt{h1xx,h300}{\ButtonSelect}
-    \opt{ipodcolor,ipodnano}{\ButtonScrollFwd}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
     & Zoom in\\
-    \opt{recorder,recorderv2fm}{\fixme{MENU}}
-    \opt{ondio}{\ButtonMenu+\ButtonDown}
-    \opt{h1xx,h300}{\ButtonMode}
-    \opt{ipodcolor,ipodnano,ipod4g,ipodmini}{\ButtonScrollBack}
+    \opt{RECORDER_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonScrollBack}
+    \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
     & Zoom out\\
-    \opt{recorder,recorderv2fm}{\ButtonFThree}
-    \opt{ondio}{\ButtonMenu+\ButtonRight}
-    \opt{h1xx}{\ButtonOn}
-    \opt{h300}{\ButtonRec}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonRight}
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
+    \opt{IRIVER_H100_PAD}{\ButtonOn}
+    \opt{IRIVER_H300_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonRight}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     & Next jpeg in folder\\
-    \opt{recorder,recorderv2fm}{\ButtonFTwo}
-    \opt{ondio}{\ButtonMenu}
-    \opt{h1xx}{\ButtonRec}
-    \opt{h300}{\ButtonOn}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonLeft}
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonRec}
+    \opt{IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft}
     & Previous jpeg in folder\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOff}
-    \opt{ondio}{\ButtonOff}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonMenu}
-    & Show menu\\\bottomrule
-    \end{tabularx}
-    \end{center}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Show menu\\
+\end{btnmap}
 \end{table}
 
 The menu has the following entries.
 \begin{description}
-\item[Quit.] Quits the viewer and returns to the file browser.
+\item[Quit.] Quits the viewer and returns to the \setting{File Browser}.
 \item[Toggle Slideshow Mode.] Enables or disables the slideshow mode.
 \item[Change Slideshow Timeout.] You can set the timeout for the slideshow
   between 1 second and 20 seconds.
