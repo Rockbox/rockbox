@@ -644,9 +644,11 @@ static bool dirbrowse(void)
                     /* Stop the music if it is playing */
                     if(audio_status()) {
                         if (!global_settings.party_mode)
+                        {
                             if (global_settings.fade_on_stop)
                                 fade(0);
                             audio_stop();
+                        }
                     }
 #if defined(CONFIG_CHARGING) && \
     (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
