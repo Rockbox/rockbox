@@ -835,7 +835,7 @@ static bool dirbrowse(void)
                     if (attr & ATTR_DIRECTORY)
                     {
                         DEBUGF("Playing directory thumbnail: %s", currdir);
-                        res = ft_play_dirname(lasti);
+                        res = ft_play_dirname(name);
                         if (res < 0) /* failed, not existing */
                         {   /* say the number instead, as a fallback */
                             talk_id(VOICE_DIR, false);
@@ -1298,17 +1298,16 @@ int ft_play_filenumber(int pos, int attr)
     return 1;
 }
 
-int ft_play_dirname(int start_index)
+int ft_play_dirname(char* name)
 {
     int fd;
     char dirname_mp3_filename[MAX_PATH+1];
-    struct entry *dircache = tc.dircache;
 
     if (audio_status() & AUDIO_STATUS_PLAY)
         return 0;
 
     snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
-             tc.currdir[1] ? tc.currdir : "" , dircache[start_index].name,
+             tc.currdir[1] ? tc.currdir : "" , name, 
              dir_thumbnail_name);
 
     DEBUGF("Checking for %s\n", dirname_mp3_filename);

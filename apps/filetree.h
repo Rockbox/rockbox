@@ -22,7 +22,7 @@
 
 int ft_load(struct tree_context* c, const char* tempdir);
 int ft_play_filenumber(int pos, int attr);
-int ft_play_dirname(int start_index);
+int ft_play_dirname(char* name);
 void ft_play_filename(char *dir, char *file);
 int ft_enter(struct tree_context* c);
 int ft_exit(struct tree_context* c);
