@@ -246,7 +246,7 @@ tile minefield[LCD_HEIGHT/8][LCD_WIDTH/8];
 /* total number of mines on the game */
 int mine_num = 0;
 
-/* percentage of mines on minefield used durring generation */
+/* percentage of mines on minefield used during generation */
 int p=16;
 
 /* number of tiles left on the game */
@@ -460,8 +460,10 @@ int minesweeper(void)
         rb->lcd_puts(0,6,"ON to start");
 #elif CONFIG_KEYPAD == ONDIO_PAD
         rb->lcd_puts(0,6,"MODE to start");
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD==IRIVER_H100_PAD) || (CONFIG_KEYPAD==IPOD_4G_PAD)
         rb->lcd_puts(0,6,"SELECT to start");
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+        rb->lcd_puts(0,6,"REC to start");
 #endif
         rb->lcd_update();
 
