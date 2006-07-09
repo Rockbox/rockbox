@@ -58,7 +58,7 @@ for the next daily builds.}
       uninstall Rockbox from your Ipod}
   \item Extract the Apple firmware from the partition image image just created:
     \begin{code}
-    ipodpatcher -r \emph{N} bootpartition.bin
+    ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{code}
 \optv{ipodvideo}{
   \item Similarly, extract the Broadcom firmware:
