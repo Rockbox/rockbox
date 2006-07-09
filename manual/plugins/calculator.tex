@@ -1,12 +1,36 @@
+% $Id$ %
 \subsection{Calculator}
-{\centering\itshape
-%\includegraphics{plugins/images/\platform/ss_calculator.png}
-\par}
+\screenshot{plugins/images/ss-calculator}{Calculator}{img:calculator}
 
-This is a simple scientific calculator for
-use on the Jukebox.  It works like a standard calculator.  Move using
-the arrow keys and press PLAY to press a button.  Pressing the ``1st''
-button will toggle between other available maths functions on the right
-hand side.
+This is a simple scientific calculator for use on the \dap. It works like a
+standard calculator. Pressing the ``1st'' button will toggle between other
+available maths functions on the right hand side.
 
+\begin{table}
+\begin{btnmap}{}{}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Direction keys}
+    \opt{IPOD_4G_PAD}{\ButtonLeft, \ButtonRight, \ButtonScrollFwd,
+        \ButtonScrollBack}
+    & Move around the keypad\\
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonSelect}
+    & Press a button on the keypad\\
+    \opt{RECORDER_PAD}{\ButtonFOne & Delete last entered digit or clear after
+        calculation\\}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRec & Delete
+        last entered digit or clear after calculation\\}
 
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{ONDIO_PAD}{Hold \ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD}{Hold \ButtonPlay}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
+    & Calculate\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Quit\\
+\end{btnmap}
+\end{table}
