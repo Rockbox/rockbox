@@ -26,6 +26,7 @@
 #include "file.h"
 #include "dircache.h"
 #include "timefuncs.h"
+#include "tagcache.h"
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
@@ -439,8 +440,11 @@ struct user_settings
 #ifdef HAVE_DIRCACHE
     bool dircache;          /* enable directory cache */
     int dircache_size;      /* directory cache structure last size, 22 bits */
-    bool tagcache_ram;      /* tag cache mode (0=disabled,1=disk,2=ram) */
 #endif
+#ifdef HAVE_TC_RAMCACHE
+    bool tagcache_ram;        /* load tagcache to ram? */
+#endif
+    bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
     int default_codepage;   /* set default codepage for tag conversion */
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
