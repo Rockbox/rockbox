@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 44
+#define CONFIG_BLOCK_VERSION 45
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -554,8 +554,11 @@ static const struct bit_entry hd_bits[] =
 #ifdef HAVE_DIRCACHE
     {1, S_O(dircache), false, "dircache", off_on },
     {22, S_O(dircache_size), 0, NULL, NULL },
+#endif
+#ifdef HAVE_TC_RAMCACHE
     {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
 #endif
+    {1, S_O(tagcache_autoupdate), 0, "tagcache_autoupdate", off_on },
 
     {4, S_O(default_codepage), 0, "default codepage",
         "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256" },
@@ -563,6 +566,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(warnon_erase_dynplaylist), false,
         "warn when erasing dynamic playlist", off_on },
 
+    
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

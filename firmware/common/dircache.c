@@ -690,6 +690,14 @@ bool dircache_is_enabled(void)
 }
 
 /**
+ * Returns true if dircache is being initialized.
+ */
+bool dircache_is_initializing(void)
+{
+    return dircache_initializing;
+}
+
+/**
  * Returns the current number of entries (directories and files) in the cache.
  */
 int dircache_get_entry_count(void)

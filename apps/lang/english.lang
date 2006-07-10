@@ -1676,7 +1676,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu 
   user:
   <source>
     *: "Tag Cache"
@@ -1690,16 +1690,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Keep on Disk"
+    *: ""
   </dest>
   <voice>
-    *: "Keep on Disk"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1717,17 +1717,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TAGCACHE_FORCE_UPDATE
+  id: LANG_TAGCACHE_INITIALIZE
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </dest>
   <voice>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </voice>
 </phrase>
 <phrase>
@@ -8529,3 +8529,31 @@
     *: "Remote Scrolling Options"
   </voice>
 </phrase>   
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Update now"
+  </dest>
+  <voice>
+    *: "Update now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Auto update"
+  </dest>
+  <voice>
+    *: "Auto update"
+  </voice>
+</phrase>

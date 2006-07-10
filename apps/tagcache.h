@@ -27,10 +27,6 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 #define TAG_COUNT 10
 
-#ifdef HAVE_DIRCACHE
-#define HAVE_TC_RAMCACHE 1
-#endif
-
 /* Allow a little drift to the filename ordering (should not be too high/low). */
 #define POS_HISTORY_COUNT 4
 
@@ -70,7 +66,8 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
 
 /* Flags */
-#define FLAG_DELETED    0x0001
+#define FLAG_DELETED    0x0001  /* Entry has been removed from db */
+#define FLAG_DIRCACHE   0x0002  /* Filename is a dircache pointer */
 
 enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
     clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
@@ -102,6 +99,7 @@ struct tagcache_search {
     int fd, masterfd;
     int idxfd[TAG_COUNT];
     long seek_list[SEEK_LIST_SIZE];
+    long seek_flags[SEEK_LIST_SIZE];
     long filter_tag[TAGCACHE_MAX_FILTERS];
     long filter_seek[TAGCACHE_MAX_FILTERS];
     int filter_count;
@@ -147,6 +145,7 @@ void tagcache_init(void);
 bool tagcache_is_initialized(void);
 void tagcache_start_scan(void);
 void tagcache_stop_scan(void);
-bool tagcache_force_update(void);
+bool tagcache_update(void);
+bool tagcache_rebuild(void);
 
 #endif

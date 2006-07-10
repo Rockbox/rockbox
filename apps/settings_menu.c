@@ -1520,18 +1520,51 @@ static bool dircache(void)
 
     return result;
 }
+#endif /* HAVE_DIRCACHE */
 
+#ifdef HAVE_TC_RAMCACHE
 static bool tagcache_ram(void)
 {
-    bool result = set_bool_options(str(LANG_TAGCACHE),
+    bool result = set_bool_options(str(LANG_TAGCACHE_RAM),
                                    &global_settings.tagcache_ram,
-                                   STR(LANG_TAGCACHE_RAM),
-                                   STR(LANG_TAGCACHE_DISK),
+                                   STR(LANG_SET_BOOL_YES),
+                                   STR(LANG_SET_BOOL_NO),
                                    NULL);
 
     return result;
 }
-#endif /* HAVE_DIRCACHE */
+#endif
+
+static bool tagcache_autoupdate(void)
+{
+     bool rc = set_bool_options(str(LANG_TAGCACHE_AUTOUPDATE),
+                                &global_settings.tagcache_autoupdate,
+                                STR(LANG_ON),
+                                STR(LANG_OFF),
+                                NULL);
+     return rc;
+}
+
+static bool tagcache_settings_menu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+#ifdef HAVE_TC_RAMCACHE
+        { ID2P(LANG_TAGCACHE_RAM), tagcache_ram },
+#endif
+        { ID2P(LANG_TAGCACHE_AUTOUPDATE), tagcache_autoupdate },
+        { ID2P(LANG_TAGCACHE_INITIALIZE), tagcache_rebuild },
+        { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
 
 static bool playback_settings_menu(void)
 {
@@ -1641,10 +1674,7 @@ static bool fileview_settings_menu(void)
         { ID2P(LANG_FILTER),                dir_filter            },
         { ID2P(LANG_FOLLOW),                browse_current        },
         { ID2P(LANG_SHOW_ICONS),            show_icons            },
-#ifdef HAVE_DIRCACHE
-        { ID2P(LANG_TAGCACHE),              tagcache_ram          },
-#endif
-        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_force_update },
+        { ID2P(LANG_TAGCACHE),              tagcache_settings_menu},
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

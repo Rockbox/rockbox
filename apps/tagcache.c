@@ -67,7 +67,8 @@ static struct tagcache_stat stat;
 enum tagcache_queue {
     Q_STOP_SCAN = 0,
     Q_START_SCAN,
-    Q_FORCE_UPDATE,
+    Q_UPDATE,
+    Q_REBUILD,
 };
 
 
@@ -177,7 +178,7 @@ bool tagcache_is_sorted_tag(int type)
     return false;
 }
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static struct index_entry *find_entry_ram(const char *filename,
                                           const struct dircache_entry *dc)
 {
@@ -272,7 +273,7 @@ static struct index_entry *find_entry_disk(const char *filename, bool retrieve)
         
         if (tfe.tag_length >= (long)sizeof(buf))
         {
-            logf("too long tag");
+            logf("too long tag #1");
             close(fd);
             last_pos = -1;
             return NULL;
@@ -487,6 +488,8 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             {
                 tcs->seek_list[tcs->seek_list_count] =
                         hdr->indices[i].tag_seek[tcs->type];
+                tcs->seek_flags[tcs->seek_list_count] =
+                        hdr->indices[i].flag;
                 tcs->seek_list_count++;
             }
         }
@@ -503,6 +506,10 @@ static bool build_lookup_list(struct tagcache_search *tcs)
     while (read(tcs->masterfd, &entry, sizeof(struct index_entry)) ==
            sizeof(struct index_entry))
     {
+        /* Check if entry has been deleted. */
+        if (entry.flag & FLAG_DELETED)
+            continue;
+        
         if (tcs->seek_list_count == SEEK_LIST_SIZE)
             break ;
 
@@ -538,6 +545,10 @@ static bool build_lookup_list(struct tagcache_search *tcs)
                 }
 
                 read(fd, str, tfe.tag_length);
+                
+                /* Check if entry has been deleted. */
+                if (str[0] == '\0')
+                    break;
             }
             
             if (!check_against_clause(seek, str, tcs->clause[i]))
@@ -559,6 +570,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         {
             tcs->seek_list[tcs->seek_list_count] =
                     entry.tag_seek[tcs->type];
+            tcs->seek_flags[tcs->seek_list_count] = entry.flag;
             tcs->seek_list_count++;
         }
         
@@ -582,7 +594,6 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
         return false;
     
     tcs->position = sizeof(struct tagcache_header);
-    tcs->fd = -1;
     tcs->type = tag;
     tcs->seek_pos = 0;
     tcs->seek_list_count = 0;
@@ -608,17 +619,15 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
             return true;
         
         snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tcs->type);
-        tcs->fd = open(buf, O_RDONLY);
-        if (tcs->fd < 0)
+        tcs->idxfd[tcs->type] = open(buf, O_RDONLY);
+        if (tcs->idxfd[tcs->type] < 0)
         {
             logf("failed to open index");
             return false;
         }
 
-        tcs->idxfd[tcs->type] = tcs->fd;
-        
         /* Check the header. */
-        if (read(tcs->fd, &h, sizeof(struct tagcache_header)) !=
+        if (read(tcs->idxfd[tcs->type], &h, sizeof(struct tagcache_header)) !=
             sizeof(struct tagcache_header) || h.magic != TAGCACHE_MAGIC)
         {
             logf("incorrect header");
@@ -685,7 +694,30 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
     return true;
 }
 
-bool tagcache_get_next(struct tagcache_search *tcs)
+static bool open_files(struct tagcache_search *tcs)
+{
+    if (tcs->idxfd[tcs->type] < 0)
+    {
+        char fn[MAX_PATH];
+
+        snprintf(fn, sizeof fn, TAGCACHE_FILE_INDEX, tcs->type);
+        tcs->idxfd[tcs->type] = open(fn, O_RDONLY);
+    }
+    
+    if (tcs->idxfd[tcs->type] < 0)
+    {
+        logf("File not open!");
+        return false;
+    }
+    
+    return true;
+}
+
+#define TAG_FILENAME_RAM(tcs) ((tcs->type == tag_filename) \
+                                   ? (tcs->seek_flags[tcs->seek_list_count] \
+                                      & FLAG_DIRCACHE) : 1)
+
+static bool get_next(struct tagcache_search *tcs)
 {
     static char buf[MAX_PATH];
     struct tagfile_entry entry;
@@ -693,7 +725,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     if (!tcs->valid)
         return false;
         
-    if (tcs->fd < 0 && !tagcache_is_numeric_tag(tcs->type)
+    if (tcs->idxfd[tcs->type] < 0 && !tagcache_is_numeric_tag(tcs->type)
 #ifdef HAVE_TC_RAMCACHE
         && !tcs->ramsearch
 #endif
@@ -718,15 +750,20 @@ bool tagcache_get_next(struct tagcache_search *tcs)
         tcs->seek_list_count--;
         
         /* Seek stream to the correct position and continue to direct fetch. */
-        if (!tcs->ramsearch)
-            lseek(tcs->fd, tcs->seek_list[tcs->seek_list_count], SEEK_SET);
+        if (!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
+        {
+            if (!open_files(tcs))
+                return false;
+        
+            lseek(tcs->idxfd[tcs->type], tcs->seek_list[tcs->seek_list_count], SEEK_SET);
+        }
         else
             tcs->position = tcs->seek_list[tcs->seek_list_count];
     }
     
     /* Direct fetch. */
 #ifdef HAVE_TC_RAMCACHE
-    if (tcs->ramsearch)
+    if (tcs->ramsearch && TAG_FILENAME_RAM(tcs))
     {
         struct tagfile_entry *ep;
         
@@ -738,20 +775,22 @@ bool tagcache_get_next(struct tagcache_search *tcs)
         tcs->entry_count--;
         tcs->result_seek = tcs->position;
         
+# ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
         {
             dircache_copy_path((struct dircache_entry *)tcs->position,
-                                buf, sizeof buf);
+                               buf, sizeof buf);
             tcs->result = buf;
             tcs->result_len = strlen(buf) + 1;
             
             return true;
         }
+# endif
         
         ep = (struct tagfile_entry *)&hdr->tags[tcs->type][tcs->position];
         tcs->position += sizeof(struct tagfile_entry) + ep->tag_length;
         tcs->result = ep->tag_data;
-        tcs->result_len = ep->tag_length;
+        tcs->result_len = strlen(tcs->result) + 1;
         tcs->idx_id = ep->idx_id;
         
         if (!tagcache_is_unique_tag(tcs->type))
@@ -762,8 +801,11 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     else
 #endif
     {
-        tcs->result_seek = lseek(tcs->fd, 0, SEEK_CUR);
-        if (read(tcs->fd, &entry, sizeof(struct tagfile_entry)) !=
+        if (!open_files(tcs))
+            return false;
+        
+        tcs->result_seek = lseek(tcs->idxfd[tcs->type], 0, SEEK_CUR);
+        if (read(tcs->idxfd[tcs->type], &entry, sizeof(struct tagfile_entry)) !=
             sizeof(struct tagfile_entry))
         {
             /* End of data. */
@@ -775,11 +817,11 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     if (entry.tag_length > (long)sizeof(buf))
     {
         tcs->valid = false;
-        logf("too long tag");
+        logf("too long tag #2");
         return false;
     }
     
-    if (read(tcs->fd, buf, entry.tag_length) != entry.tag_length)
+    if (read(tcs->idxfd[tcs->type], buf, entry.tag_length) != entry.tag_length)
     {
         tcs->valid = false;
         logf("read error");
@@ -787,12 +829,23 @@ bool tagcache_get_next(struct tagcache_search *tcs)
     }
     
     tcs->result = buf;
-    tcs->result_len = entry.tag_length;
+    tcs->result_len = strlen(tcs->result) + 1;
     tcs->idx_id = entry.idx_id;
     if (!tagcache_is_unique_tag(tcs->type))
         tcs->result_seek = tcs->idx_id;
 
     return true;
+}
+
+bool tagcache_get_next(struct tagcache_search *tcs)
+{
+    while (get_next(tcs))
+    {
+        if (tcs->result_len > 1)
+            return true;
+    }
+    
+    return false;
 }
 
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
@@ -809,38 +862,29 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     }
     
 #ifdef HAVE_TC_RAMCACHE
-    if (tcs->ramsearch)
+    if (tcs->ramsearch && TAG_FILENAME_RAM(tcs))
     {
+        struct tagfile_entry *ep;
+        
+# ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
         {
             dircache_copy_path((struct dircache_entry *)seek,
-                                buf, size);
+                               buf, size);
+            return true;
         }
-        else
-        {
-            struct tagfile_entry *ep;
-            
-            ep = (struct tagfile_entry *)&hdr->tags[tcs->type][seek];
-            strncpy(buf, ep->tag_data, size-1);
-        }
+# endif
+        
+        
+        ep = (struct tagfile_entry *)&hdr->tags[tcs->type][seek];
+        strncpy(buf, ep->tag_data, size-1);
         
         return true;
     }
 #endif
-        
-    if (tcs->idxfd[tcs->type] < 0)
-    {
-        char fn[MAX_PATH];
-
-        snprintf(fn, sizeof fn, TAGCACHE_FILE_INDEX, tcs->type);
-        tcs->idxfd[tcs->type] = open(fn, O_RDONLY);
-    }
     
-    if (tcs->idxfd[tcs->type] < 0)
-    {
-        logf("File not open!");
+    if (!open_files(tcs))
         return false;
-    }
     
     lseek(tcs->idxfd[tcs->type], seek, SEEK_SET);
     if (read(tcs->idxfd[tcs->type], &tfe, sizeof(struct tagfile_entry)) !=
@@ -870,18 +914,6 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
 
 #if 0
 
-static bool tagcache_delete(const char *filename)
-{
-    struct index_entry *entry;
-    
-    entry = find_entry_disk(filename, true);
-    if (entry == NULL)
-    {
-        logf("not found: %s", filename);
-        return false;
-    }
-}
-
 void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
 {
     struct tagentry *entry;
@@ -898,7 +930,7 @@ void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
         tcs->seek_list[tcs->seek_list_count];
     }
 
-    entry = find_entry_ram(
+    entry = find_entry_ram();
     
 }
 #endif
@@ -906,13 +938,6 @@ void tagcache_modify(struct tagcache_search *tcs, int type, const char *text)
 void tagcache_search_finish(struct tagcache_search *tcs)
 {
     int i;
-    
-    if (tcs->fd >= 0)
-    {
-        close(tcs->fd);
-        tcs->fd = -1;
-        tcs->idxfd[tcs->type] = -1;
-    }
     
     if (tcs->masterfd >= 0)
     {
@@ -933,7 +958,7 @@ void tagcache_search_finish(struct tagcache_search *tcs)
     tcs->valid = false;
 }
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static struct tagfile_entry *get_tag(const struct index_entry *entry, int tag)
 {
     return (struct tagfile_entry *)&hdr->tags[tag][entry->tag_seek[tag]];
@@ -943,7 +968,7 @@ static long get_tag_numeric(const struct index_entry *entry, int tag)
 {
     return entry->tag_seek[tag];
 }
-    
+
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
 {
     struct index_entry *entry;
@@ -984,7 +1009,7 @@ inline void check_if_empty(char **tag)
 
 #define CRC_BUF_LEN 8
 
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static void add_tagcache(const char *path, const struct dircache_entry *dc)
 #else
 static void add_tagcache(const char *path)
@@ -1006,8 +1031,8 @@ static void add_tagcache(const char *path)
         return ;
     
     /* Check if the file is already cached. */
-#ifdef HAVE_TC_RAMCACHE
-    if (stat.ramcache)
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    if (stat.ramcache && dircache_is_enabled())
     {
         if (find_entry_ram(path, dc))
             return ;
@@ -1477,7 +1502,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 if (entry.tag_length >= (int)sizeof(buf))
                 {
-                    logf("too long tag");
+                    logf("too long tag #3");
                     close(fd);
                     return -2;
                 }
@@ -1489,6 +1514,10 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     return -2;
                 }
 
+                /* Skip deleted entries. */
+                if (buf[0] == '\0')
+                    continue;
+                
                 /**
                  * Save the tag and tag id in the memory buffer. Tag id
                  * is saved so we can later reindex the master lookup
@@ -1673,6 +1702,18 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             
             for (j = 0; j < idxbuf_pos; j++)
             {
+                if (idxbuf[j].flag & FLAG_DELETED)
+                {
+                    int k;
+                    
+                    idxbuf_pos--;
+                    for (k = j; k < idxbuf_pos; k++)
+                        idxbuf[k] = idxbuf[k+1];
+                    
+                    j--;
+                    continue;
+                }
+                
                 idxbuf[j].tag_seek[index_type] = tempbuf_find_location(
                     idxbuf[j].tag_seek[index_type]/TAGFILE_ENTRY_CHUNK_LENGTH
                     + TAGFILE_MAX_ENTRIES);
@@ -2008,6 +2049,117 @@ static void free_tempbuf(void)
     tempbuf_size = 0;
 }
 
+static bool delete_entry(long idx_id)
+{
+    int fd;
+    int tag, i;
+    struct index_entry idx, myidx;
+    struct tagcache_header hdr;
+    char buf[MAX_PATH];
+    int in_use[TAG_COUNT];
+    
+    fd = open(TAGCACHE_FILE_MASTER, O_RDWR);
+    if (fd < 0)
+    {
+        logf("master file open failed for R/W");
+        return false;
+    }
+    
+    /* Check the header. */
+    read(fd, &hdr, sizeof(struct tagcache_header));
+    if (hdr.magic != TAGCACHE_MAGIC)
+    {
+        logf("header error");
+        return false;
+    }
+    
+    lseek(fd, idx_id * sizeof(struct index_entry), SEEK_CUR);
+    if (read(fd, &myidx, sizeof(struct index_entry)) 
+        != sizeof(struct index_entry))
+    {
+        logf("read error");
+        return false;
+    }
+    
+    myidx.flag |= FLAG_DELETED;
+    lseek(fd, -sizeof(struct index_entry), SEEK_CUR);
+    if (write(fd, &myidx, sizeof(struct index_entry))
+        != sizeof(struct index_entry))
+    {
+        logf("write error");
+        return false;
+    }
+    
+    /* Now check which tags are no longer in use (if any) */
+    for (tag = 0; tag < TAG_COUNT; tag++)
+        in_use[tag] = 0;
+    
+    lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
+    for (i = 0; i < hdr.entry_count; i++)
+    {
+        if (read(fd, &idx, sizeof(struct index_entry)) 
+            != sizeof(struct index_entry))
+        {
+            logf("read error");
+            close(fd);
+            return false;
+        }
+        
+        if (idx.flag & FLAG_DELETED)
+            continue;
+        
+        for (tag = 0; tag < TAG_COUNT; tag++)
+        {
+            if (tagcache_is_numeric_tag(tag))
+                continue;
+            
+            if (idx.tag_seek[tag] == myidx.tag_seek[tag])
+                in_use[tag]++;
+        }
+    }
+    
+    close(fd);
+    
+    /* Now delete all tags no longer in use. */
+    for (tag = 0; tag < TAG_COUNT; tag++)
+    {
+        if (tagcache_is_numeric_tag(tag))
+            continue;
+        
+        if (in_use[tag])
+        {
+            logf("in use: %d/%d", tag, in_use[tag]);
+            continue;
+        }
+        
+        /* Open the index file, which contains the tag names. */
+        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
+        fd = open(buf, O_RDWR);
+        
+        if (fd < 0)
+        {
+            logf("open failed");
+            return false;
+        }
+        
+        /* Skip the header block */
+        lseek(fd, myidx.tag_seek[tag] + sizeof(struct tagfile_entry), SEEK_SET);
+        
+        read(fd, buf, 10);
+        buf[10]='\0';
+        logf("TAG:%s", buf);
+        lseek(fd, -10, SEEK_CUR);
+        
+        /* Write first data byte in tag as \0 */
+        write(fd, "", 1);
+    
+        /* Now tag data has been removed */
+        close(fd);
+    }
+    
+    return true;
+}
+
 #ifdef HAVE_TC_RAMCACHE
 static bool allocate_tagcache(void)
 {
@@ -2063,11 +2215,12 @@ static bool load_tagcache(void)
     char *p;
     int i;
 
-    /* We really need the dircache for this. */
-    if (!dircache_is_enabled())
-        return false;
-
     logf("loading tagcache to ram...");
+    
+# ifdef HAVE_DIRCACHE
+    while (dircache_is_initializing())
+        sleep(1);
+# endif
     
     fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
     if (fd < 0)
@@ -2151,8 +2304,11 @@ static bool load_tagcache(void)
              hdr->entry_count[i] < tch->entry_count;
              hdr->entry_count[i]++)
         {
+            long pos;
+            
             yield();
             fe = (struct tagfile_entry *)p;
+            pos = lseek(fd, 0, SEEK_CUR);
             rc = read(fd, fe, sizeof(struct tagfile_entry));
             if (rc != sizeof(struct tagfile_entry))
             {
@@ -2165,10 +2321,23 @@ static bool load_tagcache(void)
             /* We have a special handling for the filename tags. */
             if (i == tag_filename)
             {
+# ifdef HAVE_DIRCACHE
                 const struct dircache_entry *dc;
+# endif
                 
+                // FIXME: This is wrong!
+                // idx = &hdr->indices[hdr->entry_count[i]];
+                idx = &hdr->indices[fe->idx_id];
+                
+                /* Check if the entry has already been removed */
+                if (idx->flag & FLAG_DELETED)
+                    continue;
+                    
                 if (fe->tag_length >= (long)sizeof(buf)-1)
                 {
+                    read(fd, buf, 10);
+                    buf[10] = '\0';
+                    logf("TAG:%s", buf);
                     logf("too long filename");
                     close(fd);
                     return false;
@@ -2182,22 +2351,47 @@ static bool load_tagcache(void)
                     return false;
                 }
                 
-                dc = dircache_get_entry_ptr(buf);
-                if (dc == NULL)
+# ifdef HAVE_DIRCACHE
+                if (dircache_is_enabled())
                 {
-                    logf("Entry no longer valid.");
-                    logf("-> %s", buf);
-                    /* FIXME: Properly delete the entry. */
-                    hdr->indices[hdr->entry_count[i]].flag |= FLAG_DELETED;
-                    continue ;
-                }
+                    dc = dircache_get_entry_ptr(buf);
+                    if (dc == NULL)
+                    {
+                        logf("Entry no longer valid.");
+                        logf("-> %s", buf);
+                        idx->flag |= FLAG_DELETED;
+                        delete_entry(fe->idx_id);
+                        continue ;
+                    }
 
-                hdr->indices[hdr->entry_count[i]].tag_seek[tag_filename]
-                        = (long)dc;
+                    idx->flag |= FLAG_DIRCACHE;
+                    idx->tag_seek[tag_filename] = (long)dc;
+                }
+                else
+# endif
+                {
+                    /* Check if entry has been removed. */
+                    if (global_settings.tagcache_autoupdate)
+                    {
+                        int testfd;
+                        
+                        testfd = open(buf, O_RDONLY);
+                        if (testfd < 0)
+                        {
+                            logf("Entry no longer valid.");
+                            logf("-> %s", buf);
+                            idx->flag |= FLAG_DELETED;
+                            delete_entry((long)idx - (long)hdr->indices);
+                            continue;
+                        }
+                    }
+
+                    idx->tag_seek[i] = pos;
+                }
                 
                 continue ;
             }
-
+            
             bytesleft -= sizeof(struct tagfile_entry) + fe->tag_length;
             if (bytesleft < 0)
             {
@@ -2231,7 +2425,59 @@ static bool load_tagcache(void)
 
     return true;
 }
-#endif
+#endif /* HAVE_TC_RAMCACHE */
+
+static bool check_deleted_files(void)
+{
+    int fd, testfd;
+    char buf[MAX_PATH];
+    struct tagfile_entry tfe;
+    
+    logf("reverse scan...");
+    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag_filename);
+    fd = open(buf, O_RDONLY);
+    
+    if (fd < 0)
+    {
+        logf("%s open fail", buf);
+        return false;
+    }
+
+    lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
+    while (read(fd, &tfe, sizeof(struct tagfile_entry))
+           == sizeof(struct tagfile_entry) && queue_empty(&tagcache_queue))
+    {
+        if (tfe.tag_length >= (long)sizeof(buf)-1)
+        {
+            logf("too long tag");
+            close(fd);
+            return false;
+        }
+        
+        if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
+        {
+            logf("read error");
+            close(fd);
+            return false;
+        }
+        
+        /* Now check if the file exists. */
+        testfd = open(buf, O_RDONLY);
+        if (testfd < 0)
+        {
+            logf("Entry no longer valid.");
+            logf("-> %s", buf);
+            delete_entry(tfe.idx_id);
+        }
+        close(testfd);
+    }
+    
+    close(fd);
+    
+    logf("done");
+    
+    return true;
+}
 
 static bool check_dir(const char *dirname)
 {
@@ -2273,7 +2519,7 @@ static bool check_dir(const char *dirname)
         if (entry->attribute & ATTR_DIRECTORY)
             check_dir(curpath);
         else
-#ifdef HAVE_TC_RAMCACHE
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
             add_tagcache(curpath, dir->internal_entry);
 #else
             add_tagcache(curpath);
@@ -2423,25 +2669,41 @@ static void tagcache_thread(void)
                 check_done = false;
                 break ;
 
-            case Q_FORCE_UPDATE:
-                //remove_files();
+            case Q_REBUILD:
+                remove_files();
                 build_tagcache();
+                break;
+            
+            case Q_UPDATE:
+                build_tagcache();
+                check_deleted_files();
                 break ;
                 
-#ifdef HAVE_TC_RAMCACHE
             case SYS_TIMEOUT:
-                if (check_done || !dircache_is_enabled())
+                if (check_done)
                     break ;
                 
+#ifdef HAVE_TC_RAMCACHE
                 if (!stat.ramcache && global_settings.tagcache_ram)
+                {
                     load_ramcache();
-    
-                if (stat.ramcache)
+                    if (stat.ramcache)
+                        build_tagcache();
+                }
+                else
+#endif
+                if (global_settings.tagcache_autoupdate)
+                {
                     build_tagcache();
+                    /* Don't do auto removal without dircache (very slow). */
+#ifdef HAVE_DIRCACHE
+                    if (dircache_is_enabled())
+                        check_deleted_files();
+#endif
+                }
                 
                 check_done = true;
                 break ;
-#endif
 
             case Q_STOP_SCAN:
                 break ;
@@ -2470,6 +2732,8 @@ static int get_progress(void)
         total_count = dircache_get_entry_count();
     }
     else
+#endif
+#ifdef HAVE_TC_RAMCACHE
     {
         if (hdr && stat.ramcache)
             total_count = hdr->h.entry_count;
@@ -2495,9 +2759,17 @@ void tagcache_start_scan(void)
     queue_post(&tagcache_queue, Q_START_SCAN, 0);
 }
 
-bool tagcache_force_update(void)
+bool tagcache_update(void)
 {
-    queue_post(&tagcache_queue, Q_FORCE_UPDATE, 0);
+    queue_post(&tagcache_queue, Q_UPDATE, 0);
+    gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
+    
+    return false;
+}
+
+bool tagcache_rebuild(void)
+{
+    queue_post(&tagcache_queue, Q_REBUILD, 0);
     gui_syncsplash(HZ*2, true, str(LANG_TAGCACHE_FORCE_UPDATE_SPLASH));
     
     return false;

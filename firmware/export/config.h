@@ -190,6 +190,10 @@
 #define HAVE_DIRCACHE 1
 #endif
 
+/* Define tagcache in ram for all players (can operate
+ * also without dircache). */
+#define HAVE_TC_RAMCACHE 1
+
 /* define for all cpus from coldfire family */
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 #define CPU_COLDFIRE

@@ -575,6 +575,7 @@ int tagtree_load(struct tree_context* c)
     {
         case root:
             count = load_root(c);
+            c->dirlevel = 0;
             break;
 
         case allsubentries:
