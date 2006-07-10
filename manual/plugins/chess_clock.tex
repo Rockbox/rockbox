@@ -1,28 +1,27 @@
+% $Id$ %
 \subsection{Chess Clock}
-\screenshot{plugins/images/ss-chess_clock}{Chess Clock}%
-{img:chessclock}
-
-The chess clock plugin is designed  to
-simulate a chess clock, but it can be used
-in any kind of game with up to ten players.
+\screenshot{plugins/images/ss-chess_clock}{Chess Clock}{img:chessclock}
+The chess clock plugin is designed  to simulate a chess clock, but it can be
+used in any kind of game with up to ten players.
 
 \subsubsection{Setup}
-
 \begin{table}
   \begin{btnmap}{}{}
-    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRight/\ButtonLeft}
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+      {\ButtonRight/\ButtonLeft}
     \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
     \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd}
-      & Increase / Decrease displayed Value\\
+      & Increase / decrease displayed Value\\
     \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonRight}
-    \opt{IPOD_4G_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
       & Move to next screen\\
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
     \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-      & Move to next screen\\
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+      & Move to previous screen\\
   \end{btnmap}
 \end{table}
 
@@ -48,38 +47,41 @@ Keys are as follows:
     \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD}{\ButtonPlay}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
       & Exit plugin \\
     \opt{PLAYER_PAD}{\ButtonStop}
     \opt{RECORDER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
       & Restart round for the current player \\
-    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
+    \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonRight}
     \opt{IPOD_4G_PAD}{\ButtonSelect}
       & Pause the time (press again to continue) \\
-    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRight}
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+      {\ButtonRight}
     \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonUp}
     \opt{IPOD_4G_PAD}{\ButtonScrollBack}
       & Switch to next player \\
-    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonLeft}
+    \opt{PLAYER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonLeft}
     \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonDown}
     \opt{IPOD_4G_PAD}{\ButtonScrollFwd}
       & Switch to previous player \\
     \opt{PLAYER_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonMenu}
     \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-      & Delete current player %
-      \opt{PLAYER_PAD,RECORDER_PAD}{(\ButtonPlay\ to confirm.)}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{(\ButtonOn\ to confirm.)}
-      \opt{ONDIO_PAD}{(\ButtonRight\ to confirm.)}
-      \opt{IPOD_4G_PAD}{(\ButtonSelect\ to confirm.)}\\
+    \opt{IAUDIO_X5_PAD}{\ButtonSelect}
+      & Open menu
+      \opt{PLAYER_PAD,RECORDER_PAD}{(\ButtonPlay\ to select.)}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{(\ButtonOn\ to select.)}
+      \opt{ONDIO_PAD}{(\ButtonRight\ to select.)}
+      \opt{IPOD_4G_PAD}{(\ButtonSelect\ to select.)}
+      \opt{IAUDIO_X5_PAD}{(press again to select.)}\\
   \end{btnmap}
 \end{table}
 From the menu it is possible to delete a player, modify the round time
-for the current player or set the total time for the game. 
-
-When the round time is up for a player the message ``ROUND UP!'' is shown (press  NEXT to continue). 
-
-When the total time is up for a player the message ``TIME UP!''is shown. Then player will  then be removed from the timer. 
-
+for the current player or set the total time for the game. When the round time
+is up for a player the message ``ROUND UP!'' is shown (press  NEXT to
+continue). When the total time is up for a player the message ``TIME UP!''is
+shown. Then player will  then be removed from the timer.

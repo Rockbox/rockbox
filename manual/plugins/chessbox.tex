@@ -1,3 +1,4 @@
+% $Id$ %
 \subsection{Chessbox}
 \screenshot{plugins/images/ss-chessbox}{Chessbox}{img:chessbox}
 Chessbox is a chess game with computer AI. The chess engine is a port of 
@@ -8,30 +9,34 @@ you resume the game.
 \subsubsection{Keys}
 \begin{table}
     \begin{btnmap}{}{}
-    Direction keys 
+    \opt{IPOD_4G_PAD}{\ButtonMenu, \ButtonPlay, \ButtonLeft, \ButtonRight}
+    \nopt{IPOD_4G_PAD}{Direction keys} 
     & Move the cursor\\
-    \opt{recorder,recorderv2fm}{\ButtonPlay}
-    \opt{ondio}{short press on \ButtonMenu}
-    \opt{h1xx,h300,ipodcolor,ipodnano}{\ButtonSelect}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+        {\ButtonSelect}
     & Select / Move piece\\
-    \opt{recorder,recorderv2fm}{\ButtonFOne}
-    \opt{ondio}{\ButtonMenu+\ButtonOff}
-    \opt{h1xx,h300}{\ButtonMode}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonRight}
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonRight}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
     & Change level\\
-    \opt{recorder,recorderv2fm}{\ButtonOn}
-    \opt{ondio}{long press on \ButtonMenu}
-    \opt{h1xx,h300}{\ButtonOn}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonPlay}
+    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{Hold \ButtonMenu}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     & Force play\\
-    \opt{recorder,recorder2fm}{n/a}
-    \opt{ondio}{n/a}
-    \opt{h1xx,h300}{\ButtonRec}
-    \opt{x5}{\ButtonSelect}
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft}
+    \opt{IAUDIO_X5_PAD}{\ButtonSelect+\ButtonPlay}
     & Restart Game\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOff}
-    \opt{ondio}{\ButtonOff}
-    \opt{ipodcolor,ipodnano}{\ButtonSelect+\ButtonMenu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
     & Quit\\
     \end{btnmap}
 \end{table}

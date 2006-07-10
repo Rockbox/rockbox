@@ -1,10 +1,11 @@
+% $Id$ %
 \subsection{Oscilloscope}
 \screenshot{plugins/images/ss-oscilloscope}{Oscilloscope}{img:oscilloscope}
 
 This demo shows the shape of the sound samples that make up the music
 being played.
 \opt{SWCODEC}{
-  At faster speed rates, the Jukebox is less responsive
+  At faster speed rates, the \dap\ is less responsive
   to user input and music may start to skip.
 }
 
@@ -12,29 +13,37 @@ being played.
 
 \begin{table}
 \begin{btnmap}{}{}
-\opt{recorder,recorderv2fm}{F1}\opt{ondio}{Mode}\opt{h1xx}{Select}
-\opt{h300}{Navi}\opt{ipodcolor,ipodnano}{Select+Play}
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonPlay}
     & Toggle filled / curve / plot \\
-\opt{recorder,recorderv2fm}{F2}\opt{ondio}{Mode+Right}\opt{h1xx,h300}{A-B}
-\opt{ipodcolor,ipodnano}{Select+Right}
+    \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonRight}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
     & Toggle whether to scroll or not \\
-\opt{recorder,recorderv2fm}{F3}\opt{ondio}{Mode+Left}\opt{h1xx,h300}{Record}
-\opt{ipodcolor,ipodnano}{Select+Left}
+    \opt{RECORDER_PAD}{\ButtonFThree}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonLeft}
+    \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
     & Toggle drawing orientation \\
-Left & Slow down scrolling \\
-Right & Speed up scrolling \\
-\opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{Play}
-\opt{ondio}{Mode+Off}
+    \opt{RECORDER_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu+\ButtonOff}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     & Pause the demo \\
-\opt{recorder,recorderv2fm,ondio,h1xx,h300}{Up}
-\opt{ipodcolor,ipodnano}{Scroll forward}
-    & Increase volume\\
-\opt{recorder,recorderv2fm,ondio,h1xx,h300}{Down}
-\opt{ipodcolor,ipodnano}{Scroll backward}
-    & Decrease volume\\
-\opt{recorder,recorderv2fm,h1xx,h300}{Stop}\opt{ondio}{Off}
-\opt{ipodcolor,ipodnano}{Select+Menu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp\/\ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd\/\ButtonScrollBack}
+    & Increase / decrease volume\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,
+        IAUDIO_X5_PAD}{\ButtonRight\/\ButtonLeft}
+    & Increase / decrease speed\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
     & Exit demo \\
 \end{btnmap}
 \end{table}
-

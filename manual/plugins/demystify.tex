@@ -1,23 +1,21 @@
+% $Id$ %
 \subsection{Demystify}
-\screenshot{plugins/images/ss-demystify}{Demystify}%
-{img:demystify}
+\screenshot{plugins/images/ss-demystify}{Demystify}{img:demystify}
 Demystify is a screen saver like demo.\\
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Up}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Right}
-        & Add polygon\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Down}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Left}
-        & Remove polygon\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Right}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll forward}
-        & Increase speed\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Left}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll backward}
-        & Decrease speed\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{Stop}
-    \opt{ondio}{Off}\opt{ipodcolor,ipodnano,ipodvideo}{Menu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
+        {\ButtonUp\ / \ButtonDown}
+    \opt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonRight\ / \ButtonLeft}
+        & Add / remove polygon\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
+        {\ButtonRight\ / \ButtonLeft}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+    \opt{IAUDIO_X5_PAD}{\ButtonUp\ / \ButtonDown}
+        & Increase / decrease speed\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
         & Quit\\
     \end{btnmap}
 \end{table}

@@ -1,23 +1,26 @@
+% $Id$ %
 \subsection{Fire}
 \screenshot{plugins/images/ss-fire}{Fire}{img:fire}
 Fire is a demo displaying a fire effect.
-
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Up}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll backward}
-    & Increase number of flames\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Down}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll forward}
-    & Decrease number of flames\\
-    \opt{recorder,recorderv2fm}{Menu}\opt{ondio}{Mode}
-    \opt{h1xx,h300}{A-B}\opt{ipodcolor,ipodnano,ipodvideo}{Select}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp\ / \ButtonDown}
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+    & Increase / decrease number of flames\\
+    \opt{RECORDER_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{\ButtonLeft}
     & Toggle flame type\\
-    \opt{recorder,recorderv2fm}{Play}
-    \opt{ondio,ipodcolor,ipodnano,ipodvideo}{Right}\opt{h1xx,h300}{Record}
+    \opt{RECORDER_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonRight}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
     & Toggle moving flames\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{Stop}
-    \opt{ondio}{Off}\opt{ipodcolor,ipodnano,ipodvideo}{Menu}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
     & Quit\\
     \end{btnmap}
 \end{table}
