@@ -45,8 +45,32 @@ for the next daily builds.}
     ipodpatcher 2
     ipodpatcher 3
     \end{code}
-    Keep increasing the number until the \dap{} is located. \fixme{What is the
-    output?} Remember the number that corresponds to your \dap{} -- in the 
+    Keep increasing the number until the \dap{} is located. 
+
+    Output for an unsuccessful attempt to contact the \dap{}...
+    \begin{code}
+    C:/rockbox>ipodpatcher 0
+    ipodpatcher v0.3 - (C) Dave Chapman 2006
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    [INFO] Reading partition table from \textbackslash\textbackslash{}.\textbackslash{}PhysicalDrive0
+    Drive is not an iPod, aborting
+    \end{code}
+    
+    A successful connection to the \dap{} will look similar to this...
+    \begin{code}
+    C:\textbackslash{}rockbox>ipodpatcher 6
+    ipodpatcher v0.3 - (C) Dave Chapman 2006
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    [INFO] Reading partition table from \textbackslash\textbackslash{}.\textbackslash{}PhysicalDrive6
+    Part    Start Sector    End Sector    Size (MB)  Type
+       0              63        160649        78.4   Empty (0x00)
+       1          160650       7984304      3820.1   W95 FAT32 (0x0b)
+   \end{code}
+    Remember the number that corresponds to your \dap{} -- in the 
     following steps, \emph{N} should be replaced with the number just found.
   \item Now, extract the firmware partition currently on the \dap{} with the
     following command:
