@@ -1717,7 +1717,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TAGCACHE_INITIALIZE
+  id: LANG_TAGCACHE_FORCE_UPDATE
   desc: in tag cache settings
   user:
   <source>

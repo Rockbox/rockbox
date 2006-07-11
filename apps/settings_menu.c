@@ -1555,7 +1555,7 @@ static bool tagcache_settings_menu(void)
         { ID2P(LANG_TAGCACHE_RAM), tagcache_ram },
 #endif
         { ID2P(LANG_TAGCACHE_AUTOUPDATE), tagcache_autoupdate },
-        { ID2P(LANG_TAGCACHE_INITIALIZE), tagcache_rebuild },
+        { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_rebuild },
         { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
     };
 
