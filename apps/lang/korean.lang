@@ -1458,10 +1458,10 @@
     *: "Resume on Startup"
   </source>
   <dest>
-    *: "시작시 현상태 기억"
+    *: "시작시 자동 재생"
   </dest>
   <voice>
-    *: "시작시 현상태 기억"
+    *: "시작시 자동 재생"
   </voice>
 </phrase>
 <phrase>
@@ -1676,30 +1676,30 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
   </source>
   <dest>
-    *: "태그 캐쉬"
+    *: "태그 캐시"
   </dest>
   <voice>
-    *: "태그 캐쉬"
+    *: "태그 캐시"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc:
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "디스크에 보관"
+    *: ""
   </dest>
   <voice>
-    *: "디스크에 보관"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1721,13 +1721,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "태그 캐쉬 업데이트 시키기"
+    *: "지금 초기화하기"
   </dest>
   <voice>
-    *: "태그 캐쉬 업데이트 시키기"
+    *: "지금 초기화하기"
   </voice>
 </phrase>
 <phrase>
@@ -1752,7 +1752,7 @@
     *: "Committing tagcache"
   </source>
   <dest>
-    *: "Committing tagcache"
+    *: "태그 캐시 적용중..."
   </dest>
   <voice>
     *: ""
@@ -2875,7 +2875,7 @@
     *: "크로스페이드 사용"
   </dest>
   <voice>
-    *: "Enable Crossfade"
+    *: "크로스페이드 사용"
   </voice>
 </phrase>
 <phrase>
@@ -3852,10 +3852,10 @@
     *: "Directory Cache"
   </source>
   <dest>
-    *: "디렉토리 캐쉬"
+    *: "디렉토리 캐시"
   </dest>
   <voice>
-    *: "디렉토리 캐쉬"
+    *: "디렉토리 캐시"
   </voice>
 </phrase>
 <phrase>
@@ -3866,7 +3866,7 @@
     *: "Please reboot to enable the cache"
   </source>
   <dest>
-    *: "캐쉬를 사용하려면 다시 시작해주세요."
+    *: "캐시를 사용하려면 다시 시작해주세요."
   </dest>
   <voice>
     *: ""
@@ -4510,7 +4510,7 @@
     *: "%d%% %dh %dm"
   </source>
   <dest>
-    *: "배터리: %d%% (약 %d시간 %d분)"
+    *: "배터리: %d%% (약 %d시간 %d분 남음)"
   </dest>
   <voice>
     *: "배터리 레벨"
@@ -4552,10 +4552,10 @@
     *: "Int:"
   </source>
   <dest>
-    *: "Int:"
+    *: "내장 용량:"
   </dest>
   <voice>
-    *: "Internal"
+    *: "내장 용량"
   </voice>
 </phrase>
 <phrase>
@@ -4566,7 +4566,7 @@
     *: "MMC:"
   </source>
   <dest>
-    *: "MMC:"
+    *: "MMC 용량:"
   </dest>
   <voice>
     *: "멀티미디어 카드"
@@ -4583,7 +4583,7 @@
     *: ""
   </dest>
   <voice>
-    *: "현재 시각: "
+    *: "현재 시각:"
   </voice>
 </phrase>
 <phrase>
@@ -4762,7 +4762,7 @@
     *: "PLAY = Select"
   </source>
   <dest>
-    *: "[NAVI]: 선택"
+    *: "[중앙]: 선택"
   </dest>
   <voice>
     *: ""
@@ -4776,7 +4776,7 @@
     *: "ON+Play = Delete"
   </source>
   <dest>
-    *: "[재생] + [NAVI]: 삭제"
+    *: "[재생] + [중앙]: 삭제"
   </dest>
   <voice>
     *: ""
@@ -5280,7 +5280,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "알람 시간이 맞지 않습니다!"
+    *: "알람 시간이 올바르지 않습니다!"
   </dest>
   <voice>
     *: ""
@@ -7240,7 +7240,7 @@
     *: "Creating"
   </source>
   <dest>
-    *: "만드는중입니다...."
+    *: "만드는중입니다..."
   </dest>
   <voice>
     *: ""
@@ -8206,7 +8206,7 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "이 모델은 지원하지 않습니다."
+    *: "이 모델을 지원하지 않습니다."
   </dest>
   <voice>
     *: ""
@@ -8220,7 +8220,7 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "이 버전은 지원하지 않습니다."
+    *: "이 버전을 지원하지 않습니다."
   </dest>
   <voice>
     *: ""
@@ -8529,3 +8529,31 @@
     *: "리모컨 문자 흐름 설정"
   </voice>
 </phrase>   
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "지금 업데이트하기"
+  </dest>
+  <voice>
+    *: "지금 업데이트하기"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "자동 업데이트"
+  </dest>
+  <voice>
+    *: "자동 업데이트"
+  </voice>
+</phrase>
