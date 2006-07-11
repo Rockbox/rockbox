@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004-2005 dionoea (Antoine Cellerier)
+ * Copyright (C) 2004-2006 dionoea (Antoine Cellerier)
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,7 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 /*****************************************************************************
 Solitaire by dionoea
 Graphics & Fix Bugs by Ben Basha
@@ -187,26 +187,26 @@ static struct plugin_api* rb;
 #define HELP_SOL_REM2STACK "PLAY+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) ||(CONFIG_KEYPAD == IPOD_3G_PAD)
-#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..." 	 
-#define HELP_SOL_DRAW "SELECT+PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack." 	 
-#define HELP_SOL_REM2CUR "SELECT+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
-#define HELP_SOL_CUR2STACK "SELECT+RIGHT..: Put the card under the cursor on one of the 4 final stacks." 	 
-#define HELP_SOL_REM2STACK "LEFT+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
+#define HELP_SOL_DRAW "SELECT+PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
+#define HELP_SOL_REM2CUR "SELECT+LEFT: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "SELECT+RIGHT..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "LEFT+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD) 
-#define HELP_SOL_MOVE "MENU: Select cards, Move cards, reveal hidden cards ..." 	 
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define HELP_SOL_MOVE "MENU: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
-#define HELP_SOL_REM2CUR "REC+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
-#define HELP_SOL_CUR2STACK "REC+UP..: Put the card under the cursor on one of the 4 final stacks." 	 
-#define HELP_SOL_REM2STACK "REC+DOWN: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
+#define HELP_SOL_REM2CUR "REC+LEFT: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "REC+UP..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "REC+DOWN: Put the card on top of the remains' stack on one of the 4 final stacks."
 
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD) 
-#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..." 	 
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#define HELP_SOL_MOVE "SELECT: Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW "MENU: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
-#define HELP_SOL_REM2CUR "POWER+LEFT: Put the card on top of the remains' stack on top of the cursor." 	 
-#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks." 	 
-#define HELP_SOL_REM2STACK "POWER+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks." 	 
-  	 
+#define HELP_SOL_REM2CUR "POWER+LEFT: Put the card on top of the remains' stack on top of the cursor."
+#define HELP_SOL_CUR2STACK "SELECT..: Put the card under the cursor on one of the 4 final stacks."
+#define HELP_SOL_REM2STACK "POWER+RIGHT: Put the card on top of the remains' stack on one of the 4 final stacks."
+
 #endif
 
 #if LCD_DEPTH>1
@@ -581,7 +581,7 @@ int solitaire_menu(unsigned char when_n)
                 switch(cursor){
                     case MENU_RESUME:
                     case MENU_RESTART:
-                    case MENU_OPT:     
+                    case MENU_OPT:
                     case MENU_QUIT:
                         return cursor;
 
@@ -610,7 +610,7 @@ int solitaire_menu(unsigned char when_n)
 #endif
             case SOL_QUIT:
                 return MENU_QUIT;
-            
+
             default:
                 if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                     return MENU_USB;
@@ -711,7 +711,7 @@ void solitaire_init(void){
 
     /* init the remainder */
     cur_rem = NOT_A_CARD;
-    
+
     coun_rem=0;
 }
 
@@ -866,8 +866,8 @@ unsigned char move_card(unsigned char dest_col, unsigned char src_card){
         else {
             deck[src_card_prev].next = deck[src_card].next;
         }
-        cur_rem = src_card_prev;
         deck[src_card].next = NOT_A_CARD;
+        cur_rem = src_card_prev;
         coun_rem = coun_rem-1;
     }
     /* if the src card is from somewhere else, just take everything */
@@ -907,10 +907,10 @@ int solitaire(void){
     int button, lastbutton = 0;
     unsigned char c,h,prevcard;
     int biggest_col_length;
-    
+
     configfile_init(rb);
-    configfile_load(FILENAME, config, 1, 0); 
-     
+    configfile_load(FILENAME, config, 1, 0);
+
     rb->srand( *rb->current_tick );
     switch(solitaire_menu(draw_type==0?MENU_BEFOREGAME:MENU_BEFOREGAMEOP)) {
        case MENU_QUIT:
@@ -920,9 +920,9 @@ int solitaire(void){
             return SOLITAIRE_USB;
        case MENU_OPT:
             draw_type=change_draw(draw_type);
-            configfile_save(FILENAME, config, 1, 0);   
+            configfile_save(FILENAME, config, 1, 0);
             when=draw_type==0?MENU_BEFOREGAME:MENU_BEFOREGAMEOP;
-            return 0; 
+            return 0;
     }
 #if LCD_DEPTH>1
                 rb->lcd_set_foreground(LCD_BLACK);
@@ -980,11 +980,11 @@ int solitaire(void){
                 if(deck[c].known == 1){
 #if LCD_DEPTH>1
    #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE); 
+                rb->lcd_set_foreground(LCD_WHITE);
                 rb->lcd_set_background(LCD_WHITE);
    #else
                 rb->lcd_set_foreground(LCD_DEFAULT_BG);
-                rb->lcd_set_background(LCD_DEFAULT_BG);   
+                rb->lcd_set_background(LCD_DEFAULT_BG);
    #endif
 #endif
                     rb->lcd_fillrect(1+i*(LCD_WIDTH - 2)/COL_NUM+1, j+1, CARD_WIDTH-1, CARD_HEIGHT-1);
@@ -1001,8 +1001,8 @@ int solitaire(void){
 #endif
                 } else {
 #ifdef HAVE_LCD_COLOR
-                    rb->lcd_bitmap(solitaire_cardback, 
-                                   1+i*(LCD_WIDTH - 2)/COL_NUM+1, j+1, 
+                    rb->lcd_bitmap(solitaire_cardback,
+                                   1+i*(LCD_WIDTH - 2)/COL_NUM+1, j+1,
                                    BMPWIDTH_CARDBACK, BMPHEIGHT_CARDBACK);
 #endif
                 }
@@ -1024,13 +1024,13 @@ int solitaire(void){
                         if(deck[c].known == 0) {
                             j += CARD_HEIGHT - NOT_KNOWN_CARD;
                         } else {
-                            j += CARD_HEIGHT - KNOWN_CARD; 
+                            j += CARD_HEIGHT - KNOWN_CARD;
                         }
                      }
                 } else {
                     /* go to the next card */
                     h = c;
-                    c = deck[c].next;                   
+                    c = deck[c].next;
                     if(c == NOT_A_CARD) break;
                     if(c!=NOT_A_CARD) {
                         if(deck[h].known == 0) {
@@ -1069,33 +1069,33 @@ int solitaire(void){
             if(c != NOT_A_CARD) {
 #if LCD_DEPTH>1
    #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE); 
+                rb->lcd_set_foreground(LCD_WHITE);
                 rb->lcd_set_background(LCD_WHITE);
    #else
                 rb->lcd_set_foreground(LCD_DEFAULT_BG);
-                rb->lcd_set_background(LCD_DEFAULT_BG);   
+                rb->lcd_set_background(LCD_DEFAULT_BG);
    #endif
 #endif
                     rb->lcd_fillrect(LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2, CARD_WIDTH-1, CARD_HEIGHT-1);
 #if LCD_DEPTH>1
                     rb->lcd_set_foreground(colors[i]);
-#endif                
+#endif
                 rb->lcd_mono_bitmap(numbers[deck[c].num], LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2, BMPWIDTH_c, BMPHEIGHT_c);
                 rb->lcd_mono_bitmap(suits[deck[c].suit], LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+10, 2, BMPWIDTH_c, BMPHEIGHT_c);
             } else {
 #if LCD_DEPTH>1
    #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE); 
+                rb->lcd_set_foreground(LCD_WHITE);
                 rb->lcd_set_background(LCD_WHITE);
    #else
                 rb->lcd_set_foreground(LCD_DEFAULT_BG);
-                rb->lcd_set_background(LCD_DEFAULT_BG);   
+                rb->lcd_set_background(LCD_DEFAULT_BG);
    #endif
 #endif
                     rb->lcd_fillrect(LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2, CARD_WIDTH-1, CARD_HEIGHT-1);
 #if LCD_DEPTH>1
                     rb->lcd_set_foreground(colors[i]);
-#endif      
+#endif
 #ifdef HAVE_LCD_COLOR
                 rb->lcd_mono_bitmap(suitsi[i], LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+(CARD_WIDTH/2-7), CARD_HEIGHT/2-7, 15, 16);
 #endif
@@ -1111,7 +1111,7 @@ int solitaire(void){
                 if(sel_card == c){
                     rb->lcd_drawrect(LCD_WIDTH2 -(CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2, CARD_WIDTH-1, CARD_HEIGHT-1);
                 }
-            } 
+            }
             rb->lcd_drawline(LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 1,LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+CARD_WIDTH,1);
             rb->lcd_drawline(LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2 ,2,LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2,CARD_HEIGHT);
             rb->lcd_drawline(LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,CARD_HEIGHT+1,LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+CARD_WIDTH - 1,CARD_HEIGHT+1);
@@ -1127,46 +1127,46 @@ int solitaire(void){
         }
 
         /* draw the remains */
-        
-                  
+
+
            if(rem != NOT_A_CARD) {
               coun_rem = coun_rem>2?coun_rem=2:coun_rem;
               if(cur_rem != NOT_A_CARD && find_prev_card(cur_rem) != NOT_A_CARD && CARDS_PER_DRAW != 1) {
                   j = (coun_rem)*(BMPWIDTH_c+2);
-                  for(i=0;i<=coun_rem;i++) {    
+                  for(i=0;i<=coun_rem;i++) {
                    if (i>0 && i<3){
 #if LCD_DEPTH>1
    #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE); 
+                rb->lcd_set_foreground(LCD_WHITE);
                 rb->lcd_set_background(LCD_WHITE);
    #else
                 rb->lcd_set_foreground(LCD_DEFAULT_BG);
-                rb->lcd_set_background(LCD_DEFAULT_BG);   
+                rb->lcd_set_background(LCD_DEFAULT_BG);
    #endif
 #endif
-                     rb->lcd_fillrect(CARD_WIDTH+4+j+1, 2, BMPWIDTH_c+1, CARD_HEIGHT-1);   
+                     rb->lcd_fillrect(CARD_WIDTH+4+j+1, 2, BMPWIDTH_c+1, CARD_HEIGHT-1);
         #if LCD_DEPTH>1
                      rb->lcd_set_foreground(LCD_BLACK);
         #endif
                      rb->lcd_drawline(CARD_WIDTH+4+j+1,1,CARD_WIDTH+4+j+BMPWIDTH_c+2,1); /* top line */
                      rb->lcd_drawline(CARD_WIDTH+4+j+1,CARD_HEIGHT+1,CARD_WIDTH+4+j+BMPWIDTH_c+2,CARD_HEIGHT+1); /* bottom line */
                      rb->lcd_drawline(CARD_WIDTH+4+j,2,CARD_WIDTH+4+j,CARD_HEIGHT); /* right line */
-        
-                     
+
+
                      prevcard = cur_rem;
-                     for(x=0;i>x;x++) 
+                     for(x=0;i>x;x++)
                         prevcard = find_prev_card(prevcard);
         #if LCD_DEPTH>1
                      rb->lcd_set_foreground(colors[deck[prevcard].suit]);
            #ifdef HAVE_LCD_COLOR
-                     rb->lcd_set_background(LCD_WHITE);   
+                     rb->lcd_set_background(LCD_WHITE);
            #endif
         #endif
                      rb->lcd_mono_bitmap(numbers[deck[prevcard].num], CARD_WIDTH+4+j+1, 3, BMPWIDTH_c, BMPHEIGHT_c);
                      rb->lcd_mono_bitmap(suits[deck[prevcard].suit],  CARD_WIDTH+4+j+1, 4+BMPHEIGHT_c, BMPWIDTH_c, BMPHEIGHT_c);
-    
-                     
-                   } 
+
+
+                   }
                   j -= BMPWIDTH_c+2;
                   }
               }
@@ -1175,28 +1175,28 @@ int solitaire(void){
 #endif
                if(CARDS_PER_DRAW==1 || cur_rem==NOT_A_CARD)
                   j=0;
-               else 
+               else
                   j=(coun_rem)*(BMPWIDTH_c+2);
                if(cur_rem != NOT_A_CARD){
                rb->lcd_drawline(CARD_WIDTH+4+j+1,1,CARD_WIDTH+4+j+CARD_WIDTH-1,1); /* top line */
                rb->lcd_drawline(CARD_WIDTH+4+j,2,CARD_WIDTH+4+j,CARD_HEIGHT); /* left line */
-               rb->lcd_drawline(CARD_WIDTH+4+j+1,CARD_HEIGHT+1,CARD_WIDTH+4+j+CARD_WIDTH - 1,CARD_HEIGHT+1); /* bottom line */ 
+               rb->lcd_drawline(CARD_WIDTH+4+j+1,CARD_HEIGHT+1,CARD_WIDTH+4+j+CARD_WIDTH - 1,CARD_HEIGHT+1); /* bottom line */
                rb->lcd_drawline(CARD_WIDTH+4+j+CARD_WIDTH,2,CARD_WIDTH+4+j+CARD_WIDTH,CARD_HEIGHT); /* right line */
                }
-               
+
                rb->lcd_drawline(2,1,CARD_WIDTH+1,1); /* top line */
                rb->lcd_drawline(1,2,1,CARD_HEIGHT); /* left line */
-               rb->lcd_drawline(2,CARD_HEIGHT+1,CARD_WIDTH + 1,CARD_HEIGHT+1); /* bottom line */ 
+               rb->lcd_drawline(2,CARD_HEIGHT+1,CARD_WIDTH + 1,CARD_HEIGHT+1); /* bottom line */
                rb->lcd_drawline(CARD_WIDTH+2,2,CARD_WIDTH+2,CARD_HEIGHT); /* right line */
 
                if(cur_rem != NOT_A_CARD){
 #if LCD_DEPTH>1
    #ifdef HAVE_LCD_COLOR
-                rb->lcd_set_foreground(LCD_WHITE); 
+                rb->lcd_set_foreground(LCD_WHITE);
                 rb->lcd_set_background(LCD_WHITE);
    #else
                 rb->lcd_set_foreground(LCD_DEFAULT_BG);
-                rb->lcd_set_background(LCD_DEFAULT_BG);   
+                rb->lcd_set_background(LCD_DEFAULT_BG);
    #endif
 #endif
                     rb->lcd_fillrect(CARD_WIDTH+4+j+1, 2, CARD_WIDTH-1, CARD_HEIGHT-1);
@@ -1221,9 +1221,9 @@ int solitaire(void){
                      rb->lcd_bitmap(solitaire_cardback, 2, 2,
                                     BMPWIDTH_CARDBACK, BMPHEIGHT_CARDBACK);
 #endif
-                } 
+                }
             }
-        
+
 
         /* draw the cursor */
         if(cur_col == REM_COL && rem != NOT_A_CARD){
@@ -1235,8 +1235,8 @@ int solitaire(void){
             rb->lcd_fillrect(CARD_WIDTH+4+1, 2,CARD_WIDTH-1, CARD_HEIGHT-1);
             rb->lcd_set_drawmode(DRMODE_SOLID);
         }
-            
-            
+
+
         rb->lcd_update();
 
         /* what to do when a key is pressed ... */
@@ -1297,7 +1297,7 @@ int solitaire(void){
                     cur_col = (cur_col - COL_NUM + 1)%(SUITS + 1) + COL_NUM;
                     if(cur_col == REM_COL){
                         cur_card = cur_rem;
-                    } 
+                    }
                     else {
                         cur_card = find_last_card(cur_col);
                     }
@@ -1375,6 +1375,10 @@ int solitaire(void){
                 } else if(sel_card == cur_card) {
                     move_card(deck[sel_card].suit + COL_NUM, sel_card);
                     sel_card = NOT_A_CARD;
+                    if( cur_col == REM_COL )
+                    {
+                        cur_card = cur_rem;
+                    }
                 /* try moving cards */
                 } else {
                     if(move_card(cur_col, sel_card) == MOVE_OK){
@@ -1411,19 +1415,19 @@ int solitaire(void){
 
 
 #ifdef SOL_REM
-            case SOL_REM:                 
+            case SOL_REM:
                 if(sel_card != NOT_A_CARD){
                     /* unselect selected card */
                     sel_card = NOT_A_CARD;
                     break;
-                } 
+                }
                 if(rem != NOT_A_CARD && cur_rem != NOT_A_CARD) {
                        sel_card=cur_rem;
                        break;
                 }
                 break;
 #endif
-                
+
             /* unselect selected card or ... */
             /* draw new cards from the remains of the deck */
             case SOL_DRAW:
@@ -1446,7 +1450,7 @@ int solitaire(void){
                     } else {
                         i = CARDS_PER_DRAW;
                     }
-                    
+
                     while(i>0 && deck[cur_rem].next != NOT_A_CARD){
                         cur_rem = deck[cur_rem].next;
                         i--;
@@ -1463,7 +1467,7 @@ int solitaire(void){
                     if(cur_col == REM_COL && cur_card == cur_rem_old) {
                         cur_card = cur_rem;
                         sel_card = NOT_A_CARD;
-                    }    
+                    }
                 }
                 break;
 
@@ -1472,7 +1476,7 @@ int solitaire(void){
             case SOL_RC_QUIT:
 #endif
             case SOL_QUIT:
-#if LCD_DEPTH>1 
+#if LCD_DEPTH>1
                 rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
                 switch(solitaire_menu(MENU_DURINGGAME)){
@@ -1481,7 +1485,7 @@ int solitaire(void){
 
                     case MENU_USB:
                         return SOLITAIRE_USB;
-                  
+
                     case MENU_RESTART:
                         solitaire_init();
                         break;
