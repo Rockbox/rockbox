@@ -862,24 +862,26 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     }
     
 #ifdef HAVE_TC_RAMCACHE
-    if (tcs->ramsearch && TAG_FILENAME_RAM(tcs))
+    if (tcs->ramsearch)
     {
         struct tagfile_entry *ep;
         
 # ifdef HAVE_DIRCACHE
-        if (tcs->type == tag_filename)
+        if (tcs->type == tag_filename && hdr->indices[idxid].flag & FLAG_DIRCACHE)
         {
             dircache_copy_path((struct dircache_entry *)seek,
                                buf, size);
             return true;
         }
+        else
 # endif
-        
-        
-        ep = (struct tagfile_entry *)&hdr->tags[tcs->type][seek];
-        strncpy(buf, ep->tag_data, size-1);
-        
-        return true;
+        if (tcs->type != tag_filename)
+        {
+            ep = (struct tagfile_entry *)&hdr->tags[tcs->type][seek];
+            strncpy(buf, ep->tag_data, size-1);
+            
+            return true;
+        }
     }
 #endif
     
@@ -2213,7 +2215,7 @@ static bool load_tagcache(void)
     struct index_entry *idx;
     int rc, fd;
     char *p;
-    int i;
+    int i, tag;
 
     logf("loading tagcache to ram...");
     
@@ -2267,19 +2269,19 @@ static bool load_tagcache(void)
 
     /* Load the tags. */
     p = (char *)idx;
-    for (i = 0; i < TAG_COUNT; i++)
+    for (tag = 0; tag < TAG_COUNT; tag++)
     {
         struct tagfile_entry *fe;
         char buf[MAX_PATH];
 
-        if (tagcache_is_numeric_tag(i))
+        if (tagcache_is_numeric_tag(tag))
             continue ;
         
         //p = ((void *)p+1);
         p = (char *)((long)p & ~0x03) + 0x04;
-        hdr->tags[i] = p;
+        hdr->tags[tag] = p;
 
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, i);
+        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
         fd = open(buf, O_RDONLY);
         
         if (fd < 0)
@@ -2300,9 +2302,9 @@ static bool load_tagcache(void)
             return false;
         }
         
-        for (hdr->entry_count[i] = 0;
-             hdr->entry_count[i] < tch->entry_count;
-             hdr->entry_count[i]++)
+        for (hdr->entry_count[tag] = 0;
+             hdr->entry_count[tag] < tch->entry_count;
+             hdr->entry_count[tag]++)
         {
             long pos;
             
@@ -2319,7 +2321,7 @@ static bool load_tagcache(void)
             }
 
             /* We have a special handling for the filename tags. */
-            if (i == tag_filename)
+            if (tag == tag_filename)
             {
 # ifdef HAVE_DIRCACHE
                 const struct dircache_entry *dc;
@@ -2351,6 +2353,21 @@ static bool load_tagcache(void)
                 if (idx->flag & FLAG_DELETED)
                     continue;
                     
+                /* This flag must not be used yet. */
+                if (idx->flag & FLAG_DIRCACHE)
+                {
+                    logf("internal error!");
+                    close(fd);
+                    return false;
+                }
+                
+                if (idx->tag_seek[tag] != pos)
+                {
+                    logf("corrupt data structures!");
+                    close(fd);
+                    return false;
+                }
+
 # ifdef HAVE_DIRCACHE
                 if (dircache_is_enabled())
                 {
@@ -2386,8 +2403,6 @@ static bool load_tagcache(void)
                         }
                         close(testfd);
                     }
-
-                    idx->tag_seek[i] = pos;
                 }
                 
                 continue ;
@@ -2413,7 +2428,7 @@ static bool load_tagcache(void)
                 logf("rc=0x%04x", rc); // 0x431
                 logf("len=0x%04x", fe->tag_length); // 0x4000
                 logf("pos=0x%04x", lseek(fd, 0, SEEK_CUR)); // 0x433
-                logf("i=0x%02x", i); // 0x00
+                logf("tag=0x%02x", tag); // 0x00
                 close(fd);
                 return false;
             }
