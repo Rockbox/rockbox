@@ -1397,6 +1397,6 @@ void tree_restore(void)
             gui_textarea_clear(&screens[i]);
         }
     }
-    tagcache_start_scan();
 #endif
+    tagcache_start_scan();
 }
