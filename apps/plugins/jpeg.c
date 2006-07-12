@@ -2785,11 +2785,25 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     buf_images = buf; buf_images_size = buf_size;
 
+    /* make sure the backlight is always on when viewing pictures
+       (actually it should also set the timeout when plugged in,
+       but the function backlight_set_timeout_plugged is not
+       available in plugins) */
+#ifdef CONFIG_BACKLIGHT
+    if (rb->global_settings->backlight_timeout > 0)
+        rb->backlight_set_timeout(1);
+#endif
+
     do
     {
         condition = load_and_show(np_file);
     }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
                                           && condition != PLUGIN_ERROR);
+
+#ifdef CONFIG_BACKLIGHT
+    /* reset backlight settings */
+    rb->backlight_set_timeout(rb->global_settings->backlight_timeout);
+#endif
 
 #ifdef USEGSLIB
     gray_release(); /* deinitialize */
