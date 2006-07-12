@@ -2329,10 +2329,6 @@ static bool load_tagcache(void)
                 // idx = &hdr->indices[hdr->entry_count[i]];
                 idx = &hdr->indices[fe->idx_id];
                 
-                /* Check if the entry has already been removed */
-                if (idx->flag & FLAG_DELETED)
-                    continue;
-                    
                 if (fe->tag_length >= (long)sizeof(buf)-1)
                 {
                     read(fd, buf, 10);
@@ -2351,6 +2347,10 @@ static bool load_tagcache(void)
                     return false;
                 }
                 
+                /* Check if the entry has already been removed */
+                if (idx->flag & FLAG_DELETED)
+                    continue;
+                    
 # ifdef HAVE_DIRCACHE
                 if (dircache_is_enabled())
                 {
