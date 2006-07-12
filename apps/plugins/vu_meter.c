@@ -103,20 +103,14 @@ const struct plugin_api* rb;
 #endif
 
 /* Defines x positions on a logarithmic (dBfs) scale. */
-const unsigned char analog_db_scale[] =
-{0,0,10,15,19,22,25,27,29,31,32,33,35,36,37,38,39,39,40,41,42,42,43,44,44,45,45,46,
-46,47,47,48,48,49,49,50,50,50,51,51,51,52,52,52,53,53,53,54,54,54,55,55,55,55,56,56};
+unsigned char analog_db_scale[LCD_WIDTH/2];
+
+/* Define's y positions, to make the needle arch, like a real needle would. */
+unsigned char y_values[LCD_WIDTH/2];
 
 const unsigned char digital_db_scale[] =
 {0,2,3,5,5,6,6,6,7,7,7,7,8,8,8,8,8,9,9,9,9,9,9,9,9,10,10,
 10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11};
-
-/* Define's y positions, to make the needle arch, like a real needle would. */
-const unsigned char y_values[] =
-{34,34,33,33,32,32,31,31,30,30,29,29,28,28,28,27,27,27,26,26,26,26,25,25,25,25,25,25,
-25,25,25,25,25,25,26,26,26,26,27,27,27,28,28,28,29,29,30,30,31,31,32,32,33,33,34,34};
-
-const unsigned char led[] = {0x0e, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x0e};
 
 const unsigned char needle_cover[] =
 {0x18, 0x1c, 0x1c, 0x1e, 0x1e, 0x1f, 0x1f, 0x1f, 0x1e, 0x1e, 0x1c, 0x1c, 0x18};
@@ -127,6 +121,23 @@ const unsigned char sound_med_level[] = {0x42,0x3C};
 const unsigned char sound_high_level[] = {0x81,0x7E};
 const unsigned char sound_max_level[] = {0x0E,0xDF,0x0E};
 
+const int half_width = LCD_WIDTH / 2;
+const int quarter_width = LCD_WIDTH / 4;
+const int half_height = LCD_HEIGHT / 2;
+
+/* approx ratio of the previous hard coded values */
+const int analog_mini_1 = (LCD_WIDTH / 2)*0.1;
+const int analog_mini_2 = (LCD_WIDTH / 2)*0.25;
+const int analog_mini_3 = (LCD_WIDTH / 2)*0.4;
+const int analog_mini_4 = (LCD_WIDTH / 2)*0.75;
+
+const int digital_block_width = LCD_WIDTH / 11;
+const int digital_block_gap = (int)(LCD_WIDTH / 11) / 10;
+/* ammount to lead in on left so 11x blocks are centered - is often 0 */
+const int digital_lead = (LCD_WIDTH - (((int)(LCD_WIDTH / 11))*11) ) / 2;
+
+const int digital_block_height = (LCD_HEIGHT - 54) / 2 ;
+
 #define ANALOG 1 /* The two meter types */
 #define DIGITAL 2
 
@@ -135,7 +146,7 @@ int left_needle_top_x;
 int last_left_needle_top_x;
 int right_needle_top_y;
 int right_needle_top_x;
-int last_right_needle_top_x = 56;
+int last_right_needle_top_x = LCD_WIDTH / 2;
 
 int num_left_leds;
 int num_right_leds;
@@ -145,6 +156,12 @@ int last_num_right_leds;
 int i;
 
 #define MAX_PEAK 0x8000
+
+/* gap at the top for left/right etc */
+#define NEEDLE_TOP 25
+
+/* pow(M_E, 5) * 65536 */
+#define E_POW_5 9726404
 
 struct saved_settings {
     int meter_type;
@@ -156,7 +173,7 @@ struct saved_settings {
     int digital_decay; 
 } settings;
 
-void reset_settings(void) {    
+void reset_settings(void) {
     settings.meter_type=ANALOG;
     settings.analog_use_db_scale=true;
     settings.digital_use_db_scale=true;
@@ -164,6 +181,108 @@ void reset_settings(void) {
     settings.digital_minimeters=false;
     settings.analog_decay=3;
     settings.digital_decay=0; 
+}
+
+/* taken from http://www.quinapalus.com/efunc.html */
+int fxlog(int x) {
+    int t,y;
+
+    y=0xa65af;
+    if(x<0x00008000) x<<=16,              y-=0xb1721;
+    if(x<0x00800000) x<<= 8,              y-=0x58b91;
+    if(x<0x08000000) x<<= 4,              y-=0x2c5c8;
+    if(x<0x20000000) x<<= 2,              y-=0x162e4;
+    if(x<0x40000000) x<<= 1,              y-=0x0b172;
+    t=x+(x>>1); if((t&0x80000000)==0) x=t,y-=0x067cd;
+    t=x+(x>>2); if((t&0x80000000)==0) x=t,y-=0x03920;
+    t=x+(x>>3); if((t&0x80000000)==0) x=t,y-=0x01e27;
+    t=x+(x>>4); if((t&0x80000000)==0) x=t,y-=0x00f85;
+    t=x+(x>>5); if((t&0x80000000)==0) x=t,y-=0x007e1;
+    t=x+(x>>6); if((t&0x80000000)==0) x=t,y-=0x003f8;
+    t=x+(x>>7); if((t&0x80000000)==0) x=t,y-=0x001fe;
+    x=0x80000000-x;
+    y-=x>>15;
+    return y;
+}
+
+/*
+ * Integer square root routine, good for up to 32-bit values.
+ * Note that the largest square root (that of 0xffffffff) is
+ * 0xffff, so the result fits in a regular unsigned and need
+ * not be `long'.
+ *
+ * Original code from Tomas Rokicki (using a well known algorithm).
+ * This version by Chris Torek, University of Maryland.
+ *
+ * This code is in the public domain.
+ */
+unsigned int root(unsigned long v)
+{
+        register unsigned long t = 1L << 30, r = 0, s;  /* 30 = 15*2 */
+
+#define STEP(k) \
+        s = t + r; \
+        r >>= 1; \
+        if (s <= v) { \
+                v -= s; \
+                r |= t; \
+        }
+        STEP(15); t >>= 2;
+        STEP(14); t >>= 2;
+        STEP(13); t >>= 2;
+        STEP(12); t >>= 2;
+        STEP(11); t >>= 2;
+        STEP(10); t >>= 2;
+        STEP(9); t >>= 2;
+        STEP(8); t >>= 2;
+        STEP(7); t >>= 2;
+        STEP(6); t >>= 2;
+        STEP(5); t >>= 2;
+        STEP(4); t >>= 2;
+        STEP(3); t >>= 2;
+        STEP(2); t >>= 2;
+        STEP(1); t >>= 2;
+        STEP(0);
+        return r;
+
+}
+
+void calc_scales(void)
+{
+    unsigned int fx_log_factor = E_POW_5/half_width;
+    unsigned int y,z;
+
+    for (i=1; i <= half_width; i++)
+    {
+        y = (half_width/5)*fxlog(i*fx_log_factor);
+
+        /* better way of checking for negative values? */
+        z = y>>16;
+        if (z > LCD_WIDTH)
+            z = 0;
+
+        analog_db_scale[i-1] = z;
+        /* play nice */
+        rb->yield();
+    }
+
+    long j;
+    long k;
+    unsigned int l;
+    int nh = LCD_HEIGHT - NEEDLE_TOP;
+    long nh2 = nh*nh;
+    for (i=1; i<=half_width; i++)
+    {
+        j = i - (int)(half_width/2);
+        k = nh2 - ( j * j );
+        /* +1 seems to give a closer approximation */
+        l = root(k) + 1;
+        l = LCD_HEIGHT - l;
+
+        y_values[i-1] = l;
+        rb->yield();
+    }
+
 }
 
 void load_settings(void) {
@@ -234,7 +353,7 @@ void change_settings(void)
             rb->lcd_putsxy(0, 24, "Minimeters:");
             if(settings.analog_minimeters)
                 rb->lcd_putsxy(65, 24, "On");
-            else        
+            else
                 rb->lcd_putsxy(65, 24, "Off");
 
             rb->lcd_putsxy(0, 32, "Decay Speed:");
@@ -258,7 +377,7 @@ void change_settings(void)
             rb->lcd_putsxy(0, 24, "Minimeters:");
             if(settings.digital_minimeters)
                 rb->lcd_putsxy(65, 24, "On");
-            else        
+            else
                 rb->lcd_putsxy(65, 24, "Off");
 
             rb->lcd_putsxy(0, 32, "Decay Speed:");
@@ -290,8 +409,8 @@ void change_settings(void)
                     settings.meter_type == DIGITAL ? settings.meter_type = ANALOG : settings.meter_type++;
                 if(settings.meter_type==ANALOG) {
                     if(selected_setting==1)
-                        settings.analog_use_db_scale = !settings.analog_use_db_scale;    
-                    if(selected_setting==2)                    
+                        settings.analog_use_db_scale = !settings.analog_use_db_scale;
+                    if(selected_setting==2)
                         settings.analog_minimeters = !settings.analog_minimeters;
                     if(selected_setting==3)
                         settings.analog_decay == 0 ? settings.analog_decay = 6 : settings.analog_decay--;
@@ -299,7 +418,7 @@ void change_settings(void)
                 else {
                     if(selected_setting==1)
                         settings.digital_use_db_scale = !settings.digital_use_db_scale;    
-                    if(selected_setting==2)                    
+                    if(selected_setting==2)
                         settings.digital_minimeters = !settings.digital_minimeters;
                     if(selected_setting==3)
                         settings.digital_decay == 0 ? settings.digital_decay = 6 : settings.digital_decay--;
@@ -338,54 +457,54 @@ void change_settings(void)
 }
 
 void draw_analog_minimeters(void) {
-    rb->lcd_mono_bitmap(sound_speaker, 0, 12, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, quarter_width-28, 12, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
-    if(5<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_low_level, 5, 12, 2, 8);
-    if(12<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_med_level, 7, 12, 2, 8);
-    if(24<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_high_level, 9, 12, 2, 8);
-    if(40<left_needle_top_x)
-        rb->lcd_mono_bitmap(sound_max_level, 12, 12, 3, 8);
+    if(analog_mini_1<left_needle_top_x)
+        rb->lcd_mono_bitmap(sound_low_level, quarter_width-23, 12, 2, 8);
+    if(analog_mini_2<left_needle_top_x)
+        rb->lcd_mono_bitmap(sound_med_level, quarter_width-21, 12, 2, 8);
+    if(analog_mini_3<left_needle_top_x)
+        rb->lcd_mono_bitmap(sound_high_level, quarter_width-19, 12, 2, 8);
+    if(analog_mini_4<left_needle_top_x)
+        rb->lcd_mono_bitmap(sound_max_level, quarter_width-16, 12, 3, 8);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_mono_bitmap(sound_speaker, 54, 12, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, quarter_width+half_width-30, 12, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
-    if(5<(right_needle_top_x-56))
-        rb->lcd_mono_bitmap(sound_low_level, 59, 12, 2, 8);
-    if(12<(right_needle_top_x-56))
-        rb->lcd_mono_bitmap(sound_med_level, 61, 12, 2, 8);
-    if(24<(right_needle_top_x-56))
-        rb->lcd_mono_bitmap(sound_high_level, 63, 12, 2, 8);
-    if(40<(right_needle_top_x-56))
-        rb->lcd_mono_bitmap(sound_max_level, 66, 12, 3, 8);
+    if(analog_mini_1<(right_needle_top_x-half_width))
+        rb->lcd_mono_bitmap(sound_low_level, quarter_width+half_width-25, 12, 2, 8);
+    if(analog_mini_2<(right_needle_top_x-half_width))
+        rb->lcd_mono_bitmap(sound_med_level, quarter_width+half_width-23, 12, 2, 8);
+    if(analog_mini_3<(right_needle_top_x-half_width))
+        rb->lcd_mono_bitmap(sound_high_level, quarter_width+half_width-21, 12, 2, 8);
+    if(analog_mini_4<(right_needle_top_x-half_width))
+        rb->lcd_mono_bitmap(sound_max_level, quarter_width+half_width-18, 12, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
 void draw_digital_minimeters(void) {
-    rb->lcd_mono_bitmap(sound_speaker, 34, 24, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 34, half_height-8, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(1<num_left_leds)
-        rb->lcd_mono_bitmap(sound_low_level, 39, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 39, half_height-8, 2, 8);
     if(2<num_left_leds)
-        rb->lcd_mono_bitmap(sound_med_level, 41, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 41, half_height-8, 2, 8);
     if(5<num_left_leds)
-        rb->lcd_mono_bitmap(sound_high_level, 43, 24, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 43, half_height-8, 2, 8);
     if(8<num_left_leds)
-        rb->lcd_mono_bitmap(sound_max_level, 46, 24, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 46, half_height-8, 3, 8);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
-    rb->lcd_mono_bitmap(sound_speaker, 34, 40, 4, 8);
+    rb->lcd_mono_bitmap(sound_speaker, 34, half_height+8, 4, 8);
     rb->lcd_set_drawmode(DRMODE_FG);
     if(1<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_low_level, 39, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_low_level, 39, half_height+8, 2, 8);
     if(2<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_med_level, 41, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_med_level, 41, half_height+8, 2, 8);
     if(5<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_high_level, 43, 40, 2, 8);
+        rb->lcd_mono_bitmap(sound_high_level, 43, half_height+8, 2, 8);
     if(8<(num_right_leds))
-        rb->lcd_mono_bitmap(sound_max_level, 46, 40, 3, 8);
+        rb->lcd_mono_bitmap(sound_max_level, 46, half_height+8, 3, 8);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 }
 
@@ -400,12 +519,12 @@ void analog_meter(void) {
 #endif
 
     if(settings.analog_use_db_scale) {
-        left_needle_top_x = analog_db_scale[left_peak * 56 / MAX_PEAK];
-        right_needle_top_x = analog_db_scale[right_peak * 56 / MAX_PEAK] + 56;
+        left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
+        right_needle_top_x = analog_db_scale[right_peak * half_width / MAX_PEAK] + half_width;
     }
     else {
-        left_needle_top_x = left_peak * 56 / MAX_PEAK;
-        right_needle_top_x = right_peak * 56 / MAX_PEAK + 56;
+        left_needle_top_x = left_peak * half_width / MAX_PEAK;
+        right_needle_top_x = right_peak * half_width / MAX_PEAK + half_width;
     }
 
     /* Makes a decay on the needle */
@@ -416,32 +535,32 @@ void analog_meter(void) {
     last_right_needle_top_x = right_needle_top_x;
 
     left_needle_top_y = y_values[left_needle_top_x];
-    right_needle_top_y = y_values[right_needle_top_x-56];
+    right_needle_top_y = y_values[right_needle_top_x-half_width];
 
     /* Needles */
-    rb->lcd_drawline(28, 63, left_needle_top_x, left_needle_top_y);
-    rb->lcd_drawline(84, 63, right_needle_top_x, right_needle_top_y);
+    rb->lcd_drawline(quarter_width, LCD_HEIGHT-1, left_needle_top_x, left_needle_top_y);
+    rb->lcd_drawline((quarter_width+half_width), LCD_HEIGHT-1, right_needle_top_x, right_needle_top_y);
 
     if(settings.analog_minimeters)
         draw_analog_minimeters();
 
     /* Needle covers */
     rb->lcd_set_drawmode(DRMODE_FG);
-    rb->lcd_mono_bitmap(needle_cover, 22, 59, 13, 5);
-    rb->lcd_mono_bitmap(needle_cover, 78, 59, 13, 5);
+    rb->lcd_mono_bitmap(needle_cover, quarter_width-6, LCD_HEIGHT-5, 13, 5);
+    rb->lcd_mono_bitmap(needle_cover, half_width+quarter_width-6, LCD_HEIGHT-5, 13, 5);
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
     /* Show Left/Right */
-    rb->lcd_putsxy(16, 12, "Left");
-    rb->lcd_putsxy(70, 12, "Right");
+    rb->lcd_putsxy(quarter_width-12, 12, "Left");
+    rb->lcd_putsxy(half_width+quarter_width-12, 12, "Right");
 
     /* Line above/below  the Left/Right text */
-    rb->lcd_drawline(0,9,111,9);
-    rb->lcd_drawline(0,21,111,21);
+    rb->lcd_drawline(0,9,LCD_WIDTH-1,9);
+    rb->lcd_drawline(0,21,LCD_WIDTH-1,21);
 
-    for(i=0; i<56; i++) {
+    for(i=0; i<half_width; i++) {
         rb->lcd_drawpixel(i, (y_values[i])-2);
-        rb->lcd_drawpixel(i+56, (y_values[i])-2);
+        rb->lcd_drawpixel(i+half_width, (y_values[i])-2);
     }
 }
 
@@ -465,17 +584,20 @@ void digital_meter(void) {
 
     num_left_leds = (num_left_leds+last_num_left_leds*settings.digital_decay)/(settings.digital_decay+1);
     num_right_leds = (num_right_leds+last_num_right_leds*settings.digital_decay)/(settings.digital_decay+1);
-    
+
     last_num_left_leds = num_left_leds;
     last_num_right_leds = num_right_leds;
 
     rb->lcd_set_drawmode(DRMODE_FG);
     /* LEDS */
     for(i=0; i<num_left_leds; i++)
-        rb->lcd_mono_bitmap(led, i*9+2+i, 14, 9, 5);
+        rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
+            14, digital_block_width - digital_block_gap, digital_block_height);
 
     for(i=0; i<num_right_leds; i++)
-        rb->lcd_mono_bitmap(led, i*9+2+i, 52, 9, 5);
+        rb->lcd_fillrect((digital_lead + (i*digital_block_width)),
+            (half_height + 20), digital_block_width - digital_block_gap, 
+            digital_block_height);
 
     rb->lcd_set_drawmode(DRMODE_SOLID);
 
@@ -483,26 +605,28 @@ void digital_meter(void) {
         draw_digital_minimeters();
 
     /* Lines above/below where the LEDS are */
-    rb->lcd_drawline(0,12,111,12);
-    rb->lcd_drawline(0,20,111,20);
+    rb->lcd_drawline(0,12,LCD_WIDTH-1,12);
+    rb->lcd_drawline(0,half_height-12,LCD_WIDTH-1,half_height-12);
 
-    rb->lcd_drawline(0,50,111,50);
-    rb->lcd_drawline(0,58,111,58);
+    rb->lcd_drawline(0,half_height+18,LCD_WIDTH-1,half_height+18);
+    rb->lcd_drawline(0,LCD_HEIGHT-6,LCD_WIDTH-1,LCD_HEIGHT-6);
 
     /* Show Left/Right */
-    rb->lcd_putsxy(2, 24, "Left");
-    rb->lcd_putsxy(2, 40, "Right");
+    rb->lcd_putsxy(2, half_height-8, "Left");
+    rb->lcd_putsxy(2, half_height+8, "Right");
 
     /* Line in the middle */
-    rb->lcd_drawline(0,35,111,35);
+    rb->lcd_drawline(0,half_height+3,LCD_WIDTH-1,half_height+3);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     int button;
     int lastbutton = BUTTON_NONE;
-    
+
     (void) parameter;
     rb = api;
+
+    calc_scales();
 
     load_settings();
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -511,13 +635,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     {
         rb->lcd_clear_display();
 
-        rb->lcd_putsxy(33, 0, "VU Meter");
+        rb->lcd_putsxy(half_width-23, 0, "VU Meter");
 
         if(settings.meter_type==ANALOG)
             analog_meter();
         else
             digital_meter();
-            
+
         rb->lcd_update();
 
         button = rb->button_get_w_tmo(1);
@@ -575,4 +699,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             lastbutton = button;
     }
 }
-#endif /* #ifdef HAVE_LCD_BITMAP and HWCODEC */
+#endif /* #ifdef HAVE_LCD_BITMAP */
