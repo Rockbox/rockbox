@@ -2381,9 +2381,10 @@ static bool load_tagcache(void)
                             logf("Entry no longer valid.");
                             logf("-> %s", buf);
                             idx->flag |= FLAG_DELETED;
-                            delete_entry((long)idx - (long)hdr->indices);
+                            delete_entry(fe->idx_id);
                             continue;
                         }
+                        close(testfd);
                     }
 
                     idx->tag_seek[i] = pos;
