@@ -102,6 +102,9 @@
 
 #define USB_X5STYLE
 
+/* USB On-the-go */
+#define CONFIG_USBOTG USBOTG_M5636
+
 /* Define this if you have adjustable CPU frequency */
 #define HAVE_ADJUSTABLE_CPU_FREQ
 

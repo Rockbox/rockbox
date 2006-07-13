@@ -92,6 +92,10 @@
 #include "isp1362.h"
 #endif
 
+#if CONFIG_USBOTG == USBOTG_M5636
+#include "m5636.h"
+#endif
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 const char appsversion[]=APPSVERSION;
@@ -282,6 +286,8 @@ void init(void)
     usb_init();
 #if CONFIG_USBOTG == USBOTG_ISP1362
     isp1362_init();
+#elif CONFIG_USBOTG == USBOTG_M5636
+    m5636_init();
 #endif
 
     backlight_init();

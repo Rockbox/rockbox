@@ -135,6 +135,7 @@
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362
+#define USBOTG_M5636 5636
 
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
