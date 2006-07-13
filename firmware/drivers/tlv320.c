@@ -154,7 +154,7 @@ void tlv320_mute(bool mute)
 
 void tlv320_close()
 {
-    /* todo */
+    tlv320_write_reg(REG_PC, 0xFF);  /* All OFF */
 }
 
 void tlv320_enable_recording(bool source_mic)
