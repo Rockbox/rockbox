@@ -1592,6 +1592,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
     bool update_line;
     bool only_one_subline;
     bool new_subline_refresh;
+    bool reset_subline;
     int search;
     int search_start;
     struct wps_data *data = gwps->data;
@@ -1650,16 +1651,17 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
     for (i = 0; i < WPS_MAX_LINES; i++)
     {
+        reset_subline = (data->curr_subline[i] == SUBLINE_RESET);
         new_subline_refresh = false;
         only_one_subline = false;
 
         /* if time to advance to next sub-line  */
         if (TIME_AFTER(current_tick,  data->subline_expire_time[i] - 1) ||
-           (data->curr_subline[i] == SUBLINE_RESET))
+           reset_subline)
         {
             /* search all sublines until the next subline with time > 0
                is found or we get back to the subline we started with */
-            if (data->curr_subline[i] == SUBLINE_RESET)
+            if (reset_subline)
                 search_start = 0;
             else
                 search_start = data->curr_subline[i];
@@ -1669,7 +1671,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                 /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
                 if ((!data->format_lines[i][data->curr_subline[i]]) ||
-                    (data->curr_subline[i] == WPS_MAX_SUBLINES))
+                    reset_subline)
                 {
                     if (data->curr_subline[i] == 1)
                         only_one_subline = true;
@@ -1682,7 +1684,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                     only_one_subline)
                 {
                     /* no other subline with a time > 0 exists */
-                    data->subline_expire_time[i] = current_tick  + 100 * HZ;
+                    data->subline_expire_time[i] = (reset_subline?
+                        current_tick : data->subline_expire_time[i]) + 100 * HZ;
                     break;
                 }
                 else
@@ -1700,7 +1703,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                     if (data->time_mult[i][data->curr_subline[i]] > 0)
                     {
                         new_subline_refresh = true;
-                        data->subline_expire_time[i] = current_tick  +
+                        data->subline_expire_time[i] = (reset_subline?
+                            current_tick : data->subline_expire_time[i]) +
                             BASE_SUBLINE_TIME * data->time_mult[i][data->curr_subline[i]];
                         break;
                     }
