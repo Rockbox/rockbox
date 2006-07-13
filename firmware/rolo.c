@@ -66,7 +66,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     for(i = 0;i < length;i++)
         *localdest++ = *source++;
 
-#if CONFIG_CPU == MCF5249
+#if defined(CPU_COLDFIRE)
     asm (
         "movec.l %0,%%vbr    \n"
         "move.l  (%0)+,%%sp  \n"
