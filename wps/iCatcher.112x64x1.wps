@@ -6,7 +6,7 @@
 %s%ac%?id<%id|%?d1<%d1|Unknown Album>>
 %s%ac%?in<%in - |%pp - >%?it<%it|%fn>
 %pb|3|11|101|
-%t6%s%acNext: %?It<%It|%?Fn<%Fn|?>>;%t6%s%acNext: %?It<%It|%?Fn<%Fn|?>>
+%t6%s%ac%?Fm<Next: %?It<%It|%Fn>|%fbKbps %fc>;%t6%s%ac%?Fm<Next: %?It<%It|%Fn>|%fbKbps %fc>
 
 %xl|A|bat0-s.bmp|93|3|
 %xl|B|bat1-s.bmp|93|3|
