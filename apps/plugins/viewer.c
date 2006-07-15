@@ -942,7 +942,7 @@ static bool viewer_init(void)
     pf = rb->font_get(FONT_UI);
 
     display_lines = LCD_HEIGHT / pf->height;
-    display_columns = LCD_WIDTH;
+    draw_columns = display_columns = LCD_WIDTH;
 #else
     /* REAL fixed pitch :) all chars use up 1 cell */
     display_lines = 2;
