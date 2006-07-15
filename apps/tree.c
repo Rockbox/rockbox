@@ -643,10 +643,10 @@ static bool dirbrowse(void)
                 {
                     /* Stop the music if it is playing */
                     if(audio_status()) {
-                        if (!global_settings.party_mode)
-                        {
+                        if (!global_settings.party_mode) {
                             if (global_settings.fade_on_stop)
                                 fade(0);
+                            bookmark_autobookmark();
                             audio_stop();
                         }
                     }
