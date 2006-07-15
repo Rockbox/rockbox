@@ -214,6 +214,9 @@ bool bookmark_autobookmark(void)
                             str(LANG_RESUME_CONFIRM_PLAYER)};
     struct text_message message={(char **)lines, 2};
 #endif
+#ifdef HAVE_LCD_COLOR
+    show_main_backdrop(); /* switch to main backdrop as we may come from wps */
+#endif
     gui_syncstatusbar_draw(&statusbars, false);
     if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {
