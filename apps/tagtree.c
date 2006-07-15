@@ -39,6 +39,7 @@
 #include "gui/list.h"
 #include "buffer.h"
 #include "atoi.h"
+#include "playback.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
@@ -47,11 +48,28 @@ static int tagtree_play_folder(struct tree_context* c);
 static char searchstring[32];
 #define MAX_TAGS 5
 
+/*
+ * "%3d. %s" autoscore title
+ * 
+ * valid = true
+ * formatstr = "%-3d. %s"
+ * tags[0] = tag_autoscore
+ * tags[1] = tag_title
+ * tag_count = 2
+ */
+struct display_format {
+    bool valid;
+    char formatstr[64];
+    int tags[MAX_TAGS];
+    int tag_count;
+};
+
 struct search_instruction {
     char name[64];
     int tagorder[MAX_TAGS];
     int tagorder_count;
     struct tagcache_search_clause clause[MAX_TAGS][TAGCACHE_MAX_CLAUSES];
+    struct display_format format[MAX_TAGS];
     int clause_count[MAX_TAGS];
     int result_seek[MAX_TAGS];
 };
@@ -121,6 +139,8 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "title", tag_title);
     MATCH(tag, buf, "tracknum", tag_tracknumber);
     MATCH(tag, buf, "year", tag_year);
+    MATCH(tag, buf, "playcount", tag_playcount);
+    MATCH(tag, buf, "autoscore", tag_virt_autoscore);
     
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
@@ -163,7 +183,7 @@ static int get_clause(int *condition)
     return 0;
 }
 
-static bool add_clause(struct search_instruction *inst,
+static bool add_clause(struct search_instruction *inst, 
                        int tag, int type, const char *str)
 {
     int len = strlen(str);
@@ -206,14 +226,51 @@ static bool add_clause(struct search_instruction *inst,
     return true;
 }
 
+static int get_format_str(struct display_format *fmt)
+{
+    int ret;
+    
+    memset(fmt, 0, sizeof(struct display_format));
+    
+    if (get_token_str(fmt->formatstr, sizeof fmt->formatstr) < 0)
+        return -10;
+    
+    while (fmt->tag_count < MAX_TAGS)
+    {
+        ret = get_tag(&fmt->tags[fmt->tag_count]);
+        if (ret < 0)
+            return -11;
+        
+        if (ret == 0)
+            break;
+        
+        fmt->tag_count++;
+    }
+    
+    fmt->valid = true;
+    
+    return 1;
+}
+
 static int get_condition(struct search_instruction *inst)
 {
+    struct display_format format;
+    struct display_format *fmt = NULL;
     int tag;
     int condition;
     char buf[32];
-    
+        
     switch (*strp)
     {
+        case '=':
+            if (get_format_str(&format) < 0)
+            {
+                logf("get_format_str() parser failed!");
+                return -4;
+            }
+            fmt = &format;
+            break;
+        
         case '?':
         case ' ':
         case '&':
@@ -225,6 +282,14 @@ static int get_condition(struct search_instruction *inst)
             return 0;
     }
 
+    if (fmt)
+    {
+        memcpy(&inst->format[inst->tagorder_count], fmt, 
+               sizeof(struct display_format));
+    }
+    else
+        inst->format[inst->tagorder_count].valid = false;
+    
     if (get_tag(&tag) <= 0)
         return -1;
     
@@ -294,6 +359,62 @@ static int compare(const void *p1, const void *p2)
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
 
+static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
+{
+    (void)id3;
+    (void)last_track;
+    
+    logf("be:%d%s", last_track, id3->path);
+}
+
+static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
+{
+    (void)last_track;
+    long playcount;
+    long playtime;
+    long lastplayed;
+    
+    /* Do not gather data unless proper setting has been enabled. */
+    if (!global_settings.runtimedb)
+        return;
+    
+    /* Don't process unplayed tracks. */
+    if (id3->elapsed == 0)
+        return;
+    
+    if (!tagcache_find_index(&tcs, id3->path))
+    {
+        logf("tc stat: not found: %s", id3->path);
+        return;
+    }
+    
+    playcount  = tagcache_get_numeric(&tcs, tag_playcount);
+    playtime   = tagcache_get_numeric(&tcs, tag_playtime);
+    lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
+    
+    playcount++;
+    
+    /* Ignore the last 15s (crossfade etc.) */
+    playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
+    
+    logf("ube:%s", id3->path);
+    logf("-> %d/%d/%d", last_track, playcount, playtime);
+    logf("-> %d/%d/%d", id3->elapsed, id3->length, MIN(id3->length, id3->elapsed + 15 * 1000));
+    
+    /* lastplayed not yet supported. */
+    
+    if (!tagcache_modify_numeric_entry(&tcs, tag_playcount, playcount)
+        || !tagcache_modify_numeric_entry(&tcs, tag_playtime, playtime)
+        || !tagcache_modify_numeric_entry(&tcs, tag_lastplayed, tag_lastplayed))
+    {
+        logf("tc stat: modify failed!");
+        tagcache_search_finish(&tcs);
+        return;
+    }
+    
+    tagcache_search_finish(&tcs);
+}
+
 void tagtree_init(void)
 {
     int fd;
@@ -350,6 +471,9 @@ void tagtree_init(void)
     close(fd);
     
     audiobuf += sizeof(struct search_instruction) * si_count + 4;
+    
+    audio_set_track_buffer_event(tagtree_buffer_event);
+    audio_set_track_unbuffer_event(tagtree_unbuffer_event);
 }
 
 bool show_search_progress(bool init, int count)
@@ -445,48 +569,100 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     while (tagcache_get_next(tcs))
     {
+        struct display_format *fmt = &csi->format[extra];
+
         if (total_count++ < offset)
             continue;
         
         dptr->newtable = navibrowse;
         dptr->extraseek = tcs->result_seek;
-        if (!tcs->ramsearch || tag == tag_title)
+        if (tag == tag_title)
+            dptr->newtable = playtrack;
+        
+        if (!tcs->ramsearch || fmt->valid)
         {
-            int tracknum = -1;
+            char buf[MAX_PATH];
+            int buf_pos = 0;
+            
+            if (fmt->valid)
+            {
+                char fmtbuf[8];
+                bool read_format = false;
+                int fmtbuf_pos = 0;
+                int parpos = 0;
+
+                memset(buf, 0, sizeof buf);
+                for (i = 0; fmt->formatstr[i] != '\0'; i++)
+                {
+                    if (fmt->formatstr[i] == '%')
+                    {
+                        read_format = true;
+                        fmtbuf_pos = 0;
+                        if (parpos >= fmt->tag_count)
+                        {
+                            logf("too many format tags");
+                            return 0;
+                        }
+                    }
+                    
+                    if (read_format)
+                    {
+                        fmtbuf[fmtbuf_pos++] = fmt->formatstr[i];
+                        if (fmtbuf_pos >= (long)sizeof(fmtbuf))
+                        {
+                            logf("format parse error");
+                            return 0;
+                        }
+                        
+                        if (fmt->formatstr[i] == 's')
+                        {
+                            fmtbuf[fmtbuf_pos] = '\0';
+                            read_format = false;
+                            snprintf(&buf[buf_pos], MAX_PATH - buf_pos, fmtbuf, tcs->result);
+                            buf_pos += strlen(&buf[buf_pos]);
+                            parpos++;
+                        }
+                        else if (fmt->formatstr[i] == 'd')
+                        {
+                            fmtbuf[fmtbuf_pos] = '\0';
+                            read_format = false;
+                            snprintf(&buf[buf_pos], MAX_PATH - buf_pos, fmtbuf,
+                                     tagcache_get_numeric(tcs, fmt->tags[parpos]));
+                            buf_pos += strlen(&buf[buf_pos]);
+                            parpos++;
+                        }
+                        continue;
+                    }
+                    
+                    buf[buf_pos++] = fmt->formatstr[i];
+                    
+                    if (buf_pos - 1 >= (long)sizeof(buf))
+                    {
+                        logf("buffer overflow");
+                        return 0;
+                    }
+                }
+                
+                buf[buf_pos++] = '\0';
+            }
             
             dptr->name = &c->name_buffer[namebufused];
-            if (tag == tag_title)
-            {
-                dptr->newtable = playtrack;
-                if (c->currtable != allsubentries && c->dirlevel > 1)
-                    tracknum = tagcache_get_numeric(tcs, tag_tracknumber);
-            }
-            
-            if (tracknum > 0)
-            {
-                snprintf(dptr->name, c->name_buffer_size - namebufused, "%02d. %s",
-                         tracknum, tcs->result);
-                namebufused += strlen(dptr->name) + 1;
-                if (namebufused >= c->name_buffer_size)
-                {
-                    logf("chunk mode #1: %d", current_entry_count);
-                    c->dirfull = true;
-                    sort = false;
-                    break ;
-                }
-            }
+            if (fmt->valid)
+                namebufused += buf_pos;
             else
-            {
                 namebufused += tcs->result_len;
-                if (namebufused >= c->name_buffer_size)
-                {
-                    logf("chunk mode #2: %d", current_entry_count);
-                    c->dirfull = true;
-                    sort = false;
-                    break ;
-                }
-                strcpy(dptr->name, tcs->result);
+            
+            if (namebufused >= c->name_buffer_size)
+            {
+                logf("chunk mode #2: %d", current_entry_count);
+                c->dirfull = true;
+                sort = false;
+                break ;
             }
+            if (fmt->valid)
+                strcpy(dptr->name, buf);
+            else
+                strcpy(dptr->name, tcs->result);
         }
         else
             dptr->name = tcs->result;

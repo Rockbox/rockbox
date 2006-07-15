@@ -1545,6 +1545,16 @@ static bool tagcache_autoupdate(void)
      return rc;
 }
 
+static bool tagcache_runtimedb(void)
+{
+     bool rc = set_bool_options(str(LANG_RUNTIMEDB_ACTIVE),
+                                &global_settings.runtimedb,
+                                STR(LANG_ON),
+                                STR(LANG_OFF),
+                                NULL);
+     return rc;
+}
+
 static bool tagcache_settings_menu(void)
 {
     int m;
@@ -1557,6 +1567,7 @@ static bool tagcache_settings_menu(void)
         { ID2P(LANG_TAGCACHE_AUTOUPDATE), tagcache_autoupdate },
         { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_rebuild },
         { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
+        { ID2P(LANG_RUNTIMEDB_ACTIVE), tagcache_runtimedb },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

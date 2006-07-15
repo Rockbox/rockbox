@@ -23,9 +23,11 @@
 
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     tag_filename, tag_composer, tag_year, tag_tracknumber,
-    tag_bitrate, tag_length };
+    tag_bitrate, tag_length, tag_playcount, tag_playtime, tag_lastplayed,
+    /* Virtual tags */
+    tag_virt_autoscore };
 
-#define TAG_COUNT 10
+#define TAG_COUNT 13
 
 /* Allow a little drift to the filename ordering (should not be too high/low). */
 #define POS_HISTORY_COUNT 4
@@ -34,7 +36,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x54434804
+#define TAGCACHE_MAGIC  0x54434805
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
@@ -68,6 +70,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* Flags */
 #define FLAG_DELETED    0x0001  /* Entry has been removed from db */
 #define FLAG_DIRCACHE   0x0002  /* Filename is a dircache pointer */
+#define FLAG_DIRTYNUM   0x0004  /* Numeric data has been modified */
 
 enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
     clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
@@ -123,6 +126,7 @@ struct tagcache_search {
 bool tagcache_is_numeric_tag(int type);
 bool tagcache_is_unique_tag(int type);
 bool tagcache_is_sorted_tag(int type);
+bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
@@ -133,6 +137,8 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
                        char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
+bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
+                                   int tag, long data);
 
 struct tagcache_stat* tagcache_get_stat(void);
 int tagcache_get_commit_step(void);
