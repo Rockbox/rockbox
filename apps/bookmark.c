@@ -51,6 +51,10 @@
 #include "splash.h"
 #include "yesno.h"
 
+#ifdef HAVE_LCD_COLOR
+#include "backdrop.h"
+#endif
+
 #define MAX_BOOKMARKS 10
 #define MAX_BOOKMARK_SIZE  350
 #define RECENT_BOOKMARK_FILE ROCKBOX_DIR "/most-recent.bmark"
