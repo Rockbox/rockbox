@@ -137,6 +137,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "genre", tag_genre);
     MATCH(tag, buf, "length", tag_length);
     MATCH(tag, buf, "title", tag_title);
+    MATCH(tag, buf, "filename", tag_filename);
     MATCH(tag, buf, "tracknum", tag_tracknumber);
     MATCH(tag, buf, "year", tag_year);
     MATCH(tag, buf, "playcount", tag_playcount);
@@ -415,6 +416,17 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     tagcache_search_finish(&tcs);
 }
 
+bool tagtree_export(void)
+{
+    gui_syncsplash(0, true, str(LANG_WAIT));
+    if (!tagcache_create_changelog(&tcs))
+    {
+        gui_syncsplash(HZ*2, true, str(LANG_FAILED));
+    }
+    
+    return false;
+}
+
 void tagtree_init(void)
 {
     int fd;
@@ -553,7 +565,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     current_entry_count = 0;
     c->dirfull = false;
     
-    if (tag != tag_title)
+    if (tag != tag_title && tag != tag_filename)
     {
         if (offset == 0)
         {
@@ -576,7 +588,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         
         dptr->newtable = navibrowse;
         dptr->extraseek = tcs->result_seek;
-        if (tag == tag_title)
+        if (tag == tag_title || tag == tag_filename)
             dptr->newtable = playtrack;
         
         if (!tcs->ramsearch || fmt->valid)

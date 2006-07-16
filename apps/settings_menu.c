@@ -50,6 +50,7 @@
 #include "dir.h"
 #include "dircache.h"
 #include "tagcache.h"
+#include "tagtree.h"
 #include "rbunicode.h"
 #include "splash.h"
 #include "yesno.h"
@@ -1568,6 +1569,7 @@ static bool tagcache_settings_menu(void)
         { ID2P(LANG_TAGCACHE_FORCE_UPDATE), tagcache_rebuild },
         { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
         { ID2P(LANG_RUNTIMEDB_ACTIVE), tagcache_runtimedb },
+        { ID2P(LANG_TAGCACHE_EXPORT), tagtree_export },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

@@ -8557,3 +8557,17 @@
     *: "Auto update"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Export modifications"
+  </dest>
+  <voice>
+    *: "Export modifications"
+  </voice>
+</phrase>

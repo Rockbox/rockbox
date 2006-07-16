@@ -478,6 +478,7 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             {
                 struct index_entry *idx = &hdr->indices[i];
                 int seek;
+                char buf[256];
                 char *str = NULL;
                 struct tagfile_entry *entry;
                 
@@ -485,8 +486,16 @@ static bool build_lookup_list(struct tagcache_search *tcs)
                 
                 if (!tagcache_is_numeric_tag(tcs->clause[j]->tag))
                 {
-                    entry = (struct tagfile_entry *)&hdr->tags[tcs->clause[j]->tag][seek];
-                    str = entry->tag_data;
+                    if (tcs->clause[j]->tag == tag_filename)
+                    {
+                        tagcache_retrieve(tcs, i, buf, sizeof buf);
+                        str = buf;
+                    }
+                    else
+                    {
+                        entry = (struct tagfile_entry *)&hdr->tags[tcs->clause[j]->tag][seek];
+                        str = entry->tag_data;
+                    }
                 }
                 
                 
@@ -2102,6 +2111,114 @@ static int open_master_fd(struct tagcache_header *hdr)
     }
     
     return fd;
+}
+
+static bool write_tag(int fd, const char *tagstr, const char *datastr)
+{
+    char buf[256];
+    int i;
+    
+    snprintf(buf, sizeof buf, "%s=\"", tagstr);
+    for (i = strlen(buf); i < (long)sizeof(buf)-2; i++)
+    {
+        if (*datastr == '\0')
+            break;
+        
+        if (*datastr == '"')
+        {
+            buf[i] = '\\';
+            *datastr++;
+            continue;
+        }
+        
+        buf[i] = *(datastr++);
+    }
+    
+    strcpy(&buf[i], "\" ");
+    
+    write(fd, buf, i + 2);
+    
+    return true;
+}
+
+bool tagcache_create_changelog(struct tagcache_search *tcs)
+{
+    static const char *tags_str[] = { "artist", "album", "genre", "title", 
+        "filename", "playcount", "playtime", "lastplayed" };
+    static const int  tags[] = { tag_artist, tag_album, tag_genre, tag_title, 
+        tag_filename, tag_playcount, tag_playtime, tag_lastplayed };
+    struct tagcache_header myhdr;
+    struct index_entry idx;
+    char buf[256];
+    char temp[32];
+    int clfd;
+    int i, j;
+    
+    if (!tagcache_search(tcs, tag_filename))
+        return false;
+    
+    /* Initialize the changelog */
+    clfd = open(TAGCACHE_FILE_CHANGELOG, O_WRONLY | O_CREAT | O_TRUNC);
+    if (clfd < 0)
+    {
+        logf("failure to open changelog");
+        return false;
+    }
+    
+    if (tcs->masterfd < 0)
+    {
+        if ( (tcs->masterfd = open_master_fd(&myhdr)) < 0)
+            return false;
+    }
+    else
+    {
+        lseek(tcs->masterfd, 0, SEEK_SET);
+        read(tcs->masterfd, &myhdr, sizeof(struct tagcache_header));
+    }
+    
+    write(clfd, "## Changelog version 1\n", 23);
+    
+    for (i = 0; i < myhdr.entry_count; i++)
+    {
+        if (read(tcs->masterfd, &idx, sizeof(struct index_entry)) 
+            != sizeof(struct index_entry))
+        {
+            logf("read error");
+            tagcache_search_finish(tcs);
+            close(clfd);
+            return false;
+        }
+        
+        /* Skip until the entry found has been modified. */
+        if (! (idx.flag & FLAG_DIRTYNUM) )
+            continue;
+        
+        logf("Found!");
+        
+        /* Now retrieve all tags. */
+        for (j = 0; j < (long)(sizeof(tags) / sizeof(tags[0])); j++)
+        {
+            if (tagcache_is_numeric_tag(tags[j]))
+            {
+                snprintf(temp, sizeof temp, "%d", idx.tag_seek[tags[j]]);
+                write_tag(clfd, tags_str[j], temp);
+                continue;
+            }
+            
+            tcs->type = tags[j];
+            tagcache_retrieve(tcs, i, buf, sizeof buf);
+            logf("tag: %s", buf);
+            write_tag(clfd, tags_str[j], buf);
+        }
+        
+        write(clfd, "\n", 1);
+    }
+    
+    close(clfd);
+    
+    tagcache_search_finish(tcs);
+    
+    return true;
 }
 
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 

@@ -63,9 +63,10 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_MAX_CLAUSES 10
 
 /* Tag database files. */
-#define TAGCACHE_FILE_TEMP    ROCKBOX_DIR "/tagcache_tmp.tcd"
-#define TAGCACHE_FILE_MASTER  ROCKBOX_DIR "/tagcache_idx.tcd"
-#define TAGCACHE_FILE_INDEX   ROCKBOX_DIR "/tagcache_%d.tcd"
+#define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/tagcache_tmp.tcd"
+#define TAGCACHE_FILE_MASTER     ROCKBOX_DIR "/tagcache_idx.tcd"
+#define TAGCACHE_FILE_INDEX      ROCKBOX_DIR "/tagcache_%d.tcd"
+#define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/tagcache_changelog.txt"
 
 /* Flags */
 #define FLAG_DELETED    0x0001  /* Entry has been removed from db */
@@ -137,6 +138,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
                        char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
+bool tagcache_create_changelog(struct tagcache_search *tcs);
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data);
 
