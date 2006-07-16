@@ -2127,7 +2127,7 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
         if (*datastr == '"')
         {
             buf[i] = '\\';
-            *datastr++;
+            datastr++;
             continue;
         }
         
