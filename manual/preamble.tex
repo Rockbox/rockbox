@@ -52,14 +52,14 @@
 \usepackage{ifthen}
 
 % new \ifpdf to check if running in pdf mode. Helps for html generation.
-\newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
+%\newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
 
 % mark this ad draft version (only for pdflatex) -- comment this out at release
-\ifpdf
+%\ifpdf
   \usepackage{pdfdraftcopy}
   \draftstring{DRAFT VERSION}
 %   \draftangle{45}
-\fi
+%\fi
 
 % fancy header style adjustments
 %\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
