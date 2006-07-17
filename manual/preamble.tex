@@ -51,15 +51,12 @@
 \usepackage{marvosym}
 \usepackage{ifthen}
 
-% new \ifpdf to check if running in pdf mode. Helps for html generation.
-%\newif\ifpdf\ifx\pdfoutput\undefined\pdffalse\else\pdfoutput=1\pdftrue\fi
-
 % mark this ad draft version (only for pdflatex) -- comment this out at release
-%\ifpdf
+\ifpdfoutput{
   \usepackage{pdfdraftcopy}
   \draftstring{DRAFT VERSION}
 %   \draftangle{45}
-%\fi
+  }
 
 % fancy header style adjustments
 %\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
@@ -133,20 +130,24 @@
 % command to display a note.
 % Usage: \note{text of your note}
 % Note: do NOT use \textbf or similar to emphasize text, use \emph!
+\ifpdfoutput{
 \newcommand{\note}[1]{
   \ifinner\else\par\noindent\fi
   \textbf{Note:}\ %
   \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Writinghand}}#1\par\fi%
-}
+}}
+{\newcommand{\note}[1]{\ifinner\else\par\noindent\fi\textbf{Note:{} }#1\par}}
 
 % command to display a warning.
 % Usage: \warn{text of your warning}
 % Note: do NOT use \textbf or similar to emphasize text!
+\ifpdfoutput{
 \newcommand{\warn}[1]{
   \ifinner\else\par\noindent\fi
   \textbf{Warning:\ }%
   \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\Stopsign}}#1\par\fi%
-}
+}}
+{\newcommand{\warn}[1]{\ifinner\else\par\noindent\fi\textbf{Warning:{} }#1}}
 
 % make table floats use "H" (as for screenshots) as default positioning
 \makeatletter\renewcommand{\fps@table}{H}\makeatother
