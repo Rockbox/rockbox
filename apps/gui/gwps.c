@@ -701,7 +701,7 @@ long gui_wps_show(void)
 #ifdef WPS_EXIT
             case WPS_EXIT:
 # ifdef WPS_EXIT_PRE
-                if (lastbutton != WPS_EXIT_PRE)
+                if ((lastbutton & ~BUTTON_REPEAT) != WPS_EXIT_PRE)
                     break;
 # endif
                 if (global_settings.party_mode)
@@ -710,7 +710,7 @@ long gui_wps_show(void)
 #ifdef WPS_RC_EXIT
             case WPS_RC_EXIT:
 #ifdef WPS_RC_EXIT_PRE
-                 if (lastbutton != WPS_RC_EXIT_PRE)
+                if ((lastbutton & ~BUTTON_REPEAT) != WPS_RC_EXIT_PRE)
                      break;
 #endif
                 if (global_settings.party_mode)
