@@ -12,4 +12,5 @@ aac.c
 #endif
 shorten.c
 aiff.c
+sid.c
 #endif

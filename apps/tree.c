@@ -101,6 +101,7 @@ const struct filetype filetypes[] = {
     { "shn", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
     { "aif", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
     { "aiff",TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
+    { "sid", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #endif
     { "m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },

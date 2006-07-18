@@ -103,6 +103,7 @@ static const char* const codec_labels[] = {
   "AAC",  /* Advanced Audio Coding in M4A container */
   "SHN",  /* Shorten */
   "AIFF", /* Audio Interchange File Format */
+  "SID",  /* SID File Format */
 #endif
 };
 

@@ -96,6 +96,7 @@ static volatile bool paused;
 #define CODEC_AAC      "/.rockbox/codecs/aac.codec"
 #define CODEC_SHN      "/.rockbox/codecs/shorten.codec"
 #define CODEC_AIFF     "/.rockbox/codecs/aiff.codec"
+#define CODEC_SID      "/.rockbox/codecs/sid.codec"
 
 /* default point to start buffer refill */
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
@@ -1475,6 +1476,9 @@ static const char *get_codec_path(int codectype) {
         case AFMT_AIFF:
             logf("Codec: PCM AIFF");
             return CODEC_AIFF;
+        case AFMT_SID:
+            logf("Codec: SID");
+            return CODEC_SID;
         default:
             logf("Codec: Unsupported");
             return NULL;
