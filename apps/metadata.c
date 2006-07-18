@@ -1270,6 +1270,51 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     id3->bitrate = id3->filesize*8/id3->length;
     return true;
 }
+
+static bool get_sid_metadata(int fd, struct mp3entry* id3)
+{    
+    /* Use the trackname part of the id3 structure as a temporary buffer */
+    unsigned char* buf = id3->path;    
+    int read_bytes;
+    char *p;
+    
+
+    if ((lseek(fd, 0, SEEK_SET) < 0) 
+        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+    {
+        return false;
+    }
+    
+    if ((memcmp(buf, "PSID",4) != 0))        
+    {
+        return false;
+    }
+
+    p = id3->id3v2buf;
+
+    /* Copy Title */
+    strcpy(p, &buf[0x16]);
+    id3->title = p;
+    p += strlen(p)+1;
+
+    /* Copy Artist */
+    strcpy(p, &buf[0x36]);
+    id3->artist = p;
+    p += strlen(p)+1;
+
+    id3->bitrate = 706;
+    id3->frequency = 44100;
+    /* New idea as posted by Marco Alanen (ravon):
+     * Set the songlength in seconds to the number of subsongs
+     * so every second represents a subsong.
+     * Users can then skip the current subsong by seeking */
+    id3->length = (buf[0xf]-1)*1000;
+    id3->vbr = false;
+    id3->filesize = filesize(fd);
+
+    return true;
+}
+
 #endif /* CONFIG_CODEC == SWCODEC */
 
 static bool get_aiff_metadata(int fd, struct mp3entry* id3)
@@ -1339,50 +1384,6 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
     {
         return false;
     }
-    return true;
-}
-
-static bool get_sid_metadata(int fd, struct mp3entry* id3)
-{    
-    /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = id3->path;    
-    int read_bytes;
-    char *p;
-    
-
-    if ((lseek(fd, 0, SEEK_SET) < 0) 
-        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
-    {
-        return false;
-    }
-    
-    if ((memcmp(buf, "PSID",4) != 0))        
-    {
-        return false;
-    }
-
-    p = id3->id3v2buf;
-
-    /* Copy Title */
-    strcpy(p, &buf[0x16]);
-    id3->title = p;
-    p += strlen(p)+1;
-
-    /* Copy Artist */
-    strcpy(p, &buf[0x36]);
-    id3->artist = p;
-    p += strlen(p)+1;
-
-    id3->bitrate = 706;
-    id3->frequency = 44100;
-    /* New idea as posted by Marco Alanen (ravon):
-     * Set the songlength in seconds to the number of subsongs
-     * so every second represents a subsong.
-     * Users can then skip the current subsong by seeking */
-    id3->length = (buf[0xf]-1)*1000;
-    id3->vbr = false;
-    id3->filesize = filesize(fd);
-
     return true;
 }
 
