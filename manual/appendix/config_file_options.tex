@@ -1,8 +1,15 @@
 \section{Settings}
 \begin{center}
   \begin{longtable}{@{}lll@{}}\toprule
-    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\\midrule
-    volume & 0 to 100 & \%\\
+    \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
+    \midrule
+    volume & \opt{player}{-78 to +18}
+             \opt{recorder,recorderv2fm,ondio}{-100 -to +12}
+             \opt{h1xx,h300}{-84 to 0}
+             \opt{ipodnano}{-72 to +6}
+             \opt{ipodvideo}{-57 dB to +6}
+             \opt{ipodcolor,x5}{-\fixme{??} to +\fixme{??}}
+                    & dB\\
     bass & -15 to +15 & dB\\
     treble & -15 to +15 &dB\\
     balance & -100 to +100 & \%\\
