@@ -32,6 +32,9 @@
 
 static bool display_on=false; /* is the display turned on? */
 
+#define LCD_CMD  *(volatile unsigned short *)0xf0008000
+#define LCD_DATA *(volatile unsigned short *)0xf0008002
+
 /* register defines for the Renesas HD66773R */
 #define R_HORIZ_RAM_ADDR_POS    0x16
 #define R_VERT_RAM_ADDR_POS     0x17
@@ -91,17 +94,17 @@ const short high8to9[] ICONST_ATTR = {
 /* called very frequently - inline! */
 inline void lcd_write_reg(int reg, int val)
 {
-    *(volatile unsigned short *)0xf0008000 = (reg >> 8) << 1;
-    *(volatile unsigned short *)0xf0008000 = (reg & 0xff) << 1;
-    *(volatile unsigned short *)0xf0008002 = (val >> 8) << 1;
-    *(volatile unsigned short *)0xf0008002 = (val & 0xff) << 1;
+    LCD_CMD = (reg >> 8) << 1;
+    LCD_CMD = (reg & 0xff) << 1;
+    LCD_DATA = (val >> 8) << 1;
+    LCD_DATA = (val & 0xff) << 1;
 }
 
 /* called very frequently - inline! */
 inline void lcd_begin_write_gram(void)
 {
-    *(volatile unsigned short *)0xf0008000 = (R_WRITE_DATA_2_GRAM >> 8) << 1;
-    *(volatile unsigned short *)0xf0008000 = (R_WRITE_DATA_2_GRAM & 0xff) << 1;
+    LCD_CMD = (R_WRITE_DATA_2_GRAM >> 8) << 1;
+    LCD_CMD = (R_WRITE_DATA_2_GRAM & 0xff) << 1;
 }
 
 /* called very frequently - inline! */
@@ -119,16 +122,16 @@ inline void lcd_write_data(const unsigned short* p_bytes, int count)
     count >>= 1;
     while(count--) {
         tmp = *ptr++;
-        *(volatile unsigned short *)0xf0008002 = high8to9[tmp >> 24];
-        *(volatile unsigned short *)0xf0008002 = tmp>>15;
-        *(volatile unsigned short *)0xf0008002 = high8to9[(tmp >> 8)&255];
-        *(volatile unsigned short *)0xf0008002 = tmp<<1;
+        LCD_DATA = high8to9[tmp >> 24];
+        LCD_DATA = tmp>>15;
+        LCD_DATA = high8to9[(tmp >> 8)&255];
+        LCD_DATA = tmp<<1;
     }
     if(extra) {
         /* the final "spare" pixel */
         unsigned short read = *(unsigned short *)ptr;
-        *(volatile unsigned short *)0xf0008002 = high8to9[read >> 8];
-        *(volatile unsigned short *)0xf0008002 = read<<1;
+        LCD_DATA = high8to9[read >> 8];
+        LCD_DATA = read<<1;
     }
 }
 
