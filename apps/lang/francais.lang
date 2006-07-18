@@ -5511,7 +5511,7 @@
     *: "[Frequency]"
   </source>
   <dest>
-    *: "[Échantillonnage]"
+    *: "[Echantillonnage]"
   </dest>
   <voice>
     *: ""
@@ -8522,3 +8522,129 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Options de défilement de la télécommande"
   </voice>
 </phrase>   
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Mise à Jour Immédiate"
+  </dest>
+  <voice>
+    *: "Mise à jour immédiate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Mise à Jour Automatique"
+  </dest>
+  <voice>
+    *: "Mise à jour automatique"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exporter des Modifications"
+  </dest>
+  <voice>
+    *: "Exporter des modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Catalogue de Listes de Lecture"
+  </dest>
+  <voice>
+    *: "Catalogue de listes de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Ajouter à la Liste de Lecture"
+  </dest>
+  <voice>
+    *: "Ajouter à la liste de lecture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Ajouter à une Nouvelle Liste"
+  </dest>
+  <voice>
+    *: "Ajouter à une nouvelle liste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Voir le Catalogue"
+  </dest>
+  <voice>
+    *: "Voir le catalogue"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s n’existe pas"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Pas de Listes de Lecture"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+
