@@ -152,7 +152,10 @@ static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (bits & mask);
+    unsigned data = *(char *)address;
+    
+    bits    ^= data;
+    *address = data ^ (bits & mask);
 }
 
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
@@ -172,7 +175,10 @@ static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (~bits & mask);
+    unsigned data = *(char *)address;
+    
+    bits     = ~bits ^ data;
+    *address = data ^ (bits & mask);
 }
 
 lcd_blockfunc_type* pgfx_blockfuncs[8] = {

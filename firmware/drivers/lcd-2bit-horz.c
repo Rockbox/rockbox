@@ -197,24 +197,29 @@ static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
 static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    mask &= ~bits;
-    *address = (*address & ~mask) | (bg_pattern & mask);
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ bg_pattern) & mask & ~bits);
 }
 
 static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
 static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    mask &= bits;
-    *address = (*address & ~mask) | (fg_pattern & mask);
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ fg_pattern) & mask & bits);
 }
 
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (bits & mask & fg_pattern)
-                                  | (~bits & mask & bg_pattern);
+    unsigned data = *address;
+    unsigned bgp  = bg_pattern;
+
+    bits     = bgp  ^ ((bgp ^ fg_pattern) & bits);
+    *address = data ^ ((data ^ bits) & mask);
 }
 
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
@@ -228,24 +233,29 @@ static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
 static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    mask &= bits;
-    *address = (*address & ~mask) | (bg_pattern & mask);
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ bg_pattern) & mask & bits);
 }
 
 static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
 static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    mask &= ~bits;
-    *address = (*address & ~mask) | (fg_pattern & mask);
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ fg_pattern) & mask & ~bits);
 }
 
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
                           ICODE_ATTR;
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (~bits & mask & fg_pattern)
-                                  | (bits & mask & bg_pattern);
+    unsigned data = *address;
+    unsigned fgp  = fg_pattern;
+
+    bits     = fgp  ^ ((fgp ^ bg_pattern) & bits);
+    *address = data ^ ((data ^ bits) & mask);
 }
 
 lcd_blockfunc_type* const lcd_blockfuncs[8] = {
@@ -255,7 +265,10 @@ lcd_blockfunc_type* const lcd_blockfuncs[8] = {
 
 static inline void setblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (bits & mask);
+    unsigned data = *address;
+    
+    bits    ^= data;
+    *address = data ^ (bits & mask);
 }
 
 /*** drawing functions ***/

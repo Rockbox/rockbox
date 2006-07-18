@@ -716,7 +716,10 @@ static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
 static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (bits & mask);
+    unsigned data = *address;
+    
+    bits    ^= data;
+    *address = data ^ (bits & mask);
 }
 
 static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
@@ -744,7 +747,10 @@ static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
                           ICODE_ATTR;
 static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
 {
-    *address = (*address & ~mask) | (~bits & mask);
+    unsigned data = *address;
+    
+    bits     = ~bits ^ data;
+    *address = data ^ (bits & mask);
 }
 
 lcd_blockfunc_type* const lcd_remote_blockfuncs[8] = {
