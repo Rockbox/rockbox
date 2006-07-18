@@ -28,6 +28,7 @@
 #include "playlist_viewer.h"
 #include "talk.h"
 #include "lang.h"
+#include "playlist_catalog.h"
 #include "playlist_menu.h"
 
 static bool save_playlist(void)
@@ -61,11 +62,12 @@ bool playlist_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-        { ID2P(LANG_CREATE_PLAYLIST),       create_playlist   },
-        { ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), playlist_viewer   },
-        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), save_playlist     },
-        { ID2P(LANG_RECURSE_DIRECTORY),     recurse_directory },
-        { ID2P(LANG_WARN_ERASEDYNPLAYLIST_MENU), warnon_option},
+        { ID2P(LANG_CREATE_PLAYLIST),            create_playlist        },
+        { ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),      playlist_viewer        },
+        { ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),      save_playlist          },
+        { ID2P(LANG_CATALOG),                    catalog_view_playlists },
+        { ID2P(LANG_RECURSE_DIRECTORY),          recurse_directory      },
+        { ID2P(LANG_WARN_ERASEDYNPLAYLIST_MENU), warnon_option          },
     };
 
     m = menu_init( items, sizeof items / sizeof(struct menu_item), NULL,

@@ -158,5 +158,8 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
 int playlist_get_track_info(struct playlist_info* playlist, int index,
                             struct playlist_track_info* info);
 int playlist_save(struct playlist_info* playlist, char *filename);
+int playlist_directory_tracksearch(const char* dirname, bool recurse,
+                                   int (*callback)(char*, void*),
+                                   void* context);
 
 #endif /* __PLAYLIST_H__ */

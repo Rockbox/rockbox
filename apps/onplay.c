@@ -63,6 +63,7 @@
 #include "eq_menu.h"
 #endif
 #include "playlist_menu.h"
+#include "playlist_catalog.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -220,6 +221,50 @@ static bool view_playlist(void)
         onplay_result = ONPLAY_START_PLAY;
 
     return result;
+}
+
+bool cat_add_to_a_playlist(void)
+{
+    return catalog_add_to_a_playlist(selected_file, selected_file_attr,
+        false);
+}
+
+bool cat_add_to_a_new_playlist(void)
+{
+    return catalog_add_to_a_playlist(selected_file, selected_file_attr, true);
+}
+
+static bool cat_playlist_options(void)
+{
+    struct menu_item items[3];
+    int m, i=0, result;
+    bool ret = false;
+
+    if ((audio_status() & AUDIO_STATUS_PLAY && context == CONTEXT_WPS) ||
+        context == CONTEXT_TREE)
+    {
+        if (context == CONTEXT_WPS)
+        {
+            items[i].desc = ID2P(LANG_CATALOG_VIEW);
+            items[i].function = catalog_view_playlists;
+            i++;
+        }
+
+        items[i].desc = ID2P(LANG_CATALOG_ADD_TO);
+        items[i].function = cat_add_to_a_playlist;
+        i++;
+        items[i].desc = ID2P(LANG_CATALOG_ADD_TO_NEW);
+        items[i].function = cat_add_to_a_new_playlist;
+        i++;
+    }
+
+    m = menu_init( items, i, NULL, NULL, NULL, NULL );
+    result = menu_show(m);
+    if(result >= 0)
+        ret = items[result].function();
+    menu_exit(m);
+
+    return ret;
 }
 
 /* Sub-menu for playlist options */
@@ -773,9 +818,9 @@ static int onplay_callback(int key, int menu)
 int onplay(char* file, int attr, int from)
 {
 #if CONFIG_CODEC == SWCODEC
-    struct menu_item items[13]; /* increase this if you add entries! */
+    struct menu_item items[14]; /* increase this if you add entries! */
 #else
-    struct menu_item items[11];
+    struct menu_item items[12];
 #endif
     int m, i=0, result;
 #ifdef HAVE_LCD_COLOR
@@ -802,6 +847,9 @@ int onplay(char* file, int attr, int from)
     {
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;
+        i++;
+        items[i].desc = ID2P(LANG_CATALOG);
+        items[i].function = cat_playlist_options;
         i++;
     }
 

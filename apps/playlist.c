@@ -133,6 +133,13 @@
 
 #define PLAYLIST_DISPLAY_COUNT          10
 
+struct directory_search_context {
+    struct playlist_info* playlist;
+    int position;
+    bool queue;
+    int count;
+};
+
 static bool changing_dir = false;
 
 static struct playlist_info current_playlist;
@@ -151,9 +158,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
                                  bool queue, int seek_pos);
-static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     const char *dirname, int *position,
-                                     bool queue, int *count, bool recurse);
+static int directory_search_callback(char* filename, void* context);
 static int remove_track_from_playlist(struct playlist_info* playlist,
                                       int position, bool write);
 static int randomise_playlist(struct playlist_info* playlist,
@@ -681,121 +686,46 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 }
 
 /*
- * Insert directory into playlist.  May be called recursively.
+ * Callback for playlist_directory_tracksearch to insert track into
+ * playlist.
  */
-static int add_directory_to_playlist(struct playlist_info* playlist,
-                                     const char *dirname, int *position,
-                                     bool queue, int *count, bool recurse)
+static int directory_search_callback(char* filename, void* context)
 {
-    char buf[MAX_PATH+1];
-    unsigned char *count_str;
-    int result = 0;
-    int num_files = 0;
-    int i;
-    struct entry *files;
-    struct tree_context* tc = tree_get_context();
-    int dirfilter = *(tc->dirfilter);
+    struct directory_search_context* c =
+        (struct directory_search_context*) context;
+    int insert_pos;
 
-    /* use the tree browser dircache to load files */
-    *(tc->dirfilter) = SHOW_ALL;
+    insert_pos = add_track_to_playlist(c->playlist, filename, c->position,
+        c->queue, -1);
 
-    if (ft_load(tc, dirname) < 0)
-    {
-        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
-        *(tc->dirfilter) = dirfilter;
+    if (insert_pos < 0)
         return -1;
-    }
-
-    files = (struct entry*) tc->dircache;
-    num_files = tc->filesindir;
-
-    /* we've overwritten the dircache so tree browser will need to be
-       reloaded */
-    reload_directory();
-
-    if (queue)
-        count_str = str(LANG_PLAYLIST_QUEUE_COUNT);
-    else
-        count_str = str(LANG_PLAYLIST_INSERT_COUNT);
-
-    for (i=0; i<num_files; i++)
+    
+    (c->count)++;
+    
+    /* Make sure tracks are inserted in correct order if user requests
+       INSERT_FIRST */
+    if (c->position == PLAYLIST_INSERT_FIRST || c->position >= 0)
+        c->position = insert_pos + 1;
+    
+    if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
     {
-        /* user abort */
-        if (button_get(false) == SETTINGS_CANCEL)
-        {
-            result = -1;
-            break;
-        }
+        unsigned char* count_str;
 
-        if (files[i].attr & ATTR_DIRECTORY)
-        {
-            if (recurse)
-            {
-                /* recursively add directories */
-                snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
-                result = add_directory_to_playlist(playlist, buf, position,
-                    queue, count, recurse);
-                if (result < 0)
-                    break;
+        if (c->queue)
+            count_str = str(LANG_PLAYLIST_QUEUE_COUNT);
+        else
+            count_str = str(LANG_PLAYLIST_INSERT_COUNT);
 
-                /* we now need to reload our current directory */
-                if(ft_load(tc, dirname) < 0)
-                {
-                    result = -1;
-                    break;
-                }
-                    
-                files = (struct entry*) tc->dircache;
-                num_files = tc->filesindir;
-                if (!num_files)
-                {
-                    result = -1;
-                    break;
-                }
-            }
-            else
-                continue;
-        }
-        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
-        {
-            int insert_pos;
-
-            snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
-            
-            insert_pos = add_track_to_playlist(playlist, buf, *position,
-                queue, -1);
-            if (insert_pos < 0)
-            {
-                result = -1;
-                break;
-            }
-
-            (*count)++;
-
-            /* Make sure tracks are inserted in correct order if user requests
-               INSERT_FIRST */
-            if (*position == PLAYLIST_INSERT_FIRST || *position >= 0)
-                *position = insert_pos + 1;
-
-            if ((*count%PLAYLIST_DISPLAY_COUNT) == 0)
-            {
-                display_playlist_count(*count, count_str);
-
-                if (*count == PLAYLIST_DISPLAY_COUNT &&
-                    (audio_status() & AUDIO_STATUS_PLAY) &&
-                    playlist->started)
-                    audio_flush_and_reload_tracks();
-            }
-            
-            /* let the other threads work */
-            yield();
-        }
+        display_playlist_count(c->count, count_str);
+        
+        if ((c->count) == PLAYLIST_DISPLAY_COUNT &&
+            (audio_status() & AUDIO_STATUS_PLAY) &&
+            c->playlist->started)
+            audio_flush_and_reload_tracks();
     }
 
-    /* restore dirfilter */
-    *(tc->dirfilter) = dirfilter;
-
-    return result;
+    return 0;
 }
 
 /*
@@ -2811,9 +2741,9 @@ int playlist_insert_directory(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
                               bool recurse)
 {
-    int count = 0;
     int result;
     unsigned char *count_str;
+    struct directory_search_context context;
 
     if (!playlist)
         playlist = &current_playlist;
@@ -2829,18 +2759,23 @@ int playlist_insert_directory(struct playlist_info* playlist,
     else
         count_str = str(LANG_PLAYLIST_INSERT_COUNT);
 
-    display_playlist_count(count, count_str);
+    display_playlist_count(0, count_str);
+
+    context.playlist = playlist;
+    context.position = position;
+    context.queue = queue;
+    context.count = 0;
 
     cpu_boost(true);
 
-    result = add_directory_to_playlist(playlist, dirname, &position, queue,
-        &count, recurse);
+    result = playlist_directory_tracksearch(dirname, recurse,
+        directory_search_callback, &context);
 
     sync_control(playlist, false);
 
     cpu_boost(false);
 
-    display_playlist_count(count, count_str);
+    display_playlist_count(context.count, count_str);
 
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
@@ -3400,6 +3335,101 @@ int playlist_save(struct playlist_info* playlist, char *filename)
     }
 
     cpu_boost(false);
+
+    return result;
+}
+
+/*
+ * Search specified directory for tracks and notify via callback.  May be
+ * called recursively.
+ */
+int playlist_directory_tracksearch(const char* dirname, bool recurse,
+                                   int (*callback)(char*, void*),
+                                   void* context)
+{
+    char buf[MAX_PATH+1];
+    int result = 0;
+    int num_files = 0;
+    int i;
+    struct entry *files;
+    struct tree_context* tc = tree_get_context();
+    int old_dirfilter = *(tc->dirfilter);
+
+    if (!callback)
+        return -1;
+
+    /* use the tree browser dircache to load files */
+    *(tc->dirfilter) = SHOW_ALL;
+
+    if (ft_load(tc, dirname) < 0)
+    {
+        gui_syncsplash(HZ*2, true, str(LANG_PLAYLIST_DIRECTORY_ACCESS_ERROR));
+        *(tc->dirfilter) = old_dirfilter;
+        return -1;
+    }
+
+    files = (struct entry*) tc->dircache;
+    num_files = tc->filesindir;
+
+    /* we've overwritten the dircache so tree browser will need to be
+       reloaded */
+    reload_directory();
+
+    for (i=0; i<num_files; i++)
+    {
+        /* user abort */
+        if (button_get(false) == SETTINGS_CANCEL)
+        {
+            result = -1;
+            break;
+        }
+
+        if (files[i].attr & ATTR_DIRECTORY)
+        {
+            if (recurse)
+            {
+                /* recursively add directories */
+                snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
+                result = playlist_directory_tracksearch(buf, recurse,
+                    callback, context);
+                if (result < 0)
+                    break;
+
+                /* we now need to reload our current directory */
+                if(ft_load(tc, dirname) < 0)
+                {
+                    result = -1;
+                    break;
+                }
+                    
+                files = (struct entry*) tc->dircache;
+                num_files = tc->filesindir;
+                if (!num_files)
+                {
+                    result = -1;
+                    break;
+                }
+            }
+            else
+                continue;
+        }
+        else if ((files[i].attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+        {
+            snprintf(buf, sizeof(buf), "%s/%s", dirname, files[i].name);
+
+            if (callback(buf, context) != 0)
+            {
+                result = -1;
+                break;
+            }
+
+            /* let the other threads work */
+            yield();
+        }
+    }
+
+    /* restore dirfilter */
+    *(tc->dirfilter) = old_dirfilter;
 
     return result;
 }
