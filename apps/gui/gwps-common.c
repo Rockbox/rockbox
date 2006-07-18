@@ -1671,7 +1671,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                 /* wrap around if beyond last defined subline or WPS_MAX_SUBLINES */
                 if ((!data->format_lines[i][data->curr_subline[i]]) ||
-                    reset_subline)
+                    (data->curr_subline[i] == WPS_MAX_SUBLINES))
                 {
                     if (data->curr_subline[i] == 1)
                         only_one_subline = true;
