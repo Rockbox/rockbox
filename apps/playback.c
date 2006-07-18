@@ -1079,6 +1079,7 @@ static void rebuffer_and_seek(size_t newpos)
         buf_ridx += AUDIO_REBUFFER_GUESS_SIZE;
         cur_ti->start_pos = newpos - AUDIO_REBUFFER_GUESS_SIZE;
     } else {
+        buf_ridx += newpos;
         cur_ti->start_pos = 0;
     }
 
