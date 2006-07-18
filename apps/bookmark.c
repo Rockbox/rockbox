@@ -408,6 +408,7 @@ bool bookmark_autoload(const char* file)
 {
     int  key;
     int  fd;
+    int i;
     bool done = false;
 
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
@@ -434,19 +435,25 @@ bool bookmark_autoload(const char* file)
     else
     {
         /* Prompting user to confirm bookmark load */
-        lcd_clear_display();
+        FOR_NB_SCREENS(i)
+            screens[i].clear_display();
+        
         gui_syncstatusbar_draw(&statusbars, false);
+        
+        FOR_NB_SCREENS(i)
+        {
 #ifdef HAVE_LCD_BITMAP
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-        lcd_puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
-        lcd_puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
-        lcd_puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
-        lcd_puts(0,3, str(LANG_CANCEL_WITH_ANY_RECORDER));
+            screens[i].setmargins(0, STATUSBAR_HEIGHT);
+            screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
+            screens[i].puts(0,1, str(LANG_CONFIRM_WITH_PLAY_RECORDER));
+            screens[i].puts(0,2, str(LANG_BOOKMARK_SELECT_LIST_BOOKMARKS));
+            screens[i].puts(0,3, str(LANG_CANCEL_WITH_ANY_RECORDER));
+            screens[i].update();
 #else
-        lcd_puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
-        lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
+            screens[i].puts_scroll(0,0, str(LANG_BOOKMARK_AUTOLOAD_QUERY));
+            screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
 #endif
-        lcd_update();
+        }
 
         while(!done)
         {
@@ -455,8 +462,14 @@ bool bookmark_autoload(const char* file)
             switch(key)
             {
 #ifdef HAVE_LCD_BITMAP
+#ifdef BOOKMARK_RC_DOWN
+                case BOOKMARK_RC_DOWN:
+#endif
                 case BOOKMARK_DOWN:
                     return bookmark_load(global_bookmark_file_name, false);
+#endif
+#ifdef SETTINGS_RC_OK
+                case SETTINGS_RC_OK:
 #endif
                 case SETTINGS_OK:
                     return bookmark_load(global_bookmark_file_name, true);
@@ -563,9 +576,11 @@ static char* select_bookmark(const char* bookmark_file_name)
     int bookmark_count = 0;
 
 #ifdef HAVE_LCD_BITMAP
+    int i;
     int x = lcd_getxmargin();
     int y = lcd_getymargin();
-    lcd_setmargins(0, 0);
+    FOR_NB_SCREENS(i)
+        screens[i].setmargins(0, 0);
 #endif
 
     bookmark_count = get_bookmark_count(bookmark_file_name);
@@ -609,6 +624,9 @@ static char* select_bookmark(const char* bookmark_file_name)
         key = button_get(true);
         switch(key)
         {
+#ifdef BOOKMARK_RC_SELECT
+            case BOOKMARK_RC_SELECT:
+#endif
             case BOOKMARK_SELECT:
 #ifdef BOOKMARK_SELECT_PRE
                 if (lastkey != BOOKMARK_SELECT_PRE)
@@ -617,12 +635,20 @@ static char* select_bookmark(const char* bookmark_file_name)
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
-                    lcd_setmargins(0, STATUSBAR_HEIGHT);
+                {
+                    FOR_NB_SCREENS(i)
+                        screens[i].setmargins(0, STATUSBAR_HEIGHT);
+                }
                 else
-                    lcd_setmargins(0, 0);
+                {
+                   FOR_NB_SCREENS(i)
+                        screens[i].setmargins(0, 0);
+                }
 #endif
                 return bookmark;
-
+#ifdef BOOKMARK_RC_DELETE
+            case BOOKMARK_RC_DELETE:
+#endif
             case BOOKMARK_DELETE:
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
@@ -632,25 +658,43 @@ static char* select_bookmark(const char* bookmark_file_name)
                     bookmark_id = bookmark_count -1;
                 break;
 
+#ifdef SETTINGS_RC_DEC
+            case SETTINGS_RC_DEC:
+            case SETTINGS_RC_DEC | BUTTON_REPEAT:
+#endif
             case SETTINGS_DEC:
             case SETTINGS_DEC | BUTTON_REPEAT:
                 bookmark_id--;
                 break;
 
+#ifdef SETTINGS_RC_DEC
+            case SETTINGS_RC_INC:
+            case SETTINGS_RC_INC | BUTTON_REPEAT:
+#endif
             case SETTINGS_INC:
             case SETTINGS_INC | BUTTON_REPEAT:
                 bookmark_id++;
                 break;
 
+#ifdef SETTINGS_RC_CANCEL
+            case SETTINGS_RC_CANCEL:
+#endif
+#ifdef SETTINGS_RC_CANCEL2
+            case SETTINGS_RC_CANCEL2:
+#endif
             case SETTINGS_CANCEL:
 #ifdef SETTINGS_CANCEL2
             case SETTINGS_CANCEL2:
+#endif
+#ifdef SETTINGS_RC_OK2
+            case SETTINGS_RC_OK2:
 #endif
 #ifdef SETTINGS_OK2
             case SETTINGS_OK2:
 #endif
 #ifdef HAVE_LCD_BITMAP
-                lcd_setmargins(x, y);
+                FOR_NB_SCREENS(i)
+                    screens[i].setmargins(x, y);
 #endif
                 return NULL;
 
@@ -732,6 +776,7 @@ static void display_bookmark(const char* bookmark,
     bool playlist_shuffle = false;
     int  len;
     char *dot;
+    int i;
 
     /* getting the index and the time into the file */
     parse_bookmark(bookmark,
@@ -739,8 +784,11 @@ static void display_bookmark(const char* bookmark,
                    &ms, &repeat_mode, &playlist_shuffle,
                    global_filename);
 
-    lcd_clear_display();
-    lcd_stop_scroll();
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].clear_display();
+        screens[i].stop_scroll();
+    }
 
 #ifdef HAVE_LCD_BITMAP
     /* bookmark shuffle and repeat states*/
@@ -771,7 +819,8 @@ static void display_bookmark(const char* bookmark,
       dot=NULL;
     if (dot)
         *dot='\0';
-    lcd_puts_scroll(0, 0, (unsigned char *)global_filename);
+    FOR_NB_SCREENS(i)
+        screens[i].puts_scroll(0, 0, (unsigned char *)global_filename);
     if (dot)
         *dot='.';
 
@@ -779,12 +828,14 @@ static void display_bookmark(const char* bookmark,
     snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d/%2d",
              str(LANG_BOOKMARK_SELECT_BOOKMARK_TEXT),
              bookmark_id + 1, bookmark_count);
-    lcd_puts_scroll(0, 1, (unsigned char *)global_temp_buffer);
+    FOR_NB_SCREENS(i)
+        screens[i].puts_scroll(0, 1, (unsigned char *)global_temp_buffer);
 
     /* bookmark resume index */
     snprintf(global_temp_buffer, sizeof(global_temp_buffer), "%s: %2d",
              str(LANG_BOOKMARK_SELECT_INDEX_TEXT), resume_index+1);
-    lcd_puts_scroll(0, 2, (unsigned char *)global_temp_buffer);
+    FOR_NB_SCREENS(i)
+        screens[i].puts_scroll(0, 2, (unsigned char *)global_temp_buffer);
 
     /* elapsed time*/
     if ( ms < 3600000 )
@@ -804,12 +855,16 @@ static void display_bookmark(const char* bookmark,
                  ms % 3600000 / 60000,
                  (unsigned int)(ms % 60000) / 1000);
     }
-    lcd_puts_scroll(0, 3, (unsigned char *)global_temp_buffer);
+    FOR_NB_SCREENS(i)
+        screens[i].puts_scroll(0, 3, (unsigned char *)global_temp_buffer);
 
     /* commands */
-    lcd_puts_scroll(0, 4, str(LANG_BOOKMARK_SELECT_PLAY));
-    lcd_puts_scroll(0, 5, str(LANG_BOOKMARK_SELECT_EXIT));
-    lcd_puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].puts_scroll(0, 4, str(LANG_BOOKMARK_SELECT_PLAY));
+        screens[i].puts_scroll(0, 5, str(LANG_BOOKMARK_SELECT_EXIT));
+        screens[i].puts_scroll(0, 6, str(LANG_BOOKMARK_SELECT_DELETE));
+    }
 #else
     (void)bookmark_id;
     len=strlen(global_filename);
@@ -840,12 +895,20 @@ static void display_bookmark(const char* bookmark,
     }
 
     gui_syncstatusbar_draw(&statusbars, false);
-    lcd_puts_scroll(0,0,global_temp_buffer);
-    lcd_puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
+    
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].puts_scroll(0,0,global_temp_buffer);
+        screens[i].puts(0,1,str(LANG_RESUME_CONFIRM_PLAYER));
+    }
     if (dot)
         *dot='.';
 #endif
-    lcd_update();
+
+#ifdef HAVE_LCD_BITMAP
+    FOR_NB_SCREENS(i)
+        screens[i].update();
+#endif
 }
 
 
