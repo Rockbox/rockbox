@@ -288,7 +288,11 @@ boot_table:
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
     /* We'll load the banked FIQ mode registers with useful values here.
        These values will be used in the FIQ handler in pcm_playback.c */
-    ldr    r12, =0x70002800 /* IISCONFIG */
+#if CONFIG_CPU == PP5002
+    ldr    r12, =0xc0002500 /* PP5002 IISCONFIG */
+#else
+    ldr    r12, =0x70002800 /* PP502x IISCONFIG */
+#endif
     ldr    r11, =p
 #endif
     /* Let abort and undefined modes use IRQ stack */

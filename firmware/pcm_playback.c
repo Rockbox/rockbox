@@ -344,7 +344,7 @@ size_t pcm_get_bytes_waiting(void)
    actually needs to do so when calling callback_for_more. C version is still
    included below for reference.
  */
-#if CONFIG_CPU == PP5020
+#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
 void fiq(void) ICODE_ATTR __attribute__((naked));
 void fiq(void)
 {
@@ -356,18 +356,32 @@ void fiq(void)
      * r10 is a working register.
      */
     asm volatile (
+#if CONFIG_CPU == PP5002
+        "ldr r10, =0xcf001040 \n\t" /* Some magic from iPodLinux */
+        "ldr r10, [r10]       \n\t"
+        "ldr r10, [r12, #0x1c]\n\t"
+        "bic r10, r10, #0x200 \n\t" /* clear interrupt */
+        "str r10, [r12, #0x1c]\n\t"
+#else
         "ldr r10, [r12]       \n\t"
         "bic r10, r10, #0x2   \n\t" /* clear interrupt */
         "str r10, [r12]       \n\t"
+#endif
         "ldr r8, [r11, #4]    \n\t" /* r8 = p_size */
         "ldr r9, [r11]        \n\t" /* r9 = p */
     ".loop:                   \n\t"
         "cmp r8, #0           \n\t" /* is p_size 0? */
         "beq .more_data       \n\t" /* if so, ask pcmbuf for more data */
-    ".fifo_loop:              \n\t"    
+    ".fifo_loop:              \n\t"
+#if CONFIG_CPU == PP5002
+        "ldr r10, [r12, #0x1c]\n\t" /* read IISFIFO_CFG to check FIFO status */
+        "and r10, r10, #0x7800000\n\t"
+        "cmp r10, #0x800000    \n\t"
+#else
         "ldr r10, [r12, #0x0c]\n\t" /* read IISFIFO_CFG to check FIFO status */
         "and r10, r10, #0x3f0000\n\t"
-        "cmp r10, #0x10000    \n\t" 
+        "cmp r10, #0x10000    \n\t"
+#endif
         "bls .fifo_full       \n\t" /* FIFO full, exit */
         "ldr r10, [r9], #4    \n\t" /* load two samples */
         "mov r10, r10, ror #16\n\t" /* put left sample at the top bits */
@@ -395,9 +409,17 @@ void fiq(void)
     ".dma_stop:               \n\t" /* no more data, do dma_stop() and exit */
         "ldr r10, =pcm_playing\n\t"
         "strb r8, [r10]       \n\t" /* pcm_playing = false (r8=0, look above) */
-        "ldr r10, [r12]       \n\t" 
+        "ldr r10, [r12]       \n\t"
+#if CONFIG_CPU == PP5002
+        "bic r10, r10, #0x4\n\t" /* disable playback FIFO */
+        "str r10, [r12]       \n\t"
+        "ldr r10, [r12, #0x1c]  \n\t"
+        "bic r10, r10, #0x200   \n\t" /* clear interrupt */
+        "str r10, [r12, #0x1c]  \n\t"
+#else
         "bic r10, r10, #0x20000002\n\t" /* disable playback FIFO and IRQ */
         "str r10, [r12]       \n\t"
+#endif
         "mrs r10, cpsr        \n\t"
         "orr r10, r10, #0x40  \n\t" /* disable FIQ */
         "msr cpsr_c, r10      \n\t"
@@ -406,9 +428,15 @@ void fiq(void)
         "str r9, [r11]        \n\t"
         "subs pc, lr, #4      \n\t" /* FIQ specific return sequence */
     ".fifo_full:              \n\t" /* enable IRQ and exit */
+#if CONFIG_CPU == PP5002
+        "ldr r10, [r12, #0x1c]\n\t"
+        "orr r10, r10, #0x200 \n\t" /* set interrupt */
+        "str r10, [r12, #0x1c]\n\t"
+#else
         "ldr r10, [r12]       \n\t"
         "orr r10, r10, #0x2   \n\t" /* set interrupt */
         "str r10, [r12]       \n\t"
+#endif
         "b .exit              \n\t"
     );
 }
