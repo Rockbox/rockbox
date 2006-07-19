@@ -1119,6 +1119,7 @@ void peak_meter_draw_trig(int xpos, int ypos)
 {
     int barstart, barend;
     int icon, ixpos;
+    int i;
     switch (trig_status) {
 
         case TRIG_READY:
@@ -1160,8 +1161,11 @@ void peak_meter_draw_trig(int xpos, int ypos)
     scrollbar(xpos + ICON_PLAY_STATE_WIDTH + 1, ypos + 1,
               TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
               TRIGBAR_WIDTH, barstart, barend, HORIZONTAL);
-    lcd_mono_bitmap(bitmap_icons_7x8[icon], ixpos, ypos,
-                    ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].mono_bitmap(bitmap_icons_7x8[icon], ixpos, ypos,
+                        ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
+    }
 }
 #endif
 
@@ -1226,7 +1230,7 @@ bool peak_meter_histogram(void)
         unsigned int max = 0;
         int y = 0;
         int x = 0;
-        lcd_clear_display();
+        screens[0].clear_display();
 
         for (i = 0; i < PEEKS_PER_DRAW_SIZE; i++) {
             max = MAX(max, peeks_per_redraw[i]);
@@ -1234,7 +1238,7 @@ bool peak_meter_histogram(void)
 
         for (i = 0; i < PEEKS_PER_DRAW_SIZE; i++) {
             x = peeks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            lcd_hline(0, x, y + i);
+            screens[0].hline(0, x, y + i);
         }
 
         y = PEEKS_PER_DRAW_SIZE + 1;
@@ -1246,9 +1250,9 @@ bool peak_meter_histogram(void)
 
         for (i = 0; i < TICKS_PER_DRAW_SIZE; i++) {
             x = ticks_per_redraw[i] * (LCD_WIDTH - 1)/ max;
-            lcd_hline(0, x, y + i);
+            screens[0].hline(0, x, y + i);
         }
-        lcd_update();
+        screens[0].update();
 
         btn = button_get(true);
         if (btn == BUTTON_PLAY) {

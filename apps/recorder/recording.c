@@ -975,8 +975,10 @@ bool recording_screen(void)
             if (peak_meter_trigger_status() != TRIG_OFF)
             {
                 peak_meter_draw_trig(LCD_WIDTH - TRIG_WIDTH, 4 * h);
-                lcd_update_rect(LCD_WIDTH - (TRIG_WIDTH + 2), 4 * h,
-                                TRIG_WIDTH + 2, TRIG_HEIGHT);
+                FOR_NB_SCREENS(i){
+                    screens[i].update_rect(LCD_WIDTH - (TRIG_WIDTH + 2), 4 * h,
+                                    TRIG_WIDTH + 2, TRIG_HEIGHT);
+                }
             }
         }
 
@@ -996,7 +998,10 @@ bool recording_screen(void)
     {
         gui_syncsplash(0, true, str(LANG_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars, true);
-        lcd_update();
+        
+        FOR_NB_SCREENS(i)
+            screens[i].update();
+        
         audio_error_clear();
 
         while(1)
@@ -1026,7 +1031,8 @@ bool recording_screen(void)
 
     sound_settings_apply();
 
-    lcd_setfont(FONT_UI);
+    FOR_NB_SCREENS(i)
+        screens[i].setfont(FONT_UI);
 
     if (have_recorded)
         reload_directory();
@@ -1042,34 +1048,47 @@ bool f2_rec_screen(void)
 {
     bool exit = false;
     bool used = false;
-    int w, h;
+    int w, h, i;
     char buf[32];
     int button;
 
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("A",&w,&h);
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_SYSFIXED);
+        screens[i].getstringsize("A",&w,&h);
+    }
 
     while (!exit) {
         const char* ptr=NULL;
 
-        lcd_clear_display();
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
 
-        /* Recording quality */
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_QUALITY));
-        snprintf(buf, 32, "%d", global_settings.rec_quality);
-        lcd_putsxy(0, LCD_HEIGHT/2-h, buf);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+            /* Recording quality */
+            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_QUALITY));
+        }
+        
+            snprintf(buf, 32, "%d", global_settings.rec_quality);
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].putsxy(0, LCD_HEIGHT/2-h, buf);
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
                         LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
+        }
 
         /* Frequency */
         snprintf(buf, sizeof buf, "%s:", str(LANG_RECORDING_FREQUENCY));
-        lcd_getstringsize(buf,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
         ptr = freq_str[global_settings.rec_frequency];
-        lcd_getstringsize(ptr, &w, &h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                        LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].getstringsize(buf,&w,&h);
+            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, buf);
+            screens[i].getstringsize(ptr, &w, &h);
+            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                            LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
+        }
 
         /* Channel mode */
         switch ( global_settings.rec_channels ) {
@@ -1082,17 +1101,20 @@ bool f2_rec_screen(void)
                 break;
         }
 
-        lcd_getstringsize(str(LANG_RECORDING_CHANNELS), &w, &h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
-                   str(LANG_RECORDING_CHANNELS));
-        lcd_getstringsize(str(LANG_F2_MODE), &w, &h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
-        lcd_getstringsize(ptr, &w, &h);
-        lcd_putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].getstringsize(str(LANG_RECORDING_CHANNELS), &w, &h);
+            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
+                       str(LANG_RECORDING_CHANNELS));
+            screens[i].getstringsize(str(LANG_F2_MODE), &w, &h);
+            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
+            screens[i].getstringsize(ptr, &w, &h);
+            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
                         LCD_WIDTH/2 + 8, LCD_HEIGHT/2 - 4, 7, 8);
 
-        lcd_update();
+            screens[i].update();
+        }
 
         button = button_get(true);
         switch (button) {
@@ -1150,7 +1172,8 @@ bool f2_rec_screen(void)
     set_gain();
     
     settings_save();
-    lcd_setfont(FONT_UI);
+    FOR_NB_SCREENS(i)
+        screens[i].setfont(FONT_UI);
 
     return false;
 }
@@ -1161,7 +1184,7 @@ bool f3_rec_screen(void)
 {
     bool exit = false;
     bool used = false;
-    int w, h;
+    int w, h, i;
     int button;
     char *src_str[] =
     {
@@ -1169,31 +1192,39 @@ bool f3_rec_screen(void)
         str(LANG_RECORDING_SRC_LINE),
         str(LANG_RECORDING_SRC_DIGITAL)
     };
-
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize("A",&w,&h);
-
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_SYSFIXED);
+        screens[i].getstringsize("A",&w,&h);
+    }
+    
     while (!exit) {
         char* ptr=NULL;
-
-        lcd_clear_display();
-
-        /* Recording source */
-        lcd_putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_SOURCE));
         ptr = src_str[global_settings.rec_source];
-        lcd_getstringsize(ptr, &w, &h);
-        lcd_putsxy(0, LCD_HEIGHT/2-h, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
-                        LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
+
+            /* Recording source */
+            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_SOURCE));
+ 
+            screens[i].getstringsize(ptr, &w, &h);
+            screens[i].putsxy(0, LCD_HEIGHT/2-h, ptr);
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastBackward], 
+                            LCD_WIDTH/2 - 16, LCD_HEIGHT/2 - 4, 7, 8);
+        }
 
         /* trigger setup */
         ptr = str(LANG_RECORD_TRIGGER);
-        lcd_getstringsize(ptr,&w,&h);
-        lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, ptr);
-        lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].getstringsize(ptr,&w,&h);
+            screens[i].putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h*2, ptr);
+            screens[i].mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                         LCD_WIDTH/2 - 3, LCD_HEIGHT - h*3, 7, 8);
 
-        lcd_update();
+            screens[i].update();
+        }
 
         button = button_get(true);
         switch (button) {
@@ -1245,7 +1276,8 @@ bool f3_rec_screen(void)
     set_gain();
 
     settings_save();
-    lcd_setfont(FONT_UI);
+    FOR_NB_SCREENS(i)
+        screens[i].setfont(FONT_UI);
 
     return false;
 }
