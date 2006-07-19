@@ -149,6 +149,15 @@
 }}
 {\newcommand{\warn}[1]{\ifinner\else\par\noindent\fi\textbf{Warning:{} }#1}}
 
+% command to mark a text block as intended especially for blind people
+% Usage: \blind{text}
+\ifpdfoutput{
+\newcommand{\blind}[1]{
+  \ifinner\else\par\noindent\fi
+  \ifinner#1\else\marginpar{\raisebox{-6pt}{\Huge\ForwardToEnd}}#1\par\fi%
+}}
+{\newcommand{\blind}[1]{\ifinner\else\par\noindent\fi#1}}
+
 % make table floats use "H" (as for screenshots) as default positioning
 \makeatletter\renewcommand{\fps@table}{H}\makeatother
 % change defaults for floats on a page as we have a lot of small images
