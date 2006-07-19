@@ -21,4 +21,7 @@ profile_plugin.c
 xlcd_core.c
 xlcd_draw.c
 xlcd_scroll.c
+#ifdef HAVE_LCD_COLOR
+bmp.c
+#endif
 #endif
