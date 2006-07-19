@@ -241,5 +241,10 @@ tetrox_background.160x128x2.bmp
 tetrox_background.138x110x2.bmp
 #endif
 
+#ifdef HAVE_LCD_COLOR
+/* Rockpaint */
+rockpaint.bmp
+rockpaint_hsvrgb.bmp
+#endif
 
 #endif /* HAVE_LCD_BITMAP */
