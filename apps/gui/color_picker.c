@@ -16,6 +16,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
 #include "stdarg.h"
 #include "string.h"
 #include "stdio.h"
@@ -87,6 +88,7 @@ static void draw_screen(struct screen *display, char *title,
     int slider_width = (display->width-SLIDER_START-(display->char_width*5));
     int background_color = global_settings.bg_color;
     int text_color = global_settings.fg_color;
+    bool display_three_rows = (display->height/6) > display->char_height;
 
     display->clear_display();
 
@@ -97,21 +99,23 @@ static void draw_screen(struct screen *display, char *title,
     i = display->getstringsize(title,0,0);
     display->putsxy((display->width-i)/2,6,title );
 
-    for (i=0;i<3;i++)
+    text_top = display->char_height*2;
+    for (i=0; i<3 ;i++)
     {
-        text_top =display->char_height*((i*2)+2);
+        if (!display_three_rows)
+            i = row;        
 
         if (i==row)
         {
-            if (global_settings.invert_cursor)
+            if ((global_settings.invert_cursor) && (display->depth >2))
             {
                 display->fillrect(0,text_top-1,display->width,display->char_height+2);
                 bg_col = text_color;
             }
-            else
+            else if (display_three_rows)
             {
                 display->putsxy(0,text_top,">");
-                display->putsxy(display->width-TEXT_MARGIN,text_top,"<");
+                display->putsxy(display->width-display->char_width-2,text_top,"<");
                 bg_col = background_color;
             }
             if (display->depth > 1)
@@ -145,6 +149,9 @@ static void draw_screen(struct screen *display, char *title,
         gui_scrollbar_draw(display,SLIDER_START,text_top,slider_width,
                            display->char_height/2,
                            max_val[i],0,rgb_val[i],HORIZONTAL);
+        if (!display_three_rows)
+           break;
+        text_top += display->char_height;
     }
 
     if (display->depth > 1) {
@@ -152,7 +159,7 @@ static void draw_screen(struct screen *display, char *title,
         display->set_foreground(text_color);
     }
 
-    if (text_top + (display->char_height*2) < (LCD_HEIGHT-40-display->char_height))
+    if (text_top + (display->char_height*2) < (display->height-40-display->char_height))
         text_top += (display->char_height*2);
     else text_top += (display->char_height);
 
@@ -162,7 +169,7 @@ static void draw_screen(struct screen *display, char *title,
                                  RGB_UNPACK_GREEN(color),
                                  RGB_UNPACK_BLUE(color));
 
-    display->putsxy((LCD_WIDTH-(display->char_width*21))/2,text_top,buf);
+    display->putsxy((display->width-(display->char_width*11))/2,text_top,buf);
 
     if (display->depth > 1) {
         display->set_foreground(color);
@@ -213,20 +220,22 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
         newcolor = swap16((rgb_val[0] << 11) | (rgb_val[1] << 5) | (rgb_val[2]));
 #endif
         FOR_NB_SCREENS(i)
+        {
             draw_screen(&screens[i], title, rgb_val, newcolor, slider);
-
+        }
+        
         button = button_get(true);
         switch (button)
         {
             case SLIDER_UP:
-#ifdef HAVE_LCD_REMOTE
+#ifdef SLIDER_RC_UP
             case SLIDER_RC_UP:
 #endif
                 slider = (slider+2)%3;
                 break;
 
             case SLIDER_DOWN:
-#ifdef HAVE_LCD_REMOTE
+#ifdef SLIDER_RC_DOWN
             case SLIDER_RC_DOWN:
 #endif
                 slider = (slider+1)%3;
@@ -234,7 +243,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
 
             case SLIDER_RIGHT:
             case SLIDER_RIGHT|BUTTON_REPEAT:
-#ifdef HAVE_LCD_REMOTE
+#ifdef SLIDER_RC_RIGHT
             case SLIDER_RC_RIGHT:
             case SLIDER_RC_RIGHT|BUTTON_REPEAT:
 #endif
@@ -244,7 +253,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
 
             case SLIDER_LEFT:
             case SLIDER_LEFT|BUTTON_REPEAT:
-#ifdef HAVE_LCD_REMOTE
+#ifdef SLIDER_RC_LEFT
             case SLIDER_RC_LEFT:
             case SLIDER_RC_LEFT|BUTTON_REPEAT:
 #endif
@@ -253,7 +262,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
                 break;
 
             case SLIDER_OK:
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
             case SLIDER_RC_OK:
 #endif
 #ifdef SLIDER_OK2
@@ -269,7 +278,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
                 break;
 
             case SLIDER_CANCEL:
-#ifdef HAVE_LCD_REMOTE
+#ifdef HAVE_REMOTE_LCD
             case SLIDER_RC_CANCEL:
 #endif
                 exit = 1;
