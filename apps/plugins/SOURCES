@@ -85,6 +85,10 @@ xobox.c
 
 spacerocks.c
 
+#if LCD_DEPTH >= 16
+rockpaint.c
+#endif
+
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_LCD_CHARCELLS          /* Player model only */
