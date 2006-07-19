@@ -524,6 +524,11 @@ struct plugin_api {
     void (*reload_directory)(void);
     bool (*set_bool)(const char* string, bool* variable );
     struct screen* screens[NB_SCREENS];
+#ifdef HAVE_LCD_BITMAP
+    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
+    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
+    struct font* (*font_load)(const char *path);
+#endif
 };
 
 /* plugin header */

@@ -66,6 +66,7 @@
 #include "peakmeter.h"
 #include "widgets.h"
 #include "bmp.h"
+#include "bidi.h"
 #endif
 
 #ifdef HAVE_REMOTE_LCD
@@ -439,7 +440,7 @@ static const struct plugin_api rockbox_api = {
     lcd_setmargins,
 #endif
     utf8seek,
-    
+
     set_int,
     reload_directory,
     set_bool,
@@ -447,6 +448,11 @@ static const struct plugin_api rockbox_api = {
     {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
 #else
     {&screens[SCREEN_MAIN]},
+#endif
+#ifdef HAVE_LCD_BITMAP
+    bidi_l2v,
+    font_get_bits,
+    font_load,
 #endif
 };
 
