@@ -172,12 +172,19 @@ void lcd_update_rect(int x, int y, int width, int height)
         unsigned short *end = &src[LCD_WIDTH * height];
         int line_rem = (LCD_WIDTH - width);
         while (src < end) {
-            /* for each column */
-            unsigned short *end_line = src + width;
-            while (src < end_line) {
-                /* write out two pixels */
-                outw(*(src++), 0x30000000);
-                outw(*(src++), 0x30000000);
+            /* Duff's Device to unroll loop */
+            register int count = width ;
+            register int n=( count + 7 ) / 8;
+            switch( count % 8 ) {
+                case 0: do{ outw(*(src++), 0x30000000);
+                case 7:     outw(*(src++), 0x30000000);
+                case 6:     outw(*(src++), 0x30000000);
+                case 5:     outw(*(src++), 0x30000000);
+                case 4:     outw(*(src++), 0x30000000);
+                case 3:     outw(*(src++), 0x30000000);
+                case 2:     outw(*(src++), 0x30000000);
+                case 1:     outw(*(src++), 0x30000000);
+              } while(--n>0);
             }
             src += line_rem;
         }
