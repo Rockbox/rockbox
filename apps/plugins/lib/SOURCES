@@ -1,5 +1,6 @@
 configfile.c
 playback_control.c
+rgb_hsv.c
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && (CONFIG_LCD != LCD_IPOD2BPP)
 gray_core.c
 gray_draw.c
