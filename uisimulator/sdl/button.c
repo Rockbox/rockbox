@@ -115,6 +115,12 @@ void button_event(int key, bool pressed)
 #endif
         break;
 
+    case SDLK_ESCAPE:
+#if defined BUTTON_POWER
+        new_btn = BUTTON_POWER;
+#endif
+        break;
+
     case SDLK_KP_ENTER:
     case SDLK_RETURN:
     case SDLK_a:
