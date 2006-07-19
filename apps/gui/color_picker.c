@@ -100,6 +100,7 @@ static void draw_screen(struct screen *display, char *title,
     display->putsxy((display->width-i)/2,6,title );
 
     text_top = display->char_height*2;
+    bg_col = background_color;
     for (i=0; i<3 ;i++)
     {
         if (!display_three_rows)
