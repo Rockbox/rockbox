@@ -2,9 +2,22 @@ DOCUMENT := rockbox-build
 LATEX := pdflatex
 include LaTeX.Rules
 GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
+HTLATEX := htlatex
+HTOPTS1 := "html,early_,2"
+HTOPTS2 := ""
+HTOPTS3 := "-dhtml/"
 
 .PHONY: all cleaner buildmanual output
 
 buildmanual: rockbox-build.tex
 	@cp $(OBJDIR)/rockbox-build.pdf $(OBJDIR)/../rockbox-$(ARCHOS)-$(VERSION).pdf
 
+buildhtml: rockbox-build.tex
+	@mkdir -p $(OBJDIR)/html
+	@$(HTLATEX) $(DOCUMENT) $(HTOPTS1) $(HTOPTS2) $(HTOPTS3)
+	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/png/!d;s/.*\"\(.*\.png\)\".*/\1/g'` $(OBJDIR)/html
+	@cp -r $(OBJDIR)/html $(OBJDIR)/../
+
+htmlzip: buildhtml 
+	@zip -r $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/html
+	@cp $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/../

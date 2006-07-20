@@ -1296,24 +1296,33 @@ bzip2: tar
 gzip: tar
 	\$(SILENT)gzip -f9 rockbox.tar
 
-manual:
-	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual buildmanual
+manual: manual-pdf
+manual-pdf:
+	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-pdf
+
+manual-html:
+	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-html
+
+manual-zip:
+	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-zip
 
 help:
 	@echo "A few helpful make targets"
 	@echo ""
-	@echo "all       - builds a full Rockbox (default), including tools"
-	@echo "clean     - cleans a build directory (not tools)"
-	@echo "veryclean - cleans the build and tools directories"
-	@echo "manual    - builds a manual"
-	@echo "fullzip   - creates a rockbox.zip of your build with fonts"
-	@echo "zip       - creates a rockbox.zip of your build (no fonts)"
-	@echo "gzip      - creates a rockbox.tar.gz of your build (no fonts)"
-	@echo "bzip2     - creates a rockbox.tar.bz2 of your build (no fonts)"
-	@echo "7zip      - creates a rockbox.7z of your build (no fonts)"
-	@echo "fontzip   - creates rockbox-fonts.zip"
-	@echo "tools     - builds the tools only"
-	@echo "install   - installs your build (for simulator builds only)" 
+	@echo "all         - builds a full Rockbox (default), including tools"
+	@echo "clean       - cleans a build directory (not tools)"
+	@echo "veryclean   - cleans the build and tools directories"
+	@echo "manual      - builds a manual"
+	@echo "manual-html - HTML manual"
+	@echo "manual-zip  - HTML manual (zipped)"
+	@echo "fullzip     - creates a rockbox.zip of your build with fonts"
+	@echo "zip         - creates a rockbox.zip of your build (no fonts)"
+	@echo "gzip        - creates a rockbox.tar.gz of your build (no fonts)"
+	@echo "bzip2       - creates a rockbox.tar.bz2 of your build (no fonts)"
+	@echo "7zip        - creates a rockbox.7z of your build (no fonts)"
+	@echo "fontzip     - creates rockbox-fonts.zip"
+	@echo "tools       - builds the tools only"
+	@echo "install     - installs your build (for simulator builds only)" 
 
 EOF
 
