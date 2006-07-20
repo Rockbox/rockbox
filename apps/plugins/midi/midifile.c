@@ -245,7 +245,7 @@ int readID(int file)
         id[a]=readChar(file);
     if(eof(file))
     {
-        printf("\End of file reached.");
+        printf("\nEnd of file reached.");
         return ID_EOF;
     }
     if(rb->strcmp(id, "MThd")==0)
