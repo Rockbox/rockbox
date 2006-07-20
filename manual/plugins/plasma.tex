@@ -1,19 +1,21 @@
+% $Id$ %
 \subsection{Plasma}
 \screenshot{plugins/images/ss-plasma}{Plasma}{img:plasma}
 Plasma is a demo displaying a 80's style retro plasma effect.
 
 \begin{table}
     \begin{btnmap}{}{}
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Up}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll backward}
-    & Increase frequency\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Down}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll forward}
-    & Decrease frequency\\
-    \opt{ipodcolor,ipodnano,ipodvideo}{Select & Change colours\\}
-    \opt{h300}{Navi & Change colours\\}
-    \opt{recorder,recorderv2fm,h1xx,h300}{Stop}\opt{ondio}{Off}
-%
-    \opt{ipodcolor,ipodnano,ipodvideo}{Menu} & Quit\\
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+    \nopt{IPOD_4G_PAD}{\ButtonUp\ / \ButtonDown}
+    & Adjust frequency\\
+    \opt{HAVE_LCD_COLOR}{
+        \opt{IRIVER_H300_PAD,IPOD_4G_PAD}{\ButtonSelect}
+        \opt{IAUDIO_X5_PAD}{\ButtonPlay}
+        & Change colours\\
+    }
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    & Quit\\
     \end{btnmap}
 \end{table}

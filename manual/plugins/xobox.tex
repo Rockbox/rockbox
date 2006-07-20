@@ -1,5 +1,6 @@
+% $Id$ %
 \subsection{Xobox}
-\screenshot{plugins/images/ss-xobox}{Xobox}{}
+\screenshot{plugins/images/ss-xobox}{Xobox}{img:xobox}
 Xobox is a simple clone of the well known arcade game Qix.
 The aim of the game is to section off parts of the arena with your trail in
 order to remove that section from the game. Be careful not to get in the way of
@@ -7,13 +8,18 @@ enemy balls because, if they hit you or your trail, you lose a life.
 To finish a level you have to section off more than 75\%.
 
 \begin{table}
-\begin{btnmap}{The Xobox plugin}{tab:xobox}
-    \opt{h1xx,h300}{A-B}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Select} 
+\begin{btnmap}{}{}
+    \opt{IPOD_4G_PAD}{\ButtonMenu, \ButtonPlay,}
+    \nopt{IPOD_4G_PAD}{\ButtonUp, \ButtonDown,}
+    \ButtonLeft, \ButtonRight
+    & Move around the arena\\
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IPOD_4G_PAD}{\ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{\ButtonPlay}
     & Pause\\
-    \opt{h1xx,h300}{Stop}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Menu+Select} 
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IPOD_4G_PAD}{\ButtonSelect+\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
     & Quit\\
 \end{btnmap}
 \end{table}
-

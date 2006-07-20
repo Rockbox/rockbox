@@ -1,20 +1,17 @@
+% $Id$ %
 \subsection{Starfield}
-\screenshot{plugins/images/ss-starfield}{Starfield}{fig:starfield}
+\screenshot{plugins/images/ss-starfield}{Starfield}{img:starfield}
 Starfield simulation (like the classic screensaver).
 
 \begin{table}
     \begin{btnmap}{}{}
-    Right & Increase number of stars\\
-    Left & Decrease number of stars\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Up}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll backward}
-    & Increase speed\\
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300}{Down}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Scroll forward}
-    & Decrease speed\\
-    \opt{recorder,recorderv2fm,h1xx,h300}{Stop}
-    \opt{ondio}{Off}
-    \opt{ipodcolor,ipodnano,ipodvideo}{Menu}
+    \ButtonRight\ / \ButtonLeft & Increase / decrease number of stars\\
+    \opt{IPOD_4G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+    \nopt{IPOD_4G_PAD}{\ButtonUp\ / \ButtonDown}
+    & Increase / decrease speed\\
+    \opt{IPOD_4G_PAD}{\ButtonMenu}
+    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    \nopt{IPOD_4G_PAD,IAUDIO_X5_PAD}{\ButtonOff}
     & Quit\\
     \end{btnmap}
 \end{table}
