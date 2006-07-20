@@ -8,7 +8,7 @@
 #
 while (<STDIN>) {
     if(($_ =~ /^([A-Z]+[\S ]+)/) && ($_ !~ /^People/)) {
-        print "\\Forward{} $1\n";
+        print "\\Forward{}\~$1\n";
     }
 }
 
