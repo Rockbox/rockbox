@@ -3,7 +3,7 @@ LATEX := pdflatex
 include LaTeX.Rules
 GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
 HTLATEX := htlatex
-HTOPTS1 := "html,early_,2"
+HTOPTS1 := "rockbox-html,early_,2"
 HTOPTS2 := ""
 HTOPTS3 := "-dhtml/"
 
