@@ -22,7 +22,7 @@
  * all sorts of friendly Rockbox people.
  *
  */
- 
+
  /* tagResolver and associated code copyright 2003 Thomas Paul Diffenbach
  */
 
@@ -136,8 +136,8 @@ char* id3_get_codec(const struct mp3entry* id3)
         numerical values, for cases where a number won't do, e.g.,
         YEAR: "circa 1765", "1790/1977" (composed/performed), "28 Feb 1969"
         TRACK: "1/12", "1 of 12", GENRE: "Freeform genre name"
-        Text is more flexible, and as the main use of id3 data is to 
-        display it, converting it to an int just means reconverting to 
+        Text is more flexible, and as the main use of id3 data is to
+        display it, converting it to an int just means reconverting to
         display it, at a runtime cost.)
 
     2. If any special processing beyond copying the tag value from the Id3
@@ -161,22 +161,23 @@ char* id3_get_codec(const struct mp3entry* id3)
             char* ID3 Tag symbolic name -- see the ID3 specification for these,
             sizeof() that name minus 1,
             offsetof( struct mp3entry, variable_name_in_struct_mp3entry ),
-            pointer to your special processing function or NULL 
+            pointer to your special processing function or NULL
                 if you need no special processing
-        Many ID3 symbolic names come in more than one form. You can add both 
-        forms, each referencing the same variable in struct mp3entry. 
+            flag indicating if this tag is binary or textual
+        Many ID3 symbolic names come in more than one form. You can add both
+        forms, each referencing the same variable in struct mp3entry.
         If both forms are present, the last found will be used.
         Note that the offset can be zero, in which case no entry will be set
         in the mp3entry struct; the frame is still read into the buffer and
         the special processing function is called (several times, if there
         are several frames with the same name).
-            
+
     4. Alternately, use the TAG_LIST_ENTRY macro with
-         ID3 tag symbolic name, 
-         variable in struct mp3entry, 
+         ID3 tag symbolic name,
+         variable in struct mp3entry,
          special processing function address
-         
-    5.  Add code to wps-display.c function get_tag to assign a printf-like 
+
+    5.  Add code to wps-display.c function get_tag to assign a printf-like
         format specifier for the tag */
 
 /* Structure for ID3 Tag extraction information */
@@ -185,6 +186,7 @@ struct tag_resolver {
     int tag_length;
     size_t offset;
     int (*ppFunc)(struct mp3entry*, char* tag, int bufferpos);
+    bool binary;
 };
 
 static bool global_ff_found;
@@ -196,7 +198,7 @@ static int unsynchronize(char* tag, int len, bool *ff_found)
     unsigned char *rp, *wp;
 
     wp = rp = (unsigned char *)tag;
-    
+
     rp = (unsigned char *)tag;
     for(i = 0;i < len;i++) {
         /* Read the next byte and write it back, but don't increment the
@@ -233,7 +235,7 @@ static int read_unsynched(int fd, void *buf, int len)
     char *rp;
 
     wp = buf;
-    
+
     while(remaining) {
         rp = wp;
         rc = read(fd, rp, remaining);
@@ -319,16 +321,42 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
     char* value = NULL;
     int desc_len = strlen(tag);
     int value_len = 0;
-    
-    if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
-        /* At least part of the value was read, so we can safely try to 
-         * parse it 
+
+    /* Only parse TXXX replaygain tags if tag version < 2.4 */
+    if (entry->id3version < ID3_VER_2_4 &&
+        (tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
+        /* At least part of the value was read, so we can safely try to
+         * parse it
          */
         value = tag + desc_len + 1;
-        value_len = parse_replaygain(tag, value, entry, tag, 
+        value_len = parse_replaygain(tag, value, entry, tag,
             bufferpos - (tag - entry->id3v2buf));
     }
-    
+
+    if (value_len) {
+        bufferpos = tag - entry->id3v2buf + value_len;
+    } else {
+        bufferpos = tag - entry->id3v2buf;
+    }
+
+    return bufferpos;
+}
+
+/* parse RVA2 binary data and convert to replaygain information. */
+static int parserva2( struct mp3entry* entry, char* tag, int bufferpos )
+{
+    char* value = NULL;
+    int desc_len = strlen(tag);
+    int value_len = 0;
+
+    /* Only parse RVA2 replaygain tags if tag version == 2.4 */
+    if (entry->id3version == ID3_VER_2_4 &&
+        (tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
+        value = tag + desc_len + 1;
+        value_len = parse_replaygain_rva(tag, value, entry, tag,
+            bufferpos - (tag - entry->id3v2buf));
+    }
+
     if (value_len) {
         bufferpos = tag - entry->id3v2buf + value_len;
     } else {
@@ -340,22 +368,23 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
 #endif
 
 static const struct tag_resolver taglist[] = {
-    { "TPE1", 4, offsetof(struct mp3entry, artist), NULL },
-    { "TP1",  3, offsetof(struct mp3entry, artist), NULL },
-    { "TIT2", 4, offsetof(struct mp3entry, title), NULL },
-    { "TT2",  3, offsetof(struct mp3entry, title), NULL },
-    { "TALB", 4, offsetof(struct mp3entry, album), NULL },
-    { "TAL",  3, offsetof(struct mp3entry, album), NULL },
-    { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum },
-    { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum },
-    { "TDRC", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
-    { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum },
-    { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum },
-    { "TCOM", 4, offsetof(struct mp3entry, composer), NULL },
-    { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre },
-    { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre },
+    { "TPE1", 4, offsetof(struct mp3entry, artist), NULL, false },
+    { "TP1",  3, offsetof(struct mp3entry, artist), NULL, false },
+    { "TIT2", 4, offsetof(struct mp3entry, title), NULL, false },
+    { "TT2",  3, offsetof(struct mp3entry, title), NULL, false },
+    { "TALB", 4, offsetof(struct mp3entry, album), NULL, false },
+    { "TAL",  3, offsetof(struct mp3entry, album), NULL, false },
+    { "TRK",  3, offsetof(struct mp3entry, track_string), &parsetracknum, false },
+    { "TRCK", 4, offsetof(struct mp3entry, track_string), &parsetracknum, false },
+    { "TDRC", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
+    { "TYER", 4, offsetof(struct mp3entry, year_string), &parseyearnum, false },
+    { "TYE",  3, offsetof(struct mp3entry, year_string), &parseyearnum, false },
+    { "TCOM", 4, offsetof(struct mp3entry, composer), NULL, false },
+    { "TCON", 4, offsetof(struct mp3entry, genre_string), &parsegenre, false },
+    { "TCO",  3, offsetof(struct mp3entry, genre_string), &parsegenre, false },
 #if CONFIG_CODEC == SWCODEC
-    { "TXXX", 4, 0, &parseuser },
+    { "TXXX", 4, 0, &parseuser, false },
+    { "RVA2", 4, 0, &parserva2, true },
 #endif
 };
 
@@ -449,7 +478,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
  *
  * Returns: true if a title was found and created, else false
  */
-static bool setid3v1title(int fd, struct mp3entry *entry) 
+static bool setid3v1title(int fd, struct mp3entry *entry)
 {
     unsigned char buffer[128];
     static const char offsets[] = {3, 33, 63, 93, 125, 127};
@@ -525,7 +554,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
  *
  * Returns: true if a title was found and created, else false
  */
-static void setid3v2title(int fd, struct mp3entry *entry) 
+static void setid3v2title(int fd, struct mp3entry *entry)
 {
     int minframesize;
     int size;
@@ -546,7 +575,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     int rc;
 
     global_ff_found = false;
-    
+
     /* Bail out if the tag is shorter than 10 bytes */
     if(entry->id3v2len < 10)
         return;
@@ -586,7 +615,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     entry->title = entry->artist = entry->album = NULL;
 
     global_flags = header[5];
-    
+
     /* Skip the extended header if it is present */
     if(global_flags & 0x40) {
         if(version == ID3_VER_2_3) {
@@ -603,14 +632,14 @@ static void setid3v2title(int fd, struct mp3entry *entry)
 
             lseek(fd, framelen - 10, SEEK_CUR);
         }
-        
+
         if(version >= ID3_VER_2_4) {
             if(4 != read(fd, header, 4))
                 return;
 
             /* The 2.4 extended header size does include the entire header,
                so here we can just skip it. This header is unsynched. */
-            framelen = UNSYNC(header[0], header[1], 
+            framelen = UNSYNC(header[0], header[1],
                               header[2], header[3]);
 
             lseek(fd, framelen - 4, SEEK_CUR);
@@ -621,14 +650,14 @@ static void setid3v2title(int fd, struct mp3entry *entry)
     if(global_flags & 0x80) {
         global_unsynch = true;
     }
-    
-    /* 
-     * We must have at least minframesize bytes left for the 
-     * remaining frames to be interesting 
+
+    /*
+     * We must have at least minframesize bytes left for the
+     * remaining frames to be interesting
      */
     while (size >= minframesize && bufferpos < buffersize - 1) {
         flags = 0;
-        
+
         /* Read frame header and check length */
         if(version >= ID3_VER_2_3) {
             if(global_unsynch && version <= ID3_VER_2_3)
@@ -641,14 +670,14 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             size -= 10;
 
             flags = BYTES2INT(0, 0, header[8], header[9]);
-            
+
             if (version >= ID3_VER_2_4) {
-                framelen = UNSYNC(header[4], header[5], 
+                framelen = UNSYNC(header[4], header[5],
                                   header[6], header[7]);
             } else {
                 /* version .3 files don't use synchsafe ints for
                  * size */
-                framelen = BYTES2INT(header[4], header[5], 
+                framelen = BYTES2INT(header[4], header[5],
                                      header[6], header[7]);
             }
         } else {
@@ -656,17 +685,17 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 return;
             /* Adjust for the 6 bytes we read */
             size -= 6;
-            
+
             framelen = BYTES2INT(0, header[3], header[4], header[5]);
         }
 
         /* Keep track of the total size */
         totframelen = framelen;
-        
+
         DEBUGF("framelen = %d\n", framelen);
         if(framelen == 0){
             if (header[0] == 0 && header[1] == 0 && header[2] == 0)
-                return; 
+                return;
             else
                 continue;
         }
@@ -677,7 +706,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
         if(flags)
         {
             skip = 0;
-            
+
             if (version >= ID3_VER_2_4) {
                 if(flags & 0x0040) { /* Grouping identity */
                     lseek(fd, 1, SEEK_CUR); /* Skip 1 byte */
@@ -689,7 +718,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                     framelen--;
                 }
             }
-            
+
             if(flags & 0x000c) /* Compression or encryption */
             {
                 /* Skip it using the total size in case
@@ -712,7 +741,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                 }
             }
         }
-        
+
         /* If the frame is larger than the remaining buffer space we try
            to read as much as would fit in the buffer */
         if(framelen >= buffersize - bufferpos)
@@ -726,7 +755,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
            the amount of bytes we read.  If we fail to read as many bytes as
            we expect, we assume that we can't read from this file, and bail
            out.
-        
+
            For each frame. we will iterate over the list of supported tags,
            and read the tag into entry's buffer. All tags will be kept as
            strings, for cases where a number won't do, e.g., YEAR: "circa
@@ -735,7 +764,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
            flexible, and as the main use of id3 data is to display it,
            converting it to an int just means reconverting to display it, at a
            runtime cost.
-        
+
            For tags that the current code does convert to ints, a post
            processing function will be called via a pointer to function. */
 
@@ -744,7 +773,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             char** ptag = tr->offset ? (char**) (((char*)entry) + tr->offset)
                 : NULL;
             char* tag;
-            
+
             /* Only ID3_VER_2_2 uses frames with three-character names. */
             if (((version == ID3_VER_2_2) && (tr->tag_length != 3))
                 || ((version > ID3_VER_2_2) && (tr->tag_length != 4))) {
@@ -757,8 +786,8 @@ static void setid3v2title(int fd, struct mp3entry *entry)
              * particular) be updated to handle the case of being called
              * multiple times, or should the "*ptag" check be removed?
              */
-            if( (!ptag || !*ptag) && !memcmp( header, tr->tag, tr->tag_length ) ) { 
-                
+            if( (!ptag || !*ptag) && !memcmp( header, tr->tag, tr->tag_length ) ) {
+
                 /* found a tag matching one in tagList, and not yet filled */
                 tag = buffer + bufferpos;
 
@@ -766,36 +795,40 @@ static void setid3v2title(int fd, struct mp3entry *entry)
                     bytesread = read_unsynched(fd, tag, framelen);
                 else
                     bytesread = read(fd, tag, framelen);
-                
+
                 if( bytesread != framelen )
                     return;
-                
+
                 size -= bytesread;
-                
+
                 if(unsynch || (global_unsynch && version >= ID3_VER_2_4))
                     bytesread = unsynchronize_frame(tag, bytesread);
-                
 
-                /* UTF-8 could potentially be 3 times larger */
-                /* so we need to create a new buffer         */
-                char utf8buf[(3 * bytesread) + 1];
+                /* Attempt to parse Unicode string only if the tag contents
+                   aren't binary */
+                if(!tr->binary) {
+                    /* UTF-8 could potentially be 3 times larger */
+                    /* so we need to create a new buffer         */
+                    char utf8buf[(3 * bytesread) + 1];
 
-                unicode_munge( tag, utf8buf, &bytesread );
+                    unicode_munge( tag, utf8buf, &bytesread );
 
-                if(bytesread >= buffersize - bufferpos)
-                    bytesread = buffersize - bufferpos - 1;
+                    if(bytesread >= buffersize - bufferpos)
+                        bytesread = buffersize - bufferpos - 1;
 
-                for (j = 0; j < bytesread; j++)
-                    tag[j] = utf8buf[j];
+                    for (j = 0; j < bytesread; j++)
+                        tag[j] = utf8buf[j];
+
+                    /* remove trailing spaces */
+                    while ( bytesread > 0 && isspace(tag[bytesread-1]))
+                        bytesread--;
+                }
+
+                tag[bytesread] = 0;
+                bufferpos += bytesread + 1;
 
                 if (ptag)
                     *ptag = tag;
-
-                /* remove trailing spaces */
-                while ( bytesread > 0 && isspace(tag[bytesread-1]))
-                    bytesread--;
-                tag[bytesread] = 0;
-                bufferpos += bytesread + 1;
 
                 if( tr->ppFunc )
                     bufferpos = tr->ppFunc(entry, tag, bufferpos);
@@ -816,7 +849,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
             } else {
                 if(data_length_ind)
                     totframelen = data_length_ind;
-                
+
                 size -= totframelen;
                 if( lseek(fd, totframelen, SEEK_CUR) == -1 )
                     return;
@@ -832,7 +865,7 @@ static void setid3v2title(int fd, struct mp3entry *entry)
  *
  * Returns: the size of the tag or 0 if none was found
  */
-int getid3v2len(int fd) 
+int getid3v2len(int fd)
 {
     char buf[6];
     int offset;
@@ -862,7 +895,7 @@ int getid3v2len(int fd)
  * Arguments: file - the file to calculate the length upon
  *            entry - the entry to update with the length
  *
- * Returns: the song length in milliseconds, 
+ * Returns: the song length in milliseconds,
  *          0 means that it couldn't be calculated
  */
 static int getsonglength(int fd, struct mp3entry *entry)
@@ -871,7 +904,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
     struct mp3info info;
     long bytecount;
 
-    /* Start searching after ID3v2 header */ 
+    /* Start searching after ID3v2 header */
     if(-1 == lseek(fd, entry->id3v2len, SEEK_SET))
         return 0;
 
@@ -882,7 +915,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     if(bytecount < 0)
         return -1;
-    
+
     bytecount += entry->id3v2len;
 
     /* Validate byte count, in case the file has been edited without
@@ -890,11 +923,11 @@ static int getsonglength(int fd, struct mp3entry *entry)
      */
     if (info.byte_count)
     {
-        const unsigned long expected = entry->filesize - entry->id3v1len 
+        const unsigned long expected = entry->filesize - entry->id3v1len
             - entry->id3v2len;
         const unsigned long diff = MAX(10240, info.byte_count / 20);
-    
-        if ((info.byte_count > expected + diff) 
+
+        if ((info.byte_count > expected + diff)
             || (info.byte_count < expected - diff))
         {
             DEBUGF("Note: info.byte_count differs from expected value by "
@@ -933,7 +966,7 @@ static int getsonglength(int fd, struct mp3entry *entry)
        rate MP3, so just use the default formula */
 
     filetime = info.file_time;
-    
+
     if(filetime == 0)
     {
         filetime = (entry->filesize - bytecount) / (info.bitrate / 8);
@@ -949,11 +982,11 @@ static int getsonglength(int fd, struct mp3entry *entry)
 
     entry->lead_trim = info.enc_delay;
     entry->tail_trim = info.enc_padding;
-    
+
     memcpy(entry->toc, info.toc, sizeof(info.toc));
 
     entry->vbr_header_pos = info.vbr_header_pos;
-    
+
     /* Update the seek point for the first playable frame */
     entry->first_frame_offset = bytecount;
     DEBUGF("First frame is at %x\n", entry->first_frame_offset);
@@ -970,7 +1003,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
 {
     int fd;
     int v1found = false;
-    
+
     fd = open(filename, O_RDONLY);
     if(-1 == fd)
         return true;
@@ -980,7 +1013,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
 #endif
 
     strncpy(entry->path, filename, sizeof(entry->path));
- 
+
     entry->title = NULL;
     entry->filesize = filesize(fd);
     entry->id3v2len = getid3v2len(fd);
@@ -989,7 +1022,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
 
     if(v1first)
         v1found = setid3v1title(fd, entry);
-    
+
     if (!v1found && entry->id3v2len)
         setid3v2title(fd, entry);
     entry->length = getsonglength(fd, entry);
@@ -997,7 +1030,7 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
     /* Subtract the meta information from the file size to get
        the true size of the MP3 stream */
     entry->filesize -= entry->first_frame_offset;
-    
+
     /* only seek to end of file if no id3v2 tags were found,
        and we already haven't looked for a v1 tag */
     if (!v1first && !entry->id3v2len) {
@@ -1076,10 +1109,10 @@ int main(int argc, char **argv)
                "      Title: %s\n"
                "     Artist: %s\n"
                "      Album: %s\n"
-               "      Genre: %s (%d) \n" 
-               "   Composer: %s\n"        
+               "      Genre: %s (%d) \n"
+               "   Composer: %s\n"
                "       Year: %s (%d)\n"
-               "      Track: %s (%d)\n"        
+               "      Track: %s (%d)\n"
                "     Length: %s / %d s\n"
                "    Bitrate: %d\n"
                "  Frequency: %d\n",
@@ -1099,7 +1132,7 @@ int main(int argc, char **argv)
                mp3.bitrate,
                mp3.frequency);
     }
-    
+
     return 0;
 }
 

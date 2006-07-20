@@ -25,7 +25,9 @@
 long get_replaygain_int(long int_gain);
 long get_replaygain(const char* str);
 long get_replaypeak(const char* str);
-long parse_replaygain(const char* key, const char* value, 
+long parse_replaygain(const char* key, const char* value,
+    struct mp3entry* entry, char* buffer, int length);
+long parse_replaygain_rva(const char* key, const char* value,
     struct mp3entry* entry, char* buffer, int length);
 
 #endif

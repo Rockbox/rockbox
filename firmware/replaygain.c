@@ -28,6 +28,10 @@
 #include "id3.h"
 #include "debug.h"
 
+/* Type of channel for RVA2 frame. There are more than this defined in the spec
+   but we don't use them. */
+#define MASTER_CHANNEL 1
+
 /* The fixed point math routines (with the exception of fp_atof) are based
  * on oMathFP by Dan Carter (http://orbisstudios.com).
  */
@@ -278,7 +282,7 @@ static long fp_atof(const char* s, int precision)
       frac_max_int *= 10;
     }
 
-    return sign * ((int_part * int_one) 
+    return sign * ((int_part * int_one)
         + (((int64_t) frac_part * int_one) / frac_max_int));
 }
 
@@ -286,14 +290,14 @@ static long convert_gain(long gain)
 {
     if (gain != 0)
     {
-        /* Don't allow unreasonably low or high gain changes. 
+        /* Don't allow unreasonably low or high gain changes.
          * Our math code can't handle it properly anyway. :)
          */
         if (gain < (-48 * FP_ONE))
         {
             gain = -48 * FP_ONE;
         }
-    
+
         if (gain > (17 * FP_ONE))
         {
             gain = 17 * FP_ONE;
@@ -301,55 +305,55 @@ static long convert_gain(long gain)
 
         gain = fp_exp10(gain / 20) << (24 - FP_BITS);
     }
-    
+
     return gain;
 }
 
 long get_replaygain_int(long int_gain)
 {
     long gain = 0;
-    
+
     if (int_gain)
     {
         gain = convert_gain(int_gain * FP_ONE / 100);
     }
-    
+
     return gain;
 }
 
 long get_replaygain(const char* str)
 {
     long gain = 0;
-    
+
     if (str)
     {
         gain = fp_atof(str, FP_BITS);
         gain = convert_gain(gain);
     }
-    
+
     return gain;
 }
 
 long get_replaypeak(const char* str)
 {
     long peak = 0;
-    
+
     if (str)
     {
         peak = fp_atof(str, 24);
     }
-    
+
     return peak;
 }
 
-/* Check for a ReplayGain tag conforming to the "VorbisGain standard". If 
+/* Check for a ReplayGain tag conforming to the "VorbisGain standard". If
  * found, set the mp3entry accordingly. buffer is where to store the text
- * contents of the gain tags; up to length bytes (including end nil) can be 
- * written. Returns number of bytes written to the tag text buffer, or zero 
+ * contents of the gain tags; up to length bytes (including end nil) can be
+ * written. Returns number of bytes written to the tag text buffer, or zero
  * if no ReplayGain tag was found (or nothing was copied to the buffer for
  * other reasons).
  */
-long parse_replaygain(const char* key, const char* value, 
+long parse_replaygain(const char* key, const char* value,
     struct mp3entry* entry, char* buffer, int length)
 {
     char **p = NULL;
@@ -359,7 +363,7 @@ long parse_replaygain(const char* key, const char* value,
     {
         entry->track_gain = get_replaygain(value);
         p = &(entry->track_gain_string);
-    } 
+    }
     else if ((strcasecmp(key, "replaygain_album_gain") == 0)
         || ((strcasecmp(key, "rg_audiophile") == 0) && !entry->album_gain))
     {
@@ -370,7 +374,7 @@ long parse_replaygain(const char* key, const char* value,
         || ((strcasecmp(key, "rg_peak") == 0) && !entry->track_peak))
     {
         entry->track_peak = get_replaypeak(value);
-    } 
+    }
     else if (strcasecmp(key, "replaygain_album_peak") == 0)
     {
         entry->album_peak = get_replaypeak(value);
@@ -379,7 +383,7 @@ long parse_replaygain(const char* key, const char* value,
     if (p)
     {
         int len = strlen(value);
-        
+
         len = MIN(len, length - 1);
 
         /* A few characters just isn't interesting... */
@@ -390,6 +394,78 @@ long parse_replaygain(const char* key, const char* value,
             *p = buffer;
             return len + 1;
         }
+    }
+
+    return 0;
+}
+
+static long get_rva_values(const char *frame, long *gain, long *peak,
+    char **string, char *buffer, int length)
+{
+    long value, len;
+    int negative = 0;
+    char tmpbuf[10];
+    int peakbits, peakbytes, shift;
+    unsigned long peakvalue = 0;
+
+    value = 256 * ((unsigned char)*frame) + ((unsigned char)*(frame + 1));
+    if (value & 0x8000)
+    {
+        value = -(value | ~0xFFFF);
+        negative = 1;
+    }
+
+    len = snprintf(tmpbuf, sizeof(tmpbuf), "%s%d.%02d dB", negative ? "-" : "",
+        value / 512, (value & 0x1FF) * 195 / 1000);
+
+    *gain = get_replaygain(tmpbuf);
+
+    len = MIN(len, length - 1);
+    if (len > 1)
+    {
+        strncpy(buffer, tmpbuf, len);
+        buffer[len] = 0;
+        *string = buffer;
+    }
+
+    frame += 2;
+    peakbits = *(unsigned char *)frame++;
+    peakbytes = MIN(4, (peakbits + 7) >> 3);
+    shift = ((8 - (peakbits & 7)) & 7) + (4 - peakbytes) * 8;
+
+    for (; peakbytes; peakbytes--)
+    {
+            peakvalue <<= 8;
+            peakvalue += (unsigned long)*frame++;
+    }
+
+    peakvalue <<= shift;
+
+    if (peakbits > 32)
+        peakvalue += (unsigned long)*frame >> (8 - shift);
+
+    snprintf(tmpbuf, sizeof(tmpbuf), "%d.%06d", peakvalue >> 31,
+        (peakvalue & ~(1 << 31)) / 2147);
+
+    *peak = get_replaypeak(tmpbuf);
+
+    return len + 1;
+}
+
+long parse_replaygain_rva(const char* key, const char* value,
+    struct mp3entry* entry, char* buffer, int length)
+{
+    if ((strcasecmp(key, "track") == 0) && *value == MASTER_CHANNEL
+        && !entry->track_gain && !entry->track_peak)
+    {
+        return get_rva_values(value + 1, &(entry->track_gain), &(entry->track_peak),
+            &(entry->track_gain_string), buffer, length);
+    }
+    else if ((strcasecmp(key, "album") == 0) && *value == MASTER_CHANNEL
+        && !entry->album_gain && !entry->album_peak)
+    {
+        return get_rva_values(value + 1, &(entry->album_gain), &(entry->album_peak),
+            &(entry->album_gain_string), buffer, length);
     }
 
     return 0;
