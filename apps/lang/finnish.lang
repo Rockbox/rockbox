@@ -1637,7 +1637,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu 
   user:
   <source>
     *: "Tag Cache"
@@ -1651,16 +1651,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "S√§ilyt√§ levyll√§"
+    *: ""
   </dest>
   <voice>
-    *: "S‰ilyt‰ levyll‰"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1682,13 +1682,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Pakota ID3 Tag-v√§limuistin p√§ivitys"
+    *: "P√§ivit√§ ID3 Tag-v√§limuisti"
   </dest>
   <voice>
-    *: "Pakota ID3 Tag-v‰limuistin p‰ivitys"
+    *: "P‰ivit‰ ID3 Tag-v‰limuisti"
   </voice>
 </phrase>
 <phrase>
@@ -8471,6 +8471,160 @@
   </source>
   <dest>
     *: "ID3 Tag-v√§limuisti ei ole valmiina"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Kaukos√§√§timen vieritysasetukset"
+  </dest>
+  <voice>
+    *: "Kaukos‰‰timen vieritysasetukset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Virheellinen tiedostonimi!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Automaattinen p√§ivitys"
+  </dest>
+  <voice>
+    *: "Automaattinen p√§ivitys"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "P√§ivit√§"
+  </dest>
+  <voice>
+    *: "P√§ivit√§"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Vie muutokset"
+  </dest>
+  <voice>
+    *: "Vie muutokset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Soittolistaluettelo"
+  </dest>
+  <voice>
+    *: "Soittolistaluettelo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Lis√§√§ uuteen soittolistaan"
+  </dest>
+  <voice>
+    *: "Lis‰‰ uuteen soittolistaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Lis√§√§ soittolistaan"
+  </dest>
+  <voice>
+    *: "Lis‰‰ soittolistaan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "N√§yt√§ luettelo"
+  </dest>
+  <voice>
+    *: "N‰yt‰ luettelo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s ei ole olemassa"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Ei soittolistoja"
   </dest>
   <voice>
     *: ""
