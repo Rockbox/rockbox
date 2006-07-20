@@ -36,7 +36,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x54434805
+#define TAGCACHE_MAGIC  0x54434806
 
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
@@ -79,6 +79,7 @@ enum modifiers { clause_mod_none, clause_mod_not };
 
 struct tagcache_stat {
     bool initialized;        /* Is tagcache currently busy? */
+    bool ready;              /* Is tagcache ready to be used? */
     bool ramcache;           /* Is tagcache loaded in ram? */
     bool commit_delayed;     /* Has commit been delayed until next reboot? */
     int  commit_step;        /* Commit progress */
@@ -124,6 +125,9 @@ struct tagcache_search {
     long result_seek;
 };
 
+int tagcache_str_to_tag(const char *str);
+const char* tagcache_tag_to_str(int tag);
+
 bool tagcache_is_numeric_tag(int type);
 bool tagcache_is_unique_tag(int type);
 bool tagcache_is_sorted_tag(int type);
@@ -138,6 +142,9 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
                        char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
+long tagcache_increase_serial(void);
+long tagcache_get_serial(void);
+bool tagcache_import_changelog(void);
 bool tagcache_create_changelog(struct tagcache_search *tcs);
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
                                    int tag, long data);

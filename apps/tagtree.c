@@ -395,6 +395,10 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     
     playcount++;
     
+    lastplayed = tagcache_increase_serial();
+    if (lastplayed < 0)
+        return;
+    
     /* Ignore the last 15s (crossfade etc.) */
     playtime += MIN(id3->length, id3->elapsed + 15 * 1000);
     
@@ -420,6 +424,17 @@ bool tagtree_export(void)
 {
     gui_syncsplash(0, true, str(LANG_WAIT));
     if (!tagcache_create_changelog(&tcs))
+    {
+        gui_syncsplash(HZ*2, true, str(LANG_FAILED));
+    }
+    
+    return false;
+}
+
+bool tagtree_import(void)
+{
+    gui_syncsplash(0, true, str(LANG_WAIT));
+    if (!tagcache_import_changelog())
     {
         gui_syncsplash(HZ*2, true, str(LANG_FAILED));
     }

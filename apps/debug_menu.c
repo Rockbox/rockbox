@@ -1877,7 +1877,9 @@ static bool dbg_tagcache_info(void)
         
         lcd_clear_display();
         stat = tagcache_get_stat();
-        snprintf(buf, sizeof(buf), "Busy: %s", stat->initialized ? "No" : "Yes"); 
+        snprintf(buf, sizeof(buf), "Initialized: %s", stat->initialized ? "Yes" : "No"); 
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "DB Ready: %s", stat->ready ? "Yes" : "No"); 
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "RAM Cache: %s", stat->ramcache ? "Yes" : "No"); 
         lcd_puts(0, line++, buf);

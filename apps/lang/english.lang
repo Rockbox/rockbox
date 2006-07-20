@@ -8655,4 +8655,18 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Import modifications"
+  </dest>
+  <voice>
+    *: "Import modifications"
+  </voice>
+</phrase>
 

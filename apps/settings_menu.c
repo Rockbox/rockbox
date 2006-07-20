@@ -1570,6 +1570,7 @@ static bool tagcache_settings_menu(void)
         { ID2P(LANG_TAGCACHE_UPDATE), tagcache_update },
         { ID2P(LANG_RUNTIMEDB_ACTIVE), tagcache_runtimedb },
         { ID2P(LANG_TAGCACHE_EXPORT), tagtree_export },
+        { ID2P(LANG_TAGCACHE_IMPORT), tagtree_import },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
