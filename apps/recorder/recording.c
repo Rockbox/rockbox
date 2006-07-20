@@ -91,7 +91,8 @@
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
 #define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_REC
+#define REC_RECPAUSE BUTTON_ON
+#define REC_NEWFILE BUTTON_REC
 #define REC_INC BUTTON_RIGHT
 #define REC_DEC BUTTON_LEFT
 #define REC_NEXT BUTTON_DOWN
@@ -101,6 +102,7 @@
 #define REC_RC_SHUTDOWN (BUTTON_RC_STOP | BUTTON_REPEAT)
 #define REC_RC_STOPEXIT BUTTON_RC_STOP
 #define REC_RC_RECPAUSE BUTTON_RC_ON
+#define REC_RC_NEWFILE BUTTON_RC_REC
 #define REC_RC_INC BUTTON_RC_BITRATE
 #define REC_RC_DEC BUTTON_RC_SOURCE
 #define REC_RC_NEXT BUTTON_RC_FF
@@ -324,6 +326,7 @@ bool recording_screen(void)
     unsigned int seconds;
     int hours, minutes;
     char path_buffer[MAX_PATH];
+    char filename[13];
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
     int audio_stat;
@@ -332,6 +335,8 @@ bool recording_screen(void)
     int led_countdown = 2;
 #endif
     int i;
+    int filename_offset[NB_SCREENS];
+    int pm_y[NB_SCREENS];
 
     const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
@@ -395,6 +400,8 @@ bool recording_screen(void)
         screens[i].setfont(FONT_SYSFIXED);
         screens[i].getstringsize("M", &w, &h);
         screens[i].setmargins(global_settings.invert_cursor ? 0 : w, 8);
+        filename_offset[i] = ((screens[i].height >= 80) ? 1 : 0);
+        pm_y[i] = 8 + h * (2 + filename_offset[i]);
     }
     
     if(rec_create_directory() > 0)
@@ -456,7 +463,7 @@ bool recording_screen(void)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(0, 8 + h*2, h * PM_HEIGHT);
+        button = peak_meter_draw_get_btn(0, pm_y, h * PM_HEIGHT);
 
         if (last_audio_stat != audio_stat)
         {
@@ -500,6 +507,12 @@ bool recording_screen(void)
 #ifdef REC_RC_RECPAUSE
             case REC_RC_RECPAUSE:
 #endif
+#ifdef REC_NEWFILE            
+            case REC_NEWFILE:
+#endif
+#ifdef REC_RC_NEWFILE
+            case REC_RC_NEWFILE:
+#endif
 #ifdef REC_RECPAUSE_PRE
                 if (lastbutton != REC_RECPAUSE_PRE)
                     break;
@@ -534,17 +547,33 @@ bool recording_screen(void)
                 }
                 else
                 {
-                    if(audio_stat & AUDIO_STATUS_PAUSE)
+#ifdef REC_NEWFILE
+                    /*if new file button pressed, start new file */
+                    if ((button == REC_NEWFILE)
+#ifdef REC_RC_NEWFILE
+                          || (button == REC_RC_NEWFILE)
+#endif
+                                )
                     {
-                        audio_resume_recording();
-                        if (global_settings.talk_menu)
-                        {   /* no voice possible here, but a beep */
-                            audio_beep(HZ/4); /* short beep on resume */
-                        }
+                        audio_new_file(rec_create_filename(path_buffer));
+                        last_seconds = 0;
                     }
                     else
+#endif
+                    /* if pause button pressed, pause or resume */
                     {
-                        audio_pause_recording();
+                        if(audio_stat & AUDIO_STATUS_PAUSE)
+                        {
+                            audio_resume_recording();
+                            if (global_settings.talk_menu)
+                            {   /* no voice possible here, but a beep */
+                                audio_beep(HZ/4); /* short beep on resume */
+                            }
+                        }
+                        else
+                        {
+                            audio_pause_recording();
+                        }
                     }
                 }
                 update_countdown = 1; /* Update immediately */
@@ -830,6 +859,24 @@ bool recording_screen(void)
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, 1, buf);
 
+            FOR_NB_SCREENS(i)
+            {
+                if (filename_offset[i] > 0)
+                {
+                    if (audio_stat & AUDIO_STATUS_RECORD)
+                    {
+                        strncpy(filename, path_buffer +
+                                    strlen(path_buffer) - 12, 13);
+                        filename[12]='\0';
+                    }
+                    else
+                        strcpy(filename, "");
+
+                    snprintf(buf, 32, "Filename: %s", filename);
+                    screens[i].puts(0, 2, buf);         
+                }
+            }
+
             /* We will do file splitting regardless, either at the end of
                a split interval, or when the filesize approaches the 2GB
                FAT file size (compatibility) limit. */
@@ -850,13 +897,13 @@ bool recording_screen(void)
             if (global_settings.invert_cursor && (pos++ == cursor))
             {
                 FOR_NB_SCREENS(i)
-                    screens[i].puts_style_offset(0, 2+PM_HEIGHT, buf,
-                                                 STYLE_INVERT,0);
+                    screens[i].puts_style_offset(0, filename_offset[i] +
+                                           PM_HEIGHT + 2, buf, STYLE_INVERT,0);
             }
             else
             {
                 FOR_NB_SCREENS(i)
-                    screens[i].puts(0, 2+PM_HEIGHT, buf);
+                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 2, buf);
             }                
 
             if(global_settings.rec_source == SOURCE_MIC)
@@ -868,13 +915,14 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 3+PM_HEIGHT, buf,
-                                                     STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, filename_offset[i] +
+                                            PM_HEIGHT + 3, buf, STYLE_INVERT,0);
                 }
                 else
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts(0, 3+PM_HEIGHT, buf);
+                        screens[i].puts(0, filename_offset[i] +
+                                            PM_HEIGHT + 3, buf);
                 }
             }
             else if(global_settings.rec_source == SOURCE_LINE)
@@ -887,13 +935,14 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 3+PM_HEIGHT, buf,
-                                                     STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, filename_offset[i] + 
+                                           PM_HEIGHT + 3, buf, STYLE_INVERT,0);
                 }
                 else
                 {
                      FOR_NB_SCREENS(i)
-                         screens[i].puts(0, 3+PM_HEIGHT, buf);
+                         screens[i].puts(0, filename_offset[i] +
+                                             PM_HEIGHT + 3, buf);
                 }                
 
                 snprintf(buf, 32, "%s:%s",
@@ -904,14 +953,16 @@ bool recording_screen(void)
                 if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts_style_offset(0, 4+PM_HEIGHT, buf,
-                                                     STYLE_INVERT,0);
+                        screens[i].puts_style_offset(0, filename_offset[i] + 
+                                            PM_HEIGHT + 4, buf, STYLE_INVERT,0);
                 }
                 else
                 {
                     FOR_NB_SCREENS(i)
-                        screens[i].puts(0, 4+PM_HEIGHT, buf);
+                        screens[i].puts(0, filename_offset[i] + 
+                                            PM_HEIGHT + 4, buf);
                 }                
+
             }
 
             if(!global_settings.invert_cursor){
@@ -919,30 +970,35 @@ bool recording_screen(void)
                 {
                     case 1:
                         FOR_NB_SCREENS(i)
-                            screen_put_cursorxy(&screens[i], 0,
-                                                3+PM_HEIGHT, true);
+                            screen_put_cursorxy(&screens[i], 0, 
+                                                    filename_offset[i] +
+                                                    PM_HEIGHT + 3, true);
 
                         if(global_settings.rec_source != SOURCE_MIC)
                         {
                             FOR_NB_SCREENS(i)
                                 screen_put_cursorxy(&screens[i], 0, 
-                                                    4+PM_HEIGHT, true);
+                                                        filename_offset[i] +
+                                                        PM_HEIGHT + 4, true);
                         }
                     break;
                     case 2:
                         FOR_NB_SCREENS(i)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                3+PM_HEIGHT, true);
+                                                    filename_offset[i] + 
+                                                    PM_HEIGHT + 3, true);
                     break;
                     case 3:
                         FOR_NB_SCREENS(i)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                4+PM_HEIGHT, true);
+                                                    filename_offset[i] + 
+                                                    PM_HEIGHT + 4, true);
                     break;
                     default:
                         FOR_NB_SCREENS(i)
                             screen_put_cursorxy(&screens[i], 0, 
-                                                2+PM_HEIGHT, true);
+                                                    filename_offset[i] + 
+                                                    PM_HEIGHT + 2, true);
                 }
             }
 /* Can't measure S/PDIF sample rate on Archos yet */
@@ -961,13 +1017,13 @@ bool recording_screen(void)
                      global_settings.rec_channels ?
                      str(LANG_CHANNEL_MONO) : str(LANG_CHANNEL_STEREO));
             FOR_NB_SCREENS(i)
-                screens[i].puts(0, 5+PM_HEIGHT, buf);
+                screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 5, buf);
 
             gui_syncstatusbar_draw(&statusbars, true);
 
             FOR_NB_SCREENS(i)
             {
-                peak_meter_screen(&screens[i], 0, 8 + h*2, h*PM_HEIGHT);
+                peak_meter_screen(&screens[i], 0, pm_y[i], h*PM_HEIGHT);
                 screens[i].update();                
             }
 

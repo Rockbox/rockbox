@@ -635,6 +635,9 @@ bool rectrigger(void)
     int offset = 0;
     int option_lines;
     int w, h;
+    /* array for y ordinate of peak_meter_draw_get_button
+       function in peakmeter.c*/
+    int pm_y[NB_SCREENS];
 
     /* restart trigger with new values */
     settings_apply_trigger();
@@ -747,7 +750,9 @@ bool rectrigger(void)
 
         peak_meter_draw_trig(0, LCD_HEIGHT - 8 - TRIG_HEIGHT);
 
-        button = peak_meter_draw_get_btn(0, LCD_HEIGHT - 8, 8);
+        FOR_NB_SCREENS(i)
+            pm_y[i] = screens[i].height - 8;
+        button = peak_meter_draw_get_btn(0, pm_y, 8);
 
         lcd_update();
 

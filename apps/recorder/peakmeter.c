@@ -1169,7 +1169,7 @@ void peak_meter_draw_trig(int xpos, int ypos)
 }
 #endif
 
-int peak_meter_draw_get_btn(int x, int y, int height)
+int peak_meter_draw_get_btn(int x, int y[], int height)
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
@@ -1197,8 +1197,8 @@ int peak_meter_draw_get_btn(int x, int y, int height)
         if (TIME_AFTER(current_tick, next_refresh)) {
             FOR_NB_SCREENS(i)
             {
-                peak_meter_screen(&screens[i], x, y, height);
-                screens[i].update_rect(x, y, screens[i].width, height);
+                peak_meter_screen(&screens[i], x, y[i], height);
+                screens[i].update_rect(x, y[i], screens[i].width, height);
             }
             next_refresh += HZ / PEAK_METER_FPS;
             dopeek = true;
