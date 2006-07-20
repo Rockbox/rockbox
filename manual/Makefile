@@ -11,7 +11,7 @@ rockbox-build.tex: rockbox.tex
 	@echo "\newcommand{\buildversion}{$(VERSION)}" >> $(OBJDIR)/rockbox-build.tex
 	@echo "\input{rockbox.tex}" >> $(OBJDIR)/rockbox-build.tex
 	@mv $(OBJDIR)/Makefile.pdflatex $(OBJDIR)/Makefile
-	make -C $(OBJDIR)
+	$(MAKE) -C $(OBJDIR)
 
 clean:
 	@if [ "$(OBJDIR)" == "" ]; then echo Run make in you build diriectory!; false; fi
