@@ -210,10 +210,10 @@ drivers/isp1362.c
 drivers/m5636.c
 #endif
 
-#ifndef SIMULATOR
 #ifdef IAUDIO_X5
-drivers/generic_i2c.c
 target/coldfire/iaudio/x5/power-x5.c
+#ifndef SIMULATOR
+drivers/generic_i2c.c
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/pcf50606-x5.c
 target/coldfire/iaudio/x5/adc-x5.c

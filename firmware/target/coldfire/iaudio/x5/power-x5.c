@@ -64,20 +64,6 @@ void power_off(void)
         yield();
 }
 
-static bool powered = false;
-
-bool radio_powered()
-{
-    return powered;
-}
-
-bool radio_power(bool status)
-{
-    bool old_status = powered;
-    powered = status;
-    return old_status;
-}
-
 #else
 
 bool charger_inserted(void)
@@ -100,3 +86,17 @@ void ide_power_enable(bool on)
 }
 
 #endif /* SIMULATOR */
+
+static bool powered = false;
+
+bool radio_powered()
+{
+    return powered;
+}
+
+bool radio_power(bool status)
+{
+    bool old_status = powered;
+    powered = status;
+    return old_status;
+}

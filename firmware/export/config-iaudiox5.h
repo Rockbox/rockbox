@@ -60,6 +60,8 @@
 
 #define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
 
+#define HAVE_TLV320
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5250 */
@@ -67,8 +69,6 @@
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
-
-#define HAVE_TLV320
 
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
