@@ -375,9 +375,6 @@ bool recording_screen(void)
     audio_stop();
     /* Set peak meter to recording mode */
     peak_meter_playback(false);
-#ifdef IAUDIO_X5
-    pcm_rec_mux(0); /* select line-in (not radio) */
-#endif
 
 #if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
     if (global_settings.rec_source == SOURCE_SPDIF)
