@@ -358,24 +358,25 @@ long parse_replaygain(const char* key, const char* value,
 {
     char **p = NULL;
 
-    if ((strcasecmp(key, "replaygain_track_gain") == 0)
-        || ((strcasecmp(key, "rg_radio") == 0) && !entry->track_gain))
+    if (((strcasecmp(key, "replaygain_track_gain") == 0)
+        || (strcasecmp(key, "rg_radio") == 0)) && !entry->track_gain)
     {
         entry->track_gain = get_replaygain(value);
         p = &(entry->track_gain_string);
     }
-    else if ((strcasecmp(key, "replaygain_album_gain") == 0)
-        || ((strcasecmp(key, "rg_audiophile") == 0) && !entry->album_gain))
+    else if (((strcasecmp(key, "replaygain_album_gain") == 0)
+        || (strcasecmp(key, "rg_audiophile") == 0)) && !entry->album_gain)
     {
         entry->album_gain = get_replaygain(value);
         p = &(entry->album_gain_string);
     }
-    else if ((strcasecmp(key, "replaygain_track_peak") == 0)
-        || ((strcasecmp(key, "rg_peak") == 0) && !entry->track_peak))
+    else if (((strcasecmp(key, "replaygain_track_peak") == 0)
+        || (strcasecmp(key, "rg_peak") == 0)) && !entry->track_peak)
     {
         entry->track_peak = get_replaypeak(value);
     }
-    else if (strcasecmp(key, "replaygain_album_peak") == 0)
+    else if ((strcasecmp(key, "replaygain_album_peak") == 0)
+        && !entry->album_peak)
     {
         entry->album_peak = get_replaypeak(value);
     }
@@ -455,14 +456,14 @@ static long get_rva_values(const char *frame, long *gain, long *peak,
 long parse_replaygain_rva(const char* key, const char* value,
     struct mp3entry* entry, char* buffer, int length)
 {
-    if ((strcasecmp(key, "track") == 0) && *value == MASTER_CHANNEL
-        && !entry->track_gain && !entry->track_peak)
+    /* Values will be overwritten if they already exist. This gives priority to
+       replaygain in RVA2 fields over TXXX fields for ID3v2.4. */
+    if ((strcasecmp(key, "track") == 0) && *value == MASTER_CHANNEL)
     {
         return get_rva_values(value + 1, &(entry->track_gain), &(entry->track_peak),
             &(entry->track_gain_string), buffer, length);
     }
-    else if ((strcasecmp(key, "album") == 0) && *value == MASTER_CHANNEL
-        && !entry->album_gain && !entry->album_peak)
+    else if ((strcasecmp(key, "album") == 0) && *value == MASTER_CHANNEL)
     {
         return get_rva_values(value + 1, &(entry->album_gain), &(entry->album_peak),
             &(entry->album_gain_string), buffer, length);

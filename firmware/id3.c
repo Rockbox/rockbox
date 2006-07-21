@@ -322,9 +322,9 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
     int desc_len = strlen(tag);
     int value_len = 0;
 
-    /* Only parse TXXX replaygain tags if tag version < 2.4 */
-    if (entry->id3version < ID3_VER_2_4 &&
-        (tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
+    /* Note: for ID3v2.4, parse_replaygain will not overwrite replaygain
+       values already parsed from RVA2 tags */
+    if ((tag - entry->id3v2buf + desc_len + 2) < bufferpos) {
         /* At least part of the value was read, so we can safely try to
          * parse it
          */
