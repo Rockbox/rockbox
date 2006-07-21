@@ -23,6 +23,7 @@
 #include "iriver.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
+int ipod_encode(char *iname, char *oname, int fw_ver);
 
 enum
 {
@@ -41,6 +42,12 @@ int size_limit[] =
     0x64000, /* ARCHOS_ONDIO_SP */
     0x64000  /* ARCHOS_ONDIO_FM */
 };
+
+void short2le(unsigned short val, unsigned char* addr)
+{
+    addr[0] = val & 0xFF;
+    addr[1] = (val >> 8) & 0xff;
+}
 
 void int2le(unsigned int val, unsigned char* addr)
 {
@@ -210,6 +217,11 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         return iaudio_encode(iname, oname, "COWON_X5V_FW");
+    }
+    else if(!strcmp(argv[1], "-ipod")) {
+        iname = argv[2];
+        oname = argv[3];
+        return ipod_encode(iname, oname, 3); /* Firmware image v3 */
     }
     
     /* open file */
@@ -430,6 +442,107 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
     }
     
     len = fwrite(outbuf, 1, length+0x1030, file);
+    if(len < length) {
+        perror(oname);
+        return -4;
+    }
+
+    fclose(file);
+}
+
+
+/* Create an ipod firmware partition image 
+
+   fw_ver = 2 for 3rd Gen ipods, 3 for all later ipods including 5g.
+
+   This function doesn't yet handle the Broadcom resource image for the 5g,
+   so the resulting images won't be usable.
+
+   This has also only been tested on an ipod Photo 
+*/
+
+int ipod_encode(char *iname, char *oname, int fw_ver)
+{
+    static const char *apple_stop_sign = "{{~~  /-----\\   "\
+                                         "{{~~ /       \\  "\
+                                         "{{~~|         | "\
+                                         "{{~~| S T O P | "\
+                                         "{{~~|         | "\
+                                         "{{~~ \\       /  "\
+                                         "{{~~  \\-----/   "\
+                                         "Copyright(C) 200"\
+                                         "1 Apple Computer"\
+                                         ", Inc.----------"\
+                                         "----------------"\
+                                         "----------------"\
+                                         "----------------"\
+                                         "----------------"\
+                                         "----------------"\
+                                         "---------------";
+    size_t len;
+    int length;
+    FILE *file;
+    unsigned char *outbuf;
+    int i;
+    unsigned int sum = 0;
+    
+    file = fopen(iname, "rb");
+    if (!file) {
+       perror(iname);
+       return -1;
+    }
+    fseek(file,0,SEEK_END);
+    length = ftell(file);
+    
+    fseek(file,0,SEEK_SET); 
+    outbuf = malloc(length+0x4600);
+
+    if ( !outbuf ) {
+       printf("out of memory!\n");
+       return -1;
+    }
+
+    len = fread(outbuf+0x4600, 1, length, file);
+    if(len < length) {
+        perror(iname);
+        return -2;
+    }
+    fclose(file);
+
+    /* Calculate checksum for later use in header */    
+    for(i = 0x4600; i < 0x4600+length;i++)
+        sum += outbuf[i];
+
+    /* Clear the header area to zero */
+    memset(outbuf, 0, 0x4600);
+
+    /* APPLE STOP SIGN */
+    strcpy((char *)outbuf, apple_stop_sign);
+
+    /* VOLUME HEADER */
+    memcpy(&outbuf[0x100],"]ih[",4);   /* Magic */
+    int2le(0x4000,   &outbuf[0x104]);  /* Firmware offset relative to 0x200 */
+    short2le(0x10c,  &outbuf[0x108]);  /* Location of extended header */
+    short2le(fw_ver, &outbuf[0x10a]);
+
+    /* Firmware Directory - "osos" entry */
+    memcpy(&outbuf[0x4200],"!ATAsoso",8);  /* dev and type */
+    int2le(0,          &outbuf[0x4208]);   /* id */
+    int2le(0x4400,     &outbuf[0x420c]);   /* devOffset */
+    int2le(length,     &outbuf[0x4210]);   /* Length of firmware */
+    int2le(0x10000000, &outbuf[0x4214]);   /* Addr */
+    int2le(0,          &outbuf[0x4218]);   /* Entry Offset */
+    int2le(sum,        &outbuf[0x421c]);   /* Checksum */
+    int2le(0x00006012, &outbuf[0x4220]);   /* vers - 0x6012 is a guess */
+    int2le(0xffffffff, &outbuf[0x4224]);   /* LoadAddr - for flash images */
+
+    file = fopen(oname, "wb");
+    if (!file) {
+       perror(oname);
+       return -3;
+    }
+    
+    len = fwrite(outbuf, 1, length+0x4600, file);
     if(len < length) {
         perror(oname);
         return -4;
