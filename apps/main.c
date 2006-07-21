@@ -72,7 +72,7 @@
 #else
 #define pcmbuf_init()
 #endif
-#if (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)) && !defined(SIMULATOR)
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #include "pcm_record.h"
 #define SETTINGS_RESET BUTTON_REC
 #endif
@@ -425,7 +425,7 @@ void init(void)
     talk_init();
 
     audio_init();
-#if (defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)) && !defined(SIMULATOR)
+#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
     pcm_rec_init();
 #endif
 

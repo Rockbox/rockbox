@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ *
  * $Id$
  *
  * Copyright (C) 2005 by Andy Young
@@ -23,17 +24,16 @@
 #include "system.h"
 #include "i2c-coldfire.h"
 
-#define I2C_DEVICE_1    ((volatile unsigned char *)&MADR)
-#define I2C_DEVICE_2    ((volatile unsigned char *)&MADR2)
 
-/* Local functions definitions */
+/* --- Local functions - declarations --- */
 
-static int i2c_write_byte(int device, unsigned char data);
-static int i2c_gen_start(int device);
-static void i2c_gen_stop(int device);
-static volatile unsigned char *i2c_get_addr(int device);
+static int i2c_start(volatile unsigned char *iface);
+static int i2c_wait_for_slave(volatile unsigned char *iface);
+static int i2c_outb(volatile unsigned char *iface, unsigned char byte);
+inline void i2c_stop(volatile unsigned char *iface);
 
-/* Public functions */
+
+/* --- Public functions - implementation --- */
 
 void i2c_init(void)
 {
@@ -55,14 +55,15 @@ void i2c_init(void)
 #endif
     
     /* I2C Clock divisor = 160 => 124.1556 MHz / 2 / 160 = 388.08 kHz */
-    MFDR = 0x0d;
+    MFDR  = 0x0d;
     MFDR2 = 0x0d;
 
 #ifdef IAUDIO_X5
-    MBCR = IEN;  /* Enable interface */
+    MBCR  = IEN;  /* Enable interface */
+    MBCR2 = IEN; 
 #endif
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     /* Audio Codec */
     MBDR = 0;    /* iRiver firmware does this */
     MBCR = IEN;  /* Enable interface */
@@ -72,109 +73,169 @@ void i2c_init(void)
 void i2c_close(void)
 {
     MBCR  = 0;
+    MBCR2 = 0;
 }
 
-/**
- * Writes bytes to the selected device.
+/*
+ * Writes bytes to a I2C device.
  *
- * Use device=1 for bus 1 at 0x40000280
- * Use device=2 for bus 2 at 0x80000440
- * 
- * Returns number of bytes successfully send or -1 if START failed
+ * Returns number of bytes successfully sent or a negative value on error.
  */
-int i2c_write(int device, unsigned char *buf, int count)
+int i2c_write(volatile unsigned char *iface, unsigned char addr, 
+              const unsigned char *buf, int count)
 {
-    int i;
-    int rc;
+    int i, rc;
 
-    rc = i2c_gen_start(device);
+    if ( ! count)
+        return 0;
+   
+    rc = i2c_start(iface);
     if (rc < 0)
+        return rc;
+    
+    rc = i2c_outb(iface, addr & 0xfe);
+    if (rc < 0)
+        return rc;
+    
+    for (i = 0; i < count; i++)
     {
-        logf("i2c: gen_start failed (d=%d)", device);
-        return rc*10 - 1;
-    }
-
-    for (i=0; i<count; i++)
-    {
-        rc = i2c_write_byte(device, buf[i]);
+        rc = i2c_outb(iface, *buf++);
         if (rc < 0)
-        {
-            logf("i2c: write failed at (d=%d,i=%d)", device, i);
-            return rc*10 - 2;
-        }
+            return rc;
     }
-
-    i2c_gen_stop(device);
-
+    i2c_stop(iface);
+    
     return count;
 }
 
-/* Write a byte to the interface, returns 0 on success, -1 otherwise. */
-int i2c_write_byte(int device, unsigned char data)
+/*
+ * Reads bytes from a I2C device.
+ *
+ * Returns number of bytes successfully received or a negative value on error.
+ */
+int i2c_read(volatile unsigned char *iface, unsigned char addr, 
+             unsigned char *buf, int count)
 {
-    volatile unsigned char *regs = i2c_get_addr(device);
+    int i, rc;
 
-    long count = 0;
+    if ( ! count)
+        return 0;
+   
+    rc = i2c_start(iface);
+    if (rc < 0)
+        return rc;
 
-    regs[O_MBDR] = data;                /* Write data byte */   
+    rc = i2c_outb(iface, addr | 1);
+    if (rc < 0)
+        return rc;
 
-    /* Wait for bus busy */
-    while (!(regs[O_MBSR] & IBB) && count < MAX_LOOP)
-        count++;
+    /* Switch to Rx mode */
+    iface[O_MBCR] &= ~MTX;
+    iface[O_MBCR] &= ~TXAK;
+ 
+    /* Dummy read */
+    rc = (int) iface[O_MBDR];
+  
+    for (i = 0; i < count; i++)
+    {
+        rc = i2c_wait_for_slave(iface);
+        if (rc < 0)
+            return rc;
 
-    if (count >= MAX_LOOP)
-        return -1;
+        if (i == count-2)
+            /* Don't ACK the next-to-last byte */
+            iface[O_MBCR] |= TXAK;
+    
+        if (i == count-1)
+            /* Generate STOP before reading last byte */
+            i2c_stop(iface); 
 
-    count = 0;
-
-    /* Wait for interrupt flag */
-    while (!(regs[O_MBSR] & IFF) && count < MAX_LOOP)
-        count++;
-
-    if (count >= MAX_LOOP)
-        return -2;
-
-    regs[O_MBSR] &= ~IFF;       /* Clear interrupt flag  */
-
-    if (!(regs[O_MBSR] & ICF))  /* Check that transfer is complete */
-        return -3;
-
-    if (regs[O_MBSR] & RXAK)    /* Check that the byte has been ACKed */
-        return -4;
-
-    return 0;
+        *buf++ = iface[O_MBDR];
+    }
+    return count;
 }
 
+/* --- Local functions - implementation --- */
 
-/* Returns 0 on success, -1 on failure */
-int i2c_gen_start(int device)
+/* Begin I2C session on the given interface.
+ *
+ * Returns 0 on success, negative value on error.
+ */
+int i2c_start(volatile unsigned char *iface)
 {
-    volatile unsigned char *regs = i2c_get_addr(device);
-    long count = 0;
-
     /* Wait for bus to become free */
-    while ((regs[O_MBSR] & IBB) && (count < MAX_LOOP))
-        count++;
-
-    if (count >= MAX_LOOP)
+    int j = MAX_LOOP;
+    while (--j && (iface[O_MBSR] & IBB))
+        ;
+    if (!j)
+    {
+        logf("i2c: bus is busy (iface=%08x)", iface);
         return -1;
-
-    regs[O_MBCR] |= MSTA | MTX;         /* Generate START */
-
-    return 0;
-}  
-
-void i2c_gen_stop(int device)
-{
-    volatile unsigned char *regs = i2c_get_addr(device);
-    regs[O_MBCR] &= ~MSTA;          /* Clear MSTA to generate STOP */
+    }
+ 
+    /* Generate START and prepare for write */
+    iface[O_MBCR] |= (MSTA | TXAK | MTX);
+  
+    return 0; 
 }
 
-
-volatile unsigned char *i2c_get_addr(int device)
+/* Wait for slave to act on given I2C interface.
+ *
+ * Returns 0 on success, negative value on error.
+ */
+int i2c_wait_for_slave(volatile unsigned char *iface)
 {
-    if (device == 1)
-        return I2C_DEVICE_1;
+    int j = MAX_LOOP;
+    while (--j && ! (iface[O_MBSR] & IFF))
+        ;
+    if (!j)
+    {
+        logf("i2c: IFF not set (iface=%08x)", iface);
+        i2c_stop(iface); 
+        return -2;
+    }
+  
+    /* Clear interrupt flag */
+    iface[O_MBSR] &= ~IFF;
+    
+    return 0;
+}
 
-    return I2C_DEVICE_2;
+/* Write the given byte to the given I2C interface.
+ *
+ * Returns 0 on success, negative value on error.
+ */
+int i2c_outb(volatile unsigned char *iface, unsigned char byte)
+{
+    int rc;
+
+    iface[O_MBDR] = byte;
+
+    rc = i2c_wait_for_slave(iface);
+    if (rc < 0)
+        return rc;
+    
+    /* Check that transfer is complete */
+    if ( !(iface[O_MBSR] & ICF))
+    {
+        logf("i2c: transfer error (iface=%08x)", iface);
+        i2c_stop(iface); 
+        return -3;
+    }
+    
+    /* Check that the byte has been ACKed */
+    if (iface[O_MBSR] & RXAK)
+    {
+        logf("i2c: no ACK (iface=%08x)", iface);
+        i2c_stop(iface); 
+        return -4;
+    }
+    
+    return 0;
+}
+
+/* End I2C session on the given interface. */
+inline void i2c_stop(volatile unsigned char *iface)
+{
+    iface[O_MBCR] &= ~MSTA;
 }

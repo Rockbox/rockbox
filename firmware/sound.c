@@ -111,7 +111,11 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
-#endif
+#elif defined(HAVE_TLV320)
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1, NULL},
+ #endif
 };
 
 const char *sound_unit(int setting)
@@ -897,6 +901,25 @@ int sound_val2phys(int setting, int value)
             break;
 
         default:
+            result = value;
+            break;
+    }
+    return result;
+#elif defined(HAVE_TLV320)
+    int result = 0;
+    
+    switch(setting)
+    {
+        case SOUND_LEFT_GAIN:
+        case SOUND_RIGHT_GAIN:
+            result = (value - 23) * 15;    /* (x - 23)/1.5 *10 */
+            break;
+
+        case SOUND_MIC_GAIN:
+            result = value * 200;          /* 0 or 20 dB */
+            break;
+
+       default:
             result = value;
             break;
     }

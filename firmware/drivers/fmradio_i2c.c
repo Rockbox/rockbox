@@ -27,6 +27,22 @@
 
 #if (CONFIG_TUNER & TEA5767)
 #if (CONFIG_I2C == I2C_COLDFIRE)
+
+#ifdef IAUDIO_X5
+#include "i2c-coldfire.h"
+
+int fmradio_i2c_write(unsigned char address, const unsigned char* buf,
+                      int count)
+{
+    return i2c_write(I2C_IFACE_0, address, buf, count);
+}
+
+int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
+{
+    return i2c_read(I2C_IFACE_0, address, buf, count);
+}
+#else
+
 /* cute little functions, atomic read-modify-write */
 /* SDA is GPIO1,23 */
 
@@ -242,6 +258,7 @@ int fmradio_i2c_read(int address, unsigned char* buf, int count)
     fmradio_i2c_stop();
     return x;
 }
+#endif /* ! IAUDIO_X5 */
 #else
 /* cute little functions, atomic read-modify-write */
 /* SDA is PB4 */

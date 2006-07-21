@@ -6,7 +6,7 @@
 #define MODEL_NUMBER 10
 
 /* define this if you have recording possibility */
-/*#define HAVE_RECORDING 1*/
+#define HAVE_RECORDING 1
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
@@ -52,6 +52,11 @@
 
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
+
+/* FM Tuner */
+#define CONFIG_TUNER       TEA5767
+#define CONFIG_TUNER_XTAL  32768
+
 
 #define BATTERY_CAPACITY_DEFAULT 950 /* default battery capacity */
 

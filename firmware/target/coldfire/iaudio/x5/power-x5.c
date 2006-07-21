@@ -64,6 +64,20 @@ void power_off(void)
         yield();
 }
 
+static bool powered = false;
+
+bool radio_powered()
+{
+    return powered;
+}
+
+bool radio_power(bool status)
+{
+    bool old_status = powered;
+    powered = status;
+    return old_status;
+}
+
 #else
 
 bool charger_inserted(void)

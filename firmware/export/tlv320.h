@@ -26,11 +26,12 @@ extern void tlv320_init(void);
 extern void tlv320_reset(void);
 extern void tlv320_enable_output(bool enable);
 extern void tlv320_set_headphone_vol(int vol_l, int vol_r);
-extern void tlv320_set_linein_vol(int vol_l, int vol_r);
+extern void tlv320_set_recvol(int left, int right, int type);
 extern void tlv320_mute(bool mute);
 extern void tlv320_close(void);
 extern void tlv320_enable_recording(bool source_mic);
 extern void tlv320_disable_recording(void);
+extern void tlv320_set_monitor(bool enable);
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
 

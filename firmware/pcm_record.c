@@ -31,7 +31,12 @@
 #include "cpu.h"
 #include "i2c.h"
 #include "power.h"
+#ifdef HAVE_UDA1380
 #include "uda1380.h"
+#endif
+#ifdef HAVE_TLV320
+#include "tlv320.h"
+#endif
 #include "system.h"
 #include "usb.h"
 
@@ -51,14 +56,14 @@ extern int boost_counter; /* used for boost check */
 
 /***************************************************************************/
 
-static volatile bool is_recording;              /* We are recording */
-static volatile bool is_stopping;               /* Are we going to stop */
-static volatile bool is_paused;                 /* We have paused   */
-static volatile bool is_error;                  /* An error has occured */
+static bool is_recording;              /* We are recording */
+static bool is_stopping;               /* Are we going to stop */
+static bool is_paused;                 /* We have paused   */
+static bool is_error;                  /* An error has occured */
 
-static volatile unsigned long num_rec_bytes;    /* Num bytes recorded */
-static volatile unsigned long num_file_bytes;   /* Num bytes written to current file */
-static volatile int error_count;                /* Number of DMA errors */
+static unsigned long num_rec_bytes;    /* Num bytes recorded */
+static unsigned long num_file_bytes;   /* Num bytes written to current file */
+static int error_count;                /* Number of DMA errors */
 
 static long record_start_time;                  /* Value of current_tick when recording was started */
 static long pause_start_time;                   /* Value of current_tick when pause was started */
@@ -69,7 +74,7 @@ static int rec_source;           /* Current recording source */
 static int wav_file;
 static char recording_filename[MAX_PATH];
 
-static volatile bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
+static bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
 
 static short peak_left, peak_right;
 
@@ -90,16 +95,23 @@ static unsigned int rec_buffer_offset;
 static unsigned char *rec_buffer;  /* Circular recording buffer */
 static int num_chunks;             /* Number of chunks available in rec_buffer */
 
-
+#ifdef IAUDIO_X5
+#define SET_IIS_PLAY(x) IIS1CONFIG = (x);
+#define SET_IIS_REC(x)  IIS1CONFIG = (x);
+#else
+#define SET_IIS_PLAY(x) IIS2CONFIG = (x);
+#define SET_IIS_REC(x)  IIS1CONFIG = (x);
+#endif
+  
 /* 
  Overrun occures when DMA needs to write a new chunk and write_index == read_index 
  Solution to this is to optimize pcmrec_callback, use cpu_boost or save to disk
  more often.
 */
 
-static volatile int write_index;       /* Current chunk the DMA is writing to */
-static volatile int read_index;        /* Oldest chunk that is not written to disk */
-static volatile int read2_index;       /* Latest chunk that has not been converted to little endian */
+static int write_index;                /* Current chunk the DMA is writing to */
+static int read_index;                 /* Oldest chunk that is not written to disk */
+static int read2_index;                /* Latest chunk that has not been converted to little endian */
 static long pre_record_ticks;          /* pre-record time expressed in ticks */
 static int pre_record_chunks;          /* pre-record time expressed in chunks */
 
@@ -137,7 +149,7 @@ void pcm_rec_init(void)
 
 
 /* Initializes recording:
- * - Set up the UDA1380 for recording 
+ * - Set up the UDA1380/TLV320 for recording 
  * - Prepare for DMA transfers
  */
  
@@ -292,14 +304,26 @@ void audio_set_recording_options(int frequency, int quality,
         case 0: 
             /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
             DATAINCONTROL = 0xc020;
+            
+#ifdef HAVE_UDA1380            
             uda1380_enable_recording(true); 
+#endif
+#ifdef HAVE_TLV320
+            tlv320_enable_recording(true);
+#endif            
         break;
 
         /* line-in */
         case 1: 
             /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
             DATAINCONTROL = 0xc020;
+            
+#ifdef HAVE_UDA1380            
             uda1380_enable_recording(false); 
+#endif
+#ifdef HAVE_TLV320
+            tlv320_enable_recording(false);
+#endif            
         break;
 #ifdef HAVE_SPDIF_IN        
         /* SPDIF */
@@ -322,7 +346,8 @@ void audio_set_recording_options(int frequency, int quality,
 
     /* Monitoring: route the signals through the coldfire audio interface. */
 
-    IIS2CONFIG = 0x800; /* Reset before reprogram */
+    SET_IIS_PLAY(0x800); /* Reset before reprogram */
+    
 #ifdef HAVE_SPDIF_IN
     if (source == 2) {
         /* SCLK2 = Audioclk/4 (can't use EBUin clock), TXSRC = EBU1rcv, 64 bclk/wclk */
@@ -340,21 +365,27 @@ void audio_set_recording_options(int frequency, int quality,
     }
 #else
     /* SCLK2 follow IIS1 (UDA clock), TXSRC = IIS1rcv, 64 bclk/wclk */
-    IIS2CONFIG = (8 << 12) | (4 << 8) | (4 << 2);
+    SET_IIS_PLAY( (8 << 12) | (4 << 8) | (4 << 2) );
 #endif
 }
 
 
 /**
  * Note that microphone is mono, only left value is used 
- * See uda1380_set_recvol() for exact ranges.
+ * See {uda1380,tlv320}_set_recvol() for exact ranges.
  *
  * @param type   0=line-in (radio), 1=mic
  * 
  */
 void audio_set_recording_gain(int left, int right, int type)
 {
+    //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
+#ifdef HAVE_UDA1380            
     uda1380_set_recvol(left, right, type);
+#endif
+#ifdef HAVE_TLV320
+    tlv320_set_recvol(left, right, type);
+#endif            
 }
 
 
@@ -987,7 +1018,7 @@ static void pcmrec_init(void)
 
     logf("num_chunks: %d", num_chunks);
 
-    IIS1CONFIG = 0x800;             /* Stop any playback                              */
+    SET_IIS_PLAY(0x800);            /* Stop any playback                              */
     AUDIOGLOB |= 0x180;             /* IIS1 fifo auto sync = on, PDIR2 auto sync = on */
     DATAINCONTROL = 0xc000;         /* Generate Interrupt when 6 samples in fifo      */
 
@@ -1007,7 +1038,12 @@ static void pcmrec_init(void)
 
 static void pcmrec_close(void)
 {
+#ifdef HAVE_UDA1380            
     uda1380_disable_recording();
+#endif
+#ifdef HAVE_TLV320
+    tlv320_disable_recording();
+#endif            
 
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(spdif_power_setting);
@@ -1091,7 +1127,7 @@ void pcm_rec_mux(int source)
         
     or_l(0x40000000, &GPIO_ENABLE);
     or_l(0x40000000, &GPIO_FUNCTION);
-#else
+#elif defined(IRIVER_H100_SERIES)
     if(source == 0)
         and_l(~0x00800000, &GPIO_OUT);  /* Line In */
     else
@@ -1099,5 +1135,16 @@ void pcm_rec_mux(int source)
         
     or_l(0x00800000, &GPIO_ENABLE);
     or_l(0x00800000, &GPIO_FUNCTION);
+    
+#elif defined(IAUDIO_X5)
+    if(source == 0)
+        or_l((1<<29), &GPIO_OUT);      /* Line In */
+    else
+        and_l(~(1<<29), &GPIO_OUT);    /* FM radio */
+        
+    or_l((1<<29), &GPIO_ENABLE);
+    or_l((1<<29), &GPIO_FUNCTION);
+
+    /* iAudio x5 */
 #endif
 }

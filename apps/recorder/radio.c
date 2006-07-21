@@ -64,7 +64,13 @@
 #ifdef CONFIG_TUNER
 
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_UDA1380
 #include "uda1380.h"
+#endif
+#ifdef HAVE_TLV320
+#include "tlv320.h"
+#endif
+
 #include "pcm_record.h"
 #endif
 
@@ -108,6 +114,35 @@
 /* stop and exit radio - STOP */
 #define FM_STOP BUTTON_OFF
 #define FM_RC_STOP BUTTON_RC_STOP
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+/* pause/play - short PLAY */
+#define FM_PLAY_PRE BUTTON_PLAY
+#define FM_RC_PLAY_PRE BUTTON_RC_PLAY
+#define FM_PLAY (BUTTON_PLAY | BUTTON_REL)
+#define FM_RC_PLAY (BUTTON_RC_PLAY | BUTTON_REL)
+/* preset/scan mode - long PLAY */
+#define FM_MODE (BUTTON_PLAY | BUTTON_REPEAT)
+#define FM_RC_MODE (BUTTON_RC_PLAY | BUTTON_REPEAT)
+/* preset menu - short SELECT */
+#define FM_PRESET_PRE BUTTON_SELECT
+#define FM_RC_PRESET_PRE BUTTON_RC_MENU
+#define FM_PRESET (BUTTON_SELECT | BUTTON_REL)
+#define FM_RC_PRESET (BUTTON_RC_MENU | BUTTON_REL)
+/* fm menu - long SELECT */
+#define FM_MENU (BUTTON_SELECT | BUTTON_REPEAT)
+#define FM_RC_MENU (BUTTON_RC_MENU | BUTTON_REPEAT)
+/* main menu(exit radio while playing) - REC */
+#define FM_EXIT_PRE BUTTON_REC
+#define FM_EXIT (BUTTON_REC | BUTTON_REL)
+#define FM_RC_EXIT_PRE BUTTON_RC_MODE
+#define FM_RC_EXIT (BUTTON_RC_MODE | BUTTON_REL)
+/* prev/next preset on the remote - REW/FF */
+#define FM_NEXT_PRESET (BUTTON_RC_FF | BUTTON_REL)
+#define FM_PREV_PRESET (BUTTON_RC_REW | BUTTON_REL)
+/* stop and exit radio - ON */
+#define FM_STOP BUTTON_POWER
+#define FM_RC_STOP (BUTTON_RC_MODE | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
 #define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
@@ -158,7 +193,7 @@ int radio_get(int setting);
 #if CONFIG_TUNER == S1A0903X01 /* FM recorder */
 #define radio_set samsung_set
 #define radio_get samsung_get
-#elif CONFIG_TUNER == TEA5767 /* Iriver */
+#elif CONFIG_TUNER == TEA5767 /* iriver, iaudio */
 #define radio_set philips_set
 #define radio_get philips_get
 #elif CONFIG_TUNER == (S1A0903X01 | TEA5767) /* OndioFM */
@@ -387,8 +422,15 @@ bool radio_screen(void)
     
 #else
     peak_meter_enabled = false;
+
+#ifdef HAVE_UDA1380
     uda1380_enable_recording(false);
     uda1380_set_monitor(true);
+#elif defined(HAVE_TLV320)
+    //tlv320_enable_recording(false);
+    tlv320_set_recvol(23, 23, AUDIO_GAIN_LINEIN); /* 0dB */
+    tlv320_set_monitor(true);
+#endif
 
     /* Set the input multiplexer to FM */
     pcm_rec_mux(1);
@@ -971,7 +1013,7 @@ bool radio_screen(void)
         while(1)
         {
             button = button_get(true);
-            if(button == (BUTTON_OFF | BUTTON_REL))
+            if(button == (FM_STOP | BUTTON_REL))
                 break;
         }
     }
@@ -1004,6 +1046,11 @@ bool radio_screen(void)
         radio_stop();
 #ifndef SIMULATOR /* SIMULATOR. Catch FMRADIO_OFF status for the sim. */ 
 #if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_TLV320
+    //tlv320_disable_recording();
+    tlv320_set_monitor(false);
+#endif
+
         pcm_rec_mux(0); /* Line In */
         peak_meter_enabled = true;
 #endif
@@ -1320,7 +1367,7 @@ int handle_radio_presets_cb(int key, int m)
             key = BUTTON_NONE;
             break;
 #endif
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
 #ifdef FM_PRESET
         case FM_PRESET:
             menu_draw(m);
@@ -1565,7 +1612,7 @@ int radio_menu_cb(int key, int m)
     (void)m;
     switch(key)
     {
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
 #ifdef MENU_ENTER2
     case MENU_ENTER2:
 #endif
@@ -1574,7 +1621,7 @@ int radio_menu_cb(int key, int m)
         key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
         break;
 
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
 #ifdef MENU_ENTER2
     case MENU_ENTER2 | BUTTON_REL:
 #endif

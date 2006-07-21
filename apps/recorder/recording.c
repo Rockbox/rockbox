@@ -34,6 +34,9 @@
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
 #endif
+#ifdef HAVE_TLV320
+#include "tlv320.h"
+#endif
 
 #include "mp3_playback.h"
 #include "mas.h"
@@ -108,6 +111,16 @@
 #define REC_RC_NEXT BUTTON_RC_FF
 #define REC_RC_PREV BUTTON_RC_REW
 #define REC_RC_SETTINGS BUTTON_RC_MODE
+
+#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#define REC_SHUTDOWN (BUTTON_POWER | BUTTON_REPEAT)
+#define REC_STOPEXIT BUTTON_POWER
+#define REC_RECPAUSE BUTTON_REC
+#define REC_INC BUTTON_RIGHT
+#define REC_DEC BUTTON_LEFT
+#define REC_NEXT BUTTON_DOWN
+#define REC_PREV BUTTON_UP
+#define REC_SETTINGS BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
@@ -362,6 +375,9 @@ bool recording_screen(void)
     audio_stop();
     /* Set peak meter to recording mode */
     peak_meter_playback(false);
+#ifdef IAUDIO_X5
+    pcm_rec_mux(0); /* select line-in (not radio) */
+#endif
 
 #if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
     if (global_settings.rec_source == SOURCE_SPDIF)

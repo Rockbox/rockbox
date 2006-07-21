@@ -28,6 +28,7 @@
 #include "string.h"
 #include "file.h"
 #include "buffer.h"
+#include "audio.h"
 
 #include "i2c-coldfire.h"
 #include "tlv320.h"
@@ -46,14 +47,13 @@ unsigned tlv320_regs[0xf];
 
 void tlv320_write_reg(unsigned reg, unsigned value)
 {
-    unsigned char data[3];
+    unsigned char data[2];
 
-    data[0] = TLV320_ADDR;
     /* The register address is the high 7 bits and the data the low 9 bits */
-    data[1] = (reg << 1) | ((value >> 8) & 1);
-    data[2] = value & 0xff; 
+    data[0] = (reg << 1) | ((value >> 8) & 1);
+    data[1] = value & 0xff; 
 
-    if (i2c_write(1, data, 3) != 3)
+    if (i2c_write(I2C_IFACE_0, TLV320_ADDR, data, 2) != 2)
     {
         logf("tlv320 error reg=0x%x", reg);
         return;
@@ -73,15 +73,16 @@ void tlv320_init(void)
 
     /* Initialize all registers */
 
-    tlv320_write_reg(REG_PC, 0x00); /* All ON */
-    tlv320_set_linein_vol(0, 0);
+    tlv320_write_reg(REG_PC, PC_ADC|PC_MIC|PC_LINE);  /* All ON except ADC, MIC and LINE */
+    tlv320_set_recvol(0, 0, AUDIO_GAIN_MIC);
+    tlv320_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
     tlv320_mute(true);
     tlv320_write_reg(REG_AAP, AAP_DAC|AAP_MICM);
     tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16|DAIF_FOR_I2S);
     tlv320_set_headphone_vol(0, 0);
     tlv320_write_reg(REG_DIA, DIA_ACT);
-    tlv320_write_reg(REG_SRC, (8 << 2)); /* 44.1kHz */
+    tlv320_write_reg(REG_SRC, (1 << 5)); /* 44.1kHz */
 }
 
 /**
@@ -114,18 +115,30 @@ void tlv320_set_headphone_vol(int vol_l, int vol_r)
 }
 
 /**
- * Sets left and right linein volume  (31(max) to 0(muted))
+ * Set recording volume
+ *
+ * Line in   : 0 .. 31 => Volume -34.5 .. 12 dB
+ * Mic (left): 0 ..  1 => Volume   0   .. 20 dB
+ *
  */
-void tlv320_set_linein_vol(int vol_l, int vol_r)
+void tlv320_set_recvol(int left, int right, int type)
 {
-    unsigned value_l = tlv320_regs[REG_LLIV];
-    unsigned value_r = tlv320_regs[REG_RLIV];
+    if (type == AUDIO_GAIN_MIC)
+    {
+        unsigned value_aap = tlv320_regs[REG_AAP];
+        
+        if (left)
+            value_aap |= AAP_MICB;  /* Enable mic boost (20dB) */
+        else
+            value_aap &= ~AAP_MICB;
 
-    value_l |= LLIV_LIV(vol_l);
-    value_r |= RLIV_RIV(vol_r);
-
-    tlv320_write_reg(REG_LLIV, value_l);
-    tlv320_write_reg(REG_RLIV, value_r);
+        tlv320_write_reg(REG_AAP, value_aap);            
+        
+    } else if (type == AUDIO_GAIN_LINEIN)
+    {
+        tlv320_write_reg(REG_LLIV, LLIV_LIV(left));
+        tlv320_write_reg(REG_RLIV, RLIV_RIV(right));    
+    }
 }
 
 /**
@@ -148,10 +161,11 @@ void tlv320_mute(bool mute)
         value_r = RHV_RHV(tlv320.vol_r);
     }
 
-    tlv320_write_reg(REG_LHV, value_r);
+    tlv320_write_reg(REG_LHV, value_l);
     tlv320_write_reg(REG_RHV, value_r);
 }
 
+/* Nice shutdown of TLV320 codec */
 void tlv320_close()
 {
     tlv320_write_reg(REG_PC, 0xFF);  /* All OFF */
@@ -159,35 +173,66 @@ void tlv320_close()
 
 void tlv320_enable_recording(bool source_mic)
 {
-    unsigned value_pc = tlv320_regs[REG_PC];
-    unsigned value_aap = tlv320_regs[REG_AAP];
-
-    /* select source*/
+    unsigned value_daif = tlv320_regs[REG_DAIF];
+    unsigned value_aap, value_pc;
+    
     if (source_mic)
     {
-        value_aap &= ~AAP_INSEL;
-        value_pc |= PC_MIC;
+        /* select mic and enable mic boost (20 dB) */
+        value_aap = AAP_DAC | AAP_INSEL | AAP_MICB;   
+        value_pc = PC_LINE;                 /* power down line-in */
     }
     else
     {
-        value_aap |= AAP_INSEL;
-        value_pc |= PC_LINE;
+        value_aap = AAP_DAC | AAP_MICM;
+        value_pc = PC_MIC;                  /* power down mic */
     }
 
-    /* poweron adc */
-    value_pc |= PC_ADC;
+    tlv320_write_reg(REG_PC, value_pc);
+    sleep(HZ/8);
 
     tlv320_write_reg(REG_AAP, value_aap);
-    tlv320_write_reg(REG_PC, value_pc);
+    sleep(HZ/8);
+    
+    /* Enable MASTER mode (start sending I2S data to the CPU) */
+    value_daif |= DAIF_MS;                   
+    tlv320_write_reg(REG_DAIF, value_daif);
 }
-
+  
 void tlv320_disable_recording()
 {
-    unsigned value = tlv320_regs[REG_PC];
+    unsigned value_pc = tlv320_regs[REG_PC];
+    unsigned value_aap = tlv320_regs[REG_AAP];
+    unsigned value_daif = tlv320_regs[REG_DAIF];
 
-    /* powerdown mic, linein and adc */
-    value &= ~(PC_MIC | PC_LINE | PC_ADC);
+    value_daif &= ~DAIF_MS;                /* disable MASTER mode */
+    tlv320_write_reg(REG_DAIF, value_daif);
+    
+    value_aap |= AAP_MICM;                 /* mute mic */
+    tlv320_write_reg(REG_PC, value_aap);
 
-    /* powerdown mic, linein and adc */
-    tlv320_write_reg(REG_PC, value);
+    value_pc |= (PC_MIC|PC_LINE|PC_ADC);   /* power down mic, line-in and adc */
+    tlv320_write_reg(REG_PC, value_pc);    
+    
+    sleep(HZ/8);
 }
+
+void tlv320_set_monitor(bool enable)
+{
+  unsigned value_aap, value_pc;
+  if (enable)
+  {
+    value_aap = AAP_BYPASS | AAP_MICM;
+    value_pc = (PC_MIC|PC_DAC|PC_ADC);   /* power down mic, dac and adc */
+  }
+  else
+  {
+    value_aap = AAP_DAC | AAP_MICM;
+    value_pc = (PC_MIC|PC_LINE|PC_ADC);   /* power down mic, line-in and adc */
+  }
+  tlv320_write_reg(REG_AAP, value_aap);
+  tlv320_write_reg(REG_PC,  value_pc);
+
+  sleep(HZ/8);
+}
+
