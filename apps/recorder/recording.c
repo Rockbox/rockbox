@@ -114,13 +114,16 @@
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define REC_SHUTDOWN (BUTTON_POWER | BUTTON_REPEAT)
-#define REC_STOPEXIT BUTTON_POWER
-#define REC_RECPAUSE BUTTON_REC
+#define REC_STOPEXIT (BUTTON_PLAY | BUTTON_REPEAT)
+#define REC_RECPAUSE_PRE BUTTON_PLAY
+#define REC_RECPAUSE (BUTTON_PLAY | BUTTON_REL)
 #define REC_INC BUTTON_RIGHT
 #define REC_DEC BUTTON_LEFT
 #define REC_NEXT BUTTON_DOWN
 #define REC_PREV BUTTON_UP
-#define REC_SETTINGS BUTTON_PLAY
+#define REC_NEWFILE_PRE BUTTON_REC
+#define REC_SETTINGS (BUTTON_REC | BUTTON_REPEAT)
+#define REC_NEWFILE (BUTTON_REC | BUTTON_REL)
 
 #elif CONFIG_KEYPAD == GMINI100_PAD
 #define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
@@ -520,16 +523,23 @@ bool recording_screen(void)
 #ifdef REC_RC_RECPAUSE
             case REC_RC_RECPAUSE:
 #endif
+#ifdef REC_RECPAUSE_PRE
+                if (lastbutton != REC_RECPAUSE_PRE)
+                    break;
+#endif
 #ifdef REC_NEWFILE            
             case REC_NEWFILE:
 #endif
 #ifdef REC_RC_NEWFILE
             case REC_RC_NEWFILE:
 #endif
-#ifdef REC_RECPAUSE_PRE
-                if (lastbutton != REC_RECPAUSE_PRE)
-                    break;
+#ifdef REC_NEWFILE_PRE
+                if (button == REC_NEWFILE){
+                    if (lastbutton != REC_NEWFILE_PRE) 
+                        break;
+                }
 #endif
+
                 /* Only act if the mpeg is stopped */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
