@@ -1804,13 +1804,8 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             {
                 if (idxbuf[j].flag & FLAG_DELETED)
                 {
-                    int k;
-                    
-                    idxbuf_pos--;
-                    for (k = j; k < idxbuf_pos; k++)
-                        idxbuf[k] = idxbuf[k+1];
-                    
-                    j--;
+                    /* We can just ignore deleted entries. */
+                    idxbuf[j].tag_seek[index_type] = 0;
                     continue;
                 }
                 
