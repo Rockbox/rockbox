@@ -353,6 +353,7 @@ struct user_settings
     int remote_scroll_speed;  /* long texts scrolling speed: 1-30 */
     int remote_scroll_delay;  /* delay (in 1/10s) before starting scroll */
     int remote_scroll_step;   /* pixels to advance per update */
+    int remote_bidir_limit;   /* bidir scroll length limit */
 #endif
 
 #ifdef HAVE_LCD_BITMAP

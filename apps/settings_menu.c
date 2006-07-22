@@ -880,6 +880,14 @@ static bool remote_scroll_delay(void)
     global_settings.remote_scroll_delay = dummy / (HZ/10);
     return rc;
 }
+
+static bool remote_bidir_limit(void)
+{
+    return set_int(str(LANG_BIDIR_SCROLL), "%", UNIT_PERCENT,
+                   &global_settings.remote_bidir_limit,
+                   &lcd_remote_bidir_scroll, 25, 0, 200, NULL );
+}
+
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -1708,6 +1716,7 @@ static bool remote_scroll_sets(void)
         { ID2P(LANG_SCROLL_SPEED),        remote_scroll_speed },
         { ID2P(LANG_SCROLL_DELAY),        remote_scroll_delay },
         { ID2P(LANG_SCROLL_STEP),         remote_scroll_step  },
+        { ID2P(LANG_BIDIR_SCROLL),        remote_bidir_limit  },
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
@@ -1729,10 +1738,10 @@ static bool scroll_settings_menu(void)
 #ifdef HAVE_LCD_BITMAP
         { ID2P(LANG_SCROLL_STEP),         scroll_step        },
 #endif
+        { ID2P(LANG_BIDIR_SCROLL),        bidir_limit        },
 #ifdef HAVE_REMOTE_LCD
         { ID2P(LANG_REMOTE_SCROLL_SETS),  remote_scroll_sets },
 #endif
-        { ID2P(LANG_BIDIR_SCROLL),        bidir_limit        },
 #ifdef HAVE_LCD_CHARCELLS
         { ID2P(LANG_JUMP_SCROLL),         jump_scroll        },
         { ID2P(LANG_JUMP_SCROLL_DELAY),   jump_scroll_delay  },

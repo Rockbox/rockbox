@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 45
+#define CONFIG_BLOCK_VERSION 46
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -364,6 +364,7 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(remote_scroll_speed), 9, "remote scroll speed", NULL }, /* 0...15 */
     {8, S_O(remote_scroll_step), 6, "remote scroll step", NULL }, /* 1...160 */
     {8, S_O(remote_scroll_delay), 100, "remote scroll delay", NULL }, /* 0...250 */
+    {8, S_O(remote_bidir_limit), 50, "remote bidir limit", NULL }, /* 0...200 */
 #endif
 
 #ifdef HAVE_LCD_BITMAP
@@ -1018,6 +1019,7 @@ void settings_apply(void)
     lcd_remote_scroll_speed(global_settings.remote_scroll_speed);
     lcd_remote_scroll_step(global_settings.remote_scroll_step);
     lcd_remote_scroll_delay(global_settings.remote_scroll_delay * (HZ/10));
+    lcd_remote_bidir_scroll(global_settings.remote_bidir_limit);
 #ifdef HAVE_REMOTE_LCD_TICKING
     lcd_remote_emireduce(global_settings.remote_reduce_ticking);
 #endif
