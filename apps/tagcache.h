@@ -41,9 +41,6 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 /* How much to allocate extra space for ramcache. */
 #define TAGCACHE_RESERVE 32768
 
-/* How many entries we can create in one tag file (for sorting). */
-#define TAGFILE_MAX_ENTRIES  10000
-
 /** 
  * Define how long one entry must be at least (longer -> less memory at commit).
  * Must be at least 4 bytes in length for correct alignment. 

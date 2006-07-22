@@ -141,7 +141,9 @@ struct tempbuf_searchidx {
     struct tempbuf_id_list idlist;
 };
 
-#define LOOKUP_BUF_DEPTH  (TAGFILE_MAX_ENTRIES*2 \
+static long commit_entry_count;
+
+#define LOOKUP_BUF_DEPTH  (commit_entry_count*2 \
     * (TAGFILE_ENTRY_AVG_LENGTH/TAGFILE_ENTRY_CHUNK_LENGTH))
 
 struct tempbuf_searchidx **lookup;
@@ -1276,7 +1278,7 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
     
     /* Insert it to the buffer. */
     tempbuf_left -= len;
-    if (tempbuf_left - 4 < 0 || tempbufidx >= TAGFILE_MAX_ENTRIES-1)
+    if (tempbuf_left - 4 < 0 || tempbufidx >= commit_entry_count-1)
         return false;
     
     if (id >= 0 && id < LOOKUP_BUF_DEPTH)
@@ -1536,18 +1538,28 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     
     logf("Building index: %d", index_type);
     
+    /* Check the number of entries we need to allocate ram for. */
+    commit_entry_count = h->entry_count + 1;
+    
+    masterfd = open_master_fd(&tcmh, false);
+    if (masterfd >= 0)
+    {
+        commit_entry_count += tcmh.tch.entry_count;
+        close(masterfd);
+    }
+    
     tempbufidx = 0;
-    tempbuf_pos = TAGFILE_MAX_ENTRIES * sizeof(struct tempbuf_searchidx);
+    tempbuf_pos = commit_entry_count * sizeof(struct tempbuf_searchidx);
     tempbuf_pos += LOOKUP_BUF_DEPTH * sizeof(void **);
     tempbuf_left = tempbuf_size - tempbuf_pos - 8;
-    if (tempbuf_left - TAGFILE_ENTRY_AVG_LENGTH * TAGFILE_MAX_ENTRIES < 0)
+    if (tempbuf_left - TAGFILE_ENTRY_AVG_LENGTH * commit_entry_count < 0)
     {
         logf("Buffer way too small!");
         return 0;
     }
 
     lookup = (struct tempbuf_searchidx **)
-        (tempbuf + sizeof(struct tempbuf_searchidx)*TAGFILE_MAX_ENTRIES);
+        (tempbuf + sizeof(struct tempbuf_searchidx)*commit_entry_count);
     memset(lookup, 0, LOOKUP_BUF_DEPTH * sizeof(void **));
     
     /* Open the index file, which contains the tag names. */
@@ -1610,7 +1622,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                  * table when the index gets resorted.
                  */
                 tempbuf_insert(buf, loc/TAGFILE_ENTRY_CHUNK_LENGTH 
-                               + TAGFILE_MAX_ENTRIES, entry.idx_id,
+                               + commit_entry_count, entry.idx_id,
                                tagcache_is_unique_tag(index_type));
                 yield();
             }
@@ -1804,7 +1816,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 
                 idxbuf[j].tag_seek[index_type] = tempbuf_find_location(
                     idxbuf[j].tag_seek[index_type]/TAGFILE_ENTRY_CHUNK_LENGTH
-                    + TAGFILE_MAX_ENTRIES);
+                    + commit_entry_count);
                 
                 if (idxbuf[j].tag_seek[index_type] < 0)
                 {
