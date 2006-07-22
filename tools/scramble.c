@@ -19,11 +19,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include "iriver.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
-int ipod_encode(char *iname, char *oname, int fw_ver);
+int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
 
 enum
 {
@@ -78,6 +79,9 @@ void usage(void)
            "\t-iriver iRiver format\n"
            "\t-iaudiox5 iAudio X5 format\n"
            "\t-iaudiox5v iAudio X5V format\n"
+           "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
+           "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
+           "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
            "\t                   ip3g, ip4g, mini, x5)\n"
@@ -218,10 +222,20 @@ int main (int argc, char** argv)
         oname = argv[3];
         return iaudio_encode(iname, oname, "COWON_X5V_FW");
     }
-    else if(!strcmp(argv[1], "-ipod")) {
+    else if(!strcmp(argv[1], "-ipod3g")) {
         iname = argv[2];
         oname = argv[3];
-        return ipod_encode(iname, oname, 3); /* Firmware image v3 */
+        return ipod_encode(iname, oname, 2, false); /* Firmware image v2 */
+    }
+    else if(!strcmp(argv[1], "-ipod4g")) {
+        iname = argv[2];
+        oname = argv[3];
+        return ipod_encode(iname, oname, 3, false); /* Firmware image v3 */
+    }
+    else if(!strcmp(argv[1], "-ipod5g")) {
+        iname = argv[2];
+        oname = argv[3];
+        return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
     }
     
     /* open file */
@@ -461,7 +475,7 @@ int iaudio_encode(char *iname, char *oname, char *idstring)
    This has also only been tested on an ipod Photo 
 */
 
-int ipod_encode(char *iname, char *oname, int fw_ver)
+int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
 {
     static const char *apple_stop_sign = "{{~~  /-----\\   "\
                                          "{{~~ /       \\  "\
@@ -481,11 +495,15 @@ int ipod_encode(char *iname, char *oname, int fw_ver)
                                          "---------------";
     size_t len;
     int length;
+    int rsrclength;
+    int rsrcoffset;
     FILE *file;
-    unsigned char *outbuf;
-    int i;
     unsigned int sum = 0;
-    
+    unsigned int rsrcsum = 0;
+    unsigned char *outbuf;
+    int bufsize;
+    int i;
+
     file = fopen(iname, "rb");
     if (!file) {
        perror(iname);
@@ -494,8 +512,14 @@ int ipod_encode(char *iname, char *oname, int fw_ver)
     fseek(file,0,SEEK_END);
     length = ftell(file);
     
-    fseek(file,0,SEEK_SET); 
-    outbuf = malloc(length+0x4600);
+    fseek(file,0,SEEK_SET);
+
+    bufsize=(length+0x4600);
+    if (fake_rsrc) {
+        bufsize = (bufsize + 0x400) & ~0x200;
+    }
+
+    outbuf = malloc(bufsize);
 
     if ( !outbuf ) {
        printf("out of memory!\n");
@@ -535,6 +559,23 @@ int ipod_encode(char *iname, char *oname, int fw_ver)
     int2le(sum,        &outbuf[0x421c]);   /* Checksum */
     int2le(0x00006012, &outbuf[0x4220]);   /* vers - 0x6012 is a guess */
     int2le(0xffffffff, &outbuf[0x4224]);   /* LoadAddr - for flash images */
+
+    /* "rsrc" entry (if applicable) */
+    if (fake_rsrc) {
+        rsrcoffset=(length+0x4600+0x200) & ~0x200;
+        rsrclength=0x200;
+        rsrcsum=0;
+
+        memcpy(&outbuf[0x4228],"!ATAcrsr",8); /* dev and type */
+        int2le(0,          &outbuf[0x4230]);  /* id */
+        int2le(rsrcoffset, &outbuf[0x4234]);  /* devOffset */
+        int2le(rsrclength, &outbuf[0x4238]);  /* Length of firmware */
+        int2le(0x10000000, &outbuf[0x423c]);  /* Addr */
+        int2le(0,          &outbuf[0x4240]);  /* Entry Offset */
+        int2le(rsrcsum,    &outbuf[0x4244]);  /* Checksum */
+        int2le(0x0000b000, &outbuf[0x4248]);  /* vers */
+        int2le(0xffffffff, &outbuf[0x424c]);  /* LoadAddr - for flash images */
+    }
 
     file = fopen(oname, "wb");
     if (!file) {
