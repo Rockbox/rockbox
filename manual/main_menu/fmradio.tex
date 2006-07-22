@@ -1,0 +1,117 @@
+% $Id$ %
+\section{\label{ref:FMradio}FM Radio}  
+\screenshot{main_menu/images/ss-fm-radio-screen}{The FM radio screen}{}
+  This menu option switches to the radio screen.
+  The FM radio has the ability \opt{HAVE_RECORDING}{to record and } to
+  remember station frequency settings (presets).
+
+    \begin{table}
+      \begin{btnmap}{}{}
+          \ButtonLeft, \ButtonRight & Change frequency in 0.1 MHz steps.\\
+          %
+          Hold \ButtonLeft, \ButtonRight & Seek to next station or preset.\\
+          %
+          \ButtonUp, \ButtonDown
+          & Change volume.\\
+          \opt{RECORDER_PAD}{
+            \ButtonPlay & \emph{(EXPERIMENTAL)}\\
+            & freezes all screen updates. May enhance radio reception in some
+              cases.\\
+          }
+          %
+          \opt{RECORDER_PAD}{\ButtonOn}
+          \opt{ONDIO_PAD}{Hold \ButtonOff}
+          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+          \opt{IAUDIO_X5_PAD}{\ButtonRec}
+          & Leave the radio screen with the radio playing.\\
+          %
+          \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
+            {\ButtonOff}
+          \opt{IAUDIO_X5_PAD}{\ButtonPower}
+          & Stops the radio and returns to \setting{Main Menu}.\\
+          %
+          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn & Mutes radio playback.\\}
+          \opt{IAUDIO_X5_PAD}{\ButtonPlay & Mutes radio playback.\\}
+          %
+          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+            \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOn}
+            \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
+            & Switches between \setting{SCAN} and \setting{PRESET} mode.\\
+          }
+          %
+          \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+            \opt{RECORDER_PAD}{\ButtonFTwo}
+            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+            & Opens a list of radio presets. You can view all the presets that
+              you have, and switch to the station.\\
+          }
+          %
+          \opt{RECORDER_PAD}{\ButtonFOne}
+          \opt{ONDIO_PAD}{Hold \ButtonMenu}
+          \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Hold \ButtonSelect}
+          & Displays the FM radio settings menu.\\
+       \end{btnmap}
+    \end{table}
+    
+  \begin{description}
+    
+  \item[Saving a preset:]
+    Up to 32 of your favourite stations can be saved as presets.
+    %
+    \opt{RECORDER_PAD}{Press \ButtonFTwo\ to go to the presets list, press
+      \ButtonFOne to add a preset.}
+    %
+    \opt{ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+      \opt{ONDIO_PAD}{Hold \ButtonMenu}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Hold \ButtonSelect}
+      to go to the menu, then select \setting{Add preset}.
+    }
+    %
+    Enter the name (maximum number of characters is 32).
+    \opt{RECORDER_PAD}{Press \ButtonFTwo}
+    \opt{ONDIO_PAD}{Hold \ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Press \ButtonOn}
+    \opt{IAUDIO_X5_PAD}{Press \ButtonPlay}
+    to save.
+    
+    \note{See this page for pre-made FM radio presets from all around the world.}
+    \wikilink{FmPresets}
+    
+  \item[Selecting a preset:]
+        \opt{ONDIO_PAD}{Hold \ButtonMenu\ to open the menu, select
+          \setting{Preset} to open the presets list.}
+        %
+        \opt{RECORDER_PAD}{Press \ButtonFTwo\ to go to the preset list.}
+        %
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+          {Press \ButtonSelect\ to go to the preset list.}
+        %
+        Use \ButtonUp\ and \ButtonDown\ to 
+        move the cursor and then press 
+        \opt{RECORDER_PAD}{\ButtonPlay}
+        \opt{ONDIO_PAD}{\ButtonRight}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+        to select. Use \ButtonLeft\ to leave the preset without selecting
+        anything.
+        
+  \item[Removing a preset:]
+        \opt{ONDIO_PAD}{\fixme{Fix Me}}
+        \opt{RECORDER_PAD}{Press \ButtonFTwo}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Press \ButtonSelect}
+        to go to the preset list. Use \ButtonUp\
+        and \ButtonDown\ to move the cursor and then
+        \opt{RECORDER_PAD}{press \ButtonFThree}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{Hold \ButtonSelect}
+        on the preset that you wish to remove, then select \setting{Remove Preset}.
+     
+      \opt{RECORDER_PAD}{
+          \item[Recording:]
+            Press \ButtonFThree\ to start recording the currently playing 
+            station. Press \ButtonOff\ to stop recording. Press \ButtonPlay\ 
+            again to seamlessly start recording to a new file. The settings
+            for the recording can be changed in the \ButtonFOne\ menu before
+            starting the recording. See page \pageref{ref:Recordingsettings} 
+            for details of recording settings.
+          }
+  \end{description}
+  \note{The radio will turn off when starting playback of an audio file.}
