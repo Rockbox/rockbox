@@ -249,6 +249,13 @@ struct user_settings
                           5 = 01:00, 6 = 02:00, 7 = 04:00, 8 = 06:00
                           9 = 08:00, 10= 10:00, 11= 12:00, 12= 18:00,
                           13= 24:00 */
+    int rec_sizesplit; /* 0 = off,
+                          1 = 5MB, 2 = 10MB, 3 = 15MB, 4 = 32MB
+                          5 = 64MB, 6 = 75MB, 7 = 100MB, 8 = 128MB
+                          9 = 256MB, 10= 512MB, 11= 650MB, 12= 700MB,
+                          13= 1GB, 14 = 1.5GB 15 = 1.75MB*/
+    int rec_split_type; /* split/stop */
+    int rec_split_method; /* time/filesize */
 
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     int rec_directory; /* 0=base dir, 1=current dir */
@@ -549,6 +556,7 @@ int read_line(int fd, char* buffer, int buffer_size);
 void set_file(char* filename, char* setting, int maxlen);
 
 unsigned int rec_timesplit_seconds(void);
+unsigned long rec_sizesplit_bytes(void);
 void settings_apply_trigger(void);
 
 /* global settings */

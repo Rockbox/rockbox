@@ -2698,16 +2698,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Time Split"
+    *: "File Split Options"
   </dest>
   <voice>
-    *: "Time Split"
+    *: "File Split Options"
   </voice>
 </phrase>
 <phrase>
@@ -8669,4 +8669,111 @@
     *: "Import modifications"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Split Measure"
+  </dest>
+  <voice>
+    *: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "What to do when Splitting"
+  </dest>
+  <voice>
+    *: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Split Time"
+  </dest>
+  <voice>
+    *: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Split Filesize"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Time"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filesize"
+  </dest>
+  <voice>
+    *: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Start new file"
+  </dest>
+  <voice>
+    *: "Start new file"
+  </voice>
+</phrase>   
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Stop recording"
+  </dest>
+  <voice>
+    *: "Stop recording"
+  </voice>
+</phrase>

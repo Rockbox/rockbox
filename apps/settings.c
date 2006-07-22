@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 46
+#define CONFIG_BLOCK_VERSION 47
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -466,7 +466,12 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
     {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
+    {4, S_O(rec_sizesplit), 0, "rec sizesplit", /* 0...15 */
+        "off,5MB,10MB,15MB,32MB,64MB,75MB,100MB,128MB,256MB,512MB,650MB,700MB,1GB,1.5GB,1.75GB" },
     {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
+    {1, S_O(rec_split_type), 0, "rec split type", "Split, Stop" },
+    {1, S_O(rec_split_method), 0, "rec split method", "Time,Filesize" },
+
 #ifdef HAVE_SPDIF_IN
     {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
 #else
@@ -1929,6 +1934,31 @@ unsigned int rec_timesplit_seconds(void)
     return rec_timer_seconds[global_settings.rec_timesplit];
 }
 
+/* This array holds the record size interval lengths, in bytes */
+static const unsigned long rec_size_bytes[] =
+{
+    0,               /* 0 means OFF */
+    5*1024*1024,     /* 5MB */
+    10*1024*1024,    /* 10MB */
+    15*1024*1024,    /* 15MB */
+    32*1024*1024,    /* 32MB */
+    64*1024*1024,    /* 64MB */
+    75*1024*1024,    /* 75MB */
+    100*1024*1024,   /* 100MB */
+    128*1024*1024,   /* 128MB */
+    256*1024*1024,   /* 256MB */
+    512*1024*1024,   /* 512MB */
+    650*1024*1024,   /* 650MB */
+    700*1024*1024,   /* 700MB */
+    1024*1024*1024,  /* 1GB */
+    1536*1024*1024,  /* 1.5GB */
+    1792*1024*1024,  /* 1.75GB  */
+};
+
+unsigned long rec_sizesplit_bytes(void)
+{
+    return rec_size_bytes[global_settings.rec_sizesplit];
+}
 /*
  * Time strings used for the trigger durations.
  * Keep synchronous to trigger_times in settings_apply_trigger

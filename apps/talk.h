@@ -40,6 +40,7 @@ enum {
     UNIT_PIXEL,   /* pixels */
     UNIT_PER_SEC, /* per second */
     UNIT_HERTZ,   /* hertz */
+    UNIT_MB,      /* Megabytes */
     UNIT_LAST     /* END MARKER */
 };
 

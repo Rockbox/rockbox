@@ -366,11 +366,77 @@ static bool rectimesplit(void)
         { "18:00" , TALK_ID(18, UNIT_HOUR) },
         { "24:00" , TALK_ID(24, UNIT_HOUR) }
     };
-    return set_option(str(LANG_RECORD_TIMESPLIT),
+    return set_option(str(LANG_SPLIT_TIME),
                       &global_settings.rec_timesplit, INT,
                       names, 16, NULL );
 }
 
+static bool recsizesplit(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { "5MB" , TALK_ID(5, UNIT_MB) },
+        { "10MB" , TALK_ID(10, UNIT_MB) },
+        { "15MB" , TALK_ID(15, UNIT_MB) },
+        { "32MB" , TALK_ID(32, UNIT_MB) },
+        { "64MB" , TALK_ID(64, UNIT_MB) },
+        { "75MB" , TALK_ID(75, UNIT_MB) },
+        { "100MB" , TALK_ID(100, UNIT_MB) },
+        { "128MB" , TALK_ID(128, UNIT_MB) },
+        { "256MB" , TALK_ID(256, UNIT_MB) },
+        { "512MB" , TALK_ID(512, UNIT_MB) },
+        { "650MB" , TALK_ID(650, UNIT_MB) },
+        { "700MB" , TALK_ID(700, UNIT_MB) },
+        { "1GB" , TALK_ID(1024, UNIT_MB) },
+        { "1.5GB" , TALK_ID(1536, UNIT_MB) },
+        { "1.75GB" , TALK_ID(1792, UNIT_MB) }
+    };
+    return set_option(str(LANG_SPLIT_SIZE),
+                      &global_settings.rec_sizesplit, INT,
+                      names, 16, NULL );
+}
+
+static bool splitmethod(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_REC_TIME) },
+        { STR(LANG_REC_SIZE) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_SPLIT_MEASURE),
+                    &global_settings.rec_split_method, INT, names, 2, NULL);
+    return ret;
+}
+
+static bool splittype(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_START_NEW_FILE) },
+        { STR(LANG_STOP_RECORDING) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_SPLIT_TYPE),
+                    &global_settings.rec_split_type, INT, names, 2, NULL);
+    return ret;
+}
+
+static bool filesplitoptionsmenu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_SPLIT_MEASURE), splitmethod },
+        { ID2P(LANG_SPLIT_TYPE),  splittype  },
+        { ID2P(LANG_SPLIT_TIME),  rectimesplit  },
+        { ID2P(LANG_SPLIT_SIZE), recsizesplit   }
+    };
+     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
 static bool recprerecord(void)
 {
     static const struct opt_items names[] = {
@@ -931,7 +997,7 @@ bool recording_menu(bool no_source)
     items[i++].function = receditable;
 #endif
     items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);
-    items[i++].function = rectimesplit;
+    items[i++].function = filesplitoptionsmenu;
     items[i].desc = ID2P(LANG_RECORD_PRERECORD_TIME);
     items[i++].function = recprerecord;
     items[i].desc = ID2P(LANG_RECORD_DIRECTORY);

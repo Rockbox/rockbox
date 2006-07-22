@@ -830,26 +830,37 @@ bool recording_screen(void)
         if(update_countdown == 0 || seconds > last_seconds)
         {
             unsigned int dseconds, dhours, dminutes;
-            unsigned long num_recorded_bytes;
+            unsigned long num_recorded_bytes, dsize, dmb;
             int pos = 0;
             char spdif_sfreq[8];
 
             update_countdown = 5;
             last_seconds = seconds;
 
+            dseconds = rec_timesplit_seconds();
+            dsize = rec_sizesplit_bytes();
+            num_recorded_bytes = audio_num_recorded_bytes();
+            
             FOR_NB_SCREENS(i)
                 screens[i].clear_display(); 
 
-            hours = seconds / 3600;
-            minutes = (seconds - (hours * 3600)) / 60;
-            snprintf(buf, 32, "%s %02d:%02d:%02d",
-                     str(LANG_RECORDING_TIME),
-                     hours, minutes, seconds%60);
+            if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
+            {
+                dmb = dsize/1024/1024;
+                snprintf(buf, 32, "%s %dMB",
+                             str(LANG_SPLIT_SIZE), dmb);
+            }
+            else
+            {
+                hours = seconds / 3600;
+                minutes = (seconds - (hours * 3600)) / 60;
+                snprintf(buf, 32, "%s %02d:%02d:%02d",
+                         str(LANG_RECORDING_TIME),
+                         hours, minutes, seconds%60);
+            }
+            
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, 0, buf); 
-
-            dseconds = rec_timesplit_seconds();
-            num_recorded_bytes = audio_num_recorded_bytes();
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
@@ -859,7 +870,7 @@ bool recording_screen(void)
             {
                 /* Display the split interval if the record timesplit
                    is active */
-                if (global_settings.rec_timesplit)
+                if ((global_settings.rec_timesplit) && !(global_settings.rec_split_method))
                 {
                     /* Display the record timesplit interval rather
                        than the file size if the record timer is
@@ -903,13 +914,25 @@ bool recording_screen(void)
             /* We will do file splitting regardless, either at the end of
                a split interval, or when the filesize approaches the 2GB
                FAT file size (compatibility) limit. */
-            if (audio_stat && 
-                ((global_settings.rec_timesplit && (seconds >= dseconds))
-                 || (num_recorded_bytes >= MAX_FILE_SIZE)))
+            if ((audio_stat && !(global_settings.rec_split_method) 
+                 && global_settings.rec_timesplit && (seconds >= dseconds))
+                 || (audio_stat && global_settings.rec_split_method
+                 && global_settings.rec_sizesplit && (num_recorded_bytes >= dsize))
+                 || (num_recorded_bytes >= MAX_FILE_SIZE))
             {
-                audio_new_file(rec_create_filename(path_buffer));
+                if (!(global_settings.rec_split_type)
+                     || (num_recorded_bytes >= MAX_FILE_SIZE))
+                {
+                    audio_new_file(rec_create_filename(path_buffer));
+                    last_seconds = 0;
+                }
+                else
+                {
+                    peak_meter_trigger(false);
+                    peak_meter_set_trigger_listener(NULL);
+                    audio_stop_recording();
+                }
                 update_countdown = 1;
-                last_seconds = 0;
             }
 
             snprintf(buf, 32, "%s: %s", str(LANG_VOLUME),
