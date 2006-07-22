@@ -106,6 +106,7 @@ void button_event(int key, bool pressed)
         break;
 
     case SDLK_KP_PLUS:
+    case SDLK_F8:
 #ifdef BUTTON_ON
         new_btn = BUTTON_ON;
 #elif defined(BUTTON_SELECT) && defined(BUTTON_PLAY)
