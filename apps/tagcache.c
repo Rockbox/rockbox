@@ -3190,6 +3190,7 @@ static void tagcache_thread(void)
 #endif
                 }
                 
+                logf("tagcache check done");
                 check_done = true;
                 break ;
 
@@ -3281,9 +3282,7 @@ bool tagcache_is_ramcache(void)
 
 void tagcache_init(void)
 {
-    stat.initialized = false;
-    stat.ready = false;
-    stat.commit_step = 0;
+    memset(&stat, 0, sizeof(struct tagcache_stat));
     filenametag_fd = -1;
     current_serial = 0;
     
