@@ -1346,6 +1346,7 @@ static void draw_text( int x, int y )
                 break;
 
             case TEXT_MENU_PREVIEW:
+                rb->lcd_set_foreground( rp_colors[ drawcolor ] );
                 while( 1 )
                 {
                     unsigned int button;
@@ -1387,6 +1388,7 @@ static void draw_text( int x, int y )
                 break;
 
             case TEXT_MENU_APPLY:
+                rb->lcd_set_foreground( rp_colors[ drawcolor ] );
                 buffer_putsxyofs( save_buffer, COLS, ROWS, x, y, 0,
                                   buffer.text.text );
             case TEXT_MENU_CANCEL:
