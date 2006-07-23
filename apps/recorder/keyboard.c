@@ -222,7 +222,7 @@ int load_kbd(unsigned char* filename)
 {
     int fd, count, l;
     int i = 0;
-    unsigned char buf[4];  
+    unsigned char buf[4];
 
     if (filename == NULL) {
         kbd_loaded = false;
@@ -253,12 +253,12 @@ int load_kbd(unsigned char* filename)
             kbd_loaded = false;
             return 1;
         }
-        
+
         FOR_NB_SCREENS(l)
             utf8decode(buf, &param[l].kbd_buf[i]);
-            
-        if (param[0].kbd_buf[i] != 0xFEFF && param[0].kbd_buf[i] != '\n' &&
-            param[0].kbd_buf[i] != '\r') /*skip BOM & newlines */
+
+        if (param[0].kbd_buf[i] != 0xFEFF &&
+            param[0].kbd_buf[i] != '\r') /*skip BOM & carriage returns */
             i++;
     }
 
