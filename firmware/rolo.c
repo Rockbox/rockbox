@@ -31,8 +31,8 @@
 #include "buffer.h"
 
 #if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) && \
-    !defined(IPOD_ARCH)
-/* FIX: this doesn't work on Gmini, iFP and iPods yet */
+    (CONFIG_CPU != PP5002)
+/* FIX: this doesn't work on Gmini, iFP or 3rd Gen ipods yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -62,6 +62,9 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 {
     long i;
     unsigned char* localdest = dest;
+#if (CONFIG_CPU==PP5020)
+    unsigned long* memmapregs = (unsigned long*)0xf000f000;
+#endif
 
     for(i = 0;i < length;i++)
         *localdest++ = *source++;
@@ -74,9 +77,22 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "jmp     (%0)        \n"
         : : "a"(dest)
     );
-#endif
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU==PP5020)
-    /* TODO: Implement for iPod */
+#elif (CONFIG_CPU==PP5020)
+    /* Copy a further 8KB of data to try and ensure the cache is flushed */
+    for(i = length; i < length+8192; i++)
+        *localdest++ = *source++;
+
+    /* Disable cache */
+    outl(0x0, 0x6000C000);
+
+    /* Reset the memory mapping registers to zero */
+    for (i=0;i<8;i++)
+        memmapregs[i]=0;
+
+    asm volatile(
+        "mov   r0, #0x10000000   \n"
+        "mov   pc, r0            \n"
+    );
 #endif
 }
 #endif
@@ -131,6 +147,10 @@ int rolo_load(const char* filename)
         rolo_error("Error Reading checksum");
         return -1;
     }
+
+    /* Rockbox checksums are big-endian */
+    file_checksum = betoh32(file_checksum);
+
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     if (read(fd, audiobuf, length) != length) {
