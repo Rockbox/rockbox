@@ -215,6 +215,7 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
     char buf[MAX_PATH];
+    int rc;
     
     if (tagcache_is_numeric_tag(tag) || tag < 0 || tag >= TAG_COUNT)
         return -1;
@@ -230,8 +231,8 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
     }
     
     /* Check the header. */
-    read(fd, hdr, sizeof(struct tagcache_header));
-    if (hdr->magic != TAGCACHE_MAGIC)
+    rc = read(fd, hdr, sizeof(struct tagcache_header));
+    if (hdr->magic != TAGCACHE_MAGIC || rc != sizeof(struct tagcache_header))
     {
         logf("header error");
         stat.ready = false;
@@ -700,6 +701,7 @@ static void remove_files(void)
     char buf[MAX_PATH];
     
     stat.ready = false;
+    stat.ramcache = false;
     remove(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
@@ -715,6 +717,7 @@ static void remove_files(void)
 static int open_master_fd(struct master_header *hdr, bool write)
 {
     int fd;
+    int rc;
     
     fd = open(TAGCACHE_FILE_MASTER, write ? O_RDWR : O_RDONLY);
     if (fd < 0)
@@ -725,8 +728,8 @@ static int open_master_fd(struct master_header *hdr, bool write)
     }
     
     /* Check the header. */
-    read(fd, hdr, sizeof(struct master_header));
-    if (hdr->tch.magic != TAGCACHE_MAGIC)
+    rc = read(fd, hdr, sizeof(struct master_header));
+    if (hdr->tch.magic != TAGCACHE_MAGIC || rc != sizeof(struct master_header))
     {
         logf("header error");
         stat.ready = false;
@@ -1659,6 +1662,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
          */
+        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
         fd = open(buf, O_WRONLY | O_CREAT | O_TRUNC);
         if (fd < 0)
         {
