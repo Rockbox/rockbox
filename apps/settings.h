@@ -570,6 +570,11 @@ extern const char rec_base_directory[];
 
 /* system defines */
 
+#ifdef IAUDIO_X5
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        29
+#define DEFAULT_CONTRAST_SETTING    15
+#else
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_CONTRAST_SETTING        31
 #define DEFAULT_CONTRAST_SETTING    30
@@ -578,7 +583,7 @@ extern const char rec_base_directory[];
 #define DEFAULT_CONTRAST_SETTING    38
 #endif
 #define MIN_CONTRAST_SETTING        5
-
+#endif // X5
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */

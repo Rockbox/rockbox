@@ -655,7 +655,7 @@ bool is_remote_backlight_on(void) {return true;}
 #endif /* #ifdef CONFIG_BACKLIGHT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#ifdef IRIVER_H300_SERIES
+#if defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
 void backlight_set_brightness(int val)
 {
     /* set H300 brightness by changing the PWM

@@ -266,7 +266,7 @@ static bool remote_caption_backlight(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
-#ifndef HAVE_LCD_COLOR
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
@@ -1776,12 +1776,12 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
 #endif
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-        { ID2P(LANG_BRIGHTNESS), brightness },
-#endif
         { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_bl_filter_first_keypress },
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+        { ID2P(LANG_BRIGHTNESS),      brightness },
+#endif
 #endif /* CONFIG_BACKLIGHT */
-#ifndef HAVE_LCD_COLOR
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
         { ID2P(LANG_CONTRAST),        contrast },
 #endif
 #ifdef HAVE_LCD_BITMAP
