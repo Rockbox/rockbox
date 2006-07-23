@@ -72,6 +72,7 @@ static struct tagcache_stat stat;
 enum tagcache_queue {
     Q_STOP_SCAN = 0,
     Q_START_SCAN,
+    Q_IMPORT_CHANGELOG,
     Q_UPDATE,
     Q_REBUILD,
 };
@@ -424,11 +425,10 @@ bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
     return true;
 }
 
-static bool tagcache_get_index(const struct tagcache_search *tcs,
-                               int idxid, struct index_entry *idx)
+static bool get_index(int masterfd, int idxid, struct index_entry *idx)
 {
 #ifdef HAVE_TC_RAMCACHE
-    if (tcs->ramsearch)
+    if (stat.ramcache)
     {
         if (hdr->indices[idxid].flag & FLAG_DELETED)
             return false;
@@ -438,12 +438,34 @@ static bool tagcache_get_index(const struct tagcache_search *tcs,
     }
 #endif
     
-    lseek(tcs->masterfd, idxid * sizeof(struct index_entry) 
+    lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
-    if (read(tcs->masterfd, idx, sizeof(struct index_entry)) !=
+    if (read(masterfd, idx, sizeof(struct index_entry)) !=
         sizeof(struct index_entry))
     {
         logf("read error #3");
+        return false;
+    }
+    
+    if (idx->flag & FLAG_DELETED)
+        return false;
+    
+    return true;
+}
+
+static bool write_index(int masterfd, int idxid, struct index_entry *idx)
+{
+#ifdef HAVE_TC_RAMCACHE
+    if (stat.ramcache)
+        memcpy(&hdr->indices[idxid], idx, sizeof(struct index_entry));
+#endif
+    
+    lseek(masterfd, idxid * sizeof(struct index_entry) 
+          + sizeof(struct master_header), SEEK_SET);
+    if (write(masterfd, idx, sizeof(struct index_entry)) !=
+        sizeof(struct index_entry))
+    {
+        logf("write error #3");
         return false;
     }
     
@@ -487,7 +509,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     if (!tagcache_is_numeric_tag(tag))
         return -1;
     
-    if (!tagcache_get_index(tcs, tcs->idx_id, &idx))
+    if (!get_index(tcs->masterfd, tcs->idx_id, &idx))
         return -2;
     
     return check_virtual_tags(tag, &idx);
@@ -991,7 +1013,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     struct index_entry idx;
     long seek;
     
-    if (!tagcache_get_index(tcs, idxid, &idx))
+    if (!get_index(tcs->masterfd, idxid, &idx))
         return false;
     
     seek = idx.tag_seek[tcs->type];
@@ -2137,6 +2159,8 @@ static bool commit(void)
         tagcache_start_scan();
 #endif
     
+    queue_post(&tagcache_queue, Q_IMPORT_CHANGELOG, 0);
+    
     return true;
 }
 
@@ -2208,37 +2232,13 @@ static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
     if (!tagcache_is_numeric_tag(tag))
         return false;
     
-#ifdef HAVE_TC_RAMCACHE
-    /* Update ram entries first. */
-    if (hdr)
-    {
-        hdr->indices[idx_id].tag_seek[tag] = data;
-        hdr->indices[idx_id].flag |= FLAG_DIRTYNUM;
-    }
-#endif
-    
-    /* And now update the db on disk also. */
-    lseek(masterfd, idx_id * sizeof(struct index_entry)
-          + sizeof(struct master_header), SEEK_SET);
-    if (read(masterfd, &idx, sizeof(struct index_entry)) 
-        != sizeof(struct index_entry))
-    {
-        logf("read error");
+    if (!get_index(masterfd, idx_id, &idx))
         return false;
-    }
     
-    idx.flag |= FLAG_DIRTYNUM;
     idx.tag_seek[tag] = data;
+    idx.flag |= FLAG_DIRTYNUM;
     
-    lseek(masterfd, -sizeof(struct index_entry), SEEK_CUR);
-    if (write(masterfd, &idx, sizeof(struct index_entry))
-        != sizeof(struct index_entry))
-    {
-        logf("write error");
-        return false;
-    }
-    
-    return true;
+    return write_index(masterfd, idx_id, &idx);
 }
 
 bool tagcache_modify_numeric_entry(struct tagcache_search *tcs, 
@@ -2357,6 +2357,7 @@ static bool read_tag(char *dest, long size,
 
 static bool parse_changelog_line(int masterfd, const char *buf)
 {
+    struct index_entry idx;
     char tag_data[MAX_PATH];
     int idx_id;
     const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed };
@@ -2379,6 +2380,19 @@ static bool parse_changelog_line(int masterfd, const char *buf)
         return false;
     }
     
+    if (!get_index(masterfd, idx_id, &idx))
+    {
+        logf("failed to retrieve index entry");
+        return false;
+    }
+    
+    /* Stop if tag has already been modified. */
+    if (idx.flag & FLAG_DIRTYNUM)
+        return false;
+    
+    logf("import: %s", tag_data);
+    
+    idx.flag |= FLAG_DIRTYNUM;
     for (i = 0; i < (long)(sizeof(import_tags)/sizeof(import_tags[0])); i++)
     {
         int data;
@@ -2393,13 +2407,13 @@ static bool parse_changelog_line(int masterfd, const char *buf)
         if (data < 0)
             continue;
         
-        modify_numeric_entry(masterfd, idx_id, import_tags[i], data);
+        idx.tag_seek[import_tags[i]] = data;
         
         if (import_tags[i] == tag_lastplayed && data > current_serial)
             current_serial = data;
     }
     
-    return true;
+    return write_index(masterfd, idx_id, &idx);
 }
 
 bool tagcache_import_changelog(void)
@@ -3155,10 +3169,10 @@ static void tagcache_thread(void)
 
         switch (ev.id)
         {
-            case Q_START_SCAN:
-                check_done = false;
-                break ;
-
+            case Q_IMPORT_CHANGELOG:
+                tagcache_import_changelog();
+                break;
+            
             case Q_REBUILD:
                 remove_files();
                 build_tagcache();
@@ -3169,6 +3183,8 @@ static void tagcache_thread(void)
                 check_deleted_files();
                 break ;
                 
+            case Q_START_SCAN:
+                check_done = false;
             case SYS_TIMEOUT:
                 if (check_done || !stat.ready)
                     break ;
@@ -3191,7 +3207,8 @@ static void tagcache_thread(void)
                         check_deleted_files();
 #endif
                 }
-                
+            
+
                 logf("tagcache check done");
                 check_done = true;
                 break ;
