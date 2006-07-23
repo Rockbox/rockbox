@@ -276,6 +276,9 @@ static union
         char text[MAX_TEXT+1];
         char font[MAX_PATH+1];
         char old_font[MAX_PATH+1];
+        int fh_buf[30];
+        int fw_buf[30];
+        char fontname_buf[30][MAX_PATH];
     } text;
 } buffer;
 
@@ -780,12 +783,19 @@ static bool browse_fonts( char *dst, int dst_size )
     int fvi = 0; /* first visible item */
     int lvi = 0; /* last visible item */
     int si = 0; /* selected item */
+    int osi = 0; /* old selected item */
     int li = 0; /* last item */
     int nvih = 0; /* next visible item height */
     int i;
+    int b_need_redraw = 1; /* Do we need to redraw ? */
 
     int cp = 0; /* current position */
     int fh; /* font height */
+
+    #define fh_buf buffer.text.fh_buf /* 30 might not be enough ... */
+    #define fw_buf buffer.text.fw_buf
+    int fw;
+    #define fontname_buf buffer.text.fontname_buf
 
     rb->snprintf( old_font, MAX_PATH,
                   ROCKBOX_DIR FONT_DIR "/%s.fnt",
@@ -793,80 +803,113 @@ static bool browse_fonts( char *dst, int dst_size )
 
     while( 1 )
     {
-        d = rb->PREFIX(opendir)( ROCKBOX_DIR FONT_DIR "/" );
-        if( !d )
+        if( !b_need_redraw )
         {
-            return false;
-        }
-        top_inside = draw_window( HEIGHT, WIDTH, &top, &left, "Fonts" );
-        i = 0;
-        li = -1;
-        while( i < fvi )
-        {
-            rb->PREFIX(readdir)( d );
-            i++;
-        }
-        cp = top_inside+LINE_SPACE;
-        while( cp < top+HEIGHT )
-        {
-            de = rb->PREFIX(readdir)( d );
-            if( !de )
+            /* we don't need to redraw ... but we need to unselect
+             * the previously selected item */
+            cp = top_inside + LINE_SPACE;
+            for( i = 0; i+fvi < osi; i++ )
             {
-                li = i-1;
-                break;
+                cp += fh_buf[i] + LINE_SPACE;
             }
-            if( rb->strlen( de->d_name ) < 4
-                || rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
-                               ".fnt" ) )
-                continue;
-            rb->snprintf( bbuf, MAX_PATH, ROCKBOX_DIR FONT_DIR "/%s",
-                          de->d_name );
-            rb->font_load( bbuf );
-            rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
-            if( nvih > 0 )
+            rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+            rb->lcd_fillrect( left+10, cp, fw_buf[i], fh_buf[i] );
+            rb->lcd_set_drawmode(DRMODE_SOLID);
+        }
+
+        if( b_need_redraw )
+        {
+            b_need_redraw = 0;
+
+            d = rb->PREFIX(opendir)( ROCKBOX_DIR FONT_DIR "/" );
+            if( !d )
             {
-                nvih -= fh;
-                fvi++;
-                if( nvih < 0 ) nvih = 0;
+                return false;
+            }
+            top_inside = draw_window( HEIGHT, WIDTH, &top, &left, "Fonts" );
+            i = 0;
+            li = -1;
+            while( i < fvi )
+            {
+                rb->PREFIX(readdir)( d );
                 i++;
-                continue;
             }
-            if( cp + fh >= top+HEIGHT )
+            cp = top_inside+LINE_SPACE;
+
+            rb->lcd_set_foreground(COLOR_BLACK);
+            rb->lcd_set_background(COLOR_LIGHTGRAY);
+
+            while( cp < top+HEIGHT )
             {
-                nvih = fh;
-                break;
-            }
-            rb->lcd_set_foreground((si==i?COLOR_WHITE:COLOR_BLACK));
-            rb->lcd_set_background((si==i?COLOR_BLUE:COLOR_LIGHTGRAY));
-            rb->lcd_putsxy( left+10, cp, de->d_name );
-            cp += fh + LINE_SPACE;
-            if( si == i )
-                rb->strcpy( bbuf_s, bbuf );
-            i++;
-        }
-        lvi = i-1;
-        if( li == -1 )
-        {
-            if( !(de = rb->PREFIX(readdir)( d ) ) )
-            {
-                li = lvi;
-            }
-            else if( !nvih && !rb->strlen( de->d_name ) < 4
-                && !rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
-                               ".fnt" ) )
-            {
+                de = rb->PREFIX(readdir)( d );
+                if( !de )
+                {
+                    li = i-1;
+                    break;
+                }
+                if( rb->strlen( de->d_name ) < 4
+                    || rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
+                                   ".fnt" ) )
+                    continue;
                 rb->snprintf( bbuf, MAX_PATH, ROCKBOX_DIR FONT_DIR "/%s",
-                      de->d_name );
+                              de->d_name );
                 rb->font_load( bbuf );
-                rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
-                nvih = fh;
+                rb->font_getstringsize( de->d_name, &fw, &fh, FONT_UI );
+                if( nvih > 0 )
+                {
+                    nvih -= fh;
+                    fvi++;
+                    if( nvih < 0 ) nvih = 0;
+                    i++;
+                    continue;
+                }
+                if( cp + fh >= top+HEIGHT )
+                {
+                    nvih = fh;
+                    break;
+                }
+                rb->lcd_putsxy( left+10, cp, de->d_name );
+                fh_buf[i-fvi] = fh;
+                fw_buf[i-fvi] = fw;
+                cp += fh + LINE_SPACE;
+                rb->strcpy( fontname_buf[i-fvi], bbuf );
+                i++;
             }
+            lvi = i-1;
+            if( li == -1 )
+            {
+                if( !(de = rb->PREFIX(readdir)( d ) ) )
+                {
+                    li = lvi;
+                }
+                else if( !nvih && !rb->strlen( de->d_name ) < 4
+                    && !rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
+                                   ".fnt" ) )
+                {
+                    rb->snprintf( bbuf, MAX_PATH, ROCKBOX_DIR FONT_DIR "/%s",
+                          de->d_name );
+                    rb->font_load( bbuf );
+                    rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
+                    nvih = fh;
+                }
+            }
+            rb->font_load( old_font );
+            rb->PREFIX(closedir)( d );
         }
-        rb->font_load( old_font );
-        rb->PREFIX(closedir)( d );
+
+        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
+        cp = top_inside + LINE_SPACE;
+        for( i = 0; i+fvi < si; i++ )
+        {
+            cp += fh_buf[i] + LINE_SPACE;
+        }
+        rb->lcd_fillrect( left+10, cp, fw_buf[i], fh_buf[i] );
+        rb->lcd_set_drawmode(DRMODE_SOLID);
 
         rb->lcd_update_rect( left, top, WIDTH, HEIGHT );
 
+        osi = si;
+        i = fvi;
         switch( rb->button_get(true) )
         {
             case ROCKPAINT_UP:
@@ -894,14 +937,23 @@ static bool browse_fonts( char *dst, int dst_size )
 
             case ROCKPAINT_RIGHT:
             case ROCKPAINT_DRAW:
-                rb->snprintf( dst, dst_size, "%s", bbuf_s );
+                rb->snprintf( dst, dst_size, "%s", fontname_buf[si-fvi] );
                 return true;
         }
+
+        if( i != fvi || si > lvi )
+        {
+            b_need_redraw = 1;
+        }
+
         if( si<=lvi )
         {
             nvih = 0;
         }
     }
+#undef fh_buf
+#undef fw_buf
+#undef fontname_buf
 #undef WIDTH
 #undef HEIGHT
 #undef LINE_SPACE
@@ -1327,7 +1379,6 @@ static void draw_text( int x, int y )
     rb->snprintf( buffer.text.old_font, MAX_PATH,
                   ROCKBOX_DIR FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
-    DEBUGF( "old font: %s\n", buffer.text.old_font );
     while( 1 )
     {
         int m = TEXT_MENU_TEXT;
