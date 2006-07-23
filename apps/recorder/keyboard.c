@@ -223,7 +223,7 @@ int load_kbd(unsigned char* filename)
     int fd, count, l;
     int i[NB_SCREENS];
     unsigned char buf[4];
-    
+
     FOR_NB_SCREENS(l)
         i[l] = 0;
 
@@ -260,8 +260,8 @@ int load_kbd(unsigned char* filename)
             }
 
             utf8decode(buf, &param[l].kbd_buf[i[l]]);
-            if (param[l].kbd_buf[i[l]] != 0xFEFF && param[l].kbd_buf[i[l]] != '\n' &&
-                param[l].kbd_buf[i[l]] != '\r') /*skip BOM & newlines */
+            if (param[l].kbd_buf[i[l]] != 0xFEFF &&
+                param[l].kbd_buf[i[l]] != '\r') /*skip BOM & carriage returns */
                 i[l]++;
         }
     }
@@ -352,9 +352,9 @@ int kbd_input(char* text, int buflen)
     unsigned char morse_code = 0;
     int morse_tick = 0, morse_len;
     char buf[2];
-#endif    
+#endif
     int char_screen = 0;
-    
+
     FOR_NB_SCREENS(l)
     {
         if ((screens[l].width >= 160) && (screens[l].height >= 96))
@@ -368,7 +368,7 @@ int kbd_input(char* text, int buflen)
                       "àáâãäåæ ìíîï èéêë «»°ºª¹²³\n"
                       "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ ¯±×÷¡¿µ·\n"
                       "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨";
-                      
+
              param[l].DEFAULT_LINES = 8;
         }
         else
@@ -388,7 +388,7 @@ int kbd_input(char* text, int buflen)
                        "àáâãäåæ ìíîï èéêë\n"
                        "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ\n"
                        "òóôõöø çðþýÿ ùúûü";
-                       
+
               param[l].DEFAULT_LINES = 4;
          }
     }
@@ -408,18 +408,14 @@ int kbd_input(char* text, int buflen)
 #endif
     FOR_NB_SCREENS(l)
     {
-        i = 0;
-        if (!kbd_loaded) {
+        if( !kbd_loaded )
+        {
+            /* Copy default keyboard to buffer */
+            i = 0;
             param[l].curfont = FONT_SYSFIXED;
             p = param[l].default_kbd;
-            while (*p != 0) {
-                p = utf8decode(p, &param[l].kbd_buf[i]);
-                if (param[l].kbd_buf[i] == '\n')
-                    while (i % (screens[l].width/6))
-                        param[l].kbd_buf[i++] = ' ';
-                else
-                    i++;
-            }
+            while (*p != 0)
+                p = utf8decode(p, &param[l].kbd_buf[i++]);
             param[l].nchars = i;
         }
         else
@@ -444,6 +440,51 @@ int kbd_input(char* text, int buflen)
             if (w > param[l].font_w)
                 param[l].font_w = w;
         }
+        /* Since we're going to be adding spaces, make sure that we check
+         * their width too */
+        w = font_get_width( param[l].font, ' ' );
+        if( w > param[l].font_w )
+            param[l].font_w = w;
+    }
+    FOR_NB_SCREENS(l)
+    {
+        i = 0;
+        /* Pad lines with spaces */
+        while( i < param[l].nchars )
+        {
+            if( param[l].kbd_buf[i] == '\n' )
+            {
+                k = ( screens[l].width / param[l].font_w )
+                        - i % ( screens[l].width / param[l].font_w ) - 1;
+                if( k == ( screens[l].width / param[l].font_w ) - 1 )
+                {
+                    param[l].nchars--;
+                    for( j = i; j < param[l].nchars; j++ )
+                    {
+                        param[l].kbd_buf[j] = param[l].kbd_buf[j+1];
+                    }
+                }
+                else
+                {
+                    if( param[l].nchars + k - 1 >= KBD_BUF_SIZE )
+                    {   /* We don't want to overflow the buffer */
+                        k = KBD_BUF_SIZE - param[l].nchars;
+                    }
+                    for( j = param[l].nchars + k - 1; j > i+k; j-- )
+                    {
+                        param[l].kbd_buf[j] = param[l].kbd_buf[j-k];
+                    }
+                    param[l].nchars += k;
+                    k++;
+                    while( k-- )
+                    {
+                        param[l].kbd_buf[i++] = ' ';
+                    }
+                }
+            }
+            else
+                i++;
+        }
     }
 
     /* find max width for text string */
@@ -455,7 +496,7 @@ int kbd_input(char* text, int buflen)
             utf8 = (unsigned char*)utf8decode(utf8, &ch);
             w = font_get_width(param[l].font, ch);
             if (w > text_w)
-            text_w = w;
+                text_w = w;
         }
         param[l].max_chars_text = screens[l].width / text_w - 2;
 
@@ -466,7 +507,7 @@ int kbd_input(char* text, int buflen)
             param[l].keyboard_margin = DEFAULT_MARGIN;
         } else {
             param[l].lines = (screens[l].height - BUTTONBAR_HEIGHT - statusbar_size) / param[l].font_h - 1;
-            param[l].keyboard_margin = screens[l].height - BUTTONBAR_HEIGHT - 
+            param[l].keyboard_margin = screens[l].height - BUTTONBAR_HEIGHT -
                 statusbar_size - (param[l].lines+1)*param[l].font_h;
             if (param[l].keyboard_margin < 3) {
                 param[l].lines--;
@@ -569,13 +610,14 @@ int kbd_input(char* text, int buflen)
 
         /* write out the text */
             screens[l].setfont(param[l].curfont);
-        
+
             i=j=0;
-            param[l].curpos = MIN(editpos, param[l].max_chars_text 
+            param[l].curpos = MIN(editpos, param[l].max_chars_text
                                 - MIN(len_utf8 - editpos, 2));
             param[l].leftpos = editpos - param[l].curpos;
             utf8 = text + utf8seek(text, param[l].leftpos);
 
+            text_w = param[l].font_w;
             while (*utf8 && i < param[l].max_chars_text) {
                 outline[j++] = *utf8++;
                 if ((*utf8 & MASK) != COMP) {
@@ -650,7 +692,7 @@ int kbd_input(char* text, int buflen)
                 button = KBD_CURSOR_LEFT;
             if (button == KBD_RIGHT || button == (KBD_RIGHT | BUTTON_REPEAT))
                 button = KBD_CURSOR_RIGHT;
-#ifdef KBD_RC_LEFT 
+#ifdef KBD_RC_LEFT
             if (button == KBD_RC_LEFT || button == (KBD_RC_LEFT | BUTTON_REPEAT))
                 button = KBD_RC_CURSOR_LEFT;
             if (button == KBD_RC_RIGHT || button == (KBD_RC_RIGHT | BUTTON_REPEAT))
@@ -667,7 +709,7 @@ int kbd_input(char* text, int buflen)
             case KBD_ABORT:
                 FOR_NB_SCREENS(l)
                     screens[l].setfont(FONT_UI);
-                    
+
 #ifdef HAS_BUTTONBAR
                 global_settings.buttonbar=buttonbar_config;
 #endif
@@ -687,7 +729,7 @@ int kbd_input(char* text, int buflen)
                 {
                     if (++param[l].page == param[l].pages)
                          param[l].page = 0;
-                    k = (param[l].page*param[l].lines + 
+                    k = (param[l].page*param[l].lines +
                           param[l].y)*param[l].max_chars + param[l].x;
                     kbd_spellchar(param[l].kbd_buf[k]);
                 }
@@ -792,7 +834,7 @@ int kbd_input(char* text, int buflen)
 #endif
                             param[l].x = param[l].max_chars - 1;
                         }
-                        k = (param[l].page*param[l].lines + 
+                        k = (param[l].page*param[l].lines +
                             param[l].y)*param[l].max_chars + param[l].x;
                         kbd_spellchar(param[l].kbd_buf[k]);
                     }
@@ -885,7 +927,7 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-#ifdef KBD_RC_DONE       
+#ifdef KBD_RC_DONE
             case KBD_RC_DONE:
 #endif
             case KBD_DONE:
@@ -918,12 +960,12 @@ int kbd_input(char* text, int buflen)
 
 #ifdef KBD_RC_SELECT
             case KBD_RC_SELECT:
-            
+
                 if (button == KBD_RC_SELECT)
                     char_screen = 1;
 #endif
             case KBD_SELECT:
-            
+
                 if (button == KBD_SELECT)
                     char_screen = 0;
 #ifdef KBD_MORSE_INPUT
@@ -972,7 +1014,7 @@ int kbd_input(char* text, int buflen)
                 {
                     /* find input char */
                         k = (param[char_screen].page*param[char_screen].lines +
-                            param[char_screen].y)*param[char_screen].max_chars + 
+                            param[char_screen].y)*param[char_screen].max_chars +
                             param[char_screen].x;
                         if (k < param[char_screen].nchars)
                             ch = param[char_screen].kbd_buf[k];
@@ -981,7 +1023,7 @@ int kbd_input(char* text, int buflen)
                     /* check for hangul input */
                     if (ch >= 0x3131 && ch <= 0x3163)
                     {
-                        if (!hangul) 
+                        if (!hangul)
                         {
                             hlead=hvowel=htail=0;
                             hangul = true;
@@ -990,10 +1032,10 @@ int kbd_input(char* text, int buflen)
                             hvowel = ch;
                         else if (!htail)
                            htail = ch;
-                        else 
+                        else
                         { /* previous hangul complete */
                             /* check whether tail is actually lead of next char */
-                            if ((tmp = hangul_join(htail, ch, 0)) != 0xfffd) 
+                            if ((tmp = hangul_join(htail, ch, 0)) != 0xfffd)
                             {
                                 tmp = hangul_join(hlead, hvowel, 0);
                                 kbd_delchar(text, &editpos);
@@ -1004,33 +1046,33 @@ int kbd_input(char* text, int buflen)
                                 hvowel = ch;
                                 htail = 0;
                             }
-                            else 
+                            else
                             {
                                 hvowel=htail=0;
                                 hlead = ch;
                             }
                         }
                         /* combine into hangul */
-                        if ((tmp = hangul_join(hlead, hvowel, htail)) != 0xfffd) 
+                        if ((tmp = hangul_join(hlead, hvowel, htail)) != 0xfffd)
                         {
                             kbd_delchar(text, &editpos);
                             ch = tmp;
-                        } 
+                        }
                         else
                         {
                             hvowel=htail=0;
                             hlead = ch;
                         }
-                    } 
+                    }
                     else
                         hangul = false;
-                        
+
                     /* insert char */
                     kbd_inschar(text, buflen, &editpos, ch);
                 }
                 if (global_settings.talk_menu) /* voice UI? */
-                    talk_spell(text, false); 
-                    
+                    talk_spell(text, false);
+
                 /* speak revised text */
                 break;
 
@@ -1041,7 +1083,7 @@ int kbd_input(char* text, int buflen)
 #endif
             case KBD_BACKSPACE:
             case KBD_BACKSPACE | BUTTON_REPEAT:
-                if (hangul) 
+                if (hangul)
                 {
                     if (htail)
                         htail = 0;
@@ -1051,7 +1093,7 @@ int kbd_input(char* text, int buflen)
                         hangul = false;
                 }
                 kbd_delchar(text, &editpos);
-                if (hangul) 
+                if (hangul)
                 {
                     if (hvowel)
                         ch = hangul_join(hlead, hvowel, htail);
