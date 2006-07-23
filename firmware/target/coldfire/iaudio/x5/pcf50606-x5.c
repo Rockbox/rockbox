@@ -166,6 +166,9 @@ void pcf50606_init(void)
 
     set_voltages();
 
+    pcf50606_write(0x39, 0x00); /* GPOOD0 = green led OFF */
+    pcf50606_write(0x3a, 0x00); /* GPOOD1 = red led OFF */
+
     pcf50606_write(0x35, 0xf1); /* Backlight PWM = 7kHz 8/16 */
     pcf50606_write(0x38, 0x30); /* Backlight ON */
 }
