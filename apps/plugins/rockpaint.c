@@ -646,13 +646,14 @@ static bool browse( char *dst, int dst_size, const char *start )
         d = rb->PREFIX(opendir)( bbuf );
         if( !d )
         {
+            /*
             if( errno == ENOTDIR )
-            {
+            {*/
                 /* this is a file */
                 bbuf[rb->strlen(bbuf)-1] = '\0';
                 rb->strncpy( dst, bbuf, dst_size );
                 return true;
-            }
+            /*}
             else if( errno == EACCES || errno == ENOENT )
             {
                 bbuf[0] = '/'; bbuf[1] = '\0';
@@ -661,7 +662,7 @@ static bool browse( char *dst, int dst_size, const char *start )
             else
             {
                 return false;
-            }
+            }*/
         }
         top_inside = draw_window( HEIGHT, WIDTH, &top, &left, bbuf );
         i = 0;
@@ -2158,7 +2159,7 @@ static void draw_toolbars(bool update)
 
 static void toolbar( void )
 {
-    unsigned int button, i, j;
+    int button, i, j;
     restore_screen();
     draw_toolbars( false );
     y = LCD_HEIGHT-TB_HEIGHT/2;
