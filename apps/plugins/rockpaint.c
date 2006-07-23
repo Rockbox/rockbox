@@ -776,7 +776,7 @@ static bool browse_fonts( char *dst, int dst_size )
 #define WIDTH ( LCD_WIDTH - 20 )
 #define HEIGHT ( LCD_HEIGHT - 20 )
 #define LINE_SPACE 2
-    int top, top_inside, left;
+    int top, top_inside = 0, left;
 
     DIR *d;
     struct dirent *de;
