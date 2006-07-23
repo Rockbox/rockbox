@@ -221,11 +221,8 @@ static bool morse_mode = false;
 int load_kbd(unsigned char* filename)
 {
     int fd, count, l;
-    int i[NB_SCREENS];
-    unsigned char buf[4];
-
-    FOR_NB_SCREENS(l)
-        i[l] = 0;
+    int i = 0;
+    unsigned char buf[4];  
 
     if (filename == NULL) {
         kbd_loaded = false;
@@ -236,40 +233,39 @@ int load_kbd(unsigned char* filename)
     if (fd < 0)
         return 1;
 
-    FOR_NB_SCREENS(l)
-    {
-        while (read(fd, buf, 1) == 1 && i[l] < KBD_BUF_SIZE) {
-        /* check how many bytes to read */
-            if (buf[0] < 0x80) {
-                count = 0;
-            } else if (buf[0] < 0xe0) {
-                count = 1;
-            } else if (buf[0] < 0xf0) {
-                count = 2;
-            } else if (buf[0] < 0xf5) {
-                count = 3;
-            } else {
-            /* Invalid size. */
-                continue;
-            }
-
-            if (read(fd, &buf[1], count) != count) {
-                close(fd);
-                kbd_loaded = false;
-                return 1;
-            }
-
-            utf8decode(buf, &param[l].kbd_buf[i[l]]);
-            if (param[l].kbd_buf[i[l]] != 0xFEFF &&
-                param[l].kbd_buf[i[l]] != '\r') /*skip BOM & carriage returns */
-                i[l]++;
+    while (read(fd, buf, 1) == 1 && i < KBD_BUF_SIZE) {
+    /* check how many bytes to read */
+        if (buf[0] < 0x80) {
+            count = 0;
+        } else if (buf[0] < 0xe0) {
+            count = 1;
+        } else if (buf[0] < 0xf0) {
+            count = 2;
+        } else if (buf[0] < 0xf5) {
+            count = 3;
+        } else {
+        /* Invalid size. */
+            continue;
         }
+
+        if (read(fd, &buf[1], count) != count) {
+            close(fd);
+            kbd_loaded = false;
+            return 1;
+        }
+        
+        FOR_NB_SCREENS(l)
+            utf8decode(buf, &param[l].kbd_buf[i]);
+            
+        if (param[0].kbd_buf[i] != 0xFEFF && param[0].kbd_buf[i] != '\n' &&
+            param[0].kbd_buf[i] != '\r') /*skip BOM & newlines */
+            i++;
     }
 
     close(fd);
     kbd_loaded = true;
     FOR_NB_SCREENS(l)
-        param[l].nchars = i[l];
+        param[l].nchars = i;
     return 0;
 
 }
