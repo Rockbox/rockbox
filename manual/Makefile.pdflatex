@@ -19,5 +19,6 @@ buildhtml: rockbox-build.tex
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
 
 htmlzip: buildhtml 
-	@zip -r $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/html
-	@cp $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/../
+	@(cd $(OBJDIR); \
+	zip -r $(OBJDIR)/rockbox-manual.zip html; \
+	cp $(OBJDIR)/rockbox-manual.zip $(OBJDIR)/../ )
