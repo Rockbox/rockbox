@@ -211,6 +211,37 @@ bool tagcache_is_sorted_tag(int type)
     return false;
 }
 
+static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
+{
+    int fd;
+    char buf[MAX_PATH];
+    
+    if (tagcache_is_numeric_tag(tag) || tag < 0 || tag >= TAG_COUNT)
+        return -1;
+    
+    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
+    
+    fd = open(buf, write ? O_RDWR : O_RDONLY);
+    if (fd < 0)
+    {
+        logf("tag file open failed: %d", tag);
+        stat.ready = false;
+        return fd;
+    }
+    
+    /* Check the header. */
+    read(fd, hdr, sizeof(struct tagcache_header));
+    if (hdr->magic != TAGCACHE_MAGIC)
+    {
+        logf("header error");
+        stat.ready = false;
+        close(fd);
+        return -2;
+    }
+    
+    return fd;
+}
+
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
 static long find_entry_ram(const char *filename,
                            const struct dircache_entry *dc)
@@ -266,6 +297,7 @@ static long find_entry_ram(const char *filename,
 
 static long find_entry_disk(const char *filename)
 {
+    struct tagcache_header tch;
     static long last_pos = -1;
     long pos_history[POS_HISTORY_COUNT];
     long pos_history_idx = 0;
@@ -276,11 +308,14 @@ static long find_entry_disk(const char *filename)
     int i;
     int pos = -1;
 
+    if (!stat.ready)
+        return -2;
+    
     fd = filenametag_fd;
     if (fd < 0)
     {
         last_pos = -1;
-        if ( (fd = open(TAGCACHE_FILE_MASTER, O_RDONLY)) < 0)
+        if ( (fd = open_tag_fd(&tch, tag_filename, false)) < 0)
             return -1;
     }
     
@@ -288,8 +323,6 @@ static long find_entry_disk(const char *filename)
     
     if (last_pos > 0)
         lseek(fd, last_pos, SEEK_SET);
-    else
-        lseek(fd, sizeof(struct master_header), SEEK_SET);
 
     while (true)
     {
@@ -374,6 +407,9 @@ bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
 {
     int idx_id;
     
+    if (!stat.ready)
+        return false;
+    
     idx_id = find_index(filename);
     if (idx_id < 0)
         return false;
@@ -443,6 +479,9 @@ static long check_virtual_tags(int tag, const struct index_entry *idx)
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
 {
     struct index_entry idx;
+    
+    if (!stat.ready)
+        return false;
     
     if (!tagcache_is_numeric_tag(tag))
         return -1;
@@ -672,6 +711,7 @@ static void remove_files(void)
     }
 }
 
+
 static int open_master_fd(struct master_header *hdr, bool write)
 {
     int fd;
@@ -691,7 +731,6 @@ static int open_master_fd(struct master_header *hdr, bool write)
         logf("header error");
         stat.ready = false;
         close(fd);
-        remove_files();
         return -2;
     }
     
@@ -702,7 +741,6 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
 {
     struct tagcache_header tag_hdr;
     struct master_header   master_hdr;
-    char buf[MAX_PATH];
     int i;
 
     if (tcs->valid)
@@ -737,22 +775,10 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
         if (tagcache_is_numeric_tag(tcs->type))
             return true;
         
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tcs->type);
-        tcs->idxfd[tcs->type] = open(buf, O_RDONLY);
+        tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
         if (tcs->idxfd[tcs->type] < 0)
-        {
-            logf("failed to open index");
             return false;
-        }
 
-        /* Check the header. */
-        if (read(tcs->idxfd[tcs->type], &tag_hdr, sizeof(struct tagcache_header)) !=
-            sizeof(struct tagcache_header) || tag_hdr.magic != TAGCACHE_MAGIC)
-        {
-            logf("incorrect header");
-            return false;
-        }
-        
         tcs->masterfd = open_master_fd(&master_hdr, false);
         
         if (tcs->masterfd < 0)
@@ -829,7 +855,7 @@ static bool get_next(struct tagcache_search *tcs)
     static char buf[MAX_PATH];
     struct tagfile_entry entry;
 
-    if (!tcs->valid)
+    if (!tcs->valid || !stat.ready)
         return false;
         
     if (tcs->idxfd[tcs->type] < 0 && !tagcache_is_numeric_tag(tcs->type)
@@ -1087,6 +1113,9 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     struct index_entry *entry;
     int idx_id;
     
+    if (!stat.ready)
+        return false;
+    
     /* Find the corresponding entry in tagcache. */
     idx_id = find_entry_ram(filename, NULL);
     if (idx_id < 0 || !stat.ramcache)
@@ -1156,8 +1185,11 @@ static void add_tagcache(const char *path)
     else
 #endif
     {
-        if (find_entry_disk(path) >= 0)
-            return ;
+        if (filenametag_fd >= 0)
+        {
+            if (find_entry_disk(path) >= 0)
+                return ;
+        }
     }
     
     fd = open(path, O_RDONLY);
@@ -1563,20 +1595,10 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     memset(lookup, 0, LOOKUP_BUF_DEPTH * sizeof(void **));
     
     /* Open the index file, which contains the tag names. */
-    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
-    fd = open(buf, O_RDWR);
+    fd = open_tag_fd(&tch, index_type, true);
 
     if (fd >= 0)
     {
-        /* Read the header. */
-        if (read(fd, &tch, sizeof(struct tagcache_header)) !=
-            sizeof(struct tagcache_header) || tch.magic != TAGCACHE_MAGIC)
-        {
-            logf("header error");
-            close(fd);
-            return -2;
-        }
-
         /**
          * If tag file contains unique tags (sorted index), we will load
          * it entirely into memory so we can resort it later for use with
@@ -1991,7 +2013,6 @@ static bool commit(void)
     {
         logf("incorrect header");
         close(tmpfd);
-        remove_files();
         remove(TAGCACHE_FILE_TEMP);
         return false;
     }
@@ -2159,6 +2180,9 @@ static bool update_current_serial(long serial)
 
 long tagcache_increase_serial(void)
 {
+    if (!stat.ready)
+        return -2;
+    
     if (!update_current_serial(current_serial + 1))
         return -1;
     
@@ -2173,6 +2197,9 @@ long tagcache_get_serial(void)
 static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
 {
     struct index_entry idx;
+    
+    if (!stat.ready)
+        return false;
     
     if (!tagcache_is_numeric_tag(tag))
         return false;
@@ -2378,6 +2405,9 @@ bool tagcache_import_changelog(void)
     char buf[512];
     int pos = 0;
     
+    if (!stat.ready)
+        return false;
+    
     clfd = open(TAGCACHE_FILE_CHANGELOG, O_RDONLY);
     if (clfd < 0)
     {
@@ -2443,6 +2473,9 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
     char temp[32];
     int clfd;
     int i, j;
+    
+    if (!stat.ready)
+        return false;
     
     if (!tagcache_search(tcs, tag_filename))
         return false;
@@ -2621,33 +2654,19 @@ static bool delete_entry(long idx_id)
 #ifdef HAVE_TC_RAMCACHE
 static bool allocate_tagcache(void)
 {
-    int rc, len;
     int fd;
-
-    hdr = NULL;
-    
-    fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
-    if (fd < 0)
-    {
-        logf("no tagcache file found.");
-        return false;
-    }
 
     /* Load the header. */
     hdr = (struct ramcache_header *)(((long)audiobuf & ~0x03) + 0x04);
     memset(hdr, 0, sizeof(struct ramcache_header));
-    len = sizeof(struct master_header);
-    rc = read(fd, &hdr->h, len);
-    close(fd);
-    
-    if (hdr->h.tch.magic != TAGCACHE_MAGIC || rc != len)
+    if ( (fd = open_master_fd(&hdr->h, false)) < 0)
     {
-        logf("incorrect header");
-        remove_files();
         hdr = NULL;
         return false;
     }
-
+    
+    close(fd);
+    
     hdr->indices = (struct index_entry *)(hdr + 1);
     
     /** 
@@ -2734,26 +2753,12 @@ static bool load_tagcache(void)
         p = (char *)((long)p & ~0x03) + 0x04;
         hdr->tags[tag] = p;
 
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
-        fd = open(buf, O_RDONLY);
-        
-        if (fd < 0)
-        {
-            logf("%s open fail", buf);
-            return false;
-        }
-
         /* Check the header. */
         tch = (struct tagcache_header *)p;
-        rc = read(fd, tch, sizeof(struct tagcache_header));
-        p += rc;
-        if (rc != sizeof(struct tagcache_header) ||
-            tch->magic != TAGCACHE_MAGIC)
-        {
-            logf("incorrect header");
-            close(fd);
+        p += sizeof(struct tagcache_header);
+        
+        if ( (fd = open_tag_fd(tch, tag, false)) < 0)
             return false;
-        }
         
         for (hdr->entry_count[tag] = 0;
              hdr->entry_count[tag] < tch->entry_count;
@@ -3004,7 +3009,6 @@ static void build_tagcache(void)
 {
     struct tagcache_header header;
     bool ret;
-    char buf[MAX_PATH];
 
     curpath[0] = '\0';
     data_size = 0;
@@ -3028,21 +3032,8 @@ static void build_tagcache(void)
         return ;
     }
 
-    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag_filename);
-    filenametag_fd = open(buf, O_RDONLY);
-
-    if (filenametag_fd >= 0)
-    {
-        if (read(filenametag_fd, &header, sizeof(struct tagcache_header)) !=
-            sizeof(struct tagcache_header) || header.magic != TAGCACHE_MAGIC)
-        {
-            logf("header error");
-            close(filenametag_fd);
-            filenametag_fd = -1;
-        }
-    }
-
-            
+    filenametag_fd = open_tag_fd(&header, tag_filename, false);
+    
     cpu_boost(true);
 
     /* Scan for new files. */
@@ -3095,18 +3086,17 @@ static void load_ramcache(void)
     stat.ramcache = load_tagcache();
 
     if (!stat.ramcache)
-    {
         hdr = NULL;
-        remove_files();
-    }
     
     cpu_boost(false);
 }
 #endif
 
-static bool check_master_fd(void)
+static bool check_all_headers(void)
 {
     struct master_header myhdr;
+    struct tagcache_header tch;
+    int tag;
     int fd;
     
     if ( (fd = open_master_fd(&myhdr, false)) < 0)
@@ -3114,6 +3104,17 @@ static bool check_master_fd(void)
     
     close(fd);
     current_serial = myhdr.serial;
+    
+    for (tag = 0; tag < TAG_COUNT; tag++)
+    {
+        if (tagcache_is_numeric_tag(tag))
+            continue;
+        
+        if ( (fd = open_tag_fd(&tch, tag, false)) < 0)
+            return false;
+        
+        close(fd);
+    }
     
     return true;
 }
@@ -3137,10 +3138,12 @@ static void tagcache_thread(void)
 #endif
     
     cpu_boost(false);
-    
-    stat.ready = check_master_fd();
-    
     stat.initialized = true;
+    
+    /* Don't delay bootup with the header check but do it on background. */
+    sleep(HZ);
+    stat.ready = check_all_headers();
+    
     
     while (1)
     {
@@ -3163,7 +3166,7 @@ static void tagcache_thread(void)
                 break ;
                 
             case SYS_TIMEOUT:
-                if (check_done)
+                if (check_done || !stat.ready)
                     break ;
                 
 #ifdef HAVE_TC_RAMCACHE
