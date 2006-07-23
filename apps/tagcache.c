@@ -460,6 +460,9 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
         memcpy(&hdr->indices[idxid], idx, sizeof(struct index_entry));
 #endif
     
+    /* We need to exclude all memory only flags when writing on disk. */
+    idx->flag = idx->flag & ~(FLAG_DIRCACHE);
+    
     lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
     if (write(masterfd, idx, sizeof(struct index_entry)) !=
@@ -3104,7 +3107,12 @@ static void load_ramcache(void)
     stat.ramcache = load_tagcache();
 
     if (!stat.ramcache)
+    {
+        /* If loading failed, it must indicate some problem with the db
+         * so disable it entirely to prevent further issues. */
+        stat.ready = false;
         hdr = NULL;
+    }
     
     cpu_boost(false);
 }
