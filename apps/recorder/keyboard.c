@@ -823,12 +823,12 @@ int kbd_input(char* text, int buflen)
                     {
                         if (param[l].y < param[l].lines - 1)
                             param[l].y++;
-#ifndef KBD_MODES
                         else
+#ifndef KBD_MODES
                             param[l].y=0;}
 #else
+                            line_edit = true;
                     }
-                    line_edit = true;
                 }
                 if (!line_edit)
 #endif
