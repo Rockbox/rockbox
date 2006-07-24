@@ -427,10 +427,11 @@ bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
     return true;
 }
 
-static bool get_index(int masterfd, int idxid, struct index_entry *idx)
+static bool get_index(int masterfd, int idxid, 
+                      struct index_entry *idx, bool use_ram)
 {
 #ifdef HAVE_TC_RAMCACHE
-    if (stat.ramcache)
+    if (stat.ramcache && use_ram)
     {
         if (hdr->indices[idxid].flag & FLAG_DELETED)
             return false;
@@ -457,13 +458,19 @@ static bool get_index(int masterfd, int idxid, struct index_entry *idx)
 
 static bool write_index(int masterfd, int idxid, struct index_entry *idx)
 {
+    /* We need to exclude all memory only flags & tags when writing to disk. */
+    if (idx->flag & FLAG_DIRCACHE)
+    {
+        logf("memory only flags!");
+        return false;
+    }
+    
 #ifdef HAVE_TC_RAMCACHE
     if (stat.ramcache)
+    {
         memcpy(&hdr->indices[idxid], idx, sizeof(struct index_entry));
+    }
 #endif
-    
-    /* We need to exclude all memory only flags when writing on disk. */
-    idx->flag = idx->flag & ~(FLAG_DIRCACHE);
     
     lseek(masterfd, idxid * sizeof(struct index_entry) 
           + sizeof(struct master_header), SEEK_SET);
@@ -514,7 +521,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     if (!tagcache_is_numeric_tag(tag))
         return -1;
     
-    if (!get_index(tcs->masterfd, tcs->idx_id, &idx))
+    if (!get_index(tcs->masterfd, tcs->idx_id, &idx, true))
         return -2;
     
     return check_virtual_tags(tag, &idx);
@@ -1018,7 +1025,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     struct index_entry idx;
     long seek;
     
-    if (!get_index(tcs->masterfd, idxid, &idx))
+    if (!get_index(tcs->masterfd, idxid, &idx, true))
         return false;
     
     seek = idx.tag_seek[tcs->type];
@@ -2239,7 +2246,7 @@ static bool modify_numeric_entry(int masterfd, int idx_id, int tag, long data)
     if (!tagcache_is_numeric_tag(tag))
         return false;
     
-    if (!get_index(masterfd, idx_id, &idx))
+    if (!get_index(masterfd, idx_id, &idx, false))
         return false;
     
     idx.tag_seek[tag] = data;
@@ -2387,7 +2394,7 @@ static bool parse_changelog_line(int masterfd, const char *buf)
         return false;
     }
     
-    if (!get_index(masterfd, idx_id, &idx))
+    if (!get_index(masterfd, idx_id, &idx, false))
     {
         logf("failed to retrieve index entry");
         return false;
