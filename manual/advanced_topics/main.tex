@@ -294,7 +294,6 @@ project development you can try development builds and help by reporting bugs,
 feature requests and so so. But be aware that using a development build may
 eat also some more time.}
 
-
 \section{\label{ref:FirmwareLoading}Firmware Loading}
 \opt{player,recorder,recorderv2fm,ondio}{
   When your \dap\ powers on, it loads the Archos firmware in ROM, which
@@ -306,13 +305,15 @@ eat also some more time.}
   intended.
 }
 
-\section{\label{ref:using_rolo}Using ROLO (Rockbox loader)}
+\subsection{\label{ref:using_rolo}Using ROLO (Rockbox loader)}
 Rockbox is able to load and start another firmware file without rebooting. 
-You just press PLAY on an%
-\opt{recorder,recorderv2fm,ondio}{\fname{.ajz}}
-\opt{player}{.mod}\opt{h1xx,h300}{\fname{.iriver}}
-\opt{ipodnano,ipodvideo,ipodmini,ipod4g,ipodcolor}{\fname{.ipod}}%
--file. This can be used to test new firmware versions without deleting your
+You just ``play'' a file with the extension %
+\opt{recorder,recorderv2fm,ondio}{\fname{.ajz}.} %
+\opt{player}{\fname{.mod}.} %
+\opt{iriver}{\fname{.iriver}.} %
+\opt{ipod}{\fname{.ipod}.} %
+\opt{iaudio}{\fname{.iaudio}.} %
+This can be used to test new firmware versions without deleting your
 current version.
 
 \opt{archos}{\input{advanced_topics/archos-flashing.tex}}
