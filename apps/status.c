@@ -46,6 +46,9 @@
 #ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
+#if CONFIG_CODEC == SWCODEC
+#include "pcm_record.h"
+#endif
 
 enum playmode ff_mode;
 
@@ -82,16 +85,18 @@ int current_playmode(void)
         else
             return STATUS_PLAY;
     }
-#if CONFIG_CODEC == MAS3587F
-    else
+
+#ifdef HAVE_RECORDING
+#if CONFIG_CODEC == SWCODEC       
+    audio_stat = pcm_rec_status();
+#endif
+
+    if(audio_stat & AUDIO_STATUS_RECORD)
     {
-        if(audio_stat & AUDIO_STATUS_RECORD)
-        {
-            if(audio_stat & AUDIO_STATUS_PAUSE)
-                return STATUS_RECORD_PAUSE;
-            else
-                return STATUS_RECORD;
-        }
+        if(audio_stat & AUDIO_STATUS_PAUSE)
+            return STATUS_RECORD_PAUSE;
+        else
+            return STATUS_RECORD;
     }
 #endif
 
