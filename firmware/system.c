@@ -1307,7 +1307,38 @@ static void ipod_init_cache(void)
 
     outl(0x3, 0xcf004024);
 }
+#endif
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void set_cpu_frequency(long frequency)
+{
+    unsigned long postmult;
+
+    if (frequency == CPUFREQ_NORMAL)
+        postmult = CPUFREQ_NORMAL_MULT;
+    else if (frequency == CPUFREQ_MAX)
+        postmult = CPUFREQ_MAX_MULT;
+    else
+        postmult = CPUFREQ_DEFAULT_MULT;
+    cpu_frequency = frequency;
     
+    outl(0x02, 0xcf005008);
+    outl(0x55, 0xcf00500c);
+    outl(0x6000, 0xcf005010);
+
+    /* Clock frequency = (24/8)*postmult */
+    outl(8, 0xcf005018);
+    outl(postmult, 0xcf00501c);
+
+    outl(0xe000, 0xcf005010);
+
+    /* Wait for PLL relock? */
+    udelay(2000);
+
+    /* Select PLL as clock source? */
+    outl(0xa8, 0xcf00500c);
+}
+#elif !defined(BOOTLOADER)
 static void ipod_set_cpu_speed(void)
 {
     outl(0x02, 0xcf005008);
@@ -1340,7 +1371,9 @@ void system_init(void)
     outl(-1, 0xcf00101c);
     outl(-1, 0xcf001028);
     outl(-1, 0xcf001038);
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
     ipod_set_cpu_speed();
+#endif
     ipod_init_cache();
 #endif
 }
