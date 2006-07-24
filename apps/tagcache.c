@@ -325,6 +325,8 @@ static long find_entry_disk(const char *filename)
     
     if (last_pos > 0)
         lseek(fd, last_pos, SEEK_SET);
+    else
+        lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
 
     while (true)
     {
@@ -1236,6 +1238,8 @@ static void add_tagcache(const char *path)
     if (!ret)
         return ;
 
+    // logf("-> %s", path);
+    
     genrestr = id3_get_genre(&track.id3);
     
     check_if_empty(&track.id3.title);
@@ -3201,7 +3205,7 @@ static void tagcache_thread(void)
                 if (!stat.ramcache && global_settings.tagcache_ram)
                 {
                     load_ramcache();
-                    if (stat.ramcache)
+                    if (stat.ramcache && global_settings.tagcache_autoupdate)
                         build_tagcache();
                 }
                 else
