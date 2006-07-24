@@ -3,7 +3,7 @@ LATEX := pdflatex
 include LaTeX.Rules
 GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
 HTLATEX := htlatex
-HTOPTS1 := "rockbox-html,early_,2"
+HTOPTS1 := rockbox-html,early_
 HTOPTS2 := ""
 HTOPTS3 := "-dhtml/"
 
@@ -14,7 +14,12 @@ buildmanual: rockbox-build.tex
 
 buildhtml: rockbox-build.tex
 	@mkdir -p $(OBJDIR)/html
-	@$(HTLATEX) $(DOCUMENT) $(HTOPTS1) $(HTOPTS2) $(HTOPTS3)
+	@(if [ $(SPLITHTML) ]; then \
+	$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),$(SPLITHTML)" $(HTOPTS2) $(HTOPTS3); \
+	else \
+	$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),2" $(HTOPTS2) $(HTOPTS3); \
+	fi)
+
 	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/png/!d;s/.*\"\(.*\.png\)\".*/\1/g'` $(OBJDIR)/html
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
 
