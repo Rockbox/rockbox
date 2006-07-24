@@ -15,7 +15,15 @@ ifdef APPEXTRA
 endif
 
 # NOTE: FPM_ define has been moved to global.h
-MADOPTS = -UDEBUG -DNDEBUG -O2
+MADOPTS = -UDEBUG -DNDEBUG
+
+# libmad is faster on ipods with -O instead of -O2
+ifeq ($(findstring IPOD,$(TARGET)),IPOD)
+   MADOPTS += -O
+else
+   MADOPTS += -O2
+endif
+
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(MADOPTS) $(TARGET) $(EXTRA_DEFINES) \
  -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
