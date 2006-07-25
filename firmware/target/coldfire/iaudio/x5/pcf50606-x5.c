@@ -169,6 +169,12 @@ void pcf50606_init(void)
     pcf50606_write(0x39, 0x00); /* GPOOD0 = green led OFF */
     pcf50606_write(0x3a, 0x00); /* GPOOD1 = red led OFF */
 
-    pcf50606_write(0x35, 0xf1); /* Backlight PWM = 7kHz 8/16 */
-    pcf50606_write(0x38, 0x30); /* Backlight ON */
+    /* D305A datasheet says PWM clock frequency should be 400Hz - 2000Hz so
+     * I changed it from 7kHz to 512Hz. The lower frequency looks the same.
+     * GPO1 is also inverted so that display brightness increases with PWM
+     * setting which also lets the X5 share the H300's
+     * set_backlight_brightness code.
+     */
+    pcf50606_write(0x35, 0x11); /* Backlight PWM = 512Hz, 8/16, Active */
+    pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
 }

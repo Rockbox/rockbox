@@ -349,7 +349,7 @@ static const struct bit_entry hd_bits[] =
         "remote caption backlight", off_on },
 #endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {4, S_O(brightness), 9, "brightness", NULL },
+    {4, S_O(brightness), DEFAULT_BRIGHTNESS_SETTING, "brightness", NULL },
 #endif
 #ifdef HAVE_BACKLIGHT_PWM_FADING
     /* backlight fading */

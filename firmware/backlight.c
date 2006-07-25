@@ -659,28 +659,26 @@ bool is_remote_backlight_on(void) {return true;}
 void backlight_set_brightness(int val)
 {
 #ifndef SIMULATOR
-    /* set H300 brightness by changing the PWM
-       accepts 0..15 but note that 0 and 1 give a black display! */
+    /* set brightness by changing the PWM
+     * accepts 0..15 but note that 0 and 1 give a black display on H300!
+     * 0 is black on the X5.
+     */
 
     /* disable IRQs while bitbanging */
     int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
-    val &= 0x0F;
+    /* Clamp setting to range */
     if(val<MIN_BRIGHTNESS_SETTING)
         val=MIN_BRIGHTNESS_SETTING;
+    else if(val>MAX_BRIGHTNESS_SETTING)
+        val=MAX_BRIGHTNESS_SETTING;
 
-    /* shift one bit left */
-    val <<= 1;
-
-    /* enable PWM */
-    val |= 0x01;
-
-    pcf50606_write(0x35, val);
+    pcf50606_write(0x35, (val << 1) | 0x01); /* 512Hz, Enable PWM */
 
     /* enable IRQs again */
     set_irq_level(old_irq_level);
 #else
-	val=0;
+    val=0;
 #endif
 }
 #endif
