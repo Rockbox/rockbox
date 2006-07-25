@@ -137,6 +137,11 @@ inline void lcd_write_data(const unsigned short* p_bytes, int count)
 
 /*** hardware configuration ***/
 
+int lcd_default_contrast(void)
+{
+    return 16;
+}
+
 void lcd_set_contrast(int val)
 {
     if (val >= 15) // val must'nt be 15 or 31

@@ -573,7 +573,6 @@ extern const char rec_base_directory[];
 #ifdef IAUDIO_X5
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        29
-#define DEFAULT_CONTRAST_SETTING    15
 #else
 #ifdef HAVE_LCD_CHARCELLS
 #define MAX_CONTRAST_SETTING        31

@@ -94,7 +94,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 48
+#define CONFIG_BLOCK_VERSION 49
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -1260,7 +1260,7 @@ void settings_load(int which)
         }
 
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
-            global_settings.contrast = DEFAULT_CONTRAST_SETTING;
+            global_settings.contrast = lcd_default_contrast();
 
         i = 0xb8;
         strncpy((char *)global_settings.wps_file, (char *)&config_block[i],
@@ -1722,7 +1722,7 @@ void settings_reset(void) {
     global_settings.mdb_enable = sound_default(SOUND_MDB_ENABLE);
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
-    global_settings.contrast    = DEFAULT_CONTRAST_SETTING;
+    global_settings.contrast = lcd_default_contrast();
 #ifdef HAVE_LCD_REMOTE
     global_settings.remote_contrast = lcd_remote_default_contrast();
 #endif
