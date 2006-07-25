@@ -157,11 +157,11 @@ void lcd_write_data( const unsigned char* data, int count )
 
 /*** hardware configuration ***/
 
+#ifndef SIMULATOR
+
 int lcd_default_contrast(void)
 {
-#ifdef SIMULATOR
-    return 30;
-#elif CONFIG_LCD == LCD_GMINI100
+#if CONFIG_LCD == LCD_GMINI100
     return 31;
 #elif CONFIG_LCD == LCD_IFP7XX
     return 45;
@@ -169,8 +169,6 @@ int lcd_default_contrast(void)
     return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
 #endif
 }
-
-#ifndef SIMULATOR
 
 void lcd_set_contrast(int val)
 {

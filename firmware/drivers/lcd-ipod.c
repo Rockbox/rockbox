@@ -146,6 +146,15 @@ void lcd_init_device(void)
 
 /*** hardware configuration ***/
 
+int lcd_default_contrast(void)
+{
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+    return 42;
+#else
+    return 35;
+#endif
+}
+
 /* Rockbox stores the contrast as 0..63 - we add 64 to it */
 void lcd_set_contrast(int val)
 {

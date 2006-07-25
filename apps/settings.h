@@ -274,7 +274,9 @@ struct user_settings
 
     /* device settings */
 
-    int contrast;   /* lcd contrast:          0-63 0=low 63=high            */
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
+    int contrast;   /* lcd contrast */
+#endif
     bool invert;    /* invert display */
     bool invert_cursor; /* invert the current file in dir browser and menu
                            instead of using the default cursor */
@@ -573,16 +575,13 @@ extern const char rec_base_directory[];
 #ifdef IAUDIO_X5
 #define MIN_CONTRAST_SETTING        0
 #define MAX_CONTRAST_SETTING        29
-#else
-#ifdef HAVE_LCD_CHARCELLS
-#define MAX_CONTRAST_SETTING        31
-#define DEFAULT_CONTRAST_SETTING    30
-#else
-#define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    38
-#endif
+#elif defined HAVE_LCD_CHARCELLS
 #define MIN_CONTRAST_SETTING        5
-#endif // X5
+#define MAX_CONTRAST_SETTING        31
+#else
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#endif
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */

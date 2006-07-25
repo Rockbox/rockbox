@@ -53,9 +53,9 @@ void lcd_set_invert_display(bool invert)
     (void)invert;
 }
 
-void lcd_remote_set_invert_display(bool invert)
+int lcd_default_contrast(void)
 {
-    (void)invert;
+    return 28;
 }
 
 #ifdef HAVE_REMOTE_LCD
@@ -75,5 +75,10 @@ void lcd_remote_backlight_off(int val)
 void lcd_remote_set_flip(bool yesno)
 {
     (void)yesno;
+}
+
+void lcd_remote_set_invert_display(bool invert)
+{
+    (void)invert;
 }
 #endif

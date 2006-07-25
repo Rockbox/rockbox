@@ -79,15 +79,6 @@ void lcd_init(void)
                   sizeof(scroll_stack), scroll_name);
 }
 
-int lcd_default_contrast(void)
-{
-#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
-    return 42;
-#else
-    return 35;
-#endif
-}
-
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)

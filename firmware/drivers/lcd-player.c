@@ -274,11 +274,6 @@ bool lcdx_putc(int x, int y, unsigned short ch)
     return false;
 }
 
-int lcd_default_contrast(void)
-{
-    return 30;
-}
-
 void lcd_clear_display(void)
 {
     int i;
@@ -481,6 +476,11 @@ void lcd_icon(int icon, bool enable)
         icon_mirror[pos] &= ~mask;
     
     lcd_write_data(&icon_mirror[pos], 1);
+}
+
+int lcd_default_contrast(void)
+{
+    return 30;
 }
 
 void lcd_set_contrast(int val)

@@ -240,7 +240,9 @@ static const struct bit_entry rtc_bits[] =
     {32 | SIGNED, S_O(resume_seed), -1, NULL, NULL },
     {3, S_O(repeat_mode), REPEAT_ALL, "repeat", "off,all,one,shuffle,ab" },
     /* LCD */
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
     {6, S_O(contrast), 40, "contrast", NULL },
+#endif
 #ifdef CONFIG_BACKLIGHT
     {5, S_O(backlight_timeout), 5, "backlight timeout", backlight_times_conf },
 #ifdef CONFIG_CHARGING
@@ -1015,7 +1017,9 @@ void settings_apply(void)
 
     audio_set_buffer_margin(global_settings.buffer_margin);
 
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
     lcd_set_contrast(global_settings.contrast);
+#endif
     lcd_scroll_speed(global_settings.scroll_speed);
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_contrast(global_settings.remote_contrast);
@@ -1259,8 +1263,10 @@ void settings_load(int which)
                 RTC_BLOCK_SIZE*8);
         }
 
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
+#endif
 
         i = 0xb8;
         strncpy((char *)global_settings.wps_file, (char *)&config_block[i],
@@ -1722,7 +1728,9 @@ void settings_reset(void) {
     global_settings.mdb_enable = sound_default(SOUND_MDB_ENABLE);
     global_settings.superbass = sound_default(SOUND_SUPERBASS);
 #endif
+#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
     global_settings.contrast = lcd_default_contrast();
+#endif
 #ifdef HAVE_LCD_REMOTE
     global_settings.remote_contrast = lcd_remote_default_contrast();
 #endif

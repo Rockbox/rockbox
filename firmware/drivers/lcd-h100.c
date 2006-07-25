@@ -102,12 +102,12 @@ static const char scroll_tick_table[16] = {
 
 /*** hardware configuration ***/
 
+#ifndef SIMULATOR
+
 int lcd_default_contrast(void)
 {
     return 28;
 }
-
-#ifndef SIMULATOR
 
 void lcd_set_contrast(int val)
 {
