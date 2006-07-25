@@ -245,6 +245,15 @@ void radio_stop(void)
     radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
     radio_status = FMRADIO_OFF;
     radio_power(false); /* status update, power off if avail. */
+
+#ifndef SIMULATOR /* SIMULATOR. Catch FMRADIO_OFF status for the sim. */ 
+#if CONFIG_CODEC == SWCODEC
+#ifdef HAVE_TLV320
+    tlv320_set_monitor(false);
+#endif
+    pcm_rec_mux(0); /* Line In */
+#endif
+#endif /* SIMULATOR */
 }
 
 bool radio_hardware_present(void)
@@ -1044,17 +1053,9 @@ bool radio_screen(void)
     else
     {
         radio_stop();
-#ifndef SIMULATOR /* SIMULATOR. Catch FMRADIO_OFF status for the sim. */ 
 #if CONFIG_CODEC == SWCODEC
-#ifdef HAVE_TLV320
-    //tlv320_disable_recording();
-    tlv320_set_monitor(false);
-#endif
-
-        pcm_rec_mux(0); /* Line In */
         peak_meter_enabled = true;
 #endif
-#endif /* SIMULATOR */
     }
     
     cpu_idle_mode(false);
