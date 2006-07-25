@@ -839,18 +839,16 @@ static void viewer_draw(int col)
                 if (line_width > col) {
                     str = oldstr = line_begin;
                     k = col;
-                    while (k > 0) {
-                        str = crop_at_width(str);
-                        k-=draw_columns;
-                    }
-
-                    oldstr=line_begin=str;
-                    
                     width = 0;
                     while( (width<draw_columns) && (oldstr<line_end) )
                     {
                         oldstr = get_ucs(oldstr, &ch);
-                        width += glyph_width(ch);
+                        if (k > 0) {
+                            k -= glyph_width(ch);
+                            line_begin = oldstr;
+                        } else {
+                            width += glyph_width(ch);
+                        }
                     }
 
                     if(prefs.view_mode==WIDE)
@@ -1355,18 +1353,22 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 #ifdef VIEWER_COLUMN_LEFT
             case VIEWER_COLUMN_LEFT:
             case VIEWER_COLUMN_LEFT | BUTTON_REPEAT:
-                /* Scroll left one column */
-                col -= glyph_width('o');
-                col = col_limit(col);
-                viewer_draw(col);
+                if (prefs.view_mode == WIDE) {
+                    /* Scroll left one column */
+                    col -= glyph_width('o');
+                    col = col_limit(col);
+                    viewer_draw(col);
+                }
                 break;
 
             case VIEWER_COLUMN_RIGHT:
             case VIEWER_COLUMN_RIGHT | BUTTON_REPEAT:
-                /* Scroll right one column */
-                col += glyph_width('o');
-                col = col_limit(col);
-                viewer_draw(col);
+                if (prefs.view_mode == WIDE) {
+                    /* Scroll right one column */
+                    col += glyph_width('o');
+                    col = col_limit(col);
+                    viewer_draw(col);
+                }
                 break;
 #endif
 
