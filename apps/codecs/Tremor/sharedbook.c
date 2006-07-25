@@ -26,9 +26,10 @@
 
 /* Size (in number of entries) for static buffers in book_init_decode, so
  * that large alloca() calls can be avoided, which is needed in Rockbox.
- * This is enough for one certain test file...
+ * This is more than enough for one certain test file (which needs 6561 
+ * entries)...
  */
-#define BOOK_INIT_MAXSIZE   3072
+#define BOOK_INIT_MAXSIZE   8192
 
 /* Max value in static_codebook.dim we expect to find in _book_unquantize.
  * Used to avoid some temporary allocations. Again, enough for some test 
@@ -83,7 +84,11 @@ static ogg_int32_t _float32_unpack(long val,int *point){
 ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
   long i,j,count=0;
   ogg_uint32_t marker[33];
-  ogg_uint32_t *r=(ogg_uint32_t *)_ogg_malloc((sparsecount?sparsecount:n)*sizeof(*r));
+  /* Avoid temporary malloc; _make_words is only called from
+   * vorbis_book_init_decode, and the result is only used for a short while.
+   */
+  static ogg_uint32_t r[BOOK_INIT_MAXSIZE];
+  /* ogg_uint32_t *r=(ogg_uint32_t *)_ogg_malloc((sparsecount?sparsecount:n)*sizeof(*r)); */
   memset(marker,0,sizeof(marker));
 
   for(i=0;i<n;i++){
@@ -99,7 +104,7 @@ ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
       /* update ourself */
       if(length<32 && (entry>>length)){
 	/* error condition; the lengths must specify an overpopulated tree */
-	_ogg_free(r);
+	/* _ogg_free(r); */
 	return(NULL);
       }
       r[count++]=entry;
@@ -401,7 +406,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     for(i=0;i<n;i++)
       c->codelist[sortindex[i]]=codes[i];
-    _ogg_free(codes);
+    /* _ogg_free(codes); */
   }
 
   
