@@ -81,6 +81,8 @@ static const char *strp;
 static int current_offset;
 static int current_entry_count;
 
+static struct tree_context *tc;
+
 static int get_token_str(char *buf, int size)
 {
     /* Find the start. */
@@ -745,6 +747,7 @@ static int load_root(struct tree_context *c)
     struct tagentry *dptr = (struct tagentry *)c->dircache;
     int i;
     
+    tc = c;
     c->currtable = root;
     for (i = 0; i < si_count; i++)
     {
@@ -924,23 +927,17 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     
     return 0;
 }
-   
-static int tagtree_play_folder(struct tree_context* c)
+
+bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 {
     int i;
     char buf[MAX_PATH];
-
-    if (playlist_create(NULL, NULL) < 0)
-    {
-        logf("Failed creating playlist\n");
-        return -1;
-    }
 
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
     {
         gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
-        return -1;
+        return false;
     }
     
     for (i=0; i < c->filesindir; i++)
@@ -954,10 +951,76 @@ static int tagtree_play_folder(struct tree_context* c)
             continue;
         }
 
-        playlist_insert_track(NULL, buf, PLAYLIST_INSERT, false);
+        playlist_insert_track(NULL, buf, position, queue);
     }
     tagcache_search_finish(&tcs);
     cpu_boost(false);
+    
+    return true;
+}
+
+bool tagtree_insert_selection_playlist(int position, bool queue)
+{
+    struct tagentry *dptr;
+    int dirlevel = tc->dirlevel;
+
+    dptr = tagtree_get_entry(tc, tc->selected_item);
+    
+    /* We need to set the table to allsubentries. */
+    if (dptr->newtable == navibrowse)
+    {
+        tagtree_enter(tc);
+        tagtree_load(tc);
+        dptr = tagtree_get_entry(tc, tc->selected_item);
+    }
+    else if (dptr->newtable != allsubentries)
+    {
+        logf("unsupported table: %d", dptr->newtable);
+        return false;
+    }
+    
+    /* Now the current table should be allsubentries. */
+    if (dptr->newtable != playtrack)
+    {
+        tagtree_enter(tc);
+        tagtree_load(tc);
+        dptr = tagtree_get_entry(tc, tc->selected_item);
+    
+        /* And now the newtable should be playtrack. */
+        if (dptr->newtable != playtrack)
+        {
+            logf("newtable: %d !!", dptr->newtable);
+            tc->dirlevel = dirlevel;
+            return false;
+        }
+    }
+
+    if (tc->filesindir <= 0)
+        gui_syncsplash(HZ, true, str(LANG_END_PLAYLIST_PLAYER));
+    else
+    {
+        logf("insert_all_playlist");
+        insert_all_playlist(tc, position, queue);
+    }
+    
+    /* Finally return the dirlevel to its original value. */
+    while (tc->dirlevel > dirlevel)
+        tagtree_exit(tc);
+    tagtree_load(tc);
+    
+    return true;
+}
+
+static int tagtree_play_folder(struct tree_context* c)
+{
+    if (playlist_create(NULL, NULL) < 0)
+    {
+        logf("Failed creating playlist\n");
+        return -1;
+    }
+
+    if (!insert_all_playlist(c, PLAYLIST_INSERT, false))
+        return -2;
     
     if (global_settings.playlist_shuffle)
         c->selected_item = playlist_shuffle(current_tick, c->selected_item);

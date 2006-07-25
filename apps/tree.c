@@ -782,6 +782,8 @@ static bool dirbrowse(void)
                             attr = TREE_ATTR_MPA;
                             tagtree_get_filename(&tc, buf, sizeof(buf));
                         }
+                        else
+                            attr = ATTR_DIRECTORY;
                     }
                     else
                     {

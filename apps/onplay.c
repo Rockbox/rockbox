@@ -64,6 +64,7 @@
 #endif
 #include "playlist_menu.h"
 #include "playlist_catalog.h"
+#include "tagtree.h"
 
 static int context;
 static char* selected_file = NULL;
@@ -174,26 +175,33 @@ static bool add_to_playlist(int position, bool queue)
     if (new_playlist)
         playlist_create(NULL, NULL);
 
-    if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
-        playlist_insert_track(NULL, selected_file, position, queue);
-    else if (selected_file_attr & ATTR_DIRECTORY)
+    if (context == CONTEXT_ID3DB)
     {
-        bool recurse = false;
-
-        if (global_settings.recursive_dir_insert != RECURSE_ASK)
-            recurse = (bool)global_settings.recursive_dir_insert;
-        else
-        {
-            /* Ask if user wants to recurse directory */
-            recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
-        }
-
-        playlist_insert_directory(NULL, selected_file, position, queue,
-                                  recurse);
+        tagtree_insert_selection_playlist(position, queue);
     }
-    else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
-        playlist_insert_playlist(NULL, selected_file, position, queue);
-
+    else
+    {
+        if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
+            playlist_insert_track(NULL, selected_file, position, queue);
+        else if (selected_file_attr & ATTR_DIRECTORY)
+        {
+            bool recurse = false;
+            
+            if (global_settings.recursive_dir_insert != RECURSE_ASK)
+                recurse = (bool)global_settings.recursive_dir_insert;
+            else
+            {
+                /* Ask if user wants to recurse directory */
+                recurse = (gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES);
+            }
+            
+            playlist_insert_directory(NULL, selected_file, position, queue,
+                                      recurse);
+        }
+        else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
+            playlist_insert_playlist(NULL, selected_file, position, queue);
+    }
+    
     if (new_playlist && (playlist_amount() > 0))
     {
         /* nothing is currently playing so begin playing what we just
@@ -842,8 +850,7 @@ int onplay(char* file, int attr, int from)
 
     if (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
-        ((context == CONTEXT_ID3DB) &&
-         (attr & TREE_ATTR_MASK) == TREE_ATTR_MPA))
+        (context == CONTEXT_ID3DB))
     {
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;
