@@ -30,7 +30,7 @@ common/strchr.c
 common/strcmp.c
 common/strcpy.c
 #if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
-common/strlen_a.S
+target/sh/strlen-sh.S
 #else
 common/strlen.c
 #endif
@@ -39,22 +39,24 @@ common/strncpy.c
 common/strrchr.c
 common/strtok.c
 common/timefuncs.c
-#if (CONFIG_CPU == SH7034) || defined(CPU_COLDFIRE)
-common/memcpy_a.S
-common/memmove_a.S
-common/memset_a.S
+
+#ifdef CPU_COLDFIRE
+target/coldfire/memcpy-coldfire.S
+target/coldfire/memmove-coldfire.S
+target/coldfire/memset-coldfire.S
+target/coldfire/memset16-coldfire.S
+#elif (CONFIG_CPU == SH7034)
+target/sh/memcpy-sh.S
+target/sh/memmove-sh.S
+target/sh/memset-sh.S
 #elif defined(CPU_ARM)
 common/memcpy.c
 common/memmove.c
-common/memset_a.S
+target/arm/memset-arm.S
 #else
 common/memcpy.c
 common/memmove.c
 common/memset.c
-#endif
-#ifdef CPU_COLDFIRE
-common/memset16_a.S
-#else
 common/memset16.c
 #endif
 #ifdef HAVE_LCD_CHARCELLS

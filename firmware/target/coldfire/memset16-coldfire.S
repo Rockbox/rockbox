@@ -20,7 +20,6 @@
 
     .section    .icode,"ax",@progbits
 
-#ifdef CPU_COLDFIRE
     .global     memset16
     .type       memset16,@function
 
@@ -143,4 +142,3 @@ memset16:
 
 .end:
     .size   memset16,.end-memset16
-#endif
