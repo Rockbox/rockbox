@@ -1,25 +1,21 @@
 % $Id$ %
 \chapter{Plugins}\label{ref:plugins}
-Plugins are little programs that Rockbox can load and run. Plugins have
-the file extension .rock.  Most of them can be started from the main
-menu if you put them in the \textbf{/.rockbox/rocks} directory. Press
-PLAY on them to start them.
+Plugins are little programs that Rockbox can load and run. Only one plugin can
+be loaded at a time. Plugins have exclusive control over the user interface.
+This means you cannot switch back and forth between a plugin and Rockbox, a
+plugin is loaded, run and then exited, which returns control to Rockbox. Most
+plugins will not interfere with music playback but some of them will stop
+playback while runnig. Plugins have the file extension \fname{.rock}. Most of
+them can be started from \setting{Browse Plugins} in the \setting{Main Menu}.
 
-Viewer plugins get started automatically by
-``playing'' an associated file (i.e. text
-files, chip8 games), or from the ``Open with'' option on the File menu.\\
-
-\textbf{The plugin loader}
-Only one plugin can be loaded at a time. Plugins run in the GUI thread
-and have exclusive control over the user interface. This means you
-cannot switch back and forth between a plugin and Rockbox. A plugin is
-loaded, run and then exited, which returns control to Rockbox.  Music
-will carry on playing whilst plugins are being run.
+Viewer plugins get started automatically by opening an associated file (i.e.
+text files, chip8 games), or from the \setting{Open with} option on the
+\setting{File Menu}.
 
 \section{Games}
 \opt{HAVE_LCD_BITMAP}
     {See also the Chip{}-8 emulator on page \pageref{ref:Chip8emulator}
-    \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodvideo}
+    \opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodvideo}
     {and Rockboy on page \pageref{ref:Rockboy}}.}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/brickmania.tex}}
