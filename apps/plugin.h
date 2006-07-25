@@ -327,8 +327,8 @@ struct plugin_api {
     /* unicode stuff */
     const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
     unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
-    unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
-    unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, unsigned int count);
+    unsigned char* (*utf16LEdecode)(const unsigned char *utf16, unsigned char *utf8, int count);
+    unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, int count);
     unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
     unsigned long (*utf8length)(const unsigned char *utf8);
 
