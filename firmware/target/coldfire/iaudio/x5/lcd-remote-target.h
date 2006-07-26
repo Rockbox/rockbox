@@ -16,12 +16,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef BACKLIGHT_TARGET_H
-#define BACKLIGHT_TARGET_H
+#ifndef LCD_REMOTE_TARGET_H
+#define LCD_REMOTE_TARGET_H
 
-void __backlight_on(void);
-void __backlight_off(void);
-void __remote_backlight_on(void);
-void __remote_backlight_off(void);
+void lcd_remote_write_command(int cmd);
+void lcd_remote_write_command_ex(int cmd, int data);
+void lcd_remote_write_data(const unsigned char* p_bytes, int count);
+bool remote_detect(void);
+void lcd_remote_powersave(bool on);
+void lcd_remote_set_contrast(int val);
+void remote_set_row_and_col(int row, int col);
 
 #endif

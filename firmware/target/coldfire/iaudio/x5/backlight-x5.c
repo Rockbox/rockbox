@@ -35,3 +35,13 @@ void __backlight_off(void)
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
     set_irq_level(level);
 }
+
+void __remote_backlight_on(void)
+{
+    and_l(~0x00200000, &GPIO_OUT);
+}
+
+void __remote_backlight_off(void)
+{
+    or_l(0x00200000, &GPIO_OUT);
+}
