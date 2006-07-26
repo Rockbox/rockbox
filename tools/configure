@@ -717,7 +717,7 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset="$iaudiobitmaptools"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="coldfire"
-    t_manufactorer="iaudio"
+    t_manufacturer="iaudio"
     t_model="x5"
     ;;
 
@@ -1121,8 +1121,8 @@ sed > autoconf.h \
 EOF
 
 if test -n "$t_cpu"; then
-  TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufactorer/$t_model"
-  TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufactorer"
+  TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
+  TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
   GCCOPTS="$GCCOPTS -DTARGET_TREE"
 fi
