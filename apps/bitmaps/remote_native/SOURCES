@@ -1,3 +1,9 @@
 #ifdef HAVE_REMOTE_LCD
-remote_rockboxlogo.112x37x1.bmp
+
+#if (LCD_REMOTE_DEPTH == 1)
+remote_rockboxlogo.128x42x1.bmp
+#elif (LCD_REMOTE_DEPTH == 2)
+remote_rockboxlogo.128x42x2.bmp
 #endif
+
+#endif /* HAVE_REMOTE_LCD */

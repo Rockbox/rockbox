@@ -613,7 +613,7 @@ int show_logo( void )
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_rockboxlogo,10,14,BMPWIDTH_remote_rockboxlogo,
+    lcd_remote_bitmap(remote_rockboxlogo, 0, 10, BMPWIDTH_remote_rockboxlogo,
                       BMPHEIGHT_remote_rockboxlogo);
 #endif
 
