@@ -424,7 +424,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
 
 bool tagtree_export(void)
 {
-    gui_syncsplash(0, true, str(LANG_WAIT));
+    gui_syncsplash(0, true, str(LANG_CREATING));
     if (!tagcache_create_changelog(&tcs))
     {
         gui_syncsplash(HZ*2, true, str(LANG_FAILED));
@@ -962,9 +962,23 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 bool tagtree_insert_selection_playlist(int position, bool queue)
 {
     struct tagentry *dptr;
+    char buf[MAX_PATH];
     int dirlevel = tc->dirlevel;
 
     dptr = tagtree_get_entry(tc, tc->selected_item);
+    
+    /* Insert a single track? */
+    if (dptr->newtable == playtrack)
+    {
+        if (tagtree_get_filename(tc, buf, sizeof buf) < 0)
+        {
+            logf("tagtree_get_filename failed");
+            return false;
+        }
+        playlist_insert_track(NULL, buf, position, queue);
+        
+        return true;
+    }
     
     /* We need to set the table to allsubentries. */
     if (dptr->newtable == navibrowse)
