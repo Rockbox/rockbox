@@ -161,7 +161,17 @@ next_track:
     state = a52_init(0);
 
     /* The main decoding loop */
-    samplesdone = 0;
+    if (ci->id3->offset) {
+        if (ci->seek_buffer(ci->id3->offset)) {
+            samplesdone = (ci->id3->offset / ci->id3->bytesperframe) *
+                A52_SAMPLESPERFRAME;
+            ci->set_elapsed(samplesdone/(ci->id3->frequency / 1000));
+        }
+    }
+    else {
+        samplesdone = 0;
+    }
+
     while (1) {
         if (ci->stop_codec || ci->new_track)
             break;

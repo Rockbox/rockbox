@@ -1762,6 +1762,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
         case AFMT_OGG_VORBIS:
         case AFMT_FLAC:
         case AFMT_PCM_WAV:
+        case AFMT_A52:
             tracks[track_widx].id3.offset = offset;
             break;
         }
