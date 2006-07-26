@@ -135,7 +135,7 @@
     *: "Startar om uppspelning..."
   </dest>
   <voice>
-    *: "Restarting playback..."
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -513,7 +513,7 @@
     *: "Stereobredd"
   </dest>
   <voice>
-    *: "Stereo width"
+    *: "Stereo Width"
   </voice>
 </phrase>
 <phrase>
@@ -569,7 +569,7 @@
     *: "Superbas"
   </dest>
   <voice>
-    *: "Super bass"
+    *: "Super Bass"
   </voice>
 </phrase>
 <phrase>
@@ -625,7 +625,7 @@
     *: "MDB-mittfrekvens"
   </dest>
   <voice>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -975,7 +975,7 @@
     *: "Inspelningsskärm"
   </dest>
   <voice>
-    *: "Recording screen"
+    *: "Recording Screen"
   </voice>
 </phrase>
 <phrase>
@@ -1003,7 +1003,7 @@
     *: "Aktivera EQ"
   </dest>
   <voice>
-    *: "Enable EQ"
+    *: "Enable equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -1017,7 +1017,7 @@
     *: "Parametrisk EQ"
   </dest>
   <voice>
-    *: "Graphical EQ"
+    *: "Graphical equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -1045,7 +1045,7 @@
     *: "Enkla EQ-inställnngar"
   </dest>
   <voice>
-    *: "Simple EQ Settings"
+    *: "Simple equalizer settings"
   </voice>
 </phrase>
 <phrase>
@@ -1059,7 +1059,7 @@
     *: "Avancerade EQ-inställningar"
   </dest>
   <voice>
-    *: "Advanced EQ Settings"
+    *: "Advanced equalizer settings"
   </voice>
 </phrase>
 <phrase>
@@ -1073,7 +1073,7 @@
     *: "Spara EQ-inställningar"
   </dest>
   <voice>
-    *: "Save EQ Preset"
+    *: "Save equalizer preset"
   </voice>
 </phrase>
 <phrase>
@@ -1087,7 +1087,7 @@
     *: "Lista EQ-inställningar"
   </dest>
   <voice>
-    *: "Browse EQ Presets"
+    *: "Browse equalizer presets"
   </voice>
 </phrase>
 <phrase>
@@ -1129,7 +1129,7 @@
     *: "Low shelf-filter"
   </dest>
   <voice>
-    *: ""
+    *: "Low shelf filter"
   </voice>
 </phrase>
 <phrase>
@@ -1143,7 +1143,7 @@
     *: "Peak-filter %d"
   </dest>
   <voice>
-    *: ""
+    *: "Peak filter"
   </voice>
 </phrase>
 <phrase>
@@ -1157,7 +1157,7 @@
     *: "High shelf-filter"
   </dest>
   <voice>
-    *: ""
+    *: "High Shelf Filter"
   </voice>
 </phrase>
 <phrase>
@@ -1437,7 +1437,7 @@
     *: "Återuppta vid start"
   </dest>
   <voice>
-    *: "Resume on startup"
+    *: "Resume on Startup"
   </voice>
 </phrase>
 <phrase>
@@ -1535,7 +1535,7 @@
     *: "Pipvolym"
   </dest>
   <voice>
-    *: "Beep volume"
+    *: "Beep Volume"
   </voice>
 </phrase>
 <phrase>
@@ -1591,7 +1591,7 @@
     *: "Optisk utgång"
   </dest>
   <voice>
-    *: "Optical output"
+    *: "Optical Output"
   </voice>
 </phrase>
 <phrase>
@@ -1605,7 +1605,7 @@
     *: "ID3-prioritet"
   </dest>
   <voice>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </voice>
 </phrase>
 <phrase>
@@ -1647,12 +1647,12 @@
     *: "Byt katalog automatiskt"
   </dest>
   <voice>
-    *: "Auto change directory"
+    *: "Auto-Change Directory"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu 
   user:
   <source>
     *: "Tag Cache"
@@ -1661,21 +1661,21 @@
     *: "Taggcache"
   </dest>
   <voice>
-    *: "Tag cache"
+    *: "Tag Cache"
   </voice>
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Behåll på disk"
+    *: ""
   </dest>
   <voice>
-    *: "Keep on disk"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1689,7 +1689,7 @@
     *: "Ladda till RAM"
   </dest>
   <voice>
-    *: "Load to ram"
+    *: "Load to RAM"
   </voice>
 </phrase>
 <phrase>
@@ -1697,13 +1697,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Tvinga uppdatering av taggcache"
+    *: "Initiera nu"
   </dest>
   <voice>
-    *: "Force tag cache update"
+    *: "Initialize now"
   </voice>
 </phrase>
 <phrase>
@@ -1717,7 +1717,7 @@
     *: "Uppdaterar i bakgrunden"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1745,7 +1745,7 @@
     *: "Samla kördata (experimentell)"
   </dest>
   <voice>
-    *: "Gather runtime data"
+    *: "Gather Runtime Data"
   </voice>
 </phrase>
 <phrase>
@@ -1815,7 +1815,7 @@
     *: "på datum"
   </dest>
   <voice>
-    *: "by date"
+    *: "By Date"
   </voice>
 </phrase>
 <phrase>
@@ -1829,7 +1829,7 @@
     *: "på senaste datum"
   </dest>
   <voice>
-    *: "by newest date"
+    *: "By Newest Date"
   </voice>
 </phrase>
 <phrase>
@@ -1843,7 +1843,7 @@
     *: "på typ"
   </dest>
   <voice>
-    *: "by type"
+    *: "By Type"
   </voice>
 </phrase>
 <phrase>
@@ -1927,7 +1927,7 @@
     *: "ID3-databas"
   </dest>
   <voice>
-    *: "ID3 database"
+    *: "ID3 Database"
   </voice>
 </phrase>
 <phrase>
@@ -2081,7 +2081,7 @@
     *: "Förvald teckentabell"
   </dest>
   <voice>
-    *: ""
+    *: "Default codepage"
   </voice>
 </phrase>
 <phrase>
@@ -2109,7 +2109,7 @@
     *: "Grekiska (ISO-8859-7)"
   </dest>
   <voice>
-    *: ""
+    *: "Greek"
   </voice>
 </phrase>
 <phrase>
@@ -2123,7 +2123,7 @@
     *: "Hebreiska (ISO-8859-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Hebrew"
   </voice>
 </phrase>
 <phrase>
@@ -2137,7 +2137,7 @@
     *: "Krylliska (CP1251)"
   </dest>
   <voice>
-    *: ""
+    *: "Cyrillic"
   </voice>
 </phrase>
 <phrase>
@@ -2151,7 +2151,7 @@
     *: "Thailändska (ISO-8859-11)"
   </dest>
   <voice>
-    *: ""
+    *: "Thai"
   </voice>
 </phrase>
 <phrase>
@@ -2165,7 +2165,7 @@
     *: "Arabiska (CP1256)"
   </dest>
   <voice>
-    *: ""
+    *: "Arabic"
   </voice>
 </phrase>
 <phrase>
@@ -2179,7 +2179,7 @@
     *: "Turkiska (ISO-8859-9)"
   </dest>
   <voice>
-    *: ""
+    *: "Turkish"
   </voice>
 </phrase>
 <phrase>
@@ -2193,7 +2193,7 @@
     *: "Utökad latin (ISO-8859-2)"
   </dest>
   <voice>
-    *: ""
+    *: "Latin extended"
   </voice>
 </phrase>
 <phrase>
@@ -2207,7 +2207,7 @@
     *: "Japanska (SJIS)"
   </dest>
   <voice>
-    *: ""
+    *: "Japanese"
   </voice>
 </phrase>
 <phrase>
@@ -2221,7 +2221,7 @@
     *: "Förenklad kinesiska (GB2312)"
   </dest>
   <voice>
-    *: ""
+    *: "Simplified Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -2235,7 +2235,7 @@
     *: "Koreanska (KSX1001)"
   </dest>
   <voice>
-    *: ""
+    *: "Korean"
   </voice>
 </phrase>
 <phrase>
@@ -2249,7 +2249,7 @@
     *: "Traditionell kinesiska (BIG5)"
   </dest>
   <voice>
-    *: ""
+    *: "Traditional Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -2669,21 +2669,21 @@
     *: "Oberoende ramar"
   </dest>
   <voice>
-    *: "Independent frames"
+    *: "Independent Frames"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Tidsdelning"
+    *: "Filuppdelning"
   </dest>
   <voice>
-    *: "Time Split"
+    *: "File Split Options"
   </voice>
 </phrase>
 <phrase>
@@ -2739,7 +2739,7 @@
     *: "Visa inspelningsskärm vid start"
   </dest>
   <voice>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </voice>
 </phrase>
 <phrase>
@@ -2767,7 +2767,7 @@
     *: "Ljus vid klippning"
   </dest>
   <voice>
-    *: "Clipping light"
+    *: "Clipping Light"
   </voice>
 </phrase>
 <phrase>
@@ -2851,7 +2851,7 @@
     *: "Aktivera korstoning"
   </dest>
   <voice>
-    *: "Enable crossfade"
+    *: "Enable Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -2879,7 +2879,7 @@
     *: "Intoningsfördröjning"
   </dest>
   <voice>
-    *: "Fade in delay"
+    *: "Fade-In Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2893,7 +2893,7 @@
     *: "Intoningslängd"
   </dest>
   <voice>
-    *: "Fade in duration"
+    *: "Fade-In Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2907,7 +2907,7 @@
     *: "Uttoningsfördröjning"
   </dest>
   <voice>
-    *: "Fade out delay"
+    *: "Fade-Out Delay"
   </voice>
 </phrase>
 <phrase>
@@ -2921,7 +2921,7 @@
     *: "Uttoningslängd"
   </dest>
   <voice>
-    *: "Fade out duration"
+    *: "Fade-Out Duration"
   </voice>
 </phrase>
 <phrase>
@@ -2935,7 +2935,7 @@
     *: "Uttoningsläge"
   </dest>
   <voice>
-    *: "Fade out mode"
+    *: "Fade-Out Mode"
   </voice>
 </phrase>
 <phrase>
@@ -2963,7 +2963,7 @@
     *: "Aktivera volymutjämning"
   </dest>
   <voice>
-    *: "Enable replaygain"
+    *: "Enable Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2977,7 +2977,7 @@
     *: "Förhindra klippning"
   </dest>
   <voice>
-    *: "Prevent clipping"
+    *: "Prevent Clipping"
   </voice>
 </phrase>
 <phrase>
@@ -2991,7 +2991,7 @@
     *: "Volymutjämningstyp"
   </dest>
   <voice>
-    *: "Replaygain type"
+    *: "Replaygain Type"
   </voice>
 </phrase>
 <phrase>
@@ -3005,7 +3005,7 @@
     *: "Per album"
   </dest>
   <voice>
-    *: "Album gain"
+    *: "Album Gain"
   </voice>
 </phrase>
 <phrase>
@@ -3019,7 +3019,7 @@
     *: "Per spår"
   </dest>
   <voice>
-    *: "Track gain"
+    *: "Track Gain"
   </voice>
 </phrase>
 <phrase>
@@ -3033,7 +3033,7 @@
     *: "Spårvolymutjämning vid blandning"
   </dest>
   <voice>
-    *: "Track gain if shuffling"
+    *: "Track Gain if Shuffling"
   </voice>
 </phrase>
 <phrase>
@@ -3075,7 +3075,7 @@
     *: "Belysning vid laddning"
   </dest>
   <voice>
-    *: "Backlight When Plugged"
+    *: "Backlight (While Plugged In)"
   </voice>
 </phrase>
 <phrase>
@@ -3089,7 +3089,7 @@
     *: "Belysning vid spårbyte"
   </dest>
   <voice>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </voice>
 </phrase>
 <phrase>
@@ -3103,7 +3103,7 @@
     *: "Tona in belysning"
   </dest>
   <voice>
-    *: "Backlight fade in"
+    *: "Backlight Fade In"
   </voice>
 </phrase>
 <phrase>
@@ -3117,7 +3117,7 @@
     *: "Tona ut belysning"
   </dest>
   <voice>
-    *: "Backlight fade out"
+    *: "Backlight Fade Out"
   </voice>
 </phrase>
 <phrase>
@@ -3159,7 +3159,7 @@
     *: "Första knapptryck tänder endast belysning"
   </dest>
   <voice>
-    *: "First keypress enables backlight only"
+    *: "First Keypress Enables Backlight Only"
   </voice>
 </phrase>
 <phrase>
@@ -3271,7 +3271,7 @@
     *: "Rensa bakgrund"
   </dest>
   <voice>
-    *: "Clear backdrop"
+    *: "Clear Backdrop"
   </voice>
 </phrase>
 <phrase>
@@ -3327,7 +3327,7 @@
     *: "Reducera tickande"
   </dest>
   <voice>
-    *: "Reduce ticking"
+    *: "Reduce Ticking"
   </voice>
 </phrase>
 <phrase>
@@ -3425,7 +3425,7 @@
     *: "Hopprullning"
   </dest>
   <voice>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </voice>
 </phrase>
 <phrase>
@@ -3495,7 +3495,7 @@
     *: "Sidvis rullning"
   </dest>
   <voice>
-    *: ""
+    *: "Paged scrolling"
   </voice>
 </phrase>
 <phrase>
@@ -3537,7 +3537,7 @@
     *: "Knapprad"
   </dest>
   <voice>
-    *: "Button bar"
+    *: "Button Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3831,7 +3831,7 @@
     *: "Katalogcache"
   </dest>
   <voice>
-    *: "Directory cache"
+    *: "Directory Cache"
   </voice>
 </phrase>
 <phrase>
@@ -3929,7 +3929,7 @@
     *: "Max filer i kataloglista"
   </dest>
   <voice>
-    *: "Max files in directory browser"
+    *: "Maximum files in directory browser"
   </voice>
 </phrase>
 <phrase>
@@ -3943,7 +3943,7 @@
     *: "Max filer i spellista"
   </dest>
   <voice>
-    *: "Max playlist size"
+    *: "Maximum playlist size"
   </voice>
 </phrase>
 <phrase>
@@ -3999,7 +3999,7 @@
     *: "Värdera sången"
   </dest>
   <voice>
-    *: "Set song rating"
+    *: "Set Song Rating"
   </voice>
 </phrase>
 <phrase>
@@ -4013,7 +4013,7 @@
     *: "Värdering:"
   </dest>
   <voice>
-    *: "Rating"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4083,7 +4083,7 @@
     *: "Fil eller katalog existerar. Skriv över?"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4111,7 +4111,7 @@
     *: "Använd som bakgrund"
   </dest>
   <voice>
-    *: "Set as backdrop"
+    *: "Set As Backdrop"
   </voice>
 </phrase>
 <phrase>
@@ -4181,7 +4181,7 @@
     *: "Skapa katalog"
   </dest>
   <voice>
-    *: "Create directory"
+    *: "Create Directory"
   </voice>
 </phrase>
 <phrase>
@@ -4349,7 +4349,7 @@
     *: "Sök i spellista"
   </dest>
   <voice>
-    *: ""
+    *: "Search In Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -5287,7 +5287,7 @@
     *: "Alarmet avaktiverat"
   </dest>
   <voice>
-    *: "Alarm Disabled"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5411,6 +5411,20 @@
   </source>
   <dest>
     *: "[År]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Längd]"
   </dest>
   <voice>
     *: ""
@@ -7163,7 +7177,7 @@
     *: "Full spellistebuffert"
   </dest>
   <voice>
-    *: "Playlist "
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7401,7 +7415,7 @@
     *: "Lägg till kanal"
   </dest>
   <voice>
-    *: "Add preset"
+    *: "Add Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7849,7 +7863,7 @@
     *: "Bakgrund laddad"
   </dest>
   <voice>
-    *: "Backdrop loaded"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7863,7 +7877,7 @@
     *: "Bakgrund misslyckades"
   </dest>
   <voice>
-    *: "Backdrop failed"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7933,7 +7947,7 @@
     *: "Genrer"
   </dest>
   <voice>
-    *: "Genres"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8087,7 +8101,7 @@
     *: "Endast spårnamnet"
   </dest>
   <voice>
-    *: "Track name only"
+    *: "Track Name Only"
   </voice>
 </phrase>
 <phrase>
@@ -8101,7 +8115,7 @@
     *: "Hela sökvägen"
   </dest>
   <voice>
-    *: "Full path"
+    *: "Full Path"
   </voice>
 </phrase>
 <phrase>
@@ -8273,20 +8287,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ID3_LENGTH
-  desc: in tag viewer
-  user:
-  <source>
-    *: "[Length]"
-  </source>
-  <dest>
-    *: "[Längd]"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_PRESET_LOAD
   desc: load preset list in fm radio
   user:
@@ -8385,30 +8385,43 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TAGNAVI_ALL_TRACKS
-  desc: "<All tracks>" entry in tag browser
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
   user:
   <source>
-    *: "<All tracks>"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: "<Alla spår>"
+    *: "Direkt dämpning"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Direct gain"
+  </voice>
+</phrase>   
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Korsdämpning"
+  </dest>
+  <voice>  
+    *: "Cross gain"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TAGCACHE_BUSY
-  desc: when trying to shutdown and tagcache is committing
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
   <source>
-    *: "Tagcache is not ready"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "Taggcachen är inte klar"
+    *: "Högfrekvensdämpning"
   </dest>
   <voice>
-    *: "Tagcache is not ready"
+    *: "High-frequency attenuation"
   </voice>
 </phrase>
 <phrase>
@@ -8438,43 +8451,30 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CROSSFEED_CROSS_GAIN
-  desc: in crossfeed settings
-  <source>  
-    *: "Cross Gain"
-  </source>
-  <dest>  
-    *: "Korsdämpning"
-  </dest>
-  <voice>  
-    *: "Cross gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED_HF_ATTENUATION
-  desc: in crossfeed settings
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "High-Frequency Attenuation"
+    *: "Tagcache is not ready"
   </source>
   <dest>
-    *: "Högfrekvensdämpning"
+    *: "Taggcachen är inte klar"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: "Tagcache is not ready"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CROSSFEED_DIRECT_GAIN
-  desc: in crossfeed settings
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
   user:
   <source>
-    *: "Direct Gain"
+    *: "<All tracks>"
   </source>
   <dest>
-    *: "Direkt dämpning"
+    *: "<Alla spår>"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: "All tracks"
   </voice>
 </phrase>
 <phrase>
@@ -8503,5 +8503,253 @@
   </dest>
   <voice>
     *: "Remote Scrolling Options"
+  </voice>
+</phrase>   
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Uppdatera nu"
+  </dest>
+  <voice>
+    *: "Update now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Uppdatera automatiskt"
+  </dest>
+  <voice>
+    *: "Auto update"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exportera ändringar"
+  </dest>
+  <voice>
+    *: "Export modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Spellistekatalog"
+  </dest>
+  <voice>
+    *: "Playlist catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Lägg till till spellista"
+  </dest>
+  <voice>
+    *: "Add to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Lägg till till ny spellista"
+  </dest>
+  <voice>
+    *: "Add to new playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Visa katalog"
+  </dest>
+  <voice>
+    *: "View catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s finns inte"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Inga spellistor"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importera ändringar"
+  </dest>
+  <voice>
+    *: "Import modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Uppdelningsenhet"
+  </dest>
+  <voice>
+    *: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Aktivitet vid uppdelning"
+  </dest>
+  <voice>
+    *: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Uppdelningstid"
+  </dest>
+  <voice>
+    *: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Uppdelningsstorlek"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tid"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filstorlek"
+  </dest>
+  <voice>
+    *: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Påbörja ny fil"
+  </dest>
+  <voice>
+    *: "Start new file"
+  </voice>
+</phrase>   
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Stoppa inspelning"
+  </dest>
+  <voice>
+    *: "Stop recording"
   </voice>
 </phrase>
