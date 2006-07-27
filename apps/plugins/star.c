@@ -960,12 +960,21 @@ static int star_menu(void)
                                    PLUGIN_USB_CONNECTED : PLUGIN_OK;
                         break;
                     case 1:
+#if LCD_DEPTH > 1
                         star_display_text(
                             "INFO\n\n"
-                            "Take all \"o\" to go to the next level. "
+                            "Take all the stars to go to the next level. "
+                            "You can toggle control with the block to "
+                            "use it as a mobile wall. The block cannot "
+                            "take stars.", true);
+#else
+                        star_display_text(
+                            "INFO\n\n"
+                            "Take all the \"o\"s to go to the next level. "
                             "You can toggle control with the block to "
                             "use it as a mobile wall. The block cannot "
                             "take \"o\".", true);
+#endif
                         break;
                     case 2:
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -982,6 +991,34 @@ static int star_menu(void)
                                           "[M <] Prev. level\n"
                                           "[M ^] Reset level\n"
                                           "[M >] Next level", true);
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+                        star_display_text("KEYS\n\n"
+                                          "[A-B] Toggle Ctl\n"
+                                          "[OFF] Exit\n"
+                                          "[A-B <] Prev. level\n"
+                                          "[A-B ^] Reset level\n"
+                                          "[A-B >] Next level", true);
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
+                        star_display_text("KEYS\n\n"
+                                          "[SELECT] Toggle Ctl\n"
+                                          "[S + MENU] Exit\n"
+                                          "[S <] Prev. level\n"
+                                          "[S + PLAY] Reset level\n"
+                                          "[S >] Next level", true);
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+                        star_display_text("KEYS\n\n"
+                                          "[SELECT] Toggle Ctl\n"
+                                          "[POWER] Exit\n"
+                                          "[PLAY+DOWN] Prev. level\n"
+                                          "[PLAY+RIGHT] Reset level\n"
+                                          "[PLAY+UP] Next level", true);
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+                        star_display_text("KEYS\n\n"
+                                          "[MENU] Toggle Ctl\n"
+                                          "[A] Exit\n"
+                                          "[PWR+DOWN] Prev. level\n"
+                                          "[PWR+RIGHT] Reset level\n"
+                                          "[PWR+UP] Next level", true);
 #endif
                         break;
                     case 3:
