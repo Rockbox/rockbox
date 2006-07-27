@@ -1,51 +1,95 @@
 % $Id$ %
-\section{Tag Cache\label{ref:tagcache}} 
+\section{\label{ref:tagcache}Tag Cache} 
 
 \subsection{Introduction}
-Tag Cache is Rockbox's music database system. Using the information 
+Tag Cache is the Rockbox music database system. Using the information 
 contained in the tags (ID3v1, ID3v2, Vorbis Comments, Apev2, etc.) in your 
 audio files, Rockbox builds and maintains a database of the music files on 
 your player and allows you to browse them by Artist, Album and Genre.
 
-\subsection{Using Tag Cache}
-Before you use the Tag Cache for the first time, you need to tell Rockbox to
-create the database from your music files. This typically takes around 
-5 -- 10 minutes and you can continue listening to music normally whilst 
-this is happenning. You can even shut down your player and resume the 
-database building process next time you turn it on.
-To force the initial database to be built, go to the main menu, then 
-  \setting{General Settings $\rightarrow$ File View $\rightarrow$ Force tag cache update}.
-  
-\opt{SWCODEC}{
-  The Tag Cache database can either be kept on disk (to save memory), or 
-  loaded into RAM (for fast browsing). This configuration option can be 
-  found in \setting{General Settings $\rightarrow$ File View $\rightarrow$ Tag cache}.
-	}
-  Once the database has been built, you can browse your music using this 
-  database. To use the database change the show mode by changing the 
-  \setting{General Settings $\rightarrow$ File View $\rightarrow$ Show files} option to 
-	\setting{ID3 database}. This disables the File Browser and instead of the file
-	browser you will now access the database.
-%
-\begin{description}
-\item[Keeping Tag Cache on disk.] This does not require extra RAM for the
-Tag Cache and speeds up the boot process, but is slower when accessing.
-\item[Keeping Tag Cache on disk with Dircache enabled.] With Dircache
-enabled updating of the database is much faster. Also updates can be
-committed in background immediately.
-\item[Loading Tag Cache to RAM.] The fastest mode is when loading Tag Cache
-to RAM. New files are automatically detected and Tag Cache will get updated.
-Use this for the fastest browsing and searching without any waiting.
-\note{To use the RAM mode, first you have to turn on 
-Directory Cache in \setting{General Settings $\rightarrow$ System $\rightarrow$ 
-Disk $\rightarrow$ Directory Cache}.}
-\end{description}
+\subsection{Initializing the Tag Cache}
+Before you use the Tag Cache for the first time, you must initialize it by using
+the \setting{Initialize Now} function in the \setting{Tag Cache Menu}, which is
+described in the following section.
 
-\note{You may need to increase the value of the \setting{Max files in dir browser}
-setting (\setting{General Settings $\rightarrow$ System $\rightarrow$ Limits}) 
-in order to view long lists of tracks in the ID3 database browser.\\
-There is no option to turn off Tag Cache completely. If you don't want
-to use it just don't do the initial build of the database and don't load it
+\subsection{\label{ref:tagcachemenu}The Tag Cache Menu}
+
+	\begin{description}
+		\opt{SWCODEC}{
+			\item[Load To Ram:  ]
+			The Tag Cache database can either be kept on disk (to save memory), or
+			loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
+			the tagcache to RAM, allowing faster browsing and searching. Setting this
+			option to \setting{No} keeps the tagcache on the disk, meaning slower 
+			browsing but it does not use extra RAM and saves some battery on boot up. 
+			
+			\note{If you use TagCache frequently, you should load to RAM, as this
+			will reduce the overall battery consumption because the disk will not
+			need to spin on each search.}
+  		}
+
+		\item[Auto Update:  ]
+		If \setting{Auto update} is set to \setting{on}, each time the play
+		boots, Tag Cache will automatically do everything that the 
+		\setting{Update now} setting does.  Note that the \setting{Auto
+		Update} will only check for deleted files if the Directory Cache
+		(\setting{General Settings $\rightarrow$ System $\rightarrow$
+		Disk $\rightarrow$ Directory Cache}) is enabled.  
+		"Update now" includes that check whether dircache has been enabled or not.
+
+		\item[Initialize Now:  ]
+		Before you use the Tag Cache for the first time, you must initialize it by 
+		using the \setting{Initialize Now} function in the \setting{Tag Cache 
+		Menu}.  \setting{Initialize Now} removes all database files (removing 
+		runtimedb data also) and rebuilds the database from scratch. This takes 
+		approximately 5 to 10 minutes, and may require a restart to allow the 
+		files to be committed to the cache. 
+
+		The Tag Cache initialization happens in the background, so you can continue 
+		to listen to music while the Tag Cache is being initialized.  If you shut 
+		down your player during initialization, the database building process will 
+		continue next time you turn it on.
+
+		\item[Update Now:  ]
+		\setting{Update now} causes Tag Cache to detect new and deleted files 
+		Note that unlike the \setting{Auto Update} function, \setting{Update Now} 
+		will update the database regardless of whether the \setting{Directory Cache}
+		is enabled.  Thus, an update using \setting{Update now} may take a long
+		time.  Unlike \setting{Initialize Now}, the \setting{Update Now} function 
+		does not remove runtime database information.
+
+		\item[Gather Runtime Data (Experimental):  ]
+		When enabled, this option allows the most played, unplayed and most recently
+		played tracks to be logged and scored.
+
+		\item[Export modifications:  ]
+		This allows for the runtime data to be exported into 
+		\fname{/.rockbox/tagcache\_changelog.txt}, which backs up the runtime data in
+		ASCII format. This is needed when Tag Cache structures change, because new 
+		code cannot read old Tag Cache database code.  But, all modifications 
+		exported to ASCII format should be readable by all Tag Cache versions.
+
+		\item[Import modifications:  ]
+		Allows the \fname{/.rockbox/tagcache\_changelog.txt} backup to be 
+		conveniently loaded into the Tag Cache. This is performed automatically when
+		the Tag Cache is initialized.
+	
+	\end{description}
+
+\subsection{Using the Tag Cache}
+Once the Tag Cache has been initialized, you can browse your music by Artist, 
+Album, Genre and Song Name.  To use the Tag Cache, change the 
+\setting{Show Files} show mode by changing the \setting{General Settings 
+$\rightarrow$ File View $\rightarrow$ Show files} option to 
+\setting{ID3 database}.  This disables the \setting{File Browser} and instead
+allows you to view files using the information in the Tag Cache database.\\
+
+\note{You may need to increase the value of the \setting{Max files in dir 
+browser} setting (\setting{General Settings $\rightarrow$ System $\rightarrow$ 
+Limits}) in order to view long lists of tracks in the ID3 database browser.\\
+
+There is no option to turn off Tag Cache completely. If you do not want
+to use it just don't do the initial build of the database and do not load it
 to RAM.}
 %
 \begin{table}
