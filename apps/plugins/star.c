@@ -920,19 +920,27 @@ static int star_menu(void)
             case STAR_UP:
                 if (menu_y > 0) {
                     move_y = -1;
+#if LCD_DEPTH > 1
                     int oldforeground = rb->lcd_get_foreground();
                     rb->lcd_set_foreground(LCD_BLACK);
+#endif
                     rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 2, 15, char_height + 3);
+#if LCD_DEPTH > 1
                     rb->lcd_set_foreground(oldforeground);
+#endif
                 }
                 break;
             case STAR_DOWN:
                 if (menu_y < 3) {
                     move_y = 1;
+#if LCD_DEPTH > 1
                     int oldforeground = rb->lcd_get_foreground();
                     rb->lcd_set_foreground(LCD_BLACK);
+#endif
                     rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 1, 15, char_height + 2);
+#if LCD_DEPTH > 1
                     rb->lcd_set_foreground(oldforeground);
+#endif
                 }
                 break;
 
