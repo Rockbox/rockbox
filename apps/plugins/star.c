@@ -156,14 +156,14 @@ static int control;
 /* the current board */
 static char board[STAR_HEIGHT][STAR_WIDTH];
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 
 extern const fb_data star_tiles[];
 
 /* size of a tile */
-#if LCD_WIDTH >= 320
+#if LCD_WIDTH >= 320 && defined( HAVE_LCD_COLOR )
 #  define STAR_TILE_SIZE 20
-#elif LCD_WIDTH >= 220
+#elif LCD_WIDTH >= 220 && defined( HAVE_LCD_COLOR )
 #  define STAR_TILE_SIZE 13
 #else
 #  define STAR_TILE_SIZE 10
@@ -565,7 +565,7 @@ static void star_display_board_info(void)
                  current_level, star_count);
     rb->lcd_putsxy(0, label_offset_y, str_info);
 
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     if( control == STAR_CONTROL_BALL )
             rb->lcd_bitmap_part( star_tiles, 0,
                                  ball*STAR_TILE_SIZE, STAR_TILE_SIZE,
@@ -612,7 +612,7 @@ static int star_load_level(int current_level)
             board[y][x] = *ptr_tab;
             switch (*ptr_tab)
             {
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #   define DRAW_TILE( a )                                                    \
                     rb->lcd_bitmap_part( star_tiles, 0,                     \
                                          a*STAR_TILE_SIZE, STAR_TILE_SIZE,   \
@@ -627,7 +627,7 @@ static int star_load_level(int current_level)
                                          STAR_TILE_SIZE, STAR_TILE_SIZE);
 #endif
                 case STAR_VOID:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                     DRAW_TILE( space );
 #endif
                     break;
@@ -769,7 +769,7 @@ static int star_run_game(void)
             {
                 for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
                 {
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                     rb->lcd_bitmap_part(
                         star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
                         STAR_OFFSET_X + ball_x * STAR_TILE_SIZE,
@@ -818,7 +818,7 @@ static int star_run_game(void)
             {
                 for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
                 {
-#if HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                     rb->lcd_bitmap_part(
                         star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
                         STAR_OFFSET_X + block_x * STAR_TILE_SIZE,
@@ -1026,7 +1026,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (char_width == -1)
         rb->lcd_getstringsize("a", &char_width, &char_height);
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     rb->lcd_set_background( LCD_BLACK );
     rb->lcd_set_foreground( LCD_WHITE );
 #endif

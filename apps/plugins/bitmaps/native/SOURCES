@@ -138,7 +138,7 @@ flipit_tokens.20x20x2.bmp
 #endif
 
 /* Star */
-#ifdef HAVE_LCD_COLOR
+#if defined( HAVE_LCD_COLOR )
 #if LCD_WIDTH >= 320
 star_tiles.20x20.bmp
 #elif LCD_WIDTH >= 220
@@ -146,6 +146,8 @@ star_tiles.13x13.bmp
 #else
 star_tiles.10x10.bmp
 #endif
+#elif LCD_DEPTH > 1
+star_tiles.10x10.grey.bmp
 #endif
 
 /* Solitaire */
