@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2004 dionoea (Antoine Cellerier)
+ * Copyright (C) 2004-2006 Antoine Cellerier <dionoea -at- videolan -dot- org>
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -279,11 +279,11 @@ void push (int *stack, int y, int x){
 
 /* Unveil tiles and push them to stack if they are empty. */
 void unveil(int *stack, int y, int x){
-    
+
     if(x < c_width() || y < c_height() || x > c_width() + width-1
        || y > c_height() + height-1 || minefield[y][x].known
        || minefield[y][x].mine || minefield[y][x].flag) return;
-        
+
     if(minefield[y][x].neighbors == 0){
         minefield[y][x].known = 1;
         push(stack, y, x);
@@ -292,20 +292,20 @@ void unveil(int *stack, int y, int x){
 }
 
 void discover(int y, int x){
-    
+
     int stack[height*width];
-    
+
     /* Selected tile. */
     if(x < c_width() || y < c_height() || x > c_width() + width-1
        || y > c_height() + height-1 || minefield[y][x].known
        || minefield[y][x].mine || minefield[y][x].flag) return;
-                
+
     minefield[y][x].known = 1;
     /* Exit if the tile is not empty. (no mines nearby) */
     if(minefield[y][x].neighbors) return;
-    
+
     push(stack, y, x);
-        
+
     /* Scan all nearby tiles. If we meet a tile with a number we just unveil
        it. If we meet an empty tile, we push the location in stack. For each
        location in stack we do the same thing. (scan again all nearby tiles) */
@@ -313,11 +313,11 @@ void discover(int y, int x){
         /* Retrieve x, y from stack. */
         x = stack[stack_pos];
         y = stack[stack_pos-1];
-        
+
         /* Pop. */
         if(stack_pos > 0) stack_pos -= 2;
         else rb->splash(HZ,true,"ERROR");
-            
+
         unveil(stack, y-1, x-1);
         unveil(stack, y-1, x);
         unveil(stack, y-1, x+1);
@@ -326,7 +326,7 @@ void discover(int y, int x){
         unveil(stack, y+1, x);
         unveil(stack, y+1, x-1);
         unveil(stack, y, x-1);
-    }    
+    }
 }
 
 /* Reset the whole board for a new game. */
@@ -364,7 +364,7 @@ void minesweeper_putmines(int p, int x, int y){
             minefield[i][j].neighbors = 0;
         }
     }
-            
+
     /* we need to compute the neighbor element for each tile */
     for(i=c_height();i<c_height() + height;i++){
         for(j=c_width();j<c_width() + width;j++){
@@ -388,7 +388,7 @@ void minesweeper_putmines(int p, int x, int y){
             }
         }
     }
-    
+
     no_mines = false;
     /* In case the user is lucky and there are no mines positioned. */
     if(!mine_num && height*width != 1) minesweeper_putmines(p, x, y);
@@ -398,7 +398,7 @@ void minesweeper_putmines(int p, int x, int y){
    can easily be expanded, (just a call assigned to a button) as a solver. */
 void mine_show(void){
     int i, j, button;
-            
+
     for(i=c_height();i<c_height() + height;i++){
         for(j=c_width();j<c_width() + width;j++){
 #if LCD_DEPTH > 1
@@ -410,11 +410,11 @@ void mine_show(void){
 #endif
             if(!minefield[i][j].known){
                 if(minefield[i][j].mine){
-                    rb->lcd_set_drawmode(DRMODE_FG);
+                    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
                     rb->lcd_mono_bitmap(num[9], j*8,i*8,8,8);
                     rb->lcd_set_drawmode(DRMODE_SOLID);
                 } else if(minefield[i][j].neighbors){
-                    rb->lcd_set_drawmode(DRMODE_FG);
+                    rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
                     rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],
                                                         j*8,i*8,8,8);
                     rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -423,7 +423,7 @@ void mine_show(void){
         }
     }
     rb->lcd_update();
-    
+
     do
         button = rb->button_get(true);
     while ((button == BUTTON_NONE) || (button & (BUTTON_REL|BUTTON_REPEAT)));
@@ -492,7 +492,7 @@ int minesweeper(void)
             case (BUTTON_LEFT | BUTTON_REPEAT):
                 width = width%(LCD_WIDTH/8)+1;
                 break;
-                
+
             case MINESWP_RIGHT:
             case (MINESWP_RIGHT | BUTTON_REPEAT):
                 height--;
@@ -555,7 +555,7 @@ int minesweeper(void)
 #endif
                 if(minefield[i][j].known){
                     if(minefield[i][j].neighbors){
-                        rb->lcd_set_drawmode(DRMODE_FG);
+                        rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
                         rb->lcd_mono_bitmap(num[minefield[i][j].neighbors],
                                                               j*8,i*8,8,8);
                         rb->lcd_set_drawmode(DRMODE_SOLID);
@@ -591,7 +591,7 @@ int minesweeper(void)
 #endif
             case MINESWP_QUIT:
                 return MINESWEEPER_QUIT;
-                                                
+
                 /* move cursor left */
             case BUTTON_LEFT:
             case (BUTTON_LEFT | BUTTON_REPEAT):
@@ -630,9 +630,9 @@ int minesweeper(void)
                 /* lose on the first "click" */
                 if(tiles_left == width*height && no_mines)
                     minesweeper_putmines(p,x,y);
-                                
+
                 discover(y, x);
-                
+
                 if(minefield[y][x].mine){
                     return MINESWEEPER_LOSE;
                 }
