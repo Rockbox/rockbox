@@ -48,7 +48,8 @@ PLUGIN_HEADER
 #define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
-#ifdef HAVE_LCD_COLOR
+#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
+/* iPod 5G LCD is *slow* */
 #define STAR_SLEEP ;
 #else
 #define STAR_SLEEP rb->sleep(1);
@@ -94,6 +95,7 @@ PLUGIN_HEADER
 #define STAR_LEVEL_DOWN (BUTTON_MODE | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT (BUTTON_MODE | BUTTON_UP)
 #define STAR_MENU_RUN BUTTON_RIGHT
+#define STAR_MENU_RUN2 BUTTON_SELECT
 
 #define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -108,6 +110,7 @@ PLUGIN_HEADER
 #define STAR_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
 #define STAR_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_PLAY)
 #define STAR_MENU_RUN BUTTON_RIGHT
+#define STAR_MENU_RUN2 BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 
@@ -566,14 +569,14 @@ static void star_display_board_info(void)
     if( control == STAR_CONTROL_BALL )
             rb->lcd_bitmap_part( star_tiles, 0,
                                  ball*STAR_TILE_SIZE, STAR_TILE_SIZE,
-                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1,
+                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2,
                                  STAR_TILE_SIZE, STAR_TILE_SIZE);
     else
             rb->lcd_bitmap_part( star_tiles, 0,
                                  block*STAR_TILE_SIZE, STAR_TILE_SIZE,
-                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1,
+                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2,
                                  STAR_TILE_SIZE, STAR_TILE_SIZE);
-    rb->lcd_update_rect(0, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 + 1, LCD_WIDTH, STAR_TILE_SIZE );
+    rb->lcd_update_rect(0, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2, LCD_WIDTH, STAR_TILE_SIZE );
 #else
     if (control == STAR_CONTROL_BALL)
         rb->lcd_mono_bitmap (ball_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
@@ -915,17 +918,29 @@ static int star_menu(void)
             case STAR_QUIT:
                 return PLUGIN_OK;
             case STAR_UP:
-                if (menu_y > 0)
+                if (menu_y > 0) {
                     move_y = -1;
+                    int oldforeground = rb->lcd_get_foreground();
+                    rb->lcd_set_foreground(LCD_BLACK);
+                    rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 2, 15, char_height + 3);
+                    rb->lcd_set_foreground(oldforeground);
+                }
                 break;
             case STAR_DOWN:
-                if (menu_y < 3)
+                if (menu_y < 3) {
                     move_y = 1;
+                    int oldforeground = rb->lcd_get_foreground();
+                    rb->lcd_set_foreground(LCD_BLACK);
+                    rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 1, 15, char_height + 2);
+                    rb->lcd_set_foreground(oldforeground);
+                }
                 break;
 
             case STAR_MENU_RUN:
-#ifdef STAR_MENU_RUN3
+#ifdef STAR_MENU_RUN2
             case STAR_MENU_RUN2:
+#endif
+#ifdef STAR_MENU_RUN3
             case STAR_MENU_RUN3:
 #endif
                 refresh = true;
