@@ -44,6 +44,10 @@
 #include "lcd-remote.h"
 #endif
 
+#ifdef TARGET_TREE
+#include "button-target.h"
+#endif
+
 struct event_queue button_queue;
 
 static long lastbtn;   /* Last valid button status */
@@ -72,10 +76,7 @@ static bool remote_filter_first_keypress;
     (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define POWEROFF_BUTTON BUTTON_PLAY
 #define POWEROFF_COUNT 40
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT 10
-#else
+#elif !defined(TARGET_TREE)
 #define POWEROFF_BUTTON BUTTON_OFF
 #define POWEROFF_COUNT 10
 #endif
@@ -603,7 +604,10 @@ long button_get_w_tmo(int ticks)
 void button_init(void)
 {
     /* hardware inits */
-#if CONFIG_KEYPAD == IRIVER_H100_PAD
+#ifdef TARGET_TREE
+    button_init_device();
+    
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
     GPIO1_FUNCTION |= 0x00100062;
     GPIO1_ENABLE &= ~0x00100060;
@@ -614,11 +618,6 @@ void button_init(void)
     /* Set GPIO33, GPIO37, GPIO38  and GPIO52 as general purpose inputs */
     GPIO1_ENABLE &= ~0x00100060;
     GPIO1_FUNCTION |= 0x00100062;
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-    /* Power, Remote Play & Hold switch */
-    GPIO_FUNCTION |= 0x0e000000;
-    GPIO_ENABLE &= ~0x0e000000;
-
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
     PBCR1 &= 0xfffc;  /* PB8MD = 00 */
@@ -833,9 +832,14 @@ static int button_read(void)
 {
     int btn = BUTTON_NONE;
     int retval;
+#ifndef TARGET_TREE
     int data;
+#endif
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#ifdef TARGET_TREE
+    btn = button_read_device();
+    
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     static bool hold_button = false;
     static bool remote_hold_button = false;
     static int prev_data = 0xff;
@@ -1238,86 +1242,6 @@ static int button_read(void)
     (void)data;
     btn = ipod_3g_button_read();
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-    static bool hold_button = false;
-    static bool remote_hold_button = false;
-
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
-    /* TODO: add light handling for the remote */
-
-    hold_button = button_hold();
-    remote_hold_button = remote_button_hold();
-
-    /* normal buttons */
-    if (!hold_button)
-    {
-        data = adc_scan(ADC_BUTTONS);
-        if (data < 0xf0)
-        {
-            if(data < 0x7c)
-                if(data < 0x42)
-                    btn = BUTTON_LEFT;
-                else
-                    if(data < 0x62)
-                        btn = BUTTON_RIGHT;
-                    else
-                        btn = BUTTON_SELECT;
-            else
-                if(data < 0xb6)
-                    if(data < 0x98)
-                        btn = BUTTON_REC;
-                    else
-                        btn = BUTTON_PLAY;
-                else
-                    if(data < 0xd3)
-                        btn = BUTTON_DOWN;
-                    else
-                        btn = BUTTON_UP;
-        }
-    }
-
-    /* remote buttons */
-    data = adc_scan(ADC_REMOTE);
-    if(data < 0x17)
-        remote_hold_button = true;
-
-    if(!remote_hold_button)
-    {
-        if (data < 0xee)
-        {
-            if(data < 0x7a)
-                if(data < 0x41)
-                    btn |= BUTTON_RC_REW;
-                else
-                    if(data < 0x61)
-                        btn |= BUTTON_RC_FF;
-                    else
-                        btn |= BUTTON_RC_MODE;
-            else
-                if(data < 0xb4)
-                    if(data < 0x96)
-                        btn |= BUTTON_RC_REC;
-                    else
-                        btn |= BUTTON_RC_MENU;
-                else
-                    if(data < 0xd1)
-                        btn |= BUTTON_RC_VOL_UP;
-                    else
-                        btn |= BUTTON_RC_VOL_DOWN;
-        }
-    }
-
-    data = GPIO_READ;
-    if (!(data & 0x04000000))
-        btn |= BUTTON_POWER;
-
-    if (!(data & 0x02000000))
-        btn |= BUTTON_RC_PLAY;
-
 #endif /* CONFIG_KEYPAD */
 
 #ifdef HAVE_LCD_BITMAP
@@ -1372,18 +1296,6 @@ bool remote_button_hold(void)
 bool button_hold(void)
 {
     return (GPIO5_READ & 4) ? false : true;
-}
-#endif
-
-#if (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-bool button_hold(void)
-{
-    return (GPIO_READ & 0x08000000)?false:true;
-}
-
-bool remote_button_hold(void)
-{
-    return false; /* TODO X5 */
 }
 #endif
 

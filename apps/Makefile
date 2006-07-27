@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
+INCLUDES= $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR)	\
  -I$(BUILDDIR)/bitmaps -I$(OBJDIR)
 
 DEPFILE = $(OBJDIR)/dep-apps

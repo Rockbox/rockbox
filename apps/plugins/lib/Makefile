@@ -10,7 +10,7 @@
 # ../.. for the plugin.h in the apps dir
 # .. for stuff in the plugins dir
 # . for stuff in the pluginlib dir
-INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
+INCLUDES=-I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(BUILDDIR)
 
 ifdef APPEXTRA

@@ -7,7 +7,7 @@
 # $Id$
 #
 
-INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
+INCLUDES = $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
  -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR) \
  -I$(BUILDDIR)/pluginbitmaps
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(EXTRA_DEFINES)	\

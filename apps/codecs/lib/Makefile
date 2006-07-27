@@ -10,7 +10,7 @@
 # ../.. for the codec.h in the apps dir
 # .. for stuff in the codecs dir
 # . for stuff in the codeclib dir
-INCLUDES=-I$(APPSDIR) -I.. -I. -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
+INCLUDES=-I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export	\
  -I$(FIRMDIR)/common -I$(BUILDDIR)
 
 ifdef APPEXTRA

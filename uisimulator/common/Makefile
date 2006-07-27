@@ -23,7 +23,7 @@ RM = rm -f
 DEBUG = -g
 
 # Use this for simulator-only files
-INCLUDES = -I. -I$(OBJDIR) -I$(FIRMDIR)/export -I$(APPSDIR)	\
+INCLUDES = -I. -I$(OBJDIR) $(TARGET_INC) -I$(FIRMDIR)/export -I$(APPSDIR)	\
 -I$(ROOTDIR)/uisimulator/$(SIMVER) -I$(BUILDDIR)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES

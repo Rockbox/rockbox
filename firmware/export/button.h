@@ -23,8 +23,7 @@
 #include <stdbool.h>
 #include "config.h"
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-    (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
@@ -63,6 +62,10 @@ bool remote_button_hold(void);
 #define BUTTON_REL          0x02000000
 #define BUTTON_REPEAT       0x04000000
 
+
+#ifdef TARGET_TREE
+#include "button-target.h"
+#else
 
   /* Target specific button codes */
 
@@ -258,44 +261,6 @@ bool remote_button_hold(void);
 
 #define BUTTON_REMOTE 0
 
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-
-/* iaudio X5 specific button codes */
-
-    /* Main unit's buttons */
-#define BUTTON_POWER        0x00000001
-#define BUTTON_REC          0x00000002
-
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_UP           0x00000010
-#define BUTTON_DOWN         0x00000020
-
-#define BUTTON_PLAY         0x00000040
-#define BUTTON_SELECT       0x00000080
-
-#define BUTTON_MAIN (BUTTON_POWER|BUTTON_PLAY|BUTTON_LEFT|BUTTON_RIGHT\
-                |BUTTON_UP|BUTTON_DOWN|BUTTON_REC|BUTTON_SELECT)
-
-    /* Remote control's buttons */
-#define BUTTON_RC_PLAY      0x00100000
-
-#define BUTTON_RC_REW       0x00080000
-#define BUTTON_RC_FF        0x00040000
-#define BUTTON_RC_VOL_UP    0x00020000
-#define BUTTON_RC_VOL_DOWN  0x00010000
-
-#define BUTTON_RC_REC       0x00008000
-#define BUTTON_RC_MENU      0x00004000
-
-#define BUTTON_RC_MODE      0x00002000
-
-#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN\
-                |BUTTON_RC_REW|BUTTON_RC_FF\
-                |BUTTON_RC_REC|BUTTON_RC_MENU|BUTTON_RC_MODE)
-
-
-
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 /* Toshiba Gigabeat specific button codes */
 
@@ -336,6 +301,8 @@ bool remote_button_hold(void);
 
 
 #endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
+
+#endif /* TARGET_TREE */
 
 #endif /* _BUTTON_H_ */
 
