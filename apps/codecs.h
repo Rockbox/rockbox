@@ -36,7 +36,6 @@
 #include "config.h"
 #include "dir.h"
 #include "kernel.h"
-#include "button.h"
 #include "font.h"
 #include "system.h"
 #include "id3.h"
