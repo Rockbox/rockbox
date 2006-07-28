@@ -19,6 +19,7 @@
 #include "config.h"
 #include "system.h"
 #include "kernel.h"
+#include "lcd-remote.h"
 
 /* The LCD in the iAudio M3/M5/X5 remote control is a Tomato LSI 0350 */
 
@@ -39,6 +40,7 @@
 #define	LCD_SET_GRAY       0x88
 #define	LCD_SET_PWM_FRC    0x90
 #define	LCD_SET_POWER_SAVE 0xa8
+#define LCD_REVERSE        0xa6
 
 #define CS_LO      and_l(~0x00000020, &GPIO1_OUT)
 #define CS_HI      or_l(0x00000020, &GPIO1_OUT)
@@ -51,8 +53,12 @@
 
 #define LCD_REMOTE_DEFAULT_CONTRAST 0x18;
 
+/* cached settings values */
+static bool cached_invert = false;
+static bool cached_flip = false;
 static int cached_contrast = LCD_REMOTE_DEFAULT_CONTRAST;
-static bool remote_initialized = false;
+
+bool remote_initialized = false;
 
 static void remote_write(unsigned char byte, bool is_command)
 {
@@ -94,13 +100,6 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
         remote_write(*p_bytes++, false);
 }
 
-void remote_set_row_and_col(int row, int col)
-{
-    lcd_remote_write_command(LCD_SET_PAGE | (row & 0xf));
-    lcd_remote_write_command_ex(LCD_SET_COLUMN | ((col >> 4) & 0xf),
-                                col & 0xf);
-}
-
 int lcd_remote_default_contrast(void)
 {
     return LCD_REMOTE_DEFAULT_CONTRAST;
@@ -108,24 +107,27 @@ int lcd_remote_default_contrast(void)
 
 void lcd_remote_powersave(bool on)
 {
-    if (on)
-        lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
-    else
-        lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
+    if(remote_initialized) {
+        if (on)
+            lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
+        else
+            lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
+    }
 }
 
 void lcd_remote_set_contrast(int val)
 {
     cached_contrast = val;
-    lcd_remote_write_command_ex(LCD_SET_VOLUME, val);
+    if(remote_initialized)
+        lcd_remote_write_command_ex(LCD_SET_VOLUME, val);
 }
 
 bool remote_detect(void)
 {
-    return (GPIO_READ & 0x01000000);
+    return (GPIO_READ & 0x01000000)?false:true;
 }
 
-void remote_init(void)
+void lcd_remote_init_device(void)
 {
     or_l(0x0000e000, &GPIO_OUT);
     or_l(0x0000e000, &GPIO_ENABLE);
@@ -135,16 +137,17 @@ void remote_init(void)
     or_l(0x00000020, &GPIO1_ENABLE);
     or_l(0x00000020, &GPIO1_FUNCTION);
 	
+    and_l(~0x01000000, &GPIO_OUT);
+    and_l(~0x01000000, &GPIO_ENABLE);
+    or_l(0x01000000, &GPIO_FUNCTION);
+}
+
+void lcd_remote_on(void)
+{
     sleep(10);
 	
     lcd_remote_write_command(LCD_SET_DUTY_RATIO);
     lcd_remote_write_command(0x70);  /* 1/128 */
-    
-    lcd_remote_write_command(LCD_SELECT_ADC | 1); /* Reverse direction */
-    lcd_remote_write_command(LCD_SELECT_SHL | 8); /* Reverse direction */
-    
-    lcd_remote_write_command(LCD_SET_COM0);
-    lcd_remote_write_command(0x00);
     
     lcd_remote_write_command(LCD_OSC_ON);
     
@@ -173,5 +176,90 @@ void remote_init(void)
 
     remote_initialized = true;
 
+    lcd_remote_set_flip(cached_flip);
     lcd_remote_set_contrast(cached_contrast);
+    lcd_remote_set_invert_display(cached_invert);
+}
+
+void lcd_remote_off(void)
+{
+    remote_initialized = false;
+    CS_HI;
+    RS_HI;
+}
+
+/* Update the display.
+   This must be called after all other LCD functions that change the display. */
+void lcd_remote_update(void) ICODE_ATTR;
+void lcd_remote_update(void)
+{
+    int y;
+    if(remote_initialized) {
+        for(y = 0;y < LCD_REMOTE_HEIGHT/8;y++) {
+            /* Copy display bitmap to hardware.
+               The COM48-COM63 lines are not connected so we have to skip
+               them. Further, the column address doesn't wrap, so we
+               have to update one page at a time. */
+            lcd_remote_write_command(LCD_SET_PAGE | (y>5?y+2:y));
+            lcd_remote_write_command_ex(LCD_SET_COLUMN | 0, 0);
+            lcd_remote_write_data((unsigned char *)lcd_remote_framebuffer[y],
+                                  LCD_REMOTE_WIDTH*2);
+        }
+    }
+}
+
+/* Update a fraction of the display. */
+void lcd_remote_update_rect(int, int, int, int) ICODE_ATTR;
+void lcd_remote_update_rect(int x, int y, int width, int height)
+{
+    if(remote_initialized) {
+        int ymax;
+
+        /* The Y coordinates have to work on even 8 pixel rows */
+        ymax = (y + height-1) >> 3;
+        y >>= 3;
+
+        if(x + width > LCD_REMOTE_WIDTH)
+            width = LCD_REMOTE_WIDTH - x;
+        if (width <= 0)
+            return; /* nothing left to do, 0 is harmful to lcd_write_data() */
+        if(ymax >= LCD_REMOTE_HEIGHT)
+            ymax = LCD_REMOTE_HEIGHT-1;
+
+        /* Copy specified rectangle bitmap to hardware
+           COM48-COM63 are not connected, so we need to skip those */
+        for (; y <= ymax; y++) 
+        {
+            lcd_remote_write_command(LCD_SET_PAGE |
+                                     ((y > 5?y + 2:y) & 0xf));
+            lcd_remote_write_command_ex(LCD_SET_COLUMN | ((x >> 4) & 0xf),
+                                        x & 0xf);
+
+            lcd_remote_write_data (
+                (unsigned char *)&lcd_remote_framebuffer[y][x], width*2);
+        } 
+    }
+}
+
+void lcd_remote_set_invert_display(bool yesno)
+{
+    cached_invert = yesno;
+    if(remote_initialized)
+        lcd_remote_write_command(LCD_REVERSE | yesno);
+}
+
+void lcd_remote_set_flip(bool yesno)
+{
+    cached_flip = yesno;
+    if(remote_initialized) {
+        if(yesno) {
+            lcd_remote_write_command(LCD_SELECT_ADC | 0);
+            lcd_remote_write_command(LCD_SELECT_SHL | 0);
+            lcd_remote_write_command_ex(LCD_SET_COM0, 16);
+        } else {
+            lcd_remote_write_command(LCD_SELECT_ADC | 1);
+            lcd_remote_write_command(LCD_SELECT_SHL | 8);
+            lcd_remote_write_command_ex(LCD_SET_COM0, 0);
+        }
+    }
 }

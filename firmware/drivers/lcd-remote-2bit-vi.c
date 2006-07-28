@@ -33,6 +33,7 @@
 #include "font.h"
 #include "rbunicode.h"
 #include "bidi.h"
+#include "lcd-remote-target.h"
 
 #define SCROLLABLE_LINES (((LCD_REMOTE_HEIGHT+4)/5 < 32) ? (LCD_REMOTE_HEIGHT+4)/5 : 32)
 
@@ -67,18 +68,12 @@ static const char scroll_tick_table[16] = {
     100, 80, 64, 50, 40, 32, 25, 20, 16, 12, 10, 8, 6, 5, 4, 3
 };
 
-
-/* LCD init */
-void lcd_remote_init(void)
-{
-    lcd_remote_clear_display();
-#if 0 /* FIXME */
-    /* Call device specific init */
-    remote_init();
+/* remote hotplug */
+#ifndef SIMULATOR
+static struct event_queue remote_scroll_queue;
+#define REMOTE_INIT_LCD   1
+#define REMOTE_DEINIT_LCD 2
 #endif
-    create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name);
-}
 
 /*** parameter handling ***/
 
@@ -1020,6 +1015,51 @@ void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *stri
         scrolling_lines &= ~(1<<y);
 }
 
+#ifndef SIMULATOR
+/* Monitor remote hotswap */
+static void remote_tick(void)
+{
+    static bool last_status = false;
+    static int countdown = 0;
+    static int init_delay = 0;
+    bool current_status;
+
+    current_status = remote_detect();
+    
+    /* Only report when the status has changed */
+    if (current_status != last_status)
+    {
+        last_status = current_status;
+        countdown = current_status ? 20*HZ : 1;
+    }
+    else
+    {
+        /* Count down until it gets negative */
+        if (countdown >= 0)
+            countdown--;
+            
+        if (current_status)
+        {
+            if (!(countdown % 8))
+            {
+                if (--init_delay <= 0)
+                {
+                    queue_post(&remote_scroll_queue, REMOTE_INIT_LCD, 0);
+                    init_delay = 6;
+                }
+            }
+        }
+        else
+        {
+            if (countdown == 0)
+            {
+                queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
+            }
+        }
+    }
+}
+#endif
+
 static void scroll_thread(void)
 {
     struct font* pf;
@@ -1027,11 +1067,42 @@ static void scroll_thread(void)
     int index;
     int xpos, ypos;
     int lastmode;
+    long delay = 0;
+    long next_tick = current_tick;
+#ifndef SIMULATOR
+    struct event ev;
+#endif
 
     /* initialize scroll struct array */
     scrolling_lines = 0;
 
     while ( 1 ) {
+
+#ifdef SIMULATOR
+        sleep(delay);
+#else
+        if (remote_initialized)
+            queue_wait_w_tmo(&remote_scroll_queue, &ev, delay);
+        else
+            queue_wait(&remote_scroll_queue, &ev);
+
+        switch (ev.id)
+        {
+            case REMOTE_INIT_LCD:
+                lcd_remote_on();
+                lcd_remote_update();
+                break;
+                
+            case REMOTE_DEINIT_LCD:
+                lcd_remote_off();
+                break;
+        }
+
+        delay = next_tick - current_tick - 1;
+        if (delay >= 0)
+            continue;
+#endif
+
         for ( index = 0; index < SCROLLABLE_LINES; index++ ) {
             /* really scroll? */
             if ( !(scrolling_lines&(1<<index)) )
@@ -1080,6 +1151,34 @@ static void scroll_thread(void)
             lcd_remote_update_rect(xpos, ypos, LCD_REMOTE_WIDTH - xpos, pf->height);
         }
 
-        sleep(scroll_ticks);
+
+        next_tick += scroll_ticks;
+        delay = next_tick - current_tick - 1;
+        if (delay < 0)
+        {
+            next_tick = current_tick + 1;
+            delay = 0;
+        }
     }
 }
+
+/* LCD init */
+#ifdef SIMULATOR
+void lcd_remote_init(void)
+{
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
+}
+#else
+void lcd_remote_init(void)
+{
+    /* Call device specific init */
+    lcd_remote_init_device();
+    
+    lcd_remote_clear_display();
+    queue_clear(&remote_scroll_queue); /* no queue_init() -- private queue */
+    tick_add_task(remote_tick);
+    create_thread(scroll_thread, scroll_stack,
+                  sizeof(scroll_stack), scroll_name);
+}
+#endif

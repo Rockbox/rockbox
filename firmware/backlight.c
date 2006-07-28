@@ -336,12 +336,21 @@ static void _backlight_off(void)
 }
 
 #ifdef HAVE_REMOTE_LCD
+#ifdef SIMULATOR
+static void __remote_backlight_on(void)
+{
+    sim_remote_backlight(100);
+}
+
+static void __remote_backlight_off(void)
+{
+    sim_remote_backlight(0);
+}
+#else
 #ifndef TARGET_TREE
 static void __remote_backlight_on(void)
 {
-#ifdef SIMULATOR
-    sim_remote_backlight(100);
-#elif defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H300_SERIES)
     and_l(~0x00000002, &GPIO1_OUT);
 #else
     and_l(~0x00000800, &GPIO_OUT);
@@ -350,9 +359,7 @@ static void __remote_backlight_on(void)
 
 static void __remote_backlight_off(void)
 {
-#ifdef SIMULATOR
-    sim_remote_backlight(0);
-#elif defined(IRIVER_H300_SERIES)
+#if defined(IRIVER_H300_SERIES)
     or_l(0x00000002, &GPIO1_OUT);
 #else
     or_l(0x00000800, &GPIO_OUT);
@@ -360,6 +367,7 @@ static void __remote_backlight_off(void)
 }
 #endif /* TARGET_TREE */
 #endif /* HAVE_REMOTE_LCD */
+#endif /* SIMULATOR */
 
 void backlight_thread(void)
 {
