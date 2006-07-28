@@ -6,7 +6,7 @@ lcd-bitmap.c
 lcd-charcell.c
 #endif
 #ifdef HAVE_REMOTE_LCD
-lcd-remote.c
+lcd-remote-bitmap.c
 #endif
 lcd-sdl.c
 sound.c

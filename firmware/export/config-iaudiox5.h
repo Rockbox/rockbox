@@ -27,17 +27,18 @@
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
-#define LCD_REMOTE_HEIGHT 64
-#define LCD_REMOTE_DEPTH  1
+#define LCD_REMOTE_HEIGHT 96
+#define LCD_REMOTE_DEPTH  2
+
+#define LCD_REMOTE_PIXELFORMAT VERTICAL_INTERLEAVED
 
 #define CONFIG_KEYPAD IAUDIO_X5_PAD
 
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
-/* Define this if you have an remote lcd
+/* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
-*/
 
 #define CONFIG_LCD LCD_X5
 

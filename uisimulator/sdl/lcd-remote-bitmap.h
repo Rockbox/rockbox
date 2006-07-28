@@ -21,6 +21,7 @@
 #define __LCDREMOTE_H__
 
 #include "lcd.h"
+#include "lcd-remote.h"
 #include "SDL.h"
 
 void sim_lcd_remote_init(void);

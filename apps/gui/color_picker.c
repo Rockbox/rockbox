@@ -73,6 +73,10 @@
 #define SLIDER_OK        BUTTON_SELECT
 #define SLIDER_CANCEL    BUTTON_PLAY
 
+/* FIXME: chosen at will to make it compile */
+#define SLIDER_RC_OK     BUTTON_RC_PLAY
+#define SLIDER_RC_CANCEL BUTTON_RC_REC
+
 #endif
 
 static const int max_val[3] = {LCD_MAX_RED,LCD_MAX_GREEN,LCD_MAX_BLUE};

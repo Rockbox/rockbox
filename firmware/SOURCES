@@ -80,6 +80,13 @@ drivers/lcd-h100.c
 drivers/lcd-16bit.c
 #endif
 #endif
+#ifdef HAVE_REMOTE_LCD
+#if LCD_REMOTE_DEPTH == 1
+drivers/lcd-h100-remote.c
+#elif LCD_REMOTE_DEPTH == 2
+drivers/lcd-remote-2bit-vi.c
+#endif
+#endif
 #if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR || CONFIG_LCD == LCD_IPOD2BPP
 drivers/lcd-ipod.c
 #endif
@@ -177,9 +184,6 @@ usb.c
 #if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
 bitswap.S
 descramble.S
-#endif
-#ifdef HAVE_REMOTE_LCD
-drivers/lcd-h100-remote.c
 #endif
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 drivers/uda1380.c

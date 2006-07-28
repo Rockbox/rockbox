@@ -104,7 +104,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 24
+#define PLUGIN_API_VERSION 25
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -221,7 +221,7 @@ struct plugin_api {
     void (*lcd_remote_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_remote_puts_scroll_style)(int x, int y, const unsigned char* string,
                                          int style);
-    unsigned char* lcd_remote_framebuffer;
+    fb_remote_data* lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);
 
@@ -528,6 +528,16 @@ struct plugin_api {
     unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
     const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
     struct font* (*font_load)(const char *path);
+#endif
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+    void     (*lcd_remote_set_foreground)(unsigned foreground);
+    unsigned (*lcd_remote_get_foreground)(void);
+    void     (*lcd_remote_set_background)(unsigned foreground);
+    unsigned (*lcd_remote_get_background)(void);
+    void (*lcd_remote_bitmap_part)(const fb_remote_data *src, int src_x, int src_y,
+                                   int stride, int x, int y, int width, int height);
+    void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
+                              int height);
 #endif
 };
 

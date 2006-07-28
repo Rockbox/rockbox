@@ -140,8 +140,8 @@ static void snow_move(void)
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {
-                rb->lcd_remote_bitmap(flake,particles[i][0],particles[i][1],
-                                      FLAKE_WIDTH,FLAKE_WIDTH);
+                rb->lcd_remote_mono_bitmap(flake,particles[i][0],particles[i][1],
+                                           FLAKE_WIDTH,FLAKE_WIDTH);
             }
 #endif
         }

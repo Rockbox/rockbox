@@ -326,6 +326,12 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
         dst_h = height;
         dst_d = 8;
         break;
+        
+      case 7: /* greyscale X5 remote 4-grey */
+        dst_w = width;
+        dst_h = (height + 7) / 8;
+        dst_d = 16;
+        break;
 
       default: /* unknown */
         debugf("error - Undefined destination format\n");
@@ -403,6 +409,17 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
             {
                 (*dest)[row * dst_w + (col/4)] |=
                        (~brightness(src[row * width + col]) & 0xC0) >> (2 * (col & 3));
+            }
+        break;
+        
+      case 7: /* greyscale X5 remote 4-grey */
+        for (row = 0; row < height; row++)
+            for (col = 0; col < width; col++)
+            {
+                unsigned short data = (~brightness(src[row * width + col]) & 0xC0) >> 6;
+                
+                data = (data | (data << 7)) & 0x0101;
+                (*dest)[(row/8) * dst_w + col] |= data << (row & 7);
             }
         break;
     }
@@ -514,10 +531,11 @@ void print_usage(void)
            "\t         0  Archos recorder, Ondio, Gmini 120/SP, Iriver H1x0 mono\n"
            "\t         1  Archos player graphics library\n"
            "\t         2  Iriver H1x0 4-grey\n"
-           "\t         3  Canonical 8-bit grayscale\n"
+           "\t         3  Canonical 8-bit greyscale\n"
            "\t         4  16-bit packed 5-6-5 RGB (iriver H300)\n"
            "\t         5  16-bit packed and byte-swapped 5-6-5 RGB (iPod)\n"
-           "\t         6  Greayscale iPod 4-grey\n"
+           "\t         6  Greyscale iPod 4-grey\n"
+           "\t         7  Greyscale X5 remote 4-grey\n"
            , APPLICATION_NAME);
     printf("build date: " __DATE__ "\n\n");
 }

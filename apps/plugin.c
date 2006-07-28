@@ -454,6 +454,14 @@ static const struct plugin_api rockbox_api = {
     font_get_bits,
     font_load,
 #endif
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+    lcd_remote_set_foreground,
+    lcd_remote_get_foreground,
+    lcd_remote_set_background,
+    lcd_remote_get_background,
+    lcd_remote_bitmap_part,
+    lcd_remote_bitmap,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

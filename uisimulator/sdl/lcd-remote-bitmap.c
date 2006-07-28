@@ -19,7 +19,7 @@
 
 #include "uisdl.h"
 #include "lcd-sdl.h"
-#include "lcd-remote.h"
+#include "lcd-remote-bitmap.h"
 
 SDL_Surface *remote_surface;
 
@@ -27,10 +27,15 @@ SDL_Color remote_color_zero = {UI_REMOTE_BGCOLOR, 0};
 SDL_Color remote_backlight_color_zero = {UI_REMOTE_BGCOLORLIGHT, 0};
 SDL_Color remote_color_max  = {0, 0, 0, 0};
 
-extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
-
 static unsigned long get_lcd_remote_pixel(int x, int y) {
-    return ((lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1);
+#if LCD_REMOTE_DEPTH == 1
+    return (lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 1;
+#elif LCD_REMOTE_DEPTH == 2
+#if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
+    unsigned bits = (lcd_remote_framebuffer[y/8][x] >> (y & 7)) & 0x0101;
+    return (bits | (bits >> 7)) & 3;
+#endif
+#endif
 }
 
 void lcd_remote_update (void)

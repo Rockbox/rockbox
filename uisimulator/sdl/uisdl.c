@@ -31,7 +31,7 @@
 #include "lcd-charcell.h"
 #endif
 #ifdef HAVE_REMOTE_LCD
-#include "lcd-remote.h"
+#include "lcd-remote-bitmap.h"
 #endif
 #include "thread-sdl.h"
 #include "SDL_mutex.h"
