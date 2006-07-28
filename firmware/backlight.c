@@ -336,6 +336,7 @@ static void _backlight_off(void)
 }
 
 #ifdef HAVE_REMOTE_LCD
+#ifndef TARGET_TREE
 static void __remote_backlight_on(void)
 {
 #ifdef SIMULATOR
@@ -357,6 +358,7 @@ static void __remote_backlight_off(void)
     or_l(0x00000800, &GPIO_OUT);
 #endif
 }
+#endif /* TARGET_TREE */
 #endif /* HAVE_REMOTE_LCD */
 
 void backlight_thread(void)
