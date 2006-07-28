@@ -94,7 +94,7 @@ static struct event_queue remote_scroll_queue;
 #define REMOTE_DEINIT_LCD 2
 
 static bool remote_initialized = false;
-static int _remote_type = 0;
+static int _remote_type = REMOTETYPE_UNPLUGGED;
 
 /* cached settings values */
 static bool cached_invert = false;
@@ -506,7 +506,7 @@ static void remote_tick(void)
         {
             if (countdown == 0)
             {
-                _remote_type = 0;
+                _remote_type = REMOTETYPE_UNPLUGGED;
 
                 queue_post(&remote_scroll_queue, REMOTE_DEINIT_LCD, 0);
             }
