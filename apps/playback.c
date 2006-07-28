@@ -2157,6 +2157,10 @@ static void initiate_track_change(long direction)
     if (playlist_check(direction))
     {
         playlist_end = false;
+        /* Flag track changed immediately so wps can update instantly.
+         * No need to wait for disk to spin up or message to travel
+         * through the deep queues as this info is only for the wps. */
+        track_changed = true;
         ci.new_track += direction;
     }
 }
@@ -2474,7 +2478,7 @@ struct mp3entry* audio_current_track(void)
     int cur_idx = track_ridx + ci.new_track;
 
     if (cur_idx >= MAX_TRACK)
-        cur_idx += MAX_TRACK;
+        cur_idx -= MAX_TRACK;
     else if (cur_idx < 0)
         cur_idx += MAX_TRACK;
 
@@ -2572,7 +2576,10 @@ void audio_next(void)
     if (global_settings.beep)
         pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
+    /* Should be safe to do outside of thread, that way we get
+     * the instant wps response at least. */
+    initiate_track_change(1);
+    // queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
 }
 
 void audio_prev(void)
@@ -2580,7 +2587,8 @@ void audio_prev(void)
     if (global_settings.beep)
         pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-    queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
+    initiate_track_change(-1);
+    // queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
 }
 
 void audio_next_dir(void)
