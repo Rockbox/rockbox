@@ -34,7 +34,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 
-#define SCROLLABLE_LINES 26
+#define SCROLLABLE_LINES (((LCD_HEIGHT+4)/5 < 32) ? (LCD_HEIGHT+4)/5 : 32)
 
 /*** globals ***/
 
@@ -148,21 +148,28 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 static void setpixel(int x, int y)
 {
-    unsigned char *data = &lcd_framebuffer[y][x>>2];
     unsigned mask = pixmask[x & 3];
-    *data = (*data & ~mask) | (fg_pattern & mask);
+    fb_data *address = &lcd_framebuffer[y][x>>2];
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ fg_pattern) & mask);
 }
 
 static void clearpixel(int x, int y)
 {
-    unsigned char *data = &lcd_framebuffer[y][x>>2];
     unsigned mask = pixmask[x & 3];
-    *data = (*data & ~mask) | (bg_pattern & mask);
+    fb_data *address = &lcd_framebuffer[y][x>>2];
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ bg_pattern) & mask);
 }
 
 static void flippixel(int x, int y)
 {
-    lcd_framebuffer[y][x>>2] ^=  pixmask[x & 3];
+    unsigned mask =  pixmask[x & 3];
+    fb_data *address = &lcd_framebuffer[y][x>>2];
+    
+    *address ^= mask;
 }
 
 static void nopixel(int x, int y)
@@ -177,34 +184,34 @@ lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
 };
 
 /* 'mask' and 'bits' contain 2 bits per pixel */
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipblock(fb_data *address, unsigned mask, unsigned bits)
                       ICODE_ATTR;
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipblock(fb_data *address, unsigned mask, unsigned bits)
 {
     *address ^= bits & mask;
 }
 
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bgblock(fb_data *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bgblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & ~bits);
 }
 
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fgblock(fb_data *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fgblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask & bits);
 }
 
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidblock(fb_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
     unsigned bgp  = bg_pattern;
@@ -213,34 +220,34 @@ static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
                          ICODE_ATTR;
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
 {
     *address ^= ~bits & mask;
 }
 
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bginvblock(fb_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bginvblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & bits);
 }
 
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fginvblock(fb_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fginvblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
 
     *address = data ^ ((data ^ fg_pattern) & mask & ~bits);
 }
 
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
                           ICODE_ATTR;
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
     unsigned fgp  = fg_pattern;
@@ -254,7 +261,7 @@ lcd_blockfunc_type* const lcd_blockfuncs[8] = {
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
 
-static inline void setblock(unsigned char *address, unsigned mask, unsigned bits)
+static inline void setblock(fb_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
     
@@ -510,11 +517,11 @@ void lcd_fillrect(int x, int y, int width, int height)
 /* About Rockbox' internal monochrome bitmap format:
  *
  * A bitmap contains one bit for every pixel that defines if that pixel is
- * black (1) or white (0). Bits within a byte are arranged horizontally, LSB
+ * black (1) or white (0). Bits within a byte are arranged vertically, LSB
  * at top.
  * The bytes are stored in row-major order, with byte 0 being top left,
- * byte 1 2nd from left etc. The first row of bytes defines pixel row
- * 0, the second row defines pixel row 1 etc. */
+ * byte 1 2nd from left etc. The first row of bytes defines pixel rows
+ * 0..7, the second row defines pixel row 8..15 etc. */
 
 /* Draw a partial monochrome bitmap */
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
@@ -937,15 +944,9 @@ static void scroll_thread(void)
             }
 
             lastmode = drawmode;
-            drawmode = (DRMODE_SOLID|DRMODE_INVERSEVID);
-            lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            drawmode = DRMODE_SOLID;
-            lcd_putsxyofs(xpos, ypos, s->offset, (unsigned char *)s->line);
-            if (s->invert)
-            {
-                drawmode = DRMODE_COMPLEMENT;
-                lcd_fillrect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
-            }
+            drawmode = s->invert ?
+                       (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
+            lcd_putsxyofs(xpos, ypos, s->offset, s->line);
             drawmode = lastmode;
             lcd_update_rect(xpos, ypos, LCD_WIDTH - xpos, pf->height);
         }

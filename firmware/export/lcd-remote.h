@@ -27,14 +27,58 @@
 
 #ifdef HAVE_REMOTE_LCD
 
-#define STYLE_DEFAULT 0
-#define STYLE_INVERT  1
-
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define REMOTETYPE_H100_LCD 1
 #define REMOTETYPE_H300_LCD 2
 #define REMOTETYPE_H300_NONLCD 3
 extern int remote_type(void);
+#endif
+
+#define STYLE_DEFAULT 0
+#define STYLE_INVERT  1
+
+#if LCD_REMOTE_DEPTH <= 8
+#if (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED) \
+ || (LCD_REMOTE_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
+typedef unsigned short fb_remote_data;
+#else
+typedef unsigned char fb_remote_data;
+#endif
+#elif LCD_DEPTH <= 16
+typedef unsigned short fb_remote_data;
+#else
+typedef unsigned long fb_remote_data;
+#endif
+
+#ifndef LCD_REMOTE_FBWIDTH
+#define LCD_REMOTE_FBWIDTH LCD_REMOTE_WIDTH
+#endif
+
+/* Low-level drawing function types */
+typedef void lcd_remote_pixelfunc_type(int x, int y);
+typedef void lcd_remote_blockfunc_type(fb_remote_data *address, unsigned mask,
+                                       unsigned bits);
+
+#if LCD_REMOTE_DEPTH > 1 /* greyscale */
+#define LCD_REMOTE_MAX_LEVEL ((1 << LCD_REMOTE_DEPTH) - 1)
+#define LCD_REMOTE_BRIGHTNESS(y) (((y) * LCD_REMOTE_MAX_LEVEL + 127) / 255)
+
+#define LCD_REMOTE_BLACK      LCD_REMOTE_BRIGHTNESS(0)
+#define LCD_REMOTE_DARKGRAY   LCD_REMOTE_BRIGHTNESS(85)
+#define LCD_REMOTE_LIGHTGRAY  LCD_REMOTE_BRIGHTNESS(170)
+#define LCD_REMOTE_WHITE      LCD_REMOTE_BRIGHTNESS(255)
+#define LCD_REMOTE_DEFAULT_FG LCD_REMOTE_BLACK
+#define LCD_REMOTE_DEFAULT_BG LCD_REMOTE_WHITE
+
+#endif
+
+/* Memory copy of display bitmap */
+#if LCD_REMOTE_DEPTH == 1
+extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+#elif LCD_REMOTE_DEPTH == 2
+#if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
+extern fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
+#endif
 #endif
 
 extern void lcd_remote_init(void);
@@ -43,28 +87,28 @@ extern void lcd_remote_set_contrast(int val);
 extern void lcd_remote_emireduce(bool state);
 
 extern void lcd_remote_clear_display(void);
-extern void lcd_remote_puts(int x, int y, const unsigned char *string);
-extern void lcd_remote_puts_style(int x, int y, const unsigned char *string,
+extern void lcd_remote_puts(int x, int y, const unsigned char *str);
+extern void lcd_remote_puts_style(int x, int y, const unsigned char *str,
                                   int style);
-extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str, int offset);
-extern void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str, int style, int offset);
+extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str, 
+                                   int offset);
+extern void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
+                                         int style, int offset);
 extern void lcd_remote_putc(int x, int y, unsigned short ch);
 extern void lcd_remote_stop_scroll(void);
 extern void lcd_remote_scroll_speed(int speed);
 extern void lcd_remote_scroll_delay(int ms);
-extern void lcd_remote_puts_scroll(int x, int y, const unsigned char* string);
-extern void lcd_remote_puts_scroll_style(int x, int y,const unsigned char* string,
-                                                int style);
-extern void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string,
-                                                int offset);
-extern void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
+extern void lcd_remote_puts_scroll(int x, int y, const unsigned char *str);
+extern void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *str,
+                                         int style);
+extern void lcd_remote_puts_scroll_offset(int x, int y,
+                                          const unsigned char *str, int offset);
+extern void lcd_remote_puts_scroll_style_offset(int x, int y,
+                                                const unsigned char *string,
                                                 int style, int offset);
 
 extern void lcd_remote_update(void);
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
-
-/* Memory copy of display bitmap */
-extern unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH];
 
 extern void lcd_remote_set_invert_display(bool yesno);
 extern void lcd_remote_set_flip(bool yesno);
@@ -78,25 +122,50 @@ extern int  lcd_remote_getymargin(void);
 extern void lcd_remote_setfont(int font);
 extern int  lcd_remote_getstringsize(const unsigned char *str, int *w, int *h);
 
+/* low level drawing function pointer arrays */
+extern lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs[8];
+extern lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8];
+
 extern void lcd_remote_drawpixel(int x, int y);
 extern void lcd_remote_drawline(int x1, int y1, int x2, int y2);
 extern void lcd_remote_hline(int x1, int x2, int y);
 extern void lcd_remote_vline(int x, int y1, int y2);
 extern void lcd_remote_drawrect(int x, int y, int width, int height);
 extern void lcd_remote_fillrect(int x, int y, int width, int height);
-extern void lcd_remote_bitmap_part(const unsigned char *src, int src_x,
+extern void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x,
                                    int src_y, int stride, int x, int y,
                                    int width, int height);
-extern void lcd_remote_bitmap(const unsigned char *src, int x, int y,
+extern void lcd_remote_bitmap(const fb_remote_data *src, int x, int y,
                               int width, int height);
-extern void lcd_remote_putsxy(int x, int y, const unsigned char *string);
+extern void lcd_remote_putsxy(int x, int y, const unsigned char *str);
 
 extern void lcd_remote_invertscroll(int x, int y);
 extern void lcd_remote_bidir_scroll(int threshold);
 extern void lcd_remote_scroll_step(int pixels);
 
+#if LCD_REMOTE_DEPTH > 1
+extern void     lcd_remote_set_foreground(unsigned foreground);
+extern unsigned lcd_remote_get_foreground(void);
+extern void     lcd_remote_set_background(unsigned background);
+extern unsigned lcd_remote_get_background(void);
+extern void     lcd_remote_set_drawinfo(int mode, unsigned foreground,
+                                        unsigned background);
+
+extern void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x,
+                                        int src_y, int stride, int x, int y,
+                                        int width, int height);
+extern void lcd_remote_mono_bitmap(const unsigned char *src, int x, int y,
+                                   int width, int height);
+extern void lcd_remote_bitmap_transparent_part(const fb_remote_data *src,
+                                               int src_x, int src_y,
+                                               int stride, int x, int y,
+                                               int width, int height);
+extern void lcd_bitmap_remote_transparent(const fb_remote_data *src, int x,
+                                          int y, int width, int height);
+#else /* LCD_REMOTE_DEPTH == 1 */
 #define lcd_remote_mono_bitmap lcd_remote_bitmap
 #define lcd_remote_mono_bitmap_part lcd_remote_bitmap_part
+#endif /* LCD_REMOTE_DEPTH */
 
 #endif
-#endif
+#endif /* __LCD_REMOTE_H__ */

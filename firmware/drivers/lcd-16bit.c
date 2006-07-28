@@ -34,7 +34,7 @@
 #include "rbunicode.h"
 #include "bidi.h"
 
-#define SCROLLABLE_LINES 26
+#define SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
 
 enum fill_opt {
     OPT_NONE = 0,
@@ -972,4 +972,3 @@ static void scroll_thread(void)
         sleep(scroll_ticks);
     }
 }
-

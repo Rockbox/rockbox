@@ -65,8 +65,8 @@
 
 /*** globals ***/
 
-unsigned char lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
-                                     IBSS_ATTR;
+fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_WIDTH]
+                                      IBSS_ATTR;
 
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
@@ -686,35 +686,35 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_pixelfunc_type* const lcd_remote_pixelfuncs[8] = {
+lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
                                
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipblock(fb_remote_data *address, unsigned mask, unsigned bits)
                       ICODE_ATTR;
-static void flipblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address ^= bits & mask;
 }
 
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bgblock(fb_remote_data *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void bgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bgblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address &= bits | ~mask;
 }
 
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fgblock(fb_remote_data *address, unsigned mask, unsigned bits)
                     ICODE_ATTR;
-static void fgblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fgblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address |= bits & mask;
 }
 
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidblock(fb_remote_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
     
@@ -722,30 +722,30 @@ static void solidblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = data ^ (bits & mask);
 }
 
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
                          ICODE_ATTR;
-static void flipinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void flipinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address ^= ~bits & mask;
 }
 
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void bginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void bginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address &= ~(bits & mask);
 }
 
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
                        ICODE_ATTR;
-static void fginvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void fginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     *address |= ~bits & mask;
 }
 
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
                           ICODE_ATTR;
-static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
+static void solidinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
     
@@ -753,7 +753,7 @@ static void solidinvblock(unsigned char *address, unsigned mask, unsigned bits)
     *address = data ^ (bits & mask);
 }
 
-lcd_blockfunc_type* const lcd_remote_blockfuncs[8] = {
+lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
@@ -785,7 +785,7 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_pixelfunc_type *pfunc = lcd_remote_pixelfuncs[drawmode];
+    lcd_remote_pixelfunc_type *pfunc = lcd_remote_pixelfuncs[drawmode];
 
     deltax = abs(x2 - x1);
     deltay = abs(y2 - y1);
@@ -851,9 +851,9 @@ void lcd_remote_drawline(int x1, int y1, int x2, int y2)
 void lcd_remote_hline(int x1, int x2, int y)
 {
     int x;
-    unsigned char *dst, *dst_end;
+    fb_remote_data *dst, *dst_end;
     unsigned mask;
-    lcd_blockfunc_type *bfunc;
+    lcd_remote_blockfunc_type *bfunc;
 
     /* direction flip */
     if (x2 < x1)
@@ -888,9 +888,9 @@ void lcd_remote_hline(int x1, int x2, int y)
 void lcd_remote_vline(int x, int y1, int y2)
 {
     int ny;
-    unsigned char *dst;
+    fb_remote_data *dst;
     unsigned mask, mask_bottom;
-    lcd_blockfunc_type *bfunc;
+    lcd_remote_blockfunc_type *bfunc;
 
     /* direction flip */
     if (y2 < y1)
@@ -946,10 +946,10 @@ void lcd_remote_drawrect(int x, int y, int width, int height)
 void lcd_remote_fillrect(int x, int y, int width, int height)
 {
     int ny;
-    unsigned char *dst, *dst_end;
+    fb_remote_data *dst, *dst_end;
     unsigned mask, mask_bottom;
     unsigned bits = 0;
-    lcd_blockfunc_type *bfunc;
+    lcd_remote_blockfunc_type *bfunc;
     bool fillopt = false;
 
     /* nothing to draw? */
@@ -1000,7 +1000,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
             memset(dst, bits, width);
         else
         {
-            unsigned char *dst_row = dst;
+            fb_remote_data *dst_row = dst;
 
             dst_end = dst_row + width;
             do
@@ -1043,9 +1043,9 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
     int shift, ny;
-    unsigned char *dst, *dst_end;
+    fb_remote_data *dst, *dst_end;
     unsigned mask, mask_bottom;
-    lcd_blockfunc_type *bfunc;
+    lcd_remote_blockfunc_type *bfunc;
 
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
@@ -1070,9 +1070,9 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > LCD_REMOTE_HEIGHT)
         height = LCD_REMOTE_HEIGHT - y;
 
-    src    += stride * (src_y >> 3) + src_x; /* move starting point */
-    src_y  &= 7;
-    y      -= src_y;
+    src   += stride * (src_y >> 3) + src_x; /* move starting point */
+    src_y &= 7;
+    y     -= src_y;
     dst    = &lcd_remote_framebuffer[y>>3][x];
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
@@ -1092,7 +1092,7 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
             else
             {
                 const unsigned char *src_row = src;
-                unsigned char *dst_row = dst;
+                fb_remote_data *dst_row = dst;
 
                 dst_end = dst_row + width;
                 do
@@ -1122,7 +1122,7 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
         do
         {
             const unsigned char *src_col = src++;
-            unsigned char *dst_col = dst++;
+            fb_remote_data *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
             

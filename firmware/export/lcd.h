@@ -138,7 +138,7 @@ extern void lcd_jump_scroll_delay(int ms);
 
 /* Low-level drawing function types */
 typedef void lcd_pixelfunc_type(int x, int y);
-typedef void lcd_blockfunc_type(unsigned char *address, unsigned mask, unsigned bits);
+typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 #if LCD_DEPTH >= 8
 typedef void lcd_fastpixelfunc_type(fb_data *address);
 #endif
