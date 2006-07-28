@@ -50,8 +50,7 @@ your WPS (While Playing Screen).
 
 \begin{table}
   \begin{btnmap}{}{}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonUp/\ButtonDown}
-      \opt{IAUDIO_X5_PAD}{\fixme{Please add correct keys}}
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp/\ButtonDown}
       \opt{IPOD_4G_PAD}{\ButtonScrollFwd/\ButtonScrollBack}
       \opt{PLAYER_PAD}{\ButtonMenu+\ButtonRight/\ButtonLeft} 
       & Volume up/down \\
@@ -99,7 +98,7 @@ your WPS (While Playing Screen).
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{RECORDER_PAD}{\ButtonFOne}
       \opt{PLAYER_PAD,IPOD_4G_PAD}{\ButtonMenu}
-      \opt{ONDIO_PAD}{Hold \ButtonMenu then \ButtonMenu again}
+      \opt{ONDIO_PAD}{Hold \ButtonMenu\ then \ButtonMenu\ again}
       \opt{IAUDIO_X5_PAD}{\ButtonRec}
       & Go to Main menu \\
       %
@@ -109,12 +108,17 @@ your WPS (While Playing Screen).
         \ButtonFThree & Toggles Display quick menu \\
         \ButtonFOne+\ButtonDown & Key lock on/off \\
         \ButtonFOne+\ButtonPlay & Mute on/off \\
-        \ButtonFOne+\ButtonOn & Enter ID3 viewer \\
       }
       \opt{PLAYER_PAD}{
         \ButtonMenu+\ButtonStop & Key lock on/off \\
         \ButtonMenu+\ButtonPlay & Mute on/off \\
-        \ButtonMenu+\ButtonOn & Enter ID3 viewer \\
+      }
+      
+      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
+        \opt{PLAYER_PAD}{\ButtonMenu+\ButtonOn}
+        \opt{RECORDER_PAD}{\ButtonFOne+\ButtonOn}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonMode}
+        & Enter \setting{ID3 Viewer} \\
       }
     \end{btnmap}
 \end{table}
