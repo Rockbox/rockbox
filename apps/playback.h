@@ -33,7 +33,9 @@
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 
-#define MAX_TRACK 32
+#define MAX_TRACK       32
+#define MAX_TRACK_MASK  (MAX_TRACK-1)
+
 struct track_info {
     struct mp3entry id3;       /* TAG metadata */
     char *codecbuf;            /* Pointer to codec buffer */
