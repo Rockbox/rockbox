@@ -925,20 +925,24 @@ static void audio_rebuffer(void)
         queue_post(&codec_callback_queue, Q_CODEC_REQUEST_PENDING, 0);
     
     /* Stop in progress fill, and clear open file descriptor */
-    close(current_fd);
-    current_fd = -1;
+    if (current_fd >= 0)
+    {
+        close(current_fd);
+        current_fd = -1;
+    }
     filling = false;
 
     /* Reset buffer and track pointers */
     buf_ridx = buf_widx = 0;
-    track_widx = track_ridx = 0;
-    audio_clear_track_entries(false, true);
+    track_widx = track_ridx;
+    audio_clear_track_entries(true, true);
     filebufused = 0;
 
     /* Fill the buffer */
     last_peek_offset = -1;
     cur_ti->filesize = 0;
     cur_ti->start_pos = 0;
+    ci.curpos = 0;
 
     if (!cur_ti->taginfo_ready)
         memset(&cur_ti->id3, 0, sizeof(struct mp3entry));
@@ -2124,7 +2128,8 @@ static void track_skip_done(bool was_manual)
     }
 }
 
-static bool load_next_track(void) {
+static bool load_next_track(void) 
+{
     struct event ev;
 
     if (ci.seek_time)
@@ -2144,7 +2149,8 @@ static bool load_next_track(void) {
     
     cpu_boost(true);
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
-    while (1) {
+    while (1) 
+    {
         queue_wait(&codec_callback_queue, &ev);
         if (ev.id == Q_CODEC_REQUEST_PENDING)
         {
