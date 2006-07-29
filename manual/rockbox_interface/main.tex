@@ -69,13 +69,13 @@ To turn on and shut down your \dap, the following keys are used:
     \end{btnmap}
 \end{table}
 \label{ref:Safeshutdown}On shutdown, Rockbox automatically saves its settings.
-
 \opt{PLAYER_PAD,RECORDER_PAD,ONDIO_PAD}{
   In the unlikely event of a software failure, a hardware power off can be
-  performed by holding down 
+  performed by holding down
   \opt{PLAYER_PAD}{\ButtonStop}
   \opt{RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
-  until the Jukebox power light goes off.
+  until the \nopt{ondiosp,ondiofm}{\dap\ power light}
+  \opt{ondiosp,ondiofm}{\daps\ display goes off}.
 }
 
 \section{\label{ref:file_browser}File Browser}

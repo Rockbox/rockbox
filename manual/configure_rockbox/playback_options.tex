@@ -1,57 +1,67 @@
 % $Id$ %
 \section{\label{ref:PlaybackOptions}Playback Options}
-  The ``Playback Options'' submenu allows you to configure settings related to audio playback.
+  The \setting{Playback Options} submenu allows you to configure settings
+  related to audio playback.
   \begin{description}
     \item[Shuffle: ]Alters how Rockbox will select which next song to play.\\
-      Options: On/Off.
+      Options: \setting{On}/\setting{Off}.
       %
-    \item[Repeat: ]Configures settings related to repeating of directories or playlists.\\
-      Options: Off/All/One/Shuffle/A--B:
+    \item[Repeat: ]Configures settings related to repeating of directories or
+        playlists.\\
+      Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle}
+        \nopt{ondiosp,ondiofm}{\setting{/A--B}}:
       \begin{description}
         %
         \item[Off: ]The current directory or playlist will not repeat 
           when it is finished.
-          \note{If you have the ``Auto change directory'' option set to ``Yes'', 
-          Rockbox will move on to the next directory on your hard drive.  If the ``Auto 
-          change directory'' option is set to ``No'', playback will stop when the current 
-          directory or playlist is finished.}
+          \note{If you have the \setting{Auto change directory} option set to
+          \setting{Yes}, Rockbox will move on to the next directory on your
+          hard drive. If the \setting{Auto Change Directory} option is set to
+          \setting{No}, playback will stop when the current directory or
+          playlist is finished.}
         %
-        \item[All: ]The current directory or playlist will repeat when it is finished.
-          \note{This option does \emph{not} shuffle all files on your \dap. 
-          Rockbox is playlist oriented. When you play a song, or a directory, or an album, 
-          Rockbox creates a playlist and plays it. Thus, to shuffle all songs on the \dap, 
-          you need to create a playlist of all songs on the player, and play that playlist 
-          with shuffle mode set to ``All''.}
+        \item[All: ]The current directory or playlist will repeat when it is
+          finished.
+          \note{This option does \emph{not} shuffle all files on your \dap.
+          Rockbox is playlist oriented. When you play a song, a directory, or
+          an album, Rockbox creates a playlist and plays it. Thus, to shuffle
+          all songs on the \dap, you need to create a playlist of all songs on
+          the player, and play that playlist with shuffle mode set to
+          \setting{All}.}
         %
         \item[One: ]Repeat one track over and over.
         %
-        \item[Shuffle: ]When the current directory or playlist has finished playing, it 
-          will be shuffled and then repeated.
+        \item[Shuffle: ]When the current directory or playlist has finished
+          playing, it will be shuffled and then repeated.
         %
-        \item[A--B: ]Repeats between two user defined point within a track, typically
-          used by musicians when attempting to learn a piece of music.
-
-          This option is more complicated to use that the others as the \dap\ must first be 
-          placed into A--B repeat mode and then the start and end points defined.\\
+        \nopt{ondiosp,ondiofm}{
+        \item[A--B: ]Repeats between two user defined point within a track,
+          typically used by musicians when attempting to learn a piece of music.
+          This option is more complicated to use that the others as the \dap\
+          must first be placed into A--B repeat mode and then the start and end
+          points defined.\\
               \fixme{
               Hold Play and press Left  --- Sets Start Point (A)\\
               Hold Play and press Right --- Sets End Point (B)\\
               }
+        }
       \end{description}
 
-    \item[Play Selected First: ]This setting controls what happens when you select a file 
-      for playback while shuffle mode is on. If the Play Selected First setting is 
-      ``Yes'', the file you selected will be played first. If this setting is ``No'', 
-      a random file in the directory will be played first.
+    \item[Play Selected First: ]This setting controls what happens when you
+      select a file for playback while shuffle mode is on. If the
+      \setting{Play Selected First} setting is \setting{Yes}, the file you
+      selected will be played first. If this setting is \setting{No}, a random
+      file in the directory will be played first.
    
-    \item[Resume: ]Rockbox can be configured to start playing automatically when you turn 
-      on the \dap. If the resume function is set to start automatically playing, Rockbox 
-      will start at the point where you last turned off the \dap.  The options for the 
-      Resume function are:
+    \item[Resume: ]Rockbox can be configured to start playing automatically
+      when you turn on the \dap. If the resume function is set to start
+      automatically playing, Rockbox will start at the point where you last
+      turned off the \dap. The options for the \setting{Resume} function are:
       \begin{description}
         \item[Yes: ]Rockbox will unconditionally try to resume.
         \item[No:  ]Rockbox will not resume. 
-        \emph{If resume is set to ``No,'' Rockbox will start in the File Browser.}
+        \emph{If resume is set to \setting{No}, Rockbox will start in the
+          \setting{File Browser}.}
       \end{description}
       \note{Earlier versions of Rockbox had an ``Ask'' setting, which would ask whether 
       to resume when the jukebox was turned on. This setting has been eliminated because it 
@@ -62,25 +72,25 @@
       on the \dap\ will resume from the point where the \dap\ was stopped before shutdown.
 
     \item[Fast-Forward/Rewind: ]How fast you want search (fast forward or rewind) to accelerate 
-      when you hold down the button. ``Off'' means no acceleration. ``2x/1s'' means double 
-      the search speed once every second the button is held. ``2x/5s'' means double the 
+      when you hold down the button. \setting{Off} means no acceleration. \setting{2x/1s} means double 
+      the search speed once every second the button is held. \setting{2x/5s} means double the 
       search speed once every 5 seconds the button is held.
 
-    \item[Anti-Skip Buffer: ]This setting allows you to control how much music is stored 
-      in the \dap's memory whilst playing a song, acting as a buffer against shock or 
-      playback problems.  The \dap\ transfers the selected amount of the forthcoming song 
-      into its memory at high speed whilst you are playing the song. It keeps a ``rolling'' 
-      buffer, which keeps feeding more of the forthcoming song into memory as it goes along. 
-      If the \dap\ is knocked, shaken or jogged heavily while Rockbox is trying to read the 
-      hard drive, Rockbox might not be able to read the drive.  Rockbox will retry over and 
-      over again until it succeeds, but may eventually reach the end of the memory buffer.  
-      When that happens, Rockbox must stop playing and wait for more data from the disk, 
-      which causes your music to skip.  The anti-skip setting tells Rockbox how much extra 
-      buffer memory to spare to handle this situation.  This setting therefore allows you to 
+    \item[Anti-Skip Buffer: ]This setting allows you to control how much music is stored
+      in the \dap's memory whilst playing a song, acting as a buffer against shock or
+      playback problems. The \dap\ transfers the selected amount of the forthcoming song
+      into its memory at high speed whilst you are playing the song. It keeps a ``rolling''
+      buffer, which keeps feeding more of the forthcoming song into memory as it goes along.
+      If the \dap\ is knocked, shaken or jogged heavily while Rockbox is trying to read the
+      hard drive, Rockbox might not be able to read the drive. Rockbox will retry over and
+      over again until it succeeds, but may eventually reach the end of the memory buffer.
+      When that happens, Rockbox must stop playing and wait for more data from the disk,
+      which causes your music to skip. The anti-skip setting tells Rockbox how much extra
+      buffer memory to spare to handle this situation. This setting therefore allows you to
       reduce the chances of there being a gap or pause during playback of songs.
 
     \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7 seconds.}
-    \opt{SWCODEC}{The anti-skip buffer can be set to various values between 
+    \opt{SWCODEC}{The anti-skip buffer can be set to various values between
       5 seconds and 10 minutes.}
 
     \note{Having a large anti-skip buffer tends to use more power, and may
@@ -88,24 +98,24 @@
       possible setting that allows correct and continuous playback.}
 
     \item[Fade On Stop/Pause: ]Enables and disables a fade effect when you
-      pause or stop playing a song.  If the Fade on Stop/Pause option is
-      set to ``Yes,'' your music will fade out when you stop or pause playback,
+      pause or stop playing a song. If the Fade on Stop/Pause option is
+      set to \setting{Yes}, your music will fade out when you stop or pause playback,
       and fade in when you resume playback.
 
     \item[Party Mode: ]Enables unstoppable music playback.  When new songs are
       selected, they are added to the end of the current dynamic playlist
-      instead of being played immediately.  
+      instead of being played immediately.
       The \fixme{PLAY} and \fixme{STOP} buttons are disabled.
 
     \opt{SWCODEC}{
     \item[Crossfade: ]
-      This setting enables a cross-fader. At the end of a song, the song will fade out as the 
+      This setting enables a cross-fader. At the end of a song, the song will fade out as the
       next song fades in, creating a smooth transition between songs.\\
       Options:
     \begin{description}
-      \item[Enable Crossfade: ]If set to ``Off,'' crossfade is disabled. If set to ``Always,'' 
-        songs will always crossfade into one another. If set to ``Shuffle,'' crossfade is 
-        enabled when the shuffle feature is set to ``Yes,'' but disabled otherwise.  If set to
+      \item[Enable Crossfade: ]If set to \setting{Off}, crossfade is disabled. If set to \setting{Always},
+        songs will always crossfade into one another. If set to \setting{Shuffle}, crossfade is 
+        enabled when the shuffle feature is set to \setting{Yes}, but disabled otherwise. If set to
         track skip only, tracks will only crossfade when you manually change tracks.
         %
       \item[Fade In Delay: ]The ``fade in delay'' is the length of time between when the crossfade
@@ -118,9 +128,9 @@
         %
       \item[Fade Out Duration: ]The length of time, in seconds, that it takes your music to fade out.
         %
-      \item[Fade Out Mode: ]If set to ``Crossfade'', one song will fade out and the next song will 
-        simultaneously fade in.  If set to ``Mix,'' the ending song will continue to play as normal
-        until its end, while the starting song will fade in from under it.  ``Mix'' mode is not
+      \item[Fade Out Mode: ]If set to \setting{Crossfade}, one song will fade out and the next song will 
+        simultaneously fade in. If set to \setting{Mix}, the ending song will continue to play as normal
+        until its end, while the starting song will fade in from under it. \setting{Mix} mode is not
         used for manual track skips, even if it is selected here.
     \end{description}
   
@@ -172,10 +182,10 @@
         }
     }
     \item[Auto Change Directory: ]Control what Rockbox does when it reaches the end
-      of a directory.  If Auto Change Directory is set to ``Yes,'' Rockbox will 
-      continue to the next directory.  If ``Auto Change Directory'' is set to ``No,''
+      of a directory. If Auto Change Directory is set to \setting{Yes}, Rockbox will 
+      continue to the next directory. If \setting{Auto Change Directory} is set to \setting{No},
       playback will stop at the end of the current directory.
-      \note{You must have the ``Repeat'' option set to ``No'' for Auto Change Directory
+      \note{You must have the \setting{Repeat} option set to \setting{No} for \setting{Auto Change Directory}
       to function properly.}
       %
 	\end{description}
