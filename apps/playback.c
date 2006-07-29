@@ -2630,6 +2630,7 @@ struct mp3entry* audio_next_track(void)
     if (!have_tracks())
         return NULL;
 
+    next_idx++;
     next_idx &= MAX_TRACK_MASK;
 
     if (!tracks[next_idx].taginfo_ready)
