@@ -177,7 +177,6 @@ struct voice_info {
 
 
 static struct mutex mutex_codecthread;
-static struct mutex mutex_buffering;
 static struct event_queue codec_callback_queue;
 
 static struct mp3entry id3_voice;
@@ -831,15 +830,11 @@ static bool buffer_wind_forward(int new_track_ridx, int old_track_ridx)
 {
     size_t amount;
 
-    mutex_lock(&mutex_buffering);
-    
     /* Start with the remainder of the previously playing track */
     amount = tracks[old_track_ridx].filesize - ci.curpos;
     /* Then collect all data from tracks in between them */
     amount += buffer_count_tracks(old_track_ridx, new_track_ridx);
     
-    mutex_unlock(&mutex_buffering);
-
     if (amount > filebufused)
         return false;
 
@@ -862,8 +857,6 @@ static bool buffer_wind_backward(int new_track_ridx, int old_track_ridx)
     size_t buf_back;
     /* Start with the previously playing track's data and our data */
     size_t amount;
-    
-    mutex_lock(&mutex_buffering);
     
     buf_back = buf_ridx;
     amount = ci.curpos;
@@ -896,10 +889,7 @@ static bool buffer_wind_backward(int new_track_ridx, int old_track_ridx)
 
     /* Do we have space to make this skip? */
     if (amount > buf_back)
-    {
-        mutex_unlock(&mutex_buffering);
         return false;
-    }
 
     logf("bwb:%ldB",amount);
 
@@ -912,7 +902,6 @@ static bool buffer_wind_backward(int new_track_ridx, int old_track_ridx)
 
     /* Reset to the beginning of the new track */
     tracks[new_track_ridx].available = tracks[new_track_ridx].filesize;
-    mutex_unlock(&mutex_buffering);
 
     return true;
 }
@@ -3070,7 +3059,6 @@ void audio_preinit(void)
     cur_ti = &tracks[0];
 
     mutex_init(&mutex_codecthread);
-    mutex_init(&mutex_buffering);
 
     queue_init(&audio_queue);
     queue_init(&codec_queue);
