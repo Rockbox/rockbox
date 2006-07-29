@@ -176,5 +176,5 @@ void pcf50606_init(void)
      * set_backlight_brightness code.
      */
     pcf50606_write(0x35, 0x11); /* Backlight PWM = 512Hz, 8/16, Active */
-    pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
+    pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=011 */
 }
