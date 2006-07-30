@@ -842,6 +842,7 @@
   </source>
   <dest>
     *: "PLAY = 是"
+    h100,h120,h300: "NAVI = 是"
   </dest>
   <voice>
     *: ""

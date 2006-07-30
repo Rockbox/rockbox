@@ -819,6 +819,7 @@
   </source>
   <dest>
     *: "PLAY = Ja"
+    h100,h120,h300: "NAVI = Ja"
   </dest>
   <voice>
     *: ""

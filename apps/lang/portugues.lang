@@ -833,6 +833,7 @@
   </source>
   <dest>
     *: "PLAY = Sim"
+    h100,h120,h300: "NAVI = Sim"
   </dest>
   <voice>
     *: ""

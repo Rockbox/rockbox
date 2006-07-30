@@ -841,6 +841,7 @@
   </source>
   <dest>
     *: "SPIL = Ja"
+    h100,h120,h300: "NAVI = Ja"
   </dest>
   <voice>
     *: ""

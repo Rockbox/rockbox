@@ -833,6 +833,7 @@
   </source>
   <dest>
     *: "PLAY = Si"
+    h100,h120,h300: "NAVI = Si"
   </dest>
   <voice>
     *: ""

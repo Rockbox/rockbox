@@ -777,6 +777,7 @@
   </source>
   <dest>
     *: "Play = Ano"
+    h100,h120,h300: "NAVI = Ano"
   </dest>
   <voice>
     *: ""

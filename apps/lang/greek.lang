@@ -789,6 +789,7 @@
   </source>
   <dest>
     *: "PLAY = Ναί"
+    h100,h120,h300: "NAVI = Ναί"
   </dest>
   <voice>
     *: ""

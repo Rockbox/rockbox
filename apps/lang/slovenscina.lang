@@ -469,6 +469,7 @@
   </source>
   <dest>
     *: "PLAY = Da"
+    h100,h120,h300: "NAVI = Da"
   </dest>
   <voice>
     *: ""

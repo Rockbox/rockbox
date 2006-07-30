@@ -857,6 +857,7 @@
   </source>
   <dest>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
   </dest>
   <voice>
     *: ""
@@ -4763,6 +4764,7 @@
   </source>
   <dest>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
   </dest>
   <voice>
     *: ""

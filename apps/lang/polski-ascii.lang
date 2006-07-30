@@ -525,6 +525,7 @@
   </source>
   <dest>
     *: "GRAJ = Tak"
+    h100,h120,h300: "NAVI = Tak"
   </dest>
   <voice>
     *: ""

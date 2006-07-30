@@ -847,6 +847,7 @@
   </source>
   <dest>
     *: "LEGI = Jes"
+    h100,h120,h300: "NAVI = Jes"
   </dest>
   <voice>
     *: ""

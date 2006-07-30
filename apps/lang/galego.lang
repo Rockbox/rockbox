@@ -763,6 +763,7 @@
   </source>
   <dest>
     *: "PLAY = SI"
+    h100,h120,h300: "NAVI = SI"
   </dest>
   <voice>
     *: ""
