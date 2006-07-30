@@ -267,6 +267,12 @@ void game (void) {
         rb->sleep(HZ/level);
 
         button=rb->button_get(false);
+        
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        button = SNAKE_PLAYPAUSE;
+#endif
+
         switch (button) {
              case SNAKE_UP:
                  if (dir!=2) dir=0;

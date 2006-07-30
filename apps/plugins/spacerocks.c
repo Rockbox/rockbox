@@ -1525,6 +1525,12 @@ enum plugin_status start_game(void)
             
             rb->lcd_update();
             button = rb->button_get(false);
+
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        game_state = PAUSE_MODE;
+#endif
+
             switch(button)
             {
             case(AST_PAUSE):

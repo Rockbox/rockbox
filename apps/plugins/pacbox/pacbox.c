@@ -283,6 +283,11 @@ static int gameProc( void )
         /* Check the button status */
         status = rb->button_status();
 
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        status = PACMAN_MENU;
+#endif
+
         if ((status & PACMAN_MENU) == PACMAN_MENU
 #ifdef PACMAN_RC_MENU
             || status == PACMAN_RC_MENU

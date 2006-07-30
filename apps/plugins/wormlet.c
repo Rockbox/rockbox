@@ -1479,6 +1479,11 @@ static int run(void)
         int i;
         long cycle_duration=0;
 
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        paused = true;
+#endif
+
         switch (button) {
             case BTN_STARTPAUSE:
                 paused = !paused;

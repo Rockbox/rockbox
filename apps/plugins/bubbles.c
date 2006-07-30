@@ -2368,6 +2368,12 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     long start;
 
     button = rb->button_get_w_tmo(timeout);
+
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        button = BUBBLES_START;
+#endif
+
     switch(button){
         case (BUBBLES_LEFT|BUTTON_REPEAT):
             if(bb->angle > MIN_ANGLE) bb->angle -= 4;

@@ -1113,6 +1113,12 @@ void game (void)
         rb->sleep(HZ/speed);
 
         button = rb->button_get(false);
+
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold())
+        button = SNAKE2_PLAYPAUSE;
+#endif
+
         switch (button)
         {
              case SNAKE2_UP:

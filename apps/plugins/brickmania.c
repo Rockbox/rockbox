@@ -1740,6 +1740,12 @@ int game_loop(void)
             int move_button,button;
             int button_right,button_left;
             button=rb->button_get(false);
+
+#ifdef HAS_BUTTON_HOLD
+            if (rb->button_hold())
+            button = QUIT;
+#endif
+
             move_button=rb->button_status();
 
             button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));

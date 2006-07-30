@@ -766,6 +766,14 @@ static int xobox_loop (void)
 
     while (!quit) {
         end = *rb->current_tick + (CYCLETIME * HZ) / 1000;
+
+#ifdef HAS_BUTTON_HOLD
+        if (rb->button_hold()) {
+        pause = true;
+        rb->splash (HZ, true, "PAUSED");
+        }
+#endif
+
         button = rb->button_get_w_tmo (true);
         switch (button) {
             case UP:
