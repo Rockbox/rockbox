@@ -4,54 +4,65 @@
     Options relating to the batteries in the \dap.
   \begin{description}
     \item [Battery Capacity: ]This setting can be used to tell Rockbox what
-    capacity (in mAh) of battery is being used inside it.
-    \opt{player,recorder,recorderv2fm,ondio}{The default is 1500mAh 
-      for NiMH battery based units, and 2300mAh for LiOn battery based units,
-      which is the capacity value for the standard batteries shipped with these units.}%
-    \opt{h1xx,h300}{The default is 1300mAh.}%
-    \opt{ipodmini}{The standard battery is 40mAh (1G) or 630mAh (2G).}%
-    \opt{ipodcolor}{The standard battery is 700 mAh.}%
-    \opt{ipodnano,ipodvideo}{The value of the standard battery is currently unknown.}%
-    \opt{IPOD_4G_PAD}{This value is fairly meaningless in the iPod family at
-      present, and work is ongoing into finding a better way to determine battery life.}%
-    \ % 
-    Rockbox uses this value to estimate remaining battery life for the status 
-    bar and WPS. Changing this setting has no effect whatsoever on actual battery life.
-    This setting affects only the the accuracy of the battery life display on screen.
+      capacity (in mAh) of battery is being used inside it. The default is
+      \opt{player,recorder}{1500mAh}
+      \opt{recorderv2fm}{2200mAh}
+      \opt{ondiosp,ondiofm}{1000mAh}
+      \opt{h1xx,h300}{1300mAh}
+      \opt{ipodmini}{400mAh (1G) or 630mAh (2G)}
+      \opt{ipodcolor}{700mAh}
+      \opt{ipodnano,ipodvideo,ipod4g}{\fixme{unknown}}
+      \opt{x5}{950mAh}
+      which is the capacity value for the standard batteries shipped with the \dap.
+      Rockbox uses this value to estimate remaining battery life for the status
+      bar and WPS. Changing this setting has no effect whatsoever on actual battery life.
+      This setting affects only the the accuracy of the battery life display on screen.
    
+      \opt{ipod}{This value is fairly meaningless in the iPod family at
+        present, and work is ongoing into finding a better way to determine battery life.}
+    
+    \opt{ondiosp,ondiofm}{
+      \item [Battery Type: ]This setting tells Rockbox wich type of battery
+        that is currently used in the \dap.
+    }
+    
   \end{description}
 
+\nopt{ondiosp,ondiofm}{
 \subsection{Disk}
     Options relating to the hard disk.
 
   \begin{description}
-    \nopt{ondio}{
     \item [Disk Spindown: ]Rockbox has a timer that makes it spin down the
       hard disk after it is idle for a certain amount of time. This setting
       controls the amount of time between the last user activity and the time
       that the disk spins down. This idle time is only affected by user
       activity, like navigating through file browser. When the hard disk spins
-      up to fill mp3 buffer, it automatically spins down afterwards.
-    }
-    \opt{recorder,h1xx,h300}{
+      up to fill the audio buffer, it automatically spins down afterwards.
+      
+    \opt{recorder,h1xx,h300,x5}{
       \item [Disk Poweroff: ]This setting controls whether the disk is powered
-      off or only set to ``sleep'' when spun down. If this setting is YES,
-      the disk will power off.  If set to NO, the disk will enter ``sleep''
-      mode.  Power off uses less power but takes slightly longer to spin-up.
+      off or only set to ``sleep'' when spun down. If this setting is set to
+      \setting{YES}, the disk will power off. If set to \setting{NO}, the disk
+      will enter ``sleep'' mode. Power off uses less power but takes slightly
+      longer to spin-up.
     }
-    \item [Directory cache: ]Rockbox has the ability to scan the contents of
+    \opt{SWCODEC}{
+    \item [Directory Cache: ]Rockbox has the ability to scan the contents of
       your drive in the background and save those contents to a cache in RAM.
-      The Directory Cache takes a small amount of memory away from Rockbox
+      The \setting{Directory Cache} takes a small amount of memory away from Rockbox
       that would otherwise be used to buffer music, but it speeds up navigation
       by eliminating the slight pause between the time a navigation button is
-      pressed and the time Rockbox responds.  Turning this setting \setting{On}
-      activates the directory cache, and turning it OFF deactivates the 
+      pressed and the time Rockbox responds. Turning this setting \setting{On}
+      activates the directory cache, and turning it \setting{Off} deactivates the 
       directory cache.
       \note{The first time you set the directory cache to \setting{On}, 
       Rockbox will request a reboot of the \dap\ and upon restarting take a few
       minutes to scan the drive. Thereafter, the directory cache will work in the 
       background.}
+    }
   \end{description}
+} % \nopt{ondiosp,ondiofm}
 
 \opt{CONFIG_RTC}{
   \subsection{Time and Date}
