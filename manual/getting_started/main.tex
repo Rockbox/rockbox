@@ -6,7 +6,7 @@ for a growing number of MP3 players. Rockbox aims to be considerably more
 functional and efficient than your device's stock firmware while remaining easy
 to use and customizable. Rockbox is written by users, for users. Not only is it
 free to use, it's also released under the GNU public license, which means that
-it will always remain free to both use and to change.
+it will always remain free both to use and to change.
 
 Rockbox has been in development since 2001, and recieves new features, tweaks
 and fixes each day to provide you with the best possible experience on your MP3
@@ -81,58 +81,87 @@ are used:
 }
 \opt{SWCODEC}{
 \subsection{Introduction}
-There are two separate components of Rockbox that need to be installed in order
-to run Rockbox.
-\begin{enumerate}
-\item The Rockbox bootloader. This is the component of Rockbox that is installed
-  to the flash memory of your \playerman. The bootloader is the program that tells
-  your \dap\ how to boot and load other components of Rockbox.
-\item The Rockbox firmware. Unlike the \playerman\ firmware, which runs entirely
-  from flash memory, most of the Rockbox code is contained in the build that
-  resides on your jukebox's hard drive. This makes it easy to update Rockbox. The
-  build contain a file named \firmwarefilename\ and a directory called
-  \fname{.rockbox} which are located in the root directory of your  hard drive.
-\end{enumerate}
-\opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
-\opt{ipod4g,ipodcolor,ipodnano,ipodmini,ipodvideo}
-	{\input{getting_started/ipod_install.tex}}
-\opt{x5}{\input{getting_started/iaudio_install.tex}}
+	There are two separate components of Rockbox that need to be installed in order
+	to run Rockbox.
+	\begin{enumerate}
+	\item The Rockbox bootloader. This is the component of Rockbox that is installed
+	  to the flash memory of your \playerman. The bootloader is the program that tells
+	  your \dap\ how to boot and load other components of Rockbox.
+	\item The Rockbox firmware. Unlike the \playerman\ firmware, which runs entirely
+  	from flash memory, most of the Rockbox code is contained in the build that
+  	resides on your jukebox's hard drive. This makes it easy to update Rockbox. The
+  	build contain a file named \firmwarefilename\ and a directory called
+  	\fname{.rockbox} which are located in the root directory of your  hard drive.
+	\end{enumerate}
+	\opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
+	\opt{ipod4g,ipodcolor,ipodnano,ipodmini,ipodvideo}
+		{\input{getting_started/ipod_install.tex}}
+	\opt{x5}{\input{getting_started/iaudio_install.tex}}
    
-  \subsection{Installing the firmware}
-  After installing the bootloader the installation becomes fairly easy.
+  \subsection{Installing the firmware} 
+  
+	After installing the bootloader, the installation becomes fairly easy.}  
+	
+	Go to \url{http://www.rockbox.org/daily.shtml} and download the latest 
+	Rockbox daily build for the \playername{}.  Connect your \playername\ to the 
+	computer via USB as described in the manual that came with your \playername{}. 
+	On Windows, the	\playername\ drive will appear as a drive letter in your 
+	``My Computer''	folder. Take the file that you downloaded above, and unpack 
+	its contents to	your \playername\ drive. You can do this using a program 
+	such as \url{http://www.info-zip.org/} or \url{http://www.winzip.org/}.
+
+	\note{If this is the first time you are installing Rockbox, you should also 
+	download the ``Fonts'' package avaible on the Daily Builds page.}
+
+	You will need to unpack all of the files in the archive onto your hard disk. 
+	If this has been done correctly, you will have a file called 
+	\fname{\firmwarefilename} in the main folder of your \playername\ drive, and 
+	also a folder called /\fname{.rockbox}, which contains a number of system 
+	files used by the software. 
+	
+	\note{Please note that the firmware folder starts with a leading dot. You may 
+	experience problems when trying to create such 	folders when using Windows. 
+	Directly unzipping to your \daps drive works flawlessly; it is only Windows' 
+	Explorer that is limited in handling such 	files.}
+
+\section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support} 
+If you wish to use speech support you will also need a language file, available 
+from \wikilink{VoiceFiles}.  For the English language, the file is called 
+\fname{english.voice}. When it has been downloaded, unpack this file and copy it 
+into the \fname{lang} folder which is inside the /\fname{.rockbox} folder on 
+your Jukebox. Voice menus are turned on by default. See 
+\rockref{ref:Voiceconfiguration} for details on voice settings.
+
+\section{Running Rockbox} 
+Remove your \dap from the computer's USB port. Unplug any connected power supply 
+and turn the unit off. When you next turn the unit on, Rockbox should load. When 
+you see the Rockbox splash screen, Rockbox is loaded and ready for use.
+
+\opt{ipod}{
+\note{Rockbox starts in the \setting{File Browser}.  If you have loaded music 
+onto your player using Itunes, you will not be able to see your music because 
+Itunes changes your files' names and hides them in directories in the 
+\fname{Ipod\_Control} folder.  You can view files placed on your \dap{} by Itunes 
+by initializing and using Rockbox's Tag Cache.  See \rockref{ref:tagcache} for 
+more information.}
 }
 
-Connect your \playername\ to the computer via USB as described in the 
-manual that came with your \playername. On Windows, the \playername\ drive 
-will appear as a drive letter in your ``My Computer'' folder. Take the file 
-that you downloaded above, and unpack its contents to your \playername\ drive.
-You can do this using a program such as \url{http://www.info-zip.org/} or 
-\url{http://www.winzip.org/}.
+\section{Updating Rockbox} Updating Rockbox is easy.  Download a Rockbox build. 
+(The latest release of the Rockbox software will always be available from 
+\url{http://www.rockbox.org/download/}.)  Unzip the build to the root directory 
+of your \dap.  If your unzip program asks you whether to overwrite files, choose 
+the ``Yes to all'' option.  The new build will be installed over your current build.
 
-You will need to unpack all of the files in the archive onto your hard disk. If 
-this has been done correctly, you will have a file called 
-\fname{\firmwarefilename} in the main folder of your \playername\ drive, and
-also a folder called /\fname{.rockbox}, which contains a number of system files
-used by the software.
-\note{Please note that the firmware folder starts with a leading dot. You may
-experience problems when trying to create such folders when using Windows.
-Directly unzipping to your \dap's drive works flawlessly; it is only Windows'
-Explorer that is limited in handling such files.}
-
-\section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
-If you wish to use speech support you will also need a language file, available
-from \wikilink{VoiceFiles}.  For the
-English language, the file is called \fname{english.voice}. When it has been
-downloaded, unpack this file and copy it into the \fname{lang} folder which is
-inside the /\fname{.rockbox} folder on your Jukebox. Voice menus are turned on
-by default. See \rockref{ref:Voiceconfiguration} for details on voice
-settings.
-
-\section{Running Rockbox}
-Remove your Jukebox from the computer's USB port. Unplug any connected power
-supply and turn the unit off. When you next turn the unit on, the Jukebox
-firmware will start to load, and then it will load Rockbox for you. When you see
-the Rockbox splash screen, Rockbox is loaded and ready for use.
+\note{Settings are stored on an otherwise-unused sector of your hard disk, not 
+in any of the files contained in the Rockbox build.  Therefore, generally 
+speaking, installing a new build does \emph{not} reset Rockbox to its default 
+settings.  Be aware, however, that from time to time, a change is made to the 
+Rockbox source code that \emph{does} cause settings to be reset to their 
+defaults when a Rockbox build is updated.  Thus, it is a good idea to save your 
+settings using the \setting{Manage Settings} $\rightarrow$ \setting{Write .cfg 
+file} function before updating your Rockbox build so that you can easily restore 
+the settings if necessary.  For additional information on how to save, load, and 
+reset Rockbox's settings, see \rockref{ref:SystemOptions}.}
 
 \section{Uninstalling Rockbox}
 If you would like to go back to using the original \playername\ software, then
@@ -141,12 +170,3 @@ connect the \playername\ to your computer, and delete the
 wish to delete the \fname{.rockbox} folder and its contents. Turn the
 \playername\ off and on and the normal \playername\ software will load.
 
-\section{Updating Rockbox}
-The latest release of the Rockbox software will always be available from
-\url{http://www.rockbox.org/download/}.
-\opt{MASCODEC}{
-  Windows users may wish to download the self-extracting Windows installer,
-  which works for all Jukebox models, but those wishing to install manually or
-  using a different operating system should choose the .zip archive containing
-  the firmware for their model of the Jukebox.
-}
