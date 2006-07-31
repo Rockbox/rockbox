@@ -818,7 +818,7 @@ bool rectrigger(void)
 
         FOR_NB_SCREENS(i)
             pm_y[i] = screens[i].height - 8;
-        button = peak_meter_draw_get_btn(0, pm_y, 8);
+        button = peak_meter_draw_get_btn(0, pm_y, 8, NB_SCREENS);
 
         lcd_update();
 

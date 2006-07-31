@@ -1169,7 +1169,7 @@ void peak_meter_draw_trig(int xpos, int ypos)
 }
 #endif
 
-int peak_meter_draw_get_btn(int x, int y[], int height)
+int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
 {
     int button = BUTTON_NONE;
     long next_refresh = current_tick;
@@ -1195,7 +1195,7 @@ int peak_meter_draw_get_btn(int x, int y[], int height)
             sleep(0);          /* Sleep until end of current tick. */
         }
         if (TIME_AFTER(current_tick, next_refresh)) {
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < nb_screens; i++)
             {
                 peak_meter_screen(&screens[i], x, y[i], height);
                 screens[i].update_rect(x, y[i], screens[i].width, height);

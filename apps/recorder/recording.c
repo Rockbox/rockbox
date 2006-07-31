@@ -111,6 +111,7 @@
 #define REC_RC_NEXT BUTTON_RC_FF
 #define REC_RC_PREV BUTTON_RC_REW
 #define REC_RC_SETTINGS BUTTON_RC_MODE
+#define BUTTON_RC_DISPLAY BUTTON_RC_VOL_DOWN
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define REC_SHUTDOWN (BUTTON_POWER | BUTTON_REPEAT)
@@ -155,6 +156,8 @@ bool f3_rec_screen(void);
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
+int screen_update = NB_SCREENS;
+bool remote_display_on = true;
 const char* const freq_str[6] =
 {
     "44.1kHz",
@@ -422,6 +425,16 @@ bool recording_screen(void)
     
     if(rec_create_directory() > 0)
         have_recorded = true;
+        
+    if (!remote_display_on)
+    {
+        screens[1].clear_display();
+        snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
+        screens[1].puts((screens[1].width/w - strlen(buf))/2, 
+                            screens[1].height/(h*2) + 1, buf);
+        screens[1].update();
+        gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
+    }
 
     while(!done)
     {
@@ -479,7 +492,7 @@ bool recording_screen(void)
 #endif /* CONFIG_LED */
 
         /* Wait for a button a while (HZ/10) drawing the peak meter */
-        button = peak_meter_draw_get_btn(0, pm_y, h * PM_HEIGHT);
+        button = peak_meter_draw_get_btn(0, pm_y, h * PM_HEIGHT, screen_update);
 
         if (last_audio_stat != audio_stat)
         {
@@ -492,6 +505,26 @@ bool recording_screen(void)
 
         switch(button)
         {
+#ifdef BUTTON_RC_DISPLAY
+            case BUTTON_RC_DISPLAY:
+                if (remote_display_on)
+                {
+                    remote_display_on = false;
+                    screen_update = 1;
+                    screens[1].clear_display();
+                    snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
+                    screens[1].puts((screens[1].width/w - strlen(buf))/2, 
+                                          screens[1].height/(h*2) + 1, buf);
+                    screens[1].update();
+                    gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
+                }
+                else
+                {
+                    remote_display_on = true;
+                    screen_update = NB_SCREENS;
+                }
+                break;
+#endif
             case REC_STOPEXIT:
             case REC_SHUTDOWN:
 #ifdef REC_RC_STOPEXIT
@@ -1065,10 +1098,9 @@ bool recording_screen(void)
             FOR_NB_SCREENS(i)
                 screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 5, buf);
 
-            gui_syncstatusbar_draw(&statusbars, true);
-
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
             {
+                gui_statusbar_draw(&(statusbars.statusbars[i]), true);
                 peak_meter_screen(&screens[i], 0, pm_y[i], h*PM_HEIGHT);
                 screens[i].update();                
             }
@@ -1077,7 +1109,7 @@ bool recording_screen(void)
             if (peak_meter_trigger_status() != TRIG_OFF)
             {
                 peak_meter_draw_trig(LCD_WIDTH - TRIG_WIDTH, 4 * h);
-                FOR_NB_SCREENS(i){
+                for(i = 0; i < screen_update; i++){
                     screens[i].update_rect(LCD_WIDTH - (TRIG_WIDTH + 2), 4 * h,
                                     TRIG_WIDTH + 2, TRIG_HEIGHT);
                 }

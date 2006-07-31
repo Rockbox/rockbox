@@ -8779,3 +8779,31 @@
     *: "Stop recording"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Remote Display OFF"
+  </dest>
+  <voice>
+    *: "Remote Display OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : Re-enable)"
+  </dest>
+  <voice>
+    *: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
