@@ -32,8 +32,14 @@ SDL_mutex *m;
 
 void yield(void)
 {
+    static int counter = 0;
+    
     SDL_mutexV(m);
-    SDL_Delay(1);
+    if (counter++ >= 5)
+    {
+        SDL_Delay(1);
+        counter = 0;
+    }
     SDL_mutexP(m);
 }
 
