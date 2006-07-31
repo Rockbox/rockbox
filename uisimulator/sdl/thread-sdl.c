@@ -35,7 +35,7 @@ void yield(void)
     static int counter = 0;
     
     SDL_mutexV(m);
-    if (counter++ >= 5)
+    if (counter++ >= 50)
     {
         SDL_Delay(1);
         counter = 0;
