@@ -25,9 +25,17 @@
 
 #define SECTOR_SIZE 512
 
+/* Number of bytes reserved for a file name (including the trailing \0).
+   Since names are stored in the entry as UTF-8, we won't be able to
+   store all names allowed by FAT. In FAT, a name can have max 255
+   characters (not bytes!). Since the UTF-8 encoding of a char may take
+   up to 4 bytes, there will be names that we won't be able to store
+   completely. For such names, the short DOS name is used. */
+#define FAT_FILENAME_BYTES 256
+
 struct fat_direntry
 {
-    unsigned char name[256];        /* Name plus \0 */
+    unsigned char name[FAT_FILENAME_BYTES]; /* UTF-8 encoded name plus \0 */
     unsigned short attr;            /* Attributes */
     unsigned char crttimetenth;     /* Millisecond creation
                                        time stamp (0-199) */

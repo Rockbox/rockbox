@@ -29,12 +29,13 @@
 #include "timefuncs.h"
 #include "kernel.h"
 #include "rbunicode.h"
+#include "logf.h"
 
 #define BYTES2INT16(array,pos) \
           (array[pos] | (array[pos+1] << 8 ))
-#define BYTES2INT32(array,pos)					\
-    ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
-     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
+#define BYTES2INT32(array,pos) \
+    ((long)array[pos] | ((long)array[pos+1] << 8 ) | \
+    ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
 #define FATTYPE_FAT12       0
 #define FATTYPE_FAT16       1
@@ -115,6 +116,8 @@
 #define NAME_BYTES_PER_ENTRY 13
 #define FAT_BAD_MARK         0x0ffffff7
 #define FAT_EOF_MARK         0x0ffffff8
+#define FAT_LONGNAME_PAD_BYTE 0xff
+#define FAT_LONGNAME_PAD_UCS 0xffff
 
 struct fsinfo {
     unsigned long freecount; /* last known free cluster count */
@@ -720,9 +723,7 @@ static unsigned long find_free_cluster(IF_MV2(struct bpb* fat_bpb,) unsigned lon
     return 0; /* 0 is an illegal cluster number */
 }
 
-static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) 
-			    unsigned long entry, 
-			    unsigned long val)
+static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, unsigned long val)
 {
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
@@ -1117,9 +1118,9 @@ static int write_long_name(struct fat_file* file,
                 entry[FATLONG_ORDER] |= 0x40;
 
                 /* pad name with 0xffff  */
-                for (k=1; k<11; k++) entry[k] = 0xff;
-                for (k=14; k<26; k++) entry[k] = 0xff;
-                for (k=28; k<32; k++) entry[k] = 0xff;
+                for (k=1; k<11; k++) entry[k] = FAT_LONGNAME_PAD_BYTE;
+                for (k=14; k<26; k++) entry[k] = FAT_LONGNAME_PAD_BYTE;
+                for (k=28; k<32; k++) entry[k] = FAT_LONGNAME_PAD_BYTE;
             };
             /* set name */
             for (k=0; k<5 && l <= namelen; k++) {
@@ -2165,12 +2166,43 @@ int fat_opendir(IF_MV2(int volume,)
     return 0;
 }
 
+/* Copies a segment of long file name (UTF-16 LE encoded) to the
+ * destination buffer (UTF-8 encoded). Copying is stopped when
+ * either 0x0000 or 0xffff (FAT pad char) is encountered.
+ * Trailing \0 is also appended at the end of the UTF8-encoded
+ * string.
+ *
+ * utf16src   utf16 (little endian) segment to copy
+ * utf16count max number of the utf16-characters to copy
+ * utf8dst    where to write UTF8-encoded string to
+ *
+ * returns the number of UTF-16 characters actually copied
+ */
+static int fat_copy_long_name_segment(unsigned char *utf16src,
+                int utf16count, unsigned char *utf8dst) {
+    int cnt = 0;
+    while ((utf16count--) > 0) {
+        unsigned short ucs = utf16src[0] | (utf16src[1] << 8);
+        if ((ucs == 0) || (ucs == FAT_LONGNAME_PAD_UCS)) {
+            break;
+        }
+        utf8dst = utf8encode(ucs, utf8dst);
+        utf16src += 2;
+        cnt++;
+    }
+    *utf8dst = 0;
+    return cnt;
+}
+
 int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 {
     bool done = false;
     int i;
     int rc;
     unsigned char firstbyte;
+    /* Long file names are stored in special entries. Each entry holds
+       up to 13 characters. Names can be max 255 chars (not bytes!) long
+       hence max 20 entries are required. */
     int longarray[20];
     int longs=0;
     int sectoridx=0;
@@ -2238,7 +2270,14 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                     /* replace shortname with longname? */
                     if ( longs ) {
                         int j;
-                        unsigned char* utf8 = entry->name;
+                        /* This should be enough to hold any name segment utf8-encoded */
+                        unsigned char shortname[13]; /* 8+3+dot+\0 */
+                        unsigned char longname_utf8segm[6*4 + 1]; /* Add 1 for trailing \0 */
+                        int longname_utf8len = 0;
+                        
+                        strcpy(shortname, entry->name); /* Temporarily store it */
+                        entry->name[0] = 0;
+                        
                         /* iterate backwards through the dir entries */
                         for (j=longs-1; j>=0; j--) {
                             unsigned char* ptr = cached_buf;
@@ -2260,11 +2299,52 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                 index &= SECTOR_SIZE-1;
                             }
 
-                            utf8 = utf16LEdecode(ptr + index + 1, utf8, 5);
-                            utf8 = utf16LEdecode(ptr + index + 14, utf8, 6);
-                            utf8 = utf16LEdecode(ptr + index + 28, utf8, 2);
+                            /* Try to append each segment of the long name. Check if we'd
+                               exceed the buffer. Also check for FAT padding characters 0xFFFF. */
+                            if (fat_copy_long_name_segment(ptr + index + 1, 5,
+                                    longname_utf8segm) == 0) break;
+                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            longname_utf8len += strlen(longname_utf8segm);
+                            if (longname_utf8len < FAT_FILENAME_BYTES)
+                                strcat(entry->name, longname_utf8segm);
+                            else
+                                break;
+
+                            if (fat_copy_long_name_segment(ptr + index + 14, 6,
+                                    longname_utf8segm) == 0) break;
+                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            longname_utf8len += strlen(longname_utf8segm);
+                            if (longname_utf8len < FAT_FILENAME_BYTES)
+                                strcat(entry->name, longname_utf8segm);
+                            else
+                                break;
+
+                            if (fat_copy_long_name_segment(ptr + index + 28, 2,
+                                    longname_utf8segm) == 0) break;
+                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            longname_utf8len += strlen(longname_utf8segm);
+                            if (longname_utf8len < FAT_FILENAME_BYTES)
+                                strcat(entry->name, longname_utf8segm);
+                            else
+                                break;
                         }
+
+                        /* Does the utf8-encoded name fit into the entry? */
+                        if (longname_utf8len >= FAT_FILENAME_BYTES) {
+                            /* Take the short DOS name. Need to utf8-encode it since
+                               it may contain chars from the upper half of the OEM
+                               code page which wouldn't be a valid utf8. Beware: this
+                               file will be shown with strange glyphs in file browser
+                               since unicode 0x80 to 0x9F are control characters. */
+                            logf("SN-DOS: %s", shortname);
+                            unsigned char *utf8;
+                            utf8 = iso_decode(shortname, entry->name, -1, strlen(shortname));
                         *utf8 = 0;
+                            logf("SN: %s", entry->name);
+                        } else {
+                            logf("LN: %s", entry->name);
+                            logf("LNLen: %d (%c)", longname_utf8len, entry->name[0]);
+                        }
                     }
                     done = true;
                     sectoridx = 0;
