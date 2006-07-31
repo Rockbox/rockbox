@@ -430,7 +430,7 @@ bool recording_screen(void)
     {
         screens[1].clear_display();
         snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
-        screens[1].puts((screens[1].width/w - strlen(buf))/2, 
+        screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                             screens[1].height/(h*2) + 1, buf);
         screens[1].update();
         gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
@@ -513,7 +513,7 @@ bool recording_screen(void)
                     screen_update = 1;
                     screens[1].clear_display();
                     snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
-                    screens[1].puts((screens[1].width/w - strlen(buf))/2, 
+                    screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                                           screens[1].height/(h*2) + 1, buf);
                     screens[1].update();
                     gui_syncsplash(0, true, str(LANG_REMOTE_LCD_OFF));
@@ -874,7 +874,7 @@ bool recording_screen(void)
             dsize = rec_sizesplit_bytes();
             num_recorded_bytes = audio_num_recorded_bytes();
             
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
                 screens[i].clear_display(); 
 
             if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
@@ -892,7 +892,7 @@ bool recording_screen(void)
                          hours, minutes, seconds%60);
             }
             
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
                 screens[i].puts(0, 0, buf); 
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
@@ -923,10 +923,10 @@ bool recording_screen(void)
                              str(LANG_RECORDING_SIZE), buf2);
                 }
             }
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
                 screens[i].puts(0, 1, buf);
 
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
             {
                 if (filename_offset[i] > 0)
                 {
@@ -975,13 +975,13 @@ bool recording_screen(void)
             
             if (global_settings.invert_cursor && (pos++ == cursor))
             {
-                FOR_NB_SCREENS(i)
+                for(i = 0; i < screen_update; i++)
                     screens[i].puts_style_offset(0, filename_offset[i] +
                                            PM_HEIGHT + 2, buf, STYLE_INVERT,0);
             }
             else
             {
-                FOR_NB_SCREENS(i)
+                for(i = 0; i < screen_update; i++)
                     screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 2, buf);
             }                
 
@@ -993,13 +993,13 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
-                    FOR_NB_SCREENS(i)
+                    for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] +
                                             PM_HEIGHT + 3, buf, STYLE_INVERT,0);
                 }
                 else
                 {
-                    FOR_NB_SCREENS(i)
+                    for(i = 0; i < screen_update; i++)
                         screens[i].puts(0, filename_offset[i] +
                                             PM_HEIGHT + 3, buf);
                 }
@@ -1013,13 +1013,13 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
                 if(global_settings.invert_cursor && ((1==cursor)||(2==cursor)))
                 {
-                    FOR_NB_SCREENS(i)
+                    for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] + 
                                            PM_HEIGHT + 3, buf, STYLE_INVERT,0);
                 }
                 else
                 {
-                     FOR_NB_SCREENS(i)
+                     for(i = 0; i < screen_update; i++)
                          screens[i].puts(0, filename_offset[i] +
                                              PM_HEIGHT + 3, buf);
                 }                
@@ -1031,13 +1031,13 @@ bool recording_screen(void)
                                   buf2, sizeof(buf2)));
                 if(global_settings.invert_cursor && ((1==cursor)||(3==cursor)))
                 {
-                    FOR_NB_SCREENS(i)
+                    for(i = 0; i < screen_update; i++)
                         screens[i].puts_style_offset(0, filename_offset[i] + 
                                             PM_HEIGHT + 4, buf, STYLE_INVERT,0);
                 }
                 else
                 {
-                    FOR_NB_SCREENS(i)
+                    for(i = 0; i < screen_update; i++)
                         screens[i].puts(0, filename_offset[i] + 
                                             PM_HEIGHT + 4, buf);
                 }                
@@ -1048,33 +1048,33 @@ bool recording_screen(void)
                 switch(cursor)
                 {
                     case 1:
-                        FOR_NB_SCREENS(i)
+                        for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
                                                     filename_offset[i] +
                                                     PM_HEIGHT + 3, true);
 
                         if(global_settings.rec_source != SOURCE_MIC)
                         {
-                            FOR_NB_SCREENS(i)
+                            for(i = 0; i < screen_update; i++)
                                 screen_put_cursorxy(&screens[i], 0, 
                                                         filename_offset[i] +
                                                         PM_HEIGHT + 4, true);
                         }
                     break;
                     case 2:
-                        FOR_NB_SCREENS(i)
+                        for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
                                                     filename_offset[i] + 
                                                     PM_HEIGHT + 3, true);
                     break;
                     case 3:
-                        FOR_NB_SCREENS(i)
+                        for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
                                                     filename_offset[i] + 
                                                     PM_HEIGHT + 4, true);
                     break;
                     default:
-                        FOR_NB_SCREENS(i)
+                        for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
                                                     filename_offset[i] + 
                                                     PM_HEIGHT + 2, true);
@@ -1095,7 +1095,7 @@ bool recording_screen(void)
                      freq_str[global_settings.rec_frequency],
                      global_settings.rec_channels ?
                      str(LANG_CHANNEL_MONO) : str(LANG_CHANNEL_STEREO));
-            FOR_NB_SCREENS(i)
+            for(i = 0; i < screen_update; i++)
                 screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 5, buf);
 
             for(i = 0; i < screen_update; i++)
