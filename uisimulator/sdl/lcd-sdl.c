@@ -75,7 +75,6 @@ void sdl_gui_update(SDL_Surface *surface, int x_start, int y_start, int width,
                     xmax * display_zoom, ymax * display_zoom};
 
     SDL_BlitSurface(surface, &src, gui_surface, &dest);
-    SDL_UpdateRect(gui_surface, dest.x, dest.y, dest.w, dest.h);
     SDL_Flip(gui_surface);
 }
 
