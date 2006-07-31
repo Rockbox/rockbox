@@ -921,8 +921,23 @@ static void audio_rebuffer(void)
     logf("Forcing rebuffer");
     
     /* Notify the codec that this will take a while */
-    if (!filling)
-        queue_post(&codec_callback_queue, Q_CODEC_REQUEST_PENDING, 0);
+    /* Currently this can cause some problems (logf in reverse order):
+     * Codec load error:-1
+     * Codec load disk
+     * Codec: Unsupported
+     * Codec finished
+     * New codec:0/3
+     * Clearing tracks:7/7, 1
+     * Forcing rebuffer
+     * Check new track buffer
+     * Request new track
+     * Clearing tracks:5/5, 0
+     * Starting buffer fill
+     * Clearing tracks:5/5, 1
+     * Re-buffering song w/seek
+     */
+    //if (!filling)
+    //    queue_post(&codec_callback_queue, Q_CODEC_REQUEST_PENDING, 0);
     
     /* Stop in progress fill, and clear open file descriptor */
     if (current_fd >= 0)
@@ -935,6 +950,7 @@ static void audio_rebuffer(void)
     /* Reset buffer and track pointers */
     buf_ridx = buf_widx = 0;
     track_widx = track_ridx;
+    cur_ti = &tracks[track_ridx];
     audio_clear_track_entries(true, true);
     filebufused = 0;
 
@@ -1111,16 +1127,12 @@ static void rebuffer_and_seek(size_t newpos)
     ci.curpos = newpos;
 
     /* Clear codec buffer. */
-    filebufused = 0;
-    buf_widx = cur_ti->buf_idx + newpos;
-    while (buf_widx >= filebuflen)
-        buf_widx -= filebuflen;
-    buf_ridx = buf_widx;
-
-    /* Write to the now current track */
     track_widx = track_ridx;
+    filebufused = 0;
+    buf_widx = buf_ridx = 0;
 
     last_peek_offset = 0;
+    filling = false;
     initialize_buffer_fill(true);
 
     if (newpos > AUDIO_REBUFFER_GUESS_SIZE) 
@@ -1496,25 +1508,23 @@ static void codec_discard_codec_callback(void)
         if (buf_ridx >= filebuflen)
             buf_ridx -= filebuflen;
     }
-    
-    /* Check if a buffer desync has happened, and log it */
+
+#if 0
+    /* Check if a buffer desync has happened, log it and stop playback. */
     if (buf_ridx != cur_ti->buf_idx)
     {
         int offset = cur_ti->buf_idx - buf_ridx;
         size_t new_used = filebufused - offset;
+        
         logf("Buf off :%d=%d-%d", offset, cur_ti->buf_idx, buf_ridx);
-        buf_ridx += offset;
-        /* Reset the buffer used amount based on the read and write pointers */
-        filebufused = track_widx;
-        if (track_widx < track_ridx)
-            filebufused += filebuflen;
-        filebufused -= track_ridx;
-        /* If that was not the same amount as the track was off, log it */
-        if (new_used != filebufused) 
-        {
-            logf("Used off:%d",filebufused - new_used);
-        }
+        logf("Used off:%d",filebufused - new_used);
+        
+        /* This is a fatal internal error and it's not safe to 
+         * continue playback. */
+        ci.stop_codec = true;
+        queue_post(&audio_queue, Q_AUDIO_STOP, 0);
     }
+#endif
 }
 
 static const char *get_codec_path(int codectype) 
@@ -1602,7 +1612,8 @@ static bool loadcodec(bool start_play)
             /* If the previous codec is the same as this one, there is no need
              * to put another copy of it on the file buffer */
             if (get_codec_base_type(tracks[track_widx].id3.codectype) ==
-                    get_codec_base_type(tracks[prev_track].id3.codectype))
+                    get_codec_base_type(tracks[prev_track].id3.codectype)
+                && audio_codec_loaded)
             {
                 logf("Reusing prev. codec");
                 return true;
@@ -1729,7 +1740,8 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     {
         /* Handle broken playlists. */
         current_fd = open(trackname, O_RDONLY);
-        if (current_fd < 0) {
+        if (current_fd < 0) 
+        {
             logf("Open failed");
             /* Skip invalid entry from playlist. */
             playlist_skip_entry(NULL, last_peek_offset);
@@ -1869,13 +1881,14 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     }
     
     logf("alt:%s", trackname);
-    tracks[track_widx].buf_idx = buf_widx;
+    // tracks[track_widx].buf_idx = buf_widx;
 
     audio_read_file(rebuffer);
 
     return true;
 }
 
+/* Note that this function might yield(). */
 static void audio_clear_track_entries(
         bool clear_buffered, bool clear_unbuffered)
 {
@@ -1883,6 +1896,7 @@ static void audio_clear_track_entries(
     int last_idx = -1;
     
     logf("Clearing tracks:%d/%d, %d", track_ridx, track_widx, clear_unbuffered);
+    
     /* Loop over all tracks from write-to-read */
     while (1) 
     {
@@ -2060,9 +2074,11 @@ static void initialize_buffer_fill(bool clear_tracks)
     /* TODO: This doesn't look right, and might explain some problems with
      *       seeking in large files (to offsets larger than filebuflen).
      *       And what about buffer wraps?
+     * 
+     * This really doesn't look right, so don't use it.
      */
-    if (buf_ridx > cur_ti->buf_idx)
-        cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
+    // if (buf_ridx > cur_ti->buf_idx)
+    //    cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
 
     if (clear_tracks)
         audio_clear_track_entries(true, false);
