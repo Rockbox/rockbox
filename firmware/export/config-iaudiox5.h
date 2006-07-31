@@ -22,6 +22,7 @@
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  16   /* pseudo 262.144 colors */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
+#define HAVE_LCD_CONTRAST
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
@@ -39,6 +40,10 @@
 #define HAVE_REMOTE_LCD
 
 #define CONFIG_LCD LCD_X5
+
+#define MIN_CONTRAST_SETTING        1
+#define MAX_CONTRAST_SETTING        30
+#define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled !?!? */ 

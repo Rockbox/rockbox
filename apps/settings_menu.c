@@ -266,7 +266,7 @@ static bool remote_caption_backlight(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
-#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
+#ifdef HAVE_LCD_CONTRAST
 static bool contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
@@ -274,7 +274,7 @@ static bool contrast(void)
                     lcd_set_contrast, 1, MIN_CONTRAST_SETTING,
                     MAX_CONTRAST_SETTING, NULL );
 }
-#endif /* HAVE_LCD_COLOR */
+#endif /* HAVE_LCD_CONTRAST */
 
 #ifdef HAVE_LCD_BITMAP
 #ifndef HAVE_LCD_COLOR
@@ -1781,7 +1781,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_BRIGHTNESS),      brightness },
 #endif
 #endif /* CONFIG_BACKLIGHT */
-#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
+#ifdef HAVE_LCD_CONTRAST
         { ID2P(LANG_CONTRAST),        contrast },
 #endif
 #ifdef HAVE_LCD_BITMAP

@@ -1045,7 +1045,9 @@ void shutdown_hw(void)
     lcd_update();
     sleep(HZ/16);
 #endif
+#ifndef IAUDIO_X5
     lcd_set_contrast(0);
+#endif    
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_off();
     lcd_remote_set_contrast(0);

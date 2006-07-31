@@ -139,17 +139,20 @@ inline void lcd_write_data(const unsigned short* p_bytes, int count)
 
 int lcd_default_contrast(void)
 {
-    return 16;
+    return DEFAULT_CONTRAST_SETTING;
 }
 
 void lcd_set_contrast(int val)
 {
-    if (val >= 15) // val must'nt be 15 or 31
-     ++val; 
-    if (val > 30)
-      return;
+    /* Clamp val in range 0-14, 16-30 */
+    if (val < 1)
+        val = 0;
+    else if (val <= 15)
+        --val;
+    else if (val > 30)
+        val = 30;
 
-    lcd_write_reg(0x0e, 0x201e + (val << 8));
+    lcd_write_reg(0x0e, 0x2018 + (val << 8));
 }
 
 void lcd_set_invert_display(bool yesno)

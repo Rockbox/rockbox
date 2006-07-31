@@ -200,6 +200,13 @@ extern unsigned char vp_dummy[VIRT_SIZE];
 /* get the string ID from a virtual pointer, -1 if not virtual */
 #define P2ID(p) ((p>=VIRT_PTR && p<=VIRT_PTR+VIRT_SIZE) ? p-VIRT_PTR : -1)
 
+/* !defined(HAVE_LCD_COLOR) implies HAVE_LCD_CONTRAST with default 40.
+   Explicitly define HAVE_LCD_CONTRAST in config file for newer ports for
+   simplicity. */
+#if !defined(HAVE_LCD_COLOR)
+#define HAVE_LCD_CONTRAST
+#define DEFAULT_CONTRAST_SETTING    40
+#endif
 
 struct user_settings
 {
@@ -274,7 +281,7 @@ struct user_settings
 
     /* device settings */
 
-#if !defined(HAVE_LCD_COLOR) || defined(IAUDIO_X5)
+#ifdef HAVE_LCD_CONTRAST
     int contrast;   /* lcd contrast */
 #endif
     bool invert;    /* invert display */
@@ -571,10 +578,10 @@ extern long lasttime;
 extern const char rec_base_directory[];
 
 /* system defines */
-
 #ifdef IAUDIO_X5
-#define MIN_CONTRAST_SETTING        0
-#define MAX_CONTRAST_SETTING        29
+#define MIN_CONTRAST_SETTING        1
+#define MAX_CONTRAST_SETTING        30
+#define DEFAULT_CONTRAST_SETTING    19
 #elif defined HAVE_LCD_CHARCELLS
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        31
