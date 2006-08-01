@@ -96,12 +96,12 @@ drivers/lcd-ipodvideo.c
 #if CONFIG_LCD==LCD_H300
 drivers/lcd-h300.c
 #endif
-#ifndef IAUDIO_X5
+#ifndef TARGET_TREE
 drivers/power.c
 #endif
 drivers/led.c
 #ifndef SIMULATOR
-#ifndef IAUDIO_X5
+#ifndef TARGET_TREE
 drivers/adc.c
 #endif
 #ifdef HAVE_MMC
@@ -110,7 +110,9 @@ drivers/ata_mmc.c
 #ifdef HAVE_FLASH_DISK
 drivers/ata_flash.c
 #else
+#ifndef SANSA_E200
 drivers/ata.c
+#endif
 #endif
 #endif
 drivers/button.c
@@ -215,6 +217,11 @@ drivers/isp1362.c
 #endif
 #if CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
+#endif
+
+#ifdef SANSA_E200
+target/arm/sandisk/sansa-e200/ata.c
+target/arm/sandisk/sansa-e200/lcd.c
 #endif
 
 #ifdef IAUDIO_X5

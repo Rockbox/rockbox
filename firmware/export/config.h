@@ -56,6 +56,8 @@
 #define IPOD_3G_PAD         8
 #define IRIVER_IFP7XX_PAD   9
 #define GIGABEAT_PAD       10
+#define IRIVER_H10_PAD     11
+#define SANSA_E200_PAD     12
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -67,6 +69,7 @@
 #define BATT_4AA_NIMH   1500
 #define BATT_3AAA       1000 /* Ondio */
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
+#define BATT_LPCS355385 1550 /* iriver h10 - SKC LPCS355385 */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
@@ -182,6 +185,10 @@
 #include "config-ipodmini.h"
 #elif defined(IPOD_MINI2G)
 #include "config-ipodmini2g.h"
+#elif defined(IRIVER_H10)
+#include "config-h10.h"
+#elif defined(SANSA_E200)
+#include "config-e200.h"
 #else
 /* no known platform */
 #endif
@@ -203,7 +210,7 @@
 #endif
 
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440)
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == PP5024)
 #define CPU_ARM
 #endif
 

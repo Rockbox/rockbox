@@ -248,6 +248,8 @@ void pcm_init(void)
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x3f0000) >> 16)
 #elif CONFIG_CPU == PP5002
 #define FIFO_FREE_COUNT ((IISFIFO_CFG & 0x7800000) >> 23)
+#elif CONFIG_CPU == PP5024
+#define FIFO_FREE_COUNT 4 /* TODO: make this sensible */
 #endif
 
 static int pcm_freq = 44100; /* 44.1 is default */
@@ -268,6 +270,7 @@ static void dma_start(const void *addr, size_t size)
     /* setup I2S interrupt for FIQ */
     outl(inl(0x6000402c) | I2S_MASK, 0x6000402c);
     outl(I2S_MASK, 0x60004024);
+#elif CONFIG_CPU == PP5024
 #else
     /* setup I2S interrupt for FIQ */
     outl(inl(0xcf00102c) | DMA_OUT_MASK, 0xcf00102c);

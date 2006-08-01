@@ -1,5 +1,9 @@
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 ipod.c
+#elif defined(SANSA_E200)
+e200.c
+#elif defined(IRIVER_H10)
+h10.c
 #else
 main.c
 #endif
