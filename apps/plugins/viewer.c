@@ -268,7 +268,7 @@ bool done = false;
 int col = 0;
 
 #define ADVANCE_COUNTERS(c) { width += glyph_width(c); k++; }
-#define LINE_IS_FULL ((k<MAX_COLUMNS-1) ||( width > draw_columns))
+#define LINE_IS_FULL ((k>=MAX_COLUMNS-1) ||( width >= draw_columns))
 #define LINE_IS_NOT_FULL ((k<MAX_COLUMNS-1) &&( width < draw_columns))
 static unsigned char* crop_at_width(const unsigned char* p)
 {
@@ -741,7 +741,7 @@ static void viewer_draw(int col)
             if (col != -1) {
                 scratch_buffer[k] = 0;
                 endptr = rb->iso_decode(scratch_buffer + col, utf8_buffer,
-                                        prefs.encoding, draw_columns/glyph_width('a'));
+                                        prefs.encoding, draw_columns/glyph_width('i'));
                 *endptr = 0;
             }
         }
