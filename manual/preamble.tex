@@ -250,7 +250,6 @@
    commandchars=\\\{\}%
    }
 
-
 % Use the nopt command to exclude a certain defined feature from a sectio
 % Example:
 % \nopt{ondio}{This text will be excluded for ondios}
@@ -260,12 +259,10 @@
    \ifthenelse{\optnvalue > 0}{}{#2}
  }
 
-
-
-% Use the rockref to handle get a flexible reference command
-% usage \rockref{ref_section}
+% Use the reference to handle get a flexible reference command
+% usage \reference{ref_section}
 \ifpdfoutput{
-  \newcommand{\rockref}[1]{%
+  \newcommand{\reference}[1]{%
     section \ref{#1} (page \pageref{#1})
 }}
-{\newcommand{\rockref}[1]{section \ref{#1}}}
+{\newcommand{\reference}[1]{section \ref{#1}}}
