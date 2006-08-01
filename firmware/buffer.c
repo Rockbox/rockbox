@@ -31,7 +31,8 @@ unsigned char *audiobuf;
 
 void buffer_init(void)
 {
-    audiobuf = audiobuffer;
+    /* 32-bit aligned */
+    audiobuf = (void *)(((unsigned long)audiobuffer + 3) & ~3);
 }
 
 void *buffer_alloc(size_t size)
@@ -39,5 +40,7 @@ void *buffer_alloc(size_t size)
     void *retval = audiobuf;
     
     audiobuf += size;
+    /* 32-bit aligned */;
+    audiobuf = (void *)(((unsigned long)audiobuf + 3) & ~3);
     return retval;
 }
