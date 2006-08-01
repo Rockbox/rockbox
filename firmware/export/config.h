@@ -43,6 +43,7 @@
 #define PP5020  5020
 #define PNX0101  101
 #define S3C2440 2440
+#define PP5024  5024
 
 /* CONFIG_KEYPAD */
 #define PLAYER_PAD          0

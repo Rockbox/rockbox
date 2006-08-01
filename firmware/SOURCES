@@ -220,8 +220,8 @@ drivers/m5636.c
 #endif
 
 #ifdef SANSA_E200
-target/arm/sandisk/sansa-e200/ata.c
-target/arm/sandisk/sansa-e200/lcd.c
+target/arm/sandisk/sansa-e200/ata-e200.c
+target/arm/sandisk/sansa-e200/lcd-e200.c
 #endif
 
 #ifdef IAUDIO_X5
