@@ -1306,8 +1306,10 @@ int ft_play_dirname(char* name)
     int fd;
     char dirname_mp3_filename[MAX_PATH+1];
 
+#if CONFIG_CODEC != SWCODEC
     if (audio_status() & AUDIO_STATUS_PLAY)
         return 0;
+#endif
 
     snprintf(dirname_mp3_filename, sizeof(dirname_mp3_filename), "%s/%s/%s",
              tc.currdir[1] ? tc.currdir : "" , name, 
@@ -1334,8 +1336,10 @@ void ft_play_filename(char *dir, char *file)
 {
     char name_mp3_filename[MAX_PATH+1];
 
+#if CONFIG_CODEC != SWCODEC
     if (audio_status() & AUDIO_STATUS_PLAY)
         return;
+#endif
 
     if (strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
                     file_thumbnail_ext))

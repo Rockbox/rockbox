@@ -39,6 +39,23 @@
 #include "playback.h"
 #endif
 
+
+/* Memory layout varies between targets because the
+   Archos (MASCODEC) devices cannot mix voice and audio playback
+ 
+             MASCODEC  | MASCODEC  | SWCODEC
+             (playing) | (stopped) |
+    audiobuf-----------+-----------+-----------
+              audio    | voice     | thumbnail
+                       |-----------|-----------
+                       | thumbnail | voice
+                       |           |-----------
+                       |           | audio
+  audiobufend----------+-----------+-----------
+
+  SWCODEC allocates dedicated buffers, MASCODEC reuses audiobuf. */
+
+
 /***************** Constants *****************/
 
 #define QUEUE_SIZE 64 /* must be a power of two */
@@ -51,6 +68,10 @@ const char* const file_thumbnail_ext = ".talk";
 #define QUEUE_LEVEL ((queue_write - queue_read) & QUEUE_MASK)
 
 #define LOADED_MASK 0x80000000 /* MSB */
+
+#if CONFIG_CODEC == SWCODEC    
+#define MAX_THUMBNAIL_BUFSIZE 32768
+#endif
 
 
 /***************** Data types *****************/
@@ -172,12 +193,16 @@ static void load_voicefile(void)
     if (((struct voicefile*)audiobuf)->table /* format check */
            == offsetof(struct voicefile, index))
     {
+#if CONFIG_CODEC == SWCODEC
+        /* SWCODEC: allocate permanent buffer */
+        p_voicefile = (struct voicefile*)buffer_alloc(file_size);
+#else
+        /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_voicefile = (struct voicefile*)audiobuf;
-
-        /* thumbnail buffer is the remaining space behind */
         p_thumbnail = audiobuf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
         size_for_thumbnail = audiobufend - p_thumbnail;
+#endif
     }
     else
        goto load_err;
@@ -198,7 +223,7 @@ static void load_voicefile(void)
     cpu_boost(true);
     buf = (unsigned char *)(&p_voicefile->index) +
         (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
-    length = file_size - (buf - audiobuf);
+    length = file_size - (buf - (unsigned char *) p_voicefile);
                
     for (i = 0; i < length; i++)
     {
@@ -216,7 +241,7 @@ static void load_voicefile(void)
     load_size = (p_voicefile->id1_max + p_voicefile->id2_max)
                 * sizeof(struct clip_entry);
     got_size = read(filehandle, 
-                    audiobuf + offsetof(struct voicefile, index), load_size);
+                    (unsigned char *) p_voicefile + offsetof(struct voicefile, index), load_size);
     if (got_size != load_size) /* read error */
        goto load_err;
 #else
@@ -278,9 +303,9 @@ re_check:
         curr_hd[1] = p_lastclip[2];
         curr_hd[2] = p_lastclip[3];
     }
-    else if (p_silence != NULL            /* silence clip available */
-             && p_lastclip != p_silence   /* previous clip wasn't silence */
-             && p_lastclip < p_thumbnail) /* ..and not a thumbnail */
+    else if (p_silence != NULL             /* silence clip available */
+             && p_lastclip != p_silence    /* previous clip wasn't silence */
+             && p_lastclip != p_thumbnail) /* ..or thumbnail */
     {   /* add silence clip when queue runs empty playing a voice clip */
         queue[queue_write].buf = p_silence;
         queue[queue_write].len = silence_len;
@@ -424,7 +449,7 @@ static unsigned char* get_clip(long id, long* p_size)
     clipsize = p_voicefile->index[id].size;
     if (clipsize == 0) /* clip not included in voicefile */
         return NULL;
-    clipbuf = audiobuf + p_voicefile->index[id].offset;
+    clipbuf = (unsigned char *) p_voicefile + p_voicefile->index[id].offset;
 
 #ifdef HAVE_MMC /* dynamic loading, on demand */
     if (!(clipsize & LOADED_MASK))
@@ -451,8 +476,17 @@ static void reset_state(void)
 {
     queue_write = queue_read = 0; /* reset the queue */
     p_voicefile = NULL; /* indicate no voicefile (trashed) */
-    p_thumbnail = audiobuf; /*  whole space for thumbnail */
+#if CONFIG_CODEC == SWCODEC
+    /* Allocate a dedicated thumbnail buffer */
     size_for_thumbnail = audiobufend - audiobuf;
+    if (size_for_thumbnail > MAX_THUMBNAIL_BUFSIZE)
+        size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
+    p_thumbnail = buffer_alloc(size_for_thumbnail);
+#else
+    /* Just use the audiobuf, without allocating anything */
+    p_thumbnail = audiobuf;
+    size_for_thumbnail = audiobufend - audiobuf;
+#endif
     p_silence = NULL; /* pause clip not accessible */
 }
 
@@ -563,8 +597,10 @@ int talk_file(const char* filename, bool enqueue)
     int size;
     struct mp3entry info;
 
+#if CONFIG_CODEC != SWCODEC
     if (audio_status()) /* busy, buffer in use */
         return -1; 
+#endif
 
     if (p_thumbnail == NULL || size_for_thumbnail <= 0)
         return -1;
@@ -587,7 +623,7 @@ int talk_file(const char* filename, bool enqueue)
 
     /* ToDo: find audio, skip ID headers and trailers */
 
-    if (size)
+    if (size != 0 && size != size_for_thumbnail)    /* Don't play missing or truncated clips */
     {
 #if CONFIG_CODEC != SWCODEC
         bitswap(p_thumbnail, size);
