@@ -469,6 +469,8 @@ toolsdir='\$(ROOTDIR)/tools'
   echo "19 - iriver iFP-790"
   echo "20 - Toshiba Gigabeat F"
   echo "21 - iPod Mini 2G"
+  echo "22 - iriver H10"
+  echo "23 - SanDisk Sansa e200"
 
   target_id=`input`;
 
@@ -479,9 +481,9 @@ toolsdir='\$(ROOTDIR)/tools'
   archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb codepages"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
-  gigabeatbitmaptools="$toolset bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
-  ifpbitmaptools="$toolset bmp2rb codepages"
+  # generic is used by Gigabeat, IFP, H10, Sansa-e200
+  genericbitmaptools="$toolset bmp2rb codepages"
 
   case $target_id in
 
@@ -851,7 +853,7 @@ toolsdir='\$(ROOTDIR)/tools'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset=$ifpbitmaptools
+    toolset=$genericbitmaptools
     ;;
 
    20)
@@ -868,7 +870,7 @@ toolsdir='\$(ROOTDIR)/tools'
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
-    toolset=$gigabeatbitmaptools
+    toolset=$genericbitmaptools
     ;;
 
    21)
@@ -888,6 +890,54 @@ toolsdir='\$(ROOTDIR)/tools'
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    ;;
+
+   22)
+    archos="h10"
+    target="-DIRIVER_H10"
+    memory=32 # always
+    arm7tdmicc
+    #tool="$rootdir/tools/ -add=iax5"
+    tool="$rootdir/tools/mi4code build"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.iriver"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$genericbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="h10"
+    ;;
+
+   23)
+    archos="e200"
+    target="-DSANSA_E200"
+    memory=32 # supposedly
+    arm7tdmicc
+    #tool="$rootdir/tools/ -add=iax5"
+    tool="$rootdir/tools/mi4code build"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.sansa"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$genericbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="sandisk"
+    t_model="sansa-e200"
     ;;
 
    *)
@@ -945,7 +995,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g)
+          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g|h10|e200)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"
@@ -1124,7 +1174,7 @@ if test -n "$t_cpu"; then
   TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer"
   TARGET_INC="$TARGET_INC -I\$(FIRMDIR)/target/$t_cpu"
-  GCCOPTS="$GCCOPTS -DTARGET_TREE"
+  GCCOPTS="$GCCOPTS"
 fi
 
 if test "$simulator" = "yes"; then
