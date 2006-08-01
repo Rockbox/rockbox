@@ -1,4 +1,4 @@
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(IPOD_ARCH)
 ipod.c
 #elif defined(SANSA_E200)
 e200.c
