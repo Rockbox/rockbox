@@ -313,10 +313,10 @@
     *: "Info"
   </source>
   <dest>
-    *: "Info"
+    *: "Tiedot"
   </dest>
   <voice>
-    *: "Info"
+    *: "Tiedot"
   </voice>
 </phrase>
 <phrase>
@@ -2660,10 +2660,10 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
     *: "Katkaisuaika"
@@ -6603,7 +6603,7 @@
     *:
   </dest>
   <voice>
-    *: "‰ff"
+    *: "F"
   </voice>
 </phrase>
 <phrase>
@@ -6687,7 +6687,7 @@
     *:
   </dest>
   <voice>
-    *: "‰ll"
+    *: "L"
   </voice>
 </phrase>
 <phrase>
@@ -6701,7 +6701,7 @@
     *:
   </dest>
   <voice>
-    *: "‰mm"
+    *: "M"
   </voice>
 </phrase>
 <phrase>
@@ -6715,7 +6715,7 @@
     *:
   </dest>
   <voice>
-    *: "‰nn"
+    *: "N"
   </voice>
 </phrase>
 <phrase>
@@ -6771,7 +6771,7 @@
     *:
   </dest>
   <voice>
-    *: "‰rr"
+    *: "R"
   </voice>
 </phrase>
 <phrase>
@@ -6785,7 +6785,7 @@
     *:
   </dest>
   <voice>
-    *: "‰ss"
+    *: "S"
   </voice>
 </phrase>
 <phrase>
@@ -6841,7 +6841,7 @@
     *:
   </dest>
   <voice>
-    *: "tuplavee"
+    *: "W"
   </voice>
 </phrase>
 <phrase>
@@ -6855,7 +6855,7 @@
     *:
   </dest>
   <voice>
-    *: "‰ks"
+    *: "X"
   </voice>
 </phrase>
 <phrase>
@@ -8530,7 +8530,7 @@
     *: "P√§ivit√§"
   </dest>
   <voice>
-    *: "P√§ivit√§"
+    *: "P‰ivit‰"
   </voice>
 </phrase>
 <phrase>
@@ -8629,5 +8629,127 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Tuo muutokset"
+  </dest>
+  <voice>
+    *: "Tuo muutokset"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Aika"
+  </dest>
+  <voice>
+    *: "Aika"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Tiedostokoko"
+  </dest>
+  <voice>
+    *: "Tiedostokoko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Pys√§yt√§ nauhoitus"
+  </dest>
+  <voice>
+    *: "Pys‰yt‰ nauhoitus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Katkaisun tiedostokoko"
+  </dest>
+  <voice>
+    *: "Katkaisun tiedostokoko"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Katkaisun suuruus"
+  </dest>
+  <voice>
+    *: "Katkaisun suuruus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Katkaisuaika"
+  </dest>
+  <voice>
+    *: "Katkaisuaika"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Aloita uusi tiedosto"
+  </dest>
+  <voice>
+    *: "Aloita uusi tiedosto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Katkaisutyyppi"
+  </dest>
+  <voice>
+    *: "Katkaisutyyppi"
   </voice>
 </phrase>
