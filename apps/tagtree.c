@@ -379,11 +379,17 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     
     /* Do not gather data unless proper setting has been enabled. */
     if (!global_settings.runtimedb)
+    {
+        logf("runtimedb gathering not enabled");
         return;
+    }
     
     /* Don't process unplayed tracks. */
     if (id3->elapsed == 0)
+    {
+        logf("not logging unplayed track");
         return;
+    }
     
     if (!tagcache_find_index(&tcs, id3->path))
     {
@@ -399,7 +405,11 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     
     lastplayed = tagcache_increase_serial();
     if (lastplayed < 0)
+    {
+        logf("incorrect tc serial:%d", lastplayed);
+        tagcache_search_finish(&tcs);
         return;
+    }
     
     /* Ignore the last 15s (crossfade etc.) */
     playtime += MIN(id3->length, id3->elapsed + 15 * 1000);

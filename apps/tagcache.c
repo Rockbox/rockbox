@@ -43,9 +43,9 @@
  *   |    |   |   |          +--x--------x---------+        |
  *   |    |   |   |          | Temporary Commit DB |        |
  *   |    |   |   |          +---------------------+        |
- * +-x----x---x---x--+                                      |
+ * +-x----x-------x--+                                      |
  * | TagCache RAM DB x==\(W) +-----------------+            |
- * +-x----x---x---x--+   \===x                 |            |
+ * +-----------------+   \===x                 |            |
  *   |    |   |   |      (R) |  Ram DB Loader  x============x DirCache
  * +-x----x---x---x---+   /==x                 |            | (optional)
  * | Tagcache Disk DB x==/   +-----------------+            |  
@@ -190,6 +190,10 @@ static int cachefd = -1, filenametag_fd;
 static int total_entry_count = 0;
 static int data_size = 0;
 static int processed_dir_count;
+
+/* Thread safe locking */
+static volatile int write_lock;
+static volatile int read_lock;
 
 int tagcache_str_to_tag(const char *str)
 {
@@ -516,6 +520,7 @@ static bool write_index(int masterfd, int idxid, struct index_entry *idx)
         sizeof(struct index_entry))
     {
         logf("write error #3");
+        logf("idxid: %d", idxid);
         return false;
     }
     
@@ -818,8 +823,11 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     struct master_header   master_hdr;
     int i;
 
-    if (tcs->valid)
+    if (tcs->initialized)
         tagcache_search_finish(tcs);
+    
+    while (read_lock)
+        sleep(1);
     
     memset(tcs, 0, sizeof(struct tagcache_search));
     if (stat.commit_step > 0 || !stat.ready)
@@ -830,7 +838,6 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     tcs->seek_pos = 0;
     tcs->seek_list_count = 0;
     tcs->filter_count = 0;
-    tcs->valid = true;
     tcs->masterfd = -1;
 
     for (i = 0; i < TAG_COUNT; i++)
@@ -848,18 +855,28 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
 #endif
     {
         if (tagcache_is_numeric_tag(tcs->type))
+        {
+            tcs->valid = true;
+            tcs->initialized = true;
             return true;
+        }
         
         tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
         if (tcs->idxfd[tcs->type] < 0)
             return false;
 
-        tcs->masterfd = open_master_fd(&master_hdr, false);
+        /* Always open as R/W so we can pass tcs to functions that modify data also
+         * without failing. */
+        tcs->masterfd = open_master_fd(&master_hdr, true);
         
         if (tcs->masterfd < 0)
             return false;
     }
 
+    tcs->valid = true;
+    tcs->initialized = true;
+    write_lock++;
+    
     return true;
 }
 
@@ -1153,6 +1170,9 @@ void tagcache_search_finish(struct tagcache_search *tcs)
 {
     int i;
     
+    if (!tcs->initialized)
+        return;
+    
     if (tcs->masterfd >= 0)
     {
         close(tcs->masterfd);
@@ -1170,6 +1190,9 @@ void tagcache_search_finish(struct tagcache_search *tcs)
     
     tcs->ramsearch = false;
     tcs->valid = false;
+    tcs->initialized = 0;
+    if (write_lock > 0)
+        write_lock--;
 }
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
@@ -2076,6 +2099,9 @@ static bool commit(void)
     
     logf("committing tagcache");
     
+    while (write_lock)
+        sleep(1);
+    
     tmpfd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (tmpfd < 0)
     {
@@ -2103,6 +2129,8 @@ static bool commit(void)
         return true;
     }
 
+    read_lock++;
+    
     /* Try to steal every buffer we can :) */
     if (tempbuf_size == 0)
         local_allocation = true;
@@ -2138,6 +2166,7 @@ static bool commit(void)
         logf("delaying commit until next boot");
         stat.commit_delayed = true;
         close(tmpfd);
+        read_lock--;
         return false;
     }
     
@@ -2169,6 +2198,7 @@ static bool commit(void)
             else
                 stat.commit_delayed = true;
             stat.commit_step = 0;
+            read_lock--;
             return false;
         }
     }
@@ -2178,8 +2208,11 @@ static bool commit(void)
     
     /* Update the master index headers. */
     if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
+    {
+        read_lock--;
         return false;
-
+    }
+    
     tcmh.tch.entry_count += tch.entry_count;
     tcmh.tch.datasize = sizeof(struct master_header) 
         + sizeof(struct index_entry) * tcmh.tch.entry_count
@@ -2212,6 +2245,7 @@ static bool commit(void)
 #endif
     
     queue_post(&tagcache_queue, Q_IMPORT_CHANGELOG, 0);
+    read_lock--;
     
     return true;
 }
@@ -2262,6 +2296,9 @@ long tagcache_increase_serial(void)
 {
     if (!stat.ready)
         return -2;
+    
+    while (read_lock)
+        sleep(1);
     
     if (!update_current_serial(current_serial + 1))
         return -1;
@@ -2478,6 +2515,9 @@ bool tagcache_import_changelog(void)
     if (!stat.ready)
         return false;
     
+    while (read_lock)
+        sleep(1);
+    
     clfd = open(TAGCACHE_FILE_CHANGELOG, O_RDONLY);
     if (clfd < 0)
     {
@@ -2490,6 +2530,8 @@ bool tagcache_import_changelog(void)
         close(clfd);
         return false;
     }
+    
+    write_lock++;
     
     /* Fast readline */
     while ( 1 )
@@ -2529,6 +2571,8 @@ bool tagcache_import_changelog(void)
     
     close(clfd);
     close(masterfd);
+    
+    write_lock--;
     
     update_current_serial(current_serial);
     
@@ -2724,12 +2768,11 @@ static bool delete_entry(long idx_id)
 #ifdef HAVE_TC_RAMCACHE
 static bool allocate_tagcache(void)
 {
+    struct master_header tcmh;
     int fd;
 
     /* Load the header. */
-    hdr = (struct ramcache_header *)(((long)audiobuf & ~0x03) + 0x04);
-    memset(hdr, 0, sizeof(struct ramcache_header));
-    if ( (fd = open_master_fd(&hdr->h, false)) < 0)
+    if ( (fd = open_master_fd(&tcmh, false)) < 0)
     {
         hdr = NULL;
         return false;
@@ -2737,17 +2780,17 @@ static bool allocate_tagcache(void)
     
     close(fd);
     
-    hdr->indices = (struct index_entry *)(hdr + 1);
-    
     /** 
      * Now calculate the required cache size plus 
      * some extra space for alignment fixes. 
      */
-    stat.ramcache_allocated = hdr->h.tch.datasize + 128 + TAGCACHE_RESERVE +
+    stat.ramcache_allocated = tcmh.tch.datasize + 128 + TAGCACHE_RESERVE +
         sizeof(struct ramcache_header) + TAG_COUNT*sizeof(void *);
+    hdr = buffer_alloc(stat.ramcache_allocated + 128);
+    memset(hdr, 0, sizeof(struct ramcache_header));
+    memcpy(&hdr->h, &tcmh, sizeof(struct master_header));
+    hdr->indices = (struct index_entry *)(hdr + 1);
     logf("tagcache: %d bytes allocated.", stat.ramcache_allocated);
-    logf("at: 0x%04x", audiobuf);
-    audiobuf += (long)((stat.ramcache_allocated & ~0x03) + 128);
 
     return true;
 }
@@ -3361,6 +3404,7 @@ void tagcache_init(void)
     memset(&stat, 0, sizeof(struct tagcache_stat));
     filenametag_fd = -1;
     current_serial = 0;
+    write_lock = read_lock = 0;
     
     queue_init(&tagcache_queue);
     create_thread(tagcache_thread, tagcache_stack,

@@ -113,6 +113,7 @@ struct tagcache_search {
     long position;
     int entry_count;
     bool valid;
+    bool initialized;
 
     /* Exported variables. */
     bool ramsearch;

@@ -850,7 +850,7 @@ int onplay(char* file, int attr, int from)
 
     if (context == CONTEXT_WPS ||
         context == CONTEXT_TREE ||
-        (context == CONTEXT_ID3DB))
+        context == CONTEXT_ID3DB)
     {
         items[i].desc = ID2P(LANG_PLAYLIST);
         items[i].function = playlist_options;

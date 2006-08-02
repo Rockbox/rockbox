@@ -623,20 +623,18 @@ int dircache_build(int last_size)
         return 2;
     }
     
-    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
-
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
-        
-        /* We have to long align the audiobuf to keep the buffer access fast. */
-        audiobuf += (long)((allocated_size & ~0x03) + 0x04);
+        dircache_root = (struct dircache_entry *)buffer_alloc(allocated_size);
         thread_enabled = true;
 
         /* Start a transparent rebuild. */
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 3;
     }
+
+    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
 
     /* Start a non-transparent rebuild. */
     return dircache_do_rebuild();
@@ -672,8 +670,7 @@ void dircache_init(void)
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
     {
-        opendirs[i].secondary_entry.d_name = audiobuf;
-        audiobuf += MAX_PATH;
+        opendirs[i].secondary_entry.d_name = buffer_alloc(MAX_PATH);
     }
     
     queue_init(&dircache_queue);
