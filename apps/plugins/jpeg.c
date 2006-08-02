@@ -2771,7 +2771,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef USEGSLIB
     /* initialize the grayscale buffer: 32 bitplanes for 33 shades of gray. */
     grayscales = gray_init(rb, buf, buf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
-                           32, &graysize) + 1;
+                           32, 2<<8, &graysize) + 1;
     buf += graysize;
     buf_size -= graysize;
     if (grayscales < 33 || buf_size <= 0)

@@ -183,7 +183,7 @@ int main(void)
        H1x0: 160 pixels wide, 30 rows (120 pixels) high, (try to) reserve
        32 bitplanes for 33 shades of grey. */
     shades = gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, GFX_HEIGHT/8,
-                       32, NULL) + 1;
+                       32, 0, NULL) + 1;
 
     /* place greyscale overlay 1 row down */
     gray_set_position(0, 1);

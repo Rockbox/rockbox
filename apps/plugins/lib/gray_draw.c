@@ -32,12 +32,12 @@
 
 static void setpixel(unsigned char *address)
 {
-    *address = _gray_info.fg_brightness;
+    *address = _gray_info.fg_index;
 }
 
 static void clearpixel(unsigned char *address)
 {
-    *address = _gray_info.bg_brightness;
+    *address = _gray_info.bg_index;
 }
 
 static void flippixel(unsigned char *address)
@@ -61,7 +61,7 @@ void (* const _gray_pixelfuncs[8])(unsigned char *address) = {
 void gray_clear_display(void)
 {
     int brightness = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-                     _gray_info.fg_brightness : _gray_info.bg_brightness;
+                     _gray_info.fg_index : _gray_info.bg_index;
 
     _gray_rb->memset(_gray_info.cur_buffer, brightness,
                      MULU16(_gray_info.width, _gray_info.height));
@@ -219,7 +219,7 @@ void gray_vline(int x, int y1, int y2)
         if (_gray_info.drawmode & DRMODE_BG)
         {
             fillopt = true;
-            bits = _gray_info.bg_brightness;
+            bits = _gray_info.bg_index;
         }
     }
     else
@@ -227,7 +227,7 @@ void gray_vline(int x, int y1, int y2)
         if (_gray_info.drawmode & DRMODE_FG)
         {
             fillopt = true;
-            bits = _gray_info.fg_brightness;
+            bits = _gray_info.fg_index;
         }
     }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
@@ -293,7 +293,7 @@ void gray_fillrect(int x, int y, int width, int height)
         if (_gray_info.drawmode & DRMODE_BG)
         {
             fillopt = true;
-            bits = _gray_info.bg_brightness;
+            bits = _gray_info.bg_index;
         }
     }
     else
@@ -301,7 +301,7 @@ void gray_fillrect(int x, int y, int width, int height)
         if (_gray_info.drawmode & DRMODE_FG)
         {
             fillopt = true;
-            bits = _gray_info.fg_brightness;
+            bits = _gray_info.fg_index;
         }
     }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
@@ -525,8 +525,7 @@ void gray_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         dst_end = dst_col + height;
         do
         {
-            unsigned data = MULU16(_gray_info.depth, *src_col) + 127;
-            *dst_col++ = (data + (data >> 8)) >> 8; /* approx. data / 255 */
+            *dst_col++ = _gray_info.idxtable[*src_col];
             src_col += stride;
         }
         while (dst_col < dst_end);
@@ -642,13 +641,8 @@ static void _writearray(unsigned char *address, const unsigned char *src,
 
         "mov.b   @%[src],r0  \n"  /* load src byte */
         "extu.b  r0,r0       \n"  /* extend unsigned */
-        "mulu    %[dpth],r0  \n"  /* macl = byte * depth; */
-        "sts     macl,r1     \n"  /* r1 = macl; */
-        "add     #127,r1     \n"  /* byte += 127; */
-        "mov     r1,r0       \n"
-        "shlr8   r1          \n"
-        "add     r1,r0       \n"  /* byte += byte >> 8; */
-        "shlr8   r0          \n"  /* byte >>= 8; */
+        "mov.b   @(r0,%[trns]),r0\n"  /* idxtable into pattern index */
+        "extu.b  r0,r0       \n"  /* extend unsigned */
         "shll2   r0          \n"
         "mov.l   @(r0,%[bpat]),r4\n"  /* r4 = bitpattern[byte]; */
 
@@ -693,7 +687,8 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         [stri]"r"(stride),
         [dpth]"r"(_gray_info.depth),
         [bpat]"r"(_gray_info.bitpattern),
-        [rmsk]"r"(_gray_info.randmask)
+        [rmsk]"r"(_gray_info.randmask),
+        [trns]"r"(_gray_info.idxtable)
         : /* clobbers */
         "r0", "r1", "r3", "r4", "r5", "macl", "pr"
     );
@@ -811,12 +806,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
 
         "clr.l   %%d0        \n"
         "move.b  (%[src]),%%d0   \n"  /* load src byte */
-        "mulu.w  %[dpth],%%d0\n"  /* byte = byte * depth; */
-        "add.l   #127,%%d0   \n"  /* byte += 127; */
-        "move.l  %%d0,%%d1   \n"
-        "lsr.l   #8,%%d1     \n"
-        "add.l   %%d1,%%d0   \n"  /* byte += byte >> 8; */
-        "lsr.l   #8,%%d0     \n"  /* byte >>= 8; */
+        "move.b  (%%d0:l:1,%[trns]),%%d0\n" /* idxtable into pattern index */
         "move.l  (%%d0:l:4,%[bpat]),%%d2\n" /* d2 = bitpattern[byte]; */
 
         "mulu.w  #75,%[rnd]  \n"  /* multiply by 75 */
@@ -852,6 +842,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         : /* inputs */
         [stri]"r"(stride),
         [bpat]"a"(_gray_info.bitpattern),
+        [trns]"a"(_gray_info.idxtable),
         [dpth]"d"(_gray_info.depth),
         [rmsk]"d"(_gray_info.randmask)
         : /* clobbers */

@@ -332,7 +332,7 @@ int main(void)
     shades = 256;
 #else
     shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
-                       32, NULL) + 1;
+                       32, 2<<8, NULL) + 1;
     if(shades <= 1)
     {
         rb->splash(HZ, true, "not enough memory");

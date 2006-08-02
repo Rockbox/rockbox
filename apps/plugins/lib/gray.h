@@ -38,7 +38,8 @@
 
 /* Library initialisation and release */
 int  gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
-               bool buffered, int width, int bheight, int depth, long *buf_taken);
+               bool buffered, int width, int bheight, int depth, int gamma,
+               long *buf_taken);
 void gray_release(void);
 
 /* Special functions */
@@ -138,9 +139,12 @@ struct _gray_info
 #endif
     unsigned char *cur_buffer; /* start of current chunky pixel buffer */
     unsigned char *back_buffer;/* start of chunky pixel back buffer */
+    unsigned char idxtable[256]; /* calculated brightness -> index translation table */
+    int fg_index;              /* current foreground index */
+    int bg_index;              /* current background index */
+    int fg_brightness;         /* current foreground brightness, for returning */
+    int bg_brightness;         /* current background brightness, for returning */
     int drawmode;              /* current draw mode */
-    int fg_brightness;         /* current foreground brightness */
-    int bg_brightness;         /* current background brightness */
     int curfont;               /* current selected font */
 };
 

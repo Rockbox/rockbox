@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.17  2006/04/22 03:48:15  kkurbjun
+ * Revision 1.18  2006/08/02 00:21:59  amiconn
+ * Grayscale library: LCD linearisation and gamma correction.
+ *
+ * Revision 1.17  2006-04-22 03:48:15  kkurbjun
  * Better video update, add options to startup menu, change default screensize
  *
  * Revision 1.16  2006-04-20 19:39:56  kkurbjun
@@ -484,7 +487,8 @@ void I_InitGraphics(void)
 
 #ifndef HAVE_LCD_COLOR
    gbuf=malloc(GRAYBUFSIZE);
-   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT/8, 32, NULL);
+   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT/8, 32, 
+             3<<7 /* 1.5 */, NULL);
    /* switch on grayscale overlay */
    gray_show(true);
 #endif

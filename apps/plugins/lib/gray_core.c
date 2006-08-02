@@ -33,7 +33,117 @@ struct plugin_api *_gray_rb = NULL; /* global api struct pointer */
 struct _gray_info _gray_info;       /* global info structure */
 #ifndef SIMULATOR
 short _gray_random_buffer;          /* buffer for random number generator */
+
+#if CONFIG_LCD == LCD_SSD1815
+/* measured and interpolated curve */
+static const unsigned char lcdlinear[256] = {
+      0,   3,   5,   8,  11,  13,  16,  18,
+     21,  23,  26,  28,  31,  33,  36,  38,
+     40,  42,  45,  47,  49,  51,  53,  55,
+     57,  59,  60,  62,  64,  66,  67,  69,
+     70,  72,  73,  74,  76,  77,  78,  79,
+     81,  82,  83,  84,  85,  86,  87,  88,
+     88,  89,  90,  91,  92,  92,  93,  94,
+     95,  95,  96,  97,  97,  98,  99,  99,
+    100, 101, 102, 102, 103, 104, 104, 105,
+    106, 106, 107, 107, 108, 109, 109, 110,
+    111, 111, 112, 113, 113, 114, 114, 115,
+    116, 116, 117, 117, 118, 119, 119, 120,
+    120, 121, 121, 122, 122, 123, 123, 124,
+    124, 125, 125, 126, 126, 127, 127, 128,
+    128, 128, 129, 129, 130, 130, 131, 131,
+    132, 132, 133, 133, 133, 134, 134, 135,
+    135, 136, 136, 137, 137, 138, 138, 138,
+    139, 139, 140, 140, 141, 141, 142, 142,
+    143, 143, 144, 144, 145, 145, 146, 146,
+    147, 147, 148, 148, 148, 149, 149, 150,
+    150, 151, 151, 152, 152, 153, 153, 153,
+    154, 154, 155, 155, 156, 156, 157, 157,
+    158, 158, 158, 159, 159, 160, 160, 161,
+    161, 162, 162, 163, 163, 164, 164, 165,
+    165, 166, 167, 167, 168, 168, 169, 169,
+    170, 171, 171, 172, 173, 173, 174, 175,
+    176, 176, 177, 178, 179, 180, 181, 181,
+    182, 183, 184, 185, 186, 188, 189, 190,
+    191, 192, 194, 195, 196, 198, 199, 201,
+    202, 204, 205, 207, 209, 211, 213, 215,
+    217, 219, 222, 224, 226, 229, 231, 234,
+    236, 239, 242, 244, 247, 250, 252, 255
+};
+#elif CONFIG_LCD == LCD_S1D15E06
+/* measured and interpolated curve */
+static const unsigned char lcdlinear[256] = {
+      0,   5,  11,  16,  21,  27,  32,  37,
+     42,  47,  51,  56,  60,  64,  68,  72,
+     75,  78,  81,  84,  87,  89,  91,  93,
+     95,  96,  98,  99, 101, 102, 103, 104,
+    105, 106, 107, 108, 109, 110, 111, 111,
+    112, 113, 113, 114, 115, 115, 116, 117,
+    117, 118, 118, 119, 119, 120, 120, 121,
+    121, 122, 122, 123, 123, 124, 124, 125,
+    125, 126, 126, 127, 127, 127, 128, 128,
+    129, 129, 130, 130, 131, 131, 132, 132,
+    133, 133, 134, 134, 135, 135, 136, 136,
+    137, 137, 138, 138, 138, 139, 139, 140,
+    140, 141, 141, 141, 142, 142, 143, 143,
+    143, 144, 144, 145, 145, 145, 146, 146,
+    146, 147, 147, 147, 148, 148, 149, 149,
+    149, 150, 150, 150, 151, 151, 151, 152,
+    152, 153, 153, 153, 154, 154, 155, 155,
+    155, 156, 156, 157, 157, 157, 158, 158,
+    159, 159, 159, 160, 160, 161, 161, 162,
+    162, 162, 163, 163, 164, 164, 164, 165,
+    165, 166, 166, 167, 167, 167, 168, 168,
+    169, 169, 170, 170, 170, 171, 171, 172,
+    172, 173, 173, 174, 174, 175, 175, 176,
+    176, 177, 177, 178, 178, 179, 179, 180,
+    180, 181, 182, 182, 183, 184, 184, 185,
+    186, 186, 187, 188, 188, 189, 190, 191,
+    191, 192, 193, 194, 195, 196, 196, 197,
+    198, 199, 200, 201, 202, 203, 204, 205,
+    206, 207, 208, 209, 210, 211, 213, 214,
+    215, 216, 218, 219, 220, 222, 223, 225,
+    227, 228, 230, 232, 233, 235, 237, 239,
+    241, 243, 245, 247, 249, 251, 253, 255
+};
 #endif
+#else /* SIMULATOR */
+/* undo a (generic) PC display gamma of 2.0 to simulate target behaviour */
+static const unsigned char lcdlinear[256] = {
+      0,  16,  23,  28,  32,  36,  39,  42,
+     45,  48,  50,  53,  55,  58,  60,  62,
+     64,  66,  68,  70,  71,  73,  75,  77,
+     78,  80,  81,  83,  84,  86,  87,  89,
+     90,  92,  93,  94,  96,  97,  98, 100,
+    101, 102, 103, 105, 106, 107, 108, 109,
+    111, 112, 113, 114, 115, 116, 117, 118,
+    119, 121, 122, 123, 124, 125, 126, 127,
+    128, 129, 130, 131, 132, 133, 134, 135,
+    135, 136, 137, 138, 139, 140, 141, 142,
+    143, 144, 145, 145, 146, 147, 148, 149,
+    150, 151, 151, 152, 153, 154, 155, 156,
+    156, 157, 158, 159, 160, 160, 161, 162,
+    163, 164, 164, 165, 166, 167, 167, 168,
+    169, 170, 170, 171, 172, 173, 173, 174,
+    175, 176, 176, 177, 178, 179, 179, 180,
+    181, 181, 182, 183, 183, 184, 185, 186,
+    186, 187, 188, 188, 189, 190, 190, 191,
+    192, 192, 193, 194, 194, 195, 196, 196,
+    197, 198, 198, 199, 199, 200, 201, 201,
+    202, 203, 203, 204, 204, 205, 206, 206,
+    207, 208, 208, 209, 209, 210, 211, 211,
+    212, 212, 213, 214, 214, 215, 215, 216,
+    217, 217, 218, 218, 219, 220, 220, 221,
+    221, 222, 222, 223, 224, 224, 225, 225,
+    226, 226, 227, 228, 228, 229, 229, 230,
+    230, 231, 231, 232, 233, 233, 234, 234,
+    235, 235, 236, 236, 237, 237, 238, 238,
+    239, 240, 240, 241, 241, 242, 242, 243,
+    243, 244, 244, 245, 245, 246, 246, 247,
+    247, 248, 248, 249, 249, 250, 250, 251,
+    251, 252, 252, 253, 253, 254, 254, 255
+};
+#endif /* SIMULATOR */
 
 /* Prototypes */
 static inline void _deferred_update(void) __attribute__ ((always_inline));
@@ -84,6 +194,75 @@ static void _timer_isr(void)
 }
 #endif /* !SIMULATOR */
 
+/* fixed point exp() */
+static int exp_s16p16(int x)
+{
+    int t;
+    int y = 0x00010000;
+    
+    if (x == 0)
+    {
+        return y;
+    }
+    else if (x > 0)
+    {
+        t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
+        t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
+        t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
+        t = x - 0x0b172; if (t >= 0) x = t, y <<= 1;
+    }
+    else
+    {
+        t = x + 0x58b91; if (t < 0) x = t, y >>= 8;
+        t = x + 0x2c5c8; if (t < 0) x = t, y >>= 4;
+        t = x + 0x162e4; if (t < 0) x = t, y >>= 2;
+        t = x + 0x0b172; if (t < 0) x = t, y >>= 1;
+        x += 0x0b172;                      y >>= 1;
+    }
+    t = x - 0x067cd; if (t >= 0) x = t, y += y >> 1;
+    t = x - 0x03920; if (t >= 0) x = t, y += y >> 2;
+    t = x - 0x01e27; if (t >= 0) x = t, y += y >> 3;
+    t = x - 0x00f85; if (t >= 0) x = t, y += y >> 4;
+    t = x - 0x007e1; if (t >= 0) x = t, y += y >> 5;
+    t = x - 0x003f8; if (t >= 0) x = t, y += y >> 6;
+    t = x - 0x001fe; if (t >= 0) x = t, y += y >> 7;
+    if (x & 0x100)               y += y >> 8;
+    if (x & 0x080)               y += y >> 9;
+    if (x & 0x040)               y += y >> 10;
+    if (x & 0x020)               y += y >> 11;
+    if (x & 0x010)               y += y >> 12;
+    if (x & 0x008)               y += y >> 13;
+    if (x & 0x004)               y += y >> 14;
+    if (x & 0x002)               y += y >> 15;
+    if (x & 0x001)               y += y >> 16;
+
+    return y;
+}
+
+/* fixed point log() */
+int log_s16p16(int x)
+{
+    int t;
+    int y = 0xa65af;
+
+    if (x < 0x00008000) x <<=16,                        y -= 0xb1721;
+    if (x < 0x00800000) x <<= 8,                        y -= 0x58b91;
+    if (x < 0x08000000) x <<= 4,                        y -= 0x2c5c8;
+    if (x < 0x20000000) x <<= 2,                        y -= 0x162e4;
+    if (x < 0x40000000) x <<= 1,                        y -= 0x0b172;
+    t = x + (x >> 1); if ((t & 0x80000000) == 0) x = t, y -= 0x067cd;
+    t = x + (x >> 2); if ((t & 0x80000000) == 0) x = t, y -= 0x03920;
+    t = x + (x >> 3); if ((t & 0x80000000) == 0) x = t, y -= 0x01e27;
+    t = x + (x >> 4); if ((t & 0x80000000) == 0) x = t, y -= 0x00f85;
+    t = x + (x >> 5); if ((t & 0x80000000) == 0) x = t, y -= 0x007e1;
+    t = x + (x >> 6); if ((t & 0x80000000) == 0) x = t, y -= 0x003f8;
+    t = x + (x >> 7); if ((t & 0x80000000) == 0) x = t, y -= 0x001fe;
+    x = 0x80000000 - x;
+    y -= x >> 15;
+
+    return y;
+}
+
 /* Initialise the framework and prepare the greyscale display buffer
 
  arguments:
@@ -97,6 +276,8 @@ static void _timer_isr(void)
    width     = width in pixels  (1..LCD_WIDTH)
    bheight   = height in LCD pixel-block units (8 pixels) (1..LCD_HEIGHT/8)
    depth     = number of bitplanes to use (1..32).
+   gamma     = gamma value as s8p8 fixed point. gamma <= 0 means no
+               correction at all, i.e. no LCD linearisation as well.
 
  result:
    = depth  if there was enough memory
@@ -128,12 +309,14 @@ static void _timer_isr(void)
    one situation where it will consume more memory on the sim than on the
    target: if you're allocating a low depth (< 8) without buffering. */
 int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
-              bool buffered, int width, int bheight, int depth, long *buf_taken)
+              bool buffered, int width, int bheight, int depth, int gamma,
+              long *buf_taken)
 {
-    int possible_depth;
+    int possible_depth, i;
     long plane_size, buftaken;
+    unsigned data;
 #ifndef SIMULATOR
-    int i, j;
+    int j;
 #endif
 
     _gray_rb = newrb;
@@ -240,8 +423,33 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     }
 #endif
 
+    /* precalculate the value -> pattern index conversion table, taking 
+       linearisation and gamma correction into account */
+    if (gamma <= 0)
+    {
+        for (i = 0; i < 256; i++)
+        {
+            data = MULU16(depth, lcdlinear[i]) + 127;
+            _gray_info.idxtable[i] = (data + (data >> 8)) >> 8;
+                                      /* approx. data / 255 */
+        }
+    }
+    else
+    {
+        for (i = 0; i < 256; i++)
+        {
+            data = exp_s16p16(gamma * (log_s16p16(i * 257 + 1) >> 8));
+            data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
+            data = MULU16(depth, lcdlinear[data]) + 127;
+            _gray_info.idxtable[i] = (data + (data >> 8)) >> 8;
+                                      /* approx. data / 255 */
+        }
+    }
+
+    _gray_info.fg_index = 0;
+    _gray_info.bg_index = depth;
     _gray_info.fg_brightness = 0;
-    _gray_info.bg_brightness = depth;
+    _gray_info.bg_brightness = 255;
     _gray_info.drawmode = DRMODE_SOLID;
     _gray_info.curfont = FONT_SYSFIXED;
 
