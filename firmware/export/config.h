@@ -210,8 +210,13 @@
 #define CPU_COLDFIRE
 #endif
 
+/* define for all cpus from PP family */
+#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5024)
+#define CPU_PP
+#endif
+
 /* define for all cpus from ARM family */
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440) || (CONFIG_CPU == PP5024)
+#if defined(CPU_PP) || (CONFIG_CPU == PNX0101) || (CONFIG_CPU == S3C2440)
 #define CPU_ARM
 #endif
 
