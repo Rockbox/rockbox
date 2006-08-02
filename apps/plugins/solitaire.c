@@ -1161,6 +1161,7 @@ int solitaire( void )
         }
 
         /* draw the remains */
+        prevcard = cur_rem;
         if( rem != NOT_A_CARD )
         {
             coun_rem = coun_rem>2 ? coun_rem=2 : coun_rem;
@@ -1169,7 +1170,6 @@ int solitaire( void )
                 && cards_per_draw != 1 )
             {
                 j = 0;
-                prevcard = cur_rem;
                 for( i = 0; i < coun_rem; i++ )
                     prevcard = find_prev_card(prevcard);
                 for( i = 0; i <= coun_rem; i++ )
@@ -1185,15 +1185,15 @@ int solitaire( void )
             {
                 draw_cursor( CARD_WIDTH+4+1, 2 );
             }
+        }
 
-            if( ( prevcard == NOT_A_CARD && rem != NOT_A_CARD )
-                || deck[prevcard].next != NOT_A_CARD )
-            {
-                /* gruik ! (we want to display a card back) */
-                deck[rem].known = false;
-                draw_card( deck[rem], 2, 2, false, false, false );
-                deck[rem].known = true;
-            }
+        if( ( prevcard == NOT_A_CARD && rem != NOT_A_CARD )
+            || deck[prevcard].next != NOT_A_CARD )
+        {
+            /* gruik ! (we want to display a card back) */
+            deck[rem].known = false;
+            draw_card( deck[rem], 2, 2, false, false, false );
+            deck[rem].known = true;
         }
 
         rb->lcd_update();
