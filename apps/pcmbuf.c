@@ -36,7 +36,8 @@
 #include "audio.h"
 #include "dsp.h"
 
-#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 1)
+/* 1.5s low mark */
+#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 6)
 
 /* Structure we can use to queue pcm chunks in memory to be played
  * by the driver code. */
@@ -298,7 +299,7 @@ bool pcmbuf_crossfade_init(bool manual_skip)
     }
 
     /* Not enough data, or crossfade disabled, flush the old data instead */
-    if (LOW_DATA(6) || !pcmbuf_is_crossfade_enabled() || low_latency_mode)
+    if (LOW_DATA(2) || !pcmbuf_is_crossfade_enabled() || low_latency_mode)
     {
         pcmbuf_boost(true);
         pcmbuf_flush_fillpos();
@@ -973,10 +974,10 @@ void pcmbuf_crossfade_enable(bool on_off)
     crossfade_enabled = on_off;
 
     if (crossfade_enabled) {
-        /* If crossfading, try to keep the buffer full other than 2 second */
-        pcmbuf_set_watermark_bytes(pcmbuf_size - PCMBUF_WATERMARK * 2);
+        /* If crossfading, try to keep the buffer full other than 1 second */
+        pcmbuf_set_watermark_bytes(pcmbuf_size - (NATIVE_FREQUENCY * 4 * 1));
     } else {
-        /* Otherwise, just keep it above 1 second */
+        /* Otherwise, just keep it above 2 second */
         pcmbuf_set_watermark_bytes(PCMBUF_WATERMARK);
     }
 }
