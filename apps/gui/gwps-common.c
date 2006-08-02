@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -918,7 +918,7 @@ static char* get_tag(struct wps_data* wps_data,
                 return buf;
             }
             break;
-       case 'r':  /* Runtime database Information */
+       case 'r':  /* Runtime database Information and Replaygain */
             switch(tag[1])
             {
                 case 'p':  /* Playcount */
@@ -930,6 +930,16 @@ static char* get_tag(struct wps_data* wps_data,
                     *intval = cid3->rating+1;
                     snprintf(buf, buf_size, "%d", cid3->rating);
                     return buf;
+#if CONFIG_CODEC == SWCODEC
+                case 'g': /* ReplayGain */
+                    *flags |= WPS_REFRESH_STATIC;
+                    if(global_settings.replaygain)
+                        *intval = global_settings.replaygain_type+2;
+                    else
+                        *intval = 1;
+                    snprintf(buf, buf_size, "%d", *intval);
+                    return buf;
+#endif
             }
             break;
 #ifdef CONFIG_RTC
@@ -1070,6 +1080,21 @@ static char* get_tag(struct wps_data* wps_data,
                 return buf;
             }
 #endif /* CONFIG_RTC */
+#if CONFIG_CODEC == SWCODEC
+        case 'x':
+            *flags |= WPS_REFRESH_DYNAMIC;
+            switch(tag[1])
+            {
+                case 'd': /* crossfeed */
+                    if(global_settings.crossfeed)
+                        return "d";
+                case 'f': /* crossfade */
+                     *intval = global_settings.crossfade+1;
+                     snprintf(buf, buf_size, "%d", global_settings.crossfade);
+                return buf;
+            }
+            break;
+#endif
     }
     return NULL;
 }
