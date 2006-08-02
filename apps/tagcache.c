@@ -475,6 +475,8 @@ static bool get_index(int masterfd, int idxid,
         memcpy(idx, &hdr->indices[idxid], sizeof(struct index_entry));
         return true;
     }
+#else
+    (void)use_ram;
 #endif
     
     lseek(masterfd, idxid * sizeof(struct index_entry) 
