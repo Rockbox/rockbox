@@ -166,7 +166,7 @@ remap_end:
     bhi    1b
 
 #ifdef BOOTLOADER
-#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
+#ifdef CPU_PP
     .equ    PP5002_PROC_ID,  0xc4000000
     .equ    PP5002_COP_CTRL, 0xcf004058
     .equ    PP5020_PROC_ID,  0x60000000
