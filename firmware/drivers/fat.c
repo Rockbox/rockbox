@@ -2303,7 +2303,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                                exceed the buffer. Also check for FAT padding characters 0xFFFF. */
                             if (fat_copy_long_name_segment(ptr + index + 1, 5,
                                     longname_utf8segm) == 0) break;
-                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2312,7 +2312,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                             if (fat_copy_long_name_segment(ptr + index + 14, 6,
                                     longname_utf8segm) == 0) break;
-                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2321,7 +2321,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
                             if (fat_copy_long_name_segment(ptr + index + 28, 2,
                                     longname_utf8segm) == 0) break;
-                            logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
+                            // logf("SG: %s, EN: %s", longname_utf8segm, entry->name);
                             longname_utf8len += strlen(longname_utf8segm);
                             if (longname_utf8len < FAT_FILENAME_BYTES)
                                 strcat(entry->name, longname_utf8segm);
@@ -2342,8 +2342,8 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                         *utf8 = 0;
                             logf("SN: %s", entry->name);
                         } else {
-                            logf("LN: %s", entry->name);
-                            logf("LNLen: %d (%c)", longname_utf8len, entry->name[0]);
+                            // logf("LN: %s", entry->name);
+                            // logf("LNLen: %d (%c)", longname_utf8len, entry->name[0]);
                         }
                     }
                     done = true;
