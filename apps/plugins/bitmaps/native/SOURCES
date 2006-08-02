@@ -158,6 +158,21 @@ solitaire_cardback.220x176x16.bmp
 solitaire_cardback.176x132x16.bmp
 #endif
 #endif
+#if defined( HAVE_LCD_COLOR )
+solitaire_numbers.8x10x1.bmp
+solitaire_suits.8x10x16.bmp
+#elif LCD_HEIGHT > 64
+solitaire_numbers.8x10x1.bmp
+solitaire_suits.8x10x1.bmp
+#else
+solitaire_numbers.6x6x1.bmp
+solitaire_suits.6x6x1.bmp
+#endif
+#ifdef HAVE_LCD_COLOR
+solitaire_suitsi.15x16x16.bmp
+#else
+solitaire_suitsi.15x16x1.bmp
+#endif
 
 /* Sudoku */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT==64) && (LCD_DEPTH == 1)
