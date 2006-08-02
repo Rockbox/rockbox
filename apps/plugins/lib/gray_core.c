@@ -438,7 +438,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     {
         for (i = 0; i < 256; i++)
         {
-            data = exp_s16p16(gamma * (log_s16p16(i * 257 + 1) >> 8));
+            data = exp_s16p16((gamma * log_s16p16(i * 257 + 1)) >> 8);
             data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
             data = MULU16(depth, lcdlinear[data]) + 127;
             _gray_info.idxtable[i] = (data + (data >> 8)) >> 8;
