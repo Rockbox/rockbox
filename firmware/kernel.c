@@ -344,7 +344,7 @@ void tick_start(unsigned int interval_in_ms)
     IMR0 |= (1<<2);
 }
 
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU==PP5024)
+#elif defined(CPU_PP)
 
 #ifndef BOOTLOADER
 void TIMER1(void)
