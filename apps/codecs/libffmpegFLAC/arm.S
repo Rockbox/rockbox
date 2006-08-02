@@ -202,14 +202,14 @@ lpc_decode_arm:
     b .exit
 
 .order1:
-    ldr r5, [r4]
-    ldr r4, [r3], #4 
+    ldr r5, [r4]            @ load the one coef we need
+    ldr r4, [r3], #4        @ load one history sample, r3 now points to residual
 .loop1:
-    mul r2, r4, r5
-    ldr r4, [r3]
-    add r2, r4, r2, asr r1
-    str r2, [r3], #4
-    subs r0, r0, #1
+    mul r2, r4, r5          @ multiply coef by history sample
+    ldr r4, [r3]            @ load residual
+    add r4, r4, r2, asr r1  @ add result to residual
+    str r4, [r3], #4        @ place r3 at next residual, we already have 
+    subs r0, r0, #1         @ the current sample in r4 for the next iteration
     bne .loop1
     b .exit
 
