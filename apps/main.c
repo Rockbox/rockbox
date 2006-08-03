@@ -451,6 +451,7 @@ void init(void)
 #endif
 }
 
+#ifdef CPU_PP
 void cop_main(void)
 {
 /* This is the entry point for the coprocessor
@@ -463,6 +464,7 @@ void cop_main(void)
         COP_CTL = PROC_SLEEP;
     }
 }
+#endif
 
 int main(void)
 {
