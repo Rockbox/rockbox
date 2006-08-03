@@ -60,6 +60,12 @@ PLUGIN_HEADER
 #define BTN_UP           BUTTON_UP
 #define BTN_DOWN         BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_SCROLL_UP
+#define BTN_DOWN         BUTTON_SCROLL_DOWN
+
 #endif
 
 

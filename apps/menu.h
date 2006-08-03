@@ -106,6 +106,15 @@
 #define MENU_NEXT       BUTTON_DOWN
 #define MENU_PREV       BUTTON_UP
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+#define MENU_NEXT       BUTTON_SCROLL_DOWN
+#define MENU_PREV       BUTTON_SCROLL_UP
+#define MENU_EXIT       BUTTON_LEFT
+#define MENU_EXIT_MENU  BUTTON_REW
+#define MENU_ENTER      BUTTON_RIGHT
+#define MENU_ENTER2     BUTTON_FF
+
 #endif
 
 struct menu_item {

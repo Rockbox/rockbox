@@ -125,6 +125,15 @@ use stop to exit
 #define DICE_BUTTON_ON         BUTTON_POWER
 #define DICE_BUTTON_OFF        BUTTON_A
 
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define DICE_BUTTON_UP         BUTTON_SCROLL_UP
+#define DICE_BUTTON_DOWN       BUTTON_SCROLL_DOWN
+#define DICE_BUTTON_LEFT       BUTTON_LEFT
+#define DICE_BUTTON_RIGHT      BUTTON_RIGHT
+#define DICE_BUTTON_SELECT     BUTTON_REW
+#define DICE_BUTTON_ON         BUTTON_PLAY
+#define DICE_BUTTON_OFF        BUTTON_POWER
+ 
 #else
     #error DICE: Unsupported keypad
 #endif

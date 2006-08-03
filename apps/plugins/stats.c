@@ -54,6 +54,9 @@ static int fontwidth, fontheight;
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define STATS_STOP BUTTON_A
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define STATS_STOP BUTTON_POWER
+
 #endif
 
 /* TODO: Better get the exts from the filetypes var in tree.c */

@@ -278,6 +278,29 @@
 
 #define HAVE_DIR_NAVIGATION
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+/* TODO: Check WPS button assignments */
+
+#define WPS_NEXT       (BUTTON_FF | BUTTON_REL)
+#define WPS_NEXT_PRE   BUTTON_FF
+#define WPS_PREV       (BUTTON_REW | BUTTON_REL)
+#define WPS_PREV_PRE   BUTTON_REW
+#define WPS_FFWD       (BUTTON_FF | BUTTON_REPEAT)
+#define WPS_REW        (BUTTON_REW | BUTTON_REPEAT)
+#define WPS_INCVOL     BUTTON_SCROLL_UP
+#define WPS_DECVOL     BUTTON_SCROLL_DOWN
+#define WPS_PAUSE      BUTTON_PLAY
+#define WPS_MENU       (BUTTON_RIGHT | BUTTON_REL)
+#define WPS_MENU_PRE   BUTTON_RIGHT
+#define WPS_BROWSE     (BUTTON_LEFT | BUTTON_REL)
+#define WPS_BROWSE_PRE BUTTON_LEFT
+#define WPS_EXIT       (BUTTON_PLAY | BUTTON_REPEAT)
+#define WPS_CONTEXT    (BUTTON_LEFT | BUTTON_REPEAT)
+#define WPS_QUICK      (BUTTON_RIGHT | BUTTON_REPEAT)
+
+#define HAVE_DIR_NAVIGATION
+
 #endif
 
 /* constants used in line_type and as refresh_mode for wps_refresh */

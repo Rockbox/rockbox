@@ -102,6 +102,15 @@
 #define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
 #define EQ_BTN_EXIT         BUTTON_A
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+#define EQ_BTN_DECREMENT    BUTTON_LEFT
+#define EQ_BTN_INCREMENT    BUTTON_RIGHT
+#define EQ_BTN_NEXT_BAND    BUTTON_SCROLL_DOWN
+#define EQ_BTN_PREV_BAND    BUTTON_SCROLL_UP
+#define EQ_BTN_CHANGE_MODE  BUTTON_PLAY
+#define EQ_BTN_EXIT         BUTTON_POWER
+
 #endif
 
 /* Various user interface limits and sizes */

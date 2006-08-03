@@ -66,6 +66,16 @@ PLUGIN_HEADER
 #define DOWN BUTTON_DOWN
 #define PAUSE BUTTON_MENU
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+#define QUIT BUTTON_POWER
+#define LEFT BUTTON_LEFT
+#define RIGHT BUTTON_RIGHT
+#define SELECT BUTTON_REW
+#define UP BUTTON_SCROLL_UP
+#define DOWN BUTTON_SCROLL_DOWN
+#define PAUSE BUTTON_PLAY
+
 #else
 #error Unsupported keypad
 #endif

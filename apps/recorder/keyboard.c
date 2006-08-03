@@ -174,6 +174,20 @@
 #define KBD_UP BUTTON_UP
 #define KBD_DOWN BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+/* TODO: Check keyboard mappings */
+
+#define KBD_MODES /* iriver H10 uses 2 modes, picker and line edit */
+#define KBD_SELECT (BUTTON_REW | BUTTON_REL) /* backspace in line edit */
+#define KBD_SELECT_PRE BUTTON_REW
+#define KBD_DONE BUTTON_PLAY
+#define KBD_ABORT BUTTON_FF
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_SCROLL_UP
+#define KBD_DOWN BUTTON_SCROLL_DOWN
+
 #endif
 
 struct keyboard_parameters {

@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.18  2006/08/02 00:21:59  amiconn
+ * Revision 1.19  2006/08/03 20:17:22  bagder
+ * Barry Wardell's keymappings for H10
+ *
+ * Revision 1.18  2006-08-02 00:21:59  amiconn
  * Grayscale library: LCD linearisation and gamma correction.
  *
  * Revision 1.17  2006-04-22 03:48:15  kkurbjun
@@ -139,6 +142,16 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ESC     BUTTON_POWER
 #define DOOMBUTTON_ENTER   BUTTON_SELECT
 #define DOOMBUTTON_WEAPON  BUTTON_REC
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define DOOMBUTTON_UP      BUTTON_SCROLL_UP
+#define DOOMBUTTON_DOWN    BUTTON_SCROLL_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_REW
+#define DOOMBUTTON_OPEN    BUTTON_PLAY
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_ENTER   BUTTON_PLAY
+#define DOOMBUTTON_WEAPON  BUTTON_FF
 #else
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN

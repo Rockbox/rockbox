@@ -93,6 +93,10 @@
 #define LIST_NEXT      BUTTON_DOWN
 #define LIST_PREV      BUTTON_UP
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define LIST_NEXT      BUTTON_SCROLL_DOWN
+#define LIST_PREV      BUTTON_SCROLL_UP
+
 #endif
 
 /*

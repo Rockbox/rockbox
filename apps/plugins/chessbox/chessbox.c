@@ -119,6 +119,17 @@ PLUGIN_HEADER
 #define CB_LEVEL   BUTTON_MENU
 #define CB_QUIT    BUTTON_A
 
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define CB_SELECT  BUTTON_REW
+#define CB_UP      BUTTON_SCROLL_UP
+#define CB_DOWN    BUTTON_SCROLL_DOWN
+#define CB_LEFT    BUTTON_LEFT
+#define CB_RIGHT   BUTTON_RIGHT
+#define CB_PLAY    BUTTON_PLAY
+#define CB_LEVEL   BUTTON_FF
+#define CB_RESTART (BUTTON_REW | BUTTON_PLAY)
+#define CB_QUIT    BUTTON_POWER
+
 #else
     #error CHESSBOX: Unsupported keypad
 #endif
