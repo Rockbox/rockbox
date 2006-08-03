@@ -209,12 +209,20 @@ static struct plugin_api* rb;
 #   define CARD_WIDTH  19
 #   define CARD_HEIGHT 24
 #else
-#   define CARD_WIDTH  14
+#   define CARD_WIDTH  15
 #   define CARD_HEIGHT 10
 #endif
 
 /* where the cards start */
-#define CARD_START ( CARD_HEIGHT + 4 )
+#if LCD_HEIGHT > 64
+#   define UPPER_ROW_MARGIN 2
+#   define CARD_START ( CARD_HEIGHT + 4 )
+#else
+    /* The screen is *small* */
+#   define UPPER_ROW_MARGIN 0
+#   define CARD_START ( CARD_HEIGHT + 1 )
+#endif
+
 
 #if LCD_HEIGHT > 64
 #   define NUMBER_HEIGHT 10
@@ -234,7 +242,7 @@ static struct plugin_api* rb;
 
 #define SUITI_HEIGHT 16
 #define SUITI_WIDTH  15
-#define SUITI_STRIDE 16
+#define SUITI_STRIDE 15
 
 
 #define draw_number( num, x, y ) \
@@ -376,14 +384,20 @@ static void draw_card( card_t card, int x, int y,
         rb->lcd_set_foreground( LCD_WHITE );
         rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
 #endif
-        draw_number( card.num, x+1, y+1 );
         if( leftstyle )
         {
+#if UPPER_ROW_MARGIN > 0
             draw_suit( card.suit, x+1, y+2+NUMBER_HEIGHT );
+            draw_number( card.num, x+1, y+1 );
+#else
+            draw_suit( card.suit, x+1, y+NUMBER_HEIGHT-1 );
+            draw_number( card.num, x+1, y-1 );
+#endif
         }
         else
         {
             draw_suit( card.suit, x+2+NUMBER_WIDTH, y+1 );
+            draw_number( card.num, x+1, y+1 );
         }
     }
 #ifdef HAVE_LCD_COLOR
@@ -1149,13 +1163,15 @@ int solitaire( void )
             if( c != NOT_A_CARD )
             {
                 draw_card( deck[c],
-                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2,
+                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
+                           UPPER_ROW_MARGIN,
                            c == sel_card, cur_col == STACKS_COL + i, false );
             }
             else
             {
                 draw_empty_stack( i,
-                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1, 2,
+                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
+                           UPPER_ROW_MARGIN,
                            cur_col == STACKS_COL + i );
             }
         }
@@ -1174,16 +1190,18 @@ int solitaire( void )
                     prevcard = find_prev_card(prevcard);
                 for( i = 0; i <= coun_rem; i++ )
                 {
-                    draw_card( deck[prevcard], CARD_WIDTH+4+j+1, 2,
-                               sel_card == prevcard, cur_card == prevcard,
-                               i < coun_rem );
+                    draw_card( deck[prevcard],
+                               CARD_WIDTH+2*UPPER_ROW_MARGIN+j+1,
+                               UPPER_ROW_MARGIN, sel_card == prevcard,
+                               cur_card == prevcard, i < coun_rem );
                     prevcard = deck[prevcard].next;
                     j += NUMBER_WIDTH+2;
                 }
             }
             else if( cur_rem == NOT_A_CARD && cur_col == REM_COL )
             {
-                draw_cursor( CARD_WIDTH+4+1, 2 );
+                draw_cursor( CARD_WIDTH+2*UPPER_ROW_MARGIN+1,
+                             UPPER_ROW_MARGIN );
             }
         }
 
@@ -1192,7 +1210,8 @@ int solitaire( void )
         {
             /* gruik ! (we want to display a card back) */
             deck[rem].known = false;
-            draw_card( deck[rem], 2, 2, false, false, false );
+            draw_card( deck[rem], UPPER_ROW_MARGIN, UPPER_ROW_MARGIN,
+                       false, false, false );
             deck[rem].known = true;
         }
 
