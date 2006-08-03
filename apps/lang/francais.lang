@@ -110,7 +110,7 @@
     *: "Chargement..."
   </dest>
   <voice>
-    *: "" 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1301,7 +1301,7 @@
     *: "Avertir Avant Effacer Liste de Lecture Courante"
   </dest>
   <voice>
-    *: "" 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -2272,7 +2272,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc: 
+  desc:
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -5212,7 +5212,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -6280,7 +6280,7 @@
   user:
   <source>
     *: ""
-  </source> 
+  </source>
   <dest>
     *: ""
   </dest>
@@ -8415,17 +8415,17 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   <voice>
     *: "Gain direct"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
+  <source>
     *: "Cross Gain"
   </source>
-  <dest>  
+  <dest>
     *: "Gain Croisé"
   </dest>
-  <voice>  
+  <voice>
     *: "Gain croisé"
   </voice>
 </phrase>
@@ -8522,7 +8522,8 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   <voice>
     *: "Options de défilement de la télécommande"
   </voice>
-</phrase>   
+</phrase>
+<phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
   user:
