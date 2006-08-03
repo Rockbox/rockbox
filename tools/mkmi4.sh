@@ -87,11 +87,11 @@ fi
 
 
 # build a 010301 version
-echo "$tool build $input $output.raw"
+#echo "$tool build $input $output.raw"
 $tool build $input $output.raw
 # encrypt
-echo "$tool encrypt $output.raw $output.encrypt $tea"
+#echo "$tool encrypt $output.raw $output.encrypt $tea"
 $tool encrypt $output.raw $output.encrypt $tea
 # sign
-echo "$tool sign $output.encrypt $output"
+#echo "$tool sign $output.encrypt $output"
 $tool sign $output.encrypt $output
