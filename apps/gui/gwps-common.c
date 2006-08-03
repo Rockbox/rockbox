@@ -1088,6 +1088,8 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'd': /* crossfeed */
                     if(global_settings.crossfeed)
                         return "d";
+                    else
+                        return NULL;
                 case 'f': /* crossfade */
                      *intval = global_settings.crossfade+1;
                      snprintf(buf, buf_size, "%d", global_settings.crossfade);
