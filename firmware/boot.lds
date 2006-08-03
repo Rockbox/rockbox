@@ -7,6 +7,11 @@ INPUT(crt0.o)
 #elif defined (CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
+#ifndef IPOD_ARCH
+/* the ipods can't have the crt0.o mentioned here, but the others can't do
+   without it! */
+INPUT(crt0.o)
+#endif
 #else
 OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
@@ -64,7 +69,7 @@ INPUT(crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#if (CONFIG_CPU!=PP5002) && (CONFIG_CPU!=PP5020) && (CONFIG_CPU!=PP5024)
+#ifndef CPU_PP
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
@@ -74,7 +79,7 @@ MEMORY
 #endif
 
 SECTIONS
-#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
+#ifdef CPU_PP
 {
   . = IRAMORIG;
 
