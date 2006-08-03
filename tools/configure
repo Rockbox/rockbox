@@ -921,11 +921,10 @@ toolsdir='\$(ROOTDIR)/tools'
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
-    #tool="$rootdir/tools/ -add=iax5"
-    tool="$rootdir/tools/mi4code build"
+    tool="$rootdir/tools/mkmi4.sh e200"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.sansa"
+    output="PP5022.mi4"
     appextra="recorder:gui"
     archosrom=""
     flash=""

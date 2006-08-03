@@ -20,3 +20,4 @@ ucl/src/Makefile
 ucl/include/ucl/*.h
 profile_reader/*.pl
 rockboxdev.sh
+mkmi4.sh
