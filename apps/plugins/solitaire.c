@@ -1047,13 +1047,6 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
 
 enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
 
-#if ( LCD_WIDTH > ( CARD_WIDTH * 8 ) )
-#   define BIG_SCREEN 1
-#else
-#   define BIG_SCREEN 0
-#endif
-#define LCD_WIDTH2 (LCD_WIDTH - BIG_SCREEN)
-
 int solitaire( void )
 {
 
@@ -1163,14 +1156,14 @@ int solitaire( void )
             if( c != NOT_A_CARD )
             {
                 draw_card( deck[c],
-                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
+                           LCD_WIDTH - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
                            UPPER_ROW_MARGIN,
                            c == sel_card, cur_col == STACKS_COL + i, false );
             }
             else
             {
                 draw_empty_stack( i,
-                           LCD_WIDTH2 - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
+                           LCD_WIDTH - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
                            UPPER_ROW_MARGIN,
                            cur_col == STACKS_COL + i );
             }
