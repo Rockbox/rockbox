@@ -285,7 +285,7 @@ boot_table:
     /* Set up stack for FIQ mode */ 
     msr    cpsr_c, #0xd1
     ldr    sp, =fiq_stack
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#ifdef CPU_PP
     /* We'll load the banked FIQ mode registers with useful values here.
        These values will be used in the FIQ handler in pcm_playback.c */
 #if CONFIG_CPU == PP5002

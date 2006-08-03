@@ -29,7 +29,7 @@ extern void system_init(void);
 
 extern long cpu_frequency;
 
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#ifdef CPU_PP
 #define inl(a) (*(volatile unsigned long *) (a))
 #define outl(a,b) (*(volatile unsigned long *) (b) = (a))
 #define inb(a) (*(volatile unsigned char *) (a))
