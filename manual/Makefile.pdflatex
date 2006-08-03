@@ -20,7 +20,7 @@ buildhtml: rockbox-build.tex
 	$(HTLATEX) $(DOCUMENT) "$(HTOPTS1),2" $(HTOPTS2) $(HTOPTS3); \
 	fi)
 
-	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/png/!d;s/.*\"\(.*\.png\)\".*/\1/g'` $(OBJDIR)/html
+	@cp --parent `cat $(OBJDIR)/html/*.html | sed -e '/[pj][np]g/!d;s/.*\"\(.*\.[pj][np]g\)\".*/\1/g;/</d'` $(OBJDIR)/html
 	@cp -r $(OBJDIR)/html $(OBJDIR)/../
 
 htmlzip: buildhtml 
