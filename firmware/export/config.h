@@ -114,6 +114,7 @@
 #define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
 #define BL_IPODMINI      10 /* Apple iPod Mini */
 #define BL_GIGABEAT      11 /* Toshiba Gigabeat */
+#define BL_IRIVER_H10    12 /* iriver H10 */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -138,6 +139,7 @@
 #define RTC_PCF50605 2 /* iPod 3G, 4G & Mini */
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
+#define RTC_E8564    5 /* iriver H10 */
 
 /* USB On-the-go */
 #define USBOTG_ISP1362 1362
@@ -241,7 +243,7 @@
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
-    (CONFIG_CPU == PP5020) ||  /* iPod: core, plugins, codecs */ \
+    (CONFIG_CPU == PP5020) ||  /* iPod and H10: core, plugins, codecs */ \
     (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
     (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
