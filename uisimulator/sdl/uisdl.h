@@ -198,8 +198,17 @@
 #define UI_LCD_POSY                 60 /* y position of lcd */
 #define UI_LCD_WIDTH                240
 #define UI_LCD_HEIGHT               320
-#endif
 
+#elif defined(IRIVER_H10)
+#define UI_TITLE                    "iriver H10"
+#define UI_WIDTH                    392 /* width of GUI window */
+#define UI_HEIGHT                   391 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 111 /* x position of lcd */
+#define UI_LCD_POSY                 30 /* y position of lcd (74 for real aspect) */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+#endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */
 extern int display_zoom; 
