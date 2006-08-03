@@ -7,12 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Dave Chapman
+ * Copyright (C) 2006 Daniel Stenberg
  *
- * Based on ipod.c by Dave Chapman
- * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
- * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
- * 
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -40,50 +36,15 @@
 #include "power.h"
 #include "file.h"
 
-#define XSC(X) #X
-#define SC(X) XSC(X)
-
-#define DRAM_START              0x10000000
-
-#define BUTTON_LEFT  1
-#define BUTTON_MENU  2
-#define BUTTON_RIGHT 3
-#define BUTTON_PLAY  4
-#define BUTTON_HOLD  5
-
-/* Size of the buffer to store the loaded Rockbox/Linux image */
-#define MAX_LOADSIZE (4*1024*1024)
-
-char version[] = APPSVERSION;
-
-typedef struct _image {
-    unsigned type;              /* '' */
-    unsigned id;                /* */
-    unsigned pad1;              /* 0000 0000 */
-    unsigned devOffset;         /* byte offset of start of image code */
-    unsigned len;               /* length in bytes of image */
-    void    *addr;              /* load address */
-    unsigned entryOffset;       /* execution start within image */
-    unsigned chksum;            /* checksum for image */
-    unsigned vers;              /* image version */
-    unsigned loadAddr;          /* load address for image */
-} image_t;
-
-extern image_t boot_table[];
-
-int line=0;
-
 void main(void)
 {
-    char buf[256];
-    int imageno=0;
     int i;
-    int rc;
-    int padding = 0x4400;
-    image_t *tblp = boot_table;
-    void* entry;
-    struct partinfo* pinfo;
-    unsigned short* identify_info;
+ 
+    volatile unsigned short *ptr = (unsigned short *)0x14700000;
+
+    for(i=0; i< 10000; i++)
+        *ptr++=i;
+    while(1);
 }
 
 /* These functions are present in the firmware library, but we reimplement
