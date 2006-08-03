@@ -98,6 +98,10 @@ PLUGIN_HEADER
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
+/* Only iPod have scroll events */
+#define SCROLL_FWD(x) (0)
+#define SCROLL_BACK(x) (0)
+
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD /* grayscale at the moment */
 
 #define QUIT BUTTON_POWER
