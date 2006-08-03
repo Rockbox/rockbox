@@ -258,6 +258,7 @@ SECTIONS
        stackend = .;
     } > IRAM
     
+#ifdef CPU_PP
     .cop_stack :
     {
        *(.cop_stack)
@@ -265,6 +266,7 @@ SECTIONS
        . += 0x0500;
        cop_stackend = .;
     } > IRAM
+#endif
 
 #else
     /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section
