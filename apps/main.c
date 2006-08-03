@@ -451,6 +451,19 @@ void init(void)
 #endif
 }
 
+void cop_main(void)
+{
+/* This is the entry point for the coprocessor
+   Anyone not running an upgraded bootloader will never reach this point,
+   so it should not be assumed that the coprocessor be usable even on
+   platforms which support it.
+
+   At present all we do is send the COP to sleep if anything wakes it. */
+    while(1) {
+        COP_CTL = PROC_SLEEP;
+    }
+}
+
 int main(void)
 {
     app_main();

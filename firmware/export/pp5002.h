@@ -20,6 +20,8 @@
 #define __PP5002_H__
 
 /* All info gleaned and/or copied from the iPodLinux project. */
+#define CPU_CTL          (*(volatile unsigned char *)(0xcf004054))
+#define COP_CTL          (*(volatile unsigned char *)(0xcf004058))
 
 #define GPIOA_ENABLE     (*(volatile unsigned char *)(0xcf000000))
 #define GPIOB_ENABLE     (*(volatile unsigned char *)(0xcf000004))
@@ -97,5 +99,8 @@
 #define SER0_MASK    (1 << SER0_IRQ)
 #define SER1_MASK    (1 << SER1_IRQ)
 #define DMA_OUT_MASK (1 << DMA_OUT_IRQ)
+
+#define PROC_SLEEP   0xca
+#define PROC_WAKE    0xce
 
 #endif

@@ -36,11 +36,15 @@ start:
  * Copyright (c) 2005, Bernard Leach <leachbj@bouncycastle.org>
  *
  */
+    .equ    PP5002_PROC_ID,  0xc4000000
+    .equ    PP5002_COP_CTRL, 0xcf004058
+    .equ    PP5020_PROC_ID,  0x60000000
+    .equ    PP5020_COP_CTRL, 0x60007004
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 
 #ifndef BOOTLOADER
-#if CONFIG_CPU == PP5002 || CONFIG_CPU == PP5020
+#ifdef CPU_PP
     b      pad_skip
 .space 50*4 /* (more than enough) space for exception vectors */
 pad_skip:
@@ -80,6 +84,34 @@ remap_start:
     mov    pc, r0
 L_post_remap: .word remap_end
 remap_end:
+
+#ifdef CPU_PP 
+    /* After doing the remapping, send the COP to sleep.
+       On wakeup it will go to cop_init */
+#if CONFIG_CPU == PP5002
+    ldr    r0, =PP5002_PROC_ID
+#else
+    ldr    r0, =PP5020_PROC_ID
+#endif
+    ldr    r0, [r0]
+    and    r0, r0, #0xff
+    cmp    r0, #0x55
+    beq    1f
+    
+    /* put us (co-processor) to sleep */
+#if CONFIG_CPU == PP5002
+    ldr    r4, =PP5002_COP_CTRL
+    mov    r3, #0xca
+#else
+    ldr    r4, =PP5020_COP_CTRL
+    mov    r3, #0x80000000
+#endif
+    str    r3, [r4]
+
+    ldr    pc, =cop_init
+
+1:
+#endif
 
 #elif CONFIG_CPU == PNX0101
 
@@ -167,10 +199,6 @@ remap_end:
 
 #ifdef BOOTLOADER
 #ifdef CPU_PP
-    .equ    PP5002_PROC_ID,  0xc4000000
-    .equ    PP5002_COP_CTRL, 0xcf004058
-    .equ    PP5020_PROC_ID,  0x60000000
-    .equ    PP5020_COP_CTRL, 0x60007004
     /* TODO: the high part of the address is probably dependent on CONFIG_CPU.
        Since we tend to use ifdefs for each chipset target
        anyway, we might as well just hardcode it here.
@@ -306,6 +334,35 @@ boot_table:
     bl     main
     /* main() should never return */
 
+#ifdef CPU_PP
+cop_init:
+    ldr    sp, =cop_stackend
+    mov    r3, sp
+    ldr    r2, =cop_stackbegin
+    ldr    r4, =0xdeadbeef
+2:
+    cmp    r3, r2
+    strhi  r4, [r2], #4
+    bhi    2b
+
+    ldr    sp, =cop_stackend
+    bl     cop_main
+#else
+    /* If we don't plan to use the COP, we have some code to catch it and send
+       it back to sleep if somebody wakes it.  This means that the firmware
+       size doesn't grow too much while the COP is still unused, but it is
+       still handled cleanly. */
+#if CONFIG_CPU==PP5002
+    ldr    r4, =PP5002_COP_CTRL
+    mov    r3, #0xca
+#else
+    ldr    r4, =PP5020_COP_CTRL
+    mov    r3, #0x80000000
+#endif
+    str    r3, [r4]
+    ldr    pc, =cop_init    
+#endif   /* PP specific */
+    
 /* Exception handlers. Will be copied to address 0 after memory remapping */
     .section .vectors,"aw"
     ldr    pc, [pc, #24]

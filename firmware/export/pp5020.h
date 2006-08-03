@@ -165,4 +165,7 @@
 #define IISFIFO_WR          (*(volatile unsigned long*)(0x70002840))
 #define IISFIFO_RD          (*(volatile unsigned long*)(0x70002880))
 
+#define PROC_SLEEP   0x80000000
+#define PROC_WAKE    0x0
+
 #endif

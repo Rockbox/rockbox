@@ -257,6 +257,15 @@ SECTIONS
        . += 0x2000;
        stackend = .;
     } > IRAM
+    
+    .cop_stack :
+    {
+       *(.cop_stack)
+       cop_stackbegin = .;
+       . += 0x0500;
+       cop_stackend = .;
+    } > IRAM
+
 #else
     /* TRICK ALERT! We want 0x2000 bytes of stack, but we set the section
        size smaller, and allow the stack to grow into the .iram copy */
