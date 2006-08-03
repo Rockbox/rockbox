@@ -1917,8 +1917,11 @@ static void audio_clear_track_entries(
                     /* If there is an unbuffer callback, call it, otherwise,
                      * just clear the track */
                     if (track_unbuffer_callback)
+                    {
+                        yield_codecs();
                         track_unbuffer_callback(&tracks[last_idx].id3, false);
-
+                    }
+                    
                     memset(&tracks[last_idx], 0, sizeof(struct track_info));
                 }
                 last_idx = cur_idx;
@@ -1982,6 +1985,7 @@ static void audio_stop_playback(void)
     }
 
     /* Mark all entries null. */
+    audio_clear_track_entries(true, false);
     memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
 }
 
@@ -2335,7 +2339,6 @@ void audio_thread(void)
 
             case Q_AUDIO_STOP:
                 logf("audio_stop");
-                audio_clear_track_entries(true, false);
                 audio_stop_playback();
                 break ;
 
