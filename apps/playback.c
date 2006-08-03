@@ -263,7 +263,7 @@ static void mp3_set_elapsed(struct mp3entry* id3);
 static int mp3_get_file_pos(void);
 
 static void audio_clear_track_entries(
-        bool clear_buffered, bool clear_unbuffered);
+        bool clear_buffered, bool clear_unbuffered, bool may_yield);
 static void initialize_buffer_fill(bool clear_tracks);
 static void audio_fill_file_buffer(
         bool start_play, bool rebuffer, size_t offset);
@@ -951,7 +951,7 @@ static void audio_rebuffer(void)
     buf_ridx = buf_widx = 0;
     track_widx = track_ridx;
     cur_ti = &tracks[track_ridx];
-    audio_clear_track_entries(true, true);
+    audio_clear_track_entries(true, true, false);
     filebufused = 0;
 
     /* Fill the buffer */
@@ -1890,7 +1890,8 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
 
 /* Note that this function might yield(). */
 static void audio_clear_track_entries(
-        bool clear_buffered, bool clear_unbuffered)
+    bool clear_buffered, bool clear_unbuffered,
+    bool may_yield)
 {
     int cur_idx = track_widx;
     int last_idx = -1;
@@ -1918,7 +1919,8 @@ static void audio_clear_track_entries(
                      * just clear the track */
                     if (track_unbuffer_callback)
                     {
-                        yield_codecs();
+                        if (may_yield)
+                            yield_codecs();
                         track_unbuffer_callback(&tracks[last_idx].id3, false);
                     }
                     
@@ -1985,7 +1987,7 @@ static void audio_stop_playback(void)
     }
 
     /* Mark all entries null. */
-    audio_clear_track_entries(true, false);
+    audio_clear_track_entries(true, false, false);
     memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
 }
 
@@ -2085,7 +2087,7 @@ static void initialize_buffer_fill(bool clear_tracks)
     //    cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
 
     if (clear_tracks)
-        audio_clear_track_entries(true, false);
+        audio_clear_track_entries(true, false, true);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
@@ -2237,7 +2239,7 @@ void audio_invalidate_tracks(void)
 
         playlist_end = false;
         track_widx = track_ridx;
-        audio_clear_track_entries(true, true);
+        audio_clear_track_entries(true, true, true);
 
         /* If the current track is fully buffered, advance the write pointer */
         if (tracks[track_widx].filerem == 0)
@@ -2260,7 +2262,7 @@ static void audio_new_playlist(void)
     if (have_tracks()) {
         playlist_end = false;
         track_widx = track_ridx;
-        audio_clear_track_entries(true, true);
+        audio_clear_track_entries(true, true, true);
 
         track_widx++;
         track_widx &= MAX_TRACK_MASK;
@@ -2333,7 +2335,7 @@ void audio_thread(void)
 
             case Q_AUDIO_PLAY:
                 logf("starting...");
-                audio_clear_track_entries(true, false);
+                audio_clear_track_entries(true, false, true);
                 audio_play_start((size_t)ev.data);
                 break ;
 
