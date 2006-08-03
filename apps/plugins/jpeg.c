@@ -2140,7 +2140,7 @@ int show_menu(void) /* return 1 to quit */
         case 4:
             break;
     }
-    MYLCD(clear_display)();
+    rb->lcd_clear_display();
     rb->menu_exit(m);
     return 0;
 }
@@ -2727,13 +2727,14 @@ int load_and_show(char* filename)
 
 #ifdef USEGSLIB
         gray_show(false); /* switch off overlay */
-#else
-        rb->lcd_clear_display();
 #endif
-
+        rb->lcd_clear_display();
     }
     while (status != PLUGIN_OK && status != PLUGIN_USB_CONNECTED
                                        && status != PLUGIN_OTHER);
+#ifdef USEGSLIB
+    rb->lcd_update();
+#endif
     return status;
 }
 
