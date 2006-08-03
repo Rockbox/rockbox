@@ -240,3 +240,14 @@ target/coldfire/iaudio/x5/m5636-x5.c
 target/coldfire/iaudio/x5/lcd-remote-x5.c
 #endif
 #endif
+
+#ifdef IRIVER_H10
+#ifndef SIMULATOR
+target/arm/iriver/h10/backlight-h10.c
+target/arm/iriver/h10/button-h10.c
+target/arm/iriver/h10/ata-h10.c
+target/arm/iriver/h10/power-h10.c
+target/arm/iriver/h10/usb-h10.c
+target/arm/iriver/h10/lcd-h10.c
+#endif
+#endif
