@@ -1,14 +1,17 @@
 % $Id$ %
 \chapter{\label{ref:wps_tags}WPS Tags}
 \section{Status Bar}
+\begin{table}
 \begin{tagmap}{}{}
 \config{\%we} & Status Bar Enabled\\
 \config{\%wd} & Status Bar Disabled\\
 \end{tagmap}
+\end{table}
 These tags override the player setting for the display of the status bar.
 They must be noted on their own line.
 
 \section{ID3 Info}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%ia} & ID3 Artist\\
     \config{\%ic} & ID3 Composer\\
@@ -19,10 +22,12 @@ They must be noted on their own line.
     \config{\%iv} & ID3 Version (1.0, 1.1, 2.2, 2.3, 2.4 or empty if no id3 tag)\\
     \config{\%iy} & ID3 Year\\
   \end{tagmap}
+\end{table}
 Remember that this information is not always available, so use the 
 conditionals to show alternate information in preference to assuming.
 
 \section{Power Related Information}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%bl} & Show numeric battery level in percent.\\
                   & Can also be used in a conditional: 
@@ -35,8 +40,10 @@ conditionals to show alternate information in preference to assuming.
          & (only on targets that have software charge control or monitoring)\\
     \config{\%bs} & Sleep timer. Shows the remaining time if the sleeptimer is set\\
   \end{tagmap}
+\end{table}
 
 \section{File Info}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%fb} & File Bitrate (in kbps)\\
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
@@ -58,12 +65,14 @@ conditionals to show alternate information in preference to assuming.
     \config{\%d2} & Second directory from end of file path.\\
     \config{\%d3} & Third directory from end of file path.\\
   \end{tagmap}
+\end{table}
 Example for the the \config{\%dN} commands: If the path is 
 ``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d1} is ``Isola'', 
 \config{\%d2} is ``Kent'' \dots
 You get the picture.
 
 \section{Playlist/Song Info}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%pb} & Progress Bar\\
     \opt{player}{
@@ -90,8 +99,10 @@ You get the picture.
            {\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8%
            {\textbar}9{\textbar}10{\textgreater}}\\
   \end{tagmap}
+\end{table}
 
 \section{Runtime Database}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%rp} & Song playcount\\
     \config{\%rr} & Song rating (0-10). This tag can also be used in a conditional tag, %
@@ -99,43 +110,60 @@ You get the picture.
            4{\textbar}5{\textbar}6{\textbar}7{\textbar}8{\textbar}9{\textbar}%
            10{\textgreater}}\\
   \end{tagmap}
+\end{table}
 
 \opt{SWCODEC}{
 \section{Sound (DSP) settings}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%sp} & display current playback pitch \\
+  \opt{SWCODEC}{
+    \config{\%xf} & Crossfade setting, in the order: Off, Shuffle, Skip, Always\\
+    \config{\%rg} & ReplayGain setting, in the order: Off, Track, Album, Shuffle\\
+    \config{\%xd} & Crossfeed setting\\
+  }
   \end{tagmap}
+\end{table}
 }
 \opt{h1xx,h300}{
 \section{Hold Switches}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%mh} & ``h'' if the main unit hold switch is on\\
     \config{\%mr} & ``r'' if the remote hold switch is on\\
   \end{tagmap}
+\end{table}
 }
 
 \section{Virtual LED}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%lh} & ``h'' if there is hard disk activity\\
   \end{tagmap}
+\end{table}
 
 \section{Repeat Mode}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%mm} & Repeat mode, 0-4, in the order: Off, All, One, Shuffle
            \opt{player,recorder,recorderv2fm}{, A-B}\\
   \end{tagmap}
+\end{table}
 Example: \config{\%?mm{\textless}Off{\textbar}All{\textbar}One{\textbar}Shuffle%
 {\textbar}A-B{\textgreater}}
 
 \section{Playback Mode Tags}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause, 
            Fast forward, Rewind\\
   \end{tagmap}
+\end{table}
 Example: \config{\%?mp{\textless}Stop{\textbar}Play{\textbar}Pause{\textbar}%
 Ffwd{\textbar}Rew{\textgreater}}
 
 \section{Images}
+\begin{table}
   \begin{tagmap}{}{}
     \opt{h300,x5,ipodcolor,ipodvideo}{
     \config{\%X{\textbar}filename.bmp{\textbar}}
@@ -160,6 +188,7 @@ Ffwd{\textbar}Rew{\textgreater}}
     \config{\%xdn} & Display a preloaded image\\
         & \config{n}: image ID (a-z and A-Z)\\
   \end{tagmap}
+\end{table}
 
 Example: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
 \config{\%x{\textbar}a{\textbar}bg.bmp{\textbar}37{\textbar}109{\textbar}}
@@ -176,24 +205,29 @@ Example: image \fname{/.rockbox/bg.bmp} with ID ``a'' at 37, 109 would be:\\
 }
 
 \section{Alignment}
+\begin{table}
   \begin{tagmap}{}{}
     \config{\%al} & Text is left aligned\\
     \config{\%ac} & Text is center aligned\\
     \config{\%ar} & Text is right aligned\\
   \end{tagmap}
+\end{table}
 All alignment tags may be present in one line, but they need to be in the 
 order left -- center -- right. If the aligned texts overlap, they are merged.
 
 \section{Conditional Tags}
 
+\begin{table}
 \begin{tagmap}{}{}
 \config{\%?xx{\textless}true{\textbar}false{\textgreater}}
     & If / Else: Evaluate for true or false case \\
 \config{\%?xx{\textless}alt1{\textbar}alt2{\textbar}alt3{\textbar}\dots{\textbar}else{\textgreater}}
     & Enumerations: Evaluate for first / second / third / \dots / last condition \\
 \end{tagmap}
+\end{table}
 
 \section{Other Tags}
+\begin{table}
 \begin{tagmap}{}{}
   \config{\%\%}          & Display a `\%'\\
   \config{\%{\textless}} & Display a `{\textless}'\\
@@ -207,3 +241,5 @@ order left -- center -- right. If the aligned texts overlap, they are merged.
                            contain dynamic content such as timers, peak meters 
                            or progress bars.\\
 \end{tagmap}
+\end{table}
+
