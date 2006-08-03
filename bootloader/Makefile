@@ -61,18 +61,18 @@ $(MAXOUTFILE):
 
 $(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
 	@echo "LD bootloader.elf"
-	$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
+	$(SILENT)$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
 
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
 	@echo "OBJCOPY $<"
-	@$(OC) -O binary $< $@
+	$(SILENT)$(OC) -O binary $< $@
 
 $(OBJDIR)/bootloader.asm: $(OBJDIR)/bootloader.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootloader.bin
 	@echo "Build bootloader file"
-	@$(MKFIRMWARE) $< $@
+	$(SILENT)$(MKFIRMWARE) $< $@
 
 include $(TOOLSDIR)/make.inc
 
