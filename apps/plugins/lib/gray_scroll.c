@@ -42,7 +42,7 @@ void gray_scroll_left(int count)
     shift = MULU16(_gray_info.height, count);
     length = MULU16(_gray_info.height, _gray_info.width - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-            _gray_info.fg_brightness : _gray_info.bg_brightness;
+            _gray_info.fg_index : _gray_info.bg_index;
 
     _gray_rb->memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift, length);
     _gray_rb->memset(_gray_info.cur_buffer + length, blank, shift);
@@ -60,7 +60,7 @@ void gray_scroll_right(int count)
     shift = MULU16(_gray_info.height, count);
     length = MULU16(_gray_info.height, _gray_info.width - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-            _gray_info.fg_brightness : _gray_info.bg_brightness;
+            _gray_info.fg_index : _gray_info.bg_index;
 
     _gray_rb->memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer, length);
     _gray_rb->memset(_gray_info.cur_buffer, blank, shift);
@@ -79,7 +79,7 @@ void gray_scroll_up(int count)
     data_end = data + MULU16(_gray_info.width, _gray_info.height);
     length = _gray_info.height - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-            _gray_info.fg_brightness : _gray_info.bg_brightness;
+            _gray_info.fg_index : _gray_info.bg_index;
 
     do
     {
@@ -103,7 +103,7 @@ void gray_scroll_down(int count)
     data_end = data + MULU16(_gray_info.width, _gray_info.height);
     length = _gray_info.height - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
-            _gray_info.fg_brightness : _gray_info.bg_brightness;
+            _gray_info.fg_index : _gray_info.bg_index;
 
     do
     {
