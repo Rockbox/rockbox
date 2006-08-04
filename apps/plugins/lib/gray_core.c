@@ -200,25 +200,11 @@ static int exp_s16p16(int x)
     int t;
     int y = 0x00010000;
     
-    if (x == 0)
-    {
-        return y;
-    }
-    else if (x > 0)
-    {
-        t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
-        t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
-        t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
-        t = x - 0x0b172; if (t >= 0) x = t, y <<= 1;
-    }
-    else
-    {
-        t = x + 0x58b91; if (t < 0) x = t, y >>= 8;
-        t = x + 0x2c5c8; if (t < 0) x = t, y >>= 4;
-        t = x + 0x162e4; if (t < 0) x = t, y >>= 2;
-        t = x + 0x0b172; if (t < 0) x = t, y >>= 1;
-        x += 0x0b172;                      y >>= 1;
-    }
+	if (x < 0) x += 0xb1721,            y >>= 16;
+    t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
+    t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
+    t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
+    t = x - 0x0b172; if (t >= 0) x = t, y <<= 1;
     t = x - 0x067cd; if (t >= 0) x = t, y += y >> 1;
     t = x - 0x03920; if (t >= 0) x = t, y += y >> 2;
     t = x - 0x01e27; if (t >= 0) x = t, y += y >> 3;
