@@ -226,15 +226,7 @@ static int exp_s16p16(int x)
     t = x - 0x007e1; if (t >= 0) x = t, y += y >> 5;
     t = x - 0x003f8; if (t >= 0) x = t, y += y >> 6;
     t = x - 0x001fe; if (t >= 0) x = t, y += y >> 7;
-    if (x & 0x100)               y += y >> 8;
-    if (x & 0x080)               y += y >> 9;
-    if (x & 0x040)               y += y >> 10;
-    if (x & 0x020)               y += y >> 11;
-    if (x & 0x010)               y += y >> 12;
-    if (x & 0x008)               y += y >> 13;
-    if (x & 0x004)               y += y >> 14;
-    if (x & 0x002)               y += y >> 15;
-    if (x & 0x001)               y += y >> 16;
+    y += ((y >> 8) * x) >> 8;
 
     return y;
 }
