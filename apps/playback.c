@@ -264,7 +264,7 @@ static int mp3_get_file_pos(void);
 
 static void audio_clear_track_entries(
         bool clear_buffered, bool clear_unbuffered, bool may_yield);
-static void initialize_buffer_fill(bool clear_tracks);
+static bool initialize_buffer_fill(bool clear_tracks);
 static void audio_fill_file_buffer(
         bool start_play, bool rebuffer, size_t offset);
 
@@ -2068,12 +2068,16 @@ static void generate_postbuffer_events(void)
     }
 }
 
-static void initialize_buffer_fill(bool clear_tracks)
+static bool initialize_buffer_fill(bool clear_tracks)
 {
     /* Don't initialize if we're already initialized */
     if (filling)
-        return ;
+        return true;
 
+    /* Don't start buffer fill if buffer is already full. */
+    if (filebufused > conf_watermark && !filling)
+        return false;
+    
     logf("Starting buffer fill");
 
     fill_bytesleft = filebuflen - filebufused;
@@ -2086,13 +2090,17 @@ static void initialize_buffer_fill(bool clear_tracks)
     // if (buf_ridx > cur_ti->buf_idx)
     //    cur_ti->start_pos = buf_ridx - cur_ti->buf_idx;
 
+    /* Set the filling flag true before calling audio_clear_tracks as that
+     * function can yield and we start looping. */
+    filling = true;
+    
     if (clear_tracks)
         audio_clear_track_entries(true, false, true);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
-
-    filling = true;
+    
+    return true;
 }
 
 static void audio_fill_file_buffer(
@@ -2100,7 +2108,8 @@ static void audio_fill_file_buffer(
 {
     bool had_next_track = audio_next_track() != NULL;
 
-    initialize_buffer_fill(!start_play);
+    if (!initialize_buffer_fill(!start_play))
+        return ;
 
     /* If we have a partially buffered track, continue loading,
      * otherwise load a new track */
