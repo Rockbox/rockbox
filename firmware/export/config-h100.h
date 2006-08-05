@@ -123,8 +123,13 @@
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
+#define BOOTLOADER_ENTRYPOINT  0x001F0000
+#define FLASH_ENTRYPOINT       0x00001000
+#define FLASH_MAGIC            0xfbfbfbf1
+
 /* Define this if there is an EEPROM chip */
-#define HAVE_EEPROM
+/* Someone with H100 and BDM, please verify if this works. */
+// #define HAVE_EEPROM
 
 #endif /* !SIMULATOR */
 
