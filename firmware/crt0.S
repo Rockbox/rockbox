@@ -85,7 +85,6 @@ remap_start:
 L_post_remap: .word remap_end
 remap_end:
 
-#ifdef CPU_PP 
     /* After doing the remapping, send the COP to sleep.
        On wakeup it will go to cop_init */
 #if CONFIG_CPU == PP5002
@@ -111,7 +110,6 @@ remap_end:
     ldr    pc, =cop_init
 
 1:
-#endif
 
 #elif CONFIG_CPU == PNX0101
 
@@ -347,20 +345,6 @@ cop_init:
 
     ldr    sp, =cop_stackend
     bl     cop_main
-#else
-    /* If we don't plan to use the COP, we have some code to catch it and send
-       it back to sleep if somebody wakes it.  This means that the firmware
-       size doesn't grow too much while the COP is still unused, but it is
-       still handled cleanly. */
-#if CONFIG_CPU==PP5002
-    ldr    r4, =PP5002_COP_CTRL
-    mov    r3, #0xca
-#else
-    ldr    r4, =PP5020_COP_CTRL
-    mov    r3, #0x80000000
-#endif
-    str    r3, [r4]
-    ldr    pc, =cop_init    
 #endif   /* PP specific */
     
 /* Exception handlers. Will be copied to address 0 after memory remapping */
