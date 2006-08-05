@@ -2549,16 +2549,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Intervallo di tempo"
+    *: "Opzioni di suddivisione file"
   </dest>
   <voice>
-    *: "Intervallo di tempo"
+    *: "Opzioni di suddivisione file"
   </voice>
 </phrase>
 <phrase>
@@ -7897,16 +7897,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Mantieni su disco"
+    *: ""
   </dest>
   <voice>
-    *: "Mantieni su disco"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8082,13 +8082,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Forza aggiornamento Tag Cache"
+    *: "Inizializa ora"
   </dest>
   <voice>
-    *: "Forza aggiornamento Tag Cache"
+    *: "Inizializza ora"
   </voice>
 </phrase>
 <phrase>
@@ -8228,7 +8228,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8289,7 +8289,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu 
   user:
   <source>
     *: "Tag Cache"
@@ -8326,7 +8326,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8504,5 +8504,281 @@
   </dest>
   <voice>
     *: "Opzioni di scorrimento per telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tempo"
+  </dest>
+  <voice>
+    *: "Tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importa modifiche"
+  </dest>
+  <voice>
+    *: "Importa modifiche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Dimensione file"
+  </dest>
+  <voice>
+    *: "Dimensione file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Aggiornamento automatico"
+  </dest>
+  <voice>
+    *: "Aggiornamento automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Ferma registrazione"
+  </dest>
+  <voice>
+    *: "Ferma registrazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Aggiorna ora"
+  </dest>
+  <voice>
+    *: "Aggiorna ora"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Esporta modifiche"
+  </dest>
+  <voice>
+    *: "Esporta modifiche"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Dimensione divisione del file"
+  </dest>
+  <voice>
+    *: "Dimensione divisione del file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Catalogo playlist"
+  </dest>
+  <voice>
+    *: "Catalogo playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Misura del segmento"
+  </dest>
+  <voice>
+    *: "Misura del segmento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Aggiungi a una nuova playlist"
+  </dest>
+  <voice>
+    *: "Aggiungi a una nuova playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Tempo di divisione"
+  </dest>
+  <voice>
+    *: "Tempo di divisione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Aggiungi a una playlist"
+  </dest>
+  <voice>
+    *: "Aggiungi a una playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Inizia un nuovo file"
+  </dest>
+  <voice>
+    *: "Inizia un nuovo file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Cosa fare quando si divide"
+  </dest>
+  <voice>
+    *: "Cosa fare quando si divide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Visualizza catalogo"
+  </dest>
+  <voice>
+    *: "Visualizza catalogo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s non esiste"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Non ci sono playlist"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Display del telecomando OFF"
+  </dest>
+  <voice>
+    *: "Display del telecomando OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : Re-Attivato)"
+  </dest>
+  <voice>
+    *: "(Vol- : Re-Attivato)"
   </voice>
 </phrase>
