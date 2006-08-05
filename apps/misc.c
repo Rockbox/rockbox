@@ -49,6 +49,7 @@
 #include "ata_mmc.h"
 #endif
 #include "tree.h"
+#include "eeprom_settings.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
@@ -484,13 +485,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #else
     int i;
 
-    if (tagcache_get_commit_step() > 0)
-    {
-        cancel_shutdown();
-        gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
-        return false;
-    }
-    
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
     if(!charger_inserted())
 #endif
@@ -498,11 +492,26 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
         gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+        
+        if (!tagcache_prepare_shutdown())
+        {
+            cancel_shutdown();
+            gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+            return false;
+        }
+    
         if (callback != NULL)
             callback(parameter);
 
         system_flush();
-        
+#ifdef HAVE_EEPROM
+        if (firmware_settings.initialized)
+        {
+            firmware_settings.disk_clean = true;
+            firmware_settings.bl_version = 0;
+            eeprom_settings_store();
+        }
+#endif
         shutdown_hw();
     }
 #endif

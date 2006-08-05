@@ -64,6 +64,7 @@
 #include "tagcache.h"
 #include "yesno.h"
 #include "gwps-common.h"
+#include "eeprom_settings.h"
 
 /* gui api */
 #include "list.h"
@@ -1367,8 +1368,13 @@ void tree_flush(void)
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
-        if (dircache_is_enabled())
+# ifdef HAVE_EEPROM
+        if (dircache_is_enabled() && firmware_settings.initialized)
+        {
             global_settings.dircache_size = dircache_get_cache_size();
+            dircache_save(DIRCACHE_FILE);
+        }
+# endif
         dircache_disable();
     }
     else
@@ -1382,6 +1388,7 @@ void tree_flush(void)
 void tree_restore(void)
 {
 #ifdef HAVE_DIRCACHE
+    remove(DIRCACHE_FILE);
     if (global_settings.dircache)
     {
         /* Print "Scanning disk..." to the display. */

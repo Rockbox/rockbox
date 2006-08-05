@@ -45,6 +45,14 @@ static inline void udelay(unsigned usecs)
 }
 #endif
 
+struct flash_header {
+    unsigned long magic;
+    unsigned long length;
+    char version[32];
+};
+
+bool detect_flashed_rockbox(void);
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 #define FREQ cpu_frequency
 void set_cpu_frequency(long frequency);

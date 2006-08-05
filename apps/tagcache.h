@@ -64,6 +64,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_FILE_MASTER     ROCKBOX_DIR "/tagcache_idx.tcd"
 #define TAGCACHE_FILE_INDEX      ROCKBOX_DIR "/tagcache_%d.tcd"
 #define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/tagcache_changelog.txt"
+#define TAGCACHE_STATEFILE       ROCKBOX_DIR "/tagcache_state.tcd"
 
 /* Flags */
 #define FLAG_DELETED    0x0001  /* Entry has been removed from db */
@@ -149,6 +150,7 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
 
 struct tagcache_stat* tagcache_get_stat(void);
 int tagcache_get_commit_step(void);
+bool tagcache_prepare_shutdown(void);
 
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);

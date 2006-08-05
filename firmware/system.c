@@ -24,6 +24,8 @@
 #include "system.h"
 #include "kernel.h"
 #include "timer.h"
+#include "inttypes.h"
+#include "string.h"
 
 #ifndef SIMULATOR
 long cpu_frequency = CPU_FREQ;
@@ -74,6 +76,25 @@ void cpu_idle_mode(bool on_off)
     }
 }
 
+#endif
+
+#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
+bool detect_flashed_rockbox(void)
+{
+    struct flash_header hdr;
+    uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
+    
+    memcpy(&hdr, src, sizeof(struct flash_header));
+    if (hdr.magic != FLASH_MAGIC)
+        return false;
+    
+    return true;
+}
+#else
+bool detect_flashed_rockbox(void)
+{
+    return false;
+}
 #endif
 
 #if CONFIG_CPU == TCC730

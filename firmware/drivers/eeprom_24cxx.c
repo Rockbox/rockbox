@@ -308,7 +308,7 @@ bool eeprom_24cxx_read_byte(unsigned int address, char *c)
 bool eeprom_24cxx_write_byte(unsigned int address, char c)
 {
     int ret;
-    int count = 10;
+    int count = 100;
 
     if (address >= EEPROM_SIZE)
     {
@@ -318,10 +318,6 @@ bool eeprom_24cxx_write_byte(unsigned int address, char c)
     
     do {
         ret = sw_i2c_write_byte(address, c);
-        if (ret < 0)
-        {
-            logf("EEPROM Fail: %d/%d", ret, address);
-        }
     } while (ret < 0 && count--) ;
 
     if (ret < 0)

@@ -145,6 +145,10 @@ drivers/mas.c
 #ifdef IRIVER_H300_SERIES
 drivers/pcf50606.c
 #endif
+#ifdef HAVE_EEPROM
+drivers/eeprom_24cxx.c
+eeprom_settings.c
+#endif
 #ifdef IPOD_ARCH
 drivers/pcf50605.c
 #endif

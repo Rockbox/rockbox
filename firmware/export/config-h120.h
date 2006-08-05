@@ -118,7 +118,14 @@
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
-#endif
+#define BOOTLOADER_ENTRYPOINT  0x001F0000
+#define FLASH_ENTRYPOINT       0x00001000
+#define FLASH_MAGIC            0xfbfbfbf1
+
+/* Define this if there is an EEPROM chip */
+#define HAVE_EEPROM
+
+#endif /* !SIMULATOR */
 
 /* Define this for S/PDIF input available */
 #define HAVE_SPDIF_IN
@@ -128,3 +135,4 @@
 
 /* Define this if you can control the S/PDIF power */
 #define HAVE_SPDIF_POWER
+

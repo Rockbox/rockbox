@@ -993,8 +993,8 @@ void sys_poweroff(void)
 {
     logf("sys_poweroff()");
     /* If the main thread fails to shut down the system, we will force a
-       power off after an 8 second timeout */
-    shutdown_timeout = HZ*8;
+       power off after an 20 second timeout */
+    shutdown_timeout = HZ*20;
 
     queue_post(&button_queue, SYS_POWEROFF, NULL);
 }

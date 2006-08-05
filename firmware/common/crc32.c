@@ -21,8 +21,10 @@
 
 /* Tool function to calculate a CRC32 across some buffer */
 /* third argument is either 0xFFFFFFFF to start or value from last piece */
-unsigned crc_32(unsigned char* buf, unsigned len, unsigned crc32)
+unsigned crc_32(const void *src, unsigned len, unsigned crc32)
 {
+    const unsigned char *buf = (const unsigned char *)src;
+    
     /* CCITT standard polynomial 0x04C11DB7 */
     static const unsigned crc32_lookup[16] =
     {   /* lookup table for 4 bits at a time is affordable */

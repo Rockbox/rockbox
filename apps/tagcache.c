@@ -70,6 +70,7 @@
 #include "buffer.h"
 #include "atoi.h"
 #include "crc32.h"
+#include "eeprom_settings.h"
 
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
@@ -151,6 +152,13 @@ struct ramcache_header {
     char *tags[TAG_COUNT];       /* Tag file content (not including filename tag) */
     int entry_count[TAG_COUNT];  /* Number of entries in the indices. */
 };
+
+# ifdef HAVE_EEPROM
+struct statefile_header {
+    struct ramcache_header *hdr;
+    struct tagcache_stat stat;
+};
+# endif
 
 /* Pointer to allocated ramcache_header */
 static struct ramcache_header *hdr;
@@ -2795,6 +2803,85 @@ static bool allocate_tagcache(void)
     return true;
 }
 
+# ifdef HAVE_EEPROM
+static bool tagcache_dumpload(void)
+{
+    struct statefile_header shdr;
+    int fd, rc;
+    long offpos;
+    int i;
+    
+    fd = open(TAGCACHE_STATEFILE, O_RDONLY);
+    if (fd < 0)
+    {
+        logf("no tagcache statedump");
+        return false;
+    }
+    
+    /* Check the statefile memory placement */
+    hdr = buffer_alloc(0);
+    rc = read(fd, &shdr, sizeof(struct statefile_header));
+    if (rc != sizeof(struct statefile_header)
+        /* || (long)hdr != (long)shdr.hdr */)
+    {
+        logf("incorrect statefile");
+        hdr = NULL;
+        close(fd);
+        return false;
+    }
+    
+    offpos = (long)hdr - (long)shdr.hdr;
+    
+    /* Lets allocate real memory and load it */
+    hdr = buffer_alloc(shdr.stat.ramcache_allocated);
+    rc = read(fd, hdr, shdr.stat.ramcache_allocated);
+    close(fd);
+    
+    if (rc != shdr.stat.ramcache_allocated)
+    {
+        logf("read failure!");
+        hdr = NULL;
+        return false;
+    }
+    
+    memcpy(&stat, &shdr.stat, sizeof(struct tagcache_stat));
+    
+    /* Now fix the pointers */
+    hdr->indices = (struct index_entry *)((long)hdr->indices + offpos);
+    for (i = 0; i < TAG_COUNT; i++)
+        hdr->tags[i] += offpos;
+    
+    return true;
+}
+
+static bool tagcache_dumpsave(void)
+{
+    struct statefile_header shdr;
+    int fd;
+    
+    if (!stat.ramcache)
+        return false;
+    
+    fd = open(TAGCACHE_STATEFILE, O_WRONLY | O_CREAT | O_TRUNC);
+    if (fd < 0)
+    {
+        logf("failed to create a statedump");
+        return false;
+    }
+    
+    /* Create the header */
+    shdr.hdr = hdr;
+    memcpy(&shdr.stat, &stat, sizeof(struct tagcache_stat));
+    write(fd, &shdr, sizeof(struct statefile_header));
+    
+    /* And dump the data too */
+    write(fd, hdr, stat.ramcache_allocated);
+    close(fd);
+    
+    return true;
+}
+# endif
+
 static bool load_tagcache(void)
 {
     struct tagcache_header *tch;
@@ -3250,8 +3337,15 @@ static void tagcache_thread(void)
     free_tempbuf();
     
 #ifdef HAVE_TC_RAMCACHE
+# ifdef HAVE_EEPROM
+    if (firmware_settings.initialized && firmware_settings.disk_clean)
+        check_done = tagcache_dumpload();
+
+    remove(TAGCACHE_STATEFILE);
+# endif
+    
     /* Allocate space for the tagcache if found on disk. */
-    if (global_settings.tagcache_ram)
+    if (global_settings.tagcache_ram && !stat.ramcache)
         allocate_tagcache();
 #endif
     
@@ -3328,6 +3422,19 @@ static void tagcache_thread(void)
 #endif
         }
     }
+}
+
+bool tagcache_prepare_shutdown(void)
+{
+    if (tagcache_get_commit_step() > 0)
+        return false;
+    
+#ifdef HAVE_EEPROM
+    if (stat.ramcache)
+        tagcache_dumpsave();
+#endif
+    
+    return true;
 }
 
 static int get_progress(void)

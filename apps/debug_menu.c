@@ -53,6 +53,8 @@
 #include "tagcache.h"
 #include "lcd-remote.h"
 #include "crc32.h"
+#include "eeprom_24cxx.h"
+#include "logf.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -1952,6 +1954,22 @@ bool dbg_save_roms(void)
         close(fd);
     }
     system_memory_guard(oldmode);
+    
+#ifdef HAVE_EEPROM
+    fd = creat("/internal_eeprom.bin", O_WRONLY);
+    if (fd >= 0)
+    {
+        char buf[EEPROM_SIZE];
+        
+        if (!eeprom_24cxx_read(0, buf, sizeof buf))
+            gui_syncsplash(HZ*3, true, "Eeprom read failure!");
+        else
+            write(fd, buf, sizeof buf);
+            
+        close(fd);
+    }
+#endif
+    
     return false;
 }
 #endif /* CPU */

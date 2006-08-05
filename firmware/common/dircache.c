@@ -402,7 +402,7 @@ static struct dircache_entry* dircache_get_entry(const char *path,
     return cache_entry;
 }
 
-#if 0
+#if 1
 /**
  * Function to load the internal cache structure from disk to initialize
  * the dircache really fast and little disk access.
@@ -423,32 +423,41 @@ int dircache_load(const char *path)
     if (fd < 0)
         return -2;
         
-    dircache_root = (struct dircache_entry *)(((long)audiobuf & ~0x03) + 0x04);
     bytes_read = read(fd, &maindata, sizeof(struct dircache_maindata));
     if (bytes_read != sizeof(struct dircache_maindata)
-        || (long)maindata.root_entry != (long)dircache_root
         || maindata.size <= 0)
     {
+        logf("Dircache file header error");
         close(fd);
         return -3;
     }
 
+    dircache_root = buffer_alloc(0);
+    if ((long)maindata.root_entry != (long)dircache_root)
+    {
+        logf("Position missmatch");
+        close(fd);
+        return -4;
+    }
+    
+    dircache_root = buffer_alloc(maindata.size + DIRCACHE_RESERVE);
     entry_count = maindata.entry_count;
     bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
     close(fd);
     
     if (bytes_read != maindata.size)
+    {
+        logf("Dircache read failed");
         return -6;
+    }
 
     /* Cache successfully loaded. */
     dircache_size = maindata.size;
+    allocated_size = dircache_size + DIRCACHE_RESERVE;
+    reserve_used = 0;
     logf("Done, %d KiB used", dircache_size / 1024);
     dircache_initialized = true;
     memset(fd_bindings, 0, sizeof(fd_bindings));
-    
-    /* We have to long align the audiobuf to keep the buffer access fast. */
-    audiobuf += (long)((dircache_size & ~0x03) + 0x04);
-    audiobuf += DIRCACHE_RESERVE;
 
     return 0;
 }
@@ -472,7 +481,7 @@ int dircache_save(const char *path)
         return -1;
 
     logf("Saving directory cache");
-    fd = open(path, O_WRONLY | O_CREAT);
+    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
 
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;
@@ -484,6 +493,7 @@ int dircache_save(const char *path)
     if (bytes_written != sizeof(struct dircache_maindata))
     {
         close(fd);
+        logf("dircache: write failed #1");
         return -2;
     }
 
@@ -491,8 +501,11 @@ int dircache_save(const char *path)
     bytes_written = write(fd, dircache_root, dircache_size);
     close(fd);
     if (bytes_written != dircache_size)
+    {
+        logf("dircache: write failed #2");
         return -3;
-
+    }
+    
     return 0;
 }
 #endif /* #if 0 */
@@ -616,6 +629,7 @@ int dircache_build(int last_size)
         return -3;
 
     logf("Building directory cache");
+    /* Background build, dircache has been previously allocated */
     if (dircache_size > 0)
     {
         thread_enabled = true;

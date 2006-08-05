@@ -65,6 +65,7 @@
 #include "lang.h"
 #include "string.h"
 #include "splash.h"
+#include "eeprom_settings.h"
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
@@ -108,35 +109,30 @@ void app_main(void)
     browse_root();
 }
 
-#ifdef HAVE_DIRCACHE
-void init_dircache(void)
+int init_dircache(void)
 {
-    int result;
-    bool clear = false;
+#ifdef HAVE_DIRCACHE
+    int result = 0;
     
     dircache_init();
     if (global_settings.dircache)
     {
-        if (global_settings.dircache_size == 0)
+# ifdef HAVE_EEPROM
+        if (firmware_settings.initialized && firmware_settings.disk_clean)
         {
-            gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
-            clear = true;
+            if (dircache_load(DIRCACHE_FILE) == 0)
+                return 0;
         }
+# endif
         
         result = dircache_build(global_settings.dircache_size);
-        if (result < 0)
-            gui_syncsplash(0, true, "Failed! Result: %d", result);
-        
-        if (clear)
-        {
-            backlight_on();
-            show_logo();
-        }
     }
-}
+    
+    return result;
 #else
-# define init_dircache(...)
+    return 0;
 #endif
+}
 
 void init_tagcache(void)
 {
@@ -376,6 +372,10 @@ void init(void)
         }
     }
 
+#ifdef HAVE_EEPROM
+    eeprom_settings_init();
+#endif
+    
     settings_calc_config_sector();
     
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -395,11 +395,21 @@ void init(void)
         settings_load(SETTINGS_ALL);
 
     
+    init_dircache();
+    
     gui_sync_wps_init();
     settings_apply();
-    init_dircache();
+    //init_dircache();
     init_tagcache();
 
+#ifdef HAVE_EEPROM
+    if (firmware_settings.initialized)
+    {
+        /* In case we crash. */
+        firmware_settings.disk_clean = false;
+        eeprom_settings_store();
+    }
+#endif
     status_init();
     playlist_init();
     tree_init();
