@@ -1597,10 +1597,10 @@
     *: "ID3 Database"
   </source>
   <dest>
-    *: "ID3 database"
+    *: "Infodatabase"
   </dest>
   <voice>
-    *: "ID3 database"
+    *: "Infodatabase"
   </voice>
 </phrase>
 <phrase>
@@ -2347,16 +2347,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Del ved tid"
+    *: "Fildelings indstillinger"
   </dest>
   <voice>
-    *: "Del ved tid"
+    *: "Fildelings indstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -7639,16 +7639,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Gem på disk"
+    *: ""
   </dest>
   <voice>
-    *: "Gem på disk"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7880,7 +7880,7 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
     *: "Opdater infodatabase"
@@ -8157,7 +8157,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu 
   user:
   <source>
     *: "Tag Cache"
@@ -8526,5 +8526,281 @@
   </dest>
   <voice>
     *: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tid"
+  </dest>
+  <voice>
+    *: "Tid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importer ændringer"
+  </dest>
+  <voice>
+    *: "Import ændringer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filestørrelse"
+  </dest>
+  <voice>
+    *: "Filstørrelse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Fjernbetjeningsskærm slukket"
+  </dest>
+  <voice>
+    *: "Fjernbetjeningsskærm slukket"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Opdater automatisk"
+  </dest>
+  <voice>
+    *: "Opdater automatisk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Stop indspilning"
+  </dest>
+  <voice>
+    *: "Stop indspilning"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Opdater nu"
+  </dest>
+  <voice>
+    *: "Opdater nu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exporter ændringer"
+  </dest>
+  <voice>
+    *: "Exporter ændringer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Del ved filstørrelse"
+  </dest>
+  <voice>
+    *: "Del ved filstørrelse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Lydstyrke- : Tænd)"
+  </dest>
+  <voice>
+    *: "(Lydstyrke- : Tænd)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Sætliste katalog"
+  </dest>
+  <voice>
+    *: "Sætliste katalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Fildelings type"
+  </dest>
+  <voice>
+    *: "Fildelings type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Tilføj til ny sætliste"
+  </dest>
+  <voice>
+    *: "Tilføj til ny sætliste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Del ved tid"
+  </dest>
+  <voice>
+    *: "Del ved tid"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Tilføj til sætliste"
+  </dest>
+  <voice>
+    *: "Tilføj til sætliste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Start ny fil"
+  </dest>
+  <voice>
+    *: "Start ny fil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Handling ved fildeling"
+  </dest>
+  <voice>
+    *: "Handling ved fildeling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Vis katalog"
+  </dest>
+  <voice>
+    *: "Vis katalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s eksisterer ikke"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Ingen sætlister"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
