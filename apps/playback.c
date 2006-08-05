@@ -694,7 +694,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     break;
 
             case SYS_USB_CONNECTED:
-                logf("USB: Audio core");
+                logf("USB: Voice codec");
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 if (audio_codec_loaded)
                     swap_codec();
@@ -1970,7 +1970,7 @@ static void audio_stop_playback(void)
 
     if (voice_is_playing)
     {
-        while (voice_is_playing || !queue_empty(&voice_codec_queue))
+        while (voice_is_playing && !queue_empty(&voice_codec_queue))
             yield();
     }
     
