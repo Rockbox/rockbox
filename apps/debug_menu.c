@@ -1961,7 +1961,7 @@ bool dbg_save_roms(void)
     {
         char buf[EEPROM_SIZE];
         
-        if (!eeprom_24cxx_read(0, buf, sizeof buf))
+        if (eeprom_24cxx_read(0, buf, sizeof buf))
             gui_syncsplash(HZ*3, true, "Eeprom read failure!");
         else
             write(fd, buf, sizeof buf);
