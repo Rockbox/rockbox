@@ -594,6 +594,13 @@ irq_handler:
 #endif
 
 #ifdef BOOTLOADER
+    /* Check if original firmware is still present */
+    lea     0x00001000,%a2
+    move.l  (%a2),%d0
+    move.l  #0xfbfbfbf1,%d1
+    cmp.l   %d0,%d1
+    beq.b   .ignorecookie
+    
     /* The cookie is not reset. This must mean that the boot loader
        has crashed. Let's start the original firmware immediately. */
     lea     0x10017ffc,%a2
@@ -604,10 +611,11 @@ irq_handler:
     /* Clear the cookie again */
     clr.l   (%a2)
     jmp     8
-
+        
 .nocookie:
     /* Set the cookie */
     move.l  %d1,(%a2)
+.ignorecookie:
 
     /* Set up the DRAM controller. The refresh is based on the 11.2896MHz
        clock (5.6448MHz bus frequency). We haven't yet started the PLL */
