@@ -1,0 +1,10 @@
+alloc.c
+cpu_accel.c
+cpu_state.c
+decode.c
+header.c
+idct.c
+motion_comp.c
+slice.c
+video_out_rockbox.c
+mpegplayer.c

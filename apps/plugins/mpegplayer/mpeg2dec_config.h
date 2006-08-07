@@ -1,0 +1,2 @@
+#define ATTRIBUTE_ALIGNED_MAX 16
+

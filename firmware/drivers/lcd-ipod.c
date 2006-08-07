@@ -400,6 +400,237 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (63*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
+#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    int y0, x0, y1, x1;
+    int h;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
+        || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > LCD_WIDTH)
+        width = LCD_WIDTH - x;
+    if (y + height > LCD_HEIGHT)
+        height = LCD_HEIGHT - y;
+
+    /* calculate the drawing region */
+#if CONFIG_LCD == LCD_IPODNANO
+    y0 = x;                         /* start horiz */
+    x0 = y;                         /* start vert */
+    y1 = (x + width) - 1;           /* max horiz */
+    x1 = (y + height) - 1;          /* max vert */
+#elif CONFIG_LCD == LCD_IPODCOLOR
+    y0 = y;                         /* start vert */
+    x0 = (LCD_WIDTH - 1) - x;       /* start horiz */
+    y1 = (y + height) - 1;          /* end vert */
+    x1 = (x0 - width) + 1;          /* end horiz */
+#endif
+
+    /* setup the drawing region */
+    if (lcd_type == 0) {
+        lcd_cmd_data(0x12, y0);      /* start vert */
+        lcd_cmd_data(0x13, x0);      /* start horiz */
+        lcd_cmd_data(0x15, y1);      /* end vert */
+        lcd_cmd_data(0x16, x1);      /* end horiz */
+    } else {
+        /* swap max horiz < start horiz */
+        if (y1 < y0) {
+            int t;
+            t = y0;
+            y0 = y1;
+            y1 = t;
+        }
+
+        /* swap max vert < start vert */
+        if (x1 < x0) {
+            int t;
+            t = x0;
+            x0 = x1;
+            x1 = t;
+        }
+
+        /* max horiz << 8 | start horiz */
+        lcd_cmd_data(LCD_CNTL_HORIZ_RAM_ADDR_POS, (y1 << 8) | y0);
+        /* max vert << 8 | start vert */
+        lcd_cmd_data(LCD_CNTL_VERT_RAM_ADDR_POS, (x1 << 8) | x0);
+
+        /* start vert = max vert */
+#if CONFIG_LCD == LCD_IPODCOLOR
+        x0 = x1;
+#endif
+
+        /* position cursor (set AD0-AD15) */
+        /* start vert << 8 | start horiz */
+        lcd_cmd_data(LCD_CNTL_RAM_ADDR_SET, ((x0 << 8) | y0));
+
+        /* start drawing */
+        lcd_send_lo(0x0);
+        lcd_send_lo(LCD_CNTL_WRITE_TO_GRAM);
+    }
+
+    h=0;
+    while (1) {
+        int pixels_to_write;
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+        const unsigned char *row_end = ysrc + width;
+        int y, u, v;
+        int red, green, blue;
+        unsigned rbits, gbits, bbits;
+        fb_data pixel1,pixel2;
+
+        if (h==0) {
+            while ((inl(0x70008a20) & 0x4000000) == 0);
+            outl(0x0, 0x70008a24);
+
+            if (height == 0) break;
+
+            pixels_to_write = (width * height) * 2;
+            h = height;
+
+            /* calculate how much we can do in one go */
+            if (pixels_to_write > 64000) {
+                h = (64000/2) / width;
+                pixels_to_write = (width * h) * 2;
+            }
+
+            height -= h;
+            outl(0x10000080, 0x70008a20);
+            outl((pixels_to_write - 1) | 0xc0010000, 0x70008a24);
+            outl(0x34000000, 0x70008a20);
+        }
+
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        int rc, gc, bc;
+
+        u = *usrc++ - 128;
+        v = *vsrc++ - 128;
+        rc = RVFAC * v + ROUNDOFFS;
+        gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+        bc = BUFAC * u + ROUNDOFFS;
+
+        do
+        {
+            y = *ysrc++;
+            red   = RYFAC * y + rc;
+            green = GYFAC * y + gc;
+            blue  = BYFAC * y + bc;
+
+            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            {
+                if (red < 0)
+                    red = 0;
+                else
+                    red = (RYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            {
+                if (green < 0)
+                    green = 0;
+                else
+                    green = (GYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            {
+                if (blue < 0)
+                    blue = 0;
+                else
+                    blue = (BYFAC*255+ROUNDOFFS);
+            }
+            rbits = ((unsigned)red) >> 16 ;
+            gbits = ((unsigned)green) >> 16 ;
+            bbits = ((unsigned)blue) >> 16 ;
+
+            pixel1 = swap16((rbits << 11) | (gbits << 5) | bbits);
+
+            y = *ysrc++;
+            red   = RYFAC * y + rc;
+            green = GYFAC * y + gc;
+            blue  = BYFAC * y + bc;
+
+            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            {
+                if (red < 0)
+                    red = 0;
+                else
+                    red = (RYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            {
+                if (green < 0)
+                    green = 0;
+                else
+                    green = (GYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            {
+                if (blue < 0)
+                    blue = 0;
+                else
+                    blue = (BYFAC*255+ROUNDOFFS);
+            }
+            rbits = ((unsigned)red) >> 16 ;
+            gbits = ((unsigned)green) >> 16 ;
+            bbits = ((unsigned)blue) >> 16 ;
+
+            pixel2 = swap16((rbits << 11) | (gbits << 5) | bbits);
+
+            u = *usrc++ - 128;
+            v = *vsrc++ - 128;
+            rc = RVFAC * v + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+            bc = BUFAC * u + ROUNDOFFS;
+
+            while ((inl(0x70008a20) & 0x1000000) == 0);
+
+            /* output 2 pixels */
+            outl((pixel2<<16)|pixel1, 0x70008b00);
+        }
+        while (ysrc < row_end);
+
+        src_y++;
+        h--;
+    }
+
+    while ((inl(0x70008a20) & 0x4000000) == 0);
+    outl(0x0, 0x70008a24);
+}
+
+
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {

@@ -1,0 +1,44 @@
+Library: libmpeg2 from mpeg2dec-0.4.0b (Released 2004-01-21)
+Imported: 2006-08-06 by Dave Chapman
+
+
+This directory contains a local version of libmpeg2 imported into
+Rockbox for MPEG video decoding.
+
+
+LICENSING INFORMATION
+
+mpeg2dec and libmpeg2 are licensed under Version 2 of the GNU General
+Public License.
+
+
+IMPORT DETAILS
+
+The following files were imported from the mpeg2dec-0.4.0b
+distribution.  Minor changes were made to enable compilation in
+Rockbox and TABs were replaced by spaces to comply with the Rockbox
+coding guidelines.
+
+AUTHORS
+README
+SOURCES
+attributes.h
+cpu_accel.c
+cpu_state.c
+decode.c
+header.c
+idct.c
+motion_comp.c
+mpeg2.h
+mpeg2_internal.h
+slice.c
+video_out.h
+vlc.h
+
+The following files are new, but based on code in mpeg2dec.
+
+Makefile
+mpegplayer.c
+video_out_rockbox.c
+mpeg2dec_config.h
+alloc.c
