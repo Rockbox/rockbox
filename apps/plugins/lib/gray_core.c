@@ -1470,7 +1470,10 @@ static void gray_screendump_hook(int fd)
 {
     int i;
     int x, y;
-    int gx, gy, mask;
+    int gx, gy;
+#if (LCD_DEPTH == 1) || !defined(SIMULATOR)
+    int mask;
+#endif
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     unsigned data;
 #else
@@ -1629,9 +1632,7 @@ static void gray_screendump_hook(int fd)
         if ((unsigned)gy < (unsigned)_gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
-#ifdef SIMULATOR
-            (void)mask;
-#else
+#ifndef SIMULATOR
             unsigned char *grayptr = _gray_info.plane_data
                                    + MULU16(_gray_info.width, gy >> 3);
             mask = 1 << (gy & 7);
