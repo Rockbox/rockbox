@@ -368,14 +368,14 @@ void pitch_screen_draw(int pitch)
     lcd_clear_display();
 
     /* UP: Pitch Up */
-    ptr = str(LANG_PITCH_UP);
+    ptr = str(LANG_SYSFONT_PITCH_UP);
     lcd_getstringsize(ptr,&w,&h);
     lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
     lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
                     LCD_WIDTH/2 - 3, h, 7, 8);
 
     /* DOWN: Pitch Down */
-    ptr = str(LANG_PITCH_DOWN);
+    ptr = str(LANG_SYSFONT_PITCH_DOWN);
     lcd_getstringsize(ptr,&w,&h);
     lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
     lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
@@ -396,7 +396,7 @@ void pitch_screen_draw(int pitch)
                     w+1, (LCD_HEIGHT-h)/2, 7, 8);
 
     /* "Pitch" */
-    snprintf((char *)buf, sizeof(buf), str(LANG_PITCH));
+    snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
     lcd_getstringsize(buf,&w,&h);
     lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT/2)-h, buf);
     /* "XX.X%" */
@@ -531,23 +531,23 @@ bool quick_screen_quick(int button_enter)
     int oldrepeat, old_x_margin, old_y_margin;
 
     static const struct opt_items left_items[] = {
-        [0]={ STR(LANG_OFF) },
-        [1]={ STR(LANG_ON) }
+        [0]={ STR(LANG_SYSFONT_OFF) },
+        [1]={ STR(LANG_SYSFONT_ON) }
     };
     static const struct opt_items bottom_items[] = {
-        [SHOW_ALL]={ STR(LANG_FILTER_ALL) },
-        [SHOW_SUPPORTED]={ STR(LANG_FILTER_SUPPORTED) },
-        [SHOW_MUSIC]={ STR(LANG_FILTER_MUSIC) },
-        [SHOW_PLAYLIST]={ STR(LANG_FILTER_PLAYLIST) },
-        [SHOW_ID3DB]={ STR(LANG_FILTER_ID3DB) }
+        [SHOW_ALL]={ STR(LANG_SYSFONT_FILTER_ALL) },
+        [SHOW_SUPPORTED]={ STR(LANG_SYSFONT_FILTER_SUPPORTED) },
+        [SHOW_MUSIC]={ STR(LANG_SYSFONT_FILTER_MUSIC) },
+        [SHOW_PLAYLIST]={ STR(LANG_SYSFONT_FILTER_PLAYLIST) },
+        [SHOW_ID3DB]={ STR(LANG_SYSFONT_FILTER_ID3DB) }
     };
     static const struct opt_items right_items[] = {
-        [REPEAT_OFF]={ STR(LANG_OFF) },
-        [REPEAT_ALL]={ STR(LANG_REPEAT_ALL) },
-        [REPEAT_ONE]={ STR(LANG_REPEAT_ONE) },
-        [REPEAT_SHUFFLE]={ STR(LANG_SHUFFLE) },
+        [REPEAT_OFF]={ STR(LANG_SYSFONT_OFF) },
+        [REPEAT_ALL]={ STR(LANG_SYSFONT_REPEAT_ALL) },
+        [REPEAT_ONE]={ STR(LANG_SYSFONT_REPEAT_ONE) },
+        [REPEAT_SHUFFLE]={ STR(LANG_SYSFONT_SHUFFLE) },
 #if (AB_REPEAT_ENABLE == 1)
-        [REPEAT_AB]={ STR(LANG_REPEAT_AB) }
+        [REPEAT_AB]={ STR(LANG_SYSFONT_REPEAT_AB) }
 #endif
     };
     struct gui_quickscreen qs;
@@ -557,17 +557,17 @@ bool quick_screen_quick(int button_enter)
     lcd_setmargins(0, 0);
 
     option_select_init_items(&left_option,
-                             (char *)str(LANG_SHUFFLE),
+                             (char *)str(LANG_SYSFONT_SHUFFLE),
                              bool_to_int(global_settings.playlist_shuffle),
                              left_items,
                              2);
     option_select_init_items(&bottom_option,
-                             (char *)str(LANG_FILTER),
+                             (char *)str(LANG_SYSFONT_FILTER),
                              global_settings.dirfilter,
                              bottom_items,
                              sizeof(bottom_items)/sizeof(struct opt_items));
     option_select_init_items(&right_option,
-                             (char *)str(LANG_REPEAT),
+                             (char *)str(LANG_SYSFONT_REPEAT),
                              global_settings.repeat_mode,
                              right_items,
                              sizeof(right_items)/sizeof(struct opt_items));
@@ -621,12 +621,12 @@ bool quick_screen_f3(int button_enter)
     int old_x_margin, old_y_margin;
 
     static const struct opt_items onoff_items[] = {
-        [0]={ STR(LANG_OFF) },
-        [1]={ STR(LANG_ON) }
+        [0]={ STR(LANG_SYSFONT_OFF) },
+        [1]={ STR(LANG_SYSFONT_ON) }
     };
     static const struct opt_items yesno_items[] = {
-        [0]={ STR(LANG_SET_BOOL_NO) },
-        [1]={ STR(LANG_SET_BOOL_YES) }
+        [0]={ STR(LANG_SYSFONT_SET_BOOL_NO) },
+        [1]={ STR(LANG_SYSFONT_SET_BOOL_YES) }
     };
 
     struct gui_quickscreen qs;
@@ -636,17 +636,17 @@ bool quick_screen_f3(int button_enter)
     lcd_setmargins(0, 0);
 
     option_select_init_items(&left_option,
-                             str(LANG_SCROLL_BAR),
+                             str(LANG_SYSFONT_SCROLL_BAR),
                              bool_to_int(global_settings.scrollbar),
                              onoff_items,
                              2);
     option_select_init_items(&bottom_option,
-                             str(LANG_FLIP_DISPLAY),
+                             str(LANG_SYSFONT_FLIP_DISPLAY),
                              bool_to_int(global_settings.flip_display),
                              yesno_items,
                              2);
     option_select_init_items(&right_option,
-                             str(LANG_STATUS_BAR),
+                             str(LANG_SYSFONT_STATUS_BAR),
                              bool_to_int(global_settings.statusbar),
                              onoff_items,
                              2);

@@ -881,14 +881,14 @@ bool recording_screen(void)
             {
                 dmb = dsize/1024/1024;
                 snprintf(buf, 32, "%s %dMB",
-                             str(LANG_SPLIT_SIZE), dmb);
+                             str(LANG_SYSFONT_SPLIT_SIZE), dmb);
             }
             else
             {
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;
                 snprintf(buf, 32, "%s %02d:%02d:%02d",
-                         str(LANG_RECORDING_TIME),
+                         str(LANG_SYSFONT_RECORDING_TIME),
                          hours, minutes, seconds%60);
             }
             
@@ -897,7 +897,7 @@ bool recording_screen(void)
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
-                snprintf(buf, 32, "%s...", str(LANG_RECORD_PRERECORD));
+                snprintf(buf, 32, "%s...", str(LANG_SYSFONT_RECORD_PRERECORD));
             }
             else
             {
@@ -911,7 +911,7 @@ bool recording_screen(void)
                     dhours = dseconds / 3600;
                     dminutes = (dseconds - (dhours * 3600)) / 60;
                     snprintf(buf, 32, "%s %02d:%02d",
-                             str(LANG_RECORD_TIMESPLIT_REC),
+                             str(LANG_SYSFONT_RECORD_TIMESPLIT_REC),
                              dhours, dminutes);
                 }
                 else
@@ -920,7 +920,7 @@ bool recording_screen(void)
                                      num_recorded_bytes,
                                      byte_units, true);
                     snprintf(buf, 32, "%s %s",
-                             str(LANG_RECORDING_SIZE), buf2);
+                             str(LANG_SYSFONT_RECORDING_SIZE), buf2);
                 }
             }
             for(i = 0; i < screen_update; i++)
@@ -968,7 +968,7 @@ bool recording_screen(void)
                 update_countdown = 1;
             }
 
-            snprintf(buf, 32, "%s: %s", str(LANG_VOLUME),
+            snprintf(buf, 32, "%s: %s", str(LANG_SYSFONT_VOLUME),
                      fmt_gain(SOUND_VOLUME,
                               global_settings.volume,
                               buf2, sizeof(buf2)));
@@ -987,7 +987,7 @@ bool recording_screen(void)
 
             if(global_settings.rec_source == SOURCE_MIC)
             { 
-                snprintf(buf, 32, "%s:%s", str(LANG_RECORDING_GAIN),
+                snprintf(buf, 32, "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
@@ -1007,7 +1007,7 @@ bool recording_screen(void)
             else if(global_settings.rec_source == SOURCE_LINE)
             {
                 snprintf(buf, 32, "%s:%s",
-                         str(LANG_RECORDING_LEFT),
+                         str(LANG_SYSFONT_RECORDING_LEFT),
                          fmt_gain(SOUND_LEFT_GAIN,
                                   global_settings.rec_left_gain,
                                   buf2, sizeof(buf2)));
@@ -1025,7 +1025,7 @@ bool recording_screen(void)
                 }                
 
                 snprintf(buf, 32, "%s:%s",
-                         str(LANG_RECORDING_RIGHT),
+                         str(LANG_SYSFONT_RECORDING_RIGHT),
                          fmt_gain(SOUND_RIGHT_GAIN,
                                   global_settings.rec_right_gain,
                                   buf2, sizeof(buf2)));
@@ -1094,7 +1094,8 @@ bool recording_screen(void)
 #endif
                      freq_str[global_settings.rec_frequency],
                      global_settings.rec_channels ?
-                     str(LANG_CHANNEL_MONO) : str(LANG_CHANNEL_STEREO));
+                         str(LANG_SYSFONT_CHANNEL_MONO) :
+                         str(LANG_SYSFONT_CHANNEL_STEREO));
             for(i = 0; i < screen_update; i++)
                 screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 5, buf);
 
@@ -1130,7 +1131,7 @@ bool recording_screen(void)
 #endif
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
-        gui_syncsplash(0, true, str(LANG_DISK_FULL));
+        gui_syncsplash(0, true, str(LANG_SYSFONT_DISK_FULL));
         gui_syncstatusbar_draw(&statusbars, true);
         
         FOR_NB_SCREENS(i)
@@ -1200,7 +1201,8 @@ bool f2_rec_screen(void)
             screens[i].clear_display();
 
             /* Recording quality */
-            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_QUALITY));
+            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
+                str(LANG_SYSFONT_RECORDING_QUALITY));
         }
         
             snprintf(buf, 32, "%d", global_settings.rec_quality);
@@ -1212,7 +1214,7 @@ bool f2_rec_screen(void)
         }
 
         /* Frequency */
-        snprintf(buf, sizeof buf, "%s:", str(LANG_RECORDING_FREQUENCY));
+        snprintf(buf, sizeof buf, "%s:", str(LANG_SYSFONT_RECORDING_FREQUENCY));
         ptr = freq_str[global_settings.rec_frequency];
         FOR_NB_SCREENS(i)
         {
@@ -1227,21 +1229,22 @@ bool f2_rec_screen(void)
         /* Channel mode */
         switch ( global_settings.rec_channels ) {
             case 0:
-                ptr = str(LANG_CHANNEL_STEREO);
+                ptr = str(LANG_SYSFONT_CHANNEL_STEREO);
                 break;
 
             case 1:
-                ptr = str(LANG_CHANNEL_MONO);
+                ptr = str(LANG_SYSFONT_CHANNEL_MONO);
                 break;
         }
 
         FOR_NB_SCREENS(i)
         {
-            screens[i].getstringsize(str(LANG_RECORDING_CHANNELS), &w, &h);
+            screens[i].getstringsize(str(LANG_SYSFONT_RECORDING_CHANNELS), &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
-                       str(LANG_RECORDING_CHANNELS));
-            screens[i].getstringsize(str(LANG_F2_MODE), &w, &h);
-            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h, str(LANG_F2_MODE));
+                       str(LANG_SYSFONT_RECORDING_CHANNELS));
+            screens[i].getstringsize(str(LANG_SYSFONT_F2_MODE), &w, &h);
+            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h
+                       str(LANG_SYSFONT_F2_MODE));
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
             screens[i].mono_bitmap(bitmap_icons_7x8[Icon_FastForward], 
@@ -1322,9 +1325,9 @@ bool f3_rec_screen(void)
     int button;
     char *src_str[] =
     {
-        str(LANG_RECORDING_SRC_MIC),
-        str(LANG_RECORDING_SRC_LINE),
-        str(LANG_RECORDING_SRC_DIGITAL)
+        str(LANG_SYSFONT_RECORDING_SRC_MIC),
+        str(LANG_SYSFONT_RECORDING_SRC_LINE),
+        str(LANG_SYSFONT_RECORDING_SRC_DIGITAL)
     };
     FOR_NB_SCREENS(i)
     {
@@ -1340,7 +1343,8 @@ bool f3_rec_screen(void)
             screens[i].clear_display();
 
             /* Recording source */
-            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2, str(LANG_RECORDING_SOURCE));
+            screens[i].putsxy(0, LCD_HEIGHT/2 - h*2,
+                str(LANG_SYSFONT_RECORDING_SOURCE));
  
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(0, LCD_HEIGHT/2-h, ptr);
@@ -1349,7 +1353,7 @@ bool f3_rec_screen(void)
         }
 
         /* trigger setup */
-        ptr = str(LANG_RECORD_TRIGGER);
+        ptr = str(LANG_SYSFONT_RECORD_TRIGGER);
         FOR_NB_SCREENS(i)
         {
             screens[i].getstringsize(ptr,&w,&h);

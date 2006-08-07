@@ -357,9 +357,9 @@ static int update_dir(void)
 #ifdef HAS_BUTTONBAR
     if (global_settings.buttonbar) {
         if (*tc.dirfilter < NUM_FILTER_MODES)
-            gui_buttonbar_set(&tree_buttonbar, str(LANG_DIRBROWSE_F1),
-                          str(LANG_DIRBROWSE_F2),
-                          str(LANG_DIRBROWSE_F3));
+            gui_buttonbar_set(&tree_buttonbar, str(LANG_SYSFONT_DIRBROWSE_F1),
+                          str(LANG_SYSFONT_DIRBROWSE_F2),
+                          str(LANG_SYSFONT_DIRBROWSE_F3));
         else
             gui_buttonbar_set(&tree_buttonbar, "<<<", "", "");
         gui_buttonbar_draw(&tree_buttonbar);

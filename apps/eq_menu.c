@@ -643,8 +643,8 @@ bool eq_menu_graphical(void)
             max = EQ_GAIN_MAX;
             voice_unit = UNIT_DB;
             
-            snprintf(buf, sizeof(buf), str(LANG_EQUALIZER_EDIT_MODE),
-                str(LANG_EQUALIZER_BAND_GAIN));
+            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                str(LANG_SYSFONT_EQUALIZER_BAND_GAIN));
             
             screens[SCREEN_MAIN].putsxy(2, y, buf);
         } else if (mode == CUTOFF) {
@@ -658,8 +658,8 @@ bool eq_menu_graphical(void)
             max = EQ_CUTOFF_MAX;
             voice_unit = UNIT_HERTZ;
 
-            snprintf(buf, sizeof(buf), str(LANG_EQUALIZER_EDIT_MODE),
-                str(LANG_EQUALIZER_BAND_CUTOFF));
+            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF));
             
             screens[SCREEN_MAIN].putsxy(2, y, buf);
         } else {
@@ -673,7 +673,7 @@ bool eq_menu_graphical(void)
             max = EQ_Q_MAX;
             voice_unit = UNIT_INT;
             
-            snprintf(buf, sizeof(buf), str(LANG_EQUALIZER_EDIT_MODE),
+            snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                 str(LANG_EQUALIZER_BAND_Q));
             
             screens[SCREEN_MAIN].putsxy(2, y, buf);
