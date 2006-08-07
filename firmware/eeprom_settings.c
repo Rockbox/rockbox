@@ -37,7 +37,7 @@ static void reset_config(void)
 
 bool eeprom_settings_init(void)
 {
-    bool ret;
+    int ret;
     uint32_t sum;
     
     eeprom_24cxx_init();
@@ -54,7 +54,7 @@ bool eeprom_settings_init(void)
     ret = eeprom_24cxx_read(0, &firmware_settings, 
                             sizeof(struct eeprom_settings));
     
-    if (!ret)
+    if (ret < 0)
     {
         memset(&firmware_settings, 0, sizeof(struct eeprom_settings));
         firmware_settings.initialized = false;
@@ -92,7 +92,7 @@ bool eeprom_settings_init(void)
 
 bool eeprom_settings_store(void)
 {
-    bool ret;
+    int ret;
     uint32_t sum;
     
     if (!firmware_settings.initialized || !detect_flashed_rockbox())
@@ -108,7 +108,7 @@ bool eeprom_settings_store(void)
     ret = eeprom_24cxx_write(0, &firmware_settings,
                              sizeof(struct eeprom_settings));
     
-    if (!ret)
+    if (ret < 0)
         firmware_settings.initialized = false;
     
     return ret;

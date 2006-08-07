@@ -103,9 +103,9 @@ static void sw_i2c_ack(void)
     DELAY;
 }
 
-static int sw_i2c_getack(void)
+static bool sw_i2c_getack(void)
 {
-    int ret = 1;
+    bool ret = true;
     int count = 10;
 
     SCL_LO;
@@ -119,7 +119,7 @@ static int sw_i2c_getack(void)
     
     if (SDA)
         /* ack failed */
-        ret = 0;
+        ret = false;
     
     SCL_LO;
     SCL_OUTPUT;
@@ -132,22 +132,23 @@ static int sw_i2c_getack(void)
 
 static void sw_i2c_outb(unsigned char byte)
 {
-   int i;
+    int i;
 
-   /* clock out each bit, MSB first */
-   for ( i=0x80; i; i>>=1 ) {
-      SCL_LO;
-      DELAY;
-      if ( i & byte )
-         SDA_HI;
-      else
-         SDA_LO;
-      DELAY;
-      SCL_HI;
-      DELAY;
-   }
+    /* clock out each bit, MSB first */
+    for ( i=0x80; i; i>>=1 )
+    {
+        SCL_LO;
+        DELAY;
+        if ( i & byte )
+            SDA_HI;
+        else
+            SDA_LO;
+        DELAY;
+        SCL_HI;
+        DELAY;
+    }
 
-   // SDA_LO;
+    // SDA_LO;
 }
 
 static unsigned char sw_i2c_inb(void)
@@ -274,7 +275,7 @@ void eeprom_24cxx_init(void)
     sw_i2c_init();
 }
 
-bool eeprom_24cxx_read_byte(unsigned int address, char *c)
+int eeprom_24cxx_read_byte(unsigned int address, char *c)
 {
     int ret;
     char byte;
@@ -283,29 +284,31 @@ bool eeprom_24cxx_read_byte(unsigned int address, char *c)
     if (address >= EEPROM_SIZE)
     {
         logf("EEPROM address: %d", address);
-        return false;
+        return -9;
     }
     
     *c = 0;
-    do {
+    do
+    {
         ret = sw_i2c_read(address, &byte);
         if (ret < 0)
         {
+            /* keep between {} as logf is whitespace in normal builds */
             logf("EEPROM Fail: %d/%d", ret, address);
         }
-    } while (ret < 0 && count--) ;
+    } while (ret < 0 && count--);
 
     if (ret < 0)
     {
         logf("EEPROM RFail: %d/%d", ret, address);
-        return false;
+        return ret;
     }
     
     *c = byte;
-    return true;
+    return 0;
 }
 
-bool eeprom_24cxx_write_byte(unsigned int address, char c)
+int eeprom_24cxx_write_byte(unsigned int address, char c)
 {
     int ret;
     int count = 100;
@@ -313,41 +316,50 @@ bool eeprom_24cxx_write_byte(unsigned int address, char c)
     if (address >= EEPROM_SIZE)
     {
         logf("EEPROM address: %d", address);
-        return false;
+        return -9;
     }
     
-    do {
+    do
+    {
         ret = sw_i2c_write_byte(address, c);
+        if (ret < 0)
+        {
+            /* keep between {} as logf is whitespace in normal builds */
+            logf("EEPROM Fail: %d/%d", ret, address);
+        }
     } while (ret < 0 && count--) ;
 
     if (ret < 0)
     {
         logf("EEPROM WFail: %d/%d", ret, address);
-        return false;
+        return ret;
     }
     
-    return true;
+    return 0;
 }
 
-bool eeprom_24cxx_read(unsigned char address, void *dest, int length)
+int eeprom_24cxx_read(unsigned char address, void *dest, int length)
 {
     char *buf = (char *)dest;
+    int ret = 0;
     int i;
     
     for (i = 0; i < length; i++)
     {
-        if (!eeprom_24cxx_read_byte(address+i, &buf[i]))
-            return false;
+        ret = eeprom_24cxx_read_byte(address+i, &buf[i]);
+        if (ret < 0)
+            return ret;
     }
     
-    return true;
+    return ret;
 }
 
-bool eeprom_24cxx_write(unsigned char address, const void *src, int length)
+int eeprom_24cxx_write(unsigned char address, const void *src, int length)
 {
     const char *buf = (const char *)src;
     int count = 10;
-    int i, ok;
+    int i;
+    bool ok;
     
     while (count-- > 0)
     {
@@ -369,9 +381,9 @@ bool eeprom_24cxx_write(unsigned char address, const void *src, int length)
         }
         
         if (ok)
-            return true;
+            return 0;
     }
     
-    return false;
+    return -1;
 }
 

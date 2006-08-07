@@ -24,9 +24,9 @@
 #define EEPROM_SIZE   128
 
 void eeprom_24cxx_init(void);
-bool eeprom_24cxx_read_byte(unsigned int address, char *c);
-bool eeprom_24cxx_read(unsigned char address, void *dest, int length);
-bool eeprom_24cxx_write(unsigned char address, const void *src, int length);
+int eeprom_24cxx_read_byte(unsigned int address, char *c);
+int eeprom_24cxx_read(unsigned char address, void *dest, int length);
+int eeprom_24cxx_write(unsigned char address, const void *src, int length);
 
 #endif
 
