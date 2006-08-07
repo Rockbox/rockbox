@@ -283,32 +283,32 @@ void gray_ub_scroll_left(int count)
     if (count)
     {
         asm (
-            "mov     r4, %[high]     \n"
+            "mov     r4, %[high]             \n" /* rows = height */
 
-        ".sl_rloop:                  \n"
-            "mov     r5, %[addr]     \n"
-            "mov     r2, %[dpth]     \n"
+        ".sl_rloop:                          \n" /* repeat for every row */
+            "mov     r5, %[addr]             \n" /* get start address */
+            "mov     r2, %[dpth]             \n" /* planes = depth */
 
-        ".sl_oloop:                  \n"
-            "mov     r6, r5          \n"
-            "mov     r3, %[cols]     \n"
-            "mov     r1, #0          \n"
+        ".sl_oloop:                          \n" /* repeat for every bitplane */
+            "mov     r6, r5                  \n" /* get start address */
+            "mov     r3, %[cols]             \n" /* cols = col_count */
+            "mov     r1, #0                  \n" /* fill with zero */
 
-        ".sl_iloop:                          \n"
-            "mov     r1, r1, lsr #8          \n"
-            "ldrb    r0, [r6, #-1]!          \n"
-            "orr     r1, r1, r0, lsl %[cnt]  \n"
-            "strb    r1, [r6]                \n"
+        ".sl_iloop:                          \n" /* repeat for all cols */
+            "mov     r1, r1, lsr #8          \n" /* shift right to get residue */
+            "ldrb    r0, [r6, #-1]!          \n" /* decrement addr & get data byte */
+            "orr     r1, r1, r0, lsl %[cnt]  \n" /* combine with last residue */
+            "strb    r1, [r6]                \n" /* store data */
 
-            "subs    r3, r3, #1      \n"
-            "bne     .sl_iloop       \n"
+            "subs    r3, r3, #1              \n" /* cols-- */
+            "bne     .sl_iloop               \n"
 
-            "add     r5, r5, %[psiz] \n"
-            "subs    r2, r2, #1      \n"
-            "bne     .sl_oloop       \n"
+            "add     r5, r5, %[psiz]         \n" /* start_address += plane_size */
+            "subs    r2, r2, #1              \n" /* planes-- */
+            "bne     .sl_oloop               \n"
 
-            "add     %[addr],%[addr],%[bwid] \n"
-            "subs    r4, r4, #1              \n"
+            "add     %[addr],%[addr],%[bwid] \n" /* start_address += bwidth */
+            "subs    r4, r4, #1              \n" /* rows-- */
             "bne     .sl_rloop               \n"
             : /* outputs */
             : /* inputs */
@@ -364,32 +364,32 @@ void gray_ub_scroll_right(int count)
     if (count)
     {
         asm (
-            "mov     r4, %[high]     \n"
+            "mov     r4, %[high]             \n" /* rows = height */
 
-        ".sr_rloop:                  \n"
-            "mov     r5, %[addr]     \n"
-            "mov     r2, %[dpth]     \n"
+        ".sr_rloop:                          \n" /* repeat for every row */
+            "mov     r5, %[addr]             \n" /* get start address */
+            "mov     r2, %[dpth]             \n" /* planes = depth */
 
-        ".sr_oloop:                  \n"
-            "mov     r6, r5          \n"
-            "mov     r3, %[cols]     \n"
-            "mov     r1, #0          \n"
+        ".sr_oloop:                          \n" /* repeat for every bitplane */
+            "mov     r6, r5                  \n" /* get start address */
+            "mov     r3, %[cols]             \n" /* cols = col_count */
+            "mov     r1, #0                  \n" /* fill with zero */
 
-        ".sr_iloop:                          \n"
-            "ldrb    r0, [r6]                \n"
-            "orr     r1, r0, r1, lsl #8      \n"
-            "mov     r0, r1, lsr %[cnt]      \n"
-            "strb    r0, [r6], #1            \n"
+        ".sr_iloop:                          \n" /* repeat for all cols */
+            "ldrb    r0, [r6]                \n" /* get data byte */
+            "orr     r1, r0, r1, lsl #8      \n" /* combine w/ old data shifted to 2nd byte */
+            "mov     r0, r1, lsr %[cnt]      \n" /* shift right */
+            "strb    r0, [r6], #1            \n" /* store data, increment addr */
 
-            "subs    r3, r3, #1      \n"
-            "bne     .sr_iloop       \n"
+            "subs    r3, r3, #1              \n" /* cols-- */
+            "bne     .sr_iloop               \n"
 
-            "add     r5, r5, %[psiz] \n"
-            "subs    r2, r2, #1      \n"
-            "bne     .sr_oloop       \n"
+            "add     r5, r5, %[psiz]         \n" /* start_address += plane_size */
+            "subs    r2, r2, #1              \n" /* planes-- */
+            "bne     .sr_oloop               \n"
 
-            "add     %[addr],%[addr],%[bwid] \n"
-            "subs    r4, r4, #1              \n"
+            "add     %[addr],%[addr],%[bwid] \n" /* start_address += bwidth */
+            "subs    r4, r4, #1              \n" /* rows-- */
             "bne     .sr_rloop               \n"
             : /* outputs */
             : /* inputs */
@@ -714,8 +714,7 @@ void gray_ub_scroll_up(int count)
             "move.b  (%%a1),%%d0 \n"  /* get data byte */
             "lsl.l   #8,%%d1     \n"  /* old data to 2nd byte */
             "or.l    %%d1,%%d0   \n"  /* combine old data */
-            "clr.l   %%d1        \n"
-            "move.b  %%d0,%%d1   \n"  /* keep data for next round */
+            "move.l  %%d0,%%d1   \n"  /* keep data for next round */
             "lsr.l   %[cnt],%%d0 \n"  /* shift right */
             "move.b  %%d0,(%%a1) \n"  /* store data */
 

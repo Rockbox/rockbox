@@ -876,8 +876,140 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     unsigned long pat_stack[8];
     unsigned long *pat_ptr = &pat_stack[8];
     unsigned char *addr, *end;      
-#if 0 /* CPU specific asm versions will go here */
+#ifdef CPU_ARM
+    const unsigned char *_src;
+    unsigned _mask, trash;
+
+    _mask = mask;
+    _src = src;
+
+    /* precalculate the bit patterns with random shifts 
+       for all 8 pixels and put them on an extra "stack" */
+    asm volatile (
+        "mov     %[mask], %[mask], lsl #24   \n"  /* shift mask to upper byte */
+        "mov     r3, #8                      \n"  /* loop count */
+        
+    ".wa_loop:                               \n"  /** load pattern for pixel **/
+        "mov     r2, #0                      \n"  /* pattern for skipped pixel must be 0 */
+        "movs    %[mask], %[mask], lsl #1    \n"  /* shift out msb of mask */
+        "bcc     .wa_skip                    \n"  /* skip this pixel */
+        
+        "ldrb    r0, [%[src]]                \n"  /* load src byte */
+        "ldrb    r0, [%[trns], r0]           \n"  /* idxtable into pattern index */
+        "ldr     r2, [%[bpat], r0, lsl #2]   \n"  /* r2 = bitpattern[byte]; */
+
+        "add     r0, %[rnd], %[rnd], lsl #3  \n"  /* multiply by 75 */
+        "add     %[rnd], %[rnd], %[rnd], lsl #1  \n"
+        "add     %[rnd], %[rnd], r0, lsl #3  \n"
+        "add     %[rnd], %[rnd], #74         \n"  /* add another 74 */
+        /* Since the lower bits are not very random:   get bits 8..15 (need max. 5) */
+        "and     r1, %[rmsk], %[rnd], lsr #8 \n"  /* ..and mask out unneeded bits */
+
+        "cmp     r1, %[dpth]                 \n"  /* random >= depth ? */
+        "subhs   r1, r1, %[dpth]             \n"  /* yes: random -= depth */
+
+        "mov     r0, r2, lsl r1              \n"  /** rotate pattern **/
+        "sub     r1, %[dpth], r1             \n"
+        "orr     r2, r0, r2, lsr r1          \n"
+
+    ".wa_skip:                               \n"
+        "str     r2, [%[patp], #-4]!         \n"  /* push on pattern stack */
+
+        "add     %[src], %[src], #1          \n"  /* src++; */
+        "subs    r3, r3, #1                  \n"  /* loop 8 times (pixel block) */
+        "bne     .wa_loop                    \n"
+        : /* outputs */
+        [src] "+r"(_src),
+        [patp]"+r"(pat_ptr),
+        [rnd] "+r"(_gray_random_buffer),
+        [mask]"+r"(_mask)
+        : /* inputs */
+        [bpat]"r"(_gray_info.bitpattern),
+        [trns]"r"(_gray_info.idxtable),
+        [dpth]"r"(_gray_info.depth),
+        [rmsk]"r"(_gray_info.randmask)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3"
+    );
+    
+    addr = address;
+    end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+    _mask = mask;
+
+    /* set the bits for all 8 pixels in all bytes according to the
+     * precalculated patterns on the pattern stack */
+    asm volatile (
+        "ldmia   %[patp], {r2 - r8, %[rx]}   \n" /* pop all 8 patterns */
+        
+        "mvn     %[mask], %[mask]            \n" /* "set" mask -> "keep" mask */
+        "ands    %[mask], %[mask], #0xff     \n"
+        "beq     .wa_sloop                   \n" /* short loop if nothing to keep */
+
+    ".wa_floop:                              \n" /** full loop (there are bits to keep)**/
+        "movs    %[rx], %[rx], lsr #1        \n" /* shift out pattern bit */
+        "adc     r0, r0, r0                  \n" /* put bit into LSB of byte */
+        "movs    r8, r8, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r7, r7, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r6, r6, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r5, r5, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r4, r4, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r3, r3, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r2, r2, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+
+        "ldrb    r1, [%[addr]]               \n" /* read old value */
+        "and     r1, r1, %[mask]             \n" /* mask out replaced bits */
+        "orr     r1, r1, r0                  \n" /* set new bits */
+        "strb    r1, [%[addr]], %[psiz]      \n" /* store value, advance to next bpl */
+
+        "cmp     %[end], %[addr]             \n" /* loop through all bitplanes */
+        "bne     .wa_floop                   \n"
+        
+        "b       .wa_end                     \n"
+
+    ".wa_sloop:                              \n" /** short loop (nothing to keep) **/
+        "movs    %[rx], %[rx], lsr #1        \n" /* shift out pattern bit */
+        "adc     r0, r0, r0                  \n" /* put bit into LSB of byte */
+        "movs    r8, r8, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r7, r7, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r6, r6, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r5, r5, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r4, r4, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r3, r3, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        "movs    r2, r2, lsr #1              \n"
+        "adc     r0, r0, r0                  \n"
+        
+        "strb    r0, [%[addr]], %[psiz]      \n" /* store byte, advance to next bpl */
+
+        "cmp     %[end], %[addr]             \n" /* loop through all bitplanes */
+        "bne     .wa_sloop                   \n"
+        
+    ".wa_end:                                \n"
+        : /* outputs */
+        [addr]"+r"(addr),
+        [mask]"+r"(_mask),
+        [rx]  "=&r"(trash)
+        : /* inputs */
+        [psiz]"r"(_gray_info.plane_size),
+        [end] "r"(end),
+        [patp]"[rx]"(pat_ptr)
+        : /* clobbers */
+        "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8"
+    );
 #else /* C version, for reference*/
+#warning C version of _writearray() used
     unsigned test = 0x80;
     int i;
 
@@ -1027,52 +1159,52 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     /* precalculate the bit patterns with random shifts
        for all 8 pixels and put them on an extra "stack" */
     asm volatile (
-        "mov     #8,r3       \n"  /* loop count in r3: 8 pixels */
+        "mov     #8,r3           \n"  /* loop count */
 
-    ".wa_loop:               \n"  /** load pattern for pixel **/
-        "mov     #0,r0       \n"  /* pattern for skipped pixel must be 0 */
-        "shlr    %[mask]     \n"  /* shift out lsb of mask */
-        "bf      .wa_skip    \n"  /* skip this pixel */
+    ".wa_loop:                   \n"  /** load pattern for pixel **/
+        "mov     #0,r0           \n"  /* pattern for skipped pixel must be 0 */
+        "shlr    %[mask]         \n"  /* shift out lsb of mask */
+        "bf      .wa_skip        \n"  /* skip this pixel */
 
-        "mov.b   @%[src],r0  \n"  /* load src byte */
-        "extu.b  r0,r0       \n"  /* extend unsigned */
+        "mov.b   @%[src],r0      \n"  /* load src byte */
+        "extu.b  r0,r0           \n"  /* extend unsigned */
         "mov.b   @(r0,%[trns]),r0\n"  /* idxtable into pattern index */
-        "extu.b  r0,r0       \n"  /* extend unsigned */
-        "shll2   r0          \n"
+        "extu.b  r0,r0           \n"  /* extend unsigned */
+        "shll2   r0              \n"
         "mov.l   @(r0,%[bpat]),r4\n"  /* r4 = bitpattern[byte]; */
 
-        "mov     #75,r0      \n"
-        "mulu    r0,%[rnd]   \n"  /* multiply by 75 */
-        "sts     macl,%[rnd] \n"
-        "add     #74,%[rnd]  \n"  /* add another 74 */
+        "mov     #75,r0          \n"
+        "mulu    r0,%[rnd]       \n"  /* multiply by 75 */
+        "sts     macl,%[rnd]     \n"
+        "add     #74,%[rnd]      \n"  /* add another 74 */
         /* Since the lower bits are not very random: */
-        "swap.b  %[rnd],r1   \n"  /* get bits 8..15 (need max. 5) */
-        "and     %[rmsk],r1  \n"  /* mask out unneeded bits */
+        "swap.b  %[rnd],r1       \n"  /* get bits 8..15 (need max. 5) */
+        "and     %[rmsk],r1      \n"  /* mask out unneeded bits */
 
-        "cmp/hs  %[dpth],r1  \n"  /* random >= depth ? */
-        "bf      .wa_ntrim   \n"
-        "sub     %[dpth],r1  \n"  /* yes: random -= depth; */
-    ".wa_ntrim:              \n"
+        "cmp/hs  %[dpth],r1      \n"  /* random >= depth ? */
+        "bf      .wa_ntrim       \n"
+        "sub     %[dpth],r1      \n"  /* yes: random -= depth; */
+    ".wa_ntrim:                  \n"
 
-        "mov.l   .ashlsi3,r0 \n"  /** rotate pattern **/
-        "jsr     @r0         \n"  /* r4 -> r0, shift left by r5 */
-        "mov     r1,r5       \n"
+        "mov.l   .ashlsi3,r0     \n"  /** rotate pattern **/
+        "jsr     @r0             \n"  /* r4 -> r0, shift left by r5 */
+        "mov     r1,r5           \n"
 
-        "mov     %[dpth],r5  \n"
-        "sub     r1,r5       \n"  /* r5 = depth - r1 */
-        "mov.l   .lshrsi3,r1 \n"
-        "jsr     @r1         \n"  /* r4 -> r0, shift right by r5 */
-        "mov     r0,r1       \n"  /* store previous result in r1 */
+        "mov     %[dpth],r5      \n"
+        "sub     r1,r5           \n"  /* r5 = depth - r1 */
+        "mov.l   .lshrsi3,r1     \n"
+        "jsr     @r1             \n"  /* r4 -> r0, shift right by r5 */
+        "mov     r0,r1           \n"  /* store previous result in r1 */
 
-        "or      r1,r0       \n"  /* rotated_pattern = r0 | r1 */
+        "or      r1,r0           \n"  /* rotated_pattern = r0 | r1 */
 
-    ".wa_skip:               \n"
-        "mov.l   r0,@-%[patp]\n"  /* push on pattern stack */
+    ".wa_skip:                   \n"
+        "mov.l   r0,@-%[patp]    \n"  /* push on pattern stack */
 
         "add     %[stri],%[src]  \n"  /* src += stride; */
-        "add     #-1,r3      \n"  /* decrease loop count */
-        "cmp/pl  r3          \n"  /* loop count > 0? */
-        "bt      .wa_loop    \n"  /* yes: loop */
+        "add     #-1,r3          \n"  /* loop 8 times (pixel block) */
+        "cmp/pl  r3              \n"
+        "bt      .wa_loop        \n"
         : /* outputs */
         [src] "+r"(_src),
         [rnd] "+r"(_gray_random_buffer),
@@ -1095,79 +1227,79 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
     asm volatile (
-        "mov.l   @%[patp]+,r1\n"  /* pop all 8 patterns */
-        "mov.l   @%[patp]+,r2\n"
-        "mov.l   @%[patp]+,r3\n"
-        "mov.l   @%[patp]+,r6\n"
-        "mov.l   @%[patp]+,r7\n"
-        "mov.l   @%[patp]+,r8\n"
-        "mov.l   @%[patp]+,r9\n"
-        "mov.l   @%[patp],r10\n"
+        "mov.l   @%[patp]+,r1    \n"  /* pop all 8 patterns */
+        "mov.l   @%[patp]+,r2    \n"
+        "mov.l   @%[patp]+,r3    \n"
+        "mov.l   @%[patp]+,r6    \n"
+        "mov.l   @%[patp]+,r7    \n"
+        "mov.l   @%[patp]+,r8    \n"
+        "mov.l   @%[patp]+,r9    \n"
+        "mov.l   @%[patp],r10    \n"
 
         "not     %[mask],%[mask] \n"  /* "set" mask -> "keep" mask */
         "extu.b  %[mask],%[mask] \n"  /* mask out high bits */
-        "tst     %[mask],%[mask] \n"  /* nothing to keep? */
-        "bt      .wa_sloop   \n"  /* yes: jump to short loop */
+        "tst     %[mask],%[mask] \n"
+        "bt      .wa_sloop       \n"  /* short loop if nothing to keep */
 
-    ".wa_floop:              \n"  /** full loop (there are bits to keep)**/
-        "shlr    r1          \n"  /* rotate lsb of pattern 1 to t bit */
-        "rotcl   r0          \n"  /* rotate t bit into r0 */
-        "shlr    r2          \n"
-        "rotcl   r0          \n"
-        "shlr    r3          \n"
-        "rotcl   r0          \n"
-        "shlr    r6          \n"
-        "rotcl   r0          \n"
-        "shlr    r7          \n"
-        "rotcl   r0          \n"
-        "shlr    r8          \n"
-        "rotcl   r0          \n"
-        "shlr    r9          \n"
-        "rotcl   r0          \n"
-        "shlr    r10         \n"
+    ".wa_floop:                  \n"  /** full loop (there are bits to keep)**/
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r6              \n"
+        "rotcl   r0              \n"
+        "shlr    r7              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "shlr    r9              \n"
+        "rotcl   r0              \n"
+        "shlr    r10             \n"
         "mov.b   @%[addr],%[rx]  \n"  /* read old value */
-        "rotcl   r0          \n"
-        "and     %[mask],%[rx]   \n"  /* mask out unneeded bits */
-        "or      %[rx],r0    \n"  /* set new bits */
-        "mov.b   r0,@%[addr] \n"  /* store value to bitplane */
+        "rotcl   r0              \n"
+        "and     %[mask],%[rx]   \n"  /* mask out replaced bits */
+        "or      %[rx],r0        \n"  /* set new bits */
+        "mov.b   r0,@%[addr]     \n"  /* store value to bitplane */
         "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
-        "cmp/hi  %[addr],%[end]  \n"  /* last bitplane done? */
-        "bt      .wa_floop   \n"  /* no: loop */
+        "cmp/hi  %[addr],%[end]  \n"  /* loop for all bitplanes */
+        "bt      .wa_floop       \n"
 
-        "bra     .wa_end     \n"
-        "nop                 \n"
+        "bra     .wa_end         \n"
+        "nop                     \n"
 
         /* References to C library routines used in the precalc block */
-        ".align  2           \n"
-    ".ashlsi3:               \n"  /* C library routine: */
-        ".long   ___ashlsi3  \n"  /* shift r4 left by r5, result in r0 */
-    ".lshrsi3:               \n"  /* C library routine: */
-        ".long   ___lshrsi3  \n"  /* shift r4 right by r5, result in r0 */
+        ".align  2               \n"
+    ".ashlsi3:                   \n"  /* C library routine: */
+        ".long   ___ashlsi3      \n"  /* shift r4 left by r5, result in r0 */
+    ".lshrsi3:                   \n"  /* C library routine: */
+        ".long   ___lshrsi3      \n"  /* shift r4 right by r5, result in r0 */
         /* both routines preserve r4, destroy r5 and take ~16 cycles */
 
-    ".wa_sloop:              \n"  /** short loop (nothing to keep) **/
-        "shlr    r1          \n"  /* rotate lsb of pattern 1 to t bit */
-        "rotcl   r0          \n"  /* rotate t bit into r0 */
-        "shlr    r2          \n"
-        "rotcl   r0          \n"
-        "shlr    r3          \n"
-        "rotcl   r0          \n"
-        "shlr    r6          \n"
-        "rotcl   r0          \n"
-        "shlr    r7          \n"
-        "rotcl   r0          \n"
-        "shlr    r8          \n"
-        "rotcl   r0          \n"
-        "shlr    r9          \n"
-        "rotcl   r0          \n"
-        "shlr    r10         \n"
-        "rotcl   r0          \n"
-        "mov.b   r0,@%[addr] \n"  /* store byte to bitplane */
+    ".wa_sloop:                  \n"  /** short loop (nothing to keep) **/
+        "shlr    r1              \n"  /* rotate lsb of pattern 1 to t bit */
+        "rotcl   r0              \n"  /* rotate t bit into r0 */
+        "shlr    r2              \n"
+        "rotcl   r0              \n"
+        "shlr    r3              \n"
+        "rotcl   r0              \n"
+        "shlr    r6              \n"
+        "rotcl   r0              \n"
+        "shlr    r7              \n"
+        "rotcl   r0              \n"
+        "shlr    r8              \n"
+        "rotcl   r0              \n"
+        "shlr    r9              \n"
+        "rotcl   r0              \n"
+        "shlr    r10             \n"
+        "rotcl   r0              \n"
+        "mov.b   r0,@%[addr]     \n"  /* store byte to bitplane */
         "add     %[psiz],%[addr] \n"  /* advance to next bitplane */
-        "cmp/hi  %[addr],%[end]  \n"  /* last bitplane done? */
-        "bt      .wa_sloop   \n"  /* no: loop */
+        "cmp/hi  %[addr],%[end]  \n"  /* loop for all bitplanes */
+        "bt      .wa_sloop       \n"
 
-    ".wa_end:                \n"
+    ".wa_end:                    \n"
         : /* outputs */
         [addr]"+r"(addr),
         [mask]"+r"(_mask),
@@ -1189,43 +1321,43 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     /* precalculate the bit patterns with random shifts 
        for all 8 pixels and put them on an extra "stack" */
     asm volatile (
-        "moveq.l #8,%%d3     \n"  /* loop count in d3: 8 pixels */
+        "moveq.l #8,%%d3         \n"  /* loop count */
 
-    ".wa_loop:               \n"  /** load pattern for pixel **/
-        "clr.l   %%d2        \n"  /* pattern for skipped pixel must be 0 */
-        "lsr.l   #1,%[mask]  \n"  /* shift out lsb of mask */
-        "bcc.b   .wa_skip    \n"  /* skip this pixel */
+    ".wa_loop:                   \n"  /** load pattern for pixel **/
+        "clr.l   %%d2            \n"  /* pattern for skipped pixel must be 0 */
+        "lsr.l   #1,%[mask]      \n"  /* shift out lsb of mask */
+        "bcc.b   .wa_skip        \n"  /* skip this pixel */
 
-        "clr.l   %%d0        \n"
+        "clr.l   %%d0            \n"
         "move.b  (%[src]),%%d0   \n"  /* load src byte */
         "move.b  (%%d0:l:1,%[trns]),%%d0\n" /* idxtable into pattern index */
         "move.l  (%%d0:l:4,%[bpat]),%%d2\n" /* d2 = bitpattern[byte]; */
 
-        "mulu.w  #75,%[rnd]  \n"  /* multiply by 75 */
-        "add.l   #74,%[rnd]  \n"  /* add another 74 */
+        "mulu.w  #75,%[rnd]      \n"  /* multiply by 75 */
+        "add.l   #74,%[rnd]      \n"  /* add another 74 */
         /* Since the lower bits are not very random: */
-        "move.l  %[rnd],%%d1 \n"
-        "lsr.l   #8,%%d1     \n"  /* get bits 8..15 (need max. 5) */
-        "and.l   %[rmsk],%%d1\n"  /* mask out unneeded bits */
+        "move.l  %[rnd],%%d1     \n"
+        "lsr.l   #8,%%d1         \n"  /* get bits 8..15 (need max. 5) */
+        "and.l   %[rmsk],%%d1    \n"  /* mask out unneeded bits */
 
-        "cmp.l   %[dpth],%%d1\n"  /* random >= depth ? */
-        "blo.b   .wa_ntrim   \n"
-        "sub.l   %[dpth],%%d1\n"  /* yes: random -= depth; */
-    ".wa_ntrim:              \n"
+        "cmp.l   %[dpth],%%d1    \n"  /* random >= depth ? */
+        "blo.b   .wa_ntrim       \n"
+        "sub.l   %[dpth],%%d1    \n"  /* yes: random -= depth; */
+    ".wa_ntrim:                  \n"
 
-        "move.l  %%d2,%%d0   \n"
-        "lsl.l   %%d1,%%d0   \n"
-        "sub.l   %[dpth],%%d1\n"
-        "neg.l   %%d1        \n"  /* d1 = depth - d1 */
-        "lsr.l   %%d1,%%d2   \n"
-        "or.l    %%d0,%%d2   \n"
+        "move.l  %%d2,%%d0       \n"  /** rotate pattern **/
+        "lsl.l   %%d1,%%d0       \n"
+        "sub.l   %[dpth],%%d1    \n"
+        "neg.l   %%d1            \n"  /* d1 = depth - d1 */
+        "lsr.l   %%d1,%%d2       \n"
+        "or.l    %%d0,%%d2       \n"
 
-    ".wa_skip:               \n"
+    ".wa_skip:                   \n"
         "move.l  %%d2,-(%[patp]) \n"  /* push on pattern stack */
 
         "add.l   %[stri],%[src]  \n"  /* src += stride; */
-        "subq.l  #1,%%d3     \n"  /* decrease loop count */
-        "bne.b   .wa_loop    \n"  /* yes: loop */
+        "subq.l  #1,%%d3         \n"  /* loop 8 times (pixel block) */
+        "bne.b   .wa_loop        \n"
         : /* outputs */
         [src] "+a"(_src),
         [patp]"+a"(pat_ptr),
@@ -1250,78 +1382,76 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     asm volatile (
         "movem.l (%[patp]),%%d2-%%d6/%%a0-%%a1/%[ax] \n"  
                                   /* pop all 8 patterns */
-        "not.l   %[mask]     \n"  /* "set" mask -> "keep" mask */
+        "not.l   %[mask]         \n"  /* "set" mask -> "keep" mask */
         "and.l   #0xFF,%[mask]   \n"
-        "beq.b   .wa_sstart  \n"  /* yes: jump to short loop */
+        "beq.b   .wa_sstart      \n"  /* short loop if nothing to keep */
 
-    ".wa_floop:              \n"  /** full loop (there are bits to keep)**/
-        "clr.l   %%d0        \n"
-        "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
-        "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-        "lsr.l   #1,%%d3     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d4     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d5     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d6     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%a0,%%d1   \n"
-        "lsr.l   #1,%%d1     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a0   \n"
-        "move.l  %%a1,%%d1   \n"
-        "lsr.l   #1,%%d1     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a1   \n"
-        "move.l  %[ax],%%d1  \n"
-        "lsr.l   #1,%%d1     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%[ax]  \n"
+    ".wa_floop:                  \n"  /** full loop (there are bits to keep)**/
+        "lsr.l   #1,%%d2         \n"  /* shift out pattern bit */
+        "addx.l  %%d0,%%d0       \n"  /* put bit into LSB of byte */
+        "lsr.l   #1,%%d3         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d4         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d5         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d6         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%a0,%%d1       \n"
+        "lsr.l   #1,%%d1         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%d1,%%a0       \n"
+        "move.l  %%a1,%%d1       \n"
+        "lsr.l   #1,%%d1         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%d1,%%a1       \n"
+        "move.l  %[ax],%%d1      \n"
+        "lsr.l   #1,%%d1         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%d1,%[ax]      \n"
 
         "move.b  (%[addr]),%%d1  \n"  /* read old value */
-        "and.l   %[mask],%%d1    \n"  /* mask out unneeded bits */
+        "and.l   %[mask],%%d1    \n"  /* mask out replaced bits */
         "or.l    %%d0,%%d1       \n"  /* set new bits */
         "move.b  %%d1,(%[addr])  \n"  /* store value to bitplane */
 
         "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
-        "cmp.l   %[addr],%[end]  \n"  /* last bitplane done? */
-        "bhi.b   .wa_floop   \n"  /* no: loop */
+        "cmp.l   %[addr],%[end]  \n"  /* loop for all bitplanes */
+        "bhi.b   .wa_floop       \n"
 
-        "bra.b   .wa_end     \n"
+        "bra.b   .wa_end         \n"
 
-    ".wa_sstart:             \n"
-        "move.l  %%a0,%[mask]\n"  /* mask isn't needed here, reuse reg */
+    ".wa_sstart:                 \n"
+        "move.l  %%a0,%[mask]    \n"  /* mask isn't needed here, reuse reg */
 
-    ".wa_sloop:              \n"  /** short loop (nothing to keep) **/
-        "clr.l   %%d0        \n"
-        "lsr.l   #1,%%d2     \n"  /* shift out mask bit */
-        "addx.l  %%d0,%%d0   \n"  /* puts bit into LSB, shifts left by 1 */
-        "lsr.l   #1,%%d3     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d4     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d5     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%%d6     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "lsr.l   #1,%[mask]  \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%a1,%%d1   \n"
-        "lsr.l   #1,%%d1     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%%a1   \n"
-        "move.l  %[ax],%%d1  \n"
-        "lsr.l   #1,%%d1     \n"
-        "addx.l  %%d0,%%d0   \n"
-        "move.l  %%d1,%[ax]  \n"
+    ".wa_sloop:                  \n"  /** short loop (nothing to keep) **/
+        "lsr.l   #1,%%d2         \n"  /* shift out pattern bit */
+        "addx.l  %%d0,%%d0       \n"  /* put bit into LSB of byte */
+        "lsr.l   #1,%%d3         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d4         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d5         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%%d6         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "lsr.l   #1,%[mask]      \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%a1,%%d1       \n"
+        "lsr.l   #1,%%d1         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%d1,%%a1       \n"
+        "move.l  %[ax],%%d1      \n"
+        "lsr.l   #1,%%d1         \n"
+        "addx.l  %%d0,%%d0       \n"
+        "move.l  %%d1,%[ax]      \n"
 
         "move.b  %%d0,(%[addr])  \n"  /* store byte to bitplane */
         "add.l   %[psiz],%[addr] \n"  /* advance to next bitplane */
-        "cmp.l   %[addr],%[end]  \n"  /* last bitplane done? */
-        "bhi.b   .wa_sloop   \n"  /* no: loop */
+        "cmp.l   %[addr],%[end]  \n"  /* loop for all bitplanes */
+        "bhi.b   .wa_sloop       \n"
 
-    ".wa_end:                \n"
+    ".wa_end:                    \n"
         : /* outputs */
         [addr]"+a"(addr),
         [mask]"+d"(_mask),
