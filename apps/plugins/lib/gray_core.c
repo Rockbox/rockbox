@@ -29,7 +29,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
-#ifdef CPU_PP
+#if defined(CPU_PP) && defined(HAVE_ADJUSTABLE_CPU_FREQ)
 #define NEED_BOOST
 #endif
 
@@ -1469,10 +1469,15 @@ static const unsigned char bmpheader[] =
 static void gray_screendump_hook(int fd)
 {
     int i;
-    int x, y, by;
+    int x, y;
     int gx, gy, mask;
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    unsigned data;
+#else
+    int by;
 #if LCD_DEPTH == 2
     int shift;
+#endif
 #endif
     unsigned char *clut_entry;
     unsigned char *lcdptr;
@@ -1499,6 +1504,75 @@ static void gray_screendump_hook(int fd)
         _gray_rb->memset(linebuf, 0, BMP_LINESIZE);
 
         gy = y - _gray_info.y;
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#if LCD_DEPTH == 2
+        lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_FBWIDTH, y);
+
+        if ((unsigned) gy < (unsigned) _gray_info.height)
+        {
+            /* line contains greyscale (and maybe b&w) graphics */
+#ifndef SIMULATOR
+            unsigned char *grayptr = _gray_info.plane_data
+                                   + MULU16(_gray_info.bwidth, gy);
+#endif
+
+            for (x = 0; x < LCD_WIDTH; x += 4)
+            {
+                gx = x - _gray_info.x;
+
+                if ((unsigned)gx < (unsigned)_gray_info.width)
+                {
+#ifdef SIMULATOR
+                    data = MULU16(gy, _gray_info.width) + gx;
+
+                    for (i = 0; i < 4; i++)
+                        linebuf[x + i] = BMP_FIXEDCOLORS + _gray_info.depth
+                                       - _gray_info.cur_buffer[data + i];
+#else
+                    mask = 0x80 >> (gx & 7);
+
+                    for (i = 0; i < 4; i++)
+                    {
+                        int j;
+                        int idx = BMP_FIXEDCOLORS;
+                        unsigned char *grayptr2 = grayptr + (gx >> 3);
+
+                        for (j = _gray_info.depth; j > 0; j--)
+                        {
+                            if (*grayptr2 & mask)
+                                idx++;
+                            grayptr2 += _gray_info.plane_size;
+                        }
+                        linebuf[x + i] = idx;
+                        mask >>= 1;
+                    }
+#endif
+                }
+                else
+                {
+                    data = *lcdptr;
+                    linebuf[x]     = (data >> 6) & 3;
+                    linebuf[x + 1] = (data >> 4) & 3;
+                    linebuf[x + 2] = (data >> 2) & 3;
+                    linebuf[x + 3] = data & 3;
+                }
+                lcdptr++;
+            }
+        }
+        else
+        {
+            /* line contains only b&w graphics */
+            for (x = 0; x < LCD_WIDTH; x += 4)
+            {
+                data = *lcdptr++;
+                linebuf[x] = (data >> 6) & 3;
+                linebuf[x + 1] = (data >> 4) & 3;
+                linebuf[x + 2] = (data >> 2) & 3;
+                linebuf[x + 3] = data & 3;
+            }
+        }
+#endif /* LCD_DEPTH */
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
 #if LCD_DEPTH == 1
         mask = 1 << (y & 7);
         by = y >> 3;
@@ -1599,6 +1673,7 @@ static void gray_screendump_hook(int fd)
                 linebuf[x] = (*lcdptr++ >> shift) & 3;
         }
 #endif /* LCD_DEPTH */
+#endif /* LCD_PIXELFORMAT */
 
         _gray_rb->write(fd, linebuf, BMP_LINESIZE);
     }
