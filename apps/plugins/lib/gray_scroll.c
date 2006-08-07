@@ -11,7 +11,8 @@
 * Scrolling routines
 *
 * This is a generic framework to display up to 33 shades of grey
-* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey, iPod 4-grey)
+* within plugins.
 *
 * Copyright (C) 2004-2006 Jens Arnold
 *
@@ -30,6 +31,96 @@
 
 /*** Scrolling ***/
 
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+
+/* Scroll left */
+void gray_scroll_left(int count)
+{
+    unsigned char *data, *data_end;
+    int length, blank;
+
+    if ((unsigned)count >= (unsigned)_gray_info.width)
+        return;
+
+    data = _gray_info.cur_buffer;
+    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    length = _gray_info.width - count;
+    blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
+            _gray_info.fg_index : _gray_info.bg_index;
+
+    do
+    {
+        _gray_rb->memmove(data, data + count, length);
+        _gray_rb->memset(data + length, blank, count);
+        data += _gray_info.width;
+    }
+    while (data < data_end);
+}
+
+/* Scroll right */
+void gray_scroll_right(int count)
+{
+    unsigned char *data, *data_end;
+    int length, blank;
+
+    if ((unsigned)count >= (unsigned)_gray_info.width)
+        return;
+
+    data = _gray_info.cur_buffer;
+    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    length = _gray_info.width - count;
+    blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
+            _gray_info.fg_index : _gray_info.bg_index;
+
+    do
+    {
+        _gray_rb->memmove(data + count, data, length);
+        _gray_rb->memset(data, blank, count);
+        data += _gray_info.width;
+    }
+    while (data < data_end);
+}
+
+/* Scroll up */
+void gray_scroll_up(int count)
+{
+    long shift, length;
+    int blank;
+
+    if ((unsigned)count >= (unsigned)_gray_info.height)
+        return;
+
+    shift = MULU16(_gray_info.width, count);
+    length = MULU16(_gray_info.width, _gray_info.height - count);
+    blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
+            _gray_info.fg_index : _gray_info.bg_index;
+
+    _gray_rb->memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift,
+                      length);
+    _gray_rb->memset(_gray_info.cur_buffer + length, blank, shift);
+}
+
+/* Scroll down */
+void gray_scroll_down(int count)
+{
+    long shift, length;
+    int blank;
+
+    if ((unsigned)count >= (unsigned)_gray_info.height)
+        return;
+
+    shift = MULU16(_gray_info.width, count);
+    length = MULU16(_gray_info.width, _gray_info.height - count);
+    blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
+            _gray_info.fg_index : _gray_info.bg_index;
+
+    _gray_rb->memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer,
+                      length);
+    _gray_rb->memset(_gray_info.cur_buffer, blank, shift);
+}
+
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+
 /* Scroll left */
 void gray_scroll_left(int count)
 {
@@ -44,7 +135,8 @@ void gray_scroll_left(int count)
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
-    _gray_rb->memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift, length);
+    _gray_rb->memmove(_gray_info.cur_buffer, _gray_info.cur_buffer + shift,
+                      length);
     _gray_rb->memset(_gray_info.cur_buffer + length, blank, shift);
 }
 
@@ -62,7 +154,8 @@ void gray_scroll_right(int count)
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
-    _gray_rb->memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer, length);
+    _gray_rb->memmove(_gray_info.cur_buffer + shift, _gray_info.cur_buffer,
+                      length);
     _gray_rb->memset(_gray_info.cur_buffer, blank, shift);
 }
 
@@ -113,6 +206,7 @@ void gray_scroll_down(int count)
     }
     while (data < data_end);
 }
+#endif /* LCD_PIXELFORMAT */
 
 /*** Unbuffered scrolling functions ***/
 
@@ -148,6 +242,260 @@ void gray_ub_scroll_down(int count)
 
 #else /* !SIMULATOR */
 
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+
+/* Scroll left */
+void gray_ub_scroll_left(int count)
+{
+    int shift, length;
+    unsigned char *ptr, *ptr_end;
+
+    if ((unsigned) count >= (unsigned) _gray_info.width)
+        return;
+
+    shift = count >> 3;
+    count &= 7;
+
+    if (shift)
+    {
+        length = _gray_info.bwidth - shift;
+        ptr = _gray_info.plane_data;
+        ptr_end = ptr + _gray_info.plane_size;
+
+        /* Scroll row by row to minimize flicker */
+        do
+        {
+            unsigned char *ptr_row = ptr;
+            unsigned char *row_end = ptr_row
+                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+            do
+            {
+                _gray_rb->memmove(ptr_row, ptr_row + shift, length);
+                _gray_rb->memset(ptr_row + length, 0, shift);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+
+            ptr += _gray_info.bwidth;
+        }
+        while (ptr < ptr_end);
+    }
+    if (count)
+    {
+        asm (
+            "mov     r4, %[high]     \n"
+
+        ".sl_rloop:                  \n"
+            "mov     r5, %[addr]     \n"
+            "mov     r2, %[dpth]     \n"
+
+        ".sl_oloop:                  \n"
+            "mov     r6, r5          \n"
+            "mov     r3, %[cols]     \n"
+            "mov     r1, #0          \n"
+
+        ".sl_iloop:                          \n"
+            "mov     r1, r1, lsr #8          \n"
+            "ldrb    r0, [r6, #-1]!          \n"
+            "orr     r1, r1, r0, lsl %[cnt]  \n"
+            "strb    r1, [r6]                \n"
+
+            "subs    r3, r3, #1      \n"
+            "bne     .sl_iloop       \n"
+
+            "add     r5, r5, %[psiz] \n"
+            "subs    r2, r2, #1      \n"
+            "bne     .sl_oloop       \n"
+
+            "add     %[addr],%[addr],%[bwid] \n"
+            "subs    r4, r4, #1              \n"
+            "bne     .sl_rloop               \n"
+            : /* outputs */
+            : /* inputs */
+            [dpth]"r"(_gray_info.depth),
+            [high]"r"(_gray_info.height),
+            [bwid]"r"(_gray_info.bwidth),
+            [cols]"r"(_gray_info.bwidth - shift),
+            [psiz]"r"(_gray_info.plane_size),
+            [addr]"r"(_gray_info.plane_data + _gray_info.bwidth - shift),
+            [cnt] "r"(count)
+            : /* clobbers */
+            "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+        );
+    }
+}
+
+/* Scroll right */
+void gray_ub_scroll_right(int count)
+{
+    int shift, length;
+    unsigned char *ptr, *ptr_end;
+
+    if ((unsigned) count >= (unsigned) _gray_info.width)
+        return;
+
+    shift = count >> 3;
+    count &= 7;
+
+    if (shift)
+    {
+        length = _gray_info.bwidth - shift;
+        ptr = _gray_info.plane_data;
+        ptr_end = ptr + _gray_info.plane_size;
+
+        /* Scroll row by row to minimize flicker */
+        do
+        {
+            unsigned char *ptr_row = ptr;
+            unsigned char *row_end = ptr_row
+                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+            do
+            {
+                _gray_rb->memmove(ptr_row + shift, ptr_row, length);
+                _gray_rb->memset(ptr_row, 0, shift);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+
+            ptr += _gray_info.bwidth;
+        }
+        while (ptr < ptr_end);
+    }
+    if (count)
+    {
+        asm (
+            "mov     r4, %[high]     \n"
+
+        ".sr_rloop:                  \n"
+            "mov     r5, %[addr]     \n"
+            "mov     r2, %[dpth]     \n"
+
+        ".sr_oloop:                  \n"
+            "mov     r6, r5          \n"
+            "mov     r3, %[cols]     \n"
+            "mov     r1, #0          \n"
+
+        ".sr_iloop:                          \n"
+            "ldrb    r0, [r6]                \n"
+            "orr     r1, r0, r1, lsl #8      \n"
+            "mov     r0, r1, lsr %[cnt]      \n"
+            "strb    r0, [r6], #1            \n"
+
+            "subs    r3, r3, #1      \n"
+            "bne     .sr_iloop       \n"
+
+            "add     r5, r5, %[psiz] \n"
+            "subs    r2, r2, #1      \n"
+            "bne     .sr_oloop       \n"
+
+            "add     %[addr],%[addr],%[bwid] \n"
+            "subs    r4, r4, #1              \n"
+            "bne     .sr_rloop               \n"
+            : /* outputs */
+            : /* inputs */
+            [dpth]"r"(_gray_info.depth),
+            [high]"r"(_gray_info.height),
+            [bwid]"r"(_gray_info.bwidth),
+            [cols]"r"(_gray_info.bwidth - shift),
+            [psiz]"r"(_gray_info.plane_size),
+            [addr]"r"(_gray_info.plane_data + shift),
+            [cnt] "r"(count)
+            : /* clobbers */
+            "r0", "r1", "r2", "r3", "r4", "r5", "r6"
+        );
+    }
+}
+
+/* Scroll up */
+void gray_ub_scroll_up(int count)
+{
+    long blockshift;
+    unsigned char *ptr, *ptr_end1, *ptr_end2;
+
+    if ((unsigned) count >= (unsigned) _gray_info.height)
+        return;
+
+    blockshift = MULU16(_gray_info.bwidth, count);
+    ptr      = _gray_info.plane_data;
+    ptr_end2 = ptr + _gray_info.plane_size;
+    ptr_end1 = ptr_end2 - blockshift;
+    /* Scroll row by row to minimize flicker */
+    do
+    {
+        unsigned char *ptr_row = ptr;
+        unsigned char *row_end = ptr_row
+                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+        if (ptr < ptr_end1)
+        {
+            do
+            {
+                _gray_rb->memcpy(ptr_row, ptr_row + blockshift,
+                                 _gray_info.bwidth);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+        }
+        else
+        {
+            do
+            {
+                _gray_rb->memset(ptr_row, 0, _gray_info.bwidth);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+        }
+
+        ptr += _gray_info.bwidth;
+    }
+    while (ptr < ptr_end2);
+}
+
+/* Scroll down */
+void gray_ub_scroll_down(int count)
+{
+    long blockshift;
+    unsigned char *ptr, *ptr_end1, *ptr_end2;
+
+    if ((unsigned) count >= (unsigned) _gray_info.height)
+        return;
+
+    blockshift = MULU16(_gray_info.bwidth, count);
+    ptr_end2 = _gray_info.plane_data;
+    ptr_end1 = ptr_end2 + blockshift;
+    ptr      = ptr_end2 + _gray_info.plane_size;
+    /* Scroll row by row to minimize flicker */
+    do
+    {
+        unsigned char *ptr_row, *row_end;
+
+        ptr -= _gray_info.bwidth;
+        ptr_row = ptr;
+        row_end = ptr_row + MULU16(_gray_info.plane_size, _gray_info.depth);
+
+        if (ptr >= ptr_end1)
+        {
+            do
+            {
+                _gray_rb->memcpy(ptr_row, ptr_row - blockshift,
+                                 _gray_info.bwidth);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+        }
+        else
+        {
+            do
+            {
+                _gray_rb->memset(ptr_row, 0, _gray_info.bwidth);
+                ptr_row += _gray_info.plane_size;
+            }
+            while (ptr_row < row_end);
+        }
+    }
+    while (ptr > ptr_end2);
+}
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+
 /* Scroll left */
 void gray_ub_scroll_left(int count)
 {
@@ -156,17 +504,17 @@ void gray_ub_scroll_left(int count)
 
     if ((unsigned) count >= (unsigned) _gray_info.width)
         return;
-        
+
     length = _gray_info.width - count;
     ptr = _gray_info.plane_data;
     ptr_end = ptr + _gray_info.plane_size;
-    
+
     /* Scroll row by row to minimize flicker (pixel block rows) */
     do
     {
         unsigned char *ptr_row = ptr;
-        unsigned char *row_end = ptr_row 
-                               + MULU16(_gray_info.plane_size, _gray_info.depth);
+        unsigned char *row_end = ptr_row
+                             + MULU16(_gray_info.plane_size, _gray_info.depth);
         do
         {
             _gray_rb->memmove(ptr_row, ptr_row + count, length);
@@ -188,17 +536,17 @@ void gray_ub_scroll_right(int count)
 
     if ((unsigned) count >= (unsigned) _gray_info.width)
         return;
-        
+
     length = _gray_info.width - count;
     ptr = _gray_info.plane_data;
     ptr_end = ptr + _gray_info.plane_size;
-    
+
     /* Scroll row by row to minimize flicker (pixel block rows) */
     do
     {
         unsigned char *ptr_row = ptr;
-        unsigned char *row_end = ptr_row 
-                               + MULU16(_gray_info.plane_size, _gray_info.depth);
+        unsigned char *row_end = ptr_row
+                             + MULU16(_gray_info.plane_size, _gray_info.depth);
         do
         {
             _gray_rb->memmove(ptr_row + count, ptr_row, length);
@@ -221,10 +569,10 @@ void gray_ub_scroll_up(int count)
 
     if ((unsigned) count >= (unsigned) _gray_info.height)
         return;
-        
-    shift = count >> _PBLOCK_EXP;
-    count &= (_PBLOCK-1);
-    
+
+    shift = count >> 3;
+    count &= 7;
+
     if (shift)
     {
         blockshift = MULU16(_gray_info.width, shift);
@@ -235,7 +583,7 @@ void gray_ub_scroll_up(int count)
         do
         {
             unsigned char *ptr_row = ptr;
-            unsigned char *row_end = ptr_row 
+            unsigned char *row_end = ptr_row
                              + MULU16(_gray_info.plane_size, _gray_info.depth);
             if (ptr < ptr_end1)
             {
@@ -263,7 +611,7 @@ void gray_ub_scroll_up(int count)
     }
     if (count)
     {
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
+#if CONFIG_CPU == SH7034
         /* scroll column by column to minimize flicker */
         asm (
             "mov     #0,r6       \n"  /* x = 0 */
@@ -345,7 +693,7 @@ void gray_ub_scroll_up(int count)
             : /* clobbers */
             "r0", "r1", "r2", "r3", "r4", "r5", "r6"
         );
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+#elif defined(CPU_COLDFIRE)
         /* scroll column by column to minimize flicker */
         asm (
             "move.l  %[wide],%%d4\n"  /* columns = width */
@@ -406,9 +754,9 @@ void gray_ub_scroll_down(int count)
     if ((unsigned) count >= (unsigned) _gray_info.height)
         return;
 
-    shift = count >> _PBLOCK_EXP;
-    count &= (_PBLOCK-1);
-    
+    shift = count >> 3;
+    count &= 7;
+
     if (shift)
     {
         blockshift = MULU16(_gray_info.width, shift);
@@ -448,7 +796,7 @@ void gray_ub_scroll_down(int count)
     }
     if (count)
     {
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
+#if CONFIG_CPU == SH7034
         /* scroll column by column to minimize flicker */
         asm (
             "mov     #0,r6       \n"  /* x = 0 */
@@ -529,7 +877,7 @@ void gray_ub_scroll_down(int count)
             : /* clobbers */
             "r0", "r1", "r2", "r3", "r4", "r5", "r6"
         );
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+#elif defined(CPU_COLDFIRE)
         /* scroll column by column to minimize flicker */
         asm (
             "move.l  %[wide],%%d4\n"  /* columns = width */
@@ -576,7 +924,8 @@ void gray_ub_scroll_down(int count)
 #endif
     }
 }
+#endif /* LCD_PIXELFORMAT */
+
 #endif /* !SIMULATOR */
 
 #endif /* HAVE_LCD_BITMAP */
-

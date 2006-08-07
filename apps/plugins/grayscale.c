@@ -21,7 +21,7 @@
 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && (CONFIG_LCD != LCD_IPOD2BPP)
+#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
 #include "gray.h"
 
 PLUGIN_HEADER
@@ -54,12 +54,12 @@ PLUGIN_HEADER
 #define GRAYSCALE_RC_OFF BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define GRAYSCALE_SHIFT (BUTTON_SELECT | BUTTON_REL)
-#define GRAYSCALE_UP BUTTON_MENU
-#define GRAYSCALE_DOWN BUTTON_PLAY
+#define GRAYSCALE_SHIFT BUTTON_SELECT
+#define GRAYSCALE_UP BUTTON_SCROLL_BACK
+#define GRAYSCALE_DOWN BUTTON_SCROLL_FWD
 #define GRAYSCALE_LEFT BUTTON_LEFT
 #define GRAYSCALE_RIGHT BUTTON_RIGHT
-#define GRAYSCALE_OFF (BUTTON_SELECT | BUTTON_MENU)
+#define GRAYSCALE_OFF BUTTON_MENU
 #endif
 
 #define GFX_HEIGHT (LCD_HEIGHT-8)
@@ -182,11 +182,11 @@ int main(void)
        32 bitplanes for 33 shades of grey.
        H1x0: 160 pixels wide, 30 rows (120 pixels) high, (try to) reserve
        32 bitplanes for 33 shades of grey. */
-    shades = gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, GFX_HEIGHT/8,
+    shades = gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, GFX_HEIGHT,
                        32, 0, NULL) + 1;
 
     /* place greyscale overlay 1 row down */
-    gray_set_position(0, 1);
+    gray_set_position(0, 8);
 
     rb->snprintf(pbuf, sizeof(pbuf), "Shades: %d", shades);
     rb->lcd_puts(0, 0, pbuf);

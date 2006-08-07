@@ -87,7 +87,8 @@ drivers/lcd-h100-remote.c
 drivers/lcd-remote-2bit-vi.c
 #endif
 #endif
-#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR || CONFIG_LCD == LCD_IPOD2BPP
+#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR \
+ || CONFIG_LCD == LCD_IPOD2BPP || CONFIG_LCD == LCD_IPODMINI
 drivers/lcd-ipod.c
 #endif
 #if CONFIG_LCD==LCD_IPODVIDEO

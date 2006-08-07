@@ -547,7 +547,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #elif defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
-    if (gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT/8, 3, 0, NULL)
+    if (gray_init(rb, gbuf, gbuf_size, true, LCD_WIDTH, LCD_HEIGHT, 3, 0, NULL)
         != 3)
     {
         rb->splash(HZ, true, "Couldn't get grayscale buffer");

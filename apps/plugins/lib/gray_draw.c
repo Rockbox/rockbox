@@ -11,7 +11,8 @@
 * Drawing functions
 *
 * This is a generic framework to display up to 33 shades of grey
-* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey, iPod 4-grey)
+* within plugins.
 *
 * Copyright (C) 2004-2006 Jens Arnold
 *
@@ -72,8 +73,13 @@ void gray_drawpixel(int x, int y)
 {
     if (((unsigned)x < (unsigned)_gray_info.width)
         && ((unsigned)y < (unsigned)_gray_info.height))
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+        _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[MULU16(y,
+                                               _gray_info.width) + x]);
+#else
         _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[MULU16(x,
                                                _gray_info.height) + y]);
+#endif
 }
 
 /* Draw a line */
@@ -131,7 +137,11 @@ void gray_drawline(int x1, int y1, int x2, int y2)
     {
         if (((unsigned)x < (unsigned)_gray_info.width) 
             && ((unsigned)y < (unsigned)_gray_info.height))
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+            pfunc(&_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x]);
+#else
             pfunc(&_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y]);
+#endif
 
         if (d < 0)
         {
@@ -147,6 +157,175 @@ void gray_drawline(int x1, int y1, int x2, int y2)
         }
     }
 }
+
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+
+/* Draw a horizontal line (optimised) */
+void gray_hline(int x1, int x2, int y)
+{
+    int x;
+    int bits = 0;
+    unsigned char *dst;
+    bool fillopt = false;
+    void (*pfunc)(unsigned char *address);
+    
+    /* direction flip */
+    if (x2 < x1)
+    {
+        x = x1;
+        x1 = x2;
+        x2 = x;
+    }
+
+    /* nothing to draw? */
+    if (((unsigned)y >= (unsigned)_gray_info.height) 
+        || (x1 >= _gray_info.width) || (x2 < 0))
+        return;  
+    
+    /* clipping */
+    if (x1 < 0)
+        x1 = 0;
+    if (x2 >= _gray_info.width)
+        x2 = _gray_info.width - 1;
+        
+    if (_gray_info.drawmode & DRMODE_INVERSEVID)
+    {
+        if (_gray_info.drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            bits = _gray_info.bg_index;
+        }
+    }
+    else
+    {
+        if (_gray_info.drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = _gray_info.fg_index;
+        }
+    }
+    pfunc = _gray_pixelfuncs[_gray_info.drawmode];
+    dst   = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x1];
+
+    if (fillopt)
+        _gray_rb->memset(dst, bits, x2 - x1 + 1);
+    else
+    {
+        unsigned char *dst_end = dst + x2 - x1;
+        do
+            pfunc(dst++);
+        while (dst <= dst_end);
+    }
+}
+
+/* Draw a vertical line (optimised) */
+void gray_vline(int x, int y1, int y2)
+{
+    int y;
+    unsigned char *dst, *dst_end;
+    void (*pfunc)(unsigned char *address);
+    
+    /* direction flip */
+    if (y2 < y1)
+    {
+        y = y1;
+        y1 = y2;
+        y2 = y;
+    }
+
+    /* nothing to draw? */
+    if (((unsigned)x >= (unsigned)_gray_info.width) 
+        || (y1 >= _gray_info.height) || (y2 < 0))
+        return;  
+    
+    /* clipping */
+    if (y1 < 0)
+        y1 = 0;
+    if (y2 >= _gray_info.height)
+        y2 = _gray_info.height - 1;
+
+    pfunc = _gray_pixelfuncs[_gray_info.drawmode];
+    dst   = &_gray_info.cur_buffer[MULU16(y1, _gray_info.width) + x];
+
+    dst_end = dst + MULU16(y2 - y1, _gray_info.width);
+    do
+    {
+        pfunc(dst);
+        dst += _gray_info.width;
+    }
+    while (dst <= dst_end);
+}
+
+/* Draw a filled triangle */
+void gray_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
+{
+    int x, y;
+    long fp_x1, fp_x2, fp_dx1, fp_dx2;
+
+    /* sort vertices by increasing y value */
+    if (y1 > y3)
+    {
+        if (y2 < y3)       /* y2 < y3 < y1 */
+        {
+            x = x1; x1 = x2; x2 = x3; x3 = x;
+            y = y1; y1 = y2; y2 = y3; y3 = y;
+        }
+        else if (y2 > y1)  /* y3 < y1 < y2 */
+        {
+            x = x1; x1 = x3; x3 = x2; x2 = x;
+            y = y1; y1 = y3; y3 = y2; y2 = y;
+        }
+        else               /* y3 <= y2 <= y1 */
+        {
+            x = x1; x1 = x3; x3 = x;
+            y = y1; y1 = y3; y3 = y;
+        }
+    }
+    else
+    {
+        if (y2 < y1)       /* y2 < y1 <= y3 */
+        {
+            x = x1; x1 = x2; x2 = x;
+            y = y1; y1 = y2; y2 = y;
+        }
+        else if (y2 > y3)  /* y1 <= y3 < y2 */
+        {
+            x = x2; x2 = x3; x3 = x;
+            y = y2; y2 = y3; y3 = y;
+        }
+        /* else already sorted */
+    }
+
+    if (y1 < y3)  /* draw */
+    {
+        fp_dx1 = ((x3 - x1) << 16) / (y3 - y1);
+        fp_x1  = (x1 << 16) + (1<<15) + (fp_dx1 >> 1);
+
+        if (y1 < y2)  /* first part */
+        {
+            fp_dx2 = ((x2 - x1) << 16) / (y2 - y1);
+            fp_x2  = (x1 << 16) + (1<<15) + (fp_dx2 >> 1);
+            for (y = y1; y < y2; y++)
+            {
+                gray_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                fp_x1 += fp_dx1;
+                fp_x2 += fp_dx2;
+            }
+        }
+        if (y2 < y3)  /* second part */
+        {
+            fp_dx2 = ((x3 - x2) << 16) / (y3 - y2);
+            fp_x2 = (x2 << 16) + (1<<15) + (fp_dx2 >> 1);
+            for (y = y2; y < y3; y++)
+            {
+                gray_hline(fp_x1 >> 16, fp_x2 >> 16, y);
+                fp_x1 += fp_dx1;
+                fp_x2 += fp_dx2;
+            }
+        }
+    }
+}
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
 
 /* Draw a horizontal line (optimised) */
 void gray_hline(int x1, int x2, int y)
@@ -244,88 +423,6 @@ void gray_vline(int x, int y1, int y2)
     }
 }
 
-/* Draw a rectangular box */
-void gray_drawrect(int x, int y, int width, int height)
-{
-    if ((width <= 0) || (height <= 0))
-        return;
-
-    int x2 = x + width - 1;
-    int y2 = y + height - 1;
-
-    gray_vline(x, y, y2);
-    gray_vline(x2, y, y2);
-    gray_hline(x, x2, y);
-    gray_hline(x, x2, y2);
-}
-
-/* Fill a rectangular area */
-void gray_fillrect(int x, int y, int width, int height)
-{
-    int bits = 0;
-    unsigned char *dst, *dst_end;
-    bool fillopt = false;
-    void (*pfunc)(unsigned char *address);
-
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= _gray_info.width) 
-        || (y >= _gray_info.height) || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        y = 0;
-    }
-    if (x + width > _gray_info.width)
-        width = _gray_info.width - x;
-    if (y + height > _gray_info.height)
-        height = _gray_info.height - y;
-    
-    if (_gray_info.drawmode & DRMODE_INVERSEVID)
-    {
-        if (_gray_info.drawmode & DRMODE_BG)
-        {
-            fillopt = true;
-            bits = _gray_info.bg_index;
-        }
-    }
-    else
-    {
-        if (_gray_info.drawmode & DRMODE_FG)
-        {
-            fillopt = true;
-            bits = _gray_info.fg_index;
-        }
-    }
-    pfunc = _gray_pixelfuncs[_gray_info.drawmode];
-    dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
-    dst_end = dst + MULU16(width, _gray_info.height);
-
-    do
-    {
-        if (fillopt)
-            _gray_rb->memset(dst, bits, height);
-        else
-        {
-            unsigned char *dst_col = dst;
-            unsigned char *col_end = dst_col + height;
-            
-            do
-                pfunc(dst_col++);
-            while (dst_col < col_end);
-        }
-        dst += _gray_info.height;
-    }
-    while (dst < dst_end);
-}
-
 /* Draw a filled triangle */
 void gray_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
 {
@@ -395,6 +492,111 @@ void gray_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
         }
     }
 }
+#endif /* LCD_PIXELFORMAT */
+
+/* Draw a rectangular box */
+void gray_drawrect(int x, int y, int width, int height)
+{
+    if ((width <= 0) || (height <= 0))
+        return;
+
+    int x2 = x + width - 1;
+    int y2 = y + height - 1;
+
+    gray_vline(x, y, y2);
+    gray_vline(x2, y, y2);
+    gray_hline(x, x2, y);
+    gray_hline(x, x2, y2);
+}
+
+/* Fill a rectangular area */
+void gray_fillrect(int x, int y, int width, int height)
+{
+    int bits = 0;
+    unsigned char *dst, *dst_end;
+    bool fillopt = false;
+    void (*pfunc)(unsigned char *address);
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= _gray_info.width) 
+        || (y >= _gray_info.height) || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        y = 0;
+    }
+    if (x + width > _gray_info.width)
+        width = _gray_info.width - x;
+    if (y + height > _gray_info.height)
+        height = _gray_info.height - y;
+    
+    if (_gray_info.drawmode & DRMODE_INVERSEVID)
+    {
+        if (_gray_info.drawmode & DRMODE_BG)
+        {
+            fillopt = true;
+            bits = _gray_info.bg_index;
+        }
+    }
+    else
+    {
+        if (_gray_info.drawmode & DRMODE_FG)
+        {
+            fillopt = true;
+            bits = _gray_info.fg_index;
+        }
+    }
+    pfunc = _gray_pixelfuncs[_gray_info.drawmode];
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    dst   = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
+    dst_end = dst + MULU16(height, _gray_info.width);
+
+    do
+    {
+        if (fillopt)
+            _gray_rb->memset(dst, bits, width);
+        else
+        {
+            unsigned char *dst_row = dst;
+            unsigned char *row_end = dst_row + width;
+            
+            do
+                pfunc(dst_row++);
+            while (dst_row < row_end);
+        }
+        dst += _gray_info.width;
+    }
+    while (dst < dst_end);
+#else
+    dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
+    dst_end = dst + MULU16(width, _gray_info.height);
+
+    do
+    {
+        if (fillopt)
+            _gray_rb->memset(dst, bits, height);
+        else
+        {
+            unsigned char *dst_col = dst;
+            unsigned char *col_end = dst_col + height;
+            
+            do
+                pfunc(dst_col++);
+            while (dst_col < col_end);
+        }
+        dst += _gray_info.height;
+    }
+    while (dst < dst_end);
+#endif
+}
 
 /* About Rockbox' internal monochrome bitmap format:
  *
@@ -403,9 +605,7 @@ void gray_filltriangle(int x1, int y1, int x2, int y2, int x3, int y3)
  * vertically, LSB at top.
  * The bytes are stored in row-major order, with byte 0 being top left,
  * byte 1 2nd from left etc. The first row of bytes defines pixel rows
- * 0..7, the second row defines pixel row 8..15 etc.
- *
- * This is similar to the internal lcd hw format. */
+ * 0..7, the second row defines pixel row 8..15 etc. */
 
 /* Draw a partial monochrome bitmap */
 void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
@@ -443,9 +643,41 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     src_y  &= 7;
     src_end = src + width;
 
-    dst    = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
     fgfunc = _gray_pixelfuncs[_gray_info.drawmode];
     bgfunc = _gray_pixelfuncs[_gray_info.drawmode ^ DRMODE_INVERSEVID];
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    dst    = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
+    
+    do
+    {
+        const unsigned char *src_col = src++;
+        unsigned char *dst_col = dst++;
+        unsigned data = *src_col >> src_y;
+        int numbits = 8 - src_y;
+        
+        dst_end = dst_col + MULU16(height, _gray_info.width);
+        do
+        {
+            if (data & 0x01)
+                fgfunc(dst_col);
+            else
+                bgfunc(dst_col);
+
+            dst_col += _gray_info.width;
+
+            data >>= 1;
+            if (--numbits == 0)
+            {
+                src_col += stride;
+                data = *src_col;
+                numbits = 8;
+            }
+        }
+        while (dst_col < dst_end);
+    }
+    while (src < src_end);
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+    dst    = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
     
     do
     {
@@ -475,6 +707,7 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         dst += _gray_info.height;
     }
     while (src < src_end);
+#endif /* LCD_PIXELFORMAT */
 }
 
 /* Draw a full monochrome bitmap */
@@ -487,7 +720,6 @@ void gray_mono_bitmap(const unsigned char *src, int x, int y, int width, int hei
 void gray_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
 {
-    const unsigned char *src_end;
     unsigned char *dst, *dst_end;
 
     /* nothing to draw? */
@@ -514,25 +746,45 @@ void gray_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         height = _gray_info.height - y;
 
     src    += MULU16(stride, src_y) + src_x; /* move starting point */
-    src_end = src + width;
-    dst     = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    dst     = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
+    dst_end = dst + MULU16(height, _gray_info.width);
 
     do
     {
-        const unsigned char *src_col = src++;
-        unsigned char *dst_col = dst;
+        const unsigned char *src_row = src;
+        unsigned char *dst_row = dst;
+        unsigned char *row_end = dst_row + width;
 
-        dst_end = dst_col + height;
+        do
+            *dst_row++ = _gray_info.idxtable[*src_row++];
+        while (dst_row < row_end);
+
+        src += stride;
+        dst += _gray_info.width;
+    }
+    while (dst < dst_end);
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+    dst     = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
+    dst_end = dst + height;
+
+    do
+    {
+        const unsigned char *src_row = src;
+        unsigned char *dst_row = dst++;
+        unsigned char *row_end = dst_row + MULU16(width, _gray_info.height);
+
         do
         {
-            *dst_col++ = _gray_info.idxtable[*src_col];
-            src_col += stride;
+            *dst_row = _gray_info.idxtable[*src_row++];
+            dst_row += _gray_info.height;
         }
-        while (dst_col < dst_end);
+        while (dst_row < row_end);
 
-        dst += _gray_info.height;
+        src += stride;
     }
-    while (src < src_end);
+    while (dst < dst_end);
+#endif /* LCD_PIXELFORMAT */
 }
 
 /* Draw a full greyscale bitmap, canonical format */
@@ -612,6 +864,149 @@ void gray_ub_clear_display(void)
                      _gray_info.plane_size));
 }
 
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+
+/* Write a pixel block, defined by their brightnesses in a greymap.
+   Address is the byte in the first bitplane, src is the greymap start address,
+   stride is the increment for the greymap to get to the next pixel, mask
+   determines which pixels of the destination block are changed. */
+static void _writearray(unsigned char *address, const unsigned char *src,
+                        unsigned mask)
+{
+    unsigned long pat_stack[8];
+    unsigned long *pat_ptr = &pat_stack[8];
+    unsigned char *addr, *end;      
+#if 0 /* CPU specific asm versions will go here */
+#else /* C version, for reference*/
+    unsigned test = 0x80;
+    int i;
+
+    /* precalculate the bit patterns with random shifts
+     * for all 8 pixels and put them on an extra "stack" */
+    for (i = 7; i >= 0; i--)
+    {
+        unsigned pat = 0;
+
+        if (mask & test)
+        {
+            int shift;
+
+            pat = _gray_info.bitpattern[_gray_info.idxtable[*src]];
+
+            /* shift pattern pseudo-random, simple & fast PRNG */
+            _gray_random_buffer = 75 * _gray_random_buffer + 74;
+            shift = (_gray_random_buffer >> 8) & _gray_info.randmask;
+            if (shift >= _gray_info.depth)
+                shift -= _gray_info.depth;
+
+            pat = (pat << shift) | (pat >> (_gray_info.depth - shift));
+        }
+        *(--pat_ptr) = pat;
+        src++;
+        test >>= 1;
+    }
+
+    addr = address;
+    end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+
+    /* set the bits for all 8 pixels in all bytes according to the
+     * precalculated patterns on the pattern stack */
+    test = 1;
+    mask = (~mask & 0xff);
+    if (mask == 0)
+    {
+        do
+        {
+            unsigned data = 0;
+
+            for (i = 7; i >= 0; i--)
+                data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+
+            *addr = data;
+            addr += _gray_info.plane_size;
+            test <<= 1;
+        }
+        while (addr < end);
+    }
+    else
+    {
+        do
+        {
+            unsigned data = 0;
+
+            for (i = 7; i >= 0; i--)
+                data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+
+            *addr = (*addr & mask) | data;
+            addr += _gray_info.plane_size;
+            test <<= 1;
+        }
+        while (addr < end);
+    }
+#endif
+}
+
+/* Draw a partial greyscale bitmap, canonical format */
+void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
+                              int stride, int x, int y, int width, int height)
+{
+    int shift, nx;
+    unsigned char *dst, *dst_end;
+    unsigned mask, mask_right;
+
+    /* nothing to draw? */
+    if ((width <= 0) || (height <= 0) || (x >= _gray_info.width)
+        || (y >= _gray_info.height) || (x + width <= 0) || (y + height <= 0))
+        return;
+
+    /* clipping */
+    if (x < 0)
+    {
+        width += x;
+        src_x -= x;
+        x = 0;
+    }
+    if (y < 0)
+    {
+        height += y;
+        src_y -= y;
+        y = 0;
+    }
+    if (x + width > _gray_info.width)
+        width = _gray_info.width - x;
+    if (y + height > _gray_info.height)
+        height = _gray_info.height - y;
+
+    shift = x & 7;
+    src += MULU16(stride, src_y) + src_x - shift;
+    dst  = _gray_info.plane_data + (x >> 3) + MULU16(_gray_info.bwidth, y);
+    nx   = width - 1 + shift;
+
+    mask = 0xFFu >> shift;
+    mask_right = 0xFFu << (~nx & 7);
+    
+    dst_end = dst + MULU16(_gray_info.bwidth, height);
+    do
+    {
+        const unsigned char *src_row = src;
+        unsigned char *dst_row = dst;
+        unsigned mask_row = mask;
+        
+        for (x = nx; x >= 8; x -= 8)
+        {
+            _writearray(dst_row++, src_row, mask_row);
+            src_row += 8;
+            mask_row = 0xFFu;
+        }
+        _writearray(dst_row, src_row, mask_row & mask_right);
+
+        src += stride;
+        dst += _gray_info.bwidth;
+    }
+    while (dst < dst_end);
+}
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+
 /* Write a pixel block, defined by their brightnesses in a greymap.
    Address is the byte in the first bitplane, src is the greymap start address,
    stride is the increment for the greymap to get to the next pixel, mask
@@ -619,17 +1014,17 @@ void gray_ub_clear_display(void)
 static void _writearray(unsigned char *address, const unsigned char *src,
                         int stride, unsigned mask)
 {
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
     unsigned long pat_stack[8];
     unsigned long *pat_ptr = &pat_stack[8];
+    unsigned char *addr, *end;      
+#if CONFIG_CPU == SH7034
     const unsigned char *_src;
-    unsigned char *addr, *end;
     unsigned _mask, trash;
 
     _mask = mask;
     _src = src;
 
-    /* precalculate the bit patterns with random shifts 
+    /* precalculate the bit patterns with random shifts
        for all 8 pixels and put them on an extra "stack" */
     asm volatile (
         "mov     #8,r3       \n"  /* loop count in r3: 8 pixels */
@@ -784,11 +1179,8 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         : /* clobbers */
         "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9", "r10"
     );
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
-    unsigned long pat_stack[8];
-    unsigned long *pat_ptr = &pat_stack[8];
+#elif defined(CPU_COLDFIRE)
     const unsigned char *_src;
-    unsigned char *addr, *end;
     unsigned _mask, trash;
 
     _mask = mask;
@@ -941,12 +1333,73 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         : /* clobbers */
         "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
     );
-#elif defined(CPU_ARM) && (LCD_DEPTH == 1)
-    /* TODO: implement for iFP */
-    (void)address;
-    (void)src;
-    (void)stride;
-    (void)mask;
+#else /* C version, for reference*/
+#warning C version of _writearray() used
+    unsigned test = 1;
+    int i;
+
+    /* precalculate the bit patterns with random shifts
+     * for all 8 pixels and put them on an extra "stack" */
+    for (i = 7; i >= 0; i--)
+    {
+        unsigned pat = 0;
+
+        if (mask & test)
+        {
+            int shift;
+
+            pat = _gray_info.bitpattern[_gray_info.idxtable[*src]];
+
+            /* shift pattern pseudo-random, simple & fast PRNG */
+            _gray_random_buffer = 75 * _gray_random_buffer + 74;
+            shift = (_gray_random_buffer >> 8) & _gray_info.randmask;
+            if (shift >= _gray_info.depth)
+                shift -= _gray_info.depth;
+
+            pat = (pat << shift) | (pat >> (_gray_info.depth - shift));
+        }
+        *(--pat_ptr) = pat;
+        src += stride;
+        test <<= 1;
+    }
+
+    addr = address;
+    end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+
+    /* set the bits for all 8 pixels in all bytes according to the
+     * precalculated patterns on the pattern stack */
+    test = 1;
+    mask = (~mask & 0xff);
+    if (mask == 0)
+    {
+        do
+        {
+            unsigned data = 0;
+
+            for (i = 0; i < 8; i++)
+                data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+
+            *addr = data;
+            addr += _gray_info.plane_size;
+            test <<= 1;
+        }
+        while (addr < end);
+    }
+    else
+    {
+        do
+        {
+            unsigned data = 0;
+
+            for (i = 0; i < 8; i++)
+                data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+
+            *addr = (*addr & mask) | data;
+            addr += _gray_info.plane_size;
+            test <<= 1;
+        }
+        while (addr < end);
+    }
 #endif
 }
 
@@ -981,16 +1434,16 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _gray_info.height)
         height = _gray_info.height - y;
 
-    shift = y & (_PBLOCK-1);
+    shift = y & 7;
     src += MULU16(stride, src_y) + src_x - MULU16(stride, shift);
     dst  = _gray_info.plane_data + x
-           + MULU16(_gray_info.width, y >> _PBLOCK_EXP);
+           + MULU16(_gray_info.width, y >> 3);
     ny   = height - 1 + shift;
 
     mask = 0xFFu << shift;
-    mask_bottom = 0xFFu >> (~ny & (_PBLOCK-1));
+    mask_bottom = 0xFFu >> (~ny & 7);
 
-    for (; ny >= _PBLOCK; ny -= _PBLOCK)
+    for (; ny >= 8; ny -= 8)
     {
         const unsigned char *src_row = src;
         unsigned char *dst_row = dst;
@@ -1000,7 +1453,7 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
             _writearray(dst_row++, src_row++, stride, mask);
         while (dst_row < dst_end);
 
-        src += stride << _PBLOCK_EXP;
+        src += stride << 3;
         dst += _gray_info.width;
         mask = 0xFFu;
     }
@@ -1010,6 +1463,7 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         _writearray(dst++, src++, stride, mask);
     while (dst < dst_end);
 }
+#endif /* LCD_PIXELFORMAT */
 
 #endif /* !SIMULATOR */
 
@@ -1020,6 +1474,4 @@ void gray_ub_gray_bitmap(const unsigned char *src, int x, int y, int width,
     gray_ub_gray_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
-
 #endif /* HAVE_LCD_BITMAP */
-

@@ -89,9 +89,10 @@
 #define LCD_IPODCOLOR 6 /* as used by iPod Color/Photo */
 #define LCD_IPODNANO  7 /* as used by iPod Nano */
 #define LCD_IPODVIDEO 8 /* as used by iPod Video */
-#define LCD_IPOD2BPP  9 /* as used by all greyscale iPods */
-#define LCD_IFP7XX   10 /* as used by iRiver iFP 7xx/8xx */
-#define LCD_GIGABEAT 11
+#define LCD_IPOD2BPP  9 /* as used by all fullsize greyscale iPods */
+#define LCD_IPODMINI 10 /* as used by iPod Mini g1/g2 */
+#define LCD_IFP7XX   11 /* as used by iRiver iFP 7xx/8xx */
+#define LCD_GIGABEAT 12
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1

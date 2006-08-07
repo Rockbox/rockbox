@@ -82,7 +82,7 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ      11289600
 
-#define CONFIG_LCD LCD_IPOD2BPP
+#define CONFIG_LCD LCD_IPODMINI
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

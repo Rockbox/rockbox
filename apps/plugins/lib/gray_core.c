@@ -11,7 +11,8 @@
 * Core & miscellaneous functions
 *
 * This is a generic framework to display up to 33 shades of grey
-* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey, iPod 4-grey)
+* within plugins.
 *
 * Copyright (C) 2004-2006 Jens Arnold
 *
@@ -28,9 +29,14 @@
 #ifdef HAVE_LCD_BITMAP
 #include "gray.h"
 
+#ifdef CPU_PP
+#define NEED_BOOST
+#endif
+
 /* Global variables */
 struct plugin_api *_gray_rb = NULL; /* global api struct pointer */
 struct _gray_info _gray_info;       /* global info structure */
+
 #ifndef SIMULATOR
 short _gray_random_buffer;          /* buffer for random number generator */
 
@@ -106,6 +112,43 @@ static const unsigned char lcdlinear[256] = {
     227, 228, 230, 232, 233, 235, 237, 239,
     241, 243, 245, 247, 249, 251, 253, 255
 };
+#elif (CONFIG_LCD == LCD_IPOD2BPP) || (CONFIG_LCD == LCD_IPODMINI)
+/* measured and interpolated curve for mini LCD */
+/* TODO: verify this curve on the fullsize greyscale LCD */
+static const unsigned char lcdlinear[256] = {
+      0,   3,   6,   8,  11,  14,  17,  19,
+     22,  24,  27,  29,  32,  34,  36,  38,
+     40,  42,  44,  45,  47,  48,  50,  51,
+     52,  54,  55,  56,  57,  58,  58,  59,
+     60,  61,  62,  62,  63,  64,  64,  65,
+     66,  66,  67,  67,  68,  68,  69,  69,
+     70,  70,  70,  71,  71,  71,  72,  72,
+     73,  73,  73,  74,  74,  74,  74,  75,
+     75,  75,  76,  76,  76,  77,  77,  77,
+     78,  78,  78,  79,  79,  79,  80,  80,
+     80,  80,  81,  81,  81,  82,  82,  82,
+     83,  83,  83,  84,  84,  84,  85,  85,
+     85,  85,  86,  86,  86,  87,  87,  87,
+     87,  88,  88,  88,  89,  89,  89,  89,
+     90,  90,  90,  91,  91,  91,  92,  92,
+     92,  93,  93,  93,  94,  94,  94,  95,
+     95,  96,  96,  96,  97,  97,  98,  98,
+     99,  99,  99, 100, 100, 101, 101, 102,
+    102, 103, 103, 104, 104, 105, 105, 106,
+    106, 107, 107, 108, 108, 109, 109, 110,
+    110, 111, 111, 112, 113, 113, 114, 114,
+    115, 115, 116, 117, 117, 118, 118, 119,
+    120, 120, 121, 122, 122, 123, 124, 124,
+    125, 126, 126, 127, 128, 128, 129, 130,
+    131, 131, 132, 133, 134, 134, 135, 136,
+    137, 138, 139, 140, 141, 142, 143, 144,
+    145, 146, 147, 148, 149, 150, 152, 153,
+    154, 156, 157, 159, 160, 162, 163, 165,
+    167, 168, 170, 172, 174, 176, 178, 180,
+    182, 184, 187, 189, 192, 194, 197, 200,
+    203, 206, 209, 212, 215, 219, 222, 226,
+    229, 233, 236, 240, 244, 248, 251, 255
+};
 #endif
 #else /* SIMULATOR */
 /* undo a (generic) PC display gamma of 2.0 to simulate target behaviour */
@@ -147,20 +190,22 @@ static const unsigned char lcdlinear[256] = {
 
 /* Prototypes */
 static inline void _deferred_update(void) __attribute__ ((always_inline));
+static int exp_s16p16(int x);
+static int log_s16p16(int x);
+static void gray_screendump_hook(int fd);
 #ifdef SIMULATOR
 static unsigned long _gray_get_pixel(int x, int y);
 #else
 static void _timer_isr(void);
 #endif
-static void gray_screendump_hook(int fd);
 
 /* Update LCD areas not covered by the greyscale overlay */
 static inline void _deferred_update(void)
 {
     int x1 = MAX(_gray_info.x, 0);
     int x2 = MIN(_gray_info.x + _gray_info.width, LCD_WIDTH);
-    int y1 = MAX(_gray_info.by << _PBLOCK_EXP, 0);
-    int y2 = MIN((_gray_info.by << _PBLOCK_EXP) + _gray_info.height, LCD_HEIGHT);
+    int y1 = MAX(_gray_info.y, 0);
+    int y2 = MIN(_gray_info.y + _gray_info.height, LCD_HEIGHT);
 
     if (y1 > 0)  /* refresh part above overlay, full width */
         _gray_rb->lcd_update_rect(0, 0, LCD_WIDTH, y1);
@@ -179,9 +224,15 @@ static inline void _deferred_update(void)
 /* Timer interrupt handler: display next bitplane */
 static void _timer_isr(void)
 {
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    _gray_rb->lcd_blit(_gray_info.plane_data + MULU16(_gray_info.plane_size,
+                       _gray_info.cur_plane), _gray_info.bx, _gray_info.y,
+                       _gray_info.bwidth, _gray_info.height, _gray_info.bwidth);
+#else
     _gray_rb->lcd_blit(_gray_info.plane_data + MULU16(_gray_info.plane_size,
                        _gray_info.cur_plane), _gray_info.x, _gray_info.by,
                        _gray_info.width, _gray_info.bheight, _gray_info.width);
+#endif
 
     if (++_gray_info.cur_plane >= _gray_info.depth)
         _gray_info.cur_plane = 0;
@@ -200,7 +251,7 @@ static int exp_s16p16(int x)
     int t;
     int y = 0x00010000;
     
-	if (x < 0) x += 0xb1721,            y >>= 16;
+    if (x < 0) x += 0xb1721,            y >>= 16;
     t = x - 0x58b91; if (t >= 0) x = t, y <<= 8;
     t = x - 0x2c5c8; if (t >= 0) x = t, y <<= 4;
     t = x - 0x162e4; if (t >= 0) x = t, y <<= 2;
@@ -218,7 +269,7 @@ static int exp_s16p16(int x)
 }
 
 /* fixed point log() */
-int log_s16p16(int x)
+static int log_s16p16(int x)
 {
     int t;
     int y = 0xa65af;
@@ -252,7 +303,9 @@ int log_s16p16(int x)
                memory. Unbuffered operation provides only a subset of
                drawing functions. (only gray_bitmap drawing and scrolling)
    width     = width in pixels  (1..LCD_WIDTH)
-   bheight   = height in LCD pixel-block units (8 pixels) (1..LCD_HEIGHT/8)
+   height    = height in pixels (1..LCD_HEIGHT)
+               Note that depending on the target LCD, either height or
+               width are rounded up to a multiple of 8.
    depth     = number of bitplanes to use (1..32).
    gamma     = gamma value as s8p8 fixed point. gamma <= 0 means no
                correction at all, i.e. no LCD linearisation as well.
@@ -277,20 +330,21 @@ int log_s16p16(int x)
    used. The total memory needed can be calculated as follows:
  total_mem =
      shades * sizeof(long)               (bitpatterns)
-   + (width * bheight) * depth           (bitplane data)
+   + [horizontal_packing] ?              (bitplane data)
+       ((width + 7) / 8) * height * depth : width * ((height + 7) / 8) * depth
    + buffered ?                          (chunky front- & backbuffer)
-       (width * bheight * 8 * 2) : 0
+       (width * height * 2) : 0
    + 0..3                                (longword alignment)
-   
+
    The function tries to be as authentic as possible regarding memory usage on
    the simulator, even if it doesn't use all of the allocated memory. There's
    one situation where it will consume more memory on the sim than on the
    target: if you're allocating a low depth (< 8) without buffering. */
 int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
-              bool buffered, int width, int bheight, int depth, int gamma,
+              bool buffered, int width, int height, int depth, int gamma,
               long *buf_taken)
 {
-    int possible_depth, i;
+    int possible_depth, bdim, i;
     long plane_size, buftaken;
     unsigned data;
 #ifndef SIMULATOR
@@ -300,9 +354,17 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _gray_rb = newrb;
 
     if ((unsigned) width > LCD_WIDTH
-        || (unsigned) bheight > (LCD_HEIGHT/_PBLOCK)
+        || (unsigned) height > LCD_HEIGHT
         || depth < 1)
         return 0;
+
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    bdim = (width + 7) >> 3;
+    width = bdim << 3;
+#else
+    bdim = (height + 7) >> 3;
+    height = bdim << 3;
+#endif
 
     /* the buffer has to be long aligned */
     buftaken = (-(long)gbuf) & 3;
@@ -311,7 +373,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     /* chunky front- & backbuffer */
     if (buffered)  
     {
-        plane_size = MULU16(width, bheight << _PBLOCK_EXP);
+        plane_size = MULU16(width, height);
         buftaken += 2 * plane_size;
         if (buftaken > gbuf_size)
             return 0;
@@ -324,7 +386,11 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         gbuf += plane_size;
     }
 
-    plane_size = MULU16(width, bheight);
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    plane_size = MULU16(bdim, height);
+#else
+    plane_size = MULU16(width, bdim);
+#endif
     possible_depth = (gbuf_size - buftaken - sizeof(long))
                      / (plane_size + sizeof(long));
 
@@ -339,7 +405,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     {
         long orig_size = depth * plane_size + (depth + 1) * sizeof(long);
         
-        plane_size = MULU16(width, bheight << _PBLOCK_EXP);
+        plane_size = MULU16(width, height);
         if (plane_size > orig_size)
         {
             buftaken += plane_size;
@@ -357,10 +423,16 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         buftaken += depth * plane_size + (depth + 1) * sizeof(long);
 
     _gray_info.x = 0;
-    _gray_info.by = 0;
+    _gray_info.y = 0;
     _gray_info.width = width;
-    _gray_info.height = bheight << _PBLOCK_EXP;
-    _gray_info.bheight = bheight;
+    _gray_info.height = height;
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    _gray_info.bx = 0;
+    _gray_info.bwidth = bdim;
+#else
+    _gray_info.by = 0;
+    _gray_info.bheight = bdim;
+#endif
     _gray_info.depth = depth;
     _gray_info.flags = 0;
 #ifndef SIMULATOR
@@ -463,13 +535,20 @@ void gray_show(bool enable)
         _gray_rb->sim_lcd_ex_init(_gray_info.depth + 1, _gray_get_pixel);
         gray_update();
 #else /* !SIMULATOR */
+#ifdef NEED_BOOST
+        _gray_rb->cpu_boost(true);
+#endif
 #if CONFIG_LCD == LCD_SSD1815
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 67, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_S1D15E06
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 70, 1, _timer_isr);
+#elif CONFIG_LCD == LCD_IPOD2BPP
+        /* FIXME: verify value */
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 40, 1, _timer_isr);
+#elif CONFIG_LCD == LCD_IPODMINI
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 44, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
-        /* TODO: implement for iFP */
-        (void)_timer_isr;
+        (void)_timer_isr;   /* TODO: implement for iFP */
 #endif /* CONFIG_LCD */
 #endif /* !SIMULATOR */
         _gray_rb->screen_dump_set_hook(gray_screendump_hook);
@@ -480,6 +559,9 @@ void gray_show(bool enable)
         _gray_rb->sim_lcd_ex_init(0, NULL);
 #else
         _gray_rb->timer_unregister();
+#ifdef NEED_BOOST
+        _gray_rb->cpu_boost(false);
+#endif
 #endif
         _gray_info.flags &= ~_GRAY_RUNNING;
         _gray_rb->screen_dump_set_hook(NULL);
@@ -492,9 +574,15 @@ void gray_show(bool enable)
    Note that x and y are in LCD coordinates, not graybuffer coordinates! */
 static unsigned long _gray_get_pixel(int x, int y)
 {
-    return _gray_info.cur_buffer[MULU16(x - _gray_info.x, _gray_info.height)
-                                 + y - (_gray_info.by << _PBLOCK_EXP)]
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    return _gray_info.cur_buffer[MULU16(y - _gray_info.y, _gray_info.width)
+                                 + x - _gray_info.x]
            + (1 << LCD_DEPTH);
+#else
+    return _gray_info.cur_buffer[MULU16(x - _gray_info.x, _gray_info.height)
+                                 + y - _gray_info.y]
+           + (1 << LCD_DEPTH);
+#endif
 }
 
 /* Update a rectangular area of the greyscale overlay */
@@ -506,7 +594,7 @@ void gray_update_rect(int x, int y, int width, int height)
         height = _gray_info.height - y;
         
     x += _gray_info.x;
-    y += _gray_info.by << _PBLOCK_EXP;
+    y += _gray_info.y;
 
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x;
@@ -517,38 +605,41 @@ void gray_update_rect(int x, int y, int width, int height)
 }
 
 #else /* !SIMULATOR */
+
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+
 /* Update a rectangular area of the greyscale overlay */
 void gray_update_rect(int x, int y, int width, int height)
 {
-    int ymax;
+    int xmax, bwidth;
     long srcofs;
     unsigned char *dst;
 
-    if (width <= 0)
+    if ((width <= 0) || (height <= 0))
         return; /* nothing to do */
 
-    /* The Y coordinates have to work on whole pixel block rows */
-    ymax = (y + height - 1) >> _PBLOCK_EXP;
-    y >>= _PBLOCK_EXP;
+    /* The X coordinates have to work on whole pixel block columns */
+    xmax = (x + width - 1) >> 3;
+    x >>= 3;
 
-    if (x + width > _gray_info.width)
-        width = _gray_info.width - x;
-    if (ymax >= _gray_info.bheight)
-        ymax = _gray_info.bheight - 1;
+    if (y + height > _gray_info.height)
+        height = _gray_info.height - y;
+    if (xmax >= _gray_info.bwidth)
+        xmax = _gray_info.bwidth - 1;
+    bwidth = xmax - x + 1;
         
-    srcofs = (y << _PBLOCK_EXP) + MULU16(_gray_info.height, x);
-    dst = _gray_info.plane_data + MULU16(_gray_info.width, y) + x;
+    srcofs = MULU16(_gray_info.width, y) + (x << 3);
+    dst = _gray_info.plane_data + MULU16(_gray_info.bwidth, y) + x;
     
-    /* Copy specified rectange bitmap to hardware */
-    for (; y <= ymax; y++)
+    /* Copy specified rectangle bitmap to hardware */
+    for (; height > 0; height--)
     {
         long srcofs_row = srcofs;
         unsigned char *dst_row = dst;
-        unsigned char *dst_end = dst_row + width;
+        unsigned char *dst_end = dst_row + bwidth;
 
         do
         {
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
             unsigned long pat_stack[8];
             unsigned long *pat_ptr;
             unsigned char *cbuf, *bbuf;
@@ -557,6 +648,145 @@ void gray_update_rect(int x, int y, int width, int height)
             cbuf = _gray_info.cur_buffer + srcofs_row;
             bbuf = _gray_info.back_buffer + srcofs_row;
 
+#if 0 /* CPU specific asm versions will go here */
+#else /* C version, for reference*/
+            (void)pat_ptr;
+            /* check whether anything changed in the 8-pixel block */
+            change  = *(uint32_t *)cbuf ^ *(uint32_t *)bbuf;
+            cbuf += sizeof(uint32_t);
+            bbuf += sizeof(uint32_t);
+            change |= *(uint32_t *)cbuf ^ *(uint32_t *)bbuf;
+
+            if (change != 0)
+            {
+                unsigned char *addr, *end;
+                unsigned mask = 0;
+                unsigned test = 1;
+                int i;
+
+                cbuf = _gray_info.cur_buffer + srcofs_row;
+                bbuf = _gray_info.back_buffer + srcofs_row;
+
+                /* precalculate the bit patterns with random shifts
+                 * for all 8 pixels and put them on an extra "stack" */
+                for (i = 7; i >= 0; i--)
+                {
+                    unsigned pat = 0;
+                    unsigned char cur = *cbuf++;
+                    unsigned char back = *bbuf;
+                    
+                    *bbuf++ = cur;
+
+                    mask <<= 1;
+                    if (cur != back)
+                    {
+                        int shift;
+
+                        pat = _gray_info.bitpattern[cur];
+
+                        /* shift pattern pseudo-random, simple & fast PRNG */
+                        _gray_random_buffer = 75 * _gray_random_buffer + 74;
+                        shift = (_gray_random_buffer >> 8) & _gray_info.randmask;
+                        if (shift >= _gray_info.depth)
+                            shift -= _gray_info.depth;
+                            
+                        pat = (pat << shift) | (pat >> (_gray_info.depth - shift));
+                        
+                        mask |= 1;
+                    }
+                    pat_stack[i] = pat;
+                }
+
+                addr = dst_row;
+                end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+
+                /* set the bits for all 8 pixels in all bytes according to the
+                 * precalculated patterns on the pattern stack */
+                mask = (~mask & 0xff);
+                if (mask == 0)
+                {
+                    do
+                    {
+                        unsigned data = 0;
+
+                        for (i = 7; i >= 0; i--)
+                            data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+                        
+                        *addr = data;
+                        addr += _gray_info.plane_size;
+                        test <<= 1;
+                    }
+                    while (addr < end);
+                }
+                else
+                {
+                    do
+                    {
+                        unsigned data = 0;
+
+                        for (i = 7; i >= 0; i--)
+                            data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+                        
+                        *addr = (*addr & mask) | data;
+                        addr += _gray_info.plane_size;
+                        test <<= 1;
+                    }
+                    while (addr < end);
+                }
+
+            }
+#endif /* CONFIG_CPU */
+            srcofs_row += 8;
+            dst_row++;
+        }
+        while (dst_row < dst_end);
+        
+        srcofs += _gray_info.width;
+        dst += _gray_info.bwidth;
+    }
+}
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
+
+/* Update a rectangular area of the greyscale overlay */
+void gray_update_rect(int x, int y, int width, int height)
+{
+    int ymax;
+    long srcofs;
+    unsigned char *dst;
+
+    if ((width <= 0) || (height <= 0))
+        return; /* nothing to do */
+
+    /* The Y coordinates have to work on whole pixel block rows */
+    ymax = (y + height - 1) >> 3;
+    y >>= 3;
+
+    if (x + width > _gray_info.width)
+        width = _gray_info.width - x;
+    if (ymax >= _gray_info.bheight)
+        ymax = _gray_info.bheight - 1;
+        
+    srcofs = (y << 3) + MULU16(_gray_info.height, x);
+    dst = _gray_info.plane_data + MULU16(_gray_info.width, y) + x;
+    
+    /* Copy specified rectangle bitmap to hardware */
+    for (; y <= ymax; y++)
+    {
+        long srcofs_row = srcofs;
+        unsigned char *dst_row = dst;
+        unsigned char *dst_end = dst_row + width;
+
+        do
+        {
+            unsigned long pat_stack[8];
+            unsigned long *pat_ptr;
+            unsigned char *cbuf, *bbuf;
+            unsigned change;
+
+            cbuf = _gray_info.cur_buffer + srcofs_row;
+            bbuf = _gray_info.back_buffer + srcofs_row;
+
+#if CONFIG_CPU == SH7034
             asm volatile (
                 "mov.l   @%[cbuf]+,r1    \n"
                 "mov.l   @%[bbuf]+,r2    \n"
@@ -738,15 +968,7 @@ void gray_update_rect(int x, int y, int width, int height)
                     "r0", "r1", "r2", "r3", "r6", "r7", "r8", "r9", "r10"
                 );
             }
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
-            unsigned long pat_stack[8];
-            unsigned long *pat_ptr;
-            unsigned char *cbuf, *bbuf;
-            unsigned change;
-
-            cbuf = _gray_info.cur_buffer + srcofs_row;
-            bbuf = _gray_info.back_buffer + srcofs_row;
-
+#elif defined(CPU_COLDFIRE)
             asm volatile (
                 "move.l  (%[cbuf])+,%%d0 \n"
                 "move.l  (%[bbuf])+,%%d1 \n"
@@ -924,16 +1146,105 @@ void gray_update_rect(int x, int y, int width, int height)
                     "d0", "d1", "d2", "d3", "d4", "d5", "d6", "a0", "a1"
                 );
             }
-#endif /* CONFIG_CPU, LCD_DEPTH */
+#else /* C version, for reference*/
+#warning C version of gray_update_rect() used
+            (void)pat_ptr;
+            /* check whether anything changed in the 8-pixel block */
+            change  = *(uint32_t *)cbuf ^ *(uint32_t *)bbuf;
+            cbuf += sizeof(uint32_t);
+            bbuf += sizeof(uint32_t);
+            change |= *(uint32_t *)cbuf ^ *(uint32_t *)bbuf;
+            
+            if (change != 0)
+            {
+                unsigned char *addr, *end;
+                unsigned mask = 0;
+                unsigned test = 1;
+                int i;
+
+                cbuf = _gray_info.cur_buffer + srcofs_row;
+                bbuf = _gray_info.back_buffer + srcofs_row;
+
+                /* precalculate the bit patterns with random shifts
+                 * for all 8 pixels and put them on an extra "stack" */
+                for (i = 0; i < 8; i++)
+                {
+                    unsigned pat = 0;
+                    unsigned char cur = *cbuf++;
+                    unsigned char back = *bbuf;
+                    
+                    *bbuf++ = cur;
+
+                    if (cur != back)
+                    {
+                        int shift;
+
+                        pat = _gray_info.bitpattern[cur];
+
+                        /* shift pattern pseudo-random, simple & fast PRNG */
+                        _gray_random_buffer = 75 * _gray_random_buffer + 74;
+                        shift = (_gray_random_buffer >> 8) & _gray_info.randmask;
+                        if (shift >= _gray_info.depth)
+                            shift -= _gray_info.depth;
+                            
+                        pat = (pat << shift) | (pat >> (_gray_info.depth - shift));
+                        
+                        mask |= 0x100;
+                    }
+                    mask >>= 1;
+                    pat_stack[i] = pat;
+                }
+
+                addr = dst_row;
+                end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+
+                /* set the bits for all 8 pixels in all bytes according to the
+                 * precalculated patterns on the pattern stack */
+                mask = (~mask & 0xff);
+                if (mask == 0)
+                {
+                    do
+                    {
+                        unsigned data = 0;
+
+                        for (i = 7; i >= 0; i--)
+                            data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+                        
+                        *addr = data;
+                        addr += _gray_info.plane_size;
+                        test <<= 1;
+                    }
+                    while (addr < end);
+                }
+                else
+                {
+                    do
+                    {
+                        unsigned data = 0;
+
+                        for (i = 7; i >= 0; i--)
+                            data = (data << 1) | ((pat_stack[i] & test) ? 1 : 0);
+                        
+                        *addr = (*addr & mask) | data;
+                        addr += _gray_info.plane_size;
+                        test <<= 1;
+                    }
+                    while (addr < end);
+                }
+
+            }
+#endif /* CONFIG_CPU */
             srcofs_row += _gray_info.height;
             dst_row++;
         }
         while (dst_row < dst_end);
         
-        srcofs += _PBLOCK;
+        srcofs += 8;
         dst += _gray_info.width;
     }
 }
+#endif /* LCD_PIXELFORMAT */
+
 #endif /* !SIMULATOR */
 
 /* Update the whole greyscale overlay */
@@ -1047,10 +1358,10 @@ static void gray_screendump_hook(int fd)
     {
         _gray_rb->memset(linebuf, 0, BMP_LINESIZE);
 
-        gy = y - (_gray_info.by << _PBLOCK_EXP);
+        gy = y - _gray_info.y;
 #if LCD_DEPTH == 1
-        mask = 1 << (y & (_PBLOCK-1));
-        by = y >> _PBLOCK_EXP;
+        mask = 1 << (y & 7);
+        by = y >> 3;
         lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
 
         if ((unsigned) gy < (unsigned) _gray_info.height)
@@ -1058,7 +1369,7 @@ static void gray_screendump_hook(int fd)
             /* line contains greyscale (and maybe b&w) graphics */
 #ifndef SIMULATOR
             unsigned char *grayptr = _gray_info.plane_data 
-                                   + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
+                                   + MULU16(_gray_info.width, gy >> 3);
 #endif
 
             for (x = 0; x < LCD_WIDTH; x++)
@@ -1108,8 +1419,8 @@ static void gray_screendump_hook(int fd)
             (void)mask;
 #else
             unsigned char *grayptr = _gray_info.plane_data
-                                   + MULU16(_gray_info.width, gy >> _PBLOCK_EXP);
-            mask = 1 << (gy & (_PBLOCK-1));
+                                   + MULU16(_gray_info.width, gy >> 3);
+            mask = 1 << (gy & 7);
 #endif
 
             for (x = 0; x < LCD_WIDTH; x++)

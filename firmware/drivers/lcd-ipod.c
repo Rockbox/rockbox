@@ -36,7 +36,7 @@ static inline bool timer_check(int clock_start, int usecs)
     return ((int)(USEC_TIMER - clock_start)) >= usecs;
 }
 
-#if (CONFIG_LCD == LCD_IPOD2BPP)
+#if (CONFIG_LCD == LCD_IPOD2BPP) || (CONFIG_LCD == LCD_IPODMINI)
 
 /*** hardware configuration ***/
 

@@ -27,7 +27,7 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP /* and also not for the Player */
+#ifdef HAVE_LCD_BITMAP /* not for the Player */
 
 #define GRAY_BRIGHTNESS(y) (y)
 
@@ -109,9 +109,6 @@ void gray_ub_scroll_down(int count);
 
 /*** Internal stuff ***/
 
-#define _PBLOCK_EXP 3
-#define _PBLOCK (1 << _PBLOCK_EXP)
-
 /* flag definitions */
 #define _GRAY_RUNNING          0x0001  /* greyscale overlay is running */
 #define _GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
@@ -124,10 +121,16 @@ void gray_ub_scroll_down(int count);
 struct _gray_info
 {
     int x;
-    int by;         /* 8-pixel units */
+    int y;
     int width;
     int height;
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    int bx;         /* 8-pixel units */
+    int bwidth;     /* 8-pixel units */
+#else /* vertical packing */
+    int by;         /* 8-pixel units */
     int bheight;    /* 8-pixel units */
+#endif
     int depth;      /* number_of_bitplanes  = (number_of_grayscales - 1) */
     unsigned long flags;       /* various flags, see #defines */
 #ifndef SIMULATOR

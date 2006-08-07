@@ -27,12 +27,11 @@ dice.c
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 text_editor.c
 
-#if CONFIG_LCD != LCD_IPOD2BPP     /* Plugins needing the grayscale lib */
+/* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
 jpeg.c
 mandelbrot.c
 plasma.c
-#endif
 
 bounce.c
 bubbles.c

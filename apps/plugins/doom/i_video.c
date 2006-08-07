@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.19  2006/08/03 20:17:22  bagder
+ * Revision 1.20  2006/08/07 01:46:41  amiconn
+ * Grayscale library ported to the grayscale iPods, first version. Added C reference versions of gray_update_rect() for both horizontal and vertical pixel packing. gray_update_rect() and gray_ub_gray_bitmap_part() not yet assembler optimised. Grayscale screendump doesn't work yet. * Fixed button assignments for iPod in grayscale.c
+ *
+ * Revision 1.19  2006-08-03 20:17:22  bagder
  * Barry Wardell's keymappings for H10
  *
  * Revision 1.18  2006-08-02 00:21:59  amiconn
@@ -500,7 +503,7 @@ void I_InitGraphics(void)
 
 #ifndef HAVE_LCD_COLOR
    gbuf=malloc(GRAYBUFSIZE);
-   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT/8, 32, 
+   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT, 32, 
              3<<7 /* 1.5 */, NULL);
    /* switch on grayscale overlay */
    gray_show(true);

@@ -338,7 +338,7 @@ int main(void)
 #ifdef HAVE_LCD_COLOR
     shades = 256;
 #else
-    shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT/8,
+    shades = gray_init(rb, gbuf, gbuf_size, false, LCD_WIDTH, LCD_HEIGHT,
                        32, 2<<8, NULL) + 1;
     if(shades <= 1)
     {

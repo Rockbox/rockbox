@@ -11,7 +11,8 @@
 * Parameter handling
 *
 * This is a generic framework to display up to 33 shades of grey
-* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey) within plugins.
+* on low-depth bitmap LCDs (Archos b&w, Iriver 4-grey, iPod 4-grey)
+* within plugins.
 *
 * Copyright (C) 2004-2006 Jens Arnold
 *
@@ -29,11 +30,19 @@
 #include "gray.h"
 
 /* Set position of the top left corner of the greyscale overlay
-   Note that by is in pixel-block units (8 pixels) */
-void gray_set_position(int x, int by)
+   Note that depending on the target LCD, either x or y gets rounded
+   to the nearest multiple of 8 */
+void gray_set_position(int x, int y)
 {
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+    _gray_info.bx = (x + 3) / 8;
+    x = 8 * _gray_info.bx;
+#else
+    _gray_info.by = (y + 3) / 8;
+    y = 8 * _gray_info.by;
+#endif
     _gray_info.x = x;
-    _gray_info.by = by;
+    _gray_info.y = y;
     
     if (_gray_info.flags & _GRAY_RUNNING)
     {
