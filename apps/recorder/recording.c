@@ -1243,7 +1243,7 @@ bool f2_rec_screen(void)
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h*2,
                        str(LANG_SYSFONT_RECORDING_CHANNELS));
             screens[i].getstringsize(str(LANG_SYSFONT_F2_MODE), &w, &h);
-            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h
+            screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2 - h,
                        str(LANG_SYSFONT_F2_MODE));
             screens[i].getstringsize(ptr, &w, &h);
             screens[i].putsxy(LCD_WIDTH - w, LCD_HEIGHT/2, ptr);
