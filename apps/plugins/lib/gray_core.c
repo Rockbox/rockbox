@@ -544,9 +544,9 @@ void gray_show(bool enable)
         _gray_rb->timer_register(1, NULL, TIMER_FREQ / 70, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IPOD2BPP
         /* FIXME: verify value */
-        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 40, 1, _timer_isr);
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 80, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IPODMINI
-        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 44, 1, _timer_isr);
+        _gray_rb->timer_register(1, NULL, TIMER_FREQ / 88, 1, _timer_isr);
 #elif CONFIG_LCD == LCD_IFP7XX
         (void)_timer_isr;   /* TODO: implement for iFP */
 #endif /* CONFIG_LCD */
