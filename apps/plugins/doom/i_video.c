@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.20  2006/08/07 01:46:41  amiconn
+ * Revision 1.21  2006/08/07 01:57:29  amiconn
+ * Fix red iPod g3 build.
+ *
+ * Revision 1.20  2006-08-07 01:46:41  amiconn
  * Grayscale library ported to the grayscale iPods, first version. Added C reference versions of gray_update_rect() for both horizontal and vertical pixel packing. gray_update_rect() and gray_ub_gray_bitmap_part() not yet assembler optimised. Grayscale screendump doesn't work yet. * Fixed button assignments for iPod in grayscale.c
  *
  * Revision 1.19  2006-08-03 20:17:22  bagder
@@ -126,7 +129,7 @@ void I_ShutdownGraphics(void)
 // I_StartTic
 //
 
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
 //#define DOOMBUTTON_SCROLLWHEEL
 #define DOOMBUTTON_UP         BUTTON_MENU
 #define DOOMBUTTON_WEAPON     BUTTON_SELECT
