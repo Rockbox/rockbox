@@ -266,3 +266,8 @@
     section \ref{#1} (page \pageref{#1})
 }}
 {\newcommand{\reference}[1]{section \ref{#1}}}
+
+% special HTML output adjustments
+\ifpdfoutput{}{\setlength{\parindent}{0mm}}
+\ifpdfoutput{}{\renewcommand{\Forward}[1]{$\triangleright${}#1}}
+
