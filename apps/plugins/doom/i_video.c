@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.21  2006/08/07 01:57:29  amiconn
+ * Revision 1.22  2006/08/07 02:44:18  amiconn
+ * Use striped buffering for grayscale targets to make the buffer fit on iPod g3/g4. Also slightly faster (at least on H1x0) with the buffer in IRAM.
+ *
+ * Revision 1.21  2006-08-07 01:57:29  amiconn
  * Fix red iPod g3 build.
  *
  * Revision 1.20  2006-08-07 01:46:41  amiconn
@@ -103,7 +106,7 @@
 
 #ifndef HAVE_LCD_COLOR
 #include "../lib/gray.h"
-static unsigned char graybuffer[LCD_HEIGHT*LCD_WIDTH]; /* off screen buffer */
+static unsigned char graybuffer[8*LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
 static unsigned char *gbuf;
 #define GRAYBUFSIZE (LCD_WIDTH*LCD_HEIGHT*4+200)
 #endif
@@ -193,7 +196,7 @@ inline void getkey()
          event.type = ev_keyup;
          hswitch=0;
       }
-#if CONFIG_KEYPAD == IPOD_4G_PAD
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
       /* Bring up the menu */
       event.data1=KEY_ESCAPE;
 #else
@@ -457,23 +460,35 @@ void I_FinishUpdate (void)
    unsigned char paletteIndex;
    int x, y;
 
+#ifdef HAVE_LCD_COLOR
    for (y = 0; y < LCD_HEIGHT; y++)
    {
       for (x = 0; x < LCD_WIDTH; x++)
       {
          paletteIndex = d_screens[0][y*SCREENWIDTH + x];
-#ifndef HAVE_LCD_COLOR
-         graybuffer[y * LCD_WIDTH + x]=palette[paletteIndex];
-#else
          rb->lcd_framebuffer[y * LCD_WIDTH + x] = palette[paletteIndex];
-#endif
       }
    }
-#ifndef HAVE_LCD_COLOR
-   gray_ub_gray_bitmap(graybuffer, 0, 0, LCD_WIDTH, LCD_HEIGHT);
-#else
    rb->lcd_update();
-#endif
+#else /* !HAVE_LCD_COLOR */
+   int yd = 0;
+
+   for (y = 0; y < LCD_HEIGHT; y++)
+   {
+      for (x = 0; x < LCD_WIDTH; x++)
+      {
+         paletteIndex = d_screens[0][y*SCREENWIDTH + x];
+         graybuffer[yd * LCD_WIDTH + x]=palette[paletteIndex];
+      }
+      if (++yd == 8)
+      {
+         gray_ub_gray_bitmap(graybuffer, 0, y & ~7, LCD_WIDTH, 8);
+         yd = 0;
+      }
+   }
+   if (yd > 0)
+       gray_ub_gray_bitmap(graybuffer, 0, y & ~7, LCD_WIDTH, yd);
+#endif /* !HAVE_LCD_COLOR */
 #endif
 }
 
@@ -506,7 +521,7 @@ void I_InitGraphics(void)
 
 #ifndef HAVE_LCD_COLOR
    gbuf=malloc(GRAYBUFSIZE);
-   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT, 32, 
+   gray_init(rb, gbuf, GRAYBUFSIZE, false, LCD_WIDTH, LCD_HEIGHT, 32,
              3<<7 /* 1.5 */, NULL);
    /* switch on grayscale overlay */
    gray_show(true);
