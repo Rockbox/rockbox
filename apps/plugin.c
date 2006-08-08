@@ -463,8 +463,8 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_bitmap,
 #endif
 
-#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO) && \
-    !defined(SIMULATOR)
+#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
+     || CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
     lcd_yuv_blit,
 #endif
 

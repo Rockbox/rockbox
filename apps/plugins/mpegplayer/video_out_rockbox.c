@@ -35,12 +35,14 @@ static int starttick;
 #define CSUB_X 2
 #define CSUB_Y 2
 
-static int image_x;
-static int image_y;
 static int image_width;
 static int image_height;
 static int image_chroma_x;
 static int image_chroma_y;
+static int output_x;
+static int output_y;
+static int output_width;
+static int output_height;
 
 #if (LCD_DEPTH == 16) && \
     ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
@@ -197,16 +199,16 @@ static void rockbox_draw_frame (vo_instance_t * instance,
     (void)id;
     (void)instance;
 
-#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO) && \
-    !defined(SIMULATOR)
+#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
+     || CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
     rb->lcd_yuv_blit(buf,
                     0,0,image_width,
-                    image_x,image_y,image_width,image_height);
+                    output_x,output_y,output_width,output_height);
 #elif (LCD_DEPTH == 16) && \
     ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
     yuv_bitmap_part(buf,0,0,image_width,
-                    image_x,image_y,image_width,image_height);
-    rb->lcd_update_rect(image_x,image_y,image_width,image_height);
+                    output_x,output_y,output_width,output_height);
+    rb->lcd_update_rect(output_x,output_y,output_width,output_height);
 #endif
 
     if (starttick==0) starttick=*rb->current_tick-1; /* Avoid divby0 */
@@ -265,15 +267,19 @@ static int rockbox_setup (vo_instance_t * instance, unsigned int width,
     image_chroma_y=image_height/chroma_height;
 
     if (image_width >= LCD_WIDTH) {
-        image_x = 0;
+        output_width = LCD_WIDTH;
+        output_x = 0;
     } else {
-        image_x = (LCD_WIDTH-image_width)/2;
+        output_width = image_width;
+        output_x = (LCD_WIDTH-image_width)/2;
     }
 
     if (image_height >= LCD_HEIGHT) {
-        image_y = 0;
+        output_height = LCD_HEIGHT;
+        output_y = 0;
     } else {
-        image_y = (LCD_HEIGHT-image_height)/2;
+        output_height = image_height;
+        output_y = (LCD_HEIGHT-image_height)/2;
     }
 
     return 0;

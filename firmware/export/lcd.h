@@ -71,7 +71,8 @@ extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
 extern void lcd_icon(int icon, bool enable);
 
-#if CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO
+#if CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
+    || CONFIG_LCD == LCD_H300
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height);

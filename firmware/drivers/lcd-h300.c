@@ -77,18 +77,20 @@ static int xoffset = 0; /* needed for flip */
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
 
+#define LCD_CMD  (*(volatile unsigned short *)0xf0000000)
+#define LCD_DATA (*(volatile unsigned short *)0xf0000002)
 
 /* called very frequently - inline! */
 static inline void lcd_write_reg(int reg, int val)
 {
-    *(volatile unsigned short *)0xf0000000 = reg;
-    *(volatile unsigned short *)0xf0000002 = val;
+    LCD_CMD = reg;
+    LCD_DATA = val;
 }
 
 /* called very frequently - inline! */
 static inline void lcd_begin_write_gram(void)
 {
-    *(volatile unsigned short *)0xf0000000 = R_WRITE_DATA_2_GRAM;
+    LCD_CMD = R_WRITE_DATA_2_GRAM;
 }
 
 /*** hardware configuration ***/
@@ -299,6 +301,135 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     /*if(display_on)*/
 }
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (63*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
+#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    if (display_on)
+    {
+        int ymax;
+        
+        width  = (width + 1) & ~1;
+        height = (height + 1) & ~1;
+        ymax = y + height - 1;
+
+        /* set update window */
+
+        /* horiz ram addr */ 
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (ymax << 8) | y);
+        
+        /* vert ram addr */ 
+        lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
+        lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
+        lcd_begin_write_gram(); 
+
+        for (; y <= ymax; y++)
+        {
+            /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+            const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+            const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                               + (src_x/CSUB_X);
+            const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                               + (src_x/CSUB_X);
+            const unsigned char *row_end = ysrc + width;
+
+            int y, u, v;
+            int rc, gc, bc;
+            int red, green, blue;
+            unsigned rbits, gbits, bbits;
+
+            do
+            {
+                u = *usrc++ - 128;
+                v = *vsrc++ - 128;
+                rc = RVFAC * v + ROUNDOFFS;
+                gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+                bc = BUFAC * u + ROUNDOFFS;
+
+                y = *ysrc++;
+                red   = RYFAC * y + rc;
+                green = GYFAC * y + gc;
+                blue  = BYFAC * y + bc;
+
+                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+                {
+                    if (red < 0)
+                        red = 0;
+                    else
+                        red = (RYFAC*255+ROUNDOFFS);
+                }
+                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+                {
+                    if (green < 0)
+                        green = 0;
+                    else
+                        green = (GYFAC*255+ROUNDOFFS);
+                }
+                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+                {
+                    if (blue < 0)
+                        blue = 0;
+                    else
+                        blue = (BYFAC*255+ROUNDOFFS);
+                }
+                rbits = ((unsigned)red) >> 16 ;
+                gbits = ((unsigned)green) >> 16 ;
+                bbits = ((unsigned)blue) >> 16 ;
+
+                LCD_DATA = (rbits << 11) | (gbits << 5) | bbits;
+
+                y = *ysrc++;
+                red   = RYFAC * y + rc;
+                green = GYFAC * y + gc;
+                blue  = BYFAC * y + bc;
+
+                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+                {
+                    if (red < 0)
+                        red = 0;
+                    else
+                        red = (RYFAC*255+ROUNDOFFS);
+                }
+                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+                {
+                    if (green < 0)
+                        green = 0;
+                    else
+                        green = (GYFAC*255+ROUNDOFFS);
+                }
+                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+                {
+                    if (blue < 0)
+                        blue = 0;
+                    else
+                        blue = (BYFAC*255+ROUNDOFFS);
+                }
+                rbits = ((unsigned)red) >> 16 ;
+                gbits = ((unsigned)green) >> 16 ;
+                bbits = ((unsigned)blue) >> 16 ;
+
+                LCD_DATA = (rbits << 11) | (gbits << 5) | bbits;
+            }
+            while (ysrc < row_end);
+
+            src_y++;
+        }
+    }
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */
@@ -324,8 +455,8 @@ void lcd_update(void)
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    if(display_on) {    
-        int ymax = y + height;
+    if(display_on) {
+        int ymax = y + height - 1;
 
         if(x + width > LCD_WIDTH)
             width = LCD_WIDTH - x;
