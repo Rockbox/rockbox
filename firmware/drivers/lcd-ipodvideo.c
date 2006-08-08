@@ -274,7 +274,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
         int y, u, v;
         int red, green, blue;
         unsigned rbits, gbits, bbits;
-        unsigned short pixel;
 
         int rc, gc, bc;
 
