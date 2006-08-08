@@ -118,12 +118,12 @@ static unsigned lcd_bcm_read32(unsigned address) {
     return inw(0x30000000) | inw(0x30000000) << 16;
 }
 
+static int finishup_needed = 0;
+
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    static int finishup_needed = 0;
-
     {
         int endy = x + width;
         /* Ensure x and width are both even - so we can read 32-bit aligned 
@@ -203,4 +203,164 @@ void lcd_update_rect(int x, int y, int width, int height)
 void lcd_update(void)
 {
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);
+}
+
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (63*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
+#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    int ymax;
+
+    width = (width + 1) & ~1;
+
+    if (finishup_needed) {
+        unsigned int data;
+        /* Bottom-half of original lcd_bcm_finishup() function */
+        do {
+            /* This function takes about 14ms to execute - so we yield() */
+            yield();
+            data = lcd_bcm_read32(0x1F8);
+        } while (data == 0xFFFA0005 || data == 0xFFFF);
+    }
+
+    lcd_bcm_read32(0x1FC);
+
+    {
+        int rect1, rect2, rect3, rect4;
+        int count = (width * height) << 1;
+        /* calculate the drawing region */
+        rect1 = x;                         /* start horiz */
+        rect2 = y;                         /* start vert */
+        rect3 = (x + width) - 1;           /* max horiz */
+        rect4 = (y + height) - 1;          /* max vert */
+
+        /* setup the drawing region */
+        lcd_bcm_setup_rect(0x34, rect1, rect2, rect3, rect4, count);
+    }
+
+    /* write out destination address as two 16bit values */
+    outw((0xE0020 & 0xffff), 0x30010000);
+    outw((0xE0020 >> 16), 0x30010000);
+
+    /* wait for it to be write ready */
+    while ((inw(0x30030000) & 0x2) == 0);
+
+    ymax = y + height - 1 ;
+
+    for (; y <= ymax ; y++)
+    {
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+        const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
+                                           + (src_x/CSUB_X);
+        const unsigned char *row_end = ysrc + width;
+
+        int y, u, v;
+        int red, green, blue;
+        unsigned rbits, gbits, bbits;
+        unsigned short pixel;
+
+        int rc, gc, bc;
+
+        do
+        {
+            u = *usrc++ - 128;
+            v = *vsrc++ - 128;
+            rc = RVFAC * v + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+            bc = BUFAC * u + ROUNDOFFS;
+
+            /* Pixel 1 */
+            y = *ysrc++;
+            red   = RYFAC * y + rc;
+            green = GYFAC * y + gc;
+            blue  = BYFAC * y + bc;
+
+            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            {
+                if (red < 0)
+                    red = 0;
+                else
+                    red = (RYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            {
+                if (green < 0)
+                    green = 0;
+                else
+                    green = (GYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            {
+                if (blue < 0)
+                    blue = 0;
+                else
+                    blue = (BYFAC*255+ROUNDOFFS);
+            }
+            rbits = ((unsigned)red) >> 16 ;
+            gbits = ((unsigned)green) >> 16 ;
+            bbits = ((unsigned)blue) >> 16 ;
+
+            outw((rbits << 11) | (gbits << 5) | bbits, 0x30000000);
+
+            /* Pixel 2 */
+            y = *ysrc++;
+            red   = RYFAC * y + rc;
+            green = GYFAC * y + gc;
+            blue  = BYFAC * y + bc;
+
+            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
+            {
+                if (red < 0)
+                    red = 0;
+                else
+                    red = (RYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
+            {
+                if (green < 0)
+                    green = 0;
+                else
+                    green = (GYFAC*255+ROUNDOFFS);
+            }
+            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
+            {
+                if (blue < 0)
+                    blue = 0;
+                else
+                    blue = (BYFAC*255+ROUNDOFFS);
+            }
+            rbits = ((unsigned)red) >> 16 ;
+            gbits = ((unsigned)green) >> 16 ;
+            bbits = ((unsigned)blue) >> 16 ;
+
+            outw((rbits << 11) | (gbits << 5) | bbits, 0x30000000);
+        }
+        while (ysrc < row_end);
+
+        src_y++;
+    }
+
+    /* Top-half of original lcd_bcm_finishup() function */
+    outw(0x31, 0x30030000); 
+
+    lcd_bcm_read32(0x1FC);
+
+    finishup_needed = 1;
 }

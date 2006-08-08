@@ -540,7 +540,8 @@ struct plugin_api {
                               int height);
 #endif
 #if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
-     || CONFIG_LCD == LCD_H300) &&  !defined(SIMULATOR)
+     || CONFIG_LCD == LCD_H300 || CONFIG_LCD == LCD_IPODVIDEO) && \
+     !defined(SIMULATOR)
     void (*lcd_yuv_blit)(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);
