@@ -200,12 +200,11 @@ INLINE unsigned range_limit(int value)
     );
     return value;
 #elif defined(CPU_ARM)
-    asm (
-        "adds %[v], %[v], #128\n"  /* value += 128 */
-        "movmi %[v], #0       \n"  /* clip to 0 if negative result */
-        "cmp %[v], #255       \n"  /* did we exceed 255? */
-        "movgt %[v], #255     \n"  /* yes, clip to limit */
-        :
+    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
+        "add     %[v], %[v], #128    \n"  /* value += 128 */
+        "cmp     %[v], #255          \n"  /* out of range 0..255? */
+        "mvnhi   %[v], %[v], asr #31 \n"  /* yes: set all bits to ~(sign_bit) */
+        : /* outputs */
         [v]"+r"(value)
     );
     return value;
