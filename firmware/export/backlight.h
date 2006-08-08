@@ -27,6 +27,10 @@ void backlight_off(void);
 void backlight_set_timeout(int index);
 #ifdef CONFIG_BACKLIGHT
 void backlight_init(void);
+#if defined(IAUDIO_X5) && !defined(SIMULATOR)
+#define X5_BACKLIGHT_SHUTDOWN
+void x5_backlight_shutdown(void);
+#endif
 int  backlight_get_current_timeout(void);
 #ifdef HAVE_BACKLIGHT_PWM_FADING
 void backlight_set_fade_in(int index);
@@ -34,9 +38,17 @@ void backlight_set_fade_out(int index);
 #endif
 void backlight_set_timeout_plugged(int index);
 extern const signed char backlight_timeout_value[];
-#else
-#define backlight_init()
+#ifdef HAS_BUTTON_HOLD
+void backlight_set_on_button_hold(int index);
+void backlight_hold_changed(bool hold_button);
 #endif
+#ifdef HAVE_LCD_SLEEP
+void lcd_set_sleep_after_backlight_off(int index);
+extern const signed char lcd_sleep_timeout_value[];
+#endif
+#else /* ndef CONFIG_BACKLIGHT */
+#define backlight_init()
+#endif /* CONFIG_BACKLIGHT */
 
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void);

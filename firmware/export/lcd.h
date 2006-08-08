@@ -227,8 +227,15 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #define LCD_FBWIDTH LCD_WIDTH
 #endif
 
-#if (CONFIG_BACKLIGHT==BL_IRIVER_H300) || (CONFIG_BACKLIGHT==BL_IPOD3G)
+/** Port-specific functions. Enable in port config file. **/
+#ifdef HAVE_LCD_ENABLE
+/* Enable/disable the main display. */
 extern void lcd_enable(bool on);
+#endif
+
+#ifdef HAVE_LCD_SLEEP
+/* Put the LCD into a power saving state deeper than lcd_enable(false). */
+extern void lcd_sleep(void);
 #endif
 
 /* Bitmap formats */

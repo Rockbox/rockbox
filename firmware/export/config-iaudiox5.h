@@ -23,7 +23,6 @@
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  16   /* pseudo 262.144 colors */
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
-#define HAVE_LCD_CONTRAST
 
 /* remote LCD */
 #define LCD_REMOTE_WIDTH  128
@@ -47,7 +46,7 @@
 #define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
 
 /* Define this for LCD backlight available */
-#define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled !?!? */ 
+#define CONFIG_BACKLIGHT BL_X5 /* PCF50606 I2C */
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Define this if you have a software controlled poweroff */
@@ -69,6 +68,16 @@
 #define HAVE_TLV320
 
 #ifndef SIMULATOR
+
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+   should be defined as well. */
+#define HAVE_LCD_SLEEP
 
 /* Define this if you have a Motorola SCF5250 */
 #define CONFIG_CPU MCF5250
@@ -122,4 +131,4 @@
 #define BOOTFILE_EXT "iaudio"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
-#endif
+#endif /* SIMULATOR */

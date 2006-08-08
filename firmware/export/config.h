@@ -116,6 +116,7 @@
 #define BL_IPODMINI      10 /* Apple iPod Mini */
 #define BL_GIGABEAT      11 /* Toshiba Gigabeat */
 #define BL_IRIVER_H10    12 /* iriver H10 */
+#define BL_X5            13 /* iAudio X5 PCF50606 I2C */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */

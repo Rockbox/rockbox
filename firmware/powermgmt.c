@@ -1032,10 +1032,12 @@ void shutdown_hw(void)
 #elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
     wmcodec_close();
 #endif
+#ifndef IAUDIO_X5
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
     backlight_set_fade_out(0);
 #endif
     backlight_off();
+#endif /* IAUDIO_X5 */
 #if defined(IPOD_ARCH) && defined(HAVE_LCD_COLOR)
     /* Clear the screen and backdrop to
     remove ghosting effect on shutdown */

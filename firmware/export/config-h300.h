@@ -70,6 +70,9 @@
 
 #ifndef SIMULATOR
 
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU MCF5249
 
@@ -126,4 +129,4 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
-#endif
+#endif /* SIMULATOR */

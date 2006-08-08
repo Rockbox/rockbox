@@ -54,6 +54,9 @@
 
 #ifndef SIMULATOR
 
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
 /* Define this if you have a PortalPlayer PP5002 */
 #define CONFIG_CPU PP5002
 
@@ -103,4 +106,4 @@
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
-#endif
+#endif /* SIMULATOR */

@@ -531,7 +531,13 @@ struct user_settings
 #ifdef HAVE_REMOTE_LCD
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
 #endif
+#ifdef HAS_BUTTON_HOLD
+    int backlight_on_button_hold;
 #endif
+#ifdef HAVE_LCD_SLEEP
+    int lcd_sleep_after_backlight_off;
+#endif
+#endif /* CONFIG_BACKLIGHT */
 
 #ifdef HAVE_LCD_BITMAP
     unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */

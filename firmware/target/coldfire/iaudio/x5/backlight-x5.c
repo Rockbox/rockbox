@@ -21,10 +21,13 @@
 #include "system.h"
 #include "backlight.h"
 #include "pcf50606.h"
+#include "lcd.h"
 
 void __backlight_on(void)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level;
+    lcd_enable(true);
+    level = set_irq_level(HIGHEST_IRQ_LEVEL);
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
     set_irq_level(level);
 }
@@ -34,6 +37,7 @@ void __backlight_off(void)
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
     pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=000 */
     set_irq_level(level);
+    lcd_enable(false);
 }
 
 void __remote_backlight_on(void)

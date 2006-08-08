@@ -196,6 +196,21 @@ static bool backlight_timer(void)
                       backlight_set_timeout );
 }
 
+#ifdef HAS_BUTTON_HOLD
+static bool backlight_on_button_hold(void)
+{
+    static const struct opt_items names[3] = {
+        { STR(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL) },
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
+    };
+    return set_option(str(LANG_BACKLIGHT_ON_BUTTON_HOLD),
+                      &global_settings.backlight_on_button_hold,
+                      INT, names, 3,
+                      backlight_set_on_button_hold);
+}
+#endif /* HAS_BUTTON_HOLD */
+
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 static bool backlight_fade_in(void)
 {
@@ -227,6 +242,29 @@ static bool backlight_fade_out(void)
                       INT, names, 8, backlight_set_fade_out );
 }
 #endif
+
+#ifdef HAVE_LCD_SLEEP
+static bool lcd_sleep_after_backlight_off(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_ALWAYS) },
+        { STR(LANG_NEVER) },
+        { (unsigned char *)"5s", TALK_ID(5, UNIT_SEC) },
+        { (unsigned char *)"10s", TALK_ID(10, UNIT_SEC) },
+        { (unsigned char *)"15s", TALK_ID(15, UNIT_SEC) },
+        { (unsigned char *)"20s", TALK_ID(20, UNIT_SEC) },
+        { (unsigned char *)"30s", TALK_ID(30, UNIT_SEC) },
+        { (unsigned char *)"45s", TALK_ID(45, UNIT_SEC) },
+        { (unsigned char *)"60s", TALK_ID(60, UNIT_SEC) },
+        { (unsigned char *)"90s", TALK_ID(90, UNIT_SEC) },
+    };
+
+    return set_option(str(LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF),
+                      &global_settings.lcd_sleep_after_backlight_off,
+                      INT, names, 10,
+                      lcd_set_sleep_after_backlight_off );
+}
+#endif /* HAVE_LCD_SLEEP */
 #endif /* CONFIG_BACKLIGHT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
@@ -257,7 +295,7 @@ static bool remote_backlight_timer_plugged(void)
                       INT, backlight_timeouts, 19,
                       remote_backlight_set_timeout_plugged );
 }
-#endif
+#endif /* HAVE_REMOTE_LCD */
 
 static bool remote_caption_backlight(void)
 {
@@ -1771,12 +1809,18 @@ static bool lcd_settings_menu(void)
 #ifdef CONFIG_CHARGING
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING), backlight_timer_plugged },
 #endif
+#ifdef HAS_BUTTON_HOLD
+        { ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD), backlight_on_button_hold },
+#endif
         { ID2P(LANG_CAPTION_BACKLIGHT), caption_backlight },
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
         { ID2P(LANG_BACKLIGHT_FADE_IN), backlight_fade_in },
         { ID2P(LANG_BACKLIGHT_FADE_OUT), backlight_fade_out },
 #endif
         { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_bl_filter_first_keypress },
+#ifdef HAVE_LCD_SLEEP
+        { ID2P(LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF), lcd_sleep_after_backlight_off },
+#endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
         { ID2P(LANG_BRIGHTNESS),      brightness },
 #endif

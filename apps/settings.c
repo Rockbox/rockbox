@@ -24,11 +24,11 @@
 #include "config.h"
 #include "kernel.h"
 #include "thread.h"
+#include "button.h"
 #include "settings.h"
 #include "disk.h"
 #include "panic.h"
 #include "debug.h"
-#include "button.h"
 #include "usb.h"
 #include "backlight.h"
 #include "lcd.h"
@@ -40,7 +40,6 @@
 #include "ata.h"
 #include "fat.h"
 #include "power.h"
-#include "backlight.h"
 #include "powermgmt.h"
 #include "status.h"
 #include "atoi.h"
@@ -244,7 +243,7 @@ static const struct bit_entry rtc_bits[] =
     {6, S_O(contrast), DEFAULT_CONTRAST_SETTING, "contrast", NULL },
 #endif
 #ifdef CONFIG_BACKLIGHT
-    {5, S_O(backlight_timeout), 5, "backlight timeout", backlight_times_conf },
+    {5, S_O(backlight_timeout), 6, "backlight timeout", backlight_times_conf },
 #ifdef CONFIG_CHARGING
     {5, S_O(backlight_timeout_plugged), 11, "backlight timeout plugged",
         backlight_times_conf },
@@ -296,7 +295,7 @@ static const struct bit_entry rtc_bits[] =
     {6, S_O(remote_contrast), 42, "remote contrast", NULL },
     {1, S_O(remote_invert), false, "remote invert", off_on },
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
-    {5, S_O(remote_backlight_timeout), 5, "remote backlight timeout",
+    {5, S_O(remote_backlight_timeout), 6, "remote backlight timeout",
         backlight_times_conf },
 #ifdef CONFIG_CHARGING
     {5, S_O(remote_backlight_timeout_plugged), 11,
@@ -319,8 +318,7 @@ static const struct bit_entry rtc_bits[] =
     {1, S_O(remote_bl_filter_first_keypress), false,
             "backlight filters first remote keypress", off_on },
 #endif
-
-#endif
+#endif /* CONFIG_BACKLIGHT */
 
     /* new stuff to be added here */
     /* If values are just added to the end, no need to bump the version. */
@@ -573,6 +571,20 @@ static const struct bit_entry hd_bits[] =
 
     {1, S_O(warnon_erase_dynplaylist), false,
         "warn when erasing dynamic playlist", off_on },
+
+#ifdef CONFIG_BACKLIGHT
+#ifdef HAS_BUTTON_HOLD
+    {2, S_O(backlight_on_button_hold), 0, "backlight on button hold",
+        "normal,off,on" },
+#endif
+
+#ifdef HAVE_LCD_SLEEP
+    {4, S_O(lcd_sleep_after_backlight_off), 3,
+        "lcd sleep after backlight off",
+        "always,never,5,10,15,20,30,45,60,90" },
+#endif
+#endif /* CONFIG_BACKLIGHT */
+
 
     
     /* If values are just added to the end, no need to bump the version. */
@@ -1183,7 +1195,13 @@ void settings_apply(void)
 #ifdef HAVE_REMOTE_LCD
     set_remote_backlight_filter_keypress(global_settings.remote_bl_filter_first_keypress);
 #endif
+#ifdef HAS_BUTTON_HOLD
+    backlight_set_on_button_hold(global_settings.backlight_on_button_hold);
 #endif
+#ifdef HAVE_LCD_SLEEP
+    lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
+#endif
+#endif /* CONFIG_BACKLIGHT */
 }
 
 

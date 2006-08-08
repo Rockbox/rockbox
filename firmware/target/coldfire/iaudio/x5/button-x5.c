@@ -50,18 +50,16 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     static bool hold_button = false;
     static bool remote_hold_button = false;
-
-    /* backlight handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
-    /* TODO: add light handling for the remote */
-
-    hold_button = button_hold();
-    remote_hold_button = remote_button_hold();
+    bool hold_button_old;
 
     /* normal buttons */
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+    /* give BL notice if HB state chaged */
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
@@ -90,6 +88,11 @@ int button_read_device(void)
     }
 
     /* remote buttons */
+
+    /* TODO: add light handling for the remote */
+
+    remote_hold_button = remote_button_hold();
+
     data = adc_scan(ADC_REMOTE);
     if(data < 0x17)
         remote_hold_button = true;

@@ -8805,6 +8805,62 @@
   </dest>
   <voice>
     *: "(Vol- : Re-enable)"
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normal"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Backlight (On Hold Key)"
+  </dest>
+  <voice>
+    *: "Backlight on hold key"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Never"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Sleep (After Backlight Off)"
+  </dest>
+  <voice>
+    *: "Sleep after backlight off"
+  </voice>
+</phrase>
   </voice>
 </phrase>
 <phrase>

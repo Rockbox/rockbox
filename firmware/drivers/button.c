@@ -844,21 +844,15 @@ static int button_read(void)
     static bool remote_hold_button = false;
     static int prev_data = 0xff;
     static int last_valid = 0xff;
-
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
-    if (remote_hold_button && !remote_button_hold_only())
-    {
-        remote_backlight_on();
-    }
-
-    hold_button = button_hold();
-    remote_hold_button = remote_button_hold_only();
+    bool hold_button_old;
 
     /* normal buttons */
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+
     if (!hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
@@ -920,6 +914,13 @@ static int button_read(void)
     }
 
     /* remote buttons */
+    remote_hold_button = remote_button_hold_only();
+
+    if (remote_hold_button && !remote_button_hold_only())
+    {
+        remote_backlight_on();
+    }
+
     if (!remote_hold_button)
     {
         data = adc_scan(ADC_REMOTE);
@@ -1038,15 +1039,15 @@ static int button_read(void)
    
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
     static bool hold_button = false;
-
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
-    hold_button = button_hold();
+    bool hold_button_old;
 
     /* normal buttons */
+    hold_button_old = hold_button;
+    hold_button = button_hold();
+
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
+
     if (!button_hold())
     {          
         data = adc_read(ADC_BUTTONS);
@@ -1217,13 +1218,14 @@ static int button_read(void)
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD)
     static bool hold_button = false;
+    bool hold_button_old;
 
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
+    /* normal buttons */
+    hold_button_old = hold_button;
     hold_button = button_hold();
+
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
 
     (void)data;
     /* The int_btn variable is set in the button interrupt handler */
@@ -1231,13 +1233,14 @@ static int button_read(void)
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD)
     static bool hold_button = false;
+    bool hold_button_old;
 
-    /* light handling */
-    if (hold_button && !button_hold())
-    {
-        backlight_on();
-    }
+    /* normal buttons */
+    hold_button_old = hold_button;
     hold_button = button_hold();
+
+    if (hold_button != hold_button_old)
+        backlight_hold_changed(hold_button);
 
     (void)data;
     btn = ipod_3g_button_read();
