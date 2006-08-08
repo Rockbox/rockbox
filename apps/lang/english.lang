@@ -8805,6 +8805,8 @@
   </dest>
   <voice>
     *: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
   desc: in lcd settings
@@ -8859,8 +8861,6 @@
   </dest>
   <voice>
     *: "Sleep after backlight off"
-  </voice>
-</phrase>
   </voice>
 </phrase>
 <phrase>
