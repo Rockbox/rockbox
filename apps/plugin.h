@@ -104,7 +104,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 26
+#define PLUGIN_API_VERSION 27
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -546,6 +546,7 @@ struct plugin_api {
                          int x, int y, int width, int height);
 #endif
 
+    int (*PREFIX(rmdir))(const char *name);
 };
 
 /* plugin header */

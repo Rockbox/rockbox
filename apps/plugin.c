@@ -467,6 +467,8 @@ static const struct plugin_api rockbox_api = {
     !defined(SIMULATOR)
     lcd_yuv_blit,
 #endif
+
+    PREFIX(rmdir),
 };
 
 int plugin_load(const char* plugin, void* parameter)
