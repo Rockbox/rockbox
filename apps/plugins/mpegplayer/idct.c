@@ -47,8 +47,34 @@ void (* mpeg2_idct_add) (int last, int16_t * block,
  * to +-3826 - this is the worst case for a column IDCT where the
  * column inputs are 16-bit values.
  */
+#ifdef CPU_COLDFIRE
+static inline unsigned CLIP(int value)
+{
+    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
+        "cmp.l   #255,%[v]   \n"  /* overflow? */
+        "bls.b   1f          \n"  /* no: return value */
+        "spl.b   %[v]        \n"  /* yes: set low byte to appropriate boundary */
+    "1:                      \n"
+        : /* outputs */
+        [v]"+d"(value)
+    );
+    return value;
+}
+#elif defined CPU_ARM
+static inline unsigned CLIP(int value)
+{
+    asm ( /* Note: Uses knowledge that only the low byte of the result is used */
+        "cmp     %[v], #255          \n"
+        "mvnhi   %[v], %[v], asr #31 \n"
+        : /* outputs */
+        [v]"+r"(value)
+    );
+    return value;
+}
+#else
 uint8_t mpeg2_clip[3840 * 2 + 256] IBSS_ATTR;
 #define CLIP(i) ((mpeg2_clip + 3840)[i])
+#endif
 
 #if 0
 #define BUTTERFLY(t0,t1,W0,W1,d0,d1)        \
@@ -275,8 +301,10 @@ void mpeg2_idct_init (uint32_t accel)
 
         mpeg2_idct_copy = mpeg2_idct_copy_c;
         mpeg2_idct_add = mpeg2_idct_add_c;
+#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
         for (i = -3840; i < 3840 + 256; i++)
             CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
+#endif
         for (i = 0; i < 64; i++) {
             j = mpeg2_scan_norm[i];
             mpeg2_scan_norm[i] = ((j & 0x36) >> 1) | ((j & 0x09) << 2);
