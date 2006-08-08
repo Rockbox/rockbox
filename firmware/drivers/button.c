@@ -850,8 +850,10 @@ static int button_read(void)
     hold_button_old = hold_button;
     hold_button = button_hold();
 
+#ifndef BOOTLOADER
     if (hold_button != hold_button_old)
         backlight_hold_changed(hold_button);
+#endif
 
     if (!hold_button)
     {
