@@ -86,6 +86,7 @@ void roll_credits(void)
             else
                 rb->lcd_puts(x, line, credits[name]);
 
+
             if (++name >= numnames)
                 break;
 
@@ -128,6 +129,9 @@ void roll_credits(void)
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     #define PAUSE_TIME 0
     #define ANIM_SPEED 35
+#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+    #define PAUSE_TIME 0
+    #define ANIM_SPEED 100
 #else
     #define PAUSE_TIME 1
     #define ANIM_SPEED 40
