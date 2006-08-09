@@ -175,19 +175,35 @@ solitaire_suitsi.15x16x1.bmp
 #endif
 
 /* Sudoku */
+#if LCD_WIDTH >= LCD_HEIGHT
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT==64) && (LCD_DEPTH == 1)
 sudoku_start.112x64x1.bmp
 sudoku_normal.112x64x1.bmp
 sudoku_inverse.112x64x1.bmp
+#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH >= 2)
+sudoku_start.138x110x2.bmp
+sudoku_normal.138x110x2.bmp
+sudoku_inverse.138x110x2.bmp
 #elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 2)) || \
       ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH >= 2))
 sudoku_start.160x128x2.bmp
 sudoku_normal.160x128x2.bmp
 sudoku_inverse.160x128x2.bmp
-#elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
+#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176) && (LCD_DEPTH == 16)
 sudoku_start.220x176x16.bmp
 sudoku_normal.220x176x16.bmp
 sudoku_inverse.220x176x16.bmp
+#elif (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH == 16)
+sudoku_start.320x240x16.bmp
+sudoku_normal.320x240x16.bmp
+sudoku_inverse.320x240x16.bmp
+#endif
+#else
+#if (LCD_WIDTH >= 240) && (LCD_HEIGHT >= 320) && (LCD_DEPTH == 16)
+sudoku_start.320x240x16.bmp
+sudoku_normal.320x240x16.bmp
+sudoku_inverse.320x240x16.bmp
+#endif
 #endif
 
 /* Brickmania */

@@ -64,6 +64,14 @@ Example ".ss" file, and one with a saved state:
 #include "sudoku.h"
 #include "generator.h"
 
+/* The bitmaps */
+#include "sudoku_normal.h"
+#include "sudoku_inverse.h"
+#include "sudoku_start.h"
+
+#define BITMAP_HEIGHT (BMPHEIGHT_sudoku_normal/10)
+#define BITMAP_STRIDE BMPWIDTH_sudoku_normal
+
 PLUGIN_HEADER
 
 /* here is a global api struct pointer. while not strictly necessary,
@@ -71,11 +79,6 @@ PLUGIN_HEADER
    in the plugin */
 
 struct plugin_api* rb;
-
-/* The bitmaps */
-extern const fb_data sudoku_normal[];
-extern const fb_data sudoku_start[];
-extern const fb_data sudoku_inverse[];
 
 /* Default game - used to initialise sudoku.ss if it doesn't exist. */
 static const char default_game[9][9] =
@@ -93,80 +96,103 @@ static const char default_game[9][9] =
     { '0','0','0',  '4','0','8', '0','5','0' },
 };
 
-#if ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
-    ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
-/* For iriver H1x0 - 160x128, 9 cells @ 12x12 with 14 border lines*/
+#if LCD_HEIGHT <= LCD_WIDTH /* Horizontal layout, scratchpad at the left */
+
+#if (LCD_HEIGHT==64) && (LCD_WIDTH==112)
+/* Archos Recorders and Ondios - 112x64, 9 cells @ 8x6 with 10 border lines */
 
 /* Internal dimensions of a cell */
-#define CELL_WIDTH 12
+#define CELL_WIDTH  8
+#define CELL_HEIGHT 6
+#define SMALL_BOARD
+
+#elif (LCD_HEIGHT==110) && (LCD_WIDTH==138)
+/* iPod Mini - 138x110, 9 cells @ 10x10 with 14 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  10
+#define CELL_HEIGHT 10
+
+#elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
+      ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
+/* iAudio X5, Iriver H1x0, iPod G3, G4 - 160x128; */
+/* iPod Nano - 176x132, 9 cells @ 12x12 with 14 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  12
 #define CELL_HEIGHT 12
 
-#define BOARD_WIDTH (CELL_WIDTH*9+10+4)
-#define BOARD_HEIGHT (CELL_HEIGHT*9+10+4)
-
-#define XOFS (((LCD_WIDTH-BOARD_WIDTH)/2)+10)
-#define YOFS ((LCD_HEIGHT-BOARD_HEIGHT)/2)
-
-#define XOFSSCRATCHPAD 3
-
-/* Locations of each cell */
-static unsigned char cellxpos[9]={ 2, 15, 28, 42, 55, 68, 82, 95, 108 };
-static unsigned char cellypos[9]={ 2, 15, 28, 42, 55, 68, 82, 95, 108 };
-
-/* The height of one cell in the bitmap */
-#define BITMAP_HEIGHT 12
-#define BITMAP_STRIDE 12
-
-#elif (LCD_HEIGHT==64) && (LCD_WIDTH==112)
-/* For Archos Recorder, FM and Ondio (112x64):
-   9 cells @ 8x6 with 10 border lines
-*/
+#elif (LCD_HEIGHT==176) && (LCD_WIDTH==220)
+/* Iriver h300, iPod Color/Photo - 220x176, 9 cells @ 16x16 with 14 border lines */
 
 /* Internal dimensions of a cell */
-#define CELL_WIDTH 8
-#define CELL_HEIGHT 6
-
-#define BOARD_WIDTH (CELL_WIDTH*9+10)
-#define BOARD_HEIGHT (CELL_HEIGHT*9+10)
-
-#define XOFS (((LCD_WIDTH-BOARD_WIDTH)/2)+7)
-#define YOFS ((LCD_HEIGHT-BOARD_HEIGHT)/2)
-
-#define XOFSSCRATCHPAD 2
-
-/* Locations of each cell */
-static unsigned char cellxpos[9]={ 1, 10, 19, 28, 37, 46, 55, 64, 73 };
-static unsigned char cellypos[9]={ 1,  8, 15, 22, 29, 36, 43, 50, 57 }; 
-
-/* The height of one cell in the bitmap */
-#define BITMAP_HEIGHT 8
-#define BITMAP_STRIDE 8
-
-#elif (LCD_HEIGHT>=176) && (LCD_WIDTH>=220)
-/* iriver h300 */
-
-/* Internal dimensions of a cell */
-#define CELL_WIDTH 16
+#define CELL_WIDTH  16
 #define CELL_HEIGHT 16
 
-#define BOARD_WIDTH (CELL_WIDTH*9+10+4)
-#define BOARD_HEIGHT (CELL_HEIGHT*9+10+4)
+#elif (LCD_HEIGHT>=240) && (LCD_WIDTH>=320)
+/* iPod Video - 320x240, 9 cells @ 25x25 with 14 border lines */
 
-#define XOFS (((LCD_WIDTH-BOARD_WIDTH)/2)+15)
-#define YOFS ((LCD_HEIGHT-BOARD_HEIGHT)/2)
-
-#define XOFSSCRATCHPAD 10
-
-/* Locations of each cell */
-static unsigned char cellxpos[9]={ 2, 19, 36, 54, 71, 88, 106, 123, 140 };
-static unsigned char cellypos[9]={ 2, 19, 36, 54, 71, 88, 106, 123, 140 };
-
-/* The height of one cell in the bitmap */
-#define BITMAP_HEIGHT 16
-#define BITMAP_STRIDE  16
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  25
+#define CELL_HEIGHT 25
 
 #else
   #error SUDOKU: Unsupported LCD size
+#endif
+
+#else /* Vertical layout, scratchpad at the bottom */
+#define VERTICAL_LAYOUT
+
+#if (LCD_HEIGHT>=320) && (LCD_WIDTH>=240)
+/* Gigabeat - 240x320, 9 cells @ 16x16 with 14 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  25
+#define CELL_HEIGHT 25
+
+#else
+  #error SUDOKU: Unsupported LCD size
+#endif
+
+#endif /* Layout */
+
+/* Size dependent build-time calculations */
+#ifdef SMALL_BOARD
+#define BOARD_WIDTH  (CELL_WIDTH*9+10)
+#define BOARD_HEIGHT (CELL_HEIGHT*9+10)
+static unsigned char cellxpos[9]={
+                  1,    (CELL_WIDTH+2), (2*CELL_WIDTH+3),
+    (3*CELL_WIDTH+4), (4*CELL_WIDTH+5), (5*CELL_WIDTH+6),
+    (6*CELL_WIDTH+7), (7*CELL_WIDTH+8), (8*CELL_WIDTH+9)
+};
+static unsigned char cellypos[9]={
+                   1,    (CELL_HEIGHT+2), (2*CELL_HEIGHT+3),
+    (3*CELL_HEIGHT+4), (4*CELL_HEIGHT+5), (5*CELL_HEIGHT+6),
+    (6*CELL_HEIGHT+7), (7*CELL_HEIGHT+8), (8*CELL_HEIGHT+9)
+};
+#else /* !SMALL_BOARD */
+#define BOARD_WIDTH  (CELL_WIDTH*9+10+4)
+#define BOARD_HEIGHT (CELL_HEIGHT*9+10+4)
+static unsigned char cellxpos[9]={
+                   2,    (CELL_WIDTH +3), (2*CELL_WIDTH +4),
+    (3*CELL_WIDTH +6), (4*CELL_WIDTH +7), (5*CELL_WIDTH +8),
+    (6*CELL_WIDTH+10), (7*CELL_WIDTH+11), (8*CELL_WIDTH+12)
+};
+static unsigned char cellypos[9]={
+                    2,    (CELL_HEIGHT +3), (2*CELL_HEIGHT +4),
+    (3*CELL_HEIGHT +6), (4*CELL_HEIGHT +7), (5*CELL_HEIGHT +8),
+    (6*CELL_HEIGHT+10), (7*CELL_HEIGHT+11), (8*CELL_HEIGHT+12)
+};
+#endif
+
+#ifdef VERTICAL_LAYOUT
+#define XOFS ((LCD_WIDTH-BOARD_WIDTH)/2)
+#define YOFS ((LCD_HEIGHT-(BOARD_HEIGHT+CELL_HEIGHT*2+2))/2)
+#define YOFSSCRATCHPAD (YOFS+BOARD_HEIGHT+CELL_WIDTH)
+#else
+#define XOFSSCRATCHPAD ((LCD_WIDTH-(BOARD_WIDTH+CELL_WIDTH*2+2))/2)
+#define XOFS (XOFSSCRATCHPAD+CELL_WIDTH*2+2)
+#define YOFS ((LCD_HEIGHT-BOARD_HEIGHT)/2)
 #endif
 
 /****** Solver routine by Tom Shackell <shackell@cs.york.ac.uk>
@@ -760,21 +786,7 @@ void display_board(struct sudoku_state_t* state)
 
     /* Draw the gridlines - differently for different targets */
 
-#if LCD_HEIGHT > 64
-    /* Large targets - draw single/double lines */
-    for (r=0;r<9;r++) {
-        rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
-        rb->lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
-        if ((r % 3)==0) { 
-            rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-2);
-            rb->lcd_vline(XOFS+cellxpos[r]-2,YOFS,YOFS+BOARD_HEIGHT-1);
-        }
-    }
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
-    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT+1);
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
-    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
-#elif (LCD_HEIGHT==64)
+#ifdef SMALL_BOARD
     /* Small targets - draw dotted/single lines */
     for (r=0;r<9;r++) {
         if ((r % 3)==0) {
@@ -794,21 +806,66 @@ void display_board(struct sudoku_state_t* state)
     rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
     rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
 #else
-#error SUDOKU: Unsupported LCD height
+    /* Large targets - draw single/double lines */
+    for (r=0;r<9;r++) {
+        rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-1);
+        rb->lcd_vline(XOFS+cellxpos[r]-1,YOFS,YOFS+BOARD_HEIGHT-1);
+        if ((r % 3)==0) { 
+            rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[r]-2);
+            rb->lcd_vline(XOFS+cellxpos[r]-2,YOFS,YOFS+BOARD_HEIGHT-1);
+        }
+    }
+    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT);
+    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFS+cellypos[8]+CELL_HEIGHT+1);
+    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFS,YOFS+BOARD_HEIGHT-1);
+    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
 #endif
 
 #ifdef SUDOKU_BUTTON_POSSIBLE
+#ifdef VERTICAL_LAYOUT
+    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD);
+    rb->lcd_hline(XOFS,XOFS+BOARD_WIDTH-1,YOFSSCRATCHPAD+CELL_HEIGHT+1);
+    for (r=0;r<9;r++) {
+#ifdef SMALL_BOARD
+        /* Small targets - draw dotted/single lines */
+        if ((r % 3)==0) {
+            /* Solid Line */
+            rb->lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
+                          YOFSSCRATCHPAD+CELL_HEIGHT+1);
+        } else {
+            /* Dotted line */
+            for (c=YOFSSCRATCHPAD;c<YOFSSCRATCHPAD+CELL_HEIGHT+1;c+=2) {
+                rb->lcd_drawpixel(XOFS+cellxpos[r]-1,c);
+            }
+        }
+#else
+        /* Large targets - draw single/double lines */
+        rb->lcd_vline(XOFS+cellxpos[r]-1,YOFSSCRATCHPAD,
+                      YOFSSCRATCHPAD+CELL_HEIGHT+1);
+        if ((r % 3)==0)
+            rb->lcd_vline(XOFS+cellxpos[r]-2,YOFSSCRATCHPAD,
+                          YOFSSCRATCHPAD+CELL_HEIGHT+1);
+#endif
+        if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
+            rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
+                                XOFS+cellxpos[r-1],YOFSSCRATCHPAD+1,
+                                CELL_WIDTH,CELL_HEIGHT);
+    }
+    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH,YOFSSCRATCHPAD,
+                  YOFSSCRATCHPAD+CELL_HEIGHT+1);
+#ifndef SMALL_BOARD
+    rb->lcd_vline(XOFS+cellxpos[8]+CELL_WIDTH+1,YOFSSCRATCHPAD,
+                  YOFSSCRATCHPAD+CELL_HEIGHT+1);
+#endif
+    if (state->possiblevals[state->y][state->x]&(1<<(r)))
+        rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
+                            XOFS+cellxpos[8],YOFSSCRATCHPAD+1,
+                            CELL_WIDTH,CELL_HEIGHT);
+#else /* Horizontal layout */
     rb->lcd_vline(XOFSSCRATCHPAD,YOFS,YOFS+BOARD_HEIGHT-1);
     rb->lcd_vline(XOFSSCRATCHPAD+CELL_WIDTH+1,YOFS,YOFS+BOARD_HEIGHT-1);
     for (r=0;r<9;r++) {
-#if LCD_HEIGHT > 64
-        /* Large targets - draw single/double lines */
-        rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
-                      YOFS+cellypos[r]-1);
-        if ((r % 3)==0)
-            rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
-                          YOFS+cellypos[r]-2);
-#elif LCD_HEIGHT == 64
+#ifdef SMALL_BOARD
         /* Small targets - draw dotted/single lines */
         if ((r % 3)==0) {
             /* Solid Line */
@@ -820,6 +877,13 @@ void display_board(struct sudoku_state_t* state)
                 rb->lcd_drawpixel(c,YOFS+cellypos[r]-1);
             }
         }
+#else
+        /* Large targets - draw single/double lines */
+        rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+                      YOFS+cellypos[r]-1);
+        if ((r % 3)==0)
+            rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
+                          YOFS+cellypos[r]-2);
 #endif
         if ((r>0) && state->possiblevals[state->y][state->x]&(1<<(r)))
             rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
@@ -828,7 +892,7 @@ void display_board(struct sudoku_state_t* state)
     }
     rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT);
-#if LCD_HEIGHT > 64
+#ifndef SMALL_BOARD
     rb->lcd_hline(XOFSSCRATCHPAD,XOFSSCRATCHPAD+CELL_WIDTH+1,
                   YOFS+cellypos[8]+CELL_HEIGHT+1);
 #endif
@@ -836,7 +900,8 @@ void display_board(struct sudoku_state_t* state)
         rb->lcd_bitmap_part(sudoku_normal,0,BITMAP_HEIGHT*r,BITMAP_STRIDE,
                             XOFSSCRATCHPAD+1,YOFS+cellypos[8],
                             CELL_WIDTH,CELL_HEIGHT);
-#endif
+#endif /* Layout */
+#endif /* SUDOKU_BUTTON_POSSIBLE */
 
     /* Draw the numbers */
     for (r=0;r<9;r++) {
