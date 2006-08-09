@@ -41,7 +41,8 @@ extern char iend[];
 
 struct plugin_api* rb;
 
-#define BUFFER_SIZE 25*1024*1024
+/* The main buffer storing the compressed video data */
+#define BUFFER_SIZE (MEM-6)*1024*1024
 
 static mpeg2dec_t * mpeg2dec;
 static vo_open_t * output_open = NULL;
@@ -49,8 +50,49 @@ static vo_instance_t * output;
 static int total_offset = 0;
 
 extern vo_open_t vo_rockbox_open;
+/* button definitions */
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define MPEG_STOP       BUTTON_OFF
+#define MPEG_PAUSE      BUTTON_ON
 
-static void decode_mpeg2 (uint8_t * current, uint8_t * end)
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#define MPEG_STOP       BUTTON_MENU
+#define MPEG_PAUSE      BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define MPEG_STOP       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_PLAY
+
+#else
+#error MPEGPLAYER: Unsupported keypad
+#endif
+static bool button_loop(void)
+{
+    int button = rb->button_get(false);
+    switch (button)
+    {
+        case MPEG_STOP:
+            return true;
+        case MPEG_PAUSE:
+            button = BUTTON_NONE;
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+            do {
+                button = rb->button_get(true);
+            } while (button != MPEG_PAUSE);
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            break;
+        default:
+            if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
+                return true;
+    }
+    return false;
+}
+
+static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
 {
     const mpeg2_info_t * info;
     mpeg2_state_t state;
@@ -61,11 +103,13 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
 
     info = mpeg2_info (mpeg2dec);
     while (1) {
+        if (button_loop())
+            return true;
         state = mpeg2_parse (mpeg2dec);
 
         switch (state) {
         case STATE_BUFFER:
-            return;
+            return false;
         case STATE_SEQUENCE:
             /* might set nb fbuf, convert format, stride */
             /* might set fbufs */
@@ -74,12 +118,12 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
                                info->sequence->chroma_width,
                                info->sequence->chroma_height, &setup_result)) {
                 //fprintf (stderr, "display setup failed\n");
-                return;
+                return false;
             }
             if (setup_result.convert &&
                 mpeg2_convert (mpeg2dec, setup_result.convert, NULL)) {
                 //fprintf (stderr, "color conversion setup failed\n");
-                return;
+                return false;
             }
             if (output->set_fbuf) {
                 uint8_t * buf[3];
@@ -140,21 +184,19 @@ static void decode_mpeg2 (uint8_t * current, uint8_t * end)
     }
 }
 
-static void es_loop (int in_file)
+static void es_loop (int in_file, uint8_t* buffer, size_t buffer_size)
 {
-    static uint8_t* buffer;
     uint8_t * end;
-
-    buffer=mpeg2_malloc(BUFFER_SIZE,0);
 
     if (buffer==NULL)
         return;
 
     do {
         rb->splash(0,true,"Buffering...");
-        end = buffer + rb->read (in_file, buffer, BUFFER_SIZE);
-        decode_mpeg2 (buffer, end);
-    } while (end == buffer + BUFFER_SIZE);
+        end = buffer + rb->read (in_file, buffer, buffer_size);
+        if (decode_mpeg2 (buffer, end))
+            break;
+    } while (end == buffer + buffer_size);
 }
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
@@ -163,6 +205,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     void* audiobuf;
     int audiosize;
     int in_file;
+    uint8_t* buffer;
+    size_t buffer_size;
 
     rb = api;
 
@@ -171,6 +215,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Initialise our malloc buffer */
     mpeg2_alloc_init(audiobuf,audiosize);
+
+    /* Grab most of the buffer for the compressed video - leave 2MB */
+    buffer_size = audiosize - 2*1024*1024;
+    buffer = mpeg2_malloc(buffer_size,0);
+
+    if (buffer == NULL)
+        return PLUGIN_ERROR;
 
 #ifdef USE_IRAM
     rb->memcpy(iramstart, iramcopy, iramend-iramstart);
@@ -227,7 +278,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->cpu_boost(true);
 #endif
 
-    es_loop (in_file);
+    es_loop (in_file, buffer, buffer_size);
 
     mpeg2_close (mpeg2dec);
 
