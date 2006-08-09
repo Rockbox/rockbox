@@ -21,6 +21,7 @@
 #include "eeprom_24cxx.h"
 #include "crc32.h"
 
+#include "system.h"
 #include "string.h"
 #include "logf.h"
 
@@ -64,16 +65,17 @@ bool eeprom_settings_init(void)
     sum = crc_32(&firmware_settings, sizeof(struct eeprom_settings)-4,
                  0xffffffff);
     
-    if (firmware_settings.checksum != sum)
+    logf("BL version: %d", firmware_settings.bl_version);
+    if (firmware_settings.version != EEPROM_SETTINGS_VERSION)
     {
-        logf("Checksum mismatch");
+        logf("Version mismatch");
         reset_config();
         return true;
     }
     
-    if (firmware_settings.version != EEPROM_SETTINGS_VERSION)
+    if (firmware_settings.checksum != sum)
     {
-        logf("Version mismatch");
+        logf("Checksum mismatch");
         reset_config();
         return true;
     }

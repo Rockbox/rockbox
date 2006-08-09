@@ -82,10 +82,6 @@ static void sw_i2c_start(void)
 
 static void sw_i2c_stop(void)
 {
-   // SCL_LO;
-   // DELAY;
-   // SDA_LO;
-   // DELAY;
     SCL_HI;
     DELAY;
     SDA_HI;
@@ -294,7 +290,7 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
         if (ret < 0)
         {
             /* keep between {} as logf is whitespace in normal builds */
-            logf("EEPROM Fail: %d/%d", ret, address);
+            logf("EEPROM rFail: %d/%d", ret, address);
         }
     } while (ret < 0 && count--);
 
@@ -325,7 +321,7 @@ int eeprom_24cxx_write_byte(unsigned int address, char c)
         if (ret < 0)
         {
             /* keep between {} as logf is whitespace in normal builds */
-            logf("EEPROM Fail: %d/%d", ret, address);
+            logf("EEPROM wFail: %d/%d", ret, address);
         }
     } while (ret < 0 && count--) ;
 
@@ -357,7 +353,7 @@ int eeprom_24cxx_read(unsigned char address, void *dest, int length)
 int eeprom_24cxx_write(unsigned char address, const void *src, int length)
 {
     const char *buf = (const char *)src;
-    int count = 10;
+    int count = 5;
     int i;
     bool ok;
     

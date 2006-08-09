@@ -381,12 +381,13 @@ void show_fatal_error(void)
 
 int flash_bootloader(const char *filename)
 {
-    // char buf[32];
+    char buf[32];
     int pos, i, len, rc;
     unsigned long checksum, sum, crc32;
     unsigned char *p8;
     uint16_t *p16;
     
+    (void)buf;
     len = load_firmware_file(filename, &checksum);
     if (len < 0)
         return len * 10;
@@ -399,15 +400,16 @@ int flash_bootloader(const char *filename)
     
     /* Verify the crc32 checksum also. */
     crc32 = crc_32(audiobuf, len, 0xffffffff);
-    // rb->snprintf(buf, sizeof buf, "crc32 = 0x%08x", crc32);
-    // rb->splash(HZ*10, true, buf);
-    
-    if (crc32 != 0x5361a679)
+#if 0
+    rb->snprintf(buf, sizeof buf, "crc32 = 0x%08x", crc32);
+    rb->splash(HZ*10, true, buf);
+#else
+    if (crc32 != 0xa930906d)
     {
         rb->splash(HZ*3, true, "Untested bootloader");
         return -2;
     }
-    
+#endif
     rb->lcd_puts(0, 3, "Processing critical sections...");
     rb->lcd_update();
 

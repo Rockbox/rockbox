@@ -40,7 +40,6 @@ struct eeprom_settings
 
 extern struct eeprom_settings firmware_settings;
 
-bool detect_flashed_rockbox(void);
 bool eeprom_settings_init(void);
 bool eeprom_settings_store(void);
 

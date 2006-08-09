@@ -124,6 +124,10 @@
 #define BOOTFILE_EXT "iriver"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
+#define BOOTLOADER_ENTRYPOINT  0x001F0000
+#define FLASH_ENTRYPOINT       0x00001000
+#define FLASH_MAGIC            0xfbfbfbf1
+
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* define this if the unit can be powered or charged via USB */

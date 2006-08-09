@@ -120,7 +120,9 @@ int init_dircache(void)
 # ifdef HAVE_EEPROM
         if (firmware_settings.initialized && firmware_settings.disk_clean)
         {
-            if (dircache_load(DIRCACHE_FILE) == 0)
+            result = dircache_load(DIRCACHE_FILE);
+            remove(DIRCACHE_FILE);
+            if (result == 0)
                 return 0;
         }
 # endif

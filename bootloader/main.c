@@ -20,6 +20,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "inttypes.h"
+#include "string.h"
 #include "cpu.h"
 #include "system.h"
 #include "lcd.h"
@@ -39,6 +41,7 @@
 #include "power.h"
 #include "file.h"
 #include "uda1380.h"
+#include "eeprom_settings.h"
 
 #include "pcf50606.h"
 
@@ -151,6 +154,21 @@ int load_firmware(void)
     return 0;
 }
 
+int load_flashed_rockbox(void)
+{
+    struct flash_header hdr;
+    unsigned char *buf = (unsigned char *)DRAM_START;
+    uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
+    
+    cpu_boost(true);
+    memcpy(&hdr, src, sizeof(struct flash_header));
+    src += sizeof(struct flash_header);
+    memcpy(buf, src, hdr.length);
+    cpu_boost(false);
+
+    return 0;
+}
+
 
 void start_firmware(void)
 {
@@ -171,12 +189,14 @@ void main(void)
     int rc;
     bool rc_on_button = false;
     bool on_button = false;
+    bool rec_button = false;
     int data;
     int adc_battery, battery_voltage, batt_int, batt_frac;
 
 #ifdef IAUDIO_X5
     (void)rc_on_button;
     (void)on_button;
+    (void)rec_button;
     (void)data;
     power_init();
 
@@ -311,13 +331,66 @@ void main(void)
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
+    rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC) 
+        || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
+    
 
-    /* Holding REC while starting runs the original firmware */
-    if(((button_status() & BUTTON_REC) == BUTTON_REC) ||
-       ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC)) {
-        printf("Starting original firmware...");
+#ifdef HAVE_EEPROM
+    firmware_settings.initialized = false;
+#endif
+    if (detect_flashed_rockbox())
+    {
+        bool load_from_flash;
+        
+        load_from_flash = !rec_button;
+#ifdef HAVE_EEPROM
+        if (eeprom_settings_init())
+        {
+            /* If bootloader version has not been reset, disk might
+             * not be intact. */
+            if (firmware_settings.bl_version)
+                firmware_settings.disk_clean = false;
+            
+            firmware_settings.bl_version = 7;
+            /* Invert the record button if we want to load from disk
+             * by default. */
+            if (firmware_settings.boot_disk)
+                load_from_flash = rec_button;
+        }
+#endif
+        
+        if (load_from_flash)
+        {
+            /* Load firmware from flash */
+            i = load_flashed_rockbox();
+            printf("Result: %d", i);
+            lcd_update();
+            if (i == 0)
+            {
+#ifdef HAVE_EEPROM
+                eeprom_settings_store();
+#endif
+                start_firmware();
+                printf("Fatal: Corrupted firmware");
+                printf("Hold down REC on next boot");
+                lcd_update();
+                sleep(HZ*2);
+                power_off();
+            }
+        }
+        
+        printf("Loading from disk...");
         lcd_update();
-        start_iriver_fw();
+    }
+    else
+    {
+        /* Holding REC while starting runs the original firmware */
+        if (rec_button)
+        {
+            printf("Starting original firmware...");
+            lcd_update();
+            start_iriver_fw();
+        }
     }
 
     /* Don't start if the Hold button is active on the device you
@@ -384,6 +457,13 @@ void main(void)
         sleep(HZ);
 #endif
     
+#ifdef HAVE_EEPROM
+        if (firmware_settings.initialized)
+        {
+            firmware_settings.disk_clean = false;
+            eeprom_settings_store();
+        }
+#endif
         ata_spin();
         ata_enable(false);
         usb_enable(true);
@@ -423,6 +503,11 @@ void main(void)
     printf("Result: %d", i);
     lcd_update();
 
+#ifdef HAVE_EEPROM
+    if (firmware_settings.initialized)
+        eeprom_settings_store();
+#endif
+    
     if(i == 0)
         start_firmware();
     
