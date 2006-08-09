@@ -63,6 +63,10 @@ extern vo_open_t vo_rockbox_open;
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define MPEG_STOP       BUTTON_A
+#define MPEG_PAUSE      BUTTON_SELECT
+
 #else
 #error MPEGPLAYER: Unsupported keypad
 #endif
