@@ -54,10 +54,10 @@ plugins/sudoku/Makefile
 plugins/sudoku/SOURCES
 plugins/sudoku/*.[ch]
 plugins/midi/*.[ch]
-apps/plugins/mpegplayer/*.[ch]
-apps/plugins/mpegplayer/Makefile
-apps/plugins/mpegplayer/SOURCES
-apps/plugins/mpegplayer/README*
+plugins/mpegplayer/*.[ch]
+plugins/mpegplayer/Makefile
+plugins/mpegplayer/SOURCES
+plugins/mpegplayer/README*
 codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
