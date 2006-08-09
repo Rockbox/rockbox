@@ -135,7 +135,7 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
-/* Fixed point format: 6 bits integer part incl. sign, 26 bits fractional part */
+/* Fixed point format s5.26: sign, 5 bits integer part, 26 bits fractional part */
 static long x_min;
 static long x_max;
 static long x_step;
@@ -291,10 +291,30 @@ static inline long muls32_asr26(long a, long b)
     return r;
 }
 
+#elif defined CPU_ARM
+
+#define MULS32_ASR26(a, b) muls32_asr26(a, b)
+static inline long muls32_asr26(long a, long b)
+{
+    long r, t1;
+    asm (
+        "smull   %[r], %[t1], %[a], %[b]     \n"
+        "mov     %[r], %[r], lsr #26         \n"
+        "orr     %[r], %[r], %[t1], lsl #6   \n"
+        : /* outputs */
+        [r] "=&r"(r),
+        [t1]"=&r"(t1)
+        : /* inputs */
+        [a] "r" (a),
+        [b] "r" (b)
+    );
+    return r;
+}
+
 #endif /* CPU */
 
 /* default macros */
-#ifndef MULS16_ASR10 
+#ifndef MULS16_ASR10
 #define MULS16_ASR10(a, b) ((short)(((long)(a) * (long)(b)) >> 10))
 #endif
 #ifndef MULS32_ASR26
@@ -327,24 +347,36 @@ int ilog2_fp(long value) /* calculate integer log2(value_fp_6.26) */
 void recalc_parameters(void)
 {
     x_step = (x_max - x_min) / LCD_WIDTH;
-    x_delta = x_step * (LCD_WIDTH/8);
+    x_delta = (x_step * LCD_WIDTH) / 8;
     y_step = (y_max - y_min) / LCD_HEIGHT;
-    y_delta = y_step * (LCD_HEIGHT/8);
+    y_delta = (y_step * LCD_HEIGHT) / 8;
     step_log2 = ilog2_fp(MIN(x_step, y_step));
     max_iter = MAX(15, -15 * step_log2 - 45);
 }
 
+#if CONFIG_LCD == LCD_SSD1815 
+/* Recorder, Ondio: pixel_height == 1.25 * pixel_width */
+#define MB_HEIGHT (LCD_HEIGHT*5/4)
+#else
+/* square pixels */
+#define MB_HEIGHT LCD_HEIGHT
+#endif
+
+#define MB_XOFS (-0x03000000L)       /* -0.75 (s5.26) */
+#if 3000*MB_HEIGHT/LCD_WIDTH >= 2400 /* width is limiting factor */
+#define MB_XFAC (0x06000000LL)       /* 1.5 (s5.26) */
+#define MB_YFAC (MB_XFAC*MB_HEIGHT/LCD_WIDTH)
+#else                                /* height is limiting factor */
+#define MB_YFAC (0x04cccccdLL)       /* 1.2 (s5.26) */
+#define MB_XFAC (MB_YFAC*LCD_WIDTH/MB_HEIGHT)
+#endif
+
 void init_mandelbrot_set(void)
 {
-#if CONFIG_LCD == LCD_SSD1815 /* Recorder, Ondio. */
-    x_min = -38L<<22;  /* -2.375<<26 */
-    x_max =  15L<<22;  /*  0.9375<<26 */
-#else  /* all others (square pixels) */
-    x_min = -36L<<22;  /* -2.25<<26 */
-    x_max =  12L<<22;  /*  0.75<<26 */
-#endif
-    y_min = -19L<<22;  /* -1.1875<<26 */
-    y_max =  19L<<22;  /*  1.1875<<26 */
+    x_min = MB_XOFS-MB_XFAC;
+    x_max = MB_XOFS+MB_XFAC;
+    y_min = -MB_YFAC;
+    y_max = MB_YFAC;
     recalc_parameters();
 }
 
