@@ -690,9 +690,8 @@ void gray_update_rect(int x, int y, int width, int height)
 
                     "ldr     r2, [%[bpat], r0, lsl #2]   \n"  /* r2 = bitpattern[byte]; */
 
-                    "add     r0, %[rnd], %[rnd], lsl #3  \n"  /* multiply by 75 */
-                    "add     %[rnd], %[rnd], %[rnd], lsl #1  \n"
-                    "add     %[rnd], %[rnd], r0, lsl #3  \n"
+                    "add     %[rnd], %[rnd], %[rnd], lsl #2  \n"  /* multiply by 75 */
+                    "rsb     %[rnd], %[rnd], %[rnd], lsl #4  \n"
                     "add     %[rnd], %[rnd], #74         \n"  /* add another 74 */
                     /* Since the lower bits are not very random:   get bits 8..15 (need max. 5) */
                     "and     r1, %[rmsk], %[rnd], lsr #8 \n"  /* ..and mask out unneeded bits */
