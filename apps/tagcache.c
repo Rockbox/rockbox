@@ -3295,6 +3295,13 @@ static void load_ramcache(void)
     
     cpu_boost(false);
 }
+
+void tagcache_unload_ramcache(void)
+{
+    stat.ramcache = false;
+    /* Just to make sure there is no statefile present. */
+    remove(TAGCACHE_STATEFILE);
+}
 #endif
 
 static bool check_all_headers(void)

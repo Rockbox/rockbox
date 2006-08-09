@@ -1365,6 +1365,10 @@ void tree_flush(void)
     tagcache_stop_scan();
     playlist_shutdown();
 
+#ifdef HAVE_TC_RAMCACHE
+    tagcache_unload_ramcache();
+#endif
+    
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
@@ -1387,6 +1391,10 @@ void tree_flush(void)
 
 void tree_restore(void)
 {
+#ifdef HAVE_EEPROM
+    firmware_settings.disk_clean = false;
+#endif
+    
 #ifdef HAVE_DIRCACHE
     remove(DIRCACHE_FILE);
     if (global_settings.dircache)

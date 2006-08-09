@@ -155,6 +155,7 @@ bool tagcache_prepare_shutdown(void);
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
+void tagcache_unload_ramcache(void);
 #endif
 void tagcache_init(void);
 bool tagcache_is_initialized(void);
