@@ -40,6 +40,7 @@
 #include "buffer.h"
 #include "atoi.h"
 #include "playback.h"
+#include "yesno.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
@@ -883,6 +884,19 @@ int tagtree_enter(struct tree_context* c)
             if (newextra == playtrack)
             {
                 c->dirlevel--;
+                /* about to create a new current playlist...
+                 allow user to cancel the operation */
+                if (global_settings.warnon_erase_dynplaylist &&
+                    !global_settings.party_mode &&
+                    playlist_modified(NULL))
+                {
+                    char *lines[]={str(LANG_WARN_ERASEDYNPLAYLIST_PROMPT)};
+                    struct text_message message={lines, 1};
+                    
+                    if (gui_syncyesno_run(&message, NULL, NULL) != YESNO_YES)
+                        break;
+                }
+
                 if (tagtree_play_folder(c) >= 0)
                     rc = 2;
                 break;
