@@ -89,11 +89,11 @@ PLUGIN_HEADER
 #define STAR_QUIT BUTTON_OFF
 #define STAR_UP   BUTTON_UP
 #define STAR_DOWN BUTTON_DOWN
-#define STAR_TOGGLE_CONTROL_PRE BUTTON_MODE
-#define STAR_TOGGLE_CONTROL (BUTTON_MODE | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_MODE | BUTTON_RIGHT)
-#define STAR_LEVEL_DOWN (BUTTON_MODE | BUTTON_LEFT)
-#define STAR_LEVEL_REPEAT (BUTTON_MODE | BUTTON_UP)
+#define STAR_TOGGLE_CONTROL BUTTON_MODE
+#define STAR_TOGGLE_CONTROL2 BUTTON_SELECT
+#define STAR_LEVEL_UP (BUTTON_ON | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN (BUTTON_ON | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT (BUTTON_ON | BUTTON_SELECT)
 #define STAR_MENU_RUN BUTTON_RIGHT
 #define STAR_MENU_RUN2 BUTTON_SELECT
 
@@ -519,7 +519,8 @@ static void star_display_text(char *str, bool waitkey)
                 key = rb->button_get(true);
                 switch (key)
                 {
-                    case STAR_MENU_RUN:
+                    case STAR_QUIT:
+                    case BUTTON_LEFT:
                     case STAR_DOWN:
                         go_on = true;
                         break;
@@ -707,7 +708,7 @@ static int star_run_game(void)
                 case STAR_RC_QUIT:
 #endif
                 case STAR_QUIT:
-                    return 0;
+                    return -1;
 
                 case BUTTON_LEFT:
                     move_x = -1;
@@ -881,6 +882,68 @@ static int star_run_game(void)
 }
 
 /**
+ * Display the choose level screen.
+ */
+static int star_choose_level(void)
+{
+    int level = current_level;
+    int key = BUTTON_NONE;
+    char str_info[32];
+    int lastkey = BUTTON_NONE;
+
+    while (true)
+    {
+       rb->lcd_clear_display();
+       rb->snprintf(str_info, sizeof(str_info), "Level:%02d / %02d",
+                 level,STAR_LEVEL_COUNT);
+       rb->lcd_putsxy(0, 0, str_info);
+       rb->lcd_update();
+         key = rb->button_get(true);
+         switch (key)
+         {
+             case STAR_QUIT:
+             case BUTTON_LEFT:
+                 return -1;
+                 break;
+
+            case STAR_MENU_RUN:
+#ifdef STAR_MENU_RUN2
+            case STAR_MENU_RUN2:
+#endif
+#ifdef STAR_MENU_RUN3
+            case STAR_MENU_RUN3:
+#endif
+                 current_level=level;
+                 return star_run_game();
+                 break;
+
+             case STAR_UP:
+             case BUTTON_REPEAT | STAR_UP:
+                 if(level< STAR_LEVEL_COUNT - 1)
+                    level++;
+                 break;
+
+             case STAR_DOWN:
+             case BUTTON_REPEAT | STAR_DOWN:
+                 if(level> 0)
+                    level--;
+                 break;
+
+             default:
+                 if (rb->default_event_handler(key) == SYS_USB_CONNECTED)
+                 {
+                     usb_detected = true;
+                     return 0;
+                 }
+                 break;
+         }
+         
+         if (key != BUTTON_NONE)
+             lastkey = key;
+     }
+}
+
+/**
  * Display the choice menu.
  */
 static int star_menu(void)
@@ -890,7 +953,8 @@ static int star_menu(void)
     int i = 0;
     bool refresh = true;
     char anim_state = 0;
-    unsigned char *menu[4] = {"Start", "Information", "Keys", "Exit"};
+    unsigned char *menu[5] = {"Play", "Choose Level", "Information",
+                                                      "Keys", "Exit"};
     int menu_count = sizeof(menu) / sizeof(unsigned char *);
     int menu_offset_y;
     int key;
@@ -936,20 +1000,22 @@ static int star_menu(void)
                     int oldforeground = rb->lcd_get_foreground();
                     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-                    rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 2, 15, char_height + 3);
+                    rb->lcd_fillrect(0,menu_offset_y + char_height * menu_y - 2,
+                                                      15, char_height + 3);
 #if LCD_DEPTH > 1
                     rb->lcd_set_foreground(oldforeground);
 #endif
                 }
                 break;
             case STAR_DOWN:
-                if (menu_y < 3) {
+                if (menu_y < menu_count-1) {
                     move_y = 1;
 #if LCD_DEPTH > 1
                     int oldforeground = rb->lcd_get_foreground();
                     rb->lcd_set_foreground(LCD_BLACK);
 #endif
-                    rb->lcd_fillrect(0, menu_offset_y + char_height * menu_y - 1, 15, char_height + 2);
+                    rb->lcd_fillrect(0,menu_offset_y + char_height * menu_y - 1,
+                                                       15, char_height + 2);
 #if LCD_DEPTH > 1
                     rb->lcd_set_foreground(oldforeground);
 #endif
@@ -967,11 +1033,12 @@ static int star_menu(void)
                 switch (menu_y)
                 {
                     case 0:
-                        if (!star_run_game())
-                            return usb_detected ?
-                                   PLUGIN_USB_CONNECTED : PLUGIN_OK;
+                        star_run_game();
                         break;
                     case 1:
+                        star_choose_level();
+                        break;
+                    case 2:
 #if LCD_DEPTH > 1
                         star_display_text(
                             "INFO\n\n"
@@ -988,7 +1055,7 @@ static int star_menu(void)
                             "take \"o\".", true);
 #endif
                         break;
-                    case 2:
+                    case 3:
 #if CONFIG_KEYPAD == RECORDER_PAD
                         star_display_text("KEYS\n\n"
                                           "[ON] Toggle Ctl.\n"
@@ -1005,11 +1072,11 @@ static int star_menu(void)
                                           "[M >] Next level", true);
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         star_display_text("KEYS\n\n"
-                                          "[A-B] Toggle Ctl\n"
+                                          "[MODE/SELECT] Toggle Ctrl\n"
                                           "[OFF] Exit\n"
-                                          "[A-B <] Prev. level\n"
-                                          "[A-B ^] Reset level\n"
-                                          "[A-B >] Next level", true);
+                                          "[ON + LEFT] Prev. level\n"
+                                          "[ON + SELECT] Reset level\n"
+                                          "[ON + NEXT] Next level", true);
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         star_display_text("KEYS\n\n"
                                           "[SELECT] Toggle Ctl\n"
@@ -1033,7 +1100,7 @@ static int star_menu(void)
                                           "[PWR+UP] Next level", true);
 #endif
                         break;
-                    case 3:
+                    case 4:
                         return PLUGIN_OK;
                 }
                 if (usb_detected)
@@ -1049,11 +1116,11 @@ static int star_menu(void)
         for (i = 0 ; i < char_height ; i++)
         {
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-            rb->lcd_fillrect (2, 30, 7, 4 * 8);
+            rb->lcd_fillrect (2, menu_offset_y, 8, menu_count * 8);
             rb->lcd_set_drawmode(DRMODE_FG);
             rb->lcd_mono_bitmap(arrow_bmp[anim_arrow[(anim_state & 0x38) >> 3]],
                                 2, menu_offset_y + menu_y * 8 + move_y * i, 7, 8);
-            rb->lcd_update_rect(2, 30, 8, 4 * 8);
+            rb->lcd_update_rect(2, menu_offset_y, 8, menu_count * 8);
             anim_state++;
             STAR_SLEEP
         }
