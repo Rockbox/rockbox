@@ -52,7 +52,7 @@ PLUGIN_HEADER
 /* iPod 5G LCD is *slow* */
 #define STAR_SLEEP ;
 #else
-#define STAR_SLEEP rb->sleep(1);
+#define STAR_SLEEP rb->sleep(0.2);
 #endif
 
 /* value of ball and block control */
@@ -1076,7 +1076,7 @@ static int star_menu(void)
                                           "[OFF] Exit\n"
                                           "[ON + LEFT] Prev. level\n"
                                           "[ON + SELECT] Reset level\n"
-                                          "[ON + NEXT] Next level", true);
+                                          "[ON + RIGHT] Next level", true);
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         star_display_text("KEYS\n\n"
                                           "[SELECT] Toggle Ctl\n"
