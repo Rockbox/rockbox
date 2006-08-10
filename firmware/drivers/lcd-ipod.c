@@ -130,7 +130,7 @@ static void lcd_cmd_and_data(unsigned cmd, unsigned data)
 /* LCD init */
 void lcd_init_device(void)
 {
-    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+    lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
     lcd_set_flip(false);
     lcd_cmd_and_data(R_ENTRY_MODE, 0x0000);
 
@@ -167,9 +167,9 @@ void lcd_set_contrast(int val)
 void lcd_set_invert_display(bool yesno)
 {
     if (yesno)
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0017);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0023);
     else
-        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0015);
+        lcd_cmd_and_data(R_DISPLAY_CONTROL, 0x0009);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */

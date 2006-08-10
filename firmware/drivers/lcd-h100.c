@@ -184,7 +184,7 @@ void lcd_init(void)
     lcd_write_command_ex(LCD_CNTL_POWER_CONTROL, 0x17, -1);
 
     lcd_write_command_ex(LCD_CNTL_DISPLAY_START_LINE, 0, -1);
-    lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x42, -1);
+    lcd_write_command_ex(LCD_CNTL_GRAY_SCALE_PATTERN, 0x32, -1);
     lcd_write_command_ex(LCD_CNTL_DISPLAY_MODE, 0, -1); /* Greyscale mode */
     lcd_write_command(LCD_CNTL_DATA_INPUT_DIR | 0); /* Column mode */
     
