@@ -53,7 +53,7 @@ struct GWaveform * loadWaveform(int file)
     wav->envOffset=readData(file, 6);
 
     wav->tremSweep=readChar(file);
-    wav->tremRate==readChar(file);
+    wav->tremRate=readChar(file);
     wav->tremDepth=readChar(file);
     wav->vibSweep=readChar(file);
     wav->vibRate=readChar(file);
