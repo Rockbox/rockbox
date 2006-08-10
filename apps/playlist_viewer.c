@@ -357,18 +357,16 @@ static void format_name(char* dest, const char* src)
         case 0:
         default:
         {
-            /* Only display the mp3 filename */
+            /* Only display the filename */
             char* p = strrchr(src, '/');
-            int len;
 
             strcpy(dest, p+1);
-            len = strlen(dest);
 
             /* Remove the extension */
-            if (!strcasecmp(&dest[len-4], ".mp3") ||
-                !strcasecmp(&dest[len-4], ".mp2") ||
-                !strcasecmp(&dest[len-4], ".mpa"))
-                dest[len-4] = '\0';
+            char* q = strrchr(dest, '.');
+
+            if (q != NULL)
+                *q = '\0';
 
             break;
         }
