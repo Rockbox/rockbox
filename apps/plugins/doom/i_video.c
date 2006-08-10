@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.22  2006/08/07 02:44:18  amiconn
+ * Revision 1.23  2006/08/10 18:34:43  amiconn
+ * Correct calculation of necessary buffer size to give maximum number of shades on iPod Mini.
+ *
+ * Revision 1.22  2006-08-07 02:44:18  amiconn
  * Use striped buffering for grayscale targets to make the buffer fit on iPod g3/g4. Also slightly faster (at least on H1x0) with the buffer in IRAM.
  *
  * Revision 1.21  2006-08-07 01:57:29  amiconn
@@ -108,7 +111,11 @@
 #include "../lib/gray.h"
 static unsigned char graybuffer[8*LCD_WIDTH] IBSS_ATTR; /* off screen buffer */
 static unsigned char *gbuf;
-#define GRAYBUFSIZE (LCD_WIDTH*LCD_HEIGHT*4+200)
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
+#define GRAYBUFSIZE (((LCD_WIDTH+7)/8)*LCD_HEIGHT*32+200)
+#else
+#define GRAYBUFSIZE (LCD_WIDTH*((LCD_HEIGHT+7)/8)*32+200)
+#endif
 #endif
 
 #if defined(CPU_COLDFIRE) 
