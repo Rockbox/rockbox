@@ -130,11 +130,11 @@ static const char default_game[9][9] =
 #define CELL_HEIGHT 16
 
 #elif (LCD_HEIGHT>=240) && (LCD_WIDTH>=320)
-/* iPod Video - 320x240, 9 cells @ 25x25 with 14 border lines */
+/* iPod Video - 320x240, 9 cells @ 24x24 with 14 border lines */
 
 /* Internal dimensions of a cell */
-#define CELL_WIDTH  25
-#define CELL_HEIGHT 25
+#define CELL_WIDTH  24
+#define CELL_HEIGHT 24
 
 #else
   #error SUDOKU: Unsupported LCD size
@@ -144,11 +144,11 @@ static const char default_game[9][9] =
 #define VERTICAL_LAYOUT
 
 #if (LCD_HEIGHT>=320) && (LCD_WIDTH>=240)
-/* Gigabeat - 240x320, 9 cells @ 16x16 with 14 border lines */
+/* Gigabeat - 240x320, 9 cells @ 24x24 with 14 border lines */
 
 /* Internal dimensions of a cell */
-#define CELL_WIDTH  25
-#define CELL_HEIGHT 25
+#define CELL_WIDTH  24
+#define CELL_HEIGHT 24
 
 #else
   #error SUDOKU: Unsupported LCD size
