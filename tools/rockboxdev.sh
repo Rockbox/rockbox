@@ -43,16 +43,16 @@ getfile() {
     tool=`findtool wget`
     if test -n "$tool"; then
       # wget download
-      echo "download $2/$1 using wget"
+      echo "ROCKBOXDEV: downloads $2/$1 using wget"
       $tool -O $dlwhere/$1 $2/$1
     fi
   else
      # curl download
-      echo "download $2/$1 using curl"
+      echo "ROCKBOXDEV: downloads $2/$1 using curl"
      $tool -Lo $dlwhere/$1 $2/$1
   fi
   if test -z "$tool"; then 
-    echo "couldn't find downloader tool to use!"
+    echo "ROCKBOXDEV: couldn't find downloader tool to use!"
     exit
   fi
   
@@ -170,29 +170,39 @@ if test -n "$gccpatch"; then
   fi
 fi
 
-echo "extracting binutils"
+echo "ROCKBOXDEV: extracting binutils-$binutils in $builddir"
 tar xjf $dlwhere/binutils-$binutils.tar.bz2
-echo "extracting gcc"
+echo "ROCKBOXDEV: extracting gcc-$gccver in $builddir"
 tar xjf $dlwhere/gcc-$gccver.tar.bz2
 
 if test -n "$gccpatch"; then
-  echo "applying gcc patch"
+  echo "ROCKBOXDEV: applying gcc patch"
   patch -p0 < "$dlwhere/$gccpatch"
 fi
 
+echo "ROCKBOXDEV: mkdir build-binu"
 mkdir build-binu
+echo "ROCKBOXDEV: cd build-binu"
 cd build-binu
+echo "ROCKBOXDEV: binutils/configure"
 ../binutils-$binutils/configure --target=$target --prefix=$prefix/$target
+echo "ROCKBOXDEV: binutils/make"
 make
+echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
 make install
 cd .. # get out of build-binu
 PATH="${PATH}:$bindir"
 SHELL=/bin/sh # seems to be needed by the gcc build in some cases
 
+echo "ROCKBOXDEV: mkdir build-gcc"
 mkdir build-gcc
+echo "ROCKBOXDEV: cd build-gcc"
 cd build-gcc
+echo "ROCKBOXDEV: gcc/configure"
 ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c
+echo "ROCKBOXDEV: gcc/make"
 make
+echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
 make install
 cd .. # get out of build-gcc
 cd .. # get out of $builddir
@@ -202,9 +212,9 @@ cd .. # get out of $builddir
 
 echo ""
 echo "Select target arch:"
-echo "s   - sh"
-echo "m   - m68k"
-echo "a   - arm"
+echo "s   - sh       (Archos models)"
+echo "m   - m68k     (iriver h1x0/h3x0, ifp7x0 and iaudio)"
+echo "a   - arm      (ipods, iriver H10, Sansa, etc)"
 echo "all - all three compilers"
 
 arch=`input`
