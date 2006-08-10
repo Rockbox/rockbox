@@ -295,8 +295,7 @@ void power_off(void)
     set_irq_level(HIGHEST_IRQ_LEVEL);
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     and_l(~0x00080000, &GPIO1_OUT);
-#elif defined(IAUDIO_X5)
-    and_l(~0x00000008, &GPIO_OUT);
+    asm("halt");
 #elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
 #ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
