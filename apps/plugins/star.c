@@ -48,11 +48,12 @@ PLUGIN_HEADER
 #define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
-#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
-/* iPod 5G LCD is *slow* */
+#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320) /* iPod 5G LCD is *slow* */
 #define STAR_SLEEP ;
+#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
+#define STAR_SLEEP rb->sleep(0);
 #else
-#define STAR_SLEEP rb->sleep(0.2);
+#define STAR_SLEEP rb->sleep(1);
 #endif
 
 /* value of ball and block control */
