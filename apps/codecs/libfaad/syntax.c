@@ -785,8 +785,9 @@ static uint8_t ics_info(NeAACDecHandle hDecoder, ic_stream *ics, bitfile *ld,
                 {
 #ifdef MAIN_DEC
                     ics->pred.predictor_reset_group_number =
+                        (uint8_t)
 #endif
-                        (uint8_t)faad_getbits(ld, 5 DEBUGVAR(1,54,"ics_info(): pred.predictor_reset_group_number"));
+                        faad_getbits(ld, 5 DEBUGVAR(1,54,"ics_info(): pred.predictor_reset_group_number"));
                 }
 
                 for (sfb = 0; sfb < limit; sfb++)
