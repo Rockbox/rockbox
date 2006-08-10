@@ -2700,12 +2700,26 @@ void playlist_close(struct playlist_info* playlist)
         remove(playlist->control_filename);
 }
 
+void playlist_sync(struct playlist_info* playlist)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+    
+    sync_control(playlist, false);
+    if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
+        audio_flush_and_reload_tracks();
+
+#ifdef HAVE_DIRCACHE
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
+}
+
 /*
  * Insert track into playlist at specified position (or one of the special
  * positions).  Returns position where track was inserted or -1 if error.
  */
-int playlist_insert_track(struct playlist_info* playlist,
-                          const char *filename, int position, bool queue)
+int playlist_insert_track(struct playlist_info* playlist, const char *filename,
+                          int position, bool queue, bool sync)
 {
     int result;
     
@@ -2720,16 +2734,11 @@ int playlist_insert_track(struct playlist_info* playlist,
 
     result = add_track_to_playlist(playlist, filename, position, queue, -1);
 
-    if (result != -1)
-    {
-        sync_control(playlist, false);
-        if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
-            audio_flush_and_reload_tracks();
-    }
-
-#ifdef HAVE_DIRCACHE
-    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
-#endif
+    /* Check if we want manually sync later. For example when adding
+     * bunch of files from tagcache, syncing after every file wouldn't be
+     * a good thing to do. */
+    if (sync && result >= 0)
+        playlist_sync(playlist);
 
     return result;
 }

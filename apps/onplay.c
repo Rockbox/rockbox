@@ -182,7 +182,7 @@ static bool add_to_playlist(int position, bool queue)
     else
     {
         if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
-            playlist_insert_track(NULL, selected_file, position, queue);
+            playlist_insert_track(NULL, selected_file, position, queue, true);
         else if (selected_file_attr & ATTR_DIRECTORY)
         {
             bool recurse = false;

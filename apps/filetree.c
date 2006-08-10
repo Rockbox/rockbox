@@ -409,9 +409,10 @@ int ft_enter(struct tree_context* c)
                         break;
                 }
 
-                if (global_settings.party_mode) {
+                if (global_settings.party_mode) 
+                {
                     playlist_insert_track(NULL, buf,
-                                          PLAYLIST_INSERT_LAST, true);
+                                          PLAYLIST_INSERT_LAST, true, true);
                     gui_syncsplash(HZ, true, str(LANG_QUEUE_LAST));
                 }
                 else if (playlist_create(c->currdir, NULL) != -1)

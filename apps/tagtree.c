@@ -975,8 +975,10 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
             continue;
         }
 
-        playlist_insert_track(NULL, buf, position, queue);
+        if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
+            break;
     }
+    playlist_sync(NULL);
     tagcache_search_finish(&tcs);
     cpu_boost(false);
     
@@ -999,12 +1001,13 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
             logf("tagtree_get_filename failed");
             return false;
         }
-        playlist_insert_track(NULL, buf, position, queue);
+        playlist_insert_track(NULL, buf, position, queue, true);
         
         return true;
     }
     
     /* We need to set the table to allsubentries. */
+    show_search_progress(true, 0);
     if (dptr->newtable == navibrowse)
     {
         tagtree_enter(tc);
