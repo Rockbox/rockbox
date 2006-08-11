@@ -334,6 +334,28 @@ void main(void)
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC) 
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
     
+    /* Don't start if the Hold button is active on the device you
+       are starting with */
+    if (!usb_detect() && ((on_button && button_hold()) ||
+                          (rc_on_button && remote_button_hold())))
+    {
+        printf("HOLD switch on, power off...");
+        lcd_update();
+        sleep(HZ*2);
+
+        /* Backlight OFF */
+#ifdef HAVE_REMOTE_LCD
+#ifdef IRIVER_H300_SERIES
+        or_l(0x00000002, &GPIO1_OUT);
+#else
+        or_l(0x00000800, &GPIO_OUT);
+#endif
+#endif
+        /* Reset the cookie for the crt0 crash check */
+        asm(" move.l #0,%d0");
+        asm(" move.l %d0,0x10017ffc");
+        power_off();
+    }
 
 #ifdef HAVE_EEPROM
     firmware_settings.initialized = false;
@@ -391,28 +413,6 @@ void main(void)
             lcd_update();
             start_iriver_fw();
         }
-    }
-
-    /* Don't start if the Hold button is active on the device you
-       are starting with */
-    if(!usb_detect() && ((on_button && button_hold()) ||
-       (rc_on_button && remote_button_hold()))) {
-        printf("HOLD switch on, power off...");
-        lcd_update();
-        sleep(HZ*2);
-
-        /* Backlight OFF */
-#ifdef HAVE_REMOTE_LCD
-#ifdef IRIVER_H300_SERIES
-        or_l(0x00000002, &GPIO1_OUT);
-#else
-        or_l(0x00000800, &GPIO_OUT);
-#endif
-#endif
-        /* Reset the cookie for the crt0 crash check */
-        asm(" move.l #0,%d0");
-        asm(" move.l %d0,0x10017ffc");
-        power_off();
     }
 
     usb_init();

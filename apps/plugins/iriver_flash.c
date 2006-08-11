@@ -404,7 +404,7 @@ int flash_bootloader(const char *filename)
     rb->snprintf(buf, sizeof buf, "crc32 = 0x%08x", crc32);
     rb->splash(HZ*10, true, buf);
 #else
-    if (crc32 != 0xa930906d)
+    if (crc32 != 0x77395351)
     {
         rb->splash(HZ*3, true, "Untested bootloader");
         return -2;
