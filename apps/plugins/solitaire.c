@@ -1579,3 +1579,4 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     return ( result == SOLITAIRE_USB ) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
+#endif
