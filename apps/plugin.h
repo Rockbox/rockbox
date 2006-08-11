@@ -539,9 +539,7 @@ struct plugin_api {
     void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
                               int height);
 #endif
-#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
-     || CONFIG_LCD == LCD_H300 || CONFIG_LCD == LCD_IPODVIDEO) && \
-     !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
     void (*lcd_yuv_blit)(unsigned char * const src[3],
                          int src_x, int src_y, int stride,
                          int x, int y, int width, int height);

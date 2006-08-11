@@ -423,6 +423,115 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     /*if(display_on)*/
 }
 
+/* Performance function to blit a YUV bitmap directly to the LCD */
+/* Assumes YCrCb 4:2:0. */
+/*
+   See http://en.wikipedia.org/wiki/YCbCr
+   ITU-R BT.601 (formerly CCIR 601):
+   |Y'|   | 0.299000  0.587000  0.114000| |R|
+   |Pb| = |-0.168736 -0.331264  0.500000| |G| or 0.564334 * (B - Y')
+   |Pr|   | 0.500000 -0.418688  0.081312| |B| or 0.713267 * (R - Y')
+   Scaled, normalized and rounded:
+   |Y'|   | 65  129   25| |R| +  16 : 16->235
+   |Cb| = |-38  -74  112| |G| + 128 : 16->240
+   |Cr|   |112  -94  -18| |B| + 128 : 16->240
+
+   The inverse:
+   |R|   |1.000000 -0.000001  1.402000| |Y'|
+   |G| = |1.000000 -0.334136 -0.714136| |Pb|
+   |B|   |1.000000  1.772000  0.000000| |Pr|
+   Scaled, normalized, rounded and tweaked to yield RGB 666:
+   |R|   |298    0  409| |Y' -  16| / 1024
+   |G| = |298 -100 -208| |Cb - 128| / 1024
+   |B|   |298  516    0| |Cr - 128| / 1024
+*/
+void lcd_yuv_blit(unsigned char * const [3], int, int, int,
+                  int, int, int, int) ICODE_ATTR;
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    const unsigned char *ysrc, *usrc, *vsrc;
+    int uv_stepper, uv_step, y_end;
+
+    if (!display_on)
+        return;
+
+    width = (width + 1) & ~1;
+    height = (height + 1) & ~1;
+    y_end = y + height;
+
+    /* Set start position and window */
+    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) |
+        (((y + roll_offset) & 127) + y_offset));
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
+
+    lcd_begin_write_gram();
+
+    ysrc = src[0] + src_y*stride + src_x;
+    usrc = src[1] + (src_y*stride >> 2) + (src_x >> 1);
+    vsrc = src[2] + (usrc - src[1]);
+
+    stride = stride - width; /* Use end of current line->start of next */
+    uv_stepper = (stride >> 1) - (width >> 1);
+    uv_step = uv_stepper - (stride >> 1);
+
+    do
+    {
+        const unsigned char *ysrc_end = ysrc + width;
+
+        do
+        {
+            int lum, cb, cr;
+            int rv, guv, bu;
+            int r, g, b;
+
+            lum = 298* *ysrc++ - 4768; /* 298*16 */
+            cb = *usrc++ - 128;
+            cr = *vsrc++ - 128;
+            bu = 516*cb;
+            guv = -100*cb - 208*cr;
+            rv = 409*cr;
+
+            r = (lum + rv) >> 10;
+            g = (lum + guv) >> 10;
+            b = (lum + bu) >> 10;
+
+            if ((unsigned)r > 63)
+                r = (r < 0) ? 0 : 63;
+            if ((unsigned)g > 63)
+                g = (g < 0) ? 0 : 63;
+            if ((unsigned)b > 63)
+                b = (b < 0) ? 0 : 63;
+
+            LCD_DATA = (r << 3) | (g >> 3);
+            LCD_DATA = (g << 6) | b;
+
+            lum = 298* *ysrc++ - 4768; /* 298*16 */
+            r = (lum + rv) >> 10;
+            g = (lum + guv) >> 10;
+            b = (lum + bu) >> 10;
+
+            if ((unsigned)r > 63)
+                r = (r < 0) ? 0 : 63;
+            if ((unsigned)g > 63)
+                g = (g < 0) ? 0 : 63;
+            if ((unsigned)b > 63)
+                b = (b < 0) ? 0 : 63;
+
+            LCD_DATA = (r << 3) | (g >> 3);
+            LCD_DATA = (g << 6) | b;
+        }
+        while (ysrc < ysrc_end);
+
+        usrc += uv_step;
+        vsrc += uv_step;
+        uv_step = uv_stepper - uv_step;
+
+        ysrc += stride;
+    }
+    while (++y < y_end);
+}
 
 /* Update the display.
    This must be called after all other LCD functions that change the
