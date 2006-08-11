@@ -423,7 +423,7 @@ static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)
     
     if (!tagcache_modify_numeric_entry(&tcs, tag_playcount, playcount)
         || !tagcache_modify_numeric_entry(&tcs, tag_playtime, playtime)
-        || !tagcache_modify_numeric_entry(&tcs, tag_lastplayed, tag_lastplayed))
+        || !tagcache_modify_numeric_entry(&tcs, tag_lastplayed, lastplayed))
     {
         logf("tc stat: modify failed!");
         tagcache_search_finish(&tcs);
