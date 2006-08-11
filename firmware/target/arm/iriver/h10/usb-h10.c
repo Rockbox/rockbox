@@ -92,10 +92,10 @@ bool usb_detect(void)
 
 void usb_enable(bool on)
 {
-	(void)on;
+    (void)on;
 #if 0
-	/* For the ipod, we can only do one thing with USB mode - reboot
-	   into Apple's flash-based disk-mode.  This does not return. */
+    /* For the ipod, we can only do one thing with USB mode - reboot
+       into Apple's flash-based disk-mode.  This does not return. */
     if (on)
     {
       /* The following code is copied from ipodlinux */

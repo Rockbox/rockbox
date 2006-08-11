@@ -33,7 +33,7 @@
 
 void button_init_device(void)
 {
-	/* No hardware initialisation required as it is done by the bootloader */
+    /* No hardware initialisation required as it is done by the bootloader */
 }
 
 bool button_hold(void)
@@ -47,8 +47,8 @@ bool button_hold(void)
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-	unsigned char state;
-	static bool hold_button = false;
+    unsigned char state;
+    static bool hold_button = false;
 
 #if 0
     /* light handling */
@@ -59,25 +59,25 @@ int button_read_device(void)
 #endif
 
     hold_button = button_hold();
-	if (!hold_button)
+    if (!hold_button)
     {
-		/* Read normal buttons */
-		state = GPIOA_INPUT_VAL & 0xf8;
-		if ((state & 0x8) == 0) btn |= BUTTON_FF;
-		if ((state & 0x10) == 0) btn |= BUTTON_PLAY;
-		if ((state & 0x20) == 0) btn |= BUTTON_REW;
-		if ((state & 0x40) == 0) btn |= BUTTON_RIGHT;
-		if ((state & 0x80) == 0) btn |= BUTTON_LEFT;
-		
-		/* Read power button */
-		if ((GPIOB_INPUT_VAL & 0x1) == 0) btn |= BUTTON_POWER;
-		
-		/* Read scroller */
-		if ( ((GPIOC_INPUT_VAL & 0x4)==1) && ((GPIOD_INPUT_VAL & 0x10)==1) )
-		{
-			/* Scroller is pressed */
-		}
-	}
-	
+        /* Read normal buttons */
+        state = GPIOA_INPUT_VAL & 0xf8;
+        if ((state & 0x8) == 0) btn |= BUTTON_FF;
+        if ((state & 0x10) == 0) btn |= BUTTON_PLAY;
+        if ((state & 0x20) == 0) btn |= BUTTON_REW;
+        if ((state & 0x40) == 0) btn |= BUTTON_RIGHT;
+        if ((state & 0x80) == 0) btn |= BUTTON_LEFT;
+        
+        /* Read power button */
+        if ((GPIOB_INPUT_VAL & 0x1) == 0) btn |= BUTTON_POWER;
+        
+        /* Read scroller */
+        if ( ((GPIOC_INPUT_VAL & 0x4)==1) && ((GPIOD_INPUT_VAL & 0x10)==1) )
+        {
+            /* Scroller is pressed */
+        }
+    }
+    
     return btn;
 }

@@ -71,7 +71,7 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-	return (GPIOL_INPUT_VAL & 0x04)?true:false; /* FIXME: This only checks if USB is connected */
+    return (GPIOL_INPUT_VAL & 0x04)?true:false; /* FIXME: This only checks if USB is connected */
 }
 
 void ide_power_enable(bool on)
@@ -90,10 +90,10 @@ bool ide_powered(void)
 void power_off(void)
 {
     /* set_irq_level(HIGHEST_IRQ_LEVEL);*/
-	#ifndef BOOTLOADER
+    #ifndef BOOTLOADER
     /* We don't turn off the ipod, we put it in a deep sleep */
     /* pcf50605_standby_mode(); */
     while(1)
         yield();
-	#endif
+    #endif
 }
