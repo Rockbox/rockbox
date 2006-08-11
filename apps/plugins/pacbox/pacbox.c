@@ -147,42 +147,42 @@ static bool pacbox_menu(void)
     bool need_restart = false;
 
     static const struct opt_items noyes[2] = {
-        { "No", NULL },
-        { "Yes", NULL },
+        { "No", 0 },
+        { "Yes", 0 },
     };
 
     static const struct opt_items difficulty_options[2] = {
-        { "Normal", NULL },
-        { "Harder", NULL },
+        { "Normal", 0 },
+        { "Harder", 0 },
     };
 
     static const struct opt_items numlives_options[4] = {
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "5", NULL },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "5", 0 },
     };
 
     static const struct opt_items bonus_options[4] = {
-        { "10000 points", NULL },
-        { "15000 points", NULL },
-        { "20000 points", NULL },
-        { "No bonus", NULL },
+        { "10000 points", 0 },
+        { "15000 points", 0 },
+        { "20000 points", 0 },
+        { "No bonus", 0 },
     };
 
     static const struct opt_items ghostname_options[2] = {
-        { "Normal", NULL },
-        { "Alternate", NULL },
+        { "Normal", 0 },
+        { "Alternate", 0 },
     };
 
     static const struct menu_item items[] = {
-        { "Difficulty", NULL },
-        { "Pacmen Per Game", NULL },
-        { "Bonus Life", NULL },
-        { "Ghost Names", NULL },
-        { "Display FPS", NULL },
-        { "Restart", NULL },
-        { "Quit", NULL },
+        { "Difficulty", 0 },
+        { "Pacmen Per Game", 0 },
+        { "Bonus Life", 0 },
+        { "Ghost Names", 0 },
+        { "Display FPS", 0 },
+        { "Restart", 0 },
+        { "Quit", 0 },
     };
     
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),

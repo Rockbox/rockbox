@@ -2103,9 +2103,9 @@ bool set_worm_num_worms(void)
 {
     bool ret;
     static const struct opt_items num_worms_option[3] = {
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
     };
 
     ret = rb->set_option("Number Of Worms", &worm_count,INT, num_worms_option, 3, NULL);
@@ -2122,10 +2122,10 @@ bool set_worm_num_players(void)
 {
     bool ret;
     static const struct opt_items num_players_option[4] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 }
     };
 
     ret = rb->set_option("Number of Players", &players, INT,num_players_option , 4, NULL);
@@ -2144,17 +2144,17 @@ Sets the size of each argh block created
 bool set_worm_argh_size(void)
 {
     static const struct opt_items argh_size_option[11] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 }
     };
 
     return rb->set_option("Argh Size", &argh_size,INT,argh_size_option , 11, NULL);
@@ -2166,17 +2166,17 @@ Sets the amount a worm grows per food
 bool set_worm_food(void)
 {
     static const struct opt_items worm_food_option[11] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 }
     };
     return rb->set_option("Worm Growth Per Food", &worm_food,INT,worm_food_option , 11, NULL);
 }
@@ -2187,11 +2187,11 @@ Sets the number of arghs created per food
 bool set_argh_per_food(void)
 {
     static const struct opt_items argh_food_option[5] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
     };
     return rb->set_option("Arghs Per Food", &arghs_per_food,INT,argh_food_option , 5, NULL);
 }
@@ -2203,25 +2203,25 @@ bool set_worm_speed(void)
 {
     bool ret;
     static const struct opt_items speed_option[19] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL },
-        { "11", NULL },
-        { "12", NULL },
-        { "13", NULL },
-        { "14", NULL },
-        { "15", NULL },
-        { "16", NULL },
-        { "17", NULL },
-        { "18", NULL },
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 },
+        { "11", 0 },
+        { "12", 0 },
+        { "13", 0 },
+        { "14", 0 },
+        { "15", 0 },
+        { "16", 0 },
+        { "17", 0 },
+        { "18", 0 },
     };
 
 
@@ -2240,17 +2240,17 @@ bool set_bool_options(char* string, bool* variable,
 bool set_worm_control_style(void)
 {
     static const struct opt_items key1_option[2] = {
-        { "Remote Control", NULL },
-        { "No Rem. Control", NULL },
+        { "Remote Control", 0 },
+        { "No Rem. Control", 0 },
     };
 
     static const struct opt_items key2_option[2] = {
-        { "2 Key Control", NULL },
-        { "4 Key COntrol", NULL },
+        { "2 Key Control", 0 },
+        { "4 Key COntrol", 0 },
     };
 
     static const struct opt_items key3_option[1] = {
-        { "Out of Control", NULL },
+        { "Out of Control", 0 },
     };
 
     if (players > 1) {
@@ -2352,14 +2352,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Setup screen */
 
     static const struct opt_items noyes[2] = {
-        { "No", NULL },
-        { "Yes", NULL },
+        { "No", 0 },
+        { "Yes", 0 },
     };
 
     static const struct opt_items num_worms_option[3] = {
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL }
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 }
     };
 
 #ifdef MULTIPLAYER
@@ -2367,129 +2367,129 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #else
     static const struct opt_items num_players_option[2] = {
 #endif
-        { "0", NULL },
-        { "1", NULL }
+        { "0", 0 },
+        { "1", 0 }
 #ifdef MULTIPLAYER
-        ,{ "2", NULL },
-        { "3", NULL }
+        ,{ "2", 0 },
+        { "3", 0 }
 #endif
     };
 
     static const struct opt_items argh_size_option[9] = {
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL }
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 }
     };
 
     static const struct opt_items food_size_option[9] = {
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL }
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 }
     };
 
     static const struct opt_items worm_food_option[16] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL },
-        { "11", NULL },
-        { "12", NULL },
-        { "13", NULL },
-        { "14", NULL },
-        { "15", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 },
+        { "11", 0 },
+        { "12", 0 },
+        { "13", 0 },
+        { "14", 0 },
+        { "15", 0 }
     };
 
     static const struct opt_items argh_food_option[9] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 }
     };
 
     static const struct opt_items speed_option[21] = {
-        { "0", NULL },
-        { "1", NULL },
-        { "2", NULL },
-        { "3", NULL },
-        { "4", NULL },
-        { "5", NULL },
-        { "6", NULL },
-        { "7", NULL },
-        { "8", NULL },
-        { "9", NULL },
-        { "10", NULL },
-        { "11", NULL },
-        { "12", NULL },
-        { "13", NULL },
-        { "14", NULL },
-        { "15", NULL },
-        { "16", NULL },
-        { "17", NULL },
-        { "18", NULL },
-        { "19", NULL },
-        { "20", NULL }
+        { "0", 0 },
+        { "1", 0 },
+        { "2", 0 },
+        { "3", 0 },
+        { "4", 0 },
+        { "5", 0 },
+        { "6", 0 },
+        { "7", 0 },
+        { "8", 0 },
+        { "9", 0 },
+        { "10", 0 },
+        { "11", 0 },
+        { "12", 0 },
+        { "13", 0 },
+        { "14", 0 },
+        { "15", 0 },
+        { "16", 0 },
+        { "17", 0 },
+        { "18", 0 },
+        { "19", 0 },
+        { "20", 0 }
     };
 
     static const struct opt_items remoteonly_option[1] = {
-        { "Remote Control", NULL }
+        { "Remote Control", 0 }
     };
 
     static const struct opt_items key24_option[2] = {
-        { "4 Key Control", NULL },
-        { "2 Key Control", NULL }
+        { "4 Key Control", 0 },
+        { "2 Key Control", 0 }
     };
 
 #ifdef REMOTE
     static const struct opt_items remote_option[2] = {
-        { "Remote Control", NULL },
-        { "No Rem. Control", NULL }
+        { "Remote Control", 0 },
+        { "No Rem. Control", 0 }
     };
 #else
     static const struct opt_items key2_option[1] = {
-        { "2 Key Control", NULL }
+        { "2 Key Control", 0 }
     };
 #endif
 
     static const struct opt_items nokey_option[1] = {
-        { "Out of Control", NULL }
+        { "Out of Control", 0 }
     };
 
     static const struct menu_item items[] = {
-        { "Play Wormlet!", NULL },
-        { "Number of Worms",  NULL  },
-        { "Number of Players", NULL  },
-        { "Control Style", NULL },
-        { "Worm Growth Per Food", NULL },
-        { "Worm Speed", NULL },
-        { "Arghs Per Food", NULL },
-        { "Argh Size", NULL },
-        { "Food Size", NULL },
-        { "Revert to Default Settings", NULL },
-        { "Quit", NULL }
+        { "Play Wormlet!", 0 },
+        { "Number of Worms",  0  },
+        { "Number of Players", 0  },
+        { "Control Style", 0 },
+        { "Worm Growth Per Food", 0 },
+        { "Worm Speed", 0 },
+        { "Arghs Per Food", 0 },
+        { "Argh Size", 0 },
+        { "Food Size", 0 },
+        { "Revert to Default Settings", 0 },
+        { "Quit", 0 }
     };
 
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
