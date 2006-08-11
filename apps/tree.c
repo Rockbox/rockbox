@@ -1368,16 +1368,14 @@ void tree_flush(void)
 #ifdef HAVE_TC_RAMCACHE
     tagcache_unload_ramcache();
 #endif
-    
+
 #ifdef HAVE_DIRCACHE
     if (global_settings.dircache)
     {
+        global_settings.dircache_size = dircache_get_cache_size();
 # ifdef HAVE_EEPROM
         if (dircache_is_enabled() && firmware_settings.initialized)
-        {
-            global_settings.dircache_size = dircache_get_cache_size();
             dircache_save(DIRCACHE_FILE);
-        }
 # endif
         dircache_disable();
     }
@@ -1393,6 +1391,10 @@ void tree_restore(void)
 {
 #ifdef HAVE_EEPROM
     firmware_settings.disk_clean = false;
+#endif
+    
+#ifdef HAVE_TC_RAMCACHE
+    remove(TAGCACHE_STATEFILE);
 #endif
     
 #ifdef HAVE_DIRCACHE

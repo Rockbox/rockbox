@@ -84,7 +84,17 @@ bool detect_flashed_rockbox(void)
     struct flash_header hdr;
     uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
     
+# ifndef BOOTLOADER
+    int oldmode;
+    oldmode = system_memory_guard(MEMGUARD_NONE);
+# endif
+    
     memcpy(&hdr, src, sizeof(struct flash_header));
+    
+# ifndef BOOTLOADER
+    system_memory_guard(oldmode);
+# endif
+    
     if (hdr.magic != FLASH_MAGIC)
         return false;
     

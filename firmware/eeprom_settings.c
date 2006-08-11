@@ -27,13 +27,20 @@
 
 struct eeprom_settings firmware_settings;
 
-static void reset_config(void)
+static bool reset_config(void)
 {
     memset(&firmware_settings, 0, sizeof(struct eeprom_settings));
+#ifdef BOOTLOADER
+    /* Don't reset settings if we are inside bootloader. */
+    firmware_settings.initialized = false;
+#else
     firmware_settings.version = EEPROM_SETTINGS_VERSION;
     firmware_settings.initialized = true;
     firmware_settings.boot_disk = false;
     firmware_settings.bl_version = 0;
+#endif
+    
+    return firmware_settings.initialized;
 }
 
 bool eeprom_settings_init(void)
@@ -69,23 +76,20 @@ bool eeprom_settings_init(void)
     if (firmware_settings.version != EEPROM_SETTINGS_VERSION)
     {
         logf("Version mismatch");
-        reset_config();
-        return true;
+        return reset_config();
     }
     
     if (firmware_settings.checksum != sum)
     {
         logf("Checksum mismatch");
-        reset_config();
-        return true;
+        return reset_config();
     }
     
 #ifndef BOOTLOADER
     if (firmware_settings.bl_version < EEPROM_SETTINGS_BL_MINVER)
     {
         logf("Too old bootloader: %d", firmware_settings.bl_version);
-        reset_config();
-        return true;
+        return reset_config();
     }
 #endif
     

@@ -338,9 +338,17 @@ void init(void)
         panicf("ata: %d", rc);
     }
 
+#ifdef HAVE_EEPROM
+    eeprom_settings_init();
+#endif
+    
     usb_start_monitoring();
     while (usb_detect())
-    {   /* enter USB mode early, before trying to mount */
+    {   
+#ifdef HAVE_EEPROM
+        firmware_settings.disk_clean = false;
+#endif
+        /* enter USB mode early, before trying to mount */
         if (button_get_w_tmo(HZ/10) == SYS_USB_CONNECTED)
 #ifdef HAVE_MMC
             if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
@@ -374,10 +382,6 @@ void init(void)
         }
     }
 
-#ifdef HAVE_EEPROM
-    eeprom_settings_init();
-#endif
-    
     settings_calc_config_sector();
     
 #if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD)

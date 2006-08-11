@@ -3300,7 +3300,7 @@ void tagcache_unload_ramcache(void)
 {
     stat.ramcache = false;
     /* Just to make sure there is no statefile present. */
-    remove(TAGCACHE_STATEFILE);
+    // remove(TAGCACHE_STATEFILE);
 }
 #endif
 
