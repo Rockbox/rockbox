@@ -59,7 +59,7 @@
 #define CONFIG_BACKLIGHT BL_H10 /* TODO: figure this out, probably not necessary
                                    because of 'target' stuff */
 
-#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity
+#define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity
                                         TODO: check this, probably different
                                         for different models too */
 

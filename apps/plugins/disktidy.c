@@ -83,6 +83,12 @@ enum tidy_system
 #define TIDY_LEFT BUTTON_LEFT
 #define TIDY_RIGHT BUTTON_RIGHT
 
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define TIDY_DO BUTTON_PLAY
+#define TIDY_STOP BUTTON_POWER
+#define TIDY_LEFT BUTTON_LEFT
+#define TIDY_RIGHT BUTTON_RIGHT
+
 #else
   #error DISKTIDY: Unsupported keypad
 #endif
@@ -374,6 +380,9 @@ void tidy_lcd_menu(enum tidy_system system)
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
     rb->lcd_puts(0, 0, "[Select] to clean up");
     rb->lcd_puts(0, 1, "[A] to exit/abort");
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+    rb->lcd_puts(0, 0, "[Play] to clean up");
+    rb->lcd_puts(0, 1, "[Power] to exit/abort");
 #else
     #error DISKTIDY: Unsupported model
 #endif

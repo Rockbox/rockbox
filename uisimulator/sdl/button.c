@@ -89,6 +89,8 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_UP;
 #elif defined BUTTON_SCROLL_BACK
         new_btn = BUTTON_SCROLL_BACK;
+#elif defined BUTTON_SCROLL_UP
+        new_btn = BUTTON_SCROLL_UP;
 #elif defined BUTTON_PLAY
         new_btn = BUTTON_PLAY;
 #endif
@@ -100,6 +102,8 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_DOWN;
 #elif defined BUTTON_SCROLL_FWD
         new_btn = BUTTON_SCROLL_FWD;
+#elif defined BUTTON_SCROLL_DOWN
+        new_btn = BUTTON_SCROLL_DOWN;
 #elif defined BUTTON_STOP
         new_btn = BUTTON_STOP;
 #endif
@@ -149,6 +153,15 @@ void button_event(int key, bool pressed)
     case SDLK_KP_DIVIDE:
     case SDLK_F1:
         new_btn = BUTTON_REC;
+        break;
+#elif defined BUTTON_REW
+    case SDLK_KP_DIVIDE:
+    case SDLK_F1:
+        new_btn = BUTTON_REW;
+        break;
+    case SDLK_KP_MULTIPLY:
+    case SDLK_F2:
+        new_btn = BUTTON_FF;
         break;
 #endif
 

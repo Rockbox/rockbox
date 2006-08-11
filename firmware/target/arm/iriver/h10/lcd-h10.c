@@ -36,8 +36,8 @@
 
 static bool display_on=false; /* is the display turned on? */
 
-#define LCD_CMD  *(volatile unsigned short *)0xf0008000
-#define LCD_DATA *(volatile unsigned short *)0xf0008002
+#define LCD_CMD  *(volatile unsigned short *)0x70003008 /* or maybe 0x70008a0c */
+#define LCD_DATA *(volatile unsigned short *)0x70003010
 
 /* register defines for the Renesas HD66773R */
 #define R_HORIZ_RAM_ADDR_POS    0x16
@@ -98,30 +98,23 @@ const short high8to9[] ICONST_ATTR = {
 /* called very frequently - inline! */
 inline void lcd_write_reg(int reg, int val)
 {
-#if 0
     LCD_CMD = (reg >> 8) << 1;
     LCD_CMD = (reg & 0xff) << 1;
     LCD_DATA = (val >> 8) << 1;
     LCD_DATA = (val & 0xff) << 1;
-#endif
-	(void)reg;
-	(void)val;
 }
 
 /* called very frequently - inline! */
 inline void lcd_begin_write_gram(void)
 {
-#if 0
     LCD_CMD = (R_WRITE_DATA_2_GRAM >> 8) << 1;
     LCD_CMD = (R_WRITE_DATA_2_GRAM & 0xff) << 1;
-#endif
 }
 
 /* called very frequently - inline! */
 inline void lcd_write_data(const unsigned short* p_bytes, int count) ICODE_ATTR;
 inline void lcd_write_data(const unsigned short* p_bytes, int count)
 {
-#if 0
     unsigned int tmp;
     unsigned int *ptr = (unsigned int *)p_bytes;
     bool extra;
@@ -144,9 +137,6 @@ inline void lcd_write_data(const unsigned short* p_bytes, int count)
         LCD_DATA = high8to9[read >> 8];
         LCD_DATA = read<<1;
     }
-#endif
-	(void)p_bytes;
-	(void)count;
 }
 
 /*** hardware configuration ***/
@@ -158,15 +148,12 @@ int lcd_default_contrast(void)
 
 void lcd_set_contrast(int val)
 {
-#if 0
     if (val >= 15) // val must'nt be 15 or 31
      ++val; 
     if (val > 30)
       return;
 
     lcd_write_reg(0x0e, 0x201e + (val << 8));
-#endif
-	(void)val;
 }
 
 void lcd_set_invert_display(bool yesno)
@@ -197,9 +184,9 @@ void lcd_roll(int lines)
  */
 void lcd_init_device(void)
 {
-#if 0
     display_on=true;
 
+#if 0
     /* LCD Reset */
     and_l(~0x00000010, &GPIO1_OUT);
     or_l(0x00000010, &GPIO1_ENABLE);
@@ -268,10 +255,7 @@ void lcd_init_device(void)
 
 void lcd_enable(bool on)
 {
-#if 0
     display_on = on;
-#endif
-	(void)on;
 }
 
 /*** update functions ***/
@@ -297,7 +281,6 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-#if 0
     if(display_on){
 
         /* Copy display bitmap to hardware */
@@ -305,14 +288,12 @@ void lcd_update(void)
         lcd_begin_write_gram();
         lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
     }
-#endif
 }
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-#if 0
     if(display_on) {    
         int ymax = y + height;
 
@@ -343,9 +324,4 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0x7f00);
         lcd_write_reg(R_VERT_RAM_ADDR_POS, 0x9f00);
     }
-#endif
-	(void)x;
-	(void)y;
-	(void)width;
-	(void)height;
 }

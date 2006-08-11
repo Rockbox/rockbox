@@ -897,11 +897,10 @@ toolsdir='\$(ROOTDIR)/tools'
     target="-DIRIVER_H10"
     memory=32 # always
     arm7tdmicc
-    #tool="$rootdir/tools/ -add=iax5"
-    tool="$rootdir/tools/mi4code build"
+    tool="$rootdir/tools/mkmi4.sh h10"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.iriver"
+    output="H10_20GC.mi4"
     appextra="recorder:gui"
     archosrom=""
     flash=""

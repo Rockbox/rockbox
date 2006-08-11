@@ -250,7 +250,7 @@ target/coldfire/iaudio/x5/lcd-remote-x5.c
 #ifndef SIMULATOR
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
-target/arm/iriver/h10/ata-h10.c
+target/arm/ata-pp5020.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10.c
