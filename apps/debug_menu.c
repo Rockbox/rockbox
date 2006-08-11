@@ -61,6 +61,7 @@
 #include "peakmeter.h"
 #endif
 #ifdef CONFIG_TUNER
+#include "tuner.h"
 #include "radio.h"
 #endif
 #ifdef HAVE_MMC
@@ -497,7 +498,7 @@ bool dbg_hw_info(void)
         if(button == SETTINGS_CANCEL)
             return false;
     }
-#elif CONFIG_CPU == MCF5249
+#elif CONFIG_CPU == MCF5249 || CONFIG_CPU == MCF5250
     char buf[32];
     int button;
     unsigned manu, id; /* flash IDs */
@@ -1987,14 +1988,29 @@ bool dbg_fm_radio(void)
 
     while(1)
     {
+        int row = 0;
+        unsigned long regs;
+
         lcd_clear_display();
         fm_detected = radio_hardware_present();
         
         snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
-        lcd_puts(0, 0, buf);
+        lcd_puts(0, row++, buf);
+        
+#if (CONFIG_TUNER & S1A0903X01)
+        regs = samsung_get(RADIO_ALL);
+        snprintf(buf, sizeof buf, "Samsung regs: %08lx", regs);
+        lcd_puts(0, row++, buf);
+#endif
+#if (CONFIG_TUNER & TEA5767)
+        regs = philips_get(RADIO_ALL);
+        snprintf(buf, sizeof buf, "Philips regs: %08lx", regs);
+        lcd_puts(0, row++, buf);
+#endif
+
         lcd_update();
         
-        button = button_get(true);
+        button = button_get_w_tmo(HZ);
 
         switch(button)
         {
