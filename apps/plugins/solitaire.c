@@ -174,23 +174,23 @@ static struct plugin_api* rb;
 #   define HK_REM2STACK    "POWER+RIGHT"
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define SOL_QUIT BUTTON_POWER
-#define SOL_UP BUTTON_SCROLL_UP
-#define SOL_DOWN BUTTON_SCROLL_DOWN
-#define SOL_LEFT BUTTON_LEFT
-#define SOL_RIGHT BUTTON_RIGHT
-#define SOL_MOVE BUTTON_REW
-#define SOL_DRAW BUTTON_PLAY
-#define SOL_REM2CUR (BUTTON_FF | BUTTON_LEFT)
-#define SOL_CUR2STACK (BUTTON_FF | BUTTON_SCROLL_UP)
-#define SOL_REM2STACK (BUTTON_FF | BUTTON_SCROLL_DOWN)
-#define SOL_MENU_RUN BUTTON_REW
-#define SOL_MENU_INFO BUTTON_PLAY
-#define HK_MOVE "REW"
-#define HK_DRAW "PLAY"
-#define HK_REM2CUR "REW+LEFT"
-#define HK_CUR2STACK "REW+UP.."
-#define HK_REM2STACK "REW+DOWN"
+#   define SOL_QUIT        BUTTON_POWER
+#   define SOL_UP          BUTTON_SCROLL_UP
+#   define SOL_DOWN        BUTTON_SCROLL_DOWN
+#   define SOL_LEFT        BUTTON_LEFT
+#   define SOL_RIGHT       BUTTON_RIGHT
+#   define SOL_MOVE        BUTTON_REW
+#   define SOL_DRAW        BUTTON_PLAY
+#   define SOL_REM2CUR     (BUTTON_FF | BUTTON_LEFT)
+#   define SOL_CUR2STACK   (BUTTON_FF | BUTTON_SCROLL_UP)
+#   define SOL_REM2STACK   (BUTTON_FF | BUTTON_SCROLL_DOWN)
+#   define SOL_MENU_RUN    BUTTON_REW
+#   define SOL_MENU_INFO   BUTTON_PLAY
+#   define HK_MOVE         "REW"
+#   define HK_DRAW         "PLAY"
+#   define HK_REM2CUR      "REW+LEFT"
+#   define HK_CUR2STACK    "REW+UP.."
+#   define HK_REM2STACK    "REW+DOWN"
 
 #else
 #   error "Unknown keypad"
@@ -1579,11 +1579,3 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     return ( result == SOLITAIRE_USB ) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }
 
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define HELP_SOL_MOVE "REW: Select cards, Move cards, reveal hidden cards ..."
-#define HELP_SOL_DRAW "PLAY: Un-select a card if it was selected. Else, draw 3 new cards out of the remains' stack."
-#define HELP_SOL_REM2CUR "REW+LEFT: Put the card on top of the remains' stack on top of the cursor."
-#define HELP_SOL_CUR2STACK "REW+UP..: Put the card under the cursor on one of the 4 final stacks."
-#define HELP_SOL_REM2STACK "REW+DOWN: Put the card on top of the remains' stack on one of the 4 final stacks."
-
-#endif
