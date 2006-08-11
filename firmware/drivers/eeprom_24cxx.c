@@ -275,7 +275,7 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
 {
     int ret;
     char byte;
-    int count = 10;
+    int count = 0;
 
     if (address >= EEPROM_SIZE)
     {
@@ -287,19 +287,20 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
     do
     {
         ret = sw_i2c_read(address, &byte);
-        if (ret < 0)
-        {
-            /* keep between {} as logf is whitespace in normal builds */
-            logf("EEPROM rFail: %d/%d", ret, address);
-        }
-    } while (ret < 0 && count--);
+    } while (ret < 0 && count++ < 200);
 
     if (ret < 0)
     {
-        logf("EEPROM RFail: %d/%d", ret, address);
+        logf("EEPROM RFail: %d/%d/%d", ret, address, count);
         return ret;
     }
     
+    if (count)
+    {
+        /* keep between {} as logf is whitespace in normal builds */
+        logf("EEPROM rOK: %d retries", count);
+    }
+        
     *c = byte;
     return 0;
 }
@@ -307,7 +308,7 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
 int eeprom_24cxx_write_byte(unsigned int address, char c)
 {
     int ret;
-    int count = 100;
+    int count = 0;
 
     if (address >= EEPROM_SIZE)
     {
@@ -318,17 +319,18 @@ int eeprom_24cxx_write_byte(unsigned int address, char c)
     do
     {
         ret = sw_i2c_write_byte(address, c);
-        if (ret < 0)
-        {
-            /* keep between {} as logf is whitespace in normal builds */
-            logf("EEPROM wFail: %d/%d", ret, address);
-        }
-    } while (ret < 0 && count--) ;
+    } while (ret < 0 && count++ < 200) ;
 
     if (ret < 0)
     {
         logf("EEPROM WFail: %d/%d", ret, address);
         return ret;
+    }
+    
+    if (count)
+    {
+        /* keep between {} as logf is whitespace in normal builds */
+        logf("EEPROM wOK: %d retries", count);
     }
     
     return 0;
