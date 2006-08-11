@@ -322,29 +322,29 @@ static void do_opt_menu(void)
     int result;
 
     static const struct opt_items onoff[2] = {
-        { "Off", 0 },
-        { "On" , 0 },
+        { "Off", -1 },
+        { "On" , -1 },
     };
 
     static const struct opt_items fullscreen[]= {
-        { "Off", 0 },
-        { "Fullscreen", 0 },
-        { "Full - Maintain Ratio", 0 },
+        { "Off", -1 },
+        { "Fullscreen", -1 },
+        { "Full - Maintain Ratio", -1 },
     };
 
     static const struct opt_items frameskip[]= {
-        { "3 Max", 0 },
-        { "4 Max", 0 },
-        { "5 Max", 0 },
-        { "6 Max", 0 },
+        { "3 Max", -1 },
+        { "4 Max", -1 },
+        { "5 Max", -1 },
+        { "6 Max", -1 },
     };
 
     static const struct menu_item items[] = {
-        {"Max Frameskip", 0 },
-        {"Sound"        , 0 },
-        {"Stats"        , 0 },
-        {"Fullscreen"   , 0 },
-        {"Set Keys (Buggy)", 0 },
+        { "Max Frameskip", NULL },
+        { "Sound"        , NULL },
+        { "Stats"        , NULL },
+        { "Fullscreen"   , NULL },
+        { "Set Keys (Buggy)", NULL },
     };
 
     m = rb->menu_init(items, sizeof(items) / sizeof(*items), NULL, NULL, NULL, NULL);

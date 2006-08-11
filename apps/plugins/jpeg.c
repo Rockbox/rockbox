@@ -2097,22 +2097,22 @@ int show_menu(void) /* return 1 to quit */
         { "Return", NULL },
     };
     static const struct opt_items slideshow[2] = {
-        {"Disable",0},
-        {"Enable",0},
+        { "Disable", -1 },
+        { "Enable", -1 },
     };
     static const struct opt_items timeout[12] = {
-        { "1 second", 0 },
-        { "2 seconds", 0 },
-        { "3 seconds", 0 },
-        { "4 seconds", 0 },
-        { "5 seconds", 0 },
-        { "6 seconds", 0 },
-        { "7 seconds", 0 },
-        { "8 seconds", 0 },
-        { "9 seconds", 0 },
-        { "10 seconds", 0 },
-        { "15 seconds", 0 },
-        { "20 seconds", 0 },
+        { "1 second", -1 },
+        { "2 seconds", -1 },
+        { "3 seconds", -1 },
+        { "4 seconds", -1 },
+        { "5 seconds", -1 },
+        { "6 seconds", -1 },
+        { "7 seconds", -1 },
+        { "8 seconds", -1 },
+        { "9 seconds", -1 },
+        { "10 seconds", -1 },
+        { "15 seconds", -1 },
+        { "20 seconds", -1 },
     };
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);

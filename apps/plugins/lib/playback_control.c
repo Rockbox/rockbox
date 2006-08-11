@@ -57,8 +57,8 @@ static bool volume(void)
 static bool shuffle(void)
 {
     struct opt_items names[] = {
-        {"No", 0},
-        {"Yes", 0}
+        { "No", -1 },
+        { "Yes", -1 }
     };
     return api->set_option("Shuffle", &api->global_settings->playlist_shuffle,
                            BOOL, names, 2,NULL);
@@ -68,12 +68,12 @@ static bool repeat_mode(void)
 {
     bool result;
     static const struct opt_items names[] = {
-        { "Off", 0 },
-        { "Repeat All", 0 },
-        { "Repeat One", 0 },
-        { "Repeat Shuffle", 0 },
+        { "Off", -1 },
+        { "Repeat All", -1 },
+        { "Repeat One", -1 },
+        { "Repeat Shuffle", -1 },
 #ifdef AB_REPEAT_ENABLE
-        { "Repeat A-B", 0 }
+        { "Repeat A-B", -1 }
 #endif
     };
     
