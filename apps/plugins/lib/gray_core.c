@@ -348,7 +348,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     long plane_size, buftaken;
     unsigned data;
 #ifndef SIMULATOR
-    int j;
+    int j, bitfill;
 #endif
 
     _gray_rb = newrb;
@@ -439,6 +439,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _gray_info.cur_plane = 0;
     _gray_info.plane_size = plane_size;
     _gray_info.plane_data = gbuf;
+    _gray_rb->memset(gbuf, 0, depth * plane_size);
     gbuf += depth * plane_size;
     _gray_info.bitpattern = (unsigned long *)gbuf;
               
@@ -449,7 +450,8 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         i >>= 1;
         j--;
     }
-    _gray_info.randmask = 0xFFu >> j;
+    _gray_info.randmask = 0xFFu >> j; 
+    bitfill = (-depth) & 7;
 
     /* Precalculate the bit patterns for all possible pixel values */
     for (i = 0; i <= depth; i++)
@@ -469,7 +471,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         }
         /* now the lower <depth> bits contain the pattern */
 
-        _gray_info.bitpattern[i] = pattern;
+        _gray_info.bitpattern[i] = pattern << bitfill;
     }
 #endif
 
@@ -797,101 +799,93 @@ void gray_update_rect(int x, int y, int width, int height)
         "eor     r7, r7, r0                  \n"  /* r7 = ...h6g6f6e6d6c6b6a6 */
         "eor     r8, r8, r0, lsr #1          \n"  /* r8 = ...h7g7f7e7d7c7b7a7 */
 
+        "sub     r0, %[dpth], #1             \n"  /** shift out unused low bytes **/
+        "and     r0, r0, #7                  \n"
+        "add     pc, pc, r0, lsl #2          \n"  /* jump into shift streak */
+        "mov     r8, r8, lsr #8              \n"  /* r8: never reached */
+        "mov     r7, r7, lsr #8              \n"
+        "mov     r6, r6, lsr #8              \n"
+        "mov     r5, r5, lsr #8              \n"
+        "mov     r4, r4, lsr #8              \n"
+        "mov     r3, r3, lsr #8              \n"
+        "mov     r2, r2, lsr #8              \n"
+        "mov     r1, r1, lsr #8              \n"
+
         "mvn     %[mask], %[mask]            \n"  /* "set" mask -> "keep" mask */
         "ands    %[mask], %[mask], #0xff     \n"
-        "beq     .ur_sloop                   \n"  /* short loop if no bits to keep */
+        "beq     .ur_sstart                  \n"  /* short loop if no bits to keep */
 
-    ".ur_floop:                              \n"  /** full loop (bits to keep)**/
-        "cmp     %[dpth], #8                 \n"  /* 8 planes or more left? */
-        "bhs     .ur_f8                      \n"
-
-        "mul     r0, %[psiz], %[dpth]        \n"  /* point behind the last plane */
-        "add     %[addr], %[addr], r0        \n"  /*   for this round */
-
-        "ldrb    r0, [pc, %[dpth]]           \n"  /* jump into streak */
+        "ldrb    r0, [pc, r0]                \n"  /* jump into full loop */
         "add     pc, pc, r0                  \n"
     ".ur_ftable:                             \n"
-        ".byte   .ur_f0 - .ur_ftable - 4     \n"  /* [jump tables are tricky] */
-        ".byte   .ur_f1 - .ur_ftable - 4     \n"
+        ".byte   .ur_f1 - .ur_ftable - 4     \n"  /* [jump tables are tricky] */
         ".byte   .ur_f2 - .ur_ftable - 4     \n"
         ".byte   .ur_f3 - .ur_ftable - 4     \n"
         ".byte   .ur_f4 - .ur_ftable - 4     \n"
         ".byte   .ur_f5 - .ur_ftable - 4     \n"
         ".byte   .ur_f6 - .ur_ftable - 4     \n"
         ".byte   .ur_f7 - .ur_ftable - 4     \n"
+        ".byte   .ur_f8 - .ur_ftable - 4     \n"
 
+    ".ur_floop:                              \n"  /** full loop (bits to keep)**/
     ".ur_f8:                                 \n"
-        "add     %[addr], %[addr], %[psiz], lsl #3   \n"  
-        /* Point behind the last plane for this round. Note: We're using the
-         * registers backwards in order to reuse the streak for the last round.
-         * Therefore we need to go thru the bitplanes backwards too, otherwise
-         * the bit order would be destroyed which results in more flicker. */
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"  /* load old byte */
+        "ldrb    r0, [%[addr]]               \n"  /* load old byte */
         "and     r0, r0, %[mask]             \n"  /* mask out replaced bits */
-        "orr     r0, r0, r8                  \n"  /* set new bits */
-        "strb    r0, [%[addr]]               \n"  /* store byte */
-        "mov     r8, r8, lsr #8              \n"  /* shift out used-up byte */
+        "orr     r0, r0, r1                  \n"  /* set new bits */
+        "strb    r0, [%[addr]], %[psiz]      \n"  /* store byte */
+        "mov     r1, r1, lsr #8              \n"  /* shift out used-up byte */
     ".ur_f7:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
-        "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r7                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r7, r7, lsr #8              \n"
-    ".ur_f6:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
-        "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r6                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r6, r6, lsr #8              \n"
-    ".ur_f5:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
-        "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r5                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r5, r5, lsr #8              \n"
-    ".ur_f4:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
-        "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r4                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r4, r4, lsr #8              \n"
-    ".ur_f3:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
-        "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r3                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r3, r3, lsr #8              \n"
-    ".ur_f2:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
+        "ldrb    r0, [%[addr]]               \n"
         "and     r0, r0, %[mask]             \n"
         "orr     r0, r0, r2                  \n"
-        "strb    r0, [%[addr]]               \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
         "mov     r2, r2, lsr #8              \n"
-    ".ur_f1:                                 \n"
-        "ldrb    r0, [%[addr], -%[psiz]]!    \n"
+    ".ur_f6:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
         "and     r0, r0, %[mask]             \n"
-        "orr     r0, r0, r1                  \n"
-        "strb    r0, [%[addr]]               \n"
-        "mov     r1, r1, lsr #8              \n"
-    ".ur_f0:                                 \n"
+        "orr     r0, r0, r3                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r3, r3, lsr #8              \n"
+    ".ur_f5:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r4                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r4, r4, lsr #8              \n"
+    ".ur_f4:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r5                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r5, r5, lsr #8              \n"
+    ".ur_f3:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r6                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r6, r6, lsr #8              \n"
+    ".ur_f2:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r7                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r7, r7, lsr #8              \n"
+    ".ur_f1:                                 \n"
+        "ldrb    r0, [%[addr]]               \n"
+        "and     r0, r0, %[mask]             \n"
+        "orr     r0, r0, r8                  \n"
+        "strb    r0, [%[addr]], %[psiz]      \n"
+        "mov     r8, r8, lsr #8              \n"
 
-        "add     %[addr], %[addr], %[psiz], lsl #3   \n" /* correct address */
         "subs    %[dpth], %[dpth], #8        \n"  /* next round if anything left */
         "bhi     .ur_floop                   \n"
 
         "b       .ur_end                     \n"
 
-    ".ur_sloop:                              \n"  /** short loop (nothing to keep) **/
-        "cmp     %[dpth], #8                 \n"  /* 8 planes or more left? */
-        "bhs     .ur_s8                      \n"
-
-        "mul     r0, %[psiz], %[dpth]        \n"  /* point behind the last plane */
-        "add     %[addr], %[addr], r0        \n"  /*   for this round */
-        
-        "ldrb    r0, [pc, %[dpth]]           \n"  /* jump into streak */
+    ".ur_sstart:                             \n"
+        "ldrb    r0, [pc, r0]                \n"  /* jump into short loop*/
         "add     pc, pc, r0                  \n"
     ".ur_stable:                             \n"
-        ".byte   .ur_s0 - .ur_stable - 4     \n"
         ".byte   .ur_s1 - .ur_stable - 4     \n"
         ".byte   .ur_s2 - .ur_stable - 4     \n"
         ".byte   .ur_s3 - .ur_stable - 4     \n"
@@ -899,36 +893,34 @@ void gray_update_rect(int x, int y, int width, int height)
         ".byte   .ur_s5 - .ur_stable - 4     \n"
         ".byte   .ur_s6 - .ur_stable - 4     \n"
         ".byte   .ur_s7 - .ur_stable - 4     \n"
+        ".byte   .ur_s8 - .ur_stable - 4     \n"
 
+    ".ur_sloop:                              \n"  /** short loop (nothing to keep) **/
     ".ur_s8:                                 \n"
-        "add     %[addr], %[addr], %[psiz], lsl #3   \n"
-                 /* Point behind the last plane for this round. See above. */
-        "strb    r8, [%[addr], -%[psiz]]!    \n"  /* store byte */
-        "mov     r8, r8, lsr #8              \n"  /* shift out used-up byte */
+        "strb    r1, [%[addr]], %[psiz]      \n"  /* store byte */
+        "mov     r1, r1, lsr #8              \n"  /* shift out used-up byte */
     ".ur_s7:                                 \n"
-        "strb    r7, [%[addr], -%[psiz]]!    \n"
-        "mov     r7, r7, lsr #8              \n"
-    ".ur_s6:                                 \n"
-        "strb    r6, [%[addr], -%[psiz]]!    \n"
-        "mov     r6, r6, lsr #8              \n"
-    ".ur_s5:                                 \n"
-        "strb    r5, [%[addr], -%[psiz]]!    \n"
-        "mov     r5, r5, lsr #8              \n"
-    ".ur_s4:                                 \n"
-        "strb    r4, [%[addr], -%[psiz]]!    \n"
-        "mov     r4, r4, lsr #8              \n"
-    ".ur_s3:                                 \n"
-        "strb    r3, [%[addr], -%[psiz]]!    \n"
-        "mov     r3, r3, lsr #8              \n"
-    ".ur_s2:                                 \n"
-        "strb    r2, [%[addr], -%[psiz]]!    \n"
+        "strb    r2, [%[addr]], %[psiz]      \n"
         "mov     r2, r2, lsr #8              \n"
+    ".ur_s6:                                 \n"
+        "strb    r3, [%[addr]], %[psiz]      \n"
+        "mov     r3, r3, lsr #8              \n"
+    ".ur_s5:                                 \n"
+        "strb    r4, [%[addr]], %[psiz]      \n"
+        "mov     r4, r4, lsr #8              \n"
+    ".ur_s4:                                 \n"
+        "strb    r5, [%[addr]], %[psiz]      \n"
+        "mov     r5, r5, lsr #8              \n"
+    ".ur_s3:                                 \n"
+        "strb    r6, [%[addr]], %[psiz]      \n"
+        "mov     r6, r6, lsr #8              \n"
+    ".ur_s2:                                 \n"
+        "strb    r7, [%[addr]], %[psiz]      \n"
+        "mov     r7, r7, lsr #8              \n"
     ".ur_s1:                                 \n"
-        "strb    r1, [%[addr], -%[psiz]]!    \n"
-        "mov     r1, r1, lsr #8              \n"
-    ".ur_s0:                                 \n"
+        "strb    r8, [%[addr]], %[psiz]      \n"
+        "mov     r8, r8, lsr #8              \n"
 
-        "add     %[addr], %[addr], %[psiz], lsl #3   \n"  /* correct address */
         "subs    %[dpth], %[dpth], #8        \n"  /* next round if anything left */
         "bhi     .ur_sloop                   \n"
 
@@ -956,7 +948,7 @@ void gray_update_rect(int x, int y, int width, int height)
             {
                 unsigned char *addr, *end;
                 unsigned mask = 0;
-                unsigned test = 1;
+                unsigned test = 1 << ((-_gray_info.depth) & 7);
                 int i;
 
                 /* precalculate the bit patterns with random shifts
@@ -1287,25 +1279,37 @@ void gray_update_rect(int x, int y, int width, int height)
         "shlr    r0                  \n"
         "xor     r0, r8              \n"  /* r8 = ...h7g7f7e7d7c7b7a7 */
 
-        "tst     %[mask], %[mask]    \n"
-        "bt      .ur_sloop           \n"  /* short loop if nothing to keep */
-
-    ".ur_floop:                      \n"  /** full loop (there are bits to keep)**/
-        "mov     #8, r0              \n"
-        "cmp/hs  r0, %[dpth]         \n"  /* 8 planes or more left? */
-        "bt      .ur_f8              \n"
-        
-        "mulu    %[psiz], %[dpth]    \n"
-        "mova    .ur_ftable, r0      \n"
-        "mov.b   @(r0, %[dpth]), %[rx]   \n"
+        "mov     %[dpth], %[rx]      \n"  /** shift out unused low bytes **/
+        "add     #-1, %[rx]          \n"
+        "mov     #7, r0              \n"
+        "and     r0, %[rx]           \n"
+        "mova    .ur_pshift, r0      \n"
         "add     %[rx], r0           \n"
-        "sts     macl, %[rx]         \n"  /* point behind the last plane.. */
-        "jmp     @r0                 \n"  /* jump into streak */
-        "add     %[rx], %[addr]      \n"  /* ..for this round */
+        "add     %[rx], r0           \n"
+        "jmp     @r0                 \n"  /* jump into shift streak */
+        "nop                         \n"
+
+        ".align  2                   \n"
+    ".ur_pshift:                     \n"
+        "shlr8   r7                  \n"
+        "shlr8   r6                  \n"
+        "shlr8   r5                  \n"
+        "shlr8   r4                  \n"
+        "shlr8   r3                  \n"
+        "shlr8   r2                  \n"
+        "shlr8   r1                  \n"
+
+        "tst     %[mask], %[mask]    \n"
+        "bt      .ur_sstart          \n"  /* short loop if nothing to keep */
         
+        "mova    .ur_ftable, r0      \n"  /* jump into full loop */
+        "mov.b   @(r0, %[rx]), %[rx] \n"
+        "add     %[rx], r0           \n"
+        "jmp     @r0                 \n"
+        "nop                         \n"
+
         ".align  2                   \n"
     ".ur_ftable:                     \n"
-        ".byte   .ur_f0 - .ur_ftable \n"
         ".byte   .ur_f1 - .ur_ftable \n"
         ".byte   .ur_f2 - .ur_ftable \n"
         ".byte   .ur_f3 - .ur_ftable \n"
@@ -1313,74 +1317,66 @@ void gray_update_rect(int x, int y, int width, int height)
         ".byte   .ur_f5 - .ur_ftable \n"
         ".byte   .ur_f6 - .ur_ftable \n"
         ".byte   .ur_f7 - .ur_ftable \n"
+        ".byte   .ur_f8 - .ur_ftable \n"
 
+    ".ur_floop:                      \n"  /** full loop (there are bits to keep)**/
     ".ur_f8:                         \n"
-        "mov     %[psiz], %[rx]      \n"
-        "shll2   %[rx]               \n"
-        "add     %[rx], %[rx]        \n"
-        "add     %[rx], %[addr]      \n"
-        /* Point behind the last plane for this round. Note: We're using the
-         * registers backwards in order to reuse the streak for the last round.
-         * Therefore we need to go thru the bitplanes backwards too, otherwise
-         * the bit order would be destroyed which results in more flicker. */
-        "sub     %[psiz], %[addr]    \n"
         "mov.b   @%[addr], r0        \n"  /* load old byte */
         "and     %[mask], r0         \n"  /* mask out replaced bits */
-        "or      r8, r0              \n"  /* set new bits */
+        "or      r1, r0              \n"  /* set new bits */
         "mov.b   r0, @%[addr]        \n"  /* store byte */
-        "shlr8   r8                  \n"  /* shift out used-up byte */
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r1                  \n"  /* shift out used-up byte */
     ".ur_f7:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   @%[addr], r0        \n"
-        "and     %[mask], r0         \n"
-        "or      r7, r0              \n"
-        "mov.b   r0, @%[addr]        \n"
-        "shlr8   r7                  \n"
-    ".ur_f6:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   @%[addr], r0        \n"
-        "and     %[mask], r0         \n"
-        "or      r6, r0              \n"
-        "mov.b   r0, @%[addr]        \n"
-        "shlr8   r6                  \n"
-    ".ur_f5:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   @%[addr], r0        \n"
-        "and     %[mask], r0         \n"
-        "or      r5, r0              \n"
-        "mov.b   r0, @%[addr]        \n"
-        "shlr8   r5                  \n"
-    ".ur_f4:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   @%[addr], r0        \n"
-        "and     %[mask], r0         \n"
-        "or      r4, r0              \n"
-        "mov.b   r0, @%[addr]        \n"
-        "shlr8   r4                  \n"
-    ".ur_f3:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   @%[addr], r0        \n"
-        "and     %[mask], r0         \n"
-        "or      r3, r0              \n"
-        "mov.b   r0, @%[addr]        \n"
-        "shlr8   r3                  \n"
-    ".ur_f2:                         \n"
-        "sub     %[psiz], %[addr]    \n"
         "mov.b   @%[addr], r0        \n"
         "and     %[mask], r0         \n"
         "or      r2, r0              \n"
         "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
         "shlr8   r2                  \n"
-    ".ur_f1:                         \n"
-        "sub     %[psiz], %[addr]    \n"
+    ".ur_f6:                         \n"
         "mov.b   @%[addr], r0        \n"
         "and     %[mask], r0         \n"
-        "or      r1, r0              \n"
+        "or      r3, r0              \n"
         "mov.b   r0, @%[addr]        \n"
-        "shlr8   r1                  \n"
-    ".ur_f0:                         \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r3                  \n"
+    ".ur_f5:                         \n"
+        "mov.b   @%[addr], r0        \n"
+        "and     %[mask], r0         \n"
+        "or      r4, r0              \n"
+        "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r4                  \n"
+    ".ur_f4:                         \n"
+        "mov.b   @%[addr], r0        \n"
+        "and     %[mask], r0         \n"
+        "or      r5, r0              \n"
+        "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r5                  \n"
+    ".ur_f3:                         \n"
+        "mov.b   @%[addr], r0        \n"
+        "and     %[mask], r0         \n"
+        "or      r6, r0              \n"
+        "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r6                  \n"
+    ".ur_f2:                         \n"
+        "mov.b   @%[addr], r0        \n"
+        "and     %[mask], r0         \n"
+        "or      r7, r0              \n"
+        "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r7                  \n"
+    ".ur_f1:                         \n"
+        "mov.b   @%[addr], r0        \n"
+        "and     %[mask], r0         \n"
+        "or      r8, r0              \n"
+        "mov.b   r0, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r8                  \n"
 
-        "add     %[rx], %[addr]      \n"  /* correct address */
         "add     #-8, %[dpth]        \n"
         "cmp/pl  %[dpth]             \n"  /* next round if anything left */
         "bt      .ur_floop           \n"
@@ -1404,22 +1400,15 @@ void gray_update_rect(int x, int y, int width, int height)
     ".ur_mask1:                      \n"
         ".long   0xAAAAAAAA          \n"
 
-    ".ur_sloop:                      \n"  /** short loop (nothing to keep) **/
-        "mov     #8, r0              \n"
-        "cmp/hs  r0, %[dpth]         \n"  /* 8 planes or more left? */
-        "bt      .ur_s8              \n"
-
-        "mulu    %[psiz], %[dpth]    \n"
-        "mova    .ur_stable, r0      \n"
-        "mov.b   @(r0, %[dpth]), %[rx]   \n"
+    ".ur_sstart:                     \n"
+        "mova    .ur_stable, r0      \n"  /* jump into short loop */
+        "mov.b   @(r0, %[rx]), %[rx] \n"
         "add     %[rx], r0           \n"
-        "sts     macl, %[rx]         \n"  /* point behind the last plane.. */
-        "jmp     @r0                 \n"  /* jump into streak */
-        "add     %[rx], %[addr]      \n"  /* ..for this round */
+        "jmp     @r0                 \n"
+        "nop                         \n"
 
         ".align  2                   \n"
     ".ur_stable:                     \n"
-        ".byte   .ur_s0 - .ur_stable \n"
         ".byte   .ur_s1 - .ur_stable \n"
         ".byte   .ur_s2 - .ur_stable \n"
         ".byte   .ur_s3 - .ur_stable \n"
@@ -1427,47 +1416,42 @@ void gray_update_rect(int x, int y, int width, int height)
         ".byte   .ur_s5 - .ur_stable \n"
         ".byte   .ur_s6 - .ur_stable \n"
         ".byte   .ur_s7 - .ur_stable \n"
+        ".byte   .ur_s8 - .ur_stable \n"
 
+    ".ur_sloop:                      \n"  /** short loop (nothing to keep) **/
     ".ur_s8:                         \n"
-        "mov     %[psiz], %[rx]      \n"  /* Point behind the last plane */
-        "shll2   %[rx]               \n"  /*   for this round. */
-        "add     %[rx], %[rx]        \n"  /*   See above. */
-        "add     %[rx], %[addr]      \n"
-
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r8, @%[addr]        \n"  /* store byte */
-        "shlr8   r8                  \n"  /* shift out used-up byte */
+        "mov.b   r1, @%[addr]        \n"  /* store byte */
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r1                  \n"  /* shift out used-up byte */
     ".ur_s7:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r7, @%[addr]        \n"
-        "shlr8   r7                  \n"
-    ".ur_s6:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r6, @%[addr]        \n"
-        "shlr8   r6                  \n"
-    ".ur_s5:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r5, @%[addr]        \n"
-        "shlr8   r5                  \n"
-    ".ur_s4:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r4, @%[addr]        \n"
-        "shlr8   r4                  \n"
-    ".ur_s3:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r3, @%[addr]        \n"
-        "shlr8   r3                  \n"
-    ".ur_s2:                         \n"
-        "sub     %[psiz], %[addr]    \n"
         "mov.b   r2, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
         "shlr8   r2                  \n"
+    ".ur_s6:                         \n"
+        "mov.b   r3, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r3                  \n"
+    ".ur_s5:                         \n"
+        "mov.b   r4, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r4                  \n"
+    ".ur_s4:                         \n"
+        "mov.b   r5, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r5                  \n"
+    ".ur_s3:                         \n"
+        "mov.b   r6, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r6                  \n"
+    ".ur_s2:                         \n"
+        "mov.b   r7, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r7                  \n"
     ".ur_s1:                         \n"
-        "sub     %[psiz], %[addr]    \n"
-        "mov.b   r1, @%[addr]        \n"
-        "shlr8   r1                  \n"
-    ".ur_s0:                         \n"
+        "mov.b   r8, @%[addr]        \n"
+        "add     %[psiz], %[addr]    \n"
+        "shlr8   r8                  \n"
 
-        "add     %[rx], %[addr]      \n"  /* correct address */
         "add     #-8, %[dpth]        \n"
         "cmp/pl  %[dpth]             \n"  /* next round if anything left */
         "bt      .ur_sloop           \n"
@@ -1677,172 +1661,163 @@ void gray_update_rect(int x, int y, int width, int height)
         "move.l  %%a0, %%d5          \n"
         "eor.l   %%d5, %%d0          \n"
         "and.l   #0xAAAAAAAA, %%d0   \n"
-        "eor.l   %%d0, %%d5          \n"
-        "move.l  %%d5, %%a0          \n"  /* a0 = ...h0g0f0e0d0c0b0a0 */
+        "eor.l   %%d0, %%d5          \n"  /* (a0 = ...h0g0f0e0d0c0b0a0) */
+        /* move.l  %%d5, %%a0         */  /*  but keep in d5 for shift streak */
         "lsr.l   #1, %%d0            \n"
         "eor.l   %%d0, %%d7          \n"  /* d7 = ...h1g1f1e1d1c1b1a1 */
+        
+        "move.l  %[dpth], %%d0       \n"  /** shift out unused low bytes **/
+        "subq.l  #1, %%d0            \n"
+        "and.l   #7, %%d0            \n"
+        "move.l  %%d0, %%a0          \n"
+        "move.l  %[ax], %%d0         \n"  /* all data in D registers */
+        "jmp     (2, %%pc, %%a0:l:2) \n"  /* jump into shift streak */
+        "lsr.l   #8, %%d2            \n"
+        "lsr.l   #8, %%d3            \n"
+        "lsr.l   #8, %%d4            \n"
+        "lsr.l   #8, %%d0            \n"
+        "lsr.l   #8, %%d6            \n"
+        "lsr.l   #8, %%d7            \n"
+        "lsr.l   #8, %%d5            \n"
+        "move.l  %%d0, %[ax]         \n"  /* put the 2 extra words back.. */
+        "move.l  %%a0, %%d0          \n"  /* keep the value for later */
+        "move.l  %%d5, %%a0          \n"  /* ..into their A registers */
 
         "tst.l   %[mask]             \n"
-        "jeq     .ur_sloop           \n"  /* short loop if nothing to keep */
+        "jeq     .ur_sstart          \n"  /* short loop if nothing to keep */
 
         "move.l  %[mask], %%d5       \n"  /* need mask in data reg. */
         "move.l  %%d1, %[mask]       \n"  /* free d1 as working reg. */
 
-    ".ur_floop:                      \n"  /** full loop (there are bits to keep)**/
-        "cmp.l   #8, %[dpth]         \n"  /* 8 planes or more left? */
-        "bhs.s   .ur_f8              \n"
-
-        "move.l  %[psiz], %%d0       \n"
-        "move.l  %[dpth], %%d1       \n"
-        "mulu.w  %%d1, %%d0          \n"  /* point behind the last plane */
-        "add.l   %%d0, %[addr]       \n"  /*   for this round */
-        "jmp     (%%pc, %[dpth]:l:2) \n"  /* jump into streak */
-        "bra.s   .ur_f1              \n"  /* dpth == 0 should never happen */
+        "jmp     (2, %%pc, %%d0:l:2) \n"  /* jump into full loop */
+        "bra.s   .ur_f1              \n"
         "bra.s   .ur_f2              \n"
         "bra.s   .ur_f3              \n"
         "bra.s   .ur_f4              \n"
         "bra.s   .ur_f5              \n"
         "bra.s   .ur_f6              \n"
         "bra.s   .ur_f7              \n"
+        /* bra.s   .ur_f8             */  /* identical with target */
 
+    ".ur_floop:                      \n"  /** full loop (there are bits to keep)**/
     ".ur_f8:                         \n"
-        "move.l  %[psiz], %%d0       \n"
-        "lsl.l   #3, %%d0            \n"
-        "add.l   %%d0, %[addr]       \n"
-        /* Point behind the last plane for this round. Note: We're using the
-         * registers backwards in order to reuse the streak for the last round.
-         * Therefore we need to go thru the bitplanes backwards too, otherwise
-         * the bit order would be destroyed which results in more flicker. */
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"  /* load old byte */
         "and.l   %%d5, %%d0          \n"  /* mask out replaced bits */
-        "move.l  %[mask], %%d1       \n"
+        "move.l  %%a0, %%d1          \n"
         "or.l    %%d1, %%d0          \n"  /* set new bits */
         "move.b  %%d0, (%[addr])     \n"  /* store byte */
+        "add.l   %[psiz], %[addr]    \n"
         "lsr.l   #8, %%d1            \n"  /* shift out used-up byte */
-        "move.l  %%d1, %[mask]       \n"
+        "move.l  %%d1, %%a0          \n"
     ".ur_f7:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
-        "or.l    %%d2, %%d0          \n"
+        "or.l    %%d7, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
-        "lsr.l   #8, %%d2            \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d7            \n"
     ".ur_f6:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
-        "or.l    %%d3, %%d0          \n"
+        "or.l    %%d6, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
-        "lsr.l   #8, %%d3            \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d6            \n"
     ".ur_f5:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  (%[addr]), %%d0     \n"
-        "and.l   %%d5, %%d0          \n"
-        "or.l    %%d4, %%d0          \n"
-        "move.b  %%d0, (%[addr])     \n"
-        "lsr.l   #8, %%d4            \n"
-    ".ur_f4:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
         "move.l  %[ax], %%d1         \n"
         "or.l    %%d1, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
         "lsr.l   #8, %%d1            \n"
         "move.l  %%d1, %[ax]         \n"
+    ".ur_f4:                         \n"
+        "move.b  (%[addr]), %%d0     \n"
+        "and.l   %%d5, %%d0          \n"
+        "or.l    %%d4, %%d0          \n"
+        "move.b  %%d0, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d4            \n"
     ".ur_f3:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
-        "or.l    %%d6, %%d0          \n"
+        "or.l    %%d3, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
-        "lsr.l   #8, %%d6            \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d3            \n"
     ".ur_f2:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
-        "or.l    %%d7, %%d0          \n"
+        "or.l    %%d2, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
-        "lsr.l   #8, %%d7            \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d2            \n"
     ".ur_f1:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.b  (%[addr]), %%d0     \n"
         "and.l   %%d5, %%d0          \n"
-        "move.l  %%a0, %%d1          \n"
+        "move.l  %[mask], %%d1       \n"
         "or.l    %%d1, %%d0          \n"
         "move.b  %%d0, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
         "lsr.l   #8, %%d1            \n"
-        "move.l  %%d1, %%a0          \n"
+        "move.l  %%d1, %[mask]       \n"
 
-        "move.l  %[psiz], %%d0       \n"
-        "lsl.l   #3, %%d0            \n"
-        "add.l   %%d0, %[addr]       \n"  /* correct address */
         "subq.l  #8, %[dpth]         \n"
         "tst.l   %[dpth]             \n"  /* subq doesn't set flags for A reg */
         "jgt     .ur_floop           \n"  /* next round if anything left */
 
         "jra     .ur_end             \n"
 
-    ".ur_sloop:                      \n"  /** short loop (nothing to keep) **/
-        "cmp.l   #8, %[dpth]         \n"  /* 8 planes or more left? */
-        "bhs.s   .ur_s8              \n"
-
-        "move.l  %[psiz], %%d0       \n"
-        "move.l  %[dpth], %%d5       \n"
-        "mulu.w  %%d5, %%d0          \n"  /* point behind the last plane */
-        "add.l   %%d0, %[addr]       \n"  /*   for this round */
-        "jmp     (%%pc, %[dpth]:l:2) \n"  /* jump into streak */
-        "bra.s   .ur_s1              \n"  /* dpth == 0 should never happen */
+    ".ur_sstart:                     \n"
+        "jmp     (2, %%pc, %%d0:l:2) \n"  /* jump into short loop */
+        "bra.s   .ur_s1              \n"
         "bra.s   .ur_s2              \n"
         "bra.s   .ur_s3              \n"
         "bra.s   .ur_s4              \n"
         "bra.s   .ur_s5              \n"
         "bra.s   .ur_s6              \n"
         "bra.s   .ur_s7              \n"
+        /* bra.s   .ur_s8             */  /* identical with target */
 
+    ".ur_sloop:                      \n"  /** short loop (nothing to keep) **/
     ".ur_s8:                         \n"
-        "move.l  %[psiz], %%d0       \n"  /* Point behind the last plane */
-        "lsl.l   #3, %%d0            \n"  /*   for this round. */
-        "add.l   %%d0, %[addr]       \n"  /*   See above. */
-
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d1, (%[addr])     \n"  /* store byte */
-        "lsr.l   #8, %%d1            \n"  /* shift out used-up byte */
+        "move.l  %%a0, %%d5          \n"
+        "move.b  %%d5, (%[addr])     \n"  /* store byte */
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d5            \n"  /* shift out used-up byte */
+        "move.l  %%d5, %%a0          \n"
     ".ur_s7:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d2, (%[addr])     \n"
-        "lsr.l   #8, %%d2            \n"
+        "move.b  %%d7, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d7            \n"
     ".ur_s6:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d3, (%[addr])     \n"
-        "lsr.l   #8, %%d3            \n"
+        "move.b  %%d6, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d6            \n"
     ".ur_s5:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d4, (%[addr])     \n"
-        "lsr.l   #8, %%d4            \n"
-    ".ur_s4:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
         "move.l  %[ax], %%d5         \n"
         "move.b  %%d5, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
         "lsr.l   #8, %%d5            \n"
         "move.l  %%d5, %[ax]         \n"
+    ".ur_s4:                         \n"
+        "move.b  %%d4, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d4            \n"
     ".ur_s3:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d6, (%[addr])     \n"
-        "lsr.l   #8, %%d6            \n"
+        "move.b  %%d3, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d3            \n"
     ".ur_s2:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.b  %%d7, (%[addr])     \n"
-        "lsr.l   #8, %%d7            \n"
+        "move.b  %%d2, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d2            \n"
     ".ur_s1:                         \n"
-        "sub.l   %[psiz], %[addr]    \n"
-        "move.l  %%a0, %%d5          \n"
-        "move.b  %%d5, (%[addr])     \n"
-        "lsr.l   #8, %%d5            \n"
-        "move.l  %%d5, %%a0          \n"
+        "move.b  %%d1, (%[addr])     \n"
+        "add.l   %[psiz], %[addr]    \n"
+        "lsr.l   #8, %%d1            \n"
 
-        "add.l   %%d0, %[addr]       \n"  /* correct address */
         "subq.l  #8, %[dpth]         \n"
         "tst.l   %[dpth]             \n"  /* subq doesn't set flags for A reg */
         "jgt     .ur_sloop           \n"  /* next round if anything left */
@@ -1871,7 +1846,7 @@ void gray_update_rect(int x, int y, int width, int height)
             {
                 unsigned char *addr, *end;
                 unsigned mask = 0;
-                unsigned test = 1;
+                unsigned test = 1 << ((-_gray_info.depth) & 7);
                 int i;
 
                 /* precalculate the bit patterns with random shifts
