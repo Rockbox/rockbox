@@ -959,7 +959,6 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
     int i;
     char buf[MAX_PATH];
     int from, to, direction;
-    bool first = true;
 
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
