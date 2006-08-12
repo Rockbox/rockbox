@@ -109,29 +109,57 @@ void app_main(void)
     browse_root();
 }
 
-int init_dircache(void)
+int init_dircache(bool preinit)
 {
 #ifdef HAVE_DIRCACHE
     int result = 0;
+    bool clear = false;
     
-    dircache_init();
+    if (preinit)
+        dircache_init();
+    
     if (global_settings.dircache)
     {
 # ifdef HAVE_EEPROM
-        if (firmware_settings.initialized && firmware_settings.disk_clean)
+        if (firmware_settings.initialized && firmware_settings.disk_clean 
+            && preinit)
         {
             result = dircache_load(DIRCACHE_FILE);
             remove(DIRCACHE_FILE);
-            if (result == 0)
-                return 0;
+            if (result < 0)
+                firmware_settings.disk_clean = false;
+
+            return result;
         }
 # endif
         
-        result = dircache_build(global_settings.dircache_size);
+        if (preinit)
+            return -1;
+        
+        if (!dircache_is_enabled()
+            && !dircache_is_initializing())
+        {
+            if (global_settings.dircache_size <= 0)
+            {
+                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                clear = true;
+            }
+            result = dircache_build(global_settings.dircache_size);
+        }
+        
+        if (result < 0)
+            gui_syncsplash(0, true, "Failed! Result: %d", result);
+        
+        if (clear)
+        {
+            backlight_on();
+            show_logo();
+        }
     }
     
     return result;
 #else
+    (void)preinit;
     return 0;
 #endif
 }
@@ -195,7 +223,8 @@ void init(void)
     settings_load(SETTINGS_ALL);
     gui_sync_wps_init();
     settings_apply();
-    init_dircache();
+    init_dircache(true);
+    init_dircache(false);
     init_tagcache();
     sleep(HZ/2);
     tree_init();
@@ -401,11 +430,14 @@ void init(void)
         settings_load(SETTINGS_ALL);
 
     
-    init_dircache();
+    if (init_dircache(true) < 0)
+    {
+        remove(TAGCACHE_STATEFILE);
+    }
     
     gui_sync_wps_init();
     settings_apply();
-    //init_dircache();
+    init_dircache(false);
     init_tagcache();
 
 #ifdef HAVE_EEPROM
