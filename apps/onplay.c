@@ -172,6 +172,8 @@ static bool add_to_playlist(int position, bool queue)
     };
     struct text_message message={lines, 2};
 
+    gui_syncsplash(0, true, str(LANG_WAIT));
+    
     if (new_playlist)
         playlist_create(NULL, NULL);
 

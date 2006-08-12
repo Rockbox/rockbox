@@ -526,7 +526,7 @@ bool show_search_progress(bool init, int count)
         return true;
     }
     
-    if (current_tick - last_tick > HZ/2)
+    if (current_tick - last_tick > HZ/4)
     {
         gui_syncsplash(0, true, str(LANG_PLAYLIST_SEARCH_MSG), count,
 #if CONFIG_KEYPAD == PLAYER_PAD
@@ -538,6 +538,7 @@ bool show_search_progress(bool init, int count)
         if (SETTINGS_CANCEL == button_get(false))
             return false;
         last_tick = current_tick;
+        yield();
     }
     
     return true;
@@ -993,6 +994,8 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 
         if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
             break;
+        
+        yield();
     }
     playlist_sync(NULL);
     tagcache_search_finish(&tcs);
@@ -1007,6 +1010,9 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     char buf[MAX_PATH];
     int dirlevel = tc->dirlevel;
 
+    /* We need to set the table to allsubentries. */
+    show_search_progress(true, 0);
+    
     dptr = tagtree_get_entry(tc, tc->selected_item);
     
     /* Insert a single track? */
@@ -1022,8 +1028,6 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         return true;
     }
     
-    /* We need to set the table to allsubentries. */
-    show_search_progress(true, 0);
     if (dptr->newtable == navibrowse)
     {
         tagtree_enter(tc);

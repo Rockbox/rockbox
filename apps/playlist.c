@@ -1873,9 +1873,30 @@ int playlist_resume(void)
         char *str1 = NULL;
         char *str2 = NULL;
         char *str3 = NULL;
-
+        unsigned long last_tick = current_tick;
+        
         for(count=0; count<nread && !exit_loop; count++,p++)
         {
+            /* So a splash while we are loading. */
+            if (current_tick - last_tick > HZ/4)
+            {
+                gui_syncsplash(0, true, str(LANG_LOADING_PERCENT), 
+                               (total_read+count)*100/control_file_size,
+#if CONFIG_KEYPAD == PLAYER_PAD
+                               str(LANG_STOP_ABORT)
+#else
+                               str(LANG_OFF_ABORT)
+#endif
+                               );
+                if (SETTINGS_CANCEL == button_get(false))
+                {
+                    /* FIXME: 
+                     * Not sure how to implement this, somebody more familiar
+                     * with the code, please fix this. */
+                }
+                last_tick = current_tick;
+            }
+            
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
             {

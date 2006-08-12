@@ -9534,3 +9534,17 @@
     *: "Split Filesize"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Loading... %d%% done (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

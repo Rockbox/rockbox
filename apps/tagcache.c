@@ -2657,6 +2657,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         }
         
         write(clfd, "\n", 1);
+        yield();
     }
     
     close(clfd);
