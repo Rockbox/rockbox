@@ -55,6 +55,31 @@ static bool pcm_paused;
 /* the registered callback function to ask for more mp3 data */
 static void (*callback_for_more)(unsigned char**, size_t*) IDATA_ATTR = NULL;
 
+#if (CONFIG_CPU == PNX0101 || CONFIG_CPU == S3C2440)
+
+/* TODO: Implement for iFP7xx
+   For now, just implement some dummy functions.
+*/
+
+void pcm_init(void)
+{
+
+}
+
+void pcm_set_frequency(unsigned int frequency)
+{
+    (void)frequency;
+}
+
+void pcm_play_stop(void)
+{
+}
+
+size_t pcm_get_bytes_waiting(void)
+{
+    return 0;
+}
+#else
 #ifdef CPU_COLDFIRE
 
 #ifdef HAVE_SPDIF_OUT
@@ -501,29 +526,13 @@ void pcm_init(void)
     dma_stop();
 }
 
-#elif (CONFIG_CPU == PNX0101)
-
-/* TODO: Implement for iFP7xx
-   For now, just implement some dummy functions.
-*/
-
-void pcm_init(void)
-{
-
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
-}
+#endif
 
 void pcm_play_stop(void)
 {
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return 0;
+    if (pcm_playing) {
+        dma_stop();
+    }
 }
 
 #endif
@@ -562,13 +571,6 @@ void pcm_mute(bool mute)
 #endif
     if (mute)
         sleep(HZ/16);
-}
-
-void pcm_play_stop(void)
-{
-    if (pcm_playing) {
-        dma_stop();
-    }
 }
 
 void pcm_play_pause(bool play)
@@ -620,11 +622,11 @@ void pcm_play_pause(bool play)
                     IISFIFO_WR = (*(p++))<<16;
                     p_size-=4;
                 }
-#elif (CONFIG_CPU == PNX0101) /* End wmcodecs */
+#elif (CONFIG_CPU == PNX0101 || CONFIG_CPU == S3C2440) /* End wmcodecs */
                 /* nothing yet */
 #endif
             } else {
-#if (CONFIG_CPU != PNX0101)
+#if (CONFIG_CPU != PNX0101 && CONFIG_CPU != S3C2440)
                 size_t next_size;
                 unsigned char *next_start;
                 void (*get_more)(unsigned char**, size_t*) = callback_for_more;
@@ -665,7 +667,7 @@ void pcm_play_pause(bool play)
 #endif
 
             disable_fiq();
-#elif (CONFIG_CPU == PNX0101) /* End wmcodecs */
+#elif (CONFIG_CPU == PNX0101 || CONFIG_CPU == S3C2440) /* End wmcodecs */
             /* nothing yet */
 #endif
         }
@@ -697,7 +699,7 @@ bool pcm_is_paused(void) {
 
 void pcm_calculate_peaks(int *left, int *right)
 {
-#if (CONFIG_CPU == PNX0101)
+#if (CONFIG_CPU == PNX0101  || CONFIG_CPU == S3C2440)
     (void)left;
     (void)right;
 #else

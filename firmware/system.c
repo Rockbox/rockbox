@@ -77,7 +77,15 @@ void cpu_idle_mode(bool on_off)
 }
 
 #endif
+#if CONFIG_CPU == S3C2440
 
+void system_reboot(void) {
+}
+
+void system_init(void) {
+}
+
+#endif
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
 bool detect_flashed_rockbox(void)
 {

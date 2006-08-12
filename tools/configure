@@ -871,6 +871,10 @@ toolsdir='\$(ROOTDIR)/tools'
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     toolset=$genericbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="gigabeat"
+    t_model="meg-fx"
     ;;
 
    21)

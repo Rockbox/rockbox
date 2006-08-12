@@ -143,6 +143,9 @@
 #define LCDINTMSK (*(volatile int *)0x4D00005C) /* LCD interrupt mask */
 #define TCONSEL (*(volatile int *)0x4D000060) /* TCON(LPC3600/LCC3600) control */
 
+/* The following should be computed but for now, we cheat. */
+#define FRAME   ( (volatile short * ) 0x31E00000  ) /* LCD Frame buffer */
+
 /* NAND Flash */
 
 #define NFCONF (*(volatile int *)0x4E000000) /* NAND flash configuration */

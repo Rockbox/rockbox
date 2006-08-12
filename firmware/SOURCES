@@ -137,6 +137,8 @@ drivers/i2c-pp5020.c
 drivers/i2c-pp5002.c
 #elif CONFIG_I2C == I2C_PNX0101
 drivers/i2c-pnx0101.c
+#elif CONFIG_I2C == I2C_S3C2440
+/* no i2c driver yet */
 #else
 drivers/i2c.c
 #endif
@@ -254,5 +256,16 @@ target/arm/ata-pp5020.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10.c
+#endif
+#endif
+
+#ifdef GIGABEAT_F
+#ifndef SIMULATOR
+target/arm/gigabeat/meg-fx/backlight-meg-fx.c
+target/arm/gigabeat/meg-fx/button-meg-fx.c
+target/arm/gigabeat/meg-fx/ata-meg-fx.c
+target/arm/gigabeat/meg-fx/power-meg-fx.c
+target/arm/gigabeat/meg-fx/usb-meg-fx.c
+target/arm/gigabeat/meg-fx/lcd-meg-fx.c
 #endif
 #endif

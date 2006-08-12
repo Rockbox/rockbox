@@ -415,7 +415,31 @@ void tick_start(unsigned int interval_in_ms)
 
   TIMERR08 |= 0x80;
 }
+#elif CONFIG_CPU == S3C2440
+void tick_start(unsigned int interval_in_ms)
+{
+    unsigned long count;
 
+    /* period = (n + 1) / 128 , n = tick time count (1~127)*/
+    count = interval_in_ms / 1000 * 128 - 1;
+
+    if(count > 127)
+    {
+        panicf("Error! The tick interval is too long (%d ms)\n",
+               interval_in_ms);
+        return;
+    }
+
+    /* Disable the tick */
+    TICNT &= ~(1<<7);
+    /* Set the count value */
+    TICNT |= count;
+    /* Start up the ticker */
+    TICNT |= (1<<7);
+
+    /* need interrupt handler ??? */
+    
+}
 #endif
 
 int tick_add_task(void (*f)(void))

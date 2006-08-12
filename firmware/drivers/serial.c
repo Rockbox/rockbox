@@ -28,10 +28,7 @@
 #include "serial.h"
 
 
-#if (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) && \
-	(CONFIG_CPU != PP5020) && (CONFIG_CPU != PNX0101) && \
-	(CONFIG_CPU != PP5002) && (CONFIG_CPU != MCF5250) && \
-        (CONFIG_CPU != PP5024)
+#if CONFIG_CPU == SH7034
 
 /* FIX: this doesn't work on iRiver or Gmini or iPod yet */
 /* iFP7xx has no remote */

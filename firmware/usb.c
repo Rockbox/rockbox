@@ -77,6 +77,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
 #define USBPOWER_BUTTON BUTTON_REC
 #define USBPOWER_BTN_IGNORE BUTTON_ON
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define USBPOWER_BUTTON BUTTON_MENU
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
 #endif
 #endif /* HAVE_USB_POWER */
 
@@ -191,6 +194,8 @@ void usb_enable(bool on)
     (void) on;
 #elif defined(USB_X5STYLE)
     /* TODO X5 */
+#elif defined(USB_GIGABEAT_STYLE)
+    /* TODO gigabeat */
 #else
 #ifdef HAVE_LCD_BITMAP
     if(read_hw_mask() & USB_ACTIVE_HIGH)

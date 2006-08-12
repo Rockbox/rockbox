@@ -274,48 +274,6 @@ int ide_read_register(int reg) {
     return ide_reg_temp;
 }
 
-#elif defined(TOSHIBA_GIGABEAT_F)
-
-/* Plain C read & write loops */
-#define PREFER_C_READING
-#define PREFER_C_WRITING
-
-#define ATA_IOBASE      0x18000000
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
-#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x02)))
-#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
-#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0x06)))
-#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x08)))
-#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x10)))
-#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x12)))
-#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
-#define ATA_CONTROL     (*((volatile unsigned char*)(0x20000000 + 0x1c)))
-
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-#define ERROR_ABRT      0x04
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
-
-#define READ_PATTERN1_MASK 0xff
-#define READ_PATTERN2_MASK 0xff
-#define READ_PATTERN3_MASK 0xff
-#define READ_PATTERN4_MASK 0xff
-
-#define SET_REG(reg,val) reg = (val)
-#define SET_16BITREG(reg,val) reg = (val)
-
 #endif
 
 #ifndef NOINLINE_ATTR
@@ -323,6 +281,7 @@ int ide_read_register(int reg) {
 #endif
 
 #define ATA_FEATURE     ATA_ERROR
+
 #define ATA_STATUS      ATA_COMMAND
 #define ATA_ALT_STATUS  ATA_CONTROL
 
@@ -347,7 +306,6 @@ int ide_read_register(int reg) {
 #define Q_SLEEP 0
 
 #define READ_TIMEOUT 5*HZ
-
 
 static struct mutex ata_mtx;
 char ata_device; /* device 0 (master) or 1 (slave) */
@@ -430,6 +388,7 @@ static int wait_for_start_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
+
     return (ATA_ALT_STATUS & (STATUS_BSY|STATUS_DRQ)) == STATUS_DRQ;
 }
 
@@ -1402,16 +1361,16 @@ static int check_registers(void)
             return -1;
 
     for (i = 0; i<64; i++) {
-      SET_REG(ATA_NSECTOR, WRITE_PATTERN1);
-      SET_REG(ATA_SECTOR,  WRITE_PATTERN2);
-      SET_REG(ATA_LCYL,    WRITE_PATTERN3);
-      SET_REG(ATA_HCYL,    WRITE_PATTERN4);
-      
-      if (((ATA_NSECTOR & READ_PATTERN1_MASK) == READ_PATTERN1) &&
-          ((ATA_SECTOR & READ_PATTERN2_MASK) == READ_PATTERN2) &&
-          ((ATA_LCYL & READ_PATTERN3_MASK) == READ_PATTERN3) &&
-          ((ATA_HCYL & READ_PATTERN4_MASK) == READ_PATTERN4))
-        return 0;
+        SET_REG(ATA_NSECTOR, WRITE_PATTERN1);
+        SET_REG(ATA_SECTOR,  WRITE_PATTERN2);
+        SET_REG(ATA_LCYL,    WRITE_PATTERN3);
+        SET_REG(ATA_HCYL,    WRITE_PATTERN4);
+
+        if (((ATA_NSECTOR & READ_PATTERN1_MASK) == READ_PATTERN1) &&
+            ((ATA_SECTOR & READ_PATTERN2_MASK) == READ_PATTERN2) &&
+            ((ATA_LCYL & READ_PATTERN3_MASK) == READ_PATTERN3) &&
+            ((ATA_HCYL & READ_PATTERN4_MASK) == READ_PATTERN4))
+            return 0;
     }
     return -2;
 #endif
@@ -1957,12 +1916,15 @@ int ata_init(void)
         }
 
         rc = identify();
+
         if (rc)
             return -40 + rc;
+
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
 
         rc = freeze_lock();
+
         if (rc)
             return -50 + rc;
 
@@ -1976,7 +1938,6 @@ int ata_init(void)
         create_thread(ata_thread, ata_stack,
                       sizeof(ata_stack), ata_thread_name);
         initialized = true;
-
 
     }
     rc = set_multiple_mode(multisectors);

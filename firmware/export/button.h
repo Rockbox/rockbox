@@ -261,31 +261,6 @@ bool remote_button_hold(void);
 
 #define BUTTON_REMOTE 0
 
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-/* Toshiba Gigabeat specific button codes */
-
-#define BUTTON_POWER        0x00000001
-#define BUTTON_MENU         0x00000002
-
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_UP           0x00000010
-#define BUTTON_DOWN         0x00000020
-
-#define BUTTON_VOL_UP       0x00000040
-#define BUTTON_VOL_DOWN     0x00000080
-
-#define BUTTON_SELECT       0x00000100
-#define BUTTON_A            0x00000200
-
-
-#define BUTTON_MAIN (BUTTON_POWER|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
-                |BUTTON_UP|BUTTON_DOWN|BUTTON_VOL_UP|BUTTON_VOL_DOWN\
-                |BUTTON_SELECT|BUTTON_A)
-
-
-#define BUTTON_REMOTE 0
-
 #elif 0
 
 /* 

@@ -1,6 +1,8 @@
 /*
  * This config file is for toshiba Gigabeat F
  */
+#define TARGET_TREE /* this target is using the target tree system */
+
 #define TOSHIBA_GIGABEAT_F 1
 
 /* For Rolo and boot loader */
@@ -25,7 +27,10 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_PCF50606
+
+#if 0 /* TODO */
+#define CONFIG_RTC RTC_S3C2440
+#endif
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_GIGABEAT /* port controlled PWM */
@@ -42,7 +47,7 @@
 /* Define this if you have the WM8975 audio codec */
 #define HAVE_WM8751
 
-#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 830 /* default battery capacity */
 
 #ifndef SIMULATOR
 
@@ -59,7 +64,7 @@
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
-#define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
+#define BATTERY_SCALE_FACTOR 6852 /* FIX: this value is picked at random */
 
 /* Hardware controlled charging? FIXME */
 #define CONFIG_CHARGING CHARGING_SIMPLE
@@ -74,7 +79,9 @@
 #define CPU_FREQ 16934400
 
 /* Define this if you have ATA power-off control */
+#if 0 /* TODO */
 #define HAVE_ATA_POWER_OFF
+#endif
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -87,14 +94,18 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#define USB_IRIVERSTYLE
+#define USB_GIGABEAT_STYLE
 
 /* Define this if you have adjustable CPU frequency */
+#if 0 /* TODO */
 #define HAVE_ADJUSTABLE_CPU_FREQ
+#endif
 
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
+#if 0 /* TODO */
 #define HAVE_BACKLIGHT_BRIGHTNESS
+#endif
 
 #endif

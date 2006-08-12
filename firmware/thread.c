@@ -279,6 +279,8 @@ void switch_thread(void)
          0x1f seems to trigger a reset;
          0x0f is the only one other argument used by Archos.
          */
+#elif CONFIG_CPU == S3C2440
+        CLKCON |= 2;
 #endif
     }
 #endif
