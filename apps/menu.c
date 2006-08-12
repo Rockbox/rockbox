@@ -124,6 +124,7 @@ int menu_show(int m)
 #endif
     bool exit = false;
     int key;
+    unsigned lastbutton = 0;
 
     gui_synclist_draw(&(menus[m].synclist));
     gui_syncstatusbar_draw(&statusbars, true);
@@ -143,7 +144,9 @@ int menu_show(int m)
         if(gui_synclist_do_button(&(menus[m].synclist), key))
             menu_talk_selected(m);
         switch( key ) {
-            case MENU_ENTER:
+            case MENU_ENTER | BUTTON_REL:
+                if (lastbutton != MENU_ENTER)
+                    break;
 #ifdef MENU_ENTER2
             case MENU_ENTER2:
 #endif
@@ -156,12 +159,18 @@ int menu_show(int m)
                 return gui_synclist_get_sel_pos(&(menus[m].synclist));
 
 
-            case MENU_EXIT:
+            case MENU_EXIT | BUTTON_REL:
+                if (lastbutton != MENU_EXIT)
+                    break;
 #ifdef MENU_EXIT2
             case MENU_EXIT2:
 #endif
 #ifdef MENU_EXIT_MENU
-            case MENU_EXIT_MENU:
+            case MENU_EXIT_MENU | BUTTON_REL:
+                /* This is important for the Ondio's */
+                if ((key == (MENU_EXIT_MENU | BUTTON_REL)) &&
+                    (lastbutton != MENU_EXIT_MENU))
+                    break;
 #endif
 #ifdef MENU_RC_EXIT
             case MENU_RC_EXIT:
@@ -178,6 +187,8 @@ int menu_show(int m)
                 break;
         }
         gui_syncstatusbar_draw(&statusbars, false);
+        if ( key )
+            lastbutton = key;
     }
     return MENU_SELECTED_EXIT;
 }

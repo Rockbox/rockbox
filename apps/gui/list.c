@@ -651,7 +651,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 
 #ifdef LIST_PGRIGHT
         case LIST_PGRIGHT:
+#if !(LIST_PGRIGHT & BUTTON_REPEAT)
         case LIST_PGRIGHT | BUTTON_REPEAT:
+#endif
 #ifdef LIST_RC_PGRIGHT
         case LIST_RC_PGRIGHT:
         case LIST_RC_PGRIGHT | BUTTON_REPEAT:
@@ -663,7 +665,9 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 
 #ifdef LIST_PGLEFT
         case LIST_PGLEFT:
+#if !(LIST_PGLEFT & BUTTON_REPEAT)
         case LIST_PGLEFT | BUTTON_REPEAT:
+#endif     
 #ifdef LIST_RC_PGLEFT
         case LIST_RC_PGLEFT:
         case LIST_RC_PGLEFT | BUTTON_REPEAT:

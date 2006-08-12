@@ -677,7 +677,9 @@ bool playlist_viewer_ex(char* filename)
         }
         switch (button)
         {
-            case TREE_EXIT:
+            case TREE_EXIT | BUTTON_REL:
+                if (lastbutton != TREE_EXIT)
+                    break;
 #ifdef TREE_RC_EXIT
             case TREE_RC_EXIT:
 #endif
@@ -688,8 +690,9 @@ bool playlist_viewer_ex(char* filename)
                 break;
 
 #ifdef TREE_ENTER
-            case TREE_ENTER:
-            case TREE_ENTER | BUTTON_REPEAT:
+            case TREE_ENTER | BUTTON_REL:
+                if (lastbutton != TREE_ENTER)
+                    break;
 #endif
 #ifdef TREE_RC_RUN
             case TREE_RC_RUN:

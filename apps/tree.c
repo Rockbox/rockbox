@@ -587,8 +587,9 @@ static bool dirbrowse(void)
 
         switch ( button ) {
 #ifdef TREE_ENTER
-            case TREE_ENTER:
-            case TREE_ENTER | BUTTON_REPEAT:
+            case TREE_ENTER | BUTTON_REL:
+                if (lastbutton != TREE_ENTER)
+                    break;
 #endif
 #ifdef TREE_RC_RUN
             case TREE_RC_RUN:
@@ -617,8 +618,9 @@ static bool dirbrowse(void)
                 restore = true;
                 break;
 
-            case TREE_EXIT:
-            case TREE_EXIT | BUTTON_REPEAT:
+            case TREE_EXIT | BUTTON_REL:
+                if (lastbutton != TREE_EXIT)
+                    break;
 #ifdef TREE_RC_EXIT
             case TREE_RC_EXIT:
 #endif
