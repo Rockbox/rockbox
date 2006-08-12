@@ -54,19 +54,22 @@ static unsigned char flash_ce[4] = {0x20, 0x02, 0x10, 0x08};
 #define FLASH_REG_ADDR (*((volatile unsigned char*)(FLASH_IO_BASE + 8)))
 
 #define SEGMENT_SIZE 1000
-#define MAX_N_SEGMENTS 2
+#define MAX_N_SEGMENTS 8
 
 #endif
 
 #define FLASH_MODEL_NONE 0
 #define FLASH_MODEL_256 1
+#define FLASH_MODEL_512 2
 
 struct flash_disk
 {
-    short model;
     unsigned short block_map[MAX_N_SEGMENTS][SEGMENT_SIZE];
     short cur_block;
     int cur_phblock_start;
+    int n_chips;
+    unsigned char chip_no[4];
+    unsigned char model;
 };
 
 static struct flash_disk flash_disk;
@@ -81,45 +84,53 @@ void flash_select_chip(int no, int sel)
 #endif
 }
 
-unsigned char flash_read_data(void)
+static inline unsigned char flash_read_data(void)
 {
     return FLASH_REG_DATA;
 }
 
-void flash_write_data(unsigned char data)
+static inline void flash_write_data(unsigned char data)
 {
     FLASH_REG_DATA = data;
 }
 
-void flash_write_cmd(unsigned char cmd)
+/* TODO: these two doesn't work when inlined, probably some
+   delay is required */
+
+static void flash_write_cmd(unsigned char cmd)
 {
     FLASH_REG_CMD = cmd;
 }
 
-void flash_write_addr(unsigned char addr)
+static void flash_write_addr(unsigned char addr)
 {
     FLASH_REG_ADDR = addr;
 }
 
-void flash_wait_ready(void)
+static void flash_wait_ready(void)
 {
     int i;
     for (i = 0; i < 5; i++)
         while ((GPIO6_READ & 8) == 0);
 }
 
+static unsigned char model_n_sectors_order[] = {0, 19, 20};
+
 int flash_map_sector(int sector, int* chip, int* chip_sector)
 {
-    switch (flash_disk.model)
-    {
-        case FLASH_MODEL_NONE:
-        default:
-            return -1;
-        case FLASH_MODEL_256:
-            *chip = 0;
-            *chip_sector = sector;
-            return 0;
-    }
+    int ord, c;
+    if (flash_disk.model ==  FLASH_MODEL_NONE)
+        return -1;
+    
+    ord = model_n_sectors_order[flash_disk.model];
+    c = sector >> ord;
+    *chip_sector = sector & ((1 << ord) - 1);
+
+    if (c >= flash_disk.n_chips)
+        return -1;
+
+    *chip = flash_disk.chip_no[c];
+    return 0;
 }
 
 int flash_read_id(int no) {
@@ -199,19 +210,19 @@ int flash_read_sector_oob(int sector, unsigned char* oob)
     return 0;
 }
 
-static unsigned char model_n_segments[] = {0, 2};
+static unsigned char model_n_segments[] = {0, 2, 4};
 
-static int flash_get_n_segments(void)
+static inline int flash_get_n_segments(void)
 {
-    return model_n_segments[flash_disk.model];
+    return model_n_segments[flash_disk.model] * flash_disk.n_chips;
 }
 
-static int flash_get_n_phblocks(void)
+static inline int flash_get_n_phblocks(void)
 {
     return 1024;
 }
 
-static int model_n_sectors_in_block[] = {0, 256};
+static int model_n_sectors_in_block[] = {0, 256, 256};
 
 static int flash_get_n_sectors_in_block(void)
 {
@@ -362,6 +373,7 @@ int ata_read_sectors(IF_MV2(int drive,)
         int done = flash_disk_read_sectors(start, incount, inbuf);
         if (done < 0)
             return -1;
+        start += done;
         incount -= done;
         inbuf += SECTOR_SIZE * done;
     }
@@ -434,7 +446,7 @@ unsigned short* ata_get_identify(void)
 
 int ata_init(void)
 {
-    int id;
+    int i, id, id2;
 
     id = flash_read_id(0);
     switch (id)
@@ -442,11 +454,23 @@ int ata_init(void)
         case 0xda:
             flash_disk.model = FLASH_MODEL_256;
             break;
+        case 0xdc:
+            flash_disk.model = FLASH_MODEL_512;
+            break;
         default:
             flash_disk.model = FLASH_MODEL_NONE;
             return -1;
     }
 
+    flash_disk.n_chips = 1;
+    flash_disk.chip_no[0] = 0;
+    for (i = 1; i < 4; i++)
+    {
+        id2 = flash_read_id(i);
+        if (id2 == id)
+            flash_disk.chip_no[flash_disk.n_chips++] = i;
+    }
+        
     if (flash_disk_scan() < 0)
         return -2;
 
