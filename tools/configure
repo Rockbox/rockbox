@@ -210,7 +210,10 @@ coldfirecc () {
 
 arm7tdmicc () {
  prefixtools arm-elf-
- GCCOPTS="$CCOPTS -mcpu=arm7tdmi -ffunction-sections -mlong-calls"
+ GCCOPTS="$CCOPTS -mcpu=arm7tdmi"
+ if test "X$1" != "Xshort"; then
+   GCCOPTS="$GCCOPTS -ffunction-sections -mlong-calls"
+ fi
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
 }
@@ -841,7 +844,7 @@ toolsdir='\$(ROOTDIR)/tools'
     archos="ifp7xx"
     target="-DIRIVER_IFP7XX"
     memory=1
-    arm7tdmicc
+    arm7tdmicc short
     tool="cp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
