@@ -740,7 +740,11 @@ static bool prepare_insert(size_t length)
     {
         pcmbuf_boost(true);
         /* Pre-buffer 1s. */
+#if MEMORYSIZE <= 1
+        if (!LOW_DATA(1))
+#else
         if (!LOW_DATA(4))
+#endif
         {
             logf("pcm starting");
             pcmbuf_play_start();

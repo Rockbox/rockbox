@@ -136,8 +136,13 @@ enum {
 };
 
 /* As defined in plugins/lib/xxx2wav.h */
+#if MEMORYSIZE > 1
 #define MALLOC_BUFSIZE (512*1024)
 #define GUARD_BUFSIZE  (32*1024)
+#else
+#define MALLOC_BUFSIZE (100*1024)
+#define GUARD_BUFSIZE  (8*1024)
+#endif
 
 /* As defined in plugin.lds */
 #if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
@@ -2930,11 +2935,14 @@ void audio_set_crossfade(int enable)
     size_t size;
     bool was_playing = (playing && audio_is_initialized);
     size_t offset = 0;
+#if MEMORYSIZE > 1
     int seconds = 1;
+#endif
 
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
+#if MEMORYSIZE > 1
     if (enable)
         seconds = global_settings.crossfade_fade_out_delay
                 + global_settings.crossfade_fade_out_duration;
@@ -2943,6 +2951,10 @@ void audio_set_crossfade(int enable)
     seconds += 2;
     logf("buf len: %d", seconds);
     size = seconds * (NATIVE_FREQUENCY*4);
+#else
+    enable = 0;
+    size = NATIVE_FREQUENCY*2;
+#endif
     if (pcmbuf_get_bufsize() == size)
         return ;
 

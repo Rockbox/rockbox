@@ -269,10 +269,17 @@ static const struct bit_entry rtc_bits[] =
         "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
     {18, S_O(runtime), 0, NULL, NULL },
     {18, S_O(topruntime), 0, NULL, NULL },
+#if MEMORYSIZE > 1
     {15, S_O(max_files_in_playlist), 10000,
         "max files in playlist", NULL }, /* 1000...20000 */
     {14, S_O(max_files_in_dir), 400,
         "max files in dir", NULL }, /* 50...10000 */
+#else
+    {15, S_O(max_files_in_playlist), 1000,
+        "max files in playlist", NULL }, /* 1000...20000 */
+    {14, S_O(max_files_in_dir), 200,
+        "max files in dir", NULL }, /* 50...10000 */
+#endif
     /* battery */
     {12, S_O(battery_capacity), BATTERY_CAPACITY_DEFAULT, "battery capacity",
          NULL }, /* 1500...3200 for NiMH, 2200...3200 for LiIon,

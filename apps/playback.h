@@ -33,7 +33,12 @@
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 
+#if MEMORYSIZE > 1
 #define MAX_TRACK       32
+#else
+#define MAX_TRACK       8
+#endif
+
 #define MAX_TRACK_MASK  (MAX_TRACK-1)
 
 struct track_info {
