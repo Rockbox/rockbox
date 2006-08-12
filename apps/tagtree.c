@@ -798,7 +798,9 @@ int tagtree_load(struct tree_context* c)
         case allsubentries:
         case navibrowse:
             logf("navibrowse...");
+            cpu_boost(true);
             count = retrieve_entries(c, &tcs, 0, true);
+            cpu_boost(false);
             break;
         
         default:
@@ -956,6 +958,8 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 {
     int i;
     char buf[MAX_PATH];
+    int from, to, direction;
+    bool first = true;
 
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
@@ -964,7 +968,20 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
         return false;
     }
     
-    for (i=0; i < c->filesindir; i++)
+    if (position == PLAYLIST_INSERT_FIRST)
+    {
+        from = c->filesindir - 1;
+        to = -1;
+        direction = -1;
+    }
+    else
+    {
+        from = 0;
+        to = c->filesindir;
+        direction = 1;
+    }
+    
+    for (i = from; i != to; i += direction)
     {
         if (!show_search_progress(false, i))
             break;
@@ -1082,6 +1099,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
+        cpu_boost(true);
         if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)),
                              false) < 0)
         {
@@ -1089,6 +1107,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
             return NULL;
         }
         realid = id - current_offset;
+        cpu_boost(false);
     }
     
     return &entry[realid];
