@@ -968,36 +968,13 @@ bool sudoku_generate(struct sudoku_state_t* state)
         rb->memcpy(state,&new_state,sizeof(new_state));
         rb->snprintf(str,sizeof(str),"Difficulty: %s",difficulty);
         display_board(state);
-        rb->splash(3*HZ, true, str);
+        rb->splash(HZ*3, true, str);
         rb->strncpy(state->filename,GAME_FILE,MAX_PATH);
     } else {
         display_board(&new_state);
-        rb->splash(2*HZ, true, "Aborted");
+        rb->splash(HZ*2, true, "Aborted");
     }
     return res;
-}
-
-int sudoku_menu_cb(int key, int m)
-{
-    (void)m;
-    switch(key)
-    {
-#ifdef MENU_ENTER2
-    case MENU_ENTER2:
-#endif
-    case MENU_ENTER:
-        key = BUTTON_NONE; /* eat the downpress, next menu reacts on release */
-        break;
-
-#ifdef MENU_ENTER2
-    case MENU_ENTER2 | BUTTON_REL:
-#endif
-    case MENU_ENTER | BUTTON_REL:
-        key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
-        break;
-    }
-
-    return key;
 }
 
 bool sudoku_menu(struct sudoku_state_t* state)
@@ -1017,7 +994,7 @@ bool sudoku_menu(struct sudoku_state_t* state)
     };
     
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      sudoku_menu_cb, NULL, NULL, NULL);
+                      NULL, NULL, NULL, NULL);
 
     result=rb->menu_show(m);
 
@@ -1078,7 +1055,7 @@ int sudoku_edit_menu(struct sudoku_state_t* state)
     };
     
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
-                      sudoku_menu_cb, NULL, NULL, NULL);
+                      NULL, NULL, NULL, NULL);
 
     result=rb->menu_show(m);
 
