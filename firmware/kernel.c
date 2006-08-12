@@ -56,6 +56,21 @@ void kernel_init(void)
 
 void sleep(int ticks)
 {
+#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
+    int counter;
+    TCON &= ~(1 << 20); // stop timer 4
+    // TODO: this constant depends on dividers settings inherited from
+    // firmware. Set them explicitly somwhere.
+    TCNTB4 = 12193 * ticks / HZ;
+    TCON |= 1 << 21; // set manual bit
+    TCON &= ~(1 << 21); // reset manual bit
+    TCON &= ~(1 << 22); //autoreload Off
+    TCON |= (1 << 20); // start timer 4
+    do {
+       counter = TCNTO4;
+    } while(counter > 0);
+
+#else
     /* Always sleep at least 1 tick */
     int timeout = current_tick + ticks + 1;
 
@@ -63,12 +78,16 @@ void sleep(int ticks)
         sleep_thread();
     }
     wake_up_thread();
+#endif
 }
 
 void yield(void)
 {
+#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
+#else
     switch_thread();
     wake_up_thread();
+#endif
 }
 
 /****************************************************************************

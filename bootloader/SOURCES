@@ -1,5 +1,7 @@
 #if defined(IPOD_ARCH)
 ipod.c
+#elif defined(GIGABEAT_F)
+gigabeat.c
 #elif defined(SANSA_E200)
 e200.c
 #elif defined(IRIVER_H10)

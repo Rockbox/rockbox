@@ -69,7 +69,7 @@ INPUT(crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#ifndef CPU_PP
+#if !defined(CPU_PP) && (CONFIG_CPU!=S3C2440)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
@@ -110,6 +110,36 @@ SECTIONS
      DRAM */
 
   . = (DRAMORIG+16*1024*1024);
+  .bss : {
+     _edata = .;
+     *(.bss);
+     *(.ibss);
+     _end = .;
+   }
+}
+#elif (CONFIG_CPU==S3C2440)
+{
+  . = DRAMORIG + 0x8000;
+  .text : {
+    *(.init.text)
+    *(.text)
+  }
+  .data : {
+    *(.icode)
+    *(.irodata)
+    *(.idata)
+    *(.data)
+    _dataend = . ;
+   }
+  .stack :
+  {
+     *(.stack)
+     _stackbegin = .;
+     stackbegin = .;
+     . += 0x2000;
+     _stackend = .;
+     stackend = .;
+  }
   .bss : {
      _edata = .;
      *(.bss);

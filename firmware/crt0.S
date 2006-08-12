@@ -303,6 +303,11 @@ boot_table:
     .space 400
 #endif /* PP specific */
 /* Code for ARM bootloader targets other than iPod go here */
+
+#if CONFIG_CPU == S3C2440
+    bl main
+#endif
+
 #else /* BOOTLOADER */
     
     /* Set up stack for IRQ mode */ 
