@@ -111,6 +111,8 @@ splitedit.c
 /* Platform-specific plugins */
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 iriverify.c
+#endif
+#if defined(IRIVER_H100_SERIES)
 iriver_flash.c
 #endif
 
