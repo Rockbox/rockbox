@@ -127,7 +127,11 @@ int init_dircache(bool preinit)
             result = dircache_load(DIRCACHE_FILE);
             remove(DIRCACHE_FILE);
             if (result < 0)
+            {
                 firmware_settings.disk_clean = false;
+                if (global_settings.dircache_size >= 0)
+                    dircache_build(global_settings.dircache_size);
+            }
 
             return result;
         }
