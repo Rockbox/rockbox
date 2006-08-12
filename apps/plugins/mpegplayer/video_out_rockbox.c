@@ -200,10 +200,7 @@ static void rockbox_draw_frame (vo_instance_t * instance,
     (void)id;
     (void)instance;
 
-#if (CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
-     || CONFIG_LCD == LCD_H300 || CONFIG_LCD == LCD_IPODVIDEO \
-     || CONFIG_LCD == LCD_X5) \
-     && !defined(SIMULATOR)
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
     rb->lcd_yuv_blit(buf,
                     0,0,image_width,
                     output_x,output_y,output_width,output_height);

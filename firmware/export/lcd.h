@@ -71,12 +71,10 @@ extern void lcd_puts_scroll_style(int x, int y, const unsigned char* string,
                                   int style);
 extern void lcd_icon(int icon, bool enable);
 
-#if CONFIG_LCD == LCD_IPODCOLOR || CONFIG_LCD == LCD_IPODNANO \
-    || CONFIG_LCD == LCD_H300 || CONFIG_LCD == LCD_IPODVIDEO \
-	|| CONFIG_LCD == LCD_X5
-void lcd_yuv_blit(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height);
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+extern void lcd_yuv_blit(unsigned char * const src[3],
+                         int src_x, int src_y, int stride,
+                         int x, int y, int width, int height);
 #endif
 
 #if defined(SIMULATOR) || defined(HAVE_LCD_BITMAP)
