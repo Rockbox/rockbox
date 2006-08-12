@@ -247,7 +247,8 @@
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == PP5020) ||  /* iPod and H10: core, plugins, codecs */ \
     (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
-    (CONFIG_CPU == TCC730))    /* CalmRISC16: core, (plugins, codecs) */
+    (CONFIG_CPU == TCC730) || /* CalmRISC16: core, (plugins, codecs) */ \
+    (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
