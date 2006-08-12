@@ -418,31 +418,10 @@ void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    int y0, x0, y1, x1;
     int h;
+    int y0, x0, y1, x1;
 
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clipping */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
+    width = (width + 1) & ~1;
 
     /* calculate the drawing region */
 #if CONFIG_LCD == LCD_IPODNANO
