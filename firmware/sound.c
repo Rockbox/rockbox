@@ -34,6 +34,8 @@
 #include "wm8731l.h"
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
+#elif CONFIG_CPU == PNX0101
+#include "pnx0101.h"
 #endif
 #include "dac.h"
 #include "system.h"
@@ -85,6 +87,8 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1,  -6,   9,   0, sound_set_bass},
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
+#elif (CONFIG_CPU == PNX0101)
+    [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
 #else /* MAS3507D */
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
@@ -599,8 +603,8 @@ void sound_set_volume(int value)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();                          
 #elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
-    (void)value;
+    int tmp = (60 - value * 4) & 0xff;
+    CODECVOL = tmp | (tmp << 8);
 #endif
 }
 

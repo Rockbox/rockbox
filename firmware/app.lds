@@ -154,6 +154,9 @@ MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+#if CONFIG_CPU==PNX0101
+   IRAM0 : ORIGIN = 0x0, LENGTH = IRAMSIZE
+#endif
 }
 
 SECTIONS
@@ -221,7 +224,12 @@ SECTIONS
         _vectorsstart = .;
         *(.vectors);
         _vectorsend = .;
+#if CONFIG_CPU==PNX0101
+        *(.dmabuf)
+    } >IRAM0 AT> DRAM
+#else
     } AT> DRAM
+#endif
 
     _vectorscopy = LOADADDR(.vectors);
 #endif

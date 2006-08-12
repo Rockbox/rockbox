@@ -64,4 +64,18 @@
 #define ADCR24   (*(volatile unsigned long *)0x80002424)
 #define ADCR28   (*(volatile unsigned long *)0x80002428)
 
+#define DMAINTSTAT   (*(volatile unsigned long *)0x80104c04)
+#define DMAINTEN     (*(volatile unsigned long *)0x80104c08)
+
+#define DMASRC(n)    (*(volatile unsigned long *)(0x80104800 + (n) * 0x20))
+#define DMADEST(n)   (*(volatile unsigned long *)(0x80104804 + (n) * 0x20))
+#define DMALEN(n)    (*(volatile unsigned long *)(0x80104808 + (n) * 0x20))
+#define DMAR0C(n)    (*(volatile unsigned long *)(0x8010480c + (n) * 0x20))
+#define DMAR10(n)    (*(volatile unsigned long *)(0x80104810 + (n) * 0x20))
+#define DMAR1C(n)    (*(volatile unsigned long *)(0x8010481c + (n) * 0x20))
+
+#define MMUBLOCK(n)  (*(volatile unsigned long *)(0x80105018 + (n) * 4))
+
+#define CODECVOL     (*(volatile unsigned long *)0x80200398)
+
 #endif
