@@ -588,7 +588,12 @@ static bool check_against_clause(long numeric, const char *str,
                 return numeric == clause->numeric_data;
             else
                 return !strcasecmp(clause->str, str);
-        
+        case clause_is_not:
+	    if (clause->numeric)
+	        return numeric != clause->numeric_data;
+	    else
+	        return strcasecmp(clause->str, str);
+
         case clause_gt:
             return numeric > clause->numeric_data;
         case clause_gteq:
@@ -600,9 +605,15 @@ static bool check_against_clause(long numeric, const char *str,
         
         case clause_contains:
             return (strcasestr(str, clause->str) != NULL);
+        case clause_not_contains:
+            return (strcasestr(str, clause->str) == NULL);
         case clause_begins_with:
             return (strcasestr(str, clause->str) == str);
+        case clause_not_begins_with:
+	    return (strcasestr(str, clause->str) != str);
         case clause_ends_with: /* Not supported yet */
+            return false;
+        case clause_not_ends_with: /* Not supported yet */
             return false;
     }
     

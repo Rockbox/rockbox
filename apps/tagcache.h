@@ -71,9 +71,10 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define FLAG_DIRCACHE   0x0002  /* Filename is a dircache pointer */
 #define FLAG_DIRTYNUM   0x0004  /* Numeric data has been modified */
 
-enum clause { clause_none, clause_is, clause_gt, clause_gteq, clause_lt, 
-    clause_lteq, clause_contains, clause_begins_with, clause_ends_with  };
-enum modifiers { clause_mod_none, clause_mod_not };
+enum clause { clause_none, clause_is, clause_is_not, clause_gt, clause_gteq,
+    clause_lt, clause_lteq, clause_contains, clause_not_contains, 
+    clause_begins_with, clause_not_begins_with, clause_ends_with,
+    clause_not_ends_with };
 
 struct tagcache_stat {
     bool initialized;        /* Is tagcache currently busy? */

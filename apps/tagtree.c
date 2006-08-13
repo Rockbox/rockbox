@@ -176,13 +176,17 @@ static int get_clause(int *condition)
     
     MATCH(condition, buf, "=", clause_is);
     MATCH(condition, buf, "==", clause_is);
+    MATCH(condition, buf, "!=", clause_is_not);
     MATCH(condition, buf, ">", clause_gt);
     MATCH(condition, buf, ">=", clause_gteq);
     MATCH(condition, buf, "<", clause_lt);
     MATCH(condition, buf, "<=", clause_lteq);
     MATCH(condition, buf, "~", clause_contains);
+    MATCH(condition, buf, "!~", clause_not_contains);
     MATCH(condition, buf, "^", clause_begins_with);
+    MATCH(condition, buf, "!^", clause_not_begins_with);
     MATCH(condition, buf, "$", clause_ends_with);
+    MATCH(condition, buf, "!$", clause_not_ends_with);
     
     return 0;
 }
