@@ -280,4 +280,16 @@ rockpaint.bmp
 rockpaint_hsvrgb.bmp
 #endif
 
+#if defined( HAVE_LCD_COLOR )
+#if ( LCD_HEIGHT * LCD_WIDTH ) / ( 16 * 16 ) >= 130
+minesweeper_tiles.16x16x24.bmp
+#else
+minesweeper_tiles.12x12x24.bmp
+#endif
+#elif LCD_DEPTH > 1
+minesweeper_tiles.12x12x2.bmp
+#else
+minesweeper_tiles.8x8x1.bmp
+#endif
+
 #endif /* HAVE_LCD_BITMAP */
