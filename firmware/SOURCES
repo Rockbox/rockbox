@@ -236,6 +236,7 @@ target/coldfire/iaudio/x5/power-x5.c
 #ifndef SIMULATOR
 drivers/generic_i2c.c
 target/coldfire/iaudio/x5/button-x5.c
+target/coldfire/iaudio/x5/lcd-as-x5.S
 target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/iaudio/x5/pcf50606-x5.c
 target/coldfire/iaudio/x5/adc-x5.c

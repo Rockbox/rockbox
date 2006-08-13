@@ -531,7 +531,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
         ysrc += stride;
     }
     while (++y < y_end);
-}
+} /* lcd_yuv_blit */
 
 /* Update the display.
    This must be called after all other LCD functions that change the
@@ -539,9 +539,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
 void lcd_update(void) ICODE_ATTR;
 void lcd_update(void)
 {
-    /* Optimized for full-screen write. */
-    const unsigned long *ptr, *ptr_end;
-
     if (!display_on)
         return;
 
@@ -552,36 +549,16 @@ void lcd_update(void)
 
     lcd_begin_write_gram();
 
-    ptr = (unsigned long *)lcd_framebuffer;
-    ptr_end = ptr + LCD_WIDTH*LCD_HEIGHT/2;
-
-    do
-    {
-        /* 16 words per turns out to be about optimal according to
-           test_fps. */
-        lcd_write_two(*ptr++);
-#ifndef BOOTLOADER
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-        lcd_write_two(*ptr++);
-#endif
-     }
-     while (ptr < ptr_end);
+    lcd_write_data((unsigned short *)lcd_framebuffer,
+        LCD_WIDTH*LCD_HEIGHT);
 } /* lcd_update */
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    int y_end;
-    int odd_lead, odd_trail;
-    int duff;
-    const unsigned long *ptr, *duff_end;
-    int stride; /* Actually end of currline -> start of next */
+    int ymax;
+    const unsigned short *ptr;
 
     if (!display_on)
         return;
@@ -593,12 +570,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (width <= 0)
         return; /* nothing left to do */
 
-    y_end = y + height;
-    if (y_end > LCD_HEIGHT)
-        y_end = LCD_HEIGHT; /* Clip bottom */
+    ymax = y + height;
+    if (ymax > LCD_HEIGHT)
+        ymax = LCD_HEIGHT; /* Clip bottom */
     if (y < 0)
         y = 0; /* Clip top */
-    if (y >= y_end)
+    if (y >= ymax)
         return; /* nothing left to do */
 
     /* Set start position and window */
@@ -608,75 +585,12 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     lcd_begin_write_gram();
 
-    ptr = (unsigned long *)&lcd_framebuffer[y][x];
-
-    /* Aligning source reads to long boundaries helps 2% - 3% with IRAM
-       buffer. DK with DRAM. */
-    odd_lead = x & 1;
-
-    if (odd_lead)
-    {
-        duff = width - 1;
-        odd_trail = duff & 1;
-        duff >>= 1;
-    }
-    else
-    {
-        duff = width >> 1;
-        odd_trail = width & 1;
-    }
-
-    duff_end = ptr + duff;
-#ifndef BOOTLOADER
-    duff &= 7;
-#endif
-
-    stride = LCD_WIDTH - width + odd_trail; /* See odd_trail below */
+    ptr = (unsigned short *)&lcd_framebuffer[y][x];
 
     do
     {
-        if (odd_lead)
-        {
-            /* Write odd start pixel. */
-            lcd_write_one(*(unsigned short *)ptr);
-            ptr = (unsigned long *)((short *)ptr + 1);
-        }
-
-        if (ptr < duff_end)
-        {
-#ifdef BOOTLOADER
-            do
-                lcd_write_two(*ptr);
-            while (++ptr < duff_end);
-#else
-            switch (duff)
-            {
-            do
-            {
-                case 0: lcd_write_two(*ptr++);
-                case 7: lcd_write_two(*ptr++);
-                case 6: lcd_write_two(*ptr++);
-                case 5: lcd_write_two(*ptr++);
-                case 4: lcd_write_two(*ptr++);
-                case 3: lcd_write_two(*ptr++);
-                case 2: lcd_write_two(*ptr++);
-                case 1: lcd_write_two(*ptr++);
-            }
-            while (ptr < duff_end);
-            } /* end switch */
-#endif /* BOOTLOADER */
-
-            duff_end += LCD_WIDTH/2;
-        }
-
-        if (odd_trail)
-        {
-            /* Finish remaining odd pixel. */
-            lcd_write_one(*(unsigned short *)ptr);
-            /* Stride increased by one pixel. */
-        }
-
-        ptr = (unsigned long *)((short *)ptr + stride);
+        lcd_write_data(ptr, width);
+        ptr += LCD_WIDTH;
     }
-    while (++y < y_end);
-}
+    while (++y < ymax);
+} /* lcd_update_rect */
