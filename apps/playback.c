@@ -136,7 +136,7 @@ enum {
 };
 
 /* As defined in plugins/lib/xxx2wav.h */
-#if MEMORYSIZE > 1
+#if MEM > 1
 #define MALLOC_BUFSIZE (512*1024)
 #define GUARD_BUFSIZE  (32*1024)
 #else
@@ -2935,14 +2935,14 @@ void audio_set_crossfade(int enable)
     size_t size;
     bool was_playing = (playing && audio_is_initialized);
     size_t offset = 0;
-#if MEMORYSIZE > 1
+#if MEM > 1
     int seconds = 1;
 #endif
 
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
-#if MEMORYSIZE > 1
+#if MEM > 1
     if (enable)
         seconds = global_settings.crossfade_fade_out_delay
                 + global_settings.crossfade_fade_out_duration;

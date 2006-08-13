@@ -740,7 +740,7 @@ static bool prepare_insert(size_t length)
     {
         pcmbuf_boost(true);
         /* Pre-buffer 1s. */
-#if MEMORYSIZE <= 1
+#if MEM <= 1
         if (!LOW_DATA(1))
 #else
         if (!LOW_DATA(4))

@@ -19,7 +19,7 @@
 #ifndef PCMBUF_H
 #define PCMBUF_H
 
-#if MEMORYSIZE > 1
+#if MEM > 1
 #define PCMBUF_TARGET_CHUNK 32768 /* This is the target fill size of chunks
                                      on the pcm buffer */
 #define PCMBUF_MINAVG_CHUNK 24576 /* This is the minimum average size of

@@ -269,7 +269,7 @@ static const struct bit_entry rtc_bits[] =
         "idle poweroff", "off,1,2,3,4,5,6,7,8,9,10,15,30,45,60" },
     {18, S_O(runtime), 0, NULL, NULL },
     {18, S_O(topruntime), 0, NULL, NULL },
-#if MEMORYSIZE > 1
+#if MEM > 1
     {15, S_O(max_files_in_playlist), 10000,
         "max files in playlist", NULL }, /* 1000...20000 */
     {14, S_O(max_files_in_dir), 400,

@@ -33,7 +33,7 @@
 /* Not yet implemented. */
 #define CODEC_SET_AUDIOBUF_WATERMARK    4
 
-#if MEMORYSIZE > 1
+#if MEM > 1
 #define MAX_TRACK       32
 #else
 #define MAX_TRACK       8
