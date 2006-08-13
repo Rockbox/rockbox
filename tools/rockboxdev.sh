@@ -107,6 +107,8 @@ gccpatch="" # default is no gcc patch
 gccver="4.0.3" # default gcc version
 binutils="2.16.1" # The binutils version to use
 
+system=`uname -s`
+
 case $1 in
   [Ss])
     target="sh-elf"
@@ -116,6 +118,16 @@ case $1 in
   [Mm])
     target="m68k-elf"
     gccver="3.4.6"
+    case $system in
+      CYGWIN* | Darwin)
+        gccurl="http://www.rockbox.org/twiki/pub/Main/CrossCompiler"
+        gccpatch="gcc-3.4.6.patch"
+        ;;
+      Linux)
+        ;;
+      *)
+        ;;
+    esac
     ;;
   [Aa])
     target="arm-elf"
