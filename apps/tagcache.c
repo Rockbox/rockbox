@@ -578,6 +578,17 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
     return check_virtual_tags(tag, &idx);
 }
 
+inline static bool str_ends_with(const char *str1, const char *str2)
+{
+    int str_len = strlen(str1);
+    int clause_len = strlen(str2);
+    
+    if (clause_len > str_len)
+        return false;
+    
+    return !strcasecmp(&str1[str_len - clause_len], str2);
+}
+
 static bool check_against_clause(long numeric, const char *str,
                                  const struct tagcache_search_clause *clause)
 {
@@ -610,13 +621,13 @@ static bool check_against_clause(long numeric, const char *str,
         case clause_begins_with:
             return (strcasestr(str, clause->str) == str);
         case clause_not_begins_with:
-	    return (strcasestr(str, clause->str) != str);
-        case clause_ends_with: /* Not supported yet */
-            return false;
-        case clause_not_ends_with: /* Not supported yet */
-            return false;
+	        return (strcasestr(str, clause->str) != str);
+        case clause_ends_with:
+            return str_ends_with(str, clause->str);
+        case clause_not_ends_with:
+            return !str_ends_with(str, clause->str);
     }
-    
+
     return false;
 }
 
