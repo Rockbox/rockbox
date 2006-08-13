@@ -59,15 +59,13 @@
   }
 
 % fancy header style adjustments
-%\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
-%\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
-\renewcommand{\rightmark}[1]{\thechapter\ }
 \fancyhead{}
 \fancyfoot{}
-\fancyhead[L]{{\textsc{\leftmark}}}
+\fancyhead[L]{{\nouppercase{\textsc{\leftmark}}}}
 \fancyhead[R]{\iffloatpage{}{\thepage}}
 \fancyfoot[L]{\textsc{The Rockbox manual}}
 \fancyfoot[R]{\textsc{\playerman{} \playertype}}
+\fancypagestyle{plain}{}
 
 \renewcommand{\headrulewidth}{\iffloatpage{0pt}{0.4pt}}
 \renewcommand{\footrulewidth}{\iffloatpage{0pt}{0.4pt}}
@@ -261,13 +259,12 @@
 
 % Use the reference to handle get a flexible reference command
 % usage \reference{ref_section}
-\ifpdfoutput{
+\ifpdfoutput{%
   \newcommand{\reference}[1]{%
-    section \ref{#1} (page \pageref{#1})
+    section \ref{#1} (page \pageref{#1})%
 }}
 {\newcommand{\reference}[1]{section \ref{#1}}}
 
 % special HTML output adjustments
 \ifpdfoutput{}{\setlength{\parindent}{0mm}}
 \ifpdfoutput{}{\renewcommand{\Forward}[1]{$\triangleright${}#1}}
-
