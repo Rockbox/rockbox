@@ -416,7 +416,8 @@ enum minesweeper_status menu( void )
             "MODE to start"
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
       || (CONFIG_KEYPAD == IRIVER_H300_PAD ) \
-      || (CONFIG_KEYPAD == IPOD_4G_PAD)
+      || (CONFIG_KEYPAD == IPOD_4G_PAD) \
+      || (CONFIG_KEYPAD == IPOD_3G_PAD)
             "SELECT to start"
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
             "REC to start"
