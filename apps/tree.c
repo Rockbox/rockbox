@@ -1186,16 +1186,20 @@ bool create_playlist(void)
 bool rockbox_browse(const char *root, int dirfilter)
 {
     static struct tree_context backup;
-
+    int last_context;
+    
     backup = tc;
     reload_dir = true;
     memcpy(tc.currdir, root, sizeof(tc.currdir));
     start_wps = false;
     tc.dirfilter = &dirfilter;
-
+    last_context = curr_context;
+    
     dirbrowse();
 
     tc = backup;
+    curr_context = last_context;
+    
     return false;
 }
 
