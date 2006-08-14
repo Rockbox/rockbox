@@ -272,3 +272,28 @@ void wmcodec_set_monitor(int enable) {
 
     (void)enable;
 }
+
+void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain)
+{
+    unsigned int eq = 0;
+
+    /* Band 1..3 are peak filters */
+    if (band >= 1 && band <= 3) {
+        eq |= (bw << 8);
+    }
+
+    eq |= (freq << 5);
+    eq |= 12 - gain;
+
+    if (band == 0) {
+        wm8758_write(EQ0, eq);
+    } else if (band == 1) {
+        wm8758_write(EQ1, eq);
+    } else if (band == 2) {
+        wm8758_write(EQ2, eq);
+    } else if (band == 3) {
+        wm8758_write(EQ3, eq);
+    } else if (band == 4) {
+        wm8758_write(EQ4, eq);
+    }
+}

@@ -38,6 +38,8 @@ extern void wmcodec_disable_recording(void);
 extern void wmcodec_set_recvol(int left, int right, int type);
 extern void wmcodec_set_monitor(int enable);
 
+extern void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain);
+
 #define RESET      0x00
 #define PWRMGMT1   0x01
 #define PWRMGMT2   0x02
@@ -59,6 +61,12 @@ extern void wmcodec_set_monitor(int enable);
 #define PLLK1      0x25
 #define PLLK2      0x26
 #define PLLK3      0x27
+
+#define EQ0        0x12
+#define EQ1        0x13
+#define EQ2        0x14
+#define EQ3        0x15
+#define EQ4        0x16
 
 /* Register settings for the supported samplerates: */
 #define WM8758_8000HZ      0x4d

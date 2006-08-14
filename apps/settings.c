@@ -592,8 +592,28 @@ static const struct bit_entry hd_bits[] =
 #endif
 #endif /* CONFIG_BACKLIGHT */
 
-
+#ifdef HAVE_WM8758
+    {1, S_O(eq_hw_enabled), false, "eq hardware enabled", off_on },
     
+    {2, S_O(eq_hw_band0_cutoff), 1, "eq hardware band 0 cutoff", "80Hz,105Hz,135Hz,175Hz" },
+    {6|SIGNED, S_O(eq_hw_band0_gain), 12, "eq hardware band 0 gain", NULL },
+
+    {2, S_O(eq_hw_band1_center), 1, "eq hardware band 1 center", "230Hz,300Hz,385Hz,500Hz" },
+    {1, S_O(eq_hw_band1_bandwidth), 0, "eq hardware band 1 bandwidth", "narrow,wide" },
+    {6|SIGNED, S_O(eq_hw_band1_gain), 12, "eq hardware band 1 gain", NULL },
+
+    {2, S_O(eq_hw_band2_center), 1, "eq hardware band 2 center", "650Hz,850Hz,1.1kHz,1.4kHz" },
+    {1, S_O(eq_hw_band2_bandwidth), 0, "eq hardware band 2 bandwidth", "narrow,wide" },
+    {6|SIGNED, S_O(eq_hw_band2_gain), 12, "eq hardware band 2 gain", NULL },
+
+    {2, S_O(eq_hw_band3_center), 1, "eq hardware band 3 center", "1.8kHz,2.4kHz,3.2kHz,4.1kHz" },
+    {1, S_O(eq_hw_band3_bandwidth), 0, "eq hardware band 3 bandwidth", "narrow,wide" },
+    {6|SIGNED, S_O(eq_hw_band3_gain), 12, "eq hardware band 3 gain", NULL },
+
+    {2, S_O(eq_hw_band4_cutoff), 1, "eq hardware band 4 cutoff", "5.3kHz,6.9kHz,9kHz,11.7kHz" },
+    {6|SIGNED, S_O(eq_hw_band4_gain), 12, "eq hardware band 4 gain", NULL },
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

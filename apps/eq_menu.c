@@ -45,6 +45,9 @@
 #include "screen_access.h"
 #include "keyboard.h"
 #include "gui/scrollbar.h"
+#ifdef HAVE_WM8758
+#include "wm8758.h"
+#endif
 
 /* Key definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD || \
@@ -272,7 +275,7 @@ static bool eq_gain_menu(void)
         setting += 3;
     }
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -290,7 +293,7 @@ static bool eq_set_band0(void)
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band0_gain },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -308,7 +311,7 @@ static bool eq_set_band1(void)
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band1_gain },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -326,7 +329,7 @@ static bool eq_set_band2(void)
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band2_gain },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -344,7 +347,7 @@ static bool eq_set_band3(void)
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band3_gain },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -362,7 +365,7 @@ static bool eq_set_band4(void)
         { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_set_band4_gain },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -390,7 +393,7 @@ static bool eq_advanced_menu(void)
         items[i].desc = peak_band_label[i-1];
     }
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
@@ -845,6 +848,403 @@ bool eq_browse_presets(void)
     return rockbox_browse(EQS_DIR, SHOW_CFG);
 }
 
+#ifdef HAVE_WM8758
+
+/* WM8758 equalizer supports -12 to +12 dB gain in 1 dB increments. */
+#define EQ_HW_GAIN_STEP 1
+#define EQ_HW_GAIN_MIN -12
+#define EQ_HW_GAIN_MAX 12
+
+static const struct opt_items BANDWIDTH_NAMES[] = {
+    { STR(LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW) },
+    { STR(LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE) },
+};
+
+static const int BANDWIDTH_NAMES_SIZE = sizeof(BANDWIDTH_NAMES) /
+                                        sizeof(*BANDWIDTH_NAMES);
+
+static void eq_hw_gain_format(char* buffer, int buffer_size, int value,
+                                    const char* unit)
+{
+    snprintf(buffer, buffer_size, "%d %s", value, unit);
+}
+
+static bool eq_hw_set_band0_cutoff(void)
+{
+    static const struct opt_items names[] = {
+        { (unsigned char *)"80 Hz", TALK_ID(80, UNIT_HERTZ) },
+        { (unsigned char *)"105 Hz", TALK_ID(105, UNIT_HERTZ) },
+        { (unsigned char *)"135 Hz", TALK_ID(135, UNIT_HERTZ) },
+        { (unsigned char *)"175 Hz", TALK_ID(175, UNIT_HERTZ) },
+    };
+
+    bool result = set_option(str(LANG_EQUALIZER_BANDWIDTH),
+        &global_settings.eq_hw_band0_cutoff, INT, names,
+        sizeof(names) / sizeof(*names), NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
+                                global_settings.eq_hw_band0_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band0_gain(void) 
+{
+    bool result = set_int(str(LANG_EQUALIZER_BAND_GAIN), str(LANG_UNIT_DB), UNIT_DB,
+        &global_settings.eq_hw_band0_gain, NULL,
+        EQ_HW_GAIN_STEP, EQ_HW_GAIN_MIN, EQ_HW_GAIN_MAX,
+        eq_hw_gain_format);
+        
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
+                                global_settings.eq_hw_band0_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band1_center(void)
+{
+    static const struct opt_items names[] = {
+        { (unsigned char *)"230 Hz", TALK_ID(230, UNIT_HERTZ) },
+        { (unsigned char *)"300 Hz", TALK_ID(300, UNIT_HERTZ) },
+        { (unsigned char *)"385 Hz", TALK_ID(385, UNIT_HERTZ) },
+        { (unsigned char *)"500 Hz", TALK_ID(500, UNIT_HERTZ) },
+    };
+    
+    bool result = set_option(str(LANG_EQUALIZER_BAND_CENTER),
+        &global_settings.eq_hw_band1_center, INT, names,
+        sizeof(names) / sizeof(*names), NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+                                global_settings.eq_hw_band1_bandwidth,
+                                global_settings.eq_hw_band1_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band1_bandwidth(void)
+{
+    bool result = set_option(str(LANG_EQUALIZER_BANDWIDTH),
+        &global_settings.eq_hw_band1_bandwidth, INT, BANDWIDTH_NAMES,
+        BANDWIDTH_NAMES_SIZE, NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+                                global_settings.eq_hw_band1_bandwidth,
+                                global_settings.eq_hw_band1_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band1_gain(void) 
+{
+    bool result = set_int(str(LANG_EQUALIZER_BAND_GAIN), str(LANG_UNIT_DB), UNIT_DB,
+        &global_settings.eq_hw_band1_gain, NULL,
+        EQ_HW_GAIN_STEP, EQ_HW_GAIN_MIN, EQ_HW_GAIN_MAX,
+        eq_hw_gain_format);
+        
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+                                global_settings.eq_hw_band1_bandwidth,
+                                global_settings.eq_hw_band1_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band2_center(void)
+{
+    static const struct opt_items names[] = {
+        { (unsigned char *)"650 Hz", TALK_ID(650, UNIT_HERTZ) },
+        { (unsigned char *)"850 Hz", TALK_ID(850, UNIT_HERTZ) },
+        { (unsigned char *)"1.1 kHz", TALK_ID(1100, UNIT_HERTZ) },
+        { (unsigned char *)"1.4 kHz", TALK_ID(1400, UNIT_HERTZ) },
+    };
+    
+    bool result = set_option(str(LANG_EQUALIZER_BAND_CENTER),
+        &global_settings.eq_hw_band2_center, INT, names,
+        sizeof(names) / sizeof(*names), NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+                                global_settings.eq_hw_band2_bandwidth,
+                                global_settings.eq_hw_band2_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band2_bandwidth(void)
+{   
+    bool result = set_option(str(LANG_EQUALIZER_BANDWIDTH),
+        &global_settings.eq_hw_band2_bandwidth, INT, BANDWIDTH_NAMES,
+        BANDWIDTH_NAMES_SIZE, NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+                                global_settings.eq_hw_band2_bandwidth,
+                                global_settings.eq_hw_band2_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band2_gain(void) 
+{
+    bool result = set_int(str(LANG_EQUALIZER_BAND_GAIN), str(LANG_UNIT_DB), UNIT_DB,
+        &global_settings.eq_hw_band2_gain, NULL,
+        EQ_HW_GAIN_STEP, EQ_HW_GAIN_MIN, EQ_HW_GAIN_MAX,
+        eq_hw_gain_format);
+        
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+                                global_settings.eq_hw_band2_bandwidth,
+                                global_settings.eq_hw_band2_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band3_center(void)
+{
+    static const struct opt_items names[] = {
+        { (unsigned char *)"1.8 kHz", TALK_ID(1800, UNIT_HERTZ) },
+        { (unsigned char *)"2.4 kHz", TALK_ID(2400, UNIT_HERTZ) },
+        { (unsigned char *)"3.2 kHz", TALK_ID(3200, UNIT_HERTZ) },
+        { (unsigned char *)"4.1 kHz", TALK_ID(4100, UNIT_HERTZ) },
+    };
+    
+    bool result = set_option(str(LANG_EQUALIZER_BAND_CENTER),
+        &global_settings.eq_hw_band3_center, INT, names,
+        sizeof(names) / sizeof(*names), NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+                                global_settings.eq_hw_band3_bandwidth,
+                                global_settings.eq_hw_band3_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band3_bandwidth(void)
+{
+    bool result = set_option(str(LANG_EQUALIZER_BANDWIDTH),
+        &global_settings.eq_hw_band3_bandwidth, INT, BANDWIDTH_NAMES,
+        BANDWIDTH_NAMES_SIZE, NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+                                global_settings.eq_hw_band3_bandwidth,
+                                global_settings.eq_hw_band3_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band3_gain(void) 
+{
+    bool result = set_int(str(LANG_EQUALIZER_BAND_GAIN), str(LANG_UNIT_DB), UNIT_DB,
+        &global_settings.eq_hw_band3_gain, NULL,
+        EQ_HW_GAIN_STEP, EQ_HW_GAIN_MIN, EQ_HW_GAIN_MAX,
+        eq_hw_gain_format);
+        
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+                                global_settings.eq_hw_band3_bandwidth,
+                                global_settings.eq_hw_band3_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band4_cutoff(void)
+{
+    static const struct opt_items names[] = {
+        { (unsigned char *)"5.3 kHz", TALK_ID(5300, UNIT_HERTZ) },
+        { (unsigned char *)"6.9 kHz", TALK_ID(6900, UNIT_HERTZ) },
+        { (unsigned char *)"9.0 kHz", TALK_ID(9000, UNIT_HERTZ) },
+        { (unsigned char *)"11.7 kHz", TALK_ID(11700, UNIT_HERTZ) },
+    };
+    
+    bool result = set_option(str(LANG_EQUALIZER_BAND_CUTOFF),
+        &global_settings.eq_hw_band4_cutoff, INT, names,
+        sizeof(names) / sizeof(*names), NULL);
+
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
+                                global_settings.eq_hw_band4_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band4_gain(void) 
+{
+    bool result = set_int(str(LANG_EQUALIZER_BAND_GAIN), str(LANG_UNIT_DB), UNIT_DB,
+        &global_settings.eq_hw_band4_gain, NULL,
+        EQ_HW_GAIN_STEP, EQ_HW_GAIN_MIN, EQ_HW_GAIN_MAX,
+        eq_hw_gain_format);
+        
+#ifndef SIMULATOR
+    wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
+                                global_settings.eq_hw_band4_gain);
+#endif
+
+    return result;
+}
+
+static bool eq_hw_enabled(void)
+{
+    bool result = set_bool(str(LANG_EQUALIZER_HARDWARE_ENABLED),
+        &global_settings.eq_hw_enabled);
+
+#ifndef SIMULATOR
+    if (global_settings.eq_hw_enabled) {
+        wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff,
+                                   0, global_settings.eq_hw_band0_gain);
+        wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+                                   global_settings.eq_hw_band1_bandwidth,
+                                   global_settings.eq_hw_band1_gain);
+        wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+                                   global_settings.eq_hw_band2_bandwidth,
+                                   global_settings.eq_hw_band2_gain);
+        wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+                                   global_settings.eq_hw_band3_bandwidth,
+                                   global_settings.eq_hw_band3_gain);
+        wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff,
+                                   0, global_settings.eq_hw_band4_gain);
+    } else {
+        wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0, 0);
+        wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+                                   global_settings.eq_hw_band1_bandwidth, 0);
+        wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+                                   global_settings.eq_hw_band2_bandwidth, 0);
+        wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+                                   global_settings.eq_hw_band3_bandwidth, 0);
+        wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0, 0);
+    }
+#endif
+
+    return result;
+}
+
+static bool eq_hw_set_band0(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_BAND_CUTOFF), eq_hw_set_band0_cutoff },
+        { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_hw_set_band0_gain },
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
+static bool eq_hw_set_band1(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_hw_set_band1_center },
+        { ID2P(LANG_EQUALIZER_BANDWIDTH), eq_hw_set_band1_bandwidth },
+        { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_hw_set_band1_gain },
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
+static bool eq_hw_set_band2(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_hw_set_band2_center },
+        { ID2P(LANG_EQUALIZER_BANDWIDTH), eq_hw_set_band2_bandwidth },
+        { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_hw_set_band2_gain }, 
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
+static bool eq_hw_set_band3(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_BAND_CENTER), eq_hw_set_band3_center },
+        { ID2P(LANG_EQUALIZER_BANDWIDTH), eq_hw_set_band3_bandwidth },
+        { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_hw_set_band3_gain },
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
+static bool eq_hw_set_band4(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_BAND_CUTOFF), eq_hw_set_band4_cutoff },
+        { ID2P(LANG_EQUALIZER_BAND_GAIN), eq_hw_set_band4_gain },
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+
+static bool eq_hw_menu(void)
+{
+    int m;
+    bool result;
+    static const struct menu_item items[] = {
+        { ID2P(LANG_EQUALIZER_HARDWARE_ENABLED), eq_hw_enabled },
+        { ID2P(LANG_EQUALIZER_BAND_LOW_SHELF), eq_hw_set_band0 },
+        { "Peak Filter 1", eq_hw_set_band1 },
+        { "Peak Filter 2", eq_hw_set_band2 },
+        { "Peak Filter 3", eq_hw_set_band3 },        
+        { ID2P(LANG_EQUALIZER_BAND_HIGH_SHELF), eq_hw_set_band4 },
+    };
+
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+
+    return result;
+}
+#endif
+
 /* Full equalizer menu */
 bool eq_menu(void)
 {
@@ -856,11 +1256,14 @@ bool eq_menu(void)
         { ID2P(LANG_EQUALIZER_PRECUT), eq_precut },
         { ID2P(LANG_EQUALIZER_GAIN), eq_gain_menu },
         { ID2P(LANG_EQUALIZER_ADVANCED), eq_advanced_menu },
+#ifdef HAVE_WM8758
+        { ID2P(LANG_EQUALIZER_HARDWARE), eq_hw_menu },
+#endif
         { ID2P(LANG_EQUALIZER_SAVE), eq_save_preset },
         { ID2P(LANG_EQUALIZER_BROWSE), eq_browse_presets },
     };
 
-    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+    m = menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);

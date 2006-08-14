@@ -542,6 +542,28 @@ struct user_settings
 #ifdef HAVE_LCD_BITMAP
     unsigned char kbd_file[MAX_FILENAME+1]; /* last keyboard */
 #endif
+
+#ifdef HAVE_WM8758
+    bool eq_hw_enabled;            /* Enable hardware equalizer */
+    
+    int eq_hw_band0_cutoff;
+    int eq_hw_band0_gain;  
+
+    int eq_hw_band1_center;
+    int eq_hw_band1_bandwidth;
+    int eq_hw_band1_gain;
+
+    int eq_hw_band2_center;
+    int eq_hw_band2_bandwidth;
+    int eq_hw_band2_gain;
+
+    int eq_hw_band3_center;
+    int eq_hw_band3_bandwidth;
+    int eq_hw_band3_gain;
+
+    int eq_hw_band4_cutoff;
+    int eq_hw_band4_gain;
+#endif
 };
 
 enum optiontype { INT, BOOL };
