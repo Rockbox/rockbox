@@ -633,6 +633,7 @@ int dircache_build(int last_size)
     if (dircache_size > 0)
     {
         thread_enabled = true;
+        dircache_initializing = true;
         queue_post(&dircache_queue, DIRCACHE_BUILD, 0);
         return 2;
     }
@@ -680,6 +681,7 @@ void dircache_init(void)
     int i;
     
     dircache_initialized = false;
+    dircache_initializing = false;
     
     memset(opendirs, 0, sizeof(opendirs));
     for (i = 0; i < MAX_OPEN_DIRS; i++)
@@ -769,7 +771,9 @@ void dircache_disable(void)
             }
         }
     } while (cache_in_use) ;
+    
     logf("Cache released");
+    entry_count = 0;
 }
 
 /**

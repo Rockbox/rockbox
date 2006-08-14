@@ -997,8 +997,10 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
         }
 
         if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
+        {
+            logf("playlist_insert_track failed");
             break;
-        
+        }
         yield();
     }
     playlist_sync(NULL);
@@ -1065,7 +1067,8 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     else
     {
         logf("insert_all_playlist");
-        insert_all_playlist(tc, position, queue);
+        if (!insert_all_playlist(tc, position, queue))
+            gui_syncsplash(HZ*2, true, str(LANG_FAILED));
     }
     
     /* Finally return the dirlevel to its original value. */
