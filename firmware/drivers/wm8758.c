@@ -286,7 +286,7 @@ void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain)
     eq |= 12 - gain;
 
     if (band == 0) {
-        wm8758_write(EQ0, eq);
+        wm8758_write(EQ0, eq | 0x100); /* Always apply EQ to the DAC path */
     } else if (band == 1) {
         wm8758_write(EQ1, eq);
     } else if (band == 2) {
