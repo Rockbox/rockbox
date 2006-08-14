@@ -678,7 +678,10 @@ static bool build_lookup_list(struct tagcache_search *tcs)
                 {
                     if (tcs->clause[j]->tag == tag_filename)
                     {
+                        int oldtype = tcs->type;
+                        tcs->type = tag_filename;
                         tagcache_retrieve(tcs, i, buf, sizeof buf);
+                        tcs->type = oldtype;
                         str = buf;
                     }
                     else
