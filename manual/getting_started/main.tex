@@ -27,10 +27,32 @@ and filenames spelled out or spoken.
 
 \section{Getting more help}
 This manual is intended to be a comprehensive introduction to the Rockbox
-software. There is, however, more help available.  The Rockbox website at
+firmware. There is, however, more help available.  The Rockbox website at
 \url{http://www.rockbox.org/} contains very extensive documentation and guides
 written by members of the Rockbox community and this should be your first port
 of call when looking for further help.
+
+If you can't find the informations you're searching for on the Rockbox
+website there are a number of support channels you should have a look at.
+You can try the Rockbox forums located at \url{http://forums.rockbox.org/}.
+Another option are the mailing lists which can be found at
+\url{http://www.rockbox.org/mail/}. From that page you can subscribe to the
+lists and browse the archives. For searching the list archives simply use
+the search field that is located on the left side of the web site.
+Also you can ask on IRC. The main channel for rockbox is \texttt{\#rockbox}
+on \url{irc://irc.freenode.net}. A bunch of helpful developers and users
+are usually around. Just join and ask -- if someone knows the answer you'll
+usually get an answer pretty quickly. More information including IRC logs
+can be found at \url{http://www.rockbox.org/irc/}. We also have a web client
+for joining the rockbox IRC channel so there is no need for you
+to install additional software to your computer.
+
+If you think you found a bug please make sure it actually is a bug and is
+still present in the most recent version of rockbox. You should try to
+confirm that by using the above mentioned support channels first. After that
+you can submit that issue to our tracker. Refer to \reference{sec:feedback}
+for details on how to use the tracker.
+
 
 \section{Naming conventions and marks}
 We have some conventions especially on naming that are intended to be
@@ -59,116 +81,12 @@ are used:
 }
 \blind{This icon marks a section that are intended especially for the blind
   and visually impaired. As they can't
-  read the manual in the same way seeing people can do we've added some
+  read the manual in the same way sighted people can do we've added some
   additional descriptions. If you aren't blind or visually impaired you most
   likely can completely skip these blocks. To make this easier, there is an
   icon shown in the margin like here.
 }
 }{}% end ifpdfoutput
 
-\section{Installing Rockbox}\label{sec:installing_rockbox}
-\opt{MASCODEC}{
-  \subsection{Using the windows installer}
-  Using the Windows self installing executable to install Rockbox is the easiest
-  method of installing the software on your Jukebox.  Simply follow the
-  on-screen instructions and select the appropriate drive letter and Jukebox
-  model when prompted.  You can use ``Add / Remove Programs'' to uninstall the
-  software at a later date.
 
-  \subsection{Manual installation}
-  For non{}-Windows users and those wishing to install manually from the archive
-  the procedure is still fairly simple.
-}
-\opt{SWCODEC}{
-\subsection{Introduction}
-	There are two separate components of Rockbox that need to be installed in order
-	to run Rockbox.
-	\begin{enumerate}
-	\item The Rockbox bootloader. This is the component of Rockbox that is installed
-	  to the flash memory of your \playerman. The bootloader is the program that tells
-	  your \dap\ how to boot and load other components of Rockbox.
-	\item The Rockbox firmware. Unlike the \playerman\ firmware, which runs entirely
-  	from flash memory, most of the Rockbox code is contained in the build that
-  	resides on your jukebox's hard drive. This makes it easy to update Rockbox. The
-  	build contain a file named \firmwarefilename\ and a directory called
-  	\fname{.rockbox} which are located in the root directory of your  hard drive.
-	\end{enumerate}
-	\opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
-	\opt{ipod4g,ipodcolor,ipodnano,ipodmini,ipodvideo}
-		{\input{getting_started/ipod_install.tex}}
-	\opt{x5}{\input{getting_started/iaudio_install.tex}}
-   
-  \subsection{Installing the firmware} 
-  
-	After installing the bootloader, the installation becomes fairly easy.}  
-	
-	Go to \url{http://www.rockbox.org/daily.shtml} and download the latest 
-	Rockbox daily build for the \playertype{}.  Connect your \playerman\ to the 
-	computer via USB as described in the manual that came with your \playerman{}. 
-	On Windows, the	\playerman\ drive will appear as a drive letter in your 
-	``My Computer''	folder. Take the file that you downloaded above, and unpack 
-	its contents to	your \playerman\ drive. You can do this using a program 
-	such as \url{http://www.info-zip.org/} or \url{http://www.winzip.org/}.
-
-	\nopt{player}{
-	\note{If this is the first time you are installing Rockbox, you should also 
-	download the ``Fonts'' package available on the Daily Builds page.}
-	}
-
-	You will need to unpack all of the files in the archive onto your hard disk. 
-	If this has been done correctly, you will have a file called 
-	\fname{\firmwarefilename} in the main folder of your \playerman\ drive, and 
-	also a folder called /\fname{.rockbox}, which contains a number of system 
-	files used by the software. 
-	
-	\note{Please note that the firmware folder starts with a leading dot. You may 
-	experience problems when trying to create such 	folders when using Windows. 
-	Directly unzipping to your \daps drive works flawlessly; it is only Windows' 
-	Explorer that is limited in handling such 	files.}
-
-\section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support} 
-If you wish to use speech support you will also need a language file, available 
-from \wikilink{VoiceFiles}.  For the English language, the file is called 
-\fname{english.voice}. When it has been downloaded, unpack this file and copy it 
-into the \fname{lang} folder which is inside the \fname{/.rockbox} folder on 
-your Jukebox. Voice menus are turned on by default. See 
-\reference{ref:Voiceconfiguration} for details on voice settings.
-
-\section{Running Rockbox} 
-Remove your \dap from the computer's USB port. Unplug any connected power supply 
-and turn the unit off. When you next turn the unit on, Rockbox should load. When 
-you see the Rockbox splash screen, Rockbox is loaded and ready for use.
-
-\opt{ipod}{
-\note{Rockbox starts in the \setting{File Browser}.  If you have loaded music 
-onto your player using Itunes, you will not be able to see your music because 
-Itunes changes your files' names and hides them in directories in the 
-\fname{Ipod\_Control} folder.  You can view files placed on your \dap{} by Itunes 
-by initializing and using Rockbox's Tag Cache.  See \reference{ref:tagcache} for 
-more information.}
-}
-
-\section{Updating Rockbox} Updating Rockbox is easy.  Download a Rockbox build. 
-(The latest release of the Rockbox software will always be available from 
-\url{http://www.rockbox.org/download/}.)  Unzip the build to the root directory 
-of your \dap.  If your unzip program asks you whether to overwrite files, choose 
-the ``Yes to all'' option.  The new build will be installed over your current build.
-
-\note{Settings are stored on an otherwise-unused sector of your hard disk, not 
-in any of the files contained in the Rockbox build.  Therefore, generally 
-speaking, installing a new build does \emph{not} reset Rockbox to its default 
-settings.  Be aware, however, that from time to time, a change is made to the 
-Rockbox source code that \emph{does} cause settings to be reset to their 
-defaults when a Rockbox build is updated.  Thus, it is a good idea to save your 
-settings using the \setting{Manage Settings} $\rightarrow$ \setting{Write .cfg 
-file} function before updating your Rockbox build so that you can easily restore 
-the settings if necessary.  For additional information on how to save, load, and 
-reset Rockbox's settings, see \reference{ref:SystemOptions}.}
-
-\section{Uninstalling Rockbox}
-If you would like to go back to using the original \playerman\ software, then
-connect the \playerman\ to your computer, and delete the
-\fname{\firmwarefilename} file. If you wish to clean up your disk, you may also
-wish to delete the \fname{.rockbox} folder and its contents. Turn the
-\playerman\ off and on and the normal \playerman\ software will load.
-
+\input{getting_started/installation.tex}
