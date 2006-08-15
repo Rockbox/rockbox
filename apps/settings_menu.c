@@ -1266,7 +1266,9 @@ static bool voice_dirs(void)
 {
     bool ret = set_option( str(LANG_VOICE_DIR),
                        &global_settings.talk_dir, INT, voice_names, 4, NULL);
+#if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
+#endif
     return ret;
 }
 
@@ -1277,7 +1279,9 @@ static bool voice_files(void)
 
     ret = set_option( str(LANG_VOICE_FILE),
                        &global_settings.talk_file, INT, voice_names, 4, NULL);
+#if CONFIG_CODEC == SWCODEC
     audio_set_crossfade(global_settings.crossfade);
+#endif
     if (oldval != 3 && global_settings.talk_file == 3)
     {   /* force reload if newly talking thumbnails,
            because the clip presence is cached only if enabled */
