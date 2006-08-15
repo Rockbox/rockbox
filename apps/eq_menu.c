@@ -1223,7 +1223,7 @@ static bool eq_hw_set_band4(void)
     return result;
 }
 
-static bool eq_hw_menu(void)
+bool eq_hw_menu(void)
 {
     int m;
     bool result;
@@ -1256,9 +1256,6 @@ bool eq_menu(void)
         { ID2P(LANG_EQUALIZER_PRECUT), eq_precut },
         { ID2P(LANG_EQUALIZER_GAIN), eq_gain_menu },
         { ID2P(LANG_EQUALIZER_ADVANCED), eq_advanced_menu },
-#ifdef HAVE_WM8758
-        { ID2P(LANG_EQUALIZER_HARDWARE), eq_hw_menu },
-#endif
         { ID2P(LANG_EQUALIZER_SAVE), eq_save_preset },
         { ID2P(LANG_EQUALIZER_BROWSE), eq_browse_presets },
     };

@@ -560,6 +560,9 @@ bool sound_menu(void)
         { ID2P(LANG_CROSSFEED), crossfeed_menu },
         { ID2P(LANG_EQUALIZER), eq_menu },
 #endif
+#ifdef HAVE_WM8758
+        { ID2P(LANG_EQUALIZER_HARDWARE), eq_hw_menu },
+#endif
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
         { ID2P(LANG_LOUDNESS), loudness },
         { ID2P(LANG_AUTOVOL), avc },

@@ -20,9 +20,13 @@
 #define _EQ_MENU_H
 
 #include "menu.h"
+#include "config.h"
 
 bool eq_browse_presets(void);
 bool eq_menu_graphical(void);
 bool eq_menu(void);
+#ifdef HAVE_WM8758
+bool eq_hw_menu(void);
+#endif
 
 #endif
