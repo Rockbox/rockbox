@@ -377,11 +377,11 @@ void gui_list_select_next(struct gui_list * gui_list)
 
 void gui_list_select_previous(struct gui_list * gui_list)
 {
+    int nb_lines = gui_list->display->nb_lines;        
+    if (gui_list->title)
+        nb_lines--;
     if( gui_list->selected_item-gui_list->selected_size < 0 )
     {
-        int nb_lines = gui_list->display->nb_lines;        
-        if (gui_list->title)
-            nb_lines--;
         if(gui_list->limit_scroll)
             return;
         /* we have aleady reached the top of the list */
@@ -396,7 +396,6 @@ void gui_list_select_previous(struct gui_list * gui_list)
     else
     {
         int item_pos;
-        int nb_lines = gui_list->display->nb_lines;
         gui_list->selected_item-=gui_list->selected_size;
         item_pos = gui_list->selected_item - gui_list->start_item;
         if (global_settings.scroll_paginated)
