@@ -21,6 +21,7 @@
 #include "config.h"
 #include "action.h"
 #include "button.h"
+#include "settings.h"
 
 
 /* 
