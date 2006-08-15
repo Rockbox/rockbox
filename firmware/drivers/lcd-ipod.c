@@ -148,7 +148,7 @@ void lcd_init_device(void)
 
 int lcd_default_contrast(void)
 {
-#if defined(IPOD_MINI) || defined(IPOD_MINI2G)
+#if defined(IPOD_MINI) || defined(IPOD_MINI2G) || defined(IPOD_3G)
     return 42;
 #else
     return 35;
