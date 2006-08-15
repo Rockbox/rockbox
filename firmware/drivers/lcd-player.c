@@ -207,8 +207,6 @@ void xlcd_update(void)
                         int pat;
                         pat=lcd_get_free_pat(map_ch);
                         if (pat<0) {
-                            DEBUGF("Substitute for %02x (map 0x%02x)"
-                                   " is used.\n", ch, map_ch);
                             /* Find substitute char */
                             map_ch=
                                 lcd_player_extended_lcd_to_rocklatin1[map_ch];
@@ -278,7 +276,6 @@ void lcd_clear_display(void)
 {
     int i;
     bool update=false; 
-    DEBUGF("lcd_clear_display()\n");
     lcd_stop_scroll();
     cursor.len=0; /* Stop cursor */
     for (i=0;i<22;i++)
@@ -290,24 +287,12 @@ void lcd_clear_display(void)
 static void lcd_puts_cont_scroll(int x, int y, const unsigned char *string)
 {
     bool update=false; 
-    DEBUGF("lcd_puts_cont_scroll(%d, %d, \"", x, y);
 
     for (; *string && x<11; x++)
     {
-#ifdef DEBUGF
-        if (*string>=32 && *string<128)
-        {
-            DEBUGF("%c", *string);
-        }
-        else
-        {
-            DEBUGF("(0x%02x)", *string);
-        }
-#endif
         /* We should check if char is over 256 */
         update|=lcdx_putc(x, y, *(unsigned char*)string++);
     }
-    DEBUGF("\")\n");
     
     for (; x<11; x++)
         update|=lcdx_putc(x, y, ' ');
@@ -334,7 +319,6 @@ void lcd_puts(int x, int y, const unsigned char *string)
 
     tmp[i] = 0;
 
-    DEBUGF("lcd_puts(%d, %d) -> ", x, y);
     scroll[y].mode=SCROLL_MODE_OFF;
     return lcd_puts_cont_scroll(x, y, tmp);
 }
@@ -369,7 +353,6 @@ void lcd_remove_cursor(void)
 void lcd_putc(int x, int y, unsigned short ch)
 {
     bool update;
-    DEBUGF("lcd_putc(%d, %d, %d '0x%02x')\n", x, y, ch, ch);
     if (x<0 || y<0) {
         return;
     }
@@ -659,8 +642,6 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string )
     tmp[i] = 0;
 
 
-    DEBUGF("lcd_puts_scroll(%d, %d, %s)\n", x, y, string);
-
     s = &scroll[y];
 
     lcd_puts_cont_scroll(x,y,tmp);
@@ -729,13 +710,11 @@ void lcd_scroll_speed(int speed)
 void lcd_scroll_delay(int ms)
 {
     scroll_delay = ms / (HZ / 10);
-    DEBUGF("scroll_delay=%d (ms=%d, HZ=%d)\n", scroll_delay, ms, HZ);
 }
 
 void lcd_jump_scroll_delay(int ms)
 {
     jump_scroll_delay = ms / (HZ / 10);
-    DEBUGF("jump_scroll_delay=%d (ms=%d, HZ=%d)\n", jump_scroll_delay, ms, HZ);
 }
 
 static void scroll_thread(void)
