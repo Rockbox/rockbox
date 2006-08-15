@@ -68,6 +68,7 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list->scroll_all=scroll_all;
     gui_list->selected_size=selected_size;
     gui_list->title = NULL;
+    gui_list->title_width = 0;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -305,15 +306,22 @@ void gui_list_draw(struct gui_list * gui_list)
                            gui_list->start_item,
                            gui_list->start_item + display->nb_lines, VERTICAL);
     }
+#endif
     if (gui_list->title)
     {
-        int start = ((display->width/display->char_width) - strlen(gui_list->title))/2;
-        display->puts(start, 0, gui_list->title);
-    }
-#else /* char cell display */
-    if (gui_list->title)
-        display->puts(0, 0, gui_list->title); /* dont center title */
+        /* Scroll if the title is too large, otherwise center */
+        if (gui_list->title_width > gui_list->display->width) {
+            display->puts_scroll(0, 0, gui_list->title);
+        } else {
+#ifdef HAVE_LCD_BITMAP
+            display->putsxy((display->width - gui_list->title_width) / 2,
+                            gui_textarea_get_ystart(display), gui_list->title);
+#else
+            display->puts((display->width - gui_list->title_width) / 2, 0,
+                          gui_list->title);
 #endif
+        }
+    }
     gui_textarea_update(display);
 }
 
@@ -513,10 +521,17 @@ void gui_list_screen_scroll_out_of_view(bool enable)
         offset_out_of_view = false;
 }
 #endif /* HAVE_LCD_BITMAP */
-void gui_list_set_title(struct gui_list *gui_list , char* title)
+
+void gui_list_set_title(struct gui_list * gui_list, char * title)
 {
     gui_list->title = title;
+#ifdef HAVE_LCD_BITMAP
+    gui_list->display->getstringsize(title, &gui_list->title_width, NULL);
+#else
+    gui_list->title_width = strlen(title);
+#endif
 }
+
 /*
  * Synchronized lists stuffs
  */

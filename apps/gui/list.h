@@ -170,6 +170,8 @@ struct gui_list
     void * data;
     /* The optional title, set to NULL for none */
     char *title;
+    /* Cache the width of the title string in pixels/characters */
+    int title_width; 
 };
 
 /*
@@ -337,7 +339,7 @@ extern void gui_list_flash(struct gui_list * gui_list);
 /* 
  * Set the title of the list, setting to NULL disables the title
  */
-extern void gui_list_set_title(struct gui_list *gui_list , char* title);
+extern void gui_list_set_title(struct gui_list *gui_list, char* title);
 /*
  * This part handles as many lists as there are connected screens
  * (the api is similar to the ones above)
