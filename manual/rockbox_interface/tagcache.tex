@@ -14,67 +14,68 @@ described in the following section.
 
 \subsection{\label{ref:tagcachemenu}The Tag Cache Menu}
 
-	\begin{description}
-		\opt{SWCODEC}{
-			\item[Load To Ram:  ]
-			The Tag Cache database can either be kept on disk (to save memory), or
-			loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
-			the tagcache to RAM, allowing faster browsing and searching. Setting this
-			option to \setting{No} keeps the tagcache on the disk, meaning slower 
-			browsing but it does not use extra RAM and saves some battery on boot up. 
-			
-			\note{If you use TagCache frequently, you should load to RAM, as this
-			will reduce the overall battery consumption because the disk will not
-			need to spin on each search.}
-  		}
-
-		\item[Auto Update:  ]
-		If \setting{Auto update} is set to \setting{on}, each time the play
-		boots, Tag Cache will automatically do everything that the 
-		\setting{Update now} setting does.  Note that the \setting{Auto
-		Update} will only check for deleted files if the Directory Cache
-		(\setting{General Settings $\rightarrow$ System $\rightarrow$
-		Disk $\rightarrow$ Directory Cache}) is enabled.  
-		"Update now" includes that check whether dircache has been enabled or not.
-
-		\item[Initialize Now:  ]
-		Before you use the Tag Cache for the first time, you must initialize it by 
-		using the \setting{Initialize Now} function in the \setting{Tag Cache 
-		Menu}.  \setting{Initialize Now} removes all database files (removing 
-		runtimedb data also) and rebuilds the database from scratch. This takes 
-		approximately 5 to 10 minutes, and may require a restart to allow the 
-		files to be committed to the cache. 
-
-		The Tag Cache initialization happens in the background, so you can continue 
-		to listen to music while the Tag Cache is being initialized.  If you shut 
-		down your player during initialization, the database building process will 
-		continue next time you turn it on.
-
-		\item[Update Now:  ]
-		\setting{Update now} causes Tag Cache to detect new and deleted files 
-		Note that unlike the \setting{Auto Update} function, \setting{Update Now} 
-		will update the database regardless of whether the \setting{Directory Cache}
-		is enabled.  Thus, an update using \setting{Update now} may take a long
-		time.  Unlike \setting{Initialize Now}, the \setting{Update Now} function 
-		does not remove runtime database information.
-
-		\item[Gather Runtime Data (Experimental):  ]
-		When enabled, this option allows the most played, unplayed and most recently
-		played tracks to be logged and scored.
-
-		\item[Export modifications:  ]
-		This allows for the runtime data to be exported into 
-		\fname{/.rockbox/tagcache\_changelog.txt}, which backs up the runtime data in
-		ASCII format. This is needed when Tag Cache structures change, because new 
-		code cannot read old Tag Cache database code.  But, all modifications 
-		exported to ASCII format should be readable by all Tag Cache versions.
-
-		\item[Import modifications:  ]
-		Allows the \fname{/.rockbox/tagcache\_changelog.txt} backup to be 
-		conveniently loaded into the Tag Cache. This is performed automatically when
-		the Tag Cache is initialized.
-	
-	\end{description}
+\begin{description}
+  \opt{SWCODEC}{
+  \item[Load To Ram:  ]
+    The Tag Cache database can either be kept on disk (to save memory), or
+    loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
+    the tagcache to RAM, allowing faster browsing and searching. Setting this
+    option to \setting{No} keeps the tagcache on the disk, meaning slower 
+    browsing but it does not use extra RAM and saves some battery on boot up. 
+    
+    \note{If you use TagCache frequently, you should load to RAM, as this
+      will reduce the overall battery consumption because the disk will not
+      need to spin on each search.}
+  }
+  
+\item[Auto Update:  ]
+  If \setting{Auto update} is set to \setting{on}, each time the \dap{}
+  boots, Tag Cache will automatically do everything that the 
+  \setting{Update now} setting does.  Note that the \setting{Auto
+    Update} will only check for deleted files if the Directory Cache
+  (\setting{General Settings $\rightarrow$ System $\rightarrow$
+    Disk $\rightarrow$ Directory Cache}) is enabled.  
+  \setting{Update now} includes that check whether dircache has been enabled or
+  not.
+  
+\item[Initialize Now:  ]
+  Before you use the Tag Cache for the first time, you must initialize it by 
+  using the \setting{Initialize Now} function in the \setting{Tag Cache 
+    Menu}.  \setting{Initialize Now} removes all database files (removing 
+  runtimedb data also) and rebuilds the database from scratch. This takes 
+  approximately 5 to 10 minutes, and may require a restart to allow the 
+  files to be committed to the cache. 
+  
+  The Tag Cache initialization happens in the background, so you can continue 
+  to listen to music while the Tag Cache is being initialized.  If you shut 
+  down your player during initialization, the database building process will 
+  continue next time you turn it on.
+  
+\item[Update Now:  ]
+  \setting{Update now} causes Tag Cache to detect new and deleted files 
+  Note that unlike the \setting{Auto Update} function, \setting{Update Now} 
+  will update the database regardless of whether the \setting{Directory Cache}
+  is enabled.  Thus, an update using \setting{Update now} may take a long
+  time.  Unlike \setting{Initialize Now}, the \setting{Update Now} function 
+  does not remove runtime database information.
+  
+\item[Gather Runtime Data (Experimental):  ]
+  When enabled, this option allows the most played, unplayed and most recently
+  played tracks to be logged and scored.
+  
+\item[Export modifications:  ]
+  This allows for the runtime data to be exported into \\
+  \fname{/.rockbox/tagcache\_changelog.txt}, which backs up the runtime data in
+  ASCII format. This is needed when Tag Cache structures change, because new 
+  code cannot read old Tag Cache database code.  But, all modifications 
+  exported to ASCII format should be readable by all Tag Cache versions.
+  
+\item[Import modifications:  ]
+  Allows the \fname{/.rockbox/tagcache\_changelog.txt} backup to be 
+  conveniently loaded into the Tag Cache. This is performed automatically when
+  the Tag Cache is initialized.
+  
+\end{description}
 
 \subsection{Using the Tag Cache}
 Once the Tag Cache has been initialized, you can browse your music by Artist, 
