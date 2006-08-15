@@ -619,7 +619,7 @@ static bool dirbrowse(void)
                     break;
                 }
                 /* if we are in /, nothing to do */
-                if (tc.dirlevel != 0 || strcmp(currdir,"/"))
+                if (tc.dirlevel == 0 && !strcmp(currdir,"/"))
                     break;
                 
                 if (id3db)
