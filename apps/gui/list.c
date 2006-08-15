@@ -525,11 +525,15 @@ void gui_list_screen_scroll_out_of_view(bool enable)
 void gui_list_set_title(struct gui_list * gui_list, char * title)
 {
     gui_list->title = title;
+    if (title) {
 #ifdef HAVE_LCD_BITMAP
-    gui_list->display->getstringsize(title, &gui_list->title_width, NULL);
+        gui_list->display->getstringsize(title, &gui_list->title_width, NULL);
 #else
-    gui_list->title_width = strlen(title);
+        gui_list->title_width = strlen(title);
 #endif
+    } else {
+        gui_list->title_width = 0;
+    }
 }
 
 /*

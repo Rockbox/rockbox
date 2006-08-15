@@ -354,6 +354,9 @@ static int update_dir(void)
         } else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT) {
             gui_synclist_set_title(&tree_lists,
                         tc.dirlevel > 0 ? strrchr(tc.currdir, '/') + 1 : "/");
+        } else {
+            /* Must clear the title as the list is reused */
+            gui_synclist_set_title(&tree_lists, NULL);
         }
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
