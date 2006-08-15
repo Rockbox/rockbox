@@ -19,12 +19,14 @@
 
 #include "uisdl.h"
 #include "lcd-charcell.h"
+#include "lcd-remote.h"
 #include "config.h"
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
 #include "misc.h"
 
+#include "debug.h"
 /* how long until repeat kicks in */
 #define REPEAT_START      6
 
@@ -33,6 +35,15 @@
 
 /* speed repeat finishes at */
 #define REPEAT_INTERVAL_FINISH  2
+
+#if defined(IRIVER_H100_SERIES) || defined (IRIVER_H300_SERIES)
+int _remote_type=REMOTETYPE_H100_LCD;
+
+int remote_type(void)
+{
+    return _remote_type;
+}
+#endif
 
 struct event_queue button_queue;
 
@@ -74,6 +85,31 @@ void button_event(int key, bool pressed)
 
     switch (key)
     {
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+    case SDLK_t:
+        if(pressed)
+            switch(_remote_type)
+            {
+                case REMOTETYPE_UNPLUGGED: 
+                    _remote_type=REMOTETYPE_H100_LCD;
+                    DEBUGF("Changed remote type to H100\n");
+                    break;
+                case REMOTETYPE_H100_LCD:
+                    _remote_type=REMOTETYPE_H300_LCD;
+                    DEBUGF("Changed remote type to H300\n");
+                    break;
+                case REMOTETYPE_H300_LCD:
+                    _remote_type=REMOTETYPE_H300_NONLCD;
+                    DEBUGF("Changed remote type to H300 NON-LCD\n");
+                    break;
+                case REMOTETYPE_H300_NONLCD:
+                    _remote_type=REMOTETYPE_UNPLUGGED;
+                    DEBUGF("Changed remote type to none\n");
+                    break;
+            }
+        break;
+#endif
+
     case SDLK_KP4:
     case SDLK_LEFT:
         new_btn = BUTTON_LEFT;
