@@ -138,11 +138,11 @@ bool alarm_screen(void)
 
          /* dec(h) */
         case ACTION_STD_PREV:
-        case ACTION_STD_NEXTREPEAT:
+        case ACTION_STD_PREVREPEAT:
              h = (h+23) % 24;
              break;
 
-            case ACTION_STD_CANCEL:
+        case ACTION_STD_CANCEL:
             rtc_enable_alarm(false);
             gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
             done = true;
