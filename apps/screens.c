@@ -1012,7 +1012,7 @@ char * id3_get_info(int selected_item, void* data, char *buffer)
     int info_no=selected_item/2;
     if(!(selected_item%2))
     {/* header */
-        int headers[]=
+        static const int headers[]=
         {
             LANG_ID3_TITLE,
             LANG_ID3_ARTIST,
@@ -1117,7 +1117,7 @@ bool browse_id3(void)
     gui_synclist_draw(&id3_lists);
     while (true) {
         key = get_action(CONTEXT_STD,HZ/2);
-        if(key!=ACTION_NONE && /* !(key&BUTTON_REL) && ?? */ !gui_synclist_do_button(&id3_lists, key))
+        if(key!=ACTION_NONE && key!=ACTION_UNKNOWN && /* !(key&BUTTON_REL) && ?? */ !gui_synclist_do_button(&id3_lists, key))
         {
             action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);
