@@ -564,6 +564,8 @@ struct user_settings
     int eq_hw_band4_cutoff;
     int eq_hw_band4_gain;
 #endif
+
+    int show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
 };
 
 enum optiontype { INT, BOOL };
@@ -659,5 +661,8 @@ enum { RECURSE_OFF, RECURSE_ON, RECURSE_ASK };
 
 /* replaygain types */
 enum { REPLAYGAIN_TRACK = 0, REPLAYGAIN_ALBUM, REPLAYGAIN_SHUFFLE };
+
+/* show path types */
+enum { SHOW_PATH_OFF = 0, SHOW_PATH_CURRENT, SHOW_PATH_FULL };
 
 #endif /* __SETTINGS_H__ */

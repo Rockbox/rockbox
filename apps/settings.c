@@ -613,6 +613,8 @@ static const struct bit_entry hd_bits[] =
     {5|SIGNED, S_O(eq_hw_band4_gain), 12, "eq hardware band 4 gain", NULL },
 #endif
 
+    {2, S_O(show_path_in_browser), 0, "show path in browser", "off,current directory,full path" },
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

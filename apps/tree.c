@@ -347,6 +347,11 @@ static int update_dir(void)
             gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
+    if (global_settings.show_path_in_browser == SHOW_PATH_FULL) {
+        gui_synclist_set_title(&tree_lists, tc.currdir);
+    } else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT) {
+        gui_synclist_set_title(&tree_lists, strrchr(tc.currdir, '/'));
+    }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
     gui_synclist_set_icon_callback(&tree_lists,
                   global_settings.show_icons?&tree_get_fileicon:NULL);

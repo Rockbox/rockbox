@@ -62,11 +62,11 @@ extern void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain);
 #define PLLK2      0x26
 #define PLLK3      0x27
 
-#define EQ0        0x12
-#define EQ1        0x13
-#define EQ2        0x14
-#define EQ3        0x15
-#define EQ4        0x16
+#define EQ1        0x12
+#define EQ2        0x13
+#define EQ3        0x14
+#define EQ4        0x15
+#define EQ5        0x16
 
 /* Register settings for the supported samplerates: */
 #define WM8758_8000HZ      0x4d

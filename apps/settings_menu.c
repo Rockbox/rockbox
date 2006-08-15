@@ -98,6 +98,19 @@ static bool show_icons(void)
     return set_bool( (char *)str(LANG_SHOW_ICONS), &global_settings.show_icons );
 }
 
+static bool show_path(void)
+{
+    static const struct opt_items names[3] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_SHOW_PATH_CURRENT) },
+        { STR(LANG_SHOW_PATH_FULL) },
+    };
+
+    return set_option(str(LANG_SHOW_PATH),
+                      &global_settings.show_path_in_browser,
+                      INT, names, 3, NULL);
+}
+
 /**
  * Menu to set the option to scroll paginated
  */
@@ -1737,6 +1750,7 @@ static bool fileview_settings_menu(void)
         { ID2P(LANG_FILTER),                dir_filter            },
         { ID2P(LANG_FOLLOW),                browse_current        },
         { ID2P(LANG_SHOW_ICONS),            show_icons            },
+        { ID2P(LANG_SHOW_PATH),             show_path             },
         { ID2P(LANG_TAGCACHE),              tagcache_settings_menu},
     };
 
