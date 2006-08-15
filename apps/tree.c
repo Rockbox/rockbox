@@ -615,20 +615,18 @@ static bool dirbrowse(void)
                     exit_func = true;
                     break;
                 }
-                /* if we are in /, stop playback 
-                    (skip this and fall into tree_stop)*/
+                /* if we are in /, nothing to do */
                 if (tc.dirlevel != 0 || strcmp(currdir,"/"))
-                {
-                    if (id3db)
-                        tagtree_exit(&tc);
-                    else
-                        if (ft_exit(&tc) == 3)
-                            exit_func = true;
-    
-                    restore = true;
                     break;
-                }
-                /* else fall through */
+                
+                if (id3db)
+                    tagtree_exit(&tc);
+                else
+                    if (ft_exit(&tc) == 3)
+                        exit_func = true;
+                
+                restore = true;
+                break;
 
             case ACTION_TREE_STOP:
                 if (*tc.dirfilter < NUM_FILTER_MODES)
