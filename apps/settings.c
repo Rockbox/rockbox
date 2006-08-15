@@ -68,7 +68,6 @@
 #include "sound.h"
 #include "rbunicode.h"
 #include "dircache.h"
-#include "select.h"
 #include "statusbar.h"
 #include "splash.h"
 #include "list.h"
@@ -1852,6 +1851,119 @@ void talk_unit(int unit, int value)
     }
 }
 
+struct value_setting_data {
+    enum optiontype type;
+    /* used for "value" settings.. */
+    int max;
+    int step;
+    int voice_unit;
+    const char * unit;
+    void (*formatter)(char* dest, int dest_length,
+                          int variable, const char* unit);
+    /* used for BOOL and "choice" settings */
+    struct opt_items* options;    
+};
+    
+char * value_setting_get_name_cb(int selected_item,void * data, char *buffer)
+{
+    struct value_setting_data* cb_data = 
+            (struct value_setting_data*)data;
+    if (cb_data->type == INT && !cb_data->options)
+    {
+        int item = cb_data->max -(selected_item*cb_data->step);
+        if (cb_data->formatter)
+            cb_data->formatter(buffer, MAX_PATH,item,cb_data->unit);
+        else
+            snprintf(buffer, MAX_PATH,"%d %s",item,cb_data->unit);
+    }
+    else strcpy(buffer,P2STR(cb_data->options[selected_item].string));
+    return buffer;
+} 
+#define type_fromvoidptr(type, value) \
+    (type == INT)? \
+        (int)(*(int*)(value)) \
+    : \
+        (bool)(*(bool*)(value))
+bool do_set_setting(const unsigned char* string, void *variable,
+                    int nb_items,int selected, 
+                    struct value_setting_data *cb_data,
+                    void (*function)(int))
+{
+    int button;
+    bool done = false;
+    struct gui_synclist lists;
+    int oldvalue;
+    
+    if (cb_data->type == INT)
+        oldvalue = *(int*)variable;
+    else oldvalue = *(bool*)variable;
+    
+    gui_synclist_init(&lists,value_setting_get_name_cb,(void*)cb_data,false,1);
+    gui_synclist_set_title(&lists, (char*)string);
+    gui_synclist_set_icon_callback(&lists,NULL);
+    gui_synclist_set_nb_items(&lists,nb_items);
+    gui_synclist_limit_scroll(&lists,true);
+    gui_synclist_select_item(&lists, selected);
+    
+    if (global_settings.talk_menu)
+    {
+        if (cb_data->type == INT && !cb_data->options)
+            talk_unit(cb_data->voice_unit, *(int*)variable);
+        else talk_id(cb_data->options[selected].voice_id, false);
+    }
+    
+    gui_synclist_draw(&lists);
+    while (!done)
+    {
+        
+        button = button_get(true);
+        if (button == BUTTON_NONE)
+            continue;
+        
+        if (gui_synclist_do_button(&lists,button))
+        {
+            if (global_settings.talk_menu)
+            {
+                int value;
+                if (cb_data->type == INT && !cb_data->options)
+                {
+                    value = cb_data->max - 
+                            gui_synclist_get_sel_pos(&lists)*cb_data->step;
+                    talk_unit(cb_data->voice_unit, value);
+                }
+                else 
+                {
+                    value = gui_synclist_get_sel_pos(&lists);
+                    talk_id(cb_data->options[value].voice_id, false);
+                }
+            }
+            if (cb_data->type == INT && !cb_data->options)
+                *(int*)variable = cb_data->max - 
+                        gui_synclist_get_sel_pos(&lists)*cb_data->step;
+            else if (cb_data->type == BOOL)
+                *(bool*)variable = gui_synclist_get_sel_pos(&lists) ? true : false;
+            else *(int*)variable = gui_synclist_get_sel_pos(&lists);
+        }  
+        else if (button == SETTINGS_CANCEL)
+        {
+            gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
+            if (cb_data->type == INT)
+                *(int*)variable = oldvalue;
+            else *(bool*)variable = (bool)oldvalue;
+            done = true;
+        }
+        else if (button == SETTINGS_OK)
+        {
+            done = true;
+        }
+        else if(default_event_handler(button) == SYS_USB_CONNECTED)
+            return true;
+        gui_syncstatusbar_draw(&statusbars, false);
+        if ( function )
+            function(type_fromvoidptr(cb_data->type,variable));
+    }
+    return false;
+}
 bool set_int(const unsigned char* string,
              const char* unit,
              int voice_unit,
@@ -1862,36 +1974,10 @@ bool set_int(const unsigned char* string,
              int max,
              void (*formatter)(char*, int, int, const char*) )
 {
-    int button;
-    int oldvalue=*variable;
-    struct gui_select select;
-    gui_select_init_numeric(&select, (char *)string, *variable, min, max, step, unit,
-                            formatter);
-    gui_syncselect_draw(&select);
-    talk_unit(voice_unit, *variable);
-    while (!select.validated)
-    {
-        button = button_get_w_tmo(HZ/2);
-        if(gui_syncselect_do_button(&select, button))
-        {
-            *variable=select.options.option;
-            gui_syncselect_draw(&select);
-            talk_unit(voice_unit, *variable);
-            if ( function )
-                function(*variable);
-        }
-        gui_syncstatusbar_draw(&statusbars, false);
-        if(select.canceled)
-        {
-            *variable=oldvalue;
-            if ( function )
-                function(*variable);
-            return false;
-        }
-        if(default_event_handler(button) == SYS_USB_CONNECTED)
-            return true;
-    }
-    return false;
+    struct value_setting_data data = {
+        INT,max, step, voice_unit,unit,formatter,NULL };
+    return do_set_setting(string,variable,(max-min)/step + 1,
+                          (max-*variable)/step, &data,function);
 }
 
 /* NOTE: the 'type' parameter specifies the actual type of the variable
@@ -1900,64 +1986,18 @@ bool set_int(const unsigned char* string,
 
    The type separation is necessary since int and bool are fundamentally
    different and bit-incompatible types and can not share the same access
-   code. */
-
-#define set_type_fromint(type, dest, value) \
-    if (type == INT) \
-        *(int *)dest=value; \
-    else \
-        *(bool *)dest=value?true:false
-
-#define type_fromvoidptr(type, value) \
-    (type == INT)? \
-        (int)(*(int*)(value)) \
-    : \
-        (bool)(*(bool*)(value))
-
-#define get_int_fromtype(type, var) \
-    (type == INT)?*(int *)var:(*(bool *)var?1:0)
-
+   code. */ 
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int))
 {
-    int button;
-    int oldvalue;
-    /* oldvalue=*variable; */
-    oldvalue=get_int_fromtype(type, variable);
-    struct gui_select select;
-    gui_select_init_items(&select, string, oldvalue, options, numoptions);
-    gui_syncselect_draw(&select);
-    if (global_settings.talk_menu)
-        talk_id(options[select.options.option].voice_id, true);
-
-    while ( !select.validated )
-    {
-        gui_syncstatusbar_draw(&statusbars, true);
-        button = button_get_w_tmo(HZ/2);
-        select.options.limit_loop = false;
-        if(gui_syncselect_do_button(&select, button))
-        {
-            /* *variable = gui_select_get_selected(&select) */
-            set_type_fromint(type, variable, select.options.option);
-            gui_syncselect_draw(&select);
-            if (global_settings.talk_menu)
-                talk_id(options[select.options.option].voice_id, false);
-            if ( function )
-                function(type_fromvoidptr(type, variable));
-        }
-        gui_syncstatusbar_draw(&statusbars, false);
-        if(select.canceled)
-        {
-            /* *variable=oldvalue; */
-            set_type_fromint(type, variable, oldvalue);
-            if ( function )
-                function(type_fromvoidptr(type, variable));
-            return false;
-        }
-        if(default_event_handler(button) == SYS_USB_CONNECTED)
-            return true;
-    }
-    return false;
+    struct value_setting_data data = {
+        type,0, 0, 0,NULL,NULL,(struct opt_items*)options };
+    int selected;
+    if (type == BOOL)
+        selected = *(bool*)variable ? 1 : 0;
+    else selected = *(int*)variable;
+    return do_set_setting(string,variable,numoptions,
+                          selected, &data,function);
 }
 
 #ifdef HAVE_RECORDING

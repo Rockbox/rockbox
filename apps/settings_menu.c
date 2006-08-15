@@ -351,11 +351,14 @@ static bool flip_display(void)
  */
 static bool invert_cursor(void)
 {
-    return set_bool_options(str(LANG_INVERT_CURSOR),
-                            &global_settings.invert_cursor,
+    bool type = global_settings.invert_cursor;
+    bool rc = set_bool_options(str(LANG_INVERT_CURSOR),
+                            &type,
                             STR(LANG_INVERT_CURSOR_BAR),
                             STR(LANG_INVERT_CURSOR_POINTER),
                             NULL);
+    global_settings.invert_cursor = type;
+    return rc;
 }
 
 #ifdef HAVE_LCD_COLOR

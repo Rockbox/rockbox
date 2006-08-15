@@ -168,6 +168,8 @@ struct gui_list
     int selected_size;
     /* The data that will be passed to the callback function YOU implement */
     void * data;
+    /* The optional title, set to NULL for none */
+    char *title;
 };
 
 /*
@@ -332,7 +334,10 @@ extern void gui_list_del_item(struct gui_list * gui_list);
  */
 extern void gui_list_flash(struct gui_list * gui_list);
 
-
+/* 
+ * Set the title of the list, setting to NULL disables the title
+ */
+extern void gui_list_set_title(struct gui_list *gui_list , char* title);
 /*
  * This part handles as many lists as there are connected screens
  * (the api is similar to the ones above)
@@ -373,6 +378,7 @@ extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
+extern void gui_synclist_set_title(struct gui_synclist * lists, char* title);
 void gui_synclist_scroll_right(struct gui_synclist * lists);
 void gui_synclist_scroll_left(struct gui_synclist * lists);
 

@@ -22,6 +22,7 @@
 #include "font.h"
 #include "button.h"
 #include "sprintf.h"
+#include "string.h"
 #include "settings.h"
 #include "kernel.h"
 
@@ -66,6 +67,7 @@ void gui_list_init(struct gui_list * gui_list,
 #endif
     gui_list->scroll_all=scroll_all;
     gui_list->selected_size=selected_size;
+    gui_list->title = NULL;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -117,6 +119,8 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
 #endif
     gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
+    if (gui_list->title)
+        nb_lines--;
     if(put_from_end)
     {
         int list_end = gui_list->selected_item + SCROLL_LIMIT;
@@ -147,13 +151,28 @@ void gui_list_draw(struct gui_list * gui_list)
     bool draw_icons = (gui_list->callback_get_item_icon != NULL ) ;
     bool draw_cursor;
     int i;
+    int lines;
 
     /* Adjust the position of icon, cursor, text */
+    if (gui_list->title)
+    {
+        i = 1;
+        lines = display->nb_lines - 1;
+    }
+    else 
+    {
+        i = 0;
+        lines = display->nb_lines;
+    }
 #ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_UI);
     gui_textarea_update_nblines(display);
-    bool draw_scrollbar = (global_settings.scrollbar &&
-                           display->nb_lines < gui_list->nb_items);
+    bool draw_scrollbar;
+    
+    
+    draw_scrollbar = (global_settings.scrollbar &&
+                lines < gui_list->nb_items);
+    
     draw_cursor = !global_settings.invert_cursor;
     text_pos = 0; /* here it's in pixels */
     if(draw_scrollbar)
@@ -182,11 +201,12 @@ void gui_list_draw(struct gui_list * gui_list)
     screen_set_xmargin(display, text_pos);
 #endif
 
-    for(i = 0;i < display->nb_lines;i++)
+    
+    while (i < display->nb_lines)
     {
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
-        int current_item = gui_list->start_item + i;
+        int current_item = gui_list->start_item + (gui_list->title?i-1:i);
 
         /* When there are less items to display than the
          * current available space on the screen, we stop*/
@@ -268,19 +288,31 @@ void gui_list_draw(struct gui_list * gui_list)
             if(icon)
                 screen_put_iconxy(display, icon_pos, i, icon);
         }
+        i++;
     }
-#ifdef HAVE_LCD_BITMAP
+    
+#ifdef HAVE_LCD_BITMAP    
     /* Draw the scrollbar if needed*/
     if(draw_scrollbar)
     {
         int y_start = gui_textarea_get_ystart(display);
+        if (gui_list->title)
+            y_start += display->char_height;
         int scrollbar_y_end = display->char_height *
-                              display->nb_lines + y_start;
+                              lines + y_start;
         gui_scrollbar_draw(display, 0, y_start, SCROLLBAR_WIDTH-1,
                            scrollbar_y_end - y_start, gui_list->nb_items,
                            gui_list->start_item,
                            gui_list->start_item + display->nb_lines, VERTICAL);
     }
+    if (gui_list->title)
+    {
+        int start = ((display->width/display->char_width) - strlen(gui_list->title))/2;
+        display->puts(start, 0, gui_list->title);
+    }
+#else /* char cell display */
+    if (gui_list->title)
+        display->puts(0, 0, gui_list->title); /* dont center title */
 #endif
     gui_textarea_update(display);
 }
@@ -307,9 +339,11 @@ void gui_list_select_next(struct gui_list * gui_list)
     {
         gui_list->selected_item+=gui_list->selected_size;
         int nb_lines = gui_list->display->nb_lines;
+        if (gui_list->title)
+            nb_lines--;
         int item_pos = gui_list->selected_item - gui_list->start_item;
         int end_item = gui_list->start_item + nb_lines;
-
+        
         if (global_settings.scroll_paginated)
         {
             /* When we reach the bottom of the list
@@ -336,7 +370,9 @@ void gui_list_select_previous(struct gui_list * gui_list)
 {
     if( gui_list->selected_item-gui_list->selected_size < 0 )
     {
-        int nb_lines = gui_list->display->nb_lines;
+        int nb_lines = gui_list->display->nb_lines;        
+        if (gui_list->title)
+            nb_lines--;
         if(gui_list->limit_scroll)
             return;
         /* we have aleady reached the top of the list */
@@ -384,6 +420,8 @@ void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
+        if (gui_list->title)
+            nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item += nb_lines;
         if(gui_list->selected_item > gui_list->nb_items-1)
@@ -402,6 +440,8 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
+        if (gui_list->title)
+            nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item -= nb_lines;
         if(gui_list->selected_item < 0)
@@ -473,7 +513,10 @@ void gui_list_screen_scroll_out_of_view(bool enable)
         offset_out_of_view = false;
 }
 #endif /* HAVE_LCD_BITMAP */
-
+void gui_list_set_title(struct gui_list *gui_list , char* title)
+{
+    gui_list->title = title;
+}
 /*
  * Synchronized lists stuffs
  */
@@ -588,6 +631,13 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
     int i;
     FOR_NB_SCREENS(i)
         gui_list_limit_scroll(&(lists->gui_list[i]), scroll);
+}
+
+void gui_synclist_set_title(struct gui_synclist * lists, char* title)
+{
+    int i;
+    FOR_NB_SCREENS(i)
+            gui_list_set_title(&(lists->gui_list[i]), title);
 }
 
 void gui_synclist_flash(struct gui_synclist * lists)
