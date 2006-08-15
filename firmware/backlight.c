@@ -465,7 +465,14 @@ static void remote_backlight_update_state(void)
     }
     else
     {
-        __remote_backlight_on();
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+        if (remote_type() == REMOTETYPE_H300_NONLCD)
+        {
+            backlight_update_state();
+        }
+        else
+#endif 
+            __remote_backlight_on();
     }
 }
 #endif /* HAVE_REMOTE_LCD */
