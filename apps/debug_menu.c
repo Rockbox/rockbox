@@ -878,7 +878,6 @@ bool dbg_ports(void)
     unsigned short portb;
     unsigned char portc;
     char buf[32];
-    int button;
     int battery_voltage;
     int batt_int, batt_frac;
 
