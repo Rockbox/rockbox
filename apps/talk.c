@@ -146,10 +146,6 @@ static int open_voicefile(void)
     return open(buf, O_RDONLY);
 }
 
-int talk_get_bufsize(void)
-{
-    return voicefile_size;
-}
 
 /* load the voice file into the mp3 buffer */
 static void load_voicefile(void)
@@ -532,6 +528,19 @@ void talk_init(void)
     }
 }
 
+/* return if a voice codec is required or not */
+bool talk_voice_required(void)
+{
+    return (voicefile_size != 0) 
+        || (global_settings.talk_dir == 3) 
+        || (global_settings.talk_file == 3);
+}
+
+/* return size of voice file */
+int talk_get_bufsize(void)
+{
+    return voicefile_size;
+}
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 int talk_buffer_steal(void)

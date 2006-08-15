@@ -1264,16 +1264,20 @@ static const struct opt_items voice_names[] = {
 
 static bool voice_dirs(void)
 {
-    return set_option( str(LANG_VOICE_DIR),
+    bool ret = set_option( str(LANG_VOICE_DIR),
                        &global_settings.talk_dir, INT, voice_names, 4, NULL);
+    audio_set_crossfade(global_settings.crossfade);
+    return ret;
 }
 
 static bool voice_files(void)
 {
     int oldval = global_settings.talk_file;
     bool ret;
+
     ret = set_option( str(LANG_VOICE_FILE),
                        &global_settings.talk_file, INT, voice_names, 4, NULL);
+    audio_set_crossfade(global_settings.crossfade);
     if (oldval != 3 && global_settings.talk_file == 3)
     {   /* force reload if newly talking thumbnails,
            because the clip presence is cached only if enabled */
@@ -1462,9 +1466,7 @@ static bool crossfade(void)
 
     ret=set_option( str(LANG_CROSSFADE_ENABLE),
                     &global_settings.crossfade, INT, names, 4, NULL);
-
     audio_set_crossfade(global_settings.crossfade);
-
     return ret;
 }
 

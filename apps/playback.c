@@ -481,9 +481,13 @@ static void* get_voice_memory_callback(size_t *size)
 static void* get_codec_memory_callback(size_t *size)
 {
     *size = MALLOC_BUFSIZE;
+#if CONFIG_CODEC != SWCODEC
+    /* MASCODEC cannot play audio and voice simultaneously, so its
+       voice strategy is different - see talk.c for details */
     if (voice_codec_loaded)
         return &audiobuf[talk_get_bufsize()];
     else
+#endif
         return audiobuf;
 }
 
@@ -2559,7 +2563,7 @@ static void reset_buffer(void)
     filebuflen = audiobufend - audiobuf - MALLOC_BUFSIZE - GUARD_BUFSIZE -
         (pcmbuf_get_bufsize() + get_pcmbuf_descsize() + PCMBUF_MIX_CHUNK * 2);
 
-    if (talk_get_bufsize())
+    if (talk_voice_required())
     {
         filebuf = &filebuf[talk_get_bufsize()];
         filebuflen -= 2*CODEC_IRAM_SIZE + 2*CODEC_SIZE + talk_get_bufsize();
@@ -2569,8 +2573,17 @@ static void reset_buffer(void)
         iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
 #endif
         dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
-        dram_buf[1] =
-            (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+        dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+    }
+    else
+    {
+        filebuf = &filebuf[talk_get_bufsize()];
+        filebuflen -= CODEC_IRAM_SIZE + CODEC_SIZE + talk_get_bufsize();
+
+#ifndef SIMULATOR
+        iram_buf[0] = &filebuf[filebuflen];
+#endif
+        dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
     }
 
     /* Ensure that everything is aligned */
@@ -2616,8 +2629,8 @@ void voice_init(void)
         voice_codec_loaded = false;
     }
 
-    if (!talk_get_bufsize())
-        return ;
+    if (!talk_voice_required())
+        return;
 
     logf("Starting voice codec");
     queue_init(&voice_codec_queue);
