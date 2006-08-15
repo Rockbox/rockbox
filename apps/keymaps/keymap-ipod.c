@@ -23,7 +23,6 @@
 #include "button.h"
 #include "settings.h"
 
-
 /* 
  * The format of the list is as follows
  * { Action Code,   Button code,    Prereq button code } 
@@ -118,6 +117,18 @@ struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
+struct button_mapping button_context_quickscreen[]  = {
+    { ACTION_QS_DOWN,       BUTTON_PLAY,                    BUTTON_NONE },
+    { ACTION_QS_DOWN,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_PLAY },
+    { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
+    { ACTION_STD_CANCEL,    BUTTON_MENU,                    BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_quickscreen */
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 struct button_mapping* get_context_mapping(int context)
 {
@@ -145,6 +156,8 @@ struct button_mapping* get_context_mapping(int context)
             return button_context_yesno;
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
+        case CONTEXT_QUICKSCREEN:
+            return button_context_quickscreen;
         default:
             return button_context_standard;
     } 
