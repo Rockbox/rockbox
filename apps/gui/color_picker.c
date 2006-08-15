@@ -29,63 +29,10 @@
 #include "scrollbar.h"
 #include "lang.h"
 #include "splash.h"
+#include "action.h"
 
 #define TEXT_MARGIN display->char_width+2
 #define SLIDER_START 20
-
-#if (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define SLIDER_UP        BUTTON_UP
-#define SLIDER_DOWN      BUTTON_DOWN
-#define SLIDER_LEFT      BUTTON_LEFT
-#define SLIDER_RIGHT     BUTTON_RIGHT
-#define SLIDER_OK        BUTTON_ON
-#define SLIDER_OK2       BUTTON_SELECT
-#define SLIDER_CANCEL    BUTTON_OFF
-
-#define SLIDER_RC_UP     BUTTON_RC_REW
-#define SLIDER_RC_DOWN   BUTTON_RC_FF
-#define SLIDER_RC_LEFT   BUTTON_RC_SOURCE
-#define SLIDER_RC_RIGHT  BUTTON_RC_BITRATE
-#define SLIDER_RC_OK     BUTTON_RC_ON
-#define SLIDER_RC_CANCEL BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define SLIDER_UP        BUTTON_UP
-#define SLIDER_DOWN      BUTTON_DOWN
-#define SLIDER_LEFT      BUTTON_LEFT
-#define SLIDER_RIGHT     BUTTON_RIGHT
-#define SLIDER_OK        BUTTON_POWER
-#define SLIDER_CANCEL    BUTTON_A
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define SLIDER_UP        BUTTON_LEFT
-#define SLIDER_DOWN      BUTTON_RIGHT
-#define SLIDER_LEFT      BUTTON_SCROLL_BACK
-#define SLIDER_RIGHT     BUTTON_SCROLL_FWD
-#define SLIDER_OK        BUTTON_SELECT
-#define SLIDER_CANCEL    BUTTON_MENU
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define SLIDER_UP        BUTTON_UP
-#define SLIDER_DOWN      BUTTON_DOWN
-#define SLIDER_LEFT      BUTTON_LEFT
-#define SLIDER_RIGHT     BUTTON_RIGHT
-#define SLIDER_OK        BUTTON_SELECT
-#define SLIDER_CANCEL    BUTTON_PLAY
-
-/* FIXME: chosen at will to make it compile */
-#define SLIDER_RC_OK     BUTTON_RC_PLAY
-#define SLIDER_RC_CANCEL BUTTON_RC_REC
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define SLIDER_UP        BUTTON_SCROLL_UP
-#define SLIDER_DOWN      BUTTON_SCROLL_DOWN
-#define SLIDER_LEFT      BUTTON_LEFT
-#define SLIDER_RIGHT     BUTTON_RIGHT
-#define SLIDER_OK        BUTTON_PLAY
-#define SLIDER_CANCEL    BUTTON_POWER
-
-#endif
 
 static const int max_val[3] = {LCD_MAX_RED,LCD_MAX_GREEN,LCD_MAX_BLUE};
 
@@ -237,50 +184,30 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
             draw_screen(&screens[i], title, rgb_val, newcolor, slider);
         }
         
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGSGRAPHICAL,TIMEOUT_BLOCK);
         switch (button)
         {
-            case SLIDER_UP:
-#ifdef SLIDER_RC_UP
-            case SLIDER_RC_UP:
-#endif
+            case ACTION_STD_PREV:
                 slider = (slider+2)%3;
                 break;
 
-            case SLIDER_DOWN:
-#ifdef SLIDER_RC_DOWN
-            case SLIDER_RC_DOWN:
-#endif
+            case ACTION_STD_NEXT:
                 slider = (slider+1)%3;
                 break;
 
-            case SLIDER_RIGHT:
-            case SLIDER_RIGHT|BUTTON_REPEAT:
-#ifdef SLIDER_RC_RIGHT
-            case SLIDER_RC_RIGHT:
-            case SLIDER_RC_RIGHT|BUTTON_REPEAT:
-#endif
+            case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_INCREPEAT:
                 if (rgb_val[slider] < max_val[slider])
                     rgb_val[slider]++;
                 break;
 
-            case SLIDER_LEFT:
-            case SLIDER_LEFT|BUTTON_REPEAT:
-#ifdef SLIDER_RC_LEFT
-            case SLIDER_RC_LEFT:
-            case SLIDER_RC_LEFT|BUTTON_REPEAT:
-#endif
+            case ACTION_SETTINGS_DEC:
+            case ACTION_SETTINGS_DECREPEAT:
                 if (rgb_val[slider] > 0)
                     rgb_val[slider]--;
                 break;
 
-            case SLIDER_OK:
-#ifdef HAVE_REMOTE_LCD
-            case SLIDER_RC_OK:
-#endif
-#ifdef SLIDER_OK2
-            case SLIDER_OK2:
-#endif
+            case ACTION_STD_OK:
                 if ((banned_color!=-1) && (banned_color == newcolor))
                 {
                     gui_syncsplash(HZ*2,true,str(LANG_COLOR_UNACCEPTABLE));
@@ -290,10 +217,7 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
                 exit = 1;
                 break;
 
-            case SLIDER_CANCEL:
-#ifdef HAVE_REMOTE_LCD
-            case SLIDER_RC_CANCEL:
-#endif
+            case ACTION_STD_CANCEL:
                 exit = 1;
                 break;
 
@@ -306,6 +230,6 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
         }
     }
     display->set_foreground(fgcolor);
-
+    action_signalscreenchange();
     return false;
 }

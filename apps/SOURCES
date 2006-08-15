@@ -1,6 +1,7 @@
 #ifdef ROCKBOX_HAS_LOGF
 logfdisp.c
 #endif
+action.c
 alarm_menu.c
 abrepeat.c
 bookmark.c
@@ -81,3 +82,18 @@ eq_menu.c
 #endif
 metadata.c
 tagcache.c
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+keymaps/keymap-h1x0_h3x0.c
+#elif ((CONFIG_KEYPAD == IPOD_4G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD))
+keymaps/keymap-ipod.c
+#elif CONFIG_KEYPAD == RECORDER_PAD
+keymaps/keymap-recorder.c
+#elif CONFIG_KEYPAD == ONDIO_PAD
+keymaps/keymap-ondio.c
+#elif CONFIG_KEYPAD == PLAYER_PAD
+keymaps/keymap-player.c
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+keymaps/keymap-x5.c
+#endif

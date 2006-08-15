@@ -25,7 +25,7 @@
 #include "options.h"
 
 #include "lcd.h"
-#include "button.h"
+#include "action.h"
 #include "kernel.h"
 #include "sprintf.h"
 #include <string.h>
@@ -56,6 +56,7 @@ bool alarm_screen(void)
     int button;
     int i;
     bool update = true;
+    
 
     rtc_get_alarm(&h, &m);
 
@@ -84,10 +85,10 @@ bool alarm_screen(void)
             screens[i].puts(0, 1, buf);
             gui_textarea_update(&screens[i]);
         }
-        button = button_get_w_tmo(HZ);
+        button = get_action(CONTEXT_SETTINGS,HZ);
 
         switch(button) {
-        case BUTTON_PLAY:
+            case ACTION_STD_OK:
             /* prevent that an alarm occurs in the shutdown procedure */
             /* accept alarms only if they are in 2 minutes or more */
             tm = get_time();
@@ -106,8 +107,8 @@ bool alarm_screen(void)
             break;
 
          /* inc(m) */
-        case BUTTON_RIGHT:
-        case BUTTON_RIGHT | BUTTON_REPEAT:
+        case ACTION_SETTINGS_INC:
+        case ACTION_SETTINGS_INCREPEAT:
             m += 5;
             if (m == 60) {
                 h += 1;
@@ -118,8 +119,8 @@ bool alarm_screen(void)
             break;
 
          /* dec(m) */
-         case BUTTON_LEFT:
-         case BUTTON_LEFT | BUTTON_REPEAT:
+        case ACTION_SETTINGS_DEC:
+        case ACTION_SETTINGS_DECREPEAT:
              m -= 5;
              if (m == -5) {
                  h -= 1;
@@ -129,32 +130,25 @@ bool alarm_screen(void)
                  h = 23;
              break;
 
-#if CONFIG_KEYPAD == RECORDER_PAD
          /* inc(h) */
-         case BUTTON_UP:
-         case BUTTON_UP | BUTTON_REPEAT:
+         case ACTION_STD_NEXT:
+         case ACTION_STD_NEXTREPEAT:
              h = (h+1) % 24;
              break;
 
          /* dec(h) */
-         case BUTTON_DOWN:
-         case BUTTON_DOWN | BUTTON_REPEAT:
+        case ACTION_STD_PREV:
+        case ACTION_STD_NEXTREPEAT:
              h = (h+23) % 24;
              break;
-#endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-        case BUTTON_OFF:
-#else
-        case BUTTON_STOP:
-        case BUTTON_MENU:
-#endif
+            case ACTION_STD_CANCEL:
             rtc_enable_alarm(false);
             gui_syncsplash(HZ*2, true, str(LANG_ALARM_MOD_DISABLE));
             done = true;
             break;
 
-        case BUTTON_NONE:
+        case ACTION_NONE:
             gui_syncstatusbar_draw(&statusbars, false);
             break;
 
@@ -167,7 +161,7 @@ bool alarm_screen(void)
             break;
         }
     }
-
+    action_signalscreenchange();
     return false;
 }
 

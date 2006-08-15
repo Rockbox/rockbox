@@ -24,7 +24,7 @@
 
 #include "applimits.h"
 #include "lcd.h"
-#include "button.h"
+#include "action.h"
 #include "usb.h"
 #include "audio.h"
 #include "playlist.h"
@@ -458,30 +458,24 @@ bool bookmark_autoload(const char* file)
         while(!done)
         {
             /* Wait for a key to be pushed */
-            key = button_get(true);
+            key = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
             switch(key)
             {
 #ifdef HAVE_LCD_BITMAP
-#ifdef BOOKMARK_RC_DOWN
-                case BOOKMARK_RC_DOWN:
-#endif
-                case BOOKMARK_DOWN:
+                case ACTION_STD_NEXT:
                     return bookmark_load(global_bookmark_file_name, false);
 #endif
-#ifdef SETTINGS_RC_OK
-                case SETTINGS_RC_OK:
-#endif
-                case SETTINGS_OK:
+                case ACTION_STD_OK:
                     return bookmark_load(global_bookmark_file_name, true);
 
                 default:
                     /* Handle sys events, ignore button releases & repeats */
-                    if (default_event_handler(key) ||
-                        !(key & (BUTTON_REPEAT|BUTTON_REL)))
+                    if (default_event_handler(key))
                         done = true;
                     break;
             }
         }
+        action_signalscreenchange();
         return false;
     }
 }
@@ -571,7 +565,6 @@ static char* select_bookmark(const char* bookmark_file_name)
     int bookmark_id = 0;
     int bookmark_id_prev = -1;
     int key;
-    int lastkey = BUTTON_NONE;
     char* bookmark = NULL;
     int bookmark_count = 0;
 
@@ -605,6 +598,7 @@ static char* select_bookmark(const char* bookmark_file_name)
             {
                 gui_syncsplash(HZ, true, str(LANG_BOOKMARK_LOAD_EMPTY));
                 remove(bookmark_file_name);
+                action_signalscreenchange();
                 return NULL;
             }
             else
@@ -621,17 +615,10 @@ static char* select_bookmark(const char* bookmark_file_name)
         }
 
         /* waiting for the user to click a button */
-        key = button_get(true);
+        key = get_action(CONTEXT_BOOKMARKSCREEN,TIMEOUT_BLOCK);
         switch(key)
         {
-#ifdef BOOKMARK_RC_SELECT
-            case BOOKMARK_RC_SELECT:
-#endif
-            case BOOKMARK_SELECT:
-#ifdef BOOKMARK_SELECT_PRE
-                if (lastkey != BOOKMARK_SELECT_PRE)
-                    break;
-#endif
+            case ACTION_STD_OK:
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
@@ -645,11 +632,10 @@ static char* select_bookmark(const char* bookmark_file_name)
                         screens[i].setmargins(0, 0);
                 }
 #endif
+                action_signalscreenchange();
                 return bookmark;
-#ifdef BOOKMARK_RC_DELETE
-            case BOOKMARK_RC_DELETE:
-#endif
-            case BOOKMARK_DELETE:
+
+            case ACTION_BMARK_DELETE:
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
                 bookmark_id_prev=-2;
@@ -658,54 +644,32 @@ static char* select_bookmark(const char* bookmark_file_name)
                     bookmark_id = bookmark_count -1;
                 break;
 
-#ifdef SETTINGS_RC_DEC
-            case SETTINGS_RC_DEC:
-            case SETTINGS_RC_DEC | BUTTON_REPEAT:
-#endif
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
+            case ACTION_SETTINGS_DEC:
                 bookmark_id--;
                 break;
 
-#ifdef SETTINGS_RC_DEC
-            case SETTINGS_RC_INC:
-            case SETTINGS_RC_INC | BUTTON_REPEAT:
-#endif
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
+            case ACTION_SETTINGS_INC:
                 bookmark_id++;
                 break;
 
-#ifdef SETTINGS_RC_CANCEL
-            case SETTINGS_RC_CANCEL:
-#endif
-#ifdef SETTINGS_RC_CANCEL2
-            case SETTINGS_RC_CANCEL2:
-#endif
-            case SETTINGS_CANCEL:
-#ifdef SETTINGS_CANCEL2
-            case SETTINGS_CANCEL2:
-#endif
-#ifdef SETTINGS_RC_OK2
-            case SETTINGS_RC_OK2:
-#endif
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
+            case ACTION_STD_CANCEL:
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                     screens[i].setmargins(x, y);
 #endif
+                action_signalscreenchange();
                 return NULL;
 
             default:
                 if(default_event_handler(key) == SYS_USB_CONNECTED)
+                {
+                    action_signalscreenchange();
                     return NULL;
+                }
                 break;
         }
-        lastkey = key;
     }
-
+    action_signalscreenchange();
     return NULL;
 }
 

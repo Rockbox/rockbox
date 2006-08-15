@@ -70,6 +70,7 @@
 #include <string.h>
 #include "playlist.h"
 #include "file.h"
+#include "action.h"
 #include "dir.h"
 #include "sprintf.h"
 #include "debug.h"
@@ -1342,7 +1343,7 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
         for (i=0; i<num_files; i++)
         {
             /* user abort */
-            if (button_get(false) == SETTINGS_CANCEL)
+            if (action_userabort(TIMEOUT_NOBLOCK))
             {
                 result = -1;
                 exit = true;
@@ -1440,7 +1441,7 @@ static int check_subdir_for_music(char *dir, char *subdir)
     {
         for (i=0; i<num_files; i++)
         {
-            if (button_get(false) == SETTINGS_CANCEL)
+            if (action_userabort(TIMEOUT_NOBLOCK))
             {
                 result = -2;
                 break;
@@ -1888,7 +1889,7 @@ int playlist_resume(void)
                                str(LANG_OFF_ABORT)
 #endif
                                );
-                if (SETTINGS_CANCEL == button_get(false))
+                if (action_userabort(TIMEOUT_NOBLOCK))
                 {
                     /* FIXME: 
                      * Not sure how to implement this, somebody more familiar
@@ -2870,7 +2871,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
         /* user abort */
-        if (button_get(false) == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_NOBLOCK))
             break;
 
         if (temp_buf[0] != '#' && temp_buf[0] != '\0')
@@ -3281,7 +3282,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
         int seek;
 
         /* user abort */
-        if (button_get(false) == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_NOBLOCK))
         {
             result = -1;
             break;
@@ -3408,7 +3409,7 @@ int playlist_directory_tracksearch(const char* dirname, bool recurse,
     for (i=0; i<num_files; i++)
     {
         /* user abort */
-        if (button_get(false) == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_NOBLOCK))
         {
             result = -1;
             break;

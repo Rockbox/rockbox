@@ -24,19 +24,11 @@
 #include <timefuncs.h>
 #include <string.h>
 #include <kernel.h>
-#include <button.h>
+#include <action.h>
 
 #include <lcd.h>
 #include "menu.h"
 #include "logf.h"
-
-#if (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define LOGF_BUTTON_QUIT BUTTON_MENU
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define LOGF_BUTTON_QUIT BUTTON_POWER
-#else
-#define LOGF_BUTTON_QUIT BUTTON_OFF
-#endif
 
 #ifdef HAVE_LCD_BITMAP
 bool logfdisplay(void)
@@ -46,7 +38,6 @@ bool logfdisplay(void)
     int lines;
     int columns;
     int i;
-    int button;
 
     bool lcd = false; /* fixed atm */
     int index;
@@ -93,8 +84,7 @@ bool logfdisplay(void)
             lcd_puts(0, i, buffer);
         }
         lcd_update();
-        button = button_get_w_tmo(HZ/2);
-    } while(button != LOGF_BUTTON_QUIT);
+    } while(!action_userabort(HZ));
 
     return false;
 }

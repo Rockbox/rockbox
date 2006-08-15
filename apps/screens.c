@@ -21,7 +21,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "backlight.h"
-#include "button.h"
+#include "action.h"
 #include "lcd.h"
 #include "lang.h"
 #include "icons.h"
@@ -309,11 +309,7 @@ void charging_display_info(bool animate)
    2 if Off/Stop key was pressed
    3 if On key was pressed
    4 if USB was connected */
-#if (CONFIG_KEYPAD==IPOD_3G_PAD) || (CONFIG_KEYPAD==IPOD_4G_PAD)
-# define CHARGE_SCREEN_RESUME BUTTON_SELECT
-#else
-# define CHARGE_SCREEN_RESUME BUTTON_ON
-#endif
+   
 int charging_screen(void)
 {
     unsigned int button;
@@ -338,8 +334,8 @@ int charging_screen(void)
     {
         gui_syncstatusbar_draw(&statusbars, false);
         charging_display_info(true);
-        button = button_get_w_tmo(HZ/3);
-        if (button == CHARGE_SCREEN_RESUME)
+        button = get_action(CONTEXT_STD,HZ/3);
+        if (button == ACTION_STD_OK)
             rc = 2;
         else if (usb_detect())
             rc = 3;
@@ -350,6 +346,7 @@ int charging_screen(void)
 #ifdef HAVE_LCD_CHARCELLS
     logo_lock_patterns(false);
 #endif
+    action_signalscreenchange();
     return rc;
 }
 #endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
@@ -423,15 +420,15 @@ bool pitch_screen(void)
     {
         pitch_screen_draw(pitch);
 
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
         switch (button) {
-            case PITCH_UP:
+            case ACTION_SETTINGS_INC:
                 if ( pitch < 2000 )
                     pitch++;
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_UP | BUTTON_REPEAT:
+            case ACTION_SETTINGS_INCREPEAT:
                 if ( pitch < 1990 )
                     pitch += 10;
                 else
@@ -439,13 +436,13 @@ bool pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_DOWN:
+            case ACTION_SETTINGS_DEC:
                 if ( pitch > 500 )
                     pitch--;
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_DOWN | BUTTON_REPEAT:
+            case ACTION_SETTINGS_DECREPEAT:
                 if ( pitch > 510 )
                     pitch -= 10;
                 else
@@ -453,7 +450,7 @@ bool pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case PITCH_RIGHT:
+            case ACTION_STD_NEXT:
                 if ( pitch < 1980 )
                 {
                     pitch += 20;
@@ -461,15 +458,12 @@ bool pitch_screen(void)
 
                     pitch_screen_draw(pitch);
 
-                    while(button != (PITCH_RIGHT|BUTTON_REL))
-                        button = button_get(true);
-
                     pitch -= 20;
                     sound_set_pitch(pitch);
                 }
                 break;
 
-            case PITCH_LEFT:
+            case ACTION_STD_PREV:
                 if ( pitch > 520 )
                 {
                     pitch -= 20;
@@ -477,20 +471,17 @@ bool pitch_screen(void)
 
                     pitch_screen_draw(pitch);
 
-                    while(button != (PITCH_LEFT|BUTTON_REL))
-                        button = button_get(true);;
-
                     pitch += 20;
                     sound_set_pitch(pitch);
                 }
                 break;
 
-            case PITCH_RESET:
+            case ACTION_STD_OK:
                 pitch = 1000;
                 sound_set_pitch( pitch );
                 break;
 
-            case PITCH_EXIT:
+            case ACTION_STD_CANCEL:
                 exit = true;
                 break;
 
@@ -504,6 +495,7 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(false);
 #endif
     lcd_setfont(FONT_UI);
+    action_signalscreenchange();
     return 0;
 }
 #endif
@@ -923,24 +915,22 @@ bool set_time_screen(const char* string, struct tm *tm)
             say_time(cursorpos, tm);
         }
 
-        button = button_get_w_tmo(HZ/2);
+        button = get_action(CONTEXT_SETTINGS,HZ/2);
         switch ( button ) {
-            case SETTINGS_PREV:
+            case ACTION_STD_PREV:
                 cursorpos = (cursorpos + 6 - 1) % 6;
                 break;
-            case SETTINGS_NEXT:
+            case ACTION_STD_NEXT:
                 cursorpos = (cursorpos + 6 + 1) % 6;
                 break;
-            case SETTINGS_INC:
-            case SETTINGS_INC | BUTTON_REPEAT:
+            case ACTION_SETTINGS_INC:
                 *valptr = (*valptr + steps - min + 1) %
                     steps + min;
                 if(*valptr == 0)
                     *valptr = min;
                 say_time(cursorpos, tm);
                 break;
-            case SETTINGS_DEC:
-            case SETTINGS_DEC | BUTTON_REPEAT:
+            case ACTION_SETTINGS_DEC:
                 *valptr = (*valptr + steps - min - 1) %
                     steps + min;
                 if(*valptr == 0)
@@ -948,11 +938,11 @@ bool set_time_screen(const char* string, struct tm *tm)
                 say_time(cursorpos, tm);
                 break;
 
-            case SETTINGS_ACCEPT:
+            case ACTION_STD_OK:
                 done = true;
                 break;
 
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 tm->tm_year = -1;
                 break;
@@ -963,7 +953,7 @@ bool set_time_screen(const char* string, struct tm *tm)
                 break;
         }
     }
-
+    action_signalscreenchange();
     lcd_set_drawmode(lastmode);
     return false;
 }
@@ -981,10 +971,10 @@ bool shutdown_screen(void)
 
     while(!done)
     {
-        button = button_get_w_tmo(HZ*2);
+        button = get_action(CONTEXT_STD,HZ*2);
         switch(button)
         {
-            case BUTTON_OFF:
+            case ACTION_STD_CANCEL:
                 sys_poweroff();
                 break;
 
@@ -998,11 +988,14 @@ bool shutdown_screen(void)
                    not have released the button yet.
                    We also ignore REPEAT events, since we don't want to
                    remove the splash when the user holds OFF to shut down. */
+                /* Is this still needed? commenting out so it compiles..
+                    CHECK ME!!
                 if(!(button & (BUTTON_REL | BUTTON_REPEAT)))
-                   done = true;
+                */   done = true;
                 break;
         }
     }
+    action_signalscreenchange();
     return false;
 }
 #endif
@@ -1123,9 +1116,12 @@ bool browse_id3(void)
     gui_synclist_set_nb_items(&id3_lists, ID3_ITEMS*2);
     gui_synclist_draw(&id3_lists);
     while (true) {
-        key = button_get_w_tmo(HZ/2);
-        if(key!=BUTTON_NONE && !(key&BUTTON_REL) && !gui_synclist_do_button(&id3_lists, key))
+        key = get_action(CONTEXT_STD,HZ/2);
+        if(key!=ACTION_NONE && /* !(key&BUTTON_REL) && ?? */ !gui_synclist_do_button(&id3_lists, key))
+        {
+            action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);
+        }
         gui_syncstatusbar_draw(&statusbars, false);
     }
 }
@@ -1147,29 +1143,24 @@ bool set_rating(void)
         snprintf(rating_text, sizeof(rating_text), "%d", id3->rating);
         lcd_puts(0, 1, (unsigned char *)rating_text);
         lcd_update();
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
 
         switch(button)
         {
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 if (id3->rating > 0)
                     id3->rating--;
                 else
                     id3->rating = 10;
                 break;
 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 if (id3->rating < 10)
                     id3->rating++;
                 else
                     id3->rating = 0;
                 break;
-            case SETTINGS_CANCEL:
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-                /* eat release event */
-                button_get(true);
+            case ACTION_STD_CANCEL:
                 exit = true;
                 break;
 
@@ -1179,5 +1170,6 @@ bool set_rating(void)
                 break;
         }
     }
+    action_signalscreenchange();
     return false;
 }

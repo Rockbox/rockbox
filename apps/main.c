@@ -365,7 +365,7 @@ void init(void)
         lcd_puts(0, 1, str);
         lcd_puts(0, 3, "Press ON to debug");
         lcd_update();
-        while(!(button_get(true) & BUTTON_REL));
+        while(!(button_get(true) & BUTTON_REL)); /*DO NOT CHANGE TO ACTION SYSTEM */
         dbg_ports();
 #endif
         panicf("ata: %d", rc);

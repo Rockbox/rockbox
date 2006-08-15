@@ -48,6 +48,7 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "playlist_menu.h"
+#include "action.h"
 
 /* Maximum number of tracks we can have loaded at one time */
 #define MAX_PLAYLIST_ENTRIES 200
@@ -614,7 +615,7 @@ bool playlist_viewer_ex(char* filename)
 {
     bool ret = false;       /* return value */
     bool exit=false;        /* exit viewer */
-    int button, lastbutton = BUTTON_NONE;
+    int button;
     struct gui_synclist playlist_lists;
     if (!playlist_viewer_init(&viewer, filename, false))
         goto exit;
@@ -661,7 +662,7 @@ bool playlist_viewer_ex(char* filename)
         }
 
         /* Timeout so we can determine if play status has changed */
-        button = button_get_w_tmo(HZ/2);
+        button = get_action(CONTEXT_TREE,HZ/2);
         int list_action;
         if( (list_action=gui_synclist_do_button(&playlist_lists, button))!=0 )
         {
@@ -669,7 +670,7 @@ bool playlist_viewer_ex(char* filename)
             if(playlist_buffer_needs_reload(&viewer.buffer,
                 viewer.selected_track))
                 playlist_buffer_load_entries_screen(&viewer.buffer,
-                    list_action==LIST_NEXT?
+                    list_action==ACTION_STD_NEXT?
                         FORWARD
                         :
                         BACKWARD
@@ -677,36 +678,11 @@ bool playlist_viewer_ex(char* filename)
         }
         switch (button)
         {
-            case TREE_EXIT | BUTTON_REL:
-                if (lastbutton != TREE_EXIT)
-                    break;
-#ifdef TREE_RC_EXIT
-            case TREE_RC_EXIT:
-#endif
-#ifdef TREE_OFF
-            case TREE_OFF:
-#endif
+            case ACTION_STD_CANCEL:
                 exit = true;
                 break;
-
-#ifdef TREE_ENTER
-            case TREE_ENTER | BUTTON_REL:
-                if (lastbutton != TREE_ENTER)
-                    break;
-#endif
-#ifdef TREE_RC_RUN
-            case TREE_RC_RUN:
-#endif
-            case TREE_RUN:
-#ifdef TREE_RUN_PRE
-                if (((button == TREE_RUN)
-#ifdef TREE_RC_RUN_PRE
-                    || (button == TREE_RC_RUN))
-                        && ((lastbutton != TREE_RC_RUN_PRE)
-#endif
-                    && (lastbutton != TREE_RUN_PRE)))
-                    break;
-#endif
+            case ACTION_STD_OK:
+            {
                 struct playlist_entry * current_track =
                     playlist_buffer_get_track(&viewer.buffer,
                     viewer.selected_track);
@@ -744,14 +720,8 @@ bool playlist_viewer_ex(char* filename)
                 gui_synclist_draw(&playlist_lists);
 
                 break;
-
-            case TREE_CONTEXT:
-#ifdef TREE_CONTEXT2
-            case TREE_CONTEXT2:
-#endif
-#ifdef TREE_RC_CONTEXT
-            case TREE_RC_CONTEXT:
-#endif
+            }
+            case ACTION_STD_CONTEXT:
             {
                 /* ON+PLAY menu */
                 int ret;
@@ -774,14 +744,7 @@ bool playlist_viewer_ex(char* filename)
                 gui_synclist_draw(&playlist_lists);
                 break;
             }
-#ifdef TREE_MENU_PRE
-            case TREE_MENU_PRE:
-#else
-            case TREE_MENU:
-#endif
-#ifdef TREE_RC_MENU
-            case TREE_RC_MENU:
-#endif
+            case ACTION_STD_MENU:
                 if (viewer_menu())
                 {
                     ret = true;
@@ -795,7 +758,7 @@ bool playlist_viewer_ex(char* filename)
                 gui_synclist_draw(&playlist_lists);
                 break;
 
-            case BUTTON_NONE:
+            case ACTION_NONE:
                 gui_syncstatusbar_draw(&statusbars, false);
                 break;
 
@@ -807,12 +770,12 @@ bool playlist_viewer_ex(char* filename)
                 }
                 break;
         }
-        lastbutton = button;
     }
 
 exit:
     if (viewer.playlist)
         playlist_close(viewer.playlist);
+    action_signalscreenchange();
     return ret;
 }
 char * playlist_search_callback_name(int selected_item, void * data, char *buffer)
@@ -860,7 +823,7 @@ bool search_playlist(void)
                    str(LANG_OFF_ABORT)
 #endif
         );
-        if (SETTINGS_CANCEL == button_get(false))
+        if (action_userabort(TIMEOUT_NOBLOCK))
             return ret;
         playlist_get_track_info(viewer.playlist,i,&track);
         if (strcasestr(track.filename,search_str))
@@ -883,35 +846,22 @@ bool search_playlist(void)
     gui_synclist_draw(&playlist_lists);
     while (!exit)
     {
-        button = button_get(true);
+        button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (gui_synclist_do_button(&playlist_lists, button))
             continue;
         switch (button)
         {
-            case TREE_EXIT:
-#ifdef TREE_RC_EXIT
-            case TREE_RC_EXIT:
-#endif
-#ifdef TREE_OFF
-            case TREE_OFF:
-#endif
+            case ACTION_STD_CANCEL:
                 exit = true;
                 break;
 
-#ifdef TREE_ENTER
-            case TREE_ENTER:
-            case TREE_ENTER | BUTTON_REPEAT:
-#endif
-#ifdef TREE_RC_RUN
-            case TREE_RC_RUN:
-#endif
-            case TREE_RUN:
+            case ACTION_STD_OK:
                 playlist_start(
                     found_indicies[gui_synclist_get_sel_pos(&playlist_lists)]
                     ,0);
                 exit = 1;
             break;
-            case BUTTON_NONE:
+            case ACTION_NONE:
                 break;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
@@ -922,6 +872,7 @@ bool search_playlist(void)
                 break;
         }
     }
+    action_signalscreenchange();
     return ret;
 }
 

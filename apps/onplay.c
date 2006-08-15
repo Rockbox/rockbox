@@ -815,11 +815,7 @@ static int onplay_callback(int key, int menu)
 {
     (void)menu;
 
-    if (key == MENU_EXIT_MENU
-#ifdef MENU_RC_EXIT_MENU
-        || key == MENU_RC_EXIT_MENU
-#endif
-       )
+    if (key == ACTION_STD_MENU)
         exit_to_main = true;
 
     return key;

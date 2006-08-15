@@ -468,6 +468,11 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     PREFIX(rmdir),
+    /* action handling */
+    get_custom_action,
+    get_action,
+    action_signalscreenchange,
+    action_userabort,
 };
 
 int plugin_load(const char* plugin, void* parameter)

@@ -3,6 +3,7 @@
 #include "kernel.h"
 #include "misc.h"
 #include "lang.h"
+#include "action.h"
 
 void gui_yesno_init(struct gui_yesno * yn,
                     struct text_message * main_message,
@@ -54,7 +55,7 @@ bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
     gui_textarea_put_message(yn->display, message, 0);
     return(true);
 }
-
+#include "debug.h"
 enum yesno_res gui_syncyesno_run(struct text_message * main_message,
                                  struct text_message * yes_message,
                                  struct text_message * no_message)
@@ -72,23 +73,21 @@ enum yesno_res gui_syncyesno_run(struct text_message * main_message,
     }
     while (result==-1)
     {
-        button = button_get(true);
+        button = get_action(CONTEXT_YESNOSCREEN,TIMEOUT_BLOCK);
+        DEBUGF("button=%x\n",button);
         switch (button)
         {
-            case YESNO_OK:
-#ifdef YESNO_RC_OK
-            case YESNO_RC_OK:
-#endif
+            case ACTION_YESNO_ACCEPT:
                 result=YESNO_YES;
                 break;
 
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return(YESNO_USB);
-                if(!(button & BUTTON_REL))
-                    result=YESNO_NO;
+                result = YESNO_NO;
         }
     }
+    action_signalscreenchange();
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);
     if(result_displayed)

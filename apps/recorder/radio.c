@@ -1359,6 +1359,7 @@ bool handle_radio_presets_menu(void)
 int handle_radio_presets_cb(int key, int m)
 {
     (void)m;
+#if 0 /* this screen needs fixing! */
     switch(key)
     {
 #ifdef FM_PRESET_ADD
@@ -1372,7 +1373,7 @@ int handle_radio_presets_cb(int key, int m)
 #ifdef FM_PRESET
         case FM_PRESET:
             menu_draw(m);
-            key = MENU_EXIT; /* Fake an exit */
+            key = ACTION_STD_EXIT; /* Fake an exit */
             break;
 #endif
 #endif
@@ -1409,21 +1410,11 @@ int handle_radio_presets_cb(int key, int m)
         case MENU_ENTER2 | BUTTON_REL:
 #endif
         case MENU_ENTER | BUTTON_REL:
-            key = MENU_ENTER; /* fake enter for short press */
+            key = ACTION_STD_SELECT; /* fake enter for short press */
             break;
             
 /* ignore down events */
-#ifdef MENU_RC_ENTER
-        case MENU_RC_ENTER:
-#endif
-#ifdef MENU_RC_ENTER2
-        case MENU_RC_ENTER2:
-#endif
-
-#ifdef MENU_ENTER2
-        case MENU_ENTER2:
-#endif
-        case MENU_ENTER: 
+        case ACTION_STD_SELECT: 
             /* Ignore the release events */
 #ifdef FM_PRESET_ADD
         case FM_PRESET_ADD | BUTTON_REL:
@@ -1434,6 +1425,7 @@ int handle_radio_presets_cb(int key, int m)
             key = BUTTON_NONE;
             break;
     }
+#endif    
     return key;
 }
 
@@ -1611,6 +1603,7 @@ static bool scan_presets(void)
 int radio_menu_cb(int key, int m)
 {
     (void)m;
+#if 0 /* this screen needs fixing! */
     switch(key)
     {
 #if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
@@ -1631,7 +1624,7 @@ int radio_menu_cb(int key, int m)
         key = MENU_ENTER; /* fake downpress, next menu doesn't like release */
         break;
     }
-
+#endif
     return key;
 }
 

@@ -23,6 +23,7 @@
 #include "textarea.h"
 #include "screen_access.h"
 #include "kernel.h"
+#include "action.h"
 
 
 void gui_select_init_numeric(struct gui_select * select,
@@ -79,56 +80,28 @@ bool gui_syncselect_do_button(struct gui_select * select, int button)
 {
     switch(button)
     {
-        case SELECT_INC | BUTTON_REPEAT :
-#ifdef SELECT_RC_INC
-        case SELECT_RC_INC | BUTTON_REPEAT :
-#endif
+        case ACTION_SETTINGS_INCREPEAT:
             select->options.limit_loop = true;
-        case SELECT_INC :
-#ifdef SELECT_RC_INC
-        case SELECT_RC_INC :
-#endif
+        case ACTION_SETTINGS_INC:
             option_select_next(&select->options);
             return(true);
 
-        case SELECT_DEC | BUTTON_REPEAT :
-#ifdef SELECT_RC_DEC
-        case SELECT_RC_DEC | BUTTON_REPEAT :
-#endif
+        case ACTION_SETTINGS_DECREPEAT:
             select->options.limit_loop = true;
-        case SELECT_DEC :
-#ifdef SELECT_RC_DEC
-        case SELECT_RC_DEC :
-#endif
+        case ACTION_SETTINGS_DEC:
             option_select_prev(&select->options);
             return(true);
 
-        case SELECT_OK :
-#ifdef SELECT_RC_OK
-        case SELECT_RC_OK :
-#endif
-#ifdef SELECT_RC_OK2
-        case SELECT_RC_OK2 :
-#endif
-#ifdef SELECT_OK2
-        case SELECT_OK2 :
-#endif
+        case ACTION_STD_OK:
+        case ACTION_STD_PREV: /*NOTE: this is in CONTEXT_SETTINGS ! */
             select->validated=true;
             return(false);
 
-        case SELECT_CANCEL :
-#ifdef SELECT_CANCEL2
-        case SELECT_CANCEL2 :
-#endif 
-#ifdef SELECT_RC_CANCEL
-        case SELECT_RC_CANCEL :
-#endif
-#ifdef SELECT_RC_CANCEL2
-        case SELECT_RC_CANCEL2 :
-#endif
+        case ACTION_STD_CANCEL:
             select->canceled = true;
             gui_syncselect_draw(select);
             sleep(HZ/2);
+            action_signalscreenchange();
             return(false);
     }
     return(false);

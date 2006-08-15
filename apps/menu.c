@@ -40,6 +40,7 @@
 #include "talk.h"
 #include "lang.h"
 #include "misc.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
@@ -124,13 +125,12 @@ int menu_show(int m)
 #endif
     bool exit = false;
     int key;
-    unsigned lastbutton = 0;
 
     gui_synclist_draw(&(menus[m].synclist));
     gui_syncstatusbar_draw(&statusbars, true);
     menu_talk_selected(m);
     while (!exit) {
-        key = button_get_w_tmo(HZ/2);
+        key = get_action(CONTEXT_MAINMENU,HZ/2);
         /*
          * "short-circuit" the default keypresses by running the
          * callback function
@@ -144,40 +144,13 @@ int menu_show(int m)
         if(gui_synclist_do_button(&(menus[m].synclist), key))
             menu_talk_selected(m);
         switch( key ) {
-            case MENU_ENTER | BUTTON_REL:
-                if (lastbutton != MENU_ENTER)
-                    break;
-#ifdef MENU_ENTER2
-            case MENU_ENTER2:
-#endif
-#ifdef MENU_RC_ENTER
-            case MENU_RC_ENTER:
-#endif
-#ifdef MENU_RC_ENTER2
-            case MENU_RC_ENTER2:
-#endif
+            case ACTION_STD_OK:
+                action_signalscreenchange();
                 return gui_synclist_get_sel_pos(&(menus[m].synclist));
 
 
-            case MENU_EXIT | BUTTON_REL:
-                if (lastbutton != MENU_EXIT)
-                    break;
-#ifdef MENU_EXIT2
-            case MENU_EXIT2:
-#endif
-#ifdef MENU_EXIT_MENU
-            case MENU_EXIT_MENU | BUTTON_REL:
-                /* This is important for the Ondio's */
-                if ((key == (MENU_EXIT_MENU | BUTTON_REL)) &&
-                    (lastbutton != MENU_EXIT_MENU))
-                    break;
-#endif
-#ifdef MENU_RC_EXIT
-            case MENU_RC_EXIT:
-#endif
-#ifdef MENU_RC_EXIT_MENU
-            case MENU_RC_EXIT_MENU:
-#endif
+            case ACTION_STD_CANCEL:
+            case ACTION_STD_MENU:
                 exit = true;
                 break;
 
@@ -187,9 +160,8 @@ int menu_show(int m)
                 break;
         }
         gui_syncstatusbar_draw(&statusbars, false);
-        if ( key )
-            lastbutton = key;
     }
+    action_signalscreenchange();
     return MENU_SELECTED_EXIT;
 }
 

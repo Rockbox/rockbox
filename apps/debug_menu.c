@@ -27,7 +27,7 @@
 #include "debug_menu.h"
 #include "kernel.h"
 #include "sprintf.h"
-#include "button.h"
+#include "action.h"
 #include "adc.h"
 #include "mas.h"
 #include "power.h"
@@ -86,7 +86,6 @@ extern const char *thread_name[];
 bool dbg_os(void)
 {
     char buf[32];
-    int button;
     int i;
     int usage;
 
@@ -106,13 +105,8 @@ bool dbg_os(void)
 
         lcd_update();
 
-        button = button_get_w_tmo(HZ/10);
-
-        switch(button)
-        {
-            case SETTINGS_CANCEL:
-                return false;
-        }
+        if (action_userabort(TIMEOUT_BLOCK))
+            return false;
     }
     return false;
 }
@@ -134,20 +128,21 @@ bool dbg_os(void)
         snprintf(buf, 32, "%d: %d%%  ", currval, usage);
         lcd_puts(0, 1, buf);
     
-        button = button_get_w_tmo(HZ/10);
+        button = get_action(CONTEXT_SETTINGS,HZ/10);
 
         switch(button)
         {
-        case SETTINGS_CANCEL:
+        case ACTION_STD_CANCEL:
+            action_signalscreenchange();
             return false;
 
-        case SETTINGS_DEC:
+        case ACTION_SETTINGS_DEC:
             currval--;
             if(currval < 0)
                 currval = num_threads-1;
             break;
 
-        case SETTINGS_INC:
+        case ACTION_SETTINGS_INC:
             currval++;
             if(currval > num_threads-1)
                 currval = 0;
@@ -163,7 +158,6 @@ bool dbg_os(void)
 bool dbg_audio_thread(void)
 {
     char buf[32];
-    int button;
     struct audio_debug d;
 
     lcd_setmargins(0, 0);
@@ -171,12 +165,8 @@ bool dbg_audio_thread(void)
     
     while(1)
     {
-        button = button_get_w_tmo(HZ/5);
-        switch(button)
-        {
-            case SETTINGS_CANCEL:
-                return false;
-        }
+        if (action_userabort(HZ/5))
+            return false;
 
         audio_get_debugdata(&d);
         
@@ -242,23 +232,22 @@ bool dbg_audio_thread(void)
     
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
-    
     while(!done)
     {
-        button = button_get_w_tmo(HZ/5);
+        button = get_action(CONTEXT_STD,HZ/5);
         switch(button)
         {
-            case SETTINGS_NEXT:
+            case ACTION_STD_NEXT:
                 audio_next();
                 break;
-            case SETTINGS_PREV:
+            case ACTION_STD_PREV:
                 audio_prev();
                 break;
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
         }
-
+        action_signalscreenchange();
         line = 0;
         
         lcd_clear_display();
@@ -406,7 +395,6 @@ bool dbg_hw_info(void)
 {
 #if CONFIG_CPU == SH7034
     char buf[32];
-    int button;
     int usb_polarity;
     int pr_polarity;
     int bitmask = *(unsigned short*)0x20000fc;
@@ -494,13 +482,11 @@ bool dbg_hw_info(void)
 
     while(1)
     {
-        button = button_get(true);
-        if(button == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_BLOCK))
             return false;
     }
 #elif CONFIG_CPU == MCF5249 || CONFIG_CPU == MCF5250
     char buf[32];
-    int button;
     unsigned manu, id; /* flash IDs */
     bool got_id; /* flag if we managed to get the flash IDs */
     int oldmode;  /* saved memory guard mode */
@@ -530,13 +516,11 @@ bool dbg_hw_info(void)
 
     while(1)
     {
-        button = button_get(true);
-        if(button == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_BLOCK))
             return false;
     }
 #elif CONFIG_CPU == PP5020
     char buf[32];
-    int button;
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -551,8 +535,7 @@ bool dbg_hw_info(void)
 
     while(1)
     {
-        button = button_get(true);
-        if(button == SETTINGS_CANCEL)
+        if (action_userabort(TIMEOUT_BLOCK))
             return false;
     }
 #endif /* CONFIG_CPU */
@@ -641,20 +624,21 @@ bool dbg_hw_info(void)
         lcd_puts(0, 1, buf);
         lcd_update();
         
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
 
         switch(button)
         {
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
+                action_signalscreenchange();
                 return false;
 
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 currval--;
                 if(currval < 0)
                     currval = 5;
                 break;
                 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 currval++;
                 if(currval > 5)
                     currval = 0;
@@ -688,21 +672,21 @@ bool dbg_partitions(void)
         lcd_puts(0, 1, buf);
         lcd_update();
         
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
 
         switch(button)
         {
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
+                action_signalscreenchange();
                 return false;
 
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 partition--;
                 if (partition < 0)
                     partition = 3;
                 break;
                 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 partition++;
                 if (partition > 3)
                     partition = 0;
@@ -874,13 +858,8 @@ bool dbg_spdif(void)
 
         lcd_update();
 
-        switch (button_get_w_tmo(HZ/10))
-        {
-            case SETTINGS_CANCEL:
-            case SETTINGS_OK2:
-                done = true;
-                break;
-        }
+        if (action_userabort(HZ/2))
+            return false;
     }
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
@@ -940,13 +919,8 @@ bool dbg_ports(void)
         lcd_puts(0, 7, buf);
 #endif
         lcd_update();
-        button = button_get_w_tmo(HZ/10);
-
-        switch(button)
-        {
-            case SETTINGS_CANCEL:
-                return false;
-        }
+        if (action_userabort(HZ/10))
+            return false;
     }
 #elif defined(CPU_COLDFIRE)
     unsigned int gpio_out;
@@ -962,7 +936,6 @@ bool dbg_ports(void)
     int adc_remotedetect;
 #endif
     char buf[128];
-    int button;
     int line;
     int battery_voltage;
     int batt_int, batt_frac;
@@ -1033,13 +1006,8 @@ bool dbg_ports(void)
 #endif
         
         lcd_update();
-        button = button_get_w_tmo(HZ/10);
-
-        switch(button)
-        {   /* quit on release to allow for reading the cancel button input */
-            case (SETTINGS_CANCEL|BUTTON_REL):  
-                return false;
-        }
+        if (action_userabort(HZ/10))
+            return false;
     }
 
 #elif CONFIG_CPU == PP5020
@@ -1049,7 +1017,6 @@ bool dbg_ports(void)
     unsigned int gpio_i, gpio_j, gpio_k, gpio_l;
 
     char buf[128];
-    int button;
     int line;
 
     lcd_setmargins(0, 0);
@@ -1091,13 +1058,8 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 
         lcd_update();
-        button = button_get_w_tmo(HZ/10);
-
-        switch(button)
-        {
-            case SETTINGS_CANCEL:
-                return false;
-        }
+        if (action_userabort(HZ/10))
+            return false;
     }
 
 #endif /* CPU */
@@ -1170,20 +1132,21 @@ bool dbg_ports(void)
         snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
         lcd_puts(0, 1, buf);
         
-        button = button_get_w_tmo(HZ/5);
+        button = get_action(CONTEXT_SETTINGS,HZ/5);
 
         switch(button)
         {
-        case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
+            action_signalscreenchange();
             return false;
 
-        case SETTINGS_DEC:
+        case ACTION_SETTINGS_DEC:
             currval--;
             if(currval < 0)
                 currval = 10;
             break;
 
-        case SETTINGS_INC:
+        case ACTION_SETTINGS_INC:
             currval++;
             if(currval > 10)
                 currval = 0;
@@ -1219,43 +1182,25 @@ bool dbg_cpufreq(void)
         lcd_puts(0, line++, buf);
 
         lcd_update();
-        button = button_get_w_tmo(HZ/10);
+        button = get_action(CONTEXT_STD,HZ/10);
 
         switch(button)
         {
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-        case BUTTON_MENU:
-#else
-        case BUTTON_UP:
-#endif
-            cpu_boost(true);
-            break;
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-        case BUTTON_PLAY:
-#else 
-        case BUTTON_DOWN:
-#endif
-            cpu_boost(false);
-            break;
+            case ACTION_STD_PREV:
+                cpu_boost(true);
+                break;
+            case ACTION_STD_NEXT:
+                cpu_boost(false);
+                break;
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-        case BUTTON_SELECT:
-#else
-        case BUTTON_PLAY:
-#endif
-            set_cpu_frequency(CPUFREQ_DEFAULT);
-            boost_counter = 0;
-            break;
+            case ACTION_STD_OK:
+                set_cpu_frequency(CPUFREQ_DEFAULT);
+                boost_counter = 0;
+                break;
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
-        case BUTTON_LEFT:
-#else
-        case SETTINGS_CANCEL:
-        case SETTINGS_OK2:
-#endif
-            return false;
+            case ACTION_STD_CANCEL:
+                action_signalscreenchange();
+                return false;
         }
     }
 
@@ -1428,20 +1373,20 @@ bool view_battery(void)
         
         lcd_update();
         
-        switch(button_get_w_tmo(HZ/2))
+        switch(get_action(CONTEXT_SETTINGS,HZ/2))
         {
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 if (view)
                     view--;
                 break;
                 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 if (view < 3)
                     view++;
                 break;
                 
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
+                action_signalscreenchange();
                 return false;
         }
     }
@@ -1498,41 +1443,40 @@ static bool view_runtime(void)
         lcd_update();
 
         /* Wait for a key to be pushed */
-        key = button_get_w_tmo(HZ);
+        key = get_action(CONTEXT_SETTINGS,HZ);
         switch(key) {
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
 
-            case SETTINGS_INC:
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_DEC:
                 if (state == 1)
                     state = 2;
                 else
                     state = 1;
                 break;
 
-            case SETTINGS_OK:
+            case ACTION_STD_OK:
                 lcd_clear_display();
+                /*NOTE: this needs to be changed to sync splash! */
                 lcd_puts(0,0,"Clear time?");
                 lcd_puts(0,1,"PLAY = Yes");
                 lcd_update();
                 while (1) {
-                    key = button_get(true);
-                    if ( key == SETTINGS_OK ) {
+                    key = get_action(CONTEXT_STD,TIMEOUT_BLOCK);
+                    if ( key == ACTION_STD_OK ) {
                         if ( state == 1 )
                             global_settings.runtime = 0;
                         else
                             global_settings.topruntime = 0;
                         break;
                     }
-                    if (!(key & BUTTON_REL))  /* ignore button releases */
-                        break;
                 }
                 break;
         }
     }
-
+    action_signalscreenchange();
     return false;
 }
 
@@ -1620,27 +1564,26 @@ bool dbg_mmc_info(void)
 
         lcd_update();
 
-        switch (button_get_w_tmo(HZ/2))
+        switch (get_action(CONTEXT_SETTINGS,HZ/2))
         {
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
                 
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 currval--;
                 if (currval < 0)
                     currval = 3;
                 break;
 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 currval++;
                 if (currval > 3)
                     currval = 0;
                 break;
         }
     }
-
+    action_signalscreenchange();
     return false;
 }
 #else /* !HAVE_MMC */
@@ -1781,26 +1724,25 @@ static bool dbg_disk_info(void)
         lcd_update();
 
         /* Wait for a key to be pushed */
-        key = button_get_w_tmo(HZ*5);
+        key = get_action(CONTEXT_SETTINGS,HZ/5);
         switch(key) {
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
 
-            case SETTINGS_DEC:
+            case ACTION_SETTINGS_DEC:
                 if (--page < 0)
                     page = max_page;
                 break;
                 
-            case SETTINGS_INC:
+            case ACTION_SETTINGS_INC:
                 if (++page > max_page)
                     page = 0;
                 break;
         }
         lcd_stop_scroll();
     }
-
+    action_signalscreenchange();
     return false;
 }
 #endif /* !HAVE_MMC */
@@ -1849,13 +1791,8 @@ static bool dbg_dircache_info(void)
 
         lcd_update();
 
-        switch (button_get_w_tmo(HZ/2))
-        {
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
-                done = true;
-                break;
-        }
+        if (action_userabort(HZ/2))
+            return false;
     }
 
     return false;
@@ -1900,13 +1837,8 @@ static bool dbg_tagcache_info(void)
 
         lcd_update();
 
-        switch (button_get_w_tmo(HZ/2))
-        {
-            case SETTINGS_OK:
-            case SETTINGS_CANCEL:
-                done = true;
-                break;
-        }
+        if (action_userabort(HZ/2))
+            return false;
     }
 
     return false;
@@ -1979,7 +1911,6 @@ bool dbg_save_roms(void)
 bool dbg_fm_radio(void)
 {
     char buf[32];
-    int button;
     bool fm_detected;
 
 #ifdef HAVE_LCD_BITMAP
@@ -2010,13 +1941,8 @@ bool dbg_fm_radio(void)
 
         lcd_update();
         
-        button = button_get_w_tmo(HZ);
-
-        switch(button)
-        {
-            case SETTINGS_CANCEL:
-                return false;
-        }
+        if (action_userabort(TIMEOUT_BLOCK))
+            return false;
     }
     return false;
 }

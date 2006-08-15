@@ -38,6 +38,7 @@
 #include "dir.h"
 #include "kernel.h"
 #include "button.h"
+#include "action.h"
 #include "usb.h"
 #include "font.h"
 #include "system.h"
@@ -104,7 +105,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 28
+#define PLUGIN_API_VERSION 29
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -546,6 +547,12 @@ struct plugin_api {
 #endif
 
     int (*PREFIX(rmdir))(const char *name);
+    /* action handling */
+    int (*get_custom_action)(int context,int timeout,
+                          struct button_mapping* (*get_context_map)(int));
+    int (*get_action)(int context, int timeout);
+    void (*action_signalscreenchange)(void);
+    bool (*action_userabort)(int timeout);
 };
 
 /* plugin header */

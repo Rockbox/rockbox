@@ -72,6 +72,7 @@
 #include "splash.h"
 #include "buttonbar.h"
 #include "textarea.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
@@ -590,28 +591,11 @@ static bool dirbrowse(void)
             boot_changed = false;
         }
 #endif
-        button = button_get_w_tmo(HZ/5);
+        button = get_action(CONTEXT_TREE,HZ/5);
         need_update = gui_synclist_do_button(&tree_lists, button);
 
         switch ( button ) {
-#ifdef TREE_ENTER
-            case TREE_ENTER | BUTTON_REL:
-                if (lastbutton != TREE_ENTER)
-                    break;
-#endif
-#ifdef TREE_RC_RUN
-            case TREE_RC_RUN:
-#endif
-            case TREE_RUN:
-#ifdef TREE_RUN_PRE
-                if (((button == TREE_RUN)
-#ifdef TREE_RC_RUN_PRE
-                    || (button == TREE_RC_RUN))
-                        && ((lastbutton != TREE_RC_RUN_PRE)
-#endif
-                    && (lastbutton != TREE_RUN_PRE)))
-                    break;
-#endif
+            case ACTION_STD_OK:
                 /* nothing to do if no files to display */
                 if ( numentries == 0 )
                     break;
@@ -626,31 +610,27 @@ static bool dirbrowse(void)
                 restore = true;
                 break;
 
-            case TREE_EXIT | BUTTON_REL:
-                if (lastbutton != TREE_EXIT)
-                    break;
-#ifdef TREE_RC_EXIT
-            case TREE_RC_EXIT:
-#endif
+            case ACTION_STD_CANCEL:
                 if (*tc.dirfilter > NUM_FILTER_MODES && tc.dirlevel < 1) {
                     exit_func = true;
                     break;
                 }
-                /* if we are in /, nothing to do */
-                if (tc.dirlevel == 0 && !strcmp(currdir,"/"))
+                /* if we are in /, stop playback 
+                    (skip this and fall into tree_stop)*/
+                if (tc.dirlevel != 0 || strcmp(currdir,"/"))
+                {
+                    if (id3db)
+                        tagtree_exit(&tc);
+                    else
+                        if (ft_exit(&tc) == 3)
+                            exit_func = true;
+    
+                    restore = true;
                     break;
+                }
+                /* else fall through */
 
-                if (id3db)
-                    tagtree_exit(&tc);
-                else
-                    if (ft_exit(&tc) == 3)
-                        exit_func = true;
-
-                restore = true;
-                break;
-
-#ifdef TREE_OFF
-            case TREE_OFF:
+            case ACTION_TREE_STOP:
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     /* Stop the music if it is playing */
@@ -676,6 +656,7 @@ static bool dirbrowse(void)
 #endif
                 }
                 break;
+                /* ??
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
             case TREE_OFF | BUTTON_REPEAT:
                 if (charger_inserted()) {
@@ -684,25 +665,15 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
-#endif /* TREE_OFF */
-            case TREE_MENU:
-#ifdef TREE_RC_MENU
-            case TREE_RC_MENU:
-#endif
-#ifdef TREE_MENU_PRE
-                if (lastbutton != TREE_MENU_PRE
-#ifdef TREE_RC_MENU_PRE
-                    && lastbutton != TREE_RC_MENU_PRE
-#endif
-                    )
-                    break;
-#endif
+                */
+            case ACTION_STD_MENU:
                 /* don't enter menu from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
                     int i;
                     FOR_NB_SCREENS(i)
                         screens[i].stop_scroll();
+                    action_signalscreenchange();
                     if (main_menu())
                         reload_dir = true;
                     restore = true;
@@ -715,18 +686,7 @@ static bool dirbrowse(void)
                     exit_func = true;
                 break;
 
-            case TREE_WPS:
-#ifdef TREE_RC_WPS
-            case TREE_RC_WPS:
-#endif
-#ifdef TREE_WPS_PRE
-                if ((lastbutton != TREE_WPS_PRE)
-#ifdef TREE_RC_WPS
-                    && (lastbutton != TREE_RC_WPS_PRE)
-#endif
-                    )
-                    break;
-#endif
+            case ACTION_TREE_WPS:
                 /* don't enter wps from plugin browser etc */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
@@ -741,12 +701,8 @@ static bool dirbrowse(void)
                     }
                 }
                 break;
-
 #ifdef HAVE_QUICKSCREEN
-            case TREE_QUICK:
-#ifdef TREE_RC_QUICK
-            case TREE_RC_QUICK:
-#endif
+            case ACTION_STD_QUICKSCREEN:
                 /* don't enter f2 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
@@ -759,7 +715,6 @@ static bool dirbrowse(void)
                 }
                 break;
 #endif
-
 #ifdef BUTTON_F3
             case BUTTON_F3:
                 /* don't enter f3 from plugin browser */
@@ -772,13 +727,7 @@ static bool dirbrowse(void)
                 break;
 #endif
 
-            case TREE_CONTEXT:
-#ifdef TREE_RC_CONTEXT
-            case TREE_RC_CONTEXT:
-#endif
-#ifdef TREE_CONTEXT2
-            case TREE_CONTEXT2:
-#endif
+            case ACTION_STD_CONTEXT:
             {
                 int onplay_result;
                 int attr = 0;
@@ -827,7 +776,7 @@ static bool dirbrowse(void)
                 break;
             }
 
-            case BUTTON_NONE:
+            case ACTION_NONE:
                 if (thumbnail_time != -1 &&
                     TIME_AFTER(current_tick, thumbnail_time))
                 {   /* a delayed hovering thumbnail is due now */
@@ -947,7 +896,6 @@ static bool dirbrowse(void)
             lastfilter = *tc.dirfilter;
             lastsortcase = global_settings.sort_case;
             restore = true;
-            button_clear_queue(); /* clear button queue */
         }
 
         if (exit_func)
@@ -1045,7 +993,7 @@ static bool dirbrowse(void)
             }
         }
     }
-
+    action_signalscreenchange();
     return true;
 }
 
@@ -1057,7 +1005,7 @@ static bool add_dir(char* dirname, int len, int fd)
     DIRCACHED* dir;
 
     /* check for user abort */
-    if (button_get(false) == TREE_ABORT)
+    if (action_userabort(TIMEOUT_NOBLOCK))
         return true;
 
     dir = opendir_cached(dirname);

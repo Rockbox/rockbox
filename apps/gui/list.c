@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "kernel.h"
 
+#include "action.h"
 #include "screen_access.h"
 #include "list.h"
 #include "scrollbar.h"
@@ -683,106 +684,65 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
     gui_synclist_limit_scroll(lists, true);
     switch(button)
     {
-        case LIST_PREV:
-#ifdef LIST_RC_PREV
-        case LIST_RC_PREV:
-#endif
+        case ACTION_STD_PREV:
             gui_synclist_limit_scroll(lists, false);
 
-        case LIST_PREV | BUTTON_REPEAT:
-#ifdef LIST_RC_PREV
-        case LIST_RC_PREV | BUTTON_REPEAT:
-#endif
+        case ACTION_STD_PREVREPEAT:
             gui_synclist_select_previous(lists);
             gui_synclist_draw(lists);
             yield();
-            return LIST_PREV;
+            return ACTION_STD_PREV;
 
-        case LIST_NEXT:
-#ifdef LIST_RC_NEXT
-        case LIST_RC_NEXT:
-#endif
+        case ACTION_STD_NEXT:
             gui_synclist_limit_scroll(lists, false);
 
-        case LIST_NEXT | BUTTON_REPEAT:
-#ifdef LIST_RC_NEXT
-
-        case LIST_RC_NEXT | BUTTON_REPEAT:
-#endif
+        case ACTION_STD_NEXTREPEAT:
             gui_synclist_select_next(lists);
             gui_synclist_draw(lists);
             yield();
-            return LIST_NEXT;
+            return ACTION_STD_NEXT;
 
-#ifdef LIST_PGRIGHT
-        case LIST_PGRIGHT:
-#if !(LIST_PGRIGHT & BUTTON_REPEAT)
-        case LIST_PGRIGHT | BUTTON_REPEAT:
-#endif
-#ifdef LIST_RC_PGRIGHT
-        case LIST_RC_PGRIGHT:
-        case LIST_RC_PGRIGHT | BUTTON_REPEAT:
-#endif
+#ifdef HAVE_LCD_BITMAP
+        case ACTION_TREE_PGRIGHT:
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
-            return LIST_PGRIGHT;
-#endif
-
-#ifdef LIST_PGLEFT
-        case LIST_PGLEFT:
-#if !(LIST_PGLEFT & BUTTON_REPEAT)
-        case LIST_PGLEFT | BUTTON_REPEAT:
-#endif     
-#ifdef LIST_RC_PGLEFT
-        case LIST_RC_PGLEFT:
-        case LIST_RC_PGLEFT | BUTTON_REPEAT:
-#endif
+            return ACTION_TREE_PGRIGHT;
+        case ACTION_TREE_PGLEFT:
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
-            return LIST_PGLEFT;
+            return ACTION_TREE_PGLEFT;
 #endif
 
 /* for pgup / pgdown, we are obliged to have a different behaviour depending on the screen
  * for which the user pressed the key since for example, remote and main screen doesn't
  * have the same number of lines*/
-#ifdef LIST_PGUP
-        case LIST_PGUP:
+        case ACTION_LISTTREE_PGUP:
             gui_synclist_limit_scroll(lists, false);
-        case LIST_PGUP | BUTTON_REPEAT:
             gui_synclist_select_previous_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
             yield();
-            return LIST_NEXT;
-#endif
-
-#ifdef LIST_RC_PGUP
-        case LIST_RC_PGUP:
+        return ACTION_STD_NEXT;
+              
+        case ACTION_LISTTREE_PGDOWN:
             gui_synclist_limit_scroll(lists, false);
-        case LIST_RC_PGUP | BUTTON_REPEAT:
-            gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
-            gui_synclist_draw(lists);
-            yield();
-            return LIST_NEXT;
-#endif
-
-#ifdef LIST_PGDN
-        case LIST_PGDN:
-            gui_synclist_limit_scroll(lists, false);
-        case LIST_PGDN | BUTTON_REPEAT:
             gui_synclist_select_next_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
             yield();
-            return LIST_PREV;
-#endif
-
-#ifdef LIST_RC_PGDN
-        case LIST_RC_PGDN:
+            return ACTION_STD_PREV;
+#if (REMOTE_BUTTON != 0 )
+        case ACTION_LISTTREE_RC_PGUP:
             gui_synclist_limit_scroll(lists, false);
-        case LIST_RC_PGDN | BUTTON_REPEAT:
+            gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
+            gui_synclist_draw(lists);
+            yield();
+            return ACTION_STD_NEXT;
+  
+        case ACTION_LISTTREE_RC_PGDOWN:
+            gui_synclist_limit_scroll(lists, false);
             gui_synclist_select_next_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
             yield();
-            return LIST_PREV;
+            return ACTION_STD_PREV;
 #endif
     }
     return 0;

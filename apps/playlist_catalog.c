@@ -214,7 +214,6 @@ static int display_playlists(char* playlist, bool view)
 {
     int result = -1;
     int num_playlists = 0;
-    int lastbutton = BUTTON_NONE;
     bool exit = false;
     char temp_buf[MAX_PATH];
     char* playlists[MAX_PLAYLISTS];
@@ -240,7 +239,7 @@ static int display_playlists(char* playlist, bool view)
 
     while (!exit)
     {
-        int button = button_get_w_tmo(HZ/2);
+        int button = get_action(CONTEXT_LIST,HZ/2);
         char* sel_file;
 
         gui_synclist_do_button(&playlist_lists, button);
@@ -249,34 +248,11 @@ static int display_playlists(char* playlist, bool view)
 
         switch (button)
         {
-            case TREE_EXIT:
-#ifdef TREE_RC_EXIT
-            case TREE_RC_EXIT:
-#endif
-#ifdef TREE_OFF
-            case TREE_OFF:
-#endif
+            case ACTION_STD_CANCEL:
                 exit = true;
                 break;
 
-#ifdef TREE_ENTER
-            case TREE_ENTER:
-            case TREE_ENTER | BUTTON_REPEAT:
-#endif
-#ifdef TREE_RC_RUN
-            case TREE_RC_RUN:
-#endif
-            case TREE_RUN:
-#ifdef TREE_RUN_PRE
-                if (((button == TREE_RUN)
-#ifdef TREE_RC_RUN_PRE
-                    || (button == TREE_RC_RUN))
-                        && ((lastbutton != TREE_RC_RUN_PRE)
-#endif
-                    && (lastbutton != TREE_RUN_PRE)))
-                    break;
-#endif
-
+            case ACTION_STD_OK:
                 if (view)
                 {
                     /* In view mode, selecting a playlist starts playback */
@@ -298,13 +274,7 @@ static int display_playlists(char* playlist, bool view)
                 exit = true;
                 break;
 
-            case TREE_CONTEXT:
-#ifdef TREE_CONTEXT2
-            case TREE_CONTEXT2:
-#endif
-#ifdef TREE_RC_CONTEXT
-            case TREE_RC_CONTEXT:
-#endif
+            case ACTION_STD_CONTEXT:
                 /* context menu only available in view mode */
                 if (view)
                 {
@@ -322,7 +292,7 @@ static int display_playlists(char* playlist, bool view)
                 }
                 break;
 
-            case BUTTON_NONE:
+            case ACTION_NONE:
                 gui_syncstatusbar_draw(&statusbars, false);
                 break;
 
@@ -334,10 +304,8 @@ static int display_playlists(char* playlist, bool view)
                 }
                 break;
         }
-
-        lastbutton = button;
     }
-
+    action_signalscreenchange();
     return result;
 }
 

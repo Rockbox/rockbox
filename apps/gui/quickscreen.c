@@ -29,6 +29,7 @@
 #include "kernel.h"
 #include "misc.h"
 #include "statusbar.h"
+#include "action.h"
 
 void gui_quickscreen_init(struct gui_quickscreen * qs,
                           struct option_select *left_option,
@@ -128,59 +129,28 @@ bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 
     switch(button)
     {
-        case QUICKSCREEN_LEFT :
-        case QUICKSCREEN_LEFT | BUTTON_REPEAT :
-#ifdef QUICKSCREEN_RC_LEFT
-        case QUICKSCREEN_RC_LEFT :
-        case QUICKSCREEN_RC_LEFT | BUTTON_REPEAT :
-#endif
+        case ACTION_QS_LEFT:
             option_select_next(qs->left_option);
             return(true);
 
-        case QUICKSCREEN_BOTTOM :
-        case QUICKSCREEN_BOTTOM | BUTTON_REPEAT :
-#ifdef QUICKSCREEN_RC_BOTTOM
-        case QUICKSCREEN_RC_BOTTOM :
-        case QUICKSCREEN_RC_BOTTOM | BUTTON_REPEAT :
-#endif
+        case ACTION_QS_DOWN:
             option_select_next(qs->bottom_option);
             return(true);
 
-        case QUICKSCREEN_RIGHT :
-        case QUICKSCREEN_RIGHT | BUTTON_REPEAT :
-#ifdef QUICKSCREEN_RC_RIGHT
-        case QUICKSCREEN_RC_RIGHT :
-        case QUICKSCREEN_RC_RIGHT | BUTTON_REPEAT :
-#endif
+        case ACTION_QS_RIGHT:
             option_select_next(qs->right_option);
             return(true);
 
-#ifdef QUICKSCREEN_BOTTOM_INV
-        case QUICKSCREEN_BOTTOM_INV :
-        case QUICKSCREEN_BOTTOM_INV | BUTTON_REPEAT :
-#endif
-#ifdef QUICKSCREEN_RC_BOTTOM_INV
-        case QUICKSCREEN_RC_BOTTOM_INV :
-        case QUICKSCREEN_RC_BOTTOM_INV | BUTTON_REPEAT :
-#endif
-#if defined(QUICKSCREEN_RC_BOTTOM_INV) || defined(QUICKSCREEN_BOTTOM_INV)
+        case ACTION_QS_DOWNINV:
             option_select_prev(qs->bottom_option);
             return(true);
-#endif
     }
     return(false);
 }
-#ifdef BUTTON_REMOTE
-#define uncombine_button(key_read, combined_button) \
-    key_read & ~(combined_button & ~BUTTON_REMOTE)
-#else
-#define uncombine_button(key_read, combined_button) \
-    key_read & ~combined_button
-#endif
 
 bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
 {
-    int raw_key, button;
+    int button;
     /* To quit we need either :
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
@@ -188,9 +158,9 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
     bool can_quit=false;
     gui_syncquickscreen_draw(qs);
     gui_syncstatusbar_draw(&statusbars, true);
+    action_signalscreenchange();
     while (true) {
-        raw_key = button_get(true);
-        button=uncombine_button(raw_key, button_enter);
+        button = get_action(CONTEXT_QUICKSCREEN,TIMEOUT_BLOCK);
         if(default_event_handler(button) == SYS_USB_CONNECTED)
             return(true);
         if(gui_quickscreen_do_button(qs, button))
@@ -200,23 +170,19 @@ bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter)
                 qs->callback(qs);
             gui_syncquickscreen_draw(qs);
         }
-        else if(raw_key==button_enter)
+        else if(button==button_enter)
             can_quit=true;
-        if(raw_key==(button_enter | BUTTON_REL) && can_quit)
-            return(false);
-#ifdef QUICKSCREEN_QUIT
-        if(raw_key==QUICKSCREEN_QUIT
-#ifdef QUICKSCREEN_QUIT2
-           || raw_key==QUICKSCREEN_QUIT2
-#endif
-#if QUICKSCREEN_RC_QUIT
-           || raw_key==QUICKSCREEN_RC_QUIT
-#endif
-        )
-            return(false);
-#endif /* QUICKSCREEN_QUIT */
+            
+        if((button == button_enter) && can_quit)
+            break;
+            
+        if(button==ACTION_STD_CANCEL)
+            break;
+            
         gui_syncstatusbar_draw(&statusbars, false);
     }
+    action_signalscreenchange();
+    return false;
 }
 
 #endif /* HAVE_QUICKSCREEN */

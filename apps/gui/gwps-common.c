@@ -52,6 +52,7 @@
 #include "backdrop.h"
 #endif
 #include "dsp.h"
+#include "action.h"
 
 #ifdef HAVE_LCD_CHARCELLS
 static bool draw_player_progress(struct gui_wps *gwps);
@@ -2319,19 +2320,18 @@ bool ffwd_rew(int button)
     bool usb = false;
     int i = 0;
 
+    if (button == ACTION_NONE)
+    {
+        status_set_ffmode(0);
+        return usb;
+    }
     while (!exit)
     {
         switch ( button )
         {
-            case WPS_FFWD:
-#ifdef WPS_RC_FFWD 
-            case WPS_RC_FFWD:
-#endif
+            case ACTION_WPS_SEEKFWD:
                  direction = 1;
-            case WPS_REW:
-#ifdef WPS_RC_REW
-            case WPS_RC_REW:
-#endif
+            case ACTION_WPS_SEEKBACK:
                 if (wps_state.ff_rewind)
                 {
                     if (direction == 1)
@@ -2415,12 +2415,7 @@ bool ffwd_rew(int button)
 
                 break;
 
-            case WPS_PREV:
-            case WPS_NEXT: 
-#ifdef WPS_RC_PREV
-            case WPS_RC_PREV:
-            case WPS_RC_NEXT:
-#endif
+            case ACTION_WPS_STOPSEEK:
                 wps_state.id3->elapsed = wps_state.id3->elapsed+ff_rewind_count;
                 audio_ff_rewind(wps_state.id3->elapsed);
                 ff_rewind_count = 0;
@@ -2445,9 +2440,9 @@ bool ffwd_rew(int button)
                 break;
         }
         if (!exit)
-            button = button_get(true);
+            button = get_action(CONTEXT_WPS,TIMEOUT_BLOCK);
     }
-
+    action_signalscreenchange();
     return usb;
 }
 
@@ -2547,7 +2542,7 @@ bool update(struct gui_wps *gwps)
     return retcode;           
 }
 
-#ifdef WPS_KEYLOCK
+
 void display_keylock_text(bool locked)
 {
     char* s;
@@ -2568,12 +2563,4 @@ void display_keylock_text(bool locked)
 #endif
     gui_syncsplash(HZ, true, s);
 }
-
-void waitfor_nokey(void)
-{
-    /* wait until all keys are released */
-    while (button_get(false) != BUTTON_NONE)
-        yield();
-}
-#endif
 

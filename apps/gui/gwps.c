@@ -25,7 +25,7 @@
 #include "lcd.h"
 #include "font.h"
 #include "backlight.h"
-#include "button.h"
+#include "action.h"
 #include "kernel.h"
 #include "tree.h"
 #include "debug.h"
@@ -84,14 +84,11 @@ static void gui_wps_set_margin(struct gui_wps *gwps)
 
 long gui_wps_show(void)
 {
-    long button = 0, lastbutton = 0;
-    bool ignore_keyup = true;
+    long button = 0;
     bool restore = false;
     long restoretimer = 0; /* timer to delay screen redraw temporarily */
     bool exit = false;
     bool update_track = false;
-    unsigned long right_lastclick = 0;
-    unsigned long left_lastclick = 0;
     int i;
 
     wps_state_init();
@@ -163,8 +160,8 @@ long gui_wps_show(void)
             long next_big_refresh = current_tick + HZ / 5;
             button = BUTTON_NONE;
             while (TIME_BEFORE(current_tick, next_big_refresh)) {
-                button = button_get(false);
-                if (button != BUTTON_NONE) {
+                button = get_action(CONTEXT_WPS,TIMEOUT_NOBLOCK);
+                if (button != ACTION_NONE) {
                     break;
                 }
                 peak_meter_peek();
@@ -186,35 +183,10 @@ long gui_wps_show(void)
         /* The peak meter is disabled
            -> no additional screen updates needed */
         else {
-            button = button_get_w_tmo(HZ/5);
+            button = get_action(CONTEXT_WPS,HZ/5);
         }
 #else
-        button = button_get_w_tmo(HZ/5);
-#endif
-
-        /* discard first event if it's a button release */
-        if (button && ignore_keyup)
-        {
-            ignore_keyup = false;
-            /* Negative events are system events */
-            if (button >= 0 && button & BUTTON_REL )
-                continue;
-        }
-
-#ifdef WPS_KEYLOCK
-        /* ignore non-remote buttons when keys are locked */
-        if (keys_locked &&
-            ! ((button < 0) ||
-               (button == BUTTON_NONE) ||
-               ((button & WPS_KEYLOCK) == WPS_KEYLOCK) ||
-               (button & BUTTON_REMOTE)
-                ))
-        {
-            if (!(button & BUTTON_REL))
-                display_keylock_text(true);
-            restore = true;
-            button = BUTTON_NONE;
-        }
+        button = get_action(CONTEXT_WPS,HZ/5);
 #endif
 
         /* Exit if audio has stopped playing. This can happen if using the
@@ -222,17 +194,14 @@ long gui_wps_show(void)
            from F1 */
         if (!audio_status())
             exit = true;
-
+            
         switch(button)
         {
-#ifdef WPS_CONTEXT
-            case WPS_CONTEXT:
-#ifdef WPS_RC_CONTEXT
-            case WPS_RC_CONTEXT:
-#endif
+            case ACTION_WPS_CONTEXT:
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
+                action_signalscreenchange();
                 onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
 #ifdef HAVE_LCD_COLOR
                 show_wps_backdrop();
@@ -245,20 +214,8 @@ long gui_wps_show(void)
 #endif
                 restore = true;
                 break;
-#endif
 
-#ifdef WPS_RC_BROWSE
-            case WPS_RC_BROWSE:
-#endif
-            case WPS_BROWSE:
-#ifdef WPS_BROWSE_PRE
-                if ((lastbutton != WPS_BROWSE_PRE)
-#ifdef WPS_RC_BROWSE_PRE
-                    && (lastbutton != WPS_RC_BROWSE_PRE)
-#endif
-                    )
-                    break;
-#endif
+            case ACTION_WPS_BROWSE:
 #ifdef HAVE_LCD_CHARCELLS
                 status_set_record(false);
                 status_set_audio(false);
@@ -270,26 +227,14 @@ long gui_wps_show(void)
                 if (global_settings.browse_current &&
                     wps_state.current_track_path[0] != '\0')
                     set_current_file(wps_state.current_track_path);
-
+                action_signalscreenchange();
                 return 0;
                 break;
 
                 /* play/pause */
-            case WPS_PAUSE:
-#ifdef WPS_PAUSE_PRE
-                if (lastbutton != WPS_PAUSE_PRE)
-                    break;
-#endif
-#ifdef WPS_RC_PAUSE
-            case WPS_RC_PAUSE:
+            case ACTION_WPS_PLAY:
                 if (global_settings.party_mode)
                     break;
-#ifdef WPS_RC_PAUSE_PRE
-                if ((button == WPS_RC_PAUSE) &&
-                    (lastbutton != WPS_RC_PAUSE_PRE))
-                    break;
-#endif
-#endif
                 if ( wps_state.paused )
                 {
                     wps_state.paused = false;
@@ -313,12 +258,7 @@ long gui_wps_show(void)
                 break;
 
                 /* volume up */
-            case WPS_INCVOL:
-            case WPS_INCVOL | BUTTON_REPEAT:
-#ifdef WPS_RC_INCVOL
-            case WPS_RC_INCVOL:
-            case WPS_RC_INCVOL | BUTTON_REPEAT:
-#endif
+            case ACTION_WPS_VOLUP:
             {
                 global_settings.volume++;
                 bool res = false;
@@ -336,12 +276,7 @@ long gui_wps_show(void)
                 break;
 
                 /* volume down */
-            case WPS_DECVOL:
-            case WPS_DECVOL | BUTTON_REPEAT:
-#ifdef WPS_RC_DECVOL
-            case WPS_RC_DECVOL:
-            case WPS_RC_DECVOL | BUTTON_REPEAT:
-#endif
+            case ACTION_WPS_VOLDOWN:
             {
                 global_settings.volume--;
                 setvol();
@@ -357,59 +292,18 @@ long gui_wps_show(void)
                 }
             }
                 break;
-
                 /* fast forward / rewind */
-#ifdef WPS_RC_FFWD
-            case WPS_RC_FFWD:
-#endif
-            case WPS_FFWD:
+            case ACTION_WPS_SEEKFWD:
+            case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
-
-#ifdef HAVE_DIR_NAVIGATION
-                if (current_tick - right_lastclick < HZ)
-                {
-                    audio_next_dir();
-                    right_lastclick = 0;
-                    break;
-                }
-#endif
-
-#ifdef WPS_RC_REW
-            case WPS_RC_REW:
-#endif
-            case WPS_REW:
-                if (global_settings.party_mode)
-                    break;
-
-#ifdef HAVE_DIR_NAVIGATION
-                if (current_tick - left_lastclick < HZ)
-                {
-                    audio_prev_dir();
-                    left_lastclick = 0;
-                    break;
-                }
-#endif
-
                 ffwd_rew(button);
                 break;
 
                 /* prev / restart */
-            case WPS_PREV:
-#ifdef WPS_PREV_PRE
-                if (lastbutton != WPS_PREV_PRE)
-                    break;
-#endif
-#ifdef WPS_RC_PREV
-            case WPS_RC_PREV:
+            case ACTION_WPS_SKIPPREV:
                 if (global_settings.party_mode)
                     break;
-#ifdef WPS_RC_PREV_PRE
-                if ((button == WPS_RC_PREV) && (lastbutton != WPS_RC_PREV_PRE))
-                    break;
-#endif
-#endif
-                left_lastclick = current_tick;
                 update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
@@ -450,61 +344,10 @@ long gui_wps_show(void)
                 }
                 break;
 
-#ifdef WPS_NEXT_DIR
-#ifdef WPS_RC_NEXT_DIR
-            case WPS_RC_NEXT_DIR:
-#endif
-            case WPS_NEXT_DIR:
-                if (global_settings.party_mode)
-                    break;
-#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
-                if (ab_repeat_mode_enabled())
-                {
-                    ab_set_B_marker(wps_state.id3->elapsed);
-                    ab_jump_to_A_marker();
-                    update_track = true;
-                }
-                else
-#endif
-                {
-                    audio_next_dir();
-                }
-                break;
-#endif
-#ifdef WPS_PREV_DIR
-#ifdef WPS_RC_PREV_DIR
-            case WPS_RC_PREV_DIR:
-#endif
-            case WPS_PREV_DIR:
-                if (global_settings.party_mode)
-                    break;
-#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
-                if (ab_repeat_mode_enabled())
-                    ab_set_A_marker(wps_state.id3->elapsed);
-                else
-#endif
-                {
-                    audio_prev_dir();
-                }
-                break;
-#endif
-
                 /* next */
-            case WPS_NEXT:
-#ifdef WPS_NEXT_PRE
-                if (lastbutton != WPS_NEXT_PRE)
-                    break;
-#endif
-#ifdef WPS_RC_NEXT
-            case WPS_RC_NEXT:
+            case ACTION_WPS_SKIPNEXT:
                 if (global_settings.party_mode)
                     break;
-#ifdef WPS_RC_NEXT_PRE
-                if ((button == WPS_RC_NEXT) && (lastbutton != WPS_RC_NEXT_PRE))
-                    break;
-#endif
-#endif
-                right_lastclick = current_tick;
                 update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
@@ -527,27 +370,44 @@ long gui_wps_show(void)
 
                 audio_next();
                 break;
-
-#ifdef WPS_MENU
+                /* next / prev directories */
+            case ACTION_WPS_NEXTDIR:
+                if (global_settings.party_mode)
+                    break;
+#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+                if (ab_repeat_mode_enabled())
+                {
+                    ab_set_B_marker(wps_state.id3->elapsed);
+                    ab_jump_to_A_marker();
+                    update_track = true;
+                }
+                else
+#endif
+                {
+                    audio_next_dir();
+                }
+                break;
+            case ACTION_WPS_PREVDIR:
+                if (global_settings.party_mode)
+                    break;
+#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+                if (ab_repeat_mode_enabled())
+                    ab_set_A_marker(wps_state.id3->elapsed);
+                else
+#endif
+                {
+                    audio_prev_dir();
+                }
+                break;
             /* menu key functions */
-            case WPS_MENU:
-#ifdef WPS_MENU_PRE
-                if (lastbutton != WPS_MENU_PRE)
-                    break;
-#endif
-#ifdef WPS_RC_MENU
-            case WPS_RC_MENU:
-#ifdef WPS_RC_MENU_PRE
-                if ((button == WPS_RC_MENU) && (lastbutton != WPS_RC_MENU_PRE))
-                    break;
-#endif
-#endif
+            case ACTION_WPS_MENU:
                 FOR_NB_SCREENS(i)
                     gui_wps[i].display->stop_scroll();
 
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
+                action_signalscreenchange();
                 if (main_menu())
                     return true;
 #ifdef HAVE_LCD_COLOR
@@ -561,25 +421,17 @@ long gui_wps_show(void)
 #endif
                 restore = true;
                 break;
-#endif /* WPS_MENU */
 
-#ifdef WPS_KEYLOCK
             /* key lock */
-            case WPS_KEYLOCK:
-            case WPS_KEYLOCK | BUTTON_REPEAT:
-                keys_locked = !keys_locked;
-                display_keylock_text(keys_locked);
+            case ACTION_STD_KEYLOCK:
+                action_setsoftwarekeylock(ACTION_STD_KEYLOCK,true);
+                display_keylock_text(true);
                 restore = true;
-                waitfor_nokey();
                 break;
-#endif
+
 
 #ifdef HAVE_QUICKSCREEN
-                /* play settings */
-            case WPS_QUICK:
-#ifdef WPS_RC_QUICK
-            case WPS_RC_QUICK:
-#endif
+            case ACTION_WPS_QUICKSCREEN:
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
@@ -595,8 +447,8 @@ long gui_wps_show(void)
                 }
 #endif
                 restore = true;
-                lastbutton = 0;
                 break;
+#endif /* HAVE_QUICKSCREEN */
 
                 /* screen settings */
 #ifdef BUTTON_F3
@@ -611,17 +463,14 @@ long gui_wps_show(void)
                 {
                     gui_wps_set_margin(&gui_wps[i]);
                 }
-#endif
+#endif /* BUTTON_F3 */
                 restore = true;
-                lastbutton = 0;
                 break;
 #endif
 
                 /* pitch screen */
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == IRIVER_H100_PAD \
-    || CONFIG_KEYPAD == IRIVER_H300_PAD
-            case BUTTON_ON | BUTTON_UP:
-            case BUTTON_ON | BUTTON_DOWN:
+#ifdef HAVE_PITCHSCREEN
+            case ACTION_WPS_PITCHSCREEN:
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
@@ -632,17 +481,10 @@ long gui_wps_show(void)
 #endif
                 restore = true;
                 break;
-#endif
-#endif
+#endif /* HAVE_PITCHSCREEN */
 
 #ifdef AB_REPEAT_ENABLE
-
-#ifdef WPS_AB_SINGLE
-            case WPS_AB_SINGLE:
-#ifdef WPS_AB_SINGLE_PRE
-                if (lastbutton != WPS_AB_SINGLE_PRE)
-                    break;
-#endif
+            case ACTION_WPSAB_SINGLE:
 /* If we are using the menu option to enable ab_repeat mode, don't do anything
  * when it's disabled */
 #if (AB_REPEAT_ENABLE == 1)
@@ -661,20 +503,15 @@ long gui_wps_show(void)
                 }
                 ab_set_A_marker(wps_state.id3->elapsed);
                 break;
-#endif
 
 
-#ifdef WPS_AB_SET_A_MARKER
             /* set A marker for A-B repeat */
-            case WPS_AB_SET_A_MARKER:
+            case ACTION_WPSAB_SETA:
                 if (ab_repeat_mode_enabled())
                     ab_set_A_marker(wps_state.id3->elapsed);
                 break;
-#endif
-
-#ifdef WPS_AB_SET_B_MARKER
             /* set B marker for A-B repeat and jump to A */
-            case WPS_AB_SET_B_MARKER:
+            case ACTION_WPSAB_SETB:
                 if (ab_repeat_mode_enabled())
                 {
                     ab_set_B_marker(wps_state.id3->elapsed);
@@ -682,46 +519,24 @@ long gui_wps_show(void)
                     update_track = true;
                 }
                 break;
-#endif
-
-#ifdef WPS_AB_RESET_AB_MARKERS
             /* reset A&B markers */
-            case WPS_AB_RESET_AB_MARKERS:
+            case ACTION_WPSAB_RESET:
                 if (ab_repeat_mode_enabled())
                 {
                     ab_reset_markers();
                     update_track = true;
                 }
                 break;
-#endif
-
 #endif /* AB_REPEAT_ENABLE */
 
                 /* stop and exit wps */
-#ifdef WPS_EXIT
-            case WPS_EXIT:
-# ifdef WPS_EXIT_PRE
-                if ((lastbutton & ~BUTTON_REPEAT) != WPS_EXIT_PRE)
-                    break;
-# endif
+            case ACTION_WPS_STOP:
                 if (global_settings.party_mode)
                     break;
                 exit = true;
-#ifdef WPS_RC_EXIT
-            case WPS_RC_EXIT:
-#ifdef WPS_RC_EXIT_PRE
-                if ((lastbutton & ~BUTTON_REPEAT) != WPS_RC_EXIT_PRE)
-                     break;
-#endif
-                if (global_settings.party_mode)
-                    break;
-                exit = true;
-#endif
                 break;
-#endif
 
-#ifdef WPS_ID3
-            case WPS_ID3:
+            case ACTION_WPS_ID3SCREEN:
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
@@ -737,10 +552,10 @@ long gui_wps_show(void)
 #endif
                 restore = true;
                 break;
-#endif
 
-            case BUTTON_NONE: /* Timeout */
+            case ACTION_NONE: /* Timeout */
                 update_track = true;
+                ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
                 break;
 
             case SYS_POWEROFF:
@@ -779,6 +594,7 @@ long gui_wps_show(void)
         }
 
         if (exit) {
+            action_signalscreenchange();
 #ifdef HAVE_LCD_CHARCELLS
             status_set_record(false);
             status_set_audio(false);
@@ -830,8 +646,6 @@ long gui_wps_show(void)
                     gui_wps_refresh(&gui_wps[i], 0, WPS_REFRESH_NON_STATIC);
             }
         }
-        if (button != BUTTON_NONE)
-            lastbutton = button;
     }
     return 0; /* unreachable - just to reduce compiler warnings */
 }

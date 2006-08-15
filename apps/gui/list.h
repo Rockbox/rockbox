@@ -26,89 +26,6 @@
 
 #define SCROLLBAR_WIDTH  6
 
-/* Key assignement */
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
-#define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#ifdef CONFIG_REMOTE_KEYPAD
-#define LIST_RC_NEXT   BUTTON_RC_FF
-#define LIST_RC_PREV   BUTTON_RC_REW
-#define LIST_RC_PGUP   BUTTON_RC_SOURCE
-#define LIST_RC_PGDN   BUTTON_RC_BITRATE
-#define LIST_RC_PGRIGHT (BUTTON_RC_VOL_UP)
-#define LIST_RC_PGLEFT (BUTTON_RC_VOL_DOWN)
-#endif /* CONFIG_REMOTE_KEYPAD */
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
-#define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#define LIST_RC_NEXT   BUTTON_RC_RIGHT
-#define LIST_RC_PREV   BUTTON_RC_LEFT
-
-#elif CONFIG_KEYPAD == PLAYER_PAD
-#define LIST_NEXT      BUTTON_RIGHT
-#define LIST_PREV      BUTTON_LEFT
-
-#define LIST_RC_NEXT   BUTTON_RC_RIGHT
-#define LIST_RC_PREV   BUTTON_RC_LEFT
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGRIGHT   (BUTTON_MENU | BUTTON_RIGHT)
-#define LIST_PGLEFT    (BUTTON_MENU | BUTTON_LEFT)
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define LIST_NEXT      BUTTON_SCROLL_FWD
-#define LIST_PREV      BUTTON_SCROLL_BACK
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-//#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_)
-//#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_) Todo: define those
-  
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGUP      (BUTTON_ON | BUTTON_UP)
-#define LIST_PGDN      (BUTTON_ON | BUTTON_DOWN)
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define LIST_NEXT      BUTTON_DOWN
-#define LIST_PREV      BUTTON_UP
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define LIST_NEXT      BUTTON_SCROLL_DOWN
-#define LIST_PREV      BUTTON_SCROLL_UP
-#define LIST_PGRIGHT   (BUTTON_RIGHT | BUTTON_REPEAT)
-#define LIST_PGLEFT    (BUTTON_LEFT  | BUTTON_REPEAT)
-
-#endif
-
 /*
  * The gui_list is based on callback functions, if you want the list
  * to display something you have to provide it a function that
@@ -390,8 +307,8 @@ void gui_synclist_scroll_left(struct gui_synclist * lists);
  *  - lists : the synchronized lists
  *  - button : the keycode of a pressed button
  * returned value :
- *  - LIST_NEXT when moving forward (next item or pgup)
- *  - LIST_PREV when moving backward (previous item or pgdown)
+ *  - ACTION_STD_NEXT when moving forward (next item or pgup)
+ *  - ACTION_STD_PREV when moving backward (previous item or pgdown)
  */
 extern unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button);
 

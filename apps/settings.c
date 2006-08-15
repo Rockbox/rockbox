@@ -24,7 +24,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "thread.h"
-#include "button.h"
+#include "action.h"
 #include "settings.h"
 #include "disk.h"
 #include "panic.h"
@@ -612,6 +612,7 @@ static const struct bit_entry hd_bits[] =
     {2, S_O(eq_hw_band4_cutoff), 1, "eq hardware band 4 cutoff", "5.3kHz,6.9kHz,9kHz,11.7kHz" },
     {5|SIGNED, S_O(eq_hw_band4_gain), 12, "eq hardware band 4 gain", NULL },
 #endif
+    {1, S_O(hold_lr_for_scroll_in_list), true, "hold_lr_for_scroll_in_list", off_on },
 
     {2, S_O(show_path_in_browser), 0, "show path in browser", "off,current directory,full path" },
 
@@ -1799,7 +1800,7 @@ void settings_reset(void) {
 #ifdef HAVE_LCD_BITMAP
     global_settings.kbd_file[0] = '\0';
 #endif
-
+    global_settings.hold_lr_for_scroll_in_list = true;
 }
 
 bool set_bool(const char* string, bool* variable )
@@ -1891,7 +1892,7 @@ bool do_set_setting(const unsigned char* string, void *variable,
                     struct value_setting_data *cb_data,
                     void (*function)(int))
 {
-    int button;
+    int action;
     bool done = false;
     struct gui_synclist lists;
     int oldvalue;
@@ -1918,11 +1919,11 @@ bool do_set_setting(const unsigned char* string, void *variable,
     while (!done)
     {
         
-        button = button_get(true);
-        if (button == BUTTON_NONE)
+        action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK); 
+        if (action == ACTION_NONE)
             continue;
         
-        if (gui_synclist_do_button(&lists,button))
+        if (gui_synclist_do_button(&lists,action))
         {
             if (global_settings.talk_menu)
             {
@@ -1946,7 +1947,7 @@ bool do_set_setting(const unsigned char* string, void *variable,
                 *(bool*)variable = gui_synclist_get_sel_pos(&lists) ? true : false;
             else *(int*)variable = gui_synclist_get_sel_pos(&lists);
         }  
-        else if (button == SETTINGS_CANCEL)
+        else if (action == ACTION_STD_CANCEL)
         {
             gui_syncsplash(HZ/2,true,str(LANG_MENU_SETTING_CANCEL));
             if (cb_data->type == INT)
@@ -1954,11 +1955,11 @@ bool do_set_setting(const unsigned char* string, void *variable,
             else *(bool*)variable = (bool)oldvalue;
             done = true;
         }
-        else if (button == SETTINGS_OK)
+        else if (action == ACTION_STD_OK)
         {
             done = true;
         }
-        else if(default_event_handler(button) == SYS_USB_CONNECTED)
+        else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
         gui_syncstatusbar_draw(&statusbars, false);
         if ( function )

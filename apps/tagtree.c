@@ -29,6 +29,7 @@
 #include "splash.h"
 #include "icons.h"
 #include "tree.h"
+#include "action.h"
 #include "settings.h"
 #include "tagcache.h"
 #include "tagtree.h"
@@ -539,7 +540,7 @@ bool show_search_progress(bool init, int count)
                        str(LANG_OFF_ABORT)
 #endif
                        );
-        if (SETTINGS_CANCEL == button_get(false))
+        if (action_userabort(TIMEOUT_NOBLOCK))
             return false;
         last_tick = current_tick;
         yield();

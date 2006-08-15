@@ -24,7 +24,7 @@
 #include "tree.h"
 #include "lcd.h"
 #include "font.h"
-#include "button.h"
+#include "action.h"
 #include "kernel.h"
 #include "main_menu.h"
 #include "debug_menu.h"
@@ -237,48 +237,22 @@ bool show_info(void)
 #endif
 
         /* Wait for a key to be pushed */
-        key = button_get_w_tmo(HZ*5);
+        key = get_action(CONTEXT_MAINMENU,HZ*5);
         switch(key) {
 
-            case SETTINGS_OK:
-#ifdef SETTINGS_RC_OK
-            case SETTINGS_RC_OK:
-#endif
-#ifdef SETTINGS_OK2
-            case SETTINGS_OK2:
-#endif
-#ifdef SETTINGS_RC_OK2
-            case SETTINGS_RC_OK2:
-#endif
-#ifdef SETTINGS_RC_CANCEL
-            case SETTINGS_RC_CANCEL:
-#endif
-            case SETTINGS_CANCEL:
+            case ACTION_STD_CANCEL:
                 done = true;
                 break;
 
 #ifdef HAVE_LCD_CHARCELLS
-            case SETTINGS_INC:
-            case SETTINGS_DEC:
-#ifdef SETTINGS_RC_INC
-            case SETTINGS_RC_INC:
-#endif
-#ifdef SETTINGS_RC_DEC
-            case SETTINGS_RC_DEC:
-#endif
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
                 page = (page == 0) ? 1 : 0;
                 break;
 #endif
 
 #ifndef SIMULATOR
-#ifdef SETTINGS_RC_ACCEPT
-            case SETTINGS_RC_ACCEPT:
-#endif
-#ifdef SETTINGS_ACCEPT
-            case SETTINGS_ACCEPT:
-#else
-            case SETTINGS_INC: /* Ondio */
-#endif
+            case ACTION_STD_OK:
                 gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
                 fat_recalc_free(IF_MV(0));
 #ifdef HAVE_MULTIVOLUME
@@ -295,7 +269,7 @@ bool show_info(void)
                 break;
         }
     }
-
+    action_signalscreenchange();
     return false;
 }
 

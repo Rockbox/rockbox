@@ -26,7 +26,7 @@
 #include "kernel.h"
 #include "lcd.h"
 #include "menu.h"
-#include "button.h"
+#include "action.h"
 #include "mp3_playback.h"
 #include "settings.h"
 #include "statusbar.h"
@@ -47,73 +47,6 @@
 #include "gui/scrollbar.h"
 #ifdef HAVE_WM8758
 #include "wm8758.h"
-#endif
-
-/* Key definitions */
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD || \
-     CONFIG_KEYPAD == IRIVER_H300_PAD)
-
-#define EQ_BTN_MODIFIER     BUTTON_ON
-#define EQ_BTN_DECREMENT    BUTTON_LEFT
-#define EQ_BTN_INCREMENT    BUTTON_RIGHT
-#define EQ_BTN_NEXT_BAND    BUTTON_DOWN
-#define EQ_BTN_PREV_BAND    BUTTON_UP
-#define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
-#define EQ_BTN_EXIT         BUTTON_OFF
-
-#define EQ_BTN_RC_PREV_BAND     BUTTON_RC_REW
-#define EQ_BTN_RC_NEXT_BAND     BUTTON_RC_FF
-#define EQ_BTN_RC_DECREMENT     BUTTON_RC_SOURCE
-#define EQ_BTN_RC_INCREMENT     BUTTON_RC_BITRATE
-#define EQ_BTN_RC_CHANGE_MODE   BUTTON_RC_MENU
-#define EQ_BTN_RC_EXIT          BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
-
-#define EQ_BTN_DECREMENT    BUTTON_SCROLL_BACK
-#define EQ_BTN_INCREMENT    BUTTON_SCROLL_FWD
-#define EQ_BTN_NEXT_BAND    BUTTON_RIGHT
-#define EQ_BTN_PREV_BAND    BUTTON_LEFT
-#define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
-#define EQ_BTN_EXIT         BUTTON_MENU
-
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-
-#define EQ_BTN_DECREMENT    BUTTON_LEFT
-#define EQ_BTN_INCREMENT    BUTTON_RIGHT
-#define EQ_BTN_NEXT_BAND    BUTTON_DOWN
-#define EQ_BTN_PREV_BAND    BUTTON_UP
-#define EQ_BTN_CHANGE_MODE  BUTTON_REC
-#define EQ_BTN_EXIT         BUTTON_SELECT
-
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-
-#define EQ_BTN_DECREMENT    BUTTON_LEFT
-#define EQ_BTN_INCREMENT    BUTTON_RIGHT
-#define EQ_BTN_NEXT_BAND    BUTTON_DOWN
-#define EQ_BTN_PREV_BAND    BUTTON_UP
-#define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
-#define EQ_BTN_EXIT         BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-
-#define EQ_BTN_DECREMENT    BUTTON_LEFT
-#define EQ_BTN_INCREMENT    BUTTON_RIGHT
-#define EQ_BTN_NEXT_BAND    BUTTON_DOWN
-#define EQ_BTN_PREV_BAND    BUTTON_UP
-#define EQ_BTN_CHANGE_MODE  BUTTON_SELECT
-#define EQ_BTN_EXIT         BUTTON_A
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-
-#define EQ_BTN_DECREMENT    BUTTON_LEFT
-#define EQ_BTN_INCREMENT    BUTTON_RIGHT
-#define EQ_BTN_NEXT_BAND    BUTTON_SCROLL_DOWN
-#define EQ_BTN_PREV_BAND    BUTTON_SCROLL_UP
-#define EQ_BTN_CHANGE_MODE  BUTTON_PLAY
-#define EQ_BTN_EXIT         BUTTON_POWER
-
 #endif
 
 /* Various user interface limits and sizes */
@@ -686,27 +619,19 @@ bool eq_menu_graphical(void)
             screens[i].update();
         }
         
-        button = button_get(true);
+        button = get_action(CONTEXT_SETTINGSGRAPHICAL,TIMEOUT_BLOCK);
 
         switch (button) {
-        case EQ_BTN_DECREMENT:
-        case EQ_BTN_DECREMENT | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_DECREMENT
-        case EQ_BTN_RC_DECREMENT:
-        case EQ_BTN_RC_DECREMENT | BUTTON_REPEAT:
-#endif
+        case ACTION_SETTINGS_DEC:
+        case ACTION_SETTINGS_DECREPEAT:
             *(setting) -= step;
             has_changed = true;
             if (*(setting) < min)
                 *(setting) = min;
             break;
 
-        case EQ_BTN_INCREMENT:
-        case EQ_BTN_INCREMENT | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_INCREMENT
-        case EQ_BTN_RC_INCREMENT:
-        case EQ_BTN_RC_INCREMENT | BUTTON_REPEAT:
-#endif
+        case ACTION_SETTINGS_INC:
+        case ACTION_SETTINGS_INCREPEAT:
             *(setting) += step;
             has_changed = true;
             if (*(setting) > max)
@@ -731,45 +656,27 @@ bool eq_menu_graphical(void)
             break;
 #endif
 
-        case EQ_BTN_PREV_BAND:
-        case EQ_BTN_PREV_BAND | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_PREV_BAND
-        case EQ_BTN_RC_PREV_BAND:
-        case EQ_BTN_RC_PREV_BAND | BUTTON_REPEAT:
-#endif
+        case ACTION_STD_PREV:
+        case ACTION_STD_PREVREPEAT:
             current_band--;
             if (current_band < 0)
                 current_band = 4; /* wrap around */
             break;
 
-        case EQ_BTN_NEXT_BAND:
-        case EQ_BTN_NEXT_BAND | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_NEXT_BAND
-        case EQ_BTN_RC_NEXT_BAND:
-        case EQ_BTN_RC_NEXT_BAND | BUTTON_REPEAT:
-#endif
+        case ACTION_STD_NEXT:
+        case ACTION_STD_NEXTREPEAT:
             current_band++;
             if (current_band > 4)
                 current_band = 0; /* wrap around */
             break;
 
-        case EQ_BTN_CHANGE_MODE:
-        case EQ_BTN_CHANGE_MODE | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_CHANGE_MODE
-        case EQ_BTN_RC_CHANGE_MODE:
-        case EQ_BTN_RC_CHANGE_MODE | BUTTON_REPEAT:
-#endif
+            case ACTION_STD_OK:
             mode++;
             if (mode > Q)
                 mode = GAIN; /* wrap around */
             break;
 
-        case EQ_BTN_EXIT:
-        case EQ_BTN_EXIT | BUTTON_REPEAT:
-#ifdef EQ_BTN_RC_EXIT
-        case EQ_BTN_RC_EXIT:
-        case EQ_BTN_RC_EXIT | BUTTON_REPEAT:
-#endif
+            case ACTION_STD_CANCEL:
             exit_request = true;
             result = false;
             break;
@@ -789,6 +696,7 @@ bool eq_menu_graphical(void)
         }
     }
 
+    action_signalscreenchange();
     /* Reset screen settings */
     FOR_NB_SCREENS(i) {
         screens[i].setfont(FONT_UI);

@@ -4,41 +4,6 @@
 #include "screen_access.h"
 #include "textarea.h"
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-    (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define YESNO_OK       BUTTON_SELECT
-#define YESNO_RC_OK    BUTTON_RC_MENU
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define YESNO_OK       BUTTON_PLAY
-#define YESNO_RC_OK    BUTTON_RC_PLAY
-
-#elif CONFIG_KEYPAD == PLAYER_PAD
-#define YESNO_OK       BUTTON_PLAY
-#define YESNO_RC_OK    BUTTON_RC_PLAY
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define YESNO_OK       BUTTON_RIGHT
-
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#define YESNO_OK       BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define YESNO_OK       BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-#define YESNO_OK       BUTTON_RIGHT
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define YESNO_OK       BUTTON_RIGHT
-
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
-#define YESNO_OK       BUTTON_RIGHT
-
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
-#define YESNO_OK       BUTTON_RIGHT
-
-#endif
 enum yesno_res
 {
     YESNO_YES,

@@ -519,7 +519,12 @@ static void remote_tick(void)
     if (cs_countdown == 0)
         CS_HI;
 }
-#endif /* !SIMULATOR */
+#else 
+int remote_type(void)
+{
+    return REMOTETYPE_UNPLUGGED;
+}
+#endif/* !SIMULATOR */
 
 /* LCD init */
 #ifdef SIMULATOR
