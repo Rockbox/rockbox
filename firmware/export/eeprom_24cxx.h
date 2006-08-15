@@ -20,8 +20,13 @@
 #ifndef _EEPROM_24CXX_H
 #define _EEPROM_24CXX_H
 
+#ifdef IRIVER_H300_SERIES
+#define EEPROM_ADDR   0xA2
+#define EEPROM_SIZE   256
+#else
 #define EEPROM_ADDR   0xA0
 #define EEPROM_SIZE   128
+#endif
 
 void eeprom_24cxx_init(void);
 int eeprom_24cxx_read_byte(unsigned int address, char *c);

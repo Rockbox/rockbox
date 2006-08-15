@@ -52,7 +52,7 @@ void pcf50606_i2c_recalc_delay(int cpu_clock)
     i2c_delay = MAX(cpu_clock / (400000*2*3) - 7, 1);
 }
 
-static inline void pcf50606_i2c_start(void)
+inline void pcf50606_i2c_start(void)
 {
 #ifdef USE_ASM
     asm (
@@ -101,7 +101,7 @@ static inline void pcf50606_i2c_start(void)
 #endif
 }
 
-static inline void pcf50606_i2c_stop(void)
+inline void pcf50606_i2c_stop(void)
 {
 #ifdef USE_ASM
     asm (
@@ -141,7 +141,7 @@ static inline void pcf50606_i2c_stop(void)
 #endif
 }
 
-static inline void pcf50606_i2c_ack(bool ack)
+inline void pcf50606_i2c_ack(bool ack)
 {
 #ifdef USE_ASM
     asm (
@@ -193,7 +193,7 @@ static inline void pcf50606_i2c_ack(bool ack)
 #endif
 }
 
-static inline bool pcf50606_i2c_getack(void)
+inline bool pcf50606_i2c_getack(void)
 {
     bool ret;
 
@@ -251,7 +251,7 @@ static inline bool pcf50606_i2c_getack(void)
     return ret;
 }
 
-static void pcf50606_i2c_outb(unsigned char byte)
+void pcf50606_i2c_outb(unsigned char byte)
 {
 #ifdef USE_ASM
     asm volatile (
@@ -321,7 +321,7 @@ static void pcf50606_i2c_outb(unsigned char byte)
 #endif
 }
 
-static unsigned char pcf50606_i2c_inb(bool ack)
+unsigned char pcf50606_i2c_inb(bool ack)
 {
     unsigned char byte = 0;
 

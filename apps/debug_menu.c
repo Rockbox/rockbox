@@ -1891,13 +1891,22 @@ bool dbg_save_roms(void)
     fd = creat("/internal_eeprom.bin", O_WRONLY);
     if (fd >= 0)
     {
+        int old_irq_level;
         char buf[EEPROM_SIZE];
-        
-        if (eeprom_24cxx_read(0, buf, sizeof buf))
-            gui_syncsplash(HZ*3, true, "Eeprom read failure!");
+        int err;
+
+        old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+        err = eeprom_24cxx_read(0, buf, sizeof buf);
+        if (err)
+            gui_syncsplash(HZ*3, true, "Eeprom read failure (%d)",err);
         else
+        {
             write(fd, buf, sizeof buf);
-            
+        }
+
+        set_irq_level(old_irq_level);
+
         close(fd);
     }
 #endif
@@ -1976,6 +1985,46 @@ bool dbg_set_memory_guard(void)
 }
 #endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
+#if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
+bool dbg_write_eeprom(void)
+{
+    int fd;
+    int rc;
+    int old_irq_level;
+    char buf[EEPROM_SIZE];
+    int err;
+    
+    fd = open("/internal_eeprom.bin", O_RDONLY);
+
+    if (fd >= 0)
+    {
+        rc = read(fd, buf, EEPROM_SIZE);
+
+        if(rc == EEPROM_SIZE)
+        {
+            old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+            err = eeprom_24cxx_write(0, buf, sizeof buf);
+            if (err)
+                gui_syncsplash(HZ*3, true, "Eeprom write failure (%d)",err);
+
+            set_irq_level(old_irq_level);
+        }
+        else
+        {
+            gui_syncsplash(HZ*3, true, "File read error (%d)",rc);
+        }
+        close(fd);
+    }
+    else
+    {
+        gui_syncsplash(HZ*3, true, "Failed to open 'internal_eeprom.bin'");
+    }
+
+    return false;
+}
+#endif /* defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS) */
+
 bool debug_menu(void)
 {
     int m;
@@ -2022,6 +2071,9 @@ bool debug_menu(void)
         { "View runtime", view_runtime },
 #ifdef CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
+#endif
+#if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
+        { "Write back EEPROM", dbg_write_eeprom },
 #endif
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },

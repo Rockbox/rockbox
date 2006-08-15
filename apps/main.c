@@ -120,7 +120,7 @@ int init_dircache(bool preinit)
     
     if (global_settings.dircache)
     {
-# ifdef HAVE_EEPROM
+# ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized && firmware_settings.disk_clean 
             && preinit)
         {
@@ -371,14 +371,14 @@ void init(void)
         panicf("ata: %d", rc);
     }
 
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
     eeprom_settings_init();
 #endif
     
     usb_start_monitoring();
     while (usb_detect())
     {   
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
         firmware_settings.disk_clean = false;
 #endif
         /* enter USB mode early, before trying to mount */
@@ -444,7 +444,7 @@ void init(void)
     init_dircache(false);
     init_tagcache();
 
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized)
     {
         /* In case we crash. */

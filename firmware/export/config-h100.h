@@ -129,7 +129,7 @@
 
 /* Define this if there is an EEPROM chip */
 /* Someone with H100 and BDM, please verify if this works. */
-// #define HAVE_EEPROM
+/* #define HAVE_EEPROM */
 
 #endif /* !SIMULATOR */
 

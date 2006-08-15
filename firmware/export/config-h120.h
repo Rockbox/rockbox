@@ -125,6 +125,9 @@
 /* Define this if there is an EEPROM chip */
 #define HAVE_EEPROM
 
+/* Define this if the EEPROM chip is used */
+#define HAVE_EEPROM_SETTINGS
+
 #endif /* !SIMULATOR */
 
 /* Define this for S/PDIF input available */

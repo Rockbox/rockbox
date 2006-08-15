@@ -153,7 +153,7 @@ struct ramcache_header {
     int entry_count[TAG_COUNT];  /* Number of entries in the indices. */
 };
 
-# ifdef HAVE_EEPROM
+# ifdef HAVE_EEPROM_SETTINGS
 struct statefile_header {
     struct ramcache_header *hdr;
     struct tagcache_stat stat;
@@ -2829,7 +2829,7 @@ static bool allocate_tagcache(void)
     return true;
 }
 
-# ifdef HAVE_EEPROM
+# ifdef HAVE_EEPROM_SETTINGS
 static bool tagcache_dumpload(void)
 {
     struct statefile_header shdr;
@@ -3370,7 +3370,7 @@ static void tagcache_thread(void)
     free_tempbuf();
     
 #ifdef HAVE_TC_RAMCACHE
-# ifdef HAVE_EEPROM
+# ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized && firmware_settings.disk_clean)
         check_done = tagcache_dumpload();
 
@@ -3462,7 +3462,7 @@ bool tagcache_prepare_shutdown(void)
     if (tagcache_get_commit_step() > 0)
         return false;
     
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
     if (stat.ramcache)
         tagcache_dumpsave();
 #endif

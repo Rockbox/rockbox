@@ -150,7 +150,9 @@ drivers/pcf50606.c
 #endif
 #ifdef HAVE_EEPROM
 drivers/eeprom_24cxx.c
+#ifdef HAVE_EEPROM_SETTINGS
 eeprom_settings.c
+#endif
 #endif
 #ifdef IPOD_ARCH
 drivers/pcf50605.c

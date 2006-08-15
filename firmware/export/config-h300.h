@@ -133,4 +133,7 @@
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
 
+/* Define this if there is an EEPROM chip */
+#define HAVE_EEPROM
+
 #endif /* SIMULATOR */

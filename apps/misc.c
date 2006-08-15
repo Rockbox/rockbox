@@ -507,7 +507,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             callback(parameter);
 
         system_flush();
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
             firmware_settings.disk_clean = true;

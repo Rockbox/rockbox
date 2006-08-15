@@ -357,7 +357,7 @@ void main(void)
         power_off();
     }
 
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
     firmware_settings.initialized = false;
 #endif
     if (detect_flashed_rockbox())
@@ -365,7 +365,7 @@ void main(void)
         bool load_from_flash;
         
         load_from_flash = !rec_button;
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
         if (eeprom_settings_init())
         {
             /* If bootloader version has not been reset, disk might
@@ -389,7 +389,7 @@ void main(void)
             lcd_update();
             if (i == 0)
             {
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
                 eeprom_settings_store();
 #endif
                 start_firmware();
@@ -457,7 +457,7 @@ void main(void)
         sleep(HZ);
 #endif
     
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
             firmware_settings.disk_clean = false;
@@ -503,7 +503,7 @@ void main(void)
     printf("Result: %d", i);
     lcd_update();
 
-#ifdef HAVE_EEPROM
+#ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized)
         eeprom_settings_store();
 #endif

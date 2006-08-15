@@ -35,21 +35,24 @@
 #define SW_I2C_WRITE 0
 #define SW_I2C_READ  1
 
+/* h1x0 needs its own i2c driver,
+   h3x0 uses the pcf i2c driver */
+
+#ifdef IRIVER_H100_SERIES
+
 /* cute little functions, atomic read-modify-write */
 
 /* SCL is GPIO, 12 */
-#define SCL_LO     and_l(~0x00001000, &GPIO_OUT)    // and_b(~0x10, &PBDRL)
-#define SCL_HI      or_l( 0x00001000, &GPIO_OUT)    //  or_b( 0x10, &PBDRL)
-#define SCL_INPUT  and_l(~0x00001000, &GPIO_ENABLE) // and_b(~0x10, &PBIORL)
-#define SCL_OUTPUT  or_l( 0x00001000, &GPIO_ENABLE) //  or_b( 0x10, &PBIORL)
-#define SCL             ( 0x00001000 & GPIO_READ)   //      (PBDR & 0x0010)
+#define SCL             ( 0x00001000 & GPIO_READ)
+#define SCL_OUT_LO and_l(~0x00001000, &GPIO_OUT)
+#define SCL_LO      or_l( 0x00001000, &GPIO_ENABLE)
+#define SCL_HI     and_l(~0x00001000, &GPIO_ENABLE); while(!SCL);
 
 /* SDA is GPIO1, 13 */
-#define SDA_LO     and_l(~0x00002000, &GPIO1_OUT)     // and_b(~0x02, &PBDRL)
-#define SDA_HI      or_l( 0x00002000, &GPIO1_OUT)     //  or_b( 0x02, &PBDRL)
-#define SDA_INPUT  and_l(~0x00002000, &GPIO1_ENABLE)  // and_b(~0x02, &PBIORL)
-#define SDA_OUTPUT  or_l( 0x00002000, &GPIO1_ENABLE)  //  or_b( 0x02, &PBIORL) 
-#define SDA             ( 0x00002000 & GPIO1_READ)    // (PBDR & 0x0002)
+#define SDA             ( 0x00002000 & GPIO1_READ)
+#define SDA_OUT_LO and_l(~0x00002000, &GPIO1_OUT)
+#define SDA_LO      or_l( 0x00002000, &GPIO1_ENABLE)
+#define SDA_HI     and_l(~0x00002000, &GPIO1_ENABLE)
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
 #define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
@@ -61,17 +64,15 @@ static void sw_i2c_init(void)
     or_l(0x00002000, &GPIO1_FUNCTION);
     SDA_HI;
     SCL_HI;
-    SDA_OUTPUT;
-    SCL_OUTPUT;
+    SDA_OUT_LO;
+    SCL_OUT_LO;
 }
 
 static void sw_i2c_start(void)
 {
     SCL_LO;
-    SCL_OUTPUT;
     DELAY;
     SDA_HI;
-    SDA_OUTPUT;
     DELAY;
     SCL_HI;
     DELAY;
@@ -87,7 +88,6 @@ static void sw_i2c_stop(void)
     SDA_HI;
     DELAY;
 }
-
 
 static void sw_i2c_ack(void)
 {
@@ -105,7 +105,7 @@ static bool sw_i2c_getack(void)
     int count = 10;
 
     SCL_LO;
-    SDA_INPUT;   /* And set to input */
+    SDA_HI;   /* sets to input */
     DELAY;
     SCL_HI;
     DELAY;
@@ -118,10 +118,8 @@ static bool sw_i2c_getack(void)
         ret = false;
     
     SCL_LO;
-    SCL_OUTPUT;
     DELAY;
     SDA_LO;
-    SDA_OUTPUT;
 
     return ret;
 }
@@ -143,8 +141,6 @@ static void sw_i2c_outb(unsigned char byte)
         SCL_HI;
         DELAY;
     }
-
-    // SDA_LO;
 }
 
 static unsigned char sw_i2c_inb(void)
@@ -152,7 +148,7 @@ static unsigned char sw_i2c_inb(void)
     int i;
     unsigned char byte = 0;
 
-    SDA_INPUT;   /* And set to input */
+    SDA_HI;   /* sets to input */
     
     /* clock in each bit, MSB first */
     for ( i=0x80; i; i>>=1 ) 
@@ -165,12 +161,25 @@ static unsigned char sw_i2c_inb(void)
         DELAY;
     }
 
-    SDA_OUTPUT;
-   
     sw_i2c_ack();
     
     return byte;
 }
+
+#else
+
+#include "pcf50606.h"
+
+#define sw_i2c_init()       /* no extra init required */
+#define sw_i2c_start()      pcf50606_i2c_start()
+#define sw_i2c_stop()       pcf50606_i2c_stop()
+#define sw_i2c_ack()        pcf50606_i2c_ack(true)
+#define sw_i2c_getack()     pcf50606_i2c_getack()
+#define sw_i2c_outb(x)      pcf50606_i2c_outb(x)
+#define sw_i2c_inb()        pcf50606_i2c_inb(false)
+
+#endif /* IRIVER_H100_SERIES */
+
 
 int sw_i2c_write(int location, const unsigned char* buf, int count)
 {
