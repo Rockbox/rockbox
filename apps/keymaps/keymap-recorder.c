@@ -111,6 +111,19 @@ struct button_mapping button_context_yesno[] = {
     
     LAST_ITEM_IN_LIST
 }; 
+struct button_mapping button_context_quickscreen[]  = {
+    { ACTION_QS_DOWNINV,    BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_QS_DOWNINV,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP },
+    { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
+    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_DOWN },
+    { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
+    { ACTION_STD_CANCEL,    BUTTON_PLAY,                    BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_quickscreen */
 
 struct button_mapping* get_context_mapping( int context )
 {
@@ -131,7 +144,8 @@ struct button_mapping* get_context_mapping( int context )
             /* else fall through to CUSTOM|1 */
         case CONTEXT_CUSTOM|1:
             return button_context_tree;
-            
+        case CONTEXT_QUICKSCREEN:
+            return button_context_quickscreen;
         case CONTEXT_STD:
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
