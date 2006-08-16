@@ -5,9 +5,10 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) 2006 Jonathan Gordon
- *
+ * 
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
  *
@@ -28,7 +29,9 @@
 bool ignore_until_release = false;
 int last_button = BUTTON_NONE;
 int soft_unlock_action = ACTION_NONE;
+#if (BUTTON_REMOTE != 0)
 bool allow_remote_actions = true;
+#endif
 /*
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
@@ -111,12 +114,13 @@ int get_action_worker(int context, int timeout,
         /*last_button = BUTTON_NONE; this is done by action_signalscreenchange() */
         return ACTION_UNKNOWN; /* "safest" return value */
     }
-    
+#if (BUTTON_REMOTE != 0)    
     if (soft_unlock_action != ACTION_NONE)
     {
         if ((button&BUTTON_REMOTE) && !allow_remote_actions)
             return ACTION_NONE;
     }
+#endif
     /*   logf("%x,%x",last_button,button); */
     do 
     {
@@ -149,16 +153,24 @@ int get_action_worker(int context, int timeout,
     
     if (soft_unlock_action != ACTION_NONE)
     {
+#if (BUTTON_REMOTE != 0)
         if ((button&BUTTON_REMOTE) == 0)
         {
+#endif
             if (soft_unlock_action == ret)
             {
                 soft_unlock_action = ACTION_NONE;
                 ret = ACTION_NONE; /* no need to return the code */
             }
+#if (BUTTON_REMOTE != 0)
         }
         else if (!allow_remote_actions)
+        {
             ret = ACTION_NONE;
+        }
+#else
+            else ret = ACTION_NONE; /* eat the button */
+#endif
     }
     
     last_button = button;
@@ -198,6 +210,10 @@ void action_signalscreenchange(void)
 void action_setsoftwarekeylock(int unlock_action, bool allow_remote)
 {
     soft_unlock_action = unlock_action;
+#if (BUTTON_REMOTE != 0)
     allow_remote_actions = allow_remote;
+#else
+    (void)allow_remote; /* kill the warning */
+#endif
     last_button = BUTTON_NONE;
 }
