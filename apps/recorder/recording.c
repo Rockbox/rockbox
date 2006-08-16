@@ -168,6 +168,63 @@ const char* const freq_str[6] =
     "16kHz"
 };
 
+#ifdef HAVE_AGC
+/* Timing counters:
+ * peak_time is incremented every 0.2s, every 2nd run of record screen loop.
+ * hist_time is incremented every 0.5s, display update.
+ * peak_time is the counter of the peak hold read and agc process,
+ * overflow every 13 years 8-)
+ */
+static long peak_time = 0;
+static long hist_time = 0;
+
+static short peak_valid_mem[4];
+#define BAL_MEM_SIZE 24
+static short balance_mem[BAL_MEM_SIZE];
+
+/* Automatic Gain Control */
+#define AGC_MODE_SIZE 5
+static char* agc_preset_str[] =
+{ "Off", "S", "L", "D", "M", "V" };
+/*  "Off",
+    "Safety (clip)",
+    "Live (slow)",
+    "DJ-Set (slow)",
+    "Medium",
+    "Voice (fast)"  */
+#define AGC_CLIP 32766
+#define AGC_PEAK 29883 /* fast gain reduction threshold -0.8dB */
+#define AGC_HIGH 27254 /* accelerated gain reduction threshold -1.6dB */
+#define AGC_IMG    823 /* threshold for balance control -32dB */
+/* autogain high level thresholds (-3dB, -7dB, -4dB, -5dB, -5dB) */
+const short agc_th_hi[AGC_MODE_SIZE] =
+{ 23197, 14637, 21156, 18428, 18426 };
+/* autogain low level thresholds (-14dB, -11dB, -6dB, -7dB, -8dB) */
+const short agc_th_lo[AGC_MODE_SIZE] =
+{ 6538, 9235, 16422, 14636, 13045 };
+/* autogain threshold times [1/5s] or [200ms] */
+const short agc_tdrop[AGC_MODE_SIZE] =
+{ 900,  225, 150, 60, 8 };
+const short agc_trise[AGC_MODE_SIZE] =
+{ 9000, 750, 400, 150, 20 };
+const short agc_tbal[AGC_MODE_SIZE] =
+{ 4500, 500, 300, 100, 15 };
+/* AGC operation */
+static bool agc_enable = true;
+static short agc_preset;
+/* AGC levels */
+static int agc_left = 0;
+static int agc_right = 0;
+/* AGC time since high target volume was exceeded */
+static short agc_droptime = 0;
+/* AGC time since volume fallen below low target */
+static short agc_risetime = 0;
+/* AGC balance time exceeding +/- 0.7dB */
+static short agc_baltime = 0;
+/* AGC maximum gain */
+static short agc_maxgain;
+#endif /* HAVE_AGC */
+
 static void set_gain(void)
 {
     if(global_settings.rec_source == SOURCE_MIC)
@@ -182,6 +239,229 @@ static void set_gain(void)
                                  AUDIO_GAIN_LINEIN);
     }
 }
+
+#ifdef HAVE_AGC
+/* Read peak meter values & calculate balance.
+ * Returns validity of peak values.
+ * Used for automatic gain control and history diagram.
+ */
+bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
+{
+    peak_meter_get_peakhold(peak_l, peak_r);
+    peak_valid_mem[peak_time % 3] = *peak_l;
+    if (((peak_valid_mem[0] == peak_valid_mem[1]) &&
+         (peak_valid_mem[1] == peak_valid_mem[2])) &&
+        ((*peak_l < 32767)
+#ifndef SIMULATOR
+         || ata_disk_is_active()
+#endif         
+         ))
+            return false;
+
+    if (*peak_r > *peak_l)
+        balance_mem[peak_time % BAL_MEM_SIZE] =
+            MIN((10000 * *peak_r) / *peak_l - 10000, 15118);
+    else
+        balance_mem[peak_time % BAL_MEM_SIZE] =
+            MAX(10000 - (10000 * *peak_l) / *peak_r, -15118);
+    *balance = 0;
+    int i;
+    for (i = 0; i < BAL_MEM_SIZE; i++)
+        *balance += balance_mem[i];
+    *balance = *balance / BAL_MEM_SIZE;
+
+    return true;
+}
+
+/* AGC helper function to check if maximum gain is reached */
+bool agc_gain_is_max(bool left, bool right)
+{
+    /* range -128...+108 [0.5dB] */
+    short gain_current_l;
+    short gain_current_r;
+
+    if (agc_preset == 0)
+        return false;
+
+    if (global_settings.rec_source == SOURCE_LINE)
+    {
+        gain_current_l = global_settings.rec_left_gain;
+        gain_current_r = global_settings.rec_right_gain;
+    } else
+    {
+        gain_current_l = global_settings.rec_mic_gain;
+        gain_current_r = global_settings.rec_mic_gain;
+    }
+
+    return ((left && (gain_current_l >= agc_maxgain)) ||
+            (right && (gain_current_r >= agc_maxgain)));
+}
+
+void change_recording_gain(bool increment, bool left, bool right)
+{
+    int factor = (increment ? 1 : -1);
+
+    if (global_settings.rec_source == SOURCE_LINE)
+    {
+        if(left) global_settings.rec_left_gain += factor;
+        if (right) global_settings.rec_right_gain += factor;
+    }
+    else
+    {
+         global_settings.rec_mic_gain += factor;
+    }
+}
+
+/* 
+ * Handle automatic gain control (AGC).
+ * Change recording gain if peak_x levels are above or below
+ * target volume for specified timeouts.
+ */
+void auto_gain_control(int *peak_l, int *peak_r, int *balance)
+{
+    int agc_mono;
+    short agc_mode;
+    bool increment;
+
+    if (*peak_l > agc_left)
+        agc_left = *peak_l;
+    else
+        agc_left -= (agc_left - *peak_l + 3) >> 2;
+    if (*peak_r > agc_right)
+        agc_right = *peak_r;
+    else
+        agc_right -= (agc_right - *peak_r + 3) >> 2;
+    agc_mono = (agc_left + agc_right) / 2;
+    
+    agc_mode = abs(agc_preset) - 1;
+    if (agc_mode < 0) {
+        agc_enable = false;
+        return;
+    }
+
+    /* Automatic balance control */
+    if ((agc_left > AGC_IMG) && (agc_right > AGC_IMG))
+    {
+        if (*balance < -556)
+        {
+            if (*balance > -900)
+                agc_baltime -= !(peak_time % 4); /* 0.47 - 0.75dB */
+            else if (*balance > -4125)
+                agc_baltime--;                   /* 0.75 - 3.00dB */
+            else if (*balance > -7579)
+                agc_baltime -= 2;                /* 3.00 - 4.90dB */
+            else
+                agc_baltime -= !(peak_time % 8); /* 4.90 - inf dB */
+            if (agc_baltime > 0)
+                agc_baltime -= (peak_time % 2);
+        }
+        else if (*balance > 556)
+        {
+            if (*balance < 900)
+                agc_baltime += !(peak_time % 4);
+            else if (*balance < 4125)
+                agc_baltime++;
+            else if (*balance < 7579)
+                agc_baltime += 2;
+            else
+                agc_baltime += !(peak_time % 8);
+            if (agc_baltime < 0)
+                agc_baltime += (peak_time % 2);
+        }
+
+        if ((*balance * agc_baltime) < 0)
+        {
+            if (*balance < 0)
+                agc_baltime -= peak_time % 2;
+            else
+                agc_baltime += peak_time % 2;
+        }
+
+        increment = ((agc_risetime / 2) > agc_droptime);
+        
+        if (agc_baltime < -agc_tbal[agc_mode])
+        {
+            if (!increment || !agc_gain_is_max(!increment, increment)) {
+                change_recording_gain(increment, !increment, increment);
+                set_gain();
+            }
+            agc_baltime = 0;
+        }
+        else if (agc_baltime > +agc_tbal[agc_mode])
+        {
+            if (!increment || !agc_gain_is_max(increment, !increment)) {
+                change_recording_gain(increment, increment, !increment);
+                set_gain();
+            }
+            agc_baltime = 0;
+        }
+    }
+    else if (!(hist_time % 4))
+    {
+        if (agc_baltime < 0)
+            agc_baltime++;
+        else
+            agc_baltime--;
+    }
+    
+    /* Automatic gain control */
+    if ((agc_left > agc_th_hi[agc_mode]) || (agc_right > agc_th_hi[agc_mode]))
+    {
+        if ((agc_left > AGC_CLIP) || (agc_right > AGC_CLIP))
+            agc_droptime += agc_tdrop[agc_mode] /
+                            (global_settings.rec_agc_cliptime + 1);
+        if (agc_left  > AGC_HIGH) {
+            agc_droptime++;
+            agc_risetime=0;
+            if (agc_left > AGC_PEAK)
+                agc_droptime += 2;
+        }
+        if (agc_right > AGC_HIGH) {
+            agc_droptime++;
+            agc_risetime=0;
+            if (agc_right > AGC_PEAK)
+                agc_droptime += 2;
+        }
+        if (agc_mono > agc_th_hi[agc_mode])
+            agc_droptime++;
+        else
+            agc_droptime += !(peak_time % 2);
+    
+        if (agc_droptime >= agc_tdrop[agc_mode])
+        {
+            change_recording_gain(false, true, true);
+            agc_droptime = 0;
+            agc_risetime = 0;
+            set_gain();
+        }
+        agc_risetime = MAX(agc_risetime - 1, 0);
+    }
+    else if (agc_mono < agc_th_lo[agc_mode])
+    {
+        if (agc_mono < (agc_th_lo[agc_mode] / 8))
+            agc_risetime += !(peak_time % 5);
+        else if (agc_mono < (agc_th_lo[agc_mode] / 2))
+            agc_risetime += 2;
+        else
+            agc_risetime++;
+    
+        if (agc_risetime >= agc_trise[agc_mode]) {
+            if (!agc_gain_is_max(true, true)) {
+                change_recording_gain(true, true, true);
+                set_gain();
+            }
+            agc_risetime = 0;
+            agc_droptime = 0;
+        }
+        agc_droptime = MAX(agc_droptime - 1, 0);
+    }
+    else if (!(peak_time % 6)) /* on target level every 1.2 sec */
+    {
+        agc_risetime = MAX(agc_risetime - 1, 0);
+        agc_droptime = MAX(agc_droptime - 1, 0);
+    }
+}
+#endif /* HAVE_AGC */
 
 static const char* const fmtstr[] =
 {
@@ -226,6 +506,22 @@ void adjust_cursor(void)
     if(cursor < 0)
         cursor = 0;
 
+#ifdef HAVE_AGC
+    switch(global_settings.rec_source)
+    {
+    case SOURCE_MIC:
+        if(cursor == 2)
+            cursor = 4;
+        else if(cursor == 3)
+            cursor = 1;
+    case SOURCE_LINE:
+        max_cursor = 5;
+        break;
+    default:
+        max_cursor = 0;
+        break;
+    }
+#else
     switch(global_settings.rec_source)
     {
     case SOURCE_MIC:
@@ -238,6 +534,7 @@ void adjust_cursor(void)
         max_cursor = 0;
         break;
     }
+#endif /* HAVE_AGC */
 
     if(cursor > max_cursor)
         cursor = max_cursor;
@@ -353,6 +650,14 @@ bool recording_screen(void)
     bool led_state = false;
     int led_countdown = 2;
 #endif
+#ifdef HAVE_AGC
+    bool peak_read = false;
+    bool peak_valid = false;
+    int peak_l, peak_r;
+    int balance = 0;
+    bool display_agc[NB_SCREENS];
+#endif
+    int line[NB_SCREENS];
     int i;
     int filename_offset[NB_SCREENS];
     int pm_y[NB_SCREENS];
@@ -392,6 +697,9 @@ bool recording_screen(void)
     peak_meter_playback(true);
 #endif
     peak_meter_enabled = true;
+#ifdef HAVE_AGC
+    peak_meter_get_peakhold(&peak_l, &peak_r);
+#endif
 
 #if CONFIG_CODEC != SWCODEC
     if (global_settings.rec_prerecord_time)
@@ -413,6 +721,23 @@ bool recording_screen(void)
     set_gain();
 
     settings_apply_trigger();
+
+#ifdef HAVE_AGC
+    agc_preset_str[0] = str(LANG_OFF);
+    agc_preset_str[1] = str(LANG_AGC_SAFETY);
+    agc_preset_str[2] = str(LANG_AGC_LIVE);
+    agc_preset_str[3] = str(LANG_AGC_DJSET);
+    agc_preset_str[4] = str(LANG_AGC_MEDIUM);
+    agc_preset_str[5] = str(LANG_AGC_VOICE);
+    if (global_settings.rec_source == SOURCE_MIC) {
+        agc_preset = global_settings.rec_agc_preset_mic;
+        agc_maxgain = global_settings.rec_agc_maxgain_mic;
+    }
+    else {
+        agc_preset = global_settings.rec_agc_preset_line;
+        agc_maxgain = global_settings.rec_agc_maxgain_line;
+    }
+#endif
 
     FOR_NB_SCREENS(i)
     {
@@ -698,6 +1023,33 @@ bool recording_screen(void)
                            sound_max(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain++;
                         break;
+#ifdef HAVE_AGC
+                    case 4:
+                        agc_preset = MIN(agc_preset + 1, AGC_MODE_SIZE);
+                        agc_enable = (agc_preset != 0);
+                        if (global_settings.rec_source == SOURCE_MIC) {
+                            global_settings.rec_agc_preset_mic = agc_preset;
+                            agc_maxgain = global_settings.rec_agc_maxgain_mic;
+                        } else {
+                            global_settings.rec_agc_preset_line = agc_preset;
+                            agc_maxgain = global_settings.rec_agc_maxgain_line;
+                        }
+                        break;
+                    case 5:
+                        if (global_settings.rec_source == SOURCE_MIC)
+                        {
+                            agc_maxgain = MIN(agc_maxgain + 1,
+                                              sound_max(SOUND_MIC_GAIN));
+                            global_settings.rec_agc_maxgain_mic = agc_maxgain;
+                        }
+                        else
+                        {
+                            agc_maxgain = MIN(agc_maxgain + 1,
+                                              sound_max(SOUND_LEFT_GAIN));
+                            global_settings.rec_agc_maxgain_line = agc_maxgain;
+                        }
+                        break;
+#endif
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -744,6 +1096,33 @@ bool recording_screen(void)
                            sound_min(SOUND_RIGHT_GAIN))
                             global_settings.rec_right_gain--;
                         break;
+#ifdef HAVE_AGC
+                    case 4:
+                        agc_preset = MAX(agc_preset - 1, 0);
+                        agc_enable = (agc_preset != 0);
+                        if (global_settings.rec_source == SOURCE_MIC) {
+                            global_settings.rec_agc_preset_mic = agc_preset;
+                            agc_maxgain = global_settings.rec_agc_maxgain_mic;
+                        } else {
+                            global_settings.rec_agc_preset_line = agc_preset;
+                            agc_maxgain = global_settings.rec_agc_maxgain_line;
+                        }
+                        break;
+                    case 5:
+                        if (global_settings.rec_source == SOURCE_MIC)
+                        {
+                            agc_maxgain = MAX(agc_maxgain - 1,
+                                              sound_min(SOUND_MIC_GAIN));
+                            global_settings.rec_agc_maxgain_mic = agc_maxgain;
+                        }
+                        else
+                        {
+                            agc_maxgain = MAX(agc_maxgain - 1,
+                                              sound_min(SOUND_LEFT_GAIN));
+                            global_settings.rec_agc_maxgain_line = agc_maxgain;
+                        }
+                        break;
+#endif
                 }
                 set_gain();
                 update_countdown = 1; /* Update immediately */
@@ -777,6 +1156,16 @@ bool recording_screen(void)
                                                global_settings.rec_channels,
                                                global_settings.rec_editable,
                                                global_settings.rec_prerecord_time);
+#ifdef HAVE_AGC
+                    if (global_settings.rec_source == SOURCE_MIC) {
+                        agc_preset = global_settings.rec_agc_preset_mic;
+                        agc_maxgain = global_settings.rec_agc_maxgain_mic;
+                    }
+                    else {
+                        agc_preset = global_settings.rec_agc_preset_line;
+                        agc_maxgain = global_settings.rec_agc_maxgain_line;
+                    }
+#endif
 
                     adjust_cursor();
                     set_gain();
@@ -853,6 +1242,18 @@ bool recording_screen(void)
         }
         if (button != BUTTON_NONE)
             lastbutton = button;
+
+#ifdef HAVE_AGC
+        peak_read = !peak_read;
+        if (peak_read) { /* every 2nd run of loop */
+            peak_time++;
+            peak_valid = read_peak_levels(&peak_l, &peak_r, &balance);
+        }
+
+        /* Handle AGC every 200ms when enabled and peak data is valid */
+        if (peak_read && agc_enable && peak_valid)
+            auto_gain_control(&peak_l, &peak_r, &balance);
+#endif
 
             FOR_NB_SCREENS(i)       
                 screens[i].setfont(FONT_SYSFIXED);
@@ -1041,10 +1442,101 @@ bool recording_screen(void)
                         screens[i].puts(0, filename_offset[i] + 
                                             PM_HEIGHT + 4, buf);
                 }                
-
             }
 
-            if(!global_settings.invert_cursor){
+            FOR_NB_SCREENS(i)
+            {
+                if (global_settings.rec_source == SOURCE_LINE)
+                    line[i] = 5;
+                else if (global_settings.rec_source == SOURCE_MIC)
+                    line[i] = 4;
+#ifdef HAVE_SPDIF_IN
+                else if (global_settings.rec_source == SOURCE_SPDIF)
+                    line[i] = 3;
+#endif
+#ifdef HAVE_AGC
+                if (screens[i].height < h * (2 + filename_offset[i] + PM_HEIGHT + line[i]))
+                {
+                    line[i] -= 1;
+                    display_agc[i] = false;
+                }
+                else 
+                    display_agc[i] = true;
+ 
+                if ((cursor==4) || (cursor==5))
+                    display_agc[i] = true;
+             }
+
+            /************** AGC test info ******************
+            snprintf(buf, 32, "D:%d U:%d",
+                     (agc_droptime+2)/5, (agc_risetime+2)/5);
+            lcd_putsxy(1, LCD_HEIGHT - 8, buf);
+            snprintf(buf, 32, "B:%d",
+                     (agc_baltime+2)/5);
+            lcd_putsxy(LCD_WIDTH/2 + 3, LCD_HEIGHT - 8, buf);
+            ***********************************************/
+
+            if (cursor == 5)
+                snprintf(buf, 32, "%s: %s",
+                         str(LANG_RECORDING_AGC_MAXGAIN),
+                         fmt_gain(SOUND_LEFT_GAIN,
+                                  agc_maxgain, buf2, sizeof(buf2)));
+            else if (agc_preset == 0)
+                snprintf(buf, 32, "%s: %s",
+                         str(LANG_RECORDING_AGC_PRESET),
+                         agc_preset_str[agc_preset]);
+            else if (global_settings.rec_source == SOURCE_MIC)
+                snprintf(buf, 32, "%s: %s%s",
+                         str(LANG_RECORDING_AGC_PRESET),
+                         agc_preset_str[agc_preset],
+                         fmt_gain(SOUND_LEFT_GAIN,
+                             agc_maxgain -
+                             global_settings.rec_mic_gain,
+                             buf2, sizeof(buf2)));
+            else
+                snprintf(buf, 32, "%s: %s%s",
+                         str(LANG_RECORDING_AGC_PRESET),
+                         agc_preset_str[agc_preset],
+                         fmt_gain(SOUND_LEFT_GAIN,
+                             agc_maxgain -
+                            (global_settings.rec_left_gain +
+                             global_settings.rec_right_gain)/2,
+                             buf2, sizeof(buf2)));                         
+
+            if(global_settings.invert_cursor && ((cursor==4) || (cursor==5)))
+            {
+                for(i = 0; i < screen_update; i++)
+                    screens[i].puts_style_offset(0, filename_offset[i] + 
+                                        PM_HEIGHT + line[i], buf, STYLE_INVERT,0);
+            }
+            else if ((global_settings.rec_source == SOURCE_MIC) 
+                    || (global_settings.rec_source == SOURCE_LINE))    
+            {
+                for(i = 0; i < screen_update; i++) {
+                    if (display_agc[i]) {
+                        screens[i].puts(0, filename_offset[i] + 
+                                        PM_HEIGHT + line[i], buf);
+                    }
+                }
+            }
+            
+            if (global_settings.rec_source == SOURCE_MIC)
+            {
+                if(agc_maxgain < (global_settings.rec_mic_gain))
+                    change_recording_gain(false, true, true);
+            }
+            else
+            {
+                if(agc_maxgain < (global_settings.rec_left_gain))
+                    change_recording_gain(false, true, false);
+                if(agc_maxgain < (global_settings.rec_right_gain))
+                    change_recording_gain(false, false, true);
+            }
+#else
+            }
+#endif /* HAVE_AGC */
+
+            if(!global_settings.invert_cursor) {
                 switch(cursor)
                 {
                     case 1:
@@ -1073,6 +1565,15 @@ bool recording_screen(void)
                                                     filename_offset[i] + 
                                                     PM_HEIGHT + 4, true);
                     break;
+#ifdef HAVE_AGC
+                    case 4:
+                    case 5:
+                        for(i = 0; i < screen_update; i++)
+                            screen_put_cursorxy(&screens[i], 0,
+                                                filename_offset[i] + 
+                                                PM_HEIGHT + line[i], true);
+                        break;
+#endif /* HAVE_AGC */
                     default:
                         for(i = 0; i < screen_update; i++)
                             screen_put_cursorxy(&screens[i], 0, 
@@ -1096,9 +1597,20 @@ bool recording_screen(void)
                      global_settings.rec_channels ?
                          str(LANG_SYSFONT_CHANNEL_MONO) :
                          str(LANG_SYSFONT_CHANNEL_STEREO));
-            for(i = 0; i < screen_update; i++)
-                screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 5, buf);
 
+            for(i = 0; i < screen_update; i++) {
+#ifdef HAVE_AGC
+                if ((global_settings.rec_source == SOURCE_MIC)
+                         || (global_settings.rec_source == SOURCE_LINE))
+                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
+                else
+#endif
+                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i], buf);
+            }
+
+#ifdef HAVE_AGC
+            hist_time++;
+#endif
             for(i = 0; i < screen_update; i++)
             {
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);

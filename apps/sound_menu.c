@@ -516,6 +516,41 @@ static bool cliplight(void)
 }
 #endif /*CONFIG_BACKLIGHT */
 
+#ifdef HAVE_AGC
+static bool agc_preset(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_AGC_SAFETY) },
+        { STR(LANG_AGC_LIVE) },
+        { STR(LANG_AGC_DJSET) },
+        { STR(LANG_AGC_MEDIUM) },
+        { STR(LANG_AGC_VOICE) },
+    };
+    if (global_settings.rec_source)
+        return set_option(str(LANG_RECORD_AGC_PRESET),
+                          &global_settings.rec_agc_preset_line,
+                          INT, names, 6, NULL );
+    else
+        return set_option(str(LANG_RECORD_AGC_PRESET),
+                          &global_settings.rec_agc_preset_mic,
+                          INT, names, 6, NULL );
+}
+
+static bool agc_cliptime(void)
+{
+    static const struct opt_items names[] = {
+        { "200ms", TALK_ID(200, UNIT_MS) },
+        { "400ms", TALK_ID(400, UNIT_MS) },
+        { "600ms", TALK_ID(600, UNIT_MS) },
+        { "800ms", TALK_ID(800, UNIT_MS) },
+        { "1s", TALK_ID(1, UNIT_SEC) }
+    };
+    return set_option(str(LANG_RECORD_AGC_CLIPTIME),
+                      &global_settings.rec_agc_cliptime,
+                      INT, names, 5, NULL );
+}
+#endif /* HAVE_AGC */
 #endif /* HAVE_RECORDING */
 
 static bool chanconf(void)
@@ -1014,6 +1049,12 @@ bool recording_menu(bool no_source)
 #if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORD_TRIGGER);
     items[i++].function = rectrigger;
+#endif
+#ifdef HAVE_AGC
+    items[i].desc = ID2P(LANG_RECORD_AGC_PRESET);
+    items[i++].function = agc_preset;
+    items[i].desc = ID2P(LANG_RECORD_AGC_CLIPTIME);
+    items[i++].function = agc_cliptime;
 #endif
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL);

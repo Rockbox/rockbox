@@ -34,7 +34,9 @@ extern void peak_meter_set_clip_hold(int time);
 extern void peak_meter_peek(void);
 extern void peak_meter_init_range( bool dbfs, int range_min, int range_max);
 extern void peak_meter_init_times(int release, int hold, int clip_hold);
-
+#ifdef HAVE_AGC
+extern void peak_meter_get_peakhold(int *peak_left, int *peak_right);
+#endif
 extern void peak_meter_set_min(int newmin);
 extern int  peak_meter_get_min(void);
 extern void peak_meter_set_max(int newmax);

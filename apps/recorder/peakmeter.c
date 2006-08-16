@@ -62,6 +62,10 @@ static int pm_cur_left;        /* current values (last peak_meter_peek) */
 static int pm_cur_right;
 static int pm_max_left;        /* maximum values between peak meter draws */
 static int pm_max_right;
+#ifdef HAVE_AGC
+static int pm_peakhold_left;   /* max. peak values between peakhold calls */
+static int pm_peakhold_right;  /* used for AGC and histogram display */
+#endif
 
 /* Clip hold */
 static bool pm_clip_left = false;  /* when true a clip has occurred */
@@ -716,6 +720,10 @@ static int peak_meter_read_l(void)
        by peak_meter_peek since the last call of peak_meter_read_l */
     int retval = pm_max_left;
 
+#ifdef HAVE_AGC
+    /* store max peak value for peak_meter_get_peakhold_x readout */
+    pm_peakhold_left = MAX(pm_max_left, pm_peakhold_left);
+#endif
 #ifdef PM_DEBUG
     peek_calls = 0;
 #endif
@@ -737,6 +745,10 @@ static int peak_meter_read_r(void)
        by peak_meter_peek since the last call of peak_meter_read_r */
     int retval = pm_max_right;
 
+#ifdef HAVE_AGC
+    /* store max peak value for peak_meter_get_peakhold_x readout */
+    pm_peakhold_right = MAX(pm_max_right, pm_peakhold_right);
+#endif
 #ifdef PM_DEBUG
     peek_calls = 0;
 #endif
@@ -745,6 +757,23 @@ static int peak_meter_read_r(void)
     pm_max_right = pm_cur_right;
     return retval;
 }
+
+#ifdef HAVE_AGC
+/**
+ * Reads out the current peak-hold values since the last call.
+ * This is used by the histogram feature in the recording screen.
+ * Values are in the range 0 <= peak_x < MAX_PEAK. MAX_PEAK is typ 32767.
+ */
+extern void peak_meter_get_peakhold(int *peak_left, int *peak_right)
+{
+    if (peak_left)
+        *peak_left  = pm_peakhold_left;
+    if (peak_right)
+        *peak_right = pm_peakhold_right;
+    pm_peakhold_left  = 0;
+    pm_peakhold_right = 0;
+}
+#endif
 
 /**
  * Reset the detected clips. This method is for

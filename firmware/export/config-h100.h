@@ -74,6 +74,8 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING 1
 
+#define HAVE_AGC
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Motorola SCF5249 */

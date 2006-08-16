@@ -180,6 +180,26 @@ struct user_settings
     int rec_stop_gap;       /* index of trig_durations */
     int rec_trigger_mode;   /* see TRIG_MODE_XXX constants */
 
+#ifdef HAVE_AGC
+    int rec_agc_preset_mic; /* AGC mic preset modes:
+                             0 = Off
+                             1 = Safety (clip)
+                             2 = Live (slow)
+                             3 = DJ-Set (slow)
+                             4 = Medium
+                             5 = Voice (fast) */
+    int rec_agc_preset_line; /* AGC line-in preset modes:
+                              0 = Off
+                              1 = Safety (clip)
+                              2 = Live (slow)
+                              3 = DJ-Set (slow)
+                              4 = Medium
+                              5 = Voice (fast) */
+    int rec_agc_maxgain_mic;  /* AGC maximum mic gain */
+    int rec_agc_maxgain_line; /* AGC maximum line-in gain */
+    int rec_agc_cliptime;     /* 0.2, 0.4, 0.6, 0.8, 1s */
+#endif
+
     /* device settings */
 
 #ifdef HAVE_LCD_CONTRAST

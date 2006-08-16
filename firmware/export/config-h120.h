@@ -68,6 +68,8 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING 1
 
+#define HAVE_AGC
+
 #define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
 
 #ifndef SIMULATOR

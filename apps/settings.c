@@ -615,7 +615,13 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(hold_lr_for_scroll_in_list), true, "hold_lr_for_scroll_in_list", off_on },
 
     {2, S_O(show_path_in_browser), 0, "show path in browser", "off,current directory,full path" },
-
+#ifdef HAVE_AGC
+    {4, S_O(rec_agc_preset_mic), 1, "agc mic preset", NULL}, /* 0...5 */
+    {4, S_O(rec_agc_preset_line), 1, "agc line preset", NULL}, /* 0...5 */
+    {8|SIGNED, S_O(rec_agc_maxgain_mic), 104, "agc maximum mic gain", NULL},
+    {8|SIGNED, S_O(rec_agc_maxgain_line), 96, "agc maximum line gain", NULL},
+    {3, S_O(rec_agc_cliptime), 1, "agc cliptime", "0.2s,0.4s,0.6s,0.8,1s"},
+#endif
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
