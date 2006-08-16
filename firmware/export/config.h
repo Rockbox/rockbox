@@ -198,16 +198,12 @@
 /* no known platform */
 #endif
 
-/* Enable the directory cache if we have plenty of RAM. */
-/* Cache is just temporarily disabled for simulator build.
- * Do the small fix in dircache.c to enable this. */
+/* Enable the directory cache and tagcache in RAM if we have
+ * plenty of RAM. Both features can be enabled independently. */
 #if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
 #define HAVE_DIRCACHE 1
-#endif
-
-/* Define tagcache in ram for all players (can operate
- * also without dircache). */
 #define HAVE_TC_RAMCACHE 1
+#endif
 
 /* define for all cpus from coldfire family */
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
