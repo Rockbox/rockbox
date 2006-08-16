@@ -85,3 +85,4 @@ codecs/libalac/*
 codecs/lib/*.[ch]
 codecs/lib/Makefile
 codecs/lib/SOURCES
+keymaps/*.[ch]
