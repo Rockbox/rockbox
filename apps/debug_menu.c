@@ -2007,6 +2007,8 @@ bool dbg_write_eeprom(void)
             err = eeprom_24cxx_write(0, buf, sizeof buf);
             if (err)
                 gui_syncsplash(HZ*3, true, "Eeprom write failure (%d)",err);
+            else
+                gui_syncsplash(HZ*3, true, "Eeprom written successfully",rc);
 
             set_irq_level(old_irq_level);
         }
