@@ -109,23 +109,25 @@ void D_DoAdvanceDemo (void);
  *
  * Called by I/O functions when an event is received.
  * Try event handlers for each code area in turn.
- * cph - in the true spirit of the Boom source, let the 
- *  short ciruit operator madness begin!
  */
 
 void D_PostEvent(event_t *ev)
 {
    /* cph - suppress all input events at game start
     * FIXME: This is a lousy kludge */
-   if (gametic < 3) return;
-   M_Responder(ev) ||
-   (gamestate == GS_LEVEL && (
-       HU_Responder(ev) ||
-       ST_Responder(ev) ||
-       AM_Responder(ev)
-    )
-   ) ||
-   G_Responder(ev);
+   if (gametic < 3)
+       return;
+
+   if(!M_Responder(ev)) {
+       if(gamestate == GS_LEVEL && (
+              HU_Responder(ev) ||
+              ST_Responder(ev) ||
+              AM_Responder(ev)
+              ))
+           return;
+       else
+           G_Responder(ev);
+   }
 }
 
 //
