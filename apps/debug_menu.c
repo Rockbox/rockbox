@@ -1491,7 +1491,7 @@ bool dbg_mmc_info(void)
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
-    static const unsigned char *nsec_units[] = { "ns", "s", "ms" };
+    static const unsigned char *nsec_units[] = { "ns", "us", "ms" };
     
     card_name[6] = '\0';
 
