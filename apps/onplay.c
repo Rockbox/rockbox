@@ -961,7 +961,7 @@ int onplay(char* file, int attr, int from)
     }
     if (context == CONTEXT_WPS)
     {
-#if (CONFIG_KEYPAD != PLAYER_PAD)
+#ifdef HAVE_PITCHSCREEN
         /* Pitch screen access */
         items[i].desc = ID2P(LANG_PITCH);
         items[i].function = pitch_screen;

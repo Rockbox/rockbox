@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "config.h"
 
 #include "system.h"
 #include "file.h"
@@ -373,10 +374,11 @@ long gui_wps_show(void)
                 audio_next();
                 break;
                 /* next / prev directories */
-            case ACTION_WPS_NEXTDIR:
+                /* and set A-B markers if in a-b mode */
+            case ACTION_WPS_ABSETB_NEXTDIR:
                 if (global_settings.party_mode)
                     break;
-#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+#if defined(AB_REPEAT_ENABLE)
                 if (ab_repeat_mode_enabled())
                 {
                     ab_set_B_marker(wps_state.id3->elapsed);
@@ -389,10 +391,10 @@ long gui_wps_show(void)
                     audio_next_dir();
                 }
                 break;
-            case ACTION_WPS_PREVDIR:
+            case ACTION_WPS_ABSETA_PREVDIR:
                 if (global_settings.party_mode)
                     break;
-#if defined(AB_REPEAT_ENABLE) && defined(WPS_AB_SHARE_DIR_BUTTONS)
+#if defined(AB_REPEAT_ENABLE)
                 if (ab_repeat_mode_enabled())
                     ab_set_A_marker(wps_state.id3->elapsed);
                 else
@@ -465,10 +467,10 @@ long gui_wps_show(void)
                 {
                     gui_wps_set_margin(&gui_wps[i]);
                 }
-#endif /* BUTTON_F3 */
+#endif 
                 restore = true;
                 break;
-#endif
+#endif /* BUTTON_F3 */
 
                 /* pitch screen */
 #ifdef HAVE_PITCHSCREEN
@@ -476,6 +478,7 @@ long gui_wps_show(void)
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
+                action_signalscreenchange();
                 if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_COLOR
@@ -504,22 +507,6 @@ long gui_wps_show(void)
                     break;
                 }
                 ab_set_A_marker(wps_state.id3->elapsed);
-                break;
-
-
-            /* set A marker for A-B repeat */
-            case ACTION_WPSAB_SETA:
-                if (ab_repeat_mode_enabled())
-                    ab_set_A_marker(wps_state.id3->elapsed);
-                break;
-            /* set B marker for A-B repeat and jump to A */
-            case ACTION_WPSAB_SETB:
-                if (ab_repeat_mode_enabled())
-                {
-                    ab_set_B_marker(wps_state.id3->elapsed);
-                    ab_jump_to_A_marker();
-                    update_track = true;
-                }
                 break;
             /* reset A&B markers */
             case ACTION_WPSAB_RESET:

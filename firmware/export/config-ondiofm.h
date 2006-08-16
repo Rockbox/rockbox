@@ -15,6 +15,9 @@
 /* define this if you have an Ondio style 6-key keyboard */
 #define CONFIG_KEYPAD ONDIO_PAD
 
+/* define this if you have access to the pitchscreen */
+#define HAVE_PITCHSCREEN
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

@@ -46,6 +46,7 @@ enum {
     CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
     CONTEXT_BOOKMARKSCREEN, /*NOTE: requires the action_setting_* mappings also */
     CONTEXT_QUICKSCREEN, /* uses ACTION_QS_ defines below */
+    CONTEXT_PITCHSCREEN, /* uses ACTION_PS_ defines below */
 };
 
 
@@ -82,18 +83,14 @@ enum {
     ACTION_WPS_STOP,
     ACTION_WPS_VOLDOWN,
     ACTION_WPS_VOLUP,
-    ACTION_WPS_NEXTDIR,/* optional */
-    ACTION_WPS_PREVDIR,/* optional */
     ACTION_WPS_PITCHSCREEN,/* optional */
     ACTION_WPS_ID3SCREEN,/* optional */
     ACTION_WPS_CONTEXT,
     ACTION_WPS_QUICKSCREEN,/* optional */
     ACTION_WPS_MENU, /*this should be the same as ACTION_STD_MENU */
-    /* following code are for AB mode in wps, 
-       only needed if defined(AB_REPEAT_ENABLE) */
     ACTION_WPSAB_SINGLE, /* No targets use this, but leave n just-in-case! */
-    ACTION_WPSAB_SETA,   /* either #define WPS_AB_SHARE_DIR_BUTTONS        */
-    ACTION_WPSAB_SETB,   /* OR implement ACTION_WPSAB_SET[AB]              */
+    ACTION_WPS_ABSETA_PREVDIR, /* these should be safe to put together seen as */
+    ACTION_WPS_ABSETB_NEXTDIR, /* you shouldnt want to change dir in ab-mode */
     ACTION_WPSAB_RESET,
     
     /* list and tree page up/down */    
@@ -133,6 +130,20 @@ enum {
     ACTION_QS_RIGHT,
     ACTION_QS_DOWN,
     ACTION_QS_DOWNINV, /* why is this not called up?? :p */
+    
+    /* pitchscreen */
+    /* obviously ignore if you dont have thise screen */
+    ACTION_PS_INC_SMALL,
+    ACTION_PS_INC_BIG,
+    ACTION_PS_DEC_SMALL,
+    ACTION_PS_DEC_BIG,
+    ACTION_PS_NUDGE_LEFT,
+    ACTION_PS_NUDGE_RIGHT,
+    ACTION_PS_NUDGE_LEFTOFF,
+    ACTION_PS_NUDGE_RIGHTOFF,
+    ACTION_PS_RESET,
+    ACTION_PS_EXIT, /* _STD_* isnt going to work here */
+    
     
 };
 

@@ -124,6 +124,21 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
 
+const struct button_mapping button_context_pitchscreen[]  = {
+    { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,     BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_POWER,               BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_PLAY,                BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_pitchscreen */
+
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
@@ -148,6 +163,8 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_tree;
         case CONTEXT_QUICKSCREEN:
             return button_context_quickscreen;
+        case CONTEXT_PITCHSCREEN:
+            return button_context_pitchscreen;
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:

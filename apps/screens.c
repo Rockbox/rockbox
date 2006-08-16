@@ -351,7 +351,7 @@ int charging_screen(void)
 }
 #endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
-#if (CONFIG_KEYPAD != PLAYER_PAD)
+#ifdef HAVE_PITCHSCREEN
 /* returns:
    0 if no key was pressed
    1 if USB was connected */
@@ -416,19 +416,20 @@ bool pitch_screen(void)
     pcmbuf_set_low_latency(true);
 #endif
 
+    action_signalscreenchange();
     while (!exit)
     {
         pitch_screen_draw(pitch);
 
-        button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
+        button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
         switch (button) {
-            case ACTION_SETTINGS_INC:
+            case ACTION_PS_DEC_SMALL:
                 if ( pitch < 2000 )
                     pitch++;
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_SETTINGS_INCREPEAT:
+            case ACTION_PS_DEC_BIG:
                 if ( pitch < 1990 )
                     pitch += 10;
                 else
@@ -436,13 +437,13 @@ bool pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_SETTINGS_DEC:
+            case ACTION_PS_INC_SMALL:
                 if ( pitch > 500 )
                     pitch--;
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_SETTINGS_DECREPEAT:
+            case ACTION_PS_INC_BIG:
                 if ( pitch > 510 )
                     pitch -= 10;
                 else
@@ -450,33 +451,32 @@ bool pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_STD_NEXT:
+            case ACTION_PS_NUDGE_RIGHT:
                 if ( pitch < 1980 )
                 {
                     pitch += 20;
                     sound_set_pitch(pitch);
-
                     pitch_screen_draw(pitch);
-
-                    pitch -= 20;
-                    sound_set_pitch(pitch);
                 }
                 break;
+            case ACTION_PS_NUDGE_RIGHTOFF:
+                pitch -= 20;
+                sound_set_pitch(pitch);
+                break;
 
-            case ACTION_STD_PREV:
+            case ACTION_PS_NUDGE_LEFT:
                 if ( pitch > 520 )
                 {
                     pitch -= 20;
                     sound_set_pitch(pitch);
-
                     pitch_screen_draw(pitch);
-
-                    pitch += 20;
-                    sound_set_pitch(pitch);
                 }
+            case ACTION_PS_NUDGE_LEFTOFF:
+                pitch += 20;
+                sound_set_pitch(pitch);
                 break;
 
-            case ACTION_STD_OK:
+            case ACTION_PS_RESET:
                 pitch = 1000;
                 sound_set_pitch( pitch );
                 break;
@@ -498,7 +498,7 @@ bool pitch_screen(void)
     action_signalscreenchange();
     return 0;
 }
-#endif
+#endif /* HAVE_PITCHSCREEN */
 
 #ifdef HAVE_QUICKSCREEN
 

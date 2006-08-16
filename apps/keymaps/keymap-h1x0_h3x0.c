@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id $
  *
  * Copyright (C) 2006 Jonathan Gordon
  *
@@ -61,6 +62,7 @@ const struct button_mapping button_context_standard[]  = {
 
 
 const struct button_mapping button_context_wps[]  = {
+    { ACTION_NONE,              BUTTON_ON,                      BUTTON_NONE },
     { ACTION_WPS_PLAY,          BUTTON_ON|BUTTON_REL,           BUTTON_ON },
     { ACTION_WPS_SKIPNEXT,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT },
     { ACTION_WPS_SKIPPREV,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
@@ -68,14 +70,15 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_SEEKFWD,       BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
-    { ACTION_WPS_NEXTDIR,       BUTTON_ON|BUTTON_RIGHT,         BUTTON_ON },
-    { ACTION_WPS_PREVDIR,       BUTTON_ON|BUTTON_LEFT,          BUTTON_ON },
+    { ACTION_WPS_ABSETB_NEXTDIR,       BUTTON_ON|BUTTON_RIGHT,         BUTTON_ON },
+    { ACTION_WPS_ABSETA_PREVDIR,       BUTTON_ON|BUTTON_LEFT,          BUTTON_ON },
     { ACTION_WPS_STOP,          BUTTON_OFF,                     BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REL,         BUTTON_DOWN },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REL,           BUTTON_UP },
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
-    { ACTION_WPS_PITCHSCREEN,   BUTTON_ON|BUTTON_REPEAT,        BUTTON_ON },
+    { ACTION_WPS_PITCHSCREEN,   BUTTON_ON|BUTTON_UP,            BUTTON_ON },
+    { ACTION_WPS_PITCHSCREEN,   BUTTON_ON|BUTTON_DOWN,          BUTTON_ON },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,      BUTTON_MODE },
     { ACTION_WPS_MENU,          BUTTON_MODE|BUTTON_REL,         BUTTON_MODE },
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
@@ -176,6 +179,21 @@ const struct button_mapping button_context_quickscreen[]  = {
     
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
+
+const struct button_mapping button_context_pitchscreen[]  = {
+    { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,     BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_ON,                  BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_pitchcreen */
 /*****************************************************************************
  *    Remote control mappings 
  *****************************************************************************/
@@ -209,8 +227,8 @@ const struct button_mapping button_context_wps_h100lcdremote[]  = {
     { ACTION_WPS_VOLDOWN,           BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_WPS_VOLUP,             BUTTON_RC_VOL_UP,                   BUTTON_NONE },
     { ACTION_WPS_VOLUP,             BUTTON_RC_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_WPS_NEXTDIR,           BUTTON_RC_BITRATE,                  BUTTON_NONE },
-    { ACTION_WPS_PREVDIR,           BUTTON_RC_SOURCE,                   BUTTON_NONE },
+    { ACTION_WPS_ABSETB_NEXTDIR,           BUTTON_RC_BITRATE,                  BUTTON_NONE },
+    { ACTION_WPS_ABSETA_PREVDIR,           BUTTON_RC_SOURCE,                   BUTTON_NONE },
     { ACTION_WPS_PITCHSCREEN,       BUTTON_RC_ON|BUTTON_REPEAT,         BUTTON_RC_ON },
     { ACTION_WPS_QUICKSCREEN,       BUTTON_RC_MODE|BUTTON_REPEAT,       BUTTON_RC_MODE },
     { ACTION_WPS_MENU,              BUTTON_RC_MODE|BUTTON_REL,          BUTTON_RC_MODE },
@@ -383,6 +401,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:
             return button_context_quickscreen;
+        case CONTEXT_PITCHSCREEN:
+            return button_context_pitchscreen;
     } 
     return button_context_standard;
 }

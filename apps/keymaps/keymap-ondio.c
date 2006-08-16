@@ -111,6 +111,21 @@ struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
+const struct button_mapping button_context_pitchscreen[]  = {
+    { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,     BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_MENU,                BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_quickscreen */
+
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
@@ -129,7 +144,8 @@ const struct button_mapping* get_context_mapping( int context )
             
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
-
+        case CONTEXT_PITCHSCREEN:
+            return button_context_pitchscreen;
         case CONTEXT_TREE:     
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
