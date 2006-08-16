@@ -1314,6 +1314,12 @@ all: tools
 	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
 	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@
 
+bin: tools
+	@SIMUL1@
+	@SIMUL2@
+	\$(SILENT)\$(MAKE) -C \$(FIRMDIR) OBJDIR=\$(BUILDDIR)/firmware
+	\$(SILENT)\$(MAKE) -C \$(APPSDIR) OBJDIR=\$(BUILDDIR)/@APPS@ \$(BUILDDIR)/\$(BINARY)
+
 veryclean: clean toolsclean
 
 toolsclean:
