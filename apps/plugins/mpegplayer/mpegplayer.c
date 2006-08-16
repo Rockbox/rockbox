@@ -88,6 +88,8 @@ static bool button_loop(void)
 #endif
             do {
                 button = rb->button_get(true);
+                if (button == MPEG_STOP)
+                    return true;
             } while (button != MPEG_PAUSE);
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
