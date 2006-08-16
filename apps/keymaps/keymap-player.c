@@ -25,7 +25,7 @@
 #include "action.h"
 #include "button.h"
 
-const struct button_mapping button_context_standard[]  = {
+static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,       BUTTON_LEFT,                 BUTTON_NONE },
     { ACTION_STD_PREVREPEAT, BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_NEXT,       BUTTON_RIGHT,                BUTTON_NONE },
@@ -39,7 +39,7 @@ const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 };
 
-const struct button_mapping button_context_wps[]  = {
+static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,      BUTTON_PLAY,                BUTTON_NONE },
     { ACTION_WPS_SKIPNEXT,  BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_WPS_SKIPPREV,  BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
@@ -59,37 +59,77 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,   BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
     { ACTION_WPS_ID3SCREEN, BUTTON_MENU|BUTTON_ON,      BUTTON_NONE },
     
-
     LAST_ITEM_IN_LIST
 };
 
-const struct button_mapping button_context_settings[] = {
-    { ACTION_SETTINGS_INC,          BUTTON_LEFT,                  BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
+static const struct button_mapping button_context_settings[] = {
+    { ACTION_SETTINGS_INC,          BUTTON_LEFT,                 BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_RIGHT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 };
 
-const struct button_mapping button_context_tree[]  = {
+static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,      BUTTON_ON,     BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_listtree */
 
-const struct button_mapping button_context_yesno[]  = {
+static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,  BUTTON_PLAY,   BUTTON_NONE },
+
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
+/*****************************************************************************
+ *    Remote control mappings
+ *****************************************************************************/
+
+static const struct button_mapping remote_button_context_standard[]  = {
+    { ACTION_STD_PREV,      BUTTON_RC_LEFT,     BUTTON_NONE },
+    { ACTION_STD_NEXT,      BUTTON_RC_RIGHT,    BUTTON_NONE },
+    { ACTION_STD_CANCEL,    BUTTON_RC_STOP,     BUTTON_NONE },
+    { ACTION_STD_OK,        BUTTON_RC_PLAY,     BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+};
+
+static const struct button_mapping remote_button_context_wps[]  = {
+    { ACTION_WPS_PLAY,      BUTTON_RC_PLAY,     BUTTON_NONE },
+    { ACTION_WPS_SKIPNEXT,  BUTTON_RC_RIGHT,    BUTTON_NONE },
+    { ACTION_WPS_SKIPPREV,  BUTTON_RC_LEFT,     BUTTON_NONE },
+    { ACTION_WPS_STOP,      BUTTON_RC_STOP,     BUTTON_NONE },
+    
+    { ACTION_WPS_VOLDOWN,   BUTTON_RC_VOL_DOWN, BUTTON_NONE },
+    { ACTION_WPS_VOLUP,     BUTTON_RC_VOL_UP,   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+};
+
+
+static const struct button_mapping* get_context_mapping_remote( int context )
+{
+    context ^= CONTEXT_REMOTE;
+    
+    switch (context)
+    {
+        case CONTEXT_WPS:
+            return remote_button_context_wps;
+
+        default:
+            return remote_button_context_standard;
+    }
+}
+
 const struct button_mapping* get_context_mapping( int context )
 {
-    switch( context )
+    if (context&CONTEXT_REMOTE)
+        return get_context_mapping_remote(context);
+    
+    switch (context)
     {
-        case CONTEXT_STD:
-            return button_context_standard;
-            
         case CONTEXT_WPS:
             return button_context_wps;
 
@@ -102,6 +142,7 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_TREE:
             return button_context_tree;
             
+        case CONTEXT_STD:
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:
