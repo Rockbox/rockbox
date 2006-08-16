@@ -359,6 +359,11 @@ static int update_dir(void)
             gui_synclist_set_title(&tree_lists, NULL);
         }
     }
+    else 
+    {
+        /* This currently doesn't work too well in id3db so turn it off */
+        gui_synclist_set_title(&tree_lists, NULL);
+    }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
     gui_synclist_set_icon_callback(&tree_lists,
                   global_settings.show_icons?&tree_get_fileicon:NULL);
@@ -519,6 +524,7 @@ static bool check_changed_id3mode(bool currmode)
         {
             curr_context=CONTEXT_TREE;
             ft_load(&tc, NULL);
+            reload_dir = true;
         }
     }
     return currmode;
