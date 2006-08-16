@@ -184,8 +184,12 @@ sudoku_inverse.112x64x1.bmp
 sudoku_start.138x110x2.bmp
 sudoku_normal.138x110x2.bmp
 sudoku_inverse.138x110x2.bmp
-#elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 2)) || \
-      ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH >= 2))
+#elif ((LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)) || \
+      ((LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16))
+sudoku_start.160x128x16.bmp
+sudoku_normal.160x128x16.bmp
+sudoku_inverse.160x128x16.bmp
+#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 2)
 sudoku_start.160x128x2.bmp
 sudoku_normal.160x128x2.bmp
 sudoku_inverse.160x128x2.bmp
