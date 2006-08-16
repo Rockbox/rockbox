@@ -124,6 +124,20 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
 
+const struct button_mapping button_context_settingsgraphical[]  = {
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_PREV,              BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_STD_NEXT,              BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_REC,                 BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_settingsgraphical */
+
 const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
     { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
@@ -148,6 +162,9 @@ const struct button_mapping* get_context_mapping( int context )
             
         case CONTEXT_WPS:
             return button_context_wps;
+
+        case CONTEXT_SETTINGSGRAPHICAL:
+            return button_context_settingsgraphical;
 
         case CONTEXT_SETTINGS:
             return button_context_settings;
