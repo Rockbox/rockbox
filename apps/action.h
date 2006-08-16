@@ -145,7 +145,7 @@ struct button_mapping {
 /* get_context_map is a function which returns a button_mapping* depedning on the given context */
 /* custom button_mappings may "chain" to inbuilt CONTEXT's */
 int get_custom_action(int context,int timeout,
-                      struct button_mapping* (*get_context_map)(int));
+                      const struct button_mapping* (*get_context_map)(int));
 /* use if one of the standard CONTEXT_ mappings will work (ALL the core should be using this! */
 int get_action(int context, int timeout);
 /* call this whenever you leave your button loop */
@@ -160,6 +160,6 @@ bool action_userabort(int timeout);
 void action_setsoftwarekeylock(int unlock_action, bool allow_remote);
 
 /* no other code should need this apart from action.c */
-struct button_mapping* get_context_mapping(int context);
+const struct button_mapping* get_context_mapping(int context);
 
 #endif

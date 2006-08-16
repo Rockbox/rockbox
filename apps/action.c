@@ -33,7 +33,7 @@ bool allow_remote_actions = true;
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
  */
-inline int do_button_check(struct button_mapping *items, 
+inline int do_button_check(const struct button_mapping *items, 
                            int button, int last_button, int *start)
 {
     int i = 0;
@@ -41,24 +41,12 @@ inline int do_button_check(struct button_mapping *items,
     if (items == NULL)
         return ACTION_UNKNOWN;
 
-    /* Special case to make the keymaps smaller */
-    if(button & BUTTON_REPEAT)
-        last_button &= ~BUTTON_REPEAT;
-    
     while (items[i].button_code != BUTTON_NONE)
     {
         if (items[i].button_code == button) 
         {
-            if (items[i].pre_button_code != BUTTON_NONE)
-            {
-                if ((items[i].pre_button_code == last_button) ||
-                     (items[i].button_code == last_button))
-                {
-                    ret = items[i].action_code;
-                    break;
-                }
-            }
-            else
+            if ((items[i].pre_button_code == BUTTON_NONE)
+                || (items[i].pre_button_code == last_button))
             {
                 ret = items[i].action_code;
                 break;
@@ -70,7 +58,7 @@ inline int do_button_check(struct button_mapping *items,
     return ret;
 }
 
-inline int get_next_context(struct button_mapping *items, int i)
+inline int get_next_context(const struct button_mapping *items, int i)
 {
     while (items[i].button_code != BUTTON_NONE)
         i++;
@@ -95,9 +83,9 @@ inline int get_next_context(struct button_mapping *items, int i)
                   
  */
 int get_action_worker(int context, int timeout,
-                      struct button_mapping* (*get_context_map)(int) )
+                      const struct button_mapping* (*get_context_map)(int) )
 {
-    struct button_mapping *items = NULL;
+    const struct button_mapping *items = NULL;
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
@@ -183,7 +171,7 @@ int get_action(int context, int timeout)
 }
 
 int get_custom_action(int context,int timeout,
-                      struct button_mapping* (*get_context_map)(int))
+                      const struct button_mapping* (*get_context_map)(int))
 {
     return get_action_worker(context,timeout,get_context_map);
 }

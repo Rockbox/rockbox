@@ -549,7 +549,7 @@ struct plugin_api {
     int (*PREFIX(rmdir))(const char *name);
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
-                          struct button_mapping* (*get_context_map)(int));
+                          const struct button_mapping* (*get_context_map)(int));
     int (*get_action)(int context, int timeout);
     void (*action_signalscreenchange)(void);
     bool (*action_userabort)(int timeout);

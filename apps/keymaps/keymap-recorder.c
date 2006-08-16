@@ -34,40 +34,40 @@ CONTEXT_CUSTOM|1 = the standard list/tree defines (without directions)
 
 */
 
-struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,       BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT, BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
-    { ACTION_STD_NEXT,       BUTTON_DOWN,                BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT, BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+const struct button_mapping button_context_standard[]  = {
+    { ACTION_STD_PREV,        BUTTON_UP,                  BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,  BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_DOWN,                BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,  BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
 
-    { ACTION_STD_OK,     BUTTON_ON,                  BUTTON_NONE },
-    { ACTION_STD_OK,     BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_STD_OK,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
+    { ACTION_STD_OK,          BUTTON_ON,                  BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_STD_OK,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
 
-    { ACTION_STD_OK,     BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
-    { ACTION_STD_MENU,       BUTTON_F1,                  BUTTON_NONE },
-    { ACTION_STD_QUICKSCREEN,   BUTTON_F2,                  BUTTON_NONE }, 
-    { ACTION_STD_CONTEXT,    BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
-    { ACTION_STD_CANCEL,       BUTTON_OFF,                 BUTTON_NONE },
-    { ACTION_STD_CANCEL,     BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_STD_CANCEL,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
+    { ACTION_STD_OK,          BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
+    { ACTION_STD_MENU,        BUTTON_F1,                  BUTTON_NONE },
+    { ACTION_STD_QUICKSCREEN, BUTTON_F2,                  BUTTON_NONE },
+    { ACTION_STD_CONTEXT,     BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
+    { ACTION_STD_CANCEL,      BUTTON_OFF,                 BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 };
 
-struct button_mapping button_context_wps[]  = {
+const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,        BUTTON_PLAY,                BUTTON_NONE },
-    { ACTION_WPS_SKIPNEXT,    BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_WPS_SKIPPREV,    BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_WPS_SEEKBACK,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
-    { ACTION_WPS_SEEKFWD,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
-    { ACTION_WPS_STOPSEEK,      BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT|BUTTON_REPEAT },
-    { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,         BUTTON_RIGHT|BUTTON_REPEAT },
+    { ACTION_WPS_SKIPNEXT,    BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
+    { ACTION_WPS_SKIPPREV,    BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
+    { ACTION_WPS_SEEKBACK,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_WPS_SEEKFWD,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK,    BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
+    { ACTION_WPS_STOPSEEK,    BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },
     { ACTION_WPS_STOP,        BUTTON_OFF,                 BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,     BUTTON_DOWN,                BUTTON_NONE },
-    { ACTION_WPS_VOLDOWN,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_WPS_VOLDOWN,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_WPS_VOLUP,       BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_WPS_VOLUP,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_WPS_VOLUP,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_WPS_MENU,        BUTTON_F1,                  BUTTON_NONE },
     { ACTION_WPS_CONTEXT,     BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
     { ACTION_WPS_QUICKSCREEN, BUTTON_F2,                  BUTTON_NONE },
@@ -79,53 +79,53 @@ struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST
 };
 
-struct button_mapping button_context_settings[] = {
+const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_INC,          BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_DOWN,                BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 };
 
-struct button_mapping button_context_tree[]  = {
+const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,     BUTTON_PLAY,    BUTTON_NONE },
     { ACTION_TREE_STOP,    BUTTON_OFF,     BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_listtree */
-struct button_mapping button_context_tree_scroll_lr[]  = {
+const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
+    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1),
 };
 
-struct button_mapping button_context_yesno[] = {
+const struct button_mapping button_context_yesno[] = {
     { ACTION_YESNO_ACCEPT,     BUTTON_PLAY,    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; 
-struct button_mapping button_context_quickscreen[]  = {
+const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_DOWNINV,    BUTTON_UP,                      BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_UP },
+    { ACTION_QS_DOWNINV,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_DOWN,                    BUTTON_NONE },
-    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_DOWN },
+    { ACTION_QS_DOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
-    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_LEFT },
+    { ACTION_QS_LEFT,       BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
-    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_RIGHT },
+    { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_PLAY,                    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
 
-struct button_mapping* get_context_mapping( int context )
+const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
     {
