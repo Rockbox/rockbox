@@ -84,6 +84,7 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_SELECT },
     { ACTION_WPS_BROWSE,        BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT },
     { ACTION_WPSAB_RESET,       BUTTON_ON|BUTTON_SELECT,        BUTTON_ON },
+    { ACTION_WPS_ID3SCREEN,     BUTTON_ON|BUTTON_MODE,          BUTTON_ON },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -182,9 +183,9 @@ const struct button_mapping button_context_quickscreen[]  = {
 
 const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_UP,                  BUTTON_NONE },
-    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP },
+    { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,                BUTTON_NONE },
-    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_DOWN },
+    { ACTION_PS_DEC_BIG,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,     BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },

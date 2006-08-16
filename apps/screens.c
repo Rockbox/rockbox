@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -423,13 +423,13 @@ bool pitch_screen(void)
 
         button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
         switch (button) {
-            case ACTION_PS_DEC_SMALL:
+            case ACTION_PS_INC_SMALL:
                 if ( pitch < 2000 )
                     pitch++;
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_PS_DEC_BIG:
+            case ACTION_PS_INC_BIG:
                 if ( pitch < 1990 )
                     pitch += 10;
                 else
@@ -437,13 +437,13 @@ bool pitch_screen(void)
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_PS_INC_SMALL:
+            case ACTION_PS_DEC_SMALL:
                 if ( pitch > 500 )
                     pitch--;
                 sound_set_pitch(pitch);
                 break;
 
-            case ACTION_PS_INC_BIG:
+            case ACTION_PS_DEC_BIG:
                 if ( pitch > 510 )
                     pitch -= 10;
                 else
@@ -471,6 +471,7 @@ bool pitch_screen(void)
                     sound_set_pitch(pitch);
                     pitch_screen_draw(pitch);
                 }
+                break;
             case ACTION_PS_NUDGE_LEFTOFF:
                 pitch += 20;
                 sound_set_pitch(pitch);
@@ -481,7 +482,7 @@ bool pitch_screen(void)
                 sound_set_pitch( pitch );
                 break;
 
-            case ACTION_STD_CANCEL:
+            case ACTION_PS_EXIT:
                 exit = true;
                 break;
 
