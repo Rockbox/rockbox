@@ -5,6 +5,7 @@
 \edef\UseOption{\UseOption,CONFIG_TUNER}
 \edef\UseOption{\UseOption,SWCODEC}
 \edef\UseOption{\UseOption,IRIVER_H100_PAD}
+\edef\UseOption{\UseOption,HAVE_LCD_REMOTE}
 \edef\UseOption{\UseOption,iriver}
 
 \newcommand{\playerman}{Iriver}
@@ -28,3 +29,32 @@
 \newcommand{\ButtonOn}{Play}
 \newcommand{\ButtonOff}{Stop}
 
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonOff}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMode}
+\newcommand{\ActionStdMenu}{\ButtonMode}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonOn}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonOn{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonOn{} + \ButtonLeft}
+\newcommand{\ActionWpsStop}{\ButtonOff}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsPitchScreen}{\ButtonOn{} + \ButtonUp/\ButtonDown}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMode}
+\newcommand{\ActionWpsMenu}{\ButtonMode}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonSelect}
+\newcommand{\ActionWpsAbReset}{\ButtonOn{} + \ButtonSelect}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonOn{} + \ButtonMode}
