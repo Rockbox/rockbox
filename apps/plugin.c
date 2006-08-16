@@ -632,7 +632,7 @@ int plugin_load(const char* plugin, void* parameter)
             gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
             break;
     }
-
+    action_signalscreenchange();
     return PLUGIN_OK;
 }
 
