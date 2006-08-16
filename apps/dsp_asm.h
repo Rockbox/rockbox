@@ -22,7 +22,7 @@
 #ifndef _DSP_ASM_H
 #define _DSP_ASM_H
 
-#ifdef CPU_COLDFIRE
+#if defined(CPU_COLDFIRE) || defined(CPU_ARM)
 #define DSP_HAVE_ASM_CROSSFEED
 void apply_crossfeed(int32_t* src[], int count);
 #endif
