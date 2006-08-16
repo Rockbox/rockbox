@@ -91,6 +91,8 @@ long gui_wps_show(void)
     bool update_track = false;
     int i;
 
+    action_signalscreenchange();
+    
     wps_state_init();
 
 #ifdef HAVE_LCD_CHARCELLS
