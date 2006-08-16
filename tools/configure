@@ -355,13 +355,8 @@ if test "$1" = "--help"; then
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
   echo ""
-  echo "Usage: configure [--ccache]"
+  echo "Usage: configure [--ccache][--no-ccache]"
   exit
-fi
-
-if test "$1" = "--ccache"; then
-  echo "Enable ccache for building"
-  ccache="yes"
 fi
 
 if test -r "configure"; then
@@ -392,16 +387,9 @@ fi
 # get our current directory
 pwd=`pwd`;
 
-if [ "$target" = "update" ]; then
-  echo "configure update is unfortunately no longer supported"
-  exit
-else
-
 echo "This script will setup your Rockbox build environment."
 echo "Further docs here: http://www.rockbox.org/"
 echo ""
-
-fi
 
 if [ -z "$rootdir" ]; then
   ##################################################################
@@ -1120,6 +1108,13 @@ else
    GCCOPTS="$GCCOPTS -Wno-pointer-sign"
  fi
 
+ if test "$gccnum" -ge "401"; then 
+   # this is a lame hack to avoid "warning: dereferencing type-punned pointer
+   # will break strict-aliasing rules"
+
+   GCCOPTS="$GCCOPTS -fno-strict-aliasing"
+ fi
+
 fi
 
 # check the compiler for SH platforms
@@ -1142,9 +1137,20 @@ if test "$CC" = "sh-elf-gcc"; then
   fi
 fi
 
+if test "$1" = "--ccache"; then
+  echo "Enable ccache for building"
+  ccache="ccache"
+else
+  if test "$1" != "--no-ccache"; then
+    ccache=`findtool ccache`
+    if test -n "$ccache"; then
+      echo "Found and uses ccache ($ccache)"
+    fi
+  fi
+fi
 
-if test "X$ccache" = "Xyes"; then
-  CC="ccache $CC"
+if test -n "$ccache"; then
+  CC="$ccache $CC"
 fi
 
 if test "X$endian" = "Xbig"; then
