@@ -111,8 +111,7 @@ int get_action_worker(int context, int timeout,
         {
             ignore_until_release = false;
         }
-        /*last_button = BUTTON_NONE; this is done by action_signalscreenchange() */
-        return ACTION_UNKNOWN; /* "safest" return value */
+        return ACTION_NONE; /* "safest" return value */
     }
 #if (BUTTON_REMOTE != 0)    
     if (soft_unlock_action != ACTION_NONE)

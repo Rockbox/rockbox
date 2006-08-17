@@ -1118,13 +1118,13 @@ bool browse_id3(void)
     gui_synclist_draw(&id3_lists);
     action_signalscreenchange();
     while (true) {
+        gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
         if(key!=ACTION_NONE && key!=ACTION_UNKNOWN && !gui_synclist_do_button(&id3_lists, key))
         {
             action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);
         }
-        gui_syncstatusbar_draw(&statusbars, false);
     }
 }
 
