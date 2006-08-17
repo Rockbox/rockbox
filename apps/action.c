@@ -21,6 +21,8 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "lang.h"
+
 #include "button.h"
 #include "action.h"
 #include "kernel.h"
@@ -128,7 +130,7 @@ int get_action_worker(int context, int timeout,
         {
             last_button = BUTTON_NONE;
             keys_locked = false;
-            gui_syncsplash(HZ/2, true, "Keys Unlocked");
+            gui_syncsplash(HZ/2, true, str(LANG_KEYLOCK_OFF_PLAYER));
             return ACTION_REDRAW;
         } 
         else 
@@ -137,7 +139,7 @@ int get_action_worker(int context, int timeout,
 #endif
         {
             if ((button&BUTTON_REL))
-                gui_syncsplash(HZ, true, "Keys Locked");
+                gui_syncsplash(HZ/2, true, str(LANG_KEYLOCK_ON_PLAYER));
             return ACTION_REDRAW;
         }
     }
@@ -179,7 +181,7 @@ int get_action_worker(int context, int timeout,
         unlock_combo = button;
         keys_locked = true;
         action_signalscreenchange();
-        gui_syncsplash(HZ, true, "Keys Locked");
+        gui_syncsplash(HZ/2, true, str(LANG_KEYLOCK_ON_PLAYER));
         
         button_clear_queue();
         return ACTION_REDRAW;
