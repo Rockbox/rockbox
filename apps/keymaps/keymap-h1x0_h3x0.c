@@ -246,7 +246,6 @@ const struct button_mapping button_context_listtree_h100lcdremote[]  = {
     { ACTION_LISTTREE_PGDOWN,   BUTTON_RC_BITRATE,                   BUTTON_NONE },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_RC_BITRATE|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_TREE_WPS,      BUTTON_RC_ON|BUTTON_REL,             BUTTON_RC_ON },
-    { ACTION_TREE_STOP,     BUTTON_RC_STOP,                      BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_listtree_h100lcdremote */
