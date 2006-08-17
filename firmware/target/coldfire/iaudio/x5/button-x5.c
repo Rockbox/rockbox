@@ -105,10 +105,10 @@ int button_read_device(void)
         {
             if(data < 0x7a)
                 if(data < 0x41)
-                    btn |= BUTTON_RC_REW;
+                    btn |= BUTTON_RC_FF;
                 else
                     if(data < 0x61)
-                        btn |= BUTTON_RC_FF;
+                        btn |= BUTTON_RC_REW;
                     else
                         btn |= BUTTON_RC_MODE;
             else
