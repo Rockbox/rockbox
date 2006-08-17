@@ -75,6 +75,8 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_ID3SCREEN,   BUTTON_F1|BUTTON_ON,        BUTTON_F1 },
     { ACTION_WPS_PITCHSCREEN, BUTTON_ON|BUTTON_UP,        BUTTON_ON },
     { ACTION_WPS_PITCHSCREEN, BUTTON_ON|BUTTON_DOWN,      BUTTON_ON },
+    { ACTION_STD_KEYLOCK,     BUTTON_F1|BUTTON_DOWN,      BUTTON_NONE },
+    
 
     LAST_ITEM_IN_LIST
 };

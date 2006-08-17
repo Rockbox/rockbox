@@ -62,7 +62,8 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLUP,      BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_WPS_BROWSE,     BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
     { ACTION_WPS_CONTEXT,    BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
- /* { ACTION_WPS_MENU,       BUTTON_NONE,                BUTTON_NONE }, we can't have that */
+    /* { ACTION_WPS_MENU,       BUTTON_NONE,                BUTTON_NONE }, we can't have that */
+    { ACTION_STD_KEYLOCK,   BUTTON_MENU|BUTTON_DOWN,      BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 };

@@ -318,8 +318,6 @@
 #define WPS_ALIGN_CENTER 64
 #define WPS_ALIGN_LEFT 128
 
-
-extern bool keys_locked;
 /* wps_data*/
 
 #ifdef HAVE_LCD_BITMAP

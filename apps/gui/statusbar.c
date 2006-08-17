@@ -34,7 +34,7 @@
 #include "led.h"
 
 #include "status.h" /* needed for battery_state global var */
-#include "gwps.h" /* for keys_locked */
+#include "action.h" /* for keys_locked */
 #include "statusbar.h"
 
 
@@ -178,7 +178,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
 #ifdef HAS_BUTTON_HOLD
     bar->info.keylock = button_hold();
 #else
-    bar->info.keylock = keys_locked;
+    bar->info.keylock = is_keys_locked();
 #endif /* HAS_BUTTON_HOLD */
 #ifdef HAS_REMOTE_BUTTON_HOLD
     bar->info.keylockremote = remote_button_hold();

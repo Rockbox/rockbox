@@ -29,6 +29,12 @@
 #define CONTEXT_REMOTE 0x80000000 /* | this against another context to get remote buttons for that context */
 #define CONTEXT_CUSTOM 0x40000000 /* | this against anything to get your context number */
 
+#ifndef HAS_BUTTON_HOLD
+#define ALLOW_SOFTLOCK 0x20000000 /* will be stripped.. never needed except in calls to get_action() */
+#else
+#define ALLOW_SOFTLOCK 0
+#endif
+
 enum {
     CONTEXT_STD = 0,
     /* These CONTEXT_ values were here before me,
@@ -54,6 +60,7 @@ enum {
     
     ACTION_NONE = BUTTON_NONE,
     ACTION_UNKNOWN,
+    ACTION_REDRAW, /* returned if keys are locked and we splash()'ed */
     
     /* standard actions, use these first */
     ACTION_STD_PREV, 
@@ -66,9 +73,7 @@ enum {
     ACTION_STD_CONTEXT,
     ACTION_STD_MENU,
     ACTION_STD_QUICKSCREEN,
-    ACTION_STD_KEYLOCK, /* software keylock in wps screen, very optional
-                           use with action_setsoftwarekeylock */
-    
+    ACTION_STD_KEYLOCK,
     
     /* code context actions */
     
@@ -165,12 +170,9 @@ void action_signalscreenchange(void);
 /* call this if you need to check for ACTION_STD_CANCEL only (i.e user abort! */
 bool action_userabort(int timeout);
 
-/* on targets without hardware keylock, use this to to emulate keylock.
-   unlock_action is the action which will disaable the keylock
-   allow_remote should be true if you want the remote buttons to still be usable while locked */
-void action_setsoftwarekeylock(int unlock_action, bool allow_remote);
-
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
-
+#ifndef HAS_BUTTON_HOLD
+bool is_keys_locked(void);
+#endif
 #endif

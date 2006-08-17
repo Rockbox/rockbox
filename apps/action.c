@@ -25,13 +25,18 @@
 #include "action.h"
 #include "kernel.h"
 #include "debug.h"
+#include "splash.h"
 
 bool ignore_until_release = false;
 int last_button = BUTTON_NONE;
-int soft_unlock_action = ACTION_NONE;
-#if (BUTTON_REMOTE != 0)
-bool allow_remote_actions = true;
-#endif
+
+/* software keylock stuff */
+#ifndef HAS_BUTTON_HOLD
+bool keys_locked = false;
+int unlock_combo = BUTTON_NONE;
+bool screen_has_lock = false;
+#endif /* HAVE_SOFTWARE_KEYLOCK */
+
 /*
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
@@ -92,6 +97,7 @@ int get_action_worker(int context, int timeout,
     int button;
     int i=0;
     int ret = ACTION_UNKNOWN;
+    
     if (timeout == TIMEOUT_NOBLOCK)
         button = button_get(false);
     else if  (timeout == TIMEOUT_BLOCK)
@@ -113,13 +119,31 @@ int get_action_worker(int context, int timeout,
         }
         return ACTION_NONE; /* "safest" return value */
     }
-#if (BUTTON_REMOTE != 0)    
-    if (soft_unlock_action != ACTION_NONE)
+    
+#ifndef HAS_BUTTON_HOLD
+    screen_has_lock = ((context&ALLOW_SOFTLOCK)==ALLOW_SOFTLOCK);
+    if (screen_has_lock && (keys_locked == true))
     {
-        if ((button&BUTTON_REMOTE) && !allow_remote_actions)
-            return ACTION_NONE;
-    }
+        if (button == unlock_combo) 
+        {
+            last_button = BUTTON_NONE;
+            keys_locked = false;
+            gui_syncsplash(HZ/2, true, "Keys Unlocked");
+            return ACTION_REDRAW;
+        } 
+        else 
+#if (BUTTON_REMOTE != 0)   
+            if ((button&BUTTON_REMOTE) == 0) 
 #endif
+        {
+            if ((button&BUTTON_REL))
+                gui_syncsplash(HZ, true, "Keys Locked");
+            return ACTION_REDRAW;
+        }
+    }
+    context &= ~ALLOW_SOFTLOCK;
+#endif /* HAS_BUTTON_HOLD */
+    
     /*   logf("%x,%x",last_button,button); */
     do 
     {
@@ -149,29 +173,18 @@ int get_action_worker(int context, int timeout,
         else break;
     } while (1);
     /* DEBUGF("ret = %x\n",ret); */
-    
-    if (soft_unlock_action != ACTION_NONE)
-    {
-#if (BUTTON_REMOTE != 0)
-        if ((button&BUTTON_REMOTE) == 0)
-        {
-#endif
-            if (soft_unlock_action == ret)
-            {
-                soft_unlock_action = ACTION_NONE;
-                ret = ACTION_NONE; /* no need to return the code */
-            }
-#if (BUTTON_REMOTE != 0)
-        }
-        else if (!allow_remote_actions)
-        {
-            ret = ACTION_NONE;
-        }
-#else
-            else ret = ACTION_NONE; /* eat the button */
-#endif
+#ifndef HAS_BUTTON_HOLD
+    if (screen_has_lock && (ret == ACTION_STD_KEYLOCK))
+    {       
+        unlock_combo = button;
+        keys_locked = true;
+        action_signalscreenchange();
+        gui_syncsplash(HZ, true, "Keys Locked");
+        
+        button_clear_queue();
+        return ACTION_REDRAW;
     }
-    
+#endif
     last_button = button;
     return ret;
 }
@@ -205,14 +218,9 @@ void action_signalscreenchange(void)
     }
     last_button = BUTTON_NONE;
 }
-
-void action_setsoftwarekeylock(int unlock_action, bool allow_remote)
+#ifndef HAS_BUTTON_HOLD
+bool is_keys_locked(void)
 {
-    soft_unlock_action = unlock_action;
-#if (BUTTON_REMOTE != 0)
-    allow_remote_actions = allow_remote;
-#else
-    (void)allow_remote; /* kill the warning */
-#endif
-    last_button = BUTTON_NONE;
+    return (screen_has_lock && (keys_locked == true));
 }
+#endif

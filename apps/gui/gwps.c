@@ -65,8 +65,6 @@ struct wps_state wps_state;
 struct gui_wps gui_wps[NB_SCREENS];
 static struct wps_data wps_datas[NB_SCREENS];
 
-bool keys_locked = false;
-
 /* change the path to the current played track */
 static void wps_state_update_ctp(const char *path);
 
@@ -163,7 +161,7 @@ long gui_wps_show(void)
             long next_big_refresh = current_tick + HZ / 5;
             button = BUTTON_NONE;
             while (TIME_BEFORE(current_tick, next_big_refresh)) {
-                button = get_action(CONTEXT_WPS,TIMEOUT_NOBLOCK);
+                button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_NOBLOCK);
                 if (button != ACTION_NONE) {
                     break;
                 }
@@ -186,10 +184,10 @@ long gui_wps_show(void)
         /* The peak meter is disabled
            -> no additional screen updates needed */
         else {
-            button = get_action(CONTEXT_WPS,HZ/5);
+            button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
         }
 #else
-        button = get_action(CONTEXT_WPS,HZ/5);
+        button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,HZ/5);
 #endif
 
         /* Exit if audio has stopped playing. This can happen if using the
@@ -426,13 +424,6 @@ long gui_wps_show(void)
                 restore = true;
                 break;
 
-            /* key lock */
-            case ACTION_STD_KEYLOCK:
-                action_setsoftwarekeylock(ACTION_STD_KEYLOCK,true);
-                display_keylock_text(true);
-                restore = true;
-                break;
-
 
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
@@ -542,6 +533,9 @@ long gui_wps_show(void)
                 restore = true;
                 break;
 
+            case ACTION_REDRAW: /* yes are locked, just redraw */
+                restore = true;
+                break;
             case ACTION_NONE: /* Timeout */
                 update_track = true;
                 ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
@@ -598,10 +592,6 @@ long gui_wps_show(void)
 #ifdef AB_REPEAT_ENABLE
             ab_reset_markers();
 #endif
-
-            /* Keys can be locked when exiting, so either unlock here
-               or implement key locking in tree.c too */
-            keys_locked=false;
 
             /* set dir browser to current playing song */
             if (global_settings.browse_current &&
