@@ -72,7 +72,7 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOPSEEK,      BUTTON_RIGHT|BUTTON_REL,        BUTTON_RIGHT|BUTTON_REPEAT },
     { ACTION_WPS_ABSETB_NEXTDIR,       BUTTON_ON|BUTTON_RIGHT,         BUTTON_ON },
     { ACTION_WPS_ABSETA_PREVDIR,       BUTTON_ON|BUTTON_LEFT,          BUTTON_ON },
-    { ACTION_WPS_STOP,          BUTTON_OFF,                     BUTTON_NONE },
+    { ACTION_WPS_STOP,          BUTTON_OFF|BUTTON_REL,          BUTTON_OFF },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REL,         BUTTON_DOWN },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REL,           BUTTON_UP },
@@ -100,8 +100,9 @@ const struct button_mapping button_context_listtree[]  = {
 }; /* button_context_listtree */
 
 const struct button_mapping button_context_tree[]  = {
-    { ACTION_TREE_WPS,          BUTTON_ON|BUTTON_REL,                   BUTTON_ON },   
-    { ACTION_TREE_STOP,   BUTTON_OFF,                   BUTTON_NONE },
+    { ACTION_TREE_WPS,    BUTTON_ON|BUTTON_REL,         BUTTON_ON },   
+    { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REL,        BUTTON_OFF },
+    { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REPEAT,     BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_listtree */

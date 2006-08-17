@@ -662,17 +662,19 @@ static bool dirbrowse(void)
                     }
 #endif
                 }
-                break;
-                /* ??
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
-            case TREE_OFF | BUTTON_REPEAT:
-                if (charger_inserted()) {
-                    charging_splash();
-                    restore = true;
+{
+                static int last_off = 0;
+                if (current_tick - last_off < 50) {
+                    if (charger_inserted()) {
+                        charging_splash();
+                        restore = true;
+                    }
                 }
-                break;
+                last_off = current_tick;
+}
 #endif
-                */
+                break; /* case ACTION_TREE_STOP: */
             case ACTION_STD_MENU:
                 /* don't enter menu from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
