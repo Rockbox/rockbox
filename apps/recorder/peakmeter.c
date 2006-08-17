@@ -347,6 +347,11 @@ void peak_meter_set_min(int newmin)
     }
 
     pm_range = peak_meter_range_max - peak_meter_range_min;
+    
+    /* Avoid division by zero. */
+    if (pm_range == 0) {
+        pm_range = 1;
+    }
 
     pm_db_min = calc_db(peak_meter_range_min);
     pm_db_range = pm_db_max - pm_db_min;
@@ -391,6 +396,11 @@ void peak_meter_set_max(int newmax)
     }
 
     pm_range = peak_meter_range_max - peak_meter_range_min;
+
+    /* Avoid division by zero. */
+    if (pm_range == 0) {
+        pm_range = 1;
+    }
 
     pm_db_max = calc_db(peak_meter_range_max);
     pm_db_range = pm_db_max - pm_db_min;
