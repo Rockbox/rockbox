@@ -209,14 +209,15 @@ void lcd_update(void)
 #define CSUB_Y 2
 
 #define RYFAC (31*257)
-#define GYFAC (63*257)
+#define GYFAC (31*257)
 #define BYFAC (31*257)
 #define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
-#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
+#define GVFAC (-5690)  /* 31 * 257 * -0.714136 */
+#define GUFAC (-2742)   /* 31 * 257 * -0.344136 */
 #define BUFAC 14118     /* 31 * 257 *  1.772    */
 
 #define ROUNDOFFS (127*257)
+#define ROUNDOFFSG (63*257)
 
 /* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
@@ -230,11 +231,12 @@ void lcd_yuv_blit(unsigned char * const src[3],
     if (finishup_needed) {
         unsigned int data;
         /* Bottom-half of original lcd_bcm_finishup() function */
-        do {
-            /* This function takes about 14ms to execute - so we yield() */
+        data = lcd_bcm_read32(0x1F8);
+        while (data == 0xFFFA0005 || data == 0xFFFF) {
+            /* This loop can wait for up to 14ms - so we yield() */
             yield();
             data = lcd_bcm_read32(0x1F8);
-        } while (data == 0xFFFA0005 || data == 0xFFFF);
+        } 
     }
 
     lcd_bcm_read32(0x1FC);
@@ -261,18 +263,23 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
     ymax = y + height - 1 ;
 
+    const int stride_div_csub_x = stride/CSUB_X;
+
     for (; y <= ymax ; y++)
     {
         /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
         const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-        const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                           + (src_x/CSUB_X);
-        const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                           + (src_x/CSUB_X);
+
+        const int uvoffset = stride_div_csub_x * (src_y/CSUB_Y) +
+                             (src_x/CSUB_X);
+
+        const unsigned char *usrc = src[1] + uvoffset;
+        const unsigned char *vsrc = src[2] + uvoffset;
         const unsigned char *row_end = ysrc + width;
 
         int y, u, v;
-        int red, green, blue;
+        int red1, green1, blue1;
+        int red2, green2, blue2;
         unsigned rbits, gbits, bbits;
 
         int rc, gc, bc;
@@ -282,73 +289,90 @@ void lcd_yuv_blit(unsigned char * const src[3],
             u = *usrc++ - 128;
             v = *vsrc++ - 128;
             rc = RVFAC * v + ROUNDOFFS;
-            gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFSG;
             bc = BUFAC * u + ROUNDOFFS;
 
             /* Pixel 1 */
             y = *ysrc++;
-            red   = RYFAC * y + rc;
-            green = GYFAC * y + gc;
-            blue  = BYFAC * y + bc;
 
-            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-            {
-                if (red < 0)
-                    red = 0;
-                else
-                    red = (RYFAC*255+ROUNDOFFS);
-            }
-            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-            {
-                if (green < 0)
-                    green = 0;
-                else
-                    green = (GYFAC*255+ROUNDOFFS);
-            }
-            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-            {
-                if (blue < 0)
-                    blue = 0;
-                else
-                    blue = (BYFAC*255+ROUNDOFFS);
-            }
-            rbits = ((unsigned)red) >> 16 ;
-            gbits = ((unsigned)green) >> 16 ;
-            bbits = ((unsigned)blue) >> 16 ;
-
-            outw((rbits << 11) | (gbits << 5) | bbits, 0x30000000);
+            red1   = RYFAC * y + rc;
+            green1 = GYFAC * y + gc;
+            blue1  = BYFAC * y + bc;
 
             /* Pixel 2 */
             y = *ysrc++;
-            red   = RYFAC * y + rc;
-            green = GYFAC * y + gc;
-            blue  = BYFAC * y + bc;
+            red2   = RYFAC * y + rc;
+            green2 = GYFAC * y + gc;
+            blue2  = BYFAC * y + bc;
 
-            if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-            {
-                if (red < 0)
-                    red = 0;
-                else
-                    red = (RYFAC*255+ROUNDOFFS);
-            }
-            if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-            {
-                if (green < 0)
-                    green = 0;
-                else
-                    green = (GYFAC*255+ROUNDOFFS);
-            }
-            if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-            {
-                if (blue < 0)
-                    blue = 0;
-                else
-                    blue = (BYFAC*255+ROUNDOFFS);
-            }
-            rbits = ((unsigned)red) >> 16 ;
-            gbits = ((unsigned)green) >> 16 ;
-            bbits = ((unsigned)blue) >> 16 ;
+            /* Since out of bounds errors are relatively rare, we check two
+               pixels at once to see if any components are out of bounds, and
+               then fix whichever is broken. This works due to high values and
+               negative values both becoming larger than the cutoff when
+               casted to unsigned.  And ORing them together checks all of them
+               simultaneously.  */
+            if (((unsigned)(red1 | green1 | blue1 |
+                     red2 | green2 | blue2)) > (RYFAC*255+ROUNDOFFS)) {
+                if (((unsigned)(red1 | green1 | blue1)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red1 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red1 < 0)
+                            red1 = 0;
+                        else
+                            red1 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green1 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green1 < 0)
+                            green1 = 0;
+                        else
+                            green1 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue1 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue1 < 0)
+                            blue1 = 0;
+                        else
+                            blue1 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
 
+                if (((unsigned)(red2 | green2 | blue2)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red2 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red2 < 0)
+                            red2 = 0;
+                        else
+                            red2 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green2 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green2 < 0)
+                            green2 = 0;
+                        else
+                            green2 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue2 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue2 < 0)
+                            blue2 = 0;
+                        else
+                            blue2 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
+            }
+                
+            rbits = red1 >> 16 ;
+            gbits = green1 >> 15 ;
+            bbits = blue1 >> 16 ;
+
+            outw((rbits << 11) | (gbits << 5) | bbits, 0x30000000);
+
+            rbits = red2 >> 16 ;
+            gbits = green2 >> 15 ;
+            bbits = blue2 >> 16 ;
             outw((rbits << 11) | (gbits << 5) | bbits, 0x30000000);
         }
         while (ysrc < row_end);
