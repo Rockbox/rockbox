@@ -30,6 +30,20 @@
 # include "synth.h"
 
 /*
+ * This is a slightly painful workaround to silence a warning that happens
+ * with 4.1 if the const is used and with <= 4.0 if the const is not used.
+ * So in a bright future when we are >= 4.1 only we can remove this kludge
+ * again.
+ */
+#if ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 1)))
+/* before gcc 4.1 */
+#define CONST_TO_CONST_STRUCT_FIELD const
+#else
+/* after and including gcc 4.1 */
+#define CONST_TO_CONST_STRUCT_FIELD
+#endif
+
+/*
  * NAME:	synth->init()
  * DESCRIPTION:	initialize synth struct
  */
@@ -825,7 +839,7 @@ void synth_full(struct mad_synth *synth, struct mad_frame const *frame,
   int          p;
   unsigned int phase, ch, s, sb;
   mad_fixed_t *pcm, (*filter)[2][2][16][8];
-  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t CONST_TO_CONST_STRUCT_FIELD (*sbsample)[36][32];
   mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   mad_fixed_t const (*D0ptr)[32], *ptr;
   mad_fixed_t const (*D1ptr)[32];
@@ -1033,7 +1047,7 @@ void synth_half(struct mad_synth *synth, struct mad_frame const *frame,
 {
   unsigned int phase, ch, s, sb, pe, po;
   mad_fixed_t *pcm1, *pcm2, (*filter)[2][2][16][8];
-  mad_fixed_t const (*sbsample)[36][32];
+  mad_fixed_t CONST_TO_CONST_STRUCT_FIELD (*sbsample)[36][32];
   register mad_fixed_t (*fe)[8], (*fx)[8], (*fo)[8];
   register mad_fixed_t const (*Dptr)[32], *ptr;
   register mad_fixed64hi_t hi;
