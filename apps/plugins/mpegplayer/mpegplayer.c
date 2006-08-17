@@ -1,4 +1,4 @@
-/*
+ /*
  * mpegplayer.c - based on  mpeg2dec.c
  *
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
@@ -45,11 +45,8 @@ struct plugin_api* rb;
 #define BUFFER_SIZE (MEM-6)*1024*1024
 
 static mpeg2dec_t * mpeg2dec;
-static vo_open_t * output_open = NULL;
-static vo_instance_t * output;
 static int total_offset = 0;
 
-extern vo_open_t vo_rockbox_open;
 /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define MPEG_STOP       BUTTON_OFF
@@ -106,7 +103,6 @@ static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
 {
     const mpeg2_info_t * info;
     mpeg2_state_t state;
-    vo_setup_result_t setup_result;
 
     mpeg2_buffer (mpeg2dec, current, end);
     total_offset += end - current;
@@ -121,70 +117,20 @@ static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
         case STATE_BUFFER:
             return false;
         case STATE_SEQUENCE:
-            /* might set nb fbuf, convert format, stride */
-            /* might set fbufs */
-            if (output->setup (output, info->sequence->width,
-                               info->sequence->height,
-                               info->sequence->chroma_width,
-                               info->sequence->chroma_height, &setup_result)) {
-                //fprintf (stderr, "display setup failed\n");
-                return false;
-            }
-            if (setup_result.convert &&
-                mpeg2_convert (mpeg2dec, setup_result.convert, NULL)) {
-                //fprintf (stderr, "color conversion setup failed\n");
-                return false;
-            }
-            if (output->set_fbuf) {
-                uint8_t * buf[3];
-                void * id;
-
-                mpeg2_custom_fbuf (mpeg2dec, 1);
-                output->set_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-                output->set_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-            } else if (output->setup_fbuf) {
-                uint8_t * buf[3];
-                void * id;
-
-                output->setup_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-                output->setup_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-                output->setup_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-            }
-            mpeg2_skip (mpeg2dec, (output->draw == NULL));
+            vo_setup(info->sequence->width,
+                     info->sequence->height,
+                     info->sequence->chroma_width,
+                     info->sequence->chroma_height);
+            mpeg2_skip (mpeg2dec, false);
             break;
         case STATE_PICTURE:
-            /* might skip */
-            /* might set fbuf */
-            if (output->set_fbuf) {
-                uint8_t * buf[3];
-                void * id;
-
-                output->set_fbuf (output, buf, &id);
-                mpeg2_set_buf (mpeg2dec, buf, id);
-            }
-            if (output->start_fbuf)
-                output->start_fbuf (output, info->current_fbuf->buf,
-                                    info->current_fbuf->id);
             break;
         case STATE_SLICE:
         case STATE_END:
         case STATE_INVALID_END:
             /* draw current picture */
-            /* might free frame buffer */
-            if (info->display_fbuf) {
-                if (output->draw)
-                    output->draw (output, info->display_fbuf->buf,
-                                  info->display_fbuf->id);
-                //print_fps (0);
-            }
-            if (output->discard && info->discard_fbuf)
-                output->discard (output, info->discard_fbuf->buf,
-                                 info->discard_fbuf->id);
+            if (info->display_fbuf)
+                vo_draw_frame(info->display_fbuf->buf);
             break;
         default:
             break;
@@ -253,20 +199,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (in_file < 0) {
         //fprintf(stderr,"Could not open %s\n",argv[1]);
-        return PLUGIN_ERROR;
-    }
-
-    output_open = vo_rockbox_open;
-
-    if (output_open == NULL) {
-        //fprintf (stderr, "output_open is NULL\n");
-        return PLUGIN_ERROR;
-    }
-
-    output = output_open ();
-
-    if (output == NULL) {
-        //fprintf (stderr, "Can not open output\n");
         return PLUGIN_ERROR;
     }
 

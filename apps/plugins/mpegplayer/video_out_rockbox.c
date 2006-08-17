@@ -45,8 +45,7 @@ static int output_y;
 static int output_width;
 static int output_height;
 
-#if (LCD_DEPTH == 16) && \
-    ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
+#ifdef SIMULATOR
 
 #define RYFAC (31*257)
 #define GYFAC (63*257)
@@ -59,9 +58,9 @@ static int output_height;
 #define ROUNDOFFS (127*257)
 
 /* Draw a partial YUV colour bitmap - taken from the Rockbox JPEG viewer */
-void yuv_bitmap_part(unsigned char * const src[3],
-                     int src_x, int src_y, int stride,
-                     int x, int y, int width, int height)
+static void yuv_bitmap_part(unsigned char * const src[3],
+                            int src_x, int src_y, int stride,
+                            int x, int y, int width, int height)
 {
     fb_data *dst, *dst_end;
 
@@ -190,25 +189,20 @@ void yuv_bitmap_part(unsigned char * const src[3],
 }
 #endif
 
-static void rockbox_draw_frame (vo_instance_t * instance,
-                                uint8_t * const * buf, void * id)
+void vo_draw_frame (uint8_t * const * buf)
 {
     char str[80];
     static int frame=0;
     int ticks,fps;
 
-    (void)id;
-    (void)instance;
-
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-    rb->lcd_yuv_blit(buf,
-                    0,0,image_width,
-                    output_x,output_y,output_width,output_height);
-#elif (LCD_DEPTH == 16) && \
-    ((LCD_PIXELFORMAT == RGB565) || (LCD_PIXELFORMAT == RGB565SWAPPED))
+#ifdef SIMULATOR
     yuv_bitmap_part(buf,0,0,image_width,
                     output_x,output_y,output_width,output_height);
     rb->lcd_update_rect(output_x,output_y,output_width,output_height);
+#else
+    rb->lcd_yuv_blit(buf,
+                    0,0,image_width,
+                    output_x,output_y,output_width,output_height);
 #endif
 
     if (starttick==0) {
@@ -230,41 +224,9 @@ static void rockbox_draw_frame (vo_instance_t * instance,
     frame++;
 }
 
-vo_instance_t static_instance;
-
-static vo_instance_t * internal_open (int setup (vo_instance_t *, unsigned int,
-                                                 unsigned int, unsigned int,
-                                                 unsigned int,
-                                                 vo_setup_result_t *),
-                                      void draw (vo_instance_t *,
-                                                 uint8_t * const *, void *))
+void vo_setup(unsigned int width, unsigned int height, 
+             unsigned int chroma_width, unsigned int chroma_height)
 {
-    vo_instance_t * instance;
-
-    instance = (vo_instance_t *) &static_instance;
-    if (instance == NULL)
-        return NULL;
-
-    instance->setup = setup;
-    instance->setup_fbuf = NULL;
-    instance->set_fbuf = NULL;
-    instance->start_fbuf = NULL;
-    instance->draw = draw;
-    instance->discard = NULL;
-    //instance->close = (void (*) (vo_instance_t *)) free;
-
-    return instance;
-}
-
-static int rockbox_setup (vo_instance_t * instance, unsigned int width,
-                          unsigned int height, unsigned int chroma_width,
-                          unsigned int chroma_height,
-                          vo_setup_result_t * result)
-{
-    (void)instance;
-
-    result->convert = NULL;
-
     image_width=width;
     image_height=height;
     image_chroma_x=image_width/chroma_width;
@@ -285,11 +247,4 @@ static int rockbox_setup (vo_instance_t * instance, unsigned int width,
         output_height = image_height;
         output_y = (LCD_HEIGHT-image_height)/2;
     }
-
-    return 0;
-}
-
-vo_instance_t * vo_rockbox_open (void)
-{
-    return internal_open (rockbox_setup, rockbox_draw_frame);
 }
