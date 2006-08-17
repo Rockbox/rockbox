@@ -46,7 +46,7 @@
 #define SCL             ( 0x00001000 & GPIO_READ)
 #define SCL_OUT_LO and_l(~0x00001000, &GPIO_OUT)
 #define SCL_LO      or_l( 0x00001000, &GPIO_ENABLE)
-#define SCL_HI     and_l(~0x00001000, &GPIO_ENABLE); while(!SCL);
+#define SCL_HI     and_l(~0x00001000, &GPIO_ENABLE)
 
 /* SDA is GPIO1, 13 */
 #define SDA             ( 0x00002000 & GPIO1_READ)
@@ -92,6 +92,7 @@ static void sw_i2c_stop(void)
 static void sw_i2c_ack(void)
 {
     SCL_LO;
+    DELAY;
     SDA_LO;
     DELAY;
     
@@ -105,6 +106,7 @@ static bool sw_i2c_getack(void)
     int count = 10;
 
     SCL_LO;
+    DELAY;
     SDA_HI;   /* sets to input */
     DELAY;
     SCL_HI;
