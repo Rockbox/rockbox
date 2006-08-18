@@ -4779,7 +4779,7 @@
   </source>
   <dest>
     *: "ON+Play = Delete"
-		h100,h120,h300: "ON+NAVI = Delete"
+    h100,h120,h300: "RECORD = Delete"
   </dest>
   <voice>
     *: ""
