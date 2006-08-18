@@ -5,13 +5,17 @@ The Sound Settings menu offers a selection of sound properties you may
 change to customize your listening experience.
 
 \section{Volume}
-  This control adjusts the volume of your music.  Like most professional 
-audio gear and many consumer audio products, Rockbox uses a decibel scale 
-where 0 dB is a reference that indicates the maximum volume that the \dap\
-can produce without distortion (clipping).  Because the volume control 
-is basically a comparison of the volume level you set to a reference 
-maximum volume of 0 dB, the usable range of the volume setting is shown 
-as a negative number. Volume can be adjusted from a
+  This setting adjusts the volume of your music. Like most professional 
+  audio gear and many consumer audio products, Rockbox uses a decibel scale 
+  where 0 dB is a reference that indicates the maximum volume that the \dap\
+  can produce without possible distortion (clipping). All values lower than this
+  reference will be negative and yield a progressively softer volume. 
+  \opt{player, recorder, recorderv2fm, ondio, ipodnano, ipodvideo}{
+  Values higher than 0 dB are available and can be used to raise the
+  volume more than would otherwise be possible. These volume levels will
+  ordinarily lead to distorted sound, but might work nicely for music that has
+  an otherwise low volume level.}
+  The volume can be adjusted from a
   \opt{player}{minimum of -78 dB to a maximum of +18 dB.}
   \opt{recorder,recorderv2fm,ondio}{minimum of -100 dB to a maximum of +12 dB.}
   \opt{h1xx,h300}{minimum of -84 dB to a maximum of 0 dB.}
@@ -53,11 +57,9 @@ as a negative number. Volume can be adjusted from a
   to the left.
 
 \section{Channels}
-  A stereo audio signal consists of two channels, left and right. The channels
-   function controls how much of the left channel signal is mixed into the
-   right channel signal, and vice versa.
-  \opt{MASCODEC}{This option controls the on{}-board mixing facilities of the \dap.}
-  \opt{SWCODEC}{This option controls the mixing facilities of the \dap.}
+  A stereo audio signal consists of two channels, left and right. The 
+  \setting{Channels} setting controls if these channels are to be combined in
+  any way, and if so, in what manner they will be combined.
   Available options are:
   %
   \begin{table}
@@ -65,11 +67,11 @@ as a negative number. Volume can be adjusted from a
   \begin{tabularx}{\textwidth}{lX}\toprule
       \textbf{Setting} & \textbf{Description} \\\midrule
         Stereo
-        & Do not mix the signal. \\
+        & Leave the audio signal unmodified. \\
         %
         Mono 
-        & Mix both channels down to mono and send the mixed signal back to
-          both. \\
+        & Combine both channels and send the resulting signal to both stereo
+          channels, resulting in a monophonic output. \\
         %
         Custom
         & Allows you to manually specify a stereo width with the
@@ -83,21 +85,21 @@ as a negative number. Volume can be adjusted from a
         %
         Karaoke
         & Removes all sound that is the same in both channels. Since most
-          vocals are recorded in this way to make the artist sound central,
-          this often (but not always) has the effect of removing the voice
-          track from a song. This setting also very often has other undesirable
-          effects on the sound.  \\
+          music is recorded with vocals being equally present in both channels
+          to make the singer sound centrally placed, this often (but not always)
+          has the effect of removing the voice track from a song. This setting
+          also very often has other undesirable effects on the sound.  \\
         \bottomrule
   \end{tabularx}
   \end{center}
   \end{table}
       
 \section{Stereo Width}
-  Stereo width will allow you to manually specify the effect that is applied
+  Stereo width allows you to manually specify the effect that is applied
   when the \setting{Channels} setting is set to \setting{Custom}.
   All values below 100\% will progressively mix the contents of one channel into
   the other. This has the effect of gradually centering the stereo image, until
-  you have mono sound at 0\%. Values above 100\% will progressively remove
+  you have monophonic sound at 0\%. Values above 100\% will progressively remove
   components in one channel that is also present in the other. This has the
   effect of widening the stereo field. A value of 100\% will leave the stereo
   field unaltered.
@@ -193,23 +195,19 @@ as a negative number. Volume can be adjusted from a
 \opt{SWCODEC}{
 \section{Crossfeed}
   Crossfeed attempts to make the experience of listening to music on
-  headphones more similar to listening to stereo speakers. When you listen
-  to music through speakers, your right ear hears sound from the left speaker
-  and vice versa. However, the sound from the left speaker reaches your left
-  ear slightly later than the sound from your right ear, and vice versa.
-  Moreover, when listening to speakers, you hear the direct sound from the
-  speakers, but you also hear reflections of that sound as the sound waves
-  bounce off of walls, floors, ceilings, etc. These reflections reach your
-  ears slightly after the direct sound. 
+  headphones more similar to listening to music with stereo speakers. When you
+  listen to music through speakers, each ear will hear sound originating from
+  both speakers. However, the sound from the left speaker reaches your right 
+  ear slightly later than it does your left ear, and vice versa.
 
-  The human ear and brain are very good at interpreting the timing differences
-  between direct sounds and reflected sounds and using that information to
-  identify the direction that the sound is coming from.  On the other hand,
-  when listening to headphones, your ear hears only the direct sounds, and
-  not reflections. Moreover, your left ear hears only the left channel and
+  The human ear and brain together are very good at interpreting the timing
+  differences between direct sounds and reflected sounds and using that
+  information to identify the direction that the sound is coming from. On the
+  other hand, when listening to headphones, each ear hears only the stereo
+  channel  corresponding to it. The left ear hears only the left channel and
   the right ear hears only the right channel. The result is that sound from
   headphones does not provide the same spatial cues to your ear and brain as
-  speakers.
+  speakers, and might for that reason sound unnatural to some listeners.
     
   The crossfeed function uses an algorithm to feed a delayed and filtered
   portion of the signal from the right channel into the left channel and vice
