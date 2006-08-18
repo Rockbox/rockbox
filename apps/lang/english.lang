@@ -4775,11 +4775,10 @@
   desc: Used on the bookmark select window to indicated the bookmark delete option
   user:
   <source>
-    *: "ON+Play = Delete"
+    *: "RECORD = Delete"
   </source>
   <dest>
-    *: "ON+Play = Delete"
-		h100,h120,h300: "ON+NAVI = Delete"
+    *: "RECORD = Delete"
   </dest>
   <voice>
     *: ""
