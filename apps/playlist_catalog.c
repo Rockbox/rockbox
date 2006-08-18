@@ -111,14 +111,20 @@ static int initialize_catalog(void)
 
     if (!playlist_dir_exists)
     {
-        gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_DIRECTORY),
-            playlist_dir);
-        return -1;
+        if (mkdir(playlist_dir, 0) < 0) {
+            gui_syncsplash(HZ*2, true, str(LANG_CATALOG_NO_DIRECTORY),
+                playlist_dir);
+            return -1;
+        }
+        else {
+            playlist_dir_exists = true;
+            memset(most_recent_playlist, 0, sizeof(most_recent_playlist));
+            initialized = true;
+        }
     }
 
     return 0;
 }
-
 /* Use the filetree functions to retrieve the list of playlists in the
    directory */
 static int create_playlist_list(char** playlists, int num_items,
