@@ -208,6 +208,19 @@
 #define UI_LCD_POSY                 30 /* y position of lcd (74 for real aspect) */
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+
+#elif defined(IRIVER_IFP7XX)
+#define UI_TITLE                    "iriver iFP7xx"
+#define UI_WIDTH                    425 /* width of GUI window */
+#define UI_HEIGHT                   183 /* height of GUI window */
+#define UI_LCD_BGCOLOR              94, 104, 84 /* bkgnd color of LCD (no backlight) */
+#define UI_LCD_BGCOLORLIGHT         60, 160, 230 /* bkgnd color of LCD (backlight) */
+#define UI_LCD_BLACK                0, 0, 0 /* black */
+#define UI_LCD_POSX                 115 /* x position of lcd */
+#define UI_LCD_POSY                 54 /* y position of lcd */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+    
 #endif
 extern SDL_Surface *gui_surface;
 extern bool background;  /* True if the background image is enabled */

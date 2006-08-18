@@ -169,6 +169,8 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_OFF;
 #elif defined BUTTON_A
         new_btn = BUTTON_A;
+#elif defined BUTTON_EQ
+        new_btn = BUTTON_EQ;
 #endif
         break;
 
