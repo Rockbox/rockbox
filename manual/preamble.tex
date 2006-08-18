@@ -107,12 +107,12 @@
   \begin{figure}[H]
     \begin{center}
       \IfFileExists{#1-\genericimg-\specimg.png}
-        {\includegraphics[width=4cm]{#1-\genericimg-\specimg.png}
+        {\includegraphics[width=\screenshotsize]{#1-\genericimg-\specimg.png}
          \typeout{Note: device specific image used}}
         {\IfFileExists{#1-\genericimg.png}
-          {\includegraphics[width=4cm]{#1-\genericimg.png}}
+          {\includegraphics[width=\screenshotsize]{#1-\genericimg.png}}
           {\IfFileExists{#1}
-            {\includegraphics[width=4cm]{#1}
+            {\includegraphics[width=\screenshotsize]{#1}
              \typeout{Warning: deprecated plain image name used}}%
             {\typeout{Missing image: #1 (\genericimg) (\specimg)}%
              \color{red}{\textbf{WARNING!} Image not found}%
@@ -268,3 +268,5 @@
 % special HTML output adjustments
 \ifpdfoutput{}{\setlength{\parindent}{0mm}}
 \ifpdfoutput{}{\renewcommand{\Forward}[1]{$\triangleright${}#1}}
+
+%\hfuzz=2pt
