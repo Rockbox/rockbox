@@ -158,7 +158,6 @@ const struct button_mapping button_context_settingsgraphical[]  = {
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,                  BUTTON_NONE },
-    { ACTION_YESNO_ACCEPT,          BUTTON_RC_ON,                   BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
@@ -267,6 +266,11 @@ const struct button_mapping button_context_settingsgraphical_h100lcdremote[]  = 
     LAST_ITEM_IN_LIST
 }; /* button_context_settingsgraphical */
 
+const struct button_mapping button_context_yesno_h100lcdremote[]  = {
+    { ACTION_YESNO_ACCEPT,          BUTTON_RC_MENU,                  BUTTON_NONE },
+    LAST_ITEM_IN_LIST
+}; /* button_context_settings_yesno */
+
 const struct button_mapping button_context_bmark_h100lcdremote[]  = {
     { ACTION_BMARK_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RC_MENU,   BUTTON_NONE },
@@ -312,24 +316,14 @@ const struct button_mapping button_context_listtree_h300lcdremote[] = {
 
 }; /* button_context_listtree_h300lcdremote */
 
-const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = {
-    { ACTION_SETTINGS_INC,          BUTTON_RC_FF,               BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_FF|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_RC_REW,                BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_REW|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_PREV,              BUTTON_RC_VOL_UP,                  BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_NEXT,              BUTTON_RC_VOL_DOWN,                BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    
-    LAST_ITEM_IN_LIST
-}; /* button_context_settingsgraphical */
+const struct button_mapping *button_context_settingsgraphical_h300lcdremote =
+                                button_context_settingsgraphical_h100lcdremote;
+                                
+const struct button_mapping *button_context_yesno_h300lcdremote =
+                                button_context_yesno_h100lcdremote;
 
-const struct button_mapping button_context_bmark_h300lcdremote[]  = {
-    { ACTION_BMARK_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RC_MENU,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGSGRAPHICAL),
-}; /* button_context_settings_bmark */
+const struct button_mapping *button_context_bmark_h300lcdremote =
+                                button_context_bmark_h100lcdremote;
 
 const struct button_mapping *button_context_settings_h300lcdremote  = 
                                 button_context_settings_h100lcdremote; 
@@ -347,6 +341,7 @@ static const struct button_mapping
         *remote_button_context_listtree = button_context_listtree_h100lcdremote,
         *remote_button_context_settings = button_context_settings_h100lcdremote,
         *remote_button_context_settingsgraphical = button_context_settingsgraphical_h100lcdremote,
+        *remote_button_context_yesno = button_context_yesno_h100lcdremote,
         *remote_button_context_bmark = button_context_bmark_h100lcdremote;
         
 static int _remote_type = 0;
@@ -362,6 +357,7 @@ static void remap_remote(void)
             remote_button_context_listtree = NULL;
             remote_button_context_settings = NULL;
             remote_button_context_settingsgraphical = NULL;
+            remote_button_context_yesno = NULL;
             remote_button_context_bmark = NULL;
             break;
         case REMOTETYPE_H100_LCD:
@@ -370,6 +366,7 @@ static void remap_remote(void)
             remote_button_context_listtree = button_context_listtree_h100lcdremote;
             remote_button_context_settings = button_context_settings_h100lcdremote;
             remote_button_context_settingsgraphical = button_context_settingsgraphical_h100lcdremote;
+            remote_button_context_yesno = button_context_yesno_h100lcdremote;
             remote_button_context_bmark = button_context_bmark_h100lcdremote;
             break;
         case REMOTETYPE_H300_LCD:
@@ -378,6 +375,7 @@ static void remap_remote(void)
             remote_button_context_listtree = button_context_listtree_h300lcdremote;
             remote_button_context_settings = button_context_settings_h300lcdremote;
             remote_button_context_settingsgraphical = button_context_settingsgraphical_h300lcdremote;
+            remote_button_context_yesno = button_context_yesno_h300lcdremote;
             remote_button_context_bmark = button_context_bmark_h300lcdremote;
             break;
         case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */        
@@ -386,6 +384,7 @@ static void remap_remote(void)
             remote_button_context_listtree = button_context_listtree_h300lcdremote;
             remote_button_context_settings = button_context_settings_h300lcdremote;
             remote_button_context_settingsgraphical = button_context_settingsgraphical_h300lcdremote;
+            remote_button_context_yesno = button_context_yesno_h300lcdremote;
             remote_button_context_bmark = button_context_bmark_h300lcdremote;
             break;
     }
@@ -418,11 +417,10 @@ const struct button_mapping* get_context_mapping_remote(int context)
             return remote_button_context_listtree;
         case CONTEXT_SETTINGSGRAPHICAL:
             return remote_button_context_settingsgraphical;
+        case CONTEXT_YESNOSCREEN:            
+            return remote_button_context_yesno;
         case CONTEXT_BOOKMARKSCREEN:
             return remote_button_context_bmark;
-            
-        case CONTEXT_YESNOSCREEN:            
-            ; /* fall out of the switch */            
     } 
     return remote_button_context_std;
 }
