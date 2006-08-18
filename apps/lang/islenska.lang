@@ -3662,6 +3662,7 @@
   </source>
   <dest>
     *: "Spila = Velja"
+    h100,h120,h300: "NAVI = Velja"
   </dest>
   <voice>
     *: ""
@@ -3676,6 +3677,7 @@
   </source>
   <dest>
     *: "Á+Spila = Eyða"
+    h100,h120,h300: "Á+NAVI = Eyða"
   </dest>
   <voice>
     *: ""

@@ -4460,6 +4460,7 @@
   </source>
   <dest>
     *: "Play = Выбрать"
+    h100,h120,h300: "NAVI = Выбрать"
   </dest>
   <voice>
     *: ""
@@ -4474,6 +4475,7 @@
   </source>
   <dest>
     *: "ON+Play = Удалить"
+    h100,h120,h300: "ON+NAVI = Удалить"
   </dest>
   <voice>
     *: ""

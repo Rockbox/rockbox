@@ -4749,6 +4749,7 @@
   </source>
   <dest>
     *: "PLAY = 選擇"
+    h100,h120,h300: "NAVI = 選擇"
   </dest>
   <voice>
     *: ""
@@ -4763,6 +4764,7 @@
   </source>
   <dest>
     *: "ON+Play = 刪除"
+    h100,h120,h300: "ON+NAVI = 刪除"
   </dest>
   <voice>
     *: ""

@@ -3274,6 +3274,7 @@
   </source>
   <dest>
     *: "PLAY = Seleccionar"
+    h100,h120,h300: "NAVI = Seleccionar"
   </dest>
   <voice>
     *: ""
@@ -3288,6 +3289,7 @@
   </source>
   <dest>
     *: "ON+PLAY = Esborrar"
+    h100,h120,h300: "ON+NAVI = Esborrar"
   </dest>
   <voice>
     *: ""

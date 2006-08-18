@@ -4390,6 +4390,7 @@
   </source>
   <dest>
     *: "PLAY = Selecteer"
+    h100,h120,h300: "NAVI = Selecteer"
   </dest>
   <voice>
     *: ""
@@ -4404,6 +4405,7 @@
   </source>
   <dest>
     *: "ON+Play = verwijderen"
+    h100,h120,h300: "ON+NAVI = verwijderen"
   </dest>
   <voice>
     *: ""

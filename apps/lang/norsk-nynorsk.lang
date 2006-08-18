@@ -4741,6 +4741,7 @@
   </source>
   <dest>
     *: "SPEL = vel"
+    h100,h120,h300: "NAVI = vel"
   </dest>
   <voice>
     *: ""
@@ -4754,7 +4755,8 @@
     *: "ON+Play = Delete"
   </source>
   <dest>
-    *: "PÅ + SPEL = slett"
+    *: "PÅ+SPEL = slett"
+    h100,h120,h300: "PÅ+NAVI = slett"
   </dest>
   <voice>
     *: ""

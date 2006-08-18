@@ -6362,6 +6362,7 @@
   </source>
   <dest>
     *: "GRAJ = Wybierz"
+    h100,h120,h300: "NAVI = Wybierz"
   </dest>
   <voice>
     *: ""

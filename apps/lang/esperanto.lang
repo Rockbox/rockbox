@@ -4754,6 +4754,7 @@
   </source>
   <dest>
     *: "LEGI = Elekti"
+    h100,h120,h300: "NAVI = Elekti"
   </dest>
   <voice>
     *: ""
@@ -4768,6 +4769,7 @@
   </source>
   <dest>
     *: "ON+LEGI = Elpreni"
+    h100,h120,h300: "ON+NAVI = Elpreni"
   </dest>
   <voice>
     *: ""

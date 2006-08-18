@@ -3674,6 +3674,7 @@
   </source>
   <dest>
     *: "PLAY = Επιλογή"
+    h100,h120,h300: "NAVI = Επιλογή"
   </dest>
   <voice>
     *: ""
@@ -3688,6 +3689,7 @@
   </source>
   <dest>
     *: "ON+PLAY = Διαγραφή"
+    h100,h120,h300: "ON+NAVI = Διαγραφή"
   </dest>
   <voice>
     *: ""

@@ -4081,6 +4081,7 @@
   </source>
   <dest>
     *: "PLAY = Velg"
+    h100,h120,h300: "NAVI = Velg"
   </dest>
   <voice>
     *: ""
@@ -4095,6 +4096,7 @@
   </source>
   <dest>
     *: "PÅ+Play = Slett"
+    h100,h120,h300: "PÅ+NAVI = Slett"
   </dest>
   <voice>
     *: ""

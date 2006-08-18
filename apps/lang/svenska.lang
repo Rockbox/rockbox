@@ -4740,6 +4740,7 @@
   </source>
   <dest>
     *: "SPELA = Välj"
+    h100,h120,h300: "NAVI = Välj"
   </dest>
   <voice>
     *: ""
@@ -4754,6 +4755,7 @@
   </source>
   <dest>
     *: "PÅ+SPELA = Ta bort"
+    h100,h120,h300: "PÅ+NAVI = Ta bort"
   </dest>
   <voice>
     *: ""

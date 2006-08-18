@@ -4104,6 +4104,7 @@
   </source>
   <dest>
     *: "SPIL = Vælg"
+    h100,h120,h300: "NAVI = Vælg"
   </dest>
   <voice>
     *: ""
@@ -4118,6 +4119,7 @@
   </source>
   <dest>
     *: "TÆND+Spil = Slet"
+    h100,h120,h300: "TÆND+NAVI = Slet"
   </dest>
   <voice>
     *: ""

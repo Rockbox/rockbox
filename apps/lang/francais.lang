@@ -4757,6 +4757,7 @@
   </source>
   <dest>
     *: "PLAY = Sélect."
+    h100,h120,h300: "NAVI = Sélect."
   </dest>
   <voice>
     *: ""
@@ -4771,6 +4772,7 @@
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
+    h100,h120,h300: "ON+NAVI = Suppr."
   </dest>
   <voice>
     *: ""

@@ -3130,6 +3130,7 @@
   </source>
   <dest>
     *: "PLAY = üswählu"
+    h100,h120,h300: "NAVI = üswählu"
   </dest>
   <voice>
     *: ""
@@ -3144,6 +3145,7 @@
   </source>
   <dest>
     *: "ON+PLAY = leschu"
+    h100,h120,h300: "ON+NAVI = leschu"
   </dest>
   <voice>
     *: ""
