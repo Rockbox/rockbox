@@ -280,10 +280,17 @@ const struct button_mapping button_context_standard_h300lcdremote[]  = {
 const struct button_mapping *button_context_wps_h300lcdremote =
                                 button_context_wps_h100lcdremote;
 
-/* FIXME: the same as h100 ?? */
-const struct button_mapping *button_context_listtree_h300lcdremote  = 
-                                button_context_listtree_h100lcdremote;
-/* FIXME: the same as h100 ?? */
+const struct button_mapping button_context_listtree_h300lcdremote[] = {
+    { ACTION_LISTTREE_PGUP,     BUTTON_RC_SOURCE,                    BUTTON_NONE },
+    { ACTION_LISTTREE_PGUP,     BUTTON_RC_SOURCE|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN,   BUTTON_RC_BITRATE,                   BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN,   BUTTON_RC_BITRATE|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_TREE_WPS,      BUTTON_RC_ON|BUTTON_REL,             BUTTON_RC_ON },
+    { ACTION_TREE_STOP,     BUTTON_RC_STOP,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+
+}; /* button_context_listtree_h300lcdremote */
 
 const struct button_mapping *button_context_settings_h300lcdremote  = 
                                 button_context_settings_h100lcdremote; 
