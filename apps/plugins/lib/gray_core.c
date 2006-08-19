@@ -403,7 +403,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #ifdef SIMULATOR
     if (!buffered)
     {
-        long orig_size = depth * plane_size + (depth + 1) * sizeof(long);
+        long orig_size = MULU16(depth, plane_size) + (depth + 1) * sizeof(long);
         
         plane_size = MULU16(width, height);
         if (plane_size > orig_size)
@@ -420,7 +420,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     }
     else
 #endif
-        buftaken += depth * plane_size + (depth + 1) * sizeof(long);
+        buftaken += MULU16(depth, plane_size) + (depth + 1) * sizeof(long);
 
     _gray_info.x = 0;
     _gray_info.y = 0;
@@ -439,8 +439,8 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _gray_info.cur_plane = 0;
     _gray_info.plane_size = plane_size;
     _gray_info.plane_data = gbuf;
-    _gray_rb->memset(gbuf, 0, depth * plane_size);
-    gbuf += depth * plane_size;
+    _gray_rb->memset(gbuf, 0, MULU16(depth, plane_size));
+    gbuf += MULU16(depth, plane_size);
     _gray_info.bitpattern = (unsigned long *)gbuf;
               
     i = depth - 1;
@@ -1072,11 +1072,11 @@ void gray_update_rect(int x, int y, int width, int height)
 
 #if CONFIG_CPU == SH7034
             asm volatile (
-                "mov.l   @%[cbuf], r1        \n"
                 "mov.l   @%[bbuf], r2        \n"
+                "mov.l   @%[cbuf], r1        \n"
+                "mov.l   @(4,%[bbuf]), %[chg]\n"
                 "xor     r1, r2              \n"
                 "mov.l   @(4,%[cbuf]), r1    \n"
-                "mov.l   @(4,%[bbuf]), %[chg]\n"
                 "xor     r1, %[chg]          \n"
                 "or      r2, %[chg]          \n"
                 : /* outputs */
@@ -1110,11 +1110,10 @@ void gray_update_rect(int x, int y, int width, int height)
         "cmp/eq  r0, r1              \n"  /* no change? */
         "bt      .ur_skip            \n"  /* -> skip */
 
+        "mov     #75, r1             \n"
+        "mulu    r1, %[rnd]          \n"  /* multiply by 75 */
         "shll2   r0                  \n"  /* pixel value -> pattern offset */
         "mov.l   @(r0,%[bpat]), r4   \n"  /* r4 = bitpattern[byte]; */
-
-        "mov     #75, r0             \n"
-        "mulu    r0, %[rnd]          \n"  /* multiply by 75 */
         "sts     macl, %[rnd]        \n"
         "add     #74, %[rnd]         \n"  /* add another 74 */
         /* Since the lower bits are not very random: */

@@ -1303,14 +1303,13 @@ static void _writearray(unsigned char *address, const unsigned char *src,
         "bf      .wa_skip            \n"  /* skip this pixel */
 
         "mov.b   @%[src], r0         \n"  /* load src byte */
+        "mov     #75, r1             \n"
         "extu.b  r0, r0              \n"  /* extend unsigned */
         "mov.b   @(r0,%[trns]), r0   \n"  /* idxtable into pattern index */
+        "mulu    r1, %[rnd]          \n"  /* multiply by 75 */
         "extu.b  r0, r0              \n"  /* extend unsigned */
         "shll2   r0                  \n"
         "mov.l   @(r0,%[bpat]), r4   \n"  /* r4 = bitpattern[byte]; */
-
-        "mov     #75, r0             \n"
-        "mulu    r0, %[rnd]          \n"  /* multiply by 75 */
         "sts     macl, %[rnd]        \n"
         "add     #74, %[rnd]         \n"  /* add another 74 */
         /* Since the lower bits are not very random: */
