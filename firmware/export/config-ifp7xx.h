@@ -43,6 +43,8 @@
 
 #define HAVE_FLASH_DISK
 
+#define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Philips PNX0101 */
@@ -52,15 +54,12 @@
 #define CONFIG_I2C I2C_PNX0101
 
 /* Type of mobile power */
-//#define CONFIG_BATTERY BATT_LIPOL1300
-
-#define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
-
-/* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
-
-/* define this if the hardware can be powered off while charging */
-//#define HAVE_POWEROFF_WHILE_CHARGING
+#define CONFIG_BATTERY BATT_1AA
+#define BATTERY_CAPACITY_MIN 500  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2800 /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 50   /* capacity increment */
+#define BATTERY_TYPES_COUNT  2    /* Alkalines or NiMH */
+#define BATTERY_SCALE_FACTOR 3000 /* TODO: only roughly correct */
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000

@@ -159,6 +159,8 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     280
 #elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
     310, 345    /* alkaline, NiHM */
+#elif CONFIG_BATTERY == BATT_1AA /* iRiver iFP */
+    105, 115    /* alkaline, NiHM */
 #elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
     339
 #else /* Player/recorder, NiMH */
@@ -182,6 +184,11 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
      * for the 1300 mAh stock battery. */
 //  { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
     { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
+#elif CONFIG_BATTERY == BATT_1AA
+    /* These values are the same as for 3AAA divided by 3. */
+    /* May need recalibration. */
+    {  93, 108, 114, 118, 121, 125, 128, 132, 136, 142, 158 }, /* alkaline */
+    { 103, 118, 121, 123, 124, 125, 126, 127, 128, 129, 135 }  /* NiMH */
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
