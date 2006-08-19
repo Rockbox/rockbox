@@ -200,12 +200,22 @@
 #define UI_LCD_HEIGHT               320
 
 #elif defined(IRIVER_H10)
-#define UI_TITLE                    "iriver H10"
+#define UI_TITLE                    "iriver H10 20Gb"
 #define UI_WIDTH                    392 /* width of GUI window */
 #define UI_HEIGHT                   391 /* height of GUI window */
 /* high-colour */
 #define UI_LCD_POSX                 111 /* x position of lcd */
 #define UI_LCD_POSY                 30 /* y position of lcd (74 for real aspect) */
+#define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
+#define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
+
+#elif defined(IRIVER_H10_5GB)
+#define UI_TITLE                    "iriver H10 5/6Gb"
+#define UI_WIDTH                    353 /* width of GUI window */
+#define UI_HEIGHT                   460 /* height of GUI window */
+/* high-colour */
+#define UI_LCD_POSX                 112 /* x position of lcd */
+#define UI_LCD_POSY                 45  /* y position of lcd (74 for real aspect) */
 #define UI_LCD_WIDTH                LCD_WIDTH /* * 1.5 */
 #define UI_LCD_HEIGHT               LCD_HEIGHT  /* * 1.5 */
 

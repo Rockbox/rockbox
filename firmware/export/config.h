@@ -70,7 +70,8 @@
 #define BATT_4AA_NIMH   1500
 #define BATT_3AAA       1000 /* Ondio */
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
-#define BATT_LPCS355385 1550 /* iriver h10 - SKC LPCS355385 */
+#define BATT_LPCS355385 1550 /* iriver h10 20Gb - SKC LPCS355385 */
+#define BATT_BP009       820 /* iriver H10 5/6Gb - iriver BP009 */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */
@@ -93,6 +94,8 @@
 #define LCD_IPODMINI 10 /* as used by iPod Mini g1/g2 */
 #define LCD_IFP7XX   11 /* as used by iRiver iFP 7xx/8xx */
 #define LCD_GIGABEAT 12
+#define LCD_H10      13 /* as used by iriver H10 20Gb */
+#define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -115,8 +118,9 @@
 #define BL_IRIVER_IFP7XX 9 /* IRiver GPIO */
 #define BL_IPODMINI      10 /* Apple iPod Mini */
 #define BL_GIGABEAT      11 /* Toshiba Gigabeat */
-#define BL_IRIVER_H10    12 /* iriver H10 */
+#define BL_H10           12 /* iriver H10 */
 #define BL_X5            13 /* iAudio X5 PCF50606 I2C */
+#define BL_H10_5GB       14 /* iriver H10 5/6GB */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -192,6 +196,8 @@
 #include "config-ipodmini2g.h"
 #elif defined(IRIVER_H10)
 #include "config-h10.h"
+#elif defined(IRIVER_H10_5GB)
+#include "config-h10_5gb.h"
 #elif defined(SANSA_E200)
 #include "config-e200.h"
 #else

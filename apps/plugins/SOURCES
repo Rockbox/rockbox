@@ -35,7 +35,9 @@ mandelbrot.c
 plasma.c
 
 bounce.c
+#ifndef IRIVER_H10_5GB
 bubbles.c
+#endif
 #if LCD_WIDTH != 128
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c
@@ -44,7 +46,9 @@ calculator.c
 chip8.c
 demystify.c
 flipit.c
+#ifndef IRIVER_H10_5GB
 jewels.c
+#endif
 minesweeper.c
 oscilloscope.c
 pong.c
@@ -62,7 +66,9 @@ tetrox.c
 video.c
 #endif
 vu_meter.c
+#ifndef IRIVER_H10_5GB
 wormlet.c
+#endif
 
 #ifdef CONFIG_RTC 
 clock.c

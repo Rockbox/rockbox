@@ -460,8 +460,9 @@ toolsdir='\$(ROOTDIR)/tools'
   echo "19 - iriver iFP-790"
   echo "20 - Toshiba Gigabeat F"
   echo "21 - iPod Mini 2G"
-  echo "22 - iriver H10"
+  echo "22 - iriver H10 20Gb"
   echo "23 - SanDisk Sansa e200"
+  echo "24 - iriver H10 5/6Gb"
 
   target_id=`input`;
 
@@ -933,6 +934,29 @@ toolsdir='\$(ROOTDIR)/tools'
     t_model="sansa-e200"
     ;;
 
+   24)
+    archos="h10_5gb"
+    target="-DIRIVER_H10_5GB"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/mkmi4.sh h10_5gb"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="H10.mi4"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset=$genericbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="h10"
+    ;;
+
    *)
     echo "Please select an actual target platform!"
     exit
@@ -988,7 +1012,7 @@ fi
   case $option in
     [Bb])
       case $archos in
-          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g|gigabeatf|h10|e200)
+          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g|gigabeatf|h10|e200|h10_5gb)
               extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
               appsdir='\$(ROOTDIR)/bootloader'
               apps="bootloader"

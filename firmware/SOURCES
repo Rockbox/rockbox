@@ -262,6 +262,17 @@ target/arm/iriver/h10/lcd-h10.c
 #endif
 #endif
 
+#ifdef IRIVER_H10_5GB
+#ifndef SIMULATOR
+target/arm/iriver/h10/backlight-h10.c
+target/arm/iriver/h10/button-h10.c
+target/arm/ata-pp5020.c
+target/arm/iriver/h10/power-h10.c
+target/arm/iriver/h10/usb-h10.c
+target/arm/iriver/h10/lcd-h10.c
+#endif
+#endif
+
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
 target/arm/gigabeat/meg-fx/backlight-meg-fx.c

@@ -63,6 +63,9 @@ case $target in
   h10)
     tea=20gc_eng
     ;;
+  h10_5gb)
+    tea=default
+    ;;
   *)
     echo "unsupported target"
     help
