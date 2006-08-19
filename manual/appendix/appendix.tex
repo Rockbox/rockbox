@@ -73,21 +73,13 @@ For open feature requests refer to
 This is a list of Feature Requests we get repeatedly that we simply
 cannot do. View it as the opposite of a TODO!
 
-\opt{player,recorder,recorderv2fm}{
 \begin{itemize}
+\opt{archos}{
 \item Record to WAV (uncompressed) or MP3pro format!\\
 The recording hardware (the MAS) does not allow us to do this
 \item Crossfade between tracks!\\
   Crossfading would require two mp3 decoders, and we only have one. 
   This is not possible.
-\item Interfacing with other USB devices (like cameras) or 2 player games over USB\\
-  The USB system demands that there is a master that talks to a slave. The 
-  Jukebox can only serve as a slave, as most other USB devices such as 
-  cameras can. Thus, without a master no communication between the slaves 
-  can take place. If that is not enough, we have no ways of actually 
-  controlling the communication performed over USB since the USB circuit 
-  in the Jukebox is strictly made for disk{}-access and does not allow us 
-  to play with it the way we'd need for any good communication to work.
 \item Support MP3pro, WMA or other sound format playback!\\
   The mp3{}-decoding hardware can only play MP3. We cannot make it play other 
   sound formats.
@@ -104,17 +96,6 @@ The recording hardware (the MAS) does not allow us to do this
 \item Multi{}-band (or graphic) equaliser\\
   We cannot access information for that kind of visualisation from the MP3 
   decoding hardware.
-\item Support other filesystems than FAT32 (like NTFS or ext2 or whatever)!\\
-  No. Rockbox needs to support FAT32 since it can only start off a FAT32 
-  partition (since that is the only way the ROM can load it), and adding 
-  support for more file systems will just take away valuable ram for 
-  unnecessary features. You can partition your Jukebox fine, just make sure 
-  the first one is FAT32 and then make the other ones whatever file system 
-  you want. Just don't expect Rockbox to understand them.
-\item Add scandisk{}-like features!\\
-  It would be a very slow operation that would drain the batteries and 
-  take a lot of useful ram for something that is much better and faster 
-  done when connected to a host computer.
 \item CBR recording!\\
   The MP3 encoding hardware does not allow this.
 \item Change tempo of a song without changing pitch!\\
@@ -127,9 +108,30 @@ The recording hardware (the MAS) does not allow us to do this
   Adding new sound effects requires reprogramming the MAS chip, and we can't 
   do that. The MAS chip is programmable, but we have no access to the chip 
   documentation.
-\end{itemize}
 }
-
+\nopt{h300,x5}{
+\item Interfacing with other USB devices (like cameras) or 2 player games over USB\\
+  The USB system demands that there is a master that talks to a slave. The
+  \dap{} can only serve as a slave, as most other USB devices such as
+  cameras can. Thus, without a master no communication between the slaves
+  can take place. If that is not enough, we have no ways of actually
+  controlling the communication performed over USB since the USB circuit
+  in the \dap{} is strictly made for disk{}-access and does not allow us
+  to play with it the way we'd need for any good communication to work.
+}
+\item Support other filesystems than FAT32 (like NTFS or ext2 or whatever)!\\
+  No.
+  \opt{archos}{Rockbox needs to support FAT32 since it can only start off a FAT32
+  partition (since that is the only way the ROM can load it), and adding}%
+  support for more file systems will just take away valuable ram for
+  unnecessary features. You can partition your \dap{} fine, just make sure
+  the first one is FAT32 and then make the other ones whatever file system
+  you want. Just don't expect Rockbox to understand them.
+\item Add scandisk{}-like features!\\
+  It would be a very slow operation that would drain the batteries and
+  take a lot of useful ram for something that is much better and faster
+  done when connected to a host computer.
+\end{itemize}
 
 \chapter{Changelog}
 \section{What's new since v2.5?}
