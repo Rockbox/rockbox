@@ -421,6 +421,8 @@ enum minesweeper_status menu( void )
             "SELECT to start"
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
             "REC to start"
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+            "FF to start"
 #else
             ""
 #       warning Please define help string for this keypad.
