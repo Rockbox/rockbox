@@ -24,41 +24,48 @@ displays files.
   This option controls which files are displayed in the File Browser.
   %
   \begin{description}
-  \item[All:] The File Browser displays all files and directories. 
+  \item[All:] The \setting{File Browser} displays all files and directories.
     Extensions are shown. No files or directories are hidden.
-  \item[ID3 Database:] This shows the files based on the Tag Cache
-    information, thus disabling the file browser. You can browse the
-    database by various tags and search them. Only information present
-    in music file tags are shown. For a detailed description of Tag Cache
-    refer to \reference{ref:tagcache}.
-  \item[Playlists:] The File Browser displays only directories and playlists,
+  \item[Supported:] The \setting{File Browser} displays all directories and
+    files supported by Rockbox (see \reference{ref:Supportedfileformats}).
+    Files and directories starting with \fname{.} or with the ``hidden''
+    flag set are hidden.
+  \item[Music:] The \setting{File Browser} displays only folders, playlists and
+    the supported \emph{audio} file formats. Extensions are stripped. Files and
+    directories starting with \fname{.} or with the ``hidden'' flag set are
+    hidden.
+  \item[Playlists:] The \setting{File Browser} displays only directories and playlists,
     for simplified navigation.
-  \item[Music:] The File Browser displays only folders, \fname{.m3u} files 
-    and the supported \emph{audio} file formats.  Extensions are stripped.  
-    Files and directories starting with \fname{.} or with the ``hidden'' 
-    flag set are hidden.
-  \item[Supported:] The File Browser displays all directories and files 
-    supported by Rockbox (see \reference{ref:Supportedfileformats}).  
-    Files and directories starting with \fname{.} or with the ``hidden'' 
-    flag set are hidden.
+  \item[ID3 Database:] This shows the files based on the \setting{Tag Cache}
+    information, thus disabling the \setting{File Browser}. You can browse the
+    database by various tags and search them. Only information present
+    in music file tags are shown. For a detailed description of
+    \setting{Tag Cache} refer to \reference{ref:tagcache}.
+
   \end{description}
   
 \item[Follow Playlist:] 
-  This option determines what directory the File Browser displays first.  If 
-  \setting{Follow Playlist} is set to \setting{Yes}, when you enter the File 
-  Browser from the WPS, you will find yourself in the same  directory as the 
-  currently playing file.  If \setting{Follow Playlist} is set to \setting{No},
-  when you enter the File Browser from the WPS, you will find yourself in the 
-  directory you were in when you last left the File Browser.
+  This option determines what directory the \setting{File Browser} displays
+  first. If \setting{Follow Playlist} is set to \setting{Yes}, when you enter
+  the \setting{File Browser} from the WPS, you will find yourself in the same
+  directory as the currently playing file. If \setting{Follow Playlist} is set
+  to \setting{No}, when you enter the \setting{File Browser} from the WPS, you
+  will find yourself in the directory you were in when you last left the
+  \setting{File Browser}.
   
 \item[Show Icons:]
-  Rockbox has the ability to display an icon to the left of the file 
-  in the File Browser.  For details of these icons, please see
+  Rockbox has the ability to display an icon to the left of the file
+  in the \setting{File Browser}. For details of these icons, please see
   \reference{ref:Supportedfileformats}.
-  
+
+\item[Show Path:]
+  If this setting is set to \setting{Full Path} the full path to the current
+  directory will be displayed on the first line in the \setting{File Browser}.
+  If set to \setting{Current Directory Only} only the name of the current
+  directory will be displayed.
+
 \item[Tag Cache:]
   This option allows you to configure the Tag Cache.
   See \reference{ref:tagcache} for more information about using
   the Tag Cache.
-  
 \end{description}
