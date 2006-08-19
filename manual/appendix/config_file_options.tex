@@ -1,26 +1,33 @@
+% $Id$ %
 \section{Settings}
 \begin{center}
   \begin{longtable}{@{}lll@{}}\toprule
     \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
     \midrule
     volume & \opt{player}{-78 to +18}
-             \opt{recorder,recorderv2fm,ondio}{-100 -to +12}
+             \opt{recorder,recorderv2fm,ondiosp,ondiofm}{-100 -to +12}
              \opt{h1xx,h300}{-84 to 0}
              \opt{ipodnano}{-72 to +6}
-             \opt{ipodvideo}{-57 dB to +6}
+             \opt{ipodvideo}{-57 to +6}
              \opt{ipodcolor,x5}{-\fixme{??} to +\fixme{??}}
                     & dB\\
-    bass & -15 to +15 & dB\\
-    treble & -15 to +15 &dB\\
+    \nopt{x5}{
+      bass & \opt{MASCODEC}{-15 to +15}
+             \opt{h1xx,h300}{0 to +24}
+             \opt{ipod}{-6 to +9}
+                    & dB\\
+      treble & \opt{MASCODEC}{-15 to +15}
+               \opt{h1xx,h300}{0 to +6}
+               \opt{ipod}{-6 to +9}
+                    & dB\\
+    }
     balance & -100 to +100 & \%\\
-    channels & stereo, stereo narrow, & n/a\\
-             & stereo wide, & \\
-             & mono, mono left, & \\ 
-             & mono right, karaoke & \\
+    channels & stereo, mono, custom & N/A\\
+             & mono left, mono right, karaoke & \\
     shuffle & on, off & N/A\\
-    repeat & off, all, one & N/A\\
+    repeat & off, all, one, shuffle, ab & N/A\\
     play selected & on, off & N/A\\
-    resume & off, ask, ask once, on & N/A\\
+    resume & on, off & N/A\\
     scan min step & 1, 2, 3, 4, 5, 6, 8, 10, 15, & seconds\\
                   & 20, 25, 30, 45, 60 &\\
     scan accel & 0 to 15 & seconds\\
@@ -30,10 +37,10 @@
     sort case & on, off & N/A\\
     show files & all, supported, music, playlists & N/A\\
     follow playlist & on, off & N/A\\
-    playlist viewer icons & off,on & N/A\\
-    playlist viewer indices & off,on & N/A\\
+    playlist viewer icons & on, off & N/A\\
+    playlist viewer indices & on, off & N/A\\
     playlist viewer track display & track name,full path & N/A\\
-    recursive directory insert & off,on & N/A\\
+    recursive directory insert & on, off & N/A\\
     scroll speed & 1 to 25 & Hz\\
     scroll delay & 0 to 250 & 1/10s\\
     scroll step & 1 to 112 & pixels\\
@@ -43,7 +50,9 @@
     backlight timeout & off, on, 1, 2, 3, 4, 5, & seconds\\
                       & 6, 7, 8, 9, 10, 15, 20, & \\
                       & 25, 30, 45, 60, 90 & \\
-    backlight when plugged & on, off & N/A\\
+    backlight timeout plugged & off, on, 1, 2, 3, 4, 5, & seconds\\
+                              & 6, 7, 8, 9, 10, 15, 20, & \\
+                              & 25, 30, 45, 60, 90 & \\
     disk spindown & 3 to 254 & seconds\\
     battery capacity & 1500 - 3200 & mAh\\
     idle poweroff & off, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, & minutes\\
@@ -53,21 +62,63 @@
     autocreate bookmarks & off,on & N/A\\
     autoload bookmarks & off,on & N/A\\
     use most-recent-bookmarks & off,on & N/A\\
-    talk dir & off,number,spell,enter.hover & N/A\\
-    talk file & off,number,spell & N/A\\
-    talk menu & off,on & N/A\\
+    talk dir & off, number, spell, enter, hover & N/A\\
+    talk file & off, number, spell & N/A\\
+    talk menu & off, on & N/A\\
+    tagcache\_autoupdate & on, off & N/A\\
+    warn when erasing dynamic playlist & on, off & N/A\\
+    
+    \opt{SWCODEC}{
+      replaygain & on, off & N/A\\
+      replaygain type & track, album, track shuffle & N/A\\
+      replaygain noclip & on, off & N/A\\
+      replaygain preamp & -120 to 120 & 0.1dB\\
+%
+      crossfade & off, shuffle, track skip, always & N/A\\
+      crossfade fade in delay & 0 to 7 & seconds\\
+      crossfade fade out delay & 0 to 7 & seconds\\
+      crossfade fade in duration & 0 to 15 & seconds\\
+      crossfade fade out duration & 0 to 15 & seconds\\
+      crossfade fade out mode & crossfade, mix & N/A\\
+%
+      crossfeed & on, off & N/A\\
+      crossfeed direct gain & 0 to 60 & 0.1dB\\
+      crossfeed cross gain & 30 to 120 & 0.1dB\\
+      crossfeed hf attenuation & 60 to 240 & 0.1dB\\
+      crossfeed hf cutoff & 500 to 2000 & Hz\\
+%
+      eq enabled & on, off & N/A\\
+      eq precut& 0 to 240 & 0.1dB\\
+      eq band 0 cutoff & 0 to 32768 & Hz\\
+      eq band 1 cutoff & 0 to 32768 & Hz\\
+      eq band 2 cutoff & 0 to 32768 & Hz\\
+      eq band 3 cutoff & 0 to 32768 & Hz\\
+      eq band 4 cutoff & 0 to 32768 & Hz\\
+      eq band 0 q & 0 to 64 & N/A\\
+      eq band 1 q & 0 to 64 & N/A\\
+      eq band 2 q & 0 to 64 & N/A\\
+      eq band 3 q & 0 to 64 & N/A\\
+      eq band 4 q & 0 to 64 & N/A\\
+      eq band 0 gain & -240 to 240 & 0.1dB\\
+      eq band 1 gain & -240 to 240 & 0.1dB\\
+      eq band 2 gain & -240 to 240 & 0.1dB\\
+      eq band 3 gain & -240 to 240 & 0.1dB\\
+      eq band 4 gain & -240 to 240 & 0.1dB\\
+%
+      beep & off, weak, moderate, strong & N/A\\
+      dircache & on, off & N/A\\
+      tagcache\_ram & on, off & N/A\\
+    }
 
     \opt{recorder,recorderv2fm}{
       loudness & 0 to 17 & N/A\\
-      super bass & on,off & N/A\\
+      superbass & on, off & N/A\\
       auto volume & off, 20ms, 2s, 4s, 8s & seconds\\
-      MDB enable & on,off & N/A\\
-      MDB strength & 0 to 127 & dB\\
-      MDB harmonics & 0 to 100 & \%\\
-      MDB center frequency & 20 to 300 & Hz\\
-      MDB shape & 50 to 300 & Hz\\
-      deep discharge & on, off & N/A\\
-      trickle charge & on, off & N/A\\
+      mdb enable & on,off & N/A\\
+      mdb strength & 0 to 127 & dB\\
+      mdb harmonics & 0 to 100 & \%\\
+      mdb center & 20 to 300 & Hz\\
+      mdb shape & 50 to 300 & Hz\\
     }
 
     \opt{HAVE_LCD_BITMAP}{
@@ -92,6 +143,34 @@
       invert & on, off & N/A\\
       disk poweroff & on, off & N/A\\
     }
+    
+    \opt{HAVE_LCD_COLOR}{
+      backdrop & /path/filename.bmp & N/A\\
+      foreground color & 000000 to FFFFFF & RRGGBB\\
+      background color & 000000 to FFFFFF & RRGGBB\\ 
+    }
+    
+    \opt{HAVE_REMOTE_LCD}{
+      rwps & /path/filename.rwps & N/A\\
+      remote contrast & 5 to 63 & N/A\\
+      remote invert & on, off & N/A\\
+      remote flip display & on, off & N/A\\
+      remote backlight timeout & off, on, 1, 2, 3, 4, 5, & seconds\\
+                               & 6, 7, 8, 9, 10, 15, 20, & \\
+                               & 25, 30, 45, 60, 90 & \\
+      remote backlight timeout plugged & off, on, 1, 2, 3, 4, 5, & seconds\\
+                                       & 6, 7, 8, 9, 10, 15, 20, & \\
+                                       & 25, 30, 45, 60, 90 & \\
+      remote caption backlight & on, off & N/A\\
+      remote scroll speed & 0 to 15 & N/A\\
+      remote scroll step & 1 to 160 & N/A\\
+      remote scroll delay & 0 to 250 & N/A\\ 
+      remote bidir limit & 0 to 200 & N/A\\
+      backlight filters first remote keypress & on, off & N/A\\
+      \opt{h1xx,h300}{
+        remote reduce ticking & on, off & N/A\\
+      }
+    }
     \opt{CONFIG_RTC}{
       time format & 12hour, 24hour & N/A\\      
     }
@@ -107,11 +186,15 @@
      editable recordings & off,on & N/A\\
      rec timesplit & off, 0:05, 0:10, 0:15, 0:30, 1:00, & h:mm\\
                    & 2:00, 4:00, 6:00, 8:00, 16:00, 24:00 & \\
-     pre-recording time & off, 1 to 30 & s\\
+     pre-recording time & off, 1 to 30 & seconds\\
      rec directory & /recordings,current & N/A\\
     }
     \opt{CONFIG_TUNER}{
-      Force FM mono & off,on & N/A\\
+      force fm mono & off, on & N/A\\
+    }
+    \opt{player}{
+      jump scroll & 0 to 5 & N/A\\
+      jump scroll delay & 0 to 250 & 0.01s\\
     }
     \bottomrule
   \end{longtable}
