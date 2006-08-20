@@ -1162,6 +1162,16 @@ void irq(void)
     else if (CPU_HI_INT_STAT & GPIO_MASK)
         ipod_mini_button_int();        
 }
+#elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB)
+/* TODO: this should really be in the target tree, but moving it there caused
+   crt0.S not to find it while linking */
+void irq(void)
+{
+    if (CPU_INT_STAT & TIMER1_MASK)
+        TIMER1();
+    else if (CPU_INT_STAT & TIMER2_MASK)
+        TIMER2();        
+}
 #else
 extern void ipod_4g_button_int(void);
 

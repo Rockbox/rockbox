@@ -37,7 +37,7 @@
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER
-#define CONFIG_RTC RTC_E8564  /* TODO: figure this out */
+/*#define CONFIG_RTC RTC_E8564*/  /* TODO: figure this out */
 #endif
 
 /* Define this if you have a software controlled poweroff */
@@ -99,6 +99,8 @@
 /* Type of LCD */
 #define CONFIG_LCD LCD_H10
 
+#define DEFAULT_CONTRAST_SETTING    19
+
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0
 
@@ -111,13 +113,13 @@
 /* #define USB_IPODSTYLE */
 
 /* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
+/*#define HAVE_USB_POWER*/
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
 
 /* Define this if you have adjustable CPU frequency */
-#define HAVE_ADJUSTABLE_CPU_FREQ
+/*#define HAVE_ADJUSTABLE_CPU_FREQ*/
 
 #define BOOTFILE_EXT "h10"
 #define BOOTFILE "rockbox." BOOTFILE_EXT

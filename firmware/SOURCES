@@ -259,6 +259,7 @@ target/arm/ata-pp5020.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10.c
+target/arm/iriver/h10/adc-h10.c
 #endif
 #endif
 
@@ -270,6 +271,7 @@ target/arm/ata-pp5020.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10.c
+target/arm/iriver/h10/adc-h10.c
 #endif
 #endif
 

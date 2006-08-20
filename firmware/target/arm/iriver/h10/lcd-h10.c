@@ -155,14 +155,26 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
-
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+}
 
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
     int y0, x0, y1, x1;
-    int newx,newwidth;
+    /*int newx,newwidth;*/
 
     unsigned long *addr = (unsigned long *)lcd_framebuffer;
 
