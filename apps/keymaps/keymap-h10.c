@@ -66,10 +66,11 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_QUICKSCREEN,   BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_LEFT },
     { ACTION_WPS_CONTEXT,       BUTTON_RIGHT|BUTTON_REL,      BUTTON_RIGHT },
     { ACTION_WPS_MENU,          BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_RIGHT },
+    { ACTION_WPS_PITCHSCREEN,   BUTTON_PLAY|BUTTON_LEFT,      BUTTON_PLAY },
+    { ACTION_WPS_ID3SCREEN,     BUTTON_PLAY|BUTTON_RIGHT,     BUTTON_PLAY },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
-
 
 const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_INC,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
@@ -121,6 +122,38 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
 
+const struct button_mapping button_context_settingsgraphical[]  = {
+    { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                    BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                     BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,       BUTTON_NONE },
+    { ACTION_STD_PREV,           BUTTON_SCROLL_UP,                BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,     BUTTON_SCROLL_UP|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_STD_NEXT,           BUTTON_SCROLL_DOWN,              BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,     BUTTON_SCROLL_DOWN|BUTTON_REPEAT,BUTTON_NONE },
+    { ACTION_STD_OK,             BUTTON_PLAY,                     BUTTON_NONE },
+    { ACTION_STD_CANCEL,         BUTTON_POWER,                    BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_settingsgraphical */
+
+const struct button_mapping button_context_pitchscreen[]  = {
+    { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL,      BUTTON_SCROLL_DOWN,               BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_LEFT,                      BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,           BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,                     BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,          BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_POWER,                     BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_pitchscreen */
+
+
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -132,7 +165,9 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_WPS:
             return button_context_wps;
 
-        case CONTEXT_SETTINGS:
+        case CONTEXT_SETTINGSGRAPHICAL:
+  	        return button_context_settingsgraphical;
+  	    case CONTEXT_SETTINGS:
             return button_context_settings;
 
         case CONTEXT_YESNOSCREEN:
@@ -146,6 +181,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_tree;
         case CONTEXT_QUICKSCREEN:
             return button_context_quickscreen;
+        case CONTEXT_PITCHSCREEN:
+            return button_context_pitchscreen;
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:
