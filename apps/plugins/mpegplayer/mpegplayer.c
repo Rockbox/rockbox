@@ -27,6 +27,7 @@
 #include "plugin.h"
 
 #include "mpeg2.h"
+#include "mpeg_settings.h"
 #include "video_out.h"
 
 PLUGIN_HEADER
@@ -41,44 +42,88 @@ extern char iend[];
 
 struct plugin_api* rb;
 
-/* The main buffer storing the compressed video data */
-#define BUFFER_SIZE (MEM-6)*1024*1024
-
 static mpeg2dec_t * mpeg2dec;
 static int total_offset = 0;
 
 /* button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define MPEG_MENU       BUTTON_MODE
 #define MPEG_STOP       BUTTON_OFF
 #define MPEG_PAUSE      BUTTON_ON
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define MPEG_STOP       BUTTON_MENU
-#define MPEG_PAUSE      BUTTON_PLAY
+#define MPEG_MENU       BUTTON_MENU
+#define MPEG_PAUSE      (BUTTON_PLAY | BUTTON_REL)
+#define MPEG_STOP       (BUTTON_PLAY | BUTTON_REPEAT)
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#define MPEG_MENU       (BUTTON_REC | BUTTON_REL)
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
+#define MPEG_MENU       BUTTON_MENU
 #define MPEG_STOP       BUTTON_A
 #define MPEG_PAUSE      BUTTON_SELECT
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define MPEG_MENU       (BUTTON_REW | BUTTON_REL)
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
 
 #else
 #error MPEGPLAYER: Unsupported keypad
 #endif
+
+static int tick_enabled = 0;
+
+#define MPEG_CURRENT_TICK ((unsigned int)((*rb->current_tick - tick_offset)))
+
+/* The value to subtract from current_tick to get the current mpeg tick */
+static int tick_offset;
+
+/* The last tick - i.e. the time to reset the tick_offset to when unpausing */
+static int last_tick;
+
+void start_timer(void)
+{
+    last_tick = 0;
+    tick_offset = *rb->current_tick;
+}
+
+void unpause_timer(void)
+{
+    tick_offset = *rb->current_tick - last_tick;
+}
+
+void pause_timer(void)
+{
+    /* Save the current MPEG tick */
+    last_tick = *rb->current_tick - tick_offset;
+}
+
+
 static bool button_loop(void)
 {
+    bool result;
     int button = rb->button_get(false);
+
     switch (button)
     {
+        case MPEG_MENU:
+            pause_timer(); 
+
+            result = mpeg_menu();
+
+            unpause_timer();
+
+            return result;
+
         case MPEG_STOP:
             return true;
+
         case MPEG_PAUSE:
+            pause_timer(); /* Freeze time */
             button = BUTTON_NONE;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(false);
@@ -91,7 +136,9 @@ static bool button_loop(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
             rb->cpu_boost(true);
 #endif
+            unpause_timer(); /* Resume time */
             break;
+
         default:
             if(rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 return true;
@@ -99,10 +146,59 @@ static bool button_loop(void)
     return false;
 }
 
+/*
+
+NOTES:
+
+MPEG System Clock is 27MHz - i.e. 27000000 ticks/second.
+
+FPS is represented in terms of a frame period - this is always an
+integer number of 27MHz ticks.
+
+e.g. 29.97fps (30000/1001) NTSC video has an exact frame period of
+900900 27MHz ticks.
+
+In libmpeg2, info->sequence->frame_period contains the frame_period.
+
+Working with Rockbox's 100Hz tick, the common frame rates would need
+to be as follows:
+
+FPS     | 27Mhz   | 100Hz
+--------|----------------
+10*     | 2700000 | 10
+12*     | 2250000 |  8.3333
+15*     | 1800000 |  6.6667
+23.9760 | 1126125 |  4.170833333
+24      | 1125000 |  4.166667
+25      | 1080000 |  4
+29.9700 |  900900 |  3.336667
+30      |  900000 |  3.333333
+
+
+*Unofficial framerates
+
+*/
+
+static uint64_t eta;
+
 static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
 {
     const mpeg2_info_t * info;
     mpeg2_state_t state;
+    char str[80];
+    static int skipped = 0;
+    static int frame = 0;
+    static int starttick = 0;
+    static int lasttick;
+    unsigned int eta2;
+    unsigned int x;
+
+    int fps;
+
+    if (starttick == 0) {
+        starttick=*rb->current_tick-1; /* Avoid divby0 */
+        lasttick=starttick;
+    }
 
     mpeg2_buffer (mpeg2dec, current, end);
     total_offset += end - current;
@@ -122,6 +218,7 @@ static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
                      info->sequence->chroma_width,
                      info->sequence->chroma_height);
             mpeg2_skip (mpeg2dec, false);
+
             break;
         case STATE_PICTURE:
             break;
@@ -129,8 +226,44 @@ static bool decode_mpeg2 (uint8_t * current, uint8_t * end)
         case STATE_END:
         case STATE_INVALID_END:
             /* draw current picture */
-            if (info->display_fbuf)
-                vo_draw_frame(info->display_fbuf->buf);
+            if (info->display_fbuf) {
+                /* We start the timer when we draw the first frame */
+                if (!tick_enabled) {
+                    start_timer();
+                    tick_enabled = 1 ;
+                }
+
+                eta += (info->sequence->frame_period);
+                eta2 = eta / (27000000 / HZ);
+
+                if (settings.limitfps) {
+                    if (eta2 > MPEG_CURRENT_TICK) {
+                        rb->sleep(eta2-MPEG_CURRENT_TICK);
+                    }              
+                }
+                x = MPEG_CURRENT_TICK;
+
+                /* If we are more than 1/20 second behind schedule (and 
+                   more than 1/20 second into the decoding), skip frame */
+                if (settings.skipframes && (x > HZ/20) && 
+                   (eta2 < (x - (HZ/20)))) {
+                    skipped++;
+                } else {
+                    vo_draw_frame(info->display_fbuf->buf);
+                }
+
+                /* Calculate fps */
+                frame++;
+                if (settings.showfps && (*rb->current_tick-lasttick>=HZ)) {
+                    fps=(frame*(HZ*10))/x;
+                    rb->snprintf(str,sizeof(str),"%d.%d %d %d %d",
+                                 (fps/10),fps%10,skipped,x,eta2);
+                    rb->lcd_putsxy(0,0,str);
+                    rb->lcd_update_rect(0,0,LCD_WIDTH,8);
+        
+                    lasttick = *rb->current_tick;
+                }
+            }
             break;
         default:
             break;
@@ -147,8 +280,10 @@ static void es_loop (int in_file, uint8_t* buffer, size_t buffer_size)
     if (buffer==NULL)
         return;
 
+    eta = 0;
     do {
         rb->splash(0,true,"Buffering...");
+        save_settings();  /* Save settings (if they have changed) */
         end = buffer + rb->read (in_file, buffer, buffer_size);
         if (decode_mpeg2 (buffer, end))
             break;
@@ -202,6 +337,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         return PLUGIN_ERROR;
     }
 
+    init_settings();
+
     mpeg2dec = mpeg2_init ();
 
     if (mpeg2dec == NULL)
@@ -229,6 +366,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
+
+    save_settings();  /* Save settings (if they have changed) */
 
 #ifdef CONFIG_BACKLIGHT
     /* reset backlight settings */

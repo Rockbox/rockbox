@@ -7,4 +7,5 @@ idct.c
 motion_comp.c
 slice.c
 video_out_rockbox.c
+mpeg_settings.c
 mpegplayer.c

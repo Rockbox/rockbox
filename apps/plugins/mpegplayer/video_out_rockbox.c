@@ -30,9 +30,6 @@ extern struct plugin_api* rb;
 #include "mpeg2.h"
 #include "video_out.h"
 
-static int starttick = 0;
-static int lasttick = 0;
-
 #define CSUB_X 2
 #define CSUB_Y 2
 
@@ -191,10 +188,6 @@ static void yuv_bitmap_part(unsigned char * const src[3],
 
 void vo_draw_frame (uint8_t * const * buf)
 {
-    char str[80];
-    static int frame=0;
-    int ticks,fps;
-
 #ifdef SIMULATOR
     yuv_bitmap_part(buf,0,0,image_width,
                     output_x,output_y,output_width,output_height);
@@ -204,24 +197,6 @@ void vo_draw_frame (uint8_t * const * buf)
                     0,0,image_width,
                     output_x,output_y,output_width,output_height);
 #endif
-
-    if (starttick==0) {
-        starttick=*rb->current_tick-1; /* Avoid divby0 */
-        lasttick=starttick;
-    }
-
-    /* Calculate fps */
-    if (*rb->current_tick-lasttick>=2*HZ) {
-        ticks=(*rb->current_tick)-starttick;
-
-        fps=(frame*1000)/ticks;
-        rb->snprintf(str,sizeof(str),"%d.%d",(fps/10),fps%10);
-        rb->lcd_putsxy(0,0,str);
-        rb->lcd_update_rect(0,0,80,8);
-        
-        lasttick+=2*HZ;
-    }
-    frame++;
 }
 
 void vo_setup(unsigned int width, unsigned int height, 
