@@ -395,7 +395,7 @@ const struct button_mapping button_context_settingsgraphical_h100remote[]  = {
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-}; /* button_context_recscreen_h100remote*/
+}; /* button_context_settingsgraphical_h100remote */
 
 const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_RC_FF,               BUTTON_NONE },
@@ -408,7 +408,7 @@ const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = 
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-}; /* button_context_recscreen_h300lcdremote */
+}; /* button_context_settingsgraphical_h300remote */
 
 const struct button_mapping button_context_yesno_h100remote[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RC_MENU,                   BUTTON_NONE },
@@ -498,7 +498,7 @@ const struct button_mapping button_context_recscreen_h100remote[]  = {
     { ACTION_SETTINGS_DEC,  BUTTON_RC_SOURCE|BUTTON_REPEAT,     BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-};
+}; /* button_context_recscreen_h100remote */
 
 const struct button_mapping button_context_recscreen_h300lcdremote[]  = {
     { ACTION_REC_LCD,             BUTTON_RC_SOURCE,              BUTTON_NONE },
@@ -510,7 +510,7 @@ const struct button_mapping button_context_recscreen_h300lcdremote[]  = {
     { ACTION_SETTINGS_DEC,        BUTTON_RC_REW|BUTTON_REPEAT,   BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-};
+}; /* button_context_recscreen_h300lcdremote */
 
 
 /* the actual used tables */
