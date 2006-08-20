@@ -65,74 +65,8 @@
 #include "ata.h"
 #include "splash.h"
 #include "screen_access.h"
+#include "action.h"
 #ifdef HAVE_RECORDING
-
-
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
-#define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_PLAY
-#define REC_INC BUTTON_RIGHT
-#define REC_DEC BUTTON_LEFT
-#define REC_NEXT BUTTON_DOWN
-#define REC_PREV BUTTON_UP
-#define REC_SETTINGS BUTTON_F1
-#define REC_F2 BUTTON_F2
-#define REC_F3 BUTTON_F3
-
-#elif CONFIG_KEYPAD == ONDIO_PAD /* only limited features */
-#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
-#define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE_PRE BUTTON_MENU
-#define REC_RECPAUSE (BUTTON_MENU | BUTTON_REL)
-#define REC_INC BUTTON_RIGHT
-#define REC_DEC BUTTON_LEFT
-#define REC_NEXT BUTTON_DOWN
-#define REC_PREV BUTTON_UP
-#define REC_SETTINGS (BUTTON_MENU | BUTTON_REPEAT) 
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
-#define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_ON
-#define REC_NEWFILE BUTTON_REC
-#define REC_INC BUTTON_RIGHT
-#define REC_DEC BUTTON_LEFT
-#define REC_NEXT BUTTON_DOWN
-#define REC_PREV BUTTON_UP
-#define REC_SETTINGS BUTTON_MODE
-
-#define REC_RC_SHUTDOWN (BUTTON_RC_STOP | BUTTON_REPEAT)
-#define REC_RC_STOPEXIT BUTTON_RC_STOP
-#define REC_RC_RECPAUSE BUTTON_RC_ON
-#define REC_RC_NEWFILE BUTTON_RC_REC
-#define REC_RC_INC BUTTON_RC_BITRATE
-#define REC_RC_DEC BUTTON_RC_SOURCE
-#define REC_RC_NEXT BUTTON_RC_FF
-#define REC_RC_PREV BUTTON_RC_REW
-#define REC_RC_SETTINGS BUTTON_RC_MODE
-#define BUTTON_RC_DISPLAY BUTTON_RC_VOL_DOWN
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define REC_SHUTDOWN (BUTTON_POWER | BUTTON_REPEAT)
-#define REC_STOPEXIT (BUTTON_PLAY | BUTTON_REPEAT)
-#define REC_RECPAUSE_PRE BUTTON_PLAY
-#define REC_RECPAUSE (BUTTON_PLAY | BUTTON_REL)
-#define REC_INC BUTTON_RIGHT
-#define REC_DEC BUTTON_LEFT
-#define REC_NEXT BUTTON_DOWN
-#define REC_PREV BUTTON_UP
-#define REC_NEWFILE_PRE BUTTON_REC
-#define REC_SETTINGS (BUTTON_REC | BUTTON_REPEAT)
-#define REC_NEWFILE (BUTTON_REC | BUTTON_REL)
-
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#define REC_SHUTDOWN (BUTTON_OFF | BUTTON_REPEAT)
-#define REC_STOPEXIT BUTTON_OFF
-#define REC_RECPAUSE BUTTON_ON
-#define REC_INC BUTTON_RIGHT
-#define REC_DEC BUTTON_LEFT
-#endif
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
@@ -830,8 +764,7 @@ bool recording_screen(void)
 
         switch(button)
         {
-#ifdef BUTTON_RC_DISPLAY
-            case BUTTON_RC_DISPLAY:
+            case ACTION_REC_LCD:
                 if (remote_display_on)
                 {
                     remote_display_on = false;
@@ -849,15 +782,8 @@ bool recording_screen(void)
                     screen_update = NB_SCREENS;
                 }
                 break;
-#endif
-            case REC_STOPEXIT:
-            case REC_SHUTDOWN:
-#ifdef REC_RC_STOPEXIT
-            case REC_RC_STOPEXIT:
-#endif
-#ifdef REC_RC_SHUTDOWN
-            case REC_RC_SHUTDOWN:
-#endif          
+
+            case ACTION_STD_CANCEL:
                 /* turn off the trigger */
                 peak_meter_trigger(false);
                 peak_meter_set_trigger_listener(NULL);
@@ -877,27 +803,8 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
 
-            case REC_RECPAUSE:
-#ifdef REC_RC_RECPAUSE
-            case REC_RC_RECPAUSE:
-#endif
-#ifdef REC_RECPAUSE_PRE
-                if (lastbutton != REC_RECPAUSE_PRE)
-                    break;
-#endif
-#ifdef REC_NEWFILE            
-            case REC_NEWFILE:
-#endif
-#ifdef REC_RC_NEWFILE
-            case REC_RC_NEWFILE:
-#endif
-#ifdef REC_NEWFILE_PRE
-                if (button == REC_NEWFILE){
-                    if (lastbutton != REC_NEWFILE_PRE) 
-                        break;
-                }
-#endif
-
+            case ACTION_REC_PAUSE:
+            case ACTION_REC_NEWFILE:
                 /* Only act if the mpeg is stopped */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
                 {
@@ -928,19 +835,13 @@ bool recording_screen(void)
                 }
                 else
                 {
-#ifdef REC_NEWFILE
                     /*if new file button pressed, start new file */
-                    if ((button == REC_NEWFILE)
-#ifdef REC_RC_NEWFILE
-                          || (button == REC_RC_NEWFILE)
-#endif
-                                )
+                    if (button == ACTION_REC_NEWFILE)
                     {
                         audio_new_file(rec_create_filename(path_buffer));
                         last_seconds = 0;
                     }
                     else
-#endif
                     /* if pause button pressed, pause or resume */
                     {
                         if(audio_stat & AUDIO_STATUS_PAUSE)
@@ -960,34 +861,19 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
 
-#ifdef REC_PREV
-            case REC_PREV:
-#ifdef REC_RC_PREV
-            case REC_RC_PREV:
-#endif
+            case ACTION_STD_PREV:
                 cursor--;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
-#endif
 
-#ifdef REC_NEXT
-            case REC_NEXT:
-#ifdef REC_RC_NEXT
-            case REC_RC_NEXT:
-#endif
+            case ACTION_STD_NEXT:
                 cursor++;
                 adjust_cursor();
                 update_countdown = 1; /* Update immediately */
                 break;
-#endif
        
-            case REC_INC:
-            case REC_INC | BUTTON_REPEAT:
-#ifdef REC_RC_INC
-            case REC_RC_INC:
-            case REC_RC_INC | BUTTON_REPEAT:
-#endif
+            case ACTION_SETTINGS_INC:
                 switch(cursor)
                 {
                     case 0:
@@ -1055,12 +941,7 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
                 
-            case REC_DEC:
-            case REC_DEC | BUTTON_REPEAT:
-#ifdef REC_RC_DEC
-            case REC_RC_DEC:
-            case REC_RC_DEC | BUTTON_REPEAT:
-#endif
+            case ACTION_SETTINGS_DEC:
                 switch(cursor)
                 {
                     case 0:
@@ -1128,11 +1009,7 @@ bool recording_screen(void)
                 update_countdown = 1; /* Update immediately */
                 break;
                 
-#ifdef REC_SETTINGS
-            case REC_SETTINGS:
-#ifdef REC_RC_SETTINGS
-            case REC_RC_SETTINGS:
-#endif
+            case ACTION_STD_MENU:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
 #if CONFIG_LED == LED_REAL
@@ -1178,10 +1055,8 @@ bool recording_screen(void)
                     }
                 }
                 break;
-#endif
-
-#ifdef REC_F2
-            case REC_F2:
+#if CONFIG_KEYPAD == RECORDER_PAD
+            case ACTION_REC_F2:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
 #if CONFIG_LED == LED_REAL
@@ -1197,10 +1072,8 @@ bool recording_screen(void)
                         update_countdown = 1; /* Update immediately */
                 }
                 break;
-#endif
 
-#ifdef REC_F3
-            case REC_F3:
+            case ACTION_REC_F3:
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
                     audio_new_file(rec_create_filename(path_buffer));
@@ -1653,8 +1526,7 @@ bool recording_screen(void)
 
         while(1)
         {
-            button = button_get(true);
-            if(button == (REC_STOPEXIT | BUTTON_REL))
+             if (action_userabort(TIMEOUT_NOBLOCK))
                 break;
         }
     }
@@ -1690,7 +1562,7 @@ bool recording_screen(void)
     return been_in_usb_mode;
 }
 
-#ifdef REC_F2
+#if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_rec_screen(void)
 {
     bool exit = false;
@@ -1826,9 +1698,7 @@ bool f2_rec_screen(void)
 
     return false;
 }
-#endif /* #ifdef REC_F2 */
 
-#ifdef REC_F3
 bool f3_rec_screen(void)
 {
     bool exit = false;
@@ -1931,7 +1801,7 @@ bool f3_rec_screen(void)
 
     return false;
 }
-#endif /* #ifdef REC_F3 */
+#endif /* #ifdef RECORDER_PAD */
 
 #if CONFIG_CODEC == SWCODEC
 void audio_beep(int duration)

@@ -143,6 +143,18 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_pitchcreen */
 
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
+    { ACTION_REC_F2,                BUTTON_F2,                  BUTTON_NONE },
+    { ACTION_REC_F3,                BUTTON_F3,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_recscreen */
+
 /*****************************************************************************
  *    Remote control mappings
  *****************************************************************************/
@@ -211,6 +223,9 @@ const struct button_mapping* get_context_mapping( int context )
 
         case CONTEXT_QUICKSCREEN:
             return button_context_quickscreen;
+
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
 
         case CONTEXT_STD:
         case CONTEXT_LIST:

@@ -37,6 +37,7 @@
 #ifdef CONFIG_BACKLIGHT
 #include "backlight.h"
 #endif
+#include "action.h"
 
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_playback.h"
@@ -1222,7 +1223,7 @@ int peak_meter_draw_get_btn(int x, int y[], int height, int nb_screens)
     bool dopeek = true;
 
     while (TIME_BEFORE(current_tick, next_big_refresh)) {
-        button = button_get(false);
+        button = get_action(CONTEXT_RECSCREEN, TIMEOUT_NOBLOCK);
         if (button != BUTTON_NONE) {
             break;
         }

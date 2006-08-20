@@ -53,6 +53,7 @@ enum {
     CONTEXT_BOOKMARKSCREEN, /*NOTE: requires the action_setting_* mappings also */
     CONTEXT_QUICKSCREEN, /* uses ACTION_QS_ defines below */
     CONTEXT_PITCHSCREEN, /* uses ACTION_PS_ defines below */
+    CONTEXT_RECSCREEN,
 };
 
 
@@ -111,6 +112,11 @@ enum {
     ACTION_TREE_WPS,
     
     /* recording screen */
+    ACTION_REC_LCD,
+    ACTION_REC_PAUSE,
+    ACTION_REC_NEWFILE,
+    ACTION_REC_F2,
+    ACTION_REC_F3,
     
     /* main menu */
     

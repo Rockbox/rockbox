@@ -202,6 +202,19 @@ const struct button_mapping remote_button_context_wps[]  = {
     LAST_ITEM_IN_LIST
 };
 
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,             BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
+    { ACTION_STD_CANCEL,            BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
+    { ACTION_REC_NEWFILE,           BUTTON_REC|BUTTON_REL,      BUTTON_REC },
+    { ACTION_STD_MENU,              BUTTON_REC|BUTTON_REPEAT,   BUTTON_REC },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_recscreen */
+
 
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
@@ -252,6 +265,8 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:

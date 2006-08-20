@@ -197,6 +197,17 @@ const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_pitchcreen */
 
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,             BUTTON_ON,                  BUTTON_NONE },
+    { ACTION_REC_NEWFILE,           BUTTON_REC,                 BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+}; /* button_context_recscreen */
+
 /*****************************************************************************
  *    Remote control mappings 
  *****************************************************************************/
@@ -384,7 +395,7 @@ const struct button_mapping button_context_settingsgraphical_h100remote[]  = {
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-};
+}; /* button_context_recscreen_h100remote*/
 
 const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_RC_FF,               BUTTON_NONE },
@@ -397,7 +408,7 @@ const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = 
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-};
+}; /* button_context_recscreen_h300lcdremote */
 
 const struct button_mapping button_context_yesno_h100remote[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RC_MENU,                   BUTTON_NONE },
@@ -477,6 +488,29 @@ const struct button_mapping button_context_pitchscreen_h300lcdremote[]  = {
     LAST_ITEM_IN_LIST
 };
 
+const struct button_mapping button_context_recscreen_h100remote[]  = {
+    { ACTION_REC_LCD,             BUTTON_RC_VOL_DOWN,                 BUTTON_NONE },
+    { ACTION_REC_PAUSE,           BUTTON_RC_ON,                       BUTTON_NONE },
+    { ACTION_REC_NEWFILE,         BUTTON_RC_REC,                      BUTTON_NONE },
+    { ACTION_SETTINGS_INC,        BUTTON_RC_BITRATE,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INC,  BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,        BUTTON_RC_SOURCE,                   BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,  BUTTON_RC_SOURCE|BUTTON_REPEAT,     BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+};
+
+const struct button_mapping button_context_recscreen_h300lcdremote[]  = {
+    { ACTION_REC_LCD,             BUTTON_RC_SOURCE,              BUTTON_NONE },
+    { ACTION_REC_PAUSE,           BUTTON_RC_ON,                  BUTTON_NONE },
+    { ACTION_REC_NEWFILE,         BUTTON_RC_REC,                 BUTTON_NONE },
+    { ACTION_SETTINGS_INC,        BUTTON_RC_FF,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INC,        BUTTON_RC_FF|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,        BUTTON_RC_REW,                 BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,        BUTTON_RC_REW|BUTTON_REPEAT,   BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST
+};
 
 
 /* the actual used tables */
@@ -497,7 +531,9 @@ static const struct button_mapping
         *remote_btn_ctxt_quickscreen
             = button_context_quickscreen_h100remote,
         *remote_btn_ctxt_pitchscreen
-            = button_context_pitchscreen_h100remote;
+            = button_context_pitchscreen_h100remote,
+        *remote_button_ctxt_recscreen
+            = button_context_recscreen_h100remote;
 
 static int _remote_type = 0;
 
@@ -519,6 +555,7 @@ static void remap_remote(void)
             remote_btn_ctxt_bmark = NULL;
             remote_btn_ctxt_quickscreen = NULL;
             remote_btn_ctxt_pitchscreen = NULL;
+            remote_button_ctxt_recscreen = NULL;
             break;
 
         case REMOTETYPE_H100_LCD:
@@ -538,7 +575,9 @@ static void remap_remote(void)
             remote_btn_ctxt_quickscreen
                 = button_context_quickscreen_h100remote,
             remote_btn_ctxt_pitchscreen
-                = button_context_pitchscreen_h100remote;
+                = button_context_pitchscreen_h100remote,
+            remote_button_ctxt_recscreen 
+                = button_context_recscreen_h100remote;
             break;
 
         case REMOTETYPE_H300_LCD:
@@ -558,7 +597,9 @@ static void remap_remote(void)
             remote_btn_ctxt_quickscreen
                 = button_context_quickscreen_h300lcdremote,
             remote_btn_ctxt_pitchscreen
-                = button_context_pitchscreen_h300lcdremote;
+                = button_context_pitchscreen_h300lcdremote,
+            remote_button_ctxt_recscreen
+                = button_context_recscreen_h300lcdremote;
             break;
 
         case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */        
@@ -578,7 +619,9 @@ static void remap_remote(void)
             remote_btn_ctxt_quickscreen
                 = button_context_quickscreen_h300lcdremote,
             remote_btn_ctxt_pitchscreen
-                = button_context_pitchscreen_h300lcdremote;
+                = button_context_pitchscreen_h300lcdremote,
+            remote_button_ctxt_recscreen
+                = button_context_recscreen_h300lcdremote;
 #if 0 
             remote_btn_ctxt_std = 
             remote_btn_ctxt_wps = 
@@ -592,6 +635,7 @@ static void remap_remote(void)
             remote_btn_ctxt_bmark = 
             remote_btn_ctxt_quickscreen = 
             remote_btn_ctxt_pitchscreen = 
+            remote_button_ctxt_recscreen = 
 #endif
             break;
 
@@ -641,6 +685,8 @@ const struct button_mapping* get_context_mapping_remote(int context)
             return remote_btn_ctxt_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return remote_btn_ctxt_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return remote_button_ctxt_recscreen;
     } 
     return remote_btn_ctxt_std; 
 }
@@ -683,6 +729,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
     } 
     return button_context_standard;
 }
