@@ -100,7 +100,8 @@ const struct button_mapping button_context_list[]  = {
 }; /* button_context_list */
 
 const struct button_mapping button_context_tree[]  = {
-    { ACTION_TREE_WPS,    BUTTON_ON|BUTTON_REL,         BUTTON_ON },   
+    { ACTION_TREE_WPS,    BUTTON_ON|BUTTON_REL,         BUTTON_ON },
+    { ACTION_TREE_STOP,   BUTTON_OFF,                   BUTTON_NONE },
     { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REL,        BUTTON_OFF },
     { ACTION_TREE_STOP,   BUTTON_OFF|BUTTON_REPEAT,     BUTTON_NONE },
 
@@ -287,61 +288,63 @@ const struct button_mapping *button_context_list_h300lcdremote =
 
 
 const struct button_mapping button_context_tree_h100remote[]  = {
-    { ACTION_TREE_WPS,    BUTTON_RC_ON|BUTTON_REL,          BUTTON_RC_ON },   
-    { ACTION_TREE_STOP,   BUTTON_RC_STOP|BUTTON_REL,        BUTTON_RC_STOP },
-    { ACTION_TREE_STOP,   BUTTON_RC_STOP|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_TREE_WPS,    BUTTON_RC_ON,                     BUTTON_NONE },   
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
 }; /* button_context_tree_h100remote */
 
-const struct button_mapping *button_context_tree_h300lcdremote = 
-                button_context_tree_h100remote;
+const struct button_mapping button_context_tree_h300lcdremote[] = {
+    { ACTION_TREE_STOP,     BUTTON_RC_STOP,                 BUTTON_NONE },
+    { ACTION_TREE_WPS,      BUTTON_RC_ON,                   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST|CONTEXT_REMOTE)
+};  /* button_context_tree_h300lcdremote */
+               
 
 const struct button_mapping button_context_listtree_scroll_w_cmb_h100remote[]  = {
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW,             BUTTON_RC_ON },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,               BUTTON_RC_ON|BUTTON_RC_REW },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW,             BUTTON_RC_REW|BUTTON_REL },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF,              BUTTON_RC_ON },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REL,                BUTTON_RC_ON|BUTTON_RC_FF },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF,              BUTTON_RC_FF|BUTTON_REL },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW,               BUTTON_RC_ON },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,                 BUTTON_RC_ON|BUTTON_RC_REW },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW,               BUTTON_RC_REW|BUTTON_REL },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_ON|BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN,                       BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF,                BUTTON_RC_ON },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REL,                  BUTTON_RC_ON|BUTTON_RC_FF },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF,                BUTTON_RC_FF|BUTTON_REL },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_ON|BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP,                         BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE }, 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
 const struct button_mapping button_context_listtree_scroll_w_cmb_h300lcdremote[]  = {
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,        BUTTON_RC_MENU },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_SOURCE|BUTTON_REL,            BUTTON_RC_MENU|BUTTON_RC_SOURCE },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,        BUTTON_RC_SOURCE|BUTTON_REL },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE,       BUTTON_RC_MENU },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_BITRATE|BUTTON_REL,           BUTTON_RC_MENU|BUTTON_RC_BITRATE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE,       BUTTON_RC_BITRATE|BUTTON_REL },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,                BUTTON_RC_MENU },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_SOURCE|BUTTON_REL,                    BUTTON_RC_MENU|BUTTON_RC_SOURCE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,                BUTTON_RC_SOURCE|BUTTON_REL },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE,               BUTTON_RC_MENU },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_BITRATE|BUTTON_REL,                   BUTTON_RC_MENU|BUTTON_RC_BITRATE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE,               BUTTON_RC_BITRATE|BUTTON_REL },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
 const struct button_mapping button_context_listtree_scroll_wo_cmb_h100remote[]  = {
-    { ACTION_NONE,              BUTTON_RC_REW,              BUTTON_NONE },
-    { ACTION_STD_CANCEL,        BUTTON_RC_REW|BUTTON_REL,   BUTTON_RC_REW },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,   BUTTON_RC_REW|BUTTON_REPEAT },
-    { ACTION_NONE,              BUTTON_RC_FF,               BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RC_FF|BUTTON_REL,    BUTTON_RC_FF },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REL,    BUTTON_RC_FF|BUTTON_REPEAT },    
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
 const struct button_mapping button_context_listtree_scroll_wo_cmb_h300lcdremote[]  = {
-    { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
-    { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
-    { ACTION_NONE,              BUTTON_RIGHT,               BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },    
+    { ACTION_NONE,              BUTTON_RC_REW,               BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW|BUTTON_REPEAT },
+    { ACTION_NONE,              BUTTON_RC_FF,                BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_RC_FF|BUTTON_REL,     BUTTON_RC_FF },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REL,     BUTTON_RC_FF|BUTTON_REPEAT },    
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE|CONTEXT_REMOTE),
 };
 
@@ -371,14 +374,14 @@ const struct button_mapping button_context_settings_h300lcdremote[]  = {
  
 
 const struct button_mapping button_context_settingsgraphical_h100remote[]  = {
-    { ACTION_SETTINGS_INC,          BUTTON_RC_VOL_UP,           BUTTON_NONE },
-    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_DEC,          BUTTON_RC_VOL_DOWN,         BUTTON_NONE },
-    { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_PREV,              BUTTON_RC_REW,              BUTTON_NONE },
-    { ACTION_STD_PREVREPEAT,        BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_NEXT,              BUTTON_RC_FF,               BUTTON_NONE },
-    { ACTION_STD_NEXTREPEAT,        BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_SETTINGS_INC,          BUTTON_RC_FF,                  BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT,    BUTTON_RC_FF|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,          BUTTON_RC_REW,                 BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT,    BUTTON_RC_REW|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_PREV,              BUTTON_RC_SOURCE,              BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,        BUTTON_RC_SOURCE|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_STD_NEXT,              BUTTON_RC_BITRATE,             BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,        BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 };
@@ -397,15 +400,12 @@ const struct button_mapping button_context_settingsgraphical_h300lcdremote[]  = 
 };
 
 const struct button_mapping button_context_yesno_h100remote[]  = {
-    { ACTION_YESNO_ACCEPT,          BUTTON_RC_ON,                   BUTTON_NONE },
-    LAST_ITEM_IN_LIST
-}; /* button_context_settings_yesno */
-
-const struct button_mapping button_context_yesno_h300lcdremote[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RC_MENU,                   BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
+const struct button_mapping *button_context_yesno_h300lcdremote =
+                button_context_yesno_h100remote;
 
 const struct button_mapping button_context_bmark_h100remote[]  = {
     { ACTION_BMARK_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
@@ -424,10 +424,10 @@ const struct button_mapping button_context_quickscreen_h100remote[]  = {
     { ACTION_QS_DOWNINV,    BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_FF,                   BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_QS_LEFT,       BUTTON_RC_VOL_DOWN,             BUTTON_NONE },
-    { ACTION_QS_LEFT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_QS_RIGHT,      BUTTON_RC_VOL_UP,               BUTTON_NONE },
-    { ACTION_QS_RIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_RC_SOURCE,               BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_RC_SOURCE|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE,              BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_MODE,                    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
@@ -452,10 +452,10 @@ const struct button_mapping button_context_pitchscreen_h100remote[]  = {
     { ACTION_PS_INC_BIG,        BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_RC_FF,               BUTTON_NONE },
     { ACTION_PS_DEC_BIG,        BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFT,     BUTTON_RC_VOL_DOWN,         BUTTON_NONE },
-    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_VOL_DOWN|BUTTON_REL,     BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_VOL_UP,           BUTTON_NONE },
-    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_VOL_UP|BUTTON_REL,BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_RC_SOURCE,           BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_SOURCE|BUTTON_REL,BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_BITRATE,          BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_BITRATE|BUTTON_REL, BUTTON_NONE },
     { ACTION_PS_RESET,          BUTTON_RC_ON,               BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,             BUTTON_NONE },
     
