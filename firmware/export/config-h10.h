@@ -1,5 +1,5 @@
 /*
- * This config file is for the iriver H10
+ * This config file is for the iriver H10 20Gb
  */
 
 #define TARGET_TREE /* this target is using the target tree system */
@@ -96,8 +96,8 @@
 /* TODO: this is probably wrong */
 #define CPU_FREQ      11289600
 
-/* Type of LCD TODO: hopefully the same as the x5 but check this*/
-#define CONFIG_LCD LCD_X5
+/* Type of LCD */
+#define CONFIG_LCD LCD_H10
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

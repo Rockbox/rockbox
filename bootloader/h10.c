@@ -115,15 +115,19 @@ void main(void)
     );
     */
 
-    int i;
+    /*int i;
     int rc;
     int btn;
-    int fd;
+    int fd;*/
     char buffer[24];
+    
+    snprintf(buffer, 24, "Hello World");
+    lcd_puts(0, 0, buffer);
+    lcd_update();
 
-    i=ata_init();
+    /*i=ata_init();
     disk_init();
-    rc = disk_mount_all();
+    rc = disk_mount_all();*/
 
     /* Load original iriver firmware. Uses load_iriver(buf) to load the
        decrypted mi4 file from disk to DRAM. This then copies that part of DRAM
@@ -139,7 +143,7 @@ void main(void)
     
     
     /* This assumes that /test.txt exists */
-    fd=open("/test.txt",O_RDWR);
+    /*fd=open("/test.txt",O_RDWR);*/
     
     
     /*
@@ -223,16 +227,16 @@ void main(void)
     
     
     /* Apparently necessary for the data to be actually written to file */
-    fsync(fd);
-    udelay(1000000);
+    /*fsync(fd);
+    udelay(1000000);*/
     
     /* This causes the device to shut off instantly
     
     GPIOF_OUTPUT_VAL = 0;
     */
     
-    close(fd);
-    udelay(1000000);
+    /*close(fd);*/
+    udelay(100000000);
 }
 
 /* These functions are present in the firmware library, but we reimplement
