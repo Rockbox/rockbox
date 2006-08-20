@@ -409,7 +409,6 @@ bool bookmark_autoload(const char* file)
     int  key;
     int  fd;
     int i;
-    bool done = false;
 
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
         return false;
@@ -455,26 +454,21 @@ bool bookmark_autoload(const char* file)
 #endif
         }
 
-        while(!done)
+        /* Wait for a key to be pushed */
+        key = get_action(CONTEXT_BOOKMARKSCREEN,TIMEOUT_BLOCK);
+        switch(key)
         {
-            /* Wait for a key to be pushed */
-            key = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
-            switch(key)
-            {
 #ifdef HAVE_LCD_BITMAP
-                case ACTION_STD_NEXT:
-                    return bookmark_load(global_bookmark_file_name, false);
+            case ACTION_STD_NEXT:
+                return bookmark_load(global_bookmark_file_name, false);
 #endif
-                case ACTION_STD_OK:
-                    return bookmark_load(global_bookmark_file_name, true);
+            case ACTION_STD_OK:
+                return bookmark_load(global_bookmark_file_name, true);
 
-                default:
-                    /* Handle sys events, ignore button releases & repeats */
-                    if (default_event_handler(key))
-                        done = true;
-                    break;
-            }
+            default:
+                break;
         }
+
         action_signalscreenchange();
         return false;
     }
