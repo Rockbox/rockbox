@@ -102,4 +102,6 @@ $tool encrypt $output.raw $output.encrypt $tea
 if test -n "$sign"; then
   #echo "$tool sign $output.encrypt $output"
   $tool sign $output.encrypt $output
+else
+  mv $output.encrypt $output
 fi
