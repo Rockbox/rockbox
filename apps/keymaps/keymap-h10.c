@@ -80,7 +80,7 @@ const struct button_mapping button_context_settings[] = {
     { ACTION_STD_PREV,          BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_POWER,                     BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings */
 
 const struct button_mapping button_context_tree[]  = {
@@ -88,7 +88,7 @@ const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
     { ACTION_TREE_STOP,   BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_tree */
 
 const struct button_mapping button_context_tree_scroll_lr[]  = {
@@ -105,7 +105,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RIGHT,              BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_quickscreen[]  = {
@@ -119,7 +119,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,   BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
     { ACTION_STD_CANCEL, BUTTON_POWER,                     BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_quickscreen */
 
 const struct button_mapping button_context_settings_r_is_inc[]  = {
@@ -134,7 +134,7 @@ const struct button_mapping button_context_settings_r_is_inc[]  = {
     { ACTION_STD_OK,             BUTTON_PLAY,                     BUTTON_NONE },
     { ACTION_STD_CANCEL,         BUTTON_POWER,                    BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_r_is_inc */
 
 const struct button_mapping button_context_pitchscreen[]  = {
@@ -149,7 +149,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_RESET,          BUTTON_PLAY,                      BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_POWER,                     BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
 
@@ -159,7 +159,7 @@ const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
     {
-        case CONTEXT_STD:
+            case CONTEXT_STD:
             return button_context_standard;
             
         case CONTEXT_WPS:

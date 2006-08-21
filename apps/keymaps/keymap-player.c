@@ -69,19 +69,19 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_DEC,          BUTTON_RIGHT,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
 static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,      BUTTON_ON,     BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_listtree */
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,  BUTTON_PLAY,   BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
 /*****************************************************************************
@@ -94,7 +94,7 @@ static const struct button_mapping remote_button_context_standard[]  = {
     { ACTION_STD_CANCEL,    BUTTON_RC_STOP,     BUTTON_NONE },
     { ACTION_STD_OK,        BUTTON_RC_PLAY,     BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
 static const struct button_mapping remote_button_context_wps[]  = {
@@ -106,7 +106,7 @@ static const struct button_mapping remote_button_context_wps[]  = {
     { ACTION_WPS_VOLDOWN,   BUTTON_RC_VOL_DOWN, BUTTON_NONE },
     { ACTION_WPS_VOLUP,     BUTTON_RC_VOL_UP,   BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
 
 

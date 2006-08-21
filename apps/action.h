@@ -21,13 +21,15 @@
 #include "stdbool.h"
 #include "button.h"
 
-#define LAST_ITEM_IN_LIST { ACTION_NONE, BUTTON_NONE, BUTTON_NONE }
-#define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
-
 #define TIMEOUT_BLOCK   -1
 #define TIMEOUT_NOBLOCK  0
+
+#define CONTEXT_STOPSEARCHING 0xFFFFFFFF
 #define CONTEXT_REMOTE 0x80000000 /* | this against another context to get remote buttons for that context */
 #define CONTEXT_CUSTOM 0x40000000 /* | this against anything to get your context number */
+
+#define LAST_ITEM_IN_LIST { CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE }
+#define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
 #ifndef HAS_BUTTON_HOLD
 #define ALLOW_SOFTLOCK 0x20000000 /* will be stripped.. never needed except in calls to get_action() */

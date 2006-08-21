@@ -79,7 +79,7 @@ const struct button_mapping button_context_settings[]  = {
     { ACTION_NONE,                  BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_NONE,                  BUTTON_RIGHT,                   BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
 const struct button_mapping button_context_settings_r_is_inc[]  = {
@@ -92,12 +92,12 @@ const struct button_mapping button_context_settings_r_is_inc[]  = {
     { ACTION_STD_NEXT,              BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,                  BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_bmark[]  = {
@@ -116,7 +116,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,      BUTTON_RIGHT,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
 const struct button_mapping button_context_pitchscreen[]  = {
@@ -131,7 +131,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_RESET,          BUTTON_MODE,                BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_PLAY,                BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */

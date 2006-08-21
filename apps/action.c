@@ -161,11 +161,8 @@ int get_action_worker(int context, int timeout,
         
         ret = do_button_check(items,button,last_button,&i);
         
-        if ((context == CONTEXT_STD)
-#if (BUTTON_REMOTE != 0)
-             || ((unsigned)context == (CONTEXT_STD|CONTEXT_REMOTE))
-#endif
-           ) break;
+        if (context == CONTEXT_STOPSEARCHING)
+            break;
         
         if (ret == ACTION_UNKNOWN )
         {

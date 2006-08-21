@@ -57,7 +57,7 @@ const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,          BUTTON_PLAY|BUTTON_REL,      BUTTON_PLAY },
     { ACTION_TREE_STOP,         BUTTON_PLAY|BUTTON_REPEAT,   BUTTON_PLAY },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_tree */
 
 const struct button_mapping button_context_tree_scroll_lr[]  = {
@@ -90,7 +90,7 @@ const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_MENU },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST,
 }; /* button_context_wps */
 
 const struct button_mapping button_context_settings[]  = {
@@ -105,12 +105,12 @@ const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_OK,                BUTTON_SELECT|BUTTON_REL,    BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_MENU|BUTTON_REL,      BUTTON_MENU }, 
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_PLAY,                  BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_bmark[]  = {
@@ -127,7 +127,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_MENU,                    BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
 const struct button_mapping button_context_pitchscreen[]  = {
@@ -142,7 +142,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_RESET,          BUTTON_MENU,                BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_SELECT,              BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
