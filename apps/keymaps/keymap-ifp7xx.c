@@ -82,7 +82,7 @@ const struct button_mapping button_context_settings[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_settings */
 
-const struct button_mapping button_context_settingsgraphical[]  = {
+const struct button_mapping button_context_settings_r_is_inc[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
@@ -101,9 +101,9 @@ const struct button_mapping button_context_yesno[]  = {
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMARK_DELETE,      BUTTON_MODE,     BUTTON_NONE },
+    { ACTION_BMS_DELETE,      BUTTON_MODE,     BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_SELECT,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGSGRAPHICAL),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
 const struct button_mapping button_context_quickscreen[]  = {
@@ -143,8 +143,11 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_standard;
         case CONTEXT_WPS:
             return button_context_wps;
-        case CONTEXT_SETTINGSGRAPHICAL:
-            return button_context_settingsgraphical;
+        case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+        case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_COLOURCHOOSER:
+        case CONTEXT_SETTINGS_TIME:
+            return button_context_settings_r_is_inc;
         case CONTEXT_SETTINGS:
             return button_context_settings;
         case CONTEXT_YESNOSCREEN:

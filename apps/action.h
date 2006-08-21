@@ -46,13 +46,25 @@ enum {
     CONTEXT_ID3DB = 5,
     /* Add new contexts here, no need to explicitly define a value for them */    
     CONTEXT_LIST,
-    CONTEXT_SETTINGS, /* options style settings, like from menus */
-    CONTEXT_SETTINGSGRAPHICAL, /* screens like eq config and colour chooser */
+    CONTEXT_SETTINGS, /* regular setting screens (and debug screens) */
+    /* bellow are setting screens which may need to redefine the standard 
+       setting screen keys, targets should return the CONTEXT_SETTINGS
+       keymap unless they are not adequate for the screen
+    NOTE: uses ACTION_STD_[NEXT|PREV] so make sure they are there also   
+          and (possibly) ACTION_SETTINGS_[INC|DEC] */
+    CONTEXT_SETTINGS_EQ,            
+    CONTEXT_SETTINGS_COLOURCHOOSER, 
+    CONTEXT_SETTINGS_TIME,          
     
-    CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
-    CONTEXT_BOOKMARKSCREEN, /*NOTE: requires the action_setting_* mappings also */
+    /* The following contexts should use ACTION_STD_[NEXT|PREV]
+        and (possibly) ACTION_SETTINGS_[INC|DEC] 
+       Also add any extra actions they need                        */
+    CONTEXT_BOOKMARKSCREEN, /* uses ACTION_BMS_ defines */
+    CONTEXT_ALARMSCREEN, /* uses ACTION_AS_ defines */   
     CONTEXT_QUICKSCREEN, /* uses ACTION_QS_ defines below */
     CONTEXT_PITCHSCREEN, /* uses ACTION_PS_ defines below */
+    
+    CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
     CONTEXT_RECSCREEN,
 };
 
@@ -127,15 +139,19 @@ enum {
     /* settings */
     ACTION_SETTINGS_INC,
     ACTION_SETTINGS_INCREPEAT,
+    ACTION_SETTINGS_INCBIGSTEP,
     ACTION_SETTINGS_DEC,
     ACTION_SETTINGS_DECREPEAT,
-    
-    /* yesno screen */
-    ACTION_YESNO_ACCEPT,
+    ACTION_SETTINGS_DECBIGSTEP,
+    ACTION_SETTINGS_RESET,
     
     /* bookmark screen */
-    ACTION_BMARK_DELETE,
+    ACTION_BMS_SELECT,
+    ACTION_BMS_DELETE,
+    ACTION_BMS_EXIT,
     
+    /* alarm menu screen */    
+        
     /* quickscreen */
     ACTION_QS_LEFT,
     ACTION_QS_RIGHT,
@@ -154,6 +170,9 @@ enum {
     ACTION_PS_NUDGE_RIGHTOFF,
     ACTION_PS_RESET,
     ACTION_PS_EXIT, /* _STD_* isnt going to work here */
+    
+    /* yesno screen */
+    ACTION_YESNO_ACCEPT,
     
     
 };

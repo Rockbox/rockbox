@@ -619,7 +619,7 @@ bool eq_menu_graphical(void)
             screens[i].update();
         }
         
-        button = get_action(CONTEXT_SETTINGSGRAPHICAL,TIMEOUT_BLOCK);
+        button = get_action(CONTEXT_SETTINGS_EQ,TIMEOUT_BLOCK);
 
         switch (button) {
         case ACTION_SETTINGS_DEC:
@@ -638,23 +638,19 @@ bool eq_menu_graphical(void)
                 *(setting) = max;
             break;
 
-#ifdef EQ_BTN_MODIFIER
-        case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT:
-        case EQ_BTN_MODIFIER | EQ_BTN_INCREMENT | BUTTON_REPEAT:
+        case ACTION_SETTINGS_INCBIGSTEP:
             *(setting) += fast_step;
             has_changed = true;
             if (*(setting) > max)
                 *(setting) = max;
             break;
 
-        case EQ_BTN_MODIFIER | EQ_BTN_DECREMENT:
-        case EQ_BTN_MODIFIER | EQ_BTN_DECREMENT | BUTTON_REPEAT:
+        case ACTION_SETTINGS_DECBIGSTEP:
             *(setting) -= fast_step;
             has_changed = true;
             if (*(setting) < min)
                 *(setting) = min;
             break;
-#endif
 
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
@@ -670,13 +666,13 @@ bool eq_menu_graphical(void)
                 current_band = 0; /* wrap around */
             break;
 
-            case ACTION_STD_OK:
+        case ACTION_STD_OK:
             mode++;
             if (mode > Q)
                 mode = GAIN; /* wrap around */
             break;
 
-            case ACTION_STD_CANCEL:
+        case ACTION_STD_CANCEL:
             exit_request = true;
             result = false;
             break;

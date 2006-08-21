@@ -32,7 +32,7 @@
  
 /* CONTEXT_CUSTOM's used in this file...
 
-CONTEXT_CUSTOM|1 = the standard list/tree defines (without directions)
+CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
 
 
 */
@@ -45,11 +45,11 @@ const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                        BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RIGHT,                       BUTTON_NONE },
 
-    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
+    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,           BUTTON_NONE },
     { ACTION_STD_MENU,          BUTTON_MENU|BUTTON_REL,             BUTTON_MENU },
     { ACTION_STD_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,          BUTTON_MENU },
-    { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT },
-    { ACTION_STD_CANCEL,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY },
+    { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_CANCEL,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -69,7 +69,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },    
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 
 const struct button_mapping button_context_wps[]  = {
@@ -102,7 +102,8 @@ const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_RIGHT,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_STD_CANCEL,            BUTTON_MENU|BUTTON_REL,      BUTTON_MENU }, /* rel so bmark screen works */
+    { ACTION_STD_OK,                BUTTON_SELECT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_MENU|BUTTON_REL,      BUTTON_MENU }, 
     
     LAST_ITEM_IN_LIST
 }; /* button_context_settings */
@@ -113,7 +114,7 @@ const struct button_mapping button_context_yesno[]  = {
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMARK_DELETE,          BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
+    { ACTION_BMS_DELETE,          BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
@@ -157,15 +158,17 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
-            /* else fall through to CUSTOM|1 */
-        case CONTEXT_CUSTOM|1:
+            /* else fall through to CUSTOM|CONTEXT_TREE */
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
             
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
             break;
+        case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_COLOURCHOOSER:
+        case CONTEXT_SETTINGS_TIME:
         case CONTEXT_SETTINGS:
-        case CONTEXT_SETTINGSGRAPHICAL:
             return button_context_settings;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesno;

@@ -100,7 +100,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_STD_OK,            BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },    
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_tree_scroll_lr */
 
 const struct button_mapping button_context_yesno[]  = {
@@ -122,7 +122,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_quickscreen */
 
-const struct button_mapping button_context_settingsgraphical[]  = {
+const struct button_mapping button_context_settings_r_is_inc[]  = {
     { ACTION_SETTINGS_INC,       BUTTON_RIGHT,                    BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_SETTINGS_DEC,       BUTTON_LEFT,                     BUTTON_NONE },
@@ -135,7 +135,7 @@ const struct button_mapping button_context_settingsgraphical[]  = {
     { ACTION_STD_CANCEL,         BUTTON_POWER,                    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
-}; /* button_context_settingsgraphical */
+}; /* button_context_settings_r_is_inc */
 
 const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
@@ -165,8 +165,11 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_WPS:
             return button_context_wps;
 
-        case CONTEXT_SETTINGSGRAPHICAL:
-  	        return button_context_settingsgraphical;
+        case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_TIME:
+        case CONTEXT_SETTINGS_COLOURCHOOSER:
+        case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+  	        return button_context_settings_r_is_inc;
   	    case CONTEXT_SETTINGS:
             return button_context_settings;
 
@@ -177,7 +180,7 @@ const struct button_mapping* get_context_mapping(int context)
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
             /* else fall through to CUSTOM|1 */
-        case CONTEXT_CUSTOM|1:
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
         case CONTEXT_QUICKSCREEN:
             return button_context_quickscreen;

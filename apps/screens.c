@@ -916,7 +916,7 @@ bool set_time_screen(const char* string, struct tm *tm)
             say_time(cursorpos, tm);
         }
 
-        button = get_action(CONTEXT_SETTINGS,HZ/2);
+        button = get_action(CONTEXT_SETTINGS_TIME,HZ/2);
         switch ( button ) {
             case ACTION_STD_PREV:
                 cursorpos = (cursorpos + 6 - 1) % 6;
@@ -925,6 +925,7 @@ bool set_time_screen(const char* string, struct tm *tm)
                 cursorpos = (cursorpos + 6 + 1) % 6;
                 break;
             case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_INCREPEAT:
                 *valptr = (*valptr + steps - min + 1) %
                     steps + min;
                 if(*valptr == 0)
@@ -932,6 +933,7 @@ bool set_time_screen(const char* string, struct tm *tm)
                 say_time(cursorpos, tm);
                 break;
             case ACTION_SETTINGS_DEC:
+            case ACTION_SETTINGS_DECREPEAT:
                 *valptr = (*valptr + steps - min - 1) %
                     steps + min;
                 if(*valptr == 0)

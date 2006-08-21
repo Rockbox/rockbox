@@ -184,14 +184,16 @@ bool set_color(struct screen *display,char *title, int* color, int banned_color)
             draw_screen(&screens[i], title, rgb_val, newcolor, slider);
         }
         
-        button = get_action(CONTEXT_SETTINGSGRAPHICAL,TIMEOUT_BLOCK);
+        button = get_action(CONTEXT_SETTINGS_COLOURCHOOSER,TIMEOUT_BLOCK);
         switch (button)
         {
             case ACTION_STD_PREV:
+            case ACTION_STD_PREVREPEAT:
                 slider = (slider+2)%3;
                 break;
 
             case ACTION_STD_NEXT:
+            case ACTION_STD_NEXTREPEAT:
                 slider = (slider+1)%3;
                 break;
 

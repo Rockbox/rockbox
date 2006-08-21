@@ -571,7 +571,7 @@ static char* select_bookmark(const char* bookmark_file_name)
 #endif
 
     bookmark_count = get_bookmark_count(bookmark_file_name);
-
+    action_signalscreenchange();
     while(true)
     {
         if(bookmark_id < 0)
@@ -612,7 +612,7 @@ static char* select_bookmark(const char* bookmark_file_name)
         key = get_action(CONTEXT_BOOKMARKSCREEN,TIMEOUT_BLOCK);
         switch(key)
         {
-            case ACTION_STD_OK:
+            case ACTION_BMS_SELECT:
                 /* User wants to use this bookmark */
 #ifdef HAVE_LCD_BITMAP
                 if (global_settings.statusbar)
@@ -629,7 +629,7 @@ static char* select_bookmark(const char* bookmark_file_name)
                 action_signalscreenchange();
                 return bookmark;
 
-            case ACTION_BMARK_DELETE:
+            case ACTION_BMS_DELETE:
                 /* User wants to delete this bookmark */
                 delete_bookmark(bookmark_file_name, bookmark_id);
                 bookmark_id_prev=-2;
@@ -638,15 +638,17 @@ static char* select_bookmark(const char* bookmark_file_name)
                     bookmark_id = bookmark_count -1;
                 break;
 
-            case ACTION_SETTINGS_DEC:
+            case ACTION_STD_PREV:
+            case ACTION_STD_PREVREPEAT:
                 bookmark_id--;
                 break;
 
-            case ACTION_SETTINGS_INC:
+            case ACTION_STD_NEXT:
+            case ACTION_STD_NEXTREPEAT:
                 bookmark_id++;
                 break;
 
-            case ACTION_STD_CANCEL:
+            case ACTION_BMS_EXIT:
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)
                     screens[i].setmargins(x, y);

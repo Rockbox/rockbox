@@ -38,7 +38,9 @@
 /* CONTEXT_CUSTOM's used in this file...
 
 CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
-
+CONTEXT_CUSTOM|CONTEXT_SETTINGS = the direction keys for the eq/col picker screens 
+                                  i.e where up/down is inc/dec
+               CONTEXT_SETTINGS = up/down is prev/next, l/r is inc/dec
 
 */
 
@@ -51,12 +53,14 @@ const struct button_mapping button_context_standard[]  = {
     
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_OFF,                 BUTTON_NONE },
+    
     { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_SELECT },
 
     { ACTION_STD_QUICKSCREEN,   BUTTON_MODE|BUTTON_REPEAT,  BUTTON_MODE }, 
     { ACTION_STD_MENU,          BUTTON_MODE|BUTTON_REL,     BUTTON_MODE },
     { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_SELECT },
     { ACTION_STD_OK,            BUTTON_RIGHT,               BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,       BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -138,13 +142,16 @@ const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_DOWN,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_NONE,                  BUTTON_LEFT,                    BUTTON_NONE },
-    { ACTION_NONE,                  BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_STD_PREV,              BUTTON_LEFT,                    BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,        BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_STD_NEXT,              BUTTON_RIGHT,                   BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,        BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_RESET,        BUTTON_ON,                      BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_settings */
 
-const struct button_mapping button_context_settingsgraphical[]  = {
+const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_LEFT,                BUTTON_NONE },
@@ -153,6 +160,7 @@ const struct button_mapping button_context_settingsgraphical[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_DOWN,                BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_SETTINGS_RESET,        BUTTON_ON,                  BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 }; /* button_context_settingsgraphical */
@@ -162,10 +170,26 @@ const struct button_mapping button_context_yesno[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
+const struct button_mapping button_context_colorchooser[]  = {
+    { ACTION_STD_OK,            BUTTON_ON|BUTTON_REL,   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+}; /* button_context_settings_bmark */
+
+const struct button_mapping button_context_eq[]  = {
+    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+}; /* button_context_settings_bmark */
+
 const struct button_mapping button_context_bmark[]  = {
-    { ACTION_BMARK_DELETE,      BUTTON_REC,    BUTTON_NONE },
+    { ACTION_BMS_DELETE,       BUTTON_REC,      BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_SELECT,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGSGRAPHICAL),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+}; /* button_context_settings_bmark */
+
+const struct button_mapping button_context_time[]  = {
+    { ACTION_STD_CANCEL,       BUTTON_OFF,  BUTTON_NONE },
+    { ACTION_STD_OK,           BUTTON_ON,   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
 const struct button_mapping button_context_quickscreen[]  = {
@@ -419,15 +443,15 @@ const struct button_mapping *button_context_yesno_h300lcdremote =
                 button_context_yesno_h100remote;
 
 const struct button_mapping button_context_bmark_h100remote[]  = {
-    { ACTION_BMARK_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
+    { ACTION_BMS_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RC_ON,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGSGRAPHICAL|CONTEXT_REMOTE),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS|CONTEXT_REMOTE),
 }; /* button_context_settings_bmark */
 
 const struct button_mapping button_context_bmark_h300lcdremote[]  = {
-    { ACTION_BMARK_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
+    { ACTION_BMS_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RC_MENU,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGSGRAPHICAL|CONTEXT_REMOTE),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS|CONTEXT_REMOTE),
 }; 
 
 const struct button_mapping button_context_quickscreen_h100remote[]  = {
@@ -669,9 +693,6 @@ const struct button_mapping* get_context_mapping_remote(int context)
                 return remote_btn_ctxt_listtree_scroll_w_cmb; 
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return remote_btn_ctxt_tree;
-
-        case CONTEXT_SETTINGSGRAPHICAL:
-            return remote_btn_ctxt_settingsgrph;
         
         case CONTEXT_SETTINGS:
             return remote_btn_ctxt_settings;
@@ -713,16 +734,22 @@ const struct button_mapping* get_context_mapping(int context)
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
-
-        case CONTEXT_SETTINGSGRAPHICAL:
-            return button_context_settingsgraphical;
         
         case CONTEXT_SETTINGS:
             return button_context_settings;
+        case CONTEXT_CUSTOM|CONTEXT_SETTINGS:
+            return button_context_settings_right_is_inc;
+        
+        case CONTEXT_SETTINGS_COLOURCHOOSER:
+            return button_context_colorchooser;
+        case CONTEXT_SETTINGS_EQ:
+            return button_context_eq;
+            
+        case CONTEXT_SETTINGS_TIME:
+            return button_context_time;
             
         case CONTEXT_YESNOSCREEN:
-            return button_context_yesno;
-            
+            return button_context_yesno;            
         case CONTEXT_BOOKMARKSCREEN:
             return button_context_bmark;
         case CONTEXT_QUICKSCREEN:

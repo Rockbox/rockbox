@@ -27,7 +27,7 @@
 
 /* CONTEXT_CUSTOM's used in this file...
 
-CONTEXT_CUSTOM|1 = the standard list/tree defines (without directions)
+CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions)
 
 
 */
@@ -95,7 +95,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT|BUTTON_REPEAT },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|1),
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 
 const struct button_mapping button_context_yesno[] = {
@@ -106,7 +106,7 @@ const struct button_mapping button_context_yesno[] = {
 
 struct button_mapping button_context_bmark[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                 BUTTON_NONE },
-    { ACTION_BMARK_DELETE,      BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_LEFT },
+    { ACTION_BMS_DELETE,      BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_LEFT },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,      BUTTON_LEFT },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
@@ -160,8 +160,8 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_TREE:     
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
-            /* else fall through to CUSTOM|1 */
-        case CONTEXT_CUSTOM|1:
+            /* else fall through to CUSTOM|CONTEXT_TREE */
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
