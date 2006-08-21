@@ -99,7 +99,7 @@ const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGDOWN,       BUTTON_POWER|BUTTON_DOWN,                  BUTTON_POWER },
     { ACTION_LISTTREE_PGDOWN,       BUTTON_DOWN|BUTTON_REL,                 BUTTON_POWER|BUTTON_DOWN },
     { ACTION_LISTTREE_PGDOWN,       BUTTON_POWER|BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
 const struct button_mapping button_context_tree[]  = {
@@ -147,7 +147,7 @@ const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_NEXTREPEAT,        BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_SETTINGS_RESET,        BUTTON_POWER,                      BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
 const struct button_mapping button_context_settings_right_is_inc[]  = {
@@ -161,12 +161,12 @@ const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_STD_NEXTREPEAT,        BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_RESET,        BUTTON_POWER,                  BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,                  BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_colorchooser[]  = {
@@ -202,7 +202,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_RIGHT,      BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_CANCEL,    BUTTON_MENU,                    BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
 const struct button_mapping button_context_pitchscreen[]  = {
@@ -217,7 +217,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_RESET,          BUTTON_POWER,                  BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_A,                 BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
 const struct button_mapping* get_context_mapping(int context)
