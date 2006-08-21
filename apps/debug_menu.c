@@ -146,12 +146,12 @@ bool dbg_os(void)
         case ACTION_SETTINGS_DEC:
             currval--;
             if(currval < 0)
-                currval = num_threads-1;
+                currval = num_threads[CPU]-1;
             break;
 
         case ACTION_SETTINGS_INC:
             currval++;
-            if(currval > num_threads-1)
+            if(currval > num_threads[CPU]-1)
                 currval = 0;
             break;
         }
