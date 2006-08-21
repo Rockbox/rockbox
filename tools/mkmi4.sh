@@ -58,12 +58,15 @@ fi
 
 case $target in
   e200)
+    sign="yes"
     tea=sansa
     ;;
   h10)
+    sign="yes"
     tea=20gc_eng
     ;;
   h10_5gb)
+    buildopt="-2"
     tea=default
     ;;
   *)
@@ -91,10 +94,12 @@ fi
 
 # build a 010301 version
 #echo "$tool build $input $output.raw"
-$tool build $input $output.raw
+$tool build $buildopt $input $output.raw
 # encrypt
 #echo "$tool encrypt $output.raw $output.encrypt $tea"
 $tool encrypt $output.raw $output.encrypt $tea
 # sign
-#echo "$tool sign $output.encrypt $output"
-$tool sign $output.encrypt $output
+if test -n "$sign"; then
+  #echo "$tool sign $output.encrypt $output"
+  $tool sign $output.encrypt $output
+fi
