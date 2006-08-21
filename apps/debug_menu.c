@@ -338,6 +338,12 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     (void)p_device;
     (void)addr1;
     (void)addr2;
+#elif CONFIG_CPU == S3C2440
+    /* TODO: Implement for Gigabeat */
+    (void)p_manufacturer;
+    (void)p_device;
+    (void)addr1;
+    (void)addr2;
 #else
     unsigned not_manu, not_id; /* read values before switching to ID mode */
     unsigned manu, id; /* read values when in ID mode */
