@@ -89,7 +89,7 @@ inline int get_next_context(const struct button_mapping *items, int i)
         
    Timeout can be TIMEOUT_NOBLOCK to return immediatly
                   TIMEOUT_BLOCK   to wait for a button press
-                  Any number >0   to wait that many ticks for a press
+Any number >0   to wait that many ticks for a press
                   
  */
 int get_action_worker(int context, int timeout,
@@ -161,7 +161,7 @@ int get_action_worker(int context, int timeout,
         
         ret = do_button_check(items,button,last_button,&i);
         
-        if (context == CONTEXT_STOPSEARCHING)
+        if (context ==(int)CONTEXT_STOPSEARCHING)
             break;
         
         if (ret == ACTION_UNKNOWN )
