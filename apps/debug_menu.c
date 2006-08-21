@@ -78,8 +78,8 @@
 /*---------------------------------------------------*/
 extern char ata_device;
 extern int ata_io_address;
-extern int num_threads;
-extern const char *thread_name[];
+extern int num_threads[];
+extern const char *thread_name[][MAXTHREADS];
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
@@ -88,6 +88,8 @@ bool dbg_os(void)
     char buf[32];
     int i;
     int usage;
+    unsigned int core;
+    int line;
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -95,12 +97,16 @@ bool dbg_os(void)
 
     while(1)
     {
-        lcd_puts(0, 0, "Stack usage:");
-        for(i = 0; i < num_threads;i++)
+        lcd_puts(0, 0, "Core and stack usage:");
+        line = 0;
+        for(core = 0; core < NUM_CORES; core++)
         {
-            usage = thread_stack_usage(i);
-            snprintf(buf, 32, "%s: %d%%", thread_name[i], usage);
-            lcd_puts(0, 1+i, buf);
+            for(i = 0; i < num_threads[core]; i++)
+            {
+                usage = thread_stack_usage_on_core(core, i);
+                snprintf(buf, 32, "(%d) %s: %d%%", core, thread_name[core][i], usage);
+                lcd_puts(0, ++line, buf);
+            }
         }
 
         lcd_update();
@@ -124,10 +130,11 @@ bool dbg_os(void)
     {
         lcd_puts(0, 0, "Stack usage");
 
+        /* Only Archos Player uses this - so assume a single core */
         usage = thread_stack_usage(currval);
         snprintf(buf, 32, "%d: %d%%  ", currval, usage);
         lcd_puts(0, 1, buf);
-    
+
         button = get_action(CONTEXT_SETTINGS,HZ/10);
 
         switch(button)
@@ -162,14 +169,14 @@ bool dbg_audio_thread(void)
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
-    
+
     while(1)
     {
         if (action_userabort(HZ/5))
             return false;
 
         audio_get_debugdata(&d);
-        
+
         lcd_clear_display();
 
         snprintf(buf, sizeof(buf), "read: %x", d.audiobuf_read);
@@ -186,17 +193,17 @@ bool dbg_audio_thread(void)
         lcd_puts(0, 5, buf);
 
         /* Playable space left */
-        scrollbar(0, 6*8, 112, 4, d.audiobuflen, 0, 
+        scrollbar(0, 6*8, 112, 4, d.audiobuflen, 0,
                   d.playable_space, HORIZONTAL);
 
         /* Show the watermark limit */
-        scrollbar(0, 6*8+4, 112, 4, d.audiobuflen, 0, 
+        scrollbar(0, 6*8+4, 112, 4, d.audiobuflen, 0,
                   d.low_watermark_level, HORIZONTAL);
 
         snprintf(buf, sizeof(buf), "wm: %x - %x",
                  d.low_watermark_level, d.lowest_watermark_level);
         lcd_puts(0, 7, buf);
-        
+
         lcd_update();
     }
     return false;
@@ -229,7 +236,7 @@ bool dbg_audio_thread(void)
     ticks = boost_ticks = 0;
 
     tick_add_task(dbg_audio_task);
-    
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
     while(!done)
@@ -249,7 +256,7 @@ bool dbg_audio_thread(void)
         }
         action_signalscreenchange();
         line = 0;
-        
+
         lcd_clear_display();
 
         bufused = bufsize - pcmbuf_free();
@@ -283,12 +290,12 @@ bool dbg_audio_thread(void)
         snprintf(buf, sizeof(buf), "pcmbufdesc: %2d/%2d",
                 pcmbuf_used_descs(), pcmbufdescs);
         lcd_puts(0, line++, buf);
-        
+
         lcd_update();
     }
 
     tick_remove_task(dbg_audio_task);
-    
+
     return false;
 }
 #endif /* CONFIG_CODEC */
@@ -303,7 +310,7 @@ static void flash_write_word(unsigned addr, unsigned value) {
     flash_word_temp = value;
 
     long extAddr = (long)addr << 1;
-    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);  
+    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
 }
 
 static unsigned flash_read_word(unsigned addr) __attribute__ ((section(".icode")));
@@ -324,7 +331,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   __attribute__ ((section (".icode")));
 bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
-          
+
 {
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* TODO: Implement for iPod */
@@ -382,9 +389,9 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
     set_irq_level(old_level); /* enable interrupts again */
-    
+
     /* I assume success if the obtained values are different from
-        the normal flash content. This is not perfectly bulletproof, they 
+        the normal flash content. This is not perfectly bulletproof, they
         could theoretically be the same by chance, causing us to fail. */
     if (not_manu != manu || not_id != id) /* a value has changed */
     {
@@ -431,7 +438,7 @@ bool dbg_hw_info(void)
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
-    
+
     /* check if the boot ROM area is a flash mirror */
     has_bootrom = (memcmp((char*)0, (char*)0x02000000, 64*1024) != 0);
     if (has_bootrom)  /* if ROM and Flash different */
@@ -450,16 +457,16 @@ bool dbg_hw_info(void)
 
     snprintf(buf, 32, "ROM: %d.%02d", rom_version/100, rom_version%100);
     lcd_puts(0, 1, buf);
-    
+
     snprintf(buf, 32, "Mask: 0x%04x", bitmask);
     lcd_puts(0, 2, buf);
-    
+
     snprintf(buf, 32, "USB: %s", usb_polarity?"positive":"negative");
     lcd_puts(0, 3, buf);
-    
+
     snprintf(buf, 32, "PR: %s", pr_polarity?"positive":"negative");
     lcd_puts(0, 4, buf);
-    
+
     if (got_id)
         snprintf(buf, 32, "Flash: M=%02x D=%02x", manu, id);
     else
@@ -483,7 +490,7 @@ bool dbg_hw_info(void)
     snprintf(buf, 32, "ATA: 0x%x,%s", ata_io_address,
              ata_device ? "slave":"master");
     lcd_puts(0, 7, buf);
-#endif    
+#endif
     lcd_update();
 
     while(1)
@@ -503,7 +510,7 @@ bool dbg_hw_info(void)
     got_id = dbg_flash_id(&manu, &id, 0x5555, 0x2AAA); /* try SST, Atmel, NexFlash */
     if (!got_id)
         got_id = dbg_flash_id(&manu, &id, 0x555, 0x2AA); /* try AMD, Macronix */
-    
+
     system_memory_guard(oldmode);  /* re-enable memory guard */
 
     lcd_setmargins(0, 0);
@@ -533,7 +540,7 @@ bool dbg_hw_info(void)
     lcd_clear_display();
 
     lcd_puts(0, 0, "[Hardware info]");
-    
+
     snprintf(buf, sizeof(buf), "HW rev: 0x%08x", ipod_hw_rev);
     lcd_puts(0, 1, buf);
 
@@ -581,7 +588,7 @@ bool dbg_hw_info(void)
         /* calculate CRC16 checksum of boot ROM */
         rom_crc = crc_32((unsigned char*)0x0000, 64*1024, 0xffffffff);
     }
-    
+
     system_memory_guard(oldmode);  /* re-enable memory guard */
 
     lcd_clear_display();
@@ -617,7 +624,7 @@ bool dbg_hw_info(void)
                 {
                     if (rom_crc == 0x56DBA4EE) /* known Version 1 */
                         snprintf(buf, 32, "BootROM: V1");
-                    else if (rom_crc == 0x358099E8) 
+                    else if (rom_crc == 0x358099E8)
                         snprintf(buf, 32, "BootROM: V2");
                         /* alternative boot ROM found in one single player so far */
                     else
@@ -626,10 +633,10 @@ bool dbg_hw_info(void)
                 else
                     snprintf(buf, 32, "BootROM: no");
         }
-            
+
         lcd_puts(0, 1, buf);
         lcd_update();
-        
+
         button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
 
         switch(button)
@@ -643,7 +650,7 @@ bool dbg_hw_info(void)
                 if(currval < 0)
                     currval = 5;
                 break;
-                
+
             case ACTION_SETTINGS_INC:
                 currval++;
                 if(currval > 5)
@@ -677,7 +684,7 @@ bool dbg_partitions(void)
         snprintf(buf, sizeof buf, "T:%x %ld MB", p->type, p->size / 2048);
         lcd_puts(0, 1, buf);
         lcd_update();
-        
+
         button = get_action(CONTEXT_SETTINGS,TIMEOUT_BLOCK);
 
         switch(button)
@@ -691,7 +698,7 @@ bool dbg_partitions(void)
                 if (partition < 0)
                     partition = 3;
                 break;
-                
+
             case ACTION_SETTINGS_INC:
                 partition++;
                 if (partition > 3)
@@ -751,22 +758,22 @@ bool dbg_spdif(void)
         lcd_puts(0, line++, buf);
 
         line++;
-        
+
         x = control >> 31;
         snprintf(buf, sizeof(buf), "PRO: %d (%s)",
                  x, x?"Professional":"Consumer");
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 30) & 1;
         snprintf(buf, sizeof(buf), "Audio: %d (%s)",
                  x, x?"Non-PCM":"PCM");
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 29) & 1;
         snprintf(buf, sizeof(buf), "Copy: %d (%s)",
                  x, x?"Permitted":"Inhibited");
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 27) & 7;
         switch(x)
         {
@@ -786,7 +793,7 @@ bool dbg_spdif(void)
         x = (control >> 24) & 3;
         snprintf(buf, sizeof(buf), "Mode: %d", x);
         lcd_puts(0, line++, buf);
-        
+
         category = (control >> 17) & 127;
         switch(category)
         {
@@ -801,7 +808,7 @@ bool dbg_spdif(void)
         }
         snprintf(buf, sizeof(buf), "Category: 0x%02x (%s)", category, s);
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 16) & 1;
         generation = x;
         if(((category & 0x70) == 0x10) ||
@@ -813,11 +820,11 @@ bool dbg_spdif(void)
         snprintf(buf, sizeof(buf), "Generation: %d (%s)",
                  x, generation?"Original":"No ind.");
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 12) & 15;
         snprintf(buf, sizeof(buf), "Source: %d", x);
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 8) & 15;
         switch(x)
         {
@@ -836,7 +843,7 @@ bool dbg_spdif(void)
         }
         snprintf(buf, sizeof(buf), "Channel: %d (%s)", x, s);
         lcd_puts(0, line++, buf);
-        
+
         x = (control >> 4) & 15;
         switch(x)
         {
@@ -857,7 +864,7 @@ bool dbg_spdif(void)
         snprintf(buf, sizeof(buf), "Clock accuracy: %d", x);
         lcd_puts(0, line++, buf);
         line++;
-        
+
         snprintf(buf, sizeof(buf), "Measured freq: %ldHz",
                 (long)((long long)FREQMEAS*CPU_FREQ/((1 << 15)*3*(1 << 13))/128));
         lcd_puts(0, line++, buf);
@@ -914,7 +921,7 @@ bool dbg_ports(void)
         battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
         batt_int = battery_voltage / 100;
         batt_frac = battery_voltage % 100;
-    
+
         snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
                  battery_level());
         lcd_puts(0, 6, buf);
@@ -960,7 +967,7 @@ bool dbg_ports(void)
         gpio1_function = GPIO1_FUNCTION;
         gpio_enable = GPIO_ENABLE;
         gpio1_enable = GPIO1_ENABLE;
-        
+
         snprintf(buf, sizeof(buf), "GPIO_READ:     %08x", gpio_read);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_OUT:      %08x", gpio_out);
@@ -985,7 +992,7 @@ bool dbg_ports(void)
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         adc_remotedetect = adc_read(ADC_REMOTEDETECT);
 #endif
-        
+
         snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
@@ -1000,16 +1007,16 @@ bool dbg_ports(void)
         battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
         batt_int = battery_voltage / 100;
         batt_frac = battery_voltage % 100;
-    
+
         snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
                  battery_level());
         lcd_puts(0, line++, buf);
-        
+
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "remotetype:: %d", remote_type());
         lcd_puts(0, line++, buf);
 #endif
-        
+
         lcd_update();
         if (action_userabort(HZ/10))
             return false;
@@ -1128,15 +1135,15 @@ bool dbg_ports(void)
             break;
         }
         lcd_puts(0, 0, buf);
-        
-        battery_voltage = (adc_read(ADC_UNREG_POWER) * 
+
+        battery_voltage = (adc_read(ADC_UNREG_POWER) *
                            BATTERY_SCALE_FACTOR) / 10000;
         batt_int = battery_voltage / 100;
         batt_frac = battery_voltage % 100;
-    
+
         snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
         lcd_puts(0, 1, buf);
-        
+
         button = get_action(CONTEXT_SETTINGS,HZ/5);
 
         switch(button)
@@ -1179,7 +1186,7 @@ bool dbg_cpufreq(void)
     while(1)
     {
         line = 0;
-        
+
         snprintf(buf, sizeof(buf), "Frequency: %ld", FREQ);
         lcd_puts(0, line++, buf);
 
@@ -1212,7 +1219,7 @@ bool dbg_cpufreq(void)
     return false;
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
-               
+
 #ifdef HAVE_LCD_BITMAP
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
@@ -1229,7 +1236,7 @@ bool view_battery(void)
     int i, x, y;
     unsigned short maxv, minv;
     char buf[32];
-    
+
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
 
@@ -1248,20 +1255,20 @@ bool view_battery(void)
                         minv = power_history[i];
                     }
                 }
-                
+
                 if ((minv < 1) || (minv >= 65535))
                     minv = 1;
                 if (maxv < 2)
                     maxv = 2;
-                    
+
                 lcd_clear_display();
                 snprintf(buf, 30, "Battery %d.%02d", power_history[0] / 100,
                          power_history[0] % 100);
                 lcd_puts(0, 0, buf);
-                snprintf(buf, 30, "scale %d.%02d-%d.%02d V", 
+                snprintf(buf, 30, "scale %d.%02d-%d.%02d V",
                          minv / 100, minv % 100, maxv / 100, maxv % 100);
                 lcd_puts(0, 1, buf);
-                
+
                 x = 0;
                 for (i = BAT_LAST_VAL - 1; i >= 0; i--) {
                     y = (power_history[i] - minv) * BAT_YSPACE / (maxv - minv);
@@ -1274,7 +1281,7 @@ bool view_battery(void)
                 }
 
                 break;
-                
+
             case 1: /* status: */
                 lcd_clear_display();
                 lcd_puts(0, 0, "Power status:");
@@ -1289,7 +1296,7 @@ bool view_battery(void)
 #endif
 #ifdef CONFIG_CHARGING
 #if CONFIG_CHARGING == CHARGING_CONTROL
-                snprintf(buf, 30, "Chgr: %s %s", 
+                snprintf(buf, 30, "Chgr: %s %s",
                          charger_inserted() ? "present" : "absent",
                          charger_enabled ? "on" : "off");
                 lcd_puts(0, 3, buf);
@@ -1329,15 +1336,15 @@ bool view_battery(void)
 #endif /* CONFIG_CHARGING != CHARGING_CONTROL */
 #endif /* CONFIG_CHARGING */
                 break;
-                
+
             case 2: /* voltage deltas: */
                 lcd_clear_display();
                 lcd_puts(0, 0, "Voltage deltas:");
-                
+
                 for (i = 0; i <= 6; i++) {
                     y = power_history[i] - power_history[i+i];
                     snprintf(buf, 30, "-%d min: %s%d.%02d V", i,
-                             (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 100, 
+                             (y < 0) ? "-" : "", ((y < 0) ? y * -1 : y) / 100,
                              ((y < 0) ? y * -1 : y ) % 100);
                     lcd_puts(0, i+1, buf);
                 }
@@ -1375,21 +1382,21 @@ bool view_battery(void)
                 lcd_puts(0, 7, buf);
                 break;
         }
-        
+
         lcd_update();
-        
+
         switch(get_action(CONTEXT_SETTINGS,HZ/2))
         {
             case ACTION_SETTINGS_DEC:
                 if (view)
                     view--;
                 break;
-                
+
             case ACTION_SETTINGS_INC:
                 if (view < 3)
                     view++;
                 break;
-                
+
             case ACTION_STD_CANCEL:
                 action_signalscreenchange();
                 return false;
@@ -1399,7 +1406,7 @@ bool view_battery(void)
 }
 
 #endif /* HAVE_LCD_BITMAP */
-                              
+
 static bool view_runtime(void)
 {
     char s[32];
@@ -1441,7 +1448,7 @@ static bool view_runtime(void)
             t = global_settings.topruntime;
             lcd_puts(0, y++, "Top time");
         }
-    
+
         snprintf(s, sizeof(s), "%dh %dm %ds",
                  t / 3600, (t % 3600) / 60, t % 60);
         lcd_puts(0, y++, s);
@@ -1498,7 +1505,7 @@ bool dbg_mmc_info(void)
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
     static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
-    
+
     card_name[6] = '\0';
 
     lcd_setmargins(0, 0);
@@ -1574,7 +1581,7 @@ bool dbg_mmc_info(void)
             case ACTION_STD_CANCEL:
                 done = true;
                 break;
-                
+
             case ACTION_SETTINGS_DEC:
                 currval--;
                 if (currval < 0)
@@ -1606,7 +1613,7 @@ static bool dbg_disk_info(void)
 #ifdef HAVE_LCD_BITMAP
     lcd_setmargins(0, 0);
 #endif
-    
+
     while(!done)
     {
         int y=0;
@@ -1639,7 +1646,7 @@ static bool dbg_disk_info(void)
 
             case 2:
                 snprintf(buf, sizeof buf, "%ld MB",
-                         ((unsigned long)identify_info[61] << 16 | 
+                         ((unsigned long)identify_info[61] << 16 |
                           (unsigned long)identify_info[60]) / 2048 );
                 lcd_puts(0, y++, "Size");
                 lcd_puts(0, y++, buf);
@@ -1739,7 +1746,7 @@ static bool dbg_disk_info(void)
                 if (--page < 0)
                     page = max_page;
                 break;
-                
+
             case ACTION_SETTINGS_INC:
                 if (++page > max_page)
                     page = 0;
@@ -1765,9 +1772,9 @@ static bool dbg_dircache_info(void)
     while (!done)
     {
         line = 0;
-        
+
         lcd_clear_display();
-        snprintf(buf, sizeof(buf), "Cache initialized: %s", 
+        snprintf(buf, sizeof(buf), "Cache initialized: %s",
                  dircache_is_enabled() ? "Yes" : "No");
         lcd_puts(0, line++, buf);
 
@@ -1819,25 +1826,25 @@ static bool dbg_tagcache_info(void)
     while (!done)
     {
         line = 0;
-        
+
         lcd_clear_display();
         stat = tagcache_get_stat();
-        snprintf(buf, sizeof(buf), "Initialized: %s", stat->initialized ? "Yes" : "No"); 
+        snprintf(buf, sizeof(buf), "Initialized: %s", stat->initialized ? "Yes" : "No");
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "DB Ready: %s", stat->ready ? "Yes" : "No"); 
+        snprintf(buf, sizeof(buf), "DB Ready: %s", stat->ready ? "Yes" : "No");
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "RAM Cache: %s", stat->ramcache ? "Yes" : "No"); 
+        snprintf(buf, sizeof(buf), "RAM Cache: %s", stat->ramcache ? "Yes" : "No");
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "RAM: %d/%d B", 
-                 stat->ramcache_used, stat->ramcache_allocated); 
+        snprintf(buf, sizeof(buf), "RAM: %d/%d B",
+                 stat->ramcache_used, stat->ramcache_allocated);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Progress: %d%% (%d entries)", 
+        snprintf(buf, sizeof(buf), "Progress: %d%% (%d entries)",
                  stat->progress, stat->processed_entries);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Commit step: %d", stat->commit_step); 
+        snprintf(buf, sizeof(buf), "Commit step: %d", stat->commit_step);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "Commit delayed: %s", 
-                 stat->commit_delayed ? "Yes" : "No"); 
+        snprintf(buf, sizeof(buf), "Commit delayed: %s",
+                 stat->commit_delayed ? "Yes" : "No");
         lcd_puts(0, line++, buf);
 
         lcd_update();
@@ -1892,7 +1899,7 @@ bool dbg_save_roms(void)
         close(fd);
     }
     system_memory_guard(oldmode);
-    
+
 #ifdef HAVE_EEPROM
     fd = creat("/internal_eeprom.bin", O_WRONLY);
     if (fd >= 0)
@@ -1916,7 +1923,7 @@ bool dbg_save_roms(void)
         close(fd);
     }
 #endif
-    
+
     return false;
 }
 #endif /* CPU */
@@ -1938,10 +1945,10 @@ bool dbg_fm_radio(void)
 
         lcd_clear_display();
         fm_detected = radio_hardware_present();
-        
+
         snprintf(buf, sizeof buf, "HW detected: %s", fm_detected?"yes":"no");
         lcd_puts(0, row++, buf);
-        
+
 #if (CONFIG_TUNER & S1A0903X01)
         regs = samsung_get(RADIO_ALL);
         snprintf(buf, sizeof buf, "Samsung regs: %08lx", regs);
@@ -1954,7 +1961,7 @@ bool dbg_fm_radio(void)
 #endif
 
         lcd_update();
-        
+
         if (action_userabort(HZ))
             return false;
     }
@@ -1983,7 +1990,7 @@ bool dbg_set_memory_guard(void)
         { "Zero area (all)",  -1 }
     };
     int mode = system_memory_guard(MEMGUARD_KEEP);
-    
+
     set_option( "Catch mem accesses", &mode, INT, names, MAXMEMGUARD, NULL);
     system_memory_guard(mode);
 
@@ -1999,7 +2006,7 @@ bool dbg_write_eeprom(void)
     int old_irq_level;
     char buf[EEPROM_SIZE];
     int err;
-    
+
     fd = open("/internal_eeprom.bin", O_RDONLY);
 
     if (fd >= 0)
@@ -2093,7 +2100,7 @@ bool debug_menu(void)
                  NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
-    
+
     return result;
 }
 

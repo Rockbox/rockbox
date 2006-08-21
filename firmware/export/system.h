@@ -43,6 +43,8 @@ static inline void udelay(unsigned usecs)
     unsigned start = USEC_TIMER;
     while ((USEC_TIMER - start) < usecs);
 }
+
+unsigned int current_core(void);
 #endif
 
 struct flash_header {
@@ -88,7 +90,7 @@ void cpu_idle_mode(bool on_off);
 #define betoh32(x) swap32(x)
 #define htobe16(x) swap16(x)
 #define htobe32(x) swap32(x)
-#else 
+#else
 #define letoh16(x) swap16(x)
 #define letoh32(x) swap32(x)
 #define htole16(x) swap16(x)
@@ -178,7 +180,7 @@ static inline void coldfire_set_macsr(unsigned long flags)
 static inline unsigned long coldfire_get_macsr(void)
 {
     unsigned long m;
-    
+
     asm volatile ("move.l %%macsr, %0" : "=r" (m));
     return m;
 }
@@ -301,7 +303,7 @@ static inline void invalidate_icache(void)
                  "move.l #0x80000000,%d0\n"
                  "movec.l %d0,%cacr");
 }
-            
+
 #define CPUFREQ_DEFAULT_MULT 1
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)
 #define CPUFREQ_NORMAL_MULT  4
@@ -315,7 +317,7 @@ static inline void invalidate_icache(void)
 
 #define CPUFREQ_DEFAULT_MULT 8
 #define CPUFREQ_DEFAULT 24000000
-#define CPUFREQ_NORMAL_MULT 10 
+#define CPUFREQ_NORMAL_MULT 10
 #define CPUFREQ_NORMAL 30000000
 #define CPUFREQ_MAX_MULT 25
 #define CPUFREQ_MAX 75000000
@@ -336,7 +338,7 @@ static inline unsigned long swap32(unsigned long value)
       result[15.. 8] = value[23..16];
       result[ 7.. 0] = value[31..24];
     */
-{   
+{
     unsigned int tmp;
 
     asm volatile (
@@ -418,7 +420,7 @@ static inline int set_irq_level(int level)
     __asm__ volatile ("clrsr ie");
   else
     __asm__ volatile ("setsr ie");
-    
+
   return result;
 }
 

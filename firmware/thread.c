@@ -41,7 +41,7 @@ struct regs
     void         *pr;    /* Procedure register */
     void         *start; /* Thread start address, or NULL when started */
 };
-#elif defined(CPU_ARM) 
+#elif defined(CPU_ARM)
 struct regs
 {
     unsigned int r[8];   /* Registers r4-r11 */
@@ -62,17 +62,30 @@ struct regs
 /* Cast to the the machine int type, whose size could be < 4. */
 
 
-int num_threads;
-static volatile int num_sleepers;
-static int current_thread;
-static struct regs thread_contexts[MAXTHREADS] IBSS_ATTR;
-const char *thread_name[MAXTHREADS];
-void *thread_stack[MAXTHREADS];
-int thread_stack_size[MAXTHREADS];
+int num_threads[NUM_CORES];
+static volatile int num_sleepers[NUM_CORES];
+static int current_thread[NUM_CORES];
+static struct regs thread_contexts[NUM_CORES][MAXTHREADS] IBSS_ATTR;
+const char *thread_name[NUM_CORES][MAXTHREADS];
+void *thread_stack[NUM_CORES][MAXTHREADS];
+int thread_stack_size[NUM_CORES][MAXTHREADS];
 static const char main_thread_name[] = "main";
 
 extern int stackbegin[];
 extern int stackend[];
+
+#ifdef CPU_PP
+#ifndef BOOTLOADER
+extern int cop_stackbegin[];
+extern int cop_stackend[];
+#else
+/* The coprocessor stack is not set up in the bootloader code, but the
+   threading is.  No threads are run on the coprocessor, so set up some dummy
+   stack */
+int *cop_stackbegin = stackbegin;
+int *cop_stackend = stackend;
+#endif
+#endif
 
 void switch_thread(void) ICODE_ATTR;
 static inline void store_context(void* addr) __attribute__ ((always_inline));
@@ -86,7 +99,7 @@ void profile_thread(void) {
 #endif
 
 #if defined(CPU_ARM)
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
@@ -116,7 +129,7 @@ static inline void load_context(const void* addr)
 }
 
 #elif defined(CPU_COLDFIRE)
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
@@ -199,7 +212,7 @@ static inline void load_context(const void* addr)
 }
 
 #elif CONFIG_CPU == TCC730
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Store non-volatile context.
  *---------------------------------------------------------------------------
  */
@@ -215,7 +228,7 @@ static inline void load_context(const void* addr)
         "push a14\n\t"                                  \
         "ldw @[%0+0], a15\n\t" : : "a" (addr) );
 
-/*--------------------------------------------------------------------------- 
+/*---------------------------------------------------------------------------
  * Load non-volatile context.
  *---------------------------------------------------------------------------
  */
@@ -260,7 +273,7 @@ void switch_thread(void)
 #ifdef SIMULATOR
     /* Do nothing */
 #else
-    while (num_sleepers == num_threads)
+    while (num_sleepers[CURRENT_CORE] == num_threads[CURRENT_CORE])
     {
         /* Enter sleep mode, woken up on interrupt */
 #ifdef CPU_COLDFIRE
@@ -284,21 +297,21 @@ void switch_thread(void)
 #endif
     }
 #endif
-    current = current_thread;
-    store_context(&thread_contexts[current]);
-    
+    current = current_thread[CURRENT_CORE];
+    store_context(&thread_contexts[CURRENT_CORE][current]);
+
 #if CONFIG_CPU != TCC730
     /* Check if the current thread stack is overflown */
-    stackptr = thread_stack[current];
+    stackptr = thread_stack[CURRENT_CORE][current];
     if(stackptr[0] != DEADBEEF)
-       panicf("Stkov %s", thread_name[current]);
+       panicf("Stkov %s", thread_name[CURRENT_CORE][current]);
 #endif
 
-    if (++current >= num_threads)
+    if (++current >= num_threads[CURRENT_CORE])
         current = 0;
 
-    current_thread = current;
-    load_context(&thread_contexts[current]);
+    current_thread[CURRENT_CORE] = current;
+    load_context(&thread_contexts[CURRENT_CORE][current]);
 #ifdef RB_PROFILE
     profile_thread_started(current_thread);
 #endif
@@ -306,21 +319,34 @@ void switch_thread(void)
 
 void sleep_thread(void)
 {
-    ++num_sleepers;
+    ++num_sleepers[CURRENT_CORE];
     switch_thread();
 }
 
 void wake_up_thread(void)
 {
-    num_sleepers = 0;
+    num_sleepers[CURRENT_CORE] = 0;
 }
 
-/*--------------------------------------------------------------------------- 
- * Create thread.
+
+/*---------------------------------------------------------------------------
+ * Create thread on the current core.
  * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
 int create_thread(void (*function)(void), void* stack, int stack_size,
+                  const char *name)
+{
+    return create_thread_on_core(CURRENT_CORE, function, stack, stack_size,
+                  name);
+}
+
+/*---------------------------------------------------------------------------
+ * Create thread on a specific core.
+ * Return ID if context area could be allocated, else -1.
+ *---------------------------------------------------------------------------
+ */
+int create_thread_on_core(unsigned int core, void (*function)(void), void* stack, int stack_size,
                   const char *name)
 {
     unsigned int i;
@@ -328,7 +354,7 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     unsigned int *stackptr;
     struct regs *regs;
 
-    if (num_threads >= MAXTHREADS)
+    if (num_threads[core] >= MAXTHREADS)
         return -1;
 
     /* Munge the stack to make it easy to spot stack overflows */
@@ -340,10 +366,10 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     }
 
     /* Store interesting information */
-    thread_name[num_threads] = name;
-    thread_stack[num_threads] = stack;
-    thread_stack_size[num_threads] = stack_size;
-    regs = &thread_contexts[num_threads];
+    thread_name[core][num_threads[core]] = name;
+    thread_stack[core][num_threads[core]] = stack;
+    thread_stack_size[core][num_threads[core]] = stack_size;
+    regs = &thread_contexts[core][num_threads[core]];
 #if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || defined(CPU_ARM)
     /* Align stack to an even 32 bit boundary */
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
@@ -355,65 +381,91 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
     regs->start = (void*)function;
 
     wake_up_thread();
-    return num_threads++; /* return the current ID, e.g for remove_thread() */
+    return num_threads[core]++; /* return the current ID, e.g for remove_thread() */
 }
 
-/*--------------------------------------------------------------------------- 
- * Remove a thread from the scheduler.
+/*---------------------------------------------------------------------------
+ * Remove a thread on the current core from the scheduler.
  * Parameter is the ID as returned from create_thread().
  *---------------------------------------------------------------------------
  */
 void remove_thread(int threadnum)
 {
+    remove_thread_on_core(CURRENT_CORE, threadnum);
+}
+
+/*---------------------------------------------------------------------------
+ * Remove a thread on the specified core from the scheduler.
+ * Parameters are the core and the ID as returned from create_thread().
+ *---------------------------------------------------------------------------
+ */
+void remove_thread_on_core(unsigned int core, int threadnum)
+{
     int i;
 
-    if(threadnum >= num_threads)
+    if(threadnum >= num_threads[core])
        return;
 
-    num_threads--;
-    for (i=threadnum; i<num_threads-1; i++)
+    num_threads[core]--;
+    for (i=threadnum; i<num_threads[core]-1; i++)
     {   /* move all entries which are behind */
-        thread_name[i]       = thread_name[i+1];
-        thread_stack[i]      = thread_stack[i+1];
-        thread_stack_size[i] = thread_stack_size[i+1];
-        thread_contexts[i]   = thread_contexts[i+1];
+        thread_name[core][i]       = thread_name[core][i+1];
+        thread_stack[core][i]      = thread_stack[core][i+1];
+        thread_stack_size[core][i] = thread_stack_size[core][i+1];
+        thread_contexts[core][i]   = thread_contexts[core][i+1];
     }
 
-    if (current_thread == threadnum) /* deleting the current one? */
-        current_thread = num_threads; /* set beyond last, avoid store harm */
-    else if (current_thread > threadnum) /* within the moved positions? */
-        current_thread--; /* adjust it, point to same context again */
+    if (current_thread[core] == threadnum) /* deleting the current one? */
+        current_thread[core] = num_threads[core]; /* set beyond last, avoid store harm */
+    else if (current_thread[core] > threadnum) /* within the moved positions? */
+        current_thread[core]--; /* adjust it, point to same context again */
 }
 
 void init_threads(void)
 {
-    num_threads = 1; /* We have 1 thread to begin with */
-    current_thread = 0; /* The current thread is number 0 */
-    thread_name[0] = main_thread_name;
-    thread_stack[0] = stackbegin;
-    thread_stack_size[0] = (int)stackend - (int)stackbegin;
-#if CONFIG_CPU == TCC730
-    thread_contexts[0].started = 1;
-#else
-    thread_contexts[0].start = 0; /* thread 0 already running */
+    unsigned int core = CURRENT_CORE;
+
+    num_threads[core] = 1; /* We have 1 thread to begin with */
+    current_thread[core] = 0; /* The current thread is number 0 */
+    thread_name[core][0] = main_thread_name;
+/* In multiple core setups, each core has a different stack.  There is probably
+   a much better way to do this. */
+    if(core == CPU)
+    {
+        thread_stack[CPU][0] = stackbegin;
+        thread_stack_size[CPU][0] = (int)stackend - (int)stackbegin;
+    } else {
+#if NUM_CORES > 1  /* This code path will not be run on single core targets */
+        thread_stack[COP][0] = cop_stackbegin;
+        thread_stack_size[COP][0] = (int)cop_stackend - (int)cop_stackbegin;
 #endif
-    num_sleepers = 0;
+    }
+#if CONFIG_CPU == TCC730
+    thread_contexts[core][0].started = 1;
+#else
+    thread_contexts[core][0].start = 0; /* thread 0 already running */
+#endif
+    num_sleepers[core] = 0;
 }
 
-int thread_stack_usage(int threadnum)
+int thread_stack_usage(int threadnum){
+    return thread_stack_usage_on_core(CURRENT_CORE, threadnum);
+}
+
+int thread_stack_usage_on_core(unsigned int core, int threadnum)
 {
     unsigned int i;
-    unsigned int *stackptr = thread_stack[threadnum];
+    unsigned int *stackptr = thread_stack[core][threadnum];
 
-    if(threadnum >= num_threads)
+    if(threadnum >= num_threads[core])
         return -1;
 
-    for(i = 0;i < thread_stack_size[threadnum]/sizeof(int);i++)
+    for(i = 0;i < thread_stack_size[core][threadnum]/sizeof(int);i++)
     {
         if(stackptr[i] != DEADBEEF)
             break;
     }
 
-    return ((thread_stack_size[threadnum] - i * sizeof(int)) * 100) /
-        thread_stack_size[threadnum];
-}       
+    return ((thread_stack_size[core][threadnum] - i * sizeof(int)) * 100) /
+        thread_stack_size[core][threadnum];
+}

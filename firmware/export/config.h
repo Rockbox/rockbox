@@ -151,6 +151,10 @@
 #define USBOTG_ISP1362 1362
 #define USBOTG_M5636 5636
 
+/* Multiple cores */
+#define CPU 0
+#define COP 1
+
 /* now go and pick yours */
 #if defined(ARCHOS_PLAYER)
 #include "config-player.h"
@@ -219,6 +223,19 @@
 /* define for all cpus from PP family */
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020) || (CONFIG_CPU == PP5024)
 #define CPU_PP
+
+/* PP family has dual cores */
+#if 0
+/* Keep it as single core until dual core support is ready */
+#define NUM_CORES 2
+#define CURRENT_CORE current_core()
+#endif
+
+#define NUM_CORES 1
+#define CURRENT_CORE 0
+#else
+#define NUM_CORES 1
+#define CURRENT_CORE 0
 #endif
 
 /* define for all cpus from ARM family */

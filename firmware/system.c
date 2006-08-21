@@ -91,21 +91,21 @@ bool detect_flashed_rockbox(void)
 {
     struct flash_header hdr;
     uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
-    
+
 # ifndef BOOTLOADER
     int oldmode;
     oldmode = system_memory_guard(MEMGUARD_NONE);
 # endif
-    
+
     memcpy(&hdr, src, sizeof(struct flash_header));
-    
+
 # ifndef BOOTLOADER
     system_memory_guard(oldmode);
 # endif
-    
+
     if (hdr.magic != FLASH_MAGIC)
         return false;
-    
+
     return true;
 }
 #else
@@ -139,13 +139,13 @@ void ddma_transfer(int dir, int mem, void* intAddr, long extAddr, int num) {
     /* HW wants those two in word units. */
     num /= 2;
     externalAddress /= 2;
-    
+
     DDMACFG = (dir << 1) | (mem << 2);
     DDMAIADR = internalAddress;
     DDMAEADR = externalAddress;
     DDMANUM = num;
     DDMACOM |= 0x4; /* start */
-    
+
     ddma_wait_idle(); /* wait for completion */
     set_irq_level(irq);
 }
@@ -164,13 +164,13 @@ static void ddma_transfer_noicode(int dir, int mem, long intAddr, long extAddr, 
     /* HW wants those two in word units. */
     num /= 2;
     externalAddress /= 2;
-    
+
     DDMACFG = (dir << 1) | (mem << 2);
     DDMAIADR = internalAddress;
     DDMAEADR = externalAddress;
     DDMANUM = num;
     DDMACOM |= 0x4; /* start */
-    
+
     ddma_wait_idle_noicode(); /* wait for completion */
     set_irq_level(irq);
 }
@@ -220,7 +220,7 @@ void smsc_delay() {
        Delay doesn't depend on CPU speed in Archos' firmware.
     */
     for (i = 0; i < 100; i++) {
-        
+
     }
 }
 
@@ -228,9 +228,9 @@ static void extra_init(void) {
     /* Power on stuff */
     P1 |= 0x07;
     P1CON |= 0x1f;
-    
+
     /* P5 conf
-     * lines 0, 1 & 4 are digital, other analog. : 
+     * lines 0, 1 & 4 are digital, other analog. :
      */
     P5CON = 0xec;
 
@@ -294,21 +294,21 @@ void system_init(void)
     /********
      * CPU
      */
-    
-    
+
+
     /* PLL0 (cpu osc. frequency) */
     /* set_cpu_frequency(CPU_FREQ); */
 
 
     /*******************
-     * configure S(D)RAM 
+     * configure S(D)RAM
      */
 
     /************************
      * Copy .icode section to icram
      */
     ddma_transfer_noicode(0, 0, 0x40, (long)&icodecopy, (int)&icodesize);
-   
+
 
     /***************************
      * Interrupts
@@ -472,12 +472,12 @@ void UIE (void) /* Unexpected Interrupt or Exception */
     unsigned int format_vector, pc;
     int vector;
     char str[32];
-    
+
     asm volatile ("move.l (52,%%sp),%0": "=r"(format_vector));
     asm volatile ("move.l (56,%%sp),%0": "=r"(pc));
 
     vector = (format_vector >> 18) & 0xff;
-    
+
     /* clear screen */
     lcd_clear_display ();
 #ifdef HAVE_LCD_BITMAP
@@ -488,7 +488,7 @@ void UIE (void) /* Unexpected Interrupt or Exception */
     snprintf(str,sizeof(str),"at %08x",pc);
     lcd_puts(0,1,str);
     lcd_update();
-    
+
     /* set cpu frequency to 11mhz (to prevent overheating) */
     DCR = (DCR & ~0x01ff) | 1;
     PLLCR = 0x10800000;
@@ -510,7 +510,7 @@ void UIE (void) /* Unexpected Interrupt or Exception */
 }
 
 /* reset vectors are handled in crt0.S */
-void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) = 
+void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
 {
     UIE,UIE,UIE,UIE,UIE,UIE,
     UIE,UIE,UIE,UIE,UIE,UIE,UIE,UIE,
@@ -520,7 +520,7 @@ void (* const vbr[]) (void) __attribute__ ((section (".vectors"))) =
 
     TRAP0,TRAP1,TRAP2,TRAP3,TRAP4,TRAP5,TRAP6,TRAP7,
     TRAP8,TRAP9,TRAP10,TRAP11,TRAP12,TRAP13,TRAP14,TRAP15,
-    
+
     SWT,UIE,UIE,I2C,UART1,UART2,DMA0,DMA1,
     DMA2,DMA3,QSPI,UIE,UIE,UIE,UIE,UIE,
     PDIR1FULL,PDIR2FULL,EBUTXEMPTY,IIS2TXEMPTY,
@@ -741,7 +741,7 @@ static const char* const irqname[] = {
 
 asm (
 
-/* Vector table. 
+/* Vector table.
  * Handled in asm because gcc 4.x doesn't allow weak aliases to symbols
  * defined in an asm block -- silly.
  * Reset vectors (0..3) are handled in crt0.S */
@@ -854,7 +854,7 @@ asm (
     RESERVE_INTERRUPT (        108)
     DEFAULT_INTERRUPT (ADITI,  109)
 
-/* UIE# block. 
+/* UIE# block.
  * Must go into the same section as the UIE() handler */
 
     "\t.text\n"
@@ -979,7 +979,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     char str[32];
 
     asm volatile ("sts\tpr,%0" : "=r"(n));
-    
+
     /* clear screen */
     lcd_clear_display ();
 #ifdef HAVE_LCD_BITMAP
@@ -1002,7 +1002,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
         volatile int i;
         led (state);
         state = !state;
-        
+
         for (i = 0; i < 240000; ++i);
 #endif
 
@@ -1018,7 +1018,7 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 #elif CONFIG_KEYPAD == ONDIO_PAD
         if (!(PCDR & 0x0008))
 #endif
-        {   
+        {
             /* enable the watchguard timer, but don't service it */
             RSTCSR_W = 0x5a40; /* Reset enabled, power-on reset */
             TCSR_W = 0xa560; /* Watchdog timer mode, timer enabled, sysclk/2 */
@@ -1086,7 +1086,7 @@ int system_memory_guard(int newmode)
 
     int oldmode = MEMGUARD_NONE;
     int i;
-    
+
     /* figure out the old mode from what is in the UBC regs. If the register
        values don't match any mode, assume MEMGUARD_NONE */
     for (i = MEMGUARD_NONE; i < MAXMEMGUARD; i++)
@@ -1098,7 +1098,7 @@ int system_memory_guard(int newmode)
             break;
         }
     }
-    
+
     if (newmode == MEMGUARD_KEEP)
         newmode = oldmode;
 
@@ -1109,7 +1109,7 @@ int system_memory_guard(int newmode)
     BAR  = modes[newmode].addr;
     BAMR = modes[newmode].mask;
     BBR  = modes[newmode].bbr;
-    
+
     return oldmode;
 }
 #elif defined(CPU_ARM)
@@ -1124,7 +1124,7 @@ static const char* const uiename[] = {
 void UIE(unsigned int pc, unsigned int num)
 {
     char str[32];
-    
+
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
@@ -1133,7 +1133,7 @@ void UIE(unsigned int pc, unsigned int num)
     snprintf(str, sizeof(str), "at %08x", pc);
     lcd_puts(0, 1, str);
     lcd_update();
-    
+
     while (1)
     {
         /* TODO: perhaps add button handling in here when we get a polling
@@ -1160,7 +1160,7 @@ void irq(void)
     else if (CPU_INT_STAT & TIMER2_MASK)
         TIMER2();
     else if (CPU_HI_INT_STAT & GPIO_MASK)
-        ipod_mini_button_int();        
+        ipod_mini_button_int();
 }
 #elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB)
 /* TODO: this should really be in the target tree, but moving it there caused
@@ -1170,14 +1170,14 @@ void irq(void)
     if (CPU_INT_STAT & TIMER1_MASK)
         TIMER1();
     else if (CPU_INT_STAT & TIMER2_MASK)
-        TIMER2();        
+        TIMER2();
 }
 #else
 extern void ipod_4g_button_int(void);
 
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK) 
+    if (CPU_INT_STAT & TIMER1_MASK)
         TIMER1();
     else if (CPU_INT_STAT & TIMER2_MASK)
         TIMER2();
@@ -1187,11 +1187,21 @@ void irq(void)
 #endif
 #endif /* BOOTLOADER */
 
+unsigned int current_core(void)
+{
+    if(((*(volatile unsigned long *)(0x60000000)) & 0xff) == 0x55)
+    {
+        return CPU;
+    }
+    return COP;
+}
+
+
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what
    they should be named. Because of this I also have no way of knowing how
-   to extend the funtions to do alternate cache configurations and/or 
+   to extend the funtions to do alternate cache configurations and/or
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
@@ -1251,7 +1261,7 @@ void set_cpu_frequency(long frequency)
 #if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI)
     /* We don't know why the timer interrupt gets disabled on the PP5020
        based ipods, but without the following line, the 4Gs will freeze
-       when CPU frequency changing is enabled.  
+       when CPU frequency changing is enabled.
 
        Note also that a simple "CPU_INT_EN = TIMER1_MASK;" (as used
        elsewhere to enable interrupts) doesn't work, we need "|=".
@@ -1321,19 +1331,29 @@ extern void TIMER2(void);
 
 void irq(void)
 {
-    if (CPU_INT_STAT & TIMER1_MASK) 
+    if (CPU_INT_STAT & TIMER1_MASK)
         TIMER1();
-    else if (CPU_INT_STAT & TIMER2_MASK) 
+    else if (CPU_INT_STAT & TIMER2_MASK)
         TIMER2();
 }
 
 #endif
 
+unsigned int current_core(void)
+{
+    if(((*(volatile unsigned long *)(0xc4000000)) & 0xff) == 0x55)
+    {
+        return CPU;
+    }
+    return COP;
+}
+
+
 /* TODO: The following two function have been lifted straight from IPL, and
    hence have a lot of numeric addresses used straight. I'd like to use
    #defines for these, but don't know what most of them are for or even what
    they should be named. Because of this I also have no way of knowing how
-   to extend the funtions to do alternate cache configurations and/or 
+   to extend the funtions to do alternate cache configurations and/or
    some other CPU frequency scaling. */
 
 #ifndef BOOTLOADER
@@ -1370,7 +1390,7 @@ void set_cpu_frequency(long frequency)
     else
         postmult = CPUFREQ_DEFAULT_MULT;
     cpu_frequency = frequency;
-    
+
     outl(0x02, 0xcf005008);
     outl(0x55, 0xcf00500c);
     outl(0x6000, 0xcf005010);
@@ -1501,7 +1521,7 @@ void system_init(void)
     IRQ_WRITE_WAIT(0, 0, v == 0);
     IRQ_WRITE_WAIT(4, 0, v == 0);
     */
-    
+
     for (i = 0; i < 0x1c; i++)
     {
         IRQ_WRITE_WAIT(0x404 + i * 4, 0x1e000001, (v & 0x3010f) == 1);

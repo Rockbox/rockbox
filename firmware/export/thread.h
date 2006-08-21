@@ -31,12 +31,16 @@
 
 int create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name);
+int create_thread_on_core(unsigned int core, void (*function)(void), void* stack, int stack_size,
+                  const char *name);
 void remove_thread(int threadnum);
+void remove_thread_on_core(unsigned int core, int threadnum);
 void switch_thread(void);
 void sleep_thread(void);
 void wake_up_thread(void);
 void init_threads(void);
 int thread_stack_usage(int threadnum);
+int thread_stack_usage_on_core(unsigned int core, int threadnum);
 #ifdef RB_PROFILE
 void profile_thread(void);
 #endif
