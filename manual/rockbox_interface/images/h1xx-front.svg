@@ -20,7 +20,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.43"
    sodipodi:docname="h1xx-front.svg"
-   sodipodi:docbase="/home/martin/src/dev/pics/pixelma"><metadata
+   sodipodi:docbase="/home/martin/src/dev/rockbox-devel/manual/rockbox_interface/images"><metadata
    id="metadata1870"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
@@ -519,6 +519,7 @@
      id="tspan2318"
      x="-2048.6355"
      y="5292.3081">Up</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -530,6 +531,7 @@
      id="tspan2322"
      x="-2283.7993"
      y="9990.6211">Left</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -541,6 +543,7 @@
      id="tspan2326"
      x="-2198.4395"
      y="7557.8667">Rec</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -552,6 +555,7 @@
      id="tspan2330"
      x="-2369.1592"
      y="13191.614">Down</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -563,6 +567,7 @@
      id="tspan2334"
      x="10306.771"
      y="14770.771">Navi</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -574,6 +579,7 @@
      id="tspan2338"
      x="10306.771"
      y="7557.8667">A-B</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -585,6 +591,7 @@
      id="tspan2342"
      x="10306.771"
      y="5210.4722">Stop</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -596,6 +603,7 @@
      id="tspan2346"
      x="10306.771"
      y="2820.3977">Play</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -606,7 +614,8 @@
      sodipodi:role="line"
      id="tspan2350"
      x="10331.25"
-     y="9999.6924">Left</tspan></text>
+     y="9999.6924">Right</tspan></text>
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:URW Palladio L"
@@ -618,4 +627,5 @@
      id="tspan2354"
      x="10273.011"
      y="11985.095">Hold</tspan></text>
+
 </svg>
