@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id $
  *
  * Copyright (C) 2006 Jonathan Gordon
  *
@@ -109,7 +110,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,              BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_quickscreen[]  = {
@@ -168,7 +169,7 @@ const struct button_mapping remote_button_context_standard[]  = {
     { ACTION_STD_MENU,       BUTTON_RC_MENU|BUTTON_REL,     BUTTON_RC_MENU },
     { ACTION_STD_QUICKSCREEN,BUTTON_RC_MENU|BUTTON_REPEAT,  BUTTON_RC_MENU },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 };
 
 const struct button_mapping remote_button_context_tree[]  = {
