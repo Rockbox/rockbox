@@ -89,6 +89,7 @@ long gui_wps_show(void)
     bool exit = false;
     bool update_track = false;
     int i;
+    long last_left = 0, last_right = 0;
 
     action_signalscreenchange();
     
@@ -293,18 +294,32 @@ long gui_wps_show(void)
                 }
             }
                 break;
-                /* fast forward / rewind */
+            /* fast forward 
+                OR next dir if this is straight after ACTION_WPS_SKIPNEXT */
             case ACTION_WPS_SEEKFWD:
+                if (global_settings.party_mode)
+                    break;
+                if (current_tick -last_right < HZ)
+                   audio_next_dir();
+                else ffwd_rew(ACTION_WPS_SEEKFWD);
+                last_right = 0;
+                break;
+            /* fast rewind 
+                OR prev dir if this is straight after ACTION_WPS_SKIPPREV */
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
-                ffwd_rew(button);
+                if (current_tick -last_left < HZ)
+                    audio_prev_dir();
+                else ffwd_rew(ACTION_WPS_SEEKBACK);
+                last_left = 0;
                 break;
 
                 /* prev / restart */
             case ACTION_WPS_SKIPPREV:
                 if (global_settings.party_mode)
                     break;
+                last_left = current_tick;
                 update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
@@ -349,6 +364,7 @@ long gui_wps_show(void)
             case ACTION_WPS_SKIPNEXT:
                 if (global_settings.party_mode)
                     break;
+                last_right = current_tick;
                 update_track = true;
 
 #ifdef AB_REPEAT_ENABLE
@@ -368,7 +384,6 @@ long gui_wps_show(void)
                 }
                 /* ...otherwise, do it normally */
 #endif
-
                 audio_next();
                 break;
                 /* next / prev directories */
