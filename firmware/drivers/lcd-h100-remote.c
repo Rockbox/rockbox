@@ -85,7 +85,7 @@ static int cs_countdown IDATA_ATTR = 0;
 #ifdef HAVE_REMOTE_LCD_TICKING
 /* If set to true, will prevent "ticking" to headphones. */
 static bool emireduce = false;
-static int byte_delay = 172;
+static int byte_delay = 0;
 #endif
 
 /* remote hotplug */
@@ -124,153 +124,204 @@ static const char scroll_tick_table[16] = {
 #ifndef SIMULATOR
 
 #ifdef HAVE_REMOTE_LCD_TICKING
-static inline void _byte_delay(void)
+static inline void _byte_delay(int delay)
 {
     asm (
-        "move.l  %[dly],%%d0     \n"
+        "move.l  %[dly], %%d0    \n"
+        "ble.s   2f              \n"
     "1:                          \n"
-        "subq.l  #1,%%d0         \n"
-        "bhi.s   1b              \n"
+        "subq.l  #1, %%d0        \n"
+        "bne.s   1b              \n"
+    "2:                          \n"
         : /* outputs */
         : /* inputs */
-        [dly]"d"(byte_delay)
+        [dly]"d"(delay)
         : /* clobbers */
         "d0"
     );
 }
 #endif /* HAVE_REMOTE_LCD_TICKING */
 
-/* Standard low-level byte writer */
+/* Standard low-level byte writer. Requires CLK low on entry */
 static inline void _write_byte(unsigned data)
 {
     asm volatile (
-        "moveq.l #8,%%d1           \n" /* bit counter */
+        "move.l  (%[gpo1]), %%d0     \n"  /* Get current state of data line */
+        "and.l   %[dbit], %%d0       \n"
+        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
+        "bset    #8, %[data]         \n"  
+    "1:                              \n"
+        "move.l  %[data], %%d0       \n"  /* Compute the 'bit derivative', i.e. a value */
+        "lsr.l   #1, %%d0            \n"  /*   with 1's where the data changes from the */
+        "eor.l   %%d0, %[data]       \n"  /*   previous state, and 0's where it doesn't */
+        "swap    %[data]             \n"  /* Shift data to upper byte */
+        "lsl.l   #8, %[data]         \n"
 
-    "2:                            \n"
-        "lsl.l   #1,%[data]        \n" /* data <<= 1, MSB of data set? */
-        "bcc.s   1f                \n"
-        "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
-        ".word   0x51fa            \n" /* trapf.w - shadow next insn */
-    "1:                            \n"
-        "and.l   %[dlo],(%[gpi1])  \n" /* reset data bit */
-        "eor.l   %[cbit],(%[gpio]) \n" /* set clock bit */
-        "eor.l   %[cbit],(%[gpio]) \n" /* reset clock bit */
+        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"  /* 1: flip DATA */
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"  /* Flip CLK */
+        "eor.l   %[cbit], (%[gpo0])  \n"  /* Flip CLK */
 
-        "subq.l  #1,%%d1           \n"
-        "bne.s   2b                \n"
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
 
-        "or.l    %[dhi],(%[gpi1])  \n" /* set data bit */
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], (%[gpo1])  \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
         : /* outputs */
+        [data]"+d"(data)
         : /* inputs */
-        [data]"d"(data << 24),
-        [gpio]"a"(&GPIO_OUT),
+        [gpo0]"a"(&GPIO_OUT),
         [cbit]"d"(0x10000000),
-        [gpi1]"a"(&GPIO1_OUT),
-        [dhi] "d"(0x00040000),
-        [dlo] "d"(~0x00040000)
+        [gpo1]"a"(&GPIO1_OUT),
+        [dbit]"d"(0x00040000)
         : /* clobbers */
-        "d1"
+        "d0"
     );
 }
 
-/* Unrolled fast low-level byte writer. Don't use with high CPU clock. */
-static inline void _write_unrolled(unsigned data)
+/* Fast low-level byte writer. Don't use with high CPU clock.
+ * Requires CLK low on entry */
+static inline void _write_fast(unsigned data)
 {
     asm volatile (
-        "move.w  %%sr,%%d4       \n" /* get current interrupt level */
-        "move.w  #0x2700,%%sr    \n" /* disable interrupts */
+        "move.w  %%sr,%%d3           \n"  /* Get current interrupt level */
+        "move.w  #0x2700,%%sr        \n"  /* Disable interrupts */
 
-        "move.l  #0x00040000,%%d1\n" /* precalculate port values */
-        "move.l  %%d1,%%d0       \n" /* for setting and resetting */
-        "or.l    (%[gpi1]),%%d1  \n" /* the data bit */
-        "eor.l   %%d1,%%d0       \n"
+        "move.l  (%[gpo1]), %%d0     \n"  /* Get current state of data port */
+        "move.l  %%d0, %%d1          \n"
+        "and.l   %[dbit], %%d1       \n"  /* Check current state of data line */
+        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
+        "bset    #8, %[data]         \n"
+    "1:                              \n"
+        "move.l  %[data], %%d1       \n"  /* Compute the 'bit derivative', i.e. a value */
+        "lsr.l   #1, %%d1            \n"  /*   with 1's where the data changes from the */
+        "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
+        "swap    %[data]             \n"  /* Shift data to upper byte */
+        "lsl.l   #8, %[data]         \n"
+        
+        "move.l  (%[gpo0]), %%d1     \n"  /* Get current state of clock port */
+        "move.l  %[cbit], %%d2       \n"  /* Precalculate opposite state of clock line */
+        "eor.l   %%d1, %%d2          \n"  
 
-        "move.l  #0x10000000,%%d3\n" /* precalculate port values */
-        "move.l  %%d3,%%d2       \n" /* for setting and resetting */
-        "or.l    (%[gpio]),%%d3  \n" /* the clock bit */
-        "eor.l   %%d3,%%d2       \n"
+        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"  /* 1: flip data bit */
+        "move.l  %%d0, (%[gpo1])     \n"  /*   and output new DATA state */
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"  /* Set CLK */
+        "move.l  %%d1, (%[gpo0])     \n"  /* Reset CLK */
 
-        "lsl.l   #1,%[data]      \n" /* data <<= 1, MSB of data set? */
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
-        ".word   0x51fa          \n" /* trapf.w - shadow next insn */
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n" /* reset data bit */
-        "move.l  %%d3,(%[gpio])  \n" /* set clock bit */
-        "move.l  %%d2,(%[gpio])  \n" /* reset clock bit */
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo1])     \n"
+    "1:                              \n"
+        "move.l  %%d2, (%[gpo0])     \n"
+        "move.l  %%d1, (%[gpo0])     \n"
 
-        "lsl.l   #1,%[data]      \n"
-        "bcc.s   1f              \n"
-        "move.l  %%d1,(%[gpi1])  \n"
-        ".word   0x51fa          \n"
-    "1:                          \n"
-        "move.l  %%d0,(%[gpi1])  \n"
-        "move.l  %%d3,(%[gpio])  \n"
-        "move.l  %%d2,(%[gpio])  \n"
-
-        "move.l  %%d1,(%[gpi1])  \n" /* set data bit */
-        "move.w  %%d4,%%sr       \n" /* reenable interrupts */
+        "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
         : /* outputs */
+        [data]"+d"(data)
         : /* inputs */
-        [data]"d"(data << 24),
-        [gpio]"a"(&GPIO_OUT),
-        [gpi1]"a"(&GPIO1_OUT)
+        [gpo0]"a"(&GPIO_OUT),
+        [cbit]"i"(0x10000000),
+        [gpo1]"a"(&GPIO1_OUT),
+        [dbit]"d"(0x00040000)
         : /* clobbers */
-        "d0", "d1", "d2", "d3", "d4"
+        "d0", "d1", "d2", "d3"
     );
 }
 
@@ -282,8 +333,7 @@ void lcd_remote_write_command(int cmd)
 
     _write_byte(cmd);
 #ifdef HAVE_REMOTE_LCD_TICKING
-    if (emireduce)
-        _byte_delay();
+     _byte_delay(byte_delay - 148);
 #endif
 
     cs_countdown = CS_TIMEOUT;
@@ -295,20 +345,14 @@ void lcd_remote_write_command_ex(int cmd, int data)
     RS_LO;
     CS_LO;
 
+    _write_byte(cmd);
 #ifdef HAVE_REMOTE_LCD_TICKING
-    if (emireduce)
-    {
-        _write_byte(cmd);
-        _byte_delay();
-        _write_byte(data);
-        _byte_delay();
-    }
-    else
+    _byte_delay(byte_delay - 148);
 #endif
-    {
-        _write_byte(cmd);
-        _write_byte(data);
-    }
+    _write_byte(data);
+#ifdef HAVE_REMOTE_LCD_TICKING
+    _byte_delay(byte_delay - 148);
+#endif
 
     cs_countdown = CS_TIMEOUT;
 }
@@ -323,25 +367,26 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
     CS_LO;
 
     /* This is safe as long as lcd_remote_write_data() isn't called from within
-     * an ISR. */    
-    if (cpu_frequency < 20000000)
+     * an ISR. */
+    if (cpu_frequency < 50000000)
     {
         while (p_bytes < p_end)
-            _write_unrolled(*p_bytes++);
+        {
+            _write_fast(*p_bytes++);
+#ifdef HAVE_REMOTE_LCD_TICKING
+            _byte_delay(byte_delay - 87);
+#endif
+        }
     }
     else
     {
+        while (p_bytes < p_end)
+        {
+            _write_byte(*p_bytes++);
 #ifdef HAVE_REMOTE_LCD_TICKING
-        if (emireduce)
-            while (p_bytes < p_end)
-            {
-                _write_byte(*p_bytes++);
-                _byte_delay();
-            }
-        else
+            _byte_delay(byte_delay - 148);
 #endif
-            while (p_bytes < p_end)
-                _write_byte(*p_bytes++);
+        }
     }
 
     cs_countdown = CS_TIMEOUT;
@@ -415,6 +460,7 @@ void lcd_remote_set_flip(bool yesno)
 static void remote_lcd_init(void)
 {
     CS_HI;
+    CLK_LO;
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_BIAS | 0x0);
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x5);
@@ -574,8 +620,8 @@ void lcd_remote_update(void)
         return;
       
 #ifdef HAVE_REMOTE_LCD_TICKING
-    /* adjust byte delay for emi reduction */
-    byte_delay = (cpu_frequency >> 18) - 30;
+    /* Adjust byte delay for emi reduction. */
+    byte_delay = emireduce ? cpu_frequency / 197600 + 28: 0;
 #endif
 
     /* Copy display bitmap to hardware */
@@ -609,8 +655,8 @@ void lcd_remote_update_rect(int x, int y, int width, int height)
         ymax = LCD_REMOTE_HEIGHT/8-1;
 
 #ifdef HAVE_REMOTE_LCD_TICKING
-    /* adjust byte delay for emi reduction */
-    byte_delay = (cpu_frequency >> 18) - 30;
+    /* Adjust byte delay for emi reduction */
+    byte_delay = emireduce ? cpu_frequency / 197600 + 28: 0;
 #endif
 
     /* Copy specified rectange bitmap to hardware */
