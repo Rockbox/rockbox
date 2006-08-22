@@ -3,6 +3,7 @@
 #include "lcd.h"
 #include "kernel.h"
 #include "system.h"
+#include "string.h"
 
 void lcd_init_device(void);
 void lcd_update_rec(int, int, int, int);

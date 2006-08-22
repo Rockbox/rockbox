@@ -55,7 +55,7 @@ void sc606_i2c_stop(void)
     DELAY;
 }
 
-void sc606_i2c_ack()
+void sc606_i2c_ack(void)
 {
 
     SDA_LO;
@@ -106,7 +106,7 @@ int sc606_i2c_outb(unsigned char byte)
     return sc606_i2c_getack();
 }
 
-unsigned char sc606_i2c_inb()
+unsigned char sc606_i2c_inb(void)
 {
    int i;
    unsigned char byte = 0;
@@ -159,7 +159,7 @@ int sc606_read(unsigned char reg, unsigned char* data)
     return x;
 }
 
-void sc606_init()
+void sc606_init(void)
 {
     /* Set GPB2 (EN) to 1 */
     GPBCON = (GPBCON & ~(3<<4)) | 1<<4;

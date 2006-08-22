@@ -20,7 +20,7 @@
 
 char version[] = APPSVERSION;
 
-void go_usb_mode() {
+void go_usb_mode(void) {
   /* Drop into USB mode.  This does not check for disconnection. */
 
     int i;
