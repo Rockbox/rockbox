@@ -51,6 +51,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,      BUTTON_OFF,                 BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_F3,      BUTTON_F3,                BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 };
@@ -76,6 +77,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PITCHSCREEN, BUTTON_ON|BUTTON_UP,        BUTTON_ON },
     { ACTION_WPS_PITCHSCREEN, BUTTON_ON|BUTTON_DOWN,      BUTTON_ON },
     { ACTION_STD_KEYLOCK,     BUTTON_F1|BUTTON_DOWN,      BUTTON_NONE },
+    { ACTION_F3,      BUTTON_F3,                BUTTON_NONE },
     
 
     LAST_ITEM_IN_LIST

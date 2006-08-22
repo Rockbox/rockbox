@@ -462,11 +462,11 @@ long gui_wps_show(void)
 
                 /* screen settings */
 #ifdef BUTTON_F3
-            case BUTTON_F3:
+            case ACTION_F3:
 #ifdef HAVE_LCD_COLOR
                 show_main_backdrop();
 #endif
-                if (quick_screen_f3(button))
+                if (quick_screen_f3(BUTTON_F3))
                     return SYS_USB_CONNECTED;
 #ifdef HAVE_LCD_BITMAP
                 FOR_NB_SCREENS(i)

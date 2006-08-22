@@ -90,6 +90,7 @@ enum {
     ACTION_STD_QUICKSCREEN,
     ACTION_STD_KEYLOCK,
     
+    ACTION_F3, /* just so everything works again, possibly change me */
     /* code context actions */
     
     /* WPS codes */
