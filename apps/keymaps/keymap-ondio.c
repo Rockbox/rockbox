@@ -137,6 +137,22 @@ const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
+const struct button_mapping button_context_keyboard[]  = {
+    { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_MENU|BUTTON_REL,                BUTTON_MENU },
+    { ACTION_KBD_DONE,         BUTTON_MENU|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_OFF,                            BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP,                             BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN,                           BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,             BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_keyboard */
+
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )
@@ -165,7 +181,9 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_tree;
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
-            
+        case CONTEXT_KEYBOARD:
+            return button_context_keyboard;
+
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
         default:

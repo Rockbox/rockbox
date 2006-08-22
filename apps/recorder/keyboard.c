@@ -36,6 +36,7 @@
 #include "icons.h"
 #include "file.h"
 #include "hangul.h"
+#include "action.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -52,143 +53,22 @@
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
-#define KBD_CURSOR_LEFT (BUTTON_ON | BUTTON_LEFT)
-#define KBD_SELECT BUTTON_SELECT
-#define KBD_PAGE_FLIP BUTTON_MODE  /* unused */
-#define KBD_DONE_PRE BUTTON_ON
-#define KBD_DONE (BUTTON_ON | BUTTON_REL)
-#define KBD_ABORT BUTTON_OFF
-#define KBD_BACKSPACE BUTTON_REC
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-#define KBD_MORSE_INPUT (BUTTON_ON | BUTTON_MODE)
-#define KBD_RC_CURSOR_RIGHT (BUTTON_RC_ON | BUTTON_RC_FF)
-#define KBD_RC_CURSOR_LEFT (BUTTON_RC_ON | BUTTON_RC_REW)
-#define KBD_RC_SELECT BUTTON_RC_MENU
-#define KBD_RC_PAGE_FLIP BUTTON_RC_MODE
-#define KBD_RC_DONE_PRE BUTTON_RC_ON
-#define KBD_RC_DONE (BUTTON_RC_ON | BUTTON_REL)
-#define KBD_RC_ABORT BUTTON_RC_STOP
-#define KBD_RC_BACKSPACE BUTTON_RC_REC
-#define KBD_RC_LEFT BUTTON_RC_REW
-#define KBD_RC_RIGHT BUTTON_RC_FF
-#define KBD_RC_UP BUTTON_RC_SOURCE
-#define KBD_RC_DOWN BUTTON_RC_BITRATE
-#define KBD_RC_MORSE_INPUT (BUTTON_RC_ON | BUTTON_RC_MODE)
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define KBD_CURSOR_RIGHT (BUTTON_ON | BUTTON_RIGHT)
-#define KBD_CURSOR_LEFT (BUTTON_ON | BUTTON_LEFT)
-#define KBD_SELECT BUTTON_PLAY
-#define KBD_PAGE_FLIP BUTTON_F1
-#define KBD_DONE BUTTON_F2
-#define KBD_ABORT BUTTON_OFF
-#define KBD_BACKSPACE BUTTON_F3
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
+#define KBD_MORSE_INPUT /* I-Rivers have a Morse input mode */
 
 #elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
 #define KBD_MODES /* Ondio uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_MENU | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_MENU
-#define KBD_DONE_PRE BUTTON_MENU
-#define KBD_DONE (BUTTON_MENU | BUTTON_REPEAT)
-#define KBD_ABORT BUTTON_OFF
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#define KBD_CURSOR_RIGHT (BUTTON_MENU | BUTTON_RIGHT)
-#define KBD_CURSOR_LEFT (BUTTON_MENU | BUTTON_LEFT)
-#define KBD_SELECT (BUTTON_PLAY | BUTTON_REL)
-#define KBD_SELECT_PRE BUTTON_PLAY
-#define KBD_PAGE_FLIP BUTTON_ON
-#define KBD_DONE_PRE BUTTON_PLAY
-#define KBD_DONE (BUTTON_PLAY | BUTTON_REPEAT)
-#define KBD_ABORT BUTTON_OFF
-#define KBD_BACKSPACE (BUTTON_MENU | BUTTON_PLAY)
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-
 #define KBD_MODES /* iPod uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_SELECT
-#define KBD_DONE_PRE BUTTON_SELECT
-#define KBD_DONE (BUTTON_SELECT | BUTTON_REPEAT)
-#define KBD_ABORT BUTTON_MENU
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_SCROLL_BACK
-#define KBD_DOWN BUTTON_SCROLL_FWD
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-
-/* TODO: Check keyboard mappings */
-
 #define KBD_MODES /* iFP7xx uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_SELECT
-#define KBD_DONE BUTTON_MODE
-#define KBD_ABORT BUTTON_PLAY
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-
-/* TODO: Check keyboard mappings */
-
 #define KBD_MODES /* iAudio X5 uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_SELECT | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_SELECT
-#define KBD_DONE BUTTON_PLAY
-#define KBD_ABORT BUTTON_REC
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-
-#define KBD_CURSOR_RIGHT (BUTTON_POWER | BUTTON_RIGHT)
-#define KBD_CURSOR_LEFT (BUTTON_POWER | BUTTON_LEFT)
-#define KBD_SELECT BUTTON_SELECT
-#define KBD_PAGE_FLIP (BUTTON_POWER | BUTTON_MENU)
-#define KBD_DONE_PRE BUTTON_POWER
-#define KBD_DONE (BUTTON_POWER | BUTTON_REL)
-#define KBD_ABORT BUTTON_A
-#define KBD_BACKSPACE BUTTON_MENU
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-
-/* TODO: Check keyboard mappings */
-
 #define KBD_MODES /* iriver H10 uses 2 modes, picker and line edit */
-#define KBD_SELECT (BUTTON_REW | BUTTON_REL) /* backspace in line edit */
-#define KBD_SELECT_PRE BUTTON_REW
-#define KBD_DONE BUTTON_PLAY
-#define KBD_ABORT BUTTON_FF
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_SCROLL_UP
-#define KBD_DOWN BUTTON_SCROLL_DOWN
-
 #endif
 
 struct keyboard_parameters {
@@ -694,30 +574,21 @@ int kbd_input(char* text, int buflen)
         FOR_NB_SCREENS(l)
         screens[l].update();
 
-        button = button_get_w_tmo(HZ/2);
+        button = get_action(CONTEXT_KEYBOARD,HZ/2);
 #ifdef KBD_MORSE_INPUT
         if (morse_mode)
         {
             /* Remap some buttons for morse mode. */
-            if (button == KBD_LEFT || button == (KBD_LEFT | BUTTON_REPEAT))
-                button = KBD_CURSOR_LEFT;
-            if (button == KBD_RIGHT || button == (KBD_RIGHT | BUTTON_REPEAT))
-                button = KBD_CURSOR_RIGHT;
-#ifdef KBD_RC_LEFT
-            if (button == KBD_RC_LEFT || button == (KBD_RC_LEFT | BUTTON_REPEAT))
-                button = KBD_RC_CURSOR_LEFT;
-            if (button == KBD_RC_RIGHT || button == (KBD_RC_RIGHT | BUTTON_REPEAT))
-                button = KBD_RC_CURSOR_RIGHT;
+            if (button == ACTION_KBD_LEFT)
+                button = ACTION_KBD_CURSOR_LEFT;
+            if (button == ACTION_KBD_RIGHT)
+                button = ACTION_KBD_CURSOR_RIGHT;
         }
-#endif
 #endif
 
         switch ( button ) {
 
-#ifdef KBD_RC_ABORT
-            case KBD_RC_ABORT:
-#endif
-            case KBD_ABORT:
+            case ACTION_KBD_ABORT:
                 FOR_NB_SCREENS(l)
                     screens[l].setfont(FONT_UI);
 
@@ -727,11 +598,7 @@ int kbd_input(char* text, int buflen)
                 return -1;
                 break;
 
-#if defined(KBD_PAGE_FLIP)
-            case KBD_PAGE_FLIP:
-#ifdef KBD_RC_PAGE_FLIP
-            case KBD_RC_PAGE_FLIP:
-#endif
+            case ACTION_KBD_PAGE_FLIP:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -745,13 +612,10 @@ int kbd_input(char* text, int buflen)
                     kbd_spellchar(param[l].kbd_buf[k]);
                 }
                 break;
-#endif
 
 #ifdef KBD_MORSE_INPUT
-            case KBD_MORSE_INPUT:
-#ifdef KBD_RC_MORSE_INPUT
-            case KBD_RC_MORSE_INPUT:
-#endif
+            case ACTION_KBD_MORSE_INPUT:
+
                 morse_mode = !morse_mode;
                 FOR_NB_SCREENS(l)
                 {
@@ -765,12 +629,8 @@ int kbd_input(char* text, int buflen)
                 /* FIXME: We should talk something like Morse mode.. */
                 break;
 #endif
-#ifdef KBD_RC_RIGHT
-            case KBD_RC_RIGHT:
-            case KBD_RC_RIGHT | BUTTON_REPEAT:
-#endif
-            case KBD_RIGHT:
-            case KBD_RIGHT | BUTTON_REPEAT:
+
+            case ACTION_KBD_RIGHT:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -806,12 +666,8 @@ int kbd_input(char* text, int buflen)
                     }
                 }
                 break;
-#ifdef KBD_RC_LEFT
-            case KBD_RC_LEFT:
-            case KBD_RC_LEFT | BUTTON_REPEAT:
-#endif
-            case KBD_LEFT:
-            case KBD_LEFT | BUTTON_REPEAT:
+
+            case ACTION_KBD_LEFT:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -852,12 +708,7 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-#ifdef KBD_RC_DOWN
-            case KBD_RC_DOWN:
-            case KBD_RC_DOWN | BUTTON_REPEAT:
-#endif
-            case KBD_DOWN:
-            case KBD_DOWN | BUTTON_REPEAT:
+            case ACTION_KBD_DOWN:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -895,12 +746,7 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-#ifdef KBD_RC_UP
-            case KBD_RC_UP:
-            case KBD_RC_UP | BUTTON_REPEAT:
-#endif
-            case KBD_UP:
-            case KBD_UP | BUTTON_REPEAT:
+            case ACTION_KBD_UP:
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
                     break;
@@ -938,27 +784,13 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-#ifdef KBD_RC_DONE
-            case KBD_RC_DONE:
-#endif
-            case KBD_DONE:
+            case ACTION_KBD_DONE:
                 /* accepts what was entered and continues */
-#ifdef KBD_DONE_PRE
-                if ((lastbutton != KBD_DONE_PRE)
-#ifdef KBD_RC_DONE_PRE
-                       && (lastbutton != KBD_RC_DONE_PRE)
-#endif
-                    )
-                    break;
-#endif
                 done = true;
                 break;
 
 #ifdef KBD_MORSE_INPUT
-#ifdef KBD_RC_SELECT
-            case KBD_RC_SELECT | BUTTON_REL:
-#endif
-            case KBD_SELECT | BUTTON_REL:
+            case ACTION_KBD_MORSE_SELECT:
                 if (morse_mode && morse_reading)
                 {
                     morse_code <<= 1;
@@ -969,15 +801,11 @@ int kbd_input(char* text, int buflen)
                 break;
 #endif
 
-#ifdef KBD_RC_SELECT
-            case KBD_RC_SELECT:
-
-                if (button == KBD_RC_SELECT)
+            case ACTION_KBD_SELECT:
+            case ACTION_KBD_SELECT_REM:
+                if (button == ACTION_KBD_SELECT_REM)
                     char_screen = 1;
-#endif
-            case KBD_SELECT:
-
-                if (button == KBD_SELECT)
+                else
                     char_screen = 0;
 #ifdef KBD_MORSE_INPUT
                 if (morse_mode)
@@ -993,14 +821,6 @@ int kbd_input(char* text, int buflen)
 #endif
 
                 /* inserts the selected char */
-#ifdef KBD_SELECT_PRE
-                if ((lastbutton != KBD_SELECT_PRE)
-#ifdef KBD_RC_SELECT_PRE
-                        && (lastbutton != KBD_RC_SELECT_PRE)
-#endif
-                   )
-                    break;
-#endif
 #ifdef KBD_MODES
                 if (line_edit) { /* select doubles as backspace in line_edit */
                     if (hangul) {
@@ -1088,12 +908,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
 #ifndef KBD_MODES
-#ifdef KBD_RC_BACKSPACE
-            case KBD_RC_BACKSPACE:
-            case KBD_RC_BACKSPACE | BUTTON_REPEAT:
-#endif
-            case KBD_BACKSPACE:
-            case KBD_BACKSPACE | BUTTON_REPEAT:
+            case ACTION_KBD_BACKSPACE:
                 if (hangul)
                 {
                     if (htail)
@@ -1116,12 +931,8 @@ int kbd_input(char* text, int buflen)
                     talk_spell(text, false);   /* speak revised text */
                 break;
 
-#ifdef KBD_RC_CURSOR_RIGHT
-            case KBD_RC_CURSOR_RIGHT:
-            case KBD_RC_CURSOR_RIGHT | BUTTON_REPEAT:
-#endif
- case KBD_CURSOR_RIGHT:
-            case KBD_CURSOR_RIGHT | BUTTON_REPEAT:
+            case ACTION_KBD_CURSOR_RIGHT:
+
                 if (hangul)
                     hangul = false;
 
@@ -1133,12 +944,8 @@ int kbd_input(char* text, int buflen)
                 }
                 break;
 
-#ifdef KBD_RC_CURSOR_LEFT
-            case KBD_RC_CURSOR_LEFT:
-            case KBD_RC_CURSOR_LEFT | BUTTON_REPEAT:
-#endif
-            case KBD_CURSOR_LEFT:
-            case KBD_CURSOR_LEFT | BUTTON_REPEAT:
+            case ACTION_KBD_CURSOR_LEFT:
+
                 if (hangul)
                     hangul = false;
                 if (editpos)

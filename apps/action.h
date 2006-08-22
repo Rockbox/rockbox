@@ -68,6 +68,7 @@ enum {
     
     CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
     CONTEXT_RECSCREEN,
+    CONTEXT_KEYBOARD,
 };
 
 
@@ -177,7 +178,22 @@ enum {
     /* yesno screen */
     ACTION_YESNO_ACCEPT,
     
-    
+    /* keyboard screen */
+    ACTION_KBD_LEFT,
+    ACTION_KBD_RIGHT,
+    ACTION_KBD_CURSOR_LEFT,
+    ACTION_KBD_CURSOR_RIGHT,
+    ACTION_KBD_SELECT,
+    ACTION_KBD_SELECT_REM,
+    ACTION_KBD_PAGE_FLIP,
+    ACTION_KBD_DONE,
+    ACTION_KBD_ABORT,
+    ACTION_KBD_BACKSPACE,
+    ACTION_KBD_UP,
+    ACTION_KBD_DOWN,
+    ACTION_KBD_MORSE_INPUT,
+    ACTION_KBD_MORSE_SELECT,
+
 };
 
 struct button_mapping {

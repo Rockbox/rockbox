@@ -146,6 +146,20 @@ const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
+const struct button_mapping button_context_keyboard[]  = {
+    { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_SELECT|BUTTON_REL,              BUTTON_SELECT },
+    { ACTION_KBD_DONE,         BUTTON_SELECT|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_KBD_ABORT,        BUTTON_MENU,                           BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_SCROLL_BACK,                    BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_SCROLL_FWD,                     BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_keyboard */
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -180,6 +194,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
+        case CONTEXT_KEYBOARD:
+            return button_context_keyboard;
         default:
             return button_context_standard;
     } 

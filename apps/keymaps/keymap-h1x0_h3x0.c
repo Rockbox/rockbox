@@ -232,6 +232,31 @@ const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
+const struct button_mapping button_context_keyboard[]  = {
+    { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_ON|BUTTON_LEFT,                 BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_ON|BUTTON_RIGHT,                BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_ON|BUTTON_RIGHT|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_SELECT,                         BUTTON_NONE },
+    { ACTION_KBD_PAGE_FLIP,    BUTTON_MODE,                           BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_ON|BUTTON_REL,                  BUTTON_ON },
+    { ACTION_KBD_ABORT,        BUTTON_OFF,                            BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_REC,                            BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_REC|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP,                             BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_UP|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN,                           BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_DOWN|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_ON|BUTTON_MODE,                 BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_SELECT|BUTTON_REL,              BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_keyboard */
+
 /*****************************************************************************
  *    Remote control mappings 
  *****************************************************************************/
@@ -536,6 +561,64 @@ const struct button_mapping button_context_recscreen_h300lcdremote[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen_h300lcdremote */
 
+const struct button_mapping button_context_keyboard_h100remote[]  = {
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW,                            BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_RC_FF,                             BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RC_FF|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_ON|BUTTON_RC_REW,               BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_ON|BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_ON|BUTTON_RC_FF,                BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_ON|BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_VOL_DOWN,                       BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_VOL_UP,                         BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_KBD_SELECT_REM,   BUTTON_RC_MENU,                           BUTTON_NONE },
+    { ACTION_KBD_PAGE_FLIP,    BUTTON_RC_MODE,                           BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_RC_ON|BUTTON_REL,                  BUTTON_RC_ON },
+    { ACTION_KBD_ABORT,        BUTTON_RC_STOP,                           BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_RC_REC,                            BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_RC_REC|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_RC_SOURCE,                         BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_RC_SOURCE|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_RC_BITRATE,                        BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_RC_BITRATE|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_RC_ON|BUTTON_RC_MODE,              BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_RC_MENU|BUTTON_REL,                BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_keyboard_h100remote */
+
+const struct button_mapping button_context_keyboard_h300lcdremote[]  = {
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW,                            BUTTON_NONE },
+    { ACTION_KBD_LEFT,         BUTTON_RC_REW|BUTTON_REPEAT,              BUTTON_NONE },   
+    { ACTION_KBD_RIGHT,        BUTTON_RC_FF,                             BUTTON_NONE },
+    { ACTION_KBD_RIGHT,        BUTTON_RC_FF|BUTTON_REPEAT,               BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_MENU|BUTTON_RC_REW,               BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_MENU|BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_MENU|BUTTON_RC_FF,                BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_MENU|BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_SOURCE,                         BUTTON_NONE },
+    { ACTION_KBD_CURSOR_LEFT,  BUTTON_RC_SOURCE|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_BITRATE,                        BUTTON_NONE },
+    { ACTION_KBD_CURSOR_RIGHT, BUTTON_RC_BITRATE|BUTTON_REPEAT,          BUTTON_NONE },
+    { ACTION_KBD_SELECT_REM,   BUTTON_RC_MENU,                           BUTTON_NONE },
+    { ACTION_KBD_PAGE_FLIP,    BUTTON_RC_MODE,                           BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_RC_ON|BUTTON_REL,                  BUTTON_RC_ON },
+    { ACTION_KBD_ABORT,        BUTTON_RC_STOP,                           BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_RC_REC,                            BUTTON_NONE },
+    { ACTION_KBD_BACKSPACE,    BUTTON_RC_REC|BUTTON_REPEAT,              BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_RC_VOL_UP,                         BUTTON_NONE },
+    { ACTION_KBD_UP,           BUTTON_RC_VOL_UP|BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_RC_VOL_DOWN,                       BUTTON_NONE },
+    { ACTION_KBD_DOWN,         BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_RC_ON|BUTTON_RC_MODE,              BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_RC_MENU|BUTTON_REL,                BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* button_context_keyboard_h300lcdremote */
+
 
 /* the actual used tables */
 static const struct button_mapping 
@@ -556,8 +639,10 @@ static const struct button_mapping
             = button_context_quickscreen_h100remote,
         *remote_btn_ctxt_pitchscreen
             = button_context_pitchscreen_h100remote,
-        *remote_button_ctxt_recscreen
-            = button_context_recscreen_h100remote;
+        *remote_btn_ctxt_recscreen
+            = button_context_recscreen_h100remote,
+        *remote_btn_ctxt_keyboard
+            = button_context_keyboard_h100remote;
 
 static int _remote_type = 0;
 
@@ -579,7 +664,8 @@ static void remap_remote(void)
             remote_btn_ctxt_bmark = NULL;
             remote_btn_ctxt_quickscreen = NULL;
             remote_btn_ctxt_pitchscreen = NULL;
-            remote_button_ctxt_recscreen = NULL;
+            remote_btn_ctxt_recscreen = NULL;
+            remote_btn_ctxt_keyboard = NULL;
             break;
 
         case REMOTETYPE_H100_LCD:
@@ -600,8 +686,10 @@ static void remap_remote(void)
                 = button_context_quickscreen_h100remote,
             remote_btn_ctxt_pitchscreen
                 = button_context_pitchscreen_h100remote,
-            remote_button_ctxt_recscreen 
-                = button_context_recscreen_h100remote;
+            remote_btn_ctxt_recscreen 
+                = button_context_recscreen_h100remote,
+            remote_btn_ctxt_keyboard 
+                = button_context_keyboard_h100remote;
             break;
 
         case REMOTETYPE_H300_LCD:
@@ -622,8 +710,10 @@ static void remap_remote(void)
                 = button_context_quickscreen_h300lcdremote,
             remote_btn_ctxt_pitchscreen
                 = button_context_pitchscreen_h300lcdremote,
-            remote_button_ctxt_recscreen
-                = button_context_recscreen_h300lcdremote;
+            remote_btn_ctxt_recscreen
+                = button_context_recscreen_h300lcdremote,
+            remote_btn_ctxt_keyboard 
+                = button_context_keyboard_h300lcdremote;
             break;
 
         case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */        
@@ -644,8 +734,10 @@ static void remap_remote(void)
                 = button_context_quickscreen_h300lcdremote,
             remote_btn_ctxt_pitchscreen
                 = button_context_pitchscreen_h300lcdremote,
-            remote_button_ctxt_recscreen
-                = button_context_recscreen_h300lcdremote;
+            remote_btn_ctxt_recscreen
+                = button_context_recscreen_h300lcdremote,
+            remote_btn_ctxt_keyboard 
+                = button_context_keyboard_h300lcdremote;
 #if 0 
             remote_btn_ctxt_std = 
             remote_btn_ctxt_wps = 
@@ -659,7 +751,8 @@ static void remap_remote(void)
             remote_btn_ctxt_bmark = 
             remote_btn_ctxt_quickscreen = 
             remote_btn_ctxt_pitchscreen = 
-            remote_button_ctxt_recscreen = 
+            remote_btn_ctxt_recscreen = 
+            remote_btn_ctxt_keyboard = 
 #endif
             break;
 
@@ -707,7 +800,9 @@ const struct button_mapping* get_context_mapping_remote(int context)
         case CONTEXT_PITCHSCREEN:
             return remote_btn_ctxt_pitchscreen;
         case CONTEXT_RECSCREEN:
-            return remote_button_ctxt_recscreen;
+            return remote_btn_ctxt_recscreen;
+        case CONTEXT_KEYBOARD:
+            return remote_btn_ctxt_keyboard;
     } 
     return remote_btn_ctxt_std; 
 }
@@ -758,6 +853,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_RECSCREEN:
             return button_context_recscreen;
+        case CONTEXT_KEYBOARD:
+            return button_context_keyboard;
     } 
     return button_context_standard;
 }
