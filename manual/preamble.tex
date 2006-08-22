@@ -261,9 +261,9 @@
 % usage \reference{ref_section}
 \ifpdfoutput{%
   \newcommand{\reference}[1]{%
-    section \ref{#1} (page \pageref{#1})%
+    section~\ref{#1} (page~\pageref{#1})%
 }}
-{\newcommand{\reference}[1]{section \ref{#1}}}
+{\newcommand{\reference}[1]{section~\ref{#1}}}
 
 % special HTML output adjustments
 \ifpdfoutput{}{\setlength{\parindent}{0mm}}
