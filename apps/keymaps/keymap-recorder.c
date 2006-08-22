@@ -171,7 +171,7 @@ static const struct button_mapping remote_button_context_standard[]  = {
     { ACTION_STD_CANCEL,    BUTTON_RC_STOP,     BUTTON_NONE },
     { ACTION_STD_OK,        BUTTON_RC_PLAY,     BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 };
 
 static const struct button_mapping remote_button_context_wps[]  = {

@@ -251,7 +251,7 @@ const struct button_mapping button_context_standard_h100remote[]  = {
     { ACTION_STD_OK,            BUTTON_RC_ON,                   BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RC_MENU|BUTTON_REL,      BUTTON_RC_MENU },
     
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 }; /* button_context_standard_h100lcdremote */
 
 const struct button_mapping button_context_standard_h300lcdremote[]  = {
@@ -268,7 +268,7 @@ const struct button_mapping button_context_standard_h300lcdremote[]  = {
     { ACTION_STD_OK,            BUTTON_RC_MENU|BUTTON_REL,          BUTTON_RC_MENU },
     { ACTION_STD_OK,            BUTTON_RC_FF,                       BUTTON_NONE },
     
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 
 };
 
