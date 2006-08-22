@@ -60,44 +60,236 @@ static int cached_contrast = LCD_REMOTE_DEFAULT_CONTRAST;
 
 bool remote_initialized = false;
 
-static void remote_write(unsigned char byte, bool is_command)
+/* Standard low-level byte writer. Requires CLK high on entry */
+static inline void _write_byte(unsigned data)
 {
-    int i;
-  
-    CS_LO;
-    if (is_command)
-  	RS_LO;
-    else
-        RS_HI;
-  
-    for (i = 0x80; i; i >>= 1)
-    {
-        CLK_LO;
-        if (i & byte) 
-            DATA_HI;
-        else
-            DATA_LO;
-        CLK_HI;
-    }
+    asm volatile (
+        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data line */
+        "and.l   %[dbit], %%d0       \n"
+        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
+        "bset    #8, %[data]         \n"  
+    "1:                              \n"
+        "move.l  %[data], %%d0       \n"  /* Compute the 'bit derivative', i.e. a value */
+        "lsr.l   #1, %%d0            \n"  /*   with 1's where the data changes from the */
+        "eor.l   %%d0, %[data]       \n"  /*   previous state, and 0's where it doesn't */
+        "swap    %[data]             \n"  /* Shift data to upper byte */
+        "lsl.l   #8, %[data]         \n"
+        
+        "move.l  %[cbit], %%d1       \n"  /* Prepare mask for flipping CLK */
+        "or.l    %[dbit], %%d1       \n"  /*   and DATA at once */
 
-    CS_HI;
+        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"  /* 1: Flip both CLK and DATA */
+        ".word   0x51fa              \n"  /* (trapf.w - shadow next insn) */
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"  /*   else flip CLK only */
+        "eor.l   %[cbit], (%[gpo0])  \n"  /* Flip CLK again */
+
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %%d1, (%[gpo0])     \n"
+        ".word   0x51fa              \n"
+    "1:                              \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        "eor.l   %[cbit], (%[gpo0])  \n"
+        : /* outputs */
+        [data]"+d"(data)
+        : /* inputs */
+        [gpo0]"a"(&GPIO_OUT),
+        [cbit]"d"(0x00004000),
+        [dbit]"d"(0x00002000)
+        : /* clobbers */
+        "d0", "d1"
+    );
+}
+
+/* Fast low-level byte writer. Don't use with high CPU clock.
+ * Requires CLK high on entry */
+static inline void _write_fast(unsigned data)
+{
+    asm volatile (
+        "move.w  %%sr,%%d3           \n"  /* Get current interrupt level */
+        "move.w  #0x2700,%%sr        \n"  /* Disable interrupts */
+
+        "move.l  (%[gpo0]), %%d0     \n"  /* Get current state of data port */
+        "move.l  %%d0, %%d1          \n"
+        "and.l   %[dbit], %%d1       \n"  /* Check current state of data line */
+        "beq.s   1f                  \n"  /*   and set it as previous-state bit */
+        "bset    #8, %[data]         \n"
+    "1:                              \n"
+        "move.l  %[data], %%d1       \n"  /* Compute the 'bit derivative', i.e. a value */
+        "lsr.l   #1, %%d1            \n"  /*   with 1's where the data changes from the */
+        "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
+        "swap    %[data]             \n"  /* Shift data to upper byte */
+        "lsl.l   #8, %[data]         \n"
+        
+        "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"  /* 1: Flip data bit */
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
+        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
+        "eor.l   %[cbit], %%d0       \n"  /* Flip clock bit */
+        "move.l  %%d0, (%[gpo0])     \n"  /* Output new state */
+
+        "lsl.l   #1,%[data]          \n"  /* ..unrolled.. */
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+
+        "lsl.l   #1,%[data]          \n"
+        "bcc.s   1f                  \n"
+        "eor.l   %[dbit], %%d0       \n"
+    "1:                              \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"
+        "eor.l   %[cbit], %%d0       \n"
+        "move.l  %%d0, (%[gpo0])     \n"  
+
+        "move.w  %%d3, %%sr          \n" /* Restore interrupt level */
+        : /* outputs */
+        [data]"+d"(data)
+        : /* inputs */
+        [gpo0]"a"(&GPIO_OUT),
+        [cbit]"d"(0x00004000),
+        [dbit]"d"(0x00002000)
+        : /* clobbers */
+        "d0", "d1", "d2", "d3"
+    );
 }
 
 void lcd_remote_write_command(int cmd)
 {
-    remote_write(cmd, true);
+    RS_LO;
+    CS_LO;
+    _write_byte(cmd);
+    CS_HI;
 }
 
 void lcd_remote_write_command_ex(int cmd, int data)
 {
-    remote_write(cmd, true);
-    remote_write(data, true);
+    RS_LO;
+    CS_LO;
+    _write_byte(cmd);
+    _write_byte(data);
+    CS_HI;
 }
 
 void lcd_remote_write_data(const unsigned char* p_bytes, int count)
 {
-    while(count--)
-        remote_write(*p_bytes++, false);
+    const unsigned char *p_end = p_bytes + count;
+
+    RS_HI;
+    CS_LO;
+    if (cpu_frequency < 50000000)
+    {
+        while (p_bytes < p_end)
+            _write_fast(*p_bytes++);
+    }
+    else
+    {
+        while (p_bytes < p_end)
+            _write_byte(*p_bytes++);
+    }
+    CS_HI;
 }
 
 int lcd_remote_default_contrast(void)
@@ -144,6 +336,8 @@ void lcd_remote_init_device(void)
 
 void lcd_remote_on(void)
 {
+    CS_HI;
+    CLK_HI;
     sleep(10);
 	
     lcd_remote_write_command(LCD_SET_DUTY_RATIO);
