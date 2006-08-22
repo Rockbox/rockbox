@@ -19,4 +19,12 @@
 #ifndef _ADC_TARGET_H_
 #define _ADC_TARGET_H_
 
+#define NUM_ADC_CHANNELS 4
+
+#define ADC_BATTERY     0
+#define ADC_UNKNOWN_2   1
+#define ADC_UNKNOWN_3   2
+#define ADC_UNKNOWN_4   3
+#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+
 #endif
