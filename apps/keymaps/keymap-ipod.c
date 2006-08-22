@@ -5,7 +5,8 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- *
+ * $Id $
+ * 
  * Copyright (C) 2006 Jonathan Gordon
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -45,7 +46,7 @@ const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,        BUTTON_LEFT,                        BUTTON_NONE },
     { ACTION_STD_OK,            BUTTON_RIGHT,                       BUTTON_NONE },
 
-    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,           BUTTON_NONE },
+    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT },
     { ACTION_STD_MENU,          BUTTON_MENU|BUTTON_REL,             BUTTON_MENU },
     { ACTION_STD_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,          BUTTON_MENU },
     { ACTION_STD_CONTEXT,       BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE },
@@ -110,7 +111,7 @@ const struct button_mapping button_context_settings[]  = {
 
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_PLAY,                  BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+    LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
 const struct button_mapping button_context_bmark[]  = {
@@ -164,7 +165,8 @@ const struct button_mapping* get_context_mapping(int context)
             
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
-            break;
+            return button_context_standard;
+            
         case CONTEXT_SETTINGS_EQ:
         case CONTEXT_SETTINGS_COLOURCHOOSER:
         case CONTEXT_SETTINGS_TIME:
