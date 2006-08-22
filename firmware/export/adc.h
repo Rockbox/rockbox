@@ -21,13 +21,8 @@
 
 #include "config.h"
 
-#ifdef IAUDIO_X5
-#define NUM_ADC_CHANNELS 3
-
-#define ADC_BUTTONS 0
-#define ADC_REMOTE  1
-#define ADC_BATTERY 2
-#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
+#ifdef TARGET_TREE
+#include "adc-target.h"
 
 #elif defined(IPOD_ARCH)
 #define NUM_ADC_CHANNELS 1
@@ -112,7 +107,7 @@ unsigned short adc_read(int channel);
 void adc_init(void);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)\
- || defined(IAUDIO_X5) || defined(IPOD_ARCH)
+ || defined(IPOD_ARCH)
 /* Force a scan now */
 unsigned short adc_scan(int channel);
 #endif

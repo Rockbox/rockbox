@@ -70,7 +70,7 @@ int button_read_device(void)
         if ((state & 0x80) == 0) btn |= BUTTON_LEFT;
         
         /* Read power button */
-        if ((GPIOB_INPUT_VAL & 0x1) == 0) btn |= BUTTON_POWER;
+        if ((GPIOB_INPUT_VAL & 0x1) == 1) btn |= BUTTON_POWER;
         
         /* Read scroller */
         if ( ((GPIOC_INPUT_VAL & 0x4)==1) && ((GPIOD_INPUT_VAL & 0x10)==1) )
