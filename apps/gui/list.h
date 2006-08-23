@@ -88,7 +88,9 @@ struct gui_list
     /* The optional title, set to NULL for none */
     char *title;
     /* Cache the width of the title string in pixels/characters */
-    int title_width; 
+    int title_width;
+    /* Optional title icon */
+    ICON title_icon;
 };
 
 /*
@@ -254,9 +256,12 @@ extern void gui_list_del_item(struct gui_list * gui_list);
 extern void gui_list_flash(struct gui_list * gui_list);
 
 /* 
- * Set the title of the list, setting to NULL disables the title
+ * Set the title and title icon of the list. Setting title to NULL disables
+ * both the title and icon. Use NOICON if there is no icon.
  */
-extern void gui_list_set_title(struct gui_list *gui_list, char* title);
+extern void gui_list_set_title(struct gui_list *gui_list, char* title,
+                               ICON icon);
+
 /*
  * This part handles as many lists as there are connected screens
  * (the api is similar to the ones above)
@@ -297,7 +302,8 @@ extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_flash(struct gui_synclist * lists);
-extern void gui_synclist_set_title(struct gui_synclist * lists, char* title);
+extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
+                                   ICON icon);
 void gui_synclist_scroll_right(struct gui_synclist * lists);
 void gui_synclist_scroll_left(struct gui_synclist * lists);
 

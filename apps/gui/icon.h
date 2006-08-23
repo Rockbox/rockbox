@@ -23,9 +23,11 @@
 /* Defines a type for the icons since it's not the same thing on
  * char-based displays and bitmap displays */
 #ifdef HAVE_LCD_BITMAP
-    typedef const unsigned char * ICON;
+typedef const unsigned char * ICON;
+#define NOICON NULL
 #else
-    typedef short ICON;
+typedef short ICON;
+#define NOICON -1
 #endif
 
 #define CURSOR_CHAR 0x92

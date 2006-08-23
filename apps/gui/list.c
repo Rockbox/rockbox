@@ -70,6 +70,7 @@ void gui_list_init(struct gui_list * gui_list,
     gui_list->selected_size=selected_size;
     gui_list->title = NULL;
     gui_list->title_width = 0;
+    gui_list->title_icon = NOICON;
 }
 
 void gui_list_set_display(struct gui_list * gui_list, struct screen * display)
@@ -144,6 +145,39 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
         gui_list->start_item = 0;
 }
 
+#ifdef HAVE_LCD_BITMAP
+int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
+                             int text_pos)
+{
+    struct screen * display=gui_list->display;
+    int item_offset;
+    
+    if (offset_out_of_view)
+    {
+        item_offset = gui_list->offset_position;
+    }
+    else
+    {
+        /* if text is smaller then view */
+        if (item_width <= display->width - text_pos)
+        {
+            item_offset = 0;
+        }
+        else
+        {
+            /* if text got out of view  */
+            if (gui_list->offset_position > 
+                    item_width - (display->width - text_pos))
+                item_offset = item_width - (display->width - text_pos);
+            else
+                item_offset = gui_list->offset_position;
+        }
+    }
+
+    return item_offset;
+}
+#endif
+
 void gui_list_draw(struct gui_list * gui_list)
 {
     struct screen * display=gui_list->display;
@@ -154,30 +188,62 @@ void gui_list_draw(struct gui_list * gui_list)
     bool draw_cursor;
     int i;
     int lines;
+#ifdef HAVE_LCD_BITMAP
+    int item_offset;
+#endif
 
-    /* Adjust the position of icon, cursor, text */
+    gui_textarea_clear(display);
+
+    /* position and draw the list title & icon */
     if (gui_list->title)
     {
         i = 1;
         lines = display->nb_lines - 1;
+
+        if (gui_list->title_icon != NOICON && draw_icons)
+        {
+            screen_put_iconxy(display, 0, 0, gui_list->title_icon);
+#ifdef HAVE_LCD_BITMAP
+            text_pos = 8; /* pixels */
+#else
+            text_pos = 1; /* chars */
+#endif
+        }
+        else
+        {
+            text_pos = 0;
+        }
+
+#ifdef HAVE_LCD_BITMAP
+        screen_set_xmargin(display, text_pos); /* margin for title */
+        item_offset = gui_list_get_item_offset(gui_list, gui_list->title_width,
+                                               text_pos);
+        if (item_offset > gui_list->title_width - (display->width - text_pos))
+            display->puts_offset(0, 0, gui_list->title, item_offset);
+        else
+            display->puts_scroll_offset(0, 0, gui_list->title, item_offset);
+#else
+        display->puts_scroll(text_pos, 0, gui_list->title);
+#endif
     }
     else 
     {
         i = 0;
         lines = display->nb_lines;
     }
+
+    /* Adjust the position of icon, cursor, text for the list */
 #ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_UI);
     gui_textarea_update_nblines(display);
     bool draw_scrollbar;
-    
-    
+
     draw_scrollbar = (global_settings.scrollbar &&
                 lines < gui_list->nb_items);
     
     draw_cursor = !global_settings.invert_cursor;
     text_pos = 0; /* here it's in pixels */
-    if(draw_scrollbar)
+    if(draw_scrollbar || gui_list->title) /* indent if there's a title */
     {
         cursor_pos++;
         icon_pos++;
@@ -198,12 +264,10 @@ void gui_list_draw(struct gui_list * gui_list)
         text_pos = 1;
 #endif
 
-    gui_textarea_clear(display);
 #ifdef HAVE_LCD_BITMAP
-    screen_set_xmargin(display, text_pos);
+    screen_set_xmargin(display, text_pos); /* margin for list */
 #endif
 
-    
     while (i < display->nb_lines)
     {
         char entry_buffer[MAX_PATH];
@@ -219,26 +283,13 @@ void gui_list_draw(struct gui_list * gui_list)
                                                       entry_buffer);
 #ifdef HAVE_LCD_BITMAP
         /* position the string at the correct offset place */
-        int item_offset;
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
-
-        if (offset_out_of_view)
-            item_offset = gui_list->offset_position;
-        else
-            /* if text is smaller then view */
-            if (item_width <= display->width - text_pos)
-                item_offset = 0;
-            else
-                /* if text got out of view  */
-                if (gui_list->offset_position > 
-                        item_width - (display->width - text_pos))
-                    item_offset = item_width - (display->width - text_pos);
-                else
-                    item_offset = gui_list->offset_position;
-
+        item_offset = gui_list_get_item_offset(gui_list, item_width, text_pos);
 #endif
-        if(current_item >= gui_list->selected_item && current_item < gui_list->selected_item+gui_list->selected_size)
+
+        if(current_item >= gui_list->selected_item &&
+           current_item <  gui_list->selected_item + gui_list->selected_size)
         {/* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_BITMAP
             if (global_settings.invert_cursor)/* Display inverted-line-style*/
@@ -308,21 +359,7 @@ void gui_list_draw(struct gui_list * gui_list)
                            gui_list->start_item + display->nb_lines, VERTICAL);
     }
 #endif
-    if (gui_list->title)
-    {
-        /* Scroll if the title is too large, otherwise center */
-        if (gui_list->title_width > gui_list->display->width) {
-            display->puts_scroll(0, 0, gui_list->title);
-        } else {
-#ifdef HAVE_LCD_BITMAP
-            display->putsxy((display->width - gui_list->title_width) / 2,
-                            gui_textarea_get_ystart(display), gui_list->title);
-#else
-            display->puts((display->width - gui_list->title_width) / 2, 0,
-                          gui_list->title);
-#endif
-        }
-    }
+
     gui_textarea_update(display);
 }
 
@@ -522,9 +559,10 @@ void gui_list_screen_scroll_out_of_view(bool enable)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-void gui_list_set_title(struct gui_list * gui_list, char * title)
+void gui_list_set_title(struct gui_list * gui_list, char * title, ICON icon)
 {
     gui_list->title = title;
+    gui_list->title_icon = icon;
     if (title) {
 #ifdef HAVE_LCD_BITMAP
         gui_list->display->getstringsize(title, &gui_list->title_width, NULL);
@@ -652,11 +690,11 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
         gui_list_limit_scroll(&(lists->gui_list[i]), scroll);
 }
 
-void gui_synclist_set_title(struct gui_synclist * lists, char* title)
+void gui_synclist_set_title(struct gui_synclist * lists, char * title, ICON icon)
 {
     int i;
     FOR_NB_SCREENS(i)
-            gui_list_set_title(&(lists->gui_list[i]), title);
+            gui_list_set_title(&(lists->gui_list[i]), title, icon);
 }
 
 void gui_synclist_flash(struct gui_synclist * lists)

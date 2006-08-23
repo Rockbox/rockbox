@@ -349,20 +349,33 @@ static int update_dir(void)
         }
     }
     if (!id3db) {
-        if (global_settings.show_path_in_browser == SHOW_PATH_FULL) {
-            gui_synclist_set_title(&tree_lists, tc.currdir);
-        } else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT) {
-            gui_synclist_set_title(&tree_lists,
-                        tc.dirlevel > 0 ? strrchr(tc.currdir, '/') + 1 : "/");
-        } else {
-            /* Must clear the title as the list is reused */
-            gui_synclist_set_title(&tree_lists, NULL);
+        if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
+        {
+            gui_synclist_set_title(&tree_lists, tc.currdir,
+                    filetype_get_icon(ATTR_DIRECTORY));
         }
+        else if (global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
+        {
+            char *title = strrchr(tc.currdir, '/') + 1;
+            if (*title == '\0')
+            {
+                /* Display nothing for the root dir */
+                gui_synclist_set_title(&tree_lists, NULL, NOICON);
+            }
+            else
+                gui_synclist_set_title(&tree_lists, title,
+                        filetype_get_icon(ATTR_DIRECTORY));
+        }
+        else
+        {
+            /* Must clear the title as the list is reused */
+            gui_synclist_set_title(&tree_lists, NULL, NOICON);
+        } 
     }
     else 
     {
         /* This currently doesn't work too well in id3db so turn it off */
-        gui_synclist_set_title(&tree_lists, NULL);
+        gui_synclist_set_title(&tree_lists, NULL, NOICON);
     }
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
     gui_synclist_set_icon_callback(&tree_lists,
