@@ -464,9 +464,8 @@ void tagtree_init(void)
 {
     int fd;
     char buf[256];
-    int pos = 0;
-    
-    si_count = 0;
+    int rc;
+    int line_count;
     
     fd = open(FILE_SEARCH_INSTRUCTIONS, O_RDONLY);
     if (fd < 0)
@@ -475,47 +474,31 @@ void tagtree_init(void)
         return ;
     }
     
-    si = (struct search_instruction *)(((long)audiobuf & ~0x03) + 0x04);
-    
+    /* Pre-pass search instructions file to count how many entries */
+    line_count = 0;
     while ( 1 )
     {
-        char *p;
-        char *next = NULL;
-        int rc;
-        
-        rc = read(fd, &buf[pos], sizeof(buf)-pos-1);
-        if (rc >= 0)
-            buf[pos+rc] = '\0';
-        
-        if ( (p = strchr(buf, '\r')) != NULL)
-        {
-            *p = '\0';
-            next = ++p;
-        }
-        else
-            p = buf;
-        
-        if ( (p = strchr(p, '\n')) != NULL)
-        {
-            *p = '\0';
-            next = ++p;
-        }
-        
+        rc = read_line(fd, buf, sizeof(buf)-1);
+        if (rc <= 0)
+            break;
+        line_count++;
+    }
+
+    /* Allocate memory for searches */
+    si = (struct search_instruction *) buffer_alloc(sizeof(struct search_instruction) * line_count + 4);
+
+    /* Now read file for real, parsing into si */
+    lseek(fd, 0L, SEEK_SET);
+    while ( 1 )
+    {
+        rc = read_line(fd, buf, sizeof(buf)-1);
+        if (rc <= 0)
+            break;      
         if (!parse_search(si + si_count, buf))
             break;
         si_count++;
-        
-        if (next)
-        {
-            pos = sizeof(buf) - ((long)next - (long)buf) - 1;
-            memmove(buf, next, pos);
-        }
-        else
-            break ;
     }
     close(fd);
-    
-    audiobuf += sizeof(struct search_instruction) * si_count + 4;
     
     audio_set_track_buffer_event(tagtree_buffer_event);
     audio_set_track_unbuffer_event(tagtree_unbuffer_event);
