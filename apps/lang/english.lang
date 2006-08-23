@@ -7456,7 +7456,7 @@
     *: "Edit Preset"
   </dest>
   <voice>
-    *: ""
+    *: "Edit Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7470,7 +7470,7 @@
     *: "Remove Preset"
   </dest>
   <voice>
-    *: ""
+    *: "Remove Preset"
   </voice>
 </phrase>
 <phrase>
