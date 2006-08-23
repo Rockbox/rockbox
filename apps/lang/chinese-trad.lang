@@ -2684,16 +2684,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "自動時間分割"
+    *: "檔案分割選項"
   </dest>
   <voice>
-    *: "Time Split"
+    *: "File Split Options"
   </voice>
 </phrase>
 <phrase>
@@ -4764,7 +4764,7 @@
   </source>
   <dest>
     *: "ON+Play = 刪除"
-    h100,h120,h300: "ON+NAVI = 刪除"
+    h100,h120,h300: "RECORD = 刪除"
   </dest>
   <voice>
     *: ""
@@ -8567,7 +8567,7 @@
     *: "Yes"
   </source>
   <dest>
-    *: "是"
+    *: "Yes"
   </dest>
   <voice>
     *: "Yes"
@@ -8581,7 +8581,7 @@
     *: "No"
   </source>
   <dest>
-    *: "否"
+    *: "No"
   </dest>
   <voice>
     *: "No"
@@ -8623,7 +8623,7 @@
     *: "Volume"
   </source>
   <dest>
-    *: "音量"
+    *: "Volume"
   </dest>
   <voice>
     *: "Volume"
@@ -8637,7 +8637,7 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "立體聲"
+    *: "Stereo"
   </dest>
   <voice>
     *: "Stereo"
@@ -8651,7 +8651,7 @@
     *: "Mono"
   </source>
   <dest>
-    *: "單聲道"
+    *: "Mono"
   </dest>
   <voice>
     *: "Mono"
@@ -8665,7 +8665,7 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "編輯模式: %s"
+    *: "Edit mode: %s"
   </dest>
   <voice>
     *: ""
@@ -8679,7 +8679,7 @@
     *: "Cutoff Frequency"
   </source>
   <dest>
-    *: "截斷頻率"
+    *: "Cutoff Frequency"
   </dest>
   <voice>
     *: "Cutoff Frequency"
@@ -8693,7 +8693,7 @@
     *: "Gain"
   </source>
   <dest>
-    *: "增益"
+    *: "Gain"
   </dest>
   <voice>
     *: "Gain"
@@ -8707,7 +8707,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "亂序播放"
+    *: "Shuffle"
   </dest>
   <voice>
     *: "Shuffle"
@@ -8721,7 +8721,7 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "重覆"
+    *: "Repeat"
   </dest>
   <voice>
     *: "Repeat"
@@ -8735,7 +8735,7 @@
     *: "All"
   </source>
   <dest>
-    *: "全部"
+    *: "All"
   </dest>
   <voice>
     *: "All"
@@ -8749,7 +8749,7 @@
     *: "One"
   </source>
   <dest>
-    *: "一首"
+    *: "One"
   </dest>
   <voice>
     *: "One"
@@ -8777,7 +8777,7 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "顯示檔案"
+    *: "Show Files"
   </dest>
   <voice>
     *: "Show Files"
@@ -8791,7 +8791,7 @@
     *: "All"
   </source>
   <dest>
-    *: "全部"
+    *: "All"
   </dest>
   <voice>
     *: "All"
@@ -8805,7 +8805,7 @@
     *: "Supported"
   </source>
   <dest>
-    *: "支援的"
+    *: "Supported"
   </dest>
   <voice>
     *: "Supported"
@@ -8819,7 +8819,7 @@
     *: "Music"
   </source>
   <dest>
-    *: "音樂"
+    *: "Music"
   </dest>
   <voice>
     *: "Music"
@@ -8833,7 +8833,7 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "播放清單"
+    *: "Playlists"
   </dest>
   <voice>
     *: "Playlists"
@@ -8847,7 +8847,7 @@
     *: "ID3 Database"
   </source>
   <dest>
-    *: "ID3資料庫"
+    *: "ID3 Database"
   </dest>
   <voice>
     *: "ID3 Database"
@@ -8861,7 +8861,7 @@
     *: "Quality"
   </source>
   <dest>
-    *: "品質"
+    *: "Quality"
   </dest>
   <voice>
     *: "Quality"
@@ -8875,7 +8875,7 @@
     *: "Frequency"
   </source>
   <dest>
-    *: "頻率"
+    *: "Frequency"
   </dest>
   <voice>
     *: "Frequency"
@@ -8889,7 +8889,7 @@
     *: "Source"
   </source>
   <dest>
-    *: "來源"
+    *: "Source"
   </dest>
   <voice>
     *: "Source"
@@ -8903,7 +8903,7 @@
     *: "Mic"
   </source>
   <dest>
-    *: "麥克風"
+    *: "Mic"
   </dest>
   <voice>
     *: "Microphone"
@@ -8931,7 +8931,7 @@
     *: "Digital"
   </source>
   <dest>
-    *: "數位"
+    *: "Digital"
   </dest>
   <voice>
     *: "Digital"
@@ -8945,7 +8945,7 @@
     *: "Channels"
   </source>
   <dest>
-    *: "聲道"
+    *: "Channels"
   </dest>
   <voice>
     *: "Channels"
@@ -8959,7 +8959,7 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "觸發"
+    *: "Trigger"
   </dest>
   <voice>
     *: "Trigger"
@@ -8973,7 +8973,7 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "上下反轉"
+    *: "Upside Down"
   </dest>
   <voice>
     *: "Upside Down"
@@ -8987,7 +8987,7 @@
     *: "Scroll Bar"
   </source>
   <dest>
-    *: "捲動軸"
+    *: "Scroll Bar"
   </dest>
   <voice>
     *: "Scroll Bar"
@@ -9001,7 +9001,7 @@
     *: "Status Bar"
   </source>
   <dest>
-    *: "狀態列"
+    *: "Status Bar"
   </dest>
   <voice>
     *: "Status Bar"
@@ -9015,7 +9015,7 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "音調"
+    *: "Pitch"
   </dest>
   <voice>
     *: "Pitch"
@@ -9029,7 +9029,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "音調升高"
+    *: "Pitch Up"
   </dest>
   <voice>
     *: ""
@@ -9043,7 +9043,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "音調降低"
+    *: "Pitch Down"
   </dest>
   <voice>
     *: ""
@@ -9057,7 +9057,7 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "模式:"
+    *: "Mode:"
   </dest>
   <voice>
     *: ""
@@ -9071,7 +9071,7 @@
     *: "Time:"
   </source>
   <dest>
-    *: "時間:"
+    *: "Time:"
   </dest>
   <voice>
     *: ""
@@ -9085,7 +9085,7 @@
     *: "Split Time:"
   </source>
   <dest>
-    *: "分割時間:"
+    *: "Split Time:"
   </dest>
   <voice>
     *: ""
@@ -9099,7 +9099,7 @@
     *: "Size:"
   </source>
   <dest>
-    *: "檔案大小:"
+    *: "Size:"
   </dest>
   <voice>
     *: ""
@@ -9113,7 +9113,7 @@
     *: "Pre-Recording"
   </source>
   <dest>
-    *: "預錄"
+    *: "Pre-Recording"
   </dest>
   <voice>
     *: ""
@@ -9127,7 +9127,7 @@
     *: "Gain"
   </source>
   <dest>
-    *: "增益"
+    *: "Gain"
   </dest>
   <voice>
     *: ""
@@ -9141,7 +9141,7 @@
     *: "Gain Left"
   </source>
   <dest>
-    *: "左增益"
+    *: "Gain Left"
   </dest>
   <voice>
     *: ""
@@ -9155,7 +9155,7 @@
     *: "Gain Right"
   </source>
   <dest>
-    *: "右增益"
+    *: "Gain Right"
   </dest>
   <voice>
     *: ""
@@ -9169,7 +9169,7 @@
     *: "The disk is full. Press OFF to continue."
   </source>
   <dest>
-    *: "硬碟已滿，按下OFF繼續。"
+    *: "The disk is full. Press OFF to continue."
   </dest>
   <voice>
     *: ""
@@ -9183,7 +9183,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "選單"
+    *: "Menu"
   </dest>
   <voice>
     *: ""
@@ -9197,7 +9197,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "選項"
+    *: "Option"
   </dest>
   <voice>
     *: ""
@@ -9211,7 +9211,7 @@
     *: "LCD"
   </source>
   <dest>
-    *: "液晶螢幕"
+    *: "LCD"
   </dest>
   <voice>
     *: ""
