@@ -230,3 +230,64 @@ unsigned int alac_seek (demux_res_t* demux_res,
     return 0;
   }
 }
+
+/* Seek to file_loc (or close to it).  Return 1 on success (and
+   modify samplesdone and currentblock), 0 if failed 
+
+   Seeking uses the following array:
+
+     the sample_byte_size array contains the length in bytes of
+     each block ("sample" in Applespeak).
+
+   So we just find the last block before (or at) the requested position.
+
+   Each ALAC block seems to be independent of all the others.
+ */
+
+unsigned int alac_seek_raw (demux_res_t* demux_res, 
+                        stream_t* stream,
+                        unsigned int file_loc, 
+                        uint32_t* samplesdone, int* currentblock)
+{
+  unsigned int i;
+  unsigned int j;
+  unsigned int newblock;
+  unsigned int newsample;
+  unsigned int newpos;
+
+  /* First check we have the appropriate metadata - we should always
+     have it. */
+  if ((demux_res->num_time_to_samples==0) ||
+    (demux_res->num_sample_byte_sizes==0)) { return 0; }
+
+  /* Find the destination block from the sample_byte_size array. */
+  newpos=demux_res->mdat_offset;
+  for (i=0;(i<demux_res->num_sample_byte_sizes) &&
+           (newpos+demux_res->sample_byte_size[i]<=file_loc);i++) {
+    newpos+=demux_res->sample_byte_size[i];
+  }
+  
+  newblock=i;
+  newsample=0;
+
+  /* Get the sample offset of the block */
+  for (i=0,j=0;(i<demux_res->num_time_to_samples) && (j<newblock);
+       i++,j+=demux_res->time_to_sample[i].sample_count) {
+    if (newblock-j < demux_res->time_to_sample[i].sample_count) {
+        newsample+=(newblock-j)*demux_res->time_to_sample[i].sample_duration;
+        break;
+    } else {
+        newsample+=(demux_res->time_to_sample[i].sample_duration
+                   * demux_res->time_to_sample[i].sample_count);
+    }
+  }
+
+  /* We know the new file position, so let's try to seek to it */
+  if (stream->ci->seek_buffer(newpos)) {
+    *samplesdone=newsample;
+    *currentblock=newblock;
+    return 1;
+  } else {
+    return 0;
+  }
+}

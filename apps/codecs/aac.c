@@ -75,9 +75,11 @@ next_track:
         goto exit;
     }
 
-    while (!rb->taginfo_ready)
-        rb->yield();
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
   
+    samplesdone = ci->id3->offset;
+
     ci->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
 
     stream_create(&input_stream,ci);
@@ -117,7 +119,17 @@ next_track:
     ci->id3->frequency=s;
 
     i=0;
-    samplesdone=0;
+    
+    if (samplesdone > 0) {
+        if (alac_seek_raw(&demux_res, &input_stream, samplesdone,
+                          &samplesdone, (int *)&i)) {
+            elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
+            ci->set_elapsed(elapsedtime);
+        } else {
+            samplesdone=0;
+        }
+    }
+
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
         rb->yield();

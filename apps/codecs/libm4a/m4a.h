@@ -100,5 +100,9 @@ unsigned int alac_seek (demux_res_t* demux_res,
                         stream_t* stream,
                         unsigned int sample_loc, 
                         uint32_t* samplesdone, int* currentblock);
+unsigned int alac_seek_raw (demux_res_t* demux_res, 
+                        stream_t* stream,
+                        unsigned int file_loc, 
+                        uint32_t* samplesdone, int* currentblock);
 
 #endif /* STREAM_H */
