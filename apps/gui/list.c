@@ -720,28 +720,24 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
  * for which the user pressed the key since for example, remote and main screen doesn't
  * have the same number of lines*/
         case ACTION_LISTTREE_PGUP:
-            gui_synclist_limit_scroll(lists, false);
             gui_synclist_select_previous_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
             yield();
         return ACTION_STD_NEXT;
               
         case ACTION_LISTTREE_PGDOWN:
-            gui_synclist_limit_scroll(lists, false);
             gui_synclist_select_next_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
             yield();
             return ACTION_STD_PREV;
 #if (REMOTE_BUTTON != 0 )
         case ACTION_LISTTREE_RC_PGUP:
-            gui_synclist_limit_scroll(lists, false);
             gui_synclist_select_previous_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
             yield();
             return ACTION_STD_NEXT;
   
         case ACTION_LISTTREE_RC_PGDOWN:
-            gui_synclist_limit_scroll(lists, false);
             gui_synclist_select_next_page(lists, SCREEN_REMOTE);
             gui_synclist_draw(lists);
             yield();
