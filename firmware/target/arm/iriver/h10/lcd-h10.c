@@ -39,6 +39,7 @@ static inline bool timer_check(int clock_start, int usecs)
 #define LCD_CMD         0x80000000
 #define LCD_DATA        0x81000000
 
+#ifdef IRIVER_H10
 /* register defines for the Renesas HD66773R */
 #define R_START_OSC             0x00
 #define R_DEVICE_CODE_READ      0x00
@@ -57,8 +58,8 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_VERT_SCROLL_CONTROL   0x11
 #define R_1ST_SCR_DRV_POS       0x14
 #define R_2ND_SCR_DRV_POS       0x15
-#define R_HORIZ_RAM_ADDR_POS    0x44
-#define R_VERT_RAM_ADDR_POS     0x45
+#define R_HORIZ_RAM_ADDR_POS    0x16
+#define R_VERT_RAM_ADDR_POS     0x17
 #define R_RAM_WRITE_DATA_MASK   0x20
 #define R_RAM_ADDR_SET          0x21
 #define R_WRITE_DATA_2_GRAM     0x22
@@ -74,6 +75,39 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_GAMMA_AMP_ADJ_POS     0x3a
 #define R_GAMMA_AMP_ADJ_NEG     0x3b
 
+#elif defined(IRIVER_H10_5GB)
+/* register defines for TL1771 */
+#define R_START_OSC             0x00
+#define R_DEVICE_CODE_READ      0x00
+#define R_DRV_OUTPUT_CONTROL    0x01
+#define R_DRV_AC_CONTROL        0x02
+#define R_ENTRY_MODE            0x03
+#define R_DISP_CONTROL1         0x07
+#define R_DISP_CONTROL2         0x08
+#define R_FRAME_CYCLE_CONTROL   0x0b
+#define R_POWER_CONTROL1        0x10
+#define R_POWER_CONTROL2        0x11
+#define R_POWER_CONTROL3        0x12
+#define R_POWER_CONTROL4        0x13
+#define R_POWER_CONTROL5        0x14
+#define R_RAM_ADDR_SET          0x21
+#define R_WRITE_DATA_2_GRAM     0x22
+#define R_GAMMA_FINE_ADJ_POS1   0x30
+#define R_GAMMA_FINE_ADJ_POS2   0x31
+#define R_GAMMA_FINE_ADJ_POS3   0x32
+#define R_GAMMA_GRAD_ADJ_POS    0x33
+#define R_GAMMA_FINE_ADJ_NEG1   0x34
+#define R_GAMMA_FINE_ADJ_NEG2   0x35
+#define R_GAMMA_FINE_ADJ_NEG3   0x36
+#define R_GAMMA_GRAD_ADJ_NEG    0x37
+#define R_POWER_CONTROL6        0x38
+#define R_GATE_SCAN_START_POS   0x40
+#define R_1ST_SCR_DRV_POS       0x42
+#define R_2ND_SCR_DRV_POS       0x43
+#define R_HORIZ_RAM_ADDR_POS    0x44
+#define R_VERT_RAM_ADDR_POS     0x45
+
+#endif
 
 static void lcd_wait_write(void)
 {
@@ -171,25 +205,23 @@ void lcd_yuv_blit(unsigned char * const src[3],
 
 
 /* Update a fraction of the display. */
-void lcd_update_rect(int x, int y, int width, int height)
+void lcd_update_rect(int x0, int y0, int width, int height)
 {
-    int y0, x0, y1, x1;
-    /*int newx,newwidth;*/
+    int x1, y1;
+    int newx,newwidth;
 
     unsigned long *addr = (unsigned long *)lcd_framebuffer;
 
     /* Ensure x and width are both even - so we can read 32-bit aligned 
        data from lcd_framebuffer */
-    /*newx=x&~1;
+    newx=x0&~1;
     newwidth=width&~1;
-    if (newx+newwidth < x+width) { newwidth+=2; }
-    x=newx; width=newwidth;*/
+    if (newx+newwidth < x0+width) { newwidth+=2; }
+    x0=newx; width=newwidth;
 
     /* calculate the drawing region */
-    y0 = x;                         /* start horiz */
-    x0 = y;                         /* start vert */
-    y1 = (x + width) - 1;           /* max horiz */
-    x1 = (y + height) - 1;          /* max vert */
+    y1 = (y0 + height) - 1;           /* max vert */
+    x1 = (x0 + width) - 1;          /* max horiz */
 
 
     /* swap max horiz < start horiz */
@@ -218,12 +250,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* position cursor (set AD0-AD15) */
     /* start vert << 8 | start horiz */
     lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data(((x0 << 8) | y0));
+    lcd_send_data(((y0 << 8) | x0));
 
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
-    addr = (unsigned long*)&lcd_framebuffer[y][x];
+    addr = (unsigned long*)&lcd_framebuffer[y0][x0];
 
     int c, r;
 
