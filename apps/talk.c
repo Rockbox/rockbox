@@ -38,6 +38,7 @@
 #if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #endif
+#include "debug.h"
 
 
 /* Memory layout varies between targets because the
@@ -47,7 +48,7 @@
              (playing) | (stopped) |
     audiobuf-----------+-----------+-----------
               audio    | voice     | thumbnail
-                       |-----------|-----------
+                       |-----------|----------- filebuf
                        | thumbnail | voice
                        |           |-----------
                        |           | audio
@@ -189,12 +190,10 @@ static void load_voicefile(void)
     if (((struct voicefile*)audiobuf)->table /* format check */
            == offsetof(struct voicefile, index))
     {
-#if CONFIG_CODEC == SWCODEC
-        /* SWCODEC: allocate permanent buffer */
-        p_voicefile = (struct voicefile*)buffer_alloc(file_size);
-#else
-        /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_voicefile = (struct voicefile*)audiobuf;
+
+#if CONFIG_CODEC != SWCODEC
+        /* MASCODEC: now use audiobuf for voice then thumbnail */
         p_thumbnail = audiobuf + file_size;
         p_thumbnail += (long)p_thumbnail % 2; /* 16-bit align */
         size_for_thumbnail = audiobufend - p_thumbnail;
@@ -526,13 +525,14 @@ void talk_init(void)
         close(filehandle); /* close again, this was just to detect presence */
         filehandle = -1;
     }
+
 }
 
 /* return if a voice codec is required or not */
 bool talk_voice_required(void)
 {
-    return (voicefile_size != 0) 
-        || (global_settings.talk_dir == 3) 
+    return (voicefile_size != 0) /* Voice file is available */
+        || (global_settings.talk_dir == 3)  /* Thumbnail clips are required */
         || (global_settings.talk_file == 3);
 }
 

@@ -481,14 +481,7 @@ static void* get_voice_memory_callback(size_t *size)
 static void* get_codec_memory_callback(size_t *size)
 {
     *size = MALLOC_BUFSIZE;
-#if CONFIG_CODEC != SWCODEC
-    /* MASCODEC cannot play audio and voice simultaneously, so its
-       voice strategy is different - see talk.c for details */
-    if (voice_codec_loaded)
-        return &audiobuf[talk_get_bufsize()];
-    else
-#endif
-        return audiobuf;
+    return &audiobuf[talk_get_bufsize()];
 }
 
 static void pcmbuf_position_callback(size_t size) ICODE_ATTR;
@@ -2559,14 +2552,16 @@ static void reset_buffer(void)
 {
     size_t offset;
 
-    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
-    filebuflen = audiobufend - audiobuf - MALLOC_BUFSIZE - GUARD_BUFSIZE -
+    /* Set up file buffer as all space available */
+    filebuf = (char *)&audiobuf[talk_get_bufsize()+MALLOC_BUFSIZE];
+    filebuflen = audiobufend - (unsigned char *) filebuf - GUARD_BUFSIZE - 
         (pcmbuf_get_bufsize() + get_pcmbuf_descsize() + PCMBUF_MIX_CHUNK * 2);
 
+    /* Allow for codec(s) at end of file buffer */
     if (talk_voice_required())
     {
-        filebuf = &filebuf[talk_get_bufsize()];
-        filebuflen -= 2*CODEC_IRAM_SIZE + 2*CODEC_SIZE + talk_get_bufsize();
+        /* Allow 2 codecs at end of file buffer */
+        filebuflen -= 2 * (CODEC_IRAM_SIZE + CODEC_SIZE);
 
 #ifndef SIMULATOR
         iram_buf[0] = &filebuf[filebuflen];
@@ -2577,16 +2572,18 @@ static void reset_buffer(void)
     }
     else
     {
-        filebuf = &filebuf[talk_get_bufsize()];
-        filebuflen -= CODEC_IRAM_SIZE + CODEC_SIZE + talk_get_bufsize();
+        /* Allow for 1 codec at end of file buffer */
+        filebuflen -= CODEC_IRAM_SIZE + CODEC_SIZE;
 
 #ifndef SIMULATOR
         iram_buf[0] = &filebuf[filebuflen];
+        iram_buf[1] = NULL;
 #endif
-        dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
+        dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE];
+        dram_buf[1] = NULL;
     }
 
-    /* Ensure that everything is aligned */
+    /* Ensure that file buffer is aligned */
     offset = (-(size_t)filebuf) & 3;
     filebuf += offset;
     filebuflen -= offset;
@@ -3092,7 +3089,7 @@ static void playback_init(void)
 #endif
     }
 
-    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE];
+    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE]; /* Will be reset by reset_buffer */
 
     audio_set_crossfade(global_settings.crossfade);
 
