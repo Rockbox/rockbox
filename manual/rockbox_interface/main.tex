@@ -28,7 +28,12 @@
     }
     {\includegraphics{rockbox_interface/images/h1xx-front.png}}
   }
-  \opt{h300}{\includegraphics[height=11.8cm]{rockbox_interface/images/h300-front.jpg}}
+  \opt{h300}{
+    \ifpdfoutput{
+    \includegraphics[height=8cm]{rockbox_interface/images/h300-front.pdf}
+    }
+    {\includegraphics{rockbox_interface/images/h300-front.png}}
+ }
  \opt{ipodmini}{
     \ifpdfoutput{
     \includegraphics[height=8cm]{rockbox_interface/images/ipodmini-front.pdf}
