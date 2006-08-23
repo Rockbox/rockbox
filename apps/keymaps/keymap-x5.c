@@ -232,6 +232,12 @@ const struct button_mapping button_context_keyboard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
+const struct button_mapping button_context_bmark[]  = {
+    { ACTION_BMS_DELETE,       BUTTON_REC|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_BMS_SELECT,       BUTTON_SELECT,   BUTTON_NONE },
+    { ACTION_BMS_EXIT,         BUTTON_REC|BUTTON_REL,      BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
+}; /* button_context_settings_bmark */
 
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
@@ -277,7 +283,7 @@ const struct button_mapping* get_context_mapping( int context )
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;
-            /* else fall through to CUSTOM|1 */
+            /* else fall through to CUSTOM|CONTEXT_TREE */
         case CONTEXT_CUSTOM|CONTEXT_TREE
         :
             return button_context_tree;

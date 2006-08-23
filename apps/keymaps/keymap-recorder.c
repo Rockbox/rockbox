@@ -184,6 +184,14 @@ const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+struct button_mapping button_context_bmark[]  = {
+    { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_PLAY },
+    { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_ON },
+    { ACTION_BMS_EXIT,        BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_BMS_SELECT,       BUTTON_PLAY|BUTTON_REL,   BUTTON_PLAY },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+}; /* button_context_settings_bmark */
 /*****************************************************************************
  *    Remote control mappings
  *****************************************************************************/
@@ -242,7 +250,8 @@ const struct button_mapping* get_context_mapping( int context )
 
         case CONTEXT_PITCHSCREEN:
             return button_context_pitchscreen;
-
+        case CONTEXT_BOOKMARKSCREEN:
+            return button_context_bmark;
         case CONTEXT_TREE:
             if (global_settings.hold_lr_for_scroll_in_list)
                 return button_context_tree_scroll_lr;

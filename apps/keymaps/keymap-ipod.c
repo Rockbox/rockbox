@@ -116,6 +116,8 @@ const struct button_mapping button_context_yesno[]  = {
 
 const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,          BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
+    { ACTION_BMS_SELECT,       BUTTON_SELECT,   BUTTON_NONE },
+    { ACTION_BMS_EXIT,         BUTTON_PLAY,      BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 

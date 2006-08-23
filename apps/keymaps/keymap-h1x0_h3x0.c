@@ -183,7 +183,8 @@ const struct button_mapping button_context_eq[]  = {
 
 const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_REC,      BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_SELECT,   BUTTON_NONE },
+    { ACTION_BMS_SELECT,       BUTTON_SELECT,   BUTTON_NONE },
+    { ACTION_BMS_EXIT,         BUTTON_OFF,      BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
