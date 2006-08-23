@@ -64,6 +64,12 @@
     }
     {\includegraphics{rockbox_interface/images/ipod4g-front.png}}
  }
+ \opt{ipod3g}{
+    \ifpdfoutput{
+    \includegraphics[height=8cm]{rockbox_interface/images/ipod3g-front.pdf}
+    }
+    {\includegraphics{rockbox_interface/images/ipod3g-front.png}}
+ }
 \end{center}
 
 Throughout this manual, the buttons on the \dap\ are labelled according to the
@@ -100,7 +106,7 @@ picture above.
   used in Rockbox. 
   }
   %
-  \opt{ipod4g,ipodcolor,ipodvideo,ipodmini}
+  \opt{ipod4g, ipod3g,ipodcolor,ipodvideo,ipodmini}
   { 
   The main controls on the \dap\ are a slightly indented scroll wheel 
   with a flat round button in the center. Hold the \dap\ with these controls 
@@ -108,7 +114,8 @@ picture above.
 
   The top of the player will have the following, from left to 
   right:
-  \opt{ipod4g,ipodcolor}{remote connector, headphone jack, hold switch.}
+  \opt{ipod4g, ipod3g ,ipodcolor}{remote connector, headphone jack, hold 
+    switch.}
   \opt{ipodvideo}{hold switch, headphone jack.}
   \opt{ipodmini}{hold switch, remote connector, headphone jack.}	
 
@@ -149,7 +156,7 @@ picture above.
   off before trying to use your player.
   }
   %
-  \nopt{h1xx,h300,ipodnano,ipodvideo,ipodmini,ipod4g,ipodcolor}
+  \nopt{h1xx,h300,ipodnano,ipodvideo,ipodmini,ipod4g,ipod3g,ipodcolor}
   {
     \fixme{Write a section describing the \dap\ for blind users.}
   }
@@ -161,13 +168,13 @@ To turn on and shut down your \dap, the following keys are used:
 \begin{table}
     \begin{btnmap}{}{}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-      \opt{IPOD_4G_PAD}{\ButtonMenu\ or \ButtonSelect}
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu\ or \ButtonSelect}
       \opt{ONDIO_PAD}{\ButtonOff}\opt{RECORDER_PAD,PLAYER_PAD}
         {Hold \ButtonOn\ for 2{}-3s}
       \opt{IAUDIO_X5_PAD}{\ButtonPower} 
       & Start Rockbox\\
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{Hold \ButtonOff}
-      \opt{IPOD_4G_PAD}{Hold \ButtonPlay}
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonPlay}
       \opt{ONDIO_PAD,recorderv2fm}{Hold \ButtonOff}
       \opt{recorder}{Double tap \ButtonOff\ when playback is stopped}
       \opt{PLAYER_PAD}{From the Main Menu, select \textbf{Shutdown}}
@@ -215,21 +222,21 @@ that are not available within the \setting{Tag Cache Browser}.  Read more about
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_X5_PAD}
         {\ButtonUp/\ButtonDown}
       \opt{PLAYER_PAD}{\ButtonLeft/\ButtonRight}
-      \opt{IPOD_4G_PAD}{\ButtonScrollBack/\ButtonScrollFwd} 
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack/\ButtonScrollFwd} 
          & Go to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {\ButtonOn+\ButtonUp/\ButtonDown}
-      \opt{PLAYER_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}{n/a}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{n/a}
       \opt{ONDIO_PAD}{n/a}
       & Move one page up/down on the list.\\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD}{\ButtonLeft}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonLeft}
       \opt{PLAYER_PAD}{\ButtonStop} 
       & Go to the parent directory. \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}
         {\ButtonRight/\ButtonSelect}
       \opt{PLAYER_PAD}{\ButtonPlay}
       \opt{ONDIO_PAD}{\ButtonRight}
@@ -238,12 +245,12 @@ that are not available within the \setting{Tag Cache Browser}.  Read more about
         (See \reference{ref:Filemenu}) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
-      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD}{\ButtonPlay}
+      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay}
       \opt{ONDIO_PAD}{Short press on \ButtonMenu} 
       & If there is a MP3 playing, returns to the While Playing Screen (WPS)
         without stopping playback.  \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}
         {Hold \ButtonSelect}
       \opt{RECORDER_PAD,PLAYER_PAD}{Hold \ButtonPlay/\ButtonOn+\ButtonPlay}
       \opt{ONDIO_PAD}{Hold \ButtonRight} 
@@ -251,7 +258,7 @@ that are not available within the \setting{Tag Cache Browser}.  Read more about
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{RECORDER_PAD}{\ButtonFOne}
-      \opt{PLAYER_PAD,IPOD_4G_PAD,ONDIO_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
+      \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,ONDIO_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}
       \opt{IAUDIO_X5_PAD}{Press \ButtonRec}
       & Enter the Main Menu \\
       %
@@ -275,7 +282,7 @@ that are not available within the \setting{Tag Cache Browser}.  Read more about
 The \setting{File Menu} allows you to perform certain operations on files or 
 folders.  To access the \setting{File Menu}, position the selector over a file 
 or folder and 
-	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD}
+	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}
 		{hold the \ButtonSelect\ button.}
 	\opt{RECORDER_PAD,PLAYER_PAD}{press the \ButtonPlay/\ButtonOn+\ButtonPlay\ 
 	  buttons.}
@@ -307,7 +314,7 @@ each option pertains both to files and directories):
   Deletes the currently selected file.  This option applies only to files, and
   not to directories.  Rockbox will ask for confirmation before deleting a file.
   Press
-  	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_VIDEO_PAD}
+  	\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}
       {\ButtonSelect}
     \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD}{\ButtonRight}
@@ -431,7 +438,7 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
   \end{table}
 }
 
-\opt{IPOD_4G_PAD}{
+\opt{IPOD_4G_PAD,IPOD_3G_PAD}{
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
