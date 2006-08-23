@@ -9671,7 +9671,7 @@
     *: "Automatic Gain Control"
   </dest>
   <voice>
-    *: "pixels"
+    *: "Automatic gain control"
   </voice>
 </phrase>
 <phrase>
@@ -9684,7 +9684,7 @@
     *: "Safety (clip)"
   </dest>
   <voice>
-    *: "pixels"
+    *: "Safety (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -9697,7 +9697,7 @@
     *: "Live (slow)"
   </dest>
   <voice>
-    *: "pixels"
+    *: "Live (slow)"
   </voice>
 </phrase>
 <phrase>
@@ -9710,7 +9710,7 @@
     *: "DJ-Set (slow)"
   </dest>
   <voice>
-    *: "pixels"
+    *: "DJ set (slow)"
   </voice>
 </phrase>
 <phrase>
@@ -9723,7 +9723,7 @@
     *: "Medium"
   </dest>
   <voice>
-    *: "pixels"
+    *: "Medium"
   </voice>
 </phrase>
 <phrase>
@@ -9736,7 +9736,7 @@
     *: "Voice (fast)"
   </dest>
   <voice>
-    *: "pixels"
+    *: "Voice (fast)"
   </voice>
 </phrase>
 <phrase>
@@ -9749,7 +9749,7 @@
     *: "AGC clip time"
   </dest>
   <voice>
-    *: "pixels"
+    *: "AGC clip time"
   </voice>
 </phrase>
 <phrase>
@@ -9762,7 +9762,7 @@
     *: "AGC"
   </dest>
   <voice>
-    *: "pixels"
+    *: "AGC"
   </voice>
 </phrase>
 <phrase>
@@ -9775,6 +9775,6 @@
     *: "AGC max. gain"
   </dest>
   <voice>
-    *: "pixels"
+    *: "AGC maximum gain"
   </voice>
 </phrase>
