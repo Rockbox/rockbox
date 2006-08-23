@@ -252,7 +252,9 @@ target/coldfire/iaudio/x5/lcd-remote-x5.c
 #endif
 
 #ifdef IRIVER_H300_SERIES
+#ifndef SIMULATOR
 target/coldfire/iriver/h300/lcd-as-h300.S
+#endif
 #endif
 
 #ifdef IRIVER_H10
