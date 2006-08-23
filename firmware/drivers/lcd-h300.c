@@ -301,134 +301,59 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     /*if(display_on)*/
 }
 
-#define CSUB_X 2
-#define CSUB_Y 2
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.
+ * y should have two lines of Y back to back.
+ * bu and rv should contain the Cb and Cr data for the two lines of Y.
+ * Stores bu, guv and rv in repective buffers for use in second line.
+ */
+extern void lcd_write_yuv420_lines(const unsigned char *y,
+    unsigned char *bu, unsigned char *guv, unsigned char *rv, int width);
 
-#define RYFAC (31*257)
-#define GYFAC (63*257)
-#define BYFAC (31*257)
-#define RVFAC 11170     /* 31 * 257 *  1.402    */
-#define GVFAC (-11563)  /* 63 * 257 * -0.714136 */
-#define GUFAC (-5572)   /* 63 * 257 * -0.344136 */
-#define BUFAC 14118     /* 31 * 257 *  1.772    */
-
-#define ROUNDOFFS (127*257)
-
-/* Performance function to blit a YUV bitmap directly to the LCD */
+/* Performance function to blit a YUV bitmap directly to the LCD
+ * src_x, src_y, width and height should be even
+ * x, y, width and height have to be within LCD bounds
+ */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    if (display_on)
+    /* IRAM Y, Cb/bu, guv and Cb/rv buffers. */
+    unsigned char y_ibuf[LCD_WIDTH*2];
+    unsigned char bu_ibuf[LCD_WIDTH/2];
+    unsigned char guv_ibuf[LCD_WIDTH/2];
+    unsigned char rv_ibuf[LCD_WIDTH/2];
+    const unsigned char *ysrc, *usrc, *vsrc;
+    const unsigned char *ysrc_max;
+
+    if (!display_on)
+        return;
+
+    width &= ~1;  /* stay on the safe side */
+    height &= ~1;
+
+    /* Set start position and window */
+    lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
+    lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
+
+    lcd_begin_write_gram();
+
+    ysrc = src[0] + src_y * stride + src_x;
+    usrc = src[1] + (src_y * stride >> 2) + (src_x >> 1);
+    vsrc = src[2] + (src_y * stride >> 2) + (src_x >> 1);
+    ysrc_max = ysrc + height * stride;
+
+    do
     {
-        int ymax;
-        
-        width  = (width + 1) & ~1;
-        height = (height + 1) & ~1;
-        ymax = y + height - 1;
-
-        /* set update window */
-
-        /* horiz ram addr */ 
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (ymax << 8) | y);
-        
-        /* vert ram addr */ 
-        lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
-        lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
-        lcd_begin_write_gram(); 
-
-        for (; y <= ymax; y++)
-        {
-            /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
-            const unsigned char *ysrc = src[0] + stride * src_y + src_x;
-            const unsigned char *usrc = src[1] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                               + (src_x/CSUB_X);
-            const unsigned char *vsrc = src[2] + (stride/CSUB_X) * (src_y/CSUB_Y)
-                                               + (src_x/CSUB_X);
-            const unsigned char *row_end = ysrc + width;
-
-            int y, u, v;
-            int rc, gc, bc;
-            int red, green, blue;
-            unsigned rbits, gbits, bbits;
-
-            do
-            {
-                u = *usrc++ - 128;
-                v = *vsrc++ - 128;
-                rc = RVFAC * v + ROUNDOFFS;
-                gc = GVFAC * v + GUFAC * u + ROUNDOFFS;
-                bc = BUFAC * u + ROUNDOFFS;
-
-                y = *ysrc++;
-                red   = RYFAC * y + rc;
-                green = GYFAC * y + gc;
-                blue  = BYFAC * y + bc;
-
-                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-                {
-                    if (red < 0)
-                        red = 0;
-                    else
-                        red = (RYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-                {
-                    if (green < 0)
-                        green = 0;
-                    else
-                        green = (GYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-                {
-                    if (blue < 0)
-                        blue = 0;
-                    else
-                        blue = (BYFAC*255+ROUNDOFFS);
-                }
-                rbits = ((unsigned)red) >> 16 ;
-                gbits = ((unsigned)green) >> 16 ;
-                bbits = ((unsigned)blue) >> 16 ;
-
-                LCD_DATA = (rbits << 11) | (gbits << 5) | bbits;
-
-                y = *ysrc++;
-                red   = RYFAC * y + rc;
-                green = GYFAC * y + gc;
-                blue  = BYFAC * y + bc;
-
-                if ((unsigned)red > (RYFAC*255+ROUNDOFFS))
-                {
-                    if (red < 0)
-                        red = 0;
-                    else
-                        red = (RYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)green > (GYFAC*255+ROUNDOFFS))
-                {
-                    if (green < 0)
-                        green = 0;
-                    else
-                        green = (GYFAC*255+ROUNDOFFS);
-                }
-                if ((unsigned)blue > (BYFAC*255+ROUNDOFFS))
-                {
-                    if (blue < 0)
-                        blue = 0;
-                    else
-                        blue = (BYFAC*255+ROUNDOFFS);
-                }
-                rbits = ((unsigned)red) >> 16 ;
-                gbits = ((unsigned)green) >> 16 ;
-                bbits = ((unsigned)blue) >> 16 ;
-
-                LCD_DATA = (rbits << 11) | (gbits << 5) | bbits;
-            }
-            while (ysrc < row_end);
-
-            src_y++;
-        }
+        memcpy(y_ibuf, ysrc, width);
+        memcpy(y_ibuf + width, ysrc + stride, width);
+        memcpy(bu_ibuf, usrc, width >> 1);
+        memcpy(rv_ibuf, vsrc, width >> 1);
+        lcd_write_yuv420_lines(y_ibuf, bu_ibuf, guv_ibuf, rv_ibuf, width);
+        ysrc += 2 * stride;
+        usrc += stride >> 1;
+        vsrc += stride >> 1;
     }
+    while (ysrc < ysrc_max);
 }
 
 /* Update the display.
@@ -438,10 +363,6 @@ void lcd_update(void)
 {
     if(display_on){
         /* reset update window */
-        /* horiz ram addr: 0 - 175 */
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, 0xaf00);
-
-        /* vert ram addr: 0 - 219 */
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((xoffset+219)<<8) | xoffset);
 
         /* Copy display bitmap to hardware */
@@ -467,15 +388,11 @@ void lcd_update_rect(int x, int y, int width, int height)
 
         /* set update window */ 
 
-        /* horiz ram addr */ 
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (ymax << 8) | y);
-        
-        /* vert ram addr */ 
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
         lcd_begin_write_gram(); 
 
-        /* Copy specified rectangle bitmap to hardware */ 
+        /* Copy specified rectangle bitmap to hardware */
         for (; y <= ymax; y++) 
         { 
             lcd_write_data ((unsigned short *)&lcd_framebuffer[y][x], width); 

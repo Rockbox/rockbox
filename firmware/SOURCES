@@ -179,7 +179,7 @@ thread.c
 timer.c
 crt0.S
 drivers/lcd.S
-#endif  
+#endif
 mp3_playback.c
 mp3data.c
 #if CONFIG_CODEC != SWCODEC
@@ -249,6 +249,10 @@ target/coldfire/iaudio/x5/backlight-x5.c
 target/coldfire/iaudio/x5/m5636-x5.c
 target/coldfire/iaudio/x5/lcd-remote-x5.c
 #endif
+#endif
+
+#ifdef IRIVER_H300_SERIES
+target/coldfire/iriver/h300/lcd-as-h300.S
 #endif
 
 #ifdef IRIVER_H10
