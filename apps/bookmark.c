@@ -462,7 +462,7 @@ bool bookmark_autoload(const char* file)
             case ACTION_STD_NEXT:
                 return bookmark_load(global_bookmark_file_name, false);
 #endif
-            case ACTION_STD_OK:
+            case ACTION_BMS_SELECT:
                 return bookmark_load(global_bookmark_file_name, true);
 
             default:
