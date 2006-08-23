@@ -882,7 +882,7 @@ void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
 
         s->len = utf8length((char *)string);
         s->offset = offset;
-        s->startx = x;
+        s->startx = xmargin + x * s->width / s->len;;
         s->backward = false;
         scrolling_lines |= (1<<y);
     }
@@ -920,7 +920,7 @@ static void scroll_thread(void)
                 s->offset += scroll_step;
 
             pf = font_get(curfont);
-            xpos = xmargin + s->startx * s->width / s->len;
+            xpos = s->startx;
             ypos = ymargin + index * pf->height;
 
             if (s->bidir) { /* scroll bidirectional */
