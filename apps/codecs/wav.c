@@ -232,6 +232,7 @@ enum codec_status codec_start(struct codec_api *api)
     uint16_t blockalign = 0;
     uint32_t avgbytespersec = 0;
     off_t firstblockposn;     /* position of the first block in file */
+    
  
     /* Generic codec initialisation */
     rb = api;
@@ -253,9 +254,12 @@ next_track:
         goto exit;
     }
 
-    while (!*ci->taginfo_ready)
-        ci->yield();
+    while (!*ci->taginfo_ready && !ci->stop_codec)
+        ci->sleep(1);
     
+    /* Need to save offset for later use (cleared indirectly by advance_buffer) */
+    bytesdone = ci->id3->offset;
+
     /* get RIFF chunk header */
     buf = ci->request_buffer(&n, 12);
     if (n < 12) {
@@ -420,9 +424,9 @@ next_track:
     }
 
     /* make sure we're at the correct offset */
-    if (ci->id3->offset > (uint32_t) firstblockposn) {
+    if (bytesdone > (uint32_t) firstblockposn) {
         /* Round down to previous block */
-        uint32_t offset = ci->id3->offset - ci->id3->offset % blockalign;
+        uint32_t offset = bytesdone - bytesdone % blockalign;
 
         ci->advance_buffer(offset-firstblockposn);
         bytesdone = offset - firstblockposn;
