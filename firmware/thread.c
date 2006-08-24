@@ -94,7 +94,7 @@ static inline void load_context(const void* addr) __attribute__ ((always_inline)
 #ifdef RB_PROFILE
 #include <profile.h>
 void profile_thread(void) {
-    profstart(current_thread);
+    profstart(current_thread[CURRENT_CORE]);
 }
 #endif
 
@@ -265,7 +265,7 @@ static inline void load_context(const void* addr)
 void switch_thread(void)
 {
 #ifdef RB_PROFILE
-    profile_thread_stopped(current_thread);
+    profile_thread_stopped(current_thread[CURRENT_CORE]);
 #endif
     int current;
     unsigned int *stackptr;
@@ -313,7 +313,7 @@ void switch_thread(void)
     current_thread[CURRENT_CORE] = current;
     load_context(&thread_contexts[CURRENT_CORE][current]);
 #ifdef RB_PROFILE
-    profile_thread_started(current_thread);
+    profile_thread_started(current_thread[CURRENT_CORE]);
 #endif
 }
 

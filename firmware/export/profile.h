@@ -8,7 +8,7 @@
  * $Id$
  *
  * Profiling routines counts ticks and calls to each profiled function.
- * 
+ *
  * Copyright (C) 2005 by Brandon Low
  *
  * All files in this archive are subject to the GNU General Public License.
@@ -31,8 +31,8 @@
 #define INDEX_MASK 0x7FF /* lower INDEX_BITS 1 */
 
 /*
- * In the current setup (pfd has 4 longs and 2 shorts) this uses 20k of RAM 
- * for profiling, and allows for profiling sections of code with up-to 
+ * In the current setup (pfd has 4 longs and 2 shorts) this uses 20k of RAM
+ * for profiling, and allows for profiling sections of code with up-to
  * 1024 function caller->callee pairs
  */
 #define NUMPFDS 1024
@@ -54,8 +54,6 @@ struct pfd_struct {
 #define PROF_OFF_THREAD 0x10
 #define PROF_ON_THREAD 0x0F
 
-extern int current_thread;
-
 /* Initialize and start profiling */
 void profstart(int current_thread)
   NO_PROF_ATTR;
@@ -72,7 +70,7 @@ void profile_thread_stopped(int current_thread)
 void profile_thread_started(int current_thread)
   NO_PROF_ATTR;
 
-void profile_func_exit(void *this_fn, void *call_site) 
+void profile_func_exit(void *this_fn, void *call_site)
   NO_PROF_ATTR ICODE_ATTR;
 void profile_func_enter(void *this_fn, void *call_site)
   NO_PROF_ATTR ICODE_ATTR;
