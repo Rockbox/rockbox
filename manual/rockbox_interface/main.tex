@@ -20,8 +20,18 @@
     }
     {\includegraphics{rockbox_interface/images/recorderv2fm-front.png}}
   }
- \opt{ondiosp}{\includegraphics[height=11.8cm]{rockbox_interface/images/ondiosp-front.png}}
-  \opt{ondiofm}{\includegraphics[height=11.8cm]{rockbox_interface/images/ondiofm-front.png}}
+  \opt{ondiosp}{
+    \ifpdfoutput{
+    \includegraphics[height=8cm]{rockbox_interface/images/ondiosp-front.pdf}
+    }
+    {\includegraphics{rockbox_interface/images/ondiosp-front.png}}
+  }
+  \opt{ondiofm}{
+    \ifpdfoutput{
+    \includegraphics[height=8cm]{rockbox_interface/images/ondiofm-front.pdf}
+    }
+    {\includegraphics{rockbox_interface/images/ondiofm-front.png}}
+  }
   \opt{h1xx}{
     \ifpdfoutput{
     \includegraphics[height=8cm]{rockbox_interface/images/h1xx-front.pdf}
