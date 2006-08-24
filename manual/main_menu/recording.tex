@@ -1,172 +1,175 @@
 % $Id$ %
 \section{\label{ref:Recording}Recording}
-  \subsection{\label{ref:Whilerecordingscreen}While Recording Screen}
-  \screenshot{main_menu/images/ss-while-recording-screen}{The while recording
-    screen}{}
+\subsection{\label{ref:Whilerecordingscreen}While Recording Screen}
+\screenshot{main_menu/images/ss-while-recording-screen}{The while recording
+  screen}{}
 
-  Entering the \setting{Recording} option in the \setting{Main Menu} brings up
-  a screen in wich you can choose to enter the \setting{Recording Screen} or
-  the \setting{Recording Settings} (see below). The \setting{Recording Screen}
-  shows the time elapsed and the size of the file being recorded. A peak meter
-  is present to allow you set Gain correctly. There is also a volume setting,
-  this will only affect the output level of the \dap\ and does \emph{not}
-  affect the recorded sound.
-  \opt{MASCODEC}{The frequency, channels and quality}
-  \opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
-  
-  The controls for this screen are:
-  
-    \begin{table}
-      \begin{btnmap}{}{}
-        
-        \ButtonUp\ / \ButtonDown & Select setting.\\
-        %
-        \ButtonLeft\ / \ButtonRight & Adjust selected setting.\\
-        %
-        \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
-        \opt{ONDIO_PAD}{\ButtonMenu}
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
-        & Start recording.\\
-        & While recording: pause recording (press again to continue).\\
-        %
-        \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-        \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
-        & Exit \setting{Recording Screen}.\\
-        & While recording: Stop recording.\\
-        %
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
-          \ButtonRec & Starts recording.\\
-          & While recording: close the current file and open a new one.\\
-        }
-        %
-        \opt{RECORDER_PAD}{\ButtonFOne}
-        \opt{ONDIO_PAD}{Hold \ButtonMenu}
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-        \opt{IAUDIO_X5_PAD}{Hold \ButtonRec}
-        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonSelect} 
-        & Open \setting{Recording Settings} (see below).\\
-        %
-        \opt{RECORDER_PAD}{
-          \ButtonFTwo & Quick menu for recording settings. A quick press will
-          leave the screen up (press \ButtonFTwo\ again to exit), while holding
-          it will close the screen when you release it.\\
-        }
-        %
-        \opt{RECORDER_PAD}{
-          \ButtonFThree & Quick menu for source setting.\\
-          & Quick/hold works as for \ButtonFTwo.\\
-          & While recording: Start a new recording file.\\
-        }
-      \end{btnmap}
-  \end{table}
-  
-  \subsection{\label{ref:Recordingsettings}Recording Settings}
-  \screenshot{main_menu/images/ss-recording-settings}{The recording settings screen}{}
-  
-  \opt{MASCODEC}{
-    \begin{description}
-    \item[Quality:]
-      Choose the quality here (0 to 7). Default is 5, best quality is 7,
-      smallest file size is 0. This setting effects how much your sound
-      sample will be compressed. Higher quality settings result in larger
-      MP3 files.
-      
-      The quality setting is just a way of selecting an average bit rate,
-      or number of  bits per second, for a recording.  When  this setting
-      is lowered, recordings are compressed more (meaning worse sound quality),
-      and the average bitrate changes as follows.
-    \end{description}
-    
-    \begin{table}[h!]
-      \begin{center}
-        \begin{tabularx}{0.75\textwidth}{lX}\toprule
-          \emph{Frequency} & \emph{Bitrate} (Kbit/s) -- quality 0$\rightarrow$7 \\\midrule
-          44100Hz stereo        & 75, 80, 90, 100, 120, 140, 160, 170 \\
-          22050Hz stereo        & 39, 41, 45, 50,  60,  80,  110, 130 \\
-          44100Hz mono          & 65, 68, 73, 80,  90,  105, 125, 140 \\
-          22050Hz mono          & 35, 38, 40, 45,  50,  60,  75,  90 \\\bottomrule
-        \end{tabularx}
-      \end{center}
-    \end{table}
-  }
-  
-    \begin{description}
-    \opt{MASCODEC,x5}{
-    \item[Frequency:]
-      Choose the recording frequency (sample rate) -- 48kHz, 44.1kHz, 32kHz and
-      24kHz, 22.05kHz, 16kHz are available. Higher sample rates use up more disk
-      space, but give better sound quality.
-      This setting determines which frequency range can accurately be reproduced
-      during playback, Lower frequencies produce smaller files.
-      \opt{MASCODEC}{
-        The frequency setting also determines which version of the MPEG standard
-        the sound is recorded using:\\
-        MPEG v1 for 48, 44.1 and 32\\
-        MPEG v2 for 24, 22.05 and 16\\
-      }
-  }
-  \item[Source:]
-    Choose the source of the recording. This can be
-    \opt{recorder,recorderv2fm,h1xx}{SPDIF (digital),} microphone or line in.
-    \opt{CONFIG_TUNER}{For recording from the radio see \reference{ref:FMradio}.}
-    
-    % Add h1xx here whenever it supports setting recording frequency.
-    \opt{recorder,recorderv2fm}
-        {\note{You cannot change the sample rate for digital recordings.}}
+Entering the \setting{Recording} option in the \setting{Main Menu} brings up
+a screen in wich you can choose to enter the \setting{Recording Screen} or
+the \setting{Recording Settings} (see below). The \setting{Recording Screen}
+shows the time elapsed and the size of the file being recorded. A peak meter
+is present to allow you set Gain correctly. There is also a volume setting,
+this will only affect the output level of the \dap{} and does \emph{not}
+affect the recorded sound.
+\note{When you start a recording, the hard disk will spin up. This will cause
+the peak meters to freeze in the process. This is expected behaviour, and
+nothing to worry about. Recording is continiued during the spin up.}
+\opt{MASCODEC}{The frequency, channels and quality}
+\opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
 
-  \opt{MASCODEC,x5}{
-    \item[Channels:]
-      This allows you to select mono or stereo recording. Please note that
-      for mono recording, only the left channel is recorded.  Mono recordings
-      are usually somewhat smaller than stereo.
-  }
+The controls for this screen are:
 
-  \opt{MASCODEC}{
-    \item[Independent Frames:]
-      The independent frames option tells the \dap\ to encode with the bit
-      reservoir disabled, so the frames are independent of each other. This
-      makes a file easier to edit.
-  }
+\begin{table}
+  \begin{btnmap}{}{}
+    
+    \ButtonUp\ / \ButtonDown & Select setting.\\
+    %
+    \ButtonLeft\ / \ButtonRight & Adjust selected setting.\\
+    %
+    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
+    & Start recording.\\
+    & While recording: pause recording (press again to continue).\\
+    %
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
+    & Exit \setting{Recording Screen}.\\
+    & While recording: Stop recording.\\
+    %
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+      \ButtonRec & Starts recording.\\
+      & While recording: close the current file and open a new one.\\
+    }
+    %
+    \opt{RECORDER_PAD}{\ButtonFOne}
+    \opt{ONDIO_PAD}{Hold \ButtonMenu}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+    \opt{IAUDIO_X5_PAD}{Hold \ButtonRec}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonSelect} 
+    & Open \setting{Recording Settings} (see below).\\
+    %
+    \opt{RECORDER_PAD}{
+      \ButtonFTwo & Quick menu for recording settings. A quick press will
+      leave the screen up (press \ButtonFTwo\ again to exit), while holding
+      it will close the screen when you release it.\\
+    }
+    %
+    \opt{RECORDER_PAD}{
+      \ButtonFThree & Quick menu for source setting.\\
+      & Quick/hold works as for \ButtonFTwo.\\
+      & While recording: Start a new recording file.\\
+    }
+  \end{btnmap}
+\end{table}
 
-  \item[Time Split:]
-    This option is useful when timing recordings. If set to active it stops
-    a recording at a given interval and then starts recording again with a
-    new file, which is useful for long term recordings.
-    \newline
-    The splits are seamless (frame accurate), no audio is lost at the split
-    point. The break between recordings is only the time required to stop
-    and restart the recording, on the order of 2 -- 4 seconds.
-    \newline
-    Options (hours:minutes between splits): off, 24:00, 18:00, 12:00, 10:00,
-    8:00, 6:00, 4:00, 2:00, 1:20 (80 minute CD), 1:14 (74 minute  CD), 1:00,
-    00:30, 00:15, 00:10, 00:05.
-    
-  \item[Prerecord Time:]
-    This setting buffers a small amount of audio so that when the record button
-    is pressed, the recording will begin from that number of seconds earlier.
-    This is useful for ensuring that a recording begins before a cue that is
-    being waited for.\\
-    Options: \setting{Off}, \setting{1 -- 30 seconds}
-    
-  \item[Directory:]
-    Allows changing the location where the recorded files are saved. The
-    default location is \fname{/recordings}.
-    
-  \item[Show recording screen on startup:]
-    If set to yes, the \dap\ will start up with the while recording screen
-    showing.\\
-    Options: \setting{Yes}, \setting{No}
-    
-  \item[Clipping Light:]
-    Causes the backlight to flash on when clipping has been detected.\\
-    Options: \setting{Off}, \setting{Remote unit only},
-      \setting{Main and remote unit}, \setting{Main unit only}.
-    
-  \opt{MASCODEC}{
-    \item[Trigger:]
-    \fixme{Add description of triggered recording.}
-  }
+\subsection{\label{ref:Recordingsettings}Recording Settings}
+\screenshot{main_menu/images/ss-recording-settings}{The recording settings screen}{}
 
+\opt{MASCODEC}{
+  \begin{description}
+  \item[Quality:]
+    Choose the quality here (0 to 7). Default is 5, best quality is 7,
+    smallest file size is 0. This setting effects how much your sound
+    sample will be compressed. Higher quality settings result in larger
+    MP3 files.
+    
+    The quality setting is just a way of selecting an average bit rate,
+    or number of  bits per second, for a recording.  When  this setting
+    is lowered, recordings are compressed more (meaning worse sound quality),
+    and the average bitrate changes as follows.
   \end{description}
+  
+  \begin{table}[h!]
+    \begin{center}
+      \begin{tabularx}{0.75\textwidth}{lX}\toprule
+        \emph{Frequency} & \emph{Bitrate} (Kbit/s) -- quality 0$\rightarrow$7 \\\midrule
+        44100Hz stereo        & 75, 80, 90, 100, 120, 140, 160, 170 \\
+        22050Hz stereo        & 39, 41, 45, 50,  60,  80,  110, 130 \\
+        44100Hz mono          & 65, 68, 73, 80,  90,  105, 125, 140 \\
+        22050Hz mono          & 35, 38, 40, 45,  50,  60,  75,  90 \\\bottomrule
+      \end{tabularx}
+    \end{center}
+  \end{table}
+}
+
+\begin{description}
+  \opt{MASCODEC,x5}{
+  \item[Frequency:]
+    Choose the recording frequency (sample rate) -- 48kHz, 44.1kHz, 32kHz and
+    24kHz, 22.05kHz, 16kHz are available. Higher sample rates use up more disk
+    space, but give better sound quality.
+    This setting determines which frequency range can accurately be reproduced
+    during playback, Lower frequencies produce smaller files.
+    \opt{MASCODEC}{
+      The frequency setting also determines which version of the MPEG standard
+      the sound is recorded using:\\
+      MPEG v1 for 48, 44.1 and 32\\
+      MPEG v2 for 24, 22.05 and 16\\
+    }
+  }
+\item[Source:]
+  Choose the source of the recording. This can be
+  \opt{recorder,recorderv2fm,h1xx}{SPDIF (digital),} microphone or line in.
+  \opt{CONFIG_TUNER}{For recording from the radio see \reference{ref:FMradio}.}
+  
+  % Add h1xx here whenever it supports setting recording frequency.
+  \opt{recorder,recorderv2fm}
+      {\note{You cannot change the sample rate for digital recordings.}}
+      
+      \opt{MASCODEC,x5}{
+      \item[Channels:]
+        This allows you to select mono or stereo recording. Please note that
+        for mono recording, only the left channel is recorded.  Mono recordings
+        are usually somewhat smaller than stereo.
+      }
+      
+      \opt{MASCODEC}{
+      \item[Independent Frames:]
+        The independent frames option tells the \dap\ to encode with the bit
+        reservoir disabled, so the frames are independent of each other. This
+        makes a file easier to edit.
+      }
+      
+    \item[File Split:]
+      This option is useful when timing recordings. If set to active it stops
+      a recording at a given interval and then starts recording again with a
+      new file, which is useful for long term recordings.
+      \newline
+      The splits are seamless (frame accurate), no audio is lost at the split
+      point. The break between recordings is only the time required to stop
+      and restart the recording, on the order of 2 -- 4 seconds.
+      \newline
+      Options (hours:minutes between splits): off, 24:00, 18:00, 12:00, 10:00,
+      8:00, 6:00, 4:00, 2:00, 1:20 (80 minute CD), 1:14 (74 minute  CD), 1:00,
+      00:30, 00:15, 00:10, 00:05.
+      
+    \item[Prerecord Time:]
+      This setting buffers a small amount of audio so that when the record button
+      is pressed, the recording will begin from that number of seconds earlier.
+      This is useful for ensuring that a recording begins before a cue that is
+      being waited for.\\
+      Options: \setting{Off}, \setting{1 -- 30 seconds}
+      
+    \item[Directory:]
+      Allows changing the location where the recorded files are saved. The
+      default location is \fname{/recordings}.
+      
+    \item[Show recording screen on startup:]
+      If set to yes, the \dap\ will start up with the while recording screen
+      showing.\\
+      Options: \setting{Yes}, \setting{No}
+      
+    \item[Clipping Light:]
+      Causes the backlight to flash on when clipping has been detected.\\
+      Options: \setting{Off}, \setting{Remote unit only},
+      \setting{Main and remote unit}, \setting{Main unit only}.
+      
+      \opt{MASCODEC}{
+      \item[Trigger:]
+        \fixme{Add description of triggered recording.}
+      }
+      
+\end{description}
