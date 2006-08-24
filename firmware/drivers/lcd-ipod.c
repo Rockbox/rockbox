@@ -512,8 +512,8 @@ void lcd_yuv_blit(unsigned char * const src[3],
             h = height;
 
             /* calculate how much we can do in one go */
-            if (pixels_to_write > 64000) {
-                h = (64000/2) / width;
+            if (pixels_to_write > 0x10000) {
+                h = (0x10000/2) / width;
                 pixels_to_write = (width * h) * 2;
             }
 
@@ -709,8 +709,8 @@ void lcd_update_rect(int x, int y, int width, int height)
         h = height;
 
         /* calculate how much we can do in one go */
-        if (pixels_to_write > 64000) {
-            h = (64000/2) / width;
+        if (pixels_to_write > 0x10000) {
+            h = (0x10000/2) / width;
             pixels_to_write = (width * h) * 2;
         }
 
