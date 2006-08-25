@@ -7,27 +7,28 @@ already available on your computer but if not you need to get some additional
 software.
 
 \begin{description}
-\item[zip Utility.]
-  Rockbox is distributed as an archive using the ``zip'' format. Thus you
+\item[ZIP utility.]
+  Rockbox is distributed as an archive using the \fname{.zip} format. Thus you
   need a tool to handle that compressed format. Usually your
-  computer should have a tool installed that can handle the zip file format.
-  Windows XP has builtin support for zip files and presents them to you
-  as folders unless you have installed a third party program that handles
-  compressed files. For other operating systems this may vary. If the zip file
-  format isn't recognized on your computer you can find a program to
-  handle them at \url{http://www.info-zip.org/} or
+  computer should have a tool installed that can handle the \fname{.zip} file 
+  format.
+  Windows XP has builtin support for \fname{.zip} files and presents them to 
+  you as folders unless you have installed a third party program that handles
+  compressed files. For other operating systems this may vary. If the 
+  \fname{.zip} file format isn't recognized on your computer you can find a 
+  program to handle them at \url{http://www.info-zip.org/} or
   \url{http://sevenzip.sf.net/} which can downloaded and used free of
   charge.
 \item[USB connection.]
   To transfer Rockbox to your \dap{} you need to connect it to your computer.
-  To proceed you need to know where to access the \dap{}. On windows this
+  To proceed you need to know where to access the \dap{}. On Windows this
   means you need to figure out the drive letter the device got associated
   with. On Linux you need to know the mount point of your \dap{}.
   \opt{ipod}{A connection means you need to be able accessing your \dap{}
     as hard disk meaning you need to use the so-called ``disk-mode''.
     \fixme{add a note on how to enter the disk mode}
   }
-\item[Text Editor.]
+\item[Text editor.]
   If you want to create customized configuration files you'll need a text
   editor like Windows' ``Wordpad''. Of course you can simply save
   configurations on the \dap{} for which you don't need an editor at all.
@@ -40,8 +41,8 @@ software.
 \section{Installing Rockbox}\label{sec:installing_rockbox}
 \opt{MASCODEC}{
   \subsection{Using the windows installer}
-  Using the Windows self installing executable to install Rockbox is the easiest
-  method of installing the software on your Jukebox.  Simply follow the
+  Using the Windows self installing executable to install Rockbox is the 
+  easiest method of installing the software on your Jukebox.  Simply follow the
   on-screen instructions and select the appropriate drive letter and Jukebox
   model when prompted.  You can use ``Add / Remove Programs'' to uninstall the
   software at a later date.
@@ -51,23 +52,25 @@ software.
   the procedure is still fairly simple.
 }
 \opt{SWCODEC}{
-\subsection{Introduction}
-  There are two separate components of Rockbox that need to be installed in order
-  to run Rockbox.
+  \subsection{Introduction}
+  There are two separate components of Rockbox that need to be installed in 
+  order to run Rockbox.
   \begin{enumerate}
-  \item The Rockbox bootloader. This is the component of Rockbox that is installed
-    to the flash memory of your \playerman. The bootloader is the program that tells
-    your \dap\ how to boot and load other components of Rockbox.
-  \item The Rockbox firmware. Unlike the \playerman\ firmware which runs entirely
-    from flash memory most of the Rockbox code is contained in the build that
-    resides on your \daps{} hard drive. This makes it easy to update Rockbox. The
-    build contain a file named \firmwarefilename\ and a directory called
-    \fname{.rockbox} which are located in the root directory of your  hard drive.
+  \item The Rockbox bootloader. This is the component of Rockbox that is 
+    installed to the flash memory of your \playerman. The bootloader is the 
+    program that tells your \dap{} how to boot and load other components of 
+    Rockbox.
+  \item The Rockbox firmware. Unlike the \playerman\ firmware which runs 
+    entirely from flash memory, most of the Rockbox code is contained in the 
+    build that resides on your \daps{} hard drive. This makes it easy to update
+    Rockbox. The build consist of a file named \firmwarefilename\ and a 
+    directory called \fname{.rockbox} which are located in the root directory 
+    of your hard drive.
   \end{enumerate}
 	
 % Installing the bootloader
 \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
-\opt{ipod4g,ipodcolor,ipodnano,ipodmini,ipodvideo}
+\opt{ipod4g,ipod3g,ipodcolor,ipodnano,ipodmini,ipodvideo}
   {\input{getting_started/ipod_install.tex}}
 \opt{x5}{\input{getting_started/iaudio_install.tex}}
 

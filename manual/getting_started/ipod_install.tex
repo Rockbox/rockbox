@@ -8,7 +8,7 @@ for the next daily builds.}
   Installing the bootloader is the trickiest part of the installation.
   The process is different depending on your operating system, but before
   starting, connect the \dap{} to the computer using either an USB \fixme{or
-  Firewire?} cable. Next, create a folder on the computer's harddrive and
+  Firewire?} cable. Next, create a folder on the computer's hard drive and
   download the following file to that folder:
   \opt{ipodvideo}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-video.bin}}
   \opt{ipodnano}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-nano.bin}}
@@ -17,6 +17,7 @@ for the next daily builds.}
     generation your \dap{} is.\fixme{Describe how to identify 1/2G}}
   \opt{ipodcolor}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-color.bin}}
   \opt{ipod4g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-4g.bin}}
+  \opt{ipod3g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-3g.bin}}
 
   When that is done, proceed to the section below that matches the operating
   system on the computer.
@@ -211,6 +212,11 @@ Now you can proceed installing the firmware itself.
 \optv{ipod4g}{
     \begin{code}
     ./ipod_fw -g 4g -o rockboot.bin -i apple_os.bin bootloader-4g.bin
+    \end{code}
+}
+\optv{ipod3g}{
+    \begin{code}
+    ./ipod_fw -g 3g -o rockboot.bin -i apple_os.bin bootloader-3g.bin
     \end{code}
 }
   \item
