@@ -51,13 +51,13 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGFILE_ENTRY_AVG_LENGTH   16
 
 /* How many entries to fetch to the seek table at once while searching. */
-#define SEEK_LIST_SIZE 50
+#define SEEK_LIST_SIZE 32
 
 /* Always strict align entries for best performance and binary compatability. */
 #define TAGCACHE_STRICT_ALIGN 1
 
-#define TAGCACHE_MAX_FILTERS 3
-#define TAGCACHE_MAX_CLAUSES 10
+#define TAGCACHE_MAX_FILTERS 4
+#define TAGCACHE_MAX_CLAUSES 16
 
 /* Tag database files. */
 #define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/tagcache_tmp.tcd"
@@ -116,6 +116,9 @@ struct tagcache_search {
     int entry_count;
     bool valid;
     bool initialized;
+    long *unique_list;
+    int unique_list_capacity;
+    int unique_list_count;
 
     /* Exported variables. */
     bool ramsearch;
@@ -133,6 +136,8 @@ bool tagcache_is_unique_tag(int type);
 bool tagcache_is_sorted_tag(int type);
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
+void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
+                                 void *buffer, long length);
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
 bool tagcache_search_add_clause(struct tagcache_search *tcs,

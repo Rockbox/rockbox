@@ -631,6 +631,30 @@ static bool check_against_clause(long numeric, const char *str,
     return false;
 }
 
+static bool add_uniqbuf(struct tagcache_search *tcs, long id)
+{
+    int i;
+    
+    /* If uniq buffer is not defined we must return true for search to work. */
+    if (tcs->unique_list == NULL)
+        return true;
+    
+    for (i = 0; i < tcs->unique_list_count; i++)
+    {
+        /* Return false if entry is found. */
+        if (tcs->unique_list[i] == id)
+            return false;
+    }
+    
+    if (tcs->unique_list_count < tcs->unique_list_capacity)
+    {
+        tcs->unique_list[i] = id;
+        tcs->unique_list_count++;
+    }
+    
+    return true;
+}
+
 static bool build_lookup_list(struct tagcache_search *tcs)
 {
     struct index_entry entry;
@@ -699,22 +723,16 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             if (j < tcs->clause_count)
                 continue ;
             
-            /* Add to the seek list if not already there. */
-            for (j = 0; j < tcs->seek_list_count; j++)
-            {
-                if (tcs->seek_list[j] == hdr->indices[i].tag_seek[tcs->type])
-                    break ;
-            }
-
+            /* Add to the seek list if not already in uniq buffer. */
+            if (!add_uniqbuf(tcs, hdr->indices[i].tag_seek[tcs->type]))
+                continue;
+            
             /* Lets add it. */
-            if (j == tcs->seek_list_count)
-            {
-                tcs->seek_list[tcs->seek_list_count] =
-                        hdr->indices[i].tag_seek[tcs->type];
-                tcs->seek_flags[tcs->seek_list_count] =
-                        hdr->indices[i].flag;
-                tcs->seek_list_count++;
-            }
+            tcs->seek_list[tcs->seek_list_count] = 
+                hdr->indices[i].tag_seek[tcs->type];
+            tcs->seek_flags[tcs->seek_list_count] =
+                hdr->indices[i].flag;
+            tcs->seek_list_count++;
         }
         
         tcs->seek_pos = i;
@@ -783,22 +801,14 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         if (i < tcs->clause_count)
             continue ;
             
-        /* Add to the seek list if not already there. */
-        for (i = 0; i < tcs->seek_list_count; i++)
-        {
-            if (tcs->seek_list[i] == entry.tag_seek[tcs->type])
-                break ;
-        }
-
+        /* Add to the seek list if not already in uniq buffer. */
+        if (!add_uniqbuf(tcs, entry.tag_seek[tcs->type]))
+            continue;
+            
         /* Lets add it. */
-        if (i == tcs->seek_list_count)
-        {
-            tcs->seek_list[tcs->seek_list_count] =
-                    entry.tag_seek[tcs->type];
-            tcs->seek_flags[tcs->seek_list_count] = entry.flag;
-            tcs->seek_list_count++;
-        }
-        
+        tcs->seek_list[tcs->seek_list_count] = entry.tag_seek[tcs->type];
+        tcs->seek_flags[tcs->seek_list_count] = entry.flag;
+        tcs->seek_list_count++;
     }
 
     return tcs->seek_list_count > 0;
@@ -913,6 +923,14 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     return true;
 }
 
+void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
+                                 void *buffer, long length)
+{
+    tcs->unique_list = (unsigned long *)buffer;
+    tcs->unique_list_capacity = length / sizeof(*tcs->unique_list);
+    tcs->unique_list_count = 0;
+}
+
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek)
 {
@@ -932,12 +950,23 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause)
 {
+    int i;
+    
     if (tcs->clause_count >= TAGCACHE_MAX_CLAUSES)
     {
         logf("Too many clauses");
         return false;
     }
 
+    /* Check if there is already a similar filter in present (filters are
+     * much faster than clauses). 
+     */
+    for (i = 0; i < tcs->filter_count; i++)
+    {
+        if (tcs->filter_tag[i] == clause->tag)
+            return true;
+    }
+    
     if (!tagcache_is_numeric_tag(clause->tag) && tcs->idxfd[clause->tag] < 0)
     {
         char buf[MAX_PATH];

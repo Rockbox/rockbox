@@ -48,6 +48,11 @@
 static int tagtree_play_folder(struct tree_context* c);
 
 static char searchstring[32];
+
+/* Capacity 10 000 entries (for example 10k different artists) */
+#define UNIQBUF_SIZE (64*1024)
+static long *uniqbuf;
+
 #define MAX_TAGS 5
 
 /*
@@ -500,6 +505,7 @@ void tagtree_init(void)
     }
     close(fd);
     
+    uniqbuf = buffer_alloc(UNIQBUF_SIZE);
     audio_set_track_buffer_event(tagtree_buffer_event);
     audio_set_track_unbuffer_event(tagtree_unbuffer_event);
 }
@@ -566,16 +572,21 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     if (!tagcache_search(tcs, tag))
         return -1;
     
-    for (i = 0; i < extra; i++)
-    {
-        tagcache_search_add_filter(tcs, csi->tagorder[i], csi->result_seek[i]);
-        sort = true;
-    }
+    /* Prevent duplicate entries in the search list. */
+    tagcache_search_set_uniqbuf(tcs, uniqbuf, UNIQBUF_SIZE);
     
-    for (i = 0; i < csi->clause_count[extra]; i++)
-    {
-        tagcache_search_add_clause(tcs, &csi->clause[extra][i]);
+    if (extra || csi->clause_count[0])
         sort = true;
+    
+    for (i = 0; i < extra; i++)
+        tagcache_search_add_filter(tcs, csi->tagorder[i], csi->result_seek[i]);
+    
+    for (i = 0; i <= extra; i++)
+    {
+        int j;
+        
+        for (j = 0; j < csi->clause_count[i]; j++)
+            tagcache_search_add_clause(tcs, &csi->clause[i][j]);
     }
     
     current_offset = offset;
