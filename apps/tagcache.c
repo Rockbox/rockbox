@@ -636,7 +636,7 @@ static bool add_uniqbuf(struct tagcache_search *tcs, long id)
     int i;
     
     /* If uniq buffer is not defined we must return true for search to work. */
-    if (tcs->unique_list == NULL)
+    if (tcs->unique_list == NULL || !tagcache_is_unique_tag(tcs->type))
         return true;
     
     for (i = 0; i < tcs->unique_list_count; i++)
