@@ -4,6 +4,7 @@
   \begin{longtable}{@{}lll@{}}\toprule
     \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
     \midrule
+    \endhead
     volume & \opt{player}{-78 to +18}
              \opt{recorder,recorderv2fm,ondiosp,ondiofm}{-100 -to +12}
              \opt{h1xx,h300}{-84 to 0}
@@ -44,8 +45,7 @@
     scroll speed & 1 to 25 & Hz\\
     scroll delay & 0 to 250 & 1/10s\\
     scroll step & 1 to 112 & pixels\\
-    bidir limit & 0 to 200 & \% of \\
-                &          & screen width\\
+    bidir limit & 0 to 200 & \% screen\\
     contrast & 0 to 63 & N/A\\
     backlight timeout & off, on, 1, 2, 3, 4, 5, & seconds\\
                       & 6, 7, 8, 9, 10, 15, 20, & \\
@@ -131,8 +131,8 @@
                            & 3min, 5min, 10min, 20min, &\\
                            & 45min, 90min & \\
       peak meter busy & on, off & N/A\\
-      peak meter dbfs & on, off & on = dbfs,\\
-                      &         & off = linear\\
+      peak meter dbfs & on, off & on:~dbfs,\\
+                      &         & off:~linear\\
       peak meter min  & 0 to 89 (dB) or 0 to 100 (\%) & dB or \%\\
       peak meter max  & 0 to 89 /(dB) or 0 to 100 (\%) & dB or \%\\
       statusbar & on, off & N/A\\
@@ -175,8 +175,8 @@
       time format & 12hour, 24hour & N/A\\      
     }
     \opt{HAVE_RECORDING}{
-     rec quality & 0 to 7 & 0=smallest size,\\
-                 &        & 7=highest quality\\
+     rec quality & 0 to 7 & 0: small size,\\
+                 &        & 7: high quality\\
      rec frequency & 48, 44, 32, 24, 22, 16 & kHz\\
      rec source & mic, line, spdif & N/A\\
      rec channels & mono, stereo & N/A\\
