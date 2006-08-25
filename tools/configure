@@ -1011,18 +1011,17 @@ fi
 
   case $option in
     [Bb])
-      case $archos in
-          h100|h120|h300|x5|ipodcolor|ipodnano|ipodvideo|ipod3g|ipod4g|ipodmini|ipodmini2g|gigabeatf|h10|e200|h10_5gb)
-              extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
-              appsdir='\$(ROOTDIR)/bootloader'
-              apps="bootloader"
-              ;;
-          *)
-              extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
-              appsdir='\$(ROOTDIR)/flash/bootbox'
-              apps="bootbox"
-              ;;
-      esac
+      if test -n "$archosrom"; then
+          # Archos SH-based players do this somewhat differently for
+          # some reason
+          extradefines="-DBOOTLOADER -ffunction-sections -fdata-sections"
+          appsdir='\$(ROOTDIR)/flash/bootbox'
+          apps="bootbox"
+      else
+          extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
+          appsdir='\$(ROOTDIR)/bootloader'
+          apps="bootloader"
+      fi
       bootloader="1"
       echo "Bootloader build selected"
       ;;
