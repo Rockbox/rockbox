@@ -546,7 +546,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int namebufused = 0;
     int total_count = 0;
     int special_entry_count = 0;
-    int extra = c->currextra;
+    int level = c->currextra;
     int tag;
     bool sort = false;
     
@@ -564,10 +564,10 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     if (c->currtable == allsubentries)
     {
         tag = tag_title;
-        extra--;
+        level--;
     }
     else
-        tag = csi->tagorder[extra];
+        tag = csi->tagorder[level];
 
     if (!tagcache_search(tcs, tag))
         return -1;
@@ -575,13 +575,30 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     /* Prevent duplicate entries in the search list. */
     tagcache_search_set_uniqbuf(tcs, uniqbuf, UNIQBUF_SIZE);
     
-    if (extra || csi->clause_count[0])
+    if (level || csi->clause_count[0] || tagcache_is_numeric_tag(tag))
         sort = true;
     
-    for (i = 0; i < extra; i++)
-        tagcache_search_add_filter(tcs, csi->tagorder[i], csi->result_seek[i]);
-    
-    for (i = 0; i <= extra; i++)
+    for (i = 0; i < level; i++)
+    {
+        if (tagcache_is_numeric_tag(csi->tagorder[i]))
+        {
+            static struct tagcache_search_clause cc;
+            
+            memset(&cc, 0, sizeof(struct tagcache_search_clause));
+            cc.tag = csi->tagorder[i];
+            cc.type = clause_is;
+            cc.numeric = true;
+            cc.numeric_data = csi->result_seek[i];
+            tagcache_search_add_clause(tcs, &cc);
+        }
+        else
+        {
+            tagcache_search_add_filter(tcs, csi->tagorder[i], 
+                                       csi->result_seek[i]);
+        }
+    }
+   
+    for (i = 0; i <= level; i++)
     {
         int j;
         
@@ -609,7 +626,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     while (tagcache_get_next(tcs))
     {
-        struct display_format *fmt = &csi->format[extra];
+        struct display_format *fmt = &csi->format[level];
 
         if (total_count++ < offset)
             continue;
@@ -619,7 +636,8 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         if (tag == tag_title || tag == tag_filename)
             dptr->newtable = playtrack;
         
-        if (!tcs->ramsearch || fmt->valid)
+        if (!tcs->ramsearch || fmt->valid
+            || tagcache_is_numeric_tag(tag))
         {
             char buf[MAX_PATH];
             int buf_pos = 0;

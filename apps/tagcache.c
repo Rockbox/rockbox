@@ -636,8 +636,12 @@ static bool add_uniqbuf(struct tagcache_search *tcs, long id)
     int i;
     
     /* If uniq buffer is not defined we must return true for search to work. */
-    if (tcs->unique_list == NULL || !tagcache_is_unique_tag(tcs->type))
+    if (tcs->unique_list == NULL 
+        || (!tagcache_is_unique_tag(tcs->type)
+            && !tagcache_is_numeric_tag(tcs->type)))
+    {
         return true;
+    }
     
     for (i = 0; i < tcs->unique_list_count; i++)
     {
@@ -681,7 +685,9 @@ static bool build_lookup_list(struct tagcache_search *tcs)
             {
                 if (hdr->indices[i].tag_seek[tcs->filter_tag[j]] !=
                     tcs->filter_seek[j])
+                {
                     break ;
+                }
             }
             
             if (j < tcs->filter_count)
@@ -809,6 +815,8 @@ static bool build_lookup_list(struct tagcache_search *tcs)
         tcs->seek_list[tcs->seek_list_count] = entry.tag_seek[tcs->type];
         tcs->seek_flags[tcs->seek_list_count] = entry.flag;
         tcs->seek_list_count++;
+        
+        yield();
     }
 
     return tcs->seek_list_count > 0;
@@ -897,17 +905,13 @@ bool tagcache_search(struct tagcache_search *tcs, int tag)
     else
 #endif
     {
-        if (tagcache_is_numeric_tag(tcs->type))
+        if (!tagcache_is_numeric_tag(tcs->type))
         {
-            tcs->valid = true;
-            tcs->initialized = true;
-            return true;
+            tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
+            if (tcs->idxfd[tcs->type] < 0)
+                return false;
         }
         
-        tcs->idxfd[tcs->type] = open_tag_fd(&tag_hdr, tcs->type, false);
-        if (tcs->idxfd[tcs->type] < 0)
-            return false;
-
         /* Always open as R/W so we can pass tcs to functions that modify data also
          * without failing. */
         tcs->masterfd = open_master_fd(&master_hdr, true);
@@ -1019,25 +1023,26 @@ static bool get_next(struct tagcache_search *tcs)
         )
         return false;
     
-    /* Searching not supported for numeric tags yet. */
-    if (tagcache_is_numeric_tag(tcs->type))
-        return false;
-    
     /* Relative fetch. */
-    if (tcs->filter_count > 0 || tcs->clause_count > 0)
+    if (tcs->filter_count > 0 || tcs->clause_count > 0
+        || tagcache_is_numeric_tag(tcs->type))
     {
         /* Check for end of list. */
         if (tcs->seek_list_count == 0)
         {
             /* Try to fetch more. */
             if (!build_lookup_list(tcs))
+            {
+                tcs->valid = false;
                 return false;
+            }
         }
         
         tcs->seek_list_count--;
         
         /* Seek stream to the correct position and continue to direct fetch. */
-        if (!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
+        if ((!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
+            && !tagcache_is_numeric_tag(tcs->type))
         {
             if (!open_files(tcs))
                 return false;
@@ -1046,6 +1051,16 @@ static bool get_next(struct tagcache_search *tcs)
         }
         else
             tcs->position = tcs->seek_list[tcs->seek_list_count];
+    }
+    
+    if (tagcache_is_numeric_tag(tcs->type))
+    {
+        logf("r:%d", tcs->position);
+        snprintf(buf, sizeof(buf), "%d", tcs->position);
+        tcs->result_seek = tcs->position;
+        tcs->result = buf;
+        tcs->result_len = strlen(buf) + 1;
+        return true;
     }
     
     /* Direct fetch. */
