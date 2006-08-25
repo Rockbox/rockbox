@@ -133,6 +133,10 @@ static bool timer_set(long cycles, bool start)
         phi &= ~1;       /* timer disabled at start */
     }
 
+    /* If it is already enabled, writing a 0 to the RST bit will clear the
+       register, so we clear RST explicitly before writing the real data. */
+    TMR1 = 0;
+    
     /* We are using timer 1 */
     TMR1 = 0x0018 | (unsigned short)phi | ((unsigned short)(prescale - 1) << 8);
     TRR1 = (unsigned short)(cycles - 1);
