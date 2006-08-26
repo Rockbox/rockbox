@@ -790,7 +790,7 @@ static char* get_tag(struct wps_data* wps_data,
                     }
                     else
                     {
-                        *intval = 0;
+                        *intval = 1;
                         return "?";
                     }
                     return buf;
