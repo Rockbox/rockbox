@@ -104,8 +104,8 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_GATE_SCAN_START_POS   0x40
 #define R_1ST_SCR_DRV_POS       0x42
 #define R_2ND_SCR_DRV_POS       0x43
-#define R_HORIZ_RAM_ADDR_POS    0x44
-#define R_VERT_RAM_ADDR_POS     0x45
+#define R_VERT_RAM_ADDR_POS     0x44
+#define R_HORIZ_RAM_ADDR_POS    0x45
 
 #endif
 

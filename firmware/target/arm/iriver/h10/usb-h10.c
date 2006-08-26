@@ -87,7 +87,7 @@ void usb_init_device(void)
 
 bool usb_detect(void)
 {
-    return (GPIOA_INPUT_VAL & 0x04)?true:false;
+    return (GPIOL_INPUT_VAL & 0x04)?true:false;
 }
 
 void usb_enable(bool on)
