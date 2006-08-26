@@ -456,6 +456,7 @@ static char* get_tag(struct wps_data* wps_data,
                      int *intval)
 {
     struct mp3entry *id3 = cid3; /* default to current song */
+    int limit = *intval;
 #ifndef HAVE_LCD_CHARCELLS
     (void)wps_data;
 #endif
@@ -705,7 +706,7 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'v': /* volume */
                     *flags |= WPS_REFRESH_DYNAMIC;
                     snprintf(buf, buf_size, "%d", global_settings.volume);
-                    *intval = 10 * (global_settings.volume 
+                    *intval = limit * (global_settings.volume 
                                     - sound_min(SOUND_VOLUME))
                                  / (sound_max(SOUND_VOLUME)
                                     - sound_min(SOUND_VOLUME)) + 1;
@@ -780,14 +781,16 @@ static char* get_tag(struct wps_data* wps_data,
                 case 'l': /* battery level */
                 {
                     int l = battery_level();
+                    limit = MAX(limit, 2);
                     if (l > -1)
                     {
                         snprintf(buf, buf_size, "%d", l);
-                        *intval = l / 20 + 1;
+                        /* First enum is used for "unknown level". */
+                        *intval = (limit - 1) * l / 100 + 1 + 1;
                     }
                     else
                     {
-                        *intval = 6;
+                        *intval = 0;
                         return "?";
                     }
                     return buf;
@@ -1121,11 +1124,14 @@ static void clear_image_pos(struct gui_wps *gwps, int n)
  * fmt     - string to skip it. Should point to somewhere after the leading
  *           "<" char (and before or at the last ">").
  * num     - number of |'s to skip, or 0 to skip to the end (the ">").
+ * enums   - If not NULL, set to the number of |'s found in the current 
+ *           conditional (sub-conditionals are ignored). num should be 0
+ *           to find all |'s.
  *
  * Returns the new position in fmt.
  */
 static const char* skip_conditional(struct gui_wps *gwps, const char* fmt,
-                                    int num)
+                                    int num, int *enums)
 {
     int level = 1;
     int count = num;
@@ -1135,6 +1141,8 @@ static const char* skip_conditional(struct gui_wps *gwps, const char* fmt,
     int last_x=-1, last_y=-1, last_w=-1, last_h=-1;
     if(gwps)
         data = gwps->data;
+    if (enums)
+        *enums = 0;
 #else
     (void)gwps;
 #endif
@@ -1168,6 +1176,8 @@ static const char* skip_conditional(struct gui_wps *gwps, const char* fmt,
 
             case '|':
                 if(1 == level) {
+                    if (enums)
+                        (*enums)++;
                     last_alternative = fmt;
                     if(num) {
                         count--;
@@ -1279,7 +1289,7 @@ static void format_display(struct gui_wps *gwps, char* buf,
             case '>':
                 if (level > 0)
                 {
-                    fmt = skip_conditional(NULL,fmt, 0);
+                    fmt = skip_conditional(NULL, fmt, 0, NULL);
                     level--;
                     continue;
                 }
@@ -1366,6 +1376,10 @@ static void format_display(struct gui_wps *gwps, char* buf,
 
             case '?':
                 fmt++;
+                /* Get number of "|" chars in the current conditional;
+                 * used by get_tag when calculating levels.
+                 */
+                skip_conditional(NULL, fmt, 0, &intval);
                 value = get_tag(gwps->data, id3, nid3, fmt, temp_buf,
                                 sizeof(temp_buf),&tag_length,
                                 subline_time_mult, flags, &intval);
@@ -1379,15 +1393,16 @@ static void format_display(struct gui_wps *gwps, char* buf,
                 /* No value, so skip to else part, using a sufficiently high
                    value to "hit" the last part of the conditional */
                 if ((!value) || (!strlen(value)))
-                    fmt = skip_conditional(gwps, fmt, 1000);
+                    fmt = skip_conditional(gwps, fmt, 1000, NULL);
                 else
                     if(intval > 1) /* enum */
-                        fmt = skip_conditional(gwps, fmt, intval - 1);
+                        fmt = skip_conditional(gwps, fmt, intval - 1, NULL);
 
                 level++;
                 break;
 
             default:
+                intval = 1;
                 value = get_tag(gwps->data, id3, nid3, fmt, temp_buf,
                                 sizeof(temp_buf), &tag_length,
                                 subline_time_mult, flags,&intval);
