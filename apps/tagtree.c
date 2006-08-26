@@ -49,26 +49,40 @@ static int tagtree_play_folder(struct tree_context* c);
 
 static char searchstring[32];
 
+enum variables {
+    var_sorttype = 100,
+    var_limit
+};
+
 /* Capacity 10 000 entries (for example 10k different artists) */
 #define UNIQBUF_SIZE (64*1024)
 static long *uniqbuf;
 
 #define MAX_TAGS 5
 
+static struct tagcache_search tcs, tcs2;
+static bool sort_inverse;
+
 /*
- * "%3d. %s" autoscore title
+ * "%3d. %s" autoscore title %sort = "inverse" %limit = "100"
  * 
  * valid = true
  * formatstr = "%-3d. %s"
  * tags[0] = tag_autoscore
  * tags[1] = tag_title
  * tag_count = 2
+ * 
+ * limit = 100
+ * sort_inverse = true
  */
 struct display_format {
     bool valid;
     char formatstr[64];
     int tags[MAX_TAGS];
     int tag_count;
+    
+    int limit;
+    bool sort_inverse;
 };
 
 struct search_instruction {
@@ -127,7 +141,7 @@ static int get_tag(int *tag)
     while (*strp == ' ' && *strp != '\0')
         strp++;
     
-    if (*strp == '\0')
+    if (*strp == '\0' || *strp == '?' || *strp == ':')
         return 0;
     
     for (i = 0; i < (int)sizeof(buf)-1; i++)
@@ -151,6 +165,8 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "year", tag_year);
     MATCH(tag, buf, "playcount", tag_playcount);
     MATCH(tag, buf, "autoscore", tag_virt_autoscore);
+    MATCH(tag, buf, "%sort", var_sorttype);
+    MATCH(tag, buf, "%limit", var_limit);
     
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
@@ -240,9 +256,27 @@ static bool add_clause(struct search_instruction *inst,
     return true;
 }
 
+static bool read_variable(char *buf, int size)
+{
+    int condition;
+    
+    if (!get_clause(&condition))
+        return false;
+    
+    if (condition != clause_is)
+        return false;
+    
+    if (get_token_str(buf, size) < 0)
+        return false;
+    
+    return true;
+}
+
+/* "%3d. %s" autoscore title %sort = "inverse" %limit = "100" */
 static int get_format_str(struct display_format *fmt)
 {
     int ret;
+    char buf[32];
     
     memset(fmt, 0, sizeof(struct display_format));
     
@@ -258,7 +292,23 @@ static int get_format_str(struct display_format *fmt)
         if (ret == 0)
             break;
         
-        fmt->tag_count++;
+        switch (fmt->tags[fmt->tag_count]) {
+        case var_sorttype:
+            if (!read_variable(buf, sizeof buf))
+                return -12;
+            if (!strcasecmp("inverse", buf))
+                fmt->sort_inverse = true;
+            break;
+            
+        case var_limit:
+            if (!read_variable(buf, sizeof buf))
+                return -13;
+            fmt->limit = atoi(buf);
+            break;
+            
+        default:
+            fmt->tag_count++;
+        }
     }
     
     fmt->valid = true;
@@ -268,8 +318,6 @@ static int get_format_str(struct display_format *fmt)
 
 static int get_condition(struct search_instruction *inst)
 {
-    struct display_format format;
-    struct display_format *fmt = NULL;
     int tag;
     int condition;
     char buf[32];
@@ -277,13 +325,12 @@ static int get_condition(struct search_instruction *inst)
     switch (*strp)
     {
         case '=':
-            if (get_format_str(&format) < 0)
+            if (get_format_str(&inst->format[inst->tagorder_count]) < 0)
             {
                 logf("get_format_str() parser failed!");
                 return -4;
             }
-            fmt = &format;
-            break;
+            return 1;
         
         case '?':
         case ' ':
@@ -296,14 +343,6 @@ static int get_condition(struct search_instruction *inst)
             return 0;
     }
 
-    if (fmt)
-    {
-        memcpy(&inst->format[inst->tagorder_count], fmt, 
-               sizeof(struct display_format));
-    }
-    else
-        inst->format[inst->tagorder_count].valid = false;
-    
     if (get_tag(&tag) <= 0)
         return -1;
     
@@ -362,13 +401,13 @@ static bool parse_search(struct search_instruction *inst, const char *str)
     return true;
 }
 
-
-static struct tagcache_search tcs, tcs2;
-
 static int compare(const void *p1, const void *p2)
 {
     struct tagentry *e1 = (struct tagentry *)p1;
     struct tagentry *e2 = (struct tagentry *)p2;
+    
+    if (sort_inverse)
+        return strncasecmp(e2->name, e1->name, MAX_PATH);
     
     return strncasecmp(e1->name, e2->name, MAX_PATH);
 }
@@ -558,6 +597,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
                      int offset, bool init)
 {
     struct tagentry *dptr = (struct tagentry *)c->dircache;
+    struct display_format *fmt;
     int i;
     int namebufused = 0;
     int total_count = 0;
@@ -565,6 +605,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int level = c->currextra;
     int tag;
     bool sort = false;
+    int sort_limit = 0;
     
     if (init
 #ifdef HAVE_TC_RAMCACHE
@@ -625,6 +666,17 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     current_offset = offset;
     current_entry_count = 0;
     c->dirfull = false;
+    fmt = &csi->format[level];
+    if (fmt->valid)
+    {
+        sort_inverse = fmt->sort_inverse;
+        sort_limit = fmt->limit;
+    }
+    else
+    {
+        sort_inverse = false;
+        sort_limit = 0;
+    }
     
     if (tag != tag_title && tag != tag_filename)
     {
@@ -642,8 +694,6 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     while (tagcache_get_next(tcs))
     {
-        struct display_format *fmt = &csi->format[level];
-
         if (total_count++ < offset)
             continue;
         
@@ -664,7 +714,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
                 bool read_format = false;
                 int fmtbuf_pos = 0;
                 int parpos = 0;
-
+                
                 memset(buf, 0, sizeof buf);
                 for (i = 0; fmt->formatstr[i] != '\0'; i++)
                 {
@@ -784,6 +834,17 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     }
     
     tagcache_search_finish(tcs);
+    
+    if (!sort && (sort_inverse || sort_limit))
+    {
+        gui_syncsplash(HZ*4, true, str(LANG_INCREASE_DIR_BUFFER), total_count);
+        logf("Too small dir buffer");
+        return 0;
+    }
+    
+    if (sort_limit)
+        total_count = MIN(total_count, sort_limit);
+    
     return total_count;
 }
 
