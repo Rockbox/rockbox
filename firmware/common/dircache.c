@@ -567,6 +567,7 @@ static int dircache_do_rebuild(void)
     memset(fd_bindings, 0, sizeof(fd_bindings));
     for (i = 0; i < fdbind_idx; i++)
         dircache_bind(fdbind_cache[i].fd, fdbind_cache[i].path);
+    fdbind_idx = 0;
     
     if (thread_enabled)
     {
@@ -641,7 +642,7 @@ int dircache_build(int last_size)
     if (last_size > DIRCACHE_RESERVE && last_size < DIRCACHE_LIMIT )
     {
         allocated_size = last_size + DIRCACHE_RESERVE;
-        dircache_root = (struct dircache_entry *)buffer_alloc(allocated_size);
+        dircache_root = buffer_alloc(allocated_size);
         thread_enabled = true;
 
         /* Start a transparent rebuild. */

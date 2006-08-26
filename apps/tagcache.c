@@ -2585,6 +2585,7 @@ static bool parse_changelog_line(int masterfd, const char *buf)
 bool tagcache_import_changelog(void)
 {
     struct master_header myhdr;
+    struct tagcache_header tch;
     int clfd, masterfd;
     char buf[512];
     int pos = 0;
@@ -2609,6 +2610,8 @@ bool tagcache_import_changelog(void)
     }
     
     write_lock++;
+    
+    filenametag_fd = open_tag_fd(&tch, tag_filename, false);
     
     /* Fast readline */
     while ( 1 )
@@ -2648,6 +2651,9 @@ bool tagcache_import_changelog(void)
     
     close(clfd);
     close(masterfd);
+    
+    if (filenametag_fd >= 0)
+        close(filenametag_fd);
     
     write_lock--;
     
@@ -3114,6 +3120,8 @@ static bool load_tagcache(void)
                 else
 # endif
                 {
+                    
+# if 0 /* Maybe we could enable this for flash players. Too slow otherwise. */
                     /* Check if entry has been removed. */
                     if (global_settings.tagcache_autoupdate)
                     {
@@ -3129,6 +3137,7 @@ static bool load_tagcache(void)
                         }
                         close(testfd);
                     }
+# endif
                 }
                 
                 continue ;
@@ -3286,6 +3295,11 @@ static void build_tagcache(void)
     processed_dir_count = 0;
     
     logf("updating tagcache");
+    
+#ifdef HAVE_DIRCACHE
+    while (dircache_is_initializing())
+        sleep(1);
+#endif
     
     cachefd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (cachefd >= 0)
