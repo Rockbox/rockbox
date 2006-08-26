@@ -43,7 +43,14 @@
 #define MAX_PATH 260
 
 #include <fcntl.h>
+
 #include "debug.h"
+#include "config.h"
+
+#ifdef HAVE_DIRCACHE
+void dircache_remove(const char *name);
+void dircache_rename(const char *oldpath, const char *newpath);
+#endif
 
 #define SIMULATOR_ARCHOS_ROOT "archos"
 
@@ -212,6 +219,10 @@ int sim_remove(const char *name)
 {
     char buffer[256]; /* sufficiently big */
 
+#ifdef HAVE_DIRCACHE
+    dircache_remove(name);
+#endif
+
     if(name[0] == '/') {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
@@ -225,6 +236,10 @@ int sim_rename(const char *oldpath, const char* newpath)
 {
     char buffer1[256];
     char buffer2[256];
+
+#ifdef HAVE_DIRCACHE
+    dircache_rename(oldpath, newpath);
+#endif
 
     if(oldpath[0] == '/') {
         sprintf(buffer1, "%s%s", SIMULATOR_ARCHOS_ROOT, oldpath);
