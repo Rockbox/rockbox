@@ -378,7 +378,23 @@ static void tagtree_buffer_event(struct mp3entry *id3, bool last_track)
     (void)id3;
     (void)last_track;
     
+    /* Do not gather data unless proper setting has been enabled. */
+    if (!global_settings.runtimedb)
+        return;
+
     logf("be:%d%s", last_track, id3->path);
+    
+    if (!tagcache_find_index(&tcs, id3->path))
+    {
+        logf("tc stat: not found: %s", id3->path);
+        return;
+    }
+    
+    id3->playcount  = tagcache_get_numeric(&tcs, tag_playcount);
+    id3->lastplayed = tagcache_get_numeric(&tcs, tag_lastplayed);
+    id3->rating     = tagcache_get_numeric(&tcs, tag_virt_autoscore) / 10;
+    
+    tagcache_search_finish(&tcs);
 }
 
 static void tagtree_unbuffer_event(struct mp3entry *id3, bool last_track)

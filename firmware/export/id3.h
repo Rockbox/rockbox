@@ -109,9 +109,7 @@ struct mp3entry {
     long rundbentryoffset;
 
     /* runtime database fields */
-    long rundbhash;
     short rating;
-    short voladjust;
     long playcount;
     long lastplayed;
     
