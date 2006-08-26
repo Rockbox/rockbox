@@ -38,7 +38,7 @@ void button_init_device(void)
 
 bool button_hold(void)
 {
-    return (GPIOA_INPUT_VAL & 0x40)?false:true;
+    return (GPIOA_INPUT_VAL & 0x4)?false:true;
 }
 
 /*
@@ -70,12 +70,13 @@ int button_read_device(void)
         if ((state & 0x80) == 0) btn |= BUTTON_LEFT;
         
         /* Read power button */
-        if ((GPIOB_INPUT_VAL & 0x1) == 1) btn |= BUTTON_POWER;
+        if (GPIOB_INPUT_VAL & 0x1) btn |= BUTTON_POWER;
         
         /* Read scroller */
-        if ( ((GPIOC_INPUT_VAL & 0x4)==1) && ((GPIOD_INPUT_VAL & 0x10)==1) )
+        if ( (GPIOC_INPUT_VAL & 0x8) && (GPIOD_INPUT_VAL & 0x20) )
         {
             /* Scroller is pressed */
+            btn |= BUTTON_SCROLL_DOWN;
         }
     }
     
