@@ -66,7 +66,9 @@
 //  Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
 //  that is submitted to the audio device.
-signed short mixbuffer[MIXBUFFERSIZE] IBSS_ATTR;
+signed short mixbuffer[MIXBUFFERSIZE];
+/* Don't place this in IRAM!
+ * Sound playback uses DMA, and not all IRAM is DMA capable on coldfire. */
 
 typedef struct {
    // SFX id of the playing sound effect.
