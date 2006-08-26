@@ -341,11 +341,15 @@ static void lcd_display_off(void)
 void lcd_init_device(void)
 {
     /* Reset settings */
-    power_on = false;
-    display_on = false;
     y_offset = 0;
     roll_offset = 0;
     disp_control_rev = 0x0004;
+
+#ifdef BOOTLOADER
+    /* Initial boot requires setting up chip registers but a full reset is
+       not needed again. */
+    power_on = false;
+    display_on = false;
 
     /* LCD Reset */
     and_l(~0x00000010, &GPIO1_OUT);
@@ -357,6 +361,11 @@ void lcd_init_device(void)
     sleep(HZ/100);
 
     lcd_display_on();
+#else
+    /* Power and display already ON */
+    power_on = true;
+    display_on = true;
+#endif
 }
 
 void lcd_enable(bool on)
