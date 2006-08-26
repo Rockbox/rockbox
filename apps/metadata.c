@@ -961,6 +961,9 @@ static bool get_m4a_metadata(int fd, struct mp3entry* id3)
     }
 
     n=read(fd,&chunk_id,4);
+    if (n < 4)
+        return false;
+      
     if (memcmp(&chunk_id,"ftyp",4)==0) {
       /* Check for M4A type */
       n=read(fd,&chunk_id,4);
