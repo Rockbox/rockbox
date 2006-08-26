@@ -53,7 +53,7 @@ extern void tlv320_set_monitor(bool enable);
 /* REG_LHV: Left Channel Headphone Volume Control */
 #define REG_LHV         0x2
 #define LHV_LRS         (1 << 8)    /* simultaneous volume/mute update */
-#define LHV_LZC         (1 << 7)	/* Left-channel zero-cross detect  */
+#define LHV_LZC         (1 << 7)    /* Left-channel zero-cross detect  */
 #define LHV_LHV(x)      ((x) & 0x7f)/* Left headphone volume control    */
 
 /* REG_RHV: Right Channel Headphone Volume Control */
@@ -80,7 +80,7 @@ extern void tlv320_set_monitor(bool enable);
 
 /* REG_PC: Power Down Control */
 #define REG_PC          0x6
-#define PC_ON           (1 << 7)    /* Device power     */
+#define PC_OFF          (1 << 7)    /* Device power     */
 #define PC_CLK          (1 << 6)    /* Clock            */
 #define PC_OSC          (1 << 5)    /* Oscillator       */
 #define PC_OUT          (1 << 4)    /* Outputs          */
