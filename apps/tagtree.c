@@ -837,7 +837,7 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (!sort && (sort_inverse || sort_limit))
     {
-        gui_syncsplash(HZ*4, true, str(LANG_INCREASE_DIR_BUFFER), total_count);
+        gui_syncsplash(HZ*4, true, str(LANG_SHOWDIR_BUFFER_FULL), total_count);
         logf("Too small dir buffer");
         return 0;
     }
