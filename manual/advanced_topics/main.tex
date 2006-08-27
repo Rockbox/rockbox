@@ -77,7 +77,7 @@ all the tags that are available.
 \item All characters not preceded by \% are displayed as typed.
 \item Lines beginning with \# are comments and will be ignored.
 \item Maximum file size used is 
-  \opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{1600}
+  \opt{HAVE_LCD_BITMAP}{1600}
   \opt{player}{400} bytes.
   If you have a bigger WPS file, only the first part of it will be 
   loaded and used.
@@ -289,7 +289,7 @@ Example of a configuration file:
 \note{As you can see from the example, configuration files do not need to 
   contain all of the Rockbox options.  You can create configuration files 
   that change only certain settings. So, for example, supppose you 
-  typically use the \dap at one volume in the car, and another when using 
+  typically use the \dap{} at one volume in the car, and another when using 
   headphones. Further, suppose you like to use an inverse LCD when you are 
   in the car, and a regular LCD setting when you are using headphones. You 
   could create configuration files that control only the volume and LCD 
@@ -300,23 +300,23 @@ Example of a configuration file:
 
 \subsection{\label{ref:manage_settings_menu}The \setting{Manage Settings} 
   menu} The \setting{Manage Settings} menu can be found in the \setting{Main 
-  Menu}.  The \setting{Manage Settings} menu allows you to save and load 
-\fname{.cfg} files.  \opt{MASCODEC}{The \setting{Manage Settings} menu also 
+  Menu}. The \setting{Manage Settings} menu allows you to save and load 
+\fname{.cfg} files. \opt{MASCODEC}{The \setting{Manage Settings} menu also 
   allows you to load or save different firmware versions.} 
 
 \begin{description}
   
-\item [Browse .cfg 	Files.]Opens the file browser in the 
-  \fname{/.rockbox} directory and displays all \fname{.cfg} (configuration) 
-  files. Selecting a \fname{.cfg}	file will cause Rockbox to load the 
-  settings contained in that file.  Pressing \ButtonLeft\ will exit back to 
-  the \setting{Manage Settings} menu.  See the \setting{Write .cfg files} 
-  option on the \setting{Manage Settings} menu for details of how to save 
-  and edit a configuration file. 
+\item [Browse .cfg Files.]Opens the file browser in the \fname{/.rockbox} 
+  directory and displays all \fname{.cfg} (configuration) files. Selecting a 
+  \fname{.cfg} file will cause Rockbox to load the settings contained in that 
+  file. Pressing \ButtonLeft\ will exit back to the \setting{Manage Settings}
+  menu. See the \setting{Write .cfg files} option on the 
+  \setting{Manage Settings} menu for details of how to save and edit a 
+  configuration file.
   
 \item [Browse	Firmwares.]
   %
-  \opt{SWCODEC}{\fixme{This is a legacy item,	and is deprecated.}} 
+  \opt{SWCODEC}{\fixme{This is a legacy item, and is deprecated.}} 
   %	
   \opt{MASCODEC}{
     This displays a list of firmware files in the \fname{/.rockbox} 
@@ -325,7 +325,7 @@ Example of a configuration file:
     \opt{recorder,recorderv2fm,ondio}{Firmware files have an extension of 
       \fname{.ajz}. }			
     %
-    \opt{player}{Firmware files have an extension	of \fname{.mod}. }
+    \opt{player}{Firmware files have an extension of \fname{.mod}. }
     %
     Playing a firmware file loads it into	memory.  Thus, it is possible 
     to run the original Archos	firmware or a different version of Rockbox 
