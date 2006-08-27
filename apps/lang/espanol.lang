@@ -1,4 +1,4 @@
-<phrase>
+﻿<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
@@ -70,7 +70,7 @@
 </phrase>
 <phrase>
   id: LANG_ALWAYS
-  desc: (player) the jump scroll shall be done "always
+  desc: used in various places
   user:
   <source>
     *: "Always"
@@ -118,10 +118,10 @@
     *: "Please remove inserted MMC"
   </source>
   <dest>
-    *: "Por favor retire la tarjeta MMC insertada"
+    *: "Por favor retire la tarjeta MMC"
   </dest>
   <voice>
-    *: "Por favor retire la tarjeta MMC insertada"
+    *: "Por favor retire la tarjeta multimedia"
   </voice>
 </phrase>
 <phrase>
@@ -140,7 +140,7 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -154,16 +154,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
-  desc: Text for the menu text to access the most recent bookmarks list
+  desc: in the main menu
   user:
   <source>
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "Marcapáginas Recientes"
+    *: "Marcadores Recientes"
   </dest>
   <voice>
-    *: "Marcapáginas Recientes"
+    *: "Marcadores Recientes"
   </voice>
 </phrase>
 <phrase>
@@ -174,10 +174,10 @@
     *: "Sound Settings"
   </source>
   <dest>
-    *: "Opciones de Sonido"
+    *: "Configuraciones de Sonido"
   </dest>
   <voice>
-    *: "Opciones de sonido"
+    *: "Configuraciones de Sonido"
   </voice>
 </phrase>
 <phrase>
@@ -188,29 +188,29 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Opciones Generales"
+    *: "Configuraciones Generales"
   </dest>
   <voice>
-    *: "Opciones generales"
+    *: "Configuraciones Generales"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MANAGE_MENU
-  desc: in the system sub menu
+  desc: in the main menu
   user:
   <source>
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Gestionar Opciones"
+    *: "Administración de Configuraciones"
   </dest>
   <voice>
-    *: "Gestionar opciones"
+    *: "Administración de Configuraciones"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FM_RADIO
-  desc: in main menu
+  desc: in the main menu
   user:
   <source>
     *: "FM Radio"
@@ -238,30 +238,30 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_MENU
-  desc: in main menu.
+  desc: in the main menu
   user:
   <source>
     *: "Playlist Options"
   </source>
   <dest>
-    *: "Opciones de la Lista de Reproducción"
+    *: "Opciones de Listas de Reproducción"
   </dest>
   <voice>
-    *: "Opciones de la Lista de Reproducción"
+    *: "Opciones de Listas de Reproducción"
   </voice>
 </phrase>
 <phrase>
   id: LANG_PLUGINS
-  desc: in main_menu()
+  desc: in the main menu
   user:
   <source>
     *: "Browse Plugins"
   </source>
   <dest>
-    *: "Mostrar Plugins"
+    *: "Explorar Plugins"
   </dest>
   <voice>
-    *: "Mostrar Plugins"
+    *: "Explorar Plugins"
   </voice>
 </phrase>
 <phrase>
@@ -370,7 +370,7 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Configuración de canales"   "
+    *: "Configuración de Canales"
   </dest>
   <voice>
     *: ""
@@ -465,13 +465,13 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
-    *: "Amplitud Estéreo"
+    *: "Amplitud de Estéreo"
   </dest>
   <voice>
-    *: "Amplitud estéreo"
+    *: "Amplitud Estéreo"
   </voice>
 </phrase>
 <phrase>
@@ -482,10 +482,10 @@
     *: "Loudness"
   </source>
   <dest>
-    *: "Sonoridad"
+    *: "Intensidad"
   </dest>
   <voice>
-    *: "Sonoridad"
+    *: "Intensidad"
   </voice>
 </phrase>
 <phrase>
@@ -496,10 +496,10 @@
     *: "Auto Volume"
   </source>
   <dest>
-    *: "Auto Volumen"
+    *: "Volumen Automático"
   </dest>
   <voice>
-    *: "Auto Volumen"
+    *: "Volumen Automático"
   </voice>
 </phrase>
 <phrase>
@@ -510,7 +510,7 @@
     *: "AV Decay Time"
   </source>
   <dest>
-    *: "Tiempo de caída del AV"    "
+    *: "Tiempo de caída de AV"
   </dest>
   <voice>
     *: ""
@@ -521,13 +521,13 @@
   desc: in sound settings
   user:
   <source>
-    *: "Super bass"
+    *: "Super Bass"
   </source>
   <dest>
-    *: "Super grave"
+    *: "Super Graves"
   </dest>
   <voice>
-    *: "Super grave"
+    *: "Super Graves"
   </voice>
 </phrase>
 <phrase>
@@ -577,7 +577,7 @@
   desc: in sound settings
   user:
   <source>
-    *: "MDB Center frequency"
+    *: "MDB Center Frequency"
   </source>
   <dest>
     *: "Frecuencia central MDB"
@@ -608,7 +608,7 @@
     *: "Playback"
   </source>
   <dest>
-    *: "Reproducción"    "
+    *: "Reproducción"
   </dest>
   <voice>
     *: "Reproducción"
@@ -622,10 +622,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Vista de archivos"
+    *: "Visualización de Archivos"
   </dest>
   <voice>
-    *: "Vista de archivos"
+    *: "Visualización de Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -664,10 +664,10 @@
     *: "Bookmarking"
   </source>
   <dest>
-    *: "Marcapáginas"
+    *: "Marcadores"
   </dest>
   <voice>
-    *: "Marcapáginas"
+    *: "Marcadores"
   </voice>
 </phrase>
 <phrase>
@@ -706,10 +706,10 @@
     *: "Browse .cfg files"
   </source>
   <dest>
-    *: "Mostrar archivos .cfg"
+    *: "Explorar Archivos de Configuración (.cfg)"
   </dest>
   <voice>
-    *: "Mostrar archivos de configuración"
+    *: "Explorar Archivos de Configuración"
   </voice>
 </phrase>
 <phrase>
@@ -720,10 +720,10 @@
     *: "Browse Firmwares"
   </source>
   <dest>
-    *: "Mostrar Firmwares"
+    *: "Explorar Firmwares"
   </dest>
   <voice>
-    *: "Mostrar Firmwares"
+    *: "Explorar Firmwares"
   </voice>
 </phrase>
 <phrase>
@@ -734,10 +734,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Reiniciar opciones"
+    *: "Resetear Configuraciones"
   </dest>
   <voice>
-    *: "Reiniciar opciones"
+    *: "Resetear Configuraciones"
   </voice>
 </phrase>
 <phrase>
@@ -748,7 +748,7 @@
     *: "Are You Sure?"
   </source>
   <dest>
-    *: "¿Estás seguro?"  "
+    *: "¿Estás seguro?"
   </dest>
   <voice>
     *: ""
@@ -791,7 +791,7 @@
     *: "Settings"
   </source>
   <dest>
-    *: "Opciones"
+    *: "Configuraciones"
   </dest>
   <voice>
     *: ""
@@ -833,10 +833,10 @@
     *: "Write .cfg file"
   </source>
   <dest>
-    *: "Escribir archivo .cfg"
+    *: "Guardar Configuración Actual en Archivo (.cfg)"
   </dest>
   <voice>
-    *: "Escribir archivo de configuración"
+    *: "Guardar Configuración Actual en Archivo"
   </voice>
 </phrase>
 <phrase>
@@ -847,7 +847,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Fallo al salvar"
+    *: "Fallo al Guardar"
   </dest>
   <voice>
     *: ""
@@ -861,7 +861,7 @@
     *: "Partition?"
   </source>
   <dest>
-    *: "Partición?"
+    *: "¿Partición?"
   </dest>
   <voice>
     *: ""
@@ -875,7 +875,7 @@
     *: "Save Failed"
   </source>
   <dest>
-    *: "Fallo al guardar"
+    *: "Fallo al Guardar"
   </dest>
   <voice>
     *: ""
@@ -900,7 +900,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Pantalla de Grabación"
@@ -917,10 +917,10 @@
     *: "Recording Settings"
   </source>
   <dest>
-    *: "Opciones de Grabación"
+    *: "Configuraciones de Grabación"
   </dest>
   <voice>
-    *: "Opciones de Grabación"
+    *: "Configuraciones de Grabación"
   </voice>
 </phrase>
 <phrase>
@@ -934,7 +934,7 @@
     *: "Crear Lista de Reproducción"
   </dest>
   <voice>
-    *: "Crear lista de reproducción"
+    *: "Crear Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -973,21 +973,21 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Añadir Directorios Recursivamente"
+    *: "Añadir Carpetas Recursivamente"
   </dest>
   <voice>
-    *: "Añadir Directorios Recursivamente"
+    *: "Añadir Carpetas Recursivamente"
   </voice>
 </phrase>
 <phrase>
   id: LANG_INFO_MENU
-  desc: in the info sub menu
+  desc: in the info menu
   user:
   <source>
     *: "Rockbox Info"
   </source>
   <dest>
-    *: "Info. de Rockbox"
+    *: "Información de Rockbox"
   </dest>
   <voice>
     *: "Información de Rockbox"
@@ -995,7 +995,7 @@
 </phrase>
 <phrase>
   id: LANG_VERSION
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Version"
@@ -1009,7 +1009,7 @@
 </phrase>
 <phrase>
   id: LANG_DEBUG
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "Debug (Keep Out!)"
@@ -1023,7 +1023,7 @@
 </phrase>
 <phrase>
   id: LANG_USB
-  desc: in the main menu
+  desc: in the info menu
   user:
   <source>
     *: "USB (Sim)"
@@ -1099,10 +1099,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Reproducir primero la canción marcada"
+    *: "Reproducir Primero la Canción Seleccionada"
   </dest>
   <voice>
-    *: "Reproducir primero la canción marcada"
+    *: "Reproducir Primero la Canción Seleccionada"
   </voice>
 </phrase>
 <phrase>
@@ -1110,13 +1110,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Resume"
+    *: "Resume on Startup"
   </source>
   <dest>
-    *: "Continuar"
+    *: "Continuar al Encender"
   </dest>
   <voice>
-    *: "Continuar"
+    *: "Continuar al Encender"
   </voice>
 </phrase>
 <phrase>
@@ -1124,13 +1124,13 @@
   desc: in the playback sub menu
   user:
   <source>
-    *: "FFwd/Rewind"
+    *: "Fast-Forward/Rewind"
   </source>
   <dest>
-    *: "Av.Rápido/Rebobinar"
+    *: "Adelantar/Retroceder"
   </dest>
   <voice>
-    *: "Avance rápido y rebobinar"
+    *: "Adelantar y Retroceder"
   </voice>
 </phrase>
 <phrase>
@@ -1141,10 +1141,10 @@
     *: "Anti-Skip Buffer"
   </source>
   <dest>
-    *: "Buffer Anti-salto"
+    *: "Buffer Anti-Salto"
   </dest>
   <voice>
-    *: "Buffer Anti-salto"
+    *: "Buffer Anti-Salto"
   </voice>
 </phrase>
 <phrase>
@@ -1152,13 +1152,13 @@
   desc: options menu to set fade on stop or pause
   user:
   <source>
-    *: "Fade On Stop/Pause"
+    *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Silencio gradual al Parar/Pausar"
+    *: "Silencio Gradual al Detener/Pausar"
   </dest>
   <voice>
-    *: "Silencio gradual al Parar y Pausar"
+    *: "Silencio Gradual al Detener y Pausar"
   </voice>
 </phrase>
 <phrase>
@@ -1166,13 +1166,13 @@
   desc: in playback settings screen
   user:
   <source>
-    *: "ID3 tag priority"
+    *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "Prioridad etiqueta ID3"
+    *: "Prioridad de Etiquetas ID3"
   </dest>
   <voice>
-    *: "Prioridad etiqueta ID3"
+    *: "Prioridad de Etiquetas ID3"
   </voice>
 </phrase>
 <phrase>
@@ -1183,10 +1183,10 @@
     *: "V1 then V2"
   </source>
   <dest>
-    *: "V1 y despues V2"
+    *: "V1 y después V2"
   </dest>
   <voice>
-    *: "Versión 1 y despues versión 2"
+    *: "Versión 1 y después Versión 2"
   </voice>
 </phrase>
 <phrase>
@@ -1197,10 +1197,10 @@
     *: "V2 then V1"
   </source>
   <dest>
-    *: "V2 y despues V1"
+    *: "V2 y después V1"
   </dest>
   <voice>
-    *: "Versión 2 y despues versión 1"
+    *: "Versión 2 y después Versión 1"
   </voice>
 </phrase>
 <phrase>
@@ -1211,10 +1211,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Sensible a May/minúsculas"
+    *: "Ordenamiento Sensible a Mayúsculas/Minúsculas"
   </dest>
   <voice>
-    *: "Sensible a May/minúsculas"
+    *: "Ordenamiento Sensible a Mayúsculas/Minúsculas"
   </voice>
 </phrase>
 <phrase>
@@ -1225,10 +1225,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Ordenar directorios"
+    *: "Ordenar Carpetas"
   </dest>
   <voice>
-    *: "Ordenar directorios"
+    *: "Ordenar Carpetas"
   </voice>
 </phrase>
 <phrase>
@@ -1239,10 +1239,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Ordenar archivos"
+    *: "Ordenar Archivos"
   </dest>
   <voice>
-    *: "Ordenar archivos"
+    *: "Ordenar Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -1264,13 +1264,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by date"
+    *: "By Date"
   </source>
   <dest>
-    *: "Por fecha"
+    *: "Por Fecha"
   </dest>
   <voice>
-    *: "Por fecha"
+    *: "Por Fecha"
   </voice>
 </phrase>
 <phrase>
@@ -1278,13 +1278,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by newest date"
+    *: "By Newest Date"
   </source>
   <dest>
-    *: "más reciente"
+    *: "Más Reciente"
   </dest>
   <voice>
-    *: "más reciente"
+    *: "Más Reciente"
   </voice>
 </phrase>
 <phrase>
@@ -1292,13 +1292,13 @@
   desc: browser sorting setting
   user:
   <source>
-    *: "by type"
+    *: "By Type"
   </source>
   <dest>
-    *: "por tipo"
+    *: "Por Tipo"
   </dest>
   <voice>
-    *: "por tipo"
+    *: "Por Tipo"
   </voice>
 </phrase>
 <phrase>
@@ -1309,10 +1309,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Mostrar archivos"
+    *: "Mostrar Archivos"
   </dest>
   <voice>
-    *: "Mostrar archivos"
+    *: "Mostrar Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -1323,10 +1323,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Todos"
+    *: "Todos los Archivos"
   </dest>
   <voice>
-    *: "Todos"
+    *: "Todos los Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -1337,10 +1337,10 @@
     *: "Supported"
   </source>
   <dest>
-    *: "soportados"
+    *: "Archivos Soportados"
   </dest>
   <voice>
-    *: "Soportados"
+    *: "Archivos Soportados"
   </voice>
 </phrase>
 <phrase>
@@ -1351,10 +1351,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "Música"
+    *: "Archivos de Música"
   </dest>
   <voice>
-    *: "Música"
+    *: "Archivos de Música"
   </voice>
 </phrase>
 <phrase>
@@ -1365,24 +1365,24 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Listas de reproducción"
+    *: "Listas de Reproducción"
   </dest>
   <voice>
-    *: "Listas de reproducción"
+    *: "Listas de Reproducción"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FILTER_ID3DB
-  desc: show ID3 database
+  desc: show ID3 Database
   user:
   <source>
-    *: "ID3 database"
+    *: "ID3 Database"
   </source>
   <dest>
-    *: "Base de datos ID3"
+    *: "Base de Datos ID3"
   </dest>
   <voice>
-    *: "Base de datos ID3"
+    *: "Base de Datos ID3"
   </voice>
 </phrase>
 <phrase>
@@ -1393,10 +1393,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Seguir lista de repr."
+    *: "Seguir Lista de Reproducción"
   </dest>
   <voice>
-    *: "Seguir lista de reproducción"
+    *: "Seguir Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -1421,10 +1421,10 @@
     *: "Browse Fonts"
   </source>
   <dest>
-    *: "Mostrar Fuentes"
+    *: "Explorar Fuentes (Tipos de Letra)"
   </dest>
   <voice>
-    *: "Mostrar fuentes"
+    *: "Explorar Fuentes (Tipos de Letra)"
   </voice>
 </phrase>
 <phrase>
@@ -1435,10 +1435,10 @@
     *: "Browse .wps files"
   </source>
   <dest>
-    *: "Mostrar archivos .wps"
+    *: "Explorar Archivos de Pantalla de Reproducción (.wps)"
   </dest>
   <voice>
-    *: "Mostrar archivos de pantalla de reproducción"
+    *: "Explorar Archivos de Pantalla de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -1449,10 +1449,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "Opciones del LCD"
+    *: "Configuraciones del LCD"
   </dest>
   <voice>
-    *: "Opciones del LCD"
+    *: "Configuraciones del LCD"
   </voice>
 </phrase>
 <phrase>
@@ -1477,10 +1477,10 @@
     *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: "Barras de Estado/Desplazamiento"
+    *: "Barra de Estado/Desplazamiento"
   </dest>
   <voice>
-    *: "Barras de Estado y desplazamiento"
+    *: "Barra de Estado y Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -1491,10 +1491,10 @@
     *: "Peak Meter"
   </source>
   <dest>
-    *: "Analizador de espectro"
+    *: "Analizador de Espectro"
   </dest>
   <voice>
-    *: "Analizador de espectro"
+    *: "Analizador de Espectro"
   </voice>
 </phrase>
 <phrase>
@@ -1519,10 +1519,10 @@
     *: "Disk"
   </source>
   <dest>
-    *: "Disco"
+    *: "Disco Duro"
   </dest>
   <voice>
-    *: "Disco"
+    *: "Disco Duro"
   </voice>
 </phrase>
 <phrase>
@@ -1547,10 +1547,10 @@
     *: "Idle Poweroff"
   </source>
   <dest>
-    *: "Auto apagado"
+    *: "Apagado Automático por Inactividad"
   </dest>
   <voice>
-    *: "Auto apagado"
+    *: "Apagado Automático por Inactividad"
   </voice>
 </phrase>
 <phrase>
@@ -1561,10 +1561,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Temporizador apagado"
+    *: "Temporizador para Apagado"
   </dest>
   <voice>
-    *: "Temporizador de apagado"
+    *: "Temporizador para Apagado"
   </voice>
 </phrase>
 <phrase>
@@ -1575,10 +1575,10 @@
     *: "Wake-Up Alarm"
   </source>
   <dest>
-    *: "Alarma despertador"
+    *: "Alarma Despertador"
   </dest>
   <voice>
-    *: "Alarma despertador"
+    *: "Alarma Despertador"
   </voice>
 </phrase>
 <phrase>
@@ -1603,10 +1603,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Analógica"
+    *: "Línea de Entrada"
   </dest>
   <voice>
-    *: "Entrada Analógica"
+    *: "Línea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -1617,10 +1617,10 @@
     *: "Car Adapter Mode"
   </source>
   <dest>
-    *: "Modo Adaptador de Coche"
+    *: "Modo Adaptador de Automóvil"
   </dest>
   <voice>
-    *: "Modo Adaptador de Coche"
+    *: "Modo Adaptador de Automóvil"
   </voice>
 </phrase>
 <phrase>
@@ -1631,10 +1631,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Marcar página al Detener"
+    *: "Marcar posición al Detener"
   </dest>
   <voice>
-    *: "Marcar página al Detener"
+    *: "Marcar posición al Detener"
   </voice>
 </phrase>
 <phrase>
@@ -1673,10 +1673,10 @@
     *: "Load Last Bookmark"
   </source>
   <dest>
-    *: "Cargar último Marcapáginas"
+    *: "Cargar Último Marcador"
   </dest>
   <voice>
-    *: "Cargar último Marcapáginas"
+    *: "Cargar Último Marcador"
   </voice>
 </phrase>
 <phrase>
@@ -1687,10 +1687,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "¿Mantener una Lista de Marcapáginas Recientes?"
+    *: "¿Mantener una Lista de Marcadores Recientes?"
   </dest>
   <voice>
-    *: "¿Mantener una Lista de Marcapáginas Recientes?"
+    *: "¿Mantener una Lista de Marcadores Recientes?"
   </voice>
 </phrase>
 <phrase>
@@ -1701,10 +1701,10 @@
     *: "Unique only"
   </source>
   <dest>
-    *: "Sólo único"
+    *: "Solo uno por cada Lista de Reproducción"
   </dest>
   <voice>
-    *: "Sólo único"
+    *: "Solo uno por cada Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -1715,10 +1715,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Nombrar menus"
+    *: "Hablar Menús"
   </dest>
   <voice>
-    *: "Nombrar menus"
+    *: "Hablar Menús"
   </voice>
 </phrase>
 <phrase>
@@ -1729,10 +1729,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Nombrar directorios"
+    *: "Hablar Carpetas"
   </dest>
   <voice>
-    *: "Nombrar directorios"
+    *: "Hablar Carpetas"
   </voice>
 </phrase>
 <phrase>
@@ -1743,15 +1743,15 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Nombrar archivos"
+    *: "Hablar Archivos"
   </dest>
   <voice>
-    *: "Nombrar archivos"
+    *: "Hablar Archivos"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_NUMBER
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Numbers"
@@ -1760,12 +1760,12 @@
     *: "Números"
   </dest>
   <voice>
-    *: "Numeros"
+    *: "Números"
   </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_SPELL
-  desc: talkbox" mode for files+directories
+  desc: "talkbox" mode for files+directories
   user:
   <source>
     *: "Spell"
@@ -1779,16 +1779,16 @@
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
-  desc: talkbox" mode for directories + files
+  desc: "talkbox" mode for directories + files
   user:
   <source>
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "fichero mp3 .talk"
+    *: "Archivo mp3 (.talk)"
   </dest>
   <voice>
-    *: "fichero mp3 .talk"
+    *: "Archivo mp3 (.talk)"
   </voice>
 </phrase>
 <phrase>
@@ -1827,10 +1827,10 @@
     *: "Source"
   </source>
   <dest>
-    *: "Fuente"
+    *: "Origen"
   </dest>
   <voice>
-    *: "Fuente"
+    *: "Origen"
   </voice>
 </phrase>
 <phrase>
@@ -1841,7 +1841,7 @@
     *: "Mic"
   </source>
   <dest>
-    *: "Micro"
+    *: "Micrófono"
   </dest>
   <voice>
     *: "Micrófono"
@@ -1855,10 +1855,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Analógica"
+    *: "Línea de Entrada"
   </dest>
   <voice>
-    *: "Analógica"
+    *: "Línea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -1894,27 +1894,27 @@
   desc: Editable recordings setting
   user:
   <source>
-    *: "Independent frames"
+    *: "Independent Frames"
   </source>
   <dest>
-    *: "Marcos independientes"
+    *: "Marcos Independientes"
   </dest>
   <voice>
-    *: "Marcos independientes"
+    *: "Marcos Independientes"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Separación por Tiempo"
+    *: "Opciones de Separación de Archivos"
   </dest>
   <voice>
-    *: "Separación por Tiempo"
+    *: "Opciones de Separación de Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -1922,7 +1922,7 @@
   desc: in recording settings_menu
   user:
   <source>
-    *: "Prerecord time"
+    *: "Prerecord Time"
   </source>
   <dest>
     *: "Tiempo de Pregrabación"
@@ -1939,10 +1939,10 @@
     *: "Directory"
   </source>
   <dest>
-    *: "Directorio"
+    *: "Carpeta"
   </dest>
   <voice>
-    *: "Directorio"
+    *: "Carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -1950,27 +1950,27 @@
   desc: in recording directory options
   user:
   <source>
-    *: "Current dir"
+    *: "Current Directory"
   </source>
   <dest>
-    *: "Directorio Actual"
+    *: "Carpeta Actual"
   </dest>
   <voice>
-    *: "Directorio Actual"
+    *: "Carpeta Actual"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_STARTUP
-  desc: Start Rockbox in Recording screen
+  desc: Start Rockbox in Recording Screen
   user:
   <source>
-    *: "Show recording screen on startup"
+    *: "Show Recording Screen on Startup"
   </source>
   <dest>
-    *: "Mostrar pantalla de grabación al encender"
+    *: "Mostrar Pantalla de Grabación al Encender"
   </dest>
   <voice>
-    *: "Mostrar pantalla de grabación al encender"
+    *: "Mostrar Pantalla de Grabación al Encender"
   </voice>
 </phrase>
 <phrase>
@@ -1981,10 +1981,10 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "Paso mínimo FF/RW"
+    *: "Paso Mínimo Adelantar/Retroceder"
   </dest>
   <voice>
-    *: "Paso mínimo"
+    *: "Paso Mínimo Adelantar y Retroceder"
   </voice>
 </phrase>
 <phrase>
@@ -1995,10 +1995,10 @@
     *: "FF/RW Accel"
   </source>
   <dest>
-    *: "Aceleración FF/RW"  "
+    *: "Aceleración de Adelantar/Retroceder"
   </dest>
   <voice>
-    *: "Aceleración"
+    *: "Aceleración de Adelantar y Retroceder"
   </voice>
 </phrase>
 <phrase>
@@ -2017,16 +2017,16 @@
 </phrase>
 <phrase>
   id: LANG_BACKLIGHT_ON_WHEN_CHARGING
-  desc: in display_settings_menu
+  desc: in display_settings_menu, backlight timeout with charger connected
   user:
   <source>
-    *: "Backlight On When Plugged"
+    *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Iluminación estando enchufado"
+    *: "Iluminación (mientras esté conectado)"
   </dest>
   <voice>
-    *: "Iluminación estando enchufado"
+    *: "Iluminación (mientras esté conectado)"
   </voice>
 </phrase>
 <phrase>
@@ -2034,13 +2034,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Caption backlight"
+    *: "Caption Backlight"
   </source>
   <dest>
-    *: "Iluminación al iniciar Canción"
+    *: "Iluminación al Iniciar Canción"
   </dest>
   <voice>
-    *: "Iluminacion al iniciar Canción"
+    *: "Iluminacion al Iniciar Canción"
   </voice>
 </phrase>
 <phrase>
@@ -2093,10 +2093,10 @@
     *: "Inverse"
   </source>
   <dest>
-    *: "Inverso"
+    *: "Invertido"
   </dest>
   <voice>
-    *: "Inverso"
+    *: "Invertido"
   </voice>
 </phrase>
 <phrase>
@@ -2121,10 +2121,10 @@
     *: "Line Selector"
   </source>
   <dest>
-    *: "Selector de linea"
+    *: "Selector de Linea"
   </dest>
   <voice>
-    *: "Selector de linea"
+    *: "Selector de Linea"
   </voice>
 </phrase>
 <phrase>
@@ -2146,13 +2146,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Bar(Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Barra(inversa)"
+    *: "Barra (invertir)"
   </dest>
   <voice>
-    *: "Barra inversa"
+    *: "Barra (invertir)"
   </voice>
 </phrase>
 <phrase>
@@ -2177,7 +2177,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Ejemplo de la velocidad de desplazamiento"
+    *: "Ejemplo de Velocidad de Desplazamiento"
   </dest>
   <voice>
     *: ""
@@ -2191,10 +2191,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Retraso del inicio del desplaz."
+    *: "Retraso para Iniciar Desplazamiento"
   </dest>
   <voice>
-    *: "Retraso del inicio del desplazamiento"
+    *: "Retraso para Iniciar Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -2205,10 +2205,10 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Tamaño del paso de Desplaz."
+    *: "Tamaño del Paso de Desplazamiento"
   </dest>
   <voice>
-    *: "Tamaño del paso de Desplazamiento"
+    *: "Tamaño del Paso de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -2219,7 +2219,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Texto de ejemplo del tamaño de paso de desplazamiento"
+    *: "Texto Ejemplo del Tamaño del Paso de Desplazamiento"
   </dest>
   <voice>
     *: ""
@@ -2233,10 +2233,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Límite de desplaz. bidireccional"
+    *: "Límite de Desplazamiento Bidireccional"
   </dest>
   <voice>
-    *: "Límite de desplazamiento bidireccional"
+    *: "Límite de Desplazamiento Bidireccional"
   </voice>
 </phrase>
 <phrase>
@@ -2244,7 +2244,7 @@
   desc: (player) menu altarnative for jump scroll
   user:
   <source>
-    *: "Jump scroll"
+    *: "Jump Scroll"
   </source>
   <dest>
     *: "Salto de Desplazamiento"
@@ -2255,7 +2255,7 @@
 </phrase>
 <phrase>
   id: LANG_ONE_TIME
-  desc: (player) the jump scroll shall be done "one time
+  desc: (player) the jump scroll shall be done "one time"
   user:
   <source>
     *: "One time"
@@ -2292,7 +2292,7 @@
     *: "Barra de Desplazamiento"
   </dest>
   <voice>
-    *: "Barra de desplazamiento"
+    *: "Barra de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -2306,7 +2306,7 @@
     *: "Barra de Estado"
   </dest>
   <voice>
-    *: "Barra de estado"
+    *: "Barra de Estado"
   </voice>
 </phrase>
 <phrase>
@@ -2314,7 +2314,7 @@
   desc: in settings menu
   user:
   <source>
-    *: "Button bar"
+    *: "Button Bar"
   </source>
   <dest>
     *: "Barra de Botones"
@@ -2331,10 +2331,10 @@
     *: "Volume Display"
   </source>
   <dest>
-    *: "Mostrar volumen"
+    *: "Mostrar Volumen"
   </dest>
   <voice>
-    *: "Mostrar volumen"
+    *: "Mostrar Volumen"
   </voice>
 </phrase>
 <phrase>
@@ -2387,10 +2387,10 @@
     *: "Peak Release"
   </source>
   <dest>
-    *: "Caida del analizador"
+    *: "Caida del Analizador de Espectro"
   </dest>
   <voice>
-    *: "Caida del analizador"
+    *: "Caida del Analizador de Espectro"
   </voice>
 </phrase>
 <phrase>
@@ -2401,10 +2401,10 @@
     *: "Units Per Read"
   </source>
   <dest>
-    *: "Unidades por lectura"
+    *: "Unidades por Lectura"
   </dest>
   <voice>
-    *: "Unidades por lectura"
+    *: "Unidades por Lectura"
   </voice>
 </phrase>
 <phrase>
@@ -2415,10 +2415,10 @@
     *: "Peak Hold Time"
   </source>
   <dest>
-    *: "Permanencia del analizador"
+    *: "Permanencia del Analizador de Espectro"
   </dest>
   <voice>
-    *: "Permanencia del analizador"
+    *: "Permanencia del Analizador de Espectro"
   </voice>
 </phrase>
 <phrase>
@@ -2429,10 +2429,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Permanencia de los recortes"
+    *: "Permanencia de los Recortes"
   </dest>
   <voice>
-    *: "Permanencia de los recortes"
+    *: "Permanencia de los Recortes"
   </voice>
 </phrase>
 <phrase>
@@ -2468,10 +2468,10 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Logarithmic(dB)"
+    *: "Logarithmic (dB)"
   </source>
   <dest>
-    *: "Logarítmica(dB)"
+    *: "Logarítmica (dB)"
   </dest>
   <voice>
     *: "Logarítmica decibelio"
@@ -2482,13 +2482,13 @@
   desc: in the peak meter menu
   user:
   <source>
-    *: "Linear(%)"
+    *: "Linear (%)"
   </source>
   <dest>
-    *: "Lineal(%)"
+    *: "Lineal (%)"
   </dest>
   <voice>
-    *: "Porcentaje lineal"
+    *: "Porcentaje Lineal"
   </voice>
 </phrase>
 <phrase>
@@ -2499,10 +2499,10 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "Mínimo de rango"
+    *: "Mínimo de Rango"
   </dest>
   <voice>
-    *: "Mínimo de rango"
+    *: "Mínimo de Rango"
   </voice>
 </phrase>
 <phrase>
@@ -2513,10 +2513,10 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "Máximo de rango"
+    *: "Máximo de Rango"
   </dest>
   <voice>
-    *: "Máximo de rango"
+    *: "Máximo de Rango"
   </voice>
 </phrase>
 <phrase>
@@ -2527,10 +2527,10 @@
     *: "Battery Capacity"
   </source>
   <dest>
-    *: "Capacidad Batería"
+    *: "Capacidad de la Batería"
   </dest>
   <voice>
-    *: "Capacidad Batería"
+    *: "Capacidad de la Batería"
   </voice>
 </phrase>
 <phrase>
@@ -2541,10 +2541,10 @@
     *: "Battery Type"
   </source>
   <dest>
-    *: "Tipo de batería"
+    *: "Tipo de Batería"
   </dest>
   <voice>
-    *: "Tipo de batería"
+    *: "Tipo de Batería"
   </voice>
 </phrase>
 <phrase>
@@ -2572,7 +2572,7 @@
     *: "NiMH"
   </dest>
   <voice>
-    *: "Níquel hidruro de metal"
+    *: "Níquel e hidruro de metal"
   </voice>
 </phrase>
 <phrase>
@@ -2583,10 +2583,10 @@
     *: "Disk Spindown"
   </source>
   <dest>
-    *: "Parada del disco duro"
+    *: "Detención del Disco Duro"
   </dest>
   <voice>
-    *: "Parada del disco duro"
+    *: "Detención del Disco Duro"
   </voice>
 </phrase>
 <phrase>
@@ -2597,10 +2597,10 @@
     *: "Disk Poweroff"
   </source>
   <dest>
-    *: "Apagado del disco"
+    *: "Apagado del Disco Duro"
   </dest>
   <voice>
-    *: "Apagado del disco"
+    *: "Apagado del Disco Duro"
   </voice>
 </phrase>
 <phrase>
@@ -2611,10 +2611,10 @@
     *: "Set Time/Date"
   </source>
   <dest>
-    *: "Poner Fecha/Hora"
+    *: "Establecer Fecha/Hora"
   </dest>
   <voice>
-    *: "Poner fecha y hora"
+    *: "Establecer fecha y hora"
   </voice>
 </phrase>
 <phrase>
@@ -2625,10 +2625,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Formato del reloj"
+    *: "Formato del Reloj"
   </dest>
   <voice>
-    *: "Formato del reloj"
+    *: "Formato del Reloj"
   </voice>
 </phrase>
 <phrase>
@@ -2664,13 +2664,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max files in dir browser"
+    *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Max. Archivos por directorio"
+    *: "Máx. Archivos por Carpeta"
   </dest>
   <voice>
-    *: "Número maximo de archivos por directorio"
+    *: "Número Máximo de Archivos por Carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -2678,13 +2678,13 @@
   desc: in settings_menu
   user:
   <source>
-    *: "Max playlist size"
+    *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Tamaño maximo de Lista de Reproducción"
+    *: "Tamaño Máximo de Lista de Reproducción"
   </dest>
   <voice>
-    *: "Tamaño maximo de Lista de Reproducción"
+    *: "Tamaño Máximo de Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -2695,10 +2695,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Lista de reproducción"
+    *: "Lista de Reproducción"
   </dest>
   <voice>
-    *: "Lista de reproducción"
+    *: "Lista de Reproducción"
   </voice>
 </phrase>
 <phrase>
@@ -2709,24 +2709,24 @@
     *: "Bookmarks"
   </source>
   <dest>
-    *: "Marcapáginas"
+    *: "Marcadores"
   </dest>
   <voice>
-    *: "Marcapáginas"
+    *: "Marcadores"
   </voice>
 </phrase>
 <phrase>
   id: LANG_MENU_SHOW_ID3_INFO
-  desc: Menu option to start id3 viewer
+  desc: Menu option to start tag viewer
   user:
   <source>
     *: "Show ID3 Info"
   </source>
   <dest>
-    *: "Mostrar Info ID3"
+    *: "Mostrar Información ID3"
   </dest>
   <voice>
-    *: "Mostrar Info ID3"
+    *: "Mostrar Información ID3"
   </voice>
 </phrase>
 <phrase>
@@ -2762,13 +2762,13 @@
   desc: in on+play menu
   user:
   <source>
-    *: "Delete directory"
+    *: "Delete Directory"
   </source>
   <dest>
-    *: "Borrar directorio"
+    *: "Borrar Carpeta"
   </dest>
   <voice>
-    *: "Borrar directorio"
+    *: "Borrar Carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -2804,10 +2804,10 @@
   desc: Onplay open with
   user:
   <source>
-    *: "Open with"
+    *: "Open With..."
   </source>
   <dest>
-    *: "Abrir con"
+    *: "Abrir con..."
   </dest>
   <voice>
     *: "Abrir con"
@@ -2818,13 +2818,13 @@
   desc: in main menu
   user:
   <source>
-    *: "Create directory"
+    *: "Create Directory"
   </source>
   <dest>
-    *: "Crear Directorio"
+    *: "Crear Carpeta"
   </dest>
   <voice>
-    *: "Crear directorio"
+    *: "Crear Carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -2863,10 +2863,10 @@
     *: "Insert next"
   </source>
   <dest>
-    *: "Añadir como próxima"
+    *: "Añadir como siguiente"
   </dest>
   <voice>
-    *: "Añadir como próxima"
+    *: "Añadir como siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -2905,10 +2905,10 @@
     *: "Queue next"
   </source>
   <dest>
-    *: "En cola como proxima"
+    *: "En Cola como siguiente"
   </dest>
   <voice>
-    *: "En cola como proxima"
+    *: "En Cola como siguiente"
   </voice>
 </phrase>
 <phrase>
@@ -2919,10 +2919,10 @@
     *: "Queue last"
   </source>
   <dest>
-    *: "En cola al final"
+    *: "En Cola al final"
   </dest>
   <voice>
-    *: "En cola al final"
+    *: "En Cola al final"
   </voice>
 </phrase>
 <phrase>
@@ -2933,10 +2933,10 @@
     *: "Create Bookmark"
   </source>
   <dest>
-    *: "Crear Marcapáginas"
+    *: "Crear Marcador"
   </dest>
   <voice>
-    *: "Crear Marcapáginas"
+    *: "Crear Marcador"
   </voice>
 </phrase>
 <phrase>
@@ -2947,10 +2947,10 @@
     *: "List Bookmarks"
   </source>
   <dest>
-    *: "Listar Marcapáginas"
+    *: "Listar Marcadores"
   </dest>
   <voice>
-    *: "Listar Marcapáginas"
+    *: "Listar Marcadores"
   </voice>
 </phrase>
 <phrase>
@@ -2961,7 +2961,7 @@
     *: "Rockbox Info:"
   </source>
   <dest>
-    *: "Info. de rockbox:"
+    *: "Información de Rockbox:"
   </dest>
   <voice>
     *: ""
@@ -3059,7 +3059,7 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Disco:"
+    *: "Disco Duro:"
   </dest>
   <voice>
     *: ""
@@ -3073,10 +3073,10 @@
     *: "Free:"
   </source>
   <dest>
-    *: "Libre:"
+    *: "Espacio Libre:"
   </dest>
   <voice>
-    *: "Espacio libre"
+    *: "Espacio Libre"
   </voice>
 </phrase>
 <phrase>
@@ -3090,7 +3090,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Current time:"
+    *: "Hora Actual:"
   </voice>
 </phrase>
 <phrase>
@@ -3227,7 +3227,7 @@
     *: "Bookmark"
   </source>
   <dest>
-    *: "Marcapáginas"
+    *: "Marcador"
   </dest>
   <voice>
     *: ""
@@ -3270,7 +3270,6 @@
   </source>
   <dest>
     *: "PLAY = Seleccionar"
-    h100,h120,h300: "NAVI = Seleccionar"
   </dest>
   <voice>
     *: ""
@@ -3285,7 +3284,6 @@
   </source>
   <dest>
     *: "ON+PLAY = Borrar"
-    h100,h120,h300: "ON+NAVI = Borrar"
   </dest>
   <voice>
     *: ""
@@ -3299,7 +3297,7 @@
     *: "Load Last Bookmark?"
   </source>
   <dest>
-    *: "¿Cargar último Marcapáginas?"
+    *: "¿Cargar Último Marcador?"
   </dest>
   <voice>
     *: ""
@@ -3313,7 +3311,7 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "¿Crear un marcapáginas?"
+    *: "¿Crear un Marcador?"
   </dest>
   <voice>
     *: ""
@@ -3327,7 +3325,7 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Marcapáginas Creado"
+    *: "Marcador Creado"
   </dest>
   <voice>
     *: ""
@@ -3341,7 +3339,7 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Falló el Marcapáginas"
+    *: "Falló el Marcador"
   </dest>
   <voice>
     *: ""
@@ -3355,7 +3353,7 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Marcapáginas Vacio"
+    *: "Marcador Vacío"
   </dest>
   <voice>
     *: ""
@@ -3369,7 +3367,7 @@
     *: "ON To Set"
   </source>
   <dest>
-    *: "ON para cambiar"
+    *: "ON para Cambiar"
   </dest>
   <voice>
     *: ""
@@ -3383,7 +3381,7 @@
     *: "OFF To Revert"
   </source>
   <dest>
-    *: "OFF para cancelar"
+    *: "OFF para Cancelar"
   </dest>
   <voice>
     *: ""
@@ -3397,7 +3395,7 @@
     *: "Key Lock ON"
   </source>
   <dest>
-    *: "Teclas Bloq"
+    *: "Teclas Bloquedas"
   </dest>
   <voice>
     *: ""
@@ -3411,7 +3409,7 @@
     *: "Key Lock OFF"
   </source>
   <dest>
-    *: "Tecl desblq"
+    *: "Teclas Desbloquedas"
   </dest>
   <voice>
     *: ""
@@ -3422,7 +3420,7 @@
   desc: displayed when key lock is on
   user:
   <source>
-    *: "Key Lock Is ON"
+    *: "Keylock is ON"
   </source>
   <dest>
     *: "Teclado Bloqueado"
@@ -3436,7 +3434,7 @@
   desc: displayed when key lock is turned off
   user:
   <source>
-    *: "Key Lock Is OFF"
+    *: "Keylock is OFF"
   </source>
   <dest>
     *: "Teclado Desbloqueado"
@@ -3464,7 +3462,7 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-    *: "Split time:"
+    *: "Split Time:"
   </source>
   <dest>
     *: "Tiempo de Separación:"
@@ -3492,7 +3490,7 @@
   desc: in recording and radio screen
   user:
   <source>
-    *: "Prerecording"
+    *: "Pre-Recording"
   </source>
   <dest>
     *: "Pregrabación"
@@ -3520,10 +3518,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Left"
+    *: "Gain Left"
   </source>
   <dest>
-    *: "Izquierdo"
+    *: "Ganancia Izquierda"
   </dest>
   <voice>
     *: ""
@@ -3534,10 +3532,10 @@
   desc: in the recording screen
   user:
   <source>
-    *: "Right"
+    *: "Gain Right"
   </source>
   <dest>
-    *: "Derecho"
+    *: "Ganancia Derecha"
   </dest>
   <voice>
     *: ""
@@ -3551,7 +3549,7 @@
     *: "The disk is full. Press OFF to continue."
   </source>
   <dest>
-    *: "Disco lleno. Pulsa OFF para continuar"
+    *: "Disco Duro Lleno. Pulsa OFF para Continuar"
   </dest>
   <voice>
     *: ""
@@ -3607,7 +3605,7 @@
     *: "Alarm Time Is Too Soon!"
   </source>
   <dest>
-    *: "Alarma demasiado temprano"
+    *: "Alarma Demasiado Temprano"
   </dest>
   <voice>
     *: ""
@@ -3643,7 +3641,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TITLE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Title]"
@@ -3657,7 +3655,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps 
+  desc: in tag viewer
   user:
   <source>
     *: "[Artist]"
@@ -3671,7 +3669,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ALBUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Album]"
@@ -3685,13 +3683,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_TRACKNUM
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Tracknum]"
   </source>
   <dest>
-    *: "[Nº pista]"
+    *: "[Nº Pista]"
   </dest>
   <voice>
     *: ""
@@ -3699,7 +3697,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_GENRE
-  desc: ID3 frame 'genre'
+  desc: in tag viewer
   user:
   <source>
     *: "[Genre]"
@@ -3713,7 +3711,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_YEAR
-  desc: ID3 info 'year'
+  desc: in tag viewer
   user:
   <source>
     *: "[Year]"
@@ -3727,7 +3725,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PLAYLIST
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Playlist]"
@@ -3741,7 +3739,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_BITRATE
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Bitrate]"
@@ -3755,7 +3753,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_FRECUENCY
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Frequency]"
@@ -3769,7 +3767,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_PATH
-  desc: in wps
+  desc: in tag viewer
   user:
   <source>
     *: "[Path]"
@@ -3783,13 +3781,13 @@
 </phrase>
 <phrase>
   id: LANG_ID3_NO_INFO
-  desc: ID3 info is missing
+  desc: in tag viewer
   user:
   <source>
     *: "<No Info>"
   </source>
   <dest>
-    *: "<sin info>"
+    *: "<Sin Info>"
   </dest>
   <voice>
     *: ""
@@ -3820,7 +3818,7 @@
     *: "Lun"
   </dest>
   <voice>
-    *: ""
+    *: "Lunes"
   </voice>
 </phrase>
 <phrase>
@@ -3834,7 +3832,7 @@
     *: "Mar"
   </dest>
   <voice>
-    *: ""
+    *: "Martes"
   </voice>
 </phrase>
 <phrase>
@@ -3848,7 +3846,7 @@
     *: "Mie"
   </dest>
   <voice>
-    *: ""
+    *: "Miercoles"
   </voice>
 </phrase>
 <phrase>
@@ -3859,10 +3857,10 @@
     *: "Thu"
   </source>
   <dest>
-    *: "Mar"
+    *: "Jue"
   </dest>
   <voice>
-    *: ""
+    *: "Jueves"
   </voice>
 </phrase>
 <phrase>
@@ -3876,7 +3874,7 @@
     *: "Vie"
   </dest>
   <voice>
-    *: ""
+    *: "Viernes"
   </voice>
 </phrase>
 <phrase>
@@ -3887,10 +3885,10 @@
     *: "Sat"
   </source>
   <dest>
-    *: "Sab"
+    *: "Sáb"
   </dest>
   <voice>
-    *: ""
+    *: "Sábado"
   </voice>
 </phrase>
 <phrase>
@@ -4646,7 +4644,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilohercio"
+    *: "kilohertz"
   </voice>
 </phrase>
 <phrase>
@@ -4660,7 +4658,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibelio"
+    *: "decibeles"
   </voice>
 </phrase>
 <phrase>
@@ -4688,7 +4686,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mili-amperios hora"
+    *: "mili-amperios por hora"
   </voice>
 </phrase>
 <phrase>
@@ -4730,7 +4728,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hercio"
+    *: "hertz"
   </voice>
 </phrase>
 <phrase>
@@ -4744,7 +4742,7 @@
     *: "B"
   </dest>
   <voice>
-    *: ""
+    *: "Byte"
   </voice>
 </phrase>
 <phrase>
@@ -4758,7 +4756,7 @@
     *: "KB"
   </dest>
   <voice>
-    *: "kilobyte"
+    *: "KiloByte"
   </voice>
 </phrase>
 <phrase>
@@ -4772,7 +4770,7 @@
     *: "MB"
   </dest>
   <voice>
-    *: "megabyte"
+    *: "MegaByte"
   </voice>
 </phrase>
 <phrase>
@@ -4786,7 +4784,7 @@
     *: "GB"
   </dest>
   <voice>
-    *: "gigabyte"
+    *: "GigaByte"
   </voice>
 </phrase>
 <phrase>
@@ -5220,7 +5218,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "carpeta"
   </voice>
 </phrase>
 <phrase>
@@ -5318,7 +5316,7 @@
     *: ""
   </dest>
   <voice>
-    *: "marcapáginas"
+    *: "marcadores"
   </voice>
 </phrase>
 <phrase>
@@ -5379,13 +5377,13 @@
 </phrase>
 <phrase>
   id: LANG_PLAYLIST_BUFFER_FULL
-  desc: in playlist.indices() when playlist is full *WARNING* this and next ID are only used in this function.
+  desc: in playlist.indices() when playlist is full
   user:
   <source>
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "El bufer de la"  lista esta lleno"
+    *: "Buffer de Lista de Reproducción Lleno"
   </dest>
   <voice>
     *: ""
@@ -5396,10 +5394,10 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of List"
+    *: "End of List"
   </source>
   <dest>
-    *: "Fin de lista"
+    *: "Fin de Lista de Reproducción"
   </dest>
   <voice>
     *: ""
@@ -5410,10 +5408,10 @@
   desc: when playlist has finished
   user:
   <source>
-    *: "End Of Song List"
+    *: "End of Song List"
   </source>
   <dest>
-    *: "Fin de lista"
+    *: "Fin de Lista de Reproducción"
   </dest>
   <voice>
     *: ""
@@ -5455,7 +5453,7 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "En cola %d Pistas (%s)"
+    *: "En Cola %d Pistas (%s)"
   </dest>
   <voice>
     *: ""
@@ -5511,7 +5509,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Error al acceder a la Lista de Reproducción"
+    *: "Error al Acceder a la Lista de Reproducción"
   </dest>
   <voice>
     *: ""
@@ -5525,7 +5523,7 @@
     *: "Error accessing playlist control file"
   </source>
   <dest>
-    *: "Error al acceder al archivo de control de Listas de Reproducción"
+    *: "Error al Acceder al Archivo de Control de Listas de Reproducción"
   </dest>
   <voice>
     *: ""
@@ -5539,7 +5537,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Error al Acceder al Directorio"
+    *: "Error al Acceder a la Carpeta"
   </dest>
   <voice>
     *: ""
@@ -5553,7 +5551,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Archivo de Control de Listas de Reproducción inválido"
+    *: "Archivo de Control de Listas de Reproducción Inválido"
   </dest>
   <voice>
     *: ""
@@ -5575,16 +5573,16 @@
 </phrase>
 <phrase>
   id: LANG_FM_NO_PRESETS
-  desc: DEPRECATED
+  desc: error when preset list is empty
   user:
   <source>
-    *: ""
+    *: "No presets"
   </source>
   <dest>
-    *: ""
+    *: "No hay Presintonías"
   </dest>
   <voice>
-    *: ""
+    *: "No hay Presintonías"
   </voice>
 </phrase>
 <phrase>
@@ -5592,13 +5590,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Edit preset"
+    *: "Edit Preset"
   </source>
   <dest>
-    *: "Edit presintonía"
+    *: "Editar Presintonía"
   </dest>
   <voice>
-    *: ""
+    *: "Editar Presintonía"
   </voice>
 </phrase>
 <phrase>
@@ -5606,13 +5604,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Remove preset"
+    *: "Remove Preset"
   </source>
   <dest>
-    *: "Eliminar Sintonia"
+    *: "Eliminar Presintonía"
   </dest>
   <voice>
-    *: ""
+    *: "Eliminar Presintonía"
   </voice>
 </phrase>
 <phrase>
@@ -5620,13 +5618,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "Preset save failed"
+    *: "Preset Save Failed"
   </source>
   <dest>
-    *: "Fallo al salvar Sintonia"
+    *: "Error al Guardar Presintonía"
   </dest>
   <voice>
-    *: ""
+    *: "Error al Guardar Presintonía"
   </voice>
 </phrase>
 <phrase>
@@ -5634,13 +5632,13 @@
   desc: in radio screen
   user:
   <source>
-    *: "The preset list is full"
+    *: "The Preset List is Full"
   </source>
   <dest>
-    *: "Lista de Sintonias llena"
+    *: "Lista de Presintonías Llena"
   </dest>
   <voice>
-    *: ""
+    *: "Lista de Presintonías Llena"
   </voice>
 </phrase>
 <phrase>
@@ -5651,10 +5649,10 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menu"
+    *: "Menú"
   </dest>
   <voice>
-    *: ""
+    *: "Menú"
   </voice>
 </phrase>
 <phrase>
@@ -5693,7 +5691,7 @@
     *: "Preset"
   </source>
   <dest>
-    *: "Sintonia"
+    *: "Presintonías"
   </dest>
   <voice>
     *: ""
@@ -5715,7 +5713,7 @@
 </phrase>
 <phrase>
   id: LANG_FM_BUTTONBAR_RECORD
-  desc: in main menu
+  desc: in radio screen
   user:
   <source>
     *: "Record"
@@ -5749,7 +5747,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menu"
+    *: "Menú"
   </dest>
   <voice>
     *: ""
@@ -5763,7 +5761,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Opcion"
+    *: "Opción"
   </dest>
   <voice>
     *: ""
@@ -5788,10 +5786,10 @@
   desc: in showdir(), displayed on screen when you reach buffer limit
   user:
   <source>
-    *: "Dir Buffer Is Full!"
+    *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Buffer de directorio Completo!"   "
+    *: "Buffer de Carpeta Completo!"
   </dest>
   <voice>
     *: ""
@@ -5805,7 +5803,7 @@
     *: "New Language"
   </source>
   <dest>
-    *: "nuevo idioma"
+    *: "Nuevo Idioma"
   </dest>
   <voice>
     *: ""
@@ -5819,7 +5817,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Opciones Cargadas"
+    *: "Configuraciones Cargadas"
   </dest>
   <voice>
     *: ""
@@ -5833,7 +5831,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Opciones"  Grabadas"
+    *: "Configuraciones  Guardadas"
   </dest>
   <voice>
     *: ""
@@ -5861,7 +5859,7 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Reiniciar ahora?"
+    *: "¿Reiniciar Ahora?"
   </dest>
   <voice>
     *: ""
@@ -5875,7 +5873,7 @@
     *: "OFF to abort"
   </source>
   <dest>
-    *: "OFF para cancelar"
+    *: "OFF para Cancelar"
   </dest>
   <voice>
     *: ""
@@ -5903,7 +5901,7 @@
     *: "No files"
   </source>
   <dest>
-    *: "No hay archivos"
+    *: "No hay Archivos"
   </dest>
   <voice>
     *: ""
@@ -5920,7 +5918,7 @@
     *: "Artistas"
   </dest>
   <voice>
-    *: ""
+    *: "Artistas"
   </voice>
 </phrase>
 <phrase>
@@ -5934,7 +5932,7 @@
     *: "Discos"
   </dest>
   <voice>
-    *: ""
+    *: "Discos"
   </voice>
 </phrase>
 <phrase>
@@ -5948,7 +5946,7 @@
     *: "Canciones"
   </dest>
   <voice>
-    *: ""
+    *: "Canciones"
   </voice>
 </phrase>
 <phrase>
@@ -5962,7 +5960,7 @@
     *: "Búsqueda"
   </dest>
   <voice>
-    *: ""
+    *: "Búsqueda"
   </voice>
 </phrase>
 <phrase>
@@ -5976,7 +5974,7 @@
     *: "Buscar Artistas"
   </dest>
   <voice>
-    *: ""
+    *: "Buscar Artistas"
   </voice>
 </phrase>
 <phrase>
@@ -5990,7 +5988,7 @@
     *: "Buscar Discos"
   </dest>
   <voice>
-    *: ""
+    *: "Buscar Discos"
   </voice>
 </phrase>
 <phrase>
@@ -6004,7 +6002,7 @@
     *: "Buscar Canciones"
   </dest>
   <voice>
-    *: ""
+    *: "Buscar Canciones"
   </voice>
 </phrase>
 <phrase>
@@ -6015,7 +6013,7 @@
     *: "Found %d matches"
   </source>
   <dest>
-    *: "Encontradas %d coincidencias"
+    *: "Encontradas %d Coincidencias"
   </dest>
   <voice>
     *: ""
@@ -6032,7 +6030,7 @@
     *: "<Todas las Canciones>"
   </dest>
   <voice>
-    *: ""
+    *: "<Todas las Canciones>"
   </voice>
 </phrase>
 <phrase>
@@ -6054,10 +6052,10 @@
   desc: Error message displayed in playlist viewer
   user:
   <source>
-    *: "Move failed"
+    *: "Move Failed"
   </source>
   <dest>
-    *: "Fallo al mover"
+    *: "Fallo al Mover"
   </dest>
   <voice>
     *: ""
@@ -6085,10 +6083,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Pantalla de Seguimiento"
+    *: "Mostrar Pista"
   </dest>
   <voice>
-    *: "Pantalla de Seguimiento"
+    *: "Mostrar Pista"
   </voice>
 </phrase>
 <phrase>
@@ -6096,13 +6094,13 @@
   desc: track display options
   user:
   <source>
-    *: "Track name only"
+    *: "Track Name Only"
   </source>
   <dest>
-    *: "Sólo nombre de pista"
+    *: "Sólo Nombre de Pista"
   </dest>
   <voice>
-    *: "Sólo nombre de pista"
+    *: "Sólo Nombre de Pista"
   </voice>
 </phrase>
 <phrase>
@@ -6110,7 +6108,7 @@
   desc: track display options
   user:
   <source>
-    *: "Full path"
+    *: "Full Path"
   </source>
   <dest>
     *: "Ruta Completa"
@@ -6211,7 +6209,7 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "El Plugin devolvio un Error"
+    *: "El Plugin Devolvió un Error"
   </dest>
   <voice>
     *: ""
@@ -6225,7 +6223,7 @@
     *: "Extension array full"
   </source>
   <dest>
-    *: "lista de extensiones completa"
+    *: "Lista de Extensiones Completa"
   </dest>
   <voice>
     *: ""
@@ -6239,7 +6237,7 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "lista de tipos de archivo completa"
+    *: "Lista de Tipos de Archivo Completa"
   </dest>
   <voice>
     *: ""
@@ -6253,7 +6251,7 @@
     *: "Plugin name too long"
   </source>
   <dest>
-    *: "Nombre de Plugin muy largo"
+    *: "Nombre de Plugin muy Largo"
   </dest>
   <voice>
     *: ""
@@ -6267,7 +6265,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Buffer de la cadena de tipos de archivo vacia"
+    *: "Buffer de la Cadena de Tipos de Archivo Vacía"
   </dest>
   <voice>
     *: ""
@@ -6449,10 +6447,10 @@
     *: "Show Files"
   </source>
   <dest>
-    *: "Mostrar archivos"
+    *: "Mostrar Archivos"
   </dest>
   <voice>
-    *: "Mostrar archivos"
+    *: "Mostrar Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -6463,10 +6461,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Todos"
+    *: "Todos los Archivos"
   </dest>
   <voice>
-    *: "Todos"
+    *: "Todos los Archivos"
   </voice>
 </phrase>
 <phrase>
@@ -6477,10 +6475,10 @@
     *: "Supported"
   </source>
   <dest>
-    *: "soportados"
+    *: "Archivos Soportados"
   </dest>
   <voice>
-    *: "Soportados"
+    *: "Archivos Soportados"
   </voice>
 </phrase>
 <phrase>
@@ -6491,10 +6489,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "Música"
+    *: "Archivos de Música"
   </dest>
   <voice>
-    *: "Música"
+    *: "Archivos de Música"
   </voice>
 </phrase>
 <phrase>
@@ -6505,30 +6503,24 @@
     *: "Playlists"
   </source>
   <dest>
-    *: "Listas de reproducción"
+    *: "Listas de Reproducción"
   </dest>
   <voice>
-    *: "Listas de reproducción"
+    *: "Listas de Reproducción"
   </voice>
 </phrase>
 <phrase>
   id: LANG_SYSFONT_FILTER_ID3DB
-### The 'desc' field differs from the english!
-### the previously used desc is commented below:
-### desc: show ID3 database
   desc: show ID3 Database
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "ID3 database"
     *: "ID3 Database"
   </source>
   <dest>
-    *: "Base de datos ID3"
+    *: "Base de Datos ID3"
   </dest>
   <voice>
-    *: "Base de datos ID3"
+    *: "Base de Datos ID3"
   </voice>
 </phrase>
 <phrase>
@@ -6567,10 +6559,10 @@
     *: "Source"
   </source>
   <dest>
-    *: "Fuente"
+    *: "Origen"
   </dest>
   <voice>
-    *: "Fuente"
+    *: "Origen"
   </voice>
 </phrase>
 <phrase>
@@ -6581,7 +6573,7 @@
     *: "Mic"
   </source>
   <dest>
-    *: "Micro"
+    *: "Micrófono"
   </dest>
   <voice>
     *: "Micrófono"
@@ -6595,10 +6587,10 @@
     *: "Line In"
   </source>
   <dest>
-    *: "Analógica"
+    *: "Línea de Entrada"
   </dest>
   <voice>
-    *: "Analógica"
+    *: "Línea de Entrada"
   </voice>
 </phrase>
 <phrase>
@@ -6654,7 +6646,7 @@
     *: "Barra de Desplazamiento"
   </dest>
   <voice>
-    *: "Barra de desplazamiento"
+    *: "Barra de Desplazamiento"
   </voice>
 </phrase>
 <phrase>
@@ -6668,7 +6660,7 @@
     *: "Barra de Estado"
   </dest>
   <voice>
-    *: "Barra de estado"
+    *: "Barra de Estado"
   </voice>
 </phrase>
 <phrase>
@@ -6732,9 +6724,6 @@
   desc: Display of record timer interval setting, on the record screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Split time:"
     *: "Split Time:"
   </source>
   <dest>
@@ -6763,9 +6752,6 @@
   desc: in recording and radio screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Prerecording"
     *: "Pre-Recording"
   </source>
   <dest>
@@ -6794,13 +6780,10 @@
   desc: in the recording screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Left"
     *: "Gain Left"
   </source>
   <dest>
-    *: "Izquierdo"
+    *: "Ganancia Izquierda"
   </dest>
   <voice>
     *: ""
@@ -6811,13 +6794,10 @@
   desc: in the recording screen
   user:
   <source>
-### The <source> section differs from the english!
-### the previously used one is commented below:
-###     *: "Right"
     *: "Gain Right"
   </source>
   <dest>
-    *: "Derecho"
+    *: "Ganancia Derecha"
   </dest>
   <voice>
     *: ""
@@ -6831,7 +6811,7 @@
     *: "The disk is full. Press OFF to continue."
   </source>
   <dest>
-    *: "Disco lleno. Pulsa OFF para continuar"
+    *: "Disco Duro Lleno. Pulsa OFF para continuar"
   </dest>
   <voice>
     *: ""
@@ -6845,7 +6825,7 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menu"
+    *: "Menú"
   </dest>
   <voice>
     *: ""
@@ -6859,7 +6839,7 @@
     *: "Option"
   </source>
   <dest>
-    *: "Opcion"
+    *: "Opción"
   </dest>
   <voice>
     *: ""
@@ -6879,8 +6859,6 @@
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
   desc: in the equalizer settings menu
@@ -6889,14 +6867,12 @@
     *: "Gain"
   </source>
   <dest>
-    *: "Gain"
+    *: "Ganancia"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Ganancia"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_REPEAT_AB
   desc: repeat one song
@@ -6911,8 +6887,6 @@
     *: "A-B"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
   desc: in the equalizer settings menu
@@ -6921,14 +6895,12 @@
     *: "Cutoff Frequency"
   </source>
   <dest>
-    *: "Cutoff Frequency"
+    *: "Frecuencia de Corte"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: "Frecuencia de Corte"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_PITCH
   desc: "pitch" in the pitch screen
@@ -6937,14 +6909,12 @@
     *: "Pitch"
   </source>
   <dest>
-    *: "Pitch"
+    *: "Velocidad"
   </dest>
   <voice>
-    *: "Pitch"
+    *: "Velocidad"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
   desc: in the equalizer settings menu
@@ -6953,14 +6923,12 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Edit mode: %s"
+    *: "Modo de Edición: %s"
   </dest>
   <voice>
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
@@ -6969,9 +6937,2519 @@
     *: "Trigger"
   </source>
   <dest>
-    *: "Trigger"
+    *: "Disparador"
   </dest>
   <voice>
+    *: "Disparador"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SAVE_CHANGES
+  desc: When you try to exit radio to confirm save
+  user:
+  <source>
+    *: "Save Changes?"
+  </source>
+  <dest>
+    *: "¿Guardar Cambios?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Configuraciones Avanzadas de EQ"
+  </dest>
+  <voice>
+    *: "Configuraciones Avanzadas de Ecualizador"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tiempo"
+  </dest>
+  <voice>
+    *: "Tiempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_MENU
+  desc: in playlist options menu, option to warn when erasing dynamic playlist
+  user:
+  <source>
+    *: "Warn When Erasing Dynamic Playlist"
+  </source>
+  <dest>
+    *: "Advertir al Borrar Listas Dinámicas"
+  </dest>
+  <voice>
+    *: "Advertir al Borrar Listas Dinámicas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPDIF_ENABLE
+  desc: in playback settings menu. enable/disable the optical out
+  user:
+  <source>
+    *: "Optical Output"
+  </source>
+  <dest>
+    *: "Salida Óptica"
+  </dest>
+  <voice>
+    *: "Salida Óptica"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_SET_RATING
+  desc: in wps context menu
+  user:
+  <source>
+    *: "Set Song Rating"
+  </source>
+  <dest>
+    *: "Colocar Puntaje"
+  </dest>
+  <voice>
+    *: "Colocar Puntaje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user:
+  <source>
+    *: "Committing tagcache"
+  </source>
+  <dest>
+    *: "Grabando TagCache"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXT_FOLDER
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
+  user:
+  <source>
+    *: "Auto-Change Directory"
+  </source>
+  <dest>
+    *: "Cambiar Carpeta Automáticamente"
+  </dest>
+  <voice>
+    *: "Cambiar Carpeta Automáticamente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Todas las Pistas>"
+  </dest>
+  <voice>
+    *: "Todas las Pistas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_VBR
+  desc: in browse_id3
+  user:
+  <source>
+    *: " (VBR)"
+  </source>
+  <dest>
+    *: " (VBR)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Ecualizador Gráfico"
+  </dest>
+  <voice>
+    *: "Ecualizador Gráfico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user:
+  <source>
+    *: "Clear Backdrop"
+  </source>
+  <dest>
+    *: "Limpiar Fondo de Pantalla"
+  </dest>
+  <voice>
+    *: "Limpiar Fondo de Pantalla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user:
+  <source>
+    *: "Browse Themes"
+  </source>
+  <dest>
+    *: "Explorar Temas"
+  </dest>
+  <voice>
+    *: "Explorar Temas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_TUNE_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Modo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MODERATE
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Moderate"
+  </source>
+  <dest>
+    *: "Moderado"
+  </dest>
+  <voice>
+    *: "Moderado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user:
+  <source>
+    *: "Browse .rwps files"
+  </source>
+  <dest>
+    *: "Explorar Archivos .rwps"
+  </dest>
+  <voice>
+    *: "Explorar Archivos de Pantalla de Reproducción Remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importar Modificaciones"
+  </dest>
+  <voice>
+    *: "Importar Modificaciones"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_REARM
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Repetir"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user:
+  <source>
+    *: "%d.%01dMHz"
+  </source>
+  <dest>
+    *: "%d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Tamaño de Archivo"
+  </dest>
+  <voice>
+    *: "Tamaño de Archivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Enable Crossfade"
+  </source>
+  <dest>
+    *: "Activar Fundido"
+  </dest>
+  <voice>
+    *: "Activar Fundido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user:
+  <source>
+    *: "Background Colour"
+  </source>
+  <dest>
+    *: "Color de Fondo"
+  </dest>
+  <voice>
+    *: "Color de Fondo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Q"
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_SHUFFLED
+  desc: in onplay menu.  queue a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Queue shuffled"
+  </source>
+  <dest>
+    *: "Colocar en Cola Aleatoriamente"
+  </dest>
+  <voice>
+    *: "Colocar en Cola Aleatoriamente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_MODE
+  desc: in recording settings_menu
+  user:
+  <source>
     *: "Trigger"
+  </source>
+  <dest>
+    *: "Disparador"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Apagar Visualización Remota"
+  </dest>
+  <voice>
+    *: "Apagar Visualización Remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user:
+  <source>
+    *: "Reduce Ticking"
+  </source>
+  <dest>
+    *: "Reducir Clickeo"
+  </dest>
+  <voice>
+    *: "Reducir Clickeo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: "Thai (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: "Thai"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PASTE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "Paste"
+  </source>
+  <dest>
+    *: "Pegar"
+  </dest>
+  <voice>
+    *: "Pegar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain"
+  </source>
+  <dest>
+    *: "Replaygain"
+  </dest>
+  <voice>
+    *: "Replaygain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STRONG
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Strong"
+  </source>
+  <dest>
+    *: "Alto"
+  </dest>
+  <voice>
+    *: "Alto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_IN
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight Fade In"
+  </source>
+  <dest>
+    *: "Fundido de Entrada de Iluminación"
+  </dest>
+  <voice>
+    *: "Fundido de Entrada de Iluminación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RATING
+  desc: in set_rating
+  user:
+  <source>
+    *: "Rating:"
+  </source>
+  <dest>
+    *: "Puntaje:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user:
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Precorte"
+  </dest>
+  <voice>
+    *: "Pre-corte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_DISK
+  desc: 
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: "Japanese (SJIS)"
+  </dest>
+  <voice>
+    *: "Japanese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Actualizar Automáticamente"
+  </dest>
+  <voice>
+    *: "Actualizar Automáticamente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_ALBUM_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Album Gain]"
+  </source>
+  <dest>
+    *: "[Album Gain]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: "Hebrew (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: "Hebrew"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Detener Grabación"
+  </dest>
+  <voice>
+    *: "Detener Grabación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARN_ERASEDYNPLAYLIST_PROMPT
+  desc: prompt shown when about to erase a modified dynamic playlist
+  user:
+  <source>
+    *: "Erase dynamic playlist?"
+  </source>
+  <dest>
+    *: "¿Borrar Lista de Reproducción Dinámica?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_NOCLIP
+  desc: in replaygain
+  user:
+  <source>
+    *: "Prevent Clipping"
+  </source>
+  <dest>
+    *: "Prevenir Cortes"
+  </dest>
+  <voice>
+    *: "Prevenir Cortes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Trigger"
+  </source>
+  <dest>
+    *: "Disparador"
+  </dest>
+  <voice>
+    *: "Disparador"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "TagCache no ha finalizado"
+  </dest>
+  <voice>
+    *: "TagCache no ha finalizado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: "Korean (KSX1001)"
+  </dest>
+  <voice>
+    *: "Korean"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Turkish (ISO-8859-9)"
+  </source>
+  <dest>
+    *: "Turkish (ISO-8859-9)"
+  </dest>
+  <voice>
+    *: "Turkish"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user:
+  <source>
+    *: "Foreground Colour"
+  </source>
+  <dest>
+    *: "Color de Fuentes"
+  </dest>
+  <voice>
+    *: "Color de Fuentes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: "Simp. Chinese (GB2312)"
+  </dest>
+  <voice>
+    *: "Simplified Chinese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user:
+  <source>
+    *: "First Keypress Enables Backlight Only"
+  </source>
+  <dest>
+    *: "Sólo Activar Iluminación a la Primera Acción"
+  </dest>
+  <voice>
+    *: "Sólo Activar Iluminación a la Primera Acción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main and Remote Unit"
+  </source>
+  <dest>
+    *: "Unidad Principal y Remota"
+  </dest>
+  <voice>
+    *: "Unidad Principal y Remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_DB
+  desc: in browse_id3
+  user:
+  <source>
+    *: "dB"
+  </source>
+  <dest>
+    *: "dB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PIXELS
+  desc: In the settings menu
+  user:
+  <source>
+    *: "pixels"
+  </source>
+  <dest>
+    *: "pixeles"
+  </dest>
+  <voice>
+    *: "pixeles"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_KBD
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "teclado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Actualizar Ahora"
+  </dest>
+  <voice>
+    *: "Actualizar Ahora"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BEEP
+  desc: in playback settings
+  user:
+  <source>
+    *: "Beep Volume"
+  </source>
+  <dest>
+    *: "Volumen del Beep"
+  </dest>
+  <voice>
+    *: "Volumen del Beep"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Brightness"
+  </source>
+  <dest>
+    *: "Brillo"
+  </dest>
+  <voice>
+    *: "Brillo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Guardar EQ Preestablecido"
+  </dest>
+  <voice>
+    *: "Guardar EQ Preestablecido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Main Unit Only"
+  </source>
+  <dest>
+    *: "Únicamente Unidad Principal"
+  </dest>
+  <voice>
+    *: "Únicamente Unidad Principal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user:
+  <source>
+    *: "Load Preset List"
+  </source>
+  <dest>
+    *: "Cargar Lista de Presintonías"
+  </dest>
+  <voice>
+    *: "Cargar Lista de Presintonías"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_FADE_OUT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Backlight Fade Out"
+  </source>
+  <dest>
+    *: "Fundido de Salida de Iluminación"
+  </dest>
+  <voice>
+    *: "Fundido de Salida de Iluminación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTARTING_PLAYBACK
+  desc: splash screen displayed when pcm buffer size is changed
+  user:
+  <source>
+    *: "Restarting playback..."
+  </source>
+  <dest>
+    *: "Reiniciando Reproducción..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Load to RAM"
+  </source>
+  <dest>
+    *: "Cargar a RAM"
+  </dest>
+  <voice>
+    *: "Cargar a RAM"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED
+  desc: in sound settings
+  user:
+  <source>
+    *: "Crossfeed"
+  </source>
+  <dest>
+    *: "Reproducción con Fundido"
+  </dest>
+  <voice>
+    *: "Reproducción con Fundido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Greek (ISO-8859-7)"
+  </source>
+  <dest>
+    *: "Greek (ISO-8859-7)"
+  </dest>
+  <voice>
+    *: "Greek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Opciones de Desplazamiento Remoto"
+  </dest>
+  <voice>
+    *: "Opciones de Desplazamiento Remoto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_INTERNAL
+  desc: in info menu; name for internal disk with multivolume (keep short!)
+  user:
+  <source>
+    *: "Int:"
+  </source>
+  <dest>
+    *: "Int:"
+  </dest>
+  <voice>
+    *: "Interno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_MODE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Replaygain Type"
+  </source>
+  <dest>
+    *: "Replaygain Type"
+  </dest>
+  <voice>
+    *: "Replaygain Type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: "Trad. Chinese (BIG5)"
+  </dest>
+  <voice>
+    *: "Traditional Chinese"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_TRACK_GAIN
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Track Gain]"
+  </source>
+  <dest>
+    *: "[Track Gain]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COPY
+  desc: The verb/action Copy
+  user:
+  <source>
+    *: "Copy"
+  </source>
+  <dest>
+    *: "Copiar"
+  </dest>
+  <voice>
+    *: "Copiar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_MIN_DURATION
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "for at least"
+  </source>
+  <dest>
+    *: "por lo menos"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exportar Modificaciones"
+  </dest>
+  <voice>
+    *: "Exportar Modificaciones"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Tamaño por el cual Separar"
+  </dest>
+  <voice>
+    *: "Tamaño por el cual Separar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : Re-enable)"
+  </dest>
+  <voice>
+    *: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_PREAMP
+  desc: in replaygain settings
+  user:
+  <source>
+    *: "Pre-amp"
+  </source>
+  <dest>
+    *: "Pre-amp"
+  </dest>
+  <voice>
+    *: "Preamp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user:
+  <source>
+    *: "Scanning %d.%01dMHz"
+  </source>
+  <dest>
+    *: "Scaneando %d.%01dMHz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user:
+  <source>
+    *: "Screen frozen!"
+  </source>
+  <dest>
+    *: "Pantalla congelada!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PITCH
+  desc: "pitch" in the pitch screen
+  user:
+  <source>
+    *: "Pitch"
+  </source>
+  <dest>
+    *: "Aceleración"
+  </dest>
+  <voice>
+    *: "Aceleración"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user:
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Tamaño del Paso de Desplazamiento por Pantalla"
+  </dest>
+  <voice>
+    *: "Tamaño del Paso de Desplazamiento por Pantalla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Scan"
+  </source>
+  <dest>
+    *: "Scanear"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Catalogo de Listas de Reproducción"
+  </dest>
+  <voice>
+    *: "Catalogo de Listas de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Cyrillic (CP1251)"
+  </source>
+  <dest>
+    *: "Cyrillic (CP1251)"
+  </dest>
+  <voice>
+    *: "Cyrillic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Medición de Separación"
+  </dest>
+  <voice>
+    *: "Medición de Separación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user:
+  <source>
+    *: "Paged Scrolling"
+  </source>
+  <dest>
+    *: "Desplazamiento Paginado"
+  </dest>
+  <voice>
+    *: "Desplazamiento Paginado"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Cortar Altas Frecuencias"
+  </dest>
+  <voice>
+    *: "Cortar Altas Frecuencias"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user:
+  <source>
+    *: "Preset List"
+  </source>
+  <dest>
+    *: "Lista de Presintonías"
+  </dest>
+  <voice>
+    *: "Lista de Presintonías"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Delay"
+  </source>
+  <dest>
+    *: "Retraso de Fundido de Salida"
+  </dest>
+  <voice>
+    *: "Retraso de Fundido de Salida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Unicode (UTF-8)"
+  </source>
+  <dest>
+    *: "Unicode (UTF-8)"
+  </dest>
+  <voice>
+    *: "Unicode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user:
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: "Desplazamiento fuera de Pantalla"
+  </dest>
+  <voice>
+    *: "Desplazamiento fuera de Pantalla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user:
+  <source>
+    *: "Invalid colour"
+  </source>
+  <dest>
+    *: "Color Inválido"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Initialize now"
+  </source>
+  <dest>
+    *: "Inicializar Ahora"
+  </dest>
+  <voice>
+    *: "Inicializar Ahora"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_DIGITAL
+  desc: in the recording screen
+  user:
+  <source>
+    *: "D"
+  </source>
+  <dest>
+    *: "D"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3_LENGTH
+  desc: in tag viewer
+  user:
+  <source>
+    *: "[Length]"
+  </source>
+  <dest>
+    *: "[Length]"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_SHUFFLED
+  desc: in onplay menu.  insert a track/playlist randomly into dynamic playlist
+  user:
+  <source>
+    *: "Insert shuffled"
+  </source>
+  <dest>
+    *: "Agregar Aleatoriamente"
+  </dest>
+  <voice>
+    *: "Agregar Aleatoriamente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ID3DB_GENRES
+  desc: in tag cache
+  user:
+  <source>
+    *: "Genres"
+  </source>
+  <dest>
+    *: "Géneros"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Nombre de Archivo Inválido!"
+  </dest>
+  <voice>
+    *: "Nombre de Archivo Inválido!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SEARCH_IN_PLAYLIST
+  desc: in playlist menu.
+  user:
+  <source>
+    *: "Search In Playlist"
+  </source>
+  <dest>
+    *: "Buscar en Lista de Reproducción"
+  </dest>
+  <voice>
+    *: "Buscar en Lista de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_PLAYLIST
+  desc: in playlist menu, reshuffles the order in which songs are played
+  user:
+  <source>
+    *: "Reshuffle"
+  </source>
+  <dest>
+    *: "Re-Aleatoriamente"
+  </dest>
+  <voice>
+    *: "Re-Aleatoriamente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user:
+  <source>
+    *: "Party Mode"
+  </source>
+  <dest>
+    *: "Modo Fiesta"
+  </dest>
+  <voice>
+    *: "Modo Fiesta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_FAILED
+  desc: text for splash to indicate a failure to load a bitmap as backdrop
+  user:
+  <source>
+    *: "Backdrop Failed"
+  </source>
+  <dest>
+    *: "Fondo de Pantalla Falló"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Remote Unit Only"
+  </source>
+  <dest>
+    *: "Únicamente Unidad Remota"
+  </dest>
+  <voice>
+    *: "Únicamente Unidad Remota"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REALLY_OVERWRITE
+  desc: The verb/action Paste
+  user:
+  <source>
+    *: "File/directory exists. Overwrite?"
+  </source>
+  <dest>
+    *: "Archivo/Carpeta Existe. ¿Sobreescribir?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_NOREARM
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Once"
+  </source>
+  <dest>
+    *: "Una Vez"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Frecuencia de Corte"
+  </dest>
+  <voice>
+    *: "Frecuencia de Corte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user:
+  <source>
+    *: "Loading..."
+  </source>
+  <dest>
+    *: "Cargando..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_BUILDING
+  desc: when booting up and rebuilding the cache
+  user:
+  <source>
+    *: "Scanning disk..."
+  </source>
+  <dest>
+    *: "Escaneando Disco..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user:
+  <source>
+    *: "Clipping Light"
+  </source>
+  <dest>
+    *: "Clipping Light"
+  </dest>
+  <voice>
+    *: "Clipping Light"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user:
+  <source>
+    *: "Reset Colours"
+  </source>
+  <dest>
+    *: "Reestablecer Colores"
+  </dest>
+  <voice>
+    *: "Reestablecer Colores"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Añadir a Nueva Lista de Reproducción"
+  </dest>
+  <voice>
+    *: "Añadir a Nueva Lista de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Duration"
+  </source>
+  <dest>
+    *: "Duración de Entrada"
+  </dest>
+  <voice>
+    *: "Duración de Entrada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Duration"
+  </source>
+  <dest>
+    *: "Duración de Salida"
+  </dest>
+  <voice>
+    *: "Duración de Salida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Tiempo de Separación"
+  </dest>
+  <voice>
+    *: "Tiempo de Separación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user:
+  <source>
+    *: "No Settings found, AutoScan?"
+  </source>
+  <dest>
+    *: "No se Encontraron Configuraciones, ¿AutoScanear?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user:
+  <source>
+    *: "RGB"
+  </source>
+  <dest>
+    *: "RGB"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_ACTIVE
+  desc: 
+  user:
+  <source>
+    *: "Trigger Active"
+  </source>
+  <dest>
+    *: "Disparador Activo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user:
+  <source>
+    *: "Directory Cache"
+  </source>
+  <dest>
+    *: "Caché de Carpetas"
+  </dest>
+  <voice>
+    *: "Caché de Carpetas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_SEARCH_MSG
+  desc: splash number of tracks inserted
+  user:
+  <source>
+    *: "Searching... %d found (%s)"
+  </source>
+  <dest>
+    *: "Buscando... %d encontrados (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "%d Hz Band Gain"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACKSKIP
+  desc: in crossfade settings
+  user:
+  <source>
+    *: "Track Skip Only"
+  </source>
+  <dest>
+    *: "Sólo Saltar Pista"
+  </dest>
+  <voice>
+    *: "Sólo Saltar Pista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Center Frequency"
+  </source>
+  <dest>
+    *: "Centrar Frecuencia"
+  </dest>
+  <voice>
+    *: "Centrar Frecuencia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user:
+  <source>
+    *: "Clear Preset List"
+  </source>
+  <dest>
+    *: "Borrar Lista de Presintonías"
+  </dest>
+  <voice>
+    *: "Borrar Lista de Presintonías"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYBOARD_LOADED
+  desc: shown when a keyboard has been loaded from the dir browser
+  user:
+  <source>
+    *: "New Keyboard"
+  </source>
+  <dest>
+    *: "Nuevo Teclado"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin Extended (ISO-8859-2)"
+  </source>
+  <dest>
+    *: "Latin Extended (ISO-8859-2)"
+  </dest>
+  <voice>
+    *: "Latin extended"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Añadir a Lista de Reproducción"
+  </dest>
+  <voice>
+    *: "Añadir a Lista de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISK_NAME_MMC
+  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  user:
+  <source>
+    *: "MMC:"
+  </source>
+  <dest>
+    *: "MMC:"
+  </dest>
+  <voice>
+    *: "Multimedia card"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE
+  desc: in settings menu 
+  user:
+  <source>
+    *: "Tag Cache"
+  </source>
+  <dest>
+    *: "Tag Cache"
+  </dest>
+  <voice>
+    *: "Tag Cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user:
+  <source>
+    *: "Track Gain if Shuffling"
+  </source>
+  <dest>
+    *: "Track Gain if Shuffling"
+  </dest>
+  <voice>
+    *: "Track Gain if Shuffling"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPEAT_AB
+  desc: repeat one song
+  user:
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "A-B"
+  </dest>
+  <voice>
+    *: "A-B"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_GAP
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Presplit Gap"
+  </source>
+  <dest>
+    *: "Presplit Gap"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNTIMEDB_ACTIVE
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Gather Runtime Data (experimental)"
+  </source>
+  <dest>
+    *: "Gather Runtime Data (experimental)"
+  </dest>
+  <voice>
+    *: "Gather Runtime Data"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Album Gain"
+  </source>
+  <dest>
+    *: "Album Gain"
+  </dest>
+  <voice>
+    *: "Album Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Comenzar Nuevo Archivo"
+  </dest>
+  <voice>
+    *: "Comenzar Nuevo Archivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Qué hacer al separar"
+  </dest>
+  <voice>
+    *: "Qué hacer al separar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Tamaño por el cual Separar"
+  </dest>
+  <voice>
+    *: "Tamaño por el cual Separar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Latin1 (ISO-8859-1)"
+  </source>
+  <dest>
+    *: "Latin1 (ISO-8859-1)"
+  </dest>
+  <voice>
+    *: "Latin 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN_ENABLE
+  desc: in replaygain
+  user:
+  <source>
+    *: "Enable Replaygain"
+  </source>
+  <dest>
+    *: "Enable Replaygain"
+  </dest>
+  <voice>
+    *: "Enable Replaygain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>  
+    *: "Cross Gain"
+  </source>
+  <dest>  
+    *: "Cross Gain"
+  </dest>
+  <voice>  
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Gain"
+  </dest>
+  <voice>
+    *: "Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user:
+  <source>
+    *: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: "Arabic (CP1256)"
+  </dest>
+  <voice>
+    *: "Arabic"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user:
+  <source>
+    *: "Save Preset List"
+  </source>
+  <dest>
+    *: "Guardar Lista de Presintonías"
+  </dest>
+  <voice>
+    *: "Guardar Lista de Presintonías"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user:
+  <source>
+    *: "RGB: %02X%02X%02X"
+  </source>
+  <dest>
+    *: "RGB: %02X%02X%02X"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_REMOTE_MENU
+  desc: in the display sub menu
+  user:
+  <source>
+    *: "Remote-LCD Settings"
+  </source>
+  <dest>
+    *: "Configuraciones de LCD Remoto"
+  </dest>
+  <voice>
+    *: "Configuraciones de LCD Remoto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Configuraciones de EQ Simple"
+  </dest>
+  <voice>
+    *: "Configuraciones de EQ Simple"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Low Shelf Filter"
+  </dest>
+  <voice>
+    *: "Low shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user:
+  <source>
+    *: "Add Preset"
+  </source>
+  <dest>
+    *: "Añadir Presintonía"
+  </dest>
+  <voice>
+    *: "Añadir Presintonía"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WEAK
+  desc: in beep volume in playback settings
+  user:
+  <source>
+    *: "Weak"
+  </source>
+  <dest>
+    *: "Débil"
+  </dest>
+  <voice>
+    *: "Débil"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DB_INF
+  desc: -inf db for values below measurement
+  user:
+  <source>
+    *: "-inf"
+  </source>
+  <dest>
+    *: "-inf"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Modo de Edición: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Atenuación de Altas Frecuencias"
+  </dest>
+  <voice>
+    *: "Atenuación de Altas Frecuencias"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE
+  desc: in playback settings
+  user:
+  <source>
+    *: "Crossfade"
+  </source>
+  <dest>
+    *: "Fundido"
+  </dest>
+  <voice>
+    *: "Fundido"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Habilitar EQ"
+  </dest>
+  <voice>
+    *: "Habilitar Ecualizador"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Ver Catalogo"
+  </dest>
+  <voice>
+    *: "Ver Catalogo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CUT
+  desc: The verb/action Cut
+  user:
+  <source>
+    *: "Cut"
+  </source>
+  <dest>
+    *: "Cortar"
+  </dest>
+  <voice>
+    *: "Cortar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Stop Below"
+  </source>
+  <dest>
+    *: "Detener Debajo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "High Shelf Filter"
+  </dest>
+  <voice>
+    *: "High shelf filter"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EXT_RWPS
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "remote while-playing-screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RADIO_PRESET_MODE
+  desc: in radio screen / menu
+  user:
+  <source>
+    *: "Preset"
+  </source>
+  <dest>
+    *: "Presintonía"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIG_IDLE
+  desc: waiting for threshold
+  user:
+  <source>
+    *: "Trigger Idle"
+  </source>
+  <dest>
+    *: "Trigger Idle"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_GAIN
+  desc: in replaygain
+  user:
+  <source>
+    *: "Track Gain"
+  </source>
+  <dest>
+    *: "Track Gain"
+  </dest>
+  <voice>
+    *: "Track Gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user:
+  <source>
+    *: "Auto-Scan Presets"
+  </source>
+  <dest>
+    *: "Auto-Scanear Presintonías"
+  </dest>
+  <voice>
+    *: "Auto Scanear Presintonías"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Explorar EQ Preestablecidas"
+  </dest>
+  <voice>
+    *: "Explorar Ecualizaciones Preestablecidas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user:
+  <source>
+    *: "Default Codepage"
+  </source>
+  <dest>
+    *: "Default Codepage"
+  </dest>
+  <voice>
+    *: "Default codepage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-Out Mode"
+  </source>
+  <dest>
+    *: "Modo de Salida"
+  </dest>
+  <voice>
+    *: "Modo de Salida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Ecualizador"
+  </dest>
+  <voice>
+    *: "Ecualizador"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOTHING_TO_RESUME
+  desc: Error message displayed when resume button pressed but no playlist
+  user:
+  <source>
+    *: "Nothing to resume"
+  </source>
+  <dest>
+    *: "Nada para retomar"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_GAIN_ANALOG
+  desc: in the recording screen
+  user:
+  <source>
+    *: "A"
+  </source>
+  <dest>
+    *: "A"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKDROP_LOADED
+  desc: text for splash to indicate a new backdrop has been loaded successfully
+  user:
+  <source>
+    *: "Backdrop Loaded"
+  </source>
+  <dest>
+    *: "Fondo de Pantalla Cargado"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_START_THRESHOLD
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "Start Above"
+  </source>
+  <dest>
+    *: "Iniciar Encima"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_BACKDROP
+  desc: text for onplay menu entry
+  user:
+  <source>
+    *: "Set As Backdrop"
+  </source>
+  <dest>
+    *: "Establecer como Fondo de Pantalla"
+  </dest>
+  <voice>
+    *: "Establecer como Fondo de Pantalla"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direct Gain"
+  </dest>
+  <voice>
+    *: "Direct gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRCACHE_REBOOT
+  desc: when activating directory cache
+  user:
+  <source>
+    *: "Please reboot to enable the cache"
+  </source>
+  <dest>
+    *: "Por Favor Reinicie para Activar Tag Cache"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user:
+  <source>
+    *: "Clear Current Presets?"
+  </source>
+  <dest>
+    *: "¿Borrar Presintonía Actual?"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Peak Filter %d"
+  </dest>
+  <voice>
+    *: "Peak filter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user:
+  <source>
+    *: "Fade-In Delay"
+  </source>
+  <dest>
+    *: "Retraso de Entrada"
+  </dest>
+  <voice>
+    *: "Retraso de Entrada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s no existe"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Actualizando en Segundo Plano"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "No hay Listas de Reproducción"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_STOP_POSTREC
+  desc: in recording settings_menu
+  user:
+  <source>
+    *: "for at least"
+  </source>
+  <dest>
+    *: "for at least"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIX
+  desc: in playback settings, crossfade option
+  user:
+  <source>
+    *: "Mix"
+  </source>
+  <dest>
+    *: "Mix"
+  </dest>
+  <voice>
+    *: "Mix"
   </voice>
 </phrase>
