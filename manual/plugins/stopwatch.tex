@@ -3,8 +3,6 @@
 
 A simple stopwatch program with support for saving times.
 
-\subsubsection{Keys are as follows:}
-
 \begin{table}
 \begin{btnmap}{}{}
 \opt{player}{\ButtonMenu}
@@ -21,7 +19,7 @@ A simple stopwatch program with support for saving times.
 \opt{recorder,recorderv2fm,ondio}{\ButtonLeft}
 \opt{h1xx,h300}{\ButtonDown}
 \opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
-& Reset timer \\
+& Reset timer (only when timer is stopped)\\
 \opt{player,recorder,recorderv2fm}{\ButtonOn}
 \opt{ondio}{\ButtonMenu}
 \opt{h1xx,h300}{\ButtonOn}
@@ -29,6 +27,7 @@ A simple stopwatch program with support for saving times.
 & Take lap time \\
 \opt{player,h1xx,h300,ipodcolor,ipodnano}{\ButtonLeft/\ButtonRight}
 \opt{recorder,recorderv2fm}{\ButtonDown/\ButtonUp}
+\opt{ondio}{\ButtonUp/\ButtonDown}
 & Scroll through lap times \\
 \end{btnmap}
 \end{table}

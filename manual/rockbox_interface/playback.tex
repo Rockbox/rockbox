@@ -22,7 +22,14 @@ setting.
 that are not available within the \setting{Tag Cache Browser}.  Read more about
 \setting{Tag Cache} in \reference{ref:tagcache}.  The remainder of this section deals with the \setting{File Browser}.}
 
-\opt{ondio}{\fixme{Add information on hotplug/multivolume support}}
+\opt{ondio}{
+Unlike the Archos Firmware, Rockbox provides multivolume support for the 
+MultiMediaCard, this means the \dap{} can access both data volumes (internal 
+memory and the MMC), thus being able to for instance, build playlists with 
+files from both volumes.
+In File Browser mode a new folder will appear as soon as the device has read 
+the content after inserting the card. This new folders name is generated as \fname{<MMC1>}, and will behave exactly as any other folder on the \dap{}.
+}
 
 \subsection{\label{ref:controls}File Browser Controls}
 \begin{table}
@@ -32,10 +39,10 @@ that are not available within the \setting{Tag Cache Browser}.  Read more about
            entry, the cursor will wrap to the last/first entry.\\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
-        {\ButtonOn+\ButtonUp/\ButtonDown}
-      \opt{PLAYER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{n/a}
-      \opt{ONDIO_PAD}{n/a}
-      & Move one page up/down on the list.\\
+        {
+          \ButtonOn+\ButtonUp/\ButtonDown
+          & Move one page up/down on the list.\\
+        }
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonLeft}
       \opt{PLAYER_PAD}{\ButtonStop} 
@@ -158,21 +165,23 @@ invoked on a single track, it will put only that track into the playlist.
 On the other hand, if the \setting{Playlist Submenu} is invoked on a
 directory, Rockbox adds all of the tracks in that directory to the playlist.
 
-\note{You can control whether or not Rockbox includes the contents of subdirectories
-when adding an entire directory to a playlists.  Set the \setting{Main Menu 
-$\rightarrow$ Playlist Options $\rightarrow$ Recusively Insert Directories} setting to 
-\setting{Yes} if you would like Rockbox to include tracks in subdirectories as well as tracks
-in the currently-selected directory.}
+\note{You can control whether or not Rockbox includes the contents of 
+  subdirectories when adding an entire directory to a playlists. Set the 
+  \setting{Main Menu $\rightarrow$ Playlist Options $\rightarrow$ Recusively 
+    Insert Directories} setting to \setting{Yes} if you would like Rockbox to 
+  include tracks in subdirectories as well as tracks in the currently-selected 
+  directory.}
 
-If you want to have Rockbox create a playlist of a whole folder (to play an entire 
-album, for example), use the \setting{File Browser} to select the song. When a single 
-song is selected from the \setting{File Browser}, Rockbox will automatically create a 
-playlist with all songs in the current folder. However, if you want to play only a single 
-song and then stop, stop playback, navigate to the song you want to play, and use the 
+If you want to have Rockbox create a playlist of a whole folder (to play an 
+entire album, for example), use the \setting{File Browser} to select the song. 
+When a single song is selected from the \setting{File Browser}, Rockbox will 
+automatically create a playlist with all songs in the current folder. However, 
+if you want to play only a single song and then stop, stop playback, navigate 
+to the song you want to play, and use the 
 \setting{Playlist $\rightarrow$ Insert} function to select the song.
 
-Dynamic playlists are saved so resume will restore them exactly as they were before
-shutdown.
+Dynamic playlists are saved so resume will restore them exactly as they were 
+before shutdown.
 
 \note{To view, save or reshuffle the current dynamic playlist, use the 
 \setting{Playlist Options} setting in the WPS Context Menu.}
@@ -253,31 +262,30 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
   \end{table}
 }
 \opt{ondio}{
-  \textbf{Picker area}
-  \begin{table}
-    \begin{btnmap}{}{}
+    \begin{table}
+    \begin{btnmap}{Picker area}{}
       \ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight
         & Move about the virtual keyboard (moves the solid cursor).
           If you move out of the picker area with \ButtonUp/\ButtonDown,
           you get to the line edit mode. \\
       \ButtonMenu 
         & Selects the letter underneath the cursor. \\
-      Long press on \ButtonMenu 
-       & Accepts the currently selected letter\\
+      Hold \ButtonMenu 
+       & Accepts the change and returns to the File Browser.\\
       \ButtonOff 
-       & Aborts the currently selected letter\\
+       & Quit the virtual keyboard without saving the changes.\\
     \end{btnmap}
   \end{table}
-  \textbf{Line edit mode}
   \begin{table}
-    \begin{btnmap}{}{}
+    \begin{btnmap}{Line edit mode}{}
       \ButtonLeft/\ButtonRight & Move left and right\\
       \ButtonMenu & Deletes the letter to the left of the cursor\\
-      Long press on \ButtonMenu & Accepts the deletion\\
+      Hold \ButtonMenu & Accepts the deletion\\
       \ButtonUp/\ButtonDown & Returns to the picker area\\
     \end{btnmap}
   \end{table}
-}\opt{player}{
+}
+\opt{player}{
   The current filename is always listed on the first line of the display. The
   second line of the display can contain the character selection bar, as in the
   screenshot above, or  one of a number of other options.

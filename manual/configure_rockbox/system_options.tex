@@ -14,17 +14,20 @@
       \opt{ipodcolor}{700mAh}%
       \opt{ipodnano,ipodvideo,ipod4g,ipod3g}{\fixme{unknown}}%
       \opt{x5}{950mAh}%
-      , which is the capacity value for the standard batteries shipped with the \dap.
-      Rockbox uses this value to estimate remaining battery life for the status
-      bar and WPS. Changing this setting has no effect whatsoever on actual battery life.
-      This setting affects only the the accuracy of the battery life display on screen.
+      , which is the capacity value for the standard batteries shipped with the
+      \dap. Rockbox uses this value to estimate remaining battery life for the 
+      statusbar and WPS. Changing this setting has no effect what-so-ever on 
+      actual battery life. This setting only affects the accuracy of the 
+      battery life estimation as shown on screen.
    
       \opt{ipod}{This value is fairly meaningless in the iPod family at
-        present, and work is ongoing into finding a better way to determine battery life.}
+        present, and work is on-going into finding a better way to determine 
+        battery life.}
     
     \opt{ondiosp,ondiofm}{
-      \item [Battery Type: ]This setting tells Rockbox wich type of battery
-        that is currently used in the \dap.
+    \item [Battery Type: ]This setting tells Rockbox wich type of battery
+      that is currently used in the \dap{}. Select \setting{Alkaline} or
+      \setting{NiMH} with \ButtonUp/\ButtonDown.
     }
   \end{description}
 
@@ -43,19 +46,19 @@
     \opt{recorder,h1xx,h300,x5}{
       \item [Disk Poweroff: ]This setting controls whether the disk is powered
       off or only set to ``sleep'' when spun down. If this setting is set to
-      \setting{YES}, the disk will power off. If set to \setting{NO}, the disk
+      \setting{Yes}, the disk will power off. If set to \setting{No}, the disk
       will enter ``sleep'' mode. Power off uses less power but takes slightly
       longer to spin-up.
     }
     \opt{SWCODEC}{
     \item [Directory Cache: ]Rockbox has the ability to scan the contents of
       your drive in the background and save those contents to a cache in RAM.
-      The \setting{Directory Cache} takes a small amount of memory away from Rockbox
-      that would otherwise be used to buffer music, but it speeds up navigation
-      by eliminating the slight pause between the time a navigation button is
-      pressed and the time Rockbox responds. Turning this setting \setting{On}
-      activates the directory cache, and turning it \setting{Off} deactivates the
-      directory cache.
+      The \setting{Directory Cache} takes a small amount of memory away from 
+      Rockbox that would otherwise be used to buffer music, but it speeds up 
+      navigation by eliminating the slight pause between the time a navigation 
+      button is pressed and the time Rockbox responds. Turning this setting 
+      \setting{On} activates the directory cache, and turning it \setting{Off} 
+      deactivates the directory cache.
       \note{The first time you set the directory cache to \setting{On},
       Rockbox will request a reboot of the \dap\ and upon restarting take a few
       minutes to scan the drive. Thereafter, the directory cache will work in the
@@ -73,30 +76,31 @@
     \end{description}
 }
 
-\subsection{Power Control}
-  \begin{description}
-    \item [\label{ref:idlepoweroff}Idle Poweroff: ]Rockbox can be configured
-    to turn off power after the unit has been idle for a defined number of
-    minutes. The \dap\ is idle when playback is stopped or paused. It is not
-    idle while the USB or charger is connected, or while recording.
-
-    \item [Sleep Timer: ]This option lets you power off your \dap\ after
-    playing for a given time.
-    \opt{recorderv2fm}{This setting is reset on boot. Using this option
-    disables the \setting{Wake up alarm} (see below).}
-    \opt{recorderv2fm}{
-      \item [Wake up alarm: ]This option turns the \dap\ off and then starts
-      it up again at the specified time. This is most useful when combined
-      with the \setting{resume} setting in the \setting{Playback Options}
-      menu is set to \setting{Yes}, so that the \dap\ wakes up and immediately
-      starts playing music. Use \ButtonLeft\ and \ButtonRight\ to adjust the
-      minutes setting, \ButtonUp\ and \ButtonDown\ to adjust the HOURS.
-      \ButtonPlay\ confirms the alarm and shuts your \dap\ down, and \ButtonOff
-      cancels setting an alarm. If the \dap\ is turned on again before the
-      alarm occurs, the alarm will be canceled. Using this option disables
-      the \setting{Sleep Timer}(see above).
-    }
-  \end{description}
+\subsection{Idle Poweroff}
+Rockbox can be configured to turn off power after the unit has been idle for a 
+defined number of minutes. The \dap{} is idle when playback is stopped or 
+paused. It is not idle while the USB or charger is connected, or while 
+recording. Settings are either \setting{Off} or \setting{1} to \setting{10}
+minutes in 1 minute steps. Then \setting{15,30,45} and \setting{60} minutes are
+available.
+\subsection{Sleep Timer}
+This option lets you power off your \dap{} after playing for a given time. Can
+be set from \setting{Off} to 5 hours in 5 minute steps.
+\opt{recorderv2fm}{This setting is reset on boot. Using this option
+  disables the \setting{Wake up alarm} (see below).}
+\opt{recorderv2fm}{
+  \subsection{Wake Up alarm}
+    This option turns the \dap{} off and then starts it up again at the 
+    specified time. This is most useful when combined with the \setting{Resume}
+    setting in the \setting{Playback Options} menu is set to \setting{Yes}, so 
+    that the \dap{} wakes up and immediately starts playing music. Use 
+    \ButtonLeft{} and \ButtonRight{} to adjust the minutes setting, \ButtonUp{}
+    and \ButtonDown{} to adjust the HOURS.
+    \ButtonPlay{} confirms the alarm and shuts your \dap{} down, and \ButtonOff
+    cancels setting an alarm. If the \dap{} is turned on again before the alarm
+    occurs, the alarm will be canceled. Using this option disables the 
+    \setting{Sleep Timer}(see above).
+}
 
 \subsection{Limits}
 This submenu relates to limits in the Rockbox operating system.

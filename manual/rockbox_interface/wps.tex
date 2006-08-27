@@ -9,10 +9,17 @@ currently playing audio file.
   or off independently. Refer to \reference{ref:wps_tags} for details on how
   to change the display of the WPS.
   \begin{itemize}
-  \item Status bar: The Status bar shows Battery level, charger status, 
-    volume, play mode, repeat mode, shuffle mode\opt{CONFIG_RTC}{ and clock}.
-    In contrast to all other items, the status bar is always at the top of
-    the screen.
+    \nopt{ondio}{
+    \item Status bar: The Status bar shows Battery level, charger status, 
+      volume, play mode, repeat mode, shuffle mode\opt{CONFIG_RTC}{ and clock}.
+      In contrast to all other items, the status bar is always at the top of
+      the screen.
+    }
+    \opt{ondio}{
+    \item Status bar: The Status bar shows Battery level, USB power mode, key
+      lock status, memory access indicator. In contrast to all other items, the
+      status bar is always at the top of the screen.
+    }
   \item (Scrolling) path and filename of the current song.
   \item The ID3 track name.
   \item The ID3 album name.
@@ -69,6 +76,7 @@ your WPS (While Playing Screen).
       & Fast forward in track. \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+      \opt{ONDIO_PAD}{Hold \ButtonOff}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,RECORDER_PAD,PLAYER_PAD}{\ButtonPlay}
       & Toggle play/pause \\
       %
@@ -113,7 +121,9 @@ your WPS (While Playing Screen).
         \ButtonMenu+\ButtonStop & Key lock on/off \\
         \ButtonMenu+\ButtonPlay & Mute on/off \\
       }
-      
+      \opt{ONDIO_PAD}{
+        Hold \ButtonMenu+\ButtonDown & Key lock on/off\\
+      }
       \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \opt{PLAYER_PAD}{\ButtonMenu+\ButtonOn}
         \opt{RECORDER_PAD}{\ButtonFOne+\ButtonOn}
@@ -262,11 +272,11 @@ your WPS (While Playing Screen).
   Scroll bar turns the display of the Scroll bar on the left of the screen on
   or off.
   
-  Status bar turns the status display at the top of the screen on or off. Upside
-  down inverts the screen so that the top of the display appears nearest to the
-  buttons.  This is sometimes useful when storing the \dap\ in a pocket.  Key
-  assignments swap over with the display orientation where it is logical for
-  them to do so.
+  Status bar turns the status display at the top of the screen on or off. 
+  Upside down inverts the screen so that the top of the display appears nearest
+  to the buttons. This is sometimes useful when storing the \dap\ in a pocket.
+  Key assignments swap over with the display orientation where it is logical 
+  for them to do so.
 
   See \reference{ref:Displayoptions} for more information about these
   settings.

@@ -1,12 +1,12 @@
 \chapter{Advanced Topics}
 
 \section{\label{ref:CustomisingUI}Customising the userinterface}
-\subsection{\label{ref:GettingExtras}Getting Extras (Fonts, Languages)}
-Rockbox supports custom fonts (for the Recorder and Ondio only) and a number of
-different languages. Rockbox comes with several fonts and languages already 
-included. If new fonts have been created, then they will be found in the font 
-package at \url{http://www.rockbox.org/daily.shtml}. The latest \fname{.lng} 
-files are always included in the daily Rockbox builds.
+\subsection{\label{ref:GettingExtras}Getting Extras}
+\opt{HAVE_LCD_BITMAP}{
+Rockbox supports custom fonts. A collection of fonts is available for download
+in the font package at \url{http://www.rockbox.org/daily.shtml}}. Support for a
+number of languages is included with Rockbox, and the latest \fname{.lng} files
+are always included in the different Rockbox builds.
 
 \opt{HAVE_LCD_BITMAP}{
   \subsection{\label{ref:Loadingfonts}Loading Fonts}
@@ -362,13 +362,13 @@ Example of a configuration file:
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
 \opt{player,recorder,recorderv2fm,ondio}{
-  When your \dap\ powers on, it loads the Archos firmware in ROM, which
-  automatically checks your Jukebox hard disk's root folder for a file named 
+  When your \dap{} powers on, it loads the Archos firmware in ROM, which
+  automatically checks your \daps{} root folder for a file named 
   \firmwarefilename. Note that Archos firmware can only read the first 
   ten characters of each filename in this process, so don't rename your old 
   firmware files with names like \firmwarefilename.\fname{old} and so on, 
-  because it's possible that the \dap\ will load a file other than the one you 
-  intended.
+  because it's possible that the \dap{} will load a file other than the one 
+  you intended.
 }
 
 \subsection{\label{ref:using_rolo}Using ROLO (Rockbox loader)}

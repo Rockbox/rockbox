@@ -5,6 +5,18 @@ This is the popular snake game. The aim is to grow your snake as large
 as possible by eating the dots that appear on the screen. The game will
 end when the snake touches either the borders of the screen or itself.
 
-Change levels with UP/DOWN keys (level 1 is slowest, level 9 is
-fastest). Press PLAY to start or pause. 
+Change levels with the \ButtonUp/\ButtonDown{} keys (level 1 is slowest, level 
+9 is fastest). Press \opt{ondio}{\ButtonMenu}\ to start or pause.
 
+\begin{table}
+    \begin{btnmap}{}{}
+    {\ButtonUp/\ButtonDown}
+    & Change levels (1 is slowest, 9 is fastest)\\
+    %
+    \opt{RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu}
+    & Toggle Play/Pause\\
+    %
+    \end{btnmap}
+\end{table}

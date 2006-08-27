@@ -60,18 +60,19 @@ related to audio playback.
   \begin{description}
   \item[Yes: ]Rockbox will unconditionally try to resume.
   \item[No:  ]Rockbox will not resume. 
-    \emph{If resume is set to \setting{No}, Rockbox will start in the
+    \note{If resume is set to \setting{No}, Rockbox will start in the
       \setting{File Browser}.}
   \end{description}
-  \note{Earlier versions of Rockbox had an ``Ask'' setting, which would ask 
-    whether to resume when the jukebox was turned on. This setting has been 
-    eliminated because it was redundant. If resume is set to ``Yes'' pressing 
+  \note{Earlier versions of Rockbox had an \setting{Ask} setting, which would 
+    ask whether to resume when the \dap{} was turned on. This setting has been 
+    eliminated because it was redundant. If resume is set to \setting{Yes} 
+    pressing 
     \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{
-      \fixme{FixMe}}
-    \opt{ONDIO_PAD}{\fixme{FixMe}}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    on the \dap\ will resume from the point where the \dap\ was stopped before 
-    shutdown.
+      \fixme{FixMe}}%
+    \opt{ONDIO_PAD}{\ButtonMenu}%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
+    on the \dap{} will resume playback from the point where the \dap{} was 
+    stopped before shutdown.
     
   \item[Fast-Forward/Rewind: ]How fast you want search (fast forward or rewind)
     to accelerate when you hold down the button. \setting{Off} means no 
@@ -80,9 +81,9 @@ related to audio playback.
     once every 5 seconds the button is held.
     
   \item[Anti-Skip Buffer: ]This setting allows you to control how much music is
-    stored in the \dap's memory whilst playing a song, acting as a buffer 
-    against shock or playback problems. The \dap\ transfers the selected amount
-    of the forthcoming song into its memory at high speed whilst you are 
+    stored in the \daps{} memory whilst playing a song, acting as a buffer 
+    against shock or playback problems. The \dap{} transfers the selected 
+    amount of the forthcoming song into its memory at high speed whilst you are
     playing the song. It keeps a ``rolling'' buffer, which keeps feeding more 
     of the forthcoming song into memory as it goes along.
     If the \dap\ is knocked, shaken or jogged heavily while Rockbox is trying 
@@ -95,8 +96,14 @@ related to audio playback.
     to reduce the chances of there being a gap or pause during playback of 
     songs.
     
-    \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7 
-      seconds.}
+    \nopt{ondio}{
+      \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7
+        seconds.}
+    }
+    \opt{ondio}{
+      The anti-skip buffer can safely be kept at zero. It will eventually be 
+      eliminated.
+    }
     \opt{SWCODEC}{The anti-skip buffer can be set to various values between
       5 seconds and 10 minutes.}
     
