@@ -1075,8 +1075,12 @@ static bool get_next(struct tagcache_search *tcs)
             return false;
         }
         tcs->entry_count--;
-        tcs->result_seek = tcs->position;
         
+        if (tagcache_is_unique_tag(tcs->type))
+            tcs->result_seek = tcs->position;
+        else
+            tcs->result_seek = tcs->idx_id;
+
 # ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
         {
@@ -1095,9 +1099,6 @@ static bool get_next(struct tagcache_search *tcs)
         tcs->result_len = strlen(tcs->result) + 1;
         tcs->idx_id = ep->idx_id;
         
-        if (!tagcache_is_unique_tag(tcs->type))
-            tcs->result_seek = tcs->idx_id;
-
         return true;
     }
     else
