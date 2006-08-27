@@ -2070,6 +2070,9 @@ static void generate_postbuffer_events(void)
             if (track_buffer_callback)
                 track_buffer_callback(&tracks[last_idx].id3, true);
         }
+        
+        /* Force WPS reload. */
+        track_changed = true;
     }
 }
 
