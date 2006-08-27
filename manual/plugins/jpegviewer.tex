@@ -1,10 +1,16 @@
 % $Id$ %
 \subsection{JPEG viewer}
 Open a JPEG file in the \setting{File Browser} to view it
-\opt{recorder,recorderv2fm,ondio,h1xx}{ using Rockbox's greyscale library}.
+\opt{recorder,recorderv2fm,ondio,h1xx,ipod4g,ipod3g,ipodmini}{ using Rockbox's 
+greyscale library}.
+\opt{SWCODEC}{
 \note{When an audio file is playing the size of the image is limited as 
 the decoding process needs to share memory with audio tracks. To be able to
 view a bigger file you may need to stop playback.}
+}
+\opt{MASCODEC}{
+\note{This plugin will case playback to stop.}
+}
 \begin{table}
 \begin{btnmap}{}{}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
