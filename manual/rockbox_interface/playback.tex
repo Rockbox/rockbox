@@ -285,44 +285,24 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
     \end{btnmap}
   \end{table}
 }
+
 \opt{player}{
   The current filename is always listed on the first line of the display. The
   second line of the display can contain the character selection bar, as in the
-  screenshot above, or  one of a number of other options.
+  screenshot above.
   \begin{table}
-    \begin{btnmap}{}{}
-      \ButtonLeft/\ButtonRight & Moves the arrow to/from the filename \\
-                               & and changes between the character bar \\
-                               & and BACKSPACE, DELETE, ACCEPT and ABORT. \\
-      \ButtonPlay/\ButtonStop & Varies (see below) \\
-      \ButtonMenu & Shift.  When the character selection bar is selected\\
-                  & this changes between upper case, lower case, \\
-                  & and accented letters. \\
+     \begin{btnmap}{}{}
+       \ButtonOn & Toggle picker- and line edit mode\\
+       \ButtonLeft/\ButtonRight &  moves back and forth in the selected \\
+                                & line (picker of input line) \\
+       \ButtonPlay & Picks character in character bar, or acts as backspace \\
+                   & in the filename.\\
+       Hold \ButtonPlay & Accept\\
+       \ButtonStop & Cancel\\
+       \ButtonMenu & Flips picker lines\\
     \end{btnmap}
   \end{table}
 
-  The function of the \ButtonPlay\ and \ButtonStop\ buttons depends on what the
-  arrow is pointing to, as follows.
-  
-  \begin{table}
-      \begin{center}
-      \begin{tabularx}{.75\textwidth}{lX}
-        \textbf{Selected option} & \textbf{Play/Stop function} \\\midrule
-        filename & Moves the cursor left (\ButtonStop) \\
-                 & or right (\ButtonPlay) within the filename \\
-        character bar & Moves the character bar to the next (\ButtonPlay)\\
-                      & or previous (\ButtonStop) character. \\
-        BACKSPACE & \ButtonPlay deletes the character before \\
-                  & the current cursor position \\
-        DELETE & \ButtonPlay deletes the character at the \\
-               & current cursor position\\
-        ACCEPT & \ButtonPlay exits the virtual keyboard and \\
-               & saves any changes \\
-        ABORT & \ButtonPlay exits the virtual keyboard and \\
-              & discards any changes \\\bottomrule
-      \end{tabularx}
-    \end{center}
-  \end{table}
 }
 
 \input{rockbox_interface/tagcache.tex}
