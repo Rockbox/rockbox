@@ -7,21 +7,28 @@ A simple stopwatch program with support for saving times.
 
 \begin{table}
 \begin{btnmap}{}{}
-\opt{player}{Menu}\opt{recorder,recorderv2fm}{Off}
-\opt{ondio}{OnOff}\opt{h1xx,h300}{Stop}
-\opt{ipodcolor,ipodnano}{Menu} 
+\opt{player}{\ButtonMenu}
+\opt{recorder,recorderv2fm,h1xx,h300}{\ButtonOff}
+\opt{ondio}{\ButtonOff}
+\opt{ipodcolor,ipodnano}{\ButtonMenu}
 & Quit Plugin \\
-\opt{player,recorder,recorderv2fm}{Play}\opt{ondio}{Right}
-\opt{h1xx,h300}{Select}\opt{ipodcolor,ipodnano}{Play} 
+\opt{player,recorder,recorderv2fm}{\ButtonPlay}
+\opt{ondio}{\ButtonRight}
+\opt{h1xx,h300}{\ButtonSelect}
+\opt{ipodcolor,ipodnano}{\ButtonPlay}
 & Start / stop \\
-\opt{player}{Stop}\opt{recorder,recorderv2fm,ondio}{Left}
-\opt{h1xx,h300}{Down}\opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
+\opt{player}{\ButtonStop}
+\opt{recorder,recorderv2fm,ondio}{\ButtonLeft}
+\opt{h1xx,h300}{\ButtonDown}
+\opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
 & Reset timer \\
-\opt{player,recorder,recorderv2fm}{On}\opt{ondio}{Mode}\opt{h1xx,h300}{Play}
+\opt{player,recorder,recorderv2fm}{\ButtonOn}
+\opt{ondio}{\ButtonMenu}
+\opt{h1xx,h300}{\ButtonOn}
 \opt{ipodcolor,ipodnano}{\fixme{Unknown}} 
 & Take lap time \\
-\opt{player,h1xx,h300,ipodcolor,ipodnano}{Left/Right}
-\opt{recorder,recorderv2fm}{Down/Up} 
+\opt{player,h1xx,h300,ipodcolor,ipodnano}{\ButtonLeft/\ButtonRight}
+\opt{recorder,recorderv2fm}{\ButtonDown/\ButtonUp}
 & Scroll through lap times \\
 \end{btnmap}
 \end{table}
