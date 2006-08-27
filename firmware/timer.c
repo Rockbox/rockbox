@@ -28,6 +28,8 @@ static void (*pfn_timer)(void) = NULL;      /* timer callback */
 static void (*pfn_unregister)(void) = NULL; /* unregister callback */
 #ifdef CPU_COLDFIRE
 static int base_prescale;
+#elif defined CPU_PP
+static long cycles_new = 0;
 #endif
 
 /* interrupt handler */
@@ -51,6 +53,11 @@ void TIMER1(void)
 void TIMER2(void)
 {
     TIMER2_VAL; /* ACK interrupt */
+    if (cycles_new > 0)
+    {
+        TIMER2_CFG = 0xc0000000 | cycles_new;
+        cycles_new = 0;
+    }
     if (pfn_timer != NULL)
         pfn_timer();
 }
@@ -58,21 +65,10 @@ void TIMER2(void)
 
 static bool timer_set(long cycles, bool start)
 {
+#if (CONFIG_CPU == SH7034) || defined(CPU_COLDFIRE)
     int phi = 0; /* bits for the prescaler */
     int prescale = 1;
 
-#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
-    /* TODO: Implement for iPod and iFP (if they have prescaler capabilities) */
-    (void)phi;
-#endif
-
-#if CONFIG_CPU == PNX0101
-    (void)start;
-#endif
-
-/* Don't do this on ipods, we don't know if these platforms have prescaler
-   capabilities on the timer we use. */
-#if CONFIG_CPU != PP5020 && CONFIG_CPU != PP5002
     while (cycles > 0x10000)
     {   /* work out the smallest prescaler that makes it fit */
 #if CONFIG_CPU == SH7034
@@ -81,6 +77,10 @@ static bool timer_set(long cycles, bool start)
         prescale *= 2;
         cycles >>= 1;
     }
+#endif
+
+#if CONFIG_CPU == PNX0101  /* TODO: Implement for iFP */
+    (void)start;
 #endif
 
 #if CONFIG_CPU == SH7034
@@ -145,7 +145,9 @@ static bool timer_set(long cycles, bool start)
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
 #elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
-    (void)prescale;
+    if (cycles > 0x1fffffff)
+        return false;
+
     if (start)
     {
         if (pfn_unregister != NULL)
@@ -153,11 +155,14 @@ static bool timer_set(long cycles, bool start)
             pfn_unregister();
             pfn_unregister = NULL;
         }
+        cycles_new = 0;
+        TIMER2_CFG = 0;
+        TIMER2_VAL;
+        TIMER2_CFG = 0xc0000000 | cycles;   /* enable timer */
     }
-    TIMER2_CFG = 0x0;
-    TIMER2_VAL;
-    /* enable timer */
-    TIMER2_CFG = 0xc0000000 | cycles;
+    else
+        cycles_new = cycles;
+
 #endif /* CONFIG_CPU */
     return true;
 }
@@ -235,6 +240,7 @@ void timer_unregister(void)
     TMR1 = 0;               /* disable timer 1 */
     or_l((1<<10), &IMR);    /* disable interrupt */
 #elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+    TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_CLR = TIMER2_MASK;
 #endif
     pfn_timer = NULL;
