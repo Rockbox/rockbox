@@ -1763,7 +1763,8 @@ int game_loop(void)
 
             button_right=((move_button & RIGHT) || (SCROLL_FWD(button)));
             button_left=((move_button & LEFT) || (SCROLL_BACK(button)));
-
+            if ((con_game== 1 && start_game!=1) && (button_right || button_left))
+                continue;
             if ((button_right && flip_sides==false) ||
                 (button_left && flip_sides==true)) {
                 if (pad_pos_x+8+PAD_WIDTH > LCD_WIDTH) {
@@ -1795,7 +1796,7 @@ int game_loop(void)
                 }
             }
 
-
+            
             switch(button) {
                 case UP:
                 case SELECT:
