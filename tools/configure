@@ -350,7 +350,9 @@ if [ -z "$simver" ]; then
 fi
 }
 
-if test "$1" = "--help"; then
+target=$1
+
+if test "$target" = "--help"; then
   echo "Rockbox configure script."
   echo "Invoke this in a directory to generate a Makefile to build Rockbox"
   echo "Do *NOT* run this within the tools directory!"
@@ -375,13 +377,6 @@ if test -r "configure"; then
    echo "Much happiness will arise from this. Enjoy"
    exit
  fi
-fi
-
-if [ "$target" = "--help" -o \
-     "$target" = "-h" ]; then
-  echo "Just invoke the script and answer the questions."
-  echo "This script will write a Makefile for you"
-  exit
 fi
 
 # get our current directory
@@ -439,32 +434,23 @@ toolsdir='\$(ROOTDIR)/tools'
 
   echo "Enter target platform:"
 
-  echo "1 - Archos Player/Studio"
-  echo "2 - Archos Recorder"
-  echo "3 - Archos FM Recorder"
-  echo "4 - Archos Recorder v2"
-  echo "5 - Archos Gmini 120"
-  echo "6 - Archos Gmini SP"
-  echo "7 - Archos Ondio SP"
-  echo "8 - Archos Ondio FM"
-  echo "9 - iriver H120/H140"
+  echo "1 - Archos Player/Studio               16 - iPod 3G"
+  echo "2 - Archos Recorder                    17 - iPod 4G (Grayscale)"
+  echo "3 - Archos FM Recorder                 18 - iPod Mini (1G)"
+  echo "4 - Archos Recorder v2                 19 - iriver iFP-790"
+  echo "5 - Archos Gmini 120                   20 - Toshiba Gigabeat F"
+  echo "6 - Archos Gmini SP                    21 - iPod Mini 2G"
+  echo "7 - Archos Ondio SP                    22 - iriver H10 20Gb"
+  echo "8 - Archos Ondio FM                    23 - SanDisk Sansa e200"
+  echo "9 - iriver H120/H140                   24 - iriver H10 5/6Gb"
   echo "10 - iriver H320/H340"
   echo "11 - iriver iHP-100/iHP-110/iHP-115"
   echo "12 - iAudio X5"
   echo "13 - iPod Color/Photo"
   echo "14 - iPod Nano"
   echo "15 - iPod Video"
-  echo "16 - iPod 3G"
-  echo "17 - iPod 4G (Grayscale)"
-  echo "18 - iPod Mini (1G)"
-  echo "19 - iriver iFP-790"
-  echo "20 - Toshiba Gigabeat F"
-  echo "21 - iPod Mini 2G"
-  echo "22 - iriver H10 20Gb"
-  echo "23 - SanDisk Sansa e200"
-  echo "24 - iriver H10 5/6Gb"
 
-  target_id=`input`;
+  buildfor=`input`;
 
   # Set of tools built for all target platforms:
   toolset="rdf2binary convbdf"
@@ -477,9 +463,40 @@ toolsdir='\$(ROOTDIR)/tools'
   # generic is used by Gigabeat, IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb codepages"
 
-  case $target_id in
 
-   1)
+  #  ---- For each target ----
+  #
+  #   *Variables*
+  # target_id: a unique number identifying this target, DOES NOT necessarily
+  #            have to be the menu number. Just use the currently highest
+  #            number+1 when you add a new target.
+  # archos:    short model name used all over to identify this target
+  # target:    -Ddefine passed to the build commands to make the correct
+  #            config-*.h file get included etc
+  # tool:      the tool that takes a plain binary and converts that into a
+  #            working "firmware" file for your target
+  # output:    the final output file name
+  # appextra:  passed to the APPEXTRA variable in the Makefiles.
+  #            TODO: add proper explanation
+  # archosrom: used only for Archos targets that build a special flashable .ucl
+  #            image. Set to blank for other builds.
+  # flash:     the same as archosrom. These two should be merged
+  # plugins:   set to 'yes' to build the plugins. Early development builds can
+  #            set this to no in the early stages to have an easier life for a
+  #            while
+  # codecs:    lists codecs to build for this target
+  # toolset:   lists what particular tools in the tools/ directory that this
+  #            target needs to have built prior to building Rockbox
+  #
+  #   *Functions*
+  # *cc:       sets up gcc and compiler options for your target builds. Note
+  #            that if you select a simulator build, the compiler selection is
+  #            overridden later in the script.
+
+  case $buildfor in
+
+   1|player)
+    target_id=1
     archos="player"
     target="-DARCHOS_PLAYER"
     shcc
@@ -501,7 +518,8 @@ toolsdir='\$(ROOTDIR)/tools'
 
     ;;
 
-   2)
+   2|recorder)
+    target_id=2
     archos="recorder"
     target="-DARCHOS_RECORDER"
     shcc
@@ -519,7 +537,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$archosbitmaptools
     ;;
 
-   3)
+   3|fmrecorder)
+    target_id=3
     archos="fmrecorder"
     target="-DARCHOS_FMRECORDER"
     shcc
@@ -537,7 +556,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$archosbitmaptools
     ;;
 
-   4)
+   4|recorderv2)
+    target_id=4
     archos="recorderv2"
     target="-DARCHOS_RECORDERV2"
     shcc
@@ -555,7 +575,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$archosbitmaptools
     ;;
 
-   5)
+   5|gmini120)
+    target_id=5
     archos="gmini120"
     target="-DARCHOS_GMINI120"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
@@ -574,7 +595,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset="$toolset bmp2rb codepages"
     ;;
 
-   6)
+   6|gminisp)
+    target_id=6
     archos="gminisp"
     target="-DARCHOS_GMINISP"
     memory=16 # fixed size (16 is a guess, remove comment when checked)
@@ -593,7 +615,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset="$toolset bmp2rb codepages"
     ;;
 
-   7)
+   7|ondiosp)
+    target_id=7
     archos="ondiosp"
     target="-DARCHOS_ONDIOSP"
     shcc
@@ -611,7 +634,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$archosbitmaptools
     ;;
 
-   8)
+   8|ondiofm)
+    target_id=8
     archos="ondiofm"
     target="-DARCHOS_ONDIOFM"
     shcc
@@ -627,7 +651,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$archosbitmaptools
     ;;
 
-   9)
+   9|h120)
+    target_id=9
     archos="h120"
     target="-DIRIVER_H120"
     memory=32 # always
@@ -648,7 +673,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$iriverbitmaptools
     ;;
 
-   10)
+   10|h300)
+    target_id=10
     archos="h300"
     target="-DIRIVER_H300"
     memory=32 # always
@@ -669,7 +695,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$iriverbitmaptools
     ;;
 
-   11)
+   11|h100)
+    target_id=11
     archos="h100"
     target="-DIRIVER_H100"
     memory=16 # always
@@ -690,7 +717,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$iriverbitmaptools
     ;;
 
-   12)
+   12|x5)
+    target_id=12
     archos="x5"
     target="-DIAUDIO_X5"
     memory=16 # always
@@ -715,7 +743,8 @@ toolsdir='\$(ROOTDIR)/tools'
     t_model="x5"
     ;;
 
-   13)
+   13|ipodcolor)
+    target_id=13
     archos="ipodcolor"
     target="-DIPOD_COLOR"
     memory=32 # always
@@ -734,7 +763,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
 
-   14)
+   14|ipodnano)
+    target_id=14
     archos="ipodnano"
     target="-DIPOD_NANO"
     memory=32 # always
@@ -753,7 +783,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
 
-   15)
+   15|ipodvideo)
+    target_id=15
     archos="ipodvideo"
     target="-DIPOD_VIDEO"
     memory=32 # 30GB models have 32MB, 60GB have 64MB
@@ -772,7 +803,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
 
-   16)
+   16|ipod3g)
+    target_id=16
     archos="ipod3g"
     target="-DIPOD_3G"
     memory=32 # always
@@ -791,7 +823,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
     
-   17)
+   17|ipod4g)
+    target_id=17
     archos="ipod4g"
     target="-DIPOD_4G"
     memory=32 # always
@@ -810,7 +843,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
     
-   18)
+   18|ipodmini)
+    target_id=18
     archos="ipodmini"
     target="-DIPOD_MINI"
     memory=32 # always
@@ -829,7 +863,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
     
-   19)
+   19|ifp7xx)
+    target_id=19
     archos="ifp7xx"
     target="-DIRIVER_IFP7XX"
     memory=1
@@ -848,7 +883,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$genericbitmaptools
     ;;
 
-   20)
+   20|gigabeatf)
+    target_id=20
     archos="gigabeatf"
     target="-DGIGABEAT_F"
     memory=32 # always
@@ -869,7 +905,8 @@ toolsdir='\$(ROOTDIR)/tools'
     t_model="meg-fx"
     ;;
 
-   21)
+   21|ipodmini2g)
+    target_id=21
     archos="ipodmini2g"
     target="-DIPOD_MINI2G"
     memory=32 # always
@@ -888,7 +925,8 @@ toolsdir='\$(ROOTDIR)/tools'
     toolset=$ipodbitmaptools
     ;;
 
-   22)
+   22|h10)
+    target_id=22
     archos="h10"
     target="-DIRIVER_H10"
     memory=32 # always
@@ -911,7 +949,8 @@ toolsdir='\$(ROOTDIR)/tools'
     t_model="h10"
     ;;
 
-   23)
+   23|e200)
+    target_id=23
     archos="e200"
     target="-DSANSA_E200"
     memory=32 # supposedly
@@ -934,7 +973,8 @@ toolsdir='\$(ROOTDIR)/tools'
     t_model="sansa-e200"
     ;;
 
-   24)
+   24|h10_5gb)
+    target_id=24
     archos="h10_5gb"
     target="-DIRIVER_H10_5GB"
     memory=32 # always
