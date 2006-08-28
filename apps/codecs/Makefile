@@ -58,6 +58,9 @@ $(OBJDIR)/wavpack.elf : $(OBJDIR)/wavpack.o $(BUILDDIR)/libwavpack.a
 $(OBJDIR)/alac.elf : $(OBJDIR)/alac.o $(BUILDDIR)/libalac.a $(BUILDDIR)/libm4a.a
 $(OBJDIR)/aac.elf : $(OBJDIR)/aac.o $(BUILDDIR)/libfaad.a $(BUILDDIR)/libm4a.a
 $(OBJDIR)/shorten.elf : $(OBJDIR)/shorten.o $(BUILDDIR)/libffmpegFLAC.a
+$(OBJDIR)/mp3_enc.elf: $(OBJDIR)/mp3_enc.o
+$(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o
+$(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a
 
 $(OBJDIR)/%.elf :
 	@echo "LD $(notdir $@)"

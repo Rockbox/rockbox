@@ -20,19 +20,19 @@
 #define RADIO_H
 #define FMPRESET_PATH ROCKBOX_DIR "/fmpresets"
 
-#define FMRADIO_OFF     0
-#define FMRADIO_PLAYING 1
-#define FMRADIO_PLAYING_OUT  2
-#define FMRADIO_PAUSED  3
-#define FMRADIO_PAUSED_OUT  4
+#ifndef FMRADIO_H
+#include "fmradio.h"
+#endif
 
 #ifdef CONFIG_TUNER
 void radio_load_presets(char *filename);
 void radio_init(void);
 bool radio_screen(void);
+void radio_start(void);
+void radio_pause(void);
 void radio_stop(void);
 bool radio_hardware_present(void);
-int  get_radio_status(void);
+bool in_radio_screen(void);
 
 #define MAX_FMPRESET_LEN 27
 

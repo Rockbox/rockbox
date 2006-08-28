@@ -1,4 +1,5 @@
 #if CONFIG_CODEC == SWCODEC
+/* decoders */
 vorbis.c
 mpa.c
 flac.c
@@ -13,4 +14,11 @@ aac.c
 shorten.c
 aiff.c
 sid.c
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+/* encoders */
+mp3_enc.c
+wav_enc.c
+wavpack_enc.c
 #endif
+#endif
+

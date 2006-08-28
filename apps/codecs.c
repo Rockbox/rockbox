@@ -40,6 +40,7 @@
 #include "mpeg.h"
 #include "buffer.h"
 #include "mp3_playback.h"
+#include "playback.h"
 #include "backlight.h"
 #include "ata.h"
 #include "talk.h"
@@ -208,10 +209,27 @@ struct codec_api ci = {
     profile_func_exit,
 #endif
 
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    false,
+    enc_get_inputs,
+    enc_set_parameters,
+    enc_alloc_chunk,
+    enc_free_chunk,
+    enc_wavbuf_near_empty,
+    enc_get_wav_data,
+    &enc_set_header_callback,
+#endif
+
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
 };
+
+void codec_get_full_path(char *path, const char *codec_fn)
+{
+    /* Create full codec path */
+    snprintf(path, MAX_PATH-1, ROCKBOX_DIR CODECS_DIR "/%s", codec_fn);
+}
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
                    struct codec_api *api)
@@ -277,15 +295,18 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
 int codec_load_file(const char *plugin, struct codec_api *api)
 {
     char msgbuf[80];
+    char path[MAX_PATH];
     int fd;
     int rc;
+
+    codec_get_full_path(path, plugin);
     
     /* zero out codec buffer to ensure a properly zeroed bss area */
     memset(codecbuf, 0, CODEC_SIZE);
 
-    fd = open(plugin, O_RDONLY);
+    fd = open(path, O_RDONLY);
     if (fd < 0) {
-        snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", plugin);
+        snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", path);
         logf("Codec load error:%d", fd);
         gui_syncsplash(HZ*2, true, msgbuf);
         return fd;

@@ -24,7 +24,6 @@
 #include "file.h"
 
 /* Audio file types. */
-/* NOTE: When adding new audio types, also add to codec_labels[] in id3.c */
 enum {
     AFMT_UNKNOWN = 0,  /* Unknown file format */
 
@@ -46,8 +45,47 @@ enum {
 
     /* New formats must be added to the end of this list */
 
-    AFMT_NUM_CODECS
+    AFMT_NUM_CODECS,
+
+#if CONFIG_CODEC == SWCODEC
+    /* masks to decompose parts */
+    CODEC_AFMT_MASK    = 0x0fff,
+    CODEC_TYPE_MASK    = 0x7000,
+
+    /* switch for specifying codec type when requesting a filename */
+    CODEC_TYPE_DECODER = (0 << 12), /* default */
+    CODEC_TYPE_ENCODER = (1 << 12)
+#endif
 };
+
+#if CONFIG_CODEC == SWCODEC
+#define AFMT_ENTRY(label, codec_fname, codec_enc_fname, enc_ext) \
+    { label, codec_fname, codec_enc_fname, enc_ext }
+#else
+#define AFMT_ENTRY(label, codec_fname, codec_enc_fname, enc_ext) \
+    { label }
+#endif
+
+/* record describing the audio format */
+struct afmt_entry
+{
+#if CONFIG_CODEC == SWCODEC
+    char label[8];      /* format label */
+    char *codec_fn;     /* filename of decoder codec */
+    char *codec_enc_fn; /* filename of encoder codec */
+    char *ext;          /* default extension for file (enc only for now) */
+#else
+    char label[4];
+#endif
+};
+
+/* database of labels and codecs. add formats per above enum */
+extern const struct afmt_entry audio_formats[AFMT_NUM_CODECS];
+
+#if CONFIG_CODEC == SWCODEC
+/* recording quality to AFMT_* */
+extern const int rec_quality_info_afmt[9];
+#endif
 
 struct mp3entry {
     char path[MAX_PATH];

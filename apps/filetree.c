@@ -445,9 +445,8 @@ int ft_enter(struct tree_context* c)
                 {
                     set_file(buf, global_settings.fmr_file, MAX_FILENAME);
                     radio_load_presets(global_settings.fmr_file);
-                    if(get_radio_status() != FMRADIO_PLAYING &&
-                        get_radio_status() != FMRADIO_PAUSED)
-                            radio_screen();
+                    if(!in_radio_screen())
+                        radio_screen();
                 }
                 /*
                  * Preset outside default folder, we can choose such only

@@ -24,12 +24,14 @@
 #include <stdlib.h>
 
 #include "system.h"
+#include "power.h"
 #include "lcd.h"
 #include "led.h"
 #include "mpeg.h"
 #include "audio.h"
 #if CONFIG_CODEC == SWCODEC
 #include "pcm_record.h"
+#include "playback.h"
 #endif
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -37,7 +39,7 @@
 #ifdef HAVE_TLV320
 #include "tlv320.h"
 #endif
-
+#include "recording.h"
 #include "mp3_playback.h"
 #include "mas.h"
 #include "button.h"
@@ -66,27 +68,13 @@
 #include "splash.h"
 #include "screen_access.h"
 #include "action.h"
+#include "radio.h"
 #ifdef HAVE_RECORDING
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
-
-#define SOURCE_MIC   0
-#define SOURCE_LINE  1
-#ifdef HAVE_SPDIF_IN
-#define SOURCE_SPDIF 2
-#define MAX_SOURCE   SOURCE_SPDIF
-#else
-#define MAX_SOURCE   SOURCE_LINE
-#endif
-
-#if CONFIG_CODEC == SWCODEC
-#define REC_FILE_ENDING ".wav"
-#else
-#define REC_FILE_ENDING ".mp3"
-#endif
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
@@ -101,6 +89,19 @@ const char* const freq_str[6] =
     "24kHz",
     "16kHz"
 };
+
+#if CONFIG_CODEC == SWCODEC
+#define REC_ENCODER_ID(q) \
+    rec_quality_info_afmt[q]
+#define REC_QUALITY_LABEL(q) \
+    (audio_formats[REC_ENCODER_ID(q)].label)
+#define REC_FILE_ENDING(q) \
+    (audio_formats[REC_ENCODER_ID(q)].ext)
+#else
+/* default record file extension for HWCODEC */
+#define REC_QUALITY_LABEL(q)    "MP3"
+#define REC_FILE_ENDING(q)      ".mp3"
+#endif
 
 #ifdef HAVE_AGC
 /* Timing counters:
@@ -161,13 +162,14 @@ static short agc_maxgain;
 
 static void set_gain(void)
 {
-    if(global_settings.rec_source == SOURCE_MIC)
+    if(global_settings.rec_source == AUDIO_SRC_MIC)
     {
         audio_set_recording_gain(global_settings.rec_mic_gain,
                                  0, AUDIO_GAIN_MIC);
     }
     else
     {
+        /* AUDIO_SRC_LINEIN, AUDIO_SRC_SPDIF, AUDIO_SRC_FMRADIO */
         audio_set_recording_gain(global_settings.rec_left_gain,
                                  global_settings.rec_right_gain,
                                  AUDIO_GAIN_LINEIN);
@@ -217,12 +219,16 @@ bool agc_gain_is_max(bool left, bool right)
     if (agc_preset == 0)
         return false;
 
-    if (global_settings.rec_source == SOURCE_LINE)
+    switch (global_settings.rec_source)
     {
+    case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+    case AUDIO_SRC_FMRADIO:
+#endif
         gain_current_l = global_settings.rec_left_gain;
         gain_current_r = global_settings.rec_right_gain;
-    } else
-    {
+        break;
+    default:
         gain_current_l = global_settings.rec_mic_gain;
         gain_current_r = global_settings.rec_mic_gain;
     }
@@ -235,13 +241,16 @@ void change_recording_gain(bool increment, bool left, bool right)
 {
     int factor = (increment ? 1 : -1);
 
-    if (global_settings.rec_source == SOURCE_LINE)
+    switch (global_settings.rec_source)
     {
+    case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+    case AUDIO_SRC_FMRADIO:
+#endif
         if(left) global_settings.rec_left_gain += factor;
         if (right) global_settings.rec_right_gain += factor;
-    }
-    else
-    {
+        break;
+    default:
          global_settings.rec_mic_gain += factor;
     }
 }
@@ -443,12 +452,15 @@ void adjust_cursor(void)
 #ifdef HAVE_AGC
     switch(global_settings.rec_source)
     {
-    case SOURCE_MIC:
+    case AUDIO_SRC_MIC:
         if(cursor == 2)
             cursor = 4;
         else if(cursor == 3)
             cursor = 1;
-    case SOURCE_LINE:
+    case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+    case AUDIO_SRC_FMRADIO:
+#endif
         max_cursor = 5;
         break;
     default:
@@ -458,10 +470,13 @@ void adjust_cursor(void)
 #else
     switch(global_settings.rec_source)
     {
-    case SOURCE_MIC:
+    case AUDIO_SRC_MIC:
         max_cursor = 1;
         break;
-    case SOURCE_LINE:
+    case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+    case AUDIO_SRC_FMRADIO:
+#endif
         max_cursor = 3;
         break;
     default:
@@ -481,10 +496,13 @@ char *rec_create_filename(char *buffer)
     else
         strncpy(buffer, rec_base_directory, MAX_PATH);
 
+
 #ifdef CONFIG_RTC 
-    create_datetime_filename(buffer, buffer, "R", REC_FILE_ENDING);
+    create_datetime_filename(buffer, buffer, "R",
+        REC_FILE_ENDING(global_settings.rec_quality));
 #else
-    create_numbered_filename(buffer, buffer, "rec_", REC_FILE_ENDING, 4);
+    create_numbered_filename(buffer, buffer, "rec_",
+        REC_FILE_ENDING(global_settings.rec_quality), 4);
 #endif
     return buffer;
 }
@@ -515,7 +533,189 @@ int rec_create_directory(void)
     return 0;
 }
 
+#if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
+/**
+ * Selects an audio source for recording or playback
+ * powers/unpowers related devices.
+ * Here because it calls app code and used only for HAVE_RECORDING atm.
+ * Would like it in pcm_record.c.
+ */
+#if defined(HAVE_UDA1380)
+#define ac_disable_recording uda1380_disable_recording
+#define ac_enable_recording  uda1380_enable_recording
+#define ac_set_monitor       uda1380_set_monitor
+#elif defined(HAVE_TLV320)
+#define ac_disable_recording tlv320_disable_recording
+#define ac_enable_recording  tlv320_enable_recording
+#define ac_set_monitor       tlv320_set_monitor
+#endif
+
+void rec_set_source(int source, int flags)
+{
+    /* Prevent pops from unneeded switching */
+    static int last_source = AUDIO_SRC_PLAYBACK;
+#ifdef HAVE_TLV320
+    static bool last_recording = false;
+#endif
+
+    bool recording = flags & SRCF_RECORDING;
+    /* Default to peakmeter record. */
+    bool pm_playback = false;
+    bool pm_enabled = true;
+
+    /** Do power up/down of associated device(s) **/
+
+#ifdef HAVE_SPDIF_IN
+    if ((source == AUDIO_SRC_SPDIF) != (source == last_source))
+        cpu_boost(source == AUDIO_SRC_SPDIF);
+
+#ifdef HAVE_SPDIF_POWER
+    /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
+       both optical in and out is controlled by the same power source, which is
+       the case on H1x0. */
+    spdif_power_enable((source == AUDIO_SRC_SPDIF) ||
+                       global_settings.spdif_enable);
+#endif
+#endif
+
+#ifdef CONFIG_TUNER
+    /* Switch radio off or on per source and flags. */
+    if (source != AUDIO_SRC_FMRADIO)
+        radio_stop();
+    else if (flags & SRCF_FMRADIO_PAUSED)
+        radio_pause();
+    else
+        radio_start();
+#endif
+
+    switch (source)
+    {
+        default:                        /* playback - no recording */
+            pm_playback = true;
+            if (source == last_source)
+                break;
+            ac_disable_recording();
+            ac_set_monitor(false);
+            pcm_rec_mux(0);             /* line in */
+        break;
+
+        case AUDIO_SRC_MIC:             /* recording only */
+            if (source == last_source)
+                break;
+            ac_enable_recording(true);  /* source mic */
+            pcm_rec_mux(0);             /* line in */
+        break;
+
+        case AUDIO_SRC_LINEIN:          /* recording only */
+            if (source == last_source)
+                break;
+            pcm_rec_mux(0);             /* line in */
+            ac_enable_recording(false); /* source line */
+        break;
+
+#ifdef HAVE_SPDIF_IN
+        case AUDIO_SRC_SPDIF:           /* recording only */
+            if (recording)
+            {
+                /* This was originally done in audio_set_recording_options only */
+#ifdef HAVE_SPDIF_POWER
+                EBU1CONFIG = global_settings.spdif_enable ? (1 << 2) : 0;
+                /* Input source is EBUin1, Feed-through monitoring if desired */
+#else
+                EBU1CONFIG = (1 << 2);
+                /* Input source is EBUin1, Feed-through monitoring */
+#endif
+            }
+
+            if (source != last_source)
+                uda1380_disable_recording();
+        break;
+#endif /* HAVE_SPDIF_IN */
+
+#ifdef HAVE_FMRADIO_IN
+        case AUDIO_SRC_FMRADIO:
+            if (!recording)
+            {
+                audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
+                        sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
+                pm_playback = true;
+                pm_enabled = false;
+            }
+
+            pcm_rec_mux(1);                     /* fm radio */
+
+#ifdef HAVE_UDA1380
+            if (source == last_source)
+                break;
+            /* I2S recording and playback */
+            uda1380_enable_recording(false);    /* source line */
+            uda1380_set_monitor(true);
+#endif
+#ifdef HAVE_TLV320
+            /* I2S recording and analog playback */
+            if (source == last_source && recording == last_recording)
+                break;
+
+            last_recording = recording;
+
+            if (recording)
+                tlv320_enable_recording(false); /* source line */
+            else
+            {
+                tlv320_disable_recording();
+                tlv320_set_monitor(true);       /* analog bypass */
+            }
+#endif
+        break;
+/* #elif defined(CONFIG_TUNER)  */
+/* Have radio but cannot record it */
+/*      case AUDIO_SRC_FMRADIO: */
+/*          break;              */
+#endif /* HAVE_FMRADIO_IN */
+    } /* end switch */
+
+    peak_meter_playback(pm_playback);
+    peak_meter_enabled = pm_enabled;
+
+    last_source = source;
+} /* rec_set_source */
+#endif /* CONFIG_CODEC == SWCODEC && !defined(SIMULATOR) */
+
+/* steal the mp3 buffer then actually set options */
+void rec_set_recording_options(int frequency, int quality,
+                               int source, int source_flags,
+                               int channel_mode, bool editable,
+                               int prerecord_time)
+{
+#if CONFIG_CODEC != SWCODEC
+    if (global_settings.rec_prerecord_time)
+#endif
+        talk_buffer_steal(); /* will use the mp3 buffer */
+
+#if CONFIG_CODEC == SWCODEC
+    rec_set_source(source, source_flags | SRCF_RECORDING);
+#else
+    (void)source_flags;
+#endif
+
+    audio_set_recording_options(frequency, quality, source,
+        channel_mode, editable, prerecord_time);
+}
+
 static char path_buffer[MAX_PATH];
+
+/* steals mp3 buffer, creates unique filename and starts recording */
+void rec_record(void)
+{
+    talk_buffer_steal(); /* we use the mp3 buffer */
+    audio_record(rec_create_filename(path_buffer));
+}
+
+/* creates unique filename and starts recording */
+void rec_new_file(void)
+{
+    audio_new_file(rec_create_filename(path_buffer));
+}
 
 /* used in trigger_listerner and recording_screen */
 static unsigned int last_seconds = 0;
@@ -533,16 +733,16 @@ static void trigger_listener(int trigger_status)
             if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
             {
                 talk_buffer_steal(); /* we use the mp3 buffer */
-                audio_record(rec_create_filename(path_buffer));
-
-                /* give control to mpeg thread so that it can start recording*/
+                rec_record();
+                /* give control to mpeg thread so that it can start
+                   recording */
                 yield(); yield(); yield();
             }
 
             /* if we're already recording this is a retrigger */
             else
             {
-                audio_new_file(rec_create_filename(path_buffer));
+                rec_new_file();
                 /* tell recording_screen to reset the time */
                 last_seconds = 0;
             }
@@ -563,10 +763,9 @@ static void trigger_listener(int trigger_status)
     }
 }
 
-bool recording_screen(void)
+bool recording_screen(bool no_source)
 {
     long button;
-    long lastbutton = BUTTON_NONE;
     bool done = false;
     char buf[32];
     char buf2[32];
@@ -575,11 +774,19 @@ bool recording_screen(void)
     bool have_recorded = false;
     unsigned int seconds;
     int hours, minutes;
-    char path_buffer[MAX_PATH];
     char filename[13];
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
     int audio_stat;
+#ifdef HAVE_FMRADIO_IN
+    /* Radio is left on if:
+     *   1) Is was on at the start and the initial source is FM Radio
+     *   2) 1) and the source was never changed to something else
+     */
+    int radio_status = (global_settings.rec_source != AUDIO_SRC_FMRADIO) ?
+                            FMRADIO_OFF : get_radio_status();
+#endif
+    int talk_menu = global_settings.talk_menu;
 #if CONFIG_LED == LED_REAL
     bool led_state = false;
     int led_countdown = 2;
@@ -608,6 +815,18 @@ bool recording_screen(void)
     ata_set_led_enabled(false);
 #endif
 
+#if CONFIG_CODEC == SWCODEC
+    audio_stop();
+    voice_stop();
+    /* recording_menu gets messed up: so reset talk_menu */
+    talk_menu = global_settings.talk_menu;
+    global_settings.talk_menu = 0;
+#else
+    /* Yes, we use the D/A for monitoring */
+    peak_meter_enabled = true;
+    peak_meter_playback(true);
+#endif
+
 #ifndef SIMULATOR
     audio_init_recording(talk_get_bufsize());
 #else
@@ -616,44 +835,19 @@ bool recording_screen(void)
 
     sound_set_volume(global_settings.volume);
 
-#if CONFIG_CODEC == SWCODEC
-    audio_stop();
-    /* Set peak meter to recording mode */
-    peak_meter_playback(false);
-
-#if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-    if (global_settings.rec_source == SOURCE_SPDIF)
-        cpu_boost(true);
-#endif
-
-#else
-    /* Yes, we use the D/A for monitoring */
-    peak_meter_playback(true);
-#endif
-    peak_meter_enabled = true;
 #ifdef HAVE_AGC
     peak_meter_get_peakhold(&peak_l, &peak_r);
 #endif
 
-#if CONFIG_CODEC != SWCODEC
-    if (global_settings.rec_prerecord_time)
-#endif
-        talk_buffer_steal(); /* will use the mp3 buffer */
-
-#if defined(HAVE_SPDIF_POWER) && !defined(SIMULATOR)
-    /* Tell recording whether we want S/PDIF power enabled at all times */
-    audio_set_spdif_power_setting(global_settings.spdif_enable);
-#endif
-
-    audio_set_recording_options(global_settings.rec_frequency,
-                               global_settings.rec_quality,
-                               global_settings.rec_source,
-                               global_settings.rec_channels,
-                               global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+    rec_set_recording_options(global_settings.rec_frequency,
+                              global_settings.rec_quality,
+                              global_settings.rec_source,
+                              0,
+                              global_settings.rec_channels,
+                              global_settings.rec_editable,
+                              global_settings.rec_prerecord_time);
 
     set_gain();
-
     settings_apply_trigger();
 
 #ifdef HAVE_AGC
@@ -663,7 +857,7 @@ bool recording_screen(void)
     agc_preset_str[3] = str(LANG_AGC_DJSET);
     agc_preset_str[4] = str(LANG_AGC_MEDIUM);
     agc_preset_str[5] = str(LANG_AGC_VOICE);
-    if (global_settings.rec_source == SOURCE_MIC) {
+    if (global_settings.rec_source == AUDIO_SRC_MIC) {
         agc_preset = global_settings.rec_agc_preset_mic;
         agc_maxgain = global_settings.rec_agc_maxgain_mic;
     }
@@ -697,11 +891,7 @@ bool recording_screen(void)
 
     while(!done)
     {
-#if CONFIG_CODEC == SWCODEC        
-        audio_stat = pcm_rec_status();
-#else
         audio_stat = audio_status();
-#endif
         
 #if CONFIG_LED == LED_REAL
 
@@ -794,8 +984,8 @@ bool recording_screen(void)
                 }
                 else
                 {
-                    peak_meter_playback(true);
 #if CONFIG_CODEC != SWCODEC
+                    peak_meter_playback(true);
                     peak_meter_enabled = false;
 #endif                    
                     done = true;
@@ -815,14 +1005,13 @@ bool recording_screen(void)
                         /* manual recording */
                         have_recorded = true;
                         talk_buffer_steal(); /* we use the mp3 buffer */
-                        audio_record(rec_create_filename(path_buffer));
+                        rec_record();
                         last_seconds = 0;
-                        if (global_settings.talk_menu)
+                        if (talk_menu)
                         {   /* no voice possible here, but a beep */
                             audio_beep(HZ/2); /* longer beep on start */
                         }
                     }
-
                     /* this is triggered recording */
                     else
                     {
@@ -838,7 +1027,7 @@ bool recording_screen(void)
                     /*if new file button pressed, start new file */
                     if (button == ACTION_REC_NEWFILE)
                     {
-                        audio_new_file(rec_create_filename(path_buffer));
+                        rec_new_file();
                         last_seconds = 0;
                     }
                     else
@@ -847,7 +1036,7 @@ bool recording_screen(void)
                         if(audio_stat & AUDIO_STATUS_PAUSE)
                         {
                             audio_resume_recording();
-                            if (global_settings.talk_menu)
+                            if (talk_menu)
                             {   /* no voice possible here, but a beep */
                                 audio_beep(HZ/4); /* short beep on resume */
                             }
@@ -883,7 +1072,7 @@ bool recording_screen(void)
                         sound_set_volume(global_settings.volume);
                         break;
                     case 1:
-                        if(global_settings.rec_source == SOURCE_MIC)
+                        if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             if(global_settings.rec_mic_gain <
                                sound_max(SOUND_MIC_GAIN))
@@ -913,7 +1102,7 @@ bool recording_screen(void)
                     case 4:
                         agc_preset = MIN(agc_preset + 1, AGC_MODE_SIZE);
                         agc_enable = (agc_preset != 0);
-                        if (global_settings.rec_source == SOURCE_MIC) {
+                        if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             global_settings.rec_agc_preset_mic = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_mic;
                         } else {
@@ -922,7 +1111,7 @@ bool recording_screen(void)
                         }
                         break;
                     case 5:
-                        if (global_settings.rec_source == SOURCE_MIC)
+                        if (global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             agc_maxgain = MIN(agc_maxgain + 1,
                                               sound_max(SOUND_MIC_GAIN));
@@ -951,7 +1140,7 @@ bool recording_screen(void)
                         sound_set_volume(global_settings.volume);
                         break;
                     case 1:
-                        if(global_settings.rec_source == SOURCE_MIC)
+                        if(global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             if(global_settings.rec_mic_gain >
                                sound_min(SOUND_MIC_GAIN))
@@ -981,7 +1170,7 @@ bool recording_screen(void)
                     case 4:
                         agc_preset = MAX(agc_preset - 1, 0);
                         agc_enable = (agc_preset != 0);
-                        if (global_settings.rec_source == SOURCE_MIC) {
+                        if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             global_settings.rec_agc_preset_mic = agc_preset;
                             agc_maxgain = global_settings.rec_agc_maxgain_mic;
                         } else {
@@ -990,7 +1179,7 @@ bool recording_screen(void)
                         }
                         break;
                     case 5:
-                        if (global_settings.rec_source == SOURCE_MIC)
+                        if (global_settings.rec_source == AUDIO_SRC_MIC)
                         {
                             agc_maxgain = MAX(agc_maxgain - 1,
                                               sound_min(SOUND_MIC_GAIN));
@@ -1012,49 +1201,73 @@ bool recording_screen(void)
             case ACTION_STD_MENU:
                 if(audio_stat != AUDIO_STATUS_RECORD)
                 {
+#ifdef HAVE_FMRADIO_IN
+                    const int prev_rec_source = global_settings.rec_source;
+#endif
+
 #if CONFIG_LED == LED_REAL
                     /* led is restored at begin of loop / end of function */
                     led(false);
 #endif
-                    if (recording_menu(false))
+                    if (recording_menu(no_source))
                     {
-                        return SYS_USB_CONNECTED;
-                    }
-                    settings_save();
-
-#if CONFIG_CODEC != SWCODEC
-                    if (global_settings.rec_prerecord_time)
+                        done = true;
+                        been_in_usb_mode = true;
+#ifdef HAVE_FMRADIO_IN
+                        radio_status = FMRADIO_OFF;
 #endif
-                        talk_buffer_steal(); /* will use the mp3 buffer */
+                    }
+                    else
+                    {
+                        settings_save();
 
-                    audio_set_recording_options(global_settings.rec_frequency,
-                                               global_settings.rec_quality,
-                                               global_settings.rec_source,
-                                               global_settings.rec_channels,
-                                               global_settings.rec_editable,
-                                               global_settings.rec_prerecord_time);
+#ifdef HAVE_FMRADIO_IN
+                        /* If input changes away from FM Radio, radio will
+                           remain off when recording screen closes. */
+                        if (global_settings.rec_source != prev_rec_source
+                            && prev_rec_source == AUDIO_SRC_FMRADIO)
+                            radio_status = FMRADIO_OFF;
+#endif
+
+#if CONFIG_CODEC == SWCODEC
+                        /* reinit after submenu exit */
+                        audio_close_recording();
+                        audio_init_recording(talk_get_bufsize());
+#endif
+                        rec_set_recording_options(
+                            global_settings.rec_frequency,
+                            global_settings.rec_quality,
+                            global_settings.rec_source,
+                            0,
+                            global_settings.rec_channels,
+                            global_settings.rec_editable,
+                            global_settings.rec_prerecord_time);
+
 #ifdef HAVE_AGC
-                    if (global_settings.rec_source == SOURCE_MIC) {
-                        agc_preset = global_settings.rec_agc_preset_mic;
-                        agc_maxgain = global_settings.rec_agc_maxgain_mic;
-                    }
-                    else {
-                        agc_preset = global_settings.rec_agc_preset_line;
-                        agc_maxgain = global_settings.rec_agc_maxgain_line;
-                    }
+                        if (global_settings.rec_source == AUDIO_SRC_MIC) {
+                            agc_preset = global_settings.rec_agc_preset_mic;
+                            agc_maxgain = global_settings.rec_agc_maxgain_mic;
+                        }
+                        else {
+                            agc_preset = global_settings.rec_agc_preset_line;
+                            agc_maxgain = global_settings.rec_agc_maxgain_line;
+                        }
 #endif
 
-                    adjust_cursor();
-                    set_gain();
-                    update_countdown = 1; /* Update immediately */
+                        adjust_cursor();
+                        set_gain();
+                        update_countdown = 1; /* Update immediately */
 
-                    FOR_NB_SCREENS(i)
-                    {
-                        screens[i].setfont(FONT_SYSFIXED);
-                        screens[i].setmargins(global_settings.invert_cursor ? 0 : w, 8);
+                        FOR_NB_SCREENS(i)
+                        {
+                            screens[i].setfont(FONT_SYSFIXED);
+                            screens[i].setmargins(
+                                global_settings.invert_cursor ? 0 : w, 8);
+                        }
                     }
                 }
                 break;
+
 #if CONFIG_KEYPAD == RECORDER_PAD
             case ACTION_REC_F2:
                 if(audio_stat != AUDIO_STATUS_RECORD)
@@ -1076,7 +1289,7 @@ bool recording_screen(void)
             case ACTION_REC_F3:
                 if(audio_stat & AUDIO_STATUS_RECORD)
                 {
-                    audio_new_file(rec_create_filename(path_buffer));
+                    rec_new_file();
                     last_seconds = 0;
                 }
                 else
@@ -1097,7 +1310,7 @@ bool recording_screen(void)
                     }
                 }
                 break;
-#endif
+#endif /*  CONFIG_KEYPAD == RECORDER_PAD */
 
             case SYS_USB_CONNECTED:
                 /* Only accept USB connection when not recording */
@@ -1106,6 +1319,9 @@ bool recording_screen(void)
                     default_event_handler(SYS_USB_CONNECTED);
                     done = true;
                     been_in_usb_mode = true;
+#ifdef HAVE_FMRADIO_IN
+                    radio_status = FMRADIO_OFF;
+#endif
                 }
                 break;
                 
@@ -1113,8 +1329,6 @@ bool recording_screen(void)
                 default_event_handler(button);
                 break;
         }
-        if (button != BUTTON_NONE)
-            lastbutton = button;
 
 #ifdef HAVE_AGC
         peak_read = !peak_read;
@@ -1230,7 +1444,7 @@ bool recording_screen(void)
                 if (!(global_settings.rec_split_type)
                      || (num_recorded_bytes >= MAX_FILE_SIZE))
                 {
-                    audio_new_file(rec_create_filename(path_buffer));
+                    rec_new_file();
                     last_seconds = 0;
                 }
                 else
@@ -1259,8 +1473,9 @@ bool recording_screen(void)
                     screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 2, buf);
             }                
 
-            if(global_settings.rec_source == SOURCE_MIC)
-            { 
+            if(global_settings.rec_source == AUDIO_SRC_MIC)
+            {
+                /* Draw MIC recording gain */
                 snprintf(buf, 32, "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
@@ -1278,8 +1493,13 @@ bool recording_screen(void)
                                             PM_HEIGHT + 3, buf);
                 }
             }
-            else if(global_settings.rec_source == SOURCE_LINE)
+            else if(global_settings.rec_source == AUDIO_SRC_LINEIN
+#ifdef HAVE_FMRADIO_IN
+                    || global_settings.rec_source == AUDIO_SRC_FMRADIO
+#endif
+                    )
             {
+                /* Draw LINE or FMRADIO recording gain */
                 snprintf(buf, 32, "%s:%s",
                          str(LANG_SYSFONT_RECORDING_LEFT),
                          fmt_gain(SOUND_LEFT_GAIN,
@@ -1319,14 +1539,23 @@ bool recording_screen(void)
 
             FOR_NB_SCREENS(i)
             {
-                if (global_settings.rec_source == SOURCE_LINE)
-                    line[i] = 5;
-                else if (global_settings.rec_source == SOURCE_MIC)
-                    line[i] = 4;
-#ifdef HAVE_SPDIF_IN
-                else if (global_settings.rec_source == SOURCE_SPDIF)
-                    line[i] = 3;
+                switch (global_settings.rec_source)
+                {
+                case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+                case AUDIO_SRC_FMRADIO:
 #endif
+                    line[i] = 5;
+                    break;
+                case AUDIO_SRC_MIC:
+                    line[i] = 4;
+                    break;
+#ifdef HAVE_SPDIF_IN
+                case AUDIO_SRC_SPDIF:
+                    line[i] = 3;
+                    break;
+#endif
+                } /* end switch */
 #ifdef HAVE_AGC
                 if (screens[i].height < h * (2 + filename_offset[i] + PM_HEIGHT + line[i]))
                 {
@@ -1358,7 +1587,7 @@ bool recording_screen(void)
                 snprintf(buf, 32, "%s: %s",
                          str(LANG_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset]);
-            else if (global_settings.rec_source == SOURCE_MIC)
+            else if (global_settings.rec_source == AUDIO_SRC_MIC)
                 snprintf(buf, 32, "%s: %s%s",
                          str(LANG_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset],
@@ -1382,8 +1611,12 @@ bool recording_screen(void)
                     screens[i].puts_style_offset(0, filename_offset[i] + 
                                         PM_HEIGHT + line[i], buf, STYLE_INVERT,0);
             }
-            else if ((global_settings.rec_source == SOURCE_MIC) 
-                    || (global_settings.rec_source == SOURCE_LINE))    
+            else if (global_settings.rec_source == AUDIO_SRC_MIC
+                    || global_settings.rec_source == AUDIO_SRC_LINEIN
+#ifdef HAVE_FMRADIO_IN
+                    || global_settings.rec_source == AUDIO_SRC_FMRADIO
+#endif
+                    )    
             {
                 for(i = 0; i < screen_update; i++) {
                     if (display_agc[i]) {
@@ -1393,7 +1626,7 @@ bool recording_screen(void)
                 }
             }
             
-            if (global_settings.rec_source == SOURCE_MIC)
+            if (global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 if(agc_maxgain < (global_settings.rec_mic_gain))
                     change_recording_gain(false, true, true);
@@ -1418,7 +1651,7 @@ bool recording_screen(void)
                                                     filename_offset[i] +
                                                     PM_HEIGHT + 3, true);
 
-                        if(global_settings.rec_source != SOURCE_MIC)
+                        if(global_settings.rec_source != AUDIO_SRC_MIC)
                         {
                             for(i = 0; i < screen_update; i++)
                                 screen_put_cursorxy(&screens[i], 0, 
@@ -1456,14 +1689,14 @@ bool recording_screen(void)
             }
 /* Can't measure S/PDIF sample rate on Archos yet */
 #if (CONFIG_CODEC != MAS3587F) && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-            if (global_settings.rec_source == SOURCE_SPDIF)
+            if (global_settings.rec_source == AUDIO_SRC_SPDIF)
                 snprintf(spdif_sfreq, 8, "%dHz", audio_get_spdif_sample_rate());
 #else
             (void)spdif_sfreq;
 #endif
             snprintf(buf, 32, "%s %s",
 #if (CONFIG_CODEC != MAS3587F) && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-                     global_settings.rec_source == SOURCE_SPDIF ?
+                     global_settings.rec_source == AUDIO_SRC_SPDIF ?
                      spdif_sfreq :
 #endif
                      freq_str[global_settings.rec_frequency],
@@ -1473,8 +1706,8 @@ bool recording_screen(void)
 
             for(i = 0; i < screen_update; i++) {
 #ifdef HAVE_AGC
-                if ((global_settings.rec_source == SOURCE_MIC)
-                         || (global_settings.rec_source == SOURCE_LINE))
+                if ((global_settings.rec_source == AUDIO_SRC_MIC)
+                         || (global_settings.rec_source == AUDIO_SRC_LINEIN))
                     screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
                 else
 #endif
@@ -1484,6 +1717,14 @@ bool recording_screen(void)
 #ifdef HAVE_AGC
             hist_time++;
 #endif
+
+#if CONFIG_CODEC == SWCODEC
+            snprintf(buf, 32, "%s",
+                REC_QUALITY_LABEL(global_settings.rec_quality));
+            for(i = 0; i < screen_update; i++)
+                screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 6, buf);
+#endif
+
             for(i = 0; i < screen_update; i++)
             {
                 gui_statusbar_draw(&(statusbars.statusbars[i]), true);
@@ -1506,7 +1747,7 @@ bool recording_screen(void)
         {
             done = true;
         }
-    }
+    } /* end while(!done) */
 
     
 #if CONFIG_CODEC == SWCODEC        
@@ -1531,18 +1772,26 @@ bool recording_screen(void)
         }
     }
     
-#if CONFIG_CODEC == SWCODEC        
+#if CONFIG_CODEC == SWCODEC
     audio_stop_recording(); 
     audio_close_recording();
 
-#if defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-    if (global_settings.rec_source == SOURCE_SPDIF)
-        cpu_boost(false);
+#ifdef HAVE_FMRADIO_IN
+    if (radio_status != FMRADIO_OFF)
+        /* Restore radio playback - radio_status should be unchanged if started
+           through fm radio screen (barring usb connect) */
+        rec_set_source(AUDIO_SRC_FMRADIO, (radio_status & FMRADIO_PAUSED) ?
+                            SRCF_FMRADIO_PAUSED : SRCF_FMRADIO_PLAYING);
+    else
 #endif
+        /* Go back to playback mode */
+        rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 
-#else
+    /* restore talk_menu setting */
+    global_settings.talk_menu = talk_menu;
+#else /* !SWCODEC */
     audio_init_playback();
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
     /* make sure the trigger is really turned off */
     peak_meter_trigger(false);
@@ -1560,7 +1809,7 @@ bool recording_screen(void)
     ata_set_led_enabled(true);
 #endif
     return been_in_usb_mode;
-}
+} /* recording_screen */
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_rec_screen(void)
@@ -1680,15 +1929,13 @@ bool f2_rec_screen(void)
         }
     }
 
-    if (global_settings.rec_prerecord_time)
-        talk_buffer_steal(); /* will use the mp3 buffer */
-
-    audio_set_recording_options(global_settings.rec_frequency,
-                               global_settings.rec_quality,
-                               global_settings.rec_source,
-                               global_settings.rec_channels,
-                               global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
+    rec_set_recording_options(global_settings.rec_frequency,
+                              global_settings.rec_quality,
+                              global_settings.rec_source,
+                              0,
+                              global_settings.rec_channels,
+                              global_settings.rec_editable,
+                              global_settings.rec_prerecord_time);
 
     set_gain();
     
@@ -1760,7 +2007,7 @@ bool f3_rec_screen(void)
             case BUTTON_LEFT:
             case BUTTON_F3 | BUTTON_LEFT:
                 global_settings.rec_source++;
-                if(global_settings.rec_source > MAX_SOURCE)
+                if(global_settings.rec_source > AUDIO_SRC_MAX)
                     global_settings.rec_source = 0;
                 used = true;
                 break;
@@ -1782,16 +2029,13 @@ bool f3_rec_screen(void)
         }
     }
 
-    if (global_settings.rec_prerecord_time)
-        talk_buffer_steal(); /* will use the mp3 buffer */
-
-    audio_set_recording_options(global_settings.rec_frequency,
-                               global_settings.rec_quality,
-                               global_settings.rec_source,
-                               global_settings.rec_channels,
-                               global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
-                                                              
+    rec_set_recording_options(global_settings.rec_frequency,
+                              global_settings.rec_quality,
+                              global_settings.rec_source,
+                              0,
+                              global_settings.rec_channels,
+                              global_settings.rec_editable,
+                              global_settings.rec_prerecord_time);
 
     set_gain();
 
@@ -1801,7 +2045,7 @@ bool f3_rec_screen(void)
 
     return false;
 }
-#endif /* #ifdef RECORDER_PAD */
+#endif /* CONFIG_KEYPAD == RECORDER_PAD */
 
 #if CONFIG_CODEC == SWCODEC
 void audio_beep(int duration)
@@ -1830,6 +2074,14 @@ unsigned long audio_num_recorded_bytes(void)
 {
     return 5 * 1024 * 1024;
 }
+
+#if CONFIG_CODEC == SWCODEC
+void rec_set_source(int source, int flags)
+{
+    source = source;
+    flags = flags;
+}
+#endif
 
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,

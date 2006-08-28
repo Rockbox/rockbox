@@ -74,29 +74,18 @@
 #include "misc.h"
 #include "sound.h"
 #include "metadata.h"
-#include "talk.h"
-#ifdef CONFIG_TUNER
-#include "radio.h"
-#endif
 #include "splash.h"
+#include "talk.h"
+
+#ifdef HAVE_RECORDING
+#include "recording.h"
+#endif
 
 static volatile bool audio_codec_loaded;
 static volatile bool voice_codec_loaded;
 static volatile bool playing;
 static volatile bool paused;
 
-#define CODEC_VORBIS   "/.rockbox/codecs/vorbis.codec"
-#define CODEC_MPA_L3   "/.rockbox/codecs/mpa.codec"
-#define CODEC_FLAC     "/.rockbox/codecs/flac.codec"
-#define CODEC_WAV      "/.rockbox/codecs/wav.codec"
-#define CODEC_A52      "/.rockbox/codecs/a52.codec"
-#define CODEC_MPC      "/.rockbox/codecs/mpc.codec"
-#define CODEC_WAVPACK  "/.rockbox/codecs/wavpack.codec"
-#define CODEC_ALAC     "/.rockbox/codecs/alac.codec"
-#define CODEC_AAC      "/.rockbox/codecs/aac.codec"
-#define CODEC_SHN      "/.rockbox/codecs/shorten.codec"
-#define CODEC_AIFF     "/.rockbox/codecs/aiff.codec"
-#define CODEC_SID      "/.rockbox/codecs/sid.codec"
 
 /* default point to start buffer refill */
 #define AUDIO_DEFAULT_WATERMARK      (1024*512)
@@ -133,6 +122,11 @@ enum {
 
     Q_CODEC_LOAD,
     Q_CODEC_LOAD_DISK,
+
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    Q_ENCODER_LOAD_DISK,
+    Q_ENCODER_RECORD,
+#endif
 };
 
 /* As defined in plugins/lib/xxx2wav.h */
@@ -382,7 +376,7 @@ static bool voice_pcmbuf_insert_split_callback(
     }
 
     return true;
-}
+} /* voice_pcmbuf_insert_split_callback */
 
 static bool codec_pcmbuf_insert_split_callback(
         const void *ch1, const void *ch2, size_t length)
@@ -444,7 +438,7 @@ static bool codec_pcmbuf_insert_split_callback(
     }
 
     return true;
-}
+} /* codec_pcmbuf_insert_split_callback */
 
 static bool voice_pcmbuf_insert_callback(const char *buf, size_t length)
 {
@@ -649,7 +643,7 @@ static size_t codec_filebuf_callback(void *ptr, size_t size)
 
     /* Return the actual amount of data copied to the buffer */
     return copy_n;
-}
+} /* codec_filebuf_callback */
 
 static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 {
@@ -664,7 +658,9 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
     while (1)
     {
         if (voice_is_playing)
+        {
             queue_wait_w_tmo(&voice_codec_queue, &ev, 0);
+        }
         else if (playing)
         {
             queue_wait_w_tmo(&voice_codec_queue, &ev, 0);
@@ -679,7 +675,11 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 if (playing)
                     swap_codec();
                 break;
-
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+            case Q_ENCODER_RECORD:
+                swap_codec();
+                break;
+#endif
             case Q_VOICE_STOP:
                 if (voice_is_playing)
                 {
@@ -743,7 +743,7 @@ voice_play_clip:
         return NULL;
 
     return voicebuf;
-}
+} /* voice_request_buffer_callback */
 
 static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
 {
@@ -794,7 +794,7 @@ static void* codec_request_buffer_callback(size_t *realsize, size_t reqsize)
     *realsize = copy_n;
     
     return (char *)&filebuf[buf_ridx];
-}
+} /* codec_request_buffer_callback */
 
 static int get_codec_base_type(int type)
 {
@@ -1531,52 +1531,24 @@ static void codec_discard_codec_callback(void)
 #endif
 }
 
-static const char *get_codec_path(int codectype) 
+static const char * get_codec_filename(int enc_spec)
 {
-    switch (codectype) {
-        case AFMT_OGG_VORBIS:
-            logf("Codec: Vorbis");
-            return CODEC_VORBIS;
-        case AFMT_MPA_L1:
-        case AFMT_MPA_L2:
-        case AFMT_MPA_L3:
-            logf("Codec: MPA L1/L2/L3");
-            return CODEC_MPA_L3;
-        case AFMT_PCM_WAV:
-            logf("Codec: PCM WAV");
-            return CODEC_WAV;
-        case AFMT_FLAC:
-            logf("Codec: FLAC");
-            return CODEC_FLAC;
-        case AFMT_A52:
-            logf("Codec: A52");
-            return CODEC_A52;
-        case AFMT_MPC:
-            logf("Codec: Musepack");
-            return CODEC_MPC;
-        case AFMT_WAVPACK:
-            logf("Codec: WAVPACK");
-            return CODEC_WAVPACK;
-        case AFMT_ALAC:
-            logf("Codec: ALAC");
-            return CODEC_ALAC;
-        case AFMT_AAC:
-            logf("Codec: AAC");
-            return CODEC_AAC;
-        case AFMT_SHN:
-            logf("Codec: SHN");
-            return CODEC_SHN;
-        case AFMT_AIFF:
-            logf("Codec: PCM AIFF");
-            return CODEC_AIFF;
-        case AFMT_SID:
-            logf("Codec: SID");
-            return CODEC_SID;
-        default:
-            logf("Codec: Unsupported");
-            return NULL;
-    }
-}
+    const char *fname;
+    int type = enc_spec & CODEC_TYPE_MASK;
+    int afmt = enc_spec & CODEC_AFMT_MASK;
+
+    if ((unsigned)afmt >= AFMT_NUM_CODECS)
+        type = AFMT_UNKNOWN | (type & CODEC_TYPE_MASK);
+
+    fname = (type == CODEC_TYPE_DECODER) ?
+        audio_formats[afmt].codec_fn : audio_formats[afmt].codec_enc_fn;
+
+    logf("%s: %d - %s",
+        (type == CODEC_TYPE_ENCODER) ? "Encoder" : "Decoder",
+        afmt, fname ? fname : "<unknown>");
+
+    return fname;
+} /* get_codec_filename */
 
 static bool loadcodec(bool start_play)
 {
@@ -1585,9 +1557,10 @@ static bool loadcodec(bool start_play)
     int rc;
     size_t copy_n;
     int prev_track;
+    char codec_path[MAX_PATH]; /* Full path to codec */
 
-    const char *codec_path = get_codec_path(tracks[track_widx].id3.codectype);
-    if (codec_path == NULL)
+    const char * codec_fn = get_codec_filename(tracks[track_widx].id3.codectype);
+    if (codec_fn == NULL)
         return false;
 
     tracks[track_widx].has_codec = false;
@@ -1603,7 +1576,7 @@ static bool loadcodec(bool start_play)
         ci.taginfo_ready = &cur_ti->taginfo_ready;
         ci.curpos = 0;
         playing = true;
-        queue_post(&codec_queue, Q_CODEC_LOAD_DISK, (void *)codec_path);
+        queue_post(&codec_queue, Q_CODEC_LOAD_DISK, (void *)codec_fn);
         return true;
     }
     else
@@ -1624,6 +1597,8 @@ static bool loadcodec(bool start_play)
             }
         }
     }
+
+    codec_get_full_path(codec_path, codec_fn);
 
     fd = open(codec_path, O_RDONLY);
     if (fd < 0)
@@ -1973,11 +1948,8 @@ static void audio_stop_playback(void)
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
     }
 
-    if (voice_is_playing)
-    {
-        while (voice_is_playing && !queue_empty(&voice_codec_queue))
-            yield();
-    }
+    while (voice_is_playing && !queue_empty(&voice_codec_queue))
+        yield();
     
     filebufused = 0;
     playing = false;
@@ -1998,10 +1970,8 @@ static void audio_stop_playback(void)
 
 static void audio_play_start(size_t offset)
 {
-#ifdef CONFIG_TUNER
-    /* check if radio is playing */
-    if (get_radio_status() != FMRADIO_OFF)
-        radio_stop();
+#if defined(HAVE_RECORDING) || defined(CONFIG_TUNER)
+    rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #endif
 
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */
@@ -2483,6 +2453,20 @@ static void codec_thread(void)
                 mutex_unlock(&mutex_codecthread);
                 break ;
 
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+            case Q_ENCODER_LOAD_DISK:
+                logf("Encoder load disk");
+                audio_codec_loaded = false;
+                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
+                    queue_post(&voice_codec_queue, Q_ENCODER_RECORD, NULL);
+                mutex_lock(&mutex_codecthread);
+                current_codec = CODEC_IDX_AUDIO;
+                ci.stop_codec = false;
+                status = codec_load_file((const char *)ev.data, &ci);
+                mutex_unlock(&mutex_codecthread);
+                break;
+#endif
+
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 queue_clear(&codec_queue);
@@ -2511,8 +2495,6 @@ static void codec_thread(void)
             case Q_CODEC_LOAD:
                 if (playing) 
                 {
-                    const char *codec_path;
-                    
                     if (ci.new_track || status != CODEC_OK) 
                     {
                         if (!ci.new_track) 
@@ -2523,7 +2505,8 @@ static void codec_thread(void)
                         
                         if (!load_next_track())
                         {
-                            queue_post(&codec_queue, Q_AUDIO_STOP, 0);
+                            // queue_post(&codec_queue, Q_AUDIO_STOP, 0);
+                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
                     } 
@@ -2545,12 +2528,12 @@ static void codec_thread(void)
                         queue_post(&codec_queue, Q_CODEC_LOAD, 0);
                     else
                     {
-                        codec_path = get_codec_path(cur_ti->id3.codectype);
-                        queue_post(&codec_queue,
-                                Q_CODEC_LOAD_DISK, (void *)codec_path);
+                        const char *codec_fn = get_codec_filename(cur_ti->id3.codectype);
+                        queue_post(&codec_queue, Q_CODEC_LOAD_DISK,
+                            (void *)codec_fn);
                     }
                 }
-        }
+        } /* end switch */
     }
 }
 
@@ -2596,6 +2579,37 @@ static void reset_buffer(void)
     filebuflen &= ~3;
 }
 
+void audio_load_encoder(int enc_id)
+{
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    const char *enc_fn = get_codec_filename(enc_id | CODEC_TYPE_ENCODER);
+    if (!enc_fn)
+        return;
+
+    audio_remove_encoder();
+
+    queue_post(&codec_queue, Q_ENCODER_LOAD_DISK, (void *)enc_fn);
+
+    while (!ci.enc_codec_loaded)
+        yield();
+#endif
+    return;
+    (void)enc_id;
+} /* audio_load_encoder */
+
+void audio_remove_encoder(void)
+{
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    /* force encoder codec unload (if previously loaded) */
+    if (!ci.enc_codec_loaded)
+        return;
+
+    ci.stop_codec = true;
+    while (ci.enc_codec_loaded)
+        yield();
+#endif
+} /* audio_remove_encoder */
+
 static void voice_codec_thread(void)
 {
     while (1)
@@ -2608,13 +2622,13 @@ static void voice_codec_thread(void)
         voice_remaining = 0;
         voice_getmore = NULL;
 
-        codec_load_file(CODEC_MPA_L3, &ci_voice);
+        codec_load_file(get_codec_filename(AFMT_MPA_L3), &ci_voice);
 
         logf("Voice codec finished");
-        mutex_unlock(&mutex_codecthread);
         voice_codec_loaded = false;
+        mutex_unlock(&mutex_codecthread);
     }
-}
+} /* voice_codec_thread */
 
 void voice_init(void)
 {
@@ -2642,7 +2656,20 @@ void voice_init(void)
     
     while (!voice_codec_loaded)
         yield();
-}
+} /* voice_init */
+
+void voice_stop(void)
+{
+    /* Messages should not be posted to voice codec queue unless it is the
+       current codec or deadlocks happen. This will be addressed globally soon.
+       -- jhMikeS */
+    if (current_codec != CODEC_IDX_VOICE)
+        return;
+
+    mp3_play_stop();
+    while (voice_is_playing && !queue_empty(&voice_codec_queue))
+        yield();
+} /* voice_stop */
 
 struct mp3entry* audio_current_track(void)
 {
@@ -2803,7 +2830,17 @@ int audio_status(void)
     if (paused)
         ret |= AUDIO_STATUS_PAUSE;
 
+#ifdef HAVE_RECORDING
+    /* Do this here for constitency with mpeg.c version */
+    ret |= pcm_rec_status();
+#endif
+
     return ret;
+}
+
+bool audio_query_poweroff(void)
+{
+    return !(playing && paused);
 }
 
 int audio_get_file_pos(void)

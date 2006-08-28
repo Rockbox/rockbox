@@ -50,6 +50,8 @@
 #include "lcd.h"
 #include "lcd-remote.h"
 #include "pcm_playback.h"
+#include "sound.h"
+#include "id3.h"
 #include "pcm_record.h"
 
 extern int boost_counter; /* used for boost check */
@@ -57,43 +59,26 @@ extern int boost_counter; /* used for boost check */
 /***************************************************************************/
 
 static bool is_recording;              /* We are recording */
-static bool is_stopping;               /* Are we going to stop */
 static bool is_paused;                 /* We have paused   */
 static bool is_error;                  /* An error has occured */
 
 static unsigned long num_rec_bytes;    /* Num bytes recorded */
 static unsigned long num_file_bytes;   /* Num bytes written to current file */
 static int error_count;                /* Number of DMA errors */
+static unsigned long num_pcm_samples;  /* Num pcm samples written to current file */
 
-static long record_start_time;                  /* Value of current_tick when recording was started */
-static long pause_start_time;                   /* Value of current_tick when pause was started */
-static volatile int buffered_chunks;            /* number of valid chunks in buffer */
-static unsigned int sample_rate; /* Sample rate at time of recording start */
-static int rec_source;           /* Current recording source */
+static long record_start_time;         /* current_tick when recording was started */
+static long pause_start_time;          /* current_tick when pause was started */
+static unsigned int sample_rate;       /* Sample rate at time of recording start */
+static int rec_source;                 /* Current recording source */
 
 static int wav_file;
 static char recording_filename[MAX_PATH];
 
-static bool init_done, close_done, record_done, stop_done, pause_done, resume_done, new_file_done;
+static volatile bool init_done, close_done, record_done;
+static volatile bool stop_done, pause_done, resume_done, new_file_done;
 
-static short peak_left, peak_right;
-
-/***************************************************************************/
-
-/*
-  Some estimates:
-    Normal recording rate: 44100 HZ * 4     = 176 KB/s
-    Total buffer size:     32 MB / 176 KB/s = 181s before writing to disk
-*/
-
-#define CHUNK_SIZE       8192  /* Multiple of 4 */
-#define WRITE_THRESHOLD  250   /* (2 MB) Write when this many chunks (or less) until buffer full */
-
-#define GET_CHUNK(x)     (short*)(&rec_buffer[CHUNK_SIZE*(x)])
-
-static unsigned int rec_buffer_offset;
-static unsigned char *rec_buffer;  /* Circular recording buffer */
-static int num_chunks;             /* Number of chunks available in rec_buffer */
+static int peak_left, peak_right;
 
 #ifdef IAUDIO_X5
 #define SET_IIS_PLAY(x) IIS1CONFIG = (x);
@@ -103,27 +88,71 @@ static int num_chunks;             /* Number of chunks available in rec_buffer *
 #define SET_IIS_REC(x)  IIS1CONFIG = (x);
 #endif
   
-/* 
- Overrun occures when DMA needs to write a new chunk and write_index == read_index 
- Solution to this is to optimize pcmrec_callback, use cpu_boost or save to disk
- more often.
-*/
+/****************************************************************************
+  use 2 circular buffers of same size:
+  rec_buffer=DMA output buffer:    chunks (8192 Bytes) of raw pcm audio data
+  enc_buffer=encoded audio buffer: storage for encoder output data
 
-static int write_index;                /* Current chunk the DMA is writing to */
-static int read_index;                 /* Oldest chunk that is not written to disk */
-static int read2_index;                /* Latest chunk that has not been converted to little endian */
-static long pre_record_ticks;          /* pre-record time expressed in ticks */
-static int pre_record_chunks;          /* pre-record time expressed in chunks */
+  Flow:
+  1. when entering recording_screen DMA feeds the ringbuffer rec_buffer
+  2. if enough pcm data are available the encoder codec does encoding of pcm
+      chunks (4-8192 Bytes) into ringbuffer enc_buffer in codec_thread
+  3. pcmrec_callback detects enc_buffer 'near full' and writes data to disk
+
+  Functions calls:
+  1.main: codec_load_encoder();      start the encoder
+  2.encoder: enc_get_inputs();       get encoder buffsize, mono/stereo, quality
+  3.encoder: enc_set_parameters();   set the encoder parameters (max.chunksize)
+  4.encoder: enc_get_wav_data();     get n bytes of unprocessed pcm data
+  5.encoder: enc_wavbuf_near_empty();if true: reduce cpu_boost
+  6.encoder: enc_alloc_chunk();      get a ptr to next enc chunk
+  7.encoder: <process enc chunk>     compress and store data to enc chunk
+  8.encoder: enc_free_chunk();       inform main about chunk process finished
+  9.encoder: repeat 4. to 8.
+  A.main: enc_set_header_callback(); create the current format header (file)
+****************************************************************************/
+#define NUM_CHUNKS                   256 /* Power of 2 */
+#define CHUNK_SIZE                  8192 /* Power of 2 */
+#define MAX_FEED_SIZE              20000 /* max pcm size passed to encoder */
+#define CHUNK_MASK                 (NUM_CHUNKS * CHUNK_SIZE - 1)
+#define WRITE_THRESHOLD            (44100 * 5 / enc_samp_per_chunk) /* 5sec */
+#define GET_CHUNK(x)               (long*)(&rec_buffer[x])
+#define GET_ENC_CHUNK(x)           (long*)(&enc_buffer[enc_chunk_size*(x)])
+
+static int            audio_enc_id;    /* current encoder id                 */
+static unsigned char *rec_buffer;      /* Circular recording buffer          */
+static unsigned char *enc_buffer;      /* Circular encoding buffer           */
+static unsigned char *enc_head_buffer; /* encoder header buffer              */
+static int            enc_head_size;   /* used size in header buffer         */
+static int            write_pos;       /* Current chunk pos for DMA writing  */
+static int            read_pos;        /* Current chunk pos for encoding     */
+static long           pre_record_ticks;/* pre-record time expressed in ticks */
+static int            enc_wr_index;    /* Current encoding chunk write index */
+static int            enc_rd_index;    /* Current encoding chunk read index  */
+static int            enc_chunk_size;  /* maximum encoder chunk size         */
+static int            enc_num_chunks;  /* number of chunks in ringbuffer     */
+static int            enc_buffer_size; /* encode buffer size                 */
+static int            enc_channels;    /* 1=mono 2=stereo                    */
+static int            enc_quality;     /* mp3: 64,96,128,160,192,320 kBit    */
+static int            enc_samp_per_chunk;/* pcm samples per encoder chunk    */
+static bool           wav_queue_empty; /* all wav chunks processed?          */
+static unsigned long  avrg_bit_rate;   /* average bit rates from chunks      */
+static unsigned long  curr_bit_rate;   /* cumulated bit rates from chunks    */
+static unsigned long  curr_chunk_cnt;  /* number of processed chunks         */
+ 
+void (*enc_set_header_callback)(void *head_buffer, int head_size,
+                                int num_pcm_samples, bool is_file_header);
 
 /***************************************************************************/
 
 static struct event_queue  pcmrec_queue;
-static long                pcmrec_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
+static long                pcmrec_stack[2*DEFAULT_STACK_SIZE/sizeof(long)];
 static const char          pcmrec_thread_name[] = "pcmrec";
 
 static void pcmrec_thread(void);
 static void pcmrec_dma_start(void);
 static void pcmrec_dma_stop(void);
+static void close_wave(void);
 
 /* Event IDs */
 #define PCMREC_INIT         1     /* Enable recording */
@@ -144,9 +173,15 @@ static void pcmrec_dma_stop(void);
 void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue);
-    create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack), pcmrec_thread_name);
+    create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
+        pcmrec_thread_name);
 }
 
+
+int audio_get_encoder_id(void)
+{
+    return audio_enc_id;
+}
 
 /* Initializes recording:
  * - Set up the UDA1380/TLV320 for recording 
@@ -155,13 +190,14 @@ void pcm_rec_init(void)
  
 void audio_init_recording(unsigned int buffer_offset)
 {
-    rec_buffer_offset = buffer_offset;
+    (void)buffer_offset;
+
     init_done = false;
     queue_post(&pcmrec_queue, PCMREC_INIT, 0);
     
     while(!init_done)
         sleep_thread();
-    wake_up_thread();    
+    wake_up_thread();
 }
 
 void audio_close_recording(void)
@@ -171,7 +207,9 @@ void audio_close_recording(void)
     
     while(!close_done)
         sleep_thread();
-    wake_up_thread();    
+    wake_up_thread();
+
+    audio_remove_encoder();
 }
 
 unsigned long pcm_rec_status(void)
@@ -184,8 +222,15 @@ unsigned long pcm_rec_status(void)
         ret |= AUDIO_STATUS_PAUSE;
     if (is_error)
         ret |= AUDIO_STATUS_ERROR;
+    if (!is_recording && pre_record_ticks && init_done && !close_done)
+        ret |= AUDIO_STATUS_PRERECORD;
 
     return ret;
+}
+
+int pcm_rec_current_bitrate(void)
+{
+    return avrg_bit_rate;
 }
 
 unsigned long audio_recorded_time(void)
@@ -248,6 +293,8 @@ unsigned long audio_get_spdif_sample_rate(void)
 }
 #endif
 
+#if 0
+/* not needed atm */
 #ifdef HAVE_SPDIF_POWER
 static bool spdif_power_setting;
 
@@ -256,21 +303,18 @@ void audio_set_spdif_power_setting(bool on)
     spdif_power_setting = on;
 }
 #endif
+#endif
 
 /**
- * Sets the audio source 
+ * Sets recording parameters
  * 
  * This functions starts feeding the CPU with audio data over the I2S bus
- *
- * @param source 0=mic, 1=line-in, 2=spdif
  */
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time)
 {
     /* TODO: */
-    (void)quality;
-    (void)channel_mode;
     (void)editable;
 
     /* NOTE: Coldfire UDA based recording does not yet support anything other
@@ -278,69 +322,30 @@ void audio_set_recording_options(int frequency, int quality,
      * based recording will overwrite this value with the proper sample rate in
      * audio_record(), and will not be affected by this.
      */
-    frequency = 44100;   
+    frequency        = 44100;
+    enc_quality      = quality;
+    rec_source       = source;
+    enc_channels     = channel_mode == CHN_MODE_MONO ? 1 : 2;
     pre_record_ticks = prerecord_time * HZ;
-    pre_record_chunks = ((frequency * prerecord_time * 4)/CHUNK_SIZE)+1;
-    if(pre_record_chunks >= (num_chunks-250))
-    {
-        /* we can't prerecord more than our buffersize minus treshold to write to disk! */
-        pre_record_chunks = num_chunks-250;
-        /* don't forget to recalculate that time! */
-        pre_record_ticks = ((pre_record_chunks * CHUNK_SIZE)/(4*frequency)) * HZ;
-    }
-    
-    //logf("pcmrec: src=%d", source);
 
-    rec_source = source;
-#ifdef HAVE_SPDIF_POWER
-    /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
-       both optical in and out is controlled by the same power source, which is
-       the case on H1x0. */
-    spdif_power_enable((source == 2) || spdif_power_setting);
-#endif
     switch (source)
     {
-        /* mic */
-        case 0: 
+        case AUDIO_SRC_MIC:
+        case AUDIO_SRC_LINEIN:
+#ifdef HAVE_FMRADIO_IN
+        case AUDIO_SRC_FMRADIO:
+#endif
             /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
             DATAINCONTROL = 0xc020;
-            
-#ifdef HAVE_UDA1380            
-            uda1380_enable_recording(true); 
-#endif
-#ifdef HAVE_TLV320
-            tlv320_enable_recording(true);
-#endif            
         break;
 
-        /* line-in */
-        case 1: 
-            /* Generate int. when 6 samples in FIFO, PDIR2 src = IIS1recv */
-            DATAINCONTROL = 0xc020;
-            
-#ifdef HAVE_UDA1380            
-            uda1380_enable_recording(false); 
-#endif
-#ifdef HAVE_TLV320
-            tlv320_enable_recording(false);
-#endif            
-        break;
-#ifdef HAVE_SPDIF_IN        
-        /* SPDIF */
-        case 2:
+#ifdef HAVE_SPDIF_IN
+        case AUDIO_SRC_SPDIF:
             /* Int. when 6 samples in FIFO. PDIR2 source = ebu1RcvData */
             DATAINCONTROL = 0xc038;
-#ifdef HAVE_SPDIF_POWER
-            EBU1CONFIG = spdif_power_setting ? (1 << 2) : 0;
-            /* Input source is EBUin1, Feed-through monitoring if desired */
-#else
-            EBU1CONFIG = (1 << 2);
-            /* Input source is EBUin1, Feed-through monitoring */
-#endif
-            uda1380_disable_recording();
         break;
-#endif
-    }    
+#endif /* HAVE_SPDIF_IN */
+    }
 
     sample_rate = frequency;
 
@@ -349,7 +354,8 @@ void audio_set_recording_options(int frequency, int quality,
     SET_IIS_PLAY(0x800); /* Reset before reprogram */
     
 #ifdef HAVE_SPDIF_IN
-    if (source == 2) {
+    if (source == AUDIO_SRC_SPDIF)
+    {
         /* SCLK2 = Audioclk/4 (can't use EBUin clock), TXSRC = EBU1rcv, 64 bclk/wclk */
         IIS2CONFIG = (6 << 12) | (7 << 8) | (4 << 2);
         /* S/PDIF feed-through already configured */
@@ -367,6 +373,8 @@ void audio_set_recording_options(int frequency, int quality,
     /* SCLK2 follow IIS1 (UDA clock), TXSRC = IIS1rcv, 64 bclk/wclk */
     SET_IIS_PLAY( (8 << 12) | (4 << 8) | (4 << 2) );
 #endif
+
+    audio_load_encoder(rec_quality_info_afmt[quality]);
 }
 
 
@@ -380,10 +388,9 @@ void audio_set_recording_options(int frequency, int quality,
 void audio_set_recording_gain(int left, int right, int type)
 {
     //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
-#ifdef HAVE_UDA1380            
+#if defined(HAVE_UDA1380)
     uda1380_set_recvol(left, right, type);
-#endif
-#ifdef HAVE_TLV320
+#elif defined (HAVE_TLV320)
     tlv320_set_recvol(left, right, type);
 #endif            
 }
@@ -406,7 +413,7 @@ void audio_record(const char *filename)
     recording_filename[MAX_PATH - 1] = 0;
 
 #ifdef HAVE_SPDIF_IN
-    if (rec_source == 2)
+    if (rec_source == AUDIO_SRC_SPDIF)
         sample_rate = audio_get_spdif_sample_rate();
 #endif
     
@@ -447,6 +454,7 @@ void audio_stop_recording(void)
 
     logf("pcm_stop");
     
+    is_paused = true;  /* fix pcm write ptr at current position */
     stop_done = false;
     queue_post(&pcmrec_queue, PCMREC_STOP, 0);
 
@@ -499,9 +507,9 @@ void audio_resume_recording(void)
 void pcm_rec_get_peaks(int *left, int *right)
 {
     if (left)
-        *left = (int)peak_left;
+        *left = peak_left;
     if (right)
-        *right = (int)peak_right;
+        *right = peak_right;
     peak_left = 0;
     peak_right = 0;
 }
@@ -511,7 +519,7 @@ void pcm_rec_get_peaks(int *left, int *right)
 /***************************************************************************/
 
 /**
- * Process the chunks using read_index and write_index.
+ * Process the chunks
  *
  * This function is called when queue_get_w_tmo times out.
  *
@@ -519,70 +527,24 @@ void pcm_rec_get_peaks(int *left, int *right)
  * they want to save everything in the buffers to disk.
  *
  */
-
-static void pcmrec_callback(bool flush) ICODE_ATTR;
 static void pcmrec_callback(bool flush)
 {
-    int num_ready, num_free, num_new;
-    short *ptr;    
-    short value;
-    int i, j, w;
+    int  i, num_ready, size_yield;
+    long *enc_chunk, chunk_size;
 
-    w = write_index;
-
-    num_new = w - read2_index;
-    if (num_new < 0)
-        num_new += num_chunks;
-
-    for (i=0; i<num_new; i++)
-    {
-        /* Convert the samples to little-endian so we only have to write later
-           (Less hd-spinning time), also do peak detection while we're at it
-        */
-        ptr = GET_CHUNK(read2_index);
-        for (j=0; j<CHUNK_SIZE/4; j++)
-        {
-            value = *ptr;
-            if(value > peak_left)
-                peak_left = value;
-            else if (-value > peak_left)
-                peak_left = -value;
-
-            *ptr = htole16(value);
-            ptr++;
-
-            value = *ptr;
-            if(value > peak_right)
-                peak_right = value;
-            else if (-value > peak_right)
-                peak_right = -value;
-
-            *ptr = htole16(value);
-            ptr++;
-        }
-
-        if(is_recording && !is_paused) 
-            num_rec_bytes += CHUNK_SIZE;
-        
-        read2_index++;
-        if (read2_index >= num_chunks)
-            read2_index = 0;
-    }
-
-    if ((!is_recording || is_paused) && !flush)
-    {
-        /* not recording = no saving to disk, fake buffer clearing */
-        read_index = write_index;
+    if (!is_recording && !flush)
         return;
-    }
 
-    num_ready = w - read_index;
+    num_ready = enc_wr_index - enc_rd_index;
     if (num_ready < 0)
-        num_ready += num_chunks;
+        num_ready += enc_num_chunks;
 
-    num_free = num_chunks - num_ready;
-    
-    if (num_free <= WRITE_THRESHOLD || flush)
+    /* calculate an estimate of recorded bytes */
+    num_rec_bytes = num_file_bytes + num_ready * /* enc_chunk_size */
+            ((avrg_bit_rate * 1000 / 8 * enc_samp_per_chunk + 22050) / 44100);
+
+    /* near full state reached: less than 5sec remaining space */
+    if (enc_num_chunks - num_ready < WRITE_THRESHOLD || flush)
     {
         bool must_boost = (boost_counter ? false : true);
 
@@ -591,23 +553,41 @@ static void pcmrec_callback(bool flush)
         if(must_boost)
             cpu_boost(true);
 
+        size_yield = 0;
         for (i=0; i<num_ready; i++)
         {
-            if (write(wav_file, GET_CHUNK(read_index), CHUNK_SIZE) != CHUNK_SIZE)
+            enc_chunk  = GET_ENC_CHUNK(enc_rd_index);
+            chunk_size = *enc_chunk++;
+
+            /* safety net: if size entry got corrupted => limit */
+            if (chunk_size > (long)(enc_chunk_size - sizeof(long)))
+                chunk_size = enc_chunk_size - sizeof(long);
+
+            if (enc_set_header_callback != NULL)
+                enc_set_header_callback(enc_chunk, enc_chunk_size,
+                                              num_pcm_samples, false);
+
+            if (write(wav_file, enc_chunk, chunk_size) != chunk_size)
             {
+                close_wave();
                 if(must_boost)
                     cpu_boost(false);
                 logf("pcmrec: write err");
-                pcmrec_dma_stop();
-                return;
+                is_error = true;
+                break;
             }
-            
-            num_file_bytes += CHUNK_SIZE;
-            
-            read_index++;
-            if (read_index >= num_chunks)
-                read_index = 0;
-            yield();
+
+            num_file_bytes  += chunk_size;
+            num_pcm_samples += enc_samp_per_chunk;
+            size_yield      += chunk_size;
+
+            if (size_yield >= 32768)
+            {   /* yield when 32kB written */
+                size_yield = 0;
+                yield();
+            }
+
+            enc_rd_index = (enc_rd_index + 1) % enc_num_chunks;
         }
 
         if(must_boost)
@@ -623,35 +603,32 @@ static void pcmrec_callback(bool flush)
 /* Abort dma transfer */
 static void pcmrec_dma_stop(void)
 {
-    DCR1 = 0; 
-    
-    is_error = true;
-    is_recording = false;
-    
+    DCR1 = 0;
+
     error_count++;
-    
+
+    DSR1 = 1;    /* Clear interrupt */
+    IPR |= (1<<15); /* Clear pending interrupt request */
+
     logf("dma1 stopped");
 }
 
 static void pcmrec_dma_start(void)
 {
-    DAR1 = (unsigned long)GET_CHUNK(write_index);    /* Destination address */
-    SAR1 = (unsigned long)&PDIR2;                    /* Source address */
-    BCR1 = CHUNK_SIZE;                               /* Bytes to transfer */
+    DAR1 = (unsigned long)GET_CHUNK(write_pos);  /* Destination address */
+    SAR1 = (unsigned long)&PDIR2;                /* Source address */
+    BCR1 = CHUNK_SIZE;                           /* Bytes to transfer */
 
     /* Start the DMA transfer.. */
-    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_START;
-
 #ifdef HAVE_SPDIF_IN
     INTERRUPTCLEAR = 0x03c00000;
 #endif
 
-    /* pre-recording: buffer count */
-    buffered_chunks = 0;
+    /* 16Byte transfers prevents from sporadic errors during cpu_boost() */
+    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_DSIZE(3) | DMA_START;
 
     logf("dma1 started");
 }
-
 
 /* DMA1 Interrupt is called when the DMA has finished transfering a chunk */
 void DMA1(void) __attribute__ ((interrupt_handler, section(".icode")));
@@ -668,62 +645,64 @@ void DMA1(void)
 
         logf("dma1 err: 0x%x", res);
 
-        DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
+        DAR1 = (unsigned long)GET_CHUNK(write_pos);  /* Destination address */
         BCR1 = CHUNK_SIZE;
         DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC | DMA_START;
+
+        /* Flush recorded data to disk and stop recording */
+        queue_post(&pcmrec_queue, PCMREC_STOP, NULL);
     } 
 #ifdef HAVE_SPDIF_IN
-    else if ((rec_source == 2) && (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
+    else if ((rec_source == AUDIO_SRC_SPDIF) &&
+        (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
     {
         INTERRUPTCLEAR = 0x03c00000;
         error_count++;
 
         logf("spdif err");
 
-        if (is_stopping)
-        {
-            DCR1 = 0;   /* Stop DMA transfer */
-            is_stopping = false;
-
-            logf("dma1 stopping");
-        }
-        else
-        {
-            DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
-            BCR1 = CHUNK_SIZE;
-        }
+        DAR1 = (unsigned long)GET_CHUNK(write_pos);  /* Destination address */
+        BCR1 = CHUNK_SIZE;
     }
 #endif
     else
     {
-        write_index++;
-        if (write_index >= num_chunks)
-            write_index = 0;
+        long peak_l, peak_r;
+        long *ptr, j;
 
-        /* update number of valid chunks for pre-recording */
-        if(buffered_chunks < num_chunks)
-            buffered_chunks++;
+        ptr = GET_CHUNK(write_pos);
 
-        if (is_stopping)
+        if (!is_paused) /* advance write position */
+            write_pos = (write_pos + CHUNK_SIZE) & CHUNK_MASK;
+
+        DAR1 = (unsigned long)GET_CHUNK(write_pos);  /* Destination address */
+        BCR1 = CHUNK_SIZE;
+
+        peak_l = peak_r = 0;
+
+        /* only peak every 4th sample */
+        for (j=0; j<CHUNK_SIZE/4; j+=4)
         {
-            DCR1 = 0;   /* Stop DMA transfer */
-            is_stopping = false;
+            long value = ptr[j];
+#ifdef ROCKBOX_BIG_ENDIAN
+            if (value > peak_l)       peak_l =  value;
+            else if (-value > peak_l) peak_l = -value;
 
-            logf("dma1 stopping");
-        }
-        else if (write_index == read_index)
-        {
-            DCR1 = 0;   /* Stop DMA transfer */
-            is_recording = false;
+            value <<= 16;
+            if (value > peak_r)       peak_r =  value;
+            else if (-value > peak_r) peak_r = -value;
+#else
+            if (value > peak_r)       peak_r =  value;
+            else if (-value > peak_r) peak_r = -value;
 
-            logf("dma1 overrun");
+            value <<= 16;
+            if (value > peak_l)       peak_l =  value;
+            else if (-value > peak_l) peak_l = -value;
+#endif
+        }
 
-        }
-        else
-        {
-            DAR1 = (unsigned long)GET_CHUNK(write_index);  /* Destination address */
-            BCR1 = CHUNK_SIZE;
-        }
+        peak_left  = (int)(peak_l >> 16);
+        peak_right = (int)(peak_r >> 16);
     }
 
     IPR |= (1<<15); /* Clear pending interrupt request */
@@ -733,15 +712,8 @@ void DMA1(void)
 /* Sets returns 0 if success, -1 on failure */
 static int start_wave(void)
 {
-    unsigned char header[44] = 
-    {
-        'R','I','F','F',0,0,0,0,'W','A','V','E','f','m','t',' ',
-        0x10,0,0,0,1,0,2,0,0,0,0,0,0,0,0,0,
-        4,0,0x10,0,'d','a','t','a',0,0,0,0
-    };
-    unsigned long avg_bytes_per_sec;
-    
     wav_file = open(recording_filename, O_RDWR|O_CREAT|O_TRUNC);
+
     if (wav_file < 0)
     {
         wav_file = -1;
@@ -749,19 +721,9 @@ static int start_wave(void)
         is_error = true;
         return -1;
     }
-    /* Now set the sample rate field of the WAV header to what it should be */
-    header[24] = (unsigned char)(sample_rate & 0xff);
-    header[25] = (unsigned char)(sample_rate >> 8);
-    header[26] = (unsigned char)(sample_rate >> 16);
-    header[27] = (unsigned char)(sample_rate >> 24);
-    /* And then the average bytes per second field */
-    avg_bytes_per_sec = sample_rate*4; /* Hard coded to 16 bit stereo */
-    header[28] = (unsigned char)(avg_bytes_per_sec & 0xff);
-    header[29] = (unsigned char)(avg_bytes_per_sec >> 8);
-    header[30] = (unsigned char)(avg_bytes_per_sec >> 16);
-    header[31] = (unsigned char)(avg_bytes_per_sec >> 24);
    
-    if (sizeof(header) != write(wav_file, header, sizeof(header)))
+    /* add main file header (enc_head_size=0 for encoders without) */
+    if (enc_head_size != write(wav_file, enc_head_buffer, enc_head_size))
     {
         close(wav_file);
         wav_file = -1;
@@ -776,18 +738,22 @@ static int start_wave(void)
 /* Update header and set correct length values */
 static void close_wave(void)
 {
-    long l;
+    unsigned char head[100]; /* assume maximum 100 bytes for file header */
+    int           size_read;
 
     if (wav_file != -1)
     {
-        l = htole32(num_file_bytes + 36);
-        lseek(wav_file, 4, SEEK_SET);
-        write(wav_file, &l, 4);
-    
-        l = htole32(num_file_bytes);
-        lseek(wav_file, 40, SEEK_SET);
-        write(wav_file, &l, 4);
-    
+        /* update header before closing the file (wav+wv encoder will do) */
+        if (enc_set_header_callback != NULL)
+        {
+            lseek(wav_file, 0, SEEK_SET);
+            /* try to read the head size (but we'll accept less) */
+            size_read = read(wav_file, head, sizeof(head));
+
+            enc_set_header_callback(head, size_read, num_pcm_samples, true);
+            lseek(wav_file, 0, SEEK_SET);
+            write(wav_file, head, size_read);
+        }
         close(wav_file);
         wav_file = -1;
     }
@@ -795,8 +761,7 @@ static void close_wave(void)
 
 static void pcmrec_start(void)
 {
-    int pre_chunks = pre_record_chunks; /* recalculate every time! */
-    long pre_ticks = pre_record_ticks;   /* recalculate every time! */
+    long max_pre_chunks, pre_ticks, max_pre_ticks;
 
     logf("pcmrec_start");
 
@@ -808,7 +773,7 @@ static void pcmrec_start(void)
     }
 
     if (wav_file != -1)
-        close(wav_file);
+        close_wave();
 
     if (start_wave() != 0)
     {
@@ -817,32 +782,29 @@ static void pcmrec_start(void)
         return;
     }
 
-    /* pre-recording calculation */
-    if(buffered_chunks < pre_chunks)
-    {
-        /* not enough good chunks available - limit pre-record time */
-        pre_chunks = buffered_chunks;
-        pre_ticks = ((buffered_chunks * CHUNK_SIZE)/(4*sample_rate)) * HZ;
-    }
+    /* calculate maximum available chunks & resulting ticks */
+    max_pre_chunks = (enc_wr_index - enc_rd_index +
+                        enc_num_chunks) % enc_num_chunks;
+    if (max_pre_chunks > enc_num_chunks - WRITE_THRESHOLD)
+        max_pre_chunks = enc_num_chunks - WRITE_THRESHOLD;
+    max_pre_ticks = max_pre_chunks * HZ * enc_samp_per_chunk / 44100;
+
+    /* limit prerecord if not enough data available */
+    pre_ticks = pre_record_ticks > max_pre_ticks ?
+        max_pre_ticks : pre_record_ticks;
+    max_pre_chunks = 44100 * pre_ticks / HZ / enc_samp_per_chunk;
+    enc_rd_index = (enc_wr_index - max_pre_chunks +
+                        enc_num_chunks) % enc_num_chunks;
+
     record_start_time = current_tick - pre_ticks;
 
-    read_index = write_index - pre_chunks;
-    if(read_index < 0)
-    {
-        read_index += num_chunks;
-    }
-
-    peak_left = 0;
-    peak_right = 0;
- 
-    num_rec_bytes = pre_chunks * CHUNK_SIZE;
+    num_rec_bytes = enc_num_chunks * CHUNK_SIZE;
     num_file_bytes = 0;
+    num_pcm_samples = 0;
     pause_start_time = 0;
     
-    is_stopping = false;
     is_paused = false;
     is_recording = true;
-    
     record_done = true;
 }
 
@@ -850,36 +812,24 @@ static void pcmrec_stop(void)
 {
     logf("pcmrec_stop");
    
-    if (!is_recording)
+    if (is_recording)
     {
-        stop_done = true;
-        return;
-    }
-   
-    if (!is_paused)
-    { 
-        /* wait for recording to finish */
-        is_stopping = true;
-        
-        while (is_stopping && is_recording)
+        /* wait for encoding finish */
+        is_paused = true;
+        while(!wav_queue_empty)
             sleep_thread();
-        wake_up_thread();    
-        
-        is_stopping = false;
+
+        wake_up_thread();
+        is_recording = false;
+
+        /* Flush buffers to file */
+        pcmrec_callback(true);
+        close_wave();
     }
-    
-    is_recording = false;
-    
-    /* Flush buffers to file */
-    pcmrec_callback(true);
 
-    close_wave();
-
+    is_paused = false;
     stop_done = true;
-    
-    /* Finally start dma again for peakmeters and pre-recoding to work. */
-    pcmrec_dma_start();
-    
+
     logf("pcmrec_stop done");
 }
 
@@ -898,7 +848,6 @@ static void pcmrec_new_file(void)
        here is a good approximation when recording to the new file starts 
     */
     record_start_time = current_tick;
-    num_rec_bytes = 0;
     
     if (is_paused)
         pause_start_time = record_start_time;
@@ -908,7 +857,9 @@ static void pcmrec_new_file(void)
     
     close_wave();
 
+    num_rec_bytes = 0;
     num_file_bytes = 0;
+    num_pcm_samples = 0;
     
     /* start the new file */    
     if (start_wave() != 0)
@@ -932,20 +883,8 @@ static void pcmrec_pause(void)
         return;
     }
     
-    /* Abort DMA transfer and flush to file? */
-        
-    is_stopping = true;        
-    
-    while (is_stopping && is_recording)
-        sleep_thread();
-    wake_up_thread();        
-    
     pause_start_time = current_tick;
-    is_paused = true;    
-    
-    /* Flush what we got in buffers to file */
-    pcmrec_callback(true);
-        
+    is_paused = true;  
     pause_done = true;
     
     logf("pcmrec_pause done");
@@ -973,10 +912,7 @@ static void pcmrec_resume(void)
         pause_start_time = 0;
     }
     
-    pcmrec_dma_start();
-    
     resume_done = true;
-    
     logf("pcmrec_resume done");
 }
 
@@ -986,50 +922,47 @@ static void pcmrec_resume(void)
  */
 static void pcmrec_init(void)
 {
-    unsigned long buffer_size;
-
     wav_file = -1;  
-    read_index = 0;
-    read2_index = 0;
-    write_index = 0;
-    pre_record_chunks = 0;
-    pre_record_ticks = 0;
+    read_pos = 0;
+    write_pos = 0;
+    enc_wr_index = 0;
+    enc_rd_index = 0;
+
+    avrg_bit_rate  = 0;
+    curr_bit_rate  = 0;
+    curr_chunk_cnt = 0;
 
     peak_left = 0;
     peak_right = 0;
     
     num_rec_bytes = 0;
     num_file_bytes = 0;
+    num_pcm_samples = 0;
     record_start_time = 0;
     pause_start_time = 0;
-    buffered_chunks = 0;
-    
+
+    close_done = false;
     is_recording = false;
-    is_stopping = false;
     is_paused = false;
     is_error = false;
 
-    rec_buffer = (unsigned char*)(((unsigned long)audiobuf + rec_buffer_offset) & ~3);
-    buffer_size = (long)audiobufend - (long)audiobuf - rec_buffer_offset - 16;
-    
-    logf("buf size: %d kb", buffer_size/1024);
-    
-    num_chunks = buffer_size / CHUNK_SIZE;
+    rec_buffer = (unsigned char*)(((long)audiobuf + 15) & ~15);
+    enc_buffer = rec_buffer + NUM_CHUNKS * CHUNK_SIZE + MAX_FEED_SIZE;
+    /* 8000Bytes at audiobufend */
+    enc_buffer_size = audiobufend - enc_buffer - 8000;
 
-    logf("num_chunks: %d", num_chunks);
+    SET_IIS_PLAY(0x800); /* Stop any playback                              */
+    AUDIOGLOB |= 0x180;  /* IIS1 fifo auto sync = on, PDIR2 auto sync = on */
+    DATAINCONTROL = 0xc000; /* Generate Interrupt when 6 samples in fifo   */
 
-    SET_IIS_PLAY(0x800);            /* Stop any playback                              */
-    AUDIOGLOB |= 0x180;             /* IIS1 fifo auto sync = on, PDIR2 auto sync = on */
-    DATAINCONTROL = 0xc000;         /* Generate Interrupt when 6 samples in fifo      */
-
-    DIVR1 = 55;                     /* DMA1 is mapped into vector 55 in system.c      */
-    DMACONFIG = 1;                  /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
+    DIVR1 = 55;          /* DMA1 is mapped into vector 55 in system.c      */
+    DMACONFIG = 1;       /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
     DMAROUTE = (DMAROUTE & 0xffff00ff) | DMA1_REQ_AUDIO_2;
-    ICR7 = 0x1c;                    /* Enable interrupt at level 7, priority 0 */
-    IMR &= ~(1<<15);                /* bit 15 is DMA1 */
+    ICR7 = 0x1c;         /* Enable interrupt at level 7, priority 0        */
+    IMR &= ~(1<<15);     /* bit 15 is DMA1                                 */
 
 #ifdef HAVE_SPDIF_IN
-    PHASECONFIG = 0x34;             /* Gain = 3*2^13, source = EBUIN */
+    PHASECONFIG = 0x34;  /* Gain = 3*2^13, source = EBUIN                  */
 #endif
     pcmrec_dma_start();
 
@@ -1038,23 +971,16 @@ static void pcmrec_init(void)
 
 static void pcmrec_close(void)
 {
-#ifdef HAVE_UDA1380            
-    uda1380_disable_recording();
-#endif
-#ifdef HAVE_TLV320
-    tlv320_disable_recording();
-#endif            
-
-#ifdef HAVE_SPDIF_POWER
-    spdif_power_enable(spdif_power_setting);
-#endif
     DMAROUTE = (DMAROUTE & 0xffff00ff);
     ICR7 = 0x00;     /* Disable interrupt */
     IMR |= (1<<15);  /* bit 15 is DMA1 */
 
+    pcmrec_dma_stop();
+
     /* Reset PDIR2 data flow */
     DATAINCONTROL = 0x200;
     close_done = true;
+    init_done = false;
 }
 
 static void pcmrec_thread(void)
@@ -1064,10 +990,10 @@ static void pcmrec_thread(void)
     logf("thread pcmrec start");
 
     error_count = 0;
-    
-    while (1)
+
+    while(1)
     {
-        queue_wait_w_tmo(&pcmrec_queue, &ev, HZ / 40);
+        queue_wait_w_tmo(&pcmrec_queue, &ev, HZ / 4);
 
         switch (ev.id)
         {
@@ -1104,8 +1030,9 @@ static void pcmrec_thread(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                if (!is_recording && !is_stopping)
+                if (!is_recording)
                 {
+                    pcmrec_close();
                     usb_acknowledge(SYS_USB_CONNECTED_ACK);
                     usb_wait_for_disconnect(&pcmrec_queue);
                 }
@@ -1147,4 +1074,103 @@ void pcm_rec_mux(int source)
 
     /* iAudio x5 */
 #endif
+}
+
+
+/****************************************************************************/
+/*                                                                          */
+/*         following functions will be called by the encoder codec          */
+/*                                                                          */
+/****************************************************************************/
+
+/* pass the encoder buffer pointer/size, mono/stereo, quality to the encoder */
+void enc_get_inputs(int *buffer_size, int *channels, int *quality)
+{
+    *buffer_size = enc_buffer_size;
+    *channels    = enc_channels;
+    *quality     = enc_quality;
+}
+
+/* set the encoder dimensions (called by encoder codec at initialization) */
+void enc_set_parameters(int chunk_size, int num_chunks, int samp_per_chunk,
+                        char *head_ptr, int head_size, int enc_id)
+{
+    /* set read_pos just in front of current write_pos */
+    read_pos = (write_pos - CHUNK_SIZE) & CHUNK_MASK;
+
+    enc_rd_index       = 0;              /* reset */
+    enc_wr_index       = 0;              /* reset */
+    enc_chunk_size     = chunk_size;     /* max chunk size */
+    enc_num_chunks     = num_chunks;     /* total number of chunks */
+    enc_samp_per_chunk = samp_per_chunk; /* pcm samples / encoderchunk */
+    enc_head_buffer    = head_ptr;       /* optional file header data (wav) */
+    enc_head_size      = head_size;      /* optional file header data (wav) */
+    audio_enc_id       = enc_id;         /* AFMT_* id */
+}
+
+/* allocate encoder chunk */
+unsigned int *enc_alloc_chunk(void)
+{
+    return (unsigned int*)(enc_buffer + enc_wr_index * enc_chunk_size);
+}
+
+/* free previously allocated encoder chunk */
+void enc_free_chunk(void)
+{
+    unsigned long *enc_chunk;
+
+    enc_chunk = GET_ENC_CHUNK(enc_wr_index);
+    curr_chunk_cnt++;
+/*  curr_bit_rate += *enc_chunk * 44100 * 8 / (enc_samp_per_chunk * 1000); */
+    curr_bit_rate += *enc_chunk * 441   * 8 / (enc_samp_per_chunk * 10  );
+    avrg_bit_rate  = (curr_bit_rate + curr_chunk_cnt / 2) / curr_chunk_cnt;
+
+    /* advance enc_wr_index to the next chunk */
+    enc_wr_index = (enc_wr_index + 1) % enc_num_chunks;
+
+    /* buffer full: advance enc_rd_index (for prerecording purpose) */
+    if (enc_rd_index == enc_wr_index)
+    {
+        enc_rd_index = (enc_rd_index + 1) % enc_num_chunks;
+    }
+}
+
+/* checks near empty state on wav input buffer */
+int enc_wavbuf_near_empty(void)
+{
+    /* less than 1sec raw data? => unboost encoder */
+    if (((write_pos - read_pos) & CHUNK_MASK) < 44100*4)
+        return 1;
+    else
+        return 0;
+}
+
+/* passes a pointer to next chunk of unprocessed wav data */
+char *enc_get_wav_data(int size)
+{
+    char *ptr;
+    int  avail;
+
+    /* limit the requested pcm data size */
+    if(size > MAX_FEED_SIZE)
+        size = MAX_FEED_SIZE;
+
+    avail = (write_pos - read_pos) & CHUNK_MASK;
+
+    if (avail >= size)
+    {
+        ptr = rec_buffer + read_pos;
+        read_pos = (read_pos + size) & CHUNK_MASK;
+
+        /* ptr must point to continous data at wraparound position */
+        if (read_pos < size)
+            memcpy(rec_buffer + NUM_CHUNKS * CHUNK_SIZE,
+                rec_buffer, read_pos);
+
+        wav_queue_empty = false;
+        return ptr;
+    }
+
+    wav_queue_empty = true;
+    return NULL;
 }

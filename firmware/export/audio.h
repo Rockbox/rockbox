@@ -31,6 +31,9 @@
 #define AUDIO_STATUS_PRERECORD 8
 #define AUDIO_STATUS_ERROR 16
 
+#define AUDIO_STATUS_STAYON_FLAGS \
+    (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE | AUDIO_STATUS_RECORD | AUDIO_)
+
 #define AUDIOERR_DISK_FULL 1
 
 #define AUDIO_GAIN_LINEIN    0
@@ -69,6 +72,7 @@ void audio_resume(void);
 void audio_next(void);
 void audio_prev(void);
 int audio_status(void);
+bool audio_query_poweroff(void);
 int audio_track_count(void); /* SWCODEC only */
 void audio_pre_ff_rewind(void); /* SWCODEC only */
 void audio_ff_rewind(long newtime);
@@ -93,14 +97,56 @@ void audio_stop_recording(void);
 void audio_pause_recording(void);
 void audio_resume_recording(void);
 void audio_new_file(const char *filename);
+
+/* audio sources */
+enum
+{
+    AUDIO_SRC_PLAYBACK = -1,    /* for audio playback (default) */
+    AUDIO_SRC_MIC,              /* monitor mic */
+    AUDIO_SRC_LINEIN,           /* monitor line in */
+#ifdef HAVE_SPDIF_IN
+    AUDIO_SRC_SPDIF,            /* monitor spdif */
+#endif
+#if defined(HAVE_FMRADIO_IN) || defined(CONFIG_TUNER)
+    AUDIO_SRC_FMRADIO,          /* monitor fm radio */
+#endif
+    /* define new audio sources above this line */
+    AUDIO_SOURCE_LIST_END,
+    /* AUDIO_SRC_FMRADIO must be declared #ifdef CONFIG_TUNER but is not in
+       the list of recordable sources. HAVE_FMRADIO_IN implies CONFIG_TUNER. */
+#if defined(HAVE_FMRADIO_IN) || !defined(CONFIG_TUNER)
+    AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END,
+#else
+    AUDIO_NUM_SOURCES = AUDIO_SOURCE_LIST_END-1,
+#endif
+    AUDIO_SRC_MAX = AUDIO_NUM_SOURCES-1
+};
+
+/* channel modes */
+enum
+{
+    CHN_MODE_MONO = 1,
+    CHN_MODE_STEREO,
+};
 void audio_set_recording_options(int frequency, int quality,
                                 int source, int channel_mode,
                                 bool editable, int prerecord_time);
 void audio_set_recording_gain(int left, int right, int type);
 unsigned long audio_recorded_time(void);
 unsigned long audio_num_recorded_bytes(void);
+#if 0
+#ifdef HAVE_SPDIF_POWER
 void audio_set_spdif_power_setting(bool on);
+#endif
+#endif
 unsigned long audio_get_spdif_sample_rate(void);
+#if CONFIG_CODEC == SWCODEC
+/* audio encoder functions (defined in playback.c) */
+int  audio_get_encoder_id(void);
+void audio_load_encoder(int enc_id);
+void audio_remove_encoder(void);
+#endif /* CONFIG_CODEC == SWCODEC */
+
 
 
 

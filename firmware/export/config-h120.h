@@ -132,6 +132,9 @@
 /* Define this if the EEPROM chip is used */
 #define HAVE_EEPROM_SETTINGS
 
+/* Define this for FM radio input available (not for SIMULATOR) */
+#define HAVE_FMRADIO_IN
+
 #endif /* !SIMULATOR */
 
 /* Define this for S/PDIF input available */

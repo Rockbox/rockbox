@@ -554,6 +554,7 @@ int talk_buffer_steal(void)
     }
 #endif
     reset_state();
+
     return 0;
 }
 
@@ -728,6 +729,7 @@ int talk_value(long n, int unit, bool enqueue)
         VOICE_PIXEL,
         VOICE_PER_SEC,
         VOICE_HERTZ,
+        VOICE_KBIT_PER_SEC,
     };
 
 #if CONFIG_CODEC != SWCODEC

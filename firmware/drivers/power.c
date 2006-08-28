@@ -38,7 +38,7 @@ bool charger_enabled;
 
 static bool powered = false;
 
-bool radio_powered()
+bool radio_powered(void)
 {
     return powered;
 }

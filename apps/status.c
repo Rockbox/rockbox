@@ -103,10 +103,10 @@ int current_playmode(void)
 #ifdef CONFIG_TUNER
     audio_stat = get_radio_status();
 
-    if(audio_stat == FMRADIO_PLAYING)
+    if(audio_stat & FMRADIO_PLAYING)
        return STATUS_RADIO;
 
-    if(audio_stat == FMRADIO_PAUSED)
+    if(audio_stat & FMRADIO_PAUSED)
        return STATUS_RADIO_PAUSE;
 #endif
     

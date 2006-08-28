@@ -92,7 +92,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 50
+#define CONFIG_BLOCK_VERSION 51
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -473,11 +473,21 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_split_type), 0, "rec split type", "Split, Stop" },
     {1, S_O(rec_split_method), 0, "rec split method", "Time,Filesize" },
 
-#ifdef HAVE_SPDIF_IN
-    {2, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line,spdif" },
+    {
+#if defined(HAVE_SPDIF_IN) || defined(HAVE_FMRADIO_IN)
+        2,
 #else
-    {1, S_O(rec_source), 0 /* 0=mic */, "rec source", "mic,line" },
+        1,
 #endif
+        S_O(rec_source), 0 /* 0=mic */, "rec source",
+        "mic,line"
+#ifdef HAVE_SPDIF_IN
+        ",spdif"
+#endif
+#ifdef HAVE_FMRADIO_IN
+        ",fmradio"
+#endif
+    },
     {5, S_O(rec_prerecord_time), 0, "prerecording time", NULL }, /* 0...30 */
     {1, S_O(rec_directory), 0, /* rec_base_directory */
         "rec directory", REC_BASE_DIR ",current" },
@@ -490,14 +500,21 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(rec_right_gain), 2 /* 0dB */, "rec right gain", NULL }, /* 0...15 */
     {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
         "rec frequency", "44,48,32,22,24,16" },
+    {3, S_O(rec_quality), 5 /* 192 kBit/s max */, "rec quality", NULL },
     {1, S_O(rec_editable), false, "editable recordings", off_on },
-    {3, S_O(rec_quality), 5, "rec quality", NULL },
-#elif defined(HAVE_UDA1380)
+#elif defined(HAVE_UDA1380) || defined(HAVE_TLV320)
+#ifdef HAVE_UDA1380
     {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
+#endif
+#ifdef HAVE_TLV320
+    /* TLV320 only has no mic boost or 20db mic boost */
+    {1, S_O(rec_mic_gain), 0 /* 0 dB */, "rec mic gain", NULL }, /* 0db or 20db */
+#endif
     {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
     {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
     {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
         "rec frequency", "44,48,32,22,24,16" },
+    {4, S_O(rec_quality), 4 /* MP3 L3 192 kBit/s */, "rec quality", NULL },
 #endif
 
     /* values for the trigger */

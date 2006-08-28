@@ -424,6 +424,7 @@ static void battery_status_update(void)
  * 1) The USB is connected
  * 2) The charger is connected
  * 3) We are recording, or recording with pause
+ * 4) The radio is playing
  */
 static void handle_auto_poweroff(void)
 {
@@ -442,7 +443,7 @@ static void handle_auto_poweroff(void)
 
     if(timeout &&
 #ifdef CONFIG_TUNER
-       (!radio_powered()) &&
+       (!(get_radio_status() & FMRADIO_PLAYING)) &&
 #endif
        !usb_inserted() &&
        ((audio_stat == 0) ||

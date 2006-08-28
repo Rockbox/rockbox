@@ -17,6 +17,7 @@
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
+
 /* define this if you have access to the pitchscreen */
 #define HAVE_PITCHSCREEN
 
@@ -80,6 +81,9 @@
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
    should be defined as well. */
 #define HAVE_LCD_SLEEP
+
+/* Define this for FM radio input available (not for SIMULATOR) */
+#define HAVE_FMRADIO_IN
 
 /* Define this if you have a Motorola SCF5250 */
 #define CONFIG_CPU MCF5250

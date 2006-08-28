@@ -85,27 +85,58 @@ static const char* const genres[] = {
     "Synthpop"
 };
 
-static const char* const codec_labels[] = {
-  "???",  /* Unknown file format */
-
-  "MP1",  /* MPEG Audio layer 1 */
-  "MP2",  /* MPEG Audio layer 2 */
-  "MP3",  /* MPEG Audio layer 3 */
-
+/* database of audio formats */
+const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
+{
+    /* Unknown file format */
+    AFMT_ENTRY("???",  NULL,            NULL,                NULL  ),
+    /* MPEG Audio layer 1 */
+    AFMT_ENTRY("MP1",  "mpa.codec",     NULL,                NULL  ),
+    /* MPEG Audio layer 2 */
+    AFMT_ENTRY("MP2",  "mpa.codec",     NULL,                NULL  ),
+    /* MPEG Audio layer 3 */
+    AFMT_ENTRY("MP3",  "mpa.codec",     "mp3_enc.codec",     ".mp3"),
 #if CONFIG_CODEC == SWCODEC
-  "WAV",  /* Uncompressed PCM in a WAV file */
-  "Ogg",  /* Ogg Vorbis */
-  "FLAC", /* FLAC */
-  "MPC",  /* Musepack */
-  "AC3",  /* A/52 (aka AC3) audio */
-  "WV",   /* WavPack */
-  "ALAC", /* Apple Lossless Audio Codec */
-  "AAC",  /* Advanced Audio Coding in M4A container */
-  "SHN",  /* Shorten */
-  "AIFF", /* Audio Interchange File Format */
-  "SID",  /* SID File Format */
+    /* Uncompressed PCM in a WAV file */
+    AFMT_ENTRY("WAV",  "wav.codec",     "wav_enc.codec",     ".wav"),
+    /* Ogg Vorbis */
+    AFMT_ENTRY("Ogg",  "vorbis.codec",  NULL,                NULL  ),
+    /* FLAC */
+    AFMT_ENTRY("FLAC", "flac.codec",    NULL,                NULL  ),
+    /* Musepack */
+    AFMT_ENTRY("MPC",  "mpc.codec",     NULL,                NULL  ),
+    /* A/52 (aka AC3) audio */
+    AFMT_ENTRY("AC3",  "a52.codec",     NULL,                NULL  ),
+    /* WavPack */
+    AFMT_ENTRY("WV",   "wavpack.codec", "wavpack_enc.codec", ".wv" ),
+    /* Apple Lossless Audio Codec */
+    AFMT_ENTRY("ALAC", "alac.codec",    NULL,                NULL  ),
+    /* Advanced Audio Coding in M4A container */
+    AFMT_ENTRY("AAC",  "aac.codec",     NULL,                NULL  ),
+    /* Shorten */
+    AFMT_ENTRY("SHN",  "shorten.codec", NULL,                NULL  ),
+    /* Audio Interchange File Format */
+    AFMT_ENTRY("AIFF", "aiff.codec",    NULL,                NULL  ),
+    /* SID File Format */
+    AFMT_ENTRY("SID",  "sid.codec",     NULL,                NULL  ),
 #endif
 };
+
+#if CONFIG_CODEC == SWCODEC
+/* recording quality to AFMT_* */
+const int rec_quality_info_afmt[9] =
+{
+    AFMT_MPA_L3,    /* MPEG L3   64 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3   96 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3  128 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3  160 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3  192 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3  224 kBit/s */
+    AFMT_MPA_L3,    /* MPEG L3  320 kBit/s */
+    AFMT_WAVPACK,   /* WavPack  909 kBit/s */
+    AFMT_PCM_WAV,   /* PCM Wav 1411 kBit/s */
+};
+#endif /* SWCODEC */
 
 char* id3_get_genre(const struct mp3entry* id3)
 {
@@ -119,8 +150,8 @@ char* id3_get_genre(const struct mp3entry* id3)
 
 char* id3_get_codec(const struct mp3entry* id3)
 {
-    if (id3->codectype < sizeof(codec_labels)/sizeof(char*)) {
-        return (char*)codec_labels[id3->codectype];
+    if (id3->codectype < AFMT_NUM_CODECS) {
+        return (char*)audio_formats[id3->codectype].label;
     } else {
         return NULL;
     }

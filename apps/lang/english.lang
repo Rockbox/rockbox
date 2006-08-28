@@ -9661,6 +9661,22 @@
     *: "Full Path"
   </voice>
 </phrase>
+<<<<<<< english.lang
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+=======
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
@@ -9778,3 +9794,4 @@
     *: "AGC maximum gain"
   </voice>
 </phrase>
+>>>>>>> 1.267

@@ -285,9 +285,31 @@ static bool custom_theme_browse(void)
 
 #ifdef HAVE_RECORDING
 
+static bool rec_menu_recording_screen(void)
+{
+    return recording_screen(false);
+}
+
 static bool recording_settings(void)
 {
-    return recording_menu(false);
+    bool ret;
+#ifdef HAVE_FMRADIO_IN
+    int rec_source = global_settings.rec_source;
+#endif
+
+    ret = recording_menu(false);
+
+#ifdef HAVE_FMRADIO_IN
+    if (rec_source != global_settings.rec_source)
+    {
+        if (rec_source == AUDIO_SRC_FMRADIO)
+            radio_stop();
+        /* If AUDIO_SRC_FMRADIO was selected from something else,
+           the recording screen will start the radio */       
+    }
+#endif
+
+    return ret;
 }
 
 bool rec_menu(void)
@@ -297,7 +319,7 @@ bool rec_menu(void)
 
     /* recording menu */
     static const struct menu_item items[] = {
-        { ID2P(LANG_RECORDING_MENU),     recording_screen  },
+        { ID2P(LANG_RECORDING_MENU),     rec_menu_recording_screen  },
         { ID2P(LANG_RECORDING_SETTINGS), recording_settings},
     };
 

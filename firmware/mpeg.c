@@ -2484,7 +2484,7 @@ void audio_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
 
-    if(source == 0) /* Mic */
+    if(source == AUDIO_SRC_MIC)
     {
         /* Copy left channel to right (mono mode) */
         mas_codec_writereg(8, 0x8000);

@@ -46,6 +46,9 @@
 #include "profile.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC)
+#if !defined(SIMULATOR)
+#include "pcm_record.h"
+#endif
 #include "dsp.h"
 #include "playback.h"
 #endif
@@ -84,7 +87,7 @@
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 8
+#define CODEC_API_VERSION 9
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -284,6 +287,21 @@ struct codec_api {
     void (*profile_func_enter)(void *this_fn, void *call_site);
     void (*profile_func_exit)(void *this_fn, void *call_site);
 #endif
+ 
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    bool          enc_codec_loaded;
+    void          (*enc_get_inputs)(int *buffer_size,
+                        int *channels, int *quality);
+    void          (*enc_set_parameters)(int chunk_size, int num_chunks,
+                    int samp_per_chunk, char *head_ptr, int head_size,
+                    int enc_id);
+    unsigned int* (*enc_alloc_chunk)(void);
+    void          (*enc_free_chunk)(void);
+    int           (*enc_wavbuf_near_empty)(void);
+    char*         (*enc_get_wav_data)(int size);
+    void          (**enc_set_header_callback)(void *head_buffer,
+                    int head_size, int num_samples, bool is_file_header);
+#endif
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */     
@@ -316,6 +334,10 @@ extern unsigned char plugin_end_addr[];
         NULL, NULL, codec_start };
 #endif
 #endif
+
+/* create full codec path from filenames in audio_formats[]
+   assumes buffer size is MAX_PATH */
+void codec_get_full_path(char *path, const char *codec_fn);
 
 /* defined by the codec loader (codec.c) */
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,

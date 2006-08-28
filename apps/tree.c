@@ -577,7 +577,7 @@ static bool dirbrowse(void)
         if (global_settings.rec_startup) {
             /* We fake being in the menu structure by calling
                the appropriate parent when we drop out of each screen */
-            recording_screen();
+            recording_screen(false);
             rec_menu();
             main_menu();
         }

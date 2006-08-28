@@ -39,6 +39,12 @@
 #include "talk.h"
 #include "misc.h"
 #include "sound.h"
+#ifdef HAVE_RECORDING
+#include "audio.h"
+#ifdef CONFIG_TUNER
+#include "radio.h"
+#endif
+#endif
 #if CONFIG_CODEC == MAS3587F
 #include "peakmeter.h"
 #include "mas.h"
@@ -290,19 +296,68 @@ static bool avc(void)
 #ifdef HAVE_RECORDING
 static bool recsource(void)
 {
-    static const struct opt_items names[] = {
+    int n_opts = AUDIO_NUM_SOURCES;
+
+    struct opt_items names[AUDIO_NUM_SOURCES] = {
         { STR(LANG_RECORDING_SRC_MIC) },
         { STR(LANG_RECORDING_SRC_LINE) },
 #ifdef HAVE_SPDIF_IN
         { STR(LANG_RECORDING_SRC_DIGITAL) },
 #endif
     };
+
+    /* caveat: assumes it's the last item! */
+#ifdef HAVE_FMRADIO_IN
+    if (radio_hardware_present())
+    {
+        names[AUDIO_SRC_FMRADIO].string = ID2P(LANG_FM_RADIO);
+        names[AUDIO_SRC_FMRADIO].voice_id = LANG_FM_RADIO;
+    }
+    else
+        n_opts--;
+#endif
+
     return set_option(str(LANG_RECORDING_SOURCE),
                       &global_settings.rec_source, INT, names,
-                      sizeof(names)/sizeof(struct opt_items), NULL );
+                      n_opts, NULL );
 }
 
 /* To be removed when we add support for sample rates and channel settings */
+#if CONFIG_CODEC == SWCODEC
+static bool recquality(void)
+{
+    static const struct opt_items names[] = {
+        { "MP3   64 kBit/s", TALK_ID(  64, UNIT_KBIT) },
+        { "MP3   96 kBit/s", TALK_ID(  96, UNIT_KBIT) },
+        { "MP3  128 kBit/s", TALK_ID( 128, UNIT_KBIT) },
+        { "MP3  160 kBit/s", TALK_ID( 160, UNIT_KBIT) },
+        { "MP3  192 kBit/s", TALK_ID( 192, UNIT_KBIT) },
+        { "MP3  224 kBit/s", TALK_ID( 224, UNIT_KBIT) },
+        { "MP3  320 kBit/s", TALK_ID( 320, UNIT_KBIT) },
+        { "WV   900 kBit/s", TALK_ID( 900, UNIT_KBIT) },
+        { "WAV 1411 kBit/s", TALK_ID(1411, UNIT_KBIT) }
+    };
+
+    return set_option(str(LANG_RECORDING_QUALITY),
+                      &global_settings.rec_quality, INT,
+                      names, sizeof (names)/sizeof(struct opt_items),
+                      NULL );
+}
+#elif CONFIG_CODEC == MAS3587F
+static bool recquality(void)
+{
+    return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
+                   &global_settings.rec_quality, 
+                   NULL, 1, 0, 7, NULL );
+}
+
+static bool receditable(void)
+{
+    return set_bool(str(LANG_RECORDING_EDITABLE),
+                    &global_settings.rec_editable);
+}
+#endif
+
 #ifndef HAVE_UDA1380
 static bool recfrequency(void)
 {
@@ -328,21 +383,6 @@ static bool recchannels(void)
     return set_option(str(LANG_RECORDING_CHANNELS),
                       &global_settings.rec_channels, INT,
                       names, 2, NULL );
-}
-#endif
-
-#if CONFIG_CODEC == MAS3587F
-static bool recquality(void)
-{
-    return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
-                   &global_settings.rec_quality, 
-                   NULL, 1, 0, 7, NULL );
-}
-
-static bool receditable(void)
-{
-    return set_bool(str(LANG_RECORDING_EDITABLE),
-                    &global_settings.rec_editable);
 }
 #endif
 
@@ -1011,13 +1051,13 @@ bool recording_menu(bool no_source)
     struct menu_item items[13];
     bool result;
 
-#if CONFIG_CODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F || CONFIG_CODEC == SWCODEC
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
     items[i++].function = recquality;
 #endif
+#ifndef HAVE_UDA1380
 /* We don't support frequency selection for UDA1380 yet. Let it just stay at
    the default 44100 Hz. */
-#ifndef HAVE_UDA1380
     items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
     items[i++].function = recfrequency;
 #endif

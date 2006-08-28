@@ -20,6 +20,22 @@
 #ifndef FMRADIO_H
 #define FMRADIO_H
 
+/** declare some stuff here so powermgmt.c can properly tell if the radio is
+    actually playing and not just paused. This break in heirarchy is allowed
+    for audio_status(). **/
+
+/* set when radio is playing or paused within fm radio screen */
+#define FMRADIO_OFF         0x0
+#define FMRADIO_PLAYING     0x1
+#define FMRADIO_PAUSED      0x2
+
+/* returns the IN flag */
+#define FMRADIO_IN_SCREEN(s)        ((s) & FMRADIO_IN_FLAG)
+#define FMRADIO_STATUS_PLAYING(s)   ((s) & FMRADIO_PLAYING_OUT)
+#define FMRADIO_STATUS_PAUSED(s)    ((s) & FMRADIO_PAUSED_OUT)
+
+extern int  get_radio_status(void);
+
 extern int fmradio_read(int addr);
 extern void fmradio_set(int addr, int data);
 

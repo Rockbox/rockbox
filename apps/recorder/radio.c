@@ -24,7 +24,6 @@
 #include "mas.h"
 #include "settings.h"
 #include "button.h"
-#include "fmradio.h"
 #include "status.h"
 #include "kernel.h"
 #include "mpeg.h"
@@ -62,17 +61,6 @@
 #include "dir.h"
 
 #ifdef CONFIG_TUNER
-
-#if CONFIG_CODEC == SWCODEC
-#ifdef HAVE_UDA1380
-#include "uda1380.h"
-#endif
-#ifdef HAVE_TLV320
-#include "tlv320.h"
-#endif
-
-#include "pcm_record.h"
-#endif
 
 #if CONFIG_KEYPAD == RECORDER_PAD
 #define FM_MENU BUTTON_F1
@@ -165,6 +153,7 @@ static int curr_freq;
 static int radio_mode = RADIO_SCAN_MODE;
 
 static int radio_status = FMRADIO_OFF;
+static bool in_screen = false;
 
 #define MAX_PRESETS 64
 static bool presets_loaded = false, presets_changed = false;
@@ -239,22 +228,87 @@ int get_radio_status(void)
     return radio_status;
 }
 
+bool in_radio_screen(void)
+{
+    return in_screen;
+}
+
+/* secret flag for starting paused - prevents unmute */
+#define FMRADIO_START_PAUSED 0x8000
+void radio_start(void)
+{
+    bool start_paused;
+    int mute_timeout;
+
+    if(radio_status == FMRADIO_PLAYING)
+        return;
+
+    start_paused = radio_status & FMRADIO_START_PAUSED;
+    /* clear flag before any yielding */
+    radio_status &= ~FMRADIO_START_PAUSED;
+
+    if(radio_status == FMRADIO_OFF)
+        radio_power(true);
+
+    curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
+
+    radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
+    radio_set(RADIO_FREQUENCY, curr_freq);
+
+    if(radio_status == FMRADIO_OFF)
+    {
+        radio_set(RADIO_IF_MEASUREMENT, 0);
+        radio_set(RADIO_SENSITIVITY, 0);
+        radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+        mute_timeout = current_tick + 1*HZ;
+    }
+    else
+    {
+        /* paused */
+        mute_timeout = current_tick + 2*HZ;
+    }
+
+    while(!radio_get(RADIO_STEREO) && !radio_get(RADIO_TUNED))
+    {
+        if(TIME_AFTER(current_tick, mute_timeout))
+             break;
+        yield();
+    }
+
+    /* keep radio from sounding initially */
+    if(!start_paused)
+        radio_set(RADIO_MUTE, 0);
+
+    radio_status = FMRADIO_PLAYING;
+} /* radio_start */
+
+void radio_pause(void)
+{
+    if(radio_status == FMRADIO_PAUSED)
+        return;
+
+    if(radio_status == FMRADIO_OFF)
+    {
+        radio_status |= FMRADIO_START_PAUSED;    
+        radio_start();
+    }
+
+    radio_set(RADIO_MUTE, 1);
+    radio_set(RADIO_SLEEP, 1);
+
+    radio_status = FMRADIO_PAUSED;
+} /* radio_pause */
+
 void radio_stop(void)
-{             
+{
+    if(radio_status == FMRADIO_OFF)
+        return;
+
     radio_set(RADIO_MUTE, 1);
     radio_set(RADIO_SLEEP, 1); /* low power mode, if available */
     radio_status = FMRADIO_OFF;
     radio_power(false); /* status update, power off if avail. */
-
-#ifndef SIMULATOR /* SIMULATOR. Catch FMRADIO_OFF status for the sim. */ 
-#if CONFIG_CODEC == SWCODEC
-#ifdef HAVE_TLV320
-    tlv320_set_monitor(false);
-#endif
-    pcm_rec_mux(0); /* Line In */
-#endif
-#endif /* SIMULATOR */
-}
+} /* radio_stop */
 
 bool radio_hardware_present(void)
 {
@@ -297,17 +351,15 @@ static int find_closest_preset(int freq)
             return i;
         if(diff < 0)
             diff = -diff;
-	if(diff < min_diff)
+        if(diff < min_diff)
         {
             preset = i;
-            min_diff = diff;	
+            min_diff = diff;
         }
     }
 
     return preset;
 }
-
-
 
 static void remember_frequency(void)
 {
@@ -366,13 +418,15 @@ bool radio_screen(void)
 #endif
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
-    int mute_timeout = current_tick;
     int button_timeout = current_tick + (2*HZ);
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
     gui_buttonbar_init(&buttonbar);
     gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
 #endif
+    /* change status to "in screen" */
+    in_screen = true;
+
     /* always display status bar in radio screen for now */
     global_settings.statusbar = true;
     FOR_NB_SCREENS(i)
@@ -396,80 +450,44 @@ bool radio_screen(void)
     }
                                        
 #ifndef SIMULATOR
+    if(radio_status == FMRADIO_OFF)    
+        audio_stop();
+
 #if CONFIG_CODEC != SWCODEC
     if(rec_create_directory() > 0)
         have_recorded = true;
-#endif
 
-    if(radio_status == FMRADIO_PLAYING_OUT)
-        radio_status = FMRADIO_PLAYING;
-    else if(radio_status == FMRADIO_PAUSED_OUT)
-        radio_status = FMRADIO_PAUSED;
-
-    if(radio_status == FMRADIO_OFF)    
-        audio_stop();
-        
-#if CONFIG_CODEC != SWCODEC
     audio_init_recording(talk_get_bufsize());
 
     sound_settings_apply();
     /* Yes, we use the D/A for monitoring */
     peak_meter_playback(true);
-    
+
     peak_meter_enabled = true;
 
-    if (global_settings.rec_prerecord_time)
-        talk_buffer_steal(); /* will use the mp3 buffer */
+    rec_set_recording_options(global_settings.rec_frequency,
+                              global_settings.rec_quality,
+                              AUDIO_SRC_LINEIN, 0,
+                              global_settings.rec_channels,
+                              global_settings.rec_editable,
+                              global_settings.rec_prerecord_time);
 
-    audio_set_recording_options(global_settings.rec_frequency,
-                               global_settings.rec_quality,
-                               1, /* Line In */
-                               global_settings.rec_channels,
-                               global_settings.rec_editable,
-                               global_settings.rec_prerecord_time);
-
-    
-#else
-    peak_meter_enabled = false;
-
-#ifdef HAVE_UDA1380
-    uda1380_enable_recording(false);
-    uda1380_set_monitor(true);
-#elif defined(HAVE_TLV320)
-    //tlv320_enable_recording(false);
-    tlv320_set_recvol(23, 23, AUDIO_GAIN_LINEIN); /* 0dB */
-    tlv320_set_monitor(true);
-#endif
-
-    /* Set the input multiplexer to FM */
-    pcm_rec_mux(1);
-#endif
     audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                            sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
+            sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
+
+#endif /* CONFIG_CODEC != SWCODEC */
+#endif /* ndef SIMULATOR */
+
+    /* turn on radio */
+#if CONFIG_CODEC == SWCODEC
+    rec_set_source(AUDIO_SRC_FMRADIO, (radio_status == FMRADIO_PAUSED) ?
+                       SRCF_FMRADIO_PAUSED : SRCF_FMRADIO_PLAYING);
+#else
+    if (radio_status == FMRADIO_OFF)
+        radio_start();
 #endif
 
-    curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
-    
-    if(radio_status == FMRADIO_OFF)
-    {
-        radio_power(true);
-        radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
-        radio_set(RADIO_FREQUENCY, curr_freq);
-        radio_set(RADIO_IF_MEASUREMENT, 0);
-        radio_set(RADIO_SENSITIVITY, 0);
-        radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
-        mute_timeout = current_tick + (1*HZ);
-        while( !radio_get(RADIO_STEREO)
-             &&!radio_get(RADIO_TUNED) )
-        {
-            if(TIME_AFTER(current_tick, mute_timeout))
-                 break;
-            yield();
-        }
-        radio_set(RADIO_MUTE, 0);
-        radio_status = FMRADIO_PLAYING;
-    }
-
+    /* I hate this thing with vehement passion (jhMikeS): */
    if(num_presets == 0 && yesno_pop(str(LANG_FM_FIRST_AUTOSCAN)))
         scan_presets();
     
@@ -478,8 +496,8 @@ bool radio_screen(void)
          radio_mode = RADIO_PRESET_MODE;
 
 #ifdef HAS_BUTTONBAR
-    gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU), str(LANG_FM_BUTTONBAR_PRESETS),
-                  str(LANG_FM_BUTTONBAR_RECORD));
+    gui_buttonbar_set(&buttonbar, str(LANG_BUTTONBAR_MENU),
+        str(LANG_FM_BUTTONBAR_PRESETS), str(LANG_FM_BUTTONBAR_RECORD));
 #endif
 
     cpu_idle_mode(true);
@@ -535,7 +553,7 @@ bool radio_screen(void)
                 if (lastbutton != FM_STOP_PRE)
                     break;
 #endif
-#ifndef SIMULATOR
+#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
                     audio_stop();
@@ -548,7 +566,7 @@ bool radio_screen(void)
                     {
                         if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
                         {
-					        if(filepreset[0] == '\0')
+                            if(filepreset[0] == '\0')
                                 save_preset_list();
                             else
                                 radio_save_presets();
@@ -577,14 +595,13 @@ bool radio_screen(void)
 #ifndef SIMULATOR
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
-                    audio_new_file(rec_create_filename(buf));
+                    rec_new_file();
                     update_screen = true;
                 }
                 else
                 {
                     have_recorded = true;
-                    talk_buffer_steal(); /* we use the mp3 buffer */
-                    audio_record(rec_create_filename(buf));
+                    rec_record();
                     update_screen = true;
                 }
 #endif
@@ -604,7 +621,7 @@ bool radio_screen(void)
                     )
                     break;
 #endif
-#ifndef SIMULATOR
+#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
                 if(audio_status() == AUDIO_STATUS_RECORD)
                     audio_stop();
 #endif
@@ -615,7 +632,7 @@ bool radio_screen(void)
                 {
                     if(yesno_pop(str(LANG_FM_SAVE_CHANGES)))
                     {
-				        if(filepreset[0] == '\0')
+                        if(filepreset[0] == '\0')
                             save_preset_list();
                         else
                             radio_save_presets();
@@ -734,27 +751,11 @@ bool radio_screen(void)
                   )
                      break;
 #endif
-                if(radio_status != FMRADIO_PLAYING)
-                {
-                     radio_set(RADIO_SLEEP, 0);
-                     radio_set(RADIO_FREQUENCY, curr_freq);
-                     mute_timeout = current_tick + (2*HZ);
-                     while( !radio_get(RADIO_STEREO)
-                          &&!radio_get(RADIO_TUNED) )
-                     {
-                         if(TIME_AFTER(current_tick, mute_timeout))
-                             break;
-                         yield();
-                     }
-                     radio_set(RADIO_MUTE, 0);
-                     radio_status = FMRADIO_PLAYING;
-                }
+                if (radio_status == FMRADIO_PLAYING)
+                    radio_pause();
                 else
-                {
-                     radio_set(RADIO_MUTE, 1);
-                     radio_set(RADIO_SLEEP, 1);
-                     radio_status = FMRADIO_PAUSED;
-                }
+                    radio_start();
+
                 update_screen = true;
                 break;
 #endif
@@ -917,13 +918,17 @@ bool radio_screen(void)
             if(TIME_AFTER(current_tick, timeout))
             {
                 timeout = current_tick + HZ;
-                
-                stereo = radio_get(RADIO_STEREO) &&
-                    !global_settings.fm_force_mono;
-                if(stereo != last_stereo_status)
+
+                /* keep "mono" from always being displayed when paused */
+                if (radio_status != FMRADIO_PAUSED)
                 {
-                    update_screen = true;
-                    last_stereo_status = stereo;
+                    stereo = radio_get(RADIO_STEREO) &&
+                        !global_settings.fm_force_mono;
+                    if(stereo != last_stereo_status)
+                    {
+                        update_screen = true;
+                        last_stereo_status = stereo;
+                    }
                 }
             }
             
@@ -952,9 +957,6 @@ bool radio_screen(void)
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 1, buf);
                 
-                strcat(buf, stereo?str(LANG_CHANNEL_STEREO):
-                                   str(LANG_CHANNEL_MONO));
-
                 snprintf(buf, 128, stereo?str(LANG_CHANNEL_STEREO):
                                           str(LANG_CHANNEL_MONO));
                 FOR_NB_SCREENS(i)
@@ -1005,9 +1007,9 @@ bool radio_screen(void)
             done = true;
         }
         if (TIME_AFTER(current_tick, button_timeout))
-       	{
-       		cpu_idle_mode(true);
-       	}
+        {
+            cpu_idle_mode(true);
+        }
     } /*while(!done)*/
 
 #ifndef SIMULATOR
@@ -1033,28 +1035,26 @@ bool radio_screen(void)
 
     sound_settings_apply();
 #endif /* SIMULATOR */
+
     if(keep_playing)
     {
-/* Catch FMRADIO_PLAYING_OUT status for the sim. */ 
+/* Catch FMRADIO_PLAYING status for the sim. */ 
 #ifndef SIMULATOR
 #if CONFIG_CODEC != SWCODEC
         /* Enable the Left and right A/D Converter */
         audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                                sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
+                                 sound_default(SOUND_RIGHT_GAIN),
+                                 AUDIO_GAIN_LINEIN);
         mas_codec_writereg(6, 0x4000);
 #endif
 #endif
-        if(radio_status == FMRADIO_PAUSED)
-            radio_status = FMRADIO_PAUSED_OUT;
-        else
-            radio_status = FMRADIO_PLAYING_OUT;
-
     }
     else
     {
-        radio_stop();
 #if CONFIG_CODEC == SWCODEC
-        peak_meter_enabled = true;
+        rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
+#else
+        radio_stop();
 #endif
     }
     
@@ -1062,9 +1062,11 @@ bool radio_screen(void)
 
     /* restore status bar settings */
     global_settings.statusbar = statusbar;
+
+    in_screen = false;
     
     return have_recorded;
-}
+} /* radio_screen */
 
 void radio_save_presets(void)
 {
@@ -1106,16 +1108,16 @@ void radio_load_presets(char *filename)
 
 /* No Preset in configuration. */
     if(filename[0] == '\0')
-	{
+    {
         filepreset[0] = '\0';
         return;
-	}
+    }
 /* Temporary preset, loaded until player shuts down. */
     else if(filename[0] == '/') 
         strncpy(filepreset, filename, sizeof(filepreset));
 /* Preset from default directory. */
     else
-	    snprintf(filepreset, sizeof(filepreset), "%s/%s.fmr",
+        snprintf(filepreset, sizeof(filepreset), "%s/%s.fmr",
             FMPRESET_PATH, filename);
     
     fd = open(filepreset, O_RDONLY);
@@ -1466,30 +1468,6 @@ bool handle_radio_presets(void)
     return reload_dir;
 }
 
-#ifndef SIMULATOR
-#if CONFIG_CODEC != SWCODEC
-static bool fm_recording_settings(void)
-{
-    bool ret;
-    
-    ret = recording_menu(true);
-    if(!ret)
-    {
-        if (global_settings.rec_prerecord_time)
-            talk_buffer_steal(); /* will use the mp3 buffer */
-
-        audio_set_recording_options(global_settings.rec_frequency,
-                                   global_settings.rec_quality,
-                                   1, /* Line In */
-                                   global_settings.rec_channels,
-                                   global_settings.rec_editable,
-                                   global_settings.rec_prerecord_time);
-    }
-    return ret;
-}
-#endif
-#endif
-
 char monomode_menu_string[32];
 
 static void create_monomode_menu(void)
@@ -1628,6 +1606,55 @@ int radio_menu_cb(int key, int m)
     return key;
 }
 
+#ifndef SIMULATOR
+#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+static bool fm_recording_screen(void)
+{
+    bool ret;
+
+#ifdef HAVE_FMRADIO_IN
+    /* switch recording source to FMRADIO for the duration */
+    int rec_source = global_settings.rec_source;
+    global_settings.rec_source = AUDIO_SRC_FMRADIO;
+
+    /* clearing queue seems to cure a spontaneous abort during record */
+    while (button_get(false) != BUTTON_NONE);
+#endif
+
+    ret = recording_screen(true);
+
+#ifdef HAVE_FMRADIO_IN
+    /* safe to reset as changing sources is prohibited here */
+    global_settings.rec_source = rec_source;
+#endif
+
+    return ret;
+}
+
+static bool fm_recording_settings(void)
+{
+    bool ret = recording_menu(true);
+
+    if (!ret)
+    {
+        rec_set_recording_options(global_settings.rec_frequency,
+                                  global_settings.rec_quality,
+#if CONFIG_CODEC == SWCODEC
+                                  AUDIO_SRC_FMRADIO, SRCF_FMRADIO_PLAYING,
+#else
+                                  AUDIO_SRC_LINEIN, 0,
+#endif
+                                  global_settings.rec_channels,
+                                  global_settings.rec_editable,
+                                  global_settings.rec_prerecord_time);
+    }
+
+    return ret;
+}
+#endif
+#endif /* SIMULATOR */
+
+
 /* main menu of the radio screen */
 bool radio_menu(void)
 {
@@ -1637,24 +1664,27 @@ bool radio_menu(void)
     static const struct menu_item items[] = {
 /* Add functions not accessible via buttons */
 #ifndef FM_PRESET
-        { ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets },
+        { ID2P(LANG_FM_BUTTONBAR_PRESETS), handle_radio_presets  },
 #endif
 #ifndef FM_PRESET_ADD
-        { ID2P(LANG_FM_ADD_PRESET)       , radio_add_preset     },
+        { ID2P(LANG_FM_ADD_PRESET)       , radio_add_preset      },
 #endif
-        { ID2P(LANG_FM_PRESET_LOAD)      , load_preset_list     },
-        { ID2P(LANG_FM_PRESET_SAVE)      , save_preset_list     },
-        { ID2P(LANG_FM_PRESET_CLEAR)     , clear_preset_list    },
+        { ID2P(LANG_FM_PRESET_LOAD)      , load_preset_list      },
+        { ID2P(LANG_FM_PRESET_SAVE)      , save_preset_list      },
+        { ID2P(LANG_FM_PRESET_CLEAR)     , clear_preset_list     },
 
-        { monomode_menu_string           , toggle_mono_mode     },
+        { monomode_menu_string           , toggle_mono_mode      },
 #ifndef FM_MODE
-        { radiomode_menu_string          , toggle_radio_mode    },
+        { radiomode_menu_string          , toggle_radio_mode     },
 #endif
-        { ID2P(LANG_SOUND_SETTINGS)      , sound_menu           },
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings},
+        { ID2P(LANG_SOUND_SETTINGS)      , sound_menu            },
+#ifndef SIMULATOR
+#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+        { ID2P(LANG_RECORDING_MENU)      , fm_recording_screen   },
+        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings },
 #endif
-        { ID2P(LANG_FM_SCAN_PRESETS)     , scan_presets         },
+#endif
+        { ID2P(LANG_FM_SCAN_PRESETS)     , scan_presets          },
     };
 
     create_monomode_menu();

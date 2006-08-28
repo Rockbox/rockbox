@@ -42,6 +42,7 @@
 #define BACKDROP_DIR ROCKBOX_DIR"/backdrops"
 #define REC_BASE_DIR "/recordings"
 #define EQS_DIR ROCKBOX_DIR "/eqs"
+#define CODECS_DIR "/codecs"
 
 #define MAX_FILENAME 20
 
