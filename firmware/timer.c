@@ -59,7 +59,13 @@ void TIMER2(void)
         cycles_new = 0;
     }
     if (pfn_timer != NULL)
+    {
+        cycles_new = -1; 
+        /* "lock" the variable, in case timer_set_period()
+         * is called within pfn_timer() */
         pfn_timer();
+        cycles_new = 0;
+    }
 }
 #endif /* CONFIG_CPU */
 
@@ -155,11 +161,9 @@ static bool timer_set(long cycles, bool start)
             pfn_unregister();
             pfn_unregister = NULL;
         }
-        cycles_new = 0;
-        TIMER2_CFG = 0;
-        TIMER2_VAL;
-        TIMER2_CFG = 0xc0000000 | cycles;   /* enable timer */
     }
+    if (start || (cycles_new == -1))  /* within isr, cycles_new is "locked" */
+        TIMER2_CFG = 0xc0000000 | cycles;    /* enable timer */
     else
         cycles_new = cycles;
 
