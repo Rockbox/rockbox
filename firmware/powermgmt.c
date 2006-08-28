@@ -442,7 +442,7 @@ static void handle_auto_poweroff(void)
 #endif
 
     if(timeout &&
-#ifdef CONFIG_TUNER
+#if defined(CONFIG_TUNER) && !defined(BOOTLOADER)
        (!(get_radio_status() & FMRADIO_PLAYING)) &&
 #endif
        !usb_inserted() &&
