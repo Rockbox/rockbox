@@ -48,10 +48,10 @@ file find the instructions on the Rockbox website:
   layout. There are a number of WPS files included in Rockbox, and you can 
   load one of these at anytime by selecting it in
   \setting{General Settings $\rightarrow$ Display $\rightarrow$ Browse .wps files}.
-
-\opt{h1xx,h300}{There is a related option to browse \fname{.rwps} files for 
-  \daps\ with LCD remote controls installed.  This will load a similar WPS 
-  screen for the remote but with usually a simpler and more concise layout.}
+  \opt{HAVE_REMOTE_LCD}{There is a related option to browse \fname{.rwps} 
+    files for \daps{} with LCD remote controls installed. This will load a 
+    similar WPS screen for the remote but with usually a simpler and more 
+    concise layout.}
 
 \note{``Playing'' a \fname{.wps} from the file browser has the same effect.}
 
@@ -82,6 +82,9 @@ all the tags that are available.
   If you have a bigger WPS file, only the first part of it will be 
   loaded and used.
 \end{itemize}
+
+\note{Keep in mind that your \dap{} resolution is \genericimg{} when 
+  designing your own WPS, or if you use a WPS designed for another target.}
 
 \subsubsection{Conditional Tags}
 
