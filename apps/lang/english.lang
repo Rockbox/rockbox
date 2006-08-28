@@ -1677,7 +1677,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu 
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -1691,7 +1691,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: 
+  desc:
   user:
   <source>
     *: ""
@@ -5221,7 +5221,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -8424,17 +8424,17 @@
   <voice>
     *: "Direct gain"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
+  <source>
     *: "Cross Gain"
   </source>
-  <dest>  
+  <dest>
     *: "Cross Gain"
   </dest>
-  <voice>  
+  <voice>
     *: "Cross gain"
   </voice>
 </phrase>
@@ -8531,7 +8531,7 @@
   <voice>
     *: "Remote Scrolling Options"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
@@ -8765,7 +8765,7 @@
   <voice>
     *: "Start new file"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_STOP_RECORDING
   desc: in record timesplit options
@@ -9661,22 +9661,6 @@
     *: "Full Path"
   </voice>
 </phrase>
-<<<<<<< english.lang
-<phrase>
-  id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
-  user:
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "kilobits per second"
-  </voice>
-</phrase>
-=======
 <phrase>
   id: LANG_RECORD_AGC_PRESET
   desc: automatic gain control in record settings
@@ -9794,4 +9778,17 @@
     *: "AGC maximum gain"
   </voice>
 </phrase>
->>>>>>> 1.267
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
