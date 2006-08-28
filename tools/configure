@@ -128,6 +128,10 @@ simcc () {
        LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
        crosswincc # setup cross-compiler
    elif [ "$simver" = "sdl" ]; then
+       if [ "0" != `sdl-config --libs |grep -c mwindows` ]; then
+           # Enable crosscompiling if sdl-config is from Windows SDL
+           crosswincc
+       fi
        GCCOPTS="$GCCOPTS `sdl-config --cflags`"
        LDOPTS="`sdl-config --libs`"
        checksoundcard
