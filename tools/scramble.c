@@ -84,7 +84,7 @@ void usage(void)
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
-           "\t                   ip3g, ip4g, mini, x5)\n"
+           "\t                   ip3g, ip4g, mini, x5, h10, h10_5gb)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -196,6 +196,10 @@ int main (int argc, char** argv)
             modelnum = 10;
         else if(!strcmp(&argv[1][5], "mn2g"))
             modelnum = 11;
+        else if(!strcmp(&argv[1][5], "h10"))
+            modelnum = 13;
+        else if(!strcmp(&argv[1][5], "h10_5gb"))
+            modelnum = 14;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

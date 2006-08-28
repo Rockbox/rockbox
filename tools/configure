@@ -893,10 +893,10 @@ toolsdir='\$(ROOTDIR)/tools'
     target="-DIRIVER_H10"
     memory=32 # always
     arm7tdmicc
-    tool="$rootdir/tools/mkmi4.sh h10"
+    tool="$rootdir/tools/scramble -add=h10"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="H10_20GC.mi4"
+    output="rockbox.h10"
     appextra="recorder:gui"
     archosrom=""
     flash=""
@@ -904,7 +904,7 @@ toolsdir='\$(ROOTDIR)/tools'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset=$genericbitmaptools
+    toolset="$genericbitmaptools scramble"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="iriver"
@@ -939,10 +939,10 @@ toolsdir='\$(ROOTDIR)/tools'
     target="-DIRIVER_H10_5GB"
     memory=32 # always
     arm7tdmicc
-    tool="$rootdir/tools/mkmi4.sh h10_5gb"
+    tool="$rootdir/tools/scramble -add=h10_5gb"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="H10.mi4"
+    output="rockbox.h10"
     appextra="recorder:gui"
     archosrom=""
     flash=""
@@ -950,7 +950,7 @@ toolsdir='\$(ROOTDIR)/tools'
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset=$genericbitmaptools
+    toolset="$genericbitmaptools scramble"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="iriver"

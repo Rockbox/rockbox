@@ -43,33 +43,19 @@
 /* Size of the buffer to store the loaded Rockbox/iriver image */
 #define MAX_LOADSIZE (5*1024*1024)
 
-/* This is identical to the function used in the iPod bootloader */
-static void memmove16(void *dest, const void *src, unsigned count)
-{
-    struct bufstr {
-        unsigned _buf[4];
-    } *d, *s;
+/* A buffer to load the iriver firmware or Rockbox into */
+unsigned char loadbuffer[MAX_LOADSIZE];
 
-    if (src >= dest) {
-        count = (count + 15) >> 4;
-        d = (struct bufstr *) dest;
-        s = (struct bufstr *) src;
-        while (count--)
-            *d++ = *s++;
-    } else {
-        count = (count + 15) >> 4;
-        d = (struct bufstr *)(dest + (count <<4));
-        s = (struct bufstr *)(src + (count <<4));
-        while (count--)
-            *--d = *--s;
-    }
-}
+char version[] = APPSVERSION;
 
+#define DRAM_START              0x10000000
+
+int line=0;
 
 /* Load original iriver firmware. This function expects a file called
-   "H10_20GC.mi4" in the root directory of the player. It should be decrypted
+   "/System/Original.mi4" on the player. It should be decrypted
    and have the header stripped using mi4code. It reads the file in to a memory
-   buffer called buf. The rest of the loading is done in main()
+   buffer called buf. The rest of the loading is done in main() and crt0.S
 */
 int load_iriver(unsigned char* buf)
 {
@@ -77,9 +63,13 @@ int load_iriver(unsigned char* buf)
     int rc;
     int len;
     
-    fd = open("/H10_20GC.mi4", O_RDONLY);
+    fd = open("/System/Original.mi4", O_RDONLY);
 
     len = filesize(fd);
+    
+    if (len > MAX_LOADSIZE)
+        return -6;
+
     rc = read(fd, buf, len);
     if(rc < len)
         return -4;
@@ -88,155 +78,158 @@ int load_iriver(unsigned char* buf)
     return len;
 }
 
-/* A buffer to load the iriver firmware or Rockbox into */
-unsigned char loadbuffer[MAX_LOADSIZE];
-
-void main(void)
+/* Load Rockbox firmware (rockbox.h10) */
+int load_rockbox(unsigned char* buf)
 {
-    /* Attempt to load original iriver firmware. Successfully starts loading the
-       iriver firmware but then locks up once the "System Initialising" screen
-       is displayed.
-       
-       The iriver firmware was decrypted and the header removed. It was then
-       appended to the end of bootloader.bin and an mi4 file was created from
-       the resulting file. 
-       
-       The original firmware starts at 0xd800 in the file and is of length
-       0x47da00.
-       
-       The whole file (bootloader.bin + decrypted mi4) are loaded to memory by
-       the original iriver bootloader on startup. This copies the mi4 part to
-       the start of DRAM and passes execution to there.
-    
-    memmove16((void*)DRAMORIG, (void*)(DRAMORIG + 0xd800), 0x47da00);
-    asm volatile(
-        "mov   r0, #" SC(DRAMORIG) "\n"
-        "mov   pc, r0                 \n"
-    );
-    */
-
-    /*int i;
+    int fd;
     int rc;
-    int btn;
-    int fd;*/
-    char buffer[24];
+    int len;
+    unsigned long chksum;
+    char model[5];
+    unsigned long sum;
+    int i;
+    char str[80];
     
-    snprintf(buffer, 24, "Hello World");
-    lcd_puts(0, 0, buffer);
+    fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
+    if(fd < 0)
+    {
+        fd = open("/" BOOTFILE, O_RDONLY);
+        if(fd < 0)
+            return -1;
+    }
+
+    len = filesize(fd) - 8;
+
+    snprintf(str, sizeof(str), "Length: %x", len);
+    lcd_puts(0, line++ ,str);
+    lcd_update();
+    
+    if (len > MAX_LOADSIZE)
+        return -6;
+
+    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
+    
+    rc = read(fd, &chksum, 4);
+    chksum=betoh32(chksum); /* Rockbox checksums are big-endian */
+    if(rc < 4)
+        return -2;
+
+    snprintf(str, sizeof(str), "Checksum: %x", chksum);
+    lcd_puts(0, line++ ,str);
     lcd_update();
 
-    /*i=ata_init();
-    disk_init();
-    rc = disk_mount_all();*/
+    rc = read(fd, model, 4);
+    if(rc < 4)
+        return -3;
 
-    /* Load original iriver firmware. Uses load_iriver(buf) to load the
-       decrypted mi4 file from disk to DRAM. This then copies that part of DRAM
-       to the start of DRAM and passes 
-       execution to there.
+    model[4] = 0;
     
-    rc=load_iriver(loadbuffer);
-    memcpy((void*)DRAMORIG,loadbuffer,rc);
-    asm volatile(
-        "mov   r0, #" SC(DRAMORIG) "\n"
-        "mov   pc, r0                 \n"
-    );*/
-    
-    
-    /* This assumes that /test.txt exists */
-    /*fd=open("/test.txt",O_RDWR);*/
-    
-    
-    /*
-    for(i=0;i<100;i++){
-        btn = button_read_device();
-        switch(btn){
-        case BUTTON_LEFT:
-            snprintf(buffer, sizeof(buffer), "Left");
-            write(fd,buffer,sizeof(buffer));
-            break;
-        case BUTTON_RIGHT:
-        break;
-        case BUTTON_REW:
-        break;
-        case BUTTON_FF:
-        break;
-        case BUTTON_PLAY:
-        break;
-        default:
-        break;
-        }
-        
+    snprintf(str, sizeof(str), "Model name: %s", model);
+    lcd_puts(0, line++ ,str);
+    lcd_update();
 
+    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
+
+    rc = read(fd, buf, len);
+    if(rc < len)
+        return -4;
+
+    close(fd);
+
+    sum = MODEL_NUMBER;
+    
+    for(i = 0;i < len;i++) {
+        sum += buf[i];
     }
-    */
-    
-    
-    
-    /* Investigate gpio
-    
-    unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
-    unsigned int gpio_e, gpio_f, gpio_g, gpio_h;
-    unsigned int gpio_i, gpio_j, gpio_k, gpio_l;
 
-    gpio_a = GPIOA_INPUT_VAL;
-    gpio_b = GPIOB_INPUT_VAL;
-    gpio_c = GPIOC_INPUT_VAL;
+    snprintf(str, sizeof(str), "Sum: %x", sum);
+    lcd_puts(0, line++ ,str);
+    lcd_update();
 
-    gpio_g = GPIOG_INPUT_VAL;
-    gpio_h = GPIOH_INPUT_VAL;
-    gpio_i = GPIOI_INPUT_VAL;
+    if(sum != chksum)
+        return -5;
 
-    snprintf(buffer,sizeof(buffer),"GPIO_A: %02x GPIO_G: %02x\n",gpio_a,gpio_g);
-    write(fd,buffer,sizeof(buffer));
-    snprintf(buffer,sizeof(buffer),"GPIO_B: %02x GPIO_H: %02x\n",gpio_b,gpio_h);
-    write(fd,buffer,sizeof(buffer));
-    snprintf(buffer,sizeof(buffer),"GPIO_C: %02x GPIO_I: %02x\n",gpio_c,gpio_i);
-    write(fd,buffer,sizeof(buffer));
-    
-    gpio_d = GPIOD_INPUT_VAL;
-    gpio_e = GPIOE_INPUT_VAL;
-    gpio_f = GPIOF_INPUT_VAL;
+    return len;
+}
 
-    gpio_j = GPIOJ_INPUT_VAL;
-    gpio_k = GPIOK_INPUT_VAL;
-    gpio_l = GPIOL_INPUT_VAL;
+void* main(void)
+{
+    char buf[256];
+    int i;
+    int rc;
+    unsigned short* identify_info;
+    struct partinfo* pinfo;
 
-    snprintf(buffer,sizeof(buffer),"GPIO_D: %02x GPIO_J: %02x\n",gpio_d,gpio_j);
-    write(fd,buffer,sizeof(buffer));
-    snprintf(buffer,sizeof(buffer),"GPIO_E: %02x GPIO_K: %02x\n",gpio_e,gpio_k);
-    write(fd,buffer,sizeof(buffer));
-    snprintf(buffer,sizeof(buffer),"GPIO_F: %02x GPIO_L: %02x\n",gpio_f,gpio_l);
-    write(fd,buffer,sizeof(buffer));
-    */
+    system_init();
+    kernel_init();
+    lcd_init();
+    font_init();
+
+    line=0;
+
+    lcd_setfont(FONT_SYSFIXED);
+
+    lcd_puts(0, line++, "Rockbox boot loader");
+    snprintf(buf, sizeof(buf), "Version: 20%s", version);
+    lcd_puts(0, line++, buf);
+    snprintf(buf, sizeof(buf), "iriver H10");
+    lcd_puts(0, line++, buf);
+    lcd_update();
+
+    i=ata_init();
+    if (i==0) {
+      identify_info=ata_get_identify();
+      /* Show model */
+      for (i=0; i < 20; i++) {
+        ((unsigned short*)buf)[i]=htobe16(identify_info[i+27]);
+      }
+      buf[40]=0;
+      for (i=39; i && buf[i]==' '; i--) {
+        buf[i]=0;
+      }
+      lcd_puts(0, line++, buf);
+      lcd_update();
+    } else {
+      snprintf(buf, sizeof(buf), "ATA: %d", i);
+      lcd_puts(0, line++, buf);
+      lcd_update();
+    }
+
+    disk_init();
+    rc = disk_mount_all();
+    if (rc<=0)
+    {
+        lcd_puts(0, line++, "No partition found");
+        lcd_update();
+    }
+
+    pinfo = disk_partinfo(0);
+    snprintf(buf, sizeof(buf), "Partition 0: 0x%02x %ld MB", 
+                  pinfo->type, pinfo->size / 2048);
+    lcd_puts(0, line++, buf);
+    lcd_update();
+
+    i=button_read_device();
+    if(i==BUTTON_LEFT)
+    {
+        lcd_puts(0, line, "Loading iriver firmware...");
+        lcd_update();
+        rc=load_iriver(loadbuffer);
+    } else {
+        lcd_puts(0, line, "Loading Rockbox...");
+        lcd_update();
+        rc=load_rockbox(loadbuffer);
+    }
+
+    if (rc < 0) {
+            snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
+            lcd_puts(0, line++, buf);
+            lcd_update();
+    }
     
+    memcpy((void*)DRAM_START,loadbuffer,rc);
     
-    
-    /* Detect the scroller being touched
-    
-    int j = 0;
-    for(j=0;j<1000;j++){
-        if(gpio_c!=0xF7){
-            snprintf(buffer, sizeof(buffer), "GPIO_C: %02x\n", gpio_c);
-            write(fd,buffer,sizeof(buffer));
-        }
-        if(gpio_d!=0xDD){
-            snprintf(buffer, sizeof(buffer), "GPIO_D: %02x\n", gpio_d);
-            write(fd,buffer,sizeof(buffer));
-        }
-    }*/
-    
-    
-    /* Apparently necessary for the data to be actually written to file */
-    /*fsync(fd);
-    udelay(1000000);*/
-    
-    /* This causes the device to shut off instantly
-    
-    GPIOF_OUTPUT_VAL = 0;
-    */
-    
-    /*close(fd);*/
-    udelay(100000000);
+    return (void*)DRAM_START;
 }
 
 /* These functions are present in the firmware library, but we reimplement

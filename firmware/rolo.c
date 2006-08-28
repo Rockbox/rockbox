@@ -31,8 +31,8 @@
 #include "buffer.h"
 
 #if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) && \
-    (CONFIG_CPU != PP5002)
-/* FIX: this doesn't work on Gmini, iFP or 3rd Gen ipods yet */
+    (CONFIG_CPU != PP5002) && !defined(IRIVER_H10) && !defined(IRIVER_H10_5GB)
+/* FIX: this doesn't work on Gmini, iFP, 3rd Gen ipods, or H10 yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 

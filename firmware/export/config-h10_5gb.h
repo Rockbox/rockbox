@@ -5,7 +5,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 13
+#define MODEL_NUMBER 14
 
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/ /* TODO: add support for this */

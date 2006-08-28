@@ -48,7 +48,7 @@ findtool(){
 }
 
 help () {
-  echo "Usage: mi4fix.sh <e200/h10> <input> <output>"
+  echo "Usage: mi4fix.sh <e200/h10/h10_5gb> <input> <output>"
   exit
 }
 
