@@ -84,8 +84,8 @@
  }
 \end{center}
 
-Throughout this manual, the buttons on the \dap\ are labelled according to the
-picture above.
+Throughout this manual, the buttons on the \dap{} are labelled according to the
+picture above. In detail the buttons are described in the following paragraph.
 
 \blind{
   %
@@ -93,12 +93,17 @@ picture above.
   If you lay the \dap{} on the table with the joystick pointing 
   towards you, and the curved sides at the top, you will find the following 
   if you start from the top-right corner and follow the side of the \dap{} in a
-  clockwise direction: 
-  \ButtonOn, \ButtonOff, \ButtonMode, USB port, a small hole for resetting the 
-  \dap, charger plug, \ButtonRec, headphone minijack plug, remote port, 
-  optical/line in, optical/line out. The joystick in the middle of the \dap\ is 
+  clockwise direction:
+  On the right side the buttons \ButtonOn{}, \ButtonOff{}, \ButtonMode{} and
+  the hold switch. Next comes on the bottom the USB port,
+  a small hole for resetting the \dap{}, charger plug. On the left side located
+  is the button \ButtonRec{}. At least the top has headphone minijack plug,
+  remote port, optical/line in and optical/line out.
+  The joystick in the middle of the \dap{} is 
   used to navigate menus by pressing it up, down, left and right. Pressing the 
-  joystick down is labelled \ButtonSelect{} throughout this manual. }
+  joystick down is labelled \ButtonSelect{} throughout this manual. Its
+  directions are labelled \ButtonRight{}, \ButtonDown{}, \ButtonLeft{} and
+  \ButtonUp{}.}
   % 
   \opt{h300}{
   Hold the lay the \dap{} so that the side with the button pad and 
@@ -232,10 +237,10 @@ be extended or modified while playing. This is also known as
 ``on-the-fly playlist''.
 To go back to the file browser stop the playback with the \ActionWpsStop{}
 button or return to the file browser while keeping playback running using
-\ActionWpsBrowse{}. 
-\fixme{describe the back button in the tree view -- stop stops playback 
-in the file browser but not in the menus so it would be more consistent if
-stop always would stop playback and left always go back (h100 buttons)}
+\ActionWpsBrowse{}.
+In list views you can go back one step with \ActionStdCancel{}. The file
+browser is a bit different in this case as pressing \ActionWpsStop{}
+stops the playback instead of going up a level.
 
 \subsection{Basic concepts}
 \subsubsection{Main Screen}
@@ -248,7 +253,7 @@ playback gets stopped. There is no point showing the WPS when playback is
 stopped, so this is not and will not be possible.
 
 \subsubsection{Playlists}
-Rockbox is playlist oriented. This means that every time you play a audio file,
+Rockbox is playlist oriented. This means that every time you play an audio file,
 a so-called ``dynamic playlist'' is generated,  unless you play a saved
 playlist. You can modify the dynamic playlist while playing and also save
 it to a file. If you don't want to use playlists you can simply play your
@@ -260,7 +265,7 @@ From the menu you can customise Rockbox. Rockbox itself is very customisable.
 Also there are some special menus for quick access to frequently used
 functions.
 
-\subsubsection{Contect Menu}
+\subsubsection{Context Menu}
 Some views, especially the file browser and the WPS have a context menu.
 From the file browser this can be accessed with \ActionStdContext{}.
 The contents of the context menu vary, depending on the situation it gets
@@ -269,7 +274,8 @@ perform with the currently hightlighted file. In the file browser this is
 the file (or folder) that is highlighted by the cursor. From the WPS this is
 the currently playing file. Also there are some actions that don't apply
 to the current file but refer to the screen from which the context menu
-gets called.
+gets called. One example is the playback menu, which can be called using
+the context menu from within the WPS.
 
 \section{Customizing Rockbox}
 Rockbox' User Interface can be customized using ``Themes''. Themes usually
