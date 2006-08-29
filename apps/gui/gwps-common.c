@@ -1379,7 +1379,7 @@ static void format_display(struct gui_wps *gwps, char* buf,
                 /* Get number of "|" chars in the current conditional;
                  * used by get_tag when calculating levels.
                  */
-                skip_conditional(NULL, fmt, 0, &intval);
+                skip_conditional(gwps, fmt, 0, &intval);
                 value = get_tag(gwps->data, id3, nid3, fmt, temp_buf,
                                 sizeof(temp_buf),&tag_length,
                                 subline_time_mult, flags, &intval);
@@ -1393,10 +1393,10 @@ static void format_display(struct gui_wps *gwps, char* buf,
                 /* No value, so skip to else part, using a sufficiently high
                    value to "hit" the last part of the conditional */
                 if ((!value) || (!strlen(value)))
-                    fmt = skip_conditional(gwps, fmt, 1000, NULL);
+                    fmt = skip_conditional(NULL, fmt, 1000, NULL);
                 else
                     if(intval > 1) /* enum */
-                        fmt = skip_conditional(gwps, fmt, intval - 1, NULL);
+                        fmt = skip_conditional(NULL, fmt, intval - 1, NULL);
 
                 level++;
                 break;
