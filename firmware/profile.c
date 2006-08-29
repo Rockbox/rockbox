@@ -106,7 +106,7 @@ void profile_thread_started(int current_thread) {
         if (profiling < PROF_ERROR) {
             /* After we de-mask, if profiling is active, reactivate the timer */
             timer_register(0, profile_timer_unregister, 
-                    CPU_FREQ/10000, 0, profile_timer_tick);
+                    TIMER_FREQ/10000, 0, profile_timer_tick);
         }
     }
 }
@@ -135,7 +135,7 @@ void profstart(int current_thread) {
     pfds[0].self_pc = 0;
     memset(&indices,0,INDEX_SIZE * sizeof(unsigned short));
     timer_register(
-        0, profile_timer_unregister, CPU_FREQ/10000, 0, profile_timer_tick);
+        0, profile_timer_unregister, TIMER_FREQ/10000, 0, profile_timer_tick);
     profiling = PROF_ON;
 }
 
