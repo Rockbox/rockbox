@@ -187,7 +187,7 @@ const struct button_mapping button_context_keyboard[]  = {
 struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_PLAY },
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_ON },
-    { ACTION_BMS_EXIT,        BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_BMS_EXIT,      BUTTON_OFF,                 BUTTON_NONE },
     { ACTION_BMS_SELECT,       BUTTON_PLAY|BUTTON_REL,   BUTTON_PLAY },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
