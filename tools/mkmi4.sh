@@ -59,6 +59,7 @@ fi
 case $target in
   e200)
     sign="yes"
+    encrypt="yes"
     tea=sansa
     ;;
   h10)
@@ -89,15 +90,21 @@ else
   tool=$MI4CODE
 fi
 
+# Use full file plaintext length if not encrypting
+if test -z "$encrypt"; then
+  buildopt="$buildopt -pall"
+fi
 
-
-
-# build a 010301 version
+# build mi4
 #echo "$tool build $input $output.raw"
 $tool build $buildopt $input $output.raw
 # encrypt
-#echo "$tool encrypt $output.raw $output.encrypt $tea"
-$tool encrypt $output.raw $output.encrypt $tea
+if test -n "$encrypt"; then
+  #echo "$tool encrypt $output.raw $output.encrypt $tea"
+  $tool encrypt $output.raw $output.encrypt $tea
+else
+  mv $output.raw $output.encrypt
+fi
 # sign
 if test -n "$sign"; then
   #echo "$tool sign $output.encrypt $output"
