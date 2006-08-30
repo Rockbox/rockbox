@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese
+ * Copyright (C) 2002 by Linus Nielsen Feltzing, Uwe Freese, Laurent Baum
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -24,13 +24,55 @@
 #include "system.h"
 #include "pcf50606.h"
 #include "pcf50605.h"
-#include <stdbool.h> 
+#if CONFIG_RTC == RTC_E8564
+#include "i2c-pp5020.h"
+#endif /*CONFIG_RTC == RTC_E8564*/
+#include <stdbool.h>
 
 #define RTC_ADR 0xd0
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
 #define	RTC_DEV_READ    (RTC_ADR | 0x01)
 
-#if CONFIG_RTC == RTC_PCF50605
+#if CONFIG_RTC == RTC_E8564
+void rtc_init(void)
+{
+}
+
+int rtc_read_datetime(unsigned char* buf)
+{
+    unsigned char tmp;
+    int read;
+    
+    /*RTC_E8564's slave address is 0x51*/
+    read = i2c_readbytes(0x51,0x02,7,buf);
+
+    /* swap wday and mday to be compatible with
+     * get_time() from firmware/common/timefuncs.c */
+    tmp=buf[3];
+    buf[3]=buf[4];
+    buf[4]=tmp;
+    
+    return read;
+}
+
+int rtc_write_datetime(unsigned char* buf)
+{
+    int i;
+    unsigned char tmp;
+    
+    /* swap wday and mday to be compatible with
+     * set_time() in firmware/common/timefuncs.c */
+    tmp=buf[3];
+    buf[3]=buf[4];
+    buf[4]=tmp;
+
+    for (i=0;i<7;i++){
+        ipod_i2c_send(0x51, 0x02+i,buf[i]);
+    }
+    return 1;
+}
+
+#elif CONFIG_RTC == RTC_PCF50605
 void rtc_init(void)
 {
 }
