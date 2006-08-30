@@ -48,7 +48,7 @@ findtool(){
 }
 
 help () {
-  echo "Usage: mi4fix.sh <e200/h10/h10_5gb> <input> <output>"
+  echo "Usage: mi4fix.sh <e200/h10/h10_5gb/elio> <input> <output>"
   exit
 }
 
@@ -73,6 +73,9 @@ case $target in
     sign="yes"
     ;;
   h10_5gb)
+    buildopt="-2"
+    ;;
+  elio)
     buildopt="-2"
     ;;
   *)
@@ -108,7 +111,8 @@ if test -n "$encrypt"; then
   #echo "$tool encrypt $output.raw $output.encrypt $tea"
   $tool encrypt $output.raw $output.encrypt $tea
 else
-  mv $output.raw $output.encrypt
+  # Even if we don't encrypt we need to do this to ensure the crc gets fixed
+  $tool encrypt -pall $output.raw $output.encrypt default
 fi
 # sign
 if test -n "$sign"; then
