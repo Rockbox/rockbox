@@ -53,7 +53,7 @@ void wm8731_write(int reg, int data)
 #else
     /* The iPod's audio codecs use an I2C address of 0x1a */ 
     ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
-#end
+#endif
 }
 
 int wmcodec_mute(int mute)
