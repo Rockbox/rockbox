@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "iriver.h"
+#include "mi4.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
 int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
@@ -82,6 +83,8 @@ void usage(void)
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
+           "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
+           "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
            "\t                   ip3g, ip4g, mini, x5, h10, h10_5gb)\n"
@@ -240,6 +243,16 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         return ipod_encode(iname, oname, 3, true);  /* Firmware image v3 */
+    }
+    else if(!strcmp(argv[1], "-mi4v2")) {
+        iname = argv[2];
+        oname = argv[3];
+        return mi4_encode(iname, oname, 0x00010201);
+    }
+    else if(!strcmp(argv[1], "-mi4v3")) {
+        iname = argv[2];
+        oname = argv[3];
+        return mi4_encode(iname, oname, 0x00010301);
     }
     
     /* open file */

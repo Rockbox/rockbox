@@ -10,17 +10,18 @@ CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw codepages uclpack
+ generate_rocklatin mkboot ipod_fw codepages uclpack mi4
 
 all:
 	@echo "Run make in your build directory!"
 
-scramble: scramble.o iriver.o
+scramble: scramble.o iriver.o mi4.o
 descramble: descramble.o iriver.o
 
 scramble.o: scramble.c iriver.h
 descramble.o: descramble.c iriver.h
 iriver.o: iriver.c iriver.h
+mi4.o: mi4.c mi4.h
 
 sh2d: sh2d.c
 
