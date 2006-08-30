@@ -218,9 +218,17 @@ void wmcodec_enable_output(bool enable)
 
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
         wm8731_write(DACCTRL, 0x0);
-
+        
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+        /* We need to enable bit 4 of GPIOL for output for sound on H10 */
+        GPIOL_OUTPUT_VAL |= 0x10;
+#endif
         wmcodec_mute(0);
     } else {
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+        /* We need to disable bit 4 of GPIOL to disable sound on H10 */
+        GPIOL_OUTPUT_VAL ^= 0x10;
+#endif
         wmcodec_mute(1);
     }
 }
