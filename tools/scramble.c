@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "iriver.h"
+#include "gigabeat.h"
 #include "mi4.h"
 
 int iaudio_encode(char *iname, char *oname, char *idstring);
@@ -83,6 +84,7 @@ void usage(void)
            "\t-ipod3g ipod firmware partition format (3rd Gen)\n"
            "\t-ipod4g ipod firmware partition format (4th Gen, Mini, Nano, Photo/Color)\n"
            "\t-ipod5g ipod firmware partition format (5th Gen - aka Video)\n"
+           "\t-gigabeat Toshiba Gigabeat format\n"
            "\t-mi4v2  PortalPlayer .mi4 format (revision 010201)\n"
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
@@ -217,6 +219,13 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         iriver_encode(iname, oname, FALSE);
+        return 0;
+    }
+    else if(!strcmp(argv[1], "-gigabeat")) {
+        /* iRiver code dealt with in the iriver.c code */
+        iname = argv[2];
+        oname = argv[3];
+        gigabeat_code(iname, oname);
         return 0;
     }
     else if(!strcmp(argv[1], "-iaudiox5")) {

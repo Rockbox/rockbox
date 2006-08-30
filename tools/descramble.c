@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "iriver.h"
+#include "gigabeat.h"
 
 int iaudio_decode(char *iname, char *oname);
 
@@ -33,6 +34,7 @@ void usage(void)
            "\t-v2     Archos V2 recorder format\n"
            "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
+           "\t-gigabeat Toshiba Gigabeat format\n"
            "\t-iaudio iAudio format\n"
           "\nNo option assumes Archos standard player/recorder format.\n");
     exit(1);
@@ -71,6 +73,12 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         iriver_decode(iname, oname, FALSE, STRIP_NONE);
+        return 0;
+    }
+    if(!strcmp(argv[1], "-gigabeat")) {
+        iname = argv[2];
+        oname = argv[3];
+        gigabeat_code(iname, oname);
         return 0;
     }
     

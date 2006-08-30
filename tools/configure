@@ -454,7 +454,8 @@ EOF
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb codepages"
   ipodbitmaptools="$toolset scramble ipod_fw bmp2rb codepages"
-  # generic is used by Gigabeat, IFP, H10, Sansa-e200
+  gigabeatbitmaptools="$toolset scramble descramble bmp2rb codepages"
+  # generic is used by IFP, H10, Sansa-e200
   genericbitmaptools="$toolset bmp2rb codepages"
 
 
@@ -892,7 +893,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
-    toolset=$genericbitmaptools
+    toolset=$gigabeatbitmaptools
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
     t_manufacturer="gigabeat"
