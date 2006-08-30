@@ -698,12 +698,15 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
             continue;
         
         dptr->newtable = navibrowse;
-        dptr->extraseek = tcs->result_seek;
         if (tag == tag_title || tag == tag_filename)
+        {
             dptr->newtable = playtrack;
+            dptr->extraseek = tcs->idx_id;
+        }
+        else
+            dptr->extraseek = tcs->result_seek;
         
-        if (!tcs->ramsearch || fmt->valid
-            || tagcache_is_numeric_tag(tag))
+        if (!tcs->ramresult || fmt->valid)
         {
             char buf[MAX_PATH];
             int buf_pos = 0;

@@ -478,6 +478,12 @@ bool tagcache_find_index(struct tagcache_search *tcs, const char *filename)
 static bool get_index(int masterfd, int idxid, 
                       struct index_entry *idx, bool use_ram)
 {
+    if (idxid < 0)
+    {
+        logf("Incorrect idxid: %d", idxid);
+        return false;
+    }
+    
 #ifdef HAVE_TC_RAMCACHE
     if (stat.ramcache && use_ram)
     {
@@ -1005,13 +1011,13 @@ static bool open_files(struct tagcache_search *tcs)
 }
 
 #define TAG_FILENAME_RAM(tcs) ((tcs->type == tag_filename) \
-                                   ? (tcs->seek_flags[tcs->seek_list_count] \
-                                      & FLAG_DIRCACHE) : 1)
+                                   ? (flag & FLAG_DIRCACHE) : 1)
 
 static bool get_next(struct tagcache_search *tcs)
 {
     static char buf[MAX_PATH];
     struct tagfile_entry entry;
+    long flag = 0;
 
     if (!tcs->valid || !stat.ready)
         return false;
@@ -1039,6 +1045,7 @@ static bool get_next(struct tagcache_search *tcs)
         }
         
         tcs->seek_list_count--;
+        flag = tcs->seek_flags[tcs->seek_list_count];
         
         /* Seek stream to the correct position and continue to direct fetch. */
         if ((!tcs->ramsearch || !TAG_FILENAME_RAM(tcs))
@@ -1076,10 +1083,7 @@ static bool get_next(struct tagcache_search *tcs)
         }
         tcs->entry_count--;
         
-        if (tagcache_is_unique_tag(tcs->type))
-            tcs->result_seek = tcs->position;
-        else
-            tcs->result_seek = tcs->idx_id;
+        tcs->result_seek = tcs->position;
 
 # ifdef HAVE_DIRCACHE
         if (tcs->type == tag_filename)
@@ -1088,6 +1092,8 @@ static bool get_next(struct tagcache_search *tcs)
                                buf, sizeof buf);
             tcs->result = buf;
             tcs->result_len = strlen(buf) + 1;
+            tcs->idx_id = FLAG_GET_ATTR(flag);
+            tcs->ramresult = false;
             
             return true;
         }
@@ -1098,6 +1104,7 @@ static bool get_next(struct tagcache_search *tcs)
         tcs->result = ep->tag_data;
         tcs->result_len = strlen(tcs->result) + 1;
         tcs->idx_id = ep->idx_id;
+        tcs->ramresult = true;
         
         return true;
     }
@@ -1134,8 +1141,7 @@ static bool get_next(struct tagcache_search *tcs)
     tcs->result = buf;
     tcs->result_len = strlen(tcs->result) + 1;
     tcs->idx_id = entry.idx_id;
-    if (!tagcache_is_unique_tag(tcs->type))
-        tcs->result_seek = tcs->idx_id;
+    tcs->ramresult = false;
 
     return true;
 }
@@ -3116,6 +3122,7 @@ static bool load_tagcache(void)
                     }
 
                     idx->flag |= FLAG_DIRCACHE;
+                    FLAG_SET_ATTR(idx->flag, fe->idx_id);
                     idx->tag_seek[tag_filename] = (long)dc;
                 }
                 else
