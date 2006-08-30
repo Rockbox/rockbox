@@ -45,7 +45,15 @@
 
 void wm8731_write(int reg, int data)
 {
+/* Todo: Since the ipod_i2c_* functions also work on H10 and possibly other PP
+   targets, these functions should probably be renamed */
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+    /* The H10's audio codec uses an I2C address of 0x1b */
+    ipod_i2c_send(0x1b, (reg<<1) | ((data&0x100)>>8),data&0xff);
+#else
+    /* The iPod's audio codecs use an I2C address of 0x1a */ 
     ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
+#end
 }
 
 int wmcodec_mute(int mute)
