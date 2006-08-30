@@ -1258,7 +1258,7 @@ void set_cpu_frequency(long frequency)
     /* Select PLL as clock source? */
     outl((inl(0x60006020) & 0x0fffff0f) | 0x20000070, 0x60006020);
 
-#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI)
+#if defined(IPOD_COLOR) || defined(IPOD_4G) || defined(IPOD_MINI) || defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
     /* We don't know why the timer interrupt gets disabled on the PP5020
        based ipods, but without the following line, the 4Gs will freeze
        when CPU frequency changing is enabled.
