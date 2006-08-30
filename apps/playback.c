@@ -1477,7 +1477,7 @@ static void audio_read_file(bool quick)
         overlap = buf_widx - tracks[track_ridx].buf_idx;
         if (buf_widx >= filebuflen)
             buf_widx -= filebuflen;
-        if (overlap >= filebuflen)
+        if (overlap > 0 && (unsigned) overlap >= filebuflen)
             overlap -= filebuflen;
 
         if (overlap > 0 && overlap <= rc && tracks[track_ridx].available != 0) {
