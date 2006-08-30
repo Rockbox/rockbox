@@ -1,0 +1,60 @@
+% $Id$ %
+\def\UseOption{h10}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,HAVE_LCD_COLOR}
+\edef\UseOption{\UseOption,CONFIG_RTC}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,IRIVER_H10_PAD}
+\edef\UseOption{\UseOption,iriver}
+
+\newcommand{\playerman}{Iriver}
+\newcommand{\playertype}{H10}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{160x128x16}
+\newcommand{\specimg}{h10}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.h10}}
+\newcommand{\screenshotsize}{4cm}
+
+\newcommand{\ButtonLeft}{\btnfnt{Prev}}
+\newcommand{\ButtonRight}{\btnfnt{Next}}
+\newcommand{\ButtonRew}{\btnfnt{Rew}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonFF}{\btnfnt{Ffwd}}
+\newcommand{\ButtonScrollUp}{\btnfnt{Scroll Up}}
+\newcommand{\ButtonScrollDown}{\btnfnt{Scroll Down}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonScrollUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonScrollUp}
+\newcommand{\ActionStdNext}{\ButtonScrollDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonScrollDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft or \ButtonPower}
+\newcommand{\ActionStdContext}{Long \ButtonFF}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonRew}
+\newcommand{\ActionStdMenu}{Long \ButtonRew}
+\newcommand{\ActionStdOk}{\ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsSkipNext}{\ButtonFF}
+\newcommand{\ActionWpsSkipPrev}{\ButtonRew}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonRew}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonFF}
+
+\newcommand{\ActionWpsStop}{Long \ButtonPlay}
+\newcommand{\ActionWpsVolDown}{\ButtonScrollDown}
+\newcommand{\ActionWpsVolUp}{\ButtonScrollUp}
+
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonLeft}
+\newcommand{\ActionWpsMenu}{Long \ButtonRight}
+\newcommand{\ActionWpsContext}{\ButtonRight}
+\newcommand{\ActionWpsBrowse}{\ButtonLeft}
+\newcommand{\ActionWpsPitchScreen}{\ButtonPlay+\ButtonLeft}
+\newcommand{\AdtionWpsIdThreeScreen}{\ButtonPlay+\ButtonRight}
+
