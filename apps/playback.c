@@ -256,6 +256,7 @@ static void playback_init(void);
 /* Configuration */
 static size_t conf_watermark;
 static size_t conf_filechunk;
+static size_t conf_preseek;
 static size_t buffer_margin;
 
 static bool v1first = false;
@@ -952,11 +953,12 @@ static void audio_rebuffer(void)
     filling = false;
 
     /* Reset buffer and track pointers */
-    buf_ridx = buf_widx = 0;
+    tracks[track_ridx].buf_idx = buf_ridx = buf_widx = 0;
     track_widx = track_ridx;
     cur_ti = &tracks[track_ridx];
     audio_clear_track_entries(true, true, false);
     filebufused = 0;
+    cur_ti->available = 0;
 
     /* Fill the buffer */
     last_peek_offset = -1;
@@ -1133,16 +1135,16 @@ static void rebuffer_and_seek(size_t newpos)
     /* Clear codec buffer. */
     track_widx = track_ridx;
     filebufused = 0;
-    buf_widx = buf_ridx = 0;
+    tracks[track_widx].buf_idx = buf_widx = buf_ridx = 0;
 
     last_peek_offset = 0;
     filling = false;
     initialize_buffer_fill(true);
+    filling = true;
 
-    if (newpos > AUDIO_REBUFFER_GUESS_SIZE) 
-    {
-        buf_ridx += AUDIO_REBUFFER_GUESS_SIZE;
-        cur_ti->start_pos = newpos - AUDIO_REBUFFER_GUESS_SIZE;
+    if (newpos > conf_preseek) {
+        buf_ridx += conf_preseek;
+        cur_ti->start_pos = newpos - conf_preseek;
     } 
     else 
     {
@@ -1341,6 +1343,10 @@ static void codec_configure_callback(int setting, void *value)
         conf_filechunk = (unsigned long)value;
         break;
 
+    case CODEC_SET_FILEBUF_PRESEEK:
+        conf_preseek = (unsigned long)value;
+        break;
+
     default:
         if (!dsp_configure(setting, value)) { logf("Illegal key:%d", setting); }
     }
@@ -1447,6 +1453,8 @@ static void audio_read_file(bool quick)
 
     while (tracks[track_widx].filerem > 0) 
     {
+        int overlap;
+
         if (fill_bytesleft == 0)
             break ;
 
@@ -1465,8 +1473,18 @@ static void audio_read_file(bool quick)
         }
 
         buf_widx += rc;
+
+        overlap = buf_widx - tracks[track_ridx].buf_idx;
         if (buf_widx >= filebuflen)
             buf_widx -= filebuflen;
+        if (overlap >= filebuflen)
+            overlap -= filebuflen;
+
+        if (overlap > 0 && overlap <= rc && tracks[track_ridx].available != 0) {
+            tracks[track_ridx].buf_idx = buf_widx;
+            tracks[track_ridx].start_pos += overlap;
+        }
+        
         tracks[track_widx].available += rc;
         tracks[track_widx].filerem -= rc;
 
@@ -1750,6 +1768,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
         current_codec = CODEC_IDX_AUDIO;
         conf_watermark = AUDIO_DEFAULT_WATERMARK;
         conf_filechunk = AUDIO_DEFAULT_FILECHUNK;
+        conf_preseek = AUDIO_REBUFFER_GUESS_SIZE;
         dsp_configure(DSP_RESET, 0);
         current_codec = last_codec;
     }
@@ -1861,7 +1880,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     }
     
     logf("alt:%s", trackname);
-    // tracks[track_widx].buf_idx = buf_widx;
+    tracks[track_widx].buf_idx = buf_widx;
 
     audio_read_file(rebuffer);
 
