@@ -56,19 +56,24 @@ if test -z "$output"; then
   help
 fi
 
+# sign - if the firmware should be DSA signed with a dummy (only 010301
+#        firmwares)
+# tea -  name of the TEA crypt key to use for encrypting, but only if ...
+# encrypt - is set to "yes" for encrypting the firmware
 case $target in
+ # fake example)
+ #   sign="yes"
+ #   encrypt="yes"
+ #   tea=targetkey
+ #   ;;
   e200)
     sign="yes"
-    encrypt="yes"
-    tea=sansa
     ;;
   h10)
     sign="yes"
-    tea=20gc_eng
     ;;
   h10_5gb)
     buildopt="-2"
-    tea=default
     ;;
   *)
     echo "unsupported target"
