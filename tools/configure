@@ -1022,7 +1022,7 @@ EOF
     ;;
 
    60|tpj1022)
-    target_id=23
+    target_id=25
     archos="tpj1022"
     target="-DELIO_TPJ1022"
     memory=32 # always
