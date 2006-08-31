@@ -616,4 +616,6 @@ int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
     }
 
     fclose(file);
+
+    return 0;
 }
