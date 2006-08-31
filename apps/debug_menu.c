@@ -88,8 +88,10 @@ bool dbg_os(void)
     char buf[32];
     int i;
     int usage;
+#if NUM_CORES > 1
     unsigned int core;
     int line;
+#endif
 
     lcd_setmargins(0, 0);
     lcd_setfont(FONT_SYSFIXED);
@@ -97,6 +99,7 @@ bool dbg_os(void)
 
     while(1)
     {
+#if NUM_CORES > 1
         lcd_puts(0, 0, "Core and stack usage:");
         line = 0;
         for(core = 0; core < NUM_CORES; core++)
@@ -108,6 +111,15 @@ bool dbg_os(void)
                 lcd_puts(0, ++line, buf);
             }
         }
+#else
+        lcd_puts(0, 0, "Stack usage:");
+        for(i = 0; i < num_threads[CURRENT_CORE];i++)
+        {
+            usage = thread_stack_usage(i);
+            snprintf(buf, 32, "%s: %d%%", thread_name[CURRENT_CORE][i], usage);
+            lcd_puts(0, 1+i, buf);
+        }
+#endif
 
         lcd_update();
 
