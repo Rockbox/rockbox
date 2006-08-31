@@ -577,6 +577,11 @@ static bool dirbrowse(void)
         if (global_settings.rec_startup) {
             /* We fake being in the menu structure by calling
                the appropriate parent when we drop out of each screen */
+#if CONFIG_CODEC == SWCODEC
+            /* Put in a 1 sec pause to slow bootup or the recording codecs
+               won't initialize */
+            sleep(HZ);
+#endif
             recording_screen(false);
             rec_menu();
             main_menu();
