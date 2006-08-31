@@ -504,7 +504,7 @@ const struct button_mapping button_context_quickscreen_h300lcdremote[]  = {
     { ACTION_QS_LEFT,       BUTTON_RC_REW|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_FF,                   BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_FF|BUTTON_REPEAT,     BUTTON_NONE },
-    { ACTION_STD_CANCEL,    BUTTON_MODE,                    BUTTON_NONE },
+    { ACTION_STD_CANCEL,    BUTTON_RC_MODE,                 BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
