@@ -471,6 +471,10 @@ EOF
   # tool:      the tool that takes a plain binary and converts that into a
   #            working "firmware" file for your target
   # output:    the final output file name
+  # boottool:  the tool that takes a plain binary and generates a bootloader
+  #            file for your target (or blank to use $tool)
+  # bootoutput:the final output file name for the bootloader (or blank to use 
+  #            $output)
   # appextra:  passed to the APPEXTRA variable in the Makefiles.
   #            TODO: add proper explanation
   # archosrom: used only for Archos targets that build a special flashable .ucl
