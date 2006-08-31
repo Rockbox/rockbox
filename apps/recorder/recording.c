@@ -1707,7 +1707,8 @@ bool recording_screen(bool no_source)
             for(i = 0; i < screen_update; i++) {
 #ifdef HAVE_AGC
                 if ((global_settings.rec_source == AUDIO_SRC_MIC)
-                         || (global_settings.rec_source == AUDIO_SRC_LINEIN))
+                         || (global_settings.rec_source == AUDIO_SRC_LINEIN)
+                         || (global_settings.rec_source == AUDIO_SRC_FMRADIO))
                     screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
                 else
 #endif
