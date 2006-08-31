@@ -3,17 +3,21 @@
 ENTRY(start)
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
-INPUT(crt0.o)
+INPUT(target/coldfire/crt0.o)
 #elif CONFIG_CPU == TCC730
 OUTPUT_FORMAT(elf32-calmrisc16)
 INPUT(crt0.o)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-INPUT(crt0.o)
+#ifdef CPU_PP
+INPUT(target/arm/crt0-pp.o)
+#elif defined(CPU_ARM)
+INPUT(target/arm/crt0.o)
+#endif
 #else
 OUTPUT_FORMAT(elf32-sh)
-INPUT(crt0.o)
+INPUT(target/sh/crt0.o)
 #endif
 
 #if CONFIG_CPU == TCC730

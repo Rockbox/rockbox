@@ -6,7 +6,18 @@ OUTPUT_FORMAT(elf32-m68k)
 #else
 OUTPUT_FORMAT(elf32-sh)
 #endif
+#ifdef CPU_COLDFIRE
+INPUT(target/coldfire/crt0.o)
+#elif defined(CPU_PP)
+INPUT(target/arm/crt0-pp.o)
+#elif defined(CPU_ARM)
+INPUT(target/arm/crt0.o)
+#elif CONFIG_CPU == SH7034
+INPUT(target/sh/crt0.o)
+#else
 INPUT(crt0.o)
+#endif
+
 
 #if MEMORYSIZE >= 32
 #define PLUGINSIZE 0xC0000

@@ -178,7 +178,17 @@ kernel.c
 rolo.c
 thread.c
 timer.c
+#ifdef CPU_PP
+target/arm/crt0-pp.S
+#elif defined(CPU_ARM)
+target/arm/crt0.S
+#elif defined(CPU_COLDFIRE)
+target/coldfire/crt0.S
+#elif CONFIG_CPU == SH7034
+target/sh/crt0.S
+#else
 crt0.S
+#endif
 drivers/lcd.S
 #endif
 mp3_playback.c

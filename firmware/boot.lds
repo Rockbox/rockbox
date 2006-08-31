@@ -3,18 +3,22 @@
 ENTRY(start)
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
-INPUT(crt0.o)
+INPUT(target/coldfire/crt0.o)
 #elif defined (CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifndef IPOD_ARCH
 /* the ipods can't have the crt0.o mentioned here, but the others can't do
    without it! */
-INPUT(crt0.o)
+#ifdef CPU_PP
+INPUT(target/arm/crt0-pp.o)
+#else
+INPUT(target/arm/crt0.o)
+#endif
 #endif
 #else
 OUTPUT_FORMAT(elf32-sh)
-INPUT(crt0.o)
+INPUT(target/sh/crt0.o)
 #endif
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000)
