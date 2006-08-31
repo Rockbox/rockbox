@@ -83,7 +83,8 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
+#if (CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022) && defined(BOOTLOADER))
+    /* Some targets don't like yielding in the bootloader */
 #else
     switch_thread();
     wake_up_thread();

@@ -293,3 +293,15 @@ target/arm/gigabeat/meg-fx/lcd-meg-fx.c
 target/arm/gigabeat/meg-fx/sc606-meg-fx.c
 #endif
 #endif
+
+#ifdef ELIO_TPJ1022
+#ifndef SIMULATOR
+target/arm/tatung/tpj1022/backlight-tpj1022.c
+target/arm/tatung/tpj1022/button-tpj1022.c
+target/arm/ata-pp5020.c
+target/arm/tatung/tpj1022/power-tpj1022.c
+target/arm/tatung/tpj1022/usb-tpj1022.c
+target/arm/tatung/tpj1022/lcd-tpj1022.c
+target/arm/tatung/tpj1022/adc-tpj1022.c
+#endif
+#endif

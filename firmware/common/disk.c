@@ -146,6 +146,10 @@ int disk_mount(int drive)
     {
         return 0;
     }
+#ifndef ELIO_TPJ1022
+    /* The Elio's hard drive has no partition table and probing for partitions causes
+       Rockbox to crash - so we temporarily disable the probing until we fix the
+       real problem. */
     for (i=0; volume != -1 && i<4; i++)
     {
         if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start))
@@ -155,6 +159,7 @@ int disk_mount(int drive)
             volume = get_free_volume(); /* prepare next entry */
         }
     }
+#endif
 
     if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
     {   /* try "superfloppy" mode */

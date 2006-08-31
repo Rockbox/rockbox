@@ -59,6 +59,7 @@
 #define GIGABEAT_PAD       10
 #define IRIVER_H10_PAD     11
 #define SANSA_E200_PAD     12
+#define ELIO_TPJ1022_PAD   13
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE 1
@@ -96,6 +97,7 @@
 #define LCD_GIGABEAT 12
 #define LCD_H10      13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
+#define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -121,6 +123,7 @@
 #define BL_H10           12 /* iriver H10 */
 #define BL_X5            13 /* iAudio X5 PCF50606 I2C */
 #define BL_H10_5GB       14 /* iriver H10 5/6GB */
+#define BL_TPJ1022       15 /* Tatung Elio TPJ-1022 */
 
 /* CONFIG_I2C */
 #define I2C_PLAYREC  0 /* Archos Player/Recorder style */
@@ -204,6 +207,8 @@
 #include "config-h10_5gb.h"
 #elif defined(SANSA_E200)
 #include "config-e200.h"
+#elif defined(ELIO_TPJ1022)
+#include "config-tpj1022.h"
 #else
 /* no known platform */
 #endif

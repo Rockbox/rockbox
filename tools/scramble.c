@@ -205,6 +205,8 @@ int main (int argc, char** argv)
             modelnum = 13;
         else if(!strcmp(&argv[1][5], "h10_5gb"))
             modelnum = 14;
+        else if(!strcmp(&argv[1][5], "tpj2"))
+            modelnum = 15;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

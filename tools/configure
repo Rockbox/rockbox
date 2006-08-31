@@ -442,6 +442,9 @@ cat <<EOF
 
  ==iAudio==            ==Toshiba==            ==SanDisk==      
  30) X5/X5V/X5L        40) Gigabeat F         50) Sansa e200   
+
+ ==Tatung==
+ 60) Elio TPJ-1022
 EOF
 
   buildfor=`input`;
@@ -1016,6 +1019,32 @@ EOF
     t_cpu="arm"
     t_manufacturer="iriver"
     t_model="h10"
+    ;;
+
+   60|tpj1022)
+    target_id=23
+    archos="tpj1022"
+    target="-DELIO_TPJ1022"
+    memory=32 # always
+    arm7tdmicc
+    tool="$rootdir/tools/scramble -add tpj2"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
+    output="rockbox.elio"
+    appextra="recorder:gui"
+    archosrom=""
+    flash=""
+    plugins="yes"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    boottool="$rootdir/tools/scramble -mi4v2"
+    bootoutput="pp5020.mi4"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$genericbitmaptools scramble"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="tatung"
+    t_model="tpj1022"
     ;;
 
    *)
