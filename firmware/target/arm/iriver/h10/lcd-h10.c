@@ -109,7 +109,7 @@ static inline bool timer_check(int clock_start, int usecs)
 
 #endif
 
-static void lcd_wait_write(void)
+static inline void lcd_wait_write(void)
 {
     if ((LCD_BASE & LCD_BUSY_MASK) != 0) {
         int start = USEC_TIMER;
@@ -121,7 +121,7 @@ static void lcd_wait_write(void)
 }
 
 /* Send command */
-static void lcd_send_cmd(int v)
+static inline void lcd_send_cmd(int v)
 {
     lcd_wait_write();
     LCD_BASE =   0x00000000 | LCD_CMD;
@@ -129,7 +129,7 @@ static void lcd_send_cmd(int v)
 }
 
 /* Send 16-bit data */
-static void lcd_send_data(int v)
+static inline void lcd_send_data(int v)
 {
     lcd_wait_write();
     LCD_BASE = (     v & 0xff) | LCD_DATA;  /* Send MSB first */
@@ -137,7 +137,7 @@ static void lcd_send_data(int v)
 }
 
 /* Send two 16-bit data */
-static void lcd_send_data2(int v)
+static inline void lcd_send_data2(int v)
 {
     unsigned int vsr = v;
     lcd_send_data(vsr);
@@ -189,18 +189,168 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
     (void)stride;
 }
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (31*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-5690)  /* 31 * 257 * -0.714136 */
+#define GUFAC (-2742)   /* 31 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+#define ROUNDOFFSG (63*257)
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
 void lcd_yuv_blit(unsigned char * const src[3],
                   int src_x, int src_y, int stride,
                   int x, int y, int width, int height)
 {
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
+    int y0, x0, y1, x1;
+    int ymax;
+
+    width = (width + 1) & ~1;
+
+    /* calculate the drawing region */
+    x0 = x;
+    x1 = x + width - 1;
+    y0 = y;
+    y1 = y + height - 1;
+
+    /* max horiz << 8 | start horiz */
+    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data((y0 << 8) | y1);
+    /* max vert << 8 | start vert */
+    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
+    lcd_send_data((x0 << 8) | x1);
+
+    /* position cursor (set AD0-AD15) */
+    /* start vert << 8 | start horiz */
+    lcd_send_cmd(R_RAM_ADDR_SET);
+    lcd_send_data(((y0 << 8) | x0));
+
+    /* start drawing */
+    lcd_send_cmd(R_WRITE_DATA_2_GRAM);
+
+    ymax = y + height - 1 ;
+
+    const int stride_div_csub_x = stride/CSUB_X;
+
+    for (; y <= ymax ; y++)
+    {
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+
+        const int uvoffset = stride_div_csub_x * (src_y/CSUB_Y) +
+                             (src_x/CSUB_X);
+
+        const unsigned char *usrc = src[1] + uvoffset;
+        const unsigned char *vsrc = src[2] + uvoffset;
+        const unsigned char *row_end = ysrc + width;
+
+        int y, u, v;
+        int red1, green1, blue1;
+        int red2, green2, blue2;
+        unsigned rbits, gbits, bbits;
+
+        int rc, gc, bc;
+
+        do
+        {
+            u = *usrc++ - 128;
+            v = *vsrc++ - 128;
+            rc = RVFAC * v + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFSG;
+            bc = BUFAC * u + ROUNDOFFS;
+
+            /* Pixel 1 */
+            y = *ysrc++;
+
+            red1   = RYFAC * y + rc;
+            green1 = GYFAC * y + gc;
+            blue1  = BYFAC * y + bc;
+
+            /* Pixel 2 */
+            y = *ysrc++;
+            red2   = RYFAC * y + rc;
+            green2 = GYFAC * y + gc;
+            blue2  = BYFAC * y + bc;
+
+            /* Since out of bounds errors are relatively rare, we check two
+               pixels at once to see if any components are out of bounds, and
+               then fix whichever is broken. This works due to high values and
+               negative values both becoming larger than the cutoff when
+               casted to unsigned.  And ORing them together checks all of them
+               simultaneously.  */
+            if (((unsigned)(red1 | green1 | blue1 |
+                     red2 | green2 | blue2)) > (RYFAC*255+ROUNDOFFS)) {
+                if (((unsigned)(red1 | green1 | blue1)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red1 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red1 < 0)
+                            red1 = 0;
+                        else
+                            red1 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green1 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green1 < 0)
+                            green1 = 0;
+                        else
+                            green1 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue1 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue1 < 0)
+                            blue1 = 0;
+                        else
+                            blue1 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
+
+                if (((unsigned)(red2 | green2 | blue2)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red2 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red2 < 0)
+                            red2 = 0;
+                        else
+                            red2 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green2 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green2 < 0)
+                            green2 = 0;
+                        else
+                            green2 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue2 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue2 < 0)
+                            blue2 = 0;
+                        else
+                            blue2 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
+            }
+                
+            rbits = red1 >> 16 ;
+            gbits = green1 >> 15 ;
+            bbits = blue1 >> 16 ;
+            lcd_send_data(swap16((rbits << 11) | (gbits << 5) | bbits));
+
+            rbits = red2 >> 16 ;
+            gbits = green2 >> 15 ;
+            bbits = blue2 >> 16 ;
+            lcd_send_data(swap16((rbits << 11) | (gbits << 5) | bbits));
+        }
+        while (ysrc < row_end);
+
+        src_y++;
+    }
 }
 
 
