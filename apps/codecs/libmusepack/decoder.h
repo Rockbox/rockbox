@@ -44,6 +44,7 @@
 #include "streaminfo.h"
 
 #define MPC_SUPPORT_SV456
+#define SCF_HACK
 
 enum {
     MPC_V_MEM = 2304,
@@ -51,8 +52,8 @@ enum {
 };
 
 typedef struct {
-    mpc_int32_t  L [36];
-    mpc_int32_t  R [36];
+    mpc_int16_t  L [36];
+    mpc_int16_t  R [36];
 } QuantTyp;
 
 typedef struct mpc_decoder_t {
@@ -61,10 +62,12 @@ typedef struct mpc_decoder_t {
     /// @name internal state variables
     //@{
 
+    mpc_uint32_t  next;
     mpc_uint32_t  dword; /// currently decoded 32bit-word
     mpc_uint32_t  pos;   /// bit-position within dword
-    mpc_uint32_t  Speicher[MPC_DECODER_MEMSIZE]; /// read-buffer
+    mpc_uint32_t  *Speicher; /// read-buffer
     mpc_uint32_t  Zaehler; /// actual index within read-buffer
+    mpc_uint32_t  Ring;
 
     mpc_uint32_t  samples_to_skip;
     mpc_uint32_t  last_block_samples;
@@ -74,6 +77,9 @@ typedef struct mpc_decoder_t {
 
     mpc_uint32_t  DecodedFrames;
     mpc_uint32_t  OverallFrames;
+    mpc_uint32_t  MaxDecodedFrames;           // Maximum frames decoded (indicates usable seek table entries)
+    mpc_uint16_t  SeekTableIndex;
+    mpc_uint32_t  SeekTableCounter;
     mpc_int32_t   SampleRate;                 // Sample frequency
 
     mpc_uint32_t  StreamVersion;              // version of bitstream
@@ -90,28 +96,34 @@ typedef struct mpc_decoder_t {
     mpc_uint32_t  __r1; 
     mpc_uint32_t  __r2; 
 
-    mpc_int32_t   SCF_Index_L [32] [3];
-    mpc_int32_t   SCF_Index_R [32] [3];       // holds scalefactor-indices
+    mpc_int8_t    SCF_Index_L [32] [3];
+    mpc_int8_t    SCF_Index_R [32] [3];       // holds scalefactor-indices
     QuantTyp      Q [32];                     // holds quantized samples
-    mpc_int32_t   Res_L [32];
-    mpc_int32_t   Res_R [32];                 // holds the chosen quantizer for each subband
+    mpc_int8_t    Res_L [32];
+    mpc_int8_t    Res_R [32];                 // holds the chosen quantizer for each subband
+#ifdef MPC_SUPPORT_SV456
     mpc_bool_t    DSCF_Flag_L [32];
     mpc_bool_t    DSCF_Flag_R [32];           // differential SCF used?
-    mpc_int32_t   SCFI_L [32];
-    mpc_int32_t   SCFI_R [32];                // describes order of transmitted SCF
-    mpc_int32_t   DSCF_Reference_L [32];
-    mpc_int32_t   DSCF_Reference_R [32];      // holds last frames SCF
+#endif
+    mpc_int8_t    SCFI_L [32];
+    mpc_int8_t    SCFI_R [32];                // describes order of transmitted SCF
+    //mpc_int32_t   DSCF_Reference_L [32];
+    //mpc_int32_t   DSCF_Reference_R [32];      // holds last frames SCF
     mpc_bool_t    MS_Flag[32];                // MS used?
+
+    mpc_uint32_t* SeekTable;
+    mpc_bool_t    Use_SeekTable;
+    mpc_bool_t    Use_FastSeek;
+    mpc_bool_t    Use_StaticSeekTable;
+    mpc_uint8_t   SeekTable_Step;
+    mpc_uint32_t  Max_SeekTable_Size;
+
 #ifdef MPC_FIXED_POINT
     unsigned char SCF_shift[256];
 #endif
 
-    /* These two see very frequent use in synth_filter.c, so we'll put them
-       in IRAM for Rockbox use. Actual arrays are placed in mpc_decoder.c */
-    /* MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960]; */
-    /* MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960]; */
-    MPC_SAMPLE_FORMAT *V_L;
-    MPC_SAMPLE_FORMAT *V_R;
+    MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960];
+    MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960];
     MPC_SAMPLE_FORMAT Y_L[36][32];
     MPC_SAMPLE_FORMAT Y_R[36][32];
     MPC_SAMPLE_FORMAT SCF[256]; ///< holds adapted scalefactors (for clipping prevention)

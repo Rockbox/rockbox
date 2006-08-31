@@ -54,6 +54,10 @@ mpc_uint32_t mpc_swap32(mpc_uint32_t val) {
 }
 #endif
 
+#ifndef min
+#define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
 /// Searches for a ID3v2-tag and reads the length (in bytes) of it.
 /// \param reader supplying raw stream data
 /// \return size of tag, in bytes

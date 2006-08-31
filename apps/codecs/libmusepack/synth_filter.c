@@ -334,6 +334,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
     for ( n = 0; n < 36; n++, Y += 32 ) {
         V -= 64;
         Calculate_New_V ( Y, V );
+        if (OutData != NULL) 
         {
             MPC_SAMPLE_FORMAT * Data = OutData;
             const MPC_SAMPLE_FORMAT *  D = (const MPC_SAMPLE_FORMAT *) &Di_opt;
@@ -429,7 +430,7 @@ static void Synthese_Filter_float_internal(MPC_SAMPLE_FORMAT * OutData,MPC_SAMPL
                     , 1);
                 
                 Data += 1;
-                #endif
+            #endif
             }
             V -= 32;//bleh
             OutData+=32;
@@ -452,7 +453,7 @@ mpc_decoder_synthese_filter_float(mpc_decoder *d, MPC_SAMPLE_FORMAT* OutData)
     memmove(d->V_R + MPC_V_MEM, d->V_R, 960 * sizeof(MPC_SAMPLE_FORMAT) );
 
     Synthese_Filter_float_internal(
-        OutData + MPC_FRAME_LENGTH,
+        (OutData == NULL ? NULL : OutData + MPC_FRAME_LENGTH),
         (MPC_SAMPLE_FORMAT *)(d->V_R + MPC_V_MEM),
         (MPC_SAMPLE_FORMAT *)(d->Y_R [0]));
 }

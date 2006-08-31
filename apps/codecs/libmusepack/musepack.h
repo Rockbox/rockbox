@@ -132,6 +132,12 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample);
 /// Seeks to specified position in seconds in the source stream.
 mpc_bool_t mpc_decoder_seek_seconds(mpc_decoder *d, double seconds);
 
+/// Sets the static seek table pointer.
+void mpc_decoder_set_seek_table(mpc_decoder *d, mpc_uint32_t *seek_table, mpc_uint32_t max_table_size);
+
+/// Cleans up the decoder
+void mpc_decoder_destroy(mpc_decoder *d);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus

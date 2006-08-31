@@ -40,6 +40,8 @@ typedef unsigned char mpc_bool_t;
 #define FALSE 0
 
 /* these are filled in by configure */
+typedef signed char mpc_int8_t;
+typedef unsigned char mpc_uint8_t;
 typedef short mpc_int16_t;
 typedef unsigned short mpc_uint16_t;
 typedef int mpc_int32_t;

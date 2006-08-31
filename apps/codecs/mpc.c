@@ -22,7 +22,7 @@
 
 CODEC_HEADER
 
-mpc_decoder decoder;
+mpc_decoder decoder IBSS_ATTR;
 
 /* Our implementations of the mpc_reader callback functions. */
 mpc_int32_t read_impl(void *data, void *ptr, mpc_int32_t size)
@@ -63,7 +63,8 @@ mpc_bool_t canseek_impl(void *data)
     return true;
 }
 
-MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
+MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH];
+mpc_uint32_t    seek_table[10000];
 
 #ifdef USE_IRAM
 extern char iramcopy[];
@@ -92,6 +93,7 @@ enum codec_status codec_start(struct codec_api *api)
     ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(28));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
+    ci->configure(CODEC_SET_FILEBUF_PRESEEK, (long *)(0));
     
     /* Create a decoder instance */
     reader.read = read_impl;
@@ -100,6 +102,11 @@ enum codec_status codec_start(struct codec_api *api)
     reader.get_size = get_size_impl;
     reader.canseek = canseek_impl;
     reader.data = ci;
+
+    /* Ensure that SeekTable is clear since decoder is reused */
+    decoder.SeekTable = NULL;
+    
+    mpc_decoder_set_seek_table(&decoder, seek_table, sizeof(seek_table));
 
 next_track:    
     if (codec_init(api)) {
@@ -113,7 +120,7 @@ next_track:
         retval = CODEC_ERROR;
         goto done;
     }
-    frequency = info.sample_freq;
+    frequency = info.sample_freq / 1000;
     ci->configure(DSP_SET_FREQUENCY, (long *)(long)info.sample_freq);
         
     /* set playback engine up for correct number of channels */
@@ -139,21 +146,23 @@ next_track:
     /* This is the decoding loop. */
     samplesdone = 0;
     do {
-        #if 0
-        /* Complete seek handler. This will be extremely slow and unresponsive 
-           on target, so has been disabledt. */
+       #if 1
+       /* Complete seek handler. */
         if (ci->seek_time) {
-            mpc_int64_t new_offset = (ci->seek_time - 1)*info.sample_freq/1000;
+            /* hack to improve seek time if filebuf goes empty */
+            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*512));
+            mpc_int64_t new_offset = (ci->seek_time - 1)*frequency;
             if (mpc_decoder_seek_sample(&decoder, new_offset)) {
                 samplesdone = new_offset;
                 ci->set_elapsed(ci->seek_time);
             }
             ci->seek_complete();
+            /* reset chunksize */
+            ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
+
         }
         #else
-        /* Seek to start of track handler. This is the only case that isn't slow
-           as hell, and needs to be supported for the back button to function as
-           wanted. */
+        /* Seek to start of track handler. */
         if (ci->seek_time) {
             if (ci->seek_time == 1 && mpc_decoder_seek_sample(&decoder, 0)) {
                 samplesdone = 0;
@@ -178,7 +187,7 @@ next_track:
                                             status*sizeof(MPC_SAMPLE_FORMAT)))
                 ci->yield();
             samplesdone += status;
-            ci->set_elapsed(samplesdone/(frequency/1000));
+            ci->set_elapsed(samplesdone/frequency);
         }
     } while (status != 0);
     retval = CODEC_OK;
@@ -188,6 +197,7 @@ done:
         goto next_track;
 
 exit:
+    mpc_decoder_destroy(&decoder);
     return retval;
 }
 

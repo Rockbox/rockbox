@@ -46,8 +46,8 @@ struct mpc_decoder_t; // forward declare to break circular dependencies
 /// Huffman table entry.
 typedef struct huffman_type_t {
     mpc_uint32_t  Code;
-    mpc_uint16_t  Length;
-    mpc_int16_t   Value;
+    mpc_uint8_t   Length;
+    mpc_int8_t    Value;
 } HuffmanTyp;
 
 #endif // _mpcdec_huffman_h_

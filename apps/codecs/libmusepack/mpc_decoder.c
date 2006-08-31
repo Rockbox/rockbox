@@ -58,6 +58,38 @@ extern const HuffmanTyp    mpc_table_Region_C [ 4];
 
 #endif
 
+#ifndef MPC_LITTLE_ENDIAN
+#define SWAP(X) mpc_swap32(X)
+#else
+#define SWAP(X) X
+#endif
+
+#ifdef SCF_HACK
+#define SCF_DIFF(SCF, D) (SCF == -128 ? -128 : SCF + D)
+#else 
+#define SCF_DIFF(SCF, D) SCF + D
+#endif
+
+#define LOOKUP(x, e, q)   mpc_decoder_make_huffman_lookup ( (q), sizeof(q), (x), (e) )
+#define Decode_DSCF()   HUFFMAN_DECODE_FASTEST ( d, mpc_table_HuffDSCF, LUTDSCF, 6 )
+#define HUFFMAN_DECODE_FASTEST(d,a,b,c)  mpc_decoder_huffman_decode_fastest ( (d), (a), (b), 32-(c) )
+#define HUFFMAN_DECODE_FASTERER(d,a,b,c)  mpc_decoder_huffman_decode_fasterer ( (d), (a), (b), 32-(c) )
+
+mpc_uint8_t     LUT1_0  [1<< 6];
+mpc_uint8_t     LUT1_1  [1<< 9];            //  576 Bytes
+mpc_uint8_t     LUT2_0  [1<< 7];
+mpc_uint8_t     LUT2_1  [1<<10];            // 1152 Bytes
+mpc_uint8_t     LUT3_0  [1<< 4];
+mpc_uint8_t     LUT3_1  [1<< 5];            //   48 Bytes
+mpc_uint8_t     LUT4_0  [1<< 4];
+mpc_uint8_t     LUT4_1  [1<< 5];            //   48 Bytes
+mpc_uint8_t     LUT5_0  [1<< 6];
+mpc_uint8_t     LUT5_1  [1<< 8];            //  320 Bytes
+mpc_uint8_t     LUT6_0  [1<< 7];
+mpc_uint8_t     LUT6_1  [1<< 7];            //  256 Bytes
+mpc_uint8_t     LUT7_0  [1<< 8];mpc_uint8_t     LUT7_1  [1<< 8];            //  512 Bytes
+mpc_uint8_t     LUTDSCF [1<< 6];            //   64 Bytes = 2976 Bytes
+
 //------------------------------------------------------------------------------
 // types
 //------------------------------------------------------------------------------
@@ -75,10 +107,20 @@ enum
 // forward declarations
 //------------------------------------------------------------------------------
 void mpc_decoder_read_bitstream_sv6(mpc_decoder *d);
-void mpc_decoder_read_bitstream_sv7(mpc_decoder *d);
-void mpc_decoder_update_buffer(mpc_decoder *d, mpc_uint32_t RING);
+void mpc_decoder_read_bitstream_sv7(mpc_decoder *d, mpc_bool_t fastSeeking);
+void mpc_decoder_update_buffer(mpc_decoder *d);
 mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample);
 void mpc_decoder_requantisierung(mpc_decoder *d, const mpc_int32_t Last_Band);
+void mpc_decoder_seek_to(mpc_decoder *d, mpc_uint32_t bitPos);
+void mpc_decoder_seek_forward(mpc_decoder *d, mpc_uint32_t bits);
+mpc_uint32_t mpc_decoder_jump_frame(mpc_decoder *d);
+void mpc_decoder_fill_buffer(mpc_decoder *d);
+void mpc_decoder_reset_state(mpc_decoder *d);
+static mpc_uint32_t get_initial_fpos(mpc_decoder *d, mpc_uint32_t StreamVersion);
+static inline mpc_int32_t mpc_decoder_huffman_decode_fastest(mpc_decoder *d, const HuffmanTyp* Table, const mpc_uint8_t* tab, mpc_uint16_t unused_bits);
+static void mpc_move_next(mpc_decoder *d);
+
+mpc_uint32_t  Speicher[MPC_DECODER_MEMSIZE];
 
 //------------------------------------------------------------------------------
 // utility functions
@@ -96,19 +138,13 @@ static mpc_bool_t f_seek(mpc_decoder *d, mpc_int32_t offset)
 static mpc_int32_t f_read_dword(mpc_decoder *d, mpc_uint32_t * ptr, mpc_uint32_t count) 
 {
     count = f_read(d, ptr, count << 2) >> 2;
-#ifndef MPC_LITTLE_ENDIAN
-    mpc_uint32_t n;
-    for(n = 0; n< count; n++) {
-        ptr[n] = mpc_swap32(ptr[n]);
-    }
-#endif
     return count;
 }
 
 //------------------------------------------------------------------------------
 // huffman & bitstream functions
 //------------------------------------------------------------------------------
-static const mpc_uint32_t mask [33] = {
+static const mpc_uint32_t mask [33] ICONST_ATTR = {
     0x00000000, 0x00000001, 0x00000003, 0x00000007,
     0x0000000F, 0x0000001F, 0x0000003F, 0x0000007F,
     0x000000FF, 0x000001FF, 0x000003FF, 0x000007FF,
@@ -127,6 +163,7 @@ static void
 mpc_decoder_reset_bitstream_decode(mpc_decoder *d) 
 {
     d->dword = 0;
+    d->next = 0;
     d->pos = 0;
     d->Zaehler = 0;
     d->WordsRead = 0;
@@ -139,8 +176,16 @@ mpc_decoder_bits_read(mpc_decoder *d)
     return 32 * d->WordsRead + d->pos;
 }
 
+static void mpc_move_next(mpc_decoder *d) {
+    d->Zaehler = (d->Zaehler + 1) & MEMMASK;
+    d->dword = d->next;
+    d->next = SWAP(d->Speicher[(d->Zaehler + 1) & MEMMASK]);
+    d->pos -= 32;
+    ++(d->WordsRead);
+}
+
 // read desired number of bits out of the bitstream
-static mpc_uint32_t
+static inline mpc_uint32_t
 mpc_decoder_bitstream_read(mpc_decoder *d, const mpc_uint32_t bits) 
 {
     mpc_uint32_t out = d->dword;
@@ -151,28 +196,45 @@ mpc_decoder_bitstream_read(mpc_decoder *d, const mpc_uint32_t bits)
         out >>= (32 - d->pos);
     }
     else {
-        d->dword = d->Speicher[d->Zaehler = (d->Zaehler + 1) & MEMMASK];
-        d->pos -= 32;
+        mpc_move_next(d);
         if (d->pos) {
             out <<= d->pos;
             out |= d->dword >> (32 - d->pos);
         }
-        ++(d->WordsRead);
     }
 
     return out & mask[bits];
+}
+
+static void 
+mpc_decoder_make_huffman_lookup(
+    mpc_uint8_t* lookup, size_t length, const HuffmanTyp* Table, size_t elements )
+{
+    size_t    i;
+    size_t    idx  = elements;
+    mpc_uint32_t  dval = (mpc_uint32_t)0x80000000L / length * 2;
+    mpc_uint32_t  val  = dval - 1;
+
+    for ( i = 0; i < length; i++, val += dval ) {
+        while ( idx > 0  &&  val >= Table[idx-1].Code )
+            idx--;
+        *lookup++ = (mpc_uint8_t)idx;
+    }
+
+    return;
 }
 
 // decode SCFI-bundle (sv4,5,6)
 static void
 mpc_decoder_scfi_bundle_read(
     mpc_decoder *d,
-    const HuffmanTyp* Table, mpc_int32_t* SCFI, mpc_bool_t* DSCF) 
+    const HuffmanTyp* Table, mpc_int8_t* SCFI, mpc_bool_t* DSCF) 
 {
     // load preview and decode
     mpc_uint32_t code  = d->dword << d->pos;
+
     if (d->pos > 26) {
-        code |= d->Speicher[(d->Zaehler + 1) & MEMMASK] >> (32 - d->pos);
+        code |= d->next >> (32 - d->pos);
     }
     while (code < Table->Code) {
         Table++;
@@ -180,9 +242,7 @@ mpc_decoder_scfi_bundle_read(
 
     // set the new position within bitstream without performing a dummy-read
     if ((d->pos += Table->Length) >= 32) {
-        d->pos -= 32;
-        d->dword = d->Speicher[d->Zaehler = (d->Zaehler+1) & MEMMASK];
-        ++(d->WordsRead);
+        mpc_move_next(d);
     }
 
     *SCFI = Table->Value >> 1;
@@ -196,8 +256,9 @@ mpc_decoder_huffman_decode(mpc_decoder *d, const HuffmanTyp *Table)
 {
     // load preview and decode
     mpc_uint32_t code = d->dword << d->pos;
+    
     if (d->pos > 18) {
-        code |= d->Speicher[(d->Zaehler + 1) & MEMMASK] >> (32 - d->pos);
+        code |= d->next >> (32 - d->pos);
     }
     while (code < Table->Code) {
         Table++;
@@ -205,9 +266,7 @@ mpc_decoder_huffman_decode(mpc_decoder *d, const HuffmanTyp *Table)
 
     // set the new position within bitstream without performing a dummy-read
     if ((d->pos += Table->Length) >= 32) {
-        d->pos -= 32;
-        d->dword = d->Speicher[d->Zaehler = (d->Zaehler + 1) & MEMMASK];
-        ++(d->WordsRead);
+        mpc_move_next(d);
     }
 
     return Table->Value;
@@ -220,8 +279,9 @@ mpc_decoder_huffman_decode_fast(mpc_decoder *d, const HuffmanTyp* Table)
 {
     // load preview and decode
     mpc_uint32_t code  = d->dword << d->pos;
+    
     if (d->pos > 22) {
-        code |= d->Speicher[(d->Zaehler + 1) & MEMMASK] >> (32 - d->pos);
+        code |= d->next >> (32 - d->pos);
     }
     while (code < Table->Code) {
         Table++;
@@ -229,9 +289,7 @@ mpc_decoder_huffman_decode_fast(mpc_decoder *d, const HuffmanTyp* Table)
 
     // set the new position within bitstream without performing a dummy-read
     if ((d->pos += Table->Length) >= 32) {
-        d->pos -= 32;
-        d->dword = d->Speicher[d->Zaehler = (d->Zaehler + 1) & MEMMASK];
-        ++(d->WordsRead);
+        mpc_move_next(d);
     }
 
     return Table->Value;
@@ -244,8 +302,9 @@ mpc_decoder_huffman_decode_faster(mpc_decoder *d, const HuffmanTyp* Table)
 {
     // load preview and decode
     mpc_uint32_t code  = d->dword << d->pos;
+    
     if (d->pos > 27) {
-        code |= d->Speicher[(d->Zaehler + 1) & MEMMASK] >> (32 - d->pos);
+        code |= d->next >> (32 - d->pos);
     }
     while (code < Table->Code) {
         Table++;
@@ -253,23 +312,63 @@ mpc_decoder_huffman_decode_faster(mpc_decoder *d, const HuffmanTyp* Table)
 
     // set the new position within bitstream without performing a dummy-read
     if ((d->pos += Table->Length) >= 32) {
-        d->pos -= 32;
-        d->dword = d->Speicher[d->Zaehler = (d->Zaehler + 1) & MEMMASK];
-        ++(d->WordsRead);
+        mpc_move_next(d);
     }
 
     return Table->Value;
 }
 
-MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960] IBSS_ATTR;
-MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960] IBSS_ATTR;
+/* partial lookup table decode */
+static mpc_int32_t
+mpc_decoder_huffman_decode_fasterer(mpc_decoder *d, const HuffmanTyp* Table, const mpc_uint8_t* tab, mpc_uint16_t unused_bits)
+{
+    // load preview and decode
+    mpc_uint32_t code  = d->dword << d->pos;
+    
+    if (d->pos > 18) { // preview 14 bits
+        code |= d->next >> (32 - d->pos);
+    }
+
+    Table += tab [(size_t)(code >> unused_bits) ];
+
+    while (code < Table->Code) {
+        Table++;
+    }
+
+    // set the new position within bitstream without performing a dummy-read
+    if ((d->pos += Table->Length) >= 32) {
+        mpc_move_next(d);
+    }
+
+    return Table->Value;
+}
+
+/* full decode using lookup table */
+static inline mpc_int32_t
+mpc_decoder_huffman_decode_fastest(mpc_decoder *d, const HuffmanTyp* Table, const mpc_uint8_t* tab, mpc_uint16_t unused_bits)
+{
+    // load preview and decode
+    mpc_uint32_t code  = d->dword << d->pos;
+
+    if (d->pos > unused_bits) {
+        code |= d->next >> (32 - d->pos);
+    }
+
+    Table+=tab [(size_t)(code >> unused_bits) ];
+
+    // set the new position within bitstream without performing a dummy-read
+    if ((d->pos += Table->Length) >= 32) {
+        mpc_move_next(d);
+    }
+
+    return Table->Value;
+}
 
 static void
 mpc_decoder_reset_v(mpc_decoder *d) 
 {
-    /* since d->V_L and d->V_R are now pointers, sizeof (d->V_x) will no longer work */
-    memset(d->V_L, 0, sizeof V_L);
-    memset(d->V_R, 0, sizeof V_R);
+    memset(d->V_L, 0, sizeof d->V_L);
+    memset(d->V_R, 0, sizeof d->V_R);
 }
 
 static void
@@ -291,6 +390,8 @@ mpc_decoder_reset_globals(mpc_decoder *d)
     mpc_decoder_reset_bitstream_decode(d);
 
     d->DecodedFrames  = 0;
+    d->SeekTableIndex = 0;
+    d->MaxDecodedFrames = 0;
     d->StreamVersion  = 0;
     d->MS_used        = 0;
 
@@ -302,10 +403,12 @@ mpc_decoder_reset_globals(mpc_decoder *d)
     memset(d->Res_R           , 0, sizeof d->Res_R            );
     memset(d->SCFI_L          , 0, sizeof d->SCFI_L           );
     memset(d->SCFI_R          , 0, sizeof d->SCFI_R           );
+#ifdef MPC_SUPPORT_SV456
     memset(d->DSCF_Flag_L     , 0, sizeof d->DSCF_Flag_L      );
     memset(d->DSCF_Flag_R     , 0, sizeof d->DSCF_Flag_R      );
-    memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
-    memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
+#endif
+    //memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
+    //memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
     memset(d->Q               , 0, sizeof d->Q                );
     memset(d->MS_Flag         , 0, sizeof d->MS_Flag          );
 }
@@ -314,16 +417,11 @@ mpc_uint32_t
 mpc_decoder_decode_frame(mpc_decoder *d, mpc_uint32_t *in_buffer,
                          mpc_uint32_t in_len, MPC_SAMPLE_FORMAT *out_buffer)
 {
-  unsigned int i;
   mpc_decoder_reset_bitstream_decode(d);
-  if (in_len > sizeof(d->Speicher)) in_len = sizeof(d->Speicher);
+  if (in_len > sizeof(Speicher)) in_len = sizeof(Speicher);
   memcpy(d->Speicher, in_buffer, in_len);
-#ifdef MPC_LITTLE_ENDIAN
-  for (i = 0; i < (in_len + 3) / 4; i++)
-    d->Speicher[i] = mpc_swap32(d->Speicher[i]);
-#endif
-  (void)i; /* avoid warning */
-  d->dword = d->Speicher[0];
+  d->dword = SWAP(d->Speicher[0]);
+  d->next = SWAP(d->Speicher[1]);
   switch (d->StreamVersion) {
 #ifdef MPC_SUPPORT_SV456
     case 0x04:
@@ -334,7 +432,7 @@ mpc_decoder_decode_frame(mpc_decoder *d, mpc_uint32_t *in_buffer,
 #endif
     case 0x07:
     case 0x17:
-        mpc_decoder_read_bitstream_sv7(d);
+        mpc_decoder_read_bitstream_sv7(d, FALSE);
         break;
     default:
         return (mpc_uint32_t)(-1);
@@ -359,7 +457,7 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
             mpc_decoder_reset_y(d);
         } else {
             mpc_decoder_bitstream_read(d, 20);
-            mpc_decoder_read_bitstream_sv7(d);
+            mpc_decoder_read_bitstream_sv7(d, FALSE);
             mpc_decoder_requantisierung(d, d->Max_Band);
         }
         mpc_decoder_synthese_filter_float(d, buffer);
@@ -369,6 +467,9 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
     if (d->DecodedFrames >= d->OverallFrames) {
         return (mpc_uint32_t)(-1);                           // end of file -> abort decoding
     }
+
+    if (d->DecodedFrames == 0 && d->Use_SeekTable)
+        d->SeekTable[0] = mpc_decoder_bits_read(d);
 
     // read jump-info for validity check of frame
     d->FwdJumpInfo  = mpc_decoder_bitstream_read(d, 20);
@@ -387,12 +488,27 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
 #endif
     case 0x07:
     case 0x17:
-        mpc_decoder_read_bitstream_sv7(d);
+        mpc_decoder_read_bitstream_sv7(d, FALSE);
         break;
     default:
         return (mpc_uint32_t)(-1);
     }
     d->FrameWasValid = mpc_decoder_bits_read(d) - FrameBitCnt == d->FwdJumpInfo;
+
+    d->DecodedFrames++;
+
+    if (d->Use_SeekTable) {
+        if (d->SeekTable_Step == 1) {
+            d->SeekTable [d->DecodedFrames] = d->FwdJumpInfo + 20;
+        } else {
+            if ((d->DecodedFrames-1) % d->SeekTable_Step == 0) {
+                d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                d->SeekTableIndex += 1;
+                d->SeekTableCounter = 0;
+            }
+            d->SeekTableCounter += d->FwdJumpInfo + 20;
+        }
+    }
 
     // synthesize signal
     mpc_decoder_requantisierung(d, d->Max_Band);
@@ -401,8 +517,6 @@ mpc_decoder_decode_internal(mpc_decoder *d, MPC_SAMPLE_FORMAT *buffer)
     //    perform_EQ ();
 
     mpc_decoder_synthese_filter_float(d, buffer);
-
-    d->DecodedFrames++;
 
     // cut off first MPC_DECODER_SYNTH_DELAY zero-samples
     if (d->DecodedFrames == d->OverallFrames  && d->StreamVersion >= 6) {        
@@ -483,7 +597,7 @@ mpc_uint32_t mpc_decoder_decode(
             }
 
         }
-        mpc_decoder_update_buffer(d, RING);
+        mpc_decoder_update_buffer(d);
 
         if (valid_samples > 0) {
             return valid_samples;
@@ -502,8 +616,8 @@ mpc_decoder_requantisierung(mpc_decoder *d, const mpc_int32_t Last_Band)
     MPC_SAMPLE_FORMAT tempr;
     MPC_SAMPLE_FORMAT* YL;
     MPC_SAMPLE_FORMAT* YR;
-    mpc_int32_t*    L;
-    mpc_int32_t*    R;
+    mpc_int16_t*    L;
+    mpc_int16_t*    R;
 
 #ifdef MPC_FIXED_POINT
 #if MPC_FIXED_POINT_FRACTPART == 14
@@ -694,10 +808,12 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
     const HuffmanTyp *Table;
     const HuffmanTyp *x1;
     const HuffmanTyp *x2;
-    mpc_int32_t *L;
-    mpc_int32_t *R;
-    mpc_int32_t *ResL = d->Res_L;
-    mpc_int32_t *ResR = d->Res_R;
+    mpc_int8_t *L;
+    mpc_int8_t *R;
+    mpc_int16_t *QL;
+    mpc_int16_t *QR;
+    mpc_int8_t *ResL = d->Res_L;
+    mpc_int8_t *ResR = d->Res_R;
 
     /************************ HEADER **************************/
     ResL = d->Res_L;
@@ -738,7 +854,7 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
             /*********** DSCF ************/
             if (d->DSCF_Flag_L[n]==1)
             {
-                L[2] = d->DSCF_Reference_L[n];
+                //L[2] = d->DSCF_Reference_L[n];
                 switch (d->SCFI_L[n])
                 {
                 case 3:
@@ -797,11 +913,11 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
                 }
             }
             // update Reference for DSCF
-            d->DSCF_Reference_L[n] = L[2];
+            //d->DSCF_Reference_L[n] = L[2];
         }
         if (*ResR)
         {
-            R[2] = d->DSCF_Reference_R[n];
+            //R[2] = d->DSCF_Reference_R[n];
             /*********** DSCF ************/
             if (d->DSCF_Flag_R[n]==1)
             {
@@ -863,7 +979,7 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
                 }
             }
             // update Reference for DSCF
-            d->DSCF_Reference_R[n] = R[2];
+            //d->DSCF_Reference_R[n] = R[2];
         }
     }
 
@@ -875,28 +991,28 @@ mpc_decoder_read_bitstream_sv6(mpc_decoder *d)
         // setting pointers
         x1 = mpc_table_SampleHuff[*ResL];
         x2 = mpc_table_SampleHuff[*ResR];
-        L = d->Q[n].L;
-        R = d->Q[n].R;
+        QL = d->Q[n].L;
+        QR = d->Q[n].R;
 
         if (x1!=NULL || x2!=NULL)
             for (k=0; k<36; ++k)
             {
-                if (x1 != NULL) *L++ = mpc_decoder_huffman_decode_fast(d,  x1);
-                if (x2 != NULL) *R++ = mpc_decoder_huffman_decode_fast(d,  x2);
+                if (x1 != NULL) *QL++ = mpc_decoder_huffman_decode_fast(d,  x1);
+                if (x2 != NULL) *QR++ = mpc_decoder_huffman_decode_fast(d,  x2);
             }
 
         if (*ResL>7 || *ResR>7)
             for (k=0; k<36; ++k)
             {
-                if (*ResL>7) *L++ = (mpc_int32_t)mpc_decoder_bitstream_read(d,  Res_bit[*ResL]) - Dc[*ResL];
-                if (*ResR>7) *R++ = (mpc_int32_t)mpc_decoder_bitstream_read(d,  Res_bit[*ResR]) - Dc[*ResR];
+                if (*ResL>7) *QL++ = (mpc_int16_t)mpc_decoder_bitstream_read(d,  Res_bit[*ResL]) - Dc[*ResL];
+                if (*ResR>7) *QR++ = (mpc_int16_t)mpc_decoder_bitstream_read(d,  Res_bit[*ResR]) - Dc[*ResR];
             }
     }
 }
 #endif //MPC_SUPPORT_SV456
 /****************************************** SV 7 ******************************************/
 void
-mpc_decoder_read_bitstream_sv7(mpc_decoder *d) 
+mpc_decoder_read_bitstream_sv7(mpc_decoder *d, mpc_bool_t fastSeeking) 
 {
     // these arrays hold decoding results for bundled quantizers (3- and 5-step)
     /*static*/ mpc_int32_t idx30[] = { -1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1,-1, 0, 1};
@@ -909,9 +1025,12 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
     mpc_int32_t Max_used_Band=0;
     const HuffmanTyp *Table;
     mpc_int32_t idx;
-    mpc_int32_t *L   ,*R;
-    mpc_int32_t *ResL,*ResR;
+    mpc_int8_t *L   ,*R;
+    mpc_int16_t *LQ   ,*RQ;
+    mpc_int8_t *ResL,*ResR;
     mpc_uint32_t tmp;
+    mpc_uint8_t *LUT;
+    mpc_uint8_t max_length;
 
     /***************************** Header *****************************/
     ResL  = d->Res_L;
@@ -922,6 +1041,8 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
     *ResR = mpc_decoder_bitstream_read(d, 4);
     if (d->MS_used && !(*ResL==0 && *ResR==0)) {
         d->MS_Flag[0] = mpc_decoder_bitstream_read(d, 1);
+    } else {
+        d->MS_Flag[0] = 0;
     }
 
     // consecutive subbands
@@ -941,6 +1062,8 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
         // only perform following procedures up to the maximum non-zero subband
         if (*ResL!=0 || *ResR!=0) {
             Max_used_Band = n;
+        } else {
+            d->MS_Flag[n] = 0;
         }
     }
     /****************************** SCFI ******************************/
@@ -961,148 +1084,215 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
     for (n=0; n<=Max_used_Band; ++n, ++ResL, ++ResR, L+=3, R+=3) {
         if (*ResL)
         {
-            L[2] = d->DSCF_Reference_L[n];
+            //L[2] = d->DSCF_Reference_L[n];
             switch (d->SCFI_L[n])
             {
             case 1:
-                idx  = mpc_decoder_huffman_decode_fast(d, mpc_table_HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d, mpc_table_HuffDSCF);
-                L[1] = (idx!=8) ? L[0] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[0] = (idx!=8) ? SCF_DIFF(L[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[1] = (idx!=8) ? SCF_DIFF(L[0], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 L[2] = L[1];
                 break;
             case 3:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[0] = (idx!=8) ? SCF_DIFF(L[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 L[1] = L[0];
                 L[2] = L[1];
                 break;
             case 2:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[0] = (idx!=8) ? SCF_DIFF(L[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 L[1] = L[0];
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[2] = (idx!=8) ? L[1] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[2] = (idx!=8) ? SCF_DIFF(L[1], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 break;
             case 0:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[0] = (idx!=8) ? L[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[1] = (idx!=8) ? L[0] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                L[2] = (idx!=8) ? L[1] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[0] = (idx!=8) ? SCF_DIFF(L[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[1] = (idx!=8) ? SCF_DIFF(L[0], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                L[2] = (idx!=8) ? SCF_DIFF(L[1], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 break;
             default:
                 return;
                 break;
             }
-            // update Reference for DSCF
-            d->DSCF_Reference_L[n] = L[2];
         }
         if (*ResR)
         {
-            R[2] = d->DSCF_Reference_R[n];
             switch (d->SCFI_R[n])
             {
             case 1:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[1] = (idx!=8) ? R[0] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[0] = (idx!=8) ? SCF_DIFF(R[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[1] = (idx!=8) ? SCF_DIFF(R[0], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 R[2] = R[1];
                 break;
             case 3:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[0] = (idx!=8) ? SCF_DIFF(R[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 R[1] = R[0];
                 R[2] = R[1];
                 break;
             case 2:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[0] = (idx!=8) ? SCF_DIFF(R[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 R[1] = R[0];
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[2] = (idx!=8) ? R[1] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[2] = (idx!=8) ? SCF_DIFF(R[1], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 break;
             case 0:
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[0] = (idx!=8) ? R[2] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[1] = (idx!=8) ? R[0] + idx : (int) mpc_decoder_bitstream_read(d, 6);
-                idx  = mpc_decoder_huffman_decode_fast(d,  mpc_table_HuffDSCF);
-                R[2] = (idx!=8) ? R[1] + idx : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[0] = (idx!=8) ? SCF_DIFF(R[2], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[1] = (idx!=8) ? SCF_DIFF(R[0], idx) : (int) mpc_decoder_bitstream_read(d, 6);
+                idx = Decode_DSCF ();
+                R[2] = (idx!=8) ? SCF_DIFF(R[1], idx) : (int) mpc_decoder_bitstream_read(d, 6);
                 break;
             default:
                 return;
                 break;
             }
-            // update Reference for DSCF
-            d->DSCF_Reference_R[n] = R[2];
         }
     }
+
+    if (fastSeeking)
+        return;
+
     /***************************** Samples ****************************/
     ResL = d->Res_L;
     ResR = d->Res_R;
-    L    = d->Q[0].L;
-    R    = d->Q[0].R;
-    for (n=0; n <= Max_used_Band; ++n, ++ResL, ++ResR, L+=36, R+=36)
+    LQ    = d->Q[0].L;
+    RQ    = d->Q[0].R;
+    for (n=0; n <= Max_used_Band; ++n, ++ResL, ++ResR, LQ+=36, RQ+=36)
     {
         /************** links **************/
         switch (*ResL)
         {
         case  -2: case  -3: case  -4: case  -5: case  -6: case  -7: case  -8: case  -9:
         case -10: case -11: case -12: case -13: case -14: case -15: case -16: case -17:
-            L += 36;
+            LQ += 36;
             break;
         case -1:
             for (k=0; k<36; k++ ) {
                 tmp  = mpc_random_int(d);
-                *L++ = ((tmp >> 24) & 0xFF) + ((tmp >> 16) & 0xFF) + ((tmp >>  8) & 0xFF) + ((tmp >>  0) & 0xFF) - 510;
+                *LQ++ = ((tmp >> 24) & 0xFF) + ((tmp >> 16) & 0xFF) + ((tmp >>  8) & 0xFF) + ((tmp >>  0) & 0xFF) - 510;
             }
             break;
         case 0:
-            L += 36;// increase pointer
+            LQ += 36;// increase pointer
             break;
         case 1:
-            Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][1];
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][1];
+                LUT = LUT1_1;
+                max_length = 9;
+            } else {
+                Table = mpc_table_HuffQ[0][1];
+                LUT = LUT1_0;
+                max_length = 6;
+            }
             for (k=0; k<12; ++k)
             {
-                idx = mpc_decoder_huffman_decode_fast(d,  Table);
-                *L++ = idx30[idx];
-                *L++ = idx31[idx];
-                *L++ = idx32[idx];
+                idx  = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+                *LQ++ = idx30[idx];
+                *LQ++ = idx31[idx];
+                *LQ++ = idx32[idx];
             }
             break;
         case 2:
-            Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][2];
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][2];
+                LUT = LUT2_1;
+                max_length = 10;
+            } else {
+                Table = mpc_table_HuffQ[0][2];
+                LUT = LUT2_0;
+                max_length = 7;
+            }
             for (k=0; k<18; ++k)
             {
-                idx = mpc_decoder_huffman_decode_fast(d,  Table);
-                *L++ = idx50[idx];
-                *L++ = idx51[idx];
+                idx  = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+                *LQ++ = idx50[idx];
+                *LQ++ = idx51[idx];
             }
             break;
         case 3:
-        case 4:
-            Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResL];
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][3];
+                LUT = LUT3_1;
+                max_length = 5;
+            } else {
+                Table = mpc_table_HuffQ[0][3];
+                LUT = LUT3_0;
+                max_length = 4;
+            }
             for (k=0; k<36; ++k)
-                *L++ = mpc_decoder_huffman_decode_faster(d, Table);
+                *LQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+            break;
+        case 4:
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][4];
+                LUT = LUT4_1;
+                max_length = 5;
+            } else {
+                Table = mpc_table_HuffQ[0][4];
+                LUT = LUT4_0;
+                max_length = 4;
+            }
+            for (k=0; k<36; ++k)
+                *LQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
             break;
         case 5:
-            Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResL];
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][5];
+                LUT = LUT5_1;
+                max_length = 8;
+            } else {
+                Table = mpc_table_HuffQ[0][5];
+                LUT = LUT5_0;
+                max_length = 6;
+            }
             for (k=0; k<36; ++k)
-                *L++ = mpc_decoder_huffman_decode_fast(d, Table);
+                *LQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
             break;
         case 6:
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][6];
+                LUT = LUT6_1;
+                max_length = 7;
+                for (k=0; k<36; ++k)
+                    *LQ++ = HUFFMAN_DECODE_FASTERER ( d, Table, LUT, max_length );
+            } else {
+                Table = mpc_table_HuffQ[0][6];
+                LUT = LUT6_0;
+                max_length = 7;
+                for (k=0; k<36; ++k)
+                    *LQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+            }
+            break;
         case 7:
-            Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResL];
-            for (k=0; k<36; ++k)
-                *L++ = mpc_decoder_huffman_decode(d, Table);
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][7];
+                LUT = LUT7_1;
+                max_length = 8;
+                for (k=0; k<36; ++k)
+                    *LQ++ = HUFFMAN_DECODE_FASTERER ( d, Table, LUT, max_length );
+            } else {
+                Table = mpc_table_HuffQ[0][7];
+                LUT = LUT7_0;
+                max_length = 8;
+                for (k=0; k<36; ++k)
+                    *LQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+            }           
             break;
         case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15: case 16: case 17:
             tmp = Dc[*ResL];
             for (k=0; k<36; ++k)
-                *L++ = (mpc_int32_t)mpc_decoder_bitstream_read(d, Res_bit[*ResL]) - tmp;
+                *LQ++ = (mpc_int16_t)mpc_decoder_bitstream_read(d, Res_bit[*ResL]) - tmp;
             break;
         default:
             return;
@@ -1112,57 +1302,125 @@ mpc_decoder_read_bitstream_sv7(mpc_decoder *d)
         {
         case  -2: case  -3: case  -4: case  -5: case  -6: case  -7: case  -8: case  -9:
         case -10: case -11: case -12: case -13: case -14: case -15: case -16: case -17:
-            R += 36;
+            RQ += 36;
             break;
         case -1:
                 for (k=0; k<36; k++ ) {
                     tmp  = mpc_random_int(d);
-                    *R++ = ((tmp >> 24) & 0xFF) + ((tmp >> 16) & 0xFF) + ((tmp >>  8) & 0xFF) + ((tmp >>  0) & 0xFF) - 510;
+                    *RQ++ = ((tmp >> 24) & 0xFF) + ((tmp >> 16) & 0xFF) + ((tmp >>  8) & 0xFF) + ((tmp >>  0) & 0xFF) - 510;
                 }
                 break;
             case 0:
-                R += 36;// increase pointer
+                RQ += 36;// increase pointer
                 break;
             case 1:
-                Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][1];
+                if (mpc_decoder_bitstream_read(d, 1)) {
+                    Table = mpc_table_HuffQ[1][1];
+                    LUT = LUT1_1;
+                    max_length = 9;
+                } else {
+                    Table = mpc_table_HuffQ[0][1];
+                    LUT = LUT1_0;
+                    max_length = 6;
+                }
                 for (k=0; k<12; ++k)
                 {
-                    idx = mpc_decoder_huffman_decode_fast(d, Table);
-                    *R++ = idx30[idx];
-                    *R++ = idx31[idx];
-                    *R++ = idx32[idx];
+                    idx = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+                    *RQ++ = idx30[idx];
+                    *RQ++ = idx31[idx];
+                    *RQ++ = idx32[idx];
                 }
                 break;
             case 2:
-                Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][2];
+                if (mpc_decoder_bitstream_read(d, 1)) {
+                    Table = mpc_table_HuffQ[1][2];
+                    LUT = LUT2_1;
+                    max_length = 10;
+                } else {
+                    Table = mpc_table_HuffQ[0][2];
+                    LUT = LUT2_0;
+                    max_length = 7;
+                }
                 for (k=0; k<18; ++k)
                 {
-                    idx = mpc_decoder_huffman_decode_fast(d, Table);
-                    *R++ = idx50[idx];
-                    *R++ = idx51[idx];
+                    idx = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+                    *RQ++ = idx50[idx];
+                    *RQ++ = idx51[idx];
                 }
                 break;
             case 3:
-            case 4:
-                Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResR];
+                if (mpc_decoder_bitstream_read(d, 1)) {
+                    Table = mpc_table_HuffQ[1][3];
+                    LUT = LUT3_1;
+                    max_length = 5;
+                } else {
+                    Table = mpc_table_HuffQ[0][3];
+                    LUT = LUT3_0;
+                    max_length = 4;
+                }
                 for (k=0; k<36; ++k)
-                    *R++ = mpc_decoder_huffman_decode_faster(d, Table);
+                    *RQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+                break;
+            case 4:
+                if (mpc_decoder_bitstream_read(d, 1)) {
+                    Table = mpc_table_HuffQ[1][4];
+                    LUT = LUT4_1;
+                    max_length = 5;
+                } else {
+                    Table = mpc_table_HuffQ[0][4];
+                    LUT = LUT4_0;
+                    max_length = 4;
+                }
+                for (k=0; k<36; ++k)
+                    *RQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
                 break;
             case 5:
-                Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResR];
+                if (mpc_decoder_bitstream_read(d, 1)) {
+                    Table = mpc_table_HuffQ[1][5];
+                    LUT = LUT5_1;
+                    max_length = 8;
+                } else {
+                    Table = mpc_table_HuffQ[0][5];
+                    LUT = LUT5_0;
+                    max_length = 6;
+                }
                 for (k=0; k<36; ++k)
-                    *R++ = mpc_decoder_huffman_decode_fast(d, Table);
+                    *RQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
                 break;
             case 6:
-            case 7:
-                Table = mpc_table_HuffQ[mpc_decoder_bitstream_read(d, 1)][*ResR];
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][6];
+                LUT = LUT6_1;
+                max_length = 7;
                 for (k=0; k<36; ++k)
-                    *R++ = mpc_decoder_huffman_decode(d, Table);
-                break;
+                    *RQ++ = HUFFMAN_DECODE_FASTERER ( d, Table, LUT, max_length );
+            } else {
+                Table = mpc_table_HuffQ[0][6];
+                LUT = LUT6_0;
+                max_length = 7;
+                for (k=0; k<36; ++k)
+                    *RQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+            }
+            break;
+        case 7:
+            if (mpc_decoder_bitstream_read(d, 1)) {
+                Table = mpc_table_HuffQ[1][7];
+                LUT = LUT7_1;
+                max_length = 8;
+                for (k=0; k<36; ++k)
+                    *RQ++ = HUFFMAN_DECODE_FASTERER ( d, Table, LUT, max_length );
+            } else {
+                Table = mpc_table_HuffQ[0][7];
+                LUT = LUT7_0;
+                max_length = 8;
+                for (k=0; k<36; ++k)
+                    *RQ++ = HUFFMAN_DECODE_FASTEST ( d, Table, LUT, max_length );
+            }           
+            break;
             case 8: case 9: case 10: case 11: case 12: case 13: case 14: case 15: case 16: case 17:
                 tmp = Dc[*ResR];
                 for (k=0; k<36; ++k)
-                    *R++ = (mpc_int32_t)mpc_decoder_bitstream_read(d, Res_bit[*ResR]) - tmp;
+                    *RQ++ = (mpc_int16_t)mpc_decoder_bitstream_read(d, Res_bit[*ResR]) - tmp;
                 break;
             default:
                 return;
@@ -1182,6 +1440,7 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   d->FrameWasValid = 0;
   d->OverallFrames = 0;
   d->DecodedFrames = 0;
+  d->MaxDecodedFrames = 0;
   d->TrueGaplessPresent = 0;
   d->last_block_samples = 0;
   d->WordsRead = 0;
@@ -1193,21 +1452,58 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   d->dword = 0;
   d->pos = 0;
   d->Zaehler = 0;
+  d->Ring = 0;
   d->WordsRead = 0;
   d->Max_Band = 0;
+  d->SeekTable = NULL;
+  d->Use_FastSeek = TRUE;
+  d->Use_SeekTable = TRUE;
+  d->Use_StaticSeekTable = FALSE;
+  d->SeekTable_Step = 1;
+  d->SeekTableIndex = 0;
+  d->SeekTableCounter = 0;
+  d->Max_SeekTable_Size = 0;
 
   mpc_decoder_initialisiere_quantisierungstabellen(d, 1.0f);
+#if 0
+  mpc_decoder_init_huffman_sv6(d);
+  mpc_decoder_init_huffman_sv7(d);
+#endif
 
-  /* Link struct entries to actual tables which are placed in IRAM */
-  d->V_L = V_L;
-  d->V_R = V_R;
+  LOOKUP ( mpc_table_HuffQ[0][1], 27, LUT1_0  );
+  LOOKUP ( mpc_table_HuffQ[1][1], 27, LUT1_1  );
+  LOOKUP ( mpc_table_HuffQ[0][2], 25, LUT2_0  );
+  LOOKUP ( mpc_table_HuffQ[1][2], 25, LUT2_1  );
+  LOOKUP ( mpc_table_HuffQ[0][3], 7,  LUT3_0  );
+  LOOKUP ( mpc_table_HuffQ[1][3], 7,  LUT3_1  );
+  LOOKUP ( mpc_table_HuffQ[0][4], 9,  LUT4_0  );
+  LOOKUP ( mpc_table_HuffQ[1][4], 9,  LUT4_1  );
+  LOOKUP ( mpc_table_HuffQ[0][5], 15, LUT5_0  );
+  LOOKUP ( mpc_table_HuffQ[1][5], 15, LUT5_1  );
+  LOOKUP ( mpc_table_HuffQ[0][6], 31, LUT6_0  );
+  LOOKUP ( mpc_table_HuffQ[1][6], 31, LUT6_1  );
+  LOOKUP ( mpc_table_HuffQ[0][7], 63, LUT7_0  );
+  LOOKUP ( mpc_table_HuffQ[1][7], 63, LUT7_1  );
+  LOOKUP ( mpc_table_HuffDSCF,    16, LUTDSCF );
+
+  d->Speicher = Speicher;
+
   #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
   #endif
 }
 
+void mpc_decoder_destroy(mpc_decoder *d) {
+
+    if (d->SeekTable != NULL && d->Use_StaticSeekTable == FALSE)
+        free(d->SeekTable);
+
+}
+
 void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
 {
+    mpc_uint16_t seekTableSize;
+
     mpc_decoder_reset_synthesis(d);
     mpc_decoder_reset_globals(d);
 
@@ -1220,26 +1516,53 @@ void mpc_decoder_set_streaminfo(mpc_decoder *d, mpc_streaminfo *si)
     d->SampleRate         = (mpc_int32_t)si->sample_freq;
 
     d->samples_to_skip = MPC_DECODER_SYNTH_DELAY;
+
+    if (d->SeekTable != NULL && d->Use_StaticSeekTable == FALSE) 
+        free(d->SeekTable);
+
+    if (d->Use_SeekTable) {
+        if (d->Use_StaticSeekTable == FALSE) {
+            if (d->Max_SeekTable_Size == 0) {
+                seekTableSize = si->frames;
+            } else {
+                seekTableSize = min(si->frames, d->Max_SeekTable_Size / sizeof(mpc_uint32_t));
+            }
+            d->SeekTable = (mpc_uint32_t*) calloc( sizeof(mpc_uint32_t), seekTableSize);
+            d->SeekTable_Step = si->frames / seekTableSize;
+            if (si->frames % seekTableSize)
+                d->SeekTable_Step+=1;
+        } else {
+            seekTableSize = d->Max_SeekTable_Size / sizeof(mpc_uint32_t);
+            d->SeekTable_Step = si->frames / seekTableSize;
+            if (si->frames % seekTableSize)
+                d->SeekTable_Step+=1;
+        }
+    }
+
 }
 
 mpc_bool_t mpc_decoder_initialize(mpc_decoder *d, mpc_streaminfo *si) 
 {
+    mpc_uint32_t bitPos;
+    mpc_uint32_t fpos;
+
     mpc_decoder_set_streaminfo(d, si);
 
-    // AB: setting position to the beginning of the data-bitstream
-    switch (d->StreamVersion) {
-    case 0x04: f_seek(d, 4 + d->MPCHeaderPos); d->pos = 16; break;  // Geht auch über eine der Helperfunktionen
-    case 0x05:
-    case 0x06: f_seek(d, 8 + d->MPCHeaderPos); d->pos =  0; break;
-    case 0x07:
-    case 0x17: /*f_seek ( 24 + d->MPCHeaderPos );*/ d->pos =  8; break;
-    default: return FALSE;
-    }
+    // setting position to the beginning of the data-bitstream
+    bitPos = get_initial_fpos(d, d->StreamVersion);
+    fpos = bitPos >> 5;
 
-    // AB: fill buffer and initialize decoder
-    f_read_dword(d, d->Speicher, MEMSIZE );
-    d->dword = d->Speicher[d->Zaehler = 0];
-
+    // fill buffer and initialize decoder
+    f_seek(d, fpos*4 + d->MPCHeaderPos);
+    f_read_dword(d, d->Speicher, MEMSIZE);
+    d->Ring = 0;
+    d->Zaehler = 0;
+    d->pos = bitPos & 31;
+    d->WordsRead = fpos;
+    d->dword = SWAP(d->Speicher[0]);
+    d->next = SWAP(d->Speicher[1]);
+    d->SeekTable_Step = 1;
+    
     return TRUE;
 }
 
@@ -1253,21 +1576,19 @@ helper1(mpc_decoder *d, mpc_uint32_t bitpos)
 {
     f_seek(d, (bitpos >> 5) * 4 + d->MPCHeaderPos);
     f_read_dword(d, d->Speicher, 2);
-    d->dword = d->Speicher[d->Zaehler = 0];
+    d->dword = SWAP(d->Speicher[d->Zaehler = 0]);
     d->pos = bitpos & 31;
 }
-#endif
 
 static void
 helper2(mpc_decoder *d, mpc_uint32_t bitpos) 
 {
     f_seek(d, (bitpos>>5) * 4 + d->MPCHeaderPos);
     f_read_dword(d, d->Speicher, MEMSIZE);
-    d->dword = d->Speicher[d->Zaehler = 0];
+    d->dword = SWAP(d->Speicher[d->Zaehler = 0]);
     d->pos = bitpos & 31;
 }
 
-#if 0
 static void
 helper3(mpc_decoder *d, mpc_uint32_t bitpos, mpc_uint32_t* buffoffs) 
 {
@@ -1278,9 +1599,27 @@ helper3(mpc_decoder *d, mpc_uint32_t bitpos, mpc_uint32_t* buffoffs)
         f_seek(d, bitpos * 4L + d->MPCHeaderPos);
         f_read_dword(d, d->Speicher, MEMSIZE );
     }
-    d->dword = d->Speicher[d->Zaehler = bitpos - *buffoffs ];
+    d->dword = SWAP(d->Speicher[d->Zaehler = bitpos - *buffoffs ]);
 }
 #endif
+
+// jumps over the current frame
+mpc_uint32_t mpc_decoder_jump_frame(mpc_decoder *d) {
+
+    mpc_uint32_t frameSize;
+
+    // ensure the buffer is full
+    mpc_decoder_update_buffer(d);
+
+    // bits in frame
+    frameSize = mpc_decoder_bitstream_read(d, 20);
+
+    // jump forward
+    mpc_decoder_seek_forward(d, frameSize);
+
+    return frameSize + 20;
+
+}
 
 static mpc_uint32_t get_initial_fpos(mpc_decoder *d, mpc_uint32_t StreamVersion)
 {
@@ -1301,55 +1640,170 @@ mpc_bool_t mpc_decoder_seek_seconds(mpc_decoder *d, double seconds)
     return mpc_decoder_seek_sample(d, (mpc_int64_t)(seconds * (double)d->SampleRate + 0.5));
 }
 
-mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample) 
-{
-    mpc_uint32_t fpos;
-    mpc_uint32_t fwd;
+void mpc_decoder_reset_state(mpc_decoder *d) {
 
-    fwd = (mpc_uint32_t) (destsample / MPC_FRAME_LENGTH);
-    d->samples_to_skip = MPC_DECODER_SYNTH_DELAY + (mpc_uint32_t)(destsample % MPC_FRAME_LENGTH);
-
-    memset(d->Y_L          , 0, sizeof d->Y_L           );
-    memset(d->Y_R          , 0, sizeof d->Y_R           );
+    memset(d->Y_L             , 0, sizeof d->Y_L              );
+    memset(d->Y_R             , 0, sizeof d->Y_R              );
+#ifdef SCF_HACK
+    memset(d->SCF_Index_L     , -128, sizeof d->SCF_Index_L   );
+    memset(d->SCF_Index_R     , -128, sizeof d->SCF_Index_R   );
+#else
     memset(d->SCF_Index_L     , 0, sizeof d->SCF_Index_L      );
     memset(d->SCF_Index_R     , 0, sizeof d->SCF_Index_R      );
+#endif
     memset(d->Res_L           , 0, sizeof d->Res_L            );
     memset(d->Res_R           , 0, sizeof d->Res_R            );
     memset(d->SCFI_L          , 0, sizeof d->SCFI_L           );
     memset(d->SCFI_R          , 0, sizeof d->SCFI_R           );
+#ifdef MPC_SUPPORT_SV456
     memset(d->DSCF_Flag_L     , 0, sizeof d->DSCF_Flag_L      );
     memset(d->DSCF_Flag_R     , 0, sizeof d->DSCF_Flag_R      );
-    memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
-    memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
+#endif
+    //memset(d->DSCF_Reference_L, 0, sizeof d->DSCF_Reference_L );
+    //memset(d->DSCF_Reference_R, 0, sizeof d->DSCF_Reference_R );
     memset(d->Q               , 0, sizeof d->Q                );
     memset(d->MS_Flag         , 0, sizeof d->MS_Flag          );
 
-    // resetting synthesis filter to avoid "clicks"
-    mpc_decoder_reset_synthesis(d);
+}
+
+mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample) 
+{
+    mpc_uint32_t fpos = 0;        // the bit to seek to
+    mpc_uint32_t seekFrame = 0;   // the frame to seek to
+    mpc_uint32_t lastFrame = 0;   // last frame to seek to before scanning scale factors
+    mpc_int32_t  delta = 0;       // direction of seek
+    
+    destsample += MPC_DECODER_SYNTH_DELAY;
+    seekFrame = (mpc_uint32_t) ((destsample) / MPC_FRAME_LENGTH);
+    d->samples_to_skip = (mpc_uint32_t)((destsample) % MPC_FRAME_LENGTH);
 
     // prevent from desired position out of allowed range
-    fwd = fwd < d->OverallFrames  ?  fwd  :  d->OverallFrames;
+    seekFrame = seekFrame < d->OverallFrames  ?  seekFrame  :  d->OverallFrames;
 
-    // reset number of decoded frames
-    d->DecodedFrames = 0;
+    // seek direction (note: avoids casting to int64)
+    delta = (d->DecodedFrames > seekFrame ? -(mpc_int32_t)(d->DecodedFrames - seekFrame) : (mpc_int32_t)(seekFrame - d->DecodedFrames));
 
-    fpos = get_initial_fpos(d, d->StreamVersion);
-    if (fpos == 0) {
-        return FALSE;
-    }
+    // update max decoded frames
+    if (d->DecodedFrames > d->MaxDecodedFrames)
+        d->MaxDecodedFrames = d->DecodedFrames;
 
-    helper2(d, fpos);
+    if (seekFrame > 33) 
+        lastFrame = seekFrame - 33 + 1 - d->SeekTable_Step;
 
-    // read the last 32 frames before the desired position to scan the scalefactors (artifactless jumping)
-    for ( ; d->DecodedFrames < fwd; d->DecodedFrames++ ) {
+    if ((!d->Use_SeekTable && delta < 0) || d->MaxDecodedFrames == 0) {
+
+        mpc_decoder_reset_state(d);
+
+        // starts from the beginning since no frames have been decoded yet, or not using seek table
+        fpos = get_initial_fpos(d, d->StreamVersion);
+
+        // seek to the first frame
+        mpc_decoder_seek_to(d, fpos);
+
+        // reset number of decoded frames
+        d->DecodedFrames = 0;
+
+        if (d->Use_SeekTable) {
+            // jump to the last frame, updating seek table
+            if (d->SeekTable_Step == 1) {
+                d->SeekTable[0] = (mpc_uint32_t)fpos;
+                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
+                    d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
+            } else {
+                d->SeekTableIndex = 0;
+                d->SeekTableCounter = (mpc_uint32_t)fpos;
+                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
+                    if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                        d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                        d->SeekTableIndex += 1;
+                        d->SeekTableCounter = 0;
+                    }
+                    d->SeekTableCounter += mpc_decoder_jump_frame(d);
+                }
+            }
+        } else {
+            // just jump to the last frame
+            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
+                mpc_decoder_jump_frame(d);
+        } 
+        
+    } else if (delta < 0) {
+
+        mpc_decoder_reset_state(d);
+
+        // jumps backwards using the seek table
+        fpos = d->SeekTable[0];
+        if (d->SeekTable_Step == 1) {
+            for (d->DecodedFrames = 0;d->DecodedFrames < lastFrame; d->DecodedFrames++)
+                fpos += d->SeekTable[d->DecodedFrames+1];
+        } else {
+            d->SeekTableIndex = 0;
+            //d->SeekTableCounter = 0;
+            for (d->DecodedFrames = 0;d->DecodedFrames < lastFrame; d->DecodedFrames+=d->SeekTable_Step, d->SeekTableIndex++)
+                fpos += d->SeekTable[d->SeekTableIndex+1];
+            d->SeekTableCounter = d->SeekTable[d->SeekTableIndex];
+        }
+        mpc_decoder_seek_to(d, fpos);
+
+    } else if (delta > 33) {
+
+        mpc_decoder_reset_state(d);
+
+        // jumps forward from the current position
+        if (d->Use_SeekTable) {
+
+            if (d->MaxDecodedFrames > lastFrame) { // REVIEW: Correct?? or (d->MaxDecodedFrames > d->DecodedFrames)
+                // jump to the last usable position in the seek table
+                if (d->SeekTable_Step == 1) {
+                    fpos = mpc_decoder_bits_read(d);
+                    for (; d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames++)
+                        fpos += d->SeekTable[d->DecodedFrames+1];
+                } else {
+                    // could test SeekTable offset and jump to next entry but this is easier for now...
+                    //d->SeekTableIndex = 0;
+                    //d->SeekTableCounter = 0;
+                    fpos = d->SeekTable[0];
+                    d->SeekTableIndex = 0;
+                    for (d->DecodedFrames = 0;d->DecodedFrames < d->MaxDecodedFrames && d->DecodedFrames < lastFrame; d->DecodedFrames+=d->SeekTable_Step, d->SeekTableIndex++)
+                        fpos += d->SeekTable[d->SeekTableIndex+1];
+                    d->SeekTableCounter = d->SeekTable[d->SeekTableIndex];
+                }
+
+                mpc_decoder_seek_to(d, fpos);
+            }
+            if (d->SeekTable_Step == 1) {
+                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
+                    d->SeekTable[d->DecodedFrames+1] = mpc_decoder_jump_frame(d);
+            } else {
+                for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) {
+                    if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                        d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                        d->SeekTableIndex += 1;
+                        d->SeekTableCounter = 0;
+                    }
+                    d->SeekTableCounter += mpc_decoder_jump_frame(d);
+                }
+            } 
+        } else {
+            for (;d->DecodedFrames < lastFrame; d->DecodedFrames++) 
+                mpc_decoder_jump_frame(d);
+        }
+
+    } 
+
+    // REVIEW: Needed?
+    mpc_decoder_update_buffer(d);
+
+    for (;d->DecodedFrames < seekFrame; d->DecodedFrames++) {
+
         mpc_uint32_t   FrameBitCnt;
-        mpc_uint32_t   RING;
-        RING         = d->Zaehler;
+
         d->FwdJumpInfo  = mpc_decoder_bitstream_read(d, 20);    // read jump-info
         d->ActDecodePos = (d->Zaehler << 5) + d->pos;
-        FrameBitCnt  = mpc_decoder_bits_read(d);  // scanning the scalefactors and check for validity of frame
+        FrameBitCnt  = mpc_decoder_bits_read(d);  
+        // scanning the scalefactors (and check for validity of frame)
         if (d->StreamVersion >= 7)  {
-            mpc_decoder_read_bitstream_sv7(d);
+            mpc_decoder_read_bitstream_sv7(d, d->Use_FastSeek && (d->DecodedFrames < seekFrame - 1));
         }
         else {
 #ifdef MPC_SUPPORT_SV456
@@ -1358,28 +1812,123 @@ mpc_bool_t mpc_decoder_seek_sample(mpc_decoder *d, mpc_int64_t destsample)
             return FALSE;
 #endif
         }
-        if (mpc_decoder_bits_read(d) - FrameBitCnt != d->FwdJumpInfo ) {
-            // Box ("Bug in perform_jump");
-            return FALSE;
-        }
-        // update buffer
-        if ((RING ^ d->Zaehler) & MEMSIZE2) {
-            f_read_dword(d, d->Speicher + (RING & MEMSIZE2),  MEMSIZE2);
-        }
-    }
 
-    // LastBitsRead = BitsRead ();
-    // LastFrame = d->DecodedFrames;
+        FrameBitCnt = mpc_decoder_bits_read(d) - FrameBitCnt;
+
+        if (d->Use_FastSeek && d->FwdJumpInfo > FrameBitCnt) 
+            mpc_decoder_seek_forward(d, d->FwdJumpInfo - FrameBitCnt);
+        else if (FrameBitCnt != d->FwdJumpInfo ) 
+            // Bug in perform_jump;
+            return FALSE;
+
+        // REVIEW: Only if decodedFrames < maxDecodedFrames??
+        if (d->Use_SeekTable) {
+            if (d->SeekTable_Step == 1) {
+                // check that the frame length corresponds with any data already in the seek table
+                if (d->SeekTable[d->DecodedFrames+1] != 0 && d->SeekTable[d->DecodedFrames+1] != d->FwdJumpInfo + 20)
+                    return FALSE;
+                d->SeekTable [d->DecodedFrames+1] = d->FwdJumpInfo + 20;
+            } else {
+                if (d->DecodedFrames % d->SeekTable_Step == 0) {
+                    if (d->SeekTable[d->SeekTableIndex] != 0 && d->SeekTable[d->SeekTableIndex] != d->SeekTableCounter)
+                        return FALSE;
+                    d->SeekTable[d->SeekTableIndex] = d->SeekTableCounter;
+                    d->SeekTableIndex += 1;
+                    d->SeekTableCounter = 0;
+                }
+                d->SeekTableCounter += d->FwdJumpInfo + 20;
+            } 
+        }
+
+        // update buffer
+        mpc_decoder_update_buffer(d);
+
+        if (d->DecodedFrames == seekFrame - 1) {
+            
+            // initialize the synth correctly for perfect decoding
+            mpc_decoder_requantisierung(d, d->Max_Band);
+            mpc_decoder_synthese_filter_float(d, NULL);
+
+        }
+        
+    }
 
     return TRUE;
 }
 
-void mpc_decoder_update_buffer(mpc_decoder *d, mpc_uint32_t RING) 
+
+void mpc_decoder_fill_buffer(mpc_decoder *d) {
+
+    f_read_dword(d, d->Speicher, MEMSIZE);
+    d->dword = SWAP(d->Speicher[d->Zaehler = 0]);
+    d->next = SWAP(d->Speicher[1]);
+    d->Ring = 0;
+
+}
+
+
+void mpc_decoder_update_buffer(mpc_decoder *d) 
 {
-    if ((RING ^ d->Zaehler) & MEMSIZE2 ) {
+    if ((d->Ring ^ d->Zaehler) & MEMSIZE2) {
         // update buffer
-        f_read_dword(d, d->Speicher + (RING & MEMSIZE2), MEMSIZE2);
+        f_read_dword(d, d->Speicher + (d->Ring & MEMSIZE2), MEMSIZE2);
+        d->Ring = d->Zaehler;
     }
 }
 
 
+void mpc_decoder_seek_to(mpc_decoder *d, mpc_uint32_t bitPos) {
+
+    // required dword
+    mpc_uint32_t fpos = (bitPos >> 5);
+    mpc_uint32_t bufferStart = d->WordsRead - d->Zaehler;
+    if ((d->Zaehler & MEMSIZE2) != FALSE)
+        bufferStart += MEMSIZE2;
+
+    if (fpos >= bufferStart && fpos < bufferStart + MEMSIZE) {
+
+        // required position is within the buffer, no need to seek
+        d->Zaehler = (fpos - bufferStart + ((d->Zaehler & MEMSIZE2) != FALSE ? MEMSIZE2 : 0)) & MEMMASK;
+        d->pos = bitPos & 31;
+        d->WordsRead = fpos;
+        d->dword = SWAP(d->Speicher[d->Zaehler]);
+        d->next = SWAP(d->Speicher[(d->Zaehler + 1) & MEMMASK]);
+
+        mpc_decoder_update_buffer(d);
+        
+
+    } else {
+
+        // DWORD aligned
+        f_seek(d, fpos*4 + d->MPCHeaderPos);
+        d->Zaehler = 0;
+        d->pos = bitPos & 31;
+        d->WordsRead = fpos;
+
+        mpc_decoder_fill_buffer(d);
+
+    }
+    
+}
+
+
+void mpc_decoder_seek_forward(mpc_decoder *d, mpc_uint32_t bits) {
+
+    bits += d->pos;
+    d->pos = bits & 31;
+    bits = bits >> 5; // to DWORDs
+    d->Zaehler = (d->Zaehler + bits) & MEMMASK;
+    d->dword = SWAP(d->Speicher[d->Zaehler]);
+    d->next = SWAP(d->Speicher[(d->Zaehler + 1) & MEMMASK]);
+    d->WordsRead += bits;
+
+}
+
+
+void mpc_decoder_set_seek_table(mpc_decoder *d, mpc_uint32_t *seek_table, mpc_uint32_t max_table_size) {
+
+    d->Use_StaticSeekTable = TRUE;
+    d->SeekTable = seek_table;
+    d->Max_SeekTable_Size = max_table_size;
+
+}
