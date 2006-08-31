@@ -227,7 +227,7 @@ void wmcodec_enable_output(bool enable)
     } else {
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         /* We need to disable bit 4 of GPIOL to disable sound on H10 */
-        GPIOL_OUTPUT_VAL ^= 0x10;
+        GPIOL_OUTPUT_VAL &= ~0x10;
 #endif
         wmcodec_mute(1);
     }

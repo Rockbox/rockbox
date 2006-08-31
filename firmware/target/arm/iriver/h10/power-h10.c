@@ -89,11 +89,8 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    /* set_irq_level(HIGHEST_IRQ_LEVEL);*/
-    #ifndef BOOTLOADER
-    /* We don't turn off the ipod, we put it in a deep sleep */
-    /* pcf50605_standby_mode(); */
-    while(1)
-        yield();
-    #endif
+    /* Give things a second to settle before cutting power */
+    sleep(HZ);
+    
+    GPIOF_OUTPUT_VAL &=~ 0x20;
 }

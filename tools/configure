@@ -952,7 +952,7 @@ EOF
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v3"
-    bootoutput="h10.mi4"
+    bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools scramble"
@@ -1004,7 +1004,7 @@ EOF
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v2"
-    bootoutput="h10.mi4"
+    bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools scramble"
