@@ -55,7 +55,7 @@ void TIMER2(void)
     TIMER2_VAL; /* ACK interrupt */
     if (cycles_new > 0)
     {
-        TIMER2_CFG = 0xc0000000 | cycles_new;
+        TIMER2_CFG = 0xc0000000 | (cycles_new - 1);
         cycles_new = 0;
     }
     if (pfn_timer != NULL)
@@ -151,7 +151,7 @@ static bool timer_set(long cycles, bool start)
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
 #elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
-    if (cycles > 0x1fffffff)
+    if (cycles > 0x20000000)
         return false;
 
     if (start)
@@ -163,7 +163,7 @@ static bool timer_set(long cycles, bool start)
         }
     }
     if (start || (cycles_new == -1))  /* within isr, cycles_new is "locked" */
-        TIMER2_CFG = 0xc0000000 | cycles;    /* enable timer */
+        TIMER2_CFG = 0xc0000000 | (cycles - 1);    /* enable timer */
     else
         cycles_new = cycles;
 

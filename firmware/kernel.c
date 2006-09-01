@@ -392,7 +392,7 @@ void tick_start(unsigned int interval_in_ms)
     TIMER1_CFG = 0x0;
     TIMER1_VAL;
     /* enable timer */
-    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000);
+    TIMER1_CFG = 0xc0000000 | (interval_in_ms*1000 - 1);
     /* unmask interrupt source */
     CPU_INT_EN = TIMER1_MASK;
 #else
