@@ -124,8 +124,8 @@ typedef struct mpc_decoder_t {
 
     MPC_SAMPLE_FORMAT V_L[MPC_V_MEM + 960];
     MPC_SAMPLE_FORMAT V_R[MPC_V_MEM + 960];
-    MPC_SAMPLE_FORMAT Y_L[36][32];
-    MPC_SAMPLE_FORMAT Y_R[36][32];
+    MPC_SAMPLE_FORMAT (*Y_L)[32];
+    MPC_SAMPLE_FORMAT (*Y_R)[32];
     MPC_SAMPLE_FORMAT SCF[256]; ///< holds adapted scalefactors (for clipping prevention)
     //@}
 

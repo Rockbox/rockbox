@@ -121,6 +121,8 @@ static inline mpc_int32_t mpc_decoder_huffman_decode_fastest(mpc_decoder *d, con
 static void mpc_move_next(mpc_decoder *d);
 
 mpc_uint32_t  Speicher[MPC_DECODER_MEMSIZE];
+MPC_SAMPLE_FORMAT Y_L[36][32];
+MPC_SAMPLE_FORMAT Y_R[36][32];
 
 //------------------------------------------------------------------------------
 // utility functions
@@ -380,8 +382,8 @@ mpc_decoder_reset_synthesis(mpc_decoder *d)
 static void
 mpc_decoder_reset_y(mpc_decoder *d) 
 {
-    memset(d->Y_L, 0, sizeof d->Y_L);
-    memset(d->Y_R, 0, sizeof d->Y_R);
+    memset(d->Y_L, 0, sizeof Y_L);
+    memset(d->Y_R, 0, sizeof Y_R);
 }
 
 static void
@@ -395,8 +397,8 @@ mpc_decoder_reset_globals(mpc_decoder *d)
     d->StreamVersion  = 0;
     d->MS_used        = 0;
 
-    memset(d->Y_L          , 0, sizeof d->Y_L           );
-    memset(d->Y_R          , 0, sizeof d->Y_R           );
+    memset(d->Y_L          , 0, sizeof Y_L           );
+    memset(d->Y_R          , 0, sizeof Y_R           );
     memset(d->SCF_Index_L     , 0, sizeof d->SCF_Index_L      );
     memset(d->SCF_Index_R     , 0, sizeof d->SCF_Index_R      );
     memset(d->Res_L           , 0, sizeof d->Res_L            );
@@ -1487,6 +1489,8 @@ void mpc_decoder_setup(mpc_decoder *d, mpc_reader *r)
   LOOKUP ( mpc_table_HuffDSCF,    16, LUTDSCF );
 
   d->Speicher = Speicher;
+  d->Y_L = Y_L;
+  d->Y_R = Y_R;
 
   #if defined(CPU_COLDFIRE)&& !defined(SIMULATOR)
   coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE);
@@ -1642,8 +1646,8 @@ mpc_bool_t mpc_decoder_seek_seconds(mpc_decoder *d, double seconds)
 
 void mpc_decoder_reset_state(mpc_decoder *d) {
 
-    memset(d->Y_L             , 0, sizeof d->Y_L              );
-    memset(d->Y_R             , 0, sizeof d->Y_R              );
+    memset(d->Y_L             , 0, sizeof Y_L              );
+    memset(d->Y_R             , 0, sizeof Y_R              );
 #ifdef SCF_HACK
     memset(d->SCF_Index_L     , -128, sizeof d->SCF_Index_L   );
     memset(d->SCF_Index_R     , -128, sizeof d->SCF_Index_R   );
