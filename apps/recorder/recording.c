@@ -1722,8 +1722,16 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC == SWCODEC
             snprintf(buf, 32, "%s",
                 REC_QUALITY_LABEL(global_settings.rec_quality));
-            for(i = 0; i < screen_update; i++)
-                screens[i].puts(0, filename_offset[i] + PM_HEIGHT + 6, buf);
+            for(i = 0; i < screen_update; i++){
+#ifdef HAVE_AGC
+                if ((global_settings.rec_source == AUDIO_SRC_MIC)
+                         || (global_settings.rec_source == AUDIO_SRC_LINEIN)
+                         || (global_settings.rec_source == AUDIO_SRC_FMRADIO))
+                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 2, buf);
+                else
+#endif
+                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
+            }
 #endif
 
             for(i = 0; i < screen_update; i++)
