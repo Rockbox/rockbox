@@ -16,9 +16,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-/* Taken from the x5's implementation */
-
 #ifndef BACKLIGHT_TARGET_H
 #define BACKLIGHT_TARGET_H
 
