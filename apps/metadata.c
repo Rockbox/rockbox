@@ -1260,9 +1260,24 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
                                "%d.%d dB", album_gain/100, abs(album_gain)%100);
         }
     } else {
-        /* There's no certain way to detect these pre-sv7 streams, apparently */
-        /* TODO: add sv6 parsing here */
-        return false;
+        header[0] = letoh32(header[0]);
+        unsigned int streamversion = (header[0] >> 11) & 0x03FF;
+        if (streamversion != 4 && streamversion != 5 && streamversion != 6)
+            return false;
+        id3->frequency = 44100;
+        id3->track_gain = 0;
+        id3->track_peak = 0;
+        id3->album_gain = 0;
+        id3->album_peak = 0;
+
+        if (streamversion >= 5)
+            samples = (uint64_t)header[1]*1152; // 32 bit
+        else
+            samples = (uint64_t)(header[1] >> 16)*1152; // 16 bit
+
+        samples -= 576;
+        if (streamversion < 6)
+            samples -= 1152;
     }
 
     id3->vbr = true;

@@ -234,8 +234,15 @@ mpc_streaminfo_read(mpc_streaminfo * si, mpc_reader * r)
         }
     } else {
 #ifdef MPC_SUPPORT_SV456
+#ifndef MPC_LITTLE_ENDIAN
+        mpc_uint32_t ptr;
+        for (ptr = 0; ptr < 8; ptr++) {
+            HeaderData[ptr] = mpc_swap32(HeaderData[ptr]);
+        }
+#endif
         // stream version 4-6
         Error = streaminfo_read_header_sv6(si, HeaderData);
+        if (Error != ERROR_CODE_OK) return Error;
 #else
         return ERROR_CODE_INVALIDSV;
 #endif
