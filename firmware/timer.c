@@ -60,7 +60,7 @@ void TIMER2(void)
     }
     if (pfn_timer != NULL)
     {
-        cycles_new = -1; 
+        cycles_new = -1;
         /* "lock" the variable, in case timer_set_period()
          * is called within pfn_timer() */
         pfn_timer();
@@ -151,7 +151,7 @@ static bool timer_set(long cycles, bool start)
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
 #elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
-    if (cycles > 0x20000000)
+    if (cycles > 0x20000000 || cycles < 2)
         return false;
 
     if (start)

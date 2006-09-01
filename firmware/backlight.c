@@ -303,7 +303,7 @@ static void backlight_dim(int value)
     if (bl_timer_active)
         return ;
 
-    if (timer_register(0, backlight_release_timer, 1, 0, backlight_isr))
+    if (timer_register(0, backlight_release_timer, 2, 0, backlight_isr))
     {
 #ifdef CPU_COLDFIRE
         /* Prevent cpu frequency changes while dimming. */
