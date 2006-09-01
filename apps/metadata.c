@@ -1491,23 +1491,34 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         break;
 
     case AFMT_WAVPACK:
-        /* A simple parser to read basic information from a WavPack file.
-         * This will fail on WavPack files that don't have the WavPack header
-         * as the first thing (i.e. self-extracting WavPack files) or WavPack
-         * files that have so much extra RIFF data stored in the first block
-         * that they don't have samples (very rare, I would think).
+        /* A simple parser to read basic information from a WavPack file. This
+         * now works with self-extrating WavPack files and also will fail on
+         * WavPack files containing floating-point audio data (although these
+         * should be possible to play in theory).
          */
 
         /* Use the trackname part of the id3 structure as a temporary buffer */
         buf = track->id3.path;
       
-        if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 32) < 32))
-        {
-            return false;
+        for (i = 0; i < 256; ++i) {
+
+            /* at every 256 bytes into file, try to read a WavPack header */
+
+            if ((lseek(fd, i * 256, SEEK_SET) < 0) || (read(fd, buf, 32) < 32))
+            {
+                return false;
+            }
+
+            /* if valid WavPack 4 header version & not floating data, break */
+
+            if (memcmp (buf, "wvpk", 4) == 0 && buf [9] == 4 &&
+                (buf [8] >= 2 && buf [8] <= 0x10) && !(buf [24] & 0x80))
+            {          
+                break;
+            }
         }
 
-        if (memcmp (buf, "wvpk", 4) != 0 || buf [9] != 4 || buf [8] < 2) 
-        {          
+        if (i == 256) {
             logf ("%s is not a WavPack file\n", trackname);
             return false;
         }
