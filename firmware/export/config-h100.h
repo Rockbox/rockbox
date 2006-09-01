@@ -135,9 +135,6 @@
 /* Someone with H100 and BDM, please verify if this works. */
 /* #define HAVE_EEPROM */
 
-/* Define this for FM radio input available (not for SIMULATOR) */
-#define HAVE_FMRADIO_IN
-
 #endif /* !SIMULATOR */
 
 /* Define this for S/PDIF input available */
@@ -150,3 +147,5 @@
 #define HAVE_SPDIF_POWER
 #define SPDIF_POWER_INVERTED
 
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN

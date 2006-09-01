@@ -82,9 +82,6 @@
    should be defined as well. */
 #define HAVE_LCD_SLEEP
 
-/* Define this for FM radio input available (not for SIMULATOR) */
-#define HAVE_FMRADIO_IN
-
 /* Define this if you have a Motorola SCF5250 */
 #define CONFIG_CPU MCF5250
 
@@ -142,3 +139,6 @@
 #define FLASH_MAGIC            0xfbfbfbf1
 
 #endif /* SIMULATOR */
+
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN

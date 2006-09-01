@@ -140,7 +140,8 @@
 /* Define this if there is an EEPROM chip */
 #define HAVE_EEPROM
 
-/* Define this for FM radio input available (not for SIMULATOR) */
+#endif /* SIMULATOR */
+
+/* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
 
-#endif /* SIMULATOR */
