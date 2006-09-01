@@ -17,55 +17,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-/* button definitions, every keypad must only have select,menu and cancel */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define TEXT_EDITOR_SELECT BUTTON_PLAY
-#define TEXT_EDITOR_CANCEL BUTTON_OFF
-#define TEXT_EDITOR_ITEM_MENU BUTTON_F1
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define TEXT_EDITOR_SELECT_PRE BUTTON_MENU
-#define TEXT_EDITOR_SELECT (BUTTON_MENU|BUTTON_REL)
-#define TEXT_EDITOR_CANCEL BUTTON_OFF
-#define TEXT_EDITOR_ITEM_MENU BUTTON_MENU|BUTTON_REPEAT
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define TEXT_EDITOR_SELECT BUTTON_SELECT
-#define TEXT_EDITOR_CANCEL BUTTON_OFF
-#define TEXT_EDITOR_DELETE BUTTON_REC
-#define TEXT_EDITOR_ITEM_MENU BUTTON_MODE
-
-#define TEXT_EDITOR_RC_CANCEL BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define TEXT_EDITOR_SELECT_PRE    BUTTON_SELECT
-#define TEXT_EDITOR_SELECT ( BUTTON_SELECT | BUTTON_REL)
-#define TEXT_EDITOR_CANCEL_PRE    BUTTON_SELECT
-#define TEXT_EDITOR_CANCEL (BUTTON_SELECT | BUTTON_MENU)
-#define TEXT_EDITOR_DELETE (BUTTON_LEFT)
-#define TEXT_EDITOR_ITEM_MENU (BUTTON_MENU)
-
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define TEXT_EDITOR_SELECT BUTTON_SELECT
-#define TEXT_EDITOR_CANCEL BUTTON_POWER
-#define TEXT_EDITOR_ITEM_MENU BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define TEXT_EDITOR_SELECT BUTTON_SELECT
-#define TEXT_EDITOR_CANCEL BUTTON_A
-#define TEXT_EDITOR_ITEM_MENU BUTTON_MENU
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define TEXT_EDITOR_SELECT BUTTON_REW
-#define TEXT_EDITOR_CANCEL BUTTON_POWER
-#define TEXT_EDITOR_ITEM_MENU BUTTON_PLAY
-
-#else
-    #error TEXT_EDITOR: Unsupported keypad
-#endif
-
+#include "action.h"
 
 #if PLUGIN_BUFFER_SIZE > 0x45000
 #define MAX_CHARS    0x40000 /* 128 kiB */
@@ -338,7 +290,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     struct gui_synclist lists;
     bool exit = false;
-    int button, last_button = BUTTON_NONE;
+    int button;
     bool changed = false;
     int cur_sel=0;
     static char copy_buffer[MAX_LINE_LEN];
@@ -396,7 +348,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
         rb->gui_synclist_draw(&lists);
         cur_sel = rb->gui_synclist_get_sel_pos(&lists);
-        button = rb->button_get(true);
+        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&lists,button))
             continue;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -404,12 +356,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
         switch (button)
         {
-            case TEXT_EDITOR_SELECT:
+            case ACTION_STD_OK:
             {
-#ifdef TEXT_EDITOR_SELECT_PRE
-                if (last_button != TEXT_EDITOR_SELECT_PRE)
-                    break;
-#endif
                 if (line_count)
                     rb->strcpy(temp_line,&buffer[do_action(ACTION_GET,0,cur_sel)]);
                 if (!rb->kbd_input(temp_line,MAX_LINE_LEN))
@@ -435,19 +383,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 changed = true;
             break;
 #endif
-#ifdef TEXT_EDITOR_ITEM_MENU
-            case TEXT_EDITOR_ITEM_MENU:
-#ifdef TEXT_EDITOR_RC_ITEM_MENU
-            case TEXT_EDITOR_RC_ITEM_MENU:
-#endif
-#ifdef TEXT_EDITOR_ITEM_MENU_PRE
-                if (lastbutton != TEXT_EDITOR_ITEM_MENU_PRE
-#ifdef TEXT_EDITOR_RC_ITEM_MENU_PRE
-                    && lastbutton != TEXT_EDITOR_RC_ITEM_MENU_PRE
-#endif
-                    )
-                    break;
-#endif
+            case ACTION_STD_MENU:
             { /* do the item menu */
                 switch (do_item_menu(cur_sel, copy_buffer))
                 {
@@ -463,15 +399,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 }
             }
             break;
-#endif /* TEXT_EDITOR_ITEM_MENU */
-            case TEXT_EDITOR_CANCEL:
-#ifdef TEXT_EDITOR_CANCEL_PRE
-                if (last_button != TEXT_EDITOR_CANCEL_PRE)
-                    break;
-#endif
-#ifdef TEXT_EDITOR_RC_CANCEL
-            case TEXT_EDITOR_RC_CANCEL:
-#endif
+            case ACTION_STD_CANCEL:
                 if (changed)
                 {
                     int m;
@@ -518,7 +446,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 else exit=1;
             break;
         }
-        last_button = button;
         rb->gui_synclist_set_nb_items(&lists,line_count);
     }
     rb->global_settings->statusbar = prev_show_statusbar;
