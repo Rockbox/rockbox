@@ -2418,16 +2418,15 @@ void filter_subband(int s[SBLIMIT], int off, int k)
 {
   short *enwindow = enwindow_int;
   int   i, tmp = 0;
-#ifdef CPU_COLDFIRE 
-  int   reg_buff[14]; /* register storage buffer */
+#ifdef CPU_COLDFIRE
+  short *yint = y_int;
 #endif
+
 
   /* 36864=72*512: shift samples into proper window positions */
 #ifdef CPU_COLDFIRE
   { short *xint = &x_int[k][off];
-    short *yint = y_int;
 
-    asm volatile ("movem.l %%d0/%%d2-%%d7/%%a2-%%a7,%0\n" : "=m" (*(int*)reg_buff));
     asm volatile(
     "moveq.l #32, %%d0\n"
     "move.l %%d0, %[i]\n"                 /* set loop counter */
@@ -2474,11 +2473,9 @@ void filter_subband(int s[SBLIMIT], int off, int k)
     "sub.l #1, %[i]\n"
     "jbne loop_start\n"
 
-    : [xint] "+a" (xint), [yint] "+a" (yint), [i] "+m" (i)
-    : [enwindow] "a" (enwindow)
+    : [xint] "+a" (xint), [yint] "+a" (yint), [i] "+m" (i), [enwindow] "+a" (enwindow)
+    :
     : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a2", "a3", "a4", "a5");
-
-    asm volatile ("movem.l %0,%%d0/%%d2-%%d7/%%a2-%%a7\n" : : "m" (*(int*)reg_buff));
   }
 #else
   for(i=0; i<64; i++)
@@ -2487,6 +2484,10 @@ void filter_subband(int s[SBLIMIT], int off, int k)
       tmp += (int)x_int[k][(i+j+off)&(HAN_SIZE-1)] * (int)*(enwindow++);
     y_int[i] = (short)((tmp + (1<<18)) >> 19);
   }
+#endif
+
+#ifdef CPU_COLDFIRE
+  yint = y_int;
 #endif
     
   /* 147456=72*2048 */
@@ -2568,7 +2569,8 @@ void filter_subband(int s[SBLIMIT], int off, int k)
       "mac.w %%d7l, %%a5l,                   %%acc0\n"
       "lea.l (-31*4, %[yint]), %[yint]\n" /* wrap yint back to start */
       "movclr.l %%acc0, %[tmp]"
-      : [tmp] "=r" (tmp) : [filt] "a" (filt), [yint] "a" (y_int)
+      : [tmp] "=r" (tmp), [yint] "+a" (yint)
+      : [filt] "a" (filt)
       : "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "a5" );
     }
 #else
