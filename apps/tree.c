@@ -556,7 +556,6 @@ static bool dirbrowse(void)
     bool exit_func = false;
     long thumbnail_time = -1; /* for delaying a thumbnail */
 
-    unsigned lastbutton = 0;
     char* currdir = tc.currdir; /* just a shortcut */
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
 
@@ -871,7 +870,6 @@ static bool dirbrowse(void)
         if ( button )
         {
             ata_spin();
-            lastbutton = button;
         }
 
         if (start_wps && audio_status() )

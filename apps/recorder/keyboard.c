@@ -288,7 +288,7 @@ int kbd_input(char* text, int buflen)
 #endif
 
     char outline[256];
-    int button, lastbutton = 0;
+    int button;
 #ifdef HAS_BUTTONBAR
     struct gui_buttonbar buttonbar;
     bool buttonbar_config = global_settings.buttonbar;
@@ -998,7 +998,6 @@ int kbd_input(char* text, int buflen)
         }
         if (button != BUTTON_NONE)
         {
-            lastbutton = button;
             cur_blink = true;
         }
     }
