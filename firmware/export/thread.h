@@ -29,6 +29,56 @@
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
+/* Need to keep structures inside the header file because debug_menu
+ * needs them. */
+#ifdef CPU_COLDFIRE
+struct regs
+{
+    unsigned int macsr;  /* EMAC status register */
+    unsigned int d[6];   /* d2-d7 */
+    unsigned int a[5];   /* a2-a6 */
+    void         *sp;    /* Stack pointer (a7) */
+    void         *start; /* Thread start address, or NULL when started */
+};
+#elif CONFIG_CPU == SH7034
+struct regs
+{
+    unsigned int r[7];   /* Registers r8 thru r14 */
+    void         *sp;    /* Stack pointer (r15) */
+    void         *pr;    /* Procedure register */
+    void         *start; /* Thread start address, or NULL when started */
+};
+#elif defined(CPU_ARM)
+struct regs
+{
+    unsigned int r[8];   /* Registers r4-r11 */
+    void         *sp;    /* Stack pointer (r13) */
+    unsigned int lr;     /* r14 (lr) */
+    void         *start; /* Thread start address, or NULL when started */
+};
+#elif CONFIG_CPU == TCC730
+struct regs
+{
+    void *sp;    /* Stack pointer (a15) */
+    void *start; /* Thread start address */
+    int started; /* 0 when not started */
+};
+#endif
+
+struct thread_entry {
+    struct regs context;
+    const char *name;
+    void *stack;
+    int stack_size;
+};
+
+struct core_entry {
+    int num_threads;
+    volatile int num_sleepers;
+    int current_thread;
+    struct thread_entry threads[MAXTHREADS];
+};
+
 int create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name);
 int create_thread_on_core(unsigned int core, void (*function)(void), void* stack, int stack_size,

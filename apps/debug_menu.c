@@ -78,8 +78,7 @@
 /*---------------------------------------------------*/
 extern char ata_device;
 extern int ata_io_address;
-extern int num_threads[];
-extern const char *thread_name[][MAXTHREADS];
+extern struct core_entry cores[NUM_CORES];
 
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
@@ -113,10 +112,10 @@ bool dbg_os(void)
         }
 #else
         lcd_puts(0, 0, "Stack usage:");
-        for(i = 0; i < num_threads[CURRENT_CORE];i++)
+        for(i = 0; i < cores[CURRENT_CORE].num_threads;i++)
         {
             usage = thread_stack_usage(i);
-            snprintf(buf, 32, "%s: %d%%", thread_name[CURRENT_CORE][i], usage);
+            snprintf(buf, 32, "%s: %d%%", cores[CURRENT_CORE].threads[i].name, usage);
             lcd_puts(0, 1+i, buf);
         }
 #endif
