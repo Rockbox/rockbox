@@ -228,7 +228,7 @@ static struct plugin_api* rb;
 #   define CARD_WIDTH  19
 #   define CARD_HEIGHT 24
 #else
-#   define CARD_WIDTH  15
+#   define CARD_WIDTH  14
 #   define CARD_HEIGHT 12
 #endif
 
@@ -429,7 +429,11 @@ static void draw_card( card_t card, int x, int y,
         }
         else
         {
+#if UPPER_ROW_MARGIN > 0
             draw_suit( card.suit, x+2+NUMBER_WIDTH, y+1 );
+#else
+            draw_suit( card.suit, x+1+NUMBER_WIDTH, y+1 );
+#endif
             draw_number( card.num, x+1, y+1 );
         }
     }
@@ -1138,7 +1142,8 @@ int solitaire( void )
             c = cols[i];
             while( c != NOT_A_CARD )
             {
-                j++;
+                if( deck[c].known ) j += 2;
+                else j ++;
                 c = deck[c].next;
             }
             if( j > biggest_col_length ) biggest_col_length = j;
@@ -1164,12 +1169,12 @@ int solitaire( void )
                     /* draw the cursor on empty columns */
                     if( cur_col == i )
                     {
-                        draw_cursor( 1+i*((LCD_WIDTH - 2)/COL_NUM), j+1 );
+                        draw_cursor( i*((LCD_WIDTH)/COL_NUM), j+1 );
                     }
                     break;
                 }
 
-                draw_card( deck[c], 1+i*((LCD_WIDTH - 2)/COL_NUM), j+1,
+                draw_card( deck[c], i*((LCD_WIDTH)/COL_NUM), j+1,
                            c == sel_card, c == cur_card, false );
 
                 h = c;
@@ -1180,6 +1185,9 @@ int solitaire( void )
                  * they don't overflow out of the LCD */
                 if( h == cur_card )
                     j += SUIT_HEIGHT+2;
+                else if( deck[h].known )
+                    j += min( SUIT_HEIGHT+2,
+                 2*(LCD_HEIGHT - CARD_START - CARD_HEIGHT)/biggest_col_length );
                 else
                     j += min( SUIT_HEIGHT+2,
                    (LCD_HEIGHT - CARD_START - CARD_HEIGHT)/biggest_col_length );
@@ -1225,11 +1233,7 @@ int solitaire( void )
             if( cur_rem != NOT_A_CARD )
             {
                 prevcard = cur_rem;
-#if UPPER_ROW_MARGIN > 0
                 j = CARD_WIDTH+2*UPPER_ROW_MARGIN+1;
-#else
-                j = CARD_WIDTH/2+2*UPPER_ROW_MARGIN+1;
-#endif
                 for( i = 0; i < count_rem; i++ )
                     prevcard = find_prev_card(prevcard);
                 for( i = 0; i <= count_rem; i++ )
