@@ -9,7 +9,7 @@
 
 INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
  -I$(FIRMDIR)/drivers -I$(APPSDIR) -Ilib -I$(BUILDDIR)
-CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(EXTRA_DEFINES) \
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DCODEC
 
 ifdef APPEXTRA
@@ -68,7 +68,6 @@ $(OBJDIR)/%.elf :
 		-lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(BUILDDIR)/%.a : % $(CODECDEPS)
-	
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	@echo "OBJCOPY $(notdir $@)"

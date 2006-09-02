@@ -24,8 +24,8 @@ else
    MADOPTS += -O2
 endif
 
-CFLAGS = $(INCLUDES) $(GCCOPTS) $(MADOPTS) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(MADOPTS) $(TARGET)	\
+$(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

@@ -15,8 +15,8 @@ ifdef APPEXTRA
 endif
 
 FAADOPTS = -O2 -Wno-char-subscripts
-CFLAGS = $(INCLUDES) $(GCCOPTS) $(FAADOPTS) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(FAADOPTS) $(TARGET)	\
+ $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
