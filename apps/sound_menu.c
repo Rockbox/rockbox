@@ -1055,21 +1055,14 @@ bool recording_menu(bool no_source)
     items[i].desc = ID2P(LANG_RECORDING_QUALITY);
     items[i++].function = recquality;
 #endif
-#ifndef HAVE_UDA1380
-/* We don't support frequency selection for UDA1380 yet. Let it just stay at
-   the default 44100 Hz. */
     items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
     items[i++].function = recfrequency;
-#endif
     if(!no_source) {
         items[i].desc = ID2P(LANG_RECORDING_SOURCE);
         items[i++].function = recsource;
     }
-/* We don't support other configurations than stereo yet either */
-#ifndef HAVE_UDA1380
     items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
     items[i++].function = recchannels;
-#endif
 #if CONFIG_CODEC == MAS3587F
     items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
     items[i++].function = receditable;
