@@ -502,7 +502,9 @@ static const struct bit_entry hd_bits[] =
         "rec frequency", "44,48,32,22,24,16" },
     {3, S_O(rec_quality), 5 /* 192 kBit/s max */, "rec quality", NULL },
     {1, S_O(rec_editable), false, "editable recordings", off_on },
-#elif defined(HAVE_UDA1380) || defined(HAVE_TLV320)
+#endif /* CONFIG_CODEC == MAS3587F */
+
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
 #ifdef HAVE_UDA1380
     {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
 #endif
@@ -512,10 +514,16 @@ static const struct bit_entry hd_bits[] =
 #endif
     {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
     {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#if 0 /* Till samplerates are added for SWCODEC */
     {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
         "rec frequency", "44,48,32,22,24,16" },
-    {4, S_O(rec_quality), 4 /* MP3 L3 192 kBit/s */, "rec quality", NULL },
+#else
+    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
+        "rec frequency", "44" },
 #endif
+
+    {4, S_O(rec_quality), 4 /* MP3 L3 192 kBit/s */, "rec quality", NULL },
+#endif /* CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) */
 
     /* values for the trigger */
     {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},

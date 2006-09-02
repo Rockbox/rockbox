@@ -356,22 +356,23 @@ static bool receditable(void)
     return set_bool(str(LANG_RECORDING_EDITABLE),
                     &global_settings.rec_editable);
 }
-#endif
+#endif /* CONFIG_CODEC == MAS3587F */
 
-#ifndef HAVE_UDA1380
 static bool recfrequency(void)
 {
     static const struct opt_items names[] = {
         { "44.1kHz", TALK_ID(44, UNIT_KHZ) },
+#if CONFIG_CODEC != SWCODEC     /* This is temporary */
         { "48kHz", TALK_ID(48, UNIT_KHZ) },
         { "32kHz", TALK_ID(32, UNIT_KHZ) },
         { "22.05kHz", TALK_ID(22, UNIT_KHZ) },
         { "24kHz", TALK_ID(24, UNIT_KHZ) },
         { "16kHz", TALK_ID(16, UNIT_KHZ) }
+#endif
     };
     return set_option(str(LANG_RECORDING_FREQUENCY),
                       &global_settings.rec_frequency, INT,
-                      names, 6, NULL );
+                      names, sizeof(names)/sizeof(*names), NULL );
 }
 
 static bool recchannels(void)
@@ -384,7 +385,6 @@ static bool recchannels(void)
                       &global_settings.rec_channels, INT,
                       names, 2, NULL );
 }
-#endif
 
 static bool rectimesplit(void)
 {
