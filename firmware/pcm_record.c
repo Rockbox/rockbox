@@ -289,7 +289,7 @@ unsigned long audio_get_spdif_sample_rate(void)
 
         if (diff2 > diff1) --i;
     }
-    return spdif_sample_rates[i];
+    return i;
 }
 #endif
 

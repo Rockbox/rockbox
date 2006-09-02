@@ -36,7 +36,9 @@
 #include "status.h" /* needed for battery_state global var */
 #include "action.h" /* for keys_locked */
 #include "statusbar.h"
-
+#ifdef HAVE_RECORDING
+#include "audio.h"
+#endif
 
 /* FIXME: should be removed from icon.h to avoid redefinition,
    but still needed for compatibility with old system */
@@ -52,6 +54,11 @@
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 2*ICONS_SPACING
 #define STATUSBAR_VOLUME_WIDTH                  16
+#define STATUSBAR_ENCODER_X_POS                 STATUSBAR_X_POS + \
+                                                STATUSBAR_BATTERY_WIDTH + \
+                                                STATUSBAR_PLUG_WIDTH + \
+                                                2*ICONS_SPACING - 1
+#define STATUSBAR_ENCODER_WIDTH                 18
 #define STATUSBAR_PLAY_STATE_X_POS              STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
@@ -65,6 +72,21 @@
                                                 STATUSBAR_PLAY_STATE_WIDTH + \
                                                 4*ICONS_SPACING
 #define STATUSBAR_PLAY_MODE_WIDTH               7
+#define STATUSBAR_RECFREQ_X_POS                 STATUSBAR_X_POS + \
+                                                STATUSBAR_BATTERY_WIDTH + \
+                                                STATUSBAR_PLUG_WIDTH + \
+                                                STATUSBAR_VOLUME_WIDTH + \
+                                                STATUSBAR_PLAY_STATE_WIDTH + \
+                                                3*ICONS_SPACING
+#define STATUSBAR_RECFREQ_WIDTH                 12
+#define STATUSBAR_RECCHANNELS_X_POS             STATUSBAR_X_POS + \
+                                                STATUSBAR_BATTERY_WIDTH + \
+                                                STATUSBAR_PLUG_WIDTH + \
+                                                STATUSBAR_VOLUME_WIDTH + \
+                                                STATUSBAR_PLAY_STATE_WIDTH + \
+                                                STATUSBAR_RECFREQ_WIDTH + \
+                                                4*ICONS_SPACING
+#define STATUSBAR_RECCHANNELS_WIDTH             5
 #define STATUSBAR_SHUFFLE_X_POS                 STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
@@ -102,6 +124,18 @@
 #endif
 #define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width - 1 - \
                                                 STATUSBAR_DISK_WIDTH
+#if defined(HAVE_RECORDING)
+/* analogue frequency numbers taken from the order of frequencies in sample_rate */
+#define FREQ_44 7
+#define FREQ_48 8
+#define FREQ_32 6
+#define FREQ_22 4
+#define FREQ_24 5
+#define FREQ_16 3
+#ifdef HAVE_SPDIF_IN
+#define SOURCE_SPDIF 2
+#endif
+#endif
 
 struct gui_syncstatusbar statusbars;
 
@@ -234,28 +268,40 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw)
                                     STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
                                     STATUSBAR_HEIGHT);
 #endif
-
-        bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
+#ifdef HAVE_RECORDING
+        /* turn off volume display in recording screen */
+        if (!global_settings.recscreen_on)
+#endif
+            bar->redraw_volume = gui_statusbar_icon_volume(bar, bar->info.volume);
         gui_statusbar_icon_play_state(display, current_playmode() + Icon_Play);
-
-        switch (bar->info.repeat) {
+        
+#ifdef HAVE_RECORDING
+        /* If in recording screen, replace repeat mode, volume
+           and shuffle icons with recording info */
+        if (global_settings.recscreen_on)
+            gui_statusbar_icon_recording_info(display);
+        else
+#endif
+        {
+            switch (bar->info.repeat) {
 #if (AB_REPEAT_ENABLE == 1)
-            case REPEAT_AB:
-                gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
-                break;
+                case REPEAT_AB:
+                    gui_statusbar_icon_play_mode(display, Icon_RepeatAB);
+                    break;
 #endif /* AB_REPEAT_ENABLE == 1 */
 
-            case REPEAT_ONE:
-                gui_statusbar_icon_play_mode(display, Icon_RepeatOne);
-                break;
+                case REPEAT_ONE:
+                    gui_statusbar_icon_play_mode(display, Icon_RepeatOne);
+                    break;
 
-            case REPEAT_ALL:
-            case REPEAT_SHUFFLE:
-                gui_statusbar_icon_play_mode(display, Icon_Repeat);
-                break;
+                case REPEAT_ALL:
+                case REPEAT_SHUFFLE:
+                    gui_statusbar_icon_play_mode(display, Icon_Repeat);
+                    break;
+            }
+            if (bar->info.shuffle)
+                gui_statusbar_icon_shuffle(display);
         }
-        if (bar->info.shuffle)
-            gui_statusbar_icon_shuffle(display);
         if (bar->info.keylock)
             gui_statusbar_icon_lock(display);
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -552,6 +598,115 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 
 }
 #endif
+
+#ifdef HAVE_RECORDING
+void gui_statusbar_icon_recording_info(struct screen * display)
+{
+    int width, height;
+    char buffer[4];
+    char* const sample_rate[12] =
+    {
+        "8",
+        "11",
+        "12",
+        "16",
+        "22",
+        "24",
+        "32",
+        "44",
+        "48",
+        "64",
+        "88",
+        "96"
+    };
+#if CONFIG_CODEC != SWCODEC
+    char* const bit_rate[9] =
+    {
+        "MQ0",
+        "MQ1",
+        "MQ2",
+        "MQ3",
+        "MQ4",
+        "MQ5",
+        "MQ6",
+        "MQ7",
+        "WAV"
+    };
+#endif
+
+    display->setfont(FONT_SYSFIXED);
+
+    /* Display Codec info in statusbar */
+#if CONFIG_CODEC == SWCODEC
+    /* Can't fit info for sw codec targets in statusbar using FONT_SYSFIXED 
+       so must use icons */
+    display->mono_bitmap(bitmap_icons_18x8[global_settings.rec_quality],
+                             STATUSBAR_ENCODER_X_POS, STATUSBAR_Y_POS,
+                             STATUSBAR_ENCODER_WIDTH, STATUSBAR_HEIGHT);
+#else
+    snprintf(buffer, sizeof(buffer), "%s", bit_rate[global_settings.rec_quality]);
+    display->getstringsize(buffer, &width, &height);
+    if (height <= STATUSBAR_HEIGHT)
+    {
+        display->putsxy(STATUSBAR_ENCODER_X_POS, STATUSBAR_Y_POS, buffer);
+    }
+#endif
+
+    /* Display Samplerate info in statusbar */
+#if defined(HAVE_SPDIF_IN)            
+    if (global_settings.rec_source == SOURCE_SPDIF)
+    {
+#if (CONFIG_CODEC != MAS3587F) && !defined(SIMULATOR)
+        snprintf(buffer, sizeof(buffer), "%s", sample_rate[audio_get_spdif_sample_rate()]);
+#else
+        /* Can't measure S/PDIF sample rate on Archos/Sim yet so just display input type */
+        snprintf(buffer, sizeof(buffer), "Dg");
+#endif
+    }
+    else
+#endif /* HAVE_SPDIF_IN */
+    {
+    /* Analogue frequency in wrong order so remap settings numbers */
+        int freq = global_settings.rec_frequency;
+        if (freq == 0)
+            freq = FREQ_44;
+        else if (freq == 1)
+            freq = FREQ_48;
+        else if (freq == 2)
+            freq = FREQ_32;
+        else if (freq == 3)
+            freq = FREQ_22;
+        else if (freq == 4)
+            freq = FREQ_24;
+        else if (freq == 5)
+            freq = FREQ_16;
+
+        snprintf(buffer, sizeof(buffer), "%s", sample_rate[freq]);
+    }
+
+    display->getstringsize(buffer, &width, &height);
+    if (height <= STATUSBAR_HEIGHT)
+    {
+        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
+    }
+
+    display->setfont(FONT_UI);
+
+    /* Display Channel status in status bar */
+    if(global_settings.rec_channels)
+    {
+        display->mono_bitmap(bitmap_icons_5x8[Icon_Mono],
+                             STATUSBAR_RECCHANNELS_X_POS , STATUSBAR_Y_POS,
+                             STATUSBAR_RECCHANNELS_WIDTH, STATUSBAR_HEIGHT);
+    }
+    else
+    {
+        display->mono_bitmap(bitmap_icons_5x8[Icon_Stereo],
+                             STATUSBAR_RECCHANNELS_X_POS, STATUSBAR_Y_POS,
+                             STATUSBAR_RECCHANNELS_WIDTH, STATUSBAR_HEIGHT);
+    }
+}
+#endif /* HAVE_RECORDING */
 
 #endif /* HAVE_LCD_BITMAP */
 

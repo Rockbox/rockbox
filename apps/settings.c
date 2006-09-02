@@ -92,7 +92,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 51
+#define CONFIG_BLOCK_VERSION 52
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -464,6 +464,7 @@ static const struct bit_entry hd_bits[] =
 
 #ifdef HAVE_RECORDING
     /* recording */
+    {1, S_O(recscreen_on), false, "recscreen on", off_on },
     {1, S_O(rec_startup), false, "rec screen on startup", off_on },
     {4, S_O(rec_timesplit), 0, "rec timesplit", /* 0...15 */
         "off,00:05,00:10,00:15,00:30,01:00,01:14,01:20,02:00,04:00,06:00,08:00,10:00,12:00,18:00,24:00" },
@@ -1336,6 +1337,9 @@ void settings_load(int which)
                 RTC_BLOCK_SIZE*8);
         }
 
+#ifdef HAVE_RECORDING
+    global_settings.recscreen_on = false;
+#endif
 #ifdef HAVE_LCD_CONTRAST
         if ( global_settings.contrast < MIN_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();

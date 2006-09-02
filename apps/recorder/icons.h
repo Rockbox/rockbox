@@ -39,6 +39,8 @@
 enum icons_5x8 {
     Icon_Lock_Main,
     Icon_Lock_Remote,
+    Icon_Stereo,
+    Icon_Mono,
     Icon5x8Last
 };
 
@@ -83,9 +85,22 @@ enum icons_7x8 {
     Icon7x8Last
 };
 
+enum icons_18x8 {
+    Icon_mp364,
+    Icon_mp396,
+    Icon_mp3128,
+    Icon_mp3160,
+    Icon_mp3192,
+    Icon_mp3224,
+    Icon_mp3320,
+    Icon_wv,
+    Icon_wav,
+    Icon18x8Last
+};
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
+extern const unsigned char bitmap_icons_18x8[Icon18x8Last][18];
 extern const unsigned char bitmap_icon_disk[];
 
 #define STATUSBAR_X_POS       0

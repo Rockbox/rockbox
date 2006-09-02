@@ -810,6 +810,7 @@ bool recording_screen(bool no_source)
         ID2P(LANG_GIGABYTE)
     };
 
+    global_settings.recscreen_on = true;
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
@@ -1353,7 +1354,6 @@ bool recording_screen(bool no_source)
             unsigned int dseconds, dhours, dminutes;
             unsigned long num_recorded_bytes, dsize, dmb;
             int pos = 0;
-            char spdif_sfreq[8];
 
             update_countdown = 5;
             last_seconds = seconds;
@@ -1687,51 +1687,9 @@ bool recording_screen(bool no_source)
                                                     PM_HEIGHT + 2, true);
                 }
             }
-/* Can't measure S/PDIF sample rate on Archos yet */
-#if (CONFIG_CODEC != MAS3587F) && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-            if (global_settings.rec_source == AUDIO_SRC_SPDIF)
-                snprintf(spdif_sfreq, 8, "%dHz", audio_get_spdif_sample_rate());
-#else
-            (void)spdif_sfreq;
-#endif
-            snprintf(buf, 32, "%s %s",
-#if (CONFIG_CODEC != MAS3587F) && defined(HAVE_SPDIF_IN) && !defined(SIMULATOR)
-                     global_settings.rec_source == AUDIO_SRC_SPDIF ?
-                     spdif_sfreq :
-#endif
-                     freq_str[global_settings.rec_frequency],
-                     global_settings.rec_channels ?
-                         str(LANG_SYSFONT_CHANNEL_MONO) :
-                         str(LANG_SYSFONT_CHANNEL_STEREO));
-
-            for(i = 0; i < screen_update; i++) {
-#ifdef HAVE_AGC
-                if ((global_settings.rec_source == AUDIO_SRC_MIC)
-                         || (global_settings.rec_source == AUDIO_SRC_LINEIN)
-                         || (global_settings.rec_source == AUDIO_SRC_FMRADIO))
-                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
-                else
-#endif
-                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i], buf);
-            }
 
 #ifdef HAVE_AGC
             hist_time++;
-#endif
-
-#if CONFIG_CODEC == SWCODEC
-            snprintf(buf, 32, "%s",
-                REC_QUALITY_LABEL(global_settings.rec_quality));
-            for(i = 0; i < screen_update; i++){
-#ifdef HAVE_AGC
-                if ((global_settings.rec_source == AUDIO_SRC_MIC)
-                         || (global_settings.rec_source == AUDIO_SRC_LINEIN)
-                         || (global_settings.rec_source == AUDIO_SRC_FMRADIO))
-                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 2, buf);
-                else
-#endif
-                    screens[i].puts(0, filename_offset[i] + PM_HEIGHT + line[i] + 1, buf);
-            }
 #endif
 
             for(i = 0; i < screen_update; i++)
@@ -1758,7 +1716,6 @@ bool recording_screen(bool no_source)
         }
     } /* end while(!done) */
 
-    
 #if CONFIG_CODEC == SWCODEC        
     audio_stat = pcm_rec_status();
 #else
@@ -1806,6 +1763,7 @@ bool recording_screen(bool no_source)
     peak_meter_trigger(false);
     peak_meter_set_trigger_listener(NULL);
 
+    global_settings.recscreen_on = false;
     sound_settings_apply();
 
     FOR_NB_SCREENS(i)

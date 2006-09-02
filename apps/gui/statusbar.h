@@ -105,7 +105,9 @@ void gui_statusbar_icon_shuffle(struct screen * display);
 void gui_statusbar_icon_lock(struct screen * display);
 void gui_statusbar_icon_lock_remote(struct screen * display);
 void gui_statusbar_led(struct screen * display);
-
+#ifdef HAVE_RECORDING
+void gui_statusbar_icon_recording_info(struct screen * display);
+#endif
 
 #ifdef CONFIG_RTC
 void gui_statusbar_time(struct screen * display, int hour, int minute);
