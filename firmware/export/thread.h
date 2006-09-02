@@ -29,6 +29,7 @@
 
 #define DEFAULT_STACK_SIZE 0x400 /* Bytes */
 
+#ifndef SIMULATOR
 /* Need to keep structures inside the header file because debug_menu
  * needs them. */
 #ifdef CPU_COLDFIRE
@@ -78,6 +79,7 @@ struct core_entry {
     int current_thread;
     struct thread_entry threads[MAXTHREADS];
 };
+#endif
 
 int create_thread(void (*function)(void), void* stack, int stack_size,
                   const char *name);
