@@ -27,6 +27,7 @@
 #include "dircache.h"
 #include "timefuncs.h"
 #include "tagcache.h"
+#include "button.h"
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
