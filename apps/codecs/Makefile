@@ -43,9 +43,11 @@ CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
 OUTPUT = $(SOFTWARECODECS)
 
-all: $(ROCKS)
+all: $(LINKCODEC) $(ROCKS)
 
 ifndef SIMVER
+$(BUILDDIR)/%.a : % $(CODECDEPS)
+
 $(OBJDIR)/wav.elf : $(OBJDIR)/wav.o
 $(OBJDIR)/sid.elf : $(OBJDIR)/sid.o
 $(OBJDIR)/aiff.elf : $(OBJDIR)/aiff.o
@@ -62,12 +64,9 @@ $(OBJDIR)/mp3_enc.elf: $(OBJDIR)/mp3_enc.o
 $(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o
 $(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a
 
-$(OBJDIR)/%.elf :
+$(OBJDIR)/%.elf:
 	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec \
-		-lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
-
-$(BUILDDIR)/%.a : % $(CODECDEPS)
+	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
 	@echo "OBJCOPY $(notdir $@)"
@@ -95,7 +94,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	@echo "LD $(notdir $@)"
+	@echo "LD $(notdir $@) $^"
 	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -140,25 +139,35 @@ $(LINKCODEC): $(LDS)
 	@echo "build $@"
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
+$(BUILDDIR)/libmad.a: libmad
+
 libmad:
 	@echo "MAKE in libmad"
 	$(SILENT)mkdir -p $(OBJDIR)/libmad
 	$(SILENT)$(MAKE) -C libmad OBJDIR=$(OBJDIR)/libmad OUTPUT=$(BUILDDIR)/libmad.a
+
+$(BUILDDIR)/liba52.a: liba52
 
 liba52:
 	@echo "MAKE in liba52"
 	$(SILENT)mkdir -p $(OBJDIR)/liba52
 	$(SILENT)$(MAKE) -C liba52 OBJDIR=$(OBJDIR)/liba52 OUTPUT=$(BUILDDIR)/liba52.a
 
+$(BUILDDIR)/libffmpegFLAC.a: libffmpegFLAC
+
 libffmpegFLAC:
 	@echo "MAKE in libffmpegFLAC"
 	$(SILENT)mkdir -p $(OBJDIR)/libffmpegFLAC
 	$(SILENT)$(MAKE) -C libffmpegFLAC OBJDIR=$(OBJDIR)/libffmpegFLAC OUTPUT=$(BUILDDIR)/libffmpegFLAC.a
 
+$(BUILDDIR)/libTremor.a: libTremor
+
 libTremor:
 	@echo "MAKE in Tremor"
 	$(SILENT)mkdir -p $(OBJDIR)/Tremor
 	$(SILENT)$(MAKE) -C Tremor OBJDIR=$(OBJDIR)/Tremor OUTPUT=$(BUILDDIR)/libTremor.a
+
+$(BUILDDIR)/libwavpack.a: libwavpack
 
 libwavpack:
 	@echo "MAKE in libwavpack"
@@ -170,20 +179,28 @@ dumb:
 	$(SILENT)mkdir -p $(OBJDIR)/dumb
 	$(SILENT)$(MAKE) -C dumb OBJDIR=$(OBJDIR)/dumb LIBDIR=$(BUILDDIR) OFLAGS="$(CFLAGS)"
 
+$(BUILDDIR)/libmusepack.a: libmusepack
+
 libmusepack:
 	@echo "MAKE in libmusepack"
 	$(SILENT)mkdir -p $(OBJDIR)/libmusepack
 	$(SILENT)$(MAKE) -C libmusepack OBJDIR=$(OBJDIR)/libmusepack OUTPUT=$(BUILDDIR)/libmusepack.a
+
+$(BUILDDIR)/libalac.a: libalac
 
 libalac:
 	@echo "MAKE in libalac"
 	$(SILENT)mkdir -p $(OBJDIR)/libalac
 	$(SILENT)$(MAKE) -C libalac OBJDIR=$(OBJDIR)/libalac OUTPUT=$(BUILDDIR)/libalac.a
 
+$(BUILDDIR)/libm4a.a: libm4a
+
 libm4a:
 	@echo "MAKE in libm4a"
 	$(SILENT)mkdir -p $(OBJDIR)/libm4a
 	$(SILENT)$(MAKE) -C libm4a OBJDIR=$(OBJDIR)/libm4a OUTPUT=$(BUILDDIR)/libm4a.a
+
+$(BUILDDIR)/libfaad.a: libfaad
 
 libfaad:
 	@echo "MAKE in libfaad"
