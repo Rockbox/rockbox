@@ -265,15 +265,15 @@ static struct plugin_api* rb;
 
 
 #define draw_number( num, x, y ) \
-    rb->lcd_bitmap_part( numbers, 0, num * NUMBER_HEIGHT, NUMBER_STRIDE, \
-                         x, y, NUMBER_WIDTH, NUMBER_HEIGHT );
-extern const fb_data solitaire_numbers[];
+    rb->lcd_mono_bitmap_part( numbers, 0, num * NUMBER_HEIGHT, NUMBER_STRIDE, \
+                              x, y, NUMBER_WIDTH, NUMBER_HEIGHT );
+extern const unsigned char solitaire_numbers[];
 #define numbers solitaire_numbers
 
 #define draw_suit( num, x, y ) \
-    rb->lcd_bitmap_part( suits, 0, num * SUIT_HEIGHT, SUIT_STRIDE, \
-                         x, y, SUIT_WIDTH, SUIT_HEIGHT );
-extern const fb_data solitaire_suits[];
+    rb->lcd_mono_bitmap_part( suits, 0, num * SUIT_HEIGHT, SUIT_STRIDE, \
+                              x, y, SUIT_WIDTH, SUIT_HEIGHT );
+extern const unsigned char solitaire_suits[];
 #define suits   solitaire_suits
 
 #if ( CARD_HEIGHT < SUITI_HEIGHT + 1 ) || ( CARD_WIDTH < SUITI_WIDTH + 1 )
@@ -284,9 +284,9 @@ extern const fb_data solitaire_suits[];
 #   define draw_suiti( num, x, y ) draw_suit( num, x, y )
 #else
 #   define draw_suiti( num, x, y ) \
-    rb->lcd_bitmap_part( suitsi, 0, num * SUITI_HEIGHT, SUITI_STRIDE, \
-                         x, y, SUITI_WIDTH, SUITI_HEIGHT );
-    extern const fb_data solitaire_suitsi[];
+    rb->lcd_mono_bitmap_part( suitsi, 0, num * SUITI_HEIGHT, SUITI_STRIDE, \
+                              x, y, SUITI_WIDTH, SUITI_HEIGHT );
+    extern const unsigned char solitaire_suitsi[];
 #   define suitsi  solitaire_suitsi
 #endif
 
@@ -300,6 +300,16 @@ extern const fb_data solitaire_suits[];
 #   endif
 
     extern const fb_data solitaire_cardback[];
+#endif
+
+#if HAVE_LCD_COLOR
+    static const unsigned colors[4] = {
+        LCD_BLACK, LCD_RGBPACK(255, 0, 0), LCD_BLACK, LCD_RGBPACK(255, 0, 0)
+    };
+#elif LCD_DEPTH > 1
+    static const unsigned colors[4] = {
+        LCD_BLACK, LCD_BRIGHTNESS(127), LCD_BLACK, LCD_BRIGHTNESS(127)
+    };
 #endif
 
 #define CONFIG_FILENAME "sol.cfg"
@@ -403,6 +413,10 @@ static void draw_card( card_t card, int x, int y,
         rb->lcd_set_foreground( LCD_WHITE );
         rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
 #endif
+
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground( colors[card.suit] );
+#endif
         if( leftstyle )
         {
 #if UPPER_ROW_MARGIN > 0
@@ -442,6 +456,11 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
 #if LCD_DEPTH == 1
     rb->lcd_set_drawmode( DRMODE_SOLID );
 #endif
+
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground( colors[s] );
+#endif
+
     draw_suiti( s, x+(CARD_WIDTH-SUITI_WIDTH)/2,
                 y+(CARD_HEIGHT-SUITI_HEIGHT)/2 );
 
