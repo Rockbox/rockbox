@@ -738,7 +738,7 @@ card_t deck[ NUM_CARDS ];
 /* the remaining cards */
 unsigned char rem;
 unsigned char cur_rem;
-unsigned char coun_rem;
+unsigned char count_rem;
 
 /* the 7 game columns */
 unsigned char cols[COL_NUM];
@@ -852,7 +852,7 @@ void solitaire_init( void )
     /* init the remainder */
     cur_rem = NOT_A_CARD;
 
-    coun_rem=0;
+    count_rem=0;
 }
 
 /* find the column number in which 'card' can be found */
@@ -1025,7 +1025,7 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         if( src_card_prev == NOT_A_CARD )
         {
             rem = deck[src_card].next;
-            coun_rem = coun_rem-1;
+            count_rem = count_rem-1;
         }
         /* if src card is not the first card from the stack */
         else
@@ -1034,7 +1034,7 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         }
         deck[src_card].next = NOT_A_CARD;
         cur_rem = src_card_prev;
-        coun_rem = coun_rem-1;
+        count_rem = count_rem-1;
     }
     /* if the src card is from somewhere else, just take everything */
     else
@@ -1201,10 +1201,9 @@ int solitaire( void )
 
         if( rem != NOT_A_CARD )
         {
-            if( coun_rem >= cards_per_draw )
-                coun_rem = cards_per_draw-1;
-            if(    cur_rem != NOT_A_CARD
-                && find_prev_card(cur_rem) != NOT_A_CARD )
+            if( count_rem >= cards_per_draw )
+                count_rem = cards_per_draw-1;
+            if( cur_rem != NOT_A_CARD )
             {
                 prevcard = cur_rem;
 #if UPPER_ROW_MARGIN > 0
@@ -1212,13 +1211,13 @@ int solitaire( void )
 #else
                 j = CARD_WIDTH/2+2*UPPER_ROW_MARGIN+1;
 #endif
-                for( i = 0; i < coun_rem; i++ )
+                for( i = 0; i < count_rem; i++ )
                     prevcard = find_prev_card(prevcard);
-                for( i = 0; i <= coun_rem; i++ )
+                for( i = 0; i <= count_rem; i++ )
                 {
                     draw_card( deck[prevcard], j,
                                UPPER_ROW_MARGIN, sel_card == prevcard,
-                               cur_card == prevcard, i < coun_rem );
+                               cur_card == prevcard, i < count_rem );
                     prevcard = deck[prevcard].next;
                     j += NUMBER_WIDTH+2;
                 }
@@ -1426,7 +1425,7 @@ int solitaire( void )
                 if( lastbutton != SOL_REM2CUR_PRE )
                     break;
 #endif
-                coun_rem = coun_rem-1;
+                count_rem = count_rem-1;
                 move_card( cur_col, cur_rem );
                 sel_card = NOT_A_CARD;
                 break;
@@ -1442,7 +1441,7 @@ int solitaire( void )
                 {
                     move_card( deck[cur_rem].suit + COL_NUM, cur_rem );
                     sel_card = NOT_A_CARD;
-                    coun_rem = coun_rem-1;
+                    count_rem = count_rem-1;
                 }
                 break;
 
@@ -1456,7 +1455,7 @@ int solitaire( void )
                 }
                 if( rem != NOT_A_CARD && cur_rem != NOT_A_CARD )
                 {
-                    sel_card=cur_rem;
+                    sel_card = cur_rem;
                     break;
                 }
                 break;
@@ -1478,13 +1477,14 @@ int solitaire( void )
                 if( rem != NOT_A_CARD )
                 {
                     int cur_rem_old = cur_rem;
-                    coun_rem = 0;
+                    count_rem = 0;
                     /* draw new cards form the remains of the deck */
                     if( cur_rem == NOT_A_CARD )
                     {
                         /*if the cursor card is null*/
                         cur_rem = rem;
                         i = cards_per_draw - 1;
+                        count_rem++;
                     }
                     else
                     {
@@ -1495,14 +1495,14 @@ int solitaire( void )
                     {
                         cur_rem = deck[cur_rem].next;
                         i--;
-                        coun_rem = coun_rem +1;
+                        count_rem++;
                     }
                     /* test if any cards are really left on
                      * the remains' stack */
-                    if( i == cards_per_draw )
+                    if( i > 0 )
                     {
                         cur_rem = NOT_A_CARD;
-                        coun_rem = 0;
+                        count_rem = 0;
                     }
                     /* if cursor was on remains' stack when new cards were
                      * drawn, put cursor on top of remains' stack */
