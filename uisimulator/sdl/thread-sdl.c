@@ -33,7 +33,7 @@ SDL_mutex *m;
 void yield(void)
 {
     static int counter = 0;
-    
+
     SDL_mutexV(m);
     if (counter++ >= 50)
     {
@@ -56,6 +56,12 @@ int runthread(void *data)
     ((void(*)())data) ();
     SDL_mutexV(m);
     return 0;
+}
+
+int create_thread_on_core(void (*core)(void), void (*fp)(void), void* sp, int stk_size)
+{
+    (void)core;
+    return create_thread(fp, sp, stk_size);
 }
 
 int create_thread(void (*fp)(void), void* sp, int stk_size)
