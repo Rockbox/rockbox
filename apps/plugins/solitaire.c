@@ -234,11 +234,11 @@ static struct plugin_api* rb;
 
 /* where the cards start */
 #if LCD_HEIGHT > 64
-#   define UPPER_ROW_MARGIN 2
+#   define MARGIN 2
 #   define CARD_START ( CARD_HEIGHT + 4 )
 #else
     /* The screen is *small* */
-#   define UPPER_ROW_MARGIN 0
+#   define MARGIN 0
 #   define CARD_START ( CARD_HEIGHT + 1 )
 #endif
 
@@ -419,7 +419,7 @@ static void draw_card( card_t card, int x, int y,
 #endif
         if( leftstyle )
         {
-#if UPPER_ROW_MARGIN > 0
+#if MARGIN > 0
             draw_suit( card.suit, x+1, y+2+NUMBER_HEIGHT );
             draw_number( card.num, x+1, y+1 );
 #else
@@ -429,7 +429,7 @@ static void draw_card( card_t card, int x, int y,
         }
         else
         {
-#if UPPER_ROW_MARGIN > 0
+#if MARGIN > 0
             draw_suit( card.suit, x+2+NUMBER_WIDTH, y+1 );
 #else
             draw_suit( card.suit, x+1+NUMBER_WIDTH, y+1 );
@@ -1169,13 +1169,14 @@ int solitaire( void )
                     /* draw the cursor on empty columns */
                     if( cur_col == i )
                     {
-                        draw_cursor( i*((LCD_WIDTH)/COL_NUM), j+1 );
+                        draw_cursor( MARGIN+i*((LCD_WIDTH-2*MARGIN)/COL_NUM),
+                                     j+1 );
                     }
                     break;
                 }
 
-                draw_card( deck[c], i*((LCD_WIDTH)/COL_NUM), j+1,
-                           c == sel_card, c == cur_card, false );
+                draw_card( deck[c], MARGIN+i*((LCD_WIDTH-2*MARGIN)/COL_NUM),
+                           j+1, c == sel_card, c == cur_card, false );
 
                 h = c;
                 c = deck[c].next;
@@ -1202,16 +1203,15 @@ int solitaire( void )
             if( c != NOT_A_CARD )
             {
                 draw_card( deck[c],
-                           LCD_WIDTH - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
-                           UPPER_ROW_MARGIN,
+                           LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*i+i*2+1,
+                           MARGIN,
                            c == sel_card, cur_col == STACKS_COL + i, false );
             }
             else
             {
                 draw_empty_stack( i,
-                           LCD_WIDTH - (CARD_WIDTH*4+8)+CARD_WIDTH*i+i*2+1,
-                           UPPER_ROW_MARGIN,
-                           cur_col == STACKS_COL + i );
+                           LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*i+i*2+1,
+                           MARGIN, cur_col == STACKS_COL + i );
             }
         }
 
@@ -1221,8 +1221,7 @@ int solitaire( void )
         {
             /* gruik ! (we want to display a card back) */
             deck[rem].known = false;
-            draw_card( deck[rem], UPPER_ROW_MARGIN, UPPER_ROW_MARGIN,
-                       false, false, false );
+            draw_card( deck[rem], MARGIN, MARGIN, false, false, false );
             deck[rem].known = true;
         }
 
@@ -1233,13 +1232,13 @@ int solitaire( void )
             if( cur_rem != NOT_A_CARD )
             {
                 prevcard = cur_rem;
-                j = CARD_WIDTH+2*UPPER_ROW_MARGIN+1;
+                j = CARD_WIDTH+2*MARGIN+1;
                 for( i = 0; i < count_rem; i++ )
                     prevcard = find_prev_card(prevcard);
                 for( i = 0; i <= count_rem; i++ )
                 {
                     draw_card( deck[prevcard], j,
-                               UPPER_ROW_MARGIN, sel_card == prevcard,
+                               MARGIN, sel_card == prevcard,
                                cur_card == prevcard, i < count_rem );
                     prevcard = deck[prevcard].next;
                     j += NUMBER_WIDTH+2;
@@ -1247,8 +1246,7 @@ int solitaire( void )
             }
             else if( cur_rem == NOT_A_CARD && cur_col == REM_COL )
             {
-                draw_cursor( CARD_WIDTH+2*UPPER_ROW_MARGIN+1,
-                             UPPER_ROW_MARGIN );
+                draw_cursor( CARD_WIDTH+2*MARGIN+1, MARGIN );
             }
         }
 
