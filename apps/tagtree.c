@@ -1062,6 +1062,7 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
     if (!tagcache_search(&tcs, tag_filename))
     {
         gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+        cpu_boost(false);
         return false;
     }
     
@@ -1207,6 +1208,7 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
                              false) < 0)
         {
             logf("retrieve failed");
+            cpu_boost(false);
             return NULL;
         }
         realid = id - current_offset;

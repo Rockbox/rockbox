@@ -534,6 +534,20 @@ int rec_create_directory(void)
 }
 
 #if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
+
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+static void rec_boost(bool state)
+{
+    static bool cpu_boosted = false;
+
+    if (state != cpu_boosted)
+    {
+        cpu_boost(state);
+        cpu_boosted = state;
+    }
+}
+#endif
+
 /**
  * Selects an audio source for recording or playback
  * powers/unpowers related devices.
@@ -567,7 +581,7 @@ void rec_set_source(int source, int flags)
 
 #ifdef HAVE_SPDIF_IN
     if ((source == AUDIO_SRC_SPDIF) != (source == last_source))
-        cpu_boost(source == AUDIO_SRC_SPDIF);
+        rec_boost(source == AUDIO_SRC_SPDIF);
 
 #ifdef HAVE_SPDIF_POWER
     /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
