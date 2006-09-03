@@ -423,7 +423,6 @@ bool pitch_screen(void)
     bool exit = false;
     int i;
 
-    lcd_setfont(FONT_SYSFIXED);
 #if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(true);
 #endif
@@ -470,7 +469,7 @@ bool pitch_screen(void)
                     pitch += 20;
                     sound_set_pitch(pitch);
                     FOR_NB_SCREENS(i)
-                            pitch_screen_draw(&screens[i],pitch);
+                        pitch_screen_draw(&screens[i],pitch);
                 }
                 break;
             case ACTION_PS_NUDGE_RIGHTOFF:
@@ -484,7 +483,7 @@ bool pitch_screen(void)
                     pitch -= 20;
                     sound_set_pitch(pitch);
                     FOR_NB_SCREENS(i)
-                            pitch_screen_draw(&screens[i],pitch);
+                        pitch_screen_draw(&screens[i],pitch);
                 }
                 break;
             case ACTION_PS_NUDGE_LEFTOFF:
