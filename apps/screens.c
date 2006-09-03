@@ -356,53 +356,64 @@ int charging_screen(void)
    0 if no key was pressed
    1 if USB was connected */
 
-void pitch_screen_draw(int pitch)
+void pitch_screen_draw(struct screen *display, int pitch)
 {
     unsigned char* ptr;
     unsigned char buf[32];
     int w, h;
 
-    lcd_clear_display();
+    display->clear_display();
+    
+    if (display->nb_lines < 4) /* very small screen, just show the pitch value */
+    {
+        w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_SYSFONT_PITCH),
+                  pitch / 10, pitch % 10 );
+        display->putsxy((display->width-(w*display->char_width))/2,
+                         display->nb_lines/2,buf);
+    }
+    else /* bigger screen, show everything... */
+    {
 
-    /* UP: Pitch Up */
-    ptr = str(LANG_SYSFONT_PITCH_UP);
-    lcd_getstringsize(ptr,&w,&h);
-    lcd_putsxy((LCD_WIDTH-w)/2, 0, ptr);
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
-                    LCD_WIDTH/2 - 3, h, 7, 8);
+        /* UP: Pitch Up */
+        ptr = str(LANG_SYSFONT_PITCH_UP);
+        display->getstringsize(ptr,&w,&h);
+        display->putsxy((display->width-w)/2, 0, ptr);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
+                        display->width/2 - 3, h, 7, 8);
 
-    /* DOWN: Pitch Down */
-    ptr = str(LANG_SYSFONT_PITCH_DOWN);
-    lcd_getstringsize(ptr,&w,&h);
-    lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT - h, ptr);
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
-                    LCD_WIDTH/2 - 3, LCD_HEIGHT - h*2, 7, 8);
+        /* DOWN: Pitch Down */
+        ptr = str(LANG_SYSFONT_PITCH_DOWN);
+        display->getstringsize(ptr,&w,&h);
+        display->putsxy((display->width-w)/2, display->height - h, ptr);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
+                             display->width/2 - 3, display->height - h*2, 7, 8);
+    
+        /* RIGHT: +2% */
+        ptr = "+2%";
+        display->getstringsize(ptr,&w,&h);
+        display->putsxy(display->width-w, (display->height-h)/2, ptr);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
+                             display->width-w-8, (display->height-h)/2, 7, 8);
+    
+        /* LEFT: -2% */
+        ptr = "-2%";
+        display->getstringsize(ptr,&w,&h);
+        display->putsxy(0, (display->height-h)/2, ptr);
+        display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
+                             w+1, (display->height-h)/2, 7, 8);
+    
+        /* "Pitch" */
+        snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
+        display->getstringsize(buf,&w,&h);
+        display->putsxy((display->width-w)/2, (display->height/2)-h, buf);
+        /* "XX.X%" */
+        snprintf((char *)buf, sizeof(buf), "%d.%d%%",
+                pitch / 10, pitch % 10 );
+        display->getstringsize(buf,&w,&h);
+        display->putsxy((display->width-w)/2, display->height/2, buf);
+    }
 
-    /* RIGHT: +2% */
-    ptr = "+2%";
-    lcd_getstringsize(ptr,&w,&h);
-    lcd_putsxy(LCD_WIDTH-w, (LCD_HEIGHT-h)/2, ptr);
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
-                    LCD_WIDTH-w-8, (LCD_HEIGHT-h)/2, 7, 8);
-
-    /* LEFT: -2% */
-    ptr = "-2%";
-    lcd_getstringsize(ptr,&w,&h);
-    lcd_putsxy(0, (LCD_HEIGHT-h)/2, ptr);
-    lcd_mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
-                    w+1, (LCD_HEIGHT-h)/2, 7, 8);
-
-    /* "Pitch" */
-    snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
-    lcd_getstringsize(buf,&w,&h);
-    lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT/2)-h, buf);
-    /* "XX.X%" */
-    snprintf((char *)buf, sizeof(buf), "%d.%d%%",
-             pitch / 10, pitch % 10 );
-    lcd_getstringsize(buf,&w,&h);
-    lcd_putsxy((LCD_WIDTH-w)/2, LCD_HEIGHT/2, buf);
-
-    lcd_update();
+    display->update();
 }
 
 bool pitch_screen(void)
@@ -410,6 +421,7 @@ bool pitch_screen(void)
     int button;
     int pitch = sound_get_pitch();
     bool exit = false;
+    int i;
 
     lcd_setfont(FONT_SYSFIXED);
 #if CONFIG_CODEC == SWCODEC
@@ -419,7 +431,8 @@ bool pitch_screen(void)
     action_signalscreenchange();
     while (!exit)
     {
-        pitch_screen_draw(pitch);
+        FOR_NB_SCREENS(i)
+            pitch_screen_draw(&screens[i],pitch);
 
         button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
         switch (button) {
@@ -456,7 +469,8 @@ bool pitch_screen(void)
                 {
                     pitch += 20;
                     sound_set_pitch(pitch);
-                    pitch_screen_draw(pitch);
+                    FOR_NB_SCREENS(i)
+                            pitch_screen_draw(&screens[i],pitch);
                 }
                 break;
             case ACTION_PS_NUDGE_RIGHTOFF:
@@ -469,7 +483,8 @@ bool pitch_screen(void)
                 {
                     pitch -= 20;
                     sound_set_pitch(pitch);
-                    pitch_screen_draw(pitch);
+                    FOR_NB_SCREENS(i)
+                            pitch_screen_draw(&screens[i],pitch);
                 }
                 break;
             case ACTION_PS_NUDGE_LEFTOFF:
