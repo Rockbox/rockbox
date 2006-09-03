@@ -1,0 +1,30 @@
+% $Id $ %
+\subsection{Disk Tidy}
+  Disk Tidy deletes junk files left behind by Windows or OS X after a USB connection.
+  Select the OS's files you want to delete and press the "Clean up" button.
+
+  \subsubsection{Available Options}
+  \begin{description}
+    \item[Both] deletes both OS X and Windows files.
+    \item[Win] deletes Windows files, \fname{Thumbs.db}, \fname{/Recycled} and
+      \fname{/System Volume Information}.
+    \item[Mac] deletes OS X files, \fname{.\_*}, \fname{.DS\_Store} and
+      \fname{/.Trashes}.
+  \end{description}
+  
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ButtonLeft\ / \ButtonRight & Select option\\
+      \opt{RECORDER_PAD}{\ButtonOn}%
+      \opt{ONDIO_PAD}{\ButtonMenu}%
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD}
+        {\ButtonSelect}%
+      \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}%
+      & Clean Up\\
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}
+        {\ButtonOff}%
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}%
+      \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}%
+      & Exit\ /\ Abort\\
+    \end{btnmap}
+\end{table}
