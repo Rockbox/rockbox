@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2002 by Björn Stenberg <bjorn@haxx.se>
@@ -51,7 +51,7 @@ int ata_write_sectors(IF_MV2(int drive,)
                       const void* buf)
 {
     int i;
-    
+
     for (i=0; i<count; i++ ) {
         FILE* f;
         char name[32];
@@ -72,7 +72,7 @@ int ata_read_sectors(IF_MV2(int drive,)
                      void* buf)
 {
     int i;
-    
+
     for (i=0; i<count; i++ ) {
         FILE* f;
         char name[32];
@@ -241,7 +241,7 @@ int talk_number(int n, bool enqueue)
     return 0;
 }
 
-int talk_spell(char* spell, bool enqueue) 
+int talk_spell(char* spell, bool enqueue)
 {
     (void)spell;
     (void)enqueue;
@@ -256,6 +256,12 @@ const char* const file_thumbnail_ext = ".talk";
    I'm afraid on Win32/X11 it'll be hard to kill a thread from outside. */
 void remove_thread(int threadnum)
 {
+    (void)threadnum;
+}
+
+void remove_thread_on_core(unsigned int core, int threadnum)
+{
+    (void)core;
     (void)threadnum;
 }
 

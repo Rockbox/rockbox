@@ -58,12 +58,6 @@ int runthread(void *data)
     return 0;
 }
 
-int create_thread_on_core(void (*core)(void), void (*fp)(void), void* sp, int stk_size)
-{
-    (void)core;
-    return create_thread(fp, sp, stk_size);
-}
-
 int create_thread(void (*fp)(void), void* sp, int stk_size)
 {
     /** Avoid compiler warnings */
@@ -79,6 +73,12 @@ int create_thread(void (*fp)(void), void* sp, int stk_size)
     yield();
 
     return 0;
+}
+
+int create_thread_on_core(void (*core)(void), void (*fp)(void), void* sp, int stk_size)
+{
+    (void)core;
+    return create_thread(fp, sp, stk_size);
 }
 
 void init_threads(void)
