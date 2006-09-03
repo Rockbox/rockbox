@@ -208,7 +208,7 @@ static struct plugin_api* rb;
     ": Select cards, Move cards, reveal hidden cards ..."
 #define HELP_SOL_DRAW HK_DRAW \
     ": Un-select a card if it was selected. " \
-    "Else, draw 3 new cards out of the remains' stack."
+    "Else, draw new cards out of the remains' stack."
 #define HELP_SOL_REM2CUR HK_REM2CUR \
     ": Put the card on top of the remains' stack on top of the cursor."
 #define HELP_SOL_CUR2STACK  HK_CUR2STACK \
@@ -937,7 +937,8 @@ unsigned char find_last_card( unsigned char col )
     }
     else
     {
-        c = rem;
+        //c = rem;
+        c = cur_rem;
     }
 
     if(c == NOT_A_CARD)
@@ -1216,8 +1217,8 @@ int solitaire( void )
         }
 
         /* draw the remains */
-        if( ( cur_rem == NOT_A_CARD && rem != NOT_A_CARD )
-            || deck[cur_rem].next != NOT_A_CARD )
+        if( rem != NOT_A_CARD &&
+            ( cur_rem == NOT_A_CARD || deck[cur_rem].next != NOT_A_CARD ) )
         {
             /* gruik ! (we want to display a card back) */
             deck[rem].known = false;
