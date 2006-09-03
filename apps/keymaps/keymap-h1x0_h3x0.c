@@ -482,12 +482,8 @@ const struct button_mapping button_context_bmark_h300lcdremote[]  = {
 }; 
 
 const struct button_mapping button_context_quickscreen_nonlcdremote[]  = {
-    { ACTION_QS_DOWNINV,    BUTTON_RC_SOURCE,                 BUTTON_NONE },
-    { ACTION_QS_DOWNINV,    BUTTON_RC_SOURCE|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP,                 BUTTON_NONE },
     { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_QS_DOWN,       BUTTON_RC_BITRATE,                BUTTON_NONE },
-    { ACTION_QS_DOWN,       BUTTON_RC_BITRATE|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW,                    BUTTON_NONE },
@@ -506,9 +502,13 @@ const struct button_mapping button_context_quickscreen_h100lcdremote[]  = {
     { ACTION_QS_DOWN,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW,                      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_RC_REW|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_RC_FF,                      BUTTON_NONE },
+    { ACTION_QS_LEFT,       BUTTON_RC_FF|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RC_SOURCE,                  BUTTON_NONE },
+    { ACTION_QS_RIGHT,      BUTTON_RC_SOURCE|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE,                  BUTTON_NONE },
     { ACTION_QS_RIGHT,      BUTTON_RC_BITRATE|BUTTON_REPEAT,    BUTTON_NONE },
-    { ACTION_STD_CANCEL,    BUTTON_RC_ON,                     BUTTON_NONE },
+    { ACTION_STD_CANCEL,    BUTTON_RC_MODE,                     BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
@@ -653,29 +653,22 @@ const struct button_mapping button_context_keyboard_h300lcdremote[]  = {
 
 /* the actual used tables */
 static const struct button_mapping 
-        *remote_btn_ctxt_std = button_context_standard_h100remote, 
-        *remote_btn_ctxt_wps = button_context_wps_h100remote,
-        *remote_btn_ctxt_list = button_context_list_h100remote,
-        *remote_btn_ctxt_tree = button_context_tree_h100remote,
-        *remote_btn_ctxt_listtree_scroll_w_cmb 
-            = button_context_listtree_scroll_w_cmb_h100remote,
-        *remote_btn_ctxt_listtree_scroll_wo_cmb 
-            = button_context_listtree_scroll_wo_cmb_h100remote,
-        *remote_btn_ctxt_settings = button_context_settings_h100remote,
-        *remote_btn_ctxt_settingsgrph 
-            = button_context_settingsgraphical_h100remote,
-        *remote_btn_ctxt_yesno = button_context_yesno_h100remote,
-        *remote_btn_ctxt_bmark = button_context_bmark_h100remote,
-        *remote_btn_ctxt_quickscreen
-            = button_context_quickscreen_nonlcdremote,
-        *remote_btn_ctxt_pitchscreen
-            = button_context_pitchscreen_nonlcdremote,
-        *remote_btn_ctxt_recscreen
-            = button_context_recscreen_h100remote,
-        *remote_btn_ctxt_keyboard
-            = button_context_keyboard_h100remote;
+        *remote_btn_ctxt_std = 0, 
+        *remote_btn_ctxt_wps = 0,
+        *remote_btn_ctxt_list = 0,
+        *remote_btn_ctxt_tree = 0,
+        *remote_btn_ctxt_listtree_scroll_w_cmb = 0,
+        *remote_btn_ctxt_listtree_scroll_wo_cmb = 0,
+        *remote_btn_ctxt_settings = 0,
+        *remote_btn_ctxt_settingsgrph = 0,
+        *remote_btn_ctxt_yesno = 0,
+        *remote_btn_ctxt_bmark = 0,
+        *remote_btn_ctxt_quickscreen = 0,
+        *remote_btn_ctxt_pitchscreen = 0,
+        *remote_btn_ctxt_recscreen = 0,
+        *remote_btn_ctxt_keyboard  = 0;
 
-static int _remote_type = 0;
+static int _remote_type = -1; /*safe value, forces the first press to init the mappings */
 
 static void remap_remote(void)
 {
