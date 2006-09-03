@@ -535,7 +535,8 @@ int rec_create_directory(void)
 
 #if CONFIG_CODEC == SWCODEC && !defined(SIMULATOR)
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+# ifdef HAVE_SPDIF_IN
+#  ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static void rec_boost(bool state)
 {
     static bool cpu_boosted = false;
@@ -546,7 +547,8 @@ static void rec_boost(bool state)
         cpu_boosted = state;
     }
 }
-#endif
+#  endif
+# endif
 
 /**
  * Selects an audio source for recording or playback
