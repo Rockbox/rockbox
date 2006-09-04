@@ -975,6 +975,8 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
     if( src_card == NOT_A_CARD ) return MOVE_NOT_OK;
     /* you can't put a card back on the remains' stack */
     if( dest_col == REM_COL ) return MOVE_NOT_OK;
+    /* you can't move an unknown card */
+    if( !deck[src_card].known ) return MOVE_NOT_OK;
 
     src_col = find_card_col( src_card );
     dest_card = find_last_card( dest_col );
@@ -1091,11 +1093,62 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
     return MOVE_OK;
 }
 
+enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
+
+/**
+ * Bouncing cards at the end of the game
+ */
+int bouncing_cards( void )
+{
+    int i, j, x, y, vx, vy, button;
+
+    /* flush the button queue */
+    while( ( button = rb->button_get( false ) ) != BUTTON_NONE )
+    {
+        if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+            return SOLITAIRE_USB;
+    }
+
+    /* fun stuff :) */
+    for( i = CARDS_PER_SUIT-1; i>=0; i-- )
+    {
+        for( j = 0; j < SUITS; j++ )
+        {
+            x = LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*j+j*2+1;
+            y = MARGIN;
+
+            vx = rb->rand()%8-5;
+            if( !vx ) vx = -6;
+
+            vy = -rb->rand()%6;
+
+            while( x < LCD_WIDTH && x + CARD_WIDTH > 0 )
+            {
+                vy += 1;
+                x += vx;
+                y += vy;
+                if( y + CARD_HEIGHT >= LCD_HEIGHT )
+                {
+                    vy = -vy*3/4;
+                    y = LCD_HEIGHT - CARD_HEIGHT;
+                }
+                draw_card( deck[j*CARDS_PER_SUIT+i], x, y, false, false, false );
+                rb->lcd_update();
+
+                button = rb->button_get( false );
+                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
+                    return SOLITAIRE_USB;
+                if( button == SOL_QUIT || button == SOL_MOVE )
+                    return SOLITAIRE_WIN;
+            }
+        }
+    }
+    return SOLITAIRE_WIN;
+}
+
 /**
  * The main game loop
  */
-
-enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
 
 int solitaire( void )
 {
@@ -1160,8 +1213,8 @@ int solitaire( void )
         /* if there aren't any, that means you won :) */
         if( biggest_col_length == 0 && rem == NOT_A_CARD )
         {
-            rb->splash( HZ*2, true, "You Won :)" );
-            return SOLITAIRE_WIN;
+            rb->splash( HZ, true, "You Won :)" );
+            return bouncing_cards();
         }
 
         /* draw the columns */
