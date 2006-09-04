@@ -33,7 +33,9 @@
 
 void button_init_device(void)
 {
-    /* No hardware initialisation required as it is done by the bootloader */
+    /* We need to output to pin 6 of GPIOD when reading the scroll pad value */
+    GPIOD_OUTPUT_EN |= 0x40;
+    GPIOD_OUTPUT_VAL |= 0x40;
 }
 
 bool button_hold(void)
@@ -73,10 +75,21 @@ int button_read_device(void)
         if (GPIOB_INPUT_VAL & 0x1) btn |= BUTTON_POWER;
         
         /* Read scroller */
-        if ( (GPIOC_INPUT_VAL & 0x8) && (GPIOD_INPUT_VAL & 0x20) )
+        if ( GPIOD_INPUT_VAL & 0x20 )
         {
-            /* Scroller is pressed */
-            btn |= BUTTON_SCROLL_DOWN;
+            int scroll_pos;
+            
+            GPIOD_OUTPUT_VAL &=~ 0x40;
+            udelay(50);
+            scroll_pos = adc_scan(ADC_SCROLLPAD);
+            GPIOD_OUTPUT_VAL |= 0x40;
+            
+            if(scroll_pos < 0x210)
+            {
+                btn |= BUTTON_SCROLL_DOWN;
+            } else {
+                btn |= BUTTON_SCROLL_UP;
+            }
         }
     }
     
