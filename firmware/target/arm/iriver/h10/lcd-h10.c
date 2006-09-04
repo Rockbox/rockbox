@@ -104,8 +104,8 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_GATE_SCAN_START_POS   0x40
 #define R_1ST_SCR_DRV_POS       0x42
 #define R_2ND_SCR_DRV_POS       0x43
-#define R_VERT_RAM_ADDR_POS     0x44
-#define R_HORIZ_RAM_ADDR_POS    0x45
+#define R_HORIZ_RAM_ADDR_POS    0x44
+#define R_VERT_RAM_ADDR_POS     0x45
 
 #endif
 
@@ -219,18 +219,40 @@ void lcd_yuv_blit(unsigned char * const src[3],
     y0 = y;
     y1 = y + height - 1;
 
-    /* max horiz << 8 | start horiz */
+#if CONFIG_LCD == LCD_H10_5GB
+    /* start horiz << 8 | max horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data((x0 << 8) | x1);
+    
+    /* start vert << 8 | max vert */
+    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
     lcd_send_data((y0 << 8) | y1);
-    /* max vert << 8 | start vert */
+
+    /* start horiz << 8 | start vert */
+    lcd_send_cmd(R_RAM_ADDR_SET);
+    lcd_send_data(((x0 << 8) | y0));
+    
+#elif CONFIG_LCD == LCD_H10_20GB
+    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
+     * is actually the bottom left and horizontal and vertical are swapped. 
+     * Rockbox expects the origin to be the top left so we need to use 
+     * 127 - y instead of just y */
+     
+    /* start horiz << 8 | max horiz */
+    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data(((127-y1) << 8) | (127-y0));
+    
+    /* start vert << 8 | max vert */
     lcd_send_cmd(R_VERT_RAM_ADDR_POS);
     lcd_send_data((x0 << 8) | x1);
 
     /* position cursor (set AD0-AD15) */
-    /* start vert << 8 | start horiz */
+    /* start horiz << 8 | start vert */
     lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data(((y0 << 8) | x0));
-
+    lcd_send_data((((127-y0) << 8) | x0));
+    
+#endif /* CONFIG_LCD */
+    
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
 
@@ -390,17 +412,39 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         x1 = t;
     }
 
-    /* max horiz << 8 | start horiz */
+#if CONFIG_LCD == LCD_H10_5GB
+    /* start horiz << 8 | max horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data((x0 << 8) | x1);
+    
+    /* start vert << 8 | max vert */
+    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
     lcd_send_data((y0 << 8) | y1);
-    /* max vert << 8 | start vert */
+
+    /* start horiz << 8 | start vert */
+    lcd_send_cmd(R_RAM_ADDR_SET);
+    lcd_send_data(((x0 << 8) | y0));
+    
+#elif CONFIG_LCD == LCD_H10_20GB
+    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
+     * is actually the bottom left and horizontal and vertical are swapped. 
+     * Rockbox expects the origin to be the top left so we need to use 
+     * 127 - y instead of just y */
+     
+    /* start horiz << 8 | max horiz */
+    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data(((127-y1) << 8) | (127-y0));
+    
+    /* start vert << 8 | max vert */
     lcd_send_cmd(R_VERT_RAM_ADDR_POS);
     lcd_send_data((x0 << 8) | x1);
 
     /* position cursor (set AD0-AD15) */
-    /* start vert << 8 | start horiz */
+    /* start horiz << 8 | start vert */
     lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data(((y0 << 8) | x0));
+    lcd_send_data((((127-y0) << 8) | x0));
+    
+#endif /* CONFIG_LCD */
 
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);

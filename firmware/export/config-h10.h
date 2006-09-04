@@ -97,7 +97,7 @@
 #define CPU_FREQ      11289600
 
 /* Type of LCD */
-#define CONFIG_LCD LCD_H10
+#define CONFIG_LCD LCD_H10_20GB
 
 #define DEFAULT_CONTRAST_SETTING    19
 
