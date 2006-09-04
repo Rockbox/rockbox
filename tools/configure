@@ -207,7 +207,7 @@ calmrisccc () {
 
 coldfirecc () {
  prefixtools m68k-elf-
- GCCOPTS="$CCOPTS -g -m5200 -Wa\,-m5249 -malign-int -mstrict-align"
+ GCCOPTS="$CCOPTS -g -m5206e -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
 }
