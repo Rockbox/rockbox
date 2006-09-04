@@ -672,6 +672,10 @@ int solitaire_menu( unsigned char context )
         context = MENU_DURINGGAME;
     }
 
+#if LCD_DEPTH > 1
+    rb->lcd_set_background( LCD_DEFAULT_BG );
+#endif
+
     while( true )
     {
 
@@ -1548,9 +1552,6 @@ int solitaire( void )
             case SOL_RC_QUIT:
 #endif
             case SOL_QUIT:
-#if LCD_DEPTH > 1
-                rb->lcd_set_background( LCD_DEFAULT_BG );
-#endif
                 switch( solitaire_menu( MENU_DURINGGAME ) )
                 {
                     case MENU_QUIT:
