@@ -759,14 +759,17 @@ unsigned char sel_card;
 card_t deck[ NUM_CARDS ];
 
 /* the remaining cards */
+/* first card of the remains' stack */
 unsigned char rem;
+/* upper visible card from the remains' stack */
 unsigned char cur_rem;
+/* number of cards drawn from the remains stack - 1 */
 unsigned char count_rem;
+/* number of cards per draw of the remains' stack */
+int cards_per_draw;
 
 /* the 7 game columns */
 unsigned char cols[COL_NUM];
-
-int cards_per_draw;
 /* the 4 final stacks */
 unsigned char stacks[SUITS];
 
@@ -875,7 +878,7 @@ void solitaire_init( void )
     /* init the remainder */
     cur_rem = NOT_A_CARD;
 
-    count_rem=0;
+    count_rem=-1;
 }
 
 /* find the column number in which 'card' can be found */
@@ -1049,7 +1052,7 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         if( src_card_prev == NOT_A_CARD )
         {
             rem = deck[src_card].next;
-            count_rem = count_rem-1;
+            //count_rem--;
         }
         /* if src card is not the first card from the stack */
         else
@@ -1058,7 +1061,7 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         }
         deck[src_card].next = NOT_A_CARD;
         cur_rem = src_card_prev;
-        count_rem = count_rem-1;
+        count_rem--;
     }
     /* if the src card is from somewhere else, just take everything */
     else
@@ -1120,7 +1123,6 @@ int solitaire( void )
 
     while( true )
     {
-
 #if LCD_DEPTH>1
         rb->lcd_set_foreground(LCD_BLACK);
 #ifdef HAVE_LCD_COLOR
@@ -1447,9 +1449,11 @@ int solitaire( void )
                 if( lastbutton != SOL_REM2CUR_PRE )
                     break;
 #endif
-                count_rem = count_rem-1;
-                move_card( cur_col, cur_rem );
-                sel_card = NOT_A_CARD;
+                if( move_card( cur_col, cur_rem ) == MOVE_OK )
+                {
+                    //count_rem--;
+                    sel_card = NOT_A_CARD;
+                }
                 break;
 
             /* If the card on top of the remains can be put on one
@@ -1461,9 +1465,12 @@ int solitaire( void )
 #endif
                 if( cur_rem != NOT_A_CARD )
                 {
-                    move_card( deck[cur_rem].suit + COL_NUM, cur_rem );
-                    sel_card = NOT_A_CARD;
-                    count_rem = count_rem-1;
+                    if( move_card( deck[cur_rem].suit + COL_NUM, cur_rem )
+                        == MOVE_OK )
+                    {
+                        sel_card = NOT_A_CARD;
+                        //count_rem--;
+                    }
                 }
                 break;
 
@@ -1499,7 +1506,7 @@ int solitaire( void )
                 if( rem != NOT_A_CARD )
                 {
                     int cur_rem_old = cur_rem;
-                    count_rem = 0;
+                    count_rem = -1;
                     /* draw new cards form the remains of the deck */
                     if( cur_rem == NOT_A_CARD )
                     {
@@ -1521,10 +1528,10 @@ int solitaire( void )
                     }
                     /* test if any cards are really left on
                      * the remains' stack */
-                    if( i > 0 )
+                    if( i == cards_per_draw )
                     {
                         cur_rem = NOT_A_CARD;
-                        count_rem = 0;
+                        count_rem = -1;
                     }
                     /* if cursor was on remains' stack when new cards were
                      * drawn, put cursor on top of remains' stack */
