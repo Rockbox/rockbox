@@ -351,11 +351,12 @@ bool detect_flashed_rockbox(void)
     return true;
 }
 
-unsigned long valid_bootloaders[][2] =
-    { 
-        { 62332, 0x77395351 },
-        { 0,     0 }
-    };
+unsigned long valid_bootloaders[][2] = { 
+    /* Size-8   CRC32 */
+    { 62332, 0x77395351 }, /* Pre-release v7 */
+    { 63340, 0xc41857b6 }, /* Pre-release v7, fixed crash unless firmware found. */
+    { 0,     0 }
+};
 
 
 bool detect_valid_bootloader(const unsigned char *addr, int len)

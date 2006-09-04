@@ -508,10 +508,20 @@ void main(void)
         eeprom_settings_store();
 #endif
     
-    if(i == 0)
+    if (i == 0)
         start_firmware();
     
-    start_iriver_fw();
+    if (detect_flashed_rockbox())
+    {
+        printf("No firmware found on disk");
+        printf("Powering off...");
+        lcd_update();
+        ata_sleep();
+        sleep(HZ*4);
+        power_off();
+    }
+    else
+        start_iriver_fw();
 #endif /* IAUDIO_X5 */
 }
 
