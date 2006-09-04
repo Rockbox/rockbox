@@ -674,6 +674,7 @@ int solitaire_menu( unsigned char context )
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background( LCD_DEFAULT_BG );
+    rb->lcd_set_foreground( LCD_DEFAULT_FG );
 #endif
 
     while( true )
