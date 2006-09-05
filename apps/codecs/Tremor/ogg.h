@@ -191,7 +191,7 @@ static inline long oggpack_look(oggpack_buffer *b, int bits){
   if(bits+b->headbit < b->headend<<3){
     extern const unsigned long oggpack_mask[];
     unsigned long m=oggpack_mask[bits];
-    unsigned long ret=0;
+    unsigned long ret=-1;
 
     bits+=b->headbit;
     ret=b->headptr[0]>>b->headbit;

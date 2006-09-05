@@ -52,7 +52,7 @@ void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
 long oggpack_look_full(oggpack_buffer *b,int bits) ICODE_ATTR;
 long oggpack_look_full(oggpack_buffer *b,int bits){
   unsigned long m=oggpack_mask[bits];
-  unsigned long ret=0;
+  unsigned long ret=-1;
 
   bits+=b->headbit;
 
@@ -139,7 +139,7 @@ int oggpack_eop(oggpack_buffer *b){
 long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR;
 long oggpack_read(oggpack_buffer *b,int bits){
   unsigned long m=oggpack_mask[bits];
-  ogg_uint32_t ret=0;
+  ogg_uint32_t ret=-1;
 
   bits+=b->headbit;
 
