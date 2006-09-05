@@ -1006,7 +1006,9 @@ static bool eq_hw_set_band4_gain(void)
 
 void eq_hw_enable(bool enable)
 {
-#ifndef SIMULATOR
+#ifdef SIMULATOR
+    (void) enable;
+#else
     if (enable) {
         wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff,
                                    0, global_settings.eq_hw_band0_gain);

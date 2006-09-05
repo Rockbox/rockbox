@@ -92,6 +92,10 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "dsp.h"
 #endif
 
+#ifdef HAVE_WM8758
+#include "eq_menu.h"
+#endif
+
 #define CONFIG_BLOCK_VERSION 52
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
