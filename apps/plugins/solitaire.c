@@ -1133,10 +1133,12 @@ int bouncing_cards( void )
                     vy = -vy*3/4;
                     y = LCD_HEIGHT - CARD_HEIGHT;
                 }
-                draw_card( deck[j*CARDS_PER_SUIT+i], x, y, false, false, false );
-                rb->lcd_update();
+                draw_card( deck[j*CARDS_PER_SUIT+i], x, y,
+                           false, false, false );
+                rb->lcd_update_rect( x<0?0:x, y<0?0:y,
+                                     CARD_WIDTH+1, CARD_HEIGHT+1 );
 
-                button = rb->button_get( false );
+                button = rb->button_get_w_tmo( 1 );
                 if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
                 if( button == SOL_QUIT || button == SOL_MOVE )
