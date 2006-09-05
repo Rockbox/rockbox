@@ -1307,10 +1307,11 @@ int solitaire( void )
                     j += NUMBER_WIDTH+2;
                 }
             }
-            else if( cur_rem == NOT_A_CARD && cur_col == REM_COL )
-            {
-                draw_cursor( CARD_WIDTH+2*MARGIN+1, MARGIN );
-            }
+        }
+        if( ( cur_rem == NOT_A_CARD || rem == NOT_A_CARD )
+              && cur_col == REM_COL )
+        {
+            draw_cursor( CARD_WIDTH+2*MARGIN+1, MARGIN );
         }
 
         rb->lcd_update();
