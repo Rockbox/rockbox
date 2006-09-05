@@ -459,6 +459,7 @@ int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
 }
 
 /* pcm==NULL indicates we just want the pending samples, no more */
+int vorbis_synthesis_pcmout(vorbis_dsp_state *v,ogg_int32_t ***pcm) ICODE_ATTR;
 int vorbis_synthesis_pcmout(vorbis_dsp_state *v,ogg_int32_t ***pcm){
   vorbis_info *vi=v->vi;
   if(v->pcm_returned>-1 && v->pcm_returned<v->pcm_current){

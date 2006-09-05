@@ -184,7 +184,6 @@ static int seq = 0;
 
 #define CHANNELS 2    /* max 2 channels on the ihp-1xx (stereo)  */
 
-static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l) ICODE_ATTR;
 static int mapping0_inverse(vorbis_block *vb,vorbis_look_mapping *l){
   vorbis_dsp_state     *vd=vb->vd;
   vorbis_info          *vi=vd->vi;
