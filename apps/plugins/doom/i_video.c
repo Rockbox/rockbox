@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.23  2006/08/10 18:34:43  amiconn
+ * Revision 1.24  2006/09/05 00:23:06  barrywardell
+ * Fix not being able to exit Doom on the H10.
+ *
+ * Revision 1.23  2006-08-10 18:34:43  amiconn
  * Correct calculation of necessary buffer size to give maximum number of shades on iPod Mini.
  *
  * Revision 1.22  2006-08-07 02:44:18  amiconn
@@ -166,7 +169,7 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_SHOOT   BUTTON_REW
 #define DOOMBUTTON_OPEN    BUTTON_PLAY
 #define DOOMBUTTON_ESC     BUTTON_POWER
-#define DOOMBUTTON_ENTER   BUTTON_PLAY
+#define DOOMBUTTON_ENTER   BUTTON_REW
 #define DOOMBUTTON_WEAPON  BUTTON_FF
 #else
 #define DOOMBUTTON_UP      BUTTON_UP
