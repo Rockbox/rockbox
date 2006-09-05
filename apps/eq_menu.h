@@ -27,6 +27,7 @@ bool eq_menu_graphical(void);
 bool eq_menu(void);
 #ifdef HAVE_WM8758
 bool eq_hw_menu(void);
+void eq_hw_enable(bool enable);
 #endif
 
 #endif

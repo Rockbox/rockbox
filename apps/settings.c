@@ -1242,6 +1242,10 @@ void settings_apply(void)
     }
 #endif
 
+#ifdef HAVE_WM8758
+    eq_hw_enable(global_settings.eq_hw_enabled);
+#endif
+
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
 #endif

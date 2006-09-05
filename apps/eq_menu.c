@@ -1004,13 +1004,10 @@ static bool eq_hw_set_band4_gain(void)
     return result;
 }
 
-static bool eq_hw_enabled(void)
+void eq_hw_enable(bool enable)
 {
-    bool result = set_bool(str(LANG_EQUALIZER_HARDWARE_ENABLED),
-        &global_settings.eq_hw_enabled);
-
 #ifndef SIMULATOR
-    if (global_settings.eq_hw_enabled) {
+    if (enable) {
         wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff,
                                    0, global_settings.eq_hw_band0_gain);
         wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
@@ -1035,6 +1032,14 @@ static bool eq_hw_enabled(void)
         wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0, 0);
     }
 #endif
+}
+
+static bool eq_hw_enabled(void)
+{
+    bool result = set_bool(str(LANG_EQUALIZER_HARDWARE_ENABLED),
+        &global_settings.eq_hw_enabled);
+
+    eq_hw_enable(global_settings.eq_hw_enabled);
 
     return result;
 }
