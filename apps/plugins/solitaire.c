@@ -1093,13 +1093,13 @@ int bouncing_cards( void )
             vx = rb->rand()%8-5;
             if( !vx ) vx = -6;
 
-            vy = -rb->rand()%6;
+            vy = -rb->rand()%(6<<8);
 
             while( x < LCD_WIDTH && x + CARD_WIDTH > 0 )
             {
-                vy += 1;
+                vy += (1<<8);
                 x += vx;
-                y += vy;
+                y += vy >> 8;
                 if( y + CARD_HEIGHT >= LCD_HEIGHT )
                 {
                     vy = -vy*3/4;
