@@ -111,10 +111,10 @@ static struct plugin_api* rb;
 #   define SOL_OPT          BUTTON_ON
 #   define SOL_REM          BUTTON_REC
 #   define SOL_RC_QUIT      BUTTON_RC_STOP
-#   define HK_MOVE         "SELECT"
-#   define HK_DRAW         "REC"
+#   define HK_MOVE         "NAVI"
+#   define HK_DRAW         "A-B"
 #   define HK_REM2CUR      "PLAY+LEFT"
-#   define HK_CUR2STACK    "SELECT"
+#   define HK_CUR2STACK    "NAVI"
 #   define HK_REM2STACK    "PLAY+RIGHT"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) ||(CONFIG_KEYPAD == IPOD_3G_PAD)
@@ -487,7 +487,7 @@ enum help solitaire_help( void )
         rb->lcd_putsxy(20, 32, "return to menu.");
         rb->lcd_putsxy(20, 48, "All actions can be");
         rb->lcd_putsxy(20, 56, "done using the");
-        rb->lcd_putsxy(20, 64, "joystick and RECORD.");
+        rb->lcd_putsxy(20, 64, "joystick and A-B.");
 #else
 //#   warning "Add help strings for other keypads"
 #endif
