@@ -36,17 +36,15 @@ tetrox_background.112x64x1.bmp
 solitaire_numbers.8x10x1.bmp
 #if HAVE_LCD_COLOR
 solitaire_suits.8x10x1_filled.bmp
+solitaire_suitsi.15x16x1_filled.bmp
 #else
 solitaire_suits.8x10x1.bmp
+solitaire_suitsi.15x16x1.bmp
 #endif
 #else
 solitaire_numbers.6x6x1.bmp
 solitaire_suits.6x6x1.bmp
-#endif
-#if HAVE_LCD_COLOR
-solitaire_suitsi.15x16x1_filled.bmp
-#else
-solitaire_suitsi.15x16x1.bmp
+solitaire_suitsi.9x9x1.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */

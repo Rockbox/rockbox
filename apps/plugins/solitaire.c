@@ -222,84 +222,56 @@ static struct plugin_api* rb;
 
 /* size of a card on the screen */
 #if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
-#   define CARD_WIDTH  27
-#   define CARD_HEIGHT 34
+#   define CARD_WIDTH  28
+#   define CARD_HEIGHT 35
 #elif LCD_HEIGHT > 64
-#   define CARD_WIDTH  19
-#   define CARD_HEIGHT 24
+#   define CARD_WIDTH  20
+#   define CARD_HEIGHT 25
 #else
-#   define CARD_WIDTH  14
-#   define CARD_HEIGHT 12
+#   define CARD_WIDTH  15
+#   define CARD_HEIGHT 13
 #endif
 
 /* where the cards start */
 #if LCD_HEIGHT > 64
 #   define MARGIN 2
-#   define CARD_START ( CARD_HEIGHT + 4 )
+#   define CARD_START ( CARD_HEIGHT + 3 )
 #else
     /* The screen is *small* */
 #   define MARGIN 0
-#   define CARD_START ( CARD_HEIGHT + 1 )
+#   define CARD_START ( CARD_HEIGHT )
 #endif
 
+#include "solitaire_numbers.h"
+#include "solitaire_suits.h"
+#include "solitaire_suitsi.h"
 
-#if LCD_HEIGHT > 64
-#   define NUMBER_HEIGHT 10
-#   define NUMBER_WIDTH  8
-#   define NUMBER_STRIDE 8
-#   define SUIT_HEIGHT 10
-#   define SUIT_WIDTH  8
-#   define SUIT_STRIDE 8
-#else
-#   define NUMBER_HEIGHT 6
-#   define NUMBER_WIDTH  6
-#   define NUMBER_STRIDE 6
-#   define SUIT_HEIGHT 6
-#   define SUIT_WIDTH  6
-#   define SUIT_STRIDE 6
-#endif
-
-#define SUITI_HEIGHT 16
-#define SUITI_WIDTH  15
-#define SUITI_STRIDE 15
-
+#define NUMBER_HEIGHT (BMPHEIGHT_solitaire_numbers/13)
+#define NUMBER_WIDTH  BMPWIDTH_solitaire_numbers
+#define NUMBER_STRIDE BMPWIDTH_solitaire_numbers
+#define SUIT_HEIGHT   (BMPHEIGHT_solitaire_suits/4)
+#define SUIT_WIDTH    BMPWIDTH_solitaire_suits
+#define SUIT_STRIDE   BMPWIDTH_solitaire_suits
+#define SUITI_HEIGHT  (BMPHEIGHT_solitaire_suitsi/4)
+#define SUITI_WIDTH   BMPWIDTH_solitaire_suitsi
+#define SUITI_STRIDE  BMPWIDTH_solitaire_suitsi
 
 #define draw_number( num, x, y ) \
-    rb->lcd_mono_bitmap_part( numbers, 0, num * NUMBER_HEIGHT, NUMBER_STRIDE, \
-                              x, y, NUMBER_WIDTH, NUMBER_HEIGHT );
-extern const unsigned char solitaire_numbers[];
-#define numbers solitaire_numbers
+    rb->lcd_mono_bitmap_part( solitaire_numbers, 0, num * NUMBER_HEIGHT, \
+                              NUMBER_STRIDE, x, y, NUMBER_WIDTH, NUMBER_HEIGHT );
 
 #define draw_suit( num, x, y ) \
-    rb->lcd_mono_bitmap_part( suits, 0, num * SUIT_HEIGHT, SUIT_STRIDE, \
-                              x, y, SUIT_WIDTH, SUIT_HEIGHT );
-extern const unsigned char solitaire_suits[];
-#define suits   solitaire_suits
+    rb->lcd_mono_bitmap_part( solitaire_suits, 0, num * SUIT_HEIGHT, \
+                              SUIT_STRIDE, x, y, SUIT_WIDTH, SUIT_HEIGHT );
 
-#if ( CARD_HEIGHT < SUITI_HEIGHT + 1 ) || ( CARD_WIDTH < SUITI_WIDTH + 1 )
-#   undef  SUITI_HEIGHT
-#   undef  SUITI_WIDTH
-#   define SUITI_HEIGHT SUIT_HEIGHT
-#   define SUITI_WIDTH  SUIT_WIDTH
-#   define draw_suiti( num, x, y ) draw_suit( num, x, y )
-#else
-#   define draw_suiti( num, x, y ) \
-    rb->lcd_mono_bitmap_part( suitsi, 0, num * SUITI_HEIGHT, SUITI_STRIDE, \
-                              x, y, SUITI_WIDTH, SUITI_HEIGHT );
-    extern const unsigned char solitaire_suitsi[];
-#   define suitsi  solitaire_suitsi
-#endif
+#define draw_suiti( num, x, y ) \
+    rb->lcd_mono_bitmap_part( solitaire_suitsi, 0, num * SUITI_HEIGHT, \
+                              SUITI_STRIDE, x, y, SUITI_WIDTH, SUITI_HEIGHT );
 
 #ifdef HAVE_LCD_COLOR
-#   if (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176)
-#       define CARDBACK_HEIGHT 33
-#       define CARDBACK_WIDTH  26
-#   else
-#       define CARDBACK_HEIGHT 24
-#       define CARDBACK_WIDTH  18
-#   endif
-
-    extern const fb_data solitaire_cardback[];
+#include "solitaire_cardback.h"
+#define CARDBACK_HEIGHT BMPHEIGHT_solitaire_cardback
+#define CARDBACK_WIDTH  BMPWIDTH_solitaire_cardback
 #endif
 
 #if HAVE_LCD_COLOR
@@ -359,7 +331,7 @@ typedef struct
 static void draw_cursor( int x, int y )
 {
     rb->lcd_set_drawmode( DRMODE_COMPLEMENT );
-    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
+    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
     rb->lcd_set_drawmode( DRMODE_SOLID );
 }
 
@@ -372,14 +344,14 @@ static void draw_card_ext( int x, int y, bool selected, bool cursor )
 #endif
     /* draw a rectangle omiting the corner pixels, which is why we don't
      * use drawrect */
-    rb->lcd_drawline( x+1, y, x+CARD_WIDTH-1, y );
-    rb->lcd_drawline( x+1, y+CARD_HEIGHT, x+CARD_WIDTH-1, y+CARD_HEIGHT );
-    rb->lcd_drawline( x, y+1, x, y+CARD_HEIGHT-1 );
-    rb->lcd_drawline( x+CARD_WIDTH, y+1, x+CARD_WIDTH, y+CARD_HEIGHT-1 );
+    rb->lcd_hline( x+1, x+CARD_WIDTH-2, y );
+    rb->lcd_hline( x+1, x+CARD_WIDTH-2, y+CARD_HEIGHT-1 );
+    rb->lcd_vline( x, y+1, y+CARD_HEIGHT-2 );
+    rb->lcd_vline( x+CARD_WIDTH-1, y+1, y+CARD_HEIGHT-2 );
 
     if( selected )
     {
-        rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
+        rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
     }
     if( cursor )
     {
@@ -400,7 +372,7 @@ static void draw_card( card_t card, int x, int y,
 #else
     rb->lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
 #endif
-    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
+    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #if LCD_DEPTH == 1
     rb->lcd_set_drawmode( DRMODE_SOLID );
 #endif
@@ -411,7 +383,7 @@ static void draw_card( card_t card, int x, int y,
         /* On Color LCDs we have a card back so we only need to clear
          * the card area when it's known*/
         rb->lcd_set_foreground( LCD_WHITE );
-        rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
+        rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #endif
 
 #if LCD_DEPTH > 1
@@ -456,7 +428,7 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
 #else
     rb->lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
 #endif
-    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-1, CARD_HEIGHT-1 );
+    rb->lcd_fillrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #if LCD_DEPTH == 1
     rb->lcd_set_drawmode( DRMODE_SOLID );
 #endif
@@ -1115,7 +1087,7 @@ int bouncing_cards( void )
     {
         for( j = 0; j < SUITS; j++ )
         {
-            x = LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*j+j*2+1;
+            x = LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*j+j+1;
             y = MARGIN;
 
             vx = rb->rand()%8-5;
@@ -1136,9 +1108,9 @@ int bouncing_cards( void )
                 draw_card( deck[j*CARDS_PER_SUIT+i], x, y,
                            false, false, false );
                 rb->lcd_update_rect( x<0?0:x, y<0?0:y,
-                                     CARD_WIDTH+1, CARD_HEIGHT+1 );
+                                     CARD_WIDTH, CARD_HEIGHT );
 
-                button = rb->button_get_w_tmo( 1 );
+                button = rb->button_get_w_tmo( 2 );
                 if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
                     return SOLITAIRE_USB;
                 if( button == SOL_QUIT || button == SOL_MOVE )
@@ -1266,14 +1238,14 @@ int solitaire( void )
             if( c != NOT_A_CARD )
             {
                 draw_card( deck[c],
-                           LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*i+i*2+1,
+                           LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*i+i+1,
                            MARGIN,
                            c == sel_card, cur_col == STACKS_COL + i, false );
             }
             else
             {
                 draw_empty_stack( i,
-                           LCD_WIDTH-(CARD_WIDTH*4+8+MARGIN)+CARD_WIDTH*i+i*2+1,
+                           LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*i+i+1,
                            MARGIN, cur_col == STACKS_COL + i );
             }
         }
