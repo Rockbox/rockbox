@@ -91,6 +91,6 @@ memset:
         strneb  r1, [r0, #-1]!
         tst     r2, #1
         strneb  r1, [r0, #-1]!
-        mov     pc, lr
-end:
+        bx      lr
+.end:
         .size   memset,.end-memset
