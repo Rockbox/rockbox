@@ -22,15 +22,13 @@
 #define UNALIGNED(X)   ((long)X & (sizeof(long) - 1))
 #define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
 
-void *memset16(void *dst, int val, size_t len)
+void memset16(void *dst, int val, size_t len)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
     unsigned short *p = (unsigned short *)dst;
 
     while (len--)
         *p++ = val;
-
-    return dst;
 #else
     unsigned short *p = (unsigned short *)dst;
     unsigned int i;
@@ -73,7 +71,5 @@ void *memset16(void *dst, int val, size_t len)
 
     while (len--)
         *p++ = val;
-
-    return dst;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }

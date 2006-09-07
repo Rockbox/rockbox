@@ -53,7 +53,7 @@ target/sh/memset-sh.S
 common/memcpy.c
 common/memmove.c
 target/arm/memset-arm.S
-common/memset16.c
+target/arm/memset16-arm.S
 #else
 common/memcpy.c
 common/memmove.c

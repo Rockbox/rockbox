@@ -22,6 +22,6 @@
 
 #include <sys/types.h>
 
-void *memset16(void *dst, int val, size_t len);
+void memset16(void *dst, int val, size_t len);
 
 #endif /* _MEMORY_H_ */
