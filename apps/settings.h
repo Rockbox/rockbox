@@ -532,17 +532,15 @@ extern long lasttime;
 extern const char rec_base_directory[];
 
 /* system defines */
-#ifdef IAUDIO_X5
-#define MIN_CONTRAST_SETTING        1
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    19
-#elif defined HAVE_LCD_CHARCELLS
+#ifndef TARGET_TREE
+#if defined HAVE_LCD_CHARCELLS
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        31
 #else
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
 #endif
+#endif /* !TARGET_TREE */
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */

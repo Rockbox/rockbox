@@ -20,13 +20,20 @@
 #include "cpu.h"
 #include "system.h"
 #include "backlight.h"
+#include "lcd.h"
 
 void __backlight_on(void)
 {
+#if (CONFIG_LCD == LCD_H10_20GB)
+    lcd_enable(true);
+#endif
     GPIOL_OUTPUT_VAL |= 0x20;
 }
 
 void __backlight_off(void)
 {
     GPIOL_OUTPUT_VAL &=~ 0x20;
+#if (CONFIG_LCD == LCD_H10_20GB)
+    lcd_enable(false);
+#endif
 }

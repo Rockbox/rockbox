@@ -26,7 +26,10 @@
 #define LCD_WIDTH  160
 #define LCD_HEIGHT 128
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
+#define LCD_PIXELFORMAT RGB565 /* rgb565 */
+
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
@@ -93,13 +96,25 @@
 #define ROM_START 0x00000000
 
 /* Define this to the CPU frequency */
-/* TODO: this is probably wrong */
-#define CPU_FREQ      11289600
+#define CPU_FREQ      75000000
 
 /* Type of LCD */
 #define CONFIG_LCD LCD_H10_20GB
 
-#define DEFAULT_CONTRAST_SETTING    19
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        0
+#define MAX_CONTRAST_SETTING        30
+#define DEFAULT_CONTRAST_SETTING    14 /* Match boot contrast */
+
+/* Define this if your LCD can be enabled/disabled */
+#define HAVE_LCD_ENABLE
+
+/* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
+ * should be defined as well.
+ * We can currently put the lcd to sleep but it won't wake up properly */
+/*#define HAVE_LCD_SLEEP*/
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

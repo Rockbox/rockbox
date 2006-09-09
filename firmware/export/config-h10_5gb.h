@@ -63,7 +63,7 @@
 #define CONFIG_BACKLIGHT BL_H10 /* TODO: figure this out, probably not necessary
                                    because of target tree stuff */
 
-#define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */
+#define BATTERY_CAPACITY_DEFAULT 820 /* default battery capacity */
 
 #ifndef SIMULATOR
 
@@ -93,12 +93,10 @@
 
 /* Define this to the CPU frequency */
 /* TODO: this is probably wrong */
-#define CPU_FREQ      11289600
+#define CPU_FREQ      75000000
 
 /* Type of LCD */
 #define CONFIG_LCD LCD_H10_5GB
-
-#define DEFAULT_CONTRAST_SETTING    19
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

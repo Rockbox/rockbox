@@ -39,43 +39,6 @@ static inline bool timer_check(int clock_start, int usecs)
 #define LCD_CMD         0x80000000
 #define LCD_DATA        0x81000000
 
-#ifdef IRIVER_H10
-/* register defines for the Renesas HD66773R */
-#define R_START_OSC             0x00
-#define R_DEVICE_CODE_READ      0x00
-#define R_DRV_OUTPUT_CONTROL    0x01
-#define R_DRV_AC_CONTROL        0x02
-#define R_POWER_CONTROL1        0x03
-#define R_POWER_CONTROL2        0x04
-#define R_ENTRY_MODE            0x05
-#define R_COMPARE_REG           0x06
-#define R_DISP_CONTROL          0x07
-#define R_FRAME_CYCLE_CONTROL   0x0b
-#define R_POWER_CONTROL3        0x0c
-#define R_POWER_CONTROL4        0x0d
-#define R_POWER_CONTROL5        0x0e
-#define R_GATE_SCAN_START_POS   0x0f
-#define R_VERT_SCROLL_CONTROL   0x11
-#define R_1ST_SCR_DRV_POS       0x14
-#define R_2ND_SCR_DRV_POS       0x15
-#define R_HORIZ_RAM_ADDR_POS    0x16
-#define R_VERT_RAM_ADDR_POS     0x17
-#define R_RAM_WRITE_DATA_MASK   0x20
-#define R_RAM_ADDR_SET          0x21
-#define R_WRITE_DATA_2_GRAM     0x22
-#define R_RAM_READ_DATA         0x22
-#define R_GAMMA_FINE_ADJ_POS1   0x30
-#define R_GAMMA_FINE_ADJ_POS2   0x31
-#define R_GAMMA_FINE_ADJ_POS3   0x32
-#define R_GAMMA_GRAD_ADJ_POS    0x33
-#define R_GAMMA_FINE_ADJ_NEG1   0x34
-#define R_GAMMA_FINE_ADJ_NEG2   0x35
-#define R_GAMMA_FINE_ADJ_NEG3   0x36
-#define R_GAMMA_GRAD_ADJ_NEG    0x37
-#define R_GAMMA_AMP_ADJ_POS     0x3a
-#define R_GAMMA_AMP_ADJ_NEG     0x3b
-
-#elif defined(IRIVER_H10_5GB)
 /* register defines for TL1771 */
 #define R_START_OSC             0x00
 #define R_DEVICE_CODE_READ      0x00
@@ -106,8 +69,6 @@ static inline bool timer_check(int clock_start, int usecs)
 #define R_2ND_SCR_DRV_POS       0x43
 #define R_HORIZ_RAM_ADDR_POS    0x44
 #define R_VERT_RAM_ADDR_POS     0x45
-
-#endif
 
 static inline void lcd_wait_write(void)
 {
@@ -219,7 +180,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
     y0 = y;
     y1 = y + height - 1;
 
-#if CONFIG_LCD == LCD_H10_5GB
     /* start horiz << 8 | max horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
     lcd_send_data((x0 << 8) | x1);
@@ -231,27 +191,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
     /* start horiz << 8 | start vert */
     lcd_send_cmd(R_RAM_ADDR_SET);
     lcd_send_data(((x0 << 8) | y0));
-    
-#elif CONFIG_LCD == LCD_H10_20GB
-    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
-     * is actually the bottom left and horizontal and vertical are swapped. 
-     * Rockbox expects the origin to be the top left so we need to use 
-     * 127 - y instead of just y */
-     
-    /* start horiz << 8 | max horiz */
-    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data(((127-y1) << 8) | (127-y0));
-    
-    /* start vert << 8 | max vert */
-    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((x0 << 8) | x1);
-
-    /* position cursor (set AD0-AD15) */
-    /* start horiz << 8 | start vert */
-    lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data((((127-y0) << 8) | x0));
-    
-#endif /* CONFIG_LCD */
     
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
@@ -412,7 +351,6 @@ void lcd_update_rect(int x0, int y0, int width, int height)
         x1 = t;
     }
 
-#if CONFIG_LCD == LCD_H10_5GB
     /* start horiz << 8 | max horiz */
     lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
     lcd_send_data((x0 << 8) | x1);
@@ -424,27 +362,6 @@ void lcd_update_rect(int x0, int y0, int width, int height)
     /* start horiz << 8 | start vert */
     lcd_send_cmd(R_RAM_ADDR_SET);
     lcd_send_data(((x0 << 8) | y0));
-    
-#elif CONFIG_LCD == LCD_H10_20GB
-    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
-     * is actually the bottom left and horizontal and vertical are swapped. 
-     * Rockbox expects the origin to be the top left so we need to use 
-     * 127 - y instead of just y */
-     
-    /* start horiz << 8 | max horiz */
-    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
-    lcd_send_data(((127-y1) << 8) | (127-y0));
-    
-    /* start vert << 8 | max vert */
-    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
-    lcd_send_data((x0 << 8) | x1);
-
-    /* position cursor (set AD0-AD15) */
-    /* start horiz << 8 | start vert */
-    lcd_send_cmd(R_RAM_ADDR_SET);
-    lcd_send_data((((127-y0) << 8) | x0));
-    
-#endif /* CONFIG_LCD */
 
     /* start drawing */
     lcd_send_cmd(R_WRITE_DATA_2_GRAM);
