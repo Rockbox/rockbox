@@ -146,27 +146,32 @@ your WPS (While Playing Screen).
         See \reference{ref:configure_rockbox_sound} for more information.
 	
 	\subsubsection{Playlist}
-	The \setting{Playlist} submenu allows you to view, save, search and reshuffle the current 
-	playlist.
-	
+	The \setting{Playlist} submenu allows you to view, save, search and
+    reshuffle the current playlist. To change settings for the
+    \setting{Playlist Viewer} press \ActionStdMenu{} while viewing the playlist
+    to bring up the \setting{Playlist Viewer Menu}.
+    
+    \subsubsection{Playlist catalog}
+    \fixme{Add description of Playlist catalog}
+      \begin{description}
+        \item [View catalog]
+        \item [Add to playlist]
+        \item [Add to new playlist]
+      \end{description}
 	\subsubsection{Bookmarks}
 	This allows you to create a bookmark in the currently-playing track.
 
-	\subsubsection{\label{ref:ID3viewer}ID3 Viewer}
+	\subsubsection{\label{ref:ID3viewer}Show ID3 info}
 	\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
 	This screen is accessible from the WPS screen, and provides a detailed view of
 	all the identity information about the current track. This info is known as
 	meta data and is stored in audio file formats to keep information on artist,
 	album etc. To access this screen, % 
-        \opt{h1xx,h300}{hold \ButtonSelect\ to access the WPS context menu
-          and select the ID3 viewer from there.}%
-	\opt{RECORDER_PAD}{press \ButtonFOne+\ButtonOn}%
-	\opt{PLAYER_PAD}{press \ButtonMenu+\ButtonOn.}%
-	\opt{IPOD_4G_PAD,IPOD_3G_PAD}{hold \ButtonSelect{} to access the WPS 
-          context menu and select the ID3 viewer from there. }%
-        \opt{IAUDIO_X5_PAD}{\fixme{add correct information here}}%
-	\opt{ONDIO_PAD}{hold \ButtonMenu to access the WPS context menu and 
-	  select the ID3 viewer from there.}%
+    \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
+      press \ActionWpsIdThreeScreen. }%
+	\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{press \ActionWpsContext{}
+      to access the \setting{WPS Context Menu} and select
+      \setting{Show ID3 info}. }%
 	\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
 	  to move through the information.}%
 	
@@ -174,7 +179,7 @@ your WPS (While Playing Screen).
 	This \setting{Open With} function is the same as the \setting{Open With} function
 	in the \setting{File Context Menu}.
 	
-	\subsubsection{\label{sec:pitchscreen}Pitch Screen}
+	\subsubsection{\label{sec:pitchscreen}Pitch}
   The Pitch Screen allows you to quickly change the pitch of your \dap. The
   pitch value can be adjusted between 50\% and 200\%.
   \begin{table}
@@ -203,9 +208,15 @@ your WPS (While Playing Screen).
   \end{btnmap}
   \end{table}
   \opt{RECORDER_PAD,ONDIO_PAD}{
-  \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
-}
+    \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
+  }
+    \opt{SWCODEC}{
+      \subsubsection{Graphical EQ}
+        This is a shortcut to the \setting{Equalizer}. See \reference{ref:EQ}.
 
+      \subsubsection{Browse EQ Presets}
+        Browse presets for the \setting{Equalizer}.
+    }
 
 %********************QUICKSCREENS***********************************************
 \opt{RECORDER_PAD}{
