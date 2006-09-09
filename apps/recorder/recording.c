@@ -819,7 +819,7 @@ bool recording_screen(bool no_source)
     int filename_offset[NB_SCREENS];
     int pm_y[NB_SCREENS];
 
-    const unsigned char *byte_units[] = {
+    static const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
         ID2P(LANG_KILOBYTE),
         ID2P(LANG_MEGABYTE),
@@ -899,7 +899,7 @@ bool recording_screen(bool no_source)
     if (!remote_display_on)
     {
         screens[1].clear_display();
-        snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
+        snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
         screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                             screens[1].height/(h*2) + 1, buf);
         screens[1].update();
@@ -977,7 +977,7 @@ bool recording_screen(bool no_source)
                     remote_display_on = false;
                     screen_update = 1;
                     screens[1].clear_display();
-                    snprintf(buf, 32, str(LANG_REMOTE_LCD_ON));
+                    snprintf(buf, sizeof(buf), str(LANG_REMOTE_LCD_ON));
                     screens[1].puts((screens[1].width/w - strlen(buf))/2 + 1, 
                                           screens[1].height/(h*2) + 1, buf);
                     screens[1].update();
@@ -1384,14 +1384,14 @@ bool recording_screen(bool no_source)
             if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
             {
                 dmb = dsize/1024/1024;
-                snprintf(buf, 32, "%s %dMB",
+                snprintf(buf, sizeof(buf), "%s %dMB",
                              str(LANG_SYSFONT_SPLIT_SIZE), dmb);
             }
             else
             {
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;
-                snprintf(buf, 32, "%s %02d:%02d:%02d",
+                snprintf(buf, sizeof(buf), "%s %02d:%02d:%02d",
                          str(LANG_SYSFONT_RECORDING_TIME),
                          hours, minutes, seconds%60);
             }
@@ -1401,7 +1401,7 @@ bool recording_screen(bool no_source)
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
-                snprintf(buf, 32, "%s...", str(LANG_SYSFONT_RECORD_PRERECORD));
+                snprintf(buf, sizeof(buf), "%s...", str(LANG_SYSFONT_RECORD_PRERECORD));
             }
             else
             {
@@ -1414,7 +1414,7 @@ bool recording_screen(bool no_source)
                        active */
                     dhours = dseconds / 3600;
                     dminutes = (dseconds - (dhours * 3600)) / 60;
-                    snprintf(buf, 32, "%s %02d:%02d",
+                    snprintf(buf, sizeof(buf), "%s %02d:%02d",
                              str(LANG_SYSFONT_RECORD_TIMESPLIT_REC),
                              dhours, dminutes);
                 }
@@ -1423,7 +1423,7 @@ bool recording_screen(bool no_source)
                     output_dyn_value(buf2, sizeof buf2,
                                      num_recorded_bytes,
                                      byte_units, true);
-                    snprintf(buf, 32, "%s %s",
+                    snprintf(buf, sizeof(buf), "%s %s",
                              str(LANG_SYSFONT_RECORDING_SIZE), buf2);
                 }
             }
@@ -1443,7 +1443,8 @@ bool recording_screen(bool no_source)
                     else
                         strcpy(filename, "");
 
-                    snprintf(buf, 32, "Filename: %s", filename);
+                    snprintf(buf, sizeof(buf), "%s %s",
+                        str(LANG_SYSFONT_RECORDING_FILENAME), filename);
                     screens[i].puts(0, 2, buf);         
                 }
             }
@@ -1472,7 +1473,7 @@ bool recording_screen(bool no_source)
                 update_countdown = 1;
             }
 
-            snprintf(buf, 32, "%s: %s", str(LANG_SYSFONT_VOLUME),
+            snprintf(buf, sizeof(buf), "%s: %s", str(LANG_SYSFONT_VOLUME),
                      fmt_gain(SOUND_VOLUME,
                               global_settings.volume,
                               buf2, sizeof(buf2)));
@@ -1492,7 +1493,7 @@ bool recording_screen(bool no_source)
             if(global_settings.rec_source == AUDIO_SRC_MIC)
             {
                 /* Draw MIC recording gain */
-                snprintf(buf, 32, "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
+                snprintf(buf, sizeof(buf), "%s:%s", str(LANG_SYSFONT_RECORDING_GAIN),
                          fmt_gain(SOUND_MIC_GAIN,
                                   global_settings.rec_mic_gain,
                                   buf2, sizeof(buf2)));
@@ -1516,7 +1517,7 @@ bool recording_screen(bool no_source)
                     )
             {
                 /* Draw LINE or FMRADIO recording gain */
-                snprintf(buf, 32, "%s:%s",
+                snprintf(buf, sizeof(buf), "%s:%s",
                          str(LANG_SYSFONT_RECORDING_LEFT),
                          fmt_gain(SOUND_LEFT_GAIN,
                                   global_settings.rec_left_gain,
@@ -1534,7 +1535,7 @@ bool recording_screen(bool no_source)
                                              PM_HEIGHT + 3, buf);
                 }                
 
-                snprintf(buf, 32, "%s:%s",
+                snprintf(buf, sizeof(buf), "%s:%s",
                          str(LANG_SYSFONT_RECORDING_RIGHT),
                          fmt_gain(SOUND_RIGHT_GAIN,
                                   global_settings.rec_right_gain,
@@ -1586,25 +1587,25 @@ bool recording_screen(bool no_source)
              }
 
             /************** AGC test info ******************
-            snprintf(buf, 32, "D:%d U:%d",
+            snprintf(buf, sizeof(buf), "D:%d U:%d",
                      (agc_droptime+2)/5, (agc_risetime+2)/5);
             lcd_putsxy(1, LCD_HEIGHT - 8, buf);
-            snprintf(buf, 32, "B:%d",
+            snprintf(buf, sizeof(buf), "B:%d",
                      (agc_baltime+2)/5);
             lcd_putsxy(LCD_WIDTH/2 + 3, LCD_HEIGHT - 8, buf);
             ***********************************************/
 
             if (cursor == 5)
-                snprintf(buf, 32, "%s: %s",
+                snprintf(buf, sizeof(buf), "%s: %s",
                          str(LANG_RECORDING_AGC_MAXGAIN),
                          fmt_gain(SOUND_LEFT_GAIN,
                                   agc_maxgain, buf2, sizeof(buf2)));
             else if (agc_preset == 0)
-                snprintf(buf, 32, "%s: %s",
+                snprintf(buf, sizeof(buf), "%s: %s",
                          str(LANG_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset]);
             else if (global_settings.rec_source == AUDIO_SRC_MIC)
-                snprintf(buf, 32, "%s: %s%s",
+                snprintf(buf, sizeof(buf), "%s: %s%s",
                          str(LANG_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset],
                          fmt_gain(SOUND_LEFT_GAIN,
@@ -1612,7 +1613,7 @@ bool recording_screen(bool no_source)
                              global_settings.rec_mic_gain,
                              buf2, sizeof(buf2)));
             else
-                snprintf(buf, 32, "%s: %s%s",
+                snprintf(buf, sizeof(buf), "%s: %s%s",
                          str(LANG_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset],
                          fmt_gain(SOUND_LEFT_GAIN,
@@ -1821,7 +1822,7 @@ bool f2_rec_screen(void)
                 str(LANG_SYSFONT_RECORDING_QUALITY));
         }
         
-            snprintf(buf, 32, "%d", global_settings.rec_quality);
+            snprintf(buf, sizeof(buf), "%d", global_settings.rec_quality);
         FOR_NB_SCREENS(i)
         {
             screens[i].putsxy(0, LCD_HEIGHT/2-h, buf);
