@@ -177,7 +177,8 @@ void pcf50606_init(void)
     and_l(~0x00000001, &GPIO_ENABLE);
     or_l(0x00000001, &GPIO_FUNCTION);
     or_l(0x00000100, &GPIO_INT_EN);     /* GPI0 H-L */
-    INTPRI5 |= (6 << 0);                /* INT32 - Priority 6 */
+    and_l(~0xF, &INTPRI5);       /* INT32 - Priority 6 */
+    or_l(0x6, &INTPRI5);
 
     pcf50606_write(0x39, 0x00); /* GPOOD0 = green led OFF */
     pcf50606_write(0x3a, 0x00); /* GPOOD1 = red led OFF */
