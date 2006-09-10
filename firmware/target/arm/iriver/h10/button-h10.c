@@ -52,11 +52,13 @@ int button_read_device(void)
     unsigned char state;
     static bool hold_button = false;
 
+#ifndef BOOTLOADER
     /* light handling */
     if (hold_button && !button_hold())
     {
         backlight_hold_changed(hold_button);
     }
+#endif
 
     hold_button = button_hold();
     if (!hold_button)
