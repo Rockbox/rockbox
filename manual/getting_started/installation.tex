@@ -1,46 +1,61 @@
 % $Id$ %
 \chapter{Installation}\label{sec:installation}
+
 \section{Prerequisites}\label{sec:prerequisites}
+
 Before installing Rockbox you should make sure you meet the prerequisites.
 Also you may need some tools for installation. In most cases these will be
 already available on your computer but if not you need to get some additional
 software.
 
-\begin{description}
-\item[ZIP utility.]
-  Rockbox is distributed as an archive using the \fname{.zip} format. Thus you
-  need a tool to handle that compressed format. Usually your
-  computer should have a tool installed that can handle the \fname{.zip} file 
-  format.
-  Windows XP has builtin support for \fname{.zip} files and presents them to 
-  you as folders unless you have installed a third party program that handles
-  compressed files. For other operating systems this may vary. If the 
-  \fname{.zip} file format isn't recognized on your computer you can find a 
-  program to handle them at \url{http://www.info-zip.org/} or
-  \url{http://sevenzip.sf.net/} which can downloaded and used free of
-  charge.
-\item[USB connection.]
-  To transfer Rockbox to your \dap{} you need to connect it to your computer.
-  To proceed you need to know where to access the \dap{}. On Windows this
-  means you need to figure out the drive letter the device got associated
-  with. On Linux you need to know the mount point of your \dap{}.
-  \opt{ipod}{A connection means you need to be able accessing your \dap{}
-    as hard disk meaning you need to use the so-called ``disk-mode''.
-    \fixme{add a note on how to enter the disk mode}
-  }
-\item[Text editor.]
-  If you want to create customized configuration files you'll need a text
-  editor like Windows' ``Wordpad''. Of course you can simply save
-  configurations on the \dap{} for which you don't need an editor at all.
-  Modifying configurations from your computer is a more advanced feature
-  which you probably won't need.
+	\begin{description}
+		
+		\item[ZIP utility.]	  Rockbox is distributed as an archive using the 
+		\fname{.zip} format. Thus you need a tool to handle that compressed 
+		format. Usually your computer should have a tool installed that can 
+		handle the \fname{.zip} file format. Windows XP has builtin support for 
+		\fname{.zip} files and presents them to you as folders unless you have 
+		installed a third party program that handles compressed files.   For 
+		other operating systems this may vary. If the \fname{.zip} file format 
+		is not recognized on your computer you can find a program to handle them 
+		at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/} which 
+		can be downloaded and used free of charge.
+
+		\item[USB connection.]  To transfer Rockbox to your \dap{} you need to 
+		connect it to your computer. To proceed you need to know where to access the 
+		\dap{}. On Windows this means you need to figure out the drive letter 
+		associated with the device. On Linux you need to know the mount point of 
+		your \dap{}.
+
+  \opt{ipod}
+  	{
+     \note
+    	{
+    	Your \dap{} should enter disk mode automatically when connected to a 
+     	computer via USB.  If your computer does not recognize your \dap{}, you 
+     	may need to enter the disk mode manually.  Disconnect your \dap{} 
+     	from the computer.  Reset the \dap{} by pressing and holding the 
+     	\ButtonMenu{} and \ButtonSelect{} buttons	simultaneously. As soon as the 
+     	\dap{} resets, press and hold the	\ButtonMenu{} and \ButtonPlay{} buttons 
+     	simultaneously.  Your \dap{} should enter disk mode, and you can try 
+     	reconnecting to the computer.
+    	}
+    }
+
+		\item[Text editor.]  As you will see in the following chapters, Rockbox is 
+		highly configurable.  In addition to saving configurations within Rockbox, 
+		Rockbox also allows you to create customized configuration files.  If you 
+		would like to edit custom configuration files on your computer, you will 
+		need a text editor like Windows' ``Wordpad''.
+
 \end{description}
 
 
-
 \section{Installing Rockbox}\label{sec:installing_rockbox}
-\opt{MASCODEC}{
-  \subsection{Using the windows installer}
+
+\opt{MASCODEC}
+	{
+	\subsection{Using the windows installer}
   Using the Windows self installing executable to install Rockbox is the 
   easiest method of installing the software on your \dap{}.  Simply follow the
   on-screen instructions and select the appropriate drive letter and 
@@ -50,89 +65,110 @@ software.
   \subsection{Manual installation}
   For non{}-Windows users and those wishing to install manually from the archive
   the procedure is still fairly simple.
-}
-\opt{SWCODEC}{
+	}
+
+\opt{SWCODEC}
+	{
   \subsection{Introduction}
+  
   There are two separate components of Rockbox that need to be installed in 
   order to run Rockbox.
-  \begin{enumerate}
-  \item The Rockbox bootloader. This is the component of Rockbox that is 
-    installed to the flash memory of your \playerman. The bootloader is the 
-    program that tells your \dap{} how to boot and load other components of 
-    Rockbox.
-  \item The Rockbox firmware. Unlike the \playerman\ firmware which runs 
-    entirely from flash memory, most of the Rockbox code is contained in the 
-    build that resides on your \daps{} hard drive. This makes it easy to update
-    Rockbox. The build consist of a file named \firmwarefilename\ and a 
-    directory called \fname{.rockbox} which are located in the root directory 
-    of your hard drive.
-  \end{enumerate}
+  
+  \begin{description}
+  
+  	\item[The Rockbox bootloader.] The bootloader is the program that tells your 
+  	\dap{} how to boot and load other components of Rockbox. This is the 
+  	component of Rockbox that is installed to the flash memory of your 
+  	\playerman. 
+  
+  	\item[The Rockbox firmware.] Unlike the \playerman\ firmware, which runs 
+  	entirely from flash memory, most of the Rockbox code is contained in a 
+  	``build'' that resides on your \daps{} hard drive. This makes it easy to 
+  	update Rockbox. The build consists of a file named \firmwarefilename\ and a 
+  	directory called \fname{.rockbox}, both of which are located in the root 
+  	directory of your hard drive.
+    
+  \end{description}
 	
-% Installing the bootloader
-\opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
-\opt{ipod4g,ipod3g,ipodcolor,ipodnano,ipodmini,ipodvideo}
-  {\input{getting_started/ipod_install.tex}}
-\opt{x5}{\input{getting_started/iaudio_install.tex}}
+	\subsection{Installing the bootloader}
+		\opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
+		\opt{ipod}{\input{getting_started/ipod_install.tex}}
+		\opt{x5}{\input{getting_started/iaudio_install.tex}}
 
   \subsection{Installing the firmware} 
-  
-  After installing the bootloader, the installation becomes fairly easy.}
-  There are three different types of firmware binaries from Rockbox website:
-  Current Version, Daily Build and Bleeding Edge.
-  You need to decide which one you want to install and get the version for
-  your \dap{}.
+  	After installing the bootloader, the installation becomes fairly easy. 
+	} 
+	  
+There are three different types of firmware binaries from Rockbox website: 
+current version, daily build and CVS build. You need to decide which one 	you 
+want to install and get the version for your \dap{}.
 
 \begin{description}
-\item[Current Version.] The current version is the latest stable version
-  developed by the Rockbox Team. It's free of known critical bugs.  It is
-  available from \url{http://www.rockbox.org/download/}. The current version
-  includes everything meaning you won't need to download the fonts package
-  separately.
-  \opt{SWCODEC}{\note{currently there hasn't been any stable release for
-    \playername{}!}}
+
+	\item[Current Version.] The current version is the latest stable release, free 
+	of known critical bugs.  The current stable release of Rockbox, version 2.5, 
+	is available at \url{http://www.rockbox.org/download/}. 		
+		\opt{SWCODEC}{ 
+			\note{The current stable release is available only for Archos jukeboxes. 
+			There has not yet been a stable release for the	\playername{}.  Until 
+			there is a stable release for \playername{}, use a daily build or CVS build.
+			}
+		}
   
-\item[Daily Build.] The Daily Build is a development version of Rockbox. It
-  supports all new features and patches developed since last stable version. It
-  may also contain bugs! This version is generated automatically every day
-  and can be found at \url{http://www.rockbox.org/daily.shtml}.
-  The daily builds don't include the fonts (as they change rarely).
-  When installing Rockbox for the first time you should install the fonts
-  package.
+		\item[Daily Build.] The daily build is a development version of Rockbox. It
+		contains features and patches developed since last stable version.  It 
+		may also contain bugs! This daily build is generated automatically every day 
+		and can be found at \url{http://www.rockbox.org/daily.shtml}. 
   
-\item[Bleeding Edge.] Bleeding edge builds are the same as the Daily build, 
-  but built from the latest development on each commit to the CVS repository.
-  These builds are for people who want to test the code that developers just
-  checked in.
+		\item[CVS Build (formerly, ``Bleeding Edge Build.'')] CVS stands for 
+		``Concurrent Versions System.'' CVS is the system that Rockbox 
+		developers use to keep track of changes to the Rockbox source code. CVS 
+		builds are made automatically every time there is a change to the 
+		Rockbox source. These builds are for people who want to	test the code 
+		that developers just checked in. 
+		
 \end{description}
+	
+	\nopt{player}{
+		\note{
+			Rockbox has a fonts package that is available at 
+			\url{http://www.rockbox.org/daily.shtml}.  While the daily builds and CVS
+			builds change frequently, the fonts package rarely changes.  Thus, the 
+			fonts package is not included in the daily builds and CVS builds. (The 
+			stable release, on the other hand, does not change, so fonts are 
+			include with the stable release.)  When installing Rockbox for the 
+			first time, you should install the	fonts package. 
+			}
+		}
 
-If you don't want to get undefined behaviour from your \dap\ you should
-really stick to the Current Version. Development versions may have lots of
-changes so they may behave completely different than described in this manual,
-introduce new (and maybe annoying) bugs and similar. If you want to help the
-project development you can try development builds and help by reporting bugs,
-feature requests and so so. But be aware that using a development build may
-eat also some more time.
+Because daily builds and CVS builds are development versions which change 
+frequently, they may behave differently than described in this manual, or 
+they may introduce new (and maybe annoying) bugs. If you do not want to get 
+undefined behaviour from your \dap\ you should really stick to the current 
+stable release, if there is one for your \dap{}. If you want to help the 
+project development, you can try development builds and help by reporting 
+bugs. Just be aware that these are development builds that are 	highly 
+functional, but not perfect!
 
-After downloading the Rockbox package connect your \dap{} to the 
-computer via USB as described in the manual that came with your \dap{}.
-Take the file that you downloaded above, and unpack
-its contents to your \playerman{}'s drive.
+After downloading the Rockbox package connect your \dap{} to the computer via 
+USB as described in the manual that came with your \dap{}. Take the file that 
+you downloaded above, and extract its contents to your \daps{} drive.
 
-You will need to unpack all of the files in the archive onto your hard disk. 
-If this has been done correctly, you will have a file called 
-\fname{\firmwarefilename} in the main folder of your \daps{} drive, and 
-also a folder called /\fname{.rockbox}, which contains a number of system 
-files needed by Rockbox.
+Use the ``Extract all'' command of your unzip program to extract the files in 
+the \fname{.zip} file onto your \dap{}. Note that the entire contents of the 
+\fname{/zip} file should be extracted directly to the root of your \daps{} 
+drive.  Do not try to create a separate directory or folder on your \dap{} for 
+the Rockbox files!  The \fname{.zip} file already contains the internal 
+directory structure that Rockbox needs. 
 
-\nopt{player}{
-  \note{If this is the first time you are installing Rockbox, you should also 
-  download the ``Fonts'' package available on the Daily Builds page.}
-}%
-
-\note{Please note that the firmware folder starts with a leading dot. You may 
-  experience problems when trying to create such folders when using Windows.
-  Directly unzipping to your \daps{} drive works flawlessly; it is only Windows'
-  Explorer that is limited in handling such files.}
+	\note{
+		If the contents of the \fname{.zip} file are extracted correctly, you 	will 
+		have a file called \fname{\firmwarefilename} in the main folder of 	your 
+		\daps{} drive, and also a folder called /\fname{.rockbox}, which 	contains a 
+		number of other folders and system files needed by Rockbox. If you receive a 
+		``-1'' error when you start Rockbox, you have not extracted the contents of 
+		the \fname{.zip} file to the proper location. 
+		}
 
 \section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support} 
 If you wish to use speech support you will also need a language file, available
@@ -148,45 +184,83 @@ and turn the unit off. When you next turn the unit on, Rockbox should load. When
 you see the Rockbox splash screen, Rockbox is loaded and ready for use.
 
 \opt{ipod}{
-\note{Rockbox starts in the \setting{File Browser}. If you have loaded music
-onto your player using Itunes, you will not be able to see your music because
-Itunes changes your files' names and hides them in directories in the
-\fname{Ipod\_Control} folder. You can view files placed on your \dap{} by Itunes
-by initializing and using Rockbox's Tag Cache. See \reference{ref:tagcache} for
-more information.}
-}
+	\note{
+		Rockbox starts in the \setting{File Browser}. If you have loaded music onto 
+		your player using Itunes, you will not be able to see your music because 
+		Itunes changes your files' names and hides them in directories in the 
+		\fname{Ipod\_Control} folder. You can view files placed on your \dap{} by 
+		Itunes by initializing and using Rockbox's Tag Cache. See 
+		\reference{ref:tagcache} for more information. 
+		} 
+	}
 
 \section{Updating Rockbox} Updating Rockbox is easy. Download a Rockbox build.
 (The latest release of the Rockbox software will always be available from 
 \url{http://www.rockbox.org/download/}). Unzip the build to the root directory 
 of your \dap{} like you did in the installation step before. If your unzip
 program asks you whether to overwrite files, choose the ``Yes to all'' option.
-The new build will be installed over your current build replacing that.
+The new build will be installed over your current build.
 
-\note{Settings are stored on an otherwise-unused sector of your hard disk, not 
-in any of the files contained in the Rockbox build.  Therefore, generally 
-speaking, installing a new build does \emph{not} reset Rockbox to its default 
-settings.  Be aware, however, that from time to time, a change is made to the 
-Rockbox source code that \emph{does} cause settings to be reset to their 
-defaults when a Rockbox build is updated.  Thus it is recommended to save your
-settings using the \setting{Manage Settings} $\rightarrow$ \setting{Write .cfg
-file} function before updating your Rockbox build so that you can easily restore
-the settings if necessary.  For additional information on how to save, load, and
-reset Rockbox's settings, see \reference{ref:SystemOptions}.}
+\note{
+	Settings are stored on an otherwise-unused sector of your hard disk, not in 
+	any of the files contained in the Rockbox build.  Therefore, generally 
+	speaking, installing a new build does \emph{not} reset Rockbox to its default 
+	settings.  Be aware, however, that from time to time, a change is made to the 
+	Rockbox source code that \emph{does} cause settings to be reset to their 
+	defaults when a Rockbox build is updated.  Thus it is recommended to save your 
+	settings using the \setting{Manage Settings} $\rightarrow$ \setting{Write .cfg 
+	file} function before updating your Rockbox build so that you can easily 
+	restore the settings if necessary.  For additional information on how to save, 
+	load, and reset Rockbox's settings, see \reference{ref:SystemOptions}. 
+	}
 
 \section{Uninstalling Rockbox}
-If you would like to go back to using the original \playerman\ software, then
-connect the \playerman\ to your computer, and delete the
-\fname{\firmwarefilename} file. If you wish to clean up your disk, you may also
-wish to delete the \fname{.rockbox} folder and its contents. Turn the
-\playerman\ off and on and the original \playerman\ software will load.
 
-\opt{h1xx,h300}{\note{There's no need to remove the installed boot loader. If you
-  want to remove it simply flash an unpatched \playerman{} firmware.
-  Be aware that doing so will also remove the bootloader USB mode. As that
-  mode can come in quite handy (especially when having disk errors) it is
-  recommended to keep the bootloader. It also gives you the possibility
-  of trying Rockbox anytime later by simply installing the distribution
-  files.}
-}
+If you would like to go back to using the original \playerman{} software, then
+connect the \playerman{} to your computer, and delete the
+\fname{\firmwarefilename} file. 
 
+	\optv{ipod}{
+		Next, open a command window (Windows) or a terminal window (Mac or Linux). 
+		Navigate to the folder you created when you downloaded the 
+		\fname{ipodpatcher} program you used to install the Rockbox bootloader. 
+		Type the following command:
+		
+			\begin{code}
+				ipodpatcher -r \emph{N} bootpartition.bin
+			\end{code}
+			
+		Remember that \emph{N} is the number that you found when you installed 
+		Rockbox on your \playerman{}.
+		}
+		
+If you wish to clean up your disk, you may also wish to delete the 
+\fname{.rockbox} folder and its contents. Turn the \playerman{} off.
+
+\opt{h300}{Press and hold the \ButtonRec{} button.}
+
+Turn the \dap{} back on and the original \playerman{} software will load.
+
+\opt{h1xx}{ 
+	\note{
+		There's no need to remove the installed bootloader. If you want to remove it 
+		simply flash an unpatched \playerman{} firmware. Be aware that doing so will 
+		also remove the bootloader USB mode. As that mode can come in quite handy 
+		(especially when having disk errors) it is recommended to keep the 
+		bootloader. It also gives you the possibility of trying Rockbox anytime 
+		later by simply installing the distribution files. 
+		}
+	}
+
+\opt{h300}{ 
+	\note{
+		There's no need to remove the installed bootloader, although you if you 
+		retain the Rockbox bootloader, you will need to hold the \ButtonRec{} button 
+		each time you want to start the original firmware. If you want to remove it 
+		simply flash an unpatched \playerman{} firmware. Be aware that doing so will 
+		also remove the bootloader USB mode. As that mode can come in quite handy 
+		(especially when having disk errors), you may wish to keep the bootloader. 
+		It also gives you the possibility of trying Rockbox anytime later by simply 
+		installing a new build. 
+		}
+	}
