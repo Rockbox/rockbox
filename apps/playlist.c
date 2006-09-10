@@ -501,6 +501,14 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         
         p = (unsigned char *)buffer;
 
+        /* utf8 BOM at beginning of file? */
+        if(i == 0 && nread > 3 
+           && *p == 0xef && *(p+1) == 0xbb && *(p+2) == 0xbf) {
+            nread -= 3;
+            p += 3;
+            i += 3;
+        }
+
         for(count=0; count < nread; count++,p++) {
 
             /* Are we on a new line? */

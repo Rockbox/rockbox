@@ -106,6 +106,7 @@ const struct filetype filetypes[] = {
     { "sid", TREE_ATTR_MPA, Icon_Audio, VOICE_EXT_MPA },
 #endif
     { "m3u", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
+    { "m3u8", TREE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "cfg", TREE_ATTR_CFG, Icon_Config, VOICE_EXT_CFG },
     { "wps", TREE_ATTR_WPS, Icon_Wps, VOICE_EXT_WPS },
 #ifdef HAVE_REMOTE_LCD
