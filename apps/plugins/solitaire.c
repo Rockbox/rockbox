@@ -741,9 +741,9 @@ unsigned char rem;
 /* upper visible card from the remains' stack */
 unsigned char cur_rem;
 /* number of cards drawn from the remains stack - 1 */
-unsigned char count_rem;
+char count_rem;
 /* number of cards per draw of the remains' stack */
-int cards_per_draw;
+char cards_per_draw;
 
 /* the 7 game columns */
 unsigned char cols[COL_NUM];
@@ -917,7 +917,6 @@ unsigned char find_last_card( unsigned char col )
     }
     else
     {
-        //c = rem;
         c = cur_rem;
     }
 
@@ -973,7 +972,8 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
             /* this is a winning combination */
             cols[dest_col] = src_card;
         }
-        /* ... or check if the cards follow one another and have same suit */
+        /* ... or check if the cards follow one another and have
+         * different colorsuit */
         else if(( deck[dest_card].suit + deck[src_card].suit)%2==1
                   && deck[dest_card].num == deck[src_card].num + 1 )
         {
@@ -1012,7 +1012,7 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         /* ... or, well that's not good news */
         else
         {
-            /* this is not a winnong combination */
+            /* this is not a winning combination */
             return MOVE_NOT_OK;
         }
     }
@@ -1031,7 +1031,6 @@ enum move move_card( unsigned char dest_col, unsigned char src_card )
         if( src_card_prev == NOT_A_CARD )
         {
             rem = deck[src_card].next;
-            //count_rem--;
         }
         /* if src card is not the first card from the stack */
         else
@@ -1260,24 +1259,29 @@ int solitaire( void )
             deck[rem].known = true;
         }
 
-        if( rem != NOT_A_CARD )
+        if( rem != NOT_A_CARD && cur_rem != NOT_A_CARD )
         {
-            if( count_rem >= cards_per_draw )
-                count_rem = cards_per_draw-1;
-            if( cur_rem != NOT_A_CARD )
+            if( count_rem < 0 )
             {
-                prevcard = cur_rem;
-                j = CARD_WIDTH+2*MARGIN+1;
-                for( i = 0; i < count_rem; i++ )
-                    prevcard = find_prev_card(prevcard);
-                for( i = 0; i <= count_rem; i++ )
+                prevcard = rem;
+                count_rem = 0;
+                while( prevcard != cur_rem && count_rem < cards_per_draw-1 )
                 {
-                    draw_card( deck[prevcard], j,
-                               MARGIN, sel_card == prevcard,
-                               cur_card == prevcard, i < count_rem );
                     prevcard = deck[prevcard].next;
-                    j += NUMBER_WIDTH+2;
+                    count_rem++;
                 }
+            }
+            prevcard = cur_rem;
+            j = CARD_WIDTH+2*MARGIN+1;
+            for( i = 0; i < count_rem; i++ )
+                prevcard = find_prev_card(prevcard);
+            for( i = 0; i <= count_rem; i++ )
+            {
+                draw_card( deck[prevcard], j,
+                           MARGIN, sel_card == prevcard,
+                           cur_card == prevcard, i < count_rem );
+                prevcard = deck[prevcard].next;
+                j += NUMBER_WIDTH+2;
             }
         }
         if( ( cur_rem == NOT_A_CARD || rem == NOT_A_CARD )
@@ -1419,11 +1423,7 @@ int solitaire( void )
                 if( lastbutton != SOL_CUR2STACK_PRE )
                     break;
 #endif
-                if( cur_card != NOT_A_CARD )
-                {
-                    move_card( deck[cur_card].suit + STACKS_COL, cur_card );
-                    sel_card = NOT_A_CARD;
-                }
+                move_card( deck[cur_card].suit + STACKS_COL, cur_card );
                 break;
 
             /* Move cards arround, Uncover cards, ... */
@@ -1458,20 +1458,17 @@ int solitaire( void )
                 {
                     /* unselect card or try putting card on
                      * one of the 4 stacks */
-                    move_card( deck[sel_card].suit + COL_NUM, sel_card );
-                    sel_card = NOT_A_CARD;
-                    if( cur_col == REM_COL )
+                    if( move_card( deck[sel_card].suit + COL_NUM, sel_card )
+                        == MOVE_OK && cur_col == REM_COL )
                     {
                         cur_card = cur_rem;
                     }
+                    sel_card = NOT_A_CARD;
                 }
                 else
                 {
                     /* try moving cards */
-                    if( move_card( cur_col, sel_card ) == MOVE_OK )
-                    {
-                        sel_card = NOT_A_CARD;
-                    }
+                    move_card( cur_col, sel_card );
                 }
                 break;
 
@@ -1482,11 +1479,7 @@ int solitaire( void )
                 if( lastbutton != SOL_REM2CUR_PRE )
                     break;
 #endif
-                if( move_card( cur_col, cur_rem ) == MOVE_OK )
-                {
-                    //count_rem--;
-                    sel_card = NOT_A_CARD;
-                }
+                move_card( cur_col, cur_rem );
                 break;
 
             /* If the card on top of the remains can be put on one
@@ -1496,15 +1489,7 @@ int solitaire( void )
                 if( lastbutton != SOL_REM2STACK_PRE )
                     break;
 #endif
-                if( cur_rem != NOT_A_CARD )
-                {
-                    if( move_card( deck[cur_rem].suit + COL_NUM, cur_rem )
-                        == MOVE_OK )
-                    {
-                        sel_card = NOT_A_CARD;
-                        //count_rem--;
-                    }
-                }
+                move_card( deck[cur_rem].suit + COL_NUM, cur_rem );
                 break;
 
 #ifdef SOL_REM
