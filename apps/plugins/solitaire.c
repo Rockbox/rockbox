@@ -741,9 +741,9 @@ unsigned char rem;
 /* upper visible card from the remains' stack */
 unsigned char cur_rem;
 /* number of cards drawn from the remains stack - 1 */
-char count_rem;
+signed char count_rem;
 /* number of cards per draw of the remains' stack */
-char cards_per_draw;
+signed char cards_per_draw;
 
 /* the 7 game columns */
 unsigned char cols[COL_NUM];
