@@ -315,6 +315,22 @@ static bool remote_caption_backlight(void)
     return set_bool((char *)str(LANG_CAPTION_BACKLIGHT),
                     &global_settings.remote_caption_backlight);
 }
+
+#ifdef HAS_REMOTE_BUTTON_HOLD
+static bool remote_backlight_on_button_hold(void)
+{
+    static const struct opt_items names[3] = {
+        { STR(LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL) },
+        { STR(LANG_OFF) },
+        { STR(LANG_ON) },
+    };
+    return set_option(str(LANG_BACKLIGHT_ON_BUTTON_HOLD),
+                      &global_settings.remote_backlight_on_button_hold,
+                      INT, names, 3,
+                      remote_backlight_set_on_button_hold);
+}
+#endif /* HAS_BUTTON_HOLD */
+
 #endif /* HAVE_REMOTE_LCD */
 
 #ifdef HAVE_LCD_CONTRAST
@@ -1886,6 +1902,9 @@ static bool lcd_remote_settings_menu(void)
 #ifdef CONFIG_CHARGING
         { ID2P(LANG_BACKLIGHT_ON_WHEN_CHARGING),
                                       remote_backlight_timer_plugged },
+#endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+        { ID2P(LANG_BACKLIGHT_ON_BUTTON_HOLD), remote_backlight_on_button_hold },
 #endif
         { ID2P(LANG_CAPTION_BACKLIGHT), remote_caption_backlight },
         { ID2P(LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS), set_remote_bl_filter_first_keypress },

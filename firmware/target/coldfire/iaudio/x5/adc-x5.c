@@ -35,6 +35,7 @@ static int channelnum[] =
 
 unsigned short adc_scan(int channel)
 {
+    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned char data;
     
     pcf50606_write(0x2f, 0x80 | (channelnum[channel] << 1) | 1);
@@ -42,6 +43,7 @@ unsigned short adc_scan(int channel)
 
     adcdata[channel] = data;
 
+    set_irq_level(level);
     return data;
 }
 

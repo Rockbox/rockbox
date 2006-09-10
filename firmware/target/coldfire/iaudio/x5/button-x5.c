@@ -41,7 +41,7 @@ bool button_hold(void)
 
 bool remote_button_hold(void)
 {
-    return false; /* TODO X5 */
+    return adc_scan(ADC_REMOTE) < 0x17;
 }
 
 int button_read_device(void)
@@ -51,6 +51,7 @@ int button_read_device(void)
     static bool hold_button = false;
     static bool remote_hold_button = false;
     bool hold_button_old;
+    bool remote_hold_button_old;
 
     /* normal buttons */
     hold_button_old = hold_button;
@@ -90,14 +91,15 @@ int button_read_device(void)
     }
 
     /* remote buttons */
-
-    /* TODO: add light handling for the remote */
-
-    remote_hold_button = remote_button_hold();
+    remote_hold_button_old = remote_hold_button;
 
     data = adc_scan(ADC_REMOTE);
-    if(data < 0x17)
-        remote_hold_button = true;
+    remote_hold_button = data < 0x17;
+
+#ifndef BOOTLOADER
+    if (remote_hold_button != remote_hold_button_old)
+        remote_backlight_hold_changed(remote_hold_button);
+#endif
 
     if(!remote_hold_button)
     {

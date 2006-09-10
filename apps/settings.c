@@ -647,6 +647,14 @@ static const struct bit_entry hd_bits[] =
     {8|SIGNED, S_O(rec_agc_maxgain_line), 96, "agc maximum line gain", NULL},
     {3, S_O(rec_agc_cliptime), 1, "agc cliptime", "0.2s,0.4s,0.6s,0.8,1s"},
 #endif
+
+#ifdef HAVE_REMOTE_LCD
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    {2, S_O(remote_backlight_on_button_hold), 0, "remote backlight on button hold",
+        "normal,off,on" },
+#endif
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 
@@ -1108,7 +1116,10 @@ void settings_apply(void)
 #ifdef CONFIG_CHARGING
     remote_backlight_set_timeout_plugged(global_settings.remote_backlight_timeout_plugged);
 #endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    remote_backlight_set_on_button_hold(global_settings.remote_backlight_on_button_hold);
 #endif
+#endif /* HAVE_REMOTE_LCD */
 #ifdef CONFIG_BACKLIGHT
     backlight_set_timeout(global_settings.backlight_timeout);
 #ifdef CONFIG_CHARGING

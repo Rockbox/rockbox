@@ -354,11 +354,15 @@ struct user_settings
                                then according to timeout_values[] */
     int remote_backlight_timeout_plugged;
     bool remote_caption_backlight; /* turn on backlight at end and start of track */
+#ifdef HAS_REMOTE_BUTTON_HOLD
+    int remote_backlight_on_button_hold; /* what to do with remote backlight when hold
+                                            switch is on */
+#endif
 #ifdef HAVE_REMOTE_LCD_TICKING
     bool remote_reduce_ticking; /* 0=normal operation,
                                    1=EMI reduce on with cost more CPU. */
 #endif
-#endif
+#endif /* HAVE_REMOTE_LCD */
     
     bool next_folder; /* move to next folder */
     bool runtimedb;   /* runtime database active? */
@@ -446,10 +450,12 @@ struct user_settings
     bool remote_bl_filter_first_keypress; /* filter first remote keypress when remote dark? */
 #endif
 #ifdef HAS_BUTTON_HOLD
-    int backlight_on_button_hold;
+    int backlight_on_button_hold; /* what to do with backlight when hold
+                                     switch is on */
 #endif
 #ifdef HAVE_LCD_SLEEP
-    int lcd_sleep_after_backlight_off;
+    int lcd_sleep_after_backlight_off; /* when to put lcd to sleep after backlight
+                                          has turned off */
 #endif
 #endif /* CONFIG_BACKLIGHT */
 

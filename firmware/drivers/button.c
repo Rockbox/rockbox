@@ -845,6 +845,7 @@ static int button_read(void)
     static int prev_data = 0xff;
     static int last_valid = 0xff;
     bool hold_button_old;
+    bool remote_hold_button_old;
 
     /* normal buttons */
     hold_button_old = hold_button;
@@ -916,12 +917,13 @@ static int button_read(void)
     }
 
     /* remote buttons */
+    remote_hold_button_old = remote_hold_button;
     remote_hold_button = remote_button_hold_only();
 
-    if (remote_hold_button && !remote_button_hold_only())
-    {
-        remote_backlight_on();
-    }
+#ifndef BOOTLOADER
+    if (remote_hold_button != remote_hold_button_old)
+        remote_backlight_hold_changed(remote_hold_button);
+#endif
 
     if (!remote_hold_button)
     {

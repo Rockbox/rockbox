@@ -25,27 +25,35 @@ bool is_backlight_on(void);
 void backlight_on(void);
 void backlight_off(void);
 void backlight_set_timeout(int index);
+
 #ifdef CONFIG_BACKLIGHT
 void backlight_init(void);
+
 #if defined(IAUDIO_X5) && !defined(SIMULATOR)
 #define X5_BACKLIGHT_SHUTDOWN
 void x5_backlight_shutdown(void);
 #endif
+
 int  backlight_get_current_timeout(void);
+
 #ifdef HAVE_BACKLIGHT_PWM_FADING
 void backlight_set_fade_in(int index);
 void backlight_set_fade_out(int index);
 #endif
+
 void backlight_set_timeout_plugged(int index);
 extern const signed char backlight_timeout_value[];
+
 #ifdef HAS_BUTTON_HOLD
-void backlight_set_on_button_hold(int index);
 void backlight_hold_changed(bool hold_button);
+void backlight_set_on_button_hold(int index);
 #endif
+
 #ifdef HAVE_LCD_SLEEP
 void lcd_set_sleep_after_backlight_off(int index);
 extern const signed char lcd_sleep_timeout_value[];
 #endif
+
 #else /* ndef CONFIG_BACKLIGHT */
 #define backlight_init()
 #endif /* CONFIG_BACKLIGHT */
@@ -56,15 +64,20 @@ void remote_backlight_off(void);
 void remote_backlight_set_timeout(int index);
 void remote_backlight_set_timeout_plugged(int index);
 bool is_remote_backlight_on(void);
+
+#ifdef HAS_REMOTE_BUTTON_HOLD
+void remote_backlight_hold_changed(bool rc_hold_button);
+void remote_backlight_set_on_button_hold(int index);
 #endif
+#endif /* HAVE_REMOTE_LCD */
 
 #ifdef SIMULATOR
 void sim_backlight(int value);
 void sim_remote_backlight(int value);
 #endif
-#endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
+
 #ifdef IAUDIO_X5
 /* PFC50506 can output 0%-100% duty cycle but D305A expects %15-100%. */
 #define MIN_BRIGHTNESS_SETTING      1  /* 15/16 (93.75%) */
@@ -74,7 +87,9 @@ void sim_remote_backlight(int value);
 #define MIN_BRIGHTNESS_SETTING      2  /*  2/16 (12.50%) */
 #define MAX_BRIGHTNESS_SETTING      15 /* 15/16 (93.75%) */
 #define DEFAULT_BRIGHTNESS_SETTING  9  /*  9/16 (56.25%) */
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#endif
 
 void backlight_set_brightness(int val);
-#endif
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+
+#endif /* BACKLIGHT_H */

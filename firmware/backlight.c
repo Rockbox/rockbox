@@ -178,6 +178,9 @@ static int remote_backlight_timeout = 5*HZ;
 #ifdef CONFIG_CHARGING
 static int remote_backlight_timeout_plugged = 5*HZ;
 #endif
+#ifdef HAS_REMOTE_BUTTON_HOLD
+static int remote_backlight_on_button_hold = 0;
+#endif
 #endif
 
 #ifdef HAVE_LCD_SLEEP
@@ -461,6 +464,10 @@ static void remote_backlight_update_state(void)
     if (remote_backlight_timer < 0)
     {
         remote_backlight_timer = 0; /* Disable the timeout */
+#ifdef HAS_REMOTE_BUTTON_HOLD
+        if (remote_backlight_on_button_hold == 2 && remote_button_hold())
+            return; /* Keep on if "On" */
+#endif
         __remote_backlight_off();
     }
     else
@@ -471,8 +478,18 @@ static void remote_backlight_update_state(void)
             backlight_update_state();
         }
         else
-#endif 
+#endif
+        {
+#ifdef HAS_REMOTE_BUTTON_HOLD
+            if (remote_backlight_on_button_hold == 1 && remote_button_hold())
+            {
+                /* Keep off if "Off". */
+                remote_backlight_timer = 0; /* Disable the timeout */
+                return;
+            }
+#endif
             __remote_backlight_on();
+        }
     }
 }
 #endif /* HAVE_REMOTE_LCD */
@@ -493,9 +510,15 @@ void backlight_thread(void)
 
             case REMOTE_BACKLIGHT_OFF:
                 remote_backlight_timer = 0; /* Disable the timeout */
+#ifdef HAS_REMOTE_BUTTON_HOLD
+                if (remote_backlight_on_button_hold == 2 &&
+                    remote_button_hold())
+                    break; /* Keep on if "On" */
+#endif
                 __remote_backlight_off();
                 break;
-#endif
+#endif /* HAVE_REMOTE_LCD */
+
             case BACKLIGHT_ON:
                 backlight_update_state();
                 break;
@@ -701,9 +724,7 @@ void backlight_hold_changed(bool hold_button)
        set to "Normal" */
     /* Queue or freeze */
     if (hold_button && backlight_on_button_hold == 1)
-    {
         backlight_off(); /* setting == Off */
-    }
     else  /* setting == On, Normal, no hold button, or anything else */
         backlight_on();
 }
@@ -773,6 +794,34 @@ void remote_backlight_set_timeout_plugged(int index)
     remote_backlight_update_state();
 }
 #endif /* CONFIG_CHARGING */
+
+#ifdef HAS_REMOTE_BUTTON_HOLD
+/* Remote hold button change event handler. */
+void remote_backlight_hold_changed(bool rc_hold_button)
+{
+    /* Hold switch overrides all backlight behavior except when
+       set to "Normal" */
+    /* Queue or freeze */
+    if (rc_hold_button && remote_backlight_on_button_hold == 1)
+        remote_backlight_off(); /* setting == Off */
+    else  /* setting == On, Normal, no hold button, or anything else */
+        remote_backlight_on();
+
+}
+
+void remote_backlight_set_on_button_hold(int index)
+{
+    if ((unsigned)index >= 3)
+        /* if given a weird value, use default */
+        index = 0;
+
+    if (index == remote_backlight_on_button_hold)
+        return;
+
+    remote_backlight_on_button_hold = index;
+    remote_backlight_hold_changed(remote_button_hold());
+}
+#endif /* HAS_REMOTE_BUTTON_HOLD */
 
 /* return value in ticks; 0 means always on, <0 means always off */
 int remote_backlight_get_current_timeout(void)
