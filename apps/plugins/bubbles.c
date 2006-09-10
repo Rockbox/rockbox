@@ -2398,6 +2398,9 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             break;
 
         case BUBBLES_SELECT: /* fire the shot */
+#if CONFIG_KEYPAD == IRIVER_H10_PAD
+        case BUBBLES_UP: /* easier to press on H10 */
+#endif
             if(!animblock) {
                 bb->elapsedlvl += bb->elapsedshot;
                 bb->elapsedshot = 0;
@@ -2519,6 +2522,22 @@ static int bubbles(struct game_context* bb) {
                                 "OFF to exit, "
                                 "UP to fire and show high scores, "
                                 "LEFT/RIGHT to aim and to change level.");
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define BUBBLES_LEFT   BUTTON_LEFT
+#define BUBBLES_RIGHT  BUTTON_RIGHT
+#define BUBBLES_UP     BUTTON_SCROLL_UP
+#define BUBBLES_DOWN   BUTTON_SCROLL_DOWN
+#define BUBBLES_QUIT   BUTTON_POWER
+#define BUBBLES_START  BUTTON_PLAY
+#define BUBBLES_SELECT BUTTON_REW
+#define BUBBLES_RESUME BUTTON_FF
+            rb->lcd_puts(0, 2, "PLAY to start/pause");
+            rb->lcd_puts(0, 3, "FF to save/resume");
+            rb->lcd_puts(0, 4, "POWER to exit");
+            rb->lcd_puts(0, 5, "REW/UP to fire");
+            rb->lcd_puts(0, 6, " and show high scores");
+            rb->lcd_puts(0, 7, "LEFT/RIGHT to aim");
+            rb->lcd_puts(0, 8, "UP/DOWN to change level");
 #endif
 #if LCD_WIDTH >= 138
             rb->snprintf(str, 28, "Start on level %d of %d", startlevel+1,
