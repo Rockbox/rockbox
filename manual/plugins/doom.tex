@@ -50,7 +50,10 @@ Rockdoom options, you will need to quit your current game and restart the plugin
   \emph{Headsup Display} Show the player status when in fullscreen\\
   \emph{Statusbar Always Red} Disable color response statusbar%\\
 
-  \item[InGame Main Menu: ]This menu can only be accessed from within a running game, and is displayed by  \opt{h1xx,h300}{pressing \ButtonOff}\opt{IPOD_4G_PAD}{flipping your hold switch a couple of times}
+  \item[InGame Main Menu: ]This menu can only be accessed from within a running game, and is displayed by
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{pressing \ButtonOff}
+    \opt{IPOD_3G_PAD,IPOD_4G_PAD}{flipping your hold switch a couple of times}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{pressing \ButtonPower}
 
   \emph{New Game } Start a new game\\
   \emph{Options } In game options\\
@@ -72,33 +75,47 @@ Rockdoom options, you will need to quit your current game and restart the plugin
 \subsubsection{Keys}
 \begin{table}
 \begin{btnmap}{}{}
-\opt{h1xx,h300}{\ButtonUp}
-\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonMenu}
-& Move Forward \\
-\opt{h1xx,h300}{\ButtonDown}
-\opt{ipod4g,ipodcolor,ipodvideo}{na}
-& Down \\
-\opt{h1xx,h300}{\ButtonLeft}
-\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
-& Turn Left \\
-\opt{h1xx,h300}{\ButtonRight}
-\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
-& Turn Right \\
-\opt{h1xx,h300}{\ButtonRec}
-\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonPlay}
-& Shoot \\
-\opt{h1xx,h300}{\ButtonMode}
-\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonMenu}
-& Open \\
-\opt{h1xx,h300}{\ButtonOff}
-\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{Hold switch}}
-& Escape \\
-\opt{h1xx,h300}{\ButtonSelect}
-\opt{ipod4g,ipodcolor,ipodvideo}{\fixme{tbd}}
-& Enter \\
-\opt{h1xx,h300}{\ButtonOn}
-\opt{ipod4g,ipodcolor,ipodvideo}{\ButtonSelect}
-& Change Weapon \\
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+  \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
+  \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
+    & Move Forward \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown & Down\\}
+  \opt{IRIVER_H10_PAD}{\ButtonScrollDown & Down\\}
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonLeft}
+    & Turn Left \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonRight}
+    & Turn Right \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
+  \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
+  \opt{IAUDIO_X5_PAD}{\ButtonSelect}
+  \opt{IRIVER_H10_PAD}{\ButtonRew}
+    & Shoot \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+  \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
+  \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay}
+    & Open \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+  \opt{IPOD_3G_PAD,IPOD_4G_PAD}{Hold switch}
+  \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}
+    & Escape \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IAUDIO_X5_PAD}
+    {\ButtonSelect}
+  \opt{IRIVER_H10_PAD}{\ButtonRew}
+    & Enter \\
+%
+  \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+  \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonSelect}
+  \opt{IAUDIO_X5_PAD}{\ButtonRec}
+  \opt{IRIVER_H10_PAD}{\ButtonFF}
+    & Change Weapon \\
+%
 \end{btnmap}
 \end{table}
 

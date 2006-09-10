@@ -24,7 +24,7 @@ text files, chip8 games), or from the \setting{Open with} option on the
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/chessbox.tex}}
 
-\opt{h1xx,h300,ipodcolor,ipodnano,ipodvideo}{\input{plugins/doom.tex}}
+\opt{SWCODEC}{\input{plugins/doom.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/flipit.tex}}
 
@@ -54,7 +54,7 @@ text files, chip8 games), or from the \setting{Open with} option on the
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/star.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipod3g,ipod4g,ipodcolor,ipodnano,ipodvideo,x5}{\input{plugins/sudoku.tex}}
+\opt{recorder,recorderv2fm,ondio,h1xx,ipod3g,ipod4g,HAVE_LCD_COLOR}{\input{plugins/sudoku.tex}}
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/tetrox.tex}}
 
@@ -76,7 +76,7 @@ text files, chip8 games), or from the \setting{Open with} option on the
 
 {\input{plugins/logo.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,HAVE_LCD_COLOR}{\input{plugins/mandelbrot.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/mandelbrot.tex}}
 
 {\input{plugins/mosaic.tex}}
 
@@ -94,12 +94,12 @@ text files, chip8 games), or from the \setting{Open with} option on the
 
 Viewers are plugins which are associated with specific file extensions.
 They cannot be run directly but are started by ``playing''
-the associated file.  Viewers are stored in the
+the associated file. Viewers are stored in the
 \textbf{/.rockbox/viewers/ }directory.
 
 \opt{HAVE_LCD_BITMAP}{\input{plugins/chip8emulator.tex}}
 
-\opt{recorder,recorderv2fm,ondio,h1xx,HAVE_LCD_COLOR}{\input{plugins/jpegviewer.tex}}
+\opt{HAVE_LCD_BITMAP}{\input{plugins/jpegviewer.tex}}
 
 \opt{recorder,recorderv2fm,ondio}{\input{plugins/movieplayer.tex}}
 
