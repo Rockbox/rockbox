@@ -84,6 +84,7 @@ const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_STD_PREV,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,            BUTTON_REC,                 BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_POWER,                  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 };
