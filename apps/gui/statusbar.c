@@ -77,7 +77,7 @@
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 STATUSBAR_VOLUME_WIDTH + \
                                                 STATUSBAR_PLAY_STATE_WIDTH + \
-                                                3*ICONS_SPACING
+                                                4*ICONS_SPACING - 1
 #define STATUSBAR_RECFREQ_WIDTH                 12
 #define STATUSBAR_RECCHANNELS_X_POS             STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
@@ -602,8 +602,11 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 #ifdef HAVE_RECORDING
 void gui_statusbar_icon_recording_info(struct screen * display)
 {
-    int width, height;
+#if (CONFIG_CODEC != SWCODEC) || defined(SIMULATOR)
     char buffer[4];
+#endif
+#if CONFIG_CODEC != SWCODEC
+    int width, height;
     char* const sample_rate[12] =
     {
         "8",
@@ -619,22 +622,21 @@ void gui_statusbar_icon_recording_info(struct screen * display)
         "88",
         "96"
     };
-#if CONFIG_CODEC != SWCODEC
     char* const bit_rate[9] =
     {
-        "MQ0",
-        "MQ1",
-        "MQ2",
-        "MQ3",
-        "MQ4",
-        "MQ5",
-        "MQ6",
-        "MQ7",
+        "Mq0",
+        "Mq1",
+        "Mq2",
+        "Mq3",
+        "Mq4",
+        "Mq5",
+        "Mq6",
+        "Mq7",
         "WAV"
     };
-#endif
 
     display->setfont(FONT_SYSFIXED);
+#endif
 
     /* Display Codec info in statusbar */
 #if CONFIG_CODEC == SWCODEC
@@ -644,7 +646,8 @@ void gui_statusbar_icon_recording_info(struct screen * display)
                              STATUSBAR_ENCODER_X_POS, STATUSBAR_Y_POS,
                              STATUSBAR_ENCODER_WIDTH, STATUSBAR_HEIGHT);
 #else
-    snprintf(buffer, sizeof(buffer), "%s", bit_rate[global_settings.rec_quality]);
+    snprintf(buffer, sizeof(buffer), "%s",
+                 bit_rate[global_settings.rec_quality]);
     display->getstringsize(buffer, &width, &height);
     if (height <= STATUSBAR_HEIGHT)
     {
@@ -657,9 +660,12 @@ void gui_statusbar_icon_recording_info(struct screen * display)
     if (global_settings.rec_source == SOURCE_SPDIF)
     {
 #if (CONFIG_CODEC != MAS3587F) && !defined(SIMULATOR)
-        snprintf(buffer, sizeof(buffer), "%s", sample_rate[audio_get_spdif_sample_rate()]);
+        display->mono_bitmap(bitmap_icons_12x8[audio_get_spdif_sample_rate()],
+                                STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS,
+                                STATUSBAR_RECFREQ_WIDTH, STATUSBAR_HEIGHT);
 #else
-        /* Can't measure S/PDIF sample rate on Archos/Sim yet so just display input type */
+        /* Can't measure S/PDIF sample rate on Archos/Sim yet so
+           just display input type */
         snprintf(buffer, sizeof(buffer), "Dg");
 #endif
     }
@@ -681,17 +687,22 @@ void gui_statusbar_icon_recording_info(struct screen * display)
         else if (freq == 5)
             freq = FREQ_16;
 
+#if CONFIG_CODEC == SWCODEC
+        /* samplerate icons for swcodec targets*/
+        display->mono_bitmap(bitmap_icons_12x8[freq],
+                                STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS,
+                                STATUSBAR_RECFREQ_WIDTH, STATUSBAR_HEIGHT);
+#else
+        /* hwcodec targets have sysfont characters */ 
         snprintf(buffer, sizeof(buffer), "%s", sample_rate[freq]);
+        display->getstringsize(buffer, &width, &height);
+
+        if (height <= STATUSBAR_HEIGHT)
+            display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
+
+        display->setfont(FONT_UI);
+#endif
     }
-
-    display->getstringsize(buffer, &width, &height);
-    if (height <= STATUSBAR_HEIGHT)
-    {
-        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
-    }
-
-    display->setfont(FONT_UI);
-
     /* Display Channel status in status bar */
     if(global_settings.rec_channels)
     {

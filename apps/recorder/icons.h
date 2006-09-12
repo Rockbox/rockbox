@@ -85,6 +85,24 @@ enum icons_7x8 {
     Icon7x8Last
 };
 
+#if CONFIG_CODEC == SWCODEC
+enum icons_12x8 {
+    Icon_8000,
+    Icon_11025,
+    Icon_12000,
+    Icon_16000,
+    Icon_22050,
+    Icon_24000,
+    Icon_32000,
+    Icon_44100,
+    Icon_48000,
+    Icon_64000,
+    Icon_88200,
+    Icon_96000,
+    Icon12x8Last
+};
+#endif
+
 enum icons_18x8 {
     Icon_mp364,
     Icon_mp396,
@@ -100,6 +118,9 @@ enum icons_18x8 {
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
+#if CONFIG_CODEC == SWCODEC
+extern const unsigned char bitmap_icons_12x8[Icon12x8Last][12];
+#endif
 extern const unsigned char bitmap_icons_18x8[Icon18x8Last][18];
 extern const unsigned char bitmap_icon_disk[];
 
