@@ -602,7 +602,7 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 #ifdef HAVE_RECORDING
 void gui_statusbar_icon_recording_info(struct screen * display)
 {
-#if (CONFIG_CODEC != SWCODEC) || defined(SIMULATOR)
+#if (CONFIG_CODEC != SWCODEC) || (defined(SIMULATOR) && defined(HAVE_SPDIF_IN))
     char buffer[4];
 #endif
 #if CONFIG_CODEC != SWCODEC
