@@ -59,6 +59,10 @@
 #include <time.h>
 #endif
 
+#ifdef IAUDIO_X5
+extern void pcf50606_reset_timeout(void);
+#endif
+
 /*
  * Define DEBUG_FILE to create a csv (spreadsheet) with battery information
  * in it (one sample per minute).  This is only for very low level debug.
@@ -1010,6 +1014,13 @@ void sys_poweroff(void)
 void cancel_shutdown(void)
 {
     logf("sys_cancel_shutdown()");
+
+#ifdef IAUDIO_X5
+    /* TODO: Move some things to target/ tree */
+    if (shutdown_timeout)
+        pcf50606_reset_timeout();
+#endif
+
     shutdown_timeout = 0;
 }
 
