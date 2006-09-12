@@ -607,7 +607,7 @@ void gui_statusbar_icon_recording_info(struct screen * display)
 #endif
 #if CONFIG_CODEC != SWCODEC
     int width, height;
-    char* const sample_rate[12] =
+    static char* const sample_rate[12] =
     {
         "8",
         "11",
@@ -622,7 +622,7 @@ void gui_statusbar_icon_recording_info(struct screen * display)
         "88",
         "96"
     };
-    char* const bit_rate[9] =
+    static char* const bit_rate[9] =
     {
         "Mq0",
         "Mq1",

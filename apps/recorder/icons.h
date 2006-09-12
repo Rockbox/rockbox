@@ -101,7 +101,6 @@ enum icons_12x8 {
     Icon_96000,
     Icon12x8Last
 };
-#endif
 
 enum icons_18x8 {
     Icon_mp364,
@@ -115,13 +114,15 @@ enum icons_18x8 {
     Icon_wav,
     Icon18x8Last
 };
+#endif
+
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 #if CONFIG_CODEC == SWCODEC
 extern const unsigned char bitmap_icons_12x8[Icon12x8Last][12];
-#endif
 extern const unsigned char bitmap_icons_18x8[Icon18x8Last][18];
+#endif
 extern const unsigned char bitmap_icon_disk[];
 
 #define STATUSBAR_X_POS       0
