@@ -489,6 +489,8 @@ static void button_tick(void)
                         if ((btn == POWEROFF_BUTTON
 #ifdef BUTTON_RC_STOP
                                     || btn == BUTTON_RC_STOP
+#elif defined(RC_POWEROFF_BUTTON)
+                                    || btn == RC_POWEROFF_BUTTON
 #endif
                                     ) &&
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)

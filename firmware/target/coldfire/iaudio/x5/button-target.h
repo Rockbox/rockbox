@@ -64,7 +64,8 @@ int button_read_device(void);
                 |BUTTON_RC_REW|BUTTON_RC_FF\
                 |BUTTON_RC_REC|BUTTON_RC_MENU|BUTTON_RC_MODE)
 
-#define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT 10
+#define POWEROFF_BUTTON     BUTTON_POWER
+#define RC_POWEROFF_BUTTON  BUTTON_RC_PLAY
+#define POWEROFF_COUNT      30
 
 #endif /* _BUTTON_TARGET_H_ */
