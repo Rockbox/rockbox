@@ -33,7 +33,14 @@
 
 void button_init_device(void)
 {
+    /* Enable REW, FF, Play, Left, Right, Hold buttons */
+    GPIOA_ENABLE |= 0xfc;
+    
+    /* Enable POWER button */
+    GPIOB_ENABLE |= 0x1;
+    
     /* We need to output to pin 6 of GPIOD when reading the scroll pad value */
+    GPIOD_ENABLE |= 0x40;
     GPIOD_OUTPUT_EN |= 0x40;
     GPIOD_OUTPUT_VAL |= 0x40;
 }
@@ -51,16 +58,20 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     unsigned char state;
     static bool hold_button = false;
+    bool hold_button_old;
+
+    /* Hold */
+    hold_button_old = hold_button;
+    hold_button = button_hold();
 
 #ifndef BOOTLOADER
     /* light handling */
-    if (hold_button && !button_hold())
+    if (hold_button != hold_button_old)
     {
         backlight_hold_changed(hold_button);
     }
 #endif
 
-    hold_button = button_hold();
     if (!hold_button)
     {
         /* Read normal buttons */
