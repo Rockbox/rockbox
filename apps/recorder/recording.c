@@ -195,11 +195,11 @@ bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
             return false;
 
     if (*peak_r > *peak_l)
-        balance_mem[peak_time % BAL_MEM_SIZE] =
-            MIN((10000 * *peak_r) / *peak_l - 10000, 15118);
+        balance_mem[peak_time % BAL_MEM_SIZE] = (*peak_l ? 
+            MIN((10000 * *peak_r) / *peak_l - 10000, 15118) : 15118);
     else
-        balance_mem[peak_time % BAL_MEM_SIZE] =
-            MAX(10000 - (10000 * *peak_l) / *peak_r, -15118);
+        balance_mem[peak_time % BAL_MEM_SIZE] = (*peak_r ?
+            MAX(10000 - (10000 * *peak_l) / *peak_r, -15118) : -15118);
     *balance = 0;
     int i;
     for (i = 0; i < BAL_MEM_SIZE; i++)
