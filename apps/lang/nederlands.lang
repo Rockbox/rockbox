@@ -2563,16 +2563,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Tijd split"
+    *: "Automatisch splitsen"
   </dest>
   <voice>
-    *: "Tijd split"
+    *: "Automatisch splitsen"
   </voice>
 </phrase>
 <phrase>
@@ -3591,7 +3591,7 @@
     *: "Please reboot to enable the cache"
   </source>
   <dest>
-    *: "Herstart om folder buffer te activeren"
+    *: "Herstart om map buffer te activeren"
   </dest>
   <voice>
     *: ""
@@ -7927,10 +7927,10 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
     *: "Bewaar op schijf"
@@ -8166,13 +8166,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Forceer verniewing Tag Cache"
+    *: "Vernieuw Tag Cache nu"
   </dest>
   <voice>
-    *: "Forceer verniewing Tag Cache"
+    *: "Vernieuw Tag Cache nu"
   </voice>
 </phrase>
 <phrase>
@@ -8387,7 +8387,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -9164,5 +9164,621 @@
   </dest>
   <voice>
     *: "Pitch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "Smal"
+  </dest>
+  <voice>
+    *: "Smal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Automatic Gain Control"
+  </dest>
+  <voice>
+    *: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tijd"
+  </dest>
+  <voice>
+    *: "Tijd"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per seconde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "AGC max. gain"
+  </dest>
+  <voice>
+    *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nooit"
+  </dest>
+  <voice>
+    *: "Nooit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (traag)"
+  </dest>
+  <voice>
+    *: "DJ set (traag)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importeer wijzigingen"
+  </dest>
+  <voice>
+    *: "Importeer wijzigingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Slaap (Na verlichting uit)"
+  </dest>
+  <voice>
+    *: "Slaap na verlichting uit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Bestandsgrootte"
+  </dest>
+  <voice>
+    *: "Bestandsgrootte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Afstandsbediening scherm uit"
+  </dest>
+  <voice>
+    *: "Afstandsbediening scherm uit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "Zet Hardware EQ aan"
+  </dest>
+  <voice>
+    *: "Zet Hardware EQ aan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Automatisch verversen"
+  </dest>
+  <voice>
+    *: "Automatisch verversen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Stop opname"
+  </dest>
+  <voice>
+    *: "Stop opname"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Volledig Path"
+  </dest>
+  <voice>
+    *: "Volledig Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Ververs nu"
+  </dest>
+  <voice>
+    *: "Ververs nu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normaal"
+  </dest>
+  <voice>
+    *: "Normaal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (traag)"
+  </dest>
+  <voice>
+    *: "Live (traag)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Spraak (snel)"
+  </dest>
+  <voice>
+    *: "Spraak (snel)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Exporteer wijzigingen"
+  </dest>
+  <voice>
+    *: "Exporteer wijzigingen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Splits Bestandsgrootte"
+  </dest>
+  <voice>
+    *: "Splits Bestandsgrootte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : terug aan)"
+  </dest>
+  <voice>
+    *: "(Vol- : terug aan)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Bestandsnaam:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Veiligheid (clip)"
+  </dest>
+  <voice>
+    *: "Veiligheid (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Speellijst cataloog"
+  </dest>
+  <voice>
+    *: "Speellijst cataloog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Splits criterium"
+  </dest>
+  <voice>
+    *: "Splits criterium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Voeg toe aan nieuwe speellijst"
+  </dest>
+  <voice>
+    *: "Voeg toe aan nieuwe speellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Splits Tijd"
+  </dest>
+  <voice>
+    *: "Splits Tijd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Voeg toe aan speellijst"
+  </dest>
+  <voice>
+    *: "Voeg toe aan speellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Laden... %d%% klaar (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Begin nieuw bestand"
+  </dest>
+  <voice>
+    *: "Begin nieuw bestand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Wat doen bij splitsen"
+  </dest>
+  <voice>
+    *: "Wat doen bij splitsen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Splits Bestandsgrootte"
+  </dest>
+  <voice>
+    *: "Splits Bestandsgrootte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Hardware Equalizer"
+  </dest>
+  <voice>
+    *: "Hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Toon Path"
+  </dest>
+  <voice>
+    *: "Toon Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "Bandbreedte"
+  </dest>
+  <voice>
+    *: "Bandbreedte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Toon cataloog"
+  </dest>
+  <voice>
+    *: "Toon cataloog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "AGC clip tijd"
+  </dest>
+  <voice>
+    *: "AGC clip tijd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Enkel huidige map"
+  </dest>
+  <voice>
+    *: "Enkel huidige map"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Wijd"
+  </dest>
+  <voice>
+    *: "Wijd"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Verlichting (met Hold knop)"
+  </dest>
+  <voice>
+    *: "Verlichting met hold knop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s bestaat niet"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Geen speellijsten"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
