@@ -289,7 +289,7 @@
     *: "Playlist Optionen"
   </dest>
   <voice>
-    *: "Abspielliste Optionen"
+    *: "Abspiellisten-Optionen"
   </voice>
 </phrase>
 <phrase>
@@ -1653,7 +1653,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -1667,16 +1667,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Von Festplatte lesen"
+    *: ""
   </dest>
   <voice>
-    *: "Von Festplatte lesen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1698,13 +1698,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Tag-Datenbank aktualisieren"
+    *: "Neu generieren"
   </dest>
   <voice>
-    *: "Tag-Datenbank aktualisieren"
+    *: "Neu generieren"
   </voice>
 </phrase>
 <phrase>
@@ -2675,16 +2675,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Zeitabhängiges Aufteilen"
+    *: "Aufteilungeinstellungen"
   </dest>
   <voice>
-    *: "Zeitabhängiges Aufteilen"
+    *: "Aufteilungeinstellungen"
   </voice>
 </phrase>
 <phrase>
@@ -9043,5 +9043,742 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "Schmal"
+  </dest>
+  <voice>
+    *: "Schmal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Automatische Aussteuerung"
+  </dest>
+  <voice>
+    *: "Automatische Aussteuerung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Zeit"
+  </dest>
+  <voice>
+    *: "Zeit"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Kilobit pro Sekunde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "Maximale Verstärkung"
+  </dest>
+  <voice>
+    *: "Maximale Verstärkung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nie"
+  </dest>
+  <voice>
+    *: "Nie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user:
+  <source>
+    *: "<All tracks>"
+  </source>
+  <dest>
+    *: "<Alle Titel>"
+  </dest>
+  <voice>
+    *: "Alle Titel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Gerät (langsam)"
+  </dest>
+  <voice>
+    *: "DJ-Gerät (langsam)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Änderungen importieren"
+  </dest>
+  <voice>
+    *: "Änderungen importieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Stromsparmodus (nach Ausschalten der Hintergrundbeleuchtung)"
+  </dest>
+  <voice>
+    *: "Stromsparmodus (nach Ausschalten der Hintergrundbeleuchtung)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filesize"
+  </dest>
+  <voice>
+    *: "Dateigröße"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Remote-LCD aus"
+  </dest>
+  <voice>
+    *: "Remote-LCD aus"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "Hardware-EQ einschalten"
+  </dest>
+  <voice>
+    *: "Hardware-Equalizer einschalten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Auto-Aktualisierung"
+  </dest>
+  <voice>
+    *: "Automatische Aktualisierung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Aufnahme stoppen"
+  </dest>
+  <voice>
+    *: "Aufnahme stoppen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  <source>
+    *: "Tagcache is not ready"
+  </source>
+  <dest>
+    *: "Tag-Cache ist nicht bereit"
+  </dest>
+  <voice>
+    *: "Tag-Cache ist nicht bereit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Kompletter Pfad"
+  </dest>
+  <voice>
+    *: "Kompletter Pfad"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Jetzt aktualisieren"
+  </dest>
+  <voice>
+    *: "Jetzt aktualisieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Remote-Scroll-Einstellungen"
+  </dest>
+  <voice>
+    *: "Remote-Scroll-Einstellungen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normal"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (langsam)"
+  </dest>
+  <voice>
+    *: "Live (langsam)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Sprache (schnell)"
+  </dest>
+  <voice>
+    *: "Sprache (schnell)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Änderungen exportieren"
+  </dest>
+  <voice>
+    *: "Änderungen exportieren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Aufteilungsgröße"
+  </dest>
+  <voice>
+    *: "Aufteilungsgröße"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Lautstärke- : Reaktivieren)"
+  </dest>
+  <voice>
+    *: "(Lautstärke Minus zum Reaktivieren)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Mittel"
+  </dest>
+  <voice>
+    *: "Mittel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Dateiname:"
+  </dest>
+  <voice>
+    *: "Dateiname"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Sicherheit (Übersteuerung)"
+  </dest>
+  <voice>
+    *: "Safety (Übersteuerung)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Playlist-Katalog"
+  </dest>
+  <voice>
+    *: "Abspiellisten-Katalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Aufteilungskriterium"
+  </dest>
+  <voice>
+    *: "Aufteilungskriterium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Hochfrequenz-Abschnitt"
+  </dest>
+  <voice>
+    *: "Hochfrequenz-Abschnitt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Ungültiger Dateiname!"
+  </dest>
+  <voice>
+    *: "Ungültiger Dateiname"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Zu neuer Playlist hinzufügen"
+  </dest>
+  <voice>
+    *: "Zu neuer Abspielliste hinzufügen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Aufteilzeit"
+  </dest>
+  <voice>
+    *: "Aufteilzeit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Zu Playlist hinzufügen"
+  </dest>
+  <voice>
+    *: "Zu Abspielliste hinzufügen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Laden... %d%% done (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Neue Datei beginnen"
+  </dest>
+  <voice>
+    *: "Neue Datei beginnen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Beim Aufteilen folgendes tun"
+  </dest>
+  <voice>
+    *: "Beim Aufteilen folgendes tun"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Aufteilungs-Dateigröße"
+  </dest>
+  <voice>
+    *: "Aufteilungs-Dateigröße"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNIT_HERTZ
+  desc: in sound settings
+  <source>
+    *: "Hz"
+  </source>
+  <dest>
+    *: "Hz"
+  </dest>
+  <voice>
+    *: "Hertz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Hardware-Equalizer"
+  </dest>
+  <voice>
+    *: "Hardware-Equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
+  <source>
+    *: "Cross Gain"
+  </source>
+  <dest>
+    *: "Cross Gain"
+  </dest>
+  <voice>
+    *: "Cross gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Pfad anzeigen"
+  </dest>
+  <voice>
+    *: "Pfad anzeigen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "Bandbreite"
+  </dest>
+  <voice>
+    *: "Bandbreite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Hochfrequenz-Abschwächung"
+  </dest>
+  <voice>
+    *: "Hochfrequenz-Abschwächung"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Katalog anzeigen"
+  </dest>
+  <voice>
+    *: "Katalog anzeigen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "Übersteuerungs-Schwellwert"
+  </dest>
+  <voice>
+    *: "Übersteuerungs-Schwellwert"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Nur aktuelles Verzeichnis"
+  </dest>
+  <voice>
+    *: "Nur aktuelles Verzeichnis"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "Automatisch"
+  </dest>
+  <voice>
+    *: "Automatisch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Breit"
+  </dest>
+  <voice>
+    *: "Breit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Hintergrundbeleuchtung (Bei Hold-Taste)"
+  </dest>
+  <voice>
+    *: "Hintergrundbeleuchtung bei Hold-Taste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
+  user:
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Direkter Pegel"
+  </dest>
+  <voice>
+    *: "Direkter Pegel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s existiert nicht"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Keine Playlists"
+  </dest>
+  <voice>
+    *: "Keine Abspielliste"
   </voice>
 </phrase>

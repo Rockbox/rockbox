@@ -8159,7 +8159,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu 
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -9774,5 +9774,33 @@
   </dest>
   <voice>
     *: "Lys ved tastatur lås"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobit per sekund"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Filnavn:"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>

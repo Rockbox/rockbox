@@ -2768,7 +2768,7 @@
     *: "Abilita Replaygain"
   </dest>
   <voice>
-    *: "Abilita Replaygaintn"
+    *: "Abilita Replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -2779,10 +2779,10 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Previene distorsione"
+    *: "Previene Saturazione"
   </dest>
   <voice>
-    *: "Previene distorsione"
+    *: "Previene saturazione"
   </voice>
 </phrase>
 <phrase>
@@ -4207,7 +4207,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "Tono su"
+    *: "Incremento velocita'"
   </dest>
   <voice>
     *: ""
@@ -4221,7 +4221,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "Tono giu'"
+    *: "Decremento velocita'"
   </dest>
   <voice>
     *: ""
@@ -4391,7 +4391,7 @@
   </source>
   <dest>
     *: "ON+Play = Cancella"
-    h100,h120,h300: "ON+NAVI = Cancella"
+    h100,h120,h300: "RECORD = Cancella"
   </dest>
   <voice>
     *: ""
@@ -8291,7 +8291,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu 
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -8394,10 +8394,10 @@
     *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "Taglio alta frequenza"
+    *: "Taglio delle alte frequenze"
   </dest>
   <voice>
-    *: "Taglio alta frequenza"
+    *: "Taglio delle altefrequenze"
   </voice>
 </phrase>
 <phrase>
@@ -8410,7 +8410,7 @@
     *: "Hz"
   </dest>
   <voice>
-    *: ""
+    *: "Herz"
   </voice>
 </phrase>
 <phrase>
@@ -8433,10 +8433,10 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "Attenuazione alta frequenza"
+    *: "Attenuazione delle altefrequenze"
   </dest>
   <voice>
-    *: "Attenuazione alta frequenza"
+    *: "Attenuazione delle altefrequenze"
   </voice>
 </phrase>
 <phrase>
@@ -8613,10 +8613,10 @@
     *: "Split Filesize"
   </source>
   <dest>
-    *: "Dimensione divisione del file"
+    *: "Dimensione file"
   </dest>
   <voice>
-    *: "Dimensione divisione del file"
+    *: "Dimensione file"
   </voice>
 </phrase>
 <phrase>
@@ -8640,10 +8640,10 @@
     *: "Split Measure"
   </source>
   <dest>
-    *: "Misura del segmento"
+    *: "Suddivisione per: "
   </dest>
   <voice>
-    *: "Misura del segmento"
+    *: "Suddivisione per: "
   </voice>
 </phrase>
 <phrase>
@@ -8667,10 +8667,10 @@
     *: "Split Time"
   </source>
   <dest>
-    *: "Tempo di divisione"
+    *: "Tempo: "
   </dest>
   <voice>
-    *: "Tempo di divisione"
+    *: "Tempo: "
   </voice>
 </phrase>
 <phrase>
@@ -8681,10 +8681,10 @@
     *: "Add to playlist"
   </source>
   <dest>
-    *: "Aggiungi a una playlist"
+    *: "Aggiungi alla playlist"
   </dest>
   <voice>
-    *: "Aggiungi a una playlist"
+    *: "Aggiungi alla playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8708,10 +8708,10 @@
     *: "What to do when Splitting"
   </source>
   <dest>
-    *: "Cosa fare quando si divide"
+    *: "Cosa fare quando si suddivide"
   </dest>
   <voice>
-    *: "Cosa fare quando si divide"
+    *: "Cosa fare quando si suddivide"
   </voice>
 </phrase>
 <phrase>
@@ -8750,7 +8750,7 @@
     *: "No playlists"
   </source>
   <dest>
-    *: "Non ci sono playlist"
+    *: "Nessuna playlist"
   </dest>
   <voice>
     *: ""
@@ -8785,398 +8785,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_SET_BOOL_YES
-  desc: bool true representation
-  user:
-  <source>
-    *: "Yes"
-  </source>
-  <dest>
-    *: "Si"
-  </dest>
-  <voice>
-    *: "Si"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SET_BOOL_NO
-  desc: bool false representation
-  user:
-  <source>
-    *: "No"
-  </source>
-  <dest>
-    *: "No"
-  </dest>
-  <voice>
-    *: "No"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_ON
-  desc: Used in a lot of places
-  user:
-  <source>
-    *: "On"
-  </source>
-  <dest>
-    *: "Attivato"
-  </dest>
-  <voice>
-    *: "Attivato"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_OFF
-  desc: Used in a lot of places
-  user:
-  <source>
-    *: "Off"
-  </source>
-  <dest>
-    *: "Disattivato"
-  </dest>
-  <voice>
-    *: "Disattivato"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_VOLUME
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Volume"
-  </source>
-  <dest>
-    *: "Volume"
-  </dest>
-  <voice>
-    *: "Volume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Stereo"
-  </source>
-  <dest>
-    *: "Stereo"
-  </dest>
-  <voice>
-    *: "Stereo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user:
-  <source>
-    *: "Mono"
-  </source>
-  <dest>
-    *: "Mono"
-  </dest>
-  <voice>
-    *: "Mono"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Edit mode: %s"
-  </source>
-  <dest>
-    *: "Modo editing: %s"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Cutoff Frequency"
-  </source>
-  <dest>
-    *: "Taglio Frequenza"
-  </dest>
-  <voice>
-    *: "Taglio Frequenza"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
-  desc: in the equalizer settings menu
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Guadagno"
-  </dest>
-  <voice>
-    *: "Guadagno"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SHUFFLE
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Shuffle"
-  </source>
-  <dest>
-    *: "Casuale"
-  </dest>
-  <voice>
-    *: "Casuale"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT
-  desc: in settings_menu
-  user:
-  <source>
-    *: "Repeat"
-  </source>
-  <dest>
-    *: "Ripeti"
-  </dest>
-  <voice>
-    *: "Ripeti"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ALL
-  desc: repeat playlist once all songs have completed
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Tutte"
-  </dest>
-  <voice>
-    *: "Tutte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_ONE
-  desc: repeat one song
-  user:
-  <source>
-    *: "One"
-  </source>
-  <dest>
-    *: "Una"
-  </dest>
-  <voice>
-    *: "Una"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_REPEAT_AB
-  desc: repeat one song
-  user:
-  <source>
-    *: "A-B"
-  </source>
-  <dest>
-    *: "A-B"
-  </dest>
-  <voice>
-    *: "parte di una traccia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER
-  desc: setting name for dir filter
-  user:
-  <source>
-    *: "Show Files"
-  </source>
-  <dest>
-    *: "Mostra files"
-  </dest>
-  <voice>
-    *: "Mostra File"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ALL
-  desc: show all files
-  user:
-  <source>
-    *: "All"
-  </source>
-  <dest>
-    *: "Tutti"
-  </dest>
-  <voice>
-    *: "Tutti"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_SUPPORTED
-  desc: show all file types supported by Rockbox
-  user:
-  <source>
-    *: "Supported"
-  </source>
-  <dest>
-    *: "Supportati"
-  </dest>
-  <voice>
-    *: "Supportati"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_MUSIC
-  desc: show only music-related files
-  user:
-  <source>
-    *: "Music"
-  </source>
-  <dest>
-    *: "Musicali"
-  </dest>
-  <voice>
-    *: "Musicali"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_PLAYLIST
-  desc: show only playlist
-  user:
-  <source>
-    *: "Playlists"
-  </source>
-  <dest>
-    *: "Playlist"
-  </dest>
-  <voice>
-    *: "Playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_FILTER_ID3DB
-  desc: show ID3 Database
-  user:
-  <source>
-    *: "ID3 Database"
-  </source>
-  <dest>
-    *: "Database ID3"
-  </dest>
-  <voice>
-    *: "database ID3"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Quality"
-  </source>
-  <dest>
-    *: "Qualita'"
-  </dest>
-  <voice>
-    *: "Qualita'"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Frequency"
-  </source>
-  <dest>
-    *: "Frequenza"
-  </dest>
-  <voice>
-    *: "Frequenza"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Source"
-  </source>
-  <dest>
-    *: "Sorgente"
-  </dest>
-  <voice>
-    *: "Sorgente"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Mic"
-  </source>
-  <dest>
-    *: "Microfono"
-  </dest>
-  <voice>
-    *: "Microfono"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_LINE
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Line In"
-  </source>
-  <dest>
-    *: "Linea in ingresso"
-  </dest>
-  <voice>
-    *: "Linea In Ingresso"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Digital"
-  </source>
-  <dest>
-    *: "Digitale"
-  </dest>
-  <voice>
-    *: "Digitale"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_CHANNELS
-  desc: in the recording settings
-  user:
-  <source>
-    *: "Channels"
-  </source>
-  <dest>
-    *: "Canali"
-  </dest>
-  <voice>
-    *: "Canali"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
   user:
@@ -9191,154 +8799,14 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_FLIP_DISPLAY
-  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
   user:
   <source>
-    *: "Upside Down"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Capovolgi display"
-  </dest>
-  <voice>
-    *: "Capovolgi Display"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_SCROLL_BAR
-  desc: display menu, F3 substitute
-  user:
-  <source>
-    *: "Scroll Bar"
-  </source>
-  <dest>
-    *: "Barra di scorrimento"
-  </dest>
-  <voice>
-    *: "Barra di scorrimento"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_STATUS_BAR
-  desc: display menu, F3 substitute
-  user:
-  <source>
-    *: "Status Bar"
-  </source>
-  <dest>
-    *: "Barra di stato"
-  </dest>
-  <voice>
-    *: "Barra di Stato"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_UP
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Up"
-  </source>
-  <dest>
-    *: "Tono su"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN
-  desc: in wps
-  user:
-  <source>
-    *: "Pitch Down"
-  </source>
-  <dest>
-    *: "Tono giu'"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_F2_MODE
-  desc: in wps F2 pressed
-  user:
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Modo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_TIME
-  desc: Display of recorded time
-  user:
-  <source>
-    *: "Time:"
-  </source>
-  <dest>
-    *: "Tempo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
-  desc: Display of record timer interval setting, on the record screen
-  user:
-  <source>
-    *: "Split Time:"
-  </source>
-  <dest>
-    *: "Intervallo di tempo:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SIZE
-  desc: Display of recorded file size
-  user:
-  <source>
-    *: "Size:"
-  </source>
-  <dest>
-    *: "Dimensioni:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_PRERECORD
-  desc: in recording and radio screen
-  user:
-  <source>
-    *: "Pre-Recording"
-  </source>
-  <dest>
-    *: "Pre-Registrazione"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_GAIN
-  desc: in the recording screen
-  user:
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "Guadagno"
+    *: "Modo editazione: %s"
   </dest>
   <voice>
     *: ""
@@ -9359,17 +8827,87 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_RIGHT
-  desc: in the recording screen
+  id: LANG_SYSFONT_RECORD_PRERECORD
+  desc: in recording and radio screen
   user:
   <source>
-    *: "Gain Right"
+    *: "Pre-Recording"
   </source>
   <dest>
-    *: "Guadagno Destro"
+    *: "Pre-Registrazione"
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_OFF
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "Off"
+  </source>
+  <dest>
+    *: "Disattivato"
+  </dest>
+  <voice>
+    *: "Disattivato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_ALL
+  desc: show all files
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Tutti"
+  </dest>
+  <voice>
+    *: "Tutti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Mic"
+  </source>
+  <dest>
+    *: "Microfono"
+  </dest>
+  <voice>
+    *: "Microfono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Frequenza di Taglio"
+  </dest>
+  <voice>
+    *: "Frequenza di Taglio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SET_BOOL_NO
+  desc: bool false representation
+  user:
+  <source>
+    *: "No"
+  </source>
+  <dest>
+    *: "No"
+  </dest>
+  <voice>
+    *: "No"
   </voice>
 </phrase>
 <phrase>
@@ -9380,7 +8918,7 @@
     *: "The disk is full. Press OFF to continue."
   </source>
   <dest>
-    *: "Disco pieno. Premi OFF per continuare"
+    *: "Disco pieno. Premere OFF per continuare."
   </dest>
   <voice>
     *: ""
@@ -9394,7 +8932,21 @@
     *: "Menu"
   </source>
   <dest>
-    *: "Menu'"
+    *: "Menu"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_F2_MODE
+  desc: in wps F2 pressed
+  user:
+  <source>
+    *: "Mode:"
+  </source>
+  <dest>
+    *: "Modo:"
   </dest>
   <voice>
     *: ""
@@ -9415,17 +8967,353 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
+  id: LANG_SYSFONT_VOLUME
+  desc: in sound_settings
   user:
   <source>
-    *: "LCD"
+    *: "Volume"
   </source>
   <dest>
-    *: "LCD"
+    *: "Volume"
+  </dest>
+  <voice>
+    *: "Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SOURCE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Source"
+  </source>
+  <dest>
+    *: "Sorgente"
+  </dest>
+  <voice>
+    *: "Sorgente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_GAIN
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Guadagno"
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SIZE
+  desc: Display of recorded file size
+  user:
+  <source>
+    *: "Size:"
+  </source>
+  <dest>
+    *: "Dimensione:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNEL_STEREO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Stereo"
+  </source>
+  <dest>
+    *: "Stereo"
+  </dest>
+  <voice>
+    *: "Stereo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Up"
+  </source>
+  <dest>
+    *: "Tono Su"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_STATUS_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Status Bar"
+  </source>
+  <dest>
+    *: "Barra di stato"
+  </dest>
+  <voice>
+    *: "Barra di stato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_CHANNELS
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Channels"
+  </source>
+  <dest>
+    *: "Canali"
+  </dest>
+  <voice>
+    *: "Canali"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_ON
+  desc: Used in a lot of places
+  user:
+  <source>
+    *: "On"
+  </source>
+  <dest>
+    *: "Attivato"
+  </dest>
+  <voice>
+    *: "Attivato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_ALL
+  desc: repeat playlist once all songs have completed
+  user:
+  <source>
+    *: "All"
+  </source>
+  <dest>
+    *: "Tutti"
+  </dest>
+  <voice>
+    *: "Tutti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_PLAYLIST
+  desc: show only playlist
+  user:
+  <source>
+    *: "Playlists"
+  </source>
+  <dest>
+    *: "Playlist"
+  </dest>
+  <voice>
+    *: "Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FREQUENCY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Frequency"
+  </source>
+  <dest>
+    *: "Frequenza"
+  </dest>
+  <voice>
+    *: "Frequenza"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Gain"
+  </source>
+  <dest>
+    *: "Guadagno"
+  </dest>
+  <voice>
+    *: "Guadagno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Digital"
+  </source>
+  <dest>
+    *: "Digitale"
+  </dest>
+  <voice>
+    *: "Digitale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_ID3DB
+  desc: show ID3 Database
+  user:
+  <source>
+    *: "ID3 Database"
+  </source>
+  <dest>
+    *: "Database Id3"
+  </dest>
+  <voice>
+    *: "Database ID3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN
+  desc: in wps
+  user:
+  <source>
+    *: "Pitch Down"
+  </source>
+  <dest>
+    *: "Tono Giu'"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_ONE
+  desc: repeat one song
+  user:
+  <source>
+    *: "One"
+  </source>
+  <dest>
+    *: "Una"
+  </dest>
+  <voice>
+    *: "Una"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SET_BOOL_YES
+  desc: bool true representation
+  user:
+  <source>
+    *: "Yes"
+  </source>
+  <dest>
+    *: "Si"
+  </dest>
+  <voice>
+    *: "Si"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_MUSIC
+  desc: show only music-related files
+  user:
+  <source>
+    *: "Music"
+  </source>
+  <dest>
+    *: "Musicali"
+  </dest>
+  <voice>
+    *: "Musicali"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user:
+  <source>
+    *: "Scroll Bar"
+  </source>
+  <dest>
+    *: "Barra di Scorrimento"
+  </dest>
+  <voice>
+    *: "Barra di scorrimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT_AB
+  desc: repeat one song
+  user:
+  <source>
+    *: "A-B"
+  </source>
+  <dest>
+    *: "A-B"
+  </dest>
+  <voice>
+    *: "Parte di una traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORD_TIMESPLIT_REC
+  desc: Display of record timer interval setting, on the record screen
+  user:
+  <source>
+    *: "Split Time:"
+  </source>
+  <dest>
+    *: "Tempo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_REPEAT
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Repeat"
+  </source>
+  <dest>
+    *: "Ripeti"
+  </dest>
+  <voice>
+    *: "Ripeti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_RIGHT
+  desc: in the recording screen
+  user:
+  <source>
+    *: "Gain Right"
+  </source>
+  <dest>
+    *: "Guadagno Destro"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degreed
+  user:
+  <source>
+    *: "Upside Down"
+  </source>
+  <dest>
+    *: "Capovolgi"
+  </dest>
+  <voice>
+    *: "Capovolgi"
   </voice>
 </phrase>
 <phrase>
@@ -9440,5 +9328,457 @@
   </dest>
   <voice>
     *: "Velocita'"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Dimensione"
+  </dest>
+  <voice>
+    *: "Dimensione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_SRC_LINE
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Line In"
+  </source>
+  <dest>
+    *: "Linea in ingresso"
+  </dest>
+  <voice>
+    *: "Linea in ingresso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_DIRBROWSE_F3
+  desc: in dir browser, F3 button bar text
+  user:
+  <source>
+    *: "LCD"
+  </source>
+  <dest>
+    *: "LCD"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_QUALITY
+  desc: in the recording settings
+  user:
+  <source>
+    *: "Quality"
+  </source>
+  <dest>
+    *: "Qualita'"
+  </dest>
+  <voice>
+    *: "Qualita'"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user:
+  <source>
+    *: "Supported"
+  </source>
+  <dest>
+    *: "Supportati"
+  </dest>
+  <voice>
+    *: "Supportati"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_FILTER
+  desc: setting name for dir filter
+  user:
+  <source>
+    *: "Show Files"
+  </source>
+  <dest>
+    *: "Mostra Files"
+  </dest>
+  <voice>
+    *: "Mostra File"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_TIME
+  desc: Display of recorded time
+  user:
+  <source>
+    *: "Time:"
+  </source>
+  <dest>
+    *: "Tempo:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_CHANNEL_MONO
+  desc: in sound_settings
+  user:
+  <source>
+    *: "Mono"
+  </source>
+  <dest>
+    *: "Mono"
+  </dest>
+  <voice>
+    *: "Mono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SHUFFLE
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle"
+  </source>
+  <dest>
+    *: "Casuale"
+  </dest>
+  <voice>
+    *: "Casuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Mai"
+  </dest>
+  <voice>
+    *: "Mai"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Sospendi (Quando la luce e' spenta)"
+  </dest>
+  <voice>
+    *: "Sospendi Quando la luce e' spenta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normale"
+  </dest>
+  <voice>
+    *: "Normale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Retroilluminazione (Sul tasto di blocco)"
+  </dest>
+  <voice>
+    *: "RetroIlluminazione sul tasto di blocco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Caricamento... %d%% fatto (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Equalizzatore Hardware"
+  </dest>
+  <voice>
+    *: "Equalizzatore Hardware"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "Abilita EQ Hardware"
+  </dest>
+  <voice>
+    *: "Abilita equalizzatore hardware"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "Larghezza di banda"
+  </dest>
+  <voice>
+    *: "Larghezza di banda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "Stretta"
+  </dest>
+  <voice>
+    *: "Stretta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Ampia"
+  </dest>
+  <voice>
+    *: "Ampia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Mostra percorso"
+  </dest>
+  <voice>
+    *: "Mostra percorso"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Solo cartella corrente"
+  </dest>
+  <voice>
+    *: "Solo cartella corrente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Percorso completo"
+  </dest>
+  <voice>
+    *: "Percorso completo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Guadagno automatico"
+  </dest>
+  <voice>
+    *: "Guadagno automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Previene saturazione"
+  </dest>
+  <voice>
+    *: "Previene saturazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (lento)"
+  </dest>
+  <voice>
+    *: "Live (lento)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (lento)"
+  </dest>
+  <voice>
+    *: "DJ-Set (lento)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medio"
+  </dest>
+  <voice>
+    *: "Medio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Voce (veloce)"
+  </dest>
+  <voice>
+    *: "Voce (veloce)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "Tempo di clip per guadagno automatico"
+  </dest>
+  <voice>
+    *: "Tempo di clip per guadagno automatico"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "Guadagno massimo"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits al secondo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Nome file:"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
