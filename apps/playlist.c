@@ -484,10 +484,14 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     {
         /* use mp3 buffer for maximum load speed */
         audio_stop();
+#if CONFIG_CODEC != SWCODEC
         talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
-
-        buffer = (char *)audiobuf;
         buflen = (audiobufend - audiobuf);
+        buffer = (char *)audiobuf;
+#else
+        buflen = (audiobufend - audiobuf - talk_get_bufsize());
+        buffer = (char *)&audiobuf[talk_get_bufsize()];
+#endif
     }
     
     store_index = true;
