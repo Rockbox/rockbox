@@ -589,12 +589,15 @@ enum help solitaire_help( void )
  *
  * TODO: use rockbox api menus instead
  */
-
+ 
 #define CFGFILE_VERSION 0
-int draw_type;
+
+/* introduce a struct if there's more than one setting */
+int draw_type_disk = 0;
+int draw_type;  
 
 static struct configdata config[] = {
-   { TYPE_INT, 0, 1, &draw_type, "draw_type", NULL, NULL }
+   { TYPE_INT, 0, 1, &draw_type_disk, "draw_type", NULL, NULL }
 };
 
 /* menu return codes */
@@ -1072,7 +1075,7 @@ enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
  */
 int bouncing_cards( void )
 {
-    int i, j, x, y, vx, vy, button;
+    int i, j, x, vx, y, fp_y, fp_vy, button;
 
     /* flush the button queue */
     while( ( button = rb->button_get( false ) ) != BUTTON_NONE )
@@ -1087,23 +1090,24 @@ int bouncing_cards( void )
         for( j = 0; j < SUITS; j++ )
         {
             x = LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*j+j+1;
-            y = MARGIN;
+            fp_y = MARGIN<<8;
 
             vx = rb->rand()%8-5;
             if( !vx ) vx = -6;
 
-            vy = -rb->rand()%(6<<8);
+            fp_vy = -rb->rand()%(6<<8);
 
             while( x < LCD_WIDTH && x + CARD_WIDTH > 0 )
             {
-                vy += (1<<8);
+                fp_vy += 1<<8;
                 x += vx;
-                y += vy >> 8;
-                if( y + CARD_HEIGHT >= LCD_HEIGHT )
+                fp_y += fp_vy;
+                if( fp_y >= (LCD_HEIGHT-CARD_HEIGHT) << 8 )
                 {
-                    vy = -vy*3/4;
-                    y = LCD_HEIGHT - CARD_HEIGHT;
+                    fp_vy = -fp_vy*3/4;
+                    fp_y = (LCD_HEIGHT-CARD_HEIGHT) << 8;
                 }
+                y = fp_y >> 8;
                 draw_card( deck[j*CARDS_PER_SUIT+i], x, y,
                            false, false, false );
                 rb->lcd_update_rect( x<0?0:x, y<0?0:y,
@@ -1132,9 +1136,6 @@ int solitaire( void )
     unsigned char c,h,prevcard;
     int biggest_col_length;
 
-    configfile_init(rb);
-    configfile_load(CONFIG_FILENAME, config, 1, 0);
-
     rb->srand( *rb->current_tick );
     switch( solitaire_menu( draw_type == 0 ? MENU_BEFOREGAME
                                            : MENU_BEFOREGAMEOP ) )
@@ -1147,7 +1148,6 @@ int solitaire( void )
 
         case MENU_OPT:
             draw_type = (draw_type+1)%2;
-            configfile_save(CONFIG_FILENAME, config, 1, 0);
             return 0;
     }
     solitaire_init();
@@ -1614,10 +1614,20 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
 
     rb->splash( HZ, true, "Welcome to Solitaire!" );
 
+    configfile_init(rb);
+    configfile_load(CONFIG_FILENAME, config, 1, 0);
+    draw_type = draw_type_disk;
+
     /* play the game :)
      * Keep playing if a game was won (that means display the menu after
      * winning instead of quiting) */
     while( ( result = solitaire() ) == SOLITAIRE_WIN );
+    
+    if (draw_type != draw_type_disk)
+    {
+        draw_type_disk = draw_type;
+        configfile_save(CONFIG_FILENAME, config, 1, 0);
+    }
 
     /* Exit the plugin */
     return ( result == SOLITAIRE_USB ) ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
