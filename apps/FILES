@@ -58,6 +58,13 @@ plugins/mpegplayer/*.[ch]
 plugins/mpegplayer/Makefile
 plugins/mpegplayer/SOURCES
 plugins/mpegplayer/README*
+plugins/zxbox/*.[ch]
+plugins/zxbox/Makefile
+plugins/zxbox/README*
+plugins/zxbox/SOURCES
+plugins/zxbox/ChangeLog
+plugins/zxbox/COPYING
+plugins/zxbox/*.lds
 codecs/SOURCES
 codecs/*.[ch]
 codecs/Makefile
