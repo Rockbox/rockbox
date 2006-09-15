@@ -59,7 +59,7 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (LCD_WIDTH != 240) && (LCD_WIDTH != 128)
+#if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64))
 tetrox.c
 #endif
 #if CONFIG_LCD == LCD_SSD1815
