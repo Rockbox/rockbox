@@ -177,6 +177,10 @@ static bool add_to_playlist(int position, bool queue)
     if (new_playlist)
         playlist_create(NULL, NULL);
 
+    /* always set seed before inserting shuffled */
+    if (position == PLAYLIST_INSERT_SHUFFLED)
+        srand(current_tick);
+
     if (context == CONTEXT_ID3DB)
     {
         tagtree_insert_selection_playlist(position, queue);
