@@ -16,7 +16,7 @@ my $verbose;
 my $help;
 my $dirisalbum;
 my $littleendian = 0;
-my $dbver = 0x54434804;
+my $dbver = 0x54434806;
 
 # file data
 my %entries;
@@ -411,22 +411,20 @@ for (sort keys %entries) {
 }
 
 if ($db) {
-    # Artists
+    # tagcache index files
     create_tagcache_index_file(0, 'ARTIST', 1);
-    # Albums
     create_tagcache_index_file(1, 'ALBUM', 1);
-    # Genres
     create_tagcache_index_file(2, 'GENRE', 1);
-    # Titles
     create_tagcache_index_file(3, 'TITLE', 0);
-    # Filenames
     create_tagcache_index_file(4, 'PATH', 0);
-    # Composers
     create_tagcache_index_file(5, 'COMPOSER', 1);
 
     # Master index file
     openfile $db ."_idx.tcd";
     dump_tag_header(0);
+
+    # current serial
+    dumpint(0);
 
     for (sort keys %entries) {
         dumpint($entries{$_}->{'ARTIST_OFFSET'});
@@ -439,6 +437,13 @@ if ($db) {
         dumpint($entries{$_}->{'TRACKNUM'});
         dumpint($entries{$_}->{'BITRATE'});
         dumpint($entries{$_}->{'SECS'});
+        # play count
+        dumpint(0);
+        # play time
+        dumpint(0);
+        # last played
+        dumpint(0);
+        # status flag
         dumpint(0);
     }
 
