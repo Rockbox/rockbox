@@ -1,0 +1,33 @@
+Spectemu is now basically usable under DOS.
+
+Still missing:
+
+1) Sound
+2) Decent GUI
+
+How to compile:
+---------------
+
+- You will need DJGPP version 2, libkb, and the allegro game library.
+  You can get these at:
+
+To get DJGPP, read:
+   ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/00README.TXT
+
+Libkb is at:
+   ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2tk/libkb100.zip
+
+Allegro is at:
+   ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2tk/allegro/alleg30.zip
+
+
+- Not all files are needed (no long named files are needed, you can
+  try to get rid of them, but they cause no harm)
+
+- copy 'Makefile.dos' to 'Makefile', and 'config.dos' to 'config.h'
+
+- type 'make'
+
+It should compile without warnings. To start it, enter 'vgaspect'.
+
+See also README, for what can be done with the emulator.

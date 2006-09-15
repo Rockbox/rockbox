@@ -19,6 +19,11 @@ chessbox
 sudoku
 #endif
 
+/* For all 2bpp and colour targets */
+#if (LCD_DEPTH >= 2)
+zxbox
+#endif
+
 /* For all the colour targets and iriver H1x0 */
 #if defined(HAVE_LCD_COLOR) || defined(IRIVER_H100_SERIES)
 pacbox

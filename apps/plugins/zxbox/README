@@ -1,0 +1,770 @@
+
+                      * * * * * * * * * * * * * * *
+                      *                           *
+                      *      S P E C T E M U      *
+                      *                           *
+                      *        Version 0.94       *
+                      *                           *
+                      * * * * * * * * * * * * * * *
+
+
+This package contains a 48k ZX-Spectrum emulator for Linux and other
+UNIX operating systems, with full Z80 instruction set, comprehensive
+screen, sound and tape emulation, and snapshot file saving and
+loading. It can run on a Linux console, or in an X11 window.
+
+The program is free software and is copyrighted under the GNU General
+Public License. It comes with absolutely no warranty. See the file
+COPYING for details.
+
+Written by Miklos Szeredi
+Email: mszeredi@inf.bme.hu
+
+It can be downloaded by FTP from:
+    tsx-11.mit.edu:/pub/linux/ALPHA/spectemu/spectemu-0.94.tar.gz
+or
+    sunsite.unc.edu:/pub/Linux/system/emulators/zx/spectemu-0.94.tar.gz 
+
+For news and updates have a look at the Spectemu Page:
+    http://www.inf.bme.hu/~mszeredi/spectemu/
+
+
+You can also join a mailing list (at the Spectemu Page), to receive a
+notice when new versions of spectemu are available.
+
+
+Table of contents
+=================
+
+  1.   Requirements
+
+  2.   Recommended
+
+  3.   Features
+
+  4.   Drawbacks
+
+  5.   Compiling and installation
+
+  6.   Using the emulator
+
+  6.1    Command line arguments and configuration files (NEW)
+
+  6.2    Using the Spectrum keyboard
+
+  6.3    Keys that control the emulator
+
+  6.4    Effects of changing frame frequency and sound buffer size
+
+  7.   Where can I get ZX Spectrum games for this emulator
+
+  8.   Tape files
+
+  8.1    Loading a tape file
+
+  8.2    Quick loading of tape files
+
+  8.3    Saving to a tape file
+
+  8.4    Saving a tape file to real tape
+
+  8.5    Making a tape file from a real tape
+
+  9.   Bug reports
+
+  10.  Credits
+
+
+1. Requirements
+===============
+
+Linux or other UNIX OS.
+Color X11 server (depths 8, 16 and 32 bits are supported) 
+        and/or 
+SVGALIB console graphics library on Linux.
+
+2. Recommended
+==============
+
+A sound-card on Linux for wonderful spectrum 1-bit sound.  And well, a
+fast enough processor... (Especially for the X11 version.)
+
+3. Features
+===========
+
+ - Very fast because of assembly code in emulation (only on Intel
+   processors).
+
+ - Emulation also in C, which is slower, but supports any processor.
+
+ - X support (with MITSHM if available, optionally double size window)
+
+ - Linux console graphics (with SVGALIB)
+
+ - Sound support (through Linux kernel sound-card driver, 
+   or SUN sound drivers)
+
+ - Snapshot saving and loading (.Z80 and .SNA format)
+
+ - Tape emulation: loading from tape files (.TAP and .TZX format)
+
+ - Optional quick loading of tapes. 
+
+ - Saving to tape files.
+
+ - Separate utility to save tape files to real tape
+
+ - Configurable with config files and from command line
+
+4. Drawbacks
+============
+
+ - Poor user interface
+
+See the file TODO for a list of things which still need to be done (Maybe
+by YOU)
+
+5. Compiling and installation
+=============================
+
+To install the precompiled Linux executables just run 'make install'
+as root.
+
+To recompile the programs on other platforms first type
+
+   ./configure
+
+This tries to determine the system type and parameters.  Probably you
+won't have to give any options to configure, but here is the list of
+the most important options:
+
+  --help                Print a full list of options
+
+  --prefix=PREFIX       Install files under PREFIX (default is /usr/local)
+                        Executables go under PREFIX/bin, ...
+
+  --without-readline    Do not use the readline library (default is to 
+                        use it if it's available on your system)
+
+  --without-i386asm     Do not use the Intel assembly code (default is 
+                        to use it, if your system is Intel based)
+
+You may want to have a look at the produced `Makefile' and `config.h'.
+Then just type
+
+  make clean
+  make
+
+Then to install the program, login as root, and run
+
+  make install
+
+(If you want to compile on another machine be sure to `make realclean'
+before re-configuring and re-making the program!)
+
+At the moment, there are two executable programs for running the emulator:
+
+  xspect             the X11 version
+  vgaspect           the Linux console version
+
+'vgaspect' uses the SVGALIB library. If you do not have this installed
+on your system 'vgaspect' cannot be started. You _MUST_ have SVGALIB
+version 1.2.10 or greater installed, and it is STRONGLY recommended,
+that you get version 1.2.11 or later!
+
+SVGALIB is available at:
+sunsite.unc.edu:/pub/Linux/libs/graphics/
+
+If you have SVGALIB version 1.2.11 or later, the emulator can run in
+background when you switch virtual consoles.
+
+6. Using the emulator
+=====================
+
+After starting 'xspect' or 'vgaspect' you should get the '(C) 1982 Sinclair
+Research Ltd' message, and after pressing a key, the flashing cursor. If
+not, then all I can say, is hard luck to you (if you are ambitious, compile
+the programs with debug information, and try to figure out what is causing
+the problem). Do not start the emulator processes in the background, the
+terminal is needed when loading or saving files. 
+
+To load a snapshot immediately after the start of the emulator, you
+can enter the name of the snapshot file on the command line. (Also see
+section 6.1)
+
+E.g. 
+
+xspect snap/chuckie2
+
+In X you can resize the window. Window size can only be a multiple of
+the smallest window size (320x256). Smaller window means faster
+emulation, so if emulation doesn't run at full speed, try making the
+window smaller.
+
+6.1 Command line arguments and configuration files
+--------------------------------------------------
+
+You can give options to Spectemu in three different ways:
+
+ 1) In a configuration file (either ~/.spectemurc, or 
+    /usr/local/share/spectemu/spectemu.cfg)
+
+ 2) With the X Resource Database (.Xdefaults), this applies only to 'xspect'
+
+ 3) On the command line
+
+Most of the options are common to all three methods, only the syntax
+differs slightly. Here are examples of the different syntax:
+
+Config File:
+    scale = 1
+    private-map = true
+    sound = false
+    color-type = grayscale
+
+.Xdefaults:
+    xspect.scale:      1
+    xspect.privateMap: true
+    xspect.sound:      false
+    xspect.colorType:  grayscale
+
+Command line:
+    xspect -scale 1 -private-map -no-sound -color-type grayscale
+
+List of common options:
+~~~~~~~~~~~~~~~~~~~~~~~
+
+ NAME               RANGE     DEFAULT   DESCRIPTION
+ ----               -----     -------   -----------
+
+ frame-skip         1...      2         The smaller this is, the more 
+                                        often the screen is updatated
+
+ scale              1..4      2         Window size of 'xspect'
+
+ private-map        yes/no    no        Use private colormap in 'xspect'
+
+ mit-shm            yes/no    yes       Use MIT-SHM extension in X server 
+                                        if available
+
+ vga-mode           320x200   320x240   Resolution to use in 'vgaspect',
+                    320x240             320x200 is faster (but not so nice)
+
+ sound              yes/no    yes       Spectrum sound, if availble
+
+ sound-delay        1...      4         The amount of frames (1/50 seconds) 
+                                        to delay sound. See section 6.4
+
+ sound-device       filename  (system   The name of the sound device
+                              dependent)  
+
+ sound-sample-rate  4000...   ~15625    Sample rate of sound device
+
+ sound-autoclose    yes/no    yes       Whether to close sound device when
+                                        unused (so other programs can use it) 
+
+ sound-dsp-setfrag  yes/no    yes       Set this to 'no' if you use PCSND
+                                        sound driver
+
+ keyboard-type      extended  extended  Specifies the mapping of the keys,
+                    spectrum            from the PC keyboard to the spectrum
+                    compat              keys. See section 6.2
+                    custom              
+
+ cursor-type        shifted   shifted   How to use the arrow keys on the
+                    raw                 PC keyboard. See section 6.2
+                    joystick            
+
+ allow-ascii        yes/no    yes       Interpret other keys on the PC
+                                        keyboard. See section 6.2
+
+ true-shift         <modif>*  alt       Modifier to get shifted symbol 
+                                        as on the PC.
+
+ func_shift         <modif>*  control   Modifier to get control functions.
+
+ color-type         normal    normal    What type of colors to use. Gray-
+                    grayscale           scale looks better on monochrome
+                    custom              displays.
+
+ pause-on-iconify   yes/no    no        Whether to pause emulator, when it
+                                        is iconified ('xspect' only)
+
+ vga-pause-bg       yes/no    no        Whether to pasue emulator, when you
+                                        switch to a different console
+
+ quick-load         yes/no    no        Use built in (quick) loader for
+                                        tapefiles.
+
+ auto-stop          yes/no    no        Pause tape after each segment when
+                                        quick loading.
+
+ load-immed         yes/no    no        Load tapefile immediately (as if 
+                                        you typed LOAD "" / ENTER)
+
+ pause              yes/no    no        Pause the emulator on startup
+
+
+* <modif> can be one of: none, shift, lock, control, alt, 
+                         mod2, mod3, mod4, mod5
+
+Extra command line parameters:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On the command line you may also use the following options:
+
+ -help              Prints usage information, and a list of available
+                    options
+
+ -version           Prints out the version
+
+
+Also on the command line, a snapshot file and/or a tapefile can be
+specified. Spectemu figures out the type of file from the extension.
+You can omit the extension, e.g. you have a snapshot file 'snap.z80'
+and you start spectemu with 'xspect snap', then it will add the '.z80'
+extension.
+
+You can specify what type is the file by preceding it with one of
+'-z80', '-sna', '-tap' or '-tzx' options. This is useful for cases,
+when the filename does not have an extension (e.g. automatic starting
+with the midnight commander). 
+
+Extra config file options:
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Color configuration
+'''''''''''''''''''
+You can configure the custom colors in the config files (and the X
+Resource Database) with:
+
+    color[0..15] = R G B
+
+e.g. 
+
+    color-type = custom
+
+    color0 = 10 20 30
+    color7 = 40 50 60
+
+changes the 0-th (black) and the 7-th (white) colors. 
+
+Keyboard configuration
+''''''''''''''''''''''
+You can set custom key bindings in the config file:
+
+    Key_<keysym_name> = K ...
+    ...
+
+Or in the X resource database:
+
+    xspect.keys: <keysym_name> = K ...; ...
+
+
+The <keysym_name> can be set to any keysym (defined in 'spkey_p.h').
+The K arguments are the spectrum keys to be assigned to the given PC
+key. K can be any letter, number (a..z, 0..9) or the following:
+
+    none, space, enter, capsshift, symbolshift, 
+    kempston_up, kempston_down, kempston_left, kempston_right, kempston_fire
+
+e.g.
+   
+    keyboard-type = custom
+    true-shift  = none   
+
+    Key_Insert  = capsshift 9
+    Key_Tab     = capsshift symbolshift
+    Key_Shift_R = kempston_fire
+    Key_Alt_L   = symbolshift
+    Key_Alt_R   = symbolshift
+    
+or as it would appear in a .Xdefaults file:
+
+    xspect.keyboardType: custom
+    xspect.trueShift:    none
+
+    xspect.keys:         Insert = capsshift 9;        \
+                         Tab = capsshift symbolshift; \
+                         Shift_R = kempston_fire;     \
+                         Alt_L = symbolshift; Alt_R = symbolshift
+
+6.2 Using the Spectrum keyboard
+-------------------------------
+
+Those of you that have at some time used a Spectrum know, that the keyboard
+of this little computer is something very strange, with a LOT of keywords
+and symbols on and around each key. If you have not seen this keyboard (or
+have somehow managed to forget some bit of information that is on it) we
+produced quite a good copy of it, found in the 'spectkey.gif' file.
+
+If you are using 'xspect' than pressing 'Ctrl-k' brings up the picture
+of the spectrum keyboard. You can press keys with the mouse (even more
+than one if you like), and it also shows which keys are pressed.  (You
+can see what the emulator does when, for example you press 'BackSpace'
+or a '[' key on the PC keyboard).
+
+The default mapping of the spectrum's keyboard to the PC's is the
+following:
+
+The numbers, the letters, Enter and Space are the same. The left Shift on
+the PC corresponds to the CAPS SHIFT key of the Spectrum, and the right
+Shift corresponds to the SYMBOL SHIFT. This is quite simple and with these
+keys you can get all the functionality of the original Spectrum (assuming
+of course, you know how).
+
+But...
+
+To make life a bit easier, you can also use the Backspace, the arrow
+keys, and the following symbols as on a PC keyboard: ,./;'-=<>?:"_+[]{}\|~
+(unless you turn the 'allow-ascii' option off) 
+
+To get a symbol which is written above the numbers on the PC, and not
+the function or symbol that is on the Spectrum, press Alt (actually
+the value of the 'true-shift' option) instead of Shift.
+
+You can slightly modify the mapping with the 'keyboard-type' and
+'cursor-type' options. Every mapping includes the basic keys (letters,
+numbers, Space and Enter). Here are the mappings special to each
+keyboard type and cursor type:
+
+   PC Key            Spectrum Key
+   ------            ------------
+
+(Keyboard Types)
+
+extended: (default)
+   Left Shift    ->  Caps Shift
+   Right Shift   ->  Symbol Shift
+   Back Space    ->  Caps Shift + '0'
+   Escape        ->  Caps Shift + '1'
+
+spectrum: (spectrum-like layout, useful for some games, e.g. Jumping Jack)
+   < same as extended, plus: >
+   Comma (,)     ->  Symbol Shift
+   Period (.)    ->  Space
+   Semicolon (;) ->  Enter    
+
+compat: (similar to other emulators' layouts, e.g. Z80, X128, XZX ...)
+   Shift (both)  ->  Caps Shift
+   Alt           ->  Symbol Shift
+   Back Space    ->  Caps Shift + '0'
+   Escape        ->  Caps Shift + '1'
+
+custom:
+   Use key bindings specified in the config file (see section 6.1)
+
+(Cursor Types)
+
+shifted: (default)
+   Left Arrow    -> Caps Shift + '5'
+   Down Arrow    -> Caps Shift + '6'
+   Up Arrow      -> Caps Shift + '7'
+   Right Arrow   -> Caps Shift + '8'
+
+raw:
+   Left Arrow    -> '5'
+   Down Arrow    -> '6'
+   Up Arrow      -> '7'
+   Right Arrow   -> '8'
+
+
+joystick:
+   Left Arrow    -> Kempston Left
+   Down Arrow    -> Kempston Down
+   Up Arrow      -> Kempston Up
+   Right Arrow   -> Kempston Right
+   Keypad Ins    -> Kempston Fire
+   Keypad Del    -> Kempston Fire
+   Keypad Home   -> Kempston Up + Left
+   Keypad PgUp   -> Kempston Up + Right
+   Keypad End    -> Kempston Down + Left
+   Keypad PgDn   -> Kempston Down + Right
+
+
+6.3 Keys that control the emulator
+----------------------------------
+
+All control keys are produced by pressing the Ctrl key and another key.
+
+ Ctrl-c, F10      Quit the emulator immediately
+             
+ Ctrl-l, F3       Load a snapshot file; you must type the path and 
+                  filename on the terminal where you started the emulator,
+                  e.g. 'snap/chuckie2'. The type and extension of the
+                  file is determined automatically (.z80 or .sna). 
+             
+ Ctrl-t, F2       Save the current state of the emulator in a snapshot file.
+                  Format depends on the extension (.z80 or .sna). If no
+                  extension is given, .z80 is appended. 
+
+ Ctrl-w, Ctrl-F2  Save a snapshot to a temporary file 
+
+ Ctrl-e, Ctrl-F3  Restore last temporary snapshot saved with 'Ctrl-w'
+
+ Ctrl-q, F5       Reset the Spectrum
+          
+ Ctrl-f           Fast mode
+          
+ Ctrl-n           Normal speed mode
+          
+ Ctrl-b           Pause/Unpause emulator (you can do operations like loading
+                  a snapshot file, etc... in paused mode too)
+          
+ Ctrl-m           Toggle sound on/off
+
+ Ctrl-h, F1       Print help
+          
+ Ctrl-k           Display (undisplay) keyboard of spectrum. See section 6.2.
+          
+ Ctrl-p, F4       Play tape. Tape file must be entered on the terminal. 
+                  Optionally the starting segment can be entered; 
+                  e.g. 'tape/tape1.tap' or 'tape/tape1.tzx 13'
+          
+ Ctrl-s, F7       Stop tape
+          
+ Ctrl-y           Toggle quick loading
+          
+ Ctrl-o, F6       Pause and unpause during tapefile playing (restarts the
+                  current segment).
+          
+ Ctrl-r           Record to tape file. See section 8.3.
+          
+ Ctrl-\, F9       Refresh screen, reset keyboard state and 
+                  refresh colors.
+
+ Ctrl-j           Toggle private colormap mode (only X) 
+      
+ Ctrl-comma       Decrease window size (only X)
+
+ Ctrl-dot         Increase window size (only X)
+          
+ Ctrl-equals      Skip more screen frames
+          
+ Ctrl-minus       Skip less screen frames
+          
+ Ctrl-]           Increase sound buffer size 
+          
+ Ctrl-[           Decrease sound buffer size
+          
+
+6.4 Effects of changing frame frequency and sound buffer size
+-------------------------------------------------------------
+
+ONLY READ THIS IF YOU ARE NOT TOTALLY SATISFIED WITH THE EMULATOR'S
+PERFORMANCE
+
+This should be totally automatic, so I'm now programming you to do what
+the emulator should. (Luckily you are much easier to program) 
+
+Frame skipping determines, after how many frames the emulator displays one
+on the screen. There are 50 frames in one second, and normally every other
+frame is displayed (25 per second). If the emulator is too slow under X,
+increasing frame skipping can have a good effect on performance, but at the
+cost of poorer quality. But the interesting thing is, that increasing frame
+skipping may cause a worsening of both performance and of picture quality
+(I will not explain it here why).
+
+Decreasing frame skipping has the opposite effect of the above.
+
+If the emulator uses sound, but sound is not continuous, then experiment
+with increasing sound buffer size, and increasing frame skipping. If you
+are lucky you can make things a bit better. Increasing sound buffer size
+has also the negative effect of delaying more the sound effects.
+
+7. Where can I get ZX Spectrum games for this emulator
+======================================================
+
+On the Spectemu homepage (http://www.inf.bme.hu/~mszeredi/spectemu/)
+you can find a list of sites worth checking. Here are some:
+
+http://www.void.demon.nl/spectrum.html
+http://www.nvg.unit.no/sinclair/planet/
+
+The fact is, that there were a lot of Spectrum games around on audio tapes,
+and some of them are really good. There were always cracked and copyable
+versions around, and nobody was interested in copyrights. Unfortunately the
+big FTP archives do not allow non free software on their servers, so I
+can't include any games in this distribution.
+
+(Because Spectrums have died out, and perhaps some of the software
+companies do not exist any more, probably some games could be distributed
+freely. But I will not check on those things.)
+
+I've included a program named 'spconv', written by Henk de Groot
+(hegr@ensae.ericsson.se) which can convert between snapshot file formats.
+
+Alternatively if you have some old spectrum tapes laying around, and you
+are very brave, you can check out section 8.5.
+
+8. Tape files
+=============
+
+8.1 Loading a tape file
+-----------------------
+
+The emulator now supports G.A. Lunter's .TAP and Tomaz Kac's .TZX tape
+files. To load a file, enter
+
+LOAD ""
+
+to the spectrum (by pressing keys j""), then press 'Ctrl-p'.
+On the terminal enter the name of the tape file to load, e.g.
+
+tape/cnamemat
+
+The emulator will now load from the tape file 'tape/cnamemat.tzx' or
+'tape/cnamemat.tap' whichever exists. Playing automatically stops at
+the end of the tape file. To stop loading before this press Ctrl-s.
+
+The default extensions are '.tap' / '.tzx' or '.TAP' / '.TZX' depending
+on whether the entered tape file is upper or lower case.
+
+While loading try pressing Ctrl-f, which can speed things up. After loading
+the file press press Ctrl-n to restore normal speed.
+
+8.2 Quick loading of tape files 
+-------------------------------
+
+Quick loading means bypassing of the tape loading routine in the
+spectrum ROM, and loading of tape blocks directly into the memory.
+Some programs use their own tape loading routines, and in that case
+the tape blocks are always "slow loaded" (see above section).
+
+Quick loading is optional and can be toggled with the 'Ctrl-y' key.
+
+When quick loading is on, after entering 'LOAD ""' you are immediately
+prompted for a tapefile. If the tapefile can't be loaded, the quick
+loading of the first header block is cancelled, but you can still load
+the rest of tape by pressing 'Ctrl-p' and entering the tapefile name.
+
+Even in quick load mode, the playing of tapes is not automatically
+paused, when the program doesn't load more blocks, so with '.tap'
+files containing multipart games, you have to pause the tape at the
+end of each part with 'Ctrl-o' ('.tzx' tapefiles can contain a
+"Stop the Tape" mark, to automatically pause playing).
+
+8.3 Saving to a tape file
+-------------------------
+
+If you want to save something to a tape file using the spectrum's "SAVE"
+command, do the following:
+
+1) Enter 'SAVE "file"' on the spectrum
+2) press Ctrl-r to start the recording
+3) on the terminal enter the name of the tapefile to use
+4) press a key on the spectrum
+5) wait for the recording to stop
+6) press Ctrl-s to stop recording
+
+If the specified tape file already exists, the newly saved segments are
+appended to the old tapefile.
+
+
+8.4 Saving a tape file to real tape
+-----------------------------------
+
+The utility 'tapeout' enables you to save tape files (.tap and .tzx)
+to real tape via the soundcard. At the moment it only works on Linux,
+because it uses the OSS sound driver. (You can compile it for non
+linux systems, by adding -DNO_SOUNDCARD to CFLAGS in Makefile. Then
+instead of writing to the sound device, the program writes to a
+headerless wav file (bits: 8, sample rate: what you've given).)
+
+You can compile 'tapeout' by entering
+
+  make tapeout
+
+in the main directory of spectemu. The command line parameters are:
+
+  tapeout sample_rate tapefile [start_block [output_file]]
+
+The default value for start_block is 0, for output_file it is "/dev/dsp"
+(or if compiled -DNO_SOUNDCARD it is "tape.out").
+
+You can stop recording to the tape by pressing Ctrl-C.
+
+8.5 Making a tape file from a real tape
+---------------------------------------
+
+WARNING, ONLY TRY THIS IF YOU REALLY-REALLY WANT TO!
+
+Well it's not so bad as that, I've digitized a lot Spectrum tapes with
+ease, but I have the advantage of having played with tapes a lot on the
+real Spectrum, and of being able to modify the code which does the
+digitization.
+
+First of all you must have a sound-card to do this. If you've got it, then
+you have a small chance of succeeding.
+
+First get the cassette player which you used to play Spectrum tapes. Then
+plug it in your sound-card's 'line-in' or 'mic' inputs. Then somehow set the
+sound driver so that it reads things form the input in which you plugged
+your cassette (I use 'xmmix' the 'Motif Audio Mixer' to do this). And if
+you've managed to get this far, go to the directory where you want to store
+the tape files (remember, there will be a lot of little files: one for each
+little segment!), and enter the following command:
+
+  recs - 32000 | filt | spload tapefile
+
+               or     
+
+  recs - 32000 | spload tapefile
+
+(The first type worked better for me)
+
+Where 'recs', 'filt' and 'spload' are programs found in the utils
+directory, and 'tapefile' is the name of the tape file without the '.spt'
+extension.
+
+'.spt' tape files only exist because of historical reasons (the tape
+digitizing program preceeded the emulator, and also at that time I didn't
+know of the '.TAP' format), and now it isn't suppurted by the emulator
+any more. So you must convert '.spt' files to '.tap' with the utility 
+spt2tap (in the utils directory) to use it with the emulator. 
+
+(The contents of the utils directory can be remade by changing to that
+directory and entering the command:  'make realclean; make')
+
+Now you can put your favorite Spectrum cassette in the cassette player, and
+press the Play button.
+
+'spload' will write a lot of information on the terminal, of which you
+might try to make some sense. Also you can do a 'tail -f tapefile.spt' in
+another terminal, to see what is happening. Again if nothing happens, then
+you are on your own (and most probably at first nothing will happen).
+
+And remember that this digitizer is not better than the real Spectrum, so
+if you cannot load a program with a Spectrum, you'll most probably will not
+be able to load it with 'spload'.
+
+Good Luck!
+
+9. Bug reports
+==============
+
+Please send bug reports to:
+
+mszeredi@inf.bme.hu
+
+If you make any changes to the source, please mail me the 'diff -u' of the
+file(s) changed, and also why were the changes needed.
+
+Please also tell me if you would like to maintain, or to continue
+developing spectemu.
+
+10. Credits
+===========
+
+Szeredi Tamas, for testing the emulator, and for helping with the
+'spectkey.gif'.
+
+Egmont Koblinger for helping to write some parts of the emulator, and for
+a lot of useful suggestions.
+
+Dani Nagy and Zsazsa for helping to test the emulator.
+
+G.A. Lunter for a very good description of the Spectrum, the undocumented
+features of Z80, and the '.z80' snapshot file format.
+
+And lots of others, who sent me good ideas and modifications.

@@ -1,0 +1,182 @@
+This file describes how to use the Z80 processor emulation as a
+standalone module (without the ZX Spectrum emulation).
+
+===========================================================================
+You will need the following files:
+
+For the 'intel x86' assembly version:
+-------------------------------------
+
+z80.c z80.h z80_type.h i386step.S i386def.S i386op1.S i386op1x.S 
+i386op2.S i386op2x.S i386op3.S i386op3x.S i386op4.S i386op5.S i386op6.S 
+sp_to_s.c
+
+For the 'C' version:
+--------------------
+
+z80.c z80.h z80_type.h z80_step.c z80_def.h z80_ari.h z80optab.c z80optab.h
+z80_op1.c z80_op1x.c z80_op1.h z80_op2.c z80_op2x.c z80_op2.h
+z80_op3.c z80_op3x.c z80_op3.h z80_op4.c z80_op4x.c z80_op4.h
+z80_op5.c z80_op5.h z80_op6.c z80_op6.h
+
+===========================================================================
+Makefile rules:
+
+For the 'intel x86' assembly version:
+-------------------------------------
+
+CC = gcc
+AR = ar
+CPPFLAGS = 
+CFLAGS = -Wall -O3
+CPP = $(CC) -E
+
+z80_i386_objs = z80.o i386emul.o
+
+libz80.a: $(z80_i386_objs)
+    $(AR) cr libz80.a $(z80_i386_objs)
+
+i386emul.o: i386emul.s
+    $(CC) -c $(CFLAGS) i386emul.s
+
+i386emul.s: i386emul.sp sp_to_s
+    ./sp_to_s < i386emul.sp > i386emul.s
+
+i386emul.sp: i386step.S
+    $(CPP) $(CPPFLAGS) i386step.S > i386emul.sp
+
+sp_to_s: sp_to_s.o
+    $(CC) -o sp_to_s $(LDFLAGS) sp_to_s.o
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+    $(CC) -c $(CFLAGS) $(CPPFLAGS) $<
+
+
+For 'C' version:
+----------------
+
+CC = gcc
+AR = ar
+CPPFLAGS = -DZ80C
+CFLAGS = -Wall -O3 -fomit-frame-pointer -funroll-loops
+
+z80_c_objs = z80.o z80_step.o z80optab.o z80_op1.o z80_op2.o z80_op3.o \
+             z80_op4.o z80_op5.o z80_op6.o 
+
+libz80.a: $(z80_c_objs)
+    $(AR) cr libz80.a $(z80_c_objs)
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+
+.c.o:
+    $(CC) -c $(CFLAGS) $(CPPFLAGS) $<
+
+===========================================================================
+The following functions are defined by libz80.a:
+
+void z80_init()
+---------------
+
+This function initializes the processor emulation. This must be called
+only once at the beginning of the program.
+
+int z80_step(int ticknum)
+-------------------------
+
+This function executes z80 instructions for 'ticknum' number of clock
+cycles. It returns the remaining number of ticks.
+
+NOTE: the remaining number of ticks is always zero or negative,
+meaning that exactly, or more than the given 'ticknum' clock cycles
+were executed. This is because WHOLE instructions are executed at a
+time.
+
+NOTE: HALT, LDDR, etc... do not count as one instruction, but as a
+series of instructions (e.g. HALT is a series of NOPs).
+
+void z80_reset()
+----------------
+
+This function resets the Z80 processor. This has the same effect as
+applying a pulse to the RESET input of the processor.
+
+NOTE: z80_init() does not reset the Z80, z80_reset() should be called
+after it.
+
+void z80_interrupt(int data)
+-----------------------------
+
+Causes a Maskable Interrupt. Interrupt mode 1 and 2 are emulated
+correctly, in interrupt mode 2 'data' is used in the address
+calculation. In interrupt mode 0, it is assumed (as on the ZX
+Spectrum) that 0xFF is on the data bus, and always RST 38 is
+generated.
+
+NOTE: It is not emulated, that in the instruction after EI no
+interrupt can be generated.
+
+void z80_nmi()
+--------------
+
+Causes a Non Maskable Interrupt.
+
+===========================================================================
+Accessing the memory, the I/O ports and the Z80 processor's state
+(i.e. registers, etc...)
+
+To use the functions above and the variables below, include the
+"z80.h" include file.
+
+Memory
+------
+
+The memory is stored in the z80_proc.mem[] byte array, which has a
+size of 65536. By default it is all RAM. To make parts of it read
+only, you have to redefine the appropriate macros in i386step.S and/or
+z80_def.h. (These macros are sorounded by #ifdef SPECT_MEM, #else,
+#endif statements.)
+
+The memory is initialised to random data. You must fill it in before
+starting the emulation, but AFTER the call to z80_init().
+
+I/O
+---
+
+The input port values are stored in z80_inports[] array, which has a
+size of 256. The IN instruction will use the appropriate element of
+this array. This array is initialised to all zeroes.
+
+The output port values can be queried from the z80_outports[] array,
+which has also a size of 256. The OUT instruction will store the value
+in the element addressed by the instruction.
+
+If you need more complex behaviour of the I/O, you must redefine the
+appropriate macros in i386step.S and z80_def.h.
+
+Processor state
+---------------
+
+You can access the processor's state with the following variables and
+macros defined in "z80.h".
+
+Registers:
+
+Double registers: 
+  normal:  BC, DE, HL, AF, IR, IX, IY, PC, SP,
+  aux:     BCBK, DEBK, HLBK, AFBK
+
+Single registers:
+  RB, RC, RD, RE, RH, RL, RA, RF, RI, RR, XH, XL, YH, YL, PCH, PCL, SPH, SPL
+
+Misc state:
+  z80_proc.haltstate   (1: processor is in halt mode, 0: processor is runnig)
+  z80_proc.it_mode     (interrupt mode 0, 1 or 2)
+  z80_proc.iff1        (interrupt flip-flop 1)
+  z80_proc.iff2        (interrupt flip-flop 2)
+
+You need not access the other parts of z80_proc, they are meaningless
+outside the z80_step() function.

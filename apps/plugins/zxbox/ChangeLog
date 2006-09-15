@@ -1,0 +1,193 @@
+04.09.2006 code cleanup; now using IRAM correctly (i hope)
+
+31.08.2006 far better sound, volume option is working now
+
+29.08.2006 predefined keymaps, menu reworking, volume settings
+
+28.08.2006 more options : frame-skipping, sound on/off, toggle 'fast' mode
+28.08.2006 output actual speed of emulation in percent rather than number of rendered frames
+28.08.2006 timing implementation (no >100 % speed in sims)
+
+
+15.08.2006 output FPS on screen when in buffered and into logf when in unbuffered mode (grayscale)
+
+
+15.08.2006 buffered mode when in grayscale mode
+
+11.08.2006 support for grayscale lib
+
+05/2006  - edited by Anton Romanov for 
+RockBox - http://www.rockbox.org
+with the help of Dave Chapman and Szeredi Miklos
+
+ 
+98/05/18  Version 0.94 released
+===============================
+
+98/05/18  Updated the man page (a more complete man-page is still needed!)
+98/05/15  Some bugs fixed
+
+98/05/14 Version 0.93.4 released
+--------------------------------
+
+98/05/14  Small additions:
+      - Keyboard matrix is emulated (only 1 level, I hope this is enough) 
+          - "color refreshing" (maybe some other aplications could do it!)
+          - Keyboard configuration is now fully implemented
+    
+98/05/11  Added DOS timer support with Allegro library
+
+98/05/08  Version 0.93.3 released
+---------------------------------
+    
+98/05/08  Created README.Z80 to describe how to use Z80 emulation    
+98/05/06  Small new features + bugfixes
+      - Function keys for commonly used functions
+      - Keyboard config: (extended, spectrum, compat) and (shifted, raw) 
+        are now working. No custom keyboard or joystick yet
+      - Small modifications to make z80 emulation separate
+
+98/04/30  Version 0.93.2 released
+---------------------------------
+
+98/04/30  I've removed the BROKEN_VGAKEYBOARD part from vgakey.c. 
+      I hope nobody's using SVGALIB version smaller than 1.2.11.
+
+98/04/29  Some small new features: (see example.cfg for a complete list)
+      - different icon when the emulator is paused
+      - optional private colormap
+      - configurable colours (grayscale looks better on
+        monochrome displays)
+      - filetype can be given on the command line (tapefiles too)
+      - optional immediate loading of tapes (-load-immed)
+    
+98/04/27  Added configurability to spectemu:
+      - global config file (($prefix)/share/spectemu/spectemu.cfg)
+      - user's config file (~/.spectemurc)
+      - X resource database
+      - command line
+    
+98/04/23  Mode 320x240 is used in vgaspect (if available)
+
+98/04/22  Version 0.93.1 released
+---------------------------------
+    
+98/04/21  Handle "extra" ascii keys: []{}|\~
+98/04/19  Added Spectrum keyboard picture, which shows pressed keys, and
+      keys can be pressed with mouse.
+98/04/16  Rewrite keyboard handling:
+      - Fixes keyboard bug in X (key remained pressed)
+      - Better configurability: spectrum key definitions are in spkey.c
+        instead of xkey.c and vgakey.c
+
+98/04/07  Added readline support by Christian Sievers <sievers@cip.rz.tu-bs.de>
+
+98/03/24  Version 0.92 released
+===============================
+    
+98/03/23  Last minute bugfixes
+    
+98/03/20  Version 0.92p3 released
+98/03/20  Eliminated all sorts of minor bugs
+98/03/19  Implement LOOP/CALL/RETURN blocks in TZX handling
+98/03/17  Fixed (hopefully all) bugs in TZX handling:
+       - There must be a 1ms pause at end of tape.
+      - Pausing after data blocks fixed.
+      - Made tape I/O timing ultra precise (e.g. see Flashpoint)
+    
+98/03/14  Fixed small bug in quick load
+98/03/13  Sound of tape is now fixed (not perfect, but good enough)
+          Created simple man page
+    
+98/03/11  Version 0.92pre2 released
+98/03/10  Fixed quick load of tapefiles
+98/03/10  Fixed resize bugs
+
+98/03/09  Version 0.92pre1 released
+98/03/08  C-version now handles bits 3 and 5 of the Flag register
+      (I hope I didn't break anything with this).
+98/03/08  Wrote 'tapeout' utility to save tapefiles to real tape (via 
+      soundcard).
+
+98/03/06  Implemented emulator pause.
+98/03/06  Added ability to display spectrum keyboard layout on text 
+      console (Radovan.Garabik@fmph.uniba.sk).
+
+98/03/05  Rewrite of snapshot handeling:
+          - All versions of Z80 snapshots can now be loaded.
+      - Loading and saving of SNA snapshot format is supported. 
+      - Quick loading and saving of temporary snapshot.
+    
+98/03/03  Rewrite of tapefile handeling:
+      - Support for most TZX blocks (recognise length of all v1.11
+        blocks)
+      - SPT tapefiles are no longer supported 
+          - Added quick loading of tapefiles
+      - Timing in tape emulation is very exact now, but this makes 
+        tape sound ugly (this will be fixed).
+    
+98/01/28  Version 0.91a released
+98/01/26  Added detection for underlines in asm names to configure  
+
+98/01/12  Version 0.91 released
+===============================
+    
+98/01/08  Changes to configure to detect X libraries better
+    
+97/11/29  Use XSetWMProperties instead of XmbSetWMProperties
+97/11/26  Created icon for xspect
+97/11/20  IO and memory timing are improved (ULA / CPU clash)
+
+97/11/18  Fixed 0xfe port problems
+97/11/17  Input from unused ports (others than 0xFE) result in 0xFF, not 0x00
+
+97/11/12  8000 sample/sec sound on SUN
+97/11/12  Fixed screen bugs
+
+97/11/11  Window resizing in X (thanks to Egmont)  
+97/11/11  Fixed FocusIn/FocusOut bug (twm, olwm, ...)
+97/11/11  Small changes and bugfixes
+    
+97/11/09  Sound on SUN (sample rate 16000, but 8000 is coming for older
+      SUNs.
+    
+97/10/26  'Interrupted system call' is not an error on sound device
+97/10/26  Fixed screen scramble bug in console background running
+    
+97/10/20  Version 0.90pre1 released
+
+97/10/20  Tested on the following Machines/Operating systems/Compilers:
+       o Intel/Linux/gcc              (assembly)
+       o Sparc/Solaris/gcc            (C)
+       o Alpha/OSF1/cc                (C)
+       o Sequent(i486)/Dynix-Ptx/gcc  (assembly)
+
+97/10/20  Automatic configuration with 'configure' script   
+97/10/20  Bugfixes and cleanups
+97/10/20  Experimental DOS support with DJGPP (timer missing)
+97/10/20  Added emulation in C
+97/05/22  Background running for svgalib added (Needs svgalib >= 1.2.11)
+
+97/04/17  Version 0.84 released
+===============================
+    
+97/04/17  Added SLL to the emulated instructions
+
+97/04/12  The following changes were inspired by Egmont Koblinger:
+      - Resize bug fixed
+      - Implemented tape file pause
+      - Implemented saving to tape file
+      - Snapshot loading from command line
+      - Other small changes
+
+97/04/03  Bug fix in tape handling (thanks to Egmont Koblinger)
+97/03/26  Speeded up border drawing in X
+97/03/26  Added .TAP support
+
+97/03/10  Version 0.81 released
+===============================
+    
+97/03/10  Bug fixes and minor changes (thanks to Tamas Meszaros)
+    
+97/01/21  Version 0.8: First public release
+===========================================

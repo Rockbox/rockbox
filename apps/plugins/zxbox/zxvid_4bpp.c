@@ -1,0 +1,81 @@
+#include "zxvid_com.h"
+
+#if !defined USE_GRAY && LCD_PIXELFORMAT == HORIZONTAL_PACKING && LCD_DEPTH < 4
+/* screen routines for greyscale targets not using greyscale lib */
+#define FB_WIDTH ((LCD_WIDTH+3)/4)
+unsigned char pixmask[4] ICONST_ATTR = {
+        0xC0, 0x30, 0x0C, 0x03
+    };
+
+void init_spect_scr(void)
+{
+    sp_colors[0] = 0;/* BLACK ? */
+    sp_colors[1] = 1;/* BLUE ? */
+    sp_colors[2] = 1;/* RED ? */
+    sp_colors[3] = 1;/* MAGENTA ? */
+    sp_colors[4] = 2;/* GREEN ? */
+    sp_colors[5] = 2;/* CYAN ? */
+    sp_colors[6] = 3;/* YELLOW ? */
+    sp_colors[7] = 3;/* WHITE ? */
+
+    /* same but 'light/bright' colors */
+    sp_colors[8] = 1;
+    sp_colors[9] = 1;
+    sp_colors[10] = 1;
+    sp_colors[11] = 1;
+    sp_colors[12] = 2;
+    sp_colors[13] = 2;
+    sp_colors[14] = 3;
+    sp_colors[15] = 3;
+
+    if ( !settings.invert_colors ){
+        int i;
+        for ( i = 0 ; i < 16 ; i++ )
+            sp_colors[i] = 3 - sp_colors[i];
+    }
+    sp_image = (char *) &image_array;
+    spscr_init_mask_color();
+    spscr_init_line_pointers(HEIGHT);
+
+}
+void update_screen(void)
+{
+    char str[80];
+ 
+    fb_data *frameb;
+    int y=0;
+    int x=0;
+    unsigned char* image;
+    int srcx, srcy=0;     /* x / y coordinates in source image */
+    image = sp_image + ( (Y_OFF)*(WIDTH) ) + X_OFF;
+    unsigned mask;
+
+    for(y = 0; y < LCD_HEIGHT; y++)
+    {
+        frameb = rb->lcd_framebuffer + (y) * FB_WIDTH;
+        srcx = 0;           /* reset our x counter before each row... */
+        for(x = 0; x < LCD_WIDTH; x++)
+        {
+            mask = pixmask[x & 3];
+            frameb[x >> 2] = (frameb[x >> 2] & ~mask) |  ((image[(srcx>>16)]&0x3) << ((3-(x & 3 )) * 2 ));
+            srcx += X_STEP;    /* move through source image */
+        }
+        srcy += Y_STEP;      /* move through the source image... */
+        image += (srcy>>16)*WIDTH;   /* and possibly to the next row. */
+        srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
+    }
+
+    if ( settings.showfps ) {
+        int percent=0;
+        int TPF = HZ/50;/* ticks per frame */
+        if ((*rb->current_tick-start_time) > TPF )
+            percent = 100*video_frames/((*rb->current_tick-start_time)/TPF);
+        rb->snprintf(str,sizeof(str),"%d %%",percent);
+        rb->lcd_putsxy(0,0,str);
+    }
+
+
+    rb -> lcd_update();
+}
+
+#endif
