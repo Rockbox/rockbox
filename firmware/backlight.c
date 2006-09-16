@@ -158,7 +158,7 @@ static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 #ifdef X5_BACKLIGHT_SHUTDOWN
 #define BACKLIGHT_QUIT 256
 /* Need to save this for x5 shutdown */
-static int backlight_thread_id;
+struct thread_entry* backlight_thread_id;
 #endif
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
