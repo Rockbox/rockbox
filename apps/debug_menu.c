@@ -186,7 +186,7 @@ bool dbg_os(void)
         lcd_puts(0, 0, "Stack usage");
 
         /* Only Archos Player uses this - so assume a single core */
-        usage = thread_stack_usage(currval);
+        usage = thread_stack_usage(&cores[CPU].threads[currval]);
         snprintf(buf, 32, "%d: %d%%  ", currval, usage);
         lcd_puts(0, 1, buf);
 
@@ -201,12 +201,12 @@ bool dbg_os(void)
         case ACTION_SETTINGS_DEC:
             currval--;
             if(currval < 0)
-                currval = cores[CPU].num_threads-1;
+                currval = MAXTHREADS-1;
             break;
 
         case ACTION_SETTINGS_INC:
             currval++;
-            if(currval > cores[CPU].num_threads-1)
+            if(currval > MAXTHREADS-1)
                 currval = 0;
             break;
         }
