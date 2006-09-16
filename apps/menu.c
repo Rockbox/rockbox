@@ -60,7 +60,7 @@ struct menu {
     struct gui_synclist synclist;
 };
 
-#define MAX_MENUS 5
+#define MAX_MENUS 6
 
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
