@@ -671,8 +671,8 @@ void remove_thread(struct thread_entry *thread)
     
     if (thread == cores[CURRENT_CORE].sleeping)
         remove_from_list(&cores[CURRENT_CORE].sleeping, thread);
-    
-    remove_from_list(NULL, thread);
+    else
+        remove_from_list(NULL, thread);
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
