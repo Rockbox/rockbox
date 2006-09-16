@@ -1315,6 +1315,8 @@ bool view_battery(void)
                     minv = 1;
                 if (maxv < 2)
                     maxv = 2;
+                if (minv == maxv)
+                    maxv < 65535 ? maxv++ : minv--;
 
                 lcd_clear_display();
                 snprintf(buf, 30, "Battery %d.%02d", power_history[0] / 100,
