@@ -80,13 +80,27 @@ extern char ata_device;
 extern int ata_io_address;
 extern struct core_entry cores[NUM_CORES];
 
+char thread_status_char(int status)
+{
+    switch (status)
+    {
+        case STATE_RUNNING      : return 'R';
+        case STATE_BLOCKED      : return 'B';
+        case STATE_SLEEPING     : return 'S';
+        case STATE_BLOCKED_W_TMO: return 'T';
+    }
+    
+    return '?';
+}
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 bool dbg_os(void)
 {
+    struct thread_entry *thread;
     char buf[32];
     int i;
     int usage;
+    int status;
 #if NUM_CORES > 1
     unsigned int core;
     int line;
@@ -98,24 +112,54 @@ bool dbg_os(void)
 
     while(1)
     {
+#if 0 /* Enable to simulate UI lag. */
+        int _x;
+        for (_x = 0; _x < 1000000L; _x++) ;
+#endif
 #if NUM_CORES > 1
         lcd_puts(0, 0, "Core and stack usage:");
         line = 0;
         for(core = 0; core < NUM_CORES; core++)
         {
-            for(i = 0; i < num_threads[core]; i++)
+            for(i = 0; i < MAXTHREADS; i++)
             {
-                usage = thread_stack_usage_on_core(core, i);
-                snprintf(buf, 32, "(%d) %s: %d%%", core, thread_name[core][i], usage);
+                thread = &cores[core].threads[i];
+                if (thread->name == NULL)
+                    continue;
+                
+                usage = thread_stack_usage(thread);
+                status = thread_get_status(thread);
+                
+                snprintf(buf, 32, "(%d) %c%c %d %s: %d%%", core, 
+                         (status == STATE_RUNNING) ? '*' : ' ', 
+                         thread_status_char(status),
+                         cores[CURRENT_CORE].threads[i].priority,
+                         cores[core].threads[i].name, usage);
                 lcd_puts(0, ++line, buf);
             }
         }
 #else
         lcd_puts(0, 0, "Stack usage:");
-        for(i = 0; i < cores[CURRENT_CORE].num_threads;i++)
+        for(i = 0; i < MAXTHREADS; i++)
         {
-            usage = thread_stack_usage(i);
-            snprintf(buf, 32, "%s: %d%%", cores[CURRENT_CORE].threads[i].name, usage);
+            thread = &cores[CURRENT_CORE].threads[i];
+            if (thread->name == NULL)
+                continue;
+            
+            usage = thread_stack_usage(thread);
+            status = thread_get_status(thread);
+# ifdef HAVE_PRIORITY_SCHEDULING
+            snprintf(buf, 32, "%c%c %d %s: %d%%",
+                     (status == STATE_RUNNING) ? '*' : ' ', 
+                     thread_status_char(status),
+                     cores[CURRENT_CORE].threads[i].priority,
+                     cores[CURRENT_CORE].threads[i].name, usage);
+# else
+            snprintf(buf, 32, "%c%c %s: %d%%",
+                     (status == STATE_RUNNING) ? '*' : ' ', 
+                     (status == STATE_BLOCKED) ? 'B' : ' ', 
+                     cores[CURRENT_CORE].threads[i].name, usage);
+# endif
             lcd_puts(0, 1+i, buf);
         }
 #endif

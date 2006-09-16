@@ -1932,11 +1932,12 @@ int ata_init(void)
         if (rc)
             return -60 + rc;
 
-        queue_init(&ata_queue);
+        queue_init(&ata_queue, true);
 
         last_disk_activity = current_tick;
         create_thread(ata_thread, ata_stack,
-                      sizeof(ata_stack), ata_thread_name);
+                      sizeof(ata_stack), ata_thread_name
+                      IF_PRIO(, PRIORITY_SYSTEM));
         initialized = true;
 
     }

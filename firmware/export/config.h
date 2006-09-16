@@ -216,8 +216,12 @@
 /* Enable the directory cache and tagcache in RAM if we have
  * plenty of RAM. Both features can be enabled independently. */
 #if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
-#define HAVE_DIRCACHE 1
-#define HAVE_TC_RAMCACHE 1
+#define HAVE_DIRCACHE
+#define HAVE_TC_RAMCACHE
+#endif
+
+#if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+#define HAVE_PRIORITY_SCHEDULING
 #endif
 
 /* define for all cpus from coldfire family */

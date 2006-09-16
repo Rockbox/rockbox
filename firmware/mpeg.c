@@ -761,7 +761,6 @@ void rec_tick(void)
             {
                 prerecord_timeout = current_tick + HZ;
                 queue_post(&mpeg_queue, MPEG_PRERECORDING_TICK, 0);
-                wake_up_thread();
             }
         }
         else
@@ -773,7 +772,6 @@ void rec_tick(void)
             {
                 saving_status = BUFFER_FULL;
                 queue_post(&mpeg_queue, MPEG_SAVE_DATA, 0);
-                wake_up_thread();
             }
         }
     }
@@ -894,8 +892,6 @@ static void transfer_end(unsigned char** ppbuf, int* psize)
             *psize = 0; /* no more transfer */
         }
     }
-
-    wake_up_thread();
 }
 
 static struct trackdata *add_track_to_tag_list(const char *filename)
@@ -2119,8 +2115,7 @@ void audio_init_playback(void)
     queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
 
     while(!init_playback_done)
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
 }
 
 
@@ -2134,8 +2129,7 @@ void audio_init_recording(unsigned int buffer_offset)
     queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
 
     while(!init_recording_done)
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
 }
 
 static void init_recording(void)
@@ -2886,10 +2880,10 @@ void audio_init(void)
 
 #ifndef SIMULATOR
     audiobuflen = audiobufend - audiobuf;
-    queue_init(&mpeg_queue);
+    queue_init(&mpeg_queue, true);
 #endif /* !SIMULATOR */
     create_thread(mpeg_thread, mpeg_stack,
-                  sizeof(mpeg_stack), mpeg_thread_name);
+                  sizeof(mpeg_stack), mpeg_thread_name IF_PRIO(, PRIORITY_SYSTEM));
 
     memset(trackdata, sizeof(trackdata), 0);
 

@@ -232,7 +232,7 @@ void lcd_set_flip(bool yesno)
 void lcd_init(void)
 {
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name);
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
 }
 #else
 
@@ -278,7 +278,7 @@ void lcd_init(void)
     lcd_update();
 
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name);
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
 }
 
 /*** Update functions ***/

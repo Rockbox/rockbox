@@ -123,7 +123,7 @@ struct codec_api ci = {
     &current_tick,
     default_event_handler,
     default_event_handler_ex,
-    create_thread,
+    create_thread_on_core,
     remove_thread,
     reset_poweroff_timer,
 #ifndef SIMULATOR

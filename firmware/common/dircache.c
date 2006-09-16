@@ -690,9 +690,9 @@ void dircache_init(void)
         opendirs[i].secondary_entry.d_name = buffer_alloc(MAX_PATH);
     }
     
-    queue_init(&dircache_queue);
+    queue_init(&dircache_queue, true);
     create_thread(dircache_thread, dircache_stack,
-                sizeof(dircache_stack), dircache_thread_name);
+                sizeof(dircache_stack), dircache_thread_name IF_PRIO(, PRIORITY_BACKGROUND));
 }
 
 /**

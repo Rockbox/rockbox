@@ -54,6 +54,7 @@
  */
 
 #include <stdio.h>
+#include "config.h"
 #include "thread.h"
 #include "kernel.h"
 #include "system.h"
@@ -1062,7 +1063,6 @@ static bool get_next(struct tagcache_search *tcs)
     
     if (tagcache_is_numeric_tag(tcs->type))
     {
-        logf("r:%d", tcs->position);
         snprintf(buf, sizeof(buf), "%d", tcs->position);
         tcs->result_seek = tcs->position;
         tcs->result = buf;
@@ -3455,7 +3455,6 @@ static void tagcache_thread(void)
     sleep(HZ);
     stat.ready = check_all_headers();
     
-    
     while (1)
     {
         queue_wait_w_tmo(&tagcache_queue, &ev, HZ);
@@ -3503,6 +3502,7 @@ static void tagcache_thread(void)
             
 
                 logf("tagcache check done");
+    
                 check_done = true;
                 break ;
 
@@ -3612,9 +3612,10 @@ void tagcache_init(void)
     current_serial = 0;
     write_lock = read_lock = 0;
     
-    queue_init(&tagcache_queue);
+    queue_init(&tagcache_queue, true);
     create_thread(tagcache_thread, tagcache_stack,
-                  sizeof(tagcache_stack), tagcache_thread_name);
+                  sizeof(tagcache_stack), tagcache_thread_name 
+                  IF_PRIO(, PRIORITY_BACKGROUND));
 }
 
 bool tagcache_is_initialized(void)

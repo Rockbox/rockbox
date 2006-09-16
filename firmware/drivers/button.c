@@ -674,7 +674,7 @@ void button_init(void)
     GPIOA_INT_CLR = GPIOA_INT_STAT;
     GPIOA_INT_EN  = 0xff;
 #endif /* CONFIG_KEYPAD */
-    queue_init(&button_queue);
+    queue_init(&button_queue, true);
     button_read();
     lastbtn = button_read();
     tick_add_task(button_tick);

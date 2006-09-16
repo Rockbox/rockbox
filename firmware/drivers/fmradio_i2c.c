@@ -317,8 +317,7 @@ static void fmradio_i2c_ack(int bit)
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(0);
 
     DELAY;
     SCL_OUTPUT;
@@ -337,8 +336,7 @@ static int fmradio_i2c_getack(void)
     SDA_INPUT;   /* And set to input */
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the slave to release it */
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(0);
     
     if (SDA)
         /* ack failed */

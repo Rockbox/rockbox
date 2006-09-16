@@ -35,9 +35,10 @@
 #include "settings.h"
 #include "audio.h"
 #include "dsp.h"
+#include "thread.h"
 
-/* 1.5s low mark */
-#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 6)
+/* Keep watermark high for iPods at least (2s) */
+#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 8)
 
 /* Structure we can use to queue pcm chunks in memory to be played
  * by the driver code. */
@@ -94,6 +95,8 @@ static size_t pcmbuf_mix_sample IDATA_ATTR;
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
 
+extern struct thread_entry *codec_thread_p;
+
 /* Helpful macros for use in conditionals this assumes some of the above
  * static variable names */
 #define NEED_FLUSH(position) \
@@ -109,14 +112,37 @@ static bool pcmbuf_flush_fillpos(void);
 void pcmbuf_boost(bool state)
 {
     static bool boost_state = false;
-
+#ifdef HAVE_PRIORITY_SCHEDULING
+    static bool priority_modified = false;
+#endif
+    
     if (crossfade_init || crossfade_active)
         return;
 
-    if (state != boost_state) {
+    if (state != boost_state)
+    {
         cpu_boost(state);
         boost_state = state;
     }
+    
+#ifdef HAVE_PRIORITY_SCHEDULING
+    if (state && LOW_DATA(2) && pcm_is_playing())
+    {
+        if (!priority_modified)
+        {
+            /* Buffer is critically low so override UI priority. */
+            priority_modified = true;
+            thread_set_priority(codec_thread_p, PRIORITY_REALTIME);
+        }
+    }
+    else if (priority_modified)
+    {
+        /* Set back the original priority. */
+        thread_set_priority(codec_thread_p, PRIORITY_PLAYBACK);
+        priority_modified = false;
+    }
+    
+#endif
 }
 #endif
 
@@ -244,7 +270,9 @@ static void pcmbuf_under_watermark(void)
     pcmbuf_boost(true);
     /* Disable crossfade if < .5s of audio */
     if (LOW_DATA(2))
+    {
         crossfade_active = false;
+    }
 }
 
 void pcmbuf_set_event_handler(void (*event_handler)(void))
@@ -270,8 +298,8 @@ bool pcmbuf_is_lowdata(void)
             crossfade_init || crossfade_active)
         return false;
 
-    /* 0.5 seconds of buffer is low data */
-    return LOW_DATA(2);
+    /* 1 seconds of buffer is low data */
+    return LOW_DATA(4);
 }
 
 /* Amount of bytes left in the buffer. */
@@ -443,7 +471,7 @@ static bool pcmbuf_flush_fillpos(void)
                 pcmbuf_play_start();
             }
             /* Let approximately one chunk of data playback */
-            sleep(PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY * 4) / 5);
+            sleep(HZ*PCMBUF_TARGET_CHUNK/(NATIVE_FREQUENCY*4));
         }
         pcmbuf_add_chunk();
         return true;

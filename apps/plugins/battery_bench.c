@@ -102,7 +102,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 struct 
 {
-    int id;
+    struct thread_entry *id;
     bool ended;
 } s_thread;
 
@@ -454,10 +454,11 @@ int main(void)
         rb->close(fd);
     }
     
-    rb->queue_init(&thread_q); /* put the thread's queue in the bcast list */
+    rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
     rb->memset(&s_thread, 0, sizeof(s_thread)); /* zero the struct */
     if((s_thread.id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), "Battery Benchmark"))<0)
+        sizeof(thread_stack), "Battery Benchmark" 
+        IF_PRIO(, PRIORITY_BACKGROUND))) == NULL)
     {
         rb->splash(HZ,true,"Cannot create thread!");
         return PLUGIN_ERROR;

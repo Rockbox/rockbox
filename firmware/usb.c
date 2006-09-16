@@ -558,8 +558,9 @@ void usb_init(void)
     last_usb_status = false;
 
 #ifndef BOOTLOADER
-    queue_init(&usb_queue);
-    create_thread(usb_thread, usb_stack, sizeof(usb_stack), usb_thread_name);
+    queue_init(&usb_queue, true);
+    create_thread(usb_thread, usb_stack, sizeof(usb_stack), 
+                  usb_thread_name IF_PRIO(, PRIORITY_SYSTEM));
 
     tick_add_task(usb_tick);
 #endif

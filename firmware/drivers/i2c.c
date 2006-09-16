@@ -145,8 +145,7 @@ void i2c_ack(int bit)
     
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
 
     DELAY;
     SCL_OUTPUT;
@@ -168,8 +167,7 @@ int i2c_getack(void)
     SDA_INPUT;   /* And set to input */
     SCL_INPUT;   /* Set the clock to input */
     while(!SCL)  /* and wait for the MAS to release it */
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
     
     if (SDA)
         /* ack failed */

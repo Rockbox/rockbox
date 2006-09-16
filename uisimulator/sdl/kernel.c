@@ -32,8 +32,10 @@ int set_irq_level (int level)
     return (_lv = level);
 }
 
-void queue_init(struct event_queue *q)
+void queue_init(struct event_queue *q, bool register_queue)
 {
+    (void)register_queue;
+    
     q->read = 0;
     q->write = 0;
 }
@@ -47,7 +49,7 @@ void queue_wait(struct event_queue *q, struct event *ev)
 {
     while(q->read == q->write)
     {
-        switch_thread();
+        switch_thread(true, NULL);
     }
 
     *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
@@ -97,8 +99,11 @@ void queue_clear(struct event_queue* q)
     q->write = 0;
 }
 
-void switch_thread (void)
+void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
+    (void)save_context;
+    (void)blocked_list;
+    
     yield ();
 }
 
@@ -160,7 +165,7 @@ void mutex_init(struct mutex *m)
 void mutex_lock(struct mutex *m)
 {
     while(m->locked)
-        switch_thread();
+        switch_thread(true, NULL);
     m->locked = true;
 }
 

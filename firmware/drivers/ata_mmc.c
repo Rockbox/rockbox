@@ -1182,9 +1182,9 @@ int ata_init(void)
         if (!last_mmc_status)
             mmc_status = MMC_UNTOUCHED;
 #ifdef HAVE_HOTSWAP
-        queue_init(&mmc_queue);
+        queue_init(&mmc_queue, true);
         create_thread(mmc_thread, mmc_stack,
-                      sizeof(mmc_stack), mmc_thread_name);
+                      sizeof(mmc_stack), mmc_thread_name IF_PRIO(, PRIORITY_SYSTEM));
 #endif
         tick_add_task(mmc_tick);
         initialized = true;

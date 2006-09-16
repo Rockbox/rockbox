@@ -1777,8 +1777,8 @@ void playlist_init(void)
     memset(playlist->filenames, 0,
            playlist->max_playlist_size * sizeof(int));
     create_thread(playlist_thread, playlist_stack, sizeof(playlist_stack),
-                  playlist_thread_name);
-    queue_init(&playlist_queue);
+                  playlist_thread_name IF_PRIO(, PRIORITY_BACKGROUND));
+    queue_init(&playlist_queue, true);
 #endif
 }
 

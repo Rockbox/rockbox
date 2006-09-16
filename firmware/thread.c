@@ -23,12 +23,18 @@
 #include "system.h"
 #include "kernel.h"
 #include "cpu.h"
-
+#include "string.h"
 
 #define DEADBEEF ((unsigned int)0xdeadbeef)
 /* Cast to the the machine int type, whose size could be < 4. */
 
 struct core_entry cores[NUM_CORES] IBSS_ATTR;
+#ifdef HAVE_PRIORITY_SCHEDULING
+static unsigned short highest_priority IBSS_ATTR;
+#endif
+
+/* Define to enable additional checks for blocking violations etc. */
+// #define THREAD_EXTRA_CHECKS
 
 static const char main_thread_name[] = "main";
 
@@ -48,7 +54,16 @@ int *cop_stackend = stackend;
 #endif
 #endif
 
-void switch_thread(void) ICODE_ATTR;
+/* Conserve IRAM
+static void add_to_list(struct thread_entry **list,
+                        struct thread_entry *thread) ICODE_ATTR;
+static void remove_from_list(struct thread_entry **list,
+                             struct thread_entry *thread) ICODE_ATTR;
+*/
+
+void switch_thread(bool save_context, struct thread_entry **blocked_list)
+    ICODE_ATTR;
+
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
 
@@ -219,24 +234,109 @@ static inline void load_context(const void* addr)
 
 #endif
 
-/*---------------------------------------------------------------------------
- * Switch thread in round robin fashion.
- *---------------------------------------------------------------------------
- */
-void switch_thread(void)
+static void add_to_list(struct thread_entry **list,
+                        struct thread_entry *thread)
 {
-#ifdef RB_PROFILE
-    profile_thread_stopped(cores[CURRENT_CORE].current_thread);
-#endif
-    int current;
-    unsigned int *stackptr;
-
-#ifdef SIMULATOR
-    /* Do nothing */
-#else
-    while (cores[CURRENT_CORE].num_sleepers == cores[CURRENT_CORE].num_threads)
+    if (*list == NULL)
     {
-        /* Enter sleep mode, woken up on interrupt */
+        thread->next = thread;
+        thread->prev = thread;
+        *list = thread;
+    }
+    else
+    {
+        /* Insert last */
+        thread->next = *list;
+        thread->prev = (*list)->prev;
+        thread->prev->next = thread;
+        (*list)->prev = thread;
+        
+        /* Insert next
+         thread->next = (*list)->next;
+         thread->prev = *list;
+         thread->next->prev = thread;
+         (*list)->next = thread;
+         */
+    }
+}
+
+static void remove_from_list(struct thread_entry **list,
+                      struct thread_entry *thread)
+{
+    if (list != NULL)
+    {
+        if (thread == thread->next)
+        {
+            *list = NULL;
+            return;
+        }
+        
+        if (thread == *list)
+            *list = thread->next;
+    }
+    
+    /* Fix links to jump over the removed entry. */
+    thread->prev->next = thread->next;
+    thread->next->prev = thread->prev;
+}
+
+/* Compiler trick: Don't declare as static to prevent putting 
+ * function in IRAM. */
+void check_sleepers(void)
+{
+    struct thread_entry *current, *next;
+    
+    /* Check sleeping threads. */
+    current = cores[CURRENT_CORE].sleeping;
+    if (current == NULL)
+        return ;
+    
+    for (;;)
+    {
+        next = current->next;
+        
+        if ((unsigned)current_tick >= GET_STATE_ARG(current->statearg))
+        {
+            /* Sleep timeout has been reached so bring the thread
+             * back to life again. */
+            remove_from_list(&cores[CURRENT_CORE].sleeping, current);
+            add_to_list(&cores[CURRENT_CORE].running, current);
+            
+            /* If there is no more processes in the list, break the loop. */
+            if (cores[CURRENT_CORE].sleeping == NULL)
+                break;
+            
+            current = next;
+            continue;
+        }
+        
+        current = next;
+        
+        /* Break the loop once we have walked through the list of all
+         * sleeping processes. */
+        if (current == cores[CURRENT_CORE].sleeping)
+            break;
+    }
+}
+
+static inline void sleep_core(void)
+{
+    static long last_tick = 0;
+    
+    for (;;)
+    {
+        if (last_tick != current_tick)
+        {
+            check_sleepers();
+            last_tick = current_tick;
+        }
+        
+        /* We must sleep until there is at least one process in the list
+         * of running processes. */
+        if (cores[CURRENT_CORE].running != NULL)
+            break;
+
+        /* Enter sleep mode to reduce power usage, woken up on interrupt */
 #ifdef CPU_COLDFIRE
         asm volatile ("stop #0x2000");
 #elif CONFIG_CPU == SH7034
@@ -257,49 +357,232 @@ void switch_thread(void)
         CLKCON |= 2;
 #endif
     }
-#endif
-    current = cores[CURRENT_CORE].current_thread;
-    store_context(&cores[CURRENT_CORE].threads[current].context);
+}
 
-#if CONFIG_CPU != TCC730
-    /* Check if the current thread stack is overflown */
-    stackptr = cores[CURRENT_CORE].threads[current].stack;
-    if(stackptr[0] != DEADBEEF)
-       panicf("Stkov %s", cores[CURRENT_CORE].threads[current].name);
-#endif
-
-    if (++current >= cores[CURRENT_CORE].num_threads)
-        current = 0;
-
-    cores[CURRENT_CORE].current_thread = current;
-    load_context(&cores[CURRENT_CORE].threads[current].context);
 #ifdef RB_PROFILE
-    profile_thread_started(cores[CURRENT_CORE].current_thread);
+static int get_threadnum(struct thread_entry *thread)
+{
+    int i;
+    
+    for (i = 0; i < MAXTHREADS; i++)
+    {
+        if (&cores[CURRENT_CORE].threads[i] == thread)
+            return i;
+    }
+    
+    return -1;
+}
+#endif
+
+/* Compiler trick: Don't declare as static to prevent putting 
+ * function in IRAM. */
+void change_thread_state(struct thread_entry **blocked_list)
+{
+    struct thread_entry *old;
+    
+    /* Remove the thread from the list of running threads. */
+    old = cores[CURRENT_CORE].running;
+    remove_from_list(&cores[CURRENT_CORE].running, old);
+    
+    /* And put the thread into a new list of inactive threads. */
+    if (GET_STATE(old->statearg) == STATE_BLOCKED)
+        add_to_list(blocked_list, old);
+    else
+        add_to_list(&cores[CURRENT_CORE].sleeping, old);
+    
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* Reset priorities */
+    if (old->priority == highest_priority)
+        highest_priority = 100;
 #endif
 }
 
-void sleep_thread(void)
+/*---------------------------------------------------------------------------
+ * Switch thread in round robin fashion.
+ *---------------------------------------------------------------------------
+ */
+void switch_thread(bool save_context, struct thread_entry **blocked_list)
 {
-    ++cores[CURRENT_CORE].num_sleepers;
-    switch_thread();
+#ifdef RB_PROFILE
+    profile_thread_stopped(get_threadnum(cores[CURRENT_CORE].running));
+#endif
+    unsigned int *stackptr;
+    
+#ifdef SIMULATOR
+    /* Do nothing */
+#else
+    
+    /* Begin task switching by saving our current context so that we can
+     * restore the state of the current thread later to the point prior
+     * to this call. */
+    if (save_context)
+    {
+        store_context(&cores[CURRENT_CORE].running->context);
+
+# if CONFIG_CPU != TCC730
+        /* Check if the current thread stack is overflown */
+        stackptr = cores[CURRENT_CORE].running->stack;
+        if(stackptr[0] != DEADBEEF)
+        panicf("Stkov %s", cores[CURRENT_CORE].running->name);
+# endif
+        
+        /* Check if a thread state change has been requested. */
+        if (cores[CURRENT_CORE].running->statearg)
+        {
+            /* Change running thread state and switch to next thread. */
+            change_thread_state(blocked_list);
+        }
+        else
+        {
+            /* Switch to the next running thread. */
+            cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
+        }
+    }
+    
+    /* Go through the list of sleeping task to check if we need to wake up
+     * any of them due to timeout. Also puts core into sleep state until
+     * there is at least one running process again. */
+    sleep_core();
+    
+#ifdef HAVE_PRIORITY_SCHEDULING
+    /* Select the new task based on priorities and the last time a process
+     * got CPU time. */
+    for (;;)
+    {
+        int priority = cores[CURRENT_CORE].running->priority;
+        
+        if (priority < highest_priority)
+            highest_priority = priority;
+        
+        if (priority == highest_priority || (current_tick 
+            - cores[CURRENT_CORE].running->last_run > priority * 8))
+        {
+            break;
+        }
+        cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
+    }
+    
+    /* Reset the value of thread's last running time to the current time. */
+    cores[CURRENT_CORE].running->last_run = current_tick;
+#endif
+    
+#endif
+    /* And finally give control to the next thread. */
+    load_context(&cores[CURRENT_CORE].running->context);
+    
+#ifdef RB_PROFILE
+    profile_thread_started(get_threadnum(cores[CURRENT_CORE].running));
+#endif
 }
 
-void wake_up_thread(void)
+void sleep_thread(int ticks)
 {
-    cores[CURRENT_CORE].num_sleepers = 0;
+    /* Set the thread's new state and timeout and finally force a task switch
+     * so that scheduler removes thread from the list of running processes
+     * and puts it in list of sleeping tasks. */
+    cores[CURRENT_CORE].running->statearg = 
+        SET_STATE(STATE_SLEEPING, current_tick + ticks + 1);
+    switch_thread(true, NULL);
+    
+    /* Clear all flags to indicate we are up and running again. */
+    cores[CURRENT_CORE].running->statearg = 0;
 }
 
+void block_thread(struct thread_entry **list, int timeout)
+{
+    struct thread_entry *current;
+    
+    /* Get the entry for the current running thread. */
+    current = cores[CURRENT_CORE].running;
+    
+    /* At next task switch scheduler will immediately change the thread
+     * state (and we also force the task switch to happen). */
+    if (timeout)
+    {
+#ifdef THREAD_EXTRA_CHECKS
+        /* We can store only one thread to the "list" if thread is used
+         * in other list (such as core's list for sleeping tasks). */
+        if (*list)
+            panicf("Blocking violation T->*B");
+#endif
+        
+        current->statearg = 
+            SET_STATE(STATE_BLOCKED_W_TMO, current_tick + timeout);
+        *list = current;
+
+        /* Now force a task switch and block until we have been woken up
+         * by another thread or timeout is reached. */
+        switch_thread(true, NULL);
+        
+        /* If timeout is reached, we must set list back to NULL here. */
+        *list = NULL;
+    }
+    else
+    {
+#ifdef THREAD_EXTRA_CHECKS
+        /* We are not allowed to mix blocking types in one queue. */
+        if (*list && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO)
+            panicf("Blocking violation B->*T");
+#endif
+        
+        current->statearg = SET_STATE(STATE_BLOCKED, 0);
+        
+        /* Now force a task switch and block until we have been woken up
+         * by another thread or timeout is reached. */
+        switch_thread(true, list);
+    }
+    
+    /* Clear all flags to indicate we are up and running again. */
+    current->statearg = 0;
+}
+
+void wakeup_thread(struct thread_entry **list)
+{
+    struct thread_entry *thread;
+    
+    /* Check if there is a blocked thread at all. */
+    if (*list == NULL)
+        return ;
+    
+    /* Wake up the last thread first. */
+    thread = *list;
+    
+    /* Determine thread's current state. */
+    switch (GET_STATE(thread->statearg)) 
+    {
+        case STATE_BLOCKED:
+            /* Remove thread from the list of blocked threads and add it
+             * to the scheduler's list of running processes. */
+            remove_from_list(list, thread);
+            add_to_list(&cores[CURRENT_CORE].running, thread);
+            thread->statearg = 0;
+            break;
+        
+        case STATE_BLOCKED_W_TMO:
+            /* Just remove the timeout to cause scheduler to immediately
+             * wake up the thread. */
+            thread->statearg &= 0xC0000000;
+            *list = NULL;
+            break;
+        
+        default:
+            /* Nothing to do. Thread has already been woken up
+             * or it's state is not blocked or blocked with timeout. */
+            return ;
+    }
+}
 
 /*---------------------------------------------------------------------------
  * Create thread on the current core.
  * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread(void (*function)(void), void* stack, int stack_size,
-                  const char *name)
+struct thread_entry* 
+    create_thread(void (*function)(void), void* stack, int stack_size,
+                  const char *name IF_PRIO(, int priority))
 {
     return create_thread_on_core(CURRENT_CORE, function, stack, stack_size,
-                  name);
+                  name IF_PRIO(, priority));
 }
 
 /*---------------------------------------------------------------------------
@@ -307,18 +590,28 @@ int create_thread(void (*function)(void), void* stack, int stack_size,
  * Return ID if context area could be allocated, else -1.
  *---------------------------------------------------------------------------
  */
-int create_thread_on_core(unsigned int core, void (*function)(void), void* stack, int stack_size,
-                  const char *name)
+struct thread_entry* 
+    create_thread_on_core(unsigned int core, void (*function)(void), 
+                          void* stack, int stack_size,
+                          const char *name IF_PRIO(, int priority))
 {
     unsigned int i;
     unsigned int stacklen;
     unsigned int *stackptr;
+    int n;
     struct regs *regs;
     struct thread_entry *thread;
 
-    if (cores[core].num_threads >= MAXTHREADS)
-        return -1;
-
+    for (n = 0; n < MAXTHREADS; n++)
+    {
+        if (cores[core].threads[n].name == NULL)
+            break;
+    }
+    
+    if (n == MAXTHREADS)
+        return NULL;
+    
+    
     /* Munge the stack to make it easy to spot stack overflows */
     stacklen = stack_size / sizeof(int);
     stackptr = stack;
@@ -328,10 +621,17 @@ int create_thread_on_core(unsigned int core, void (*function)(void), void* stack
     }
 
     /* Store interesting information */
-    thread = &cores[core].threads[cores[core].num_threads];
+    thread = &cores[core].threads[n];
     thread->name = name;
     thread->stack = stack;
     thread->stack_size = stack_size;
+    thread->statearg = 0;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    thread->priority = priority;
+    highest_priority = 100;
+#endif
+    add_to_list(&cores[core].running, thread);
+    
     regs = &thread->context;
 #if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || defined(CPU_ARM)
     /* Align stack to an even 32 bit boundary */
@@ -343,8 +643,7 @@ int create_thread_on_core(unsigned int core, void (*function)(void), void* stack
 #endif
     regs->start = (void*)function;
 
-    wake_up_thread();
-    return cores[core].num_threads++; /* return the current ID, e.g for remove_thread() */
+    return thread;
 }
 
 /*---------------------------------------------------------------------------
@@ -352,44 +651,58 @@ int create_thread_on_core(unsigned int core, void (*function)(void), void* stack
  * Parameter is the ID as returned from create_thread().
  *---------------------------------------------------------------------------
  */
-void remove_thread(int threadnum)
+void remove_thread(struct thread_entry *thread)
 {
-    remove_thread_on_core(CURRENT_CORE, threadnum);
-}
-
-/*---------------------------------------------------------------------------
- * Remove a thread on the specified core from the scheduler.
- * Parameters are the core and the ID as returned from create_thread().
- *---------------------------------------------------------------------------
- */
-void remove_thread_on_core(unsigned int core, int threadnum)
-{
-    int i;
-
-    if (threadnum >= cores[core].num_threads)
-       return;
-
-    cores[core].num_threads--;
-    for (i=threadnum; i<cores[core].num_threads-1; i++)
-    {   /* move all entries which are behind */
-        cores[core].threads[i] = cores[core].threads[i+1];
+    if (thread == NULL)
+        thread = cores[CURRENT_CORE].running;
+    
+    /* Free the entry by removing thread name. */
+    thread->name = NULL;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    highest_priority = 100;
+#endif
+    
+    if (thread == cores[CURRENT_CORE].running)
+    {
+        remove_from_list(&cores[CURRENT_CORE].running, thread);
+        switch_thread(false, NULL);
+        return ;
     }
-
-    if (cores[core].current_thread == threadnum) /* deleting the current one? */
-        cores[core].current_thread = cores[core].num_threads; /* set beyond last, avoid store harm */
-    else if (cores[core].current_thread > threadnum) /* within the moved positions? */
-        cores[core].current_thread--; /* adjust it, point to same context again */
+    
+    if (thread == cores[CURRENT_CORE].sleeping)
+        remove_from_list(&cores[CURRENT_CORE].sleeping, thread);
+    
+    remove_from_list(NULL, thread);
 }
+
+#ifdef HAVE_PRIORITY_SCHEDULING
+void thread_set_priority(struct thread_entry *thread, int priority)
+{
+    if (thread == NULL)
+        thread = cores[CURRENT_CORE].running;
+    
+    thread->priority = priority;
+    highest_priority = 100;
+}
+#endif
 
 void init_threads(void)
 {
     unsigned int core = CURRENT_CORE;
 
-    cores[core].num_threads = 1; /* We have 1 thread to begin with */
-    cores[core].current_thread = 0; /* The current thread is number 0 */
+    memset(cores, 0, sizeof cores);
+    cores[core].sleeping = NULL;
+    cores[core].running = NULL;
     cores[core].threads[0].name = main_thread_name;
-/* In multiple core setups, each core has a different stack.  There is probably
-   a much better way to do this. */
+    cores[core].threads[0].statearg = 0;
+#ifdef HAVE_PRIORITY_SCHEDULING
+    cores[core].threads[0].priority = PRIORITY_USER_INTERFACE;
+    highest_priority = 100;
+#endif
+    add_to_list(&cores[core].running, &cores[core].threads[0]);
+    
+    /* In multiple core setups, each core has a different stack.  There is probably
+     a much better way to do this. */
     if (core == CPU)
     {
         cores[CPU].threads[0].stack = stackbegin;
@@ -405,28 +718,24 @@ void init_threads(void)
 #else
     cores[core].threads[0].context.start = 0; /* thread 0 already running */
 #endif
-    cores[core].num_sleepers = 0;
 }
 
-int thread_stack_usage(int threadnum)
-{
-    return thread_stack_usage_on_core(CURRENT_CORE, threadnum);
-}
-
-int thread_stack_usage_on_core(unsigned int core, int threadnum)
+int thread_stack_usage(const struct thread_entry *thread)
 {
     unsigned int i;
-    unsigned int *stackptr = cores[core].threads[threadnum].stack;
+    unsigned int *stackptr = thread->stack;
 
-    if (threadnum >= cores[core].num_threads)
-        return -1;
-
-    for (i = 0;i < cores[core].threads[threadnum].stack_size/sizeof(int);i++)
+    for (i = 0;i < thread->stack_size/sizeof(int);i++)
     {
         if (stackptr[i] != DEADBEEF)
             break;
     }
 
-    return ((cores[core].threads[threadnum].stack_size - i * sizeof(int)) * 100) /
-        cores[core].threads[threadnum].stack_size;
+    return ((thread->stack_size - i * sizeof(int)) * 100) /
+        thread->stack_size;
+}
+
+int thread_get_status(const struct thread_entry *thread)
+{
+    return GET_STATE(thread->statearg);
 }

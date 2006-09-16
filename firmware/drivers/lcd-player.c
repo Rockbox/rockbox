@@ -610,7 +610,7 @@ void lcd_init (void)
     lcd_set_contrast(lcd_default_contrast());
 
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name);
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
 }
 
 void lcd_jump_scroll (int mode) /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */

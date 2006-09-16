@@ -35,7 +35,6 @@ static void (*tick_funcs[MAX_NUM_TICK_TASKS])(void);
 static struct event_queue *all_queues[32];
 static int num_queues;
 
-void sleep(int ticks) ICODE_ATTR;
 void queue_wait(struct event_queue *q, struct event *ev) ICODE_ATTR;
 
 /****************************************************************************
@@ -71,13 +70,7 @@ void sleep(int ticks)
     } while(counter > 0);
 
 #else
-    /* Always sleep at least 1 tick */
-    int timeout = current_tick + ticks + 1;
-
-    while (TIME_BEFORE( current_tick, timeout )) {
-        sleep_thread();
-    }
-    wake_up_thread();
+    sleep_thread(ticks);
 #endif
 }
 
@@ -86,21 +79,24 @@ void yield(void)
 #if (CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022) && defined(BOOTLOADER))
     /* Some targets don't like yielding in the bootloader */
 #else
-    switch_thread();
-    wake_up_thread();
+    switch_thread(true, NULL);
 #endif
 }
 
 /****************************************************************************
  * Queue handling stuff
  ****************************************************************************/
-void queue_init(struct event_queue *q)
+void queue_init(struct event_queue *q, bool register_queue)
 {
     q->read = 0;
     q->write = 0;
-
-    /* Add it to the all_queues array */
-    all_queues[num_queues++] = q;
+    q->thread = NULL;
+    
+    if (register_queue)
+    {
+        /* Add it to the all_queues array */
+        all_queues[num_queues++] = q;
+    }
 }
 
 void queue_delete(struct event_queue *q)
@@ -108,6 +104,8 @@ void queue_delete(struct event_queue *q)
     int i;
     bool found = false;
 
+    wakeup_thread(&q->thread);
+    
     /* Find the queue to be deleted */
     for(i = 0;i < num_queues;i++)
     {
@@ -132,26 +130,22 @@ void queue_delete(struct event_queue *q)
 
 void queue_wait(struct event_queue *q, struct event *ev)
 {
-    while(q->read == q->write)
+    if (q->read == q->write)
     {
-        sleep_thread();
+        block_thread(&q->thread, 0);
     }
-    wake_up_thread();
 
     *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
 }
 
 void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
-    unsigned int timeout = current_tick + ticks;
-
-    while(q->read == q->write && TIME_BEFORE( current_tick, timeout ))
+    if (q->read == q->write && ticks > 0)
     {
-        sleep_thread();
+        block_thread(&q->thread, ticks);
     }
-    wake_up_thread();
 
-    if(q->read != q->write)
+    if (q->read != q->write)
     {
         *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
     }
@@ -171,6 +165,9 @@ void queue_post(struct event_queue *q, long id, void *data)
 
     q->events[wr].id = id;
     q->events[wr].data = data;
+    
+    wakeup_thread(&q->thread);
+    
     set_irq_level(oldlevel);
 }
 
@@ -250,7 +247,6 @@ void IMIA0(void)
     }
 
     current_tick++;
-    wake_up_thread();
 
     TSR0 &= ~0x01;
 }
@@ -301,7 +297,6 @@ void TIMER0(void)
     }
 
     current_tick++;
-    wake_up_thread();
 
     TER0 = 0xff; /* Clear all events */
 }
@@ -330,7 +325,6 @@ void TIMER0(void)
     }
 
     current_tick++;
-    wake_up_thread();
 
     /* re-enable timer by clearing the counter */
     TACON |= 0x80;
@@ -382,7 +376,6 @@ void TIMER1(void)
     }
 
     current_tick++;
-    wake_up_thread();
 }
 #endif
 
@@ -415,7 +408,6 @@ void timer_handler(void)
     }
 
     current_tick++;
-    wake_up_thread();
 
     TIMERR0C = 1;
 }
@@ -513,22 +505,27 @@ int tick_remove_task(void (*f)(void))
 void mutex_init(struct mutex *m)
 {
     m->locked = false;
+    m->thread = NULL;
 }
 
 void mutex_lock(struct mutex *m)
 {
-    /* Wait until the lock is open... */
-    while(m->locked)
-        sleep_thread();
-    wake_up_thread();
-
+    if (m->locked)
+    {
+        /* Wait until the lock is open... */
+        block_thread(&m->thread, 0);
+    }
+    
     /* ...and lock it */
     m->locked = true;
 }
 
 void mutex_unlock(struct mutex *m)
 {
-    m->locked = false;
+    if (m->thread == NULL)
+        m->locked = false;
+    else
+        wakeup_thread(&m->thread);
 }
 
 #endif

@@ -105,12 +105,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 29
+#define PLUGIN_API_VERSION 30
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 14
+#define PLUGIN_MIN_API_VERSION 30
 
 /* plugin return codes */
 enum plugin_status {
@@ -143,6 +143,7 @@ struct plugin_api {
     void (*PREFIX(lcd_icon))(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else
+    void (*lcd_setmargins)(int x, int y);
     void (*lcd_set_drawmode)(int mode);
     int  (*lcd_get_drawmode)(void);
     void (*lcd_setfont)(int font);
@@ -174,6 +175,9 @@ struct plugin_api {
     void (*lcd_bitmap_transparent)(const fb_data *src, int x, int y,
             int width, int height);
 #endif
+    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
+    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
+    struct font* (*font_load)(const char *path);
     void (*lcd_putsxy)(int x, int y, const unsigned char *string);
     void (*lcd_puts_style)(int x, int y, const unsigned char *str, int style);
     void (*lcd_puts_scroll_style)(int x, int y, const unsigned char* string,
@@ -229,7 +233,50 @@ struct plugin_api {
     void (*remote_backlight_on)(void);
     void (*remote_backlight_off)(void);
 #endif
+    struct screen* screens[NB_SCREENS];
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+    void     (*lcd_remote_set_foreground)(unsigned foreground);
+    unsigned (*lcd_remote_get_foreground)(void);
+    void     (*lcd_remote_set_background)(unsigned foreground);
+    unsigned (*lcd_remote_get_background)(void);
+    void (*lcd_remote_bitmap_part)(const fb_remote_data *src, int src_x, int src_y,
+                                   int stride, int x, int y, int width, int height);
+    void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
+                              int height);
+#endif
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+    void (*lcd_yuv_blit)(unsigned char * const src[3],
+                         int src_x, int src_y, int stride,
+                         int x, int y, int width, int height);
+#endif
 
+    /* list */
+    void (*gui_synclist_init)(struct gui_synclist * lists,
+            list_get_name callback_get_item_name,void * data,
+            bool scroll_all,int selected_size);
+    void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
+    void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
+    int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
+    int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
+    void (*gui_synclist_draw)(struct gui_synclist * lists);
+    void (*gui_synclist_select_item)(struct gui_synclist * lists,
+    int item_number);
+    void (*gui_synclist_select_next)(struct gui_synclist * lists);
+    void (*gui_synclist_select_previous)(struct gui_synclist * lists);
+    void (*gui_synclist_select_next_page)(struct gui_synclist * lists,
+    enum screen_type screen);
+    void (*gui_synclist_select_previous_page)(struct gui_synclist * lists,
+    enum screen_type screen);
+    void (*gui_synclist_add_item)(struct gui_synclist * lists);
+    void (*gui_synclist_del_item)(struct gui_synclist * lists);
+    void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
+    void (*gui_synclist_flash)(struct gui_synclist * lists);
+#ifdef HAVE_LCD_BITMAP
+    void (*gui_synclist_scroll_right)(struct gui_synclist * lists);
+    void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
+#endif
+    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
+    
     /* button */
     long (*button_get)(bool block);
     long (*button_get_w_tmo)(int ticks);
@@ -257,12 +304,14 @@ struct plugin_api {
     void (*ata_sleep)(void);
     bool (*ata_disk_is_active)(void);
 #endif
+    void (*reload_directory)(void);
 
     /* dir */
     DIR* (*PREFIX(opendir))(const char* name);
     int (*PREFIX(closedir))(DIR* dir);
     struct dirent* (*PREFIX(readdir))(DIR* dir);
     int (*PREFIX(mkdir))(const char *name, int mode);
+    int (*PREFIX(rmdir))(const char *name);
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);
@@ -270,8 +319,10 @@ struct plugin_api {
     long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
-    int (*create_thread)(void (*function)(void), void* stack, int stack_size, const char *name);
-    void (*remove_thread)(int threadnum);
+    struct thread_entry* (*create_thread)(void (*function)(void), void* stack, 
+                                          int stack_size, const char *name 
+                                          IF_PRIO(, int priority));
+    void (*remove_thread)(struct thread_entry *thread);
     void (*reset_poweroff_timer)(void);
 #ifndef SIMULATOR
     int (*system_memory_guard)(int newmode);
@@ -285,7 +336,7 @@ struct plugin_api {
     void (*timer_unregister)(void);
     bool (*timer_set_period)(long count);
 #endif
-    void (*queue_init)(struct event_queue *q);
+    void (*queue_init)(struct event_queue *q, bool register_queue);
     void (*queue_delete)(struct event_queue *q);
     void (*queue_post)(struct event_queue *q, long id, void *data);
     void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev,
@@ -308,6 +359,7 @@ struct plugin_api {
 
     /* strings and memory */
     int (*snprintf)(char *buf, size_t size, const char *fmt, ...);
+    int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
     char* (*strcpy)(char *dst, const char *src);
     char* (*strncpy)(char *dst, const char *src, size_t length);
     size_t (*strlen)(const char *str);
@@ -323,6 +375,7 @@ struct plugin_api {
     int (*atoi)(const char *str);
     char *(*strchr)(const char *s, int c);
     char *(*strcat)(char *s1, const char *s2);
+    void *(*memchr)(const void *s1, int c, size_t n);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
     /* unicode stuff */
@@ -332,9 +385,12 @@ struct plugin_api {
     unsigned char* (*utf16BEdecode)(const unsigned char *utf16, unsigned char *utf8, int count);
     unsigned char* (*utf8encode)(unsigned long ucs, unsigned char *utf8);
     unsigned long (*utf8length)(const unsigned char *utf8);
+    int (*utf8seek)(const unsigned char* utf8, int offset);
 
     /* sound */
     void (*sound_set)(int setting, int value);
+    bool (*set_sound)(const unsigned char * string,
+                      int* variable, int setting);
     int (*sound_min)(int setting);
     int (*sound_max)(int setting);
 #ifndef SIMULATOR
@@ -390,6 +446,9 @@ struct plugin_api {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     int (*mas_codec_writereg)(int reg, unsigned int val);
     int (*mas_codec_readreg)(int reg);
+    void (*i2c_begin)(void);
+    void (*i2c_end)(void);
+    int  (*i2c_write)(int address, unsigned char* buf, int count );
 #endif
 #endif
 
@@ -413,7 +472,17 @@ struct plugin_api {
     bool (*set_option)(const char* string, void* variable,
                        enum optiontype type, const struct opt_items* options,
                        int numoptions, void (*function)(int));
+    bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
+                    int* variable, void (*function)(int), int step, int min,
+                    int max, void (*formatter)(char*, int, int, const char*) );
+    bool (*set_bool)(const char* string, bool* variable );
 
+    /* action handling */
+    int (*get_custom_action)(int context,int timeout,
+                          const struct button_mapping* (*get_context_map)(int));
+    int (*get_action)(int context, int timeout);
+    void (*action_signalscreenchange)(void);
+    bool (*action_userabort)(int timeout);
 
     /* power */
     int (*battery_level)(void);
@@ -476,83 +545,6 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    bool (*set_sound)(const unsigned char * string,
-                      int* variable, int setting);
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
-    void (*i2c_begin)(void);
-    void (*i2c_end)(void);
-    int  (*i2c_write)(int address, unsigned char* buf, int count );
-#endif
-
-    int (*vsnprintf)(char *buf, int size, const char *fmt, va_list ap);
-    void *(*memchr)(const void *s1, int c, size_t n);
-
-    /* list */
-    void (*gui_synclist_init)(struct gui_synclist * lists,
-            list_get_name callback_get_item_name,void * data,
-            bool scroll_all,int selected_size);
-    void (*gui_synclist_set_nb_items)(struct gui_synclist * lists, int nb_items);
-    void (*gui_synclist_set_icon_callback)(struct gui_synclist * lists, list_get_icon icon_callback);
-    int (*gui_synclist_get_nb_items)(struct gui_synclist * lists);
-    int  (*gui_synclist_get_sel_pos)(struct gui_synclist * lists);
-    void (*gui_synclist_draw)(struct gui_synclist * lists);
-    void (*gui_synclist_select_item)(struct gui_synclist * lists,
-    int item_number);
-    void (*gui_synclist_select_next)(struct gui_synclist * lists);
-    void (*gui_synclist_select_previous)(struct gui_synclist * lists);
-    void (*gui_synclist_select_next_page)(struct gui_synclist * lists,
-    enum screen_type screen);
-    void (*gui_synclist_select_previous_page)(struct gui_synclist * lists,
-    enum screen_type screen);
-    void (*gui_synclist_add_item)(struct gui_synclist * lists);
-    void (*gui_synclist_del_item)(struct gui_synclist * lists);
-    void (*gui_synclist_limit_scroll)(struct gui_synclist * lists, bool scroll);
-    void (*gui_synclist_flash)(struct gui_synclist * lists);
-#ifdef HAVE_LCD_BITMAP
-    void (*gui_synclist_scroll_right)(struct gui_synclist * lists);
-    void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
-#endif
-    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
-
-#ifdef HAVE_LCD_BITMAP
-    void (*lcd_setmargins)(int x, int y);
-#endif
-    int (*utf8seek)(const unsigned char* utf8, int offset);
-
-    bool (*set_int)(const unsigned char* string, const char* unit, int voice_unit,
-                    int* variable, void (*function)(int), int step, int min,
-                    int max, void (*formatter)(char*, int, int, const char*) );
-    void (*reload_directory)(void);
-    bool (*set_bool)(const char* string, bool* variable );
-    struct screen* screens[NB_SCREENS];
-#ifdef HAVE_LCD_BITMAP
-    unsigned short *(*bidi_l2v)( const unsigned char *str, int orientation );
-    const unsigned char *(*font_get_bits)( struct font *pf, unsigned short char_code );
-    struct font* (*font_load)(const char *path);
-#endif
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-    void     (*lcd_remote_set_foreground)(unsigned foreground);
-    unsigned (*lcd_remote_get_foreground)(void);
-    void     (*lcd_remote_set_background)(unsigned foreground);
-    unsigned (*lcd_remote_get_background)(void);
-    void (*lcd_remote_bitmap_part)(const fb_remote_data *src, int src_x, int src_y,
-                                   int stride, int x, int y, int width, int height);
-    void (*lcd_remote_bitmap)(const fb_remote_data *src, int x, int y, int width,
-                              int height);
-#endif
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-    void (*lcd_yuv_blit)(unsigned char * const src[3],
-                         int src_x, int src_y, int stride,
-                         int x, int y, int width, int height);
-#endif
-
-    int (*PREFIX(rmdir))(const char *name);
-    /* action handling */
-    int (*get_custom_action)(int context,int timeout,
-                          const struct button_mapping* (*get_context_map)(int));
-    int (*get_action)(int context, int timeout);
-    void (*action_signalscreenchange)(void);
-    bool (*action_userabort)(int timeout);
 };
 
 /* plugin header */

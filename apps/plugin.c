@@ -108,6 +108,7 @@ static const struct plugin_api rockbox_api = {
     PREFIX(lcd_icon),
     lcd_double_height,
 #else
+    lcd_setmargins,
     lcd_set_drawmode,
     lcd_get_drawmode,
     lcd_setfont,
@@ -132,6 +133,9 @@ static const struct plugin_api rockbox_api = {
     lcd_bitmap_transparent_part,
     lcd_bitmap_transparent,
 #endif
+    bidi_l2v,
+    font_get_bits,
+    font_load,
     lcd_putsxy,
     lcd_puts_style,
     lcd_puts_scroll_style,
@@ -178,6 +182,45 @@ static const struct plugin_api rockbox_api = {
     remote_backlight_on,
     remote_backlight_off,
 #endif
+#if NB_SCREENS == 2
+    {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
+#else
+    {&screens[SCREEN_MAIN]},
+#endif
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+    lcd_remote_set_foreground,
+    lcd_remote_get_foreground,
+    lcd_remote_set_background,
+    lcd_remote_get_background,
+    lcd_remote_bitmap_part,
+    lcd_remote_bitmap,
+#endif
+
+#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
+    lcd_yuv_blit,
+#endif
+    /* list */
+    gui_synclist_init,
+    gui_synclist_set_nb_items,
+    gui_synclist_set_icon_callback,
+    gui_synclist_get_nb_items,
+    gui_synclist_get_sel_pos,
+    gui_synclist_draw,
+    gui_synclist_select_item,
+    gui_synclist_select_next,
+    gui_synclist_select_previous,
+    gui_synclist_select_next_page,
+    gui_synclist_select_previous_page,
+    gui_synclist_add_item,
+    gui_synclist_del_item,
+    gui_synclist_limit_scroll,
+    gui_synclist_flash,
+#ifdef HAVE_LCD_BITMAP
+    gui_synclist_scroll_right,
+    gui_synclist_scroll_left,
+#endif
+    gui_synclist_do_button,
+    
     /* button */
     button_get,
     button_get_w_tmo,
@@ -205,12 +248,14 @@ static const struct plugin_api rockbox_api = {
     ata_sleep,
     ata_disk_is_active,
 #endif
+    reload_directory,
 
     /* dir */
     PREFIX(opendir),
     PREFIX(closedir),
     PREFIX(readdir),
     PREFIX(mkdir),
+    PREFIX(rmdir),
 
     /* kernel/ system */
     PREFIX(sleep),
@@ -253,6 +298,7 @@ static const struct plugin_api rockbox_api = {
 
     /* strings and memory */
     snprintf,
+    vsnprintf,
     strcpy,
     strncpy,
     strlen,
@@ -268,6 +314,7 @@ static const struct plugin_api rockbox_api = {
     atoi,
     strchr,
     strcat,
+    memchr,
     memcmp,
     strcasestr,
     /* unicode stuff */
@@ -277,9 +324,12 @@ static const struct plugin_api rockbox_api = {
     utf16BEdecode,
     utf8encode,
     utf8length,
+    utf8seek,
 
     /* sound */
     sound_set,
+    set_sound,
+
     sound_min,
     sound_max,
 #ifndef SIMULATOR
@@ -334,6 +384,9 @@ static const struct plugin_api rockbox_api = {
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     mas_codec_writereg,
     mas_codec_readreg,
+    i2c_begin,
+    i2c_end,
+    i2c_write,
 #endif
 #endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
@@ -352,7 +405,15 @@ static const struct plugin_api rockbox_api = {
     menu_insert,
     menu_set_cursor,
     set_option,
+    set_int,
+    set_bool,
 
+    /* action handling */
+    get_custom_action,
+    get_action,
+    action_signalscreenchange,
+    action_userabort,
+    
     /* power */
     battery_level,
     battery_level_safe,
@@ -405,74 +466,6 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-    set_sound,
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
-    i2c_begin,
-    i2c_end,
-    i2c_write,
-#endif
-
-    vsnprintf,
-    memchr,
-    /* list */
-    gui_synclist_init,
-    gui_synclist_set_nb_items,
-    gui_synclist_set_icon_callback,
-    gui_synclist_get_nb_items,
-    gui_synclist_get_sel_pos,
-    gui_synclist_draw,
-    gui_synclist_select_item,
-    gui_synclist_select_next,
-    gui_synclist_select_previous,
-    gui_synclist_select_next_page,
-    gui_synclist_select_previous_page,
-    gui_synclist_add_item,
-    gui_synclist_del_item,
-    gui_synclist_limit_scroll,
-    gui_synclist_flash,
-#ifdef HAVE_LCD_BITMAP
-    gui_synclist_scroll_right,
-    gui_synclist_scroll_left,
-#endif
-    gui_synclist_do_button,
-
-#ifdef HAVE_LCD_BITMAP
-    lcd_setmargins,
-#endif
-    utf8seek,
-
-    set_int,
-    reload_directory,
-    set_bool,
-#if NB_SCREENS == 2
-    {&screens[SCREEN_MAIN], &screens[SCREEN_REMOTE]},
-#else
-    {&screens[SCREEN_MAIN]},
-#endif
-#ifdef HAVE_LCD_BITMAP
-    bidi_l2v,
-    font_get_bits,
-    font_load,
-#endif
-#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
-    lcd_remote_set_foreground,
-    lcd_remote_get_foreground,
-    lcd_remote_set_background,
-    lcd_remote_get_background,
-    lcd_remote_bitmap_part,
-    lcd_remote_bitmap,
-#endif
-
-#if defined(HAVE_LCD_COLOR) && !defined(SIMULATOR)
-    lcd_yuv_blit,
-#endif
-
-    PREFIX(rmdir),
-    /* action handling */
-    get_custom_action,
-    get_action,
-    action_signalscreenchange,
-    action_userabort,
 };
 
 int plugin_load(const char* plugin, void* parameter)

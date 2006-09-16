@@ -176,7 +176,7 @@ static char *voicebuf;
 static size_t voice_remaining;
 static bool voice_is_playing;
 static void (*voice_getmore)(unsigned char** start, int* size);
-static int voice_thread_num = -1;
+static struct thread_entry *voice_thread_p = NULL;
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling IDATA_ATTR;
@@ -267,6 +267,8 @@ static struct event_queue codec_queue;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
+/* For modifying thread priority later. */
+struct thread_entry *codec_thread_p;
 
 /* Voice thread */
 static struct event_queue voice_queue;
@@ -628,13 +630,13 @@ void audio_preinit(void)
 
     mutex_init(&mutex_codecthread);
 
-    queue_init(&audio_queue);
-    queue_init(&codec_queue);
-    /* clear, not init to create a private queue */
-    queue_clear(&codec_callback_queue);
+    queue_init(&audio_queue, true);
+    queue_init(&codec_queue, true);
+    /* create a private queue */
+    queue_init(&codec_callback_queue, false);
 
     create_thread(audio_thread, audio_stack, sizeof(audio_stack),
-                  audio_thread_name);
+                  audio_thread_name IF_PRIO(, PRIORITY_BUFFERING));
 }
 
 void audio_init(void)
@@ -648,14 +650,14 @@ void voice_init(void)
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
-    if (voice_thread_num >= 0)
+    if (voice_thread_p)
     {
         logf("Terminating voice codec");
-        remove_thread(voice_thread_num);
+        remove_thread(voice_thread_p);
         if (current_codec == CODEC_IDX_VOICE)
             mutex_unlock(&mutex_codecthread);
         queue_delete(&voice_queue);
-        voice_thread_num = -1;
+        voice_thread_p = NULL;
         voice_codec_loaded = false;
     }
 
@@ -663,9 +665,10 @@ void voice_init(void)
         return;
 
     logf("Starting voice codec");
-    queue_init(&voice_queue);
-    voice_thread_num = create_thread(voice_thread, voice_stack,
-            sizeof(voice_stack), voice_thread_name);
+    queue_init(&voice_queue, true);
+    voice_thread_p = create_thread(voice_thread, voice_stack,
+            sizeof(voice_stack), voice_thread_name 
+            IF_PRIO(, PRIORITY_PLAYBACK));
     
     while (!voice_codec_loaded)
         yield();
@@ -1740,7 +1743,7 @@ static void codec_thread(void)
 #endif
 
 #ifndef SIMULATOR
-            case SYS_USB_CONNECTED:
+            case SYS_USB_CONNECTED:  
                 LOGFQUEUE("codec < SYS_USB_CONNECTED");
                 queue_clear(&codec_queue);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -1982,13 +1985,15 @@ static bool audio_yield_codecs(void)
 {
     yield();
     
-    if (!queue_empty(&audio_queue)) return true;
+    if (!queue_empty(&audio_queue)) 
+        return true;
 
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && !audio_filebuf_is_lowdata())
     {
         sleep(1);
-        if (!queue_empty(&audio_queue)) return true;
+        if (!queue_empty(&audio_queue)) 
+            return true;
     }
     
     return false;
@@ -3178,8 +3183,9 @@ static void audio_playback_init(void)
     id3_voice.frequency = 11200;
     id3_voice.length = 1000000L;
 
-    create_thread(codec_thread, codec_stack, sizeof(codec_stack),
-            codec_thread_name);
+    codec_thread_p = create_thread(codec_thread, codec_stack, 
+                                   sizeof(codec_stack),
+                                   codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK));
 
     while (1)
     {
@@ -3213,7 +3219,8 @@ static void audio_thread(void)
     /* At first initialize audio system in background. */
     audio_playback_init();
 
-    while (1) {
+    while (1) 
+    {
         if (filling)
         {
             queue_wait_w_tmo(&audio_queue, &ev, 0);
@@ -3221,7 +3228,7 @@ static void audio_thread(void)
                 ev.id = Q_AUDIO_FILL_BUFFER;
         }
         else
-            queue_wait_w_tmo(&audio_queue, &ev, HZ);
+            queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 
         switch (ev.id) {
             case Q_AUDIO_FILL_BUFFER:

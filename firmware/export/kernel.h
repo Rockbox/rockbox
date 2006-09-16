@@ -56,12 +56,14 @@ struct event
 struct event_queue
 {
     struct event events[QUEUE_LENGTH];
+    struct thread_entry *thread;
     unsigned int read;
     unsigned int write;
 };
 
 struct mutex
 {
+    struct thread_entry *thread;
     bool locked;
 };
 
@@ -85,7 +87,7 @@ extern void sleep(int ticks);
 int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
-extern void queue_init(struct event_queue *q);
+extern void queue_init(struct event_queue *q, bool register_queue);
 extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);

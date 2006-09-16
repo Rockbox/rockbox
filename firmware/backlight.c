@@ -618,12 +618,13 @@ static void backlight_tick(void)
 
 void backlight_init(void)
 {
-    queue_init(&backlight_queue);
+    queue_init(&backlight_queue, true);
 #ifdef X5_BACKLIGHT_SHUTDOWN
     backlight_thread_id =
 #endif
     create_thread(backlight_thread, backlight_stack,
-                  sizeof(backlight_stack), backlight_thread_name);
+                  sizeof(backlight_stack), backlight_thread_name 
+                  IF_PRIO(, PRIORITY_SYSTEM));
     tick_add_task(backlight_tick);
 #ifdef SIMULATOR
     /* do nothing */

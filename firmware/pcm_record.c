@@ -172,9 +172,9 @@ static void close_wave(void);
 /* Creates pcmrec_thread */
 void pcm_rec_init(void)
 {
-    queue_init(&pcmrec_queue);
+    queue_init(&pcmrec_queue, true);
     create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
-        pcmrec_thread_name);
+                  pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING));
 }
 
 
@@ -196,8 +196,7 @@ void audio_init_recording(unsigned int buffer_offset)
     queue_post(&pcmrec_queue, PCMREC_INIT, 0);
     
     while(!init_done)
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
 }
 
 void audio_close_recording(void)
@@ -206,8 +205,7 @@ void audio_close_recording(void)
     queue_post(&pcmrec_queue, PCMREC_CLOSE, 0);
     
     while(!close_done)
-        sleep_thread();
-    wake_up_thread();
+        sleep_thread(1);
 
     audio_remove_encoder();
 }
@@ -421,8 +419,7 @@ void audio_record(const char *filename)
     queue_post(&pcmrec_queue, PCMREC_START, 0);
     
     while(!record_done)
-        sleep_thread();
-    wake_up_thread();    
+        sleep_thread(1);
 }
 
 
@@ -438,8 +435,7 @@ void audio_new_file(const char *filename)
     queue_post(&pcmrec_queue, PCMREC_NEW_FILE, 0);
     
     while(!new_file_done)
-        sleep_thread();
-    wake_up_thread();    
+        sleep_thread(1);
     
     logf("pcm_new_file done");
 }
@@ -459,8 +455,7 @@ void audio_stop_recording(void)
     queue_post(&pcmrec_queue, PCMREC_STOP, 0);
 
     while(!stop_done)
-        sleep_thread();
-    wake_up_thread();    
+        sleep_thread(1);
 
     logf("pcm_stop done");
 }
@@ -482,8 +477,7 @@ void audio_pause_recording(void)
     queue_post(&pcmrec_queue, PCMREC_PAUSE, 0);
 
     while(!pause_done)
-        sleep_thread();
-    wake_up_thread();    
+        sleep_thread(1);
 }
 
 void audio_resume_recording(void)
@@ -498,8 +492,7 @@ void audio_resume_recording(void)
     queue_post(&pcmrec_queue, PCMREC_RESUME, 0);
 
     while(!resume_done)
-        sleep_thread();
-    wake_up_thread();    
+        sleep_thread(1);
 }
 
 /* return peaks as int, so convert from short first
@@ -817,9 +810,8 @@ static void pcmrec_stop(void)
         /* wait for encoding finish */
         is_paused = true;
         while(!wav_queue_empty)
-            sleep_thread();
+            sleep_thread(1);
 
-        wake_up_thread();
         is_recording = false;
 
         /* Flush buffers to file */
