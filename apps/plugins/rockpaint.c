@@ -422,7 +422,7 @@ static void buffer_putsxyofs( fb_data *buf, int buf_width, int buf_height,
 struct menu_items
 {
     int value;
-    char label[13]; /* GRUIK ? */
+    char label[16]; /* GRUIK ? */
 };
 
 #define MENU_ESC -1242
@@ -437,6 +437,8 @@ enum {
         MAIN_MENU_EXIT,
         /* Select action menu */
         SELECT_MENU_CUT, SELECT_MENU_COPY, SELECT_MENU_INVERT,
+        SELECT_MENU_HFLIP, SELECT_MENU_VFLIP, SELECT_MENU_ROTATE90,
+        SELECT_MENU_ROTATE180, SELECT_MENU_ROTATE270,
         SELECT_MENU_CANCEL,
         /* Text menu */
         TEXT_MENU_TEXT, TEXT_MENU_FONT,
@@ -484,6 +486,11 @@ static struct menu_items select_menu[] =
       { SELECT_MENU_CUT, "Cut" },
       { SELECT_MENU_COPY, "Copy" },
       { SELECT_MENU_INVERT, "Invert" },
+      { SELECT_MENU_HFLIP, "Horizontal flip" },
+      { SELECT_MENU_VFLIP, "Vertical flip" },
+//      { SELECT_MENU_ROTATE90, "Rotate 90°" },
+      { SELECT_MENU_ROTATE180, "Rotate 180°" },
+//      { SELECT_MENU_ROTATE270, "Rotate 270°" },
       { SELECT_MENU_CANCEL, "Cancel" },
       { MENU_END, "" } };
 
@@ -1338,6 +1345,63 @@ static void draw_invert( int x1, int y1, int x2, int y2 )
         }
     }
     /*if( update )*/ rb->lcd_update();
+}
+
+static void draw_hflip( int x1, int y1, int x2, int y2 )
+{
+    int i;
+    if( x1 > x2 )
+    {
+        i = x1;
+        x1 = x2;
+        x2 = i;
+    }
+    if( y1 > y2 )
+    {
+        i = y1;
+        y1 = y2;
+        y2 = i;
+    }
+
+    copy_to_clipboard();
+
+    for( i = 0; i <= y2 - y1; i++ )
+    {
+        rb->memcpy( save_buffer+(y1+i)*COLS+x1,
+                    buffer.clipboard+(y2-i)*COLS+x1,
+                    (x2-x1+1)*sizeof( fb_data ) );
+    }
+    restore_screen();
+    rb->lcd_update();
+}
+
+static void draw_vflip( int x1, int y1, int x2, int y2 )
+{
+    int i;
+    if( x1 > x2 )
+    {
+        i = x1;
+        x1 = x2;
+        x2 = i;
+    }
+    if( y1 > y2 )
+    {
+        i = y1;
+        y1 = y2;
+        y2 = i;
+    }
+
+    copy_to_clipboard();
+
+    for( ; y1 <= y2; y1++ )
+    {
+        for( i = 0; i <= x2 - x1; i++ )
+        {
+            save_buffer[y1*COLS+x1+i] = buffer.clipboard[y1*COLS+x2-i];
+        }
+    }
+    restore_screen();
+    rb->lcd_update();
 }
 
 static void draw_paste_rectangle( int src_x1, int src_y1, int src_x2,
@@ -2542,11 +2606,33 @@ static bool rockpaint_loop( void )
                                     prev_x2 = x;
                                     prev_y2 = y;
                                     copy_to_clipboard();
+                                    if( prev_x < x ) x = prev_x;
+                                    if( prev_y < y ) y = prev_y;
                                     break;
 
                                 case SELECT_MENU_INVERT:
                                     draw_invert( prev_x, prev_y, x, y );
                                     reset_tool();
+                                    break;
+
+                                case SELECT_MENU_HFLIP:
+                                    draw_hflip( prev_x, prev_y, x, y );
+                                    reset_tool();
+                                    break;
+
+                                case SELECT_MENU_VFLIP:
+                                    draw_vflip( prev_x, prev_y, x, y );
+                                    reset_tool();
+                                    break;
+
+                                case SELECT_MENU_ROTATE90:
+                                    break;
+                                case SELECT_MENU_ROTATE180:
+                                    draw_hflip( prev_x, prev_y, x, y );
+                                    draw_vflip( prev_x, prev_y, x, y );
+                                    reset_tool();
+                                    break;
+                                case SELECT_MENU_ROTATE270:
                                     break;
 
                                 case SELECT_MENU_CANCEL:
