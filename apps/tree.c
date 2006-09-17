@@ -549,7 +549,7 @@ static bool dirbrowse(void)
     int numentries=0;
     char buf[MAX_PATH];
     int lasti = -1;
-    unsigned button;
+    unsigned button, returned_button;
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
@@ -619,7 +619,10 @@ static bool dirbrowse(void)
         }
 #endif
         button = get_action(CONTEXT_TREE,HZ/5);
-        need_update = gui_synclist_do_button(&tree_lists, button);
+        returned_button = gui_synclist_do_button(&tree_lists, button);
+        need_update = (bool)returned_button;
+        if (returned_button == ACTION_STD_CANCEL)
+            button = ACTION_STD_CANCEL;
 
         switch ( button ) {
             case ACTION_STD_OK:

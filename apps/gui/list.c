@@ -749,6 +749,8 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
             gui_synclist_draw(lists);
             return ACTION_TREE_PGRIGHT;
         case ACTION_TREE_PGLEFT:
+            if (lists->gui_list[0].offset_position == 0)
+                return ACTION_STD_CANCEL;
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
             return ACTION_TREE_PGLEFT;
