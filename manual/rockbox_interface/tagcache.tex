@@ -17,7 +17,7 @@ described in the following section.
 
 \begin{description}
   \opt{SWCODEC}{
-  \item[Load To Ram:  ]
+  \item[Load To Ram.]
     The Tag Cache database can either be kept on disk (to save memory), or
     loaded into RAM (for fast browsing). Setting this to \setting{Yes} loads
     the tagcache to RAM, allowing faster browsing and searching. Setting this
@@ -29,7 +29,7 @@ described in the following section.
       disk will not need to spin on each search.}
   }
   
-\item[Auto Update:  ]
+\item[Auto Update.]
   If \setting{Auto update} is set to \setting{on}, each time the \dap{}
   boots, Tag Cache will automatically update the database.
   \opt{SWCODEC}{
@@ -42,7 +42,7 @@ described in the following section.
   \opt{MASCODEC}{\setting{Auto Update} does not detect deleted files. To remove
     deleted files from the database you need to run \setting{Update Now}.}%
 
-\item[Initialize Now:  ]
+\item[Initialize Now.]
   Before you use the Tag Cache for the first time, you must initialize it by
   using the \setting{Initialize Now} function in the \setting{Tag Cache
     Menu}.
@@ -57,7 +57,7 @@ described in the following section.
   down your player during initialization, the database building process will
   continue next time you turn it on.
   
-\item[Update Now:  ]
+\item[Update Now.]
   \setting{Update now} causes Tag Cache to detect new and deleted files
   \opt{SWCODEC}{
     \note{Unlike the \setting{Auto Update} function, \setting{Update Now}
@@ -69,18 +69,18 @@ described in the following section.
   Unlike \setting{Initialize Now}, the \setting{Update Now} function
   does not remove runtime database information.
   
-\item[Gather Runtime Data (Experimental):  ]
+\item[Gather Runtime Data (Experimental).]
   When enabled, this option allows the most played, unplayed and most recently
   played tracks to be logged and scored.
   
-\item[Export modifications:  ]
+\item[Export modifications.]
   This allows for the runtime data to be exported into \\
   \fname{/.rockbox/tagcache\_changelog.txt}, which backs up the runtime data in
   ASCII format. This is needed when Tag Cache structures change, because new
   code cannot read old Tag Cache database code. But, all modifications
   exported to ASCII format should be readable by all Tag Cache versions.
   
-\item[Import modifications:  ]
+\item[Import modifications.]
   Allows the \fname{/.rockbox/tagcache\_changelog.txt} backup to be 
   conveniently loaded into the Tag Cache. This is performed automatically when
   the Tag Cache is initialized.
@@ -105,9 +105,9 @@ to RAM.}
 %
 \begin{table}
 \begin{center}
-  \begin{tabularx}{.75\textwidth}{XX}
-  \toprule
-  Supported Tags   & Unsupported Tags \\ 
+  \begin{tabularx}{.75\textwidth}{XX}%
+  \toprule%
+  \textbf{Supported Tags}   & \textbf{Unsupported Tags} \\
   \midrule
   Artist           & Comment \\
   Album            & Performer\\
