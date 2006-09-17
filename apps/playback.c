@@ -951,19 +951,13 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
             case Q_AUDIO_PLAY:
                 LOGFQUEUE("voice < Q_AUDIO_PLAY");
                 if (playing)
-                {
-                    if (audio_codec_loaded)
-                        swap_codec();
-                    else
-                        yield();
-                }
+                    swap_codec();
                 break;
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
             case Q_ENCODER_RECORD:
                 LOGFQUEUE("voice < Q_ENCODER_RECORD");
-                if (audio_codec_loaded)
-                    swap_codec();
+                swap_codec();
                 break;
 #endif
 
@@ -1747,7 +1741,8 @@ static void codec_thread(void)
                 LOGFQUEUE("codec < Q_CODEC_LOAD_DISK");
                 audio_codec_loaded = true;
 #ifdef PLAYBACK_VOICE
-                if (voice_codec_loaded)
+                /* Don't sent messages to voice codec if it's not current */
+                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
                 {
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
@@ -1776,7 +1771,7 @@ static void codec_thread(void)
 
                 audio_codec_loaded = true;
 #ifdef PLAYBACK_VOICE
-                if (voice_codec_loaded)
+                if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
                 {
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
@@ -1794,7 +1789,7 @@ static void codec_thread(void)
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
             case Q_ENCODER_LOAD_DISK:
                 LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
-                audio_codec_loaded = false;
+                audio_codec_loaded = false; /* Not audio codec! */
 #ifdef PLAYBACK_VOICE
                 if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
                 {

@@ -1635,19 +1635,17 @@ static bool fm_recording_settings(void)
 {
     bool ret = recording_menu(true);
 
+#if CONFIG_CODEC != SWCODEC
     if (!ret)
     {
         rec_set_recording_options(global_settings.rec_frequency,
                                   global_settings.rec_quality,
-#if CONFIG_CODEC == SWCODEC
-                                  AUDIO_SRC_FMRADIO, SRCF_FMRADIO_PLAYING,
-#else
                                   AUDIO_SRC_LINEIN, 0,
-#endif
                                   global_settings.rec_channels,
                                   global_settings.rec_editable,
                                   global_settings.rec_prerecord_time);
     }
+#endif
 
     return ret;
 }
