@@ -1185,9 +1185,12 @@ static bool view_mode_setting(void)
         {"No (Narrow)", -1},
         {"Yes",         -1},
     };
-
-    return rb->set_option("Wide View", &prefs.view_mode, INT,
+    bool ret;
+    ret = rb->set_option("Wide View", &prefs.view_mode, INT,
                            names , 2, NULL);
+    if (prefs.view_mode == NARROW)
+        col = 0;
+    return ret;
 }
 
 static bool scroll_mode_setting(void)
