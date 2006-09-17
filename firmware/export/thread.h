@@ -19,6 +19,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 
+#include "config.h"
 #include <stdbool.h>
 
 /* Priority scheduling (when enabled with HAVE_PRIORITY_SCHEDULING) works
