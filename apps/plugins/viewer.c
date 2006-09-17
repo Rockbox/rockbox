@@ -37,7 +37,7 @@ PLUGIN_HEADER
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
 #define SCROLLBAR_WIDTH     6
 
-#define MAX_BOOKMARKED_FILES ((signed)BUFFER_SIZE/(signed)sizeof(struct bookmarked_file_info))
+#define MAX_BOOKMARKED_FILES 10/*((signed)BUFFER_SIZE/(signed)sizeof(struct bookmarked_file_info))*/
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
