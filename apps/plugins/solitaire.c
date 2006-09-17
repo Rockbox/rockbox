@@ -54,16 +54,16 @@ static struct plugin_api* rb;
 #   define SOL_LEFT         BUTTON_LEFT
 #   define SOL_RIGHT        BUTTON_RIGHT
 #   define SOL_MOVE         BUTTON_ON
-#   define SOL_DRAW         BUTTON_F2
+#   define SOL_DRAW         BUTTON_F1
 #   define SOL_REM2CUR      BUTTON_PLAY
-#   define SOL_CUR2STACK    BUTTON_F1
+#   define SOL_CUR2STACK    BUTTON_F2
 #   define SOL_REM2STACK    BUTTON_F3
 #   define SOL_MENU_RUN     BUTTON_RIGHT
 #   define SOL_MENU_RUN2    BUTTON_PLAY
 #   define HK_MOVE         "ON"
-#   define HK_DRAW         "F2"
+#   define HK_DRAW         "F1"
 #   define HK_REM2CUR      "PLAY"
-#   define HK_CUR2STACK    "F1"
+#   define HK_CUR2STACK    "F2"
 #   define HK_REM2STACK    "F3"
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
@@ -80,18 +80,18 @@ static struct plugin_api* rb;
 #   define SOL_MOVE         (BUTTON_MENU | BUTTON_REL)
 #   define SOL_DRAW_PRE     BUTTON_MENU
 #   define SOL_DRAW         (BUTTON_MENU | BUTTON_REPEAT)
-#   define SOL_REM2CUR_PRE  BUTTON_LEFT
-#   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_REPEAT)
-#   define SOL_CUR2STACK_PRE BUTTON_RIGHT
-#   define SOL_CUR2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define SOL_REM2STACK_PRE BUTTON_UP
-#   define SOL_REM2STACK    (BUTTON_UP | BUTTON_REPEAT)
+#   define SOL_REM2CUR_PRE  BUTTON_DOWN
+#   define SOL_REM2CUR      (BUTTON_DOWN | BUTTON_REPEAT)
+#   define SOL_CUR2STACK_PRE BUTTON_UP
+#   define SOL_CUR2STACK    (BUTTON_UP | BUTTON_REPEAT)
+#   define SOL_REM2STACK_PRE BUTTON_RIGHT
+#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
 #   define SOL_MENU_RUN     BUTTON_RIGHT
 #   define HK_MOVE         "MODE"
 #   define HK_DRAW         "MODE.."
-#   define HK_REM2CUR      "LEFT.."
-#   define HK_CUR2STACK    "RIGHT.."
-#   define HK_REM2STACK    "UP.."
+#   define HK_REM2CUR      "DOWN.."
+#   define HK_CUR2STACK    "UP.."
+#   define HK_REM2STACK    "RIGHT.."
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -114,26 +114,33 @@ static struct plugin_api* rb;
 #   define HK_MOVE         "NAVI"
 #   define HK_DRAW         "A-B"
 #   define HK_REM2CUR      "PLAY+LEFT"
-#   define HK_CUR2STACK    "NAVI"
+#   define HK_CUR2STACK    "NAVI.."
 #   define HK_REM2STACK    "PLAY+RIGHT"
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) ||(CONFIG_KEYPAD == IPOD_3G_PAD)
 #   define SOL_QUIT         (BUTTON_SELECT | BUTTON_MENU)
-#   define SOL_UP           BUTTON_MENU
-#   define SOL_DOWN         BUTTON_PLAY
-#   define SOL_LEFT         BUTTON_LEFT
-#   define SOL_RIGHT        BUTTON_RIGHT
-#   define SOL_MOVE         BUTTON_SELECT
-#   define SOL_DRAW         (BUTTON_SELECT | BUTTON_PLAY)
-#   define SOL_REM2CUR      (BUTTON_SELECT | BUTTON_LEFT)
-#   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_RIGHT)
-#   define SOL_REM2STACK    (BUTTON_LEFT | BUTTON_RIGHT)
+#   define SOL_UP           BUTTON_SCROLL_BACK
+#   define SOL_DOWN         BUTTON_SCROLL_FWD
+#   define SOL_LEFT_PRE     BUTTON_LEFT
+#   define SOL_LEFT         (BUTTON_LEFT | BUTTON_REL)
+#   define SOL_RIGHT_PRE    BUTTON_RIGHT
+#   define SOL_RIGHT        (BUTTON_RIGHT | BUTTON_REL)
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
+#   define SOL_DRAW_PRE     BUTTON_MENU
+#   define SOL_DRAW         (BUTTON_MENU | BUTTON_REL)
+#   define SOL_REM2CUR      BUTTON_PLAY
+#   define SOL_CUR2STACK_PRE BUTTON_MENU
+#   define SOL_CUR2STACK    (BUTTON_MENU | BUTTON_REPEAT)
+#   define SOL_REM2STACK_PRE BUTTON_RIGHT
+#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
 #   define SOL_MENU_RUN     BUTTON_SELECT
+#   define HK_UD           "SROLL U/D"
 #   define HK_MOVE         "SELECT"
-#   define HK_DRAW         "SELECT+PLAY"
-#   define HK_REM2CUR      "SELECT+LEFT"
-#   define HK_CUR2STACK    "SELECT+RIGHT.."
-#   define HK_REM2STACK    "LEFT+RIGHT"
+#   define HK_DRAW         "MENU"
+#   define HK_REM2CUR      "PLAY"
+#   define HK_CUR2STACK    "MENU.."
+#   define HK_REM2STACK    "RIGHT.."
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #   define SOL_QUIT         BUTTON_POWER
@@ -147,10 +154,11 @@ static struct plugin_api* rb;
 #   define SOL_CUR2STACK    (BUTTON_REC | BUTTON_UP)
 #   define SOL_REM2STACK    (BUTTON_REC | BUTTON_DOWN)
 #   define SOL_MENU_RUN     BUTTON_SELECT
+#   define SOL_MENU_RUN2    BUTTON_RIGHT
 #   define HK_MOVE         "MENU"
 #   define HK_DRAW         "PLAY"
 #   define HK_REM2CUR      "REC+LEFT"
-#   define HK_CUR2STACK    "REC+UP.."
+#   define HK_CUR2STACK    "REC+UP"
 #   define HK_REM2STACK    "REC+DOWN"
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
@@ -196,25 +204,30 @@ static struct plugin_api* rb;
 #   error "Unknown keypad"
 #endif
 
+#define HK_LR "LEFT/RIGHT"
+#ifndef HK_UD
+#   define HK_UD "UP/DOWN"
+#endif
+
 /**
  * Help strings
  */
 
-#define HELP_SOL_UP     "UP: Move the cursor up in the column."
-#define HELP_SOL_DOWN   "DOWN: Move the cursor down in the column."
-#define HELP_SOL_LEFT   "LEFT: Move the cursor to the previous column."
-#define HELP_SOL_RIGHT  "RIGHT: Move the cursor to the next column."
-#define HELP_SOL_MOVE HK_MOVE \
-    ": Select cards, Move cards, reveal hidden cards ..."
-#define HELP_SOL_DRAW HK_DRAW \
-    ": Un-select a card if it was selected. " \
-    "Else, draw new cards out of the remains' stack."
-#define HELP_SOL_REM2CUR HK_REM2CUR \
-    ": Put the card on top of the remains' stack on top of the cursor."
-#define HELP_SOL_CUR2STACK  HK_CUR2STACK \
-    ": Put the card under the cursor on one of the 4 final stacks."
-#define HELP_SOL_REM2STACK HK_REM2STACK \
-    ": Put the card on top of the remains' stack on one of the 4 final stacks."
+static int helplines;
+static int displaylines;
+
+static char helptext[] = 
+    /* Use single spaces only! Close each line with one \0. */
+    "-- Navigation --\0"
+    HK_LR   ": Move the cursor to the previous/ next column.\0"
+    HK_UD   ": Move the cursor up/ down in the column.\0"
+    HK_MOVE ": Select cards, move cards, reveal hidden cards...\0"
+    HK_DRAW ": Deselect a card if it was selected. Else draw new card(s) from the remains stack.\0"
+    "-- Shortcuts --\0"
+    HK_REM2CUR   ": Put the card on top of the remains stack on top of the cursor.\0"
+    HK_CUR2STACK ": Put the card under the cursor on one of the 4 final stacks.\0"
+    HK_REM2STACK ": Put the card on top of the remains stack on one of the 4 final stacks.\0"
+;
 
 /**
  * Misc constants, graphics and other defines
@@ -445,53 +458,77 @@ static void draw_empty_stack( int s, int x, int y, bool cursor )
 
 /**
  * Help
- *
- * TODO: the help menu should just list the key definitions. Asking the
- *       user to try all possible keys/key combos is just counter
- *       productive.
  */
+
+static void init_help(void)
+{
+    int lines = 0;
+    int w_space, w, h;
+    int para_len;
+    char *para = helptext;
+
+    rb->lcd_getstringsize(" ", &w_space, &h);
+    displaylines = LCD_HEIGHT / h;
+    para_len = rb->strlen(para);
+
+    while (para_len)
+    {   
+        bool first = true;
+        int x = 0;
+        char *next, *store;
+
+        next = rb->strtok_r(para, " ", &store);
+        while (next)
+        {
+            rb->lcd_getstringsize(next, &w, NULL);
+            if (!first)
+            {
+                if (x + w > LCD_WIDTH)
+                {
+                    lines++;
+                    x = 0;
+                }
+                else
+                    next[-1] = ' ';  /* re-concatenate string */
+            }
+            else
+                first = false;
+
+            x += w + w_space;
+            next = rb->strtok_r(NULL, " ", &store);
+        }
+
+        lines++;
+        para += para_len + 1;
+        para_len = rb->strlen(para);
+    }
+    helplines = lines;
+}
 
 enum help { HELP_QUIT, HELP_USB };
 
 /* help for the not so intuitive interface */
 enum help solitaire_help( void )
 {
-
+    int start = 0;
     int button;
     int lastbutton = BUTTON_NONE;
+    bool fixed = (displaylines >= helplines);
 
     while( true )
     {
+        char *text = helptext;
+        int line  = fixed ? (displaylines - helplines) / 2 : 0;
+        int i;
+
         rb->lcd_clear_display();
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-        rb->lcd_putsxy(0, 0, "Press a key to see");
-        rb->lcd_putsxy(0, 7, "it's role.");
-        rb->lcd_putsxy(0, 21, "Press OFF to");
-        rb->lcd_putsxy(0, 28, "return to menu.");
-        rb->lcd_putsxy(0, 42, "All actions can");
-        rb->lcd_putsxy(0, 49, "be done using");
-        rb->lcd_putsxy(0, 56, "arrows, ON and F2.");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-        rb->lcd_putsxy(0, 0, "Press a key short");
-        rb->lcd_putsxy(0, 7, "or long to see it's");
-        rb->lcd_putsxy(0, 21, "role. Press OFF to");
-        rb->lcd_putsxy(0, 28, "return to menu.");
-        rb->lcd_putsxy(0, 42, "All actions can be");
-        rb->lcd_putsxy(0, 49, "done using arrows,");
-        rb->lcd_putsxy(0, 56, "short & long MODE.");
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
-        rb->lcd_putsxy(20, 8, "Press a key or key");
-        rb->lcd_putsxy(20, 16, "combo to see it's");
-        rb->lcd_putsxy(20, 24, "role. Press STOP to");
-        rb->lcd_putsxy(20, 32, "return to menu.");
-        rb->lcd_putsxy(20, 48, "All actions can be");
-        rb->lcd_putsxy(20, 56, "done using the");
-        rb->lcd_putsxy(20, 64, "joystick and A-B.");
-#else
-//#   warning "Add help strings for other keypads"
-#endif
-
+        for (i = 0; i < start + displaylines; i++)
+        {
+            if (i >= start)
+                rb->lcd_puts(0, line++, text);
+            text += rb->strlen(text) + 1;
+        }
         rb->lcd_update();
 
         button = rb->button_get( true );
@@ -501,73 +538,24 @@ enum help solitaire_help( void )
 #ifdef SOL_UP_PRE
                 if( lastbutton != SOL_UP_PRE )
                     break;
+#else
+            case SOL_UP|BUTTON_REPEAT:
 #endif
-                rb->splash( HZ*2, true, HELP_SOL_UP );
+                if (!fixed && start > 0)
+                    start--;
                 break;
 
             case SOL_DOWN:
 #ifdef SOL_DOWN_PRE
                 if( lastbutton != SOL_DOWN_PRE )
                     break;
+#else
+            case SOL_DOWN|BUTTON_REPEAT:
 #endif
-                rb->splash( HZ*2, true, HELP_SOL_DOWN );
+                if (!fixed && start < helplines - displaylines)
+                    start++;
                 break;
 
-            case SOL_LEFT:
-#ifdef SOL_LEFT_PRE
-                if( lastbutton != SOL_LEFT_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_LEFT );
-                break;
-
-            case SOL_RIGHT:
-#ifdef SOL_RIGHT_PRE
-                if( lastbutton != SOL_RIGHT_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_RIGHT );
-                break;
-
-            case SOL_MOVE:
-#ifdef SOL_MOVE_PRE
-                if( lastbutton != SOL_MOVE_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_MOVE );
-                break;
-
-            case SOL_DRAW:
-#ifdef SOL_DRAW_PRE
-                if( lastbutton != SOL_DRAW_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_DRAW );
-                break;
-
-            case SOL_CUR2STACK:
-#ifdef SOL_CUR2STACK_PRE
-                if( lastbutton != SOL_CUR2STACK_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_CUR2STACK );
-                break;
-
-            case SOL_REM2STACK:
-#ifdef SOL_REM2STACK_PRE
-                if( lastbutton != SOL_REM2STACK_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_REM2STACK );
-                break;
-
-            case SOL_REM2CUR:
-#ifdef SOL_REM2CUR_PRE
-                if( lastbutton != SOL_REM2CUR_PRE )
-                    break;
-#endif
-                rb->splash( HZ*2, true, HELP_SOL_REM2CUR );
-                break;
 #ifdef SOL_RC_QUIT
             case SOL_RC_QUIT:
 #endif
@@ -675,10 +663,16 @@ int solitaire_menu( unsigned char context )
         switch( button )
         {
             case SOL_UP:
+#ifndef SOL_UP_PRE
+            case SOL_UP|BUTTON_REPEAT:
+#endif
                 cursor = (cursor + MENU_LENGTH - 1)%MENU_LENGTH;
                 break;
 
             case SOL_DOWN:
+#ifndef SOL_DOWN_PRE
+            case SOL_DOWN|BUTTON_REPEAT:
+#endif
                 cursor = (cursor + 1)%MENU_LENGTH;
                 break;
 
@@ -1357,6 +1351,8 @@ int solitaire( void )
 #ifdef SOL_DOWN_PRE
                 if( lastbutton != SOL_DOWN_PRE )
                     break;
+#else
+            case SOL_DOWN|BUTTON_REPEAT:
 #endif
                 if( cur_col >= COL_NUM )
                 {
@@ -1392,6 +1388,8 @@ int solitaire( void )
 #ifdef SOL_UP_PRE
                 if( lastbutton != SOL_UP_PRE )
                     break;
+#else
+            case SOL_UP|BUTTON_REPEAT:
 #endif
                 if( cur_col >= COL_NUM )
                 {
@@ -1617,6 +1615,8 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     configfile_init(rb);
     configfile_load(CONFIG_FILENAME, config, 1, 0);
     draw_type = draw_type_disk;
+    
+    init_help();
 
     /* play the game :)
      * Keep playing if a game was won (that means display the menu after
