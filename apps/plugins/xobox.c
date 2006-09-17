@@ -275,8 +275,8 @@ static void init_board (void)
     int i, j;
     for (j = 0; j < BOARD_H; j++)
         for (i = 0; i < BOARD_W; i++) { /* make a nice cyan frame */
-            if ((i == 0) || (j == 1) || (j == 0) || (i == BOARD_W - 1)
-                || (j == BOARD_H - 1) || (j == BOARD_H - 2))
+            if ((i == 0) || (j <= 1) || (i == BOARD_W - 1)
+                || (j >= BOARD_H - 2))
                 board[j][i] = FILLED;
             else
                 board[j][i] = EMPTIED;
@@ -325,11 +325,25 @@ static void refresh_board (void)
     rb->lcd_set_background (LCD_BLACK);
     rb->lcd_clear_display ();
     for (j = 0; j < BOARD_H; j++)
-        for (i = 0; i < BOARD_W; i++) {
-            rb->lcd_set_foreground (board[j][i]);
-            rb->lcd_fillrect (BOARD_X + CUBE_SIZE * i, BOARD_Y + CUBE_SIZE * j,
-                              CUBE_SIZE, CUBE_SIZE);
+    {
+        unsigned last_color = board[j][0];
+        int last_i = 0;
+        for (i = 1; i < BOARD_W; i++) {
+            if( last_color != board[j][i] )
+            {
+                rb->lcd_set_foreground (last_color);
+                rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
+                                  BOARD_Y + CUBE_SIZE * j,
+                                  CUBE_SIZE  * (i - last_i), CUBE_SIZE );
+                last_color = board[j][i];
+                last_i = i;
+            }
         }
+        rb->lcd_set_foreground (last_color);
+        rb->lcd_fillrect (BOARD_X + CUBE_SIZE * (last_i),
+                          BOARD_Y + CUBE_SIZE * j,
+                          CUBE_SIZE * (i - last_i), CUBE_SIZE);
+    }
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (CLR_LTBLUE);
     rb->snprintf (str, sizeof (str), "Level %d", player.level + 1);
@@ -379,23 +393,19 @@ static inline int infested_area (int i, int j)
         p3.y = p.y + 1;
         p4.x = p.x;
         p4.y = p.y - 1;
-        if ((p1.x < BOARD_W) && (p1.x >= 0) && (p1.y < BOARD_H) && (p1.y >= 0)
-            && (testboard[p1.y][p1.x] == UNCHECKED))
+        if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
             if (board[p1.y][p1.x] != FILLED)
                 if (!push (&p1))
                     return -1;
-        if ((p2.x < BOARD_W) && (p2.x >= 0) && (p2.y < BOARD_H) && (p2.y >= 0)
-            && (testboard[p2.y][p2.x] == UNCHECKED))
+        if ((p2.x >= 0) && (testboard[p2.y][p2.x] == UNCHECKED))
             if (board[p2.y][p2.x] != FILLED)
                 if (!push (&p2))
                     return -1;
-        if ((p3.x < BOARD_W) && (p3.x >= 0) && (p3.y < BOARD_H) && (p3.y >= 0)
-            && (testboard[p3.y][p3.x] == UNCHECKED))
+        if ((p3.y < BOARD_H) && (testboard[p3.y][p3.x] == UNCHECKED))
             if (board[p3.y][p3.x] != FILLED)
                 if (!push (&p3))
                     return -1;
-        if ((p4.x < BOARD_W) && (p4.x >= 0) && (p4.y < BOARD_H) && (p4.y >= 0)
-            && (testboard[p4.y][p4.x] == UNCHECKED))
+        if ((p4.y >= 0) && (testboard[p4.y][p4.x] == UNCHECKED))
             if (board[p4.y][p4.x] != FILLED)
                 if (!push (&p4))
                     return -1;
@@ -423,23 +433,19 @@ static inline int fill_area (int i, int j)
         p3.y = p.y + 1;
         p4.x = p.x;
         p4.y = p.y - 1;
-        if ((p1.x < BOARD_W) && (p1.x >= 0) && (p1.y < BOARD_H) && (p1.y >= 0)
-            && (testboard[p1.y][p1.x] == UNCHECKED))
+        if ((p1.x < BOARD_W) && (testboard[p1.y][p1.x] == UNCHECKED))
             if (board[p1.y][p1.x] == EMPTIED)
                 if (!push (&p1))
                     return -1;
-        if ((p2.x < BOARD_W) && (p2.x >= 0) && (p2.y < BOARD_H) && (p2.y >= 0)
-            && (testboard[p2.y][p2.x] == UNCHECKED))
+        if ((p2.x >= 0) && (testboard[p2.y][p2.x] == UNCHECKED))
             if (board[p2.y][p2.x] == EMPTIED)
                 if (!push (&p2))
                     return -1;
-        if ((p3.x < BOARD_W) && (p3.x >= 0) && (p3.y < BOARD_H) && (p3.y >= 0)
-            && (testboard[p3.y][p3.x] == UNCHECKED))
+        if ((p3.y < BOARD_H) && (testboard[p3.y][p3.x] == UNCHECKED))
             if (board[p3.y][p3.x] == EMPTIED)
                 if (!push (&p3))
                     return -1;
-        if ((p4.x < BOARD_W) && (p4.x >= 0) && (p4.y < BOARD_H) && (p4.y >= 0)
-            && (testboard[p4.y][p4.x] == UNCHECKED))
+        if ((p4.y >= 0) && (testboard[p4.y][p4.x] == UNCHECKED))
             if (board[p4.y][p4.x] == EMPTIED)
                 if (!push (&p4))
                     return -1;
@@ -465,21 +471,15 @@ static void complete_trail (int fill)
 
     if (fill) {
         for (i = 0; i < player.level + STARTING_QIXES; i++) /* add qixes to board */
-            boardcopy[div (qixes[i].y - BOARD_Y, CUBE_SIZE)][div
-                                                             (qixes[i].x - BOARD_X,
-                                                              CUBE_SIZE)] = QIX;
+            boardcopy[div(qixes[i].y - BOARD_Y, CUBE_SIZE)]
+                     [div(qixes[i].x - BOARD_X, CUBE_SIZE)] = QIX;
 
         for (j = 1; j < BOARD_H - 1; j++)
             for (i = 0; i < BOARD_W - 0; i++)
                 if (board[j][i] != FILLED) {
                     ret = infested_area (i, j);
-                    if (ret < 0)
+                    if (ret < 0 || ( ret == 0 && fill_area (i, j) < 0 ) )
                         quit = true;
-                    else if (ret == 0) {
-                        ret = fill_area (i, j);
-                        if (ret < 0)
-                            quit = true;
-                    }
                 }
      }
 
