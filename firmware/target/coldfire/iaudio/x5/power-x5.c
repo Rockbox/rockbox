@@ -23,6 +23,7 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
+#include "lcd-remote-target.h"
 
 #ifndef SIMULATOR
 
@@ -58,6 +59,7 @@ bool ide_powered(void)
 
 void power_off(void)
 {
+    lcd_remote_poweroff();
     set_irq_level(HIGHEST_IRQ_LEVEL);
     and_l(~0x00000008, &GPIO_OUT); /* Set KEEPACT low */
     asm("halt");

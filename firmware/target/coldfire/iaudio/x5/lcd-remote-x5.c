@@ -23,23 +23,23 @@
 
 /* The LCD in the iAudio M3/M5/X5 remote control is a Tomato LSI 0350 */
 
-#define	LCD_SET_DUTY_RATIO 0x48
-#define	LCD_SELECT_ADC     0xa0
-#define	LCD_SELECT_SHL     0xc0
-#define	LCD_SET_COM0       0x44
-#define	LCD_OSC_ON         0xab
-#define	LCD_SELECT_DCDC    0x64
-#define	LCD_SELECT_RES     0x20
-#define	LCD_SET_VOLUME     0x81
-#define	LCD_SET_BIAS       0x50
-#define	LCD_CONTROL_POWER  0x28
-#define	LCD_DISPLAY_ON     0xae
-#define	LCD_SET_INITLINE   0x40
-#define	LCD_SET_COLUMN     0x10
-#define	LCD_SET_PAGE       0xb0
-#define	LCD_SET_GRAY       0x88
-#define	LCD_SET_PWM_FRC    0x90
-#define	LCD_SET_POWER_SAVE 0xa8
+#define LCD_SET_DUTY_RATIO 0x48
+#define LCD_SELECT_ADC     0xa0
+#define LCD_SELECT_SHL     0xc0
+#define LCD_SET_COM0       0x44
+#define LCD_OSC_ON         0xab
+#define LCD_SELECT_DCDC    0x64
+#define LCD_SELECT_RES     0x20
+#define LCD_SET_VOLUME     0x81
+#define LCD_SET_BIAS       0x50
+#define LCD_CONTROL_POWER  0x28
+#define LCD_DISPLAY_ON     0xae
+#define LCD_SET_INITLINE   0x40
+#define LCD_SET_COLUMN     0x10
+#define LCD_SET_PAGE       0xb0
+#define LCD_SET_GRAY       0x88
+#define LCD_SET_PWM_FRC    0x90
+#define LCD_SET_POWER_SAVE 0xa8
 #define LCD_REVERSE        0xa6
 
 #define CS_LO      and_l(~0x00000020, &GPIO1_OUT)
@@ -328,7 +328,7 @@ void lcd_remote_init_device(void)
     or_l(0x00000020, &GPIO1_OUT);
     or_l(0x00000020, &GPIO1_ENABLE);
     or_l(0x00000020, &GPIO1_FUNCTION);
-	
+    
     and_l(~0x01000000, &GPIO_OUT);
     and_l(~0x01000000, &GPIO_ENABLE);
     or_l(0x01000000, &GPIO_FUNCTION);
@@ -339,7 +339,7 @@ void lcd_remote_on(void)
     CS_HI;
     CLK_HI;
     sleep(10);
-	
+    
     lcd_remote_write_command(LCD_SET_DUTY_RATIO);
     lcd_remote_write_command(0x70);  /* 1/128 */
     
@@ -380,6 +380,13 @@ void lcd_remote_off(void)
     remote_initialized = false;
     CS_HI;
     RS_HI;
+}
+
+void lcd_remote_poweroff(void)
+{
+    /* Set power save -> Power OFF (VDD - VSS) .. that's it */
+    if (remote_initialized && remote_detect())
+        lcd_remote_write_command(LCD_SET_POWER_SAVE | 1);
 }
 
 /* Update the display.
