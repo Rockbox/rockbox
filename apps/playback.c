@@ -22,6 +22,8 @@
 /* TODO: Also play, stop ^^ */
 /* TODO: Can use the track changed callback to detect end of track and seek
  * in the previous track until this happens */
+/* TODO: Pause should be handled in here, rather than PCMBUF so that voice can
+ * play whilst audio is paused */
 /* Design: we have prev_ti already, have a conditional for what type of seek
  * to do on a seek request, if it is a previous track seek, skip previous,
  * and in the request_next_track callback set the offset up the same way that
@@ -39,7 +41,6 @@
 #include "file.h"
 #include "lcd.h"
 #include "font.h"
-#include "backlight.h"
 #include "button.h"
 #include "kernel.h"
 #include "tree.h"
@@ -81,10 +82,7 @@
 #include "recording.h"
 #endif
 
-static volatile bool audio_codec_loaded;
-static volatile bool voice_codec_loaded;
-static volatile bool playing;
-static volatile bool paused;
+#define PLAYBACK_VOICE
 
 
 /* default point to start buffer refill */
@@ -99,10 +97,10 @@ static volatile bool paused;
 
 /* macros to enable logf for queues */
 #ifdef SIMULATOR
-#define LOGF_QUEUES /* Define this for logf output of all queuing */
+#define PLAYBACK_LOGQUEUES /* Define this for logf output of all queuing */
 #endif
 
-#ifdef LOGF_QUEUES
+#ifdef PLAYBACK_LOGQUEUES
 #define LOGFQUEUE(s) logf("%s", s)
 #else
 #define LOGFQUEUE(s)
@@ -159,6 +157,14 @@ enum {
 #endif
 #define CODEC_IRAM_SIZE     0xc000
 
+#ifdef PLAYBACK_VOICE
+#ifdef SIMULATOR
+static unsigned char sim_iram[CODEC_IRAM_SIZE];
+#undef CODEC_IRAM_ORIGIN
+#define CODEC_IRAM_ORIGIN sim_iram
+#endif
+#endif
+
 #ifndef SIMULATOR
 extern bool audio_is_initialized;
 #else
@@ -170,13 +176,9 @@ static bool audio_is_initialized = false;
 static struct mutex mutex_codecthread;
 static struct event_queue codec_callback_queue;
 
-static struct mp3entry id3_voice;
-
-static char *voicebuf;
-static size_t voice_remaining;
-static bool voice_is_playing;
-static void (*voice_getmore)(unsigned char** start, int* size);
-static struct thread_entry *voice_thread_p = NULL;
+static volatile bool audio_codec_loaded;
+static volatile bool playing;
+static volatile bool paused;
 
 /* Is file buffer currently being refilled? */
 static volatile bool filling IDATA_ATTR;
@@ -197,9 +199,7 @@ size_t filebufused;
 static volatile size_t buf_ridx IDATA_ATTR;
 static volatile size_t buf_widx IDATA_ATTR;
 
-#ifndef SIMULATOR
 static unsigned char *iram_buf[2];
-#endif
 static unsigned char *dram_buf[2];
 
 /* Step count to the next unbuffered track. */
@@ -209,7 +209,7 @@ static int last_peek_offset;
    track ring structure. */
 static int track_ridx;
 static int track_widx;
-static bool track_changed;
+static bool track_changed;                      /* Audio and codec threads */
 
 /* Partially loaded song's file handle to continue buffering later. */
 static int current_fd;
@@ -218,23 +218,20 @@ static int current_fd;
 static size_t fill_bytesleft;
 
 /* Track info structure about songs in the file buffer. */
-static struct track_info tracks[MAX_TRACK];
+static struct track_info tracks[MAX_TRACK];     /* Audio thread */
 
 /* Pointer to track info structure about current song playing. */
-static struct track_info *cur_ti;
-static struct track_info *prev_ti;
+static struct track_info *cur_ti;               /* Audio and codec threads */
+static struct track_info *prev_ti;              /* Audio and codec threads */
 
 /* Have we reached end of the current playlist. */
-static bool playlist_end = false;
-
-/* Codec API including function callbacks. */
-extern struct codec_api ci;
-extern struct codec_api ci_voice;
+static bool playlist_end = false;               /* Audio thread */
 
 /* Was the skip being executed manual or automatic? */
-static bool automatic_skip;
-static bool dir_skip = false;
-static bool new_playlist = false;
+static bool automatic_skip = false;             /* Audio and codec threads */
+static bool dir_skip = false;                   /* Audio thread */
+static bool new_playlist = false;               /* Audio thread */
+static int wps_offset = 0;
 
 /* Callback function to call when current track has really changed. */
 void (*track_changed_callback)(struct mp3entry *id3);
@@ -250,6 +247,7 @@ static bool v1first = false;
 
 /* Multiple threads */
 static const char * get_codec_filename(int enc_spec);
+static void set_filebuf_watermark(int seconds);
 
 /* Audio thread */
 static struct event_queue audio_queue;
@@ -257,12 +255,12 @@ static long audio_stack[(DEFAULT_STACK_SIZE + 0x1000)/sizeof(long)];
 static const char audio_thread_name[] = "audio";
 
 static void audio_thread(void);
-static void set_filebuf_watermark(int seconds);
 static void audio_initiate_track_change(long direction);
 static bool audio_have_tracks(void);
 static void audio_reset_buffer(void);
 
 /* Codec thread */
+extern struct codec_api ci;
 static struct event_queue codec_queue;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
@@ -271,6 +269,17 @@ static const char codec_thread_name[] = "codec";
 struct thread_entry *codec_thread_p;
 
 /* Voice thread */
+#ifdef PLAYBACK_VOICE
+extern struct codec_api ci_voice;
+
+static volatile bool voice_thread_start;
+static volatile bool voice_is_playing;
+static volatile bool voice_codec_loaded;
+static void (*voice_getmore)(unsigned char** start, int* size);
+static char *voicebuf;
+static size_t voice_remaining;
+static struct thread_entry *voice_thread_p = NULL;
+
 static struct event_queue voice_queue;
 static long voice_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
@@ -286,30 +295,39 @@ static void voice_boost_cpu(bool state);
 #else
 #define voice_boost_cpu(state)   do { } while(0)
 #endif
-
 static void voice_thread(void);
+
+#endif /* PLAYBACK_VOICE */
 
 /* --- External interfaces --- */
 
 void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, int* size))
 {
+#ifdef PLAYBACK_VOICE
     static struct voice_info voice_clip;
     voice_clip.callback = get_more;
     voice_clip.buf = (char *)start;
     voice_clip.size = size;
-    logf("mp3 > voice Q_VOICE_STOP");
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 0);
-    logf("mp3 > voice Q_VOICE_PLAY");
+    LOGFQUEUE("mp3 > voice Q_VOICE_PLAY");
     queue_post(&voice_queue, Q_VOICE_PLAY, &voice_clip);
-    voice_is_playing = true;
+    voice_thread_start = true;
     voice_boost_cpu(true);
+#else
+    (void) start;
+    (void) size;
+    (void) get_more;
+#endif
 }
 
 void mp3_play_stop(void)
 {
-    logf("mp3 > voice Q_VOICE_STOP");
+#ifdef PLAYBACK_VOICE
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 0);
+#endif
 }
 
 bool mp3_pause_done(void)
@@ -360,8 +378,9 @@ struct mp3entry* audio_current_track(void)
     const char *p;
     static struct mp3entry temp_id3;
     int cur_idx;
+    int offset = ci.new_track + wps_offset;
     
-    cur_idx = track_ridx + ci.new_track;
+    cur_idx = track_ridx + offset;
     cur_idx &= MAX_TRACK_MASK;
 
     if (tracks[cur_idx].taginfo_ready)
@@ -369,7 +388,7 @@ struct mp3entry* audio_current_track(void)
 
     memset(&temp_id3, 0, sizeof(struct mp3entry));
     
-    filename = playlist_peek(ci.new_track);
+    filename = playlist_peek(offset);
     if (!filename)
         filename = "No file!";
 
@@ -427,10 +446,7 @@ void audio_play(long offset)
     }
     else
     {
-        if (playing)
-            audio_stop();
-
-        playing = true;
+        audio_stop();
         LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
     }
@@ -440,8 +456,6 @@ void audio_stop(void)
 {
     LOGFQUEUE("audio > audio Q_AUDIO_STOP");
     queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-    while (playing || audio_codec_loaded)
-        yield();
 }
 
 void audio_pause(void)
@@ -461,10 +475,21 @@ void audio_next(void)
     if (global_settings.beep)
         pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-    /* Should be safe to do outside of thread, that way we get
-     * the instant wps response at least. */
-    audio_initiate_track_change(1);
-    // queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
+    if (playlist_check(ci.new_track + wps_offset + 1))
+    {
+        LOGFQUEUE("audio > audio Q_AUDIO_SKIP 1");
+        queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
+        /* Keep wps fast while our message travels inside deep playback queues. */
+        wps_offset++;
+        track_changed = true;
+    }
+    else
+    {
+        /* No more tracks. */
+        if (global_settings.beep)
+            pcmbuf_beep(3000, 300, 2500*global_settings.beep);
+
+    }
 }
 
 void audio_prev(void)
@@ -472,8 +497,21 @@ void audio_prev(void)
     if (global_settings.beep)
         pcmbuf_beep(5000, 100, 2500*global_settings.beep);
 
-    audio_initiate_track_change(-1);
-    // queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
+    if (playlist_check(ci.new_track + wps_offset - 1))
+    {
+        LOGFQUEUE("audio > audio Q_AUDIO_SKIP -1");
+        queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
+        /* Keep wps fast while our message travels inside deep playback queues. */
+        wps_offset--;
+        track_changed = true;
+    }
+    else
+    {
+        /* No more tracks. */
+        if (global_settings.beep)
+            pcmbuf_beep(3000, 300, 2500*global_settings.beep);
+
+    }
 }
 
 void audio_next_dir(void)
@@ -598,7 +636,6 @@ void audio_set_crossfade(int enable)
 
     /* Restart playback. */
     if (was_playing) {
-        playing = true;
         LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
 
@@ -619,7 +656,11 @@ void audio_preinit(void)
     playing = false;
     paused = false;
     audio_codec_loaded = false;
+#ifdef PLAYBACK_VOICE
     voice_is_playing = false;
+    voice_thread_start = false;
+    voice_codec_loaded = false;
+#endif
     track_changed = false;
     current_fd = -1;
     track_buffer_callback = NULL;
@@ -647,6 +688,7 @@ void audio_init(void)
 
 void voice_init(void)
 {
+#ifdef PLAYBACK_VOICE
     if (!filebuf)
         return;     /* Audio buffers not yet set up */
 
@@ -672,10 +714,12 @@ void voice_init(void)
     
     while (!voice_codec_loaded)
         yield();
+#endif
 } /* voice_init */
 
 void voice_stop(void)
 {
+#ifdef PLAYBACK_VOICE
     /* Messages should not be posted to voice codec queue unless it is the
        current codec or deadlocks happen. This will be addressed globally soon.
        -- jhMikeS */
@@ -683,14 +727,14 @@ void voice_stop(void)
         return;
 
     mp3_play_stop();
-    while (voice_is_playing && !queue_empty(&voice_queue))
-        yield();
+#endif
 } /* voice_stop */
 
 
 
 /* --- Routines called from multiple threads --- */
 
+#ifdef PLAYBACK_VOICE
 static void swap_codec(void)
 {
     int my_codec = current_codec;
@@ -698,31 +742,34 @@ static void swap_codec(void)
     logf("swapping out codec:%d", my_codec);
 
     /* Save our current IRAM and DRAM */
-#ifndef SIMULATOR
     memcpy(iram_buf[my_codec], (unsigned char *)CODEC_IRAM_ORIGIN,
             CODEC_IRAM_SIZE);
-#endif
     memcpy(dram_buf[my_codec], codecbuf, CODEC_SIZE);
 
+    /* Release my semaphore */
+    mutex_unlock(&mutex_codecthread);
+
+    /* Loop until the other codec has locked and run */
     do {
         /* Release my semaphore and force a task switch. */
-        mutex_unlock(&mutex_codecthread);
         yield();
-        mutex_lock(&mutex_codecthread);
-    /* Loop until the other codec has locked and run */
     } while (my_codec == current_codec);
+
+    /* Wait for other codec to unlock */
+    mutex_lock(&mutex_codecthread);
+
+    /* Take control */
     current_codec = my_codec;
 
     /* Reload our IRAM and DRAM */
-#ifndef SIMULATOR
     memcpy((unsigned char *)CODEC_IRAM_ORIGIN, iram_buf[my_codec],
             CODEC_IRAM_SIZE);
-#endif
     invalidate_icache();
     memcpy(codecbuf, dram_buf[my_codec], CODEC_SIZE);
 
     logf("resuming codec:%d", my_codec);
 }
+#endif
 
 static void set_filebuf_watermark(int seconds)
 {
@@ -761,6 +808,8 @@ static const char * get_codec_filename(int enc_spec)
 
 /* --- Voice thread --- */
 
+#ifdef PLAYBACK_VOICE
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static void voice_boost_cpu(bool state)
 {
@@ -768,8 +817,8 @@ static void voice_boost_cpu(bool state)
 
     if (state != voice_cpu_boosted)
     {
-        cpu_boost(state);
         voice_cpu_boosted = state;
+        cpu_boost(state);
     }
 }
 #endif
@@ -795,7 +844,7 @@ static bool voice_pcmbuf_insert_split_callback(
         while ((dest = pcmbuf_request_voice_buffer(est_output_size,
                         &output_size, playing)) == NULL)
         {
-            if (playing)
+            if (playing && audio_codec_loaded)
                 swap_codec();
             else
                 yield();
@@ -823,7 +872,7 @@ static bool voice_pcmbuf_insert_split_callback(
         if (playing)
         {
             pcmbuf_mix_voice(output_size);
-            if (pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30)
+            if ((pcmbuf_usage() < 10 || pcmbuf_mix_free() < 30) && audio_codec_loaded)
                 swap_codec();
         }
         else
@@ -902,13 +951,19 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
             case Q_AUDIO_PLAY:
                 LOGFQUEUE("voice < Q_AUDIO_PLAY");
                 if (playing)
-                    swap_codec();
+                {
+                    if (audio_codec_loaded)
+                        swap_codec();
+                    else
+                        yield();
+                }
                 break;
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
             case Q_ENCODER_RECORD:
                 LOGFQUEUE("voice < Q_ENCODER_RECORD");
-                swap_codec();
+                if (audio_codec_loaded)
+                    swap_codec();
                 break;
 #endif
 
@@ -940,6 +995,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 
             case Q_VOICE_PLAY:
                 LOGFQUEUE("voice < Q_VOICE_PLAY");
+                if (!voice_is_playing)
                 {
                     struct voice_info *voice_data;
                     voice_is_playing = true;
@@ -949,6 +1005,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     voicebuf = voice_data->buf;
                     voice_getmore = voice_data->callback;
                 }
+                goto voice_play_clip;
 
             case SYS_TIMEOUT:
                 LOGFQUEUE("voice < SYS_TIMEOUT");
@@ -967,7 +1024,7 @@ voice_play_clip:
             voice_getmore((unsigned char **)&voicebuf, (int *)&voice_remaining);
 
         /* If this clip is done */
-        if (!voice_remaining)
+        if (voice_remaining == 0)
         {
             LOGFQUEUE("voice > voice Q_VOICE_STOP");
             queue_post(&voice_queue, Q_VOICE_STOP, 0);
@@ -1044,6 +1101,7 @@ static void voice_thread(void)
     }
 } /* voice_thread */
 
+#endif /* PLAYBACK_VOICE */
 
 /* --- Codec thread --- */
 
@@ -1097,11 +1155,15 @@ static bool codec_pcmbuf_insert_split_callback(
 
         pcmbuf_write_complete(output_size);
 
-        if (voice_is_playing && pcm_is_playing() &&
-                pcmbuf_usage() > 30 && pcmbuf_mix_free() > 80)
+#ifdef PLAYBACK_VOICE
+        if ((voice_is_playing || voice_thread_start) 
+            && pcm_is_playing() && voice_codec_loaded &&
+            pcmbuf_usage() > 30 && pcmbuf_mix_free() > 80)
         {
+            voice_thread_start = false;
             swap_codec();
         }
+#endif
         
         length -= input_size;
     }
@@ -1684,11 +1746,13 @@ static void codec_thread(void)
             case Q_CODEC_LOAD_DISK:
                 LOGFQUEUE("codec < Q_CODEC_LOAD_DISK");
                 audio_codec_loaded = true;
+#ifdef PLAYBACK_VOICE
                 if (voice_codec_loaded)
                 {
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
+#endif
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
                 ci.stop_codec = false;
@@ -1711,11 +1775,13 @@ static void codec_thread(void)
                 }
 
                 audio_codec_loaded = true;
+#ifdef PLAYBACK_VOICE
                 if (voice_codec_loaded)
                 {
                     LOGFQUEUE("codec > voice Q_AUDIO_PLAY");
                     queue_post(&voice_queue, Q_AUDIO_PLAY, 0);
                 }
+#endif
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
                 ci.stop_codec = false;
@@ -1729,11 +1795,13 @@ static void codec_thread(void)
             case Q_ENCODER_LOAD_DISK:
                 LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
                 audio_codec_loaded = false;
+#ifdef PLAYBACK_VOICE
                 if (voice_codec_loaded && current_codec == CODEC_IDX_VOICE)
                 {
                     LOGFQUEUE("codec > voice Q_ENCODER_RECORD");
                     queue_post(&voice_queue, Q_ENCODER_RECORD, NULL);
                 }
+#endif
                 mutex_lock(&mutex_codecthread);
                 current_codec = CODEC_IDX_AUDIO;
                 ci.stop_codec = false;
@@ -1747,8 +1815,10 @@ static void codec_thread(void)
                 LOGFQUEUE("codec < SYS_USB_CONNECTED");
                 queue_clear(&codec_queue);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                if (voice_codec_loaded)
+#ifdef PLAYBACK_VOICE
+                if(voice_codec_loaded)
                     swap_codec();
+#endif
                 usb_wait_for_disconnect(&codec_queue);
                 break;
 #endif
@@ -2199,7 +2269,6 @@ static bool audio_loadcodec(bool start_play)
         ci.id3 = &cur_ti->id3;
         ci.taginfo_ready = &cur_ti->taginfo_ready;
         ci.curpos = 0;
-        playing = true;
         LOGFQUEUE("codec > codec Q_CODEC_LOAD_DISK");
         queue_post(&codec_queue, Q_CODEC_LOAD_DISK, (void *)codec_fn);
         return true;
@@ -2260,9 +2329,7 @@ static bool audio_loadcodec(bool start_play)
         if (buf_widx >= filebuflen)
             buf_widx -= filebuflen;
 
-        tracks[track_widx].codecsize += rc;
-        
-        audio_yield_codecs();
+        tracks[track_widx].codecsize += rc;       
     }
 
     tracks[track_widx].has_codec = true;
@@ -2941,9 +3008,6 @@ static void audio_stop_playback(void)
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
     }
 
-    while (voice_is_playing && !queue_empty(&voice_queue))
-        yield();
-    
     filebufused = 0;
     playing = false;
     filling = false;
@@ -2968,8 +3032,7 @@ static void audio_play_start(size_t offset)
 #endif
 
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */
-    while (audio_codec_loaded)
-        audio_stop_codec_flush();
+    audio_stop_codec_flush();
 
     track_changed = true;
     playlist_end = false;
@@ -2977,7 +3040,8 @@ static void audio_play_start(size_t offset)
     playing = true;
     ci.new_track = 0;
     ci.seek_time = 0;
-
+    wps_offset = 0;
+    
     if (current_fd >= 0) 
     {
         close(current_fd);
@@ -3057,15 +3121,9 @@ static void audio_new_playlist(void)
 
 static void audio_initiate_track_change(long direction)
 {
-    if (playlist_check(direction))
-    {
-        playlist_end = false;
-        /* Flag track changed immediately so wps can update instantly.
-         * No need to wait for disk to spin up or message to travel
-         * through the deep queues as this info is only for the wps. */
-        track_changed = true;
-        ci.new_track += direction;
-    }
+    playlist_end = false;
+    ci.new_track += direction;
+    wps_offset -= direction;
 }
 
 static void audio_initiate_dir_change(long direction)
@@ -3090,10 +3148,8 @@ static void audio_reset_buffer(void)
         /* Allow 2 codecs at end of file buffer */
         filebuflen -= 2 * (CODEC_IRAM_SIZE + CODEC_SIZE);
 
-#ifndef SIMULATOR
         iram_buf[0] = &filebuf[filebuflen];
         iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
-#endif
         dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
         dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
     }
@@ -3102,10 +3158,8 @@ static void audio_reset_buffer(void)
         /* Allow for 1 codec at end of file buffer */
         filebuflen -= CODEC_IRAM_SIZE + CODEC_SIZE;
 
-#ifndef SIMULATOR
         iram_buf[0] = &filebuf[filebuflen];
         iram_buf[1] = NULL;
-#endif
         dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE];
         dram_buf[1] = NULL;
     }
@@ -3129,7 +3183,10 @@ static void audio_test_track_changed_event(struct mp3entry *id3)
 
 static void audio_playback_init(void)
 {
+#ifdef PLAYBACK_VOICE
     static bool voicetagtrue = true;
+    static struct mp3entry id3_voice;
+#endif
     struct event ev;
 
     logf("playback api init");
@@ -3162,6 +3219,7 @@ static void audio_playback_init(void)
     ci.discard_codec = codec_discard_codec_callback;
 
     /* Initialize voice codec api. */
+#ifdef PLAYBACK_VOICE
     memcpy(&ci_voice, &ci, sizeof(struct codec_api));
     memset(&id3_voice, 0, sizeof(struct mp3entry));
     ci_voice.read_filebuf = voice_filebuf_callback;
@@ -3182,6 +3240,7 @@ static void audio_playback_init(void)
     ci_voice.id3 = &id3_voice;
     id3_voice.frequency = 11200;
     id3_voice.length = 1000000L;
+#endif
 
     codec_thread_p = create_thread(codec_thread, codec_stack, 
                                    sizeof(codec_stack),
@@ -3288,8 +3347,6 @@ static void audio_thread(void)
             case Q_AUDIO_DIR_SKIP:
                 LOGFQUEUE("audio < Q_AUDIO_DIR_SKIP");
                 playlist_end = false;
-                if (global_settings.beep)
-                    pcmbuf_beep(5000, 100, 2500*global_settings.beep);
                 audio_initiate_dir_change((long)ev.data);
                 break;
 
