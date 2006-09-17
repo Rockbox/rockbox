@@ -1473,7 +1473,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 break;
         }
         if (button != BUTTON_NONE)
+        {
             lastbutton = button;
+            rb->yield();
+        }
     }
     return PLUGIN_OK;
 }
