@@ -23,7 +23,7 @@
 
 PLUGIN_HEADER
 
-#define SETTINGS_FILE   "/.rockbox/viewers/viewer.cfg"
+#define SETTINGS_FILE   "/.rockbox/viewers/viewer.dat" /* binary file, so dont use .cfg */
 
 #define WRAP_TRIM          44  /* Max number of spaces to trim (arbitrary) */
 #define MAX_COLUMNS        64  /* Max displayable string len (over-estimate) */
@@ -36,6 +36,8 @@ PLUGIN_HEADER
 #define MID_SECTOR     (buffer + SMALL_BLOCK_SIZE)
 #define BOTTOM_SECTOR  (buffer + 2*(SMALL_BLOCK_SIZE))
 #define SCROLLBAR_WIDTH     6
+
+#define MAX_BOOKMARKED_FILES ((signed)BUFFER_SIZE/(signed)sizeof(struct bookmarked_file_info))
 
 /* Out-Of-Bounds test for any pointer to data in the buffer */
 #define BUFFER_OOB(p)    ((p) < buffer || (p) >= buffer_end)
@@ -166,6 +168,11 @@ PLUGIN_HEADER
 
 #endif
 
+struct bookmarked_file_info {
+    long file_position;
+    int  top_ptr_pos;
+    char filename[MAX_PATH];
+};
 struct preferences {
     enum {
         WRAP=0,
@@ -220,6 +227,9 @@ struct preferences {
     } scroll_mode;
 
     int autoscroll_speed;
+    /* stuff for the bookmarking */
+    signed int bookmarked_files_count;
+    struct bookmarked_file_info bookmarks[MAX_BOOKMARKED_FILES];
 } prefs;
 
 static unsigned char buffer[BUFFER_SIZE + 1];
@@ -243,6 +253,7 @@ static struct plugin_api* rb;
 #ifdef HAVE_LCD_BITMAP
 static struct font *pf;
 #endif
+
 
 int glyph_width(int ch)
 {
@@ -993,11 +1004,26 @@ static void viewer_reset_settings(void)
     prefs.scrollbar_mode = SB_OFF;
 #endif
     prefs.autoscroll_speed = 1;
+    prefs.bookmarked_files_count = 0;
+}
+static int get_bookmarked_position(char* filename)
+{
+    int i;
+    if (prefs.bookmarked_files_count > MAX_BOOKMARKED_FILES)
+        prefs.bookmarked_files_count = MAX_BOOKMARKED_FILES;
+    
+    for (i=0; i < prefs.bookmarked_files_count; i++)
+    {
+        if (!rb->strcmp(filename, prefs.bookmarks[i].filename))
+            return i;
+    }
+    return -1;
 }
 
 static void viewer_load_settings(void) /* same name as global, but not the same file.. */
 {
     int settings_fd;
+    int bookmarked_pos;
 
     settings_fd=rb->open(SETTINGS_FILE, O_RDONLY);
     if (settings_fd < 0)
@@ -1016,23 +1042,70 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
 
     init_need_scrollbar();
 
-    file_pos=0;
+    bookmarked_pos = get_bookmarked_position(file_name);
+    
+    if (bookmarked_pos < 0)
+    {
+        file_pos = 0;
+        screen_top_ptr = buffer;
+    }
+    else
+    {
+        file_pos = prefs.bookmarks[bookmarked_pos].file_position;
+        screen_top_ptr = buffer + prefs.bookmarks[bookmarked_pos].top_ptr_pos;
+    }
     buffer_end = BUFFER_END();  /* Update whenever file_pos changes */
 
-    screen_top_ptr = buffer;
     if (BUFFER_OOB(screen_top_ptr)) {
         screen_top_ptr = buffer;
     }
 
     fill_buffer(file_pos, buffer, BUFFER_SIZE);
 }
+void viewer_rearrange_bookmarks(void)
+{
+    int this_item = -1;
+    struct bookmarked_file_info *buf = (struct bookmarked_file_info*)buffer; /* grab the text buffer */
+    /* copy the bookmakred file list to the text buffer,
+    put this file at the top, then dump the filenames back and write to the fd */
+    rb->memcpy(buf,&prefs.bookmarks, sizeof(struct bookmarked_file_info)*MAX_BOOKMARKED_FILES);
+    this_item = get_bookmarked_position(file_name);
+    
+    /* regardless of its position in the list, put it on top */
+    rb->strcpy(prefs.bookmarks[0].filename, file_name);
+    prefs.bookmarks[0].file_position = file_pos;
+    prefs.bookmarks[0].top_ptr_pos = screen_top_ptr - buffer;
+    
+    if (this_item < 0)
+    {
+        /* not in the list yet, so put it first then dump the list back */    
+        if (prefs.bookmarked_files_count == MAX_BOOKMARKED_FILES)
+        {
+            /* bookmark list is full! dump the lru file*/
+            rb->memcpy(&prefs.bookmarks[1],buf, sizeof(struct bookmarked_file_info)*(MAX_BOOKMARKED_FILES-1));
+        }
+        else
+        {
+            rb->memcpy(&prefs.bookmarks[1],buf, sizeof(struct bookmarked_file_info)*(prefs.bookmarked_files_count));
+            prefs.bookmarked_files_count++;
+        }
+    }
+    else
+    {
+        /* dump up to this item, skip 1 then dummp the rest */
+        rb->memcpy(&prefs.bookmarks[1],buf, sizeof(struct bookmarked_file_info)*(this_item));
+        rb->memcpy(&prefs.bookmarks[this_item+1],&buf[this_item+1], 
+                    sizeof(struct bookmarked_file_info)*(MAX_BOOKMARKED_FILES-this_item-1));
+    }
+}
 
 static void viewer_save_settings(void)/* same name as global, but not the same file.. */
 {
     int settings_fd;
-
     settings_fd = rb->creat(SETTINGS_FILE, O_WRONLY); /* create the settings file */
 
+    viewer_rearrange_bookmarks();
+    
     rb->write (settings_fd, &prefs, sizeof(struct preferences));
     rb->close(settings_fd);
 }
@@ -1251,7 +1324,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
 
     viewer_reset_settings(); /* load defaults first */
     viewer_load_settings(); /* .. then try to load from disk */
-
+    
     viewer_draw(col);
 
     while (!done) {
@@ -1265,7 +1338,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* file)
                 old_tick = *rb->current_tick;
             }
         }
-
+        
         button = rb->button_get_w_tmo(HZ/10);
         switch (button) {
             case VIEWER_MENU:
