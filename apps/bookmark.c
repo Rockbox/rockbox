@@ -460,9 +460,11 @@ bool bookmark_autoload(const char* file)
         {
 #ifdef HAVE_LCD_BITMAP
             case ACTION_STD_NEXT:
+                action_signalscreenchange();
                 return bookmark_load(global_bookmark_file_name, false);
 #endif
             case ACTION_BMS_SELECT:
+                action_signalscreenchange();
                 return bookmark_load(global_bookmark_file_name, true);
 
             default:
