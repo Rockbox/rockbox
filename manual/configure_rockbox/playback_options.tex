@@ -3,16 +3,16 @@
 The \setting{Playback Options} submenu allows you to configure settings
 related to audio playback.
 \begin{description}
-\item[Shuffle: ]Alters how Rockbox will select which next song to play.\\
+\item[Shuffle. ]Alters how Rockbox will select which next song to play.\\
   Options: \setting{On}/\setting{Off}.
   %
-\item[Repeat: ]Configures settings related to repeating of directories or
+\item[Repeat. ]Configures settings related to repeating of directories or
   playlists.\\
   Options: \setting{Off} / \setting{All} / \setting{One} / \setting{Shuffle}
   \nopt{ondiosp,ondiofm}{\setting{/A-B}}:
   \begin{description}
     %
-  \item[Off: ]The current directory or playlist will not repeat 
+  \item[Off. ]The current directory or playlist will not repeat
     when it is finished.
     \note{If you have the \setting{Auto change directory} option set to
       \setting{Yes}, Rockbox will move on to the next directory on your
@@ -20,7 +20,7 @@ related to audio playback.
       \setting{No}, playback will stop when the current directory or
       playlist is finished.}
     %
-  \item[All: ]The current directory or playlist will repeat when it is
+  \item[All. ]The current directory or playlist will repeat when it is
     finished.
     \note{This option does \emph{not} shuffle all files on your \dap.
       Rockbox is playlist oriented. When you play a song, a directory, or
@@ -29,13 +29,13 @@ related to audio playback.
       the player, and play that playlist with shuffle mode set to
       \setting{All}.}
     %
-  \item[One: ]Repeat one track over and over.
+  \item[One. ]Repeat one track over and over.
     %
-  \item[Shuffle: ]When the current directory or playlist has finished
+  \item[Shuffle. ]When the current directory or playlist has finished
     playing, it will be shuffled and then repeated.
     %
     \nopt{ondiosp,ondiofm}{
-    \item[A-B: ]Repeats between two user defined points within a track,
+    \item[A-B. ]Repeats between two user defined points within a track,
       typically used by musicians when attempting to learn a piece of music.
       This option is more complicated to use than the others as the \dap\
       must first be placed into A-B repeat mode and then the start and end
@@ -47,19 +47,19 @@ related to audio playback.
     }
   \end{description}
   
-\item[Play Selected First: ]This setting controls what happens when you
+\item[Play Selected First. ]This setting controls what happens when you
   select a file for playback while shuffle mode is on. If the
   \setting{Play Selected First} setting is \setting{Yes}, the file you
   selected will be played first. If this setting is \setting{No}, a random
   file in the directory will be played first.
   
-\item[Resume: ]Rockbox can be configured to start playing automatically
+\item[Resume. ]Rockbox can be configured to start playing automatically
   when you turn on the \dap. If the resume function is set to start
   automatically playing, Rockbox will start at the point where you last
   turned off the \dap. The options for the \setting{Resume} function are:
   \begin{description}
-  \item[Yes: ]Rockbox will unconditionally try to resume.
-  \item[No:  ]Rockbox will not resume. 
+  \item[Yes. ]Rockbox will unconditionally try to resume.
+  \item[No. ]Rockbox will not resume.
     \note{If resume is set to \setting{No}, Rockbox will start in the
       \setting{File Browser}.}
   \end{description}
@@ -69,18 +69,18 @@ related to audio playback.
     pressing 
     \opt{PLAYER_PAD,RECORDER_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{
       \fixme{FixMe}}%
-    \opt{ONDIO_PAD}{\ButtonMenu}%
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
+    \opt{ONDIO_PAD}{\ButtonMenu{}}%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn{}} %
     on the \dap{} will resume playback from the point where the \dap{} was 
     stopped before shutdown.
     
-  \item[Fast-Forward/Rewind: ]How fast you want search (fast forward or rewind)
+  \item[Fast-Forward/Rewind. ]How fast you want search (fast forward or rewind)
     to accelerate when you hold down the button. \setting{Off} means no 
     acceleration. \setting{2x/1s} means double the search speed once every 
     second the button is held. \setting{2x/5s} means double the search speed 
     once every 5 seconds the button is held.
     
-  \item[Anti-Skip Buffer: ]This setting allows you to control how much music is
+  \item[Anti-Skip Buffer. ]This setting allows you to control how much music is
     stored in the \daps{} memory whilst playing a song, acting as a buffer 
     against shock or playback problems. The \dap{} transfers the selected 
     amount of the forthcoming song into its memory at high speed whilst you are
@@ -99,57 +99,57 @@ related to audio playback.
     \nopt{ondio}{
       \opt{MASCODEC}{The anti-skip buffer can be set to a value between 0 and 7
         seconds.}
-    }
+    }%
     \opt{ondio}{
       The anti-skip buffer can safely be kept at zero. It will eventually be 
       eliminated.
-    }
+    }%
     \opt{SWCODEC}{The anti-skip buffer can be set to various values between
-      5 seconds and 10 minutes.}
+      5 seconds and 10 minutes.}%
     
     \note{Having a large anti-skip buffer tends to use more power, and may
       reduce your battery life. It is recommended to always use the lowest
       possible setting that allows correct and continuous playback.}
     
-  \item[Fade On Stop/Pause: ]Enables and disables a fade effect when you
+  \item[Fade On Stop/Pause. ]Enables and disables a fade effect when you
     pause or stop playing a song. If the Fade on Stop/Pause option is
     set to \setting{Yes}, your music will fade out when you stop or pause 
     playback, and fade in when you resume playback.
     
-  \item[Party Mode: ]Enables unstoppable music playback.  When new songs are
+  \item[Party Mode. ]Enables unstoppable music playback.  When new songs are
     selected, they are added to the end of the current dynamic playlist
     instead of being played immediately.
     The \fixme{PLAY} and \fixme{STOP} buttons are disabled.
     
     \opt{SWCODEC}{
-    \item[Crossfade: ]
+    \item[Crossfade. ]
       This setting enables a cross-fader. At the end of a song, the song will 
       fade out as the next song fades in, creating a smooth transition between 
       songs.\\
       Options:
       \begin{description}
-      \item[Enable Crossfade: ]If set to \setting{Off}, crossfade is disabled. 
+      \item[Enable Crossfade. ]If set to \setting{Off}, crossfade is disabled.
         If set to \setting{Always}, songs will always crossfade into one 
         another. If set to \setting{Shuffle}, crossfade is enabled when the 
         shuffle feature is set to \setting{Yes}, but disabled otherwise. If set
         to track skip only, tracks will only crossfade when you manually change
         tracks.
         %
-      \item[Fade In Delay: ]The ``fade in delay'' is the length of time between
+      \item[Fade In Delay. ]The ``fade in delay'' is the length of time between
         when the crossfade process begins and when the new track begins to fade
         in.
         %
-      \item[Fade In Duration: ]The length of time, in seconds, that it takes 
+      \item[Fade In Duration. ]The length of time, in seconds, that it takes
         your music to fade in.
         %
-      \item[Fade Out Delay: ]The ``fade out delay'' is the length of time 
+      \item[Fade Out Delay. ]The ``fade out delay'' is the length of time
         between when the crossfade process begins and when the old track begins
         to fade out.
         %
-      \item[Fade Out Duration: ]The length of time, in seconds, that it takes 
+      \item[Fade Out Duration. ]The length of time, in seconds, that it takes
         your music to fade out.
         %
-      \item[Fade Out Mode: ]If set to \setting{Crossfade}, one song will fade 
+      \item[Fade Out Mode. ]If set to \setting{Crossfade}, one song will fade
         out and the next song will simultaneously fade in. If set to 
         \setting{Mix}, the ending song will continue to play as normal until 
         its end, while the starting song will fade in from under it. 
@@ -159,10 +159,10 @@ related to audio playback.
       
       \note{The crossfade setting is particularly effective when the player is 
         set on shuffle.}
-    }
+    }%
     
     \opt{SWCODEC}{
-    \item[Replaygain: ]This allows you to control the replaygain function.
+    \item[Replaygain. ]This allows you to control the replaygain function.
       The purpose of replaygain is to adjust the volume of the music played 
       so that all songs (or albums, depending on your settings) have the 
       same apparent volume.  This prevents sudden changes in volume when 
@@ -173,29 +173,29 @@ related to audio playback.
       
       Options for replaygain are:
       \begin{description}
-      \item[Enable Replaygain: ]This turns on/off the replaygain function.
+      \item[Enable Replaygain. ]This turns on/off the replaygain function.
         %
-      \item[Prevent Clipping: ]Avoid clipping of a song's waveform.
+      \item[Prevent Clipping. ]Avoid clipping of a song's waveform.
         If a song would clip during playback, the volume is lowered for 
         that song. Replaygain information is needed for this to work.
         %
-      \item[Replaygain type: ]Choose the type of replaygain to apply:
+      \item[Replaygain type. ]Choose the type of replaygain to apply:
         \begin{description}
-        \item[Album Gain: ]Maintain a constant volume level between 
+        \item[Album Gain. ]Maintain a constant volume level between
           albums, but keep any intentional volume variations between 
           songs in an album. (If album gain value is not available,
           uses track gain information).
           %
-        \item[Track Gain: ]Maintain a constant volume level between 
+        \item[Track Gain. ]Maintain a constant volume level between
           tracks. If track gain value is not available, no replaygain 
           is applied.
           %
-        \item[Track Gain if Shuffling: ]Maintains a constant volume 
+        \item[Track Gain if Shuffling. ]Maintains a constant volume
           between tracks if shuffle mode is selected. Reverts to album
           mode if shuffle is off.
         \end{description}
         %
-      \item[Pre-Amp: ]This allows you to adjust the volume when replaygain
+      \item[Pre-Amp. ]This allows you to adjust the volume when replaygain
         is applied. Replaygain often lowers the volume, sometimes quite
         much, so here you can compensate for that. Please note that a 
         (large) positive pre-amp setting can cause clipping, unless 
@@ -204,7 +204,7 @@ related to audio playback.
       \end{description}
     }
   }
-\item[Auto Change Directory: ]Control what Rockbox does when it reaches the end
+\item[Auto Change Directory. ]Control what Rockbox does when it reaches the end
   of a directory. If Auto Change Directory is set to \setting{Yes}, Rockbox 
   will continue to the next directory. If \setting{Auto Change Directory} is 
   set to \setting{No}, playback will stop at the end of the current directory.
