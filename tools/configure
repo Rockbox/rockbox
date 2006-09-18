@@ -207,7 +207,7 @@ calmrisccc () {
 
 coldfirecc () {
  prefixtools m68k-elf-
- GCCOPTS="$CCOPTS -g -m5206e -Wa\,-m5249 -malign-int -mstrict-align"
+ GCCOPTS="$CCOPTS -m5206e -Wa\,-m5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
 }
@@ -311,7 +311,6 @@ whichdevel () {
   if [ "yes" = "$profile" ]; then
     extradefines="$extradefines -DRB_PROFILE"
     PROFILE_OPTS="-finstrument-functions"
-    GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
   fi
 }
 
@@ -1172,11 +1171,13 @@ fi
     *)
       debug=""
       echo "Normal build selected"
-      GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
       ;;
 
   esac
 
+if [ -z "$debug" ]; then
+  GCCOPTS="$GCCOPTS $GCCOPTIMIZE"
+fi
 
 whichaddr
 
