@@ -11,6 +11,9 @@ bubbles_emblem.160x128x2.bmp
 bubbles_emblem.160x128x16.bmp
 bubbles_left.160x128x16.bmp
 bubbles_right.160x128x16.bmp
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
+bubbles_emblem.160x128x16.bmp
+bubbles_left.160x128x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
 bubbles_emblem.160x128x16.bmp
 bubbles_left.176x132x16.bmp

@@ -35,10 +35,9 @@ mandelbrot.c
 plasma.c
 
 bounce.c
-#ifndef IRIVER_H10_5GB
 bubbles.c
-#endif
-#if LCD_WIDTH != 128
+
+#if LCD_WIDTH != 128 
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c
 #endif

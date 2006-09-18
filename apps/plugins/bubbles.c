@@ -175,8 +175,8 @@ PLUGIN_HEADER
 #define ROW_INDENT     6
 #define MAX_FPS       40
 
-/* 12x12 bubbles (H100, iAudio X5, iPod 3G, iPod 4G grayscale) */
-#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
+/* 12x12 bubbles (H100, H10, iAudio X5, iPod 3G, iPod 4G grayscale) */
+#elif (LCD_HEIGHT == 128) && ((LCD_WIDTH == 160) || (LCD_WIDTH == 128))
 #define BUBBLE_WIDTH  12
 #define BUBBLE_HEIGHT 12
 #define EMBLEM_WIDTH   8
@@ -224,9 +224,12 @@ PLUGIN_HEADER
 /* external bitmaps */
 extern const fb_data bubbles_bubble[];
 extern const fb_data bubbles_emblem[];
-#ifdef HAVE_LCD_COLOR
+#ifdef HAVE_LCD_COLOR 
 extern const fb_data bubbles_left[];
+/* skip right border for square screens */
+#if (LCD_WIDTH > LCD_HEIGHT)
 extern const fb_data bubbles_right[];
+#endif
 #endif
 
 /* global rockbox api */
@@ -1506,8 +1509,11 @@ static void bubbles_drawboard(struct game_context* bb) {
     /* draw sidebars */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap(bubbles_left, 0, 0, XOFS, LCD_HEIGHT);
+    /* skip right border for square screens */
+#if (LCD_WIDTH > LCD_HEIGHT)
     rb->lcd_bitmap(bubbles_right, XOFS-1+BB_WIDTH*BUBBLE_WIDTH, 0,
                    LCD_WIDTH-(XOFS-1+BB_WIDTH*BUBBLE_WIDTH), LCD_HEIGHT);
+#endif
 #endif
 
     /* display play board */
@@ -2523,14 +2529,6 @@ static int bubbles(struct game_context* bb) {
                                 "UP to fire and show high scores, "
                                 "LEFT/RIGHT to aim and to change level.");
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_SCROLL_UP
-#define BUBBLES_DOWN   BUTTON_SCROLL_DOWN
-#define BUBBLES_QUIT   BUTTON_POWER
-#define BUBBLES_START  BUTTON_PLAY
-#define BUBBLES_SELECT BUTTON_REW
-#define BUBBLES_RESUME BUTTON_FF
             rb->lcd_puts(0, 2, "PLAY to start/pause");
             rb->lcd_puts(0, 3, "FF to save/resume");
             rb->lcd_puts(0, 4, "POWER to exit");
