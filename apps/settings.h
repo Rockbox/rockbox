@@ -167,7 +167,10 @@ struct user_settings
                           13= 1GB, 14 = 1.5GB 15 = 1.75MB*/
     int rec_split_type; /* split/stop */
     int rec_split_method; /* time/filesize */
-
+    int ctdn_mins; /* 0 - 59 */
+    int ctdn_hrs; /* 0 - 23 */
+    int ctdn_secs; /* 0 - 59 */
+    int ctdn_days; /* 0 - 6 */
     int rec_prerecord_time; /* In seconds, 0-30, 0 means OFF */
     int rec_directory; /* 0=base dir, 1=current dir */
     bool rec_startup; /* true means start Rockbox in recording screen */
@@ -495,6 +498,11 @@ struct opt_items {
     long voice_id;
 };
 
+struct opt_settings {
+    int* setting;
+    int setting_max;
+};
+
 /* prototypes */
 
 void settings_calc_config_sector(void);
@@ -516,6 +524,8 @@ bool set_bool_options(const char* string, bool* variable,
 bool set_bool(const char* string, bool* variable );
 bool set_option(const char* string, void* variable, enum optiontype type,
                 const struct opt_items* options, int numoptions, void (*function)(int));
+bool set_multi_int(const char* string, const struct opt_items * names,
+                           struct opt_settings * variable, int varcount);
 bool set_int(const unsigned char* string, const char* unit, int voice_unit,
              int* variable,
              void (*function)(int), int step, int min, int max, 

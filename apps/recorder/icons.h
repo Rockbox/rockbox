@@ -44,6 +44,12 @@ enum icons_5x8 {
     Icon5x8Last
 };
 
+enum icons_7x7 {
+    Icon_Timer,
+    Icon_Blank,
+    Icon7x7Last
+};
+
 enum icons_6x8 {
     Icon_Audio,
     Icon_Folder,
@@ -117,6 +123,7 @@ enum icons_18x8 {
 #endif
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
+extern const unsigned char bitmap_icons_7x7[Icon7x7Last][7];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 #if CONFIG_CODEC == SWCODEC

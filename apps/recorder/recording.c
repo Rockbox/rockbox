@@ -69,7 +69,17 @@
 #include "screen_access.h"
 #include "action.h"
 #include "radio.h"
+#include "timer.h"
 #ifdef HAVE_RECORDING
+
+#ifdef SIMULATOR
+bool timer_register(int reg_prio, void (*unregister_callback)(void),
+                    long cycles, int int_prio, void (*timer_callback)(void));
+void timer_unregister(void);
+#define TIMER_FREQ 0
+#endif
+#define TIMER_ICON_WIDTH 7
+#define TIMER_ICON_HEIGHT 7
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
@@ -77,6 +87,9 @@ bool f2_rec_screen(void);
 bool f3_rec_screen(void);
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
+
+int days, hrs, mins, secs;
+bool timer_icon; /* timer icon displayed? */
 
 int screen_update = NB_SCREENS;
 bool remote_display_on = true;
@@ -779,6 +792,52 @@ static void trigger_listener(int trigger_status)
     }
 }
 
+/* countdown timer callback function */
+void timer_callback(void)
+{
+    static int mini_tick = 0;
+    /* print icon at bottom right of main screen */
+    if (timer_icon)
+        screens[0].mono_bitmap(bitmap_icons_7x7[Icon_Timer], 
+                                   screens[0].width - TIMER_ICON_WIDTH,
+                                   screens[0].height - TIMER_ICON_HEIGHT,
+                                   TIMER_ICON_WIDTH, TIMER_ICON_HEIGHT);
+    else
+        screens[0].mono_bitmap(bitmap_icons_7x7[Icon_Blank],
+                                   screens[0].width - TIMER_ICON_WIDTH,
+                                   screens[0].height - TIMER_ICON_HEIGHT,
+                                   TIMER_ICON_WIDTH, TIMER_ICON_HEIGHT);
+                                   
+    screens[0].update_rect(screens[0].width - TIMER_ICON_WIDTH,
+                               screens[0].height - TIMER_ICON_HEIGHT,
+                               TIMER_ICON_WIDTH, TIMER_ICON_HEIGHT);
+
+    mini_tick ++;
+    /* the countdown */
+    if (mini_tick > 10)
+    {
+        secs -= 1;
+        if (secs < 0){
+            mins -= 1;
+            secs = 59;
+            if (mins < 0){
+                hrs -= 1;
+                mins = 59;
+                if (hrs < 0){
+                    days -= 1;
+                    hrs = 23;
+                    if (days < 0)
+                    {
+                        days = hrs = mins = secs = 0;
+                        timer_icon = !timer_icon; /* flash icon when */
+                    }                             /* countdown finished */
+                }
+            }
+        }
+        mini_tick = 0;
+    }
+}
+
 bool recording_screen(bool no_source)
 {
     long button;
@@ -818,6 +877,8 @@ bool recording_screen(bool no_source)
     int i;
     int filename_offset[NB_SCREENS];
     int pm_y[NB_SCREENS];
+    static bool countdown; /* countdown in progress indicator */
+    int countdown_offset = 0;
 
     static const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
@@ -827,6 +888,20 @@ bool recording_screen(bool no_source)
     };
 
     global_settings.recscreen_on = true;
+
+    /* Stop countdown if countdown settings changed */
+    if ((mins != global_settings.ctdn_mins)|| 
+            (hrs != global_settings.ctdn_hrs) ||
+            (days != global_settings.ctdn_days))
+    {
+        mins = global_settings.ctdn_mins;
+        hrs = global_settings.ctdn_hrs;
+        days = global_settings.ctdn_days;
+        secs = global_settings.ctdn_secs;
+        countdown = false;
+        timer_unregister();
+    }
+
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
@@ -969,6 +1044,17 @@ bool recording_screen(bool no_source)
             last_audio_stat = audio_stat;
         }
 
+        /* When countdown timer reaches zero fake a new file button press */
+        if (countdown && !days && !hrs && !mins && !secs)
+        {
+            timer_unregister();
+            button = ACTION_REC_NEWFILE;
+            countdown = false;
+            global_settings.ctdn_days = days;
+            global_settings.ctdn_hrs = hrs;
+            global_settings.ctdn_mins = mins;
+        }
+
         switch(button)
         {
             case ACTION_REC_LCD:
@@ -1004,7 +1090,12 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC != SWCODEC
                     peak_meter_playback(true);
                     peak_meter_enabled = false;
-#endif                    
+#endif
+                    /* keeps settings the same as the countdown values */
+                    global_settings.ctdn_days = days;
+                    global_settings.ctdn_hrs = hrs;
+                    global_settings.ctdn_mins = mins;
+                    global_settings.ctdn_secs = secs;
                     done = true;
                 }
                 update_countdown = 1; /* Update immediately */
@@ -1014,7 +1105,27 @@ bool recording_screen(bool no_source)
             case ACTION_REC_NEWFILE:
                 /* Only act if the mpeg is stopped */
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
-                {
+                {   /* if countdown timer is set, start countdown */
+                    if (days || hrs || mins || secs)
+                    {
+                        if (button == ACTION_REC_PAUSE)
+                        {
+                            countdown = !countdown;
+                            if (countdown)
+                                timer_register(1, NULL, TIMER_FREQ/10, 1, timer_callback);
+                            else
+                                timer_unregister();
+                            break;
+                        }
+                        else
+                        {
+                        /* if newfile button pressed and countdown timer is on,
+                           start new file and reset timer */
+                            timer_unregister();
+                            days = hrs = mins = secs = 0;
+                            countdown = false;
+                        }
+                    }
                     /* is this manual or triggered recording? */
                     if ((global_settings.rec_trigger_mode == TRIG_MODE_OFF) ||
                         (peak_meter_trigger_status() != TRIG_OFF))
@@ -1221,7 +1332,11 @@ bool recording_screen(bool no_source)
 #ifdef HAVE_FMRADIO_IN
                     const int prev_rec_source = global_settings.rec_source;
 #endif
-
+                    /* maintain countdown values when entering menu */ 
+                    global_settings.ctdn_days = days;
+                    global_settings.ctdn_hrs = hrs;
+                    global_settings.ctdn_mins = mins;
+                    global_settings.ctdn_secs = secs;
 #if CONFIG_LED == LED_REAL
                     /* led is restored at begin of loop / end of function */
                     led(false);
@@ -1245,6 +1360,19 @@ bool recording_screen(bool no_source)
                             && prev_rec_source == AUDIO_SRC_FMRADIO)
                             radio_status = FMRADIO_OFF;
 #endif
+                        /* if countdown timer settings changed in menu, 
+                           stop counting and reset */
+                        if ((hrs != global_settings.ctdn_hrs) ||
+                               (mins != global_settings.ctdn_mins) ||
+                               (days != global_settings.ctdn_days))
+                        {
+                            days = global_settings.ctdn_days;
+                            hrs = global_settings.ctdn_hrs;
+                            mins = global_settings.ctdn_mins;
+                            secs = global_settings.ctdn_secs;
+                            countdown = false;
+                            timer_unregister();
+                        }                           
 
 #if CONFIG_CODEC == SWCODEC
                         /* reinit after submenu exit */
@@ -1347,6 +1475,8 @@ bool recording_screen(bool no_source)
                 break;
         }
 
+        timer_icon = countdown; /* display timer icon if countdown enabled */
+
 #ifdef HAVE_AGC
         peak_read = !peak_read;
         if (peak_read) { /* every 2nd run of loop */
@@ -1383,17 +1513,24 @@ bool recording_screen(bool no_source)
 
             if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
             {
+                countdown_offset = 1;
                 dmb = dsize/1024/1024;
                 snprintf(buf, sizeof(buf), "%s %dMB",
                              str(LANG_SYSFONT_SPLIT_SIZE), dmb);
             }
-            else
+            /* only display recording time if countdown timer is off */
+            else if (!days && !hrs && !mins && !secs)
             {
                 hours = seconds / 3600;
                 minutes = (seconds - (hours * 3600)) / 60;
                 snprintf(buf, sizeof(buf), "%s %02d:%02d:%02d",
                          str(LANG_SYSFONT_RECORDING_TIME),
                          hours, minutes, seconds%60);
+            }
+            else
+            {
+                countdown_offset = 0;
+                snprintf(buf, 32, "");
             }
             
             for(i = 0; i < screen_update; i++)
@@ -1418,7 +1555,8 @@ bool recording_screen(bool no_source)
                              str(LANG_SYSFONT_RECORD_TIMESPLIT_REC),
                              dhours, dminutes);
                 }
-                else
+                /* only display recording size if countdown timer is off */    
+                else if (!days && !hrs && !mins && !secs)
                 {
                     output_dyn_value(buf2, sizeof buf2,
                                      num_recorded_bytes,
@@ -1430,6 +1568,16 @@ bool recording_screen(bool no_source)
             for(i = 0; i < screen_update; i++)
                 screens[i].puts(0, 1, buf);
 
+            /* display countdown timer if set */
+            if (days || hrs || mins || secs)
+            {
+                 snprintf(buf, 32, "%s %d:%02d:%02d:%02d", str(LANG_REC_TIMER),
+                        days, hrs, mins, secs);
+                        
+                 for(i = 0; i < screen_update; i++)
+                     screens[i].puts(0, countdown_offset, buf);
+            }
+                
             for(i = 0; i < screen_update; i++)
             {
                 if (filename_offset[i] > 0)
@@ -2123,6 +2271,21 @@ unsigned long pcm_rec_status(void)
 
 #endif /* #ifdef SIMULATOR */
 #endif /* #ifdef CONFIG_CODEC == SWCODEC */
+#ifdef SIMULATOR
+bool timer_register(int reg_prio, void (*unregister_callback)(void),
+                    long cycles, int int_prio, void (*timer_callback)(void))
+{
+    reg_prio = reg_prio;
+    unregister_callback = unregister_callback;
+    cycles = cycles;
+    int_prio = int_prio;
+    timer_callback = timer_callback;
+    return false;
+}
 
+void timer_unregister(void)
+{
+}
+#endif
 
 #endif /* HAVE_RECORDING */
