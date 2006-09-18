@@ -1,5 +1,3 @@
-#ifndef IRIVER_H10_5GB
 sudoku.c
 generator.c
 templates.c
-#endif

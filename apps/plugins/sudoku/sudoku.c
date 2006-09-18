@@ -113,6 +113,13 @@ static const char default_game[9][9] =
 #define CELL_WIDTH  10
 #define CELL_HEIGHT 10
 
+#elif (LCD_HEIGHT==128) && (LCD_WIDTH==128)
+/* iriver H10 5-6GB - 128x128, 9 cells @ 10x10 with 14 border lines */
+
+/* Internal dimensions of a cell */
+#define CELL_WIDTH  10
+#define CELL_HEIGHT 10
+
 #elif ((LCD_HEIGHT==128) && (LCD_WIDTH==160)) || \
       ((LCD_HEIGHT==132) && (LCD_WIDTH==176))
 /* iAudio X5, Iriver H1x0, iPod G3, G4 - 160x128; */
