@@ -1181,7 +1181,7 @@ static int tagtree_play_folder(struct tree_context* c)
         return -1;
     }
 
-    if (!insert_all_playlist(c, PLAYLIST_INSERT, false))
+    if (!insert_all_playlist(c, PLAYLIST_INSERT_LAST, false))
         return -2;
     
     if (global_settings.playlist_shuffle)
