@@ -96,7 +96,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 53
+#define CONFIG_BLOCK_VERSION 52
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -477,11 +477,6 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_channels), 0, "rec channels", "stereo,mono" },
     {1, S_O(rec_split_type), 0, "rec split type", "Split, Stop" },
     {1, S_O(rec_split_method), 0, "rec split method", "Time,Filesize" },
-    {6, S_O(ctdn_mins), 0, "countdown timer minutes", NULL }, /* 0 - 59 */
-    {5, S_O(ctdn_hrs), 0, "countdown timer hours", NULL }, /* 0 - 23 */
-    {6, S_O(ctdn_secs), 0, "countdown timer seconds", NULL }, /* 0 - 59 */
-    {3, S_O(ctdn_days), 0, "countdown timer days", NULL }, /* 0 - 6 */
-    
 
     {
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_FMRADIO_IN)
@@ -2035,167 +2030,6 @@ bool set_int(const unsigned char* string,
         INT,max, step, voice_unit,unit,formatter,NULL };
     return do_set_setting(string,variable,(max-min)/step + 1,
                           (max-*variable)/step, &data,function);
-}
-
-/* Useful for time and other multi integer settings */
-bool set_multi_int(const char* string, const struct opt_items * names,
-                           struct opt_settings * variable, int varcount)
-{
-    int i, j;
-    char buf[32];
-    long button;
-    int cursor = 0;
-    bool done = false;
-    int oldvalue[varcount];
-    int pos = 0;
-
-    for(j = 0; j < varcount; j++)
-        oldvalue[j] = *(int*)variable[j].setting;  
-
-    FOR_NB_SCREENS(i)
-    {
-        screens[i].clear_display();
-#ifdef HAVE_LCD_BITMAP
-        screens[i].setmargins(0, 8);
-#endif
-    }
-
-    snprintf(buf, sizeof(buf), "%s", string);
-    FOR_NB_SCREENS(i)
-        screens[i].puts(0, 0, buf);
-
-    /* print variable names */
-    for(j = 0; j < varcount ; j++)
-    {
-        if (j > 0)
-        {
-            snprintf(buf, sizeof(buf), ":");
-            FOR_NB_SCREENS(i)
-                screens[i].puts(pos - 2, 1, buf);
-        }
-
-        snprintf(buf, sizeof(buf), "%s", P2STR(names[j].string));
-        FOR_NB_SCREENS(i)
-            screens[i].puts(pos, 1, buf);
-
-        pos += strlen(buf) + 3;
-    }
-
-    snprintf(buf, sizeof(buf), "%s", str(LANG_TIMER_CONFIRM));
-    FOR_NB_SCREENS(i)
-        screens[i].puts(0, 5, buf);
-
-    gui_syncstatusbar_draw(&statusbars, true);
-
-    while(!done)
-    {
-        pos = 0;
-        
-        /* print variables */
-        for(j = 0; j < varcount; j++)
-        {
-            if (j > 0)
-            {
-                snprintf(buf, sizeof(buf), " :");
-                FOR_NB_SCREENS(i)
-                screens[i].puts(pos - 3, 3, buf);
-            }
-
-            snprintf(buf, sizeof(buf), "%d", *(int*)variable[j].setting);
-
-#ifdef HAVE_LCD_BITMAP
-            if (cursor == j)
-            {
-                FOR_NB_SCREENS(i)
-                     screens[i].puts_style_offset(pos, 3, buf, STYLE_INVERT, 0);
-            }
-            else
-#endif
-            {
-                FOR_NB_SCREENS(i)
-                     screens[i].puts(pos, 3, buf);
-            }
-
-            snprintf(buf, sizeof(buf), "%d", variable[j].setting_max);
-            pos += strlen(buf) + 3;
-        }
-
-        /* print empty char to terminate invert style */
-        snprintf(buf, sizeof(buf), " ");
-        FOR_NB_SCREENS(i)
-            screens[i].puts(pos - 3, 3, buf);
-
-#ifdef HAVE_LCD_BITMAP
-       FOR_NB_SCREENS(i)
-           screens[i].update();
-#endif
-
-        button = get_action(CONTEXT_SETTINGS, TIMEOUT_BLOCK);
-
-        switch (button)
-        {
-            case ACTION_STD_NEXT:
-                cursor ++;
-                if (cursor >= varcount)
-                    cursor = varcount - 1;
-                if (global_settings.talk_menu)
-                    talk_id(names[cursor].voice_id, false);
-                break;
-
-            case ACTION_STD_PREV:
-                if (cursor == 0)
-                {
-                    /* cancel if pressing left when cursor
-                       is already at the far left */
-                    for(j = 0; j < varcount; j++)
-                       *(int*)variable[j].setting = oldvalue[j];  
-                    gui_syncsplash(HZ/2, true, str(LANG_MENU_SETTING_CANCEL));
-                    done = true;
-                }
-                else
-                    cursor --;
-                    if (cursor < 0)
-                        cursor = 0;
-                    if (global_settings.talk_menu)
-                        talk_id(names[cursor].voice_id, false);
-                break;
-
-            case ACTION_SETTINGS_INC:
-            case ACTION_SETTINGS_INCREPEAT:
-                *(int*)variable[cursor].setting += 1;
-                if (*(int*)variable[cursor].setting >
-                        variable[cursor].setting_max)
-                    *(int*)variable[cursor].setting = 0;
-                if (global_settings.talk_menu)
-                    talk_unit(INT, *(int*)variable[cursor].setting);
-                break;
-
-            case ACTION_SETTINGS_DEC:
-            case ACTION_SETTINGS_DECREPEAT:
-                *(int*)variable[cursor].setting -= 1;
-                if (*(int*)variable[cursor].setting < 0)
-                    *(int*)variable[cursor].setting =
-                        variable[cursor].setting_max;
-                if (global_settings.talk_menu)
-                    talk_unit(INT, *(int*)variable[cursor].setting);
-                break;
- 
-            case ACTION_STD_OK:
-                done = true;
-                break;
-
-            case ACTION_STD_CANCEL:
-                for(j = 0; j < varcount; j++)
-                   *(int*)variable[j].setting = oldvalue[j];  
-                gui_syncsplash(HZ/2, true, str(LANG_MENU_SETTING_CANCEL));
-                return false;
-            
-            default:
-                if (default_event_handler(button) == SYS_USB_CONNECTED)
-                    return true;
-        }
-    }
-    return false;
 }
 
 /* NOTE: the 'type' parameter specifies the actual type of the variable

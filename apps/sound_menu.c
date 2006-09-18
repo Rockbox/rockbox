@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Bjï¿½n Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -591,25 +591,6 @@ static bool agc_cliptime(void)
                       INT, names, 5, NULL );
 }
 #endif /* HAVE_AGC */
-
-/* Displays a menu for changing the countdown timer settings */
-static bool countdown_timer(void)
-{
-    static const struct opt_items names[] = {
-        { STR(LANG_TIMER_DAYS) },
-        { STR(LANG_TIMER_HRS) },
-        { STR(LANG_TIMER_MINS) }
-    };
-
-    struct opt_settings settings[] = {
-        { &global_settings.ctdn_days, 6 },
-        { &global_settings.ctdn_hrs, 23 },
-        { &global_settings.ctdn_mins, 59 }
-    };
-        
-    return set_multi_int(str(LANG_TIMER_SET), names, settings, 3);
-}
-
 #endif /* HAVE_RECORDING */
 
 static bool chanconf(void)
@@ -1108,8 +1089,6 @@ bool recording_menu(bool no_source)
     items[i].desc = ID2P(LANG_RECORD_AGC_CLIPTIME);
     items[i++].function = agc_cliptime;
 #endif
-    items[i].desc = ID2P(LANG_TIMER_SET);
-    items[i++].function = countdown_timer;
 
     m=menu_init( items, i, NULL, NULL, NULL, NULL);
     result = menu_run(m);
