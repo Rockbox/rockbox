@@ -4,7 +4,8 @@
 % define a local version of endhead, as using the output distinction adds
 % an unwanted newline. endhead breaks with htlatex so we need to remove it
 % for the html output.
-\ifpdfoutput{\newcommand{\localendhead}{\endhead}}{} 
+\ifpdfoutput{\newcommand{\localendhead}{\endhead}}%
+    {\newcommand{\localendhead}{}}
   \begin{longtable}{@{}>{\raggedright}p{.35\textwidth}@{}>{\raggedright}p{.4\textwidth}@{}p{.25\textwidth}@{}}
     \toprule
     \textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
