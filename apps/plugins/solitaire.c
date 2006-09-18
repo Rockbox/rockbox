@@ -58,8 +58,6 @@ static struct plugin_api* rb;
 #   define SOL_REM2CUR      BUTTON_PLAY
 #   define SOL_CUR2STACK    BUTTON_F2
 #   define SOL_REM2STACK    BUTTON_F3
-#   define SOL_MENU_RUN     BUTTON_RIGHT
-#   define SOL_MENU_RUN2    BUTTON_PLAY
 #   define HK_MOVE         "ON"
 #   define HK_DRAW         "F1"
 #   define HK_REM2CUR      "PLAY"
@@ -86,7 +84,6 @@ static struct plugin_api* rb;
 #   define SOL_CUR2STACK    (BUTTON_UP | BUTTON_REPEAT)
 #   define SOL_REM2STACK_PRE BUTTON_RIGHT
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define SOL_MENU_RUN     BUTTON_RIGHT
 #   define HK_MOVE         "MODE"
 #   define HK_DRAW         "MODE.."
 #   define HK_REM2CUR      "DOWN.."
@@ -106,9 +103,6 @@ static struct plugin_api* rb;
 #   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_ON)
 #   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_ON)
-#   define SOL_MENU_RUN     BUTTON_SELECT
-#   define SOL_MENU_RUN2    BUTTON_RIGHT
-#   define SOL_OPT          BUTTON_ON
 #   define SOL_REM          BUTTON_REC
 #   define SOL_RC_QUIT      BUTTON_RC_STOP
 #   define HK_MOVE         "NAVI"
@@ -134,7 +128,6 @@ static struct plugin_api* rb;
 #   define SOL_CUR2STACK    (BUTTON_MENU | BUTTON_REPEAT)
 #   define SOL_REM2STACK_PRE BUTTON_RIGHT
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define SOL_MENU_RUN     BUTTON_SELECT
 #   define HK_UD           "SCROLL U/D"
 #   define HK_MOVE         "SELECT"
 #   define HK_DRAW         "MENU"
@@ -153,8 +146,6 @@ static struct plugin_api* rb;
 #   define SOL_REM2CUR      (BUTTON_REC | BUTTON_LEFT)
 #   define SOL_CUR2STACK    (BUTTON_REC | BUTTON_UP)
 #   define SOL_REM2STACK    (BUTTON_REC | BUTTON_DOWN)
-#   define SOL_MENU_RUN     BUTTON_SELECT
-#   define SOL_MENU_RUN2    BUTTON_RIGHT
 #   define HK_MOVE         "MENU"
 #   define HK_DRAW         "PLAY"
 #   define HK_REM2CUR      "REC+LEFT"
@@ -173,8 +164,6 @@ static struct plugin_api* rb;
 #   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_POWER)
 #   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_POWER)
-#   define SOL_MENU_RUN     BUTTON_SELECT
-#   define SOL_MENU_RUN2    BUTTON_RIGHT
 #   define HK_MOVE         "SELECT"
 #   define HK_DRAW         "MENU"
 #   define HK_REM2CUR      "POWER+LEFT"
@@ -192,8 +181,6 @@ static struct plugin_api* rb;
 #   define SOL_REM2CUR     (BUTTON_FF | BUTTON_LEFT)
 #   define SOL_CUR2STACK   (BUTTON_FF | BUTTON_SCROLL_UP)
 #   define SOL_REM2STACK   (BUTTON_FF | BUTTON_SCROLL_DOWN)
-#   define SOL_MENU_RUN    BUTTON_REW
-#   define SOL_MENU_INFO   BUTTON_PLAY
 #   define HK_MOVE         "REW"
 #   define HK_DRAW         "PLAY"
 #   define HK_REM2CUR      "REW+LEFT"
