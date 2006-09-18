@@ -571,9 +571,11 @@ static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
                                  bool queue, int seek_pos)
 {
-    int insert_position = position;
+    int insert_position, orig_position;
     unsigned long flags = PLAYLIST_INSERT_TYPE_INSERT;
     int i;
+
+    insert_position = orig_position = position;
 
     if (playlist->amount >= playlist->max_playlist_size)
     {
@@ -661,7 +663,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
         playlist->index++;
 
     if (playlist->amount > 0 && insert_position <= playlist->first_index &&
-        position != PLAYLIST_PREPEND && playlist->started)
+        orig_position != PLAYLIST_PREPEND && playlist->started)
     {
         playlist->first_index++;
 
