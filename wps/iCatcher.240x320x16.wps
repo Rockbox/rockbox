@@ -1,75 +1,78 @@
 %wd
-%X|bg-176x132x16.bmp|
-
+%X|bg-240x320x16.bmp|
 
 
 %t1 %?mp<%al Stopped%ar-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >;%t1 %?mp<%al Stopped-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
-%al    %bl%%%ar%pp/%pe 
+%al  %bl%%%ar%pp/%pe 
+
+
 
 %s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
 %s%ac%?id<%id|%?d1<%d1|Unknown Album>>
 %s%ac%?in<%in|%pp> - %?it<%it|%fn>
 
+
+
 %al %fbKbps
-%pb|4|10|166|
+%pb|7|11|229|
 
 %s%acNext: %?It<%It|%?Fn<%Fn|?>>
 
-%xl|A|bat0.bmp|151|8|
-%xl|B|bat1.bmp|151|8|
-%xl|C|bat2.bmp|151|8|
-%xl|D|bat3.bmp|151|8|
-%xl|E|bat4.bmp|151|8|
+%xl|A|bat0-b.bmp|204|12|
+%xl|B|bat1-b.bmp|204|12|
+%xl|C|bat2-b.bmp|204|12|
+%xl|D|bat3-b.bmp|204|12|
+%xl|E|bat4-b.bmp|204|12|
 %t0.5 %?bp<%?bc<%xdA|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdB|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdC|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdD|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>;%t0.5 %?bp<%?bc<%xdE|%xdE>|%?bl<%xdA|%xdA|%xdB|%xdC|%xdD|%xdE|%xdE>>
-%xl|F|hold0.bmp|122|5|
-%xl|G|holdmain.bmp|122|5|
-%xl|H|holdremote.bmp|122|5|
-%xl|I|holdboth.bmp|122|5|
+%xl|F|hold0-b.bmp|164|8|
+%xl|G|holdmain-b.bmp|164|8|
+%xl|H|holdremote-b.bmp|164|8|
+%xl|I|holdboth-b.bmp|164|8|
 %?mh<%?mr<%xdI|%xdG>|%?mr<%xdH|%xdF>>
-%xl|J|repeat0.bmp|91|6|
-%xl|K|repeatall.bmp|91|6|
-%xl|L|repeatone.bmp|91|6|
-%xl|M|repeatshuffle.bmp|91|6|
-%xl|N|repeata-b.bmp|91|6|
+%xl|J|repeat0-b.bmp|126|9|
+%xl|K|repeatall-b.bmp|126|9|
+%xl|L|repeatone-b.bmp|126|9|
+%xl|M|repeatshuffle-b.bmp|126|9|
+%xl|N|repeata-b-b.bmp|126|9|
 %?mm<%xdJ|%xdK|%xdL|%xdM|%xdN>
-%xl|O|shuffle0.bmp|66|7|
-%xl|P|shuffle1.bmp|66|7|
+%xl|O|shuffle0-b.bmp|91|11|
+%xl|P|shuffle1-b.bmp|91|11|
 %?ps<%xdP|%xdO>
-%xl|R|pb-play.bmp|6|7|
-%xl|S|pb-pause.bmp|6|7|
-%xl|T|pb-fforward.bmp|6|7|
-%xl|U|pb-rewind.bmp|6|7|
+%xl|R|pb-play-b.bmp|11|10|
+%xl|S|pb-pause-b.bmp|11|10|
+%xl|T|pb-fforward-b.bmp|11|10|
+%xl|U|pb-rewind-b.bmp|11|10|
 %?mp<|%xdR|%xdS|%xdT|%xdU>
-%xl|a|vol0.bmp|24|3|
-%xl|b|vol1.bmp|24|3|
-%xl|c|vol2.bmp|24|3|
-%xl|d|vol3.bmp|24|3|
-%xl|e|vol4.bmp|24|3|
-%xl|f|vol5.bmp|24|3|
-%xl|g|vol6.bmp|24|3|
-%xl|h|vol7.bmp|24|3|
-%xl|i|vol8.bmp|24|3|
-%xl|j|ani1.bmp|24|3|
-%xl|k|ani2.bmp|24|3|
-%xl|l|ani3.bmp|24|3|
-%xl|m|ani4.bmp|24|3|
-%xl|n|ani5.bmp|24|3|
-%xl|o|ani6.bmp|24|3|
-%xl|p|ani7.bmp|24|3|
-%xl|q|ani8.bmp|24|3|
+%xl|a|vol0-b.bmp|34|5|
+%xl|b|vol1-b.bmp|34|5|
+%xl|c|vol2-b.bmp|34|5|
+%xl|d|vol3-b.bmp|34|5|
+%xl|e|vol4-b.bmp|34|5|
+%xl|f|vol5-b.bmp|34|5|
+%xl|g|vol6-b.bmp|34|5|
+%xl|h|vol7-b.bmp|34|5|
+%xl|i|vol8-b.bmp|34|5|
+%xl|j|ani1-b.bmp|34|5|
+%xl|k|ani2-b.bmp|34|5|
+%xl|l|ani3-b.bmp|34|5|
+%xl|m|ani4-b.bmp|34|5|
+%xl|n|ani5-b.bmp|34|5|
+%xl|o|ani6-b.bmp|34|5|
+%xl|p|ani7-b.bmp|34|5|
+%xl|q|ani8-b.bmp|34|5|
 %t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdj|%xdj|%xdj>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdk|%xdk|%xdk>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdl|%xdl|%xdl>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdm|%xdm|%xdm>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdn|%xdn|%xdn>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdo|%xdo|%xdo>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdp|%xdp|%xdp>;%t0.1 %?mp<%xda|%?pv<%xda|%xdb|%xdc|%xdd|%xde|%xdf|%xdg|%xdh|%xdi>|%xdq|%xdq|%xdq>
-%xl|r|codec-mp1.bmp|131|85|
-%xl|s|codec-mp2.bmp|131|85|
-%xl|t|codec-mp3.bmp|131|85|
-%xl|u|codec-wav.bmp|131|85|
-%xl|v|codec-ogg.bmp|131|85|
-%xl|w|codec-flac.bmp|131|85|
-%xl|x|codec-mpc.bmp|131|85|
-%xl|y|codec-ac3.bmp|131|85|
-%xl|z|codec-wavpack.bmp|131|85|
-%xl|V|codec-alac.bmp|131|85|
-%xl|W|codec-aac.bmp|131|85|
-%xl|X|codec-shorten.bmp|131|85|
-%xl|Y|codec-aiff.bmp|131|85|
-%xl|Z|codec-unknown.bmp|131|85|
+%xl|r|codec-mp1-b.bmp|168|232|
+%xl|s|codec-mp2-b.bmp|168|232|
+%xl|t|codec-mp3-b.bmp|168|232|
+%xl|u|codec-wav-b.bmp|168|232|
+%xl|v|codec-ogg-b.bmp|168|232|
+%xl|w|codec-flac-b.bmp|168|232|
+%xl|x|codec-mpc-b.bmp|168|232|
+%xl|y|codec-ac3-b.bmp|168|232|
+%xl|z|codec-wavpack-b.bmp|168|232|
+%xl|V|codec-alac-b.bmp|168|232|
+%xl|W|codec-aac-b.bmp|168|232|
+%xl|X|codec-shorten-b.bmp|168|232|
+%xl|Y|codec-aiff-b.bmp|168|232|
+%xl|Z|codec-unknown-b.bmp|168|232|
 %?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
