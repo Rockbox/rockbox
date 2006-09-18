@@ -1034,7 +1034,6 @@ static void viewer_load_settings(void) /* same name as global, but not the same 
     if (settings_fd >= 0)
     {
         struct bookmark_file_data *data = (struct bookmark_file_data*)buffer; /* grab the text buffer */
-        struct bookmark_file_data dummy;
         int i;
         data->bookmarked_files_count = 0;
         rb->read(settings_fd, &data->bookmarked_files_count, sizeof(signed int)); /* figure out how many items to read */
@@ -1105,9 +1104,10 @@ static void viewer_save_settings(void)/* same name as global, but not the same f
     settings_fd = rb->open(BOOKMARKS_FILE, O_WRONLY|O_CREAT);
     if (settings_fd >= 0 )
     {
-        struct bookmarked_file_info b = {0,0,""};
+        struct bookmarked_file_info b;
         b.file_position = file_pos;
         b.top_ptr_pos = screen_top_ptr - buffer;
+        rb->memset(&b.filename[0],0,MAX_PATH);
         rb->strcpy(b.filename,file_name);
         rb->PREFIX(lseek)(settings_fd,sizeof(signed int),SEEK_SET);
         rb->write (settings_fd, &b, sizeof(struct bookmarked_file_info));
