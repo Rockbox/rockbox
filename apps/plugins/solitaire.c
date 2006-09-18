@@ -135,7 +135,7 @@ static struct plugin_api* rb;
 #   define SOL_REM2STACK_PRE BUTTON_RIGHT
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
 #   define SOL_MENU_RUN     BUTTON_SELECT
-#   define HK_UD           "SROLL U/D"
+#   define HK_UD           "SCROLL U/D"
 #   define HK_MOVE         "SELECT"
 #   define HK_DRAW         "MENU"
 #   define HK_REM2CUR      "PLAY"
@@ -574,8 +574,6 @@ enum help solitaire_help( void )
 
 /**
  * Custom menu / options
- *
- * TODO: use rockbox api menus instead
  */
  
 #define CFGFILE_VERSION 0
@@ -588,133 +586,88 @@ static struct configdata config[] = {
    { TYPE_INT, 0, 1, &draw_type_disk, "draw_type", NULL, NULL }
 };
 
-/* menu return codes */
-enum { MENU_RESUME, MENU_RESTART, MENU_OPT,
-       MENU_HELP,   MENU_QUIT,    MENU_USB };
-#define MENU_LENGTH MENU_USB
 
-/* different menu behaviors */
-enum { MENU_BEFOREGAME, MENU_BEFOREGAMEOP, MENU_DURINGGAME };
+char draw_option_string[32];
 
-/**
- * The menu
- * text displayed changes depending on the context */
-int solitaire_menu( unsigned char context )
+static void create_draw_option_string(void)
 {
-    static char menu[3][MENU_LENGTH][17] =
-        { { "Start Game",
-            "",
-            "Draw Three Cards",
-            "Help",
-            "Quit" },
-          { "Start Game",
-            "",
-            "Draw One Card",
-            "Help",
-            "Quit" },
-          { "Resume Game",
-            "Restart Game",
-            "",
-            "Help",
-            "Quit"},
-        };
+    if (draw_type == 0)
+        rb->strcpy(draw_option_string, "Draw Three Cards");
+    else
+        rb->strcpy(draw_option_string, "Draw One Card");
+}
 
+void solitaire_init(void);
 
-    int i;
-    int cursor = 0;
-    int button;
+/* menu return codes */
+enum { MENU_RESUME, MENU_QUIT, MENU_USB };
 
-    int fh;
-    rb->lcd_getstringsize( menu[0][0], NULL, &fh );
-    fh++;
+int solitaire_menu(bool in_game)
+{
+    int m;
+    int result = -1;
+    int i = 0;
 
-    if(    context != MENU_BEFOREGAMEOP
-        && context != MENU_BEFOREGAME
-        && context != MENU_DURINGGAME )
+    struct menu_item items[4];
+
+    if (in_game)
     {
-        context = MENU_DURINGGAME;
+        items[i++].desc = "Resume Game";
+        items[i++].desc = "Restart Game";
     }
-
-#if LCD_DEPTH > 1
-    rb->lcd_set_background( LCD_DEFAULT_BG );
-    rb->lcd_set_foreground( LCD_DEFAULT_FG );
-#endif
-
-    while( true )
+    else
     {
+        items[i++].desc = "Start Game";
+        items[i++].desc = draw_option_string;
+    }
+    items[i++].desc = "Help";
+    items[i++].desc = "Quit";
 
-        rb->lcd_clear_display();
-        rb->lcd_putsxy( 20, 1, "Solitaire" );
-
-        for( i = 0; i<MENU_LENGTH; i++ )
+    create_draw_option_string();
+    m = rb->menu_init(items, i, NULL, NULL, NULL, NULL);
+    while (result < 0)
+    {
+        switch (rb->menu_show(m))
         {
-            rb->lcd_putsxy( 1, 17+fh*i, menu[context][i] );
-            if( cursor == i )
-            {
-                rb->lcd_set_drawmode( DRMODE_COMPLEMENT );
-                rb->lcd_fillrect( 0, 17+fh*i, LCD_WIDTH, fh );
-                rb->lcd_set_drawmode( DRMODE_SOLID );
-            }
-        }
-
-        rb->lcd_update();
-
-        button = rb->button_get( true );
-        switch( button )
-        {
-            case SOL_UP:
-#ifndef SOL_UP_PRE
-            case SOL_UP|BUTTON_REPEAT:
-#endif
-                cursor = (cursor + MENU_LENGTH - 1)%MENU_LENGTH;
+            case MENU_SELECTED_EXIT:
+                result = MENU_RESUME;
                 break;
 
-            case SOL_DOWN:
-#ifndef SOL_DOWN_PRE
-            case SOL_DOWN|BUTTON_REPEAT:
-#endif
-                cursor = (cursor + 1)%MENU_LENGTH;
+            case MENU_ATTACHED_USB:
+                result = MENU_USB;
                 break;
 
-            case SOL_LEFT:
-                return MENU_RESUME;
+            case 0:
+                result = MENU_RESUME;
+                break;
 
-            case SOL_MENU_RUN:
-#ifdef SOL_MENU_RUN2
-            case SOL_MENU_RUN2:
-#endif
-                switch( cursor )
+            case 1:
+                if (in_game)
                 {
-                    case MENU_RESUME:
-                    case MENU_RESTART:
-                    case MENU_OPT:
-                    case MENU_QUIT:
-                        return cursor;
-
-                    case MENU_HELP:
-                        if( solitaire_help() == HELP_USB )
-                            return MENU_USB;
-                        break;
+                    solitaire_init();
+                    result = MENU_RESUME;
+                }
+                else
+                {
+                    draw_type = (draw_type + 1) % 2;
+                    create_draw_option_string();
                 }
                 break;
 
-#ifdef SOL_OPT
-            case SOL_OPT:
-                return MENU_OPT;
-#endif
+            case 2:
+                rb->lcd_setmargins(0, 0);
+                if (solitaire_help() == HELP_USB)
+                    result = MENU_USB;
+                break;
 
-#ifdef SOL_RC_QUIT
-            case SOL_RC_QUIT:
-#endif
-            case SOL_QUIT:
-                return MENU_QUIT;
-
-            default:
-                if( rb->default_event_handler( button ) == SYS_USB_CONNECTED )
-                    return MENU_USB;
+            case 3:
+                result = MENU_QUIT;
                 break;
         }
     }
+    rb->menu_exit(m);
+    rb->lcd_setmargins(0, 0);
+    return result;
 }
 
 /**
@@ -1131,18 +1084,13 @@ int solitaire( void )
     int biggest_col_length;
 
     rb->srand( *rb->current_tick );
-    switch( solitaire_menu( draw_type == 0 ? MENU_BEFOREGAME
-                                           : MENU_BEFOREGAMEOP ) )
+    switch( solitaire_menu(false) )
     {
         case MENU_QUIT:
             return SOLITAIRE_QUIT;
 
         case MENU_USB:
             return SOLITAIRE_USB;
-
-        case MENU_OPT:
-            draw_type = (draw_type+1)%2;
-            return 0;
     }
     solitaire_init();
 
@@ -1564,17 +1512,13 @@ int solitaire( void )
             case SOL_RC_QUIT:
 #endif
             case SOL_QUIT:
-                switch( solitaire_menu( MENU_DURINGGAME ) )
+                switch( solitaire_menu(true) )
                 {
                     case MENU_QUIT:
                         return SOLITAIRE_QUIT;
 
                     case MENU_USB:
                         return SOLITAIRE_USB;
-
-                    case MENU_RESTART:
-                        solitaire_init();
-                        break;
                 }
                 break;
 
