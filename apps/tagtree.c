@@ -51,7 +51,12 @@ static char searchstring[32];
 
 enum variables {
     var_sorttype = 100,
-    var_limit
+    var_limit,
+    var_menu_start,
+    var_include,
+    var_rootmenu,
+    menu_next,
+    menu_load,
 };
 
 /* Capacity 10 000 entries (for example 10k different artists) */
@@ -95,9 +100,30 @@ struct search_instruction {
     int result_seek[MAX_TAGS];
 };
 
-static struct search_instruction *si, *csi;
-static int si_count = 0;
+struct menu_entry {
+    char name[64];
+    int type;
+    struct search_instruction *si;
+    int link;
+};
+
+#define TAGNAVI_VERSION    "#! rockbox/tagbrowser/2.0"
+#define TAGMENU_MAX_ITEMS  32
+#define TAGMENU_MAX_MENUS  8
+struct root_menu {
+    char title[64];
+    char id[32];
+    int itemcount;
+    struct root_menu *parent;
+    struct menu_entry *items[TAGMENU_MAX_ITEMS];
+};
+
+static struct root_menu menus[TAGMENU_MAX_MENUS];
+static struct root_menu *menu;
+static struct search_instruction *csi;
 static const char *strp;
+static int menu_count;
+static int root_menu;
 
 static int current_offset;
 static int current_entry_count;
@@ -138,10 +164,10 @@ static int get_tag(int *tag)
     int i;
     
     /* Find the start. */
-    while (*strp == ' ' && *strp != '\0')
+    while ((*strp == ' ' || *strp == '>') && *strp != '\0')
         strp++;
     
-    if (*strp == '\0' || *strp == '?' || *strp == ':')
+    if (*strp == '\0' || *strp == '?')
         return 0;
     
     for (i = 0; i < (int)sizeof(buf)-1; i++)
@@ -167,6 +193,11 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "autoscore", tag_virt_autoscore);
     MATCH(tag, buf, "%sort", var_sorttype);
     MATCH(tag, buf, "%limit", var_limit);
+    MATCH(tag, buf, "%menu_start", var_menu_start);
+    MATCH(tag, buf, "%include", var_include);
+    MATCH(tag, buf, "%root_menu", var_rootmenu);
+    MATCH(tag, buf, "->", menu_next);
+    MATCH(tag, buf, "==>", menu_load);
     
     logf("NO MATCH: %s\n", buf);
     if (buf[0] == '?')
@@ -337,8 +368,7 @@ static int get_condition(struct search_instruction *inst)
         case '&':
             strp++;
             return 1;
-        case ':':
-            strp++;
+        case '-':
         case '\0':
             return 0;
     }
@@ -366,18 +396,48 @@ static int get_condition(struct search_instruction *inst)
  * $  ends with
  */
 
-static bool parse_search(struct search_instruction *inst, const char *str)
+static bool parse_search(struct menu_entry *entry, const char *str)
 {
     int ret;
+    int type;
+    struct search_instruction *inst = entry->si;
+    char buf[MAX_PATH];
+    int i;
     
-    memset(inst, 0, sizeof(struct search_instruction));
     strp = str;
     
-    if (get_token_str(inst->name, sizeof inst->name) < 0)
+    /* Parse entry name */
+    if (get_token_str(entry->name, sizeof entry->name) < 0)
     {
         logf("No name found.");
         return false;
     }
+    
+    /* Parse entry type */
+    if (get_tag(&entry->type) <= 0)
+        return false;
+    
+    if (entry->type == menu_load)
+    {
+        if (get_token_str(buf, sizeof buf) < 0)
+            return false;
+        
+        /* Find the matching root menu or "create" it */
+        for (i = 0; i < menu_count; i++)
+        {
+            if (!strcasecmp(menus[i].id, buf))
+            {
+                entry->link = i;
+                menus[i].parent = menu;
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    if (entry->type != menu_next)
+        return false;
     
     while (inst->tagorder_count < MAX_TAGS)
     {
@@ -385,6 +445,7 @@ static bool parse_search(struct search_instruction *inst, const char *str)
         if (ret < 0) 
         {
             logf("Parse error #1");
+            logf("%s", strp);
             return false;
         }
         
@@ -396,6 +457,9 @@ static bool parse_search(struct search_instruction *inst, const char *str)
         while (get_condition(inst) > 0) ;
 
         inst->tagorder_count++;
+        
+        if (get_tag(&type) <= 0 || type != menu_next)
+            break;
     }
     
     return true;
@@ -520,45 +584,141 @@ bool tagtree_import(void)
     return false;
 }
 
-void tagtree_init(void)
+static bool parse_menu(const char *filename)
 {
     int fd;
     char buf[256];
+    char data[256];
+    int variable;
     int rc;
-    int line_count;
+    bool first = true;
+    bool read_menu = false;
+    int i;
+
+    if (menu_count >= TAGMENU_MAX_MENUS)
+        return false;
     
-    fd = open(FILE_SEARCH_INSTRUCTIONS, O_RDONLY);
+    fd = open(filename, O_RDONLY);
     if (fd < 0)
     {
         logf("Search instruction file not found.");
-        return ;
+        return false;
     }
     
-    /* Pre-pass search instructions file to count how many entries */
-    line_count = 0;
-    while ( 1 )
-    {
-        rc = read_line(fd, buf, sizeof(buf)-1);
-        if (rc <= 0)
-            break;
-        line_count++;
-    }
-
-    /* Allocate memory for searches */
-    si = (struct search_instruction *) buffer_alloc(sizeof(struct search_instruction) * line_count + 4);
-
     /* Now read file for real, parsing into si */
-    lseek(fd, 0L, SEEK_SET);
     while ( 1 )
     {
         rc = read_line(fd, buf, sizeof(buf)-1);
         if (rc <= 0)
-            break;      
-        if (!parse_search(si + si_count, buf))
             break;
-        si_count++;
+        
+        if (first)
+        {
+            if (strcasecmp(TAGNAVI_VERSION, buf))
+            {
+                logf("Version mismatch");
+                break;
+            }
+            first = false;
+        }
+        
+        if (buf[0] == '#')
+            continue;
+        
+        if (buf[0] == '\0')
+        {
+            if (read_menu)
+            {
+                /* End the menu */
+                menu_count++;
+                menu = &menus[menu_count];
+                read_menu = false;
+            }
+            continue;
+        }
+        
+        if (!read_menu)
+        {
+            strp = buf;
+            if (get_tag(&variable) <= 0)
+                continue;
+            
+            switch (variable)
+            {
+                case var_include:
+                    if (get_token_str(data, sizeof(data)) < 0)
+                    {
+                        logf("%include empty");
+                        return false;
+                    }
+                    
+                    if (!parse_menu(data))
+                    {
+                        logf("Load menu fail: %s", data);
+                    }
+                    break;
+                
+                case var_menu_start:
+                    if (get_token_str(menu->id, sizeof(menu->id)) < 0)
+                    {
+                        logf("%menu_start id empty");
+                        return false;
+                    }
+                    if (get_token_str(menu->title, sizeof(menu->title)) < 0)
+                    {
+                        logf("%menu_start title empty");
+                        return false;
+                    }
+                    menu->itemcount = 0;
+                    read_menu = true;
+                    break;
+                
+                case var_rootmenu:
+                    if (get_token_str(data, sizeof(data)) < 0)
+                    {
+                        logf("%root_menu empty");
+                        return false;
+                    }
+                
+                    for (i = 0; i < menu_count; i++)
+                    {
+                        if (!strcasecmp(menus[i].id, data))
+                        {
+                            root_menu = i;
+                        }
+                    }
+                    break;
+            }
+            
+            continue;
+        }
+        
+        /* Allocate */
+        if (menu->items[menu->itemcount] == NULL)
+        {
+            menu->items[menu->itemcount] = buffer_alloc(sizeof(struct menu_entry));
+            memset(menu->items[menu->itemcount], 0, sizeof(struct menu_entry));
+            menu->items[menu->itemcount]->si = buffer_alloc(sizeof(struct search_instruction));
+            memset(menu->items[menu->itemcount]->si, 0, sizeof(struct search_instruction));
+        }
+        
+        if (!parse_search(menu->items[menu->itemcount], buf))
+            continue;
+        
+        menu->itemcount++;
     }
     close(fd);
+    
+    return true;
+}
+
+void tagtree_init(void)
+{
+    memset(menus, 0, sizeof menus);
+    menu_count = 0;
+    menu = &menus[0];
+    root_menu = 0;
+    parse_menu(FILE_SEARCH_INSTRUCTIONS);
     
     uniqbuf = buffer_alloc(UNIQBUF_SIZE);
     audio_set_track_buffer_event(tagtree_buffer_event);
@@ -858,11 +1018,27 @@ static int load_root(struct tree_context *c)
     
     tc = c;
     c->currtable = root;
-    for (i = 0; i < si_count; i++)
+    if (c->dirlevel == 0)
+        c->currextra = root_menu;
+    
+    menu = &menus[c->currextra];
+    
+    for (i = 0; i < menu->itemcount; i++)
     {
-        dptr->name = (si+i)->name;
-        dptr->newtable = navibrowse;
-        dptr->extraseek = i;
+        dptr->name = menu->items[i]->name;
+        switch (menu->items[i]->type)
+        {
+            case menu_next:
+                dptr->newtable = navibrowse;
+                dptr->extraseek = i;
+                break;
+            
+            case menu_load:
+                dptr->newtable = root;
+                dptr->extraseek = menu->items[i]->link;
+                break;
+        }
+
         dptr++;
     }
     
@@ -884,13 +1060,13 @@ int tagtree_load(struct tree_context* c)
         c->dirfull = false;
         table = root;
         c->currtable = table;
+        c->currextra = root_menu;
     }
 
     switch (table) 
     {
         case root:
             count = load_root(c);
-            c->dirlevel = 0;
             break;
 
         case allsubentries:
@@ -945,11 +1121,17 @@ int tagtree_enter(struct tree_context* c)
         case root:
             c->currextra = newextra;
         
-            if (newextra == navibrowse)
+            if (newextra == root)
+            {
+                menu = &menus[seek];
+                c->currextra = seek;
+            }
+        
+            else if (newextra == navibrowse)
             {
                 int i, j;
                 
-                csi = si+seek;
+                csi = menu->items[seek]->si;
                 c->currextra = 0;
                 
                 /* Read input as necessary. */
@@ -963,7 +1145,7 @@ int tagtree_enter(struct tree_context* c)
                         rc = kbd_input(searchstring, sizeof(searchstring));
                         if (rc == -1 || !searchstring[0])
                         {
-                            c->dirlevel--;
+                            tagtree_exit(c);
                             return 0;
                         }
                         
@@ -1024,7 +1206,8 @@ int tagtree_enter(struct tree_context* c)
 void tagtree_exit(struct tree_context* c)
 {
     c->dirfull = false;
-    c->dirlevel--;
+    if (c->dirlevel > 0)
+        c->dirlevel--;
     c->selected_item=c->selected_item_history[c->dirlevel];
     gui_synclist_select_item(&tree_lists, c->selected_item);
     c->currtable = c->table_history[c->dirlevel];
