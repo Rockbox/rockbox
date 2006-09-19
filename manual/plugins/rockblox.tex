@@ -1,0 +1,34 @@
+\subsection{Rockblox}
+\screenshot{plugins/images/ss-rockblox}{Rockblox}{fig:rockblox}
+Rockblox is a rockbox version of the classic falling blocks game. The aim of the game is to make
+the falling blocks of different shapes form full rows. Whenever a row is
+complete it will be cleared and the game score will increase. For every ten
+lines completed the game level increases, making the blocks fall faster. If the
+pile of blocks reach the ceiling the game is over.
+
+\begin{table}
+    \begin{btnmap}{}{}
+    \opt{RECORDER_PAD}{\ButtonFOne & Restart game\\}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn & Restart game\\}
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay & Restart game\\}
+        \opt{IAUDIO_X5_PAD}{\ButtonPlay & Restart game\\}
+    \ButtonLeft & Move left\\
+    \ButtonRight & Move right\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonDown}\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonPlay} & Move down\\
+    \opt{RECORDER_PAD}{\ButtonPlay}\opt{ONDIO_PAD}{\ButtonMenu+\ButtonUp}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}\opt{IAUDIO_X5_PAD}{\ButtonPower}
+        & Rotate left\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
+        {\ButtonUp}\opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack/\ButtonMenu}
+        & Rotate right\\
+    \opt{RECORDER_PAD}{\ButtonOn}\opt{ONDIO_PAD}{\ButtonMenu}
+        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect}\opt{IAUDIO_X5_PAD}{\ButtonRec}
+        & Drop\\
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}
+        \opt{IAUDIO_X5_PAD}{\ButtonPower} & Quit\\
+    \end{btnmap}
+\end{table}
