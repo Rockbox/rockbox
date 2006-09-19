@@ -1401,6 +1401,23 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     return &entry[realid];
 }
 
+char *tagtree_get_title(struct tree_context* c)
+{
+    switch (c->currtable)
+    {
+        case root:
+            return menu->title;
+        
+        case navibrowse:
+            return (char *)tagcache_tag_to_str(csi->tagorder[c->currextra]);
+
+        case allsubentries:
+            return "Tracks";
+    }
+    
+    return "?";
+}
+
 int tagtree_get_attr(struct tree_context* c)
 {
     int attr = -1;

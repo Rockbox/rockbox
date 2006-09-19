@@ -38,6 +38,7 @@ void tagtree_exit(struct tree_context* c);
 int tagtree_load(struct tree_context* c);
 struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
 bool tagtree_insert_selection_playlist(int position, bool queue);
+char *tagtree_get_title(struct tree_context* c);
 int tagtree_get_attr(struct tree_context* c);
 #ifdef HAVE_LCD_BITMAP
 const unsigned char* tagtree_get_icon(struct tree_context* c);
