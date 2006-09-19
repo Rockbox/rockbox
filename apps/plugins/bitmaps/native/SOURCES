@@ -255,21 +255,21 @@ brickmania_break.176x132x16.bmp
 
 #endif
 
-/* Tetrox */
+/* Rockblox */
 #if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240) && (LCD_DEPTH == 16)
-tetrox_background.320x240x16.bmp
+rockblox_background.320x240x16.bmp
 #elif (LCD_WIDTH >= 220) && (LCD_HEIGHT >= 176) && (LCD_DEPTH == 16)
-tetrox_background.220x176x16.bmp
+rockblox_background.220x176x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
-tetrox_background.176x132x16.bmp
+rockblox_background.176x132x16.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
-tetrox_background.160x128x16.bmp
+rockblox_background.160x128x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
-tetrox_background.128x128x16.bmp
+rockblox_background.128x128x16.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 2)
-tetrox_background.160x128x2.bmp
+rockblox_background.160x128x2.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 2)
-tetrox_background.138x110x2.bmp
+rockblox_background.138x110x2.bmp
 #endif
 
 #ifdef HAVE_LCD_COLOR

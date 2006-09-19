@@ -27,9 +27,9 @@ brickmania_powerups.112x64x1.bmp
 
 #endif
 
-/* Tetrox */
+/* Rockblox */
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
-tetrox_background.112x64x1.bmp
+rockblox_background.112x64x1.bmp
 #endif
 
 /* Solitaire */
