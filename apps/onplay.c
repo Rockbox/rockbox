@@ -370,7 +370,7 @@ static bool playlist_options(void)
                  (selected_file_attr & ATTR_DIRECTORY))
         {
             items[i].desc = ID2P(LANG_INSERT);
-            args[i].position = PLAYLIST_INSERT;
+            args[i].position = PLAYLIST_INSERT_LAST;
             args[i].queue = false;
             i++;
 
