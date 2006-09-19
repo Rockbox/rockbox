@@ -597,6 +597,11 @@ int solitaire_menu(bool in_game)
 
     struct menu_item items[4];
 
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground(LCD_DEFAULT_FG);
+    rb->lcd_set_background(LCD_DEFAULT_BG);
+#endif
+
     if (in_game)
     {
         items[i++].desc = "Resume Game";
