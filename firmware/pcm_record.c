@@ -560,8 +560,6 @@ static void pcmrec_callback(bool flush)
             if (write(wav_file, enc_chunk, chunk_size) != chunk_size)
             {
                 close_wave();
-                if(must_boost)
-                    cpu_boost(false);
                 logf("pcmrec: write err");
                 is_error = true;
                 break;
@@ -580,10 +578,10 @@ static void pcmrec_callback(bool flush)
             enc_rd_index = (enc_rd_index + 1) % enc_num_chunks;
         }
 
-        cpu_boost(false);
-
         /* sync file */
         fsync(wav_file);
+
+        cpu_boost(false);
 
         logf("done");
     }
