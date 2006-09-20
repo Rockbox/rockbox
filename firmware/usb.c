@@ -80,6 +80,9 @@ void screen_dump(void);   /* Nasty again. Defined in apps/ too */
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define USBPOWER_BUTTON BUTTON_MENU
 #define USBPOWER_BTN_IGNORE BUTTON_POWER
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#define USBPOWER_BUTTON BUTTON_NONE
+#define USBPOWER_BTN_IGNORE BUTTON_POWER
 #endif
 #endif /* HAVE_USB_POWER */
 

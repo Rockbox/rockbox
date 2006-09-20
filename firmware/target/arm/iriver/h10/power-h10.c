@@ -71,7 +71,7 @@ void power_init(void)
 
 bool charger_inserted(void)
 {     
-    return (GPIOL_INPUT_VAL & 0x04)?true:false; /* FIXME: This only checks if USB is connected */
+    return (GPIOF_INPUT_VAL & 0x08)?true:false;
 }
 
 void ide_power_enable(bool on)
@@ -89,8 +89,5 @@ bool ide_powered(void)
 
 void power_off(void)
 {
-    /* Give things a second to settle before cutting power */
-    sleep(HZ);
-    
     GPIOF_OUTPUT_VAL &=~ 0x20;
 }

@@ -1316,6 +1316,8 @@ void system_init(void)
 
 void system_reboot(void)
 {
+    /* Reboot */
+    DEV_RS |= DEV_SYSTEM;
 }
 
 int system_memory_guard(int newmode)

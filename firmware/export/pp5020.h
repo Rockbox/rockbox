@@ -125,6 +125,8 @@
 #define DEV_RS (*(volatile unsigned long *)(0x60006004))
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
+#define DEV_SYSTEM  0x4
+
 #define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
 #define TIMER1_VAL   (*(volatile unsigned long *)(0x60005004))
 #define TIMER2_CFG   (*(volatile unsigned long *)(0x60005008))

@@ -81,12 +81,11 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 5865
 
-/* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Hardware controlled charging */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
-/* TODO: should this be set for the H10? */
-//#define HAVE_POWEROFF_WHILE_CHARGING
+#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
@@ -110,7 +109,7 @@
 /* #define USB_IPODSTYLE */
 
 /* define this if the unit can be powered or charged via USB */
-/*#define HAVE_USB_POWER*/
+#define HAVE_USB_POWER
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
