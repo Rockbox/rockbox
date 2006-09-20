@@ -275,18 +275,18 @@ static char helptext[] =
 #endif
 
 #if HAVE_LCD_COLOR
-    static const unsigned colors[4] = {
+    static const fb_data colors[4] = {
         LCD_BLACK, LCD_RGBPACK(255, 0, 0), LCD_BLACK, LCD_RGBPACK(255, 0, 0)
     };
 #elif LCD_DEPTH > 1
-    static const unsigned colors[4] = {
+    static const fb_data colors[4] = {
         LCD_BLACK, LCD_BRIGHTNESS(127), LCD_BLACK, LCD_BRIGHTNESS(127)
     };
 #endif
 
 #define CONFIG_FILENAME "sol.cfg"
 
-#define NOT_A_CARD 255
+#define NOT_A_CARD -1
 
 /* number of cards per suit */
 #define CARDS_PER_SUIT 13
@@ -305,7 +305,7 @@ static char helptext[] =
 /* column COL_NUM + SUITS corresponds to the remains' stack */
 #define REM_COL (STACKS_COL + SUITS)
 
-#define NOT_A_COL 255
+#define NOT_A_COL -1
 
 /* background color */
 #define BACKGROUND_COLOR LCD_RGBPACK(0,157,0)
@@ -316,11 +316,11 @@ static char helptext[] =
 
 typedef struct
 {
-    unsigned char suit : 2;
-    unsigned char num : 4;
-    unsigned char known : 1;
-    unsigned char used : 1;/* this is what is used when dealing cards */
-    unsigned char next;
+    signed char suit;
+    signed char num;
+    bool known : 1;
+    bool used : 1; /* this is what is used when dealing cards */
+    signed char next;
 } card_t;
 
 
@@ -336,7 +336,7 @@ static void draw_cursor( int x, int y )
 }
 
 /* Draw a card's border, select it if it's selected and draw the cursor
- * is the cursor is currently over the card */
+ * if the cursor is currently over the card */
 static void draw_card_ext( int x, int y, bool selected, bool cursor )
 {
 #if LCD_DEPTH > 1
@@ -360,7 +360,7 @@ static void draw_card_ext( int x, int y, bool selected, bool cursor )
 }
 
 /* Draw a card's inner graphics */
-static void draw_card( card_t card, int x, int y,
+static void draw_card( card_t *card, int x, int y,
                        bool selected, bool cursor, bool leftstyle )
 {
 #ifndef HAVE_LCD_COLOR
@@ -377,7 +377,7 @@ static void draw_card( card_t card, int x, int y,
     rb->lcd_set_drawmode( DRMODE_SOLID );
 #endif
 #endif
-    if( card.known )
+    if( card->known )
     {
 #ifdef HAVE_LCD_COLOR
         /* On Color LCDs we have a card back so we only need to clear
@@ -387,26 +387,26 @@ static void draw_card( card_t card, int x, int y,
 #endif
 
 #if LCD_DEPTH > 1
-        rb->lcd_set_foreground( colors[card.suit] );
+        rb->lcd_set_foreground( colors[card->suit] );
 #endif
         if( leftstyle )
         {
 #if MARGIN > 0
-            draw_suit( card.suit, x+1, y+2+NUMBER_HEIGHT );
-            draw_number( card.num, x+1, y+1 );
+            draw_suit( card->suit, x+1, y+2+NUMBER_HEIGHT );
+            draw_number( card->num, x+1, y+1 );
 #else
-            draw_suit( card.suit, x+1, y+NUMBER_HEIGHT );
-            draw_number( card.num, x+1, y );
+            draw_suit( card->suit, x+1, y+NUMBER_HEIGHT );
+            draw_number( card->num, x+1, y );
 #endif
         }
         else
         {
 #if MARGIN > 0
-            draw_suit( card.suit, x+2+NUMBER_WIDTH, y+1 );
+            draw_suit( card->suit, x+2+NUMBER_WIDTH, y+1 );
 #else
-            draw_suit( card.suit, x+1+NUMBER_WIDTH, y+1 );
+            draw_suit( card->suit, x+1+NUMBER_WIDTH, y+1 );
 #endif
-            draw_number( card.num, x+1, y+1 );
+            draw_number( card->num, x+1, y+1 );
         }
     }
 #ifdef HAVE_LCD_COLOR
@@ -667,38 +667,38 @@ int solitaire_menu(bool in_game)
  */
 
 /* player's cursor */
-unsigned char cur_card;
+int cur_card;
 /* player's cursor column num */
-unsigned char cur_col;
+int cur_col;
 
 /* selected card */
-unsigned char sel_card;
+int sel_card;
 
 /* the deck */
 card_t deck[ NUM_CARDS ];
 
 /* the remaining cards */
 /* first card of the remains' stack */
-unsigned char rem;
+int rem;
 /* upper visible card from the remains' stack */
-unsigned char cur_rem;
+int cur_rem;
 /* number of cards drawn from the remains stack - 1 */
-signed char count_rem;
+int count_rem;
 /* number of cards per draw of the remains' stack */
-signed char cards_per_draw;
+int cards_per_draw;
 
 /* the 7 game columns */
-unsigned char cols[COL_NUM];
+int cols[COL_NUM];
 /* the 4 final stacks */
-unsigned char stacks[SUITS];
+int stacks[SUITS];
 
 /**
  * Card handling routines
  */
 
-unsigned char next_random_card( card_t *deck )
+int next_random_card( card_t *deck )
 {
-    unsigned char i,r;
+    int i,r;
 
     r = rb->rand()%(NUM_CARDS)+1;
     i = 0;
@@ -709,7 +709,7 @@ unsigned char next_random_card( card_t *deck )
         if( !deck[i].used ) r--;
     }
 
-    deck[i].used = 1;
+    deck[i].used = true;
 
     return i;
 }
@@ -719,7 +719,7 @@ unsigned char next_random_card( card_t *deck )
 void solitaire_init( void )
 {
 
-    unsigned char c;
+    int c;
     int i, j;
 
     /* number of cards that are drawn on the remains' stack (by pressing F2) */
@@ -740,8 +740,8 @@ void solitaire_init( void )
 #define card deck[i*CARDS_PER_SUIT+j]
             card.suit = i;
             card.num = j;
-            card.known = 1;
-            card.used = 0;
+            card.known = true;
+            card.used = false;
             card.next = NOT_A_CARD;
 #undef card
         }
@@ -765,7 +765,7 @@ void solitaire_init( void )
                 c = deck[c].next;
             }
             if( j < i )
-                deck[c].known = 0;
+                deck[c].known = false;
         }
     }
 
@@ -801,10 +801,10 @@ void solitaire_init( void )
 }
 
 /* find the column number in which 'card' can be found */
-unsigned char find_card_col( unsigned char card )
+int find_card_col( int card )
 {
     int i;
-    unsigned char c;
+    int c;
 
     if( card == NOT_A_CARD ) return NOT_A_COL;
 
@@ -833,7 +833,7 @@ unsigned char find_card_col( unsigned char card )
 
 /* find the card preceding 'card' */
 /* if it doesn't exist, return NOT_A_CARD */
-unsigned char find_prev_card( unsigned char card ){
+int find_prev_card( int card ){
     int i;
 
     for( i=0; i < NUM_CARDS; i++ )
@@ -845,9 +845,9 @@ unsigned char find_prev_card( unsigned char card ){
 }
 
 /* find the last card of a given column */
-unsigned char find_last_card( unsigned char col )
+int find_last_card( int col )
 {
-    unsigned char c;
+    int c;
 
     if( col < COL_NUM )
     {
@@ -874,16 +874,16 @@ unsigned char find_last_card( unsigned char col )
 
 enum move { MOVE_OK, MOVE_NOT_OK };
 
-enum move move_card( unsigned char dest_col, unsigned char src_card )
+enum move move_card( int dest_col, int src_card )
 {
     /* the column on which to take src_card */
-    unsigned char src_col;
+    int src_col;
 
     /* the last card of dest_col */
-    unsigned char dest_card;
+    int dest_card;
 
     /* the card under src_card */
-    unsigned char src_card_prev;
+    int src_card_prev;
 
     /* you can't move no card (at least, it doesn't have any consequence) */
     if( src_card == NOT_A_CARD ) return MOVE_NOT_OK;
@@ -1047,7 +1047,7 @@ int bouncing_cards( void )
                     fp_y = (LCD_HEIGHT-CARD_HEIGHT) << 8;
                 }
                 y = fp_y >> 8;
-                draw_card( deck[j*CARDS_PER_SUIT+i], x, y,
+                draw_card( &deck[j*CARDS_PER_SUIT+i], x, y,
                            false, false, false );
                 rb->lcd_update_rect( x<0?0:x, y<0?0:y,
                                      CARD_WIDTH, CARD_HEIGHT );
@@ -1072,7 +1072,7 @@ int solitaire( void )
 
     int i,j;
     int button, lastbutton = 0;
-    unsigned char c,h,prevcard;
+    int c,h,prevcard;
     int biggest_col_length;
 
     rb->srand( *rb->current_tick );
@@ -1143,7 +1143,7 @@ int solitaire( void )
                     break;
                 }
 
-                draw_card( deck[c], MARGIN+i*((LCD_WIDTH-2*MARGIN)/COL_NUM),
+                draw_card( &deck[c], MARGIN+i*((LCD_WIDTH-2*MARGIN)/COL_NUM),
                            j+1, c == sel_card, c == cur_card, false );
 
                 h = c;
@@ -1170,7 +1170,7 @@ int solitaire( void )
 
             if( c != NOT_A_CARD )
             {
-                draw_card( deck[c],
+                draw_card( &deck[c],
                            LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*i+i+1,
                            MARGIN,
                            c == sel_card, cur_col == STACKS_COL + i, false );
@@ -1189,7 +1189,7 @@ int solitaire( void )
         {
             /* gruik ! (we want to display a card back) */
             deck[rem].known = false;
-            draw_card( deck[rem], MARGIN, MARGIN, false, false, false );
+            draw_card( &deck[rem], MARGIN, MARGIN, false, false, false );
             deck[rem].known = true;
         }
 
@@ -1211,7 +1211,7 @@ int solitaire( void )
                 prevcard = find_prev_card(prevcard);
             for( i = 0; i <= count_rem; i++ )
             {
-                draw_card( deck[prevcard], j,
+                draw_card( &deck[prevcard], j,
                            MARGIN, sel_card == prevcard,
                            cur_card == prevcard, i < count_rem );
                 prevcard = deck[prevcard].next;
@@ -1315,7 +1315,7 @@ int solitaire( void )
                 else
                 {
                     cur_card = cols[cur_col];
-                    while( deck[ cur_card].known == 0
+                    while( !deck[ cur_card].known
                            && deck[cur_card].next != NOT_A_CARD )
                     {
                         cur_card = deck[cur_card].next;
@@ -1352,7 +1352,7 @@ int solitaire( void )
                         cur_card = find_last_card( cur_col );
                     }
                 } while(    deck[cur_card].next != NOT_A_CARD
-                         && deck[cur_card].known == 0 );
+                         && !deck[cur_card].known );
                 break;
 
             /* Try to put card under cursor on one of the stacks */
@@ -1376,10 +1376,10 @@ int solitaire( void )
                     if( cur_card != NOT_A_CARD )
                     {
                         if(    deck[cur_card].next == NOT_A_CARD
-                            && deck[cur_card].known == 0 )
+                            && !deck[cur_card].known )
                         {
                             /* reveal a hidden card */
-                            deck[cur_card].known = 1;
+                            deck[cur_card].known = true;
                         }
                         else if( cur_col == REM_COL && cur_rem == NOT_A_CARD )
                         {
