@@ -539,12 +539,9 @@ static void pcmrec_callback(bool flush)
     /* near full state reached: less than 5sec remaining space */
     if (enc_num_chunks - num_ready < WRITE_THRESHOLD || flush)
     {
-        bool must_boost = (boost_counter ? false : true);
-
         logf("writing: %d (%d)", num_ready, flush);
         
-        if(must_boost)
-            cpu_boost(true);
+        cpu_boost(true);
 
         size_yield = 0;
         for (i=0; i<num_ready; i++)
@@ -583,8 +580,7 @@ static void pcmrec_callback(bool flush)
             enc_rd_index = (enc_rd_index + 1) % enc_num_chunks;
         }
 
-        if(must_boost)
-            cpu_boost(false);
+        cpu_boost(false);
 
         /* sync file */
         fsync(wav_file);
