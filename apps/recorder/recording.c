@@ -844,7 +844,11 @@ bool recording_screen(bool no_source)
     peak_meter_playback(true);
 #endif
 
+#if CONFIG_CODEC == SWCODEC
     audio_init_recording(talk_get_bufsize());
+#else
+    audio_init_recording(0);
+#endif
     sound_set_volume(global_settings.volume);
 
 #ifdef HAVE_AGC
