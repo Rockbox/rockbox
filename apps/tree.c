@@ -1222,9 +1222,10 @@ void bookmark_play(char *resume_file, int index, int offset, int seed,
                    char *filename)
 {
     int i;
-    int len=strlen(resume_file);
+    char* suffix = strrchr(resume_file, '.');
 
-    if (!strcasecmp(&resume_file[len-4], ".m3u"))
+    if (suffix != NULL &&
+        (!strcasecmp(suffix, ".m3u") || !strcasecmp(suffix, ".m3u8")))
     {
         /* Playlist playback */
         char* slash;
