@@ -22,13 +22,22 @@
 PLUGIN_HEADER
 
 #ifdef HAVE_LCD_BITMAP
-#define LARGE ((LCD_WIDTH - 2) / 2)
-#define HAUT  ((LCD_HEIGHT - 2) / 2)
 #define MYLCD(fn) rb->lcd_ ## fn
+#define GFX_X (LCD_WIDTH/2-1)
+#define GFX_Y (LCD_HEIGHT/2-1)
+#if LCD_WIDTH != LCD_HEIGHT
+#define GFX_WIDTH  GFX_X
+#define GFX_HEIGHT GFX_Y
 #else
-#define LARGE 9
-#define HAUT  6
+#define GFX_WIDTH  GFX_X
+#define GFX_HEIGHT (4*GFX_Y/5)
+#endif
+#else
 #define MYLCD(fn) pgfx_ ## fn
+#define GFX_X 9
+#define GFX_Y 6
+#define GFX_WIDTH  9
+#define GFX_HEIGHT 6
 #endif
 
 /* variable button definitions */
@@ -107,9 +116,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     while (1) {
 
         x+=sx;
-        if (x>LARGE) 
+        if (x>GFX_WIDTH) 
         {
-            x = 2*LARGE-x;
+            x = 2*GFX_WIDTH-x;
             sx=-sx;
         }
 	
@@ -120,9 +129,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         }
 	
         y+=sy;
-        if (y>HAUT) 
+        if (y>GFX_HEIGHT) 
         {
-            y = 2*HAUT-y;
+            y = 2*GFX_HEIGHT-y;
             sy=-sy;
         }
 	
@@ -132,10 +141,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
             sy = -sy;
         }
 
-        MYLCD(fillrect)(LARGE-x, HAUT-y, 2*x+1, 1);
-        MYLCD(fillrect)(LARGE-x, HAUT+y, 2*x+1, 1);
-        MYLCD(fillrect)(LARGE-x, HAUT-y+1, 1, 2*y-1);
-        MYLCD(fillrect)(LARGE+x, HAUT-y+1, 1, 2*y-1);
+        MYLCD(fillrect)(GFX_X-x, GFX_Y-y, 2*x+1, 1);
+        MYLCD(fillrect)(GFX_X-x, GFX_Y+y, 2*x+1, 1);
+        MYLCD(fillrect)(GFX_X-x, GFX_Y-y+1, 1, 2*y-1);
+        MYLCD(fillrect)(GFX_X+x, GFX_Y-y+1, 1, 2*y-1);
         MYLCD(update)();
 
         rb->sleep(HZ/timer);
@@ -161,8 +170,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
                 
             case MOSAIQUE_RESTART:
 
-                sx = rb->rand() % (HAUT/2) + 1;
-                sy = rb->rand() % (HAUT/2) + 1;
+                sx = rb->rand() % (GFX_HEIGHT/2) + 1;
+                sy = rb->rand() % (GFX_HEIGHT/2) + 1;
                 x=0;
                 y=0;
                 MYLCD(clear_display)();
