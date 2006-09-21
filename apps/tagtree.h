@@ -22,6 +22,10 @@
 #include "tagcache.h"
 #include "tree.h"
 
+#define TAGNAVI_VERSION    "#! rockbox/tagbrowser/2.0"
+#define TAGMENU_MAX_ITEMS  32
+#define TAGMENU_MAX_MENUS  16
+
 enum table { root = 1, navibrowse, allsubentries, playtrack };
 
 struct tagentry {

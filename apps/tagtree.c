@@ -107,9 +107,6 @@ struct menu_entry {
     int link;
 };
 
-#define TAGNAVI_VERSION    "#! rockbox/tagbrowser/2.0"
-#define TAGMENU_MAX_ITEMS  32
-#define TAGMENU_MAX_MENUS  8
 struct root_menu {
     char title[64];
     char id[32];
@@ -596,7 +593,10 @@ static bool parse_menu(const char *filename)
     int i;
 
     if (menu_count >= TAGMENU_MAX_MENUS)
+    {
+        logf("max menucount reached");
         return false;
+    }
     
     fd = open(filename, O_RDONLY);
     if (fd < 0)
@@ -659,6 +659,12 @@ static bool parse_menu(const char *filename)
                     break;
                 
                 case var_menu_start:
+                    if (menu_count >= TAGMENU_MAX_MENUS)
+                    {
+                        logf("max menucount reached");
+                        return false;
+                    }
+    
                     if (get_token_str(menu->id, sizeof(menu->id)) < 0)
                     {
                         logf("%menu_start id empty");
@@ -690,6 +696,12 @@ static bool parse_menu(const char *filename)
                     break;
             }
             
+            continue;
+        }
+        
+        if (menu->itemcount >= TAGMENU_MAX_ITEMS)
+        {
+            logf("max itemcount reached");
             continue;
         }
         
