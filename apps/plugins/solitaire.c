@@ -1012,6 +1012,11 @@ enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
 /**
  * Bouncing cards at the end of the game
  */
+ 
+#define BC_ACCEL   ((1<<16)*LCD_HEIGHT/128)
+#define BC_MYSPEED (6*BC_ACCEL)
+#define BC_MXSPEED (6*LCD_WIDTH/160)
+
 int bouncing_cards( void )
 {
     int i, j, x, vx, y, fp_y, fp_vy, button;
@@ -1029,24 +1034,25 @@ int bouncing_cards( void )
         for( j = 0; j < SUITS; j++ )
         {
             x = LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*j+j+1;
-            fp_y = MARGIN<<8;
+            fp_y = MARGIN<<16;
 
-            vx = rb->rand()%8-5;
-            if( !vx ) vx = -6;
+            vx = rb->rand() % (4*BC_MXSPEED/3) - BC_MXSPEED;
+            if( vx >= 0 )
+                vx++;
 
-            fp_vy = -rb->rand()%(6<<8);
+            fp_vy = -rb->rand() % BC_MYSPEED;
 
             while( x < LCD_WIDTH && x + CARD_WIDTH > 0 )
             {
-                fp_vy += 1<<8;
+                fp_vy += BC_ACCEL;
                 x += vx;
                 fp_y += fp_vy;
-                if( fp_y >= (LCD_HEIGHT-CARD_HEIGHT) << 8 )
+                if( fp_y >= (LCD_HEIGHT-CARD_HEIGHT) << 16 )
                 {
-                    fp_vy = -fp_vy*3/4;
-                    fp_y = (LCD_HEIGHT-CARD_HEIGHT) << 8;
+                    fp_vy = -fp_vy*4/5;
+                    fp_y = (LCD_HEIGHT-CARD_HEIGHT) << 16;
                 }
-                y = fp_y >> 8;
+                y = fp_y >> 16;
                 draw_card( &deck[j*CARDS_PER_SUIT+i], x, y,
                            false, false, false );
                 rb->lcd_update_rect( x<0?0:x, y<0?0:y,
