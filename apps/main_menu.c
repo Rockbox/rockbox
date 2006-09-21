@@ -117,6 +117,14 @@ bool show_info(void)
                     talk_id(LANG_BATTERY_TIME, enqueue);
                     enqueue = true;
                     talk_value(battery_level(), UNIT_PERCENT, true);
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+                    if (charge_state == CHARGING)
+                        talk_id(LANG_BATTERY_CHARGE, true);               
+                    else if (charge_state == TOPOFF)
+                        talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
+                    else if (charge_state == TRICKLE)
+                        talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
+#endif
                 }
 
                 talk_id(LANG_DISK_FREE_INFO, enqueue);

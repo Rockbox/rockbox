@@ -4472,7 +4472,7 @@
     *: "Battery: Charging"
   </dest>
   <voice>
-    *: ""
+    *: "Charging"
   </voice>
 </phrase>
 <phrase>
@@ -4486,7 +4486,7 @@
     *: "Battery: Top-Off Chg"
   </dest>
   <voice>
-    *: ""
+    *: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -4500,7 +4500,7 @@
     *: "Battery: Trickle Chg"
   </dest>
   <voice>
-    *: ""
+    *: "Trickle charge"
   </voice>
 </phrase>
 <phrase>
