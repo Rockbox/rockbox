@@ -156,6 +156,17 @@ const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,          BUTTON_MENU | BUTTON_REPEAT,           BUTTON_NONE },
+    { ACTION_FM_RECORD_DBLPRE, BUTTON_MENU,                           BUTTON_NONE},
+    { ACTION_FM_RECORD,        BUTTON_MENU | BUTTON_REL,              BUTTON_NONE },
+    { ACTION_FM_STOP,          BUTTON_OFF | BUTTON_REL,               BUTTON_OFF },
+    { ACTION_FM_EXIT,          BUTTON_OFF | BUTTON_REPEAT,            BUTTON_OFF },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    
+};
+
 const struct button_mapping* get_context_mapping( int context )
 {
     switch( context )

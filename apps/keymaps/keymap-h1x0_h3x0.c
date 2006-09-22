@@ -259,6 +259,18 @@ const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,        BUTTON_SELECT | BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_SELECT | BUTTON_REL,            BUTTON_SELECT },
+    { ACTION_FM_STOP,        BUTTON_OFF,                            BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_ON | BUTTON_REPEAT,             BUTTON_ON },
+    { ACTION_FM_EXIT,        BUTTON_MODE | BUTTON_REL,              BUTTON_MODE },
+    { ACTION_FM_PLAY,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    
+};
+
 /*****************************************************************************
  *    Remote control mappings 
  *****************************************************************************/
@@ -650,6 +662,21 @@ const struct button_mapping button_context_keyboard_h300lcdremote[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard_h300lcdremote */
 
+const struct button_mapping button_context_radio_h100remote[]  = {
+    { ACTION_FM_MENU,        BUTTON_RC_MENU | BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_RC_MENU | BUTTON_REL,            BUTTON_RC_MENU },
+    { ACTION_FM_STOP,        BUTTON_RC_STOP,                         BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_RC_ON | BUTTON_REPEAT,           BUTTON_RC_ON },
+    { ACTION_FM_EXIT,        BUTTON_RC_MODE | BUTTON_REL,            BUTTON_RC_MODE },
+    { ACTION_FM_PLAY,        BUTTON_RC_ON | BUTTON_REL,              BUTTON_RC_ON },
+    { ACTION_FM_NEXT_PRESET, BUTTON_RC_BITRATE,                      BUTTON_NONE },
+    { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                      BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+};
+
+const struct button_mapping *button_context_radio_h300lcdremote =
+                button_context_radio_h100remote;
 
 /* the actual used tables */
 static const struct button_mapping 
@@ -667,6 +694,7 @@ static const struct button_mapping
         *remote_btn_ctxt_pitchscreen = 0,
         *remote_btn_ctxt_recscreen = 0,
         *remote_btn_ctxt_keyboard  = 0;
+        *remote_btn_ctxt_radio  = 0;
 
 static int _remote_type = -1; /*safe value, forces the first press to init the mappings */
 
@@ -690,6 +718,7 @@ static void remap_remote(void)
             remote_btn_ctxt_pitchscreen = NULL;
             remote_btn_ctxt_recscreen = NULL;
             remote_btn_ctxt_keyboard = NULL;
+            remote_btn_ctxt_radio  = NULL;
             break;
 
         case REMOTETYPE_H100_LCD:
@@ -714,6 +743,8 @@ static void remap_remote(void)
                 = button_context_recscreen_h100remote,
             remote_btn_ctxt_keyboard 
                 = button_context_keyboard_h100remote;
+            remote_btn_ctxt_radio
+                = button_context_radio_h100remote;
             break;
 
         case REMOTETYPE_H300_LCD:
@@ -738,6 +769,8 @@ static void remap_remote(void)
                 = button_context_recscreen_h300lcdremote,
             remote_btn_ctxt_keyboard 
                 = button_context_keyboard_h300lcdremote;
+            remote_btn_ctxt_radio
+                = button_context_radio_h300lcdremote;
             break;
 
         case REMOTETYPE_H300_NONLCD: /* FIXME: add its tables */        
@@ -762,6 +795,8 @@ static void remap_remote(void)
                 = button_context_recscreen_h300lcdremote,
             remote_btn_ctxt_keyboard 
                 = button_context_keyboard_h300lcdremote;
+            remote_btn_ctxt_radio
+                = button_context_radio_h300lcdremote;
 #if 0 
             remote_btn_ctxt_std = 
             remote_btn_ctxt_wps = 
@@ -777,6 +812,7 @@ static void remap_remote(void)
             remote_btn_ctxt_pitchscreen = 
             remote_btn_ctxt_recscreen = 
             remote_btn_ctxt_keyboard = 
+            remote_btn_ctxt_radio = 
 #endif
             break;
 
@@ -827,6 +863,8 @@ const struct button_mapping* get_context_mapping_remote(int context)
             return remote_btn_ctxt_recscreen;
         case CONTEXT_KEYBOARD:
             return remote_btn_ctxt_keyboard;
+        case CONTEXT_FM:
+            return remote_btn_ctxt_radio;
     } 
     return remote_btn_ctxt_std; 
 }
@@ -879,6 +917,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_FM:
+            return button_context_radio;
     } 
     return button_context_standard;
 }

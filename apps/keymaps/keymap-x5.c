@@ -242,6 +242,18 @@ const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
+const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,        BUTTON_SELECT | BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_SELECT | BUTTON_REL,        BUTTON_SELECT },   
+    { ACTION_FM_STOP,        BUTTON_POWER,                      BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_PLAY | BUTTON_REPEAT,       BUTTON_PLAY },
+    { ACTION_FM_EXIT,        BUTTON_REC | BUTTON_REL,           BUTTON_REC },
+    { ACTION_FM_PLAY,        BUTTON_PLAY | BUTTON_REL,          BUTTON_PLAY },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    
+};
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;

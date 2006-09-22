@@ -69,6 +69,7 @@ enum {
     CONTEXT_YESNOSCREEN, /*NOTE: make sure your target has this and ACTION_YESNO_ACCEPT */
     CONTEXT_RECSCREEN,
     CONTEXT_KEYBOARD,
+    CONTEXT_FM,
 };
 
 
@@ -127,6 +128,19 @@ enum {
     ACTION_TREE_STOP,
     ACTION_TREE_WPS,
     
+    /* radio */
+    ACTION_FM_MENU,
+    ACTION_FM_PRESET,
+    ACTION_FM_RECORD,
+    ACTION_FM_FREEZE,
+    ACTION_FM_STOP,
+    ACTION_FM_MODE,
+    ACTION_FM_EXIT,
+    ACTION_FM_PLAY,
+    ACTION_FM_RECORD_DBLPRE,
+    ACTION_FM_NEXT_PRESET,
+    ACTION_FM_PREV_PRESET,
+
     /* recording screen */
     ACTION_REC_LCD,
     ACTION_REC_PAUSE,

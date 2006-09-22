@@ -191,7 +191,22 @@ struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_SELECT,       BUTTON_PLAY|BUTTON_REL,   BUTTON_PLAY },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+    
 }; /* button_context_settings_bmark */
+
+const struct button_mapping button_context_radio[]  = {
+    { ACTION_FM_MENU,        BUTTON_F1,                             BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_F2,                             BUTTON_NONE },
+    { ACTION_FM_RECORD,      BUTTON_F3,                             BUTTON_NONE },
+    { ACTION_FM_FREEZE,      BUTTON_PLAY,                           BUTTON_NONE },
+    { ACTION_FM_STOP,        BUTTON_OFF,                            BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_ON | BUTTON_REPEAT,             BUTTON_ON },
+    { ACTION_FM_EXIT,        BUTTON_ON | BUTTON_REL,                BUTTON_ON },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+    
+};
+
 /*****************************************************************************
  *    Remote control mappings
  *****************************************************************************/

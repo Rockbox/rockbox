@@ -59,86 +59,25 @@
 #include "power.h"
 #include "tree.h"
 #include "dir.h"
+#include "action.h"
 
 #ifdef CONFIG_TUNER
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define FM_MENU BUTTON_F1
-#define FM_PRESET BUTTON_F2
-#define FM_RECORD BUTTON_F3
-#define FM_FREEZE BUTTON_PLAY
-#define FM_STOP BUTTON_OFF
-#define FM_MODE (BUTTON_ON | BUTTON_REPEAT)
-#define FM_EXIT_PRE BUTTON_ON
-#define FM_EXIT (BUTTON_ON | BUTTON_REL)
-#define FM_PRESET_ADD BUTTON_F1
-#define FM_PRESET_ACTION BUTTON_F3
+#define FM_RECORD
+#define FM_PRESET_ADD
+#define FM_PRESET_ACTION
+#define FM_PRESET
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-/* pause/play - short PLAY */
-#define FM_PLAY_PRE BUTTON_ON
-#define FM_RC_PLAY_PRE BUTTON_RC_ON
-#define FM_PLAY (BUTTON_ON | BUTTON_REL)
-#define FM_RC_PLAY (BUTTON_RC_ON | BUTTON_REL)
-/* preset/scan mode - long PLAY */
-#define FM_MODE (BUTTON_ON | BUTTON_REPEAT)
-#define FM_RC_MODE (BUTTON_RC_ON | BUTTON_REPEAT)
-/* preset menu - short SELECT */
-#define FM_PRESET_PRE BUTTON_SELECT
-#define FM_RC_PRESET_PRE BUTTON_RC_MENU
-#define FM_PRESET (BUTTON_SELECT | BUTTON_REL)
-#define FM_RC_PRESET (BUTTON_RC_MENU | BUTTON_REL)
-/* fm menu - long SELECT */
-#define FM_MENU (BUTTON_SELECT | BUTTON_REPEAT)
-#define FM_RC_MENU (BUTTON_RC_MENU | BUTTON_REPEAT)
-/* main menu(exit radio while playing) - A-B */
-#define FM_EXIT_PRE BUTTON_MODE
-#define FM_EXIT (BUTTON_MODE | BUTTON_REL)
-#define FM_RC_EXIT_PRE BUTTON_RC_MODE
-#define FM_RC_EXIT (BUTTON_RC_MODE | BUTTON_REL)
-/* prev/next preset on the remote - BITRATE/SOURCE */
-#define FM_NEXT_PRESET (BUTTON_RC_BITRATE | BUTTON_REL)
-#define FM_PREV_PRESET (BUTTON_RC_SOURCE | BUTTON_REL)
-/* stop and exit radio - STOP */
-#define FM_STOP BUTTON_OFF
-#define FM_RC_STOP BUTTON_RC_STOP
+#define FM_PRESET
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-/* pause/play - short PLAY */
-#define FM_PLAY_PRE BUTTON_PLAY
-#define FM_RC_PLAY_PRE BUTTON_RC_PLAY
-#define FM_PLAY (BUTTON_PLAY | BUTTON_REL)
-#define FM_RC_PLAY (BUTTON_RC_PLAY | BUTTON_REL)
-/* preset/scan mode - long PLAY */
-#define FM_MODE (BUTTON_PLAY | BUTTON_REPEAT)
-#define FM_RC_MODE (BUTTON_RC_PLAY | BUTTON_REPEAT)
-/* preset menu - short SELECT */
-#define FM_PRESET_PRE BUTTON_SELECT
-#define FM_RC_PRESET_PRE BUTTON_RC_MENU
-#define FM_PRESET (BUTTON_SELECT | BUTTON_REL)
-#define FM_RC_PRESET (BUTTON_RC_MENU | BUTTON_REL)
-/* fm menu - long SELECT */
-#define FM_MENU (BUTTON_SELECT | BUTTON_REPEAT)
-#define FM_RC_MENU (BUTTON_RC_MENU | BUTTON_REPEAT)
-/* main menu(exit radio while playing) - REC */
-#define FM_EXIT_PRE BUTTON_REC
-#define FM_EXIT (BUTTON_REC | BUTTON_REL)
-#define FM_RC_EXIT_PRE BUTTON_RC_MODE
-#define FM_RC_EXIT (BUTTON_RC_MODE | BUTTON_REL)
-/* prev/next preset on the remote - REW/FF */
-#define FM_NEXT_PRESET (BUTTON_RC_FF | BUTTON_REL)
-#define FM_PREV_PRESET (BUTTON_RC_REW | BUTTON_REL)
-/* stop and exit radio - ON */
-#define FM_STOP BUTTON_POWER
-#define FM_RC_STOP (BUTTON_RC_MODE | BUTTON_REPEAT)
+#define FM_PRESET
 
-#elif CONFIG_KEYPAD == ONDIO_PAD /* restricted keypad */
-#define FM_MENU (BUTTON_MENU | BUTTON_REPEAT)
-#define FM_RECORD_DBLPRE BUTTON_MENU
-#define FM_RECORD (BUTTON_MENU | BUTTON_REL)
-#define FM_STOP_PRE BUTTON_OFF
-#define FM_STOP (BUTTON_OFF | BUTTON_REL)
-#define FM_EXIT (BUTTON_OFF | BUTTON_REPEAT)
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#define FM_RECORD_DBLPRE
+#define FM_RECORD
 #endif
 
 #define MAX_FREQ (108000000)
@@ -537,22 +476,15 @@ bool radio_screen(void)
         if(search_dir)
             button = button_get(false);
         else
-            button = button_get_w_tmo(HZ / PEAK_METER_FPS);
-        if (button != BUTTON_NONE)
+            button = get_action(CONTEXT_FM, HZ / PEAK_METER_FPS);
+        if (button != ACTION_NONE)
         {
             cpu_idle_mode(false);
             button_timeout = current_tick + (2*HZ);
         }
         switch(button)
         {
-#ifdef FM_RC_STOP
-            case FM_RC_STOP:
-#endif
-            case FM_STOP:
-#ifdef FM_STOP_PRE
-                if (lastbutton != FM_STOP_PRE)
-                    break;
-#endif
+             case ACTION_FM_STOP:
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
                 if(audio_status() == AUDIO_STATUS_RECORD)
                 {
@@ -579,9 +511,9 @@ bool radio_screen(void)
                 break;
 
 #ifdef FM_RECORD
-            case FM_RECORD:
+            case ACTION_FM_RECORD:
 #ifdef FM_RECORD_DBLPRE
-                if (lastbutton != FM_RECORD_DBLPRE)
+                if (lastbutton != ACTION_FM_RECORD_DBLPRE)
                 {
                     rec_lastclick = 0;
                     break;
@@ -609,18 +541,7 @@ bool radio_screen(void)
                 break;
 #endif /* #ifdef FM_RECORD */
 
-#ifdef FM_RC_EXIT
-            case FM_RC_EXIT:
-#endif
-            case FM_EXIT:
-#ifdef FM_EXIT_PRE
-                if(lastbutton != FM_EXIT_PRE
-#ifdef FM_RC_EXIT_PRE
-                   && lastbutton != FM_RC_EXIT_PRE
-#endif                    
-                    )
-                    break;
-#endif
+            case ACTION_FM_EXIT:
 #if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
                 if(audio_status() == AUDIO_STATUS_RECORD)
                     audio_stop();
@@ -643,11 +564,8 @@ bool radio_screen(void)
                 clear_preset_list();
                     
                 break;
-                
-#ifdef BUTTON_RC_REW
-            case BUTTON_RC_REW:
-#endif
-            case BUTTON_LEFT:
+
+            case ACTION_STD_PREV:
                 if(radio_mode == RADIO_SCAN_MODE)
                 {
                      curr_freq -= FREQ_STEP;
@@ -663,10 +581,7 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
 
-#ifdef BUTTON_RC_FF
-            case BUTTON_RC_FF:
-#endif
-            case BUTTON_RIGHT:
+            case ACTION_STD_NEXT:
                 if(radio_mode == RADIO_SCAN_MODE)
                 {
                      curr_freq += FREQ_STEP;
@@ -682,10 +597,7 @@ bool radio_screen(void)
                 update_screen = true;
                 break;
 
-#ifdef BUTTON_RC_REW
-            case BUTTON_RC_REW | BUTTON_REPEAT:
-#endif
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case ACTION_STD_PREVREPEAT:
                 if(radio_mode == RADIO_SCAN_MODE)
                     search_dir = -1;
                 else
@@ -695,11 +607,8 @@ bool radio_screen(void)
                 }
 
                 break;
-                
-#ifdef BUTTON_RC_FF
-            case BUTTON_RC_FF | BUTTON_REPEAT:
-#endif
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+
+            case ACTION_STD_NEXTREPEAT:
                 if(radio_mode == RADIO_SCAN_MODE)
                     search_dir = 1;
                 else
@@ -710,12 +619,9 @@ bool radio_screen(void)
                 
                 break;
 
-#ifdef BUTTON_RC_VOL_UP
-            case BUTTON_RC_VOL_UP:
-            case BUTTON_RC_VOL_UP | BUTTON_REPEAT:
-#endif
-            case BUTTON_UP:
-            case BUTTON_UP | BUTTON_REPEAT:
+
+            case ACTION_SETTINGS_INC:
+            case ACTION_SETTINGS_INCREPEAT:
                 global_settings.volume++;
                 if(global_settings.volume > sound_max(SOUND_VOLUME))
                     global_settings.volume = sound_max(SOUND_VOLUME);
@@ -724,12 +630,8 @@ bool radio_screen(void)
                 settings_save();
                 break;
 
-#ifdef BUTTON_RC_VOL_DOWN
-            case BUTTON_RC_VOL_DOWN:
-            case BUTTON_RC_VOL_DOWN | BUTTON_REPEAT:
-#endif
-            case BUTTON_DOWN:
-            case BUTTON_DOWN | BUTTON_REPEAT:
+            case ACTION_SETTINGS_DEC:
+            case ACTION_SETTINGS_DECREPEAT:
                 global_settings.volume--;
                 if(global_settings.volume < sound_min(SOUND_VOLUME))
                     global_settings.volume = sound_min(SOUND_VOLUME);
@@ -738,19 +640,7 @@ bool radio_screen(void)
                 settings_save();
                 break;
 
-#ifdef FM_PLAY
-#ifdef FM_RC_PLAY
-            case FM_RC_PLAY:
-#endif
-            case FM_PLAY:
-#ifdef FM_PLAY_PRE
-                if(lastbutton != FM_PLAY_PRE
-#ifdef FM_RC_PLAY_PRE
-                    && lastbutton != FM_RC_PLAY_PRE
-#endif
-                  )
-                     break;
-#endif
+            case ACTION_FM_PLAY:
                 if (radio_status == FMRADIO_PLAYING)
                     radio_pause();
                 else
@@ -758,12 +648,8 @@ bool radio_screen(void)
 
                 update_screen = true;
                 break;
-#endif
-#ifdef FM_MENU
-#ifdef FM_RC_MENU
-            case FM_RC_MENU:
-#endif
-            case FM_MENU:
+
+            case ACTION_FM_MENU:
                 radio_menu();
                 curr_preset = find_preset(curr_freq);
                 FOR_NB_SCREENS(i){
@@ -777,21 +663,9 @@ bool radio_screen(void)
 #endif
                 update_screen = true;
                 break;
-#endif
-
-#ifdef FM_RC_PRESET
-            case FM_RC_PRESET:
-#endif                    
+      
 #ifdef FM_PRESET
-            case FM_PRESET:
-#ifdef FM_PRESET_PRE
-                if(lastbutton != FM_PRESET_PRE
-#ifdef FM_RC_PRESET_PRE
-                    && lastbutton != FM_RC_PRESET_PRE
-#endif
-                  )
-                     break;
-#endif
+            case ACTION_FM_PRESET:
                 if(num_presets < 1)
                 {
                     gui_syncsplash(HZ, true, str(LANG_FM_NO_PRESETS));
@@ -823,7 +697,7 @@ bool radio_screen(void)
 #endif
                 
 #ifdef FM_FREEZE
-            case FM_FREEZE:
+            case ACTION_FM_FREEZE:
                 if(!screen_freeze)
                 {
                     gui_syncsplash(HZ, true, str(LANG_FM_FREEZE));
@@ -847,38 +721,28 @@ bool radio_screen(void)
                 }
                 break;
 
-#ifdef FM_RC_MODE
-           case FM_RC_MODE:
-#endif
 #ifdef FM_MODE
-           case FM_MODE:
-                if(lastbutton != FM_MODE 
-#ifdef FM_RC_MODE
-                   && lastbutton != FM_RC_MODE
-#endif                    
-                   )
+           case ACTION_FM_MODE:
+                if(radio_mode == RADIO_SCAN_MODE)
                 {
-                    if(radio_mode == RADIO_SCAN_MODE)
-                    {
-                        /* Force scan mode if there are no presets. */
-                        if(num_presets > 0)
-                            radio_mode = RADIO_PRESET_MODE;
-                    }
-                    else
-                        radio_mode = RADIO_SCAN_MODE;
-                    update_screen = true;
+                    /* Force scan mode if there are no presets. */
+                    if(num_presets > 0)
+                        radio_mode = RADIO_PRESET_MODE;
                 }
+                else
+                    radio_mode = RADIO_SCAN_MODE;
+                update_screen = true;
                 break;
 #endif
 #ifdef FM_NEXT_PRESET
-            case FM_NEXT_PRESET:
+            case ACTION_FM_NEXT_PRESET:
                 next_preset(1);
                 search_dir = 0;
                 update_screen = true;
                 break;
 #endif
 #ifdef FM_PREV_PRESET
-            case FM_PREV_PRESET:
+            case ACTION_FM_PREV_PRESET:
                 next_preset(-1);
                 search_dir = 0;
                 update_screen = true;
@@ -890,9 +754,11 @@ bool radio_screen(void)
                 break;
         } /*switch(button)*/
 
-        if (button != BUTTON_NONE)
+        if (button != ACTION_NONE)
             lastbutton = button;
-        
+
+       // action_signalscreenchange();
+
 #if CONFIG_CODEC != SWCODEC
         peak_meter_peek();
 #endif
@@ -1023,8 +889,8 @@ bool radio_screen(void)
 
         while(1)
         {
-            button = button_get(true);
-            if(button == (FM_STOP | BUTTON_REL))
+            button = get_action(CONTEXT_FM, TIMEOUT_BLOCK);
+            if(button == (ACTION_FM_STOP | BUTTON_REL))
                 break;
         }
     }
@@ -1205,13 +1071,9 @@ static int handle_radio_presets_menu_cb(int key, int m)
 #ifdef FM_PRESET_ACTION
     switch(key)
     {
-        case FM_PRESET_ACTION:
-            key = MENU_EXIT; /* Fake an exit */
-            break;
-            
-        case FM_PRESET_ACTION | BUTTON_REL:
-            /* Ignore the release events */
-            key = BUTTON_NONE;
+        case ACTION_F3:
+            key = ACTION_STD_CANCEL; /* Fake an exit */
+            action_signalscreenchange();
             break;
     }
 #endif
@@ -1361,11 +1223,11 @@ bool handle_radio_presets_menu(void)
 int handle_radio_presets_cb(int key, int m)
 {
     (void)m;
-#if 0 /* this screen needs fixing! */
+
     switch(key)
     {
 #ifdef FM_PRESET_ADD
-        case FM_PRESET_ADD:
+        case ACTION_STD_MENU:
             radio_add_preset();
             menu_draw(m);
             key = BUTTON_NONE;
@@ -1373,61 +1235,25 @@ int handle_radio_presets_cb(int key, int m)
 #endif
 #if (CONFIG_KEYPAD != IRIVER_H100_PAD) && (CONFIG_KEYPAD != IRIVER_H300_PAD) && (CONFIG_KEYPAD != IAUDIO_X5_PAD)
 #ifdef FM_PRESET
-        case FM_PRESET:
+        case ACTION_STD_QUICKSCREEN:
             menu_draw(m);
             key = ACTION_STD_EXIT; /* Fake an exit */
             break;
 #endif
 #endif
-#ifdef FM_PRESET_ACTION
-        case FM_PRESET_ACTION:
-#endif
-#ifdef MENU_RC_ENTER
-        case MENU_RC_ENTER | BUTTON_REPEAT:
-#endif
-#ifdef MENU_RC_ENTER2
-        case MENU_RC_ENTER2 | BUTTON_REPEAT:
-#endif
-#ifdef MENU_ENTER2
-        case MENU_ENTER2 | BUTTON_REPEAT:
-#endif
-        case MENU_ENTER | BUTTON_REPEAT: /* long gives options */
+        case ACTION_F3:
+        case ACTION_STD_CONTEXT:
         {
             bool ret;
             ret = handle_radio_presets_menu();
             menu_draw(m);
             if(ret)
-                key = MENU_ATTACHED_USB;
+                key = SYS_USB_CONNECTED;
             else
-                key = BUTTON_NONE;
+                key = ACTION_NONE;
             break;
         }
-#ifdef MENU_RC_ENTER
-        case MENU_RC_ENTER | BUTTON_REL:
-#endif
-#ifdef MENU_RC_ENTER2
-        case MENU_RC_ENTER2 | BUTTON_REL:
-#endif
-#ifdef MENU_ENTER2
-        case MENU_ENTER2 | BUTTON_REL:
-#endif
-        case MENU_ENTER | BUTTON_REL:
-            key = ACTION_STD_SELECT; /* fake enter for short press */
-            break;
-            
-/* ignore down events */
-        case ACTION_STD_SELECT: 
-            /* Ignore the release events */
-#ifdef FM_PRESET_ADD
-        case FM_PRESET_ADD | BUTTON_REL:
-#endif
-#ifdef FM_PRESET_ACTION
-        case FM_PRESET_ACTION | BUTTON_REL:
-#endif
-            key = BUTTON_NONE;
-            break;
     }
-#endif    
     return key;
 }
 
