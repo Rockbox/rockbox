@@ -693,7 +693,7 @@ static const struct button_mapping
         *remote_btn_ctxt_quickscreen = 0,
         *remote_btn_ctxt_pitchscreen = 0,
         *remote_btn_ctxt_recscreen = 0,
-        *remote_btn_ctxt_keyboard  = 0;
+        *remote_btn_ctxt_keyboard  = 0,
         *remote_btn_ctxt_radio  = 0;
 
 static int _remote_type = -1; /*safe value, forces the first press to init the mappings */

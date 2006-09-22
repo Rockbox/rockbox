@@ -1237,7 +1237,7 @@ int handle_radio_presets_cb(int key, int m)
 #ifdef FM_PRESET
         case ACTION_STD_QUICKSCREEN:
             menu_draw(m);
-            key = ACTION_STD_EXIT; /* Fake an exit */
+            key = ACTION_STD_CANCEL; /* Fake an exit */
             break;
 #endif
 #endif
