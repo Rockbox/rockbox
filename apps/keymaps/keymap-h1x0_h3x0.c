@@ -742,7 +742,7 @@ static void remap_remote(void)
             remote_btn_ctxt_recscreen 
                 = button_context_recscreen_h100remote,
             remote_btn_ctxt_keyboard 
-                = button_context_keyboard_h100remote;
+                = button_context_keyboard_h100remote,
             remote_btn_ctxt_radio
                 = button_context_radio_h100remote;
             break;
@@ -768,7 +768,7 @@ static void remap_remote(void)
             remote_btn_ctxt_recscreen
                 = button_context_recscreen_h300lcdremote,
             remote_btn_ctxt_keyboard 
-                = button_context_keyboard_h300lcdremote;
+                = button_context_keyboard_h300lcdremote,
             remote_btn_ctxt_radio
                 = button_context_radio_h300lcdremote;
             break;
@@ -794,7 +794,7 @@ static void remap_remote(void)
             remote_btn_ctxt_recscreen
                 = button_context_recscreen_h300lcdremote,
             remote_btn_ctxt_keyboard 
-                = button_context_keyboard_h300lcdremote;
+                = button_context_keyboard_h300lcdremote,
             remote_btn_ctxt_radio
                 = button_context_radio_h300lcdremote;
 #if 0 
