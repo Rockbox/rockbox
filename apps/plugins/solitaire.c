@@ -1015,7 +1015,7 @@ enum { SOLITAIRE_WIN, SOLITAIRE_QUIT, SOLITAIRE_USB };
  
 #define BC_ACCEL   ((1<<16)*LCD_HEIGHT/128)
 #define BC_MYSPEED (6*BC_ACCEL)
-#define BC_MXSPEED (6*LCD_WIDTH/160)
+#define BC_MXSPEED (6*LCD_HEIGHT/128)
 
 int bouncing_cards( void )
 {
@@ -1036,9 +1036,15 @@ int bouncing_cards( void )
             x = LCD_WIDTH-(CARD_WIDTH*4+4+MARGIN)+CARD_WIDTH*j+j+1;
             fp_y = MARGIN<<16;
 
+#if LCD_WIDTH > 200
+            vx = rb->rand() % (4*BC_MXSPEED/3-2) - BC_MXSPEED;
+            if( vx >= -1 )
+                vx += 3;
+#else
             vx = rb->rand() % (4*BC_MXSPEED/3) - BC_MXSPEED;
             if( vx >= 0 )
                 vx++;
+#endif
 
             fp_vy = -rb->rand() % BC_MYSPEED;
 
