@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -55,6 +55,7 @@
 #include "eq_menu.h"
 #include "pcmbuf.h"
 #endif
+#include "action.h"
 
 int selected_setting; /* Used by the callback */
 void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
@@ -901,7 +902,7 @@ bool rectrigger(void)
         lcd_update();
 
         switch (button) {
-            case TRIG_CANCEL:
+            case ACTION_STD_CANCEL:
                 gui_syncsplash(50, true, str(LANG_MENU_SETTING_CANCEL));
                 global_settings.rec_start_thres = old_start_thres;
                 global_settings.rec_start_duration = old_start_duration;
@@ -913,26 +914,25 @@ bool rectrigger(void)
                 exit_request = true;
                 break;
 
-            case TRIG_ACCEPT:
+            case ACTION_REC_PAUSE:
                 exit_request = true;
                 break;
 
-            case BUTTON_UP:
+            case ACTION_STD_PREV:
                 selected += TRIG_OPTION_COUNT - 1;
                 selected %= TRIG_OPTION_COUNT;
                 offset = MIN(offset, (int)selected);
                 offset = MAX(offset, (int)selected - option_lines + 1);
                 break;
 
-            case BUTTON_DOWN:
+            case ACTION_STD_NEXT:
                 selected ++;
                 selected %= TRIG_OPTION_COUNT;
                 offset = MIN(offset, (int)selected);
                 offset = MAX(offset, (int)selected - option_lines + 1);
                 break;
 
-            case BUTTON_RIGHT:
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case ACTION_SETTINGS_INC:
                 switch (selected) {
                     case TRIGGER_MODE:
                         global_settings.rec_trigger_mode ++;
@@ -975,8 +975,7 @@ bool rectrigger(void)
                 settings_apply_trigger();
                 break;
 
-            case BUTTON_LEFT:
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case ACTION_SETTINGS_DEC:
                 switch (selected) {
                     case TRIGGER_MODE:
                         global_settings.rec_trigger_mode+=TRIGGER_MODE_COUNT-1;
@@ -1023,7 +1022,7 @@ bool rectrigger(void)
                 break;
 
 #ifdef TRIG_RESET_SIM
-            case TRIG_RESET_SIM:
+            case ACTION_REC_F2:
                 peak_meter_trigger(true);
                 break;
 #endif
