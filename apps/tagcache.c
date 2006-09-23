@@ -1164,6 +1164,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     struct index_entry idx;
     long seek;
     
+    *buf = '\0';
     if (!get_index(tcs->masterfd, idxid, &idx, true))
         return false;
     
@@ -1390,7 +1391,7 @@ static void add_tagcache(const char *path)
     if (!ret)
         return ;
 
-    // logf("-> %s", path);
+    logf("-> %s", path);
     
     genrestr = id3_get_genre(&track.id3);
     
@@ -2328,7 +2329,6 @@ static bool commit(void)
         tagcache_start_scan();
 #endif
     
-    queue_post(&tagcache_queue, Q_IMPORT_CHANGELOG, 0);
     read_lock--;
     
     return true;
@@ -2594,7 +2594,7 @@ bool tagcache_import_changelog(void)
     struct master_header myhdr;
     struct tagcache_header tch;
     int clfd, masterfd;
-    char buf[512];
+    char buf[2048];
     int pos = 0;
     
     if (!stat.ready)
@@ -2673,7 +2673,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
 {
     struct master_header myhdr;
     struct index_entry idx;
-    char buf[256];
+    char buf[MAX_PATH];
     char temp[32];
     int clfd;
     int i, j;
@@ -2720,8 +2720,6 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         if (! (idx.flag & FLAG_DIRTYNUM) )
             continue;
         
-        logf("Found!");
-        
         /* Now retrieve all tags. */
         for (j = 0; j < TAG_COUNT; j++)
         {
@@ -2734,7 +2732,6 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
             
             tcs->type = j;
             tagcache_retrieve(tcs, i, buf, sizeof buf);
-            logf("tag: %s", buf);
             write_tag(clfd, tagcache_tag_to_str(j), buf);
         }
         
@@ -2965,6 +2962,28 @@ static bool tagcache_dumpsave(void)
 }
 # endif
 
+/**
+ * Returns true if there is an event waiting in the queue
+ * that requires the current operation to be aborted.
+ */
+static bool check_event_queue(void)
+{
+    struct event ev;
+    
+    queue_wait_w_tmo(&tagcache_queue, &ev, 0);
+    switch (ev.id)
+    {
+        case Q_STOP_SCAN:
+        case SYS_POWEROFF:
+        case SYS_USB_CONNECTED:
+            /* Put the event back into the queue. */
+            queue_post(&tagcache_queue, ev.id, ev.data);
+            return true;
+    }
+    
+    return false;
+}
+
 static bool load_tagcache(void)
 {
     struct tagcache_header *tch;
@@ -2973,13 +2992,14 @@ static bool load_tagcache(void)
     int rc, fd;
     char *p;
     int i, tag;
+    int yield_count = 0;
 
-    logf("loading tagcache to ram...");
-    
 # ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
         sleep(1);
 # endif
+    
+    logf("loading tagcache to ram...");
     
     fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
     if (fd < 0)
@@ -3049,7 +3069,15 @@ static bool load_tagcache(void)
         {
             long pos;
             
-            yield();
+            if (yield_count++ == 100)
+            {
+                yield();
+                /* Abort if we got a critical event in queue */
+                if (check_event_queue())
+                    return false;
+                yield_count = 0;
+            }
+            
             fe = (struct tagfile_entry *)p;
             pos = lseek(fd, 0, SEEK_CUR);
             rc = read(fd, fe, sizeof(struct tagfile_entry));
@@ -3204,7 +3232,7 @@ static bool check_deleted_files(void)
 
     lseek(fd, sizeof(struct tagcache_header), SEEK_SET);
     while (read(fd, &tfe, sizeof(struct tagfile_entry))
-           == sizeof(struct tagfile_entry) && queue_empty(&tagcache_queue))
+           == sizeof(struct tagfile_entry) && !check_event_queue())
     {
         if (tfe.tag_length >= (long)sizeof(buf)-1)
         {
@@ -3252,7 +3280,7 @@ static bool check_dir(const char *dirname)
     }
     
     /* Recursively scan the dir. */
-    while (queue_empty(&tagcache_queue))
+    while (!check_event_queue())
     {
         struct dircache_entry *entry;
 
@@ -3302,12 +3330,12 @@ static void build_tagcache(void)
     total_entry_count = 0;
     processed_dir_count = 0;
     
-    logf("updating tagcache");
-    
 #ifdef HAVE_DIRCACHE
     while (dircache_is_initializing())
         sleep(1);
 #endif
+    
+    logf("updating tagcache");
     
     cachefd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (cachefd >= 0)
@@ -3362,6 +3390,15 @@ static void build_tagcache(void)
         remove(TAGCACHE_FILE_TEMP);
         logf("tagcache built!");
     }
+    
+#ifdef HAVE_TC_RAMCACHE
+    if (hdr)
+    {
+        /* Import runtime statistics if we just initialized the db. */
+        if (hdr->h.serial == 0)
+            queue_post(&tagcache_queue, Q_IMPORT_CHANGELOG, 0);
+    }
+#endif
     
     cpu_boost(false);
 }
@@ -3500,7 +3537,6 @@ static void tagcache_thread(void)
 #endif
                 }
             
-
                 logf("tagcache check done");
     
                 check_done = true;
@@ -3528,12 +3564,19 @@ bool tagcache_prepare_shutdown(void)
     if (tagcache_get_commit_step() > 0)
         return false;
     
+    tagcache_stop_scan();
+    while (read_lock || write_lock)
+        sleep(1);
+    
+    return true;
+}
+
+void tagcache_shutdown(void)
+{
 #ifdef HAVE_EEPROM_SETTINGS
     if (stat.ramcache)
         tagcache_dumpsave();
 #endif
-    
-    return true;
 }
 
 static int get_progress(void)

@@ -160,6 +160,7 @@ bool tagcache_modify_numeric_entry(struct tagcache_search *tcs,
 struct tagcache_stat* tagcache_get_stat(void);
 int tagcache_get_commit_step(void);
 bool tagcache_prepare_shutdown(void);
+void tagcache_shutdown(void);
 
 #ifdef HAVE_TC_RAMCACHE
 bool tagcache_is_ramcache(void);

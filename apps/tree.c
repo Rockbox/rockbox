@@ -1367,7 +1367,7 @@ void ft_play_filename(char *dir, char *file)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
-    tagcache_stop_scan();
+    tagcache_shutdown();
     playlist_shutdown();
 
 #ifdef HAVE_TC_RAMCACHE

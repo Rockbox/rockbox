@@ -494,8 +494,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef X5_BACKLIGHT_SHUTDOWN
         x5_backlight_shutdown();
 #endif
-        gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
-        
         if (!tagcache_prepare_shutdown())
         {
             cancel_shutdown();
@@ -503,6 +501,12 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             return false;
         }
     
+        gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+        
+        audio_stop();
+        while (audio_status())
+            sleep(1);
+        
         if (callback != NULL)
             callback(parameter);
 
