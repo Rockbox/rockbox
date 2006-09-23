@@ -357,6 +357,8 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_FM:
+            return button_context_radio;
 
         case CONTEXT_MAINMENU:
             return button_context_menu;

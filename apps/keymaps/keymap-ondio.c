@@ -162,6 +162,12 @@ const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_RECORD,        BUTTON_MENU | BUTTON_REL,              BUTTON_NONE },
     { ACTION_FM_STOP,          BUTTON_OFF | BUTTON_REL,               BUTTON_OFF },
     { ACTION_FM_EXIT,          BUTTON_OFF | BUTTON_REPEAT,            BUTTON_OFF },
+    { ACTION_STD_PREV,         BUTTON_LEFT,                           BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,   BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },
+    { ACTION_STD_NEXT,         BUTTON_RIGHT,                          BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,   BUTTON_RIGHT|BUTTON_REPEAT,            BUTTON_NONE },
+    
+    
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
     
@@ -197,6 +203,8 @@ const struct button_mapping* get_context_mapping( int context )
             return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_FM:
+            return button_context_radio;
 
         case CONTEXT_LIST:
         case CONTEXT_MAINMENU:
