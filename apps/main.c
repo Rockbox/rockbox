@@ -417,7 +417,7 @@ void init(void)
 
     settings_calc_config_sector();
     
-#if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+#if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #ifdef SETTINGS_RESET
     /* Reset settings if holding the rec button. */
     if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)

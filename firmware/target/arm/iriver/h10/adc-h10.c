@@ -81,21 +81,12 @@ void adc_init(void)
     
     /* Initialise */
     ADC_INIT=0;
-    ADC_ADDR=0x130;
-    ADC_STATUS=0;
-    
-    /* Enable Channels 1-4 */
-    ADC_ADDR |= 0x1000000;
-    ADC_ADDR |= 0x2000000;
-    ADC_ADDR |= 0x4000000;
-    ADC_ADDR |= 0x8000000;
-    
-    /* Start? */
-    ADC_ADDR |= 0x20000000;
-    ADC_ADDR |= 0x80000000;
-    
-    /* Wait 50ms for things to settle */
-    sleep(HZ/20);
+
+    /* Force a scan of all channels to get initial values */
+    adc_scan(ADC_BATTERY);
+    adc_scan(ADC_UNKNOWN_1);
+    adc_scan(ADC_UNKNOWN_2);
+    adc_scan(ADC_SCROLLPAD);
     
     tick_add_task(adc_tick);
 }

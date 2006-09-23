@@ -1123,7 +1123,17 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "GPIO_F: %02x  GPIO_L: %02x", gpio_f, gpio_l);
         lcd_puts(0, line++, buf);
-
+#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
+        line++;
+        snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_read(ADC_BATTERY));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_UNKNOWN_1:  %02x", adc_read(ADC_UNKNOWN_1));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_UNKNOWN_2: %02x", adc_read(ADC_UNKNOWN_2));
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_SCROLLPAD: %02x", adc_read(ADC_SCROLLPAD));
+        lcd_puts(0, line++, buf);
+#endif
         lcd_update();
         if (action_userabort(HZ/10))
             return false;

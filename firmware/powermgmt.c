@@ -169,6 +169,10 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     105, 115    /* alkaline, NiHM */
 #elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
     339
+#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
+    378
+#elif CONFIG_BATTERY == BATT_BP009 /* iriver H10 5/6GB */
+    378
 #else /* Player/recorder, NiMH */
     475
 #endif
@@ -190,6 +194,12 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
      * for the 1300 mAh stock battery. */
 //  { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
     { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
+#elif CONFIG_BATTERY == BATT_LPCS355385
+    /* iriver H10 20GB */
+    { 378, 382, 386, 390, 395, 399, 404, 408, 413, 417, 422 }
+#elif CONFIG_BATTERY == BATT_BP009
+    /* iriver H10 5/6GB: Same as 20GB for now */
+    { 378, 382, 386, 390, 395, 399, 404, 408, 413, 417, 422 }
 #elif CONFIG_BATTERY == BATT_1AA
     /* These values are the same as for 3AAA divided by 3. */
     /* May need recalibration. */
@@ -213,6 +223,12 @@ static const short percent_to_volt_charge[11] =
     /* Calibrated for 1900 mAh Ionity battery (estimated 90% charge when
      entering in trickle-charging). We will never reach 100%. */
     340, 390, 394, 399, 400, 404, 407, 413, 417, 422, 426
+#elif CONFIG_BATTERY == BATT_LPCS355385
+    /* iriver H10 20GB: Same as iPod for now */
+    388, 392, 396, 400, 406, 410, 415, 419, 424, 428, 433
+#elif CONFIG_BATTERY == BATT_BP009
+    /* iriver H10 5/6GB: Same as iPod for now */
+    388, 392, 396, 400, 406, 410, 415, 419, 424, 428, 433
 #else
     /* values guessed, see
        http://www.seattlerobotics.org/encoder/200210/LiIon2.pdf until someone
