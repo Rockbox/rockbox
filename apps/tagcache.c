@@ -2853,6 +2853,28 @@ static bool delete_entry(long idx_id)
     return true;
 }
 
+/**
+ * Returns true if there is an event waiting in the queue
+ * that requires the current operation to be aborted.
+ */
+static bool check_event_queue(void)
+{
+    struct event ev;
+    
+    queue_wait_w_tmo(&tagcache_queue, &ev, 0);
+    switch (ev.id)
+    {
+        case Q_STOP_SCAN:
+        case SYS_POWEROFF:
+        case SYS_USB_CONNECTED:
+            /* Put the event back into the queue. */
+            queue_post(&tagcache_queue, ev.id, ev.data);
+            return true;
+    }
+    
+    return false;
+}
+
 #ifdef HAVE_TC_RAMCACHE
 static bool allocate_tagcache(void)
 {
@@ -2961,28 +2983,6 @@ static bool tagcache_dumpsave(void)
     return true;
 }
 # endif
-
-/**
- * Returns true if there is an event waiting in the queue
- * that requires the current operation to be aborted.
- */
-static bool check_event_queue(void)
-{
-    struct event ev;
-    
-    queue_wait_w_tmo(&tagcache_queue, &ev, 0);
-    switch (ev.id)
-    {
-        case Q_STOP_SCAN:
-        case SYS_POWEROFF:
-        case SYS_USB_CONNECTED:
-            /* Put the event back into the queue. */
-            queue_post(&tagcache_queue, ev.id, ev.data);
-            return true;
-    }
-    
-    return false;
-}
 
 static bool load_tagcache(void)
 {
