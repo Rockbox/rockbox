@@ -24,6 +24,9 @@
 #include "kernel.h"
 #include "cpu.h"
 #include "string.h"
+#ifdef RB_PROFILE
+#include <profile.h>
+#endif
 
 #define DEADBEEF ((unsigned int)0xdeadbeef)
 /* Cast to the the machine int type, whose size could be < 4. */
@@ -66,13 +69,6 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 
 static inline void store_context(void* addr) __attribute__ ((always_inline));
 static inline void load_context(const void* addr) __attribute__ ((always_inline));
-
-#ifdef RB_PROFILE
-#include <profile.h>
-void profile_thread(void) {
-    profstart(cores[CURRENT_CORE].current_thread);
-}
-#endif
 
 #if defined(CPU_ARM)
 /*---------------------------------------------------------------------------
@@ -371,6 +367,10 @@ static int get_threadnum(struct thread_entry *thread)
     }
     
     return -1;
+}
+
+void profile_thread(void) {
+    profstart(get_threadnum(cores[CURRENT_CORE].running));
 }
 #endif
 

@@ -43,16 +43,6 @@ static int              enc_channels;
 
 static long input_buffer[CHUNK_SIZE/2] IBSS_ATTR;
 
-void *memset(void *s, int c, size_t n)
-{
-    return(ci->memset(s,c,n));
-}
-
-void *memcpy(void *dest, const void *src, size_t n)
-{
-    return(ci->memcpy(dest,src,n));
-}
-
 /* update file header info callback function */
 void enc_set_header(void *head_buffer,    /* ptr to the file header data     */
                     int  head_size,       /* size of this header data        */
@@ -112,6 +102,8 @@ enum codec_status codec_start(struct codec_api* api)
     bool           cpu_boosted = true; /* start boosted */
 
     ci = api; // copy to global api pointer
+    
+    codec_init(ci);
 
     if(ci->enc_get_inputs          == NULL ||
        ci->enc_set_parameters      == NULL ||
