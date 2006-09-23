@@ -1039,6 +1039,7 @@ bool rectrigger(void)
     peak_meter_trigger(false);
     lcd_setfont(FONT_UI);
     lcd_setmargins(old_x_margin, old_y_margin);
+    action_signalscreenchange();
     return retval;
 }
 #endif
