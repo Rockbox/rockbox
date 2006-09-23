@@ -670,13 +670,35 @@ const struct button_mapping button_context_radio_h100remote[]  = {
     { ACTION_FM_EXIT,        BUTTON_RC_MODE | BUTTON_REL,            BUTTON_RC_MODE },
     { ACTION_FM_PLAY,        BUTTON_RC_ON | BUTTON_REL,              BUTTON_RC_ON },
     { ACTION_FM_NEXT_PRESET, BUTTON_RC_BITRATE,                      BUTTON_NONE },
-    { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                      BUTTON_NONE },
+    { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                       BUTTON_NONE },
+    { ACTION_SETTINGS_INC,       BUTTON_RC_VOL_UP,                   BUTTON_NONE },
+    { ACTION_SETTINGS_INCREPEAT, BUTTON_RC_VOL_UP|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_SETTINGS_DEC,       BUTTON_RC_VOL_DOWN,                 BUTTON_NONE },
+    { ACTION_SETTINGS_DECREPEAT, BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_RC_REW,                          BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT, BUTTON_RC_REW|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_STD_NEXT,       BUTTON_RC_FF,                           BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT, BUTTON_RC_FF|BUTTON_REPEAT,             BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+};
+
+const struct button_mapping button_context_radio_h300lcdremote[] = {
+    { ACTION_FM_MENU,        BUTTON_RC_MENU | BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_FM_PRESET,      BUTTON_RC_MENU | BUTTON_REL,            BUTTON_RC_MENU },
+    { ACTION_FM_STOP,        BUTTON_RC_STOP,                         BUTTON_NONE },
+    { ACTION_FM_MODE,        BUTTON_RC_ON | BUTTON_REPEAT,           BUTTON_RC_ON },
+    { ACTION_FM_EXIT,        BUTTON_RC_MODE | BUTTON_REL,            BUTTON_RC_MODE },
+    { ACTION_FM_PLAY,        BUTTON_RC_ON | BUTTON_REL,              BUTTON_RC_ON },
+    { ACTION_FM_NEXT_PRESET, BUTTON_RC_BITRATE,                      BUTTON_NONE },
+    { ACTION_FM_PREV_PRESET, BUTTON_RC_SOURCE,                       BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_RC_REW,                          BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT, BUTTON_RC_REW|BUTTON_REPEAT,            BUTTON_NONE },
+    { ACTION_STD_NEXT,       BUTTON_RC_FF,                           BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT, BUTTON_RC_FF|BUTTON_REPEAT,             BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 };
-
-const struct button_mapping *button_context_radio_h300lcdremote =
-                button_context_radio_h100remote;
 
 /* the actual used tables */
 static const struct button_mapping 

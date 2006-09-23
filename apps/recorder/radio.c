@@ -73,6 +73,8 @@
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define FM_PRESET
 #define FM_MODE
+#define FM_NEXT_PRESET
+#define FM_PREV_PRESET
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 #define FM_PRESET
@@ -759,8 +761,6 @@ bool radio_screen(void)
 
         if (button != ACTION_NONE)
             lastbutton = button;
-
-       // action_signalscreenchange();
 
 #if CONFIG_CODEC != SWCODEC
         peak_meter_peek();
