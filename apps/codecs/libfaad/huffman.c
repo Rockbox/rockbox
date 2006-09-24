@@ -50,7 +50,9 @@ static uint8_t huffman_binary_quad_sign(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_pair(uint8_t cb, bitfile *ld, int16_t *sp);
 static uint8_t huffman_binary_pair_sign(uint8_t cb, bitfile *ld, int16_t *sp);
 static int16_t huffman_codebook(uint8_t i);
+#ifdef ERROR_RESILIENCE
 static void vcb11_check_LAV(uint8_t cb, int16_t *sp);
+#endif
 
 int8_t huffman_scale_factor(bitfile *ld)
 {
@@ -311,6 +313,7 @@ static int16_t huffman_codebook(uint8_t i)
     else        return (int16_t)data & 0xFFFF;
 }
 
+#ifdef ERROR_RESILIENCE
 static void vcb11_check_LAV(uint8_t cb, int16_t *sp)
 {
     static const uint16_t vcb11_LAV_tab[] = {
@@ -330,6 +333,7 @@ static void vcb11_check_LAV(uint8_t cb, int16_t *sp)
         sp[1] = 0;
     }
 }
+#endif
 
 uint8_t huffman_spectral_data(uint8_t cb, bitfile *ld, int16_t *sp)
 {
