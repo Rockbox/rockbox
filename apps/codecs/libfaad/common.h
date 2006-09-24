@@ -113,7 +113,7 @@ extern struct codec_api* ci;
 
 
 // Define LC_ONLY_DECODER if you want a pure AAC LC decoder (independant of SBR_DEC and PS_DEC)
-//#define LC_ONLY_DECODER
+#define LC_ONLY_DECODER
 #ifdef LC_ONLY_DECODER
   #undef LD_DEC
   #undef LTP_DEC

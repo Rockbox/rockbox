@@ -37,7 +37,7 @@ extern "C" {
 #pragma warning(disable:4244)
 #endif
 
-ALIGN static const real_t sine_long_1024[] =
+ALIGN static const real_t sine_long_1024[] ICONST_ATTR =
 {
     FRAC_CONST(0.00076699031874270449),
     FRAC_CONST(0.002300969151425805),
@@ -2031,7 +2031,7 @@ ALIGN static const real_t sine_long_960[] =
 };
 #endif
 
-ALIGN static const real_t sine_short_128[] =
+ALIGN static const real_t sine_short_128[] ICONST_ATTR =
 {
     FRAC_CONST(0.0061358846491544753),
     FRAC_CONST(0.01840672990580482),

@@ -35,7 +35,7 @@ extern "C" {
 #ifdef FIXED_POINT
 
 /* 256 (N/4) complex twiddle factors */
-ALIGN static const complex_t mdct_tab_2048[] =
+ALIGN static const complex_t mdct_tab_2048[] ICONST_ATTR =
 {
     { FRAC_CONST(0.999999926465718), FRAC_CONST(0.000383495187571) },
     { FRAC_CONST(0.999994043728986), FRAC_CONST(0.003451449920136) },
@@ -552,7 +552,7 @@ ALIGN static const complex_t mdct_tab_2048[] =
 };
 
 /* 64 (N/4) complex twiddle factors */
-ALIGN static const complex_t mdct_tab_256[] =
+ALIGN static const complex_t mdct_tab_256[] ICONST_ATTR =
 {
     { FRAC_CONST(0.999995293809576), FRAC_CONST(0.003067956762966) },
     { FRAC_CONST(0.999618822495179), FRAC_CONST(0.027608145778966) },

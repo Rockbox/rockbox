@@ -960,7 +960,17 @@ cfft_info *cffti(uint16_t n)
     cfft_info *cfft = (cfft_info*)faad_malloc(sizeof(cfft_info));
 
     cfft->n = n;
-    cfft->work = (complex_t*)faad_malloc(n*sizeof(complex_t));
+
+    if (n <= 512)
+    {
+        static complex_t work_buf[512] IBSS_ATTR;
+    
+        cfft->work = work_buf;
+    }
+    else
+    {
+        cfft->work = (complex_t*)faad_malloc(n*sizeof(complex_t));
+    }
 
 #ifndef FIXED_POINT
     cfft->tab = (complex_t*)faad_malloc(n*sizeof(complex_t));

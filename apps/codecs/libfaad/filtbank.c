@@ -127,6 +127,7 @@ static INLINE void imdct_long(fb_info *fb, real_t *in_data, real_t *out_data, ui
 
     faad_imdct(mdct, in_data, out_data);
 #else
+    (void) len;
     faad_imdct(fb->mdct2048, in_data, out_data);
 #endif
 }
@@ -159,7 +160,7 @@ static INLINE void mdct(fb_info *fb, real_t *in_data, real_t *out_data, uint16_t
 }
 #endif
 
-ALIGN real_t transf_buf[2*1024] = {0};
+ALIGN real_t transf_buf[2*1024] IBSS_ATTR;
 
 void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
                   uint8_t window_shape_prev, real_t *freq_in,
@@ -191,6 +192,8 @@ void ifilter_bank(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
         window_long       = fb->ld_window[window_shape];
         window_long_prev  = fb->ld_window[window_shape_prev];
     } else {
+#else
+        (void) object_type;
 #endif
         window_long       = fb->long_window[window_shape];
         window_long_prev  = fb->long_window[window_shape_prev];
@@ -359,6 +362,8 @@ void filter_bank_ltp(fb_info *fb, uint8_t window_sequence, uint8_t window_shape,
         window_long       = fb->ld_window[window_shape];
         window_long_prev  = fb->ld_window[window_shape_prev];
     } else {
+#else
+        (void) object_type;
 #endif
         window_long       = fb->long_window[window_shape];
         window_long_prev  = fb->long_window[window_shape_prev];

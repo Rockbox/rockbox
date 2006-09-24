@@ -34,7 +34,7 @@ extern "C" {
 
 #ifdef FIXED_POINT
 
-ALIGN static const complex_t cfft_tab_512[] =
+ALIGN static const complex_t cfft_tab_512[] ICONST_ATTR =
 {
     { FRAC_CONST(1.000000000000000), FRAC_CONST(0.000000000000000) },
     { FRAC_CONST(0.999924719333649), FRAC_CONST(0.012271538376808) },
@@ -1036,7 +1036,7 @@ ALIGN static const complex_t cfft_tab_480[] =
 };
 #endif
 
-ALIGN static const complex_t cfft_tab_64[] =
+ALIGN static const complex_t cfft_tab_64[] ICONST_ATTR =
 {
     { FRAC_CONST(1.000000000000000), FRAC_CONST(0.000000000000000) },
     { FRAC_CONST(0.995184719562531), FRAC_CONST(0.098017141222954) },
@@ -1680,7 +1680,7 @@ ALIGN static const complex_t cfft_tab_240[] =
 
 #endif
 
-ALIGN static const complex_t cfft_tab_128[] =
+ALIGN static const complex_t cfft_tab_128[] ICONST_ATTR =
 {
     { FRAC_CONST(1.000000000000000), FRAC_CONST(0.000000000000000) },
     { FRAC_CONST(0.998795449733734), FRAC_CONST(0.049067676067352) },

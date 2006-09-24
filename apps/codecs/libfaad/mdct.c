@@ -126,7 +126,7 @@ void faad_imdct(mdct_info *mdct, real_t *X_in, real_t *X_out)
     real_t scale = 0, b_scale = 0;
 #endif
 #endif
-    ALIGN static complex_t Z1[512];
+    ALIGN static complex_t Z1[512] IBSS_ATTR;
     complex_t *sincos = mdct->sincos;
 
     uint16_t N  = mdct->N;

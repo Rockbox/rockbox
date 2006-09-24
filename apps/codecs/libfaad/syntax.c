@@ -559,7 +559,7 @@ void raw_data_block(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
 /* Table 4.4.4 and */
 /* Table 4.4.9 */
 ALIGN int16_t spec_data[1024] = {0};
-element sce IBSS_ATTR;
+element sce;
 static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
                                           uint8_t channel, uint8_t *tag)
 {
@@ -603,9 +603,9 @@ static uint8_t single_lfe_channel_element(NeAACDecHandle hDecoder, bitfile *ld,
 }
 
 /* Table 4.4.5 */
-ALIGN int16_t spec_data1[1024];
-ALIGN int16_t spec_data2[1024];
-element cpe IBSS_ATTR;
+ALIGN int16_t spec_data1[1024] IBSS_ATTR;
+ALIGN int16_t spec_data2[1024] IBSS_ATTR;
+element cpe;
 static uint8_t channel_pair_element(NeAACDecHandle hDecoder, bitfile *ld,
                                     uint8_t channels, uint8_t *tag)
 {
@@ -833,6 +833,8 @@ static uint8_t ics_info(NeAACDecHandle hDecoder, ic_stream *ics, bitfile *ld,
                 }
 #endif
             }
+#else
+            (void) common_window;
 #endif
         }
     }
@@ -1166,8 +1168,8 @@ static void gain_control_data(bitfile *ld, ic_stream *ics)
 #endif
 
 #ifdef SCALABLE_DEC
-ALIGN int16_t spec_data1[1024] IBSS_ATTR;
-ALIGN int16_t spec_data2[1024] IBSS_ATTR;
+ALIGN int16_t spec_data1[1024];
+ALIGN int16_t spec_data2[1024];
 /* Table 4.4.13 ASME */
 void aac_scalable_main_element(NeAACDecHandle hDecoder, NeAACDecFrameInfo *hInfo,
                                bitfile *ld, program_config *pce, drc_info *drc)
@@ -1610,6 +1612,8 @@ static uint8_t section_data(NeAACDecHandle hDecoder, ic_stream *ics, bitfile *ld
 #ifdef ERROR_RESILIENCE
             if (hDecoder->aacSectionDataResilienceFlag)
                 sect_cb_bits = 5;
+#else
+            (void) hDecoder;
 #endif
 
             ics->sect_cb[g][i] = (uint8_t)faad_getbits(ld, sect_cb_bits
@@ -1797,6 +1801,8 @@ static uint8_t scale_factor_data(NeAACDecHandle hDecoder, ic_stream *ics, bitfil
 #ifdef ERROR_RESILIENCE
     if (!hDecoder->aacScalefactorDataResilienceFlag)
     {
+#else
+            (void) hDecoder;
 #endif
         ret = decode_scale_factors(ics, ld);
 #ifdef ERROR_RESILIENCE
