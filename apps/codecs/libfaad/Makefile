@@ -16,7 +16,7 @@ endif
 
 FAADOPTS = -O2 -Wno-char-subscripts
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(FAADOPTS) $(TARGET)	\
- $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE}
+ $(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc

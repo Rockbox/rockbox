@@ -71,22 +71,15 @@ static INLINE real_t MUL_F(real_t A, real_t B)
     return A;
 }
 
-#if 0
-/* this currently provokes an ICE in gcc 3.4.x */
 static INLINE real_t MUL_C(real_t A, real_t B)
 {
     asm volatile (
         "mac.l %[A], %[B], %%acc0\n\t"
         "movclr.l %%acc0, %[A]\n\t"
-        "asl.l #3, %[A]"
         : [A] "+&d" (A) : [B] "r" (B)
     );
-    return A;
+    return A << 3;
 }
-#else
-/* keep this one around until the ICE is solved */
-#define MUL_C(A,B) (real_t)(((int64_t)(A)*(int64_t)(B)+(1 << (COEF_BITS-1))) >> COEF_BITS)
-#endif
 
 /* MUL_R needs too many shifts for us to just operate on the top 32 bits the
    emac unit gives as usual, so we do a full 64 bit mul here. */
