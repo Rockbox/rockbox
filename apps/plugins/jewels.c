@@ -50,8 +50,8 @@ PLUGIN_HEADER
 #define JEWELS_RIGHT  BUTTON_RIGHT
 #define JEWELS_SELECT BUTTON_SELECT
 #define JEWELS_CANCEL BUTTON_OFF
-
 #define JEWELS_RC_CANCEL BUTTON_RC_STOP
+
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define JEWELS_SCROLLWHEEL
 #define JEWELS_UP     BUTTON_MENU
@@ -98,16 +98,16 @@ PLUGIN_HEADER
     #error JEWELS: Unsupported keypad
 #endif
 
-/* use 30x30 tiles (iPod Video) */
-#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
+/* use 30x30 tiles (iPod Video, Gigabeat) */
+#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320) || \
+      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
 #define TILE_WIDTH  30
 #define TILE_HEIGHT 30
 #define YOFS 0
 #define NUM_SCORES 10
 
-/* use 22x22 tiles (H300, iPod Color, Gigabeat) */
-#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220)) || \
-      ((LCD_HEIGHT == 320) && (LCD_WIDTH == 240))
+/* use 22x22 tiles (H300, iPod Color) */
+#elif ((LCD_HEIGHT == 176) && (LCD_WIDTH == 220))
 #define TILE_WIDTH  22
 #define TILE_HEIGHT 22
 #define YOFS 0
@@ -124,6 +124,13 @@ PLUGIN_HEADER
 #elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
 #define TILE_WIDTH  16
 #define TILE_HEIGHT 16
+#define YOFS 0
+#define NUM_SCORES 10
+
+/* use 14x14 tiles (H10 5/6 GB) */
+#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 128)
+#define TILE_WIDTH  14
+#define TILE_HEIGHT 14
 #define YOFS 0
 #define NUM_SCORES 10
 
@@ -314,17 +321,12 @@ static void jewels_drawboard(struct game_context* bj) {
     int w, h;
     unsigned int tempscore;
     char *title = "Level";
-    char str[6];
+    char str[10];
 
     tempscore = (bj->score>LEVEL_PTS ? LEVEL_PTS : bj->score);
 
     /* clear screen */
     rb->lcd_clear_display();
-
-    /* draw separator lines */
-    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT);
-    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH, 18);
-    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH, LCD_HEIGHT-10);
 
     /* dispay playing board */
     for(i=0; i<BJ_HEIGHT-1; i++){
@@ -345,6 +347,14 @@ static void jewels_drawboard(struct game_context* bj) {
 #endif
         }
     }
+
+#if LCD_WIDTH > LCD_HEIGHT /* horizontal layout */
+
+    /* draw separator lines */
+    jewels_setcolors();
+    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, LCD_HEIGHT-1);
+    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, 18);
+    rb->lcd_hline(BJ_WIDTH*TILE_WIDTH, LCD_WIDTH-1, LCD_HEIGHT-10);
 
     /* draw progress bar */
 #ifdef HAVE_LCD_COLOR
@@ -382,6 +392,86 @@ static void jewels_drawboard(struct game_context* bj) {
     rb->lcd_getstringsize(str, &w, &h);
     rb->lcd_putsxy(LCD_WIDTH-(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-w/2,
                    LCD_HEIGHT-8, str);
+
+#elif LCD_WIDTH < LCD_HEIGHT /* vertical layout */
+
+    /* draw separator lines */
+    jewels_setcolors();
+    rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
+    rb->lcd_hline(0, LCD_WIDTH-1, LCD_HEIGHT-14);
+    rb->lcd_vline(LCD_WIDTH/2, LCD_HEIGHT-14, LCD_HEIGHT-1);
+
+    /* draw progress bar */
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
+#endif
+    rb->lcd_fillrect(0, (8*TILE_HEIGHT+YOFS)
+                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
+                     LCD_WIDTH*tempscore/LEVEL_PTS,
+                     (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
+    rb->lcd_drawrect(1, (8*TILE_HEIGHT+YOFS)
+                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4+1,
+                     LCD_WIDTH*tempscore/LEVEL_PTS-1,
+                     (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2-2);
+    jewels_setcolors();
+    rb->lcd_drawrect(0, (8*TILE_HEIGHT+YOFS)
+                           +(LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/4,
+                     LCD_WIDTH*tempscore/LEVEL_PTS+1,
+                     (LCD_HEIGHT-14-(8*TILE_HEIGHT+YOFS))/2);
+#endif
+
+    /* print text */
+    rb->snprintf(str, 10, "%s %d", title, bj->level);
+    rb->lcd_putsxy(1, LCD_HEIGHT-10, str);
+
+    rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+    rb->lcd_getstringsize(str, &w, &h);
+    rb->lcd_putsxy((LCD_WIDTH-2)-w, LCD_HEIGHT-10, str);
+
+#else /* square layout */
+
+    /* draw separator lines */
+    jewels_setcolors();
+    rb->lcd_hline(0, LCD_WIDTH-1, 8*TILE_HEIGHT+YOFS);
+    rb->lcd_vline(BJ_WIDTH*TILE_WIDTH, 0, 8*TILE_HEIGHT+YOFS);
+    rb->lcd_vline(LCD_WIDTH/2, 8*TILE_HEIGHT+YOFS, LCD_HEIGHT-1);
+
+    /* draw progress bar */
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(104, 63, 63));
+#endif
+    rb->lcd_fillrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+                     (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
+                        *tempscore/LEVEL_PTS,
+                     (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
+                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(LCD_RGBPACK(83, 44, 44));
+    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4+1,
+                     (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
+                        *tempscore/LEVEL_PTS+1,
+                     (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2-2,
+                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS-1);
+    jewels_setcolors();
+    rb->lcd_drawrect(BJ_WIDTH*TILE_WIDTH+(LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/4,
+                     (8*TILE_HEIGHT+YOFS)-(8*TILE_HEIGHT+YOFS)
+                        *tempscore/LEVEL_PTS,
+                     (LCD_WIDTH-BJ_WIDTH*TILE_WIDTH)/2,
+                     (8*TILE_HEIGHT+YOFS)*tempscore/LEVEL_PTS+1);
+#endif
+
+    /* print text */
+    rb->snprintf(str, 10, "%s %d", title, bj->level);
+    rb->lcd_putsxy(1, LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
+
+    rb->snprintf(str, 6, "%d", (bj->level-1)*LEVEL_PTS+bj->score);
+    rb->lcd_getstringsize(str, &w, &h);
+    rb->lcd_putsxy((LCD_WIDTH-2)-w,
+                   LCD_HEIGHT-(LCD_HEIGHT-(8*TILE_HEIGHT+YOFS))/2-3, str);
+
+#endif /* layout */
 
     rb->lcd_update();
 }
