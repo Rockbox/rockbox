@@ -893,7 +893,7 @@ bool radio_screen(void)
         while(1)
         {
             button = get_action(CONTEXT_FM, TIMEOUT_BLOCK);
-            if(button == (ACTION_FM_STOP | BUTTON_REL))
+            if(button == ACTION_FM_STOP)
                 break;
         }
     }
