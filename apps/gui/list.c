@@ -722,7 +722,9 @@ void gui_synclist_scroll_left(struct gui_synclist * lists)
 
 unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 {
+#ifdef HAVE_LCD_BITMAP
     static bool scrolling_left = false;
+#endif
 
     gui_synclist_limit_scroll(lists, true);
     switch(button)
