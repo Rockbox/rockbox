@@ -704,6 +704,9 @@ static int button_flip(int button)
 #if defined(BUTTON_UP) && defined(BUTTON_DOWN)
         | BUTTON_UP | BUTTON_DOWN
 #endif
+#if defined(BUTTON_SCROLL_UP) && defined(BUTTON_SCROLL_DOWN)
+        | BUTTON_SCROLL_UP | BUTTON_SCROLL_DOWN
+#endif
 #if CONFIG_KEYPAD == RECORDER_PAD
         | BUTTON_F1 | BUTTON_F3
 #endif
@@ -718,6 +721,12 @@ static int button_flip(int button)
         newbutton |= BUTTON_DOWN;
     if (button & BUTTON_DOWN)
         newbutton |= BUTTON_UP;
+#endif
+#if defined(BUTTON_SCROLL_UP) && defined(BUTTON_SCROLL_DOWN)
+    if (button & BUTTON_SCROLL_UP)
+        newbutton |= BUTTON_SCROLL_DOWN;
+    if (button & BUTTON_SCROLL_DOWN)
+        newbutton |= BUTTON_SCROLL_UP;
 #endif
 #if CONFIG_KEYPAD == RECORDER_PAD
     if (button & BUTTON_F1)

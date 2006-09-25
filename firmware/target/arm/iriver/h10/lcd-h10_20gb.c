@@ -169,8 +169,10 @@ void lcd_set_flip(bool yesno)
     if (!power_on)
         return;
 
+    /* SCN4-0=000x0 (G1/G160) */
+    lcd_write_reg(R_GATE_SCAN_START_POS, yesno ? 0x0002 : 0x0000);
     /* SM=0, GS=x, SS=x, NL4-0=10011 (G1-G160) */
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x0013 : 0x0113);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x0213 : 0x0113);
     /* HEA7-0=0xxx, HSA7-0=0xxx */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS, y_offset ? 0x8304 : 0x7f00);
 }
