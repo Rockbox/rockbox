@@ -344,7 +344,7 @@ static bool contrast(void)
 #endif /* HAVE_LCD_CONTRAST */
 
 #ifdef HAVE_LCD_BITMAP
-#ifndef HAVE_LCD_COLOR
+#ifdef HAVE_LCD_INVERT
  /**
  * Menu to set LCD Mode (normal/inverse)
  */
@@ -357,7 +357,7 @@ static bool invert(void)
                                lcd_set_invert_display);
     return rc;
 }
-#endif /* HAVE_LCD_COLOR */
+#endif /* HAVE_LCD_INVERT */
 
 #ifdef HAVE_LCD_FLIP
 /**
@@ -1868,7 +1868,7 @@ static bool lcd_settings_menu(void)
         { ID2P(LANG_CONTRAST),        contrast },
 #endif
 #ifdef HAVE_LCD_BITMAP
-#ifndef HAVE_LCD_COLOR
+#ifdef HAVE_LCD_INVERT
         { ID2P(LANG_INVERT),          invert },
 #endif
 #ifdef HAVE_LCD_FLIP

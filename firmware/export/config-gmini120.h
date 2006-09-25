@@ -7,6 +7,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_M41ST84W
 

@@ -12,6 +12,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 /* define this if you have access to the pitchscreen */

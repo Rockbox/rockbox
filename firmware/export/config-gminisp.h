@@ -4,6 +4,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64

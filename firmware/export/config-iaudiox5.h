@@ -15,6 +15,9 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you can invert the colours on your LCD */
+#define HAVE_LCD_INVERT
+
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
