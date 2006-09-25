@@ -573,7 +573,7 @@ static void remote_tick(void)
 void lcd_remote_init(void)
 {
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
 #else /* !SIMULATOR */
 
@@ -605,7 +605,7 @@ void lcd_remote_init(void)
     queue_init(&remote_scroll_queue, false);
     tick_add_task(remote_tick);
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
 
 /*** update functions ***/

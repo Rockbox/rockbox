@@ -76,7 +76,7 @@ void lcd_init(void)
     /* Call device specific init */
     lcd_init_device();
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
 
 /*** parameter handling ***/

@@ -144,7 +144,7 @@ void lcd_set_flip(bool yesno)
 void lcd_init(void)
 {
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
 #else
 
@@ -193,7 +193,7 @@ void lcd_init(void)
     lcd_write_command(LCD_CNTL_ON_OFF | 1); /* LCD ON */
 
     create_thread(scroll_thread, scroll_stack,
-                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_SYSTEM));
+                  sizeof(scroll_stack), scroll_name IF_PRIO(, PRIORITY_USER_INTERFACE));
 }
 
 /*** update functions ***/
