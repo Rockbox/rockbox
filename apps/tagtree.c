@@ -115,6 +115,9 @@ struct root_menu {
     struct menu_entry *items[TAGMENU_MAX_ITEMS];
 };
 
+/* Statusbar text of the current view. */
+static char current_title[MAX_TAGS][128];
+
 static struct root_menu menus[TAGMENU_MAX_MENUS];
 static struct root_menu *menu;
 static struct search_instruction *csi;
@@ -680,6 +683,10 @@ static bool parse_menu(const char *filename)
                     break;
                 
                 case var_rootmenu:
+                    /* Only set root menu once. */
+                    if (root_menu)
+                        break;
+                
                     if (get_token_str(data, sizeof(data)) < 0)
                     {
                         logf("%root_menu empty");
@@ -1146,6 +1153,9 @@ int tagtree_enter(struct tree_context* c)
                 csi = menu->items[seek]->si;
                 c->currextra = 0;
                 
+                strncpy(current_title[c->currextra], dptr->name, 
+                        sizeof(current_title[0]) - 1);
+    
                 /* Read input as necessary. */
                 for (i = 0; i < csi->tagorder_count; i++)
                 {
@@ -1202,6 +1212,10 @@ int tagtree_enter(struct tree_context* c)
                 c->currextra++;
             else
                 c->dirlevel--;
+        
+            /* Update the statusbar title */
+            strncpy(current_title[c->currextra], dptr->name, 
+                    sizeof(current_title[0]) - 1);
             break;
         
         default:
@@ -1421,10 +1435,8 @@ char *tagtree_get_title(struct tree_context* c)
             return menu->title;
         
         case navibrowse:
-            return (char *)tagcache_tag_to_str(csi->tagorder[c->currextra]);
-
         case allsubentries:
-            return "Tracks";
+            return current_title[c->currextra];
     }
     
     return "?";
