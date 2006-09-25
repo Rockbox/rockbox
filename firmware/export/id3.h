@@ -42,6 +42,7 @@ enum {
     AFMT_SHN,          /* Shorten */
     AFMT_AIFF,         /* Audio Interchange File Format */
     AFMT_SID,          /* SID File Format */
+    AFMT_ADX,          /* ADX */
 
     /* New formats must be added to the end of this list */
 

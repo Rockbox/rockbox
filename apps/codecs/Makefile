@@ -50,6 +50,7 @@ $(BUILDDIR)/%.a : % $(CODECDEPS)
 
 $(OBJDIR)/wav.elf : $(OBJDIR)/wav.o
 $(OBJDIR)/sid.elf : $(OBJDIR)/sid.o
+$(OBJDIR)/adx.elf : $(OBJDIR)/adx.o
 $(OBJDIR)/aiff.elf : $(OBJDIR)/aiff.o
 $(OBJDIR)/mpa.elf : $(OBJDIR)/mpa.o $(BUILDDIR)/libmad.a
 $(OBJDIR)/a52.elf : $(OBJDIR)/a52.o $(BUILDDIR)/liba52.a

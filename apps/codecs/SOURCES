@@ -14,6 +14,7 @@ aac.c
 shorten.c
 aiff.c
 sid.c
+adx.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
 mp3_enc.c

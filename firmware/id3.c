@@ -119,6 +119,8 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     AFMT_ENTRY("AIFF", "aiff.codec",    NULL,                NULL  ),
     /* SID File Format */
     AFMT_ENTRY("SID",  "sid.codec",     NULL,                NULL  ),
+    /* ADX File Format */
+    AFMT_ENTRY("ADX", "adx.codec",	NULL,		     NULL  ),
 #endif
 };
 
