@@ -19,14 +19,13 @@ extern int intkeys[5];
 
 /* undef not to use grayscale lib */
 #if !defined HAVE_LCD_COLOR && LCD_PIXELFORMAT != HORIZONTAL_PACKING
+/* grayscale is far slower for now at least on ipods :( */
 #define USE_GRAY
 #define USE_BUFFERED_GRAY
 #endif
 
 
 #define Z80C
-#define MULTIUSER 0
-#define DATADIR "."
 
 /* Always define this for the spectrum emulator. */
 #define SPECT_MEM 1
@@ -42,20 +41,11 @@ extern int intkeys[5];
 /* Define this to use an alternative way of passing the z80 processor
    data to the z80 instruction emulation functions. May make emulation
    faster on some machines, but not on intel, and sparc. */
-#undef PROCP /* seems not to have effect on arm targets */
-/* #define PROCP */
-
-/* Define to empty if the keyword does not work.  */
-/* #undef const */
-
-/* Define to `unsigned' if <sys/types.h> doesn't define.  */
-/* #undef size_t */
+/* seems not to have effect on arm targets */
+#undef PROCP
+/*#define PROCP*/
 
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
-
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-/* #undef WORDS_BIGENDIAN */
 
 #endif

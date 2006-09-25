@@ -25,11 +25,10 @@
 #include <time.h>
 #include "zxconfig.h"
 #include "helpers.h"
-Z80 PRNM(proc);
+Z80 PRNM(proc) IBSS_ATTR;
 
-byte PRNM(inports)[PORTNUM];
-byte PRNM(outports)[PORTNUM];
-
+byte PRNM(inports)[PORTNUM] IBSS_ATTR;
+byte PRNM(outports)[PORTNUM] IBSS_ATTR;
 
 #ifdef SPECT_MEM
 #define NUM64KSEGS 3

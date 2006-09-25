@@ -32,7 +32,10 @@ char msgbuf[MAXMSGLEN];
 char *spif_get_filename(void)
 {
     char *name=NULL;
-/*  char *name, *s;
+#if 0
+/* should be implemented when adding ability */
+/* to open snapshots from within zxbox */
+  char *name, *s;
 
   s = get_filename_line();
   for(; *s && isspace((int) *s); s++);
@@ -44,7 +47,7 @@ char *spif_get_filename(void)
     printf("Canceled!\n");
     return NULL;
   }
-*/
+#endif
   return name;
 }
 
@@ -52,7 +55,11 @@ char *spif_get_tape_fileinfo(int *startp, int *nump)
 {
     *startp=*nump=0;
      char *name=NULL;
- /* char *name, *s;
+#if 0
+/* should be implemented when adding ability */
+/* to tapes snapshots from within zxbox */
+
+  char *name, *s;
   int res;
   
   s = get_filename_line();
@@ -81,14 +88,14 @@ char *spif_get_tape_fileinfo(int *startp, int *nump)
 
   if(res < 2) *startp = -1;
   if(res < 3) *nump = -1;
-*/
+#endif
   return name;
 }
 
 void put_msg(const char *msg)
 {
 #ifndef USE_GRAY
-    rb->splash (HZ/10,true , msg );
+    rb->splash (HZ/2,true , msg );
 #else
 	LOGF(msg);
     (void)msg;

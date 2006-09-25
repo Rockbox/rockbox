@@ -39,8 +39,6 @@ int spt_auto_stop = 1;
 
 static int playing = 0;
 static int paused = 0;
-/*static FILE *tapefp;*/
-/*static int *tapefp;*/
 
 static char tapename[MAXFILENAME];
 static int tapetype;
@@ -93,10 +91,10 @@ static void put_seg_desc(void)
     len = get_seglen();
     
     me = msgbuf;
-    rb->snprintf(me,MAXDESCLEN, "%4i: ", currseg);
+    rb->snprintf(me,MAXDESCLEN, "%4d: ", currseg);
     me = me+rb->strlen(me);
     if(segtype >= SEG_DATA && len) {
-      rb->snprintf(me,MAXDESCLEN, "%5li bytes, ", len);
+      rb->snprintf(me,MAXDESCLEN, "%5ld bytes, ", len);
       me = me+rb->strlen(me);
     }
     
@@ -120,7 +118,7 @@ static void put_seg_desc(void)
     put_msg(msgbuf);
       }
       else {
-    rb->snprintf(msgbuf,MAXDESCLEN, "%4i:", currseg);
+    rb->snprintf(msgbuf,MAXDESCLEN, "%4d:", currseg);
     put_tmp_msg(msgbuf);
       }
     }
@@ -315,11 +313,11 @@ void play_tape(void)
     
     datak = (int) (get_segpos() / 1000);
     if(datak > lastdatak) {
-/*      if(ingroup) sprintf(msgbuf, "%4i: ", currseg);
-      else        sprintf(msgbuf, "      ");
-      sprintf(msgbuf+strlen(msgbuf), "%3ik", datak);
+      if(ingroup) rb->snprintf(msgbuf,MAXDESCLEN, "%4d: ", currseg);
+      else        rb->snprintf(msgbuf,MAXDESCLEN,  "      ");
+      rb->snprintf(msgbuf+rb->strlen(msgbuf),MAXDESCLEN,  "%3dk", datak);
       put_tmp_msg(msgbuf);
-*/
+
       lastdatak = datak;
     }
   }
@@ -367,19 +365,20 @@ rovid:  2..5
 #define BIT1_MAX    9
 
 #define LEADER_MIN_COUNT 512
-/*
+#if 0
 static int rec_segment;
 static int rec_state = RC_NONE;
 static byte *recbuf = NULL;
 static const char *waitchars = "-\\|/";
-*/
+#endif
 static int recording = 0;
 
 
 
 void rec_tape(void)
 {
-/*  static byte lastmic = 0;
+#if 0
+  static byte lastmic = 0;
   static int lastlen = 0;
   static int whole;
   static int leadercount;
@@ -524,18 +523,21 @@ void rec_tape(void)
     }
 
     lastlen = 0;
-  }*/
+  }
+#endif
 }
 
 static void stop_recording(void)
 {
-/*  if(recording) {
+#if 0
+  if(recording) {
     recording = 0;
     free(recbuf);
     recbuf = NULL;
 
     rb->close(tapefp);
-  }*/
+  }
+#endif
 }
 
 static void restart_playing(void)
@@ -634,8 +636,10 @@ void stop_play(void)
     if(paused) paused = 0;
   }
   else if(recording) {
-   /* sprintf(msgbuf, " * Stopped recording tape `%s' * ", tapename);
-    put_msg(msgbuf);*/
+#if 0
+    sprintf(msgbuf, " * Stopped recording tape `%s' * ", tapename);
+    put_msg(msgbuf);
+#endif
     stop_recording();
   }
 }
@@ -696,9 +700,7 @@ void qload(void)
     if(!playing) {
       if(paused) unpause_playing();
       else {
-    spkey_textmode();
     start_play();
-    spkey_screenmode();
       }
     }
     if(!playing) {

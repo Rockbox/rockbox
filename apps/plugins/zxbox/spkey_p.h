@@ -207,7 +207,6 @@ extern void spkey_screenmode(void);
 
 extern const int need_switch_mode;
     
-extern int spkey_keyfuncs(void);
 extern void spkb_refresh(void);
 extern void clear_keystates(void);
 extern int display_keyboard(void);

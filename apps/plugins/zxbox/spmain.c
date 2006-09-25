@@ -31,7 +31,6 @@
 #include "sptape.h"
 #include "spsound.h"
 #include "snapshot.h"
-#include "spver.h"
 
 #include "spconf.h"
 
@@ -48,15 +47,15 @@
 
 #include "zxbox_keyb.h"
 
-int endofsingle;
+int endofsingle IBSS_ATTR;
 
-int sp_nosync = 0;
+int sp_nosync IBSS_ATTR = 0;
 
-int showframe = 1;
+int showframe IBSS_ATTR = 1;
 int load_immed = 1;
 
-qbyte sp_int_ctr = 0;
-int intkeys[5];
+qbyte sp_int_ctr IBSS_ATTR = 0;
+int intkeys[5] IBSS_ATTR;
 
 #ifdef USE_DJGPP
 #define DOS
@@ -354,6 +353,8 @@ static bool zxbox_menu(void)
     static const struct menu_item items[] = {
         { "VKeyboard", NULL },
         { "Play/Pause Tape", NULL },
+		{ "Save quick snapshot", NULL },
+		{ "Load quick snapshot", NULL },
         { "Save Snapshot", NULL },
         { "Toggle \"fast\" mode", NULL },
         { "Options", NULL },
@@ -380,22 +381,27 @@ static bool zxbox_menu(void)
                 break;
             case 1:
                 pause_play();
-/*                SPNM(load_trapped) = 1;
-                DANM(haltstate) = 1;
-                DANM(tc) = 0;*/
                 menu_quit=1;
                 break;
-            case 2:
+			case 2:
+				save_quick_snapshot();
+				menu_quit = 1;
+				break;
+			case 3:
+				load_quick_snapshot();
+				menu_quit = 1;
+				break;
+            case 4:
                 save_snapshot();
                 break;
-            case 3:
+            case 5:
                 sp_nosync=!sp_nosync;
                 menu_quit=1;
                 break;
-            case 4:
+            case 6:
                 options_menu();
                 break;
-            case 5:
+            case 7:
                 menu_quit=1;
                 exit=1;
                 break;

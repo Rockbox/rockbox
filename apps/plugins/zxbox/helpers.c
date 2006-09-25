@@ -33,15 +33,7 @@ void *my_malloc(size_t size)
 
     if (size + 4 > abs(totalSize) )
     {
-  /*      printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");
-        printf("\nMALLOC BARF");*/
         /* We've made our point. */
-
         return NULL;
     }
 

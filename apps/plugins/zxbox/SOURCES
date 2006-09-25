@@ -8,7 +8,6 @@ rom_imag.c
 snapshot.c
 spconf.c
 spect.c
-spectkey.c
 spkey.c
 spmain.c
 spperif.c

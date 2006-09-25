@@ -62,8 +62,8 @@ static unsigned char *gbuf;
 static unsigned int gbuf_size = 0;
 #endif
 
-long video_frames = 0;
-long start_time = 0;
+long video_frames IBSS_ATTR = 0 ;
+long start_time IBSS_ATTR = 0;
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
@@ -73,7 +73,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->pcm_play_stop();
 #endif
     rb->splash(HZ, true, "Welcome to ZXBox");
-    sp_init();
 
 #ifdef USE_IRAM
    /* We need to stop audio playback in order to use IRAM */
@@ -82,6 +81,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
    rb->memset(iedata, 0, iend - iedata);
 #endif
+
+    sp_init();
 
 #ifdef USE_GRAY
     /* get the remainder of the plugin buffer */
@@ -101,7 +102,16 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #endif
 
     start_time = *rb->current_tick;
+
+#ifdef RB_PROFILE
+   rb->profile_thread();
+#endif
+
     start_spectemu(parameter);
+
+#ifdef RB_PROFILE
+   rb->profstop();
+#endif
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(false);
@@ -269,25 +279,3 @@ void press_key(int c){
     process_keys();
 }
 
-void spkey_textmode(void)
-{
-}
-
-void spkey_screenmode(void)
-{
-}
-
-void spscr_refresh_colors(void)
-{
-}
-
-void resize_spect_scr(int s)
-{
-    /* just to disable warning */
-    (void)s;
-}
-
-int display_keyboard(void)
-{
-  return 0;
-}

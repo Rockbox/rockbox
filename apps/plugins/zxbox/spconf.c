@@ -19,7 +19,6 @@
  */
 #include "misc.h"
 #include "spconf_p.h"
-#include "spver.h"
 #include "interf.h"
 #include "spscr_p.h"
 #include "spkey.h"
@@ -29,7 +28,6 @@
 #include "zxconfig.h"
 #include "stdio.h"
 #include "string.h"
-/*#include <errno.h>*/
 #include "sys/types.h"
 #include "helpers.h"
 #include "ctype.h"
@@ -42,17 +40,7 @@ char *spcf_init_snapshot = NULL;
 int   spcf_init_snapshot_type;
 char *spcf_init_tapefile = NULL;
 int   spcf_init_tapefile_type;
-#ifndef USE_GRAY
-#define exit(i) rb->splash(HZ*1,true,"Exit: %d",i)
-#else
-#define exit(i) i=i
-#endif
-#define MAXLINELEN 512
-/*static int linectr;
-static FILE *conffp;
-static int conffd;
-static const char *conffile;
-*/
+
 
 static int file_type = -1;
 static int file_subtype;

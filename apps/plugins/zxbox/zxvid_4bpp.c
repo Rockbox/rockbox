@@ -1,11 +1,18 @@
 #include "zxvid_com.h"
 
-#if !defined USE_GRAY && LCD_PIXELFORMAT == HORIZONTAL_PACKING && LCD_DEPTH < 4
+#if !defined USE_GRAY && LCD_DEPTH < 4
 /* screen routines for greyscale targets not using greyscale lib */
+
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING 
 #define FB_WIDTH ((LCD_WIDTH+3)/4)
 unsigned char pixmask[4] ICONST_ATTR = {
         0xC0, 0x30, 0x0C, 0x03
     };
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+unsigned char pixmask[4] ICONST_ATTR = {
+    0x03, 0x0C, 0x30, 0xC0
+};
+#endif
 
 void init_spect_scr(void)
 {
@@ -41,7 +48,7 @@ void init_spect_scr(void)
 void update_screen(void)
 {
     char str[80];
- 
+
     fb_data *frameb;
     int y=0;
     int x=0;
@@ -49,7 +56,7 @@ void update_screen(void)
     int srcx, srcy=0;     /* x / y coordinates in source image */
     image = sp_image + ( (Y_OFF)*(WIDTH) ) + X_OFF;
     unsigned mask;
-
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         frameb = rb->lcd_framebuffer + (y) * FB_WIDTH;
@@ -64,6 +71,24 @@ void update_screen(void)
         image += (srcy>>16)*WIDTH;   /* and possibly to the next row. */
         srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
     }
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+	int shift;
+    for(y = 0; y < LCD_HEIGHT; y++)
+    {
+        frameb = rb->lcd_framebuffer + (y/4) * LCD_WIDTH;
+        srcx = 0;           /* reset our x counter before each row... */
+		shift = ((y & 3 ) * 2 );
+		mask = pixmask[y & 3];
+        for(x = 0; x < LCD_WIDTH; x++)
+        {
+            frameb[x] = (frameb[x] & ~mask) |  ((image[(srcx>>16)]&0x3) << shift );
+            srcx += X_STEP;    /* move through source image */
+        }
+        srcy += Y_STEP;      /* move through the source image... */
+        image += (srcy>>16)*WIDTH;   /* and possibly to the next row. */
+        srcy &= 0xffff;     /* set up the y-coordinate between 0 and 1 */
+    }
+#endif 
 
     if ( settings.showfps ) {
         int percent=0;

@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "helpers.h"
-/*#include <errno.h>*/
 #include "zxconfig.h"
 #define DIR_SEP_CHAR '/'
 

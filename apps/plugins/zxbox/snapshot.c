@@ -33,17 +33,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-/*#include <errno.h>*/
-/*#include "string.h"*/
 #include <sys/types.h>
 
 #define COMPRESS_SAVE 1
 
-static char quick_snap_file[MAXFILENAME];
-static int  qsnap_created = 0;
+static char quick_snap_file[]="/.rockbox/zxboxq.z80";
+
 typedef struct {
   int isfile;
-  /*FILE *fp;*/
   int fd;
 
   unsigned len;
@@ -65,7 +62,7 @@ static int snread(void *ptr, int size, SNFILE *snfp)
   int i;
   byte *dest;
 
-  if(snfp->isfile) /*return (int) fread(ptr, 1, (size_t) size, snfp->fp);*/
+  if(snfp->isfile)
         return (int) rb->read( snfp->fd,ptr, (size_t) size);
 
   dest = (byte *) ptr;
@@ -177,7 +174,6 @@ struct z80_page_s {
 #define z80_pg_size 3        /* sizeof(struct z80_page_s)=3 */
 
 
-/*static FILE *savfp;*/
 static int savfd;
 static int memptr;
 
@@ -282,13 +278,9 @@ static void snsh_z80_save(int fd)
                         Bit 5  : 1=Block of data is compressed
                         Bit 6-7: No meaning
 */
-
-
-  /*fwrite(&z80, z80_145_size, 1, fp);*/
   rb->write(fd,&z80,z80_145_size);
 
   if(!to_comp)
-    /*fwrite(z80_proc.mem + 0x4000, 0xC000, 1, fp);*/
       rb->write(fd,z80_proc.mem + 0x4000,0xC000);    
   else {
     memptr = 0x4000;
@@ -327,8 +319,6 @@ static void snsh_sna_save(int fd)
 
   sna.im = z80_proc.it_mode & 0x03;
 
-  /*fwrite(&sna, sna_size, 1, fp);
-  fwrite(z80_proc.mem + 0x4000, 0xC000, 1, fp);*/
   rb->write(fd,&sna, sna_size);
   rb->write(fd,z80_proc.mem + 0x4000, 0xC000);
 
@@ -590,21 +580,13 @@ static void snsh_sna_load(SNFILE *fp)
 
   sp_init_screen_mark();
 }
-/*
-static void cleanup_qsnap(void)
-{
-  if(qsnap_created) rb->remove(quick_snap_file);
-}
-*/
+
 static void save_snapshot_file_type(char *name, int type)
 {
-  /*FILE *snsh;*/
   int snsh;
   snsh = rb->open(name, O_WRONLY);
   if(snsh < 0) {
       snsh = rb->creat(name, O_WRONLY);
-/*    sprintf(msgbuf, "Could not open snapshot file `%s', %s",
-        name, strerror(errno));*/
       if(snsh < 0) {
         put_msg("Could not create snapshot file");
         return;
@@ -633,22 +615,14 @@ void save_snapshot_file(char *name)
   }
 
   save_snapshot_file_type(filenamebuf, type);
-
-/*  sprintf(msgbuf, "Saved snapshot to file %s", filenamebuf);
-  put_msg(msgbuf);*/
+  char msgbuf [MAXFILENAME];
+  rb->snprintf(msgbuf,MAXFILENAME, "Saved snapshot to file %s", filenamebuf);
+  put_msg(msgbuf);
 }
 
 void save_quick_snapshot(void)
 {
-/*  if(!qsnap_created) {
-    if(tmpnam(quick_snap_file) == NULL) {
-      put_msg("Could not create temporary file for quick snapshot");
-      return;
-    }
-    qsnap_created = 1;
-    atexit(cleanup_qsnap);
-  }
-  save_snapshot_file_type(quick_snap_file, SN_Z80);*/
+  save_snapshot_file_type(quick_snap_file, SN_Z80);
 }
 
 void save_snapshot(void)
@@ -665,7 +639,6 @@ void save_snapshot(void)
 void load_snapshot_file_type(char *name, int type)
 {
   int filetype = FT_SNAPSHOT;
-  /*FILE *snsh;*/
   int snsh;
   SNFILE snfil;
 
@@ -705,10 +678,14 @@ void snsh_z80_load_intern(byte *p, unsigned len)
 
 void load_quick_snapshot(void)
 {
-  if(!qsnap_created) {
+  int  qsnap;
+  qsnap = rb->open(quick_snap_file,O_RDONLY);
+  if(qsnap < 0) {
     put_msg("No quick snapshot saved yet");
     return;
   }
+  else
+	  rb->close ( qsnap );
   load_snapshot_file_type(quick_snap_file, SN_Z80);
 }
 

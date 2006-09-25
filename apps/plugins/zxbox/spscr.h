@@ -28,7 +28,6 @@ extern volatile int screen_visible;
 
 extern void init_spect_scr(void);
 extern void destroy_spect_scr(void);
-extern void resize_spect_scr(int newsize);
 extern void update_screen(void);
 extern void flash_change(void);
 extern void translate_screen(void);

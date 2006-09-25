@@ -63,7 +63,7 @@ static int last_not_played=0;
 static int sndstate = SPS_CLOSED;
 
 static void close_snd(int normal);
-unsigned short my_buf[TMNUM*2*3*2] IBSS_ATTR;
+unsigned short my_buf[TMNUM*2*3*2];
 
 
 const byte lin8_ulaw[] = {
@@ -128,8 +128,6 @@ void init_spect_sound(void)
 }
 
 
-//#define VOLREDUCE settings.volume
-//
 #ifndef VOLREDUCE
 #define VOLREDUCE 0
 #endif
@@ -190,8 +188,9 @@ void autoclose_sound(void)
 void get_more(unsigned char** start, size_t* size)
 {
     doneplay = 1;
-   *start = (unsigned char*)(my_buf);
-   *size = TMNUM*4*3*2;
+    rb->pcm_play_stop();
+   (void)*start;
+   (void)*size;
 }
 
 /* sp_sound_buf is Unsigned 8 bit, Rate 8000 Hz, Mono */
@@ -216,7 +215,7 @@ void write_buf(void){
                     = my_buf[j+10] = my_buf[j+11] \
                     = (((byte)sp_sound_buf[i])<<8) >> settings.volume;
 
-    rb->pcm_play_data(&get_more,NULL,0);
+    rb->pcm_play_data(&get_more,(unsigned char*)(my_buf),TMNUM*4*3*2);
 
 #if 0
     /* can use to save and later analyze what we produce */
