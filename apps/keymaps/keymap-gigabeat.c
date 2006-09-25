@@ -116,6 +116,7 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     { ACTION_TREE_PGLEFT,       BUTTON_POWER|BUTTON_LEFT,                  BUTTON_POWER },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,                 BUTTON_POWER|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_POWER|BUTTON_LEFT,                  BUTTON_LEFT|BUTTON_REL },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_POWER|BUTTON_LEFT|BUTTON_REPEAT, BUTTON_POWER|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_POWER|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_POWER|BUTTON_RIGHT,                 BUTTON_POWER },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,                BUTTON_POWER|BUTTON_RIGHT },
@@ -127,6 +128,7 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
 const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_RIGHT,               BUTTON_NONE },

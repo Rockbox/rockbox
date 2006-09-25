@@ -106,8 +106,9 @@ const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
-    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REPEAT,     BUTTON_REW },
-    { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_REPEAT,      BUTTON_FF },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_REW|BUTTON_REPEAT,     BUTTON_REW },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REPEAT,     BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_REPEAT,      BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_without_combo */
 
@@ -115,7 +116,14 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     { ACTION_LISTTREE_PGUP,     BUTTON_REW|BUTTON_REPEAT,     BUTTON_REW },
     { ACTION_LISTTREE_PGDOWN,   BUTTON_FF|BUTTON_REPEAT,      BUTTON_FF  },
     { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_PLAY,       BUTTON_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REL,        BUTTON_REW|BUTTON_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_PLAY,       BUTTON_REW|BUTTON_REL },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_REW|BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_REW|BUTTON_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_PLAY,        BUTTON_PLAY },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_REL,         BUTTON_FF|BUTTON_PLAY },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_PLAY,        BUTTON_FF|BUTTON_REL },
+    { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_PLAY|BUTTON_REPEAT,   BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_with_combo */
 

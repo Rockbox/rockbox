@@ -118,6 +118,7 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     { ACTION_TREE_PGLEFT,       BUTTON_ON|BUTTON_LEFT,                  BUTTON_ON },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,                 BUTTON_ON|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_ON|BUTTON_LEFT,                  BUTTON_LEFT|BUTTON_REL },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_ON|BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_ON|BUTTON_RIGHT,                 BUTTON_ON },
     { ACTION_TREE_PGRIGHT,      BUTTON_RIGHT|BUTTON_REL,                BUTTON_ON|BUTTON_RIGHT },
@@ -129,6 +130,7 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
 const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGLEFT,       BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_RIGHT,               BUTTON_NONE },
@@ -394,6 +396,7 @@ const struct button_mapping button_context_listtree_scroll_w_cmb_h300lcdremote[]
     { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,                BUTTON_RC_MENU },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_SOURCE|BUTTON_REL,                    BUTTON_RC_MENU|BUTTON_RC_SOURCE },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE,                BUTTON_RC_SOURCE|BUTTON_REL },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_RC_MENU|BUTTON_RC_SOURCE|BUTTON_REPEAT,  BUTTON_RC_MENU|BUTTON_RC_SOURCE },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_MENU|BUTTON_RC_SOURCE|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_MENU|BUTTON_RC_BITRATE,               BUTTON_RC_MENU },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_BITRATE|BUTTON_REL,                   BUTTON_RC_MENU|BUTTON_RC_BITRATE },
@@ -404,6 +407,7 @@ const struct button_mapping button_context_listtree_scroll_w_cmb_h300lcdremote[]
 
 const struct button_mapping button_context_listtree_scroll_wo_cmb_h100remote[]  = {
     { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_RC_VOL_DOWN },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP,                 BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },    
@@ -413,6 +417,7 @@ const struct button_mapping button_context_listtree_scroll_wo_cmb_h100remote[]  
 const struct button_mapping button_context_listtree_scroll_wo_cmb_h300lcdremote[]  = {
     { ACTION_NONE,              BUTTON_RC_REW,               BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_RC_REW },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW|BUTTON_REPEAT },
     { ACTION_NONE,              BUTTON_RC_FF,                BUTTON_NONE },

@@ -123,6 +123,7 @@ enum {
     ACTION_LISTTREE_RC_PGDOWN,/* optional */
     
     /* tree */ 
+    ACTION_TREE_ROOT_INIT,
     ACTION_TREE_PGLEFT,/* optional */
     ACTION_TREE_PGRIGHT,/* optional */
     ACTION_TREE_STOP,

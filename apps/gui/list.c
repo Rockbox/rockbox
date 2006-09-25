@@ -722,6 +722,8 @@ void gui_synclist_scroll_left(struct gui_synclist * lists)
 
 unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
 {
+    static bool scrolling_left = false;
+
     gui_synclist_limit_scroll(lists, true);
     switch(button)
     {
@@ -744,15 +746,26 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
             return ACTION_STD_NEXT;
 
 #ifdef HAVE_LCD_BITMAP
+        case ACTION_TREE_ROOT_INIT:
+         /* After this button press ACTION_TREE_PGLEFT is allowed to skip to root.
+            ACTION_TREE_ROOT_INIT must be defined in the keymaps as a repeated
+            button press (the same as the repeated ACTION_TREE_PGLEFT) with the
+            pre condition being the non-repeated button press */
+            if (lists->gui_list[0].offset_position == 0)
+            {
+                scrolling_left = false;
+                return ACTION_STD_CANCEL;
+            }
         case ACTION_TREE_PGRIGHT:
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
             return ACTION_TREE_PGRIGHT;
         case ACTION_TREE_PGLEFT:
-            if (lists->gui_list[0].offset_position == 0)
+            if(!scrolling_left && (lists->gui_list[0].offset_position == 0))
                 return ACTION_STD_CANCEL;
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
+            scrolling_left = true; /* stop ACTION_TREE_PAGE_LEFT skipping to root */
             return ACTION_TREE_PGLEFT;
 #endif
 
