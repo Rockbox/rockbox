@@ -128,10 +128,13 @@ int button_read_device(void)
     }
 
     data = GPIO_READ;
+
+    /* hold and power are mutually exclusive */
     if (!(data & 0x04000000))
         btn |= BUTTON_POWER;
 
-    if (!(data & 0x02000000))
+    /* remote play button should be dead if hold */
+    if (!remote_hold_button && !(data & 0x02000000))
         btn |= BUTTON_RC_PLAY;
 
     return btn;
