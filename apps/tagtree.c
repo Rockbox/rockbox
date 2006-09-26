@@ -118,7 +118,7 @@ struct root_menu {
 /* Statusbar text of the current view. */
 static char current_title[MAX_TAGS][128];
 
-static struct root_menu menus[TAGMENU_MAX_MENUS];
+static struct root_menu *menus[TAGMENU_MAX_MENUS];
 static struct root_menu *menu;
 static struct search_instruction *csi;
 static const char *strp;
@@ -425,10 +425,10 @@ static bool parse_search(struct menu_entry *entry, const char *str)
         /* Find the matching root menu or "create" it */
         for (i = 0; i < menu_count; i++)
         {
-            if (!strcasecmp(menus[i].id, buf))
+            if (!strcasecmp(menus[i]->id, buf))
             {
                 entry->link = i;
-                menus[i].parent = menu;
+                menus[i]->parent = menu;
                 return true;
             }
         }
@@ -634,7 +634,6 @@ static bool parse_menu(const char *filename)
             {
                 /* End the menu */
                 menu_count++;
-                menu = &menus[menu_count];
                 read_menu = false;
             }
             continue;
@@ -668,6 +667,9 @@ static bool parse_menu(const char *filename)
                         return false;
                     }
     
+                    menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+                    menu = menus[menu_count];
+                    memset(menu, 0, sizeof(struct root_menu));
                     if (get_token_str(menu->id, sizeof(menu->id)) < 0)
                     {
                         logf("%menu_start id empty");
@@ -695,7 +697,7 @@ static bool parse_menu(const char *filename)
                 
                     for (i = 0; i < menu_count; i++)
                     {
-                        if (!strcasecmp(menus[i].id, data))
+                        if (!strcasecmp(menus[i]->id, data))
                         {
                             root_menu = i;
                         }
@@ -733,9 +735,8 @@ static bool parse_menu(const char *filename)
 
 void tagtree_init(void)
 {
-    memset(menus, 0, sizeof menus);
     menu_count = 0;
-    menu = &menus[0];
+    menu = NULL;
     root_menu = 0;
     parse_menu(FILE_SEARCH_INSTRUCTIONS);
     
@@ -1040,7 +1041,9 @@ static int load_root(struct tree_context *c)
     if (c->dirlevel == 0)
         c->currextra = root_menu;
     
-    menu = &menus[c->currextra];
+    menu = menus[c->currextra];
+    if (menu == NULL)
+        return 0;
     
     for (i = 0; i < menu->itemcount; i++)
     {
@@ -1142,7 +1145,7 @@ int tagtree_enter(struct tree_context* c)
         
             if (newextra == root)
             {
-                menu = &menus[seek];
+                menu = menus[seek];
                 c->currextra = seek;
             }
         
