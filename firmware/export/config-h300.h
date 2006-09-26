@@ -111,8 +111,6 @@
 
 #define CONFIG_LCD LCD_H300
 
-#define DEFAULT_REMOTE_CONTRAST_SETTING 42
-
 /* Offset ( in the firmware file's header ) to the file CRC */
 #define FIRMWARE_OFFSET_FILE_CRC 0
 
@@ -143,6 +141,8 @@
 #define HAVE_EEPROM
 
 #endif /* SIMULATOR */
+
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
