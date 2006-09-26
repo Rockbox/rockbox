@@ -41,6 +41,9 @@ enum icons_5x8 {
     Icon_Lock_Remote,
     Icon_Stereo,
     Icon_Mono,
+#if CONFIG_CODEC != SWCODEC
+    Icon_q,
+#endif
     Icon5x8Last
 };
 
