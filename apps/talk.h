@@ -27,6 +27,7 @@
 #include <stdbool.h>
 
 enum {
+    /* See array "unit_voiced" in talk.c function "talk_value" */
     UNIT_INT = 1, /* plain number */
     UNIT_SIGNED,  /* number with mandatory sign (even if positive) */
     UNIT_MS,      /* milliseconds */
@@ -45,7 +46,7 @@ enum {
     UNIT_LAST     /* END MARKER */
 };
 
-#define UNIT_SHIFT (32-4) /* this many bits left from UNIT_xx enum */
+#define UNIT_SHIFT (32-5) /* this many bits left from UNIT_xx enum */
 
 /* make a "talkable" ID from number + unit
    unit is upper 4 bits, number the remaining (in regular 2's complement) */

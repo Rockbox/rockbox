@@ -717,19 +717,33 @@ int talk_value(long n, int unit, bool enqueue)
     int unit_id;
     static const int unit_voiced[] = 
     {   /* lookup table for the voice ID of the units */
-        -1, -1, -1, /* regular ID, int, signed */
-        VOICE_MILLISECONDS, /* here come the "real" units */
-        VOICE_SECONDS, 
-        VOICE_MINUTES, 
-        VOICE_HOURS, 
-        VOICE_KHZ, 
-        VOICE_DB, 
-        VOICE_PERCENT,
-        VOICE_MILLIAMPHOURS,
-        VOICE_PIXEL,
-        VOICE_PER_SEC,
-        VOICE_HERTZ,
-        VOICE_KBIT_PER_SEC,
+        [0 ... UNIT_LAST-1] = -1, /* regular ID, int, signed */
+        [UNIT_MS]
+            = VOICE_MILLISECONDS, /* here come the "real" units */
+        [UNIT_SEC]
+            = VOICE_SECONDS, 
+        [UNIT_MIN]
+            = VOICE_MINUTES, 
+        [UNIT_HOUR]
+            = VOICE_HOURS, 
+        [UNIT_KHZ]
+            = VOICE_KHZ, 
+        [UNIT_DB]
+            = VOICE_DB, 
+        [UNIT_PERCENT]
+            = VOICE_PERCENT,
+        [UNIT_MAH]
+            = VOICE_MILLIAMPHOURS,
+        [UNIT_PIXEL]
+            = VOICE_PIXEL,
+        [UNIT_PER_SEC]
+            = VOICE_PER_SEC,
+        [UNIT_HERTZ]
+            = VOICE_HERTZ,
+        [UNIT_MB]
+            = LANG_MEGABYTE,
+        [UNIT_KBIT]
+            = VOICE_KBIT_PER_SEC,
     };
 
 #if CONFIG_CODEC != SWCODEC
