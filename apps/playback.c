@@ -446,16 +446,21 @@ void audio_play(long offset)
     }
     else
     {
-        audio_stop();
+        LOGFQUEUE("audio > audio Q_AUDIO_STOP");
+        queue_post(&audio_queue, Q_AUDIO_STOP, 0);
         LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
     }
+    while (!playing)
+        yield();
 }
 
 void audio_stop(void)
 {
     LOGFQUEUE("audio > audio Q_AUDIO_STOP");
     queue_post(&audio_queue, Q_AUDIO_STOP, 0);
+    while(playing)
+        yield();
 }
 
 void audio_pause(void)
@@ -472,11 +477,11 @@ void audio_resume(void)
 
 void audio_next(void)
 {
-    if (global_settings.beep)
-        pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-
     if (playlist_check(ci.new_track + wps_offset + 1))
     {
+        if (global_settings.beep)
+            pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP 1");
         queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)1);
         /* Keep wps fast while our message travels inside deep playback queues. */
@@ -487,18 +492,17 @@ void audio_next(void)
     {
         /* No more tracks. */
         if (global_settings.beep)
-            pcmbuf_beep(3000, 300, 2500*global_settings.beep);
-
+            pcmbuf_beep(1000, 100, 1000*global_settings.beep);
     }
 }
 
 void audio_prev(void)
 {
-    if (global_settings.beep)
-        pcmbuf_beep(5000, 100, 2500*global_settings.beep);
-
     if (playlist_check(ci.new_track + wps_offset - 1))
     {
+        if (global_settings.beep)
+            pcmbuf_beep(5000, 100, 2500*global_settings.beep);
+
         LOGFQUEUE("audio > audio Q_AUDIO_SKIP -1");
         queue_post(&audio_queue, Q_AUDIO_SKIP, (void *)-1);
         /* Keep wps fast while our message travels inside deep playback queues. */
@@ -509,8 +513,7 @@ void audio_prev(void)
     {
         /* No more tracks. */
         if (global_settings.beep)
-            pcmbuf_beep(3000, 300, 2500*global_settings.beep);
-
+            pcmbuf_beep(1000, 100, 1000*global_settings.beep);
     }
 }
 
@@ -721,12 +724,17 @@ void voice_stop(void)
 {
 #ifdef PLAYBACK_VOICE
     /* Messages should not be posted to voice codec queue unless it is the
-       current codec or deadlocks happen. This will be addressed globally soon.
+       current codec or deadlocks happen.
        -- jhMikeS */
     if (current_codec != CODEC_IDX_VOICE)
         return;
 
-    mp3_play_stop();
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
+    queue_post(&voice_queue, Q_VOICE_STOP, 0);
+    while (voice_is_playing && !queue_empty(&voice_queue))
+        yield();
+    if (!playing)   
+        pcmbuf_play_stop();
 #endif
 } /* voice_stop */
 
@@ -934,24 +942,25 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 
     while (1)
     {
-        if (voice_is_playing)
-        {
+        if (voice_is_playing || playing)
             queue_wait_w_tmo(&voice_queue, &ev, 0);
-        }
-        else if (playing)
+        else
+            queue_wait(&voice_queue, &ev);
+        if (!voice_is_playing)
         {
-            queue_wait_w_tmo(&voice_queue, &ev, 0);
             if (ev.id == SYS_TIMEOUT)
                 ev.id = Q_AUDIO_PLAY;
         }
-        else
-            queue_wait(&voice_queue, &ev);
 
         switch (ev.id) {
             case Q_AUDIO_PLAY:
                 LOGFQUEUE("voice < Q_AUDIO_PLAY");
                 if (playing)
-                    swap_codec();
+                {
+                    if (audio_codec_loaded)
+                        swap_codec();
+                    yield();
+                }
                 break;
 
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
@@ -1810,10 +1819,6 @@ static void codec_thread(void)
                 LOGFQUEUE("codec < SYS_USB_CONNECTED");
                 queue_clear(&codec_queue);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
-#ifdef PLAYBACK_VOICE
-                if(voice_codec_loaded)
-                    swap_codec();
-#endif
                 usb_wait_for_disconnect(&codec_queue);
                 break;
 #endif
@@ -2170,6 +2175,7 @@ static void audio_read_file(bool quick)
         return ;
     }
 
+    cpu_boost(true);
     while (tracks[track_widx].filerem > 0) 
     {
         int overlap;
@@ -2237,6 +2243,7 @@ static void audio_read_file(bool quick)
         logf("Partially buf:%dB",
                 tracks[track_widx].filesize - tracks[track_widx].filerem);
     }
+    cpu_boost(false);
 }
 
 static bool audio_loadcodec(bool start_play)

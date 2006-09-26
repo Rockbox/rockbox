@@ -203,6 +203,7 @@ process_new_buffer:
             *realsize = 0;
             *realstart = NULL;
             CALL_IF_EXISTS(pcmbuf_event_handler);
+            pcmbuf_boost(false);
         }
     }
 }
