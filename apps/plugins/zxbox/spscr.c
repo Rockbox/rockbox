@@ -74,7 +74,11 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
              qbyte *cmarkp)
 {
   qbyte *scrptr;
+#if LCD_WIDTH == 320 && ( LCD_HEIGHT == 240 || LCD_HEIGHT == 200 )
   qbyte brd_color;
+#else
+  (void) border;
+#endif
   int i;
   qbyte *tmptr, *mptr;
   qbyte mark, cmark;

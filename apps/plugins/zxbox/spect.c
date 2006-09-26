@@ -28,7 +28,7 @@ int SPNM(halfframe)(int firsttick, int numlines)
 {
 
   int tc, linesleft;
-  int feport, scline, border;
+  int feport, scline, border = 0;
   byte *scrptr;
   qbyte cmark = 0;
 
