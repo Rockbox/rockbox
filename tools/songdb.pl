@@ -77,7 +77,8 @@ Options:
   --add <path>   Adds this string to the left of all file names
   --dirisalbum   Use dir name as album name if the album name is missing in the
                  tags
-  --littleendian Write out data as little endian (for simulator)
+  --littleendian Write out data as little endian (for x86 simulators and ARM-
+                 based targets such as iPods and iriver H10)
   --verbose      Shows more details while working
   --help         This text  
 MOO
