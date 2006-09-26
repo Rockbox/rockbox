@@ -468,6 +468,10 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
        
     strtok_r,
+#ifdef HAVE_WHEEL_POSITION
+    wheel_status,
+    wheel_send_events,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)

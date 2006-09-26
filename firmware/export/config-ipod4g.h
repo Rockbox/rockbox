@@ -112,6 +112,9 @@
 /* Define this if you can detect headphones */
 #define HAVE_HEADPHONE_DETECTION
 
+/* Define this if you can read an absolute wheel position */
+#define HAVE_WHEEL_POSITION
+
 #define BOOTFILE_EXT "ipod"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 

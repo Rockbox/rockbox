@@ -90,6 +90,10 @@ static bool remote_button_hold_only(void);
 #if CONFIG_KEYPAD == IPOD_4G_PAD
 /* Variable to use for setting button status in interrupt handler */
 int int_btn = BUTTON_NONE;
+#ifdef HAVE_WHEEL_POSITION
+static int wheel_position = -1;
+static bool send_events = true;
+#endif
 #endif
 
 #ifdef HAVE_HEADPHONE_DETECTION
@@ -131,6 +135,8 @@ static void opto_i2c_init(void)
 
 static inline int ipod_4g_button_read(void)
 {
+    int whl = -1;
+    
     /* The ipodlinux source had a udelay(250) here, but testing has shown that
        it is not needed - tested on Nano, Color/Photo and Video. */
     /* udelay(250);*/
@@ -160,6 +166,7 @@ static inline int ipod_4g_button_read(void)
             if (status & 0x40000000) {
                 /* NB: highest wheel = 0x5F, clockwise increases */
                 int new_wheel_value = (status << 9) >> 25;
+                whl = new_wheel_value;
                 backlight_on();
                 /* The queue should have no other events when scrolling */
                 if (queue_empty(&button_queue) && old_wheel_value >= 0) {
@@ -180,9 +187,14 @@ static inline int ipod_4g_button_read(void)
                         wheel_keycode = BUTTON_SCROLL_BACK;
                     } else goto wheel_end;
 
-                    data = (wheel_delta << 16) | new_wheel_value;
-                    queue_post(&button_queue, wheel_keycode | wheel_repeat,
-                            (void *)data);
+#ifdef HAVE_WHEEL_POSITION
+                    if (send_events)
+#endif
+                    {
+                        data = (wheel_delta << 16) | new_wheel_value;
+                        queue_post(&button_queue, wheel_keycode | wheel_repeat,
+                                (void *)data);
+                    }
 
                     if (!wheel_repeat) wheel_repeat = BUTTON_REPEAT;
                 }
@@ -205,6 +217,8 @@ wheel_end:
         outl(0xffffffff, 0x7000c120);
         outl(0xffffffff, 0x7000c124);
     }
+    /* Save the new absolute wheel position */
+    wheel_position = whl;
     return btn;
 }
 
@@ -1342,6 +1356,18 @@ int button_status(void)
 {
     return lastbtn;
 }
+
+#ifdef HAVE_WHEEL_POSITION
+int wheel_status(void)
+{
+    return wheel_position;
+}
+
+void wheel_send_events(bool send)
+{
+    send_events = send;
+}
+#endif
 
 void button_clear_queue(void)
 {

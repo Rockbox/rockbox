@@ -57,7 +57,10 @@ bool remote_button_hold(void);
 #ifdef HAVE_HEADPHONE_DETECTION
 bool headphones_inserted(void);
 #endif
-
+#ifdef HAVE_WHEEL_POSITION
+int wheel_status(void);
+void wheel_send_events(bool send);
+#endif
 
 #define  BUTTON_NONE        0x00000000
 
