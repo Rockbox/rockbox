@@ -47,9 +47,15 @@
 
 #define CONFIG_LCD LCD_X5
 
+/* Main LCD contrast range and defaults */
 #define MIN_CONTRAST_SETTING        1
 #define MAX_CONTRAST_SETTING        30
 #define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
+
+/* Remote LCD contrast range and defaults */
+#define MIN_REMOTE_CONTRAST_SETTING     10
+#define MAX_REMOTE_CONTRAST_SETTING     35
+#define DEFAULT_REMOTE_CONTRAST_SETTING 24 /* Match boot contrast */
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_X5 /* PCF50606 I2C */

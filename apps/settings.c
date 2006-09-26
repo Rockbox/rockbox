@@ -302,7 +302,8 @@ static const struct bit_entry rtc_bits[] =
 
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
-    {6, S_O(remote_contrast), 42, "remote contrast", NULL },
+    {6, S_O(remote_contrast), DEFAULT_REMOTE_CONTRAST_SETTING,
+        "remote contrast", NULL },
     {1, S_O(remote_invert), false, "remote invert", off_on },
     {1, S_O(remote_flip_display), false, "remote flip display", off_on },
     {5, S_O(remote_backlight_timeout), 6, "remote backlight timeout",
@@ -1365,11 +1366,18 @@ void settings_load(int which)
 #ifdef HAVE_RECORDING
     global_settings.recscreen_on = false;
 #endif
+
 #ifdef HAVE_LCD_CONTRAST
-        if ( global_settings.contrast < MIN_CONTRAST_SETTING )
+        if ( global_settings.contrast < MIN_CONTRAST_SETTING ||
+             global_settings.contrast > MAX_CONTRAST_SETTING )
             global_settings.contrast = lcd_default_contrast();
 #endif
 
+#ifdef HAVE_LCD_REMOTE
+        if (global_settings.remote_contrast < MIN_REMOTE_CONTRAST_SETTING ||
+            global_settings.remote_contrast > MAX_REMOTE_CONTRAST_SETTING )
+            global_settings.remote_contrast = lcd_remote_default_contrast();
+#endif
         i = 0xb8;
         strncpy((char *)global_settings.wps_file, (char *)&config_block[i],
                 MAX_FILENAME);

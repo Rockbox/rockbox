@@ -108,7 +108,6 @@ extern unsigned char vp_dummy[VIRT_SIZE];
    simplicity. */
 #if !defined(HAVE_LCD_COLOR)
 #define HAVE_LCD_CONTRAST
-#define DEFAULT_CONTRAST_SETTING    40
 #endif
 
 struct user_settings
@@ -545,6 +544,11 @@ extern const char rec_base_directory[];
 
 /* system defines */
 #ifndef TARGET_TREE
+
+#ifndef HAVE_LCD_COLOR
+#define DEFAULT_CONTRAST_SETTING    40
+#endif
+
 #if defined HAVE_LCD_CHARCELLS
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        31
@@ -552,6 +556,17 @@ extern const char rec_base_directory[];
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
 #endif
+
+/* As it was */
+#ifdef HAVE_REMOTE_LCD
+#ifndef DEFAULT_REMOTE_CONTRAST_SETTING
+/* May be defined in config file if driver code needs the value */
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
+#endif
+#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
+#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
+#endif
+
 #endif /* !TARGET_TREE */
 
 /* argument bits for settings_load() */

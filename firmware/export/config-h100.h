@@ -50,6 +50,8 @@
 
 #define CONFIG_LCD LCD_S1D15E06
 
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
+
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 

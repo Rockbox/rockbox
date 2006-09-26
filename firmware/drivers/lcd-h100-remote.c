@@ -73,8 +73,6 @@ static int xmargin = 0;
 static int ymargin = 0;
 static int curfont = FONT_SYSFIXED;
 
-#define LCD_REMOTE_DEFAULT_CONTRAST 42;
-
 #ifndef SIMULATOR
 static int xoffset; /* needed for flip */
 
@@ -99,7 +97,7 @@ static int _remote_type = REMOTETYPE_UNPLUGGED;
 /* cached settings values */
 static bool cached_invert = false;
 static bool cached_flip = false;
-static int cached_contrast = LCD_REMOTE_DEFAULT_CONTRAST;
+static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 #endif
 
 /* scrolling */
@@ -397,7 +395,7 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
 
 int lcd_remote_default_contrast(void)
 {
-    return LCD_REMOTE_DEFAULT_CONTRAST;
+    return DEFAULT_REMOTE_CONTRAST_SETTING;
 }
 
 #ifndef SIMULATOR

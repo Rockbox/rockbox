@@ -51,12 +51,10 @@
 #define RS_LO      and_l(~0x00008000, &GPIO_OUT)
 #define RS_HI      or_l(0x00008000, &GPIO_OUT)
 
-#define LCD_REMOTE_DEFAULT_CONTRAST 0x18;
-
 /* cached settings values */
 static bool cached_invert = false;
 static bool cached_flip = false;
-static int cached_contrast = LCD_REMOTE_DEFAULT_CONTRAST;
+static int cached_contrast = DEFAULT_REMOTE_CONTRAST_SETTING;
 
 bool remote_initialized = false;
 
@@ -294,7 +292,7 @@ void lcd_remote_write_data(const unsigned char* p_bytes, int count)
 
 int lcd_remote_default_contrast(void)
 {
-    return LCD_REMOTE_DEFAULT_CONTRAST;
+    return DEFAULT_REMOTE_CONTRAST_SETTING;
 }
 
 void lcd_remote_powersave(bool on)
@@ -309,6 +307,11 @@ void lcd_remote_powersave(bool on)
 
 void lcd_remote_set_contrast(int val)
 {
+    if (val < 0)
+        val = 0;
+    else if (val > 63)
+        val = 63;
+
     cached_contrast = val;
     if(remote_initialized)
         lcd_remote_write_command_ex(LCD_SET_VOLUME, val);

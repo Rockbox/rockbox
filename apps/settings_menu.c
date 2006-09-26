@@ -124,8 +124,8 @@ static bool remote_contrast(void)
 {
     return set_int( str(LANG_CONTRAST), "", UNIT_INT,
                     &global_settings.remote_contrast,
-                    lcd_remote_set_contrast, 1, MIN_CONTRAST_SETTING,
-                    MAX_CONTRAST_SETTING, NULL );
+                    lcd_remote_set_contrast, 1, MIN_REMOTE_CONTRAST_SETTING,
+                    MAX_REMOTE_CONTRAST_SETTING, NULL );
 }
 
 static bool remote_invert(void)
