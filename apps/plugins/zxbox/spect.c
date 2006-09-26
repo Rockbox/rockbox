@@ -60,11 +60,15 @@ int SPNM(halfframe)(int firsttick, int numlines)
     /* Check if updating screen */
 
     if(SPNM(updating)) {
+#if LCD_WIDTH == 320 && ( LCD_HEIGHT == 240 || LCD_HEIGHT == 200 )
       border = SPNM(lastborder);
       if((feport & 0x07) != border) {
     SPNM(border_update) = 2;
     SPNM(lastborder) = feport & 0x07;
       }
+#else
+      SPNM(border_update) = 0;
+#endif
       scrptr = update_screen_line(scrptr, SPNM(coli)[scline], DANM(next_scri),
                   border, &cmark);
 

@@ -48,7 +48,6 @@ int SPNM(scri)[PORT_TIME_NUM];
 int SPNM(coli)[PORT_TIME_NUM];
 
 int SPNM(playing_tape) = 0;
-int SPNM(paused) = 0;
 
 char *SPNM(image);
 int SPNM(updating);

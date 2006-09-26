@@ -84,7 +84,7 @@ static struct configdata config[] =
 };
 int spcf_read_conf_file(const char *filename)
 {
-	settings.volume = 10;
+    settings.volume = 10;
     settings.showfps=1;
     settings.keymap[0]='2';
     settings.keymap[1]='w';
@@ -93,8 +93,8 @@ int spcf_read_conf_file(const char *filename)
     settings.keymap[4]='z';
     settings.kempston = 1 ;
     settings.invert_colors=0;
-	settings.sound = 0;
-	settings.frameskip = 0;
+    settings.sound = 0;
+    settings.frameskip = 0;
 
 
     configfile_init(rb);
@@ -112,17 +112,17 @@ int spcf_read_conf_file(const char *filename)
     /* Keep a copy of the saved version of the settings - so we can check if
        the settings have changed when we quit */
     old_settings = settings;
-	sound_on = settings.sound;
-	showframe = settings.frameskip+1;
-	int i;
+    sound_on = settings.sound;
+    showframe = settings.frameskip+1;
+    int i;
     for ( i=0 ; i<5 ; i++){
-		if (settings.keymap[i] == 'E')
-			intkeys[i]=SK_KP_Enter;
-		else if ( settings.keymap[i] == 'S' )
-			intkeys[i]=SK_KP_Space;
-		else
-			intkeys[i] = (unsigned) settings.keymap[i];
-	}
+        if (settings.keymap[i] == 'E')
+            intkeys[i]=SK_KP_Enter;
+        else if ( settings.keymap[i] == 'S' )
+            intkeys[i]=SK_KP_Space;
+        else
+            intkeys[i] = (unsigned) settings.keymap[i];
+    }
     return 1;
 }
 
@@ -131,7 +131,7 @@ int spcf_read_conf_file(const char *filename)
 /* set keys */
 static void set_keys(void){
     int m;
-	char c;
+    char c;
     int result;
     int menu_quit=0;
     static const struct menu_item items[] = {
@@ -198,8 +198,8 @@ static void select_keymap(void){
     int menu_quit=0;
     static const struct menu_item items[] = {
         { "2w90z", NULL },
-		{ "qaopS", NULL },
-		{ "7658S", NULL },
+        { "qaopS", NULL },
+        { "7658S", NULL },
        };
 
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
@@ -213,15 +213,15 @@ static void select_keymap(void){
         switch(result)
         {
             case 0:
-				rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[0].desc , sizeof(items[0].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[0].desc , sizeof(items[0].desc));
                 menu_quit=1;
                 break;            
             case 1:
-				rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[1].desc , sizeof(items[1].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[1].desc , sizeof(items[1].desc));
                 menu_quit=1;
                 break;
             case 2:
-				rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[2].desc , sizeof(items[2].desc));
+                rb->memcpy ( (void*)&settings.keymap[0] , (void*)items[2].desc , sizeof(items[2].desc));
                 menu_quit=1;
                 break;
             default:
@@ -247,9 +247,9 @@ static void options_menu(void){
         { "Map Keys to kempston", NULL },
         { "Display Speed", NULL },
         { "Invert Colors", NULL },
-		{ "Frameskip", NULL },
-		{ "Sound", NULL },
-		{ "Volume", NULL },
+        { "Frameskip", NULL },
+        { "Sound", NULL },
+        { "Volume", NULL },
         { "Predefined keymap", NULL },
         { "Custom keymap", NULL },
        };
@@ -257,15 +257,15 @@ static void options_menu(void){
         { "0", NULL },
         { "1", NULL },
         { "2", NULL },
-		{ "3", NULL },
-		{ "4", NULL },
-		{ "5", NULL },
+        { "3", NULL },
+        { "4", NULL },
+        { "5", NULL },
         { "6", NULL },
         { "7", NULL },
-		{ "8", NULL },
-		{ "9", NULL },
+        { "8", NULL },
+        { "9", NULL },
        };
-		
+        
 
     m = rb->menu_init(items, sizeof(items) / sizeof(*items),
                       NULL, NULL, NULL, NULL);
@@ -299,34 +299,34 @@ static void options_menu(void){
                     settings.invert_colors=new_setting;
                 rb->splash(HZ, true , "Restart to see effect");
                 break;
-			case 3:
+            case 3:
                 new_setting = settings.frameskip;
                 rb->set_option("Frameskip",&new_setting,INT, 
                                frameskip_items, 10, NULL);
                 if (new_setting != settings.frameskip )
                     settings.frameskip=new_setting;
                 break;
-			case 4:
+            case 4:
                 new_setting = settings.sound;
                 rb->set_option("Sound",&new_setting,INT, 
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
 #if CODEC == SWCODEC && !defined SIMULATOR
-				rb->pcm_play_stop();
+                rb->pcm_play_stop();
 #endif
                 break;
-			case 5:
+            case 5:
                 new_setting = 9 - settings.volume;
                 rb->set_option("Volume",&new_setting,INT, 
                                frameskip_items, 10, NULL);
-				new_setting = 9 - new_setting;
+                new_setting = 9 - new_setting;
                 if (new_setting != settings.volume )
                     settings.volume=new_setting;
                 break;
             case 6:
-			    select_keymap();
-		  	    break;
+                select_keymap();
+                break;
             case 7:
                 set_keys();
                 break;
@@ -353,8 +353,8 @@ static bool zxbox_menu(void)
     static const struct menu_item items[] = {
         { "VKeyboard", NULL },
         { "Play/Pause Tape", NULL },
-		{ "Save quick snapshot", NULL },
-		{ "Load quick snapshot", NULL },
+        { "Save quick snapshot", NULL },
+        { "Load quick snapshot", NULL },
         { "Save Snapshot", NULL },
         { "Toggle \"fast\" mode", NULL },
         { "Options", NULL },
@@ -383,14 +383,14 @@ static bool zxbox_menu(void)
                 pause_play();
                 menu_quit=1;
                 break;
-			case 2:
-				save_quick_snapshot();
-				menu_quit = 1;
-				break;
-			case 3:
-				load_quick_snapshot();
-				menu_quit = 1;
-				break;
+            case 2:
+                save_quick_snapshot();
+                menu_quit = 1;
+                break;
+            case 3:
+                load_quick_snapshot();
+                menu_quit = 1;
+                break;
             case 4:
                 save_snapshot();
                 break;
@@ -416,15 +416,15 @@ static bool zxbox_menu(void)
     rb->cpu_boost(true);
 #endif
 
-	int i;
+    int i;
     for ( i=0 ; i<5 ; i++){
-		if (settings.keymap[i] == 'E')
-			intkeys[i]=SK_KP_Enter;
-		else if ( settings.keymap[i] == 'S' )
-			intkeys[i]=SK_KP_Space;
-		else
-			intkeys[i] = (unsigned) settings.keymap[i];
-	}
+        if (settings.keymap[i] == 'E')
+            intkeys[i]=SK_KP_Enter;
+        else if ( settings.keymap[i] == 'S' )
+            intkeys[i]=SK_KP_Space;
+        else
+            intkeys[i] = (unsigned) settings.keymap[i];
+    }
 #ifdef USE_GRAY
     gray_show(true);
 #endif
@@ -476,20 +476,10 @@ static void run_singlemode(void)
           exit_requested = 0;
           video_frames=-1;
           start_time = *rb->current_tick;
-		  sound_on = settings.sound;
-		  showframe = settings.frameskip+1;
+          sound_on = settings.sound;
+          showframe = settings.frameskip+1;
           spti_reset();
       }
-    if(sp_paused) {
-      autoclose_sound();
-      while(sp_paused) {
-        spkb_process_events(1);
-        spti_sleep(SKIPTICKS);
-        translate_screen();
-        update();
-      }
-      spti_reset();
-    }
     halfsec = !(sp_int_ctr % 25);
     evenframe = !(sp_int_ctr & 1);
 

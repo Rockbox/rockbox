@@ -1,3 +1,5 @@
+26.09.2006 do not update border when we don't see it. some more cleanup.
+
 25.09.2006 yet more code cleanup, quick snapshot feature,sound should no longer crash,light optimizations
 
 04.09.2006 code cleanup; now using IRAM correctly (i hope)

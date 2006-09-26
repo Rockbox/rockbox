@@ -55,7 +55,6 @@ extern int SPNM(load_trapped);
 extern qbyte SPNM(scr_mark)[];
 extern byte SPNM(fe_inport_high)[];
 extern int SPNM(playing_tape);
-extern int SPNM(paused);
 
 extern int SPNM(scline);
 

@@ -30,7 +30,6 @@ extern void init_spect_scr(void);
 extern void destroy_spect_scr(void);
 extern void update_screen(void);
 extern void flash_change(void);
-extern void translate_screen(void);
 
 extern byte *update_screen_line(byte *scrp, int coli, int scri, int border,
                 qbyte *cmarkp);

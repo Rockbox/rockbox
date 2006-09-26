@@ -82,6 +82,7 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
   cmark = *cmarkp;
   scrptr = (qbyte *) scrp;
   if(scri >= 0) {          /* normal line */
+#if LCD_WIDTH == 320 && ( LCD_HEIGHT == 240 || LCD_HEIGHT == 200 )
     if(SPNM(border_update)) {
       brd_color = SPNM(colors)[border];
       brd_color |= brd_color << 8;
@@ -91,7 +92,10 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
       for(i = 8; i; i--) *scrptr++ = brd_color;
       scrptr -= 0x48;
     }
-    else scrptr += 0x08;
+    else
+#endif
+        scrptr += 0x08;
+
     tmptr = SPNM(scr_mark) + 0x2C0 + (coli >> 3);
     mark = *tmptr;
     if(!(coli & 0x07)) {
@@ -129,39 +133,22 @@ byte *update_screen_line(byte *scrp, int coli, int scri, int border,
     else scrptr += 0x48;
   }
   else if(scri == -1) {  /* only border */
+#if LCD_WIDTH == 320 && ( LCD_HEIGHT == 240 || LCD_HEIGHT == 200 )
     if(SPNM(border_update)) {
       brd_color = SPNM(colors)[border];
       brd_color |= brd_color << 8;
       brd_color |= brd_color << 16;
       for(i = 0x50; i; i--) *scrptr++ = brd_color;
     }
-    else scrptr += 0x50;
+    else
+#endif
+        scrptr += 0x50;
+
   }
 
   *cmarkp = cmark;
   return (byte *) scrptr;
 }
-
-void translate_screen(void)
-{
-  int border, scline;
-  byte *scrptr;
-  qbyte cmark = 0;
-
-  scrptr = (byte *) SPNM(image);
-
-  border = DANM(ula_outport) & 0x07;
-  if(border != SPNM(lastborder)) {
-    SPNM(border_update) = 2;
-    SPNM(lastborder) = border;
-  }
-
-  for(scline = 0; scline < (TMNUM / 2); scline++) 
-    scrptr = update_screen_line(scrptr, SPNM(coli)[scline], SPNM(scri)[scline],
-                border, &cmark);
-
-}
-
 
 void spscr_init_mask_color(void)
 {
