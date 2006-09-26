@@ -170,6 +170,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(0);
 
+#ifdef HAVE_WHEEL_POSITION
+    rb->wheel_send_events(false);
+#endif
+
 #if defined(HAVE_LCD_COLOR)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);

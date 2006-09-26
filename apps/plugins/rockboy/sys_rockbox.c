@@ -69,6 +69,20 @@ void joy_close(void)
 }
 
 unsigned int oldbuttonstate = 0, newbuttonstate,holdbutton;
+#ifdef HAVE_WHEEL_POSITION
+int oldwheel = -1, wheel;
+
+static int wheelmap[8] = {
+    PAD_UP,     /* Top */
+    PAD_A,      /* Top-right */
+    PAD_RIGHT,  /* Right */
+    PAD_START,  /* Bottom-right */
+    PAD_DOWN,   /* Bottom */
+    PAD_SELECT, /* Bottom-left */
+    PAD_LEFT,   /* Left */
+    PAD_B       /* Top-left */
+};
+#endif
 
 int released, pressed;
 
@@ -87,6 +101,44 @@ void ev_poll(void)
     if (pressed & BUTTON_ON)
         fb.mode=(fb.mode+1)%4;
 #endif
+
+#ifdef HAVE_WHEEL_POSITION
+    /* Get the current wheel position - 0..95 or -1 for untouched */
+    wheel = rb->wheel_status(); 
+
+    /* Convert to number from 0 to 7 - clockwise from top */
+    if ( wheel > 0 ){
+        wheel += 6;
+        wheel /= 12;
+        if ( wheel > 7 ) wheel = 0; 
+    }
+
+    if ( wheel != oldwheel ) {
+        if (oldwheel >= 0) {
+            ev.type = EV_RELEASE;
+            ev.code = wheelmap[oldwheel];
+            ev_postevent(&ev);
+        }
+
+        if (wheel >= 0) {
+            ev.type = EV_PRESS;
+            ev.code = wheelmap[wheel];
+            ev_postevent(&ev);
+        }
+    }
+
+    oldwheel = wheel;
+    if(released) {
+        ev.type = EV_RELEASE;
+        if ( released & (~BUTTON_SELECT) ) { ev.code=PAD_B; ev_postevent(&ev); }
+        if ( released & BUTTON_SELECT ) { ev.code=PAD_A; ev_postevent(&ev); }
+    }
+    if(pressed) { /* button press */
+        ev.type = EV_PRESS;
+        if ( pressed & (~BUTTON_SELECT) ) { ev.code=PAD_B; ev_postevent(&ev); }
+        if ( pressed & BUTTON_SELECT ) { ev.code=PAD_A; ev_postevent(&ev); }
+    }    
+#else
     if(released) {
         ev.type = EV_RELEASE;
         if(released & ROCKBOY_PAD_LEFT) { ev.code=PAD_LEFT; ev_postevent(&ev); }
@@ -120,19 +172,32 @@ void ev_poll(void)
             ev.code=PAD_SELECT;
             ev_postevent(&ev);
         }
+#endif
+#if CONFIG_KEYPAD == IPOD_4G_PAD
+        if(rb->button_hold()) {
+#else
         if(pressed & options.MENU) {
+#endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD)
-          if (do_user_menu() == USER_MENU_QUIT) 
+#ifdef HAVE_WHEEL_POSITION
+            rb->wheel_send_events(true);
 #endif
-          {
-            die("");
-            cleanshut=1;
-          }
+            if (do_user_menu() == USER_MENU_QUIT) 
+#endif
+            {
+                die("");
+                cleanshut=1;
+            }
+#ifdef HAVE_WHEEL_POSITION
+            rb->wheel_send_events(false);
+#endif
         }
+#if CONFIG_KEYPAD != IPOD_4G_PAD
     }
-    
+
+#endif    
 }
 
 void vid_setpal(int i, int r, int g, int b)
