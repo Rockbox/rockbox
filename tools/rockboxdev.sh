@@ -84,7 +84,8 @@ echo "Build dir: $builddir (edit script to change dir)"
 # be able to install there!
 if test ! -w $prefix; then
   echo "WARNING: this script is set to install in $prefix but has no"
-  echo "WARNING: write permission to do so!"
+  echo "WARNING: write permission to do so! Please fix and re-run this script"
+  exit
 fi
 
 
