@@ -580,6 +580,33 @@ void car_adapter_mode_init(void)
 }
 #endif
 
+#ifdef HAVE_HEADPHONE_DETECTION
+void unplug_change(bool inserted)
+{
+    if (global_settings.unplug_mode)
+    {
+        if (inserted)
+        {
+            if ( global_settings.unplug_mode > 1 )
+                audio_resume();
+            backlight_on();
+        } else {
+            audio_pause();
+
+            if (global_settings.unplug_rw)
+            {
+                if ( audio_current_track()->elapsed >
+                (unsigned long)(global_settings.unplug_rw*1000))
+                    audio_ff_rewind(audio_current_track()->elapsed -
+                    (global_settings.unplug_rw*1000));
+                else
+                    audio_ff_rewind(0);
+            }
+        }
+    }
+}
+#endif
+
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
 {
     switch(event)
@@ -608,6 +635,15 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_CHARGER_DISCONNECTED:
             car_adapter_mode_processing(false);
             return SYS_CHARGER_DISCONNECTED;
+#endif
+#ifdef HAVE_HEADPHONE_DETECTION
+        case SYS_PHONE_PLUGGED:
+            unplug_change(true);
+            return SYS_PHONE_PLUGGED;
+
+        case SYS_PHONE_UNPLUGGED:
+            unplug_change(false);
+            return SYS_PHONE_UNPLUGGED;
 #endif
     }
     return 0;

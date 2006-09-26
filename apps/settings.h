@@ -486,6 +486,12 @@ struct user_settings
 #endif
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
     int show_path_in_browser; /* 0=off, 1=current directory, 2=full path */
+
+#ifdef HAVE_HEADPHONE_DETECTION
+    int unplug_mode; /* pause on headphone unplug */
+    int unplug_rw; /* time in s to rewind when pausing */
+    bool unplug_autoresume; /* disable auto-resume if no phones */
+#endif
 };
 
 enum optiontype { INT, BOOL };

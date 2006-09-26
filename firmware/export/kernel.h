@@ -46,6 +46,8 @@
 #define SYS_FS_CHANGED            ((SYS_EVENT | ((long)9 << 27)))
 #define SYS_CHARGER_CONNECTED     ((SYS_EVENT | ((long)10 << 27)))
 #define SYS_CHARGER_DISCONNECTED  ((SYS_EVENT | ((long)11 << 27)))
+#define SYS_PHONE_PLUGGED         ((SYS_EVENT | ((long)12 << 27)))
+#define SYS_PHONE_UNPLUGGED       ((SYS_EVENT | ((long)13 << 27)))
 
 struct event
 {

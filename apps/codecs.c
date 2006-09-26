@@ -218,6 +218,7 @@ struct codec_api ci = {
     enc_wavbuf_near_empty,
     enc_get_wav_data,
     &enc_set_header_callback,
+    44100,
 #endif
 
     /* new stuff at the end, sort into place next time

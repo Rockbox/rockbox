@@ -1664,6 +1664,57 @@ static bool tagcache_settings_menu(void)
     return result;
 }
 
+#ifdef HAVE_HEADPHONE_DETECTION
+static bool unplug_mode(void)
+{
+    static const struct opt_items names[] = {
+        { STR(LANG_OFF) },
+        { STR(LANG_PAUSE) },
+        { STR(LANG_UNPLUG_RESUME) },
+    };
+    bool ret;
+    ret=set_option( str(LANG_UNPLUG),
+                    &global_settings.unplug_mode, INT, names, 3, NULL);
+
+    return ret;
+}
+
+static bool unplug_rw(void)
+{
+    bool ret;
+
+    ret = set_int(str(LANG_UNPLUG_RW), "s", UNIT_SEC,
+                   &global_settings.unplug_rw,
+                   NULL, 1, 0, 15, NULL );
+    audio_set_crossfade(global_settings.unplug_rw);
+    return ret;
+}
+
+static bool unplug_autoresume(void)
+{
+    return set_bool( str(LANG_UNPLUG_DISABLE_AUTORESUME), 
+                    &global_settings.unplug_autoresume );
+}
+
+static bool unplug_menu(void)
+{
+    int m;
+    bool result;
+
+    static const struct menu_item items[] = {
+        { ID2P(LANG_UNPLUG), unplug_mode },
+        { ID2P(LANG_UNPLUG_RW), unplug_rw },
+        { ID2P(LANG_UNPLUG_DISABLE_AUTORESUME), unplug_autoresume },
+    };
+
+    m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
+                 NULL, NULL, NULL);
+    result = menu_run(m);
+    menu_exit(m);
+    return result;
+}
+#endif
+
 static bool playback_settings_menu(void)
 {
     int m;
@@ -1687,7 +1738,10 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_SPDIF_ENABLE), spdif },
 #endif
         { ID2P(LANG_ID3_ORDER), id3_order },
-        { ID2P(LANG_NEXT_FOLDER), next_folder }
+        { ID2P(LANG_NEXT_FOLDER), next_folder },
+#ifdef HAVE_HEADPHONE_DETECTION
+        { ID2P(LANG_UNPLUG), unplug_menu }
+#endif
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

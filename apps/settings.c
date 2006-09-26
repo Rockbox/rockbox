@@ -655,6 +655,12 @@ static const struct bit_entry hd_bits[] =
 #endif
 #endif
 
+#ifdef HAVE_HEADPHONE_DETECTION
+    {2, S_O(unplug_mode), 0, "pause on headphone unplug", NULL},
+    {4, S_O(unplug_rw), 0, "rewind duration on pause", NULL},
+    {1, S_O(unplug_autoresume), 0, "disable autoresume if phones not present", off_on },
+#endif
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

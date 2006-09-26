@@ -303,6 +303,7 @@ struct codec_api {
     char*         (*enc_get_wav_data)(int size);
     void          (**enc_set_header_callback)(void *head_buffer,
                     int head_size, int num_samples, bool is_file_header);
+    int sample_rate;
 #endif
 
     /* new stuff at the end, sort into place next time

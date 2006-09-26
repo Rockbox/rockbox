@@ -92,6 +92,10 @@ static bool remote_button_hold_only(void);
 int int_btn = BUTTON_NONE;
 #endif
 
+#ifdef HAVE_HEADPHONE_DETECTION
+bool phones_present = false;
+#endif
+
 #if (CONFIG_KEYPAD == IPOD_4G_PAD) && !defined(IPOD_MINI)
 static void opto_i2c_init(void)
 {
@@ -430,6 +434,23 @@ static void button_tick(void)
     if(btn)
     {
         queue_post(&button_queue, btn, NULL);
+    }
+#endif
+
+#ifdef HAVE_HEADPHONE_DETECTION
+    if ( headphones_inserted() )
+    {
+        if (! phones_present )
+        {
+            queue_post(&button_queue, SYS_PHONE_PLUGGED, NULL);
+            phones_present = true;
+        }
+    } else {
+        if ( phones_present )
+        {
+            queue_post(&button_queue, SYS_PHONE_UNPLUGGED, NULL);
+            phones_present = false;
+        }
     }
 #endif
 
@@ -1326,4 +1347,11 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
+
+#ifdef HAVE_HEADPHONE_DETECTION
+bool headphones_inserted(void)
+{
+    return (GPIOA_INPUT_VAL & 0x80)?true:false;
+}
+#endif
 

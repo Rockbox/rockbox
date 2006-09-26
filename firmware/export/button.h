@@ -54,6 +54,9 @@ bool button_hold(void);
 #ifdef HAS_REMOTE_BUTTON_HOLD
 bool remote_button_hold(void);
 #endif
+#ifdef HAVE_HEADPHONE_DETECTION
+bool headphones_inserted(void);
+#endif
 
 
 #define  BUTTON_NONE        0x00000000

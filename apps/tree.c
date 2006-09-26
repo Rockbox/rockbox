@@ -466,7 +466,20 @@ static void start_resume(bool just_powered_on)
 
         /* always resume? */
         if ( global_settings.resume || ! just_powered_on)
-            do_resume = true;
+#ifdef HAVE_HEADPHONE_DETECTION
+        {
+            if ( just_powered_on )
+            {
+                if ( !global_settings.unplug_autoresume
+                    || headphones_inserted() )
+                    do_resume = true;
+            }
+            else
+                do_resume = true;
+        }
+#else
+             do_resume = true;
+#endif
 
         if (! do_resume) return;
 
