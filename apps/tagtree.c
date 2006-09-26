@@ -52,6 +52,7 @@ static char searchstring[32];
 enum variables {
     var_sorttype = 100,
     var_limit,
+    var_strip,
     var_menu_start,
     var_include,
     var_rootmenu,
@@ -87,6 +88,7 @@ struct display_format {
     int tag_count;
     
     int limit;
+    int strip;
     bool sort_inverse;
 };
 
@@ -194,6 +196,7 @@ static int get_tag(int *tag)
     MATCH(tag, buf, "autoscore", tag_virt_autoscore);
     MATCH(tag, buf, "%sort", var_sorttype);
     MATCH(tag, buf, "%limit", var_limit);
+    MATCH(tag, buf, "%strip", var_strip);
     MATCH(tag, buf, "%menu_start", var_menu_start);
     MATCH(tag, buf, "%include", var_include);
     MATCH(tag, buf, "%root_menu", var_rootmenu);
@@ -336,6 +339,12 @@ static int get_format_str(struct display_format *fmt)
             if (!read_variable(buf, sizeof buf))
                 return -13;
             fmt->limit = atoi(buf);
+            break;
+            
+        case var_strip:
+            if (!read_variable(buf, sizeof buf))
+                return -14;
+            fmt->strip = atoi(buf);
             break;
             
         default:
@@ -786,7 +795,8 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     int level = c->currextra;
     int tag;
     bool sort = false;
-    int sort_limit = 0;
+    int sort_limit;
+    int strip;
     
     if (init
 #ifdef HAVE_TC_RAMCACHE
@@ -852,11 +862,13 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     {
         sort_inverse = fmt->sort_inverse;
         sort_limit = fmt->limit;
+        strip = fmt->strip;
     }
     else
     {
         sort_inverse = false;
         sort_limit = 0;
+        strip = 0;
     }
     
     if (tag != tag_title && tag != tag_filename)
@@ -1028,6 +1040,20 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
     
     if (sort_limit)
         total_count = MIN(total_count, sort_limit);
+    
+    if (strip)
+    {
+        dptr = c->dircache;
+        for (i = 0; i < total_count; i++, dptr++)
+        {
+            int len = strlen(dptr->name);
+            
+            if (len < strip)
+                continue;
+            
+            dptr->name = &dptr->name[strip];
+        }
+    }
     
     return total_count;
 }
