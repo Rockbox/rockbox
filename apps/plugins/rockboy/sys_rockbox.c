@@ -194,9 +194,9 @@ void ev_poll(void)
             rb->wheel_send_events(false);
 #endif
         }
-#if CONFIG_KEYPAD != IPOD_4G_PAD
-    }
 
+#ifndef HAVE_WHEEL_POSITION
+    }
 #endif    
 }
 
