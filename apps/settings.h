@@ -242,9 +242,7 @@ struct user_settings
     unsigned char font_file[MAX_FILENAME+1]; /* last font */
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
     unsigned char lang_file[MAX_FILENAME+1]; /* last language */
-#ifdef HAVE_RECORDING
-    unsigned char rec_path[MAX_PATH+1];  /* path for recorded files */
-#endif
+
     /* misc options */
 
     int repeat_mode;   /* 0=off 1=repeat all 2=repeat one 3=shuffle 4=ab */
@@ -534,7 +532,6 @@ void set_file(char* filename, char* setting, int maxlen);
 unsigned int rec_timesplit_seconds(void);
 unsigned long rec_sizesplit_bytes(void);
 void settings_apply_trigger(void);
-void set_recpath(void);
 
 /* global settings */
 extern struct user_settings global_settings;

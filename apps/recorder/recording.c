@@ -491,8 +491,12 @@ void adjust_cursor(void)
 
 char *rec_create_filename(char *buffer)
 {
-    strncpy(buffer, global_settings.rec_path, MAX_PATH);
-        
+    if(global_settings.rec_directory)
+        getcwd(buffer, MAX_PATH);
+    else
+        strncpy(buffer, rec_base_directory, MAX_PATH);
+
+
 #ifdef CONFIG_RTC 
     create_datetime_filename(buffer, buffer, "R",
         REC_FILE_ENDING(global_settings.rec_quality));
@@ -506,16 +510,7 @@ char *rec_create_filename(char *buffer)
 int rec_create_directory(void)
 {
     int rc;
-    DIR* dir;
-
-    dir = opendir(global_settings.rec_path);
-    if (dir == NULL)
-    {
-        strncpy(global_settings.rec_path, rec_base_directory, MAX_PATH);
-        global_settings.rec_directory = false;
-    }
-    else
-        closedir(dir);
+    
     /* Try to create the base directory if needed */
     if(global_settings.rec_directory == 0)
     {
@@ -833,10 +828,6 @@ bool recording_screen(bool no_source)
 
     global_settings.recscreen_on = true;
     cursor = 0;
-
-    if (strlen(global_settings.rec_path) == 0)
-        strncpy(global_settings.rec_path, rec_base_directory, MAX_PATH);
-
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
     ata_set_led_enabled(false);
 #endif
@@ -1729,12 +1720,10 @@ bool recording_screen(bool no_source)
             /* draw the trigger status */
             if (peak_meter_trigger_status() != TRIG_OFF)
             {
-                peak_meter_draw_trig(LCD_WIDTH - TRIG_WIDTH,  filename_offset[0] + 
-                                        PM_HEIGHT + line[0]);
+                peak_meter_draw_trig(LCD_WIDTH - TRIG_WIDTH, 4 * h);
                 for(i = 0; i < screen_update; i++){
-                    screens[i].update_rect(LCD_WIDTH - (TRIG_WIDTH + 2),
-                                               filename_offset[0] + PM_HEIGHT +
-                                               line[0], + 2, TRIG_HEIGHT);
+                    screens[i].update_rect(LCD_WIDTH - (TRIG_WIDTH + 2), 4 * h,
+                                    TRIG_WIDTH + 2, TRIG_HEIGHT);
                 }
             }
         }
