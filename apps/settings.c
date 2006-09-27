@@ -74,6 +74,7 @@
 #ifdef HAVE_LCD_COLOR
 #include "backdrop.h"
 #endif
+#include "tree.h"
 
 #ifdef CONFIG_TUNER
 #include "radio.h"
@@ -1013,6 +1014,11 @@ int settings_save( void )
             MAX_FILENAME);
     i+= MAX_FILENAME;
 #endif
+#ifdef HAVE_RECORDING
+    strncpy((char *)&config_block[i], (char *)global_settings.rec_path,
+            MAX_PATH);
+    i+= MAX_PATH;
+#endif
 
     if(save_config_buffer())
     {
@@ -1410,6 +1416,11 @@ void settings_load(int which)
                 MAX_FILENAME);
         i+= MAX_FILENAME;
 #endif
+#ifdef HAVE_RECORDING
+        strncpy((char *)global_settings.rec_path, (char *)&config_block[i],
+                MAX_PATH);
+        i+= MAX_PATH;
+#endif
     }
 }
 
@@ -1769,6 +1780,11 @@ bool settings_save_config(void)
                  global_settings.kbd_file);
 #endif
 
+#ifdef HAVE_RECORDING
+    if (global_settings.rec_path[0] != 0)
+        fdprintf(fd, "recording path: %s\r\n", global_settings.rec_path);
+#endif
+
     /* here's the action: write values to file, specified via table */
     save_cfg_table(rtc_bits, sizeof(rtc_bits)/sizeof(rtc_bits[0]), fd);
     save_cfg_table(hd_bits, sizeof(hd_bits)/sizeof(hd_bits[0]), fd);
@@ -1862,6 +1878,9 @@ void settings_reset(void) {
 #endif
 #ifdef HAVE_LCD_BITMAP
     global_settings.kbd_file[0] = '\0';
+#endif
+#ifdef HAVE_RECORDING
+    global_settings.rec_path[0] = '\0';
 #endif
     global_settings.hold_lr_for_scroll_in_list = true;
 }
@@ -2146,5 +2165,14 @@ void settings_apply_trigger(void)
         trigger_times[global_settings.rec_stop_postrec],
         trigger_times[global_settings.rec_stop_gap]
     );
+}
+#endif
+#ifdef HAVE_RECORDING
+void set_recpath(void)
+{
+    if(global_settings.rec_directory)
+        getcwd(global_settings.rec_path, MAX_PATH);
+    else
+        strncpy(global_settings.rec_path, rec_base_directory, MAX_PATH);
 }
 #endif

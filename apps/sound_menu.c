@@ -520,13 +520,17 @@ static bool recprerecord(void)
 
 static bool recdirectory(void)
 {
+    bool ret;
     static const struct opt_items names[] = {
         { rec_base_directory, -1 },
         { STR(LANG_RECORD_CURRENT_DIR) }
     };
-    return set_option(str(LANG_RECORD_DIRECTORY),
+    ret = set_option(str(LANG_RECORD_DIRECTORY),
                       &global_settings.rec_directory, INT,
                       names, 2, NULL );
+    set_recpath();
+
+    return ret;
 }
 
 static bool reconstartup(void)
