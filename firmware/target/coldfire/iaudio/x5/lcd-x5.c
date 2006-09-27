@@ -121,6 +121,9 @@ void lcd_set_contrast(int val)
 
     lcd_contrast = val << 8;
 
+    if (!power_on)
+        return;
+
     /* VCOMG=1, VDV4-0=xxxxx, VCM4-0=11000 */
     lcd_write_reg(R_POWER_CONTROL5, 0x2018 | lcd_contrast);
 }
@@ -372,8 +375,9 @@ void lcd_init_device(void)
     /* Power and display already ON */
     power_on = true;
     display_on = true;
-    lcd_roll(0);
     lcd_set_flip(false);
+    lcd_roll(0);
+    lcd_set_invert_display(false);
     lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
 #endif
 }
