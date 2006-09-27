@@ -1259,6 +1259,7 @@ bool recording_screen(bool no_source)
                             global_settings.rec_editable,
                             global_settings.rec_prerecord_time);
 
+                        rec_create_directory();
 #ifdef HAVE_AGC
                         if (global_settings.rec_source == AUDIO_SRC_MIC) {
                             agc_preset = global_settings.rec_agc_preset_mic;
