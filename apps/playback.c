@@ -620,12 +620,13 @@ void audio_set_crossfade(int enable)
     {
         /* Store the track resume position */
         offset = cur_ti->id3.offset;
+
         /* Playback has to be stopped before changing the buffer size. */
+        gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
         LOGFQUEUE("audio > audio Q_AUDIO_STOP");
         queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-        while (audio_codec_loaded)
+        while (audio_codec_loaded || playing)
             yield();
-        gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
     }
 
     /* Re-initialize audio system. */
@@ -638,13 +639,14 @@ void audio_set_crossfade(int enable)
     voice_init();
 
     /* Restart playback. */
-    if (was_playing) {
+    if (was_playing) 
+    {
         LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
 
         /* Wait for the playback to start again (and display the splash
            screen during that period. */
-        while (playing && !audio_codec_loaded)
+        while (!playing && !audio_codec_loaded)
             yield();
     }
 }
