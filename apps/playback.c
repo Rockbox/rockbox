@@ -976,8 +976,9 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     voice_remaining = 0;
                     voicebuf = NULL;
                     voice_boost_cpu(false);
-                    ci_voice.new_track = 1;
+
                     /* Force the codec to think it's changing tracks */
+                    ci_voice.new_track = 1; 
                     *realsize = 0;
                     return NULL;
                 }
@@ -996,6 +997,11 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 LOGFQUEUE("voice < Q_VOICE_PLAY");
                 if (!voice_is_playing)
                 {
+                    /* Slight hack - flush PCM buffer if only being used for voice */
+                    if (!playing && pcm_is_playing())
+                        pcmbuf_play_stop();
+
+                    /* Set up new voice data */
                     struct voice_info *voice_data;
                     voice_is_playing = true;
                     voice_boost_cpu(true);
