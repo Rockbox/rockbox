@@ -331,28 +331,31 @@ void *sim_codec_load_ram(char* codecptr, int size,
     char path[MAX_PATH];
     int fd;
     int copy_n;
-    static int codec_count = 0;
+    int codec_count;
 #ifdef WIN32
     char buf[256];
 #endif
 
     *pd = NULL;
 
-    /* We have to create the dynamic link library file from ram
-       so we could simulate the codec loading. */
+    /* We have to create the dynamic link library file from ram so we 
+       can simulate the codec loading. With voice and crossfade,
+       multiple codecs may be loaded at the same time, so we need 
+       to find an unused filename */
+    for (codec_count = 0; codec_count < 10; codec_count++)
+    {
+        sprintf(path, TEMP_CODEC_FILE, codec_count);
 
-    sprintf(path, TEMP_CODEC_FILE, codec_count);
-
-    /* if voice is enabled, two codecs may be loaded at same time */
-    if (!codec_count)
-        codec_count++;
-
-#ifdef WIN32
-    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
-#else
-    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
-#endif
-    if (fd < 0) {
+    #ifdef WIN32
+        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, S_IRWXU);
+    #else
+        fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    #endif
+        if (fd >= 0)
+            break;  /* Created a file ok */
+    }
+    if (fd < 0)        
+    {
         DEBUGF("failed to open for write: %s\n", path);
         return NULL;
     }
