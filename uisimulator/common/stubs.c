@@ -57,7 +57,7 @@ int ata_write_sectors(IF_MV2(int drive,)
         char name[32];
 
         sprintf(name,"sector%lX.bin",start+i);
-        f=fopen(name,"w");
+        f=fopen(name,"wb");
         if (f) {
             fwrite(buf,512,1,f);
             fclose(f);
@@ -77,9 +77,9 @@ int ata_read_sectors(IF_MV2(int drive,)
         FILE* f;
         char name[32];
 
-        DEBUGF("Reading sector %X\n",start+i);
+        DEBUGF("Reading sector %lX\n",start+i);
         sprintf(name,"sector%lX.bin",start+i);
-        f=fopen(name,"r");
+        f=fopen(name,"rb");
         if (f) {
             fread(buf,512,1,f);
             fclose(f);
