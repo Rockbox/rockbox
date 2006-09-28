@@ -114,7 +114,7 @@
 /* Define this if your LCD can be put to sleep. HAVE_LCD_ENABLE
  * should be defined as well.
  * We can currently put the lcd to sleep but it won't wake up properly */
-/*#define HAVE_LCD_SLEEP*/
+#define HAVE_LCD_SLEEP
 
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0

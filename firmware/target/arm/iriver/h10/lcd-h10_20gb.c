@@ -37,6 +37,8 @@ static bool display_on;
 static int y_offset;
 /* Reverse flag. Must be remembered when display is turned off. */
 static unsigned short disp_control_rev;
+/* Contrast setting << 8 */
+static int lcd_contrast;
 
 /* Forward declarations */
 static void lcd_display_off(void);
@@ -138,7 +140,13 @@ void lcd_set_contrast(int val)
     else if (val > 30)
         val = 30;
 
-    lcd_write_reg(R_POWER_CONTROL5, 0x2018 + (val<<8));
+    lcd_contrast = val << 8;
+
+    if (!power_on)
+  	         return;
+
+    /* VCOMG=1, VDV4-0=xxxxx, VCM4-0=11000 */
+    lcd_write_reg(R_POWER_CONTROL5, 0x2018 | lcd_contrast);
 }
 
 void lcd_set_invert_display(bool yesno)
@@ -184,6 +192,7 @@ void lcd_init_device(void)
     display_on = true;    
     y_offset = 0;
     disp_control_rev = 0x0004;
+    lcd_contrast     = DEFAULT_CONTRAST_SETTING << 8;
 }
 
 static void lcd_power_on(void)
@@ -206,14 +215,14 @@ static void lcd_power_on(void)
     lcd_write_reg(R_POWER_CONTROL4, 0x0401);
     /* CAD=1 */
     lcd_write_reg(R_POWER_CONTROL2, 0x8000);
-    /* VCOMG=0, VDV4-0=10011 (19), VCM4-0=11000 */
-    lcd_write_reg(R_POWER_CONTROL5, 0x1318);
+    /* VCOMG=0, VDV4-0=xxxxx (19), VCM4-0=11000 */
+    lcd_write_reg(R_POWER_CONTROL5, 0x0018 | lcd_contrast);
     /* Instruction (2) for power setting; BT2-0, DC2-0, AP2-0 */
     /* BT2-0=000, DC2-0=001, AP2-0=011, SLP=0, STB=0 */
     lcd_write_reg(R_POWER_CONTROL1, 0x002c);
     /* Instruction (3) for power setting; VCOMG = "1" */
-    /* VCOMG=1, VDV4-0=10011 (19), VCM4-0=11000 */
-    lcd_write_reg(R_POWER_CONTROL5, 0x3318);
+    /* VCOMG=1, VDV4-0=xxxxx (19), VCM4-0=11000 */
+    lcd_write_reg(R_POWER_CONTROL5, 0x2018 | lcd_contrast);
 
     /* 40ms or more; time for step-up circuits 1,2 to stabilize */
     sleep(HZ/25);
@@ -291,7 +300,7 @@ static void lcd_power_off(void)
     /* VRL3-0=0100, PON=0, VRH3-0=0001 */
     lcd_write_reg(R_POWER_CONTROL4, 0x0401);
     /* VCOMG=0, VDV4-0=10011, VCM4-0=11000 */
-    lcd_write_reg(R_POWER_CONTROL5, 0x1318);
+    lcd_write_reg(R_POWER_CONTROL5, 0x0018 | lcd_contrast);
 
     /* Wait 100ms or more */
     sleep(HZ/10);
