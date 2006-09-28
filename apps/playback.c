@@ -625,9 +625,11 @@ void audio_set_crossfade(int enable)
         gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
         LOGFQUEUE("audio > audio Q_AUDIO_STOP");
         queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-        while (audio_codec_loaded || playing)
+        while (audio_codec_loaded)
             yield();
     }
+
+    voice_stop();
 
     /* Re-initialize audio system. */
     pcmbuf_init(size);
@@ -646,7 +648,7 @@ void audio_set_crossfade(int enable)
 
         /* Wait for the playback to start again (and display the splash
            screen during that period. */
-        while (!playing && !audio_codec_loaded)
+        while (!playing)
             yield();
     }
 }
@@ -698,15 +700,7 @@ void voice_init(void)
         return;     /* Audio buffers not yet set up */
 
     if (voice_thread_p)
-    {
-        logf("Terminating voice codec");
-        remove_thread(voice_thread_p);
-        if (current_codec == CODEC_IDX_VOICE)
-            mutex_unlock(&mutex_codecthread);
-        queue_delete(&voice_queue);
-        voice_thread_p = NULL;
-        voice_codec_loaded = false;
-    }
+        return;
 
     if (!talk_voice_required())
         return;
@@ -733,7 +727,7 @@ void voice_stop(void)
 
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 0);
-    while (voice_is_playing && !queue_empty(&voice_queue))
+    while (voice_is_playing)
         yield();
     if (!playing)   
         pcmbuf_play_stop();
