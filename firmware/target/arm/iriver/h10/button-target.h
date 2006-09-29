@@ -26,8 +26,10 @@
 #include "config.h"
 
 #define HAS_BUTTON_HOLD
+#define HAS_REMOTE_BUTTON_HOLD
 
 bool button_hold(void);
+bool remote_button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
 
@@ -49,10 +51,18 @@ int button_read_device(void);
 #define BUTTON_MAIN (BUTTON_POWER|BUTTON_O|BUTTON_BACK|BUTTON_REW\
                 |BUTTON_PLAY|BUTTON_FF)
 
-    /* No Remote control */
-#define BUTTON_REMOTE 0
+    /* Remote control's buttons */
+#define BUTTON_RC_REW       0x00080000
+#define BUTTON_RC_PLAY      0x00100000
+#define BUTTON_RC_FF        0x00200000
+#define BUTTON_RC_VOL_UP    0x00400000
+#define BUTTON_RC_VOL_DOWN  0x00800000
 
-#define POWEROFF_BUTTON BUTTON_POWER
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN\
+                |BUTTON_RC_REW|BUTTON_RC_FF)
+
+#define POWEROFF_BUTTON     BUTTON_POWER
+#define RC_POWEROFF_BUTTON  BUTTON_RC_PLAY
 #define POWEROFF_COUNT 10
 
 #endif /* _BUTTON_TARGET_H_ */

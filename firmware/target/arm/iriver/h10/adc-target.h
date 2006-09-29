@@ -32,7 +32,7 @@
 
 #define ADC_BATTERY     0
 #define ADC_UNKNOWN_1   1
-#define ADC_UNKNOWN_2   2
+#define ADC_REMOTE      2
 #define ADC_SCROLLPAD   3
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 

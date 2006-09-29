@@ -69,7 +69,7 @@ static void adc_tick(void)
         adc_counter = 0;
         adc_scan(ADC_BATTERY);
         adc_scan(ADC_UNKNOWN_1);
-        adc_scan(ADC_UNKNOWN_2);
+        adc_scan(ADC_REMOTE);
         adc_scan(ADC_SCROLLPAD);
     }
 }
@@ -85,7 +85,7 @@ void adc_init(void)
     /* Force a scan of all channels to get initial values */
     adc_scan(ADC_BATTERY);
     adc_scan(ADC_UNKNOWN_1);
-    adc_scan(ADC_UNKNOWN_2);
+    adc_scan(ADC_REMOTE);
     adc_scan(ADC_SCROLLPAD);
     
     tick_add_task(adc_tick);

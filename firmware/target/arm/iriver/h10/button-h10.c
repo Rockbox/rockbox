@@ -50,15 +50,23 @@ bool button_hold(void)
     return (GPIOA_INPUT_VAL & 0x4)?false:true;
 }
 
+bool remote_button_hold(void)
+{
+    return adc_scan(ADC_REMOTE) < 0x17;
+}
+
 /*
  * Get button pressed from hardware
  */
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
+    int data;
     unsigned char state;
     static bool hold_button = false;
+    static bool remote_hold_button = false;
     bool hold_button_old;
+    bool remote_hold_button_old;
 
     /* Hold */
     hold_button_old = hold_button;
@@ -72,6 +80,7 @@ int button_read_device(void)
     }
 #endif
 
+    /* device buttons */
     if (!hold_button)
     {
         /* Read normal buttons */
@@ -88,14 +97,12 @@ int button_read_device(void)
         /* Read scroller */
         if ( GPIOD_INPUT_VAL & 0x20 )
         {
-            int scroll_pos;
-            
             GPIOD_OUTPUT_VAL &=~ 0x40;
             udelay(50);
-            scroll_pos = adc_scan(ADC_SCROLLPAD);
+            data = adc_scan(ADC_SCROLLPAD);
             GPIOD_OUTPUT_VAL |= 0x40;
             
-            if(scroll_pos < 0x210)
+            if(data < 0x210)
             {
                 btn |= BUTTON_SCROLL_DOWN;
             } else {
@@ -103,6 +110,38 @@ int button_read_device(void)
             }
         }
     }
+    
+    /* remote buttons */
+    remote_hold_button_old = remote_hold_button;
+
+    data = adc_scan(ADC_REMOTE);
+    remote_hold_button = data < 0x17;
+
+#ifndef BOOTLOADER
+    if (remote_hold_button != remote_hold_button_old)
+        backlight_hold_changed(remote_hold_button);
+#endif
+
+    if(!remote_hold_button)
+    {
+        if (data < 0x3FF)
+        {
+            if(data < 0x1F0)
+                if(data < 0x141)
+                    btn |= BUTTON_RC_FF;
+                else
+                    btn |= BUTTON_RC_REW;
+            else
+                if(data < 0x2BC)
+                   btn |= BUTTON_RC_VOL_DOWN;
+                else
+                    btn |= BUTTON_RC_VOL_UP;
+        }
+    }
+
+    /* remote play button should be dead if hold */
+    if (!remote_hold_button && !(GPIOA_INPUT_VAL & 0x1))
+        btn |= BUTTON_RC_PLAY;
     
     return btn;
 }

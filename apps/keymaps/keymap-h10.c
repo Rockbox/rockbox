@@ -52,6 +52,15 @@ const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
+const struct button_mapping remote_button_context_standard[]  = {
+    { ACTION_STD_PREV,        BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_STD_PREVREPEAT,  BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_STD_NEXT,        BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_STD_NEXTREPEAT,  BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST
+}; /* remote_button_context_standard */
+
 const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,     BUTTON_PLAY|BUTTON_REL,   BUTTON_PLAY },
     { ACTION_WPS_STOP,     BUTTON_PLAY|BUTTON_REPEAT,BUTTON_PLAY },
@@ -77,6 +86,27 @@ const struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
+const struct button_mapping remote_button_context_wps[]  = {
+    { ACTION_WPS_PLAY,     BUTTON_RC_PLAY|BUTTON_REL,   BUTTON_RC_PLAY },
+    { ACTION_WPS_STOP,     BUTTON_RC_PLAY|BUTTON_REPEAT,BUTTON_RC_PLAY },
+    { ACTION_WPS_SKIPPREV, BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW},
+    { ACTION_WPS_SEEKBACK, BUTTON_RC_REW|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK, BUTTON_RC_REW|BUTTON_REL,    BUTTON_RC_REW|BUTTON_REPEAT },
+    { ACTION_WPS_SKIPNEXT, BUTTON_RC_FF|BUTTON_REL,     BUTTON_RC_FF },
+    { ACTION_WPS_SEEKFWD,  BUTTON_RC_FF|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_WPS_STOPSEEK, BUTTON_RC_FF|BUTTON_REL,     BUTTON_RC_FF|BUTTON_REPEAT },
+    
+    { ACTION_WPS_VOLDOWN, BUTTON_RC_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN, BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_WPS_VOLUP,   BUTTON_RC_VOL_UP,                    BUTTON_NONE },
+    { ACTION_WPS_VOLUP,   BUTTON_RC_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+
+    { ACTION_WPS_PITCHSCREEN,   BUTTON_RC_PLAY|BUTTON_LEFT,    BUTTON_RC_PLAY },
+    { ACTION_WPS_ID3SCREEN,     BUTTON_RC_PLAY|BUTTON_RIGHT,   BUTTON_RC_PLAY },
+    
+    LAST_ITEM_IN_LIST
+}; /* remote_button_context_wps */
+
 const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_INC,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
@@ -98,9 +128,23 @@ const struct button_mapping button_context_list[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
+const struct button_mapping remote_button_context_list[]  = {
+    { ACTION_LISTTREE_PGUP,         BUTTON_RC_REW|BUTTON_REL,   BUTTON_RC_REW },
+    { ACTION_LISTTREE_PGDOWN,       BUTTON_RC_FF|BUTTON_REL,    BUTTON_RC_FF  },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_list */
+
 const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
     { ACTION_TREE_STOP,   BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
+}; /* button_context_tree */
+
+const struct button_mapping remote_button_context_tree[]  = {
+    { ACTION_TREE_WPS,    BUTTON_RC_PLAY|BUTTON_REL,     BUTTON_RC_PLAY },
+    { ACTION_TREE_STOP,   BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_RC_PLAY },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
@@ -109,6 +153,13 @@ const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
     { ACTION_TREE_ROOT_INIT,    BUTTON_REW|BUTTON_REPEAT,     BUTTON_REW },
     { ACTION_TREE_PGLEFT,       BUTTON_REW|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_TREE_PGRIGHT,      BUTTON_FF|BUTTON_REPEAT,      BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
+}; /* button_context_listtree_scroll_without_combo */
+
+const struct button_mapping remote_button_context_listtree_scroll_without_combo[]  = {
+    { ACTION_TREE_ROOT_INIT,    BUTTON_RC_REW|BUTTON_REPEAT,  BUTTON_RC_REW },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REPEAT,  BUTTON_NONE   },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REPEAT,   BUTTON_NONE   },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_without_combo */
 
@@ -127,6 +178,21 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_with_combo */
 
+const struct button_mapping remote_button_context_listtree_scroll_with_combo[]  = {
+    { ACTION_LISTTREE_PGUP,     BUTTON_RC_REW|BUTTON_REPEAT,                 BUTTON_RC_REW },
+    { ACTION_LISTTREE_PGDOWN,   BUTTON_RC_FF|BUTTON_REPEAT,                  BUTTON_RC_FF  },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_RC_PLAY,                BUTTON_RC_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_REL,                    BUTTON_RC_REW|BUTTON_RC_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_RC_PLAY,                BUTTON_RC_REW|BUTTON_REL },
+    { ACTION_TREE_ROOT_INIT,    BUTTON_RC_REW|BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_RC_REW|BUTTON_RC_PLAY },
+    { ACTION_TREE_PGLEFT,       BUTTON_RC_REW|BUTTON_RC_PLAY|BUTTON_REPEAT,  BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_RC_PLAY,                 BUTTON_RC_PLAY },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_REL,                     BUTTON_RC_FF|BUTTON_RC_PLAY },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_RC_PLAY,                 BUTTON_RC_FF|BUTTON_REL },
+    { ACTION_TREE_PGRIGHT,      BUTTON_RC_FF|BUTTON_RC_PLAY|BUTTON_REPEAT,   BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
+}; /* button_context_listtree_scroll_with_combo */
+
 const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RIGHT,              BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
@@ -141,6 +207,19 @@ const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_LEFT,    BUTTON_REW|BUTTON_REPEAT,         BUTTON_NONE },
     { ACTION_QS_RIGHT,   BUTTON_FF,                        BUTTON_NONE },
     { ACTION_QS_RIGHT,   BUTTON_FF|BUTTON_REPEAT,          BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+}; /* button_context_quickscreen */
+
+const struct button_mapping remote_button_context_quickscreen[]  = {
+    { ACTION_QS_DOWNINV, BUTTON_RC_VOL_UP,                    BUTTON_NONE },
+    { ACTION_QS_DOWNINV, BUTTON_RC_VOL_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_QS_DOWN,    BUTTON_RC_VOL_DOWN,                  BUTTON_NONE },
+    { ACTION_QS_DOWN,    BUTTON_RC_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
+    { ACTION_QS_LEFT,    BUTTON_RC_REW,                       BUTTON_NONE },
+    { ACTION_QS_LEFT,    BUTTON_RC_REW|BUTTON_REPEAT,         BUTTON_NONE },
+    { ACTION_QS_RIGHT,   BUTTON_RC_FF,                        BUTTON_NONE },
+    { ACTION_QS_RIGHT,   BUTTON_RC_FF|BUTTON_REPEAT,          BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_quickscreen */
@@ -177,6 +256,20 @@ const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
+const struct button_mapping remote_button_context_pitchscreen[]  = {
+    { ACTION_PS_INC_SMALL,      BUTTON_RC_VOL_UP,                 BUTTON_NONE },
+    { ACTION_PS_INC_BIG,        BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_PS_DEC_SMALL,      BUTTON_RC_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_PS_DEC_BIG,        BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFT,     BUTTON_RC_REW,                    BUTTON_NONE },
+    { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_REW|BUTTON_REL,         BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_FF,                     BUTTON_NONE },
+    { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_FF|BUTTON_REL,          BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_RC_PLAY,                   BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
+}; /* button_context_pitchscreen */
+
 const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
@@ -200,9 +293,45 @@ const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_bmark */
 
+static const struct button_mapping* get_context_mapping_remote( int context )
+{
+    context ^= CONTEXT_REMOTE;
+    
+    switch (context)
+    {
+        case CONTEXT_STD:
+        case CONTEXT_MAINMENU:
+            return remote_button_context_standard;
+            
+        case CONTEXT_WPS:
+            return remote_button_context_wps;
+
+        case CONTEXT_LIST:
+            return remote_button_context_list;
+        case CONTEXT_TREE:
+            if (global_settings.hold_lr_for_scroll_in_list)
+                return remote_button_context_listtree_scroll_without_combo;
+            else 
+                return remote_button_context_listtree_scroll_with_combo;
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
+            return remote_button_context_tree;
+            
+        case CONTEXT_QUICKSCREEN:
+            return remote_button_context_quickscreen;
+        case CONTEXT_PITCHSCREEN:
+            return remote_button_context_pitchscreen;
+
+        default:
+            return remote_button_context_standard;
+    }
+}
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
+    if (context&CONTEXT_REMOTE)
+        return get_context_mapping_remote(context);
+
     switch (context)
     {
         case CONTEXT_STD:
@@ -220,7 +349,7 @@ const struct button_mapping* get_context_mapping(int context)
             else 
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
-            return button_context_tree;
+            return remote_button_context_tree;
 
         case CONTEXT_SETTINGS:
             return button_context_settings;
