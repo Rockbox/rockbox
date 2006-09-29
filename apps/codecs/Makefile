@@ -12,12 +12,6 @@ INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DCODEC
 
-ifeq ($(UNAME), Darwin)
-SHARED_FLAG=-dynamiclib -Wl,-single_module
-else
-SHARED_FLAG=-shared
-endif
-
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif

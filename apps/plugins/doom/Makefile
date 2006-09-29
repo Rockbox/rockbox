@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.5  2006/09/29 16:15:08  barrywardell
+# Revision 1.6  2006/09/29 20:04:35  barrywardell
+# Cleaner implementation of the recent OSX simulator build fix. No need to define SHARED_FLAG in each Makefile. Just have configure create it in the root Makefile instead.
+#
+# Revision 1.5  2006-09-29 16:15:08  barrywardell
 # Allow UI simulator to be build on OS (Slightly updated version of FS5767)
 #
 # Revision 1.4  2006-07-27 13:27:19  linus
@@ -25,12 +28,6 @@ INCLUDES = -I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN \
  -Wno-strict-prototypes -O2 $(PROFILE_OPTS)
-
-ifeq ($(UNAME), Darwin)
-SHARED_FLAG=-dynamiclib -Wl,-single_module
-else
-SHARED_FLAG=-shared
-endif
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))

@@ -16,12 +16,6 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-ifeq ($(UNAME), Darwin)
-SHARED_FLAG=-dynamiclib -Wl,-single_module
-else
-SHARED_FLAG=-shared
-endif
-
 LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-searchengine
 SRC = searchengine.c parser.c token.c dbinterface.c

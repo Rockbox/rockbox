@@ -103,6 +103,7 @@ simcc () {
    CYGWIN*)
    echo "Cygwin host detected"
 
+   SHARED_FLAG="-shared"
    if [ "$simver" = "win32" ]; then
        # win32 version
        GCCOPTS="$GCCOPTS -mno-cygwin -DNOCYGWIN"
@@ -124,6 +125,7 @@ simcc () {
    Linux)
    echo "Linux host detected"
    GCCOPTS="$GCCOPTS"
+   SHARED_FLAG="-shared"
    if [ "$simver" = "win32" ]; then
        LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -lnsl -ldl -lpthread'
        crosswincc # setup cross-compiler
@@ -144,6 +146,7 @@ simcc () {
    FreeBSD)
    echo "FreeBSD host detected"
    LDOPTS='-L/usr/X11R6/lib -lX11 -lm -lXt -lXmu -dl -lpthread'
+   SHARED_FLAG="-shared"
    if [ "$simver" = "win32" ]; then
      crosswincc # setup cross-compiler
    fi
@@ -154,6 +157,7 @@ simcc () {
    # sdl version
    GCCOPTS="$GCCOPTS `sdl-config --cflags`"
    LDOPTS="`sdl-config --libs`"
+   SHARED_FLAG="-dynamiclib -Wl\,-single_module"
    use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
    echo "Enabled PCM sound playback in simulator"
    ;;
@@ -1359,6 +1363,7 @@ sed > Makefile \
  -e "s,@PLUGINS@,${plugins},g" \
  -e "s,@CODECS@,${codecs},g" \
  -e "s,@PROFILE_OPTS@,${PROFILE_OPTS},g" \
+ -e "s,@SHARED_FLAG@,${SHARED_FLAG},g" \
  -e "s,@GCCOPTS@,${GCCOPTS},g" \
  -e "s,@TARGET_INC@,${TARGET_INC},g" \
  -e "s!@LDOPTS@!${LDOPTS}!g" \
@@ -1429,6 +1434,7 @@ export TARGET_INC=@TARGET_INC@
 export LOADADDRESS=@LOADADDRESS@
 export SIMVER=@SIMVER@
 export SIMDIR=\$(ROOTDIR)/uisimulator/\$(SIMVER)
+export SHARED_FLAG=@SHARED_FLAG@
 export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
