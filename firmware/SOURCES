@@ -302,6 +302,7 @@ target/arm/gigabeat/meg-fx/usb-meg-fx.c
 target/arm/gigabeat/meg-fx/lcd-meg-fx.c
 target/arm/gigabeat/meg-fx/sc606-meg-fx.c
 target/arm/gigabeat/meg-fx/adc-meg-fx.c
+drivers/generic_i2c.c
 target/arm/gigabeat/meg-fx/i2c-meg-fx.c
 #endif
 #endif
