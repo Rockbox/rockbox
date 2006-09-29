@@ -149,13 +149,22 @@ simcc () {
    fi
    ;;
 
+   Darwin)
+   echo "Darwin host detected"
+   # sdl version
+   GCCOPTS="$GCCOPTS `sdl-config --cflags`"
+   LDOPTS="`sdl-config --libs`"
+   use_simsound="#define ROCKBOX_HAS_SIMSOUND 1"
+   echo "Enabled PCM sound playback in simulator"
+   ;;
+
    *)
    echo "Unsupported system: $uname, fix configure and retry"
    exit
    ;;
  esac
  
- if [ `uname -m` = "x86_64" ]; then
+ if [ "`uname -m`" = "x86_64" ]; then
    GCCOPTS="$GCCOPTS -fPIC"  # needed to make shared objects link
  fi
 

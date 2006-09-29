@@ -16,6 +16,12 @@ ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
+ifeq ($(UNAME), Darwin)
+SHARED_FLAG=-dynamiclib -Wl,-single_module
+else
+SHARED_FLAG=-shared
+endif
+
 LINKFILE := $(OBJDIR)/link.lds
 DEPFILE = $(OBJDIR)/dep-rockboy
 SRC = cpu.c emu.c events.c exports.c fastmem.c hw.c lcd.c lcdc.c loader.c \
@@ -62,7 +68,7 @@ ifeq ($(SIMVER), x11)
 
 $(OUTPUT): $(OBJS)
 	@echo "LD $@"
-	@$(CC) $(CFLAGS) -shared $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -78,7 +84,7 @@ ifeq ($(SIMVER), sdl)
 
 $(OUTPUT): $(OBJS)
 	@echo "LD $@"
-	@$(CC) $(CFLAGS) -shared $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1

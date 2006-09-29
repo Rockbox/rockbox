@@ -12,6 +12,12 @@ INCLUDES = -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I$(FIRMDIR)/common \
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DCODEC
 
+ifeq ($(UNAME), Darwin)
+SHARED_FLAG=-dynamiclib -Wl,-single_module
+else
+SHARED_FLAG=-shared
+endif
+
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
@@ -80,7 +86,7 @@ ifeq ($(SIMVER), x11)
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -96,7 +102,7 @@ ifeq ($(SIMVER), sdl)
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
 	@echo "LD $(notdir $@) $^"
-	$(SILENT)$(CC) $(CFLAGS) -shared $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1

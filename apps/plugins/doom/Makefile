@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.4  2006/07/27 13:27:19  linus
+# Revision 1.5  2006/09/29 16:15:08  barrywardell
+# Allow UI simulator to be build on OS (Slightly updated version of FS5767)
+#
+# Revision 1.4  2006-07-27 13:27:19  linus
 # Moved the X5 button driver to the target tree
 #
 # Revision 1.3  2006-04-14 21:07:56  kkurbjun
@@ -22,6 +25,12 @@ INCLUDES = -I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)
 CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN \
  -Wno-strict-prototypes -O2 $(PROFILE_OPTS)
+
+ifeq ($(UNAME), Darwin)
+SHARED_FLAG=-dynamiclib -Wl,-single_module
+else
+SHARED_FLAG=-shared
+endif
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
@@ -85,7 +94,7 @@ ifeq ($(SIMVER), x11)
 
 $(OUTPUT): $(OBJS)
 	@echo "LD $@"
-	@$(CC) $(CFLAGS) -shared $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -101,7 +110,7 @@ ifeq ($(SIMVER), sdl)
 
 $(OUTPUT): $(OBJS)
 	@echo "LD $@"
-	@$(CC) $(CFLAGS) -shared $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1

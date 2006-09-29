@@ -25,6 +25,9 @@
 #ifdef __FreeBSD__
 #include <sys/param.h>
 #include <sys/mount.h>
+#elif defined(__APPLE__)
+#include <sys/param.h>
+#include <sys/mount.h>
 #elif !defined(WIN32)
 #include <sys/vfs.h>
 #endif

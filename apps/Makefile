@@ -164,12 +164,17 @@ EXTRAOBJ = $(BUILDDIR)/sim/uisw32-res.o
 LDOPTS += -lwinmm
 endif
 
+# OS X's ld does not support -Map
+ifeq ($(UNAME), Darwin)
+SIMULATOR_MAP=
+else
+SIMULATOR_MAP=-Wl,-Map,$(OBJDIR)/rockbox.map
+endif
 
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(BITMAPLIBS)
 	@echo "LD $(BINARY)"
-	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) -Wl,-Map,$(OBJDIR)/rockbox.map
-
+	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
