@@ -1101,11 +1101,11 @@ bool dbg_ports(void)
         gpio_i = GPIOI_INPUT_VAL;
 
         line = 0;
-        snprintf(buf, sizeof(buf), "GPIO_A: %02x  GPIO_G: %02x", gpio_a, gpio_g);
+        snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_G: %02x", gpio_a, gpio_g);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_B: %02x  GPIO_H: %02x", gpio_b, gpio_h);
+        snprintf(buf, sizeof(buf), "GPIO_B: %02x GPIO_H: %02x", gpio_b, gpio_h);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_C: %02x  GPIO_I: %02x", gpio_c, gpio_i);
+        snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_I: %02x", gpio_c, gpio_i);
         lcd_puts(0, line++, buf);
         line++;
 
@@ -1117,11 +1117,11 @@ bool dbg_ports(void)
         gpio_k = GPIOK_INPUT_VAL;
         gpio_l = GPIOL_INPUT_VAL;
 
-        snprintf(buf, sizeof(buf), "GPIO_D: %02x  GPIO_J: %02x", gpio_d, gpio_j);
+        snprintf(buf, sizeof(buf), "GPIO_D: %02x GPIO_J: %02x", gpio_d, gpio_j);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_E: %02x  GPIO_K: %02x", gpio_e, gpio_k);
+        snprintf(buf, sizeof(buf), "GPIO_E: %02x GPIO_K: %02x", gpio_e, gpio_k);
         lcd_puts(0, line++, buf);
-        snprintf(buf, sizeof(buf), "GPIO_F: %02x  GPIO_L: %02x", gpio_f, gpio_l);
+        snprintf(buf, sizeof(buf), "GPIO_F: %02x GPIO_L: %02x", gpio_f, gpio_l);
         lcd_puts(0, line++, buf);
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         line++;
