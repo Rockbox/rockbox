@@ -365,7 +365,7 @@ void screen_dump(void)
             unsigned char *dst = line_block;
 
             memset(line_block, 0, sizeof(line_block));
-            for (bx = LCD_WIDTH/4; bx > 0; bx--)
+            for (bx = (LCD_WIDTH+3)/4; bx > 0; bx--)
             {
                 unsigned src_byte = *src++;
                 
