@@ -1667,10 +1667,10 @@
     *: "Browse .rwps files"
   </source>
   <dest>
-    *: "Vis fjernbetjenings afspilningsskærme"
+    *: "Vis fjernbetjenings afspilnings-skærm filer"
   </dest>
   <voice>
-    *: "Vis fjernbetjenings afspilningsskærme"
+    *: "Vis fjernbetjenings afspilnings-skærm filer"
   </voice>
 </phrase>
 <phrase>
@@ -1754,7 +1754,7 @@
     *: "Standard tegnsæt"
   </dest>
   <voice>
-    *: ""
+    *: "Standard tegnsæt"
   </voice>
 </phrase>
 <phrase>
@@ -1768,7 +1768,7 @@
     *: "Vestlig (ISO-8859-1)"
   </dest>
   <voice>
-    *: ""
+    *: "Vestlig"
   </voice>
 </phrase>
 <phrase>
@@ -1782,7 +1782,7 @@
     *: "Græsk (ISO-8859-7)"
   </dest>
   <voice>
-    *: ""
+    *: "Græsk"
   </voice>
 </phrase>
 <phrase>
@@ -1796,7 +1796,7 @@
     *: "Hebræisk (ISO-8859-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Hebræisk"
   </voice>
 </phrase>
 <phrase>
@@ -1810,7 +1810,7 @@
     *: "Kyrillisk (CP1251)"
   </dest>
   <voice>
-    *: ""
+    *: "Kyrillisk"
   </voice>
 </phrase>
 <phrase>
@@ -1824,7 +1824,7 @@
     *: "Thai (ISO-8859-11)"
   </dest>
   <voice>
-    *: ""
+    *: "Thai"
   </voice>
 </phrase>
 <phrase>
@@ -1838,7 +1838,7 @@
     *: "Arabisk (CP1256)"
   </dest>
   <voice>
-    *: ""
+    *: "Arabisk"
   </voice>
 </phrase>
 <phrase>
@@ -1852,7 +1852,7 @@
     *: "Tyrkisk (ISO-8859-9)"
   </dest>
   <voice>
-    *: ""
+    *: "Tyrkisk"
   </voice>
 </phrase>
 <phrase>
@@ -1866,7 +1866,7 @@
     *: "Latin udvidet (ISO-8859-2)"
   </dest>
   <voice>
-    *: ""
+    *: "Vestlig udvidet"
   </voice>
 </phrase>
 <phrase>
@@ -1880,7 +1880,7 @@
     *: "Japansk (SJIS)"
   </dest>
   <voice>
-    *: ""
+    *: "Japansk"
   </voice>
 </phrase>
 <phrase>
@@ -1894,7 +1894,7 @@
     *: "Simplificeret kinesisk (GB2312)"
   </dest>
   <voice>
-    *: ""
+    *: "Simplificeret kinesisk"
   </voice>
 </phrase>
 <phrase>
@@ -1908,7 +1908,7 @@
     *: "Koreansk (KSX1001)"
   </dest>
   <voice>
-    *: ""
+    *: "Koreansk"
   </voice>
 </phrase>
 <phrase>
@@ -1922,7 +1922,7 @@
     *: "Tradiotionel kinesisk (BIG5)"
   </dest>
   <voice>
-    *: ""
+    *: "Traditionel kinesisk"
   </voice>
 </phrase>
 <phrase>
@@ -1936,7 +1936,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -2199,10 +2199,10 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Sange"
+    *: "Tal"
   </dest>
   <voice>
-    *: "Sange"
+    *: "Tal"
   </voice>
 </phrase>
 <phrase>
@@ -2227,10 +2227,10 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: "Stemme mp3 lydfil"
+    *: "Stemme lydfil"
   </dest>
   <voice>
-    *: "Stemme mp3 lydfil"
+    *: "Stemme lydfil"
   </voice>
 </phrase>
 <phrase>
@@ -3196,7 +3196,7 @@
     *: "Lineær(%)"
   </dest>
   <voice>
-    *: "Lineær percent"
+    *: "Lineær procent"
   </voice>
 </phrase>
 <phrase>
@@ -3812,7 +3812,7 @@
     *: "Batteri: Lader"
   </dest>
   <voice>
-    *: ""
+    *: "Batteri lader"
   </voice>
 </phrase>
 <phrase>
@@ -3826,7 +3826,7 @@
     *: "Batteri: Fyld ladning"
   </dest>
   <voice>
-    *: ""
+    *: "Batteri fyld-lader"
   </voice>
 </phrase>
 <phrase>
@@ -3840,7 +3840,7 @@
     *: "Batteri: Dryp-ladning"
   </dest>
   <voice>
-    *: ""
+    *: "Batteri dryp-lader"
   </voice>
 </phrase>
 <phrase>
@@ -3854,7 +3854,7 @@
     *: "%d%% %dt %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Batteri niveau"
   </voice>
 </phrase>
 <phrase>
@@ -3882,7 +3882,7 @@
     *: "Fri:"
   </dest>
   <voice>
-    *: "Ledig diskplads:"
+    *: "Ledig diskplads"
   </voice>
 </phrase>
 <phrase>
@@ -3924,7 +3924,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Klokken er:"
+    *: "Klokken er"
   </voice>
 </phrase>
 <phrase>
@@ -3935,7 +3935,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "Pitch op"
+    *: "Hastighed op"
   </dest>
   <voice>
     *: ""
@@ -3949,7 +3949,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "Pitch ned"
+    *: "Hastighed ned"
   </dest>
   <voice>
     *: ""
@@ -4626,7 +4626,7 @@
     *: "Alarm slået fra"
   </dest>
   <voice>
-    *: "Alarm slået fra"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4906,7 +4906,7 @@
     *: "Tor"
   </dest>
   <voice>
-    *: "Torsdag"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6264,7 +6264,7 @@
     *: ""
   </dest>
   <voice>
-    *: "mapp3"
+    *: "mappe"
   </voice>
 </phrase>
 <phrase>
@@ -6306,7 +6306,7 @@
     *: ""
   </dest>
   <voice>
-    *: "afspinings skærm fil"
+    *: "afspilningsskærm fil"
   </voice>
 </phrase>
 <phrase>
@@ -6488,7 +6488,7 @@
     *: "Opretter"
   </dest>
   <voice>
-    *: "Opretter"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6628,7 +6628,7 @@
     *: "Sætliste kontrol fil er ugyldig"
   </dest>
   <voice>
-    *: "Sætliste kontrol fil er ugyldig"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6684,7 +6684,7 @@
     *: "Ret station"
   </dest>
   <voice>
-    *: ""
+    *: "Ret station"
   </voice>
 </phrase>
 <phrase>
@@ -6698,7 +6698,7 @@
     *: "Fjern station"
   </dest>
   <voice>
-    *: ""
+    *: "Fjern station"
   </voice>
 </phrase>
 <phrase>
@@ -6866,7 +6866,7 @@
     *: "Slet nuværende stationer?"
   </dest>
   <voice>
-    *: "Slet nuværende stationer?"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7269,10 +7269,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Vis indices"
+    *: "Vis indekser"
   </dest>
   <voice>
-    *: "Vis indices"
+    *: "Vis indekser"
   </voice>
 </phrase>
 <phrase>
@@ -7507,10 +7507,10 @@
     *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "Advancerede EQ indstillinger"
+    *: "Avancerede EQ indstillinger"
   </dest>
   <voice>
-    *: "Advancerede equalizer indstillinger"
+    *: "Avancerede equalizer indstillinger"
   </voice>
 </phrase>
 <phrase>
@@ -7605,10 +7605,10 @@
     *: "Queue shuffled"
   </source>
   <dest>
-    *: "Kø blandet"
+    *: "Sæt i kø blandet"
   </dest>
   <voice>
-    *: "Kø blandet"
+    *: "Sæt i kø blandet"
   </voice>
 </phrase>
 <phrase>
@@ -7664,7 +7664,7 @@
     *: "Slet dynamisk sætliste?"
   </dest>
   <voice>
-    *: "Slet dynamisk sætliste?"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8056,7 +8056,7 @@
     *: "Ingen kanaler fundet, skan automatisk?"
   </dest>
   <voice>
-    *: "Ingen kanaler fundet, skan automatisk?"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8416,10 +8416,10 @@
     *: "Tagcache is not ready"
   </source>
   <dest>
-    *: "Tagcache ikke klar"
+    *: "Infodatabase ikke klar"
   </dest>
   <voice>
-    *: "Tagcache er ikke klar"
+    *: "Infodatabase er ikke klar"
   </voice>
 </phrase>
 <phrase>
@@ -8457,10 +8457,10 @@
     *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "High-Frequency Cutoff"
+    *: "Høj-frekvens Cutoff"
   </dest>
   <voice>
-    *: "High-frequency cutoff"
+    *: "Høj-frekvens cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -8497,10 +8497,10 @@
     *: "Cross Gain"
   </source>
   <dest>  
-    *: "Cross Gain"
+    *: "Krydsforstærkning"
   </dest>
   <voice>  
-    *: "Cross gain"
+    *: "Krydsforstærkning"
   </voice>
 </phrase>
 <phrase>
@@ -8510,10 +8510,10 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "High-Frequency Attenuation"
+    *: "Høj-frekvens dæmpning"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: "Høj-frekvens dæmpning"
   </voice>
 </phrase>
 <phrase>
@@ -8524,10 +8524,10 @@
     *: "Direct Gain"
   </source>
   <dest>
-    *: "Direct Gain"
+    *: "Direkte forstærkning"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: "Direkte forstærkning"
   </voice>
 </phrase>
 <phrase>
@@ -8555,7 +8555,7 @@
     *: "Importer ændringer"
   </dest>
   <voice>
-    *: "Import ændringer"
+    *: "Importer ændringer"
   </voice>
 </phrase>
 <phrase>
@@ -9220,7 +9220,7 @@
     *: "Pitch Up"
   </source>
   <dest>
-    *: "Pitch op"
+    *: "Hastighed op"
   </dest>
   <voice>
     *: ""
@@ -9234,7 +9234,7 @@
     *: "Pitch Down"
   </source>
   <dest>
-    *: "Pitch ned"
+    *: "Hastighed ned"
   </dest>
   <voice>
     *: ""
@@ -9321,7 +9321,7 @@
     *: "Forstærkning"
   </dest>
   <voice>
-    *: "Forstærkning"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9539,10 +9539,10 @@
     *: "Sleep (After Backlight Off)"
   </source>
   <dest>
-    *: "Sluk skærm efter lys slukket"
+    *: "Sluk skærm efter lys slukker"
   </dest>
   <voice>
-    *: "Sluk skærm efter lys slukket"
+    *: "Sluk skærm efter lys slukker"
   </voice>
 </phrase>
 <phrase>
@@ -9802,5 +9802,61 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Spol tilbage"
+  </dest>
+  <voice>
+    *: "Spol tilbage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Pause når hovedtelefoner fjernes"
+  </dest>
+  <voice>
+    *: "Pause når hovedtelefoner fjernes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Slå fortsæt fra hvis hovedtelefoner mangler"
+  </dest>
+  <voice>
+    *: "Slå fortsæt fra hvis hovedtelefoner mangler"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pause og fortsæt"
+  </dest>
+  <voice>
+    *: "Pause og fortsæt"
   </voice>
 </phrase>

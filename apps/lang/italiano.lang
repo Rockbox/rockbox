@@ -4084,7 +4084,7 @@
     *: "Batteria: In carica"
   </dest>
   <voice>
-    *: ""
+    *: "In carica"
   </voice>
 </phrase>
 <phrase>
@@ -4098,7 +4098,7 @@
     *: "Batteria: Carica completa"
   </dest>
   <voice>
-    *: ""
+    *: "Carica completa"
   </voice>
 </phrase>
 <phrase>
@@ -4112,7 +4112,7 @@
     *: "Batteria: Mantenimento carica"
   </dest>
   <voice>
-    *: ""
+    *: "Mantenimento carica"
   </voice>
 </phrase>
 <phrase>
@@ -9780,5 +9780,61 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Durata per il riavvolgimento"
+  </dest>
+  <voice>
+    *: "Durata per il riavvolgimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Pausa staccando la cuffia"
+  </dest>
+  <voice>
+    *: "Pausa staccando la cuffia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Disabilita riprendi all'avvio se manca la cuffia"
+  </dest>
+  <voice>
+    *: "Disabilita riprendi all'avvio se manca la cuffia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pausa e Riprendi"
+  </dest>
+  <voice>
+    *: "Pausa e Riprendi"
   </voice>
 </phrase>
