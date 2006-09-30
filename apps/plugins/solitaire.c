@@ -253,8 +253,10 @@ static char helptext[] =
 /* background color */
 #ifdef HAVE_LCD_COLOR
 #   define BACKGROUND_COLOR LCD_RGBPACK(0,157,0)
+#   define FRAME_COLOR      LCD_RGBPACK(23,119,218)
 #elif LCD_DEPTH > 1
 #   define BACKGROUND_COLOR LCD_WHITE
+#   define FRAME_COLOR      LCD_BLACK
 #endif
 
 
@@ -312,10 +314,6 @@ static void draw_cursor( int x, int y )
  * if the cursor is currently over the card */
 static void draw_card_ext( int x, int y, bool selected, bool cursor )
 {
-#if LCD_DEPTH > 1
-    rb->lcd_set_foreground( LCD_BLACK );
-#endif
-
 #ifdef LARGE_CARD
     rb->lcd_hline( x+2, x+CARD_WIDTH-3, y );
     rb->lcd_hline( x+2, x+CARD_WIDTH-3, y+CARD_HEIGHT-1 );
@@ -334,11 +332,18 @@ static void draw_card_ext( int x, int y, bool selected, bool cursor )
 
     if( selected )
     {
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground( FRAME_COLOR );
+#endif
         rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #ifdef LARGE_CARD
         rb->lcd_drawrect( x+2, y+2, CARD_WIDTH-4, CARD_HEIGHT-4 );
 #endif
     }
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground( LCD_BLACK );
+#endif
+
     if( cursor )
     {
         draw_cursor( x, y );
@@ -529,7 +534,6 @@ int solitaire_menu(bool in_game)
 
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(LCD_DEFAULT_FG);
-    rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
 
     if (in_game)
@@ -1036,8 +1040,8 @@ int solitaire( void )
         rb->lcd_clear_display();
 
 #if LCD_DEPTH > 1
+        rb->lcd_set_background(LCD_DEFAULT_BG);
         rb->lcd_set_foreground(LCD_BLACK);
-        rb->lcd_set_background(LCD_WHITE);
 #endif
 
         /* get the biggest column length so that display can be "optimized" */
