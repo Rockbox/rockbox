@@ -349,7 +349,7 @@ const struct button_mapping* get_context_mapping(int context)
             else 
                 return button_context_listtree_scroll_with_combo;
         case CONTEXT_CUSTOM|CONTEXT_TREE:
-            return remote_button_context_tree;
+            return button_context_tree;
 
         case CONTEXT_SETTINGS:
             return button_context_settings;
