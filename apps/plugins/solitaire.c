@@ -866,31 +866,40 @@ enum move move_card( int dest_col, int src_card )
     }
     /* if we are on one of the 4 final stacks ... */
     else if( dest_col < REM_COL )
-    {                                    
-        /* ... check if we are on an empty stack, that the src is an
-         * ace and that this is the good final stack */
-        if( dest_card == NOT_A_CARD
-            && deck[src_card].num == 0
-            && deck[src_card].suit == dest_col - STACKS_COL )
+    {
+        /* ... check if we are on an empty stack... */
+        if( dest_card == NOT_A_CARD )
         {
-            /* this is a winning combination */
-            stacks[dest_col - STACKS_COL] = src_card;
+            /* ... and the src is an ace and this is the correct final stack */
+            if( deck[src_card].num == 0
+                && deck[src_card].suit == dest_col - STACKS_COL )
+            {
+                /* this is a winning combination */
+                stacks[dest_col - STACKS_COL] = src_card;
+            }
+            else
+            {
+                /* this is not a winning combination */
+                return MOVE_NOT_OK;
+            }
         }
-        /* ... or check if the cards follow one another, have the same
-         * suit and {that src has no .next element or is from the remains'
-         * stack} */
-        else if( deck[dest_card].suit == deck[src_card].suit
-                 && deck[dest_card].num + 1 == deck[src_card].num
-                 && (deck[src_card].next == NOT_A_CARD || src_col == REM_COL) )
+        else /* non-empty stack */
         {
-            /* this is a winning combination */
-            deck[dest_card].next = src_card;
-        }
-        /* ... or, well that's not good news */
-        else
-        {
-            /* this is not a winning combination */
-            return MOVE_NOT_OK;
+            /* ...check if the cards follow one another, have the same suit and
+             * {that src has no .next element or is from the remains' stack} */
+            if( deck[dest_card].suit == deck[src_card].suit
+                && deck[dest_card].num + 1 == deck[src_card].num
+                && (deck[src_card].next == NOT_A_CARD || src_col == REM_COL) )
+            {
+                /* this is a winning combination */
+                deck[dest_card].next = src_card;
+            }
+            /* ... or, well that's not good news */
+            else
+            {
+                /* this is not a winning combination */
+                return MOVE_NOT_OK;
+            }
         }
     }
     /* if we are on the remains' stack */
