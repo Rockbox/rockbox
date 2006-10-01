@@ -827,8 +827,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->lcd_clear_display();
 
    int result = doom_menu();
-   if( result == -1 ) return PLUGIN_OK; // Quit was selected
-   else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads
+   if (result < 0)
+   {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+   	rb->cpu_boost(false);
+#endif
+       if( result == -1 ) return PLUGIN_OK; // Quit was selected
+       else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads
+   }
 
    Dhandle_ver( namemap[ result ] );
 
