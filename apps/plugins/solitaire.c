@@ -101,6 +101,7 @@ static struct plugin_api* rb;
 #   define SOL_MOVE         (BUTTON_SELECT | BUTTON_REL)
 #   define SOL_DRAW         BUTTON_MODE
 #   define SOL_REM2CUR      (BUTTON_LEFT | BUTTON_ON)
+#   define SOL_CUR2STACK_PRE BUTTON_SELECT
 #   define SOL_CUR2STACK    (BUTTON_SELECT | BUTTON_REPEAT)
 #   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_ON)
 #   define SOL_REM          BUTTON_REC
@@ -865,7 +866,7 @@ enum move move_card( int dest_col, int src_card )
     }
     /* if we are on one of the 4 final stacks ... */
     else if( dest_col < REM_COL )
-    {
+    {                                    
         /* ... check if we are on an empty stack, that the src is an
          * ace and that this is the good final stack */
         if( dest_card == NOT_A_CARD
