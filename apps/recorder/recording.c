@@ -119,6 +119,8 @@ static short balance_mem[BAL_MEM_SIZE];
 
 /* Automatic Gain Control */
 #define AGC_MODE_SIZE 5
+#define AGC_SAFETY_MODE 0
+
 static char* agc_preset_str[] =
 { "Off", "S", "L", "D", "M", "V" };
 /*  "Off",
@@ -282,71 +284,73 @@ void auto_gain_control(int *peak_l, int *peak_r, int *balance)
         return;
     }
 
-    /* Automatic balance control */
-    if ((agc_left > AGC_IMG) && (agc_right > AGC_IMG))
-    {
-        if (*balance < -556)
+    if (agc_mode != AGC_SAFETY_MODE) {
+        /* Automatic balance control - only if not in safety mode */
+        if ((agc_left > AGC_IMG) && (agc_right > AGC_IMG))
         {
-            if (*balance > -900)
-                agc_baltime -= !(peak_time % 4); /* 0.47 - 0.75dB */
-            else if (*balance > -4125)
-                agc_baltime--;                   /* 0.75 - 3.00dB */
-            else if (*balance > -7579)
-                agc_baltime -= 2;                /* 3.00 - 4.90dB */
-            else
-                agc_baltime -= !(peak_time % 8); /* 4.90 - inf dB */
-            if (agc_baltime > 0)
-                agc_baltime -= (peak_time % 2);
+            if (*balance < -556)
+            {
+                if (*balance > -900)
+                    agc_baltime -= !(peak_time % 4); /* 0.47 - 0.75dB */
+                else if (*balance > -4125)
+                    agc_baltime--;                   /* 0.75 - 3.00dB */
+                else if (*balance > -7579)
+                    agc_baltime -= 2;                /* 3.00 - 4.90dB */
+                else
+                    agc_baltime -= !(peak_time % 8); /* 4.90 - inf dB */
+                if (agc_baltime > 0)
+                    agc_baltime -= (peak_time % 2);
+            }
+            else if (*balance > 556)
+            {
+                if (*balance < 900)
+                    agc_baltime += !(peak_time % 4);
+                else if (*balance < 4125)
+                    agc_baltime++;
+                else if (*balance < 7579)
+                    agc_baltime += 2;
+                else
+                    agc_baltime += !(peak_time % 8);
+                if (agc_baltime < 0)
+                    agc_baltime += (peak_time % 2);
+            }
+
+            if ((*balance * agc_baltime) < 0)
+            {
+                if (*balance < 0)
+                    agc_baltime -= peak_time % 2;
+                else
+                    agc_baltime += peak_time % 2;
+            }
+
+            increment = ((agc_risetime / 2) > agc_droptime);
+
+            if (agc_baltime < -agc_tbal[agc_mode])
+            {
+                if (!increment || !agc_gain_is_max(!increment, increment)) {
+                    change_recording_gain(increment, !increment, increment);
+                    set_gain();
+                }
+                agc_baltime = 0;
+            }
+            else if (agc_baltime > +agc_tbal[agc_mode])
+            {
+                if (!increment || !agc_gain_is_max(increment, !increment)) {
+                    change_recording_gain(increment, increment, !increment);
+                    set_gain();
+                }
+                agc_baltime = 0;
+            }
         }
-        else if (*balance > 556)
+        else if (!(hist_time % 4))
         {
-            if (*balance < 900)
-                agc_baltime += !(peak_time % 4);
-            else if (*balance < 4125)
-                agc_baltime++;
-            else if (*balance < 7579)
-                agc_baltime += 2;
-            else
-                agc_baltime += !(peak_time % 8);
             if (agc_baltime < 0)
-                agc_baltime += (peak_time % 2);
-        }
-
-        if ((*balance * agc_baltime) < 0)
-        {
-            if (*balance < 0)
-                agc_baltime -= peak_time % 2;
+                agc_baltime++;
             else
-                agc_baltime += peak_time % 2;
+                agc_baltime--;
         }
+    }
 
-        increment = ((agc_risetime / 2) > agc_droptime);
-        
-        if (agc_baltime < -agc_tbal[agc_mode])
-        {
-            if (!increment || !agc_gain_is_max(!increment, increment)) {
-                change_recording_gain(increment, !increment, increment);
-                set_gain();
-            }
-            agc_baltime = 0;
-        }
-        else if (agc_baltime > +agc_tbal[agc_mode])
-        {
-            if (!increment || !agc_gain_is_max(increment, !increment)) {
-                change_recording_gain(increment, increment, !increment);
-                set_gain();
-            }
-            agc_baltime = 0;
-        }
-    }
-    else if (!(hist_time % 4))
-    {
-        if (agc_baltime < 0)
-            agc_baltime++;
-        else
-            agc_baltime--;
-    }
-    
     /* Automatic gain control */
     if ((agc_left > agc_th_hi[agc_mode]) || (agc_right > agc_th_hi[agc_mode]))
     {
@@ -389,7 +393,8 @@ void auto_gain_control(int *peak_l, int *peak_r, int *balance)
             agc_risetime++;
     
         if (agc_risetime >= agc_trise[agc_mode]) {
-            if (!agc_gain_is_max(true, true)) {
+            if ((agc_mode != AGC_SAFETY_MODE) &&
+                (!agc_gain_is_max(true, true))) {
                 change_recording_gain(true, true, true);
                 set_gain();
             }
