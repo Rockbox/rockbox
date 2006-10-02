@@ -277,15 +277,6 @@ signed short int synthVoice(struct SynthObject * so)
             if(so->decay < 10 && so->decay > -10)
                 so->isUsed = 0;
 
-            if(so->state == STATE_RAMPDOWN)
-            {
-                so->decay-=5;
-                if(so->decay < 5)
-                    so->isUsed=0;
-                s = (s * so->decay) >> 8;
-            }
-
-
             return so->decay*so->volscale>>14;
         }
     } else  /* OK to advance voice */
