@@ -170,10 +170,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(0);
 
-#ifdef HAVE_WHEEL_POSITION
-    rb->wheel_send_events(false);
-#endif
-
 #if defined(HAVE_LCD_COLOR)
     rb->lcd_set_foreground(LCD_WHITE);
     rb->lcd_set_background(LCD_BLACK);
@@ -203,10 +199,18 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     shut=0;
     cleanshut=0;
 
+#ifdef HAVE_WHEEL_POSITION
+    rb->wheel_send_events(false);
+#endif
+
     /* now go ahead and have fun! */
     /* rb->splash(HZ*2, true, "Rockboy v0.3"); */
     /* rb->lcd_clear_display(); */
     gnuboy_main(parameter);
+
+#ifdef HAVE_WHEEL_POSITION
+    rb->wheel_send_events(true);
+#endif
 
     if(shut&&!cleanshut)
     {
