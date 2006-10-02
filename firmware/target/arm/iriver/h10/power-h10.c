@@ -76,15 +76,17 @@ bool charger_inserted(void)
 
 void ide_power_enable(bool on)
 {
-    (void)on;
-    /* We do nothing on the iPod */
+    if(on){
+        GPIOF_OUTPUT_VAL &=~ 0x1;
+    } else {
+        GPIOF_OUTPUT_VAL |= 0x1;
+    }
 }
 
 
 bool ide_powered(void)
 {
-    /* pretend we are always powered - we don't turn it off on the ipod */
-    return true;
+    return ((GPIOF_INPUT_VAL & 0x1) == 0);
 }
 
 void power_off(void)

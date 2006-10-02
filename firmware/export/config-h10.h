@@ -116,6 +116,9 @@
  * We can currently put the lcd to sleep but it won't wake up properly */
 #define HAVE_LCD_SLEEP
 
+/* We're able to shut off power to the HDD */
+#define HAVE_ATA_POWER_OFF
+
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0
 

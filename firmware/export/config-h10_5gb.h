@@ -97,6 +97,9 @@
 /* Type of LCD */
 #define CONFIG_LCD LCD_H10_5GB
 
+/* We're able to shut off power to the HDD */
+#define HAVE_ATA_POWER_OFF
+
 /* Offset ( in the firmware file's header ) to the file length */
 #define FIRMWARE_OFFSET_FILE_LENGTH 0
 
