@@ -200,7 +200,7 @@ related to audio playback.
         set to \setting{Off}.
     }
 
-    \item[ID3 Tag Priority. ]Select wich version of ID3 tag to use if both are
+    \item[ID3 Tag Priority.] Select which version of ID3 tag to use if both are
       present.
     
 \item[Auto-Change Directory. ]Control what Rockbox does when it reaches the end
@@ -211,4 +211,28 @@ related to audio playback.
   \note{You must have the \setting{Repeat} option set to \setting{No} for
     \setting{Auto-Change Directory} to function properly.}
   %
+\opt{ipodnano,ipodvideo,ipodmini,ipod4g,ipod3g,ipodcolor}{
+\item[Pause on headphone unplug.] Enables and disables automatic pausing of 
+  playback when the headphones are disconnected from the \daps{} headphone 
+  socket.
+  %
+  \begin{description}
+  \item[Pause on headphone unplug. ]Options for automatic pause:
+    \begin{description}
+    \item[Off.] Disables automatic pause.
+      %
+    \item[Pause.] Pauses the \dap{} when the headphones are removed.
+      %
+    \item[Pause and Resume.] Pauses when the headphones are removed, and 
+      resumes playback when they are reconnected.
+  \end{description}
+  \item[Duration to rewind.] Number of seconds (between 0 and 15) to rewind 
+    playback when the headphones are removed.
+    %
+  \item[Disable auto-resume if phones not present.] This option will disable 
+    the automatic resumption of playback at startup if the headphones are not 
+    connected to the \dap{}.
+    \note{This requires \setting{Resume on Startup} to be enabled.}
+  \end{description}
+}%
 \end{description}
