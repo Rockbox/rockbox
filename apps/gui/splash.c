@@ -25,13 +25,11 @@
 
 #ifdef HAVE_LCD_BITMAP
 
-#define SPACE 3 /* pixels between words */
 #define MAXLETTERS 128 /* 16*8 */
 #define MAXLINES 10
 
 #else
 
-#define SPACE 1 /* one letter space */
 #define MAXLETTERS 22 /* 11 * 2 */
 #define MAXLINES 2
 
@@ -42,93 +40,80 @@ static void splash(struct screen * screen,
 {
     char *next;
     char *store=NULL;
-    int x=0;
-    int y=0;
+    int x = 0;
     int w, h;
     unsigned char splash_buf[MAXLETTERS];
-    unsigned char widths[MAXLINES];
-    int line=0;
+    unsigned short widths[MAXLINES];
+    unsigned char *text = splash_buf;
+    int line = 0, i_line = 0;
     bool first=true;
 #ifdef HAVE_LCD_BITMAP
     int maxw=0;
+    int space;
+    int y;
+    screen->getstringsize(" ", &space, &y);
 #if LCD_DEPTH > 1
     unsigned prevbg = LCD_DEFAULT_BG;
     unsigned prevfg = LCD_DEFAULT_FG;
 #endif
-#endif
-
-#ifdef HAVE_LCD_CHARCELLS
-    screen->double_height (false);
+#else
+    screen->double_height (false);  /* HAVE_LCD_CHARCELLS */
+    int space = 1;
+    int y = 0;
 #endif
     screen->stop_scroll();
     vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
-
-    if(center) {
-        /* first a pass to measure sizes */
-        next = strtok_r(splash_buf, " ", &store);
-        while (next) {
+    va_end( ap );
+    
+    /* measure sizes & concatenates tokenise words into lines. */
+    next = strtok_r(splash_buf, " ", &store);
+    while (next) {
 #ifdef HAVE_LCD_BITMAP
-            screen->getstringsize(next, &w, &h);
+        screen->getstringsize(next, &w, &h);
 #else
-            w = strlen(next);
-            h = 1; /* store height in characters */
+        w = strlen(next);
+        h = 1; /* store height in characters */
 #endif
-            if(!first) {
-                if(x+w> screen->width) {
-                    /* Too wide, wrap */
-                    y+=h;
-                    line++;
-                    if((y > (screen->height-h)) || (line > screen->nb_lines))
-                        /* STOP */
-                        break;
-                    x=0;
-                    first=true;
-                }
+        if(!first) {
+            if(x + w > screen->width) { /* Too wide, wrap */
+                y += h;
+                line++;
+                x = 0;
+                if((y > (screen->height-h)) || (line > screen->nb_lines))
+                    /* STOP */
+                    break;
             }
             else
-                first = false;
-
-            /* think of it as if the text was written here at position x,y
-               being w pixels/chars wide and h high */
-
-            x += w+SPACE;
-            widths[line]=x-SPACE; /* don't count the trailing space */
-#ifdef HAVE_LCD_BITMAP
-            /* store the widest line */
-            if(widths[line]>maxw)
-                maxw = widths[line];
-#endif
-            next = strtok_r(NULL, " ", &store);
+                next[-1] = ' ';  /* re-concatenate string */
         }
+        else
+            first = false;
 
+        x += w + space;
+        widths[line] = x - space; /* don't count the trailing space */
 #ifdef HAVE_LCD_BITMAP
-        /* Start displaying the message at position y. The reason for the
-           added h here is that it isn't added until the end of lines in the
-           loop above and we always break the loop in the middle of a line. */
-        y = (screen->height - (y+h) )/2;
+        /* store the widest line */
+        if(widths[line]>maxw)
+            maxw = widths[line];
+#endif
+        next = strtok_r(NULL, " ", &store);
+    }
+
+    if(center) {
+#ifdef HAVE_LCD_BITMAP
+    /* Start displaying the message at position y. */
+        y = (screen->height - y)/2;
 #else
         y = 0; /* vertical center on 2 lines would be silly */
 #endif
-        first=true;
+    } else
+        y = 0;
 
-        /* Now recreate the string again since the strtok_r() above has ruined
-           the one we already have! Here's room for improvements! */
-        vsnprintf( splash_buf, sizeof(splash_buf), fmt, ap );
-    }
-    va_end( ap );
-
-    if(center)
-    {
-        x = (screen->width-widths[0])/2;
-        if(x < 0)
-            x = 0;
-    }
-
-#ifdef HAVE_LCD_BITMAP
     /* If we center the display, then just clear the box we need and put
        a nice little frame and put the text in there! */
+#ifdef HAVE_LCD_BITMAP
     if(center && (y > 2)) {
-        int xx = (screen->width-maxw)/2 - 2;
+        int xx = (screen->width - maxw)/2 - 2;
         /* The new graphics routines handle clipping, so no need to check */
 #if LCD_DEPTH > 1
         if(screen->depth>1) {
@@ -146,43 +131,23 @@ static void splash(struct screen * screen,
     else
 #endif
         screen->clear_display();
-    line=0;
-    next = strtok_r(splash_buf, " ", &store);
-    while (next) {
+
+        /* print the message to screen */
+        while(line-- >= 0) {
+            if (center) {
+                x = (screen->width-widths[i_line++])/2;
+                if(x < 0)
+                    x = 0;
+            } else
+                x = 0;
 #ifdef HAVE_LCD_BITMAP
-        screen->getstringsize(next, &w, &h);
+            screen->putsxy(x, y, text);
 #else
-        w = strlen(next);
-        h = 1;
+            screen->puts(x, y, text);
 #endif
-        if(!first) {
-            if(x+w> screen->width) {
-                /* too wide */
-                y+=h;
-                line++; /* goto next line */
-                first=true;
-                if(y > (screen->height-h))
-                    /* STOP */
-                    break;
-                if(center) {
-                    x = (screen->width-widths[line])/2;
-                    if(x < 0)
-                       x = 0;
-                }
-                else
-                    x=0;
-            }
+            text += strlen(text) + 1;
+            y +=h;
         }
-        else
-            first=false;
-#ifdef HAVE_LCD_BITMAP
-        screen->putsxy(x, y, next);
-#else
-        screen->puts(x, y, next);
-#endif
-        x += w+SPACE; /*  pixels space! */
-        next = strtok_r(NULL, " ", &store);
-    }
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
     if(screen->depth > 1) {
