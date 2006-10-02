@@ -252,7 +252,7 @@ inline void stopVoice(struct SynthObject * so)
     if(so->state == STATE_RAMPDOWN)
         return;
     so->state = STATE_RAMPDOWN;
-    so->decay = 255;
+    so->decay = 0;
 
 }
 
@@ -267,16 +267,41 @@ signed short int synthVoice(struct SynthObject * so)
     wf = so->wf;
 
 
-    if(so->state != STATE_RAMPDOWN)
+    /* Is voice being ramped? */
+    if(so->state == STATE_RAMPDOWN)
+    {
+        if(so->decay != 0)  /* Ramp has been started */
+        {
+            so->decay = so->decay / 2;
+
+            if(so->decay < 10 && so->decay > -10)
+                so->isUsed = 0;
+
+            if(so->state == STATE_RAMPDOWN)
+            {
+                so->decay-=5;
+                if(so->decay < 5)
+                    so->isUsed=0;
+                s = (s * so->decay) >> 8;
+            }
+
+
+            return so->decay*so->volscale>>14;
+        }
+    } else  /* OK to advance voice */
     {
         so->cp += so->delta;
     }
 
+
     cpShifted = so->cp >> FRACTSIZE;   //Was 10
 
-    if( (cpShifted > (wf->numSamples) && (so->state != STATE_RAMPDOWN)))
+    /* Have we overrun? */
+    if( (cpShifted >= (wf->numSamples-1)))
     {
-        stopVoice(so);
+    	so->cp -= so->delta;
+	    cpShifted = so->cp >> FRACTSIZE;
+    	stopVoice(so);
     }
 
     s2 = getSample((cpShifted)+1, wf);
@@ -314,8 +339,8 @@ signed short int synthVoice(struct SynthObject * so)
     }
 
     /* Better, working, linear interpolation    */
-    s1=getSample((cpShifted), wf);              //\|/ Was 1023)) >> 10
-//    s = s1 + ((signed)((s2 - s1) * (so->cp & (1023)))>>10);   //Was 10
+    s1=getSample((cpShifted), wf);
+
     s = s1 + ((signed)((s2 - s1) * (so->cp & ((1<<FRACTSIZE)-1)))>>FRACTSIZE);   //Was 10
 
 /* ADSR COMMENT WOULD GO FROM HERE.........*/
@@ -324,7 +349,7 @@ signed short int synthVoice(struct SynthObject * so)
         stopVoice(so);
 
 
-    if(so->ch != 9) /* Stupid ADSR code... and don't do ADSR for drums */
+    if(so->ch != 9 && so->state != STATE_RAMPDOWN) /* Stupid ADSR code... and don't do ADSR for drums */
     {
         if(so->curOffset < so->targetOffset)
         {
@@ -352,21 +377,19 @@ signed short int synthVoice(struct SynthObject * so)
     }
 
     if(so->curOffset < 0)
-        so->isUsed=0;  /* This is OK because offset faded it out already */
-
+    	stopVoice(so);
 
     s = (s * (so->curOffset >> 22) >> 8);
 
-/* ............. TO HERE */
 
-
-    if(so->state == STATE_RAMPDOWN)
+    /* need to set ramp beginning */
+    if(so->state == STATE_RAMPDOWN && so->decay == 0)
     {
-        so->decay-=5;
-        if(so->decay < 5)
-            so->isUsed=0;
-        s = (s * so->decay) >> 8;
+        so->decay = s;
     }
+
+
+/* ............. TO HERE */
 
     /* Scaling by channel volume and note volume is done in sequencer.c */
     /* That saves us some multiplication and pointer operations         */
