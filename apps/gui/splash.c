@@ -41,7 +41,7 @@ static void splash(struct screen * screen,
     char *next;
     char *store=NULL;
     int x = 0;
-    int w, h;
+    int w, h = 1;
     unsigned char splash_buf[MAXLETTERS];
     unsigned short widths[MAXLINES];
     unsigned char *text = splash_buf;
