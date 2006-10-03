@@ -119,12 +119,13 @@ long pitchTbl[] ICONST_ATTR={
    73297,73330,73363,73396,73429,73462,73495,73528
 };
 
+
 void findDelta(struct SynthObject * so, int ch, int note)
 {
 
     struct GWaveform * wf = patchSet[chPat[ch]]->waveforms[patchSet[chPat[ch]]->noteTable[note]];
     so->wf=wf;
-    unsigned long delta= 0; /* More percision- extra bit - not so off-key as before */
+    unsigned int delta= 0;
 
     delta = (((gustable[note]<<FRACTSIZE) / (wf->rootFreq)) * wf->sampRate / (SAMPLE_RATE));
     delta = (delta * pitchTbl[chPW[ch]])>> 16;
@@ -248,10 +249,11 @@ void pressNote(int ch, int note, int vol)
         }
     }
 }
-
+inline void stopVoice(struct SynthObject * so);
 
 void releaseNote(int ch, int note)
 {
+
     if(ch==9)
         return;
 

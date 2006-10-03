@@ -238,7 +238,7 @@ void setPoint(struct SynthObject * so, int pt)
      *
      * Or just move the 1 up one line to optimize a tiny bit.
      */
-/*    so->curRate = so->curRate << 1;*/
+     so->curRate = so->curRate << 1;
 
 
     so->targetOffset = so->wf->envOffset[pt]<<(20);
@@ -251,9 +251,9 @@ inline void stopVoice(struct SynthObject * so)
 {
     if(so->state == STATE_RAMPDOWN)
         return;
+    //    so->isUsed = 0;
     so->state = STATE_RAMPDOWN;
     so->decay = 0;
-
 }
 
 signed short int synthVoice(struct SynthObject * so)
@@ -277,7 +277,7 @@ signed short int synthVoice(struct SynthObject * so)
             if(so->decay < 10 && so->decay > -10)
                 so->isUsed = 0;
 
-            return so->decay*so->volscale>>14;
+            return so->decay;
         }
     } else  /* OK to advance voice */
     {
@@ -287,13 +287,7 @@ signed short int synthVoice(struct SynthObject * so)
 
     cpShifted = so->cp >> FRACTSIZE;   //Was 10
 
-    /* Have we overrun? */
-    if( (cpShifted >= (wf->numSamples-1)))
-    {
-    	so->cp -= so->delta;
-	    cpShifted = so->cp >> FRACTSIZE;
-    	stopVoice(so);
-    }
+
 
     s2 = getSample((cpShifted)+1, wf);
 
@@ -307,8 +301,8 @@ signed short int synthVoice(struct SynthObject * so)
             s2=getSample((cpShifted), wf);
         }
         else
-            {
-                so->delta = -so->delta;
+        {
+            so->delta = -so->delta;
             so->loopDir = LOOPDIR_FORWARD;
         }
     }
@@ -329,6 +323,20 @@ signed short int synthVoice(struct SynthObject * so)
         }
     }
 
+
+    /* Have we overrun? */
+    if( (cpShifted >= (wf->numSamples-1)))
+    {
+        so->cp -= so->delta;
+
+        cpShifted = so->cp >> FRACTSIZE;
+        s2 = getSample((cpShifted)+1, wf);
+      //      if((wf->mode & (28)))
+        //        printf("OV1 (loop 2)");
+        stopVoice(so);
+    }
+
+
     /* Better, working, linear interpolation    */
     s1=getSample((cpShifted), wf);
 
@@ -337,8 +345,10 @@ signed short int synthVoice(struct SynthObject * so)
 /* ADSR COMMENT WOULD GO FROM HERE.........*/
 
     if(so->curRate == 0)
+    {
         stopVoice(so);
-
+//         printf("OV2");
+    }
 
     if(so->ch != 9 && so->state != STATE_RAMPDOWN) /* Stupid ADSR code... and don't do ADSR for drums */
     {
@@ -350,7 +360,10 @@ signed short int synthVoice(struct SynthObject * so)
                 if(so->curPoint != 5)
                     setPoint(so, so->curPoint+1);
                 else
+                {
                     stopVoice(so);
+//                     printf("OV3");
+                }
             }
         } else
         {
@@ -361,22 +374,29 @@ signed short int synthVoice(struct SynthObject * so)
                 if(so->curPoint != 5)
                     setPoint(so, so->curPoint+1);
                 else
+                {
                     stopVoice(so);
+//                     printf("OV4");
+                }
 
             }
         }
     }
 
     if(so->curOffset < 0)
+    {
     	stopVoice(so);
-
+//         printf("OV5");
+    }
     s = (s * (so->curOffset >> 22) >> 8);
 
 
     /* need to set ramp beginning */
     if(so->state == STATE_RAMPDOWN && so->decay == 0)
     {
-        so->decay = s;
+        so->decay = s*so->volscale>>14;
+        if(so->decay == 0)
+            so->decay = 1;  /* stupid junk.. */
     }
 
 

@@ -124,7 +124,7 @@ struct SynthObject
     struct GWaveform * wf;
     int delta;
     int decay;
-    unsigned int cp;
+    unsigned int cp; /* unsigned int */
     int state, loopState, loopDir;
     int note, vol, ch, isUsed;
     int curRate, curOffset, targetOffset;
