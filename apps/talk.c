@@ -142,7 +142,7 @@ static int open_voicefile(void)
         p_lang = (char *)global_settings.lang_file;
     }
 
-    snprintf(buf, sizeof(buf), ROCKBOX_DIR LANG_DIR "/%s.voice", p_lang);
+    snprintf(buf, sizeof(buf), LANG_DIR "/%s.voice", p_lang);
     
     return open(buf, O_RDONLY);
 }

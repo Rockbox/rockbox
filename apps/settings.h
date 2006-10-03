@@ -35,15 +35,15 @@
 
 #define ROCKBOX_DIR "/.rockbox"
 #define ROCKBOX_DIR_LEN 9
-#define FONT_DIR "/fonts"
-#define LANG_DIR "/langs"
-#define WPS_DIR ROCKBOX_DIR "/wps"
-#define THEME_DIR ROCKBOX_DIR "/themes"
-#define PLUGIN_DIR ROCKBOX_DIR"/rocks"
-#define BACKDROP_DIR ROCKBOX_DIR"/backdrops"
+#define FONT_DIR    ROCKBOX_DIR "/fonts"
+#define LANG_DIR    ROCKBOX_DIR "/langs"
+#define WPS_DIR     ROCKBOX_DIR "/wps"
+#define THEME_DIR   ROCKBOX_DIR "/themes"
+#define PLUGIN_DIR  ROCKBOX_DIR "/rocks"
+#define BACKDROP_DIR ROCKBOX_DIR "/backdrops"
 #define REC_BASE_DIR "/recordings"
-#define EQS_DIR ROCKBOX_DIR "/eqs"
-#define CODECS_DIR "/codecs"
+#define EQS_DIR     ROCKBOX_DIR "/eqs"
+#define CODECS_DIR  ROCKBOX_DIR"/codecs"
 
 #define MAX_FILENAME 20
 

@@ -827,7 +827,7 @@ static bool browse_fonts( char *dst, int dst_size )
     #define fontname_buf buffer.text.fontname_buf
 
     rb->snprintf( old_font, MAX_PATH,
-                  ROCKBOX_DIR FONT_DIR "/%s.fnt",
+                  FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
 
     while( 1 )
@@ -850,7 +850,7 @@ static bool browse_fonts( char *dst, int dst_size )
         {
             b_need_redraw = 0;
 
-            d = rb->PREFIX(opendir)( ROCKBOX_DIR FONT_DIR "/" );
+            d = rb->PREFIX(opendir)( FONT_DIR "/" );
             if( !d )
             {
                 return false;
@@ -880,7 +880,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     || rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
                                    ".fnt" ) )
                     continue;
-                rb->snprintf( bbuf, MAX_PATH, ROCKBOX_DIR FONT_DIR "/%s",
+                rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                               de->d_name );
                 rb->font_load( bbuf );
                 rb->font_getstringsize( de->d_name, &fw, &fh, FONT_UI );
@@ -915,7 +915,7 @@ static bool browse_fonts( char *dst, int dst_size )
                     && !rb->strcmp( de->d_name + rb->strlen( de->d_name ) - 4,
                                    ".fnt" ) )
                 {
-                    rb->snprintf( bbuf, MAX_PATH, ROCKBOX_DIR FONT_DIR "/%s",
+                    rb->snprintf( bbuf, MAX_PATH, FONT_DIR "/%s",
                           de->d_name );
                     rb->font_load( bbuf );
                     rb->font_getstringsize( de->d_name, NULL, &fh, FONT_UI );
@@ -1463,7 +1463,7 @@ static void draw_text( int x, int y )
 {
     buffer.text.text[0] = '\0';
     rb->snprintf( buffer.text.old_font, MAX_PATH,
-                  ROCKBOX_DIR FONT_DIR "/%s.fnt",
+                  FONT_DIR "/%s.fnt",
                   rb->global_settings->font_file );
     while( 1 )
     {

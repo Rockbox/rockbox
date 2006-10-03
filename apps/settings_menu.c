@@ -1257,7 +1257,7 @@ static bool custom_cfg_browse(void)
 
 static bool language_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR LANG_DIR, SHOW_LNG);
+    return rockbox_browse(LANG_DIR, SHOW_LNG);
 }
 
 static bool voice_menus(void)
@@ -1327,7 +1327,7 @@ static bool voice_menu(void)
 #ifdef HAVE_LCD_BITMAP
 static bool font_browse(void)
 {
-    return rockbox_browse(ROCKBOX_DIR FONT_DIR, SHOW_FONT);
+    return rockbox_browse(FONT_DIR, SHOW_FONT);
 }
 
 static bool scroll_bar(void)

@@ -228,7 +228,7 @@ struct codec_api ci = {
 void codec_get_full_path(char *path, const char *codec_fn)
 {
     /* Create full codec path */
-    snprintf(path, MAX_PATH-1, ROCKBOX_DIR CODECS_DIR "/%s", codec_fn);
+    snprintf(path, MAX_PATH-1, CODECS_DIR "/%s", codec_fn);
 }
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,

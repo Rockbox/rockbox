@@ -1210,7 +1210,7 @@ void settings_apply(void)
 #ifdef HAVE_LCD_BITMAP
     if ( global_settings.font_file[0] &&
          global_settings.font_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR FONT_DIR "/%s.fnt",
+        snprintf(buf, sizeof buf, FONT_DIR "/%s.fnt",
                  global_settings.font_file);
         font_load(buf);
     }
@@ -1238,7 +1238,7 @@ void settings_apply(void)
 
     if ( global_settings.lang_file[0] &&
          global_settings.lang_file[0] != 0xff ) {
-        snprintf(buf, sizeof buf, ROCKBOX_DIR LANG_DIR "/%s.lng",
+        snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                  global_settings.lang_file);
         lang_load(buf);
         talk_init(); /* use voice of same language */
@@ -1742,12 +1742,12 @@ bool settings_save_config(void)
 #endif
 
     if (global_settings.lang_file[0] != 0)
-        fdprintf(fd, "lang: %s/%s.lng\r\n", ROCKBOX_DIR LANG_DIR,
+        fdprintf(fd, "lang: %s/%s.lng\r\n", LANG_DIR,
                  global_settings.lang_file);
 
 #ifdef HAVE_LCD_BITMAP
     if (global_settings.font_file[0] != 0)
-        fdprintf(fd, "font: %s/%s.fnt\r\n", ROCKBOX_DIR FONT_DIR,
+        fdprintf(fd, "font: %s/%s.fnt\r\n", FONT_DIR,
                  global_settings.font_file);
 #endif
 
