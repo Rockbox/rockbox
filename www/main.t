@@ -21,11 +21,11 @@
 <p class="ingress">
 Rockbox is an open source replacement firmware for mp3 players. It runs on a number of different models:
 <ul>
-<li>Archos: Jukebox 5000, 6000, Studio, Recorder, FM Recorder, Recorder V2
+<li><b>Archos</b>: Jukebox 5000, 6000, Studio, Recorder, FM Recorder, Recorder V2
 and Ondio
-<li>iRiver: H100 and H300 series
-<li>Apple: iPod 4th gen (grayscale and color), 5th gen (Video), Nano and Mini 1st/2nd gen
-<li>iAudio: X5 (including X5V and X5L)
+<li><b>iriver</b>: H100, H300 and H10 series
+<li><b>Apple</b>: iPod 4th gen (grayscale and color), 5th gen (Video), 1st gen Nano and Mini 1st/2nd gen (<i>Nano 2nd gen and Video 5.5th gen are not supported</i>)
+<li><b>iAudio</b>: X5 (including X5V and X5L)
 <li>Additional models are <a href="http://www.rockbox.org/twiki/bin/view/Main/TargetStatus">in development</a>
 </ul>
 
@@ -39,6 +39,10 @@ href="/twiki/pub/Main/RockboxManual/rockbox-manual-2.4.pdf">easy to use</a>. Ins
 #endif
 
 <h2>News</h2>
+
+<p><i>2006-10-02</i>: Enhanced left-side menu of the web site
+
+<p><i>2006-08-23</i>: <a href="http://rasher.dk/rockbox/people/">Where are the Rockboxers?</a> 
 
 <p><i>2006-07-18</i>: The <a href="/mail/archive/rockbox-dev-archive-2006-07/0054.shtml">feature freeze is lifted</a>
 
