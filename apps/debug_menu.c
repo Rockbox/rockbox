@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include "config.h"
-#ifndef SIMULATOR
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -28,22 +27,14 @@
 #include "kernel.h"
 #include "sprintf.h"
 #include "action.h"
-#include "adc.h"
-#include "mas.h"
-#include "power.h"
-#include "usb.h"
-#include "rtc.h"
 #include "debug.h"
 #include "thread.h"
 #include "powermgmt.h"
 #include "system.h"
 #include "font.h"
-#include "disk.h"
 #include "audio.h"
 #include "mp3_playback.h"
 #include "settings.h"
-#include "ata.h"
-#include "fat.h"
 #include "dir.h"
 #include "panic.h"
 #include "screens.h"
@@ -53,19 +44,29 @@
 #include "tagcache.h"
 #include "lcd-remote.h"
 #include "crc32.h"
-#include "eeprom_24cxx.h"
 #include "logf.h"
-
-#ifdef HAVE_LCD_BITMAP
-#include "widgets.h"
-#include "peakmeter.h"
+#ifndef SIMULATOR
+#include "disk.h"
+#include "adc.h"
+#include "power.h"
+#include "usb.h"
+#include "rtc.h"
+#include "ata.h"
+#include "fat.h"
+#include "mas.h"
+#include "eeprom_24cxx.h"
+#ifdef HAVE_MMC
+#include "ata_mmc.h"
 #endif
 #ifdef CONFIG_TUNER
 #include "tuner.h"
 #include "radio.h"
 #endif
-#ifdef HAVE_MMC
-#include "ata_mmc.h"
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+#include "widgets.h"
+#include "peakmeter.h"
 #endif
 #include "logfdisp.h"
 #if CONFIG_CODEC == SWCODEC
@@ -92,6 +93,7 @@ char thread_status_char(int status)
     
     return '?';
 }
+#ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 bool dbg_os(void)
@@ -214,9 +216,10 @@ bool dbg_os(void)
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
-
+#endif /* !SIMULATOR */
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
+#ifndef SIMULATOR
 bool dbg_audio_thread(void)
 {
     char buf[32];
@@ -263,6 +266,7 @@ bool dbg_audio_thread(void)
     }
     return false;
 }
+#endif /* !SIMULATOR */
 #else /* CONFIG_CODEC == SWCODEC */
 extern size_t filebuflen;
 /* This is a size_t, but call it a long so it puts a - when it's bad. */
@@ -272,8 +276,10 @@ static unsigned int ticks, boost_ticks;
 
 void dbg_audio_task(void)
 {
+#ifndef SIMULATOR
     if(FREQ > CPUFREQ_NORMAL)
         boost_ticks++;
+#endif
 
     ticks++;
 }
@@ -316,14 +322,14 @@ bool dbg_audio_thread(void)
 
         bufused = bufsize - pcmbuf_free();
 
-        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld", bufused, bufsize);
+        snprintf(buf, sizeof(buf), "pcm: %7ld/%7ld", (long) bufused, (long) bufsize);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
         scrollbar(0, line*8, LCD_WIDTH, 6, bufsize, 0, bufused, HORIZONTAL);
         line++;
 
-        snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", filebufused, filebuflen);
+        snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", filebufused, (long) filebuflen);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
@@ -334,9 +340,11 @@ bool dbg_audio_thread(void)
         snprintf(buf, sizeof(buf), "track count: %2d", audio_track_count());
         lcd_puts(0, line++, buf);
 
+#ifndef SIMULATOR
         snprintf(buf, sizeof(buf), "cpu freq: %3dMHz",
                  (int)((FREQ + 500000) / 1000000));
         lcd_puts(0, line++, buf);
+#endif
 
         snprintf(buf, sizeof(buf), "boost ratio: %3d%%",
                  boost_ticks * 100 / ticks);
@@ -388,6 +396,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
 
 {
+#ifndef SIMULATOR
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* TODO: Implement for iPod */
     (void)p_manufacturer;
@@ -454,6 +463,12 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
         *p_device = id;
         return true; /* success */
     }
+#endif
+#else
+    (void) p_manufacturer;
+    (void) p_device;
+    (void) addr1;
+    (void) addr2;
 #endif
     return false; /* fail */
 }
@@ -717,6 +732,7 @@ bool dbg_hw_info(void)
 }
 #endif /* !HAVE_LCD_BITMAP */
 
+#ifndef SIMULATOR
 bool dbg_partitions(void)
 {
     int partition=0;
@@ -768,6 +784,7 @@ bool dbg_partitions(void)
     }
     return false;
 }
+#endif
 
 #if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF_OUT)
 bool dbg_spdif(void)
@@ -920,9 +937,11 @@ bool dbg_spdif(void)
         lcd_puts(0, line++, buf);
         line++;
 
+#ifndef SIMULATOR
         snprintf(buf, sizeof(buf), "Measured freq: %ldHz",
                 (long)((long long)FREQMEAS*CPU_FREQ/((1 << 15)*3*(1 << 13))/128));
         lcd_puts(0, line++, buf);
+#endif
 
         lcd_update();
 
@@ -1285,6 +1304,7 @@ bool dbg_cpufreq(void)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
+#ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
@@ -1473,6 +1493,7 @@ bool view_battery(void)
 }
 
 #endif /* HAVE_LCD_BITMAP */
+#endif
 
 static bool view_runtime(void)
 {
@@ -1559,6 +1580,7 @@ static bool view_runtime(void)
     return false;
 }
 
+#ifndef SIMULATOR
 #ifdef HAVE_MMC
 bool dbg_mmc_info(void)
 {
@@ -1713,7 +1735,7 @@ static bool dbg_disk_info(void)
 
             case 2:
                 snprintf(buf, sizeof buf, "%ld MB",
-                         ((unsigned long)identify_info[61] << 16 |
+                         ((mak)identify_info[61] << 16 |
                           (unsigned long)identify_info[60]) / 2048 );
                 lcd_puts(0, y++, "Size");
                 lcd_puts(0, y++, buf);
@@ -1825,6 +1847,7 @@ static bool dbg_disk_info(void)
     return false;
 }
 #endif /* !HAVE_MMC */
+#endif /* !SIMULATOR */
 
 #ifdef HAVE_DIRCACHE
 static bool dbg_dircache_info(void)
@@ -1995,6 +2018,7 @@ bool dbg_save_roms(void)
 }
 #endif /* CPU */
 
+#ifndef SIMULATOR
 #ifdef CONFIG_TUNER
 bool dbg_fm_radio(void)
 {
@@ -2035,6 +2059,7 @@ bool dbg_fm_radio(void)
     return false;
 }
 #endif /* CONFIG_TUNER */
+#endif /* !SIMULATOR */
 
 #ifdef HAVE_LCD_BITMAP
 extern bool do_screendump_instead_of_usb;
@@ -2128,31 +2153,45 @@ bool debug_menu(void)
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Catch mem accesses", dbg_set_memory_guard },
 #endif
+#ifndef SIMULATOR
         { "View OS stacks", dbg_os },
+#endif
 #ifdef HAVE_LCD_BITMAP
+#ifndef SIMULATOR
         { "View battery", view_battery },
+#endif
         { "Screendump", dbg_screendump },
 #endif
+#ifndef SIMULATOR
         { "View HW info", dbg_hw_info },
+#endif
+#ifndef SIMULATOR
         { "View partitions", dbg_partitions },
+#endif
+#ifndef SIMULATOR
 #ifdef HAVE_MMC
         { "View MMC info", dbg_mmc_info },
 #else
         { "View disk info", dbg_disk_info },
+#endif
 #endif
 #ifdef HAVE_DIRCACHE
         { "View dircache info", dbg_dircache_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
         { "View tagcache info", dbg_tagcache_info },
+#if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR)
         { "View audio thread", dbg_audio_thread },
+#endif
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
         { "View runtime", view_runtime },
+#ifndef SIMULATOR
 #ifdef CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },
+#endif
 #endif
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
         { "Write back EEPROM", dbg_write_eeprom },
@@ -2170,5 +2209,3 @@ bool debug_menu(void)
 
     return result;
 }
-
-#endif /* SIMULATOR */

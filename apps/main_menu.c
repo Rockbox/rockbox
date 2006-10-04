@@ -349,9 +349,8 @@ bool info_menu(void)
     static const struct menu_item items[] = {
         { ID2P(LANG_INFO_MENU),          show_info         },
         { ID2P(LANG_VERSION),            show_credits      },
-#ifndef SIMULATOR
         { ID2P(LANG_DEBUG),              debug_menu        },
-#else
+#ifdef SIMULATOR
         { ID2P(LANG_USB),                simulate_usb      },
 #ifdef ROCKBOX_HAS_LOGF
         {"logf", logfdisplay },
