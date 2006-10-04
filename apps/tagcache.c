@@ -171,7 +171,8 @@ static struct ramcache_header *hdr;
 struct temp_file_entry {
     long tag_offset[TAG_COUNT];
     short tag_length[TAG_COUNT];
-
+    long flag;
+    
     long data_length;
 };
 
@@ -447,9 +448,6 @@ static int find_index(const char *filename)
     
     if (idx_id < 0)
         idx_id = find_entry_disk(filename);
-    
-    if (idx_id < 0)
-        return false;
     
     return idx_id;
 }
@@ -1327,18 +1325,37 @@ static inline void write_item(const char *item)
     write(cachefd, item, len);
 }
 
-inline void check_if_empty(char **tag)
+static int check_if_empty(char **tag)
 {
-    if (tag == NULL || *tag == NULL || *tag[0] == '\0')
+    int length;
+    
+    if (*tag == NULL || *tag[0] == '\0')
+    {
         *tag = "<Untagged>";
+        return 11; /* Tag length */
+    }
+    
+    length = strlen(*tag);
+    if (length >= MAX_PATH-32)
+    {
+        logf("over length tag: %s", *tag);
+        *tag[MAX_PATH-32] = '\0';
+        length = MAX_PATH-32;
+    }
+    
+    return length + 1;
 }
 
-#define CRC_BUF_LEN 8
-
+#define ADD_TAG(entry,tag,data) \
+    /* Adding tag */ \
+    entry.tag_offset[tag] = offset; \
+    entry.tag_length[tag] = check_if_empty(data); \
+    offset += entry.tag_length[tag]
+    
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-static void add_tagcache(const char *path, const struct dircache_entry *dc)
+static void add_tagcache(char *path, const struct dircache_entry *dc)
 #else
-static void add_tagcache(const char *path)
+static void add_tagcache(char *path)
 #endif
 {
     struct track_info track;
@@ -1347,7 +1364,7 @@ static void add_tagcache(const char *path)
     int fd;
     char tracknumfix[3];
     char *genrestr;
-    //uint32_t crcbuf[CRC_BUF_LEN];
+    int offset = 0;
 
     if (cachefd < 0)
         return ;
@@ -1391,36 +1408,8 @@ static void add_tagcache(const char *path)
 
     logf("-> %s", path);
     
-    genrestr = id3_get_genre(&track.id3);
-    
-    check_if_empty(&track.id3.title);
-    check_if_empty(&track.id3.artist);
-    check_if_empty(&track.id3.album);
-    check_if_empty(&genrestr);
-    check_if_empty(&track.id3.composer);
-    
-    entry.tag_length[tag_filename] = strlen(path) + 1;
-    entry.tag_length[tag_title] = strlen(track.id3.title) + 1;
-    entry.tag_length[tag_artist] = strlen(track.id3.artist) + 1;
-    entry.tag_length[tag_album] = strlen(track.id3.album) + 1;
-    entry.tag_length[tag_genre] = strlen(genrestr) + 1;
-    entry.tag_length[tag_composer] = strlen(track.id3.composer) + 1;
-    
-    entry.tag_offset[tag_filename] = 0;
-    entry.tag_offset[tag_title] = entry.tag_offset[tag_filename] + entry.tag_length[tag_filename];
-    entry.tag_offset[tag_artist] = entry.tag_offset[tag_title] + entry.tag_length[tag_title];
-    entry.tag_offset[tag_album] = entry.tag_offset[tag_artist] + entry.tag_length[tag_artist];
-    entry.tag_offset[tag_genre] = entry.tag_offset[tag_album] + entry.tag_length[tag_album];
-    entry.tag_offset[tag_composer] = entry.tag_offset[tag_genre] + entry.tag_length[tag_genre];
-    entry.data_length = entry.tag_offset[tag_composer] + entry.tag_length[tag_composer];
-    
-    /* Numeric tags */
-    entry.tag_offset[tag_year] = track.id3.year;
-    entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
-    entry.tag_offset[tag_length] = track.id3.length;
-    entry.tag_offset[tag_bitrate] = track.id3.bitrate;
-    
-    if (entry.tag_offset[tag_tracknumber] <= 0)
+    /* Generate track number if missing. */
+    if (track.id3.tracknum <= 0)
     {
         const char *p = strrchr(path, '.');
         
@@ -1439,12 +1428,39 @@ static void add_tagcache(const char *path)
         }
         
         if (tracknumfix[0] != '\0')
-            entry.tag_offset[tag_tracknumber] = atoi(tracknumfix);
+        {
+            track.id3.tracknum = atoi(tracknumfix);
+            /* Set a flag to indicate track number has been generated. */
+            entry.flag |= FLAG_TRKNUMGEN;
+        }
         else
-            entry.tag_offset[tag_tracknumber] = -1;
+        {
+            /* Unable to generate track number. */
+            track.id3.tracknum = -1;
+        }
     }
     
+    genrestr = id3_get_genre(&track.id3);
+    
+    /* Numeric tags */
+    entry.tag_offset[tag_year] = track.id3.year;
+    entry.tag_offset[tag_tracknumber] = track.id3.tracknum;
+    entry.tag_offset[tag_length] = track.id3.length;
+    entry.tag_offset[tag_bitrate] = track.id3.bitrate;
+    
+    /* String tags. */
+    ADD_TAG(entry, tag_filename, &path);
+    ADD_TAG(entry, tag_title, &track.id3.title);
+    ADD_TAG(entry, tag_artist, &track.id3.artist);
+    ADD_TAG(entry, tag_album, &track.id3.album);
+    ADD_TAG(entry, tag_genre, &genrestr);
+    ADD_TAG(entry, tag_composer, &track.id3.composer);
+    entry.data_length = offset;
+    
+    /* Write the header */
     write(cachefd, &entry, sizeof(struct temp_file_entry));
+    
+    /* And tags also... Correct order is critical */
     write_item(path);
     write_item(track.id3.title);
     write_item(track.id3.artist);
@@ -1659,47 +1675,22 @@ inline static int tempbuf_find_location(int id)
     return entry->seek;
 }
 
-static bool build_numeric_index(int index_type, struct tagcache_header *h, int tmpfd)
+static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
 {
     struct master_header   tcmh;
     struct index_entry idx;
     int masterfd;
     int masterfd_pos;
-    long *databuf = (long *)tempbuf;
+    struct temp_file_entry *entrybuf = (struct temp_file_entry *)tempbuf;
     int max_entries;
-    int i;
+    int entries_processed = 0;
+    int i, j;
     
-    max_entries = tempbuf_size / sizeof(long);
+    max_entries = tempbuf_size / sizeof(struct temp_file_entry) - 1;
     
-    if (h->entry_count >= max_entries)
-    {
-        logf("not enough space!");
-        return false;
-    }
-        
-    logf("Building numeric index: %d", index_type);
-    
-    /* Walk through the temporary file. */
+    logf("Building numeric indices...");
     lseek(tmpfd, sizeof(struct tagcache_header), SEEK_SET);
-    for (i = 0; i < h->entry_count; i++)
-    {
-        struct temp_file_entry entry;
-            
-        if (read(tmpfd, &entry, sizeof(struct temp_file_entry)) !=
-            sizeof(struct temp_file_entry))
-        {
-            logf("read fail #1");
-            return false;
-        }
-
-        /* Insert data in buffer. */
-        databuf[i] = (long)entry.tag_offset[index_type];
-
-        /* Skip to next. */
-        lseek(tmpfd, entry.data_length, SEEK_CUR);
-    }
     
-    /* Update the entries in index. */
     if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
         return false;
     
@@ -1712,29 +1703,61 @@ static bool build_numeric_index(int index_type, struct tagcache_header *h, int t
         return false;
     }
 
-    for (i = 0; i < h->entry_count; i++)
+    while (entries_processed < h->entry_count)
     {
-        int loc = lseek(masterfd, 0, SEEK_CUR);
-        
-        if (read(masterfd, &idx, sizeof(struct index_entry)) !=
-            sizeof(struct index_entry))
+        int count = MIN(h->entry_count, max_entries);
+         
+        /* Read in as many entries as possible. */
+        for (i = 0; i < count; i++)
         {
-            logf("read fail #2");
-            close(masterfd);
-            return false;
+            /* Read in numeric data. */
+            if (read(tmpfd, &entrybuf[i], sizeof(struct temp_file_entry)) !=
+                sizeof(struct temp_file_entry))
+            {
+                logf("read fail #1");
+                close(masterfd);
+                return false;
+            }
+
+            /* Skip string data. */
+            lseek(tmpfd, entrybuf[i].data_length, SEEK_CUR);
         }
         
-        idx.tag_seek[index_type] = databuf[i];
-        
-        /* Write back the updated index. */
-        lseek(masterfd, loc, SEEK_SET);
-        if (write(masterfd, &idx, sizeof(struct index_entry)) !=
-            sizeof(struct index_entry))
+        /* Commit the data to the index. */
+        for (i = 0; i < count; i++)
         {
-            logf("write fail");
-            close(masterfd);
-            return false;
+            int loc = lseek(masterfd, 0, SEEK_CUR);
+            
+            if (read(masterfd, &idx, sizeof(struct index_entry)) !=
+                sizeof(struct index_entry))
+            {
+                logf("read fail #2");
+                close(masterfd);
+                return false;
+            }
+            
+            for (j = 0; j < TAG_COUNT; j++)
+            {
+                if (!tagcache_is_numeric_tag(j))
+                    continue;
+                
+                idx.tag_seek[j] = entrybuf[i].tag_offset[j];
+            }
+            idx.flag = entrybuf[i].flag;
+            
+            /* Write back the updated index. */
+            lseek(masterfd, loc, SEEK_SET);
+            if (write(masterfd, &idx, sizeof(struct index_entry)) !=
+                sizeof(struct index_entry))
+            {
+                logf("write fail");
+                close(masterfd);
+                return false;
+            }
         }
+        
+        entries_processed += count;
+        logf("%d/%d entries processed", entries_processed, h->entry_count);
     }
     
     close(masterfd);
@@ -2330,13 +2353,10 @@ static bool commit(void)
     {
         int ret;
         
-        stat.commit_step++;
         if (tagcache_is_numeric_tag(i))
-        {
-            build_numeric_index(i, &tch, tmpfd);
             continue;
-        }
         
+        stat.commit_step++;
         ret = build_index(i, &tch, tmpfd);
         if (ret <= 0)
         {
@@ -2352,6 +2372,7 @@ static bool commit(void)
         }
     }
     
+    build_numeric_indices(&tch, tmpfd);
     close(tmpfd);
     stat.commit_step = 0;
     

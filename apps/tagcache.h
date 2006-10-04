@@ -70,6 +70,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define FLAG_DELETED    0x0001  /* Entry has been removed from db */
 #define FLAG_DIRCACHE   0x0002  /* Filename is a dircache pointer */
 #define FLAG_DIRTYNUM   0x0004  /* Numeric data has been modified */
+#define FLAG_TRKNUMGEN  0x0008  /* Track number has been generated  */
 #define FLAG_GET_ATTR(flag)      ((flag >> 16) & 0x0000ffff)
 #define FLAG_SET_ATTR(flag,attr) flag = (flag & 0x0000ffff) | (attr << 16)
 
