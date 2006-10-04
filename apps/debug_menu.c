@@ -473,6 +473,7 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
     return false; /* fail */
 }
 
+#ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 bool dbg_hw_info(void)
 {
@@ -731,6 +732,7 @@ bool dbg_hw_info(void)
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
+#endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
 bool dbg_partitions(void)
@@ -956,6 +958,7 @@ bool dbg_spdif(void)
 }
 #endif /* CPU_COLDFIRE */
 
+#ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
 /* Test code!!! */
 bool dbg_ports(void)
@@ -1252,6 +1255,7 @@ bool dbg_ports(void)
     return false;
 }
 #endif /* !HAVE_LCD_BITMAP */
+#endif /* !SIMULATOR */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 extern int boost_counter;
@@ -1735,7 +1739,7 @@ static bool dbg_disk_info(void)
 
             case 2:
                 snprintf(buf, sizeof buf, "%ld MB",
-                         ((mak)identify_info[61] << 16 |
+                         ((unsigned long)identify_info[61] << 16 |
                           (unsigned long)identify_info[60]) / 2048 );
                 lcd_puts(0, y++, "Size");
                 lcd_puts(0, y++, buf);
