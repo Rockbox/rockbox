@@ -147,9 +147,6 @@ drivers/eeprom_24cxx.c
 eeprom_settings.c
 #endif
 #endif
-#ifdef IPOD_ARCH
-drivers/pcf50605.c
-#endif
 #if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606) \
  || (CONFIG_RTC == RTC_PCF50605) || (CONFIG_RTC == RTC_E8564)
 drivers/rtc.c
