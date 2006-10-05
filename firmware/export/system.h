@@ -78,6 +78,7 @@ const char *get_cpu_boost_tracker(void);
 #define CPUBOOSTID_MAININIT 'i'
 #define CPUBOOSTID_DEBUGMENU_MANUAL 'm'
 #define CPUBOOSTID_PLAYLIST 'P'
+#define CPUBOOSTID_PCMBUF 'p'
 #define CPUBOOSTID_PCMRECORD 'R'
 #define CPUBOOSTID_TREE 'r'
 #define CPUBOOSTID_TREE 'r'
