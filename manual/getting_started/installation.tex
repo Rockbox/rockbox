@@ -2,7 +2,7 @@
 \chapter{Installation}\label{sec:installation}
 
 \section{Prerequisites}\label{sec:prerequisites}
-
+\index{Installation!Prerequisites}
 Before installing Rockbox you should make sure you meet the prerequisites.
 Also you may need some tools for installation. In most cases these will be
 already available on your computer but if not you need to get some additional
@@ -10,7 +10,8 @@ software.
 
 \begin{description}
   
-\item[ZIP utility.]   Rockbox is distributed as an archive using the 
+\item[ZIP utility.]\index{zip}
+  Rockbox is distributed as an archive using the
   \fname{.zip} format. Thus you need a tool to handle that compressed 
   format. Usually your computer should have a tool installed that can 
   handle the \fname{.zip} file format. Windows XP has builtin support for 
@@ -49,7 +50,7 @@ software.
 
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}
-
+\index{Installation}
 \opt{MASCODEC}{
   \subsection{Using the windows installer}
   Using the Windows self installing executable to install Rockbox is the 
@@ -71,7 +72,8 @@ software.
   
   \begin{description}
     
-  \item[The Rockbox bootloader.] The bootloader is the program that tells your 
+  \item[The Rockbox bootloader.] \index{Bootloader}
+    The bootloader is the program that tells your 
     \dap{} how to boot and load other components of Rockbox. This is the 
     component of Rockbox that is installed to the flash memory of your 
     \playerman. 
@@ -95,7 +97,8 @@ software.
   After installing the bootloader, the installation becomes fairly easy. 
 } 
       
-There are three different types of firmware binaries from Rockbox website: 
+There are three different types of firmware binaries from Rockbox website:
+\label{Version} 
 current version, daily build and CVS build. You need to decide which one
 you want to install and get the version for your \dap{}.
 
@@ -127,13 +130,13 @@ you want to install and get the version for your \dap{}.
 \end{description}
 
 \nopt{player}{
-  \note{
+  \note{\index{Installation!Fonts}
     Rockbox has a fonts package that is available at 
     \url{http://www.rockbox.org/daily.shtml}.  While the daily builds and CVS
     builds change frequently, the fonts package rarely changes.  Thus, the 
     fonts package is not included in the daily builds and CVS builds. (The 
     stable release, on the other hand, does not change, so fonts are 
-    include with the stable release.)  When installing Rockbox for the 
+    included with the stable release.)  When installing Rockbox for the 
     first time, you should install the  fonts package. 
   }
 }
@@ -168,6 +171,7 @@ directory structure that Rockbox needs.
 }
 
 \section{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
+\index{Speech}\index{Installation!Optional Steps}
 If you wish to use speech support you will also need a language file, available
 from \wikilink{VoiceFiles}. For the English language, the file is called
 \fname{english.voice}. When it has been downloaded, unpack this file and copy 
@@ -176,9 +180,15 @@ your \dap{}. Voice menus are turned on by default. See
 \reference{ref:Voiceconfiguration} for details on voice settings.
 
 \section{Running Rockbox} 
-Remove your \dap{} from the computer's USB port. Unplug any connected power 
-supply and turn the unit off. When you next turn the unit on, Rockbox should 
-load. When you see the Rockbox splash screen, Rockbox is loaded and ready for 
+Remove your \dap{} from the computer's USB port.%
+\nopt{ipod}{Unplug any connected power supply and turn the unit off. When
+you next turn the unit on, Rockbox should load.}%
+\opt{ipod}{Rebooting the Ipod by holding
+  \opt{IPOD_4G_PAD}{\ButtonMenu{}+\ButtonSelect{}}%
+  \opt{IPOD_3G_PAD}{\ButtonMenu{}+\ButtonPlay{}}
+  for a couple of seconds until the \dap{} reboots. Now Rockbox should load.
+}%
+When you see the Rockbox splash screen, Rockbox is loaded and ready for
 use.
 
 \opt{ipod}{
@@ -213,7 +223,7 @@ The new build will be installed over your current build.
   \reference{ref:SystemOptions}.
 }
 
-\section{Uninstalling Rockbox}
+\section{Uninstalling Rockbox}\index{Installation!uninstall}
 
 If you would like to go back to using the original \playerman{} software, then
 connect the \playerman{} to your computer, and delete the
