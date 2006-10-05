@@ -81,7 +81,6 @@ const char *get_cpu_boost_tracker(void);
 #define CPUBOOSTID_PCMBUF 'p'
 #define CPUBOOSTID_PCMRECORD 'R'
 #define CPUBOOSTID_TREE 'r'
-#define CPUBOOSTID_TREE 'r'
 #define CPUBOOSTID_TALK 'T'
 #define CPUBOOSTID_TAGCACHE 't'
 #define CPUBOOSTID_PLAYBACK_VOICE 'v'
