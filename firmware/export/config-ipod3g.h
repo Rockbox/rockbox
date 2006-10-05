@@ -3,6 +3,8 @@
  */
 #define TARGET_TREE /* this target is using the target tree system */
 
+#define IPOD_ARCH 1
+
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 7
 
