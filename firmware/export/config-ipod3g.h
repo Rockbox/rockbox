@@ -32,6 +32,11 @@
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
+/* LCD contrast */
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
+
 #define CONFIG_KEYPAD IPOD_3G_PAD
 
 /* Define this if you do software codec */
@@ -102,11 +107,6 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 #define USB_NONE
-
-/* LCD contrast */
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

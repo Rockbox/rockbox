@@ -29,6 +29,11 @@
 
 #define LCD_PIXELFORMAT HORIZONTAL_PACKING
 
+/* LCD contrast */
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
+
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
 
@@ -101,11 +106,6 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 #define USB_IPODSTYLE
-
-/* LCD contrast */
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER
