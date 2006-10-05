@@ -121,6 +121,7 @@ bool charger_inserted(void)
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
+#else
     /* Player */
     return (PADR & 1) == 0;
 #endif
