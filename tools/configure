@@ -777,6 +777,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="color"
     ;;
 
    21|ipodnano)
@@ -799,6 +803,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="nano"
     ;;
 
    22|ipodvideo)
@@ -821,6 +829,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="video"
     ;;
 
    23|ipod3g)
@@ -843,6 +855,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="3g"
     ;;
     
    24|ipod4g)
@@ -865,6 +881,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="4g"
     ;;
     
    25|ipodmini)
@@ -887,6 +907,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="mini"
     ;;
     
    13|ifp7xx)
@@ -953,6 +977,10 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="arm"
+    t_manufacturer="ipod"
+    t_model="mini2g"
     ;;
 
    14|h10)

@@ -1,7 +1,7 @@
 /*
  * This config file is for the Apple iPod Mini (1st Gen)
  */
-#define IPOD_ARCH 1
+#define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 9 /* TODO: change to 9 */
@@ -99,6 +99,11 @@
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
 #define USB_IPODSTYLE
+
+/* LCD contrast */
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

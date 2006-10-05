@@ -87,13 +87,6 @@ drivers/lcd-h100-remote.c
 drivers/lcd-remote-2bit-vi.c
 #endif
 #endif
-#if CONFIG_LCD==LCD_IPODNANO || CONFIG_LCD==LCD_IPODCOLOR \
- || CONFIG_LCD == LCD_IPOD2BPP || CONFIG_LCD == LCD_IPODMINI
-drivers/lcd-ipod.c
-#endif
-#if CONFIG_LCD==LCD_IPODVIDEO
-drivers/lcd-ipodvideo.c
-#endif
 #if CONFIG_LCD==LCD_H300
 drivers/lcd-h300.c
 #endif
@@ -316,5 +309,97 @@ target/arm/tatung/tpj1022/power-tpj1022.c
 target/arm/tatung/tpj1022/usb-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/adc-tpj1022.c
+#endif
+#endif
+
+#ifdef IPOD_4G
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-4g_color.c
+target/arm/ipod/button-clickwheel.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+#endif
+#endif
+
+#ifdef IPOD_COLOR
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-4g_color.c
+target/arm/ipod/button-clickwheel.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+#endif
+#endif
+
+#ifdef IPOD_NANO
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-nano_video.c
+target/arm/ipod/button-clickwheel.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+#endif
+#endif
+
+#ifdef IPOD_VIDEO
+#ifndef SIMULATOR
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-nano_video.c
+target/arm/ipod/button-clickwheel.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+drivers/lcd-ipodvideo.c
+#endif
+#endif
+
+#ifdef IPOD_3G
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/3g/backlight-3g.c
+target/arm/ipod/3g/button-3g.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+#endif
+#endif
+
+#ifdef IPOD_MINI
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-mini1g_mini2g.c
+target/arm/ipod/button-mini1g.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
+#endif
+#endif
+
+
+#ifdef IPOD_MINI2G
+#ifndef SIMULATOR
+drivers/lcd-ipod.c
+drivers/pcf50605.c
+target/arm/ata-pp5020.c
+target/arm/ipod/adc-ipod.c
+target/arm/ipod/backlight-mini1g_mini2g.c
+target/arm/ipod/button-clickwheel.c
+target/arm/ipod/power-ipod.c
+target/arm/ipod/usb-ipod.c
 #endif
 #endif

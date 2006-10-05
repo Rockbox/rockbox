@@ -1077,15 +1077,6 @@ void shutdown_hw(void)
 #endif
     backlight_off();
 #endif /* IAUDIO_X5 */
-#if defined(IPOD_ARCH) && defined(HAVE_LCD_COLOR)
-    /* Clear the screen and backdrop to
-    remove ghosting effect on shutdown */
-    lcd_set_backdrop(NULL);
-    lcd_set_background(LCD_WHITE);
-    lcd_clear_display();
-    lcd_update();
-    sleep(HZ/16);
-#endif
 #ifndef IAUDIO_X5
     lcd_set_contrast(0);
 #endif    

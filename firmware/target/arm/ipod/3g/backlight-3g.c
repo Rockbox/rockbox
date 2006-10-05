@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 by Dave Chapman
+ * Copyright (C) 2002 by Linus Nielsen Feltzing
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,17 +16,27 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#include "config.h"
+#include <stdlib.h>
+#include "cpu.h"
+#include "kernel.h"
+#include "thread.h"
+#include "i2c.h"
+#include "debug.h"
+#include "rtc.h"
+#include "usb.h"
+#include "power.h"
+#include "system.h"
+#include "button.h"
+#include "timer.h"
+#include "backlight.h"
 
-#ifndef PCF50605_H
-#define PCF50605_H
+inline void __backlight_on(void)
+{
+    outl(inl(0xc0001000) | 0x02, 0xc0001000);
+}
 
-int pcf50605_read(int address);
-int pcf50605_read_multiple(int address, unsigned char* buf, int count);
-int pcf50605_write(int address, unsigned char val);
-int pcf50605_write_multiple(int address, const unsigned char* buf, int count);
-int pcf50605_a2d_read(int channel);
-bool pcf50605_charger_inserted(void);
-void pcf50605_standby_mode(void);
-void pcf50605_init(void);
-
-#endif
+inline void __backlight_off(void)
+{
+    outl(inl(0xc0001000) & ~0x02, 0xc0001000);
+}

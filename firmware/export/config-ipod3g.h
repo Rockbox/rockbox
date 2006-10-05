@@ -1,7 +1,7 @@
 /*
  * This config file is for the Apple iPod 3g
  */
-#define IPOD_ARCH 1
+#define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 7
@@ -101,6 +101,10 @@
 
 #define USB_NONE
 
+/* LCD contrast */
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40 /* Match boot contrast */
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL

@@ -175,23 +175,6 @@ void usb_enable(bool on)
         or_l(0x00000008,&GPIO1_OUT);
 #endif
     }
-    
-#elif defined(USB_IPODSTYLE) 
-    /* For the ipod, we can only do one thing with USB mode - reboot
-       into Apple's flash-based disk-mode.  This does not return. */
-    if (on)
-    {
-      /* The following code is copied from ipodlinux */
-#if defined(IPOD_COLOR) || defined(IPOD_3G) || \
-    defined(IPOD_4G) || defined(IPOD_MINI)
-        unsigned char* storage_ptr = (unsigned char *)0x40017F00;
-#elif defined(IPOD_NANO) || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
-        unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
-#endif
-        memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
-        DEV_RS |= 4; /* Reboot */
-    }
-
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
     (void) on;
@@ -496,7 +479,9 @@ void usb_init(void)
     usb_monitor_enabled = false;
     countdown = -1;
 
-#ifdef USB_IRIVERSTYLE
+#ifdef TARGET_TREE
+    usb_init_device();
+#elif defined USB_IRIVERSTYLE
     or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
 
 #ifdef IRIVER_H300_SERIES
@@ -514,45 +499,6 @@ void usb_init(void)
     or_l(0x01000040, &GPIO_FUNCTION);
 #endif
 
-#elif defined(USB_IPODSTYLE)
-    int r0;
-    outl(inl(0x70000084) | 0x200, 0x70000084);
-
-    outl(inl(0x7000002C) | 0x3000000, 0x7000002C);
-    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
-
-    outl(inl(0x60006004) | 0x400000, 0x60006004);   /* reset usb start */
-    outl(inl(0x60006004) & ~0x400000, 0x60006004);  /* reset usb end */
-
-    outl(inl(0x70000020) | 0x80000000, 0x70000020);
-    while ((inl(0x70000028) & 0x80) == 0);
-
-    outl(inl(0xc5000184) | 0x100, 0xc5000184);
-    while ((inl(0xc5000184) & 0x100) != 0);
-
-    outl(inl(0xc50001A4) | 0x5F000000, 0xc50001A4);
-    if ((inl(0xc50001A4) & 0x100) == 0) {
-        outl(inl(0xc50001A8) & ~0x3, 0xc50001A8);
-        outl(inl(0xc50001A8) | 0x2, 0xc50001A8);
-        outl(inl(0x70000028) | 0x4000, 0x70000028);
-        outl(inl(0x70000028) | 0x2, 0x70000028);
-    } else {
-        outl(inl(0xc50001A8) | 0x3, 0xc50001A8);
-        outl(inl(0x70000028) &~0x4000, 0x70000028);
-        outl(inl(0x70000028) | 0x2, 0x70000028);
-    }
-    outl(inl(0xc5000140) | 0x2, 0xc5000140);
-    while((inl(0xc5000140) & 0x2) != 0);
-    r0 = inl(0xc5000184);
-
-    /* Note from IPL source (referring to next 5 lines of code: 
-       THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */
-    outl(inl(0x70000020) | 0x80000000, 0x70000020);
-    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
-    while ((inl(0x70000028) & 0x80) == 0);
-    outl(inl(0x70000028) | 0x2, 0x70000028);
-
-    udelay(0x186A0);    
 #endif
 
     usb_enable(false);

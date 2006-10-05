@@ -24,12 +24,6 @@
 #ifdef TARGET_TREE
 #include "adc-target.h"
 
-#elif defined(IPOD_ARCH)
-#define NUM_ADC_CHANNELS 1
-
-#define ADC_BATTERY 0
-#define ADC_UNREG_POWER ADC_BATTERY
-
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define NUM_ADC_CHANNELS 4
 
@@ -106,8 +100,7 @@
 unsigned short adc_read(int channel);
 void adc_init(void);
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)\
- || defined(IPOD_ARCH)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 /* Force a scan now */
 unsigned short adc_scan(int channel);
 #endif

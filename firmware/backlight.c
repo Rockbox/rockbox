@@ -77,23 +77,6 @@ static inline void __backlight_on(void)
     or_b(0x40, &PADRH); /* drive it high */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 |= 0x10;
-#elif CONFIG_BACKLIGHT == BL_IPOD4G
-    /* brightness full */
-    outl(0x80000000 | (0xff << 16), 0x7000a010);
-
-    /* set port b bit 3 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-#elif CONFIG_BACKLIGHT==BL_IPODMINI
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-#elif CONFIG_BACKLIGHT==BL_IPODNANO
-    /* set port B03 on */
-    outl(((0x100 | 1) << 3), 0x6000d824);
-
-    /* set port L07 on */
-    outl(((0x100 | 1) << 7), 0x6000d12c);
-#elif CONFIG_BACKLIGHT==BL_IPOD3G
-    outl(inl(0xc0001000) | 0x02, 0xc0001000);
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_SET = 1;
 #endif
@@ -115,23 +98,8 @@ static inline void __backlight_off(void)
     and_b(~0x40, &PADRH); /* drive it low */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 &= ~0x10;
-#elif CONFIG_BACKLIGHT == BL_IPOD4G
-   /* fades backlight off on 4g */
-   outl(inl(0x70000084) & ~0x2000000, 0x70000084);
-   outl(0x80000000, 0x7000a010);
-#elif CONFIG_BACKLIGHT==BL_IPODNANO
-    /* set port B03 off */
-    outl(((0x100 | 0) << 3), 0x6000d824);
-
-    /* set port L07 off */
-    outl(((0x100 | 0) << 7), 0x6000d12c);
 #elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
     GPIO3_CLR = 1;
-#elif CONFIG_BACKLIGHT==BL_IPOD3G
-    outl(inl(0xc0001000) & ~0x02, 0xc0001000);
-#elif CONFIG_BACKLIGHT==BL_IPODMINI
-    /* set port B03 off */
-    outl(((0x100 | 0) << 3), 0x6000d824);
 #endif
 }
 #endif

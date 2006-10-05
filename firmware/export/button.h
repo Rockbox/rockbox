@@ -26,9 +26,7 @@
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
+#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
 #define HAS_BUTTON_HOLD
 #endif
 extern struct event_queue button_queue;
@@ -221,30 +219,6 @@ void wheel_send_events(bool send);
                 |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY|BUTTON_MENU)
 
 #define BUTTON_REMOTE 0
-
-#elif ((CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD))
-
-  /* iPod specific button codes */
-
-#define BUTTON_SELECT       0x00000001
-#define BUTTON_MENU         0x00000002
-
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_SCROLL_FWD   0x00000010
-#define BUTTON_SCROLL_BACK  0x00000020
-
-#define BUTTON_PLAY         0x00000040
-
-#define BUTTON_MAIN (BUTTON_SELECT|BUTTON_MENU\
-                |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_SCROLL_FWD\
-                |BUTTON_SCROLL_BACK|BUTTON_PLAY)
-
-#define BUTTON_REMOTE 0
-
-/* This is for later
-#define  BUTTON_SCROLL_TOUCH 0x00000200
-*/
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 

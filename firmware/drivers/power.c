@@ -84,8 +84,6 @@ void power_init(void)
     pcf50606_init();
 #endif
 #endif
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
-    pcf50605_init();
 #else
 #ifdef HAVE_POWEROFF_ON_PB5
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
@@ -123,12 +121,6 @@ bool charger_inserted(void)
     return (adc_read(ADC_CHARGE_REGULATOR) < 0x1FF);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
-#elif defined(IPOD_VIDEO)
-    return (GPIOL_INPUT_VAL & 0x08)?false:true;
-#elif defined(IPOD_ARCH)
-    /* This needs filling in for other ipods. */
-    return false;
-#else
     /* Player */
     return (PADR & 1) == 0;
 #endif
@@ -166,8 +158,6 @@ bool charging_state(void) {
     return charger_inserted();
 #elif defined IRIVER_H300_SERIES
     return (GPIO_READ & 0x00800000)?true:false;
-#elif defined IPOD_VIDEO
-    return (GPIOB_INPUT_VAL & 0x01)?false:true;
 #endif
 }
 #endif
@@ -201,8 +191,6 @@ void ide_power_enable(bool on)
         or_l(0x80000000, &GPIO_OUT);
 #elif defined(IAUDIO_X5)
     /* X5 TODO */
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-    /* We do nothing on the iPod */
 #elif defined(GMINI_ARCH)
     if(on)
         P1 |= 0x08;
@@ -259,9 +247,6 @@ bool ide_powered(void)
     return (GPIO_OUT & 0x80000000)?false:true;
 #elif defined(IAUDIO_X5)
     return false; /* X5 TODO */
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-    /* pretend we are always powered - we don't turn it off on the ipod */
-    return true;
 #elif defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
 #elif defined(TOSHIBA_GIGABEAT_F)
@@ -296,11 +281,6 @@ void power_off(void)
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     and_l(~0x00080000, &GPIO1_OUT);
     asm("halt");
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-#ifndef BOOTLOADER
-    /* We don't turn off the ipod, we put it in a deep sleep */
-    pcf50605_standby_mode();
-#endif
 #elif CONFIG_CPU == PNX0101
     GPIO1_CLR = 1 << 16;
     GPIO2_SET = 1;
