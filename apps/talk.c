@@ -215,7 +215,7 @@ static void load_voicefile(void)
     /* Do a bitswap as necessary. */
 #if CONFIG_CODEC == SWCODEC
     logf("Bitswapping voice file.");
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_TALK);
     buf = (unsigned char *)(&p_voicefile->index) +
         (p_voicefile->id1_max + p_voicefile->id2_max) * sizeof(struct clip_entry);
     length = file_size - (buf - (unsigned char *) p_voicefile);
@@ -227,7 +227,7 @@ static void load_voicefile(void)
         temp   = ((temp >> 2) & 0x33) | ((temp & 0x33) << 2);
         buf[i] = ((temp >> 1) & 0x55) | ((temp & 0x55) << 1);
     }
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_TALK);
     
 #endif
 

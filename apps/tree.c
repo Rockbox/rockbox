@@ -1177,9 +1177,7 @@ bool create_playlist(void)
     if (fd < 0)
         return false;
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    cpu_boost(true);
-#endif
+    cpu_boost_id(true, CPUBOOSTID_TREE);
 
     snprintf(filename, sizeof(filename), "%s",
              tc.currdir[1] ? tc.currdir : "/");
@@ -1187,9 +1185,7 @@ bool create_playlist(void)
     add_dir(filename, sizeof(filename), fd);
     close(fd);
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-    cpu_boost(false);
-#endif
+    cpu_boost_id(false, CPUBOOSTID_TREE);
 
     sleep(HZ);
 

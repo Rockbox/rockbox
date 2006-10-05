@@ -541,7 +541,7 @@ static void pcmrec_callback(bool flush)
     {
         logf("writing: %d (%d)", num_ready, flush);
         
-        cpu_boost(true);
+        cpu_boost_id(true, CPUBOOSTID_PCMRECORD);
 
         size_yield = 0;
         for (i=0; i<num_ready; i++)
@@ -581,7 +581,7 @@ static void pcmrec_callback(bool flush)
         /* sync file */
         fsync(wav_file);
 
-        cpu_boost(false);
+        cpu_boost_id(false, CPUBOOSTID_PCMRECORD);
 
         logf("done");
     }

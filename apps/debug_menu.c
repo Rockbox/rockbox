@@ -1258,7 +1258,6 @@ bool dbg_ports(void)
 #endif /* !SIMULATOR */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-extern int boost_counter;
 bool dbg_cpufreq(void)
 {
     char buf[128];
@@ -1278,7 +1277,11 @@ bool dbg_cpufreq(void)
         snprintf(buf, sizeof(buf), "Frequency: %ld", FREQ);
         lcd_puts(0, line++, buf);
 
-        snprintf(buf, sizeof(buf), "boost_counter: %d", boost_counter);
+#ifdef CPU_BOOST_TRACKING
+        snprintf(buf, sizeof(buf), "boost_counter: %d %s", get_cpu_boost_counter(), get_cpu_boost_tracker());
+#else
+        snprintf(buf, sizeof(buf), "boost_counter: %d", get_cpu_boost_counter());
+#endif
         lcd_puts(0, line++, buf);
 
         lcd_update();
@@ -1287,15 +1290,16 @@ bool dbg_cpufreq(void)
         switch(button)
         {
             case ACTION_STD_PREV:
-                cpu_boost(true);
+                cpu_boost_id(true, CPUBOOSTID_DEBUGMENU_MANUAL);
                 break;
+
             case ACTION_STD_NEXT:
-                cpu_boost(false);
+                cpu_boost_id(false, CPUBOOSTID_DEBUGMENU_MANUAL);
                 break;
 
             case ACTION_STD_OK:
-                set_cpu_frequency(CPUFREQ_DEFAULT);
-                boost_counter = 0;
+                while (get_cpu_boost_counter() > 0)
+                    cpu_boost_id(false, CPUBOOSTID_DEBUGMENU_MANUAL);
                 break;
 
             case ACTION_STD_CANCEL:

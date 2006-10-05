@@ -546,16 +546,16 @@ static int dircache_do_rebuild(void)
     memset(dircache_cur_path, 0, MAX_PATH);
     dircache_size = sizeof(struct dircache_entry);
 
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_DIRCACHE);
     if (dircache_travel(pdir, dircache_root) < 0)
     {
         logf("dircache_travel failed");
-        cpu_boost(false);
+        cpu_boost_id(false, CPUBOOSTID_DIRCACHE);
         dircache_size = 0;
         dircache_initializing = false;
         return -2;
     }
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_DIRCACHE);
 
     logf("Done, %d KiB used", dircache_size / 1024);
     

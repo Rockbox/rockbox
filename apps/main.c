@@ -276,7 +276,7 @@ void init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_NORMAL);
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_MAININIT);
 #endif
     
     buffer_init();
@@ -482,7 +482,7 @@ void init(void)
 #endif
 
     /* runtime database has to be initialized after audio_init() */
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_MAININIT);
 
 #ifdef AUTOROCK
     {

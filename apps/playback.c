@@ -822,7 +822,7 @@ static void voice_boost_cpu(bool state)
     if (state != voice_cpu_boosted)
     {
         voice_cpu_boosted = state;
-        cpu_boost(state);
+        cpu_boost_id(state, CPUBOOSTID_PLAYBACK_VOICE);
     }
 }
 #endif
@@ -1676,7 +1676,7 @@ static bool codec_load_next_track(void)
         automatic_skip = true;
     }
     
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_PLAYBACK_CODEC);
     LOGFQUEUE("codec > audio Q_AUDIO_CHECK_NEW_TRACK");
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
     while (1) 
@@ -1690,7 +1690,7 @@ static bool codec_load_next_track(void)
         else
             break;
     }
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_PLAYBACK_CODEC);
     switch (ev.id)
     {
         case Q_CODEC_REQUEST_COMPLETE:
@@ -2177,7 +2177,7 @@ static void audio_read_file(bool quick)
         return ;
     }
 
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_PLAYBACK_AUDIO);
     while (tracks[track_widx].filerem > 0) 
     {
         int overlap;
@@ -2245,7 +2245,7 @@ static void audio_read_file(bool quick)
         logf("Partially buf:%dB",
                 tracks[track_widx].filesize - tracks[track_widx].filerem);
     }
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_PLAYBACK_AUDIO);
 }
 
 static bool audio_loadcodec(bool start_play)

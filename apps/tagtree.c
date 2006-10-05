@@ -1121,9 +1121,9 @@ int tagtree_load(struct tree_context* c)
         case allsubentries:
         case navibrowse:
             logf("navibrowse...");
-            cpu_boost(true);
+            cpu_boost_id(true, CPUBOOSTID_TAGTREE);
             count = retrieve_entries(c, &tcs, 0, true);
-            cpu_boost(false);
+            cpu_boost_id(false, CPUBOOSTID_TAGTREE);
             break;
         
         default:
@@ -1297,11 +1297,11 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
     char buf[MAX_PATH];
     int from, to, direction;
 
-    cpu_boost(true);
+    cpu_boost_id(true, CPUBOOSTID_TAGTREE);
     if (!tagcache_search(&tcs, tag_filename))
     {
         gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
-        cpu_boost(false);
+        cpu_boost_id(false, CPUBOOSTID_TAGTREE);
         return false;
     }
     
@@ -1338,7 +1338,7 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
     }
     playlist_sync(NULL);
     tagcache_search_finish(&tcs);
-    cpu_boost(false);
+    cpu_boost_id(false, CPUBOOSTID_TAGTREE);
     
     return true;
 }
@@ -1442,16 +1442,16 @@ struct tagentry* tagtree_get_entry(struct tree_context *c, int id)
     /* Load the next chunk if necessary. */
     if (realid >= current_entry_count || realid < 0)
     {
-        cpu_boost(true);
+        cpu_boost_id(true, CPUBOOSTID_TAGTREE);
         if (retrieve_entries(c, &tcs2, MAX(0, id - (current_entry_count / 2)),
                              false) < 0)
         {
             logf("retrieve failed");
-            cpu_boost(false);
+            cpu_boost_id(false, CPUBOOSTID_TAGTREE);
             return NULL;
         }
         realid = id - current_offset;
-        cpu_boost(false);
+        cpu_boost_id(false, CPUBOOSTID_TAGTREE);
     }
     
     return &entry[realid];

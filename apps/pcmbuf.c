@@ -121,7 +121,7 @@ void pcmbuf_boost(bool state)
 
     if (state != boost_state)
     {
-        cpu_boost(state);
+        cpu_boost_id(state, CPUBOOSTID_PCMBUF);
         boost_state = state;
     }
     
