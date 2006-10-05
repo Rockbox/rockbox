@@ -57,7 +57,7 @@ static const struct button_mapping button_context_standard[]  = {
 };
 
 static const struct button_mapping button_context_wps[]  = {
-    { ACTION_WPS_PLAY,        BUTTON_PLAY,                BUTTON_NONE },
+    { ACTION_WPS_PLAY,        BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
     { ACTION_WPS_SKIPNEXT,    BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_WPS_SKIPPREV,    BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
@@ -97,9 +97,15 @@ static const struct button_mapping button_context_settings[] = {
 };
 
 static const struct button_mapping button_context_tree[]  = {
-    { ACTION_TREE_WPS,     BUTTON_ON,      BUTTON_NONE },
-    { ACTION_TREE_STOP,    BUTTON_OFF,     BUTTON_NONE },
-    
+    { ACTION_TREE_WPS,              BUTTON_ON|BUTTON_REL,                   BUTTON_ON },
+    { ACTION_TREE_STOP,             BUTTON_OFF,                             BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_ON,                              BUTTON_NONE },
+    { ACTION_LISTTREE_PGUP,         BUTTON_ON|BUTTON_UP,                    BUTTON_ON },
+    { ACTION_LISTTREE_PGUP,         BUTTON_UP|BUTTON_REL,                   BUTTON_ON|BUTTON_UP },
+    { ACTION_LISTTREE_PGUP,         BUTTON_ON|BUTTON_UP|BUTTON_REPEAT,      BUTTON_NONE },
+    { ACTION_LISTTREE_PGDOWN,       BUTTON_ON|BUTTON_DOWN,                  BUTTON_ON },
+    { ACTION_LISTTREE_PGDOWN,       BUTTON_DOWN|BUTTON_REL,                 BUTTON_ON|BUTTON_DOWN },
+    { ACTION_LISTTREE_PGDOWN,       BUTTON_ON|BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_listtree */
 
