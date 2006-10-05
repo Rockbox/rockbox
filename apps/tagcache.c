@@ -595,40 +595,58 @@ inline static bool str_ends_with(const char *str1, const char *str2)
 static bool check_against_clause(long numeric, const char *str,
                                  const struct tagcache_search_clause *clause)
 {
-    switch (clause->type)
+    if (clause->numeric)
     {
-        case clause_is:
-            if (clause->numeric)
+        switch (clause->type)
+        {
+            case clause_is:
                 return numeric == clause->numeric_data;
-            else
+            case clause_is_not:
+                return numeric != clause->numeric_data;
+            case clause_gt:
+                return numeric > clause->numeric_data;
+            case clause_gteq:
+                return numeric >= clause->numeric_data;
+            case clause_lt:
+                return numeric < clause->numeric_data;
+            case clause_lteq:
+                return numeric <= clause->numeric_data;        
+            default:
+                logf("Incorrect numeric tag: %d", clause->type);
+        }
+    }
+    else
+    {
+        switch (clause->type)
+        {
+            case clause_is:
                 return !strcasecmp(clause->str, str);
-        case clause_is_not:
-	    if (clause->numeric)
-	        return numeric != clause->numeric_data;
-	    else
-	        return strcasecmp(clause->str, str);
-
-        case clause_gt:
-            return numeric > clause->numeric_data;
-        case clause_gteq:
-            return numeric >= clause->numeric_data;
-        case clause_lt:
-            return numeric < clause->numeric_data;
-        case clause_lteq:
-            return numeric <= clause->numeric_data;
-        
-        case clause_contains:
-            return (strcasestr(str, clause->str) != NULL);
-        case clause_not_contains:
-            return (strcasestr(str, clause->str) == NULL);
-        case clause_begins_with:
-            return (strcasestr(str, clause->str) == str);
-        case clause_not_begins_with:
-	        return (strcasestr(str, clause->str) != str);
-        case clause_ends_with:
-            return str_ends_with(str, clause->str);
-        case clause_not_ends_with:
-            return !str_ends_with(str, clause->str);
+            case clause_is_not:
+                return strcasecmp(clause->str, str);
+            case clause_gt:
+                return 0>strcasecmp(clause->str, str);
+            case clause_gteq:
+                return 0>=strcasecmp(clause->str, str);
+            case clause_lt:
+                return 0<strcasecmp(clause->str, str);
+            case clause_lteq:
+                return 0<=strcasecmp(clause->str, str);
+            case clause_contains:
+                return (strcasestr(str, clause->str) != NULL);
+            case clause_not_contains:
+                return (strcasestr(str, clause->str) == NULL);
+            case clause_begins_with:
+                return (strcasestr(str, clause->str) == str);
+            case clause_not_begins_with:
+	            return (strcasestr(str, clause->str) != str);
+            case clause_ends_with:
+                return str_ends_with(str, clause->str);
+            case clause_not_ends_with:
+                return !str_ends_with(str, clause->str);
+            
+            default:
+                logf("Incorrect tag: %d", clause->type);
+        }
     }
 
     return false;
