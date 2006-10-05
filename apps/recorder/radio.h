@@ -42,6 +42,18 @@ struct fmstation
     char name[MAX_FMPRESET_LEN+1];
 };
 
+struct fm_region_setting
+{
+    int lang;
+    int freq_min;
+    int freq_max;
+    int freq_step;
+#if (CONFIG_TUNER & TEA5767)
+    int deemphasis; /* 0: 50us, 1: 75us */
+    int band; /* 0: europe, 1: japan (BL in TEA spec)*/
+#endif
+};
+
 #endif
 
 #endif

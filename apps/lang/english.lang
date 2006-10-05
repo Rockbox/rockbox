@@ -7408,10 +7408,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7646,10 +7646,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7660,10 +7660,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -9860,5 +9860,70 @@
   </dest>
   <voice>
     *: "Disable auto-resume if phones not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Region"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Europe"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "US / Canada"
+  </dest>
+  <voice>
+    *: "US / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japan"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Korea"
+  </dest>
+  <voice>
+    *: "Korea"
   </voice>
 </phrase>

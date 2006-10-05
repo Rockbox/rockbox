@@ -661,6 +661,9 @@ static const struct bit_entry hd_bits[] =
     {4, S_O(unplug_rw), 0, "rewind duration on pause", NULL},
     {1, S_O(unplug_autoresume), 0, "disable autoresume if phones not present", off_on },
 #endif
+#ifdef CONFIG_TUNER
+    {2, S_O(fm_region), 0, "fm_region", "eu,us,jp,kr" },
+#endif
 
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */

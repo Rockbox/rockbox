@@ -491,6 +491,10 @@ struct user_settings
     int unplug_rw; /* time in s to rewind when pausing */
     bool unplug_autoresume; /* disable auto-resume if no phones */
 #endif
+#ifdef CONFIG_TUNER
+    int fm_region;
+#endif
+
 };
 
 enum optiontype { INT, BOOL };

@@ -27,6 +27,10 @@
 #define RADIO_IF_MEASUREMENT 3
 #define RADIO_SENSITIVITY 4
 #define RADIO_FORCE_MONO 5
+#if (CONFIG_TUNER & TEA5767)
+#define RADIO_SET_DEEMPHASIS 6
+#define RADIO_SET_BAND 7
+#endif
 /* readback from the tuner layer */
 #define RADIO_PRESENT 0
 #define RADIO_TUNED 1

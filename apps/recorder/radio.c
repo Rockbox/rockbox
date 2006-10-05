@@ -85,12 +85,30 @@
 #define FM_RECORD
 #endif
 
-#define MAX_FREQ (108000000)
-#define MIN_FREQ (87500000)
-#define FREQ_STEP 100000
-
 #define RADIO_SCAN_MODE 0
 #define RADIO_PRESET_MODE 1
+
+#if (CONFIG_TUNER & TEA5767)
+#define DEEMPH_50 0,
+#define DEEMPH_75 1,
+#define BAND_LIM_EU 0
+#define BAND_LIM_JP 1
+#else
+#define DEEMPH_50
+#define DEEMPH_75
+#define BAND_LIM_EU
+#define BAND_LIM_JP
+#endif
+static struct fm_region_setting fm_region[] = {
+    /* Europe */
+    { LANG_FM_EUROPE, 87500000, 108000000,   50000, DEEMPH_50 BAND_LIM_EU },
+    /* US / Canada */
+    { LANG_FM_US,     87900000, 107900000,  200000, DEEMPH_75 BAND_LIM_EU },
+    /* Japan */
+    { LANG_FM_JAPAN,  76000000,  90000000,  100000, DEEMPH_50 BAND_LIM_JP },
+    /* Korea */
+    { LANG_FM_KOREA,  87500000, 108000000,  100000, DEEMPH_50 BAND_LIM_EU },
+    };
 
 static int curr_preset = -1;
 static int curr_freq;
@@ -194,7 +212,9 @@ void radio_start(void)
     if(radio_status == FMRADIO_OFF)
         radio_power(true);
 
-    curr_freq = global_settings.last_frequency * FREQ_STEP + MIN_FREQ;
+    curr_freq = global_settings.last_frequency 
+        * fm_region[global_settings.fm_region].freq_step 
+        + fm_region[global_settings.fm_region].freq_min;
 
     radio_set(RADIO_SLEEP, 0); /* wake up the tuner */
     radio_set(RADIO_FREQUENCY, curr_freq);
@@ -285,7 +305,7 @@ static int find_closest_preset(int freq)
 {
     int i; 
     int diff;
-    int min_diff = MAX_FREQ;
+    int min_diff = fm_region[global_settings.fm_region].freq_min;
     int preset = -1;
 
     for(i = 0;i < MAX_PRESETS;i++)
@@ -307,7 +327,9 @@ static int find_closest_preset(int freq)
 
 static void remember_frequency(void)
 {
-    global_settings.last_frequency = (curr_freq - MIN_FREQ) / FREQ_STEP;
+    global_settings.last_frequency = (curr_freq 
+        - fm_region[global_settings.fm_region].freq_min) 
+        / fm_region[global_settings.fm_region].freq_step;
     settings_save();
 }
 
@@ -450,11 +472,12 @@ bool radio_screen(void)
     {
         if(search_dir)
         {
-            curr_freq += search_dir * FREQ_STEP;
-            if(curr_freq < MIN_FREQ)
-                curr_freq = MAX_FREQ;
-            if(curr_freq > MAX_FREQ)
-                curr_freq = MIN_FREQ;
+            curr_freq += search_dir 
+                * fm_region[global_settings.fm_region].freq_step;
+            if(curr_freq < fm_region[global_settings.fm_region].freq_min)
+                curr_freq = fm_region[global_settings.fm_region].freq_max;
+            if(curr_freq > fm_region[global_settings.fm_region].freq_max)
+                curr_freq = fm_region[global_settings.fm_region].freq_min;
 
             /* Tune in and delay */
             radio_set(RADIO_FREQUENCY, curr_freq);
@@ -573,9 +596,11 @@ bool radio_screen(void)
             case ACTION_STD_PREV:
                 if(radio_mode == RADIO_SCAN_MODE)
                 {
-                     curr_freq -= FREQ_STEP;
-                     if(curr_freq < MIN_FREQ)
-                          curr_freq = MAX_FREQ;
+                     curr_freq 
+                         -= fm_region[global_settings.fm_region].freq_step;
+                     if(curr_freq < fm_region[global_settings.fm_region].freq_min)
+                          curr_freq 
+                          = fm_region[global_settings.fm_region].freq_max;
                      radio_set(RADIO_FREQUENCY, curr_freq);
                      curr_preset = find_preset(curr_freq);
                      remember_frequency();
@@ -589,9 +614,11 @@ bool radio_screen(void)
             case ACTION_STD_NEXT:
                 if(radio_mode == RADIO_SCAN_MODE)
                 {
-                     curr_freq += FREQ_STEP;
-                     if(curr_freq > MAX_FREQ)
-                           curr_freq = MIN_FREQ;
+                     curr_freq 
+                         += fm_region[global_settings.fm_region].freq_step;
+                     if(curr_freq > fm_region[global_settings.fm_region].freq_max)
+                           curr_freq 
+                            = fm_region[global_settings.fm_region].freq_min;
                      radio_set(RADIO_FREQUENCY, curr_freq);
                      curr_preset = find_preset(curr_freq);
                      remember_frequency();
@@ -821,8 +848,8 @@ bool radio_screen(void)
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen, buf);
                 
-                freq = curr_freq / 100000;
-                snprintf(buf, 128, str(LANG_FM_STATION), freq / 10, freq % 10);
+                freq = curr_freq / 10000;
+                snprintf(buf, 128, str(LANG_FM_STATION), freq / 100, freq % 100);
                 FOR_NB_SCREENS(i)
                     screens[i].puts_scroll(0, top_of_screen + 1, buf);
                 
@@ -1316,6 +1343,39 @@ static bool toggle_mono_mode(void)
     return false;
 }
 
+char region_menu_string[32];
+static void create_region_menu(void)
+{
+    snprintf(region_menu_string, sizeof(region_menu_string),
+    "%s: %s", str(LANG_FM_REGION),
+        str(fm_region[global_settings.fm_region].lang));
+}
+
+static bool toggle_region_mode(void)
+{
+    global_settings.fm_region++;
+    if(global_settings.fm_region >= 
+        (int)(sizeof(fm_region) / sizeof(struct fm_region_setting)))
+        global_settings.fm_region = 0;
+#if (CONFIG_TUNER & TEA5767)
+    radio_set(RADIO_SET_DEEMPHASIS, 
+        fm_region[global_settings.fm_region].deemphasis);
+    radio_set(RADIO_SET_BAND, fm_region[global_settings.fm_region].band);
+#endif
+    /* make sure the current frequency is in the region range */
+    curr_freq -= (curr_freq - fm_region[global_settings.fm_region].freq_min)
+        % fm_region[global_settings.fm_region].freq_step;
+    if(curr_freq < fm_region[global_settings.fm_region].freq_min)
+        curr_freq = fm_region[global_settings.fm_region].freq_min;
+    if(curr_freq > fm_region[global_settings.fm_region].freq_max)
+        curr_freq = fm_region[global_settings.fm_region].freq_max;
+    radio_set(RADIO_FREQUENCY, curr_freq);
+
+    settings_save();
+    create_region_menu();
+    return false;
+}
+
 #ifndef FM_MODE
 char radiomode_menu_string[32];
 
@@ -1346,17 +1406,17 @@ static bool scan_presets(void)
         
     if(do_scan)
     {
-        curr_freq = MIN_FREQ;
+        curr_freq = fm_region[global_settings.fm_region].freq_min;
         num_presets = 0;
         memset(presets, 0, sizeof(presets));
-        while(curr_freq <= MAX_FREQ)
+        while(curr_freq <= fm_region[global_settings.fm_region].freq_max)
         {
             if (num_presets >= MAX_PRESETS)
                 break;
 
-            freq = curr_freq /100000;
+            freq = curr_freq / 10000;
             snprintf(buf, MAX_FMPRESET_LEN, str(LANG_FM_SCANNING), 
-                            freq/10, freq % 10);
+                            freq/100, freq % 100);
             gui_syncsplash(0, true, buf);
 
             /* Tune in and delay */
@@ -1373,13 +1433,13 @@ static bool scan_presets(void)
             /* add preset */
             if(tuned){
                  snprintf(buf, MAX_FMPRESET_LEN, 
-                    str(LANG_FM_DEFAULT_PRESET_NAME),freq/10, freq % 10);
+                    str(LANG_FM_DEFAULT_PRESET_NAME),freq/100, freq % 100);
                  strcpy(presets[num_presets].name,buf);
                  presets[num_presets].frequency = curr_freq;
                  num_presets++;
             }
 
-            curr_freq += FREQ_STEP;
+            curr_freq += fm_region[global_settings.fm_region].freq_step;
                    
         }
 
@@ -1504,6 +1564,7 @@ bool radio_menu(void)
 #ifndef FM_MODE
         { radiomode_menu_string          , toggle_radio_mode     },
 #endif
+        { region_menu_string             , toggle_region_mode    },
         { ID2P(LANG_SOUND_SETTINGS)      , sound_menu            },
 #ifndef SIMULATOR
 #if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
@@ -1515,6 +1576,7 @@ bool radio_menu(void)
     };
 
     create_monomode_menu();
+    create_region_menu();
 #ifndef FM_MODE
     create_radiomode_menu();
 #endif

@@ -73,6 +73,14 @@ void philips_set(int setting, int value)
             fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
 
+        case RADIO_SET_DEEMPHASIS:
+            write_bytes[4] = (write_bytes[4] & ~(1<<6)) | (value ? (1<<6) : 0);
+            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
+            break;
+
+        case RADIO_SET_BAND:
+            write_bytes[3] = (write_bytes[3] & ~(1<<5)) | (value ? (1<<5) : 0);
+            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
         default:
             return;
     }
