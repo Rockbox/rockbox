@@ -873,8 +873,12 @@ static int star_run_game(void)
             if (current_level == STAR_LEVEL_COUNT)
             {
                 rb->lcd_clear_display();
-                star_display_text("Congratulation !", true);
+                star_display_text("Congratulations!", true);
                 rb->lcd_update();
+                
+                /* There is no such level as STAR_LEVEL_COUNT so it can't be the
+                 * current_level */
+                current_level--;
                 return 1;
             }
             star_load_level(current_level);
@@ -895,8 +899,9 @@ static int star_choose_level(void)
     while (true)
     {
        rb->lcd_clear_display();
+       /* levels are numbered 0 to (STAR_LEVEL_COUNT-1) */
        rb->snprintf(str_info, sizeof(str_info), "Level:%02d / %02d",
-                 level,STAR_LEVEL_COUNT);
+                 level,(STAR_LEVEL_COUNT-1));
        rb->lcd_putsxy(0, 0, str_info);
        rb->lcd_update();
          key = rb->button_get(true);
