@@ -23,7 +23,7 @@
 
 struct logo{
 #ifdef HAVE_LCD_BITMAP
-    const unsigned char * bitmap;
+    const fb_data* bitmap;
     int width;
     int height;
 #else

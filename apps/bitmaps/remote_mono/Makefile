@@ -21,7 +21,7 @@ DEPFILE = $(OBJDIR)/dep-bitmaps-remotemono
 
 BMP2RB = $(BMP2RB_REMOTEMONO)
 OUTPUT = $(BUILDDIR)/libbitmapsremotemono.a
-BMPINCDIR = $(BUILDDIR)/pluginbitmaps
+BMPINCDIR = $(BUILDDIR)/bitmaps
 
 include $(TOOLSDIR)/makebmp.inc
 

@@ -6,4 +6,6 @@ remote_rockboxlogo.128x42x1.bmp
 remote_rockboxlogo.128x42x2.bmp
 #endif
 
+remote_usblogo.100x32x1.bmp
+
 #endif /* HAVE_REMOTE_LCD */

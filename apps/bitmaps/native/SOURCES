@@ -21,4 +21,6 @@ rockboxlogo.240x74x16.bmp
 rockboxlogo.320x98x16.bmp
 #endif
 
+usblogo.100x32x1.bmp
+
 #endif /* HAVE_LCD_BITMAP */
