@@ -2693,7 +2693,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             char str[19];
             case BB_WIN:
                 rb->splash(HZ*2, true, "You Win!");
+                /* record high level */
+                if(bb.level-1 > bb.highlevel) {
+                    bb.highlevel = bb.level-1;
+                    bb.dirty = true;
+                }
 
+                /* record high score */
                 if((position = bubbles_recordscore(&bb))) {
                     rb->snprintf(str, 19, "New high score #%d!", position);
                     rb->splash(HZ*2, true, str);
