@@ -13,7 +13,7 @@
 #    Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005, Avr 2006, Mai 2006
+#    Nov 2005, Avr 2006, Mai 2006, Juillet 2006, Octobre 2006
 
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -166,7 +166,7 @@
     *: "Retirer la Carte MMC Insérée"
   </dest>
   <voice>
-    *: "Retirer la carte mémoire multimédia insérée"
+    *: "Retirer la carte mémoire multimédia"
   </voice>
 </phrase>
 <phrase>
@@ -185,7 +185,7 @@
 </phrase>
 <phrase>
   id: LANG_FAILED
-  desc: Something failed. To be appended after above actions
+  desc: Something failed. To be appended after actions
   user:
   <source>
     *: "Failed"
@@ -524,7 +524,7 @@
   desc: in sound_settings
   user:
   <source>
-    *: "Stereo width"
+    *: "Stereo Width"
   </source>
   <dest>
     *: "Largeur Stéréo"
@@ -600,7 +600,7 @@
     *: "MDB Actif"
   </dest>
   <voice>
-    *: "MDB Actif"
+    *: "MDB actif"
   </voice>
 </phrase>
 <phrase>
@@ -990,10 +990,10 @@
     *: "Recording screen"
   </source>
   <dest>
-    *: "Enregistrer..."
+    *: "Ecran d'Enregistrement"
   </dest>
   <voice>
-    *: "Enregistrer"
+    *: "Ecran d'enregistrement"
   </voice>
 </phrase>
 <phrase>
@@ -1301,7 +1301,7 @@
     *: "Avertir Avant Effacer Liste de Lecture Courante"
   </dest>
   <voice>
-    *: ""
+    *: "Avertir avant d'éffacer liste de lecture courante"
   </voice>
 </phrase>
 <phrase>
@@ -1343,7 +1343,7 @@
     *: "Débogue (Attention !)"
   </dest>
   <voice>
-    *: "Débogue (Attention !)"
+    *: "Débogue, attention!"
   </voice>
 </phrase>
 <phrase>
@@ -1670,7 +1670,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -1684,16 +1684,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc:
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Charger à partir du Disque"
+    *: ""
   </dest>
   <voice>
-    *: "Charger à partir du disque"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1715,13 +1715,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Forcer Mise à Jour du Cache des Tags"
+    *: "Initialiser le Cache"
   </dest>
   <voice>
-    *: "Forcer la mise à jour du cache des tags"
+    *: "Initialiser le cache"
   </voice>
 </phrase>
 <phrase>
@@ -2272,7 +2272,7 @@
 </phrase>
 <phrase>
   id: LANG_CODEPAGE_UTF8
-  desc:
+  desc: in codepage setting menu
   user:
   <source>
     *: "Unicode (UTF-8)"
@@ -2435,7 +2435,7 @@
     *: "Oui - Juste les Récents"
   </dest>
   <voice>
-    *: "Oui, mais juste les récents"
+    *: "Oui, juste les récents"
   </voice>
 </phrase>
 <phrase>
@@ -2449,7 +2449,7 @@
     *: "Demander - Juste les Récents"
   </dest>
   <voice>
-    *: "Demander, mais juste les récents"
+    *: "Demander, juste les récents"
   </voice>
 </phrase>
 <phrase>
@@ -2631,7 +2631,7 @@
     *: "Micro Intégré"
   </dest>
   <voice>
-    *: "Microphone intégré"
+    *: "Micro intégré"
   </voice>
 </phrase>
 <phrase>
@@ -2684,24 +2684,24 @@
     *: "Independent Frames"
   </source>
   <dest>
-    *: "Trames MP3 Independantes"
+    *: "Trames MP3 Indépendantes"
   </dest>
   <voice>
-    *: "Trames MP3 independantes"
+    *: "Trames MP3 indépendantes"
   </voice>
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Temps de Coupure"
+    *: "Options Temps de Coupure Fichier"
   </dest>
   <voice>
-    *: "Temps de coupure"
+    *: "Options temps de coupure fichier"
   </voice>
 </phrase>
 <phrase>
@@ -2715,7 +2715,7 @@
     *: "Temps de Pré-Enreg."
   </dest>
   <voice>
-    *: "Temps de pré enregistrement"
+    *: "Temps de pré-enregistrement"
   </voice>
 </phrase>
 <phrase>
@@ -2785,7 +2785,7 @@
     *: "Rétro-Eclairage Synchronisé"
   </dest>
   <voice>
-    *: "Rétro-éclairage synchronisé"
+    *: "Rétroéclairage synchronisé"
   </voice>
 </phrase>
 <phrase>
@@ -2838,7 +2838,7 @@
     *: "FF/RW Min Step"
   </source>
   <dest>
-    *: "AR/RR Pas Min."
+    *: "AR/RR Pas Minimum"
   </dest>
   <voice>
     *: "Pas minimum d'avance ou retour rapide"
@@ -2894,7 +2894,7 @@
     *: "Fade-In Delay"
   </source>
   <dest>
-    *: "Délais du fondu en ouverture"
+    *: "Délais du Fondu en Ouverture"
   </dest>
   <voice>
     *: "Délais du fondu en ouverture"
@@ -2908,7 +2908,7 @@
     *: "Fade-In Duration"
   </source>
   <dest>
-    *: "Durée du fondu en ouverture"
+    *: "Durée du Fondu en Ouverture"
   </dest>
   <voice>
     *: "Durée du fondu en ouverture"
@@ -2922,7 +2922,7 @@
     *: "Fade-Out Delay"
   </source>
   <dest>
-    *: "Délais du fondu en fermeture"
+    *: "Délais du Fondu en Fermeture"
   </dest>
   <voice>
     *: "Délais du fondu en fermeture"
@@ -2936,7 +2936,7 @@
     *: "Fade-Out Duration"
   </source>
   <dest>
-    *: "Durée du fondu en fermeture"
+    *: "Durée du Fondu en Fermeture"
   </dest>
   <voice>
     *: "Durée du fondu en fermeture"
@@ -2950,7 +2950,7 @@
     *: "Fade-Out Mode"
   </source>
   <dest>
-    *: "Mode du fondu en fermeture"
+    *: "Mode du Fondu en Fermeture"
   </dest>
   <voice>
     *: "Mode du fondu en fermeture"
@@ -3065,7 +3065,7 @@
     *: "Pré-Amplificateur"
   </dest>
   <voice>
-    *: "Pré amplificateur"
+    *: "Préamplificateur"
   </voice>
 </phrase>
 <phrase>
@@ -3079,7 +3079,7 @@
     *: "Durée du Rétro-éclairage"
   </dest>
   <voice>
-    *: "Durée du rétro éclairage"
+    *: "Durée du rétroéclairage"
   </voice>
 </phrase>
 <phrase>
@@ -3093,7 +3093,7 @@
     *: "Rétro-éclairage Pendant Charge"
   </dest>
   <voice>
-    *: "Rétro éclairage pendant charge"
+    *: "Rétroéclairage pendant charge"
   </voice>
 </phrase>
 <phrase>
@@ -3107,7 +3107,7 @@
     *: "Rétro-éclairage quand Changement de Piste"
   </dest>
   <voice>
-    *: "Rétro éclairage lors du changement de piste"
+    *: "Rétroéclairage lors du changement de piste"
   </voice>
 </phrase>
 <phrase>
@@ -3121,7 +3121,7 @@
     *: "Allumage Progressif du Rétro-éclairage"
   </dest>
   <voice>
-    *: "Allumage progressif du rétro éclairage"
+    *: "Allumage progressif du rétroéclairage"
   </voice>
 </phrase>
 <phrase>
@@ -3135,7 +3135,7 @@
     *: "Extinction Progressive du Rétro-éclairage"
   </dest>
   <voice>
-    *: "Extinction progressive du rétro éclairage"
+    *: "Extinction progressive du rétroéclairage"
   </voice>
 </phrase>
 <phrase>
@@ -3342,10 +3342,10 @@
     *: "Reduce Ticking"
   </source>
   <dest>
-    *: "Reduire le Bruit Parasite"
+    *: "Réduire le Bruit Parasite"
   </dest>
   <voice>
-    *: "Reduire le bruit parasite"
+    *: "Réduire le bruit parasite"
   </voice>
 </phrase>
 <phrase>
@@ -3496,7 +3496,7 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Taille du Pas de Défilement de l'Ecran"
+    *: "Taille du Pas de Défil. de l'Ecran"
   </dest>
   <voice>
     *: "Taille du pas de défilement de l'écran"
@@ -3709,7 +3709,7 @@
     *: "Logarithmique (dB)"
   </dest>
   <voice>
-    *: "Logarithmique, en décibels"
+    *: "Logarithmique décibel"
   </voice>
 </phrase>
 <phrase>
@@ -3723,7 +3723,7 @@
     *: "Linéaire (%)"
   </dest>
   <voice>
-    *: "linéaire, en pour cent"
+    *: "linéaire pour cent"
   </voice>
 </phrase>
 <phrase>
@@ -3734,7 +3734,7 @@
     *: "Minimum Of Range"
   </source>
   <dest>
-    *: "Borne Minimale"
+    *: "Borne Minimale de la Rangée"
   </dest>
   <voice>
     *: "Minimum de la rangée"
@@ -3748,7 +3748,7 @@
     *: "Maximum Of Range"
   </source>
   <dest>
-    *: "Borne Maximale"
+    *: "Borne Maximale de la Rangée"
   </dest>
   <voice>
     *: "Maximum de la rangée"
@@ -3804,7 +3804,7 @@
     *: "NiMH"
   </source>
   <dest>
-    *: "Nickel Métal Hydride"
+    *: "NiMH"
   </dest>
   <voice>
     *: "Nickel métal hydride"
@@ -3832,7 +3832,7 @@
     *: "Disk Poweroff"
   </source>
   <dest>
-    *: "Arrêt du Disque"
+    *: "Arrêt du Disque (Economie d'énergie)"
   </dest>
   <voice>
     *: "Arrêt du disque"
@@ -3916,7 +3916,7 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "Horloge sur 12H"
+    *: "Horloge sur 12 Heures"
   </dest>
   <voice>
     *: "Horloge sur 12 heures"
@@ -3930,7 +3930,7 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "Horloge sur 24H"
+    *: "Horloge sur 24 Heures"
   </dest>
   <voice>
     *: "Horloge sur 24 heures"
@@ -3944,7 +3944,7 @@
     *: "Max Files in Dir Browser"
   </source>
   <dest>
-    *: "Max. de Fichiers par Répertoire"
+    *: "Max. Fichiers par Répertoire"
   </dest>
   <voice>
     *: "Maximum de fichiers par répertoire"
@@ -3958,7 +3958,7 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max. de Fichiers par Liste de Lecture"
+    *: "Max. Fichiers par Liste de Lecture"
   </dest>
   <voice>
     *: "Maximum de fichiers par liste de lecture"
@@ -4098,7 +4098,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fichier ou Dossier Existant. Ecraser?"
+    *: "Fichier/Dossier Existant. Ecraser?"
   </dest>
   <voice>
     *: ""
@@ -4367,7 +4367,7 @@
     *: "Rechercher dans Liste de Lecture"
   </dest>
   <voice>
-    *: "Rechercher dans liste de lecture"
+    *: "Rechercher dans la liste de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -4448,7 +4448,7 @@
     *: "Buffer: %d.%03dMB"
   </source>
   <dest>
-    *: "Tampon: %d.%03dMB"
+    *: "Tamp: %d.%03dMB"
   </dest>
   <voice>
     *: ""
@@ -4465,7 +4465,7 @@
     *: "Batterie: En Charge..."
   </dest>
   <voice>
-    *: ""
+    *: "En charge"
   </voice>
 </phrase>
 <phrase>
@@ -4479,7 +4479,7 @@
     *: "Batterie: Charge Max."
   </dest>
   <voice>
-    *: ""
+    *: "Charge maximale batterie"
   </voice>
 </phrase>
 <phrase>
@@ -4493,7 +4493,7 @@
     *: "Batterie: Charge Persistante"
   </dest>
   <voice>
-    *: ""
+    *: "Charge persistante batterie"
   </voice>
 </phrase>
 <phrase>
@@ -4772,7 +4772,7 @@
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
-    h100,h120,h300: "ON+NAVI = Suppr."
+    h100,h120,h300: "RECORD = Suppr."
   </dest>
   <voice>
     *: ""
@@ -6469,7 +6469,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Milli-ampères par heure"
+    *: "Milliampères par heure"
   </voice>
 </phrase>
 <phrase>
@@ -6525,7 +6525,7 @@
     *: "B"
   </dest>
   <voice>
-    *: "Byte"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7401,10 +7401,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7449,7 +7449,7 @@
     *: "Editer Station"
   </dest>
   <voice>
-    *: ""
+    *: "Editer Station"
   </voice>
 </phrase>
 <phrase>
@@ -7463,7 +7463,7 @@
     *: "Suppr. Station"
   </dest>
   <voice>
-    *: ""
+    *: "Supprimer Station"
   </voice>
 </phrase>
 <phrase>
@@ -7639,10 +7639,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Recherche %d.%01dMHz"
+    *: "Recherche %d.%02dMHz"
   </dest>
   <voice>
     *: ""
@@ -7653,10 +7653,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -8651,7 +8651,212 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: ""
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importer Modifications"
+  </dest>
+  <voice>
+    *: "Importer des modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Mesure de Coupe"
+  </dest>
+  <voice>
+    *: "Mesure de coupe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Que Faire Quand Coupe"
+  </dest>
+  <voice>
+    *: "Que faire quand coupe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Temps de Coupe"
+  </dest>
+  <voice>
+    *: "Temps de coupe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Coupe Selon Taille Fichier"
+  </dest>
+  <voice>
+    *: "Coupe selon la taille du fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Temps"
+  </dest>
+  <voice>
+    *: "Temps"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Taille du Fichier"
+  </dest>
+  <voice>
+    *: "Taille du fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Démarrer Nouveau Fichier"
+  </dest>
+  <voice>
+    *: "Démarrer nouveau fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Arrêter l'Enregistrement"
+  </dest>
+  <voice>
+    *: "Arrêter l'enregistrement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Affichage Télécommande OFF"
+  </dest>
+  <voice>
+    *: "Affichage télécommande OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : Réactiver)"
+  </dest>
+  <voice>
+    *: "(Vol- : Réactiver)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normal"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Rétro-Eclairage (Quand touches vérrouillées)"
+  </dest>
+  <voice>
+    *: "Rétroéclairage quand touches vérrouillées"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Jamais"
+  </dest>
+  <voice>
+    *: "Jamais"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Veille LCD (Aprés Extinction Rétro-éclairage)"
+  </dest>
+  <voice>
+    *: "Veille LCD aprés l'extinction du rétroéclairage"
+  </voice>
+</phrase>
 <phrase>
   id: LANG_SYSFONT_SET_BOOL_YES
   desc: bool true representation
@@ -8884,10 +9089,10 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "All"
   </source>
   <dest>
-    *: "Tous Types"
+    *: "Tout Type"
   </dest>
   <voice>
-    *: "Tous types"
+    *: "Tout type"
   </voice>
 </phrase>
 <phrase>
@@ -8999,7 +9204,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Micro Intégré"
   </dest>
   <voice>
-    *: "Microphone intégré"
+    *: "Micro intégré"
   </voice>
 </phrase>
 <phrase>
@@ -9308,5 +9513,410 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Coupe Selon Taille Fichier"
+  </dest>
+  <voice>
+    *: "Coupe selon la taille du fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Chargement... %d%% Fait (%s)"
+  </source>
+  <dest>
+    *: "Chargement... %d%% Fait (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Equaliseur Matériel"
+  </dest>
+  <voice>
+    *: "Equaliseur matériel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "Activer EQ Matériel"
+  </dest>
+  <voice>
+    *: "Activer l'équaliseur matériel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "Bande Passante"
+  </dest>
+  <voice>
+    *: "Bande passante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "Etroit"
+  </dest>
+  <voice>
+    *: "Etroit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Large"
+  </dest>
+  <voice>
+    *: "Large"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Montrer le Chemin"
+  </dest>
+  <voice>
+    *: "Montrer le chemin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Répertoire Courant Seulement"
+  </dest>
+  <voice>
+    *: "Répertoire courant seulement"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Chemin Complet"
+  </dest>
+  <voice>
+    *: "Chemin Complet"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Contrôle Automatique du Gain"
+  </dest>
+  <voice>
+    *: "Contrôle automatique du gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Sûreté (clip)"
+  </dest>
+  <voice>
+    *: "Sûreté (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "En Direct (Lent)"
+  </dest>
+  <voice>
+    *: "En direct (lent)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (Lent)"
+  </dest>
+  <voice>
+    *: "DJ set (lent)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Moyen"
+  </dest>
+  <voice>
+    *: "Moyen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Voix (Rapide)"
+  </dest>
+  <voice>
+    *: "Voix (rapide)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "CAG Temps de Clip"
+  </dest>
+  <voice>
+    *: "CAG temps de clip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "CAG"
+  </dest>
+  <voice>
+    *: "CAG"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "CAG Gain Max."
+  </dest>
+  <voice>
+    *: "CAG gain maximum"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, for file extension
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobytes par seconde"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Nom de Fichier:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Pause Quand Ecouteurs Insérés"
+  </dest>
+  <voice>
+    *: "Pause quand écouteurs insérés"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pause et Reprise"
+  </dest>
+  <voice>
+    *: "Pause et reprise"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Durée du Retour"
+  </dest>
+  <voice>
+    *: "Durée du retour"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Désactiver auto-reprise si écouteurs non présent"
+  </dest>
+  <voice>
+    *: "Désactiver auto-reprise si écouteurs non présent"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Région"
+  </dest>
+  <voice>
+    *: "Région"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Europe"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "USA / Canada"
+  </dest>
+  <voice>
+    *: "USA / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japon"
+  </dest>
+  <voice>
+    *: "Japon"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Corée"
+  </dest>
+  <voice>
+    *: "Corée"
   </voice>
 </phrase>
