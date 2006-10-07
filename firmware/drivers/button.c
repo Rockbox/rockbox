@@ -951,15 +951,3 @@ void button_clear_queue(void)
 {
     queue_clear(&button_queue);
 }
-
-#ifdef HAVE_HEADPHONE_DETECTION
-bool headphones_inserted(void)
-{
-#if (CONFIG_KEYPAD==IPOD_3G_PAD)
-    return (GPIOB_INPUT_VAL & 0x10)?true:false;
-#elif (CONFIG_KEYPAD==IPOD_4G_PAD)
-    return (GPIOA_INPUT_VAL & 0x80)?true:false;
-#endif
-}
-#endif
-

@@ -187,3 +187,8 @@ bool button_hold(void)
 {
     return (GPIOA_INPUT_VAL & 0x20)?false:true;
 }
+
+bool headphones_inserted(void)
+{
+    return (GPIOC_INPUT_VAL & 0x1)?true:false;
+}
