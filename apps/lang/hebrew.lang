@@ -1,4 +1,4 @@
-﻿<phrase>
+<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
@@ -153,7 +153,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: 			
+  id: LANG_FAILED
   desc: Something failed. To be appended after actions
   user:
   <source>
@@ -636,7 +636,6 @@
     *: "File View"
   </source>
   <dest>
-
     *: "תצוגת קבצים"
   </dest>
   <voice>
@@ -689,7 +688,6 @@
   id: LANG_LANGUAGE
   desc: in settings_menu
   user:
-
   <source>
     *: "Language"
   </source>
@@ -984,7 +982,6 @@
   id: LANG_RECURSE_DIRECTORY
   desc: In playlist menu
   user:
-
   <source>
     *: "Recursively Insert Directories"
   </source>
@@ -1084,7 +1081,6 @@
   desc: repeat playlist once all songs have completed
   user:
   <source>
-
     *: "All"
   </source>
   <dest>
@@ -1279,7 +1275,6 @@
 <phrase>
   id: LANG_SPDIF_ENABLE
   desc: in playback settings menu. enable/disable the optical out
-
   user:
   <source>
     *: "Optical Output"
@@ -1412,7 +1407,6 @@
   </source>
   <dest>
     *: "אלפבתית"
-
   </dest>
   <voice>
     *: "Alphabetical"
@@ -2178,7 +2172,6 @@
   id: LANG_FFRW_ACCEL
   desc: in settings_menu
   user:
-
   <source>
     *: "FF/RW Accel"
   </source>
@@ -2229,7 +2222,6 @@
   </dest>
   <voice>
     *: ""
-
   </voice>
 </phrase>
 <phrase>
@@ -2353,7 +2345,6 @@
   </source>
   <dest>
     *: "עמעום תאורת המסך"
-
   </dest>
   <voice>
     *: "Backlight fade out"
@@ -2632,7 +2623,6 @@
   <source>
     *: "Button Bar"
   </source>
-
   <dest>
     *: "שורת כפתורים"
   </dest>
@@ -3160,7 +3150,6 @@
 </phrase>
 <phrase>
   id: LANG_CREATE_DIR
-
   desc: in main menu
   user:
   <source>
@@ -3460,7 +3449,6 @@
   <source>
     *: "Int:"
   </source>
-
   <dest>
     *: "פנימי:"
   </dest>
@@ -3883,7 +3871,6 @@
   </source>
   <dest>
     *: "גודל:"
-
   </dest>
   <voice>
     *: ""
@@ -3901,7 +3888,6 @@
   </dest>
   <voice>
     *: ""
-
   </voice>
 </phrase>
 <phrase>
@@ -3966,7 +3952,6 @@
   user:
   <source>
     *: "Trigger"
-
   </source>
   <dest>
     *: "גורם הפעלה"
@@ -4083,7 +4068,6 @@
   <dest>
     *: "-inf"
   </dest>
-
   <voice>
     *: ""
   </voice>
@@ -4459,7 +4443,6 @@
   <source>
     *: "Wed"
   </source>
-
   <dest>
     *: "רבי"
   </dest>
@@ -4511,7 +4494,6 @@
 </phrase>
 <phrase>
   id: LANG_MONTH_JANUARY
-
   desc: Maximum 3-letter abbreviation for monthname
   user:
   <source>
@@ -4691,7 +4673,6 @@
   <voice>
     *: "0"
   </voice>
-
 </phrase>
 <phrase>
   id: VOICE_ONE
@@ -4802,7 +4783,6 @@
     *: ""
   </dest>
   <voice>
-
     *: "8"
   </voice>
 </phrase>
@@ -6047,7 +6027,6 @@
   </source>
   <dest>
     *: "יוצר"
-
   </dest>
   <voice>
     *: ""
@@ -6271,7 +6250,6 @@
     *: "The Preset List is Full"
   </source>
   <dest>
-
     *: "רשימת התחנות הקבועות מראש מלאה"
   </dest>
   <voice>
@@ -6873,7 +6851,6 @@
   <source>
     *: "Filetype array full"
   </source>
-
   <dest>
     *: "מערך סוגי הקבצים מלא"
   </dest>
@@ -6947,7 +6924,6 @@
   <dest>
     *: "הגדרות מאפנן צליל מתקדמות"
   </dest>
-
   <voice>
     *: "Advanced equalizer settings"
   </voice>
@@ -7518,7 +7494,6 @@
   <source>
     *: "Screen frozen!"
   </source>
-
   <dest>
     *: "המסך קפוא!"
   </dest>
@@ -7872,7 +7847,6 @@
     *: "אפס צבעים"
   </dest>
   <voice>
-
     *: "Reset Colours"
   </voice>
 </phrase>
@@ -7971,7 +7945,6 @@
     *: "%d Hz רצועה מוגברת"
   </dest>
   <voice>
-
     *: ""
   </voice>
 </phrase>
@@ -8032,7 +8005,6 @@
   </voice>
 </phrase>
 <phrase>
-
   id: LANG_CODEPAGE_LATIN_EXTENDED
   desc: in codepage setting menu
   user:
@@ -8395,7 +8367,6 @@
 </phrase>
 <phrase>
   id: LANG_BACKDROP_LOADED
-
   desc: text for splash to indicate a new backdrop has been loaded successfully
   user:
   <source>
@@ -8560,7 +8531,6 @@
   </dest>
   <voice>
     *: "Off"
-
   </voice>
 </phrase>
 <phrase>
@@ -8624,7 +8594,6 @@
   desc: in dir browser, F1 button bar text
   user:
   <source>
-
     *: "Menu"
   </source>
   <dest>
@@ -8747,7 +8716,6 @@
   </voice>
 </phrase>
 <phrase>
-
   id: LANG_SYSFONT_STATUS_BAR
   desc: display menu, F3 substitute
   user:
@@ -8823,7 +8791,6 @@
   user:
   <source>
     *: "Playlists"
-
   </source>
   <dest>
     *: "Playlists"
