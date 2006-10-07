@@ -131,9 +131,9 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->mono_bitmap=&lcd_mono_bitmap;
             screen->mono_bitmap_part=&lcd_mono_bitmap_part;
             screen->set_drawmode=&lcd_set_drawmode;
-#if LCD_DEPTH > 1   
             screen->bitmap=&lcd_bitmap;
             screen->bitmap_part=&lcd_bitmap_part;            
+#if LCD_DEPTH > 1   
 #if LCD_DEPTH == 2
             /* No transparency yet for grayscale lcd */
             screen->transparent_bitmap=&lcd_bitmap;
