@@ -20,12 +20,9 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "highscore.h"
-
-#ifdef HAVE_LCD_BITMAP
+#include "playergfx.h"
 
 PLUGIN_HEADER
-
-extern const fb_data rockblox_background[];
 
 #if (CONFIG_KEYPAD == IPOD_3G_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD)
@@ -66,6 +63,17 @@ extern const fb_data rockblox_background[];
 #define ROCKBLOX_DROP          BUTTON_ON
 #define ROCKBLOX_RESTART       BUTTON_F1
 
+#elif CONFIG_KEYPAD == PLAYER_PAD
+
+#define ROCKBLOX_OFF           BUTTON_STOP
+#define ROCKBLOX_ROTATE_RIGHT  BUTTON_PLAY
+#define ROCKBLOX_ROTATE_LEFT   (BUTTON_ON|BUTTON_PLAY)
+#define ROCKBLOX_DOWN          BUTTON_MENU
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP_PRE      BUTTON_ON
+#define ROCKBLOX_DROP          (BUTTON_ON|BUTTON_REL)
+
 #elif CONFIG_KEYPAD == ONDIO_PAD
 
 #define ROCKBLOX_OFF           BUTTON_OFF
@@ -101,10 +109,13 @@ extern const fb_data rockblox_background[];
 
 #endif
 
-#define BLOCKS_NUM 7
+#define BLOCKS_NUM  7
 #define EMPTY_BLOCK 7
 
 #define BOARD_WIDTH 10
+
+#ifdef HAVE_LCD_BITMAP
+
 #define BOARD_HEIGHT 20
 
 #if (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
@@ -201,10 +212,27 @@ extern const fb_data rockblox_background[];
 
 #endif
 
-/* Pictures */
-#ifdef HAVE_LCD_COLOR
-#define SPLASH_SCREEN PLUGIN_DIR "/rockblox/splash.bmp"
-#define PIC_SCREEN PLUGIN_DIR "/rockblox/screen.bmp"
+#ifndef LEVEL_X
+#define LEVEL_X LABEL_X
+#endif
+
+#define MYLCD(fn) rb->lcd_ ## fn
+
+extern const fb_data rockblox_background[];
+
+#else /* HAVE_LCD_CHARCELLS */
+
+#define BOARD_HEIGHT 14
+
+#define BLOCK_WIDTH  1
+#define BLOCK_HEIGHT 1
+#define BOARD_X      5
+#define BOARD_Y      0
+#define PREVIEW_X    15
+#define PREVIEW_Y    1
+
+#define MYLCD(fn) pgfx_ ## fn
+
 #endif
 
 /* <<Explanation on Rockblox shapes>>
@@ -251,8 +279,12 @@ int wheel_events = 0, last_wheel_event = 0;
 bool wheel_enabled = false;
 #endif
 
-static const short scoring[4] = {       /* scoring for each number of lines */
+static const short scoring[4] = {  /* scoring for each number of lines */
+#if BOARD_HEIGHT == 20
     40 /* single */ , 100 /* double */ , 300 /* triple */ , 1200 /* rockblox */
+#elif BOARD_HEIGHT == 14           /* Player special values */
+    60 /* single */ , 150 /* double */ , 500 /* triple */ , 2000 /* rockblox */
+#endif
 };
 
 struct figure
@@ -371,6 +403,8 @@ static void init_board (void)
 static void show_details (void)
 {
     char str[25];               /* for strings */
+
+#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (LCD_WHITE);
@@ -378,13 +412,15 @@ static void show_details (void)
     rb->snprintf (str, sizeof (str), "%d", score);
     rb->lcd_putsxy (LABEL_X, SCORE_Y, str);
     rb->snprintf (str, sizeof (str), "%d", level);
-#ifdef LEVEL_X
     rb->lcd_putsxy (LEVEL_X, LEVEL_Y, str);
-#else
-    rb->lcd_putsxy (LABEL_X, LEVEL_Y, str);
-#endif
     rb->snprintf (str, sizeof (str), "%d", lines);
     rb->lcd_putsxy (LABEL_X, LINES_Y, str);
+#else  /* HAVE_LCD_CHARCELLS */
+    rb->snprintf (str, sizeof (str), "L%d/%d", level, lines);
+    rb->lcd_puts (5, 0, str);
+    rb->snprintf (str, sizeof (str), "S%d", score);
+    rb->lcd_puts (5, 1, str);
+#endif
 }
 
 static void init_rockblox (void)
@@ -395,7 +431,17 @@ static void init_rockblox (void)
     gameover = false;
     nf = t_rand (BLOCKS_NUM);
     init_board ();
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
+#else  /* HAVE_LCD_CHARCELLS */
+    pgfx_display (0, 0);
+    pgfx_display_block (3, 0, 3, 1);
+    pgfx_display_block (4, 0, 3, 0);
+    pgfx_clear_display();
+    pgfx_fillrect (3, 0, 2, 14);
+    pgfx_fillrect (15, 7, 2, 7);
+    pgfx_update();
+#endif
     show_details ();
 }
 
@@ -444,33 +490,21 @@ static void refresh_board (void)
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
+    MYLCD(set_drawmode) (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
 
-    rb->lcd_fillrect (BOARD_X, 1, BOARD_WIDTH * BLOCK_WIDTH, BOARD_Y);
+    MYLCD(fillrect) (BOARD_X, BOARD_Y, BOARD_WIDTH * BLOCK_WIDTH,
+                     BOARD_HEIGHT * BLOCK_HEIGHT);
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    MYLCD(set_drawmode) (DRMODE_SOLID);
 #endif
 
     for (i = 0; i < BOARD_WIDTH; i++)
         for (j = 0; j < BOARD_HEIGHT; j++) {
             block = board[j][i];
-            if (block == EMPTY_BLOCK) {
-#if LCD_DEPTH >= 2
-                rb->lcd_set_foreground (LCD_BLACK);
-#elif LCD_DEPTH == 1
-                rb->lcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
-#endif
-
-                rb->lcd_fillrect (BOARD_X + i * BLOCK_WIDTH,
-                                  BOARD_Y + j * BLOCK_HEIGHT, BLOCK_WIDTH,
-                                  BLOCK_HEIGHT);
-
-#if LCD_DEPTH == 1
-                rb->lcd_set_drawmode (DRMODE_SOLID);
-#endif
-            } else {
+            if (block != EMPTY_BLOCK) {
+#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
                 /* middle drawing */
                 rb->lcd_set_foreground (figures[block].color[1]);
@@ -498,12 +532,16 @@ static void refresh_board (void)
                 rb->lcd_hline (BOARD_X + i * BLOCK_WIDTH + 1,
                                BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 1);
+#else  /* HAVE_LCD_CHARCELLS */
+                pgfx_drawpixel (BOARD_X + i, BOARD_Y + j);
+#endif
             }
         }
 
     for (i = 0; i < 4; i++) {
         x = getRelativeX (cf, i, co) + cx;
         y = getRelativeY (cf, i, co) + cy;
+#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         rb->lcd_set_foreground (figures[cf].color[1]);  /* middle drawing */
 #endif
@@ -527,8 +565,11 @@ static void refresh_board (void)
         rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
+#else /* HAVE_LCD_CHARCELLS */
+        pgfx_drawpixel (BOARD_X + x, BOARD_Y + y);
+#endif
     }
-    rb->lcd_update ();
+    MYLCD(update) ();
 }
 
 static bool canMoveTo (int x, int y, int newOrientation)
@@ -552,14 +593,14 @@ static void draw_next_block (void)
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
 #elif LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID | DRMODE_INVERSEVID);
+    MYLCD(set_drawmode) (DRMODE_SOLID | DRMODE_INVERSEVID);
 #endif
 
     /* 4x4 */
-    rb->lcd_fillrect (PREVIEW_X, PREVIEW_Y, BLOCK_WIDTH * 4, BLOCK_HEIGHT * 4);
+    MYLCD(fillrect) (PREVIEW_X, PREVIEW_Y, BLOCK_WIDTH * 4, BLOCK_HEIGHT * 4);
 
 #if LCD_DEPTH == 1
-    rb->lcd_set_drawmode (DRMODE_SOLID);
+    MYLCD(set_drawmode) (DRMODE_SOLID);
 #endif
 
     /* draw the lightgray rectangles */
@@ -581,6 +622,7 @@ static void draw_next_block (void)
     for (i = 0; i < 4; i++) {
         rx = getRelativeX (nf, i, 0) + 2;
         ry = getRelativeY (nf, i, 0) + 2;
+#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         rb->lcd_set_foreground (figures[nf].color[1]);  /* middle drawing */
 #endif
@@ -605,6 +647,9 @@ static void draw_next_block (void)
         rb->lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH + 1,
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 1);
+#else /* HAVE_LCD_CHARCELLS */
+        pgfx_drawpixel (PREVIEW_X + rx, PREVIEW_Y + ry);
+#endif
     }
 
 }
@@ -851,7 +896,15 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
 
     rb->srand (*rb->current_tick);
 
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_SYSFIXED);
+#else
+    if (!pgfx_init(rb, 4, 2))
+    {
+        rb->splash(HZ*2, true, "Old LCD :(");
+        return PLUGIN_OK;
+    }
+#endif
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout (1);
@@ -859,12 +912,13 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     init_rockblox ();
     ret = rockblox_loop ();
 
-    /* Lets use the default font */
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_UI);
+#else
+    pgfx_release();
+#endif
     /* Restore user's original backlight setting */
     rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
 
     return ret;
 }
-
-#endif

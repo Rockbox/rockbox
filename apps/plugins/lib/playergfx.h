@@ -29,6 +29,7 @@
 bool pgfx_init(struct plugin_api* newrb, int cwidth, int cheight);
 void pgfx_release(void);
 void pgfx_display(int cx, int cy);
+void pgfx_display_block(int cx, int cy, int x, int y);
 void pgfx_update(void);
 
 void pgfx_set_drawmode(int mode);

@@ -9,6 +9,9 @@ firmware_flash.c
 logo.c
 metronome.c
 mosaique.c
+#if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64))
+rockblox.c
+#endif
 rockbox_flash.c
 search.c
 snow.c
@@ -56,9 +59,6 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
-#if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64))
-rockblox.c
-#endif
 #if CONFIG_LCD == LCD_SSD1815
 video.c
 #endif

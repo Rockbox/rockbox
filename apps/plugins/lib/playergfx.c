@@ -85,6 +85,12 @@ void pgfx_display(int cx, int cy)
             pgfx_rb->lcd_putc(cx + i, cy + j, gfx_chars[char_height * i + j]);
 }
 
+void pgfx_display_block(int cx, int cy, int x, int y)
+{
+    pgfx_rb->lcd_putc(cx, cy, gfx_chars[char_height * x + y]);
+}
+
+
 /*** Update functions ***/
 
 void pgfx_update(void)
