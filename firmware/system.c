@@ -413,7 +413,7 @@ static const char* const irqname[] = {
     "UCHANTXUNDER","UCHANTXEMPTY","PDIR3UNOV","IEC1PARERR",
     "IEC1VALNOGOOD","IEC1CNEW","EBUTXRESYN","EBUTXUNOV",
     "IIS2TXRESYN","IIS2TXUNOV","IIS1TXRESYN","IIS1TXUNOV",
-    "GPIO0","GPI1","GPI2","GPI3","GPI4","GPI5","GPI6","GPI7",
+    "GPI0","GPI1","GPI2","GPI3","GPI4","GPI5","GPI6","GPI7",
     "","","","","","","","SOFTINT0",
     "SOFTINT1","SOFTINT2","SOFTINT3","",
     "","CDROMCRCERR","CDROMNOSYNC","CDROMILSYNC",
@@ -600,6 +600,10 @@ void system_init(void)
        what'll be the most useful for most things which the main thread
        will do. */
     coldfire_set_macsr(EMAC_FRACTIONAL | EMAC_SATURATE | EMAC_ROUND);
+
+    /* Set INTBASE and SPURVEC */
+    INTBASE = 64;
+    SPURVEC = 24;
 }
 
 void system_reboot (void)
