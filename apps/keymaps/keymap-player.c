@@ -40,7 +40,7 @@ static const struct button_mapping button_context_standard[]  = {
 };
 
 static const struct button_mapping button_context_wps[]  = {
-    { ACTION_WPS_PLAY,      BUTTON_PLAY,                BUTTON_NONE },
+    { ACTION_WPS_PLAY,      BUTTON_PLAY|BUTTON_REL,     BUTTON_PLAY },
     { ACTION_WPS_SKIPNEXT,  BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT },
     { ACTION_WPS_SKIPPREV,  BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
     { ACTION_WPS_SEEKBACK,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE },
@@ -58,7 +58,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_MENU,      BUTTON_MENU|BUTTON_REL,     BUTTON_MENU },
     { ACTION_WPS_CONTEXT,   BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY },
     { ACTION_WPS_ID3SCREEN, BUTTON_MENU|BUTTON_ON,      BUTTON_NONE },
-    { ACTION_STD_KEYLOCK,   BUTTON_MENU|BUTTON_STOP,      BUTTON_NONE },
+    { ACTION_STD_KEYLOCK,   BUTTON_MENU|BUTTON_STOP,    BUTTON_NONE },
     
     LAST_ITEM_IN_LIST
 };
