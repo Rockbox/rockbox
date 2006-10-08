@@ -40,7 +40,8 @@ void panicf( const char *fmt, ...)
 
 #ifndef SIMULATOR
 #if CONFIG_LED == LED_REAL
-    bool state = true;
+    bool state = false;
+    int i = 0;
 #endif
 
     /* Disable interrupts */
@@ -90,11 +91,12 @@ void panicf( const char *fmt, ...)
     {
 #ifndef SIMULATOR
 #if CONFIG_LED == LED_REAL
-        volatile long i;
-        led (state);
-        state = !state;
-        
-        for (i = 0; i < 240000; ++i);
+        if (--i <= 0)
+        {
+            state = !state;
+            led(state);
+            i = 240000;
+        }
 #endif
 
         /* try to restart firmware if ON is pressed */

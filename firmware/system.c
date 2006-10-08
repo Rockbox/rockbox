@@ -1017,7 +1017,8 @@ void UIE (unsigned int pc) __attribute__((section(".text")));
 void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
 {
 #if CONFIG_LED == LED_REAL
-    bool state = true;
+    bool state = false;
+    int i = 0;
 #endif
     unsigned int n;
     char str[32];
@@ -1043,11 +1044,12 @@ void UIE (unsigned int pc) /* Unexpected Interrupt or Exception */
     while (1)
     {
 #if CONFIG_LED == LED_REAL
-        volatile int i;
-        led (state);
-        state = !state;
-
-        for (i = 0; i < 240000; ++i);
+        if (--i <= 0)
+        {
+            state = !state;
+            led(state);
+            i = 240000;
+        }
 #endif
 
         /* try to restart firmware if ON is pressed */
