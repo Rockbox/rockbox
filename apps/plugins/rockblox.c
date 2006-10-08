@@ -447,7 +447,11 @@ static void init_rockblox (void)
 
 static inline int level_speed(int level)
 {
+#if BOARD_HEIGHT == 20
     return (5*HZ) / (level + 9);
+#elif BOARD_HEIGHT == 14
+    return (7*HZ) / (level + 9);
+#endif
 }
 
 static int getRelativeX (int figure, int square, int orientation)
