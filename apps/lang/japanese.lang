@@ -7143,10 +7143,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "放送局: %d.%dMHz"
+    *: "放送局: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7381,10 +7381,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz をスキャン中"
+    *: "%d.%02d MHz をスキャン中"
   </dest>
   <voice>
     *: ""
@@ -7395,10 +7395,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: ""

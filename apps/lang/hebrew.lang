@@ -6177,10 +6177,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "תחנה: %d.%dMHz"
+    *: "תחנה: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7045,10 +7045,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: 
@@ -7478,10 +7478,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "סורק %d.%01dMHz"
+    *: "סורק %d.%02d MHz"
   </dest>
   <voice>
     *: ""

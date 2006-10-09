@@ -6964,10 +6964,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Zender: %d.%dMHz"
+    *: "Zender: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7202,10 +7202,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Zoeken: %d.%01dMHz"
+    *: "Zoeken: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7216,10 +7216,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: ""

@@ -7642,7 +7642,7 @@
     *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Recherche %d.%02dMHz"
+    *: "Recherche %d.%02d MHz"
   </dest>
   <voice>
     *: ""

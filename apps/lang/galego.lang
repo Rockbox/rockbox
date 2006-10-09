@@ -5928,10 +5928,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Estación: %d.%dMHz"
+    *: "Estación: %d.%02d MHz"
   </dest>
   <voice>
     *: ""

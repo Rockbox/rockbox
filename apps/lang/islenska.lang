@@ -6180,10 +6180,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Stöð: %d.%dMHz"
+    *: "Stöð: %d.%02d MHz"
   </dest>
   <voice>
     *: ""

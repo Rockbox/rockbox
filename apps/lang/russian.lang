@@ -7034,10 +7034,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Станция: %d.%dMHz"
+    *: "Станция: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7272,10 +7272,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Сканирование %d.%01dМГц"
+    *: "Сканирование %d.%02d МГц"
   </dest>
   <voice>
     *: ""
@@ -7286,10 +7286,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01dМГц"
+    *: "%d.%02d МГц"
   </dest>
   <voice>
     *: ""

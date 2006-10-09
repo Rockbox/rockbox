@@ -5340,10 +5340,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Sender: %d.%dMHz"
+    *: "Sender: %d.%02d MHz"
   </dest>
   <voice>
     *: ""

@@ -7384,10 +7384,10 @@
   desc: in radio screen
   user:
   <source>
-    *: "Station: %d.%dMHz"
+    *: "Station: %d.%02d MHz"
   </source>
   <dest>
-    *: "Kanal: %d.%d MHz"
+    *: "Kanal: %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7622,10 +7622,10 @@
   desc: during auto scan
   user:
   <source>
-    *: "Scanning %d.%01dMHz"
+    *: "Scanning %d.%02d MHz"
   </source>
   <dest>
-    *: "Söker vid %d.%01d MHz"
+    *: "Söker vid %d.%02d MHz"
   </dest>
   <voice>
     *: ""
@@ -7636,10 +7636,10 @@
   desc: default preset name for auto scan mode
   user:
   <source>
-    *: "%d.%01dMHz"
+    *: "%d.%02d MHz"
   </source>
   <dest>
-    *: "%d.%01d MHz"
+    *: "%d.%02d MHz"
   </dest>
   <voice>
     *: ""
