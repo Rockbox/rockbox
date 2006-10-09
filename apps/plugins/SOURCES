@@ -9,6 +9,7 @@ firmware_flash.c
 logo.c
 metronome.c
 mosaique.c
+random_folder_advance_config.c
 #if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64))
 rockblox.c
 #endif

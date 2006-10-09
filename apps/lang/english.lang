@@ -9927,3 +9927,16 @@
     *: "Korea"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RANOOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Random"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>

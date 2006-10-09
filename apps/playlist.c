@@ -1313,6 +1313,29 @@ static int get_next_dir(char *dir, bool is_forward, bool recursion)
     struct tree_context* tc = tree_get_context();
     int dirfilter = *(tc->dirfilter);
 
+    if (global_settings.next_folder == FOLDER_ADVANCE_RANDOM)
+    {
+        int fd = open(ROCKBOX_DIR "/folder_advance_list.dat",O_RDONLY);
+        char buffer[MAX_PATH];
+        int folder_count = 0,i;
+        srand(current_tick);
+        if (fd >= 0)
+        {
+            read(fd,&folder_count,sizeof(int));
+            while (!exit)
+            {
+                i = rand()%folder_count;
+                lseek(fd,sizeof(int) + (MAX_PATH*i),SEEK_SET);
+                read(fd,buffer,MAX_PATH);
+                if (check_subdir_for_music(buffer,"") ==0)
+                    exit = true;
+            }
+            strcpy(dir,buffer);
+            close(fd);
+            return 0;
+        }
+    }
+    /* not random folder advance */
     if (recursion){
        /* start with root */
        dir[0] = '\0';

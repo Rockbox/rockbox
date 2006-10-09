@@ -96,7 +96,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 52
+#define CONFIG_BLOCK_VERSION 53
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -544,7 +544,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(spdif_enable), false, "spdif enable", off_on},
 #endif
 
-    {1, S_O(next_folder), false, "folder navigation", off_on },
+    {2, S_O(next_folder), false, "folder navigation", "off,on,random" },
     {1, S_O(runtimedb), false, "gather runtime data", off_on },
 
 #if CONFIG_CODEC == SWCODEC

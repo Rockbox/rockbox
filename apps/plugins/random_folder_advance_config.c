@@ -1,0 +1,319 @@
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2006 Jonathan Gordon
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+#include "plugin.h"
+
+PLUGIN_HEADER
+
+static struct plugin_api* rb;
+static bool abort;
+static int fd;
+static int dirs_count;
+static int lasttick;
+#define RFA_FILE ROCKBOX_DIR "/folder_advance_list.dat"
+char *buffer = NULL;
+int buffer_size;
+struct file_format {
+    int count;
+    char folder[][MAX_PATH];
+};
+struct file_format *list = NULL;
+#if CONFIG_KEYPAD == PLAYER_PAD 
+
+#elif (CONFIG_KEYPAD == RECORDER_PAD) \
+   || (CONFIG_KEYPAD == ONDIO_PAD)
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+   || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+
+#elif (CONFIG_KEYPAD == IPOD_4G_PAD) \
+   || (CONFIG_KEYPAD == IPOD_3G_PAD)
+
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+
+#endif
+
+void update_screen(void)
+{
+    char buf[15];
+    int i;
+    FOR_NB_SCREENS(i)
+    {
+        rb->snprintf(buf,15,"Folders: %d",dirs_count);
+        rb->screens[i]->clear_display();
+        rb->screens[i]->putsxy(0,0,buf);
+        rb->screens[i]->update();
+    }
+}
+
+void traversedir(char* location, char* name)
+{
+    struct dirent *entry;
+    DIR* dir;
+    char fullpath[MAX_PATH];
+    bool check = false;
+
+    rb->snprintf(fullpath, sizeof(fullpath), "%s/%s", location, name);
+    dir = rb->opendir(fullpath);
+    if (dir) {
+        entry = rb->readdir(dir);
+        while (entry) {
+            if (abort == true)
+                break;
+            /* Skip .. and . */
+            if (entry->d_name[0] == '.')
+            {
+                if (    !rb->strcmp(entry->d_name,".")
+                     || !rb->strcmp(entry->d_name,"..")
+                     || !rb->strcmp(entry->d_name,".rockbox"))
+                    check = false;
+                else check = true;
+            }
+            else check = true;
+            
+            if (check)
+            {
+                if (entry->attribute & ATTR_DIRECTORY) {
+                    char *start, path[MAX_PATH];
+                    dirs_count++;
+                    rb->snprintf(path,MAX_PATH,"%s/%s",fullpath,entry->d_name);
+                    start = &path[rb->strlen(path)];
+                    rb->memset(start,0,&path[MAX_PATH-1]-start);
+                    rb->write(fd,path,MAX_PATH);
+                    traversedir(fullpath, entry->d_name);
+                }
+            }
+            if (*rb->current_tick - lasttick > (HZ/2)) {
+                update_screen();
+                lasttick = *rb->current_tick;
+                if (rb->action_userabort(TIMEOUT_NOBLOCK))
+                {
+                    abort = true;
+                    break;
+                }
+            }
+
+            entry = rb->readdir(dir);
+        }
+        rb->closedir(dir);
+    }
+}
+void generate(void)
+{
+    dirs_count = 0;
+    abort = false;
+    fd = rb->open(RFA_FILE,O_CREAT|O_WRONLY);
+    rb->write(fd,&dirs_count,sizeof(int));
+    if (fd < 0)
+    {
+        rb->splash(HZ, true, "Couldnt open %s", RFA_FILE);
+        return;
+    }
+    update_screen();
+    lasttick = *rb->current_tick;
+
+    traversedir("", "");
+    rb->lseek(fd,0,SEEK_SET);
+    rb->write(fd,&dirs_count,sizeof(int));
+    rb->close(fd);
+}
+char *list_get_name_cb(int selected_item,void* data,char* buf)
+{
+    (void)data;
+    rb->strcpy(buf,list->folder[selected_item]);
+    return buf;
+}
+
+void edit_list(void)
+{
+    struct gui_synclist lists;
+    bool exit = false;
+    int button,i;
+    int selection;
+    fd = rb->open(RFA_FILE,O_RDONLY);
+    if (fd < 0)
+        return;
+    buffer = rb->plugin_get_audio_buffer(&buffer_size);
+    if (!buffer)
+        return;
+    rb->read(fd,buffer,buffer_size);
+    rb->close(fd);
+    list = (struct file_format *)buffer;
+    
+    rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1);
+    rb->gui_synclist_set_icon_callback(&lists,NULL);
+    rb->gui_synclist_set_nb_items(&lists,list->count);
+    rb->gui_synclist_limit_scroll(&lists,true);
+    rb->gui_synclist_select_item(&lists, 0);
+    
+    while (!exit)
+    {
+        rb->gui_synclist_draw(&lists);
+        rb->lcd_update();
+        button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
+        if (rb->gui_synclist_do_button(&lists,button))
+            continue;
+        selection = rb->gui_synclist_get_sel_pos(&lists);
+        switch (button)
+        {
+            case ACTION_STD_OK:
+                list->folder[selection][0] = ' ';
+                list->folder[selection][1] = '\0';
+                break;
+            case ACTION_STD_CONTEXT:
+            {
+                int m, len;
+                static const struct menu_item items[] = {
+                    { "Remove Folder", NULL },
+                    { "Remove Folder Tree", NULL },
+                };
+                m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                                  NULL, NULL, NULL, NULL);
+
+                switch (rb->menu_show(m))
+                {
+                    case 0:
+                        list->folder[selection][0] = ' ';
+                        list->folder[selection][1] = '\0';
+                        break;
+                    case 1:
+                    {
+                        char temp[MAX_PATH];
+                        rb->strcpy(temp,list->folder[selection]);
+                        len = rb->strlen(temp);
+                        for (i=0;i<list->count;i++)
+                        {
+                            if (!rb->strncmp(list->folder[i],temp,len))
+                            {
+                                list->folder[i][0] = ' ';
+                                list->folder[i][1] = '\0';
+                            }
+                        }
+                    }
+                        break;
+                }
+                rb->menu_exit(m);
+            }
+            break;
+            case ACTION_STD_CANCEL:
+            {
+                int m;
+                static const struct menu_item items[] = {
+                    { "Save and Exit", NULL },
+                    { "Ignore Changes and Exit", NULL },
+                };
+                m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                                  NULL, NULL, NULL, NULL);
+
+                switch (rb->menu_show(m))
+                {
+                    case 0:
+                        exit = true;
+                        rb->splash(HZ*2, true, "Saving " RFA_FILE);
+                        fd = rb->open(RFA_FILE, O_CREAT|O_WRONLY);
+                        if (fd < 0)
+                        {
+                            rb->splash(HZ, true, "Could Not Open " RFA_FILE);
+                            break;
+                        }
+                        dirs_count = 0;
+                        rb->write(fd,&dirs_count,sizeof(int));
+                        for (i=0;i<list->count;i++)
+                        {
+                            if (list->folder[i][0] != ' ')
+                            {
+                                dirs_count++;
+                                rb->write(fd,list->folder[i],MAX_PATH);
+                            }
+                        }
+                        rb->lseek(fd,0,SEEK_SET);
+                        rb->write(fd,&dirs_count,sizeof(int));
+                        rb->close(fd);
+                    case 1:
+                        exit = true;
+                }
+                rb->menu_exit(m);
+            }
+                break;
+        }
+    }
+}
+int main_menu(void)
+{
+    int m;
+    static const struct menu_item items[] = {
+        { "Generate Folder List", NULL },
+        { "Edit Folder List", NULL },
+        { "Quit", NULL },
+    };
+    m = rb->menu_init(items, sizeof(items) / sizeof(*items),
+                      NULL, NULL, NULL, NULL);
+
+    switch (rb->menu_show(m))
+    {
+        case 0: /* generate */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            generate();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+#ifdef HAVE_REMOTE_LCD
+            rb->remote_backlight_on();
+#endif
+            rb->backlight_on();
+            break;
+        case 1:
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(true);
+#endif
+            edit_list();
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+            rb->cpu_boost(false);
+#endif
+#ifdef HAVE_REMOTE_LCD
+            rb->remote_backlight_on();
+#endif
+            rb->backlight_on();
+            break;
+        case 2:
+            rb->menu_exit(m);
+            return 1;
+    }
+    rb->menu_exit(m);
+    return 0;
+}
+
+enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
+{
+    (void)parameter;
+
+    rb = api;
+    abort = false;
+    
+    while (!main_menu())
+        ;
+    return PLUGIN_OK;
+}

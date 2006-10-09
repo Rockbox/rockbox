@@ -1377,7 +1377,14 @@ static bool id3_order(void)
 
 static bool next_folder(void)
 {
-    return set_bool( str(LANG_NEXT_FOLDER), &global_settings.next_folder );
+    static const struct opt_items names[] = {
+        { STR(LANG_SET_BOOL_NO)          },
+        { STR(LANG_SET_BOOL_YES)         },
+        { STR(LANG_RANOOM)               },
+    };
+    return set_option(str(LANG_NEXT_FOLDER),
+                      &global_settings.next_folder,
+                      INT, names, 3, NULL );
 }
 
 static bool codepage_setting(void)

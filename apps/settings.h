@@ -80,6 +80,10 @@ extern const char * const trig_durations[TRIG_DURATION_COUNT];
 #define CROSSFADE_ENABLE_SHUFFLE  1
 #define CROSSFADE_ENABLE_ALWAYS   2
 
+#define FOLDER_ADVANCE_OFF 0
+#define FOLDER_ADVANCE_NEXT 1
+#define FOLDER_ADVANCE_RANDOM 2
+
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
    This helps to save space for menus and options. */
@@ -363,7 +367,7 @@ struct user_settings
 #endif
 #endif /* HAVE_REMOTE_LCD */
     
-    bool next_folder; /* move to next folder */
+    int next_folder; /* move to next folder */
     bool runtimedb;   /* runtime database active? */
 
 #if CONFIG_CODEC == SWCODEC
