@@ -592,6 +592,23 @@ inline static bool str_ends_with(const char *str1, const char *str2)
     return !strcasecmp(&str1[str_len - clause_len], str2);
 }
 
+inline static bool str_oneof(const char *str, const char *list)
+{
+    const char *sep;
+    int l, len = strlen(str);
+    
+    while (*list)
+    {
+        sep = strchr(list, '|');
+        l = sep ? (long)sep - (long)list : (int)strlen(list);
+        if ((l==len) && !strncasecmp(str, list, len))
+            return true;
+        list += sep ? l + 1 : l;
+    }
+
+    return false;
+}
+
 static bool check_against_clause(long numeric, const char *str,
                                  const struct tagcache_search_clause *clause)
 {
@@ -643,6 +660,8 @@ static bool check_against_clause(long numeric, const char *str,
                 return str_ends_with(str, clause->str);
             case clause_not_ends_with:
                 return !str_ends_with(str, clause->str);
+            case clause_oneof:
+                return str_oneof(str, clause->str);
             
             default:
                 logf("Incorrect tag: %d", clause->type);

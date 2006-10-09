@@ -244,6 +244,7 @@ static int get_clause(int *condition)
     MATCH(condition, buf, "!^", clause_not_begins_with);
     MATCH(condition, buf, "$", clause_ends_with);
     MATCH(condition, buf, "!$", clause_not_ends_with);
+    MATCH(condition, buf, "@", clause_oneof);
     
     return 0;
 }
