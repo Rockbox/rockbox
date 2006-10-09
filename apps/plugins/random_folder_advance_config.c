@@ -57,6 +57,7 @@ struct file_format *list = NULL;
 void update_screen(void)
 {
     char buf[15];
+#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     int i;
     FOR_NB_SCREENS(i)
     {
@@ -65,6 +66,11 @@ void update_screen(void)
         rb->screens[i]->putsxy(0,0,buf);
         rb->screens[i]->update();
     }
+#else
+    rb->snprintf(buf,15,"Folders: %d",dirs_count);
+    rb->lcd_clear_display();
+    rb->lcd_puts(0,0,buf);
+#endif
 }
 
 void traversedir(char* location, char* name)
@@ -130,7 +136,9 @@ void generate(void)
         rb->splash(HZ, true, "Couldnt open %s", RFA_FILE);
         return;
     }
+#ifndef HAVE_LCD_CHARCELLS
     update_screen();
+#endif
     lasttick = *rb->current_tick;
 
     traversedir("", "");
@@ -170,7 +178,9 @@ void edit_list(void)
     while (!exit)
     {
         rb->gui_synclist_draw(&lists);
-        rb->lcd_update();
+#ifndef HAVE_LCD_CHARCELLS
+        update_screen();
+#endif
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&lists,button))
             continue;

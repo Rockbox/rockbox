@@ -9928,7 +9928,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RANOOM
+  id: LANG_RANDOM
   desc: random folder
   <source>
     *: "Random"

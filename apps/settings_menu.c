@@ -1380,7 +1380,7 @@ static bool next_folder(void)
     static const struct opt_items names[] = {
         { STR(LANG_SET_BOOL_NO)          },
         { STR(LANG_SET_BOOL_YES)         },
-        { STR(LANG_RANOOM)               },
+        { STR(LANG_RANDOM)               },
     };
     return set_option(str(LANG_NEXT_FOLDER),
                       &global_settings.next_folder,
