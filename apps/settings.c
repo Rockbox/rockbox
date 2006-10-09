@@ -96,7 +96,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 53
+#define CONFIG_BLOCK_VERSION 54
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -293,7 +293,7 @@ static const struct bit_entry rtc_bits[] =
     /* tuner */
 #ifdef CONFIG_TUNER
     {1, S_O(fm_force_mono), false, "force fm mono", off_on },
-    {8, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
+    {9, S_O(last_frequency), 0, NULL, NULL }, /* Default: MIN_FREQ */
 #endif
 
 #if BATTERY_TYPES_COUNT > 1
