@@ -54,7 +54,7 @@ struct file_format *list = NULL;
 
 #endif
 
-void update_screen(void)
+void update_screen(bool clear)
 {
     char buf[15];
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
@@ -62,13 +62,15 @@ void update_screen(void)
     FOR_NB_SCREENS(i)
     {
         rb->snprintf(buf,15,"Folders: %d",dirs_count);
-        rb->screens[i]->clear_display();
+        if(clear)
+            rb->screens[i]->clear_display();
         rb->screens[i]->putsxy(0,0,buf);
         rb->screens[i]->update();
     }
 #else
     rb->snprintf(buf,15,"Folders: %d",dirs_count);
-    rb->lcd_clear_display();
+    if(clear)
+        rb->lcd_clear_display();
     rb->lcd_puts(0,0,buf);
 #endif
 }
@@ -111,7 +113,7 @@ void traversedir(char* location, char* name)
                 }
             }
             if (*rb->current_tick - lasttick > (HZ/2)) {
-                update_screen();
+                update_screen(false);
                 lasttick = *rb->current_tick;
                 if (rb->action_userabort(TIMEOUT_NOBLOCK))
                 {
@@ -137,7 +139,7 @@ void generate(void)
         return;
     }
 #ifndef HAVE_LCD_CHARCELLS
-    update_screen();
+    update_screen(true);
 #endif
     lasttick = *rb->current_tick;
 
@@ -168,6 +170,7 @@ void edit_list(void)
     rb->read(fd,buffer,buffer_size);
     rb->close(fd);
     list = (struct file_format *)buffer;
+    dirs_count = list->count;
     
     rb->gui_synclist_init(&lists,list_get_name_cb,0, false, 1);
     rb->gui_synclist_set_icon_callback(&lists,NULL);
@@ -177,10 +180,10 @@ void edit_list(void)
     
     while (!exit)
     {
-        rb->gui_synclist_draw(&lists);
 #ifndef HAVE_LCD_CHARCELLS
-        update_screen();
+        update_screen(true);
 #endif
+        rb->gui_synclist_draw(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&lists,button))
             continue;
