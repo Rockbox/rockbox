@@ -22,10 +22,6 @@ stopwatch.c
 vbrfix.c
 viewer.c
 
-#ifdef CPU_COLDFIRE
-sampr_test.c
-#endif
-
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
 wavplay.c
 #endif
