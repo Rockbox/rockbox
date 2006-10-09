@@ -981,34 +981,31 @@ bool shutdown_screen(void)
 {
     int button;
     bool done = false;
+    long time_entered = current_tick;
 
     lcd_stop_scroll();
 
     gui_syncsplash(0, true, str(LANG_CONFIRM_SHUTDOWN));
 
-    while(!done)
+    while(!done && TIME_BEFORE(current_tick,time_entered+HZ*2))
     {
-        button = get_action(CONTEXT_STD,HZ*2);
+        button = get_action(CONTEXT_STD,HZ);
         switch(button)
         {
             case ACTION_STD_CANCEL:
                 sys_poweroff();
                 break;
 
+            /* do nothing here, because ACTION_UNKNOWN might be caused
+             * by timeout or button release. In case of timeout the loop 
+             * is terminated by TIME_BEFORE */
+            case ACTION_UNKNOWN:
+                break;
+
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                     return true;
-
-                /* Return if any other button was pushed, or if there
-                   was a timeout. We ignore RELEASE events, since we may
-                   have been called by a button down event, and the user might
-                   not have released the button yet.
-                   We also ignore REPEAT events, since we don't want to
-                   remove the splash when the user holds OFF to shut down. */
-                /* Is this still needed? commenting out so it compiles..
-                    CHECK ME!!
-                if(!(button & (BUTTON_REL | BUTTON_REPEAT)))
-                */   done = true;
+                done = true;
                 break;
         }
     }
