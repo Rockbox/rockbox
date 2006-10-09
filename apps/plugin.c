@@ -591,6 +591,7 @@ int plugin_load(const char* plugin, void* parameter)
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
+    lcd_set_backdrop(old_backdrop);
     lcd_set_drawinfo(DRMODE_SOLID, global_settings.fg_color,
                                    global_settings.bg_color);
 #else
@@ -601,15 +602,17 @@ int plugin_load(const char* plugin, void* parameter)
 #endif /* LCD_DEPTH */
     /* restore margins */
     lcd_setmargins(xm,ym);
-#ifdef HAVE_LCD_COLOR
-    lcd_set_backdrop(old_backdrop);
-#endif
     lcd_clear_display();
     lcd_update();
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_REMOTE_LCD
+#if LCD_REMOTE_DEPTH > 1
+    lcd_remote_set_drawinfo(DRMODE_SOLID, LCD_REMOTE_DEFAULT_FG, 
+                            LCD_REMOTE_DEFAULT_BG);
+#else
     lcd_remote_set_drawmode(DRMODE_SOLID);
+#endif
     lcd_remote_setmargins(rxm, rym);
     lcd_remote_clear_display();
     lcd_remote_update();
