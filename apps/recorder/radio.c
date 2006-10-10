@@ -1496,30 +1496,32 @@ int radio_menu_cb(int key, int m)
 }
 
 #ifndef SIMULATOR
-#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+#ifdef HAVE_RECORDING
+
+#if defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC
+#define FM_RECORDING_SCREEN
 static bool fm_recording_screen(void)
 {
     bool ret;
 
-#ifdef HAVE_FMRADIO_IN
     /* switch recording source to FMRADIO for the duration */
     int rec_source = global_settings.rec_source;
     global_settings.rec_source = AUDIO_SRC_FMRADIO;
 
     /* clearing queue seems to cure a spontaneous abort during record */
     while (button_get(false) != BUTTON_NONE);
-#endif
 
     ret = recording_screen(true);
 
-#ifdef HAVE_FMRADIO_IN
     /* safe to reset as changing sources is prohibited here */
     global_settings.rec_source = rec_source;
-#endif
 
     return ret;
 }
+#endif /* defined(HAVE_FMRADIO_IN) && CONFIG_CODEC == SWCODEC */
 
+#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+#define FM_RECORDING_SETTINGS
 static bool fm_recording_settings(void)
 {
     bool ret = recording_menu(true);
@@ -1538,7 +1540,8 @@ static bool fm_recording_settings(void)
 
     return ret;
 }
-#endif
+#endif /* defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC */
+#endif /* HAVE_RECORDING */
 #endif /* SIMULATOR */
 
 
@@ -1566,11 +1569,11 @@ bool radio_menu(void)
 #endif
         { region_menu_string             , toggle_region_mode    },
         { ID2P(LANG_SOUND_SETTINGS)      , sound_menu            },
-#ifndef SIMULATOR
-#if defined(HAVE_FMRADIO_IN) || CONFIG_CODEC != SWCODEC
+#ifdef FM_RECORDING_SCREEN
         { ID2P(LANG_RECORDING_MENU)      , fm_recording_screen   },
-        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings },
 #endif
+#ifdef FM_RECORDING_SETTINGS
+        { ID2P(LANG_RECORDING_SETTINGS)  , fm_recording_settings },
 #endif
         { ID2P(LANG_FM_SCAN_PRESETS)     , scan_presets          },
     };
