@@ -98,6 +98,8 @@ size_t pcm_get_bytes_waiting(void)
 
 static int pcm_freq = 0x6; /* 44.1 is default */
 
+int peak_left = 0, peak_right = 0;
+
 /* Set up the DMA transfer that kicks in when the audio FIFO gets empty */
 static void dma_start(const void *addr, size_t size)
 {
@@ -205,7 +207,6 @@ void DMA0(void)
             SAR0 = (unsigned long)next_start;  /* Source address */
             BCR0 = next_size;                  /* Bytes to transfer */
             DCR0 |= DMA_EEXT;
-
         }
         else
         {
@@ -846,6 +847,109 @@ bool pcm_is_paused(void) {
     return pcm_paused;
 }
 
+
+#if defined(CPU_COLDFIRE)
+/* Peaks ahead in the DMA buffer based upon the calling period to
+   attempt to compensate for the delay. Keeps a moving average of
+   length four. */
+void pcm_calculate_peaks(int *left, int *right)
+{
+    unsigned long samples;
+    unsigned long *addr, *end;
+    long peak_p, peak_n;
+
+    static unsigned long last_peak_tick = 0;
+    static unsigned long frame_period = 0;
+
+    /* Throttled peak ahead based on calling period */
+    unsigned long period = current_tick - last_peak_tick;
+
+    /* Keep reasonable limits on period */
+    if (period < 1)
+        period = 1;
+    else if (period > HZ/5)
+        period = HZ/5;
+
+    frame_period = (3*frame_period + period) >> 2;
+
+    last_peak_tick = current_tick;
+
+    if (!pcm_playing || pcm_paused)
+    {
+        peak_left = peak_right = 0;
+        goto peak_done;
+    }
+
+    samples = (BCR0 & 0xffffff) >> 2;
+    addr    = (long *)(SAR0 & ~3);
+    samples = MIN(frame_period*44100/HZ, samples);
+    end     = addr + samples;
+    peak_p  = peak_n = 0;
+
+    if (left && right)
+    {
+        if (samples > 0)
+        {
+            long peak_rp = 0, peak_rn = 0;
+
+            do
+            {
+                long value = *addr;
+                long ch;
+
+                ch = value >> 16;
+                if (ch > peak_p)       peak_p  = ch;
+                else if (ch < peak_n)  peak_n  = ch;
+
+                ch = (short)value;
+                if (ch > peak_rp)      peak_rp = ch;
+                else if (ch < peak_rn) peak_rn = ch;
+
+                addr += 4;
+            }
+            while (addr < end);
+
+            peak_left  = MAX(peak_p,  -peak_n);
+            peak_right = MAX(peak_rp, -peak_rn);
+        }
+    }
+    else if (left || right)
+    {
+        if (samples > 0)
+        {
+            if (left)
+            {
+                /* Put left channel in low word */
+                addr = (long *)((short *)addr - 1);
+                end  = (long *)((short *)end  - 1);
+            }
+
+            do
+            {
+                long value = *(short *)addr;
+
+                if (value > peak_p)      peak_p = value;
+                else if (value < peak_n) peak_n = value;
+
+                addr += 4;
+            }
+            while (addr < end);
+
+            if (left)
+                peak_left  = MAX(peak_p, -peak_n);
+            else
+                peak_right = MAX(peak_p, -peak_n);
+        }
+    }
+
+peak_done:
+    if (left)
+        *left = peak_left;
+
+    if (right)
+        *right = peak_right;
+}
+#else
 /*
  * This function goes directly into the DMA buffer to calculate the left and
  * right peak values. To avoid missing peaks it tries to look forward two full
@@ -860,7 +964,6 @@ bool pcm_is_paused(void) {
 /* Up to 1/50th of a second of audio for peak calculation */
 /* This should use NATIVE_FREQUENCY, or eventually an adjustable freq. value */
 #define PEAK_SAMPLES  (44100/50)
-
 void pcm_calculate_peaks(int *left, int *right)
 {
 #if (CONFIG_CPU == S3C2440)
@@ -870,10 +973,7 @@ void pcm_calculate_peaks(int *left, int *right)
     short *addr;
     short *end;
     {
-#ifdef CPU_COLDFIRE
-        size_t samples = (BCR0 & 0xffffff) / 4;
-        addr = (short *) (SAR0 & ~3);
-#elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
+#if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) \
    || (CONFIG_CPU == PNX0101)
         size_t samples = p_size / 4;
@@ -931,3 +1031,4 @@ void pcm_calculate_peaks(int *left, int *right)
     }
 #endif
 }
+#endif /* CPU_COLDFIRE */
