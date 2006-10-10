@@ -98,7 +98,7 @@ struct tagcache_search_clause
     bool numeric;
     bool input;
     long numeric_data;
-    char str[32];
+    char str[128];
 };
 
 struct tagcache_search {

@@ -47,7 +47,7 @@
 
 static int tagtree_play_folder(struct tree_context* c);
 
-static char searchstring[32];
+static char searchstring[128];
 
 enum variables {
     var_sorttype = 100,
@@ -162,7 +162,7 @@ static int get_token_str(char *buf, int size)
 
 static int get_tag(int *tag)
 {
-    char buf[32];
+    char buf[128];
     int i;
     
     /* Find the start. */
