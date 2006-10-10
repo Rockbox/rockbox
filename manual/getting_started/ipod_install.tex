@@ -6,13 +6,20 @@ If you find errors you're of course welcomed to report them so we can fix it
 for the next daily builds.}
 
   Installing the bootloader is the trickiest part of the installation.
+  \opt{ipodnano}{First, you need to find out which version of the Apple
+    firmware you're running. To do this, start the Apple firmware and go to
+    Settings screen. In the ``About'' screen you'll find the version number
+    of the Apple firmware. Depending on the version number the installation
+    is slightly different.}%
+    
   The process is different depending on your operating system, but before
-  starting, connect the \dap{} to the computer using either an USB \fixme{or
-  Firewire?} cable. Next, create a folder on the computer's hard drive and
+  starting, connect the \dap{} to the computer using either an USB
+  %\fixme{or Firewire?} % Firewire is currently not supported.
+  cable. Next, create a folder on the computer's hard drive and
   download the following file to that folder:
   \opt{ipodvideo}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-video.bin}}
   \opt{ipodnano}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-nano.bin}}
-  \opt{ipodmini}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-mini1g.bin} or 
+  \opt{ipodmini}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-mini1g.bin} or
     \url{http://download.rockbox.org/bootloader/ipod/bootloader-mini1g.bin} depending on which
     generation your \dap{} is.\fixme{Describe how to identify 1/2G}}
   \opt{ipodcolor}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-color.bin}}
@@ -51,7 +58,7 @@ for the next daily builds.}
     The output for an unsuccessful attempt to contact the \dap{} looks like
     this:
     \begin{code}
-    C:/rockbox>ipodpatcher 0
+    C:\textbackslash{}rockbox>ipodpatcher 0
     ipodpatcher v0.3 - (C) Dave Chapman 2006
     This is free software; see the source for copying conditions.  There is NO
     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
@@ -86,17 +93,27 @@ for the next daily builds.}
     \begin{code}
     ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{code}
-\optv{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware:
+  \opt{ipodnano}{\note{The following step is only necessary if your Apple
+    firmware has version 1.2. If this doesn't apply to you, simply skip it.}}
+\optv{ipodvideo,ipodnano}{
+  \item
+    Similarly, extract the Broadcom firmware:
     \begin{code}
     ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin
     \end{code}
 }
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware:
+    firm\-ware.%
 \optv{ipodnano}{
+    If your firmware version is lower than 1.2 this works you need
+    this command:
     \begin{code}
     ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
+    \end{code}
+    If your firmware version is 1.2 you need to use the following command
+    instead. Please note that the ``video'' is correct.
+    \begin{code}
+    ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-nano.bin
     \end{code}
 }
 \optv{ipodvideo}{
@@ -178,17 +195,27 @@ Now you can proceed installing the firmware itself.
     \begin{code}
     ./ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{code}
-\optv{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware:
+  \opt{ipodnano}{\note{The following step is only necessary if your Apple
+    firmware has version 1.2. If this doesn't apply to you, simply skip it.}}
+\optv{ipodvideo,ipodnano}{
+  \item
+    Similarly, extract the Broadcom firmware:
     \begin{code}
     ./ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin
     \end{code}
 }
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware:
+    firm\-ware.%
 \optv{ipodnano}{
+    If your firmware version is lower than 1.2 this works you need
+    this command:
     \begin{code}
     ./ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
+    \end{code}
+    If your firmware version is 1.2 you need to use the following command
+    instead. Please note that the ``video'' is correct.
+    \begin{code}
+    ./ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-nano.bin
     \end{code}
 }
 \optv{ipodvideo}{
@@ -285,19 +312,30 @@ Now, proceed with installing the firmware itself.
     \begin{code}
     ./ipod_fw -o apple_os.bin -e 0 bootpartition.bin
     \end{code}
-\optv{ipodvideo}{
-  \item Similarly, extract the Broadcom firmware: 
+  \opt{ipodnano}{\note{The following step is only necessary if your Apple
+    firmware has version 1.2. If this doesn't apply to you, simply skip it.}}
+\optv{ipodvideo,ipodnano}{
+  \item
+    Similarly, extract the Broadcom firmware:
     \begin{code}
     ./ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin
     \end{code}
 }
 
   \item Merge the Rockbox bootloader you downloaded previously with the Apple
-    firmware: 
+    firm\-ware.%
 \optv{ipodnano}{
+    If your firmware version is lower than 1.2 this works you need
+    this command:
     \begin{code}
     ./ipod_fw -g nano -o rockboot.bin -i apple_os.bin bootloader-nano.bin
     \end{code}
+    If your firmware version is 1.2 you need to use the following command
+    instead. Please note that the ``video'' is correct.
+    \begin{code}
+    ./ipod_fw -g video -o rockboot.bin -i apple_os.bin bootloader-nano.bin
+    \end{code}
+
 }
 \optv{ipodvideo}{
     \begin{code}
