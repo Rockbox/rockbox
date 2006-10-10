@@ -52,7 +52,8 @@ getfile() {
      $tool -Lo $dlwhere/$1 $2/$1
   fi
   if test -z "$tool"; then 
-    echo "ROCKBOXDEV: couldn't find downloader tool to use!"
+    echo "ROCKBOXDEV: couldn't find any downloader tool to use!"
+    echo "ROCKBOXDEV: install curl or wget and re-run the script"
     exit
   fi
   
