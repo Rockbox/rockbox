@@ -67,21 +67,41 @@ software.
 \opt{SWCODEC}{
   \subsection{Introduction}
   
-  There are two separate components of Rockbox that need to be installed in 
-  order to run Rockbox.
+  \opt{HAVE_FIRMWARE_ON_DISK}{There are three separate components of Rockbox, 
+  two of which need to be installed in order to run Rockbox.}
+  
+  \opt{HAVE_FIRMWARE_IN_FLASH}{There are two separate components of Rockbox 
+  that need to be installed in order to run Rockbox.}
   
   \begin{description}
+  \opt{HAVE_FIRMWARE_ON_DISK}{    
+  \item[The \playerman{} bootloader]
+    The \playerman{} bootloader is the program that tells your \dap{} how to boot 
+    and load the remaining firmware from disk. It is also responsible for the
+    disk mode on your \dap{}.
+    
+    This bootloader is stored in special flash memory in your \playerman. It is 
+    already installed on your \dap{}, so it is never necessary to modify this 
+    in order to install Rockbox.}
     
   \item[The Rockbox bootloader.] \index{Bootloader}
+    \opt{HAVE_FIRMWARE_ON_DISK}{The Rockbox bootloader is loaded from disk by 
+    the \playerman{} bootloader. It is responsible for loading the Rockbox 
+    firmware and for providing the dual boot function. It directly replaces the
+    \playerman{} firmware on the \daps{} disk.}
+    \opt{HAVE_FIRMWARE_IN_FLASH}{
     The bootloader is the program that tells your 
     \dap{} how to boot and load other components of Rockbox. This is the 
     component of Rockbox that is installed to the flash memory of your 
-    \playerman. 
+    \playerman.}
   
-  \item[The Rockbox firmware.] Unlike the \playerman\ firmware, which runs 
-    entirely from flash memory, most of the Rockbox code is contained in a 
+  \item[The Rockbox firmware.] 
+    \opt{HAVE_FIRMWARE_IN_FLASH}{Unlike the \playerman{} firmware, which runs 
+    entirely from flash memory, }
+    \opt{HAVE_FIRMWARE_ON_DISK}{Similar to the \playerman{} firmware, }
+    most of the Rockbox code is contained in a 
     ``build'' that resides on your \daps{} hard drive. This makes it easy to 
-    update Rockbox. The build consists of a file named \firmwarefilename\ and a
+    update Rockbox. The build consists of a file named \firmwarefilename{} and a
     directory called \fname{.rockbox}, both of which are located in the root 
     directory of your hard drive.
     
