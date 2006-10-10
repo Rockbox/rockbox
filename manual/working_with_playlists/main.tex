@@ -2,98 +2,104 @@
 \label{ref:working_with_playlists}
 
 \section{Introduction}
+\fixme{This chapter is currently in a half written state, with possible errors.
+  Please help us fix this chapter by submitting additions/corrections to the tracker}
 
 \section{Playlist terminology}
 
-Here are some common terms that are used in Rockbox when referring to playlists:
+Here are some common terms that are used in Rockbox when referring to 
+playlists:
 
-	\begin{description}
+\begin{description}
+  
+\item[Directory.]  A playlist!  One of the keys to getting the most out of 
+  Rockbox is understanding that Rockbox \emph{always} considers the song that 
+  it is playing to be part of a playlist, and in some situations, Rockbox will 
+  create a playlist automatically.  For example, if you are playing the 
+  contents of a directory, Rockbox will automatically create a playlist 
+  containing the songs in that directory.  This means that just about anything 
+  that is described in this chapter with respect to playlists also applies to 
+  directories.
+  
+\item[Dynamic playlist.]  A dynamic playlist is a playlist that is created 
+  ``On the fly.''  Any time you insert or queue tracks using the 
+  \setting{Playlist submenu} (see \reference:{playlist_submenu}), you are 
+  creating (or adding to) a dynamic playlist.
 	
-	\item[Directory:]  A playlist!  One of the keys to getting the most out of 
-	Rockbox is understanding that Rockbox \emph{always} considers the song that it 
-	is playing to be part of a playlist, and in some situations, Rockbox will 
-	create a playlist automatically.  For example, if you are playing the contents 
-	of a directory, Rockbox will automatically create a playlist containing the 
-	songs in that directory.  This means that just about anything that is 
-	described in this chapter with respect to playlists also applies to 
-	directories.
+\item[Insert.] In Rockbox, to \setting{Insert} an item into a playlist means 
+  putting an item into a playlist and leaving it there, even after it is 
+  played. As you will see later in this chapter, Rockbox can \setting{Insert} 
+  into a playlist in several places.
 	
-	\item[Dynamic playlist:]  A dynamic playlist is a playlist that is created 
-	``On the fly.''  Any time you insert or queue tracks using the 
-	\setting{Playlist submenu} (see \reference:{playlist_submenu}), you are creating (or adding 
-	to) a dynamic playlist.
-	
-	\item[Insert:] In Rockbox, to \setting{Insert} an item into a playlist means 
-	putting an item into a playlist and leaving it there, even after it is played. 
-	As you will see later in this chapter, Rockbox can \setting{Insert} into a 
-	playlist in several places.
-	
-	\item[Queue:]  In Rockbox, to \setting{Queue} a song means to put the song 
-	into a playlist and then to remove the song from the playlist once it has been 
-	played.  The only difference between \setting{Insert} and \setting{Queue} is 
-	that the \setting{Queue} option removes the song from the playlist once it has 
-	been played, and the \setting{Insert} option does not.
+\item[Queue.]  In Rockbox, to \setting{Queue} a song means to put the song 
+  into a playlist and then to remove the song from the playlist once it has 
+  been played.  The only difference between \setting{Insert} and 
+  \setting{Queue} is that the \setting{Queue} option removes the song from the 
+  playlist once it has been played, and the \setting{Insert} option does not.
+\end{description}  
 
 \section{Creating playlists}
 
 Rockbox can create playlists in four different ways. 
 
-	\subsection{Creating playlists by playing a song}
-	
-	Whenever a song is selected from the \setting{File Browser} using the 
-	\ButtonSelect\ button, Rockbox will automatically create a playlist containing 
-	all of the songs in the directory in which that song is located.
-	
-	\note{If you already have already created a dynamic playlist, playing a new 
-	song will \emph{erase} the current playlist and create a new one.  If you want 
-	to add a song to the current playlist rather than erasing the current 
-	playlist, see the section below on ``Adding music to playlists.''
-	
-	\subsection{Creating a dynamic playlist using the Insert and Queue functions}
-	
-	\subsection{Creating a playlist using the Playlist Catalog}
-	
-	\subsection{Creating a playlist from the Main Menu}
+\subsection{Creating playlists by playing a song}
+
+Whenever a song is selected from the \setting{File Browser} using the 
+\ButtonSelect{} button, Rockbox will automatically create a playlist 
+containing  all of the songs in the directory in which that song is located.
+
+\note{If you already have already created a dynamic playlist, playing a new 
+  song will \emph{erase} the current playlist and create a new one.  If you 
+  want to add a song to the current playlist rather than erasing the current 
+  playlist, see the section below on ``Adding music to playlists.''}
+
+\subsection{Creating a dynamic playlist using the Insert and Queue functions}
+
+\subsection{Creating a playlist using the Playlist Catalog}
+
+\subsection{Creating a playlist from the Main Menu}
 
 \section{Adding music to playlists}
+  
+\subsection{\label{ref:Playlistsubmenu}Adding music to a dynamic playlist} 
+\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{} 
+The \setting{Playlist Submenu} allows you to put tracks into a 
+``dynamic playlist''. If there is no music currently playing, Rockbox will 
+create a new dynamic playlist and put the selected track(s) into the 
+playlist.  If there is music currently playing, Rockbox will put the 
+selected track(s) into the current playlist.  The place in which the newly 
+selected tracks are added to the playlist is determined by the following 
+options:
 
-	\subsection{\label{ref:Playlistsubmenu}Adding music to a dynamic playlist} 
-	\screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{} 
-	The \setting{Playlist Submenu} allows you to put tracks into a ``dynamic 
-	playlist''. If there is no music currently playing, Rockbox will create a new 
-	dynamic playlist and put the selected track(s) into the playlist.  If there is 
-	music currently playing, Rockbox will put the selected track(s) into the 
-	current playlist.  The place in which the newly selected tracks are added to 
-	the playlist is determined by the following options:
-
-	\begin{description} 
-	
-	\item [Insert:] Add track(s) to playlist. If no other 
-	tracks have been inserted then the selected track will be added immediately 
-	after current playing track, otherwise they will be added to end of insertion 
-	list. 
-	
-	\item [Insert next:] Add track(s) immediately after current playing 
-	track, no matter what else has been inserted. 
-	
-	\item [Insert last:] Add track(s) to end of playlist. 
-	
-	\item [Queue:] Queue is the same as Insert except queued tracks are deleted 
-	immediately from the playlist after they've been played. Also, queued tracks 
-	are not saved to the playlist file (see \reference{ref:playlistoptions}). 
-	
-	\item [Queue next:] Queue track(s) immediately after current playing track. 
-	
-	\item [Queue last:] Queue track(s) at end of playlist. \end{description}
+\begin{description} 
+\item [Insert.] Add track(s) to playlist. If no other tracks have been 
+  inserted then the selected track will be added immediately after current 
+  playing track, otherwise they will be added to end of insertion list. 
+  
+\item [Insert next.] Add track(s) immediately after current playing 
+  track, no matter what else has been inserted. 
+  
+\item [Insert last.] Add track(s) to end of playlist. 
+  
+\item [Queue.] Queue is the same as Insert except queued tracks are 
+  deleted immediately from the playlist after they've been played. Also, 
+  queued tracks are not saved to the playlist file (see 
+  \reference{ref:playlistoptions}). 
+  
+\item [Queue next.] Queue track(s) immediately after current playing track.
+  
+\item [Queue last.] Queue track(s) at end of playlist. 
+\end{description}
 
 The \setting{Playlist Submenu} can be used to add either single tracks or 
 entire directories to a playlist. If the \setting{Playlist Submenu} is 
 invoked on a single track, it will put only that track into the playlist.  
 On the other hand, if the \setting{Playlist Submenu} is invoked on a 
-directory, Rockbox adds all of the tracks in that directory to the playlist.  
+directory, Rockbox adds all of the tracks in that directory to the 
+playlist.
 
-Dynamic playlists are saved so resume will restore them exactly as they were before
-shutdown.
+Dynamic playlists are saved so resume will restore them exactly as they 
+were before shutdown.
 
 \section{Saving playlists}
 
@@ -101,16 +107,11 @@ shutdown.
 
 \section{Helpful Hints}
 
-	\subsection{Including subdirectories in playlists} 
-	
-	You can control whether or not Rockbox includes the contents of subdirectories 
-	when adding an entire directory to a playlists.  Set the \setting{Main Menu 
-	$\rightarrow$ Playlist Options $\rightarrow$ Recusively Insert Directories} 
-	setting to \setting{Yes} if you would like Rockbox to include tracks in 
-	subdirectories as well as tracks in the currently-selected directory.}
-	
+\subsection{Including subdirectories in playlists} 
 
-
-
-
-
+You can control whether or not Rockbox includes the contents of 
+subdirectories when adding an entire directory to a playlists. 
+Set the \setting{Main Menu $\rightarrow$ Playlist Options $\rightarrow$ 
+  Recusively Insert Directories} setting to \setting{Yes} if you would like
+Rockbox to include tracks in subdirectories as well as tracks in the 
+currently selected directory.
