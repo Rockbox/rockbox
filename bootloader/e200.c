@@ -38,13 +38,29 @@
 
 void main(void)
 {
+    volatile unsigned int* ptr;
     int i;
- 
-    volatile unsigned short *ptr = (unsigned short *)0x14700000;
 
-    for(i=0; i< 10000; i++)
-        *ptr++=i;
-    while(1);
+    while(1)
+    {
+        // blink wheel backlight
+        ptr = (volatile unsigned int*)0x70000020;
+        if((*ptr) & (1 << 13))
+        {
+            *ptr = (*ptr) & ~(1 << 13);
+
+        }
+        else
+        {
+            *ptr = (*ptr) | (1 << 13);
+        }
+
+        // wait a while
+        for(i = 0; i < 0xfffff; i++)
+        {
+        }
+
+    }
 }
 
 /* These functions are present in the firmware library, but we reimplement
