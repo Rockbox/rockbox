@@ -32,7 +32,10 @@
 #include <string.h>
 #include "bits.h"
 
-uint8_t static_buffer[1024];
+/* Need to be large enough to fit the largest compressed sample in a file.
+ * Samples a little larger than 1 KB observed in a 256 kbps file.
+ */
+uint8_t static_buffer[2048];
 
 /* initialize buffer, call once before first getbits or showbits */
 void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
@@ -75,6 +78,7 @@ void faad_initbits(bitfile *ld, const void *_buffer, const uint32_t buffer_size)
 
 void faad_endbits(bitfile *ld)
 {
+#if 0
     if (ld)
     {
         if (ld->buffer)
@@ -83,6 +87,9 @@ void faad_endbits(bitfile *ld)
             ld->buffer = NULL;
         }
     }
+#else
+    (void) ld;
+#endif
 }
 
 uint32_t faad_get_processed_bits(bitfile *ld)
