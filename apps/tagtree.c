@@ -312,7 +312,7 @@ static bool read_variable(char *buf, int size)
 static int get_format_str(struct display_format *fmt)
 {
     int ret;
-    char buf[32];
+    char buf[128];
     
     memset(fmt, 0, sizeof(struct display_format));
     
@@ -362,7 +362,7 @@ static int get_condition(struct search_instruction *inst)
 {
     int tag;
     int condition;
-    char buf[32];
+    char buf[128];
         
     switch (*strp)
     {
