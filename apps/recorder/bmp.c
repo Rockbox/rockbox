@@ -97,14 +97,10 @@ inline int getpix(int px, unsigned char *bmpbuf) {
 
 #if LCD_DEPTH == 16
 /* Cheapo 24 -> 16 bit dither */
-#if LCD_PIXELFORMAT == RGB565SWAPPED
-#define RGBSWAPPED(rgb) swap16(rgb)
-#else
-#define RGBSWAPPED(rgb) rgb
-#endif
 static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
 {
-    static const unsigned char dith[2][16] = {
+    static const unsigned char dith[][16] =
+    {
         {   /* 5 bit */
             0,6,1,7,
             4,2,5,3,
@@ -116,15 +112,25 @@ static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
             2,1,2,1,
             0,3,0,3,
             2,1,2,1
-        }
+        },
     };
 
     const int elm = (row & 3) + ((col & 3) << 2);
-    short b = 31*((unsigned short)rgb.blue  + dith[0][elm]) >> 8;
-    short g = 63*((unsigned short)rgb.green + dith[1][elm]) >> 8;
-    short r = 31*((unsigned short)rgb.red   + dith[0][elm]) >> 8;
+    unsigned short color;
 
-    return RGBSWAPPED(b | (g << 5) | (r << 11));
+    unsigned b = ((unsigned)rgb.blue  + dith[0][elm]) >> 3;
+    if (b > 0x1f) b = 0x1f;
+    unsigned g = ((unsigned)rgb.green + dith[1][elm]) >> 2;
+    if (g > 0x3f) g = 0x3f;
+    unsigned r = ((unsigned)rgb.red   + dith[0][elm]) >> 3;
+    if (r > 0x1f) r = 0x1f;
+
+    color = (unsigned short)(b | (g << 5) | (r << 11));
+
+#if LCD_PIXELFORMAT == RGB565SWAPPED
+    swap16(color);
+#endif
+    return color;
 }
 #endif /* LCD_DEPTH == 16 */
 
