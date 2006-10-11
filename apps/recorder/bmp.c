@@ -31,6 +31,7 @@
 #include "lcd.h"
 #include "file.h"
 #include "config.h"
+#include "system.h"
 #include "bmp.h"
 #include "lcd.h"
 
