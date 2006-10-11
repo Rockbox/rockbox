@@ -92,7 +92,7 @@ enum codec_status codec_start(struct codec_api* api)
   }
 
   /* initialise the sound converter */
-  create_alac(demux_res.sample_size, demux_res.num_channels,&alac);
+  create_alac(demux_res.sound_sample_size, demux_res.num_channels,&alac);
   alac_set_info(&alac, demux_res.codecdata);
 
   i=0;
