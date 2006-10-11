@@ -7,9 +7,18 @@ INPUT(target/coldfire/crt0.o)
 #elif defined (CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-#ifndef CPU_PP
-/* PortalPlayer-based machines won't work if crt0 is included */
+#ifndef IPOD_ARCH
+/* the ipods can't have the crt0.o mentioned here, but the others can't do
+   without it! */
+#ifdef CPU_PP
+#if (CONFIG_CPU == PP5024)
+INPUT(target/arm/crt0-pp5024.o)
+#else
+INPUT(target/arm/crt0-pp.o)
+#endif
+#else
 INPUT(target/arm/crt0.o)
+#endif
 #endif
 #else
 OUTPUT_FORMAT(elf32-sh)
