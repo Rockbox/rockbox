@@ -36,7 +36,8 @@ bool load_backdrop(char* filename, fb_data* backdrop_buffer)
 
     /* load the image */
     bm.data=(char*)backdrop_buffer;
-    ret = read_bmp_file(filename, &bm, sizeof(main_backdrop), FORMAT_NATIVE);
+    ret = read_bmp_file(filename, &bm, sizeof(main_backdrop),
+                        FORMAT_NATIVE | FORMAT_DITHER);
 
     if ((ret > 0) && (bm.width == LCD_WIDTH) && (bm.height == LCD_HEIGHT))
     {

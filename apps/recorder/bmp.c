@@ -94,6 +94,39 @@ inline int getpix(int px, unsigned char *bmpbuf) {
     return (bmpbuf[a] & (1 << b)) != 0;
 }
 
+#if LCD_DEPTH == 16
+/* Cheapo 24 -> 16 bit dither */
+#if LCD_PIXELFORMAT == RGB565SWAPPED
+#define RGBSWAPPED(rgb) swap16(rgb)
+#else
+#define RGBSWAPPED(rgb) rgb
+#endif
+static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
+{
+    static const unsigned char dith[2][16] = {
+        {   /* 5 bit */
+            0,6,1,7,
+            4,2,5,3,
+            1,7,0,6,
+            5,3,4,2
+        },
+        {   /* 6 bit */
+            0,3,0,3,
+            2,1,2,1,
+            0,3,0,3,
+            2,1,2,1
+        }
+    };
+
+    const int elm = (row & 3) + ((col & 3) << 2);
+    short b = 31*((unsigned short)rgb.blue  + dith[0][elm]) >> 8;
+    short g = 63*((unsigned short)rgb.green + dith[1][elm]) >> 8;
+    short r = 31*((unsigned short)rgb.red   + dith[0][elm]) >> 8;
+
+    return RGBSWAPPED(b | (g << 5) | (r << 11));
+}
+#endif /* LCD_DEPTH == 16 */
+
 
 /******************************************************************************
  * read_bmp_file()
@@ -115,21 +148,25 @@ int read_bmp_file(char* filename,
     int depth;
     int totalsize;
     char *bitmap = bm->data;
-    
     unsigned char bmpbuf[LCD_WIDTH*sizeof(struct rgb_quad)]; /* Buffer for one line */
-
-#if LCD_DEPTH == 1
-    format = FORMAT_MONO;
-#else
-    bool transparent;
-    
+#if LCD_DEPTH != 1
+    bool transparent = false;
+#if LCD_DEPTH == 16
+    /* Should adapt dithering to all native depths */
+    bool dither = false;
+    if(format & FORMAT_DITHER) {
+        dither = true;
+        format &= ~FORMAT_DITHER;
+    }
+#endif
     if(format & FORMAT_TRANSPARENT) {
         transparent = true;
         format &= ~FORMAT_TRANSPARENT;
     }
+#else
+    format = FORMAT_MONO;
 #endif
-        
-    
+
     fd = open(filename, O_RDONLY);
 
     /* Exit if file opening failed */
@@ -362,12 +399,11 @@ int read_bmp_file(char* filename,
 #elif LCD_DEPTH == 16
             } else {
                 /* 8-bit RGB24 palette -> RGB16 */
-                for (col = 0; col < width; col++) {
+                for (col = 0; col < width; col++, p++) {
                     struct rgb_quad rgb = palette[*p];
-                    unsigned short rgb16 =
+                    dest[width * (height - row - 1) + col] = dither ?
+                        dither_24_to_16(rgb, row, col) :
                         LCD_RGBPACK(rgb.red, rgb.green, rgb.blue);
-                    dest[width * (height - row - 1) + col] = rgb16;
-                    p++;
                 }
             }
 #endif
@@ -429,10 +465,10 @@ int read_bmp_file(char* filename,
 #elif LCD_DEPTH == 16
             } else {
                 /* RGB24 -> RGB16 */
-                for (col = 0; col < width; col++) {
-                    unsigned short rgb = LCD_RGBPACK(p[2],p[1],p[0]);
-                    dest[width * (height - row - 1) + col] = rgb;
-                    p += 3;
+                for (col = 0; col < width; col++, p += 3) {
+                    dest[width * (height - row - 1) + col] = dither ?
+                        dither_24_to_16(*(struct rgb_quad *)p, row, col) :
+                        LCD_RGBPACK(p[2], p[1], p[0]);
                 }
             }
 #endif
