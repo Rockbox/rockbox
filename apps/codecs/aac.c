@@ -29,6 +29,8 @@ CODEC_HEADER
 extern char iramcopy[];
 extern char iramstart[];
 extern char iramend[];
+extern char iedata[];
+extern char iend[];
 #endif
 
 struct codec_api* rb;
@@ -37,27 +39,35 @@ struct codec_api* ci;
 /* this is the codec entry point */
 enum codec_status codec_start(struct codec_api* api)
 {
+    /* Note that when dealing with QuickTime/MPEG4 files, terminology is
+     * a bit confusing. Files with sound are split up in chunks, where
+     * each chunk contains one or more samples. Each sample in turn
+     * contains a number of "sound samples" (the kind you refer to with
+     * the sampling frequency).
+     */
     size_t n;
     static demux_res_t demux_res;
     stream_t input_stream;
-    uint32_t samplesdone;
-    uint32_t elapsedtime;
+    uint32_t sound_samples_done;
+    uint32_t elapsed_time;
     uint32_t sample_duration;
     uint32_t sample_byte_size;
-    int samplesdecoded;
+    int file_offset;
     unsigned int i;
     unsigned char* buffer;
-    static NeAACDecFrameInfo frameInfo;
-    NeAACDecHandle hDecoder;
+    static NeAACDecFrameInfo frame_info;
+    NeAACDecHandle decoder;
     int err;
-    int16_t* decodedbuffer;
+    uint32_t s = 0;
+    unsigned char c = 0;
 
     /* Generic codec initialisation */
     rb = api;
     ci = api;
 
 #ifndef SIMULATOR
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
+    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
+    ci->memset(iedata, 0, iend - iedata);
 #endif
 
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
@@ -68,9 +78,10 @@ enum codec_status codec_start(struct codec_api* api)
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(29));
 
 next_track:
+    err = CODEC_OK;
 
     if (codec_init(api)) {
-        LOGF("FAAD: Error initialising codec\n");
+        LOGF("FAAD: Codec init error\n");
         err = CODEC_ERROR;
         goto exit;
     }
@@ -78,7 +89,7 @@ next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
   
-    samplesdone = ci->id3->offset;
+    sound_samples_done = ci->id3->offset;
 
     ci->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
 
@@ -87,52 +98,49 @@ next_track:
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
-        LOGF("FAAD: Error initialising file\n");
+        LOGF("FAAD: File init error\n");
         err = CODEC_ERROR;
         goto done;
     }
 
     /* initialise the sound converter */
-    hDecoder = NULL;
-    hDecoder = NeAACDecOpen();
+    decoder = NeAACDecOpen();
 
-    if (!hDecoder) {
-        LOGF("FAAD: Error opening decoder\n");
+    if (!decoder) {
+        LOGF("FAAD: Decode open error\n");
         err = CODEC_ERROR;
         goto done;
     }
 
-    NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(hDecoder);
+    NeAACDecConfigurationPtr conf = NeAACDecGetCurrentConfiguration(decoder);
     conf->outputFormat = FAAD_FMT_24BIT; /* irrelevant, we don't convert */
-    NeAACDecSetConfiguration(hDecoder, conf);
+    NeAACDecSetConfiguration(decoder, conf);
 
-    uint32_t s=0;
-    unsigned char c=0;
-
-    err = NeAACDecInit2(hDecoder, demux_res.codecdata,demux_res.codecdata_len, &s, &c);
+    err = NeAACDecInit2(decoder, demux_res.codecdata, demux_res.codecdata_len, &s, &c);
     if (err) {
-        LOGF("FAAD: Error initialising decoder: %d, type=%d\n", err,hDecoder->object_type);
+        LOGF("FAAD: DecInit: %d, %d\n", err, decoder->object_type);
         err = CODEC_ERROR;
         goto done;
     }
 
-    ci->id3->frequency=s;
+    ci->id3->frequency = s;
 
-    i=0;
+    i = 0;
     
-    if (samplesdone > 0) {
-        if (alac_seek_raw(&demux_res, &input_stream, samplesdone,
-                          &samplesdone, (int *)&i)) {
-            elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
-            ci->set_elapsed(elapsedtime);
+    if (sound_samples_done > 0) {
+        if (alac_seek_raw(&demux_res, &input_stream, sound_samples_done,
+                          &sound_samples_done, (int*) &i)) {
+            elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+            ci->set_elapsed(elapsed_time);
         } else {
-            samplesdone=0;
+            sound_samples_done = 0;
         }
     }
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
         rb->yield();
+
         if (ci->stop_codec || ci->new_track) {
             break;
         }
@@ -140,10 +148,10 @@ next_track:
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
             if (alac_seek(&demux_res, &input_stream,
-                          ((ci->seek_time-1)/10) * (ci->id3->frequency/100),
-                          &samplesdone, (int *)&i)) {
-                elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
-                ci->set_elapsed(elapsedtime);
+                          ((ci->seek_time-1)/10)*(ci->id3->frequency/100),
+                          &sound_samples_done, (int*) &i)) {
+                elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+                ci->set_elapsed(elapsed_time);
             }
             ci->seek_complete();
         }
@@ -151,52 +159,65 @@ next_track:
         /* Lookup the length (in samples and bytes) of block i */
         if (!get_sample_info(&demux_res, i, &sample_duration, 
                              &sample_byte_size)) {
-            LOGF("AAC: Error in get_sample_info\n");
+            LOGF("AAC: get_sample_info error\n");
             err = CODEC_ERROR;
             goto done;
         }
 
+        /* There can be gaps between chunks, so skip ahead if needed. It
+         * doesn't seem to happen much, but it probably means that a 
+         * "proper" file can have chunks out of order. Why one would want
+         * that an good question (but files with gaps do exist, so who 
+         * knows?), so we don't support that - for now, at least.
+         */        
+        file_offset = get_sample_offset(&demux_res, i);
+        
+        if (file_offset > ci->curpos)
+        {
+            ci->advance_buffer(file_offset - ci->curpos);
+        }
+        
         /* Request the required number of bytes from the input buffer */
         buffer=ci->request_buffer(&n,sample_byte_size);
 
         /* Decode one block - returned samples will be host-endian */
-        rb->yield();
-        decodedbuffer = NeAACDecDecode(hDecoder, &frameInfo, buffer, n);
-        /* ignore decodedbuffer return value, we access samples in the
-           decoder struct directly */
-        if (frameInfo.error > 0) {
-             LOGF("FAAD: decoding error \"%s\"\n", NeAACDecGetErrorMessage(frameInfo.error));
-             err = CODEC_ERROR;
-             goto done;
+        NeAACDecDecode(decoder, &frame_info, buffer, n);
+        /* Ignore return value, we access samples in the decoder struct 
+         * directly.
+         */
+        if (frame_info.error > 0) {
+            LOGF("FAAD: decode error '%s'\n", NeAACDecGetErrorMessage(frame_info.error));
+            err = CODEC_ERROR;
+            goto done;
         }
-
-        /* Get the number of decoded samples */
-        samplesdecoded=frameInfo.samples;
 
         /* Advance codec buffer */
         ci->advance_buffer(n);
 
         /* Output the audio */
         rb->yield();
-        while (!rb->pcmbuf_insert_split(hDecoder->time_out[0],
-                                        hDecoder->time_out[1],
-                                        frameInfo.samples*2))
-            rb->yield();
+        while (!rb->pcmbuf_insert_split(decoder->time_out[0],
+                                        decoder->time_out[1],
+                                        frame_info.samples * 2))
+        {
+            rb->sleep(1);
+        }
 
         /* Update the elapsed-time indicator */
-        samplesdone+=sample_duration;
-        elapsedtime=(samplesdone*10)/(ci->id3->frequency/100);
-        ci->set_elapsed(elapsedtime);
+        sound_samples_done += sample_duration;
+        elapsed_time = (sound_samples_done * 10) / (ci->id3->frequency / 100);
+        ci->set_elapsed(elapsed_time);
 
         /* Keep track of current position - for resuming */
-        ci->set_offset(elapsedtime);
+        ci->set_offset(elapsed_time);
 
         i++;
     }
+
     err = CODEC_OK;
 
 done:
-    LOGF("AAC: Decoded %d samples\n",samplesdone);
+    LOGF("AAC: Decoded %d samples, %d frames\n", sound_samples_done);
 
     if (ci->request_next_track())
         goto next_track;

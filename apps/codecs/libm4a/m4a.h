@@ -33,11 +33,20 @@ typedef uint32_t fourcc_t;
 typedef struct
 {
     uint16_t num_channels;
-    uint16_t sample_size;
-    uint32_t sample_rate;
+    uint16_t sound_sample_size;
+    uint32_t sound_sample_rate;
     fourcc_t format;
     void *buf;
 
+    struct {
+        uint32_t first_chunk;
+        uint32_t num_samples;
+    } *sample_to_chunk;
+    uint32_t num_sample_to_chunks;
+    
+    uint32_t *chunk_offset;
+    uint32_t num_chunk_offsets;
+    
     struct {
         uint32_t sample_count;
         uint32_t sample_duration;
@@ -93,16 +102,13 @@ void stream_skip(stream_t *stream, size_t skip);
 int stream_eof(stream_t *stream);
 
 void stream_create(stream_t *stream,struct codec_api* ci);
-int get_sample_info(demux_res_t *demux_res, uint32_t samplenum,
-                    uint32_t *sample_duration,
-                    uint32_t *sample_byte_size);
-unsigned int alac_seek (demux_res_t* demux_res,
-                        stream_t* stream,
-                        unsigned int sample_loc, 
-                        uint32_t* samplesdone, int* currentblock);
-unsigned int alac_seek_raw (demux_res_t* demux_res, 
-                        stream_t* stream,
-                        unsigned int file_loc, 
-                        uint32_t* samplesdone, int* currentblock);
+int get_sample_info(demux_res_t *demux_res, uint32_t sample,
+    uint32_t *sample_duration, uint32_t *sample_byte_size);
+unsigned int get_sample_offset(demux_res_t *demux_res, uint32_t sample);
+unsigned int alac_seek (demux_res_t* demux_res, stream_t* stream,
+    uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
+    int* current_sample);
+unsigned int alac_seek_raw (demux_res_t* demux_res, stream_t* stream,
+    uint32_t file_loc, uint32_t* sound_samples_done, int* current_sample);
 
 #endif /* STREAM_H */

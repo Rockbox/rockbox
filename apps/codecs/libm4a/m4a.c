@@ -21,6 +21,13 @@
 #include <inttypes.h>
 #include "m4a.h"
 
+#if defined(DEBUG) || defined(SIMULATOR)
+extern struct codec_api* rb;
+#define DEBUGF  rb->debugf
+#else
+#define DEBUGF(...)
+#endif
+
 /* Implementation of the stream.h functions used by libalac */
 
 #define _Swap32(v) do { \
@@ -101,15 +108,7 @@ uint8_t stream_read_uint8(stream_t *stream)
 
 void stream_skip(stream_t *stream, size_t skip)
 {
-  (void)stream;
-#if 1
-  char buf;
-  while (skip > 0) {
-    stream->ci->read_filebuf(&buf,1);
-    skip--;
-  }
-#endif
-  //stream->ci->advance_buffer(skip);
+  stream->ci->advance_buffer(skip);
 }
 
 int stream_eof(stream_t *stream)
@@ -158,136 +157,273 @@ int get_sample_info(demux_res_t *demux_res, uint32_t samplenum,
     return 1;
 }
 
-/* Seek to sample_loc (or close to it).  Return 1 on success (and
-   modify samplesdone and currentblock), 0 if failed 
-
-   Seeking uses the following two arrays:
-
-     1) the sample_byte_size array contains the length in bytes of
-        each block ("sample" in Applespeak).
-
-     2) the time_to_sample array contains the duration (in samples) of
-        each block of data.
-
-     So we just find the block number we are going to seek to (using
-     time_to_sample) and then find the offset in the file (using
-     sample_byte_size).
-
-     Each ALAC block seems to be independent of all the others.
- */
-
-unsigned int alac_seek (demux_res_t* demux_res, 
-                        stream_t* stream,
-                        unsigned int sample_loc, 
-                        uint32_t* samplesdone, int* currentblock)
+unsigned int get_sample_offset(demux_res_t *demux_res, uint32_t sample)
 {
-  int flag;
-  unsigned int i,j;
-  unsigned int newblock;
-  unsigned int newsample;
-  unsigned int newpos;
-
-  /* First check we have the appropriate metadata - we should always
-     have it. */
-  if ((demux_res->num_time_to_samples==0) ||
-    (demux_res->num_sample_byte_sizes==0)) { return 0; }
-
-  /* Find the destination block from time_to_sample array */
-  i=0;
-  newblock=0;
-  newsample=0;
-  flag=0;
-
-  while ((i<demux_res->num_time_to_samples) && (flag==0) && 
-         (newsample < sample_loc)) {
-    j=(sample_loc-newsample) /
-      demux_res->time_to_sample[i].sample_duration;
+    uint32_t chunk = 1;
+    uint32_t range_samples = 0;
+    uint32_t total_samples = 0;
+    uint32_t chunk_sample;
+    uint32_t prev_chunk;
+    uint32_t prev_chunk_samples;
+    uint32_t file_offset;
+    uint32_t i;
     
-    if (j <= demux_res->time_to_sample[i].sample_count) {
-      newblock+=j;
-      newsample+=j*demux_res->time_to_sample[i].sample_duration;
-      flag=1;
-    } else {
-      newsample+=(demux_res->time_to_sample[i].sample_duration
-                 * demux_res->time_to_sample[i].sample_count);
-      newblock+=demux_res->time_to_sample[i].sample_count;
-      i++;
+    /* First check we have the appropriate metadata - we should always
+     * have it.
+     */
+       
+    if (sample >= demux_res->num_sample_byte_sizes ||
+        !demux_res->num_sample_to_chunks ||
+        !demux_res->num_chunk_offsets) 
+    {
+        return 0;
     }
-  }
 
-  /* We know the new block, now calculate the file position */
-  newpos=demux_res->mdat_offset;
-  for (i=0;i<newblock;i++) {
-    newpos+=demux_res->sample_byte_size[i];
-  }
+    /* Locate the chunk containing the sample */
+    
+    prev_chunk = demux_res->sample_to_chunk[0].first_chunk;
+    prev_chunk_samples = demux_res->sample_to_chunk[0].num_samples;
 
-  /* We know the new file position, so let's try to seek to it */
-  if (stream->ci->seek_buffer(newpos)) {
-    *samplesdone=newsample;
-    *currentblock=newblock;
-    return 1;
-  } else {
-    return 0;
-  }
+    for (i = 1; i < demux_res->num_sample_to_chunks; i++) 
+    {
+        chunk = demux_res->sample_to_chunk[i].first_chunk;
+        range_samples = (chunk - prev_chunk) * prev_chunk_samples;
+
+        if (sample < total_samples + range_samples)
+        {
+            break;
+        }
+
+        total_samples += range_samples;
+        prev_chunk = demux_res->sample_to_chunk[i].first_chunk;
+        prev_chunk_samples = demux_res->sample_to_chunk[i].num_samples;
+    }
+
+    if (demux_res->num_sample_to_chunks > 1)
+    {
+        chunk = prev_chunk + (sample - total_samples) / prev_chunk_samples;
+    }
+    else
+    {
+        chunk = 1;
+    }
+    
+    /* Get sample of the first sample in the chunk */
+    
+    chunk_sample = total_samples + (chunk - prev_chunk) * prev_chunk_samples;
+    
+    /* Get offset in file */
+    
+    if (chunk > demux_res->num_chunk_offsets)
+    {
+        file_offset = demux_res->chunk_offset[demux_res->num_chunk_offsets - 1];
+    }
+    else
+    {
+        file_offset = demux_res->chunk_offset[chunk - 1];
+    }
+    
+    if (chunk_sample > sample) {
+        return 0;
+    }
+ 
+    for (i = chunk_sample; i < sample; i++)
+    {
+        file_offset += demux_res->sample_byte_size[i];
+    }
+    
+    if (file_offset > demux_res->mdat_offset + demux_res->mdat_len)
+    {
+        return 0;
+    }
+    
+    return file_offset;
 }
 
-/* Seek to file_loc (or close to it).  Return 1 on success (and
-   modify samplesdone and currentblock), 0 if failed 
-
-   Seeking uses the following array:
-
-     the sample_byte_size array contains the length in bytes of
-     each block ("sample" in Applespeak).
-
-   So we just find the last block before (or at) the requested position.
-
-   Each ALAC block seems to be independent of all the others.
+/* Seek to the sample containing sound_sample_loc. Return 1 on success 
+ * (and modify sound_samples_done and current_sample), 0 if failed.
+ *
+ * Seeking uses the following arrays:
+ *
+ * 1) the time_to_sample array contains the duration (in sound samples) 
+ *    of each sample of data.
+ *
+ * 2) the sample_byte_size array contains the length in bytes of each
+ *    sample.
+ *
+ * 3) the sample_to_chunk array contains information about which chunk
+ *    of samples each sample belongs to.
+ *
+ * 4) the chunk_offset array contains the file offset of each chunk.
+ *
+ * So find the sample number we are going to seek to (using time_to_sample)
+ * and then find the offset in the file (using sample_to_chunk, 
+ * chunk_offset sample_byte_size, in that order.).
+ *
  */
-
-unsigned int alac_seek_raw (demux_res_t* demux_res, 
-                        stream_t* stream,
-                        unsigned int file_loc, 
-                        uint32_t* samplesdone, int* currentblock)
+unsigned int alac_seek(demux_res_t* demux_res, stream_t* stream, 
+    uint32_t sound_sample_loc, uint32_t* sound_samples_done, 
+    int* current_sample)
 {
-  unsigned int i;
-  unsigned int j;
-  unsigned int newblock;
-  unsigned int newsample;
-  unsigned int newpos;
+    uint32_t i;
+    uint32_t j;
+    uint32_t new_sample;
+    uint32_t new_sound_sample;
+    uint32_t new_pos;
 
-  /* First check we have the appropriate metadata - we should always
-     have it. */
-  if ((demux_res->num_time_to_samples==0) ||
-    (demux_res->num_sample_byte_sizes==0)) { return 0; }
-
-  /* Find the destination block from the sample_byte_size array. */
-  newpos=demux_res->mdat_offset;
-  for (i=0;(i<demux_res->num_sample_byte_sizes) &&
-           (newpos+demux_res->sample_byte_size[i]<=file_loc);i++) {
-    newpos+=demux_res->sample_byte_size[i];
-  }
-  
-  newblock=i;
-  newsample=0;
-
-  /* Get the sample offset of the block */
-  for (i=0,j=0;(i<demux_res->num_time_to_samples) && (j<newblock);
-       i++,j+=demux_res->time_to_sample[i].sample_count) {
-    if (newblock-j < demux_res->time_to_sample[i].sample_count) {
-        newsample+=(newblock-j)*demux_res->time_to_sample[i].sample_duration;
-        break;
-    } else {
-        newsample+=(demux_res->time_to_sample[i].sample_duration
-                   * demux_res->time_to_sample[i].sample_count);
+    /* First check we have the appropriate metadata - we should always
+     * have it.
+     */
+       
+    if ((demux_res->num_time_to_samples==0) ||
+       (demux_res->num_sample_byte_sizes==0))
+    { 
+        return 0; 
     }
-  }
 
-  /* We know the new file position, so let's try to seek to it */
-  if (stream->ci->seek_buffer(newpos)) {
-    *samplesdone=newsample;
-    *currentblock=newblock;
-    return 1;
-  } else {
+    /* Find the destination block from time_to_sample array */
+    
+    i = 0;
+    new_sample = 0;
+    new_sound_sample = 0;
+
+    while ((i < demux_res->num_time_to_samples) &&
+        (new_sound_sample < sound_sample_loc)) 
+    {
+        j = (sound_sample_loc - new_sound_sample) /
+            demux_res->time_to_sample[i].sample_duration;
+    
+        if (j <= demux_res->time_to_sample[i].sample_count)
+        {
+            new_sample += j;
+            new_sound_sample += j * 
+                demux_res->time_to_sample[i].sample_duration;
+            break;
+        } 
+        else 
+        {
+            new_sound_sample += (demux_res->time_to_sample[i].sample_duration
+                * demux_res->time_to_sample[i].sample_count);
+            new_sample += demux_res->time_to_sample[i].sample_count;
+            i++;
+        }
+    }
+
+    /* We know the new block, now calculate the file position. */
+  
+    new_pos = get_sample_offset(demux_res, new_sample);
+
+    /* We know the new file position, so let's try to seek to it */
+  
+    if (stream->ci->seek_buffer(new_pos)) 
+    {
+        *sound_samples_done = new_sound_sample;
+        *current_sample = new_sample;
+        return 1;
+    }
+    
     return 0;
-  }
+}
+
+/* Seek to the sample containing file_loc. Return 1 on success (and modify
+ * sound_samples_done and current_sample), 0 if failed.
+ *
+ * Seeking uses the following arrays:
+ *
+ * 1) the chunk_offset array contains the file offset of each chunk.
+ *
+ * 2) the sample_to_chunk array contains information about which chunk
+ *    of samples each sample belongs to.
+ *
+ * 3) the sample_byte_size array contains the length in bytes of each
+ *    sample.
+ *
+ * 4) the time_to_sample array contains the duration (in sound samples) 
+ *    of each sample of data.
+ *
+ * Locate the chunk containing location (using chunk_offset), find the 
+ * sample of that chunk (using sample_to_chunk) and finally the location
+ * of that sample (using sample_byte_size). Then use time_to_sample to
+ * calculate the sound_samples_done value.
+ */
+unsigned int alac_seek_raw(demux_res_t* demux_res, stream_t* stream,
+    uint32_t file_loc, uint32_t* sound_samples_done, 
+    int* current_sample)
+{
+    uint32_t chunk_sample = 0;
+    uint32_t total_samples = 0;
+    uint32_t new_sound_sample = 0;
+    uint32_t new_pos;
+    uint32_t chunk;
+    uint32_t i;
+
+    if (!demux_res->num_chunk_offsets ||
+        !demux_res->num_sample_to_chunks) 
+    {
+        return 0;
+    }
+
+    /* Locate the chunk containing file_loc. */
+
+    for (i = 0; i < demux_res->num_chunk_offsets && 
+        file_loc < demux_res->chunk_offset[i]; i++)
+    {
+    }
+    
+    chunk = i + 1;
+    new_pos = demux_res->chunk_offset[chunk - 1];
+
+    /* Get the first sample of the chunk. */
+    
+    for (i = 1; i < demux_res->num_sample_to_chunks &&
+        chunk < demux_res->sample_to_chunk[i - 1].first_chunk; i++) 
+    {
+        chunk_sample += demux_res->sample_to_chunk[i - 1].num_samples *
+            (demux_res->sample_to_chunk[i].first_chunk - 
+                demux_res->sample_to_chunk[i - 1].first_chunk);
+    }
+    
+    chunk_sample += (chunk - demux_res->sample_to_chunk[i - 1].first_chunk) *
+        demux_res->sample_to_chunk[i - 1].num_samples;
+
+    /* Get the position within the chunk. */
+    
+    for (; chunk_sample < demux_res->num_sample_byte_sizes; chunk_sample++)
+    {
+        if (file_loc < new_pos + demux_res->sample_byte_size[chunk_sample])
+        {
+            break;
+        }
+        
+        new_pos += demux_res->sample_byte_size[chunk_sample];
+    }
+    
+    /* Get sound sample offset. */
+
+    for (i = 0; i < demux_res->num_time_to_samples; i++)
+    {
+        if (chunk_sample < 
+            total_samples + demux_res->time_to_sample[i].sample_count)
+        {
+            break;
+        }
+        
+        total_samples += demux_res->time_to_sample[i].sample_count;
+        new_sound_sample += demux_res->time_to_sample[i].sample_count 
+            * demux_res->time_to_sample[i].sample_duration;
+    }
+    
+    new_sound_sample += (chunk_sample - total_samples) 
+        * demux_res->time_to_sample[i].sample_duration;
+
+    /* Go to the new file position. */
+    
+    if (stream->ci->seek_buffer(new_pos)) 
+    {
+        *sound_samples_done = new_sound_sample;
+        *current_sample = chunk_sample;
+        return 1;
+    } 
+
+    return 0;
 }
