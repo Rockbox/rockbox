@@ -42,6 +42,10 @@
 #pragma pack (push, 2)
 #endif
 
+//#undef LCD_RGBPACK
+//#define LCD_RGBPACK(r, g, b) swap16(_RGBPACK((r), (g), (b)))
+
+
 /* Struct from original code. */
 struct Fileheader {
     unsigned short Type;        /* signature - 'BM' */
@@ -128,7 +132,7 @@ static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
     color = (unsigned short)(b | (g << 5) | (r << 11));
 
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-    swap16(color);
+    color = swap16(color);
 #endif
     return color;
 }

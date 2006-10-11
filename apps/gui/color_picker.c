@@ -72,14 +72,14 @@ static void unpack_rgb(struct rgb_pick *rgb)
 {
     unsigned color = rgb->color;
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-    swap16(color);
+    color = swap16(color);
 #endif
-    rgb->r     = (color & 0xf800) >> 11;
-    rgb->g     = (color & 0x07e0) >> 5;
-    rgb->b     = (color & 0x001f);
     rgb->red   = _RGB_UNPACK_RED(color);
     rgb->green = _RGB_UNPACK_GREEN(color);
     rgb->blue  = _RGB_UNPACK_BLUE(color);
+    rgb->r     = (color & 0xf800) >> 11;
+    rgb->g     = (color & 0x07e0) >> 5;
+    rgb->b     = (color & 0x001f);
 }
 
 /* Packs the native rgb colors into a color value */
@@ -89,7 +89,7 @@ static void pack_rgb(struct rgb_pick *rgb)
                      (rgb->g & 0x3f) << 5 |
                      (rgb->b & 0x1f);
 #if LCD_PIXELFORMAT == RGB565SWAPPED
-    swap16(color);
+    color = swap16(color);
 #endif
     rgb->color = color;
 }
