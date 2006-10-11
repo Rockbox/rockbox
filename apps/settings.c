@@ -1561,13 +1561,19 @@ bool settings_load_config(const char* file)
 #ifdef HAVE_LCD_COLOR
             unload_wps_backdrop();
 #endif
-            if (wps_data_load(gui_wps[0].data, value, true))
+	    int fd2;
+            if ((fd2 = open(value, O_RDONLY)) >= 0) {
+		close(fd2);
                 set_file(value, (char *)global_settings.wps_file, MAX_FILENAME);
+	    }
         }
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
         else if (!strcasecmp(name, "rwps")) {
-            if (wps_data_load(gui_wps[1].data, value, true))
+	    int fd2;
+            if ((fd2 = open(value, O_RDONLY)) >= 0) {
+		close(fd2);
                 set_file(value, (char *)global_settings.rwps_file, MAX_FILENAME);
+	    }
         }
 #endif
         else if (!strcasecmp(name, "lang")) {
