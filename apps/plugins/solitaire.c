@@ -534,6 +534,7 @@ int solitaire_menu(bool in_game)
     struct menu_item items[4];
 
 #if LCD_DEPTH > 1
+    rb->lcd_set_background(LCD_DEFAULT_BG);
     rb->lcd_set_foreground(LCD_DEFAULT_FG);
 #endif
 
@@ -1050,7 +1051,6 @@ int solitaire( void )
         rb->lcd_clear_display();
 
 #if LCD_DEPTH > 1
-        rb->lcd_set_background(LCD_DEFAULT_BG);
         rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
