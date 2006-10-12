@@ -145,14 +145,18 @@ static void draw_screen(struct screen *display, char *title,
         background_color = display->get_background();
     }
 
-    /* Find out if there's enought room for three slider or just
-       enought to display the selected slider */
-    display_three_rows = display->height >= display->char_height*4 +
-                                            MARGIN_TOP +
-                                            TITLE_MARGIN_BOTTOM +
-                                            MARGIN_BOTTOM;
+    /* Find out if there's enough room for three sliders or just
+       enough to display the selected slider - calculate total height
+       of display with three sliders present */
+    display_three_rows =
+        display->height >= MARGIN_TOP             +
+                           display->char_height*4 + /* Title + 3 sliders */
+                           TITLE_MARGIN_BOTTOM    +
+                           SELECTOR_TB_MARGIN*6   + /* 2 margins/slider  */
+                           MARGIN_BOTTOM;
 
-    /* Figure out widest label character in case they vary */
+    /* Figure out widest label character in case they vary -
+       this function assumes labels are one character */
     for (i = 0, max_label_width = 0; i < 3; i++)
     {
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
@@ -232,7 +236,7 @@ static void draw_screen(struct screen *display, char *title,
  
         set_drawinfo(display, mode, fg, bg);
 
-        /* Draw label - assumes labels are one character */
+        /* Draw label */
         buf[0] = str(LANG_COLOR_RGB_LABELS)[i];
         buf[1] = '\0';
         display->putsxy(slider_left - display->char_width -
