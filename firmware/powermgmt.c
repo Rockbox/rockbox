@@ -170,9 +170,9 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
 #elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
     339
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
-    378
+    376
 #elif CONFIG_BATTERY == BATT_BP009 /* iriver H10 5/6GB */
-    378
+    372
 #else /* Player/recorder, NiMH */
     475
 #endif
@@ -196,10 +196,10 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
-    { 378, 382, 386, 390, 395, 399, 404, 408, 413, 417, 422 }
+    { 376, 380, 385, 387, 390, 395, 402, 407, 411, 418, 424 }
 #elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB: Same as 20GB for now */
-    { 378, 382, 386, 390, 395, 399, 404, 408, 413, 417, 422 }
+    /* iriver H10 5/6GB */
+    { 372, 374, 380, 382, 384, 388, 394, 402, 406, 415, 424 }
 #elif CONFIG_BATTERY == BATT_1AA
     /* These values are the same as for 3AAA divided by 3. */
     /* May need recalibration. */
@@ -224,10 +224,10 @@ static const short percent_to_volt_charge[11] =
      entering in trickle-charging). We will never reach 100%. */
     340, 390, 394, 399, 400, 404, 407, 413, 417, 422, 426
 #elif CONFIG_BATTERY == BATT_LPCS355385
-    /* iriver H10 20GB: Same as iPod for now */
-    388, 392, 396, 400, 406, 410, 415, 419, 424, 428, 433
+    /* iriver H10 20GB */
+    399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
 #elif CONFIG_BATTERY == BATT_BP009
-    /* iriver H10 5/6GB: Same as iPod for now */
+    /* iriver H10 5/6GB: Not yet calibrated */
     388, 392, 396, 400, 406, 410, 415, 419, 424, 428, 433
 #else
     /* values guessed, see
