@@ -224,6 +224,11 @@ void radio_start(void)
         radio_set(RADIO_IF_MEASUREMENT, 0);
         radio_set(RADIO_SENSITIVITY, 0);
         radio_set(RADIO_FORCE_MONO, global_settings.fm_force_mono);
+#if (CONFIG_TUNER & TEA5767)
+        radio_set(RADIO_SET_DEEMPHASIS, 
+            fm_region[global_settings.fm_region].deemphasis);
+        radio_set(RADIO_SET_BAND, fm_region[global_settings.fm_region].band);
+#endif
         mute_timeout = current_tick + 1*HZ;
     }
     else
@@ -1372,7 +1377,6 @@ static bool toggle_region_mode(void)
     radio_set(RADIO_FREQUENCY, curr_freq);
 
     remember_frequency();
-    settings_save();
     create_region_menu();
     return false;
 }
