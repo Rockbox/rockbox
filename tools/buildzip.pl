@@ -130,6 +130,8 @@ sub buildzip {
         mkdir ".rockbox/backdrops", 0777;
         mkdir ".rockbox/eqs", 0777;
 
+        `cp $ROOT/apps/eqs/*.cfg .rockbox/eqs/`; # equalizer presets
+
         my $c = 'find apps -name "*.codec" ! -empty -exec cp {} .rockbox/codecs/ \; 2>/dev/null';
         `$c`;
 
