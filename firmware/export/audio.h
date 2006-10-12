@@ -74,6 +74,7 @@ void audio_prev(void);
 int audio_status(void);
 bool audio_query_poweroff(void);
 int audio_track_count(void); /* SWCODEC only */
+long audio_filebufused(void); /* SWCODEC only */
 void audio_pre_ff_rewind(void); /* SWCODEC only */
 void audio_ff_rewind(long newtime);
 void audio_flush_and_reload_tracks(void);
