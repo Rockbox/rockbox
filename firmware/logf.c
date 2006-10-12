@@ -31,6 +31,7 @@
 #include "config.h"
 #include "lcd-remote.h"
 #include "logf.h"
+#include "serial.h"
 
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
@@ -90,6 +91,10 @@ void logf(const char *format, ...)
     }
     ptr = logfbuffer[logfindex];
     len = vsnprintf(ptr, MAX_LOGF_ENTRY, format, ap);
+#ifdef HAVE_SERIAL
+    serial_tx(ptr);
+    serial_tx("\r\n");
+#endif
     va_end(ap);
     if(len < MAX_LOGF_ENTRY)
         /* pad with spaces up to the MAX_LOGF_ENTRY byte border */

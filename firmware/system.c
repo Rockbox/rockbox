@@ -685,6 +685,13 @@ int system_memory_guard(int newmode)
 #define RECALC_DELAYS(f)
 #endif
 
+#ifdef HAVE_SERIAL
+#define BAUD_RATE 57600
+#define BAUDRATE_DIV_DEFAULT (CPUFREQ_DEFAULT/(BAUD_RATE*32*2))
+#define BAUDRATE_DIV_NORMAL (CPUFREQ_NORMAL/(BAUD_RATE*32*2))
+#define BAUDRATE_DIV_MAX (CPUFREQ_MAX/(BAUD_RATE*32*2))
+#endif
+
 void set_cpu_frequency (long) __attribute__ ((section (".icode")));
 void set_cpu_frequency(long frequency)
 {
@@ -710,6 +717,11 @@ void set_cpu_frequency(long frequency)
         IDECONFIG1 = 0x10100000 | (1 << 13) | (2 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (2 << 8); /* TA enable + CS2wait */
+
+#ifdef HAVE_SERIAL
+        UBG10 = BAUDRATE_DIV_MAX >> 8;
+        UBG20 = BAUDRATE_DIV_MAX & 0xff;
+#endif
         break;
 
     case CPUFREQ_NORMAL:
@@ -732,6 +744,11 @@ void set_cpu_frequency(long frequency)
         IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+
+#ifdef HAVE_SERIAL
+        UBG10 = BAUDRATE_DIV_NORMAL >> 8;
+        UBG20 = BAUDRATE_DIV_NORMAL & 0xff;
+#endif
         break;
     default:
         DCR = (DCR & ~0x01ff) | DEFAULT_REFRESH_TIMER;
@@ -750,6 +767,11 @@ void set_cpu_frequency(long frequency)
         IDECONFIG1 = 0x10100000 | (0 << 13) | (1 << 10);
         /* SRE active on write (H300 USBOTG) | BUFEN2 enable | CS2Post | CS2Pre */
         IDECONFIG2 = 0x40000 | (0 << 8); /* TA enable + CS2wait */
+
+#ifdef HAVE_SERIAL
+        UBG10 = BAUDRATE_DIV_DEFAULT >> 8;
+        UBG20 = BAUDRATE_DIV_DEFAULT & 0xff;
+#endif
         break;
     }
 }

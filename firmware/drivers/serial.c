@@ -143,7 +143,31 @@ int remote_control_rx(void)
 }
 
 #endif /* HAVE_MMC */
-#else /*  (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */
+#elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
+
+void serial_tx(const unsigned char *buf)
+{
+    while(*buf) {
+        while(!(USR0 & 0x04))
+        {
+        };
+        UTB0 = *buf++;
+    }
+}
+
+void serial_setup (void) 
+{
+    UCR0 = 0x30; /* Reset transmitter */
+    UCSR0 = 0xdd; /* Timer mode */
+
+    UCR0 = 0x10;  /* Reset pointer */
+    UMR0 = 0x13; /* No parity, 8 bits */
+    UMR0 = 0x07; /* 1 stop bit */
+
+    UCR0 = 0x04; /* Tx enable */
+}
+
+#else /* Other targets */
 void serial_setup (void) 
 {
     /* a dummy */

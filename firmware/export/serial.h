@@ -22,5 +22,6 @@
 
 extern void serial_setup (void);
 extern int remote_control_rx(void);
+extern void serial_tx(const unsigned char *buf);
 
 #endif

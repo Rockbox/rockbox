@@ -150,3 +150,6 @@
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
+
+/* Define this if you have a serial port */
+/*#define HAVE_SERIAL*/
