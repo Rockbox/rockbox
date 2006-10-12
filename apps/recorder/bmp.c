@@ -42,10 +42,6 @@
 #pragma pack (push, 2)
 #endif
 
-//#undef LCD_RGBPACK
-//#define LCD_RGBPACK(r, g, b) swap16(_RGBPACK((r), (g), (b)))
-
-
 /* Struct from original code. */
 struct Fileheader {
     unsigned short Type;        /* signature - 'BM' */
