@@ -23,6 +23,9 @@
 #include "backlight.h"
 #include "action.h"
 #include "lcd.h"
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
 #include "lang.h"
 #include "icons.h"
 #include "font.h"
@@ -51,9 +54,16 @@
 #include "statusbar.h"
 #include "screen_access.h"
 #include "quickscreen.h"
-#include "logo.h"
 #include "pcmbuf.h"
 #include "list.h"
+
+#ifdef HAVE_LCD_BITMAP
+#include <bitmaps/usblogo.h>
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+#include <bitmaps/remote_usblogo.h>
+#endif
 
 #if defined(HAVE_LCD_BITMAP)
 #include "widgets.h"
@@ -82,15 +92,33 @@ void usb_screen(void)
 #ifdef HAVE_LCD_COLOR
     show_main_backdrop();
 #endif
-    FOR_NB_SCREENS(i) {
+
+    FOR_NB_SCREENS(i)
         screens[i].backlight_on();
-        gui_logo_draw(&usb_logos[i], &screens[i]);
-    }
-#ifdef HAVE_LCD_CHARCELLS
+
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_clear_display();
+    lcd_remote_bitmap(remote_usblogo, 
+                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo)/2, 
+                      (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
+                      BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
+    lcd_remote_update();
+#endif
+
+#ifdef HAVE_LCD_BITMAP
+    lcd_clear_display();
+    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo)/2, 
+                        (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
+                        BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
+    lcd_update();
+#else
+    lcd_double_height(false);
+    lcd_puts_scroll(0, 0, "[USB Mode]");
     status_set_param(false);
     status_set_audio(false);
     status_set_usb(true);
 #endif /* HAVE_LCD_BITMAP */
+
     gui_syncstatusbar_draw(&statusbars, true);
 #ifdef SIMULATOR
     while (button_get(true) & BUTTON_REL);
