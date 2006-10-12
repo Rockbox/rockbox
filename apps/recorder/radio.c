@@ -1371,6 +1371,7 @@ static bool toggle_region_mode(void)
         curr_freq = fm_region[global_settings.fm_region].freq_max;
     radio_set(RADIO_FREQUENCY, curr_freq);
 
+    remember_frequency();
     settings_save();
     create_region_menu();
     return false;
