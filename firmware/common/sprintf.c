@@ -156,6 +156,10 @@ static int format(
     return ok; /* true means good */
 }
 
+#ifndef SIMULATOR
+/* ALSA library requires a more advanced snprintf, so let's not
+   override it in simulator */
+
 struct for_snprintf {
     unsigned char *ptr; /* where to store it */
     int bytes; /* amount already stored */
@@ -211,6 +215,8 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
     
     return pr.bytes;
 }
+
+#endif /* SIMULATOR */
 
 struct for_fprintf {
     int fd;    /* where to store it */
