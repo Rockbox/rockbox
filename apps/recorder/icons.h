@@ -63,7 +63,8 @@ enum icons_6x8 {
     Icon_Queued,
     Icon_Moving,
     Icon_Keyboard,
-    Icon6x8Last
+    Icon_Reverse_Cursor,
+    Icon6x8Last,
 };
 
 enum icons_7x8 {

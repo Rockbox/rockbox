@@ -31,6 +31,7 @@
 #include "lang.h"
 #include "splash.h"
 #include "action.h"
+#include "icons.h"
 
 /* structure for color info */
 struct rgb_pick
@@ -51,20 +52,31 @@ struct rgb_pick
     };
 };
 
-/* maximum values for components */
-static const unsigned char max_val[3] =
-{
-    LCD_MAX_RED,
-    LCD_MAX_GREEN,
-    LCD_MAX_BLUE
-};
 
 /* list of primary colors */
-static const unsigned prim_rgb[3] =
+#define SB_PRIM 0
+#define SB_FILL 1
+#define SB_MAX  2
+static const unsigned short prim_rgb[][3] =
 {
-    LCD_RGBPACK(255, 0, 0),
-    LCD_RGBPACK(0, 255, 0),
-    LCD_RGBPACK(0, 0 ,255),
+    /* Foreground colors for sliders */
+    {
+        LCD_RGBPACK(255,   0,   0),
+        LCD_RGBPACK(  0, 255,   0),
+        LCD_RGBPACK(  0,   0, 255),
+    },
+    /* Fill colors for sliders */
+    {
+        LCD_RGBPACK( 85,   0,   0),
+        LCD_RGBPACK(  0,  85,   0),
+        LCD_RGBPACK(  0,   0,  85),
+    },
+    /* maximum values for components */
+    {
+        LCD_MAX_RED,
+        LCD_MAX_GREEN,
+        LCD_MAX_BLUE
+    }
 };
 
 /* Unpacks the color value into native rgb values and 24 bit rgb values */
@@ -98,20 +110,22 @@ static void pack_rgb(struct rgb_pick *rgb)
    else return LCD_WHITE */
 static inline unsigned get_black_or_white(const struct rgb_pick *rgb)
 {
-    return (4*rgb->r + 5*rgb->g + 2*rgb->b) >= 256 ?
+    return (2*rgb->red + 5*rgb->green + rgb->blue) >= 1024 ?
         LCD_BLACK : LCD_WHITE;
 }
 
-#define MARGIN_LEFT             2 /* Left margin of screen                */
-#define MARGIN_TOP              4 /* Top margin of screen                 */
-#define MARGIN_RIGHT            2 /* Right margin of screen               */
-#define MARGIN_BOTTOM           4 /* Bottom margin of screen              */
+#define MARGIN_LEFT             0 /* Left margin of screen                */
+#define MARGIN_TOP              2 /* Top margin of screen                 */
+#define MARGIN_RIGHT            0 /* Right margin of screen               */
+#define MARGIN_BOTTOM           6 /* Bottom margin of screen              */
 #define SLIDER_MARGIN_LEFT      2 /* Gap to left of sliders               */
 #define SLIDER_MARGIN_RIGHT     2 /* Gap to right of sliders              */
 #define TITLE_MARGIN_BOTTOM     4 /* Space below title bar                */
-#define SELECTOR_LR_MARGIN      1 /* Margin between ">" and text          */
+#define SELECTOR_LR_MARGIN      0 /* Margin between ">" and text          */
 #define SELECTOR_TB_MARGIN      1 /* Margin on top and bottom of selector */
 #define SWATCH_TOP_MARGIN       4 /* Space between last slider and swatch */
+#define SELECTOR_WIDTH          6 /* Width of > and < bitmaps             */
+#define SELECTOR_HEIGHT         8 /* Height of > and < bitmaps            */
 
 /* dunno why lcd_set_drawinfo should be left out of struct screen */
 static void set_drawinfo(struct screen *display, int mode,
@@ -173,19 +187,21 @@ static void draw_screen(struct screen *display, char *title,
 
     /* Get slider positions and top starting position */
     text_top     = MARGIN_TOP + y + TITLE_MARGIN_BOTTOM + SELECTOR_TB_MARGIN;
-    slider_left  = MARGIN_LEFT + SELECTOR_LR_MARGIN + display->char_width +
+    slider_left  = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN +
                    max_label_width + SLIDER_MARGIN_LEFT;
     slider_width = display->width - slider_left - SLIDER_MARGIN_RIGHT -
-                   SELECTOR_LR_MARGIN - display->char_width*3 - MARGIN_RIGHT;
+                   display->char_width*2 - SELECTOR_LR_MARGIN - SELECTOR_WIDTH -
+                   MARGIN_RIGHT;
 
     for (i = 0; i < 3; i++)
     {
-        int      mode = DRMODE_SOLID;
-        unsigned fg   = text_color;
-        unsigned bg   = background_color;
+        unsigned sb_flags = HORIZONTAL;
+        int      mode     = DRMODE_SOLID;
+        unsigned fg       = text_color;
+        unsigned bg       = background_color;
 
         if (!display_three_rows)
-            i = row;        
+            i = row;
 
         if (i == row)
         {
@@ -201,39 +217,35 @@ static void draw_screen(struct screen *display, char *title,
                                   display->char_height +
                                   SELECTOR_TB_MARGIN*2);
 
-                if (display->depth == 1)
+                if (display->depth < 16)
                 {
-                    /* Just invert for low mono display */
-                    mode |= DRMODE_INVERSEVID;
-                }
-                else
-                {
-                    if (display->depth >= 16)
-                    {
-                        /* Backdrops will show through text in
-                           DRMODE_SOLID */
-                        mode = DRMODE_FG;
-                        fg = prim_rgb[i];
-                    }
-                    else
-                    {
-                        fg = background_color;
-                    }
-
-                    bg = text_color;
+                    sb_flags |= FOREGROUND | INNER_FILL;
+                    mode     |= DRMODE_INVERSEVID;
                 }
             }
             else if (display_three_rows)
             {
                 /* Draw ">    <" around sliders */
-                display->putsxy(MARGIN_LEFT,  text_top, ">");
-                display->putsxy(display->width-display->char_width -
-                                MARGIN_RIGHT, text_top, "<");
-                if (display->depth >= 16)
-                    fg = prim_rgb[i];
+                int top = text_top + (display->char_height -
+                                      SELECTOR_HEIGHT) / 2;
+                display->mono_bitmap(bitmap_icons_6x8[Icon_Cursor],
+                                     MARGIN_LEFT, top,
+                                     SELECTOR_WIDTH, SELECTOR_HEIGHT);
+                display->mono_bitmap(bitmap_icons_6x8[Icon_Reverse_Cursor],
+                                     display->width - MARGIN_RIGHT -
+                                     SELECTOR_WIDTH, top, SELECTOR_WIDTH,
+                                     SELECTOR_HEIGHT);
+            }
+
+            if (display->depth >= 16)
+            {
+                sb_flags |= FOREGROUND | INNER_BGFILL;
+                mode      = DRMODE_FG;
+                fg        = prim_rgb[SB_PRIM][i];
+                bg        = prim_rgb[SB_FILL][i];
             }
         }
- 
+
         set_drawinfo(display, mode, fg, bg);
 
         /* Draw label */
@@ -253,17 +265,20 @@ static void draw_screen(struct screen *display, char *title,
                            text_top + display->char_height / 4,
                            slider_width,
                            display->char_height / 2,
-                           max_val[i],
+                           prim_rgb[SB_MAX][i],
                            0,
                            rgb->rgb_val[i],
-                           HORIZONTAL);
+                           sb_flags);
 
         /* Advance to next line */
         text_top += display->char_height + 2*SELECTOR_TB_MARGIN;
 
         if (!display_three_rows)
             break;
-    }
+    } /* end for */
+
+    /* Draw color value in system font */
+    display->setfont(FONT_SYSFIXED);
 
     /* Format RGB: #rrggbb */
     snprintf(buf, sizeof(buf), str(LANG_COLOR_RGB_VALUE),
@@ -272,12 +287,11 @@ static void draw_screen(struct screen *display, char *title,
     if (display->depth >= 16)
     {
         /* Display color swatch on color screens only */
-        int left   = slider_left;
+        int left   = MARGIN_LEFT + SELECTOR_WIDTH + SELECTOR_LR_MARGIN;
         int top    = text_top + SWATCH_TOP_MARGIN;
-        int width  = display->width - slider_left - left;
+        int width  = display->width - left - SELECTOR_LR_MARGIN -
+                     SELECTOR_WIDTH - MARGIN_RIGHT;
         int height = display->height - top - MARGIN_BOTTOM;
-
-        display->setfont(FONT_SYSFIXED);
 
         /* Only draw if room */
         if (height >= display->char_height + 2)
@@ -298,10 +312,8 @@ static void draw_screen(struct screen *display, char *title,
 
             /* Draw border */
             display->set_foreground(text_color);
-            display->drawrect(left - 1, top - 1, width + 2, height + 2);
+            display->drawrect(left, top, width, height);
         }
-
-        display->setfont(FONT_UI);
     }
     else
     {
@@ -317,6 +329,8 @@ static void draw_screen(struct screen *display, char *title,
             display->putsxy(x, y, buf);
         }
     }
+
+    display->setfont(FONT_UI);
 
     display->update();
     /* Be sure screen mode is reset */
@@ -363,7 +377,7 @@ bool set_color(struct screen *display, char *title, int* color, int banned_color
 
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
-                if (rgb.rgb_val[slider] < max_val[slider])
+                if (rgb.rgb_val[slider] < prim_rgb[SB_MAX][slider])
                     rgb.rgb_val[slider]++;
                 pack_rgb(&rgb);
                 break;

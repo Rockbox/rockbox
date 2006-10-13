@@ -24,8 +24,15 @@
 #ifdef HAVE_LCD_BITMAP
 
 enum orientation {
-    VERTICAL,
-    HORIZONTAL
+    VERTICAL          = 0x0000,   /* Vertical orientation     */
+    HORIZONTAL        = 0x0001,   /* Horizontal orientation   */
+#ifdef HAVE_LCD_COLOR
+    FOREGROUND        = 0x0002,   /* Do not clear background pixels */
+    INNER_FILL        = 0x0004,   /* Fill inner part even if FOREGROUND */
+    INNER_BGFILL      = 0x0008,   /* Fill inner part with background
+                                     color even if FOREGROUND */
+    INNER_FILL_MASK   = 0x000c,
+#endif
 };
 
 /*
@@ -43,10 +50,10 @@ enum orientation {
 extern void gui_scrollbar_draw(struct screen * screen, int x, int y,
                                int width, int height, int items,
                                int min_shown, int max_shown,
-                               enum orientation orientation);
+                               unsigned flags);
 extern void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, int y,
                             int width, int height, int items,
                             int min_shown, int max_shown,
-                            enum orientation orientation);
+                            unsigned flags);
 #endif /* HAVE_LCD_BITMAP */
 #endif /* _GUI_SCROLLBAR_H_ */
