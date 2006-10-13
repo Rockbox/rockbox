@@ -190,10 +190,10 @@ void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap bm, int x, 
     if(max > items)
         max = items;
 
-    if (flags & VERTICAL)
-        inner_len = height;
-    else
+    if (flags & HORIZONTAL)
         inner_len = width;
+    else
+        inner_len = height;
 
     /* avoid overflows */
     while (items > (INT_MAX / inner_len)) {
