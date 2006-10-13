@@ -2984,10 +2984,10 @@ static void audio_stop_playback(void)
             (playlist_end && ci.stop_codec)?NULL:audio_current_track());
     }
 
-    playing = false;
     filling = false;
     paused = false;
     audio_stop_codec_flush();
+    playing = false;
     
     if (current_fd >= 0) 
     {
