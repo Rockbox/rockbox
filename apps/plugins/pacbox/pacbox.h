@@ -89,10 +89,18 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
+#if defined(IRIVER_H10_5GB)
+#define PACMAN_UP      BUTTON_SCROLL_UP
+#define PACMAN_DOWN    BUTTON_SCROLL_DOWN
+#define PACMAN_LEFT    BUTTON_LEFT
+#define PACMAN_RIGHT   BUTTON_RIGHT
+#else
 #define PACMAN_UP      BUTTON_RIGHT
 #define PACMAN_DOWN    BUTTON_LEFT
 #define PACMAN_LEFT    BUTTON_SCROLL_UP
 #define PACMAN_RIGHT   BUTTON_SCROLL_DOWN
+#endif
+
 #define PACMAN_1UP     BUTTON_REW
 #define PACMAN_2UP     BUTTON_POWER
 #define PACMAN_COIN    BUTTON_FF
@@ -112,6 +120,9 @@
 #elif (LCD_WIDTH >= 144)
 #define XOFS ((LCD_WIDTH-288/2)/2)
 #define YOFS ((LCD_HEIGHT-224/2)/2)
+#elif (LCD_WIDTH >= 128)
+#define XOFS ((LCD_WIDTH-224/2)/2)
+#define YCLIP ((288-2*LCD_HEIGHT)/2)
 #endif
 
 /* How many video frames (out of a possible 60) we display each second.

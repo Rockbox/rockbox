@@ -86,6 +86,23 @@ void blit_display(fb_data* lcd_framebuffer, unsigned char* vbuf)
             }
             vbuf+=ScreenWidth;
         }
+#elif (LCD_WIDTH >= 128) && (LCD_HEIGHT >= 128)
+        /* 0.5 scaling - display every other pixel = 112x144, crop to 112x128 */
+        (void)next_dst;
+        dst=&lcd_framebuffer[XOFS];
+        
+        /* Skip first 16 lines */
+        vbuf+=ScreenWidth*YCLIP;
+        
+        /* Show regular screen */
+        for (y=0;y<(ScreenHeight/2-YCLIP);y++) {
+            for (x=0;x<ScreenWidth/2;x++) {
+                *(dst++) = palette[*(vbuf)];
+                vbuf+=2;
+            }
+            dst += XOFS*2;
+            vbuf+=ScreenWidth;
+        }
 #endif
 #else  /* Greyscale LCDs */
 #if (LCD_WIDTH >= 144) && (LCD_HEIGHT >= 112)
