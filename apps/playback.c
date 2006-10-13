@@ -197,7 +197,7 @@ static volatile size_t buf_ridx IDATA_ATTR;
 static volatile size_t buf_widx IDATA_ATTR;
 
 /* Ring buffer arithmetic */
-#define RINGBUF_ADD(p,v) ((p+v)<=filebuflen ? p+v : p+v-filebuflen)
+#define RINGBUF_ADD(p,v) ((p+v)<filebuflen ? p+v : p+v-filebuflen)
 #define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+filebuflen-v)
 
 /* Bytes available in the buffer. */
@@ -1253,10 +1253,7 @@ static void codec_set_offset_callback(size_t value)
 
 static void codec_advance_buffer_counters(size_t amount) 
 {
-    buf_ridx += amount;
-    
-    if (buf_ridx >= filebuflen)
-        buf_ridx -= filebuflen;
+    buf_ridx = RINGBUF_ADD(buf_ridx, amount);
     
     ci.curpos += amount;
     CUR_TI->available -= amount;
@@ -1565,9 +1562,7 @@ static bool codec_seek_buffer_callback(size_t newpos)
     /* Seeking inside buffer space. */
     logf("seek: -%d", difference);
     CUR_TI->available += difference;
-    if (buf_ridx < (unsigned)difference)
-        buf_ridx += filebuflen;
-    buf_ridx -= difference;
+    buf_ridx = RINGBUF_SUB(buf_ridx, (unsigned)difference);
     ci.curpos -= difference;
 
     return true;
@@ -1613,9 +1608,7 @@ static void codec_discard_codec_callback(void)
     if (CUR_TI->has_codec) 
     {
         CUR_TI->has_codec = false;
-        buf_ridx += CUR_TI->codecsize;
-        if (buf_ridx >= filebuflen)
-            buf_ridx -= filebuflen;
+        buf_ridx = RINGBUF_ADD(buf_ridx, CUR_TI->codecsize);
     }
 
 #if 0
@@ -1982,12 +1975,8 @@ static bool audio_buffer_wind_forward(int new_track_ridx, int old_track_ridx)
     logf("bwf:%ldB",amount);
 
     /* Wind the buffer to the beginning of the target track or its codec */
-    buf_ridx += amount;
+    buf_ridx = RINGBUF_ADD(buf_ridx, amount);
     
-    /* Check and handle buffer wrapping */
-    if (buf_ridx >= filebuflen)
-        buf_ridx -= filebuflen;
-
     return true;
 }
 
@@ -1998,11 +1987,8 @@ static bool audio_buffer_wind_backward(int new_track_ridx, int old_track_ridx)
     /* Start with the previously playing track's data and our data */
     size_t amount;
     
-    buf_back = buf_ridx;
     amount = ci.curpos;
-    if (buf_ridx < buf_widx)
-        buf_back += filebuflen;
-    buf_back -= buf_widx;
+    buf_back = RINGBUF_SUB(buf_ridx, buf_widx);
     
     /* If we're not just resetting the current track */
     if (new_track_ridx != old_track_ridx)
@@ -2033,11 +2019,8 @@ static bool audio_buffer_wind_backward(int new_track_ridx, int old_track_ridx)
 
     logf("bwb:%ldB",amount);
 
-    /* Check and handle buffer wrapping */
-    if (amount > buf_ridx)
-        buf_ridx += filebuflen;
     /* Rewind the buffer to the beginning of the target track or its codec */
-    buf_ridx -= amount;
+    buf_ridx = RINGBUF_SUB(buf_ridx, amount);
 
     /* Reset to the beginning of the new track */
     tracks[new_track_ridx].available = tracks[new_track_ridx].filesize;
@@ -2140,10 +2123,7 @@ static void audio_strip_id3v1_tag(void)
     size_t tag_idx;
     size_t cur_idx;
 
-    tag_idx = buf_widx;
-    if (tag_idx < 128)
-        tag_idx += filebuflen;
-    tag_idx -= 128;
+    tag_idx = RINGBUF_SUB(buf_widx, 128);
 
     if (FILEBUFUSED > 128 && tag_idx > buf_ridx)
     {
@@ -2153,8 +2133,7 @@ static void audio_strip_id3v1_tag(void)
             if(filebuf[cur_idx] != tag[i])
                 return;
 
-            if(++cur_idx >= filebuflen)
-                cur_idx -= filebuflen;
+            cur_idx = RINGBUF_ADD(cur_idx, 1);
         }
 
         /* Skip id3v1 tag */
@@ -2203,17 +2182,15 @@ static void audio_read_file(bool quick)
             break ;
         }
 
-        buf_widx += rc;
+        overlap = buf_widx + rc - CUR_TI->buf_idx;
+        buf_widx = RINGBUF_ADD(buf_widx, rc);
 
-        overlap = buf_widx - tracks[track_ridx].buf_idx;
-        if (buf_widx >= filebuflen)
-            buf_widx -= filebuflen;
         if (overlap > 0 && (unsigned) overlap >= filebuflen)
             overlap -= filebuflen;
 
-        if (overlap > 0 && overlap <= rc && tracks[track_ridx].available != 0) {
-            tracks[track_ridx].buf_idx = buf_widx;
-            tracks[track_ridx].start_pos += overlap;
+        if (overlap > 0 && overlap <= rc && CUR_TI->available != 0) {
+            CUR_TI->buf_idx = buf_widx;
+            CUR_TI->start_pos += overlap;
         }
         
         tracks[track_widx].available += rc;
@@ -2323,16 +2300,17 @@ static bool audio_loadcodec(bool start_play)
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
         rc = read(fd, &filebuf[buf_widx], copy_n);
         if (rc < 0)
+        {
+            close(fd);
             return false;
+        }
         
         if (fill_bytesleft > (unsigned)rc)
             fill_bytesleft -= rc;
         else
             fill_bytesleft = 0;
 
-        buf_widx += rc;
-        if (buf_widx >= filebuflen)
-            buf_widx -= filebuflen;
+        buf_widx = RINGBUF_ADD(buf_widx, rc);
 
         tracks[track_widx].codecsize += rc;       
     }
@@ -2500,9 +2478,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
             /* Must undo the buffer write of the partial codec */
             logf("Partial codec loaded");
             fill_bytesleft += tracks[track_widx].codecsize;
-            if (buf_widx < tracks[track_widx].codecsize)
-                buf_widx += filebuflen;
-            buf_widx -= tracks[track_widx].codecsize;
+            buf_widx = RINGBUF_SUB(buf_widx, tracks[track_widx].codecsize);
             tracks[track_widx].codecsize = 0;
         }
 
@@ -2758,7 +2734,7 @@ static void audio_rebuffer(void)
     filling = false;
 
     /* Reset buffer and track pointers */
-    tracks[track_ridx].buf_idx = buf_ridx = buf_widx = 0;
+    CUR_TI->buf_idx = buf_ridx = buf_widx = 0;
     track_widx = track_ridx;
     audio_clear_track_entries(true, true, false);
     CUR_TI->available = 0;
@@ -2949,12 +2925,12 @@ static void audio_rebuffer_and_seek(size_t newpos)
     filling = true;
 
     if (newpos > conf_preseek) {
-        buf_ridx += conf_preseek;
+        buf_ridx = RINGBUF_ADD(buf_ridx, conf_preseek);
         CUR_TI->start_pos = newpos - conf_preseek;
     } 
     else 
     {
-        buf_ridx += newpos;
+        buf_ridx = RINGBUF_ADD(buf_ridx, newpos);
         CUR_TI->start_pos = 0;
     }
 
@@ -3075,9 +3051,7 @@ void audio_invalidate_tracks(void)
             track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
         /* Mark all other entries null (also buffered wrong metadata). */
-        buf_widx = buf_ridx + CUR_TI->available;
-        if (buf_widx >= filebuflen)
-            buf_widx -= filebuflen;
+        buf_widx = RINGBUF_ADD(buf_ridx, CUR_TI->available);
 
         audio_read_next_metadata();
     }
@@ -3104,9 +3078,7 @@ static void audio_new_playlist(void)
         CUR_TI->taginfo_ready = false;
 
         /* Invalidate the buffer other than the playing track */
-        buf_widx = buf_ridx + CUR_TI->available;
-        if (buf_widx >= filebuflen)
-            buf_widx -= filebuflen;
+        buf_widx = RINGBUF_ADD(buf_ridx, CUR_TI->available);
     }
     
     /* Signal the codec to initiate a track change forward */
