@@ -39,7 +39,7 @@
 
 #endif
 
-static void splash(struct screen * screen,  bool center,  
+static void splash(struct screen * screen,  bool center,
                    const char *fmt, va_list ap)
 {
     char splash_buf[MAXBUFFER];
@@ -56,7 +56,6 @@ static void splash(struct screen * screen,  bool center,
 #ifdef HAVE_LCD_BITMAP
     int maxw = 0;
 #if LCD_DEPTH > 1
-    unsigned prevbg = 0;
     unsigned prevfg = 0;
 #endif
 
@@ -64,7 +63,7 @@ static void splash(struct screen * screen,  bool center,
 #else /* HAVE_LCD_CHARCELLS */
 
     space_w = h = 1;
-    screen->double_height (false); 
+    screen->double_height (false);
 #endif
     y = h;
 
@@ -76,7 +75,7 @@ static void splash(struct screen * screen,  bool center,
     next = strtok_r(splash_buf, " ", &store);
     if (!next)
         return;  /* nothing to display */
-        
+
     lines[0] = next;
     while (true)
     {
@@ -132,18 +131,27 @@ static void splash(struct screen * screen,  bool center,
     {
         y = (screen->height - y) / 2;  /* height => y start position */
         x = (screen->width - maxw) / 2 - 2;
+
 #if LCD_DEPTH > 1
         if (screen->depth > 1)
         {
-            prevbg = screen->get_background();
             prevfg = screen->get_foreground();
-            screen->set_background(LCD_LIGHTGRAY);
-            screen->set_foreground(LCD_BLACK);
+            screen->set_drawmode(DRMODE_FG);
+            screen->set_foreground(LCD_LIGHTGRAY);
         }
+        else
 #endif
-        screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            screen->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+
         screen->fillrect(x, y-2, maxw+4, screen->height-y*2+4);
-        screen->set_drawmode(DRMODE_SOLID);
+
+#if LCD_DEPTH > 1
+        if (screen->depth > 1)
+            screen->set_foreground(LCD_BLACK);
+        else
+#endif
+            screen->set_drawmode(DRMODE_SOLID);
+
         screen->drawrect(x, y-2, maxw+4, screen->height-y*2+4);
     }
     else
@@ -174,10 +182,10 @@ static void splash(struct screen * screen,  bool center,
     }
 
 #if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH > 1)
-    if (center && (screen->depth > 1))
+    if (center && screen->depth > 1)
     {
-        screen->set_background(prevbg);
         screen->set_foreground(prevfg);
+        screen->set_drawmode(DRMODE_SOLID);
     }
 #endif
 #if defined(HAVE_LCD_BITMAP) || defined(SIMULATOR)
