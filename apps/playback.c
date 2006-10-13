@@ -17,19 +17,14 @@
  *
  ****************************************************************************/
 
-/* TODO: Check for a possibly broken codepath on a rapid skip, stop event */
-/* TODO: same in reverse ^^ */
-/* TODO: Also play, stop ^^ */
 /* TODO: Can use the track changed callback to detect end of track and seek
  * in the previous track until this happens */
-/* TODO: Pause should be handled in here, rather than PCMBUF so that voice can
- * play whilst audio is paused */
 /* Design: we have prev_ti already, have a conditional for what type of seek
  * to do on a seek request, if it is a previous track seek, skip previous,
  * and in the request_next_track callback set the offset up the same way that
  * starting from an offset works. */
-/* This is also necesary to prevent the problem with buffer overwriting on
- * automatic track changes */
+/* TODO: Pause should be handled in here, rather than PCMBUF so that voice can
+ * play whilst audio is paused */
 
 #include <stdio.h>
 #include <string.h>

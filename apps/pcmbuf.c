@@ -38,7 +38,7 @@
 #include "thread.h"
 
 /* Keep watermark high for iPods at least (2s) */
-#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 8)
+#define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
 
 /* Structure we can use to queue pcm chunks in memory to be played
  * by the driver code. */
@@ -203,6 +203,13 @@ process_new_buffer:
             *realsize = 0;
             *realstart = NULL;
             CALL_IF_EXISTS(pcmbuf_event_handler);
+            /* FIXME: We need to find another way to keep the CPU from
+             * being left boosted, because this is boosting in interrupt
+             * context.  This is also not a good thing, because it will
+             * result in the CPU being deboosted if there is a legitimate
+             * buffer underrun (albeit only temporarily, because someone
+             * will reboost it soon, but it will make the skip longer
+             * than necessary. */
             pcmbuf_boost(false);
         }
     }
