@@ -60,9 +60,18 @@ typedef void lcd_remote_pixelfunc_type(int x, int y);
 typedef void lcd_remote_blockfunc_type(fb_remote_data *address, unsigned mask,
                                        unsigned bits);
 
-#if LCD_REMOTE_DEPTH > 1 /* greyscale */
+#if LCD_REMOTE_DEPTH > 1 /* greyscale - 8 bit max */
+#ifdef HAVE_LCD_COLOR
+extern unsigned lcd_remote_color_to_native(unsigned color);
+#endif
+
 #define LCD_REMOTE_MAX_LEVEL ((1 << LCD_REMOTE_DEPTH) - 1)
-#define LCD_REMOTE_BRIGHTNESS(y) (((y) * LCD_REMOTE_MAX_LEVEL + 127) / 255)
+/**
+ * On 2 bit for example (y >> (8-DEPTH)) = (y >> 6) = y/64 gives:
+ *  |000-063|064-127|128-191|192-255|
+ *  |   0   |   1   |   2   |   3   |
+ */
+#define LCD_REMOTE_BRIGHTNESS(y) ((y) >> (8-LCD_REMOTE_DEPTH))
 
 #define LCD_REMOTE_BLACK      LCD_REMOTE_BRIGHTNESS(0)
 #define LCD_REMOTE_DARKGRAY   LCD_REMOTE_BRIGHTNESS(85)
@@ -70,7 +79,6 @@ typedef void lcd_remote_blockfunc_type(fb_remote_data *address, unsigned mask,
 #define LCD_REMOTE_WHITE      LCD_REMOTE_BRIGHTNESS(255)
 #define LCD_REMOTE_DEFAULT_FG LCD_REMOTE_BLACK
 #define LCD_REMOTE_DEFAULT_BG LCD_REMOTE_WHITE
-
 #endif
 
 /* Memory copy of display bitmap */
@@ -91,7 +99,7 @@ extern void lcd_remote_clear_display(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
 extern void lcd_remote_puts_style(int x, int y, const unsigned char *str,
                                   int style);
-extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str, 
+extern void lcd_remote_puts_offset(int x, int y, const unsigned char *str,
                                    int offset);
 extern void lcd_remote_puts_style_offset(int x, int y, const unsigned char *str,
                                          int style, int offset);

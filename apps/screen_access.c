@@ -52,9 +52,12 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->getstringsize=&lcd_remote_getstringsize;
             screen->putsxy=&lcd_remote_putsxy;
             screen->mono_bitmap=&lcd_remote_mono_bitmap;
-            screen->mono_bitmap_part=&lcd_remote_mono_bitmap_part;            
+            screen->mono_bitmap_part=&lcd_remote_mono_bitmap_part;
             screen->set_drawmode=&lcd_remote_set_drawmode;
 #if LCD_REMOTE_DEPTH > 1
+#if defined(HAVE_LCD_COLOR)
+            screen->color_to_native=&lcd_remote_color_to_native;
+#endif
             screen->get_background=&lcd_remote_get_background;
             screen->get_foreground=&lcd_remote_get_foreground;
             screen->set_background=&lcd_remote_set_background;
@@ -126,9 +129,9 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->mono_bitmap=&lcd_mono_bitmap;
             screen->mono_bitmap_part=&lcd_mono_bitmap_part;
             screen->set_drawmode=&lcd_set_drawmode;
-#if LCD_DEPTH > 1   
+#if LCD_DEPTH > 1
             screen->bitmap=&lcd_bitmap;
-            screen->bitmap_part=&lcd_bitmap_part;            
+            screen->bitmap_part=&lcd_bitmap_part;
 #if LCD_DEPTH == 2
             /* No transparency yet for grayscale lcd */
             screen->transparent_bitmap=&lcd_bitmap;
@@ -136,6 +139,9 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
 #else
             screen->transparent_bitmap=&lcd_bitmap_transparent;
             screen->transparent_bitmap_part=&lcd_bitmap_transparent_part;
+#endif
+#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+            screen->color_to_native=&lcd_color_to_native;
 #endif
             screen->get_background=&lcd_get_background;
             screen->get_foreground=&lcd_get_foreground;
@@ -149,8 +155,8 @@ void screen_init(struct screen * screen, enum screen_type screen_type)
             screen->drawline=&lcd_drawline;
             screen->vline=&lcd_vline;
             screen->hline=&lcd_hline;
-            screen->scroll_speed=&lcd_scroll_speed; 	 
-            screen->scroll_delay=&lcd_scroll_delay;            
+            screen->scroll_speed=&lcd_scroll_speed;
+            screen->scroll_delay=&lcd_scroll_delay;
             screen->scroll_step=&lcd_scroll_step;
             screen->invertscroll=&lcd_invertscroll;
             screen->puts_offset=&lcd_puts_offset;

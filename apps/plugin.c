@@ -220,7 +220,7 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_scroll_left,
 #endif
     gui_synclist_do_button,
-    
+
     /* button */
     button_get,
     button_get_w_tmo,
@@ -413,7 +413,7 @@ static const struct plugin_api rockbox_api = {
     get_action,
     action_signalscreenchange,
     action_userabort,
-    
+
     /* power */
     battery_level,
     battery_level_safe,
@@ -466,7 +466,7 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
+
     strtok_r,
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,
@@ -608,7 +608,7 @@ int plugin_load(const char* plugin, void* parameter)
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1
-    lcd_remote_set_drawinfo(DRMODE_SOLID, LCD_REMOTE_DEFAULT_FG, 
+    lcd_remote_set_drawinfo(DRMODE_SOLID, LCD_REMOTE_DEFAULT_FG,
                             LCD_REMOTE_DEFAULT_BG);
 #else
     lcd_remote_set_drawmode(DRMODE_SOLID);

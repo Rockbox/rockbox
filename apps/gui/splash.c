@@ -137,7 +137,8 @@ static void splash(struct screen * screen,  bool center,
         {
             prevfg = screen->get_foreground();
             screen->set_drawmode(DRMODE_FG);
-            screen->set_foreground(LCD_LIGHTGRAY);
+            screen->set_foreground(
+                SCREEN_COLOR_TO_NATIVE(screen, LCD_LIGHTGRAY));
         }
         else
 #endif
@@ -147,7 +148,8 @@ static void splash(struct screen * screen,  bool center,
 
 #if LCD_DEPTH > 1
         if (screen->depth > 1)
-            screen->set_foreground(LCD_BLACK);
+            screen->set_foreground(
+                SCREEN_COLOR_TO_NATIVE(screen, LCD_BLACK));
         else
 #endif
             screen->set_drawmode(DRMODE_SOLID);

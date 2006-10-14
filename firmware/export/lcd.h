@@ -151,6 +151,15 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
 
 #ifdef HAVE_LCD_BITMAP
 
+#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+/* Just return color for screens use */
+static inline unsigned lcd_color_to_native(unsigned color)
+    { return color; }
+#define SCREEN_COLOR_TO_NATIVE(screen, color) (screen)->color_to_native(color)
+#else
+#define SCREEN_COLOR_TO_NATIVE(screen, color) (color)
+#endif
+
 #ifdef HAVE_LCD_COLOR
 #if LCD_DEPTH == 16
 #define LCD_MAX_RED    31
@@ -169,12 +178,12 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
                               |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
 #define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(swap16(x))
 #define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(swap16(x))
-#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(swap16(x)) 
+#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(swap16(x))
 #else
 #define LCD_RGBPACK(r, g, b) _RGBPACK((r), (g), (b))
 #define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(x)
 #define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(x)
-#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(x) 
+#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(x)
 #endif
 #elif LCD_DEPTH == 18
 #define LCD_MAX_RED    63
@@ -185,7 +194,7 @@ typedef void lcd_fastpixelfunc_type(fb_data *address);
                               | (((b) * (63*257) + (127*257)) >> 16))
 #else
 /* other colour depths */
-#endif 
+#endif
 
 #define LCD_BLACK      LCD_RGBPACK(0, 0, 0)
 #define LCD_DARKGRAY   LCD_RGBPACK(85, 85, 85)
@@ -220,7 +229,7 @@ extern fb_data lcd_framebuffer[LCD_HEIGHT/4][LCD_WIDTH];
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
 #elif LCD_DEPTH == 18
 extern fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH];
-#endif       
+#endif
 
 #ifndef LCD_FBWIDTH
 #define LCD_FBWIDTH LCD_WIDTH
@@ -273,12 +282,12 @@ extern void lcd_setfont(int font);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
 extern void lcd_puts_offset(int x, int y, const unsigned char *str, int offset);
-extern void lcd_puts_style_offset(int x, int y, const unsigned char *str, 
+extern void lcd_puts_style_offset(int x, int y, const unsigned char *str,
                                   int style, int offset);
 extern void lcd_puts_scroll_offset(int x, int y, const unsigned char *string,
                                   int offset);
 extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
-                                  int style, int offset);                                  
+                                  int style, int offset);
 
 /* low level drawing function pointer arrays */
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
@@ -333,7 +342,7 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 #endif /* HAVE_LCD_BITMAP */
 
 /* internal usage, but in multiple drivers */
-#ifdef HAVE_LCD_BITMAP 
+#ifdef HAVE_LCD_BITMAP
 #define SCROLL_SPACING 3
 
 struct scrollinfo {

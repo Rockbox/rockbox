@@ -147,7 +147,7 @@ static inline void _write_byte(unsigned data)
         "move.l  (%[gpo1]), %%d0     \n"  /* Get current state of data line */
         "and.l   %[dbit], %%d0       \n"
         "beq.s   1f                  \n"  /*   and set it as previous-state bit */
-        "bset    #8, %[data]         \n"  
+        "bset    #8, %[data]         \n"
     "1:                              \n"
         "move.l  %[data], %%d0       \n"  /* Compute the 'bit derivative', i.e. a value */
         "lsr.l   #1, %%d0            \n"  /*   with 1's where the data changes from the */
@@ -241,10 +241,10 @@ static inline void _write_fast(unsigned data)
         "eor.l   %%d1, %[data]       \n"  /*   previous state, and 0's where it doesn't */
         "swap    %[data]             \n"  /* Shift data to upper byte */
         "lsl.l   #8, %[data]         \n"
-        
+
         "move.l  (%[gpo0]), %%d1     \n"  /* Get current state of clock port */
         "move.l  %[cbit], %%d2       \n"  /* Precalculate opposite state of clock line */
-        "eor.l   %%d1, %%d2          \n"  
+        "eor.l   %%d1, %%d2          \n"
 
         "lsl.l   #1,%[data]          \n"  /* Shift out MSB */
         "bcc.s   1f                  \n"
@@ -466,17 +466,17 @@ static void remote_lcd_init(void)
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x6);
     sleep(1);
     lcd_remote_write_command(LCD_REMOTE_CNTL_POWER_CONTROL | 0x7);
-    
+
     lcd_remote_write_command(LCD_REMOTE_CNTL_SELECT_REGULATOR | 0x4); // 0x4 Select regulator @ 5.0 (default);
-    
+
     sleep(1);
-    
+
     lcd_remote_write_command(LCD_REMOTE_CNTL_INIT_LINE | 0x0); // init line
     lcd_remote_write_command(LCD_REMOTE_CNTL_SET_PAGE_ADDRESS | 0x0); // page address
     lcd_remote_write_command_ex(0x10, 0x00); // Column MSB + LSB
 
     lcd_remote_write_command(LCD_REMOTE_CNTL_DISPLAY_ON_OFF | 1);
-    
+
     remote_initialized = true;
 
     lcd_remote_set_flip(cached_flip);
@@ -511,7 +511,7 @@ static void remote_tick(void)
         /* Count down until it gets negative */
         if (countdown >= 0)
             countdown--;
-            
+
         if (current_status)
         {
             if (!(countdown % 8))
@@ -520,7 +520,7 @@ static void remote_tick(void)
                 level = set_irq_level(HIGHEST_IRQ_LEVEL);
                 val = adc_scan(ADC_REMOTEDETECT);
                 set_irq_level(level);
-                
+
                 if (val < ADCVAL_H100_LCD_REMOTE_HOLD)
                 {
                     if (val < ADCVAL_H100_LCD_REMOTE)
@@ -581,7 +581,7 @@ void lcd_remote_init(void)
 #ifdef IRIVER_H300_SERIES
     or_l(0x10010000, &GPIO_FUNCTION); /* GPIO16: RS
                                          GPIO28: CLK */
-    
+
     or_l(0x00040006, &GPIO1_FUNCTION); /* GPO33:  Backlight
                                           GPIO34: CS
                                           GPIO50: Data */
@@ -591,7 +591,7 @@ void lcd_remote_init(void)
     or_l(0x10010800, &GPIO_FUNCTION); /* GPIO11: Backlight
                                          GPIO16: RS
                                          GPIO28: CLK */
-    
+
     or_l(0x00040004, &GPIO1_FUNCTION); /* GPIO34: CS
                                           GPIO50: Data */
     or_l(0x10010800, &GPIO_ENABLE);
@@ -614,10 +614,10 @@ void lcd_remote_update(void) ICODE_ATTR;
 void lcd_remote_update(void)
 {
     int y;
-    
+
     if (!remote_initialized)
         return;
-      
+
 #ifdef HAVE_REMOTE_LCD_TICKING
     /* Adjust byte delay for emi reduction. */
     byte_delay = emireduce ? cpu_frequency / 197600 + 28: 0;
@@ -735,7 +735,7 @@ lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
-                               
+
 static void flipblock(fb_remote_data *address, unsigned mask, unsigned bits)
                       ICODE_ATTR;
 static void flipblock(fb_remote_data *address, unsigned mask, unsigned bits)
@@ -762,7 +762,7 @@ static void solidblock(fb_remote_data *address, unsigned mask, unsigned bits)
 static void solidblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
-    
+
     bits    ^= data;
     *address = data ^ (bits & mask);
 }
@@ -793,7 +793,7 @@ static void solidinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 static void solidinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
-    
+
     bits     = ~bits ^ data;
     *address = data ^ (bits & mask);
 }
@@ -907,18 +907,18 @@ void lcd_remote_hline(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /* nothing to draw? */
-    if (((unsigned)y >= LCD_REMOTE_HEIGHT) || (x1 >= LCD_REMOTE_WIDTH) 
+    if (((unsigned)y >= LCD_REMOTE_HEIGHT) || (x1 >= LCD_REMOTE_WIDTH)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
     if (x2 >= LCD_REMOTE_WIDTH)
         x2 = LCD_REMOTE_WIDTH-1;
-        
+
     bfunc = lcd_remote_blockfuncs[drawmode];
     dst   = &lcd_remote_framebuffer[y>>3][x1];
     mask  = 1 << (y & 7);
@@ -946,16 +946,16 @@ void lcd_remote_vline(int x, int y1, int y2)
     }
 
     /* nothing to draw? */
-    if (((unsigned)x >= LCD_REMOTE_WIDTH) || (y1 >= LCD_REMOTE_HEIGHT) 
+    if (((unsigned)x >= LCD_REMOTE_WIDTH) || (y1 >= LCD_REMOTE_HEIGHT)
         || (y2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
     if (y2 >= LCD_REMOTE_HEIGHT)
         y2 = LCD_REMOTE_HEIGHT-1;
-        
+
     bfunc = lcd_remote_blockfuncs[drawmode];
     dst   = &lcd_remote_framebuffer[y1>>3][x];
     ny    = y2 - (y1 & ~7);
@@ -998,7 +998,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     bool fillopt = false;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH)
         || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
 
@@ -1017,7 +1017,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
         width = LCD_REMOTE_WIDTH - x;
     if (y + height > LCD_REMOTE_HEIGHT)
         height = LCD_REMOTE_HEIGHT - y;
-    
+
     if (drawmode & DRMODE_INVERSEVID)
     {
         if (drawmode & DRMODE_BG)
@@ -1093,10 +1093,10 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
     lcd_remote_blockfunc_type *bfunc;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH)
         || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -1170,7 +1170,7 @@ void lcd_remote_bitmap_part(const unsigned char *src, int src_x, int src_y,
             fb_remote_data *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
-            
+
             for (y = ny; y >= 8; y -= 8)
             {
                 data |= *src_col << shift;
@@ -1228,7 +1228,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
 
         lcd_remote_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
                                pf->height);
-        
+
         x += width - ofs;
         ofs = 0;
     }
@@ -1336,8 +1336,8 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
 void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
 {
      lcd_remote_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
-}          
-   
+}
+
 void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
                                          int style, int offset)
 {
@@ -1428,7 +1428,7 @@ static void scroll_thread(void)
                 remote_lcd_init();
                 lcd_remote_update();
                 break;
-                
+
             case REMOTE_DEINIT_LCD:
                 CLK_LO;
                 CS_HI;

@@ -41,7 +41,7 @@
 
 fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_FBWIDTH]
                                       IBSS_ATTR;
-                                      
+
 static const fb_data patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 
 static unsigned fg_pattern IDATA_ATTR = 0xFFFF; /* initially black */
@@ -76,6 +76,18 @@ static struct event_queue remote_scroll_queue;
 #endif
 
 /*** parameter handling ***/
+unsigned lcd_remote_color_to_native(unsigned color)
+{
+    unsigned r = (color & 0xf800) >> 10;
+    unsigned g = (color & 0x07e0) >> 5;
+    unsigned b = (color & 0x001f) << 2;
+    /*
+     *                                     |R|
+     * |Y'| = |0.299000 0.587000 0.114000| |G|
+     *                                     |B|
+     */
+    return (5*r + 9*g + b) >> 8;
+}
 
 void lcd_remote_set_drawmode(int mode)
 {
@@ -261,7 +273,7 @@ lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8] = {
 static inline void setblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
     unsigned data = *address;
-    
+
     bits    ^= data;
     *address = data ^ (bits & mask);
 }
@@ -370,12 +382,12 @@ void lcd_remote_hline(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /* nothing to draw? */
-    if (((unsigned)y >= LCD_REMOTE_HEIGHT) || (x1 >= LCD_REMOTE_WIDTH) 
+    if (((unsigned)y >= LCD_REMOTE_HEIGHT) || (x1 >= LCD_REMOTE_WIDTH)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
@@ -385,7 +397,7 @@ void lcd_remote_hline(int x1, int x2, int y)
     bfunc = lcd_remote_blockfuncs[drawmode];
     dst   = &lcd_remote_framebuffer[y>>3][x1];
     mask  = 0x0101 << (y & 7);
-    
+
     dst_end = dst + x2 - x1;
     do
         bfunc(dst++, mask, 0xFFFFu);
@@ -409,16 +421,16 @@ void lcd_remote_vline(int x, int y1, int y2)
     }
 
     /* nothing to draw? */
-    if (((unsigned)x >= LCD_REMOTE_WIDTH) || (y1 >= LCD_REMOTE_HEIGHT) 
+    if (((unsigned)x >= LCD_REMOTE_WIDTH) || (y1 >= LCD_REMOTE_HEIGHT)
         || (y2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
     if (y2 >= LCD_REMOTE_HEIGHT)
         y2 = LCD_REMOTE_HEIGHT-1;
-        
+
     bfunc = lcd_remote_blockfuncs[drawmode];
     dst   = &lcd_remote_framebuffer[y1>>3][x];
     ny    = y2 - (y1 & ~7);
@@ -426,7 +438,7 @@ void lcd_remote_vline(int x, int y1, int y2)
     mask |= mask << 8;
     mask_bottom  = 0xFFu >> (~ny & 7);
     mask_bottom |= mask_bottom << 8;
-    
+
     for (; ny >= 8; ny -= 8)
     {
         bfunc(dst, mask, 0xFFFFu);
@@ -463,7 +475,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     bool fillopt = false;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH)
         || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
 
@@ -506,7 +518,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
     mask |= mask << 8;
     mask_bottom  = 0xFFu >> (~ny & 7);
     mask_bottom |= mask_bottom << 8;
-    
+
     for (; ny >= 8; ny -= 8)
     {
         if (fillopt && (mask == 0xFFFFu))
@@ -561,10 +573,10 @@ void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     lcd_remote_blockfunc_type *bfunc;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH)
         || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -591,7 +603,7 @@ void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     ny     = height - 1 + shift + src_y;
 
     bfunc  = lcd_remote_blockfuncs[drawmode];
-    mask   = 0xFFu << (shift + src_y);  
+    mask   = 0xFFu << (shift + src_y);
              /* not byte-doubled here because shift+src_y can be > 7 */
     mask_bottom  = 0xFFu >> (~ny & 7);
     mask_bottom |= mask_bottom << 8;
@@ -605,7 +617,7 @@ void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         {
             const unsigned char *src_row = src;
             fb_remote_data *dst_row = dst;
-            
+
             dst_end = dst_row + width;
             do
             {
@@ -613,7 +625,7 @@ void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 bfunc(dst_row++, mask, data | (data << 8));
             }
             while (dst_row < dst_end);
- 
+
             src += stride;
             dst += LCD_REMOTE_WIDTH;
             mask = 0xFFFFu;
@@ -638,10 +650,10 @@ void lcd_remote_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
             const unsigned char *src_col = src++;
             fb_remote_data *dst_col = dst++;
             unsigned mask_col = mask & 0xFFu;
-            
+
             mask_col |= mask_col << 8;
             data = 0;
-            
+
             for (y = ny; y >= 8; y -= 8)
             {
                 data |= *src_col << shift;
@@ -701,10 +713,10 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
     unsigned mask, mask_bottom;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_REMOTE_WIDTH)
         || (y >= LCD_REMOTE_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -734,7 +746,7 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
              /* not byte-doubled here because shift+src_y can be > 7 */
     mask_bottom  = 0xFFu >> (~ny & 7);
     mask_bottom |= mask_bottom << 8;
-    
+
     if (shift == 0)
     {
         mask &= 0xFFu;
@@ -748,7 +760,7 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
             {
                 const fb_remote_data *src_row = src;
                 fb_remote_data *dst_row = dst;
-                
+
                 dst_end = dst_row + width;
                 do
                     setblock(dst_row++, mask, *src_row++);
@@ -759,7 +771,7 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
             mask = 0xFFFFu;
         }
         mask &= mask_bottom;
-        
+
         if (mask == 0xFFFFu)
             memcpy(dst, src, width * sizeof(fb_remote_data));
         else
@@ -773,7 +785,7 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
     else
     {
         unsigned datamask = (0xFFu << shift) & 0xFFu;
-        
+
         datamask |= datamask << 8;
 
         dst_end = dst + width;
@@ -785,11 +797,11 @@ void lcd_remote_bitmap_part(const fb_remote_data *src, int src_x, int src_y,
             unsigned data, olddata = 0;
 
             mask_col |= mask_col << 8;
-            
+
             for (y = ny; y >= 8; y -= 8)
             {
                 data = *src_col << shift;
-                
+
                 if (mask_col)
                 {
                     setblock(dst_col, mask_col,
@@ -847,7 +859,7 @@ static void lcd_remote_putsxyofs(int x, int y, int ofs, const unsigned char *str
 
         lcd_remote_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs,
                                     pf->height);
-        
+
         x += width - ofs;
         ofs = 0;
     }
@@ -955,8 +967,8 @@ void lcd_remote_puts_scroll_style(int x, int y, const unsigned char *string, int
 void lcd_remote_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
 {
      lcd_remote_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
-}          
-   
+}
+
 void lcd_remote_puts_scroll_style_offset(int x, int y, const unsigned char *string,
                                          int style, int offset)
 {
@@ -1025,7 +1037,7 @@ static void remote_tick(void)
     bool current_status;
 
     current_status = remote_detect();
-    
+
     /* Only report when the status has changed */
     if (current_status != last_status)
     {
@@ -1037,7 +1049,7 @@ static void remote_tick(void)
         /* Count down until it gets negative */
         if (countdown >= 0)
             countdown--;
-            
+
         if (current_status)
         {
             if (!(countdown % 8))
@@ -1092,7 +1104,7 @@ static void scroll_thread(void)
                 lcd_remote_on();
                 lcd_remote_update();
                 break;
-                
+
             case REMOTE_DEINIT_LCD:
                 lcd_remote_off();
                 break;
@@ -1174,7 +1186,7 @@ void lcd_remote_init(void)
 {
     /* Call device specific init */
     lcd_remote_init_device();
-    
+
     lcd_remote_clear_display();
     /* private queue */
     queue_init(&remote_scroll_queue, false);

@@ -237,7 +237,7 @@ struct plugin_api {
 #if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     void     (*lcd_remote_set_foreground)(unsigned foreground);
     unsigned (*lcd_remote_get_foreground)(void);
-    void     (*lcd_remote_set_background)(unsigned foreground);
+    void     (*lcd_remote_set_background)(unsigned background);
     unsigned (*lcd_remote_get_background)(void);
     void (*lcd_remote_bitmap_part)(const fb_remote_data *src, int src_x, int src_y,
                                    int stride, int x, int y, int width, int height);
@@ -276,7 +276,7 @@ struct plugin_api {
     void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
 #endif
     unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
-    
+
     /* button */
     long (*button_get)(bool block);
     long (*button_get_w_tmo)(int ticks);
@@ -319,8 +319,8 @@ struct plugin_api {
     long* current_tick;
     long (*default_event_handler)(long event);
     long (*default_event_handler_ex)(long event, void (*callback)(void *), void *parameter);
-    struct thread_entry* (*create_thread)(void (*function)(void), void* stack, 
-                                          int stack_size, const char *name 
+    struct thread_entry* (*create_thread)(void (*function)(void), void* stack,
+                                          int stack_size, const char *name
                                           IF_PRIO(, int priority));
     void (*remove_thread)(struct thread_entry *thread);
     void (*reset_poweroff_timer)(void);

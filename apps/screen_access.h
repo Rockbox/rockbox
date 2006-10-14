@@ -72,7 +72,7 @@ struct screen
 
     void (*scroll_step)(int pixels);
     void (*puts_offset)(int x, int y, const unsigned char *str, int offset);
-    void (*puts_style_offset)(int x, int y, const unsigned char *str, 
+    void (*puts_style_offset)(int x, int y, const unsigned char *str,
                               int style, int offset);
     void (*puts_scroll_style)(int x, int y, const unsigned char *string,
                                  int style);
@@ -87,12 +87,15 @@ struct screen
     void (*bitmap)(const fb_data *src,
                    int x, int y, int width, int height);
     void (*bitmap_part)(const fb_data *src, int src_x, int src_y,
-                          int stride, int x, int y, int width, int height);                    
+                          int stride, int x, int y, int width, int height);
     void (*transparent_bitmap)(const fb_data *src,
                                int x, int y, int width, int height);
     void (*transparent_bitmap_part)(const fb_data *src, int src_x, int src_y,
                                     int stride, int x, int y, int width, int height);
     void (*set_drawmode)(int mode);
+#if defined(HAVE_LCD_COLOR) && LCD_REMOTE_DEPTH > 1
+    unsigned (*color_to_native)(unsigned color);
+#endif
 #if (LCD_DEPTH > 1) || (LCD_REMOTE_DEPTH > 1)
     unsigned (*get_background)(void);
     unsigned (*get_foreground)(void);
