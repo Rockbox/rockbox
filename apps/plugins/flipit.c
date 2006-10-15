@@ -105,169 +105,73 @@ static struct plugin_api* rb;
 static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
-static char s[5];
 
-#if LCD_DEPTH >= 2
+#include "flipit_cursor.h"
+#include "flipit_tokens.h"
 
-#ifdef HAVE_LCD_COLOR
-
-#if LCD_HEIGHT >= 200
-#define tksize 50
-#elif LCD_HEIGHT >=160
-#define tksize 40
-#else
-#define tksize 30
-#endif
-
-#else
-
-#if LCD_WIDTH >= 150
-#define tksize 30
-#else
-#define tksize 20
-#endif
-
-#endif
-
-extern const fb_data flipit_tokens[];
-
-#else
-
-static char *ptr;
-
-#define tksize 16
-
-static unsigned char spot_pic[2][28] = {
-    { 0xe0, 0xf8, 0xfc, 0xfe, 0xfe, 0xff, 0xff,
-      0xff, 0xff, 0xfe, 0xfe, 0xfc, 0xf8, 0xe0,
-      0x01, 0x07, 0x0f, 0x1f, 0x1f, 0x3f, 0x3f,
-      0x3f, 0x3f, 0x1f, 0x1f, 0x0f, 0x07, 0x01 },
-    { 0xe0, 0x18, 0x04, 0x02, 0x02, 0x01, 0x01,
-      0x01, 0x01, 0x02, 0x02, 0x04, 0x18, 0xe0,
-      0x01, 0x06, 0x08, 0x10, 0x10, 0x20, 0x20,
-      0x20, 0x20, 0x10, 0x10, 0x08, 0x06, 0x01 }
-};
-static unsigned char cursor_pic[32] = {
-    0x55, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00,
-    0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0xaa,
-    0x55, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80,
-    0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0xaa };
-#endif
-
-#define INFO_WIDTH 32
-
-#if LCD_WIDTH - 5*tksize - INFO_WIDTH < 0
-#  define INFO_UNDER
-#  undef INFO_WIDTH
-#  define INFO_WIDTH 60
-#  define GRID_LEFT ((LCD_WIDTH-5*tksize)/2)
-#  define GRID_TOP 0
-#else
-#  define GRID_LEFT 0
-#  define GRID_TOP ((LCD_HEIGHT-4*tksize)/2)
-#endif
-
+#define PANEL_HEIGHT 12
+#define TK_WIDTH    BMPWIDTH_flipit_cursor
+#define TK_HEIGHT   BMPHEIGHT_flipit_cursor
+#define TK_SPACE    MAX(0, MIN((LCD_WIDTH - 5*TK_WIDTH)/4, \
+                               (LCD_HEIGHT - PANEL_HEIGHT - 4*TK_HEIGHT)/4))
+#define GRID_WIDTH  (5*TK_WIDTH + 4*TK_SPACE)
+#define GRID_LEFT   ((LCD_WIDTH - GRID_WIDTH)/2)
+#define GRID_HEIGHT (4*TK_HEIGHT + 4*TK_SPACE) /* includes grid-panel space */
+#define GRID_TOP    MAX(0, ((LCD_HEIGHT - PANEL_HEIGHT - GRID_HEIGHT)/2))
 
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
-static void draw_spot(int p) {
-#if LCD_DEPTH >= 2
-    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p]*tksize, tksize,
-                         (p%5)*tksize+GRID_LEFT, (p/5)*tksize+GRID_TOP,
-                         tksize, tksize );
-#else
-    ptr = spot_pic[spots[p]];
-    rb->lcd_mono_bitmap (ptr, (p%5)*16+1, (p/5)*16+1, 14, 8);
-    ptr += 14;
-    rb->lcd_mono_bitmap (ptr, (p%5)*16+1, (p/5)*16+9, 14, 6);
-#endif
+static void draw_spot(int p) 
+{
+    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, TK_WIDTH,
+                         GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
+                         GRID_TOP + (p/5) * (TK_HEIGHT+TK_SPACE),
+                         TK_WIDTH, TK_HEIGHT );
 }
 
 /* draw the cursor at the current cursor position */
-static void draw_cursor(void) {
-
+static void draw_cursor(void) 
+{
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_bitmap_transparent_part( flipit_tokens, 0, 2*tksize, tksize,
-                               (cursor_pos%5)*tksize+GRID_LEFT,
-                               (cursor_pos/5)*tksize+GRID_TOP,
-                               tksize, tksize );
-#elif LCD_DEPTH >= 2
-/* grayscale doesn't have transparent bitmap ... */
-    int i,j;
-    i = ( cursor_pos%5 )*tksize;
-    j = ( cursor_pos/5 )*tksize;
-    rb->lcd_set_drawmode( DRMODE_SOLID );
-    rb->lcd_drawline( i+GRID_LEFT, j+GRID_TOP,
-                      i+tksize-1+GRID_LEFT, j+GRID_TOP );
-    rb->lcd_drawline( i+GRID_LEFT, j+tksize-1+GRID_TOP,
-                      i+tksize-1+GRID_LEFT, j+tksize-1+GRID_TOP );
-    rb->lcd_drawline( i+GRID_LEFT, j+GRID_TOP,
-                      i+GRID_LEFT, j+tksize-1+GRID_TOP );
-    rb->lcd_drawline( i+tksize-1+GRID_LEFT, j+GRID_TOP,
-                      i+tksize-1+GRID_LEFT, j+tksize-1+GRID_TOP );
+    rb->lcd_bitmap_transparent( flipit_cursor,
+                                GRID_LEFT + (cursor_pos%5) * (TK_WIDTH+TK_SPACE),
+                                GRID_TOP + (cursor_pos/5) * (TK_HEIGHT+TK_SPACE),
+                                TK_WIDTH, TK_HEIGHT );
 #else
-    int i,j;
-    i = (cursor_pos%5)*16;
-    j = (cursor_pos/5)*16;
     rb->lcd_set_drawmode(DRMODE_FG);
-    ptr = cursor_pic;
-    rb->lcd_mono_bitmap (ptr, i, j, 16, 8);
-    ptr += 16;
-    rb->lcd_mono_bitmap (ptr, i, j+8, 16, 8);
+    rb->lcd_mono_bitmap( flipit_cursor,
+                         GRID_LEFT + (cursor_pos%5) * (TK_WIDTH+TK_SPACE),
+                         GRID_TOP + (cursor_pos/5) * (TK_HEIGHT+TK_SPACE),
+                         TK_WIDTH, TK_HEIGHT );
     rb->lcd_set_drawmode(DRMODE_SOLID);
 #endif
 }
 
 /* clear the cursor where it is */
-static void clear_cursor(void) {
-#if LCD_DEPTH >= 2
+static inline void clear_cursor(void)
+{
     draw_spot( cursor_pos );
-#else
-    int i,j;
-    i = (cursor_pos%5)*16;
-    j = (cursor_pos/5)*16;
-    rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-    rb->lcd_drawline(i, j, i+15, j);
-    rb->lcd_drawline(i, j+15, i+15, j+15);
-    rb->lcd_drawline(i, j, i, j+15);
-    rb->lcd_drawline(i+15, j, i+15, j+15);
-    rb->lcd_set_drawmode(DRMODE_SOLID);
-#endif
 }
 
 /* draw the info panel ... duh */
 static void draw_info_panel(void)
 {
-#ifdef INFO_UNDER
-#   define HEIGHT ( LCD_HEIGHT - 4*tksize )
-#   define LEFT ( ( LCD_WIDTH - INFO_WIDTH ) / 2 )
-#   define TOP ( LCD_HEIGHT - HEIGHT )
-#else
-#   define HEIGHT 64
-#   define LEFT ( LCD_WIDTH - (LCD_WIDTH- 5*tksize-INFO_WIDTH)/2 - INFO_WIDTH )
-#   define TOP ( ( LCD_HEIGHT - HEIGHT ) / 2 )
-#endif
+    char s[32];
+
     rb->lcd_set_drawmode( DRMODE_SOLID|DRMODE_INVERSEVID );
-    rb->lcd_fillrect( LEFT, TOP, INFO_WIDTH, HEIGHT );
+    rb->lcd_fillrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
+                      GRID_WIDTH, PANEL_HEIGHT );
     rb->lcd_set_drawmode( DRMODE_SOLID );
-    rb->lcd_drawrect( LEFT, TOP, INFO_WIDTH, HEIGHT );
-#ifdef INFO_UNDER
-    rb->lcd_putsxy( LEFT+1, TOP+1, "Flips" );
-#else
-    rb->lcd_putsxy( LEFT+1, TOP+10, "Flips" );
-#endif
-    rb->snprintf( s, sizeof(s), "%d", moves );
-#ifdef INFO_UNDER
-    rb->lcd_putsxy( LEFT+32, TOP+1, s );
-#else
-    rb->lcd_putsxy( LEFT+1, TOP+20, s );
-#endif
-#   undef HEIGHT
-#   undef LEFT
-#   undef TOP
+    rb->lcd_drawrect( GRID_LEFT, GRID_TOP + 4*(TK_HEIGHT+TK_SPACE),
+                      GRID_WIDTH, PANEL_HEIGHT );
+
+    rb->snprintf( s, sizeof(s), "Flips: %d", moves );
+    rb->lcd_putsxy( (LCD_WIDTH - rb->lcd_getstringsize(s, NULL, NULL)) / 2,
+                    GRID_TOP + 4*(TK_HEIGHT+TK_SPACE) + 2, s );
 }
 
 /* check if the puzzle is finished */
-static bool flipit_finished(void) {
+static bool flipit_finished(void) 
+{
     int i;
     for (i=0; i<20; i++)
     if (!spots[i])
@@ -277,7 +181,8 @@ static bool flipit_finished(void) {
 }
 
 /* draws the toggled spots */
-static void flipit_toggle(void) {
+static void flipit_toggle(void)
+{
     spots[cursor_pos] = 1-spots[cursor_pos];
     toggle[cursor_pos] = 1-toggle[cursor_pos];
     draw_spot(cursor_pos);
@@ -306,7 +211,8 @@ static void flipit_toggle(void) {
 }
 
 /* move the cursor in any direction */
-static void move_cursor(int x, int y) {
+static void move_cursor(int x, int y) 
+{
     if (!(flipit_finished())) {
         clear_cursor();
         cursor_pos =     ( x + 5 + cursor_pos%5 )%5
@@ -317,7 +223,8 @@ static void move_cursor(int x, int y) {
 }
 
 /* initialize the board */
-static void flipit_init(void) {
+static void flipit_init(void) 
+{
     int i;
     rb->lcd_clear_display();
     moves = 0;
@@ -340,7 +247,8 @@ static void flipit_init(void) {
 }
 
 /* the main game loop */
-static bool flipit_loop(void) {
+static bool flipit_loop(void) 
+{
     int i;
     int button;
     int lastbutton = BUTTON_NONE;
@@ -398,9 +306,7 @@ static bool flipit_loop(void) {
                 /* toggle the pieces */
                 if (!flipit_finished()) {
                     flipit_toggle();
-#if LCD_DEPTH >= 2
                     draw_cursor();
-#endif
                     rb->lcd_update();
                 }
                 break;
