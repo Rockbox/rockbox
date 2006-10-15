@@ -94,6 +94,7 @@ static size_t pcmbuf_mix_sample IDATA_ATTR;
 
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
+static volatile bool output_completed = false;
 
 extern struct thread_entry *codec_thread_p;
 
@@ -115,7 +116,7 @@ void pcmbuf_boost(bool state)
 #ifdef HAVE_PRIORITY_SCHEDULING
     static bool priority_modified = false;
 #endif
-    
+
     if (crossfade_init || crossfade_active)
         return;
 
@@ -203,14 +204,7 @@ process_new_buffer:
             *realsize = 0;
             *realstart = NULL;
             CALL_IF_EXISTS(pcmbuf_event_handler);
-            /* FIXME: We need to find another way to keep the CPU from
-             * being left boosted, because this is boosting in interrupt
-             * context.  This is also not a good thing, because it will
-             * result in the CPU being deboosted if there is a legitimate
-             * buffer underrun (albeit only temporarily, because someone
-             * will reboost it soon, but it will make the skip longer
-             * than necessary. */
-            pcmbuf_boost(false);
+            output_completed = true;
         }
     }
 }
@@ -1037,3 +1031,12 @@ bool pcmbuf_is_crossfade_enabled(void)
     return crossfade_enabled;
 }
 
+bool pcmbuf_output_completed(void)
+{
+    if (output_completed)
+    {
+        output_completed = false;
+        return true;
+    }
+    return false;
+}

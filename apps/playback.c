@@ -203,7 +203,7 @@ static unsigned char *iram_buf[2];
 static unsigned char *dram_buf[2];
 
 /* Step count to the next unbuffered track. */
-static int last_peek_offset;
+static int last_peek_offset;                    /* Audio thread */
 
 /* Track information (count in file buffer, read/write indexes for
    track ring structure. */
@@ -674,7 +674,7 @@ void audio_preinit(void)
     track_buffer_callback = NULL;
     track_unbuffer_callback = NULL;
     track_changed_callback = NULL;
-    /* Just to prevent CUR_TI never be anything random. */
+    /* Just to prevent CUR_TI from being anything random. */
     track_ridx = 0;
 
     mutex_init(&mutex_codecthread);
@@ -1249,7 +1249,6 @@ static void codec_set_offset_callback(size_t value)
 static void codec_advance_buffer_counters(size_t amount) 
 {
     buf_ridx = RINGBUF_ADD(buf_ridx, amount);
-    
     ci.curpos += amount;
     CUR_TI->available -= amount;
 
@@ -1963,11 +1962,10 @@ static bool audio_buffer_wind_forward(int new_track_ridx, int old_track_ridx)
     amount = tracks[old_track_ridx].filesize - ci.curpos;
     /* Then collect all data from tracks in between them */
     amount += audio_buffer_count_tracks(old_track_ridx, new_track_ridx);
+    logf("bwf:%ldB", (long) amount);
     
     if (amount > FILEBUFUSED)
         return false;
-
-    logf("bwf:%ldB",amount);
 
     /* Wind the buffer to the beginning of the target track or its codec */
     buf_ridx = RINGBUF_ADD(buf_ridx, amount);
@@ -2535,7 +2533,6 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
             tracks[track_widx].id3.offset = offset;
             break;
         }
-
     }
     
     logf("alt:%s", trackname);
@@ -2891,9 +2888,8 @@ static void audio_rebuffer_and_seek(size_t newpos)
     int fd;
     char *trackname;
 
-    trackname = playlist_peek(0);
     /* (Re-)open current track's file handle. */
-
+    trackname = playlist_peek(0);
     fd = open(trackname, O_RDONLY);
     if (fd < 0) 
     {
@@ -3342,6 +3338,8 @@ static void audio_thread(void)
 
             case SYS_TIMEOUT:
                 LOGFQUEUE("audio < SYS_TIMEOUT");
+                if (pcmbuf_output_completed())
+                    pcmbuf_play_stop(); /* Stop to ensure unboosted */
                 break;
 
             default:
