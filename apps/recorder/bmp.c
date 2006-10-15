@@ -63,11 +63,11 @@ struct Fileheader {
 } STRUCT_PACKED;
 
 struct rgb_quad { /* Little endian */
-  unsigned char blue; 
-  unsigned char green; 
+  unsigned char blue;
+  unsigned char green;
   unsigned char red;
   unsigned char reserved;
-} STRUCT_PACKED; 
+} STRUCT_PACKED;
 
 /* big endian functions */
 static short readshort(short *value) {
@@ -96,8 +96,8 @@ inline int getpix(int px, unsigned char *bmpbuf) {
 }
 
 #if LCD_DEPTH == 16
-/* Cheapo 24 -> 16 bit dither */
-static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
+/* 24 -> lcd depth dither */
+static fb_data dither_24_to_lcd(struct rgb_quad rgb, int row, int col)
 {
     static const unsigned char dith[][16] =
     {
@@ -115,22 +115,17 @@ static unsigned short dither_24_to_16(struct rgb_quad rgb, int row, int col)
         },
     };
 
-    const int elm = (row & 3) + ((col & 3) << 2);
-    unsigned short color;
+    const unsigned elm = (row & 3) + ((col & 3) << 2);
+    unsigned b, g, r;
 
-    unsigned b = ((unsigned)rgb.blue  + dith[0][elm]) >> 3;
-    if (b > 0x1f) b = 0x1f;
-    unsigned g = ((unsigned)rgb.green + dith[1][elm]) >> 2;
-    if (g > 0x3f) g = 0x3f;
-    unsigned r = ((unsigned)rgb.red   + dith[0][elm]) >> 3;
-    if (r > 0x1f) r = 0x1f;
+    b = ((unsigned)rgb.blue  + dith[0][elm]) >> (8-LCD_BLUE_BITS);
+    if (b > LCD_MAX_BLUE)  b = LCD_MAX_BLUE;
+    g = ((unsigned)rgb.green + dith[1][elm]) >> (8-LCD_GREEN_BITS);
+    if (g > LCD_MAX_GREEN) g = LCD_MAX_GREEN;
+    r = ((unsigned)rgb.red   + dith[0][elm]) >> (8-LCD_RED_BITS);
+    if (r > LCD_MAX_RED)   r = LCD_MAX_RED;
 
-    color = (unsigned short)(b | (g << 5) | (r << 11));
-
-#if LCD_PIXELFORMAT == RGB565SWAPPED
-    color = swap16(color);
-#endif
-    return color;
+    return LCD_RGBPACK_LCD(r, g, b);
 }
 #endif /* LCD_DEPTH == 16 */
 
@@ -179,7 +174,7 @@ int read_bmp_file(char* filename,
     /* Exit if file opening failed */
     if (fd < 0) {
         DEBUGF("error - can't open '%s' open returned: %d\n", filename, fd);
-        return (fd * 10) - 1; 
+        return (fd * 10) - 1;
     }
 
     /* read fileheader */
@@ -188,7 +183,7 @@ int read_bmp_file(char* filename,
         close(fd);
         return (ret * 10 - 2);
     }
-    
+
     if(ret != sizeof(struct Fileheader)) {
         DEBUGF("error - can't read Fileheader structure.");
         close(fd);
@@ -250,7 +245,7 @@ int read_bmp_file(char* filename,
     }
 
     /* Check if this fits the buffer */
-    
+
     if (totalsize > maxsize) {
         DEBUGF("error - Bitmap is too large to fit the supplied buffer: "
                "%d bytes.\n", (PaddedHeight * dst_width));
@@ -278,7 +273,7 @@ int read_bmp_file(char* filename,
         if(brightness(palette[0]) < brightness(palette[1]))
            invert_pixel = 1;
     }
-    
+
     /* Search to the beginning of the image data */
     lseek(fd, (off_t)readlong(&fh.OffBits), SEEK_SET);
 
@@ -286,15 +281,15 @@ int read_bmp_file(char* filename,
     if(format == FORMAT_NATIVE)
         memset(bitmap, 0, totalsize);
 #endif
-    
+
 #if LCD_DEPTH > 1
     fb_data *dest = (fb_data *)bitmap;
 #endif
-    
+
     /* loop to read rows and put them to buffer */
     for (row = 0; row < height; row++) {
         unsigned char *p;
-        
+
         /* read one row */
         ret = read(fd, bmpbuf, PaddedWidth);
         if (ret != PaddedWidth) {
@@ -326,7 +321,7 @@ int read_bmp_file(char* filename,
                 /* Mono -> 2gray (iriver H1xx) */
                 for (col = 0; col < width; col++) {
                     ret = getpix(col, bmpbuf) ^ invert_pixel;
-                    
+
                     if (ret)
                         dest[((height - row - 1)/4) * width + col] |=
                             0xC0 >> (2 * (~(height - row - 1) & 3));
@@ -337,7 +332,7 @@ int read_bmp_file(char* filename,
                 /* Mono -> 2gray (ipod) */
                 for (col = 0; col < width; col++) {
                     ret = getpix(col, bmpbuf) ^ invert_pixel;
-                    
+
                     if (ret)
                         dest[(height - row - 1) * dst_width + col/4] |=
                             0xC0 >> (2 * (col & 3));
@@ -409,8 +404,8 @@ int read_bmp_file(char* filename,
                 for (col = 0; col < width; col++, p++) {
                     struct rgb_quad rgb = palette[*p];
                     dest[width * (height - row - 1) + col] = dither ?
-                        dither_24_to_16(rgb, row, col) :
-                        LCD_RGBPACK(rgb.red, rgb.green, rgb.blue);
+                        dither_24_to_lcd(rgb, row, col) :
+                        (fb_data)LCD_RGBPACK(rgb.red, rgb.green, rgb.blue);
                 }
             }
 #endif
@@ -474,8 +469,8 @@ int read_bmp_file(char* filename,
                 /* RGB24 -> RGB16 */
                 for (col = 0; col < width; col++, p += 3) {
                     dest[width * (height - row - 1) + col] = dither ?
-                        dither_24_to_16(*(struct rgb_quad *)p, row, col) :
-                        LCD_RGBPACK(p[2], p[1], p[0]);
+                        dither_24_to_lcd(*(struct rgb_quad *)p, row, col) :
+                        (fb_data)LCD_RGBPACK(p[2], p[1], p[0]);
                 }
             }
 #endif

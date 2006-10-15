@@ -56,8 +56,7 @@ struct rgb_pick
 /* list of primary colors */
 #define SB_PRIM 0
 #define SB_FILL 1
-#define SB_MAX  2
-static const unsigned short prim_rgb[][3] =
+static const fb_data prim_rgb[][3] =
 {
     /* Foreground colors for sliders */
     {
@@ -71,39 +70,32 @@ static const unsigned short prim_rgb[][3] =
         LCD_RGBPACK(  0,  85,   0),
         LCD_RGBPACK(  0,   0,  85),
     },
-    /* maximum values for components */
-    {
-        LCD_MAX_RED,
-        LCD_MAX_GREEN,
-        LCD_MAX_BLUE
-    }
+};
+
+/* maximum values for components */
+static const unsigned char rgb_max[3] =
+{
+    LCD_MAX_RED,
+    LCD_MAX_GREEN,
+    LCD_MAX_BLUE
 };
 
 /* Unpacks the color value into native rgb values and 24 bit rgb values */
 static void unpack_rgb(struct rgb_pick *rgb)
 {
-    unsigned color = rgb->color;
-#if LCD_PIXELFORMAT == RGB565SWAPPED
-    color = swap16(color);
-#endif
+    unsigned color = _LCD_UNSWAP_COLOR(rgb->color);
     rgb->red   = _RGB_UNPACK_RED(color);
     rgb->green = _RGB_UNPACK_GREEN(color);
     rgb->blue  = _RGB_UNPACK_BLUE(color);
-    rgb->r     = (color & 0xf800) >> 11;
-    rgb->g     = (color & 0x07e0) >> 5;
-    rgb->b     = (color & 0x001f);
+    rgb->r     = _RGB_UNPACK_RED_LCD(color);
+    rgb->g     = _RGB_UNPACK_GREEN_LCD(color);
+    rgb->b     = _RGB_UNPACK_BLUE_LCD(color);
 }
 
 /* Packs the native rgb colors into a color value */
-static void pack_rgb(struct rgb_pick *rgb)
+static inline void pack_rgb(struct rgb_pick *rgb)
 {
-    unsigned color = (rgb->r & 0x1f) << 11 |
-                     (rgb->g & 0x3f) << 5 |
-                     (rgb->b & 0x1f);
-#if LCD_PIXELFORMAT == RGB565SWAPPED
-    color = swap16(color);
-#endif
-    rgb->color = color;
+    rgb->color = LCD_RGBPACK_LCD(rgb->r, rgb->g, rgb->b);
 }
 
 /* Returns LCD_BLACK if the color is above a threshold brightness
@@ -265,7 +257,7 @@ static void draw_screen(struct screen *display, char *title,
                            text_top + display->char_height / 4,
                            slider_width,
                            display->char_height / 2,
-                           prim_rgb[SB_MAX][i],
+                           rgb_max[i],
                            0,
                            rgb->rgb_val[i],
                            sb_flags);
@@ -343,22 +335,29 @@ static void draw_screen(struct screen *display, char *title,
  color is a pointer to the colour (in native format) to modify
  set banned_color to -1 to allow all
  ***********/
-bool set_color(struct screen *display, char *title, int* color, int banned_color)
+bool set_color(struct screen *display, char *title, unsigned *color,
+               unsigned banned_color)
 {
-    int exit = 0, button, slider = 0;
-    int i;
+    int exit = 0, slider = 0;
     struct rgb_pick rgb;
-    (void)display;
 
     rgb.color = *color;
 
     while (!exit)
     {
+        int button;
+
         unpack_rgb(&rgb);
 
-        FOR_NB_SCREENS(i)
+        if (display != NULL)
         {
-            draw_screen(&screens[i], title, &rgb, slider);
+            draw_screen(display, title, &rgb, slider);
+        }
+        else
+        {
+            int i;
+            FOR_NB_SCREENS(i)
+                draw_screen(&screens[i], title, &rgb, slider);
         }
 
         button = get_action(CONTEXT_SETTINGS_COLOURCHOOSER, TIMEOUT_BLOCK);
@@ -377,7 +376,7 @@ bool set_color(struct screen *display, char *title, int* color, int banned_color
 
             case ACTION_SETTINGS_INC:
             case ACTION_SETTINGS_INCREPEAT:
-                if (rgb.rgb_val[slider] < prim_rgb[SB_MAX][slider])
+                if (rgb.rgb_val[slider] < rgb_max[slider])
                     rgb.rgb_val[slider]++;
                 pack_rgb(&rgb);
                 break;
@@ -390,7 +389,8 @@ bool set_color(struct screen *display, char *title, int* color, int banned_color
                 break;
 
             case ACTION_STD_OK:
-                if (banned_color != -1 && (unsigned)banned_color == rgb.color)
+                if (banned_color != (unsigned)-1 &&
+                    banned_color == rgb.color)
                 {
                     gui_syncsplash(HZ*2, true, str(LANG_COLOR_UNACCEPTABLE));
                     break;

@@ -161,37 +161,58 @@ static inline unsigned lcd_color_to_native(unsigned color)
 #endif
 
 #ifdef HAVE_LCD_COLOR
-#if LCD_DEPTH == 16
+#if LCD_PIXELFORMAT == RGB565 || LCD_PIXELFORMAT == RGB565SWAPPED
 #define LCD_MAX_RED    31
 #define LCD_MAX_GREEN  63
 #define LCD_MAX_BLUE   31
-#define _RGB_UNPACK_RED(x)   ((((x) >> 8) & 0xf8) | ((x) >> 13))
-#define _RGB_UNPACK_GREEN(x) ((((x) >> 3) & 0xfc) | (((x) >> 9) & 0x03))
-#define _RGB_UNPACK_BLUE(x)  ((((x) << 3) & 0xf8) | (((x) >> 2) & 0x07))
-#define _RGBPACK(r, g, b) ( ((((r) * (31*257) + (127*257)) >> 16) << 11) \
-                           |((((g) * (63*257) + (127*257)) >> 16) << 5) \
-                           | (((b) * (31*257) + (127*257)) >> 16))
-/* Note: ((x * 257) >> 16) almost equals (x / 255), but it avoids the division,
- * so it's faster when the macro is used for variable r, g, b in the source. */
+#define LCD_RED_BITS   5
+#define LCD_GREEN_BITS 6
+#define LCD_BLUE_BITS  5
+
+/* pack/unpack native RGB values */
+#define _RGBPACK_LCD(r, g, b)    ( ((r) << 11) | ((g) << 5) | (b) )
+#define _RGB_UNPACK_RED_LCD(x)   ( (((x) >> 11)       ) )
+#define _RGB_UNPACK_GREEN_LCD(x) ( (((x) >>  5) & 0x3f) )
+#define _RGB_UNPACK_BLUE_LCD(x)  ( (((x)      ) & 0x1f) )
+
+/* pack/unpack 24-bit RGB values */
+#define _RGBPACK(r, g, b)    _RGBPACK_LCD((r) >> 3, (g) >> 2, (b) >> 3)
+#define _RGB_UNPACK_RED(x)   ( (((x) >> 8) & 0xf8) | (((x) >> 11) & 0x07) )
+#define _RGB_UNPACK_GREEN(x) ( (((x) >> 3) & 0xfc) | (((x) >>  5) & 0x03) )
+#define _RGB_UNPACK_BLUE(x)  ( (((x) << 3) & 0xf8) | (((x)      ) & 0x07) )
+
 #if (LCD_PIXELFORMAT == RGB565SWAPPED)
-#define LCD_RGBPACK(r, g, b) ( ((_RGBPACK((r), (g), (b)) & 0xff00) >> 8) \
-                              |((_RGBPACK((r), (g), (b)) & 0x00ff) << 8))
-#define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(swap16(x))
-#define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(swap16(x))
-#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(swap16(x))
+/* RGB3553 */
+#define _LCD_UNSWAP_COLOR(x)     swap16(x)
+#define LCD_RGBPACK_LCD(r, g, b) ( (((r) <<   3)      ) | \
+                                   (((g) >>   3)      ) | \
+                                   (((g) & 0x07) << 13) | \
+                                   (((b) <<   8)      ) )
+#define LCD_RGBPACK(r, g, b)     ( (((r) >>   3) <<  3) | \
+                                   (((g) >>   5)      ) | \
+                                   (((g) & 0x1c) << 11) | \
+                                   (((b) >>   3) <<  8) )
+/* swap color once - not currenly used in static inits */
+#define _SWAPUNPACK(x, _unp_) \
+    ({ typeof (x) _x_ = swap16(x); _unp_(_x_); })
+#define RGB_UNPACK_RED(x)        _SWAPUNPACK((x), _RGB_UNPACK_RED)
+#define RGB_UNPACK_GREEN(x)      _SWAPUNPACK((x), _RGB_UNPACK_GREEN)
+#define RGB_UNPACK_BLUE(x)       _SWAPUNPACK((x), _RGB_UNPACK_BLUE)
+#define RGB_UNPACK_RED_LCD(x)    _SWAPUNPACK((x), _RGB_UNPACK_RED_LCD)
+#define RGB_UNPACK_GREEN_LCD(x)  _SWAPUNPACK((x), _RGB_UNPACK_GREEN_LCD)
+#define RGB_UNPACK_BLUE_LCD(x)   _SWAPUNPACK((x), _RGB_UNPACK_BLUE_LCD)
 #else
-#define LCD_RGBPACK(r, g, b) _RGBPACK((r), (g), (b))
-#define RGB_UNPACK_RED(x)   _RGB_UNPACK_RED(x)
-#define RGB_UNPACK_GREEN(x) _RGB_UNPACK_GREEN(x)
-#define RGB_UNPACK_BLUE(x)  _RGB_UNPACK_BLUE(x)
+/* RGB565 */
+#define _LCD_UNSWAP_COLOR(x)     (x)
+#define LCD_RGBPACK(r, g, b)     _RGBPACK((r), (g), (b))
+#define LCD_RGBPACK_LCD(r, g, b) _RGBPACK_LCD((r), (g), (b))
+#define RGB_UNPACK_RED(x)        _RGB_UNPACK_RED(x)
+#define RGB_UNPACK_GREEN(x)      _RGB_UNPACK_GREEN(x)
+#define RGB_UNPACK_BLUE(x)       _RGB_UNPACK_BLUE(x)
+#define RGB_UNPACK_RED_LCD(x)    _RGB_UNPACK_RED(x)
+#define RGB_UNPACK_GREEN_LCD(x)  _RGB_UNPACK_GREEN(x)
+#define RGB_UNPACK_BLUE_LCD(x)   _RGB_UNPACK_BLUE(x)
 #endif
-#elif LCD_DEPTH == 18
-#define LCD_MAX_RED    63
-#define LCD_MAX_GREEN  63
-#define LCD_MAX_BLUE   63
-#define LCD_RGBPACK(r, g, b) ( ((((r) * (63*257) + (127*257)) >> 16) << 12) \
-                              |((((g) * (63*257) + (127*257)) >> 16) << 6) \
-                              | (((b) * (63*257) + (127*257)) >> 16))
 #else
 /* other colour depths */
 #endif

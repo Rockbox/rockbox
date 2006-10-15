@@ -409,7 +409,7 @@ static bool set_fg_color(void)
 {
     bool res;
 
-    res = set_color(&screens[SCREEN_MAIN],str(LANG_FOREGROUND_COLOR),
+    res = set_color(NULL,str(LANG_FOREGROUND_COLOR),
                     &global_settings.fg_color,global_settings.bg_color);
 
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
@@ -421,7 +421,7 @@ static bool set_bg_color(void)
 {
     bool res;
 
-    res = set_color(&screens[SCREEN_MAIN],str(LANG_BACKGROUND_COLOR),
+    res = set_color(NULL,str(LANG_BACKGROUND_COLOR),
                     &global_settings.bg_color,global_settings.fg_color);
 
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
@@ -1699,7 +1699,7 @@ static bool unplug_rw(void)
 
 static bool unplug_autoresume(void)
 {
-    return set_bool( str(LANG_UNPLUG_DISABLE_AUTORESUME), 
+    return set_bool( str(LANG_UNPLUG_DISABLE_AUTORESUME),
                     &global_settings.unplug_autoresume );
 }
 
