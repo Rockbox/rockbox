@@ -94,7 +94,6 @@ static size_t pcmbuf_mix_sample IDATA_ATTR;
 
 static bool low_latency_mode = false;
 static bool pcmbuf_flush;
-static volatile bool output_completed = false;
 
 extern struct thread_entry *codec_thread_p;
 
@@ -108,44 +107,6 @@ extern struct thread_entry *codec_thread_p;
 static bool prepare_insert(size_t length);
 static void pcmbuf_under_watermark(void);
 static bool pcmbuf_flush_fillpos(void);
-
-#if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)
-void pcmbuf_boost(bool state)
-{
-    static bool boost_state = false;
-#ifdef HAVE_PRIORITY_SCHEDULING
-    static bool priority_modified = false;
-#endif
-
-    if (crossfade_init || crossfade_active)
-        return;
-
-    if (state != boost_state)
-    {
-        cpu_boost_id(state, CPUBOOSTID_PCMBUF);
-        boost_state = state;
-    }
-    
-#ifdef HAVE_PRIORITY_SCHEDULING
-    if (state && LOW_DATA(2) && pcm_is_playing())
-    {
-        if (!priority_modified)
-        {
-            /* Buffer is critically low so override UI priority. */
-            priority_modified = true;
-            thread_set_priority(codec_thread_p, PRIORITY_REALTIME);
-        }
-    }
-    else if (priority_modified)
-    {
-        /* Set back the original priority. */
-        thread_set_priority(codec_thread_p, PRIORITY_PLAYBACK);
-        priority_modified = false;
-    }
-    
-#endif
-}
-#endif
 
 #define CALL_IF_EXISTS(function, args...) if (function) function(args)
 /* This function has 2 major logical parts (separated by brackets both for
@@ -204,7 +165,6 @@ process_new_buffer:
             *realsize = 0;
             *realstart = NULL;
             CALL_IF_EXISTS(pcmbuf_event_handler);
-            output_completed = true;
         }
     }
 }
@@ -268,8 +228,25 @@ static inline void pcmbuf_add_chunk(void)
 
 static void pcmbuf_under_watermark(void)
 {
+#ifdef HAVE_PRIORITY_SCHEDULING
+    static int old_priority = 0;
+    
+    if (LOW_DATA(2) && !old_priority && pcm_is_playing())
+    {
+        /* Buffer is critically low so override UI priority. */
+        old_priority = thread_set_priority(codec_thread_p, PRIORITY_REALTIME);
+    }
+    else if (old_priority)
+    {
+        /* Set back the original priority. */
+        thread_set_priority(codec_thread_p, old_priority);
+        old_priority = 0;
+    }
+#endif
+
     /* Fill audio buffer by boosting cpu */
-    pcmbuf_boost(true);
+    trigger_cpu_boost();
+
     /* Disable crossfade if < .5s of audio */
     if (LOW_DATA(2))
     {
@@ -328,16 +305,15 @@ bool pcmbuf_crossfade_init(bool manual_skip)
         return false;
     }
 
+    trigger_cpu_boost();
+    
     /* Not enough data, or crossfade disabled, flush the old data instead */
     if (LOW_DATA(2) || !pcmbuf_is_crossfade_enabled() || low_latency_mode)
     {
-        pcmbuf_boost(true);
         pcmbuf_flush_fillpos();
         pcmbuf_flush = true;
         return false;
     }
-
-    pcmbuf_boost(true);
 
     /* Don't enable mix mode when skipping tracks manually. */
     if (manual_skip)
@@ -371,9 +347,6 @@ void pcmbuf_play_stop(void)
     crossfade_init = false;
     crossfade_active = false;
     pcmbuf_flush = false;
-
-    pcmbuf_boost(false);
-
 }
 
 int pcmbuf_used_descs(void) {
@@ -433,7 +406,7 @@ void pcmbuf_pause(bool pause) {
     pcm_play_pause(!pause);
     if (!pause)
         pcm_mute(false);
-    pcmbuf_boost(!pause && pcm_is_playing());
+    trigger_cpu_boost();
 }
 
 /* Force playback. */
@@ -466,8 +439,6 @@ static bool pcmbuf_flush_fillpos(void)
     if (audiobuffer_fillpos) {
         /* Never use the last buffer descriptor */
         while (pcmbuf_write == pcmbuf_write_end) {
-            /* Deboost to let the playback catchup */
-            pcmbuf_boost(false);
             /* If this happens, something is being stupid */
             if (!pcm_is_playing()) {
                 logf("pcmbuf_flush_fillpos error");
@@ -762,14 +733,12 @@ static bool prepare_insert(size_t length)
 
     /* Need to save PCMBUF_MIN_CHUNK to prevent wrapping overwriting */
     if (pcmbuf_free() < length + PCMBUF_MIN_CHUNK)
-    {
-        pcmbuf_boost(false);
         return false;
-    }
 
     if (!pcm_is_playing())
     {
-        pcmbuf_boost(true);
+        trigger_cpu_boost();
+        
         /* Pre-buffer 1s. */
 #if MEM <= 1
         if (!LOW_DATA(1))
@@ -1031,12 +1000,3 @@ bool pcmbuf_is_crossfade_enabled(void)
     return crossfade_enabled;
 }
 
-bool pcmbuf_output_completed(void)
-{
-    if (output_completed)
-    {
-        output_completed = false;
-        return true;
-    }
-    return false;
-}

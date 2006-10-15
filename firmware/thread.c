@@ -35,6 +35,9 @@ struct core_entry cores[NUM_CORES] IBSS_ATTR;
 #ifdef HAVE_PRIORITY_SCHEDULING
 static unsigned short highest_priority IBSS_ATTR;
 #endif
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+static bool cpu_boosted IBSS_ATTR;
+#endif
 
 /* Define to enable additional checks for blocking violations etc. */
 // #define THREAD_EXTRA_CHECKS
@@ -332,6 +335,14 @@ static inline void sleep_core(void)
         if (cores[CURRENT_CORE].running != NULL)
             break;
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+        if (cpu_boosted)
+        {
+            cpu_boost(false);
+            cpu_boosted = false;
+        }
+#endif
+        
         /* Enter sleep mode to reduce power usage, woken up on interrupt */
 #ifdef CPU_COLDFIRE
         asm volatile ("stop #0x2000");
@@ -646,6 +657,17 @@ struct thread_entry*
     return thread;
 }
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+void trigger_cpu_boost(void)
+{
+    if (!cpu_boosted)
+    {
+        cpu_boost(true);
+        cpu_boosted = true;
+    }
+}
+#endif
+
 /*---------------------------------------------------------------------------
  * Remove a thread on the current core from the scheduler.
  * Parameter is the ID as returned from create_thread().
@@ -676,13 +698,18 @@ void remove_thread(struct thread_entry *thread)
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
-void thread_set_priority(struct thread_entry *thread, int priority)
+int thread_set_priority(struct thread_entry *thread, int priority)
 {
+    int old_priority;
+    
     if (thread == NULL)
         thread = cores[CURRENT_CORE].running;
     
+    old_priority = thread->priority;
     thread->priority = priority;
     highest_priority = 100;
+    
+    return old_priority;
 }
 #endif
 
@@ -698,6 +725,9 @@ void init_threads(void)
 #ifdef HAVE_PRIORITY_SCHEDULING
     cores[core].threads[0].priority = PRIORITY_USER_INTERFACE;
     highest_priority = 100;
+#endif
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    cpu_boosted = false;
 #endif
     add_to_list(&cores[core].running, &cores[core].threads[0]);
     

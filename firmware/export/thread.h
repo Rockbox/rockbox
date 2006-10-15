@@ -131,12 +131,18 @@ struct thread_entry*
                           const char *name
                           IF_PRIO(, int priority));
 
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+void trigger_cpu_boost(void);
+#else
+#define trigger_cpu_boost()
+#endif
+
 void remove_thread(struct thread_entry *thread);
 void switch_thread(bool save_context, struct thread_entry **blocked_list);
 void sleep_thread(int ticks);
 void block_thread(struct thread_entry **thread, int timeout);
 void wakeup_thread(struct thread_entry **thread);
-void thread_set_priority(struct thread_entry *thread, int priority);
+int thread_set_priority(struct thread_entry *thread, int priority);
 void init_threads(void);
 int thread_stack_usage(const struct thread_entry *thread);
 int thread_get_status(const struct thread_entry *thread);

@@ -292,11 +292,6 @@ struct voice_info {
     char *buf;
 };
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static void voice_boost_cpu(bool state);
-#else
-#define voice_boost_cpu(state)   do { } while(0)
-#endif
 static void voice_thread(void);
 
 #endif /* PLAYBACK_VOICE */
@@ -316,7 +311,7 @@ void mp3_play_data(const unsigned char* start, int size,
     LOGFQUEUE("mp3 > voice Q_VOICE_PLAY");
     queue_post(&voice_queue, Q_VOICE_PLAY, &voice_clip);
     voice_thread_start = true;
-    voice_boost_cpu(true);
+    trigger_cpu_boost();
 #else
     (void) start;
     (void) size;
@@ -815,19 +810,6 @@ static const char * get_codec_filename(int enc_spec)
 
 #ifdef PLAYBACK_VOICE
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-static void voice_boost_cpu(bool state)
-{
-    static bool voice_cpu_boosted = false;
-
-    if (state != voice_cpu_boosted)
-    {
-        voice_cpu_boosted = state;
-        cpu_boost_id(state, CPUBOOSTID_PLAYBACK_VOICE);
-    }
-}
-#endif
-
 static bool voice_pcmbuf_insert_split_callback(
         const void *ch1, const void *ch2, size_t length)
 {
@@ -976,7 +958,6 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     voice_getmore = NULL;
                     voice_remaining = 0;
                     voicebuf = NULL;
-                    voice_boost_cpu(false);
 
                     /* Force the codec to think it's changing tracks */
                     ci_voice.new_track = 1; 
@@ -1005,7 +986,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                     /* Set up new voice data */
                     struct voice_info *voice_data;
                     voice_is_playing = true;
-                    voice_boost_cpu(true);
+                    trigger_cpu_boost();
                     voice_data = ev.data;
                     voice_remaining = voice_data->size;
                     voicebuf = voice_data->buf;
@@ -1666,7 +1647,7 @@ static bool codec_load_next_track(void)
         automatic_skip = true;
     }
     
-    cpu_boost_id(true, CPUBOOSTID_PLAYBACK_CODEC);
+    trigger_cpu_boost();
     LOGFQUEUE("codec > audio Q_AUDIO_CHECK_NEW_TRACK");
     queue_post(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, 0);
     while (1) 
@@ -1680,7 +1661,7 @@ static bool codec_load_next_track(void)
         else
             break;
     }
-    cpu_boost_id(false, CPUBOOSTID_PLAYBACK_CODEC);
+
     switch (ev.id)
     {
         case Q_CODEC_REQUEST_COMPLETE:
@@ -2153,7 +2134,7 @@ static void audio_read_file(bool quick)
         return ;
     }
 
-    cpu_boost_id(true, CPUBOOSTID_PLAYBACK_AUDIO);
+    trigger_cpu_boost();
     while (tracks[track_widx].filerem > 0) 
     {
         int overlap;
@@ -2218,7 +2199,6 @@ static void audio_read_file(bool quick)
         logf("Partially buf:%dB",
                 tracks[track_widx].filesize - tracks[track_widx].filerem);
     }
-    cpu_boost_id(false, CPUBOOSTID_PLAYBACK_AUDIO);
 }
 
 static bool audio_loadcodec(bool start_play)
@@ -3338,8 +3318,6 @@ static void audio_thread(void)
 
             case SYS_TIMEOUT:
                 LOGFQUEUE("audio < SYS_TIMEOUT");
-                if (pcmbuf_output_completed())
-                    pcmbuf_play_stop(); /* Stop to ensure unboosted */
                 break;
 
             default:

@@ -46,7 +46,6 @@ size_t get_pcmbuf_descsize(void);
 void pcmbuf_pause(bool pause);
 void pcmbuf_play_stop(void);
 bool pcmbuf_is_crossfade_active(void);
-bool pcmbuf_output_completed(void);
 
 /* These functions are for playing chained buffers of PCM data */
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ) && !defined(SIMULATOR)

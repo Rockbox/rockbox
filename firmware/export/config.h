@@ -222,6 +222,7 @@
 
 #if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #define HAVE_PRIORITY_SCHEDULING
+#define HAVE_SCHEDULER_BOOSTCTRL
 #endif
 
 /* define for all cpus from coldfire family */
