@@ -1593,6 +1593,7 @@ bool dbg_mmc_info(void)
 {
     bool done = false;
     int currval = 0;
+    int line;
     tCardInfo *card;
     unsigned char pbuf[32], pbuf2[32];
     unsigned char card_name[7];
@@ -1601,6 +1602,8 @@ bool dbg_mmc_info(void)
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char *kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };
     static const unsigned char *nsec_units[] = { "ns", "µs", "ms" };
+    static const char *spec_vers[] = { "1.0-1.2", "1.4", "2.0-2.2",
+                                       "3.1-3.31", "4.0" };
 
     card_name[6] = '\0';
 
@@ -1611,64 +1614,73 @@ bool dbg_mmc_info(void)
     {
         card = mmc_card_info(currval / 2);
 
+        line = 0;
         lcd_clear_display();
         snprintf(pbuf, sizeof(pbuf), "[MMC%d p%d]", currval / 2,
                  (currval % 2) + 1);
-        lcd_puts(0, 0, pbuf);
+        lcd_puts(0, line++, pbuf);
 
         if (card->initialized)
         {
             if (!(currval % 2))   /* General info */
             {
+                int temp;
+
                 strncpy(card_name, ((unsigned char*)card->cid) + 3, 6);
                 snprintf(pbuf, sizeof(pbuf), "%s Rev %d.%d", card_name,
                          (int) mmc_extract_bits(card->cid, 72, 4),
                          (int) mmc_extract_bits(card->cid, 76, 4));
-                lcd_puts(0, 1, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Prod: %d/%d",
                          (int) mmc_extract_bits(card->cid, 112, 4),
                          (int) mmc_extract_bits(card->cid, 116, 4) + 1997);
-                lcd_puts(0, 2, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Ser#: 0x%08lx",
                          mmc_extract_bits(card->cid, 80, 32));
-                lcd_puts(0, 3, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "M=%02x, O=%04x",
                          (int) mmc_extract_bits(card->cid, 0, 8),
                          (int) mmc_extract_bits(card->cid, 8, 16));
-                lcd_puts(0, 4, pbuf);
+                lcd_puts(0, line++, pbuf);
+                temp = mmc_extract_bits(card->csd, 2, 4);
+                snprintf(pbuf, sizeof(pbuf), "MMC v%s", temp < 5 ?
+                         spec_vers[temp] : "?.?");
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "Blocks: 0x%06lx", card->numblocks);
-                lcd_puts(0, 5, pbuf);
-                snprintf(pbuf, sizeof(pbuf), "Blksz.: %d", card->blocksize);
-                lcd_puts(0, 6, pbuf);
+                lcd_puts(0, line++, pbuf);
+                snprintf(pbuf, sizeof(pbuf), "Blksz.: %d P:%c%c", card->blocksize,
+                         mmc_extract_bits(card->csd, 48, 1) ? 'R' : '-',
+                         mmc_extract_bits(card->csd, 106, 1) ? 'W' : '-');
+                lcd_puts(0, line++, pbuf);
             }
             else                  /* Technical details */
             {
                 output_dyn_value(pbuf2, sizeof pbuf2, card->speed / 1000,
                                  kbit_units, false);
                 snprintf(pbuf, sizeof pbuf, "Speed: %s", pbuf2);
-                lcd_puts(0, 1, pbuf);
+                lcd_puts(0, line++, pbuf);
 
                 output_dyn_value(pbuf2, sizeof pbuf2, card->tsac,
                                  nsec_units, false);
                 snprintf(pbuf, sizeof pbuf, "Tsac: %s", pbuf2);
-                lcd_puts(0, 2, pbuf);
+                lcd_puts(0, line++, pbuf);
 
                 snprintf(pbuf, sizeof(pbuf), "Nsac: %d clk", card->nsac);
-                lcd_puts(0, 3, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "R2W: *%d", card->r2w_factor);
-                lcd_puts(0, 4, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IRmax: %d..%d mA",
                          i_vmin[mmc_extract_bits(card->csd, 66, 3)],
                          i_vmax[mmc_extract_bits(card->csd, 69, 3)]);
-                lcd_puts(0, 5, pbuf);
+                lcd_puts(0, line++, pbuf);
                 snprintf(pbuf, sizeof(pbuf), "IWmax: %d..%d mA",
                          i_vmin[mmc_extract_bits(card->csd, 72, 3)],
                          i_vmax[mmc_extract_bits(card->csd, 75, 3)]);
-                lcd_puts(0, 6, pbuf);
+                lcd_puts(0, line++, pbuf);
             }
         }
         else
-            lcd_puts(0, 1, "Not found!");
+            lcd_puts(0, line++, "Not found!");
 
         lcd_update();
 
