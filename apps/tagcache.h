@@ -98,7 +98,7 @@ struct tagcache_search_clause
     bool numeric;
     bool input;
     long numeric_data;
-    char str[128];
+    char *str;
 };
 
 struct tagcache_search {
@@ -139,6 +139,8 @@ bool tagcache_is_numeric_tag(int type);
 bool tagcache_is_unique_tag(int type);
 bool tagcache_is_sorted_tag(int type);
 bool tagcache_find_index(struct tagcache_search *tcs, const char *filename);
+bool tagcache_check_clauses(struct tagcache_search *tcs,
+                            struct tagcache_search_clause **clause, int count);
 bool tagcache_search(struct tagcache_search *tcs, int tag);
 void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
                                  void *buffer, long length);
