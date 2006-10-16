@@ -6,6 +6,7 @@ cube.c
 dict.c
 favorites.c
 firmware_flash.c
+flipit.c
 logo.c
 metronome.c
 mosaique.c
@@ -48,7 +49,6 @@ brickmania.c
 calculator.c
 chip8.c
 demystify.c
-flipit.c
 jewels.c
 minesweeper.c
 oscilloscope.c

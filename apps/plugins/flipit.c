@@ -17,48 +17,57 @@
  *
  ****************************************************************************/
 #include "plugin.h"
-#ifdef HAVE_LCD_BITMAP
 
 PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define FLIPIT_UP   BUTTON_UP
-#define FLIPIT_DOWN BUTTON_DOWN
-#define FLIPIT_QUIT BUTTON_OFF
-#define FLIPIT_SHUFFLE BUTTON_F1
-#define FLIPIT_SOLVE BUTTON_F2
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_OFF
+#define FLIPIT_SHUFFLE      BUTTON_F1
+#define FLIPIT_SOLVE        BUTTON_F2
 #define FLIPIT_STEP_BY_STEP BUTTON_F3
-#define FLIPIT_TOGGLE BUTTON_PLAY
+#define FLIPIT_TOGGLE       BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+#define FLIPIT_UP_PRE       BUTTON_ON
+#define FLIPIT_UP           (BUTTON_ON | BUTTON_REL)
+#define FLIPIT_DOWN         BUTTON_MENU
+#define FLIPIT_QUIT         BUTTON_STOP
+#define FLIPIT_SHUFFLE      (BUTTON_ON | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_ON | BUTTON_RIGHT)
+#define FLIPIT_STEP_BY_STEP (BUTTON_ON | BUTTON_PLAY)
+#define FLIPIT_TOGGLE       BUTTON_PLAY
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define FLIPIT_UP   BUTTON_UP
-#define FLIPIT_DOWN BUTTON_DOWN
-#define FLIPIT_QUIT BUTTON_OFF
-#define FLIPIT_SHUFFLE (BUTTON_MENU | BUTTON_LEFT)
-#define FLIPIT_SOLVE (BUTTON_MENU | BUTTON_UP)
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_OFF
+#define FLIPIT_SHUFFLE      (BUTTON_MENU | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_MENU | BUTTON_UP)
 #define FLIPIT_STEP_BY_STEP (BUTTON_MENU | BUTTON_RIGHT)
-#define FLIPIT_TOGGLE_PRE BUTTON_MENU
-#define FLIPIT_TOGGLE (BUTTON_MENU | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE   BUTTON_MENU
+#define FLIPIT_TOGGLE       (BUTTON_MENU | BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define FLIPIT_UP   BUTTON_UP
-#define FLIPIT_DOWN BUTTON_DOWN
-#define FLIPIT_QUIT BUTTON_OFF
-#define FLIPIT_SHUFFLE BUTTON_MODE
-#define FLIPIT_SOLVE BUTTON_ON
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_OFF
+#define FLIPIT_SHUFFLE      BUTTON_MODE
+#define FLIPIT_SOLVE        BUTTON_ON
 #define FLIPIT_STEP_BY_STEP BUTTON_REC
-#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
-#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
+#define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
 
 #define FLIPIT_RC_QUIT BUTTON_RC_STOP
 
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
-#define FLIPIT_UP   BUTTON_MENU
-#define FLIPIT_DOWN BUTTON_PLAY
+#define FLIPIT_UP           BUTTON_MENU
+#define FLIPIT_DOWN         BUTTON_PLAY
 #define FLIPIT_QUIT         (BUTTON_SELECT | BUTTON_MENU)
 #define FLIPIT_SHUFFLE      (BUTTON_SELECT | BUTTON_LEFT)
 #define FLIPIT_SOLVE        (BUTTON_SELECT | BUTTON_PLAY)
@@ -68,36 +77,36 @@ PLUGIN_HEADER
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 
-#define FLIPIT_UP   BUTTON_UP
-#define FLIPIT_DOWN BUTTON_DOWN
-#define FLIPIT_QUIT BUTTON_POWER
-#define FLIPIT_SHUFFLE (BUTTON_PLAY | BUTTON_LEFT)
-#define FLIPIT_SOLVE (BUTTON_PLAY | BUTTON_RIGHT)
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      (BUTTON_PLAY | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_PLAY | BUTTON_RIGHT)
 #define FLIPIT_STEP_BY_STEP (BUTTON_PLAY | BUTTON_UP)
-#define FLIPIT_TOGGLE_PRE BUTTON_SELECT
-#define FLIPIT_TOGGLE (BUTTON_SELECT | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
+#define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
-#define FLIPIT_UP   BUTTON_UP
-#define FLIPIT_DOWN BUTTON_DOWN
-#define FLIPIT_QUIT BUTTON_A
-#define FLIPIT_SHUFFLE (BUTTON_POWER | BUTTON_LEFT)
-#define FLIPIT_SOLVE (BUTTON_POWER | BUTTON_RIGHT)
+#define FLIPIT_UP           BUTTON_UP
+#define FLIPIT_DOWN         BUTTON_DOWN
+#define FLIPIT_QUIT         BUTTON_A
+#define FLIPIT_SHUFFLE      (BUTTON_POWER | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_POWER | BUTTON_RIGHT)
 #define FLIPIT_STEP_BY_STEP (BUTTON_POWER | BUTTON_UP)
-#define FLIPIT_TOGGLE_PRE BUTTON_MENU
-#define FLIPIT_TOGGLE (BUTTON_MENU | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE   BUTTON_MENU
+#define FLIPIT_TOGGLE       (BUTTON_MENU | BUTTON_REL)
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
-#define FLIPIT_UP   BUTTON_SCROLL_UP
-#define FLIPIT_DOWN BUTTON_SCROLL_DOWN
-#define FLIPIT_QUIT BUTTON_POWER
-#define FLIPIT_SHUFFLE (BUTTON_PLAY | BUTTON_LEFT)
-#define FLIPIT_SOLVE (BUTTON_PLAY | BUTTON_RIGHT)
+#define FLIPIT_UP           BUTTON_SCROLL_UP
+#define FLIPIT_DOWN         BUTTON_SCROLL_DOWN
+#define FLIPIT_QUIT         BUTTON_POWER
+#define FLIPIT_SHUFFLE      (BUTTON_PLAY | BUTTON_LEFT)
+#define FLIPIT_SOLVE        (BUTTON_PLAY | BUTTON_RIGHT)
 #define FLIPIT_STEP_BY_STEP (BUTTON_PLAY | BUTTON_SCROLL_UP)
-#define FLIPIT_TOGGLE_PRE BUTTON_REW
-#define FLIPIT_TOGGLE (BUTTON_REW | BUTTON_REL)
+#define FLIPIT_TOGGLE_PRE   BUTTON_REW
+#define FLIPIT_TOGGLE       (BUTTON_REW | BUTTON_REL)
 
 #endif
 
@@ -105,6 +114,8 @@ static struct plugin_api* rb;
 static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
+
+#ifdef HAVE_LCD_BITMAP
 
 #include "flipit_cursor.h"
 #include "flipit_tokens.h"
@@ -146,12 +157,6 @@ static void draw_cursor(void)
 #endif
 }
 
-/* clear the cursor where it is */
-static inline void clear_cursor(void)
-{
-    draw_spot( cursor_pos );
-}
-
 /* draw the info panel ... duh */
 static void draw_info_panel(void)
 {
@@ -167,6 +172,86 @@ static void draw_info_panel(void)
     rb->snprintf( s, sizeof(s), "Flips: %d", moves );
     rb->lcd_putsxy( (LCD_WIDTH - rb->lcd_getstringsize(s, NULL, NULL)) / 2,
                     GRID_TOP + 4*(TK_HEIGHT+TK_SPACE) + 2, s );
+}
+
+#else /* HAVE_LCD_CHARCELLS */
+
+static const unsigned char tk_pat[4][7] = {
+    { 0x0e, 0x11, 0x0e, 0x00, 0x0e, 0x11, 0x0e }, /* white - white */
+    { 0x0e, 0x11, 0x0e, 0x00, 0x0e, 0x1f, 0x0e }, /* white - black */
+    { 0x0e, 0x1f, 0x0e, 0x00, 0x0e, 0x11, 0x0e }, /* black - white */
+    { 0x0e, 0x1f, 0x0e, 0x00, 0x0e, 0x1f, 0x0e }  /* black - black */
+};
+
+static unsigned char cur_pat[7];
+static unsigned char gfx_chars[5];
+
+static void release_gfx(void)
+{
+    int i;
+    
+    for (i = 0; i < 5; i++)
+        if (gfx_chars[i])
+            rb->lcd_unlock_pattern(gfx_chars[i]);
+}
+
+static bool init_gfx(void)
+{
+    int i;
+
+    for (i = 0; i < 5; i++) {
+        if ((gfx_chars[i] = rb->lcd_get_locked_pattern()) == 0) {
+            release_gfx();
+            return false;
+        }
+    }
+    for (i = 0; i < 4; i++)
+        rb->lcd_define_pattern(gfx_chars[i], tk_pat[i]);
+    return true;
+}
+
+/* draw a spot at the coordinates (x,y), range of p is 0-19 */
+static void draw_spot(int p)
+{
+    if ((p/5) & 1)
+        p -= 5;
+
+    rb->lcd_putc (p%5, p/10, gfx_chars[2*spots[p]+spots[p+5]]);
+}
+
+/* draw the cursor at the current cursor position */
+static void draw_cursor(void) 
+{
+    if ((cursor_pos/5) & 1) {
+        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos-5]+spots[cursor_pos]], 7 );
+        cur_pat[4] ^= 0x15;
+        cur_pat[6] ^= 0x11;
+    }
+    else {
+        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos]+spots[cursor_pos+5]], 7 );
+        cur_pat[0] ^= 0x15;
+        cur_pat[2] ^= 0x11;
+    }
+    rb->lcd_define_pattern(gfx_chars[4], cur_pat);
+    rb->lcd_putc( cursor_pos%5, cursor_pos/10, gfx_chars[4] );
+}
+
+/* draw the info panel ... duh */
+static void draw_info_panel(void)
+{
+    char s[16];
+    
+    rb->lcd_puts( 6, 0, "Flips" );
+    rb->snprintf( s, sizeof(s), "%d", moves );
+    rb->lcd_puts( 6, 1, s );
+}
+
+#endif /* LCD */
+
+/* clear the cursor where it is */
+static inline void clear_cursor(void)
+{
+    draw_spot( cursor_pos );
 }
 
 /* check if the puzzle is finished */
@@ -219,21 +304,25 @@ static void move_cursor(int x, int y)
                      + ( ( y + 4 + cursor_pos/5 )%4 )*5;
         draw_cursor();
     }
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
+#endif
 }
 
 /* initialize the board */
 static void flipit_init(void) 
 {
     int i;
+
     rb->lcd_clear_display();
-    moves = 0;
     for (i=0; i<20; i++) {
         spots[i]=1;
         toggle[i]=1;
         draw_spot(i);
     }
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
+#endif
     for (i=0; i<20; i++) {
         cursor_pos = (rb->rand() % 20);
         flipit_toggle();
@@ -243,7 +332,9 @@ static void flipit_init(void)
     draw_cursor();
     moves = 0;
     draw_info_panel();
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
+#endif
 }
 
 /* the main game loop */
@@ -278,7 +369,9 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
+#ifdef HAVE_LCD_BITMAP
                             rb->lcd_update();
+#endif
                             rb->sleep(HZ*2/3);
                         }
                 }
@@ -292,7 +385,9 @@ static bool flipit_loop(void)
                             cursor_pos = i;
                             flipit_toggle();
                             draw_cursor();
+#ifdef HAVE_LCD_BITMAP
                             rb->lcd_update();
+#endif
                             break;
                         }
                 }
@@ -307,7 +402,9 @@ static bool flipit_loop(void)
                 if (!flipit_finished()) {
                     flipit_toggle();
                     draw_cursor();
+#ifdef HAVE_LCD_BITMAP
                     rb->lcd_update();
+#endif
                 }
                 break;
 
@@ -320,6 +417,10 @@ static bool flipit_loop(void)
                 break;
 
             case FLIPIT_UP:
+#ifdef FLIPIT_UP_PRE
+                if (lastbutton != FLIPIT_UP_PRE)
+                    break;
+#endif
                 move_cursor(0, -1);
                 break;
 
@@ -340,7 +441,10 @@ static bool flipit_loop(void)
 /* called function from outside */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-    int w, h, i;
+    int i, rc;
+#ifdef HAVE_LCD_BITMAP
+    int w, h;
+#endif
 
     (void)parameter;
     rb = api;
@@ -349,15 +453,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_background(LCD_WHITE);
 #endif
 
-    /* print title */
-    rb->lcd_getstringsize("FlipIt!", &w, &h);
-    w = (w+1)/2;
-    h = (h+1)/2;
-    rb->lcd_clear_display();
-    rb->lcd_putsxy(LCD_WIDTH/2-w, (LCD_HEIGHT/2)-h, "FlipIt!");
-    rb->lcd_update();
-    rb->sleep(HZ);
+    rb->splash(HZ, true, "FlipIt!");
 
+#ifdef HAVE_LCD_BITMAP
     /* print instructions */
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -388,6 +486,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 48, "[S-RIGHT] step by step");
 #endif
     rb->lcd_update();
+#else /* HAVE_LCD_CHARCELLS */
+    if (!init_gfx())
+        return PLUGIN_ERROR;
+#endif
     rb->button_get_w_tmo(HZ*3);
 
     rb->lcd_clear_display();
@@ -396,10 +498,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         spots[i]=1;
         draw_spot(i);
     }
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
+#endif
     rb->sleep(HZ*3/2);
     rb->srand(*rb->current_tick);
 
-    return flipit_loop();
-}
+    rc = flipit_loop();
+#ifdef HAVE_LCD_CHARCELLS
+    release_gfx();
 #endif
+    return rc;
+}
