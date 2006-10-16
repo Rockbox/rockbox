@@ -5,7 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id: flipit.c,v 1.0 2003/01/18 23:51:47
+ * $Id$
  *
  * Copyright (C) 2002 Vicentini Martin
  *
@@ -75,18 +75,19 @@ PLUGIN_HEADER
 #define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
 #define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
 
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
 #define FLIPIT_QUIT         BUTTON_POWER
-#define FLIPIT_SHUFFLE      (BUTTON_PLAY | BUTTON_LEFT)
-#define FLIPIT_SOLVE        (BUTTON_PLAY | BUTTON_RIGHT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_PLAY | BUTTON_UP)
-#define FLIPIT_TOGGLE_PRE   BUTTON_SELECT
-#define FLIPIT_TOGGLE       (BUTTON_SELECT | BUTTON_REL)
+#define FLIPIT_SHUFFLE      BUTTON_REC
+#define FLIPIT_SOLVE_PRE    BUTTON_PLAY
+#define FLIPIT_SOLVE        (BUTTON_PLAY | BUTTON_REPEAT)
+#define FLIPIT_STEP_PRE     BUTTON_PLAY
+#define FLIPIT_STEP_BY_STEP (BUTTON_PLAY | BUTTON_REL)
+#define FLIPIT_TOGGLE       BUTTON_SELECT
 
-#elif (CONFIG_KEYPAD == GIGABEAT_PAD)
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
 
 #define FLIPIT_UP           BUTTON_UP
 #define FLIPIT_DOWN         BUTTON_DOWN
@@ -94,10 +95,9 @@ PLUGIN_HEADER
 #define FLIPIT_SHUFFLE      (BUTTON_POWER | BUTTON_LEFT)
 #define FLIPIT_SOLVE        (BUTTON_POWER | BUTTON_RIGHT)
 #define FLIPIT_STEP_BY_STEP (BUTTON_POWER | BUTTON_UP)
-#define FLIPIT_TOGGLE_PRE   BUTTON_MENU
-#define FLIPIT_TOGGLE       (BUTTON_MENU | BUTTON_REL)
+#define FLIPIT_TOGGLE       BUTTON_MENU
 
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #define FLIPIT_UP           BUTTON_SCROLL_UP
 #define FLIPIT_DOWN         BUTTON_SCROLL_DOWN
@@ -361,6 +361,10 @@ static bool flipit_loop(void)
                 break;
 
             case FLIPIT_SOLVE:
+#ifdef FLIPIT_SOLVE_PRE
+                if (lastbutton != FLIPIT_SOLVE_PRE)
+                    break;
+#endif
                 /* solve the puzzle */
                 if (!flipit_finished()) {
                     for (i=0; i<20; i++)
@@ -378,6 +382,10 @@ static bool flipit_loop(void)
                 break;
 
             case FLIPIT_STEP_BY_STEP:
+#ifdef FLIPIT_STEP_PRE
+                if (lastbutton != FLIPIT_STEP_PRE)
+                    break;
+#endif
                 if (!flipit_finished()) {
                     for (i=0; i<20; i++)
                         if (!toggle[i]) {
@@ -442,9 +450,6 @@ static bool flipit_loop(void)
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int i, rc;
-#ifdef HAVE_LCD_BITMAP
-    int w, h;
-#endif
 
     (void)parameter;
     rb = api;
@@ -471,7 +476,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[M-UP] solution");
     rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
     rb->lcd_putsxy(2, 8, "[STOP] to stop");
     rb->lcd_putsxy(2, 18, "[SELECT] toggle");
     rb->lcd_putsxy(2, 28, "[MODE] shuffle");
@@ -484,6 +490,24 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_putsxy(2, 28, "[S-LEFT] shuffle");
     rb->lcd_putsxy(2, 38, "[S-PLAY] solution");
     rb->lcd_putsxy(2, 48, "[S-RIGHT] step by step");
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+    rb->lcd_putsxy(2, 8, "[POWER] to stop");
+    rb->lcd_putsxy(2, 18, "[SELECT] toggle");
+    rb->lcd_putsxy(2, 28, "[REC] shuffle");
+    rb->lcd_putsxy(2, 38, "[PLAY..] solution");
+    rb->lcd_putsxy(2, 48, "[PLAY] step by step");
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+    rb->lcd_putsxy(2, 8, "[A] to stop");
+    rb->lcd_putsxy(2, 18, "[MENU] toggle");
+    rb->lcd_putsxy(2, 28, "[P-LEFT] shuffle");
+    rb->lcd_putsxy(2, 38, "[P-RIGHT] solution");
+    rb->lcd_putsxy(2, 48, "[P-UP] step by step");
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+    rb->lcd_putsxy(2, 8, "[POWER] to stop");
+    rb->lcd_putsxy(2, 18, "[REW] toggle");
+    rb->lcd_putsxy(2, 28, "[PL-LEFT] shuffle");
+    rb->lcd_putsxy(2, 38, "[PL-RIGHT] solution");
+    rb->lcd_putsxy(2, 48, "[PL-UP] step by step");
 #endif
     rb->lcd_update();
 #else /* HAVE_LCD_CHARCELLS */

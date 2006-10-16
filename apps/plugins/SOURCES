@@ -6,7 +6,6 @@ cube.c
 dict.c
 favorites.c
 firmware_flash.c
-flipit.c
 logo.c
 metronome.c
 mosaique.c
@@ -29,6 +28,8 @@ wavplay.c
 
 #ifndef IRIVER_IFP7XX_SERIES       /* Temporarily disable plugins for iFP7xx */
 dice.c
+flipit.c
+
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 disktidy.c
 text_editor.c
