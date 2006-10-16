@@ -1512,6 +1512,9 @@ fontzip:
 zip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" \$(TARGET) \$(BINARY)
 
+mapzip:
+	\$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
+
 fullzip:
 	\$(SILENT)\$(TOOLSDIR)/buildzip.pl \$(VERBOSEOPT) -t \"\$(ARCHOS)\" -r "\$(ROOTDIR)" -f 2 -o rockbox-full.zip \$(TARGET) \$(BINARY)
 
@@ -1554,6 +1557,7 @@ help:
 	@echo "bzip2       - creates a rockbox.tar.bz2 of your build (no fonts)"
 	@echo "7zip        - creates a rockbox.7z of your build (no fonts)"
 	@echo "fontzip     - creates rockbox-fonts.zip"
+	@echo "mapzip      - creates rockbox-maps.zip with all .map files"
 	@echo "tools       - builds the tools only"
 	@echo "install     - installs your build (for simulator builds only)" 
 
