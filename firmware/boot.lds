@@ -11,11 +11,7 @@ OUTPUT_ARCH(arm)
 /* the ipods can't have the crt0.o mentioned here, but the others can't do
    without it! */
 #ifdef CPU_PP
-#if (CONFIG_CPU == PP5024)
-INPUT(target/arm/crt0-pp5024.o)
-#else
 INPUT(target/arm/crt0-pp.o)
-#endif
 #else
 INPUT(target/arm/crt0.o)
 #endif

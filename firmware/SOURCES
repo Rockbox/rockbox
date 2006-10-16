@@ -169,11 +169,7 @@ rolo.c
 thread.c
 timer.c
 #ifdef CPU_PP
-#if (CONFIG_CPU == PP5024)
-target/arm/crt0-pp5024.S
-#else
 target/arm/crt0-pp.S
-#endif
 #elif defined(CPU_ARM)
 target/arm/crt0.S
 #elif defined(CPU_COLDFIRE)
@@ -236,6 +232,7 @@ drivers/m5636.c
 #ifdef SANSA_E200
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
+target/arm/sandisk/sansa-e200/adc-e200.c
 #endif
 
 #ifdef IAUDIO_X5
