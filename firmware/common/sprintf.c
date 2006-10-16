@@ -156,9 +156,10 @@ static int format(
     return ok; /* true means good */
 }
 
-#ifndef SIMULATOR
+#if !defined(SIMULATOR) || !defined(linux)
 /* ALSA library requires a more advanced snprintf, so let's not
-   override it in simulator */
+   override it in simulator for Linux.  Note that Cygwin requires
+   our snprintf or it produces garbled output after a while. */
 
 struct for_snprintf {
     unsigned char *ptr; /* where to store it */
@@ -216,7 +217,7 @@ int vsnprintf(char *buf, int size, const char *fmt, va_list ap)
     return pr.bytes;
 }
 
-#endif /* SIMULATOR */
+#endif /* Linux SIMULATOR */
 
 struct for_fprintf {
     int fd;    /* where to store it */
