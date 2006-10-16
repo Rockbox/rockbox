@@ -44,6 +44,9 @@ static unsigned short disp_control_rev;
 /* Contrast setting << 8 */
 static int lcd_contrast;
 
+/* Hardware dither bit */
+static unsigned short hw_dit = 0x0000;
+
 /* Forward declarations */
 static void lcd_display_off(void);
 
@@ -100,6 +103,13 @@ static inline void lcd_begin_write_gram(void)
 {
     LCD_CMD = 0x0000;
     LCD_CMD = R_WRITE_DATA_2_GRAM << 1;
+}
+
+static void hw_dither(bool on)
+{
+    /* DIT=x, BGR=1, HWM=0, I/D1-0=11, AM=1, LG2-0=000 */
+    hw_dit = on ? 0x8000 : 0x0000;
+    lcd_write_reg(R_ENTRY_MODE, 0x1038 | hw_dit);
 }
 
 /*** hardware configuration ***/
@@ -224,8 +234,8 @@ static void lcd_power_on(void)
     lcd_write_reg(R_DRV_OUTPUT_CONTROL, y_offset ? 0x0013 : 0x0313);
     /* FLD1-0=01 (1 field), B/C=1, EOR=1 (C-pat), NW5-0=000000 (1 row) */
     lcd_write_reg(R_DRV_AC_CONTROL, 0x0700);
-    /* DIT=1, BGR=1, HWM=0, I/D1-0=11, AM=1, LG2-0=000 */
-    lcd_write_reg(R_ENTRY_MODE, 0x9038);
+    /* DIT=x, BGR=1, HWM=0, I/D1-0=11, AM=1, LG2-0=000 */
+    lcd_write_reg(R_ENTRY_MODE, 0x1038 | hw_dit);
     /* CP15-0=0000000000000000 */
     lcd_write_reg(R_COMPARE_REG, 0x0000);
     /* NO1-0=01, SDT1-0=00, EQ1-0=00, DIV1-0=00, RTN3-00000 */
@@ -379,6 +389,7 @@ void lcd_init_device(void)
     lcd_roll(0);
     lcd_set_invert_display(false);
     lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
+    hw_dither(false); /* do this or all bootloaders will need reflashing */
 #endif
 }
 
@@ -455,6 +466,9 @@ void lcd_yuv_blit(unsigned char * const src[3],
     if (!display_on)
         return;
 
+    if (hw_dit == 0x0000)
+        hw_dither(true);
+
     width = (width + 1) & ~1;
     height = (height + 1) & ~1;
 
@@ -493,6 +507,9 @@ void lcd_update(void)
     if (!display_on)
         return;
 
+    if (hw_dit != 0x0000)
+        hw_dither(false);
+
     /* Set start position and window */
     /* Just add roll offset to start address. CP will roll back around. */
     lcd_write_reg(R_RAM_ADDR_SET, y_offset + roll_offset); /* X == 0 */
@@ -512,6 +529,9 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if (!display_on)
         return;
+
+    if (hw_dit != 0x0000)
+        hw_dither(false);
 
     if (x + width > LCD_WIDTH)
         width = LCD_WIDTH - x; /* Clip right */

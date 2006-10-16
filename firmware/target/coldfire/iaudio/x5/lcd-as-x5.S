@@ -290,6 +290,9 @@ lcd_write_yuv420_lines:
     lea.l   (36,%sp),%sp    /* restore registers */
 
     rts
+
+.yuv_end:
+    .size   lcd_write_yuv420_lines,.yuv_end-lcd_write_yuv420_lines
 /* end lcd_write_yuv420_lines */
 
 
@@ -304,22 +307,19 @@ lcd_write_data:
     add.l   %a0,%d0         /* -> end address */
     lea.l   0xf0008002,%a1  /* LCD data port */
 
-    lea.l   (-24,%sp),%sp   /* free up some registers */
-    movem.l %d2-%d6/%a2,(%sp)
+    lea.l   (-20,%sp),%sp   /* free up some registers */
+    movem.l %d2-%d5/%a2,(%sp)
 
     move.l  %a0,%d1
     btst.l  #1,%d1          /* already longword aligned? */
     beq.b   .wd_wordl_end   /* yes: skip initial word copy */
                             /* transfer initial word */
-    move.w  (%a0)+,%d1      /* |????????|????????|rrrrrggg|gggbbbbb| */
-    move.l  %d1,%d2
-    and.l   #0xfffff800,%d2 /* |????????|????????|rrrrr000|00000000| */
-    add.l   %d2,%d1         /* |????????|???????r|rrrr0ggg|gggbbbbb| */
-    move.l  %d1,%d2
-    lsr.l   #8,%d1          /* |00000000|????????|???????r|rrrr0ggg| */
-    move.w  %d1,(%a1)
-    lsl.l   #1,%d2          /* |????????|??????rr|rrr0gggg|ggbbbbb0| */
-    move.w  %d2,(%a1)
+    move.w  (%a0)+,%d2      /* |????????|????????|rrrrrggg|gggbbbbb| */
+    move.l  %d2,%d1
+	lsr.l   #7,%d1		    /* |0000000?|????????|???????r|rrrrgggg| */
+	move.w  %d1,(%a1)       /*                           ^ ^^^^^^^   */
+	lsl.l   #1,%d2      	/* |????????|???????r|rrrrgggg|ggbbbbb0| */
+	move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
 
 .wd_wordl_end:              /* now longword aligned */
     moveq.l #28,%d1
@@ -335,22 +335,17 @@ lcd_write_data:
     bls.b   .wd_long1_end   /* no: skip leading long loop */
 
 .wd_long1_loop:
-    move.l  (%a0)+,%d2      /* read longword */
-    swap    %d2             /* unstuff two pixels and correct order */
+    move.l  (%a0)+,%d2		/* read longword */
+    swap    %d2             /* |rrrrrggg|gggbbbbb|RRRRRGGG|GGGBBBBB| */
     move.l  %d2,%d5
-    and.l   #0xff00ff00,%d5 /* |rrrrrggg|00000000|rrrrrggg|00000000| */
-    eor.l   %d5,%d2         /* |00000000|gggbbbbb|00000000|gggbbbbb| */
-    lsr.l   #8,%d5          /* |00000000|rrrrrggg|00000000|rrrrrggg| */
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5 /* |00000000|rrrrr000|00000000|rrrrr000| */
-    add.l   %d6,%d5         /* |0000000r|rrrr0ggg|0000000r|rrrr0ggg| */
-    move.w  %d5,(%a1)
-    lsl.l   #1,%d2          /* |0000000g|ggbbbbb0|0000000g|ggbbbbb0| */
-    move.w  %d2,(%a1)
-    swap    %d5
-    move.w  %d5,(%a1)
-    swap    %d2
-    move.w  %d2,(%a1)
+    lsr.l   #7,%d5          /* |0000000r|rrrrgggg|ggbbbbbR|RRRRGGGG| */
+    move.w  %d5,(%a1)       /*                           ^ ^^^^^^^   */
+    lsl.l   #1,%d2          /* |rrrrgggg|ggbbbbbR|RRRRBGGG|GGBBBBB0| */
+    move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
+    swap    %d5          	/* |ggbbbbbR|RRRRGGGG|0000000r|rrrrgggg| */
+    move.w  %d5,(%a1)       /*                           ^ ^^^^^^^   */
+    swap    %d2             /* |RRRRBGGG|GGBBBBB0|rrrrgggg|ggbbbbbR| */
+    move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
     cmp.l   %a0,%d1
     bhi.b   .wd_long1_loop
 
@@ -363,15 +358,9 @@ lcd_write_data:
     lea.l   (16,%a0),%a0    /* increment address */
 
     /* transfer four pairs of longs to display */
-    /* same procedure for each as in leading long loop */
     swap    %d1
     move.l  %d1,%d5
-    and.l   #0xff00ff00,%d5
-    eor.l   %d5,%d1
-    lsr.l   #8,%d5
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5
-    add.l   %d6,%d5
+    lsr.l   #7,%d5
     move.w  %d5,(%a1)
     lsl.l   #1,%d1
     move.w  %d1,(%a1)
@@ -380,14 +369,9 @@ lcd_write_data:
     swap    %d1
     move.w  %d1,(%a1)
 
-    swap    %d2
+    swap    %d2 
     move.l  %d2,%d5
-    and.l   #0xff00ff00,%d5
-    eor.l   %d5,%d2
-    lsr.l   #8,%d5
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5
-    add.l   %d6,%d5
+    lsr.l   #7,%d5
     move.w  %d5,(%a1)
     lsl.l   #1,%d2
     move.w  %d2,(%a1)
@@ -396,14 +380,9 @@ lcd_write_data:
     swap    %d2
     move.w  %d2,(%a1)
 
-    swap    %d3
+    swap    %d3 
     move.l  %d3,%d5
-    and.l   #0xff00ff00,%d5
-    eor.l   %d5,%d3
-    lsr.l   #8,%d5
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5
-    add.l   %d6,%d5
+    lsr.l   #7,%d5
     move.w  %d5,(%a1)
     lsl.l   #1,%d3
     move.w  %d3,(%a1)
@@ -412,14 +391,9 @@ lcd_write_data:
     swap    %d3
     move.w  %d3,(%a1)
 
-    swap    %d4
+    swap    %d4 
     move.l  %d4,%d5
-    and.l   #0xff00ff00,%d5
-    eor.l   %d5,%d4
-    lsr.l   #8,%d5
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5
-    add.l   %d6,%d5
+    lsr.l   #7,%d5
     move.w  %d5,(%a1)
     lsl.l   #1,%d4
     move.w  %d4,(%a1)
@@ -437,15 +411,10 @@ lcd_write_data:
     bls.b   .wd_long2_end   /* no: skip trailing longword loop */
 
 .wd_long2_loop:
-    move.l  (%a0)+,%d2      /* read longword */
-    swap    %d2
+    move.l  (%a0)+,%d2		/* read longword */
+    swap    %d2 
     move.l  %d2,%d5
-    and.l   #0xff00ff00,%d5
-    eor.l   %d5,%d2
-    lsr.l   #8,%d5
-    move.l  %d5,%d6
-    and.l   #0x00f800f8,%d5
-    add.l   %d6,%d5
+    lsr.l   #7,%d5
     move.w  %d5,(%a1)
     lsl.l   #1,%d2
     move.w  %d2,(%a1)
@@ -459,18 +428,18 @@ lcd_write_data:
 .wd_long2_end:
     blo.b   .wd_word2_end   /* no final word: skip */
 
-    move.w  (%a0),%d1       /* transfer final word */
-    move.l  %d1,%d2
-    and.l   #0xfffff800,%d2
-    add.l   %d2,%d1
-    move.l  %d1,%d2
-    lsr.l   #8,%d1
-    move.w  %d1,(%a1)
-    lsl.l   #1,%d2
-    move.w  %d2,(%a1)
+    move.w  (%a0)+,%d2      /* transfer final word */
+    move.l  %d2,%d1
+	lsr.l   #7,%d1
+	move.w  %d1,(%a1)
+	lsl.l   #1,%d2
+	move.w  %d2,(%a1)
 
 .wd_word2_end:
-    movem.l (%sp),%d2-%d6/%a2
-    lea.l   (24,%sp),%sp    /* restore registers */
+    movem.l (%sp),%d2-%d5/%a2
+    lea.l   (20,%sp),%sp    /* restore registers */
     rts
+
+.wd_end:
+    .size   lcd_write_data,.wd_end-lcd_write_data
 /* end lcd_write_data */
