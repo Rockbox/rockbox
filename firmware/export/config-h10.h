@@ -70,6 +70,8 @@
 
 #define BATTERY_CAPACITY_DEFAULT 1550 /* default battery capacity */
 
+#define AB_REPEAT_ENABLE 1
+
 #ifndef SIMULATOR
 
 /* Define this if you have a PortalPlayer PP5020 */
