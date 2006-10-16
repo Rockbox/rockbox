@@ -307,7 +307,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     
     if (audiobuf_size < len)
     {
-        rb->splash(HZ*3, true, "Out of memory!");
+        rb->splash(HZ*3, true, "Aborting: Out of memory!");
         rb->close(fd);
         return -2;
     }
@@ -320,7 +320,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     rb->close(fd);
     if (rc != len)
     {
-        rb->splash(HZ*3, true, "Read failure");
+        rb->splash(HZ*3, true, "Aborting: Read failure");
         return -3;
     }
     
@@ -331,7 +331,7 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     
     if (sum != *checksum)
     {
-        rb->splash(HZ*3, true, "Checksums mismatch!");
+        rb->splash(HZ*3, true, "Aborting: Checksums mismatch!");
         return -4;
     }
     
@@ -387,10 +387,6 @@ int flash_rockbox(const char *filename)
     unsigned char *p8;
     uint16_t *p16;
     
-    len = load_firmware_file(filename, &checksum);
-    if (len <= 0)
-        return len * 10;
-    
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
     if (!detect_valid_bootloader(p8, 0))
     {
@@ -409,6 +405,10 @@ int flash_rockbox(const char *filename)
             return -3;
     }
 
+    len = load_firmware_file(filename, &checksum);
+    if (len <= 0)
+        return len * 10;
+    
     /* Erase the program flash. */
     for (i = 1; i < BOOTLOADER_ERASEGUARD && (i-1)*4096 < len + 32; i++)
     {
@@ -475,13 +475,19 @@ void show_fatal_error(void)
 
 int flash_bootloader(const char *filename)
 {
-    char buf[32];
+    char *bootsector;
     int pos, i, len, rc;
     unsigned long checksum, sum;
     unsigned char *p8;
     uint16_t *p16;
+
+    bootsector = audiobuf;
+    audiobuf += SEC_SIZE;
+    audiobuf_size -= SEC_SIZE;
     
-    (void)buf;
+    if (!confirm("Update bootloader?"))
+        return -2;
+    
     len = load_firmware_file(filename, &checksum);
     if (len <= 0)
         return len * 10;
@@ -499,16 +505,22 @@ int flash_bootloader(const char *filename)
         return -1;
     }
 
-    if (!confirm("Update bootloader?"))
-        return -2;
-    
     rb->lcd_puts(0, 3, "Flashing...");
     rb->lcd_update();
 
+    /* Backup the bootloader sector first. */
+    p8 = (char *)FB;
+    rb->memcpy(bootsector, p8, SEC_SIZE);
+    
     /* Erase the boot sector and write a proper reset vector. */
     cfi_erase_sector(FB);
     p16 = (uint16_t *)audiobuf;
-    for (i = 0; i < 4; i++)
+    for (i = 0; i < 8/2; i++)
+        cfi_program_word(FB + i, p16[i]);
+    
+    /* And restore original content for original FW to function. */
+    p16 = (uint16_t *)bootsector;
+    for (i = 8/2; i < SEC_SIZE/2; i++)
         cfi_program_word(FB + i, p16[i]);
     
     /* Erase the bootloader flash section. */
@@ -632,6 +644,9 @@ int load_original_bin(const char *filename)
     int len, rc;
     int fd;
     
+    if (!confirm("Restore original firmware (bootloader will be kept)?"))
+        return -2;
+    
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return -1;
@@ -658,9 +673,6 @@ int load_original_bin(const char *filename)
     if (len % 2)
         len++;
     
-    if (!confirm("Restore original firmware (bootloader will be kept)?"))
-        return -2;
-    
     return flash_original_fw(len);
 }
 
@@ -668,6 +680,9 @@ int load_romdump(const char *filename)
 {
     int len, rc;
     int fd;
+    
+    if (!confirm("Restore firmware section (bootloader will be kept)?"))
+        return -2;
     
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
@@ -692,9 +707,6 @@ int load_romdump(const char *filename)
     
     if (len > BOOTLOADER_ENTRYPOINT - 8)
         len = BOOTLOADER_ENTRYPOINT - 8;
-    
-    if (!confirm("Restore firmware section (bootloader will be kept)?"))
-        return -2;
     
     return flash_original_fw(len);
 }
