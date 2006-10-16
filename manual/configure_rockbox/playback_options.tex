@@ -40,9 +40,19 @@ related to audio playback.
       This option is more complicated to use than the others as the \dap\
       must first be placed into A-B repeat mode and then the start and end
       points defined.\\
-      \fixme{
-        Hold Play and press Left  --- Sets Start Point (A)\\
-        Hold Play and press Right --- Sets End Point (B)\\
+      \opt{h10,h10_5gb}{
+        \fixme{
+          Hold \ButtonPower{} and press \ButtonRew{}  --- Sets Start Point (A)\\
+          Hold \ButtonPower{} and press \ButtonFF{} --- Sets End Point (B)\\
+          Hold \ButtonPower{} and press \ButtonPlay{} --- Clear Start and End
+         Points
+        }
+      }
+      \nopt{h10,h10_5gb}{
+        \fixme{
+          Hold Play and press Left  --- Sets Start Point (A)\\
+          Hold Play and press Right --- Sets End Point (B)\\
+        }
       }
     }
   \end{description}
