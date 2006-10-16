@@ -75,7 +75,7 @@ int button_read_device(void)
         if ((state & 0x8) == 0) btn |= BUTTON_LEFT;
         if ((state & 0x10) == 0) btn |= BUTTON_SELECT; /* The centre button */
         if ((state & 0x20) == 0) btn |= BUTTON_UP; /* The "play" button */
-        if ((state & 0x40) == 1) btn |= BUTTON_POWER;
+        if ((state & 0x40) != 0) btn |= BUTTON_POWER;
     }
 
     return btn;
