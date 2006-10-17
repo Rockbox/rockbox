@@ -192,46 +192,43 @@ before shutdown.
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
 This is the virtual keyboard that is used when entering file names in Rockbox.
 
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}{
-    \begin{table}
+
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
+  \begin{table}
     \begin{btnmap}{}{}
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,RECORDER_PAD}
-        {\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+      \ActionKbdLeft/\ActionKbdRight/\ActionKbdUp/\ActionKbdDown
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
-        {\ButtonOn+\ButtonLeft/\ButtonRight}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
-      & Move about within the current file name (moves the line cursor) \\
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
+        \ActionKbdCursorLeft{} or \ActionKbdCursorRight
+        & Move about within the current file name (moves the line cursor) \\
+      }
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
-      \opt{RECORDER_PAD}{\ButtonPlay}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      \ActionKbdSelect
       & Inserts the currently selected keyboard letter at the current
-        filename cursor position \\
+      filename cursor position \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{\ButtonOff}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      \ActionKbdAbort
       & Exits the virtual keyboard without saving any changes \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{n/a}
-      \opt{RECORDER_PAD}{\ButtonFOne}
-      & SHIFT: Shifts between the upper case, lower case and accented keyboards \\
+      \opt{RECORDER_PAD}{
+        \ButtonFOne
+        & SHIFT: Shifts between the upper case, lower case and accented keyboards \\
+      }
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-      \opt{RECORDER_PAD}{\ButtonFTwo}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
+      \ActionKbdDone
       & OK: Exits the virtual keyboard and saves any changes \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonRec}
-      \opt{RECORDER_PAD}{\ButtonFThree}
-      \opt{IAUDIO_X5_PAD}{Please add correct keys} 
-      & DEL: Deletes the character before the current filename cursor \\
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
+        \ActionKbdBackSpace
+        & DEL: Deletes the character before the current filename cursor \\
+      }
       %
-      \opt{SWCODEC}{
-        \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn+\ButtonMode}
-        \opt{IAUDIO_X5_PAD}{Please add correct keys} 
-        & Enters Morse input mode\\
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{
+        \ActionKbdMorseInput
+        & Enters Morse input mode \\
+        \ActionKbdMorseSelect
+        & Tap to select a character in Morse input mode \\
       }
     \end{btnmap}
   \end{table}
@@ -241,25 +238,24 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
-      \ButtonScrollFwd/\ButtonScrollBack & Move about the virtual keyboard \\
-      \ButtonLeft/\ButtonRight & (moves the solid cursor).
-          If you move out of the picker area with \ButtonScrollFwd/\ButtonScrollBack,
-          you get to the line edit mode. \\
-      \ButtonSelect 
-        & Inserts the currently selected keyboard letter at the current
-          filename cursor position \\
-      Hold \ButtonSelect
-      	& OK: Exits the virtual keyboard and saves any changes \\
-      \ButtonMenu
-        & Exits the virtual keyboard without saving any changes\\
+      \ActionKbdUp/\ActionKbdDown & Move about the virtual keyboard.
+      If you move out of the picker area, you get to the \emph{Line edit mode}. \\
+      \ActionKbdLeft/\ActionKbdRight & (moves the solid cursor). \\
+      \ActionKbdSelect
+      & Inserts the currently selected keyboard letter at the current
+      filename cursor position \\
+      \ActionKbdDone
+      & OK: Exits the virtual keyboard and saves any changes \\
+      \ActionKbdAbort
+      & Exits the virtual keyboard without saving any changes\\
     \end{btnmap}
   \end{table}
   \textbf{Line edit mode}
   \begin{table}
     \begin{btnmap}{}{}
-      \ButtonLeft/\ButtonRight & Move left and right\\
-      \ButtonSelect & Deletes the letter to the left of the cursor\\
-      \ButtonScrollFwd/\ButtonScrollBack & Returns to the picker area\\
+      \ActionKbdLeft/\ActionKbdRight & Move left and right\\
+      \ActionKbdSelect & Deletes the letter to the left of the cursor\\
+      \ActionKbdUp/\ActionKbdDown & Returns to the picker area\\
     \end{btnmap}
   \end{table}
 }
