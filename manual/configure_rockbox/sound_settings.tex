@@ -7,9 +7,9 @@ change to customize your listening experience.
 \section{Volume}
   This setting adjusts the volume of your music. Like most professional 
   audio gear and many consumer audio products, Rockbox uses a decibel scale 
-  where 0 dB is a reference that indicates the maximum volume that the \dap\
-  can produce without possible distortion (clipping). All values lower than this
-  reference will be negative and yield a progressively softer volume. 
+  where 0 dB is a reference that indicates the maximum volume that the \dap{}
+  can produce without possible distortion (clipping). All values lower than 
+  this reference will be negative and yield a progressively softer volume. 
   \opt{player, recorder, recorderv2fm, ondio, ipodnano, ipodvideo}{
   Values higher than 0 dB are available and can be used to raise the
   volume more than would otherwise be possible. These volume levels will
@@ -86,9 +86,9 @@ change to customize your listening experience.
         Karaoke
         & Removes all sound that is the same in both channels. Since most
           music is recorded with vocals being equally present in both channels
-          to make the singer sound centrally placed, this often (but not always)
-          has the effect of removing the voice track from a song. This setting
-          also very often has other undesirable effects on the sound.  \\
+          to make the singer sound centrally placed, this often (but not 
+          always) has the effect of removing the voice track from a song. This 
+          setting also very often has other undesirable effects on the sound.  \\
         \bottomrule
   \end{tabularx}
   \end{center}
@@ -97,12 +97,12 @@ change to customize your listening experience.
 \section{Stereo Width}
   Stereo width allows you to manually specify the effect that is applied
   when the \setting{Channels} setting is set to \setting{Custom}.
-  All values below 100\% will progressively mix the contents of one channel into
-  the other. This has the effect of gradually centering the stereo image, until
-  you have monophonic sound at 0\%. Values above 100\% will progressively remove
-  components in one channel that is also present in the other. This has the
-  effect of widening the stereo field. A value of 100\% will leave the stereo
-  field unaltered.
+  All values below 100\% will progressively mix the contents of one channel 
+  into the other. This has the effect of gradually centering the stereo image, 
+  until you have monophonic sound at 0\%. Values above 100\% will progressively
+  remove components in one channel that is also present in the other. This has 
+  the effect of widening the stereo field. A value of 100\% will leave the 
+  stereo field unaltered.
 
 \opt{recorder,recorderv2fm}{
   \section{Loudness}
@@ -214,9 +214,9 @@ change to customize your listening experience.
   versa in order to simulate the spatial cues that the ear and brain receive
   when listening to a set of loudspeakers placed in front of the listener. The
   result is a more natural stereo image that can be especially appreciated in
-  older rock and jazz records, where one instrument is often hard-panned to just
-  one of the speakers. Many people will find such records tiring to listen to
-  using earphones and no crossfeed effect.
+  older rock and jazz records, where one instrument is often hard-panned to 
+  just one of the speakers. Many people will find such records tiring to listen
+  to using earphones and no crossfeed effect.
 
   Crossfeed has the following settings.
   \begin{description}
@@ -234,7 +234,8 @@ change to customize your listening experience.
     of both this setting and the \setting{Cross Gain} setting.
   \item[High-Frequency Cutoff]
     Decides at which frequency the cross path audio will start to be cut
-    by the amount described by the \setting{High-Frequency Attenuation} setting.
+    by the amount described by the \setting{High-Frequency Attenuation} 
+    setting.
   \end{description}
   
   Most users will find the default settings to yield satisfactory results, but
@@ -260,39 +261,39 @@ change to customize your listening experience.
       \textbf{EQ Band(s)} & \textbf{Description} \\\midrule
         Band 0:  Low shelf filter
         & A low shelf filter boosts or lowers all frequencies below the 
-        	designated cutoff point. The ``bass''control on most home or car 
-        	stereos is an example of a low shelf filter. The low shelf 
-        	filter in Rockbox is more flexible than a simple ``bass'' 
-        	control, because a simple bass control only lets you adjust 
-        	the amount of gain that is applied. Rockbox lets you control 
-        	the amount of gain that is applied (i.e., the amount that the 
-        	bass is boosted or cut) too, but Rockbox also allows you to 
-        	adjust the ``cutoff'' frequency where the shelving starts to take 
-        	effect. For example, a cutoff frequency of 50 Hz will adjust only very 
-        	low frequencies. A cutoff frequency of 200 Hz, on the other hand, will 
-        	adjust a much wider range of bass frequencies.. \\
+        designated cutoff point. The ``bass''control on most home or car 
+        stereos is an example of a low shelf filter. The low shelf 
+        filter in Rockbox is more flexible than a simple ``bass'' 
+        control, because a simple bass control only lets you adjust 
+        the amount of gain that is applied. Rockbox lets you control 
+        the amount of gain that is applied (i.e., the amount that the 
+        bass is boosted or cut) too, but Rockbox also allows you to 
+        adjust the ``cutoff'' frequency where the shelving starts to take 
+        effect. For example, a cutoff frequency of 50 Hz will adjust only very 
+        low frequencies. A cutoff frequency of 200 Hz, on the other hand, will 
+        adjust a much wider range of bass frequencies.. \\
         %
         Bands 1-3:  Peaking filters
-       	& Peaking EQ filters boost or low a center frequency that you select, 
-       		as well as the frequencies within a certain distance of that 
-       		center. Graphic equalizers in home stereos are usually peaking
-       		filters. The peaking EQs on Rockbox's parametric equalizer let
-       		you adjust three different parameters for each EQ band 1 
-       		through 3.  The ``center'' parameter controls the center 
-       		frequency that is adjusted by that EQ band. The ``gain'' 
-       		parameter controls how much each band is adjusted. Positive 
-       		numbers make the EQ band louder, while negative numbers make 
-       		that EQ band quieter. Finally, the ``Q'' parameter controls how wide 
-       		or narrow each EQ band is. Higher Q values will affect a 
-       		narrow band of frequencies, while lower EQ values will affect 
-       		a wider band of frequencies. \\
+        & Peaking EQ filters boost or low a center frequency that you select, 
+        as well as the frequencies within a certain distance of that 
+        center. Graphic equalizers in home stereos are usually peaking
+        filters. The peaking EQs on Rockbox's parametric equalizer let
+        you adjust three different parameters for each EQ band 1 
+        through 3.  The ``center'' parameter controls the center 
+        frequency that is adjusted by that EQ band. The ``gain'' 
+        parameter controls how much each band is adjusted. Positive 
+        numbers make the EQ band louder, while negative numbers make 
+        that EQ band quieter. Finally, the ``Q'' parameter controls how wide 
+        or narrow each EQ band is. Higher Q values will affect a 
+        narrow band of frequencies, while lower EQ values will affect 
+        a wider band of frequencies. \\
         %
         Band 4:  Hi shelf filter
-       	& A high shelf filter boosts or lowers all frequencies above a 
-        	designated cutoff point. The ``treble'' control on most home or car 
-        	stereos is an example of a high shelf filter. The high shelf filter is 
-        	adjusted the same way as the low shelf filter, except that it works on 
-        	the high end of the frequency spectrum rather than the low end.\\
+        & A high shelf filter boosts or lowers all frequencies above a 
+        designated cutoff point. The ``treble'' control on most home or car 
+        stereos is an example of a high shelf filter. The high shelf filter is 
+        adjusted the same way as the low shelf filter, except that it works on 
+        the high end of the frequency spectrum rather than the low end.\\
         \bottomrule
   \end{tabularx}
   \end{center}
@@ -306,9 +307,9 @@ change to customize your listening experience.
   This option controls whether the EQ is on or off.
   
   \item[Graphical EQ:]
-  This option brings up a graphic EQ screen, which allows adjustment of each of 
-  the three parameters described above (gain, center frequency, and Q) for each 
-  of the five EQ bands.  
+  This option brings up a graphic EQ screen, which allows adjustment of each of
+  the three parameters described above (gain, center frequency, and Q) for each
+  of the five EQ bands.
   
   \begin{table}
     \begin{btnmap}{}{}
@@ -327,58 +328,59 @@ change to customize your listening experience.
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonRight}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonRight} 
       & Moves to the next EQ band. \\
-			%
+      %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
       \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonSelect} 
       & Toggles the cursor among the three parameters (gain, center frequency, 
-    	  Q) for the selected EQ band.\\  
-			%
+      Q) for the selected EQ band.\\  
+      %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu} 
-      & Exits the graphic EQ screen.\\      	  
+      & Exits the graphic EQ screen.\\  
     \end{btnmap}
   \end{table}
   
   \item[Pre-cut:]
   If too much gain is added through the graphical EQ, your music may distort. 
-  The \setting{Precut} setting allows you to adjust the overall gain of the EQ. 
+  The \setting{Precut} setting allows you to adjust the overall gain of the EQ.
+  
   If your music distorts when using the EQ, trying changing this setting to a 
   negative value.
 
-	\item[Simple EQ:]	
-	This option provides an easier alternative for those who are daunted by all of 
-	the parameters that can be adjusted using the graphical EQ.  With the 
-	\setting{Simple EQ}, the only parameter that can be adjusted is the gain.
+\item[Simple EQ:]
+This option provides an easier alternative for those who are daunted by all of 
+the parameters that can be adjusted using the graphical EQ.  With the 
+\setting{Simple EQ}, the only parameter that can be adjusted is the gain.
 
-	\item[Advanced EQ:]
-	This submenu provides options for adjusting the same parameters as the 
-	\setting{Graphical EQ}.  The only difference is that the parameters are 
-	adjusted through textual menus rather than through a graphic interface.
-	
-	\item[Save EQ Preset:]
-	This option saves the current EQ configuration in a \fname{.cfg} file.
-	
-	\item[Browse EQ Presets:]
-	This menu displays a list EQ presets, as well as any EQ configurations saved 
-	using the \setting{Save EQ Preset} option.  Users unfamiliar with the 
-	operation of a parametric EQ may wish to use the presets instead of trying to 
-	configure the EQ, or use the presets for designing their own custom EQ 
-	settings.
-	
+\item[Advanced EQ:]
+This submenu provides options for adjusting the same parameters as the 
+\setting{Graphical EQ}.  The only difference is that the parameters are 
+adjusted through textual menus rather than through a graphic interface.
+
+\item[Save EQ Preset:]
+This option saves the current EQ configuration in a \fname{.cfg} file.
+
+\item[Browse EQ Presets:]
+This menu displays a list EQ presets, as well as any EQ configurations saved 
+using the \setting{Save EQ Preset} option.  Users unfamiliar with the 
+operation of a parametric EQ may wish to use the presets instead of trying to 
+configure the EQ, or use the presets for designing their own custom EQ 
+settings.
+
 \end{description}
 }
 
 \opt{ipodvideo}{
 \section{Hardware EQ}
 
-	This function controls the EQ that is built into the hardware of your 
-	\playerman{}.  The hardware EQ functions similarly to the Graphical EQ in that 
-	it allows adjustmnet of several parameters.  However, unlike the Graphical EQ, 
-	the Hardware EQ allows the user to choose from a limited number of settings 
-	for ``Center Frequency'' and ``Bandwidth'' (``Bandwidth'' in the Hardware EQ 
-	is similar to ``Q'' in the Graphical EQ).
-	
-	\note{While the \setting{Hardware EQ} menu shows Low Shelf, three peaking 
-	filters, and High Shelf, the peaking filters are not currently operational.}
-	
+This function controls the EQ that is built into the hardware of your 
+\playerman{}.  The hardware EQ functions similarly to the Graphical EQ in that 
+it allows adjustmnet of several parameters.  However, unlike the Graphical EQ, 
+the Hardware EQ allows the user to choose from a limited number of settings 
+for ``Center Frequency'' and ``Bandwidth'' (``Bandwidth'' in the Hardware EQ 
+is similar to ``Q'' in the Graphical EQ).
+
+\note{While the \setting{Hardware EQ} menu shows Low Shelf, three peaking 
+filters, and High Shelf, the peaking filters are not currently operational.}
+
 }
