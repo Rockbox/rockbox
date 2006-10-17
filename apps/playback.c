@@ -194,6 +194,7 @@ static volatile size_t buf_widx IDATA_ATTR;
 /* Ring buffer arithmetic */
 #define RINGBUF_ADD(p,v) ((p+v)<filebuflen ? p+v : p+v-filebuflen)
 #define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+filebuflen-v)
+#define RINGBUF_ADD_CROSS(p1,v,p2) ((p1<p2)?(int)(p1+v)-(int)p2:(int)(p1+v-p2)-(int)filebuflen)
 
 /* Bytes available in the buffer. */
 #define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx)
@@ -213,9 +214,6 @@ static bool track_changed;                      /* Audio and codec threads */
 
 /* Partially loaded song's file handle to continue buffering later. */
 static int current_fd;
-
-/* Information about how many bytes left on the buffer re-fill run. */
-static size_t fill_bytesleft;
 
 /* Track info structure about songs in the file buffer. */
 static struct track_info tracks[MAX_TRACK];     /* Audio thread */
@@ -1236,7 +1234,7 @@ static void codec_advance_buffer_counters(size_t amount)
     /* Start buffer filling as necessary. */
     if (!pcmbuf_is_lowdata() && !filling)
     {
-        if (conf_watermark && FILEBUFUSED <= conf_watermark && playing)
+        if (FILEBUFUSED < conf_watermark && playing)
         {
             LOGFQUEUE("codec > audio Q_AUDIO_FILL_BUFFER");
             queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
@@ -2034,9 +2032,7 @@ static bool audio_yield_codecs(void)
 }
 
 /* Note that this function might yield(). */
-static void audio_clear_track_entries(
-    bool clear_buffered, bool clear_unbuffered,
-    bool may_yield)
+static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
     int last_idx = -1;
@@ -2056,23 +2052,16 @@ static void audio_clear_track_entries(
          * otherwise clear the track if that option is selected */
         if (tracks[cur_idx].event_sent) 
         {
-            if (clear_buffered) 
+            if (last_idx >= 0)
             {
-                if (last_idx >= 0)
-                {
-                    /* If there is an unbuffer callback, call it, otherwise,
-                     * just clear the track */
-                    if (track_unbuffer_callback)
-                    {
-                        if (may_yield)
-                            audio_yield_codecs();
-                        track_unbuffer_callback(&tracks[last_idx].id3, false);
-                    }
-                    
-                    memset(&tracks[last_idx], 0, sizeof(struct track_info));
-                }
-                last_idx = cur_idx;
+                /* If there is an unbuffer callback, call it, otherwise,
+                 * just clear the track */
+                if (track_unbuffer_callback)
+                    track_unbuffer_callback(&tracks[last_idx].id3, false);
+                
+                memset(&tracks[last_idx], 0, sizeof(struct track_info));
             }
+            last_idx = cur_idx;
         } 
         else if (clear_unbuffered)
             memset(&tracks[cur_idx], 0, sizeof(struct track_info));
@@ -2118,68 +2107,71 @@ static void audio_strip_id3v1_tag(void)
     }
 }
 
-static void audio_read_file(bool quick)
+/* Returns true if a whole file is read, false otherwise */
+static bool audio_read_file(size_t minimum)
 {
-    size_t copy_n;
-    int rc;
+    bool ret_val = false;
 
     /* If we're called and no file is open, this is an error */
     if (current_fd < 0) 
     {
         logf("Bad fd in arf");
-        /* Stop this buffer cycle immediately */
-        fill_bytesleft = 0;
         /* Give some hope of miraculous recovery by forcing a track reload */
         tracks[track_widx].filesize = 0;
-        return ;
+        /* Stop this buffering run */
+        return ret_val;
     }
 
     trigger_cpu_boost();
     while (tracks[track_widx].filerem > 0) 
     {
+        size_t copy_n;
         int overlap;
-
-        if (fill_bytesleft == 0)
-            break ;
+        int rc;
 
         /* copy_n is the largest chunk that is safe to read */
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
-        copy_n = MIN(copy_n, fill_bytesleft);
+
+        if (RINGBUF_ADD_CROSS(buf_widx,copy_n,buf_ridx) >= 0)
+            break;
 
         /* rc is the actual amount read */
         rc = read(current_fd, &filebuf[buf_widx], copy_n);
 
-        if (rc <= 0) 
+        if (rc < 0) 
         {
-            /* Reached the end of the file */
+            logf("File ended %dB early", tracks[track_widx].filerem);
+            tracks[track_widx].filesize -= tracks[track_widx].filerem;
             tracks[track_widx].filerem = 0;
-            break ;
+            break;
         }
 
-        overlap = buf_widx + rc - CUR_TI->buf_idx;
-        buf_widx = RINGBUF_ADD(buf_widx, rc);
-
-        if (overlap > 0 && (unsigned) overlap >= filebuflen)
-            overlap -= filebuflen;
-
-        if (overlap > 0 && overlap <= rc && CUR_TI->available != 0) {
-            CUR_TI->buf_idx = buf_widx;
-            CUR_TI->start_pos += overlap;
-        }
-        
         tracks[track_widx].available += rc;
         tracks[track_widx].filerem -= rc;
 
-        if (fill_bytesleft > (unsigned)rc)
-            fill_bytesleft -= rc;
-        else
-            fill_bytesleft = 0;
+        /* How much of the playing track did we overwrite */
+        overlap = RINGBUF_ADD_CROSS(buf_widx,rc,CUR_TI->buf_idx);
 
-        /* Let the codec process until it is out of the danger zone, or there
-         * is an event to handle.  In the latter case, break this fill cycle
-         * immediately */
-        if (quick || audio_yield_codecs())
+        /* Advance buffer */
+        buf_widx = RINGBUF_ADD(buf_widx, rc);
+
+        /* If we write into the playing track, adjust it's buffer info */
+        if (overlap > 0 && CUR_TI->available != 0) {
+            CUR_TI->buf_idx += overlap;
+            CUR_TI->start_pos += overlap;
+        }
+            
+        /* For a rebuffer, fill at least this minimum */
+        if (minimum > (unsigned)rc)
+            minimum -= rc;
+        /* Let the codec process up to the watermark */
+        /* Break immediately if this is a quick buffer, or there is an event */
+        else if (minimum || audio_yield_codecs())
+        {
+            /* Exit quickly, but don't stop the overall buffering process */
+            ret_val = true;
             break;
+        }
     }
 
     if (tracks[track_widx].filerem == 0) 
@@ -2193,17 +2185,19 @@ static void audio_read_file(bool quick)
         track_widx &= MAX_TRACK_MASK;
 
         tracks[track_widx].filesize = 0;
+        return true;
     } 
     else 
     {
-        logf("Partially buf:%dB",
+        logf("%s buf:%dB", ret_val?"Quick":"Partially",
                 tracks[track_widx].filesize - tracks[track_widx].filerem);
+        return ret_val;
     }
 }
 
 static bool audio_loadcodec(bool start_play)
 {
-    size_t size;
+    size_t size = 0;
     int fd;
     int rc;
     size_t copy_n;
@@ -2215,7 +2209,6 @@ static bool audio_loadcodec(bool start_play)
         return false;
 
     tracks[track_widx].has_codec = false;
-    tracks[track_widx].codecsize = 0;
 
     if (start_play)
     {
@@ -2257,35 +2250,34 @@ static bool audio_loadcodec(bool start_play)
         return false;
     }
 
-    size = filesize(fd);
+    tracks[track_widx].codecsize = filesize(fd);
     
     /* Never load a partial codec */
-    if (fill_bytesleft < size) 
+    if (RINGBUF_ADD_CROSS(buf_widx,tracks[track_widx].codecsize,buf_ridx) >= 0)
     {
         logf("Not enough space");
-        fill_bytesleft = 0;
         close(fd);
         return false;
     }
 
-    while (tracks[track_widx].codecsize < size) 
+    while (size < tracks[track_widx].codecsize) 
     {
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
         rc = read(fd, &filebuf[buf_widx], copy_n);
         if (rc < 0)
         {
             close(fd);
+            /* This is an error condition, likely the codec file is corrupt */
+            logf("Partial codec loaded");
+            /* Must undo the buffer write of the partial codec */
+            buf_widx = RINGBUF_SUB(buf_widx, size);
+            tracks[track_widx].codecsize = 0;
             return false;
         }
         
-        if (fill_bytesleft > (unsigned)rc)
-            fill_bytesleft -= rc;
-        else
-            fill_bytesleft = 0;
-
         buf_widx = RINGBUF_ADD(buf_widx, rc);
 
-        tracks[track_widx].codecsize += rc;       
+        size += rc;       
     }
 
     tracks[track_widx].has_codec = true;
@@ -2446,35 +2438,28 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     tracks[track_widx].codecbuf = &filebuf[buf_widx];
     if (!audio_loadcodec(start_play)) 
     {
-        if (tracks[track_widx].codecsize)
-        {
-            /* Must undo the buffer write of the partial codec */
-            logf("Partial codec loaded");
-            fill_bytesleft += tracks[track_widx].codecsize;
-            buf_widx = RINGBUF_SUB(buf_widx, tracks[track_widx].codecsize);
-            tracks[track_widx].codecsize = 0;
-        }
-
         /* Set filesize to zero to indicate no file was loaded. */
         tracks[track_widx].filesize = 0;
         tracks[track_widx].filerem = 0;
         close(current_fd);
         current_fd = -1;
 
-        /* Try skipping to next track if there is space. */
-        if (fill_bytesleft > 0) 
+        if (tracks[track_widx].codecsize)
         {
-            /* This is an error condition unless the fill_bytesleft is 0 */
-            snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
-            /* We should not use gui_syncplash from audio thread! */
-            gui_syncsplash(HZ*2, true, msgbuf);
-            /* Skip invalid entry from playlist. */
-            playlist_skip_entry(NULL, last_peek_offset);
-            tracks[track_widx].taginfo_ready = false;
-            goto peek_again;
+            /* No space for codec on buffer, not an error */
+            tracks[track_widx].codecsize = 0;
+            return false;
         }
-        
-        return false;
+
+        /* This is an error condition, either no codec was found, or reading
+         * the codec file failed part way through, either way, skip the track */
+        snprintf(msgbuf, sizeof(msgbuf)-1, "No codec for: %s", trackname);
+        /* We should not use gui_syncplash from audio thread! */
+        gui_syncsplash(HZ*2, true, msgbuf);
+        /* Skip invalid entry from playlist. */
+        playlist_skip_entry(NULL, last_peek_offset);
+        tracks[track_widx].taginfo_ready = false;
+        goto peek_again;
     }
 
     tracks[track_widx].start_pos = 0;
@@ -2518,9 +2503,7 @@ static bool audio_load_track(int offset, bool start_play, bool rebuffer)
     logf("alt:%s", trackname);
     tracks[track_widx].buf_idx = buf_widx;
 
-    audio_read_file(rebuffer);
-
-    return true;
+    return audio_read_file(rebuffer);
 }
 
 static bool audio_read_next_metadata(void)
@@ -2612,28 +2595,14 @@ static bool audio_initialize_buffer_fill(bool clear_tracks)
     if (filling)
         return true;
 
-    /* Don't start buffer fill if buffer is already full. */
-    if (FILEBUFUSED > conf_watermark && !filling)
-        return false;
-    
     logf("Starting buffer fill");
-
-    fill_bytesleft = filebuflen - FILEBUFUSED;
-    /* TODO: This doesn't look right, and might explain some problems with
-     *       seeking in large files (to offsets larger than filebuflen).
-     *       And what about buffer wraps?
-     * 
-     * This really doesn't look right, so don't use it.
-     */
-    // if (buf_ridx > CUR_TI->buf_idx)
-    //    CUR_TI->start_pos = buf_ridx - CUR_TI->buf_idx;
 
     /* Set the filling flag true before calling audio_clear_tracks as that
      * function can yield and we start looping. */
     filling = true;
     
     if (clear_tracks)
-        audio_clear_track_entries(true, false, true);
+        audio_clear_track_entries(false);
 
     /* Save the current resume position once. */
     playlist_update_resume_info(audio_current_track());
@@ -2645,6 +2614,7 @@ static void audio_fill_file_buffer(
         bool start_play, bool rebuffer, size_t offset)
 {
     bool had_next_track = audio_next_track() != NULL;
+    bool continue_buffering;
 
     if (!audio_initialize_buffer_fill(!start_play))
         return ;
@@ -2652,15 +2622,15 @@ static void audio_fill_file_buffer(
     /* If we have a partially buffered track, continue loading,
      * otherwise load a new track */
     if (tracks[track_widx].filesize > 0)
-        audio_read_file(false);
-    else if (!audio_load_track(offset, start_play, rebuffer))
-        fill_bytesleft = 0;
+        continue_buffering = audio_read_file(rebuffer);
+    else 
+        continue_buffering = audio_load_track(offset, start_play, rebuffer);
 
     if (!had_next_track && audio_next_track())
         track_changed = true;
 
     /* If we're done buffering */
-    if (fill_bytesleft == 0)
+    if (!continue_buffering)
     {
         audio_read_next_metadata();
 
@@ -2672,6 +2642,7 @@ static void audio_fill_file_buffer(
             ata_sleep();
 #endif
     }
+
 }
 
 static void audio_rebuffer(void)
@@ -2708,7 +2679,7 @@ static void audio_rebuffer(void)
     /* Reset buffer and track pointers */
     CUR_TI->buf_idx = buf_ridx = buf_widx = 0;
     track_widx = track_ridx;
-    audio_clear_track_entries(true, true, false);
+    audio_clear_track_entries(true);
     CUR_TI->available = 0;
 
     /* Fill the buffer */
@@ -2893,22 +2864,29 @@ static void audio_rebuffer_and_seek(size_t newpos)
     last_peek_offset = 0;
     filling = false;
     audio_initialize_buffer_fill(true);
-    filling = true;
 
-    if (newpos > conf_preseek) {
-        buf_ridx = RINGBUF_ADD(buf_ridx, conf_preseek);
+    if (newpos > conf_preseek)
+    {
         CUR_TI->start_pos = newpos - conf_preseek;
+        CUR_TI->filerem = CUR_TI->filesize - CUR_TI->start_pos;
+        newpos = conf_preseek;
     } 
     else 
     {
-        buf_ridx = RINGBUF_ADD(buf_ridx, newpos);
         CUR_TI->start_pos = 0;
+        CUR_TI->filerem = CUR_TI->filesize;
     }
 
-    CUR_TI->filerem = CUR_TI->filesize - CUR_TI->start_pos;
     CUR_TI->available = 0;
 
     lseek(current_fd, CUR_TI->start_pos, SEEK_SET);
+
+    audio_read_file(newpos);
+
+    /* Account for the data we just read that is 'behind' us now */
+    CUR_TI->available -= newpos;
+
+    buf_ridx = RINGBUF_ADD(buf_ridx, newpos);
 
     LOGFQUEUE("audio > codec Q_CODEC_REQUEST_COMPLETE");
     queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
@@ -2967,7 +2945,7 @@ static void audio_stop_playback(void)
     }
 
     /* Mark all entries null. */
-    audio_clear_track_entries(true, false, false);
+    audio_clear_track_entries(false);
     memset(tracks, 0, sizeof(struct track_info) * MAX_TRACK);
 }
 
@@ -3015,13 +2993,13 @@ void audio_invalidate_tracks(void)
 
         playlist_end = false;
         track_widx = track_ridx;
-        audio_clear_track_entries(true, true, true);
+        /* Mark all other entries null (also buffered wrong metadata). */
+        audio_clear_track_entries(true);
 
         /* If the current track is fully buffered, advance the write pointer */
         if (tracks[track_widx].filerem == 0)
             track_widx = (track_widx + 1) & MAX_TRACK_MASK;
 
-        /* Mark all other entries null (also buffered wrong metadata). */
         buf_widx = RINGBUF_ADD(buf_ridx, CUR_TI->available);
 
         audio_read_next_metadata();
@@ -3035,7 +3013,7 @@ static void audio_new_playlist(void)
     if (audio_have_tracks()) {
         playlist_end = false;
         track_widx = track_ridx;
-        audio_clear_track_entries(true, true, true);
+        audio_clear_track_entries(true);
 
         track_widx++;
         track_widx &= MAX_TRACK_MASK;
@@ -3239,7 +3217,7 @@ static void audio_thread(void)
 
             case Q_AUDIO_PLAY:
                 LOGFQUEUE("audio < Q_AUDIO_PLAY");
-                audio_clear_track_entries(true, false, true);
+                audio_clear_track_entries(false);
                 audio_play_start((size_t)ev.data);
                 break ;
 
