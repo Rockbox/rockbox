@@ -181,28 +181,30 @@ album etc. To access this screen, %
 This \setting{Open With} function is the same as the \setting{Open With} 
 function in the \setting{File Context Menu}.
 
-\subsubsection{\label{sec:pitchscreen}Pitch}
-The Pitch Screen allows you to quickly change the pitch of your \dap. The
-pitch value can be adjusted between 50\% and 200\%.
-\begin{table}
-  \begin{btnmap}{}{}
-    \ActionPsIncSmall/\ActionPsDecSmall
-    & Increase / Decrease Pitch by 0.1\% \\
-    %
-    \ActionPsIncBig/\ActionPsDecBig
-    & Increase / Decrease Pitch by 1\% \\
-    %
-    \ActionPsNudgeRight/\ActionPsNudgeLeft
-    & Temporarily Increase / Decrease Pitch by 2.0\% \\
-    %
-    \ActionPsReset
-    & Reset Pitch to 100\% \\
-    %
-    \ActionPsExit
-    & Leave Pitch screen \\
-    %
-  \end{btnmap}
-\end{table}
+\nopt{player}{
+  \subsubsection{\label{sec:pitchscreen}Pitch}
+  The Pitch Screen allows you to quickly change the pitch of your \dap. The
+  pitch value can be adjusted between 50\% and 200\%.
+  \begin{table}
+    \begin{btnmap}{}{}
+      \ActionPsIncSmall/\ActionPsDecSmall
+      & Increase / Decrease Pitch by 0.1\% \\
+      %
+      \ActionPsIncBig/\ActionPsDecBig
+      & Increase / Decrease Pitch by 1\% \\
+      %
+      \ActionPsNudgeRight/\ActionPsNudgeLeft
+      & Temporarily Increase / Decrease Pitch by 2.0\% \\
+      %
+      \ActionPsReset
+      & Reset Pitch to 100\% \\
+      %
+      \ActionPsExit
+      & Leave Pitch screen \\
+      %
+    \end{btnmap}
+  \end{table}
+}
 \opt{RECORDER_PAD,ONDIO_PAD}{
   \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
 }
