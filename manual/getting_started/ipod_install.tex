@@ -5,7 +5,7 @@ Please check the wiki for up-to-date and improved installation instructions!
 If you find errors you're of course welcomed to report them so we can fix it
 for the next daily builds.}
 
-  Installing the bootloader is the trickiest part of the installation.
+  Installing the boot loader is the trickiest part of the installation.
   \opt{ipodnano}{First, you need to find out which version of the Apple
     firmware you're running. To do this, start the Apple firmware and go to
     Settings screen. In the ``About'' screen you'll find the version number
@@ -87,7 +87,7 @@ for the next daily builds.}
     ipodpatcher -r \emph{N} bootpartition.bin
     \end{code}
     \note{You should keep a safe backup of this \fname{bootpartition.bin} file
-      for use if you ever wish to either upgrade the Rockbox bootloader or
+      for use if you ever wish to either upgrade the Rockbox boot loader or
       uninstall Rockbox from your Ipod}
   \item Extract the Apple firmware from the partition image image just created:
     \begin{code}
@@ -102,7 +102,7 @@ for the next daily builds.}
     ipod_fw -o apple_sw_5g_rcsc.bin -e 1 bootpartition.bin
     \end{code}
 }
-  \item Merge the Rockbox bootloader you downloaded previously with the Apple
+  \item Merge the Rockbox boot loader you downloaded previously with the Apple
     firm\-ware.%
 \optv{ipodnano}{
     If your firmware version is lower than 1.2 this works you need
@@ -265,7 +265,7 @@ Now, proceed with installing the firmware itself.
       \item \url{http://www.rockbox.org/viewcvs.cgi/*checkout*/tools/ipod_fw.c}
     \end{itemize}
     Now compile it to an executable by opening a command prompt and changing
-    to the folder created previously. Thn run the following command:
+    to the folder created previously. Then run the following command:
     \begin{code}
     gcc -o ipod_fw ipod_fw.c
     \end{code}

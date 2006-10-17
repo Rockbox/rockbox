@@ -14,11 +14,11 @@ software.
   Rockbox is distributed as an archive using the
   \fname{.zip} format. Thus you need a tool to handle that compressed 
   format. Usually your computer should have a tool installed that can 
-  handle the \fname{.zip} file format. Windows XP has builtin support for 
+  handle the \fname{.zip} file format. Windows XP has built-in support for 
   \fname{.zip} files and presents them to you as folders unless you have 
   installed a third party program that handles compressed files. For
   other operating systems this may vary. If the \fname{.zip} file format 
-  is not recognized on your computer you can find a program to handle them 
+  is not recognised on your computer you can find a program to handle them 
   at \url{http://www.info-zip.org/} or \url{http://sevenzip.sf.net/} which 
   can be downloaded and used free of charge.
   
@@ -30,7 +30,7 @@ software.
   
   \opt{ipod}{
     \note{Your \dap{} should enter disk mode automatically when connected to a 
-      computer via USB. If your computer does not recognize your \dap{}, you 
+      computer via USB. If your computer does not recognise your \dap{}, you 
       may need to enter the disk mode manually. Disconnect your \dap{} from the
       computer. Reset the \dap{} by pressing and holding the \ButtonMenu{} and 
       \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets, 
@@ -42,7 +42,7 @@ software.
 
 \item[Text editor.]  As you will see in the following chapters, Rockbox is 
   highly configurable. In addition to saving configurations within Rockbox, 
-  Rockbox also allows you to create customized configuration files. If you 
+  Rockbox also allows you to create customised configuration files. If you 
   would like to edit custom configuration files on your computer, you will 
   need a text editor like Windows' ``Wordpad''.
 
@@ -75,22 +75,22 @@ software.
   
   \begin{description}
   \opt{HAVE_RB_BL_ON_DISK}{    
-  \item[The \playerman{} bootloader.]
-    The \playerman{} bootloader is the program that tells your \dap{} how to boot 
+  \item[The \playerman{} boot loader.]
+    The \playerman{} boot loader is the program that tells your \dap{} how to boot 
     and load the remaining firmware from disk. It is also responsible for the
     disk mode on your \dap{}.
     
-    This bootloader is stored in special flash memory in your \playerman. It is 
+    This boot loader is stored in special flash memory in your \playerman. It is 
     already installed on your \dap{}, so it is never necessary to modify this 
     in order to install Rockbox.}
     
-  \item[The Rockbox bootloader.] \index{Bootloader}
-    \opt{HAVE_RB_BL_ON_DISK}{The Rockbox bootloader is loaded from disk by 
-    the \playerman{} bootloader. It is responsible for loading the Rockbox 
+  \item[The Rockbox boot loader.] \index{Boot loader}
+    \opt{HAVE_RB_BL_ON_DISK}{The Rockbox boot loader is loaded from disk by 
+    the \playerman{} boot loader. It is responsible for loading the Rockbox 
     firmware and for providing the dual boot function. It directly replaces the
     \playerman{} firmware on the \daps{} disk.}
     \opt{HAVE_RB_BL_IN_FLASH}{
-    The bootloader is the program that tells your 
+    The boot loader is the program that tells your 
     \dap{} how to boot and load other components of Rockbox. This is the 
     component of Rockbox that is installed to the flash memory of your 
     \playerman.}
@@ -107,14 +107,14 @@ software.
     
   \end{description}
   
-  \subsection{Installing the bootloader}
+  \subsection{Installing the boot loader}
   \opt{h1xx,h300}{\input{getting_started/iriver_install.tex}}
   \opt{ipod}{\input{getting_started/ipod_install.tex}}
   \opt{x5}{\input{getting_started/iaudio_install.tex}}
   \opt{h10,h10_5gb}{\input{getting_started/h10_install.tex}}
 
   \subsection{Installing the firmware} 
-  After installing the bootloader, the installation becomes fairly easy. 
+  After installing the boot loader, the installation becomes fairly easy. 
 } 
       
 There are three different types of firmware binaries from Rockbox website:
@@ -217,7 +217,7 @@ use.
     your player using Itunes, you will not be able to see your music because
     Itunes changes your files' names and hides them in directories in the 
     \fname{Ipod\_Control} folder. You can view files placed on your \dap{} by 
-    Itunes by initializing and using Rockbox's Tag Cache. See 
+    Itunes by initialising and using Rockbox's Tag Cache. See 
     \reference{ref:tagcache} for more information. 
   } 
 }
@@ -252,7 +252,7 @@ connect the \playerman{} to your computer, and delete the
 \optv{ipod}{
   Next, open a command window (Windows) or a terminal window (Mac or Linux). 
   Navigate to the folder you created when you downloaded the 
-  \fname{ipodpatcher} program you used to install the Rockbox bootloader. 
+  \fname{ipodpatcher} program you used to install the Rockbox boot loader. 
   Type the following command:
         
   \begin{code}
@@ -272,24 +272,24 @@ Turn the \dap{} back on and the original \playerman{} software will load.
 
 \opt{h1xx}{ 
   \note{
-    There's no need to remove the installed bootloader. If you want to remove 
+    There's no need to remove the installed boot loader. If you want to remove 
     it, simply flash an unpatched \playerman{} firmware. Be aware that doing so
-    will also remove the bootloader USB mode. As that mode can come in quite 
+    will also remove the boot loader USB mode. As that mode can come in quite 
     handy (especially when having disk errors) it is recommended to keep the 
-    bootloader. It also gives you the possibility of trying Rockbox anytime 
+    boot loader. It also gives you the possibility of trying Rockbox anytime 
     later by simply installing the distribution files. 
   }
 }
 
 \opt{h300}{ 
   \note{
-    There's no need to remove the installed bootloader, although you if you 
-    retain the Rockbox bootloader, you will need to hold the \ButtonRec{} 
+    There's no need to remove the installed boot loader, although you if you 
+    retain the Rockbox boot loader, you will need to hold the \ButtonRec{} 
     button each time you want to start the original firmware. If you want to 
     remove it simply flash an unpatched \playerman{} firmware. Be aware that 
-    doing so will also remove the bootloader USB mode. As that mode can come in
+    doing so will also remove the boot loader USB mode. As that mode can come in
     quite handy (especially when having disk errors), you may wish to keep the 
-    bootloader. It also gives you the possibility of trying Rockbox anytime 
+    boot loader. It also gives you the possibility of trying Rockbox anytime 
     later by simply installing a new build.
   }
 }

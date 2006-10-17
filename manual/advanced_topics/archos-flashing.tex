@@ -20,13 +20,13 @@ Now, you can add Rockbox to the built-in software.
 
 By reprogramming the firmware, we can boot much faster. \playerman\ has an 
 unnecessary slow boot loader, versus the boot time for Rockbox is much faster 
-than the disk spinup, in fact it has to wait for the disk. Your boot time will 
-be as quick as a disk spinup (e.g. 4 seconds from powerup until resuming 
+than the disk spin-up, in fact it has to wait for the disk. Your boot time will 
+be as quick as a disk spin-up (e.g. 4 seconds from power-up until resuming 
 playback).
 
 \subsection{Method}
 
-The replaced firmware will host a bootloader and 2 images. This is possible by 
+The replaced firmware will host a boot loader and 2 images. This is possible by 
 compression. The first is the \emph{permanent} backup, not to be changed any 
 more.The second is the default one to be started, the first is only used when 
 you hold the \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} -key during start. Like supplied here, the first image 
@@ -35,7 +35,7 @@ and update. It can contain anything you like. If you prefer, you can program
 the Archos firmware to there, too.
 
 \note{For now, the binary contained in the brand new player flash package does 
-contain rockbox built from current cvs in the second image slot. This is to 
+contain Rockbox built from current CVS in the second image slot. This is to 
 lower the risk of flashing (at least one of the images will hopefully work) in 
 case you don't program a second image yourself in the first step. Of course the
 second image can be replaced like with the other models.}
@@ -50,14 +50,14 @@ There are two programming tools supplied:
   with the desired image structure.
 \item The second one is called \fname{rockbox\_flash.rock} and is used to 
   reprogram only the second image. It won't touch any other byte, should be 
-  safe to fool around with. If the programmed firmware is inoperational, you 
+  safe to fool around with. If the programmed firmware is in-operational, you 
   can still use the \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} start with the Archos firmware and Rockbox booted
   from disk to try better.
 \end{itemize}
 
-The non-user tools are in the \fname{flash} subdirectory of the cvs source 
+The non-user tools are in the \fname{flash} subdirectory of the CVS source 
 files. There's an authoring tool which composed the firmware file with the 
-bootloader and the 2 images. The bootloader project, a firmware extraction 
+boot loader and the 2 images. The boot loader project, a firmware extraction 
 tool, the plugin sources, and the tools for the UART boot feature: a monitor 
 program for the box and a PC tool to drive it. Feel free to review the sources 
 for all of it, but be careful when fooling around with powerful toys!
@@ -89,12 +89,12 @@ your box.
 There's one ultimate safety net to bring back boxes with even completely 
 garbled flash content: the \emph{UART} boot mod, which in turn requires the 
 serial mod. It can bring the dead back to life, with that it's possible to 
-reflash independently from the outside, even if the flash is completely erased.
+re-flash independently from the outside, even if the flash is completely erased.
 It has been used that during development, else Rockbox in flash wouldn't have 
 been possible. Extensive development effort went into the exploitation of the 
 UART boot mod. Mechanically adept users with good soldering skills can easily 
 perform these mods. Others may feel uncomfortable using the first tool 
-(\fname{firmware\_flash.rock}) for reflashing the firmware.
+(\fname{firmware\_flash.rock}) for re-flashing the firmware.
 
 
 To comfort you a bit again: If you are starting with a known-good image, you 
@@ -105,7 +105,7 @@ Although it worked, it's not the recommended method.
 About the safety of operation: Since we have dual boot, you're not giving up 
 the Archos firmware. It's still there when you hold
 \opt{recorder,recorderv2fm}{\ButtonFOne}\opt{ondio}{\ButtonLeft}\opt{player}{\ButtonLeft} during startup. So even if Rockbox from flash is not 100\% stable for
-everyone, you can still use the box, reflash the second image with an updated 
+everyone, you can still use the box, re-flash the second image with an updated 
 Rockbox copy, etc.
 
 The flash chip being used by Archos is specified for 100,000 cycles, so you don't need to worry about that wearing out.
@@ -138,7 +138,7 @@ Long version, step by step procedure:
   you want to restore the flash contents.
 \item Download the correct package for you model. Copy one or two files of it to 
   your box: \fname{firmware\_*.bin} (name depends on your model) into the root 
-  directory (the initial firmware for your model, with the bootloader and the 
+  directory (the initial firmware for your model, with the boot loader and the 
   Archos image). There now is also a \_norom variant, copy both, the plugin will 
   decide which one is required for your box.
 \item Enter the debug menu and select the hardware info screen. Check your flash 
@@ -187,7 +187,7 @@ Short version: very easy, just play an \fname{.ucl} file like
 Long version:
 
 The second image is the working copy, the \fname{rockbox\_flash.rock} plugin from
-this package reprograms it. The plugins needs to be consistant with the Rockbox 
+this package re-programs it. The plugins needs to be consistent with the Rockbox 
 plugin API version, otherwise it will detect mismatch and won't run.
 
 It requires an exotic input, a UCL-compressed image, because that's the internal 
@@ -202,7 +202,7 @@ program from that download is called \fname{uclpack}. We'll use that to compress
 \fname{rockbox.bin} which is the result of the compilation. This is a part of the
 build process meanwhile. If you compile Rockbox yourself, you should copy 
 \fname{uclpack} to a directory which is in the path, we recommend placing it in 
-the same dir as SH compiler.
+the same directory as SH compiler.
 
 
 Here are the steps:
@@ -230,7 +230,7 @@ and now preferred one. Use this if available.
 
 If you like or have to, you can also flash the Archos image as the second one. 
 E.g. in case Rockbox from flash doesn't work for you. This way you keep the dual 
-bootloader and you can easily try different later. The \fname{.ucl} of the Archos
+boot loader and you can easily try different later. The \fname{.ucl} of the Archos
 firmware is included in the package.
 
 \subsection{Restoring the original firmware}
@@ -253,7 +253,7 @@ There are two variants of how the boxes starts, therefore the normal and the
 \_norom firmware files. The vast majority of the \daps\ all have the same boot 
 ROM content, differentiation comes later by flash content. Rockbox identifies 
 this boot ROM with a CRC value of 0x222F in the hardware info screen. \opt{recorder,recorderv2fm}{Some recorders have the boot ROM disabled (it might be unprogrammed) and start directly from a flash mirror at address zero. They need the new 
-  \_norom firmware that has a slightly different bootloader.}
+  \_norom firmware that has a slightly different boot loader.}
 Without a boot ROM  there is no UART boot safety net. To compensate for that as 
 much as possible the MiniMon monitor is included, it starts with \opt{recorder,recorderv2fm}{\ButtonFThree+\ButtonOn}\opt{ondio}{\ButtonRight+\ButtonOff}\opt{player}{\ButtonRight+\ButtonOn}.
 Using that the box can be reprogrammed via serial if the first 2000 bytes of the
