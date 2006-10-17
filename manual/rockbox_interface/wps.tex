@@ -137,19 +137,19 @@ your WPS (While Playing Screen).
   \end{description}
 }
 \subsection{\label{sec:contextmenu}The WPS Context Menu}
-	Like the context menu for the \setting{File Browser}, the \setting{WPS Context Menu} 
-	allows you quick access to some often used functions:
+Like the context menu for the \setting{File Browser}, the \setting{WPS Context Menu} 
+allows you quick access to some often used functions:
 
-	\subsubsection{Sound Settings}
-	This is a shortcut to the \setting{Sound Settings Menu}, where you can configure volume,
-	bass, treble, and other settings affecting the sound of your music.  
-        See \reference{ref:configure_rockbox_sound} for more information.
-	
-	\subsubsection{Playlist}
-	The \setting{Playlist} submenu allows you to view, save, search and
-    reshuffle the current playlist. To change settings for the
-    \setting{Playlist Viewer} press \ActionStdMenu{} while viewing the playlist
-    to bring up the \setting{Playlist Viewer Menu}.
+\subsubsection{Sound Settings}
+This is a shortcut to the \setting{Sound Settings Menu}, where you can configure volume,
+bass, treble, and other settings affecting the sound of your music.  
+See \reference{ref:configure_rockbox_sound} for more information.
+
+\subsubsection{Playlist}
+The \setting{Playlist} submenu allows you to view, save, search and
+reshuffle the current playlist. To change settings for the
+\setting{Playlist Viewer} press \ActionStdMenu{} while viewing the playlist
+to bring up the \setting{Playlist Viewer Menu}.
     
     \subsubsection{Playlist catalog}
     \fixme{Add description of Playlist catalog}
@@ -158,65 +158,58 @@ your WPS (While Playing Screen).
         \item [Add to playlist]
         \item [Add to new playlist]
       \end{description}
-	\subsubsection{Bookmarks}
-	This allows you to create a bookmark in the currently-playing track.
+\subsubsection{Bookmarks}
+This allows you to create a bookmark in the currently-playing track.
 
-	\subsubsection{\label{ref:ID3viewer}Show ID3 info}
-	\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
-	This screen is accessible from the WPS screen, and provides a detailed view of
-	all the identity information about the current track. This info is known as
-	meta data and is stored in audio file formats to keep information on artist,
-	album etc. To access this screen, % 
-    \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
-      press \ActionWpsIdThreeScreen. }%
-	\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{press \ActionWpsContext{}
-      to access the \setting{WPS Context Menu} and select
-      \setting{Show ID3 info}. }%
-	\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
-	  to move through the information.}%
-	
-	\subsubsection{Open With...}
-	This \setting{Open With} function is the same as the \setting{Open With} function
-	in the \setting{File Context Menu}.
-	
-	\subsubsection{\label{sec:pitchscreen}Pitch}
-  The Pitch Screen allows you to quickly change the pitch of your \dap. The
-  pitch value can be adjusted between 50\% and 200\%.
-  \begin{table}
+\subsubsection{\label{ref:ID3viewer}Show ID3 info}
+\screenshot{rockbox_interface/images/ss-id3-viewer}{The ID3 viewer}{}
+This screen is accessible from the WPS screen, and provides a detailed view of
+all the identity information about the current track. This info is known as
+meta data and is stored in audio file formats to keep information on artist,
+album etc. To access this screen, % 
+\opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
+  press \ActionWpsIdThreeScreen. }%
+\opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{press \ActionWpsContext{}
+  to access the \setting{WPS Context Menu} and select
+  \setting{Show ID3 info}. }%
+\opt{RECORDER_PAD,PLAYER_PAD,ONDIO_PAD}{Use \ButtonLeft\ and \ButtonRight\
+  to move through the information.}%
+\subsubsection{Open With...}
+This \setting{Open With} function is the same as the \setting{Open With} 
+function in the \setting{File Context Menu}.
+
+\subsubsection{\label{sec:pitchscreen}Pitch}
+The Pitch Screen allows you to quickly change the pitch of your \dap. The
+pitch value can be adjusted between 50\% and 200\%.
+\begin{table}
   \begin{btnmap}{}{}
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,x5}{\ButtonUp/\ButtonDown}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Short \ButtonScrollFwd/\ButtonScrollBack}
-      & Increase / Decrease Pitch by 0.1\% \\
-      %
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD,x5}{hold \ButtonUp/\ButtonDown}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonScrollFwd/\ButtonScrollBack}
-      & Increase / Decrease Pitch by 1\% \\
-      %
-      \ButtonLeft/\ButtonRight
-      & Temporarily Increase / Decrease Pitch by 2.0\% \\
-      %
-      \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
-      \opt{h1xx,h300,RECORDER_PAD}{\ButtonOn}
-      \opt{x5}{\ButtonPower}
-      & Reset Pitch to 100\% \\
-      %
-      \opt{h1xx,h300,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
-      \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect}
-      \opt{x5}{\ButtonPlay}
-      & Leave Pitch screen \\
-      %
+    \ActionPsIncSmall/\ActionPsDecSmall
+    & Increase / Decrease Pitch by 0.1\% \\
+    %
+    \ActionPsIncBig/\ActionPsDecBig
+    & Increase / Decrease Pitch by 1\% \\
+    %
+    \ActionPsNudgeRight/\ActionPsNudgeLeft
+    & Temporarily Increase / Decrease Pitch by 2.0\% \\
+    %
+    \ActionPsReset
+    & Reset Pitch to 100\% \\
+    %
+    \ActionPsExit
+    & Leave Pitch screen \\
+    %
   \end{btnmap}
-  \end{table}
-  \opt{RECORDER_PAD,ONDIO_PAD}{
-    \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
-  }
-    \opt{SWCODEC}{
-      \subsubsection{Graphical EQ}
-        This is a shortcut to the \setting{Equalizer}. See \reference{ref:EQ}.
-
-      \subsubsection{Browse EQ Presets}
-        Browse presets for the \setting{Equalizer}.
-    }
+\end{table}
+\opt{RECORDER_PAD,ONDIO_PAD}{
+  \warn{Changing the pitch can cause audible 'Artifacts' or 'Dropouts'.}
+}
+\opt{SWCODEC}{
+  \subsubsection{Graphical EQ}
+  This is a shortcut to the \setting{Equalizer}. See \reference{ref:EQ}.
+  
+  \subsubsection{Browse EQ Presets}
+  Browse presets for the \setting{Equalizer}.
+}
 
 %********************QUICKSCREENS***********************************************
 \opt{RECORDER_PAD}{
@@ -245,11 +238,11 @@ your WPS (While Playing Screen).
   settings.
 
   \begin{table}
-      \begin{btnmap}{}{}
-        \ButtonLeft & Controls Shuffle mode setting \\
-        \ButtonRight & Controls Repeat mode setting \\
-        \ButtonDown & Controls Show file setting \\
-      \end{btnmap}
+    \begin{btnmap}{}{}
+      \ButtonLeft & Controls Shuffle mode setting \\
+      \ButtonRight & Controls Repeat mode setting \\
+      \ButtonDown & Controls Show file setting \\
+    \end{btnmap}
   \end{table}
   
   \ButtonFThree\ controls frequently used display options.
