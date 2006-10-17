@@ -5,12 +5,14 @@ The classic game of minesweeper. Use
 \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
     {the \ButtonUp\ and \ButtonDown\ keys}
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd/\ButtonScrollBack }
+\opt{IRIVER_H10_PAD}{\ButtonScrollUp/\ButtonScrollDown}
 to select the required percentage of mines to set the difficulty 
 then press the 
 \opt{RECORDER_PAD}{\ButtonOn}
 \opt{ONDIO_PAD}{\ButtonMenu}
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect}
-\opt{IAUDIO_X5_PAD}{\ButtonRec}key to begin.
+\opt{IAUDIO_X5_PAD}{\ButtonRec}
+\opt{IRIVER_H10_PAD}{\ButtonFF}key to begin.
 
 The aim of the game is to uncover all of the squares on the board.  If a
 mine is uncovered then the game is over. If a mine is not uncovered,
@@ -25,18 +27,21 @@ the location of a mine, it can be tagged to avoid accidentally
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu/\ButtonPlay/\ButtonLeft/\ButtonRight}
   \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
         {\ButtonUp/\ButtonDown/\ButtonLeft/\ButtonRight}
+  \opt{IRIVER_H10_PAD}
+  {\ButtonScrollUp/\ButtonScrollDown/\ButtonLeft/\ButtonRight}
   & Move the cursor across the minefield \\
   %
   \opt{RECORDER_PAD}{\ButtonFOne}
   \opt{ONDIO_PAD}{\ButtonMenu}
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-  \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}{\ButtonPlay} 
+  \opt{IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPlay} 
   & Toggle flag on / off \\
   %
   \opt{RECORDER_PAD}{\ButtonFTwo}
   \opt{ONDIO_PAD}{Hold \ButtonMenu}
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}
+  \opt{IRIVER_H10_PAD}{\ButtonRew}
   & Reveal the contents of the current square \\
   %
   \opt{RECORDER_PAD}{\ButtonFThree}
@@ -44,10 +49,11 @@ the location of a mine, it can be tagged to avoid accidentally
   \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
   \opt{IAUDIO_X5_PAD}{\ButtonRec+\ButtonPlay}
+  \opt{IRIVER_H10_PAD}{\ButtonRew+\ButtonPlay}
   & Display the current game status \\
   %
   \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-  \opt{IAUDIO_X5_PAD}{\ButtonPower}
+  \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}
   \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
   & Exit the game \\
 \end{btnmap}
