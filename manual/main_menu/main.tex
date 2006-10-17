@@ -13,6 +13,7 @@ To enter the \setting{Main Menu},
     button.}%
   \opt{ONDIO_PAD}{hold the \ButtonMenu{} button.}%
   \opt{IAUDIO_X5_PAD}{press the \ButtonRec\ button.}%
+  \opt{IRIVER_H10_PAD}{press the \ButtonPower\ button.}%
 
 All settings are stored on the unit. However, Rockbox does not spin up 
 the disk solely for the purpose of saving settings.  Instead, Rockbox will
@@ -22,28 +23,30 @@ settings may therefore not be saved unless the \dap\ is shut down safely
 (see \reference{ref:Safeshutdown}).
 
 \section{Navigating the Main Menu}
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{
+\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollFwd}
-      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp} 
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonUp}
+      \opt{IRIVER_H10_PAD}{\ButtonScrollUp} 
       & Moves up in the menu.\\
       & Inside a setting, increases the value or
         chooses next option \\
       %
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonScrollBack}
-      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown} 
+      \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonDown}
+      \opt{IRIVER_H10_PAD}{\ButtonScrollDown} 
       & Moves down in the menu.\\
       & Inside a setting, decreases the value or
         chooses previous option \\
       %
       \opt{RECORDER_PAD}{\ButtonPlay/\ButtonRight}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect/\ButtonRight}
-      \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonRight} 
+      \opt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,IRIVER_H10_PAD}{\ButtonRight} 
       & Selects option \\
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff/\ButtonLeft}
-      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonLeft} 
+      \opt{IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,IRIVER_H10_PAD}{\ButtonLeft} 
       & Exits menu, setting or moves to parent menu\\
     \end{btnmap}
   \end{table}
@@ -207,7 +210,7 @@ of free space on the disk.
   for more details.
 }
 
-\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD}
+\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD}
 {
 \section{Quick Menu}
   Whilst not strictly part of the \setting{Main Menu}, it is worth noting that a few
@@ -217,6 +220,7 @@ of free space on the disk.
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD}{\ButtonMenu}%
     \opt{IAUDIO_X5_PAD}{\ButtonRec}%
+    \opt{IRIVER_H10_PAD}{\ButtonLeft}%
   {} key, and it allows rapid access to the \setting{Shuffle} and \setting{Repeat} modes 
   (\reference{ref:PlaybackOptions})
   and the \setting{Show Files} option (\reference{ref:ShowFiles}).
