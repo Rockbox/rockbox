@@ -26,7 +26,7 @@
    and need to be changed when they change.
  */
 #define EQ_PEAK_SHIFT 4
-#define EQ_SHELF_SHIFT 8
+#define EQ_SHELF_SHIFT 6
 
 struct eqfilter {
     int32_t coefs[5];        /* Order is b0, b1, b2, a1, a2 */

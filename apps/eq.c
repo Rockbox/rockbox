@@ -34,7 +34,7 @@
 
 #define DIV64(x, y, z) (long)(((long long)(x) << (z))/(y))
 /* This macro requires the EMAC unit to be in fractional mode
-   when the coef generator routines are called. If this can't be guaranteeed,
+   when the coef generator routines are called. If this can't be guaranteed,
    then add "&& 0" below. This will use a slower coef calculation on Coldfire.
  */
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
@@ -188,12 +188,12 @@ static long dbtoA(long db)
 }
 
 /* Calculate first order shelving filter coefficients.
-   cutoff is a value from 0 to 0x80000000, where 0 represents 0 hz and
-   0x80000000 represents nyquist (samplerate/2).
-   ad is gain at 0 hz, and an is gain at Nyquist frequency. Both are s3.27
-   format. 
-   c is a pointer where the coefs will be stored. The coefs are s0.31 format.
-   Note that the filter is not compatible with the eq_filter routine.
+ * Note that the filter is not compatible with the eq_filter routine.
+ * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
+ * 0x80000000 represents the Nyquist frequency (samplerate/2).
+ * @param ad gain at 0 Hz. s3.27 fixed point.
+ * @param an gain at Nyquist frequency. s3.27 fixed point.
+ * @param c pointer to coefficient storage. The coefs are s0.31 format.
  */
 void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
 {
@@ -215,13 +215,14 @@ void filter_bishelf_coefs(unsigned long cutoff, long ad, long an, int32_t *c)
     c[2] = -DIV64(a1, a0, 31);
 }
 
-/* Calculate second order section peaking filter coefficients.
-   cutoff is a value from 0 to 0x80000000, where 0 represents 0 hz and
-   0x80000000 represents nyquist (samplerate/2).
-   Q is an unsigned 16.16 fixed point number, lower bound is artificially set
-   at 0.5.
-   db is s15.16 fixed point and describes gain/attenuation at peak freq.
-   c is a pointer where the coefs will be stored.
+/** 
+ * Calculate second order section peaking filter coefficients.
+ * @param cutoff a value from 0 to 0x80000000, where 0 represents 0 Hz and
+ * 0x80000000 represents the Nyquist frequency (samplerate/2).
+ * @param Q 16.16 fixed point value describing Q factor. Lower bound
+ * is artificially set at 0.5.
+ * @param db s15.16 fixed point value describing gain/attenuation at peak freq.
+ * @param c pointer to coefficient storage. Coefficients are s3.28 format.
  */
 void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
@@ -232,72 +233,90 @@ void eq_pk_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
     int32_t a0, a1, a2; /* these are all s3.28 format */
     int32_t b0, b1, b2;
 
-    /* possible numerical ranges listed after each coef */
-    b0 = one + FRACMUL(alpha, A);     /* [1.25..5] */
-    b1 = a1 = -2*(cc >> 3);           /* [-2..2] */
-    b2 = one - FRACMUL(alpha, A);     /* [-3..0.75] */
-    a0 = one + DIV64(alpha, A, 27);   /* [1.25..5] */
-    a2 = one - DIV64(alpha, A, 27);   /* [-3..0.75] */
+    /* possible numerical ranges are in comments by each coef */
+    b0 = one + FRACMUL(alpha, A);     /* [1 .. 5] */
+    b1 = a1 = -2*(cc >> 3);           /* [-2 .. 2] */
+    b2 = one - FRACMUL(alpha, A);     /* [-3 .. 1] */
+    a0 = one + DIV64(alpha, A, 27);   /* [1 .. 5] */
+    a2 = one - DIV64(alpha, A, 27);   /* [-3 .. 1] */
 
-    c[0] = DIV64(b0, a0, 28);
-    c[1] = DIV64(b1, a0, 28);
-    c[2] = DIV64(b2, a0, 28);
-    c[3] = DIV64(-a1, a0, 28);
-    c[4] = DIV64(-a2, a0, 28);
+    c[0] = DIV64(b0, a0, 28);         /* [0.25 .. 4] */
+    c[1] = DIV64(b1, a0, 28);         /* [-2 .. 2] */
+    c[2] = DIV64(b2, a0, 28);         /* [-2.4 .. 1] */
+    c[3] = DIV64(-a1, a0, 28);        /* [-2 .. 2] */
+    c[4] = DIV64(-a2, a0, 28);        /* [-0.6 .. 1] */
 }
 
-/* Calculate coefficients for lowshelf filter */
+/**
+ * Calculate coefficients for lowshelf filter. Parameters are as for
+ * eq_pk_coefs, but the coefficient format is s5.26 fixed point.
+ */
 void eq_ls_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     long cs;
-    const long one = 1 << 24; /* s7.24 */
+    const long one = 1 << 25; /* s6.25 */
     const long A = dbtoA(db);
     const long alpha = DIV64(fsincos(cutoff, &cs), 2*Q, 15); /* s1.30 */
-    const long ap1 = (A >> 5) + one;
-    const long am1 = (A >> 5) - one;
-    const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
-    int32_t a0, a1, a2; /* these are all s7.24 format */
+    const long ap1 = (A >> 4) + one;
+    const long am1 = (A >> 4) - one;
+    const long twosqrtalpha = 2*FRACMUL(fsqrt(A >> 3, 26), alpha);
+    int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
-
+    
+    /* [0.1 .. 40] */
     b0 = FRACMUL(A, ap1 - FRACMUL(am1, cs) + twosqrtalpha) << 2;
-    b1 = FRACMUL(A, am1 - FRACMUL(ap1, cs)) << 3; 
-    b2 = FRACMUL(A, ap1 - FRACMUL(am1, cs) - twosqrtalpha) << 2; 
-    a0 = ap1 + FRACMUL(am1, cs) + twosqrtalpha; 
-    a1 = -2*((am1 + FRACMUL(ap1, cs))); 
+    /* [-16 .. 63.4] */
+    b1 = FRACMUL(A, am1 - FRACMUL(ap1, cs)) << 3;
+    /* [0 .. 31.7] */
+    b2 = FRACMUL(A, ap1 - FRACMUL(am1, cs) - twosqrtalpha) << 2;
+    /* [0.5 .. 10] */
+    a0 = ap1 + FRACMUL(am1, cs) + twosqrtalpha;
+    /* [-16 .. 4] */
+    a1 = -2*((am1 + FRACMUL(ap1, cs)));
+    /* [0 .. 8] */
     a2 = ap1 + FRACMUL(am1, cs) - twosqrtalpha;
 
-    c[0] = DIV64(b0, a0, 24);
-    c[1] = DIV64(b1, a0, 24);
-    c[2] = DIV64(b2, a0, 24);
-    c[3] = DIV64(-a1, a0, 24);
-    c[4] = DIV64(-a2, a0, 24);
+    c[0] = DIV64(b0, a0, 26);       /* [0.06 .. 15.9] */
+    c[1] = DIV64(b1, a0, 26);       /* [-2 .. 31.7] */
+    c[2] = DIV64(b2, a0, 26);       /* [0 .. 15.9] */
+    c[3] = DIV64(-a1, a0, 26);      /* [-2 .. 2] */
+    c[4] = DIV64(-a2, a0, 26);      /* [0 .. 1] */
 }
 
-/* Calculate coefficients for highshelf filter */
+/**
+ * Calculate coefficients for highshelf filter. Parameters are as for
+ * eq_pk_coefs, but the coefficient format is s5.26 fixed point.
+ */
 void eq_hs_coefs(unsigned long cutoff, unsigned long Q, long db, int32_t *c)
 {
     long cs;
-    const long one = 1 << 24; /* s7.24 */
-    const long A = dbtoA(db);
-    const long alpha = DIV64(fsincos(cutoff, &cs), 2*Q, 15); /* s1.30 */
-    const long ap1 = (A >> 5) + one;
-    const long am1 = (A >> 5) - one;
-    const long twosqrtalpha = 2*(FRACMUL(fsqrt(A >> 5, 24), alpha) << 1);
-    int32_t a0, a1, a2; /* these are all s7.24 format */
+    const int one = 1 << 25; /* s6.25 */
+    const int A = dbtoA(db);
+    const int alpha = DIV64(fsincos(cutoff, &cs), 2*Q, 15); /* s1.30 */
+    const int ap1 = (A >> 4) + one;
+    const int am1 = (A >> 4) - one;
+    const int twosqrtalpha = 2*FRACMUL(fsqrt(A >> 3, 26), alpha);
+    int32_t a0, a1, a2; /* these are all s6.25 format */
     int32_t b0, b1, b2;
 
+    /* [0.1 .. 40] */
     b0 = FRACMUL(A, ap1 + FRACMUL(am1, cs) + twosqrtalpha) << 2;
+    /* [-63.5 .. 16] */
     b1 = -FRACMUL(A, am1 + FRACMUL(ap1, cs)) << 3;
+    /* [0 .. 32] */
     b2 = FRACMUL(A, ap1 + FRACMUL(am1, cs) - twosqrtalpha) << 2;
+    /* [0.5 .. 10] */
     a0 = ap1 - FRACMUL(am1, cs) + twosqrtalpha;
+    /* [-4 .. 16] */
     a1 = 2*((am1 - FRACMUL(ap1, cs)));
+    /* [0 .. 8] */
     a2 = ap1 - FRACMUL(am1, cs) - twosqrtalpha;
 
-    c[0] = DIV64(b0, a0, 24);
-    c[1] = DIV64(b1, a0, 24);
-    c[2] = DIV64(b2, a0, 24);
-    c[3] = DIV64(-a1, a0, 24);
-    c[4] = DIV64(-a2, a0, 24);
+    c[0] = DIV64(b0, a0, 26);       /* [0 .. 16] */
+    c[1] = DIV64(b1, a0, 26);       /* [-31.7 .. 2] */
+    c[2] = DIV64(b2, a0, 26);       /* [0 .. 16] */
+    c[3] = DIV64(-a1, a0, 26);      /* [-2 .. 2] */
+    c[4] = DIV64(-a2, a0, 26);      /* [0 .. 1] */
 }
 
 #if (!defined(CPU_COLDFIRE) && !defined(CPU_ARM)) || defined(SIMULATOR)
