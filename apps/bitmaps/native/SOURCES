@@ -2,7 +2,7 @@
 
 /* Rockbox logo */
 #if (LCD_DEPTH == 1)
-rockboxlogo.112x37x1.bmp
+rockboxlogo.112x30x1.bmp
 #elif (LCD_WIDTH == 128) && (LCD_DEPTH == 16)
 rockboxlogo.128x40x16.bmp
 #elif (LCD_WIDTH == 138) && (LCD_DEPTH == 2)
