@@ -55,6 +55,7 @@
 #include "bmp.h"
 #include "icons.h"
 #endif /* End HAVE_LCD_BITMAP */
+#include "gui/gwps-common.h"
 
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
@@ -502,6 +503,9 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         }
     
         gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+        
+        if (global_settings.fade_on_stop)
+            fade(0);
         
         audio_stop();
         while (audio_status())
