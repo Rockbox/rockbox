@@ -22,7 +22,7 @@ my $langversion = 3; # 3 was the latest one used in the v1 format
 
 if(!$ARGV[0]) {
     print <<MOO
-Usage: genlang2 [options] <langv2 file>
+Usage: genlang [options] <langv2 file>
 
  -p=<prefix>
     Make the tool create a [prefix].c and [prefix].h file.
@@ -43,6 +43,10 @@ Usage: genlang2 [options] <langv2 file>
  -t=<target>
     Specify which target you want the translations/phrases for. Required when
     -b or -p is used.
+
+    The target can in fact be specified as numerous different strings,
+    separated with colons. This will make genlang to use all the specified
+    strings when searching for a matching phrase.
 
  -o
     Voice mode output. Outputs all id: and voice: lines for the given target!
@@ -140,15 +144,15 @@ sub parsetarget {
     my $test;
     for $test (@all) {
 #        print "TEST ($debug) $target for $test\n";
-        if(match($target, $test)) {
-            $string = $v;
-#            print "MATCH: $test => $v\n";
+        for my $part (split(":", $target)) {
+            if(match($part, $test)) {
+                $string = $v;
+#                print "MATCH: $test => $v\n";
+                $$strref = $string;
+                return $string;
+            }
         }
     }
-    if($string) {
-        $$strref = $string;
-    }
-    return $string;
 }
 
 my $src;
@@ -446,7 +450,7 @@ if($prefix) {
         die "couldn't create file $prefix.c\n";        
 
     print HFILE <<MOO
-/* This file was automatically generated using genlang2 */
+/* This file was automatically generated using genlang */
 /*
  * The str() macro/functions is how to access strings that might be
  * translated. Use it like str(MACRO) and expect a string to be
@@ -466,7 +470,7 @@ MOO
     ;
 
     print CFILE <<MOO
-/* This file was automaticly generated using genlang2, the strings come
+/* This file was automaticly generated using genlang, the strings come
    from "$input" */
    
 #include "$prefix.h"
@@ -496,7 +500,6 @@ MOO
     ;
 
 # Output the ID names for the enum in the header file
-    my $i;
     for $i (0x8000 .. ($voiceid-1)) {
         my $name=$idnum[$i]; # get the ID name
         
@@ -557,9 +560,6 @@ elsif($binary) {
             $idnum = $idmap{$name};
 
             printf OUTF ("%c%c%s\x00", ($idnum>>8), ($idnum&0xff), $dest);
-            if($debug) {
-                printf("%02x => %s\n", $idnum, $value);
-            }
         }
     }
 }
