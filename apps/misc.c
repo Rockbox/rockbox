@@ -504,8 +504,11 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     
         gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
         
-        if (global_settings.fade_on_stop)
+        if (global_settings.fade_on_stop 
+            && (audio_status() & AUDIO_STATUS_PLAY))
+        {
             fade(0);
+        }
         
         audio_stop();
         while (audio_status())
