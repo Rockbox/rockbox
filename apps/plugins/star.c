@@ -576,7 +576,7 @@ static void star_display_board_info(void)
     char str_info[32];
 
     rb->snprintf(str_info, sizeof(str_info), "L:%02d    S:%02d   C:",
-                 current_level, star_count);
+                 current_level+1, star_count );
     rb->lcd_putsxy(0, label_offset_y, str_info);
 
 #if LCD_DEPTH > 1
@@ -899,9 +899,10 @@ static int star_choose_level(void)
     while (true)
     {
        rb->lcd_clear_display();
-       /* levels are numbered 0 to (STAR_LEVEL_COUNT-1) */
+       /* levels are numbered 0 to (STAR_LEVEL_COUNT-1) internally, but 
+        * displayed as 1 to STAR_LEVEL_COUNT because it looks nicer */
        rb->snprintf(str_info, sizeof(str_info), "Level:%02d / %02d",
-                 level,(STAR_LEVEL_COUNT-1));
+                 level+1, STAR_LEVEL_COUNT );
        rb->lcd_putsxy(0, 0, str_info);
        rb->lcd_update();
          key = rb->button_get(true);
@@ -1104,6 +1105,13 @@ static int star_menu(void)
                                           "[PWR+DOWN] Prev. level\n"
                                           "[PWR+RIGHT] Reset level\n"
                                           "[PWR+UP] Next level", true);
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+                        star_display_text("KEYS\n\n"
+                                          "[REW] Toggle Ctl\n"
+                                          "[POWER] Exit\n"
+                                          "[PLAY+DOWN] Prev. level\n"
+                                          "[PLAY+RIGHT] Reset level\n"
+                                          "[PLAY+UP] Next level", true);
 #endif
                         break;
                     case 4:
