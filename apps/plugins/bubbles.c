@@ -2274,6 +2274,9 @@ static void bubbles_loadscores(struct game_context* bb) {
         /* scores are bad, reset */
         rb->memset(bb->highscores, 0, sizeof(bb->highscores));
     }
+    
+    if( bb->highlevel >= NUM_LEVELS )
+        bb->highlevel = NUM_LEVELS - 1;
 
     rb->close(fd);
 }
@@ -2694,8 +2697,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
             case BB_WIN:
                 rb->splash(HZ*2, true, "You Win!");
                 /* record high level */
-                if(bb.level-1 > bb.highlevel) {
-                    bb.highlevel = bb.level-1;
+                if( NUM_LEVELS-1 > bb.highlevel) {
+                    bb.highlevel = NUM_LEVELS-1;
                     bb.dirty = true;
                 }
 
