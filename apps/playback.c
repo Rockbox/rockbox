@@ -1841,7 +1841,7 @@ static void codec_thread(void)
                             while(pcm_is_playing())
                             {
                                 CUR_TI->id3.elapsed = CUR_TI->id3.length - pcmbuf_get_latency();
-                                yield();
+                                sleep(1);
                             }
                             LOGFQUEUE("codec > audio Q_AUDIO_STOP");
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
