@@ -52,7 +52,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 /* increment this on any code change that effects output */
 /* replace with CVS Revision keyword? */
-#define SCROBBLER_REVISION "1.0"
+#define SCROBBLER_REVISION " $Revision$"
 
 #define SCROBBLER_MAX_CACHE 32
 /* longest entry I've had is 323, add a safety margin */
@@ -94,11 +94,11 @@ static void write_cache(void)
             fdprintf(scrobbler_fd, "#AUDIOSCROBBLER/%s\n", SCROBBLER_VERSION);
             fdprintf(scrobbler_fd, "#TZ/UNKNOWN\n");
 #ifdef CONFIG_RTC
-            fdprintf(scrobbler_fd, "#CLIENT/Rockbox %s %s\n",
-                TARGET_NAME, SCROBBLER_REVISION);
+            fdprintf(scrobbler_fd,
+                     "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION "\n");
 #else
-            fdprintf(scrobbler_fd, "#CLIENT/Rockbox %s %s Timeless\n",
-                TARGET_NAME, SCROBBLER_REVISION);
+            fdprintf(scrobbler_fd,
+                     "#CLIENT/Rockbox " TARGET_NAME SCROBBLER_REVISION " Timeless\n");
 #endif
             close(scrobbler_fd);
         }
