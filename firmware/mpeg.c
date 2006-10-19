@@ -108,6 +108,9 @@ static struct trackdata trackdata[MAX_TRACK_ENTRIES];
 static unsigned int current_track_counter = 0;
 static unsigned int last_track_counter = 0;
 
+/* Play time of the previous track */
+unsigned long prev_track_elapsed;
+
 #ifndef SIMULATOR
 static int track_read_idx = 0;
 static int track_write_idx = 0;
@@ -1056,6 +1059,9 @@ static void track_change(void)
 {
     DEBUGF("Track change\n");
 
+    struct trackdata *track = get_trackdata(0);
+    prev_track_elapsed = track->id3.elapsed;
+
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
     /* Reset the AVC */
     sound_set_avc(-1);
@@ -1070,6 +1076,11 @@ static void track_change(void)
     }
 
     current_track_counter++;
+}
+
+unsigned long audio_prev_elapsed(void)
+{
+    return prev_track_elapsed;
 }
 
 #ifdef DEBUG

@@ -272,6 +272,9 @@ struct thread_entry *codec_thread_p;
 #ifdef PLAYBACK_VOICE
 extern struct codec_api ci_voice;
 
+/* Play time of the previous track */
+unsigned long prev_track_elapsed;
+
 static volatile bool voice_thread_start;
 static volatile bool voice_is_playing;
 static volatile bool voice_codec_loaded;
@@ -1630,6 +1633,8 @@ static bool codec_load_next_track(void)
 {
     struct event ev;
 
+    prev_track_elapsed = CUR_TI->id3.elapsed;
+
     if (ci.seek_time)
         codec_seek_complete_callback();
 
@@ -2910,6 +2915,11 @@ void audio_set_track_unbuffer_event(void (*handler)(struct mp3entry *id3,
 void audio_set_track_changed_event(void (*handler)(struct mp3entry *id3))
 {
     track_changed_callback = handler;
+}
+
+unsigned long audio_prev_elapsed(void)
+{
+    return prev_track_elapsed;
 }
 
 static void audio_stop_codec_flush(void)

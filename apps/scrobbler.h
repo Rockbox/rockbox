@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2006 Robert Keevil
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,17 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#ifndef _TIMEFUNCS_H_
-#define _TIMEFUNCS_H_
-
-#include "config.h"
-#include <stdbool.h>
-#include "time.h"
-
-struct tm *get_time(void);
-int set_time(const struct tm *tm);
-bool valid_time(const struct tm *tm);
-time_t mktime(struct tm *t);
-
-#endif /* _TIMEFUNCS_H_ */
+ 
+void scrobbler_change_event(struct mp3entry *id);
+int scrobbler_init(void);
+void scrobbler_flush_cache(void);
+void scrobbler_shutdown(void);
+bool scrobbler_is_enabled(void);

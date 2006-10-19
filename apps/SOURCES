@@ -29,6 +29,7 @@ talk.c
 tree.c
 tagtree.c
 filetree.c
+scrobbler.c
 
 screen_access.c
 gui/buttonbar.c

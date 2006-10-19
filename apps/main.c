@@ -66,6 +66,7 @@
 #include "string.h"
 #include "splash.h"
 #include "eeprom_settings.h"
+#include "scrobbler.h"
 
 #if (CONFIG_CODEC == SWCODEC)
 #include "playback.h"
@@ -252,6 +253,8 @@ void init(void)
     audio_preinit();
 #endif
 
+    scrobbler_init();
+    
     /* audio_init must to know the size of voice buffer so init voice first */
 #if CONFIG_CODEC == SWCODEC
     talk_init();
@@ -455,7 +458,8 @@ void init(void)
     status_init();
     playlist_init();
     tree_init();
-        
+    scrobbler_init();
+
     /* No buffer allocation (see buffer.c) may take place after the call to
        audio_init() since the mpeg thread takes the rest of the buffer space */
     mp3_init( global_settings.volume,

@@ -665,6 +665,8 @@ static const struct bit_entry hd_bits[] =
     {2, S_O(fm_region), 0, "fm_region", "eu,us,jp,kr" },
 #endif
 
+    {1, S_O(audioscrobbler), false, "Last.fm Logging", off_on},
+
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
 

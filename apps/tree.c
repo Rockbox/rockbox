@@ -65,6 +65,7 @@
 #include "yesno.h"
 #include "gwps-common.h"
 #include "eeprom_settings.h"
+#include "scrobbler.h"
 
 /* gui api */
 #include "list.h"
@@ -1378,6 +1379,7 @@ void ft_play_filename(char *dir, char *file)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
+    scrobbler_shutdown();
     tagcache_shutdown();
     playlist_shutdown();
 
@@ -1439,4 +1441,5 @@ void tree_restore(void)
     }
 #endif
     tagcache_start_scan();
+    scrobbler_init();
 }

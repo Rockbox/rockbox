@@ -45,6 +45,7 @@
 #include "font.h"
 #include "splash.h"
 #include "tagcache.h"
+#include "scrobbler.h"
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif
@@ -625,6 +626,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (!mmc_touched() || (mmc_remove_request() == SYS_MMC_EXTRACTED))
 #endif
             {
+                scrobbler_flush_cache();
                 system_flush();
                 usb_screen();
                 system_restore();

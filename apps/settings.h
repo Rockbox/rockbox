@@ -498,6 +498,7 @@ struct user_settings
 #ifdef CONFIG_TUNER
     int fm_region;
 #endif
+    bool audioscrobbler; /* Audioscrobbler logging  */
 
 };
 

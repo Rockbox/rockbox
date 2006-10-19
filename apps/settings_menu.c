@@ -56,6 +56,7 @@
 #include "yesno.h"
 #include "list.h"
 #include "color_picker.h"
+#include "scrobbler.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
@@ -1387,6 +1388,23 @@ static bool next_folder(void)
                       INT, names, 3, NULL );
 }
 
+static bool audioscrobbler(void)
+{
+    bool result = set_bool_options(str(LANG_AUDIOSCROBBLER),
+                                   &global_settings.audioscrobbler,
+                                   STR(LANG_ON),
+                                   STR(LANG_OFF),
+                                   NULL);
+
+    if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
+        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
+
+    if(!result)
+        scrobbler_shutdown();
+
+    return result;
+}
+
 static bool codepage_setting(void)
 {
     static const struct opt_items names[] = {
@@ -1605,7 +1623,7 @@ static bool dircache(void)
                                    NULL);
 
     if (!dircache_is_enabled() && global_settings.dircache)
-        gui_syncsplash(HZ*2, true, str(LANG_DIRCACHE_REBOOT));
+        gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
 
     if (!result)
         dircache_disable();
@@ -1747,8 +1765,9 @@ static bool playback_settings_menu(void)
         { ID2P(LANG_ID3_ORDER), id3_order },
         { ID2P(LANG_NEXT_FOLDER), next_folder },
 #ifdef HAVE_HEADPHONE_DETECTION
-        { ID2P(LANG_UNPLUG), unplug_menu }
+        { ID2P(LANG_UNPLUG), unplug_menu },
 #endif
+        { ID2P(LANG_AUDIOSCROBBLER), audioscrobbler}
     };
 
     bool old_shuffle = global_settings.playlist_shuffle;

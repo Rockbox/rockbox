@@ -141,6 +141,7 @@ void audio_set_spdif_power_setting(bool on);
 #endif
 #endif
 unsigned long audio_get_spdif_sample_rate(void);
+unsigned long audio_prev_elapsed(void);
 #if CONFIG_CODEC == SWCODEC
 /* audio encoder functions (defined in playback.c) */
 int  audio_get_encoder_id(void);
