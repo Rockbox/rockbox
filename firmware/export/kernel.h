@@ -96,6 +96,7 @@ extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 extern void queue_post(struct event_queue *q, long id, void *data);
 extern bool queue_empty(const struct event_queue* q);
 void queue_clear(struct event_queue* q);
+extern void queue_remove_from_head(struct event_queue *q, long id);
 extern int queue_broadcast(long id, void *data);
 
 extern void mutex_init(struct mutex *m);

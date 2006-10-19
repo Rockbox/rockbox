@@ -2760,6 +2760,7 @@ void audio_resume(void)
 void audio_next(void)
 {
 #ifndef SIMULATOR
+    queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_NEXT, NULL);
 #else /* SIMULATOR */
     char* file;
@@ -2788,6 +2789,7 @@ void audio_next(void)
 void audio_prev(void)
 {
 #ifndef SIMULATOR
+    queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
     queue_post(&mpeg_queue, MPEG_PREV, NULL);
 #else /* SIMULATOR */
     char* file;

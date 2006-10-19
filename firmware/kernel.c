@@ -184,6 +184,19 @@ void queue_clear(struct event_queue* q)
     set_irq_level(oldlevel);
 }
 
+void queue_remove_from_head(struct event_queue *q, long id)
+{
+    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
+    
+    while (q->read != q->write && 
+      q->events[(q->read) & QUEUE_LENGTH_MASK].id == id)
+    {
+        q->read++;
+    }
+    
+    set_irq_level(oldlevel);
+}
+
 int queue_broadcast(long id, void *data)
 {
    int i;
