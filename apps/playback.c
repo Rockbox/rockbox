@@ -1839,7 +1839,10 @@ static void codec_thread(void)
                             /* Wait for the audio to stop playing before
                              * triggering the WPS exit */
                             while(pcm_is_playing())
-                                sleep(1);
+                            {
+                                CUR_TI->id3.elapsed = CUR_TI->id3.length - pcmbuf_get_latency();
+                                yield();
+                            }
                             LOGFQUEUE("codec > audio Q_AUDIO_STOP");
                             queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
