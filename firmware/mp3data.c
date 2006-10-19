@@ -442,6 +442,7 @@ int get_mp3file_info(int fd, struct mp3info *info)
 
         if (vbrheader[7] & VBR_TOC_FLAG) /* Is table-of-contents there? */
         {
+            info->has_toc = true;
             memcpy( info->toc, vbrheader+i, 100 );
             i += 100;
         }
