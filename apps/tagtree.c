@@ -1217,6 +1217,7 @@ int tagtree_load(struct tree_context* c)
     int table = c->currtable;
     
     c->dentry_size = sizeof(struct tagentry);
+    c->dirsindir = 0;
 
     if (!table)
     {
