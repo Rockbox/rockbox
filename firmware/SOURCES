@@ -298,7 +298,6 @@ target/arm/gigabeat/meg-fx/sc606-meg-fx.c
 target/arm/gigabeat/meg-fx/adc-meg-fx.c
 drivers/generic_i2c.c
 target/arm/gigabeat/meg-fx/i2c-meg-fx.c
-target/arm/gigabeat/meg-fx/mmu-meg-fx.c
 target/arm/gigabeat/meg-fx/wmcodec-meg-fx.c
 #endif
 #endif
