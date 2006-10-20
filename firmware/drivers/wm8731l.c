@@ -37,34 +37,21 @@
 #include "buffer.h"
 #include "audio.h"
 
-#include "i2c-pp5002.h"
+#include "wmcodec.h"
 #include "wm8731l.h"
-#include "pcf50605.h"
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
-void wm8731_write(int reg, int data)
-{
-/* Todo: Since the ipod_i2c_* functions also work on H10 and possibly other PP
-   targets, these functions should probably be renamed */
-#if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-    /* The H10's audio codec uses an I2C address of 0x1b */
-    ipod_i2c_send(0x1b, (reg<<1) | ((data&0x100)>>8),data&0xff);
-#else
-    /* The iPod's audio codecs use an I2C address of 0x1a */ 
-    ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
-#endif
-}
 
 int wmcodec_mute(int mute)
 {
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wm8731_write(DACCTRL, 0x8);
+        wmcodec_write(DACCTRL, 0x8);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wm8731_write(DACCTRL, 0x0);
+        wmcodec_write(DACCTRL, 0x0);
     }
 
     return 0;
@@ -75,110 +62,12 @@ static void codec_set_active(int active)
 {
     /* set active to 0x0 or 0x1 */
     if (active) {
-        wm8731_write(ACTIVECTRL, 0x01);
+        wmcodec_write(ACTIVECTRL, 0x01);
     } else {
-        wm8731_write(ACTIVECTRL, 0x00);
+        wmcodec_write(ACTIVECTRL, 0x00);
     }
 }
 
-/*
- * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
- */
-static void i2s_reset(void)
-{
-#if CONFIG_CPU == PP5020
-    /* I2S soft reset */
-    outl(inl(0x70002800) | 0x80000000, 0x70002800);
-    outl(inl(0x70002800) & ~0x80000000, 0x70002800);
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    outl(inl(0x70002800) & ~0xc00, 0x70002800);
-    /* BIT.SIZE [9:8] = 16bit (default) */
-    outl(inl(0x70002800) & ~0x300, 0x70002800);
-
-    /* FIFO.FORMAT [6:4] = 32 bit LSB */
-    /* since BIT.SIZ < FIFO.FORMAT low 16 bits will be 0 */
-    outl(inl(0x70002800) | 0x30, 0x70002800);
-
-    /* RX_ATN_LVL=1 == when 12 slots full */
-    /* TX_ATN_LVL=1 == when 12 slots empty */
-    outl(inl(0x7000280c) | 0x33, 0x7000280c);
-
-    /* Rx.CLR = 1, TX.CLR = 1 */
-    outl(inl(0x7000280c) | 0x1100, 0x7000280c);
-#elif CONFIG_CPU == PP5002
-    /* I2S device reset */
-    outl(inl(0xcf005030) | 0x80, 0xcf005030);
-    outl(inl(0xcf005030) & ~0x80, 0xcf005030);
-
-    /* I2S controller enable */
-    outl(inl(0xc0002500) | 0x1, 0xc0002500);
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    /* BIT.SIZE [9:8] = 24bit */
-    /* FIFO.FORMAT = 24 bit LSB */
-
-    /* reset DAC and ADC fifo */
-    outl(inl(0xc000251c) | 0x30000, 0xc000251c);
-#endif
-}
-
-/*
- * Initialise the WM8975 for playback via headphone and line out.
- * Note, I'm using the WM8750 datasheet as its apparently close.
- */
-int wmcodec_init(void) {
-    /* reset I2C */
-    i2c_init();
-
-#if CONFIG_CPU == PP5020
-    /* normal outputs for CDI and I2S pin groups */
-    outl(inl(0x70000020) & ~0x300, 0x70000020);
-
-    /*mini2?*/
-    outl(inl(0x70000010) & ~0x3000000, 0x70000010);
-    /*mini2?*/
-
-    /* device reset */
-    outl(inl(0x60006004) | 0x800, 0x60006004);
-    outl(inl(0x60006004) & ~0x800, 0x60006004);
-
-    /* device enable */
-    outl(inl(0x6000600C) | 0x807, 0x6000600C);
-
-    /* enable external dev clock clocks */
-    outl(inl(0x6000600c) | 0x2, 0x6000600c);
-
-    /* external dev clock to 24MHz */
-    outl(inl(0x70000018) & ~0xc, 0x70000018);
-#else
-    /* device reset */
-    outl(inl(0xcf005030) | 0x80, 0xcf005030);
-    outl(inl(0xcf005030) & ~0x80, 0xcf005030);
-
-    /* device enable */
-    outl(inl(0xcf005000) | 0x80, 0xcf005000);
-
-    /* GPIO D06 enable for output */
-    outl(inl(0xcf00000c) | 0x40, 0xcf00000c);
-    outl(inl(0xcf00001c) & ~0x40, 0xcf00001c);
-    /* bits 11,10 == 01 */
-    outl(inl(0xcf004040) | 0x400, 0xcf004040);
-    outl(inl(0xcf004040) & ~0x800, 0xcf004040);
-
-    outl(inl(0xcf004048) & ~0x1, 0xcf004048);
-
-    outl(inl(0xcf000004) & ~0xf, 0xcf000004);
-    outl(inl(0xcf004044) & ~0xf, 0xcf004044);
-
-    /* C03 = 0 */
-    outl(inl(0xcf000008) | 0x8, 0xcf000008);
-    outl(inl(0xcf000018) | 0x8, 0xcf000018);
-    outl(inl(0xcf000028) & ~0x8, 0xcf000028);
-#endif
-    
-    return 0;
-}
 
 /* Silently enable / disable audio output */
 void wmcodec_enable_output(bool enable)
@@ -188,36 +77,36 @@ void wmcodec_enable_output(bool enable)
         /* reset the I2S controller into known state */
         i2s_reset();
 
-        wm8731_write(RESET, 0x0);        /*Reset*/
+        wmcodec_write(RESET, 0x0);        /*Reset*/
 
         codec_set_active(0x0);
 
 #ifdef HAVE_WM8721
         /* DACSEL=1 */
-        wm8731_write(0x4, 0x10);
+        wmcodec_write(0x4, 0x10);
 #elif defined HAVE_WM8731
         /* DACSEL=1, BYPASS=1 */
-        wm8731_write(0x4, 0x18);
+        wmcodec_write(0x4, 0x18);
 #endif
     
         /* set power register to POWEROFF=0 on OUTPD=0, DACPD=0 */
-        wm8731_write(PWRMGMT, 0x67);
+        wmcodec_write(PWRMGMT, 0x67);
 
         /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
-        wm8731_write(AINTFCE, 0x42);
+        wmcodec_write(AINTFCE, 0x42);
 
         wmcodec_set_sample_rate(WM8731L_44100HZ);
 
         /* set the volume to -6dB */
-        wm8731_write(LOUTVOL, IPOD_PCM_LEVEL);
-        wm8731_write(ROUTVOL, 0x100 | IPOD_PCM_LEVEL);
+        wmcodec_write(LOUTVOL, IPOD_PCM_LEVEL);
+        wmcodec_write(ROUTVOL, 0x100 | IPOD_PCM_LEVEL);
 
         /* ACTIVE=1 */
         codec_set_active(1);
 
         /* 5. Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wm8731_write(DACCTRL, 0x0);
+        wmcodec_write(DACCTRL, 0x0);
         
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         /* We need to enable bit 4 of GPIOL for output for sound on H10 */
@@ -241,8 +130,8 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     /* 0110000 == -73dB */
     /* 0101111 == mute (0x2f) */
 
-    wm8731_write(LOUTVOL, vol_l);
-    wm8731_write(ROUTVOL, vol_r);
+    wmcodec_write(LOUTVOL, vol_l);
+    wmcodec_write(ROUTVOL, vol_r);
  
     return 0;
 }
@@ -269,22 +158,22 @@ void wmcodec_set_treble(int value)
 void wmcodec_close(void)
 {
    /* set DACMU=1 DEEMPH=0 */
-    wm8731_write(DACCTRL, 0x8);
+    wmcodec_write(DACCTRL, 0x8);
 
     /* ACTIVE=0 */
     codec_set_active(0x0);
 
     /* line in mute left & right*/
-    wm8731_write(LINVOL, 0x100 | 0x80);
+    wmcodec_write(LINVOL, 0x100 | 0x80);
 
     /* set DACSEL=0, MUTEMIC=1 */
-    wm8731_write(0x4, 0x2);
+    wmcodec_write(0x4, 0x2);
 
     /* set POWEROFF=0 OUTPD=0 DACPD=1 */
-    wm8731_write(PWRMGMT, 0x6f);
+    wmcodec_write(PWRMGMT, 0x6f);
 
     /* set POWEROFF=1 OUTPD=1 DACPD=1 */
-    wm8731_write(PWRMGMT, 0xff);
+    wmcodec_write(PWRMGMT, 0xff);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
@@ -296,7 +185,7 @@ void wmcodec_set_nsorder(int order)
 void wmcodec_set_sample_rate(int sampling_control)
 {
     codec_set_active(0x0);
-    wm8731_write(SAMPCTRL, sampling_control);
+    wmcodec_write(SAMPCTRL, sampling_control);
     codec_set_active(0x1);
 }
 

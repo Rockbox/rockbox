@@ -199,7 +199,7 @@ descramble.S
 #endif
 #if defined(HAVE_UDA1380) && !defined(SIMULATOR)
 drivers/uda1380.c
-#elif defined(HAVE_WM8975) && !defined(SIMULATOR)
+#elif (defined(HAVE_WM8975) || defined(HAVE_WM8751)) && !defined(SIMULATOR)
 drivers/wm8975.c
 #elif defined(HAVE_WM8758) && !defined(SIMULATOR)
 drivers/wm8758.c
@@ -233,6 +233,7 @@ drivers/m5636.c
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/adc-e200.c
+target/arm/wmcodec-pp.c
 #endif
 
 #ifdef IAUDIO_X5
@@ -268,6 +269,7 @@ target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10_20gb.c
 target/arm/iriver/h10/adc-h10.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -280,6 +282,7 @@ target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
 target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/adc-h10.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -295,6 +298,8 @@ target/arm/gigabeat/meg-fx/sc606-meg-fx.c
 target/arm/gigabeat/meg-fx/adc-meg-fx.c
 drivers/generic_i2c.c
 target/arm/gigabeat/meg-fx/i2c-meg-fx.c
+target/arm/gigabeat/meg-fx/mmu-meg-fx.c
+target/arm/gigabeat/meg-fx/wmcodec-meg-fx.c
 #endif
 #endif
 
@@ -307,6 +312,7 @@ target/arm/tatung/tpj1022/power-tpj1022.c
 target/arm/tatung/tpj1022/usb-tpj1022.c
 target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/adc-tpj1022.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -320,6 +326,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -333,6 +340,7 @@ target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -346,6 +354,7 @@ target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -359,6 +368,7 @@ target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
 drivers/lcd-ipodvideo.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -372,6 +382,7 @@ target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/3g/button-3g.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -385,6 +396,7 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif
 
@@ -399,5 +411,6 @@ target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
+target/arm/wmcodec-pp.c
 #endif
 #endif

@@ -37,9 +37,8 @@
 #include "buffer.h"
 #include "audio.h"
 
-#include "i2c-pp5020.h"
+#include "wmcodec.h"
 #include "wm8758.h"
-#include "pcf50605.h"
 
 void wmcodec_reset(void);
 
@@ -47,67 +46,6 @@ void wmcodec_reset(void);
 
 //#define BASSCTRL   0x
 //#define TREBCTRL   0x0b
-
-/*
- * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
- */
-static void i2s_reset(void)
-{
-    /* PP502x */
-
-    /* I2S soft reset */
-    outl(inl(0x70002800) | 0x80000000, 0x70002800);
-    outl(inl(0x70002800) & ~0x80000000, 0x70002800);
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    outl(inl(0x70002800) & ~0xc00, 0x70002800);
-    /* BIT.SIZE [9:8] = 16bit (default) */
-    outl(inl(0x70002800) & ~0x300, 0x70002800);
-
-    /* FIFO.FORMAT [6:4] = 32 bit LSB */
-    /* since BIT.SIZ < FIFO.FORMAT low 16 bits will be 0 */
-    outl(inl(0x70002800) | 0x30, 0x70002800);
-
-    /* RX_ATN_LVL=1 == when 12 slots full */
-    /* TX_ATN_LVL=1 == when 12 slots empty */
-    outl(inl(0x7000280c) | 0x33, 0x7000280c);
-
-    /* Rx.CLR = 1, TX.CLR = 1 */
-    outl(inl(0x7000280c) | 0x1100, 0x7000280c);
-}
-
-void wm8758_write(int reg, int data)
-{
-    ipod_i2c_send(0x1a, (reg<<1) | ((data&0x100)>>8),data&0xff);
-}
-
-/*
- * Initialise the WM8758 for playback via headphone and line out.
- * Note, I'm using the WM8750 datasheet as its apparently close.
- */
-int wmcodec_init(void) {
-    /* normal outputs for CDI and I2S pin groups */
-    outl(inl(0x70000020) & ~0x300, 0x70000020);
-
-    /*mini2?*/
-    outl(inl(0x70000010) & ~0x3000000, 0x70000010);
-    /*mini2?*/
-
-    /* device reset */
-    outl(inl(0x60006004) | 0x800, 0x60006004);
-    outl(inl(0x60006004) & ~0x800, 0x60006004);
-
-    /* device enable */
-    outl(inl(0x6000600C) | 0x807, 0x6000600C);
-
-    /* enable external dev clock clocks */
-    outl(inl(0x6000600c) | 0x2, 0x6000600c);
-
-    /* external dev clock to 24MHz */
-    outl(inl(0x70000018) & ~0xc, 0x70000018);
-
-    return 0;
-}
 
 /* Silently enable / disable audio output */
 void wmcodec_enable_output(bool enable)
@@ -119,23 +57,23 @@ void wmcodec_enable_output(bool enable)
 
         /* TODO: Review the power-up sequence to prevent pops */
 
-        wm8758_write(RESET, 0x1ff);    /*Reset*/
+        wmcodec_write(RESET, 0x1ff);    /*Reset*/
     
-        wm8758_write(PWRMGMT1, 0x2b);
-        wm8758_write(PWRMGMT2, 0x180);
-        wm8758_write(PWRMGMT3, 0x6f);
+        wmcodec_write(PWRMGMT1, 0x2b);
+        wmcodec_write(PWRMGMT2, 0x180);
+        wmcodec_write(PWRMGMT3, 0x6f);
 
-        wm8758_write(AINTFCE, 0x10);
-        wm8758_write(CLKCTRL, 0x49);
+        wmcodec_write(AINTFCE, 0x10);
+        wmcodec_write(CLKCTRL, 0x49);
 
-        wm8758_write(OUTCTRL, 1);
+        wmcodec_write(OUTCTRL, 1);
 
         /* The iPod can handle multiple frequencies, but fix at 44.1KHz
            for now */
         wmcodec_set_sample_rate(WM8758_44100HZ);
     
-        wm8758_write(LOUTMIX,0x1); /* Enable mixer */
-        wm8758_write(ROUTMIX,0x1); /* Enable mixer */
+        wmcodec_write(LOUTMIX,0x1); /* Enable mixer */
+        wmcodec_write(ROUTMIX,0x1); /* Enable mixer */
         wmcodec_mute(0);
     } else {
         wmcodec_mute(1);
@@ -145,8 +83,8 @@ void wmcodec_enable_output(bool enable)
 int wmcodec_set_master_vol(int vol_l, int vol_r)
 {
     /* OUT1 */
-    wm8758_write(LOUT1VOL, 0x080 | vol_l);
-    wm8758_write(ROUT1VOL, 0x180 | vol_r);
+    wmcodec_write(LOUT1VOL, 0x080 | vol_l);
+    wmcodec_write(ROUT1VOL, 0x180 | vol_r);
 
     return 0;
 }
@@ -154,8 +92,8 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
 int wmcodec_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
-    wm8758_write(LOUT2VOL, vol_l);
-    wm8758_write(ROUT2VOL, 0x100 | vol_r);
+    wmcodec_write(LOUT2VOL, vol_l);
+    wmcodec_write(ROUT2VOL, 0x100 | vol_r);
     
     return 0;
 }
@@ -178,7 +116,7 @@ void wmcodec_set_bass(int value)
 
     if ((value >= -6) && (value <= 9)) {
         /* We use linear bass control with 130Hz cutoff */
-        wm8758_write(BASSCTRL, regvalues[value+6]);
+        wmcodec_write(BASSCTRL, regvalues[value+6]);
     }
 #endif
 }
@@ -192,7 +130,7 @@ void wmcodec_set_treble(int value)
 
     if ((value >= -6) && (value <= 9)) {
         /* We use a 8Khz cutoff */
-        wm8758_write(TREBCTRL, regvalues[value+6]);
+        wmcodec_write(TREBCTRL, regvalues[value+6]);
     }
 #endif
 
@@ -203,10 +141,10 @@ int wmcodec_mute(int mute)
     if (mute)
     {
         /* Set DACMU = 1 to soft-mute the audio DACs. */
-        wm8758_write(DACCTRL, 0x40);
+        wmcodec_write(DACCTRL, 0x40);
     } else {
         /* Set DACMU = 0 to soft-un-mute the audio DACs. */
-        wm8758_write(DACCTRL, 0x0);
+        wmcodec_write(DACCTRL, 0x0);
     }
 
     return 0;
@@ -217,11 +155,11 @@ void wmcodec_close(void)
 {
     wmcodec_mute(1);
 
-    wm8758_write(PWRMGMT3, 0x0);
+    wmcodec_write(PWRMGMT3, 0x0);
 
-    wm8758_write(PWRMGMT1, 0x0);
+    wmcodec_write(PWRMGMT1, 0x0);
 
-    wm8758_write(PWRMGMT2, 0x40);
+    wmcodec_write(PWRMGMT2, 0x40);
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
@@ -237,19 +175,19 @@ void wmcodec_set_sample_rate(int sampling_control)
     (void)sampling_control;
 
     /* set clock div */
-    wm8758_write(CLKCTRL, 1 | (0 << 2) | (2 << 5));
+    wmcodec_write(CLKCTRL, 1 | (0 << 2) | (2 << 5));
 
     /* setup PLL for MHZ=11.2896 */
-    wm8758_write(PLLN, (1 << 4) | 0x7);
-    wm8758_write(PLLK1, 0x21);
-    wm8758_write(PLLK2, 0x161);
-    wm8758_write(PLLK3, 0x26);
+    wmcodec_write(PLLN, (1 << 4) | 0x7);
+    wmcodec_write(PLLK1, 0x21);
+    wmcodec_write(PLLK2, 0x161);
+    wmcodec_write(PLLK3, 0x26);
 
     /* set clock div */
-    wm8758_write(CLKCTRL, 1 | (1 << 2) | (2 << 5) | (1 << 8));
+    wmcodec_write(CLKCTRL, 1 | (1 << 2) | (2 << 5) | (1 << 8));
 
     /* set srate */
-    wm8758_write(SRATECTRL, (0 << 1));
+    wmcodec_write(SRATECTRL, (0 << 1));
 }
 
 void wmcodec_enable_recording(bool source_mic)
@@ -286,14 +224,14 @@ void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain)
     eq |= 12 - gain;
 
     if (band == 0) {
-        wm8758_write(EQ1, eq | 0x100); /* Always apply EQ to the DAC path */
+        wmcodec_write(EQ1, eq | 0x100); /* Always apply EQ to the DAC path */
     } else if (band == 1) {
-        wm8758_write(EQ2, eq);
+        wmcodec_write(EQ2, eq);
     } else if (band == 2) {
-        wm8758_write(EQ3, eq);
+        wmcodec_write(EQ3, eq);
     } else if (band == 3) {
-        wm8758_write(EQ4, eq);
+        wmcodec_write(EQ4, eq);
     } else if (band == 4) {
-        wm8758_write(EQ5, eq);
+        wmcodec_write(EQ5, eq);
     }
 }
