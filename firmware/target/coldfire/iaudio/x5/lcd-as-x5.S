@@ -316,10 +316,10 @@ lcd_write_data:
                             /* transfer initial word */
     move.w  (%a0)+,%d2      /* |????????|????????|rrrrrggg|gggbbbbb| */
     move.l  %d2,%d1
-	lsr.l   #7,%d1		    /* |0000000?|????????|???????r|rrrrgggg| */
-	move.w  %d1,(%a1)       /*                           ^ ^^^^^^^   */
-	lsl.l   #1,%d2      	/* |????????|???????r|rrrrgggg|ggbbbbb0| */
-	move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
+    lsr.l   #7,%d1          /* |0000000?|????????|???????r|rrrrgggg| */
+    move.w  %d1,(%a1)       /*                           ^ ^^^^^^^   */
+    lsl.l   #1,%d2          /* |????????|???????r|rrrrgggg|ggbbbbb0| */
+    move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
 
 .wd_wordl_end:              /* now longword aligned */
     moveq.l #28,%d1
@@ -335,14 +335,14 @@ lcd_write_data:
     bls.b   .wd_long1_end   /* no: skip leading long loop */
 
 .wd_long1_loop:
-    move.l  (%a0)+,%d2		/* read longword */
+    move.l  (%a0)+,%d2      /* read longword */
     swap    %d2             /* |rrrrrggg|gggbbbbb|RRRRRGGG|GGGBBBBB| */
     move.l  %d2,%d5
     lsr.l   #7,%d5          /* |0000000r|rrrrgggg|ggbbbbbR|RRRRGGGG| */
     move.w  %d5,(%a1)       /*                           ^ ^^^^^^^   */
-    lsl.l   #1,%d2          /* |rrrrgggg|ggbbbbbR|RRRRBGGG|GGBBBBB0| */
+    lsl.l   #1,%d2          /* |rrrrgggg|ggbbbbbR|RRRRGGGG|GGBBBBB0| */
     move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
-    swap    %d5          	/* |ggbbbbbR|RRRRGGGG|0000000r|rrrrgggg| */
+    swap    %d5             /* |ggbbbbbR|RRRRGGGG|0000000r|rrrrgggg| */
     move.w  %d5,(%a1)       /*                           ^ ^^^^^^^   */
     swap    %d2             /* |RRRRBGGG|GGBBBBB0|rrrrgggg|ggbbbbbR| */
     move.w  %d2,(%a1)       /*                           ^ ^^^^^^^   */
@@ -369,7 +369,7 @@ lcd_write_data:
     swap    %d1
     move.w  %d1,(%a1)
 
-    swap    %d2 
+    swap    %d2
     move.l  %d2,%d5
     lsr.l   #7,%d5
     move.w  %d5,(%a1)
@@ -380,7 +380,7 @@ lcd_write_data:
     swap    %d2
     move.w  %d2,(%a1)
 
-    swap    %d3 
+    swap    %d3
     move.l  %d3,%d5
     lsr.l   #7,%d5
     move.w  %d5,(%a1)
@@ -391,7 +391,7 @@ lcd_write_data:
     swap    %d3
     move.w  %d3,(%a1)
 
-    swap    %d4 
+    swap    %d4
     move.l  %d4,%d5
     lsr.l   #7,%d5
     move.w  %d5,(%a1)
@@ -411,8 +411,8 @@ lcd_write_data:
     bls.b   .wd_long2_end   /* no: skip trailing longword loop */
 
 .wd_long2_loop:
-    move.l  (%a0)+,%d2		/* read longword */
-    swap    %d2 
+    move.l  (%a0)+,%d2      /* read longword */
+    swap    %d2
     move.l  %d2,%d5
     lsr.l   #7,%d5
     move.w  %d5,(%a1)
@@ -430,10 +430,10 @@ lcd_write_data:
 
     move.w  (%a0)+,%d2      /* transfer final word */
     move.l  %d2,%d1
-	lsr.l   #7,%d1
-	move.w  %d1,(%a1)
-	lsl.l   #1,%d2
-	move.w  %d2,(%a1)
+    lsr.l   #7,%d1
+    move.w  %d1,(%a1)
+    lsl.l   #1,%d2
+    move.w  %d2,(%a1)
 
 .wd_word2_end:
     movem.l (%sp),%d2-%d5/%a2

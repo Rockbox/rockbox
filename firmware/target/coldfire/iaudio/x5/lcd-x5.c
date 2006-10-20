@@ -30,22 +30,33 @@
 #include "font.h"
 #include "bidi.h"
 
-/** Initialized in lcd_init_device() **/
-/* Is the power turned on? */
-static bool power_on;
-/* Is the display turned on? */
-static bool display_on;
-/* Amount of vertical offset. Used for flip offset correction/detection. */
-static int y_offset;
-/* Amount of roll offset (0-127). */
-static int roll_offset;
-/* Reverse flag. Must be remembered when display is turned off. */
-static unsigned short disp_control_rev;
-/* Contrast setting << 8 */
-static int lcd_contrast;
+/* Power and display status */
+static bool power_on   = false; /* Is the power turned on?   */
+static bool display_on = false; /* Is the display turned on? */
 
-/* Hardware dither bit */
-static unsigned short hw_dit = 0x0000;
+/* Contrast */
+static int lcd_contrast = DEFAULT_CONTRAST_SETTING << 8;
+
+/* Reverse Flag */
+#define R_DISP_CONTROL_NORMAL   0x0004
+#define R_DISP_CONTROL_REV      0x0000
+static unsigned short r_disp_control_rev = R_DISP_CONTROL_NORMAL;
+
+/* Flipping */
+#define Y_OFFSET_NORMAL     0
+#define Y_OFFSET_FLIPPED    4
+static int            y_offset              = 0; /* y correction for flip */
+static unsigned short r_gate_scan_start_pos = 0x0002;
+static unsigned short r_drv_output_control  = 0x0313;
+static unsigned short r_horiz_ram_addr_pos  = 0x7f00;
+
+/* Rolling */
+static int roll_offset = 0; /* Amount of roll offset (0-127). */
+
+/* Dithering */
+#define R_ENTRY_MODE_SOLID  0x1038
+#define R_ENTRY_MODE_DIT    0x9038
+static unsigned short r_entry_mode = R_ENTRY_MODE_SOLID;
 
 /* Forward declarations */
 static void lcd_display_off(void);
@@ -105,11 +116,12 @@ static inline void lcd_begin_write_gram(void)
     LCD_CMD = R_WRITE_DATA_2_GRAM << 1;
 }
 
+/* set hard dither mode on/off */
 static void hw_dither(bool on)
 {
     /* DIT=x, BGR=1, HWM=0, I/D1-0=11, AM=1, LG2-0=000 */
-    hw_dit = on ? 0x8000 : 0x0000;
-    lcd_write_reg(R_ENTRY_MODE, 0x1038 | hw_dit);
+    r_entry_mode = on ? R_ENTRY_MODE_DIT : R_ENTRY_MODE_SOLID;
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
 }
 
 /*** hardware configuration ***/
@@ -140,35 +152,43 @@ void lcd_set_contrast(int val)
 
 void lcd_set_invert_display(bool yesno)
 {
-    if (yesno == (disp_control_rev == 0x0000))
-        return;
-
-    disp_control_rev = yesno ? 0x0000 : 0x0004;
+    r_disp_control_rev = yesno ? R_DISP_CONTROL_REV :
+                                 R_DISP_CONTROL_NORMAL;
 
     if (!display_on)
         return;
 
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=11 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0033 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0033 | r_disp_control_rev);
 }
 
 /* turn the display upside down (call lcd_update() afterwards) */
 void lcd_set_flip(bool yesno)
 {
-    if (yesno == (y_offset != 0))
-        return;
-
-    y_offset = yesno ? 4 : 0;
+    if (yesno)
+    {
+        y_offset              = Y_OFFSET_FLIPPED;
+        r_gate_scan_start_pos = 0x0000;
+        r_drv_output_control  = 0x0013;
+        r_horiz_ram_addr_pos  = 0x8304;
+    }
+    else
+    {
+        y_offset              = Y_OFFSET_NORMAL;
+        r_gate_scan_start_pos = 0x0002;
+        r_drv_output_control  = 0x0313;
+        r_horiz_ram_addr_pos  = 0x7f00;
+    }
 
     if (!power_on)
         return;
 
     /* SCN4-0=000x0 (G1/G160) */
-    lcd_write_reg(R_GATE_SCAN_START_POS, yesno ? 0x0000 : 0x0002);
+    lcd_write_reg(R_GATE_SCAN_START_POS, r_gate_scan_start_pos);
     /* SM=0, GS=x, SS=x, NL4-0=10011 (G1-G160)*/
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, yesno ? 0x0013 : 0x0313);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL,  r_drv_output_control);
     /* HEA7-0=0xxx, HSA7-0=0xxx */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, yesno ? 0x8304 : 0x7f00);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS,  r_horiz_ram_addr_pos);
 }
 
 /* Rolls up the lcd display by the specified amount of lines.
@@ -231,17 +251,17 @@ static void lcd_power_on(void)
 
     /* Instructions for other mode settings (in register order). */
     /* SM=0, GS=x, SS=x, NL4-0=10011 (G1-G160)*/
-    lcd_write_reg(R_DRV_OUTPUT_CONTROL, y_offset ? 0x0013 : 0x0313);
+    lcd_write_reg(R_DRV_OUTPUT_CONTROL, r_drv_output_control);
     /* FLD1-0=01 (1 field), B/C=1, EOR=1 (C-pat), NW5-0=000000 (1 row) */
     lcd_write_reg(R_DRV_AC_CONTROL, 0x0700);
     /* DIT=x, BGR=1, HWM=0, I/D1-0=11, AM=1, LG2-0=000 */
-    lcd_write_reg(R_ENTRY_MODE, 0x1038 | hw_dit);
+    lcd_write_reg(R_ENTRY_MODE, r_entry_mode);
     /* CP15-0=0000000000000000 */
     lcd_write_reg(R_COMPARE_REG, 0x0000);
     /* NO1-0=01, SDT1-0=00, EQ1-0=00, DIV1-0=00, RTN3-00000 */
     lcd_write_reg(R_FRAME_CYCLE_CONTROL, 0x4000);
     /* SCN4-0=000x0 (G1/G160) */
-    lcd_write_reg(R_GATE_SCAN_START_POS, y_offset ? 0x0000 : 0x0002);
+    lcd_write_reg(R_GATE_SCAN_START_POS, r_gate_scan_start_pos);
     /* VL7-0=0x00 */
     lcd_write_reg(R_VERT_SCROLL_CONTROL, 0x0000);
     /* SE17-10(End)=0x9f (159), SS17-10(Start)=0x00 */
@@ -249,7 +269,7 @@ static void lcd_power_on(void)
     /* SE27-20(End)=0x5c (92), SS27-20(Start)=0x00 */
     lcd_write_reg(R_2ND_SCR_DRV_POS, 0x5c00);
     /* HEA7-0=0xxx, HSA7-0=0xxx */
-    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, y_offset ? 0x8304 : 0x7f00);
+    lcd_write_reg(R_HORIZ_RAM_ADDR_POS, r_horiz_ram_addr_pos);
     /* PKP12-10=0x0, PKP02-00=0x0 */
     lcd_write_reg(R_GAMMA_FINE_ADJ_POS1, 0x0003);
     /* PKP32-30=0x4, PKP22-20=0x0 */
@@ -320,14 +340,14 @@ static void lcd_display_on(void)
     sleep(HZ/25); /* Wait 2 frames or more */
 
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=01 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0021 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0021 | r_disp_control_rev);
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=11 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0023 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0023 | r_disp_control_rev);
 
     sleep(HZ/25); /* Wait 2 frames or more */
 
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=11 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0033 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0033 | r_disp_control_rev);
 
     display_on = true;
 }
@@ -342,12 +362,12 @@ static void lcd_display_off(void)
     /* EQ1-0=00 already */
 
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=1, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0032 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0032 | r_disp_control_rev);
 
     sleep(HZ/25); /* Wait 2 frames or more */
 
     /* PT1-0=00, VLE2-1=00, SPT=0, GON=1, DTE=0, REV=x, D1-0=10 */
-    lcd_write_reg(R_DISP_CONTROL, 0x0022 | disp_control_rev);
+    lcd_write_reg(R_DISP_CONTROL, 0x0022 | r_disp_control_rev);
 
     sleep(HZ/25); /* Wait 2 frames or more */
 
@@ -358,18 +378,9 @@ static void lcd_display_off(void)
 /* LCD init */
 void lcd_init_device(void)
 {
-    /* Reset settings */
-
 #ifdef BOOTLOADER
-    /* Initial boot requires setting up chip registers but a full reset is
-       not needed again. */
-    y_offset         = 0;
-    roll_offset      = 0;
-    disp_control_rev = 0x0004;
-    lcd_contrast     = DEFAULT_CONTRAST_SETTING << 8;
-
-    power_on = false;
-    display_on = false;
+    /* Initial boot requires power on reset and setting up chip
+       registers but a full reset is not needed again. */
 
     /* LCD Reset */
     and_l(~0x00000010, &GPIO1_OUT);
@@ -382,13 +393,13 @@ void lcd_init_device(void)
 
     lcd_display_on();
 #else
-    /* Power and display already ON */
-    power_on = true;
+    /* Power and display already ON - reset settings */
+    power_on   = true;
     display_on = true;
+    lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
+    lcd_set_invert_display(false);
     lcd_set_flip(false);
     lcd_roll(0);
-    lcd_set_invert_display(false);
-    lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
     hw_dither(false); /* do this or all bootloaders will need reflashing */
 #endif
 }
@@ -466,7 +477,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
     if (!display_on)
         return;
 
-    if (hw_dit == 0x0000)
+    if (r_entry_mode == R_ENTRY_MODE_SOLID)
         hw_dither(true);
 
     width = (width + 1) & ~1;
@@ -507,7 +518,7 @@ void lcd_update(void)
     if (!display_on)
         return;
 
-    if (hw_dit != 0x0000)
+    if (r_entry_mode == R_ENTRY_MODE_DIT)
         hw_dither(false);
 
     /* Set start position and window */
@@ -530,7 +541,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (!display_on)
         return;
 
-    if (hw_dit != 0x0000)
+    if (r_entry_mode == R_ENTRY_MODE_DIT)
         hw_dither(false);
 
     if (x + width > LCD_WIDTH)
