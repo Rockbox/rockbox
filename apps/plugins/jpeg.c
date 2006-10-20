@@ -2340,9 +2340,19 @@ int scroll_bmp(struct t_disp* pdisp)
 void cb_progess(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
-    rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
-                  current, HORIZONTAL);
-    rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    if(slideshow_enabled)
+    {
+        /* in slideshow mode, keep gui interference to a minimum */
+        rb->scrollbar(0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
+                      current, HORIZONTAL);
+        rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
+    }
+    else
+    {
+        rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
+                      current, HORIZONTAL);
+        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    }
 }
 
 int jpegmem(struct jpeg *p_jpg, int ds)
@@ -2449,10 +2459,13 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     buf += size;
     buf_size -= size;
 
-    rb->snprintf(print, sizeof(print), "decoding %d*%d",
-        p_jpg->x_size/ds, p_jpg->y_size/ds);
-    rb->lcd_puts(0, 3, print);
-    rb->lcd_update();
+    if(!slideshow_enabled)
+    {
+        rb->snprintf(print, sizeof(print), "decoding %d*%d",
+            p_jpg->x_size/ds, p_jpg->y_size/ds);
+        rb->lcd_puts(0, 3, print);
+        rb->lcd_update();
+    }
 
     /* update image properties */
     p_disp->width = p_jpg->x_size / ds;
@@ -2475,10 +2488,14 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
         return NULL;
     }
     time = *rb->current_tick - time;
-    rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
-    rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
-    rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
-    rb->lcd_update();
+
+    if(!slideshow_enabled)
+    {
+        rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
+        rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
+        rb->lcd_putsxy((LCD_WIDTH - w)/2, LCD_HEIGHT - h, print);
+        rb->lcd_update();
+    }
 
     return p_disp;
 }
@@ -2611,27 +2628,32 @@ int load_and_show(char* filename)
         }
     }
 
+    if(!slideshow_enabled)
+    {
 #ifdef HAVE_LCD_COLOR
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
+        rb->lcd_set_foreground(LCD_WHITE);
+        rb->lcd_set_background(LCD_BLACK);
 #endif
 
-    rb->lcd_clear_display();
-    rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
-    rb->lcd_puts(0, 0, print);
-    rb->lcd_update();
+        rb->lcd_clear_display();
+        rb->snprintf(print, sizeof(print), "%s:", rb->strrchr(filename,'/')+1);
+        rb->lcd_puts(0, 0, print);
+        rb->lcd_update();
 
-    rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
-    rb->lcd_puts(0, 1, print);
-    rb->lcd_update();
+        rb->snprintf(print, sizeof(print), "loading %d bytes", filesize);
+        rb->lcd_puts(0, 1, print);
+        rb->lcd_update();
+    }
 
     rb->read(fd, buf_jpeg, filesize);
     rb->close(fd);
 
-    rb->snprintf(print, sizeof(print), "decoding markers");
-    rb->lcd_puts(0, 2, print);
-    rb->lcd_update();
-
+    if(!slideshow_enabled)
+    {
+        rb->snprintf(print, sizeof(print), "decoding markers");
+        rb->lcd_puts(0, 2, print);
+        rb->lcd_update();
+    }
 
 
     rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
@@ -2649,10 +2671,12 @@ int load_and_show(char* filename)
         default_huff_tbl(&jpg); /* use default */
     build_lut(&jpg); /* derive Huffman and other lookup-tables */
 
-    rb->snprintf(print, sizeof(print), "image %dx%d", jpg.x_size, jpg.y_size);
-    rb->lcd_puts(0, 2, print);
-    rb->lcd_update();
-
+    if(!slideshow_enabled)
+    {
+        rb->snprintf(print, sizeof(print), "image %dx%d", jpg.x_size, jpg.y_size);
+        rb->lcd_puts(0, 2, print);
+        rb->lcd_update();
+    }
     ds_max = max_downscale(&jpg);            /* check display constraint */
     ds_min = min_downscale(&jpg, buf_size);  /* check memory constraint */
     if (ds_min == 0)
@@ -2674,11 +2698,13 @@ int load_and_show(char* filename)
 
         set_view(p_disp, cx, cy);
 
-        rb->snprintf(print, sizeof(print), "showing %dx%d",
-            p_disp->width, p_disp->height);
-        rb->lcd_puts(0, 3, print);
-        rb->lcd_update();
-
+        if(!slideshow_enabled)
+        {
+            rb->snprintf(print, sizeof(print), "showing %dx%d",
+                p_disp->width, p_disp->height);
+            rb->lcd_puts(0, 3, print);
+            rb->lcd_update();
+        }
         MYLCD(clear_display)();
 #ifdef HAVE_LCD_COLOR
         yuv_bitmap_part(
