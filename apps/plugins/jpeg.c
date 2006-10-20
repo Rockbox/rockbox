@@ -2340,19 +2340,21 @@ int scroll_bmp(struct t_disp* pdisp)
 void cb_progess(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
-    if(slideshow_enabled)
+    if(!slideshow_enabled)
+    {
+        rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
+                      current, HORIZONTAL);
+        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
+    }
+#ifndef USEGSLIB
+    else
     {
         /* in slideshow mode, keep gui interference to a minimum */
         rb->scrollbar(0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
                       current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
     }
-    else
-    {
-        rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
-                      current, HORIZONTAL);
-        rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
-    }
+#endif
 }
 
 int jpegmem(struct jpeg *p_jpg, int ds)
