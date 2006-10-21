@@ -305,7 +305,7 @@ void button_event(int key, bool pressed)
         break;
     case SDLK_KP_PLUS:
     case SDLK_F8:
-        new_btn = BUTTON_PLAY;
+        new_btn = BUTTON_ON;
         break;
     case SDLK_KP_ENTER:
     case SDLK_RETURN:
