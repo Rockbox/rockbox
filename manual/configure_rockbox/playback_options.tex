@@ -221,16 +221,6 @@ related to audio playback.
   \note{You must have the \setting{Repeat} option set to \setting{No} for
     \setting{Auto-Change Directory} to function properly.}
 
-\item[Last.fm Log.]\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
-  Enables logging of your played tracks for submittal to 
-  \url{http://www.last.fm}. This service was formely known as 
-  \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
-  start the logging. The log-file is called 
-  \opt{CONFIG_RTC}{\fname{.scrobbler.log}}%
-  \nopt{CONFIG_RTC}{\fname{.scrobbler-timeless.log}}%
-  , and is to be found in  the root directory of your \dap{}. 
-  \fixme{Describe the submit process. Preferably by use of ``official'' tools, 
-    and/or online service on rockbox.org}
   %
 \opt{ipodnano,ipodvideo,ipodmini,ipod4g,ipod3g,ipodcolor}{
 \item[Pause on headphone unplug.] Enables and disables automatic pausing of 
@@ -255,5 +245,19 @@ related to audio playback.
     connected to the \dap{}.
     \note{This requires \setting{Resume on Startup} to be enabled.}
   \end{description}
+
+
 }%
+
+\item[Last.fm Log.]\index{Last.fm Log}\index{Audioscrobbler|see{Last.fm Log}}
+  Enables logging of your played tracks for submittal to 
+  \url{http://www.last.fm}. This service was formely known as 
+  \emph{Audioscrobbler}. When you enable this option, you'll have to reboot to
+  start the logging. The log-file is called 
+  \opt{CONFIG_RTC}{\fname{.scrobbler.log}}%
+  \nopt{CONFIG_RTC}{\fname{.scrobbler-timeless.log}}%
+  , and is to be found in  the root directory of your \dap{}. 
+  \note{See \wikilink{LastFMLog} for a further description, and for tools you 
+    can use to submit your Last.fm log.}
+
 \end{description}
