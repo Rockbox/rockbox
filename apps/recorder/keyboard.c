@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 by Bjï¿½n Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -429,6 +429,7 @@ int kbd_input(char* text, int buflen)
     if (global_settings.talk_menu) /* voice UI? */
         talk_spell(text, true); /* spell initial text */
 
+    action_signalscreenchange();
     while(!done)
     {
         len_utf8 = utf8length(text);
@@ -1001,6 +1002,7 @@ int kbd_input(char* text, int buflen)
             cur_blink = true;
         }
     }
+    action_signalscreenchange();
 #ifdef HAS_BUTTONBAR
     global_settings.buttonbar=buttonbar_config;
 #endif
