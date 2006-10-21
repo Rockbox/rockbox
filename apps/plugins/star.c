@@ -21,9 +21,6 @@
 
 PLUGIN_HEADER
 
-/* file which contains the levels */
-#define STAR_LEVELS_FILE "/.rockbox/star/levels.txt"
-
 /* title of the game */
 #define STAR_TITLE      "Star"
 
@@ -48,9 +45,9 @@ PLUGIN_HEADER
 #define STAR_BLOCK      'x'
 
 /* sleep time between two frames */
-#if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320) /* iPod 5G LCD is *slow* */
-#define STAR_SLEEP ;
-#elif (LCD_HEIGHT == 128) && (LCD_WIDTH == 160)
+#if (LCD_HEIGHT * LCD_WIDTH >= 70000) /* iPod 5G LCD is *slow* */
+#define STAR_SLEEP rb->yield();
+#elif (LCD_HEIGHT * LCD_WIDTH >= 30000)
 #define STAR_SLEEP rb->sleep(0);
 #else
 #define STAR_SLEEP rb->sleep(1);
@@ -62,92 +59,92 @@ PLUGIN_HEADER
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
-#define STAR_QUIT BUTTON_OFF
-#define STAR_UP   BUTTON_UP
-#define STAR_DOWN BUTTON_DOWN
+#define STAR_QUIT           BUTTON_OFF
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_ON
 #define STAR_TOGGLE_CONTROL2 BUTTON_PLAY
-#define STAR_LEVEL_UP BUTTON_F3
-#define STAR_LEVEL_DOWN BUTTON_F1
-#define STAR_LEVEL_REPEAT BUTTON_F2
-#define STAR_MENU_RUN BUTTON_PLAY
-#define STAR_MENU_RUN2 BUTTON_RIGHT
-#define STAR_MENU_RUN3 BUTTON_ON
+#define STAR_LEVEL_UP       BUTTON_F3
+#define STAR_LEVEL_DOWN     BUTTON_F1
+#define STAR_LEVEL_REPEAT   BUTTON_F2
+#define STAR_MENU_RUN       BUTTON_PLAY
+#define STAR_MENU_RUN2      BUTTON_RIGHT
+#define STAR_MENU_RUN3      BUTTON_ON
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
-#define STAR_QUIT BUTTON_OFF
-#define STAR_UP   BUTTON_UP
-#define STAR_DOWN BUTTON_DOWN
+#define STAR_QUIT           BUTTON_OFF
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
 #define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_MENU | BUTTON_RIGHT)
-#define STAR_LEVEL_DOWN (BUTTON_MENU | BUTTON_LEFT)
-#define STAR_LEVEL_REPEAT (BUTTON_MENU | BUTTON_UP)
-#define STAR_MENU_RUN BUTTON_RIGHT
+#define STAR_LEVEL_UP       (BUTTON_MENU | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN     (BUTTON_MENU | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT   (BUTTON_MENU | BUTTON_UP)
+#define STAR_MENU_RUN       BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define STAR_QUIT BUTTON_OFF
-#define STAR_UP   BUTTON_UP
-#define STAR_DOWN BUTTON_DOWN
+#define STAR_QUIT           BUTTON_OFF
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
 #define STAR_TOGGLE_CONTROL BUTTON_MODE
 #define STAR_TOGGLE_CONTROL2 BUTTON_SELECT
-#define STAR_LEVEL_UP (BUTTON_ON | BUTTON_RIGHT)
-#define STAR_LEVEL_DOWN (BUTTON_ON | BUTTON_LEFT)
-#define STAR_LEVEL_REPEAT (BUTTON_ON | BUTTON_SELECT)
-#define STAR_MENU_RUN BUTTON_RIGHT
-#define STAR_MENU_RUN2 BUTTON_SELECT
+#define STAR_LEVEL_UP       (BUTTON_ON | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN     (BUTTON_ON | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT   (BUTTON_ON | BUTTON_SELECT)
+#define STAR_MENU_RUN       BUTTON_RIGHT
+#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #define STAR_RC_QUIT BUTTON_RC_STOP
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD)
 
-#define STAR_QUIT (BUTTON_SELECT | BUTTON_MENU)
-#define STAR_UP   BUTTON_MENU
-#define STAR_DOWN BUTTON_PLAY
+#define STAR_QUIT           (BUTTON_SELECT | BUTTON_MENU)
+#define STAR_UP             BUTTON_MENU
+#define STAR_DOWN           BUTTON_PLAY
 #define STAR_TOGGLE_CONTROL_PRE BUTTON_SELECT
 #define STAR_TOGGLE_CONTROL (BUTTON_SELECT | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_SELECT | BUTTON_RIGHT)
-#define STAR_LEVEL_DOWN (BUTTON_SELECT | BUTTON_LEFT)
-#define STAR_LEVEL_REPEAT (BUTTON_SELECT | BUTTON_PLAY)
-#define STAR_MENU_RUN BUTTON_RIGHT
-#define STAR_MENU_RUN2 BUTTON_SELECT
+#define STAR_LEVEL_UP       (BUTTON_SELECT | BUTTON_RIGHT)
+#define STAR_LEVEL_DOWN     (BUTTON_SELECT | BUTTON_LEFT)
+#define STAR_LEVEL_REPEAT   (BUTTON_SELECT | BUTTON_PLAY)
+#define STAR_MENU_RUN       BUTTON_RIGHT
+#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
 
-#define STAR_QUIT BUTTON_POWER
-#define STAR_UP   BUTTON_UP
-#define STAR_DOWN BUTTON_DOWN
-#define STAR_TOGGLE_CONTROL_PRE BUTTON_SELECT
-#define STAR_TOGGLE_CONTROL (BUTTON_SELECT | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_PLAY | BUTTON_UP)
-#define STAR_LEVEL_DOWN (BUTTON_PLAY | BUTTON_DOWN)
-#define STAR_LEVEL_REPEAT (BUTTON_PLAY | BUTTON_RIGHT)
-#define STAR_MENU_RUN BUTTON_REC
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_SELECT
+#define STAR_LEVEL_UP_PRE   BUTTON_REC
+#define STAR_LEVEL_UP       (BUTTON_REC|BUTTON_REL)
+#define STAR_LEVEL_DOWN_PRE BUTTON_REC
+#define STAR_LEVEL_DOWN     (BUTTON_REC|REPEAT)
+#define STAR_LEVEL_REPEAT   BUTTON_PLAY
+#define STAR_MENU_RUN       BUTTON_RIGHT
+#define STAR_MENU_RUN2      BUTTON_SELECT
 
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
 
-#define STAR_QUIT BUTTON_A
-#define STAR_UP   BUTTON_UP
-#define STAR_DOWN BUTTON_DOWN
-#define STAR_TOGGLE_CONTROL_PRE BUTTON_MENU
-#define STAR_TOGGLE_CONTROL (BUTTON_MENU | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_POWER | BUTTON_UP)
-#define STAR_LEVEL_DOWN (BUTTON_POWER | BUTTON_DOWN)
-#define STAR_LEVEL_REPEAT (BUTTON_POWER | BUTTON_RIGHT)
-#define STAR_MENU_RUN BUTTON_RIGHT
+#define STAR_QUIT           BUTTON_A
+#define STAR_UP             BUTTON_UP
+#define STAR_DOWN           BUTTON_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_MENU
+#define STAR_LEVEL_UP       (BUTTON_POWER | BUTTON_UP)
+#define STAR_LEVEL_DOWN     (BUTTON_POWER | BUTTON_DOWN)
+#define STAR_LEVEL_REPEAT   (BUTTON_POWER | BUTTON_RIGHT)
+#define STAR_MENU_RUN       BUTTON_RIGHT
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 
-#define STAR_QUIT BUTTON_POWER
-#define STAR_UP   BUTTON_SCROLL_UP
-#define STAR_DOWN BUTTON_SCROLL_DOWN
-#define STAR_TOGGLE_CONTROL_PRE BUTTON_REW
-#define STAR_TOGGLE_CONTROL (BUTTON_REW | BUTTON_REL)
-#define STAR_LEVEL_UP (BUTTON_PLAY | BUTTON_SCROLL_UP)
-#define STAR_LEVEL_DOWN (BUTTON_PLAY | BUTTON_SCROLL_DOWN)
-#define STAR_LEVEL_REPEAT (BUTTON_PLAY | BUTTON_RIGHT)
-#define STAR_MENU_RUN BUTTON_FF
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_UP             BUTTON_SCROLL_UP
+#define STAR_DOWN           BUTTON_SCROLL_DOWN
+#define STAR_TOGGLE_CONTROL BUTTON_REW
+#define STAR_LEVEL_UP       (BUTTON_PLAY | BUTTON_SCROLL_UP)
+#define STAR_LEVEL_DOWN     (BUTTON_PLAY | BUTTON_SCROLL_DOWN)
+#define STAR_LEVEL_REPEAT   (BUTTON_PLAY | BUTTON_RIGHT)
+#define STAR_MENU_RUN       BUTTON_FF
 
 #endif
 
@@ -169,55 +166,18 @@ static int control;
 /* the current board */
 static char board[STAR_HEIGHT][STAR_WIDTH];
 
-#if LCD_DEPTH > 1
+#include "star_tiles.h"
 
-extern const fb_data star_tiles[];
+#define TILE_WIDTH    BMPWIDTH_star_tiles
+#define TILE_HEIGHT   (BMPHEIGHT_star_tiles/5)
+#define STAR_OFFSET_X ((LCD_WIDTH - STAR_WIDTH * TILE_WIDTH) / 2)
+#define STAR_OFFSET_Y ((LCD_HEIGHT - STAR_HEIGHT * TILE_HEIGHT - MAX(TILE_HEIGHT, 8)) / 2)
 
-/* size of a tile */
-#if LCD_WIDTH >= 320 && defined( HAVE_LCD_COLOR )
-#  define STAR_TILE_SIZE 20
-#elif LCD_WIDTH >= 220 && defined( HAVE_LCD_COLOR )
-#  define STAR_TILE_SIZE 13
-#else
-#  define STAR_TILE_SIZE 10
-#endif
-
-/* left and top margin */
-#define STAR_OFFSET_X ( ( LCD_WIDTH - STAR_WIDTH * STAR_TILE_SIZE ) / 2 )
-#define STAR_OFFSET_Y ( ( LCD_HEIGHT - ( STAR_HEIGHT + 1 ) * STAR_TILE_SIZE ) / 2 )
-
-#define wall 0
-#define space 1
-#define block 2
-#define star 3
-#define ball 4
-
-#else
-
-/* left and top margin */
-#define STAR_OFFSET_X    8
-#define STAR_OFFSET_Y    0
-
-/* size of a tile */
-#define STAR_TILE_SIZE   6
-
-/* bitmap of the wall */
-static unsigned char wall_bmp[STAR_TILE_SIZE]
-    = {0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55};
-
-/* bitmap of the star */
-static unsigned char star_bmp[STAR_TILE_SIZE]
-    = {0x00, 0x0c, 0x12, 0x12, 0x0c, 0x00};
-
-/* bitmap of the ball */
-static unsigned char ball_bmp[STAR_TILE_SIZE]
-    = {0x00, 0x0c, 0x1e, 0x1a, 0x0c, 0x00};
-
-/* bitmap of the block */
-static unsigned char block_bmp[STAR_TILE_SIZE]
-    = {0x00, 0x1e, 0x1e, 0x1e, 0x1e, 0x00};
-
-#endif
+#define WALL  0
+#define SPACE 1
+#define BLOCK 2
+#define STAR  3
+#define BALL  4
 
 /* bitmap of the arrow animation */
 static unsigned char arrow_bmp[4][7] =
@@ -445,7 +405,7 @@ static unsigned char* levels =
 /**
  * Display text.
  */
-static void star_display_text(char *str, bool waitkey)
+void star_display_text(char *str, bool waitkey)
 {
     int chars_by_line;
     int lines_by_screen;
@@ -496,7 +456,7 @@ static void star_display_text(char *str, bool waitkey)
 
         line[chars_for_line] = '\0';
 
-        /* test if we have cutted a word. If it is the case we don't have to */
+        /* test if we have cut a word. If it is the case we don't have to */
         /* skip the space */
         if (i == chars_by_line && chars_for_line == chars_by_line)
             first_char_index += chars_for_line;
@@ -546,13 +506,14 @@ static void star_display_text(char *str, bool waitkey)
 static void star_transition_update(void)
 {
     int center_x = LCD_WIDTH / 2;
-    int lcd_demi_width = LCD_WIDTH / 2;
     int center_y = LCD_HEIGHT / 2;
-    int x;
+    int x = 0;
     int y = 0;
+#if LCD_WIDTH >= LCD_HEIGHT
+    int lcd_demi_width = LCD_WIDTH / 2;
     int var_y = 0;
 
-    for (x = 1 ; x < lcd_demi_width ; x++)
+    for (; x < lcd_demi_width ; x++)
     {
         var_y += LCD_HEIGHT;
         if (var_y > LCD_WIDTH)
@@ -560,10 +521,31 @@ static void star_transition_update(void)
             var_y -= LCD_WIDTH;
             y++;
         }
-        rb->lcd_update_rect(center_x - x, center_y - y,
-            x * 2, y * 2);
+        rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
+        rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
+        rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
+        rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
         STAR_SLEEP
     }
+#else
+    int lcd_demi_height = LCD_HEIGHT / 2;
+    int var_x = 0;
+
+    for (; y < lcd_demi_height ; y++)
+    {
+        var_x += LCD_WIDTH;
+        if (var_x > LCD_HEIGHT)
+        {
+            var_x -= LCD_HEIGHT;
+            x++;
+        }
+        rb->lcd_update_rect(center_x - x, center_y - y, x * 2, 1);
+        rb->lcd_update_rect(center_x - x, center_y - y, 1, y * 2);
+        rb->lcd_update_rect(center_x + x - 1, center_y - y, 1, y * 2);
+        rb->lcd_update_rect(center_x - x, center_y + y - 1, x * 2, 1);
+        STAR_SLEEP
+    }
+#endif
     rb->lcd_update();
 }
 
@@ -572,36 +554,34 @@ static void star_transition_update(void)
  */
 static void star_display_board_info(void)
 {
-    int label_offset_y = label_offset_y = LCD_HEIGHT - char_height - ( STAR_TILE_SIZE - char_height ) / 2 ;
+    int label_pos_y, tile_pos_y;
     char str_info[32];
 
-    rb->snprintf(str_info, sizeof(str_info), "L:%02d    S:%02d   C:",
-                 current_level+1, star_count );
-    rb->lcd_putsxy(0, label_offset_y, str_info);
-
-#if LCD_DEPTH > 1
-    if( control == STAR_CONTROL_BALL )
-            rb->lcd_bitmap_part( star_tiles, 0,
-                                 ball*STAR_TILE_SIZE, STAR_TILE_SIZE,
-                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2,
-                                 STAR_TILE_SIZE, STAR_TILE_SIZE);
+    if (TILE_HEIGHT > char_height)
+    {
+        tile_pos_y = LCD_HEIGHT - TILE_HEIGHT;
+        label_pos_y = tile_pos_y + (TILE_HEIGHT - char_height) / 2;
+    }
     else
-            rb->lcd_bitmap_part( star_tiles, 0,
-                                 block*STAR_TILE_SIZE, STAR_TILE_SIZE,
-                                 107, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2,
-                                 STAR_TILE_SIZE, STAR_TILE_SIZE);
-    rb->lcd_update_rect(0, label_offset_y - ( STAR_TILE_SIZE - char_height ) / 2 - 2, LCD_WIDTH, STAR_TILE_SIZE );
-#else
-    if (control == STAR_CONTROL_BALL)
-        rb->lcd_mono_bitmap (ball_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
-                             STAR_TILE_SIZE);
-    else
-        rb->lcd_mono_bitmap (block_bmp, 103, label_offset_y + 1, STAR_TILE_SIZE,
-                             STAR_TILE_SIZE);
+    {
+        label_pos_y = LCD_HEIGHT - char_height;
+        tile_pos_y = label_pos_y + (char_height - TILE_HEIGHT) / 2;
+    }
+    
+    rb->snprintf(str_info, sizeof(str_info), "L:%02d", current_level + 1);
+    rb->lcd_putsxy(STAR_OFFSET_X, label_pos_y, str_info);
+    rb->snprintf(str_info, sizeof(str_info), "S:%02d", star_count);
+    rb->lcd_putsxy(LCD_WIDTH/2 - 2 * char_width, label_pos_y, str_info);
+    rb->lcd_putsxy(STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH - 2 * char_width,
+                   label_pos_y, "C:");
 
-    rb->lcd_update_rect(0, label_offset_y, LCD_WIDTH, char_height);
-#endif
+    rb->lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
+                        BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT, TILE_WIDTH,
+                        STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH,
+                        tile_pos_y, TILE_WIDTH, TILE_HEIGHT);
 
+    rb->lcd_update_rect(0, MIN(label_pos_y, tile_pos_y), LCD_WIDTH,
+                        MAX(TILE_HEIGHT, char_height));
 }
 
 
@@ -626,46 +606,36 @@ static int star_load_level(int current_level)
             board[y][x] = *ptr_tab;
             switch (*ptr_tab)
             {
-#if LCD_DEPTH > 1
-#   define DRAW_TILE( a )                                                    \
-                    rb->lcd_bitmap_part( star_tiles, 0,                     \
-                                         a*STAR_TILE_SIZE, STAR_TILE_SIZE,   \
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE, \
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE, \
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
-#else
-#   define DRAW_TILE( a )                                                    \
-                    rb->lcd_mono_bitmap ( a ## _bmp,                          \
-                                         STAR_OFFSET_X + x * STAR_TILE_SIZE, \
-                                         STAR_OFFSET_Y + y * STAR_TILE_SIZE, \
-                                         STAR_TILE_SIZE, STAR_TILE_SIZE);
-#endif
+#   define DRAW_TILE( a )                                                 \
+                    rb->lcd_bitmap_part( star_tiles, 0,                   \
+                                         a*TILE_HEIGHT, TILE_WIDTH,       \
+                                         STAR_OFFSET_X + x * TILE_WIDTH,  \
+                                         STAR_OFFSET_Y + y * TILE_HEIGHT, \
+                                         TILE_WIDTH, TILE_HEIGHT);
                 case STAR_VOID:
-#if LCD_DEPTH > 1
-                    DRAW_TILE( space );
-#endif
+                    DRAW_TILE( SPACE );
                     break;
 
                 case STAR_WALL:
-                    DRAW_TILE( wall );
+                    DRAW_TILE( WALL );
                     break;
 
                 case STAR_STAR:
-                    DRAW_TILE( star );
+                    DRAW_TILE( STAR );
                     star_count++;
                     break;
 
                 case STAR_BALL:
                     ball_x = x;
                     ball_y = y;
-                    DRAW_TILE( ball );
+                    DRAW_TILE( BALL );
                     break;
 
 
                 case STAR_BLOCK:
                     block_x = x;
                     block_y = y;
-                    DRAW_TILE( block );
+                    DRAW_TILE( BLOCK );
                     break;
             }
             ptr_tab++;
@@ -677,6 +647,39 @@ static int star_load_level(int current_level)
     return 1;
 }
 
+static void star_animate_tile(int tile_no, int start_x, int start_y,
+                              int delta_x, int delta_y)
+{
+    int i;
+    
+    if (delta_x != 0) /* horizontal */
+    {
+        for (i = 1 ; i <= TILE_WIDTH ; i++)
+        {
+            STAR_SLEEP
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, TILE_WIDTH,
+                        start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
+            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, TILE_WIDTH,
+                        start_x + delta_x * i, start_y, TILE_WIDTH, TILE_HEIGHT);
+            rb->lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
+                                start_y, TILE_WIDTH + 1, TILE_HEIGHT);
+        }
+    }
+    else /* vertical */
+    {
+        for (i = 1 ; i <= TILE_HEIGHT ; i++)
+        {
+            STAR_SLEEP
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, TILE_WIDTH,
+                        start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
+            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, TILE_WIDTH,
+                        start_x, start_y + delta_y * i, TILE_WIDTH, TILE_HEIGHT);
+            rb->lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
+                                TILE_WIDTH, TILE_HEIGHT + 1);
+        }
+    }
+}
+
 /**
  * Run the game.
  */
@@ -684,7 +687,6 @@ static int star_run_game(void)
 {
     int move_x = 0;
     int move_y = 0;
-    int i;
     int key;
     int lastkey = BUTTON_NONE;
 
@@ -728,6 +730,10 @@ static int star_run_game(void)
                     break;
 
                 case STAR_LEVEL_DOWN:
+#ifdef STAR_LEVEL_DOWN_PRE
+                    if (lastkey != STAR_LEVEL_DOWN_PRE)
+                        break;
+#endif
                     if (current_level > 0)
                     {
                         current_level--;
@@ -740,6 +746,10 @@ static int star_run_game(void)
                     break;
 
                 case STAR_LEVEL_UP:
+#ifdef STAR_LEVEL_UP_PRE
+                    if (lastkey != STAR_LEVEL_UP_PRE)
+                        break;
+#endif
                     if (current_level < STAR_LEVEL_COUNT - 1)
                     {
                         current_level++;
@@ -781,37 +791,9 @@ static int star_run_game(void)
                     || board[ball_y + move_y][ball_x + move_x] == STAR_STAR))
 
             {
-                for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
-                {
-#if LCD_DEPTH > 1
-                    rb->lcd_bitmap_part(
-                        star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
-                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE,
-                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_bitmap_part(
-                        star_tiles, 0, ball * STAR_TILE_SIZE, STAR_TILE_SIZE,
-                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_update_rect(
-                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * (i>0?i-1:0),
-                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * (i>0?i-1:0),
-                        STAR_TILE_SIZE+(i>0?0:1), STAR_TILE_SIZE+(i>0?0:1));
-#else
-                    rb->lcd_mono_bitmap(
-                        ball_bmp,
-                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_update_rect(
-                        STAR_OFFSET_X + ball_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + ball_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-#endif
-
-                    STAR_SLEEP
-                }
+                star_animate_tile(BALL, STAR_OFFSET_X + ball_x * TILE_WIDTH,
+                                  STAR_OFFSET_Y + ball_y * TILE_HEIGHT,
+                                  move_x, move_y);
                 ball_x += move_x;
                 ball_y += move_y;
 
@@ -830,37 +812,9 @@ static int star_run_game(void)
             board[block_y][block_x] = STAR_VOID;
             while (board[block_y + move_y][block_x + move_x] == STAR_VOID)
             {
-                for (i = 0 ; i <= STAR_TILE_SIZE ; i++)
-                {
-#if LCD_DEPTH > 1
-                    rb->lcd_bitmap_part(
-                        star_tiles, 0, space * STAR_TILE_SIZE, STAR_TILE_SIZE,
-                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE,
-                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_bitmap_part(
-                        star_tiles, 0, block * STAR_TILE_SIZE, STAR_TILE_SIZE,
-                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_update_rect(
-                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * (i>0?i-1:0),
-                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * (i>0?i-1:0),
-                        STAR_TILE_SIZE+(i>0?0:1), STAR_TILE_SIZE+(i>0?0:1));
-#else
-                    rb->lcd_mono_bitmap(
-                        block_bmp,
-                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-                    rb->lcd_update_rect(
-                        STAR_OFFSET_X + block_x * STAR_TILE_SIZE + move_x * i,
-                        STAR_OFFSET_Y + block_y * STAR_TILE_SIZE + move_y * i,
-                        STAR_TILE_SIZE, STAR_TILE_SIZE);
-#endif
-
-                    STAR_SLEEP
-                }
+                star_animate_tile(BLOCK, STAR_OFFSET_X + block_x * TILE_WIDTH,
+                                  STAR_OFFSET_Y + block_y * TILE_HEIGHT,
+                                  move_x, move_y);
                 block_x += move_x;
                 block_y += move_y;
             }
@@ -1046,21 +1000,12 @@ static int star_menu(void)
                         star_choose_level();
                         break;
                     case 2:
-#if LCD_DEPTH > 1
                         star_display_text(
                             "INFO\n\n"
                             "Take all the stars to go to the next level. "
                             "You can toggle control with the block to "
                             "use it as a mobile wall. The block cannot "
                             "take stars.", true);
-#else
-                        star_display_text(
-                            "INFO\n\n"
-                            "Take all the \"o\"s to go to the next level. "
-                            "You can toggle control with the block to "
-                            "use it as a mobile wall. The block cannot "
-                            "take \"o\".", true);
-#endif
                         break;
                     case 3:
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -1079,10 +1024,10 @@ static int star_menu(void)
                                           "[M >] Next level", true);
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
                         star_display_text("KEYS\n\n"
-                                          "[MODE/SELECT] Toggle Ctrl\n"
+                                          "[MODE/NAVI] Toggle Ctrl\n"
                                           "[OFF] Exit\n"
                                           "[ON + LEFT] Prev. level\n"
-                                          "[ON + SELECT] Reset level\n"
+                                          "[ON + NAVI] Reset level\n"
                                           "[ON + RIGHT] Next level", true);
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD)
                         star_display_text("KEYS\n\n"
@@ -1095,9 +1040,9 @@ static int star_menu(void)
                         star_display_text("KEYS\n\n"
                                           "[SELECT] Toggle Ctl\n"
                                           "[POWER] Exit\n"
-                                          "[PLAY+DOWN] Prev. level\n"
-                                          "[PLAY+RIGHT] Reset level\n"
-                                          "[PLAY+UP] Next level", true);
+                                          "[REC..] Prev. level\n"
+                                          "[PLAY] Reset level\n"
+                                          "[REC] Next level", true);
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
                         star_display_text("KEYS\n\n"
                                           "[MENU] Toggle Ctl\n"

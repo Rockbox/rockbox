@@ -153,16 +153,28 @@ flipit_tokens.16x26x1.bmp
 #endif
 
 /* Star */
-#if defined( HAVE_LCD_COLOR )
-#if LCD_WIDTH >= 320
+#ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
 star_tiles.20x20.bmp
-#elif LCD_WIDTH >= 220
+#elif LCD_WIDTH >= 208 && LCD_HEIGHT >= 125
 star_tiles.13x13.bmp
-#else
+#elif LCD_WIDTH >= 176 && LCD_HEIGHT >= 107
+star_tiles.11x11.bmp
+#elif LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
 star_tiles.10x10.bmp
+#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
+star_tiles.8x8.bmp
 #endif
-#elif LCD_DEPTH > 1
+#elif LCD_DEPTH > 1 /* grey */
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >= 98
 star_tiles.10x10.grey.bmp
+#elif LCD_WIDTH >= 128 && LCD_HEIGHT >= 80
+star_tiles.8x8.grey.bmp
+#endif
+#else /* monochrome */
+#if LCD_WIDTH >= 112 && LCD_HEIGHT >= 62
+star_tiles.6x7.mono.bmp
+#endif
 #endif
 
 /* Solitaire */
