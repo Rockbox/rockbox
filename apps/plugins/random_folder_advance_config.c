@@ -180,9 +180,6 @@ void edit_list(void)
     
     while (!exit)
     {
-#ifndef HAVE_LCD_CHARCELLS
-        update_screen(true);
-#endif
         rb->gui_synclist_draw(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
         if (rb->gui_synclist_do_button(&lists,button))
