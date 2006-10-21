@@ -370,7 +370,10 @@ bool info_menu(void)
 #ifdef HAVE_LCD_CHARCELLS
 static bool do_shutdown(void)
 {
-    sys_poweroff();
+    if (!charger_inserted())
+        sys_poweroff();
+    else
+        charging_splash();
     return false;
 }
 #endif
