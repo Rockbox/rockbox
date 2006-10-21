@@ -596,6 +596,7 @@ int kbd_input(char* text, int buflen)
 #ifdef HAS_BUTTONBAR
                 global_settings.buttonbar=buttonbar_config;
 #endif
+		action_signalscreenchange();
                 return -1;
                 break;
 
