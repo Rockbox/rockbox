@@ -151,26 +151,6 @@ $(BUILDDIR)/libplugin.a:
 	$(SILENT)mkdir -p $(OBJDIR)/lib
 	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
-$(BUILDDIR)/libpluginbitmapsnative.a:
-	@echo "MAKE in plugins/bitmaps/native"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/native
-	$(SILENT)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
-
-$(BUILDDIR)/libpluginbitmapsmono.a:
-	@echo "MAKE in plugins/bitmaps/mono"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/mono
-	$(SILENT)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
-
-$(BUILDDIR)/libpluginbitmapsremotenative.a:
-	@echo "MAKE in plugins/bitmaps/remote_native"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_native
-	$(SILENT)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
-
-$(BUILDDIR)/libpluginbitmapsremotemono.a:
-	@echo "MAKE in plugins/bitmaps/remote_mono"
-	$(SILENT)mkdir -p $(OBJDIR)/bitmaps/remote_mono
-	$(SILENT)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
-
 $(LINKFILE): $(LDS)
 	@echo "build $@"
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
