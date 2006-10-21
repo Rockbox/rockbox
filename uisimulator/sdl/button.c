@@ -85,7 +85,186 @@ void button_event(int key, bool pressed)
 
     switch (key)
     {
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
+
+#if CONFIG_KEYPAD == GIGABEAT_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_A;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+
+#elif CONFIG_KEYPAD == GMINI100_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_ON;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_OFF;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_DIVIDE:
+    case SDLK_F1:
+        new_btn = BUTTON_REC;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_SCROLL_BACK;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_SCROLL_FWD;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_SCROLL_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_SCROLL_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_ESCAPE:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP_DIVIDE:
+    case SDLK_F1:
+        new_btn = BUTTON_REW;
+        break;
+    case SDLK_KP_MULTIPLY:
+    case SDLK_F2:
+        new_btn = BUTTON_FF;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_PLAY;
+        break;
+
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     case SDLK_t:
         if(pressed)
             switch(_remote_type)
@@ -108,8 +287,6 @@ void button_event(int key, bool pressed)
                     break;
             }
         break;
-#endif
-
     case SDLK_KP4:
     case SDLK_LEFT:
         new_btn = BUTTON_LEFT;
@@ -118,63 +295,150 @@ void button_event(int key, bool pressed)
     case SDLK_RIGHT:
         new_btn = BUTTON_RIGHT;
         break;
-
     case SDLK_KP8:
     case SDLK_UP:
-#ifdef BUTTON_UP
         new_btn = BUTTON_UP;
-#elif defined BUTTON_SCROLL_BACK
-        new_btn = BUTTON_SCROLL_BACK;
-#elif defined BUTTON_SCROLL_UP
-        new_btn = BUTTON_SCROLL_UP;
-#elif defined BUTTON_PLAY
-        new_btn = BUTTON_PLAY;
-#endif
         break;
-
     case SDLK_KP2:
     case SDLK_DOWN:
-#ifdef BUTTON_DOWN
         new_btn = BUTTON_DOWN;
-#elif defined BUTTON_SCROLL_FWD
-        new_btn = BUTTON_SCROLL_FWD;
-#elif defined BUTTON_SCROLL_DOWN
-        new_btn = BUTTON_SCROLL_DOWN;
-#elif defined BUTTON_STOP
-        new_btn = BUTTON_STOP;
-#endif
         break;
-
     case SDLK_KP_PLUS:
     case SDLK_F8:
-#ifdef BUTTON_ON
-        new_btn = BUTTON_ON;
-#elif defined(BUTTON_SELECT) && defined(BUTTON_PLAY)
         new_btn = BUTTON_PLAY;
-#elif defined BUTTON_POWER
-        new_btn = BUTTON_POWER;
-#endif
         break;
-
-    case SDLK_ESCAPE:
-#if defined BUTTON_POWER
-        new_btn = BUTTON_POWER;
-#endif
-        break;
-
     case SDLK_KP_ENTER:
     case SDLK_RETURN:
     case SDLK_a:
-#ifdef BUTTON_OFF
         new_btn = BUTTON_OFF;
-#elif defined BUTTON_A
-        new_btn = BUTTON_A;
-#elif defined BUTTON_EQ
-        new_btn = BUTTON_EQ;
-#endif
+        break;
+    case SDLK_KP_DIVIDE:
+    case SDLK_F1:
+        new_btn = BUTTON_REC;
+        break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MODE;
         break;
 
-#ifdef BUTTON_F1
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+       new_btn = BUTTON_EQ;
+       break;
+    case SDLK_KP5:
+    case SDLK_SPACE:
+        new_btn = BUTTON_SELECT;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MODE;
+        break;
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_OFF;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+
+#elif CONFIG_KEYPAD == PLAYER_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_PLAY;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_STOP;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_ON;
+        break;
+    case SDLK_KP_PERIOD:
+    case SDLK_INSERT:
+        new_btn = BUTTON_MENU;
+        break;
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP_PLUS:
+    case SDLK_F8:
+        new_btn = BUTTON_ON;
+        break;
+    case SDLK_KP_ENTER:
+    case SDLK_RETURN:
+    case SDLK_a:
+        new_btn = BUTTON_OFF;
+        break;
     case SDLK_KP_DIVIDE:
     case SDLK_F1:
         new_btn = BUTTON_F1;
@@ -187,31 +451,42 @@ void button_event(int key, bool pressed)
     case SDLK_F3:
         new_btn = BUTTON_F3;
         break;
-#elif defined(BUTTON_REC)
-    case SDLK_KP_DIVIDE:
-    case SDLK_F1:
-        new_btn = BUTTON_REC;
-        break;
-#elif defined BUTTON_REW
-    case SDLK_KP_DIVIDE:
-    case SDLK_F1:
-        new_btn = BUTTON_REW;
-        break;
-    case SDLK_KP_MULTIPLY:
-    case SDLK_F2:
-        new_btn = BUTTON_FF;
-        break;
-#endif
-
     case SDLK_KP5:
     case SDLK_SPACE:
-#if defined(BUTTON_PLAY) && !defined(BUTTON_SELECT)
         new_btn = BUTTON_PLAY;
-#elif defined(BUTTON_SELECT)
-        new_btn = BUTTON_SELECT;
-#endif
         break;
 
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+    case SDLK_KP4:
+    case SDLK_LEFT:
+        new_btn = BUTTON_LEFT;
+        break;
+    case SDLK_KP6:
+    case SDLK_RIGHT:
+        new_btn = BUTTON_RIGHT;
+        break;
+    case SDLK_KP8:
+    case SDLK_UP:
+        new_btn = BUTTON_UP;
+        break;
+    case SDLK_KP2:
+    case SDLK_DOWN:
+        new_btn = BUTTON_DOWN;
+        break;
+    case SDLK_KP9:
+        new_btn = BUTTON_SCROLL_UP;
+        break;
+    case SDLK_KP3:
+        new_btn = BUTTON_SCROLL_DOWN;
+        break;
+    case SDLK_KP1:
+        new_btn = BUTTON_POWER;
+        break;
+    case SDLK_KP7:
+        new_btn = BUTTON_REC;
+        break;
+
+#endif /* CONFIG_KEYPAD */
     case SDLK_KP0:
     case SDLK_F5:
         if(pressed)
@@ -219,15 +494,6 @@ void button_event(int key, bool pressed)
             screen_dump();
             return;
         }
-        break;
-
-    case SDLK_KP_PERIOD:
-    case SDLK_INSERT:
-#ifdef BUTTON_MENU
-        new_btn = BUTTON_MENU;
-#elif defined(BUTTON_MODE)
-        new_btn = BUTTON_MODE;
-#endif
         break;
     }
     
