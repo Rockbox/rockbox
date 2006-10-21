@@ -2693,7 +2693,7 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     struct index_entry idx;
     char tag_data[MAX_PATH];
     int idx_id;
-    int masterfd = (int)parameters;
+    long masterfd = (long)parameters;
     const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed };
     int i;
     (void)line_n;
@@ -2781,7 +2781,7 @@ bool tagcache_import_changelog(void)
     
     filenametag_fd = open_tag_fd(&tch, tag_filename, false);
     
-    fast_readline(filenametag_fd, buf, sizeof buf, (void *)masterfd,
+    fast_readline(filenametag_fd, buf, sizeof buf, (long *)masterfd,
                   parse_changelog_line);
     
     close(clfd);
