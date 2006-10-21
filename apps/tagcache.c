@@ -2755,7 +2755,8 @@ bool tagcache_import_changelog(void)
 {
     struct master_header myhdr;
     struct tagcache_header tch;
-    int clfd, masterfd;
+    int clfd;
+    long masterfd;
     char buf[2048];
     
     if (!stat.ready)
