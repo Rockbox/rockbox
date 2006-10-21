@@ -780,6 +780,7 @@ bool rectrigger(void)
     int offset = 0;
     int option_lines;
     int w, h;
+    int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
     /* array for y ordinate of peak_meter_draw_get_button
        function in peakmeter.c*/
     int pm_y[NB_SCREENS];
@@ -799,11 +800,10 @@ bool rectrigger(void)
 
     lcd_getstringsize("M", &w, &h);
 
-    // two lines are reserved for peak meter and trigger status
-    option_lines = (LCD_HEIGHT/h) - (global_settings.statusbar ? 1:0) - 2;
+    /* 16 pixels are reserved for peak meter and trigger status */
+    option_lines = (LCD_HEIGHT - 16 - stat_height) / h;
 
     while (!exit_request) {
-        int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
         int button, i;
         const char *str;
         char option_value[TRIG_OPTION_COUNT][7];
@@ -862,9 +862,6 @@ bool rectrigger(void)
             "%s",
             trig_durations[global_settings.rec_stop_gap]);
 
-        lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-        lcd_fillrect(0, stat_height, LCD_WIDTH, LCD_HEIGHT - stat_height);
-        lcd_set_drawmode(DRMODE_SOLID);
         gui_syncstatusbar_draw(&statusbars, true);
 
         /* reselect FONT_SYSFONT as status_draw has changed the font */
@@ -877,7 +874,7 @@ bool rectrigger(void)
             lcd_putsxy(5, stat_height + i * h, str);
 
             str = option_value[i + offset];
-            lcd_getstringsize(str, &w, &h);
+            lcd_getstringsize(str, &w, NULL);
             y = stat_height + i * h;
             x = LCD_WIDTH - w;
             lcd_putsxy(x, y, str);
@@ -889,7 +886,7 @@ bool rectrigger(void)
         }
 
         scrollbar(0, stat_height,
-            4, LCD_HEIGHT - 16 - stat_height,
+            4, option_lines * h,
             TRIG_OPTION_COUNT, offset, offset + option_lines,
             VERTICAL);
 
