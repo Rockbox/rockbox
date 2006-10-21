@@ -105,8 +105,8 @@ void usb_screen(void)
     lcd_remote_update();
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     lcd_clear_display();
+#ifdef HAVE_LCD_BITMAP
     lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo)/2, 
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
