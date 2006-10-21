@@ -472,6 +472,7 @@ static const struct plugin_api rockbox_api = {
     wheel_status,
     wheel_send_events,
 #endif
+    ata_spindown,
 };
 
 int plugin_load(const char* plugin, void* parameter)

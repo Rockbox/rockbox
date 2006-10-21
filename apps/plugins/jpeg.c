@@ -165,7 +165,11 @@ static struct plugin_api* rb;
 #define INLINE static inline
 #define ENDIAN_SWAP16(n) n /* only for poor little endian machines */
 
-static int slideshow_enabled = false;
+static int slideshow_enabled = false;   /* run slideshow */
+static int running_slideshow = false;   /* loading image because of slideshw */
+#ifndef SIMULATOR
+static int immediate_ata_off = false;   /* power down disk after loading */
+#endif
 static int  button_timeout = HZ*5;
 
 /**************** begin JPEG code ********************/
@@ -174,7 +178,7 @@ INLINE unsigned range_limit(int value)
 {
 #if CONFIG_CPU == SH7034
     unsigned tmp;
-    asm (  /* Note: Uses knowledge that only the low byte of the result is used */
+    asm (  /* Note: Uses knowledge that only low byte of result is used */
         "mov     #-128,%[t]  \n"
         "sub     %[t],%[v]   \n"  /* value -= -128; equals value += 128; */
         "extu.b  %[v],%[t]   \n"
@@ -2092,7 +2096,7 @@ int show_menu(void) /* return 1 to quit */
     static const struct menu_item items[] = {
         { "Quit", NULL },
         { "Toggle Slideshow Mode", NULL },
-        { "Change Slideshow Timeout", NULL },
+        { "Change Slideshow Time", NULL },
         { "Show Playback Menu", NULL },
         { "Return", NULL },
     };
@@ -2135,7 +2139,7 @@ int show_menu(void) /* return 1 to quit */
                 case 20: result = 11; break;
                 default: result = (button_timeout/HZ)-1; break;
             }
-            rb->set_option("Slideshow Timeout", &result, INT,
+            rb->set_option("Slideshow Time", &result, INT,
                            timeout , 12, NULL);
             switch (result)
             {
@@ -2151,6 +2155,27 @@ int show_menu(void) /* return 1 to quit */
         case 4:
             break;
     }
+
+#ifndef SIMULATOR
+    /* change ata spindown time based on slideshow time setting */
+    immediate_ata_off = false;
+    rb->ata_spindown(rb->global_settings->disk_spindown);
+
+    if (slideshow_enabled)
+    {
+        if(button_timeout/HZ < 10)
+        {
+            /* slideshow times < 10s keep disk spinning */
+            rb->ata_spindown(0);
+        }
+        else if (!rb->mp3_is_playing())
+        {
+            /* slideshow times > 10s and not playing: ata_off after load */
+            immediate_ata_off = true;
+        }
+    }
+#endif
+
     rb->lcd_clear_display();
     rb->menu_exit(m);
     return 0;
@@ -2168,6 +2193,8 @@ int scroll_bmp(struct t_disp* pdisp)
         if (slideshow_enabled)
             button = rb->button_get_w_tmo(button_timeout);
         else button = rb->button_get(true);
+
+        running_slideshow = false;
 
         switch(button)
         {
@@ -2271,6 +2298,7 @@ int scroll_bmp(struct t_disp* pdisp)
         case BUTTON_NONE:
             if (!slideshow_enabled)
                 break;
+            running_slideshow = true;
             if (entries > 0)
                 return change_filename(DIR_NEXT);
             break;
@@ -2340,7 +2368,7 @@ int scroll_bmp(struct t_disp* pdisp)
 void cb_progess(int current, int total)
 {
     rb->yield(); /* be nice to the other threads */
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
         rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
                       current, HORIZONTAL);
@@ -2461,7 +2489,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     buf += size;
     buf_size -= size;
 
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), "decoding %d*%d",
             p_jpg->x_size/ds, p_jpg->y_size/ds);
@@ -2491,7 +2519,7 @@ struct t_disp* get_image(struct jpeg* p_jpg, int ds)
     }
     time = *rb->current_tick - time;
 
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), " %d.%02d sec ", time/HZ, time%HZ);
         rb->lcd_getstringsize(print, &w, &h); /* centered in progress bar */
@@ -2630,7 +2658,7 @@ int load_and_show(char* filename)
         }
     }
 
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
 #ifdef HAVE_LCD_COLOR
         rb->lcd_set_foreground(LCD_WHITE);
@@ -2650,13 +2678,19 @@ int load_and_show(char* filename)
     rb->read(fd, buf_jpeg, filesize);
     rb->close(fd);
 
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), "decoding markers");
         rb->lcd_puts(0, 2, print);
         rb->lcd_update();
     }
-
+#ifndef SIMULATOR
+    else if(immediate_ata_off)
+    {
+        /* running slideshow and time is long enough: power down disk */
+        rb->ata_sleep();
+    }
+#endif
 
     rb->memset(&jpg, 0, sizeof(jpg)); /* clear info struct */
     /* process markers, unstuffing */
@@ -2673,7 +2707,7 @@ int load_and_show(char* filename)
         default_huff_tbl(&jpg); /* use default */
     build_lut(&jpg); /* derive Huffman and other lookup-tables */
 
-    if(!slideshow_enabled)
+    if(!running_slideshow)
     {
         rb->snprintf(print, sizeof(print), "image %dx%d", jpg.x_size, jpg.y_size);
         rb->lcd_puts(0, 2, print);
@@ -2700,7 +2734,7 @@ int load_and_show(char* filename)
 
         set_view(p_disp, cx, cy);
 
-        if(!slideshow_enabled)
+        if(!running_slideshow)
         {
             rb->snprintf(print, sizeof(print), "showing %dx%d",
                 p_disp->width, p_disp->height);
@@ -2839,6 +2873,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         condition = load_and_show(np_file);
     }while (condition != PLUGIN_OK && condition != PLUGIN_USB_CONNECTED
                                           && condition != PLUGIN_ERROR);
+
+#ifndef SIMULATOR
+    /* set back ata spindown time in case we changed it */
+    rb->ata_spindown(rb->global_settings->disk_spindown);
+#endif
 
 #ifdef CONFIG_BACKLIGHT
     /* reset backlight settings */

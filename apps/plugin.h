@@ -105,7 +105,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 32
+#define PLUGIN_API_VERSION 33
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -552,6 +552,7 @@ struct plugin_api {
     int (*wheel_status)(void);
     void (*wheel_send_events)(bool send);
 #endif
+    void (*ata_spindown)(int seconds);
 };
 
 /* plugin header */
