@@ -42,6 +42,7 @@
 #include "atoi.h"
 #include "playback.h"
 #include "yesno.h"
+#include "misc.h"
 
 #define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
 
@@ -678,16 +679,146 @@ bool tagtree_import(void)
     return false;
 }
 
+static bool parse_menu(const char *filename);
+
+int parse_line(int n, const char *buf, void *parameters)
+{
+    char data[256];
+    int variable;
+    static bool read_menu;
+    int i;
+    
+    (void)parameters;
+    
+    /* First line, do initialisation. */
+    if (n == 0)
+    {
+        if (strcasecmp(TAGNAVI_VERSION, buf))
+        {
+            logf("Version mismatch");
+            return -1;
+        }
+        
+        read_menu = false;
+    }
+    
+    if (buf[0] == '#')
+        return 0;
+    
+    if (buf[0] == '\0')
+    {
+        if (read_menu)
+        {
+            /* End the menu */
+            menu_count++;
+            read_menu = false;
+        }
+        return 0;
+    }
+    
+    if (!read_menu)
+    {
+        strp = buf;
+        if (get_tag(&variable) <= 0)
+            return 0;
+        
+        switch (variable)
+        {
+            case var_format:
+                if (add_format(strp) < 0)
+                {
+                    logf("Format add fail: %s", data);
+                }
+                break;
+                
+            case var_include:
+                if (get_token_str(data, sizeof(data)) < 0)
+                {
+                    logf("%include empty");
+                    return false;
+                }
+            
+                if (!parse_menu(data))
+                {
+                    logf("Load menu fail: %s", data);
+                }
+                break;
+                
+            case var_menu_start:
+                if (menu_count >= TAGMENU_MAX_MENUS)
+                {
+                    logf("max menucount reached");
+                    return false;
+                }
+            
+                menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
+                menu = menus[menu_count];
+                memset(menu, 0, sizeof(struct root_menu));
+                if (get_token_str(menu->id, sizeof(menu->id)) < 0)
+                {
+                    logf("%menu_start id empty");
+                    return false;
+                }
+                if (get_token_str(menu->title, sizeof(menu->title)) < 0)
+                {
+                    logf("%menu_start title empty");
+                    return false;
+                }
+                menu->itemcount = 0;
+                read_menu = true;
+                break;
+                
+            case var_rootmenu:
+                /* Only set root menu once. */
+                if (root_menu)
+                    break;
+                
+                if (get_token_str(data, sizeof(data)) < 0)
+                {
+                    logf("%root_menu empty");
+                    return false;
+                }
+                
+                for (i = 0; i < menu_count; i++)
+                {
+                    if (!strcasecmp(menus[i]->id, data))
+                    {
+                        root_menu = i;
+                    }
+                }
+                break;
+        }
+        
+        return 0;
+    }
+    
+    if (menu->itemcount >= TAGMENU_MAX_ITEMS)
+    {
+        logf("max itemcount reached");
+        return 0;
+    }
+    
+    /* Allocate */
+    if (menu->items[menu->itemcount] == NULL)
+    {
+        menu->items[menu->itemcount] = buffer_alloc(sizeof(struct menu_entry));
+        memset(menu->items[menu->itemcount], 0, sizeof(struct menu_entry));
+        menu->items[menu->itemcount]->si = buffer_alloc(sizeof(struct search_instruction));
+    }
+    
+    memset(menu->items[menu->itemcount]->si, 0, sizeof(struct search_instruction));
+    if (!parse_search(menu->items[menu->itemcount], buf))
+        return 0;
+    
+    menu->itemcount++;
+    
+    return 0;
+}
+
 static bool parse_menu(const char *filename)
 {
     int fd;
     char buf[256];
-    char data[256];
-    int variable;
-    int rc;
-    bool first = true;
-    bool read_menu = false;
-    int i;
 
     if (menu_count >= TAGMENU_MAX_MENUS)
     {
@@ -703,132 +834,7 @@ static bool parse_menu(const char *filename)
     }
     
     /* Now read file for real, parsing into si */
-    while ( 1 )
-    {
-        rc = read_line(fd, buf, sizeof(buf)-1);
-        if (rc <= 0)
-            break;
-        
-        if (first)
-        {
-            if (strcasecmp(TAGNAVI_VERSION, buf))
-            {
-                logf("Version mismatch");
-                break;
-            }
-            first = false;
-        }
-        
-        if (buf[0] == '#')
-            continue;
-        
-        if (buf[0] == '\0')
-        {
-            if (read_menu)
-            {
-                /* End the menu */
-                menu_count++;
-                read_menu = false;
-            }
-            continue;
-        }
-        
-        if (!read_menu)
-        {
-            strp = buf;
-            if (get_tag(&variable) <= 0)
-                continue;
-            
-            switch (variable)
-            {
-                case var_format:
-                    if (add_format(strp) < 0)
-                    {
-                        logf("Format add fail: %s", data);
-                    }
-                    break;
-                
-                case var_include:
-                    if (get_token_str(data, sizeof(data)) < 0)
-                    {
-                        logf("%include empty");
-                        return false;
-                    }
-                    
-                    if (!parse_menu(data))
-                    {
-                        logf("Load menu fail: %s", data);
-                    }
-                    break;
-                
-                case var_menu_start:
-                    if (menu_count >= TAGMENU_MAX_MENUS)
-                    {
-                        logf("max menucount reached");
-                        return false;
-                    }
-    
-                    menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
-                    menu = menus[menu_count];
-                    memset(menu, 0, sizeof(struct root_menu));
-                    if (get_token_str(menu->id, sizeof(menu->id)) < 0)
-                    {
-                        logf("%menu_start id empty");
-                        return false;
-                    }
-                    if (get_token_str(menu->title, sizeof(menu->title)) < 0)
-                    {
-                        logf("%menu_start title empty");
-                        return false;
-                    }
-                    menu->itemcount = 0;
-                    read_menu = true;
-                    break;
-                
-                case var_rootmenu:
-                    /* Only set root menu once. */
-                    if (root_menu)
-                        break;
-                
-                    if (get_token_str(data, sizeof(data)) < 0)
-                    {
-                        logf("%root_menu empty");
-                        return false;
-                    }
-                
-                    for (i = 0; i < menu_count; i++)
-                    {
-                        if (!strcasecmp(menus[i]->id, data))
-                        {
-                            root_menu = i;
-                        }
-                    }
-                    break;
-            }
-            
-            continue;
-        }
-        
-        if (menu->itemcount >= TAGMENU_MAX_ITEMS)
-        {
-            logf("max itemcount reached");
-            continue;
-        }
-        
-        /* Allocate */
-        if (menu->items[menu->itemcount] == NULL)
-        {
-            menu->items[menu->itemcount] = buffer_alloc(sizeof(struct menu_entry));
-            memset(menu->items[menu->itemcount], 0, sizeof(struct menu_entry));
-            menu->items[menu->itemcount]->si = buffer_alloc(sizeof(struct search_instruction));
-        }
-        
-        memset(menu->items[menu->itemcount]->si, 0, sizeof(struct search_instruction));
-        if (!parse_search(menu->items[menu->itemcount], buf))
-            continue;
-        
-        menu->itemcount++;
-    }
+    fast_readline(fd, buf, sizeof buf, NULL, parse_line);
     close(fd);
     
     return true;

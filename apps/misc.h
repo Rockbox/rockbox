@@ -42,6 +42,8 @@ char *create_datetime_filename(char *buffer, const char *path,
  * stored in buffer.
  */
 int read_line(int fd, char* buffer, int buffer_size);
+int fast_readline(int fd, char *buf, int buf_size, void *parameters,
+                  int (*callback)(int n, const char *buf, void *parameters));
 
 #ifdef HAVE_LCD_BITMAP
 /* Save a .BMP file containing the current screen contents. */

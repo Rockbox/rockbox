@@ -217,6 +217,53 @@ int read_line(int fd, char* buffer, int buffer_size)
     return errno ? -1 : num_read;
 }
 
+/* Performance optimized version of the previous function. */
+int fast_readline(int fd, char *buf, int buf_size, void *parameters,
+                  int (*callback)(int n, const char *buf, void *parameters))
+{
+    char *p, *next;
+    int rc, pos = 0;
+    int count = 0;
+    
+    while ( 1 )
+    {
+        next = NULL;
+        
+        rc = read(fd, &buf[pos], buf_size - pos - 1);
+        if (rc >= 0)
+            buf[pos+rc] = '\0';
+        
+        if ( (p = strchr(buf, '\r')) != NULL)
+        {
+            *p = '\0';
+            next = ++p;
+        }
+        else
+            p = buf;
+        
+        if ( (p = strchr(p, '\n')) != NULL)
+        {
+            *p = '\0';
+            next = ++p;
+        }
+        
+        rc = callback(count, buf, parameters);
+        if (rc < 0)
+            return rc;
+        
+        count++;
+        if (next)
+        {
+            pos = buf_size - ((long)next - (long)buf) - 1;
+            memmove(buf, next, pos);
+        }
+        else
+            break ;
+    }
+    
+    return 0;
+}
+
 #ifdef HAVE_LCD_BITMAP
 
 #if LCD_DEPTH == 16 

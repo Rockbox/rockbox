@@ -72,6 +72,7 @@
 #include "atoi.h"
 #include "crc32.h"
 #include "eeprom_settings.h"
+#include "misc.h"
 
 /* Tag Cache thread. */
 static struct event_queue tagcache_queue;
@@ -2687,40 +2688,42 @@ static bool read_tag(char *dest, long size,
     return false;
 }
 
-static bool parse_changelog_line(int masterfd, const char *buf)
+static int parse_changelog_line(int line_n, const char *buf, void *parameters)
 {
     struct index_entry idx;
     char tag_data[MAX_PATH];
     int idx_id;
+    int masterfd = (int)parameters;
     const int import_tags[] = { tag_playcount, tag_playtime, tag_lastplayed };
     int i;
+    (void)line_n;
     
     if (*buf == '#')
-        return true;
+        return 0;
     
     if (!read_tag(tag_data, sizeof tag_data, buf, "filename"))
     {
         logf("filename missing");
         logf("-> %s", buf);
-        return false;
+        return -1;
     }
     
     idx_id = find_index(tag_data);
     if (idx_id < 0)
     {
         logf("entry not found");
-        return false;
+        return -2;
     }
     
     if (!get_index(masterfd, idx_id, &idx, false))
     {
         logf("failed to retrieve index entry");
-        return false;
+        return -3;
     }
     
     /* Stop if tag has already been modified. */
     if (idx.flag & FLAG_DIRTYNUM)
-        return false;
+        return -4;
     
     logf("import: %s", tag_data);
     
@@ -2745,7 +2748,7 @@ static bool parse_changelog_line(int masterfd, const char *buf)
             current_serial = data;
     }
     
-    return write_index(masterfd, idx_id, &idx);
+    return write_index(masterfd, idx_id, &idx) ? 0 : -5;
 }
 
 bool tagcache_import_changelog(void)
@@ -2754,7 +2757,6 @@ bool tagcache_import_changelog(void)
     struct tagcache_header tch;
     int clfd, masterfd;
     char buf[2048];
-    int pos = 0;
     
     if (!stat.ready)
         return false;
@@ -2779,41 +2781,8 @@ bool tagcache_import_changelog(void)
     
     filenametag_fd = open_tag_fd(&tch, tag_filename, false);
     
-    /* Fast readline */
-    while ( 1 )
-    {
-        char *p;
-        char *next = NULL;
-        int rc;
-        
-        rc = read(clfd, &buf[pos], sizeof(buf)-pos-1);
-        if (rc >= 0)
-            buf[pos+rc] = '\0';
-        
-        if ( (p = strchr(buf, '\r')) != NULL)
-        {
-            *p = '\0';
-            next = ++p;
-        }
-        else
-            p = buf;
-        
-        if ( (p = strchr(p, '\n')) != NULL)
-        {
-            *p = '\0';
-            next = ++p;
-        }
-        
-        parse_changelog_line(masterfd, buf);
-        
-        if (next)
-        {
-            pos = sizeof(buf) - ((long)next - (long)buf) - 1;
-            memmove(buf, next, pos);
-        }
-        else
-            break ;
-    }
+    fast_readline(filenametag_fd, buf, sizeof buf, (void *)masterfd,
+                  parse_changelog_line);
     
     close(clfd);
     close(masterfd);
