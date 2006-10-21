@@ -138,14 +138,14 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     //long max_chars=0;
     //int begin, end, char_count, orig_begin;
 
-    if (!str || !*str)
-        return &(unsigned short){0};
-
     //tmp = str;
     target = tmp = utf16_buf;
     while (*str)
         str = utf8decode(str, target++);
     *target = 0;
+
+    if (target == utf16_buf) /* empty string */
+        return target;
 
     /* properly join any arabic chars */
     arabjoin(utf16_buf, length);
