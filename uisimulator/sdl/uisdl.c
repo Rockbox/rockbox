@@ -187,6 +187,11 @@ int sim_app_main(void *param)
     return 0;
 }
 
+#if defined(WIN32) && defined(main)
+/* Don't use SDL_main on windows -> no more stdio redirection */
+#undef main
+#endif
+
 int main(int argc, char *argv[])
 {
     if (argc >= 1) {

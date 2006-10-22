@@ -111,7 +111,7 @@ simcc () {
    elif [ "$simver" = "sdl" ]; then
        # sdl version
        GCCOPTS="$GCCOPTS `sdl-config --cflags`"
-       LDOPTS="`sdl-config --libs`"
+       LDOPTS="`sdl-config --libs` -mconsole"
        checksoundcard
    else
        # x11 version
