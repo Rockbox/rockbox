@@ -86,7 +86,7 @@ $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
 	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	$(SILENT)$(OC) -O binary $< $@
 else
 
@@ -95,7 +95,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "LD "`basename $@`
+	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -111,7 +111,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "LD "`basename $@`
+	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -128,7 +128,7 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "DLL "`basename $@`
+	@echo "DLL $(notdir $@)"
 	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@

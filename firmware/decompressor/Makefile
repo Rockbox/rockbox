@@ -19,11 +19,11 @@ CFLAGS = $(GCCOPTS)
 all: $(OBJDIR)/compressed.bin
 
 $(OBJDIR)/compressed.bin : $(OBJDIR)/compressed.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	$(SILENT)$(OC) -O binary $< $@
 
 $(OBJDIR)/compressed.elf : $(OBJS) $(LINKFILE)
-	@echo "LD `basename $@`"
+	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/compressed.map
 
 $(LDS): $(OBJS)
@@ -34,22 +34,22 @@ $(LINKFILE): $(LDS)
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(OBJDIR)/decompressor.o : decompressor.c $(OBJDIR)/uclimage.c
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "CC $<"
 	$(SILENT)$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
 $(OBJDIR)/startup.o : startup.S
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "AS $<"
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/uclimage.o : $(OBJDIR)/uclimage.c
-	$(SILENT)mkdir -p `dirname $@`
-	@echo "CC `basename $<`"
+	$(SILENT)mkdir -p $(dir $@)
+	@echo "CC $(notdir $<)"
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/uclimage.c : $(FLASHFILE)  $(TOOLSDIR)/ucl2src.pl
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "UCL2SRC"
 	$(SILENT)perl -s $(TOOLSDIR)/ucl2src.pl -p=$(OBJDIR)/uclimage $<
 

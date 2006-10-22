@@ -128,11 +128,11 @@ $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIB
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	@$(OC) -O binary $< $@
 
 $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	@$(OC) -O binary $< $@
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
@@ -195,7 +195,7 @@ include $(TOOLSDIR)/make.inc
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang
 	@echo "GENLANG"
-	@mkdir -p `dirname $@`
+	@mkdir -p $(dir $@)
 	$(SILENT)perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS) $<
 	@echo "CC lang.c"
 	@$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@

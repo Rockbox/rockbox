@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.6  2006/09/29 20:04:35  barrywardell
+# Revision 1.7  2006/10/22 00:21:56  amiconn
+# Speed up build process in general by using internal functions of make instead of spawning sub-shells where possible.
+#
+# Revision 1.6  2006-09-29 20:04:35  barrywardell
 # Cleaner implementation of the recent OSX simulator build fix. No need to define SHARED_FLAG in each Makefile. Just have configure create it in the root Makefile instead.
 #
 # Revision 1.5  2006-09-29 16:15:08  barrywardell
@@ -76,12 +79,12 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/doom.elf: $(OBJS) $(LINKFILE)
-	@echo "LD "`basename $@`
+	@echo "LD $(notdir $@)"
 	@$(CC) $(GCCOPTS) $(LDFLAGS) -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/doom.map
 
 $(OUTPUT): $(OBJDIR)/doom.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	@$(OC) -O binary $< $@
 else
 
@@ -123,7 +126,7 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OUTPUT): $(OBJS)
-	@echo "DLL "`basename $@`
+	@echo "DLL $(notdir $@)"
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
 	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
                 $(BUILDDIR)/libplugin.a -o $@
@@ -144,7 +147,7 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build "`basename $@`
+	@echo "build $(notdir $@)"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) \
          -E -P - >$@
 

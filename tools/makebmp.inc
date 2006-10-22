@@ -7,18 +7,18 @@ SILENT=@
 endif
 
 $(OBJDIR)/%.c: %.bmp
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)mkdir -p $(BMPINCDIR)
 	@echo BMP2RB $<
 	$(SILENT)$(BMP2RB) -h $(BMPINCDIR) $< > $@
 
 $(OBJDIR)/%.o: $(OBJDIR)/%.c
-	$(SILENT)mkdir -p `dirname $@`
-	@echo CC `basename $<`
+	$(SILENT)mkdir -p $(dir $@)
+	@echo CC $(notdir $<)
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 $(DEPFILE): SOURCES
-	$(SILENT)mkdir -p `dirname $(DEPFILE)`
+	$(SILENT)mkdir -p $(dir $(DEPFILE))
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
           if test "x" != "$$each"; then \

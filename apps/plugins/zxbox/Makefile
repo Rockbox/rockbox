@@ -43,12 +43,12 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/zxbox.elf: $(OBJS) $(LINKFILE)
-	@echo "LD "`basename $@`
+	@echo "LD $(notdir $@)"
 	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/zxbox.map
 
 $(OUTPUT): $(OBJDIR)/zxbox.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	@$(OC) -O binary $< $@
 else
 
@@ -76,7 +76,7 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build "`basename $@`
+	@echo "build $(notdir $@)"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
 	$(DEFINES) -E -P - >$@
 

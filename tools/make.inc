@@ -5,12 +5,12 @@ SILENT=@
 endif
 
 $(OBJDIR)/%.o: %.c
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "CC $<"
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.S
-	$(SILENT)mkdir -p `dirname $@`
+	$(SILENT)mkdir -p $(dir $@)
 	@echo "CC $<"
 	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
 
@@ -26,7 +26,7 @@ $(OBJDIR)/%.o: %.S
 # without the proper path.
 #
 $(DEPFILE): $(SOURCES)
-	$(SILENT)mkdir -p `dirname $(DEPFILE)`
+	$(SILENT)mkdir -p $(dir $(DEPFILE))
 	$(SILENT)rm -f $(DEPFILE)
 	$(SILENT)(for each in $(SOURCES) x; do \
 	    if test "$$each" = "credits.c"; then \

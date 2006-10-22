@@ -38,12 +38,12 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/sudoku.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
-	@echo "LD "`basename $@`
+	@echo "LD $(notdir $@)"
 	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/sudoku.map
 
 $(OUTPUT): $(OBJDIR)/sudoku.elf
-	@echo "OBJCOPY "`basename $@`
+	@echo "OBJCOPY $(notdir $@)"
 	@$(OC) -O binary $< $@
 else
 
@@ -85,7 +85,7 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OUTPUT): $(OBJS)
-	@echo "DLL "`basename $@`
+	@echo "DLL $(notdir $@)"
 	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
 	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
                 $(BUILDDIR)/libplugin.a $(BITMAPLIBS) -o $@
@@ -106,7 +106,7 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build "`basename $@`
+	@echo "build $(notdir $@)"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
 	$(DEFINES) -E -P - >$@
 
