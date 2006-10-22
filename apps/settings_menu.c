@@ -1399,7 +1399,7 @@ static bool audioscrobbler(void)
     if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
         gui_syncsplash(HZ*2, true, str(LANG_PLEASE_REBOOT));
 
-    if(!result)
+    if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
         scrobbler_shutdown();
 
     return result;
