@@ -2039,7 +2039,6 @@ static bool audio_yield_codecs(void)
     return false;
 }
 
-/* Note that this function might yield(). */
 static void audio_clear_track_entries(bool clear_unbuffered)
 {
     int cur_idx = track_widx;
@@ -2140,6 +2139,7 @@ static bool audio_read_file(size_t minimum)
         /* copy_n is the largest chunk that is safe to read */
         copy_n = MIN(conf_filechunk, filebuflen - buf_widx);
 
+        /* buf_widx == buf_ridx is defined as buffer empty, not buffer full */
         if (RINGBUF_ADD_CROSS(buf_widx,copy_n,buf_ridx) >= 0)
             break;
 
@@ -2158,7 +2158,16 @@ static bool audio_read_file(size_t minimum)
         tracks[track_widx].filerem -= rc;
 
         /* How much of the playing track did we overwrite */
-        overlap = RINGBUF_ADD_CROSS(buf_widx,rc,CUR_TI->buf_idx);
+        if (buf_widx == CUR_TI->buf_idx)
+        {
+            /* Special handling; zero or full overlap? */
+            if (CUR_TI->filerem)
+                overlap = rc;
+            else
+                overlap=0;
+        }
+        else
+            overlap = RINGBUF_ADD_CROSS(buf_widx,rc,CUR_TI->buf_idx);
 
         /* Advance buffer */
         buf_widx = RINGBUF_ADD(buf_widx, rc);
@@ -2844,6 +2853,7 @@ skip_done:
 
 static void audio_rebuffer_and_seek(size_t newpos)
 {
+    size_t real_preseek;
     int fd;
     char *trackname;
 
@@ -2877,24 +2887,25 @@ static void audio_rebuffer_and_seek(size_t newpos)
     {
         CUR_TI->start_pos = newpos - conf_preseek;
         CUR_TI->filerem = CUR_TI->filesize - CUR_TI->start_pos;
-        newpos = conf_preseek;
+        real_preseek = conf_preseek;
     } 
     else 
     {
         CUR_TI->start_pos = 0;
         CUR_TI->filerem = CUR_TI->filesize;
+        real_preseek = newpos;
     }
 
     CUR_TI->available = 0;
 
     lseek(current_fd, CUR_TI->start_pos, SEEK_SET);
 
-    audio_read_file(newpos);
+    audio_read_file(real_preseek);
 
     /* Account for the data we just read that is 'behind' us now */
-    CUR_TI->available -= newpos;
+    CUR_TI->available -= real_preseek;
 
-    buf_ridx = RINGBUF_ADD(buf_ridx, newpos);
+    buf_ridx = RINGBUF_ADD(buf_ridx, real_preseek);
 
     LOGFQUEUE("audio > codec Q_CODEC_REQUEST_COMPLETE");
     queue_post(&codec_callback_queue, Q_CODEC_REQUEST_COMPLETE, 0);
