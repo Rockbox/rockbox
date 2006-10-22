@@ -156,6 +156,8 @@ flipit_tokens.16x26x1.bmp
 #ifdef HAVE_LCD_COLOR
 #if LCD_WIDTH >= 320 && LCD_HEIGHT >= 188
 star_tiles.20x20.bmp
+#elif LCD_WIDTH >= 240 && LCD_HEIGHT >= 143
+star_tiles.15x15.bmp
 #elif LCD_WIDTH >= 208 && LCD_HEIGHT >= 125
 star_tiles.13x13.bmp
 #elif LCD_WIDTH >= 176 && LCD_HEIGHT >= 107
