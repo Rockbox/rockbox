@@ -116,6 +116,7 @@ IDX_FILE  := $(shell ls $(DOCUMENT).idx 2>/dev/null)
 END_FILE  := $(shell ls $(DOCUMENT).end 2>/dev/null)
 TEX_FILES := $(DOCUMENT).tex
 OTHER_FILES := $(DOCUMENT).blg $(DOCUMENT).log $(DOCUMENT).out
+INDEX_ARGS := -s mkidx.ist
 
 # grab the contents of \bibliograph{} commands
 ifeq ($(BIB_FILES),)
@@ -255,7 +256,7 @@ $(PDF_FILE) : %.pdf : $(TEX_FILES) $(MONITOR_FILES) $(GRAPHIC_FILES) $(XFIG_TEX)
 #
 
 %.ind : %.idx
-	makeindex $<
+	makeindex $(INDEX_ARGS) $<
 
 #
 # Generate a .aux or .idx file if it doesn't already exist.  The existance
