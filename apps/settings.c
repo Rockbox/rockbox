@@ -2051,10 +2051,18 @@ bool set_int(const unsigned char* string,
              int max,
              void (*formatter)(char*, int, int, const char*) )
 {
+#if CONFIG_KEYPAD != PLAYER_PAD
     struct value_setting_data data = {
         INT,max, step, voice_unit,unit,formatter,NULL };
     return do_set_setting(string,variable,(max-min)/step + 1,
                           (max-*variable)/step, &data,function);
+#else
+    int count = (max-min)/step + 1;
+    struct value_setting_data data = {
+        INT,min, -step, voice_unit,unit,formatter,NULL };
+    return do_set_setting(string,variable,count,
+                          count - ((max-*variable)/step), &data,function);
+#endif
 }
 
 /* NOTE: the 'type' parameter specifies the actual type of the variable
