@@ -2166,6 +2166,13 @@ static bool audio_read_file(size_t minimum)
         else
             overlap = RINGBUF_ADD_CROSS(buf_widx,rc,CUR_TI->buf_idx);
 
+        if ((unsigned)rc > tracks[track_widx].filerem)
+        {
+            logf("Bad: rc-filerem=%d, fixing", rc-tracks[track_widx].filerem);
+            tracks[track_widx].filesize += rc - tracks[track_widx].filerem;
+            tracks[track_widx].filerem = rc;
+        }
+
         /* Advance buffer */
         buf_widx = RINGBUF_ADD(buf_widx, rc);
         tracks[track_widx].available += rc;
@@ -2883,9 +2890,12 @@ static void audio_rebuffer_and_seek(size_t newpos)
     filling = false;
     audio_initialize_buffer_fill(true);
 
+    /* This may have been tweaked by the id3v1 code */
+    CUR_TI->filesize=filesize(fd);
     if (newpos > conf_preseek)
     {
         CUR_TI->start_pos = newpos - conf_preseek;
+        lseek(current_fd, CUR_TI->start_pos, SEEK_SET);
         CUR_TI->filerem = CUR_TI->filesize - CUR_TI->start_pos;
         real_preseek = conf_preseek;
     } 
@@ -2897,8 +2907,6 @@ static void audio_rebuffer_and_seek(size_t newpos)
     }
 
     CUR_TI->available = 0;
-
-    lseek(current_fd, CUR_TI->start_pos, SEEK_SET);
 
     audio_read_file(real_preseek);
 
