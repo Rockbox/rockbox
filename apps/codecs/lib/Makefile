@@ -33,7 +33,7 @@ OUTPUT = $(BUILDDIR)/libcodec.a
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR+RANLIB $@"
+	@echo "AR+RANLIB $(notdir $@)"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
 	@$(RANLIB) $@
 

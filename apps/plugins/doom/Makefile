@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.8  2006/10/23 14:09:28  markun
+# Revision 1.9  2006/10/23 22:33:36  amiconn
+# Consistent style of 'make' messages. Always use ranlib after ar.
+#
+# Revision 1.8  2006-10-23 14:09:28  markun
 # rearrange compiler options to avoid conflicts with header files on FreeBSD
 #
 # Revision 1.7  2006-10-22 00:21:56  amiconn
@@ -96,7 +99,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $@"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -112,7 +115,7 @@ ifeq ($(SIMVER), sdl)
 # This is the sdl simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $@"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"

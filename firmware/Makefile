@@ -27,7 +27,7 @@ all: $(OUTPUT) $(EXTRA_TARGETS)
 dep: $(DEPFILE)
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
-	@echo "AR+RANLIB $@"
+	@echo "AR+RANLIB $(notdir $@)"
 	$(SILENT)$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	$(SILENT)$(RANLIB) $@
 

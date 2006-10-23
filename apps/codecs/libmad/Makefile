@@ -39,8 +39,9 @@ DIRS =
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR $@"
+	@echo "AR+RANLIB $(notdir $@)"
 	@$(AR) ruv $@ $+ >/dev/null 2>&1
+	@$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 

@@ -95,7 +95,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	@echo "LD $(notdir $@) $^"
+	@echo "LD $(notdir $@)"
 	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -137,7 +137,7 @@ $(BUILDDIR)/libcodec.a:
 	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKCODEC): $(LDS)
-	@echo "build $@"
+	@echo "build $(notdir $@)"
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(BUILDDIR)/libmad.a: libmad

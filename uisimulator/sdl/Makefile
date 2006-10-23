@@ -49,8 +49,9 @@ all: $(OUTFILE)
 include $(TOOLSDIR)/make.inc
 
 $(OUTFILE): $(OBJS) $(BUILDDIR)/UI256.bmp
-	@echo "AR $@"
+	@echo "AR+RANLIB $(notdir $@)"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	@$(RANLIB) $@
 
 clean:
 	@echo "cleaning sim"

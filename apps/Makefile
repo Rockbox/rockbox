@@ -104,11 +104,11 @@ rocks: build-codecs
 	@$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
 
 $(LINKFILE): $(LDS)
-	@echo "Build LDS file"
+	@echo "Build $(notdir $@)"
 	@cat $< | $(CC) -DLOADADDRESS=$(LOADADDRESS) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(LINKROM): $(ROMLDS)
-	@echo "Build LDS file for Rombox"
+	@echo "Build $(notdir $@)"
 	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(MAXOUTFILE):
@@ -118,13 +118,13 @@ $(MAXOUTFILE):
 	@rm $(MAXINFILE)
 
 $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	@echo "LD rombox.elf"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	@echo "LD rockbox.elf"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf

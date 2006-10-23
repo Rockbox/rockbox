@@ -152,7 +152,7 @@ $(BUILDDIR)/libplugin.a:
 	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKFILE): $(LDS)
-	@echo "build $@"
+	@echo "build $(notdir $@)"
 	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(SUBDIRS): $(BITMAPLIBS)

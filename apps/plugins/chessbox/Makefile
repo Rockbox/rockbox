@@ -54,7 +54,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $<"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -70,7 +70,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $<"
+	@echo "LD $(notdir $@)"
 	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"

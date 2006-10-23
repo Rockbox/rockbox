@@ -51,7 +51,7 @@ clean:
 	@$(RM) $(OBJS) *~ core $(DEPFILE) $(OUTFILE)
 
 $(OUTFILE): $(OBJS)
-	@echo "AR+RANLIB $@"
+	@echo "AR+RANLIB $(notdir $@)"
 	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	@$(RANLIB) $@
 
