@@ -328,8 +328,8 @@ rockblox_background.138x110x2.bmp
 
 #ifdef HAVE_LCD_COLOR
 /* Rockpaint */
-rockpaint.bmp
-rockpaint_hsvrgb.bmp
+rockpaint.8x8x24.bmp
+rockpaint_hsvrgb.8x10x24.bmp
 #endif
 
 #if defined( HAVE_LCD_COLOR )
