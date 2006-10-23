@@ -2154,30 +2154,30 @@ static bool audio_read_file(size_t minimum)
             break;
         }
 
-        tracks[track_widx].available += rc;
-        tracks[track_widx].filerem -= rc;
-
         /* How much of the playing track did we overwrite */
         if (buf_widx == CUR_TI->buf_idx)
         {
             /* Special handling; zero or full overlap? */
-            if (CUR_TI->filerem)
-                overlap = rc;
+            if (track_widx == track_ridx && CUR_TI->available == 0)
+                overlap = 0;
             else
-                overlap=0;
+                overlap = rc;
         }
         else
             overlap = RINGBUF_ADD_CROSS(buf_widx,rc,CUR_TI->buf_idx);
 
         /* Advance buffer */
         buf_widx = RINGBUF_ADD(buf_widx, rc);
+        tracks[track_widx].available += rc;
+        tracks[track_widx].filerem -= rc;
 
         /* If we write into the playing track, adjust it's buffer info */
-        if (overlap > 0 && CUR_TI->available != 0) {
+        if (overlap > 0)
+        {
             CUR_TI->buf_idx += overlap;
             CUR_TI->start_pos += overlap;
         }
-            
+
         /* For a rebuffer, fill at least this minimum */
         if (minimum > (unsigned)rc)
             minimum -= rc;
