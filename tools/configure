@@ -1191,22 +1191,6 @@ fi
       toolsdir=$firmdir;
       toolset='';
       apps="manual"
-      case $archos in
-          fmrecorder)
-              archos="recorderv2fm"
-              ;;
-          recorderv2)
-              archos="recorderv2fm"
-              ;;
-          h1??)
-              archos="h1xx"
-              ;;
-          ipodmini2g)
-              archos="ipodmini"
-              ;;        
-          *)
-              ;;
-      esac
       echo "Manual build selected"
       ;; 
     *)
@@ -1214,6 +1198,24 @@ fi
       echo "Normal build selected"
       ;;
 
+  esac
+  # to be able running "make manual" from non-manual configuration
+  case $archos in
+      fmrecorder)
+          manualdev="recorderv2fm"
+          ;;
+      recorderv2)
+          manualdev="recorderv2fm"
+          ;;
+      h1??)
+          manualdev="h1xx"
+          ;;
+      ipodmini2g)
+          manualdev="ipodmini"
+          ;;        
+      *)
+          manualdev=$archos
+          ;;
   esac
 
 if [ -z "$debug" ]; then
@@ -1409,6 +1411,7 @@ sed > Makefile \
  -e "s,@TOOLSET@,${toolset},g" \
  -e "${simmagic1}" \
  -e "${simmagic2}" \
+ -e "s,@MANUALDEV@,${manualdev},g" \
 <<EOF
 ## Automaticly generated. http://www.rockbox.org/
 
@@ -1467,6 +1470,7 @@ export LDOPTS=@LDOPTS@
 export GCCVER=@GCCVER@
 export GCCNUM=@GCCNUM@
 export UNAME=@UNAME@
+export MANUALDEV=@MANUALDEV@
 
 # Do not print "Entering directory ..."
 MAKEFLAGS += --no-print-directory
@@ -1494,7 +1498,8 @@ clean:
 	\$(SILENT)echo Cleaning build directory
 	\$(SILENT)rm -rf rockbox.zip TAGS @APPS@ firmware comsim sim lang.[ch]\
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
-                  @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip
+                  @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
+	          html txt rockbox-manual*.zip
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
@@ -1534,10 +1539,13 @@ gzip: tar
 manual: manual-pdf
 manual-pdf:
 	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-pdf
-
 manual-html:
 	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-html
-
+manual-zhtml: manual-zip
+manual-txt:
+	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-txt
+manual-ztxt:
+	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-txt-zip
 manual-zip:
 	\$(SILENT)\$(MAKE) -C \$(MANUALDIR) OBJDIR=\$(BUILDDIR)/manual manual-zip
 
@@ -1551,6 +1559,7 @@ help:
 	@echo "manual      - builds a manual"
 	@echo "manual-html - HTML manual"
 	@echo "manual-zip  - HTML manual (zipped)"
+	@echo "manual-txt  - txt manual"
 	@echo "fullzip     - creates a rockbox.zip of your build with fonts"
 	@echo "zip         - creates a rockbox.zip of your build (no fonts)"
 	@echo "gzip        - creates a rockbox.tar.gz of your build (no fonts)"
