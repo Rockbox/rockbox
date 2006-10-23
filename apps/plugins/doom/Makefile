@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.7  2006/10/22 00:21:56  amiconn
+# Revision 1.8  2006/10/23 14:09:28  markun
+# rearrange compiler options to avoid conflicts with header files on FreeBSD
+#
+# Revision 1.7  2006-10-22 00:21:56  amiconn
 # Speed up build process in general by using internal functions of make instead of spawning sub-shells where possible.
 #
 # Revision 1.6  2006-09-29 20:04:35  barrywardell
@@ -28,7 +31,7 @@
 
 INCLUDES = -I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)/export \
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
-CFLAGS = $(GCCOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN \
  -Wno-strict-prototypes -O2 $(PROFILE_OPTS)
 
