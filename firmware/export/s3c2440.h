@@ -144,7 +144,7 @@
 #define TCONSEL (*(volatile int *)0x4D000060) /* TCON(LPC3600/LCC3600) control */
 
 /* The following should be computed but for now, we cheat. */
-#define FRAME   ( (volatile short * ) 0x31E00000  ) /* LCD Frame buffer */
+#define FRAME   ( (short *) 0x31E00000  ) /* LCD Frame buffer */
 
 /* NAND Flash */
 

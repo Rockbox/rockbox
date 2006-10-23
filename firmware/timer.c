@@ -167,6 +167,9 @@ static bool timer_set(long cycles, bool start)
     else
         cycles_new = cycles;
 
+#elif CONFIG_CPU == S3C2440  /* TODO: Implement for the Gigabeat */
+    (void)start;
+    (void)cycles;
 #endif /* CONFIG_CPU */
     return true;
 }
@@ -197,7 +200,8 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || cycles == 0)
         return false;
 
-#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101)
+#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101) \
+    || (CONFIG_CPU==S3C2440)
     /* TODO: Implement for iPod and iFP (if possible) */
     (void)int_prio;
 #endif
