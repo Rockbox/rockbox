@@ -509,23 +509,36 @@ enum help solitaire_help( void )
  
 #define CFGFILE_VERSION 0
 
-/* introduce a struct if there's more than one setting */
-int draw_type_disk = 0;
-int draw_type;  
-
-static struct configdata config[] = {
-   { TYPE_INT, 0, 1, &draw_type_disk, "draw_type", NULL, NULL }
+struct sol_config {
+    int draw_type;
+    int auto_unhide;
 };
 
+struct sol_config sol_disk = {0, 0};
+struct sol_config sol;
+
+static struct configdata config[] = {
+   { TYPE_INT, 0, 1, &sol_disk.draw_type, "draw_type", NULL, NULL },
+   { TYPE_INT, 0, 1, &sol_disk.auto_unhide, "auto_unhide", NULL, NULL }
+};
 
 char draw_option_string[32];
+char unhide_option_string[32];
 
 static void create_draw_option_string(void)
 {
-    if (draw_type == 0)
+    if (sol.draw_type == 0)
         rb->strcpy(draw_option_string, "Draw Three Cards");
     else
         rb->strcpy(draw_option_string, "Draw One Card");
+}
+
+static void create_unhide_option_string(void)
+{
+    if (sol.auto_unhide == 0)
+        rb->strcpy(unhide_option_string, "Unhide manually");
+    else
+        rb->strcpy(unhide_option_string, "Unhide automatically");
 }
 
 void solitaire_init(void);
@@ -539,7 +552,7 @@ int solitaire_menu(bool in_game)
     int result = -1;
     int i = 0;
 
-    struct menu_item items[4];
+    struct menu_item items[5];
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background(LCD_DEFAULT_BG);
@@ -556,10 +569,12 @@ int solitaire_menu(bool in_game)
         items[i++].desc = "Start Game";
         items[i++].desc = draw_option_string;
     }
+    items[i++].desc = unhide_option_string;
     items[i++].desc = "Help";
     items[i++].desc = "Quit";
 
     create_draw_option_string();
+    create_unhide_option_string();
     m = rb->menu_init(items, i, NULL, NULL, NULL, NULL);
     while (result < 0)
     {
@@ -585,18 +600,23 @@ int solitaire_menu(bool in_game)
                 }
                 else
                 {
-                    draw_type = (draw_type + 1) % 2;
+                    sol.draw_type = (sol.draw_type + 1) % 2;
                     create_draw_option_string();
                 }
                 break;
 
             case 2:
+                sol.auto_unhide = (sol.auto_unhide + 1) % 2;
+                create_unhide_option_string();
+                break;
+
+            case 3:
                 rb->lcd_setmargins(0, 0);
                 if (solitaire_help() == HELP_USB)
                     result = MENU_USB;
                 break;
 
-            case 3:
+            case 4:
                 result = MENU_QUIT;
                 break;
         }
@@ -667,7 +687,7 @@ void solitaire_init( void )
     int i, j;
 
     /* number of cards that are drawn on the remains' stack (by pressing F2) */
-    if( draw_type == 0 )
+    if( sol.draw_type == 0 )
     {
         cards_per_draw = 3;
     }
@@ -953,6 +973,10 @@ enum move move_card( int dest_col, int src_card )
         else
         {
             deck[src_card_prev].next = NOT_A_CARD;
+            if (sol.auto_unhide)
+            {
+                deck[src_card_prev].known = true;
+            }
         }
     }
     sel_card = NOT_A_CARD;
@@ -1533,9 +1557,10 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
     rb->splash( HZ, true, "Welcome to Solitaire!" );
 
     configfile_init(rb);
-    configfile_load(CONFIG_FILENAME, config, 1, 0);
-    draw_type = draw_type_disk;
-    
+    configfile_load(CONFIG_FILENAME, config,
+                    sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
+    rb->memcpy(&sol, &sol_disk, sizeof(sol));   /* copy to running config */
+
     init_help();
 
     /* play the game :)
@@ -1543,10 +1568,11 @@ enum plugin_status plugin_start( struct plugin_api* api, void* parameter )
      * winning instead of quiting) */
     while( ( result = solitaire() ) == SOLITAIRE_WIN );
     
-    if (draw_type != draw_type_disk)
+    if (rb->memcmp(&sol, &sol_disk, sizeof(sol))) /* save settings if changed */
     {
-        draw_type_disk = draw_type;
-        configfile_save(CONFIG_FILENAME, config, 1, 0);
+        rb->memcpy(&sol_disk, &sol, sizeof(sol));
+        configfile_save(CONFIG_FILENAME, config,
+                        sizeof(config) / sizeof(config[0]), CFGFILE_VERSION);
     }
 
     /* Exit the plugin */
