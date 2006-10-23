@@ -26,7 +26,7 @@
 #include "fmradio_i2c.h" /* physical interface driver */
 
 #define I2C_ADR 0xC0
-static unsigned char write_bytes[5];
+static unsigned char write_bytes[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 /* tuner abstraction layer: set something to the tuner */
 void philips_set(int setting, int value)
@@ -35,20 +35,16 @@ void philips_set(int setting, int value)
     {
         case RADIO_SLEEP:
             /* init values */
-            write_bytes[0] = 0x80; /* mute */
-            write_bytes[1] = 0x00;
-            write_bytes[2] = 0x00;
+            write_bytes[0] |= (1<<7); /* mute */
 #if CONFIG_TUNER_XTAL == 32768
-            write_bytes[3] = 0x1A; /* 32.768kHz, soft mute,
-                                      stereo noise cancelling */
+            /* 32.768kHz, soft mute, stereo noise cancelling */
+            write_bytes[3] |= (1<<4) | (1<<3) | (1<<1);
 #else
-            write_bytes[3] = 0x0A; /* soft mute, stereo noise cancelling */
+            /* soft mute, stereo noise cancelling */
+            write_bytes[3] |= (1<<3) | (1<<1); 
 #endif
-            write_bytes[4] = 0x00;
-            if (value) /* sleep */
-            {
-                write_bytes[3] |= 0x40; /* standby mode */
-            }
+            /* sleep / standby mode */
+            write_bytes[3] &= ~(1<<6) | (value ? (1<<6) : 0);
             break;
 
         case RADIO_FREQUENCY:
@@ -70,17 +66,14 @@ void philips_set(int setting, int value)
 
         case RADIO_FORCE_MONO:
             write_bytes[2] = (write_bytes[2] & 0xF7) | (value ? 0x08 : 0);
-            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
 
         case RADIO_SET_DEEMPHASIS:
             write_bytes[4] = (write_bytes[4] & ~(1<<6)) | (value ? (1<<6) : 0);
-            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
             break;
 
         case RADIO_SET_BAND:
             write_bytes[3] = (write_bytes[3] & ~(1<<5)) | (value ? (1<<5) : 0);
-            fmradio_i2c_write(I2C_ADR, write_bytes, sizeof(write_bytes));
         default:
             return;
     }
