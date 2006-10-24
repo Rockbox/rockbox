@@ -2701,29 +2701,30 @@ static int parse_changelog_line(int line_n, const char *buf, void *parameters)
     if (*buf == '#')
         return 0;
     
+    logf("%d/%s", line_n, buf);
     if (!read_tag(tag_data, sizeof tag_data, buf, "filename"))
     {
         logf("filename missing");
         logf("-> %s", buf);
-        return -1;
+        return 0;
     }
     
     idx_id = find_index(tag_data);
     if (idx_id < 0)
     {
         logf("entry not found");
-        return -2;
+        return 0;
     }
     
     if (!get_index(masterfd, idx_id, &idx, false))
     {
         logf("failed to retrieve index entry");
-        return -3;
+        return 0;
     }
     
     /* Stop if tag has already been modified. */
     if (idx.flag & FLAG_DIRTYNUM)
-        return -4;
+        return 0;
     
     logf("import: %s", tag_data);
     
@@ -2782,7 +2783,7 @@ bool tagcache_import_changelog(void)
     
     filenametag_fd = open_tag_fd(&tch, tag_filename, false);
     
-    fast_readline(filenametag_fd, buf, sizeof buf, (long *)masterfd,
+    fast_readline(clfd, buf, sizeof buf, (long *)masterfd,
                   parse_changelog_line);
     
     close(clfd);
