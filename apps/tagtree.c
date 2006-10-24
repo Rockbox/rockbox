@@ -1351,8 +1351,7 @@ int tagtree_enter(struct tree_context* c)
                         if (csi->clause[i][j]->numeric)
                             csi->clause[i][j]->numeric_data = atoi(searchstring);
                         else
-                            strncpy(csi->clause[i][j]->str, searchstring,
-                                    sizeof(csi->clause[i][j]->str)-1);
+                            csi->clause[i][j]->str = searchstring;
                     }
                 }
             }
