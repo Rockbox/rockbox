@@ -150,7 +150,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause);
 bool tagcache_get_next(struct tagcache_search *tcs);
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
-                       char *buf, long size);
+                       int tag, char *buf, long size);
 void tagcache_search_finish(struct tagcache_search *tcs);
 long tagcache_get_numeric(const struct tagcache_search *tcs, int tag);
 long tagcache_increase_serial(void);

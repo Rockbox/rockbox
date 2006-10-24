@@ -1288,7 +1288,7 @@ bool tagcache_get_next(struct tagcache_search *tcs)
 }
 
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
-                       char *buf, long size)
+                       int tag, char *buf, long size)
 {
     struct index_entry idx;
     
@@ -1296,7 +1296,7 @@ bool tagcache_retrieve(struct tagcache_search *tcs, int idxid,
     if (!get_index(tcs->masterfd, idxid, &idx, true))
         return false;
     
-    return retrieve(tcs, &idx, tcs->type, buf, size);
+    return retrieve(tcs, &idx, tag, buf, size);
 }
 
 #if 0
@@ -2860,7 +2860,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
             }
             
             tcs->type = j;
-            tagcache_retrieve(tcs, i, buf, sizeof buf);
+            tagcache_retrieve(tcs, i, tcs->type, buf, sizeof buf);
             write_tag(clfd, tagcache_tag_to_str(j), buf);
         }
         

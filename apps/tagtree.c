@@ -881,6 +881,86 @@ bool show_search_progress(bool init, int count)
     return true;
 }
 
+int format_str(struct tagcache_search *tcs, struct display_format *fmt,
+               char *buf, int buf_size)
+{
+    char fmtbuf[8];
+    bool read_format = false;
+    int fmtbuf_pos = 0;
+    int parpos = 0;
+    int buf_pos = 0;
+    int i;
+    
+    memset(buf, 0, buf_size);
+    for (i = 0; fmt->formatstr[i] != '\0'; i++)
+    {
+        if (fmt->formatstr[i] == '%')
+        {
+            read_format = true;
+            fmtbuf_pos = 0;
+            if (parpos >= fmt->tag_count)
+            {
+                logf("too many format tags");
+                return -1;
+            }
+        }
+        
+        if (read_format)
+        {
+            fmtbuf[fmtbuf_pos++] = fmt->formatstr[i];
+            if (fmtbuf_pos >= buf_size)
+            {
+                logf("format parse error");
+                return -2;
+            }
+            
+            if (fmt->formatstr[i] == 's')
+            {
+                fmtbuf[fmtbuf_pos] = '\0';
+                read_format = false;
+                if (fmt->tags[parpos] == tcs->type)
+                {
+                    snprintf(&buf[buf_pos], buf_size - buf_pos, fmtbuf, tcs->result);
+                }
+                else
+                {
+                    /* Need to fetch the tag data. */
+                    if (!tagcache_retrieve(tcs, tcs->idx_id, fmt->tags[parpos],
+                                           &buf[buf_pos], buf_size - buf_pos))
+                    {
+                        logf("retrieve failed");
+                        return -3;
+                    }
+                }
+                buf_pos += strlen(&buf[buf_pos]);
+                parpos++;
+            }
+            else if (fmt->formatstr[i] == 'd')
+            {
+                fmtbuf[fmtbuf_pos] = '\0';
+                read_format = false;
+                snprintf(&buf[buf_pos], buf_size - buf_pos, fmtbuf,
+                         tagcache_get_numeric(tcs, fmt->tags[parpos]));
+                buf_pos += strlen(&buf[buf_pos]);
+                parpos++;
+            }
+            continue;
+        }
+        
+        buf[buf_pos++] = fmt->formatstr[i];
+        
+        if (buf_pos - 1 >= buf_size)
+        {
+            logf("buffer overflow");
+            return -4;
+        }
+    }
+    
+    buf[buf_pos++] = '\0';
+    
+    return 0;
+}
+
 int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs, 
                      int offset, bool init)
 {
@@ -1022,73 +1102,19 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         if (!tcs->ramresult || fmt)
         {
             char buf[MAX_PATH];
-            int buf_pos = 0;
             
             if (fmt)
             {
-                char fmtbuf[8];
-                bool read_format = false;
-                int fmtbuf_pos = 0;
-                int parpos = 0;
-                
-                memset(buf, 0, sizeof buf);
-                for (i = 0; fmt->formatstr[i] != '\0'; i++)
+                if (format_str(tcs, fmt, buf, sizeof buf) < 0)
                 {
-                    if (fmt->formatstr[i] == '%')
-                    {
-                        read_format = true;
-                        fmtbuf_pos = 0;
-                        if (parpos >= fmt->tag_count)
-                        {
-                            logf("too many format tags");
-                            return 0;
-                        }
-                    }
-                    
-                    if (read_format)
-                    {
-                        fmtbuf[fmtbuf_pos++] = fmt->formatstr[i];
-                        if (fmtbuf_pos >= (long)sizeof(fmtbuf))
-                        {
-                            logf("format parse error");
-                            return 0;
-                        }
-                        
-                        if (fmt->formatstr[i] == 's')
-                        {
-                            fmtbuf[fmtbuf_pos] = '\0';
-                            read_format = false;
-                            snprintf(&buf[buf_pos], MAX_PATH - buf_pos, fmtbuf, tcs->result);
-                            buf_pos += strlen(&buf[buf_pos]);
-                            parpos++;
-                        }
-                        else if (fmt->formatstr[i] == 'd')
-                        {
-                            fmtbuf[fmtbuf_pos] = '\0';
-                            read_format = false;
-                            snprintf(&buf[buf_pos], MAX_PATH - buf_pos, fmtbuf,
-                                     tagcache_get_numeric(tcs, fmt->tags[parpos]));
-                            buf_pos += strlen(&buf[buf_pos]);
-                            parpos++;
-                        }
-                        continue;
-                    }
-                    
-                    buf[buf_pos++] = fmt->formatstr[i];
-                    
-                    if (buf_pos - 1 >= (long)sizeof(buf))
-                    {
-                        logf("buffer overflow");
-                        return 0;
-                    }
+                    logf("format_str() failed");
+                    return 0;
                 }
-                
-                buf[buf_pos++] = '\0';
             }
             
             dptr->name = &c->name_buffer[namebufused];
             if (fmt)
-                namebufused += buf_pos;
+                namebufused += strlen(buf)+1;
             else
                 namebufused += tcs->result_len;
             
@@ -1401,7 +1427,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     if (!tagcache_search(&tcs, tag_filename))
         return -1;
 
-    if (!tagcache_retrieve(&tcs, entry->extraseek, buf, buflen))
+    if (!tagcache_retrieve(&tcs, entry->extraseek, tcs.type, buf, buflen))
     {
         tagcache_search_finish(&tcs);
         return -2;
@@ -1447,7 +1473,7 @@ bool insert_all_playlist(struct tree_context *c, int position, bool queue)
             break;
         
         if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek, 
-                               buf, sizeof buf))
+                               tcs.type, buf, sizeof buf))
         {
             continue;
         }
