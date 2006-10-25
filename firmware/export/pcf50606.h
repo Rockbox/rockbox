@@ -20,13 +20,14 @@
 #define PCF50606_H
 
 void pcf50606_init(void);
-void pcf50606_i2c_recalc_delay(int cpu_clock);
 int pcf50606_write_multiple(int address, const unsigned char* buf, int count);
 int pcf50606_write(int address, unsigned char val);
 int pcf50606_read_multiple(int address, unsigned char* buf, int count);
 int pcf50606_read(int address);
 
 /* internal low level calls used by the eeprom driver for h300 */
+void pcf50606_i2c_init(void);
+void pcf50606_i2c_recalc_delay(int cpu_clock);
 void pcf50606_i2c_start(void);
 void pcf50606_i2c_stop(void);
 void pcf50606_i2c_ack(bool ack);
@@ -34,4 +35,8 @@ bool pcf50606_i2c_getack(void);
 void pcf50606_i2c_outb(unsigned char byte);
 unsigned char pcf50606_i2c_inb(bool ack);
 
+#if defined(IAUDIO_X5) && !defined(SIMULATOR)
+void pcf50606_reset_timeout(void);
 #endif
+
+#endif /* PCF50606_H */

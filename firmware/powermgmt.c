@@ -59,10 +59,8 @@
 #include <time.h>
 #endif
 
-#ifdef IAUDIO_X5
-#ifndef SIMULATOR
-extern void pcf50606_reset_timeout(void);
-#endif
+#if defined(IAUDIO_X5) && !defined (SIMULATOR)
+#include "pcf50606.h"
 #endif
 
 /*
@@ -1033,12 +1031,10 @@ void cancel_shutdown(void)
 {
     logf("sys_cancel_shutdown()");
 
-#ifdef IAUDIO_X5
-#ifndef SIMULATOR
+#if defined(IAUDIO_X5) && !defined (SIMULATOR)
     /* TODO: Move some things to target/ tree */
     if (shutdown_timeout)
         pcf50606_reset_timeout();
-#endif
 #endif
 
     shutdown_timeout = 0;
@@ -1076,10 +1072,8 @@ void shutdown_hw(void)
     backlight_set_fade_out(0);
 #endif
     backlight_off();
-#endif /* IAUDIO_X5 */
-#ifndef IAUDIO_X5
     lcd_set_contrast(0);
-#endif    
+#endif /* IAUDIO_X5 */
 #ifdef HAVE_REMOTE_LCD
     remote_backlight_off();
     lcd_remote_set_contrast(0);

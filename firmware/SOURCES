@@ -138,9 +138,6 @@ drivers/i2c.c
 #if CONFIG_CODEC != SWCODEC
 drivers/mas.c
 #endif
-#ifdef IRIVER_H300_SERIES
-drivers/pcf50606.c
-#endif
 #ifdef HAVE_EEPROM
 drivers/eeprom_24cxx.c
 #ifdef HAVE_EEPROM_SETTINGS
@@ -242,6 +239,7 @@ target/coldfire/iaudio/x5/power-x5.c
 target/coldfire/iaudio/x5/button-x5.c
 target/coldfire/iaudio/x5/lcd-as-x5.S
 target/coldfire/iaudio/x5/lcd-x5.c
+target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/x5/pcf50606-x5.c
 target/coldfire/iaudio/x5/adc-x5.c
 target/coldfire/iaudio/x5/ata-x5.c
@@ -256,6 +254,8 @@ target/coldfire/iaudio/x5/lcd-remote-x5.c
 #ifdef IRIVER_H300_SERIES
 #ifndef SIMULATOR
 target/coldfire/iriver/h300/lcd-as-h300.S
+target/coldfire/pcf50606-coldfire.c
+target/coldfire/iriver/h300/pcf50606-h300.c
 #endif
 #endif
 
