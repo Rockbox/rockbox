@@ -384,6 +384,7 @@ static unsigned flash_read_word(unsigned addr) {
 
 #endif
 
+#ifndef SIMULATOR
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
@@ -395,7 +396,6 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
 
 {
-#ifndef SIMULATOR
 #if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
     /* TODO: Implement for iPod */
     (void)p_manufacturer;
@@ -463,14 +463,9 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
         return true; /* success */
     }
 #endif
-#else
-    (void) p_manufacturer;
-    (void) p_device;
-    (void) addr1;
-    (void) addr2;
-#endif
     return false; /* fail */
 }
+#endif /* !SIMULATOR */
 
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP

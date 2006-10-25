@@ -44,3 +44,6 @@ flipit_cursor.16x13x1.bmp
 #endif
 
 #endif /* HAVE_LCD_BITMAP */
+#if defined(SIMULATOR) && defined(__APPLE__)
+osx.dummy.bmp
+#endif
