@@ -1577,8 +1577,6 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
     return true;    
 }
 
-#endif /* CONFIG_CODEC == SWCODEC */
-
 static bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
@@ -1648,6 +1646,8 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
     }
     return true;
 }
+#endif /* CONFIG_CODEC == SWCODEC */
+
 
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
@@ -1696,7 +1696,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
     case AFMT_MPA_L1:
     case AFMT_MPA_L2:
     case AFMT_MPA_L3:
-        if (mp3info(&track->id3, trackname, v1first))
+        if (!get_mp3_metadata(fd, &track->id3, trackname, v1first))
         {
             return false;
         }
@@ -1881,7 +1881,6 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
         }
 
         break;
-#endif /* CONFIG_CODEC == SWCODEC */
 
     case AFMT_AIFF:
         if (!get_aiff_metadata(fd, &(track->id3)))
@@ -1891,6 +1890,8 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
         break;
 
+#endif /* CONFIG_CODEC == SWCODEC */
+        
     default:
         /* If we don't know how to read the metadata, assume we can't play 
            the file */

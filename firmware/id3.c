@@ -1035,15 +1035,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
  * Checks all relevant information (such as ID3v1 tag, ID3v2 tag, length etc)
  * about an MP3 file and updates it's entry accordingly.
  *
- */
-bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
+  Note, that this returns true for successful, false for error! */
+bool get_mp3_metadata(int fd, struct mp3entry *entry, const char *filename, bool v1first)
 {
-    int fd;
     int v1found = false;
-
-    fd = open(filename, O_RDONLY);
-    if(-1 == fd)
-        return true;
 
 #if CONFIG_CODEC != SWCODEC
     memset(entry, 0, sizeof(struct mp3entry));
@@ -1074,14 +1069,29 @@ bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
         setid3v1title(fd, entry);
     }
 
-    close(fd);
-
     if(!entry->length || (entry->filesize < 8 ))
         /* no song length or less than 8 bytes is hereby considered to be an
            invalid mp3 and won't be played by us! */
+        return false;
+
+    return true;
+}
+
+/* Note, that this returns false for successful, true for error! */
+bool mp3info(struct mp3entry *entry, const char *filename, bool v1first)
+{
+    int fd;
+    bool result;
+
+    fd = open(filename, O_RDONLY);
+    if (fd < 0)
         return true;
 
-    return false;
+    result = !get_mp3_metadata(fd, entry, filename, v1first);
+
+    close(fd);
+
+    return result;
 }
 
 void adjust_mp3entry(struct mp3entry *entry, void *dest, void *orig)
