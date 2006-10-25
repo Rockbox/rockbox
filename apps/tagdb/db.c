@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include <string.h> // strlen() strcpy() strcat()
 
 #include "malloc.h"
@@ -601,3 +602,4 @@ int tag_info_destruct(struct tag_info *t) {
 
 	return ERR_NONE;
 }
+#endif

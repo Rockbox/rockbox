@@ -419,7 +419,11 @@ static const struct bit_entry hd_bits[] =
 
     /* browser */
     {3, S_O(dirfilter), SHOW_SUPPORTED,
-        "show files", "all,supported,music,playlists,id3 database" },
+        "show files", "all,supported,music,playlists"
+#ifdef HAVE_TAGCACHE
+        ",id3 database" 
+#endif
+        },
     {1, S_O(sort_case), false, "sort case", off_on },
     {1, S_O(browse_current), false, "follow playlist", off_on },
     /* playlist */
@@ -593,10 +597,13 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(dircache), false, "dircache", off_on },
     {22, S_O(dircache_size), 0, NULL, NULL },
 #endif
+
+#ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
     {1, S_O(tagcache_ram), 0, "tagcache_ram", off_on },
 #endif
     {1, S_O(tagcache_autoupdate), 0, "tagcache_autoupdate", off_on },
+#endif
 
     {4, S_O(default_codepage), 0, "default codepage",
         "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,iso8859-9,iso8859-2,sjis,gb2312,ksx1001,big5,utf-8,cp1256" },

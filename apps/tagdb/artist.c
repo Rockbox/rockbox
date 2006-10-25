@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "malloc.h" // realloc() and free()
 #include <string.h> // strncasecmp()
 
@@ -368,3 +369,4 @@ int artist_entry_add_album_file(FILE *fd, struct artist_entry *e, struct artist_
 	
 	return ERR_NO_INPLACE_UPDATE;
 }
+#endif

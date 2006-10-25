@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __SONG_H__
 #define __SONG_H__
 
@@ -90,4 +91,5 @@ int song_size_destruct(struct song_size *s);
  * returns 0 on success, 1 on failure
  */
 
+#endif
 #endif

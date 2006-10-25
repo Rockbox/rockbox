@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "malloc.h" // malloc() and free()
 
 #include "array_buffer.h"
@@ -664,4 +665,4 @@ int array_buffer_write(FILE *fd, struct array_buffer *b) {
 
 	return ERR_NONE;
 }
-
+#endif

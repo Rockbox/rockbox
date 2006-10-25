@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __CONFIG_H	// Include me only once
 #define __CONFIG_H
 
@@ -36,4 +37,5 @@
 
 #include <assert.h>
 
+#endif
 #endif

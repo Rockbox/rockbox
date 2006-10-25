@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "unique.h"
 
 #include <string.h>
@@ -14,3 +15,4 @@ char *create_unique_name(char *buffer, const char *prefix, const char *suffix, i
 
 	return buffer;
 }
+#endif

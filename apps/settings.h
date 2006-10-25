@@ -389,10 +389,12 @@ struct user_settings
     bool dircache;          /* enable directory cache */
     int dircache_size;      /* directory cache structure last size, 22 bits */
 #endif
+#ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
     bool tagcache_ram;        /* load tagcache to ram? */
 #endif
     bool tagcache_autoupdate; /* automatically keep tagcache in sync? */
+#endif
     int default_codepage;   /* set default codepage for tag conversion */
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */

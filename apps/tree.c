@@ -61,7 +61,9 @@
 #include "recorder/recording.h"
 #include "rtc.h"
 #include "dircache.h"
+#ifdef HAVE_TAGCACHE
 #include "tagcache.h"
+#endif
 #include "yesno.h"
 #include "gwps-common.h"
 #include "eeprom_settings.h"
@@ -177,6 +179,7 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
     int attr=0;
+#ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
 
     if (id3db)
@@ -184,6 +187,7 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
         return tagtree_get_entry(&tc, selected_item)->name;
     }
     else 
+#endif
     {
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
@@ -205,11 +209,14 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
 void tree_get_fileicon(int selected_item, void * data, ICON * icon)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
+#ifdef HAVE_TAGCACHE
     bool id3db = *(local_tc->dirfilter) == SHOW_ID3DB;
     if (id3db) {
         *icon = (ICON)tagtree_get_icon(&tc);
     }
-    else {
+    else
+#endif
+		{
         struct entry* dc = local_tc->dircache;
         struct entry* e = &dc[selected_item];
         *icon = (ICON)filetype_get_icon(e->attr);
@@ -304,8 +311,9 @@ int tree_get_file_position(char * filename)
  */
 static int update_dir(void)
 {
+  bool changed = false;
+#ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
-    bool changed = false;
     /* Checks for changes */
     if (id3db) {
         if (tc.currtable != lasttable ||
@@ -322,7 +330,9 @@ static int update_dir(void)
             changed = true;
         }
     }
-    else {
+    else 
+#endif
+		{
         /* if the tc.currdir has been changed, reload it ...*/
         if (strncmp(tc.currdir, lastdir, sizeof(lastdir)) || reload_dir) {
 
@@ -345,12 +355,17 @@ static int update_dir(void)
     }
     if (changed)
     {
-        if(!id3db && (tc.dirfull ||
+        if(
+#ifdef HAVE_TAGCACHE
+		!id3db && 
+#endif
+		(tc.dirfull ||
                       tc.filesindir == global_settings.max_files_in_dir) )
         {
             gui_syncsplash(HZ, true, str(LANG_SHOWDIR_BUFFER_FULL));
         }
     }
+#ifdef HAVE_TAGCACHE
     if (id3db) 
     {
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL
@@ -366,6 +381,7 @@ static int update_dir(void)
         } 
     }
     else
+#endif
     {
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL)
         {
@@ -417,7 +433,9 @@ static int update_dir(void)
 /* load tracks from specified directory to resume play */
 void resume_directory(const char *dir)
 {
+#ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
+#endif
 
     if (ft_load(&tc, dir) < 0)
         return;
@@ -425,8 +443,10 @@ void resume_directory(const char *dir)
 
     ft_build_playlist(&tc, 0);
 
+#ifdef HAVE_TAGCACHE
     if (id3db)
         tagtree_load(&tc);
+#endif
 }
 
 /* Returns the current working directory and also writes cwd to buf if
@@ -504,10 +524,12 @@ void set_current_file(char *path)
     char *name;
     int i;
 
+#ifdef HAVE_TAGCACHE
     /* in ID3DB mode it is a bad idea to call this function */
     /* (only happens with `follow playlist') */
     if( *tc.dirfilter == SHOW_ID3DB )
         return;
+#endif
 
     /* separate directory from filename */
     /* gets the directory's name and put it into tc.currdir */
@@ -552,6 +574,7 @@ void set_current_file(char *path)
     }
 }
 
+#ifdef HAVE_TAGCACHE
 static bool check_changed_id3mode(bool currmode)
 {
     if (currmode != (global_settings.dirfilter == SHOW_ID3DB)) {
@@ -571,6 +594,8 @@ static bool check_changed_id3mode(bool currmode)
     }
     return currmode;
 }
+#endif
+
 /* main loop, handles key events */
 static bool dirbrowse(void)
 {
@@ -586,11 +611,13 @@ static bool dirbrowse(void)
     long thumbnail_time = -1; /* for delaying a thumbnail */
 
     char* currdir = tc.currdir; /* just a shortcut */
+#ifdef HAVE_TAGCACHE
     bool id3db = *tc.dirfilter == SHOW_ID3DB;
 
     if (id3db)
         curr_context=CONTEXT_ID3DB;
     else
+#endif
         curr_context=CONTEXT_TREE;
     tc.selected_item = 0;
     tc.dirlevel=0;
@@ -659,7 +686,11 @@ static bool dirbrowse(void)
                 if ( numentries == 0 )
                     break;
 
+#ifdef HAVE_TAGCACHE
                 switch (id3db?tagtree_enter(&tc):ft_enter(&tc))
+#else
+                switch (ft_enter(&tc))
+#endif
                 {
                     case 1: reload_dir = true; break;
                     case 2: start_wps = true; break;
@@ -677,10 +708,12 @@ static bool dirbrowse(void)
                 /* if we are in /, nothing to do */
                 if (tc.dirlevel == 0 && !strcmp(currdir,"/"))
                     break;
-                
+
+#ifdef HAVE_TAGCACHE
                 if (id3db)
                     tagtree_exit(&tc);
                 else
+#endif
                     if (ft_exit(&tc) == 3)
                         exit_func = true;
                 
@@ -737,9 +770,11 @@ static bool dirbrowse(void)
                         reload_dir = true;
                     restore = true;
 
+#ifdef HAVE_TAGCACHE
                     id3db = check_changed_id3mode(id3db);
                     if(id3db)
                         reload_dir = true;
+#endif
                 }
                 else /* use it as a quick exit instead */
                     exit_func = true;
@@ -769,8 +804,10 @@ static bool dirbrowse(void)
                         reload_dir = true;
                     restore = true;
 
+#ifdef HAVE_TAGCACHE
                     id3db = check_changed_id3mode(id3db);
                     reload_dir = true;
+#endif
                 }
                 break;
 #endif
@@ -794,6 +831,7 @@ static bool dirbrowse(void)
                 if(!numentries)
                     onplay_result = onplay(NULL, 0, curr_context);
                 else {
+#ifdef HAVE_TAGCACHE
                     if (id3db)
                     {
                         if (tagtree_get_attr(&tc) == TREE_ATTR_MPA)
@@ -805,6 +843,7 @@ static bool dirbrowse(void)
                             attr = ATTR_DIRECTORY;
                     }
                     else
+#endif
                     {
                         attr = dircache[tc.selected_item].attr;
 
@@ -843,12 +882,14 @@ static bool dirbrowse(void)
                     int attr;
                     char* name;
 
+#ifdef HAVE_TAGCACHE
                     if (id3db)
                     {
                         attr = tagtree_get_attr(&tc);
                         name = tagtree_get_entry(&tc, lasti)->name;
                     }
                     else
+#endif
                     {
                         attr = dircache[lasti].attr;
                         name = dircache[lasti].name;
@@ -880,7 +921,9 @@ static bool dirbrowse(void)
 
 #ifdef HAVE_HOTSWAP
             case SYS_FS_CHANGED:
+#ifdef HAVE_TAGCACHE
                 if (!id3db)
+#endif
                     reload_dir = true;
                 /* The 'dir no longer valid' situation will be caught later
                  * by checking the showdir() result. */
@@ -916,13 +959,17 @@ static bool dirbrowse(void)
                 reload_dir = true;
 #ifdef HAVE_HOTSWAP
             else
+#ifdef HAVE_TAGCACHE
                 if (!id3db) /* Try reload to catch 'no longer valid' case. */
+#endif
                     reload_dir = true;
 #endif
 #ifdef HAVE_LCD_COLOR
             show_main_backdrop();
 #endif
+#ifdef HAVE_TAGCACHE
             id3db = check_changed_id3mode(id3db);
+#endif
             restore = true;
             start_wps=false;
         }
@@ -985,12 +1032,14 @@ static bool dirbrowse(void)
                     thumbnail_time = -1; /* Cancel whatever we were
                                             about to say */
 
+#ifdef HAVE_TAGCACHE
                     if (id3db)
                     {
                         attr = tagtree_get_attr(&tc);
                         name = tagtree_get_entry(&tc, tc.selected_item)->name;
                     }
                     else
+#endif
                     {
                         attr = dircache[tc.selected_item].attr;
                         name = dircache[tc.selected_item].name;
@@ -1380,7 +1429,9 @@ void ft_play_filename(char *dir, char *file)
 void tree_flush(void)
 {
     scrobbler_shutdown();
+#ifdef HAVE_TAGCACHE
     tagcache_shutdown();
+#endif
     playlist_shutdown();
 
 #ifdef HAVE_TC_RAMCACHE
@@ -1440,6 +1491,8 @@ void tree_restore(void)
         }
     }
 #endif
+#ifdef HAVE_TAGCACHE
     tagcache_start_scan();
+#endif
     scrobbler_init();
 }

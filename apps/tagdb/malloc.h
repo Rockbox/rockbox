@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __MALLOC_H__
 #define __MALLOC_H__
 
@@ -13,4 +14,5 @@ void *do_realloc(void *ptr, size_t size);
 
 void malloc_stats();
 
+#endif
 #endif

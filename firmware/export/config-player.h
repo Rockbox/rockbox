@@ -1,6 +1,9 @@
 /* define this if you have a charcell LCD display */
 #define HAVE_LCD_CHARCELLS 1
 
+/* define this if you would like tagcache to build on this target */
+#define HAVE_TAGCACHE
+
 /* LCD dimensions (for the simulator) */
 #define LCD_WIDTH       132 /* Display width in pixels */
 #define LCD_HEIGHT      64  /* Display height in pixels */

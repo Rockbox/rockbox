@@ -60,8 +60,10 @@
 #include "misc.h"
 #include "database.h"
 #include "dircache.h"
+#ifdef HAVE_TAGCACHE
 #include "tagcache.h"
 #include "tagtree.h"
+#endif
 #include "lang.h"
 #include "string.h"
 #include "splash.h"
@@ -169,6 +171,7 @@ int init_dircache(bool preinit)
 #endif
 }
 
+#ifdef HAVE_TAGCACHE
 void init_tagcache(void)
 {
     bool clear = false;
@@ -204,6 +207,7 @@ void init_tagcache(void)
         show_logo();
     }
 }
+#endif
 
 #ifdef SIMULATOR
 
@@ -230,7 +234,9 @@ void init(void)
     settings_apply();
     init_dircache(true);
     init_dircache(false);
+#ifdef HAVE_TAGCACHE
     init_tagcache();
+#endif
     sleep(HZ/2);
     tree_init();
     playlist_init();
@@ -436,16 +442,19 @@ void init(void)
 #endif
         settings_load(SETTINGS_ALL);
 
-    
     if (init_dircache(true) < 0)
     {
+#ifdef HAVE_TAGCACHE
         remove(TAGCACHE_STATEFILE);
+#endif
     }
     
     gui_sync_wps_init();
     settings_apply();
     init_dircache(false);
+#ifdef HAVE_TAGCACHE
     init_tagcache();
+#endif
 
 #ifdef HAVE_EEPROM_SETTINGS
     if (firmware_settings.initialized)

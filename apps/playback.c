@@ -59,7 +59,9 @@
 #include "buffer.h"
 #include "dsp.h"
 #include "abrepeat.h"
+#ifdef HAVE_TAGCACHE
 #include "tagcache.h"
+#endif
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "peakmeter.h"

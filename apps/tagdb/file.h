@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __FILE_H__
 #define __FILE_H__
 
@@ -82,3 +83,4 @@ int file_size_destruct(struct file_size *s);
  */
 
 #endif
+#ifdef HAVE_TAGCACHE

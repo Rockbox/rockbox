@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "config.h"
 #include "malloc.h"
 
@@ -9,3 +10,4 @@ int tag_dummy(char *file, struct tag_info *t) {
 	strcpy(t->song, file);
 	return ERR_NONE;
 }
+#endif

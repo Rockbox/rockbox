@@ -64,7 +64,9 @@
 #endif
 #include "playlist_menu.h"
 #include "playlist_catalog.h"
+#ifdef HAVE_TAGCACHE
 #include "tagtree.h"
+#endif
 
 static int context;
 static char* selected_file = NULL;
@@ -181,11 +183,13 @@ static bool add_to_playlist(int position, bool queue)
     if (position == PLAYLIST_INSERT_SHUFFLED)
         srand(current_tick);
 
+#ifdef HAVE_TAGCACHE
     if (context == CONTEXT_ID3DB)
     {
         tagtree_insert_selection_playlist(position, queue);
     }
     else
+#endif
     {
         if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_MPA)
             playlist_insert_track(NULL, selected_file, position, queue, true);
@@ -207,7 +211,7 @@ static bool add_to_playlist(int position, bool queue)
         else if ((selected_file_attr & TREE_ATTR_MASK) == TREE_ATTR_M3U)
             playlist_insert_playlist(NULL, selected_file, position, queue);
     }
-    
+	
     if (new_playlist && (playlist_amount() > 0))
     {
         /* nothing is currently playing so begin playing what we just

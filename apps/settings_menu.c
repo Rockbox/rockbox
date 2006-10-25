@@ -49,8 +49,10 @@
 #include "database.h"
 #include "dir.h"
 #include "dircache.h"
+#ifdef HAVE_TAGCACHE
 #include "tagcache.h"
 #include "tagtree.h"
+#endif
 #include "rbunicode.h"
 #include "splash.h"
 #include "yesno.h"
@@ -749,10 +751,17 @@ static bool dir_filter(void)
         { STR(LANG_FILTER_SUPPORTED) },
         { STR(LANG_FILTER_MUSIC) },
         { STR(LANG_FILTER_PLAYLIST) },
+#ifdef HAVE_TAGCACHE
         { STR(LANG_FILTER_ID3DB) }
+#endif
     };
+#ifdef HAVE_TAGCACHE
     return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
                        names, 5, NULL );
+#else
+    return set_option( str(LANG_FILTER), &global_settings.dirfilter, INT,
+                       names, 4, NULL );
+#endif
 }
 
 static bool sort_case(void)
@@ -1632,6 +1641,7 @@ static bool dircache(void)
 }
 #endif /* HAVE_DIRCACHE */
 
+#ifdef HAVE_TAGCACHE
 #ifdef HAVE_TC_RAMCACHE
 static bool tagcache_ram(void)
 {
@@ -1688,6 +1698,7 @@ static bool tagcache_settings_menu(void)
     menu_exit(m);
     return result;
 }
+#endif
 
 #ifdef HAVE_HEADPHONE_DETECTION
 static bool unplug_mode(void)
@@ -1853,7 +1864,9 @@ static bool fileview_settings_menu(void)
         { ID2P(LANG_FOLLOW),                browse_current        },
         { ID2P(LANG_SHOW_ICONS),            show_icons            },
         { ID2P(LANG_SHOW_PATH),             show_path             },
+#ifdef HAVE_TAGCACHE
         { ID2P(LANG_TAGCACHE),              tagcache_settings_menu},
+#endif
     };
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,

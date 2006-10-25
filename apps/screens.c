@@ -574,7 +574,9 @@ bool quick_screen_quick(int button_enter)
         [SHOW_SUPPORTED]={ STR(LANG_SYSFONT_FILTER_SUPPORTED) },
         [SHOW_MUSIC]={ STR(LANG_SYSFONT_FILTER_MUSIC) },
         [SHOW_PLAYLIST]={ STR(LANG_SYSFONT_FILTER_PLAYLIST) },
+#ifdef HAVE_TAGCACHE
         [SHOW_ID3DB]={ STR(LANG_SYSFONT_FILTER_ID3DB) }
+#endif
     };
     static const struct opt_items right_items[] = {
         [REPEAT_OFF]={ STR(LANG_SYSFONT_OFF) },

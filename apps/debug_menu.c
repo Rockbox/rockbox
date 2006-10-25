@@ -41,7 +41,9 @@
 #include "misc.h"
 #include "splash.h"
 #include "dircache.h"
+#ifdef HAVE_TAGCACHE
 #include "tagcache.h"
+#endif
 #include "lcd-remote.h"
 #include "crc32.h"
 #include "logf.h"
@@ -1917,6 +1919,7 @@ static bool dbg_dircache_info(void)
 #endif /* HAVE_DIRCACHE */
 
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_TAGCACHE
 static bool dbg_tagcache_info(void)
 {
     bool done = false;
@@ -1959,6 +1962,7 @@ static bool dbg_tagcache_info(void)
 
     return false;
 }
+#endif
 #endif
 
 #if CONFIG_CPU == SH7034
@@ -2193,7 +2197,9 @@ bool debug_menu(void)
         { "View dircache info", dbg_dircache_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
+#ifdef HAVE_TAGCACHE
         { "View tagcache info", dbg_tagcache_info },
+#endif
 #if CONFIG_CODEC == SWCODEC || !defined(SIMULATOR)
         { "View audio thread", dbg_audio_thread },
 #endif

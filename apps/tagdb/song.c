@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "malloc.h" // realloc() and free()
 #include <string.h> // strncasecmp()
 
@@ -448,3 +449,4 @@ int song_size_destruct(struct song_size *s) {
 	free(s);
 	return ERR_NONE;
 }
+#endif

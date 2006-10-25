@@ -1,4 +1,4 @@
-
+#ifdef HAVE_TAGCACHE
 #include <stdio.h>
 
 #include "header.h"
@@ -119,3 +119,4 @@ int header_write(FILE *fd, const struct header *h) {
 	
 	return ERR_NONE;
 }
+#endif

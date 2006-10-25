@@ -27,7 +27,9 @@ status.c
 talk.c
 #endif
 tree.c
+#ifdef HAVE_TAGCACHE
 tagtree.c
+#endif
 filetree.c
 scrobbler.c
 
@@ -82,7 +84,9 @@ eq_arm.S
 eq_menu.c
 #endif
 metadata.c
+#ifdef HAVE_TAGCACHE
 tagcache.c
+#endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) \
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 keymaps/keymap-h1x0_h3x0.c

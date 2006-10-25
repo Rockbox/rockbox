@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __HEADER_H__
 #define __HEADER_H__
 
@@ -36,4 +37,5 @@ struct header {
 
 int header_write(FILE *fd, const struct header *header);
 
+#endif
 #endif

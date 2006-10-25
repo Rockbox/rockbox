@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __ARTIST_H__
 #define __ARTIST_H__
 
@@ -97,4 +98,5 @@ int artist_entry_add_album_file(FILE *fd, struct artist_entry *e, struct artist_
  *         ERR_FILE on fread()/fwrite() error
  */
 
+#endif
 #endif

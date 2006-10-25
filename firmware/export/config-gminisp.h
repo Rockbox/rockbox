@@ -7,6 +7,9 @@
 /* define this if you can invert the colours on your LCD */
 #define HAVE_LCD_INVERT
 
+/* define this if you would like tagcache to build on this target */
+#define HAVE_TAGCACHE
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64

@@ -16,6 +16,9 @@
 /* define this if you have RTC RAM available for settings */
 #define HAVE_RTC_RAM 1
 
+/* define this if you would like tagcache to build on this target */
+#define HAVE_TAGCACHE
+
 /* LCD dimensions */
 #define LCD_WIDTH  128
 #define LCD_HEIGHT 64

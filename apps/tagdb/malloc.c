@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #include "config.h"
 #include "malloc.h"
 
@@ -129,3 +130,4 @@ void malloc_stats() {
 	printf("  Maximum amount of allocated memory: %dbytes\n", max_total);
 	printf("  Current amount of allocated memory: %dbytes\n", total);
 }
+#endif

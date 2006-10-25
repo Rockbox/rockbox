@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __DB_H__
 #define __DB_H__
 
@@ -34,4 +35,5 @@ struct tag_info* new_tag_info();
 
 int tag_info_destruct(struct tag_info *t);
 
+#endif
 #endif

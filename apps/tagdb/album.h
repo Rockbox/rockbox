@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __ALBUM_H__
 #define __ALBUM_H__
 
@@ -100,4 +101,5 @@ int album_entry_add_song_file(FILE *fd, struct album_entry *e, struct album_size
  *         ERR_FILE on fwrite() failure
  */
 
+#endif
 #endif

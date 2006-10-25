@@ -1,3 +1,4 @@
+#ifdef HAVE_TAGCACHE
 #ifndef __ARRAY_BUFFER_H__
 #define __ARRAY_BUFFER_H__
 
@@ -156,4 +157,5 @@ int array_buffer_write(FILE *fd, struct array_buffer *b);
  * returns 0 on success, 1 on failure
  */
 
+#endif
 #endif

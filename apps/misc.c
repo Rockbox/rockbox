@@ -543,12 +543,14 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef X5_BACKLIGHT_SHUTDOWN
         x5_backlight_shutdown();
 #endif
+#ifdef HAVE_TAGCACHE
         if (!tagcache_prepare_shutdown())
         {
             cancel_shutdown();
             gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
             return false;
         }
+#endif
     
         gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
         

@@ -217,7 +217,9 @@
  * plenty of RAM. Both features can be enabled independently. */
 #if (MEMORYSIZE > 8 || MEM > 8) && !defined(BOOTLOADER)
 #define HAVE_DIRCACHE
+#ifdef HAVE_TAGCACHE
 #define HAVE_TC_RAMCACHE
+#endif
 #endif
 
 #if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR) && !defined(BOOTLOADER)
