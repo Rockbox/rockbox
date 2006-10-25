@@ -1157,6 +1157,33 @@ bool dbg_ports(void)
             return false;
     }
 
+#elif CONFIG_CPU == PP5002
+    unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
+
+    char buf[128];
+    int line;
+
+    lcd_setmargins(0, 0);
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(1)
+    {
+        gpio_a = GPIOA_INPUT_VAL;
+        gpio_b = GPIOB_INPUT_VAL;
+        gpio_c = GPIOC_INPUT_VAL;
+        gpio_d = GPIOD_INPUT_VAL;
+
+        line = 0;
+        snprintf(buf, sizeof(buf), "GPIO_A: %02x GPIO_B: %02x", gpio_a, gpio_b);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "GPIO_C: %02x GPIO_D: %02x", gpio_c, gpio_d);
+        lcd_puts(0, line++, buf);
+
+        lcd_update();
+        if (action_userabort(HZ/10))
+            return false;
+    }
 #endif /* CPU */
     return false;
 }
@@ -2159,7 +2186,7 @@ bool debug_menu(void)
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Dump ROM contents", dbg_save_roms },
 #endif
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5020)
+#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP)
         { "View I/O ports", dbg_ports },
 #endif
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
