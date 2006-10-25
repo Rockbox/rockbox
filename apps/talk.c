@@ -377,7 +377,10 @@ static int shutup(void)
     /* nothing to do, was frame boundary or not our clip */
 #if CONFIG_CODEC == SWCODEC
     mp3_play_abort();
+#else
+    mp3_play_stop();
 #endif
+
     queue_write = queue_read = 0; /* reset the queue */
     
     return 0;
