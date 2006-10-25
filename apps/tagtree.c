@@ -407,6 +407,12 @@ static int add_format(const char *buf)
         
         while (1)
         {
+            if (clause_count >= TAGCACHE_MAX_CLAUSES)
+            {
+                logf("too many clauses");
+                break;
+            }
+            
             formats[format_count]->clause[clause_count] = 
                 buffer_alloc(sizeof(struct tagcache_search_clause));
             
@@ -690,6 +696,8 @@ int parse_line(int n, const char *buf, void *parameters)
     
     (void)parameters;
     
+    logf("parse:%d/%s", n, buf);
+    
     /* First line, do initialisation. */
     if (n == 0)
     {
@@ -735,7 +743,7 @@ int parse_line(int n, const char *buf, void *parameters)
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
                     logf("%include empty");
-                    return false;
+                    return 0;
                 }
             
                 if (!parse_menu(data))
@@ -748,7 +756,7 @@ int parse_line(int n, const char *buf, void *parameters)
                 if (menu_count >= TAGMENU_MAX_MENUS)
                 {
                     logf("max menucount reached");
-                    return false;
+                    return 0;
                 }
             
                 menus[menu_count] = buffer_alloc(sizeof(struct root_menu));
@@ -757,13 +765,14 @@ int parse_line(int n, const char *buf, void *parameters)
                 if (get_token_str(menu->id, sizeof(menu->id)) < 0)
                 {
                     logf("%menu_start id empty");
-                    return false;
+                    return 0;
                 }
                 if (get_token_str(menu->title, sizeof(menu->title)) < 0)
                 {
                     logf("%menu_start title empty");
-                    return false;
+                    return 0;
                 }
+                logf("menu: %s", menu->title);
                 menu->itemcount = 0;
                 read_menu = true;
                 break;
@@ -776,7 +785,7 @@ int parse_line(int n, const char *buf, void *parameters)
                 if (get_token_str(data, sizeof(data)) < 0)
                 {
                     logf("%root_menu empty");
-                    return false;
+                    return 0;
                 }
                 
                 for (i = 0; i < menu_count; i++)
@@ -818,7 +827,7 @@ int parse_line(int n, const char *buf, void *parameters)
 static bool parse_menu(const char *filename)
 {
     int fd;
-    char buf[256];
+    char buf[1024];
 
     if (menu_count >= TAGMENU_MAX_MENUS)
     {

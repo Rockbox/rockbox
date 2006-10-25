@@ -58,7 +58,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_STRICT_ALIGN 1
 
 #define TAGCACHE_MAX_FILTERS 4
-#define TAGCACHE_MAX_CLAUSES 16
+#define TAGCACHE_MAX_CLAUSES 32
 
 /* Tag database files. */
 #define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/tagcache_tmp.tcd"
