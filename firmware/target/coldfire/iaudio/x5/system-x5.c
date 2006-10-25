@@ -22,6 +22,7 @@
 #include "system.h"
 #include "power.h"
 #include "timer.h"
+#include "pcf50606.h"
 
 #define MAX_REFRESH_TIMER     59
 #define NORMAL_REFRESH_TIMER  21
