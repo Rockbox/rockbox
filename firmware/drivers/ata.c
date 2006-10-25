@@ -1412,20 +1412,13 @@ void ata_poweroff(bool enable)
 
 bool ata_disk_is_active(void)
 {
-#ifdef IPOD_NANO
-    return false;
-#else
     return !sleeping;
-#endif
 }
 
 static int ata_perform_sleep(void)
 {
     int ret = 0;
 
-    /* ATA sleep is currently broken on Nano, and will hang all subsequent
-     accesses, so disable until we find a cure. */
-#ifndef IPOD_NANO 
     mutex_lock(&ata_mtx);
 
     SET_REG(ATA_SELECT, ata_device);
@@ -1446,7 +1439,6 @@ static int ata_perform_sleep(void)
 
     sleeping = true;
     mutex_unlock(&ata_mtx);
-#endif
     return ret;
 }
 
@@ -1569,6 +1561,12 @@ int ata_hard_reset(void)
 
 static int perform_soft_reset(void)
 {
+/* If this code is allowed to run on a Nano, the next reads from the flash will
+ * time out, so we disable it. It shouldn't be necessary anyway, since the
+ * ATA -> Flash interface automatically sleeps almost immediately after the
+ * last command.
+ */
+#ifndef IPOD_NANO
     int ret;
     int retry_count;
     
@@ -1590,6 +1588,9 @@ static int perform_soft_reset(void)
     ret = ret?0:-1;
 
     return ret;
+#else
+    return 0; /* Always report success */
+#endif
 }
 
 int ata_soft_reset(void)
