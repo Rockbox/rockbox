@@ -328,6 +328,14 @@ void mp3_play_stop(void)
 #endif
 }
 
+void mp3_play_abort(void)
+{
+#ifdef PLAYBACK_VOICE
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
+    queue_post(&voice_queue, Q_VOICE_STOP, (void *)1);
+#endif
+}
+
 bool mp3_pause_done(void)
 {
     return pcm_is_paused();
@@ -952,6 +960,10 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
 
             case Q_VOICE_STOP:
                 LOGFQUEUE("voice < Q_VOICE_STOP");
+                if (ev.data == (void *)1 && !playing && pcm_is_playing())
+                    /* Aborting: Slight hack - flush PCM buffer if
+                       only being used for voice */
+                    pcmbuf_play_stop();
                 if (voice_is_playing)
                 {
                     /* Clear the current buffer */
@@ -980,10 +992,6 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 LOGFQUEUE("voice < Q_VOICE_PLAY");
                 if (!voice_is_playing)
                 {
-                    /* Slight hack - flush PCM buffer if only being used for voice */
-                    if (!playing && pcm_is_playing())
-                        pcmbuf_play_stop();
-
                     /* Set up new voice data */
                     struct voice_info *voice_data;
                     voice_is_playing = true;
@@ -3018,7 +3026,7 @@ static void audio_play_start(size_t offset)
 
 
 /* Invalidates all but currently playing track. */
-void audio_invalidate_tracks(void)
+static void audio_invalidate_tracks(void)
 {
     if (audio_have_tracks()) {
         last_peek_offset = 0;

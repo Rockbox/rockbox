@@ -318,14 +318,20 @@ re_check:
 /* stop the playback and the pending clips, but at frame boundary */
 static int shutup(void)
 {
+#if CONFIG_CODEC != SWCODEC
     unsigned char* pos;
     unsigned char* search;
     unsigned char* end;
+#endif
 
     if (QUEUE_LEVEL == 0) /* has ended anyway */
     {
+#if CONFIG_CODEC == SWCODEC
+        mp3_play_abort();
+#endif
         return 0;
     }
+#if CONFIG_CODEC != SWCODEC
 #if CONFIG_CPU == SH7034
     CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
 #endif
@@ -366,9 +372,12 @@ static int shutup(void)
             return 0;
         }
     }
+#endif
 
     /* nothing to do, was frame boundary or not our clip */
-    mp3_play_stop();
+#if CONFIG_CODEC == SWCODEC
+    mp3_play_abort();
+#endif
     queue_write = queue_read = 0; /* reset the queue */
     
     return 0;
