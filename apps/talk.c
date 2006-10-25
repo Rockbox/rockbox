@@ -311,11 +311,10 @@ re_check:
     else
     {
         *size = 0; /* end of data */
-        mp3_play_stop(); /* fixme: should be done by caller */
     }
 }
 
-/* stop the playback and the pending clips, but at frame boundary */
+/* stop the playback and the pending clips */
 static int shutup(void)
 {
 #if CONFIG_CODEC != SWCODEC
@@ -327,7 +326,7 @@ static int shutup(void)
     if (QUEUE_LEVEL == 0) /* has ended anyway */
     {
 #if CONFIG_CODEC == SWCODEC
-        mp3_play_abort();
+        mp3_play_stop();
 #endif
         return 0;
     }
@@ -375,11 +374,7 @@ static int shutup(void)
 #endif
 
     /* nothing to do, was frame boundary or not our clip */
-#if CONFIG_CODEC == SWCODEC
-    mp3_play_abort();
-#else
     mp3_play_stop();
-#endif
 
     queue_write = queue_read = 0; /* reset the queue */
     

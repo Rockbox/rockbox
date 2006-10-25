@@ -324,14 +324,6 @@ void mp3_play_stop(void)
 {
 #ifdef PLAYBACK_VOICE
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
-    queue_post(&voice_queue, Q_VOICE_STOP, 0);
-#endif
-}
-
-void mp3_play_abort(void)
-{
-#ifdef PLAYBACK_VOICE
-    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, (void *)1);
 #endif
 }
@@ -445,6 +437,15 @@ bool audio_has_changed_track(void)
 void audio_play(long offset)
 {
     logf("audio_play");
+
+#ifdef PLAYBACK_VOICE
+    /* Truncate any existing voice output so we don't have spelling
+     * etc. over the first part of the played track */
+    LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
+    queue_post(&voice_queue, Q_VOICE_STOP, (void *)1);
+#endif
+
+    /* Start playback */
     if (playing && offset <= 0)
     {
         LOGFQUEUE("audio > audio Q_AUDIO_NEW_PLAYLIST");
@@ -457,14 +458,19 @@ void audio_play(long offset)
         LOGFQUEUE("audio > audio Q_AUDIO_PLAY");
         queue_post(&audio_queue, Q_AUDIO_PLAY, (void *)offset);
     }
+
+    /* Don't return until playback has actually started */
     while (!playing)
         yield();
 }
 
 void audio_stop(void)
 {
+    /* Stop playback */
     LOGFQUEUE("audio > audio Q_AUDIO_STOP");
     queue_post(&audio_queue, Q_AUDIO_STOP, 0);
+
+    /* Don't return until playback has actually stopped */
     while(playing)
         yield();
 }
