@@ -277,7 +277,7 @@ while(<WPS>) {
             }
             else {
                 #print "(${wps_prefix}-${rwidth}x${rheight}x$rdepth) "; 
-                print "Skip $wps due to size restraints\n";
+                #print "Skip $wps due to size restraints\n";
             }
             $within = 0;
         }
