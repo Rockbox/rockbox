@@ -2657,7 +2657,7 @@ static void audio_fill_file_buffer(
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
-    if (!audio_initialize_buffer_fill(start_play))
+    if (!audio_initialize_buffer_fill(!start_play))
         return ;
 
     /* If we have a partially buffered track, continue loading,
