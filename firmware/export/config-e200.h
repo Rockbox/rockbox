@@ -25,7 +25,7 @@
 #define LCD_WIDTH  176
 #define LCD_HEIGHT 220
 #define LCD_DEPTH  16   /* 65536 colours */
-#define LCD_PIXELFORMAT RGB565SWAPPED /* rgb565 byte-swapped */
+#define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 /* #define IRAM_LCDFRAMEBUFFER IDATA_ATTR *//* put the lcd frame buffer in IRAM */
 
