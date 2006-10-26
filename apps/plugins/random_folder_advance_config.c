@@ -50,6 +50,8 @@ struct file_format *list = NULL;
 
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 
 #endif

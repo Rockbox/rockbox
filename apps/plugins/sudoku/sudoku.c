@@ -129,7 +129,8 @@ static const char default_game[9][9] =
 #define CELL_WIDTH  12
 #define CELL_HEIGHT 12
 
-#elif (LCD_HEIGHT==176) && (LCD_WIDTH==220)
+#elif ((LCD_HEIGHT==176) && (LCD_WIDTH==220)) || \
+      ((LCD_HEIGHT==220) && (LCD_WIDTH==176))
 /* Iriver h300, iPod Color/Photo - 220x176, 9 cells @ 16x16 with 14 border lines */
 
 /* Internal dimensions of a cell */

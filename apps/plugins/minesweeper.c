@@ -105,6 +105,17 @@ enum minesweeper_status {
 #   define MINESWP_RIGHT    (BUTTON_SELECT | BUTTON_RIGHT)
 #   define MINESWP_LEFT     (BUTTON_SELECT | BUTTON_LEFT)
 
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#   define MINESWP_UP       BUTTON_UP
+#   define MINESWP_DOWN     BUTTON_DOWN
+#   define MINESWP_QUIT     BUTTON_POWER
+#   define MINESWP_START    BUTTON_SELECT
+#   define MINESWP_TOGGLE   BUTTON_REC
+#   define MINESWP_DISCOVER BUTTON_SELECT
+#   define MINESWP_INFO     (BUTTON_REC|BUTTON_REPEAT)
+#   define MINESWP_RIGHT    (BUTTON_SELECT | BUTTON_RIGHT)
+#   define MINESWP_LEFT     (BUTTON_SELECT | BUTTON_LEFT)
+
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define MINESWP_UP       BUTTON_SCROLL_UP
 #   define MINESWP_DOWN     BUTTON_SCROLL_DOWN
@@ -424,6 +435,8 @@ enum minesweeper_status menu( void )
             "REC to start"
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
             "FF to start"
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+            "SELECT to start"
 #else
             ""
 #       warning Please define help string for this keypad.

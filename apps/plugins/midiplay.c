@@ -54,6 +54,13 @@ PLUGIN_HEADER
 #define BTN_UP           BUTTON_VOL_UP
 #define BTN_DOWN         BUTTON_VOL_DOWN
 
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD)
+#define BTN_QUIT         BUTTON_POWER
+#define BTN_RIGHT        BUTTON_RIGHT
+#define BTN_UP           BUTTON_UP
+#define BTN_DOWN         BUTTON_DOWN
+
+
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
 #define BTN_QUIT         BUTTON_POWER
 #define BTN_RIGHT        BUTTON_RIGHT

@@ -71,6 +71,11 @@ static int total_offset = 0;
 #define MPEG_STOP       BUTTON_POWER
 #define MPEG_PAUSE      BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define MPEG_MENU       BUTTON_SELECT
+#define MPEG_STOP       BUTTON_POWER
+#define MPEG_PAUSE      BUTTON_UP
+
 #else
 #error MPEGPLAYER: Unsupported keypad
 #endif

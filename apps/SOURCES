@@ -107,4 +107,6 @@ keymaps/keymap-gigabeat.c
 keymaps/keymap-h10.c
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 keymaps/keymap-ifp7xx.c
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+keymaps/keymap-e200.c
 #endif

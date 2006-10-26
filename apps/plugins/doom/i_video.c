@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.24  2006/09/05 00:23:06  barrywardell
+ * Revision 1.25  2006/10/26 13:38:04  barrywardell
+ * Allow the Sansa e200 UI simulator to be built. Thanks to Andre Smith for the nice image of the Sansa. Lots more to be done including testing and tweaking the keymaps and modifying the plugins for the Sansa's 176x220 LCD.
+ *
+ * Revision 1.24  2006-09-05 00:23:06  barrywardell
  * Fix not being able to exit Doom on the H10.
  *
  * Revision 1.23  2006-08-10 18:34:43  amiconn
@@ -171,6 +174,16 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_ESC     BUTTON_POWER
 #define DOOMBUTTON_ENTER   BUTTON_REW
 #define DOOMBUTTON_WEAPON  BUTTON_FF
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#define DOOMBUTTON_UP      BUTTON_UP
+#define DOOMBUTTON_DOWN    BUTTON_DOWN
+#define DOOMBUTTON_LEFT    BUTTON_LEFT
+#define DOOMBUTTON_RIGHT   BUTTON_RIGHT
+#define DOOMBUTTON_SHOOT   BUTTON_SELECT
+#define DOOMBUTTON_OPEN    BUTTON_REC
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_ENTER   BUTTON_SCROLL_UP
+#define DOOMBUTTON_WEAPON  BUTTON_SCROLL_DOWN
 #else
 #define DOOMBUTTON_UP      BUTTON_UP
 #define DOOMBUTTON_DOWN    BUTTON_DOWN

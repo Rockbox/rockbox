@@ -99,6 +99,17 @@
 #define KBD_UP BUTTON_SCROLL_UP
 #define KBD_DOWN BUTTON_SCROLL_DOWN
 
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+
+/* TODO: Check keyboard mappings */
+
+#define KBD_SELECT BUTTON_SELECT
+#define KBD_ABORT BUTTON_POWER
+#define KBD_LEFT BUTTON_LEFT
+#define KBD_RIGHT BUTTON_RIGHT
+#define KBD_UP BUTTON_UP
+#define KBD_DOWN BUTTON_DOWN
+
 #endif
 
 

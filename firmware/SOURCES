@@ -227,10 +227,12 @@ drivers/m5636.c
 #endif
 
 #ifdef SANSA_E200
+#ifndef SIMULATOR
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/adc-e200.c
 target/arm/wmcodec-pp.c
+#endif
 #endif
 
 #ifdef IAUDIO_X5

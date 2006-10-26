@@ -10,7 +10,7 @@ logo.c
 metronome.c
 mosaique.c
 random_folder_advance_config.c
-#if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64))
+#if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64)) && !defined(SANSA_E200)
 rockblox.c
 #endif
 rockbox_flash.c
@@ -41,16 +41,20 @@ mandelbrot.c
 plasma.c
 
 bounce.c
+#ifndef SANSA_E200
 bubbles.c
+#endif
 
-#if LCD_WIDTH != 128 
+#if LCD_WIDTH != 128  && !defined(SANSA_E200)
 /* These need adjusting for the iRiver if'p screen */
 brickmania.c
 #endif
 calculator.c
 chip8.c
 demystify.c
+#ifndef SANSA_E200
 jewels.c
+#endif
 minesweeper.c
 oscilloscope.c
 pong.c
@@ -65,7 +69,7 @@ starfield.c
 video.c
 #endif
 vu_meter.c
-#ifndef IRIVER_H10_5GB
+#if !defined(IRIVER_H10_5GB) && !defined(SANSA_E200)
 wormlet.c
 #endif
 
@@ -87,9 +91,9 @@ rockboy.c
 #if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
 xobox.c
 #endif
-
+#if !defined(SANSA_E200)
 spacerocks.c
-
+#endif
 #if LCD_DEPTH >= 16
 rockpaint.c
 #endif
