@@ -686,8 +686,8 @@ void audio_preinit(void)
     track_buffer_callback = NULL;
     track_unbuffer_callback = NULL;
     track_changed_callback = NULL;
-    /* Just to prevent CUR_TI from being anything random. */
-    track_ridx = 0;
+    track_ridx = 0; /* Just to prevent CUR_TI from being anything random. */
+    prev_ti = &tracks[MAX_TRACK-1]; /* And prevent prev_ti being random too */
 
     mutex_init(&mutex_codecthread);
 
@@ -1198,6 +1198,7 @@ static void* codec_get_memory_callback(size_t *size)
 static void codec_pcmbuf_position_callback(size_t size) ICODE_ATTR;
 static void codec_pcmbuf_position_callback(size_t size) 
 {
+    /* This is called from an ISR, so be quick */
     unsigned int time = size * 1000 / 4 / NATIVE_FREQUENCY +
         prev_ti->id3.elapsed;
     
@@ -2656,7 +2657,7 @@ static void audio_fill_file_buffer(
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
-    if (!audio_initialize_buffer_fill(!start_play))
+    if (!audio_initialize_buffer_fill(start_play))
         return ;
 
     /* If we have a partially buffered track, continue loading,
