@@ -7,7 +7,6 @@ dict.c
 favorites.c
 firmware_flash.c
 logo.c
-metronome.c
 mosaique.c
 random_folder_advance_config.c
 #if (LCD_WIDTH != 240) && ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64)) && !defined(SANSA_E200)
@@ -21,6 +20,11 @@ stats.c
 stopwatch.c
 vbrfix.c
 viewer.c
+
+/* plugins built for all targets, but not for the simulator */
+#if !defined(SIMULATOR)
+metronome.c
+#endif
 
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)) && !defined(SIMULATOR)
 wavplay.c

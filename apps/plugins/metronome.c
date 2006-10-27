@@ -18,8 +18,6 @@
  ****************************************************************************/
 #include "plugin.h"
 
-#if !defined(SIMULATOR)
-
 PLUGIN_HEADER
 
 /* variable button definitions */
@@ -1081,4 +1079,4 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
         }
     }
 }
-#endif /* #ifndef SIMULATOR */
+
