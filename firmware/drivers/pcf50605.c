@@ -85,7 +85,7 @@ int pcf50605_read_multiple(int address, unsigned char* buf, int count)
 
 int pcf50605_write(int address, unsigned char val)
 {
-    ipod_i2c_send(0x8, address, val);
+    pp_i2c_send(0x8, address, val);
     return 0;
 }
 

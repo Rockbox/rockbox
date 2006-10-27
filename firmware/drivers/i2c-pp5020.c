@@ -49,7 +49,7 @@
 
 #define POLL_TIMEOUT (HZ)
 
-static int ipod_i2c_wait_not_busy(void)
+static int pp_i2c_wait_not_busy(void)
 {
     unsigned long timeout;
     timeout = current_tick + POLL_TIMEOUT;
@@ -63,9 +63,9 @@ static int ipod_i2c_wait_not_busy(void)
     return -1;
 }
 
-static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
+static int pp_i2c_read_byte(unsigned int addr, unsigned int *data)
 {
-    if (ipod_i2c_wait_not_busy() < 0)
+    if (pp_i2c_wait_not_busy() < 0)
     {
         return -1;
     }
@@ -82,7 +82,7 @@ static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
         outb(inb(IPOD_I2C_CTRL) | IPOD_I2C_SEND, IPOD_I2C_CTRL);
 
         set_irq_level(old_irq_level);
-        if (ipod_i2c_wait_not_busy() < 0)
+        if (pp_i2c_wait_not_busy() < 0)
         {
             return -1;
         }
@@ -99,7 +99,7 @@ static int ipod_i2c_read_byte(unsigned int addr, unsigned int *data)
     return 0;
 }
 
-static int ipod_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
+static int pp_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned char *data)
 {
     int data_addr;
     unsigned int i;
@@ -109,7 +109,7 @@ static int ipod_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned cha
         return -1;
     }
 
-    if (ipod_i2c_wait_not_busy() < 0)
+    if (pp_i2c_wait_not_busy() < 0)
     {
         return -2;
     }
@@ -139,13 +139,13 @@ static int ipod_i2c_send_bytes(unsigned int addr, unsigned int len, unsigned cha
     return 0x0;
 }
 
-static int ipod_i2c_send_byte(unsigned int addr, int data0)
+static int pp_i2c_send_byte(unsigned int addr, int data0)
 {
     unsigned char data[1];
 
     data[0] = data0;
 
-    return ipod_i2c_send_bytes(addr, 1, data);
+    return pp_i2c_send_bytes(addr, 1, data);
 }
 
 /* Public functions */
@@ -155,9 +155,9 @@ int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data)
     unsigned int temp;
     int i;
     mutex_lock(&i2c_mutex);
-    ipod_i2c_send_byte(dev_addr, addr);
+    pp_i2c_send_byte(dev_addr, addr);
     for (i = 0; i < len; i++) {
-        ipod_i2c_read_byte(dev_addr, &temp);
+        pp_i2c_read_byte(dev_addr, &temp);
         data[i] = temp;
     }
     mutex_unlock(&i2c_mutex);
@@ -169,14 +169,14 @@ int i2c_readbyte(unsigned int dev_addr, int addr)
     int data;
 
     mutex_lock(&i2c_mutex);
-    ipod_i2c_send_byte(dev_addr, addr);
-    ipod_i2c_read_byte(dev_addr, &data);
+    pp_i2c_send_byte(dev_addr, addr);
+    pp_i2c_read_byte(dev_addr, &data);
     mutex_unlock(&i2c_mutex);
 
     return data;
 }
 
-int ipod_i2c_send(unsigned int addr, int data0, int data1)
+int pp_i2c_send(unsigned int addr, int data0, int data1)
 {
         int retval;
         unsigned char data[2];
@@ -185,7 +185,7 @@ int ipod_i2c_send(unsigned int addr, int data0, int data1)
         data[1] = data1;
 
         mutex_lock(&i2c_mutex);
-        retval = ipod_i2c_send_bytes(addr, 2, data);
+        retval = pp_i2c_send_bytes(addr, 2, data);
         mutex_unlock(&i2c_mutex);
 
         return retval;

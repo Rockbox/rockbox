@@ -67,7 +67,7 @@ int rtc_write_datetime(unsigned char* buf)
     buf[4]=tmp;
 
     for (i=0;i<7;i++){
-        ipod_i2c_send(0x51, 0x02+i,buf[i]);
+        pp_i2c_send(0x51, 0x02+i,buf[i]);
     }
     return 1;
 }

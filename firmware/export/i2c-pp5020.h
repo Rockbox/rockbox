@@ -29,7 +29,7 @@
 
 void i2c_init(void);
 int i2c_readbyte(unsigned int dev_addr, int addr);
-int ipod_i2c_send(unsigned int addr, int data0, int data1);
+int pp_i2c_send(unsigned int addr, int data0, int data1);
 int i2c_readbytes(unsigned int dev_addr, int addr, int len, unsigned char *data);
 
 #endif
