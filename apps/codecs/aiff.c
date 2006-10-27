@@ -83,7 +83,6 @@ enum codec_status codec_start(struct codec_api *api)
 
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
-    ci->configure(DSP_DITHER, (bool *)false);
   
 next_track:
     if (codec_init(api)) {

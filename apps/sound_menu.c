@@ -219,6 +219,15 @@ static bool crossfeed_menu(void)
 
     return result;
 }
+
+static bool dithering_enable(void)
+{
+    return set_bool_options(str(LANG_DITHERING),
+                            &global_settings.dithering_enabled, 
+                            STR(LANG_SET_BOOL_YES), 
+                            STR(LANG_SET_BOOL_NO), 
+                            dsp_dither_enable);
+}
 #endif
 
 #if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
@@ -635,6 +644,7 @@ bool sound_menu(void)
 #if CONFIG_CODEC == SWCODEC
         { ID2P(LANG_CROSSFEED), crossfeed_menu },
         { ID2P(LANG_EQUALIZER), eq_menu },
+        { ID2P(LANG_DITHERING), dithering_enable },
 #endif
 #ifdef HAVE_WM8758
         { ID2P(LANG_EQUALIZER_HARDWARE), eq_hw_menu },

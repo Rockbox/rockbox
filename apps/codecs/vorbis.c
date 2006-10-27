@@ -129,7 +129,6 @@ enum codec_status codec_start(struct codec_api *api)
     rb->memset(iedata, 0, iend - iedata);
     #endif
 
-    rb->configure(DSP_DITHER, (bool *)false);
     rb->configure(DSP_SET_SAMPLE_DEPTH, (long *)24);
     rb->configure(DSP_SET_CLIP_MAX, (long *)((1 << 24) - 1));
     rb->configure(DSP_SET_CLIP_MIN, (long *)-((1 << 24) - 1));

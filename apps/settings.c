@@ -96,7 +96,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 54
+#define CONFIG_BLOCK_VERSION 55
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -591,6 +591,9 @@ static const struct bit_entry hd_bits[] =
     {9|SIGNED, S_O(eq_band2_gain), 0, "eq band 2 gain", NULL },
     {9|SIGNED, S_O(eq_band3_gain), 0, "eq band 3 gain", NULL },
     {9|SIGNED, S_O(eq_band4_gain), 0, "eq band 4 gain", NULL },
+
+    /* dithering */
+    {1, S_O(dithering_enabled), false, "dithering enabled", off_on },
 #endif
 
 #ifdef HAVE_DIRCACHE
@@ -1274,6 +1277,8 @@ void settings_apply(void)
     for(i = 0; i < 5; i++) {
         dsp_set_eq_coefs(i);
     }
+
+    dsp_dither_enable(global_settings.dithering_enabled);
 #endif
 
 #ifdef HAVE_WM8758

@@ -141,7 +141,6 @@ enum codec_status codec_start(struct codec_api *api)
     ci->memset(iedata, 0, iend - iedata);
     #endif
 
-    ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*128));

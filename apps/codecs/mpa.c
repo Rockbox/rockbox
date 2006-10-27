@@ -95,7 +95,6 @@ enum codec_status codec_start(struct codec_api *api)
 
     /* Create a decoder instance */
 
-    ci->configure(DSP_DITHER, (bool *)false);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (int *)(MAD_F_FRACBITS));
     ci->configure(DSP_SET_CLIP_MIN, (int *)-MAD_F_ONE);
     ci->configure(DSP_SET_CLIP_MAX, (int *)(MAD_F_ONE - 1));

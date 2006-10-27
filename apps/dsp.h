@@ -39,7 +39,6 @@ enum {
     DSP_SET_SAMPLE_DEPTH,
     DSP_SET_STEREO_MODE,
     DSP_RESET,
-    DSP_DITHER,
     DSP_SET_TRACK_GAIN,
     DSP_SET_ALBUM_GAIN,
     DSP_SET_TRACK_PEAK,
@@ -63,5 +62,6 @@ void sound_set_pitch(int r);
 int sound_get_pitch(void);
 void channels_set(int value);
 void stereo_width_set(int value);
+void dsp_dither_enable(bool enable);
 
 #endif

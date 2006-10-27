@@ -435,6 +435,8 @@ struct user_settings
     int eq_band4_cutoff;        /* Hz */
     int eq_band4_q;
     int eq_band4_gain;          /* +/- dB */
+
+    bool dithering_enabled;
 #endif
 
 #ifdef HAVE_LCD_COLOR

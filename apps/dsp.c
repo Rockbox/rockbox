@@ -32,10 +32,6 @@
 #include <dsp_asm.h>
 #endif
 
-/* The "dither" code to convert the 24-bit samples produced by libmad was
- * taken from the coolplayer project - coolplayer.sourceforge.net
- */
-
 /* 16-bit samples are scaled based on these constants. The shift should be
  * no more than 15.
  */
@@ -180,6 +176,8 @@ struct dsp_config
     int stereo_mode;
     int frac_bits;
     bool dither_enabled;
+    long dither_bias;
+    long dither_mask;
     bool new_gain;
     bool crossfeed_enabled;
     bool eq_enabled;
@@ -397,7 +395,7 @@ static long upsample(int32_t **dst, int32_t **src, int count, struct resample_da
     int i = 0, j;
     int pos;
     int num_channels = dsp->stereo_mode == STEREO_MONO ? 1 : 2;
-    
+      
     while ((pos = phase >> 16) == 0)
     {
        for (j = 0; j < num_channels; j++)
@@ -479,40 +477,60 @@ static inline long clip_sample(int32_t sample, int32_t min, int32_t max)
  * taken from the coolplayer project - coolplayer.sourceforge.net
  */
 
-static long dither_sample(int32_t sample, int32_t bias, int32_t mask,
-    struct dither_data* dither)
+void dsp_dither_enable(bool enable)
 {
-    int32_t output;
+    dsp->dither_enabled = enable;
+}
+
+static void dither_init(void)
+{
+    memset(&dither_data[0], 0, sizeof(dither_data));
+    memset(&dither_data[1], 0, sizeof(dither_data));
+    dsp->dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
+    dsp->dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
+}
+
+static void dither_samples(int32_t* src, int num, struct dither_data* dither)
+{
+    int32_t output, sample;
     int32_t random;
-    int32_t min;
-    int32_t max;
+    int32_t min, max;
+    long mask = dsp->dither_mask;
+    long bias = dsp->dither_bias;
+    int i;
+    
+    for (i = 0; i < num; ++i) {
+        /* Noise shape and bias */
+        sample = src[i];
+        sample += dither->error[0] - dither->error[1] + dither->error[2];
+        dither->error[2] = dither->error[1];
+        dither->error[1] = dither->error[0]/2;
 
-    /* Noise shape and bias */
+        output = sample + bias;
 
-    sample += dither->error[0] - dither->error[1] + dither->error[2];
-    dither->error[2] = dither->error[1];
-    dither->error[1] = dither->error[0] / 2;
+        /* Dither */
+        random = dither->random*0x0019660dL + 0x3c6ef35fL;
+        output += (random & mask) - (dither->random & mask);
+        dither->random = random;
 
-    output = sample + bias;
+        /* Clip and quantize */
+        min = dsp->clip_min;
+        max = dsp->clip_max;
+        if (output > max) {
+            output = max;
+            if (sample > max)
+                sample = max;
+        } else if (output < min) {
+            output = min;
+            if (sample < min)
+                sample = min;
+        }
+        output &= ~mask;
 
-    /* Dither */
-
-    random = dither->random * 0x0019660dL + 0x3c6ef35fL;
-    sample += (random & mask) - (dither->random & mask);
-    dither->random = random;
-
-    /* Clip and quantize */
-
-    min = dsp->clip_min;
-    max = dsp->clip_max;
-    sample = clip_sample(sample, min, max);
-    output = clip_sample(output, min, max) & ~mask;
-
-    /* Error feedback */
-
-    dither->error[0] = sample - output;
-
-    return output;
+        /* Error feedback */
+        dither->error[0] = sample - output;
+        src[i] = output;
+    }
 }
 
 void dsp_set_crossfeed(bool enable)
@@ -740,7 +758,7 @@ static void apply_gain(int32_t* _src[], int _count)
 
 void channels_set(int value)
 {
-    channels_mode =  value;    
+    channels_mode = value;
 }
 
 void stereo_width_set(int value)
@@ -811,15 +829,13 @@ static void write_samples(short* dst, int32_t* src[], int count)
 
     if (dsp->dither_enabled)
     {
-        long bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
-        long mask = (1L << scale) - 1;
+        dither_samples(src[0], count, &dither_data[0]);
+        dither_samples(src[1], count, &dither_data[1]);
 
         while (count-- > 0)
         {
-            *dst++ = (short) (dither_sample(*s0++, bias, mask, &dither_data[0])
-                >> scale);
-            *dst++ = (short) (dither_sample(*s1++, bias, mask, &dither_data[1])
-                >> scale);
+            *dst++ = (short) (*s0++ >> scale);
+            *dst++ = (short) (*s1++ >> scale);
         }
     }
     else
@@ -980,7 +996,7 @@ bool dsp_configure(int setting, void *value)
         /* Fall through!!! */
     case DSP_SWITCH_FREQUENCY:
         dsp->codec_frequency = ((long) value == 0) ? NATIVE_FREQUENCY : (long) value;
-        /* Account for playback speed adjustment when settingg dsp->frequency
+        /* Account for playback speed adjustment when setting dsp->frequency
            if we're called from the main audio thread. Voice UI thread should
            not need this feature.
          */
@@ -1001,7 +1017,7 @@ bool dsp_configure(int setting, void *value)
 
     case DSP_SET_SAMPLE_DEPTH:
         dsp->sample_depth = (long) value;
-
+ 
         if (dsp->sample_depth <= NATIVE_DEPTH)
         {
             dsp->frac_bits = WORD_FRACBITS;
@@ -1017,6 +1033,7 @@ bool dsp_configure(int setting, void *value)
             dsp->clip_min = -(1 << (long)value);
         }
 
+        dither_init(); 
         break;
 
     case DSP_SET_STEREO_MODE:
@@ -1024,7 +1041,6 @@ bool dsp_configure(int setting, void *value)
         break;
 
     case DSP_RESET:
-        dsp->dither_enabled = false;
         dsp->stereo_mode = STEREO_NONINTERLEAVED;
         dsp->clip_max =  ((1 << WORD_FRACBITS) - 1);
         dsp->clip_min = -((1 << WORD_FRACBITS));
@@ -1036,11 +1052,6 @@ bool dsp_configure(int setting, void *value)
         dsp->sample_depth = NATIVE_DEPTH;
         dsp->frac_bits = WORD_FRACBITS;
         dsp->new_gain = true;
-        break;
-
-    case DSP_DITHER:
-        memset(dither_data, 0, sizeof(dither_data));
-        dsp->dither_enabled = (bool) value;
         break;
 
     case DSP_SET_TRACK_GAIN:
