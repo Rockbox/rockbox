@@ -80,54 +80,6 @@
 #define SET_REG(reg,val) reg = ((val) << 8)
 #define SET_16BITREG(reg,val) reg = (val)
 
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-
-/* Plain C read & write loops */
-#define PREFER_C_READING
-#define PREFER_C_WRITING
-
-#if (CONFIG_CPU == PP5002)
-#define ATA_IOBASE      0xc00031e0
-#define ATA_CONTROL     (*((volatile unsigned char*)(0xc00033f8)))
-#elif (CONFIG_CPU == PP5020)
-#define ATA_IOBASE      0xc30001e0
-#define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
-#endif
-
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
-#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
-#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x08)))
-#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0x0c)))
-#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x10)))
-#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
-#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x18)))
-#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x1c)))
-
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-#define ERROR_ABRT      0x04
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
-
-#define READ_PATTERN1_MASK 0xff
-#define READ_PATTERN2_MASK 0xff
-#define READ_PATTERN3_MASK 0xff
-#define READ_PATTERN4_MASK 0xff
-
-#define SET_REG(reg,val) reg = (val)
-#define SET_16BITREG(reg,val) reg = (val)
-
 #elif CONFIG_CPU == SH7034
 
 /* asm optimised read & write loops */
@@ -1685,9 +1637,6 @@ void ata_enable(bool on)
     or_l(0x00040000, &GPIO_FUNCTION);
 #elif CONFIG_CPU == TCC730
 
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-    /* TODO: Implement ata_enable() */
-    (void)on;
 #endif
 }
 #endif
@@ -1841,12 +1790,6 @@ int ata_init(void)
     bool coldstart = (P1 & 0x80) == 0;
 #elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
-#elif (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-    bool coldstart = false;
-    /* TODO: Implement coldstart variable */
-#elif defined(TOSHIBA_GIGABEAT_F)
-    /* TODO */
-    bool coldstart = true;
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif
@@ -1876,20 +1819,6 @@ int ata_init(void)
     or_l(0x00080000, &GPIO_FUNCTION);
 
     /* FYI: The IDECONFIGx registers are set by set_cpu_frequency() */
-#elif CONFIG_CPU == PP5002
-    /* From ipod-ide.c:ipod_ide_register() */
-    outl(inl(0xc0003024) | (1 << 7), 0xc0003024);
-    outl(inl(0xc0003024) & ~(1<<2), 0xc0003024);
-
-    outl(0x10, 0xc0003000);
-    outl(0x80002150, 0xc0003004);
-#elif CONFIG_CPU == PP5020
-    /* From ipod-ide.c:ipod_ide_register() */
-    outl(inl(0xc3000028) | (1 << 5), 0xc3000028);
-    outl(inl(0xc3000028) & ~0x10000000, 0xc3000028);
-
-    outl(0x10, 0xc3000000);
-    outl(0x80002150, 0xc3000004);
 #endif
 
     sleeping = false;
