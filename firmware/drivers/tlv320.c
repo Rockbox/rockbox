@@ -51,13 +51,13 @@ void tlv320_write_reg(unsigned reg, unsigned value)
 
     /* The register address is the high 7 bits and the data the low 9 bits */
     data[0] = (reg << 1) | ((value >> 8) & 1);
-    data[1] = value; 
+    data[1] = value;
 
     if (i2c_write(I2C_IFACE_0, TLV320_ADDR, data, 2) != 2)
     {
         logf("tlv320 error reg=0x%x", reg);
         return;
-    } 
+    }
 
     tlv320_regs[reg] = value;
 }
@@ -135,19 +135,19 @@ void tlv320_set_recvol(int left, int right, int type)
     if (type == AUDIO_GAIN_MIC)
     {
         unsigned value_aap = tlv320_regs[REG_AAP];
-        
+
         if (left)
             value_aap |= AAP_MICB;  /* Enable mic boost (20dB) */
         else
             value_aap &= ~AAP_MICB;
 
-        tlv320_write_reg(REG_AAP, value_aap);            
-        
+        tlv320_write_reg(REG_AAP, value_aap);
+
     }
     else if (type == AUDIO_GAIN_LINEIN)
     {
         tlv320_write_reg(REG_LLIV, LLIV_LIV(left));
-        tlv320_write_reg(REG_RLIV, RLIV_RIV(right));    
+        tlv320_write_reg(REG_RLIV, RLIV_RIV(right));
     }
 }
 
@@ -190,11 +190,11 @@ void tlv320_enable_recording(bool source_mic)
 {
     unsigned value_daif = tlv320_regs[REG_DAIF];
     unsigned value_aap, value_pc;
-    
+
     if (source_mic)
     {
         /* select MIC and enable mic boost (20 dB) */
-        value_aap = AAP_DAC | AAP_INSEL | AAP_MICB;   
+        value_aap = AAP_DAC | AAP_INSEL | AAP_MICB;
         value_pc = PC_LINE;                 /* power down LINE */
     }
     else
@@ -207,10 +207,10 @@ void tlv320_enable_recording(bool source_mic)
     tlv320_write_reg(REG_AAP, value_aap);
 
     /* Enable MASTER mode (start sending I2S data to the CPU) */
-    value_daif |= DAIF_MS;                   
+    value_daif |= DAIF_MS;
     tlv320_write_reg(REG_DAIF, value_daif);
 }
-  
+
 void tlv320_disable_recording()
 {
     unsigned value_pc = tlv320_regs[REG_PC];
@@ -219,12 +219,12 @@ void tlv320_disable_recording()
 
     value_daif &= ~DAIF_MS;                /* disable MASTER mode */
     tlv320_write_reg(REG_DAIF, value_daif);
-    
+
     value_aap |= AAP_MICM;                 /* mute MIC */
     tlv320_write_reg(REG_PC, value_aap);
 
     value_pc |= PC_ADC | PC_MIC | PC_LINE; /* ADC, MIC and LINE off */
-    tlv320_write_reg(REG_PC, value_pc);    
+    tlv320_write_reg(REG_PC, value_pc);
 }
 
 void tlv320_set_monitor(bool enable)
@@ -233,13 +233,14 @@ void tlv320_set_monitor(bool enable)
 
     if (enable)
     {
-        value_aap = AAP_BYPASS | AAP_MICM;
-        value_pc = PC_DAC | PC_ADC | PC_MIC; /* DAC, ADC and MIC off */
+        /* Keep DAC on to allow mixing of voice with analog audio */
+        value_aap = AAP_DAC | AAP_BYPASS | AAP_MICM;
+        value_pc  = PC_ADC | PC_MIC; /* ADC and MIC off */
     }
     else
     {
         value_aap = AAP_DAC | AAP_MICM;
-        value_pc = PC_ADC | PC_MIC | PC_LINE; /* ADC, MIC and LINE off */
+        value_pc  = PC_ADC | PC_MIC | PC_LINE; /* ADC, MIC and LINE off */
     }
 
     tlv320_write_reg(REG_AAP, value_aap);
