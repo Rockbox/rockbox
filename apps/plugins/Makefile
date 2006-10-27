@@ -67,27 +67,32 @@ $(DEPFILE): $(BITMAPLIBS)
 dep: $(DEPFILE)
 
 $(BUILDDIR)/credits.raw: $(DOCSDIR)/CREDITS
-	@echo "create credits.raw"
-	$(SILENT)perl credits.pl < $< > $@
+	$(call PRINTS,create credits.raw)perl credits.pl < $< > $@
 
 $(OBJDIR)/credits.o: credits.c $(BUILDDIR)/credits.raw
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "CC $<"
-	$(SILENT)$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
+	$(call PRINTS,CC $(<F))$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
-build-bitmaps:
-	$(SILENT)$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
+build-bitmapsmono:
+	$(call PRINTS,MAKE in plugins/bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
-$(BITMAPLIBS): build-bitmaps
+build-bitmapsnative:
+	$(call PRINTS,MAKE in plugins/bitmaps/native)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+
+build-bitmapsremotemono:
+	$(call PRINTS,MAKE in plugins/bitmaps/remote_mono)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+
+build-bitmapsremotenative:
+	$(call PRINTS,MAKE in plugins/bitmaps/remote_native)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+
+$(BITMAPLIBS): $(BUILDDIR)/libplugin%.a: build-%
 
 ifndef SIMVER
 $(OBJDIR)/%.elf: $(OBJDIR)/%.o $(LINKFILE) $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $< -L$(BUILDDIR) $(CODECLIBS) -lplugin $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,--gc-sections -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.elf
-	@echo "OBJCOPY $(notdir $@)"
-	$(SILENT)$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
@@ -95,8 +100,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -111,8 +115,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR)  $(CODECLIBS) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -128,8 +131,7 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OBJDIR)/%.rock : $(OBJDIR)/%.o  $(BUILDDIR)/libplugin.a $(BITMAPLIBS)
-	@echo "DLL $(notdir $@)"
-	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(BUILDDIR)/libplugin.a $(BITMAPLIBS) \
                 $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
@@ -147,23 +149,19 @@ endif # end of simulator section
 include $(TOOLSDIR)/make.inc
 
 $(BUILDDIR)/libplugin.a:
-	@echo "MAKE in plugin/lib"
 	$(SILENT)mkdir -p $(OBJDIR)/lib
-	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
+	$(call PRINTS,MAKE in plugin/lib)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKFILE): $(LDS)
-	@echo "build $(notdir $@)"
-	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
+	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(SUBDIRS): $(BITMAPLIBS)
-	@echo "MAKE in $@"
 	$(SILENT)mkdir -p $(OBJDIR)/$@
-	$(SILENT)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ \
+	$(call PRINTS,MAKE in $@)$(MAKE) -C $@ OUTDIR=$(OBJDIR) OBJDIR=$(OBJDIR)/$@ \
                                LINKBITMAPS="$(LINKBITMAPS)" BITMAPLIBS="$(BITMAPLIBS)"
 
 clean:
-	@echo "cleaning plugins"
-	$(SILENT)rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
+	$(call PRINTS,cleaning plugins)rm -f $(ROCKS) $(LINKFILE) $(OBJDIR)/*.rock $(DEPFILE) $(ELFS) \
 	$(BUILDDIR)/credits.raw $(OBJS) $(DEFS)
 	$(SILENT)$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
 	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono

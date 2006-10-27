@@ -47,12 +47,10 @@ all: $(OUTFILE)
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning commonsim"
-	@$(RM) $(OBJS) *~ core $(DEPFILE) $(OUTFILE)
+	$(call PRINTS,cleaning commonsim)$(RM) $(OBJS) *~ core $(DEPFILE) $(OUTFILE)
 
 $(OUTFILE): $(OBJS)
-	@echo "AR+RANLIB $(notdir $@)"
-	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@
 
 -include $(DEPFILE)

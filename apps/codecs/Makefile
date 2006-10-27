@@ -66,12 +66,10 @@ $(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o
 $(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a
 
 $(OBJDIR)/%.elf:
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
-	@echo "OBJCOPY $(notdir $@)"
-	$(SILENT)$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
@@ -79,8 +77,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -95,8 +92,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -112,8 +108,7 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	@echo "DLL $(notdir $@)"
-	$(SILENT)$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
+	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
 	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< \
 		$(BUILDDIR)/libcodec.a $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) \
 		-o $@
@@ -132,85 +127,72 @@ endif # end of simulator section
 include $(TOOLSDIR)/make.inc
 
 $(BUILDDIR)/libcodec.a:
-	@echo "MAKE in codecs/lib"
 	$(SILENT)mkdir -p $(OBJDIR)/lib
-	$(SILENT)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
+	$(call PRINTS,MAKE in codecs/lib)$(MAKE) -C lib OBJDIR=$(OBJDIR)/lib
 
 $(LINKCODEC): $(LDS)
-	@echo "build $(notdir $@)"
-	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
+	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) -DCODEC $(INCLUDES) $(TARGET) $(DEFINES) -E -P - >$@
 
 $(BUILDDIR)/libmad.a: libmad
 
 libmad:
-	@echo "MAKE in libmad"
 	$(SILENT)mkdir -p $(OBJDIR)/libmad
-	$(SILENT)$(MAKE) -C libmad OBJDIR=$(OBJDIR)/libmad OUTPUT=$(BUILDDIR)/libmad.a
+	$(call PRINTS,MAKE in libmad)$(MAKE) -C libmad OBJDIR=$(OBJDIR)/libmad OUTPUT=$(BUILDDIR)/libmad.a
 
 $(BUILDDIR)/liba52.a: liba52
 
 liba52:
-	@echo "MAKE in liba52"
 	$(SILENT)mkdir -p $(OBJDIR)/liba52
-	$(SILENT)$(MAKE) -C liba52 OBJDIR=$(OBJDIR)/liba52 OUTPUT=$(BUILDDIR)/liba52.a
+	$(call PRINTS,MAKE in liba52)$(MAKE) -C liba52 OBJDIR=$(OBJDIR)/liba52 OUTPUT=$(BUILDDIR)/liba52.a
 
 $(BUILDDIR)/libffmpegFLAC.a: libffmpegFLAC
 
 libffmpegFLAC:
-	@echo "MAKE in libffmpegFLAC"
 	$(SILENT)mkdir -p $(OBJDIR)/libffmpegFLAC
-	$(SILENT)$(MAKE) -C libffmpegFLAC OBJDIR=$(OBJDIR)/libffmpegFLAC OUTPUT=$(BUILDDIR)/libffmpegFLAC.a
+	$(call PRINTS,MAKE in libffmpegFLAC)$(MAKE) -C libffmpegFLAC OBJDIR=$(OBJDIR)/libffmpegFLAC OUTPUT=$(BUILDDIR)/libffmpegFLAC.a
 
 $(BUILDDIR)/libTremor.a: libTremor
 
 libTremor:
-	@echo "MAKE in Tremor"
 	$(SILENT)mkdir -p $(OBJDIR)/Tremor
-	$(SILENT)$(MAKE) -C Tremor OBJDIR=$(OBJDIR)/Tremor OUTPUT=$(BUILDDIR)/libTremor.a
+	$(call PRINTS,MAKE in Tremor)$(MAKE) -C Tremor OBJDIR=$(OBJDIR)/Tremor OUTPUT=$(BUILDDIR)/libTremor.a
 
 $(BUILDDIR)/libwavpack.a: libwavpack
 
 libwavpack:
-	@echo "MAKE in libwavpack"
 	$(SILENT)mkdir -p $(OBJDIR)/libwavpack
-	$(SILENT)$(MAKE) -C libwavpack OBJDIR=$(OBJDIR)/libwavpack OUTPUT=$(BUILDDIR)/libwavpack.a
+	$(call PRINTS,MAKE in libwavpack)$(MAKE) -C libwavpack OBJDIR=$(OBJDIR)/libwavpack OUTPUT=$(BUILDDIR)/libwavpack.a
 
 dumb:
-	@echo "MAKE in dumb"
 	$(SILENT)mkdir -p $(OBJDIR)/dumb
-	$(SILENT)$(MAKE) -C dumb OBJDIR=$(OBJDIR)/dumb LIBDIR=$(BUILDDIR) OFLAGS="$(CFLAGS)"
+	$(call PRINTS,MAKE in dumb)$(MAKE) -C dumb OBJDIR=$(OBJDIR)/dumb LIBDIR=$(BUILDDIR) OFLAGS="$(CFLAGS)"
 
 $(BUILDDIR)/libmusepack.a: libmusepack
 
 libmusepack:
-	@echo "MAKE in libmusepack"
 	$(SILENT)mkdir -p $(OBJDIR)/libmusepack
-	$(SILENT)$(MAKE) -C libmusepack OBJDIR=$(OBJDIR)/libmusepack OUTPUT=$(BUILDDIR)/libmusepack.a
+	$(call PRINTS,MAKE in libmusepack)$(MAKE) -C libmusepack OBJDIR=$(OBJDIR)/libmusepack OUTPUT=$(BUILDDIR)/libmusepack.a
 
 $(BUILDDIR)/libalac.a: libalac
 
 libalac:
-	@echo "MAKE in libalac"
 	$(SILENT)mkdir -p $(OBJDIR)/libalac
-	$(SILENT)$(MAKE) -C libalac OBJDIR=$(OBJDIR)/libalac OUTPUT=$(BUILDDIR)/libalac.a
+	$(call PRINTS,MAKE in libalac)$(MAKE) -C libalac OBJDIR=$(OBJDIR)/libalac OUTPUT=$(BUILDDIR)/libalac.a
 
 $(BUILDDIR)/libm4a.a: libm4a
 
 libm4a:
-	@echo "MAKE in libm4a"
 	$(SILENT)mkdir -p $(OBJDIR)/libm4a
-	$(SILENT)$(MAKE) -C libm4a OBJDIR=$(OBJDIR)/libm4a OUTPUT=$(BUILDDIR)/libm4a.a
+	$(call PRINTS,MAKE in libm4a)$(MAKE) -C libm4a OBJDIR=$(OBJDIR)/libm4a OUTPUT=$(BUILDDIR)/libm4a.a
 
 $(BUILDDIR)/libfaad.a: libfaad
 
 libfaad:
-	@echo "MAKE in libfaad"
 	$(SILENT)mkdir -p $(OBJDIR)/libfaad
-	$(SILENT)$(MAKE) -C libfaad OBJDIR=$(OBJDIR)/libfaad OUTPUT=$(BUILDDIR)/libfaad.a
+	$(call PRINTS,MAKE in libfaad)$(MAKE) -C libfaad OBJDIR=$(OBJDIR)/libfaad OUTPUT=$(BUILDDIR)/libfaad.a
 
 clean:
-	@echo "cleaning codecs"
-	$(SILENT)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
+	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
 	$(SILENT)$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	$(SILENT)$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	$(SILENT)$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC

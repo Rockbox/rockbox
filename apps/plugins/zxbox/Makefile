@@ -43,13 +43,11 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/zxbox.elf: $(OBJS) $(LINKFILE)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/zxbox.map
 
 $(OUTPUT): $(OBJDIR)/zxbox.elf
-	@echo "OBJCOPY $(notdir $@)"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), sdl)
@@ -57,8 +55,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -76,14 +73,12 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build $(notdir $@)"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
+	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
 	$(DEFINES) -E -P - >$@
 
 clean:
-	@echo "cleaning zxbox"
-	@rm -rf $(OBJDIR)/zxbox
-	@rm -f $(OBJDIR)/zxbox.* $(DEPFILE)
+	$(call PRINTS,cleaning zxbox)rm -rf $(OBJDIR)/zxbox
+	$(SILENT)rm -f $(OBJDIR)/zxbox.* $(DEPFILE)
 
 -include $(DEPFILE)
 

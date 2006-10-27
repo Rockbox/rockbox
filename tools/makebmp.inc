@@ -5,17 +5,16 @@ dep: $(DEPFILE)
 ifndef V
 SILENT=@
 endif
+PRINTS=$(info $(1))$(SILENT)
 
 $(OBJDIR)/%.c: %.bmp
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)mkdir -p $(BMPINCDIR)
-	@echo BMP2RB $<
-	$(SILENT)$(BMP2RB) -h $(BMPINCDIR) $< > $@
+	$(call PRINTS,BMP2RB $<)$(BMP2RB) -h $(BMPINCDIR) $< > $@
 
 $(OBJDIR)/%.o: $(OBJDIR)/%.c
 	$(SILENT)mkdir -p $(dir $@)
-	@echo CC $(notdir $<)
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(<F))$(CC) $(CFLAGS) -c $< -o $@
 
 $(DEPFILE): SOURCES
 	$(SILENT)mkdir -p $(dir $(DEPFILE))
@@ -30,6 +29,5 @@ $(DEPFILE): SOURCES
         done)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR+RANLIB $(notdir $@)"
-	@$(AR) ruv $@ $+ >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $+ >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@

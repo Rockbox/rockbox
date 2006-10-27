@@ -26,8 +26,7 @@ BMPINCDIR = $(BUILDDIR)/bitmaps
 include $(TOOLSDIR)/makebmp.inc
 
 clean:
-	@echo "cleaning bitmaps/remote_native"
-	@rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
-	@rmdir $(OBJDIR)
+	$(call PRINTS,cleaning bitmaps/remote_native)rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(SILENT)rmdir $(OBJDIR)
 
 -include $(DEPFILE)

@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.9  2006/10/23 22:33:36  amiconn
+# Revision 1.10  2006/10/27 21:47:55  amiconn
+# Next step of Makefile tuning: * Use 'make' internal commands for printing messages. Saves build time especially on cygwin. * SILENT variable used in more places. * Bitmap build system uses one Makefille less.
+#
+# Revision 1.9  2006-10-23 22:33:36  amiconn
 # Consistent style of 'make' messages. Always use ranlib after ar.
 #
 # Revision 1.8  2006-10-23 14:09:28  markun
@@ -85,13 +88,11 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/doom.elf: $(OBJS) $(LINKFILE)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(GCCOPTS) $(LDFLAGS) -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) $(LDFLAGS) -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/doom.map
 
 $(OUTPUT): $(OBJDIR)/doom.elf
-	@echo "OBJCOPY $(notdir $@)"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
@@ -99,8 +100,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -115,8 +115,7 @@ ifeq ($(SIMVER), sdl)
 # This is the sdl simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -132,9 +131,8 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OUTPUT): $(OBJS)
-	@echo "DLL $(notdir $@)"
-	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
+	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
+	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
                 $(BUILDDIR)/libplugin.a -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -153,13 +151,11 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build $(notdir $@)"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) \
+	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) \
          -E -P - >$@
 
 clean:
-	@echo "cleaning doom"
-	@rm -rf $(OBJDIR)/doom
-	@rm -f $(OBJDIR)/doom.* $(DEPFILE)
+	$(call PRINTS,cleaning doom)rm -rf $(OBJDIR)/doom
+	$(SILENT)rm -f $(OBJDIR)/doom.* $(DEPFILE)
 
 -include $(DEPFILE)

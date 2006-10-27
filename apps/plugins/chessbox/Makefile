@@ -40,13 +40,11 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/chessbox.elf: $(OBJS) $(LINKFILE) $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
            $(LINKBITMAPS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/chessbox.map
 
 $(OUTPUT): $(OBJDIR)/chessbox.elf
-	@echo "OBJCOPY $(notdir $@)"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 else
 
 ifeq ($(SIMVER), x11)
@@ -54,8 +52,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -70,8 +67,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin $(LINKBITMAPS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -87,9 +83,8 @@ DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
 $(OUTPUT): $(OBJS)
-	@echo "DLL $(notdir $@)"
-	@$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
-	@$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
+	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $(OBJS)
+	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $(OBJS) \
                 $(BUILDDIR)/libplugin.a $(BITMAPLIBS) -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
@@ -108,13 +103,11 @@ include $(TOOLSDIR)/make.inc
 # MEMORYSIZE should be passed on to this makefile with the chosen memory size
 # given in number of MB
 $(LINKFILE): $(LDS)
-	@echo "build $(notdir $@)"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
+	$(call PRINTS,build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) \
 	$(DEFINES) -E -P - >$@
 
 clean:
-	@echo "cleaning chessbox"
-	@rm -rf $(OBJDIR)/chessbox
-	@rm -f $(OBJDIR)/chessbox.* $(DEPFILE)
+	$(call PRINTS,cleaning chessbox)rm -rf $(OBJDIR)/chessbox
+	$(SILENT)rm -f $(OBJDIR)/chessbox.* $(DEPFILE)
 
 -include $(DEPFILE)

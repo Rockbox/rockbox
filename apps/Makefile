@@ -91,49 +91,52 @@ $(DEPFILE): $(BITMAPLIBS)
 dep: $(DEPFILE)
 
 build-codecs:
-	@$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
-	@$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
+	$(SILENT)$(MAKE) -C codecs/lib OBJDIR=$(OBJDIR)/codecs/lib
+	$(SILENT)$(MAKE) -C codecs OBJDIR=$(OBJDIR)/codecs
 
-build-bitmaps:
-	@$(MAKE) -C bitmaps OBJDIR=$(OBJDIR)/bitmaps
+build-bitmapsmono:
+	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
 
-$(BITMAPLIBS): build-bitmaps
+build-bitmapsnative:
+	$(call PRINTS,MAKE in bitmaps/native)$(MAKE) -C bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
+
+build-bitmapsremotemono:
+	$(call PRINTS,MAKE in bitmaps/remote_mono)$(MAKE) -C bitmaps/remote_mono OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+
+build-bitmapsremotenative:
+	$(call PRINTS,MAKE in bitmaps/remote_native)$(MAKE) -C bitmaps/remote_native OBJDIR=$(OBJDIR)/bitmaps/remote_native
+
+$(BITMAPLIBS): $(BUILDDIR)/lib%.a: build-%
 
 rocks: build-codecs
-	@$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
-	@$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
+	$(SILENT)$(MAKE) -C plugins/lib OBJDIR=$(OBJDIR)/plugins/lib
+	$(SILENT)$(MAKE) -C plugins  OBJDIR=$(OBJDIR)/plugins
 
 $(LINKFILE): $(LDS)
-	@echo "Build $(notdir $@)"
-	@cat $< | $(CC) -DLOADADDRESS=$(LOADADDRESS) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DLOADADDRESS=$(LOADADDRESS) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(LINKROM): $(ROMLDS)
-	@echo "Build $(notdir $@)"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(MAXOUTFILE):
-	@echo '#include "config.h"' > $(MAXINFILE)
-	@echo "ROM_START" >> $(MAXINFILE)
-	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
-	@rm $(MAXINFILE)
+	$(SILENT)echo '#include "config.h"' > $(MAXINFILE)
+	$(SILENT)echo "ROM_START" >> $(MAXINFILE)
+	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
+	$(SILENT)rm $(MAXINFILE)
 
 $(OBJDIR)/rombox.elf : $(OBJS) $(LINKROM) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lgcc $(LINKBITMAPS) -L$(BUILDDIR)/firmware -T$(LINKROM) -Wl,-Map,$(OBJDIR)/rombox.map
 
 ifndef SIMVER
 
 $(OBJDIR)/rockbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAPLIBS)
-	@echo "LD $(notdir $@)"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS)  -L$(BUILDDIR)/firmware -L$(BUILDDIR) -lrockbox $(LINKBITMAPS) -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/rockbox.map
 
 $(OBJDIR)/rockbox.bin : $(OBJDIR)/rockbox.elf
-	@echo "OBJCOPY $(notdir $@)"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/rombox.bin : $(OBJDIR)/rombox.elf
-	@echo "OBJCOPY $(notdir $@)"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
@@ -145,8 +148,7 @@ $(OBJDIR)/rockbox.asm: $(OBJDIR)/rockbox.bin
 # instead.
 #
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/rockbox.bin $(FLASHFILE) 
-	@echo "Build firmware file"
-	$(SILENT)($(MKFIRMWARE) $< $@; \
+	$(call PRINTS,Build firmware file)($(MKFIRMWARE) $< $@; \
 	stat=$$?; \
 	if test -n "$(FLASHFILE)"; then \
 	  if test "$$stat" -ne 0; then \
@@ -174,50 +176,44 @@ endif
 
 $(BUILDDIR)/$(BINARY) : $(OBJS) $(DEPFILE) $(BUILDDIR)/libsim.a \
 	$(BUILDDIR)/libcomsim.a $(LIBROCKBOX) $(BITMAPLIBS)
-	@echo "LD $(BINARY)"
-	$(SILENT)$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
+	$(call PRINTS,LD $(BINARY))$(CC) $(GCCOPTS) -o $@ $(OBJS) -L$(BUILDDIR) -lrockbox -lsim -lcomsim $(LINKBITMAPS) $(LDOPTS) $(EXTRAOBJ) $(SIMULATOR_MAP)
 endif
 
 $(BUILDDIR)/rockbox.ucl: $(OBJDIR)/rockbox.bin
-	$(SILENT)(echo "UCLPACK rockbox" ; \
-	$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1;)
+	$(call PRINTS,UCLPACK rockbox)$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1
 
 $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
-	$(SILENT)(echo "UCLPACK rombox" ; \
-	$(TOOLSDIR)/uclpack --none $< $@ >/dev/null 2>&1; \
+	$(call PRINTS,UCLPACK rombox)$(TOOLSDIR)/uclpack --none $< $@ >/dev/null 2>&1; \
 	perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
 	if test $$? -ne 0; then \
 	  echo "removing UCL file again, making it a fake one"; \
 	  echo "fake" > $@; \
-	fi)
+	fi
 
 include $(TOOLSDIR)/make.inc
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang
-	@echo "GENLANG"
 	@mkdir -p $(dir $@)
-	$(SILENT)perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS) $<
-	@echo "CC lang.c"
-	@$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
+	$(call PRINTS,GENLANG)perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(ARCHOS) $<
+	$(call PRINTS,CC lang.c)$(CC) $(CFLAGS) -c $(BUILDDIR)/lang.c -o $@
 
 clean:
-	@echo "cleaning apps"
-	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	     \
+	$(call PRINTS,cleaning apps)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/rockbox.asm	     \
 	$(OBJDIR)/rockbox.bin $(OBJDIR)/rockbox.elf $(OBJDIR)/*.map	     \
 	$(OBJDIR)/lang.o $(OBJDIR)/build.lang $(BUILDDIR)/lang.[ch]	     \
 	$(LINKFILE) $(BUILDDIR)/rockbox.ucl $(LINKROM)                       \
 	$(BUILDDIR)/rombox.ucl $(OBJDIR)/rombox.bin $(OBJDIR)/rombox.elf     \
 	$(MAXOUTFILE) $(DEPFILE)
-	@$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
-	@$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
-	@$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
-	@$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
-	@$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
-	@$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
-	@rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
-	@rm -rf $(BUILDDIR)/bitmaps
+	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono
+	$(SILENT)$(MAKE) -C bitmaps/native clean OBJDIR=$(OBJDIR)/bitmaps/native
+	$(SILENT)$(MAKE) -C bitmaps/remote_mono clean OBJDIR=$(OBJDIR)/bitmaps/remote_mono
+	$(SILENT)$(MAKE) -C bitmaps/remote_native clean OBJDIR=$(OBJDIR)/bitmaps/remote_native
+	$(SILENT)$(MAKE) -C plugins clean OBJDIR=$(OBJDIR)/plugins
+	$(SILENT)$(MAKE) -C codecs clean OBJDIR=$(OBJDIR)/codecs
+	$(SILENT)rm -rf $(OBJDIR)/recorder $(OBJDIR)/player
+	$(SILENT)rm -rf $(BUILDDIR)/bitmaps
 ifdef SIMVER
-	@$(MAKE) -C $(SIMDIR) clean
+	$(SILENT)$(MAKE) -C $(SIMDIR) clean
 endif
 
 ifneq ($(MAKECMDGOALS),clean)

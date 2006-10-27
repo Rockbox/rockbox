@@ -44,19 +44,16 @@ OUTPUT = $(BUILDDIR)/libFLAC.a
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR+RANLIB $(notdir $@)"
-	@$(AR) ruv $@ $+ >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $+ >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@
 
 $(OBJDIR)/libFLAC/%.o: $(APPSDIR)/codecs/libFLAC/%.c
-	@mkdir -p $(OBJDIR)/libFLAC
-	@echo "(libFLAC) CC $<"
-	@$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libFLAC/include/FLAC $< -o $@
+	$(SILENT)mkdir -p $(OBJDIR)/libFLAC
+	$(call PRINTS,CC $(<F))$(CC) -c -O2 $(CFLAGS) -I$(APPSDIR)/codecs/libFLAC/include/FLAC $< -o $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning libFLAC"
-	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(call PRINTS,cleaning libFLAC)rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
 -include $(DEPFILE)

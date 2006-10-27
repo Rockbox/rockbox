@@ -10,6 +10,7 @@
 ifndef V
 SILENT=@
 endif
+PRINTS=$(info $(1))$(SILENT)
 
 LDS := link.lds
 LINKFILE = $(OBJDIR)/linkage.lds
@@ -19,37 +20,30 @@ CFLAGS = $(GCCOPTS)
 all: $(OBJDIR)/compressed.bin
 
 $(OBJDIR)/compressed.bin : $(OBJDIR)/compressed.elf
-	@echo "OBJCOPY $(notdir $@)"
-	$(SILENT)$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/compressed.elf : $(OBJS) $(LINKFILE)
-	@echo "LD $(notdir $@)"
-	$(SILENT)$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/compressed.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/compressed.map
 
 $(LDS): $(OBJS)
 	
 
 $(LINKFILE): $(LDS)
-	@echo "Build LDS file"
-	$(SILENT)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build LDS file)cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(OBJDIR)/decompressor.o : decompressor.c $(OBJDIR)/uclimage.c
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "CC $<"
-	$(SILENT)$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
+	$(call PRINTS,CC $<)$(CC) $(CFLAGS) -I$(OBJDIR) -c $< -o $@
 
 $(OBJDIR)/startup.o : startup.S
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "AS $<"
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,AS $<)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/uclimage.o : $(OBJDIR)/uclimage.c
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "CC $(notdir $<)"
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(<F))$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/uclimage.c : $(FLASHFILE)  $(TOOLSDIR)/ucl2src.pl
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "UCL2SRC"
-	$(SILENT)perl -s $(TOOLSDIR)/ucl2src.pl -p=$(OBJDIR)/uclimage $<
+	$(call PRINTS,UCL2SRC)perl -s $(TOOLSDIR)/ucl2src.pl -p=$(OBJDIR)/uclimage $<
 

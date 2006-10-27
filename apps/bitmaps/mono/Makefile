@@ -5,7 +5,7 @@
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
 # $Id$
-#
+#                            
 
 INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(BUILDDIR) \
           -I$(OBJDIR)
@@ -26,8 +26,7 @@ BMPINCDIR = $(BUILDDIR)/bitmaps
 include $(TOOLSDIR)/makebmp.inc
 
 clean:
-	@echo "cleaning bitmaps/mono"
-	@rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
-	@rmdir $(OBJDIR)
+	$(call PRINTS,cleaning bitmaps/mono)rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(SILENT)rmdir $(OBJDIR)
 
 -include $(DEPFILE)

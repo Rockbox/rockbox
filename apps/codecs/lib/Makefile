@@ -33,14 +33,12 @@ OUTPUT = $(BUILDDIR)/libcodec.a
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJS)
-	@echo "AR+RANLIB $(notdir $@)"
-	@$(AR) ruv $@ $+ >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $+ >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning codecs/lib"
-	@rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(call PRINTS,cleaning codecs/lib)rm -f $(OBJS) $(OUTPUT) $(DEPFILE)
 
 -include $(DEPFILE)

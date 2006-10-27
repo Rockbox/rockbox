@@ -1355,8 +1355,8 @@ fi
 
 if test "$simulator" = "yes"; then
   # add simul make stuff on the #SIMUL# line
-  simmagic1="s,@SIMUL1@,@\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim,"
-  simmagic2="s,@SIMUL2@,@\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim,"
+  simmagic1="s,@SIMUL1@,\$(SILENT)\$(MAKE) -C \$(SIMDIR) OBJDIR=\$(BUILDDIR)/sim,"
+  simmagic2="s,@SIMUL2@,\$(SILENT)\$(MAKE) -C \$(ROOTDIR)/uisimulator/common OBJDIR=\$(BUILDDIR)/comsim,"
 else
   # delete the lines that match
   simmagic1='/@SIMUL1@/D'

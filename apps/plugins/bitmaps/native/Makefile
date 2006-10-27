@@ -26,8 +26,7 @@ BMPINCDIR = $(BUILDDIR)/pluginbitmaps
 include $(TOOLSDIR)/makebmp.inc
 
 clean:
-	@echo "cleaning plugins/bitmaps/native"
-	@rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
+	$(call PRINTS,cleaning plugins/bitmaps/native)rm -f $(CSRC) $(OBJS) $(OUTPUT) $(DEPFILE)
 	@rmdir $(OBJDIR)
 
 -include $(DEPFILE)

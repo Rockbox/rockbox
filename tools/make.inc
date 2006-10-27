@@ -3,16 +3,15 @@
 ifndef V
 SILENT=@
 endif
+PRINTS=$(info $(1))$(SILENT)
 
 $(OBJDIR)/%.o: %.c
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "CC $<"
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $<)$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/%.o: %.S
 	$(SILENT)mkdir -p $(dir $@)
-	@echo "CC $<"
-	$(SILENT)$(CC) $(CFLAGS) -c $< -o $@
+	$(call PRINTS,CC $<)$(CC) $(CFLAGS) -c $< -o $@
 
 # The echo stuff last in the dep update shell magic is to prevent any compiler
 # errors/warnings to cause an error code to get returned and thus stop the

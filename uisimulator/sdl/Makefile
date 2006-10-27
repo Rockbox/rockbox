@@ -49,19 +49,16 @@ all: $(OUTFILE)
 include $(TOOLSDIR)/make.inc
 
 $(OUTFILE): $(OBJS) $(BUILDDIR)/UI256.bmp
-	@echo "AR+RANLIB $(notdir $@)"
-	@$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
-	@$(RANLIB) $@
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	$(SILENT)$(RANLIB) $@
 
 clean:
-	@echo "cleaning sim"
-	@$(RM) $(OBJS) *~ core $(OUTFILE) $(DEPFILE) \
+	$(call PRINTS,cleaning sim)$(RM) $(OBJS) *~ core $(OUTFILE) $(DEPFILE) \
 	$(BUILDDIR)/UI256.bmp $(DEPFILE)
-	@$(MAKE) -C $(SIMCOMMON) clean
+	$(SILENT)$(MAKE) -C $(SIMCOMMON) clean
 
 ################## Specific dependencies ##################
 $(BUILDDIR)/UI256.bmp: UI-$(ARCHOS).bmp
-	@echo UI
-	@cp $< $@
+	$(call PRINTS,UI)cp $< $@
 
 -include $(DEPFILE)

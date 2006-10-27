@@ -27,26 +27,21 @@ all: $(OUTPUT) $(EXTRA_TARGETS)
 dep: $(DEPFILE)
 
 $(OUTPUT): $(OBJS) $(DEPFILE)
-	@echo "AR+RANLIB $(notdir $@)"
-	$(SILENT)$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
+	$(call PRINTS,AR+RANLIB $(@F))$(AR) ruv $@ $(OBJS) >/dev/null 2>&1
 	$(SILENT)$(RANLIB) $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning firmware"
-	$(SILENT)rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c $(DEPFILE)
+	$(call PRINTS,cleaning firmware)rm -f $(OBJS) $(OUTPUT) $(OBJDIR)/sysfont.c $(DEPFILE)
 	$(SILENT)rm -rf $(OBJDIR)/drivers $(OBJDIR)/common
 
 # Special targets
 $(OBJDIR)/thread.o: thread.c export/thread.h
-	$(SILENT)echo "CC thread.c"
-	$(SILENT)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
+	$(call PRINTS,CC thread.c)$(CC) -c -O -fomit-frame-pointer $(CFLAGS) $< -o $@
 
 $(OBJDIR)/sysfont.o: ../fonts/rockbox_default.bdf
-	@echo "CONVBDF"
-	$(SILENT)$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
-	@echo "CC sysfont.c"
-	$(SILENT)$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
+	$(call PRINTS,CONVBDF)$(TOOLSDIR)/convbdf -c -o $(OBJDIR)/sysfont.c $<
+	$(call PRINTS,CC sysfont.c)$(CC) $(CFLAGS) -c $(OBJDIR)/sysfont.c -o $@
 
 -include $(DEPFILE)
