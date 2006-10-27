@@ -37,6 +37,7 @@
 #include "buffer.h"
 #include "audio.h"
 #include "i2c.h"
+#include "i2c-meg-fx.h"
 /*
  * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
  */

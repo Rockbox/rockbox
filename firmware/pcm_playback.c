@@ -68,6 +68,12 @@ void pcm_init(void)
 
 }
 
+static void dma_start(const void *addr, size_t size)
+{
+    (void)addr;
+    (void)size;
+}
+
 void pcm_set_frequency(unsigned int frequency)
 {
     (void)frequency;
