@@ -367,9 +367,9 @@ bool dbg_audio_thread(void)
 
 
 #if CONFIG_CPU == TCC730
-static unsigned flash_word_temp __attribute__ ((section (".idata")));
+static unsigned flash_word_temp IDATA_ATTR;
 
-static void flash_write_word(unsigned addr, unsigned value) __attribute__ ((section(".icode")));
+static void flash_write_word(unsigned addr, unsigned value) ICODE_ATTR;
 static void flash_write_word(unsigned addr, unsigned value) {
     flash_word_temp = value;
 
@@ -377,7 +377,7 @@ static void flash_write_word(unsigned addr, unsigned value) {
     ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
 }
 
-static unsigned flash_read_word(unsigned addr) __attribute__ ((section(".icode")));
+static unsigned flash_read_word(unsigned addr) ICODE_ATTR;
 static unsigned flash_read_word(unsigned addr) {
     long extAddr = (long)addr << 1;
     ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
