@@ -1254,7 +1254,7 @@ static void codec_advance_buffer_counters(size_t amount)
     /* Start buffer filling as necessary. */
     if (!pcmbuf_is_lowdata() && !filling)
     {
-        if (FILEBUFUSED < conf_watermark && playing)
+        if (FILEBUFUSED < conf_watermark && playing && !playlist_end)
         {
             LOGFQUEUE("codec > audio Q_AUDIO_FILL_BUFFER");
             queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER, 0);
