@@ -20,6 +20,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "pcf50606.h"
+#include "adc.h"
 #include "powermgmt.h"
 
 /* These voltages were determined by measuring the output of the PCF50606
@@ -44,7 +45,7 @@ static void init_pmu_interrupts(void)
     {
         ~0x04, /* unmask ONKEY1S */
         ~0x00,
-        ~0x00
+        ~0x06, /* unmask ACDREM, ACDINS  */
     };
 
     /* make sure GPI0 interrupt is off before unmasking anything */
@@ -63,6 +64,9 @@ static void init_pmu_interrupts(void)
 
 static inline void enable_pmu_interrupts(void)
 {
+    /* clear pending GPI0 interrupts first or it may miss the first
+       H-L transition */
+    or_l(0x00000100, &GPIO_INT_CLEAR);
     or_l(0x3, &INTPRI5); /* INT32 - Priority 3 */
 }
 
@@ -86,6 +90,9 @@ void pcf50606_init(void)
     pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
 #endif
 
+    /* Accessory detect */
+    pcf50606_write(0x33, 0x8e); /* ACDAPE=1, THRSHLD=2.40V */
+
     /* allow GPI0 interrupts from PMU now */
     enable_pmu_interrupts();
 }
@@ -101,12 +108,15 @@ void pcf50606_reset_timeout(void)
 void GPI0(void) __attribute__ ((interrupt_handler, section(".text")));
 void GPI0(void)
 {
-    unsigned char read[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+    unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+
+    /* Clear pending GPI0 interrupts */
+    or_l(0x00000100, &GPIO_INT_CLEAR);
 
     /* clear pending interrupts from pcf50606 */
-    pcf50606_read_multiple(0x02, read, 3);
+    pcf50606_read_multiple(0x02, data, 3);
 
-    if (read[0] & 0x04)
+    if (data[0] & 0x04)
     {
         /* ONKEY1S */
         if (GPIO_READ & 0x02000000)
@@ -115,6 +125,12 @@ void GPI0(void)
             pcf50606_reset_timeout();   /* remote ONKEY */
     }
 
-    /* Clear pending GPI0 interrupts */
-    or_l(0x00000100, &GPIO_INT_CLEAR);
+    if (data[2] & 0x06)
+    {
+        /* ACDINS/ACDREM */
+        /* Check if adc_scan should actually scan main buttons or not -
+           bias towards "yes" out of paranoia. */
+        adc_enable_button_scan((data[2] & 0x02) != 0 ||
+                               (pcf50606_read(0x33) & 0x01) != 0);
+    }
 }

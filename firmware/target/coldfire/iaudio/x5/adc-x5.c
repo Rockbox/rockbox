@@ -26,19 +26,47 @@
 
 static unsigned short adcdata[NUM_ADC_CHANNELS];
 
-static int channelnum[] =
+static const int adcc2_parms[] =
 {
-    5,   /* ADC_BUTTONS (ADCIN2) */
-    6,   /* ADC_REMOTE  (ADCIN3) */
-    0,   /* ADC_BATTERY (BATVOLT, resistive divider) */
+    [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* ADCIN2 */
+    [ADC_REMOTE]  = 0x80 | (6 << 1) | 1, /* ADCIN3 */
+    [ADC_BATTERY] = 0x80 | (0 << 1) | 1, /* BATVOLT, resistive divider */
 };
+
+/* have buttons scan by default */
+static volatile bool button_scan_on = true;
+
+void adc_enable_button_scan(bool enable)
+{
+    button_scan_on = enable;
+}
+
+bool adc_get_button_scan_enabled(void)
+{
+    return button_scan_on;
+}
 
 unsigned short adc_scan(int channel)
 {
-    int level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    int level;
     unsigned char data;
-    
-    pcf50606_write(0x2f, 0x80 | (channelnum[channel] << 1) | 1);
+
+    if (channel == ADC_BUTTONS)
+    {
+        /* no button scan if nothing pushed */
+        if (!button_scan_on)
+            return adcdata[channel] = 0xff;
+    }
+    else if (channel == ADC_REMOTE)
+    {
+        /* no remote scan if not plugged */
+        if (GPIO_READ & 0x01000000)
+            return adcdata[channel] = 0xff;
+    }
+
+    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    pcf50606_write(0x2f, adcc2_parms[channel]);
     data = pcf50606_read(0x30);
 
     adcdata[channel] = data;
@@ -56,7 +84,7 @@ static int adc_counter;
 
 static void adc_tick(void)
 {
-    if(++adc_counter == HZ)
+    if (++adc_counter == HZ)
     {
         adc_counter = 0;
         adc_scan(ADC_BATTERY);

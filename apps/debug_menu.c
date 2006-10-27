@@ -76,6 +76,10 @@
 #include "pcm_playback.h"
 #endif
 
+#ifdef IAUDIO_X5
+#include "lcd-remote-target.h"
+#endif
+
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
@@ -92,7 +96,7 @@ char thread_status_char(int status)
         case STATE_SLEEPING     : return 'S';
         case STATE_BLOCKED_W_TMO: return 'T';
     }
-    
+
     return '?';
 }
 #ifndef SIMULATOR
@@ -130,12 +134,12 @@ bool dbg_os(void)
                 thread = &cores[core].threads[i];
                 if (thread->name == NULL)
                     continue;
-                
+
                 usage = thread_stack_usage(thread);
                 status = thread_get_status(thread);
-                
-                snprintf(buf, 32, "(%d) %c%c %d %s: %d%%", core, 
-                         (status == STATE_RUNNING) ? '*' : ' ', 
+
+                snprintf(buf, 32, "(%d) %c%c %d %s: %d%%", core,
+                         (status == STATE_RUNNING) ? '*' : ' ',
                          thread_status_char(status),
                          cores[CURRENT_CORE].threads[i].priority,
                          cores[core].threads[i].name, usage);
@@ -149,19 +153,19 @@ bool dbg_os(void)
             thread = &cores[CURRENT_CORE].threads[i];
             if (thread->name == NULL)
                 continue;
-            
+
             usage = thread_stack_usage(thread);
             status = thread_get_status(thread);
 # ifdef HAVE_PRIORITY_SCHEDULING
             snprintf(buf, 32, "%c%c %d %s: %d%%",
-                     (status == STATE_RUNNING) ? '*' : ' ', 
+                     (status == STATE_RUNNING) ? '*' : ' ',
                      thread_status_char(status),
                      cores[CURRENT_CORE].threads[i].priority,
                      cores[CURRENT_CORE].threads[i].name, usage);
 # else
             snprintf(buf, 32, "%c%c %s: %d%%",
-                     (status == STATE_RUNNING) ? '*' : ' ', 
-                     (status == STATE_BLOCKED) ? 'B' : ' ', 
+                     (status == STATE_RUNNING) ? '*' : ' ',
+                     (status == STATE_BLOCKED) ? 'B' : ' ',
                      cores[CURRENT_CORE].threads[i].name, usage);
 # endif
             lcd_puts(0, 1+i, buf);
@@ -1066,9 +1070,17 @@ bool dbg_ports(void)
         adc_remotedetect = adc_read(ADC_REMOTEDETECT);
 #endif
 
+#ifdef IAUDIO_X5
+        snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
+            adc_get_button_scan_enabled() ? '+' : '-', adc_buttons);
+        lcd_puts(0, line++, buf);
+        snprintf(buf, sizeof(buf), "ADC_REMOTE  (%c): %02x",
+            remote_detect() ? '+' : '-', adc_remote);
+#else
         snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
+#endif
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
@@ -1438,7 +1450,7 @@ bool view_battery(void)
                          ext_pwr ? "present" : "absent");
                 lcd_puts(0, 4, buf);
                 snprintf(buf, 30, "Battery:   %s",
-					charging ? "charging" : (usb_pwr||ext_pwr) ? "charged" : "discharging");
+                    charging ? "charging" : (usb_pwr||ext_pwr) ? "charged" : "discharging");
                 lcd_puts(0, 5, buf);
                 snprintf(buf, 30, "Dock mode: %s",
                          dock    ? "enabled" : "disabled");
