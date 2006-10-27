@@ -393,7 +393,7 @@ static unsigned flash_read_word(unsigned addr) {
    /* In IRAM to avoid problems when running directly from Flash */
 bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
-                  __attribute__ ((section (".icode")));
+                  ICODE_ATTR;
 bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
 
