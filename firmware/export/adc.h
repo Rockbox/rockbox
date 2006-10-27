@@ -105,9 +105,4 @@ void adc_init(void);
 unsigned short adc_scan(int channel);
 #endif
 
-#if defined(IAUDIO_X5)
-void adc_enable_button_scan(bool enable);
-bool adc_get_button_scan_enabled(void);
-#endif
-
-#endif
+#endif /* _ADC_H_ */
