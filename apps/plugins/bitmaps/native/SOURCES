@@ -56,12 +56,8 @@ jewels.112x64x1.bmp
 jewels.112x64x1.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
 jewels.128x128x16.bmp
-#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110) && (LCD_DEPTH == 1)
-jewels.138x110x1.bmp
 #elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
 jewels.138x110x2.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 1)
-jewels.160x128x1.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && !defined(HAVE_LCD_COLOR)
 jewels.160x128x2.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && defined(HAVE_LCD_COLOR)
