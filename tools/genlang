@@ -336,7 +336,10 @@ while(<LANG>) {
                     # "none" as dest (without quotes) means that this entire
                     # phrase is to be ignored
                 }
-                else {
+                elsif(!$update) {
+                    # we don't do the fully detailed analysis when we "update"
+                    # since we don't do it for a particular target etc
+
                     # allow the keyword 'deprecated' to be used on dest and
                     # voice strings to mark that as deprecated. It will then
                     # be replaced with "".
@@ -344,24 +347,24 @@ while(<LANG>) {
                     $dest =~ s/^deprecate(|d)\z/\"\"/i;
                     $voice =~ s/^deprecate(|d)\z/\"\"/i;
 
-                    # Use the ID name to figure out which id number range we
-                    # should use for this phrase. Voice-only strings are
-                    # separated.
-
                     # basic syntax error alerts, if there are no quotes we
                     # will assume an empty string was intended
                     if($dest !~ /^\"/) {
-                        print STDERR "Warning: dest before line $line lacks quotes!\n";
+                        print STDERR "Warning: dest before $input line $line lacks quotes ($dest)!\n";
                         $dest='""';
                     }
                     if($src !~ /^\"/) {
-                        print STDERR "Warning: source before line $line lacks quotes!\n";
+                        print STDERR "Warning: source before $input line $line lacks quotes ($src)!\n";
                         $src='""';
                     }
                     if($voice !~ /^\"/) {
-                        print STDERR "Warning: voice before line $line lacks quotes!\n";
+                        print STDERR "Warning: voice before $input line $line lacks quotes ($voice)!\n";
                         $voice='""';
                     }
+
+                    # Use the ID name to figure out which id number range we
+                    # should use for this phrase. Voice-only strings are
+                    # separated.
 
                     if($idstr =~ /^VOICE/) {
                         $idnum = $voiceid++;
