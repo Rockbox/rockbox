@@ -4713,6 +4713,7 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
   </source>
   <dest>
     *: "OFF = Exit"
@@ -4872,6 +4873,7 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
   </source>
   <dest>
     *: "ON To Set"
@@ -4887,6 +4889,7 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
   </source>
   <dest>
     *: "OFF To Revert"
@@ -5084,6 +5087,7 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
@@ -7857,6 +7861,7 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
   </source>
   <dest>
     *: "OFF to abort"
@@ -9487,6 +9492,7 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
