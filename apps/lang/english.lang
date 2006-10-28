@@ -22,6 +22,13 @@
 #
 # The "voice' entry contains how we want the speech UI to pronounce the phrase.
 #
+# Since this file is both the master for the language system, as well as the
+# source for generating english strings, make sure that all <source> strings
+# are *identical* to the <dest> strings within the english.lang file. The
+# <source> strings are the ones that'll be exposed and used by other languages
+# when doing updates etc, while the <dest> ones are used when this file is
+# used to simply get the full set of english strings for a particular target.
+#
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -854,6 +861,7 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
   </source>
   <dest>
     *: "PLAY = Yes"
@@ -4762,6 +4770,7 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
   </source>
   <dest>
     *: "PLAY = Select"
@@ -4777,6 +4786,7 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
   </source>
   <dest>
     *: "ON+Play = Delete"
