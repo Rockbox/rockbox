@@ -16,16 +16,17 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-#include <stdlib.h>
 #include "config.h"
-#include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
 #include "backlight.h"
 #include "adc.h"
-#include "system.h"
+#include "lcd-remote-target.h"
+
+/* have buttons scan by default */
+static bool button_scan_on     = true;
+static bool hold_button        = false;
+static bool remote_hold_button = false;
 
 void button_init_device(void)
 {
@@ -34,24 +35,32 @@ void button_init_device(void)
     GPIO_ENABLE &= ~0x0e000000;
 }
 
+void button_enable_scan(bool enable)
+{
+    button_scan_on = enable;
+}
+
+bool button_scan_enabled(void)
+{
+    return button_scan_on;
+}
+
 bool button_hold(void)
 {
-    return (GPIO_READ & 0x08000000)?false:true;
+    return (GPIO_READ & 0x08000000) == 0;
 }
 
 bool remote_button_hold(void)
 {
-    return adc_scan(ADC_REMOTE) < 0x17;
+    return remote_hold_button;
 }
 
 int button_read_device(void)
 {
-    int data;
-    int btn = BUTTON_NONE;
-    static bool hold_button = false;
-    static bool remote_hold_button = false;
+    int  btn = BUTTON_NONE;
     bool hold_button_old;
     bool remote_hold_button_old;
+    int  data;
 
     /* normal buttons */
     hold_button_old = hold_button;
@@ -63,9 +72,10 @@ int button_read_device(void)
         backlight_hold_changed(hold_button);
 #endif
 
-    if (!hold_button)
+    if (button_scan_on && !hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
+
         if (data < 0xf0)
         {
             if(data < 0x7c)
@@ -91,9 +101,9 @@ int button_read_device(void)
     }
 
     /* remote buttons */
-    remote_hold_button_old = remote_hold_button;
+    data = remote_detect() ? adc_scan(ADC_REMOTE) : 0xff;
 
-    data = adc_scan(ADC_REMOTE);
+    remote_hold_button_old = remote_hold_button;
     remote_hold_button = data < 0x17;
 
 #ifndef BOOTLOADER
@@ -101,7 +111,7 @@ int button_read_device(void)
         remote_backlight_hold_changed(remote_hold_button);
 #endif
 
-    if(!remote_hold_button)
+    if (!remote_hold_button)
     {
         if (data < 0xee)
         {

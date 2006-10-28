@@ -28,7 +28,5 @@
 
 /* Force a scan now */
 unsigned short adc_scan(int channel);
-void adc_enable_button_scan(bool enable);
-bool adc_get_button_scan_enabled(void);
 
 #endif /* _ADC_TARGET_H_ */

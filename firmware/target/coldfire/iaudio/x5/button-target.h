@@ -29,6 +29,8 @@ bool button_hold(void);
 bool remote_button_hold(void);
 void button_init_device(void);
 int button_read_device(void);
+void button_enable_scan(bool enable);
+bool button_scan_enabled(void);
 
 /* iaudio X5 specific button codes */
 

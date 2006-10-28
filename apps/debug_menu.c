@@ -1072,7 +1072,7 @@ bool dbg_ports(void)
 
 #ifdef IAUDIO_X5
         snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
-            adc_get_button_scan_enabled() ? '+' : '-', adc_buttons);
+            button_scan_enabled() ? '+' : '-', adc_buttons);
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE  (%c): %02x",
             remote_detect() ? '+' : '-', adc_remote);

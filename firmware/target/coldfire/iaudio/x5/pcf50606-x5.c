@@ -20,7 +20,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "pcf50606.h"
-#include "adc.h"
+#include "button-target.h"
 #include "powermgmt.h"
 
 /* These voltages were determined by measuring the output of the PCF50606
@@ -130,7 +130,7 @@ void GPI0(void)
         /* ACDINS/ACDREM */
         /* Check if adc_scan should actually scan main buttons or not -
            bias towards "yes" out of paranoia. */
-        adc_enable_button_scan((data[2] & 0x02) != 0 ||
-                               (pcf50606_read(0x33) & 0x01) != 0);
+        button_enable_scan((data[2] & 0x02) != 0 ||
+                           (pcf50606_read(0x33) & 0x01) != 0);
     }
 }

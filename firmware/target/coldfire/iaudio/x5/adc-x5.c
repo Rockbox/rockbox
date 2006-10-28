@@ -33,36 +33,10 @@ static const int adcc2_parms[] =
     [ADC_BATTERY] = 0x80 | (0 << 1) | 1, /* BATVOLT, resistive divider */
 };
 
-/* have buttons scan by default */
-static volatile bool button_scan_on = true;
-
-void adc_enable_button_scan(bool enable)
-{
-    button_scan_on = enable;
-}
-
-bool adc_get_button_scan_enabled(void)
-{
-    return button_scan_on;
-}
-
 unsigned short adc_scan(int channel)
 {
     int level;
     unsigned char data;
-
-    if (channel == ADC_BUTTONS)
-    {
-        /* no button scan if nothing pushed */
-        if (!button_scan_on)
-            return adcdata[channel] = 0xff;
-    }
-    else if (channel == ADC_REMOTE)
-    {
-        /* no remote scan if not plugged */
-        if (GPIO_READ & 0x01000000)
-            return adcdata[channel] = 0xff;
-    }
 
     level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
