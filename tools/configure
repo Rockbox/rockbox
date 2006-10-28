@@ -1421,6 +1421,12 @@ else
 VERBOSEOPT=-v
 endif
 
+# old 'make' versions don't have the built-in 'info' function
+info=old\$(warning Consider upgrading to GNU make 3.81+ for optimum build performance.)
+ifeq (\$(call info),old)
+export info=echo "\$\$(1)";
+endif
+
 export ROOTDIR=@ROOTDIR@
 export FIRMDIR=@FIRMDIR@
 export APPSDIR=@APPSDIR@

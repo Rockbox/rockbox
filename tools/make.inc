@@ -3,7 +3,7 @@
 ifndef V
 SILENT=@
 endif
-PRINTS=$(info $(1))$(SILENT)
+PRINTS=$(SILENT)$(call info,$(1))
 
 $(OBJDIR)/%.o: %.c
 	$(SILENT)mkdir -p $(dir $@)

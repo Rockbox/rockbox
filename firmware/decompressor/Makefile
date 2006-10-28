@@ -10,7 +10,7 @@
 ifndef V
 SILENT=@
 endif
-PRINTS=$(info $(1))$(SILENT)
+PRINTS=$(SILENT)$(call info,$(1))
 
 LDS := link.lds
 LINKFILE = $(OBJDIR)/linkage.lds

@@ -5,7 +5,7 @@ dep: $(DEPFILE)
 ifndef V
 SILENT=@
 endif
-PRINTS=$(info $(1))$(SILENT)
+PRINTS=$(SILENT)$(call info,$(1))
 
 $(OBJDIR)/%.c: %.bmp
 	$(SILENT)mkdir -p $(dir $@)
