@@ -685,6 +685,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
+    t_cpu="coldfire"
+    t_manufacturer="iriver"
+    t_model="h100"
     ;;
 
    11|h300)
@@ -707,6 +710,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
+    t_cpu="coldfire"
+    t_manufacturer="iriver"
+    t_model="h300"
     ;;
 
    12|h100)
@@ -729,6 +735,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
+    t_cpu="coldfire"
+    t_manufacturer="iriver"
+    t_model="h100"
     ;;
 
    30|x5)
