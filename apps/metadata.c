@@ -760,6 +760,12 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
+    if (id3->length <= 0)
+    {
+        logf("ogg length invalid!");
+        return false;
+    }
+    
     id3->length = (id3->samples / id3->frequency) * 1000;
     id3->bitrate = (((int64_t) id3->filesize - comment_size) * 8) / id3->length;
     id3->vbr = true;
