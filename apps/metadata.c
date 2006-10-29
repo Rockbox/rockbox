@@ -760,13 +760,14 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
+    id3->length = ((int64_t) id3->samples * 1000) / id3->frequency;
+
     if (id3->length <= 0)
     {
         logf("ogg length invalid!");
         return false;
     }
     
-    id3->length = (id3->samples / id3->frequency) * 1000;
     id3->bitrate = (((int64_t) id3->filesize - comment_size) * 8) / id3->length;
     id3->vbr = true;
     
@@ -829,7 +830,14 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
                 | (buf[16] << 8) | buf[17];
 
             /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-            id3->length = (totalsamples / id3->frequency) * 1000;
+            id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
+        
+            if (id3->length <= 0)
+            {
+                logf("flac length invalid!");
+                return false;
+            }
+
             id3->bitrate = (id3->filesize * 8) / id3->length;
         } 
         else if ((buf[0] & 0x7f) == 4)  /* 4 is the VORBIS_COMMENT block */
@@ -957,7 +965,7 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
     id3->filesize = filesize(fd);
 
     /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
-    id3->length = (totalsamples / id3->frequency) * 1000;
+    id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
 
     return true;
 }
@@ -1329,7 +1337,14 @@ static bool get_mp4_metadata(int fd, struct mp3entry* id3)
             return false;
         }
 
-        id3->length = (id3->samples / id3->frequency) * 1000;
+        id3->length = ((int64_t) id3->samples * 1000) / id3->frequency;
+    
+        if (id3->length <= 0)
+        {
+            logf("mp4 length invalid!");
+            return false;
+        }
+        
         id3->bitrate = ((int64_t) id3->filesize * 8) / id3->length;
         DEBUGF("MP4 bitrate %d, frequency %d Hz, length %d ms\n",
             id3->bitrate, id3->frequency, id3->length);
@@ -1421,9 +1436,16 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     id3->vbr = true;
     /* Estimate bitrate, we should probably subtract the various header sizes
        here for super-accurate results */
-    id3->length = samples/id3->frequency*1000;
+    id3->length = ((int64_t) samples * 1000) / id3->frequency;
+
+    if (id3->length <= 0)
+    {
+        logf("mpc length invalid!");
+        return false;
+    }
+
     id3->filesize = filesize(fd);
-    id3->bitrate = id3->filesize*8/id3->length;
+    id3->bitrate = id3->filesize * 8 / id3->length;
     return true;
 }
 
@@ -1629,7 +1651,8 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
             /* save format infos */
             id3->bitrate = (sampleSize * numChannels * sampleRate) / 1000;
             id3->frequency = sampleRate;
-            id3->length = (numSampleFrames / id3->frequency) * 1000;
+            id3->length = ((int64_t) numSampleFrames * 1000) / id3->frequency;
+
             id3->vbr = false;   /* AIFF files are CBR */
             id3->filesize = filesize(fd);
         }
