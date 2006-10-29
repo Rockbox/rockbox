@@ -20,6 +20,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "pcf50606.h"
+#include "button-target.h"
 
 /* These voltages were determined by measuring the output of the PCF50606
    on a running H300, and verified by disassembling the original firmware */
@@ -37,10 +38,44 @@ static void set_voltages(void)
     pcf50606_write_multiple(0x23, buf, 5);
 }
 
+static void init_pmu_interrupts(void)
+{
+    /* inital data is interrupt masks */
+    unsigned char data[3] =
+    {
+        ~0x00,
+        ~0x00,
+        ~0x06, /* unmask ACDREM, ACDINS  */
+    };
+
+    /* make sure GPI6 interrupt is off before unmasking anything */
+    and_l(~0x0f000000, &INTPRI5);  /* INT38 - Priority 0 (Off) */
+
+    /* unmask the PMU interrupts we want to service */
+    pcf50606_write_multiple(0x05, data, 3);
+    /* clear INT1-3 as these are left set after standby */
+    pcf50606_read_multiple(0x02, data, 3);
+
+    /* Set to read pcf50606 INT but keep GPI6 off until init completes */
+    and_l(~0x00000040, &GPIO_ENABLE);
+    or_l(0x00000040, &GPIO_FUNCTION);
+    or_l(0x00004000, &GPIO_INT_EN);     /* GPI6 H-L */
+}
+
+static inline void enable_pmu_interrupts(void)
+{
+    /* clear pending GPI6 interrupts first or it may miss the first
+       H-L transition */
+    or_l(0x00004000, &GPIO_INT_CLEAR);
+    or_l(0x03000000, &INTPRI5); /* INT38 - Priority 3 */
+}
+
 void pcf50606_init(void)
 {
     pcf50606_i2c_init();
 
+    /* initialize pmu interrupts but don't service them yet */
+    init_pmu_interrupts();
     set_voltages();
 
     pcf50606_write(0x08, 0x60); /* Wake on USB and charger insertion */
@@ -49,4 +84,30 @@ void pcf50606_init(void)
 
     pcf50606_write(0x35, 0x13); /* Backlight PWM = 512Hz 50/50 */
     pcf50606_write(0x3a, 0x3b); /* PWM output on GPOOD1 */
+
+    pcf50606_write(0x33, 0x8c); /* Accessory detect: ACDAPE=1, THRSHLD=2.20V */
+
+    enable_pmu_interrupts();    /* allow GPI6 interrupts from PMU now */
+}
+
+/* PMU interrupt */
+void GPI6(void) __attribute__ ((interrupt_handler));
+void GPI6(void)
+{
+    unsigned char data[3]; /* 0 = INT1, 1 = INT2, 2 = INT3 */
+
+    /* Clear pending GPI6 interrupts */
+    or_l(0x00004000, &GPIO_INT_CLEAR);
+
+    /* clear pending interrupts from pcf50606 */
+    pcf50606_read_multiple(0x02, data, 3);
+
+    if (data[2] & 0x06)
+    {
+        /* ACDINS/ACDREM */
+        /* Check if the button driver should actually scan main buttons or not
+           - bias towards "yes" out of paranoia. */
+        button_enable_scan((data[2] & 0x02) != 0 ||
+                           (pcf50606_read(0x33) & 0x01) != 0);
+    }
 }

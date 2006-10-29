@@ -318,7 +318,7 @@ bool dbg_audio_thread(void)
                 break;
             case ACTION_STD_CANCEL:
                 done = true;
-                break;
+                break;      
         }
         action_signalscreenchange();
         line = 0;
@@ -1070,15 +1070,17 @@ bool dbg_ports(void)
         adc_remotedetect = adc_read(ADC_REMOTEDETECT);
 #endif
 
-#ifdef IAUDIO_X5
+#if defined(IAUDIO_X5) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
+#else
+        snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
+#endif
         lcd_puts(0, line++, buf);
+#ifdef IAUDIO_X5
         snprintf(buf, sizeof(buf), "ADC_REMOTE  (%c): %02x",
             remote_detect() ? '+' : '-', adc_remote);
 #else
-        snprintf(buf, sizeof(buf), "ADC_BUTTONS: %02x", adc_buttons);
-        lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
 #endif
         lcd_puts(0, line++, buf);

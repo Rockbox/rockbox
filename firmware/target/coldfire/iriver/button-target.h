@@ -33,6 +33,10 @@ bool remote_button_hold(void);
 bool remote_button_hold_only(void);
 void button_init_device(void);
 int button_read_device(void);
+#ifdef IRIVER_H300_SERIES
+void button_enable_scan(bool enable);
+bool button_scan_enabled(void);
+#endif
 
 /* iRiver H100/H300 specific button codes */
 

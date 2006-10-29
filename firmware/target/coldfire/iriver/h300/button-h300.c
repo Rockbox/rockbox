@@ -27,9 +27,10 @@
 #include "backlight.h"
 #include "adc.h"
 #include "system.h"
-#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
-#endif
+
+/* have buttons scan by default */
+static bool button_scan_on = true;
 
 void button_init_device(void)
 {
@@ -41,13 +42,23 @@ void button_init_device(void)
     GPIO1_FUNCTION |= 0x00100062;
 }
 
+void button_enable_scan(bool enable)
+{
+    button_scan_on = enable;
+}
+
+bool button_scan_enabled(void)
+{
+    return button_scan_on;
+}
+
 bool button_hold(void)
 {
     return (GPIO1_READ & 0x00000002)?true:false;
 }
 
 bool remote_button_hold_only(void)
-{        
+{
     if(remote_type() == REMOTETYPE_H300_NONLCD)
         return adc_scan(ADC_REMOTE)<0x0d; /* hold should be 0x00 */
     else
@@ -88,7 +99,7 @@ int button_read_device(void)
         backlight_hold_changed(hold_button);
 #endif
 
-    if (!hold_button)
+    if (button_scan_on && !hold_button)
     {
         data = adc_scan(ADC_BUTTONS);
 
