@@ -112,20 +112,20 @@ void adc_init(void)
 static unsigned char adcdata[NUM_ADC_CHANNELS];
 
 #ifdef IRIVER_H300_SERIES
-static int channelnum[] =
+static int adcc2_parms[] =
 {
-    5,   /* ADC_BUTTONS (ADCIN2) */
-    6,   /* ADC_REMOTE  (ADCIN3) */
-    0,   /* ADC_BATTERY (BATVOLT, resistive divider) */
-    2,   /* ADC_REMOTEDETECT (ADCIN1, resistive divider) */
+    [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* ADCIN2 */
+    [ADC_REMOTE]  = 0x80 | (6 << 1) | 1, /* ADCIN3 */
+    [ADC_BATTERY] = 0x80 | (0 << 1) | 1, /* BATVOLT, resistive divider */
+    [ADC_REMOTEDETECT] = 0x80 | (2 << 1) | 1, /* ADCIN1, resistive divider */
 };
 
 unsigned short adc_scan(int channel)
 {
     int level = set_irq_level(HIGHEST_IRQ_LEVEL);
     unsigned char data;
-    
-    pcf50606_write(0x2f, 0x80 | (channelnum[channel] << 1) | 1);
+
+    pcf50606_write(0x2f, adcc2_parms[channel]);
     data = pcf50606_read(0x30);
 
     adcdata[channel] = data;
