@@ -17,19 +17,13 @@
  *
  ****************************************************************************/
 
-
-#include <stdlib.h>
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
 #include "backlight.h"
 #include "adc.h"
-#include "system.h"
-#ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
-#endif
 
 void button_init_device(void)
 {

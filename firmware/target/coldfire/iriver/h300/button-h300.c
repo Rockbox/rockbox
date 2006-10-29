@@ -17,16 +17,12 @@
  *
  ****************************************************************************/
 
-
-#include <stdlib.h>
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
 #include "button.h"
-#include "kernel.h"
 #include "backlight.h"
 #include "adc.h"
-#include "system.h"
 #include "lcd-remote.h"
 
 /* have buttons scan by default */
