@@ -830,6 +830,7 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
   </source>
   <dest>
     *: "SPELA = Ja"
@@ -1155,10 +1156,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "High shelf-filter"
+    *: "High Shelf Filter"
   </dest>
   <voice>
-    *: "High Shelf Filter"
+    *: "High shelf filter"
   </voice>
 </phrase>
 <phrase>
@@ -1284,7 +1285,7 @@
     *: "Varna vid radering av dynamisk spellista"
   </dest>
   <voice>
-    *: ""
+    *: "Warn When Erasing Dynamic Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -1653,7 +1654,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu 
+  desc: in settings menu
   user:
   <source>
     *: "Tag Cache"
@@ -1667,7 +1668,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: 
+  desc:
   user:
   <source>
     *: ""
@@ -2096,7 +2097,7 @@
     *: "Latin1 (ISO-8859-1)"
   </dest>
   <voice>
-    *: ""
+    *: "Latin 1"
   </voice>
 </phrase>
 <phrase>
@@ -2264,7 +2265,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: ""
+    *: "Unicode"
   </voice>
 </phrase>
 <phrase>
@@ -3837,13 +3838,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "Starta om för att aktivera cachen"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -4448,7 +4449,7 @@
     *: "Batteriladdning"
   </dest>
   <voice>
-    *: ""
+    *: "Charging"
   </voice>
 </phrase>
 <phrase>
@@ -4462,7 +4463,7 @@
     *: "Batteri: Top-off-laddning"
   </dest>
   <voice>
-    *: ""
+    *: "Top off charge"
   </voice>
 </phrase>
 <phrase>
@@ -4476,7 +4477,7 @@
     *: "Batteri: Underhållsladdning"
   </dest>
   <voice>
-    *: ""
+    *: "Trickle charge"
   </voice>
 </phrase>
 <phrase>
@@ -4681,9 +4682,11 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
   </source>
   <dest>
     *: "AV = Avsluta"
+    h100,h120,h300: "STOPP = Avsluta"
   </dest>
   <voice>
     *: ""
@@ -4737,6 +4740,7 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
   </source>
   <dest>
     *: "SPELA = Välj"
@@ -4752,6 +4756,7 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
   </source>
   <dest>
     *: "PÅ+SPELA = Ta bort"
@@ -4837,9 +4842,11 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
   </source>
   <dest>
     *: "PÅ = Ställ klocka"
+    h100,h120,h300: "VÄLJ = Ställ klocka"
   </dest>
   <voice>
     *: ""
@@ -4851,9 +4858,11 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
   </source>
   <dest>
     *: "AV = Avbryt"
+    h100,h120,h300: "STOPP = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -5024,7 +5033,7 @@
     *: "A"
   </dest>
   <voice>
-    *: "Analog Gain"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5038,7 +5047,7 @@
     *: "D"
   </dest>
   <voice>
-    *: "Digital Gain"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5047,9 +5056,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken är full. Tryck AV för att fortsätta."
+    h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
   </dest>
   <voice>
     *: ""
@@ -5197,7 +5208,7 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TRIGGER_ACTIVE
-  desc: 
+  desc:
   user:
   <source>
     *: "Trigger Active"
@@ -7432,7 +7443,7 @@
     *: "Redigera kanal"
   </dest>
   <voice>
-    *: ""
+    *: "Edit Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7446,7 +7457,7 @@
     *: "Ta bort kanal"
   </dest>
   <voice>
-    *: ""
+    *: "Remove Preset"
   </voice>
 </phrase>
 <phrase>
@@ -7819,9 +7830,11 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
   </source>
   <dest>
     *: "AV = avbryt"
+    h100,h120,h300: "STOPP = Avbryt"
   </dest>
   <voice>
     *: ""
@@ -8269,7 +8282,7 @@
     *: "Filetype string buffer empty"
   </source>
   <dest>
-    *: "Tom strängbuffert för filtyper"
+    *: "Full buffert för filtyper"
   </dest>
   <voice>
     *: ""
@@ -8400,17 +8413,17 @@
   <voice>
     *: "Direct gain"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
-  <source>  
+  <source>
     *: "Cross Gain"
   </source>
-  <dest>  
+  <dest>
     *: "Korsdämpning"
   </dest>
-  <voice>  
+  <voice>
     *: "Cross gain"
   </voice>
 </phrase>
@@ -8507,7 +8520,7 @@
   <voice>
     *: "Remote Scrolling Options"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
@@ -8741,7 +8754,7 @@
   <voice>
     *: "Start new file"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_STOP_RECORDING
   desc: in record timesplit options
@@ -9448,9 +9461,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken är full. Tryck AV för att fortsätta."
+    h100,h120,h300: "Disken är full. Tryck STOPP för att fortsätta."
   </dest>
   <voice>
     *: ""
@@ -9748,7 +9763,7 @@
     *: "AGC max. gain"
   </source>
   <dest>
-    *: "AVK max förstärkning"
+    *: "AVK max först."
   </dest>
   <voice>
     *: "AGC maximum gain"
@@ -9766,5 +9781,195 @@
   </dest>
   <voice>
     *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Filnamn:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Paus när hörlurar kopplas ur"
+  </dest>
+  <voice>
+    *: "Pause on headphone unplug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pausa och fortsätt"
+  </dest>
+  <voice>
+    *: "Pause and Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Tid att spola bakåt"
+  </dest>
+  <voice>
+    *: "Duration to rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Återuppta inte vid start om hörlurar ej inkopplade"
+  </dest>
+  <voice>
+    *: "Disable auto-resume if phones not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Region"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Europa"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "USA / Kanada"
+  </dest>
+  <voice>
+    *: "US / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japan"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Korea"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Till slumpad"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm-logg"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Starta om för att aktivera"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
   </voice>
 </phrase>
