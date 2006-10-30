@@ -45,6 +45,7 @@ target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
 target/coldfire/memset16-coldfire.S
+target/coldfire/system-coldfire.c
 #elif (CONFIG_CPU == SH7034)
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
