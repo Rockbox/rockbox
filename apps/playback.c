@@ -1570,7 +1570,6 @@ static void codec_configure_callback(int setting, void *value)
 static void codec_track_changed(void)
 {
     automatic_skip = false;
-    track_changed = true; /* FIXME: should only be updated on the audio thread? */
     LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
