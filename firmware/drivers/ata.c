@@ -36,51 +36,7 @@
 
 #define SECTOR_SIZE     (512)
 
-#if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
-
-/* asm optimised read & write loops */
-
-#define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
-
-#define ATA_IOBASE      0x20000000
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
-#define ATA_CONTROL     (*((volatile unsigned short*)(ATA_IOBASE + 0x1c)))
-
-#define ATA_ERROR       (*((volatile unsigned short*)(ATA_IOBASE + 0x22)))
-#define ATA_NSECTOR     (*((volatile unsigned short*)(ATA_IOBASE + 0x24)))
-#define ATA_SECTOR      (*((volatile unsigned short*)(ATA_IOBASE + 0x26)))
-#define ATA_LCYL        (*((volatile unsigned short*)(ATA_IOBASE + 0x28)))
-#define ATA_HCYL        (*((volatile unsigned short*)(ATA_IOBASE + 0x2a)))
-#define ATA_SELECT      (*((volatile unsigned short*)(ATA_IOBASE + 0x2c)))
-#define ATA_COMMAND     (*((volatile unsigned short*)(ATA_IOBASE + 0x2e)))
-
-#define STATUS_BSY      0x8000
-#define STATUS_RDY      0x4000
-#define STATUS_DF       0x2000
-#define STATUS_DRQ      0x0800
-#define STATUS_ERR      0x0100
-
-#define ERROR_ABRT      0x0400
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa500
-#define READ_PATTERN2 0x5a00
-#define READ_PATTERN3 0xaa00
-#define READ_PATTERN4 0x5500
-
-#define READ_PATTERN1_MASK 0xff00
-#define READ_PATTERN2_MASK 0xff00
-#define READ_PATTERN3_MASK 0xff00
-#define READ_PATTERN4_MASK 0xff00
-
-#define SET_REG(reg,val) reg = ((val) << 8)
-#define SET_16BITREG(reg,val) reg = (val)
-
-#elif CONFIG_CPU == SH7034
+#if CONFIG_CPU == SH7034
 
 /* asm optimised read & write loops */
 
