@@ -110,6 +110,30 @@ void wheel_send_events(bool send);
 
 #elif CONFIG_KEYPAD == PLAYER_PAD
 
+        /* Main unit's buttons */
+#define BUTTON_ON           0x00000001
+#define BUTTON_STOP         0x00000002
+
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_PLAY         0x00000010
+#define BUTTON_MENU         0x00000020
+
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_STOP|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_PLAY|BUTTON_MENU)
+
+    /* Remote control's buttons */
+#define BUTTON_RC_PLAY      0x00100000
+#define BUTTON_RC_STOP      0x00080000
+
+#define BUTTON_RC_LEFT      0x00040000
+#define BUTTON_RC_RIGHT     0x00020000
+#define BUTTON_RC_VOL_UP    0x00010000
+#define BUTTON_RC_VOL_DOWN  0x00008000
+
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_STOP\
+                |BUTTON_RC_LEFT|BUTTON_RC_RIGHT\
+                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
 
 
 #elif CONFIG_KEYPAD == ONDIO_PAD
