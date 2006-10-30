@@ -63,7 +63,7 @@ extern int trickle_sec;          /* trickle charge: How many seconds per minute 
 
 #if CONFIG_CHARGING >= CHARGING_MONITOR
 typedef enum {       /* sorted by increasing charging current */
-    DISCHARGING = 0, 
+    DISCHARGING = 0,
     TRICKLE,         /* Can occur for CONFIG_CHARGING >= CHARGING_MONITOR */
     TOPOFF,          /* Can occur for CONFIG_CHARGING == CHARGING_CONTROL */
     CHARGING         /* Can occur for all CONFIG_CHARGING options */
@@ -125,6 +125,9 @@ int battery_level(void);
 int battery_time(void); /* minutes */
 
 unsigned int battery_voltage(void); /* filtered batt. voltage in centivolts */
+
+/* read unfiltered battery info */
+void battery_read_info(int *adc, int *voltage, int *level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);

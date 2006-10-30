@@ -99,21 +99,16 @@ void charging_screen(void)
         lcd_puts(0, 0, msg);
         {
             char buf[32];
-            int battery_voltage;
-            int batt_int, batt_frac;
-            battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
-            batt_int = battery_voltage / 100;
-            batt_frac = battery_voltage % 100;
-
+            int battv = battery_voltage();
             snprintf(buf, sizeof(buf), "%d.%02dV %d%%",
-                batt_int, batt_frac, battery_level());
+                battv / 100, battv % 100, battery_level());
             lcd_puts(0, 1, buf);
         }
 
 #ifdef HAVE_LCD_BITMAP
         lcd_update();
 #endif
-        
+
         button = button_get_w_tmo(HZ/2);
 #ifdef BUTTON_ON
         if (button == (BUTTON_ON | BUTTON_REL))
@@ -144,7 +139,7 @@ void prompt_usb(const char* msg1, const char* msg2)
     lcd_puts(0, 3, "and fix it.");
     lcd_update();
 #endif
-    do 
+    do
     {
         button = button_get(true);
         if (button == SYS_POWEROFF)
@@ -215,7 +210,7 @@ void main(void)
     }
 
     {   // rolo the firmware
-        static const char filename[] = "/" BOOTFILE; 
+        static const char filename[] = "/" BOOTFILE;
         rolo_load((char*)filename); /* won't return if started */
 
         prompt_usb("No firmware", filename);

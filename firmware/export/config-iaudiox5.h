@@ -113,12 +113,13 @@
 #define CPU_FREQ      11289600
 
 /* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 950   /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2250  /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50    /* capacity increment */
-#define BATTERY_TYPES_COUNT  1     /* only one type */
-#define BATTERY_SCALE_FACTOR 23437 /* FIX: this value is picked at random */
+#define X5_BATT_CONFIG          2
+#define CONFIG_BATTERY          BATT_IAUDIO_X5
+#define BATTERY_CAPACITY_MIN    950   /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX    2250  /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC    50    /* capacity increment */
+#define BATTERY_TYPES_COUNT     1     /* only one type */
+#define BATTERY_SCALE_FACTOR    5859  /* (420703125 + 35900) / 71800 */
 
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_PCF50606

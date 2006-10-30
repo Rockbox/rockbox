@@ -128,8 +128,8 @@ void GPI0(void)
     if (data[2] & 0x06)
     {
         /* ACDINS/ACDREM */
-        /* Check if adc_scan should actually scan main buttons or not -
-           bias towards "yes" out of paranoia. */
+        /* Check if main buttons should be actually be scanned or not
+           - bias towards "yes" out of paranoia. */
         button_enable_scan((data[2] & 0x02) != 0 ||
                            (pcf50606_read(0x33) & 0x01) != 0);
     }

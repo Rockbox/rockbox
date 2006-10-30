@@ -70,6 +70,7 @@
 #define BATT_LIION2200  2200 /* FM/V2 recorder type */
 #define BATT_4AA_NIMH   1500
 #define BATT_3AAA       1000 /* Ondio */
+#define BATT_IAUDIO_X5   950
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
 #define BATT_LPCS355385 1550 /* iriver h10 20Gb - SKC LPCS355385 */
 #define BATT_BP009       820 /* iriver H10 5/6Gb - iriver BP009 */

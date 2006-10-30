@@ -318,7 +318,7 @@ bool dbg_audio_thread(void)
                 break;
             case ACTION_STD_CANCEL:
                 done = true;
-                break;      
+                break;
         }
         action_signalscreenchange();
         line = 0;
@@ -968,8 +968,7 @@ bool dbg_ports(void)
     unsigned short portb;
     unsigned char portc;
     char buf[32];
-    int battery_voltage;
-    int batt_int, batt_frac;
+    int adc_battery_voltage, adc_battery_level;
 
     lcd_setfont(FONT_SYSFIXED);
     lcd_setmargins(0, 0);
@@ -995,12 +994,10 @@ bool dbg_ports(void)
         snprintf(buf, 32, "AN3: %03x AN7: %03x", adc_read(3), adc_read(7));
         lcd_puts(0, 5, buf);
 
-        battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
-        batt_int = battery_voltage / 100;
-        batt_frac = battery_voltage % 100;
-
-        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
-                 battery_level());
+        battery_read_info(NULL, &adc_battery_voltage,
+                          &adc_battery_level);
+        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", adc_battery_voltage / 100,
+                 adc_battery_voltage % 100, adc_battery_level);
         lcd_puts(0, 6, buf);
 #ifndef HAVE_MMC /* have ATA */
         snprintf(buf, 32, "ATA: %s, 0x%x",
@@ -1020,14 +1017,10 @@ bool dbg_ports(void)
     unsigned int gpio1_function;
     unsigned int gpio_enable;
     unsigned int gpio1_enable;
-    int adc_buttons, adc_remote, adc_battery;
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    int adc_remotedetect;
-#endif
+    int adc_buttons, adc_remote;
+    int adc_battery, adc_battery_voltage, adc_battery_level;
     char buf[128];
     int line;
-    int battery_voltage;
-    int batt_int, batt_frac;
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
@@ -1064,12 +1057,9 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 
         adc_buttons = adc_read(ADC_BUTTONS);
-        adc_remote = adc_read(ADC_REMOTE);
-        adc_battery = adc_read(ADC_BATTERY);
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        adc_remotedetect = adc_read(ADC_REMOTEDETECT);
-#endif
-
+        adc_remote  = adc_read(ADC_REMOTE);
+        battery_read_info(&adc_battery, &adc_battery_voltage,
+                          &adc_battery_level);
 #if defined(IAUDIO_X5) || defined(IRIVER_H300_SERIES)
         snprintf(buf, sizeof(buf), "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
@@ -1083,20 +1073,18 @@ bool dbg_ports(void)
 #else
         snprintf(buf, sizeof(buf), "ADC_REMOTE:  %02x", adc_remote);
 #endif
+
         lcd_puts(0, line++, buf);
         snprintf(buf, sizeof(buf), "ADC_BATTERY: %02x", adc_battery);
         lcd_puts(0, line++, buf);
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-        snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x", adc_remotedetect);
+        snprintf(buf, sizeof(buf), "ADC_REMOTEDETECT: %02x",
+                 adc_read(ADC_REMOTEDETECT));
         lcd_puts(0, line++, buf);
 #endif
 
-        battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
-        batt_int = battery_voltage / 100;
-        batt_frac = battery_voltage % 100;
-
-        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
-                 battery_level());
+        snprintf(buf, 32, "Batt: %d.%02dV %d%%  ", adc_battery_voltage / 100,
+                 adc_battery_voltage % 100, adc_battery_level);
         lcd_puts(0, line++, buf);
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
@@ -1209,8 +1197,7 @@ bool dbg_ports(void)
     unsigned char portc;
     char buf[32];
     int button;
-    int battery_voltage;
-    int batt_int, batt_frac;
+    int adc_battery_voltage;
     int currval = 0;
 
     lcd_clear_display();
@@ -1260,12 +1247,9 @@ bool dbg_ports(void)
         }
         lcd_puts(0, 0, buf);
 
-        battery_voltage = (adc_read(ADC_UNREG_POWER) *
-                           BATTERY_SCALE_FACTOR) / 10000;
-        batt_int = battery_voltage / 100;
-        batt_frac = battery_voltage % 100;
-
-        snprintf(buf, 32, "Batt: %d.%02dV", batt_int, batt_frac);
+        battery_read_info(NULL, &adc_battery_voltage, NULL);
+        snprintf(buf, 32, "Batt: %d.%02dV", adc_battery_voltage / 100,
+                 adc_battery_voltage % 100);
         lcd_puts(0, 1, buf);
 
         button = get_action(CONTEXT_SETTINGS,HZ/5);
@@ -1418,7 +1402,7 @@ bool view_battery(void)
                 lcd_clear_display();
                 lcd_puts(0, 0, "Power status:");
 
-                y = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
+                battery_read_info(NULL, &y, NULL);
                 snprintf(buf, 30, "Battery: %d.%02d V", y / 100, y % 100);
                 lcd_puts(0, 1, buf);
 #ifdef ADC_EXT_POWER

@@ -98,8 +98,8 @@ void usb_screen(void)
 
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
-    lcd_remote_bitmap(remote_usblogo, 
-                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo)/2, 
+    lcd_remote_bitmap(remote_usblogo,
+                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo)/2,
                       (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
                       BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
     lcd_remote_update();
@@ -107,7 +107,7 @@ void usb_screen(void)
 
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo)/2, 
+    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo)/2,
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
     lcd_update();
@@ -167,17 +167,6 @@ int mmc_remove_request(void)
 }
 #endif
 
-
-/* some simulator dummies */
-#ifdef SIMULATOR
-#define BATTERY_SCALE_FACTOR 7000
-unsigned short adc_read(int channel)
-{
-   (void)channel;
-   return 100;
-}
-#endif
-
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 
 #ifdef HAVE_LCD_BITMAP
@@ -195,15 +184,9 @@ void charging_display_info(bool animate)
     if (ide_powered()) /* FM and V2 can only measure when ATA power is on */
 #endif
     {
-        int battery_voltage;
-        int batt_int, batt_frac;
-
-        battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR) / 10000;
-        batt_int = battery_voltage / 100;
-        batt_frac = battery_voltage % 100;
-
-        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", batt_int, batt_frac,
-                 battery_level());
+        int battv = battery_voltage();
+        snprintf(buf, 32, "  Batt: %d.%02dV %d%%  ", battv / 100,
+                 battv % 100, battery_level());
         lcd_puts(0, 7, buf);
     }
 
@@ -294,15 +277,14 @@ static void logo_lock_patterns(bool on)
 
 void charging_display_info(bool animate)
 {
-    int battery_voltage;
+    int battv;
     unsigned i, ypos;
     static unsigned phase = 3;
     char buf[28];
 
-    battery_voltage = (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR)
-                      / 10000;
+    battv = battery_voltage();
     snprintf(buf, sizeof(buf), "%s %d.%02dV", logo_chars,
-             battery_voltage / 100, battery_voltage % 100);
+             battv / 100, battv % 100);
     lcd_puts(0, 1, buf);
 
     memcpy(buf, logo_pattern, 28); /* copy logo patterns */
@@ -337,7 +319,7 @@ void charging_display_info(bool animate)
    2 if Off/Stop key was pressed
    3 if On key was pressed
    4 if USB was connected */
-   
+
 int charging_screen(void)
 {
     unsigned int button;
@@ -391,7 +373,7 @@ void pitch_screen_draw(struct screen *display, int pitch)
     int w, h;
 
     display->clear_display();
-    
+
     if (display->nb_lines < 4) /* very small screen, just show the pitch value */
     {
         w = snprintf((char *)buf, sizeof(buf), "%s: %d.%d%%",str(LANG_SYSFONT_PITCH),
@@ -415,21 +397,21 @@ void pitch_screen_draw(struct screen *display, int pitch)
         display->putsxy((display->width-w)/2, display->height - h, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
                              display->width/2 - 3, display->height - h*2, 7, 8);
-    
+
         /* RIGHT: +2% */
         ptr = "+2%";
         display->getstringsize(ptr,&w,&h);
         display->putsxy(display->width-w, (display->height-h)/2, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastForward],
                              display->width-w-8, (display->height-h)/2, 7, 8);
-    
+
         /* LEFT: -2% */
         ptr = "-2%";
         display->getstringsize(ptr,&w,&h);
         display->putsxy(0, (display->height-h)/2, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_FastBackward],
                              w+1, (display->height-h)/2, 7, 8);
-    
+
         /* "Pitch" */
         snprintf((char *)buf, sizeof(buf), str(LANG_SYSFONT_PITCH));
         display->getstringsize(buf,&w,&h);
@@ -1027,7 +1009,7 @@ bool shutdown_screen(void)
                 break;
 
             /* do nothing here, because ACTION_UNKNOWN might be caused
-             * by timeout or button release. In case of timeout the loop 
+             * by timeout or button release. In case of timeout the loop
              * is terminated by TIME_BEFORE */
             case ACTION_UNKNOWN:
                 break;
@@ -1164,8 +1146,8 @@ bool browse_id3(void)
     while (true) {
         gui_syncstatusbar_draw(&statusbars, false);
         key = get_action(CONTEXT_LIST,HZ/2);
-        if(key!=ACTION_NONE && key!=ACTION_UNKNOWN 
-	    && !gui_synclist_do_button(&id3_lists, key))
+        if(key!=ACTION_NONE && key!=ACTION_UNKNOWN
+        && !gui_synclist_do_button(&id3_lists, key))
         {
             action_signalscreenchange();
             return(default_event_handler(key) == SYS_USB_CONNECTED);

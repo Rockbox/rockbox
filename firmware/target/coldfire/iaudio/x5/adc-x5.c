@@ -24,49 +24,35 @@
 #include "adc.h"
 #include "pcf50606.h"
 
-static unsigned short adcdata[NUM_ADC_CHANNELS];
-
-static const int adcc2_parms[] =
+/* get remaining 2 bits and return 10 bit value */
+static int get_10bit_voltage(int msbdata)
 {
-    [ADC_BUTTONS] = 0x80 | (5 << 1) | 1, /* ADCIN2 */
-    [ADC_REMOTE]  = 0x80 | (6 << 1) | 1, /* ADCIN3 */
-    [ADC_BATTERY] = 0x80 | (0 << 1) | 1, /* BATVOLT, resistive divider */
-};
+    int data = msbdata << 2;
+    data |= pcf50606_read(0x31) & 0x3;
+    return data;
+}
 
 unsigned short adc_scan(int channel)
 {
+    static const int adcc2_parms[] =
+    {
+        [ADC_BUTTONS] = 0x81 | (5 << 1), /* 8b  - ADCIN2 */
+        [ADC_REMOTE]  = 0x81 | (6 << 1), /* 8b  - ADCIN3 */
+        [ADC_BATTERY] = 0x01 | (0 << 1), /* 10b - BATVOLT, resistive divider */
+    };
+
     int level;
-    unsigned char data;
+    int data;
 
     level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
     pcf50606_write(0x2f, adcc2_parms[channel]);
     data = pcf50606_read(0x30);
 
-    adcdata[channel] = data;
+    if (channel == ADC_BATTERY)
+        data = get_10bit_voltage(data);
 
     set_irq_level(level);
-    return data;
-}
 
-unsigned short adc_read(int channel)
-{
-    return adcdata[channel];
-}
-
-static int adc_counter;
-
-static void adc_tick(void)
-{
-    if (++adc_counter == HZ)
-    {
-        adc_counter = 0;
-        adc_scan(ADC_BATTERY);
-    }
-}
-
-void adc_init(void)
-{
-    adc_scan(ADC_BATTERY);
-    tick_add_task(adc_tick);
+    return (unsigned short)data;
 }

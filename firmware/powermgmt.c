@@ -112,6 +112,20 @@ static void battery_status_update(void)
     }
 }
 
+void battery_read_info(int *adc, int *voltage, int *level)
+{
+    battery_status_update();
+
+    if (adc)
+        *adc = batt_centivolts*10000 / BATTERY_SCALE_FACTOR;
+
+    if (voltage)
+        *voltage = batt_centivolts;
+
+    if (level)
+        *level = batt_level;
+}
+
 unsigned int battery_voltage(void)
 {
     battery_status_update();
@@ -167,6 +181,8 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     105, 115    /* alkaline, NiHM */
 #elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
     339
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5
+    354
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
     376
 #elif CONFIG_BATTERY == BATT_BP009 /* iriver H10 5/6GB */
@@ -192,6 +208,13 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
      * for the 1300 mAh stock battery. */
 //  { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
     { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5
+    /* iAudio x5 series  - still experimenting with best curve */
+// Lithium ion discharge curve
+    { 355, 356, 357, 359, 362, 365, 369, 374, 380, 387, 395 }
+// Linear
+//  { 355, 360, 364, 369, 373, 378, 382, 387, 391, 390, 400 }
+//  { 355, 359, 363, 367, 371, 375, 379, 383, 387, 391, 395 }
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     { 376, 380, 385, 387, 390, 395, 402, 407, 411, 418, 424 }
@@ -289,8 +312,24 @@ static long sleeptimer_endtick;
 
 static long last_event_tick;
 
+static int voltage_to_battery_level(int battery_centivolts);
 static void battery_status_update(void);
 static int runcurrent(void);
+
+void battery_read_info(int *adc, int *voltage, int *level)
+{
+    int adc_battery = adc_read(ADC_UNREG_POWER);
+    int centivolts  = adc_battery*BATTERY_SCALE_FACTOR / 10000;
+
+    if (adc)
+        *adc = adc_battery;
+
+    if (voltage)
+        *voltage = centivolts;
+
+    if (level)
+        *level = voltage_to_battery_level(centivolts);
+}
 
 unsigned int battery_voltage(void)
 {
@@ -387,14 +426,14 @@ static int voltage_to_percent(int voltage, const short* table)
 
 /* update battery level and estimated runtime, called once per minute or
  * when battery capacity / type settings are changed */
-static void battery_status_update(void)
+static int voltage_to_battery_level(int battery_centivolts)
 {
     int level;
 
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == DISCHARGING) {
         level = voltage_to_percent(battery_centivolts,
-                percent_to_volt_discharge[battery_type]);
+                    percent_to_volt_discharge[battery_type]);
     }
     else if (charge_state == CHARGING) {
         /* battery level is defined to be < 100% until charging is finished */
@@ -407,8 +446,15 @@ static void battery_status_update(void)
 #else
     /* always use the discharge table */
     level = voltage_to_percent(battery_centivolts,
-            percent_to_volt_discharge[battery_type]);
+                percent_to_volt_discharge[battery_type]);
 #endif
+
+    return level;
+}
+
+static void battery_status_update(void)
+{
+    int level = voltage_to_battery_level(battery_centivolts);
 
 #ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
     if (battery_percent == -1) { /* first run of this procedure */
@@ -699,7 +745,6 @@ static void power_thread(void)
 #endif
 
     /* initialize the voltages for the exponential filter */
-
     avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR *
         BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
@@ -1010,7 +1055,6 @@ void powermgmt_init(void)
 {
     /* init history to 0 */
     memset(power_history, 0x00, sizeof(power_history));
-
     create_thread(power_thread, power_stack, sizeof(power_stack),
                   power_thread_name IF_PRIO(, PRIORITY_SYSTEM));
 }

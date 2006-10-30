@@ -99,7 +99,7 @@ int load_firmware(void)
     unsigned long sum;
     int i;
     unsigned char *buf = (unsigned char *)DRAM_START;
-    
+
     fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
     if(fd < 0)
     {
@@ -114,7 +114,7 @@ int load_firmware(void)
     lcd_update();
 
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-    
+
     rc = read(fd, &chksum, 4);
     if(rc < 4)
         return -2;
@@ -127,7 +127,7 @@ int load_firmware(void)
         return -3;
 
     model[4] = 0;
-    
+
     printf("Model name: %s", model);
     lcd_update();
 
@@ -140,7 +140,7 @@ int load_firmware(void)
     close(fd);
 
     sum = MODEL_NUMBER;
-    
+
     for(i = 0;i < len;i++) {
         sum += buf[i];
     }
@@ -159,7 +159,7 @@ int load_flashed_rockbox(void)
     struct flash_header hdr;
     unsigned char *buf = (unsigned char *)DRAM_START;
     uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
-    
+
     cpu_boost(true);
     memcpy(&hdr, src, sizeof(struct flash_header));
     src += sizeof(struct flash_header);
@@ -221,7 +221,7 @@ void main(void)
     battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
     batt_int = battery_voltage / 100;
     batt_frac = battery_voltage % 100;
-    
+
     printf("Batt: %d.%02dV", batt_int, batt_frac);
     lcd_update();
 
@@ -248,12 +248,12 @@ void main(void)
     i = load_firmware();
     printf("Result: %d", i);
     lcd_update();
-    
+
     if(i == 0)
         start_firmware();
 
     power_off();
-    
+
 #else
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
@@ -266,19 +266,19 @@ void main(void)
     data = GPIO1_READ;
     if ((data & 0x20) == 0)
         on_button = true;
-    
+
     if ((data & 0x40) == 0)
         rc_on_button = true;
 
     /* Set the default state of the hard drive power to OFF */
     ide_power_enable(false);
-    
+
     power_init();
 
     /* Turn off if neither ON button is pressed */
     if(!(on_button || rc_on_button || usb_detect()))
         power_off();
-    
+
     /* Backlight ON */
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
@@ -304,7 +304,7 @@ void main(void)
         ide_power_enable(true);
     }
 #endif
-    
+
     system_init();
     kernel_init();
 
@@ -316,7 +316,7 @@ void main(void)
 #ifdef HAVE_UDA1380
     uda1380_reset();
 #endif
-    
+
     backlight_init();
     set_irq_level(0);
     lcd_init();
@@ -331,9 +331,9 @@ void main(void)
     lcd_update();
 
     sleep(HZ/50); /* Allow the button driver to check the buttons */
-    rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC) 
+    rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
-    
+
     /* Don't start if the Hold button is active on the device you
        are starting with */
     if (!usb_detect() && ((on_button && button_hold()) ||
@@ -363,7 +363,7 @@ void main(void)
     if (detect_flashed_rockbox())
     {
         bool load_from_flash;
-        
+
         load_from_flash = !rec_button;
 #ifdef HAVE_EEPROM_SETTINGS
         if (eeprom_settings_init())
@@ -372,7 +372,7 @@ void main(void)
              * not be intact. */
             if (firmware_settings.bl_version)
                 firmware_settings.disk_clean = false;
-            
+
             firmware_settings.bl_version = 7;
             /* Invert the record button if we want to load from disk
              * by default. */
@@ -380,7 +380,7 @@ void main(void)
                 load_from_flash = rec_button;
         }
 #endif
-        
+
         if (load_from_flash)
         {
             /* Load firmware from flash */
@@ -400,7 +400,7 @@ void main(void)
                 power_off();
             }
         }
-        
+
         printf("Loading from disk...");
         lcd_update();
     }
@@ -416,13 +416,13 @@ void main(void)
     }
 
     usb_init();
-    
+
     adc_battery = adc_read(ADC_BATTERY);
 
     battery_voltage = (adc_battery * BATTERY_SCALE_FACTOR) / 10000;
     batt_int = battery_voltage / 100;
     batt_frac = battery_voltage % 100;
-    
+
     printf("Batt: %d.%02dV", batt_int, batt_frac);
     lcd_update();
 
@@ -431,7 +431,7 @@ void main(void)
         lcd_update();
         sleep(HZ*2);
     }
-    
+
     rc = ata_init();
     if(rc)
     {
@@ -456,7 +456,7 @@ void main(void)
 #ifdef IRIVER_H300_SERIES
         sleep(HZ);
 #endif
-    
+
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
@@ -472,7 +472,7 @@ void main(void)
         {
             ata_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);
-            
+
             /* Backlight OFF */
             or_l(0x00020000, &GPIO1_OUT);
         }
@@ -480,12 +480,12 @@ void main(void)
         cpu_idle_mode(false);
         usb_enable(false);
         ata_init(); /* Reinitialize ATA and continue booting */
-        
+
         lcd_clear_display();
         line = 0;
         lcd_update();
     }
-    
+
     disk_init();
 
     rc = disk_mount_all();
@@ -507,10 +507,10 @@ void main(void)
     if (firmware_settings.initialized)
         eeprom_settings_store();
 #endif
-    
+
     if (i == 0)
         start_firmware();
-    
+
     if (detect_flashed_rockbox())
     {
         printf("No firmware found on disk");
