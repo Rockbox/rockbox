@@ -154,14 +154,6 @@ enum {
 #endif
 #define CODEC_IRAM_SIZE     0xc000
 
-#ifdef PLAYBACK_VOICE
-#ifdef SIMULATOR
-static unsigned char sim_iram[CODEC_IRAM_SIZE];
-#undef CODEC_IRAM_ORIGIN
-#define CODEC_IRAM_ORIGIN sim_iram
-#endif
-#endif
-
 #ifndef SIMULATOR
 extern bool audio_is_initialized;
 #else
@@ -169,87 +161,66 @@ static bool audio_is_initialized = false;
 #endif
 
 
+/* Variables are commented with the threads that use them: *
+ * A=audio, C=codec, V=voice. A suffix of - indicates that *
+ * the variable is read but not updated on that thread.    */
 
-static struct mutex mutex_codecthread;
-static struct event_queue codec_callback_queue;
+/* Main state control */
+static struct event_queue codec_callback_queue; /* Queue for codec callback responses */
+static volatile bool audio_codec_loaded;        /* Is codec loaded? (C/A-) */
+static volatile bool playing;                   /* Is audio playing? (A) */
+static volatile bool paused;                    /* Is audio paused? (A/C-) */
+static volatile bool filling IDATA_ATTR;        /* Is file buffer currently being refilled? (A/C-) */
 
-static volatile bool audio_codec_loaded;
-static volatile bool playing;
-static volatile bool paused;
+/* Ring buffer where tracks and codecs are loaded */
+static char *filebuf;                           /* Pointer to start of ring buffer (A/C-) */
+size_t filebuflen;                              /* Total size of the ring buffer FIXME: make static (A/C-)*/
+static volatile size_t buf_ridx IDATA_ATTR;     /* Ring buffer read position (A/C) FIXME? should be (C/A-) */
+static volatile size_t buf_widx IDATA_ATTR;     /* Ring buffer read position (A/C-) */
 
-/* Is file buffer currently being refilled? */
-static volatile bool filling IDATA_ATTR;
-
-volatile int current_codec IDATA_ATTR;
-extern unsigned char codecbuf[];
-
-/* Ring buffer where tracks and codecs are loaded. */
-static char *filebuf;
-
-/* Total size of the ring buffer. */
-size_t filebuflen;
-
-/* Ring buffer read and write indexes. */
-static volatile size_t buf_ridx IDATA_ATTR;
-static volatile size_t buf_widx IDATA_ATTR;
-
-/* Ring buffer arithmetic */
 #define RINGBUF_ADD(p,v) ((p+v)<filebuflen ? p+v : p+v-filebuflen)
 #define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+filebuflen-v)
 #define RINGBUF_ADD_CROSS(p1,v,p2) ((p1<p2)?(int)(p1+v)-(int)p2:(int)(p1+v-p2)-(int)filebuflen)
+#define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx) /* Bytes available in the buffer */
 
-/* Bytes available in the buffer. */
-#define FILEBUFUSED RINGBUF_SUB(buf_widx, buf_ridx)
+/* Track info buffer */
+static struct track_info tracks[MAX_TRACK];     /* Track info structure about songs in the file buffer (A/C-) */
+static volatile int track_ridx;                 /* Track being decoded (A/C-) */
+static int track_widx;                          /* Track being buffered (A) */
+static bool track_changed;                      /* Set to indicate track has changed (A) */
+static struct track_info *prev_ti;              /* Pointer to previous track played info (A/C-) */
 
-/* Codec swapping pointers */
-static unsigned char *iram_buf[2];
-static unsigned char *dram_buf[2];
+#define CUR_TI (&tracks[track_ridx])            /* Pointer to current track playing info (A/C-) */
 
-/* Step count to the next unbuffered track. */
-static int last_peek_offset;                    /* Audio thread */
+/* Audio buffering controls */
+static int last_peek_offset;                    /* Step count to the next unbuffered track (A) */
+static int current_fd;                          /* Partially loaded track file handle to continue buffering (A) */
 
-/* Track information (count in file buffer, read/write indexes for
-   track ring structure. */
-static int track_ridx;
-static int track_widx;
-static bool track_changed;                      /* Audio and codec threads */
+/* Scrobbler support */
+static unsigned long prev_track_elapsed;        /* Previous track elapsed time (C/A-) */
 
-/* Partially loaded song's file handle to continue buffering later. */
-static int current_fd;
+/* Track change controls */
+static bool automatic_skip = false;             /* Was the skip being executed manual or automatic? (C/A-) */
+static bool playlist_end = false;               /* Have we reached end of the current playlist? (A) */
+static bool dir_skip = false;                   /* Is a directory skip pending? (A) */
+static bool new_playlist = false;               /* Are we starting a new playlist? (A) */
+static int wps_offset = 0;                      /* Pending track change offset, to keep WPS responsive (A) */
 
-/* Track info structure about songs in the file buffer. */
-static struct track_info tracks[MAX_TRACK];     /* Audio thread */
-
-/* Pointer to track info structure about current song playing. */
-#define CUR_TI (&tracks[track_ridx])
-
-/* Pointer to track info structure about previous played song. */
-static struct track_info *prev_ti;              /* Audio and codec threads */
-
-/* Have we reached end of the current playlist. */
-static bool playlist_end = false;               /* Audio thread */
-
-/* Was the skip being executed manual or automatic? */
-static bool automatic_skip = false;             /* Audio and codec threads */
-static bool dir_skip = false;                   /* Audio thread */
-static bool new_playlist = false;               /* Audio thread */
-static int wps_offset = 0;
-
-/* Callback function to call when current track has really changed. */
-void (*track_changed_callback)(struct mp3entry *id3);
-void (*track_buffer_callback)(struct mp3entry *id3, bool last_track);
-void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track);
+/* Callbacks..  */
+void (*track_changed_callback)(struct mp3entry *id3); /* ...when current track has really changed */
+void (*track_buffer_callback)(struct mp3entry *id3, bool last_track); /* ...when track has been buffered */
+void (*track_unbuffer_callback)(struct mp3entry *id3, bool last_track); /* ...when track is being unbuffered */
 
 /* Configuration */
-static size_t conf_watermark;
-static size_t conf_filechunk;
-static size_t conf_preseek;
-static size_t buffer_margin;
-static bool v1first = false;
+static size_t conf_watermark;                   /* Low water mark (A/C) FIXME */
+static size_t conf_filechunk;                   /* Largest chunk the codec accepts (A/C) FIXME */
+static size_t conf_preseek;                     /* Codec pre-seek margin (A/C) FIXME */
+static size_t buffer_margin;                    /* Buffer margin aka anti-skip buffer (A/C-) */
+static bool v1first = false;                    /* ID3 data control, true if V1 then V2 (A) */
 
 /* Multiple threads */
-static const char * get_codec_filename(int enc_spec);
-static void set_filebuf_watermark(int seconds);
+static const char *get_codec_filename(int enc_spec); /* Returns codec filename (A-/C-/V-) */
+static void set_filebuf_watermark(int seconds); /* Set low watermark (A/C) FIXME */
 
 /* Audio thread */
 static struct event_queue audio_queue;
@@ -267,34 +238,48 @@ static struct event_queue codec_queue;
 static long codec_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char codec_thread_name[] = "codec";
-/* For modifying thread priority later. */
-struct thread_entry *codec_thread_p;
+struct thread_entry *codec_thread_p;            /* For modifying thread priority later. */
+
+volatile int current_codec IDATA_ATTR;          /* Current codec (normal/voice) */
 
 /* Voice thread */
 #ifdef PLAYBACK_VOICE
+
 extern struct codec_api ci_voice;
 
-/* Play time of the previous track */
-unsigned long prev_track_elapsed;
-
-static volatile bool voice_thread_start;
-static volatile bool voice_is_playing;
-static volatile bool voice_codec_loaded;
-static void (*voice_getmore)(unsigned char** start, int* size);
-static char *voicebuf;
-static size_t voice_remaining;
 static struct thread_entry *voice_thread_p = NULL;
-
 static struct event_queue voice_queue;
 static long voice_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
 IBSS_ATTR;
 static const char voice_thread_name[] = "voice codec";
+
+/* Voice codec swapping control */
+extern unsigned char codecbuf[];                /* DRAM codec swap buffer */
+
+#ifdef SIMULATOR
+static unsigned char sim_iram[CODEC_IRAM_SIZE]; /* IRAM codec swap buffer for sim*/
+#undef CODEC_IRAM_ORIGIN
+#define CODEC_IRAM_ORIGIN sim_iram
+#endif
+
+static unsigned char *iram_buf[2];              /* Ptr to IRAM buffers for normal/voice codecs */
+static unsigned char *dram_buf[2];              /* Ptr to DRAM buffers for normal/voice codecs */
+static struct mutex mutex_codecthread;          /* Mutex to control which codec (normal/voice) is running */
+
+/* Voice state */
+static volatile bool voice_thread_start;    /* Set to trigger voice playback (A/V) */
+static volatile bool voice_is_playing;      /* Is voice currently playing? (V) */
+static volatile bool voice_codec_loaded;    /* Is voice codec loaded (V/A-) */
+static char *voicebuf;
+static size_t voice_remaining;
+
+static void (*voice_getmore)(unsigned char** start, int* size);
+
 struct voice_info {
     void (*callback)(unsigned char **start, int *size);
     int size;
     char *buf;
 };
-
 static void voice_thread(void);
 
 #endif /* PLAYBACK_VOICE */
@@ -1585,7 +1570,7 @@ static void codec_configure_callback(int setting, void *value)
 static void codec_track_changed(void)
 {
     automatic_skip = false;
-    track_changed = true;
+    track_changed = true; /* FIXME: should only be updated on the audio thread? */
     LOGFQUEUE("codec > audio Q_AUDIO_TRACK_CHANGED");
     queue_post(&audio_queue, Q_AUDIO_TRACK_CHANGED, 0);
 }
