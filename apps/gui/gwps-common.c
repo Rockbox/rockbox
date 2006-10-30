@@ -1638,6 +1638,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
     bool reset_subline;
     int search;
     int search_start;
+    struct align_pos format_align;
     struct wps_data *data = gwps->data;
     struct wps_state *state = gwps->state;
     struct screen *display = gwps->display;
@@ -1738,7 +1739,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                     format_display(gwps, buf, sizeof(buf),
                                    state->id3, state->nid3,
                                    data->format_lines[i][data->curr_subline[i]],
-                                   &data->format_align[i][data->curr_subline[i]],
+                                   &format_align,
                                    &data->time_mult[i][data->curr_subline[i]],
                                    &data->line_type[i][data->curr_subline[i]]);
 
@@ -1778,7 +1779,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             format_display(gwps, buf, sizeof(buf),
                            state->id3, state->nid3,
                            data->format_lines[i][data->curr_subline[i]],
-                           &data->format_align[i][data->curr_subline[i]],
+                           &format_align,
                            &data->time_mult[i][data->curr_subline[i]],
                            &flags);
             data->line_type[i][data->curr_subline[i]] = flags;
@@ -1846,9 +1847,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 #ifdef HAVE_LCD_BITMAP
             /* calculate different string sizes and positions */
             display->getstringsize((unsigned char *)" ", &space_width, &string_height);
-            if (data->format_align[i][data->curr_subline[i]].left != 0) {
-                display->getstringsize((unsigned char *)data->format_align[i]
-                                       [data->curr_subline[i]].left,
+            if (format_align.left != 0) {
+                display->getstringsize((unsigned char *)format_align.left,
                                        &left_width, &string_height);
             }
             else {
@@ -1856,9 +1856,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             }
             left_xpos = 0;
 
-            if (data->format_align[i][data->curr_subline[i]].center != 0) {
-                display->getstringsize((unsigned char *)data->format_align[i]
-                                       [data->curr_subline[i]].center,
+            if (format_align.center != 0) {
+                display->getstringsize((unsigned char *)format_align.center,
                                        &center_width, &string_height);
             }
             else {
@@ -1866,9 +1865,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             }
             center_xpos=(display->width - center_width) / 2;
 
-            if (data->format_align[i][data->curr_subline[i]].right != 0) {
-                display->getstringsize((unsigned char *)data->format_align[i]
-                                       [data->curr_subline[i]].right,
+            if (format_align.right != 0) {
+                display->getstringsize((unsigned char *)format_align.right,
                                        &right_width, &string_height);
             }
             else {
@@ -1886,7 +1884,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 (left_xpos + left_width + space_width > center_xpos)) {
                 /* replace the former separator '\0' of left and 
                    center string with a space */
-                *(--data->format_align[i][data->curr_subline[i]].center) = ' ';
+                *(--format_align.center) = ' ';
                 /* calculate the new width and position of the merged string */
                 left_width = left_width + space_width + center_width;
                 left_xpos = 0;
@@ -1897,8 +1895,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             if ((left_width == 0 && center_width != 0) &&
                 (left_xpos + left_width > center_xpos)) {
                 /* move the center string to the left string */
-                data->format_align[i][data->curr_subline[i]].left =
-                  data->format_align[i][data->curr_subline[i]].center;
+                format_align.left = format_align.center;
                 /* calculate the new width and position of the string */
                 left_width = center_width;
                 left_xpos = 0;
@@ -1912,10 +1909,9 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 (center_xpos + center_width + space_width > right_xpos)) {
                 /* replace the former separator '\0' of center and 
                    right string with a space */
-                *(--data->format_align[i][data->curr_subline[i]].right) = ' ';
+                *(--format_align.right) = ' ';
                 /* move the center string to the right after merge */
-                data->format_align[i][data->curr_subline[i]].right = 
-                  data->format_align[i][data->curr_subline[i]].center;
+                format_align.right = format_align.center;
                 /* calculate the new width and position of the merged string */
                 right_width = center_width + space_width + right_width;
                 right_xpos = (display->width - right_width);
@@ -1926,8 +1922,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             if ((center_width != 0 && right_width == 0) &&
                 (center_xpos + center_width > right_xpos)) {
                 /* move the center string to the right string */
-                data->format_align[i][data->curr_subline[i]].right =
-                  data->format_align[i][data->curr_subline[i]].center;
+                format_align.right = format_align.center;
                 /* calculate the new width and position of the string */
                 right_width = center_width;
                 right_xpos = (display->width - right_width);
@@ -1943,7 +1938,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                 (left_xpos + left_width + space_width > right_xpos)) {
                 /* replace the former separator '\0' of left and 
                    right string with a space */
-                *(--data->format_align[i][data->curr_subline[i]].right) = ' ';
+                *(--format_align.right) = ' ';
                 /* calculate the new width and position of the string */
                 left_width = left_width + space_width + right_width;
                 left_xpos = 0;
@@ -1954,8 +1949,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
             if ((left_width == 0 && center_width == 0 && right_width != 0) &&
                 (left_xpos + left_width > right_xpos)) {
                 /* move the right string to the left string */
-                data->format_align[i][data->curr_subline[i]].left =
-                  data->format_align[i][data->curr_subline[i]].right;
+                format_align.left = format_align.right;
                 /* calculate the new width and position of the string */
                 left_width = right_width;
                 left_xpos = 0;
@@ -1976,8 +1970,7 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
 
                     if (left_width>display->width) {
                         display->puts_scroll(0, i,
-                                             (unsigned char *)data->format_align[i]
-                                             [data->curr_subline[i]].left);
+                                             (unsigned char *)format_align.left);
                     } else {
                         /* clear the line first */
                         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -1992,20 +1985,17 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                         if (left_width != 0)
                         {
                             display->putsxy(left_xpos, ypos,
-                                            (unsigned char *)data->format_align[i]
-                                            [data->curr_subline[i]].left);
+                                            (unsigned char *)format_align.left);
                         }
                         if (center_width != 0)
                         {
                             display->putsxy(center_xpos, ypos, 
-                                            (unsigned char *)data->format_align[i]
-                                            [data->curr_subline[i]].center);
+                                            (unsigned char *)format_align.center);
                         }
                         if (right_width != 0)
                         {
                             display->putsxy(right_xpos, ypos,
-                                            (unsigned char *)data->format_align[i]
-                                            [data->curr_subline[i]].right);
+                                            (unsigned char *)format_align.right);
                         }
                     }
 #else
@@ -2037,20 +2027,17 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                     if (left_width != 0)
                     {
                         display->putsxy(left_xpos, ypos,
-                                        (unsigned char *)data->format_align[i]
-                                        [data->curr_subline[i]].left);
+                                        (unsigned char *)format_align.left);
                     }
                     if (center_width != 0)
                     {
                         display->putsxy(center_xpos, ypos,
-                                        (unsigned char *)data->format_align[i]
-                                        [data->curr_subline[i]].center);
+                                        (unsigned char *)format_align.center);
                     }
                     if (right_width != 0)
                     {
                         display->putsxy(right_xpos, ypos,
-                                        (unsigned char *)data->format_align[i]
-                                        [data->curr_subline[i]].right);
+                                        (unsigned char *)format_align.right);
                     }
 #else
                     update_line = true;

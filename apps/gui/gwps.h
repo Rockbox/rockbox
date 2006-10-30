@@ -378,7 +378,6 @@ struct wps_data
 #endif
     char format_buffer[FORMAT_BUFFER_SIZE];
     char* format_lines[WPS_MAX_LINES][WPS_MAX_SUBLINES];
-    struct align_pos format_align[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     unsigned char line_type[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     unsigned short time_mult[WPS_MAX_LINES][WPS_MAX_SUBLINES];
     long subline_expire_time[WPS_MAX_LINES];
