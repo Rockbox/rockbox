@@ -117,7 +117,7 @@ void battery_read_info(int *adc, int *voltage, int *level)
     battery_status_update();
 
     if (adc)
-        *adc = batt_centivolts*10000 / BATTERY_SCALE_FACTOR;
+        *adc = batt_centivolts; /* just return something */
 
     if (voltage)
         *voltage = batt_centivolts;
