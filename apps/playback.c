@@ -1452,13 +1452,12 @@ static int codec_get_file_pos(void)
     else
         return -1;
 
+    pos += id3->first_frame_offset;
+
     /* Don't seek right to the end of the file so that we can
        transition properly to the next song */
     if (pos >= (int)(id3->filesize - id3->id3v1len))
         pos = id3->filesize - id3->id3v1len - 1;
-    /* skip past id3v2 tag and other leading garbage */
-    else if (pos < (int)id3->first_frame_offset)
-        pos = id3->first_frame_offset;
 
     return pos;
 }
@@ -2316,6 +2315,9 @@ static bool audio_loadcodec(bool start_play)
 /* TODO: Copied from mpeg.c. Should be moved somewhere else. */
 static void audio_set_elapsed(struct mp3entry* id3)
 {
+    unsigned long offset = id3->offset > id3->first_frame_offset ? 
+        id3->offset - id3->first_frame_offset : 0;
+
     if ( id3->vbr ) {
         if ( id3->has_toc ) {
             /* calculate elapsed time using TOC */
@@ -2324,7 +2326,7 @@ static void audio_set_elapsed(struct mp3entry* id3)
 
             /* find wich percent we're at */
             for (i=0; i<100; i++ )
-                if ( id3->offset < id3->toc[i] * (id3->filesize / 256) )
+                if ( offset < id3->toc[i] * (id3->filesize / 256) )
                     break;
 
             i--;
@@ -2338,7 +2340,7 @@ static void audio_set_elapsed(struct mp3entry* id3)
             else
                 nextpos = 256;
 
-            remainder = id3->offset - (relpos * (id3->filesize / 256));
+            remainder = offset - (relpos * (id3->filesize / 256));
 
             /* set time for this percent (divide before multiply to prevent
                overflow on long files. loss of precision is negligible on
@@ -2352,15 +2354,17 @@ static void audio_set_elapsed(struct mp3entry* id3)
         }
         else {
             /* no TOC exists. set a rough estimate using average bitrate */
-            int tpk = id3->length / (id3->filesize / 1024);
-            id3->elapsed = id3->offset / 1024 * tpk;
+            int tpk = id3->length / 
+                ((id3->filesize - id3->first_frame_offset - id3->id3v1len) /
+                1024);
+            id3->elapsed = offset / 1024 * tpk;
         }
     }
     else
     {
         /* constant bitrate, use exact calculation */
         if (id3->bitrate != 0)
-            id3->elapsed = id3->offset / (id3->bitrate / 8);
+            id3->elapsed = offset / (id3->bitrate / 8);
     }
 }
 
