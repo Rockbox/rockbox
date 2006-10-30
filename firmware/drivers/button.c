@@ -308,9 +308,6 @@ void button_init(void)
 #ifdef TARGET_TREE
     button_init_device();
     
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD \
-      ||  CONFIG_KEYPAD == IRIVER_H300_PAD
-    button_init_device(); /* temp untill TARGET_TREE is defined */
 #elif CONFIG_KEYPAD == RECORDER_PAD
     /* Set PB4 and PB8 as input pins */
     PBCR1 &= 0xfffc;  /* PB8MD = 00 */
