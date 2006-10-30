@@ -1476,12 +1476,6 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    and_l(~0x00080000, &GPIO_OUT);
-    sleep(1); /* > 25us */
-
-    or_l(0x00080000, &GPIO_OUT);
-    sleep(1); /* > 25us */
 #elif CONFIG_CPU == TCC730
 
     P6 &= ~0x40;
@@ -1627,14 +1621,6 @@ void ata_enable(bool on)
         or_b(0x80, &PADRL); /* disable ATA */
 
     or_b(0x80, &PAIORL);
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    if(on)
-        and_l(~0x0040000, &GPIO_OUT);
-    else
-        or_l(0x0040000, &GPIO_OUT);
-    
-    or_l(0x00040000, &GPIO_ENABLE);
-    or_l(0x00040000, &GPIO_FUNCTION);
 #elif CONFIG_CPU == TCC730
 
 #endif
@@ -1788,8 +1774,6 @@ int ata_init(void)
     bool coldstart = ata_is_coldstart();
 #elif CONFIG_CPU == TCC730
     bool coldstart = (P1 & 0x80) == 0;
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    bool coldstart = (GPIO_FUNCTION & 0x00080000) == 0;
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif

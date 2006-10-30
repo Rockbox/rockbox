@@ -61,13 +61,7 @@ static inline void __backlight_off(void)
 #ifndef TARGET_TREE
 static inline void __backlight_on(void)
 {
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
-    and_l(~0x00020000, &GPIO1_OUT);    
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
-    lcd_enable(true);
-    sleep(HZ/100); /* lcd needs time - avoid flashing for dark screens */
-    or_l(0x00020000, &GPIO1_OUT);
-#elif CONFIG_BACKLIGHT == BL_RTC
+#if CONFIG_BACKLIGHT == BL_RTC
     /* Enable square wave */
     rtc_write(0x0a, rtc_read(0x0a) | 0x40);
 #elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
@@ -84,12 +78,7 @@ static inline void __backlight_on(void)
 
 static inline void __backlight_off(void)
 {
-#if CONFIG_BACKLIGHT == BL_IRIVER_H100
-    or_l(0x00020000, &GPIO1_OUT);
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
-    and_l(~0x00020000, &GPIO1_OUT);
-    lcd_enable(false);
-#elif CONFIG_BACKLIGHT == BL_RTC
+#if CONFIG_BACKLIGHT == BL_RTC
     /* Disable square wave */
     rtc_write(0x0a, rtc_read(0x0a) & ~0x40);
 #elif CONFIG_BACKLIGHT == BL_PA14_LO /* Player */
@@ -162,7 +151,7 @@ static int lcd_sleep_timeout = 10*HZ;
 
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
 /* backlight fading */
-#define BL_PWM_INTERVAL 5000  /* Cycle interval in µs */
+#define BL_PWM_INTERVAL 5000  /* Cycle interval in s */
 #define BL_PWM_COUNT    100
 static const char backlight_fade_value[8] = { 0, 1, 2, 4, 6, 8, 10, 20 };
 static int fade_in_count = 1;
@@ -352,26 +341,6 @@ static void __remote_backlight_off(void)
 {
     sim_remote_backlight(0);
 }
-#else
-#ifndef TARGET_TREE
-static void __remote_backlight_on(void)
-{
-#if defined(IRIVER_H300_SERIES)
-    and_l(~0x00000002, &GPIO1_OUT);
-#else
-    and_l(~0x00000800, &GPIO_OUT);
-#endif
-}
-
-static void __remote_backlight_off(void)
-{
-#if defined(IRIVER_H300_SERIES)
-    or_l(0x00000002, &GPIO1_OUT);
-#else
-    or_l(0x00000800, &GPIO_OUT);
-#endif
-}
-#endif /* TARGET_TREE */
 #endif /* SIMULATOR */
 #endif /* HAVE_REMOTE_LCD */
 

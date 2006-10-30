@@ -253,18 +253,30 @@ target/coldfire/iaudio/x5/lcd-remote-x5.c
 #endif
 #endif
 
-#ifdef IRIVER_H100_SERIES
+#ifdef IRIVER_H300_SERIES
+target/coldfire/iriver/h300/power-h300.c
 #ifndef SIMULATOR
-target/coldfire/iriver/h100/button-h100.c
+target/coldfire/pcf50606-coldfire.c
+target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/h300/adc-h300.c
+target/coldfire/iriver/h300/backlight-h300.c
+target/coldfire/iriver/h300/button-h300.c
+target/coldfire/iriver/h300/lcd-as-h300.S
+target/coldfire/iriver/h300/pcf50606-h300.c
+target/coldfire/iriver/h300/usb-h300.c
 #endif
 #endif
 
-#ifdef IRIVER_H300_SERIES
+#ifdef IRIVER_H100_SERIES
+target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
-target/coldfire/iriver/h300/lcd-as-h300.S
-target/coldfire/iriver/h300/button-h300.c
-target/coldfire/pcf50606-coldfire.c
-target/coldfire/iriver/h300/pcf50606-h300.c
+target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/system-iriver.c
+target/coldfire/iriver/h100/adc-h100.c
+target/coldfire/iriver/h100/backlight-h100.c
+target/coldfire/iriver/h100/button-h100.c
+target/coldfire/iriver/h100/usb-h100.c
 #endif
 #endif
 

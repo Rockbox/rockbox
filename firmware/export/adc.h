@@ -24,28 +24,6 @@
 #ifdef TARGET_TREE
 #include "adc-target.h"
 
-#elif defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-#define NUM_ADC_CHANNELS 4
-
-#define ADC_BUTTONS 0
-#define ADC_REMOTE  1
-#define ADC_BATTERY 2
-#define ADC_REMOTEDETECT  3
-#define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
-
-/* ADC values for different remote control types */
-#ifdef IRIVER_H100_SERIES
-#define ADCVAL_H300_LCD_REMOTE      0x5E
-#define ADCVAL_H100_LCD_REMOTE      0x96
-#define ADCVAL_H300_LCD_REMOTE_HOLD 0xCC
-#define ADCVAL_H100_LCD_REMOTE_HOLD 0xEA
-#else /* H300 series */
-#define ADCVAL_H300_LCD_REMOTE      0x35
-#define ADCVAL_H100_LCD_REMOTE      0x54
-#define ADCVAL_H300_LCD_REMOTE_HOLD 0x72
-#define ADCVAL_H100_LCD_REMOTE_HOLD 0x83
-#endif
-
 #elif defined(IRIVER_IFP7XX)
 
 #define NUM_ADC_CHANNELS 5
@@ -99,10 +77,5 @@
 
 unsigned short adc_read(int channel);
 void adc_init(void);
-
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-/* Force a scan now */
-unsigned short adc_scan(int channel);
-#endif
 
 #endif /* _ADC_H_ */

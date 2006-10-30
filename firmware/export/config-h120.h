@@ -1,3 +1,4 @@
+#define TARGET_TREE /* this target is using the target tree system */
 /*
  * This config file is for iriver H120 and H140
  */
@@ -141,6 +142,13 @@
 #define HAVE_EEPROM_SETTINGS
 
 #endif /* !SIMULATOR */
+
+#define DEFAULT_CONTRAST_SETTING    40
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
+#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
+#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
 
 /* Define this for S/PDIF input available */
 #define HAVE_SPDIF_IN

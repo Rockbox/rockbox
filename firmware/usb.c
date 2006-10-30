@@ -155,26 +155,6 @@ void usb_enable(bool on)
             }
         }
     }
-#elif defined(USB_IRIVERSTYLE)
-    if(on)
-    {
-        /* Power on the Cypress chip */
-#ifdef IRIVER_H100_SERIES
-        or_l(0x01000040, &GPIO_OUT);
-#else
-        and_l(~0x00000008,&GPIO1_OUT);
-#endif
-        sleep(2);
-    }
-    else
-    {
-        /* Power off the Cypress chip */
-#ifdef IRIVER_H100_SERIES
-        and_l(~0x01000040, &GPIO_OUT);
-#else
-        or_l(0x00000008,&GPIO1_OUT);
-#endif
-    }
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
     (void) on;
@@ -391,9 +371,6 @@ bool usb_detect(void)
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
 #endif
-#ifdef USB_IRIVERSTYLE
-    current_status = (GPIO1_READ & 0x80)?true:false;
-#endif
 #ifdef USB_GMINISTYLE
     current_status = (P5 & 0x10)?true:false;
 #endif
@@ -481,24 +458,6 @@ void usb_init(void)
 
 #ifdef TARGET_TREE
     usb_init_device();
-#elif defined USB_IRIVERSTYLE
-    or_l(0x00000080, &GPIO1_FUNCTION); /* GPIO39 is the USB detect input */
-
-#ifdef IRIVER_H300_SERIES
-    /* ISD300 3.3V ON */
-    or_l(8,&GPIO1_FUNCTION);
-    or_l(8,&GPIO1_OUT);
-    or_l(8,&GPIO1_ENABLE);
-
-    /* Tristate the SCK/SDA to the ISD300 config EEPROM */
-    and_l(~0x03000000, &GPIO_ENABLE);
-    or_l(0x03000000, &GPIO_FUNCTION);
-#else
-    and_l(~0x01000040, &GPIO_OUT);     /* GPIO24 is the Cypress chip power */
-    or_l(0x01000040, &GPIO_ENABLE);
-    or_l(0x01000040, &GPIO_FUNCTION);
-#endif
-
 #endif
 
     usb_enable(false);
