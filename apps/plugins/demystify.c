@@ -81,6 +81,10 @@ PLUGIN_HEADER
 #define MAX_POLYGONS 40
 #define MIN_POLYGONS 1
 
+#ifdef HAVE_LCD_COLOR
+int r,g,b,rc,gc,bc;
+#endif
+
 /******************************* Globals ***********************************/
 
 static struct plugin_api* rb; /* global api struct pointer */
@@ -280,6 +284,34 @@ void cleanup(void *parameter)
 #endif
 }
 
+#ifdef HAVE_LCD_COLOR
+void new_color(void)
+{
+    r = rb->rand()%255;
+    g = rb->rand()%255;
+    b = rb->rand()%255;
+}
+
+void change_color(void)
+{
+    if(rc<r)
+        ++rc;
+    else if(rc>r)
+        --rc;
+    if(gc<g)
+        ++gc;
+    else if(gc>g)
+        --gc;
+    if(bc<b)
+        ++bc;
+    else if(bc>b)
+        --bc;
+    rb->lcd_set_foreground(LCD_RGBPACK(rc,gc,bc));
+    if(rc==r && gc==g && bc==b)
+        new_color();
+}
+#endif
+
 /*
  * Main function
  */
@@ -296,10 +328,23 @@ int plugin_main(void)
     struct polygon leading_polygon[NB_SCREENS];
     FOR_NB_SCREENS(i)
     {
+#ifdef HAVE_LCD_COLOR
+        struct screen *display = rb->screens[i];
+        if (display->depth > 8)
+            display->set_background(LCD_BLACK);
+#endif
         fifo_init(&polygons[i]);
         polygon_move_init(&move[i]);
         polygon_init(&leading_polygon[i], rb->screens[i]);
     }
+
+#ifdef HAVE_LCD_COLOR
+    new_color();
+    rc = r;
+    gc = g;
+    bc = b;
+#endif
+
     while (true)
     {
         FOR_NB_SCREENS(i)
@@ -325,10 +370,18 @@ int plugin_main(void)
 
             /* Now the drawing part */
 
+#ifdef HAVE_LCD_COLOR
+            if (display->depth > 8)
+                display->set_foreground(SCREEN_COLOR_TO_NATIVE(display,
+                                        LCD_RGBPACK(rc, gc, bc)));
+#endif
             display->clear_display();
             polygons_draw(&polygons[i], display);
             display->update();
         }
+#ifdef HAVE_LCD_COLOR
+        change_color();
+#endif
         /* Speed handling*/
         if (sleep_time<0)/* full speed */
             rb->yield();
