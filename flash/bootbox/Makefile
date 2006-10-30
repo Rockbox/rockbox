@@ -42,39 +42,33 @@ all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
 dep: $(DEPFILE)
 
 $(LINKFILE): $(LDS)
-	@echo "Build LDS file"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(MAXOUTFILE):
-	@echo '#include "config.h"' > $(MAXINFILE)
-	@echo "ROM_START" >> $(MAXINFILE)
-	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
-	@rm $(MAXINFILE)
+	$(SILENT)echo '#include "config.h"' > $(MAXINFILE)
+	$(SILENT)echo "ROM_START" >> $(MAXINFILE)
+	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
+	$(SILENT)rm $(MAXINFILE)
 
 $(OBJDIR)/bootbox.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
-	@echo "LD bootbox.elf"
-	$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootbox.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Wl,--gc-sections -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootbox.map
 
 $(OBJDIR)/bootbox.bin : $(OBJDIR)/bootbox.elf
-	@echo "OBJCOPY $<"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/bootbox.asm: $(OBJDIR)/bootbox.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootbox.bin
-	@echo "Build bootbox file"
-	@$(MKFIRMWARE) $< $@
+	$(call PRINTS,Build bootbox file)$(MKFIRMWARE) $< $@
 
 $(FLASHFILE): $(OBJDIR)/bootbox.bin
-	$(SILENT)(echo "UCLPACK bootbox" ; \
-	$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1;)
+	$(call PRINTS,UCLPACK bootbox)$(TOOLSDIR)/uclpack --best --2e $< $@ >/dev/null 2>&1;
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning bootbox"
-	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootbox.asm $(OBJDIR)/rockbox.ucl \
+	$(call PRINTS,cleaning bootbox)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootbox.asm $(OBJDIR)/rockbox.ucl \
 	$(OBJDIR)/bootbox.bin $(OBJDIR)/bootbox.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE) $(FLASHFILE)
 

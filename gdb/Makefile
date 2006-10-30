@@ -41,26 +41,21 @@ all: $(BUILDDIR)/$(BINARY) $(FLASHFILE)
 dep: $(DEPFILE)
 
 $(LINKFILE): $(LDS)
-	@echo "Build LDS file"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(OBJDIR)/stub.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
-	@echo "LD stub.elf"
-	@$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/stub.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/stub.map
 
 $(OBJDIR)/stub.bin : $(OBJDIR)/stub.elf
-	@echo "OBJCOPY $<"
-	@$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/stub.bin
-	@echo "Build stub file"
-	$(MKFIRMWARE) $< $@
+	$(call PRINTS,Build stub file)$(MKFIRMWARE) $< $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning stub"
-	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) \
+	$(call PRINTS,cleaning stub)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) \
 	$(OBJDIR)/stub.bin $(OBJDIR)/stub.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(DEPFILE)
 

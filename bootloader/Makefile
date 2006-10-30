@@ -50,35 +50,30 @@ endif
 dep: $(DEPFILE)
 
 $(LINKFILE): $(LDS)
-	@echo "Build LDS file"
-	@cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
+	$(call PRINTS,Build $(@F))cat $< | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - >$@
 
 $(MAXOUTFILE):
-	@echo '#include "config.h"' > $(MAXINFILE)
-	@echo "ROM_START" >> $(MAXINFILE)
-	@cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
-	@rm $(MAXINFILE)
+	$(SILENT)echo '#include "config.h"' > $(MAXINFILE)
+	$(SILENT)echo "ROM_START" >> $(MAXINFILE)
+	$(SILENT)cat $(MAXINFILE) | $(CC) -DMEMORYSIZE=$(MEMORYSIZE) $(INCLUDES) $(TARGET) $(DEFINES) -E -P $(ROMBUILD) - > $(MAXOUTFILE)
+	$(SILENT)rm $(MAXINFILE)
 
 $(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX)
-	@echo "LD bootloader.elf"
-	$(SILENT)$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -L$(BUILDDIR)/firmware -lrockbox -lgcc -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/bootloader.map
 
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
-	@echo "OBJCOPY $<"
-	$(SILENT)$(OC) -O binary $< $@
+	$(call PRINTS,OBJCOPY $(@F))$(OC) -O binary $< $@
 
 $(OBJDIR)/bootloader.asm: $(OBJDIR)/bootloader.bin
 	$(TOOLSDIR)/sh2d -sh1 $< > $@
 
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootloader.bin
-	@echo "Build bootloader file"
-	$(SILENT)$(MKFIRMWARE) $< $@
+	$(call PRINTS,Build bootloader file)$(MKFIRMWARE) $< $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	@echo "cleaning bootloader"
-	@-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
+	$(call PRINTS,cleaning bootloader)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
 	$(OBJDIR)/bootloader.bin $(OBJDIR)/bootloader.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE)
 
