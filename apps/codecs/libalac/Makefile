@@ -15,8 +15,8 @@ ifdef APPEXTRA
 endif
 
 ALACOPTS = -O3
-CFLAGS = $(GCCOPTS) $(ALACOPTS) $(INCLUDES) $(TARGET) $(EXTRA_DEFINES) \
- -DMEM=${MEMORYSIZE}
+CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET_INC) $(ALACOPTS) $(TARGET) \
+$(EXTRA_DEFINES) -DMEM=${MEMORYSIZE} $(PROFILE_OPTS)
 
 # This sets up 'SRC' based on the files mentioned in SOURCES
 include $(TOOLSDIR)/makesrc.inc
