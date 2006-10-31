@@ -16,7 +16,7 @@
     \reference{ref:WPS}. For information about editing a .wps file see
     \reference{ref:ConfiguringtheWPS}.
     
-  \opt{h1xx,h300,x5}{
+  \opt{HAVE_REMOTE_LCD}{
     \item[Browse RWPS files:]
     Opens the \setting{File Browser} in the \fname{/.rockbox/wps} directory and
     displays all \fname{.rwps} files. Selecting one will activate it, stop will
@@ -96,20 +96,21 @@
     
       \opt{HAVE_LCD_COLOR}{
         \item[Clear Backdrop:]
-        Rockbox allows you to select bitmap pictures to use as backdrops.
-        These backdrops are set in the File Context Menu. \fixme{reference!}
-        This option allows you to clear the backdrops that you set.
+          Rockbox allows you to select bitmap pictures to use as backdrops.
+          These backdrops are set in the \setting{File Menu}, see
+          \reference{ref:Filemenu}.
+          This option allows you to clear the backdrops that you set.
         \item[Set Background Colour:]
-        Sets the background colour for the LCD display.
+          Sets the background colour for the LCD display.
         \item[Set Foreground Colour:]
-        Sets the foreground colour for the LCD display.
+          Sets the colour used for text and icons.
         \item[Reset Colours:]
-        Resets the LCD display to Rockbox's default colours.
+          Resets the LCD display to Rockbox's default colours.
       }
     } % \opt{HAVE_LCD_BITMAP}
     \end{description}
 %
-  \opt{h1xx,h300,x5}{
+  \opt{HAVE_REMOTE_LCD}{
     \item[Remote-LCD Settings:]
     This sub menu contains settings that relate to the display of the remote.
       \begin{description}
@@ -164,7 +165,7 @@
       \item[Scroll Step Size:]
         Controls how many pixels the text scroll should move for each step.
     }
-    \opt{h1xx,h300,x5}{
+    \opt{HAVE_REMOTE_LCD}{
       \item[Remote Scrolling Options:]
         The options here have the same effect on the remote LCD as the options
         mentioned above have on the main LCD.
