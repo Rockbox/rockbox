@@ -88,7 +88,7 @@ extern unsigned char pluginbuf[];
 /* for actual plugins only, not for codecs */
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
-static bool (*pfn_tsr_exit)(bool) = NULL; /* TSR exit callback */
+static bool (*pfn_tsr_exit)(bool reenter) = NULL; /* TSR exit callback */
 static char current_plugin[MAX_PATH];
 
 static const struct plugin_api rockbox_api = {
