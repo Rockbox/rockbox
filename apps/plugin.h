@@ -105,12 +105,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 33
+#define PLUGIN_API_VERSION 34
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 30
+#define PLUGIN_MIN_API_VERSION 34
 
 /* plugin return codes */
 enum plugin_status {
@@ -304,6 +304,7 @@ struct plugin_api {
     void (*ata_sleep)(void);
     bool (*ata_disk_is_active)(void);
 #endif
+    void (*ata_spindown)(int seconds);
     void (*reload_directory)(void);
 
     /* dir */
@@ -378,6 +379,7 @@ struct plugin_api {
     void *(*memchr)(const void *s1, int c, size_t n);
     int (*memcmp)(const void *s1, const void *s2, size_t n);
     char *(*strcasestr) (const char* phaystack, const char* pneedle);
+    char* (*strtok_r)(char *ptr, const char *sep, char **end);
     /* unicode stuff */
     const unsigned char* (*utf8decode)(const unsigned char *utf8, unsigned short *ucs);
     unsigned char* (*iso_decode)(const unsigned char *iso, unsigned char *utf8, int cp, int count);
@@ -511,7 +513,7 @@ struct plugin_api {
     int  (*set_time)(const struct tm *tm);
     void* (*plugin_get_buffer)(int* buffer_size);
     void* (*plugin_get_audio_buffer)(int* buffer_size);
-    void (*plugin_tsr)(void (*exit_callback)(void));
+    void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...);
 #endif
@@ -543,16 +545,15 @@ struct plugin_api {
     int (*show_logo)(void);
     struct tree_context* (*tree_get_context)(void);
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-
-    char* (*strtok_r)(char *ptr, const char *sep, char **end);
-
 #ifdef HAVE_WHEEL_POSITION
     int (*wheel_status)(void);
     void (*wheel_send_events)(bool send);
 #endif
-    void (*ata_spindown)(int seconds);
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+
+
 };
 
 /* plugin header */
@@ -584,7 +585,11 @@ extern unsigned char plugin_end_addr[];
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_audio_buffer(int *buffer_size);
-void plugin_tsr(void (*exit_callback)(void));
+
+/* plugin_tsr, 
+    callback returns true to allow the new plugin to load,
+    reenter means the currently running plugin is being reloaded */
+void plugin_tsr(bool (*exit_callback)(bool reenter));
 
 /* defined by the plugin */
 enum plugin_status plugin_start(struct plugin_api* rockbox, void* parameter)

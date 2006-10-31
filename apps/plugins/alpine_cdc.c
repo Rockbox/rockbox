@@ -1122,8 +1122,10 @@ void thread(void)
 }
 
 /* callback to end the TSR plugin, called before a new one gets loaded */
-void exit_tsr(void)
+bool exit_tsr(bool reenter)
 {
+    if (reenter)
+        return false; /* dont let it start again */
     gTread.exiting = true; /* tell the thread to end */
     while (!gTread.ended) /* wait until it did */
         rb->yield();
@@ -1133,6 +1135,7 @@ void exit_tsr(void)
     timer_set_mode(TM_OFF); /* timer interrupt off */
 
     sound_normal(); /* restore sound settings */
+    return true;
 }
 
 /****************** main ******************/

@@ -88,7 +88,8 @@ extern unsigned char pluginbuf[];
 /* for actual plugins only, not for codecs */
 static bool plugin_loaded = false;
 static int  plugin_size = 0;
-static void (*pfn_tsr_exit)(void) = NULL; /* TSR exit callback */
+static bool (*pfn_tsr_exit)(bool) = NULL; /* TSR exit callback */
+static char current_plugin[MAX_PATH];
 
 static const struct plugin_api rockbox_api = {
 
@@ -248,6 +249,7 @@ static const struct plugin_api rockbox_api = {
     ata_sleep,
     ata_disk_is_active,
 #endif
+    ata_spindown,
     reload_directory,
 
     /* dir */
@@ -317,6 +319,7 @@ static const struct plugin_api rockbox_api = {
     memchr,
     memcmp,
     strcasestr,
+    strtok_r,
     /* unicode stuff */
     utf8decode,
     iso_decode,
@@ -464,21 +467,21 @@ static const struct plugin_api rockbox_api = {
     show_logo,
     tree_get_context,
 
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-
-    strtok_r,
 #ifdef HAVE_WHEEL_POSITION
     wheel_status,
     wheel_send_events,
 #endif
-    ata_spindown,
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
+
 };
 
 int plugin_load(const char* plugin, void* parameter)
 {
     int rc;
     struct plugin_header *hdr;
+    const char *p = strrchr(plugin,'/');
 #ifdef SIMULATOR
     void *pd;
 #else
@@ -495,14 +498,23 @@ int plugin_load(const char* plugin, void* parameter)
     fb_data* old_backdrop;
 #endif
 
+    if (!p)
+        p = plugin;
+    action_signalscreenchange();
+    
     if (pfn_tsr_exit != NULL) /* if we have a resident old plugin: */
     {
-        pfn_tsr_exit(); /* force it to exit now */
+        if (pfn_tsr_exit(!strcmp(current_plugin,p)) == false )
+        {
+            /* not allowing another plugin to load */
+            return PLUGIN_OK;
+        }
         pfn_tsr_exit = NULL;
         plugin_loaded = false;
     }
-
+    
     gui_syncsplash(0, true, str(LANG_WAIT));
+    strcpy(current_plugin,p);
 
 #ifdef SIMULATOR
     hdr = sim_plugin_load((char *)plugin, &pd);
@@ -635,7 +647,6 @@ int plugin_load(const char* plugin, void* parameter)
             gui_syncsplash(HZ*2, true, str(LANG_PLUGIN_ERROR));
             break;
     }
-    action_signalscreenchange();
     return PLUGIN_OK;
 }
 
@@ -675,7 +686,7 @@ void* plugin_get_audio_buffer(int* buffer_size)
 /* The plugin wants to stay resident after leaving its main function, e.g.
    runs from timer or own thread. The callback is registered to later
    instruct it to free its resources before a new plugin gets loaded. */
-void plugin_tsr(void (*exit_callback)(void))
+void plugin_tsr(bool (*exit_callback)(bool))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
 }

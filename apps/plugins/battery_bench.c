@@ -92,7 +92,7 @@ PLUGIN_HEADER
 /****************************** Plugin Entry Point ****************************/
 static struct plugin_api* rb;
 int main(void);
-void exit_tsr(void);
+bool exit_tsr(bool);
 void thread(void);
 
 
@@ -119,13 +119,27 @@ struct batt_info
 
 struct event_queue thread_q;
 
-void exit_tsr(void)
+bool exit_tsr(bool reenter)
 {
-    rb->queue_post(&thread_q, EV_EXIT, NULL);
-    while (!s_thread.ended)
-        rb->yield();
-    /* remove the thread's queue from the broadcast list */
-    rb->queue_delete(&thread_q);
+    bool exit = true;
+    (void)reenter;
+    rb->lcd_clear_display();
+    rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
+    rb->lcd_puts_scroll(0, 1, "Press OFF to cancel the test");
+    rb->lcd_puts_scroll(0, 2, "Anything else will resume");
+    rb->lcd_update();
+    if (rb->button_get(true) != BATTERY_OFF)
+        exit = false;
+    if (exit)
+    {
+        rb->queue_post(&thread_q, EV_EXIT, NULL);
+        while (!s_thread.ended)
+            rb->yield();
+        /* remove the thread's queue from the broadcast list */
+        rb->queue_delete(&thread_q);
+        return true;
+    }
+    else return false;
 }
 
 #define BIT_CHARGER     0x1000
