@@ -50,9 +50,6 @@ static unsigned short r_gate_scan_start_pos = 0x0002;
 static unsigned short r_drv_output_control  = 0x0313;
 static unsigned short r_horiz_ram_addr_pos  = 0x7f00;
 
-/* Rolling */
-static int roll_offset = 0; /* Amount of roll offset (0-127). */
-
 /* Dithering */
 #define R_ENTRY_MODE_SOLID  0x1038
 #define R_ENTRY_MODE_DIT    0x9038
@@ -189,25 +186,6 @@ void lcd_set_flip(bool yesno)
     lcd_write_reg(R_DRV_OUTPUT_CONTROL,  r_drv_output_control);
     /* HEA7-0=0xxx, HSA7-0=0xxx */
     lcd_write_reg(R_HORIZ_RAM_ADDR_POS,  r_horiz_ram_addr_pos);
-}
-
-/* Rolls up the lcd display by the specified amount of lines.
- * Lines that are rolled out over the top of the screen are
- * rolled in from the bottom again. This is a hardware
- * remapping only and all operations on the lcd are affected.
- * ->
- * @param int lines - The number of lines that are rolled.
- *  The value must be 0 <= pixels < LCD_HEIGHT.
- * Call lcd_update() afterwards */
-void lcd_roll(int lines)
-{
-    /* Just allow any value mod LCD_HEIGHT-1. Assumes LCD_HEIGHT == 128. */
-    if (lines < 0)
-        lines = -lines & 127;
-    else
-        lines = (128 - (lines & 127)) & 127;
-
-    roll_offset = lines;
 }
 
 static void lcd_power_on(void)
@@ -399,7 +377,6 @@ void lcd_init_device(void)
     lcd_set_contrast(DEFAULT_CONTRAST_SETTING);
     lcd_set_invert_display(false);
     lcd_set_flip(false);
-    lcd_roll(0);
     hw_dither(false); /* do this or all bootloaders will need reflashing */
 #endif
 }
@@ -484,8 +461,7 @@ void lcd_yuv_blit(unsigned char * const src[3],
     height = (height + 1) & ~1;
 
      /* Set start position and window */
-    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) |
-        (((y + roll_offset) & 127) + y_offset));
+    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
 
     lcd_begin_write_gram();
@@ -522,8 +498,7 @@ void lcd_update(void)
         hw_dither(false);
 
     /* Set start position and window */
-    /* Just add roll offset to start address. CP will roll back around. */
-    lcd_write_reg(R_RAM_ADDR_SET, y_offset + roll_offset); /* X == 0 */
+    lcd_write_reg(R_RAM_ADDR_SET, y_offset); /* X == 0 */
     lcd_write_reg(R_VERT_RAM_ADDR_POS, (LCD_WIDTH-1) << 8);
 
     lcd_begin_write_gram();
@@ -560,8 +535,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         return; /* nothing left to do */
 
     /* Set start position and window */
-    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) |
-        (((y + roll_offset) & 127) + y_offset));
+    lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
 
     lcd_begin_write_gram();

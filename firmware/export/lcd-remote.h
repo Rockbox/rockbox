@@ -121,7 +121,6 @@ extern void lcd_remote_update_rect(int x, int y, int width, int height);
 
 extern void lcd_remote_set_invert_display(bool yesno);
 extern void lcd_remote_set_flip(bool yesno);
-extern void lcd_remote_roll(int pixels);
 
 extern void lcd_remote_set_drawmode(int mode);
 extern int  lcd_remote_get_drawmode(void);

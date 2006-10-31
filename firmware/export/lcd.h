@@ -292,7 +292,6 @@ struct bitmap {
 
 extern void lcd_set_invert_display(bool yesno);
 extern void lcd_set_flip(bool yesno);
-extern void lcd_roll(int pixels);
 
 extern void lcd_set_drawmode(int mode);
 extern int  lcd_get_drawmode(void);
