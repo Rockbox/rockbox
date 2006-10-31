@@ -12,6 +12,9 @@
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 
+/* define this if you can flip your LCD */
+#define HAVE_LCD_FLIP
+
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
