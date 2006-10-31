@@ -127,7 +127,9 @@ bool exit_tsr(bool reenter)
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
     rb->lcd_puts_scroll(0, 1, "Press OFF to cancel the test");
     rb->lcd_puts_scroll(0, 2, "Anything else will resume");
+#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
+#endif
     if (rb->button_get(true) != BATTERY_OFF)
         exit = false;
     if (exit)
