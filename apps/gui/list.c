@@ -356,7 +356,7 @@ void gui_list_draw(struct gui_list * gui_list)
         gui_scrollbar_draw(display, 0, y_start, SCROLLBAR_WIDTH-1,
                            scrollbar_y_end - y_start, gui_list->nb_items,
                            gui_list->start_item,
-                           gui_list->start_item + display->nb_lines, VERTICAL);
+                           gui_list->start_item + lines, VERTICAL);
     }
 #endif
 
