@@ -614,7 +614,6 @@ void audio_set_crossfade(int enable)
     enable = 0;
     size = NATIVE_FREQUENCY*2;
 #endif
-    logf("%ld->%ld", (long) pcmbuf_get_bufsize(), (long) size);
     if (pcmbuf_get_bufsize() == size)
         return ;
 
