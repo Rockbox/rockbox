@@ -1321,6 +1321,7 @@ bool dbg_cpufreq(void)
             case ACTION_STD_OK:
                 while (get_cpu_boost_counter() > 0)
                     cpu_boost_id(false, CPUBOOSTID_DEBUGMENU_MANUAL);
+                set_cpu_frequency(CPUFREQ_DEFAULT);
                 break;
 
             case ACTION_STD_CANCEL:
