@@ -26,7 +26,7 @@
   extern __attribute__((weak,alias("UIE"))) void name (void)
 
 static const char* const irqname[] = {
-    "", "", "AccessErr","AddrErr","IllInstr", "", "","",
+    "", "", "AccessErr","AddrErr","IllInstr", "DivX0", "","",
     "PrivVio","Trace","Line-A", "Line-F","Debug","","FormErr","Uninit",
     "","","","","","","","",
     "Spurious","Level1","Level2","Level3","Level4","Level5","Level6","Level7",
@@ -136,29 +136,39 @@ default_interrupt (CDROMNOSYNC); /* CD-ROM No sync */
 default_interrupt (CDROMILSYNC); /* CD-ROM Illegal sync */
 default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
 
-void UIE (void) /* Unexpected Interrupt or Exception */
+static struct
 {
-    unsigned int format_vector, pc;
-    int vector;
+    unsigned long format;
+    unsigned long pc;
+}  __attribute__ ((packed)) system_exception_info;
+
+static void system_display_exception_info(void) __attribute__ ((noreturn));
+static void system_display_exception_info(void)
+{
+    int pc     = system_exception_info.pc;
+    int vector = (system_exception_info.format >> 18) & 0xff;
     char str[32];
-
-    asm volatile ("move.l (52,%%sp),%0": "=r"(format_vector));
-    asm volatile ("move.l (56,%%sp),%0": "=r"(pc));
-
-    vector = (format_vector >> 18) & 0xff;
 
     /* clear screen */
     lcd_clear_display ();
     lcd_setfont(FONT_SYSFIXED);
 
-    snprintf(str,sizeof(str),"I%02x:%s",vector,irqname[vector]);
-    lcd_puts(0,0,str);
-    snprintf(str,sizeof(str),"at %08x",pc);
-    lcd_puts(0,1,str);
+    snprintf(str, sizeof(str), "I%02x:%s", vector, irqname[vector]);
+    lcd_puts(0, 0, str);
+    snprintf(str, sizeof(str), "at %08x", pc);
+    lcd_puts(0, 1, str);
     lcd_update();
 
     /* set cpu frequency to 11mhz (to prevent overheating) */
     DCR = (DCR & ~0x01ff) | 1;
+
+#ifdef IAUDIO_X5
+    PLLCR = 0x10400000;
+
+    /* on key for 1s will shut down */
+    asm("halt");
+    while (1); /* loop to silence 'noreturn' function does return */
+#else
     PLLCR = 0x10800000;
 
     while (1)
@@ -167,6 +177,8 @@ void UIE (void) /* Unexpected Interrupt or Exception */
         if ((GPIO1_READ & 0x22) == 0)
             SYPCR = 0xc0;
            /* Start watchdog timer with 512 cycles timeout. Don't service it. */
+    }
+#endif
 
     /* We need a reset method that works in all cases. Calling system_reboot()
        doesn't work when we're called from the debug interrupt, because then
@@ -174,7 +186,20 @@ void UIE (void) /* Unexpected Interrupt or Exception */
        an rte instruction or performing a reset. Even disabling the breakpoint
        logic and performing special rte magic doesn't make system_reboot()
        reliable. The system restarts, but boot often fails with ata error -42. */
-    }
+}
+
+static void UIE(void) __attribute__ ((noreturn));
+static void UIE(void)
+{
+    asm volatile (
+        "movem.l (%%sp),%%d0-%%d1 \n" /* Copy exception frame */
+        "lea.l   %[info],%%a0     \n"
+        "movem.l %%d0-%%d1,(%%a0) \n"
+        :
+        : [info] "m" (system_exception_info)
+    );
+
+    system_display_exception_info();
 }
 
 /* reset vectors are handled in crt0.S */
