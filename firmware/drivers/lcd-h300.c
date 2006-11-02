@@ -368,7 +368,16 @@ void lcd_update(void)
         /* Copy display bitmap to hardware */
         lcd_write_reg(R_RAM_ADDR_SET, xoffset << 8);
         lcd_begin_write_gram();
-        lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+
+        DAR3 = 0xf0000002;
+        SAR3 = (unsigned long)lcd_framebuffer;
+        BCR3 = LCD_WIDTH*LCD_HEIGHT*2;
+        DCR3 = DMA_AA | DMA_BWC(1)
+             | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 
+             | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
+
+        while (!(DSR3 & 1));
+        DSR3 = 1;
     }
 }
 
@@ -376,26 +385,39 @@ void lcd_update(void)
 void lcd_update_rect(int, int, int, int) ICODE_ATTR;
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    unsigned long dma_addr;
+
     if(display_on) {
-        int ymax = y + height - 1;
 
         if(x + width > LCD_WIDTH)
             width = LCD_WIDTH - x;
-        if (width <= 0)
-            return; /* nothing left to do, 0 is harmful to lcd_write_data() */
-        if(ymax >= LCD_HEIGHT)
-            ymax = LCD_HEIGHT-1;
+        if(width <= 0) /* nothing to do */
+            return;
+        if(y + height > LCD_HEIGHT)
+            height = LCD_HEIGHT - y;
 
-        /* set update window */ 
+        /* set update window */
 
         lcd_write_reg(R_VERT_RAM_ADDR_POS,((x+xoffset+width-1) << 8) | (x+xoffset));
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
-        lcd_begin_write_gram(); 
+        lcd_begin_write_gram();
+        
+        DAR3 = 0xf0000002;
+        dma_addr = (unsigned long)&lcd_framebuffer[y][x];
+        width *= 2;
 
-        /* Copy specified rectangle bitmap to hardware */
-        for (; y <= ymax; y++) 
-        { 
-            lcd_write_data ((unsigned short *)&lcd_framebuffer[y][x], width); 
-        } 
+        for (; height > 0; height--)
+        {
+            SAR3 = dma_addr;
+            BCR3 = width;
+            DCR3 = DMA_AA | DMA_BWC(1)
+                 | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
+                 | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
+
+            dma_addr += LCD_WIDTH*2;
+
+            while (!(DSR3 & 1));
+            DSR3 = 1;
+        }
     }
 }

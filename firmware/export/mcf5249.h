@@ -251,6 +251,7 @@
 #define DMA_EEXT        (1 << 30)       /* Enable peripherial request   */
 #define DMA_CS          (1 << 29)       /* Cycle Steal                  */
 #define DMA_AA          (1 << 28)       /* Auto-Align                   */
+#define DMA_BWC(x)      (((x)&7) << 25) /* Bandwidth control            */
 #define DMA_SINC        (1 << 22)       /* Source Increment             */
 #define DMA_SSIZE(x)    (((x)&3) << 20) /* Size of source data          */
 #define DMA_DINC        (1 << 19)       /* Destination Increment        */

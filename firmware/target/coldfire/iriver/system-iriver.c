@@ -24,6 +24,28 @@
 #include "timer.h"
 #include "pcf50606.h"
 
+/* Settings for all possible clock frequencies (with properly working timers)
+ *
+ *                        xxx_REFRESH_TIMER below
+ * system.h, CPUFREQ_xxx_MULT        |
+ *              |                    |
+ *              V                    V
+ *                              Refreshtim.                         IDECONFIG1/IDECONFIG2
+ * CPUCLK/Hz  MULT    PLLCR     16MB  32MB  CSCR0   CSCR1   CSCR3   CS2Pre CS2Post CS2Wait
+ * ---------------------------------------------------------------------------------------
+ *  11289600    1   0x10c00200    4     1   0x0180  0x0180  0x0180     1      0       0
+ *  22579200    2   0x15c4e005   10     4   0x0180  0x0180  0x0180     1      0       0
+ *  33868800    3   0x13c46005   15     7   0x0180  0x0180  0x0180     1      0       0
+ *  45158400    4   0x15c4e001   21    10   0x0580  0x0180  0x0580     1      0       0
+ *  56448000    5   0x12c4e005   26    12   0x0580          0x0980
+ *  67737600    6   0x13c46001   32    15   0x0980          0x0d80
+ *  79027200    7   0x13c52001   37    18   0x0980          0x1180
+ *  90316800    8   0x13c5e001   43    21   0x0d80          0x1580
+ * 101606400    9   0x11c48005   48    23   0x0d80          0x1980
+ * 112896000   10   0x11c4e005   54    26   0x1180          0x1d80
+ * 124185600   11   0x11c56005   59    29   0x1180  0x1180  0x2180     2      1       2
+ */
+
 #if MEM < 32
 #define MAX_REFRESH_TIMER     59
 #define NORMAL_REFRESH_TIMER  21
@@ -61,7 +83,7 @@ void set_cpu_frequency(long frequency)
         RECALC_DELAYS(CPUFREQ_MAX);
         PLLCR = 0x11c56005;
         CSCR0 = 0x00001180; /* Flash: 4 wait states */
-        CSCR1 = 0x00000980; /* LCD: 2 wait states */
+        CSCR1 = 0x00001580; /* LCD: 5 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
         CSCR3 = 0x00002180; /* USBOTG: 8 wait states */
 #endif
