@@ -206,7 +206,6 @@ static bool playlist_end = false;               /* Have we reached end of the cu
 static bool dir_skip = false;                   /* Is a directory skip pending? (A) */
 static bool new_playlist = false;               /* Are we starting a new playlist? (A) */
 static int wps_offset = 0;                      /* Pending track change offset, to keep WPS responsive (A) */
-static bool quick_restart = false;              /* Are we doing a quick restart for buffer resizing? (A) */
 
 /* Callbacks..  */
 void (*track_changed_callback)(struct mp3entry *id3); /* ...when current track has really changed */
@@ -460,7 +459,7 @@ void audio_stop(void)
     queue_post(&audio_queue, Q_AUDIO_STOP, 0);
 
     /* Don't return until playback has actually stopped */
-    while(playing)
+    while(playing || !queue_empty(&audio_queue))
         yield();
 }
 
@@ -624,7 +623,6 @@ void audio_set_crossfade(int enable)
 
         /* Playback has to be stopped before changing the buffer size. */
         gui_syncsplash(0, true, (char *)str(LANG_RESTARTING_PLAYBACK));
-        quick_restart = true;
         audio_stop();
     }
 
@@ -641,10 +639,7 @@ void audio_set_crossfade(int enable)
 
     /* Restart playback. */
     if (was_playing) 
-    {
         audio_play(offset);
-        quick_restart = false;
-    }
 }
 
 void audio_preinit(void)
@@ -1852,11 +1847,8 @@ static void codec_thread(void)
                                 CUR_TI->id3.elapsed = CUR_TI->id3.length - pcmbuf_get_latency();
                                 sleep(1);
                             }
-                            if (!quick_restart)
-                            {
-                                LOGFQUEUE("codec > audio Q_AUDIO_STOP");
-                                queue_post(&audio_queue, Q_AUDIO_STOP, 0);
-                            }
+                            LOGFQUEUE("codec > audio Q_AUDIO_STOP");
+                            queue_post(&audio_queue, Q_AUDIO_STOP, 0);
                             break;
                         }
                     }
