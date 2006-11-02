@@ -1018,8 +1018,8 @@ int help(int when)
     int yoffset=0;
     /* set the maximum x and y in the helpscreen
        dont forget to update, if you change text */
-    int maxY=160;
-    int maxX=210;
+    int maxY=180;
+    int maxX=215;
 
     while(true) {
 #ifdef HAVE_LCD_COLOR
@@ -1075,16 +1075,18 @@ int help(int when)
         rb->lcd_putsxy(1+xoffset, 10*(h+2)+yoffset, "Specials");
 #endif
         rb->lcd_putsxy(1+xoffset, 11*(h+2)+yoffset,
-                       "N Normal:returns paddle to normal");
-        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset, "D DIE!:loses a life");
+                       "N  Normal:returns paddle to normal");
+        rb->lcd_putsxy(1+xoffset, 12*(h+2)+yoffset, "D  DIE!:loses a life");
         rb->lcd_putsxy(1+xoffset, 13*(h+2)+yoffset,
-                       "L Life:gains a life/power up");
+                       "L  Life:gains a life/power up");
         rb->lcd_putsxy(1+xoffset, 14*(h+2)+yoffset,
-                       "F Fire:allows you to shoot bricks");
+                       "F  Fire:allows you to shoot bricks");
         rb->lcd_putsxy(1+xoffset, 15*(h+2)+yoffset,
-                       "G Glue:ball sticks to paddle");
+                       "G  Glue:ball sticks to paddle");
         rb->lcd_putsxy(1+xoffset, 16*(h+2)+yoffset,
-                       "B Ball:Generates Another Ball");
+                       "B  Ball:generates another ball");
+        rb->lcd_putsxy(1+xoffset, 17*(h+2)+yoffset,
+                       "FL Flip:flips left / right movement");
         rb->lcd_update();
 
         button=rb->button_get(true);
