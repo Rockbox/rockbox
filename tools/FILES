@@ -2,6 +2,7 @@ FILES
 Makefile
 configure
 *.[ch]
+*.sh
 release
 genlang
 rockbox-style.el
@@ -19,5 +20,3 @@ ucl/src/*.ch
 ucl/src/Makefile
 ucl/include/ucl/*.h
 profile_reader/*.pl
-rockboxdev.sh
-mkmi4.sh
