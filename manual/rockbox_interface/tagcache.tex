@@ -1,5 +1,5 @@
 % $Id$ %
-\section{\label{ref:tagcache}Tag Cache} 
+\section{\label{ref:tagcache}Tag Cache}
 
 \subsection{Introduction}
 Tag Cache is the Rockbox music database system. Using the information
@@ -10,8 +10,9 @@ files on your player and allows you to browse them by Artist, Album and Genre.
 
 \subsection{Initialising the Tag Cache}
 Before you use the Tag Cache for the first time, you must initialise it by using
-the \setting{Initialize Now} function in the \setting{Tag Cache Menu}, which is
-described in the following section.
+the \setting{Initialize Now} function in the \setting{Tag Cache Menu}
+(\setting{General Settings $\rightarrow$ File View $\rightarrow$ Tag Cache})
+, which is described in the following section.
 
 \subsection{\label{ref:tagcachemenu}The Tag Cache Menu}
 
@@ -34,10 +35,10 @@ described in the following section.
   boots, Tag Cache will automatically update the database.
   \opt{SWCODEC}{
     \note{The \setting{Auto Update} will only check for deleted files if the
-      \setting{Directory Cache} (\setting{General Settings $\rightarrow$ System
-      $\rightarrow$ Disk $\rightarrow$ Directory Cache}) is enabled.
-      \setting{Update now} includes that check whether dircache has been
-      enabled or not.}
+      \setting{Directory Cache} (\setting{General Settings $\rightarrow$
+      System Options $\rightarrow$ Disk $\rightarrow$ Directory Cache}) is
+      enabled. \setting{Update now} includes that check whether dircache has
+      been enabled or not.}
   }%
   \opt{MASCODEC}{\setting{Auto Update} does not detect deleted files. To remove
     deleted files from the database you need to run \setting{Update Now}.}%
