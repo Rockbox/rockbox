@@ -38,6 +38,7 @@ void queue_init(struct event_queue *q, bool register_queue)
     
     q->read = 0;
     q->write = 0;
+    q->thread = NULL;
 }
 
 void queue_delete(struct event_queue *q)
@@ -97,6 +98,19 @@ void queue_clear(struct event_queue* q)
     /* fixme: This is potentially unsafe in case we do interrupt-like processing */
     q->read = 0;
     q->write = 0;
+}
+
+void queue_remove_from_head(struct event_queue *q, long id)
+{
+    int oldlevel = set_irq_level(15<<4);
+    
+    while (q->read != q->write && 
+      q->events[(q->read) & QUEUE_LENGTH_MASK].id == id)
+    {
+        q->read++;
+    }
+    
+    set_irq_level(oldlevel);
 }
 
 void switch_thread(bool save_context, struct thread_entry **blocked_list)
