@@ -136,17 +136,24 @@ default_interrupt (CDROMNOSYNC); /* CD-ROM No sync */
 default_interrupt (CDROMILSYNC); /* CD-ROM Illegal sync */
 default_interrupt (CDROMNEWBLK); /* CD-ROM New block */
 
-static struct
-{
-    unsigned long format;
-    unsigned long pc;
-}  __attribute__ ((packed)) system_exception_info;
+#ifdef IAUDIO_X5
+#define EXCP_BUTTON_GPIO_READ   GPIO_READ
+#define EXCP_BUTTON_MASK        0x0c000000
+#define EXCP_BUTTON_VALUE       0x08000000 /* On button and !hold */
+#define EXCP_PLLCR              0x10400000
+#else
+#define EXCP_BUTTON_GPIO_READ   GPIO1_READ
+#define EXCP_BUTTON_MASK        0x00000022
+#define EXCP_BUTTON_VALUE       0x00000000
+#define EXCP_PLLCR              0x10800000
+#endif
 
-static void system_display_exception_info(void) __attribute__ ((noreturn));
-static void system_display_exception_info(void)
+static void system_display_exception_info(unsigned long format,
+                                          unsigned long pc) __attribute__ ((noreturn));
+static void system_display_exception_info(unsigned long format,
+                                          unsigned long pc)
 {
-    int pc     = system_exception_info.pc;
-    int vector = (system_exception_info.format >> 18) & 0xff;
+    int vector = (format >> 18) & 0xff;
     char str[32];
 
     /* clear screen */
@@ -160,25 +167,15 @@ static void system_display_exception_info(void)
     lcd_update();
 
     /* set cpu frequency to 11mhz (to prevent overheating) */
-    DCR = (DCR & ~0x01ff) | 1;
-
-#ifdef IAUDIO_X5
-    PLLCR = 0x10400000;
-
-    /* on key for 1s will shut down */
-    asm("halt");
-    while (1); /* loop to silence 'noreturn' function does return */
-#else
-    PLLCR = 0x10800000;
+    DCR   = (DCR & ~0x01ff) | 1;
+    PLLCR = EXCP_PLLCR;
 
     while (1)
     {
-        /* check for the ON button (and !hold) */
-        if ((GPIO1_READ & 0x22) == 0)
+        if ((EXCP_BUTTON_GPIO_READ & EXCP_BUTTON_MASK) == EXCP_BUTTON_VALUE)
             SYPCR = 0xc0;
            /* Start watchdog timer with 512 cycles timeout. Don't service it. */
     }
-#endif
 
     /* We need a reset method that works in all cases. Calling system_reboot()
        doesn't work when we're called from the debug interrupt, because then
@@ -191,15 +188,9 @@ static void system_display_exception_info(void)
 static void UIE(void) __attribute__ ((noreturn));
 static void UIE(void)
 {
-    asm volatile (
-        "movem.l (%%sp),%%d0-%%d1 \n" /* Copy exception frame */
-        "lea.l   %[info],%%a0     \n"
-        "movem.l %%d0-%%d1,(%%a0) \n"
-        :
-        : [info] "m" (system_exception_info)
-    );
-
-    system_display_exception_info();
+    asm volatile("subq.l #4,%sp"); /* phony return address - never used */
+    asm volatile("jmp    system_display_exception_info");
+    while (1); /* loop to silence 'noreturn' function does return */
 }
 
 /* reset vectors are handled in crt0.S */
