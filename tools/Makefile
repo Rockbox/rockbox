@@ -50,6 +50,12 @@ generate_rocklatin: generate_rocklatin.c ../firmware/drivers/lcd-player-charset.
 uclpack:
 	$(SILENT)$(MAKE) -C ucl
 
+wavtrim: wavtrim.c
+	$(SILENT)$(CC) -g $+ -o $@
+
+voicefont: voicefont.c
+	$(SILENT)$(CC) -g $+ -o $@
+
 clean:
 	@echo "Cleaning tools"
 	$(SILENT)rm -f $(CLEANALL) $(shell for f in $(CLEANALL) ; do echo $$f.exe $$f.o $$f.obj ; done) *.ajf *~

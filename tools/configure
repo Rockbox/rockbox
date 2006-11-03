@@ -366,6 +366,154 @@ if [ -z "$simver" ]; then
 fi
 }
 
+voiceconfig () {
+    echo "Building voice for $archos"
+    echo ""
+
+    if [ `which flite` ]; then
+        FLITE="F(l)ite "
+        FLITE_OPTS="FLITE_OPTS=\"\""
+        DEFAULT_TTS="flite"
+        DEFAULT_TTS_OPTS=$FLITE_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="L"
+    fi
+    if [ `which speak` ]; then
+        ESPEAK="(e)Speak "
+        ESPEAK_OPTS="ESPEAK_OPTS=\"\""
+        DEFAULT_TTS="espeak"
+        DEFAULT_TTS_OPTS=$ESPEAK_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="e"
+    fi
+    if [ `which festival` ]; then
+        FESTIVAL="(F)estival "
+        FESTIVAL_OPTS="FLITE_OPTS=\"\""
+        DEFAULT_TTS="festival"
+        DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="F"
+    fi
+
+    if [ "$FESTIVAL" == "$FLITE" ] && [ "$FLITE" == "$ESPEAK" ]; then
+        echo "You need Festival, eSpeak or Flite in your path to build voice files"
+        exit
+    fi
+
+    echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}(${DEFAULT_CHOICE})?"
+    option=`input`
+    case "$option" in
+        [Ll])
+        TTS_ENGINE="flite"
+        NOISEFLOOR="500" # TODO: check this value
+        TTS_OPTS=$FLITE_OPTS
+        ;;
+        [Ee])
+        TTS_ENGINE="espeak"
+        NOISEFLOOR="500"
+        TTS_OPTS=$ESPEAK_OPTS
+        ;;
+        [Ff])
+        TTS_ENGINE="festival"
+        NOISEFLOOR="500"
+        TTS_OPTS=$FESTIVAL_OPTS
+        ;;
+        *)
+        TTS_ENGINE=$DEFAULT_TTS
+        TTS_OPTS=$DEFAULT_TTS_OPTS
+        NOISEFLOOR=$DEFAULT_NOISEFLOOR
+    esac
+    echo "Using $TTS_ENGINE for TTS"
+    
+    echo ""
+
+    if [ `which oggenc` ]; then
+        OGGENC="(O)ggenc "
+        DEFAULT_ENC="oggenc"
+        VORBIS_OPTS="VORBIS_OPTS=\"-q0 --downmix\""
+        DEFAULT_ENC_OPTS=$VORBIS_OPTS
+        DEFAULT_CHOICE="O"
+    fi
+    if [ `which speexenc` ]; then
+        SPEEXENC="(S)peexenc "
+        DEFAULT_ENC="speexenc"
+        SPEEX_OPTS="" # TODO: find appropriate options for speex
+        DEFAULT_ENC_OPTS=$SPEEX_OPTS 
+        DEFAULT_CHOICE="S"
+    fi
+    if [ `which lame` ]; then
+        LAME="(L)ame "
+        DEFAULT_ENC="lame"
+        LAME_OPTS="LAME_OPTS=\"--resample 12 -t -m m -h -V 9 -S\""
+        DEFAULT_ENC_OPTS=$LAME_OPTS
+        DEFAULT_CHOICE="L"
+    fi
+
+    if [ "$LAME" == "" ]; then
+        echo "You need to have Lame installed to build voice files"
+    fi
+
+    echo "Encoder to use: ${LAME}${OGGENC}${SPEEXENC}(${DEFAULT_CHOICE})?"
+    echo ""
+    echo "Note: Use Lame - the other options won't work"
+    option=`input`
+    case "$option" in
+        [Oo])
+        ENCODER="oggenc"
+        ENC_OPTS=$VORBIS_OPTS
+        ;;
+        [Ss])
+        ENCODER="speexenc"
+        ENC_OPTS=$SPEEX_OPTS
+        ;;
+        [Ll])
+        ENCODER="lame"
+        ENC_OPTS=$LAME_OPTS
+        ;;
+        *)
+        ENCODER=$DEFAULT_ENC
+        ENC_OPTS=$DEFAULT_ENC_OPTS
+    esac
+    echo "Using $ENCODER for encoding voice clips"
+
+    cat > voicesettings.sh <<EOF
+TTS_ENGINE="${TTS_ENGINE}"
+ENCODER="${ENCODER}"
+TEMPDIR="${pwd}"
+NOISEFLOOR="${NOISEFLOOR}"
+${TTS_OPTS}
+${ENC_OPTS}
+EOF
+}
+
+picklang() {     
+    # figure out which languages that are around    
+    for file in $rootdir/apps/lang/*.lang; do      
+        clean=`echo $file | sed -e 's:.*/::g' | cut "-d." -f1`    
+        langs="$langs $clean"    
+    done    
+
+    num=1      
+    for one in $langs; do     
+        echo "$num. $one"    
+        num=`expr $num + 1`     
+    done   
+
+    read pick     
+    return $pick;    
+}   
+
+whichlang() {      
+    num=1     
+    for one in $langs; do    
+        if [ "$num" = "$pick" ]; then   
+            echo $one      
+            return    
+        fi   
+        num=`expr $num + 1`     
+    done   
+}
+
 target=$1
 
 if test "$target" = "--help"; then
@@ -1144,7 +1292,7 @@ fi
   esac
 
   echo ""
-  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, $gdbstub(M)anual? (N)"
+  echo "Build (N)ormal, (D)evel, (S)imulator, (B)ootloader, $gdbstub(M)anual, (V)oice? (N)"
 
   option=`input`;
 
@@ -1202,6 +1350,11 @@ fi
       apps="manual"
       echo "Manual build selected"
       ;; 
+    [Vv])
+      echo "Voice build selected"
+      voiceconfig
+      voice="yes"
+      ;;
     *)
       debug=""
       echo "Normal build selected"
@@ -1237,6 +1390,20 @@ echo "Using source code root directory: $rootdir"
 
 # this was once possible to change at build-time, but no more:
 language="english"
+
+# Ask about language if building voice
+if [ "yes" == "$voice" ]; then
+    echo "Select a number for the language to use (default is english)"     
+
+    picklang   
+    language=`whichlang`      
+
+    if [ -z "$language" ]; then      
+        # pick a default    
+        language="english"
+    fi    
+    echo "Language set to $language"
+fi
 
 uname=`uname`
 
@@ -1515,6 +1682,9 @@ clean:
                   manual *.pdf *.a credits.raw @OUTPUT@ bitmaps pluginbitmaps \
                   @ARCHOSROM@ @FLASHFILE@ UI256.bmp rockbox-full.zip \
 	          html txt rockbox-manual*.zip
+
+voice: tools
+	\$(TOOLSDIR)/genvoice.sh \$(ROOTDIR) \$(LANGUAGE) \$(ARCHOS) voicesettings.sh
 
 tools:
 	\$(SILENT)\$(MAKE) -C \$(TOOLSDIR) CC=\$(HOSTCC) @TOOLSET@
