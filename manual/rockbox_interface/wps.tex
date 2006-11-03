@@ -72,38 +72,40 @@ your WPS (While Playing Screen).
       %
       \ActionWpsStop & Stop playback.\\
       %
-      \ActionWpsBrowse & Return to the \setting{File Browser}.\\
+      \ActionWpsBrowse & Return to the \setting{File Browser}.\\%
       %
-      \nopt{PLAYER_PAD}{\ActionWpsContext & Enter the \setting{WPS Context Menu}.\\}%
+      \nopt{PLAYER_PAD}{\ActionWpsContext & Enter \setting{WPS Context Menu}.\\}%
       %
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{%
         \ActionWpsPitchScreen & Show pitch setting screen.\\}%
       %
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
-      \opt{ONDIO_PAD}{Hold \ButtonMenu\ then \ButtonMenu\ again}%
-      & Go to Main menu.\\
+      \opt{ONDIO_PAD}{Hold \ButtonMenu{} then \ButtonMenu{} again}%
+      & Enter \setting{Main Menu}.\\%
+      %
+      \nopt{PLAYER_PAD,ONDIO_PAD}{%
+        \ActionWpsQuickScreen & Enter \setting{Quick Screen}.\\}%
       %
       %These actions need definitions for the other targets
-      \opt{RECORDER_PAD}{
-        \ButtonFTwo & Toggles Play/browse quick menu.\\
+      \opt{RECORDER_PAD}{%
         \ButtonFThree & Toggles Display quick menu.\\
         \ButtonFOne+\ButtonDown & Key lock on/off.\\
         \ButtonFOne+\ButtonPlay & Mute on/off.\\
-      }
-      \opt{PLAYER_PAD}{
+      }%
+      \opt{PLAYER_PAD}{%
         \ButtonMenu+\ButtonStop & Key lock on/off.\\
         \ButtonMenu+\ButtonPlay & Mute on/off.\\
-      }
-      \opt{ONDIO_PAD}{
+      }%
+      \opt{ONDIO_PAD}{%
         Hold \ButtonMenu+\ButtonDown & Key lock on/off.\\
-      }
+      }%
       \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
         \ActionWpsIdThreeScreen & Enter \setting{ID3 Viewer}.\\
-      }
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{
+      }%
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{%
         \ActionWpsAbSetBNextDir & Skip to the next directory.\\
         \ActionWpsAbSetAPrevDir & Skip to the previous directory.\\
-      }
+      }%
     \end{btnmap}
 \end{table}
 
