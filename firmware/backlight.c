@@ -600,6 +600,7 @@ void x5_backlight_shutdown(void)
 
 void backlight_on(void)
 {
+    queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
     queue_post(&backlight_queue, BACKLIGHT_ON, NULL);
 }
 
