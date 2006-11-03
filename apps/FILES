@@ -6,6 +6,7 @@ gui/*.[ch]
 recorder/*.[ch]
 player/*.[ch]
 lang/*.lang
+eqs/*.cfg
 bitmaps/mono/*
 bitmaps/native/*
 bitmaps/remote_mono/*
