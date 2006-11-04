@@ -188,10 +188,10 @@
   desc: Visual confirmation of canceling a changed setting
   user:
   <source>
-    *: "Canceled"
+    *: "Cancelled"
   </source>
   <dest>
-    *: "Canceled"
+    *: "Cancelled"
   </dest>
   <voice>
     *: ""
@@ -918,10 +918,10 @@
   desc: Visual confirmation of cancelation
   user:
   <source>
-    *: "Canceled"
+    *: "Cancelled"
   </source>
   <dest>
-    *: "Canceled"
+    *: "Cancelled"
   </dest>
   <voice>
     *: ""
