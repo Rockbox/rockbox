@@ -188,7 +188,7 @@
   desc: Visual confirmation of canceling a changed setting
   user:
   <source>
-    *: "Cancelled"
+    *: "Canceled"
   </source>
   <dest>
     *: "Cancelled"
@@ -918,7 +918,7 @@
   desc: Visual confirmation of cancelation
   user:
   <source>
-    *: "Cancelled"
+    *: "Canceled"
   </source>
   <dest>
     *: "Cancelled"
