@@ -1392,7 +1392,7 @@ echo "Using source code root directory: $rootdir"
 language="english"
 
 # Ask about language if building voice
-if [ "yes" == "$voice" ]; then
+if [ "yes" = "$voice" ]; then
     echo "Select a number for the language to use (default is english)"     
 
     picklang   
