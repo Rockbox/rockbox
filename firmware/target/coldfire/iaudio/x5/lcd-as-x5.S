@@ -40,260 +40,158 @@
  *   |G| = |1.000000 -0.334136 -0.714136| |Pb|
  *   |B|   |1.000000  1.772000  0.000000| |Pr|
  *   Scaled, normalized, rounded and tweaked to yield RGB 666:
- *   |R|   |74    0  101| |Y' -  16| / 256
- *   |G| = |74  -24  -51| |Cb - 128| / 256
- *   |B|   |74  128    0| |Cr - 128| / 256
+ *   |R|   |19611723        0  26881894| |Y' -  16| >> 26
+ *   |G| = |19611723 -6406711 -13692816| |Cb - 128| >> 26
+ *   |B|   |19611723 33976259         0| |Cr - 128| >> 26
+ *
+ * Needs EMAC set to saturated, signed integer mode.
  */
     .align      2
     .global     lcd_write_yuv420_lines
-    .type       lcd_write_yuv420_lines,@function
+    .type       lcd_write_yuv420_lines, @function
+
 lcd_write_yuv420_lines:
-    lea.l   (-36,%sp),%sp       /* free up some registers */
-    movem.l %d2-%d6/%a2-%a5,(%sp)
+    lea.l   (-44, %sp), %sp         /* free up some registers */
+    movem.l %d2-%d7/%a2-%a6, (%sp)
 
-    lea.l   0xf0008002,%a0      /* LCD data port */
-    movem.l (36+4,%sp),%a1-%a5  /* Y data, Cb data, guv storage, Cr data, width */
-    lea.l   (%a1,%a5),%a5       /* end address */
+    lea.l   0xf0008002, %a0         /* LCD data port */
+    movem.l (44+4, %sp), %a1-%a4    /* Y data, Cb data, Cr data, width */
+    lea.l   (%a1, %a4), %a4         /* end address */
 
-.yuv_line_loop1:
-    /** Write first pixel **/
-    clr.l   %d1             /* get bu component */
-    move.b  (%a2),%d1
-    clr.l   %d3             /* get rv component */
-    move.b  (%a4),%d3
-    moveq.l #-128,%d0
-    add.l   %d0,%d1
-    add.l   %d0,%d3
+    move.l  #19611723, %a5          /* y factor */
+    move.l  #33976259, %a6          /* bu factor */
+    move.l  #-6406711, %d5          /* gu factor */
+    move.l  #-13692816, %d6         /* gv factor */
+    move.l  #0x01040820, %d7        /* bitmask for signed->unsigned conversion
+                                     * of R, G and B within RGGB6666 at once */
 
-    move.l  %d1,%d2         /* %d2 = cb component for guv */
-    asr.l   #1,%d1          /* %d1 = 128 * (Cb - 128) / 256 */
-    move.b  %d1,(%a2)+      /* save bu for next line */
-    moveq.l #-24,%d0        /* multiply first term of guv */
-    muls.w  %d0,%d2
-    moveq.l #-51,%d0        /* multiply second term of guv */
-    muls.w  %d3,%d0
-    add.l   %d0,%d2
-    asr.l   #8,%d2
-    move.b  %d2,(%a3)+      /* save guv for next line */
-    moveq.l  #101,%d0
-    muls.w  %d0,%d3
-    asr.l   #8,%d3
-    move.b  %d3,(%a4)+      /* save rv for next line */
+    /* chroma for (very) first & second pixel */
+    clr.l   %d2                     /* load u component */
+    move.b  (%a2)+, %d2
+    clr.l   %d3                     /* load v component */
+    move.b  (%a3)+, %d3
+    moveq.l #-128, %d0
+    add.l   %d0, %d2
+    add.l   %d0, %d3
 
-    clr.l   %d4             /* get y component */
-    move.b  (%a1)+,%d4
-    moveq.l #74,%d0
-    muls.w  %d0,%d4
-    asr.l   #8,%d4
-    subq.l  #4,%d4
-    move.l  %d4,%d5
-    move.l  %d4,%d6
-    /* : %d4,%d5,%d6 = Y, %d1 = bu, %d2 = guv, %d3 = rv */
+    mac.l   %a6, %d2, %acc0         /* bu */
+    mac.l   %d5, %d2, %acc1         /* gu */
+    mac.l   %d6, %d3, %acc1         /* gv */
+    move.l  #26881894, %d0          /* rv factor */
+    mac.l   %d0, %d3, %acc2         /* rv */
 
-    add.l   %d3,%d4         /* get r */
-    add.l   %d2,%d5         /* get g */
-    add.l   %d1,%d6         /* get b */
+    /* luma for (very) first pixel */
+    clr.l   %d1
+    move.b  (%a1)+, %d1
+    moveq.l #-126, %d0
+    add.l   %d1, %d0                /* y' (-0.5 ... +0.5) */
+    mac.l   %a5, %d0, %acc0
+    mac.l   %a5, %d0, %acc1
+    mac.l   %a5, %d0, %acc2
 
-    move.l  %d6,%d0         /* is clamping needed? */
-    or.l    %d5,%d0
-    or.l    %d4,%d0
-    asr.l   #6,%d0
-    beq.b   .yuv_no_clamp1  /* values in range: skip clamping */
-    moveq.l #63, %d0
-    cmp.l   %d0, %d4
-    bls.s   .yuv_red_ok1
-    spl.b   %d4
-    and.l   %d0, %d4
-.yuv_red_ok1:
-    cmp.l   %d0, %d5
-    bls.s   .yuv_green_ok1
-    spl.b   %d5
-    and.l   %d0, %d5
-.yuv_green_ok1:
-    cmp.l   %d0, %d6
-    bls.s   .yuv_blue_ok1
-    spl.b   %d6
-    and.l   %d0, %d6
-.yuv_blue_ok1:
-.yuv_no_clamp1:
-    /* : %d4 = R, %d5 = G, %d6 = B */
+    bra.b   .yuv_line_entry
 
-    move.l  %d5,%d0         /* save g for lower 9 bits */
-    lsl.l   #3,%d4          /* R << 3 */
-    lsr.l   #3,%d0          /* G >> 3 */
-    or.l    %d4,%d0
-    move.w  %d0,(%a0)       /* |00000000|000000000|0000000r|rrrrrggg| */
-    lsl.l   #6,%d5          /* B << 6 */
-    or.l    %d5,%d6         /* |00000000|000000000|0000gggg|ggbbbbbb| */
-    move.w  %d6,(%a0)
+.yuv_line_loop:
+    /* chroma for first & second pixel */
+    clr.l   %d2                     /* load u component */
+    move.b  (%a2)+, %d2
+    clr.l   %d3                     /* load v component */
+    move.b  (%a3)+, %d3
+    moveq.l #-128, %d0
+    add.l   %d0, %d2
+    add.l   %d0, %d3
 
-    /** Write second pixel **/
-    clr.l   %d4
-    move.b  (%a1)+,%d4      /* get y component */
-    moveq.l #74,%d0
-    muls.w  %d0,%d4
-    asr.l   #8,%d4
-    subq.l  #4,%d4
-    /* : %d4 = Y, %d1 = bu, %d2 = guv, %d3 = rv */
+    mac.l   %a6, %d2, %acc0         /* bu */
+    mac.l   %d5, %d2, %acc1         /* gu */
+    mac.l   %d6, %d3, %acc1         /* gv */
+    move.l  #26881894, %d0          /* rv factor */
+    mac.l   %d0, %d3, %acc2         /* rv */
 
-    /* Add Y + each chroma component (can clobber %d1-%d3 values now) */
-    add.l   %d4,%d3         /* get r */
-    add.l   %d4,%d2         /* get g */
-    add.l   %d4,%d1         /* get b */
+    /* luma for first pixel */
+    clr.l   %d1
+    move.b  (%a1)+, %d1
+    moveq.l #-126, %d0
+    add.l   %d1, %d0                /* y' (-0.5 ... +0.5) */
+    mac.l   %a5, %d0, %acc0
+    mac.l   %a5, %d0, %acc1
+    mac.l   %a5, %d0, %acc2
+    
+    move.w  %d4, (%a0)
+    /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
 
-    move.l  %d1,%d0         /* is clamping needed? */
-    or.l    %d2,%d0
-    or.l    %d3,%d0
-    asr.l   #6,%d0
-    beq.b   .yuv_no_clamp2  /* values in range: skip clamping */
-    moveq.l #63, %d0
-    cmp.l   %d0, %d3
-    bls.s   .yuv_red_ok2
-    spl.b   %d3
-    and.l   %d0, %d3
-.yuv_red_ok2:
-    cmp.l   %d0, %d2
-    bls.s   .yuv_green_ok2
-    spl.b   %d2
-    and.l   %d0, %d2
-.yuv_green_ok2:
-    cmp.l   %d0, %d1
-    bls.s   .yuv_blue_ok2
-    spl.b   %d1
-    and.l   %d0, %d1
-.yuv_blue_ok2:
-.yuv_no_clamp2:
-    /* : %d3 = R, %d2 = G, %d1 = B */
+    /* convert to RGB666, pack and output */
+.yuv_line_entry:
+    moveq.l #26, %d0
+    move.l  %acc0, %d4
+    move.l  %acc1, %d3
+    move.l  %acc2, %d2
+    lsr.l   %d0, %d4
+    lsr.l   %d0, %d3
+    lsr.l   %d0, %d2
+    
+    lsl.l   #6, %d2
+    or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
+    lsl.l   #7, %d2
+    or.l    %d2, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
+    lsl.l   #6, %d3
+    or.l    %d3, %d4                /* |0000000R|rrrrrGgg|ggg0Gggg|ggBbbbbb| */
+    eor.l   %d7, %d4                /* |0000000r|rrrrrggg|ggg0gggg|ggbbbbbb| */
+    swap    %d4
+    move.w  %d4, (%a0)
+    swap    %d4
 
-    move.l  %d2,%d0         /* save g for lower 9 bits */
-    lsl.l   #3,%d3          /* R << 3 */
-    lsr.l   #3,%d0          /* G >> 3 */
-    or.l    %d3,%d0         /* |00000000|000000000|0000000r|rrrrrggg| */
-    move.w  %d0,(%a0)
-    lsl.l   #6,%d2          /* G << 6 */
-    or.l    %d2,%d1         /* |00000000|000000000|0000gggg|ggbbbbbb| */
-    move.w  %d1,(%a0)
+    /* luma for second pixel as delta from the first */
+    clr.l   %d0
+    move.b  (%a1)+, %d0
+    sub.l   %d1, %d0
+    mac.l   %a5, %d0, %acc0
+    mac.l   %a5, %d0, %acc1
+    mac.l   %a5, %d0, %acc2
 
-    cmp.l   %a1,%a5         /* run %a1 up to end of line */
-    bhi.w   .yuv_line_loop1
+    move.w  %d4, (%a0)
+    /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
+
+    /* convert to RGB666, pack and output */
+    moveq.l #26, %d0
+    movclr.l %acc0, %d4
+    movclr.l %acc1, %d3
+    movclr.l %acc2, %d2
+    lsr.l   %d0, %d4
+    lsr.l   %d0, %d3
+    lsr.l   %d0, %d2
+
+    lsl.l   #6, %d2
+    or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
+    lsl.l   #7, %d2
+    or.l    %d2, %d3                /* |00000000|00000Rrr|rrrGgggg|g0Gggggg| */
+    lsl.l   #6, %d3
+    or.l    %d3, %d4                /* |0000000R|rrrrrGgg|ggg0Gggg|ggBbbbbb| */
+    eor.l   %d7, %d4                /* |0000000r|rrrrrggg|ggg0gggg|ggbbbbbb| */
+    swap    %d4
+    move.w  %d4, (%a0)
+    swap    %d4
+
+    cmp.l   %a1, %a4                /* run %a1 up to end of line */
+    bhi.w   .yuv_line_loop
+
+    tst.l   (44+4, %sp)             /* use original Y pointer as a flag to */
+    beq.b   .yuv_exit               /* distinguish between first and second */
+    clr.l   (44+4, %sp)             /* pixel line */
 
     /* Rewind chroma pointers */
-    movem.l (36+8, %sp), %a2-%a5    /* bu data, guv data, rv data, width */
-    lea.l   (%a1, %a5), %a5         /* next end address */
+    movem.l (44+8, %sp), %a2-%a4    /* Cb data, Cr data, width */
+    lea.l   (%a1, %a4), %a4         /* end address */
+    bra.w   .yuv_line_loop
+    
+.yuv_exit:
+    move.w  %d4, (%a0)              /* write (very) last 2nd word */
 
-.yuv_line_loop2:
-    move.b  (%a2)+,%d1      /* read save chromas and sign extend */
-    extb.l  %d1
-    move.b  (%a3)+,%d2
-    extb.l  %d2
-    move.b  (%a4)+,%d3
-    extb.l  %d3
-
-    clr.l   %d4
-    move.b  (%a1)+,%d4      /* get y component */
-    moveq.l #74,%d0
-    muls.w  %d0,%d4
-    asr.l   #8,%d4
-    subq.l  #4,%d4
-    move.l  %d4,%d5
-    move.l  %d4,%d6
-    /* : %d4,%d5,%d6 = Y, %d1 = bu, %d2 = guv, %d3 = rv */
-
-    add.l   %d3,%d4         /* get r */
-    add.l   %d2,%d5         /* get g */
-    add.l   %d1,%d6         /* get b */
-
-    move.l  %d6,%d0         /* is clamping needed? */
-    or.l    %d5,%d0
-    or.l    %d4,%d0
-    asr.l   #6,%d0
-    beq.b   .yuv_no_clamp3  /* values in range: skip clamping */
-    moveq.l #63, %d0
-    cmp.l   %d0, %d4
-    bls.s   .yuv_red_ok3
-    spl.b   %d4
-    and.l   %d0, %d4
-.yuv_red_ok3:
-    cmp.l   %d0, %d5
-    bls.s   .yuv_green_ok3
-    spl.b   %d5
-    and.l   %d0, %d5
-.yuv_green_ok3:
-    cmp.l   %d0, %d6
-    bls.s   .yuv_blue_ok3
-    spl.b   %d6
-    and.l   %d0, %d6
-.yuv_blue_ok3:
-.yuv_no_clamp3:
-    /* : %d4 = R, %d5 = G, %d6 = B */
-
-    move.l  %d5,%d0         /* save g for lower 9 bits */
-    lsl.l   #3,%d4          /* R << 3 */
-    lsr.l   #3,%d0          /* G >> 3 */
-    or.l    %d4,%d0
-    move.w  %d0,(%a0)       /* |00000000|000000000|0000000r|rrrrrggg| */
-    lsl.l   #6,%d5          /* B << 6 */
-    or.l    %d5,%d6         /* |00000000|000000000|0000gggg|ggbbbbbb| */
-    move.w  %d6,(%a0)
-
-    /** Write second pixel **/
-    clr.l   %d4
-    move.b  (%a1)+,%d4      /* get y component */
-    moveq.l #74,%d0
-    muls.w  %d0,%d4
-    asr.l   #8,%d4
-    subq.l  #4,%d4
-    /* : %d4 = Y, %d1 = bu, %d2 = guv, %d3 = rv */
-
-    /* Add Y + each chroma component (can clobber %d1-%d3 values now) */
-    add.l   %d4,%d3         /* get r */
-    add.l   %d4,%d2         /* get g */
-    add.l   %d4,%d1         /* get b */
-
-    move.l  %d1,%d0         /* is clamping needed? */
-    or.l    %d2,%d0
-    or.l    %d3,%d0
-    asr.l   #6,%d0
-    beq.b   .yuv_no_clamp4  /* values in range: skip clamping */
-    moveq.l #63, %d0
-    cmp.l   %d0, %d3
-    bls.s   .yuv_red_ok4
-    spl.b   %d3
-    and.l   %d0, %d3
-.yuv_red_ok4:
-    cmp.l   %d0, %d2
-    bls.s   .yuv_green_ok4
-    spl.b   %d2
-    and.l   %d0, %d2
-.yuv_green_ok4:
-    cmp.l   %d0, %d1
-    bls.s   .yuv_blue_ok4
-    spl.b   %d1
-    and.l   %d0, %d1
-.yuv_blue_ok4:
-.yuv_no_clamp4:
-    /* : %d3 = R, %d2 = G, %d1 = B */
-
-    move.l  %d2,%d0         /* save g for lower 9 bits */
-    lsl.l   #3,%d3          /* R << 3 */
-    lsr.l   #3,%d0          /* G >> 3 */
-    or.l    %d3,%d0         /* |00000000|000000000|0000000r|rrrrrggg| */
-    move.w  %d0,(%a0)
-    lsl.l   #6,%d2          /* G << 6 */
-    or.l    %d2,%d1         /* |00000000|000000000|0000gggg|ggbbbbbb| */
-    move.w  %d1,(%a0)
-
-    cmp.l   %a1,%a5         /* run %a0 up to end of line */
-    bhi.w   .yuv_line_loop2
-
-    movem.l (%sp),%d2-%d6/%a2-%a5
-    lea.l   (36,%sp),%sp    /* restore registers */
+    movem.l (%sp), %d2-%d7/%a2-%a6
+    lea.l   (44, %sp), %sp  /* restore registers */
 
     rts
-
 .yuv_end:
-    .size   lcd_write_yuv420_lines,.yuv_end-lcd_write_yuv420_lines
-/* end lcd_write_yuv420_lines */
+    .size   lcd_write_yuv420_lines, yuv_end - lcd_write_yuv420_lines
 
 
 /* begin lcd_write_data */

@@ -429,11 +429,11 @@ void lcd_blit(const fb_data* data, int x, int by, int width,
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.
  * y should have two lines of Y back to back.
  * bu and rv should contain the Cb and Cr data for the two lines of Y.
- * Stores bu, guv and rv in repective buffers for use in second line.
+ * Needs EMAC set to saturated, signed integer mode.
  */
 extern void lcd_write_yuv420_lines(const unsigned char *y,
-    unsigned char *bu, unsigned char *guv, unsigned char *rv,
-    int width);
+                                   const unsigned char *bu,
+                                   const unsigned char *rv, int width);
 
 /* Performance function to blit a YUV bitmap directly to the LCD
  * src_x, src_y, width and height should be even and within the LCD's
@@ -446,7 +446,6 @@ void lcd_yuv_blit(unsigned char * const src[3],
     /* IRAM Y, Cb/bu, guv and Cb/rv buffers. */
     unsigned char y_ibuf[LCD_WIDTH*2];
     unsigned char bu_ibuf[LCD_WIDTH/2];
-    unsigned char guv_ibuf[LCD_WIDTH/2];
     unsigned char rv_ibuf[LCD_WIDTH/2];
     const unsigned char *ysrc, *usrc, *vsrc;
     const unsigned char *ysrc_max;
@@ -457,28 +456,29 @@ void lcd_yuv_blit(unsigned char * const src[3],
     if (r_entry_mode == R_ENTRY_MODE_SOLID)
         hw_dither(true);
 
-    width = (width + 1) & ~1;
-    height = (height + 1) & ~1;
+    width &= ~1;  /* stay on the safe side */
+    height &= ~1;         
 
-     /* Set start position and window */
+    /* Set start position and window */
     lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | (y + y_offset));
     lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
 
     lcd_begin_write_gram();
 
-    ysrc = src[0] + src_y*stride + src_x;
-    usrc = src[1] + (src_y*stride >> 2) + (src_x >> 1);
-    vsrc = src[2] + (usrc - src[1]);
-    ysrc_max = ysrc + height*stride;
+    ysrc = src[0] + src_y * stride + src_x;
+    usrc = src[1] + (src_y * stride >> 2) + (src_x >> 1);
+    vsrc = src[2] + (src_y * stride >> 2) + (src_x >> 1);
+    ysrc_max = ysrc + height * stride;
 
+    coldfire_set_macsr(EMAC_SATURATE);
     do
     {
         memcpy(y_ibuf, ysrc, width);
-        memcpy(&y_ibuf[width], &ysrc[stride], width);
+        memcpy(y_ibuf + width, ysrc + stride, width);
         memcpy(bu_ibuf, usrc, width >> 1);
         memcpy(rv_ibuf, vsrc, width >> 1);
-        lcd_write_yuv420_lines(y_ibuf, bu_ibuf, guv_ibuf, rv_ibuf, width);
-        ysrc += stride << 1;
+        lcd_write_yuv420_lines(y_ibuf, bu_ibuf, rv_ibuf, width);
+        ysrc += 2 * stride;
         usrc += stride >> 1;
         vsrc += stride >> 1;
     }
