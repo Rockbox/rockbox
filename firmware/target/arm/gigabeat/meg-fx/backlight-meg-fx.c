@@ -21,18 +21,25 @@
 #include "system.h"
 #include "backlight.h"
 #include "lcd.h"
+#include "sc606-meg-fx.h"
+
+int confval = SC606_LOW_FREQ;
 
 void __backlight_on(void)
 {
+    confval |= (SC606_LED_A1 | SC606_LED_A2);
+    sc606_write(SC606_REG_CONF, confval);
 }
 
 void __backlight_off(void)
 {
+    confval &= ~(SC606_LED_A1 | SC606_LED_A2);
+    sc606_write(SC606_REG_CONF, confval);
 }
 
-void __backlight_set_brightness(int val)
+void __backlight_set_brightness(int brightness)
 {
-    /* The SC606 LED driver of the gigabeat series
-     * can set the brightness in 64 steps */
-    val &= 0x3F;
+    /* The SC606 LED driver can set the brightness in 64 steps */
+    brightness &= 0x3F;
+    sc606_write(SC606_REG_A, brightness);
 }
