@@ -2109,7 +2109,9 @@ int show_menu(void) /* return 1 to quit */
         { "Quit", NULL },
         { "Toggle Slideshow Mode", NULL },
         { "Change Slideshow Time", NULL },
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
         { "Show Playback Menu", NULL },
+#endif
         { "Return", NULL },
     };
     static const struct opt_items slideshow[2] = {
@@ -2162,9 +2164,11 @@ int show_menu(void) /* return 1 to quit */
             }
             break;
         case 3:
+#if PLUGIN_BUFFER_SIZE >= MIN_MEM
             playback_control(rb);
             break;
         case 4:
+#endif
             break;
     }
 
