@@ -341,7 +341,7 @@
 #define GPCDAT (*(volatile int *)0x56000024) /* Port C data */
 #define GPCUP (*(volatile int *)0x56000028) /* Pull-up control C */
 #define GPDCON (*(volatile int *)0x56000030) /* Port D control */
-#define GPDDA1T (*(volatile int *)0x56000034) /* Port D data */
+#define GPDDAT (*(volatile int *)0x56000034) /* Port D data */
 #define GPDUP (*(volatile int *)0x56000038) /* Pull-up control D */
 #define GPECON (*(volatile int *)0x56000040) /* Port E control */
 #define GPEDAT (*(volatile int *)0x56000044) /* Port E data */
