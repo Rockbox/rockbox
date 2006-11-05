@@ -716,7 +716,7 @@ void R_InitTranMap(int progress)
       const byte *playpal = W_CacheLumpName("PLAYPAL");
       byte       *my_tranmap;
 
-      int cachefd = open(GAMEBASE"tranmap.dat",O_RDONLY);
+      int cachefd = open(GAMEBASE"tranmap.dat", O_RDWR);
 
       main_tranmap = my_tranmap = Z_Malloc(256*256, PU_STATIC, 0);  // killough 4/11/98
 
