@@ -404,7 +404,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     screen->set_drawmode(DRMODE_SOLID);
     screen->putsxy(current_x, y + 2, separator);
     current_x += separator_width;
-#ifdef HAVE_REMOTE_LCD
+#if NB_SCREENS > 1
     if (screen->screen_type == SCREEN_REMOTE) {
         if (mode == GAIN) {
             screen->putsxy(current_x, y + 2, str(LANG_EQUALIZER_BAND_GAIN));
@@ -522,7 +522,7 @@ static int draw_eq_sliders(int current_band, enum eq_slider_mode mode)
         height += draw_eq_slider(&(screens[SCREEN_MAIN]), 2, height,
                       slider_width[SCREEN_MAIN], cutoff, q, gain, 
                       i == current_band, mode, type);
-#ifdef HAVE_REMOTE_LCD
+#if NB_SCREENS > 1
         if (i == current_band)
             draw_eq_slider(&(screens[SCREEN_REMOTE]), 2, 0,
                       slider_width[SCREEN_REMOTE], cutoff, q, gain,1, mode, type);
