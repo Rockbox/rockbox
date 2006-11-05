@@ -113,9 +113,13 @@ void gray_ub_scroll_down(int count);
 #define _GRAY_RUNNING          0x0001  /* greyscale overlay is running */
 #define _GRAY_DEFERRED_UPDATE  0x0002  /* lcd_update() requested */
 
-/* unsigned 16 bit multiplication (a single instruction on the SH) */
-#define MULU16(a, b) ((unsigned long) \
-                     (((unsigned short) (a)) * ((unsigned short) (b))))
+/* fast unsigned multiplication (16x16bit->32bit or 32x32bit->32bit,
+ * whichever is faster for the architecture) */
+#ifdef CPU_ARM
+#define _GRAY_MULUQ(a, b) ((uint32_t) (((uint32_t) (a)) * ((uint32_t) (b))))
+#else
+#define _GRAY_MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
+#endif
 
 /* The grayscale buffer management structure */
 struct _gray_info

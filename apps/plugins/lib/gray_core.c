@@ -225,11 +225,11 @@ static inline void _deferred_update(void)
 static void _timer_isr(void)
 {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    _gray_rb->lcd_blit(_gray_info.plane_data + MULU16(_gray_info.plane_size,
+    _gray_rb->lcd_blit(_gray_info.plane_data + _GRAY_MULUQ(_gray_info.plane_size,
                        _gray_info.cur_plane), _gray_info.bx, _gray_info.y,
                        _gray_info.bwidth, _gray_info.height, _gray_info.bwidth);
 #else
-    _gray_rb->lcd_blit(_gray_info.plane_data + MULU16(_gray_info.plane_size,
+    _gray_rb->lcd_blit(_gray_info.plane_data + _GRAY_MULUQ(_gray_info.plane_size,
                        _gray_info.cur_plane), _gray_info.x, _gray_info.by,
                        _gray_info.width, _gray_info.bheight, _gray_info.width);
 #endif
@@ -373,7 +373,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     /* chunky front- & backbuffer */
     if (buffered)  
     {
-        plane_size = MULU16(width, height);
+        plane_size = _GRAY_MULUQ(width, height);
         buftaken += 2 * plane_size;
         if (buftaken > gbuf_size)
             return 0;
@@ -387,9 +387,9 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     }
 
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    plane_size = MULU16(bdim, height);
+    plane_size = _GRAY_MULUQ(bdim, height);
 #else
-    plane_size = MULU16(width, bdim);
+    plane_size = _GRAY_MULUQ(width, bdim);
 #endif
     possible_depth = (gbuf_size - buftaken - sizeof(long))
                      / (plane_size + sizeof(long));
@@ -403,9 +403,9 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
 #ifdef SIMULATOR
     if (!buffered)
     {
-        long orig_size = MULU16(depth, plane_size) + (depth + 1) * sizeof(long);
+        long orig_size = _GRAY_MULUQ(depth, plane_size) + (depth + 1) * sizeof(long);
         
-        plane_size = MULU16(width, height);
+        plane_size = _GRAY_MULUQ(width, height);
         if (plane_size > orig_size)
         {
             buftaken += plane_size;
@@ -420,7 +420,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     }
     else
 #endif
-        buftaken += MULU16(depth, plane_size) + (depth + 1) * sizeof(long);
+        buftaken += _GRAY_MULUQ(depth, plane_size) + (depth + 1) * sizeof(long);
 
     _gray_info.x = 0;
     _gray_info.y = 0;
@@ -439,8 +439,8 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     _gray_info.cur_plane = 0;
     _gray_info.plane_size = plane_size;
     _gray_info.plane_data = gbuf;
-    _gray_rb->memset(gbuf, 0, MULU16(depth, plane_size));
-    gbuf += MULU16(depth, plane_size);
+    _gray_rb->memset(gbuf, 0, _GRAY_MULUQ(depth, plane_size));
+    gbuf += _GRAY_MULUQ(depth, plane_size);
     _gray_info.bitpattern = (unsigned long *)gbuf;
               
     i = depth - 1;
@@ -481,7 +481,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
     {
         for (i = 0; i < 256; i++)
         {
-            data = MULU16(depth, i) + 127;
+            data = _GRAY_MULUQ(depth, i) + 127;
             _gray_info.idxtable[i] = (data + (data >> 8)) >> 8;
                                       /* approx. data / 255 */
         }
@@ -492,7 +492,7 @@ int gray_init(struct plugin_api* newrb, unsigned char *gbuf, long gbuf_size,
         {
             data = exp_s16p16((gamma * log_s16p16(i * 257 + 1)) >> 8) + 128;
             data = (data - (data >> 8)) >> 8; /* approx. data /= 257 */
-            data = MULU16(depth, lcdlinear[data]) + 127;
+            data = _GRAY_MULUQ(depth, lcdlinear[data]) + 127;
             _gray_info.idxtable[i] = (data + (data >> 8)) >> 8;
                                       /* approx. data / 255 */
         }
@@ -577,11 +577,11 @@ void gray_show(bool enable)
 static unsigned long _gray_get_pixel(int x, int y)
 {
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    return _gray_info.cur_buffer[MULU16(y - _gray_info.y, _gray_info.width)
+    return _gray_info.cur_buffer[_GRAY_MULUQ(y - _gray_info.y, _gray_info.width)
                                  + x - _gray_info.x]
            + (1 << LCD_DEPTH);
 #else
-    return _gray_info.cur_buffer[MULU16(x - _gray_info.x, _gray_info.height)
+    return _gray_info.cur_buffer[_GRAY_MULUQ(x - _gray_info.x, _gray_info.height)
                                  + y - _gray_info.y]
            + (1 << LCD_DEPTH);
 #endif
@@ -630,8 +630,8 @@ void gray_update_rect(int x, int y, int width, int height)
         xmax = _gray_info.bwidth - 1;
     bwidth = xmax - x + 1;
         
-    srcofs = MULU16(_gray_info.width, y) + (x << 3);
-    dst = _gray_info.plane_data + MULU16(_gray_info.bwidth, y) + x;
+    srcofs = _GRAY_MULUQ(_gray_info.width, y) + (x << 3);
+    dst = _gray_info.plane_data + _GRAY_MULUQ(_gray_info.bwidth, y) + x;
     
     /* Copy specified rectangle bitmap to hardware */
     for (; height > 0; height--)
@@ -982,7 +982,7 @@ void gray_update_rect(int x, int y, int width, int height)
                 }
 
                 addr = dst_row;
-                end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+                end = addr + _GRAY_MULUQ(_gray_info.depth, _gray_info.plane_size);
 
                 /* set the bits for all 8 pixels in all bytes according to the
                  * precalculated patterns on the pattern stack */
@@ -1050,8 +1050,8 @@ void gray_update_rect(int x, int y, int width, int height)
     if (ymax >= _gray_info.bheight)
         ymax = _gray_info.bheight - 1;
         
-    srcofs = (y << 3) + MULU16(_gray_info.height, x);
-    dst = _gray_info.plane_data + MULU16(_gray_info.width, y) + x;
+    srcofs = (y << 3) + _GRAY_MULUQ(_gray_info.height, x);
+    dst = _gray_info.plane_data + _GRAY_MULUQ(_gray_info.width, y) + x;
     
     /* Copy specified rectangle bitmap to hardware */
     for (; y <= ymax; y++)
@@ -1879,7 +1879,7 @@ void gray_update_rect(int x, int y, int width, int height)
                 }
 
                 addr = dst_row;
-                end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+                end = addr + _GRAY_MULUQ(_gray_info.depth, _gray_info.plane_size);
 
                 /* set the bits for all 8 pixels in all bytes according to the
                  * precalculated patterns on the pattern stack */
@@ -2037,9 +2037,9 @@ static void gray_screendump_hook(int fd)
 
     for (i = _gray_info.depth; i > 0; i--)
     {
-        *clut_entry++ = MULU16(BMP_BLUE,  i) / _gray_info.depth;
-        *clut_entry++ = MULU16(BMP_GREEN, i) / _gray_info.depth;
-        *clut_entry++ = MULU16(BMP_RED,   i) / _gray_info.depth;
+        *clut_entry++ = _GRAY_MULUQ(BMP_BLUE,  i) / _gray_info.depth;
+        *clut_entry++ = _GRAY_MULUQ(BMP_GREEN, i) / _gray_info.depth;
+        *clut_entry++ = _GRAY_MULUQ(BMP_RED,   i) / _gray_info.depth;
         clut_entry++;
     }
     _gray_rb->write(fd, linebuf, 4*BMP_VARCOLORS);
@@ -2052,14 +2052,14 @@ static void gray_screendump_hook(int fd)
         gy = y - _gray_info.y;
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #if LCD_DEPTH == 2
-        lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_FBWIDTH, y);
+        lcdptr = _gray_rb->lcd_framebuffer + _GRAY_MULUQ(LCD_FBWIDTH, y);
 
         if ((unsigned) gy < (unsigned) _gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
 #ifndef SIMULATOR
             unsigned char *grayptr = _gray_info.plane_data
-                                   + MULU16(_gray_info.bwidth, gy);
+                                   + _GRAY_MULUQ(_gray_info.bwidth, gy);
 #endif
 
             for (x = 0; x < LCD_WIDTH; x += 4)
@@ -2069,7 +2069,7 @@ static void gray_screendump_hook(int fd)
                 if ((unsigned)gx < (unsigned)_gray_info.width)
                 {
 #ifdef SIMULATOR
-                    data = MULU16(gy, _gray_info.width) + gx;
+                    data = _GRAY_MULUQ(gy, _gray_info.width) + gx;
 
                     for (i = 0; i < 4; i++)
                         linebuf[x + i] = BMP_FIXEDCOLORS + _gray_info.depth
@@ -2122,14 +2122,14 @@ static void gray_screendump_hook(int fd)
 #if LCD_DEPTH == 1
         mask = 1 << (y & 7);
         by = y >> 3;
-        lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
+        lcdptr = _gray_rb->lcd_framebuffer + _GRAY_MULUQ(LCD_WIDTH, by);
 
         if ((unsigned) gy < (unsigned) _gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
 #ifndef SIMULATOR
             unsigned char *grayptr = _gray_info.plane_data 
-                                   + MULU16(_gray_info.width, gy >> 3);
+                                   + _GRAY_MULUQ(_gray_info.width, gy >> 3);
 #endif
 
             for (x = 0; x < LCD_WIDTH; x++)
@@ -2140,7 +2140,7 @@ static void gray_screendump_hook(int fd)
                 {
 #ifdef SIMULATOR
                     linebuf[x] = BMP_FIXEDCOLORS + _gray_info.depth
-                               - _gray_info.cur_buffer[MULU16(gx, _gray_info.height) + gy];
+                               - _gray_info.cur_buffer[_GRAY_MULUQ(gx, _gray_info.height) + gy];
 #else
                     int idx = BMP_FIXEDCOLORS;
                     unsigned char *grayptr2 = grayptr + gx;
@@ -2170,14 +2170,14 @@ static void gray_screendump_hook(int fd)
 #elif LCD_DEPTH == 2
         shift = 2 * (y & 3);
         by = y >> 2;
-        lcdptr = _gray_rb->lcd_framebuffer + MULU16(LCD_WIDTH, by);
+        lcdptr = _gray_rb->lcd_framebuffer + _GRAY_MULUQ(LCD_WIDTH, by);
 
         if ((unsigned)gy < (unsigned)_gray_info.height)
         {
             /* line contains greyscale (and maybe b&w) graphics */
 #ifndef SIMULATOR
             unsigned char *grayptr = _gray_info.plane_data
-                                   + MULU16(_gray_info.width, gy >> 3);
+                                   + _GRAY_MULUQ(_gray_info.width, gy >> 3);
             mask = 1 << (gy & 7);
 #endif
 
@@ -2189,7 +2189,7 @@ static void gray_screendump_hook(int fd)
                 {
 #ifdef SIMULATOR
                     linebuf[x] = BMP_FIXEDCOLORS + _gray_info.depth
-                               - _gray_info.cur_buffer[MULU16(gx, _gray_info.height) + gy];
+                               - _gray_info.cur_buffer[_GRAY_MULUQ(gx, _gray_info.height) + gy];
 #else
                     int idx = BMP_FIXEDCOLORS;
                     unsigned char *grayptr2 = grayptr + gx;

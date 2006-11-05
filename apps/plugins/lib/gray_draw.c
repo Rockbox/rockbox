@@ -65,7 +65,7 @@ void gray_clear_display(void)
                      _gray_info.fg_index : _gray_info.bg_index;
 
     _gray_rb->memset(_gray_info.cur_buffer, brightness,
-                     MULU16(_gray_info.width, _gray_info.height));
+                     _GRAY_MULUQ(_gray_info.width, _gray_info.height));
 }
 
 /* Set a single pixel */
@@ -74,10 +74,10 @@ void gray_drawpixel(int x, int y)
     if (((unsigned)x < (unsigned)_gray_info.width)
         && ((unsigned)y < (unsigned)_gray_info.height))
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-        _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[MULU16(y,
+        _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[_GRAY_MULUQ(y,
                                                _gray_info.width) + x]);
 #else
-        _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[MULU16(x,
+        _gray_pixelfuncs[_gray_info.drawmode](&_gray_info.cur_buffer[_GRAY_MULUQ(x,
                                                _gray_info.height) + y]);
 #endif
 }
@@ -138,9 +138,9 @@ void gray_drawline(int x1, int y1, int x2, int y2)
         if (((unsigned)x < (unsigned)_gray_info.width) 
             && ((unsigned)y < (unsigned)_gray_info.height))
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-            pfunc(&_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x]);
+            pfunc(&_gray_info.cur_buffer[_GRAY_MULUQ(y, _gray_info.width) + x]);
 #else
-            pfunc(&_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y]);
+            pfunc(&_gray_info.cur_buffer[_GRAY_MULUQ(x, _gray_info.height) + y]);
 #endif
 
         if (d < 0)
@@ -205,7 +205,7 @@ void gray_hline(int x1, int x2, int y)
         }
     }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
-    dst   = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x1];
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(y, _gray_info.width) + x1];
 
     if (fillopt)
         _gray_rb->memset(dst, bits, x2 - x1 + 1);
@@ -245,9 +245,9 @@ void gray_vline(int x, int y1, int y2)
         y2 = _gray_info.height - 1;
 
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
-    dst   = &_gray_info.cur_buffer[MULU16(y1, _gray_info.width) + x];
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(y1, _gray_info.width) + x];
 
-    dst_end = dst + MULU16(y2 - y1, _gray_info.width);
+    dst_end = dst + _GRAY_MULUQ(y2 - y1, _gray_info.width);
     do
     {
         pfunc(dst);
@@ -354,9 +354,9 @@ void gray_hline(int x1, int x2, int y)
         x2 = _gray_info.width - 1;
         
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
-    dst   = &_gray_info.cur_buffer[MULU16(x1, _gray_info.height) + y];
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(x1, _gray_info.height) + y];
 
-    dst_end = dst + MULU16(x2 - x1, _gray_info.height);
+    dst_end = dst + _GRAY_MULUQ(x2 - x1, _gray_info.height);
     do
     {
         pfunc(dst);
@@ -410,7 +410,7 @@ void gray_vline(int x, int y1, int y2)
         }
     }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
-    dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y1];
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(x, _gray_info.height) + y1];
 
     if (fillopt)
         _gray_rb->memset(dst, bits, y2 - y1 + 1);
@@ -556,8 +556,8 @@ void gray_fillrect(int x, int y, int width, int height)
     }
     pfunc = _gray_pixelfuncs[_gray_info.drawmode];
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    dst   = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
-    dst_end = dst + MULU16(height, _gray_info.width);
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(y, _gray_info.width) + x];
+    dst_end = dst + _GRAY_MULUQ(height, _gray_info.width);
 
     do
     {
@@ -576,8 +576,8 @@ void gray_fillrect(int x, int y, int width, int height)
     }
     while (dst < dst_end);
 #else
-    dst   = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
-    dst_end = dst + MULU16(width, _gray_info.height);
+    dst   = &_gray_info.cur_buffer[_GRAY_MULUQ(x, _gray_info.height) + y];
+    dst_end = dst + _GRAY_MULUQ(width, _gray_info.height);
 
     do
     {
@@ -639,14 +639,14 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _gray_info.height)
         height = _gray_info.height - y;
 
-    src    += MULU16(stride, src_y >> 3) + src_x; /* move starting point */
+    src    += _GRAY_MULUQ(stride, src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
     src_end = src + width;
 
     fgfunc = _gray_pixelfuncs[_gray_info.drawmode];
     bgfunc = _gray_pixelfuncs[_gray_info.drawmode ^ DRMODE_INVERSEVID];
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    dst    = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
+    dst    = &_gray_info.cur_buffer[_GRAY_MULUQ(y, _gray_info.width) + x];
     
     do
     {
@@ -655,7 +655,7 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         unsigned data = *src_col >> src_y;
         int numbits = 8 - src_y;
         
-        dst_end = dst_col + MULU16(height, _gray_info.width);
+        dst_end = dst_col + _GRAY_MULUQ(height, _gray_info.width);
         do
         {
             if (data & 0x01)
@@ -677,7 +677,7 @@ void gray_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     }
     while (src < src_end);
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
-    dst    = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
+    dst    = &_gray_info.cur_buffer[_GRAY_MULUQ(x, _gray_info.height) + y];
     
     do
     {
@@ -745,10 +745,10 @@ void gray_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if (y + height > _gray_info.height)
         height = _gray_info.height - y;
 
-    src    += MULU16(stride, src_y) + src_x; /* move starting point */
+    src    += _GRAY_MULUQ(stride, src_y) + src_x; /* move starting point */
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-    dst     = &_gray_info.cur_buffer[MULU16(y, _gray_info.width) + x];
-    dst_end = dst + MULU16(height, _gray_info.width);
+    dst     = &_gray_info.cur_buffer[_GRAY_MULUQ(y, _gray_info.width) + x];
+    dst_end = dst + _GRAY_MULUQ(height, _gray_info.width);
 
     do
     {
@@ -765,14 +765,14 @@ void gray_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     }
     while (dst < dst_end);
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
-    dst     = &_gray_info.cur_buffer[MULU16(x, _gray_info.height) + y];
+    dst     = &_gray_info.cur_buffer[_GRAY_MULUQ(x, _gray_info.height) + y];
     dst_end = dst + height;
 
     do
     {
         const unsigned char *src_row = src;
         unsigned char *dst_row = dst++;
-        unsigned char *row_end = dst_row + MULU16(width, _gray_info.height);
+        unsigned char *row_end = dst_row + _GRAY_MULUQ(width, _gray_info.height);
 
         do
         {
@@ -843,7 +843,7 @@ void gray_putsxy(int x, int y, const unsigned char *str)
 void gray_ub_clear_display(void)
 {
     _gray_rb->memset(_gray_info.cur_buffer, _gray_info.depth,
-                     MULU16(_gray_info.width, _gray_info.height));
+                     _GRAY_MULUQ(_gray_info.width, _gray_info.height));
     gray_update();
 }
 
@@ -860,7 +860,7 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 /* Clear the greyscale display (sets all pixels to white) */
 void gray_ub_clear_display(void)
 {
-    _gray_rb->memset(_gray_info.plane_data, 0, MULU16(_gray_info.depth,
+    _gray_rb->memset(_gray_info.plane_data, 0, _GRAY_MULUQ(_gray_info.depth,
                      _gray_info.plane_size));
 }
 
@@ -1172,7 +1172,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     }
 
     addr = address;
-    end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+    end = addr + _GRAY_MULUQ(_gray_info.depth, _gray_info.plane_size);
 
     /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
@@ -1243,14 +1243,14 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         height = _gray_info.height - y;
 
     shift = x & 7;
-    src += MULU16(stride, src_y) + src_x - shift;
-    dst  = _gray_info.plane_data + (x >> 3) + MULU16(_gray_info.bwidth, y);
+    src += _GRAY_MULUQ(stride, src_y) + src_x - shift;
+    dst  = _gray_info.plane_data + (x >> 3) + _GRAY_MULUQ(_gray_info.bwidth, y);
     nx   = width - 1 + shift;
 
     mask = 0xFFu >> shift;
     mask_right = 0xFFu << (~nx & 7);
     
-    dst_end = dst + MULU16(_gray_info.bwidth, height);
+    dst_end = dst + _GRAY_MULUQ(_gray_info.bwidth, height);
     do
     {
         const unsigned char *src_row = src;
@@ -2038,7 +2038,7 @@ static void _writearray(unsigned char *address, const unsigned char *src,
     }
 
     addr = address;
-    end = addr + MULU16(_gray_info.depth, _gray_info.plane_size);
+    end = addr + _GRAY_MULUQ(_gray_info.depth, _gray_info.plane_size);
 
     /* set the bits for all 8 pixels in all bytes according to the
      * precalculated patterns on the pattern stack */
@@ -2109,9 +2109,9 @@ void gray_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
         height = _gray_info.height - y;
 
     shift = y & 7;
-    src += MULU16(stride, src_y) + src_x - MULU16(stride, shift);
+    src += _GRAY_MULUQ(stride, src_y) + src_x - _GRAY_MULUQ(stride, shift);
     dst  = _gray_info.plane_data + x
-           + MULU16(_gray_info.width, y >> 3);
+           + _GRAY_MULUQ(_gray_info.width, y >> 3);
     ny   = height - 1 + shift;
 
     mask = 0xFFu << shift;

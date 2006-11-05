@@ -43,7 +43,7 @@ void gray_scroll_left(int count)
         return;
 
     data = _gray_info.cur_buffer;
-    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    data_end = data + _GRAY_MULUQ(_gray_info.width, _gray_info.height);
     length = _gray_info.width - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
@@ -67,7 +67,7 @@ void gray_scroll_right(int count)
         return;
 
     data = _gray_info.cur_buffer;
-    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    data_end = data + _GRAY_MULUQ(_gray_info.width, _gray_info.height);
     length = _gray_info.width - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
@@ -90,8 +90,8 @@ void gray_scroll_up(int count)
     if ((unsigned)count >= (unsigned)_gray_info.height)
         return;
 
-    shift = MULU16(_gray_info.width, count);
-    length = MULU16(_gray_info.width, _gray_info.height - count);
+    shift = _GRAY_MULUQ(_gray_info.width, count);
+    length = _GRAY_MULUQ(_gray_info.width, _gray_info.height - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
@@ -109,8 +109,8 @@ void gray_scroll_down(int count)
     if ((unsigned)count >= (unsigned)_gray_info.height)
         return;
 
-    shift = MULU16(_gray_info.width, count);
-    length = MULU16(_gray_info.width, _gray_info.height - count);
+    shift = _GRAY_MULUQ(_gray_info.width, count);
+    length = _GRAY_MULUQ(_gray_info.width, _gray_info.height - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
@@ -130,8 +130,8 @@ void gray_scroll_left(int count)
     if ((unsigned)count >= (unsigned)_gray_info.width)
         return;
 
-    shift = MULU16(_gray_info.height, count);
-    length = MULU16(_gray_info.height, _gray_info.width - count);
+    shift = _GRAY_MULUQ(_gray_info.height, count);
+    length = _GRAY_MULUQ(_gray_info.height, _gray_info.width - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
@@ -149,8 +149,8 @@ void gray_scroll_right(int count)
     if ((unsigned)count >= (unsigned)_gray_info.width)
         return;
 
-    shift = MULU16(_gray_info.height, count);
-    length = MULU16(_gray_info.height, _gray_info.width - count);
+    shift = _GRAY_MULUQ(_gray_info.height, count);
+    length = _GRAY_MULUQ(_gray_info.height, _gray_info.width - count);
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
 
@@ -169,7 +169,7 @@ void gray_scroll_up(int count)
         return;
 
     data = _gray_info.cur_buffer;
-    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    data_end = data + _GRAY_MULUQ(_gray_info.width, _gray_info.height);
     length = _gray_info.height - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
@@ -193,7 +193,7 @@ void gray_scroll_down(int count)
         return;
 
     data = _gray_info.cur_buffer;
-    data_end = data + MULU16(_gray_info.width, _gray_info.height);
+    data_end = data + _GRAY_MULUQ(_gray_info.width, _gray_info.height);
     length = _gray_info.height - count;
     blank = (_gray_info.drawmode & DRMODE_INVERSEVID) ?
             _gray_info.fg_index : _gray_info.bg_index;
@@ -267,7 +267,7 @@ void gray_ub_scroll_left(int count)
         {
             unsigned char *ptr_row = ptr;
             unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
             do
             {
                 _gray_rb->memmove(ptr_row, ptr_row + shift, length);
@@ -348,7 +348,7 @@ void gray_ub_scroll_right(int count)
         {
             unsigned char *ptr_row = ptr;
             unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
             do
             {
                 _gray_rb->memmove(ptr_row + shift, ptr_row, length);
@@ -415,7 +415,7 @@ void gray_ub_scroll_up(int count)
     if ((unsigned) count >= (unsigned) _gray_info.height)
         return;
 
-    blockshift = MULU16(_gray_info.bwidth, count);
+    blockshift = _GRAY_MULUQ(_gray_info.bwidth, count);
     ptr      = _gray_info.plane_data;
     ptr_end2 = ptr + _gray_info.plane_size;
     ptr_end1 = ptr_end2 - blockshift;
@@ -424,7 +424,7 @@ void gray_ub_scroll_up(int count)
     {
         unsigned char *ptr_row = ptr;
         unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
         if (ptr < ptr_end1)
         {
             do
@@ -459,7 +459,7 @@ void gray_ub_scroll_down(int count)
     if ((unsigned) count >= (unsigned) _gray_info.height)
         return;
 
-    blockshift = MULU16(_gray_info.bwidth, count);
+    blockshift = _GRAY_MULUQ(_gray_info.bwidth, count);
     ptr_end2 = _gray_info.plane_data;
     ptr_end1 = ptr_end2 + blockshift;
     ptr      = ptr_end2 + _gray_info.plane_size;
@@ -470,7 +470,7 @@ void gray_ub_scroll_down(int count)
 
         ptr -= _gray_info.bwidth;
         ptr_row = ptr;
-        row_end = ptr_row + MULU16(_gray_info.plane_size, _gray_info.depth);
+        row_end = ptr_row + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
 
         if (ptr >= ptr_end1)
         {
@@ -514,7 +514,7 @@ void gray_ub_scroll_left(int count)
     {
         unsigned char *ptr_row = ptr;
         unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
         do
         {
             _gray_rb->memmove(ptr_row, ptr_row + count, length);
@@ -546,7 +546,7 @@ void gray_ub_scroll_right(int count)
     {
         unsigned char *ptr_row = ptr;
         unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
         do
         {
             _gray_rb->memmove(ptr_row + count, ptr_row, length);
@@ -575,7 +575,7 @@ void gray_ub_scroll_up(int count)
 
     if (shift)
     {
-        blockshift = MULU16(_gray_info.width, shift);
+        blockshift = _GRAY_MULUQ(_gray_info.width, shift);
         ptr      = _gray_info.plane_data;
         ptr_end2 = ptr + _gray_info.plane_size;
         ptr_end1 = ptr_end2 - blockshift;
@@ -584,7 +584,7 @@ void gray_ub_scroll_up(int count)
         {
             unsigned char *ptr_row = ptr;
             unsigned char *row_end = ptr_row
-                             + MULU16(_gray_info.plane_size, _gray_info.depth);
+                             + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
             if (ptr < ptr_end1)
             {
                 do
@@ -758,7 +758,7 @@ void gray_ub_scroll_down(int count)
 
     if (shift)
     {
-        blockshift = MULU16(_gray_info.width, shift);
+        blockshift = _GRAY_MULUQ(_gray_info.width, shift);
         ptr_end2 = _gray_info.plane_data;
         ptr_end1 = ptr_end2 + blockshift;
         ptr      = ptr_end2 + _gray_info.plane_size;
@@ -769,7 +769,7 @@ void gray_ub_scroll_down(int count)
 
             ptr -= _gray_info.width;
             ptr_row = ptr;
-            row_end = ptr_row + MULU16(_gray_info.plane_size, _gray_info.depth);
+            row_end = ptr_row + _GRAY_MULUQ(_gray_info.plane_size, _gray_info.depth);
 
             if (ptr >= ptr_end1)
             {
