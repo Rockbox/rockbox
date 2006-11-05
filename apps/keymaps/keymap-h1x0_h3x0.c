@@ -179,7 +179,14 @@ const struct button_mapping button_context_colorchooser[]  = {
 }; /* button_context_settings_bmark */
 
 const struct button_mapping button_context_eq[]  = {
-    { ACTION_STD_OK,            BUTTON_SELECT|BUTTON_REL,   BUTTON_NONE },
+    { ACTION_STD_OK,                BUTTON_SELECT|BUTTON_REL,               BUTTON_NONE },
+    { ACTION_NONE,                  BUTTON_ON|BUTTON_REL,                   BUTTON_NONE },
+    { ACTION_SETTINGS_INCBIGSTEP,   BUTTON_ON|BUTTON_RIGHT,                 BUTTON_ON },
+    { ACTION_SETTINGS_INCBIGSTEP,   BUTTON_RIGHT|BUTTON_REL,                BUTTON_ON|BUTTON_RIGHT },
+    { ACTION_SETTINGS_INCBIGSTEP,   BUTTON_ON|BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
+    { ACTION_SETTINGS_DECBIGSTEP,   BUTTON_ON|BUTTON_LEFT,                  BUTTON_ON },
+    { ACTION_SETTINGS_DECBIGSTEP,   BUTTON_LEFT|BUTTON_REL,                 BUTTON_ON|BUTTON_LEFT },
+    { ACTION_SETTINGS_DECBIGSTEP,   BUTTON_ON|BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
