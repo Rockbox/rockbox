@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/dash
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -395,7 +395,7 @@ voiceconfig () {
         DEFAULT_CHOICE="F"
     fi
 
-    if [ "$FESTIVAL" == "$FLITE" ] && [ "$FLITE" == "$ESPEAK" ]; then
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ]; then
         echo "You need Festival, eSpeak or Flite in your path to build voice files"
         exit
     fi
@@ -449,7 +449,7 @@ voiceconfig () {
         DEFAULT_CHOICE="L"
     fi
 
-    if [ "$LAME" == "" ]; then
+    if [ "$LAME" = "" ]; then
         echo "You need to have Lame installed to build voice files"
     fi
 
