@@ -28,6 +28,6 @@ manual-zip: manual-html
 	$(MAKE) -C $(OBJDIR) htmlzip
 
 clean:
-	@if [ "$(OBJDIR)" == "" ]; then echo Run make in you build directory!; false; fi
+	@if [ "$(OBJDIR)" = "" ]; then echo Run make in you build directory!; false; fi
 	@rm -rf $(OBJDIR)/manual $(OBJDIR)/*.pdf
 	@rm -rf $(OBJJDIR)/html $(OBJDIR)/txt
