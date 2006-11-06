@@ -91,8 +91,8 @@ int _do_action(int action, char* str, int line)
             if (line > line_count)
                 return 0;
             len = rb->strlen(&buffer[c])+1;
-            rb->memmove(&buffer[c],&buffer[c+len],char_count);
             char_count -= len;
+            rb->memmove(&buffer[c],&buffer[c+len],char_count);
             line_count--;
             break;
         case ACTION_UPDATE:
