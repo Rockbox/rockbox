@@ -24,13 +24,19 @@
 #include "file.h"
 
 /* Audio file types. */
-enum {
+enum
+{
     AFMT_UNKNOWN = 0,  /* Unknown file format */
+
+    /* start formats */
 
     AFMT_MPA_L1,       /* MPEG Audio layer 1 */
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
+    AFMT_AIFF,         /* Audio Interchange File Format */
+
+#if CONFIG_CODEC == SWCODEC
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
     AFMT_FLAC,         /* FLAC */
@@ -40,53 +46,90 @@ enum {
     AFMT_ALAC,         /* Apple Lossless Audio Codec */
     AFMT_AAC,          /* Advanced Audio Coding (AAC) in M4A container */
     AFMT_SHN,          /* Shorten */
-    AFMT_AIFF,         /* Audio Interchange File Format */
     AFMT_SID,          /* SID File Format */
-    AFMT_ADX,          /* ADX */
+    AFMT_ADX,          /* ADX File Format */
+#endif
 
-    /* New formats must be added to the end of this list */
+    /* add new formats at any index above this line to have a sensible order -
+       specified array index inits are used */
+    /* format arrays defined in id3.c */
 
     AFMT_NUM_CODECS,
 
-#if CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
     /* masks to decompose parts */
     CODEC_AFMT_MASK    = 0x0fff,
     CODEC_TYPE_MASK    = 0x7000,
 
     /* switch for specifying codec type when requesting a filename */
     CODEC_TYPE_DECODER = (0 << 12), /* default */
-    CODEC_TYPE_ENCODER = (1 << 12)
-#endif
+    CODEC_TYPE_ENCODER = (1 << 12),
+#endif /* CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) */
 };
 
 #if CONFIG_CODEC == SWCODEC
-#define AFMT_ENTRY(label, codec_fname, codec_enc_fname, enc_ext) \
-    { label, codec_fname, codec_enc_fname, enc_ext }
-#else
-#define AFMT_ENTRY(label, codec_fname, codec_enc_fname, enc_ext) \
-    { label }
-#endif
+#define CODEC_EXTENSION "codec"
+
+#ifdef HAVE_RECORDING
+#define ENCODER_SUFFIX  "_enc"
+enum rec_format_indexes
+{
+    __REC_FORMAT_START_INDEX = -1,
+
+    /* start formats */
+
+    REC_FORMAT_PCM_WAV,
+    REC_FORMAT_WAVPACK,
+    REC_FORMAT_MPA_L3,
+
+    /* add new formats at any index above this line to have a sensible order -
+       specified array index inits are used
+       REC_FORMAT_CFG_NUM_BITS should allocate enough bits to hold the range
+       REC_FORMAT_CFG_VALUE_LIST should be in same order as indexes
+    */
+
+    REC_NUM_FORMATS,
+
+    REC_FORMAT_DEFAULT = REC_FORMAT_PCM_WAV,
+    REC_FORMAT_CFG_NUM_BITS = 2
+};
+
+#define REC_FORMAT_CFG_VAL_LIST "wave,wvpk,mpa3" 
+
+/* get REC_FORMAT_* corresponding AFMT_* */
+extern const int rec_format_afmt[REC_NUM_FORMATS];
+/* get AFMT_* corresponding REC_FORMAT_* */
+extern const int afmt_rec_format[AFMT_NUM_CODECS];
+
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
+    { label, root_fname, enc_root_fname, ext_list }
+#else /* !HAVE_RECORDING */
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
+    { label, root_fname, ext_list }
+#endif /* HAVE_RECORDING */
+#else /* !SWCODEC */
+
+#define AFMT_ENTRY(label, root_fname, enc_root_fname, ext_list) \
+    { label, ext_list }
+#endif /* CONFIG_CODEC == SWCODEC */
 
 /* record describing the audio format */
 struct afmt_entry
 {
-#if CONFIG_CODEC == SWCODEC
     char label[8];      /* format label */
-    char *codec_fn;     /* filename of decoder codec */
-    char *codec_enc_fn; /* filename of encoder codec */
-    char *ext;          /* default extension for file (enc only for now) */
-#else
-    char label[4];
+#if CONFIG_CODEC == SWCODEC
+    char *codec_root_fn; /* root codec filename (sans _enc and .codec) */
+#ifdef HAVE_RECORDING
+    char *codec_enc_root_fn; /* filename of encoder codec */
 #endif
+#endif
+    char *ext_list;     /* double NULL terminated extension
+                           list for type with the first as
+                           the default for recording */
 };
 
 /* database of labels and codecs. add formats per above enum */
 extern const struct afmt_entry audio_formats[AFMT_NUM_CODECS];
-
-#if CONFIG_CODEC == SWCODEC
-/* recording quality to AFMT_* */
-extern const int rec_quality_info_afmt[9];
-#endif
 
 struct mp3entry {
     char path[MAX_PATH];

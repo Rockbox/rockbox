@@ -89,44 +89,40 @@ enum icons_7x8 {
     Icon7x8Last
 };
 
-#if CONFIG_CODEC == SWCODEC
-enum icons_12x8 {
-    Icon_8000,
-    Icon_11025,
-    Icon_12000,
-    Icon_16000,
-    Icon_22050,
-    Icon_24000,
-    Icon_32000,
-    Icon_44100,
-    Icon_48000,
-    Icon_64000,
-    Icon_88200,
-    Icon_96000,
-    Icon12x8Last
+#if CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING)
+#define BM_GLYPH_WIDTH 4
+enum Glyphs_4x8 {
+    Glyph_4x8_0 = 0,
+    Glyph_4x8_1,
+    Glyph_4x8_2,
+    Glyph_4x8_3,
+    Glyph_4x8_4,
+    Glyph_4x8_5,
+    Glyph_4x8_6,
+    Glyph_4x8_7,
+    Glyph_4x8_8,
+    Glyph_4x8_9,
+    Glyph_4x8_k,
+    Glyph_4x8Last
 };
+extern const unsigned char bitmap_glyphs_4x8[Glyph_4x8Last][4];
 
-enum icons_18x8 {
-    Icon_mp364,
-    Icon_mp396,
-    Icon_mp3128,
-    Icon_mp3160,
-    Icon_mp3192,
-    Icon_mp3224,
-    Icon_mp3320,
-    Icon_wv,
-    Icon_wav,
-    Icon18x8Last
+#define BM_MPA_L3_M_WIDTH 6
+#ifdef ID3_H
+/* This enum is redundant but sort of in keeping with the style */
+enum rec_format_18x8 {
+    Format_18x8_MPA_L3  = REC_FORMAT_MPA_L3,
+    Format_18x8_WAVPACK = REC_FORMAT_WAVPACK,
+    Format_18x8_PCM_WAV = REC_FORMAT_PCM_WAV,
+    Format_18x8Last     = REC_NUM_FORMATS
 };
-#endif
+extern const unsigned char bitmap_formats_18x8[Format_18x8Last][18];
+#endif /* ID3_H */
+#endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_6x8[Icon6x8Last][6];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
-#if CONFIG_CODEC == SWCODEC
-extern const unsigned char bitmap_icons_12x8[Icon12x8Last][12];
-extern const unsigned char bitmap_icons_18x8[Icon18x8Last][18];
-#endif
 extern const unsigned char bitmap_icon_disk[];
 
 #define STATUSBAR_X_POS       0

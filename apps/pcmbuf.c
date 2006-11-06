@@ -51,9 +51,11 @@ struct pcmbufdesc
     void (*callback)(void);
 };
 
+#define PCMBUF_DESCS(bufsize) ((bufsize) / PCMBUF_MINAVG_CHUNK)
+
 /* Size of the PCM buffer. */
 static size_t pcmbuf_size IDATA_ATTR = 0;
-
+static char *pcmbuf_bufend IDATA_ATTR;
 static char *audiobuffer IDATA_ATTR;
 /* Current audio buffer write index. */
 static size_t audiobuffer_pos IDATA_ATTR;
@@ -360,7 +362,7 @@ int pcmbuf_used_descs(void) {
 }
 
 int pcmbuf_descs(void) {
-    return pcmbuf_size / PCMBUF_MINAVG_CHUNK;
+    return PCMBUF_DESCS(pcmbuf_size);
 }
 
 size_t get_pcmbuf_descsize(void) {
@@ -371,28 +373,37 @@ static void pcmbuf_init_pcmbuffers(void) {
     struct pcmbufdesc *next = pcmbuf_write;
     next++;
     pcmbuf_write_end = pcmbuf_write;
-    while ((void *)next < (void *)audiobufend) {
+    while ((void *)next < (void *)pcmbuf_bufend) {
         pcmbuf_write_end->link=next;
         pcmbuf_write_end=next;
         next++;
     }
 }
 
+bool pcmbuf_is_same_size(size_t bufsize)
+{
+    /* keep calculations synced with pcmbuf_init */
+    bufsize += PCMBUF_MIX_CHUNK * 2 + PCMBUF_DESCS(bufsize);
+    return bufsize == (size_t)(pcmbuf_bufend - audiobuffer);
+}
+
 /* Initialize the pcmbuffer the structure looks like this:
- * ...CODECBUFFER|---------PCMBUF---------|GUARDBUF|DESCS| */
-void pcmbuf_init(size_t bufsize)
+ * ...|---------PCMBUF---------|FADEBUF|VOICEBUF|DESCS|... */
+size_t pcmbuf_init(size_t bufsize, char *bufend)
 {
     pcmbuf_size = bufsize;
+    pcmbuf_bufend = bufend;
     pcmbuf_descsize = pcmbuf_descs()*sizeof(struct pcmbufdesc);
-    audiobuffer = (char *)&audiobuf[(audiobufend - audiobuf) -
-        (pcmbuf_size + PCMBUF_MIX_CHUNK * 2 + pcmbuf_descsize)];
+    audiobuffer = pcmbuf_bufend - (pcmbuf_size + PCMBUF_MIX_CHUNK * 2
+                  + pcmbuf_descsize);
     fadebuf = &audiobuffer[pcmbuf_size];
     voicebuf = &fadebuf[PCMBUF_MIX_CHUNK];
-    pcmbuf_write = (struct pcmbufdesc *)(&voicebuf[PCMBUF_MIX_CHUNK]);
+    pcmbuf_write = (struct pcmbufdesc *)&voicebuf[PCMBUF_MIX_CHUNK];
     pcmbuf_init_pcmbuffers();
     position_callback = NULL;
     pcmbuf_event_handler = NULL;
     pcmbuf_play_stop();
+    return pcmbuf_bufend - audiobuffer;
 }
 
 size_t pcmbuf_get_bufsize(void)

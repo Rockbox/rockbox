@@ -58,6 +58,8 @@
 #endif /* End HAVE_LCD_BITMAP */
 #include "gui/gwps-common.h"
 
+#include "misc.h"
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
@@ -114,16 +116,20 @@ char *output_dyn_value(char *buf, int buf_size, int value,
 }
 
 /* Create a filename with a number part in a way that the number is 1
-   higher than the highest numbered file matching the same pattern.
-   It is allowed that buffer and path point to the same memory location,
-   saving a strcpy(). Path must always be given without trailing slash,. */
+ * higher than the highest numbered file matching the same pattern.
+ * It is allowed that buffer and path point to the same memory location,
+ * saving a strcpy(). Path must always be given without trailing slash.
+ * "num" can point to an int specifying the number to use or NULL or a value
+ * less than zero to number automatically. The final number used will also
+ * be returned in *num. If *num is >= 0 then *num will be incremented by
+ * one. */
 char *create_numbered_filename(char *buffer, const char *path,
                                const char *prefix, const char *suffix,
-                               int numberlen)
+                               int numberlen IF_CNFN_NUM_(, int *num))
 {
     DIR *dir;
     struct dirent *entry;
-    int max_num = 0;
+    int max_num;
     int pathlen;
     int prefixlen = strlen(prefix);
     char fmtstring[12];
@@ -132,6 +138,18 @@ char *create_numbered_filename(char *buffer, const char *path,
         strncpy(buffer, path, MAX_PATH);
 
     pathlen = strlen(buffer);
+
+#ifdef IF_CNFN_NUM
+    if (num && *num >= 0)
+    {
+        /* number specified */
+        max_num = *num;
+    }
+    else
+#endif
+    {
+        /* automatic numbering */
+        max_num = 0;
 
     dir = opendir(pathlen ? buffer : "/");
     if (!dir)
@@ -149,11 +167,20 @@ char *create_numbered_filename(char *buffer, const char *path,
         if (curr_num > max_num)
             max_num = curr_num;
     }
+
     closedir(dir);
+    }
+
+    max_num++;
 
     snprintf(fmtstring, sizeof(fmtstring), "/%%s%%0%dd%%s", numberlen);
     snprintf(buffer + pathlen, MAX_PATH - pathlen, fmtstring, prefix,
-             max_num + 1, suffix);
+             max_num, suffix);
+
+#ifdef IF_CNFN_NUM
+    if (num)
+        *num = max_num;
+#endif
 
     return buffer;
 }
@@ -161,12 +188,21 @@ char *create_numbered_filename(char *buffer, const char *path,
 #ifdef CONFIG_RTC
 /* Create a filename with a date+time part.
    It is allowed that buffer and path point to the same memory location,
-   saving a strcpy(). Path must always be given without trailing slash. */
+   saving a strcpy(). Path must always be given without trailing slash.
+   unique_time as true makes the function wait until the current time has
+   changed. */
 char *create_datetime_filename(char *buffer, const char *path,
-                               const char *prefix, const char *suffix)
+                               const char *prefix, const char *suffix,
+                               bool unique_time)
 {
     struct tm *tm = get_time();
+    static struct tm last_tm;
     int pathlen;
+
+    while (unique_time && !memcmp(get_time(), &last_tm, sizeof (struct tm)))
+        sleep(HZ/10);
+
+    last_tm = *tm;
 
     if (buffer != path)
         strncpy(buffer, path, MAX_PATH);
@@ -356,9 +392,10 @@ void screen_dump(void)
 #endif
 
 #ifdef CONFIG_RTC
-    create_datetime_filename(filename, "", "dump ", ".bmp");
+    create_datetime_filename(filename, "", "dump ", ".bmp", false);
 #else
-    create_numbered_filename(filename, "", "dump_", ".bmp", 4);
+    create_numbered_filename(filename, "", "dump_", ".bmp", 4
+                             IF_CNFN_NUM_(, NULL));
 #endif
 
     fh = creat(filename, O_WRONLY);

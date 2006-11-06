@@ -19,21 +19,46 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <stdbool.h>
+
 /* Format a large-range value for output, using the appropriate unit so that
  * the displayed value is in the range 1 <= display < 1000 (1024 for "binary"
  * units) if possible, and 3 significant digits are shown. If a buffer is
  * given, the result is snprintf()'d into that buffer, otherwise the result is
  * voiced.*/
-void output_dyn_value(char *buf, int buf_size, int value,
+char *output_dyn_value(char *buf, int buf_size, int value,
                       const unsigned char **units, bool bin_scale);
 
+/* Create a filename with a number part in a way that the number is 1
+ * higher than the highest numbered file matching the same pattern.
+ * It is allowed that buffer and path point to the same memory location,
+ * saving a strcpy(). Path must always be given without trailing slash.
+ *
+ * "num" can point to an int specifying the number to use or NULL or a value
+ * less than zero to number automatically. The final number used will also
+ * be returned in *num. If *num is >= 0 then *num will be incremented by
+ * one. */
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(CONFIG_RTC)
+/* this feature is needed by SWCODEC recording without a RTC to prevent
+   disk access when changing files */
+#define IF_CNFN_NUM_(...) __VA_ARGS__
+#define IF_CNFN_NUM
+#else
+#define IF_CNFN_NUM_(...)
+#endif
 char *create_numbered_filename(char *buffer, const char *path, 
                                const char *prefix, const char *suffix,
-                               int numberlen);
+                               int numberlen IF_CNFN_NUM_(, int *num));
 #ifdef CONFIG_RTC
+/* Create a filename with a date+time part.
+   It is allowed that buffer and path point to the same memory location,
+   saving a strcpy(). Path must always be given without trailing slash.
+   unique_time as true makes the function wait until the current time has
+   changed. */
 char *create_datetime_filename(char *buffer, const char *path,
-                               const char *prefix, const char *suffix);
-#endif
+                               const char *prefix, const char *suffix,
+                               bool unique_time);
+#endif /* CONFIG_RTC */
 
 /* Read (up to) a line of text from fd into buffer and return number of bytes
  * read (which may be larger than the number of bytes stored in buffer). If 
@@ -57,4 +82,4 @@ long default_event_handler(long event);
 void car_adapter_mode_init(void);
 extern int show_logo(void);
 
-#endif
+#endif /* MISC_H */

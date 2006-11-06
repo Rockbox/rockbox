@@ -88,36 +88,6 @@ struct apetag_item_header
     long flags;
 };
 
-struct format_list
-{
-    char format;
-    char extension[5];
-};
-
-static const struct format_list formats[] =
-{
-    { AFMT_MPA_L1,        "mp1"  },
-    { AFMT_MPA_L2,        "mp2"  },
-    { AFMT_MPA_L2,        "mpa"  },
-    { AFMT_MPA_L3,        "mp3"  },
-#if CONFIG_CODEC == SWCODEC
-    { AFMT_OGG_VORBIS,    "ogg"  },
-    { AFMT_PCM_WAV,       "wav"  },
-    { AFMT_FLAC,          "flac" },
-    { AFMT_MPC,           "mpc"  },
-    { AFMT_A52,           "a52"  },
-    { AFMT_A52,           "ac3"  },
-    { AFMT_WAVPACK,       "wv"   },
-    { AFMT_ALAC,          "m4a"  },
-    { AFMT_AAC,           "mp4"  },
-    { AFMT_SHN,           "shn"  },
-    { AFMT_AIFF,          "aif"  },
-    { AFMT_AIFF,          "aiff" },
-    { AFMT_SID,           "sid"  },
-    { AFMT_ADX,           "adx"  },
-#endif
-};
-
 #if CONFIG_CODEC == SWCODEC
 static const unsigned short a52_bitrates[] =
 {
@@ -1691,14 +1661,24 @@ unsigned int probe_file_format(const char *filename)
         return AFMT_UNKNOWN;
     }
     
-    suffix += 1;
-
-    for (i = 0; i < sizeof(formats) / sizeof(formats[0]); i++)
+    /* skip '.' */
+    suffix++;
+    
+    for (i = 1; i < AFMT_NUM_CODECS; i++)
     {
-        if (strcasecmp(suffix, formats[i].extension) == 0)
+        /* search extension list for type */
+        const char *ext = audio_formats[i].ext_list;
+
+        do
+    {
+            if (strcasecmp(suffix, ext) == 0)
         {
-            return formats[i].format;
+                return i;
+            }
+
+            ext += strlen(ext) + 1;
         }
+        while (*ext != '\0');
     }
     
     return AFMT_UNKNOWN;

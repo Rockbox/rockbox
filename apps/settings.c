@@ -90,13 +90,16 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "pcmbuf.h"
 #include "pcm_playback.h"
 #include "dsp.h"
+#ifdef HAVE_RECORDING
+#include "enc_config.h"
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_WM8758
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 55
+#define CONFIG_BLOCK_VERSION 56
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -514,7 +517,7 @@ static const struct bit_entry hd_bits[] =
     {1, S_O(rec_editable), false, "editable recordings", off_on },
 #endif /* CONFIG_CODEC == MAS3587F */
 
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_UDA1380
     {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
 #endif
@@ -524,16 +527,20 @@ static const struct bit_entry hd_bits[] =
 #endif
     {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
     {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
-#if 0 /* Till samplerates are added for SWCODEC */
-    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
-        "rec frequency", "44,48,32,22,24,16" },
-#else
-    {3, S_O(rec_frequency), 0, /* 0=44.1kHz */
-        "rec frequency", "44" },
-#endif
-
-    {4, S_O(rec_quality), 4 /* MP3 L3 192 kBit/s */, "rec quality", NULL },
-#endif /* CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) */
+    {REC_FREQ_CFG_NUM_BITS, S_O(rec_frequency), REC_FREQ_DEFAULT,
+        "rec frequency", REC_FREQ_CFG_VAL_LIST },
+    {REC_FORMAT_CFG_NUM_BITS ,S_O(rec_format), REC_FORMAT_DEFAULT,
+        "rec format", REC_FORMAT_CFG_VAL_LIST },
+    /** Encoder settings start - keep these together **/
+    /* mp3_enc */
+    {5,S_O(mp3_enc_config.bitrate), MP3_ENC_BITRATE_CFG_DEFAULT,
+        "mp3_enc bitrate", MP3_ENC_BITRATE_CFG_VALUE_LIST },
+    /* wav_enc */
+    /* (no settings yet) */
+    /* wavpack_enc */
+    /* (no settings yet) */
+    /** Encoder settings end **/
+#endif /* CONFIG_CODEC == SWCODEC */
 
     /* values for the trigger */
     {8 | SIGNED, S_O(rec_start_thres), -35, "trigger start threshold", NULL},
@@ -1301,6 +1308,11 @@ void settings_apply(void)
     lcd_set_sleep_after_backlight_off(global_settings.lcd_sleep_after_backlight_off);
 #endif
 #endif /* CONFIG_BACKLIGHT */
+
+    /* This should stay last */
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+    enc_global_settings_apply();
+#endif
 }
 
 
@@ -1727,13 +1739,13 @@ static void save_cfg_table(const struct bit_entry* p_table, int count, int fd)
     }
 }
 
-
 bool settings_save_config(void)
 {
     int fd;
     char filename[MAX_PATH];
 
-    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2);
+    create_numbered_filename(filename, ROCKBOX_DIR, "config", ".cfg", 2
+                             IF_CNFN_NUM_(, NULL));
 
     /* allow user to modify filename */
     while (true) {
@@ -1887,6 +1899,10 @@ void settings_reset(void) {
     global_settings.kbd_file[0] = '\0';
 #endif
     global_settings.hold_lr_for_scroll_in_list = true;
+
+#if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+    enc_global_settings_reset();
+#endif
 }
 
 bool set_bool(const char* string, bool* variable )

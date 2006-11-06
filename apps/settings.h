@@ -29,6 +29,10 @@
 #include "tagcache.h"
 #include "button.h"
 
+#if CONFIG_CODEC == SWCODEC
+#include "audio.h"
+#endif
+
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
 #endif
@@ -142,18 +146,22 @@ struct user_settings
     int crossfade_fade_out_mixmode;   /* Fade out mode (0=crossfade,1=mix) */
 #endif
 
+#if CONFIG_CODEC == SWCODEC
+    int rec_format;    /* record format index */
+#else
     int rec_quality;   /* 0-7 */
-    int rec_source;    /* 0=mic, 1=line, 2=S/PDIF */
-    int rec_frequency; /* 0 = 44.1kHz
+#endif  /* CONFIG_CODEC == SWCODEC */
+    int rec_source;    /* 0=mic, 1=line, 2=S/PDIF, 2 or 3=FM Radio */
+    int rec_frequency; /* 0 = 44.1kHz (depends on target)
                           1 = 48kHz
                           2 = 32kHz
                           3 = 22.05kHz
                           4 = 24kHz
                           5 = 16kHz */
     int rec_channels;  /* 0=Stereo, 1=Mono */
-    int rec_mic_gain; /* 0-15 */
-    int rec_left_gain; /* 0-15 */
-    int rec_right_gain; /* 0-15 */
+    int rec_mic_gain;   /* depends on target */
+    int rec_left_gain;  /* depends on target */
+    int rec_right_gain; /* depands on target */
     bool rec_editable; /* true means that the bit reservoir is off */
     bool recscreen_on; /* true if using the recording screen */
 
@@ -504,6 +512,20 @@ struct user_settings
 #endif
     bool audioscrobbler; /* Audioscrobbler logging  */
 
+    /* If values are just added to the end, no need to bump plugin API
+       version. */
+    /* new stuff to be added at the end */
+
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+    /* Encoder Settings Start - keep these together */
+    struct mp3_enc_config     mp3_enc_config;
+#if 0 /* These currently contain no members but their places in line
+         should be held */
+    struct wav_enc_config     wav_enc_config;
+    struct wavpack_enc_config wavpack_enc_config;
+#endif
+    /* Encoder Settings End */
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 enum optiontype { INT, BOOL };
@@ -584,7 +606,7 @@ extern const char rec_base_directory[];
 
 /* argument bits for settings_load() */
 #define SETTINGS_RTC 1 /* only the settings from the RTC nonvolatile RAM */
-#define SETTINGS_HD  2 /* only the settings fron the disk sector */
+#define SETTINGS_HD  2 /* only the settings from the disk sector */
 #define SETTINGS_ALL 3 /* both */
 
 /* repeat mode options */

@@ -4,6 +4,7 @@ logf.c
 #endif
 backlight.c
 buffer.c
+general.c
 common/atoi.c
 common/crc32.c
 common/ctype.c
@@ -45,7 +46,12 @@ target/coldfire/memcpy-coldfire.S
 target/coldfire/memmove-coldfire.S
 target/coldfire/memset-coldfire.S
 target/coldfire/memset16-coldfire.S
+#ifndef SIMULATOR
+#ifndef BOOTLOADER
+target/coldfire/pcm-coldfire.c
+#endif
 target/coldfire/system-coldfire.c
+#endif
 #elif (CONFIG_CPU == SH7034)
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
@@ -207,15 +213,21 @@ drivers/wm8731l.c
 #elif defined(HAVE_TLV320) && !defined(SIMULATOR)
 drivers/tlv320.c
 #endif
-#if (CONFIG_CODEC == SWCODEC) && !defined(SIMULATOR)
-pcm_playback.c
-#endif
-#if CONFIG_CODEC == SWCODEC
+#if (CONFIG_CODEC == SWCODEC) && !defined(BOOTLOADER)
+pcm_sampr.c
 replaygain.c
-#endif
-#if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
+#ifndef SIMULATOR
+pcm_playback.c
+#endif /* SIMULATOR */
+#ifdef HAVE_RECORDING
+enc_base.c
+#if defined(CPU_COLDFIRE)
+#ifndef SIMULATOR
 pcm_record.c
-#endif
+#endif /* SIMULATOR */
+#endif /* CPU_COLDFIRE */
+#endif /* HAVE_RECORDING */
+#endif /* SWCODEC && !BOOTLOADER */
 sound.c
 #if defined(IRIVER_IFP7XX_SERIES) && defined(STUB)
 common/sscanf.c

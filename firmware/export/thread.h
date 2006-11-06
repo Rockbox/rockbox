@@ -142,7 +142,10 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list);
 void sleep_thread(int ticks);
 void block_thread(struct thread_entry **thread, int timeout);
 void wakeup_thread(struct thread_entry **thread);
+#ifdef HAVE_PRIORITY_SCHEDULING
 int thread_set_priority(struct thread_entry *thread, int priority);
+int  thread_get_priority(struct thread_entry *thread);
+#endif
 void init_threads(void);
 int thread_stack_usage(const struct thread_entry *thread);
 int thread_get_status(const struct thread_entry *thread);

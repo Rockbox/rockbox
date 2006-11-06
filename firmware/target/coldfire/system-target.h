@@ -110,6 +110,28 @@ static inline unsigned long swap32(unsigned long value)
     return value;
 }
 
+static inline unsigned long swap_odd_even32(unsigned long value)
+{
+    /*
+      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
+      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
+    */
+    unsigned long mask = 0x00FF00FF;
+
+    asm (                             /* val  = ABCD */
+        "and.l   %[val],%[mask]  \n"  /* mask = .B.D */
+        "eor.l   %[mask],%[val]  \n"  /* val  = A.C. */
+        "lsl.l   #8,%[mask]      \n"  /* mask = B.D. */
+        "lsr.l   #8,%[val]       \n"  /* val  = .A.C */
+        "or.l    %[mask],%[val]  \n"  /* val  = BADC */
+        : /* outputs */
+        [val] "+d"(value),
+        [mask]"+d"(mask)
+    );
+
+    return value;
+}
+
 static inline void invalidate_icache(void)
 {
    asm volatile ("move.l #0x01000000,%d0\n"
@@ -117,6 +139,13 @@ static inline void invalidate_icache(void)
                  "move.l #0x80000000,%d0\n"
                  "movec.l %d0,%cacr");
 }
+
+#ifdef IAUDIO_X5
+#define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
+#else
+#define DEFAULT_PLLCR_AUDIO_BITS 0x10c00000
+#endif
+void coldfire_set_pllcr_audio_bits(long bits);
 
 /* 11.2896 MHz */
 #define CPUFREQ_DEFAULT_MULT 1

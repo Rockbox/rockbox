@@ -50,6 +50,7 @@
 #include "sound.h"
 #include "database.h"
 #include "splash.h"
+#include "general.h"
 
 #ifdef SIMULATOR
 #if CONFIG_CODEC == SWCODEC
@@ -104,6 +105,7 @@ struct codec_api ci = {
     PREFIX(remove),
     PREFIX(rename),
     PREFIX(ftruncate),
+    PREFIX(fsync),
     fdprintf,
     read_line,
     settings_parseline,
@@ -187,6 +189,7 @@ struct codec_api ci = {
     get_time,
     set_time,
     plugin_get_audio_buffer,
+    round_value_to_list32,
 
 #if defined(DEBUG) || defined(SIMULATOR)
     debugf,
@@ -213,11 +216,11 @@ struct codec_api ci = {
     false,
     enc_get_inputs,
     enc_set_parameters,
-    enc_alloc_chunk,
-    enc_free_chunk,
-    enc_wavbuf_near_empty,
-    enc_get_wav_data,
-    &enc_set_header_callback,
+    enc_get_chunk,
+    enc_finish_chunk,
+    enc_pcm_buf_near_empty,
+    enc_get_pcm_data,
+    enc_unget_pcm_data
 #endif
 
     /* new stuff at the end, sort into place next time
@@ -225,10 +228,10 @@ struct codec_api ci = {
 
 };
 
-void codec_get_full_path(char *path, const char *codec_fn)
+void codec_get_full_path(char *path, const char *codec_root_fn)
 {
-    /* Create full codec path */
-    snprintf(path, MAX_PATH-1, CODECS_DIR "/%s", codec_fn);
+    snprintf(path, MAX_PATH-1, CODECS_DIR "/%s." CODEC_EXTENSION,
+             codec_root_fn);
 }
 
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
@@ -254,7 +257,11 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     hdr = (struct codec_header *)codecbuf;
         
     if (size <= (signed)sizeof(struct codec_header)
-        || hdr->magic != CODEC_MAGIC
+        || (hdr->magic != CODEC_MAGIC
+#ifdef HAVE_RECORDING
+             && hdr->magic != CODEC_ENC_MAGIC
+#endif
+            )
         || hdr->target_id != TARGET_ID
         || hdr->load_addr != codecbuf
         || hdr->end_addr > codecbuf + CODEC_SIZE)

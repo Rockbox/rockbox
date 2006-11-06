@@ -84,6 +84,12 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING 1
 
+/* define hardware samples rate caps mask */
+#define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+
+/* define the bitmask of recording sample rates */
+#define REC_SAMPR_CAPS  (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+
 #define HAVE_AGC
 
 #ifndef SIMULATOR

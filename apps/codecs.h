@@ -46,7 +46,7 @@
 #include "profile.h"
 #endif
 #if (CONFIG_CODEC == SWCODEC)
-#if !defined(SIMULATOR)
+#if !defined(SIMULATOR) && defined(HAVE_RECORDING)
 #include "pcm_record.h"
 #endif
 #include "dsp.h"
@@ -84,15 +84,18 @@
 #define PREFIX(_x_) _x_
 #endif
 
+/* magic for normal codecs */
 #define CODEC_MAGIC 0x52434F44 /* RCOD */
+/* magic for encoder codecs */
+#define CODEC_ENC_MAGIC 0x52454E43 /* RENC */
 
 /* increase this every time the api struct changes */
-#define CODEC_API_VERSION 9
+#define CODEC_API_VERSION 10
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define CODEC_MIN_API_VERSION 8
+#define CODEC_MIN_API_VERSION 10
 
 /* codec return codes */
 enum codec_status {
@@ -176,6 +179,7 @@ struct codec_api {
     int (*PREFIX(remove))(const char* pathname);
     int (*PREFIX(rename))(const char* path, const char* newname);
     int (*PREFIX(ftruncate))(int fd, off_t length);
+    int (*PREFIX(fsync))(int fd);
 
     int (*fdprintf)(int fd, const char *fmt, ...);
     int (*read_line)(int fd, char* buffer, int buffer_size);
@@ -232,7 +236,8 @@ struct codec_api {
     /* sound */
     void (*sound_set)(int setting, int value);
 #ifndef SIMULATOR
-    void (*mp3_play_data)(const unsigned char* start, int size, void (*get_more)(unsigned char** start, int* size));
+    void (*mp3_play_data)(const unsigned char* start,
+        int size, void (*get_more)(unsigned char** start, int* size));
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
@@ -263,6 +268,10 @@ struct codec_api {
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
     void* (*plugin_get_audio_buffer)(int* buffer_size);
+    int (*round_value_to_list32)(unsigned long value,
+                                 const unsigned long list[],
+                                 int count,
+                                 bool signd);
 
 #if defined(DEBUG) || defined(SIMULATOR)
     void (*debugf)(const char *fmt, ...);
@@ -291,18 +300,14 @@ struct codec_api {
 #endif
  
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    bool          enc_codec_loaded;
-    void          (*enc_get_inputs)(int *buffer_size,
-                        int *channels, int *quality);
-    void          (*enc_set_parameters)(int chunk_size, int num_chunks,
-                    int samp_per_chunk, char *head_ptr, int head_size,
-                    int enc_id);
-    unsigned int* (*enc_alloc_chunk)(void);
-    void          (*enc_free_chunk)(void);
-    int           (*enc_wavbuf_near_empty)(void);
-    char*         (*enc_get_wav_data)(int size);
-    void          (**enc_set_header_callback)(void *head_buffer,
-                    int head_size, int num_samples, bool is_file_header);
+    volatile int    enc_codec_loaded; /* <0=error, 0=pending, >0=ok */
+    void            (*enc_get_inputs)(struct enc_inputs *inputs);
+    void            (*enc_set_parameters)(struct enc_parameters *params);
+    struct enc_chunk_hdr * (*enc_get_chunk)(void);
+    void            (*enc_finish_chunk)(void);
+    int             (*enc_pcm_buf_near_empty)(void);
+    unsigned char * (*enc_get_pcm_data)(size_t size);
+    size_t          (*enc_unget_pcm_data)(size_t size);
 #endif
 
     /* new stuff at the end, sort into place next time
@@ -312,34 +317,49 @@ struct codec_api {
 
 /* codec header */
 struct codec_header {
-    unsigned long magic;
+    unsigned long magic; /* RCOD or RENC */
     unsigned short target_id;
     unsigned short api_version;
     unsigned char *load_addr;
     unsigned char *end_addr;
     enum codec_status(*entry_point)(struct codec_api*);
 };
+
 #ifdef CODEC
 #ifndef SIMULATOR
 /* plugin_* is correct, codecs use the plugin linker script */
 extern unsigned char plugin_start_addr[];
 extern unsigned char plugin_end_addr[];
+/* decoders */
 #define CODEC_HEADER \
         const struct codec_header __header \
         __attribute__ ((section (".header")))= { \
         CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         plugin_start_addr, plugin_end_addr, codec_start };
-#else /* SIMULATOR */
+/* encoders */
+#define CODEC_ENC_HEADER \
+        const struct codec_header __header \
+        __attribute__ ((section (".header")))= { \
+        CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        plugin_start_addr, plugin_end_addr, codec_start };
+
+#else /* def SIMULATOR */
+/* decoders */
 #define CODEC_HEADER \
         const struct codec_header __header = { \
         CODEC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
         NULL, NULL, codec_start };
-#endif
-#endif
+/* encoders */
+#define CODEC_ENC_HEADER \
+        const struct codec_header __header = { \
+        CODEC_ENC_MAGIC, TARGET_ID, CODEC_API_VERSION, \
+        NULL, NULL, codec_start };
+#endif /* SIMULATOR */
+#endif /* CODEC */
 
-/* create full codec path from filenames in audio_formats[]
+/* create full codec path from root filenames in audio_formats[]
    assumes buffer size is MAX_PATH */
-void codec_get_full_path(char *path, const char *codec_fn);
+void codec_get_full_path(char *path, const char *codec_root_fn);
 
 /* defined by the codec loader (codec.c) */
 int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,

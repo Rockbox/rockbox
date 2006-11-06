@@ -9,6 +9,12 @@
 /* define this if you have recording possibility */
 #define HAVE_RECORDING 1
 
+/* define the bitmask of hardware sample rates */
+#define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+
+/* define the bitmask of recording sample rates */
+#define REC_SAMPR_CAPS  (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP 1
 

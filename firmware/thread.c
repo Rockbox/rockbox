@@ -711,6 +711,14 @@ int thread_set_priority(struct thread_entry *thread, int priority)
     
     return old_priority;
 }
+
+int thread_get_priority(struct thread_entry *thread)
+{
+    if (thread == NULL)
+        thread = cores[CURRENT_CORE].running;
+
+    return thread->priority;
+}
 #endif
 
 void init_threads(void)

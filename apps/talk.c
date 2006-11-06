@@ -46,13 +46,17 @@
  
              MASCODEC  | MASCODEC  | SWCODEC
              (playing) | (stopped) |
-    audiobuf-----------+-----------+-----------
+    audiobuf-----------+-----------+------------
               audio    | voice     | thumbnail
-                       |-----------|----------- filebuf
+                       |-----------|------------
                        | thumbnail | voice
-                       |           |-----------
+                       |           |------------
+                       |           | filebuf
+                       |           |------------
                        |           | audio
-  audiobufend----------+-----------+-----------
+                       |           |------------
+                       |           | codec swap
+  audiobufend----------+-----------+------------
 
   SWCODEC allocates dedicated buffers, MASCODEC reuses audiobuf. */
 
@@ -102,7 +106,7 @@ struct queue_entry /* one entry of the internal queue */
 
 /***************** Globals *****************/
 
-static unsigned char* p_thumbnail; /* buffer for thumbnail */
+static unsigned char* p_thumbnail = NULL; /* buffer for thumbnail */
 static long size_for_thumbnail; /* leftover buffer size for it */
 static struct voicefile* p_voicefile; /* loaded voicefile */
 static bool has_voicefile; /* a voicefile file is present */
@@ -479,11 +483,14 @@ static void reset_state(void)
     queue_write = queue_read = 0; /* reset the queue */
     p_voicefile = NULL; /* indicate no voicefile (trashed) */
 #if CONFIG_CODEC == SWCODEC
-    /* Allocate a dedicated thumbnail buffer */
-    size_for_thumbnail = audiobufend - audiobuf;
-    if (size_for_thumbnail > MAX_THUMBNAIL_BUFSIZE)
-        size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
-    p_thumbnail = buffer_alloc(size_for_thumbnail);
+    /* Allocate a dedicated thumbnail buffer - once */
+    if (p_thumbnail == NULL)
+    {
+        size_for_thumbnail = audiobufend - audiobuf;
+        if (size_for_thumbnail > MAX_THUMBNAIL_BUFSIZE)
+            size_for_thumbnail = MAX_THUMBNAIL_BUFSIZE;
+        p_thumbnail = buffer_alloc(size_for_thumbnail);
+    }
 #else
     /* Just use the audiobuf, without allocating anything */
     p_thumbnail = audiobuf;

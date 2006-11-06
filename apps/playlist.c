@@ -155,7 +155,7 @@ static int  recreate_control(struct playlist_info* playlist);
 static void update_playlist_filename(struct playlist_info* playlist,
                                      const char *dir, const char *file);
 static int add_indices_to_playlist(struct playlist_info* playlist,
-                                   char* buffer, int buflen);
+                                   char* buffer, size_t buflen);
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
                                  bool queue, int seek_pos);
@@ -457,7 +457,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
  * calculate track offsets within a playlist file
  */
 static int add_indices_to_playlist(struct playlist_info* playlist,
-                                   char* buffer, int buflen)
+                                   char* buffer, size_t buflen)
 {
     unsigned int nread;
     unsigned int i = 0;
@@ -489,8 +489,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
         buflen = (audiobufend - audiobuf);
         buffer = (char *)audiobuf;
 #else
-        buflen = (audiobufend - audiobuf - talk_get_bufsize());
-        buffer = (char *)&audiobuf[talk_get_bufsize()];
+        buffer = (char *)audio_get_buffer(false, &buflen);
 #endif
     }
     
@@ -1853,7 +1852,7 @@ int playlist_resume(void)
 {
     struct playlist_info* playlist = &current_playlist;
     char *buffer;
-    int buflen;
+    size_t buflen;
     int nread;
     int total_read = 0;
     int control_file_size = 0;
@@ -1866,8 +1865,7 @@ int playlist_resume(void)
     buflen = (audiobufend - audiobuf);
     buffer = (char *)audiobuf;
 #else
-    buflen = (audiobufend - audiobuf - talk_get_bufsize());
-    buffer = (char *)&audiobuf[talk_get_bufsize()];
+    buffer = (char *)audio_get_buffer(false, &buflen);
 #endif
 
     empty_playlist(playlist, true);

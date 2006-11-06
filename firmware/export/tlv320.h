@@ -24,6 +24,16 @@
 
 extern void tlv320_init(void);
 extern void tlv320_reset(void);
+/**
+ * Sets internal sample rate for DAC and ADC relative to MCLK
+ * Selection for frequency:
+ * Fs:        tlv:   with:
+ * 11025: 0 = MCLK/2 MCLK/2  SCLK, LRCK: Audio Clk / 16
+ * 22050: 0 = MCLK/2 MCLK    SCLK, LRCK: Audio Clk / 8
+ * 44100: 1 = MCLK   MCLK    SCLK, LRCK: Audio Clk / 4 (default)
+ * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
+ */
+extern void tlv320_set_frequency(unsigned fsel);
 extern void tlv320_enable_output(bool enable);
 extern void tlv320_set_headphone_vol(int vol_l, int vol_r);
 extern void tlv320_set_recvol(int left, int right, int type);

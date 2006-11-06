@@ -20,24 +20,44 @@
 #ifndef PCM_RECORD_H
 #define PCM_RECORD_H
 
-void          enc_set_parameters(int chunk_size, int num_chunks,
-                    int samp_per_chunk, char *head_ptr, int head_size,
-                    int enc_id);
-void          enc_get_inputs(int *buffer_size, int *channels, int *quality);
-unsigned int* enc_alloc_chunk(void);
-void          enc_free_chunk(void);
-int           enc_wavbuf_near_empty(void);
-char*         enc_get_wav_data(int size);
-extern void   (*enc_set_header_callback)(void *head_buffer, int head_size,
-                                int num_pcm_samples, bool is_file_header);
+#define DMA_REC_ERROR_DMA       ((size_t)-1)
+#ifdef HAVE_SPDIF_IN
+#define DMA_REC_ERROR_SPDIF     ((size_t)-2)
+#endif
+/* Use AUDIO_SRC_* enumeration values */
+void pcm_set_monitor(int monitor);
+void pcm_set_rec_source(int source);
 
+/**
+ * RAW pcm data recording
+ * These calls are nescessary only when using the raw pcm apis directly.
+ */
+
+/* Initialize pcm recording interface */
+void pcm_init_recording(void);
+/* Uninitialze pcm recording interface */
+void pcm_close_recording(void);
+
+/* Start recording "raw" PCM data */
+void pcm_record_data(pcm_more_callback_type more_ready,
+                     unsigned char *start, size_t size);
+
+/* Stop tranferring data into supplied buffer */
+void pcm_stop_recording(void);
+
+void pcm_calculate_rec_peaks(int *left, int *right);
+
+/** General functions for high level codec recording **/
+void pcm_rec_error_clear(void);
 unsigned long pcm_rec_status(void);
 void pcm_rec_init(void);
 void pcm_rec_mux(int source);
 int  pcm_rec_current_bitrate(void);
+int  pcm_rec_encoder_afmt(void); /* AFMT_* value, AFMT_UNKNOWN if none */
+int  pcm_rec_rec_format(void);   /* Format index or -1 otherwise */
+unsigned long pcm_rec_sample_rate(void);
 int  pcm_get_num_unprocessed(void);
-void pcm_rec_get_peaks(int *left, int *right);
 
-/* audio.h contains audio recording functions */
+/* audio.h contains audio_* recording functions */
 
-#endif
+#endif /* PCM_RECORD_H */

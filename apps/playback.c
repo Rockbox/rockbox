@@ -54,8 +54,6 @@
 #include "playlist.h"
 #include "playback.h"
 #include "pcmbuf.h"
-#include "pcm_playback.h"
-#include "pcm_record.h"
 #include "buffer.h"
 #include "dsp.h"
 #include "abrepeat.h"
@@ -78,6 +76,7 @@
 
 #ifdef HAVE_RECORDING
 #include "recording.h"
+#include "talk.h"
 #endif
 
 #define PLAYBACK_VOICE
@@ -93,15 +92,31 @@
  * for their correct seeek target, 32k seems a good size */
 #define AUDIO_REBUFFER_GUESS_SIZE    (1024*32)
 
-/* macros to enable logf for queues */
+/* macros to enable logf for queues
+   logging on SYS_TIMEOUT can be disabled */
 #ifdef SIMULATOR
-#define PLAYBACK_LOGQUEUES /* Define this for logf output of all queuing */
+/* Define this for logf output of all queuing except SYS_TIMEOUT */
+#define PLAYBACK_LOGQUEUES
+/* Define this to logf SYS_TIMEOUT messages */
+#define PLAYBACK_LOGQUEUES_SYS_TIMEOUT
 #endif
 
 #ifdef PLAYBACK_LOGQUEUES
 #define LOGFQUEUE(s) logf("%s", s)
 #else
 #define LOGFQUEUE(s)
+#endif
+
+#ifdef PLAYBACK_LOGQUEUES_SYS_TIMEOUT
+#define LOGFQUEUE_SYS_TIMEOUT(s) logf("%s", s)
+#else
+#define LOGFQUEUE_SYS_TIMEOUT(s)
+#endif
+
+
+/* Define one constant that includes recording related functionality */
+#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#define AUDIO_HAVE_RECORDING
 #endif
 
 enum {
@@ -122,6 +137,9 @@ enum {
 #if MEM > 8
     Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA,
 #endif
+#ifdef AUDIO_HAVE_RECORDING
+    Q_AUDIO_LOAD_ENCODER,
+#endif
 
     Q_CODEC_REQUEST_PENDING,
     Q_CODEC_REQUEST_COMPLETE,
@@ -133,7 +151,7 @@ enum {
     Q_CODEC_LOAD,
     Q_CODEC_LOAD_DISK,
 
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#ifdef AUDIO_HAVE_RECORDING
     Q_ENCODER_LOAD_DISK,
     Q_ENCODER_RECORD,
 #endif
@@ -178,10 +196,15 @@ static volatile bool paused;                    /* Is audio paused? (A/C-) */
 static volatile bool filling IDATA_ATTR;        /* Is file buffer currently being refilled? (A/C-) */
 
 /* Ring buffer where tracks and codecs are loaded */
-static char *filebuf;                           /* Pointer to start of ring buffer (A/C-) */
+static unsigned char *filebuf;                  /* Pointer to start of ring buffer (A/C-) */
 size_t filebuflen;                              /* Total size of the ring buffer FIXME: make static (A/C-)*/
 static volatile size_t buf_ridx IDATA_ATTR;     /* Ring buffer read position (A/C) FIXME? should be (C/A-) */
 static volatile size_t buf_widx IDATA_ATTR;     /* Ring buffer read position (A/C-) */
+
+#define BUFFER_STATE_TRASHED        -1          /* Buffer is in a trashed state and must be reset */
+#define BUFFER_STATE_NORMAL          0          /* Buffer is arranged for voice and audio         */
+#define BUFFER_STATE_VOICED_ONLY     1          /* Buffer is arranged for voice-only use          */
+static int buffer_state = BUFFER_STATE_TRASHED; /* Buffer state */
 
 #define RINGBUF_ADD(p,v) ((p+v)<filebuflen ? p+v : p+v-filebuflen)
 #define RINGBUF_SUB(p,v) ((p>=v) ? p-v : p+filebuflen-v)
@@ -235,7 +258,7 @@ static const char audio_thread_name[] = "audio";
 static void audio_thread(void);
 static void audio_initiate_track_change(long direction);
 static bool audio_have_tracks(void);
-static void audio_reset_buffer(void);
+static void audio_reset_buffer(size_t pcmbufsize);
 
 /* Codec thread */
 extern struct codec_api ci;
@@ -294,6 +317,10 @@ static void voice_thread(void);
 void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, int* size))
 {
+    /* must reset the buffer before any playback begins if needed */
+    if (buffer_state == BUFFER_STATE_TRASHED)
+        audio_reset_buffer(pcmbuf_get_bufsize());
+
 #ifdef PLAYBACK_VOICE
     static struct voice_info voice_clip;
     voice_clip.callback = get_more;
@@ -330,37 +357,94 @@ void mpeg_id3_options(bool _v1first)
     v1first = _v1first;
 }
 
-void audio_load_encoder(int enc_id)
+unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    const char *enc_fn = get_codec_filename(enc_id | CODEC_TYPE_ENCODER);
+    unsigned char *buf = audiobuf;
+    unsigned char *end = audiobufend;
+
+    audio_stop();
+
+    if (talk_buf || !talk_voice_required()
+        || buffer_state == BUFFER_STATE_TRASHED)
+    {
+        logf("get buffer: talk_buf");
+        /* ok to use everything from audiobuf to audiobufend */
+        if (buffer_state != BUFFER_STATE_TRASHED)
+            talk_buffer_steal();
+        buffer_state = BUFFER_STATE_TRASHED;
+    }
+    else
+    {
+        /* skip talk buffer and move pcm buffer to end */
+        logf("get buffer: voice");
+        mp3_play_stop();
+        buf += talk_get_bufsize();
+        end -= pcmbuf_init(pcmbuf_get_bufsize(), audiobufend);
+        buffer_state = BUFFER_STATE_VOICED_ONLY;
+    }
+
+    *buffer_size = end - buf;
+
+    return buf;
+}
+
+#ifdef HAVE_RECORDING
+unsigned char *audio_get_recording_buffer(size_t *buffer_size)
+{
+    /* don't allow overwrite of voice swap area or we'll trash the
+       swapped-out voice codec but can use whole thing if none */
+    unsigned char *end = iram_buf[CODEC_IDX_VOICE] ?
+        iram_buf[CODEC_IDX_VOICE] : audiobufend;
+
+    audio_stop();
+    talk_buffer_steal();
+
+    buffer_state = BUFFER_STATE_TRASHED;
+
+    *buffer_size = end - audiobuf;
+
+    return (unsigned char *)audiobuf;
+}
+
+bool audio_load_encoder(int afmt)
+{
+#ifndef SIMULATOR
+    const char *enc_fn = get_codec_filename(afmt | CODEC_TYPE_ENCODER);
     if (!enc_fn)
-        return;
+        return false;
 
     audio_remove_encoder();
+    ci.enc_codec_loaded = 0; /* clear any previous error condition */
 
-    LOGFQUEUE("audio > codec Q_ENCODER_LOAD_DISK");
-    queue_post(&codec_queue, Q_ENCODER_LOAD_DISK, (void *)enc_fn);
+    LOGFQUEUE("audio > Q_AUDIO_LOAD_ENCODER");
+    queue_post(&audio_queue, Q_AUDIO_LOAD_ENCODER, (void *)enc_fn);
 
-    while (!ci.enc_codec_loaded)
+    while (ci.enc_codec_loaded == 0)
         yield();
+
+    logf("codec loaded: %d", ci.enc_codec_loaded);
+
+    return ci.enc_codec_loaded > 0;
+#else
+    (void)afmt;
+    return true;
 #endif
-    return;
-    (void)enc_id;
 } /* audio_load_encoder */
 
 void audio_remove_encoder(void)
 {
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    /* force encoder codec unload (if previously loaded) */
-    if (!ci.enc_codec_loaded)
+#ifndef SIMULATOR
+    /* force encoder codec unload (if currently loaded) */
+    if (ci.enc_codec_loaded <= 0)
         return;
 
     ci.stop_codec = true;
-    while (ci.enc_codec_loaded)
+    while (ci.enc_codec_loaded > 0)
         yield();
 #endif
 } /* audio_remove_encoder */
+
+#endif /* HAVE_RECORDING */
 
 struct mp3entry* audio_current_track(void)
 {
@@ -553,6 +637,9 @@ void audio_flush_and_reload_tracks(void)
 
 void audio_error_clear(void)
 {
+#ifdef AUDIO_HAVE_RECORDING
+    pcm_rec_error_clear();
+#endif
 }
 
 int audio_status(void)
@@ -571,11 +658,6 @@ int audio_status(void)
 #endif
 
     return ret;
-}
-
-bool audio_query_poweroff(void)
-{
-    return !(playing && paused);
 }
 
 int audio_get_file_pos(void)
@@ -617,7 +699,7 @@ void audio_set_crossfade(int enable)
     enable = 0;
     size = NATIVE_FREQUENCY*2;
 #endif
-    if (pcmbuf_get_bufsize() == size)
+    if (buffer_state == BUFFER_STATE_NORMAL && pcmbuf_is_same_size(size))
         return ;
 
     if (was_playing)
@@ -633,9 +715,8 @@ void audio_set_crossfade(int enable)
     voice_stop();
 
     /* Re-initialize audio system. */
-    pcmbuf_init(size);
+    audio_reset_buffer(size);
     pcmbuf_crossfade_enable(enable);
-    audio_reset_buffer();
     logf("abuf:%dB", pcmbuf_get_bufsize());
     logf("fbuf:%dB", filebuflen);
 
@@ -714,8 +795,7 @@ void voice_stop(void)
 {
 #ifdef PLAYBACK_VOICE
     /* Messages should not be posted to voice codec queue unless it is the
-       current codec or deadlocks happen.
-       -- jhMikeS */
+       current codec or deadlocks happen. */
     if (current_codec != CODEC_IDX_VOICE)
         return;
 
@@ -784,21 +864,32 @@ static void set_filebuf_watermark(int seconds)
     conf_watermark = bytes;
 }
 
-static const char * get_codec_filename(int enc_spec)
+static const char * get_codec_filename(int cod_spec)
 {
     const char *fname;
-    int type = enc_spec & CODEC_TYPE_MASK;
-    int afmt = enc_spec & CODEC_AFMT_MASK;
+
+#ifdef HAVE_RECORDING
+    /* Can choose decoder or encoder if one available */
+    int type = cod_spec & CODEC_TYPE_MASK;
+    int afmt = cod_spec & CODEC_AFMT_MASK;
 
     if ((unsigned)afmt >= AFMT_NUM_CODECS)
         type = AFMT_UNKNOWN | (type & CODEC_TYPE_MASK);
 
-    fname = (type == CODEC_TYPE_DECODER) ?
-        audio_formats[afmt].codec_fn : audio_formats[afmt].codec_enc_fn;
+    fname = (type == CODEC_TYPE_ENCODER) ?
+                audio_formats[afmt].codec_enc_root_fn :
+                audio_formats[afmt].codec_root_fn;
 
     logf("%s: %d - %s",
         (type == CODEC_TYPE_ENCODER) ? "Encoder" : "Decoder",
         afmt, fname ? fname : "<unknown>");
+#else /* !HAVE_RECORDING */
+    /* Always decoder */
+    if ((unsigned)cod_spec >= AFMT_NUM_CODECS)
+        cod_spec = AFMT_UNKNOWN;
+    fname = audio_formats[cod_spec].codec_root_fn;
+    logf("Codec: %d - %s",  cod_spec, fname ? fname : "<unknown>");
+#endif /* HAVE_RECORDING */
 
     return fname;
 } /* get_codec_filename */
@@ -940,7 +1031,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 }
                 break;
 
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_RECORD:
                 LOGFQUEUE("voice < Q_ENCODER_RECORD");
                 swap_codec();
@@ -995,7 +1086,7 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 goto voice_play_clip;
 
             case SYS_TIMEOUT:
-                LOGFQUEUE("voice < SYS_TIMEOUT");
+                LOGFQUEUE_SYS_TIMEOUT("voice < SYS_TIMEOUT");
                 goto voice_play_clip;
 
             default:
@@ -1773,7 +1864,7 @@ static void codec_thread(void)
 #endif
                 break ;
 
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
+#ifdef AUDIO_HAVE_RECORDING
             case Q_ENCODER_LOAD_DISK:
                 LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
                 audio_codec_loaded = false; /* Not audio codec! */
@@ -1785,12 +1876,14 @@ static void codec_thread(void)
                 }
 #endif
                 mutex_lock(&mutex_codecthread);
+                logf("loading encoder");
                 current_codec = CODEC_IDX_AUDIO;
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
                 mutex_unlock(&mutex_codecthread);
+                logf("encoder stopped");
                 break;
-#endif
+#endif /* AUDIO_HAVE_RECORDING */
 
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:  
@@ -1871,6 +1964,24 @@ static void codec_thread(void)
                     }
                 }
                 break;
+
+#ifdef AUDIO_HAVE_RECORDING
+            case Q_ENCODER_LOAD_DISK:
+                LOGFQUEUE("codec < Q_ENCODER_LOAD_DISK");
+
+                if (status == CODEC_OK)
+                    break;
+
+                logf("Encoder failure");
+                gui_syncsplash(HZ*2, true, "Encoder failure");
+
+                if (ci.enc_codec_loaded < 0)
+                    break;
+
+                logf("Encoder failed to load");
+                ci.enc_codec_loaded = -1;
+                break;
+#endif /* AUDIO_HAVE_RECORDING */
 
             default:
                 LOGFQUEUE("codec < default");
@@ -2992,6 +3103,10 @@ static void audio_play_start(size_t offset)
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */
     audio_stop_codec_flush();
 
+    /* must reset the buffer before any playback begins if needed */
+    if (buffer_state != BUFFER_STATE_NORMAL)
+        audio_reset_buffer(pcmbuf_get_bufsize());
+
     track_changed = true;
     playlist_end = false;
 
@@ -3084,50 +3199,59 @@ static void audio_initiate_dir_change(long direction)
     ci.new_track = direction;
 }
 
-static void audio_reset_buffer(void)
+/*
+ * Layout audio buffer as follows:
+ * [|TALK]|MALLOC|FILE|GUARD|PCM|AUDIOCODEC|[VOICECODEC|]
+ */
+static void audio_reset_buffer(size_t pcmbufsize)
 {
+    /* see audio_get_recording_buffer if this is modified */
     size_t offset;
 
-    /* Set up file buffer as all space available */
-    filebuf = (char *)&audiobuf[talk_get_bufsize()+MALLOC_BUFSIZE];
-    filebuflen = audiobufend - (unsigned char *) filebuf - GUARD_BUFSIZE - 
-        (pcmbuf_get_bufsize() + get_pcmbuf_descsize() + PCMBUF_MIX_CHUNK * 2);
+    logf("audio_reset_buffer");
+    logf("  size:%08X", pcmbufsize);
 
-    /* Allow for codec(s) at end of file buffer */
+    /* Initially set up file buffer as all space available */
+    filebuf    = audiobuf + MALLOC_BUFSIZE + talk_get_bufsize();
+    filebuflen = audiobufend - filebuf;
+
+    /* Allow for codec(s) at end of audio buffer */
     if (talk_voice_required())
     {
-        /* Allow 2 codecs at end of file buffer */
+#ifdef PLAYBACK_VOICE
+        /* Allow 2 codecs at end of audio buffer */
         filebuflen -= 2 * (CODEC_IRAM_SIZE + CODEC_SIZE);
 
-#ifdef PLAYBACK_VOICE
-        iram_buf[0] = &filebuf[filebuflen];
-        iram_buf[1] = &filebuf[filebuflen+CODEC_IRAM_SIZE];
-        dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2];
-        dram_buf[1] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE*2+CODEC_SIZE];
+        iram_buf[CODEC_IDX_AUDIO] = filebuf + filebuflen;
+        dram_buf[CODEC_IDX_AUDIO] = iram_buf[CODEC_IDX_AUDIO] + CODEC_IRAM_SIZE;
+        iram_buf[CODEC_IDX_VOICE] = dram_buf[CODEC_IDX_AUDIO] + CODEC_SIZE;
+        dram_buf[CODEC_IDX_VOICE] = iram_buf[CODEC_IDX_VOICE] + CODEC_IRAM_SIZE;
 #endif
     }
     else
     {
-        /* Allow for 1 codec at end of file buffer */
+#ifdef PLAYBACK_VOICE
+        /* Allow for 1 codec at end of audio buffer */
         filebuflen -= CODEC_IRAM_SIZE + CODEC_SIZE;
 
-#ifdef PLAYBACK_VOICE
-        iram_buf[0] = &filebuf[filebuflen];
-        iram_buf[1] = NULL;
-        dram_buf[0] = (unsigned char *)&filebuf[filebuflen+CODEC_IRAM_SIZE];
-        dram_buf[1] = NULL;
+        iram_buf[CODEC_IDX_AUDIO] = filebuf + filebuflen;
+        dram_buf[CODEC_IDX_AUDIO] = iram_buf[CODEC_IDX_AUDIO] + CODEC_IRAM_SIZE;
+        iram_buf[CODEC_IDX_VOICE] = NULL;
+        dram_buf[CODEC_IDX_VOICE] = NULL;
 #endif
     }
 
+    filebuflen -= pcmbuf_init(pcmbufsize, filebuf + filebuflen) + GUARD_BUFSIZE;
+
     /* Ensure that file buffer is aligned */
-    offset = (-(size_t)filebuf) & 3;
+    offset      = -(size_t)filebuf & 3;
     filebuf += offset;
     filebuflen -= offset;
     filebuflen &= ~3;
 
     /* Clear any references to the file buffer */
+    buffer_state = BUFFER_STATE_NORMAL;
 }
-
 
 #ifdef ROCKBOX_HAS_LOGF
 static void audio_test_track_changed_event(struct mp3entry *id3)
@@ -3149,9 +3273,8 @@ static void audio_playback_init(void)
     logf("playback api init");
     pcm_init();
 
-#if defined(HAVE_RECORDING) && !defined(SIMULATOR)
-    /* Set the input multiplexer to Line In */
-    pcm_rec_mux(0);
+#ifdef AUDIO_HAVE_RECORDING
+    rec_set_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
 #endif
 
 #ifdef ROCKBOX_HAS_LOGF
@@ -3219,8 +3342,9 @@ static void audio_playback_init(void)
 #endif
     }
 
-    filebuf = (char *)&audiobuf[MALLOC_BUFSIZE]; /* Will be reset by reset_buffer */
-
+    /* initialize the buffer */
+    filebuf = audiobuf; /* must be non-NULL for audio_set_crossfade */
+    buffer_state = BUFFER_STATE_TRASHED; /* force it */
     audio_set_crossfade(global_settings.crossfade);
 
     audio_is_initialized = true;
@@ -3358,6 +3482,14 @@ static void audio_thread(void)
                 playlist_update_resume_info(audio_current_track());
                 break ;
 
+#ifdef AUDIO_HAVE_RECORDING
+            case Q_AUDIO_LOAD_ENCODER:
+                LOGFQUEUE("audio < Q_AUDIO_LOAD_ENCODER");
+                LOGFQUEUE("audio > codec Q_ENCODER_LOAD_DISK");
+                queue_post(&codec_queue, Q_ENCODER_LOAD_DISK, ev.data);
+                break;
+#endif
+
 #ifndef SIMULATOR
             case SYS_USB_CONNECTED:
                 LOGFQUEUE("audio < SYS_USB_CONNECTED");
@@ -3368,7 +3500,7 @@ static void audio_thread(void)
 #endif
 
             case SYS_TIMEOUT:
-                LOGFQUEUE("audio < SYS_TIMEOUT");
+                LOGFQUEUE_SYS_TIMEOUT("audio < SYS_TIMEOUT");
                 break;
 
             default:

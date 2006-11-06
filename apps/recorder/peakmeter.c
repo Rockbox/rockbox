@@ -540,10 +540,8 @@ void peak_meter_peek(void)
     if (pm_playback)
         pcm_calculate_peaks(&pm_cur_left, &pm_cur_right);
 #ifdef HAVE_RECORDING        
-    if (!pm_playback)
-    {
-        pcm_rec_get_peaks(&pm_cur_left, &pm_cur_right);
-    }
+    else
+        pcm_calculate_rec_peaks(&pm_cur_left, &pm_cur_right);
 #endif        
     left  = pm_cur_left;
     right = pm_cur_right;

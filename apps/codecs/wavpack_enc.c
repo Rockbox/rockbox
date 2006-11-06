@@ -22,201 +22,474 @@
 #include "codeclib.h"
 #include "libwavpack/wavpack.h"
 
-CODEC_HEADER
+CODEC_ENC_HEADER
 
-typedef unsigned  long uint32;
-typedef unsigned short uint16;
-typedef unsigned  char  uint8;
+#ifdef USE_IRAM
+extern char iramcopy[];
+extern char iramstart[];
+extern char iramend[];
+extern char iedata[];
+extern char iend[];
+#endif
 
-static unsigned char wav_header_ster [46] =
-{33,22,'R','I','F','F',0,0,0,0,'W','A','V','E','f','m','t',' ',16,
- 0,0,0,1,0,2,0,0x44,0xac,0,0,0x10,0xb1,2,0,4,0,16,0,'d','a','t','a',0,0,0,0};
-
-static unsigned char wav_header_mono   [46] =
-{33,22,'R','I','F','F',0,0,0,0,'W','A','V','E','f','m','t',' ',16,
- 0,0,0,1,0,1,0,0x44,0xac,0,0,0x88,0x58,1,0,2,0,16,0,'d','a','t','a',0,0,0,0};
-
-static struct codec_api *ci;
-static int              enc_channels;
-
-#define CHUNK_SIZE 20000
-
-static long input_buffer[CHUNK_SIZE/2] IBSS_ATTR;
-
-/* update file header info callback function */
-void enc_set_header(void *head_buffer,    /* ptr to the file header data     */
-                    int  head_size,       /* size of this header data        */
-                    int  num_pcm_sampl,   /* amount of processed pcm samples */
-                    bool is_file_header)  /* update file/chunk header        */
+/** Types **/
+typedef struct
 {
-    if(is_file_header)
+    uint8_t type;       /* Type of metadata */
+    uint8_t word_size;  /* Size of metadata in words */
+} WavpackMetadataHeader;
+
+struct riff_header
+{
+    uint8_t  riff_id[4];      /* 00h - "RIFF"                            */
+    uint32_t riff_size;       /* 04h - sz following headers + data_size  */
+    /* format header */
+    uint8_t  format[4];       /* 08h - "WAVE"                            */
+    uint8_t  format_id[4];    /* 0Ch - "fmt "                            */
+    uint32_t format_size;     /* 10h - 16 for PCM (sz format data)       */
+    /* format data */
+    uint16_t audio_format;    /* 14h - 1=PCM                             */
+    uint16_t num_channels;    /* 16h - 1=M, 2=S, etc.                    */
+    uint32_t sample_rate;     /* 18h - HZ                                */
+    uint32_t byte_rate;       /* 1Ch - num_channels*sample_rate*bits_per_sample/8 */
+    uint16_t block_align;     /* 20h - num_channels*bits_per_samples/8   */
+    uint16_t bits_per_sample; /* 22h - 8=8 bits, 16=16 bits, etc.        */
+    /* Not for audio_format=1 (PCM) */
+/*  unsigned short extra_param_size;   24h - size of extra data                */ 
+/*  unsigned char  *extra_params; */
+    /* data header */
+    uint8_t  data_id[4];      /* 24h - "data" */
+    uint32_t data_size;       /* 28h - num_samples*num_channels*bits_per_sample/8 */
+/*  unsigned char  *data;              2ch - actual sound data */
+};
+
+#define RIFF_FMT_HEADER_SIZE   12 /* format -> format_size */
+#define RIFF_FMT_DATA_SIZE     16 /* audio_format -> bits_per_sample */
+#define RIFF_DATA_HEADER_SIZE   8 /* data_id -> data_size */
+
+#define PCM_DEPTH_BITS         16
+#define PCM_DEPTH_BYTES         2
+#define PCM_SAMP_PER_CHUNK   5000
+#define PCM_CHUNK_SIZE      (4*PCM_SAMP_PER_CHUNK)
+
+/** Data **/
+static struct codec_api *ci;
+static int8_t input_buffer[PCM_CHUNK_SIZE*2]     IBSS_ATTR;
+static WavpackConfig config                      IBSS_ATTR;
+static WavpackContext *wpc;
+static int32_t data_size, input_size, input_step IBSS_ATTR;
+
+static const WavpackMetadataHeader wvpk_mdh =
+{
+    ID_RIFF_HEADER,
+    sizeof (struct riff_header) / sizeof (uint16_t),
+};
+
+static const struct riff_header riff_header =
+{
+    /* "RIFF" header */
+    { 'R', 'I', 'F', 'F' },         /* riff_id          */
+    0,                              /* riff_size   (*)  */
+    /* format header */ 
+    { 'W', 'A', 'V', 'E' },         /* format           */
+    { 'f', 'm', 't', ' ' },         /* format_id        */
+    H_TO_LE32(16),                  /* format_size      */
+    /* format data */
+    H_TO_LE16(1),                   /* audio_format     */
+    0,                              /* num_channels (*) */
+    0,                              /* sample_rate  (*) */
+    0,                              /* byte_rate    (*) */
+    0,                              /* block_align  (*) */
+    H_TO_LE16(PCM_DEPTH_BITS),      /* bits_per_sample  */
+    /* data header */
+    { 'd', 'a', 't', 'a' },         /* data_id          */
+    0                               /* data_size    (*) */
+    /* (*) updated during ENC_END_FILE event */
+};
+
+static void chunk_to_int32(int32_t *src) ICODE_ATTR;
+static void chunk_to_int32(int32_t *src)
+{
+    int32_t *dst     = (int32_t *)input_buffer + PCM_SAMP_PER_CHUNK;
+    int32_t *src_end = dst + PCM_SAMP_PER_CHUNK;
+
+    /* copy to IRAM before converting data */
+    memcpy(dst, src, PCM_CHUNK_SIZE);
+
+    src = dst;
+    dst = (int32_t *)input_buffer;
+
+    if (config.num_channels == 1)
     {
-        /* update file header before file closing */
-        if(sizeof(WavpackHeader) + sizeof(wav_header_mono) < (unsigned)head_size)
+        /*
+         *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
+         *  |mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm|
+         */
+        inline void to_int32(int32_t **src, int32_t **dst)
         {
-            char* riff_header    = (char*)head_buffer + sizeof(WavpackHeader);
-            char* wv_header      = (char*)head_buffer + sizeof(wav_header_mono);
-            int   num_file_bytes = num_pcm_sampl * 2 * enc_channels;
-            unsigned long ckSize;
+            int32_t t = *(*src)++;
+            /* endianness irrelevant */
+            *(*dst)++ = ((int16_t)t + (t >> 16)) >> 1;
+        } /* to_int32 */
 
-            /* RIFF header and WVPK header have to be swapped */
-            /* copy wavpack header to file start position */
-            ci->memcpy(head_buffer, wv_header, sizeof(WavpackHeader));
-            wv_header = head_buffer; /* recalc wavpack header position */
-
-            if(enc_channels == 2)
-                ci->memcpy(riff_header, wav_header_ster, sizeof(wav_header_ster));
-            else
-                ci->memcpy(riff_header, wav_header_mono, sizeof(wav_header_mono));
-
-            /* update the Wavpack header first chunk size & total frame count */
-            ckSize = htole32(((WavpackHeader*)wv_header)->ckSize)
-                   + sizeof(wav_header_mono);
-            ((WavpackHeader*)wv_header)->total_samples = htole32(num_pcm_sampl);
-            ((WavpackHeader*)wv_header)->ckSize        = htole32(ckSize);
-
-            /* update the RIFF WAV header size entries */
-            *(long*)(riff_header+ 6) = htole32(num_file_bytes + 36);
-            *(long*)(riff_header+42) = htole32(num_file_bytes);
+        do
+        {
+            /* read 10 longs and write 10 longs */
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
         }
+        while(src < src_end);
+
+        return;
     }
     else
     {
-        /* update timestamp (block_index) */
-        ((WavpackHeader*)head_buffer)->block_index = htole32(num_pcm_sampl);
+        /*
+         *  |llllllllllllllll|rrrrrrrrrrrrrrrr| =>
+         *  |llllllllllllllllllllllllllllllll|rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr|
+         */
+        inline void to_int32(int32_t **src, int32_t **dst)
+        {
+            int32_t t = *(*src)++;
+#ifdef ROCKBOX_BIG_ENDIAN
+            *(*dst)++ = t >> 16, *(*dst)++ = (int16_t)t;
+#else
+            *(*dst)++ = (int16_t)t, *(*dst)++ = t >> 16;
+#endif
+        } /* to_int32 */
+
+        do
+        {
+            /* read 10 longs and write 20 longs */
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+            to_int32(&src, &dst);
+        }
+        while (src < src_end);
+
+        return;
     }
-}
+} /* chunk_to_int32 */
 
-
-enum codec_status codec_start(struct codec_api* api)
+/* called very often - inline */
+static inline bool is_file_data_ok(struct enc_file_event_data *data) ICODE_ATTR;
+static inline bool is_file_data_ok(struct enc_file_event_data *data)
 {
-    int            i;
-    long           t;
-    uint32         *src;
-    uint32         *dst;
-    int            chunk_size, num_chunks, samp_per_chunk;
-    int            enc_buffer_size;
-    int            enc_quality;
-    WavpackConfig  config;
-    WavpackContext *wpc;
-    bool           cpu_boosted = true; /* start boosted */
+    return data->rec_file >= 0 && (long)data->chunk->flags >= 0;
+} /* is_file_data_ok */
 
-    ci = api; // copy to global api pointer
+/* called very often - inline */
+static inline bool on_write_chunk(struct enc_file_event_data *data) ICODE_ATTR;
+static inline bool on_write_chunk(struct enc_file_event_data *data)
+{
+    if (!is_file_data_ok(data))
+        return false;
+
+    if (data->chunk->enc_data == NULL)
+    {
+#ifdef ROCKBOX_HAS_LOGF
+        ci->logf("wvpk enc: NULL data");
+#endif
+        return true;
+    }
+
+    /* update timestamp (block_index) */
+    ((WavpackHeader *)data->chunk->enc_data)->block_index =
+            htole32(data->num_pcm_samples);
+
+    if (ci->write(data->rec_file, data->chunk->enc_data,
+                  data->chunk->enc_size) != (ssize_t)data->chunk->enc_size)
+        return false;
+
+    data->num_pcm_samples += data->chunk->num_pcm;
+    return true;
+} /* on_write_chunk */
+
+static bool on_start_file(struct enc_file_event_data *data)
+{
+    if ((data->chunk->flags & CHUNKF_ERROR) || *data->filename == '\0')
+        return false;
+
+    data->rec_file = ci->open(data->filename, O_RDWR|O_CREAT|O_TRUNC);
+
+    if (data->rec_file < 0)
+        return false;
+
+    /* reset sample count */
+    data->num_pcm_samples = 0;
+
+    /* write template headers */
+    if (ci->write(data->rec_file, &wvpk_mdh, sizeof (wvpk_mdh)) 
+            != sizeof (wvpk_mdh) ||
+        ci->write(data->rec_file, &riff_header, sizeof (riff_header))
+            != sizeof (riff_header))
+    {
+        return false;
+    }
+
+    data->new_enc_size += sizeof(wvpk_mdh) + sizeof(riff_header);
+    return true;
+} /* on_start_file */
+
+static bool on_end_file(struct enc_file_event_data *data)
+{
+    struct
+    {
+        WavpackMetadataHeader wpmdh;
+        struct riff_header    rhdr;
+        WavpackHeader         wph;
+    } __attribute__ ((packed)) h;
+
+    uint32_t data_size;
+
+    if (!is_file_data_ok(data))
+        return false;
+
+    /* read template headers at start */
+    if (ci->lseek(data->rec_file, 0, SEEK_SET) != 0 ||
+        ci->read(data->rec_file, &h, sizeof (h)) != sizeof (h))
+        return false;
+
+    data_size = data->num_pcm_samples*config.num_channels*PCM_DEPTH_BYTES;
+
+    /** "RIFF" header **/
+    h.rhdr.riff_size    = htole32(RIFF_FMT_HEADER_SIZE +
+            RIFF_FMT_DATA_SIZE + RIFF_DATA_HEADER_SIZE + data_size);
+
+    /* format data */
+    h.rhdr.num_channels = htole16(config.num_channels);
+    h.rhdr.sample_rate  = htole32(config.sample_rate);
+    h.rhdr.byte_rate    = htole32(config.sample_rate*config.num_channels*
+                                      PCM_DEPTH_BYTES);
+    h.rhdr.block_align  = htole16(config.num_channels*PCM_DEPTH_BYTES);
+
+    /* data header */
+    h.rhdr.data_size    = htole32(data_size);
+
+    /** Wavpack header **/
+    h.wph.ckSize        = htole32(letoh32(h.wph.ckSize) + sizeof (h.wpmdh)
+                                + sizeof (h.rhdr));
+    h.wph.total_samples = htole32(data->num_pcm_samples);
+
+    /* MDH|RIFF|WVPK => WVPK|MDH|RIFF */
+    if (ci->lseek(data->rec_file, 0, SEEK_SET)
+            != 0 ||
+        ci->write(data->rec_file, &h.wph, sizeof (h.wph))
+            != sizeof (h.wph) ||
+        ci->write(data->rec_file, &h.wpmdh, sizeof (h.wpmdh))
+            != sizeof (h.wpmdh) ||
+        ci->write(data->rec_file, &h.rhdr, sizeof (h.rhdr))
+            != sizeof (h.rhdr))
+    {
+        return false;
+    }
+
+    ci->fsync(data->rec_file);
+    ci->close(data->rec_file);
+    data->rec_file = -1;
+
+    return true;
+} /* on_end_file */
+
+static void enc_events_callback(enum enc_events event, void *data) ICODE_ATTR;
+static void enc_events_callback(enum enc_events event, void *data)
+{
+    if (event == ENC_WRITE_CHUNK)
+    {
+        if (on_write_chunk((struct enc_file_event_data *)data))
+            return;
+    }
+    else if (event == ENC_START_FILE)
+    {
+        /* write metadata header and RIFF header */
+        if (on_start_file((struct enc_file_event_data *)data))
+            return;
+    }
+    else if (event == ENC_END_FILE)
+    {
+        if (on_end_file((struct enc_file_event_data *)data))
+            return;
+    }
+    else
+    {
+        return;
+    }
+
+    ((struct enc_file_event_data *)data)->chunk->flags |= CHUNKF_ERROR;
+} /* enc_events_callback */
+
+static bool init_encoder(void)
+{
+    struct enc_inputs     inputs;
+    struct enc_parameters params;
     
     codec_init(ci);
 
-    if(ci->enc_get_inputs          == NULL ||
-       ci->enc_set_parameters      == NULL ||
-       ci->enc_alloc_chunk         == NULL ||
-       ci->enc_free_chunk          == NULL ||
-       ci->enc_wavbuf_near_empty   == NULL ||
-       ci->enc_get_wav_data        == NULL ||
-       ci->enc_set_header_callback == NULL )
-        return CODEC_ERROR;
+    if (ci->enc_get_inputs         == NULL ||
+        ci->enc_set_parameters     == NULL ||
+        ci->enc_get_chunk          == NULL ||
+        ci->enc_finish_chunk       == NULL ||
+        ci->enc_pcm_buf_near_empty == NULL ||
+        ci->enc_get_pcm_data       == NULL ||
+        ci->enc_unget_pcm_data     == NULL )
+        return false;
 
-    ci->cpu_boost(true);
+    ci->enc_get_inputs(&inputs);
 
-    *ci->enc_set_header_callback = enc_set_header;
-    ci->enc_get_inputs(&enc_buffer_size, &enc_channels, &enc_quality);
+    if (inputs.config->afmt != AFMT_WAVPACK)
+        return false;
 
-    /* configure the buffer system */
-    chunk_size     = sizeof(long) + CHUNK_SIZE * enc_channels / 2;
-    num_chunks     = enc_buffer_size / chunk_size;
-    samp_per_chunk = CHUNK_SIZE / 4;
-
-    /* inform the main program about buffer dimensions and other params */
-    /* add wav_header_mono as place holder to file start position */
-    /* wav header and wvpk header have to be reordered later */
-    ci->enc_set_parameters(chunk_size, num_chunks, samp_per_chunk,
-                           wav_header_mono, sizeof(wav_header_mono),
-                           AFMT_WAVPACK);
+    memset(&config, 0, sizeof (config));
+    config.bits_per_sample  = PCM_DEPTH_BITS;
+    config.bytes_per_sample = PCM_DEPTH_BYTES;
+    config.sample_rate      = inputs.sample_rate;
+    config.num_channels     = inputs.num_channels;
 
     wpc = WavpackOpenFileOutput ();
 
-    memset (&config, 0, sizeof (config));
-    config.bits_per_sample  = 16;
-    config.bytes_per_sample = 2;
-    config.sample_rate      = 44100;
-    config.num_channels     = enc_channels;
+    if (!WavpackSetConfiguration(wpc, &config, -1))
+        return false;
 
-    if (!WavpackSetConfiguration (wpc, &config, 1))
+    /* configure the buffer system */
+    params.afmt            = AFMT_WAVPACK;
+    input_size             = PCM_CHUNK_SIZE*inputs.num_channels / 2;
+    data_size              = 105*input_size / 100;
+    input_size            *= 2;
+    input_step             = input_size / 4;
+    params.chunk_size      = data_size;
+    params.enc_sample_rate = inputs.sample_rate;
+    params.reserve_bytes   = 0;
+    params.events_callback = enc_events_callback;
+
+    ci->enc_set_parameters(&params);
+
+    return true;
+} /* init_encoder */
+
+enum codec_status codec_start(struct codec_api* api)
+{
+    bool cpu_boosted;
+
+    ci = api; /* copy to global api pointer */
+
+#ifdef USE_IRAM
+    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
+    ci->memset(iedata, 0, iend - iedata);
+#endif
+
+    /* initialize params and config */
+    if (!init_encoder())
+    {
+        ci->enc_codec_loaded = -1;
         return CODEC_ERROR;
+    }
 
     /* main application waits for this flag during encoder loading */
-    ci->enc_codec_loaded = true;
+    ci->enc_codec_loaded = 1;
+
+    ci->cpu_boost(true);
+    cpu_boosted = true;
 
     /* main encoding loop */
     while(!ci->stop_codec)
     {
-        while((src = (uint32*)ci->enc_get_wav_data(CHUNK_SIZE)) != NULL)
+        uint8_t *src;
+
+        while ((src = ci->enc_get_pcm_data(PCM_CHUNK_SIZE)) != NULL)
         {
+            struct enc_chunk_hdr *chunk;
+            bool     abort_chunk;
+            uint8_t *dst;
+            uint8_t *src_end;
+
             if(ci->stop_codec)
                 break;
 
-            if(ci->enc_wavbuf_near_empty() == 0)
+            abort_chunk = true;
+
+            if (!cpu_boosted && ci->enc_pcm_buf_near_empty() == 0)
             {
-                if(!cpu_boosted)
-                {
-                    ci->cpu_boost(true);
-                    cpu_boosted = true;
-                }
+                ci->cpu_boost(true);
+                cpu_boosted = true;
             }
 
-            dst = (uint32*)ci->enc_alloc_chunk() + 1;
+            chunk = ci->enc_get_chunk();
 
-            WavpackStartBlock (wpc, (uint8*)dst, (uint8*)dst + CHUNK_SIZE);
+            /* reset counts and pointer */
+            chunk->enc_size = 0;
+            chunk->num_pcm  = 0;
+            chunk->enc_data = NULL;
 
-            if(enc_channels == 2)
+            dst = ENC_CHUNK_SKIP_HDR(dst, chunk);
+
+            WavpackStartBlock(wpc, dst, dst + data_size);
+
+            chunk_to_int32((uint32_t*)src);
+            src      = input_buffer;
+            src_end  = src + input_size;
+
+            /* encode chunk in four steps yielding between each */
+            do
             {
-                for (i=0; i<CHUNK_SIZE/4; i++)
+                if (WavpackPackSamples(wpc, (int32_t *)src,
+                                       PCM_SAMP_PER_CHUNK/4))
                 {
-                    t = (long)*src++;
-
-                    input_buffer[2*i + 0] = t >> 16;
-                    input_buffer[2*i + 1] = (short)t;
+                    chunk->num_pcm += PCM_SAMP_PER_CHUNK/4;
+                    ci->yield();
+                    /* could've been stopped in some way */
+                    abort_chunk = ci->stop_codec ||
+                                  (chunk->flags & CHUNKF_ABORT);
                 }
+
+                src += input_step;
             }
-            else
+            while (!abort_chunk && src < src_end);
+
+            if (!abort_chunk)
             {
-                for (i=0; i<CHUNK_SIZE/4; i++)
-                {
-                    t = (long)*src++;
-                    t = (((t<<16)>>16) + (t>>16)) >> 1; /* left+right */
-
-                    input_buffer[i] = t;
-                }
-            }
-
-            if (!WavpackPackSamples (wpc, input_buffer, CHUNK_SIZE/4))
-                return CODEC_ERROR;
-
+                chunk->enc_data = dst;
+                if (chunk->num_pcm < PCM_SAMP_PER_CHUNK)
+                    ci->enc_unget_pcm_data(PCM_CHUNK_SIZE - chunk->num_pcm*4);
             /* finish the chunk and store chunk size info */
-            dst[-1] = WavpackFinishBlock (wpc);
-
-            ci->enc_free_chunk();
-            ci->yield();
-        }
-
-        if(ci->enc_wavbuf_near_empty())
-        {
-            if(cpu_boosted)
-            {
-                ci->cpu_boost(false);
-                cpu_boosted = false;
+                chunk->enc_size = WavpackFinishBlock(wpc);
+                ci->enc_finish_chunk();
             }
         }
+
+        if (cpu_boosted && ci->enc_pcm_buf_near_empty() != 0)
+        {
+            ci->cpu_boost(false);
+            cpu_boosted = false;
+        }
+
         ci->yield();
     }
 
-    if(cpu_boosted) /* set initial boost state */
+    if (cpu_boosted) /* set initial boost state */
         ci->cpu_boost(false);
 
     /* reset parameters to initial state */
-    ci->enc_set_parameters(0, 0, 0, 0, 0, 0);
+    ci->enc_set_parameters(NULL);
  
     /* main application waits for this flag during encoder removing */
-    ci->enc_codec_loaded = false;
+    ci->enc_codec_loaded = 0;
 
     return CODEC_OK;
-}
-#endif
+} /* codec_start */
+
+#endif /* ndef SIMULATOR */

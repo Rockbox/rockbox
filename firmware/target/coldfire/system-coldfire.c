@@ -310,3 +310,10 @@ int system_memory_guard(int newmode)
 
     return oldmode;
 }
+
+/* allow setting of audio clock related bits */
+void coldfire_set_pllcr_audio_bits(long bits)
+{
+    PLLCR = (PLLCR & ~0x70c00000) | (bits & 0x70c00000);
+}
+

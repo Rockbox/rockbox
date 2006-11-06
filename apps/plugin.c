@@ -674,12 +674,18 @@ void* plugin_get_buffer(int* buffer_size)
 }
 
 /* Returns a pointer to the mp3 buffer.
-   Playback gets stopped, to avoid conflicts. */
+   Playback gets stopped, to avoid conflicts.
+   Talk buffer is stolen as well.
+ */
 void* plugin_get_audio_buffer(int* buffer_size)
 {
+#if CONFIG_CODEC == SWCODEC
+    return audio_get_buffer(true, (size_t *)buffer_size);
+#else
     audio_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     *buffer_size = audiobufend - audiobuf;
+#endif
     return audiobuf;
 }
 

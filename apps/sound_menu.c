@@ -54,6 +54,10 @@
 #include "dsp.h"
 #include "eq_menu.h"
 #include "pcmbuf.h"
+#ifdef HAVE_RECORDING
+#include "enc_config.h"
+#endif
+#include "general.h"
 #endif
 #include "action.h"
 
@@ -308,22 +312,20 @@ static bool recsource(void)
 {
     int n_opts = AUDIO_NUM_SOURCES;
 
-    struct opt_items names[AUDIO_NUM_SOURCES] = {
-        { STR(LANG_RECORDING_SRC_MIC) },
-        { STR(LANG_RECORDING_SRC_LINE) },
+    static const struct opt_items names[AUDIO_NUM_SOURCES] = {
+        [AUDIO_SRC_MIC]     = { STR(LANG_RECORDING_SRC_MIC) },
+        [AUDIO_SRC_LINEIN]  = { STR(LANG_RECORDING_SRC_LINE) },
 #ifdef HAVE_SPDIF_IN
-        { STR(LANG_RECORDING_SRC_DIGITAL) },
+        [AUDIO_SRC_SPDIF]   = { STR(LANG_RECORDING_SRC_DIGITAL) },
+#endif
+#ifdef HAVE_FMRADIO_IN
+        [AUDIO_SRC_FMRADIO] = { STR(LANG_FM_RADIO) }
 #endif
     };
 
     /* caveat: assumes it's the last item! */
 #ifdef HAVE_FMRADIO_IN
-    if (radio_hardware_present())
-    {
-        names[AUDIO_SRC_FMRADIO].string = ID2P(LANG_FM_RADIO);
-        names[AUDIO_SRC_FMRADIO].voice_id = LANG_FM_RADIO;
-    }
-    else
+    if (!radio_hardware_present())
         n_opts--;
 #endif
 
@@ -332,28 +334,7 @@ static bool recsource(void)
                       n_opts, NULL );
 }
 
-/* To be removed when we add support for sample rates and channel settings */
-#if CONFIG_CODEC == SWCODEC
-static bool recquality(void)
-{
-    static const struct opt_items names[] = {
-        { "MP3   64 kBit/s", TALK_ID(  64, UNIT_KBIT) },
-        { "MP3   96 kBit/s", TALK_ID(  96, UNIT_KBIT) },
-        { "MP3  128 kBit/s", TALK_ID( 128, UNIT_KBIT) },
-        { "MP3  160 kBit/s", TALK_ID( 160, UNIT_KBIT) },
-        { "MP3  192 kBit/s", TALK_ID( 192, UNIT_KBIT) },
-        { "MP3  224 kBit/s", TALK_ID( 224, UNIT_KBIT) },
-        { "MP3  320 kBit/s", TALK_ID( 320, UNIT_KBIT) },
-        { "WV   900 kBit/s", TALK_ID( 900, UNIT_KBIT) },
-        { "WAV 1411 kBit/s", TALK_ID(1411, UNIT_KBIT) }
-    };
-
-    return set_option(str(LANG_RECORDING_QUALITY),
-                      &global_settings.rec_quality, INT,
-                      names, sizeof (names)/sizeof(struct opt_items),
-                      NULL );
-}
-#elif CONFIG_CODEC == MAS3587F
+#if CONFIG_CODEC == MAS3587F
 static bool recquality(void)
 {
     return set_int(str(LANG_RECORDING_QUALITY), "", UNIT_INT,
@@ -368,32 +349,182 @@ static bool receditable(void)
 }
 #endif /* CONFIG_CODEC == MAS3587F */
 
+#if CONFIG_CODEC == SWCODEC
+/* Makes an options list from a source list of options and indexes */
+void make_options_from_indexes(const struct opt_items *src_names,
+                               const long *src_indexes,
+                               int n_indexes,
+                               struct opt_items *dst_names)
+{
+    while (--n_indexes >= 0)
+        dst_names[n_indexes] = src_names[src_indexes[n_indexes]];
+} /* make_options_from_indexes */
+
+static bool recformat(void)
+{
+    static const struct opt_items names[REC_NUM_FORMATS] = {
+        [REC_FORMAT_MPA_L3]  = { STR(LANG_AFMT_MPA_L3)  },
+        [REC_FORMAT_WAVPACK] = { STR(LANG_AFMT_WAVPACK) },
+        [REC_FORMAT_PCM_WAV] = { STR(LANG_AFMT_PCM_WAV) },
+    };
+
+    int rec_format = global_settings.rec_format;
+    bool res = set_option(str(LANG_RECORDING_FORMAT), &rec_format, INT,
+                          names, REC_NUM_FORMATS, NULL );
+
+    if (rec_format != global_settings.rec_format)
+    {
+        global_settings.rec_format = rec_format;
+        enc_global_settings_apply();
+    }
+
+    return res;
+} /* recformat */
+
+#endif /* CONFIG_CODEC == SWCODEC */
+
 static bool recfrequency(void)
 {
-    static const struct opt_items names[] = {
+#if CONFIG_CODEC == MAS3587F
+    static const struct opt_items names[6] = {
         { "44.1kHz", TALK_ID(44, UNIT_KHZ) },
-#if CONFIG_CODEC != SWCODEC     /* This is temporary */
         { "48kHz", TALK_ID(48, UNIT_KHZ) },
         { "32kHz", TALK_ID(32, UNIT_KHZ) },
         { "22.05kHz", TALK_ID(22, UNIT_KHZ) },
         { "24kHz", TALK_ID(24, UNIT_KHZ) },
         { "16kHz", TALK_ID(16, UNIT_KHZ) }
-#endif
     };
     return set_option(str(LANG_RECORDING_FREQUENCY),
                       &global_settings.rec_frequency, INT,
-                      names, sizeof(names)/sizeof(*names), NULL );
+                      names, 6, NULL );
+#endif /* CONFIG_CODEC == MAS3587F */
+
+#if CONFIG_CODEC == SWCODEC
+    static const struct opt_items names[REC_NUM_FREQ] = {
+        REC_HAVE_96_([REC_FREQ_96] = { "96kHz",     TALK_ID(96, UNIT_KHZ) },)
+        REC_HAVE_88_([REC_FREQ_88] = { "88.2kHz",   TALK_ID(88, UNIT_KHZ) },)
+        REC_HAVE_64_([REC_FREQ_64] = { "64kHz",     TALK_ID(64, UNIT_KHZ) },)
+        REC_HAVE_48_([REC_FREQ_48] = { "48kHz",     TALK_ID(48, UNIT_KHZ) },)
+        REC_HAVE_44_([REC_FREQ_44] = { "44.1kHz",   TALK_ID(44, UNIT_KHZ) },)
+        REC_HAVE_32_([REC_FREQ_32] = { "32kHz",     TALK_ID(32, UNIT_KHZ) },)
+        REC_HAVE_24_([REC_FREQ_24] = { "24kHz",     TALK_ID(24, UNIT_KHZ) },)
+        REC_HAVE_22_([REC_FREQ_22] = { "22.05kHz",  TALK_ID(22, UNIT_KHZ) },)
+        REC_HAVE_16_([REC_FREQ_16] = { "16kHz",     TALK_ID(16, UNIT_KHZ) },)
+        REC_HAVE_12_([REC_FREQ_12] = { "12kHz",     TALK_ID(12, UNIT_KHZ) },)
+        REC_HAVE_11_([REC_FREQ_11] = { "11.025kHz", TALK_ID(11, UNIT_KHZ) },)
+        REC_HAVE_8_( [REC_FREQ_8 ] = { "8kHz",      TALK_ID( 8, UNIT_KHZ) },)
+    };
+
+    struct opt_items opts[REC_NUM_FREQ];
+    unsigned long    table[REC_NUM_FREQ];
+    int              n_opts;
+    int              rec_frequency;
+    bool             ret;
+
+#ifdef HAVE_SPDIF_IN
+    if (global_settings.rec_source == AUDIO_SRC_SPDIF)
+    {
+        /* Inform user that frequency follows the source's frequency */
+        opts[0].string    = ID2P(LANG_SOURCE_FREQUENCY);
+        opts[0].voice_id  = LANG_SOURCE_FREQUENCY;
+        n_opts            = 1;
+        rec_frequency     = 0;
 }
+    else
+#endif
+    {
+        struct encoder_caps caps;
+        struct encoder_config cfg;
+
+        cfg.rec_format = global_settings.rec_format;
+        global_to_encoder_config(&cfg);
+
+        if (!enc_get_caps(&cfg, &caps, true))
+            return false;
+
+        /* Construct samplerate menu based upon encoder settings */
+        n_opts = make_list_from_caps32(REC_SAMPR_CAPS, NULL,
+                                       caps.samplerate_caps, table);
+
+        if (n_opts == 0)
+            return false; /* No common flags...?? */
+
+        make_options_from_indexes(names, table, n_opts, opts);
+
+        /* Find closest rate that the potentially restricted list
+           comes to */
+        make_list_from_caps32(REC_SAMPR_CAPS, rec_freq_sampr,
+                              caps.samplerate_caps, table);
+
+        rec_frequency = round_value_to_list32(
+                rec_freq_sampr[global_settings.rec_frequency],
+                table, n_opts, false);
+    }
+
+    ret = set_option(str(LANG_RECORDING_FREQUENCY),
+                     &rec_frequency, INT, opts, n_opts, NULL );
+
+    if (!ret
+#ifdef HAVE_SPDIF_IN
+        && global_settings.rec_source != AUDIO_SRC_SPDIF
+#endif
+    )
+    {
+        /* Translate back to full index */
+        global_settings.rec_frequency =
+                    round_value_to_list32(table[rec_frequency],
+                                          rec_freq_sampr,
+                                          REC_NUM_FREQ,
+                                          false);
+    }
+
+    return ret;
+#endif /* CONFIG_CODEC == SWCODEC */
+} /* recfrequency */
 
 static bool recchannels(void)
 {
-    static const struct opt_items names[] = {
-        { STR(LANG_CHANNEL_STEREO) },
-        { STR(LANG_CHANNEL_MONO) }
+    static const struct opt_items names[CHN_NUM_MODES] = {
+        [CHN_MODE_STEREO] = { STR(LANG_CHANNEL_STEREO) },
+        [CHN_MODE_MONO]   = { STR(LANG_CHANNEL_MONO)   }
     };
+#if CONFIG_CODEC == MAS3587F
     return set_option(str(LANG_RECORDING_CHANNELS),
                       &global_settings.rec_channels, INT,
-                      names, 2, NULL );
+                      names, CHN_NUM_MODES, NULL );
+#endif /* CONFIG_CODEC == MAS3587F */
+
+#if CONFIG_CODEC == SWCODEC
+    struct opt_items    opts[CHN_NUM_MODES];
+    long                table[CHN_NUM_MODES];
+    struct encoder_caps caps;
+    struct encoder_config cfg;
+    int                 n_opts;
+    int                 rec_channels;
+    bool                ret;
+
+    cfg.rec_format = global_settings.rec_format;
+    global_to_encoder_config(&cfg);
+
+    if (!enc_get_caps(&cfg, &caps, true))
+        return false;
+
+    n_opts = make_list_from_caps32(CHN_CAP_ALL, NULL,
+                                   caps.channel_caps, table);
+
+    rec_channels = round_value_to_list32(global_settings.rec_channels,
+                                         table, n_opts, false);
+
+    make_options_from_indexes(names, table, n_opts, opts);
+
+    ret = set_option(str(LANG_RECORDING_CHANNELS), &rec_channels,
+                     INT, opts, n_opts, NULL );
+
+    if (!ret)
+        global_settings.rec_channels = table[rec_channels];
+
+    return ret;
+#endif /* CONFIG_CODEC == SWCODEC */
 }
 
 static bool rectimesplit(void)
@@ -1049,58 +1180,59 @@ bool rectrigger(void)
     action_signalscreenchange();
     return retval;
 }
-#endif
+#endif /* !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F */
 
 bool recording_menu(bool no_source)
 {
-    int m;
-    int i = 0;
-    struct menu_item items[13];
-    bool result;
-
-#if CONFIG_CODEC == MAS3587F || CONFIG_CODEC == SWCODEC
-    items[i].desc = ID2P(LANG_RECORDING_QUALITY);
-    items[i++].function = recquality;
-#endif
-    items[i].desc = ID2P(LANG_RECORDING_FREQUENCY);
-    items[i++].function = recfrequency;
-    if(!no_source) {
-        items[i].desc = ID2P(LANG_RECORDING_SOURCE);
-        items[i++].function = recsource;
-    }
-    items[i].desc = ID2P(LANG_RECORDING_CHANNELS);
-    items[i++].function = recchannels;
+    static const struct menu_item static_items[] = {
 #if CONFIG_CODEC == MAS3587F
-    items[i].desc = ID2P(LANG_RECORDING_EDITABLE);
-    items[i++].function = receditable;
+        { ID2P(LANG_RECORDING_QUALITY), recquality },
 #endif
-    items[i].desc = ID2P(LANG_RECORD_TIMESPLIT);
-    items[i++].function = filesplitoptionsmenu;
-    items[i].desc = ID2P(LANG_RECORD_PRERECORD_TIME);
-    items[i++].function = recprerecord;
-    items[i].desc = ID2P(LANG_RECORD_DIRECTORY);
-    items[i++].function = recdirectory;
-    items[i].desc = ID2P(LANG_RECORD_STARTUP);
-    items[i++].function = reconstartup;
+#if CONFIG_CODEC == SWCODEC
+        { ID2P(LANG_RECORDING_FORMAT), recformat },
+        { ID2P(LANG_ENCODER_SETTINGS), enc_global_config_menu },
+#endif
+        { ID2P(LANG_RECORDING_FREQUENCY), recfrequency },
+        { ID2P(LANG_RECORDING_SOURCE), recsource }, /* not shown if no_source */
+        { ID2P(LANG_RECORDING_CHANNELS), recchannels },
+#if CONFIG_CODEC == MAS3587F
+        { ID2P(LANG_RECORDING_EDITABLE), receditable },
+#endif
+        { ID2P(LANG_RECORD_TIMESPLIT), filesplitoptionsmenu },
+        { ID2P(LANG_RECORD_PRERECORD_TIME), recprerecord },
+        { ID2P(LANG_RECORD_DIRECTORY), recdirectory },
+        { ID2P(LANG_RECORD_STARTUP), reconstartup },
 #ifdef CONFIG_BACKLIGHT
-    items[i].desc = ID2P(LANG_CLIP_LIGHT);
-    items[i++].function = cliplight;
+        { ID2P(LANG_CLIP_LIGHT), cliplight },
 #endif
 #if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
-    items[i].desc = ID2P(LANG_RECORD_TRIGGER);
-    items[i++].function = rectrigger;
+        { ID2P(LANG_RECORD_TRIGGER), rectrigger },
 #endif
 #ifdef HAVE_AGC
-    items[i].desc = ID2P(LANG_RECORD_AGC_PRESET);
-    items[i++].function = agc_preset;
-    items[i].desc = ID2P(LANG_RECORD_AGC_CLIPTIME);
-    items[i++].function = agc_cliptime;
+        { ID2P(LANG_RECORD_AGC_PRESET), agc_preset },
+        { ID2P(LANG_RECORD_AGC_CLIPTIME), agc_cliptime },
 #endif
+    };
 
-    m=menu_init( items, i, NULL, NULL, NULL, NULL);
+    struct menu_item items[ARRAYLEN(static_items)];
+    int i, n_items;
+    int m;
+
+    bool result;
+
+    for (i = 0, n_items = 0; i < (int)ARRAYLEN(items); i++)
+    {
+        const struct menu_item *mi = &static_items[i];
+        if (no_source && mi->function == recsource)
+            continue;
+        items[n_items++] = *mi;
+    }
+
+    m = menu_init(items, n_items, NULL, NULL, NULL, NULL);
     result = menu_run(m);
     menu_exit(m);
 
     return result;
-}
-#endif
+} /* recording_menu */
+
+#endif /* HAVE_RECORDING */

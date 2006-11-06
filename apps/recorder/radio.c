@@ -386,6 +386,7 @@ bool radio_screen(void)
     unsigned int last_seconds = 0;
 #if CONFIG_CODEC != SWCODEC
     int hours, minutes;
+    struct audio_recording_options rec_options;
 #endif
     bool keep_playing = false;
     bool statusbar = global_settings.statusbar;
@@ -436,12 +437,9 @@ bool radio_screen(void)
 
     peak_meter_enabled = true;
 
-    rec_set_recording_options(global_settings.rec_frequency,
-                              global_settings.rec_quality,
-                              AUDIO_SRC_LINEIN, 0,
-                              global_settings.rec_channels,
-                              global_settings.rec_editable,
-                              global_settings.rec_prerecord_time);
+    rec_init_recording_options(&rec_options);
+    rec_options.rec_source = AUDIO_SRC_LINEIN;
+    rec_set_recording_options(&rec_options);
 
     audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
             sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
@@ -881,7 +879,7 @@ bool radio_screen(void)
                 }
                 else
                 {
-                    if(global_settings.rec_prerecord_time)
+                    if(rec_options.rec_prerecord_time)
                     {
                         snprintf(buf, 32, "%s %02d",
                                  str(LANG_RECORD_PRERECORD), seconds%60);
@@ -1173,7 +1171,8 @@ bool save_preset_list(void)
         if(!opendir(FMPRESET_PATH)) /* Check if there is preset folder */
             mkdir(FMPRESET_PATH, 0); 
     
-        create_numbered_filename(filepreset,FMPRESET_PATH,"preset",".fmr",2);
+        create_numbered_filename(filepreset, FMPRESET_PATH, "preset",
+                                 ".fmr", 2 IF_CNFN_NUM_(, NULL));
 
         while(bad_file_name)
         {
@@ -1534,12 +1533,10 @@ static bool fm_recording_settings(void)
 #if CONFIG_CODEC != SWCODEC
     if (!ret)
     {
-        rec_set_recording_options(global_settings.rec_frequency,
-                                  global_settings.rec_quality,
-                                  AUDIO_SRC_LINEIN, 0,
-                                  global_settings.rec_channels,
-                                  global_settings.rec_editable,
-                                  global_settings.rec_prerecord_time);
+        struct audio_recording_options rec_options;
+        rec_init_recording_options(&rec_options);
+        rec_options.rec_source = AUDIO_SRC_LINEIN;
+        rec_set_recording_options(&rec_options);
     }
 #endif
 

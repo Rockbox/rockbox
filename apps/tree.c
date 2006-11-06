@@ -58,7 +58,9 @@
 #include "misc.h"
 #include "filetree.h"
 #include "tagtree.h"
+#ifdef HAVE_RECORDING
 #include "recorder/recording.h"
+#endif
 #include "rtc.h"
 #include "dircache.h"
 #ifdef HAVE_TAGCACHE

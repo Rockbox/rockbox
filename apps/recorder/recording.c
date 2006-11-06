@@ -30,8 +30,10 @@
 #include "mpeg.h"
 #include "audio.h"
 #if CONFIG_CODEC == SWCODEC
-#include "pcm_record.h"
+#include "thread.h"
+#include "pcm_playback.h"
 #include "playback.h"
+#include "enc_config.h"
 #endif
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
@@ -73,36 +75,40 @@
 
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
+#if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_rec_screen(void);
 bool f3_rec_screen(void);
+#endif
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
 int screen_update = NB_SCREENS;
 bool remote_display_on = true;
-const char* const freq_str[6] =
-{
-    "44.1kHz",
-    "48kHz",
-    "32kHz",
-    "22.05kHz",
-    "24kHz",
-    "16kHz"
-};
 
+/** File name creation **/
 #if CONFIG_CODEC == SWCODEC
-#define REC_ENCODER_ID(q) \
-    rec_quality_info_afmt[q]
-#define REC_QUALITY_LABEL(q) \
-    (audio_formats[REC_ENCODER_ID(q)].label)
-#define REC_FILE_ENDING(q) \
-    (audio_formats[REC_ENCODER_ID(q)].ext)
-#else
-/* default record file extension for HWCODEC */
-#define REC_QUALITY_LABEL(q)    "MP3"
-#define REC_FILE_ENDING(q)      ".mp3"
-#endif
 
+#ifdef IF_CNFN_NUM
+/* current file number to assist in creating unique numbered filenames
+   without actually having to create the file on disk */
+static int file_number = -1;
+#endif /* IF_CNFN_NUM */
+
+#define REC_FILE_ENDING(rec_format) \
+    (audio_formats[rec_format_afmt[rec_format]].ext_list)
+
+#else  /* CONFIG_CODEC != SWCODEC */
+
+/* default record file extension for HWCODEC */
+#define REC_FILE_ENDING(rec_format) \
+    (audio_formats[AFMT_MPA_L3].ext_list)
+
+#endif /* CONFIG_CODEC == SWCODEC */
+
+/* path for current file */
+static char path_buffer[MAX_PATH];
+
+/** Automatic Gain Control (AGC) **/
 #ifdef HAVE_AGC
 /* Timing counters:
  * peak_time is incremented every 0.2s, every 2nd run of record screen loop.
@@ -496,20 +502,24 @@ void adjust_cursor(void)
 
 char *rec_create_filename(char *buffer)
 {
+    char ext[16];
+
     if(global_settings.rec_directory)
         getcwd(buffer, MAX_PATH);
     else
         strncpy(buffer, rec_base_directory, MAX_PATH);
 
+    snprintf(ext, sizeof(ext), ".%s",
+             REC_FILE_ENDING(global_settings.rec_format));
 
 #ifdef CONFIG_RTC 
-    create_datetime_filename(buffer, buffer, "R",
-        REC_FILE_ENDING(global_settings.rec_quality));
+    /* We'll wait at least up to the start of the next second so no duplicate
+       names are created */
+    return create_datetime_filename(buffer, buffer, "R", ext, true);
 #else
-    create_numbered_filename(buffer, buffer, "rec_",
-        REC_FILE_ENDING(global_settings.rec_quality), 4);
+    return create_numbered_filename(buffer, buffer, "rec_", ext, 4
+                                    IF_CNFN_NUM_(, &file_number));
 #endif
-    return buffer;
 }
 
 int rec_create_directory(void)
@@ -557,9 +567,15 @@ static void rec_boost(bool state)
 
 /**
  * Selects an audio source for recording or playback
- * powers/unpowers related devices.
+ * powers/unpowers related devices and sets up monitoring.
  * Here because it calls app code and used only for HAVE_RECORDING atm.
  * Would like it in pcm_record.c.
+ *
+ * Behaves like a firmware function in that it does not use global settings
+ * to determine the state.
+ *
+ * The order of setting monitoring may need tweaking dependent upon the
+ * selected source to get the smoothest transition.
  */
 #if defined(HAVE_UDA1380)
 #define ac_disable_recording uda1380_disable_recording
@@ -571,7 +587,13 @@ static void rec_boost(bool state)
 #define ac_set_monitor       tlv320_set_monitor
 #endif
 
-void rec_set_source(int source, int flags)
+#ifdef HAVE_SPDIF_IN
+#define rec_spdif_set_monitor(m) audio_spdif_set_monitor(m)
+#else
+#define rec_spdif_set_monitor(m)
+#endif
+
+void rec_set_source(int source, unsigned flags)
 {
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
@@ -586,7 +608,9 @@ void rec_set_source(int source, int flags)
 
     /** Do power up/down of associated device(s) **/
 
+    /** SPDIF **/
 #ifdef HAVE_SPDIF_IN
+    /* Always boost for SPDIF */
     if ((source == AUDIO_SRC_SPDIF) != (source == last_source))
         rec_boost(source == AUDIO_SRC_SPDIF);
 
@@ -595,10 +619,11 @@ void rec_set_source(int source, int flags)
        both optical in and out is controlled by the same power source, which is
        the case on H1x0. */
     spdif_power_enable((source == AUDIO_SRC_SPDIF) ||
-                       global_settings.spdif_enable);
+                       audio_get_spdif_power_setting());
 #endif
 #endif
 
+    /** Tuner **/
 #ifdef CONFIG_TUNER
     /* Switch radio off or on per source and flags. */
     if (source != AUDIO_SRC_FMRADIO)
@@ -612,12 +637,15 @@ void rec_set_source(int source, int flags)
     switch (source)
     {
         default:                        /* playback - no recording */
+            source = AUDIO_SRC_PLAYBACK;
+        case AUDIO_SRC_PLAYBACK:
             pm_playback = true;
             if (source == last_source)
                 break;
             ac_disable_recording();
             ac_set_monitor(false);
             pcm_rec_mux(0);             /* line in */
+            rec_spdif_set_monitor(-1);  /* silence it */
         break;
 
         case AUDIO_SRC_MIC:             /* recording only */
@@ -625,6 +653,7 @@ void rec_set_source(int source, int flags)
                 break;
             ac_enable_recording(true);  /* source mic */
             pcm_rec_mux(0);             /* line in */
+            rec_spdif_set_monitor(0);
         break;
 
         case AUDIO_SRC_LINEIN:          /* recording only */
@@ -632,29 +661,20 @@ void rec_set_source(int source, int flags)
                 break;
             pcm_rec_mux(0);             /* line in */
             ac_enable_recording(false); /* source line */
+            rec_spdif_set_monitor(0);
         break;
 
 #ifdef HAVE_SPDIF_IN
         case AUDIO_SRC_SPDIF:           /* recording only */
-            if (recording)
-            {
-                /* This was originally done in audio_set_recording_options only */
-#ifdef HAVE_SPDIF_POWER
-                EBU1CONFIG = global_settings.spdif_enable ? (1 << 2) : 0;
-                /* Input source is EBUin1, Feed-through monitoring if desired */
-#else
-                EBU1CONFIG = (1 << 2);
-                /* Input source is EBUin1, Feed-through monitoring */
-#endif
-            }
-
-            if (source != last_source)
-                uda1380_disable_recording();
+            if (source == last_source)
+                break;
+            ac_disable_recording();
+            audio_spdif_set_monitor(1);
         break;
 #endif /* HAVE_SPDIF_IN */
 
 #ifdef HAVE_FMRADIO_IN
-        case AUDIO_SRC_FMRADIO:
+        case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (!recording)
             {
                 audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
@@ -687,6 +707,8 @@ void rec_set_source(int source, int flags)
                 tlv320_set_monitor(true);       /* analog bypass */
             }
 #endif
+
+            rec_spdif_set_monitor(0);
         break;
 /* #elif defined(CONFIG_TUNER)  */
 /* Have radio but cannot record it */
@@ -702,33 +724,50 @@ void rec_set_source(int source, int flags)
 } /* rec_set_source */
 #endif /* CONFIG_CODEC == SWCODEC && !defined(SIMULATOR) */
 
-/* steal the mp3 buffer then actually set options */
-void rec_set_recording_options(int frequency, int quality,
-                               int source, int source_flags,
-                               int channel_mode, bool editable,
-                               int prerecord_time)
+void rec_init_recording_options(struct audio_recording_options *options)
+{
+    options->rec_source            = global_settings.rec_source;
+    options->rec_frequency         = global_settings.rec_frequency;
+    options->rec_channels          = global_settings.rec_channels;
+    options->rec_prerecord_time    = global_settings.rec_prerecord_time;
+#if CONFIG_CODEC == SWCODEC
+    options->rec_source_flags      = 0;
+    options->enc_config.rec_format = global_settings.rec_format;
+    global_to_encoder_config(&options->enc_config);
+#else
+    options->rec_quality           = global_settings.rec_quality;
+    options->rec_editable          = global_settings.rec_editable;
+#endif
+}
+
+void rec_set_recording_options(struct audio_recording_options *options)
 {
 #if CONFIG_CODEC != SWCODEC
     if (global_settings.rec_prerecord_time)
-#endif
         talk_buffer_steal(); /* will use the mp3 buffer */
+#endif
+
+#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_POWER
+    audio_set_spdif_power_setting(global_settings.spdif_enable);
+#endif
+#endif
 
 #if CONFIG_CODEC == SWCODEC
-    rec_set_source(source, source_flags | SRCF_RECORDING);
-#else
-    (void)source_flags;
+    rec_set_source(options->rec_source,
+                   options->rec_source_flags | SRCF_RECORDING);
 #endif
 
-    audio_set_recording_options(frequency, quality, source,
-        channel_mode, editable, prerecord_time);
+    audio_set_recording_options(options);
 }
-
-static char path_buffer[MAX_PATH];
 
 /* steals mp3 buffer, creates unique filename and starts recording */
 void rec_record(void)
 {
+#if CONFIG_CODEC != SWCODEC
     talk_buffer_steal(); /* we use the mp3 buffer */
+#endif
+    IF_CNFN_NUM_(file_number = -1;) /* Hit disk for number   */
     audio_record(rec_create_filename(path_buffer));
 }
 
@@ -753,7 +792,6 @@ static void trigger_listener(int trigger_status)
         case TRIG_GO:
             if((audio_status() & AUDIO_STATUS_RECORD) != AUDIO_STATUS_RECORD)
             {
-                talk_buffer_steal(); /* we use the mp3 buffer */
                 rec_record();
                 /* give control to mpeg thread so that it can start
                    recording */
@@ -831,6 +869,8 @@ bool recording_screen(bool no_source)
         ID2P(LANG_GIGABYTE)
     };
 
+    struct audio_recording_options rec_options;
+
     global_settings.recscreen_on = true;
     cursor = 0;
 #if (CONFIG_LED == LED_REAL) && !defined(SIMULATOR)
@@ -838,35 +878,26 @@ bool recording_screen(bool no_source)
 #endif
 
 #if CONFIG_CODEC == SWCODEC
-    audio_stop();
-    voice_stop();
     /* recording_menu gets messed up: so reset talk_menu */
     talk_menu = global_settings.talk_menu;
     global_settings.talk_menu = 0;
+    /* audio_init_recording stops anything playing when it takes the audio
+       buffer */
 #else
     /* Yes, we use the D/A for monitoring */
     peak_meter_enabled = true;
     peak_meter_playback(true);
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-    audio_init_recording(talk_get_bufsize());
-#else
     audio_init_recording(0);
-#endif
     sound_set_volume(global_settings.volume);
 
 #ifdef HAVE_AGC
     peak_meter_get_peakhold(&peak_l, &peak_r);
 #endif
 
-    rec_set_recording_options(global_settings.rec_frequency,
-                              global_settings.rec_quality,
-                              global_settings.rec_source,
-                              0,
-                              global_settings.rec_channels,
-                              global_settings.rec_editable,
-                              global_settings.rec_prerecord_time);
+    rec_init_recording_options(&rec_options);
+    rec_set_recording_options(&rec_options);
 
     set_gain();
     settings_apply_trigger();
@@ -1025,7 +1056,6 @@ bool recording_screen(bool no_source)
                     {
                         /* manual recording */
                         have_recorded = true;
-                        talk_buffer_steal(); /* we use the mp3 buffer */
                         rec_record();
                         last_seconds = 0;
                         if (talk_menu)
@@ -1253,16 +1283,10 @@ bool recording_screen(bool no_source)
 #if CONFIG_CODEC == SWCODEC
                         /* reinit after submenu exit */
                         audio_close_recording();
-                        audio_init_recording(talk_get_bufsize());
+                        audio_init_recording(0);
 #endif
-                        rec_set_recording_options(
-                            global_settings.rec_frequency,
-                            global_settings.rec_quality,
-                            global_settings.rec_source,
-                            0,
-                            global_settings.rec_channels,
-                            global_settings.rec_editable,
-                            global_settings.rec_prerecord_time);
+                        rec_init_recording_options(&rec_options);
+                        rec_set_recording_options(&rec_options);
 
                         if(rec_create_directory() > 0)
                             have_recorded = true;
@@ -1739,11 +1763,7 @@ bool recording_screen(bool no_source)
         }
     } /* end while(!done) */
 
-#if CONFIG_CODEC == SWCODEC        
-    audio_stat = pcm_rec_status();
-#else
     audio_stat = audio_status();
-#endif
     if (audio_stat & AUDIO_STATUS_ERROR)
     {
         gui_syncsplash(0, true, str(LANG_SYSFONT_DISK_FULL));
@@ -1804,11 +1824,22 @@ bool recording_screen(bool no_source)
 #if CONFIG_KEYPAD == RECORDER_PAD
 bool f2_rec_screen(void)
 {
+    static const char* const freq_str[6] =
+    {
+        "44.1kHz",
+        "48kHz",
+        "32kHz",
+        "22.05kHz",
+        "24kHz",
+        "16kHz"
+    };
+
     bool exit = false;
     bool used = false;
     int w, h, i;
     char buf[32];
     int button;
+    struct audio_recording_options rec_options;
 
     FOR_NB_SCREENS(i)
     {
@@ -1919,13 +1950,8 @@ bool f2_rec_screen(void)
         }
     }
 
-    rec_set_recording_options(global_settings.rec_frequency,
-                              global_settings.rec_quality,
-                              global_settings.rec_source,
-                              0,
-                              global_settings.rec_channels,
-                              global_settings.rec_editable,
-                              global_settings.rec_prerecord_time);
+    rec_init_recording_options(&rec_options);
+    rec_set_recording_options(&rec_options);
 
     set_gain();
     
@@ -1948,6 +1974,8 @@ bool f3_rec_screen(void)
         str(LANG_SYSFONT_RECORDING_SRC_LINE),
         str(LANG_SYSFONT_RECORDING_SRC_DIGITAL)
     };
+    struct audio_recording_options rec_options;
+
     FOR_NB_SCREENS(i)
     {
         screens[i].setfont(FONT_SYSFIXED);
@@ -2019,13 +2047,8 @@ bool f3_rec_screen(void)
         }
     }
 
-    rec_set_recording_options(global_settings.rec_frequency,
-                              global_settings.rec_quality,
-                              global_settings.rec_source,
-                              0,
-                              global_settings.rec_channels,
-                              global_settings.rec_editable,
-                              global_settings.rec_prerecord_time);
+    rec_init_recording_options(&rec_options);
+    rec_set_recording_options(&rec_options);
 
     set_gain();
 
@@ -2066,23 +2089,30 @@ unsigned long audio_num_recorded_bytes(void)
 }
 
 #if CONFIG_CODEC == SWCODEC
-void rec_set_source(int source, int flags)
+void rec_set_source(int source, unsigned flags)
 {
     source = source;
     flags = flags;
 }
-#endif
 
-void audio_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode,
-                                bool editable, int prerecord_time)
+#ifdef HAVE_SPDIF_IN
+#ifdef HAVE_SPDIF_POWER
+void audio_set_spdif_power_setting(bool on)
 {
-    frequency = frequency;
-    quality = quality;
-    source = source;
-    channel_mode = channel_mode;
-    editable = editable;
-    prerecord_time = prerecord_time;
+    on = on;
+}
+
+bool audio_get_spdif_power_setting(void)
+{
+    return true;
+}
+#endif /* HAVE_SPDIF_POWER */
+#endif /* HAVE_SPDIF_IN */
+#endif /* CONFIG_CODEC == SWCODEC */
+
+void audio_set_recording_options(struct audio_recording_options *options)
+{
+    options = options;
 }
 
 void audio_set_recording_gain(int left, int right, int type)
@@ -2104,7 +2134,7 @@ void audio_resume_recording(void)
 {
 }
 
-void pcm_rec_get_peaks(int *left, int *right)
+void pcm_calculate_rec_peaks(int *left, int *right)
 {
     if (left)
         *left = 0;

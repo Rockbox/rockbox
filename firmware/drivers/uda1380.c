@@ -49,9 +49,10 @@ short recgain_line;
 #define NUM_DEFAULT_REGS 13
 unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
 {
-   REG_0,          EN_DAC | EN_INT | EN_DEC | SYSCLK_256FS | WSPLL_25_50,
+   REG_0,          EN_DAC | EN_INT | EN_DEC | ADC_CLK | DAC_CLK |
+                   SYSCLK_256FS | WSPLL_25_50,
    REG_I2S,        I2S_IFMT_IIS,
-   REG_PWR,        PON_BIAS,
+   REG_PWR,        PON_PLL | PON_BIAS,
                    /* PON_HP & PON_DAC is enabled later */
    REG_AMIX,       AMIX_RIGHT(0x3f) | AMIX_LEFT(0x3f),
                    /* 00=max, 3f=mute */
@@ -60,7 +61,7 @@ unsigned short uda1380_defaults[2*NUM_DEFAULT_REGS] =
    REG_MIX_VOL,    MIX_VOL_CH_1(0) | MIX_VOL_CH_2(0xff),
                    /* 00=max, ff=mute */
    REG_EQ,         EQ_MODE_MAX,
-                   /* Bass and tremble = 0 dB */
+                   /* Bass and treble = 0 dB */
    REG_MUTE,       MUTE_MASTER | MUTE_CH2,
                    /* Mute everything to start with */
    REG_MIX_CTL,    MIX_CTL_MIX,
@@ -192,6 +193,43 @@ void uda1380_reset(void)
 #endif
 }
 
+/**
+ * Sets frequency settings for DAC and ADC relative to MCLK
+ *
+ * Selection for frequency ranges:
+ *  Fs:        range:       with:
+ *  11025: 0 = 6.25 to 12.5 MCLK/2 SCLK, LRCK: Audio Clk / 16
+ *  22050: 1 = 12.5 to 25   MCLK/2 SCLK, LRCK: Audio Clk / 8
+ *  44100: 2 = 25   to 50   MCLK   SCLK, LRCK: Audio Clk / 4 (default)
+ *  88200: 3 = 50   to 100  MCLK   SCLK, LRCK: Audio Clk / 2 <= TODO: Needs WSPLL
+ */
+void uda1380_set_frequency(unsigned fsel)
+{
+    static const unsigned short values_reg[4][2] =
+    {
+                                                          /* Fs:   */
+        { 0,              WSPLL_625_125 | SYSCLK_512FS }, /* 11025 */
+        { 0,              WSPLL_125_25  | SYSCLK_256FS }, /* 22050 */
+        { MIX_CTL_SEL_NS, WSPLL_25_50   | SYSCLK_256FS }, /* 44100 */
+        { MIX_CTL_SEL_NS, WSPLL_50_100  | SYSCLK_256FS }, /* 88200 */
+    };
+
+    const unsigned short *ent;
+
+    if (fsel >= ARRAYLEN(values_reg))
+        fsel = 2;
+
+    ent = values_reg[fsel];
+
+    /* Set WSPLL input frequency range or SYSCLK divider */
+    uda1380_regs[REG_0] &= ~0xf;
+    uda1380_write_reg(REG_0, uda1380_regs[REG_0] | ent[1]);
+
+    /* Choose 3rd order or 5th order noise shaper */
+    uda1380_regs[REG_MIX_CTL] &= ~MIX_CTL_SEL_NS;
+    uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL] | ent[0]);
+}
+
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
 int uda1380_init(void)
 {
@@ -227,30 +265,34 @@ void uda1380_close(void)
  */
 void uda1380_enable_recording(bool source_mic)
 {
+    uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
     uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
 
     if (source_mic)
     {
         /* VGA_GAIN: 0=0 dB, F=30dB */
+        /* Output of left ADC is fed into right bitstream */
+        uda1380_regs[REG_PWR] &= ~(PON_PLL | PON_PGAR | PON_ADCR);
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_LNA | PON_ADCL);
+        uda1380_regs[REG_ADC] &= ~SKIP_DCFIL;
         uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & VGA_GAIN_MASK)
                                    | SEL_LNA | SEL_MIC | EN_DCFIL);
         uda1380_write_reg(REG_PGA, 0);
-    } else
+    }
+    else
     {
         /* PGA_GAIN: 0=0 dB, F=24dB */
+        uda1380_regs[REG_PWR] &= ~(PON_PLL | PON_LNA);
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PGAL | PON_ADCL
                                    | PON_PGAR | PON_ADCR);
         uda1380_write_reg(REG_ADC, EN_DCFIL);
-        uda1380_write_reg(REG_PGA, (uda1380_regs[REG_PGA] & PGA_GAIN_MASK)
-                                   | PGA_GAINL(0) | PGA_GAINR(0));
+        uda1380_write_reg(REG_PGA, uda1380_regs[REG_PGA] & PGA_GAIN_MASK);
     }
 
     sleep(HZ/8);
 
     uda1380_write_reg(REG_I2S,     uda1380_regs[REG_I2S] | I2S_MODE_MASTER);
     uda1380_write_reg(REG_MIX_CTL, MIX_MODE(1)); 
-
 }
 
 /** 
@@ -262,10 +304,13 @@ void uda1380_disable_recording(void)
     sleep(HZ/8);
     
     uda1380_write_reg(REG_I2S, I2S_IFMT_IIS);
-    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] & ~(PON_LNA | PON_ADCL
-                                                         | PON_ADCR | PON_PGAL
-                                                         | PON_PGAR));
-    uda1380_write_reg(REG_0,   uda1380_regs[REG_0] & ~EN_ADC);
+
+    uda1380_regs[REG_PWR] &= ~(PON_LNA | PON_ADCL | PON_ADCR | PON_PGAL | PON_PGAR);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PLL);
+
+    uda1380_regs[REG_0] &= ~EN_ADC;
+    uda1380_write_reg(REG_0,   uda1380_regs[REG_0] | ADC_CLK | DAC_CLK);
+
     uda1380_write_reg(REG_ADC, SKIP_DCFIL);
 }
 
@@ -372,21 +417,4 @@ void uda1380_set_monitor(int enable)
         uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] & ~MUTE_CH2);
     else           /* mute channel 2 */
         uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] | MUTE_CH2);
-}
-
-/* Change the order of the noise chaper,
-   5th order is recommended above 32kHz */
-void uda1380_set_nsorder(int order)
-{
-    switch(order)
-    {
-    case 5:
-        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL]
-                                       | MIX_CTL_SEL_NS);
-        break;
-    case 3:
-    default:
-        uda1380_write_reg(REG_MIX_CTL, uda1380_regs[REG_MIX_CTL]
-                                       & ~MIX_CTL_SEL_NS);
-    }
 }

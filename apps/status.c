@@ -46,7 +46,7 @@
 #ifdef CONFIG_TUNER
 #include "radio.h"
 #endif
-#if CONFIG_CODEC == SWCODEC
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
 #include "pcm_record.h"
 #endif
 
@@ -87,10 +87,6 @@ int current_playmode(void)
     }
 
 #ifdef HAVE_RECORDING
-#if CONFIG_CODEC == SWCODEC       
-    audio_stat = pcm_rec_status();
-#endif
-
     if(audio_stat & AUDIO_STATUS_RECORD)
     {
         if(audio_stat & AUDIO_STATUS_PAUSE)

@@ -390,8 +390,7 @@ int system_memory_guard(int newmode)
     (void)newmode;
     return 0;
 }
-#elif defined(CPU_COLDFIRE)
-/* system code is in target tree for all coldfire targets */
+
 #elif CONFIG_CPU == SH7034
 #include "led.h"
 #include "system.h"

@@ -2453,34 +2453,32 @@ static void stop_recording(void)
     resume_recording();
 }
 
-void audio_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode,
-                                bool editable, int prerecord_time)
+void audio_set_recording_options(struct audio_recording_options *options)
 {
     bool is_mpeg1;
 
-    is_mpeg1 = (frequency < 3)?true:false;
+    is_mpeg1 = (options->rec_frequency < 3)?true:false;
 
     rec_version_index = is_mpeg1?3:2;
-    rec_frequency_index = frequency % 3;
+    rec_frequency_index = options->rec_frequency % 3;
 
-    shadow_encoder_control = (quality << 17) |
+    shadow_encoder_control = (options->rec_quality << 17) |
         (rec_frequency_index << 10) |
         ((is_mpeg1?1:0) << 9) |
-        (((channel_mode * 2 + 1) & 3) << 6) |
+        (((options->rec_channels * 2 + 1) & 3) << 6) |
         (1 << 5) /* MS-stereo */ |
         (1 << 2) /* Is an original */;
     mas_writemem(MAS_BANK_D0, MAS_D0_ENCODER_CONTROL, &shadow_encoder_control,1);
 
     DEBUGF("mas_writemem(MAS_BANK_D0, ENCODER_CONTROL, %x)\n", shadow_encoder_control);
 
-    shadow_soft_mute = editable?4:0;
+    shadow_soft_mute = options->rec_editable?4:0;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute,1);
 
     DEBUGF("mas_writemem(MAS_BANK_D0, SOFT_MUTE, %x)\n", shadow_soft_mute);
 
     shadow_io_control_main = ((1 << 10) | /* Monitoring ON */
-        ((source < 2)?1:2) << 8) | /* Input select */
+        ((options->rec_source < 2)?1:2) << 8) | /* Input select */
         (1 << 5) | /* SDO strobe invert */
         ((is_mpeg1?0:1) << 3) |
         (1 << 2) | /* Inverted SIBC clock signal */
@@ -2489,7 +2487,7 @@ void audio_set_recording_options(int frequency, int quality,
 
     DEBUGF("mas_writemem(MAS_BANK_D0, IO_CONTROL_MAIN, %x)\n", shadow_io_control_main);
 
-    if(source == AUDIO_SRC_MIC)
+    if(options->rec_source == AUDIO_SRC_MIC)
     {
         /* Copy left channel to right (mono mode) */
         mas_codec_writereg(8, 0x8000);
@@ -2500,7 +2498,7 @@ void audio_set_recording_options(int frequency, int quality,
         mas_codec_writereg(8, 0);
     }
 
-    prerecording_max_seconds = prerecord_time;
+    prerecording_max_seconds = options->rec_prerecord_time;
     if(prerecording_max_seconds)
     {
         prerecording = true;

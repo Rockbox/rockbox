@@ -28,8 +28,17 @@ extern void uda1380_set_bass(int value);
 extern void uda1380_set_treble(int value);
 extern int uda1380_mute(int mute);
 extern void uda1380_close(void);
-extern void uda1380_set_nsorder(int order);
-
+/**
+ * Sets frequency settings for DAC and ADC relative to MCLK
+ *
+ * Selection for frequency ranges:
+ *  Fs:        range:       with:
+ *  11025: 0 = 6.25 to 12.5 SCLK, LRCK: Audio Clk / 16
+ *  22050: 1 = 12.5 to 25   SCLK, LRCK: Audio Clk / 8
+ *  44100: 2 = 25   to 50   SCLK, LRCK: Audio Clk / 4 (default)
+ *  88200: 3 = 50   to 100  SCLK, LRCK: Audio Clk / 2
+ */
+extern void uda1380_set_frequency(unsigned fsel);
 extern void uda1380_enable_recording(bool source_mic);
 extern void uda1380_disable_recording(void);
 extern void uda1380_set_recvol(int left, int right, int type);

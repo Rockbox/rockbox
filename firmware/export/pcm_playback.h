@@ -19,11 +19,23 @@
 #ifndef PCM_PLAYBACK_H
 #define PCM_PLAYBACK_H
 
+#include <sys/types.h>
+
+/* Typedef for registered callback (play and record) */
+typedef void (*pcm_more_callback_type)(unsigned char **start,
+                                       size_t *size);
+
 void pcm_init(void);
+
+/* set the pcm frequency - use values in hw_sampr_list
+ * use -1 for the default frequency
+ */
 void pcm_set_frequency(unsigned int frequency);
+/* apply settings to hardware immediately */
+void pcm_apply_settings(bool reset);
 
 /* This is for playing "raw" PCM data */
-void pcm_play_data(void (*get_more)(unsigned char** start, size_t* size),
+void pcm_play_data(pcm_more_callback_type get_more,
         unsigned char* start, size_t size);
 
 void pcm_calculate_peaks(int *left, int *right);
@@ -35,4 +47,4 @@ void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);
 
-#endif
+#endif /* PCM_PLAYBACK_H */

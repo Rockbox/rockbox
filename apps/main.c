@@ -286,6 +286,9 @@ void init(void)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     set_cpu_frequency(CPUFREQ_NORMAL);
+#ifdef CPU_COLDFIRE
+    coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
+#endif
     cpu_boost_id(true, CPUBOOSTID_MAININIT);
 #endif
     

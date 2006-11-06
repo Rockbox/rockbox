@@ -204,6 +204,7 @@ void main(void)
     kernel_init();
 
     set_cpu_frequency(CPUFREQ_NORMAL);
+    coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
 
     set_irq_level(0);
     lcd_init();
@@ -311,6 +312,9 @@ void main(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
+#ifdef CPU_COLDFIRE
+    coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
+#endif
 #endif
 
 #ifdef HAVE_UDA1380

@@ -21,7 +21,6 @@
 #define __SYSTEM_H__
 
 #include "cpu.h"
-#include "config.h"
 #include "stdbool.h"
 
 extern void system_reboot (void);
@@ -111,6 +110,23 @@ const char *get_cpu_boost_tracker(void);
 #define MAX(a, b) (((a)>(b))?(a):(b))
 #endif
 
+/* return number of elements in array a */
+#define ARRAYLEN(a) (sizeof(a)/sizeof((a)[0]))
+
+/* return p incremented by specified number of bytes */
+#define SKIPBYTES(p, count) ((typeof (p))((char *)(p) + (count)))
+
+#define P2_M1(p2)  ((1 << (p2))-1)
+
+/* align up or down to nearest 2^p2 */
+#define ALIGN_DOWN_P2(n, p2) ((n) & ~P2_M1(p2))
+#define ALIGN_UP_P2(n, p2)   ALIGN_DOWN_P2((n) + P2_M1(p2),p2)
+
+/* align up or down to nearest integer multiple of a */
+#define ALIGN_DOWN(n, a)     ((n)/(a)*(a))
+#define ALIGN_UP(n, a)       ALIGN_DOWN((n)+((a)-1),a)
+
+/* live endianness conversion */
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define letoh16(x) (x)
 #define letoh32(x) (x)
@@ -120,6 +136,8 @@ const char *get_cpu_boost_tracker(void);
 #define betoh32(x) swap32(x)
 #define htobe16(x) swap16(x)
 #define htobe32(x) swap32(x)
+#define swap_odd_even_be32(x) (x)
+#define swap_odd_even_le32(x) swap_odd_even32(x)
 #else
 #define letoh16(x) swap16(x)
 #define letoh32(x) swap32(x)
@@ -129,6 +147,37 @@ const char *get_cpu_boost_tracker(void);
 #define betoh32(x) (x)
 #define htobe16(x) (x)
 #define htobe32(x) (x)
+#define swap_odd_even_be32(x) swap_odd_even32(x)
+#define swap_odd_even_le32(x) (x)
+#endif
+
+/* static endianness conversion */
+#define SWAP_16(x) ((typeof(x))(unsigned short)(((unsigned short)(x) >> 8) | \
+                                                ((unsigned short)(x) << 8)))
+
+#define SWAP_32(x) ((typeof(x))(unsigned long)( ((unsigned long)(x) >> 24) | \
+                                               (((unsigned long)(x) & 0xff0000ul) >> 8) | \
+                                               (((unsigned long)(x) & 0xff00ul) << 8) | \
+                                                ((unsigned long)(x) << 24)))
+
+#ifdef ROCKBOX_LITTLE_ENDIAN
+#define LE_TO_H16(x) (x)
+#define LE_TO_H32(x) (x)
+#define H_TO_LE16(x) (x)
+#define H_TO_LE32(x) (x)
+#define BE_TO_H16(x) SWAP_16(x)
+#define BE_TO_H32(x) SWAP_32(x)
+#define H_TO_BE16(x) SWAP_16(x)
+#define H_TO_BE32(x) SWAP_32(x)
+#else
+#define LE_TO_H16(x) SWAP_16(x)
+#define LE_TO_H32(x) SWAP_32(x)
+#define H_TO_LE16(x) SWAP_16(x)
+#define H_TO_LE32(x) SWAP_32(x)
+#define BE_TO_H16(x) (x)
+#define BE_TO_H32(x) (x)
+#define H_TO_BE16(x) (x)
+#define H_TO_BE32(x) (x)
 #endif
 
 
@@ -180,6 +229,7 @@ enum {
      :                                       \
      : /* %0 */ I_CONSTRAINT((char)(mask)),  \
        /* %1 */ "z"(address-GBR))
+
 
 #endif /* CONFIG_CPU == SH7034 */
 
@@ -388,7 +438,20 @@ static inline unsigned long swap32(unsigned long value)
 #define invalidate_icache()
 
 #endif
-#else
+
+#ifndef CPU_COLDFIRE
+static inline unsigned long swap_odd_even32(unsigned long value)
+{
+    /*
+      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
+      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
+    */
+    unsigned long t = value & 0xff00ff00;
+    return (t >> 8) | ((t ^ value) << 8);
+}
+#endif
+
+#else /* SIMULATOR */
 
 static inline unsigned short swap16(unsigned short value)
     /*
@@ -412,8 +475,18 @@ static inline unsigned long swap32(unsigned long value)
     return (lo << 16) | hi;
 }
 
+static inline unsigned long swap_odd_even32(unsigned long value)
+{
+    /*
+      result[31..24],[15.. 8] = value[23..16],[ 7.. 0]
+      result[23..16],[ 7.. 0] = value[31..24],[15.. 8]
+    */
+    unsigned long t = value & 0xff00ff00;
+    return (t >> 8) | ((t ^ value) << 8);
+}
+
 #define invalidate_icache()
 
-#endif
+#endif /* !SIMULATOR */
 
-#endif
+#endif /* __SYSTEM_H__ */

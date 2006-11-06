@@ -32,15 +32,16 @@ int rec_create_directory(void);
 #define SRCF_FMRADIO_PLAYING  0x0000    /* default */
 #define SRCF_FMRADIO_PAUSED   0x2000
 #endif
-void rec_set_source(int source, int flags);
+void rec_set_source(int source, unsigned flags);
 #endif /* CONFIG_CODEC == SW_CODEC */
 
+/* Initializes a recording_options structure with global settings.
+   pass returned data to audio_set_recording_options or 
+   rec_set_recording_options */
+void rec_init_recording_options(struct audio_recording_options *options);
 /* steals mp3 buffer, sets source and then options */
-/* SRCF_RECORDING is implied */
-void rec_set_recording_options(int frequency, int quality,
-                               int source, int source_flags,
-                               int channel_mode, bool editable,
-                               int prerecord_time);
+/* SRCF_RECORDING is implied for SWCODEC */
+void rec_set_recording_options(struct audio_recording_options *options);
 
 /* steals mp3 buffer, creates unique filename and starts recording */
 void rec_record(void);

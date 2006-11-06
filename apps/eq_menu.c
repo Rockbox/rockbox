@@ -710,7 +710,8 @@ static bool eq_save_preset(void)
     char filename[MAX_PATH];
     int *setting;
 
-    create_numbered_filename(filename, EQS_DIR, "eq", ".cfg", 2);
+    create_numbered_filename(filename, EQS_DIR, "eq", ".cfg", 2
+        IF_CNFN_NUM_(, NULL));
 
     /* allow user to modify filename */
     while (true) {

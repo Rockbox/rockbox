@@ -38,7 +38,7 @@
 
 /* Returns true if the buffer needs to change size */
 bool pcmbuf_is_same_size(size_t bufsize);
-void pcmbuf_init(size_t bufsize);
+size_t pcmbuf_init(size_t bufsize, char *bufend);
 /* Size in bytes used by the pcmbuffer */
 size_t pcmbuf_get_bufsize(void);
 size_t get_pcmbuf_descsize(void);

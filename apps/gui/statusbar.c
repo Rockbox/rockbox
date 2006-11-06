@@ -124,19 +124,6 @@
 #endif
 #define STATUSBAR_TIME_X_END(statusbar_width)   statusbar_width - 1 - \
                                                 STATUSBAR_DISK_WIDTH
-#if defined(HAVE_RECORDING)
-/* analogue frequency numbers taken from the order of frequencies in sample_rate */
-#define FREQ_44 7
-#define FREQ_48 8
-#define FREQ_32 6
-#define FREQ_22 4
-#define FREQ_24 5
-#define FREQ_16 3
-#ifdef HAVE_SPDIF_IN
-#define SOURCE_SPDIF 2
-#endif
-#endif
-
 struct gui_syncstatusbar statusbars;
 
 void gui_statusbar_init(struct gui_statusbar * bar)
@@ -600,41 +587,113 @@ void gui_statusbar_time(struct screen * display, int hour, int minute)
 #endif
 
 #ifdef HAVE_RECORDING
+#if CONFIG_CODEC == SWCODEC
+/**
+ * Write a number to the display using bitmaps and return new position
+ */
+static int write_bitmap_number(struct screen * display, int value,
+                               int x, int y)
+{
+    char buf[12], *ptr;
+    snprintf(buf, sizeof(buf), "%d", value);
+
+    for (ptr = buf; *ptr != '\0'; ptr++, x += BM_GLYPH_WIDTH)
+        display->mono_bitmap(bitmap_glyphs_4x8[*ptr - '0'], x, y,
+                             BM_GLYPH_WIDTH, STATUSBAR_HEIGHT);
+    return x;
+}
+
+/**
+ * Write format info bitmaps - right justified
+ */
+static void gui_statusbar_write_format_info(struct screen * display)
+{
+    /* Can't fit info for sw codec targets in statusbar using FONT_SYSFIXED 
+       so must use icons */
+    int rec_format = global_settings.rec_format;
+    unsigned bitrk = 0; /* compiler warns about unitialized use !! */
+    int xpos       = STATUSBAR_ENCODER_X_POS;
+    int width      = STATUSBAR_ENCODER_WIDTH;
+    const unsigned char *bm = bitmap_formats_18x8[rec_format];
+
+    if (rec_format == REC_FORMAT_MPA_L3)
+    {
+        /* Special handling for mp3 */
+        bitrk = global_settings.mp3_enc_config.bitrate;
+        bitrk = mp3_enc_bitr[bitrk];
+
+        width = BM_MPA_L3_M_WIDTH;
+
+        /* Slide 'M' to right if fewer than three digits used */
+        if (bitrk > 999)
+            bitrk = 999; /* neurotic safety check if corrupted */
+        else
+        {
+            if (bitrk < 100)
+                xpos += BM_GLYPH_WIDTH;
+            if (bitrk < 10)
+                xpos += BM_GLYPH_WIDTH;
+        }
+    }
+       
+
+    /* Show bitmap - clipping right edge if needed */
+    display->mono_bitmap_part(bm, 0, 0, STATUSBAR_ENCODER_WIDTH,
+        xpos, STATUSBAR_Y_POS, width, STATUSBAR_HEIGHT);
+
+    if (rec_format == REC_FORMAT_MPA_L3)
+    {
+        xpos += BM_MPA_L3_M_WIDTH; /* to right of 'M' */
+        write_bitmap_number(display, bitrk, xpos, STATUSBAR_Y_POS);
+    }
+}
+
+/**
+ * Write sample rate using bitmaps - left justified
+ */
+static void gui_statusbar_write_samplerate_info(struct screen * display)
+{
+    unsigned long samprk;
+    int xpos;
+
+#ifdef SIMULATOR
+    samprk = 44100;
+#else
+#ifdef HAVE_SPDIF_IN
+    if (global_settings.rec_source == AUDIO_SRC_SPDIF)
+        /* Use rate in use, not current measured rate if it changed */
+        samprk = pcm_rec_sample_rate();
+    else
+#endif
+        samprk = rec_freq_sampr[global_settings.rec_frequency];
+#endif /* SIMULATOR */
+
+    samprk /= 1000;
+    if (samprk > 99)
+        samprk = 99;  /* Limit to 3 glyphs */
+
+    xpos = write_bitmap_number(display, (unsigned)samprk,
+                               STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS);
+
+    /* write the 'k' */
+    display->mono_bitmap(bitmap_glyphs_4x8[Glyph_4x8_k], xpos, 
+                         STATUSBAR_Y_POS, BM_GLYPH_WIDTH,
+                         STATUSBAR_HEIGHT);
+}
+#endif /* CONFIG_CODEC == SWCODEC */
+
 void gui_statusbar_icon_recording_info(struct screen * display)
 {
-#if (CONFIG_CODEC != SWCODEC) || (defined(SIMULATOR) && defined(HAVE_SPDIF_IN))
-    char buffer[3];
-#endif
 #if CONFIG_CODEC != SWCODEC
+    char buffer[3];
     int width, height;
-    static char* const sample_rate[12] =
-    {
-        "8",
-        "11",
-        "12",
-        "16",
-        "22",
-        "24",
-        "32",
-        "44",
-        "48",
-        "64",
-        "88",
-        "96"
-    };
-
     display->setfont(FONT_SYSFIXED);
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
     /* Display Codec info in statusbar */
 #if CONFIG_CODEC == SWCODEC
-    /* Can't fit info for sw codec targets in statusbar using FONT_SYSFIXED 
-       so must use icons */
-    display->mono_bitmap(bitmap_icons_18x8[global_settings.rec_quality],
-                             STATUSBAR_ENCODER_X_POS, STATUSBAR_Y_POS,
-                             STATUSBAR_ENCODER_WIDTH, STATUSBAR_HEIGHT);
-#else
-
+    gui_statusbar_write_format_info(display);
+#else /* !SWCODEC */
     display->mono_bitmap(bitmap_icons_5x8[Icon_q],
                              STATUSBAR_ENCODER_X_POS + 8, STATUSBAR_Y_POS,
                              5, STATUSBAR_HEIGHT);
@@ -643,56 +702,37 @@ void gui_statusbar_icon_recording_info(struct screen * display)
     display->getstringsize(buffer, &width, &height);
     if (height <= STATUSBAR_HEIGHT)
         display->putsxy(STATUSBAR_ENCODER_X_POS + 13, STATUSBAR_Y_POS, buffer);
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 
     /* Display Samplerate info in statusbar */
-#if defined(HAVE_SPDIF_IN)            
-    if (global_settings.rec_source == SOURCE_SPDIF)
+#if CONFIG_CODEC == SWCODEC
+    /* SWCODEC targets use bitmaps for glyphs */    
+    gui_statusbar_write_samplerate_info(display);
+#else /* !SWCODEC */
+    /* hwcodec targets have sysfont characters */ 
+#ifdef HAVE_SPDIF_IN
+    if (global_settings.rec_source == AUDIO_SRC_SPDIF)
     {
-#if (CONFIG_CODEC != MAS3587F) && !defined(SIMULATOR)
-        display->mono_bitmap(bitmap_icons_12x8[audio_get_spdif_sample_rate()],
-                                STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS,
-                                STATUSBAR_RECFREQ_WIDTH, STATUSBAR_HEIGHT);
-#else
         /* Can't measure S/PDIF sample rate on Archos/Sim yet */
         snprintf(buffer, sizeof(buffer), "--");
-#endif
     }
     else
 #endif /* HAVE_SPDIF_IN */
     {
-    /* Analogue frequency in wrong order so remap settings numbers */
-        int freq = global_settings.rec_frequency;
-        if (freq == 0)
-            freq = FREQ_44;
-        else if (freq == 1)
-            freq = FREQ_48;
-        else if (freq == 2)
-            freq = FREQ_32;
-        else if (freq == 3)
-            freq = FREQ_22;
-        else if (freq == 4)
-            freq = FREQ_24;
-        else if (freq == 5)
-            freq = FREQ_16;
-
-#if CONFIG_CODEC == SWCODEC
-        /* samplerate icons for swcodec targets*/
-        display->mono_bitmap(bitmap_icons_12x8[freq],
-                                STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS,
-                                STATUSBAR_RECFREQ_WIDTH, STATUSBAR_HEIGHT);
-    }
-#else
-        /* hwcodec targets have sysfont characters */ 
-        snprintf(buffer, sizeof(buffer), "%s", sample_rate[freq]);
-        display->getstringsize(buffer, &width, &height);
+        static char const * const freq_strings[12] =
+        { "44", "48", "32", "22", "24", "16" };
+        snprintf(buffer, sizeof(buffer), "%s",
+                 freq_strings[global_settings.rec_frequency]);
     }
 
-        if (height <= STATUSBAR_HEIGHT)
-            display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
+    display->getstringsize(buffer, &width, &height);
 
-        display->setfont(FONT_UI);
-#endif
+    if (height <= STATUSBAR_HEIGHT)
+        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, buffer);
+
+    display->setfont(FONT_UI);
+#endif /* CONFIG_CODEC == SWCODEC */
+
     /* Display Channel status in status bar */
     if(global_settings.rec_channels)
     {

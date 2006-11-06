@@ -15,6 +15,7 @@
 // the malloc() system is provided.
 
 #include "wavpack.h"
+#include "system.h"
 
 #include <string.h>
 
@@ -118,19 +119,16 @@ uint32_t bs_close_write (Bitstream *bs)
 void little_endian_to_native (void *data, char *format)
 {
     uchar *cp = (uchar *) data;
-    int32_t temp;
 
     while (*format) {
         switch (*format) {
             case 'L':
-                temp = cp [0] + ((int32_t) cp [1] << 8) + ((int32_t) cp [2] << 16) + ((int32_t) cp [3] << 24);
-                * (int32_t *) cp = temp;
+                *(long *)cp = letoh32(*(long *)cp);
                 cp += 4;
                 break;
 
             case 'S':
-                temp = cp [0] + (cp [1] << 8);
-                * (short *) cp = (short) temp;
+                *(short *)cp = letoh16(*(short *)cp);
                 cp += 2;
                 break;
 
@@ -148,28 +146,22 @@ void little_endian_to_native (void *data, char *format)
 void native_to_little_endian (void *data, char *format)
 {
     uchar *cp = (uchar *) data;
-    int32_t temp;
 
     while (*format) {
         switch (*format) {
             case 'L':
-                temp = * (int32_t *) cp;
-                *cp++ = (uchar) temp;
-                *cp++ = (uchar) (temp >> 8);
-                *cp++ = (uchar) (temp >> 16);
-                *cp++ = (uchar) (temp >> 24);
+                *(long *)cp = htole32(*(long *)cp);
+                cp += 4;
                 break;
 
             case 'S':
-                temp = * (short *) cp;
-                *cp++ = (uchar) temp;
-                *cp++ = (uchar) (temp >> 8);
+                *(short *)cp = htole16(*(short *)cp);
+                cp += 2;
                 break;
 
             default:
                 if (*format >= '0' && *format <= '9')
                     cp += *format - '0';
-
                 break;
         }
 

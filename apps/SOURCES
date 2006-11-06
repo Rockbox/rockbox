@@ -73,6 +73,9 @@ pcmbuf.c
 playback.c
 codecs.c
 dsp.c
+#ifdef HAVE_RECORDING
+enc_config.c
+#endif
 eq.c	 	
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)	 	
 dsp_cf.S
