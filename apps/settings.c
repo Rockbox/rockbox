@@ -1982,9 +1982,14 @@ bool do_set_setting(const unsigned char* string, void *variable,
     bool done = false;
     struct gui_synclist lists;
     int oldvalue;
+    bool allow_wrap = true;
     
     if (cb_data->type == INT)
-        oldvalue = *(int*)variable;
+    {
+         oldvalue = *(int*)variable;
+         if (variable == &global_settings.volume)
+             allow_wrap = false;
+    }
     else oldvalue = *(bool*)variable;
     
     gui_synclist_init(&lists,value_setting_get_name_cb,(void*)cb_data,false,1);
@@ -2008,8 +2013,8 @@ bool do_set_setting(const unsigned char* string, void *variable,
         action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK); 
         if (action == ACTION_NONE)
             continue;
-        
-        if (gui_synclist_do_button(&lists,action))
+        if (gui_synclist_do_button(&lists,action,
+                                   allow_wrap?LIST_WRAP_UNLESS_HELD:LIST_WRAP_OFF))
         {
             if (global_settings.talk_menu)
             {

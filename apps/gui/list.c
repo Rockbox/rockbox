@@ -720,18 +720,32 @@ void gui_synclist_scroll_left(struct gui_synclist * lists)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
+unsigned gui_synclist_do_button(struct gui_synclist * lists,
+                                unsigned button,enum list_wrap wrap)
 {
 #ifdef HAVE_LCD_BITMAP
     static bool scrolling_left = false;
 #endif
 
-    gui_synclist_limit_scroll(lists, true);
+    switch (wrap)
+    {
+        case LIST_WRAP_ON:
+            gui_synclist_limit_scroll(lists, false);
+        break;
+        case LIST_WRAP_OFF:
+            gui_synclist_limit_scroll(lists, true);
+        break;
+        case LIST_WRAP_UNLESS_HELD:
+            if (button == ACTION_STD_PREVREPEAT ||
+                button == ACTION_STD_NEXTREPEAT)
+                gui_synclist_limit_scroll(lists, true);
+            else gui_synclist_limit_scroll(lists, false);
+        break;
+    };
+    
     switch(button)
     {
         case ACTION_STD_PREV:
-            gui_synclist_limit_scroll(lists, false);
-
         case ACTION_STD_PREVREPEAT:
             gui_synclist_select_previous(lists);
             gui_synclist_draw(lists);
@@ -739,8 +753,6 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button)
             return ACTION_STD_PREV;
 
         case ACTION_STD_NEXT:
-            gui_synclist_limit_scroll(lists, false);
-
         case ACTION_STD_NEXTREPEAT:
             gui_synclist_select_next(lists);
             gui_synclist_draw(lists);

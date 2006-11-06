@@ -184,7 +184,7 @@ void edit_list(void)
     {
         rb->gui_synclist_draw(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&lists,button))
+        if (rb->gui_synclist_do_button(&lists,button,LIST_WRAP_UNLESS_HELD))
             continue;
         selection = rb->gui_synclist_get_sel_pos(&lists);
         switch (button)

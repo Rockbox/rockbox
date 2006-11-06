@@ -275,7 +275,8 @@ struct plugin_api {
     void (*gui_synclist_scroll_right)(struct gui_synclist * lists);
     void (*gui_synclist_scroll_left)(struct gui_synclist * lists);
 #endif
-    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists, unsigned button);
+    unsigned (*gui_synclist_do_button)(struct gui_synclist * lists,
+                                         unsigned button,enum list_wrap wrap);
 
     /* button */
     long (*button_get)(bool block);

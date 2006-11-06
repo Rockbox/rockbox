@@ -141,7 +141,7 @@ int menu_show(int m)
         if( menus[m].callback != NULL )
             key = menus[m].callback(key, m);
         /* If moved, "say" the entry under the cursor */
-        if(gui_synclist_do_button(&(menus[m].synclist), key))
+        if(gui_synclist_do_button(&(menus[m].synclist), key,LIST_WRAP_UNLESS_HELD))
             menu_talk_selected(m);
         switch( key ) {
             case ACTION_STD_OK:

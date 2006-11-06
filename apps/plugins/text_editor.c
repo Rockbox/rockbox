@@ -349,7 +349,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->gui_synclist_draw(&lists);
         cur_sel = rb->gui_synclist_get_sel_pos(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&lists,button))
+        if (rb->gui_synclist_do_button(&lists,button,LIST_WRAP_UNLESS_HELD))
             continue;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
         rb->cpu_boost(0);

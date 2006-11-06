@@ -674,7 +674,7 @@ static bool dirbrowse(void)
         }
 #endif
         button = get_action(CONTEXT_TREE,HZ/5);
-        returned_button = gui_synclist_do_button(&tree_lists, button);
+        returned_button = gui_synclist_do_button(&tree_lists, button,LIST_WRAP_UNLESS_HELD);
         if (returned_button)
             need_update = true;
         if (returned_button == ACTION_STD_CANCEL)

@@ -26,6 +26,12 @@
 
 #define SCROLLBAR_WIDTH  6
 
+enum list_wrap {
+    LIST_WRAP_ON = 0,
+    LIST_WRAP_OFF,
+    LIST_WRAP_UNLESS_HELD,
+};
+
 /*
  * The gui_list is based on callback functions, if you want the list
  * to display something you have to provide it a function that
@@ -312,10 +318,13 @@ void gui_synclist_scroll_left(struct gui_synclist * lists);
  * returns the action taken if any, 0 else
  *  - lists : the synchronized lists
  *  - button : the keycode of a pressed button
+ *  - specifies weather to allow the list to wrap or not, values at top of page
  * returned value :
  *  - ACTION_STD_NEXT when moving forward (next item or pgup)
  *  - ACTION_STD_PREV when moving backward (previous item or pgdown)
  */
-extern unsigned gui_synclist_do_button(struct gui_synclist * lists, unsigned button);
+extern unsigned gui_synclist_do_button(struct gui_synclist * lists,
+                                       unsigned button,
+                                       enum list_wrap);
 
 #endif /* _GUI_LIST_H_ */

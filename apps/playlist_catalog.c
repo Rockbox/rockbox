@@ -248,7 +248,7 @@ static int display_playlists(char* playlist, bool view)
         int button = get_action(CONTEXT_LIST,HZ/2);
         char* sel_file;
 
-        gui_synclist_do_button(&playlist_lists, button);
+        gui_synclist_do_button(&playlist_lists, button,LIST_WRAP_UNLESS_HELD);
 
         sel_file = playlists[gui_synclist_get_sel_pos(&playlist_lists)];
 

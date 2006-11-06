@@ -664,7 +664,7 @@ bool playlist_viewer_ex(char* filename)
         /* Timeout so we can determine if play status has changed */
         button = get_action(CONTEXT_TREE,HZ/2);
         int list_action;
-        if( (list_action=gui_synclist_do_button(&playlist_lists, button))!=0 )
+        if( (list_action=gui_synclist_do_button(&playlist_lists, button,LIST_WRAP_UNLESS_HELD))!=0 )
         {
             viewer.selected_track=gui_synclist_get_sel_pos(&playlist_lists);
             if(playlist_buffer_needs_reload(&viewer.buffer,
@@ -847,7 +847,7 @@ bool search_playlist(void)
     while (!exit)
     {
         button = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (gui_synclist_do_button(&playlist_lists, button))
+        if (gui_synclist_do_button(&playlist_lists, button,LIST_WRAP_UNLESS_HELD))
             continue;
         switch (button)
         {
