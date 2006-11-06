@@ -61,11 +61,10 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_MPA_L3] =
         AFMT_ENTRY("MP3", "mpa",      "mp3_enc",     "mp3\0"      ),
 
+#if CONFIG_CODEC == SWCODEC
     /* Audio Interchange File Format */
     [AFMT_AIFF] =
         AFMT_ENTRY("AIFF", "aiff",    NULL,          "aiff\0aif\0"),
-
-#if CONFIG_CODEC == SWCODEC
     /* Uncompressed PCM in a WAV file */
     [AFMT_PCM_WAV] =
         AFMT_ENTRY("WAV",  "wav",     "wav_enc",     "wav\0"      ),

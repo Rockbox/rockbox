@@ -34,9 +34,8 @@ enum
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
-    AFMT_AIFF,         /* Audio Interchange File Format */
-
 #if CONFIG_CODEC == SWCODEC
+    AFMT_AIFF,         /* Audio Interchange File Format */
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
     AFMT_FLAC,         /* FLAC */
