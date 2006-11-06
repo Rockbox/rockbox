@@ -2661,17 +2661,10 @@ void audio_init_recording(unsigned int buffer_offset)
     /* a dummy */
     (void)buffer_offset;
 }
-void audio_set_recording_options(int frequency, int quality,
-                                int source, int channel_mode,
-                                bool editable, int prerecord_time)
+void audio_set_recording_options(struct audio_recording_options *options)
 {
     /* a dummy */
-    (void)frequency;
-    (void)quality;
-    (void)source;
-    (void)channel_mode;
-    (void)editable;
-    (void)prerecord_time;
+    (void)options;
 }
 #endif /* SIMULATOR */
 #endif /* CONFIG_CODEC == MAS3587F */

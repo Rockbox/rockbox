@@ -181,7 +181,7 @@ void screen_dump(void)
     int x, y;
     static unsigned char line[BMP_LINESIZE];
 
-    create_numbered_filename(filename, "", "dump_", ".bmp", 4,
+    create_numbered_filename(filename, "", "dump_", ".bmp", 4
         IF_CNFN_NUM_(, NULL));
     DEBUGF("screen_dump\n");
 
