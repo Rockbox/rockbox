@@ -2204,6 +2204,13 @@ static void init_recording(void)
     shadow_soft_mute = 0;
     mas_writemem(MAS_BANK_D0, MAS_D0_SOFT_MUTE, &shadow_soft_mute, 1);
     
+#ifdef HAVE_SPDIF_OUT
+    val = 0x09; /* Disable SDO and SDI, low impedance S/PDIF outputs */
+#else
+    val = 0x2d; /* Disable SDO and SDI, disable S/PDIF output */
+#endif
+    mas_writemem(MAS_BANK_D0, MAS_D0_INTERFACE_CONTROL, &val, 1);
+
     /* Set Demand mode, monitoring OFF and validate all settings */
     shadow_io_control_main = 0x125;
     mas_writemem(MAS_BANK_D0, MAS_D0_IO_CONTROL_MAIN, &shadow_io_control_main, 1);
