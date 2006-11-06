@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/dash
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -249,7 +249,7 @@ voice() {
     TO_SPEAK=$1
     WAV_FILE=$2
     if [ ! -f "$WAV_FILE" ] || [ X$OVERWRITE_WAV = XY ]; then
-        if [ "${TO_SPEAK}" == "" ]; then
+        if [ "${TO_SPEAK}" = "" ]; then
             touch "$WAV_FILE"
         else
             case $TTS_ENGINE in
