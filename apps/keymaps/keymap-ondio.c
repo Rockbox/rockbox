@@ -125,6 +125,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_LEFT|BUTTON_REL,     BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,    BUTTON_NONE },
+    { ACTION_PS_TOGGLE_MODE,    BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU },
     { ACTION_PS_RESET,          BUTTON_MENU,                BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
     

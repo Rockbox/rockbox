@@ -362,11 +362,23 @@ int charging_screen(void)
 #endif /* CONFIG_CHARGING && !HAVE_POWEROFF_WHILE_CHARGING */
 
 #ifdef HAVE_PITCHSCREEN
+
+#define PITCH_MAX         2000
+#define PITCH_MIN         500
+#define PITCH_SMALL_DELTA 1
+#define PITCH_BIG_DELTA   10
+#define PITCH_NUDGE_DELTA 20
+
+#define PITCH_MODE_ABSOLUTE 1
+#define PITCH_MODE_SEMITONE -PITCH_MODE_ABSOLUTE
+
+static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
+
 /* returns:
    0 if no key was pressed
    1 if USB was connected */
 
-void pitch_screen_draw(struct screen *display, int pitch)
+void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 {
     unsigned char* ptr;
     unsigned char buf[32];
@@ -385,14 +397,22 @@ void pitch_screen_draw(struct screen *display, int pitch)
     {
 
         /* UP: Pitch Up */
-        ptr = str(LANG_SYSFONT_PITCH_UP);
+        if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+            ptr = str(LANG_SYSFONT_PITCH_UP);
+        } else {
+            ptr = str(LANG_SYSFONT_PITCH_UP_SEMITONE);
+        }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, 0, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_UpArrow],
                         display->width/2 - 3, h, 7, 8);
 
         /* DOWN: Pitch Down */
-        ptr = str(LANG_SYSFONT_PITCH_DOWN);
+        if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+            ptr = str(LANG_SYSFONT_PITCH_DOWN);
+        } else {
+            ptr = str(LANG_SYSFONT_PITCH_DOWN_SEMITONE);
+        }
         display->getstringsize(ptr,&w,&h);
         display->putsxy((display->width-w)/2, display->height - h, ptr);
         display->mono_bitmap(bitmap_icons_7x8[Icon_DownArrow],
@@ -426,10 +446,83 @@ void pitch_screen_draw(struct screen *display, int pitch)
     display->update();
 }
 
+static int pitch_increase(int pitch, int delta,
+                bool allow_cutoff, bool redraw_screens) {
+    int new_pitch;
+    int i;
+    
+    if (delta < 0) {
+        if (pitch + delta >= PITCH_MIN) {
+            new_pitch = pitch + delta;
+        } else {
+            if (!allow_cutoff) {
+                return pitch;
+            }
+            new_pitch = PITCH_MIN;
+        }
+    } else if (delta > 0) {
+        if (pitch + delta <= PITCH_MAX) {
+            new_pitch = pitch + delta;
+        } else {
+            if (!allow_cutoff) {
+                return pitch;
+            }
+            new_pitch = PITCH_MAX;
+        }
+    } else {
+        /* delta == 0 -> no real change */
+        return pitch;
+    }
+    sound_set_pitch(new_pitch);
+    
+    if (redraw_screens) {
+        FOR_NB_SCREENS(i)
+            pitch_screen_draw(&screens[i], pitch, pitch_mode);
+    }
+    
+    return new_pitch;
+}
+
+/* Factor for changing the pitch one half tone up.
+   The exact value is 2^(1/12) = 1.05946309436
+   But we use only integer arithmetics, so take
+   rounded factor multiplied by 10^5=100,000. This is
+   enough to get the same promille values as if we
+   had used floating point (checked with a spread
+   sheet).
+ */
+#define PITCH_SEMITONE_FACTOR 105946L
+
+/* Some helpful constants. K is the scaling factor for SEMITONE.
+   N is for more accurate rounding
+   KN is K * N
+ */
+#define PITCH_K_FCT           100000UL
+#define PITCH_N_FCT           10
+#define PITCH_KN_FCT          1000000UL
+
+static int pitch_increase_semitone(int pitch, bool up) {
+    uint32_t tmp;
+    uint32_t round_fct; /* How much to scale down at the end */
+    tmp = pitch;
+    if (up) {
+        tmp = tmp * PITCH_SEMITONE_FACTOR;
+        round_fct = PITCH_K_FCT;
+    } else {
+        tmp = (tmp * PITCH_KN_FCT) / PITCH_SEMITONE_FACTOR;
+        round_fct = PITCH_N_FCT;
+    }
+    /* Scaling down with rounding */
+    tmp = (tmp + round_fct / 2) / round_fct;
+    return pitch_increase(pitch, tmp - pitch, false, false);
+}
+
 bool pitch_screen(void)
 {
     int button;
     int pitch = sound_get_pitch();
+    int new_pitch;
+    bool nudged = false;
     bool exit = false;
     int i;
 
@@ -441,69 +534,70 @@ bool pitch_screen(void)
     while (!exit)
     {
         FOR_NB_SCREENS(i)
-            pitch_screen_draw(&screens[i],pitch);
+            pitch_screen_draw(&screens[i], pitch, pitch_mode);
 
         button = get_action(CONTEXT_PITCHSCREEN,TIMEOUT_BLOCK);
         switch (button) {
             case ACTION_PS_INC_SMALL:
-                if ( pitch < 2000 )
-                    pitch++;
-                sound_set_pitch(pitch);
+                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+                    pitch = pitch_increase(pitch, PITCH_SMALL_DELTA, true, false);
+                } else {
+                    pitch = pitch_increase_semitone(pitch, true);
+                }
                 break;
 
             case ACTION_PS_INC_BIG:
-                if ( pitch < 1990 )
-                    pitch += 10;
-                else
-                    pitch = 2000;
-                sound_set_pitch(pitch);
+                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+                    pitch = pitch_increase(pitch, PITCH_BIG_DELTA, true, false);
+                }
                 break;
 
             case ACTION_PS_DEC_SMALL:
-                if ( pitch > 500 )
-                    pitch--;
-                sound_set_pitch(pitch);
+                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+                    pitch = pitch_increase(pitch, -PITCH_SMALL_DELTA, true, false);
+                } else {
+                    pitch = pitch_increase_semitone(pitch, false);
+                }
                 break;
 
             case ACTION_PS_DEC_BIG:
-                if ( pitch > 510 )
-                    pitch -= 10;
-                else
-                    pitch = 500;
-                sound_set_pitch(pitch);
+                if (pitch_mode == PITCH_MODE_ABSOLUTE) {
+                    pitch = pitch_increase(pitch, -PITCH_BIG_DELTA, true, false);
+                }
                 break;
 
             case ACTION_PS_NUDGE_RIGHT:
-                if ( pitch < 1980 )
-                {
-                    pitch += 20;
-                    sound_set_pitch(pitch);
-                    FOR_NB_SCREENS(i)
-                        pitch_screen_draw(&screens[i],pitch);
-                }
+                new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false, true);
+                nudged = (new_pitch != pitch);
+                pitch = new_pitch;
                 break;
             case ACTION_PS_NUDGE_RIGHTOFF:
-                pitch -= 20;
-                sound_set_pitch(pitch);
+                if (nudged) {
+                    pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false, false);
+                }
+                nudged = false;
                 break;
 
             case ACTION_PS_NUDGE_LEFT:
-                if ( pitch > 520 )
-                {
-                    pitch -= 20;
-                    sound_set_pitch(pitch);
-                    FOR_NB_SCREENS(i)
-                        pitch_screen_draw(&screens[i],pitch);
-                }
+                new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false, true);
+                nudged = (new_pitch != pitch);
+                pitch = new_pitch;
                 break;
+                
             case ACTION_PS_NUDGE_LEFTOFF:
-                pitch += 20;
-                sound_set_pitch(pitch);
+                if (nudged) {
+                    pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false, false);
+                }
+                nudged = false;
                 break;
 
             case ACTION_PS_RESET:
                 pitch = 1000;
                 sound_set_pitch( pitch );
+                break;
+
+            case ACTION_PS_TOGGLE_MODE:
+                pitch_mode = -pitch_mode;
                 break;
 
             case ACTION_PS_EXIT:

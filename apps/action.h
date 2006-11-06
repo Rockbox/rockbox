@@ -187,6 +187,7 @@ enum {
     ACTION_PS_NUDGE_RIGHT,
     ACTION_PS_NUDGE_LEFTOFF,
     ACTION_PS_NUDGE_RIGHTOFF,
+    ACTION_PS_TOGGLE_MODE,
     ACTION_PS_RESET,
     ACTION_PS_EXIT, /* _STD_* isnt going to work here */
     
