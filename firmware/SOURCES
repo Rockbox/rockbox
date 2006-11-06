@@ -95,6 +95,7 @@ drivers/lcd-h300.c
 drivers/power.c
 #endif
 drivers/led.c
+ata_idle_notify.c
 #ifndef SIMULATOR
 #ifndef TARGET_TREE
 drivers/adc.c

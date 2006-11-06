@@ -29,7 +29,7 @@
 #include "power.h"
 #include "string.h"
 #include "hwcompat.h"
-
+#include "ata_idle_notify.h"
 #ifdef TARGET_TREE
 #include "ata-target.h"
 #endif
@@ -1364,6 +1364,7 @@ static void ata_thread(void)
 {
     static long last_sleep = 0;
     struct event ev;
+    static long last_callback_run = 0;
     
     while (1) {
         while ( queue_empty( &ata_queue ) ) {
@@ -1373,8 +1374,16 @@ static void ata_thread(void)
                  TIME_AFTER( current_tick, 
                              last_disk_activity + sleep_timeout ) )
             {
-                ata_perform_sleep();
-                last_sleep = current_tick;
+                if (!call_ata_idle_notifys())
+                {
+                    ata_perform_sleep();
+                    last_sleep = current_tick;
+                }
+            }
+            else if (TIME_AFTER(current_tick, last_callback_run+(HZ*5)))
+            {
+                last_callback_run = current_tick;
+                call_ata_idle_notifys();
             }
 
 #ifdef HAVE_ATA_POWER_OFF

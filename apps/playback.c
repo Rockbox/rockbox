@@ -74,6 +74,7 @@
 #include "metadata.h"
 #include "splash.h"
 #include "talk.h"
+#include "ata_idle_notify.h"
 
 #ifdef HAVE_RECORDING
 #include "recording.h"
@@ -118,6 +119,9 @@ enum {
     Q_AUDIO_NEW_PLAYLIST,
     Q_AUDIO_POSTINIT,
     Q_AUDIO_FILL_BUFFER,
+#if MEM > 8
+    Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA,
+#endif
 
     Q_CODEC_REQUEST_PENDING,
     Q_CODEC_REQUEST_COMPLETE,
@@ -2664,11 +2668,6 @@ static void audio_fill_file_buffer(
 
         audio_generate_postbuffer_events();
         filling = false;
-
-#ifndef SIMULATOR
-        if (playing)
-            ata_sleep();
-#endif
     }
 
 }
@@ -3228,14 +3227,30 @@ static void audio_playback_init(void)
 
     sound_settings_apply();
 }
+#if MEM > 8
+/* we dont want this rebuffering on targets with little ram
+   because the disk may never spin down */
+bool ata_fillbuffer_callback(void)
+{
+#ifndef IPOD_NANO
+    queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA, 0);
+#endif
+    return true;
+}
+#endif
 
 static void audio_thread(void)
 {
     struct event ev;
-
+#if MEM > 8
+    size_t high_watermark;
+#endif
     /* At first initialize audio system in background. */
     audio_playback_init();
-
+#if MEM > 8
+    high_watermark = (3*filebuflen)/4;
+#endif
+    
     while (1) 
     {
         if (filling)
@@ -3244,10 +3259,27 @@ static void audio_thread(void)
             if (ev.id == SYS_TIMEOUT)
                 ev.id = Q_AUDIO_FILL_BUFFER;
         }
+#if MEM > 8
         else
+        {
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
-
+            if ( (ev.id == SYS_TIMEOUT) &&
+                (FILEBUFUSED < high_watermark))
+                register_ata_idle_func(ata_fillbuffer_callback);
+        }
+#else
+            queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
+#endif
         switch (ev.id) {
+#if MEM > 8
+            case Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA:
+                 /* only fill if the disk is still spining */
+#ifndef SIMULATOR
+                 if (!ata_disk_is_active())
+                    break;
+#endif
+#endif /* MEM > 8 */
+                  /* else fall through to Q_AUDIO_FILL_BUFFER */
             case Q_AUDIO_FILL_BUFFER:
                 LOGFQUEUE("audio < Q_AUDIO_FILL_BUFFER");
                 if (!filling)
