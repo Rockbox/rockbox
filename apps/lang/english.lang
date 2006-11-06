@@ -9375,34 +9375,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_PITCH_UP_SEMITONE
-  desc: in wps
-  user:
-  <source>
-    *: "Semitone Up"
-  </source>
-  <dest>
-    *: "Semitone Up"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
-  desc: in wps
-  user:
-  <source>
-    *: "Semitone Down"
-  </source>
-  <dest>
-    *: "Semitone Down"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_F2_MODE
   desc: in wps F2 pressed
   user:
@@ -10030,5 +10002,33 @@
   </dest>
   <voice>
     *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Semitone Up"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Semitone Down"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>
