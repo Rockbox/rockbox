@@ -3356,9 +3356,7 @@ static void audio_playback_init(void)
    because the disk may never spin down */
 bool ata_fillbuffer_callback(void)
 {
-#ifndef IPOD_NANO
     queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA, 0);
-#endif
     return true;
 }
 #endif
