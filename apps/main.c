@@ -225,6 +225,9 @@ void init(void)
     button_init();
     backlight_init();
     lang_init();
+#if CONFIG_CODEC == SWCODEC
+    audio_preinit();    /* Must be done before settings_apply() */
+#endif
     /* Must be done before any code uses the multi-screen APi */
     screen_access_init();
     gui_syncstatusbar_init(&statusbars);
@@ -255,10 +258,6 @@ void init(void)
               global_settings.mdb_shape,
               global_settings.mdb_enable,
               global_settings.superbass);
-
-#if CONFIG_CODEC == SWCODEC
-    audio_preinit();
-#endif
 
     scrobbler_init();
     
