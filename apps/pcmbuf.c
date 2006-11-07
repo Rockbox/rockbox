@@ -383,7 +383,8 @@ static void pcmbuf_init_pcmbuffers(void) {
 bool pcmbuf_is_same_size(size_t bufsize)
 {
     /* keep calculations synced with pcmbuf_init */
-    bufsize += PCMBUF_MIX_CHUNK * 2 + PCMBUF_DESCS(bufsize);
+    bufsize += PCMBUF_MIX_CHUNK * 2 +
+               PCMBUF_DESCS(bufsize)*sizeof(struct pcmbufdesc);
     return bufsize == (size_t)(pcmbuf_bufend - audiobuffer);
 }
 
