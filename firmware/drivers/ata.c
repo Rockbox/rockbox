@@ -1368,24 +1368,26 @@ static void ata_thread(void)
     
     while (1) {
         while ( queue_empty( &ata_queue ) ) {
-            if ( !spinup && sleep_timeout && !sleeping &&
-                 TIME_AFTER( current_tick, 
-                             last_user_activity + sleep_timeout ) &&
-                 TIME_AFTER( current_tick, 
-                             last_disk_activity + sleep_timeout ) )
+            if (!spinup && !sleeping)
             {
-                if (!call_ata_idle_notifys())
+                if ( sleep_timeout &&
+                     TIME_AFTER( current_tick, 
+                                last_user_activity + sleep_timeout ) &&
+                     TIME_AFTER( current_tick, 
+                                last_disk_activity + sleep_timeout ) )
                 {
-                    ata_perform_sleep();
-                    last_sleep = current_tick;
+                    if (!call_ata_idle_notifys())
+                    {
+                        ata_perform_sleep();
+                        last_sleep = current_tick;
+                    }
+                }
+                else if (TIME_AFTER(current_tick, last_callback_run+(HZ*5)))
+                {
+                    last_callback_run = current_tick;
+                    call_ata_idle_notifys();
                 }
             }
-            else if (TIME_AFTER(current_tick, last_callback_run+(HZ*5)))
-            {
-                last_callback_run = current_tick;
-                call_ata_idle_notifys();
-            }
-
 #ifdef HAVE_ATA_POWER_OFF
             if ( !spinup && sleeping && poweroff_timeout && !poweroff &&
                  TIME_AFTER( current_tick, last_sleep + poweroff_timeout ))
