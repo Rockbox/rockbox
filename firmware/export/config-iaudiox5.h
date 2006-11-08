@@ -54,6 +54,9 @@
 /* Define this if you do software codec */
 #define CONFIG_CODEC SWCODEC
 
+/* define this if you have a real-time clock */
+#define CONFIG_RTC RTC_PCF50606
+
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
@@ -129,9 +132,6 @@
 #define BATTERY_CAPACITY_INC    50    /* capacity increment */
 #define BATTERY_TYPES_COUNT     1     /* only one type */
 #define BATTERY_SCALE_FACTOR    5859  /* (420703125 + 35900) / 71800 */
-
-/* define this if you have a real-time clock */
-#define CONFIG_RTC RTC_PCF50606
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
