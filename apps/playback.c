@@ -2781,6 +2781,7 @@ static void audio_fill_file_buffer(
         filling = false;
     }
 
+    ata_sleep();
 }
 
 static void audio_rebuffer(void)

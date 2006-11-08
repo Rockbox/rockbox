@@ -1098,7 +1098,6 @@ void shutdown_hw(void)
 #ifdef HAVE_LCD_BITMAP
     glyph_cache_save();
 #endif
-    ata_flush();
     ata_spindown(1);
     while(ata_disk_is_active())
         sleep(HZ/10);

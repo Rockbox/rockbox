@@ -239,9 +239,6 @@ static long ata_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char ata_thread_name[] = "ata";
 static struct event_queue ata_queue;
 static bool initialized = false;
-static bool delayed_write = false;
-static unsigned char delayed_sector[SECTOR_SIZE];
-static int delayed_sector_num;
 
 static long last_user_activity = -1;
 long last_disk_activity = -1;
@@ -804,10 +801,6 @@ int ata_read_sectors(IF_MV2(int drive,)
 
     mutex_unlock(&ata_mtx);
 
-    /* only flush if reading went ok */
-    if ( (ret == 0) && delayed_write )
-        ata_flush();
-
     return ret;
 }
 
@@ -1229,33 +1222,8 @@ int ata_write_sectors(IF_MV2(int drive,)
 
     mutex_unlock(&ata_mtx);
 
-    /* only flush if writing went ok */
-    if ( (ret == 0) && delayed_write )
-        ata_flush();
-
     return ret;
 }
-
-/* schedule a single sector write, executed with the the next spinup 
-   (volume 0 only, used for config sector) */
-extern void ata_delayed_write(unsigned long sector, const void* buf)
-{
-    memcpy(delayed_sector, buf, SECTOR_SIZE);
-    delayed_sector_num = sector;
-    delayed_write = true;
-}
-
-/* write the delayed sector to volume 0 */
-extern void ata_flush(void)
-{
-    if ( delayed_write ) {
-        DEBUGF("ata_flush()\n");
-        delayed_write = false;
-        ata_write_sectors(IF_MV2(0,) delayed_sector_num, 1, delayed_sector);
-    }
-}
-
-
 
 static int check_registers(void)
 {
@@ -1364,28 +1332,31 @@ static void ata_thread(void)
 {
     static long last_sleep = 0;
     struct event ev;
-    static long last_callback_run = 0;
+    static long last_seen_mtx_unlock = 0;
     
     while (1) {
         while ( queue_empty( &ata_queue ) ) {
             if (!spinup && !sleeping)
             {
+                if (!ata_mtx.locked)
+                {
+                    if (!last_seen_mtx_unlock)
+                        last_seen_mtx_unlock = current_tick;
+                    if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*2)))
+                    {
+                        call_ata_idle_notifys(false);
+                        last_seen_mtx_unlock = 0;
+                    }
+                }
                 if ( sleep_timeout &&
                      TIME_AFTER( current_tick, 
                                 last_user_activity + sleep_timeout ) &&
                      TIME_AFTER( current_tick, 
                                 last_disk_activity + sleep_timeout ) )
                 {
-                    if (!call_ata_idle_notifys())
-                    {
-                        ata_perform_sleep();
-                        last_sleep = current_tick;
-                    }
-                }
-                else if (TIME_AFTER(current_tick, last_callback_run+(HZ*5)))
-                {
-                    last_callback_run = current_tick;
-                    call_ata_idle_notifys();
+                    call_ata_idle_notifys(false);
+                    ata_perform_sleep();
+                    last_sleep = current_tick;
                 }
             }
 #ifdef HAVE_ATA_POWER_OFF
@@ -1403,8 +1374,10 @@ static void ata_thread(void)
         }
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
-#ifndef USB_NONE
+            case SYS_POWEROFF:
             case SYS_USB_CONNECTED:
+                call_ata_idle_notifys(false);
+#ifndef USB_NONE
                 if (poweroff) {
                     mutex_lock(&ata_mtx);
                     ata_led(true);
@@ -1419,11 +1392,13 @@ static void ata_thread(void)
 
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&ata_queue);
-                break;
 #endif
+                break;
             case Q_SLEEP:
+                call_ata_idle_notifys(true);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
+                
         }
     }
 }

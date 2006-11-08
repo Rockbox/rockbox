@@ -98,9 +98,6 @@ static bool mmc_monitor_enabled = true;
 #endif
 static bool initialized = false;
 static bool new_mmc_circuit;
-static bool delayed_write = false;
-static unsigned char delayed_sector[SECTOR_SIZE];
-static int delayed_sector_num;
 
 static enum {
     MMC_UNKNOWN,
@@ -805,10 +802,6 @@ int ata_read_sectors(IF_MV2(int drive,)
 
     deselect_card();
     
-    /* only flush if reading went ok */
-    if ( (rc == 0) && delayed_write )
-        ata_flush();
-
     return rc;
 }
 
@@ -960,31 +953,7 @@ int ata_write_sectors(IF_MV2(int drive,)
 
     deselect_card();
 
-    /* only flush if writing went ok */
-    if ( (rc == 0) && delayed_write )
-        ata_flush();
-
     return rc;
-}
-
-/* While there is no spinup, the delayed write is still here to avoid
-   wearing the flash unnecessarily */
-extern void ata_delayed_write(unsigned long sector, const void* buf)
-{
-    memcpy(delayed_sector, buf, SECTOR_SIZE);
-    delayed_sector_num = sector;
-    delayed_write = true;
-}
-
-/* write the delayed sector to volume 0 */
-extern void ata_flush(void)
-{
-    if ( delayed_write ) 
-    {
-        DEBUGF("ata_flush()\n");
-        delayed_write = false;
-        ata_write_sectors(IF_MV2(0,) delayed_sector_num, 1, delayed_sector);
-    }
 }
 
 void ata_spindown(int seconds)

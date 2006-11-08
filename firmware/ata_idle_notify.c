@@ -18,8 +18,10 @@
  ****************************************************************************/
 #include <stdbool.h>
 #include "system.h"
+#include "ata.h"
 #include "ata_idle_notify.h"
 #include "logf.h"
+#include "string.h"
 
 #if USING_ATA_CALLBACK
 static ata_idle_notify ata_idle_notify_funcs[MAX_ATA_CALLBACKS];
@@ -52,7 +54,7 @@ bool register_ata_idle_func(ata_idle_notify function)
 }
 
 #if USING_ATA_CALLBACK
-void unregister_ata_idle_func(ata_idle_notify func)
+void unregister_ata_idle_func(ata_idle_notify func, bool run)
 {
     int i;
     for (i=0; i<MAX_ATA_CALLBACKS; i++)
@@ -61,12 +63,13 @@ void unregister_ata_idle_func(ata_idle_notify func)
         {
             ata_idle_notify_funcs[i] = NULL;
             ata_callback_count--;
+            if (run) func();
         }
     }
     return;
 }
 
-bool call_ata_idle_notifys(void)
+bool call_ata_idle_notifys(bool sleep_after)
 {
     int i;
     ata_idle_notify function;
@@ -82,15 +85,14 @@ bool call_ata_idle_notifys(void)
             function();
         }
     }
+    if (sleep_after)
+        ata_sleep();
     return true;
 }
 
 void ata_idle_notify_init(void)
 {
-    int i;
-    for (i=0; i<MAX_ATA_CALLBACKS; i++)
-    {
-        ata_idle_notify_funcs[i] = NULL;
-    }
+    ata_callback_count = 0;
+    memset(ata_idle_notify_funcs, 0, sizeof(ata_idle_notify_funcs));
 }
 #endif

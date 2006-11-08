@@ -38,6 +38,7 @@
 #include "talk.h"
 #include "string.h"
 #include "ata.h"
+#include "ata_idle_notify.h"
 #include "fat.h"
 #include "power.h"
 #include "powermgmt.h"
@@ -802,6 +803,11 @@ static void init_config_buffer( void )
     config_block[3] = CONFIG_BLOCK_VERSION;
 }
 
+bool flush_config_block_callback(void)
+{
+    ata_write_sectors(IF_MV2(0,) config_sector, 1, config_block);
+    return true;
+}
 /*
  * save the config block buffer to disk or RTC RAM
  */
@@ -833,7 +839,7 @@ static int save_config_buffer( void )
 #endif
 
     if (config_sector != 0)
-        ata_delayed_write( config_sector, config_block);
+        register_ata_idle_func(flush_config_block_callback);
     else
         return -1;
 
