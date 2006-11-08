@@ -424,10 +424,6 @@ static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
 unsigned short* p IBSS_ATTR;
 size_t p_size IBSS_ATTR;
 
-void pcm_init(void)
-{
-}
-
 void pcm_play_dma_start(const void *addr, size_t size)
 {
     p = (unsigned short*)addr;
