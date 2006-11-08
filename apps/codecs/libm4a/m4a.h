@@ -53,7 +53,7 @@ typedef struct
     } *time_to_sample;
     uint32_t num_time_to_samples;
 
-    uint32_t *sample_byte_size;
+    uint16_t *sample_byte_size;
     uint32_t num_sample_byte_sizes;
 
     uint32_t codecdata_len;
