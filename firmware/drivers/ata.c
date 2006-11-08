@@ -1375,6 +1375,8 @@ static void ata_thread(void)
         queue_wait(&ata_queue, &ev);
         switch ( ev.id ) {
             case SYS_POWEROFF:
+                call_ata_idle_notifys(false);
+                break;
             case SYS_USB_CONNECTED:
                 call_ata_idle_notifys(false);
 #ifndef USB_NONE

@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include "ata.h"
 #include "ata_mmc.h"
+#include "ata_idle_notify.h"
 #include "kernel.h"
 #include "thread.h"
 #include "led.h"
@@ -979,12 +980,29 @@ void ata_spin(void)
 static void mmc_thread(void)
 {
     struct event ev;
+    static long last_seen_mtx_unlock = 0;
     
     while (1) {
+        while ( queue_empty( &mmc_queue ) ) {
+            if (!ata_disk_is_active())
+            {
+                if (!last_seen_mtx_unlock)
+                    last_seen_mtx_unlock = current_tick;
+                if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*10)))
+                {
+                    call_ata_idle_notifys(false);
+                    last_seen_mtx_unlock = 0;
+                }
+            }
+        }
         queue_wait(&mmc_queue, &ev);
         switch ( ev.id ) 
         {
+            case SYS_POWEROFF:
+                call_ata_idle_notifys(false);
+                break;
             case SYS_USB_CONNECTED:
+                call_ata_idle_notifys(false);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mmc_queue);

@@ -2780,8 +2780,10 @@ static void audio_fill_file_buffer(
         audio_generate_postbuffer_events();
         filling = false;
     }
-
+#ifndef SIMULATOR
     ata_sleep();
+#endif
+
 }
 
 static void audio_rebuffer(void)

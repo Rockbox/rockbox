@@ -35,8 +35,7 @@
 #endif
 
 #define USING_ATA_CALLBACK  !defined(SIMULATOR)             \
-                            && !defined(HAVE_FLASH_DISK)    \
-                            && !defined(HAVE_MMC)
+                            && !defined(HAVE_FLASH_DISK)
 
 #define MAX_ATA_CALLBACKS 5
 typedef bool (*ata_idle_notify)(void);

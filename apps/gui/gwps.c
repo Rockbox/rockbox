@@ -57,6 +57,7 @@
 #ifdef HAVE_LCD_COLOR
 #include "backdrop.h"
 #endif
+#include "ata_idle_notify.h"
 
 #define WPS_DEFAULTCFG WPS_DIR "/rockbox_default.wps"
 #define RWPS_DEFAULTCFG WPS_DIR "/rockbox_default.rwps"
@@ -140,7 +141,7 @@ long gui_wps_show(void)
             if (wps_state.paused) {
                 settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                ata_flush();
+                call_ata_idle_notifys(false);
 #endif
             }
         }
@@ -254,7 +255,7 @@ long gui_wps_show(void)
                         audio_pause();
                     settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                    ata_flush();   /* make sure resume info is saved */
+                    call_ata_idle_notifys(false);   /* make sure resume info is saved */
 #endif
                 }
                 break;
