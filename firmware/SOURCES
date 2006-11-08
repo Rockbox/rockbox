@@ -409,7 +409,7 @@ target/arm/wmcodec-pp.c
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
-target/arm/ata-pp5020.c
+target/arm/ata-pp5002.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/3g/button-3g.c
