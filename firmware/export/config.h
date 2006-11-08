@@ -228,6 +228,11 @@
 #define HAVE_SCHEDULER_BOOSTCTRL
 #endif
 
+/* define for all cpus from SH family */
+#if (CONFIG_CPU == SH7034)
+#define CPU_SH
+#endif
+
 /* define for all cpus from coldfire family */
 #if (CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250)
 #define CPU_COLDFIRE

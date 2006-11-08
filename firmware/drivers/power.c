@@ -65,26 +65,6 @@ bool radio_power(bool status)
 
 void power_init(void)
 {
-#if CONFIG_CPU == MCF5249
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    or_l(0x00080000, &GPIO1_OUT);
-    or_l(0x00080000, &GPIO1_ENABLE);
-    or_l(0x00080000, &GPIO1_FUNCTION);
-
-#ifndef BOOTLOADER
-    /* The boot loader controls the power */
-    ide_power_enable(true);
-#endif
-    or_l(0x80000000, &GPIO_ENABLE);
-    or_l(0x80000000, &GPIO_FUNCTION);
-#ifdef HAVE_SPDIF_POWER
-    spdif_power_enable(false);
-#endif
-#ifdef IRIVER_H300_SERIES
-    pcf50606_init();
-#endif
-#endif
-#else
 #ifdef HAVE_POWEROFF_ON_PB5
     PBCR2 &= ~0x0c00;    /* GPIO for PB5 */
     or_b(0x20, &PBIORL); 
@@ -100,19 +80,14 @@ void power_init(void)
     or_b(0x04, &PADRL); /* drive PA2 high for tuner disable */
     or_b(0x04, &PAIORL); /* output for PA2 */
 #endif
-#endif
 }
 
 
 #ifdef CONFIG_CHARGING
 bool charger_inserted(void)
 {     
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    return (GPIO1_READ & 0x00400000)?true:false;
-#elif defined(GMINI_ARCH)
+#if defined(GMINI_ARCH)
     return (P7 & 0x80) == 0;
-#elif defined(IAUDIO_X5)
-    return (GPIO1_READ & 0x01000000)?true:false;
 #elif CONFIG_CHARGING == CHARGING_CONTROL
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
@@ -155,28 +130,7 @@ bool charging_state(void) {
     charge. My tests show that ADC readings below about 0x80 means
     that the LTC1734 is only maintaining the charge. */
     return adc_read(ADC_EXT_POWER) >= 0x80;
-#elif defined(IRIVER_H100_SERIES) /* FIXME */
-    return charger_inserted();
-#elif defined IRIVER_H300_SERIES
-    return (GPIO_READ & 0x00800000)?true:false;
 #endif
-}
-#endif
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on)
-{
-    or_l(0x01000000, &GPIO1_FUNCTION);
-    or_l(0x01000000, &GPIO1_ENABLE);
-
-#ifdef SPDIF_POWER_INVERTED
-    if(!on)
-#else
-    if(on)
-#endif
-        and_l(~0x01000000, &GPIO1_OUT);
-    else
-        or_l(0x01000000, &GPIO1_OUT);
 }
 #endif
 
@@ -185,14 +139,7 @@ void ide_power_enable(bool on)
 {
     (void)on;
 
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    if(on)
-        and_l(~0x80000000, &GPIO_OUT);
-    else
-        or_l(0x80000000, &GPIO_OUT);
-#elif defined(IAUDIO_X5)
-    /* X5 TODO */
-#elif defined(GMINI_ARCH)
+#if defined(GMINI_ARCH)
     if(on)
         P1 |= 0x08;
     else
@@ -244,11 +191,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    return (GPIO_OUT & 0x80000000)?false:true;
-#elif defined(IAUDIO_X5)
-    return false; /* X5 TODO */
-#elif defined(GMINI_ARCH)
+#if defined(GMINI_ARCH)
     return (P1 & 0x08?true:false);
 #elif defined(TOSHIBA_GIGABEAT_F)
     return false;
@@ -279,10 +222,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-    and_l(~0x00080000, &GPIO1_OUT);
-    asm("halt");
-#elif CONFIG_CPU == PNX0101
+#if CONFIG_CPU == PNX0101
     GPIO1_CLR = 1 << 16;
     GPIO2_SET = 1;
 #elif defined(GMINI_ARCH)

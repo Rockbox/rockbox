@@ -1,24 +1,43 @@
-common/unicode.c
-#ifdef ROCKBOX_HAS_LOGF
-logf.c
-#endif
+ata_idle_notify.c
 backlight.c
 buffer.c
-general.c
+id3.c
+powermgmt.c
+system.c
+usb.c
+#ifdef ROCKBOX_HAS_LOGF
+logf.c
+#endif /* ROCKBOX_HAS_LOGF */
+#ifndef SIMULATOR
+#ifdef RB_PROFILE
+profile.c
+#endif /* RB_PROFILE */
+hwcompat.c
+kernel.c
+rolo.c
+thread.c
+timer.c
+#endif /* SIMULATOR */
+#if !defined(WIN32) || defined(SDL)
+panic.c
+debug.c
+#endif /* !defined(WIN32) || defined(SDL) */
+
+/* Common */
 common/atoi.c
 common/crc32.c
 common/ctype.c
 #ifndef SIMULATOR
 common/dir.c
 common/file.c
-#endif
+#endif /* SIMULATOR */
 #ifdef HAVE_DIRCACHE
 common/dircache.c
-#endif
+#endif /* HAVE_DIRCACHE */
 common/disk.c
 #if !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__)
 common/errno.c
-#endif
+#endif /* !defined(SIMULATOR) || defined(__MINGW32__) || defined(__CYGWIN__) */
 common/memcmp.c
 common/memchr.c
 common/qsort.c
@@ -30,190 +49,114 @@ common/strcat.c
 common/strchr.c
 common/strcmp.c
 common/strcpy.c
-#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
-target/sh/strlen-sh.S
-#else
-common/strlen.c
-#endif
 common/strncmp.c
 common/strncpy.c
 common/strrchr.c
 common/strtok.c
 common/timefuncs.c
+common/unicode.c
 
-#ifdef CPU_COLDFIRE
-target/coldfire/memcpy-coldfire.S
-target/coldfire/memmove-coldfire.S
-target/coldfire/memset-coldfire.S
-target/coldfire/memset16-coldfire.S
-#ifndef SIMULATOR
-#ifndef BOOTLOADER
-target/coldfire/pcm-coldfire.c
-#endif
-target/coldfire/system-coldfire.c
-#endif
-#elif (CONFIG_CPU == SH7034)
-target/sh/memcpy-sh.S
-target/sh/memmove-sh.S
-target/sh/memset-sh.S
-#elif defined(CPU_ARM)
-common/memcpy.c
-common/memmove.c
-target/arm/memset-arm.S
-target/arm/memset16-arm.S
-#else
-common/memcpy.c
-common/memmove.c
-common/memset.c
-common/memset16.c
-#endif
+/* Display */
 #ifdef HAVE_LCD_CHARCELLS
 drivers/lcd-player-charset.c
 drivers/lcd-player.c
-#endif
+#endif /* HAVE_LCD_CHARCELLS */
+
 #ifdef HAVE_LCD_BITMAP
 arabjoin.c
 bidi.c
+font_cache.c
+font.c
 hangul.c
+lru.c
 #if LCD_DEPTH == 1
 drivers/lcd-recorder.c
 #elif LCD_DEPTH == 2
-#if (LCD_PIXELFORMAT == HORIZONTAL_PACKING)
+#if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 drivers/lcd-2bit-horz.c
-#else
-drivers/lcd-h100.c
-#endif
+#endif /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
 #elif LCD_DEPTH == 16
 drivers/lcd-16bit.c
-#endif
-#endif
+#endif /* LCD_DEPTH */
+#endif /* HAVE_LCD_BITMAP */
+
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH == 1
 drivers/lcd-h100-remote.c
 #elif LCD_REMOTE_DEPTH == 2
 drivers/lcd-remote-2bit-vi.c
-#endif
-#endif
-#if CONFIG_LCD==LCD_H300
-drivers/lcd-h300.c
-#endif
-#ifndef TARGET_TREE
-drivers/power.c
-#endif
+#endif /* LCD_REMOTE_DEPTH */
+#endif /* HAVE_REMOTE_LCD */
+
+/* Misc. */
 drivers/led.c
-#ifndef SIMULATOR
 #ifndef TARGET_TREE
 drivers/adc.c
-#endif
-#ifdef HAVE_MMC
-drivers/ata_mmc.c
-#else
-#ifdef HAVE_FLASH_DISK
-drivers/ata_flash.c
-#else
-#ifndef SANSA_E200
-drivers/ata.c
-#endif
-#endif
-#endif
+drivers/power.c
+#endif /* TARGET_TREE */
+#ifndef SIMULATOR
 drivers/button.c
 drivers/dac.c
+drivers/serial.c
+#endif /* SIMULATOR */
+
+/* Storage */
+#ifndef SIMULATOR
+#ifdef HAVE_MMC
+drivers/ata_mmc.c
+#else  /* !HAVE_MMC */
+#ifdef HAVE_FLASH_DISK
+drivers/ata_flash.c
+#else  /* !HAVE_FLASH_DISK */
+#ifndef SANSA_E200
+drivers/ata.c
+#endif /* SANSA_E200 */
+#endif /* HAVE_FLASH_DISK */
+#endif /* HAVE_MMC */
 drivers/fat.c
-#ifdef CONFIG_TUNER
-#if (CONFIG_TUNER & S1A0903X01)
-drivers/fmradio.c
-tuner_samsung.c
-#endif
-#if (CONFIG_TUNER & TEA5767)
-drivers/fmradio_i2c.c
-tuner_philips.c
-#endif
-#endif
-#if CONFIG_I2C == I2C_COLDFIRE
-drivers/i2c-coldfire.c
-#elif CONFIG_I2C == I2C_PP5020
-drivers/i2c-pp5020.c
-#elif CONFIG_I2C == I2C_PP5002
-drivers/i2c-pp5002.c
-#elif CONFIG_I2C == I2C_PNX0101
-drivers/i2c-pnx0101.c
-#elif CONFIG_I2C == I2C_S3C2440
-/* no i2c driver yet */
-#else
-drivers/i2c.c
-#endif
-#if CONFIG_CODEC != SWCODEC
-drivers/mas.c
-#endif
+#endif /* SIMULATOR */
+
+/* EEPROM */
 #ifdef HAVE_EEPROM
 drivers/eeprom_24cxx.c
 #ifdef HAVE_EEPROM_SETTINGS
 eeprom_settings.c
-#endif
-#endif
-#if (CONFIG_RTC == RTC_M41ST84W) || (CONFIG_RTC == RTC_PCF50606) \
- || (CONFIG_RTC == RTC_PCF50605) || (CONFIG_RTC == RTC_E8564)
-drivers/rtc.c
-#endif
-drivers/serial.c
-#endif /* !SIMULATOR */
-#ifdef HAVE_LCD_BITMAP
-lru.c
-font_cache.c
-font.c
-#endif
-id3.c
-ata_idle_notify.c
+#endif /* HAVE_EEPROM_SETTINGS */
+#endif /* HAVE_EEPROM */
+
+/* RTC */
+#if    (CONFIG_RTC == RTC_M41ST84W) \
+    || (CONFIG_RTC == RTC_PCF50606) \
+    || (CONFIG_RTC == RTC_PCF50605) \
+    || (CONFIG_RTC == RTC_E8564)
 #ifndef SIMULATOR
-#ifdef RB_PROFILE
-profile.c
-#endif /* RB_PROFILE */
-hwcompat.c
-kernel.c
-rolo.c
-thread.c
-timer.c
-#ifdef CPU_PP
-target/arm/crt0-pp.S
-#elif defined(CPU_ARM)
-target/arm/crt0.S
-#elif defined(CPU_COLDFIRE)
-target/coldfire/crt0.S
-#elif CONFIG_CPU == SH7034
-target/sh/crt0.S
-#else
-crt0.S
-#endif
-drivers/lcd.S
-#endif
+drivers/rtc.c
+#endif /* SIMULATOR */
+#endif /* (CONFIG_RTC == RTC_*)
+
+/* Tuner */
+#ifdef CONFIG_TUNER
+#ifndef SIMULATOR
+#if (CONFIG_TUNER & S1A0903X01)
+drivers/fmradio.c
+tuner_samsung.c
+#endif /* (CONFIG_TUNER & S1A0903X01) */
+#if (CONFIG_TUNER & TEA5767)
+drivers/fmradio_i2c.c
+tuner_philips.c
+#endif /* (CONFIG_TUNER & TEA5767) */
+#endif /*SIMULATOR */
+#endif /* CONFIG_TUNER */
+
+/* Sound */
 mp3_playback.c
 mp3data.c
-#if CONFIG_CODEC != SWCODEC
-mpeg.c
-#endif
-#if !defined(WIN32) || defined(SDL)
-panic.c
-debug.c
-#endif
-powermgmt.c
-system.c
-usb.c
-#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
-bitswap.S
-descramble.S
-#endif
-#if defined(HAVE_UDA1380) && !defined(SIMULATOR)
-drivers/uda1380.c
-#elif (defined(HAVE_WM8975) || defined(HAVE_WM8751)) && !defined(SIMULATOR)
-drivers/wm8975.c
-#elif defined(HAVE_WM8758) && !defined(SIMULATOR)
-drivers/wm8758.c
-#elif (defined(HAVE_WM8731) || defined(HAVE_WM8721)) && !defined(SIMULATOR)
-drivers/wm8731l.c
-#elif defined(HAVE_TLV320) && !defined(SIMULATOR)
-drivers/tlv320.c
-#endif
-#if (CONFIG_CODEC == SWCODEC) && !defined(BOOTLOADER)
+sound.c
+
+#if CONFIG_CODEC == SWCODEC
+
+#ifndef BOOTLOADER
+general.c
 pcm_sampr.c
 replaygain.c
 #ifndef SIMULATOR
@@ -221,51 +164,155 @@ pcm_playback.c
 #endif /* SIMULATOR */
 #ifdef HAVE_RECORDING
 enc_base.c
-#if defined(CPU_COLDFIRE)
 #ifndef SIMULATOR
 pcm_record.c
 #endif /* SIMULATOR */
-#endif /* CPU_COLDFIRE */
 #endif /* HAVE_RECORDING */
-#endif /* SWCODEC && !BOOTLOADER */
-sound.c
-#if defined(IRIVER_IFP7XX_SERIES) && defined(STUB)
-common/sscanf.c
-usb_serial.c
-#endif
+#endif /* BOOTLOADER */
+
+#else  /* !SWCODEC */
+
+#ifndef BOOTLOADER
+mpeg.c
+#ifndef SIMULATOR
+drivers/mas.c
+#endif /* SIMULATOR */
+#endif /* BOOTLOADER */
+
+#endif /* SWCODEC */
+
+/* Audio codec */
+#ifndef SIMULATOR
+#if defined(HAVE_UDA1380)
+drivers/uda1380.c
+#elif defined(HAVE_WM8975) || defined(HAVE_WM8751)
+drivers/wm8975.c
+#elif defined(HAVE_WM8758)
+drivers/wm8758.c
+#elif defined(HAVE_WM8731) || defined(HAVE_WM8721)
+drivers/wm8731l.c
+#elif defined(HAVE_TLV320)
+drivers/tlv320.c
+#endif /* defined(HAVE_*) */
+#endif /* SIMULATOR */
+
+/* USBOTG */
+#if !defined(SIMULATOR) && !defined(BOOTLOADER)
 #if CONFIG_USBOTG == USBOTG_ISP1362
 drivers/isp1362.c
-#endif
-#if CONFIG_USBOTG == USBOTG_M5636
+#elif CONFIG_USBOTG == USBOTG_M5636
 drivers/m5636.c
+#endif /* CONFIG_USBOTG */
+#endif /* !defined(SIMULATOR) && !defined(BOOTLOADER) */
+
+/* CPU Specific - By class then particular chip if applicable */
+#if defined(CPU_SH)
+
+#ifndef SIMULATOR
+bitswap.S
+crt0.S
+descramble.S
+drivers/i2c.c
+drivers/lcd.S
+target/sh/crt0.S
+target/sh/memcpy-sh.S
+target/sh/memmove-sh.S
+target/sh/memset-sh.S
+target/sh/strlen-sh.S
+#endif /* SIMULATOR */
+
+#elif defined(CPU_COLDFIRE)
+
+common/strlen.c
+#ifndef SIMULATOR
+target/coldfire/crt0.S
+target/coldfire/memcpy-coldfire.S
+target/coldfire/memmove-coldfire.S
+target/coldfire/memset-coldfire.S
+#ifdef HAVE_LCD_COLOR
+target/coldfire/memset16-coldfire.S
+#endif /* HAVE_LCD_COLOR */
+target/coldfire/system-coldfire.c
+#ifndef BOOTLOADER
+target/coldfire/pcm-coldfire.c
+#endif /* BOOTLOADER */
+#if CONFIG_I2C == I2C_COLDFIRE
+target/coldfire/i2c-coldfire.c
+#endif /* CONFIG_I2C == I2C_COLDFIRE */
+#endif /* SIMULATOR */
+
+#elif defined(CPU_PP) || defined(CPU_ARM)
+/* CPU_PP => CPU_ARM, CPU_ARM !=> CPU_PP */
+common/memcpy.c
+common/memmove.c
+common/strlen.c
+drivers/lcd.S
+#ifndef SIMULATOR
+target/arm/memset-arm.S
+target/arm/memset16-arm.S
+#if CONFIG_I2C == I2C_PP5020
+drivers/i2c-pp5020.c
+#elif CONFIG_I2C == I2C_PP5002
+drivers/i2c-pp5002.c
+#elif CONFIG_I2C == I2C_PNX0101
+drivers/i2c-pnx0101.c
+#elif CONFIG_I2C == I2C_S3C2440
+/* no i2c driver yet */
 #endif
+#if defined(CPU_PP)
+target/arm/crt0-pp.S
+#elif defined(CPU_ARM)
+target/arm/crt0.S
+#endif /* defined(CPU_*) */
+#endif /* SIMULATOR */
+
+#else
+
+common/memcpy.c
+common/memmove.c
+common/memset.c
+common/memset16.c
+common/strlen.c
+#ifndef SIMULATOR
+crt0.S
+drivers/i2c.c
+#endif /* SIMULATOR */
+
+#endif /* defined(CPU_*) */
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR
+target/arm/wmcodec-pp.c
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/adc-e200.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* SANSA_E200 */
 
 #ifdef IAUDIO_X5
 target/coldfire/iaudio/x5/power-x5.c
 #ifndef SIMULATOR
-target/coldfire/iaudio/x5/button-x5.c
-target/coldfire/iaudio/x5/lcd-as-x5.S
-target/coldfire/iaudio/x5/lcd-x5.c
 target/coldfire/pcf50606-coldfire.c
-target/coldfire/iaudio/x5/pcf50606-x5.c
 target/coldfire/iaudio/x5/adc-x5.c
 target/coldfire/iaudio/x5/ata-x5.c
+target/coldfire/iaudio/x5/backlight-x5.c
+target/coldfire/iaudio/x5/button-x5.c
+target/coldfire/iaudio/x5/lcd-as-x5.S
+target/coldfire/iaudio/x5/lcd-remote-x5.c
+target/coldfire/iaudio/x5/lcd-x5.c
+target/coldfire/iaudio/x5/m5636-x5.c
+target/coldfire/iaudio/x5/pcf50606-x5.c
 target/coldfire/iaudio/x5/system-x5.c
 target/coldfire/iaudio/x5/usb-x5.c
-target/coldfire/iaudio/x5/backlight-x5.c
-target/coldfire/iaudio/x5/m5636-x5.c
-target/coldfire/iaudio/x5/lcd-remote-x5.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IAUDIO_X5 */
+
+#ifdef IRIVER_IFP7XX_SERIES
+#ifdef STUB
+usb_serial.c
+common/sscanf.c
+#endif /* STUB */
+#endif /* IRIVER_IFP7XX_SERIES */
 
 #ifdef IRIVER_H300_SERIES
 target/coldfire/iriver/h300/power-h300.c
@@ -276,13 +323,15 @@ target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
 target/coldfire/iriver/h300/button-h300.c
-target/coldfire/iriver/h300/lcd-as-h300.S
 target/coldfire/iriver/h300/pcf50606-h300.c
+target/coldfire/iriver/h300/lcd-as-h300.S
+target/coldfire/iriver/h300/lcd-h300.c
 target/coldfire/iriver/h300/usb-h300.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IRIVER_H300_SERIES */
 
 #ifdef IRIVER_H100_SERIES
+target/coldfire/iriver/h100/lcd-h100.c
 target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
 target/coldfire/iriver/ata-iriver.c
@@ -290,160 +339,160 @@ target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c
+target/coldfire/iriver/h100/lcd-as-h100.S
 target/coldfire/iriver/h100/usb-h100.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IRIVER_H100_SERIES */
 
 #ifdef IRIVER_H10
 #ifndef SIMULATOR
+target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
+target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
-target/arm/ata-pp5020.c
+target/arm/iriver/h10/lcd-h10_20gb.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
-target/arm/iriver/h10/lcd-h10_20gb.c
-target/arm/iriver/h10/adc-h10.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IRIVER_H10 */
 
 #ifdef IRIVER_H10_5GB
 #ifndef SIMULATOR
+target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
+target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
-target/arm/ata-pp5020.c
+target/arm/iriver/h10/lcd-h10_5gb.c
 target/arm/iriver/h10/power-h10.c
 target/arm/iriver/h10/usb-h10.c
-target/arm/iriver/h10/lcd-h10_5gb.c
-target/arm/iriver/h10/adc-h10.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IRIVER_H10_5GB */
 
 #ifdef GIGABEAT_F
 #ifndef SIMULATOR
+drivers/generic_i2c.c
+target/arm/gigabeat/meg-fx/adc-meg-fx.c
+target/arm/gigabeat/meg-fx/ata-meg-fx.c
 target/arm/gigabeat/meg-fx/backlight-meg-fx.c
 target/arm/gigabeat/meg-fx/button-meg-fx.c
-target/arm/gigabeat/meg-fx/ata-meg-fx.c
-target/arm/gigabeat/meg-fx/power-meg-fx.c
-target/arm/gigabeat/meg-fx/usb-meg-fx.c
-target/arm/gigabeat/meg-fx/lcd-meg-fx.c
-target/arm/gigabeat/meg-fx/sc606-meg-fx.c
-target/arm/gigabeat/meg-fx/adc-meg-fx.c
-drivers/generic_i2c.c
 target/arm/gigabeat/meg-fx/i2c-meg-fx.c
+target/arm/gigabeat/meg-fx/lcd-meg-fx.c
+target/arm/gigabeat/meg-fx/power-meg-fx.c
+target/arm/gigabeat/meg-fx/sc606-meg-fx.c
+target/arm/gigabeat/meg-fx/usb-meg-fx.c
 target/arm/gigabeat/meg-fx/wmcodec-meg-fx.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* GIGABEAT_F */
 
 #ifdef ELIO_TPJ1022
 #ifndef SIMULATOR
+target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
+target/arm/tatung/tpj1022/adc-tpj1022.c
 target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
-target/arm/ata-pp5020.c
+target/arm/tatung/tpj1022/lcd-tpj1022.c
 target/arm/tatung/tpj1022/power-tpj1022.c
 target/arm/tatung/tpj1022/usb-tpj1022.c
-target/arm/tatung/tpj1022/lcd-tpj1022.c
-target/arm/tatung/tpj1022/adc-tpj1022.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* ELIO_TPJ1022 */
 
 #ifdef IPOD_4G
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
+target/arm/wmcodec-pp.c
 target/arm/ata-pp5020.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_4G */
 
 #ifdef IPOD_COLOR
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
 #ifndef SIMULATOR
+drivers/lcd-ipodvideo.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-drivers/lcd-ipodvideo.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_VIDEO */
 
 #ifdef IPOD_3G
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5002.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/3g/button-3g.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_3G */
 
 #ifdef IPOD_MINI
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
-
+#endif /* SIMULATOR */
+#endif /* IPOD_MINI */
 
 #ifdef IPOD_MINI2G
 #ifndef SIMULATOR
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
+target/arm/wmcodec-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c
 target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
-target/arm/wmcodec-pp.c
-#endif
-#endif
+#endif /* SIMULATOR */
+#endif /* IPOD_MINI2G */

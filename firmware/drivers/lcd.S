@@ -48,23 +48,23 @@
  * -  DS -> Data Selection line, latched at the rising edge
  *          of the 8th serial clock (*) :
  *            0 : instruction register,
- *            1 : data register; 
+ *            1 : data register;
  * -  SC -> Serial Clock line (SDA).
  * -  SD -> Serial Data line (SCK), latched at the rising edge
- *          of each serial clock (*).  
+ *          of each serial clock (*).
  *
  *    _                                                          _
  * /CS \                                                        /
  *      \______________________________________________________/
- *    _____  ____  ____  ____  ____  ____  ____  ____  ____  _____ 
+ *    _____  ____  ____  ____  ____  ____  ____  ____  ____  _____
  *  SD     \/ D7 \/ D6 \/ D5 \/ D4 \/ D3 \/ D2 \/ D1 \/ D0 \/
  *    _____/\____/\____/\____/\____/\____/\____/\____/\____/\_____
  *
- *    _____     _     _     _     _     _     _     _     ________ 
+ *    _____     _     _     _     _     _     _     _     ________
  *  SC     \   * \   * \   * \   * \   * \   * \   * \   *
  *          \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
- *    _  _________________________________________________________ 
- *  DS \/                                                  
+ *    _  _________________________________________________________
+ *  DS \/
  *    _/\_________________________________________________________
  *
  */
@@ -93,14 +93,14 @@ _lcd_write_command:
     mov.l   .lcdr,r3        /* put lcd data port address in r3 */
     mov     r4,r1           /* copy data byte to r1 */
     mov     #1,r5           /* set byte count to 1 (!) */
-    
+
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. */
 
     mov.b   @r3,r0          /* r0 = PBDRL */
     or      #(LCD_SD),r0    /* r0 |= LCD_SD */
     and     #(~(LCD_CS|LCD_DS|LCD_SC)),r0  /* r0 &= ~(LCD_CS|LCD_DS|LCD_SC) */
-    
+
     bra     .single_transfer /* jump into the transfer loop */
     neg     r0,r2           /* r2 = 0 - r0 */
 
@@ -131,7 +131,7 @@ _lcd_write_data:
 
     /* This code will fail if an interrupt changes the contents of PBDRL.
      * If so, we must disable the interrupt here. If disabling interrupts
-     * for a long time (~9200 clks = ~830 µs for transferring 112 bytes on 
+     * for a long time (~9200 clks = ~830 µs for transferring 112 bytes on
      * recorders)is undesirable, the loop has to be rewritten to
      * disable/precalculate/transfer/enable for each iteration. However,
      * this would significantly decrease performance. */
@@ -148,7 +148,7 @@ _lcd_write_data:
 .multi_transfer:
     mov.b   @r4+,r1         /* load data byte from memory */
 
-.single_transfer:       
+.single_transfer:
     shll16  r1              /* shift data to most significant byte */
     shll8   r1
 
@@ -157,85 +157,85 @@ _lcd_write_data:
             /* uses neg here for compatibility with recorder version */
     bt      1f              /* data bit = 1? */
     and     #(~LCD_SD),r0   /* no: r0 &= ~LCD_SD */
-    1:                  
+    1:
     shll    r1              /* next shift here for alignment */
     mov.b   r0,@r3          /* set data to port */
     or      #(LCD_SC),r0    /* rise SC (independent of SD level) */
     mov.b   r0,@r3          /* set to port */
-            
+
     neg     r2,r0
-    bt      1f          
-    and     #(~LCD_SD),r0
-    1:                  
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-            
-    shll    r1          
-    neg     r2,r0       
-    bt      1f          
-    and     #(~LCD_SD),r0
-    1:                  
-    shll    r1          
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-            
-    neg     r2,r0       
-    bt      1f          
-    and     #(~LCD_SD),r0
-    1:                  
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-            
-    shll    r1          
-    neg     r2,r0       
     bt      1f
     and     #(~LCD_SD),r0
-    1:                  
-    shll    r1          
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-            
-    neg     r2,r0       
-    bt      1f          
-    and     #(~LCD_SD),r0
-    1:                  
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-            
-    shll    r1          
-    neg     r2,r0       
-    bt      1f          
-    and     #(~LCD_SD),r0
-    1:                  
-    shll    r1          
+    1:
     mov.b   r0,@r3
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
 
-    neg     r2,r0       
-    bt      1f          
+    shll    r1
+    neg     r2,r0
+    bt      1f
     and     #(~LCD_SD),r0
-    1:                  
-    mov.b   r0,@r3      
+    1:
+    shll    r1
+    mov.b   r0,@r3
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
+
+    neg     r2,r0
+    bt      1f
+    and     #(~LCD_SD),r0
+    1:
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    shll    r1
+    neg     r2,r0
+    bt      1f
+    and     #(~LCD_SD),r0
+    1:
+    shll    r1
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    neg     r2,r0
+    bt      1f
+    and     #(~LCD_SD),r0
+    1:
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    shll    r1
+    neg     r2,r0
+    bt      1f
+    and     #(~LCD_SD),r0
+    1:
+    shll    r1
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    neg     r2,r0
+    bt      1f
+    and     #(~LCD_SD),r0
+    1:
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
 
 #else /* HAVE_LCD_CHARCELLS */
 /* further optimized version,  exploits that SD is on bit 0 for recorders */
 
-    .align  2           
-.multi_transfer:        
+    .align  2
+.multi_transfer:
     mov.b   @r4+,r1         /* load data byte from memory */
-    nop                 
+    nop
 
 .single_transfer:
     shll16  r1              /* shift data to most significant byte */
-    shll8   r1          
+    shll8   r1
     not     r1,r1           /* and invert for use with negc */
 
     shll    r1              /* shift the MSB into carry */
@@ -245,46 +245,46 @@ _lcd_write_data:
     or      #(LCD_SC),r0    /* rise SC (independent of SD level) */
     mov.b   r0,@r3          /* set to port */
 
-    negc    r2,r0       
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-
-    shll    r1          
-    negc    r2,r0       
-    shll    r1          
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-
-    negc    r2,r0       
-    mov.b   r0,@r3      
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3      
-
-    shll    r1          
-    negc    r2,r0       
-    shll    r1          
-    mov.b   r0,@r3      
+    negc    r2,r0
+    mov.b   r0,@r3
     or      #(LCD_SC),r0
     mov.b   r0,@r3
 
-    negc    r2,r0       
-    mov.b   r0,@r3      
+    shll    r1
+    negc    r2,r0
+    shll    r1
+    mov.b   r0,@r3
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
 
-    shll    r1          
-    negc    r2,r0       
-    shll    r1          
-    mov.b   r0,@r3      
+    negc    r2,r0
+    mov.b   r0,@r3
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
 
-    negc    r2,r0       
-    mov.b   r0,@r3      
+    shll    r1
+    negc    r2,r0
+    shll    r1
+    mov.b   r0,@r3
     or      #(LCD_SC),r0
-    mov.b   r0,@r3      
+    mov.b   r0,@r3
+
+    negc    r2,r0
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    shll    r1
+    negc    r2,r0
+    shll    r1
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
+
+    negc    r2,r0
+    mov.b   r0,@r3
+    or      #(LCD_SC),r0
+    mov.b   r0,@r3
 
 #endif /* HAVE_LCD_CHARCELLS */
 
@@ -293,7 +293,7 @@ _lcd_write_data:
     bf      .multi_transfer /* no: next iteration */
 
     or      #(LCD_CS|LCD_DS|LCD_SD|LCD_SC),r0  /* restore port */
-    rts                 
+    rts
     mov.b   r0,@r3
 
     /* This is the place to reenable the interrupts, if we have disabled
@@ -305,70 +305,4 @@ _lcd_write_data:
 
 .end:
     .size   _lcd_write_command,.end-_lcd_write_command
-#elif defined(IRIVER_H100_SERIES)
-    .section    .icode,"ax",@progbits
-
-    .align      2
-    .global     lcd_write_command
-    .type       lcd_write_command,@function
-
-lcd_write_command:
-    move.l  (4,%sp),%d0
-    lea MBAR2,%a1
-    move.l   #~8,%d1
-    and.l   %d1,(0xb4,%a1)
-    move.w  %d0,0xf0000000
-    rts
-
-    .align      2
-    .global     lcd_write_command_ex
-    .type       lcd_write_command_ex,@function
-
-lcd_write_command_ex:
-    lea MBAR2,%a1
-
-    move.l  (4,%sp),%d0     /* Command */
-
-    move.l   #~8,%d1        /* Set A0 = 0 */
-    and.l   %d1,(0xb4,%a1)
-    move.w  %d0,0xf0000000  /* Write to LCD */
-
-    not.l   %d1             /* Set A0 = 1 */
-    or.l    %d1,(0xb4,%a1)
-
-    move.l  (8,%sp),%d0     /* Data */
-    cmp.l   #0xffffffff,%d0 /* -1? */
-    beq.b   .last
-    move.w  %d0,0xf0000000  /* Write to LCD */
-
-    move.l  (12,%sp),%d0    /* Data */
-    cmp.l   #0xffffffff,%d0 /* -1? */
-    beq.b   .last
-    move.w  %d0,0xf0000000  /* Write to LCD */
-
-.last:
-    rts
-
-    .align      2
-    .global     lcd_write_data
-    .type       lcd_write_data,@function
-
-lcd_write_data:
-    move.l  (4,%sp),%a0     /* Data pointer */
-    move.l  (8,%sp),%d0     /* Length */
-    lea MBAR2,%a1
-    moveq   #8,%d1
-    or.l    %d1,(0xb4,%a1)
-
-    lea     0xf0000000,%a1
-.loop:
-    /* When running in IRAM, this loop takes 7 cycles plus the LCD write.
-       The 7 cycles are necessary to follow the LCD timing specs
-       at 140MHz */
-    move.b  (%a0)+,%d1      /* 3(1/0) */
-    move.w  %d1,(%a1)       /* 1(0/1) */
-    subq.l  #1,%d0          /* 1(0/0) */
-    nop                     /* 1(0/0) */
-    bne     .loop           /* 2(0/0) */
-    rts
 #endif
