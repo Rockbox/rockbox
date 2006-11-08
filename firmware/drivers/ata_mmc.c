@@ -976,31 +976,19 @@ void ata_spin(void)
 {
 }
 
-#ifdef HAVE_HOTSWAP
 static void mmc_thread(void)
 {
     struct event ev;
     static long last_seen_mtx_unlock = 0;
     
     while (1) {
-        while ( queue_empty( &mmc_queue ) ) {
-            if (!ata_disk_is_active())
-            {
-                if (!last_seen_mtx_unlock)
-                    last_seen_mtx_unlock = current_tick;
-                if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*10)))
-                {
-                    call_ata_idle_notifys(false);
-                    last_seen_mtx_unlock = 0;
-                }
-            }
-        }
-        queue_wait(&mmc_queue, &ev);
+        queue_wait_w_tmo(&mmc_queue, &ev, HZ);
         switch ( ev.id ) 
         {
             case SYS_POWEROFF:
                 call_ata_idle_notifys(false);
                 break;
+
             case SYS_USB_CONNECTED:
                 call_ata_idle_notifys(false);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -1008,6 +996,7 @@ static void mmc_thread(void)
                 usb_wait_for_disconnect(&mmc_queue);
                 break;
 
+#ifdef HAVE_HOTSWAP
             case SYS_MMC_INSERTED:
                 disk_mount(1); /* mount MMC */
                 queue_broadcast(SYS_FS_CHANGED, NULL);
@@ -1017,15 +1006,30 @@ static void mmc_thread(void)
                 disk_unmount(1); /* release "by force" */
                 queue_broadcast(SYS_FS_CHANGED, NULL);
                 break;
+#endif
+                
+            default:
+                if (!ata_disk_is_active())
+                {
+                    if (!last_seen_mtx_unlock)
+                        last_seen_mtx_unlock = current_tick;
+                    if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*10)))
+                    {
+                        call_ata_idle_notifys(false);
+                        last_seen_mtx_unlock = 0;
+                    }
+                }
+                break;
         }
     }
 }
 
+#ifdef HAVE_HOTSWAP
 void mmc_enable_monitoring(bool on)
 {
     mmc_monitor_enabled = on;
 }
-#endif /* #ifdef HAVE_HOTSWAP */
+#endif
 
 bool mmc_detect(void)
 {
@@ -1168,11 +1172,10 @@ int ata_init(void)
     {
         if (!last_mmc_status)
             mmc_status = MMC_UNTOUCHED;
-#ifdef HAVE_HOTSWAP
+
         queue_init(&mmc_queue, true);
         create_thread(mmc_thread, mmc_stack,
                       sizeof(mmc_stack), mmc_thread_name IF_PRIO(, PRIORITY_SYSTEM));
-#endif
         tick_add_task(mmc_tick);
         initialized = true;
     }
