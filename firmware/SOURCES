@@ -116,7 +116,6 @@ drivers/ata.c
 #endif
 #endif
 #endif
-ata_idle_notify.c
 drivers/button.c
 drivers/dac.c
 drivers/fat.c
@@ -164,6 +163,7 @@ font_cache.c
 font.c
 #endif
 id3.c
+ata_idle_notify.c
 #ifndef SIMULATOR
 #ifdef RB_PROFILE
 profile.c
