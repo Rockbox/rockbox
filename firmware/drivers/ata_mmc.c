@@ -92,11 +92,13 @@ long last_disk_activity = -1;
 static struct mutex mmc_mutex;
 
 #ifdef HAVE_HOTSWAP
+static bool mmc_monitor_enabled = true;
 static long mmc_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
+#else
+static long mmc_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+#endif
 static const char mmc_thread_name[] = "mmc";
 static struct event_queue mmc_queue;
-static bool mmc_monitor_enabled = true;
-#endif
 static bool initialized = false;
 static bool new_mmc_circuit;
 
