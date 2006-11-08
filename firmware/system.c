@@ -126,34 +126,31 @@ void system_init(void) {
 }
 
 #endif
-#if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
+
 bool detect_flashed_rockbox(void)
 {
+#ifdef HAVE_FLASHED_ROCKBOX
     struct flash_header hdr;
     uint8_t *src = (uint8_t *)FLASH_ENTRYPOINT;
 
-# ifndef BOOTLOADER
-    int oldmode;
-    oldmode = system_memory_guard(MEMGUARD_NONE);
-# endif
+#ifndef BOOTLOADER
+    int oldmode = system_memory_guard(MEMGUARD_NONE);
+#endif
 
     memcpy(&hdr, src, sizeof(struct flash_header));
 
-# ifndef BOOTLOADER
+#ifndef BOOTLOADER
     system_memory_guard(oldmode);
-# endif
+#endif
 
     if (hdr.magic != FLASH_MAGIC)
         return false;
 
     return true;
-}
 #else
-bool detect_flashed_rockbox(void)
-{
     return false;
+#endif /* HAVE_FLASHED_ROCKBOX */
 }
-#endif
 
 #if CONFIG_CPU == TCC730
 

@@ -147,10 +147,6 @@ static inline void invalidate_icache(void)
 #endif
 void coldfire_set_pllcr_audio_bits(long bits);
 
-#ifdef HRIVER_H100_SERIES
-bool detect_flashed_rockbox(void);
-#endif
-
 /* 11.2896 MHz */
 #define CPUFREQ_DEFAULT_MULT 1
 #define CPUFREQ_DEFAULT      (CPUFREQ_DEFAULT_MULT * CPU_FREQ)

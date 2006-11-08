@@ -100,6 +100,9 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
 
+/* Define this if you can run rockbox from flash memory */
+#define HAVE_FLASHED_ROCKBOX
+
 /* Define if we have a hardware defect that causes ticking on the audio line */
 #define HAVE_REMOTE_LCD_TICKING
 

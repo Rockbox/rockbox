@@ -102,6 +102,9 @@
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 #define BATTERY_SCALE_FACTOR 16665 /* FIX: this value is picked at random */
 
+/* Define this if you can run rockbox from flash memory */
+#define HAVE_FLASHED_ROCKBOX
+
 /* Define if we have a hardware defect that causes ticking on the audio line */
 #define HAVE_REMOTE_LCD_TICKING
 
