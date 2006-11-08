@@ -584,5 +584,7 @@ int flac_decode_frame(FLACContext *s,
             break;
     }
 
+    s->framesize = (get_bits_count(&s->gb)+7)>>3;
+
     return 0;
 }

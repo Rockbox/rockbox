@@ -35,6 +35,9 @@ typedef struct FLACContext {
     
     int bitstream_size;
     int bitstream_index;
+
+    int sample_skip;
+    int framesize;
 } FLACContext;
 
 int flac_decode_frame(FLACContext *s,

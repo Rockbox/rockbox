@@ -46,9 +46,8 @@ int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
       uint64_t offset
       uint32_t blocksize
 
-   We don't store the blocksize (of the target frame) and we also
-   limit the sample and offset values to 32-bits - Rockbox doesn't support
-   files bigger than 2GB on FAT32 filesystems.
+   We also limit the sample and offset values to 32-bits - Rockbox doesn't
+   support files bigger than 2GB on FAT32 filesystems.
 
    The reference FLAC encoder produces a seek table with points every
    10 seconds, but this can be overridden by the user when encoding a file.
@@ -72,10 +71,14 @@ int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
 struct FLACseekpoints {
     uint32_t sample;
     uint32_t offset;
+    uint16_t blocksize;
 };
 
 struct FLACseekpoints seekpoints[MAX_SUPPORTED_SEEKTABLE_SIZE];
 int nseekpoints;
+
+static int8_t *bit_buffer;
+static size_t buff_size;
 
 static bool flac_init(FLACContext* fc, int first_frame_offset)
 {
@@ -83,12 +86,15 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     bool found_streaminfo=false;
     uint32_t seekpoint_hi,seekpoint_lo;
     uint32_t offset_hi,offset_lo;
+    uint16_t blocksize;
     int endofmetadata=0;
     int blocklength;
     int n;
 
     ci->memset(fc,0,sizeof(FLACContext));
     nseekpoints=0;
+
+    fc->sample_skip = 0;
 
     /* Skip any foreign tags at start of file */
     ci->seek_buffer(first_frame_offset);
@@ -158,14 +164,14 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
                 offset_lo=(buf[12] << 24) | (buf[13] << 16) | 
                              (buf[14] << 8) | buf[15];
 
-                /* The final two bytes contain the number of samples in the 
-                   target frame - but we don't care about that. */
+                blocksize=(buf[16] << 8) | buf[17];
 
                 /* Only store seekpoints where the high 32 bits are zero */
                 if ((seekpoint_hi == 0) && (seekpoint_lo != 0xffffffff) &&
                     (offset_hi == 0)) {
                         seekpoints[nseekpoints].sample=seekpoint_lo;
                         seekpoints[nseekpoints].offset=offset_lo;
+                        seekpoints[nseekpoints].blocksize=blocksize;
                         nseekpoints++;
                 }
             }
@@ -186,57 +192,234 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
    }
 }
 
-/* A very simple seek implementation - seek to the seekpoint before
-   the target sample.
+/* Synchronize to next frame in stream - adapted from libFLAC 1.1.3b2 */
+bool frame_sync(FLACContext* fc) {
+    unsigned int x = 0;
+    bool cached = false;
 
-   This needs to be improved to seek with greater accuracy
-*/
-bool flac_seek(FLACContext* fc, uint32_t newsample) {
-  uint32_t offset;
+    /* Make sure we're byte aligned. */
+    align_get_bits(&fc->gb);
 
-  if (nseekpoints==0) {
-      /* No seekpoints = no seeking */
-      return false;
-  } else {
-      int i=nseekpoints-1;
-      while ((i > 0) && (seekpoints[i].sample > newsample)) {
-          i--;
-      }
+    while(1) {
+        if(fc->gb.size_in_bits - get_bits_count(&fc->gb) < 8) {
+            /* Error, end of bitstream, a valid stream should never reach here
+             * since the buffer should contain at least one frame header.
+             */
+            return false;
+        }
 
-      if ((i==0) && (seekpoints[i].sample > newsample)) {
-          offset=0;
-      } else {
-          offset=seekpoints[i].offset;
-      }
-  }
+        if(cached)
+            cached = false;
+        else
+            x = get_bits(&fc->gb, 8);
 
-  return ci->seek_buffer(offset+fc->metadatalength);
+        if(x == 0xff) { /* MAGIC NUMBER for first 8 frame sync bits. */
+            x = get_bits(&fc->gb, 8);
+            /* We have to check if we just read two 0xff's in a row; the second
+             * may actually be the beginning of the sync code.
+             */
+            if(x == 0xff) { /* MAGIC NUMBER for first 8 frame sync bits. */
+                cached = true;
+            }
+            else if(x >> 2 == 0x3e) { /* MAGIC NUMBER for last 6 sync bits. */
+                /* Succesfully synced. */
+                break;
+            }
+        }
+    }
+
+    /* Advance and init bit buffer to the new frame. */
+    ci->advance_buffer((get_bits_count(&fc->gb)-16)>>3); /* consumed bytes */
+    bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE);
+    init_get_bits(&fc->gb, bit_buffer, buff_size*8);
+
+    /* Decode the frame to verify the frame crc and
+     * fill fc with its metadata.
+     */
+    if(flac_decode_frame(fc, decoded0, decoded1,
+       bit_buffer, buff_size, ci->yield) < 0) {
+        return false;
+    }
+
+    return true;
 }
 
-/* A very simple seek implementation - seek to the seekpoint before
-   the target offset.
+/* Seek to sample - adapted from libFLAC 1.1.3b2+ */
+bool flac_seek(FLACContext* fc, uint32_t target_sample) {
+    off_t orig_pos = ci->curpos;
+    off_t pos = -1;
+    unsigned long lower_bound, upper_bound;
+    unsigned long lower_bound_sample, upper_bound_sample;
+    int i;
+    unsigned approx_bytes_per_frame;
+    uint32_t this_frame_sample = fc->samplenumber;
+    unsigned this_block_size = fc->blocksize;
+    bool needs_seek = true, first_seek = true;
 
-   This needs to be improved to seek with greater accuracy
-*/
+    /* We are just guessing here. */
+    if(fc->max_framesize > 0)
+        approx_bytes_per_frame = (fc->max_framesize + fc->min_framesize)/2 + 1;
+    /* Check if it's a known fixed-blocksize stream. */
+    else if(fc->min_blocksize == fc->max_blocksize && fc->min_blocksize > 0)
+        approx_bytes_per_frame = fc->min_blocksize*fc->channels*fc->bps/8 + 64;
+    else
+        approx_bytes_per_frame = 4608 * fc->channels * fc->bps/8 + 64;
+
+    /* Set an upper and lower bound on where in the stream we will search. */
+    lower_bound = fc->metadatalength;
+    lower_bound_sample = 0;
+    upper_bound = fc->filesize;
+    upper_bound_sample = fc->totalsamples>0 ? fc->totalsamples : target_sample;
+
+    /* Refine the bounds if we have a seektable with suitable points. */
+    if(nseekpoints > 0) {
+        /* Find the closest seek point <= target_sample, if it exists. */
+        for(i = nseekpoints-1; i >= 0; i--) {
+            if(seekpoints[i].sample <= target_sample)
+                break;
+        }
+        if(i >= 0) { /* i.e. we found a suitable seek point... */
+            lower_bound = fc->metadatalength + seekpoints[i].offset;
+            lower_bound_sample = seekpoints[i].sample;
+        }
+
+        /* Find the closest seek point > target_sample, if it exists. */
+        for(i = 0; i < nseekpoints; i++) {
+            if(seekpoints[i].sample > target_sample)
+                break;
+        }
+        if(i < nseekpoints) { /* i.e. we found a suitable seek point... */
+            upper_bound = fc->metadatalength + seekpoints[i].offset;
+            upper_bound_sample = seekpoints[i].sample;
+        }
+    }
+
+    while(1) {
+        /* Check if bounds are still ok. */
+        if(lower_bound_sample >= upper_bound_sample ||
+           lower_bound > upper_bound) {
+            return false;
+        }
+
+        /* Calculate new seek position */
+        if(needs_seek) {
+            pos = (off_t)(lower_bound +
+              (((target_sample - lower_bound_sample) *
+              (int64_t)(upper_bound - lower_bound)) /
+              (upper_bound_sample - lower_bound_sample)) -
+              approx_bytes_per_frame);
+            
+            if(pos >= (off_t)upper_bound)
+                pos = (off_t)upper_bound-1;
+            if(pos < (off_t)lower_bound)
+                pos = (off_t)lower_bound;
+        }
+
+        if(!ci->seek_buffer(pos))
+            return false;
+
+        bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE);
+        init_get_bits(&fc->gb, bit_buffer, buff_size*8);
+
+        /* Now we need to get a frame.  It is possible for our seek
+         * to land in the middle of audio data that looks exactly like
+         * a frame header from a future version of an encoder.  When
+         * that happens, frame_sync() will return false.
+         * But there is a remote possibility that it is properly
+         * synced at such a "future-codec frame", so to make sure,
+         * we wait to see several "unparseable" errors in a row before
+         * bailing out.
+         */
+        {
+            unsigned unparseable_count;
+            bool got_a_frame = false;
+            for(unparseable_count = 0; !got_a_frame
+                && unparseable_count < 10; unparseable_count++) {
+                if(frame_sync(fc))
+                    got_a_frame = true;
+            }
+            if(!got_a_frame) {
+                ci->seek_buffer(orig_pos);
+                return false;
+            }
+        }
+
+        this_frame_sample = fc->samplenumber;
+        this_block_size = fc->blocksize;
+
+        if(target_sample >= this_frame_sample
+           && target_sample < this_frame_sample+this_block_size) {
+            /* Found the frame containing the target sample. */
+            fc->sample_skip = target_sample - this_frame_sample;
+            break;
+        }
+
+        if(this_frame_sample + this_block_size >= upper_bound_sample &&
+           !first_seek) {
+            if(pos == (off_t)lower_bound || !needs_seek) {
+                ci->seek_buffer(orig_pos);
+                return false;
+            }
+            /* Our last move backwards wasn't big enough, try again. */
+            approx_bytes_per_frame *= 2;
+            continue;
+        }
+        /* Allow one seek over upper bound,
+         * required for streams with unknown total samples.
+         */
+        first_seek = false;
+
+        /* Make sure we are not seeking in a corrupted stream */
+        if(this_frame_sample < lower_bound_sample) {
+            ci->seek_buffer(orig_pos);
+            return false;
+        }
+
+        approx_bytes_per_frame = this_block_size*fc->channels*fc->bps/8 + 64;
+
+        /* We need to narrow the search. */
+        if(target_sample < this_frame_sample) {
+            upper_bound_sample = this_frame_sample + this_block_size;
+            upper_bound = ci->curpos;
+        }
+        else { /* Target is beyond this frame. */
+            /* We are close, continue in decoding next frames. */
+            if(target_sample < this_frame_sample + 4*this_block_size) {
+                pos = ci->curpos + fc->framesize;
+                needs_seek = false;
+            }
+
+            lower_bound_sample = this_frame_sample + this_block_size;
+            lower_bound = ci->curpos + fc->framesize;
+        }
+    }
+
+    return true;
+}
+
+/* Seek to file offset */
 bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
-  if (nseekpoints==0) {
-      /* No seekpoints = no seeking */
-      return false;
-  } else {
-      offset-=fc->metadatalength;
-      int i=nseekpoints-1;
-      while ((i > 0) && (seekpoints[i].offset > offset)) {
-          i--;
-      }
+    unsigned unparseable_count;
+    bool got_a_frame = false;
 
-      if ((i==0) && (seekpoints[i].offset > offset)) {
-          offset=0;
-      } else {
-          offset=seekpoints[i].offset;
-      }
-  }
+    if(!ci->seek_buffer(offset))
+        return false;
 
-  return ci->seek_buffer(offset+fc->metadatalength);
+    bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE);
+    init_get_bits(&fc->gb, bit_buffer, buff_size*8);
+
+    for(unparseable_count = 0; !got_a_frame
+        && unparseable_count < 10; unparseable_count++) {
+        if(frame_sync(fc))
+            got_a_frame = true;
+    }
+    
+    if(!got_a_frame) {
+        ci->seek_buffer(fc->metadatalength);
+        return false;
+    }
+
+    return true;
 }
 
 /* this is the codec entry point */
@@ -306,7 +489,8 @@ enum codec_status codec_start(struct codec_api* api)
 
         /* Deal with any pending seek requests */
         if (ci->seek_time) {
-            if (flac_seek(&fc,((ci->seek_time-1)/20)*(ci->id3->frequency/50))) {
+            if (flac_seek(&fc,(uint32_t)(((uint64_t)(ci->seek_time-1)
+                *ci->id3->frequency)/1000))) {
                 /* Refill the input buffer */
                 buf = ci->request_buffer(&bytesleft, MAX_FRAMESIZE);
             }
@@ -323,10 +507,13 @@ enum codec_status codec_start(struct codec_api* api)
         frame++;
 
         ci->yield();
-        while(!ci->pcmbuf_insert_split((char*)decoded0,(char*)decoded1,
-              fc.blocksize*4)) {
+        while(!ci->pcmbuf_insert_split((char*)&decoded0[fc.sample_skip],
+              (char*)&decoded1[fc.sample_skip],
+              (fc.blocksize-fc.sample_skip)*4)) {
             ci->yield();
         }
+        
+        fc.sample_skip = 0;
 
         /* Update the elapsed-time indicator */
         samplesdone=fc.samplenumber+fc.blocksize;
