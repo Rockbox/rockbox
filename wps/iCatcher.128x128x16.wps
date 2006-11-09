@@ -58,9 +58,9 @@
 %xl|r|codec-mp1-sc.bmp|92|88|
 %xl|s|codec-mp2-sc.bmp|92|88|
 %xl|t|codec-mp3-sc.bmp|92|88|
-%xl|u|codec-wav-sc.bmp|92|88|
-%xl|v|codec-ogg-sc.bmp|92|88|
-%xl|w|codec-aiff-sc.bmp|92|88|
+%xl|u|codec-aiff-sc.bmp|92|88|
+%xl|v|codec-wav-sc.bmp|92|88|
+%xl|w|codec-ogg-sc.bmp|92|88|
 %xl|x|codec-flac-sc.bmp|92|88|
 %xl|y|codec-mpc-sc.bmp|92|88|
 %xl|z|codec-ac3-sc.bmp|92|88|
