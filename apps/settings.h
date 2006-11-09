@@ -193,6 +193,7 @@ struct user_settings
     int rec_stop_postrec;   /* negative: db, positive: % range -87 .. 100 */
     int rec_stop_gap;       /* index of trig_durations */
     int rec_trigger_mode;   /* see TRIG_MODE_XXX constants */
+    int rec_trigger_type;   /* what to do when trigger released */
 
 #ifdef HAVE_AGC
     int rec_agc_preset_mic; /* AGC mic preset modes:

@@ -23,7 +23,7 @@
 #include "settings.h"
 #include "ata.h"
 #include "lcd.h"
-#include "widgets.h"
+#include "scrollbar.h"
 #include "gwps.h"
 #include "sprintf.h"
 #include "button.h"
@@ -593,25 +593,33 @@ void peak_meter_peek(void)
     pm_max_right = MAX(pm_max_right, right);
 
 #ifdef HAVE_RECORDING
+#if CONFIG_CODEC == SWCODEC
+    /* Ignore any unread peakmeter data */
+#define MAX_DROP_TIME HZ/7 /* this value may need tweaking. Increase if you are
+                              getting trig events when you shouldn't with
+                              trig_stp_hold = 0 */
+    if (!trig_stp_hold)
+        trig_stp_hold = MAX_DROP_TIME;
+#endif
+
     switch (trig_status) {
         case TRIG_READY:
             /* no more changes, if trigger was activated as release trigger */
             /* threshold exceeded? */
             if ((left > trig_strt_threshold) 
                 || (right > trig_strt_threshold)) {
-                if (trig_strt_duration) {
                     /* reset trigger duration */
                     trig_hightime = current_tick;
 
                     /* reset dropout duration */
                     trig_lowtime = current_tick;
 
+                if (trig_strt_duration)
+                    set_trig_status(TRIG_STEADY);
+                else
                     /* if trig_duration is set to 0 the user wants to start
                      recording immediately */
-                    set_trig_status(TRIG_STEADY);
-                } else {
                     set_trig_status(TRIG_GO);
-                }
             }
             break;
 
@@ -652,7 +660,11 @@ void peak_meter_peek(void)
                 || (right > trig_stp_threshold)) {
                 /* restart hold time countdown */
                 trig_lowtime = current_tick;
+#if CONFIG_CODEC == SWCODEC
+            } else if (current_tick - trig_lowtime > MAX_DROP_TIME){
+#else
             } else {
+#endif
                 set_trig_status(TRIG_POSTREC);
                 trig_hightime = current_tick;
             }
@@ -667,6 +679,7 @@ void peak_meter_peek(void)
 
                     set_trig_status(TRIG_RETRIG);
                     trig_hightime = current_tick;
+                    trig_lowtime = current_tick;
                 }
                 else
 
@@ -709,6 +722,11 @@ void peak_meter_peek(void)
             }
             break;
     }
+#if CONFIG_CODEC == SWCODEC
+    /* restore stop hold value */
+    if (trig_stp_hold == MAX_DROP_TIME)
+        trig_stp_hold = 0;
+#endif
 #endif
     /* check levels next time peakmeter drawn */
     level_check = true;
@@ -1153,55 +1171,81 @@ int peak_meter_trigger_status(void)
    return trig_status; /* & TRIG_PIT_MASK;*/
 }
 
-void peak_meter_draw_trig(int xpos, int ypos) 
+void peak_meter_draw_trig(int xpos[], int ypos[], int trig_width[], int nb_screens) 
 {
-    int barstart, barend;
-    int icon, ixpos;
+    int barstart[NB_SCREENS];
+    int barend[NB_SCREENS];
+    int icon;
+    int ixpos[NB_SCREENS];
     int i;
+    int trigbar_width[NB_SCREENS];
+
+    FOR_NB_SCREENS(i)
+        trigbar_width[i] = (trig_width[i] - (2 * (ICON_PLAY_STATE_WIDTH + 1)));
+
     switch (trig_status) {
 
         case TRIG_READY:
-            barstart = 0;
-            barend = 0;
+            FOR_NB_SCREENS(i){
+                barstart[i] = 0;
+                barend[i] = 0;
+            }
             icon = Icon_Stop;
-            ixpos = xpos;
+            FOR_NB_SCREENS(i)
+                ixpos[i] = xpos[i];
             break;
 
         case TRIG_STEADY:
-        case TRIG_RETRIG: 
-            barstart = 0;
-            barend = TRIGBAR_WIDTH * (current_tick - trig_hightime) 
-                   / trig_strt_duration;
+        case TRIG_RETRIG:
+            FOR_NB_SCREENS(i)
+            {
+                barstart[i] = 0;
+                barend[i] = (trig_strt_duration == 0) ? trigbar_width[i] :
+                              trigbar_width[i] *
+                             (current_tick - trig_hightime) / trig_strt_duration;
+            }
             icon = Icon_Stop;
-            ixpos = xpos;
+            FOR_NB_SCREENS(i)
+                ixpos[i] = xpos[i];
             break;
 
         case TRIG_GO:
         case TRIG_CONTINUE:
-            barstart = TRIGBAR_WIDTH;
-            barend = TRIGBAR_WIDTH;
+            FOR_NB_SCREENS(i)
+            {
+                barstart[i] = trigbar_width[i];
+                barend[i] = trigbar_width[i];
+            }
             icon = Icon_Record;
-            ixpos = TRIG_WIDTH - ICON_PLAY_STATE_WIDTH;
+            FOR_NB_SCREENS(i)
+                ixpos[i] = xpos[i]+ trig_width[i] - ICON_PLAY_STATE_WIDTH;
             break;
 
-        case TRIG_POSTREC: 
-            barstart = TRIGBAR_WIDTH
-                     - TRIGBAR_WIDTH * (current_tick - trig_lowtime)
-                       / trig_stp_hold;
-            barend = TRIGBAR_WIDTH;
+        case TRIG_POSTREC:
+            FOR_NB_SCREENS(i)
+            {
+                barstart[i] = (trig_stp_hold == 0) ? 0 :
+                               trigbar_width[i] - trigbar_width[i] *
+                              (current_tick - trig_lowtime) / trig_stp_hold;
+                barend[i] = trigbar_width[i];
+            }
             icon = Icon_Record;
-            ixpos = TRIG_WIDTH - ICON_PLAY_STATE_WIDTH;
+            FOR_NB_SCREENS(i)
+                ixpos[i] = xpos[i] + trig_width[i] - ICON_PLAY_STATE_WIDTH;
             break;
 
         default:
             return;
     }
-    scrollbar(xpos + ICON_PLAY_STATE_WIDTH + 1, ypos + 1,
-              TRIGBAR_WIDTH, TRIG_HEIGHT - 2,
-              TRIGBAR_WIDTH, barstart, barend, HORIZONTAL);
-    FOR_NB_SCREENS(i)
+
+    for(i = 0; i < nb_screens; i++)
     {
-        screens[i].mono_bitmap(bitmap_icons_7x8[icon], ixpos, ypos,
+        gui_scrollbar_draw(&screens[i], xpos[i] + ICON_PLAY_STATE_WIDTH + 1,
+                               ypos[i] + 1, trigbar_width[i], TRIG_HEIGHT - 2,
+                               trigbar_width[i], barstart[i], barend[i],
+                               HORIZONTAL);
+
+        screens[i].mono_bitmap(bitmap_icons_7x8[icon], ixpos[i], ypos[i],
                         ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
     }
 }

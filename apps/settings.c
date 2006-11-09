@@ -687,6 +687,9 @@ static const struct bit_entry hd_bits[] =
 
     /* If values are just added to the end, no need to bump the version. */
     /* new stuff to be added at the end */
+#ifdef HAVE_RECORDING
+    {2, S_O(rec_trigger_type), 0, "trigger type", "stop,pause,nf stp"},
+#endif
 
     /* Sum of all bit sizes must not grow beyond 0xB8*8 = 1472 */
 };

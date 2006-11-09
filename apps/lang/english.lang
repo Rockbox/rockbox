@@ -10144,3 +10144,55 @@
     *: "Bitrate"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Trigtype"
+  </dest>
+  <voice>
+    *: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stop"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "New file"
+  </dest>
+  <voice>
+    *: "New file"
+  </voice>
+</phrase>

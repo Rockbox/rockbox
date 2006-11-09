@@ -69,14 +69,10 @@ extern void peak_meter_trigger(bool on);
 extern int peak_meter_trigger_status(void);
 extern void peak_meter_set_trigger_listener(void (*listener)(int status));
 
-//#define TRIG_WIDTH 12
-//#define TRIG_HEIGHT 14
-
-#define TRIG_WIDTH 112
 #define TRIG_HEIGHT 8
-#define TRIGBAR_WIDTH (TRIG_WIDTH - (2 * (ICON_PLAY_STATE_WIDTH + 1)))
 
-extern void peak_meter_draw_trig(int x, int y);
+extern void peak_meter_draw_trig(int x[], int y[], int trig_width[], 
+                                      int nb_screens);
 
 extern unsigned short peak_meter_range_min;
 extern unsigned short peak_meter_range_max;

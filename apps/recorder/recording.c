@@ -801,9 +801,16 @@ static void trigger_listener(int trigger_status)
             /* if we're already recording this is a retrigger */
             else
             {
-                rec_new_file();
-                /* tell recording_screen to reset the time */
-                last_seconds = 0;
+                if((audio_status() & AUDIO_STATUS_PAUSE) &&
+                       (global_settings.rec_trigger_type == 1))
+                    audio_resume_recording();
+                /* New file on trig start*/
+                else if (global_settings.rec_trigger_type != 2)
+                {
+                    rec_new_file();
+                    /* tell recording_screen to reset the time */
+                    last_seconds = 0;
+                }
             }
             break;
 
@@ -811,7 +818,27 @@ static void trigger_listener(int trigger_status)
         case TRIG_READY:
             if(audio_status() & AUDIO_STATUS_RECORD)
             {
-                audio_stop();
+                switch(global_settings.rec_trigger_type)
+                {
+                    case 0: /* Stop */
+#if CONFIG_CODEC == SWCODEC
+                        audio_stop_recording();
+#else
+                        audio_stop();
+#endif
+                        break;
+
+                    case 1: /* Pause */
+                        audio_pause_recording();
+                        break;
+
+                    case 2: /* New file on trig stop*/
+                        rec_new_file();
+                        /* tell recording_screen to reset the time */
+                        last_seconds = 0;
+                        break;
+                 }
+
                 if (global_settings.rec_trigger_mode != TRIG_MODE_REARM)
                 {
                     peak_meter_set_trigger_listener(NULL);
@@ -861,6 +888,9 @@ bool recording_screen(bool no_source)
     int i;
     int filename_offset[NB_SCREENS];
     int pm_y[NB_SCREENS];
+    int trig_xpos[NB_SCREENS];
+    int trig_ypos[NB_SCREENS];
+    int trig_width[NB_SCREENS];
 
     static const unsigned char *byte_units[] = {
         ID2P(LANG_BYTE),
@@ -1602,6 +1632,10 @@ bool recording_screen(bool no_source)
                     line[i] = 3;
                     break;
 #endif
+                default:
+                    line[i] = 5; /* to prevent uninitialisation
+                                    warnings for line[0] */
+                    break;
                 } /* end switch */
 #ifdef HAVE_AGC
                 if (screens[i].height < h * (2 + filename_offset[i] + PM_HEIGHT + line[i]))
@@ -1747,12 +1781,28 @@ bool recording_screen(bool no_source)
             }
 
             /* draw the trigger status */
+            FOR_NB_SCREENS(i)
+            {
+                trig_width[i] = ((screens[i].height < 64) ||
+                                ((screens[i].height < 72) && (PM_HEIGHT > 1))) ?
+                                  screens[i].width - 14 * w : screens[i].width;
+                trig_xpos[i] = screens[i].width - trig_width[i];
+                trig_ypos[i] =  ((screens[i].height < 72) && (PM_HEIGHT > 1)) ?
+                                  h*2 :
+                                  h*(1 + filename_offset[i] + PM_HEIGHT + line[i]
+#ifdef HAVE_AGC
+                               + 1
+#endif
+                               );
+            }
+
             if (peak_meter_trigger_status() != TRIG_OFF)
             {
-                peak_meter_draw_trig(LCD_WIDTH - TRIG_WIDTH, 4 * h);
+                peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width,
+                                         screen_update);
                 for(i = 0; i < screen_update; i++){
-                    screens[i].update_rect(LCD_WIDTH - (TRIG_WIDTH + 2), 4 * h,
-                                    TRIG_WIDTH + 2, TRIG_HEIGHT);
+                    screens[i].update_rect(trig_xpos[i], trig_ypos[i],
+                                           trig_width[i] + 2, TRIG_HEIGHT);
                 }
             }
         }

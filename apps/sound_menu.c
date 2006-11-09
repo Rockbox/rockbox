@@ -32,7 +32,7 @@
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
-#include "widgets.h"
+#include "scrollbar.h"
 #endif
 #include "lang.h"
 #include "sprintf.h"
@@ -45,7 +45,7 @@
 #include "radio.h"
 #endif
 #endif
-#if CONFIG_CODEC == MAS3587F
+#ifdef HAVE_RECORDING
 #include "peakmeter.h"
 #include "mas.h"
 #endif
@@ -812,6 +812,7 @@ bool sound_menu(void)
 enum trigger_menu_option
 {
     TRIGGER_MODE,
+    TRIGGER_TYPE,
     PRERECORD_TIME,
     START_THRESHOLD,
     START_DURATION,
@@ -821,7 +822,7 @@ enum trigger_menu_option
     TRIG_OPTION_COUNT,
 };
 
-#if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
+#ifdef HAVE_RECORDING
 static char* create_thres_str(int threshold)
 {
     static char retval[6];
@@ -864,17 +865,6 @@ static void change_threshold(int *threshold, int change)
     }
 }
 
-/* Variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define TRIG_CANCEL BUTTON_OFF
-#define TRIG_ACCEPT BUTTON_PLAY
-#define TRIG_RESET_SIM BUTTON_F2
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define TRIG_CANCEL BUTTON_OFF
-#define TRIG_ACCEPT BUTTON_MENU
-#endif
-
 /**
  * Displays a menu for editing the trigger settings.
  */
@@ -883,7 +873,8 @@ bool rectrigger(void)
     int exit_request = false;
     enum trigger_menu_option selected = TRIGGER_MODE;
     bool retval = false;
-    int old_x_margin, old_y_margin;
+    int old_x_margin[NB_SCREENS];
+    int old_y_margin[NB_SCREENS];
 
 #define TRIGGER_MODE_COUNT 3
     static const unsigned char *trigger_modes[] = {
@@ -900,8 +891,16 @@ bool rectrigger(void)
         "30s"
     };
 
+#define TRIGGER_TYPE_COUNT 3
+    static const unsigned char *trigger_types[] = {
+        ID2P(LANG_RECORD_TRIGGER_STOP),
+        ID2P(LANG_RECORD_TRIGGER_PAUSE),
+        ID2P(LANG_RECORD_TRIGGER_NEWFILESTP),
+    };
+
     static const unsigned char *option_name[] = {
         [TRIGGER_MODE] =    ID2P(LANG_RECORD_TRIGGER_MODE),
+        [TRIGGER_TYPE] =    ID2P(LANG_RECORD_TRIGGER_TYPE),
         [PRERECORD_TIME] =  ID2P(LANG_RECORD_PRERECORD_TIME),
         [START_THRESHOLD] = ID2P(LANG_RECORD_START_THRESHOLD),
         [START_DURATION] =  ID2P(LANG_RECORD_MIN_DURATION),
@@ -917,43 +916,72 @@ bool rectrigger(void)
     int old_stop_postrec = global_settings.rec_stop_postrec;
     int old_stop_gap = global_settings.rec_stop_gap;
     int old_trigger_mode = global_settings.rec_trigger_mode;
+    int old_trigger_type = global_settings.rec_trigger_type;
 
-    int offset = 0;
-    int option_lines;
-    int w, h;
+    int offset[NB_SCREENS];
+    int option_lines[NB_SCREENS];
+    int w, h, i;
     int stat_height = global_settings.statusbar ? STATUSBAR_HEIGHT : 0;
-    /* array for y ordinate of peak_meter_draw_get_button
-       function in peakmeter.c*/
     int pm_y[NB_SCREENS];
+
+    int trig_xpos[NB_SCREENS];
+    int trig_ypos[NB_SCREENS];
+    int trig_width[NB_SCREENS];
+
+    FOR_NB_SCREENS(i)
+    {
+        offset[i] = 0;
+        trig_xpos[i] = 0;
+        trig_ypos[i] =  screens[i].height - stat_height - TRIG_HEIGHT;
+        pm_y[i] = screens[i].height - stat_height;
+        trig_width[i] = screens[i].width;
+    }
 
     /* restart trigger with new values */
     settings_apply_trigger();
     peak_meter_trigger (global_settings.rec_trigger_mode != TRIG_MODE_OFF);
 
-    lcd_clear_display();
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].clear_display();
 
-    old_x_margin = lcd_getxmargin();
-    old_y_margin = lcd_getymargin();
-    if(global_settings.statusbar)
-        lcd_setmargins(0, STATUSBAR_HEIGHT);
-    else
-        lcd_setmargins(0, 0);
+        old_x_margin[i] = screens[i].getxmargin();
+        old_y_margin[i] = screens[i].getymargin();
+        if(global_settings.statusbar)
+           screens[i].setmargins(0, STATUSBAR_HEIGHT);
+      else
+          screens[i].setmargins(0, 0);
 
-    lcd_getstringsize("M", &w, &h);
+      screens[i].getstringsize("M", &w, &h);
 
-    /* 16 pixels are reserved for peak meter and trigger status */
-    option_lines = (LCD_HEIGHT - 16 - stat_height) / h;
+      // 16 pixels are reserved for peak meter and trigger status
+      option_lines[i] = MIN(((screens[i].height) -
+                          stat_height - 16)/h,
+                           TRIG_OPTION_COUNT);
+    }
 
     while (!exit_request) {
-        int button, i;
+        int button, k;
         const char *str;
-        char option_value[TRIG_OPTION_COUNT][7];
+        char option_value[TRIG_OPTION_COUNT][9];
 
         snprintf(
             option_value[TRIGGER_MODE],
             sizeof option_value[TRIGGER_MODE],
             "%s",
             P2STR(trigger_modes[global_settings.rec_trigger_mode]));
+
+        snprintf(
+            option_value[TRIGGER_TYPE],
+            sizeof option_value[TRIGGER_TYPE],
+            "%s",
+            P2STR(trigger_types[global_settings.rec_trigger_type]));
+
+        snprintf(
+            option_value[TRIGGER_TYPE],
+            sizeof option_value[TRIGGER_TYPE],
+            "%s",
+            P2STR(trigger_types[global_settings.rec_trigger_type]));
 
         snprintf (
             option_value[PRERECORD_TIME],
@@ -1003,41 +1031,51 @@ bool rectrigger(void)
             "%s",
             trig_durations[global_settings.rec_stop_gap]);
 
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+            screens[i].fillrect(0, stat_height, screens[i].width,
+                                   screens[i].height - stat_height);
+            screens[i].set_drawmode(DRMODE_SOLID);
+        }
+
         gui_syncstatusbar_draw(&statusbars, true);
 
         /* reselect FONT_SYSFONT as status_draw has changed the font */
         /*lcd_setfont(FONT_SYSFIXED);*/
 
-        for (i = 0; i < option_lines; i++) {
-            int x, y;
+        FOR_NB_SCREENS(i)
+        {
+            for (k = 0; k < option_lines[i]; k++) {
+                int x, y;
 
-            str = P2STR(option_name[i + offset]);
-            lcd_putsxy(5, stat_height + i * h, str);
+                str = P2STR(option_name[k + offset[i]]);
+                screens[i].putsxy((option_lines[i] < TRIG_OPTION_COUNT) ? 5 : 0,
+                                       stat_height + k * h, str);
 
-            str = option_value[i + offset];
-            lcd_getstringsize(str, &w, NULL);
-            y = stat_height + i * h;
-            x = LCD_WIDTH - w;
-            lcd_putsxy(x, y, str);
-            if ((int)selected == (i + offset)) {
-                lcd_set_drawmode(DRMODE_COMPLEMENT);
-                lcd_fillrect(x, y, w, h);
-                lcd_set_drawmode(DRMODE_SOLID);
+                str = option_value[k + offset[i]];
+                screens[i].getstringsize(str, &w, &h);
+                y = stat_height + k * h;
+                x = screens[i].width - w;
+                screens[i].putsxy(x, y, str);
+                if ((int)selected == (k + offset[i])) {
+                    screens[i].set_drawmode(DRMODE_COMPLEMENT);
+                    screens[i].fillrect(x, y, w, h);
+                    screens[i].set_drawmode(DRMODE_SOLID);
+                }
             }
+            if (option_lines[i] < TRIG_OPTION_COUNT)
+                gui_scrollbar_draw(&screens[i], 0, stat_height,
+                    4, screens[i].height - 16 - stat_height,
+                    TRIG_OPTION_COUNT, offset[i], offset[i] + option_lines[i],
+                    VERTICAL);
         }
 
-        scrollbar(0, stat_height,
-            4, option_lines * h,
-            TRIG_OPTION_COUNT, offset, offset + option_lines,
-            VERTICAL);
-
-        peak_meter_draw_trig(0, LCD_HEIGHT - 8 - TRIG_HEIGHT);
-
-        FOR_NB_SCREENS(i)
-            pm_y[i] = screens[i].height - 8;
+        peak_meter_draw_trig(trig_xpos, trig_ypos, trig_width, NB_SCREENS);
         button = peak_meter_draw_get_btn(0, pm_y, 8, NB_SCREENS);
 
-        lcd_update();
+        FOR_NB_SCREENS(i)
+            screens[i].update();
 
         switch (button) {
             case ACTION_STD_CANCEL:
@@ -1049,6 +1087,7 @@ bool rectrigger(void)
                 global_settings.rec_stop_postrec = old_stop_postrec;
                 global_settings.rec_stop_gap = old_stop_gap;
                 global_settings.rec_trigger_mode = old_trigger_mode;
+                global_settings.rec_trigger_type = old_trigger_type;
                 exit_request = true;
                 break;
 
@@ -1059,15 +1098,21 @@ bool rectrigger(void)
             case ACTION_STD_PREV:
                 selected += TRIG_OPTION_COUNT - 1;
                 selected %= TRIG_OPTION_COUNT;
-                offset = MIN(offset, (int)selected);
-                offset = MAX(offset, (int)selected - option_lines + 1);
+                FOR_NB_SCREENS(i)
+                {
+                    offset[i] = MIN(offset[i], (int)selected);
+                    offset[i] = MAX(offset[i], (int)selected - option_lines[i] + 1);
+                }
                 break;
 
             case ACTION_STD_NEXT:
                 selected ++;
                 selected %= TRIG_OPTION_COUNT;
-                offset = MIN(offset, (int)selected);
-                offset = MAX(offset, (int)selected - option_lines + 1);
+                FOR_NB_SCREENS(i)
+                {
+                    offset[i] = MIN(offset[i], (int)selected);
+                    offset[i] = MAX(offset[i], (int)selected - option_lines[i] + 1);
+                }
                 break;
 
             case ACTION_SETTINGS_INC:
@@ -1075,6 +1120,11 @@ bool rectrigger(void)
                     case TRIGGER_MODE:
                         global_settings.rec_trigger_mode ++;
                         global_settings.rec_trigger_mode %= TRIGGER_MODE_COUNT;
+                        break;
+
+                    case TRIGGER_TYPE:
+                        global_settings.rec_trigger_type ++;
+                        global_settings.rec_trigger_type %= TRIGGER_TYPE_COUNT;
                         break;
 
                     case PRERECORD_TIME:
@@ -1120,6 +1170,11 @@ bool rectrigger(void)
                         global_settings.rec_trigger_mode %= TRIGGER_MODE_COUNT;
                         break;
 
+                    case TRIGGER_TYPE:
+                        global_settings.rec_trigger_type+=TRIGGER_TYPE_COUNT-1;
+                        global_settings.rec_trigger_type %= TRIGGER_TYPE_COUNT;
+                        break;
+
                     case PRERECORD_TIME:
                         global_settings.rec_prerecord_time += PRERECORD_TIMES_COUNT - 1;
                         global_settings.rec_prerecord_time %= PRERECORD_TIMES_COUNT;
@@ -1159,11 +1214,9 @@ bool rectrigger(void)
                 settings_apply_trigger();
                 break;
 
-#ifdef TRIG_RESET_SIM
             case ACTION_REC_F2:
                 peak_meter_trigger(true);
                 break;
-#endif
 
             case SYS_USB_CONNECTED:
                 if(default_event_handler(button) == SYS_USB_CONNECTED) {
@@ -1175,8 +1228,11 @@ bool rectrigger(void)
     }
 
     peak_meter_trigger(false);
-    lcd_setfont(FONT_UI);
-    lcd_setmargins(old_x_margin, old_y_margin);
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].setfont(FONT_UI);
+        screens[i].setmargins(old_x_margin[i], old_y_margin[i]);
+    }
     action_signalscreenchange();
     return retval;
 }
@@ -1205,9 +1261,7 @@ bool recording_menu(bool no_source)
 #ifdef CONFIG_BACKLIGHT
         { ID2P(LANG_CLIP_LIGHT), cliplight },
 #endif
-#if !defined(SIMULATOR) && CONFIG_CODEC == MAS3587F
         { ID2P(LANG_RECORD_TRIGGER), rectrigger },
-#endif
 #ifdef HAVE_AGC
         { ID2P(LANG_RECORD_AGC_PRESET), agc_preset },
         { ID2P(LANG_RECORD_AGC_CLIPTIME), agc_cliptime },
