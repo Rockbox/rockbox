@@ -213,7 +213,6 @@ bitswap.S
 crt0.S
 descramble.S
 drivers/i2c.c
-drivers/lcd.S
 target/sh/crt0.S
 target/sh/memcpy-sh.S
 target/sh/memmove-sh.S
@@ -246,7 +245,6 @@ target/coldfire/i2c-coldfire.c
 common/memcpy.c
 common/memmove.c
 common/strlen.c
-drivers/lcd.S
 #ifndef SIMULATOR
 target/arm/memset-arm.S
 target/arm/memset16-arm.S
@@ -279,6 +277,30 @@ drivers/i2c.c
 #endif /* SIMULATOR */
 
 #endif /* defined(CPU_*) */
+
+#ifdef ARCHOS_PLAYER
+#ifndef SIMULATOR
+target/sh/archos/player/lcd-as-player.S
+#endif /* SIMULATOR */
+#endif /* ARCHOS_PLAYER */
+
+#ifdef ARCHOS_RECORDER
+#ifndef SIMULATOR
+target/sh/archos/lcd-as-archos-bitmap.S
+#endif /* SIMULATOR */
+#endif /* ARCHOS_RECORDER */
+
+#if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
+#ifndef SIMULATOR
+target/sh/archos/lcd-as-archos-bitmap.S
+#endif /* SIMULATOR */
+#endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
+
+#if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
+#ifndef SIMULATOR
+target/sh/archos/lcd-as-archos-bitmap.S
+#endif /* SIMULATOR */
+#endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR

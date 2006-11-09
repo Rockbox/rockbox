@@ -21,21 +21,12 @@
 #include "config.h"
 #include "cpu.h"
 
-#if CONFIG_CPU == SH7034
 #define LCDR (PBDR_ADDR+1)
 
-#ifdef HAVE_LCD_CHARCELLS
 #define LCD_DS  1 /* PB0 = 1 --- 0001 ---  LCD-DS */
 #define LCD_CS  2 /* PB1 = 1 --- 0010 --- /LCD-CS */
 #define LCD_SD  4 /* PB2 = 1 --- 0100 ---  LCD-SD */
 #define LCD_SC  8 /* PB3 = 1 --- 1000 ---  LCD-SC */
-#else
-#define LCD_SD  1 /* PB0 = 1 --- 0001 */
-#define LCD_SC  2 /* PB1 = 1 --- 0010 */
-#define LCD_RS  4 /* PB2 = 1 --- 0100 */
-#define LCD_CS  8 /* PB3 = 1 --- 1000 */
-#define LCD_DS LCD_RS
-#endif
 
 /*
  * About /CS,DS,SC,SD
@@ -83,8 +74,7 @@
  * Register usage:
  *   r0 - scratch
  *   r1 - data byte (copied)
- *   r2 - precalculated port value (CS, DS and SC low, SD high),
- *        negated (neg)!
+ *   r2 - precalculated port value (CS, DS and SC low, SD high)
  *   r3 - lcd port address
  *   r5 - 1 (byte count for reuse of the loop in _lcd_write_data)
  */
@@ -102,7 +92,7 @@ _lcd_write_command:
     and     #(~(LCD_CS|LCD_DS|LCD_SC)),r0  /* r0 &= ~(LCD_CS|LCD_DS|LCD_SC) */
 
     bra     .single_transfer /* jump into the transfer loop */
-    neg     r0,r2           /* r2 = 0 - r0 */
+    mov     r0,r2
 
 
     .align      2
@@ -139,10 +129,7 @@ _lcd_write_data:
     mov.b   @r3,r0          /* r0 = PBDRL */
     or      #(LCD_DS|LCD_SD),r0     /* r0 |= LCD_DS|LCD_SD */
     and     #(~(LCD_CS|LCD_SC)),r0  /* r0 &= ~(LCD_CS|LCD_SC) */
-    neg     r0,r2           /* r2 = 0 - r0 */
-
-#ifdef HAVE_LCD_CHARCELLS
-/* optimized player version, also works for recorders */
+    mov     r0,r2
 
     .align  2
 .multi_transfer:
@@ -153,8 +140,7 @@ _lcd_write_data:
     shll8   r1
 
     shll    r1              /* shift the msb into carry */
-    neg     r2,r0           /* copy negated precalculated port value */
-            /* uses neg here for compatibility with recorder version */
+    mov     r2,r0           /* copy precalculated port value */
     bt      1f              /* data bit = 1? */
     and     #(~LCD_SD),r0   /* no: r0 &= ~LCD_SD */
     1:
@@ -163,7 +149,7 @@ _lcd_write_data:
     or      #(LCD_SC),r0    /* rise SC (independent of SD level) */
     mov.b   r0,@r3          /* set to port */
 
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -172,7 +158,7 @@ _lcd_write_data:
     mov.b   r0,@r3
 
     shll    r1
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -181,7 +167,7 @@ _lcd_write_data:
     or      #(LCD_SC),r0
     mov.b   r0,@r3
 
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -190,7 +176,7 @@ _lcd_write_data:
     mov.b   r0,@r3
 
     shll    r1
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -199,7 +185,7 @@ _lcd_write_data:
     or      #(LCD_SC),r0
     mov.b   r0,@r3
 
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -208,7 +194,7 @@ _lcd_write_data:
     mov.b   r0,@r3
 
     shll    r1
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
@@ -217,76 +203,13 @@ _lcd_write_data:
     or      #(LCD_SC),r0
     mov.b   r0,@r3
 
-    neg     r2,r0
+    mov     r2,r0
     bt      1f
     and     #(~LCD_SD),r0
     1:
     mov.b   r0,@r3
     or      #(LCD_SC),r0
     mov.b   r0,@r3
-
-#else /* HAVE_LCD_CHARCELLS */
-/* further optimized version,  exploits that SD is on bit 0 for recorders */
-
-    .align  2
-.multi_transfer:
-    mov.b   @r4+,r1         /* load data byte from memory */
-    nop
-
-.single_transfer:
-    shll16  r1              /* shift data to most significant byte */
-    shll8   r1
-    not     r1,r1           /* and invert for use with negc */
-
-    shll    r1              /* shift the MSB into carry */
-    negc    r2,r0           /* carry to SD, SC low */
-    shll    r1              /* next shift here for alignment */
-    mov.b   r0,@r3          /* set data to port */
-    or      #(LCD_SC),r0    /* rise SC (independent of SD level) */
-    mov.b   r0,@r3          /* set to port */
-
-    negc    r2,r0
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    shll    r1
-    negc    r2,r0
-    shll    r1
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    negc    r2,r0
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    shll    r1
-    negc    r2,r0
-    shll    r1
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    negc    r2,r0
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    shll    r1
-    negc    r2,r0
-    shll    r1
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-    negc    r2,r0
-    mov.b   r0,@r3
-    or      #(LCD_SC),r0
-    mov.b   r0,@r3
-
-#endif /* HAVE_LCD_CHARCELLS */
 
     add     #-1,r5          /* decrease byte count */
     tst     r5,r5           /* r5 == 0 ? */
@@ -305,4 +228,3 @@ _lcd_write_data:
 
 .end:
     .size   _lcd_write_command,.end-_lcd_write_command
-#endif
