@@ -981,7 +981,7 @@ void ata_spin(void)
 static void mmc_thread(void)
 {
     struct event ev;
-    static long last_seen_mtx_unlock = 0;
+    bool idle_notified = false;
     
     while (1) {
         queue_wait_w_tmo(&mmc_queue, &ev, HZ);
@@ -1006,14 +1006,16 @@ static void mmc_thread(void)
 #endif
                 
             default:
-                if (!ata_disk_is_active())
+                if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
                 {
-                    if (!last_seen_mtx_unlock)
-                        last_seen_mtx_unlock = current_tick;
-                    if (TIME_AFTER(current_tick, last_seen_mtx_unlock+(HZ*10)))
+                    idle_notified = false;
+                }
+                else
+                {
+                    if (!idle_notified)
                     {
                         call_ata_idle_notifys(false);
-                        last_seen_mtx_unlock = 0;
+                        idle_notified = true;
                     }
                 }
                 break;
