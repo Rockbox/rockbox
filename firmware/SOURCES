@@ -518,3 +518,13 @@ target/arm/ipod/power-ipod.c
 target/arm/ipod/usb-ipod.c
 #endif /* SIMULATOR */
 #endif /* IPOD_MINI2G */
+
+#ifdef IRIVER_IFP7XX
+target/arm/iriver/ifp7xx/power-ifp7xx.c
+#ifndef SIMULATOR
+target/arm/iriver/ifp7xx/adc-ifp7xx.c
+target/arm/iriver/ifp7xx/backlight-ifp7xx.c
+target/arm/iriver/ifp7xx/button-ifp7xx.c
+target/arm/iriver/ifp7xx/usb-ifp7xx.c
+#endif
+#endif

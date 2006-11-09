@@ -1,6 +1,8 @@
 /*
  * This config file is for iriver iFP-799
  */
+#define TARGET_TREE
+
 #define IRIVER_IFP7XX_SERIES 1
 
 /* For Rolo and boot loader */
@@ -90,6 +92,10 @@
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
+
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40
 
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ

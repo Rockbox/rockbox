@@ -144,8 +144,6 @@ void ide_power_enable(bool on)
         P1 |= 0x08;
     else
         P1 &= ~0x08;
-#elif CONFIG_CPU == PNX0101
-    /* no ide controller */
 #elif defined(TOSHIBA_GIGABEAT_F)
     /* Gigabeat TODO */
 #else /* SH1 based archos */
@@ -222,10 +220,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#if CONFIG_CPU == PNX0101
-    GPIO1_CLR = 1 << 16;
-    GPIO2_SET = 1;
-#elif defined(GMINI_ARCH)
+#if defined(GMINI_ARCH)
     P1 &= ~1;
     P1CON &= ~1;
 #elif defined(TOSHIBA_GIGABEAT_F)

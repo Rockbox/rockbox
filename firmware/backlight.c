@@ -71,8 +71,6 @@ static inline void __backlight_on(void)
     or_b(0x40, &PADRH); /* drive it high */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 |= 0x10;
-#elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
-    GPIO3_SET = 1;
 #endif
 }
 
@@ -87,8 +85,6 @@ static inline void __backlight_off(void)
     and_b(~0x40, &PADRH); /* drive it low */
 #elif CONFIG_BACKLIGHT == BL_GMINI
     P1 &= ~0x10;
-#elif CONFIG_BACKLIGHT==BL_IRIVER_IFP7XX
-    GPIO3_CLR = 1;
 #endif
 }
 #endif

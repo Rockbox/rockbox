@@ -1088,6 +1088,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$genericbitmaptools
+    t_cpu="arm"
+    t_manufacturer="iriver"
+    t_model="ifp7xx"
     ;;
 
    40|gigabeatf)

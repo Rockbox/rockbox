@@ -75,10 +75,7 @@ static bool remote_filter_first_keypress;
 #define REPEAT_INTERVAL_FINISH  5
 
 /* the power-off button and number of repeated keys before shutting off */
-#if (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-#define POWEROFF_BUTTON BUTTON_PLAY
-#define POWEROFF_COUNT 40
-#elif !defined(TARGET_TREE)
+#if !defined(TARGET_TREE)
 #define POWEROFF_BUTTON BUTTON_OFF
 #define POWEROFF_COUNT 10
 #endif
@@ -506,46 +503,6 @@ static int button_read(void)
         || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     btn = button_read_device(); /* temp untill TARGET_TREE is defined */
 
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-    static bool hold_button = false;
-    bool hold_button_old;
-
-    /* normal buttons */
-    hold_button_old = hold_button;
-    hold_button = button_hold();
-
-    if (hold_button != hold_button_old)
-        backlight_hold_changed(hold_button);
-
-    if (!button_hold())
-    {          
-        data = adc_read(ADC_BUTTONS);
-        if (data < 0x35c)
-        {
-            if (data < 0x151)
-                if (data < 0xc7)
-                    if (data < 0x41)
-                        btn = BUTTON_LEFT;
-                    else
-                        btn = BUTTON_RIGHT;
-                else
-                    btn = BUTTON_SELECT;
-            else
-                if (data < 0x268)
-                    if (data < 0x1d7)
-                        btn = BUTTON_UP;
-                    else
-                        btn = BUTTON_DOWN;
-                else
-                    if (data < 0x2f9)
-                        btn = BUTTON_EQ;
-                    else
-                        btn = BUTTON_MODE;
-        }
-
-        if (adc_read(ADC_BUTTON_PLAY) < 0x64)
-            btn |= BUTTON_PLAY;
-    }
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #ifndef HAVE_FMADC
@@ -703,12 +660,6 @@ static int button_read(void)
     return retval;
 }
 
-#if CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-bool button_hold(void)
-{
-    return (GPIO5_READ & 4) ? false : true;
-}
-#endif
 
 int button_status(void)
 {

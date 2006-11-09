@@ -26,8 +26,6 @@
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define HAS_BUTTON_HOLD
 #define HAS_REMOTE_BUTTON_HOLD
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-#define HAS_BUTTON_HOLD
 #endif
 extern struct event_queue button_queue;
 
@@ -173,26 +171,6 @@ void wheel_send_events(bool send);
 
 #define BUTTON_REMOTE 0
 
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-
-/* iriver IFP7XX specific button codes */
-
-#define BUTTON_PLAY         0x00000001
-#define BUTTON_SELECT       0x00000002
-
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_UP           0x00000010
-#define BUTTON_DOWN         0x00000020
-
-#define BUTTON_MODE         0x00000040
-#define BUTTON_EQ           0x00000080
-
-#define BUTTON_MAIN (BUTTON_PLAY|BUTTON_SELECT\
-                |BUTTON_LEFT|BUTTON_RIGHT|BUTTON_UP|BUTTON_DOWN\
-                |BUTTON_MODE|BUTTON_EQ)
-
-#define BUTTON_REMOTE 0
 
 #elif 0
 
