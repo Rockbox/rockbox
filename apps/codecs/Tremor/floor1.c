@@ -312,7 +312,8 @@ static void render_line(int x0,register int x1,int y0,int y1,ogg_int32_t *d){
   }
 }
 
-static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in) ICODE_ATTR;
+static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;
   vorbis_info_floor1 *info=look->vi;
@@ -399,7 +400,7 @@ static void *floor1_inverse1(vorbis_block *vb,vorbis_look_floor *in){
 }
 
 static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
-                          ogg_int32_t *out) ICODE_ATTR;
+                          ogg_int32_t *out) ICODE_ATTR_TREMOR_NOT_MDCT;
 static int floor1_inverse2(vorbis_block *vb,vorbis_look_floor *in,void *memo,
                           ogg_int32_t *out){
   vorbis_look_floor1 *look=(vorbis_look_floor1 *)in;

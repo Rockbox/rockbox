@@ -18,6 +18,14 @@
   #define ICODE_ATTR
 #endif
 
+#ifndef ICODE_ATTR_FLAC
+#define ICODE_ATTR_FLAC ICODE_ATTR
+#endif
+
+#ifndef IBSS_ATTR_FLAC_DECODED0
+#define IBSS_ATTR_FLAC_DECODED0 IBSS_ATTR
+#endif
+
 /* Endian conversion routines for standalone compilation */
 #ifdef BUILD_STANDALONE
     #ifdef BUILD_BIGENDIAN
@@ -252,7 +260,7 @@ static inline unsigned int get_bits(GetBitContext *s, int n){
     return tmp;
 }
 
-unsigned int get_bits_long(GetBitContext *s, int n) ICODE_ATTR;
+unsigned int get_bits_long(GetBitContext *s, int n) ICODE_ATTR_FLAC;
 
 /**
  * shows 0-17 bits.
@@ -267,7 +275,7 @@ static inline unsigned int show_bits(GetBitContext *s, int n){
     return tmp;
 }
 
-unsigned int show_bits_long(GetBitContext *s, int n) ICODE_ATTR;
+unsigned int show_bits_long(GetBitContext *s, int n) ICODE_ATTR_FLAC;
 
 static inline void skip_bits(GetBitContext *s, int n){
  //Note gcc seems to optimize this to s->index+=n for the ALT_READER :))
@@ -328,6 +336,6 @@ static inline void init_get_bits(GetBitContext *s,
     }
 }
 
-void align_get_bits(GetBitContext *s) ICODE_ATTR;
+void align_get_bits(GetBitContext *s) ICODE_ATTR_FLAC;
 
 #endif /* BITSTREAM_H */

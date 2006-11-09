@@ -144,7 +144,8 @@ STIN  void mdct_butterfly_32(DATA_TYPE *x){
 }
 
 /* N/stage point generic N stage butterfly (in place, 4 register) */
-void mdct_butterfly_generic(DATA_TYPE *x,int points, int step) ICODE_ATTR;
+void mdct_butterfly_generic(DATA_TYPE *x,int points, int step)
+    ICODE_ATTR_TREMOR_MDCT;
 void mdct_butterfly_generic(DATA_TYPE *x,int points, int step){
   LOOKUP_T *T   = sincos_lookup0;
   DATA_TYPE *x1        = x + points      - 8;
@@ -332,7 +333,8 @@ STIN void mdct_bitreverse(DATA_TYPE *x,int n,int step,int shift) {
 }
 
 
-void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) ICODE_ATTR;
+void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out)
+    ICODE_ATTR_TREMOR_MDCT;
 void mdct_backward(int n, DATA_TYPE *in, DATA_TYPE *out) {
   int n2=n>>1;
   int n4=n>>2;

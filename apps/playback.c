@@ -176,6 +176,10 @@ enum {
 #endif
 #define CODEC_IRAM_SIZE     0xc000
 
+#ifndef IBSS_ATTR_VOICE_STACK
+#define IBSS_ATTR_VOICE_STACK IBSS_ATTR
+#endif
+
 #ifndef SIMULATOR
 extern bool audio_is_initialized;
 #else
@@ -278,7 +282,7 @@ extern struct codec_api ci_voice;
 static struct thread_entry *voice_thread_p = NULL;
 static struct event_queue voice_queue;
 static long voice_stack[(DEFAULT_STACK_SIZE + 0x2000)/sizeof(long)]
-IBSS_ATTR;
+IBSS_ATTR_VOICE_STACK;
 static const char voice_thread_name[] = "voice codec";
 
 /* Voice codec swapping control */

@@ -35,7 +35,8 @@
 static ogg_int32_t *ipcm_vect[CHANNELS] IBSS_ATTR;
 static ogg_int32_t ipcm_buff[CHANNELS*IRAM_PCM_END] IBSS_ATTR LINE_ATTR;
 
-int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep) ICODE_ATTR;
+int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 int vorbis_synthesis(vorbis_block *vb,ogg_packet *op,int decodep){
   vorbis_dsp_state     *vd=vb->vd;
   private_state        *b=(private_state *)vd->backend_state;

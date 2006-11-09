@@ -49,7 +49,7 @@ void oggpack_readinit(oggpack_buffer *b,ogg_reference *r){
                       }
 
 /* Read in bits without advancing the bitptr; bits <= 32 */
-long oggpack_look_full(oggpack_buffer *b,int bits) ICODE_ATTR;
+long oggpack_look_full(oggpack_buffer *b,int bits) ICODE_ATTR_TREMOR_NOT_MDCT;
 long oggpack_look_full(oggpack_buffer *b,int bits){
   unsigned long m=oggpack_mask[bits];
   unsigned long ret=-1;
@@ -136,7 +136,7 @@ int oggpack_eop(oggpack_buffer *b){
 }
 
 /* bits <= 32 */
-long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR;
+long oggpack_read(oggpack_buffer *b,int bits) ICODE_ATTR_TREMOR_NOT_MDCT;
 long oggpack_read(oggpack_buffer *b,int bits){
   unsigned long m=oggpack_mask[bits];
   ogg_uint32_t ret=-1;

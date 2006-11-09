@@ -34,7 +34,7 @@ struct codec_api* rb;
 struct codec_api* ci;
 
 /* The output buffers containing the decoded samples (channels 0 and 1) */
-int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR;
+int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_DECODED0;
 int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
 
 #define MAX_SUPPORTED_SEEKTABLE_SIZE 5000

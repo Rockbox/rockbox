@@ -105,7 +105,8 @@ static ogg_buffer *_fetch_buffer(ogg_buffer_state *bs,long bytes){
   return ob;
 }
 
-static ogg_reference *_fetch_ref(ogg_buffer_state *bs) ICODE_ATTR;
+static ogg_reference *_fetch_ref(ogg_buffer_state *bs)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 static ogg_reference *_fetch_ref(ogg_buffer_state *bs){
   ogg_reference *or;
   bs->outstanding++;
@@ -857,7 +858,7 @@ static void _next_lace(oggbyte_buffer *ob,ogg_stream_state *os){
   }
 }
 
-static void _span_queued_page(ogg_stream_state *os) ICODE_ATTR;
+static void _span_queued_page(ogg_stream_state *os) ICODE_ATTR_TREMOR_NOT_MDCT;
 static void _span_queued_page(ogg_stream_state *os){ 
   while( !(os->body_fill&FINFLAG) ){
     
@@ -1016,7 +1017,8 @@ int ogg_stream_reset_serialno(ogg_stream_state *os,int serialno){
   return OGG_SUCCESS;
 }
 
-static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv) ICODE_ATTR;
+static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 static int _packetout(ogg_stream_state *os,ogg_packet *op,int adv){
 
   ogg_packet_release(op);

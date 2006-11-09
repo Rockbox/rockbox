@@ -83,7 +83,7 @@ static unsigned int get_uint(ShortenContext *s, int k)
 }
 
 #if defined(CPU_COLDFIRE) && !defined(SIMULATOR)
-static void coldfire_lshift_samples(int n, int shift, int32_t *samples) ICODE_ATTR;
+static void coldfire_lshift_samples(int n, int shift, int32_t *samples) ICODE_ATTR_FLAC;
 static void coldfire_lshift_samples(int n, int shift, int32_t *samples)
 {
 /*

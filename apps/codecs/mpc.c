@@ -63,7 +63,8 @@ mpc_bool_t canseek_impl(void *data)
     return true;
 }
 
-MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH] IBSS_ATTR;
+MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH]
+IBSS_ATTR_MPC_SAMPLE_BUF;
 mpc_uint32_t    seek_table[10000];
 
 #ifdef USE_IRAM

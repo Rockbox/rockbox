@@ -226,7 +226,7 @@ void basterdised_rice_decompress(alac_file *alac,
                                  int rice_kmodifier, /* arg424->d */
                                  int rice_historymult, /* arg424->c */
                                  int rice_kmodifier_mask /* arg424->e */
-                                ) ICODE_ATTR;
+                                ) ICODE_ATTR_ALAC;
 void basterdised_rice_decompress(alac_file *alac,
                                  int32_t *output_buffer,
                                  int output_size,
@@ -373,7 +373,7 @@ static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                                            int readsamplesize,
                                            int16_t *predictor_coef_table,
                                            int predictor_coef_num,
-                                           int predictor_quantitization) ICODE_ATTR;
+                                           int predictor_quantitization) ICODE_ATTR_ALAC;
 static void predictor_decompress_fir_adapt(int32_t *error_buffer,
                                            int32_t *buffer_out,
                                            int output_size,
@@ -645,7 +645,7 @@ void deinterlace_16(int32_t* buffer0,
                     int32_t* buffer1,
                     int numsamples,
                     uint8_t interlacing_shift,
-                    uint8_t interlacing_leftweight) ICODE_ATTR;
+                    uint8_t interlacing_leftweight) ICODE_ATTR_ALAC;
 void deinterlace_16(int32_t* buffer0,
                     int32_t* buffer1,
                     int numsamples,

@@ -20,6 +20,10 @@
 #include "codeclib.h"
 #include <codecs/libffmpegFLAC/shndec.h>
 
+#ifndef IBSS_ATTR_SHORTEN_DECODED0
+#define IBSS_ATTR_SHORTEN_DECODED0 IBSS_ATTR
+#endif
+
 CODEC_HEADER
 
 #ifdef USE_IRAM
@@ -33,7 +37,7 @@ extern char iend[];
 struct codec_api* rb;
 struct codec_api* ci;
 
-int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR;
+int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR_SHORTEN_DECODED0;
 int32_t decoded1[MAX_DECODE_SIZE] IBSS_ATTR;
 
 int32_t offset0[MAX_OFFSET_SIZE] IBSS_ATTR;

@@ -256,7 +256,8 @@ void vorbis_dsp_clear(vorbis_dsp_state *v){
    block.  The time domain envelope is not yet handled at the point of
    calling (as it relies on the previous block). */
 
-int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb) ICODE_ATTR;
+int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb)
+    ICODE_ATTR_TREMOR_NOT_MDCT;
 int vorbis_synthesis_blockin(vorbis_dsp_state *v,vorbis_block *vb){
   vorbis_info *vi=v->vi;
   codec_setup_info *ci=(codec_setup_info *)vi->codec_setup;

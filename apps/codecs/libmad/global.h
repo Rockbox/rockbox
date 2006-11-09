@@ -66,4 +66,8 @@
 #  endif
 # endif
 
+#ifndef ICONST_ATTR_MPA_HUFFMAN
+#define ICONST_ATTR_MPA_HUFFMAN ICONST_ATTR
+#endif
+
 # endif

@@ -52,6 +52,10 @@ extern "C" {
 #include "reader.h"
 #include "streaminfo.h"
     
+#ifndef IBSS_ATTR_MPC_SAMPLE_BUF
+#define IBSS_ATTR_MPC_SAMPLE_BUF IBSS_ATTR
+#endif
+
 #ifdef ROCKBOX_LITTLE_ENDIAN
 #define MPC_LITTLE_ENDIAN
 #endif
