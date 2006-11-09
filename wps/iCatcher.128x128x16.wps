@@ -3,7 +3,7 @@
 
 
 %t1 %?mp<%al Stopped%ar-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >;%t1 %?mp<%al Stopped-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
-%al    %bl%%%ar%pp/%pe 
+%al    %bl%%%ar%pp/%pe
 
 %s%ac%?ia<%ia|%?d2<%d2|Unknown Artist>>
 %s%ac%?id<%id|%?d1<%d1|Unknown Album>>
@@ -60,13 +60,13 @@
 %xl|t|codec-mp3-sc.bmp|92|88|
 %xl|u|codec-wav-sc.bmp|92|88|
 %xl|v|codec-ogg-sc.bmp|92|88|
-%xl|w|codec-flac-sc.bmp|92|88|
-%xl|x|codec-mpc-sc.bmp|92|88|
-%xl|y|codec-ac3-sc.bmp|92|88|
-%xl|z|codec-wavpack-sc.bmp|92|88|
-%xl|V|codec-alac-sc.bmp|92|88|
-%xl|W|codec-aac-sc.bmp|92|88|
-%xl|X|codec-shorten-sc.bmp|92|88|
-%xl|Y|codec-aiff-sc.bmp|92|88|
+%xl|w|codec-aiff-sc.bmp|92|88|
+%xl|x|codec-flac-sc.bmp|92|88|
+%xl|y|codec-mpc-sc.bmp|92|88|
+%xl|z|codec-ac3-sc.bmp|92|88|
+%xl|V|codec-wavpack-sc.bmp|92|88|
+%xl|W|codec-alac-sc.bmp|92|88|
+%xl|X|codec-aac-sc.bmp|92|88|
+%xl|Y|codec-shorten-sc.bmp|92|88|
 %xl|Z|codec-unknown-sc.bmp|92|88|
 %?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>

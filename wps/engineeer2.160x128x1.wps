@@ -2,12 +2,12 @@
 %xl|b|codec_mp1.bmp|9|70|
 %xl|c|codec_mp2.bmp|9|70|
 %xl|d|codec_mp3.bmp|9|70|
-%xl|e|codec_wav.bmp|9|70|
-%xl|f|codec_ogg.bmp|9|70|
-%xl|g|codec_flac.bmp|9|70|
-%xl|h|codec_mpc.bmp|9|70|
-%xl|i|codec_a52.bmp|9|70|
-%xl|j|codec_wpk.bmp|9|70|
+%xl|e|codec_aiff.bmp|9|70|
+%xl|f|codec_wav.bmp|9|70|
+%xl|g|codec_ogg.bmp|9|70|
+%xl|h|codec_flac.bmp|9|70|
+%xl|i|codec_mpc.bmp|9|70|
+%xl|j|codec_a52.bmp|9|70|
 %xl|k|codec_unknown.bmp|9|70|
 %xl|l|codec_vbr.bmp|9|76|
 %xl|m|codec_cbr.bmp|9|76|
@@ -48,7 +48,7 @@
 
 %ac%pc / %pt
 
-        %fbk    
+        %fbk
 
 
 

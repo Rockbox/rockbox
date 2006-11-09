@@ -4,12 +4,12 @@
 %xl|b|cdc-mp1.bmp|46|102|
 %xl|c|cdc-mp2.bmp|46|102|
 %xl|d|cdc-mp3.bmp|46|102|
-%xl|e|cdc-wav.bmp|46|102|
-%xl|f|cdc-ogg.bmp|46|102|
-%xl|g|cdc-flac.bmp|46|102|
-%xl|h|cdc-mpc.bmp|46|102|
-%xl|i|cdc-a52.bmp|46|102|
-%xl|j|cdc-wpk.bmp|46|102|
+%xl|e|cdc-aiff.bmp|46|102|
+%xl|f|cdc-wav.bmp|46|102|
+%xl|g|cdc-ogg.bmp|46|102|
+%xl|h|cdc-flac.bmp|46|102|
+%xl|i|cdc-mpc.bmp|46|102|
+%xl|j|cdc-a52.bmp|46|102|
 %xl|J|cdc-unk.bmp|46|102|
 %xl|k|enc-vbr.bmp|46|108|
 %xl|l|enc-cbr.bmp|46|108|
@@ -43,7 +43,7 @@
 %xl|T|pwr-colour.bmp|210|10|
 %xl|y|led-colour.bmp|192|12|
 %wd
-%ar%ca, b d H:Mc 
+%ar%ca, b d H:Mc
 
 
 
@@ -56,7 +56,7 @@
 
 
 
-   %fbk    
+   %fbk
 
 %pb|8|4|215
 

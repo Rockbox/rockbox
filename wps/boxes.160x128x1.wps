@@ -2,12 +2,12 @@
 %xl|b|cdc-mp1.bmp|40|70|
 %xl|c|cdc-mp2.bmp|40|70|
 %xl|d|cdc-mp3.bmp|40|70|
-%xl|e|cdc-wav.bmp|40|70|
-%xl|f|cdc-ogg.bmp|40|70|
-%xl|g|cdc-flac.bmp|40|70|
-%xl|h|cdc-mpc.bmp|40|70|
-%xl|i|cdc-a52.bmp|40|70|
-%xl|j|cdc-wpk.bmp|40|70|
+%xl|e|cdc-aiff.bmp|40|70|
+%xl|f|cdc-wav.bmp|40|70|
+%xl|g|cdc-ogg.bmp|40|70|
+%xl|h|cdc-flac.bmp|40|70|
+%xl|i|cdc-mpc.bmp|40|70|
+%xl|j|cdc-a52.bmp|40|70|
 %xl|J|cdc-unk.bmp|40|70|
 %xl|k|enc-vbr.bmp|40|76|
 %xl|l|enc-cbr.bmp|40|76|
@@ -60,7 +60,7 @@
 
 %ac%t5%pc / %pt;%ac%t5Track %pp of %pe
 
- %fbk    
+ %fbk
 
 %pb
 

@@ -3,7 +3,7 @@
 
 
 %t1 %?mp<%al Stopped%ar-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused%ar%pc/%pt |%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >;%t1 %?mp<%al Stopped-:--/-:-- |%al %pv dB%ar%pc/%pt |%al Paused|%al Seeking%ar%pc/%pt |%al Seeking%ar%pc/%pt >
-%al  %bl%%%ar%pp/%pe 
+%al  %bl%%%ar%pp/%pe
 
 
 
@@ -64,15 +64,15 @@
 %xl|r|codec-mp1-b.bmp|168|232|
 %xl|s|codec-mp2-b.bmp|168|232|
 %xl|t|codec-mp3-b.bmp|168|232|
-%xl|u|codec-wav-b.bmp|168|232|
-%xl|v|codec-ogg-b.bmp|168|232|
-%xl|w|codec-flac-b.bmp|168|232|
-%xl|x|codec-mpc-b.bmp|168|232|
-%xl|y|codec-ac3-b.bmp|168|232|
-%xl|z|codec-wavpack-b.bmp|168|232|
-%xl|V|codec-alac-b.bmp|168|232|
-%xl|W|codec-aac-b.bmp|168|232|
-%xl|X|codec-shorten-b.bmp|168|232|
-%xl|Y|codec-aiff-b.bmp|168|232|
+%xl|u|codec-aiff-b.bmp|168|232|
+%xl|v|codec-wav-b.bmp|168|232|
+%xl|w|codec-ogg-b.bmp|168|232|
+%xl|x|codec-flac-b.bmp|168|232|
+%xl|y|codec-mpc-b.bmp|168|232|
+%xl|z|codec-ac3-b.bmp|168|232|
+%xl|V|codec-wavpack-b.bmp|168|232|
+%xl|W|codec-alac-b.bmp|168|232|
+%xl|X|codec-aac-b.bmp|168|232|
+%xl|Y|codec-shorten-b.bmp|168|232|
 %xl|Z|codec-unknown-b.bmp|168|232|
 %?fc<%xdr|%xds|%xdt|%xdu|%xdv|%xdw|%xdx|%xdy|%xdz|%xdV|%xdW|%xdX|%xdY|%xdZ>
