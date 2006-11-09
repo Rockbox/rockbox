@@ -987,12 +987,7 @@ static void mmc_thread(void)
         queue_wait_w_tmo(&mmc_queue, &ev, HZ);
         switch ( ev.id ) 
         {
-            case SYS_POWEROFF:
-                call_ata_idle_notifys(false);
-                break;
-
             case SYS_USB_CONNECTED:
-                call_ata_idle_notifys(false);
                 usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 /* Wait until the USB cable is extracted again */
                 usb_wait_for_disconnect(&mmc_queue);
