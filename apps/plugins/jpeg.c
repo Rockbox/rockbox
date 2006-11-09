@@ -2839,8 +2839,12 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     long graysize; /* helper */
 #endif
 
+    if(!parameter) return PLUGIN_ERROR;
+
     rb->strcpy(np_file, parameter);
     get_pic_list();
+
+    if(!entries) return PLUGIN_ERROR;
 
 #if (PLUGIN_BUFFER_SIZE >= MIN_MEM) && !defined(SIMULATOR)
     if(rb->audio_status())
