@@ -51,6 +51,14 @@ static inline void __backlight_off(void)
 {
     sim_backlight(0);
 }
+
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+static inline void __backlight_set_brightness(int val)
+{
+    (void)val;
+}
+#endif
+
 #else
 /* Basic low-level code that simply switches backlight on or off. Probably
  * a nice candidate for inclusion in the target/ dir. */
