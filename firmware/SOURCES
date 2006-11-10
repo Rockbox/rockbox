@@ -74,7 +74,9 @@ drivers/lcd-recorder.c
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 drivers/lcd-2bit-horz.c
-#endif /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
+#elif LCD_PIXELFORMAT == VERTICAL_PACKING
+drivers/lcd-2bit-vert.c
+#endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
 drivers/lcd-16bit.c
 #endif /* LCD_DEPTH */
@@ -353,7 +355,6 @@ target/coldfire/iriver/h300/usb-h300.c
 #endif /* IRIVER_H300_SERIES */
 
 #ifdef IRIVER_H100_SERIES
-target/coldfire/iriver/h100/lcd-h100.c
 target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
 target/coldfire/iriver/ata-iriver.c
@@ -362,6 +363,7 @@ target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c
 target/coldfire/iriver/h100/lcd-as-h100.S
+target/coldfire/iriver/h100/lcd-h100.c
 target/coldfire/iriver/h100/usb-h100.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H100_SERIES */

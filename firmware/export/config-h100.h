@@ -55,8 +55,6 @@
 
 #define CONFIG_LCD LCD_S1D15E06
 
-#define DEFAULT_REMOTE_CONTRAST_SETTING 42
-
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IRIVER_H100 /* port controlled */
 
@@ -156,9 +154,9 @@
 
 #endif /* !SIMULATOR */
 
-#define DEFAULT_CONTRAST_SETTING    40
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    28
+#define MIN_CONTRAST_SETTING        14 /* White screen a bit higher than this */
+#define MAX_CONTRAST_SETTING        63 /* Black screen a bit lower than this*/
 #define DEFAULT_REMOTE_CONTRAST_SETTING 42
 #define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
 #define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
