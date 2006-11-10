@@ -18,21 +18,21 @@ bubbles_bubble.320x240x1.bmp
 #endif
 
 /* Clock */
-#if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
+#if (LCD_WIDTH == 112)
 clock_logo.112x64x1.bmp
-#elif (LCD_WIDTH == 138) && (LCD_HEIGHT == 110)
+#elif (LCD_WIDTH == 138)
 clock_logo.138x110x1.bmp
-#elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
+#elif (LCD_WIDTH == 160)
 clock_logo.160x128x1.bmp
-#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128)
+#elif (LCD_WIDTH == 128)
 clock_logo.128x128x1.bmp
-#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132)
+#elif (LCD_WIDTH == 176)
 clock_logo.176x132x1.bmp
-#elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
+#elif (LCD_WIDTH == 220)
 clock_logo.220x176x1.bmp
-#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+#elif (LCD_WIDTH == 240)
 clock_logo.240x320x1.bmp
-#elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+#elif (LCD_WIDTH == 320)
 clock_logo.320x240x1.bmp
 #endif
 
