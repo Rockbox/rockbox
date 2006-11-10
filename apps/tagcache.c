@@ -3537,7 +3537,8 @@ void build_tagcache(const char *path)
     memset(&header, 0, sizeof(struct tagcache_header));
     write(cachefd, &header, sizeof(struct tagcache_header));
 
-    strcpy(curpath, path);
+    if (strcmp("/", path) != 0)
+        strcpy(curpath, path);
     ret = check_dir(path);
     
     /* Write the header. */
