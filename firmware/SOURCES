@@ -212,7 +212,6 @@ drivers/m5636.c
 
 #ifndef SIMULATOR
 bitswap.S
-crt0.S
 descramble.S
 drivers/i2c.c
 target/sh/crt0.S
