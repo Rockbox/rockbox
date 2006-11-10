@@ -33,9 +33,6 @@
 #include "font.h"
 #include "adc.h"
 #include "backlight.h"
-#ifdef IAUDIO_X5
-#include "backlight-target.h"
-#endif
 #include "button.h"
 #include "panic.h"
 #include "power.h"
@@ -208,7 +205,7 @@ void main(void)
 
     set_irq_level(0);
     lcd_init();
-    __backlight_on();
+    backlight_init();
     font_init();
     adc_init();
     button_init();

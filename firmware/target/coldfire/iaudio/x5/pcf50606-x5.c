@@ -81,15 +81,6 @@ void pcf50606_init(void)
     pcf50606_write(0x39, 0x00); /* GPOOD0 = green led OFF */
     pcf50606_write(0x3a, 0x00); /* GPOOD1 = red led OFF */
 
-    pcf50606_write(0x35, 0x11); /* Backlight PWM = 512Hz, 8/16, Active */
-#ifdef BOOTLOADER
-    /* Backlight starts OFF in bootloader */
-    pcf50606_write(0x38, 0x80); /* Backlight OFF, GPO1INV=1, GPO1ACT=011 */
-#else
-    /* Keep backlight on when changing to firmware */
-    pcf50606_write(0x38, 0xb0); /* Backlight ON, GPO1INV=1, GPO1ACT=011 */
-#endif
-
     /* Accessory detect */
     pcf50606_write(0x33, 0x8e); /* ACDAPE=1, THRSHLD=2.40V */
 

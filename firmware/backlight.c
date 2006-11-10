@@ -31,10 +31,6 @@
 #include "timer.h"
 #include "backlight.h"
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#include "pcf50606.h" /* iRiver, iAudio X5 brightness */
-#endif
-
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 #include "lcd.h" /* for lcd_enable() and lcd_sleep() */
 #endif
@@ -110,8 +106,6 @@ static void backlight_thread(void);
 static long backlight_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 #ifdef X5_BACKLIGHT_SHUTDOWN
 #define BACKLIGHT_QUIT 256
-/* Need to save this for x5 shutdown */
-struct thread_entry* backlight_thread_id;
 #endif
 static const char backlight_thread_name[] = "backlight";
 static struct event_queue backlight_queue;
@@ -473,7 +467,7 @@ void backlight_thread(void)
 
 #ifdef X5_BACKLIGHT_SHUTDOWN
             case BACKLIGHT_QUIT:
-                remove_thread(backlight_thread_id);
+                remove_thread(NULL);
                 break;
 #endif
 
@@ -552,23 +546,17 @@ static void backlight_tick(void)
 void backlight_init(void)
 {
     queue_init(&backlight_queue, true);
-#ifdef X5_BACKLIGHT_SHUTDOWN
-    backlight_thread_id =
-#endif
     create_thread(backlight_thread, backlight_stack,
                   sizeof(backlight_stack), backlight_thread_name 
                   IF_PRIO(, PRIORITY_SYSTEM));
     tick_add_task(backlight_tick);
 #ifdef SIMULATOR
     /* do nothing */
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H100
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
-    and_l(~0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
-#elif CONFIG_BACKLIGHT == BL_IRIVER_H300
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
-    or_l(0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
+#elif defined(__BACKLIGHT_INIT)
+    /* Remove the __BACKLIGHT_INIT references when __backlight_init is
+       available on all backlighted targets. Take them out of the
+       backlight-target.h files as well */
+    __backlight_init();
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
@@ -787,16 +775,26 @@ bool is_remote_backlight_on(void)
 
 #endif /* HAVE_REMOTE_LCD */
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_set_brightness(int val)
+{
+    if (val < MIN_BRIGHTNESS_SETTING)
+        val = MIN_BRIGHTNESS_SETTING;
+    else if (val > MAX_BRIGHTNESS_SETTING)
+        val = MAX_BRIGHTNESS_SETTING;
+
+    __backlight_set_brightness(val);
+}
+#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+
 #else /* !defined(CONFIG_BACKLIGHT) || defined(BOOTLOADER)
     -- no backlight, empty dummy functions */
 
 #if defined(BOOTLOADER) && defined(CONFIG_BACKLIGHT)
 void backlight_init(void)
 {
-#ifdef IRIVER_H300_SERIES
-    or_l(0x00020000, &GPIO1_OUT);
-    or_l(0x00020000, &GPIO1_ENABLE);
-    or_l(0x00020000, &GPIO1_FUNCTION);
+#ifdef __BACKLIGHT_INIT
+    __backlight_init();
 #endif
 }
 #endif
@@ -810,21 +808,8 @@ void remote_backlight_on(void) {}
 void remote_backlight_off(void) {}
 void remote_backlight_set_timeout(int index) {(void)index;}
 bool is_remote_backlight_on(void) {return true;}
+#endif /* HAVE_REMOTE_LCD */
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+void backlight_set_brightness(int val) { (void)val; }
 #endif
 #endif /* defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER) */
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-void backlight_set_brightness(int val)
-{
-#ifndef SIMULATOR
-    if (val < MIN_BRIGHTNESS_SETTING)
-        val = MIN_BRIGHTNESS_SETTING;
-    else if (val > MAX_BRIGHTNESS_SETTING)
-        val = MAX_BRIGHTNESS_SETTING;
-
-    __backlight_set_brightness(val);
-#else
-    (void)val;
-#endif
-}
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */

@@ -62,22 +62,6 @@
 
 #define CONFIG_LCD LCD_X5
 
-/* Main LCD contrast range and defaults */
-#define MIN_CONTRAST_SETTING        1
-#define MAX_CONTRAST_SETTING        30
-#define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
-
-/* Remote LCD contrast range and defaults */
-#define MIN_REMOTE_CONTRAST_SETTING     10
-#define MAX_REMOTE_CONTRAST_SETTING     35
-#define DEFAULT_REMOTE_CONTRAST_SETTING 24 /* Match boot contrast */
-
-/* Main LCD backlight brightness range and defaults */
-/* PCF50506 can output 0%-100% duty cycle but D305A expects %15-100%. */
-#define MIN_BRIGHTNESS_SETTING      1  /* 15/16 (93.75%) */
-#define MAX_BRIGHTNESS_SETTING      13 /*  3/16 (18.75%) */
-#define DEFAULT_BRIGHTNESS_SETTING  8  /*  8/16 (50.00%) = x5 boot default */
-
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_X5 /* PCF50606 I2C */
 #define HAVE_BACKLIGHT_BRIGHTNESS
@@ -170,3 +154,21 @@
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
+
+/** Port-specific settings **/
+
+/* Main LCD contrast range and defaults */
+#define MIN_CONTRAST_SETTING        1
+#define MAX_CONTRAST_SETTING        30
+#define DEFAULT_CONTRAST_SETTING    19 /* Match boot contrast */
+
+/* Main LCD backlight brightness range and defaults */
+/* PCF50506 can output 0%-100% duty cycle but D305A expects %15-100%. */
+#define MIN_BRIGHTNESS_SETTING      1  /* 15/16 (93.75%) */
+#define MAX_BRIGHTNESS_SETTING      13 /*  3/16 (18.75%) */
+#define DEFAULT_BRIGHTNESS_SETTING  8  /*  8/16 (50.00%) = x5 boot default */
+
+/* Remote LCD contrast range and defaults */
+#define MIN_REMOTE_CONTRAST_SETTING     10
+#define MAX_REMOTE_CONTRAST_SETTING     35
+#define DEFAULT_REMOTE_CONTRAST_SETTING 24 /* Match boot contrast */

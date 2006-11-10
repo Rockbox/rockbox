@@ -151,6 +151,12 @@
 #define HAVE_EEPROM
 
 #endif /* SIMULATOR */
+
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN
+
+/** Port-specific settings **/
+
 /* Main LCD contrast range and defaults */
 #define MIN_CONTRAST_SETTING        5
 #define MAX_CONTRAST_SETTING        63
@@ -163,9 +169,6 @@
 #define DEFAULT_BRIGHTNESS_SETTING  9  /*  9/16 (56.25%) */
 
 /* Remote LCD contrast range and defaults */
-#define MIN_REMOTE_CONTRAST_SETTING     MIN_CONTRAST_SETTING
-#define MAX_REMOTE_CONTRAST_SETTING     MAX_CONTRAST_SETTING
+#define MIN_REMOTE_CONTRAST_SETTING     5
+#define MAX_REMOTE_CONTRAST_SETTING     63
 #define DEFAULT_REMOTE_CONTRAST_SETTING 42 
-
-/* Define this for FM radio input available */
-#define HAVE_FMRADIO_IN

@@ -154,13 +154,6 @@
 
 #endif /* !SIMULATOR */
 
-#define DEFAULT_CONTRAST_SETTING    28
-#define MIN_CONTRAST_SETTING        14 /* White screen a bit higher than this */
-#define MAX_CONTRAST_SETTING        63 /* Black screen a bit lower than this*/
-#define DEFAULT_REMOTE_CONTRAST_SETTING 42
-#define MIN_REMOTE_CONTRAST_SETTING MIN_CONTRAST_SETTING
-#define MAX_REMOTE_CONTRAST_SETTING MAX_CONTRAST_SETTING
-
 /* Define this for S/PDIF input available */
 #define HAVE_SPDIF_IN
 
@@ -173,3 +166,15 @@
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN
+
+/** Port-specific settings **/
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_CONTRAST_SETTING        14 /* White screen a bit higher than this */
+#define MAX_CONTRAST_SETTING        63 /* Black screen a bit lower than this */
+#define DEFAULT_CONTRAST_SETTING    28
+
+/* Remote LCD contrast range and defaults */
+#define MIN_REMOTE_CONTRAST_SETTING     5
+#define MAX_REMOTE_CONTRAST_SETTING     63
+#define DEFAULT_REMOTE_CONTRAST_SETTING 42
