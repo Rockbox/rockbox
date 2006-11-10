@@ -2315,7 +2315,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
 
     struct tm* current_time = rb->get_time();
 
-    int fill = (LCDWIDTH/60) * second;
+    int fill = LCDWIDTH * second/60;
 
     char moday[8];
     char dateyr[6];
