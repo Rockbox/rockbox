@@ -106,11 +106,14 @@ MYDIR *sim_opendir(const char *name)
     char buffer[256]; /* sufficiently big */
     DIR *dir;
 
-    if(name[0] == '/') {
+#ifndef __PCTOOL__
+    if(name[0] == '/') 
+    {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);    
         dir=(DIR *)opendir(buffer);
     }
     else
+#endif
         dir=(DIR *)opendir(name);
     
     if(dir) {
@@ -137,8 +140,12 @@ struct sim_dirent *sim_readdir(MYDIR *dir)
     strcpy((char *)secret.d_name, x11->d_name);
 
     /* build file name */
+#ifdef __PCTOOL__
+    sprintf(buffer, "%s/%s", dir->name, x11->d_name);
+#else
     sprintf(buffer, SIMULATOR_ARCHOS_ROOT "%s/%s",
             dir->name, x11->d_name);
+#endif
     stat(buffer, &s); /* get info */
 
 #define ATTR_DIRECTORY 0x10
@@ -164,22 +171,32 @@ int sim_open(const char *name, int o)
     char buffer[256]; /* sufficiently big */
     int opts = rockbox2sim(o);
 
-    if(name[0] == '/') {
+#ifndef __PCTOOL__
+    if(name[0] == '/') 
+    {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
 
         debugf("We open the real file '%s'\n", buffer);
         return open(buffer, opts, 0666);
     }
+    
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
+#else
+    return open(name, opts, 0666);
+#endif
+    
 }
 
 int sim_creat(const char *name, mode_t mode)
 {
-    char buffer[256]; /* sufficiently big */
     int opts = rockbox2sim(mode);
-    if(name[0] == '/') {
+    
+#ifndef __PCTOOL__
+    char buffer[256]; /* sufficiently big */
+    if(name[0] == '/') 
+    {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We create the real file '%s'\n", buffer);
@@ -188,12 +205,22 @@ int sim_creat(const char *name, mode_t mode)
     fprintf(stderr, "WARNING, bad file name lacks slash: %s\n",
             name);
     return -1;
+#else
+    return open(name, opts | O_CREAT | O_TRUNC, 0666);
+#endif
 }      
 
 int sim_mkdir(const char *name, mode_t mode)
 {
-    char buffer[256]; /* sufficiently big */
     (void)mode;
+#ifdef __PCTOOL__
+# ifdef WIN32
+    return mkdir(name);
+# else
+    return mkdir(name, 0777);
+# endif
+#else
+    char buffer[256]; /* sufficiently big */
 
     sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
@@ -204,22 +231,31 @@ int sim_mkdir(const char *name, mode_t mode)
 #else
     return mkdir(buffer, 0777);
 #endif
+#endif
 }
 
 int sim_rmdir(const char *name)
 {
+#ifdef __PCTOOL__
+    return rmdir(name);
+#else
     char buffer[256]; /* sufficiently big */
-    if(name[0] == '/') {
+    if(name[0] == '/') 
+    {
         sprintf(buffer, "%s%s", SIMULATOR_ARCHOS_ROOT, name);
         
         debugf("We remove the real directory '%s'\n", buffer);
         return rmdir(buffer);
     }
     return rmdir(name);
+#endif
 }
 
 int sim_remove(const char *name)
 {
+#ifdef __PCTOOL__
+    return remove(name);
+#else
     char buffer[256]; /* sufficiently big */
 
 #ifdef HAVE_DIRCACHE
@@ -233,10 +269,14 @@ int sim_remove(const char *name)
         return remove(buffer);
     }
     return remove(name);
+#endif
 }
 
 int sim_rename(const char *oldpath, const char* newpath)
 {
+#ifdef __PCTOOL__
+    return rename(oldpath, newpath);
+#else
     char buffer1[256];
     char buffer2[256];
 
@@ -252,6 +292,7 @@ int sim_rename(const char *oldpath, const char* newpath)
         return rename(buffer1, buffer2);
     }
     return -1;
+#endif
 }
 
 /* rockbox off_t may be different from system off_t */

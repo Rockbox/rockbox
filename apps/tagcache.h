@@ -30,6 +30,9 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 
 #define TAG_COUNT 13
 
+/* Maximum length of a single tag. */
+#define TAG_MAXLEN (MAX_PATH*2)
+
 /* Allow a little drift to the filename ordering (should not be too high/low). */
 #define POS_HISTORY_COUNT 4
 
@@ -119,7 +122,7 @@ struct tagcache_search {
     int entry_count;
     bool valid;
     bool initialized;
-    long *unique_list;
+    unsigned long *unique_list;
     int unique_list_capacity;
     int unique_list_count;
 
@@ -132,6 +135,10 @@ struct tagcache_search {
     long result_seek;
     int idx_id;
 };
+
+#ifdef __PCTOOL__
+void build_tagcache(const char *path);
+#endif
 
 int tagcache_str_to_tag(const char *str);
 const char* tagcache_tag_to_str(int tag);

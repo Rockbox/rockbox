@@ -67,7 +67,7 @@ struct dircache_entry {
     long startcluster;
     unsigned short wrtdate;
     unsigned short wrttime;
-    unsigned char name_len;
+    unsigned long name_len;
     char *d_name;
 };
 

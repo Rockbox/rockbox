@@ -20,7 +20,7 @@
 #define _DIR_H_
 
 #include <stdbool.h>
-#include <file.h>
+#include "file.h"
 
 #define ATTR_READ_ONLY   0x01
 #define ATTR_HIDDEN      0x02

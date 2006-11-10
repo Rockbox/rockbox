@@ -27,7 +27,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <sprintf.h>
 #include "config.h"
 #include "lcd-remote.h"
 #include "logf.h"
@@ -36,9 +35,11 @@
 /* Only provide all this if asked to */
 #ifdef ROCKBOX_HAS_LOGF
 
+#ifndef __PCTOOL__
 unsigned char logfbuffer[MAX_LOGF_LINES][MAX_LOGF_ENTRY];
 int logfindex;
 bool logfwrap;
+#endif
 
 #ifdef HAVE_REMOTE_LCD
 static void displayremote(void)
@@ -77,7 +78,18 @@ static void displayremote(void)
 #define displayremote()
 #endif
 
-void logf(const char *format, ...)
+#ifdef __PCTOOL__
+void _logf(const char *format, ...)
+{
+    char buf[1024];
+    va_list ap;
+    va_start(ap, format);
+    
+    vsnprintf(buf, sizeof buf, format, ap);
+    printf("DEBUG: %s\n", buf);
+}
+#else
+void _logf(const char *format, ...)
 {
     int len;
     unsigned char *ptr;
@@ -104,5 +116,6 @@ void logf(const char *format, ...)
 
     displayremote();
 }
+#endif
 
 #endif

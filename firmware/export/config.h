@@ -20,7 +20,9 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
+#ifndef __PCTOOL__
 #include "autoconf.h"
+#endif
 
 /* symbolic names for multiple choice configurations: */
 

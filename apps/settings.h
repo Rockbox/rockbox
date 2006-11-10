@@ -37,8 +37,14 @@
 #include "backlight.h" /* for [MIN|MAX]_BRIGHTNESS_SETTING */
 #endif
 
+#ifdef __PCTOOL__
+#define ROCKBOX_DIR "."
+#define ROCKBOX_DIR_LEN 1
+#else
 #define ROCKBOX_DIR "/.rockbox"
 #define ROCKBOX_DIR_LEN 9
+#endif
+
 #define FONT_DIR    ROCKBOX_DIR "/fonts"
 #define LANG_DIR    ROCKBOX_DIR "/langs"
 #define WPS_DIR     ROCKBOX_DIR "/wps"

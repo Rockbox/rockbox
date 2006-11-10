@@ -457,9 +457,9 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
     long tmp;
     bool le = false;
     int i = 0;
-    char *str = string;
+    unsigned char *str = (unsigned char *)string;
     int templen = 0;
-    char* utf8 = utf8buf;
+    unsigned char* utf8 = (unsigned char *)utf8buf;
 
     switch (str[0]) {
         case 0x00: /* Type 0x00 is ordinary ISO 8859-1 */
@@ -467,7 +467,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
             (*len)--;
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = utf8 - utf8buf;
+            *len = (unsigned long)utf8 - (unsigned long)utf8buf;
             break;
 
         case 0x01: /* Unicode with or without BOM */
@@ -524,7 +524,7 @@ static int unicode_munge(char* string, char* utf8buf, int *len) {
         default: /* Plain old string */
             utf8 = iso_decode(str, utf8, -1, *len);
             *utf8 = 0;
-            *len = utf8 - utf8buf;
+            *len = (unsigned long)utf8 - (unsigned long)utf8buf;
             break;
     }
     return 0;
@@ -571,7 +571,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
             case 1:
             case 2:
                 /* convert string to utf8 */
-                utf8 = entry->id3v1buf[i];
+                utf8 = (unsigned char *)entry->id3v1buf[i];
                 utf8 = iso_decode(ptr, utf8, -1, 30);
                 /* make sure string is terminated */
                 *utf8 = 0;
@@ -579,7 +579,7 @@ static bool setid3v1title(int fd, struct mp3entry *entry)
 
             case 3:
                 ptr[4] = 0;
-                entry->year = atoi(ptr);
+                entry->year = atoi((char *)ptr);
                 break;
 
             case 4:

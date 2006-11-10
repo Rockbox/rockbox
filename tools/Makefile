@@ -10,7 +10,7 @@ CFLAGS := -O -ansi -g
 LDFLAGS := -g
 
 CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf	\
- generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat
+ generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat database
 
 all:
 	@echo "Run make in your build directory!"
@@ -37,6 +37,13 @@ mkboot:	mkboot.c
 
 ipod_fw:	ipod_fw.c
 	$(SILENT)$(CC) -g $+ -o $@
+
+database: database.c ../apps/tagcache.c ../apps/metadata.c \
+../firmware/id3.c ../firmware/common/unicode.c \
+../firmware/common/crc32.c ../uisimulator/common/io.c \
+../firmware/mp3data.c ../firmware/logf.c
+	$(SILENT)$(CC) -g -I../firmware/export -iquote ../firmware/include \
+-D__PCTOOL__ -DHAVE_TAGCACHE -DROCKBOX_HAS_LOGF -DSIMULATOR -ldl -I../apps $+ -o $@
 
 convbdf: convbdf.c
 	$(SILENT)$(CC) -g $+ -o $@

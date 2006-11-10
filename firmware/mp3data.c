@@ -242,6 +242,7 @@ unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned lo
     return __find_next_frame(fd, offset, max_offset, last_header, fileread);
 }
 
+#ifndef __PCTOOL__
 static int fnf_read_index;
 static int fnf_buf_len;
 
@@ -335,6 +336,7 @@ unsigned long mem_find_next_frame(int startpos, long *offset, long max_offset,
 
     return __find_next_frame(0, offset, max_offset, last_header, mem_getbyte);
 }
+#endif
 
 int get_mp3file_info(int fd, struct mp3info *info)
 {
@@ -543,6 +545,7 @@ static void long2bytes(unsigned char *buf, long val)
     buf[3] = val & 0xff;
 }
 
+#ifndef __PCTOOL__
 int count_mp3_frames(int fd, int startpos, int filesize,
                      void (*progressfunc)(int))
 {
@@ -762,3 +765,5 @@ int create_xing_header(int fd, long startpos, long filesize,
     
     return info.frame_size;
 }
+
+#endif

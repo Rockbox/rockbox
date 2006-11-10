@@ -57,7 +57,7 @@ static unsigned long dircache_size = 0;
 static unsigned long entry_count = 0;
 static unsigned long reserve_used = 0;
 static unsigned int  cache_build_ticks = 0;
-static char dircache_cur_path[MAX_PATH];
+static char dircache_cur_path[MAX_PATH*2];
 
 static struct event_queue dircache_queue;
 static long dircache_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
@@ -178,7 +178,7 @@ static int dircache_scan(struct travel_data *td)
         }
         
         td->ce->attribute = td->entry->attribute;
-        td->ce->name_len = MIN(254, strlen(td->entry->d_name)) + 1;
+        td->ce->name_len = strlen(td->entry->d_name);
         td->ce->d_name = ((char *)dircache_root+dircache_size);
         td->ce->size = td->entry->size;
         td->ce->wrtdate = td->entry->wrtdate;
@@ -192,7 +192,7 @@ static int dircache_scan(struct travel_data *td)
         }
         
         td->ce->attribute = td->entry.attr;
-        td->ce->name_len = MIN(254, strlen(td->entry.name)) + 1;
+        td->ce->name_len = strlen(td->entry.name) + 1;
         td->ce->d_name = ((char *)dircache_root+dircache_size);
         td->ce->startcluster = td->entry.firstcluster;
         td->ce->size = td->entry.filesize;
@@ -215,9 +215,11 @@ static int dircache_scan(struct travel_data *td)
                 return -2;
             
             td->pathpos = strlen(dircache_cur_path);
-            strncpy(&dircache_cur_path[td->pathpos], "/", MAX_PATH - td->pathpos - 1);
+            strncpy(&dircache_cur_path[td->pathpos], "/", 
+                    sizeof(dircache_cur_path) - td->pathpos - 1);
 #ifdef SIMULATOR
-            strncpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, MAX_PATH - td->pathpos - 2);
+            strncpy(&dircache_cur_path[td->pathpos+1], td->entry->d_name, 
+                    sizeof(dircache_cur_path) - td->pathpos - 2);
             
             td->newdir = opendir(dircache_cur_path);
             if (td->newdir == NULL)
@@ -226,7 +228,8 @@ static int dircache_scan(struct travel_data *td)
                 return -3;
             }
 #else
-            strncpy(&dircache_cur_path[td->pathpos+1], td->entry.name, MAX_PATH - td->pathpos - 2);
+            strncpy(&dircache_cur_path[td->pathpos+1], td->entry.name,
+                    sizeof(dircache_cur_path) - td->pathpos - 2);
 
             td->newdir = *td->dir;
             if (fat_opendir(IF_MV2(volume,) &td->newdir,
@@ -360,7 +363,7 @@ static struct dircache_entry* dircache_get_entry(const char *path,
         bool get_before, bool only_directories)
 {
     struct dircache_entry *cache_entry, *before;
-    char namecopy[MAX_PATH];
+    char namecopy[MAX_PATH*2];
     char* part;
     char* end;
 
@@ -543,7 +546,7 @@ static int dircache_do_rebuild(void)
     pdir = &dir;
 #endif
 
-    memset(dircache_cur_path, 0, MAX_PATH);
+    memset(dircache_cur_path, 0, sizeof(dircache_cur_path));
     dircache_size = sizeof(struct dircache_entry);
 
     cpu_boost_id(true, CPUBOOSTID_DIRCACHE);
@@ -837,7 +840,7 @@ static int block_until_ready(void)
 static struct dircache_entry* dircache_new_entry(const char *path, int attribute)
 {
     struct dircache_entry *entry;
-    char basedir[MAX_PATH];
+    char basedir[MAX_PATH*2];
     char *new;
     long last_cache_size = dircache_size;
 
@@ -1005,7 +1008,7 @@ void dircache_rename(const char *oldpath, const char *newpath)
 { /* Test ok. */
     struct dircache_entry *entry, *newentry;
     struct dircache_entry oldentry;
-    char absolute_path[MAX_PATH];
+    char absolute_path[MAX_PATH*2];
     char *p;
     
     if (block_until_ready())
