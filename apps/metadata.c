@@ -1419,6 +1419,8 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
     return true;
 }
 
+/* PSID metadata info is available here: 
+   http://www.unusedino.de/ec64/technical/formats/sidplay.html */
 static bool get_sid_metadata(int fd, struct mp3entry* id3)
 {    
     /* Use the trackname part of the id3 structure as a temporary buffer */
@@ -1440,22 +1442,27 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
 
     p = id3->id3v2buf;
 
-    /* Copy Title */
-    strcpy(p, (char *)&buf[0x16]);
+    /* Copy Title (assumed max 0x1f letters + 1 zero byte) */
+    strncpy(p, (char *)&buf[0x16], 0x20);
+    p[0x1f]=0; /* make sure it is zero terminated */
     id3->title = p;
     p += strlen(p)+1;
 
-    /* Copy Artist */
-    strcpy(p, (char *)&buf[0x36]);
+    /* Copy Artist (assumed max 0x1f letters + 1 zero byte) */
+    strncpy(p, (char *)&buf[0x36], 0x20);
+    p[0x1f]=0; /* make sure it is zero terminated */
     id3->artist = p;
-    p += strlen(p)+1;
 
     id3->bitrate = 706;
     id3->frequency = 44100;
     /* New idea as posted by Marco Alanen (ravon):
      * Set the songlength in seconds to the number of subsongs
      * so every second represents a subsong.
-     * Users can then skip the current subsong by seeking */
+     * Users can then skip the current subsong by seeking
+     *
+     * Note: the number of songs is a 16bit value at 0xE, so this code only
+     * uses the lower 8 bits of the counter.
+    */
     id3->length = (buf[0xf]-1)*1000;
     id3->vbr = false;
     id3->filesize = filesize(fd);
