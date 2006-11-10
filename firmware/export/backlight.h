@@ -77,18 +77,6 @@ void sim_remote_backlight(int value);
 #endif
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-
-#ifdef IAUDIO_X5
-/* PFC50506 can output 0%-100% duty cycle but D305A expects %15-100%. */
-#define MIN_BRIGHTNESS_SETTING      1  /* 15/16 (93.75%) */
-#define MAX_BRIGHTNESS_SETTING      13 /*  3/16 (18.75%) */
-#define DEFAULT_BRIGHTNESS_SETTING  8  /*  8/16 (50.00%) = x5 boot default */
-#else
-#define MIN_BRIGHTNESS_SETTING      2  /*  2/16 (12.50%) */
-#define MAX_BRIGHTNESS_SETTING      15 /* 15/16 (93.75%) */
-#define DEFAULT_BRIGHTNESS_SETTING  9  /*  9/16 (56.25%) */
-#endif
-
 void backlight_set_brightness(int val);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
 
