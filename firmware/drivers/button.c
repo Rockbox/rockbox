@@ -46,9 +46,6 @@
 
 #ifdef TARGET_TREE
 #include "button-target.h"
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) \
-    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#include "button-target.h"
 #endif
 
 struct event_queue button_queue;
@@ -490,19 +487,11 @@ static int button_read(void)
     int btn = BUTTON_NONE;
     int retval;
 #ifndef TARGET_TREE
-#if (CONFIG_KEYPAD != IRIVER_H100_PAD)  \
-        && (CONFIG_KEYPAD != IRIVER_H300_PAD)
     int data;
-#endif
 #endif
 
 #ifdef TARGET_TREE
     btn = button_read_device();
-    
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD)  \
-        || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-    btn = button_read_device(); /* temp untill TARGET_TREE is defined */
-
 
 #elif CONFIG_KEYPAD == RECORDER_PAD
 #ifndef HAVE_FMADC
