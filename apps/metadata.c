@@ -559,7 +559,7 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
      */
 
     /* Use the path name of the id3 structure as a temporary buffer. */
-    unsigned char* buf = id3->path;
+    unsigned char* buf = (unsigned char *)id3->path;
     long comment_size;
     long remaining = 0;
     long last_serial = 0;
@@ -754,7 +754,7 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
      */
 
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = id3->path;
+    unsigned char* buf = (unsigned char *)id3->path;
     bool rc = false;
 
     if (!skip_id3v2(fd, id3) || (read(fd, buf, 4) < 4))
@@ -842,7 +842,7 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
 static bool get_wave_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = id3->path;
+    unsigned char* buf = (unsigned char *)id3->path;
     unsigned long totalsamples = 0;
     unsigned long channels = 0;
     unsigned long bitspersample = 0;
@@ -1375,10 +1375,10 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
             /* Write replaygain values to strings for use in id3 screen. We use
                the XING header as buffer space since Musepack files shouldn't
                need to use it in any other way */
-            id3->track_gain_string = id3->toc;
+            id3->track_gain_string = (char *)id3->toc;
             bufused = snprintf(id3->track_gain_string, 45,
                                "%d.%d dB", track_gain/100, abs(track_gain)%100);
-            id3->album_gain_string = id3->toc + bufused + 1;
+            id3->album_gain_string = (char *)id3->toc + bufused + 1;
             bufused = snprintf(id3->album_gain_string, 45,
                                "%d.%d dB", album_gain/100, abs(album_gain)%100);
         }
@@ -1422,7 +1422,7 @@ static bool get_musepack_metadata(int fd, struct mp3entry *id3)
 static bool get_sid_metadata(int fd, struct mp3entry* id3)
 {    
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = id3->path;    
+    unsigned char* buf = (unsigned char *)id3->path;    
     int read_bytes;
     char *p;
     
@@ -1433,7 +1433,7 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
         return false;
     }
     
-    if ((memcmp(buf, "PSID",4) != 0))        
+    if ((memcmp(buf, "PSID",4) != 0))
     {
         return false;
     }
@@ -1441,12 +1441,12 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
     p = id3->id3v2buf;
 
     /* Copy Title */
-    strcpy(p, &buf[0x16]);
+    strcpy(p, (char *)&buf[0x16]);
     id3->title = p;
     p += strlen(p)+1;
 
     /* Copy Artist */
-    strcpy(p, &buf[0x36]);
+    strcpy(p, (char *)&buf[0x36]);
     id3->artist = p;
     p += strlen(p)+1;
 
@@ -1466,7 +1466,7 @@ static bool get_sid_metadata(int fd, struct mp3entry* id3)
 static bool get_adx_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char * buf = id3->path;
+    unsigned char * buf = (unsigned char *)id3->path;
     int chanstart, channels, read_bytes;
     int looping = 0, start_adr = 0, end_adr = 0;
     
@@ -1578,7 +1578,7 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
 static bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
     /* Use the trackname part of the id3 structure as a temporary buffer */
-    unsigned char* buf = id3->path;
+    unsigned char* buf = (unsigned char *)id3->path;
     unsigned long numChannels = 0;
     unsigned long numSampleFrames = 0;
     unsigned long sampleSize = 0;
@@ -1751,7 +1751,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
          */
 
         /* Use the trackname part of the id3 structure as a temporary buffer */
-        buf = track->id3.path;
+        buf = (unsigned char *)track->id3.path;
       
         for (i = 0; i < 256; ++i) {
 
@@ -1803,7 +1803,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
     case AFMT_A52:
         /* Use the trackname part of the id3 structure as a temporary buffer */
-        buf = track->id3.path;
+        buf = (unsigned char *)track->id3.path;
         
         if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, buf, 5) < 5))
         {

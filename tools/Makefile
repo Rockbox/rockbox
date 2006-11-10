@@ -41,9 +41,10 @@ ipod_fw:	ipod_fw.c
 database: database.c ../apps/tagcache.c ../apps/metadata.c \
 ../firmware/id3.c ../firmware/common/unicode.c \
 ../firmware/common/crc32.c ../uisimulator/common/io.c \
-../firmware/mp3data.c ../firmware/logf.c
+../firmware/mp3data.c ../firmware/logf.c ../firmware/replaygain.c
 	$(SILENT)$(CC) -g -I../firmware/export -iquote ../firmware/include \
--D__PCTOOL__ -DHAVE_TAGCACHE -DROCKBOX_HAS_LOGF -DSIMULATOR -ldl -I../apps $+ -o $@
+-D__PCTOOL__ -DHAVE_TAGCACHE -DROCKBOX_HAS_LOGF -DSIMULATOR \
+-DCONFIG_CODEC=1 -ldl -I../apps $+ -o $@
 
 convbdf: convbdf.c
 	$(SILENT)$(CC) -g $+ -o $@
