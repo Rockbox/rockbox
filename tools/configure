@@ -529,7 +529,7 @@ if [ -z "$rootdir" ]; then
   # Figure out where the source code root is!
   #
 
-  firmfile="crt0.S" # a file to check for in the firmware root dir
+  firmfile="app.lds" # a file to check for in the firmware root dir
 
   for dir in  . .. ../.. ../rockbox*; do
     if [ -f $dir/firmware/$firmfile ]; then
