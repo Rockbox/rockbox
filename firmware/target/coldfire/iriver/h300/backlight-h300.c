@@ -38,6 +38,16 @@ void __backlight_off(void)
     lcd_enable(false);
 }
 
+/* set brightness by changing the PWM */
+void __backlight_set_brightness(int val)
+{
+    /* disable IRQs while bitbanging */
+    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
+    pcf50606_write(0x35, (val << 1) | 0x01); /* 512Hz, Enable PWM */
+    /* enable IRQs again */
+    set_irq_level(old_irq_level);
+}
+
 void __remote_backlight_on(void)
 {
     and_l(~0x00000002, &GPIO1_OUT);

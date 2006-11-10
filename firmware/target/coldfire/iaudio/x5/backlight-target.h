@@ -21,6 +21,7 @@
 
 void __backlight_on(void);
 void __backlight_off(void);
+void __backlight_set_brightness(int val);
 void __remote_backlight_on(void);
 void __remote_backlight_off(void);
 

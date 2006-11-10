@@ -813,35 +813,18 @@ bool is_remote_backlight_on(void) {return true;}
 #endif
 #endif /* defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER) */
 
-/* TODO: Move low level code to target/ tree. Create
-   __backlight_set_brightness and call from here. */
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-#if defined(IRIVER_H300_SERIES) || defined(IAUDIO_X5)
 void backlight_set_brightness(int val)
 {
 #ifndef SIMULATOR
-    /* set brightness by changing the PWM
-     * accepts 0..15 but note that 0 and 1 give a black display on H300!
-     * 0 is black on the X5.
-     */
+    if (val < MIN_BRIGHTNESS_SETTING)
+        val = MIN_BRIGHTNESS_SETTING;
+    else if (val > MAX_BRIGHTNESS_SETTING)
+        val = MAX_BRIGHTNESS_SETTING;
 
-    /* disable IRQs while bitbanging */
-    int old_irq_level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
-    /* Clamp setting to range */
-    if(val<MIN_BRIGHTNESS_SETTING)
-        val=MIN_BRIGHTNESS_SETTING;
-    else if(val>MAX_BRIGHTNESS_SETTING)
-        val=MAX_BRIGHTNESS_SETTING;
-
-    pcf50606_write(0x35, (val << 1) | 0x01); /* 512Hz, Enable PWM */
-
-    /* enable IRQs again */
-    set_irq_level(old_irq_level);
+    __backlight_set_brightness(val);
 #else
-    val=0;
+    (void)val;
 #endif
 }
-#endif
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-

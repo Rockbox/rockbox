@@ -156,6 +156,12 @@
 #define MAX_CONTRAST_SETTING        63
 #define DEFAULT_CONTRAST_SETTING    40
 
+/* Main LCD backlight brightness range and defaults */
+/* accepts 0..15 but note that 0 and 1 give a black display on H300! */
+#define MIN_BRIGHTNESS_SETTING      2  /*  2/16 (12.50%) */
+#define MAX_BRIGHTNESS_SETTING      15 /* 15/16 (93.75%) */
+#define DEFAULT_BRIGHTNESS_SETTING  9  /*  9/16 (56.25%) */
+
 /* Remote LCD contrast range and defaults */
 #define MIN_REMOTE_CONTRAST_SETTING     MIN_CONTRAST_SETTING
 #define MAX_REMOTE_CONTRAST_SETTING     MAX_CONTRAST_SETTING
