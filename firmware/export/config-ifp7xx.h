@@ -50,6 +50,13 @@
 
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 
+/* Virtual LED (icon) */
+#define CONFIG_LED LED_VIRTUAL
+
+#define MIN_CONTRAST_SETTING        5
+#define MAX_CONTRAST_SETTING        63
+#define DEFAULT_CONTRAST_SETTING    40
+
 #ifndef SIMULATOR
 
 /* Define this if you have a Philips PNX0101 */
@@ -89,13 +96,6 @@
 #define USB_ISP1582
 
 #define HAVE_GDB_API
-
-/* Virtual LED (icon) */
-#define CONFIG_LED LED_VIRTUAL
-
-#define MIN_CONTRAST_SETTING        5
-#define MAX_CONTRAST_SETTING        63
-#define DEFAULT_CONTRAST_SETTING    40
 
 /* Define this if you have adjustable CPU frequency */
 //#define HAVE_ADJUSTABLE_CPU_FREQ
