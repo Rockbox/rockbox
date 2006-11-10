@@ -108,35 +108,7 @@ static const char scroll_tick_table[16] = {
 
 /* optimised archos recorder code is in lcd.S */
 
-#if CONFIG_CPU == TCC730
-/* Optimization opportunity:
-   In the following I do exactly as in the archos firmware.
-   There is probably a better way (ie. do only one mask operation)
-*/
-void lcd_write_command(int cmd) {
-    P2 &= 0xF7;
-    P2 &= 0xDF;
-    P2 &= 0xFB;
-    P0 = cmd;
-    P2 |= 0x04;
-    P2 |= 0x08;
-    P2 |= 0x20;
-}
-
-void lcd_write_data( const unsigned char* data, int count ) {
-    int i;
-    for (i=0; i < count; i++) {
-        P2 |= 0x08;
-        P2 &= 0xDF;
-        P2 &= 0xFB;
-        P0 = data[i];
-        P2 |= 0x04;
-        P2 |= 0x08;
-        P2 |= 0x20;
-    }
-}
-
-#elif CONFIG_CPU == PNX0101
+#if CONFIG_CPU == PNX0101
 
 void lcd_write_command(int cmd)
 {
@@ -161,9 +133,7 @@ void lcd_write_data( const unsigned char* data, int count )
 
 int lcd_default_contrast(void)
 {
-#if CONFIG_LCD == LCD_GMINI100
-    return 31;
-#elif CONFIG_LCD == LCD_IFP7XX
+#if CONFIG_LCD == LCD_IFP7XX
     return 45;
 #else
     return (read_hw_mask() & LCD_CONTRAST_BIAS) ? 31 : 49;
@@ -192,20 +162,6 @@ void lcd_set_flip(bool yesno)
 #else
     if (yesno) 
 #endif
-#if CONFIG_LCD == LCD_GMINI100
-    {
-        lcd_write_command(LCD_SET_SEGMENT_REMAP | 0x01);
-        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
-        xoffset = 132 - LCD_WIDTH;
-    } 
-    else 
-    {
-        lcd_write_command(LCD_SET_SEGMENT_REMAP);
-        lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION | 0x08);
-        xoffset = 0;
-    }
-#else
-
     {
         lcd_write_command(LCD_SET_SEGMENT_REMAP);
         lcd_write_command(LCD_SET_COM_OUTPUT_SCAN_DIRECTION);
@@ -221,7 +177,6 @@ void lcd_set_flip(bool yesno)
         xoffset = 0;
 #endif
     }
-#endif
 }
 
 #endif /* !SIMULATOR */
@@ -238,15 +193,7 @@ void lcd_init(void)
 
 void lcd_init(void)
 {
-#if CONFIG_CPU == TCC730
-    /* Initialise P0 & some P2 output pins:
-       P0 -> all pins normal cmos output 
-       P2 -> pins 1 to 5 normal cmos output. */
-    P0CON = 0xff;
-    P2CONL |= 0x5a;
-    P2CONL &= 0x5b;
-    P2CONH |= 1;
-#elif CONFIG_CPU == PNX0101
+#if CONFIG_CPU == PNX0101
     LCDREG10 = 0xf;
     LCDREG04 = 0x4084;
 #else

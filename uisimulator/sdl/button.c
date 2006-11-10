@@ -124,41 +124,6 @@ void button_event(int key, bool pressed)
         new_btn = BUTTON_MENU;
         break;
 
-#elif CONFIG_KEYPAD == GMINI100_PAD
-    case SDLK_KP4:
-    case SDLK_LEFT:
-        new_btn = BUTTON_LEFT;
-        break;
-    case SDLK_KP6:
-    case SDLK_RIGHT:
-        new_btn = BUTTON_RIGHT;
-        break;
-    case SDLK_KP8:
-    case SDLK_UP:
-        new_btn = BUTTON_UP;
-        break;
-    case SDLK_KP2:
-    case SDLK_DOWN:
-        new_btn = BUTTON_DOWN;
-        break;
-    case SDLK_KP_PLUS:
-    case SDLK_F8:
-        new_btn = BUTTON_ON;
-        break;
-    case SDLK_KP_ENTER:
-    case SDLK_RETURN:
-    case SDLK_a:
-        new_btn = BUTTON_OFF;
-        break;
-    case SDLK_KP5:
-    case SDLK_SPACE:
-        new_btn = BUTTON_PLAY;
-        break;
-    case SDLK_KP_PERIOD:
-    case SDLK_INSERT:
-        new_btn = BUTTON_MENU;
-        break;
-
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
     case SDLK_KP4:
     case SDLK_LEFT:

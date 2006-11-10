@@ -30,10 +30,10 @@
 #include "string.h"
 #include "buffer.h"
 
-#if (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) && \
+#if !defined(IRIVER_IFP7XX_SERIES) && \
     (CONFIG_CPU != PP5002) && !defined(IRIVER_H10) && \
     !defined(IRIVER_H10_5GB) && (CONFIG_CPU != S3C2440)
-/* FIX: this doesn't work on Gmini, iFP, 3rd Gen ipods, or H10 yet */
+/* FIX: this doesn't work on iFP, 3rd Gen ipods, or H10 yet */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -243,7 +243,7 @@ int rolo_load(const char* filename)
 
     return 0; /* this is never reached */
 }
-#else  /* (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) */
+#else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {
     /* dummy */
@@ -251,4 +251,4 @@ int rolo_load(const char* filename)
     return 0;
 }
 
-#endif /* (CONFIG_CPU != TCC730) && !defined(IRIVER_IFP7XX_SERIES) */
+#endif /* !defined(IRIVER_IFP7XX_SERIES) */

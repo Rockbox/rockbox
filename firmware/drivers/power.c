@@ -86,9 +86,7 @@ void power_init(void)
 #ifdef CONFIG_CHARGING
 bool charger_inserted(void)
 {     
-#if defined(GMINI_ARCH)
-    return (P7 & 0x80) == 0;
-#elif CONFIG_CHARGING == CHARGING_CONTROL
+#if CONFIG_CHARGING == CHARGING_CONTROL
     /* Recorder */
     return adc_read(ADC_EXT_POWER) > 0x100;
 #elif defined (HAVE_FMADC)
@@ -139,12 +137,7 @@ void ide_power_enable(bool on)
 {
     (void)on;
 
-#if defined(GMINI_ARCH)
-    if(on)
-        P1 |= 0x08;
-    else
-        P1 &= ~0x08;
-#elif defined(TOSHIBA_GIGABEAT_F)
+#if defined(TOSHIBA_GIGABEAT_F)
     /* Gigabeat TODO */
 #else /* SH1 based archos */
     bool touched = false;
@@ -189,9 +182,7 @@ void ide_power_enable(bool on)
 
 bool ide_powered(void)
 {
-#if defined(GMINI_ARCH)
-    return (P1 & 0x08?true:false);
-#elif defined(TOSHIBA_GIGABEAT_F)
+#if defined(TOSHIBA_GIGABEAT_F)
     return false;
 #else /* SH1 based archos */
 #if defined(NEEDS_ATA_POWER_ON) || defined(HAVE_ATA_POWER_OFF)
@@ -220,10 +211,7 @@ bool ide_powered(void)
 void power_off(void)
 {
     set_irq_level(HIGHEST_IRQ_LEVEL);
-#if defined(GMINI_ARCH)
-    P1 &= ~1;
-    P1CON &= ~1;
-#elif defined(TOSHIBA_GIGABEAT_F)
+#if defined(TOSHIBA_GIGABEAT_F)
     /* FIXME: Can we turn the device off, or only enter sleep mode? */
 #else
 #ifdef HAVE_POWEROFF_ON_PBDR

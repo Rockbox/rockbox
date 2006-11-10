@@ -131,30 +131,6 @@ void usb_enable(bool on)
         or_b(0x08, &PADRL); /* deassert card detect */
     }
     or_b(0x28, &PAIORL); /* output for USB enable and card detect */
-#elif defined(USB_GMINISTYLE)
-    {
-        int smsc_ver = smsc_version();
-        if (on) {
-            if (smsc_ver < 4) {
-                P6 &= ~0x04;
-                P10 &= ~0x20;
-                
-                smsc_delay();
-                
-                P6 |= 0x08;
-                P10 |= 0x20;    
-
-                smsc_delay();
-            }
-            P6 |= 0x10;
-        } else {
-            P6 &= ~0x10;
-            if (smsc_ver < 4) {
-                P6 &= ~0x04;
-                P10 &= ~0x20;
-            }
-        }
-    }
 #elif defined(USB_ISP1582)
     /* TODO: Implement USB_ISP1582 */
     (void) on;
@@ -371,9 +347,6 @@ bool usb_detect(void)
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
 #endif
-#ifdef USB_GMINISTYLE
-    current_status = (P5 & 0x10)?true:false;
-#endif
 #ifdef USB_IPODSTYLE
     /* The following check is in the ipodlinux source, with the
        comment "USB2D_IDENT is bad" if USB2D_IDENT != 0x22FA05 */
@@ -395,18 +368,6 @@ static void usb_tick(void)
 {
     bool current_status;
 
-#ifdef USB_GMINISTYLE
-    /* Keep usb chip in usb state (?) */
-    if (P5 & 0x10) {
-        if ((P10 & 0x20) == 0 || (P6 & 0x08) == 0) {
-            if (smsc_version() < 4) {
-                P6 |= 0x08;
-                P10 |= 0x20;
-            }
-        }
-    }
-#endif
-    
     if(usb_monitor_enabled)
     {
         current_status = usb_detect();

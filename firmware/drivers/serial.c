@@ -30,7 +30,7 @@
 
 #if CONFIG_CPU == SH7034
 
-/* FIX: this doesn't work on iRiver or Gmini or iPod yet */
+/* FIX: this doesn't work on iRiver or iPod yet */
 /* iFP7xx has no remote */
 
 #ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
@@ -172,4 +172,4 @@ void serial_setup (void)
 {
     /* a dummy */
 }
-#endif /* ! (CONFIG_CPU != MCF5249) && (CONFIG_CPU != TCC730) */
+#endif

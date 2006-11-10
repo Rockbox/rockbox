@@ -73,8 +73,6 @@ static inline void __backlight_on(void)
     or_b(0x40, &PAIORH);
 #elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
     or_b(0x40, &PADRH); /* drive it high */
-#elif CONFIG_BACKLIGHT == BL_GMINI
-    P1 |= 0x10;
 #endif
 }
 
@@ -87,8 +85,6 @@ static inline void __backlight_off(void)
     and_b(~0x40, &PAIORH); /* let it float (up) */
 #elif CONFIG_BACKLIGHT == BL_PA14_HI /* Ondio */
     and_b(~0x40, &PADRH); /* drive it low */
-#elif CONFIG_BACKLIGHT == BL_GMINI
-    P1 &= ~0x10;
 #endif
 }
 #endif
@@ -568,8 +564,6 @@ void backlight_init(void)
 #elif CONFIG_BACKLIGHT == BL_PA14_LO || CONFIG_BACKLIGHT == BL_PA14_HI
     PACR1 &= ~0x3000;    /* Set PA14 (backlight control) to GPIO */
     or_b(0x40, &PAIORH); /* ..and output */
-#elif CONFIG_BACKLIGHT == BL_GMINI
-    P1CON |= 0x10; /* P1.4 C-MOS output mode */
 #endif
     backlight_on();
 #ifdef HAVE_REMOTE_LCD

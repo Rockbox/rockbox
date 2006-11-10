@@ -28,11 +28,6 @@
 void led(bool on)
 {
     if ( on )
-#ifdef GMINI_ARCH
-        P2 |= 1;
-    else
-        P2 &= ~1;
-#else
     {
         or_b(0x40, &PBDRL);
     }
@@ -40,7 +35,6 @@ void led(bool on)
     {
         and_b(~0x40, &PBDRL);
     }
-#endif
 }
 
 #elif (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)

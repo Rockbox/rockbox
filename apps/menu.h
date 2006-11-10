@@ -61,13 +61,6 @@
 #define MENU_EXIT_MENU  BUTTON_MENU
 #define MENU_ENTER      BUTTON_RIGHT
 
-#elif CONFIG_KEYPAD == GMINI100_PAD
-#define MENU_EXIT       BUTTON_LEFT
-#define MENU_EXIT2      BUTTON_OFF
-#define MENU_EXIT_MENU  BUTTON_MENU
-#define MENU_ENTER      BUTTON_RIGHT
-#define MENU_ENTER2     BUTTON_PLAY
-
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 
 /* TODO: Check menu button assignments */

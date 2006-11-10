@@ -314,8 +314,6 @@ void button_init(void)
     PAIOR &= ~0x0820; /* Inputs */
 #elif CONFIG_KEYPAD == ONDIO_PAD
     /* nothing to initialize here */
-#elif CONFIG_KEYPAD == GMINI100_PAD
-    /* nothing to initialize here */
 #endif /* CONFIG_KEYPAD */
     queue_init(&button_queue, true);
     button_read();
@@ -598,38 +596,6 @@ static int button_read(void)
         btn |= BUTTON_MENU;
     if(adc_read(ADC_BUTTON_ONOFF) < 0x120) /* active low */
         btn |= BUTTON_OFF;
-
-#elif CONFIG_KEYPAD == GMINI100_PAD
-    data = adc_read(7);
-    if (data < 0x38a)
-    {
-        if (data < 0x1c5)
-            if (data < 0xe3)
-                btn = BUTTON_LEFT;
-            else
-                btn = BUTTON_DOWN;
-        else
-            if (data < 0x2a2)
-                btn = BUTTON_RIGHT;
-            else
-                btn = BUTTON_UP;
-    }
-
-    data = adc_read(6);
-    if (data < 0x355)
-    {
-        if (data < 0x288)
-            if (data < 0x233)
-                btn |= BUTTON_OFF;
-            else
-                btn |= BUTTON_PLAY;
-        else
-            btn |= BUTTON_MENU;
-    }
-
-    data = P7;
-    if (data & 0x01)
-        btn |= BUTTON_ON;
 
 #endif /* CONFIG_KEYPAD */
 

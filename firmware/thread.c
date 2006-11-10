@@ -186,51 +186,6 @@ static inline void load_context(const void* addr)
     );
 }
 
-#elif CONFIG_CPU == TCC730
-/*---------------------------------------------------------------------------
- * Store non-volatile context.
- *---------------------------------------------------------------------------
- */
-#define store_context(addr)				\
-    __asm__ volatile (                                  \
-        "push r0,r1\n\t"				\
-        "push r2,r3\n\t"				\
-        "push r4,r5\n\t"				\
-        "push r6,r7\n\t"				\
-        "push a8,a9\n\t"				\
-        "push a10,a11\n\t"				\
-        "push a12,a13\n\t"				\
-        "push a14\n\t"                                  \
-        "ldw @[%0+0], a15\n\t" : : "a" (addr) );
-
-/*---------------------------------------------------------------------------
- * Load non-volatile context.
- *---------------------------------------------------------------------------
- */
-#define load_context(addr)                      \
-    {                                           \
-        if (!(addr)->started) {                 \
-            (addr)->started = 1;                \
-            __asm__ volatile (                  \
-                "ldw a15, @[%0+0]\n\t"          \
-                "ldw a14, @[%0+4]\n\t"		\
-                "jmp a14\n\t" : : "a" (addr)	\
-                );				\
-        } else                                  \
-            __asm__ volatile (                  \
-                "ldw a15, @[%0+0]\n\t"		\
-                "pop a14\n\t"			\
-                "pop a13,a12\n\t"               \
-                "pop a11,a10\n\t"               \
-                "pop a9,a8\n\t"			\
-                "pop r7,r6\n\t"			\
-                "pop r5,r4\n\t"			\
-                "pop r3,r2\n\t"			\
-                "pop r1,r0\n\t" : : "a" (addr)	\
-                );                              \
-                                                \
-    }
-
 #endif
 
 static void add_to_list(struct thread_entry **list,
@@ -353,13 +308,6 @@ static inline void sleep_core(void)
         /* This should sleep the CPU. It appears to wake by itself on
            interrupts */
         CPU_CTL = 0x80000000;
-#elif CONFIG_CPU == TCC730
-	    /* Sleep mode is triggered by the SYS instr on CalmRisc16.
-         * Unfortunately, the manual doesn't specify which arg to use.
-         __asm__ volatile ("sys #0x0f");
-         0x1f seems to trigger a reset;
-         0x0f is the only one other argument used by Archos.
-         */
 #elif CONFIG_CPU == S3C2440
         CLKCON |= 2;
 #endif
@@ -430,12 +378,10 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     {
         store_context(&cores[CURRENT_CORE].running->context);
 
-# if CONFIG_CPU != TCC730
         /* Check if the current thread stack is overflown */
         stackptr = cores[CURRENT_CORE].running->stack;
         if(stackptr[0] != DEADBEEF)
         panicf("Stkov %s", cores[CURRENT_CORE].running->name);
-# endif
         
         /* Check if a thread state change has been requested. */
         if (cores[CURRENT_CORE].running->statearg)
@@ -644,14 +590,8 @@ struct thread_entry*
     add_to_list(&cores[core].running, thread);
     
     regs = &thread->context;
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == SH7034) || defined(CPU_ARM)
     /* Align stack to an even 32 bit boundary */
     regs->sp = (void*)(((unsigned int)stack + stack_size) & ~3);
-#elif CONFIG_CPU == TCC730
-   /* Align stack on word boundary */
-    regs->sp = (void*)(((unsigned long)stack + stack_size - 2) & ~1);
-    regs->started = 0;
-#endif
     regs->start = (void*)function;
 
     return thread;
@@ -751,11 +691,7 @@ void init_threads(void)
         cores[COP].threads[0].stack_size = (int)cop_stackend - (int)cop_stackbegin;
 #endif
     }
-#if CONFIG_CPU == TCC730
-    cores[core].threads[0].context.started = 1;
-#else
     cores[core].threads[0].context.start = 0; /* thread 0 already running */
-#endif
 }
 
 int thread_stack_usage(const struct thread_entry *thread)

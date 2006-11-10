@@ -40,7 +40,6 @@
 #define SH7034  7034
 #define MCF5249 5249
 #define MCF5250 5250
-#define TCC730   730   /* lacking a proper abbrivation */
 #define PP5002  5002
 #define PP5020  5020
 #define PNX0101  101
@@ -48,11 +47,10 @@
 #define PP5024  5024
 
 /* CONFIG_KEYPAD */
-#define PLAYER_PAD          0
-#define RECORDER_PAD        1
-#define ONDIO_PAD           2
-#define IRIVER_H100_PAD     3
-#define GMINI100_PAD        4
+#define PLAYER_PAD          1
+#define RECORDER_PAD        2
+#define ONDIO_PAD           3
+#define IRIVER_H100_PAD     4
 #define IRIVER_H300_PAD     5
 #define IAUDIO_X5_PAD       6
 #define IPOD_4G_PAD         7
@@ -83,7 +81,6 @@
 #define CHARGING_CONTROL 3 /* Software controlled charging */
 
 /* CONFIG_LCD */
-#define LCD_GMINI100  0
 #define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
 #define LCD_SSD1801   2 /* as used by Archos Player/Studio */
 #define LCD_S1D15E06  3 /* as used by iRiver H100 series */
@@ -111,11 +108,10 @@
 #define RGB565SWAPPED 3553
 
 /* CONFIG_BACKLIGHT */
-#define BL_PA14_LO       0 /* Player, PA14 low active */
-#define BL_RTC           1 /* Recorder, RTC square wave output */
-#define BL_PA14_HI       2 /* Ondio, PA14 high active */
-#define BL_IRIVER_H100   3 /* IRiver GPIO */
-#define BL_GMINI         4 /* Archos GMini */
+#define BL_PA14_LO       1 /* Player, PA14 low active */
+#define BL_RTC           2 /* Recorder, RTC square wave output */
+#define BL_PA14_HI       3 /* Ondio, PA14 high active */
+#define BL_IRIVER_H100   4 /* IRiver GPIO */
 #define BL_IPOD4G        5 /* Apple iPod 4G */
 #define BL_IPODNANO      6 /* Apple iPod Nano and iPod Video*/
 #define BL_IPOD3G        7 /* Apple iPod 3g with dock */
@@ -129,9 +125,8 @@
 #define BL_TPJ1022       15 /* Tatung Elio TPJ-1022 */
 
 /* CONFIG_I2C */
-#define I2C_PLAYREC  0 /* Archos Player/Recorder style */
-#define I2C_ONDIO    1 /* Ondio style */
-#define I2C_GMINI    2 /* Gmini style */
+#define I2C_PLAYREC  1 /* Archos Player/Recorder style */
+#define I2C_ONDIO    2 /* Ondio style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
 #define I2C_PP5002   4 /* PP5002 style */
 #define I2C_PP5020   5 /* PP5020 style */
@@ -139,7 +134,7 @@
 #define I2C_S3C2440  7
 
 /* CONFIG_LED */
-#define LED_REAL     1 /* SW controlled LED (Archos recorders, player, Gmini) */
+#define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
 #define LED_VIRTUAL  2 /* Virtual LED (icon) (Archos Ondio) */
 /* else                   HW controlled LED (iRiver H1x0) */
 
@@ -180,10 +175,6 @@
 #include "config-h120.h"
 #elif defined(IRIVER_H300)
 #include "config-h300.h"
-#elif defined(ARCHOS_GMINI120)
-#include "config-gmini120.h"
-#elif defined(ARCHOS_GMINISP)
-#include "config-gminisp.h"
 #elif defined(IAUDIO_X5)
 #include "config-iaudiox5.h"
 #elif defined(IPOD_COLOR)
@@ -286,7 +277,6 @@
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     (CONFIG_CPU == PP5020) ||  /* iPod and H10: core, plugins, codecs */ \
     (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
-    (CONFIG_CPU == TCC730) || /* CalmRISC16: core, (plugins, codecs) */ \
     (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

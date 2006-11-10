@@ -314,63 +314,6 @@ void TIMER0(void)
     TER0 = 0xff; /* Clear all events */
 }
 
-#elif CONFIG_CPU == TCC730
-
-void TIMER0(void)
-{
-    int i;
-        
-    /* Keep alive (?)
-     * If this is not done, power goes down when DC is unplugged.
-     */
-    if (current_tick % 2 == 0)
-        P8 |= 1;
-    else
-        P8 &= ~1;
-    
-    /* Run through the list of tick tasks */
-    for(i = 0;i < MAX_NUM_TICK_TASKS;i++)
-    {
-        if(tick_funcs[i])
-        {
-            tick_funcs[i]();
-        }
-    }
-
-    current_tick++;
-
-    /* re-enable timer by clearing the counter */
-    TACON |= 0x80;
-}
-
-void tick_start(unsigned int interval_in_ms)
-{
-    long count;
-    count = (long)FREQ * (long)interval_in_ms / 1000 / 16;
-
-    if(count > 0xffffL)
-    {
-        panicf("Error! The tick interval is too long (%dms->%lx)\n",
-               interval_in_ms, count);
-        return;
-    }
-
-    /* Use timer A */
-    TAPRE = 0x0;
-    TADATA = count;
-
-    TACON = 0x89;
-    /* counter clear; */
-    /* interval mode; */
-    /* TICS = F(osc) / 16 */
-    /* TCS = internal clock */
-    /* enable */
-    
-    /* enable the interrupt */
-    interrupt_vector[2] = TIMER0;
-    IMR0 |= (1<<2);
-}
-
 #elif defined(CPU_PP)
 
 #ifndef BOOTLOADER

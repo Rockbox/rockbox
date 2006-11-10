@@ -74,13 +74,6 @@ struct regs
     unsigned int lr;     /* r14 (lr) */
     void         *start; /* Thread start address, or NULL when started */
 };
-# elif CONFIG_CPU == TCC730
-struct regs
-{
-    void *sp;    /* Stack pointer (a15) */
-    void *start; /* Thread start address */
-    int started; /* 0 when not started */
-};
 # endif
 
 #endif /* !SIMULATOR */

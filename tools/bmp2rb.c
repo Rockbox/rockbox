@@ -290,7 +290,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
     switch (format)
     {
-      case 0: /* Archos recorders, Ondio, Gmini 120/SP, Iriver H1x0 monochrome */
+      case 0: /* Archos recorders, Ondio, Iriver H1x0 monochrome */
         dst_w = width;
         dst_h = (height + 7) / 8;
         dst_d = 8;
@@ -351,7 +351,7 @@ int transform_bitmap(const struct RGBQUAD *src, int width, int height,
 
     switch (format)
     {
-      case 0: /* Archos recorders, Ondio, Gmini 120/SP, Iriver H1x0 b&w */
+      case 0: /* Archos recorders, Ondio, Iriver H1x0 b&w */
         for (row = 0; row < height; row++)
             for (col = 0; col < width; col++)
             {
@@ -528,7 +528,7 @@ void print_usage(void)
            "\t-h <dir> Create header file in <dir>/<id>.h\n"
            "\t-a       Show ascii picture of bitmap\n"
            "\t-f <n>   Generate destination format n, default = 0\n"
-           "\t         0  Archos recorder, Ondio, Gmini 120/SP, Iriver H1x0 mono\n"
+           "\t         0  Archos recorder, Ondio, Iriver H1x0 mono\n"
            "\t         1  Archos player graphics library\n"
            "\t         2  Iriver H1x0 4-grey\n"
            "\t         3  Canonical 8-bit greyscale\n"

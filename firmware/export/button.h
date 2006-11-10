@@ -151,27 +151,6 @@ void wheel_send_events(bool send);
 
 #define BUTTON_REMOTE 0
 
-#elif CONFIG_KEYPAD == GMINI100_PAD
-
-  /* Gmini specific button codes */
-
-#define BUTTON_ON           0x00000001
-#define BUTTON_OFF          0x00000002
-
-#define BUTTON_LEFT         0x00000004
-#define BUTTON_RIGHT        0x00000008
-#define BUTTON_UP           0x00000010
-#define BUTTON_DOWN         0x00000020
-
-#define BUTTON_PLAY         0x00000040
-#define BUTTON_MENU         0x00000080
-
-#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
-                |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY|BUTTON_MENU)
-
-#define BUTTON_REMOTE 0
-
-
 #elif 0
 
 /* 
@@ -186,7 +165,7 @@ void wheel_send_events(bool send);
 
 
 
-#endif /* RECORDER/PLAYER/ONDIO/GMINI KEYPAD */
+#endif /* RECORDER/PLAYER/ONDIO KEYPAD */
 
 #endif /* TARGET_TREE */
 

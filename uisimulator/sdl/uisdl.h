@@ -173,18 +173,6 @@
 #define UI_LCD_WIDTH                320
 #define UI_LCD_HEIGHT               240
 
-#elif defined(ARCHOS_GMINI120)
-#define UI_TITLE                    "Gmini 120"
-#define UI_WIDTH                    370 /* width of GUI window */
-#define UI_HEIGHT                   264 /* height of GUI window */
-#define UI_LCD_BGCOLOR              90, 145, 90 /* bkgnd color of LCD (no backlight) */
-#define UI_LCD_BGCOLORLIGHT         60, 160, 230 /* bkgnd color of LCD (backlight) */
-#define UI_LCD_BLACK                0, 0, 0 /* black */
-#define UI_LCD_POSX                 85 /* x position of lcd */
-#define UI_LCD_POSY                 61 /* y position of lcd (74 for real aspect) */
-#define UI_LCD_WIDTH                192 /* * 1.5 */
-#define UI_LCD_HEIGHT               96  /* * 1.5 */
-
 #elif defined(IAUDIO_X5)
 #define UI_TITLE                    "iAudio X5"
 #define UI_WIDTH                    300 /* width of GUI window */

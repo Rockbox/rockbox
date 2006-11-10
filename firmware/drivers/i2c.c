@@ -24,26 +24,6 @@
 #include "system.h"
 
 /* cute little functions, atomic read-modify-write */
-#if CONFIG_I2C == I2C_GMINI
-
-/* This is done like this in the Archos' firmware.
- * However, the TCC370 has an integrated I2C
- * controller (bound to the same lines). It should be
- * possible to use it and thus save some space in flash.
- */
-#define SDA_LO     (P3 &= ~0x20)
-#define SDA_HI     (P3 |= 0x20)
-#define SDA_INPUT  (P3CONH &= ~0x0C)
-#define SDA_OUTPUT (P3CONH |= 0x04)
-#define SDA        (P3 & 0x20)
-
-#define SCL_LO     (P3 &= ~0x10)
-#define SCL_HI     (P3 |= 0x10)
-#define SCL_INPUT  (P3CONH &= ~0x03)
-#define SCL_OUTPUT (P3CONH |= 0x01)
-#define SCL        (P3 & 0x10)
-
-#else /* non Gmini below */
 
 /* SDA is PB7 */
 #define SDA_LO     and_b(~0x80, &PBDRL)
@@ -67,7 +47,6 @@
 #define SCL_HI     or_b(0x20, &PBDRH)
 #define SCL        (PBDRH & 0x20)
 #endif
-#endif /* ! I2C_GMINI */
 
 /* arbitrary delay loop */
 #define DELAY   do { int _x; for(_x=0;_x<20;_x++);} while (0)
@@ -106,13 +85,10 @@ void i2c_init(void)
 {
    int i;
 
-#if CONFIG_I2C == I2C_GMINI
-   SCL_INPUT;
-   SDA_INPUT;   
-#elif CONFIG_I2C == I2C_ONDIO
+#if CONFIG_I2C == I2C_ONDIO
    /* make PB6 & PB7 general I/O */
    PBCR2 &= ~0xf000;
-#else /* not Gmini, not Ondio */
+#else /* not Ondio */
    /* make PB7 & PB13 general I/O */
    PBCR1 &= ~0x0c00; /* PB13 */
    PBCR2 &= ~0xc000; /* PB7 */

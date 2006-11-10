@@ -84,104 +84,6 @@
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
 
-#elif CONFIG_CPU == TCC730
-
-/* Plain C read & write loops */
-#define PREFER_C_READING
-#define PREFER_C_WRITING
-
-#define SWAP_WORDS
-
-#define ATA_DATA_IDX        (0xD0)
-#define ATA_ERROR_IDX       (0xD2) 
-#define ATA_NSECTOR_IDX     (0xD4)
-#define ATA_SECTOR_IDX      (0xD6)
-#define ATA_LCYL_IDX        (0xD8)
-#define ATA_HCYL_IDX        (0xDA)
-#define ATA_SELECT_IDX      (0xDC)
-#define ATA_COMMAND_IDX     (0xDE)
-#define ATA_CONTROL_IDX     (0xEC)
-
-#define ATA_FEATURE_IDX     ATA_ERROR_IDX
-#define ATA_STATUS_IDX      ATA_COMMAND_IDX
-#define ATA_ALT_STATUS_IDX  ATA_CONTROL_IDX
-
-#define SET_REG(reg, value) (ide_write_register(reg ## _IDX, value))
-#define SET_16BITREG(reg, value) (ide_write_register(reg ## _IDX, value))
-#define GET_REG(reg) (ide_read_register(reg))
-
-#define ATA_DATA        (GET_REG(ATA_DATA_IDX))
-#define ATA_ERROR       (GET_REG(ATA_ERROR_IDX))
-#define ATA_NSECTOR     (GET_REG(ATA_NSECTOR_IDX))
-#define ATA_SECTOR      (GET_REG(ATA_SECTOR_IDX))
-#define ATA_LCYL        (GET_REG(ATA_LCYL_IDX))
-#define ATA_HCYL        (GET_REG(ATA_HCYL_IDX))
-#define ATA_SELECT      (GET_REG(ATA_SELECT_IDX))
-#define ATA_COMMAND     (GET_REG(ATA_COMMAND_IDX))
-
-#define ATA_CONTROL     (GET_REG(ATA_CONTROL_IDX))
-
-#define STATUS_BSY      0x80
-#define STATUS_RDY      0x40
-#define STATUS_DF       0x20
-#define STATUS_DRQ      0x08
-#define STATUS_ERR      0x01
-
-#define ERROR_ABRT      0x04
-
-#define WRITE_PATTERN1 0xa5
-#define WRITE_PATTERN2 0x5a
-#define WRITE_PATTERN3 0xaa
-#define WRITE_PATTERN4 0x55
-
-#define READ_PATTERN1 0xa5
-#define READ_PATTERN2 0x5a
-#define READ_PATTERN3 0xaa
-#define READ_PATTERN4 0x55
-
-#define READ_PATTERN1_MASK 0xff
-#define READ_PATTERN2_MASK 0xff
-#define READ_PATTERN3_MASK 0xff
-#define READ_PATTERN4_MASK 0xff
-
-static unsigned char ide_sector_data[SECTOR_SIZE] __attribute__ ((section(".idata")));
-static unsigned ide_reg_temp __attribute__ ((section(".idata")));
-
-void ide_write_register(int reg, int value) {
-    /* Archos firmware code does (sometimes!) this:
-       set the RAM speed to 8 cycles. 
-       MIUSCFG |= 0x7;
-    */
-
-    ide_reg_temp = value;
-
-    long extAddr = (long)reg << 16;
-    ddma_transfer(1, 1, &ide_reg_temp, extAddr, 2);  
-
-    /* set the RAM speed to 6 cycles.
-    unsigned char miuscfg = MIUSCFG;
-    miuscfg = (miuscfg & ~7) | 5;
-    */
-}
-
-int ide_read_register(int reg) {
-    /* set the RAM speed to 6 cycles. 
-       unsigned char miuscfg = MIUSCFG;
-       miuscfg = (miuscfg & ~7) | 5;
-       MIUSCFG = miuscfg; */
-  
-    long extAddr = (long)reg << 16;
-    ddma_transfer(0, 1, &ide_reg_temp, extAddr, 2);
-  
-    /* This is done like this in the archos firmware... 
-       miuscfg = MIUSCFG;
-       miuscfg = (miuscfg & ~7) | 5;
-       MIUSCFG = miuscfg;
-       Though I'd expect MIUSCFG &= ~0x7; (1 cycle) */
-  
-    return ide_reg_temp;
-}
-
 #endif
 
 #ifndef NOINLINE_ATTR
@@ -349,16 +251,7 @@ static void copy_read_sectors(unsigned char* buf, int wordcount)
         } while (++wbuf < wbufend); /* tail loop is faster */
     }
 #else /* !PREFER_C_READING */
-#if CONFIG_CPU == TCC730
-    int sectorcount = wordcount / 0x100;
-    do {
-        /* Slurp an entire sector with a single dma transfer */
-        ddma_transfer(0, 1, ide_sector_data, ATA_DATA_IDX << 16, SECTOR_SIZE);
-        memcpy(buf, ide_sector_data, SECTOR_SIZE);
-        buf += SECTOR_SIZE;
-        sectorcount--;
-    } while (sectorcount > 0);
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
     unsigned char* bufend = buf + 2 * wordcount;
     /* coldfire asm reading, utilising line bursts */
     /* this assumes there is at least one full line to copy */
@@ -1416,23 +1309,6 @@ int ata_hard_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-#elif CONFIG_CPU == TCC730
-
-    P6 &= ~0x40;
-    ddma_transfer(0, 1, ide_sector_data, 0xF00000, SECTOR_SIZE);
-    P6 |= 0x40;
-    
-    /*
-      What can the following do?
-    P1 |= 0x04;
-    P10CON &= ~0x56;
-    sleep(1);
-
-    P10CON |= 0x56;
-    P10 &= ~0x56;
-    P1 &= ~0x04;
-    sleep(1);
-    */
 #endif
 
     /* state HRR2 */
@@ -1561,8 +1437,6 @@ void ata_enable(bool on)
         or_b(0x80, &PADRL); /* disable ATA */
 
     or_b(0x80, &PAIORL);
-#elif CONFIG_CPU == TCC730
-
 #endif
 }
 #endif
@@ -1712,8 +1586,6 @@ int ata_init(void)
     int rc;
 #ifdef TARGET_TREE
     bool coldstart = ata_is_coldstart();
-#elif CONFIG_CPU == TCC730
-    bool coldstart = (P1 & 0x80) == 0;
 #else
     bool coldstart = (PACR2 & 0x4000) != 0;
 #endif

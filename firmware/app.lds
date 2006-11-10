@@ -4,9 +4,6 @@ ENTRY(start)
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
 INPUT(target/coldfire/crt0.o)
-#elif CONFIG_CPU == TCC730
-OUTPUT_FORMAT(elf32-calmrisc16)
-INPUT(crt0.o)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
@@ -20,99 +17,8 @@ OUTPUT_FORMAT(elf32-sh)
 INPUT(target/sh/crt0.o)
 #endif
 
-#if CONFIG_CPU == TCC730
-MEMORY
-{
-   FIRMWARE : ORIGIN = LOADADDRESS, LENGTH = 256K
-   FLASH (RX) : ORIGIN = 0x000000, LENGTH = 1024K
-   ICMEM (RX) : ORIGIN = 0x3FC000, LENGTH = 32K
-   IMEM1 : ORIGIN = 0x200000, LENGTH = 32K
-   IMEM2 : ORIGIN = 0x210000, LENGTH = 16K
-   IMEM3 : ORIGIN = 0x220000, LENGTH = 32K
-   IMEM4 : ORIGIN = 0x230000, LENGTH = 16K
-
-   DRAM : ORIGIN = 0x000000, LENGTH = 0x3F0000
-}
-
-SECTIONS
-{
-.text LOADADDRESS : {
-	*(.init.text)
-	*(.text) 
-	}> FLASH  AT> FIRMWARE 
-
-.icode 0x3FC040: {
-	*(.vectors)
-	*(.icode)
-	}> ICMEM  AT> FIRMWARE
-
-/* We start at 0x2000, to avoid overwriting Archos' loader datasegment.
- * If it turns out that we won't call back the loader, this can be set to 0.
- */
-.bss 0x2000 : {
-	*(.bss)
-	. = ALIGN(2);
-	}> DRAM	
-
-/* Data is put after BSS, to have all strings addresses > VIRT_PTR + VIRT_SIZE.
-   Strings are in rodata, so what we really assert is (.rodata > VIRT_PTR + VIRT_SIZE)
-   See settings.h for details */
-.data ALIGN(2): { 
-	*(.data) 
-	. = ALIGN(2);
-	*(.rodata) 
-	. = ALIGN(2);
-	*(.rodata.str1.2)
-	. = ALIGN(2);
-	}> DRAM AT> FIRMWARE
-
-
-.stack ALIGN(2) : {	
-   . = . + 0x2000;
-}> DRAM
-
-.idata 0x200000: {
-	*(.idata)
-}> IMEM1
-
-.idata2 0x220000: {
-	*(.idata2)
-}> IMEM3
-
-_codesize = SIZEOF(.text);
-
-_icodecopy = LOADADDR(.icode);
-_icodestart = ADDR(.icode);
-_icodesize = SIZEOF(.icode);
-
-_datacopy = LOADADDR(.data);
-_datastart = ADDR(.data);
-_datasize = SIZEOF(.data);
-
-
-_bssstart = ADDR(.bss);
-_bsssize = (SIZEOF(.bss) + 1) & ~ 1;
-
-_stackbegin = ADDR(.stack);
-_stackend = ADDR(.stack) + SIZEOF(.stack);
-
-_idatastart = ADDR(.idata);
-
-/* FIXME: Where to put audio buffer? */
-
-_audiobuffer = 0;
-_audiobufend = 0;
-
-/* Plugins are not supported on the Gmini*/
-
-_pluginbuf = 0;
-
-}
-#else
-
 #define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #define CODECSIZE CODEC_SIZE
-
 
 #ifdef DEBUG
 #define STUBOFFSET 0x10000
@@ -332,4 +238,3 @@ SECTIONS
     }
 }
 
-#endif

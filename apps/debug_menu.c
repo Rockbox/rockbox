@@ -370,26 +370,6 @@ bool dbg_audio_thread(void)
 #endif /* HAVE_LCD_BITMAP */
 
 
-#if CONFIG_CPU == TCC730
-static unsigned flash_word_temp IDATA_ATTR;
-
-static void flash_write_word(unsigned addr, unsigned value) ICODE_ATTR;
-static void flash_write_word(unsigned addr, unsigned value) {
-    flash_word_temp = value;
-
-    long extAddr = (long)addr << 1;
-    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
-}
-
-static unsigned flash_read_word(unsigned addr) ICODE_ATTR;
-static unsigned flash_read_word(unsigned addr) {
-    long extAddr = (long)addr << 1;
-    ddma_transfer(1, 1, &flash_word_temp, extAddr, 2);
-    return flash_word_temp;
-}
-
-#endif
-
 #ifndef SIMULATOR
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
@@ -423,37 +403,30 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
 #else
     unsigned not_manu, not_id; /* read values before switching to ID mode */
     unsigned manu, id; /* read values when in ID mode */
-#if CONFIG_CPU == TCC730
-#define FLASH(addr) (flash_read_word(addr))
-#define SET_FLASH(addr, val) (flash_write_word((addr), (val)))
 
-#else /* memory mapped */
 #if CONFIG_CPU == SH7034
     volatile unsigned char* flash = (unsigned char*)0x2000000; /* flash mapping */
 #elif defined(CPU_COLDFIRE)
     volatile unsigned short* flash = (unsigned short*)0; /* flash mapping */
 #endif
-#define FLASH(addr) (flash[addr])
-#define SET_FLASH(addr, val) (flash[addr] = val)
-#endif
     int old_level; /* saved interrupt level */
 
-    not_manu = FLASH(0); /* read the normal content */
-    not_id   = FLASH(1); /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
+    not_manu = flash[0]; /* read the normal content */
+    not_id   = flash[1]; /* should be 'A' (0x41) and 'R' (0x52) from the "ARCH" marker */
 
     /* disable interrupts, prevent any stray flash access */
     old_level = set_irq_level(HIGHEST_IRQ_LEVEL);
 
-    SET_FLASH(addr1, 0xAA); /* enter command mode */
-    SET_FLASH(addr2, 0x55);
-    SET_FLASH(addr1, 0x90); /* ID command */
+    flash[addr1] = 0xAA; /* enter command mode */
+    flash[addr2] = 0x55;
+    flash[addr1] = 0x90; /* ID command */
     /* Atmel wants 20ms pause here */
     /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
-    manu = FLASH(0); /* read the IDs */
-    id   = FLASH(1);
+    manu = flash[0]; /* read the IDs */
+    id   = flash[1];
 
-    SET_FLASH(0, 0xF0); /* reset flash (back to normal read mode) */
+    flash[0] = 0xF0; /* reset flash (back to normal read mode) */
     /* Atmel wants 20ms pause here */
     /* sleep(HZ/50); no sleeping possible while interrupts are disabled */
 
