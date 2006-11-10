@@ -496,15 +496,13 @@ const struct button_mapping *button_context_yesno_h300lcdremote =
 
 const struct button_mapping button_context_bmark_h100remote[]  = {
     { ACTION_BMS_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RC_ON,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS|CONTEXT_REMOTE),
+    { ACTION_BMS_SELECT,      BUTTON_RC_MENU,     BUTTON_NONE },
+    {  ACTION_BMS_EXIT,       BUTTON_RC_STOP,    BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_bmark */
 
-const struct button_mapping button_context_bmark_h300lcdremote[]  = {
-    { ACTION_BMS_DELETE,      BUTTON_RC_REC,    BUTTON_NONE },
-    { ACTION_STD_OK,            BUTTON_RC_MENU,   BUTTON_NONE },
-    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS|CONTEXT_REMOTE),
-}; 
+const struct button_mapping *button_context_bmark_h300lcdremote =
+                button_context_bmark_h100remote;
 
 const struct button_mapping button_context_quickscreen_nonlcdremote[]  = {
     { ACTION_QS_DOWNINV,    BUTTON_RC_VOL_UP,                 BUTTON_NONE },
