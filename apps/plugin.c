@@ -31,6 +31,7 @@
 #include "mp3data.h"
 #include "powermgmt.h"
 #include "splash.h"
+#include "logf.h"
 
 #ifdef CONFIG_CHARGING
 #include "power.h"
@@ -417,7 +418,7 @@ static const struct plugin_api rockbox_api = {
     debugf,
 #endif
 #ifdef ROCKBOX_HAS_LOGF
-    logf,
+    _logf,
 #endif
     &global_settings,
     mp3info,
