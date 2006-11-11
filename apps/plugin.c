@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Bjï¿½n Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,61 +16,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-#include <atoi.h>
-#include <timefuncs.h>
-#include <ctype.h>
-#include "debug.h"
-#include "button.h"
-#include "lcd.h"
-#include "dir.h"
-#include "file.h"
-#include "kernel.h"
-#include "usb.h"
-#include "sprintf.h"
-#include "logf.h"
-#include "screens.h"
-#include "misc.h"
-#include "i2c.h"
-#include "mas.h"
 #include "plugin.h"
+#include <ctype.h>
+#include <string.h>
+#include <sprintf.h>
+#include <atoi.h>
+#include "debug.h"
 #include "lang.h"
 #include "keyboard.h"
-#include "mpeg.h"
 #include "buffer.h"
-#include "mp3_playback.h"
 #include "backlight.h"
-#include "ata.h"
-#include "talk.h"
 #include "sound_menu.h"
 #include "mp3data.h"
 #include "powermgmt.h"
-#include "system.h"
-#include "timer.h"
-#include "sound.h"
-#include "database.h"
 #include "splash.h"
-#include "list.h"
-#if (CONFIG_CODEC == SWCODEC)
-#include "pcm_playback.h"
-#include "dsp.h"
-#endif
 
 #ifdef CONFIG_CHARGING
 #include "power.h"
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#include "peakmeter.h"
-#include "widgets.h"
 #include "bmp.h"
 #include "bidi.h"
-#endif
-
-#ifdef HAVE_REMOTE_LCD
-#include "lcd-remote.h"
 #endif
 
 #ifdef SIMULATOR
@@ -475,6 +442,27 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
+/* Keep these at the bottom till fully proven */
+#if CONFIG_CODEC == SWCODEC
+    &audio_master_sampr_list[0],
+    &hw_freq_sampr[0],
+#ifndef SIMULATOR
+    pcm_apply_settings,
+#endif
+#ifdef HAVE_RECORDING
+    &rec_freq_sampr[0],
+#ifndef SIMULATOR
+    pcm_set_monitor,
+    pcm_set_rec_source,
+    pcm_init_recording,
+    pcm_close_recording,
+    pcm_record_data,
+    pcm_stop_recording,
+    pcm_calculate_rec_peaks,
+    rec_set_source,
+#endif
+#endif /* HAVE_RECORDING */
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 int plugin_load(const char* plugin, void* parameter)

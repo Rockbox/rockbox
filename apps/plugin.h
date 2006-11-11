@@ -29,47 +29,49 @@
 #define MEM 2
 #endif
 
-#include <stdarg.h>
 #include <stdbool.h>
+#include <sys/types.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include "config.h"
+#include "system.h"
 #include "dir.h"
 #include "kernel.h"
+#include "thread.h"
 #include "button.h"
 #include "action.h"
 #include "usb.h"
 #include "font.h"
-#include "system.h"
 #include "lcd.h"
 #include "id3.h"
+#include "sound.h"
 #include "mpeg.h"
 #include "audio.h"
 #include "mp3_playback.h"
-#include "tree.h"
+#include "talk.h"
 #ifdef RB_PROFILE
 #include "profile.h"
 #endif
 #include "misc.h"
 #if (CONFIG_CODEC == SWCODEC)
-#include "pcm_playback.h"
 #include "dsp.h"
+#ifdef HAVE_RECORDING
+#include "recording.h"
+#endif
 #else
 #include "mas.h"
-#endif
+#endif /* CONFIG_CODEC == SWCODEC */
 #include "settings.h"
 #include "timer.h"
-#include "thread.h"
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
 #include "widgets.h"
 #endif
-#include "sound.h"
 #include "menu.h"
 #include "rbunicode.h"
 #include "list.h"
-#include "talk.h"
+#include "tree.h"
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -105,7 +107,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 34
+#define PLUGIN_API_VERSION 35
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -405,7 +407,7 @@ struct plugin_api {
     void (*bitswap)(unsigned char *data, int length);
 #endif
 #if CONFIG_CODEC == SWCODEC
-    void (*pcm_play_data)(void (*get_more)(unsigned char** start, size_t*size),
+    void (*pcm_play_data)(pcm_more_callback_type get_more,
             unsigned char* start, size_t size);
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
@@ -554,7 +556,28 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-
+/* Keep these at the bottom till fully proven */
+#if CONFIG_CODEC == SWCODEC
+    const unsigned long *audio_master_sampr_list;
+    const unsigned long *hw_freq_sampr;
+#ifndef SIMULATOR
+    void (*pcm_apply_settings)(bool reset);
+#endif
+#ifdef HAVE_RECORDING
+    const unsigned long *rec_freq_sampr;
+#ifndef SIMULATOR
+    void (*pcm_set_monitor)(int monitor);
+    void (*pcm_set_rec_source)(int source);
+    void (*pcm_init_recording)(void);
+    void (*pcm_close_recording)(void);
+    void (*pcm_record_data)(pcm_more_callback_type more_ready,
+                            unsigned char *start, size_t size);
+    void (*pcm_stop_recording)(void);
+    void (*pcm_calculate_rec_peaks)(int *left, int *right);
+    void (*rec_set_source)(int source, unsigned flags);
+#endif
+#endif /* HAVE_RECORDING */
+#endif /* CONFIG_CODEC == SWCODEC */
 };
 
 /* plugin header */
