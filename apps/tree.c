@@ -1229,15 +1229,13 @@ bool create_playlist(void)
     if (fd < 0)
         return false;
 
-    cpu_boost_id(true, CPUBOOSTID_TREE);
+    trigger_cpu_boost();
 
     snprintf(filename, sizeof(filename), "%s",
              tc.currdir[1] ? tc.currdir : "/");
     plsize = 0;
     add_dir(filename, sizeof(filename), fd);
     close(fd);
-
-    cpu_boost_id(false, CPUBOOSTID_TREE);
 
     sleep(HZ);
 

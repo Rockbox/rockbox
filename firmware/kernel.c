@@ -132,7 +132,7 @@ void queue_wait(struct event_queue *q, struct event *ev)
 {
     if (q->read == q->write)
     {
-        block_thread(&q->thread, 0);
+        block_thread(&q->thread);
     }
 
     *ev = q->events[(q->read++) & QUEUE_LENGTH_MASK];
@@ -142,7 +142,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
 {
     if (q->read == q->write && ticks > 0)
     {
-        block_thread(&q->thread, ticks);
+        block_thread_w_tmo(&q->thread, ticks);
     }
 
     if (q->read != q->write)
@@ -469,7 +469,7 @@ void mutex_lock(struct mutex *m)
     if (m->locked)
     {
         /* Wait until the lock is open... */
-        block_thread(&m->thread, 0);
+        block_thread(&m->thread);
     }
     
     /* ...and lock it */

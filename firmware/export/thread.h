@@ -78,14 +78,22 @@ struct regs
 
 #endif /* !SIMULATOR */
 
-#define STATE_RUNNING         0
-#define STATE_BLOCKED         1
-#define STATE_SLEEPING        2
-#define STATE_BLOCKED_W_TMO   3
+#define STATE_RUNNING             0x00000000
+#define STATE_BLOCKED             0x20000000
+#define STATE_SLEEPING            0x40000000
+#define STATE_BLOCKED_W_TMO       0x60000000
 
-#define GET_STATE_ARG(state)  (state & 0x3FFFFFFF)
-#define GET_STATE(state)      ((state >> 30) & 3)
-#define SET_STATE(state,arg)  ((state << 30) | (arg))
+#define THREAD_STATE_MASK         0x60000000
+#define STATE_ARG_MASK            0x1FFFFFFF
+
+#define GET_STATE_ARG(state)      (state & STATE_ARG_MASK)
+#define GET_STATE(state)          (state & THREAD_STATE_MASK)
+#define SET_STATE(var,state,arg)  (var = (state | ((arg) & STATE_ARG_MASK)))
+#define CLEAR_STATE_ARG(var)      (var &= ~STATE_ARG_MASK)
+
+#define STATE_BOOSTED             0x80000000
+#define STATE_IS_BOOSTED(var)     (var & STATE_BOOSTED)
+#define SET_BOOST_STATE(var)      (var |= STATE_BOOSTED)
 
 struct thread_entry {
 #ifndef SIMULATOR
@@ -133,7 +141,8 @@ void trigger_cpu_boost(void);
 void remove_thread(struct thread_entry *thread);
 void switch_thread(bool save_context, struct thread_entry **blocked_list);
 void sleep_thread(int ticks);
-void block_thread(struct thread_entry **thread, int timeout);
+void block_thread(struct thread_entry **thread);
+void block_thread_w_tmo(struct thread_entry **thread, int timeout);
 void wakeup_thread(struct thread_entry **thread);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int thread_set_priority(struct thread_entry *thread, int priority);

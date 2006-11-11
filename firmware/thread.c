@@ -36,11 +36,11 @@ struct core_entry cores[NUM_CORES] IBSS_ATTR;
 static unsigned short highest_priority IBSS_ATTR;
 #endif
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-static bool cpu_boosted IBSS_ATTR;
+static int boosted_threads IBSS_ATTR;
 #endif
 
 /* Define to enable additional checks for blocking violations etc. */
-// #define THREAD_EXTRA_CHECKS
+#define THREAD_EXTRA_CHECKS
 
 static const char main_thread_name[] = "main";
 
@@ -52,9 +52,8 @@ extern int stackend[];
 extern int cop_stackbegin[];
 extern int cop_stackend[];
 #else
-/* The coprocessor stack is not set up in the bootloader code, but the
-   threading is.  No threads are run on the coprocessor, so set up some dummy
-   stack */
+/* The coprocessor stack is not set up in the bootloader code, but the threading
+ * is.  No threads are run on the coprocessor, so set up some dummy stack */
 int *cop_stackbegin = stackbegin;
 int *cop_stackend = stackend;
 #endif
@@ -71,7 +70,8 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     ICODE_ATTR;
 
 static inline void store_context(void* addr) __attribute__ ((always_inline));
-static inline void load_context(const void* addr) __attribute__ ((always_inline));
+static inline void load_context(const void* addr)
+    __attribute__ ((always_inline));
 
 #if defined(CPU_ARM)
 /*---------------------------------------------------------------------------
@@ -188,8 +188,7 @@ static inline void load_context(const void* addr)
 
 #endif
 
-static void add_to_list(struct thread_entry **list,
-                        struct thread_entry *thread)
+static void add_to_list(struct thread_entry **list, struct thread_entry *thread)
 {
     if (*list == NULL)
     {
@@ -255,6 +254,7 @@ void check_sleepers(void)
              * back to life again. */
             remove_from_list(&cores[CURRENT_CORE].sleeping, current);
             add_to_list(&cores[CURRENT_CORE].running, current);
+            current->statearg = 0;
             
             /* If there is no more processes in the list, break the loop. */
             if (cores[CURRENT_CORE].sleeping == NULL)
@@ -290,14 +290,6 @@ static inline void sleep_core(void)
         if (cores[CURRENT_CORE].running != NULL)
             break;
 
-#ifdef HAVE_SCHEDULER_BOOSTCTRL
-        if (cpu_boosted)
-        {
-            cpu_boost(false);
-            cpu_boosted = false;
-        }
-#endif
-        
         /* Enter sleep mode to reduce power usage, woken up on interrupt */
 #ifdef CPU_COLDFIRE
         asm volatile ("stop #0x2000");
@@ -338,22 +330,33 @@ void profile_thread(void) {
 void change_thread_state(struct thread_entry **blocked_list)
 {
     struct thread_entry *old;
+    unsigned long new_state;
     
     /* Remove the thread from the list of running threads. */
     old = cores[CURRENT_CORE].running;
-    remove_from_list(&cores[CURRENT_CORE].running, old);
-    
-    /* And put the thread into a new list of inactive threads. */
-    if (GET_STATE(old->statearg) == STATE_BLOCKED)
-        add_to_list(blocked_list, old);
-    else
-        add_to_list(&cores[CURRENT_CORE].sleeping, old);
-    
+    new_state = GET_STATE(old->statearg);
+
+    /* Check if a thread state change has been requested. */
+    if (new_state)
+    {
+        /* Change running thread state and switch to next thread. */
+        remove_from_list(&cores[CURRENT_CORE].running, old);
+        
+        /* And put the thread into a new list of inactive threads. */
+        if (new_state == STATE_BLOCKED)
+            add_to_list(blocked_list, old);
+        else
+            add_to_list(&cores[CURRENT_CORE].sleeping, old);
+        
 #ifdef HAVE_PRIORITY_SCHEDULING
-    /* Reset priorities */
-    if (old->priority == highest_priority)
-        highest_priority = 100;
+        /* Reset priorities */
+        if (old->priority == highest_priority)
+            highest_priority = 100;
 #endif
+    }
+    else
+        /* Switch to the next running thread. */
+        cores[CURRENT_CORE].running = old->next;
 }
 
 /*---------------------------------------------------------------------------
@@ -381,19 +384,10 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         /* Check if the current thread stack is overflown */
         stackptr = cores[CURRENT_CORE].running->stack;
         if(stackptr[0] != DEADBEEF)
-        panicf("Stkov %s", cores[CURRENT_CORE].running->name);
-        
-        /* Check if a thread state change has been requested. */
-        if (cores[CURRENT_CORE].running->statearg)
-        {
-            /* Change running thread state and switch to next thread. */
-            change_thread_state(blocked_list);
-        }
-        else
-        {
-            /* Switch to the next running thread. */
-            cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
-        }
+            panicf("Stkov %s", cores[CURRENT_CORE].running->name);
+    
+        /* Rearrange thread lists as needed */
+        change_thread_state(blocked_list);
     }
     
     /* Go through the list of sleeping task to check if we need to wake up
@@ -411,11 +405,11 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
         if (priority < highest_priority)
             highest_priority = priority;
         
-        if (priority == highest_priority || (current_tick 
-            - cores[CURRENT_CORE].running->last_run > priority * 8))
-        {
+        if (priority == highest_priority ||
+                (current_tick - cores[CURRENT_CORE].running->last_run >
+                 priority * 8))
             break;
-        }
+
         cores[CURRENT_CORE].running = cores[CURRENT_CORE].running->next;
     }
     
@@ -434,63 +428,94 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
 
 void sleep_thread(int ticks)
 {
+    struct thread_entry *current;
+
+    current = cores[CURRENT_CORE].running;
+
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    if (STATE_IS_BOOSTED(current->statearg)) {
+        boosted_threads--;
+        if (!boosted_threads)
+            cpu_boost(false);
+    }
+#endif
+
     /* Set the thread's new state and timeout and finally force a task switch
      * so that scheduler removes thread from the list of running processes
      * and puts it in list of sleeping tasks. */
-    cores[CURRENT_CORE].running->statearg = 
-        SET_STATE(STATE_SLEEPING, current_tick + ticks + 1);
+    SET_STATE(current->statearg, STATE_SLEEPING, current_tick + ticks + 1);
     switch_thread(true, NULL);
-    
-    /* Clear all flags to indicate we are up and running again. */
-    cores[CURRENT_CORE].running->statearg = 0;
 }
 
-void block_thread(struct thread_entry **list, int timeout)
+void block_thread(struct thread_entry **list)
 {
     struct thread_entry *current;
+    /* Get the entry for the current running thread. */
+    current = cores[CURRENT_CORE].running;
+
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    /* Keep the boosted state over indefinite block calls, because
+     * we are waiting until the earliest time that someone else
+     * completes an action */
+    unsigned long boost_flag = STATE_IS_BOOSTED(current->statearg);
+#endif
+
+#ifdef THREAD_EXTRA_CHECKS
+    /* We are not allowed to mix blocking types in one queue. */
+    if (*list && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO)
+        panicf("Blocking violation B->*T");
+#endif
     
+    /* Set the state to blocked and ask the scheduler to switch tasks,
+     * this takes us off of the run queue until we are explicitly woken */
+    SET_STATE(current->statearg, STATE_BLOCKED, 0);
+    switch_thread(true, list);
+
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    /* Reset only the boosted flag to indicate we are up and running again. */
+    current->statearg = boost_flag;
+#else
+    /* Clear all flags to indicate we are up and running again. */
+    current->statearg = 0;
+#endif
+}
+
+void block_thread_w_tmo(struct thread_entry **list, int timeout)
+{
+    struct thread_entry *current;
     /* Get the entry for the current running thread. */
     current = cores[CURRENT_CORE].running;
     
-    /* At next task switch scheduler will immediately change the thread
-     * state (and we also force the task switch to happen). */
-    if (timeout)
-    {
-#ifdef THREAD_EXTRA_CHECKS
-        /* We can store only one thread to the "list" if thread is used
-         * in other list (such as core's list for sleeping tasks). */
-        if (*list)
-            panicf("Blocking violation T->*B");
+#ifdef HAVE_SCHEDULER_BOOSTCTRL
+    /* A block with a timeout is a sleep situation, whatever we are waiting
+     * for _may or may not_ happen, regardless of boost state, (user input
+     * for instance), so this thread no longer needs to boost */
+    if (STATE_IS_BOOSTED(current->statearg)) {
+        boosted_threads--;
+        if (!boosted_threads)
+            cpu_boost(false);
+    }
 #endif
-        
-        current->statearg = 
-            SET_STATE(STATE_BLOCKED_W_TMO, current_tick + timeout);
-        *list = current;
 
-        /* Now force a task switch and block until we have been woken up
-         * by another thread or timeout is reached. */
-        switch_thread(true, NULL);
-        
-        /* If timeout is reached, we must set list back to NULL here. */
-        *list = NULL;
-    }
-    else
-    {
 #ifdef THREAD_EXTRA_CHECKS
-        /* We are not allowed to mix blocking types in one queue. */
-        if (*list && GET_STATE((*list)->statearg) == STATE_BLOCKED_W_TMO)
-            panicf("Blocking violation B->*T");
+    /* We can store only one thread to the "list" if thread is used
+     * in other list (such as core's list for sleeping tasks). */
+    if (*list)
+        panicf("Blocking violation T->*B");
 #endif
-        
-        current->statearg = SET_STATE(STATE_BLOCKED, 0);
-        
-        /* Now force a task switch and block until we have been woken up
-         * by another thread or timeout is reached. */
-        switch_thread(true, list);
-    }
     
-    /* Clear all flags to indicate we are up and running again. */
-    current->statearg = 0;
+    /* Set the state to blocked with the specified timeout */
+    SET_STATE(current->statearg, STATE_BLOCKED_W_TMO, current_tick + timeout);
+
+    /* Set the "list" for explicit wakeup */
+    *list = current;
+
+    /* Now force a task switch and block until we have been woken up
+     * by another thread or timeout is reached. */
+    switch_thread(true, NULL);
+
+    /* It is now safe for another thread to block on this "list" */
+    *list = NULL;
 }
 
 void wakeup_thread(struct thread_entry **list)
@@ -512,14 +537,11 @@ void wakeup_thread(struct thread_entry **list)
              * to the scheduler's list of running processes. */
             remove_from_list(list, thread);
             add_to_list(&cores[CURRENT_CORE].running, thread);
-            thread->statearg = 0;
-            break;
         
         case STATE_BLOCKED_W_TMO:
             /* Just remove the timeout to cause scheduler to immediately
              * wake up the thread. */
-            thread->statearg &= 0xC0000000;
-            *list = NULL;
+            thread->statearg = 0;
             break;
         
         default:
@@ -600,10 +622,12 @@ struct thread_entry*
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
 void trigger_cpu_boost(void)
 {
-    if (!cpu_boosted)
+    if (!STATE_IS_BOOSTED(cores[CURRENT_CORE].running->statearg))
     {
-        cpu_boost(true);
-        cpu_boosted = true;
+        SET_BOOST_STATE(cores[CURRENT_CORE].running->statearg);
+        if (!boosted_threads)
+            cpu_boost(true);
+        boosted_threads++;
     }
 }
 #endif
@@ -675,12 +699,12 @@ void init_threads(void)
     highest_priority = 100;
 #endif
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
-    cpu_boosted = false;
+    boosted_threads = 0;
 #endif
     add_to_list(&cores[core].running, &cores[core].threads[0]);
     
-    /* In multiple core setups, each core has a different stack.  There is probably
-     a much better way to do this. */
+    /* In multiple core setups, each core has a different stack.  There is
+     * probably a much better way to do this. */
     if (core == CPU)
     {
         cores[CPU].threads[0].stack = stackbegin;
@@ -688,7 +712,8 @@ void init_threads(void)
     } else {
 #if NUM_CORES > 1  /* This code path will not be run on single core targets */
         cores[COP].threads[0].stack = cop_stackbegin;
-        cores[COP].threads[0].stack_size = (int)cop_stackend - (int)cop_stackbegin;
+        cores[COP].threads[0].stack_size =
+            (int)cop_stackend - (int)cop_stackbegin;
 #endif
     }
     cores[core].threads[0].context.start = 0; /* thread 0 already running */

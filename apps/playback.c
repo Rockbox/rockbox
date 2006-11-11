@@ -2151,7 +2151,11 @@ static bool audio_yield_codecs(void)
     while ((pcmbuf_is_crossfade_active() || pcmbuf_is_lowdata())
             && !ci.stop_codec && playing && !audio_filebuf_is_lowdata())
     {
-        sleep(1);
+        if (filling)
+            yield();
+        else
+            sleep(2);
+
         if (!queue_empty(&audio_queue)) 
             return true;
     }
