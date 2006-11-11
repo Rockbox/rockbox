@@ -436,7 +436,9 @@ void sleep_thread(int ticks)
     if (STATE_IS_BOOSTED(current->statearg)) {
         boosted_threads--;
         if (!boosted_threads)
+        {
             cpu_boost(false);
+        }
     }
 #endif
 
@@ -493,7 +495,9 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     if (STATE_IS_BOOSTED(current->statearg)) {
         boosted_threads--;
         if (!boosted_threads)
+        {
             cpu_boost(false);
+        }
     }
 #endif
 
@@ -626,7 +630,9 @@ void trigger_cpu_boost(void)
     {
         SET_BOOST_STATE(cores[CURRENT_CORE].running->statearg);
         if (!boosted_threads)
+        {
             cpu_boost(true);
+        }
         boosted_threads++;
     }
 }
