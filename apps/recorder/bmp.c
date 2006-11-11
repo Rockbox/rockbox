@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "inttypes.h"
 #include "debug.h"
 #include "lcd.h"
 #include "file.h"
@@ -44,22 +45,22 @@
 
 /* Struct from original code. */
 struct Fileheader {
-    unsigned short Type;        /* signature - 'BM' */
-    unsigned long Size;         /* file size in bytes */
-    unsigned short Reserved1;   /* 0 */
-    unsigned short Reserved2;   /* 0 */
-    unsigned long OffBits;      /* offset to bitmap */
-    unsigned long StructSize;   /* size of this struct (40) */
-    unsigned long Width;        /* bmap width in pixels */
-    unsigned long Height;       /* bmap height in pixels */
-    unsigned short Planes;      /* num planes - always 1 */
-    unsigned short BitCount;    /* bits per pixel */
-    unsigned long Compression;  /* compression flag */
-    unsigned long SizeImage;    /* image size in bytes */
-    long XPelsPerMeter;         /* horz resolution */
-    long YPelsPerMeter;         /* vert resolution */
-    unsigned long ClrUsed;      /* 0 -> color table size */
-    unsigned long ClrImportant; /* important color count */
+    uint16_t Type;        /* signature - 'BM' */
+    uint32_t Size;         /* file size in bytes */
+    uint16_t Reserved1;   /* 0 */
+    uint16_t Reserved2;   /* 0 */
+    uint32_t OffBits;      /* offset to bitmap */
+    uint32_t StructSize;   /* size of this struct (40) */
+    uint32_t Width;        /* bmap width in pixels */
+    uint32_t Height;       /* bmap height in pixels */
+    uint16_t Planes;      /* num planes - always 1 */
+    uint16_t BitCount;    /* bits per pixel */
+    uint32_t Compression;  /* compression flag */
+    uint32_t SizeImage;    /* image size in bytes */
+    int32_t XPelsPerMeter;         /* horz resolution */
+    int32_t YPelsPerMeter;         /* vert resolution */
+    uint32_t ClrUsed;      /* 0 -> color table size */
+    uint32_t ClrImportant; /* important color count */
 } STRUCT_PACKED;
 
 struct rgb_quad { /* Little endian */
@@ -70,12 +71,12 @@ struct rgb_quad { /* Little endian */
 } STRUCT_PACKED;
 
 /* big endian functions */
-static short readshort(short *value) {
+static uint16_t readshort(uint16_t *value) {
     unsigned char* bytes = (unsigned char*) value;
     return bytes[0] | (bytes[1] << 8);
 }
 
-static long readlong(long *value) {
+static uint32_t readlong(uint32_t *value) {
     unsigned char* bytes = (unsigned char*) value;
     return (long)bytes[0] | ((long)bytes[1] << 8) |
         ((long)bytes[2] << 16) | ((long)bytes[3] << 24);
