@@ -1,3 +1,5 @@
 #if CONFIG_CODEC == SWCODEC /* software codec platforms */
 codeclib.c
+#elif defined(SIMULATOR) && defined(__APPLE__)
+osx.dummy.c
 #endif
