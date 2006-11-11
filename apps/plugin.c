@@ -22,6 +22,7 @@
 #include <sprintf.h>
 #include <atoi.h>
 #include "debug.h"
+#include "i2c.h"
 #include "lang.h"
 #include "keyboard.h"
 #include "buffer.h"
@@ -36,6 +37,7 @@
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+#include "peakmeter.h" 
 #include "bmp.h"
 #include "bidi.h"
 #endif
