@@ -9782,3 +9782,31 @@
     *: "Keine Abspielliste"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "WARNUNG! Batterie fast leer!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Batterie ist leer! AUFLADEN!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

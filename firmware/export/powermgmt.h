@@ -94,13 +94,25 @@ extern charger_input_state_type charger_input_state;
 # define CURRENT_USB         1  /* host powered in USB mode; avoid zero-div */
 # define CURRENT_BACKLIGHT   0  /* no backlight */
 #else            /* Values for HD based jukeboxes */
-# ifdef IRIVER_H100_SERIES
-#  define CURRENT_NORMAL    80
-# else
+#ifdef IRIVER_H100_SERIES
+# define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */
+# define CURRENT_BACKLIGHT  23  /* from IriverBattery twiki page */
+# define CURRENT_SPDIF_OUT  10  /* optical SPDIF output on */
+#else
 #  define CURRENT_NORMAL    145  /* usual current in mA when using the AJB including some disk/backlight/... activity */
-# endif /* not IRIVER_H100_SERIES */
-# define CURRENT_USB       500  /* usual current in mA in USB mode */
-# define CURRENT_BACKLIGHT  30  /* additional current when backlight is always on */
+# define CURRENT_BACKLIGHT  30  /* additional current when backlight always on */
+#endif /* not IRIVER_H100_SERIES */
+#define CURRENT_USB        500  /* usual current in mA in USB mode */
+#ifdef IRIVER_H100_SERIES
+# define CURRENT_RECORD    105  /* additional current while recording */
+#elif defined(IRIVER_H300_SERIES)
+# define CURRENT_RECORD    110
+#elif defined(HAVE_RECORDING)
+# define CURRENT_RECORD     35  /* FIXME: this needs adjusting */
+#endif
+#ifdef HAVE_REMOTE_LCD
+# define CURRENT_REMOTE      8  /* add. current when H100-remote connected */
+#endif
 
 # define CURRENT_MIN_CHG    70  /* minimum charge current */
 # define MIN_CHG_V        8500  /* at 8.5v charger voltage get CURRENT_MIN_CHG */
@@ -112,7 +124,6 @@ extern charger_input_state_type charger_input_state;
 # define MAX_CHG_V       10250  /* anything over 10.25v gives CURRENT_MAX_CHG */
 #endif /* not HAVE_MMC */
 
-extern unsigned int bat;       /* filtered battery voltage, centivolts */
 extern unsigned short power_history[POWER_HISTORY_LEN];
 
 /* Start up power management thread */
@@ -120,10 +131,10 @@ void powermgmt_init(void);
 
 #endif /* SIMULATOR */
 
-/* Returns battery level in percent */
-int battery_level(void);
+/* Returns battery statust */
+int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
-
+int battery_adc_voltage(void); /* voltage from ADC in centivolts */
 unsigned int battery_voltage(void); /* filtered batt. voltage in centivolts */
 
 /* read unfiltered battery info */
@@ -131,6 +142,9 @@ void battery_read_info(int *adc, int *voltage, int *level);
 
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
+
+/* Tells if battery is in critical power saving state */
+bool battery_level_critical(void);
 
 void set_poweroff_timeout(int timeout);
 void set_battery_capacity(int capacity); /* set local battery capacity value */

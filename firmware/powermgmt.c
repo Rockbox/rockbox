@@ -49,9 +49,14 @@
 #include "wm8758.h"
 #elif defined(HAVE_WM8975)
 #include "wm8975.h"
+#elif defined(HAVE_WM8731)
+#include "wm8731l.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
 #include "font.h"
+#endif
+#if defined(HAVE_RECORDING) && (CONFIG_CODEC == SWCODEC)
+#include "pcm_record.h"
 #endif
 #include "logf.h"
 #include "lcd-remote.h"
@@ -149,6 +154,11 @@ bool battery_level_safe(void)
     return battery_level() >= 10;
 }
 
+bool battery_level_critical(void)
+{
+    return false;
+}
+
 void set_poweroff_timeout(int timeout)
 {
     (void)timeout;
@@ -173,41 +183,57 @@ static const int poweroff_idle_timeout_value[15] =
 
 static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-#if CONFIG_BATTERY == BATT_LIION2200 /* FM Recorder, LiIon */
+#if CONFIG_BATTERY == BATT_LIION2200    /* FM Recorder, LiIon */
     280
-#elif CONFIG_BATTERY == BATT_3AAA /* Ondio */
-    310, 345    /* alkaline, NiHM */
-#elif CONFIG_BATTERY == BATT_1AA /* iRiver iFP */
-    105, 115    /* alkaline, NiHM */
-#elif CONFIG_BATTERY == BATT_LIPOL1300 /* iRiver H1x0 */
-    339
-#elif CONFIG_BATTERY == BATT_IAUDIO_X5
+#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio: Alkaline, NiHM */
+    310, 345
+#elif CONFIG_BATTERY == BATT_1AA        /* iRiver iFP: Alkaline, NiHM */
+    105, 115
+#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
+    338
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
     354
-#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
+#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
     376
-#elif CONFIG_BATTERY == BATT_BP009 /* iriver H10 5/6GB */
+#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB: LiPolymer */
     372
-#else /* Player/recorder, NiMH */
+#else                                   /* Player/recorder: NiMH */
     475
 #endif
 };
 
-static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
+static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
+{
+#if   CONFIG_BATTERY == BATT_LIION2200  /* FM Recorder */
+    258
+#elif CONFIG_BATTERY == BATT_3AAA       /* Ondio */
+    270, 280
+#elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
+    299
+#elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
+    350
+#elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
+    365
+#elif CONFIG_BATTERY == BATT_BP009      /* iriver H10 5/6GB */
+    365
+#else                                   /* Player/recorder: NiMH */
+    440
+#endif
+};
+
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging disabled */
+static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
 #if CONFIG_BATTERY == BATT_LIION2200
     /* measured values */
     { 260, 285, 295, 303, 311, 320, 330, 345, 360, 380, 400 }
 #elif CONFIG_BATTERY == BATT_3AAA
     /* measured values */
-    { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* alkaline */
+    { 280, 325, 341, 353, 364, 374, 385, 395, 409, 427, 475 }, /* Alkaline */
     { 310, 355, 363, 369, 372, 374, 376, 378, 380, 386, 405 }  /* NiMH */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
     /* Below 337 the backlight starts flickering during HD access */
-    /* Calibrated for Ionity 1900 mAh battery. If necessary, re-calibrate
-     * for the 1300 mAh stock battery. */
-//  { 337, 358, 365, 369, 372, 377, 383, 389, 397, 406, 413 }
-    { 337, 366, 372, 374, 378, 381, 385, 392, 399, 408, 417 }
+     { 337, 365, 370, 374, 378, 382, 387, 393, 400, 408, 416 }
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5
     /* iAudio x5 series  - still experimenting with best curve */
 // Lithium ion discharge curve
@@ -238,12 +264,11 @@ static const short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 charger_input_state_type charger_input_state IDATA_ATTR;
 
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
-static const short percent_to_volt_charge[11] =
+static const unsigned short percent_to_volt_charge[11] =
 {
 #if CONFIG_BATTERY == BATT_LIPOL1300
-    /* Calibrated for 1900 mAh Ionity battery (estimated 90% charge when
-     entering in trickle-charging). We will never reach 100%. */
-    340, 390, 394, 399, 400, 404, 407, 413, 417, 422, 426
+    /* values measured over one full charging cycle */
+    354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
@@ -289,9 +314,15 @@ int pid_i = 0;                      /* PID integral term */
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter.
  */
-static unsigned int battery_centivolts;/* filtered battery voltage, centvolts */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
-#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
+static unsigned int battery_centivolts;/* filtered battery voltage, centvolts */
+#ifdef HAVE_CHARGE_CTRL
+#define BATT_AVE_SAMPLES	32  /* filter constant / @ 2Hz sample rate */
+#elif CONFIG_BATTERY == BATT_LIPOL1300
+#define BATT_AVE_SAMPLES   128  /* slow filter for iriver */
+#else
+#define BATT_AVE_SAMPLES    64  /* medium filter constant for all others */
+#endif
 
 /* battery level (0-100%) of this minute, updated once per minute */
 static int battery_percent  = -1;
@@ -301,11 +332,12 @@ static int battery_type     = 0;
 /* Power history: power_history[0] is the newest sample */
 unsigned short power_history[POWER_HISTORY_LEN];
 
-static char power_stack[DEFAULT_STACK_SIZE + DEBUG_STACK];
+static char power_stack[DEFAULT_STACK_SIZE/2 + DEBUG_STACK];
 static const char power_thread_name[] = "power";
 
 static int poweroff_timeout = 0;
 static int powermgmt_est_runningtime_min = -1;
+static bool low_battery = false;
 
 static bool sleeptimer_active = false;
 static long sleeptimer_endtick;
@@ -329,11 +361,6 @@ void battery_read_info(int *adc, int *voltage, int *level)
 
     if (level)
         *level = voltage_to_battery_level(centivolts);
-}
-
-unsigned int battery_voltage(void)
-{
-    return battery_centivolts;
 }
 
 void reset_poweroff_timer(void)
@@ -372,10 +399,28 @@ int battery_level(void)
     return battery_percent;
 }
 
+/* Returns filtered battery voltage [centivolts] */
+unsigned int battery_voltage(void)
+{
+    return battery_centivolts;
+}
+
+/* Returns battery voltage from ADC [centivolts] */
+int battery_adc_voltage(void)
+{
+    return (adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 5000) / 10000;
+}
+
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void)
 {
     return battery_centivolts > battery_level_dangerous[battery_type];
+}
+
+/* Tells if the battery is in critical powersaving state */
+bool battery_level_critical(void)
+{
+    return ((battery_capacity * battery_percent / BATTERY_CAPACITY_MIN) < 10);
 }
 
 void set_poweroff_timeout(int timeout)
@@ -403,8 +448,7 @@ int get_sleep_timer(void)
         return 0;
 }
 
-/* look into the percent_to_volt_* table and get a realistic battery level
-       percentage */
+/* look into the percent_to_volt_* table and get a realistic battery level */
 static int voltage_to_percent(int voltage, const short* table)
 {
     if (voltage <= table[0])
@@ -430,7 +474,33 @@ static int voltage_to_battery_level(int battery_centivolts)
 {
     int level;
 
-#if CONFIG_CHARGING >= CHARGING_MONITOR
+#if defined(CONFIG_CHARGER) && CONFIG_BATTERY == BATT_LIPOL1300
+    if (charger_input_state == NO_CHARGER) {
+        /* discharging. calculate new battery level and average with last */
+        level = voltage_to_percent(battery_centivolts,
+                percent_to_volt_discharge[battery_type]);
+        if (level != (battery_percent - 1))
+            level = (level + battery_percent + 1) / 2;
+    }
+    else if (charger_input_state == CHARGER_UNPLUGGED) {
+        /* just unplugged. adjust filtered values */
+        battery_centivolts -= percent_to_volt_charge[battery_percent/10] -
+                              percent_to_volt_discharge[0][battery_percent/10];
+        avgbat = battery_centivolts * 10000 * BATT_AVE_SAMPLES;
+        level  = battery_percent;
+    }
+    else if (charger_input_state == CHARGER_PLUGGED) {
+        /* just plugged in. adjust battery values */
+        battery_centivolts += percent_to_volt_charge[battery_percent/10] -
+                              percent_to_volt_discharge[0][battery_percent/10];
+        avgbat = battery_centivolts * 10000 * BATT_AVE_SAMPLES;
+        level  = MIN(12 * battery_percent / 10, 99);
+    }
+    else { /* charging. calculate new battery level */
+        level = voltage_to_percent(battery_centivolts,
+                percent_to_volt_charge);
+    }
+#elif CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == DISCHARGING) {
         level = voltage_to_percent(battery_centivolts,
                     percent_to_volt_discharge[battery_type]);
@@ -440,7 +510,7 @@ static int voltage_to_battery_level(int battery_centivolts)
         level = MIN(voltage_to_percent(battery_centivolts,
                     percent_to_volt_charge), 99);
     }
-    else { /* in topoff/trickle charge, the battery is by definition 100% full */
+    else { /* in topoff/trickle charge, battery is by definition 100% full */
         level = 100;
     }
 #else
@@ -456,35 +526,71 @@ static void battery_status_update(void)
 {
     int level = voltage_to_battery_level(battery_centivolts);
 
-#ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
-    if (battery_percent == -1) { /* first run of this procedure */
-        /* The battery voltage is usually a little lower directly after
-           turning on, because the disk was used heavily. Raise it by 5. % */
-        level = (level > 95) ? 100 : level + 5;
-    }
-#endif
-    battery_percent = level;
 
     /* calculate estimated remaining running time */
     /* discharging: remaining running time */
     /* charging:    remaining charging time */
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charge_state == CHARGING) {
-        powermgmt_est_runningtime_min = (100 - level) * battery_capacity / 100
-                                      * 60 / (CURRENT_MAX_CHG - runcurrent());
+        powermgmt_est_runningtime_min = (100 - level) * battery_capacity * 60
+                                      / 100 / (CURRENT_MAX_CHG - runcurrent());
     }
     else
+#elif defined(CONFIG_CHARGING) && CONFIG_BATTERY == BATT_LIPOL1300
+    if (charger_inserted()) {
+#ifdef IRIVER_H300_SERIES
+        /* H300_SERIES use CURRENT_MAX_CHG for basic charge time (80%)
+         * plus 110 min top off charge time */
+        powermgmt_est_runningtime_min = ((100-level) * battery_capacity * 80
+                                         /100 / CURRENT_MAX_CHG) + 110;
+#else
+        /* H100_SERIES scaled for 160 min basic charge time (80%) on
+         * 1600 mAh battery plus 110 min top off charge time */
+        powermgmt_est_runningtime_min = ((100 - level) * battery_capacity
+                                         / 993) + 110;
 #endif
-    {
-        powermgmt_est_runningtime_min = level * battery_capacity / 100
-                                      * 60 / runcurrent();
+        level = (level * 80) / 100;
+        if (level > 72) { /* > 91% */
+            int i = POWER_HISTORY_LEN;
+            int d = 1;
+#ifdef HAVE_CHARGE_STATE
+            if (charge_state == DISCHARGING)
+                d = -2;
+#endif
+            while ((i > 2) && (d > 0)) /* search zero or neg. delta */
+                d = power_history[0] - power_history[--i];
+            if ((((d == 0) && (i > 6)) || (d == -1)) && (i < 118)) {
+                /* top off charging */
+                level = MIN(80 + (i*19 / 113), 99);  /* show 81% .. 99% */
+                powermgmt_est_runningtime_min = MAX(116 - i, 0);
+            }
+            else if ((d < 0) || (i > 117)) {
+                /* charging finished */
+                level = 100;
+                powermgmt_est_runningtime_min = battery_capacity * 60
+                                                / runcurrent();
+            }
+        }
     }
+    else
+#endif /* BATT_LIPOL1300 */
+    {
+        if ((battery_centivolts + 2) > percent_to_volt_discharge[0][0])
+            powermgmt_est_runningtime_min = (level + battery_percent) * 60 *
+                                         battery_capacity / 200 / runcurrent();
+        else
+            powermgmt_est_runningtime_min = (battery_centivolts -
+                                             battery_level_shutoff[0]) / 2;
+    }
+
+    battery_percent = level;
 }
 
 /*
  * We shut off in the following cases:
  * 1) The unit is idle, not playing music
  * 2) The unit is playing music, but is paused
+ * 3) The battery level has reached shutdown limit
  *
  * We do not shut off in the following cases:
  * 1) The USB is connected
@@ -504,6 +610,41 @@ static void handle_auto_poweroff(void)
      */
     if(charger_input_state == CHARGER || audio_stat == AUDIO_STATUS_PLAY) {
         last_event_tick = current_tick;
+    }
+#endif
+
+    /* For low battery condition do some power-saving stuff */
+    if (!low_battery && battery_level_critical()) {
+#if CONFIG_BACKLIGHT == BL_IRIVER_H100
+        backlight_set_fade_in(0);
+        backlight_set_fade_out(0);
+#endif
+#if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
+        if (backlight_get_current_timeout() > 2)
+#endif
+            backlight_set_timeout(2);
+#ifdef HAVE_REMOTE_LCD
+        remote_backlight_set_timeout(2);
+#endif
+        ata_spindown(3);
+#ifdef HAVE_ATA_POWER_OFF
+        ata_poweroff(true);
+#endif
+        low_battery = true;
+    } else if (low_battery && (battery_percent > 11)) {
+        backlight_set_timeout(10);
+        ata_spindown(10);
+        low_battery = false;
+    }
+
+    /* switch off unit if battery level is too low for reliable operation */
+#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
+    (CONFIG_BATTERY!=BATT_1AA)
+    if(battery_centivolts < battery_level_shutoff[battery_type]) {
+        if(!shutdown_timeout) {
+            backlight_on();
+            sys_poweroff();
+        }
     }
 #endif
 
@@ -579,6 +720,30 @@ static int runcurrent(void)
 #if defined(CONFIG_BACKLIGHT) && !defined(BOOTLOADER)
     if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;
+#endif
+
+#if defined(HAVE_RECORDING) && defined(CURRENT_RECORD)
+#if CONFIG_CODEC == SWCODEC        
+    unsigned int audio_stat = pcm_rec_status();
+#else
+    int audio_stat = audio_status();
+#endif
+    if (audio_stat & AUDIO_STATUS_RECORD)
+        current += CURRENT_RECORD;
+#endif
+
+#ifdef HAVE_SPDIF_POWER
+#ifdef SPDIF_POWER_INVERTED
+    if (GPIO1_OUT & 0x01000000)
+#else
+    if (!(GPIO1_OUT & 0x01000000))
+#endif
+        current += CURRENT_SPDIF_OUT;
+#endif
+
+#ifdef HAVE_REMOTE_LCD
+    if ((GPIO_READ & 0x40000000) == 0)
+        current += CURRENT_REMOTE;
 #endif
 
     return(current);
@@ -689,17 +854,31 @@ static void power_thread_sleep(int ticks)
          * likely always be spinning in USB mode).
          */
         if (!ata_disk_is_active() || usb_inserted()) {
-            avgbat = avgbat - (avgbat / BATT_AVE_SAMPLES) +
-                     adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR;
+            avgbat += adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR
+                      - (avgbat / BATT_AVE_SAMPLES);
             /*
              * battery_centivolts is the centivolt-scaled filtered battery value.
              */
-            battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
-
-            /* update battery status every time an update is available */
-            battery_status_update();
-
+            battery_centivolts = (avgbat / BATT_AVE_SAMPLES + 5000) / 10000;
         }
+        else if (battery_percent < 8) {
+            /* If battery is low, observe voltage during disk activity.
+             * Shut down if voltage drops below shutoff level and we are not
+             * using NiMH or Alkaline batteries.
+             */
+            battery_centivolts = (battery_adc_voltage() +
+                                  battery_centivolts + 1) / 2;
+#if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
+    (CONFIG_BATTERY!=BATT_1AA)
+            if (!shutdown_timeout &&
+                (battery_centivolts < battery_level_shutoff[battery_type]))
+                sys_poweroff();
+            else
+#endif
+                avgbat += battery_centivolts * 10000
+                          - (avgbat / BATT_AVE_SAMPLES);
+        }
+
 #if CONFIG_CHARGING == CHARGING_CONTROL
         if (ata_disk_is_active()) {
             /* flag hdd use for charging calculation */
@@ -711,8 +890,7 @@ static void power_thread_sleep(int ticks)
          * If we have a lot of pending writes or if the disk is spining,
          * fsync the debug log file.
          */
-        if((wrcount > 10) ||
-           ((wrcount > 0) && ata_disk_is_active())) {
+        if((wrcount > 10) || ((wrcount > 0) && ata_disk_is_active())) {
             fsync(fd);
             wrcount = 0;
         }
@@ -745,9 +923,34 @@ static void power_thread(void)
 #endif
 
     /* initialize the voltages for the exponential filter */
-    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR *
-        BATT_AVE_SAMPLES;
+    avgbat = adc_read(ADC_UNREG_POWER) * BATTERY_SCALE_FACTOR + 15000;
+
+#ifndef HAVE_MMC  /* this adjustment is only needed for HD based */
+        /* The battery voltage is usually a little lower directly after
+           turning on, because the disk was used heavily. Raise it by 5% */
+#ifdef HAVE_CHARGING
+    if(!charger_inserted()) /* only if charger not connected */
+#endif
+        avgbat += (percent_to_volt_discharge[battery_type][6] -
+                   percent_to_volt_discharge[battery_type][5]) * 5000;
+#endif /* not HAVE_MMC */
+
+    avgbat = avgbat * BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
+
+#ifdef CONFIG_CHARING
+    if(charger_inserted()) {
+        battery_percent  = voltage_to_percent(battery_centivolts,
+                           percent_to_volt_charge);
+#if CONFIG_BATTERY == BATT_LIPOL1300
+        charger_input_state = CHARGER;
+#endif
+    } else
+#endif
+    {   battery_percent  = voltage_to_percent(battery_centivolts,
+                           percent_to_volt_discharge[battery_type]);
+        battery_percent += (battery_percent < 100);
+    }
 
 #if defined(DEBUG_FILE) && (CONFIG_CHARGING == CHARGING_CONTROL)
     fd      = -1;
@@ -954,7 +1157,7 @@ static void power_thread(void)
                 pid_p = pid_p * PID_PCONST;
             else
                 pid_p = 0;
-            if(battery_centivolts < target_voltage) {
+            if((unsigned) battery_centivolts < target_voltage) {
                 if(pid_i < 60) {
                     pid_i++;        /* limit so it doesn't "wind up" */
                 }
@@ -1067,7 +1270,18 @@ void sys_poweroff(void)
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout */
     shutdown_timeout = HZ*20;
-
+#if defined(HAVE_RECORDING)
+#if CONFIG_CODEC == SWCODEC        
+    unsigned int audio_stat = pcm_rec_status();
+#else
+    int audio_stat = audio_status();
+#endif
+    if (audio_stat & AUDIO_STATUS_RECORD) {
+        audio_stop_recording();
+        shutdown_timeout += 8*HZ;
+    }
+#endif
+    
     queue_post(&button_queue, SYS_POWEROFF, NULL);
 }
 
@@ -1095,30 +1309,42 @@ void shutdown_hw(void)
     }
 #endif
     audio_stop();
+    if (!battery_level_critical()) { /* do not save on critical battery */
 #ifdef HAVE_LCD_BITMAP
-    glyph_cache_save();
+        glyph_cache_save();
 #endif
-    ata_spindown(1);
+        if(ata_disk_is_active())
+            ata_spindown(1);
+    }
     while(ata_disk_is_active())
         sleep(HZ/10);
+
+#ifndef IAUDIO_X5
+#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
+    backlight_set_fade_out(0);
+#endif
+    backlight_off();
+#endif /* IAUDIO_X5 */
+#ifdef HAVE_REMOTE_LCD
+    remote_backlight_off();
+#endif
 
     mp3_shutdown();
 #ifdef HAVE_UDA1380
     uda1380_close();
 #elif defined(HAVE_TLV320)
     tlv320_close();
-#elif defined(HAVE_WM8758) || defined(HAVE_WM8975)
+#elif defined(HAVE_WM8758) || defined(HAVE_WM8975) | defined(HAVE_WM8731)
     wmcodec_close();
 #endif
+    /* If HD is still active we try to wait for spindown, otherwise the
+       shutdown_timeout in power_thread_sleep will force a power off */ 
+    while(ata_disk_is_active())
+        sleep(HZ/10);
 #ifndef IAUDIO_X5
-#if defined(HAVE_BACKLIGHT_PWM_FADING) && !defined(SIMULATOR)
-    backlight_set_fade_out(0);
-#endif
-    backlight_off();
     lcd_set_contrast(0);
 #endif /* IAUDIO_X5 */
 #ifdef HAVE_REMOTE_LCD
-    remote_backlight_off();
     lcd_remote_set_contrast(0);
 #endif
     power_off();

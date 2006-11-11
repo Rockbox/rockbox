@@ -583,16 +583,25 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef X5_BACKLIGHT_SHUTDOWN
         x5_backlight_shutdown();
 #endif
+        if (!battery_level_safe())
+            gui_syncsplash(3*HZ, true, "%s %s",
+                           str(LANG_WARNING_BATTERY_EMPTY),
+                           str(LANG_SHUTTINGDOWN));
+        else if (battery_level_critical())
+            gui_syncsplash(3*HZ, true, "%s %s",
+                           str(LANG_WARNING_BATTERY_LOW),
+                           str(LANG_SHUTTINGDOWN));
+        else {
 #ifdef HAVE_TAGCACHE
-        if (!tagcache_prepare_shutdown())
-        {
-            cancel_shutdown();
-            gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
-            return false;
-        }
+            if (!tagcache_prepare_shutdown())
+            {
+                cancel_shutdown();
+                gui_syncsplash(HZ, true, str(LANG_TAGCACHE_BUSY));
+                return false;
+            }
 #endif
-    
-        gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+            gui_syncsplash(0, true, str(LANG_SHUTTINGDOWN));
+        }
         
         if (global_settings.fade_on_stop 
             && (audio_status() & AUDIO_STATUS_PLAY))
@@ -607,7 +616,8 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         if (callback != NULL)
             callback(parameter);
 
-        system_flush();
+        if (!battery_level_critical()) /* do not save on critical battery */
+            system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {

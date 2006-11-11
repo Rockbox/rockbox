@@ -88,5 +88,11 @@ void adc_init(void)
     adc_scan(ADC_REMOTE);
     adc_scan(ADC_SCROLLPAD);
     
+    /* FIXME: The ADC sometimes reads 0 for the battery
+       voltage for the first few seconds. It would be better to fix this by
+       figuring out how to use the ADC properly. Until then, work around the
+       problem by waiting until it reads a proper value*/
+    while(adc_scan(ADC_UNREG_POWER)==0);
+
     tick_add_task(adc_tick);
 }

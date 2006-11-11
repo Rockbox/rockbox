@@ -240,6 +240,10 @@ int audio_status(void)
     return 0;
 }
 
+void audio_stop_recording(void)
+{
+}
+
 void mp3_shutdown(void)
 {
 }
