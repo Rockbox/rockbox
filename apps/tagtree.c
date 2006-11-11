@@ -95,6 +95,7 @@ struct display_format {
     int limit;
     int strip;
     bool sort_inverse;
+    bool sort;
 };
 
 static struct display_format *formats[TAGMENU_MAX_FMTS];
@@ -361,6 +362,8 @@ static int get_format_str(struct display_format *fmt)
                 return -12;
             if (!strcasecmp("inverse", buf))
                 fmt->sort_inverse = true;
+
+            fmt->sort = true;
             break;
             
         case var_limit:
@@ -1057,6 +1060,10 @@ int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
         sort_inverse = fmt->sort_inverse;
         sort_limit = fmt->limit;
         strip = fmt->strip;
+        
+        /* Check if sorting is forced. */
+        if (fmt->sort)
+            sort = true;
     }
     else
     {
