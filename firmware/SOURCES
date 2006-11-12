@@ -70,7 +70,7 @@ font.c
 hangul.c
 lru.c
 #if LCD_DEPTH == 1
-drivers/lcd-recorder.c
+drivers/lcd-1bit-vert.c
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 drivers/lcd-2bit-horz.c
@@ -287,18 +287,21 @@ target/sh/archos/player/lcd-as-player.S
 
 #ifdef ARCHOS_RECORDER
 #ifndef SIMULATOR
+target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 #endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
 
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
 #ifndef SIMULATOR
+target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 #endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
 
 #if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
 #ifndef SIMULATOR
+target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 #endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
@@ -526,6 +529,7 @@ target/arm/iriver/ifp7xx/power-ifp7xx.c
 target/arm/iriver/ifp7xx/adc-ifp7xx.c
 target/arm/iriver/ifp7xx/backlight-ifp7xx.c
 target/arm/iriver/ifp7xx/button-ifp7xx.c
+target/arm/iriver/ifp7xx/lcd-ifp7xx.c
 target/arm/iriver/ifp7xx/usb-ifp7xx.c
 #endif
 #endif
