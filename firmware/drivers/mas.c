@@ -24,8 +24,7 @@
 #include "mas.h"
 #include "kernel.h"
 #include "system.h"
-
-extern bool old_recorder;
+#include "hwcompat.h"
 
 static int mas_devread(unsigned long *dest, int len);
 
@@ -287,7 +286,14 @@ void mas_reset(void)
     or_b(0x01, &PADRH);
     sleep(HZ/5);
 #elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    if(old_recorder)
+    if (read_hw_mask() & ATA_ADDRESS_200)
+    {
+        and_b(~0x01, &PADRH);
+        sleep(HZ/100);
+        or_b(0x01, &PADRH);
+        sleep(HZ/5);
+    }
+    else
     {
         /* Older recorder models don't invert the POR signal */
         or_b(0x01, &PADRH);
@@ -295,13 +301,6 @@ void mas_reset(void)
         and_b(~0x01, &PADRH);
         sleep(HZ/5);
     }
-    else
-    {
-        and_b(~0x01, &PADRH);
-        sleep(HZ/100);
-        or_b(0x01, &PADRH);
-        sleep(HZ/5);
-    }  
 #endif
 }
 

@@ -124,7 +124,6 @@ int ata_io_address; /* 0x300 or 0x200, only valid on recorder */
 static volatile unsigned char* ata_control;
 #endif
 
-bool old_recorder = false;
 int ata_spinup_time = 0;
 #if CONFIG_LED == LED_REAL
 static bool ata_led_enabled = true;
@@ -1415,13 +1414,11 @@ static void io_address_detect(void)
     if (read_hw_mask() & ATA_ADDRESS_200)
     {
         ata_io_address = 0x200; /* For debug purposes only */
-        old_recorder = false;
         ata_control = ATA_CONTROL1;
     }
     else
     {
         ata_io_address = 0x300; /* For debug purposes only */
-        old_recorder = true;
         ata_control = ATA_CONTROL2;
     }
 }

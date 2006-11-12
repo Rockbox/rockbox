@@ -83,7 +83,6 @@
 #define DT_STOP_TRAN                 0xfd
 
 /* for compatibility */
-bool old_recorder = false; /* FIXME: get rid of this cross-dependency */
 int ata_spinup_time = 0;
 long last_disk_activity = -1;
 
