@@ -67,7 +67,7 @@ int main()
     idx_out = fopen("dict.index", "wb");
     desc_out = fopen("dict.desc", "wb");
 
-    if (in == NULL || idx_out < 0 || desc_out < 0)
+    if (in == NULL || idx_out == NULL || desc_out == NULL)
     {
         fprintf(stderr, "Error: Some files couldn't be opened\n");
         return 1;
