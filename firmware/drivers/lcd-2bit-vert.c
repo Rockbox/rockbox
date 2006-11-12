@@ -33,7 +33,7 @@
 
 /*** definitions ***/
 
-#define SCROLLABLE_LINES 26
+#define SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
 
 /*** globals ***/
 
