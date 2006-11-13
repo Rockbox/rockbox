@@ -192,7 +192,7 @@ static bool audio_is_initialized = false;
 /* Variables are commented with the threads that use them: *
  * A=audio, C=codec, V=voice. A suffix of - indicates that *
  * the variable is read but not updated on that thread.    */
-/* TBD: Split out "audio" and "calling" threads */
+/* TBD: Split out "audio" and "playback" (ie. calling) threads */
 
 /* Main state control */
 static struct event_queue codec_callback_queue; /* Queue for codec callback responses */
@@ -348,6 +348,7 @@ void mp3_play_data(const unsigned char* start, int size,
 void mp3_play_stop(void)
 {
 #ifdef PLAYBACK_VOICE
+    queue_remove_from_head(&voice_queue, Q_VOICE_STOP);
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, (void *)1);
 #endif
@@ -807,7 +808,7 @@ void voice_stop(void)
 
     LOGFQUEUE("mp3 > voice Q_VOICE_STOP");
     queue_post(&voice_queue, Q_VOICE_STOP, 0);
-    while (voice_is_playing)
+    while (voice_is_playing || !queue_empty(&voice_queue))
         yield();
     if (!playing)   
         pcmbuf_play_stop();
@@ -1880,13 +1881,15 @@ static void codec_thread(void)
                     LOGFQUEUE("codec > voice Q_ENCODER_RECORD");
                     queue_post(&voice_queue, Q_ENCODER_RECORD, NULL);
                 }
-#endif
                 mutex_lock(&mutex_codecthread);
+#endif
                 logf("loading encoder");
                 current_codec = CODEC_IDX_AUDIO;
                 ci.stop_codec = false;
                 status = codec_load_file((const char *)ev.data, &ci);
+#ifdef PLAYBACK_VOICE
                 mutex_unlock(&mutex_codecthread);
+#endif
                 logf("encoder stopped");
                 break;
 #endif /* AUDIO_HAVE_RECORDING */
