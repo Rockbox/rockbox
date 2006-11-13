@@ -94,12 +94,13 @@
       of inverted text (\setting{Bar (inverse)} option) or a small arrow to the
       left of the menu text (\setting{Pointer} option).
     
-      \opt{HAVE_LCD_COLOR}{
+      \nopt{archos}{%
         \item[Clear Backdrop:]
-          Rockbox allows you to select bitmap pictures to use as backdrops.
-          These backdrops are set in the \setting{File Menu}, see
-          \reference{ref:Filemenu}.
+          Rockbox allows you to select bitmap pictures to use as backdrops,
+          see \reference{ref:LoadingBackdrops} for further information.
           This option allows you to clear the backdrops that you set.
+      }%
+      \opt{HAVE_LCD_COLOR}{
         \item[Set Background Colour:]
           Sets the background colour for the LCD display.
         \item[Set Foreground Colour:]

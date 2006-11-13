@@ -38,6 +38,19 @@ If your language is not yet supported and you want to write your own language
 file find the instructions on the Rockbox website:
 \wikilink{HowtoUpdateLangfile}
 
+\nopt{archos}{%
+  \subsection{\label{ref:LoadingBackdrops}Loading Backdrops}
+  Rockbox supports showing an image as a backdrop in the \setting{File Browser}
+  and the menus. The backdrop image must be a \fname{.bmp} file of the exact
+  same dimensions as the display in your \dap{} (\genericimg{} with the last
+  number giving the colour depth in bits). To use an image as a backdrop browse
+  to it in the \setting{File Browser} and open the \setting{File Menu}
+  (see \reference{ref:Filemenu}) on it and select the option
+  \setting{Set As Backdrop}. If you want rockbox to remember your
+  backdrop the next time you start your \dap{} the backdrop must be placed in
+  the \fname{/.rockbox/backdrops} folder.
+}%
+
 \section{\label{ref:ConfiguringtheWPS}Configuring the WPS}
 
 \subsection{WPS -- General Info}
@@ -197,19 +210,20 @@ displaying images:
   \item Load and always show the image, using the \config{\%x} tag
   \item Preload the image with \config{\%xl} and show it with \config{\%xd}. 
     This way you can have your images displayed conditionally.
-    \opt{HAVE_LCD_COLOR}{
+    \nopt{archos}{%
     \item Load an image and show as backdrop using the \config{\%X} tag. The 
       image must be of the same exact dimensions as your display.
-    }
+    }%
 \end{enumerate}
 
-\optv{HAVE_LCD_COLOR}{
+\optv{SWCODEC}{% This doesn't depend on SWCODEC but we don't have a \noptv
+               % command.
   Example on background image use:
   \begin{example}
     %X|background.bmp|
   \end{example}
   The image with filename \fname{background.bmp} is loaded and used in the WPS.
-}
+}%
 
 Example on bitmap preloading and use:
 \begin{example}
