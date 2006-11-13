@@ -50,7 +50,7 @@
 #include "action.h"
 #include "splash.h"
 #include "yesno.h"
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -493,7 +493,7 @@ static bool delete_dir(void)
     return delete_handler(true);
 }
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 static bool set_backdrop(void)
 {
     /* load the image */
@@ -837,7 +837,7 @@ int onplay(char* file, int attr, int from)
     struct menu_item items[12];
 #endif
     int m, i=0, result;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     char *suffix;
 #endif
 
@@ -920,7 +920,7 @@ int onplay(char* file, int attr, int from)
                 items[i].function = delete_file;
                 i++;
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 suffix = strrchr(file, '.');
                 if (suffix)
                 {

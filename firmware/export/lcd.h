@@ -310,10 +310,14 @@ extern void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *stri
                                   int style, int offset);
 
 /* low level drawing function pointer arrays */
+#if LCD_DEPTH >= 8
+extern lcd_fastpixelfunc_type* const *lcd_fastpixelfuncs;
+#elif LCD_DEPTH > 1
+extern lcd_pixelfunc_type* const *lcd_pixelfuncs;
+extern lcd_blockfunc_type* const *lcd_blockfuncs;
+#else
 extern lcd_pixelfunc_type* const lcd_pixelfuncs[8];
 extern lcd_blockfunc_type* const lcd_blockfuncs[8];
-#if LCD_DEPTH >= 8
-extern lcd_fastpixelfunc_type* const * lcd_fastpixelfuncs;
 #endif
 
 extern void lcd_drawpixel(int x, int y);
@@ -339,10 +343,8 @@ extern void     lcd_set_background(unsigned background);
 extern unsigned lcd_get_background(void);
 extern void     lcd_set_drawinfo(int mode, unsigned foreground,
                                  unsigned background);
-#ifdef HAVE_LCD_COLOR
 void lcd_set_backdrop(fb_data* backdrop);
 fb_data* lcd_get_backdrop(void);
-#endif
 
 extern void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);

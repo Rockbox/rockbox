@@ -54,7 +54,7 @@ static int boot_size = 0;
 static int boot_cluster;
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 
@@ -466,7 +466,7 @@ int ft_enter(struct tree_context* c)
                 /* wps config file */
             case TREE_ATTR_WPS:
                 gui_syncsplash(0, true, str(LANG_WAIT));
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 unload_wps_backdrop();
 #endif
                 wps_data_load(gui_wps[0].data, buf, true);

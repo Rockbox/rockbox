@@ -83,7 +83,7 @@
 #include "widgets.h"
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 
@@ -118,7 +118,7 @@ const struct filetype filetypes[] = {
 #ifdef HAVE_REMOTE_LCD
     { "rwps", TREE_ATTR_RWPS, Icon_Wps, VOICE_EXT_RWPS },
 #endif
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     { "bmp", TREE_ATTR_BMP, Icon_Wps, VOICE_EXT_WPS },
 #endif
 #ifdef CONFIG_TUNER
@@ -966,7 +966,7 @@ static bool dirbrowse(void)
 #endif
                     reload_dir = true;
 #endif
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
             show_main_backdrop();
 #endif
 #ifdef HAVE_TAGCACHE

@@ -54,7 +54,7 @@
 #include "abrepeat.h"
 #include "playback.h"
 #include "splash.h"
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 #include "ata_idle_notify.h"
@@ -104,9 +104,9 @@ long gui_wps_show(void)
     {
         gui_wps_set_margin(&gui_wps[i]);
     }
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     show_wps_backdrop();
-#endif /* HAVE_LCD_COLOR */
+#endif /* LCD_DEPTH > 1 */
 #endif
 
 #ifdef AB_REPEAT_ENABLE
@@ -201,12 +201,12 @@ long gui_wps_show(void)
         switch(button)
         {
             case ACTION_WPS_CONTEXT:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 action_signalscreenchange();
                 onplay(wps_state.id3->path, TREE_ATTR_MPA, CONTEXT_WPS);
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -422,13 +422,13 @@ long gui_wps_show(void)
                 FOR_NB_SCREENS(i)
                     gui_wps[i].display->stop_scroll();
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 action_signalscreenchange();
                 if (main_menu())
                     return true;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -443,12 +443,12 @@ long gui_wps_show(void)
 
 #ifdef HAVE_QUICKSCREEN
             case ACTION_WPS_QUICKSCREEN:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 if (quick_screen_quick(button))
                     return SYS_USB_CONNECTED;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -464,7 +464,7 @@ long gui_wps_show(void)
                 /* screen settings */
 #ifdef BUTTON_F3
             case ACTION_F3:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 if (quick_screen_f3(BUTTON_F3))
@@ -482,13 +482,13 @@ long gui_wps_show(void)
                 /* pitch screen */
 #ifdef HAVE_PITCHSCREEN
             case ACTION_WPS_PITCHSCREEN:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 action_signalscreenchange();
                 if (1 == pitch_screen())
                     return SYS_USB_CONNECTED;
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
                 restore = true;
@@ -533,11 +533,11 @@ long gui_wps_show(void)
                 break;
 
             case ACTION_WPS_ID3SCREEN:
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 browse_id3();
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_wps_backdrop();
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -559,7 +559,7 @@ long gui_wps_show(void)
 
             case SYS_POWEROFF:
                 bookmark_autobookmark();
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                 show_main_backdrop();
 #endif
                 default_event_handler(SYS_POWEROFF);
@@ -868,7 +868,7 @@ void gui_sync_wps_init(void)
         gui_wps_set_data(&gui_wps[i], &wps_datas[i]);
         gui_wps_set_statusbar(&gui_wps[i], &statusbars.statusbars[i]);
     }
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     unload_wps_backdrop();
 #endif
 }

@@ -454,7 +454,7 @@ struct user_settings
     bool dithering_enabled;
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     unsigned char backdrop_file[MAX_FILENAME+1];  /* backdrop bitmap file */
 #endif
 

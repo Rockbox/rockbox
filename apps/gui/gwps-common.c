@@ -48,7 +48,7 @@
 #include "bmp.h"
 #include "atoi.h"
 #endif
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 #include "dsp.h"
@@ -143,7 +143,7 @@ bool wps_data_preload_tags(struct wps_data *data, char *buf,
             }
         break;
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         case 'X':
             /* Backdrop image - must be the same size as the LCD */
         {
@@ -2473,7 +2473,7 @@ bool gui_wps_display(void)
                     if(i == 0)
                     {
 #ifdef HAVE_LCD_BITMAP
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
                         unload_wps_backdrop();
 #endif
                         wps_data_load(gui_wps[i].data,

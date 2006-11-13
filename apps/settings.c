@@ -72,7 +72,7 @@
 #include "statusbar.h"
 #include "splash.h"
 #include "list.h"
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 
@@ -1034,7 +1034,7 @@ int settings_save( void )
     i+= MAX_FILENAME;
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     strncpy((char *)&config_block[i], (char *)global_settings.backdrop_file,
             MAX_FILENAME);
     i+= MAX_FILENAME;
@@ -1198,7 +1198,7 @@ void settings_apply(void)
         global_settings.peak_meter_clip_hold);
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     unload_wps_backdrop();
 #endif
     if ( global_settings.wps_file[0] &&
@@ -1212,7 +1212,7 @@ void settings_apply(void)
         wps_data_init(gui_wps[0].data);
     }
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     if ( global_settings.backdrop_file[0] &&
          global_settings.backdrop_file[0] != 0xff ) {
         snprintf(buf, sizeof buf, BACKDROP_DIR "/%s.bmp",
@@ -1222,7 +1222,9 @@ void settings_apply(void)
         unload_main_backdrop();
     }
     show_main_backdrop();
+#endif
 
+#ifdef HAVE_LCD_COLOR
     screens[SCREEN_MAIN].set_foreground(global_settings.fg_color);
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
 #endif
@@ -1438,7 +1440,7 @@ void settings_load(int which)
         i+= MAX_FILENAME;
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         strncpy((char *)global_settings.backdrop_file, (char *)&config_block[i],
                 MAX_FILENAME);
         i+= MAX_FILENAME;
@@ -1593,7 +1595,7 @@ bool settings_load_config(const char* file)
 
         /* check for the string values */
         if (!strcasecmp(name, "wps")) {
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
             unload_wps_backdrop();
 #endif
             int fd2;
@@ -1629,7 +1631,7 @@ bool settings_load_config(const char* file)
                 set_file(value, (char *)global_settings.font_file, MAX_FILENAME);
         }
 #endif
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         else if (!strcasecmp(name, "backdrop")) {
             if (load_main_backdrop(value)) {
                 set_file(value, (char *)global_settings.backdrop_file, MAX_FILENAME);
@@ -1795,7 +1797,7 @@ bool settings_save_config(void)
                  global_settings.font_file);
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     if (global_settings.backdrop_file[0] != 0)
         fdprintf(fd, "backdrop: %s/%s.bmp\r\n", BACKDROP_DIR,
                  global_settings.backdrop_file);
@@ -1898,9 +1900,10 @@ void settings_reset(void) {
 #endif
     global_settings.font_file[0] = '\0';
     global_settings.lang_file[0] = '\0';
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
     global_settings.backdrop_file[0] = '\0';
-
+#endif
+#ifdef HAVE_LCD_COLOR
     global_settings.fg_color = LCD_DEFAULT_FG;
     global_settings.bg_color = LCD_DEFAULT_BG;
 #endif

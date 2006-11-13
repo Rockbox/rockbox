@@ -44,6 +44,9 @@ static const unsigned char pixmask[4] ICONST_ATTR = {
     0xC0, 0x30, 0x0C, 0x03
 };
 
+static fb_data* lcd_backdrop = NULL;
+static long lcd_backdrop_offset IDATA_ATTR = 0;
+
 static unsigned fg_pattern IDATA_ATTR = 0xFF; /* initially black */
 static unsigned bg_pattern IDATA_ATTR = 0x00; /* initially white */
 static int drawmode = DRMODE_SOLID;
@@ -164,6 +167,15 @@ static void clearpixel(int x, int y)
     *address = data ^ ((data ^ bg_pattern) & mask);
 }
 
+static void clearimgpixel(int x, int y)
+{
+    unsigned mask = pixmask[x & 3];
+    fb_data *address = &lcd_framebuffer[y][x>>2];
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask);
+}
+
 static void flippixel(int x, int y)
 {
     unsigned mask =  pixmask[x & 3];
@@ -178,10 +190,18 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_pixelfunc_type* const lcd_pixelfuncs[8] = {
+lcd_pixelfunc_type* const lcd_pixelfuncs_bgcolor[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
+
+lcd_pixelfunc_type* const lcd_pixelfuncs_backdrop[8] = {
+    flippixel, nopixel, setpixel, setpixel,
+    nopixel, clearimgpixel, nopixel, clearimgpixel
+};
+
+lcd_pixelfunc_type* const * lcd_pixelfuncs = lcd_pixelfuncs_bgcolor;
+
 
 /* 'mask' and 'bits' contain 2 bits per pixel */
 static void flipblock(fb_data *address, unsigned mask, unsigned bits)
@@ -198,6 +218,15 @@ static void bgblock(fb_data *address, unsigned mask, unsigned bits)
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & ~bits);
+}
+
+static void bgimgblock(fb_data *address, unsigned mask, unsigned bits)
+                    ICODE_ATTR;
+static void bgimgblock(fb_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask & ~bits);
 }
 
 static void fgblock(fb_data *address, unsigned mask, unsigned bits)
@@ -220,6 +249,17 @@ static void solidblock(fb_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
+static void solidimgblock(fb_data *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void solidimgblock(fb_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+    unsigned bgp  = *(address + lcd_backdrop_offset);
+
+    bits     = bgp  ^ ((bgp ^ fg_pattern) & bits);
+    *address = data ^ ((data ^ bits) & mask);
+}
+
 static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
                          ICODE_ATTR;
 static void flipinvblock(fb_data *address, unsigned mask, unsigned bits)
@@ -234,6 +274,15 @@ static void bginvblock(fb_data *address, unsigned mask, unsigned bits)
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & bits);
+}
+
+static void bgimginvblock(fb_data *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void bgimginvblock(fb_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(address + lcd_backdrop_offset)) & mask & bits);
 }
 
 static void fginvblock(fb_data *address, unsigned mask, unsigned bits)
@@ -256,10 +305,52 @@ static void solidinvblock(fb_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-lcd_blockfunc_type* const lcd_blockfuncs[8] = {
+static void solidimginvblock(fb_data *address, unsigned mask, unsigned bits)
+                          ICODE_ATTR;
+static void solidimginvblock(fb_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+    unsigned fgp  = fg_pattern;
+
+    bits     = fgp  ^ ((fgp ^ *(address + lcd_backdrop_offset)) & bits);
+    *address = data ^ ((data ^ bits) & mask);
+}
+
+lcd_blockfunc_type* const lcd_blockfuncs_bgcolor[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
+
+lcd_blockfunc_type* const lcd_blockfuncs_backdrop[8] = {
+    flipblock, bgimgblock, fgblock, solidimgblock,
+    flipinvblock, bgimginvblock, fginvblock, solidimginvblock
+};
+
+lcd_blockfunc_type* const * lcd_blockfuncs = lcd_blockfuncs_bgcolor;
+
+
+void lcd_set_backdrop(fb_data* backdrop)
+{
+    lcd_backdrop = backdrop;
+    if (backdrop)
+    {
+        lcd_backdrop_offset = (long)backdrop - (long)lcd_framebuffer;
+        lcd_pixelfuncs = lcd_pixelfuncs_backdrop;
+        lcd_blockfuncs = lcd_blockfuncs_backdrop;
+    }
+    else
+    {
+        lcd_backdrop_offset = 0;
+        lcd_pixelfuncs = lcd_pixelfuncs_bgcolor;
+        lcd_blockfuncs = lcd_blockfuncs_bgcolor;
+    }
+}
+
+fb_data* lcd_get_backdrop(void)
+{
+    return lcd_backdrop;
+}
+
 
 static inline void setblock(fb_data *address, unsigned mask, unsigned bits)
 {
@@ -274,9 +365,17 @@ static inline void setblock(fb_data *address, unsigned mask, unsigned bits)
 /* Clear the whole display */
 void lcd_clear_display(void)
 {
-    unsigned bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
-
-    memset(lcd_framebuffer, bits, sizeof lcd_framebuffer);
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        memset(lcd_framebuffer, fg_pattern, sizeof lcd_framebuffer);
+    }
+    else
+    {
+        if (lcd_backdrop)
+            memcpy(lcd_framebuffer, lcd_backdrop, sizeof lcd_framebuffer);
+        else
+            memset(lcd_framebuffer, bg_pattern, sizeof lcd_framebuffer);
+    }
     scrolling_lines = 0;
 }
 

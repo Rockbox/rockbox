@@ -57,8 +57,10 @@ recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
 recorder/widgets.c
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 recorder/backdrop.c
+#endif
+#ifdef HAVE_LCD_COLOR
 gui/color_picker.c
 #endif
 #endif

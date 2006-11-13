@@ -81,7 +81,7 @@ void dac_line_in(bool enable);
 #include "dsp.h"
 #endif
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 #include "backdrop.h"
 #endif
 
@@ -393,7 +393,7 @@ static bool invert_cursor(void)
     return rc;
 }
 
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
 /**
  * Menu to clear the backdrop image
  */
@@ -404,7 +404,9 @@ static bool clear_main_backdrop(void)
     show_main_backdrop();
     return false;
 }
+#endif
 
+#ifdef HAVE_LCD_COLOR
 /**
  * Menu for fore/back colors
  */
@@ -1969,8 +1971,10 @@ static bool lcd_settings_menu(void)
 #endif
         { ID2P(LANG_INVERT_CURSOR),   invert_cursor },
 #endif
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         { ID2P(LANG_CLEAR_BACKDROP),   clear_main_backdrop },
+#endif
+#ifdef HAVE_LCD_COLOR
         { ID2P(LANG_BACKGROUND_COLOR), set_bg_color },
         { ID2P(LANG_FOREGROUND_COLOR), set_fg_color },
         { ID2P(LANG_RESET_COLORS),     reset_color },

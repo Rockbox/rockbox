@@ -21,10 +21,20 @@
 #include "config.h"
 #include "lcd.h"
 #include "backdrop.h"
-#include "splash.h" /* debugging */
 
+#if LCD_DEPTH >= 8
 fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH];
 fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH];
+#elif LCD_DEPTH == 2
+#if LCD_PIXELFORMAT == VERTICAL_PACKING
+fb_data main_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
+fb_data wps_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
+#else
+fb_data main_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
+fb_data wps_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
+#endif
+#endif
+
 bool main_backdrop_valid = false;
 bool wps_backdrop_valid = false;
 
@@ -52,27 +62,23 @@ bool load_backdrop(char* filename, fb_data* backdrop_buffer)
 bool load_main_backdrop(char* filename)
 {
     main_backdrop_valid = load_backdrop(filename, &main_backdrop[0][0]);
-/*    gui_syncsplash(100, true, "MAIN backdrop load: %s", main_backdrop_valid ? "OK" : "FAIL");*/
     return main_backdrop_valid;
 }
 
 bool load_wps_backdrop(char* filename)
 {
     wps_backdrop_valid = load_backdrop(filename, &wps_backdrop[0][0]);
-/*    gui_syncsplash(100, true, "WPS backdrop load: %s", main_backdrop_valid ? "OK" : "FAIL");*/
     return wps_backdrop_valid;
 }
 
 void unload_main_backdrop(void)
 {
     main_backdrop_valid = false;
-/*    gui_syncsplash(100, true, "MAIN backdrop unload");*/
 }
 
 void unload_wps_backdrop(void)
 {
     wps_backdrop_valid = false;
-/*    gui_syncsplash(100, true, "WPS backdrop unload");*/
 }
 
 void show_main_backdrop(void)
@@ -89,7 +95,6 @@ void show_wps_backdrop(void)
     }
     else
     {
-/*        gui_syncsplash(100, true, "WPS backdrop show: fallback to MAIN");*/
         show_main_backdrop();
     }
 }
