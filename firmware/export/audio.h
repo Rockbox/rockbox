@@ -185,10 +185,6 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size);
 #endif /* HAVE_RECORDING */
 
 #ifdef HAVE_SPDIF_IN
-#ifdef HAVE_SPDIF_POWER
-void audio_set_spdif_power_setting(bool on);
-bool audio_get_spdif_power_setting(void);
-#endif
 /* returns index into rec_master_sampr_list */
 int audio_get_spdif_sample_rate(void);
 /* > 0: monitor EBUin, 0: Monitor IISrecv, <0: reset only */

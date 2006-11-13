@@ -22,6 +22,7 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "spdif.h"
 
 
 #ifdef CONFIG_TUNER
@@ -85,8 +86,23 @@ void spdif_power_enable(bool on)
         and_l(~0x01000000, &GPIO1_OUT);
     else
         or_l(0x01000000, &GPIO1_OUT);
-}
+
+#ifndef BOOTLOADER
+    /* Make sure the feed is reset */
+    spdif_set_output_source(spdif_get_output_source(NULL), true);
 #endif
+}
+
+bool spdif_powered(void)
+{
+    bool state = (GPIO1_READ & 0x01000000)?false:true;
+#ifdef SPDIF_POWER_INVERTED
+    return !state;
+#else
+    return state;
+#endif /* SPDIF_POWER_INVERTED */
+}
+#endif /* HAVE_SPDIF_POWER */
 
 void ide_power_enable(bool on)
 {
@@ -96,12 +112,10 @@ void ide_power_enable(bool on)
         or_l(0x80000000, &GPIO_OUT);
 }
 
-
 bool ide_powered(void)
 {
     return (GPIO_OUT & 0x80000000)?false:true;
 }
-
 
 void power_off(void)
 {
@@ -137,6 +151,11 @@ void ide_power_enable(bool on)
 void spdif_power_enable(bool on)
 {
    (void)on;
+}
+
+bool spdif_powered(void)
+{
+    return false;
 }
 #endif
 

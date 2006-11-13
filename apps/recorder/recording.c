@@ -34,7 +34,10 @@
 #include "pcm_playback.h"
 #include "playback.h"
 #include "enc_config.h"
+#if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
+#include "spdif.h"
 #endif
+#endif /* CONFIG_CODEC == SWCODEC */
 #ifdef HAVE_UDA1380
 #include "uda1380.h"
 #endif
@@ -587,12 +590,6 @@ static void rec_boost(bool state)
 #define ac_set_monitor       tlv320_set_monitor
 #endif
 
-#ifdef HAVE_SPDIF_IN
-#define rec_spdif_set_monitor(m) audio_spdif_set_monitor(m)
-#else
-#define rec_spdif_set_monitor(m)
-#endif
-
 void rec_set_source(int source, unsigned flags)
 {
     /* Prevent pops from unneeded switching */
@@ -613,15 +610,23 @@ void rec_set_source(int source, unsigned flags)
     /* Always boost for SPDIF */
     if ((source == AUDIO_SRC_SPDIF) != (source == last_source))
         rec_boost(source == AUDIO_SRC_SPDIF);
+#endif /* HAVE_SPDIF_IN */
 
 #ifdef HAVE_SPDIF_POWER
     /* Check if S/PDIF output power should be switched off or on. NOTE: assumes
        both optical in and out is controlled by the same power source, which is
        the case on H1x0. */
     spdif_power_enable((source == AUDIO_SRC_SPDIF) ||
-                       audio_get_spdif_power_setting());
+                       global_settings.spdif_enable);
+    /* Set the appropriate feed for spdif output */
+#ifdef HAVE_SPDIF_OUT
+    spdif_set_output_source(source, global_settings.spdif_enable);
 #endif
+#else /* !HAVE_SPDIF_POWER */
+#ifdef HAVE_SPDIF_OUT
+    spdif_set_output_source(source, true);
 #endif
+#endif /* !HAVE_SPDIF_POWER */
 
     /** Tuner **/
 #ifdef CONFIG_TUNER
@@ -645,7 +650,6 @@ void rec_set_source(int source, unsigned flags)
             ac_disable_recording();
             ac_set_monitor(false);
             pcm_rec_mux(0);             /* line in */
-            rec_spdif_set_monitor(-1);  /* silence it */
         break;
 
         case AUDIO_SRC_MIC:             /* recording only */
@@ -653,7 +657,6 @@ void rec_set_source(int source, unsigned flags)
                 break;
             ac_enable_recording(true);  /* source mic */
             pcm_rec_mux(0);             /* line in */
-            rec_spdif_set_monitor(0);
         break;
 
         case AUDIO_SRC_LINEIN:          /* recording only */
@@ -661,7 +664,6 @@ void rec_set_source(int source, unsigned flags)
                 break;
             pcm_rec_mux(0);             /* line in */
             ac_enable_recording(false); /* source line */
-            rec_spdif_set_monitor(0);
         break;
 
 #ifdef HAVE_SPDIF_IN
@@ -669,7 +671,6 @@ void rec_set_source(int source, unsigned flags)
             if (source == last_source)
                 break;
             ac_disable_recording();
-            audio_spdif_set_monitor(1);
         break;
 #endif /* HAVE_SPDIF_IN */
 
@@ -690,7 +691,6 @@ void rec_set_source(int source, unsigned flags)
                 break;
             /* I2S recording and playback */
             uda1380_enable_recording(false);    /* source line */
-            uda1380_set_monitor(true);
 #endif
 #ifdef HAVE_TLV320
             /* I2S recording and analog playback */
@@ -707,8 +707,6 @@ void rec_set_source(int source, unsigned flags)
                 tlv320_set_monitor(true);       /* analog bypass */
             }
 #endif
-
-            rec_spdif_set_monitor(0);
         break;
 /* #elif defined(CONFIG_TUNER)  */
 /* Have radio but cannot record it */
@@ -745,18 +743,10 @@ void rec_set_recording_options(struct audio_recording_options *options)
 #if CONFIG_CODEC != SWCODEC
     if (global_settings.rec_prerecord_time)
         talk_buffer_steal(); /* will use the mp3 buffer */
-#endif
-
-#ifdef HAVE_SPDIF_IN
-#ifdef HAVE_SPDIF_POWER
-    audio_set_spdif_power_setting(global_settings.spdif_enable);
-#endif
-#endif
-
-#if CONFIG_CODEC == SWCODEC
+#else /* == SWOCODEC */
     rec_set_source(options->rec_source,
                    options->rec_source_flags | SRCF_RECORDING);
-#endif
+#endif /* CONFIG_CODEC != SWCODEC */
 
     audio_set_recording_options(options);
 }

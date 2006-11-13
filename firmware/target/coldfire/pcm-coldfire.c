@@ -26,6 +26,9 @@
 #elif defined(HAVE_TLV320)
 #include "tlv320.h"
 #endif
+#if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
+#include "spdif.h"
+#endif
 
 /* Avoid further #ifdef's for some codec functions */
 #if defined(HAVE_UDA1380)
@@ -69,10 +72,6 @@ static int rec_peak_left, rec_peak_right;
 #define IIS_CONFIG        IIS2CONFIG
 #define PLLCR_SET_AUDIO_BITS_DEFPARM \
             ((freq_ent[FPARM_CLSEL] << 28) | (3 << 22))
-
-#ifdef HAVE_SPDIF_OUT
-#define EBU_DEFPARM     ((7 << 12) | (3 << 8) | (1 << 5) | (5 << 2))
-#endif
 #endif
 
 /** Sample rates **/
@@ -229,11 +228,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     pcm_playing = true;
 
-    /* Reset the audio FIFO */
-#ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
-#endif
-
     /* Set up DMA transfer  */
     SAR0 = (unsigned long)addr;   /* Source address      */
     DAR0 = (unsigned long)&PDOR3; /* Destination address */
@@ -241,11 +235,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     /* Enable the FIFO and force one write to it */
     pcm_apply_settings(false);
-
-    /* Also send the audio to S/PDIF */
-#ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = EBU_DEFPARM;
-#endif
 
     DCR0 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA |
            DMA_SINC | DMA_SSIZE(3) | DMA_START;
@@ -263,10 +252,6 @@ void pcm_play_dma_stop(void)
 
     /* Reset the FIFO */
     pcm_apply_settings(false);
-
-#ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = IIS_RESET | EBU_DEFPARM;
-#endif
 } /* pcm_play_dma_stop */
 
 void pcm_init(void)
@@ -290,6 +275,10 @@ void pcm_init(void)
 
     /* Prevent pops (resets DAC to zero point) */
     SET_IIS_CONFIG(IIS_DEFPARM | IIS_RESET);
+
+#if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
+    spdif_init();
+#endif
 
     /* Initialize default register values. */
     ac_init();
@@ -417,11 +406,6 @@ void pcm_init_recording(void)
     DMACONFIG = 1;        /* DMA0Req = PDOR3, DMA1Req = PDIR2               */
     DMAROUTE  = (DMAROUTE & 0xffff00ff) | DMA1_REQ_AUDIO_2;
 
-#ifdef HAVE_SPDIF_IN
-    /* PHASECONFIG setup: gain = 3*2^13, source = EBUIN */
-    PHASECONFIG = (6 << 3) | (4 << 0);
-#endif
-
     pcm_rec_dma_stop();
 
     ICR7 = (7 << 2);        /* Enable interrupt at level 7, priority 0      */
@@ -506,18 +490,12 @@ void pcm_play_pause_pause(void)
     /* Disable DMA peripheral request. */
     DCR0 &= ~DMA_EEXT;
     pcm_apply_settings(true);
-#ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = EBU_DEFPARM;
-#endif
 } /* pcm_play_pause_pause */
 
 void pcm_play_pause_unpause(void)
 {
     /* Enable the FIFO and force one write to it */
     pcm_apply_settings(false);
-#ifdef HAVE_SPDIF_OUT
-    EBU1CONFIG = EBU_DEFPARM;
-#endif
     DCR0 |= DMA_EEXT | DMA_START;
 } /* pcm_play_pause_unpause */
 

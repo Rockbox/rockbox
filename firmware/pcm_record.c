@@ -34,6 +34,9 @@
 #include "audio.h"
 #include "sound.h"
 #include "id3.h"
+#ifdef HAVE_SPDIF_IN
+#include "spdif.h"
+#endif
 
 /***************************************************************************/
 
@@ -349,18 +352,6 @@ unsigned long audio_num_recorded_bytes(void)
 } /* audio_num_recorded_bytes */
     
 #ifdef HAVE_SPDIF_IN
-/* Return current SPDIF sample rate */
-static unsigned long measure_spdif_sample_rate(void)
-{
-    /* The following formula is specified in MCF5249 user's manual section
-     * 17.6.1. The 128 divide is because of the fact that the SPDIF clock is
-     * the sample rate times 128. Keep "3*(1 << 13)" part in sync with
-     * PHASECONFIG setup in pcm_init_recording in pcm-coldfire.c.
-     */
-    return (unsigned long)((unsigned long long)FREQMEAS*CPU_FREQ /
-                                               ((1 << 15)*3*(1 << 13))/128);
-} /* measure_spdif_sample_rate */
-
 /**
  * Return SPDIF sample rate index in audio_master_sampr_list. Since we base
  * our reading on the actual SPDIF sample rate (which might be a bit
@@ -369,47 +360,11 @@ static unsigned long measure_spdif_sample_rate(void)
  */
 int audio_get_spdif_sample_rate(void)
 {
-    unsigned long measured_rate = measure_spdif_sample_rate();
+    unsigned long measured_rate = spdif_measure_frequency();
     /* Find which SPDIF sample rate we're closest to. */
     return round_value_to_list32(measured_rate, audio_master_sampr_list,
                                  SAMPR_NUM_FREQ, false);
 } /* audio_get_spdif_sample_rate */
-
-#ifdef HAVE_SPDIF_POWER
-static bool spdif_power_setting;
-
-void audio_set_spdif_power_setting(bool on)
-{
-    spdif_power_setting = on;
-} /* audio_set_spdif_power_setting */
-
-bool audio_get_spdif_power_setting(void)
-{
-    return spdif_power_setting;
-} /* audio_get_spdif_power_setting */
-#endif
-
-void audio_spdif_set_monitor(int monitor_spdif)
-{
-    EBU1CONFIG = 0x800; /* Reset before reprogram */
-
-    if (monitor_spdif > 0)
-    {
-#ifdef HAVE_SPDIF_POWER
-        EBU1CONFIG = spdif_power_setting ? (1 << 2) : 0;
-        /* Input source is EBUin1, Feed-through monitoring if desired */
-#else
-        EBU1CONFIG = (1 << 2);
-        /* Input source is EBUin1, Feed-through monitoring */
-#endif
-    }
-    else if (monitor_spdif == 0)
-    {
-        /* SCLK2, TXSRC = IIS1recv, validity, normal operation */
-        EBU1CONFIG = (7 << 12) | (4 << 8) | (1 << 5) | (5 << 2);
-    }
-} /* audio_spdif_set_monitor */
-
 #endif /* HAVE_SPDIF_IN */
 
 /**
@@ -434,7 +389,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
     if (rec_source == AUDIO_SRC_SPDIF)
     {
         /* must measure SPDIF sample rate before configuring codecs */
-        unsigned long sr = measure_spdif_sample_rate();
+        unsigned long sr = spdif_measure_frequency();
         /* round to master list for SPDIF rate */
         int index = round_value_to_list32(sr, audio_master_sampr_list,
                                           SAMPR_NUM_FREQ, false);

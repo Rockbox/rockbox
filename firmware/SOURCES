@@ -366,6 +366,9 @@ target/coldfire/iriver/h100/backlight-h100.c
 target/coldfire/iriver/h100/button-h100.c
 target/coldfire/iriver/h100/lcd-as-h100.S
 target/coldfire/iriver/h100/lcd-h100.c
+#ifndef BOOTLOADER
+target/coldfire/iriver/h100/spdif-h100.c
+#endif
 target/coldfire/iriver/h100/usb-h100.c
 #endif /* SIMULATOR */
 #endif /* IRIVER_H100_SERIES */

@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Linus Nielsen Feltzing
+ * Copyright (C) 2006 by Michal Sevakis
+ * Based on the work of Thom Johansen
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,40 +17,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _POWER_H_
-#define _POWER_H_
+#ifndef SPDIF_H
+#define SPDIF_H
 
-#if CONFIG_CHARGING == CHARGING_CONTROL
-extern bool charger_enabled;
-void charger_enable(bool on);
-#endif
+/* Initialize the S/PDIF driver */
+void spdif_init(void);
+/* Return the S/PDIF frequency in herz - unrounded */
+unsigned long spdif_measure_frequency(void);
+#ifdef HAVE_SPDIF_OUT
+/* Set the S/PDIF audio feed - Use AUDIO_SRC_* values -
+   will be off if not powered or !on */
+void spdif_set_output_source(int source, bool on);
+/* Return the last set S/PDIF audio source - literally the last value passed
+   to spdif_set_monitor regardless of power state */
+int spdif_get_output_source(bool *src_on);
+#endif /* HAVE_SPDIF_OUT */
 
-#ifdef CONFIG_CHARGING
-bool charger_inserted(void);
-#endif
-
-void power_off(void);
-void ide_power_enable(bool on);
-
-#ifndef SIMULATOR
-
-void power_init(void);
-
-# if CONFIG_CHARGING == CHARGING_MONITOR
-bool charging_state(void);
-# endif
-
-bool ide_powered(void);
-#endif
-
-#ifdef HAVE_SPDIF_POWER
-void spdif_power_enable(bool on);
-bool spdif_powered(void);
-#endif
-
-#ifdef CONFIG_TUNER
-extern bool radio_power(bool status);
-extern bool radio_powered(void);
-#endif
-
-#endif
+#endif /* SPDIF_H */

@@ -74,6 +74,9 @@
 #if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "pcm_playback.h"
+#if defined(HAVE_SPDIF_OUT) || defined(HAVE_SPDIF_IN)
+#include "spdif.h"
+#endif
 #endif
 
 #ifdef IAUDIO_X5
@@ -774,14 +777,17 @@ bool dbg_spdif(void)
     unsigned int interruptstat;
     bool valnogood, symbolerr, parityerr;
     bool done = false;
+    bool spdif_src_on;
+    int spdif_source = spdif_get_output_source(&spdif_src_on);
+    spdif_set_output_source(AUDIO_SRC_SPDIF, true);
 
     lcd_setmargins(0, 0);
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
+
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(true); /* We need SPDIF power for both sending & receiving */
 #endif
-    PHASECONFIG = 0x34;       /* Gain = 3*2^13, source = EBUIN */
 
     while (!done)
     {
@@ -914,15 +920,18 @@ bool dbg_spdif(void)
 
 #ifndef SIMULATOR
         snprintf(buf, sizeof(buf), "Measured freq: %ldHz",
-                (long)((long long)FREQMEAS*CPU_FREQ/((1 << 15)*3*(1 << 13))/128));
+                 spdif_measure_frequency());
         lcd_puts(0, line++, buf);
 #endif
 
         lcd_update();
 
         if (action_userabort(HZ/10))
-            return false;
+            break;
     }
+
+    spdif_set_output_source(spdif_source, spdif_src_on);
+
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
 #endif
