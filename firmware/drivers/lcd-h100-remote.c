@@ -484,6 +484,11 @@ static void remote_lcd_init(void)
     lcd_remote_set_invert_display(cached_invert);
 }
 
+bool remote_detect(void)
+{
+    return (GPIO_READ & 0x40000000)?false:true;
+}
+
 int remote_type(void)
 {
     return _remote_type;
@@ -499,7 +504,7 @@ static void remote_tick(void)
     int val;
     int level;
 
-    current_status = ((GPIO_READ & 0x40000000) == 0);
+    current_status = remote_detect();
     /* Only report when the status has changed */
     if (current_status != last_status)
     {

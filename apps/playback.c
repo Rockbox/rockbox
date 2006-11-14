@@ -645,6 +645,7 @@ void audio_flush_and_reload_tracks(void)
 void audio_error_clear(void)
 {
 #ifdef AUDIO_HAVE_RECORDING
+    extern void pcm_rec_error_clear(void);
     pcm_rec_error_clear();
 #endif
 }
@@ -661,6 +662,7 @@ int audio_status(void)
 
 #ifdef HAVE_RECORDING
     /* Do this here for constitency with mpeg.c version */
+    extern unsigned long pcm_rec_status(void);
     ret |= pcm_rec_status();
 #endif
 

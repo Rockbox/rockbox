@@ -48,8 +48,12 @@ void pcm_stop_recording(void);
 void pcm_calculate_rec_peaks(int *left, int *right);
 
 /** General functions for high level codec recording **/
-void pcm_rec_error_clear(void);
-unsigned long pcm_rec_status(void);
+/* pcm_rec_error_clear is deprecated for general use. audio_error_clear
+   should be used */
+/* void pcm_rec_error_clear(void); */
+/* pcm_rec_status is deprecated for general use. audio_status merges the
+   results for consistency with the hardware codec version */
+/* unsigned long pcm_rec_status(void); */
 void pcm_rec_init(void);
 void pcm_rec_mux(int source);
 int  pcm_rec_current_bitrate(void);

@@ -66,6 +66,7 @@
 
 #if defined(IAUDIO_X5) && !defined (SIMULATOR)
 #include "pcf50606.h"
+#include "lcd-remote-target.h"
 #endif
 
 /*
@@ -317,7 +318,7 @@ int pid_i = 0;                      /* PID integral term */
 static unsigned int avgbat;     /* average battery voltage (filtering) */
 static unsigned int battery_centivolts;/* filtered battery voltage, centvolts */
 #ifdef HAVE_CHARGE_CTRL
-#define BATT_AVE_SAMPLES	32  /* filter constant / @ 2Hz sample rate */
+#define BATT_AVE_SAMPLES    32  /* filter constant / @ 2Hz sample rate */
 #elif CONFIG_BATTERY == BATT_LIPOL1300
 #define BATT_AVE_SAMPLES   128  /* slow filter for iriver */
 #else
@@ -723,26 +724,17 @@ static int runcurrent(void)
 #endif
 
 #if defined(HAVE_RECORDING) && defined(CURRENT_RECORD)
-#if CONFIG_CODEC == SWCODEC        
-    unsigned int audio_stat = pcm_rec_status();
-#else
-    int audio_stat = audio_status();
-#endif
-    if (audio_stat & AUDIO_STATUS_RECORD)
+    if (audio_status() & AUDIO_STATUS_RECORD)
         current += CURRENT_RECORD;
 #endif
 
 #ifdef HAVE_SPDIF_POWER
-#ifdef SPDIF_POWER_INVERTED
-    if (GPIO1_OUT & 0x01000000)
-#else
-    if (!(GPIO1_OUT & 0x01000000))
-#endif
+    if (spdif_powered())
         current += CURRENT_SPDIF_OUT;
 #endif
 
 #ifdef HAVE_REMOTE_LCD
-    if ((GPIO_READ & 0x40000000) == 0)
+    if (remote_detect())
         current += CURRENT_REMOTE;
 #endif
 
@@ -1271,11 +1263,7 @@ void sys_poweroff(void)
        power off after an 20 second timeout */
     shutdown_timeout = HZ*20;
 #if defined(HAVE_RECORDING)
-#if CONFIG_CODEC == SWCODEC        
-    unsigned int audio_stat = pcm_rec_status();
-#else
     int audio_stat = audio_status();
-#endif
     if (audio_stat & AUDIO_STATUS_RECORD) {
         audio_stop_recording();
         shutdown_timeout += 8*HZ;

@@ -33,6 +33,7 @@
 #define REMOTETYPE_H300_LCD 2
 #define REMOTETYPE_H300_NONLCD 3
 extern int remote_type(void);
+extern bool remote_detect(void);
 #endif
 
 #define STYLE_DEFAULT 0
