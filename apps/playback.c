@@ -2215,12 +2215,14 @@ static void audio_clear_track_entries(bool clear_unbuffered)
 }
 
 /* FIXME: This code should be made more generic and move to metadata.c */
-static void audio_strip_id3v1_tag(void)
+static void audio_strip_tags(void)
 {
     int i;
     static const unsigned char tag[] = "TAG";
+    static const unsigned char apetag[] = "APETAGEX";    
     size_t tag_idx;
     size_t cur_idx;
+    size_t len, version;
 
     tag_idx = RINGBUF_SUB(buf_widx, 128);
 
@@ -2230,7 +2232,7 @@ static void audio_strip_id3v1_tag(void)
         for(i = 0;i < 3;i++)
         {
             if(filebuf[cur_idx] != tag[i])
-                return;
+                goto strip_ape_tag;
 
             cur_idx = RINGBUF_ADD(cur_idx, 1);
         }
@@ -2240,6 +2242,37 @@ static void audio_strip_id3v1_tag(void)
         buf_widx = tag_idx;
         tracks[track_widx].available -= 128;
         tracks[track_widx].filesize -= 128;
+    }
+
+strip_ape_tag:
+    /* Check for APE tag (look for the APE tag footer) */
+    tag_idx = RINGBUF_SUB(buf_widx, 32);
+
+    if (FILEBUFUSED > 32 && tag_idx > buf_ridx)
+    {
+        cur_idx = tag_idx;
+        for(i = 0;i < 8;i++)
+        {
+            if(filebuf[cur_idx] != apetag[i])
+                return;
+
+            cur_idx = RINGBUF_ADD(cur_idx, 1);
+        }
+
+        /* Read the version and length from the footer */
+        version = letoh32(*(long *)(filebuf + tag_idx + 8));
+        len = letoh32(*(long *)(filebuf + tag_idx + 12));
+        if (version == 2000)
+            len += 32; /* APEv2 has a 32 byte header */
+
+        /* Skip APE tag */
+        if (FILEBUFUSED > len)
+        {
+            logf("Skipping APE tag (%dB)", len);
+            buf_widx = RINGBUF_SUB(buf_widx, len);
+            tracks[track_widx].available -= len;
+            tracks[track_widx].filesize -= len;
+        }
     }
 }
 
@@ -2332,7 +2365,7 @@ static bool audio_read_file(size_t minimum)
         logf("Finished buf:%dB", tracks[track_widx].filesize);
         close(current_fd);
         current_fd = -1;
-        audio_strip_id3v1_tag();
+        audio_strip_tags();
 
         track_widx++;
         track_widx &= MAX_TRACK_MASK;
