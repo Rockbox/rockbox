@@ -941,46 +941,24 @@ static char* get_tag(struct wps_data* wps_data,
                         *intval = 1; /* off */
                     else
                     {
-                        switch (global_settings.replaygain_type)
-                        {
-                            case REPLAYGAIN_TRACK: /* track */
-                                if (id3->track_gain_string == NULL)
-                                    *intval = 6; /* no tag */
-                                else
-                                    *intval = 2;
-                                break;
-                            case REPLAYGAIN_ALBUM: /* album */
-                                if (id3->album_gain_string == NULL)
-                                    *intval = 6; /* no tag */
-                                else
-                                    *intval = 3;
-                                break;
-                            case REPLAYGAIN_SHUFFLE: /* shuffle */
-                                if (global_settings.playlist_shuffle)
-                                {
-                                    if (id3->track_gain_string == NULL)
-                                        *intval = 6;  /* no tag */
-                                    else
-                                        *intval = 4; /* shuffle track */
-                                }
-                                else
-                                {
-                                    if (id3->album_gain_string == NULL)
-                                        *intval = 6;  /* no tag */
-                                    else
-                                        *intval = 5; /* shuffle album */
-                                }
-                                break;
-                            default:
-                                *intval = 1; /* shoudn't happen, treat as off */
-                                break;
-                        } /* switch - replay gain type */
-                    }  /* if - replay gain set */
+                        int type = get_replaygain_mode(
+                            id3->track_gain_string != NULL,
+                            id3->album_gain_string != NULL);
+                        
+                        if (type < 0)
+                            *intval = 6;    /* no tag */
+                        else
+                            *intval = type + 2;
+                            
+                        if (global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
+                            *intval += 2;
+                    }
+
                     switch (*intval)
                     {
                         case 1:
                         case 6:
-                            strncpy(buf, "+0.00 dB", buf_size);
+                            return "+0.00 dB";
                             break;
                         case 2:
                         case 4:

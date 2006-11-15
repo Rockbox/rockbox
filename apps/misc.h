@@ -82,4 +82,12 @@ long default_event_handler(long event);
 void car_adapter_mode_init(void);
 extern int show_logo(void);
 
+#if CONFIG_CODEC == SWCODEC
+/* Return current ReplayGain mode a file should have (REPLAYGAIN_TRACK or
+ * REPLAYGAIN_ALBUM) if ReplayGain processing is enabled, or -1 if no
+ * information present.
+ */
+int get_replaygain_mode(bool have_track_gain, bool have_album_gain);
+#endif
+
 #endif /* MISC_H */

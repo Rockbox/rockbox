@@ -26,6 +26,7 @@
 #include "system.h"
 #include "settings.h"
 #include "replaygain.h"
+#include "misc.h"
 #include "debug.h"
 
 #ifndef SIMULATOR
@@ -1093,10 +1094,8 @@ void dsp_set_replaygain(bool always)
 
         if (global_settings.replaygain || global_settings.replaygain_noclip)
         {
-            bool track_mode
-                = ((global_settings.replaygain_type == REPLAYGAIN_TRACK)
-                    || ((global_settings.replaygain_type == REPLAYGAIN_SHUFFLE)
-                        && global_settings.playlist_shuffle));
+            bool track_mode = get_replaygain_mode(dsp->track_gain != 0,
+                dsp->album_gain != 0) == REPLAYGAIN_TRACK;
             long peak = (track_mode || !dsp->album_peak)
                 ? dsp->track_peak : dsp->album_peak;
 
