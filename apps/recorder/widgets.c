@@ -18,8 +18,7 @@
  ****************************************************************************/
 #include <lcd.h>
 #include <limits.h>
-
-#include "widgets.h"
+#include "scrollbar.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -29,79 +28,8 @@
 void scrollbar(int x, int y, int width, int height, int items, int min_shown, 
                int max_shown, int orientation)
 {
-    int min;
-    int max;
-    int inner_len;
-    int start;
-    int size;
-
-    /* draw box */
-    lcd_drawrect(x, y, width, height);
-
-    lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-
-    /* clear edge pixels */
-    lcd_drawpixel(x, y);
-    lcd_drawpixel((x + width - 1), y);
-    lcd_drawpixel(x, (y + height - 1));
-    lcd_drawpixel((x + width - 1), (y + height - 1));
-
-    /* clear pixels in progress bar */
-    lcd_fillrect(x + 1, y + 1, width - 2, height - 2);
-
-    /* min should be min */
-    if(min_shown < max_shown) { 
-        min = min_shown;
-        max = max_shown;
-    }
-    else {
-        min = max_shown;
-        max = min_shown;
-    }
-
-    /* limit min and max */
-    if(min < 0)
-        min = 0;
-    if(min > items)
-        min = items;
-
-    if(max < 0)
-        max = 0;
-    if(max > items)
-        max = items;
-
-    if (orientation == VERTICAL)
-        inner_len = height - 2;
-    else
-        inner_len = width - 2;
-
-    /* avoid overflows */
-    while (items > (INT_MAX / inner_len)) {
-        items >>= 1;
-        min >>= 1;
-        max >>= 1;
-    }
-
-    /* calc start and end of the knob */
-    if (items > 0 && items > (max - min)) {
-        size = inner_len * (max - min) / items;
-        if (size == 0) { /* width of knob is null */
-            size = 1;
-            start = (inner_len - 1) * min / items;
-        } else {
-            start = (inner_len - size) * min / (items - (max - min));
-        }
-    } else {  /* if null draw full bar */
-        size = inner_len;
-        start = 0;
-    }
-
-    lcd_set_drawmode(DRMODE_SOLID);
-
-    if(orientation == VERTICAL)
-        lcd_fillrect(x + 1, y + start + 1, width - 2, size);
-    else
-        lcd_fillrect(x + start + 1, y + 1, size, height - 2);
+    gui_scrollbar_draw(&screens[SCREEN_MAIN],x,y,width,height,
+                       items,min_shown, max_shown, orientation);
 }
 
 /*
