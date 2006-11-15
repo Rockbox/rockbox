@@ -1134,7 +1134,7 @@ void game (void)
 
         draw_apple();
 
-        rb->sleep(HZ/speed); /* Make snake more addaptive for frequency shifts */
+        rb->sleep(HZ/speed); 
 
         button = rb->button_get(false);
 
