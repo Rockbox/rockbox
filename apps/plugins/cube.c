@@ -558,6 +558,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
     xlcd_init(rb);
 #elif defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);

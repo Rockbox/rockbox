@@ -3101,11 +3101,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
         draw_extras(year, day, month, temphour, minute, second);
 
-#if (CONFIG_KEYPAD == IPOD_4G_PAD)
-        rb->lcd_drawline (113, 0, 113, 65);
-        rb->lcd_drawline (0, 65, 113, 65);
-#endif
-
         if(!idle_poweroff)
             rb->reset_poweroff_timer();
 

@@ -657,6 +657,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     (void)parameter;
     rb = api;
+    rb->lcd_set_backdrop(NULL);
 
     while( !exit )
     {

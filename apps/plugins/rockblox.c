@@ -910,6 +910,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->srand (*rb->current_tick);
+    rb->lcd_set_backdrop(NULL);
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_SYSFIXED);

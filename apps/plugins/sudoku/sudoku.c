@@ -1125,6 +1125,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* plugin init */
     rb = api;
     /* end of plugin init */
+    
+    rb->lcd_set_backdrop(NULL);
 
     clear_state(&state);
 

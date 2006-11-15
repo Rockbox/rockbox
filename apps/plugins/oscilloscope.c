@@ -575,6 +575,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(GRAPH_COLOR);
     rb->lcd_set_background(BACKG_COLOR);
+    rb->lcd_set_backdrop(NULL);
     rb->lcd_clear_display();
     rb->lcd_update();
 #endif

@@ -466,6 +466,9 @@ static const struct plugin_api rockbox_api = {
 #endif
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
+
+    lcd_set_backdrop,
+
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -485,6 +488,7 @@ int plugin_load(const char* plugin, void* parameter)
 #ifdef HAVE_REMOTE_LCD
     int rxm, rym;
 #endif
+
 #if LCD_DEPTH > 1
     fb_data* old_backdrop;
 #endif
@@ -567,10 +571,11 @@ int plugin_load(const char* plugin, void* parameter)
     xm = lcd_getxmargin();
     ym = lcd_getymargin();
     lcd_setmargins(0,0);
+
 #if LCD_DEPTH > 1
     old_backdrop = lcd_get_backdrop();
-    lcd_set_backdrop(NULL);
 #endif
+
     lcd_clear_display();
     lcd_update();
 #else /* !HAVE_LCD_BITMAP */

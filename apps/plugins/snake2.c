@@ -1134,7 +1134,7 @@ void game (void)
 
         draw_apple();
 
-        rb->sleep(HZ/speed);
+        rb->sleep(HZ/speed); /* Make snake more addaptive for frequency shifts */
 
         button = rb->button_get(false);
 
@@ -1326,7 +1326,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     /* Lets use the default font */
     rb->lcd_setfont(FONT_SYSFIXED);
-
+    rb->lcd_set_backdrop(NULL);
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_foreground(LCD_BLACK);
     rb->lcd_set_background(LCD_WHITE);

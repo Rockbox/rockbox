@@ -546,6 +546,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #endif
 
+    rb->lcd_set_backdrop(NULL);
+
     init_mandelbrot_set();
 
     /* main loop */

@@ -849,6 +849,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->profile_thread();
 #endif
 
+   rb->lcd_set_backdrop(NULL);
+
    D_DoomMain ();
 
 #ifdef RB_PROFILE

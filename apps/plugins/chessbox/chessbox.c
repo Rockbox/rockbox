@@ -643,10 +643,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     /* plugin init */
     (void)parameter;
     rb = api;
+    rb->lcd_set_backdrop(NULL);
     /* end of plugin init */
 
     /* load opening book, soon */
-    
+
     /* init board */
     GNUChess_Initialize();
     

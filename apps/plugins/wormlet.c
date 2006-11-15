@@ -2355,6 +2355,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_background(COLOR_BG);
 #endif
 
+    rb->lcd_set_backdrop(NULL);
+
 #ifdef DEBUG_WORMLET
     testline_in_rect();
     test_worm_argh_collision_in_moves();

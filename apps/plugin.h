@@ -578,6 +578,8 @@ struct plugin_api {
 #endif
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
+
+    void (*lcd_set_backdrop)(fb_data* backdrop);
 };
 
 /* plugin header */

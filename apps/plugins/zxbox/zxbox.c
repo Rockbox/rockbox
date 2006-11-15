@@ -72,6 +72,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #if CODEC == SWCODEC && !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
+    rb->lcd_set_backdrop(NULL);
     rb->splash(HZ, true, "Welcome to ZXBox");
 
 #ifdef USE_IRAM

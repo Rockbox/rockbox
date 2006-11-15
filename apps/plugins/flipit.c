@@ -469,6 +469,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
+    rb->lcd_set_backdrop(NULL);
+
     rb->splash(HZ, true, "FlipIt!");
 
 #ifdef HAVE_LCD_BITMAP

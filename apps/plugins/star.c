@@ -1115,6 +1115,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         rb->lcd_getstringsize("a", &char_width, &char_height);
 
 #if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
     rb->lcd_set_background( LCD_BLACK );
     rb->lcd_set_foreground( LCD_WHITE );
 #endif

@@ -1562,6 +1562,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     jewels_loadscores(&bj);
 
     rb->lcd_setfont(FONT_SYSFIXED);
+    rb->lcd_set_backdrop(NULL);
     jewels_setcolors();
 
     while(!exit) {

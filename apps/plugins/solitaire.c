@@ -362,17 +362,11 @@ static void draw_card_ext( int x, int y, bool selected, bool cursor )
 
     if( selected )
     {
-#if LCD_DEPTH > 1
-        rb->lcd_set_foreground( FRAME_COLOR );
-#endif
         rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #ifdef LARGE_CARD
         rb->lcd_drawrect( x+2, y+2, CARD_WIDTH-4, CARD_HEIGHT-4 );
 #endif
     }
-#if LCD_DEPTH > 1
-    rb->lcd_set_foreground( LCD_BLACK );
-#endif
 
     if( cursor )
     {
@@ -574,11 +568,6 @@ int solitaire_menu(bool in_game)
     int i = 0;
 
     struct menu_item items[5];
-
-#if LCD_DEPTH > 1
-    rb->lcd_set_background(LCD_DEFAULT_BG);
-    rb->lcd_set_foreground(LCD_DEFAULT_FG);
-#endif
 
     if (in_game)
     {
@@ -1098,14 +1087,7 @@ int solitaire( void )
 
     while( true )
     {
-#if LCD_DEPTH>1
-        rb->lcd_set_background(BACKGROUND_COLOR);
-#endif
         rb->lcd_clear_display();
-
-#if LCD_DEPTH > 1
-        rb->lcd_set_foreground(LCD_BLACK);
-#endif
 
         /* get the biggest column length so that display can be "optimized" */
         biggest_col_length = 0;

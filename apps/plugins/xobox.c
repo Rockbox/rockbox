@@ -861,6 +861,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->lcd_setfont (FONT_SYSFIXED);
+    rb->lcd_set_backdrop(NULL);
 
     /* Permanently enable the backlight (unless the user has turned it off) */
     if (rb->global_settings->backlight_timeout > 0)

@@ -2941,6 +2941,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     rb->lcd_set_foreground(COLOR_WHITE);
+    rb->lcd_set_backdrop(NULL);
     rb->lcd_fillrect(0,0,LCD_WIDTH,LCD_HEIGHT);
     rb->splash( HZ/2, true, "Rock Paint");
 

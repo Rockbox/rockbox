@@ -445,6 +445,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int ret;
 
     rb = api; /* copy to global api pointer */
+    rb->lcd_set_backdrop(NULL);
     (void)parameter;
     if (rb->global_settings->backlight_timeout > 0)
     {
