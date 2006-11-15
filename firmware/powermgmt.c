@@ -852,6 +852,9 @@ static void power_thread_sleep(int ticks)
              * battery_centivolts is the centivolt-scaled filtered battery value.
              */
             battery_centivolts = (avgbat / BATT_AVE_SAMPLES + 5000) / 10000;
+            
+            /* update battery status every time an update is available */
+            battery_status_update();
         }
         else if (battery_percent < 8) {
             /* If battery is low, observe voltage during disk activity.
@@ -860,6 +863,10 @@ static void power_thread_sleep(int ticks)
              */
             battery_centivolts = (battery_adc_voltage() +
                                   battery_centivolts + 1) / 2;
+
+            /* update battery status every time an update is available */
+            battery_status_update();
+            
 #if (CONFIG_BATTERY!=BATT_4AA_NIMH) && (CONFIG_BATTERY!=BATT_3AAA)&& \
     (CONFIG_BATTERY!=BATT_1AA)
             if (!shutdown_timeout &&
