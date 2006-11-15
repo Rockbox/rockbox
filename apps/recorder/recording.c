@@ -691,6 +691,7 @@ void rec_set_source(int source, unsigned flags)
                 break;
             /* I2S recording and playback */
             uda1380_enable_recording(false);    /* source line */
+            uda1380_set_monitor(true);
 #endif
 #ifdef HAVE_TLV320
             /* I2S recording and analog playback */
