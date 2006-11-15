@@ -937,11 +937,60 @@ static char* get_tag(struct wps_data* wps_data,
 #if CONFIG_CODEC == SWCODEC
                 case 'g': /* ReplayGain */
                     *flags |= WPS_REFRESH_STATIC;
-                    if(global_settings.replaygain)
-                        *intval = global_settings.replaygain_type+2;
+                    if (global_settings.replaygain == 0)
+                        *intval = 1; /* off */
                     else
-                        *intval = 1;
-                    snprintf(buf, buf_size, "%d", *intval);
+                    {
+                        switch (global_settings.replaygain_type)
+                        {
+                            case REPLAYGAIN_TRACK: /* track */
+                                if (id3->track_gain_string == NULL)
+                                    *intval = 6; /* no tag */
+                                else
+                                    *intval = 2;
+                                break;
+                            case REPLAYGAIN_ALBUM: /* album */
+                                if (id3->album_gain_string == NULL)
+                                    *intval = 6; /* no tag */
+                                else
+                                    *intval = 3;
+                                break;
+                            case REPLAYGAIN_SHUFFLE: /* shuffle */
+                                if (global_settings.playlist_shuffle)
+                                {
+                                    if (id3->track_gain_string == NULL)
+                                        *intval = 6;  /* no tag */
+                                    else
+                                        *intval = 4; /* shuffle track */
+                                }
+                                else
+                                {
+                                    if (id3->album_gain_string == NULL)
+                                        *intval = 6;  /* no tag */
+                                    else
+                                        *intval = 5; /* shuffle album */
+                                }
+                                break;
+                            default:
+                                *intval = 1; /* shoudn't happen, treat as off */
+                                break;
+                        } /* switch - replay gain type */
+                    }  /* if - replay gain set */
+                    switch (*intval)
+                    {
+                        case 1:
+                        case 6:
+                            strncpy(buf, "+0.00 dB", buf_size);
+                            break;
+                        case 2:
+                        case 4:
+                            strncpy(buf, id3->track_gain_string, buf_size);
+                            break;
+                        case 3:
+                        case 5:
+                            strncpy(buf, id3->album_gain_string, buf_size);
+                            break;
+                    }
                     return buf;
 #endif
             }
