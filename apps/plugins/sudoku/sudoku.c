@@ -1125,8 +1125,10 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* plugin init */
     rb = api;
     /* end of plugin init */
-    
+
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
 
     clear_state(&state);
 

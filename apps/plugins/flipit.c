@@ -469,7 +469,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_foreground(LCD_BLACK);
 #endif
 
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
 
     rb->splash(HZ, true, "FlipIt!");
 

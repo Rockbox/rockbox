@@ -2699,7 +2699,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter) {
     rb->lcd_clear_display();
 
     /* start app */
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
     rb->lcd_setfont(FONT_SYSFIXED);
 
     while(!exit) {

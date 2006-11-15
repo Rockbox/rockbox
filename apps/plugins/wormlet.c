@@ -2355,7 +2355,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_background(COLOR_BG);
 #endif
 
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
 
 #ifdef DEBUG_WORMLET
     testline_in_rect();

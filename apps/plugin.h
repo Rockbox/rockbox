@@ -579,7 +579,9 @@ struct plugin_api {
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
+#if LCD_DEPTH > 1
     void (*lcd_set_backdrop)(fb_data* backdrop);
+#endif
 };
 
 /* plugin header */

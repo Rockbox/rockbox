@@ -170,12 +170,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb->lcd_setfont(0);
 
-    rb->lcd_set_backdrop(NULL);
-#if defined(HAVE_LCD_COLOR)
-    rb->lcd_set_foreground(LCD_WHITE);
-    rb->lcd_set_background(LCD_BLACK);
-#endif
-
     rb->lcd_clear_display();
 
     if (!parameter)

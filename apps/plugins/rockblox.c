@@ -910,7 +910,9 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->srand (*rb->current_tick);
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_SYSFIXED);

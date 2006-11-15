@@ -409,7 +409,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     rb = api; // copy to global api pointer
     (void)parameter;
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
     if (rb->global_settings->backlight_timeout > 0)
         rb->backlight_set_timeout(1);/* keep the light on */
 

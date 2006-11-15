@@ -467,7 +467,9 @@ static const struct plugin_api rockbox_api = {
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
+#if LCD_DEPTH > 1
     lcd_set_backdrop,
+#endif
 
 };
 

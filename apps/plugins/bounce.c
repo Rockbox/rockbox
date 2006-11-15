@@ -480,7 +480,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb = api;
 
     len = rb->strlen(SS_TITLE);
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
     rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
 

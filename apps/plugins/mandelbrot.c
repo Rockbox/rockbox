@@ -546,7 +546,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     xlcd_init(rb);
 #endif
 
+#if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
+#endif
 
     init_mandelbrot_set();
 
