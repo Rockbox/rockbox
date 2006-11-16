@@ -2490,7 +2490,7 @@ static int bubbles(struct game_context* bb) {
         rb->lcd_update();
 
         /* handle menu button presses */
-        button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
+        button = pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2);
         switch(button){
             case PLA_START:  /* start playing */
                 bb->level = startlevel;

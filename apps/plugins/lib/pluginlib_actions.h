@@ -152,7 +152,7 @@ static const struct button_mapping generic_actions[] =
     {PLA_FIRE_REPEAT,   BUTTON_ON|BUTTON_REPEAT,    BUTTON_NONE},
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
     {PLA_QUIT,          BUTTON_POWER,       BUTTON_NONE},
-    {PLA_START,         BUTTON_PLAY,        BUTTON_NONE},
+    {PLA_START,         BUTTON_UP,        BUTTON_NONE},
     {PLA_MENU,          BUTTON_DOWN,        BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT,      BUTTON_NONE},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
