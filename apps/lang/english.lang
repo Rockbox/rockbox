@@ -862,10 +862,18 @@
   <source>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Yes"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "PLAY = Yes"
     h100,h120,h300: "NAVI = Yes"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Yes"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </dest>
   <voice>
     *: ""
@@ -4714,10 +4722,18 @@
   <source>
     *: "OFF = Exit"
     h100,h120,h300: "STOP = Exit"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "PLAY/PAUSE = Exit"
+    ipod4g,ipodmini,ipodmini2g: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "OFF = Exit"
     h100,h120,h300: "STOP = Exit"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "PLAY/PAUSE = Exit"
+    ipod4g,ipodmini,ipodmini2g: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </dest>
   <voice>
     *: ""
@@ -4772,10 +4788,18 @@
   <source>
     *: "PLAY = Select"
     h100,h120,h300: "NAVI = Select"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Select"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "PLAY = Select"
     h100,h120,h300: "NAVI = Select"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Select"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </dest>
   <voice>
     *: ""
@@ -4788,10 +4812,18 @@
   <source>
     *: "ON+Play = Delete"
     h100,h120,h300: "RECORD = Delete"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "Long MENU = Delete"
+    ipod4g,ipodmini,ipodmini2g: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "ON+Play = Delete"
     h100,h120,h300: "RECORD = Delete"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "Long MENU = Delete"
+    ipod4g,ipodmini,ipodmini2g: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </dest>
   <voice>
     *: ""
@@ -4874,10 +4906,18 @@
   <source>
     *: "ON To Set"
     h100,h120,h300: "NAVI = Set"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Set"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "ON To Set"
     h100,h120,h300: "NAVI = Set"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "SELECT = Set"
+    ipod4g,ipodmini,ipodmini2g: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </dest>
   <voice>
     *: ""
@@ -4890,10 +4930,18 @@
   <source>
     *: "OFF To Revert"
     h100,h120,h300: "STOP = Revert"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "MENU = Revert"
+    ipod4g,ipodmini,ipodmini2g: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "OFF To Revert"
     h100,h120,h300: "STOP = Revert"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "MENU = Revert"
+    ipod4g,ipodmini,ipodmini2g: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </dest>
   <voice>
     *: ""
@@ -7862,10 +7910,18 @@
   <source>
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "MENU to abort"
+    ipod4g,ipodmini,ipodmini2g: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "OFF to abort"
     h100,h120,h300: "STOP to abort"
+    ipodcolor,ipodnano,ipodvideo,ipod3g: "MENU to abort"
+    ipod4g,ipodmini,ipodmini2g: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </dest>
   <voice>
     *: ""
