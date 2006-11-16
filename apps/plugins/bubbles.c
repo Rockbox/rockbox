@@ -21,6 +21,7 @@
 
 #include "plugin.h"
 #include "xlcd.h"
+#include "pluginlib_actions.h"
 
 #ifdef HAVE_LCD_BITMAP
 
@@ -52,93 +53,6 @@ PLUGIN_HEADER
 #define MAX_ANGLE    76
 #define NUM_COMPRESS 9
 #define MAX_SHOTTIME 1000
-
-/* button definitions */
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_UP
-#define BUBBLES_DOWN   BUTTON_DOWN
-#define BUBBLES_QUIT   BUTTON_OFF
-#define BUBBLES_START  BUTTON_ON
-#define BUBBLES_SELECT BUTTON_SELECT
-#define BUBBLES_RESUME BUTTON_MODE
-
-#define BUBBLES_RC_QUIT BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
-#define BUBBLES_LEFT   BUTTON_SCROLL_BACK
-#define BUBBLES_RIGHT  BUTTON_SCROLL_FWD
-#define BUBBLES_UP     BUTTON_SCROLL_FWD
-#define BUBBLES_DOWN   BUTTON_SCROLL_BACK
-#define BUBBLES_QUIT   BUTTON_MENU|BUTTON_REL
-#define BUBBLES_START  BUTTON_PLAY|BUTTON_REL
-#define BUBBLES_SELECT BUTTON_SELECT
-#define BUBBLES_RESUME BUTTON_RIGHT|BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_UP
-#define BUBBLES_DOWN   BUTTON_DOWN
-#define BUBBLES_QUIT   BUTTON_POWER
-#define BUBBLES_START  BUTTON_PLAY
-#define BUBBLES_SELECT BUTTON_SELECT
-#define BUBBLES_RESUME BUTTON_REC
-
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_UP
-#define BUBBLES_DOWN   BUTTON_DOWN
-#define BUBBLES_QUIT   BUTTON_A
-#define BUBBLES_START  BUTTON_POWER
-#define BUBBLES_SELECT BUTTON_SELECT
-#define BUBBLES_RESUME BUTTON_MENU
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_UP
-#define BUBBLES_DOWN   BUTTON_DOWN
-#define BUBBLES_QUIT   BUTTON_OFF
-#define BUBBLES_START  BUTTON_ON
-#define BUBBLES_SELECT BUTTON_PLAY
-#define BUBBLES_RESUME BUTTON_F1
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_RIGHT
-#define BUBBLES_DOWN   BUTTON_LEFT
-#define BUBBLES_QUIT   BUTTON_OFF
-#define BUBBLES_START  BUTTON_MENU
-#define BUBBLES_SELECT BUTTON_UP
-#define BUBBLES_RESUME BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_SCROLL_UP
-#define BUBBLES_DOWN   BUTTON_SCROLL_DOWN
-#define BUBBLES_QUIT   BUTTON_POWER
-#define BUBBLES_START  BUTTON_PLAY
-#define BUBBLES_SELECT BUTTON_SELECT
-#define BUBBLES_RESUME BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define BUBBLES_LEFT   BUTTON_LEFT
-#define BUBBLES_RIGHT  BUTTON_RIGHT
-#define BUBBLES_UP     BUTTON_SCROLL_UP
-#define BUBBLES_DOWN   BUTTON_SCROLL_DOWN
-#define BUBBLES_QUIT   BUTTON_POWER
-#define BUBBLES_START  BUTTON_PLAY
-#define BUBBLES_SELECT BUTTON_REW
-#define BUBBLES_RESUME BUTTON_FF
-
-#else
-    #error BUBBLES: Unsupported keypad
-#endif
 
 /* bubbles will consume height of 10*ROW_HEIGHT+2*(BUBBLE_HEIGHT-1)+BUBBLE_HEIGHT/2 */
 /* 24x24 bubbles (iPod Video) */
@@ -2395,31 +2309,29 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int button;
     int buttonres;
     long start;
-
-    button = rb->button_get_w_tmo(timeout);
+    const struct button_mapping *plugin_contexts[]
+                     = {generic_directions,generic_actions};
+    button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
-        button = BUBBLES_START;
+        button = PLA_START;
 #endif
 
     switch(button){
-        case (BUBBLES_LEFT|BUTTON_REPEAT):
+        case PLA_LEFT_REPEAT:
             if(bb->angle > MIN_ANGLE) bb->angle -= 4;
-        case BUBBLES_LEFT:   /* change angle to the left */
+        case PLA_LEFT:   /* change angle to the left */
             if(bb->angle > MIN_ANGLE) bb->angle -= 2;
             break;
 
-        case (BUBBLES_RIGHT|BUTTON_REPEAT):
+        case PLA_RIGHT_REPEAT:
             if(bb->angle < MAX_ANGLE) bb->angle += 4;
-        case BUBBLES_RIGHT:  /* change angle to the right */
+        case PLA_RIGHT:  /* change angle to the right */
             if(bb->angle < MAX_ANGLE) bb->angle += 2;
             break;
 
-        case BUBBLES_SELECT: /* fire the shot */
-#if CONFIG_KEYPAD == IRIVER_H10_PAD
-        case BUBBLES_UP: /* easier to press on H10 */
-#endif
+        case PLA_FIRE: /* fire the shot */
             if(!animblock) {
                 bb->elapsedlvl += bb->elapsedshot;
                 bb->elapsedshot = 0;
@@ -2431,29 +2343,27 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             }
             break;
 
-        case BUBBLES_START:  /* pause the game */
+        case PLA_START:  /* pause the game */
             start = *rb->current_tick;
             rb->splash(1, true, "Paused");
-            while(rb->button_get(true) != (BUBBLES_START));
+            while(pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2)
+                 != (PLA_START));
             bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);
             rb->lcd_update();
             break;
 
-        case BUBBLES_RESUME: /* save and end the game */
+        case PLA_MENU: /* save and end the game */
             if(!animblock) {
                 rb->splash(HZ/2, true, "Saving game...");
                 bubbles_savegame(bb);
                 return BB_END;
             }
             break;
-#ifdef BUBBLES_RC_QUIT
-        case BUBBLES_RC_QUIT:
-#endif
-        case BUBBLES_QUIT:   /* end the game */
+        case PLA_QUIT:   /* end the game */
             return BB_END;
 
-        case BUTTON_NONE:    /* no button pressed */
+        case ACTION_UNKNOWN:    /* no button pressed */
             break;
 
         default:
@@ -2479,6 +2389,8 @@ static int bubbles(struct game_context* bb) {
     bool startgame = false;
     bool showscores = false;
     long timeout;
+    const struct button_mapping *plugin_contexts[]
+                     = {generic_directions,generic_actions};
 
     bubbles_setcolors();
 
@@ -2578,23 +2490,20 @@ static int bubbles(struct game_context* bb) {
         rb->lcd_update();
 
         /* handle menu button presses */
-        button = rb->button_get(true);
+        button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
         switch(button){
-            case BUBBLES_START:  /* start playing */
+            case PLA_START:  /* start playing */
                 bb->level = startlevel;
                 startgame = true;
                 break;
-#ifdef BUBBLES_RC_QUIT
-            case BUBBLES_RC_QUIT:
-#endif
-            case BUBBLES_QUIT:   /* quit program */
+            case PLA_QUIT:   /* quit program */
                 if(showscores) {
                     showscores = false;
                     break;
                 }
                 return BB_QUIT;
 
-            case BUBBLES_RESUME: /* resume game */
+            case PLA_MENU: /* resume game */
                 if(!bubbles_loadgame(bb)) {
                     rb->splash(HZ*2, true, "Nothing to resume");
                 } else {
@@ -2602,12 +2511,12 @@ static int bubbles(struct game_context* bb) {
                 }
                 break;
 
-            case BUBBLES_SELECT: /* toggle high scores */
+            case PLA_FIRE: /* toggle high scores */
                 showscores = !showscores;
                 break;
 
-            case (BUBBLES_UP|BUTTON_REPEAT):
-            case BUBBLES_UP:     /* increase starting level */
+            case PLA_UP:     /* increase starting level */
+            case PLA_UP_REPEAT:
                 if(startlevel >= bb->highlevel) {
                     startlevel = 0;
                 } else {
@@ -2615,8 +2524,8 @@ static int bubbles(struct game_context* bb) {
                 }
                 break;
 
-            case (BUBBLES_DOWN|BUTTON_REPEAT):
-            case BUBBLES_DOWN:   /* decrease starting level */
+            case PLA_DOWN:   /* decrease starting level */
+            case PLA_DOWN_REPEAT:
                 if(startlevel <= 0) {
                     startlevel = bb->highlevel;
                 } else {

@@ -210,6 +210,8 @@ enum {
     ACTION_KBD_MORSE_INPUT,
     ACTION_KBD_MORSE_SELECT,
 
+
+    LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */
 };
 
 struct button_mapping {

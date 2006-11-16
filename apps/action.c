@@ -161,7 +161,8 @@ int get_action_worker(int context, int timeout,
         
         ret = do_button_check(items,button,last_button,&i);
         
-        if (context ==(int)CONTEXT_STOPSEARCHING)
+        if ((context ==(int)CONTEXT_STOPSEARCHING) ||
+             items == NULL )
             break;
         
         if (ret == ACTION_UNKNOWN )

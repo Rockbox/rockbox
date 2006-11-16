@@ -17,100 +17,44 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "pluginlib_actions.h"
 
 PLUGIN_HEADER
 
-/* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define METRONOME_QUIT BUTTON_OFF
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP BUTTON_UP
-#define METRONOME_VOL_DOWN BUTTON_DOWN
-#define METRONOME_TAP BUTTON_ON
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
+#define METRONOME_QUIT      PLA_QUIT
+#define METRONOME_VOL_UP    PLA_UP
+#define METRONOME_VOL_DOWN  PLA_DOWN
+#define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
+#define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
+#define METRONOME_TAP       PLA_START
+enum {
+    METRONOME_PLAY_TAP = LAST_PLUGINLIB_ACTION+1,
+    METRONOME_PAUSE,
+    METRONOME_SYNC 
+};
 
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define METRONOME_QUIT BUTTON_OFF
-#define METRONOME_PLAY_TAP BUTTON_MENU
-#define METRONOME_PAUSE (BUTTON_MENU | BUTTON_REPEAT)
-#define METRONOME_VOL_UP BUTTON_UP
-#define METRONOME_VOL_DOWN BUTTON_DOWN
+
+#if CONFIG_KEYPAD == ONDIO_PAD
 #define METRONOME_MSG_START "start: mode"
 #define METRONOME_MSG_STOP "pause: hold mode"
-
-#elif CONFIG_KEYPAD == PLAYER_PAD
-#define METRONOME_QUIT BUTTON_STOP
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP (BUTTON_ON | BUTTON_RIGHT)
-#define METRONOME_VOL_DOWN (BUTTON_ON | BUTTON_LEFT)
-#define METRONOME_TAP BUTTON_ON
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define METRONOME_QUIT BUTTON_OFF
-#define METRONOME_PLAYPAUSE BUTTON_ON
-#define METRONOME_VOL_UP BUTTON_UP
-#define METRONOME_VOL_DOWN BUTTON_DOWN
-#define METRONOME_TAP BUTTON_SELECT
-#define METRONOME_SYNC BUTTON_REC
+static const struct button_mapping ondio_action[] = 
+{
+    {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_NONE },
+    {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE }
+};
+#else
+#define METRONOME_PLAYPAUSE PLA_FIRE
 #define METRONOME_MSG_START "press play"
 #define METRONOME_MSG_STOP "press pause"
 
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD)
-#define METRONOME_QUIT BUTTON_MENU
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP BUTTON_SCROLL_FWD
-#define METRONOME_VOL_DOWN BUTTON_SCROLL_BACK
-#define METRONOME_TAP BUTTON_SELECT
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
-
-#elif (CONFIG_KEYPAD == IAUDIO_X5_PAD)
-#define METRONOME_QUIT BUTTON_POWER
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP BUTTON_UP
-#define METRONOME_VOL_DOWN BUTTON_DOWN
-#define METRONOME_TAP BUTTON_REC
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
-
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-#define METRONOME_QUIT BUTTON_MODE
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP BUTTON_UP
-#define METRONOME_VOL_DOWN BUTTON_DOWN
-#define METRONOME_TAP BUTTON_EQ
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+static const struct button_mapping iriver_syncaction[] = 
+{
+    {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
+};
 #endif
+#endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
 
-#if CONFIG_REMOTE_KEYPAD == H100_REMOTE
-#define METRONOME_R_QUIT BUTTON_RC_STOP
-#define METRONOME_R_PLAYPAUSE BUTTON_RC_ON
-#define METRONOME_R_VOL_UP BUTTON_RC_VOL_UP
-#define METRONOME_R_VOL_DOWN BUTTON_RC_VOL_DOWN
-#define METRONOME_R_TAP BUTTON_RC_BITRATE
-
-#elif CONFIG_KEYPAD == SANSA_E200_PAD
-#define METRONOME_QUIT BUTTON_POWER
-#define METRONOME_PLAYPAUSE BUTTON_UP
-#define METRONOME_VOL_UP BUTTON_SCROLL_UP
-#define METRONOME_VOL_DOWN BUTTON_SCROLL_DOWN
-#define METRONOME_TAP BUTTON_SELECT
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
-#define METRONOME_QUIT BUTTON_POWER
-#define METRONOME_PLAYPAUSE BUTTON_PLAY
-#define METRONOME_VOL_UP BUTTON_SCROLL_UP
-#define METRONOME_VOL_DOWN BUTTON_SCROLL_DOWN
-#define METRONOME_TAP BUTTON_FF
-#define METRONOME_MSG_START "press play"
-#define METRONOME_MSG_STOP "press pause"
-
-#endif
 
 static struct plugin_api* rb;
 
@@ -925,6 +869,21 @@ void tap(void)
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     int button;
+    const struct button_mapping *plugin_contexts[]
+                     = {generic_directions,
+#if CONFIG_KEYPAD == ONDIO_PAD
+                        ondio_action,
+#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+                        iriver_syncaction,
+#endif
+                        generic_actions};
+#if (CONFIG_KEYPAD == ONDIO_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H100_PAD) \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define PLA_ARRAY_COUNT 3
+#else
+#define PLA_ARRAY_COUNT 2
+#endif
 
     (void)parameter;
     rb = api;
@@ -947,53 +906,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
     while (true){
         reset_tap = true;
                     
-        button = rb->button_get(true);
-
-#if CONFIG_REMOTE_KEYPAD == H100_REMOTE
-        if(button && BUTTON_REMOTE) {
-            switch(button) {
-                case BUTTON_RC_STOP:
-                    button = METRONOME_QUIT;
-                    break;
-                case BUTTON_RC_ON:
-                    button = METRONOME_PLAYPAUSE;
-                    break;
-                case BUTTON_RC_VOL_UP:
-                    button = METRONOME_VOL_UP;
-                    break;
-                case BUTTON_RC_VOL_UP | BUTTON_REPEAT:
-                    button = METRONOME_VOL_UP | BUTTON_REPEAT;
-                    break;
-                case BUTTON_RC_VOL_DOWN:
-                    button = METRONOME_VOL_DOWN;
-                    break;
-                case BUTTON_RC_VOL_DOWN | BUTTON_REPEAT:
-                    button = METRONOME_VOL_DOWN | BUTTON_REPEAT;
-                    break;
-                case BUTTON_RC_FF:
-                    button = BUTTON_RIGHT;
-                    break;
-                case BUTTON_RC_FF | BUTTON_REPEAT:
-                    button = BUTTON_RIGHT | BUTTON_REPEAT;
-                    break;
-                case BUTTON_RC_REW:
-                    button = BUTTON_LEFT;
-                    break;
-                case BUTTON_RC_REW | BUTTON_REPEAT:
-                    button = BUTTON_LEFT | BUTTON_REPEAT;
-                    break;
-                case BUTTON_RC_MODE:
-                    button = METRONOME_SYNC;
-                    break;
-                case BUTTON_RC_REC:
-                case BUTTON_RC_SOURCE:
-                case BUTTON_RC_MENU:
-                case BUTTON_RC_BITRATE:
-                    button = METRONOME_TAP;
-                    break;
-            }
-        }
-#endif
+        button = pluginlib_getaction(rb,TIMEOUT_BLOCK,
+                                     plugin_contexts,PLA_ARRAY_COUNT);
     
         switch (button) {
 
@@ -1031,13 +945,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
 #endif
                 
             case METRONOME_VOL_UP:
-            case METRONOME_VOL_UP | BUTTON_REPEAT:
+            case METRONOME_VOL_UP_REP:
                 change_volume(1);
                 calc_period();
                 break;
           
             case METRONOME_VOL_DOWN:
-            case METRONOME_VOL_DOWN | BUTTON_REPEAT:
+            case METRONOME_VOL_DOWN_REP:
                 change_volume(-1);
                 calc_period();
                 break;
@@ -1060,7 +974,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 #endif
 
-#ifdef METRONOME_SYNC
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
             case METRONOME_SYNC:
                 minitick = period;
                 break;

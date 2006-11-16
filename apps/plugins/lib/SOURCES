@@ -25,3 +25,4 @@ xlcd_scroll.c
 bmp.c
 #endif
 #endif
+pluginlib_actions.c
