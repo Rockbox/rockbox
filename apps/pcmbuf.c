@@ -37,6 +37,13 @@
 #include "dsp.h"
 #include "thread.h"
 
+/* Define PCMBUF_MUTING if the codec requires muting to prevent pops
+ * Currently assumes anything other than tlv320 and uda1380 require it
+ */
+#if !defined(HAVE_UDA1380) && !defined(HAVE_TLV320)
+#define PCMBUF_MUTING
+#endif
+
 /* Keep watermark high for iPods at least (2s) */
 #define PCMBUF_WATERMARK     (NATIVE_FREQUENCY * 4 * 2)
 
@@ -333,9 +340,13 @@ void pcmbuf_play_stop(void)
 {
     /** Prevent a very tiny pop from happening by muting audio
      *  until dma has been initialized. */
+#ifdef PCMBUF_MUTING
     pcm_mute(true);
+#endif
     pcm_play_stop();
+#ifdef PCMBUF_MUTING
     pcm_mute(false);
+#endif
 
     pcmbuf_unplayed_bytes = 0;
     pcmbuf_mix_chunk = NULL;
@@ -413,11 +424,15 @@ size_t pcmbuf_get_bufsize(void)
 }
 
 void pcmbuf_pause(bool pause) {
+#ifdef PCMBUF_MUTING
     if (pause)
-        pcm_mute(true);
+       pcm_mute(true);
+#endif
     pcm_play_pause(!pause);
+#ifdef PCMBUF_MUTING
     if (!pause)
         pcm_mute(false);
+#endif
     trigger_cpu_boost();
 }
 
@@ -426,9 +441,11 @@ void pcmbuf_play_start(void)
 {
     if (!pcm_is_playing() && pcmbuf_unplayed_bytes)
     {
+#ifdef PCMBUF_MUTING
         /** Prevent a very tiny pop from happening by muting audio
          *  until dma has been initialized. */
         pcm_mute(true);
+#endif
 
         if (pcmbuf_read != NULL)
         {
@@ -438,8 +455,10 @@ void pcmbuf_play_start(void)
                 (unsigned char *)pcmbuf_read->addr, last_chunksize);
         }
 
+#ifdef PCMBUF_MUTING
         /* Now unmute the audio. */
         pcm_mute(false);
+#endif
     }
 }
 
