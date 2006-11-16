@@ -2260,8 +2260,10 @@ strip_ape_tag:
         }
 
         /* Read the version and length from the footer */
-        version = letoh32(*(long *)(filebuf + tag_idx + 8));
-        len = letoh32(*(long *)(filebuf + tag_idx + 12));
+        version = filebuf[tag_idx+8] | (filebuf[tag_idx+9] << 8) |
+                  (filebuf[tag_idx+10] << 16) | (filebuf[tag_idx+11] << 24);
+        len = filebuf[tag_idx+12] | (filebuf[tag_idx+13] << 8) |
+              (filebuf[tag_idx+14] << 16) | (filebuf[tag_idx+15] << 24);
         if (version == 2000)
             len += 32; /* APEv2 has a 32 byte header */
 
