@@ -54,6 +54,33 @@ PLUGIN_HEADER
 #define NUM_COMPRESS 9
 #define MAX_SHOTTIME 1000
 
+/* keyboard layouts */
+#define BUBBLES_LEFT        PLA_LEFT
+#define BUBBLES_LEFT_REP    PLA_LEFT_REPEAT
+#define BUBBLES_RIGHT       PLA_RIGHT
+#define BUBBLES_RIGHT_REP   PLA_RIGHT_REPEAT
+#define BUBBLES_QUIT    PLA_QUIT
+#define BUBBLES_START   PLA_START
+#define BUBBLES_SELECT  PLA_FIRE
+#define BUBBLES_RESUME  PLA_MENU
+
+#if CONFIG_KEYPAD != ONDIO_PAD
+
+#define BUBBLES_LVLINC      PLA_UP
+#define BUBBLES_LVLINC_REP  PLA_UP_REPEAT
+#define BUBBLES_LVLDEC      PLA_DOWN
+#define BUBBLES_LVLDEC_REP  PLA_DOWN_REPEAT
+
+#else /* ondio keys */
+
+#define BUBBLES_LVLINC      PLA_RIGHT
+#define BUBBLES_LVLINC_REP  PLA_RIGHT_REPEAT
+#define BUBBLES_LVLDEC      PLA_LEFT
+#define BUBBLES_LVLDEC_REP  PLA_LEFT_REPEAT
+
+#endif
+
+
 /* bubbles will consume height of 10*ROW_HEIGHT+2*(BUBBLE_HEIGHT-1)+BUBBLE_HEIGHT/2 */
 /* 24x24 bubbles (iPod Video) */
 #if (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
@@ -2315,23 +2342,23 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
 
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
-        button = PLA_START;
+        button = BUBBLES_START;
 #endif
 
     switch(button){
-        case PLA_LEFT_REPEAT:
+        case BUBBLES_LEFT_REP:
             if(bb->angle > MIN_ANGLE) bb->angle -= 4;
-        case PLA_LEFT:   /* change angle to the left */
+        case BUBBLES_LEFT:   /* change angle to the left */
             if(bb->angle > MIN_ANGLE) bb->angle -= 2;
             break;
 
-        case PLA_RIGHT_REPEAT:
+        case BUBBLES_RIGHT_REP:
             if(bb->angle < MAX_ANGLE) bb->angle += 4;
-        case PLA_RIGHT:  /* change angle to the right */
+        case BUBBLES_RIGHT:  /* change angle to the right */
             if(bb->angle < MAX_ANGLE) bb->angle += 2;
             break;
 
-        case PLA_FIRE: /* fire the shot */
+        case BUBBLES_SELECT: /* fire the shot */
             if(!animblock) {
                 bb->elapsedlvl += bb->elapsedshot;
                 bb->elapsedshot = 0;
@@ -2343,24 +2370,24 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
             }
             break;
 
-        case PLA_START:  /* pause the game */
+        case BUBBLES_START:  /* pause the game */
             start = *rb->current_tick;
             rb->splash(1, true, "Paused");
             while(pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2)
-                 != (PLA_START));
+                 != (BUBBLES_START));
             bb->startedshot += *rb->current_tick-start;
             bubbles_drawboard(bb);
             rb->lcd_update();
             break;
 
-        case PLA_MENU: /* save and end the game */
+        case BUBBLES_RESUME: /* save and end the game */
             if(!animblock) {
                 rb->splash(HZ/2, true, "Saving game...");
                 bubbles_savegame(bb);
                 return BB_END;
             }
             break;
-        case PLA_QUIT:   /* end the game */
+        case BUBBLES_QUIT:   /* end the game */
             return BB_END;
 
         case ACTION_UNKNOWN:    /* no button pressed */
@@ -2492,18 +2519,18 @@ static int bubbles(struct game_context* bb) {
         /* handle menu button presses */
         button = pluginlib_getaction(rb,TIMEOUT_BLOCK,plugin_contexts,2);
         switch(button){
-            case PLA_START:  /* start playing */
+            case BUBBLES_START:  /* start playing */
                 bb->level = startlevel;
                 startgame = true;
                 break;
-            case PLA_QUIT:   /* quit program */
+            case BUBBLES_QUIT:   /* quit program */
                 if(showscores) {
                     showscores = false;
                     break;
                 }
                 return BB_QUIT;
 
-            case PLA_MENU: /* resume game */
+            case BUBBLES_RESUME: /* resume game */
                 if(!bubbles_loadgame(bb)) {
                     rb->splash(HZ*2, true, "Nothing to resume");
                 } else {
@@ -2511,12 +2538,12 @@ static int bubbles(struct game_context* bb) {
                 }
                 break;
 
-            case PLA_FIRE: /* toggle high scores */
+            case BUBBLES_SELECT: /* toggle high scores */
                 showscores = !showscores;
                 break;
 
-            case PLA_UP:     /* increase starting level */
-            case PLA_UP_REPEAT:
+            case BUBBLES_LVLINC:     /* increase starting level */
+            case BUBBLES_LVLINC_REP:
                 if(startlevel >= bb->highlevel) {
                     startlevel = 0;
                 } else {
@@ -2524,8 +2551,8 @@ static int bubbles(struct game_context* bb) {
                 }
                 break;
 
-            case PLA_DOWN:   /* decrease starting level */
-            case PLA_DOWN_REPEAT:
+            case BUBBLES_LVLDEC:   /* decrease starting level */
+            case BUBBLES_LVLDEC_REP:
                 if(startlevel <= 0) {
                     startlevel = bb->highlevel;
                 } else {
