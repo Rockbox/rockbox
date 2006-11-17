@@ -27,6 +27,10 @@ PLUGIN_HEADER
 #define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
 #define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
 #define METRONOME_TAP       PLA_START
+#define METRONOME_LEFT      PLA_LEFT
+#define METRONOME_RIGHT     PLA_RIGHT
+#define METRONOME_LEFT_REP      PLA_LEFT_REPEAT
+#define METRONOME_RIGHT_REP     PLA_RIGHT_REPEAT
 enum {
     METRONOME_PLAY_TAP = LAST_PLUGINLIB_ACTION+1,
     METRONOME_PAUSE,
@@ -39,7 +43,7 @@ enum {
 #define METRONOME_MSG_STOP "pause: hold mode"
 static const struct button_mapping ondio_action[] = 
 {
-    {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_NONE },
+    {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_MENU },
     {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE }
 };
 #else
@@ -956,15 +960,15 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 calc_period();
                 break;
 
-            case BUTTON_LEFT:
+            case METRONOME_LEFT:
                 bpm_step_counter = 0;
-            case BUTTON_LEFT | BUTTON_REPEAT:
+            case METRONOME_LEFT_REP:
                 change_bpm(-1);
                 break;
 
-            case BUTTON_RIGHT:
+            case METRONOME_RIGHT:
                 bpm_step_counter = 0;
-            case BUTTON_RIGHT | BUTTON_REPEAT:
+            case METRONOME_RIGHT_REP:
                 change_bpm(1);
                 break;
 
