@@ -542,7 +542,7 @@ if [ -z "$rootdir" ]; then
     echo "This script couldn't find your source code root directory. Please enter the"
     echo "full path to the source code directory here:"
 
-    firmdir=`input`
+    rootdir=`input`
   fi
 
   #####################################################################
