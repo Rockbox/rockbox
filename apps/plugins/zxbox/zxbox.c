@@ -20,6 +20,7 @@
 #include "zxconfig.h"
 
 PLUGIN_HEADER
+PLUGIN_IRAM_DECLARE
 
 struct plugin_api* rb;
 
@@ -36,14 +37,6 @@ int privatemap;
 int use_shm = 0;
 int small_screen,pause_on_iconify;
 int vga_pause_bg;
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
 
 #include "keymaps.h"
 #include "zxvid_com.h"
@@ -75,13 +68,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     rb->lcd_set_backdrop(NULL);
     rb->splash(HZ, true, "Welcome to ZXBox");
 
-#ifdef USE_IRAM
-   /* We need to stop audio playback in order to use IRAM */
-   rb->audio_stop();
-
-   rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-   rb->memset(iedata, 0, iend - iedata);
-#endif
+    PLUGIN_IRAM_INIT(rb)
 
     sp_init();
 

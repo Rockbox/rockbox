@@ -21,14 +21,7 @@
 #include "rockmacros.h"
 
 PLUGIN_HEADER
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
+PLUGIN_IRAM_DECLARE
 
 /* here is a global api struct pointer. while not strictly necessary,
    it's nice not to have to pass the api pointer in all function calls
@@ -187,10 +180,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         audio_buffer_free = plugin_start_addr - (unsigned char *)audio_bufferbase;
 #endif
     setoptions();
-#ifdef USE_IRAM
-    memcpy(iramstart, iramcopy, iramend-iramstart);
-    memset(iedata, 0, iend - iedata);
-#endif
+
+    PLUGIN_IRAM_INIT(rb)
+
     shut=0;
     cleanshut=0;
 

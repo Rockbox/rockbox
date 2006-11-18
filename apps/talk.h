@@ -62,7 +62,9 @@ extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 void talk_init(void);
 bool talk_voice_required(void); /* returns true if voice codec required */
 int talk_get_bufsize(void); /* get the loaded voice file size */
+#if CONFIG_CODEC != SWCODEC
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */
+#endif
 int talk_id(long id, bool enqueue); /* play a voice ID from voicefont */
 int talk_file(const char* filename, bool enqueue); /* play a thumbnail from file */
 int talk_number(long n, bool enqueue); /* say a number */

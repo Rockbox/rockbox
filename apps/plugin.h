@@ -107,7 +107,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 35
+#define PLUGIN_API_VERSION 36
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -582,6 +582,11 @@ struct plugin_api {
 #if LCD_DEPTH > 1
     void (*lcd_set_backdrop)(fb_data* backdrop);
 #endif
+
+#ifdef IRAM_STEAL
+    void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
+                             char *iedata, size_t iedata_size);
+#endif
 };
 
 /* plugin header */
@@ -593,6 +598,7 @@ struct plugin_header {
     unsigned char *end_addr;
     enum plugin_status(*entry_point)(struct plugin_api*, void*);
 };
+
 #ifdef PLUGIN
 #ifndef SIMULATOR
 extern unsigned char plugin_start_addr[];
@@ -607,12 +613,33 @@ extern unsigned char plugin_end_addr[];
         const struct plugin_header __header = { \
         PLUGIN_MAGIC, TARGET_ID, PLUGIN_API_VERSION, \
         NULL, NULL, plugin_start };
-#endif
-#endif
+#endif /* SIMULATOR */
+
+#ifdef USE_IRAM
+/* Declare IRAM variables */
+#define PLUGIN_IRAM_DECLARE \
+    extern char iramcopy[]; \
+    extern char iramstart[]; \
+    extern char iramend[]; \
+    extern char iedata[]; \
+    extern char iend[];
+/* Initialize IRAM */
+#define PLUGIN_IRAM_INIT(api) \
+    (api)->plugin_iram_init(iramstart, iramcopy, iramend-iramstart, \
+                            iedata, iend-iedata);
+#else
+#define PLUGIN_IRAM_DECLARE
+#define PLUGIN_IRAM_INIT(api)
+#endif /* USE_IRAM */
+#endif /* PLUGIN */
 
 int plugin_load(const char* plugin, void* parameter);
 void* plugin_get_buffer(int *buffer_size);
 void* plugin_get_audio_buffer(int *buffer_size);
+#ifdef IRAM_STEAL
+void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
+                      char *iedata, size_t iedata_size);
+#endif
 
 /* plugin_tsr, 
     callback returns true to allow the new plugin to load,

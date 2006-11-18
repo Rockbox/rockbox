@@ -296,8 +296,8 @@ static unsigned char sim_iram[CODEC_IRAM_SIZE]; /* IRAM codec swap buffer for si
 #define CODEC_IRAM_ORIGIN sim_iram
 #endif
 
-static unsigned char *iram_buf[2];              /* Ptr to IRAM buffers for normal/voice codecs */
-static unsigned char *dram_buf[2];              /* Ptr to DRAM buffers for normal/voice codecs */
+static unsigned char *iram_buf[2] = { NULL, NULL }; /* Ptr to IRAM buffers for normal/voice codecs */
+static unsigned char *dram_buf[2] = { NULL, NULL }; /* Ptr to DRAM buffers for normal/voice codecs */
 static struct mutex mutex_codecthread;          /* Mutex to control which codec (normal/voice) is running */
 
 /* Voice state */
@@ -306,6 +306,10 @@ static volatile bool voice_is_playing;      /* Is voice currently playing? (V) *
 static volatile bool voice_codec_loaded;    /* Is voice codec loaded (V/A-) */
 static char *voicebuf;
 static size_t voice_remaining;
+
+#ifdef IRAM_STEAL
+static bool voice_iram_stolen = false;      /* Voice IRAM has been stolen for other use */
+#endif
 
 static void (*voice_getmore)(unsigned char** start, int* size);
 
@@ -318,15 +322,21 @@ static void voice_thread(void);
 
 #endif /* PLAYBACK_VOICE */
 
+/* --- Shared semi-private interfaces --- */
+
+/* imported */
+extern void talk_buffer_steal(void);
+#ifdef HAVE_RECORDING
+extern void pcm_rec_error_clear(void);
+extern unsigned long pcm_rec_status(void);
+#endif
+
+
 /* --- External interfaces --- */
 
 void mp3_play_data(const unsigned char* start, int size,
                    void (*get_more)(unsigned char** start, int* size))
 {
-    /* must reset the buffer before any playback begins if needed */
-    if (buffer_state == BUFFER_STATE_TRASHED)
-        audio_reset_buffer(pcmbuf_get_bufsize());
-
 #ifdef PLAYBACK_VOICE
     static struct voice_info voice_clip;
     voice_clip.callback = get_more;
@@ -366,10 +376,19 @@ void mpeg_id3_options(bool _v1first)
 
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
-    unsigned char *buf = audiobuf;
-    unsigned char *end = audiobufend;
+    unsigned char *buf, *end;
 
     audio_stop();
+
+    if (buffer_size == NULL)
+    {
+        /* Special case for talk_init to use */
+        buffer_state = BUFFER_STATE_TRASHED;
+        return NULL;
+    }
+
+    buf = audiobuf;
+    end = audiobufend;
 
     if (talk_buf || !talk_voice_required()
         || buffer_state == BUFFER_STATE_TRASHED)
@@ -395,16 +414,56 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     return buf;
 }
 
+#ifdef IRAM_STEAL
+void audio_iram_steal(void)
+{
+    /* We need to stop audio playback in order to use codec IRAM */
+    audio_stop();
+
+#ifdef PLAYBACK_VOICE
+    if (NULL != iram_buf[CODEC_IDX_VOICE])
+    {
+        /* Wait for voice to swap back in if current codec was audio */
+        while (current_codec != CODEC_IDX_VOICE)
+            yield();
+
+        voice_stop();
+
+        /* Save voice IRAM - safe to do here since state is known */
+        memcpy(iram_buf[CODEC_IDX_VOICE], (void *)CODEC_IRAM_ORIGIN,
+               CODEC_IRAM_SIZE);
+        voice_iram_stolen = true;
+    }
+    else
+    {
+        /* Nothing much to do if no voice */
+        voice_iram_stolen = false;
+    }
+#endif
+}
+#endif /* IRAM_STEAL */
+
 #ifdef HAVE_RECORDING
 unsigned char *audio_get_recording_buffer(size_t *buffer_size)
 {
     /* don't allow overwrite of voice swap area or we'll trash the
        swapped-out voice codec but can use whole thing if none */
-    unsigned char *end = iram_buf[CODEC_IDX_VOICE] ?
-        iram_buf[CODEC_IDX_VOICE] : audiobufend;
+    unsigned char *end;
 
     audio_stop();
     talk_buffer_steal();
+
+#ifdef PLAYBACK_VOICE
+#ifdef IRAM_STEAL
+    end = dram_buf[CODEC_IDX_VOICE] ?
+            dram_buf[CODEC_IDX_VOICE] : audiobufend;
+#else
+    end = iram_buf[CODEC_IDX_VOICE] ?
+            iram_buf[CODEC_IDX_VOICE] : audiobufend;
+#endif /* IRAM_STEAL */
+#else
+    end = audiobufend;
+#endif /* PLAYBACK_VOICE */
 
     buffer_state = BUFFER_STATE_TRASHED;
 
@@ -645,7 +704,6 @@ void audio_flush_and_reload_tracks(void)
 void audio_error_clear(void)
 {
 #ifdef AUDIO_HAVE_RECORDING
-    extern void pcm_rec_error_clear(void);
     pcm_rec_error_clear();
 #endif
 }
@@ -662,7 +720,6 @@ int audio_status(void)
 
 #ifdef HAVE_RECORDING
     /* Do this here for constitency with mpeg.c version */
-    extern unsigned long pcm_rec_status(void);
     ret |= pcm_rec_status();
 #endif
 
@@ -820,7 +877,6 @@ void voice_stop(void)
 
 
 /* --- Routines called from multiple threads --- */
-
 #ifdef PLAYBACK_VOICE
 static void swap_codec(void)
 {
@@ -829,8 +885,26 @@ static void swap_codec(void)
     logf("swapping out codec:%d", my_codec);
 
     /* Save our current IRAM and DRAM */
+#ifdef IRAM_STEAL
+    if (voice_iram_stolen)
+    {
+        logf("swap: iram restore");
+        voice_iram_stolen = false;
+        /* Don't swap trashed data into buffer - _should_ always be the case
+           if voice_iram_stolen is true since the voice has been swapped in
+           before hand */
+        if (my_codec == CODEC_IDX_VOICE)
+            goto skip_iram_swap;
+    }
+#endif
+
     memcpy(iram_buf[my_codec], (unsigned char *)CODEC_IRAM_ORIGIN,
             CODEC_IRAM_SIZE);
+
+#ifdef IRAM_STEAL
+skip_iram_swap:
+#endif
+
     memcpy(dram_buf[my_codec], codecbuf, CODEC_SIZE);
 
     /* Release my semaphore */
@@ -1085,6 +1159,21 @@ static void* voice_request_buffer_callback(size_t *realsize, size_t reqsize)
                 {
                     /* Set up new voice data */
                     struct voice_info *voice_data;
+#ifdef IRAM_STEAL
+                    if (voice_iram_stolen)
+                    {
+                        logf("voice: iram restore");
+                        memcpy((void*)CODEC_IRAM_ORIGIN,
+                               iram_buf[CODEC_IDX_VOICE],
+                               CODEC_IRAM_SIZE);
+                        voice_iram_stolen = false;
+                    }
+#endif
+                    /* must reset the buffer before any playback
+                       begins if needed */
+                    if (buffer_state == BUFFER_STATE_TRASHED)
+                        audio_reset_buffer(pcmbuf_get_bufsize());
+
                     voice_is_playing = true;
                     trigger_cpu_boost();
                     voice_data = ev.data;
@@ -2809,6 +2898,10 @@ static void audio_fill_file_buffer(
     bool had_next_track = audio_next_track() != NULL;
     bool continue_buffering;
 
+    /* must reset the buffer before use if trashed */
+    if (buffer_state != BUFFER_STATE_NORMAL)
+        audio_reset_buffer(pcmbuf_get_bufsize());
+
     if (!audio_initialize_buffer_fill(!start_play))
         return ;
 
@@ -3156,10 +3249,6 @@ static void audio_play_start(size_t offset)
     /* Wait for any previously playing audio to flush - TODO: Not necessary? */
     audio_stop_codec_flush();
 
-    /* must reset the buffer before any playback begins if needed */
-    if (buffer_state != BUFFER_STATE_NORMAL)
-        audio_reset_buffer(pcmbuf_get_bufsize());
-
     track_changed = true;
     playlist_end = false;
 
@@ -3272,14 +3361,34 @@ static void audio_reset_buffer(size_t pcmbufsize)
     if (talk_voice_required())
     {
 #ifdef PLAYBACK_VOICE
+#ifdef IRAM_STEAL
+        filebuflen -= CODEC_IRAM_SIZE + 2*CODEC_SIZE;
+#else
+        filebuflen -= 2*(CODEC_IRAM_SIZE + CODEC_SIZE);
+#endif
         /* Allow 2 codecs at end of audio buffer */
-        filebuflen -= 2 * (CODEC_IRAM_SIZE + CODEC_SIZE);
-
+        /* If using IRAM for plugins voice IRAM swap buffer must be dedicated
+           and out of the way of buffer usage or else a call to audio_get_buffer
+           and subsequent buffer use might trash the swap space. A plugin
+           initializing IRAM after getting the full buffer would present similar
+           problem. Options include: failing the request if the other buffer
+           has been obtained already or never allowing use of the voice IRAM
+           buffer within the audio buffer. Using buffer_alloc basically
+           implements the second in a more convenient way. */
         iram_buf[CODEC_IDX_AUDIO] = filebuf + filebuflen;
         dram_buf[CODEC_IDX_AUDIO] = iram_buf[CODEC_IDX_AUDIO] + CODEC_IRAM_SIZE;
+
+#ifdef IRAM_STEAL
+        /* Allocate voice IRAM swap buffer once */
+        if (iram_buf[CODEC_IDX_VOICE] == NULL)
+            iram_buf[CODEC_IDX_VOICE] = buffer_alloc(CODEC_IRAM_SIZE);
+        dram_buf[CODEC_IDX_VOICE] = dram_buf[CODEC_IDX_AUDIO] + CODEC_SIZE;
+#else
         iram_buf[CODEC_IDX_VOICE] = dram_buf[CODEC_IDX_AUDIO] + CODEC_SIZE;
         dram_buf[CODEC_IDX_VOICE] = iram_buf[CODEC_IDX_VOICE] + CODEC_IRAM_SIZE;
-#endif
+#endif /* IRAM_STEAL */
+
+#endif /* PLAYBACK_VOICE */
     }
     else
     {

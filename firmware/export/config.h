@@ -283,6 +283,9 @@
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
+#if CONFIG_CPU != SH7034
+#define IRAM_STEAL
+#endif
 #else
 #define ICODE_ATTR
 #define ICONST_ATTR

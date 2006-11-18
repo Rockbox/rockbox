@@ -471,6 +471,9 @@ static const struct plugin_api rockbox_api = {
     lcd_set_backdrop,
 #endif
 
+#ifdef IRAM_STEAL
+    plugin_iram_init,
+#endif
 };
 
 int plugin_load(const char* plugin, void* parameter)
@@ -683,9 +686,20 @@ void* plugin_get_audio_buffer(int* buffer_size)
     audio_stop();
     talk_buffer_steal(); /* we use the mp3 buffer, need to tell */
     *buffer_size = audiobufend - audiobuf;
-#endif
     return audiobuf;
+#endif
 }
+
+#ifdef IRAM_STEAL
+/* Initializes plugin IRAM */
+void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
+                      char *iedata, size_t iedata_size)
+{
+    audio_iram_steal();
+    memcpy(iramstart, iramcopy, iram_size);
+    memset(iedata, 0, iedata_size);
+}
+#endif /* IRAM_STEAL */
 
 /* The plugin wants to stay resident after leaving its main function, e.g.
    runs from timer or own thread. The callback is registered to later

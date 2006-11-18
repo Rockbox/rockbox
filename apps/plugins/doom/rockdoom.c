@@ -39,14 +39,7 @@
 #include "st_stuff.h"
 
 PLUGIN_HEADER
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
+PLUGIN_IRAM_DECLARE
 
 extern boolean timingdemo, singledemo, demoplayback, fastdemo; // killough
 
@@ -785,13 +778,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    rb->cpu_boost(true);
 #endif
 
-#ifdef USE_IRAM
-   /* We need to stop audio playback in order to use IRAM */
-   rb->audio_stop();
-
-   memcpy(iramstart, iramcopy, iramend-iramstart);
-   memset(iedata, 0, iend - iedata);
-#endif
+   PLUGIN_IRAM_INIT(rb)
 
    rb->lcd_setfont(0);
 
@@ -830,7 +817,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    if (result < 0)
    {
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-   	rb->cpu_boost(false);
+    rb->cpu_boost(false);
 #endif
        if( result == -1 ) return PLUGIN_OK; // Quit was selected
        else if( result == -2 ) return PLUGIN_ERROR; // Missing base wads

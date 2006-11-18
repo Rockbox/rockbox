@@ -522,7 +522,7 @@ void talk_init(void)
         MAX_FILENAME);
 
 #if CONFIG_CODEC == SWCODEC
-    audio_stop();
+    audio_get_buffer(false, NULL);  /* Must tell audio to reinitialize */
 #endif
     reset_state(); /* use this for most of our inits */
 

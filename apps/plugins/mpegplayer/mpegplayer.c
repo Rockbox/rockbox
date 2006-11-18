@@ -31,14 +31,7 @@
 #include "video_out.h"
 
 PLUGIN_HEADER
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
+PLUGIN_IRAM_DECLARE
 
 struct plugin_api* rb;
 
@@ -319,10 +312,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (buffer == NULL)
         return PLUGIN_ERROR;
 
-#ifdef USE_IRAM
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-    rb->memset(iedata, 0, iend - iedata);
-#endif
+    PLUGIN_IRAM_INIT(rb)
 
     rb->lcd_set_backdrop(NULL);
 

@@ -14,16 +14,9 @@
 #include "plugin.h"
 
 PLUGIN_HEADER
+PLUGIN_IRAM_DECLARE
 
 static struct plugin_api* rb;
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
 
 #define SAMP_PER_FRAME       1152
 #define SAMPL2                576
@@ -2377,10 +2370,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     asm volatile ("move.l #0, %macsr"); /* integer mode */
 #endif
 
-#ifdef USE_IRAM
-    memcpy(iramstart, iramcopy, iramend - iramstart);
-    memset(iedata, 0, iend - iedata);
-#endif
+    PLUGIN_IRAM_INIT(rb)
 
     rb->lcd_setfont(FONT_SYSFIXED);
 

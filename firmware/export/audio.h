@@ -101,7 +101,12 @@ void audio_error_clear(void);
 int audio_get_file_pos(void);
 void audio_beep(int duration);
 void audio_init_playback(void);
+/* Required call when audio buffer is require for some other purpose */
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size);
+#ifdef USE_IRAM
+/* Required call when codec IRAM is needed for some other purpose */
+void audio_iram_steal(void);
+#endif
 
 /* channel modes */
 enum rec_channel_modes

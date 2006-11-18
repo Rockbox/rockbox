@@ -19,7 +19,7 @@
 #include "../../plugin.h"
 
 PLUGIN_HEADER
-
+PLUGIN_IRAM_DECLARE
 
 /* variable button definitions */
 #if CONFIG_KEYPAD == RECORDER_PAD
@@ -102,14 +102,6 @@ short gmbuf[BUF_SIZE*NBUF] IBSS_ATTR;
 int quit=0;
 struct plugin_api * rb;
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int retval = 0;
@@ -122,10 +114,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     }
     rb->lcd_setfont(0);
 
-#ifdef USE_IRAM
-    rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-    rb->memset(iedata, 0, iend - iedata);
-#endif
+    PLUGIN_IRAM_INIT(rb)
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);
