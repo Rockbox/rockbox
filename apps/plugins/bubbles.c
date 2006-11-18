@@ -2338,8 +2338,10 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     long start;
     const struct button_mapping *plugin_contexts[]
                      = {generic_left_right_fire,generic_actions};
-    button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
 
+    if (timeout < 0)
+        timeout = 0;
+    button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold())
         button = BUBBLES_START;
@@ -2390,7 +2392,8 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
         case BUBBLES_QUIT:   /* end the game */
             return BB_END;
 
-        case ACTION_UNKNOWN:    /* no button pressed */
+        case ACTION_UNKNOWN:
+        case ACTION_NONE:    /* no button pressed */
             break;
 
         default:
