@@ -2337,7 +2337,7 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     int buttonres;
     long start;
     const struct button_mapping *plugin_contexts[]
-                     = {generic_directions,generic_actions};
+                     = {generic_left_right_fire,generic_actions};
     button = pluginlib_getaction(rb,timeout,plugin_contexts,2);
 
 #ifdef HAS_BUTTON_HOLD
@@ -2417,7 +2417,7 @@ static int bubbles(struct game_context* bb) {
     bool showscores = false;
     long timeout;
     const struct button_mapping *plugin_contexts[]
-                     = {generic_directions,generic_actions};
+                     = {generic_actions,generic_directions};
 
     bubbles_setcolors();
 

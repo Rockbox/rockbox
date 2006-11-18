@@ -104,6 +104,67 @@ static const struct button_mapping generic_directions[] =
     {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
 
+static const struct button_mapping generic_left_right_fire[] = 
+{
+#if    (CONFIG_KEYPAD == IRIVER_H100_PAD)   \
+    || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
+    || (CONFIG_KEYPAD == IAUDIO_X5_PAD)     \
+    || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
+    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    { PLA_LEFT,              BUTTON_SCROLL_BACK,         BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_SCROLL_FWD,          BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_SCROLL_BACK,         BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_SCROLL_FWD,          BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
+#elif CONFIG_KEYPAD == ONDIO_PAD
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_UP,                  BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_UP|BUTTON_REPEAT,    BUTTON_NONE},
+#elif CONFIG_KEYPAD == PLAYER_PAD
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_ON,                  BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_ON|BUTTON_REPEAT,    BUTTON_NONE},
+#elif CONFIG_KEYPAD == RECORDER_PAD
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_PLAY,                BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SANSA_E200_PAD) 
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_SELECT,              BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_SELECT|BUTTON_REPEAT,BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
+    { PLA_LEFT,              BUTTON_LEFT,                BUTTON_NONE},
+    { PLA_RIGHT,             BUTTON_RIGHT,               BUTTON_NONE},
+    { PLA_LEFT_REPEAT,       BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    { PLA_RIGHT_REPEAT,      BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    { PLA_FIRE,              BUTTON_REW,                 BUTTON_NONE},
+    { PLA_FIRE_REPEAT,       BUTTON_REW|BUTTON_REPEAT,   BUTTON_NONE},
+#else
+    #error pluginlib_actions: Unsupported keypad
+#endif
+    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
+};
+
 /* these were taken from the bubbles plugin, so may need tweaking */
 static const struct button_mapping generic_actions[] = 
 {
@@ -117,7 +178,7 @@ static const struct button_mapping generic_actions[] =
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
     {PLA_QUIT,          BUTTON_MENU|BUTTON_SELECT,      BUTTON_NONE},
     {PLA_START,         BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY},
-    {PLA_MENU,          BUTTON_MENU,                    BUTTON_NONE},
+    {PLA_MENU,          BUTTON_MENU|BUTTON_REL,         BUTTON_NONE},
     {PLA_FIRE,          BUTTON_SELECT|BUTTON_REL,       BUTTON_SELECT},
     {PLA_FIRE_REPEAT,   BUTTON_SELECT|BUTTON_REPEAT,    BUTTON_NONE},
 #elif CONFIG_KEYPAD == IAUDIO_X5_PAD
