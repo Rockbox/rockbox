@@ -528,22 +528,7 @@ if [ -z "$rootdir" ]; then
   ##################################################################
   # Figure out where the source code root is!
   #
-
-  firmfile="app.lds" # a file to check for in the firmware root dir
-
-  for dir in  . .. ../.. ../rockbox*; do
-    if [ -f $dir/firmware/$firmfile ]; then
-     rootdir=$dir
-     break
-    fi
-  done
-
-  if [ -z "$rootdir" ]; then
-    echo "This script couldn't find your source code root directory. Please enter the"
-    echo "full path to the source code directory here:"
-
-    rootdir=`input`
-  fi
+  rootdir=`dirname $0`/../
 
   #####################################################################
   # Convert the possibly relative directory name to an absolute version
