@@ -344,6 +344,11 @@ static void draw_cursor( int x, int y )
  * if the cursor is currently over the card */
 static void draw_card_ext( int x, int y, bool selected, bool cursor )
 {
+#if LCD_DEPTH > 1
+    int oldfg = rb->lcd_get_foreground();
+
+    rb->lcd_set_foreground( LCD_BLACK );
+#endif
 #ifdef LARGE_CARD
     rb->lcd_hline( x+2, x+CARD_WIDTH-3, y );
     rb->lcd_hline( x+2, x+CARD_WIDTH-3, y+CARD_HEIGHT-1 );
@@ -362,11 +367,17 @@ static void draw_card_ext( int x, int y, bool selected, bool cursor )
 
     if( selected )
     {
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground( FRAME_COLOR );
+#endif
         rb->lcd_drawrect( x+1, y+1, CARD_WIDTH-2, CARD_HEIGHT-2 );
 #ifdef LARGE_CARD
         rb->lcd_drawrect( x+2, y+2, CARD_WIDTH-4, CARD_HEIGHT-4 );
 #endif
     }
+#if LCD_DEPTH > 1
+    rb->lcd_set_foreground( oldfg );
+#endif
 
     if( cursor )
     {
