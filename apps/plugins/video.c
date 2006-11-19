@@ -11,7 +11,7 @@
 * Reads raw image data + audio data from a file
 * !!!!!!!!!! Code Police free zone !!!!!!!!!!
 *
-* Copyright (C) 2003-2004 Jörg Hohensohn aka [IDC]Dragon
+* Copyright (C) 2003-2004 Jï¿½g Hohensohn aka [IDC]Dragon
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -255,7 +255,7 @@ void DrawPosition(int pos, int total)
     /* draw a slider over the rest of the line */
     rb->lcd_getstringsize(gPrint, &w, &h);
     w++;
-    rb->gui_scrollbar_draw(&rb->screens[SCREEN_MAIN],w, LCD_HEIGHT-7, LCD_WIDTH-w,
+    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],w, LCD_HEIGHT-7, LCD_WIDTH-w,
                              7, total, 0, pos, HORIZONTAL);
 
     if (gPlay.state == paused) /* we have to draw ourselves */

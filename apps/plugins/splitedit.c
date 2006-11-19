@@ -225,9 +225,9 @@ static void update_data(void)
  */
 static void update_timebar(struct mp3entry *mp3)
 {
-    rb->scrollbar
+    rb->gui_scrollbar_draw
     (
-        0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT,
+        rb->screens[SCREEN_MAIN],0, TIMEBAR_Y, LCD_WIDTH, TIMEBAR_HEIGHT,
         mp3->length, range_start, range_end,
         HORIZONTAL
     );
@@ -604,7 +604,7 @@ static int copy_file(
             return -1;
         }
 
-        rb->gui_scrollbar_draw(&rb->screens[SCREEN_MAIN],0, prg_y, LCD_WIDTH,
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, prg_y, LCD_WIDTH,
                                  prg_h, bytes, 0, i, HORIZONTAL);
         rb->lcd_update_rect(0, prg_y, LCD_WIDTH, prg_h);
     }
