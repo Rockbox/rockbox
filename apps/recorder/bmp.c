@@ -120,7 +120,7 @@ static inline uint32_t readlong(uint32_t *value)
     return (uint32_t)bytes[0] | ((uint32_t)bytes[1] << 8) |
            ((uint32_t)bytes[2] << 16) | ((uint32_t)bytes[3] << 24);
 }
-
+                            
 static inline unsigned brightness(union rgb_union color)
 {
     return (3 * (unsigned)color.red + 6 * (unsigned)color.green
@@ -315,7 +315,7 @@ int read_bmp_file(char* filename,
         uint16_t *p2;
         uint32_t *rp;
         union rgb_union *qp;
-        union rgb_union q0, q1;
+        union rgb_union q0, q1;   
 
         /* read one row */
         ret = read(fd, bmpbuf, padded_width);
@@ -423,7 +423,7 @@ int read_bmp_file(char* filename,
         /* Convert to destination format */
         qp = (union rgb_union *)bmpbuf;
 #if LCD_DEPTH > 1
-        if (format == FORMAT_NATIVE) {
+        if (format == FORMAT_NATIVE) {    
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
             /* iriver H1x0 */
@@ -435,7 +435,8 @@ int read_bmp_file(char* filename,
             for (col = 0; col < width; col++) {
                 if (dither)
                     delta = dither_matrix[row & 0xf][col & 0xf];
-                bright = (257 * (3 * brightness(*qp++) + delta)) >> 16;
+                bright = brightness(*qp++);
+                bright = (3 * bright + (bright >> 6) + delta) >> 8;
                 *dest++ |= (~bright & 3) << shift;
             }
 #else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
@@ -449,7 +450,8 @@ int read_bmp_file(char* filename,
             for (col = 0; col < width; col++) {
                 if (dither)
                     delta = dither_matrix[row & 0xf][col & 0xf];
-                bright = (257 * (3 * brightness(*qp++) + delta)) >> 16;
+                bright = brightness(*qp++);
+                bright = (3 * bright + (bright >> 6) + delta) >> 8;
                 data |= (~bright & 3) << shift;
                 shift -= 2;
                 if (shift < 0) {
@@ -471,9 +473,9 @@ int read_bmp_file(char* filename,
                 if (dither)
                     delta = dither_matrix[row & 0xf][col & 0xf];
                 q0 = *qp++;
-                r = (257 * (31 * q0.red + delta)) >> 16;
-                g = (257 * (63 * q0.green + delta)) >> 16;
-                b = (257 * (31 * q0.blue + delta)) >> 16;
+                r = (31 * q0.red + (q0.red >> 3) + delta) >> 8;
+                g = (63 * q0.green + (q0.green >> 2) + delta) >> 8;
+                b = (31 * q0.blue + (q0.blue >> 3) + delta) >> 8;
                 *dest++ = LCD_RGBPACK_LCD(r, g, b);
             }
 #endif /* LCD_DEPTH */
