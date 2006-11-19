@@ -67,7 +67,7 @@
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#include "widgets.h"
+#include "scrollbar.h"
 #include "peakmeter.h"
 #endif
 #include "logfdisp.h"
@@ -260,11 +260,11 @@ bool dbg_audio_thread(void)
         lcd_puts(0, 5, buf);
 
         /* Playable space left */
-        scrollbar(0, 6*8, 112, 4, d.audiobuflen, 0,
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8, 112, 4, d.audiobuflen, 0,
                   d.playable_space, HORIZONTAL);
 
         /* Show the watermark limit */
-        scrollbar(0, 6*8+4, 112, 4, d.audiobuflen, 0,
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8+4, 112, 4, d.audiobuflen, 0,
                   d.low_watermark_level, HORIZONTAL);
 
         snprintf(buf, sizeof(buf), "wm: %x - %x",
@@ -334,14 +334,14 @@ bool dbg_audio_thread(void)
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*8, LCD_WIDTH, 6, bufsize, 0, bufused, HORIZONTAL);
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6, bufsize, 0, bufused, HORIZONTAL);
         line++;
 
         snprintf(buf, sizeof(buf), "codec: %8ld/%8ld", audio_filebufused(), (long) filebuflen);
         lcd_puts(0, line++, buf);
 
         /* Playable space left */
-        scrollbar(0, line*8, LCD_WIDTH, 6, filebuflen, 0,
+        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, line*8, LCD_WIDTH, 6, filebuflen, 0,
                   audio_filebufused(), HORIZONTAL);
         line++;
 

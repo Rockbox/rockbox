@@ -2386,7 +2386,7 @@ void cb_progess(int current, int total)
     rb->yield(); /* be nice to the other threads */
     if(!running_slideshow)
     {
-        rb->scrollbar(0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-8, LCD_WIDTH, 8, total, 0,
                       current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);
     }
@@ -2394,7 +2394,7 @@ void cb_progess(int current, int total)
     else
     {
         /* in slideshow mode, keep gui interference to a minimum */
-        rb->scrollbar(0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
+        rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, LCD_HEIGHT-4, LCD_WIDTH, 4, total, 0,
                       current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-4, LCD_WIDTH, 4);
     }

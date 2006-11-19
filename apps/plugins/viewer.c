@@ -662,7 +662,8 @@ static void viewer_scrollbar(void) {
     else
         max_shown = min_shown + (next_screen_ptr - screen_top_ptr);
 
-    rb->scrollbar(0, 0, SCROLLBAR_WIDTH-1, LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
+    rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, 0, SCROLLBAR_WIDTH-1,
+                         LCD_HEIGHT, items, min_shown, max_shown, VERTICAL);
 }
 #endif
 

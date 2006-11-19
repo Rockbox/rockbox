@@ -89,6 +89,7 @@ Original release, featuring analog / digital modes and a few options.
 *****************************/
 #include "plugin.h"
 #include "time.h"
+#include "checkbox.h"
 #include <pluginbitmaps/clock_logo.h>
 
 PLUGIN_HEADER
@@ -2386,7 +2387,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
             rb->lcd_putsxy((LCDWIDTH/2)-(w/2), 5, buf);
         }
         else if(settings.digital[digital_seconds] == 2) /* Second progressbar */
-            rb->scrollbar(0, 0, LCD_WIDTH, 4, 60, 0, second, HORIZONTAL);
+            rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, 0, LCD_WIDTH, 4, 60, 0, second, HORIZONTAL);
         else if(settings.digital[digital_seconds] == 3) /* Invert the LCD as seconds pass */
         {
             rb->lcd_set_drawmode(DRMODE_COMPLEMENT);
@@ -2417,7 +2418,7 @@ void draw_extras(int year, int day, int month, int hour, int minute, int second)
         }
         else if(settings.lcd[lcd_seconds] == 2) /* Second progressbar */
         {
-            rb->scrollbar(0, 0, LCD_WIDTH, 4, 60, 0, second, HORIZONTAL);
+            rb->gui_scrollbar_draw(rb->screens[SCREEN_MAIN],0, 0, LCD_WIDTH, 4, 60, 0, second, HORIZONTAL);
         }
         else if(settings.lcd[lcd_seconds] == 3) /* Invert the LCD as seconds pass */
         {
@@ -2727,8 +2728,8 @@ void counter_settings(void)
         rb->lcd_puts(0, 7, "OFF: Return");
 
         /* tell user what mode is selected */
-        rb->checkbox(1, 17, 8, 6, counting_up);
-        rb->checkbox(1, 25, 8, 6, !counting_up);
+        checkbox(rb,1, 17, 8, 6, counting_up);
+        checkbox(rb,1, 25, 8, 6, !counting_up);
 
         switch(cursorpos)
         {

@@ -79,9 +79,6 @@
 #include "textarea.h"
 #include "action.h"
 
-#ifdef HAVE_LCD_BITMAP
-#include "widgets.h"
-#endif
 
 #if LCD_DEPTH > 1
 #include "backdrop.h"

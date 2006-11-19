@@ -92,7 +92,6 @@
 #include "usb.h"
 #ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#include "widgets.h"
 #endif
 
 #include "lang.h"

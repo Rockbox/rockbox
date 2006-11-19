@@ -38,6 +38,7 @@
 #endif
 
 #ifdef HAVE_LCD_BITMAP
+#include "scrollbar.h"
 #include "peakmeter.h" 
 #include "bmp.h"
 #include "bidi.h"
@@ -99,6 +100,7 @@ static const struct plugin_api rockbox_api = {
     lcd_get_background,
     lcd_bitmap_part,
     lcd_bitmap,
+    lcd_set_backdrop,
 #endif
 #if LCD_DEPTH == 16
     lcd_bitmap_transparent_part,
@@ -114,8 +116,7 @@ static const struct plugin_api rockbox_api = {
     lcd_blit,
     lcd_update,
     lcd_update_rect,
-    scrollbar,
-    checkbox,
+    gui_scrollbar_draw,
     font_get,
     font_getstringsize,
     font_get_width,
@@ -467,9 +468,6 @@ static const struct plugin_api rockbox_api = {
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
-#if LCD_DEPTH > 1
-    lcd_set_backdrop,
-#endif
 
 #ifdef IRAM_STEAL
     plugin_iram_init,

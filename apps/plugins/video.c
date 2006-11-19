@@ -27,7 +27,6 @@
 #include "plugin.h"
 #include "sh7034.h"
 #include "system.h"
-#include "../apps/recorder/widgets.h" /* not in search path, booh */
 
 #ifndef SIMULATOR /* not for simulator by now */
 #ifdef HAVE_LCD_BITMAP /* and definitely not for the Player, haha */
@@ -256,7 +255,8 @@ void DrawPosition(int pos, int total)
     /* draw a slider over the rest of the line */
     rb->lcd_getstringsize(gPrint, &w, &h);
     w++;
-    rb->scrollbar(w, LCD_HEIGHT-7, LCD_WIDTH-w, 7, total, 0, pos, HORIZONTAL);
+    rb->gui_scrollbar_draw(&rb->screens[SCREEN_MAIN],w, LCD_HEIGHT-7, LCD_WIDTH-w,
+                             7, total, 0, pos, HORIZONTAL);
 
     if (gPlay.state == paused) /* we have to draw ourselves */
         rb->lcd_update_rect(0, LCD_HEIGHT-8, LCD_WIDTH, 8);

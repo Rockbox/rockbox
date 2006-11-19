@@ -604,7 +604,8 @@ static int copy_file(
             return -1;
         }
 
-        rb->scrollbar(0, prg_y, LCD_WIDTH, prg_h, bytes, 0, i, HORIZONTAL);
+        rb->gui_scrollbar_draw(&rb->screens[SCREEN_MAIN],0, prg_y, LCD_WIDTH,
+                                 prg_h, bytes, 0, i, HORIZONTAL);
         rb->lcd_update_rect(0, prg_y, LCD_WIDTH, prg_h);
     }
 

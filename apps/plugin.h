@@ -66,7 +66,7 @@
 #include "timer.h"
 #include "playlist.h"
 #ifdef HAVE_LCD_BITMAP
-#include "widgets.h"
+#include "scrollbar.h"
 #endif
 #include "menu.h"
 #include "rbunicode.h"
@@ -107,12 +107,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 36
+#define PLUGIN_API_VERSION 37
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 34
+#define PLUGIN_MIN_API_VERSION 37
 
 /* plugin return codes */
 enum plugin_status {
@@ -169,6 +169,7 @@ struct plugin_api {
                             int stride, int x, int y, int width, int height);
     void (*lcd_bitmap)(const fb_data *src, int x, int y, int width,
                        int height);
+    void (*lcd_set_backdrop)(fb_data* backdrop);
 #endif
 #if LCD_DEPTH == 16
     void (*lcd_bitmap_transparent_part)(const fb_data *src,
@@ -189,9 +190,10 @@ struct plugin_api {
                       int bheight, int stride);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
-    void (*scrollbar)(int x, int y, int width, int height, int items,
-                      int min_shown, int max_shown, int orientation);
-    void (*checkbox)(int x, int y, int width, int height, bool checked);
+    void (*gui_scrollbar_draw)(struct screen * screen, int x, int y,
+                               int width, int height, int items,
+                               int min_shown, int max_shown,
+                               unsigned flags);
     struct font* (*font_get)(int font);
     int  (*font_getstringsize)(const unsigned char *str, int *w, int *h,
                                int fontnumber);
@@ -579,9 +581,7 @@ struct plugin_api {
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
-#if LCD_DEPTH > 1
-    void (*lcd_set_backdrop)(fb_data* backdrop);
-#endif
+
 
 #ifdef IRAM_STEAL
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,

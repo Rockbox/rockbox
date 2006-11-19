@@ -65,9 +65,6 @@
 #include <bitmaps/remote_usblogo.h>
 #endif
 
-#if defined(HAVE_LCD_BITMAP)
-#include "widgets.h"
-#endif
 #ifdef HAVE_MMC
 #include "ata_mmc.h"
 #endif

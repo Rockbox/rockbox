@@ -56,7 +56,6 @@ recorder/bmp.c
 recorder/icons.c
 recorder/keyboard.c
 recorder/peakmeter.c
-recorder/widgets.c
 #if LCD_DEPTH > 1
 recorder/backdrop.c
 #endif
