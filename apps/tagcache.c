@@ -3420,6 +3420,10 @@ static bool check_deleted_files(void)
             return false;
         }
         
+        /* Check if the file has already deleted from the db. */
+        if (*buf == '\0')
+            continue;
+        
         /* Now check if the file exists. */
         testfd = open(buf, O_RDONLY);
         if (testfd < 0)
@@ -3858,6 +3862,14 @@ void tagcache_init(void)
     tc_stat.ready = check_all_headers();
 #endif
 }
+
+#ifdef __PCTOOL__
+void tagcache_reverse_scan(void)
+{
+    logf("Checking for deleted files");
+    check_deleted_files();
+}
+#endif
 
 bool tagcache_is_initialized(void)
 {

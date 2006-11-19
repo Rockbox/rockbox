@@ -138,6 +138,7 @@ struct tagcache_search {
 
 #ifdef __PCTOOL__
 void build_tagcache(const char *path);
+void tagcache_reverse_scan(void);
 #endif
 
 int tagcache_str_to_tag(const char *str);
