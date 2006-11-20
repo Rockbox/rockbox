@@ -223,7 +223,7 @@ int read_bmp_file(char* filename,
     }
 
     depth = readshort(&bmph.bit_count);
-    padded_width = ((width * depth + 31) / 8) & ~3;  /* 4-byte boundary aligned */
+    padded_width = ((width * depth + 31) >> 3) & ~3;  /* 4-byte boundary aligned */
 
 #if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     if (format == FORMAT_ANY) {
@@ -244,7 +244,7 @@ int read_bmp_file(char* filename,
         if (remote) {
 #if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
             dst_width  = width;
-            dst_height = (height + 7) / 8;
+            dst_height = (height + 7) >> 3;
 #endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
             totalsize = dst_width * dst_height * sizeof(fb_remote_data);
         } else
@@ -253,9 +253,9 @@ int read_bmp_file(char* filename,
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
             dst_width  = width;
-            dst_height = (height + 3) / 4;
+            dst_height = (height + 3) >> 2;
 #else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
-            dst_width  = (width + 3) / 4;
+            dst_width  = (width + 3) >> 2;
             dst_height = height;
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
@@ -268,7 +268,7 @@ int read_bmp_file(char* filename,
 #endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
     {
         dst_width  = width;
-        dst_height = (height + 7) / 8;
+        dst_height = (height + 7) >> 3;
         totalsize  = dst_width * dst_height;
     }
 
@@ -364,7 +364,7 @@ int read_bmp_file(char* filename,
           case 1:
             q0.raw = palette[0];
             q1.raw = palette[1];
-            p = (unsigned char*)bmpbuf + (width + 7) / 8;
+            p = (unsigned char*)bmpbuf + ((width + 7) >> 3);
             mask = 0x80 >> ((width + 7) & 7);
             while (p > (unsigned char*)bmpbuf) {
                 data = *(--p);
@@ -377,7 +377,7 @@ int read_bmp_file(char* filename,
           case 4:
             if (width & 1)
                 rp++;
-            p = (unsigned char*)bmpbuf + (width + 1) / 2;
+            p = (unsigned char*)bmpbuf + ((width + 1) >> 1);
             while (p > (unsigned char*)bmpbuf) {
                 data = *(--p);
                 *(--rp) = palette[data & 0x0f];
@@ -460,7 +460,7 @@ int read_bmp_file(char* filename,
             if (remote) {
 #if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
                 fb_remote_data *dest = (fb_remote_data *)bitmap
-                                     + dst_width * (row / 8);
+                                     + dst_width * (row >> 3);
                 int shift = row & 7;
                 int delta = 127;
                 unsigned bright;
@@ -479,7 +479,7 @@ int read_bmp_file(char* filename,
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
                 /* iriver H1x0 */
-                fb_data *dest = (fb_data *)bitmap + dst_width * (row / 4);
+                fb_data *dest = (fb_data *)bitmap + dst_width * (row >> 2);
                 int shift = 2 * (row & 3);
                 int delta = 127;
                 unsigned bright;
@@ -535,7 +535,7 @@ int read_bmp_file(char* filename,
         } else
 #endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
         {
-            p = bitmap + dst_width * (row / 8);
+            p = bitmap + dst_width * (row >> 3);
             mask = 1 << (row & 7);
 
             for (col = 0; col < width; col++, p++)
