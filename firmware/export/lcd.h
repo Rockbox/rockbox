@@ -277,13 +277,14 @@ enum
 
 #define FORMAT_TRANSPARENT 0x40000000
 #define FORMAT_DITHER      0x20000000
+#define FORMAT_REMOTE      0x10000000
 
 #define TRANSPARENT_COLOR LCD_RGBPACK(255,0,255)
 
 struct bitmap {
     int width;
     int height;
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     int format;
     unsigned char *maskdata;
 #endif

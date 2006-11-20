@@ -35,6 +35,9 @@
 #include "inttypes.h"
 #include "debug.h"
 #include "lcd.h"
+#ifdef HAVE_REMOTE_LCD
+#include "lcd-remote.h"
+#endif
 #include "file.h"
 #include "config.h"
 #include "system.h"
@@ -85,7 +88,7 @@ static const unsigned char bitfields[3][12] = {
     { 0x00,0x00,0xff,0,  0x00,0xff,0x00,0,  0xff,0x00,0x00,0 }, /* 32 bit */
 };
 
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
 /* canonical ordered dither matrix */
 static const unsigned char dither_matrix[16][16] = {
     {   0,192, 48,240, 12,204, 60,252,  3,195, 51,243, 15,207, 63,255 },
@@ -104,6 +107,13 @@ static const unsigned char dither_matrix[16][16] = {
     { 138, 74,186,122,134, 70,182,118,137, 73,185,121,133, 69,181,117 },
     {  42,234, 26,218, 38,230, 22,214, 41,233, 25,217, 37,229, 21,213 },
     { 170,106,154, 90,166,102,150, 86,169,105,153, 89,165,101,149, 85 }
+};
+#endif
+
+#if defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH == 2) \
+    && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
+static const fb_remote_data remote_pattern[4] = {
+    0x0101, 0x0100, 0x0001, 0x0000
 };
 #endif
 
@@ -147,10 +157,21 @@ int read_bmp_file(char* filename,
     unsigned char *bitmap = bm->data;
     uint32_t bmpbuf[LCD_WIDTH]; /* Buffer for one line */
     uint32_t palette[256];
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     bool transparent = false;
     bool dither = false;
-
+#ifdef HAVE_REMOTE_LCD
+    bool remote = false;
+    
+    if (format & FORMAT_REMOTE) {
+        remote = true;
+#if LCD_REMOTE_DEPTH == 1
+        format = FORMAT_MONO;
+#else
+        format &= ~FORMAT_REMOTE;
+#endif
+    }
+#endif /* HAVE_REMOTE_LCD */
     if (format & FORMAT_TRANSPARENT) {
         transparent = true;
         format &= ~FORMAT_TRANSPARENT;
@@ -162,7 +183,7 @@ int read_bmp_file(char* filename,
 #else
 
     (void)format;
-#endif
+#endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
 
     fd = open(filename, O_RDONLY);
 
@@ -204,7 +225,7 @@ int read_bmp_file(char* filename,
     depth = readshort(&bmph.bit_count);
     padded_width = ((width * depth + 31) / 8) & ~3;  /* 4-byte boundary aligned */
 
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     if (format == FORMAT_ANY) {
         if (depth == 1)
             format = FORMAT_MONO;
@@ -212,28 +233,39 @@ int read_bmp_file(char* filename,
             format = FORMAT_NATIVE;
     }
     bm->format = format;
-#endif
+#endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
     /* returning image size */
     bm->width = width;
     bm->height = height;
 
-#if LCD_DEPTH > 1
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     if (format == FORMAT_NATIVE) {
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+        if (remote) {
+#if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
+            dst_width  = width;
+            dst_height = (height + 7) / 8;
+#endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
+            totalsize = dst_width * dst_height * sizeof(fb_remote_data);
+        } else
+#endif /* defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 */
+        {
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
-        dst_width  = width;
-        dst_height = (height + 3) / 4;
+            dst_width  = width;
+            dst_height = (height + 3) / 4;
 #else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
-        dst_width  = (width + 3) / 4;
-        dst_height = height;
+            dst_width  = (width + 3) / 4;
+            dst_height = height;
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
-        dst_width  = width;
-        dst_height = height;
+            dst_width  = width;
+            dst_height = height;
 #endif /* LCD_DEPTH */
-        totalsize  = dst_width * dst_height * sizeof(fb_data);
+            totalsize  = dst_width * dst_height * sizeof(fb_data);
+        }
     } else
-#endif /* LCD_DEPTH > 1 */
+#endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
     {
         dst_width  = width;
         dst_height = (height + 7) / 8;
@@ -270,7 +302,10 @@ int read_bmp_file(char* filename,
       case 16:
 #if LCD_DEPTH >= 16
         /* don't dither 16 bit BMP to LCD with same or larger depth */
-        dither = false;
+#ifdef HAVE_REMOTE_LCD
+        if (!remote)
+#endif
+            dither = false;
 #endif
         if (compression == 0) { /* BI_RGB, i.e. 15 bit */
             depth = 15;
@@ -303,10 +338,7 @@ int read_bmp_file(char* filename,
     /* Search to the beginning of the image data */
     lseek(fd, (off_t)readlong(&bmph.off_bits), SEEK_SET);
 
-#if LCD_DEPTH >= 8
-    if (format == FORMAT_MONO)
-#endif
-        memset(bitmap, 0, totalsize);
+    memset(bitmap, 0, totalsize);
 
     /* loop to read rows and put them to buffer */
     for (row = height - 1; row >= 0; row--) {
@@ -422,65 +454,86 @@ int read_bmp_file(char* filename,
         
         /* Convert to destination format */
         qp = (union rgb_union *)bmpbuf;
-#if LCD_DEPTH > 1
-        if (format == FORMAT_NATIVE) {    
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
+        if (format == FORMAT_NATIVE) {
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+            if (remote) {
+#if (LCD_REMOTE_DEPTH == 2) && (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED)
+                fb_remote_data *dest = (fb_remote_data *)bitmap
+                                     + dst_width * (row / 8);
+                int shift = row & 7;
+                int delta = 127;
+                unsigned bright;
+                
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    bright = brightness(*qp++);
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= remote_pattern[bright] << shift;
+                }
+#endif /* LCD_REMOTE_DEPTH / LCD_REMOTE_PIXELFORMAT */
+            } else
+#endif /* defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1 */
+            {
 #if LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
-            /* iriver H1x0 */
-            fb_data *dest = (fb_data *)bitmap + dst_width * (row / 4);
-            int shift = 2 * (row & 3);
-            int delta = 127;
-            unsigned bright;
+                /* iriver H1x0 */
+                fb_data *dest = (fb_data *)bitmap + dst_width * (row / 4);
+                int shift = 2 * (row & 3);
+                int delta = 127;
+                unsigned bright;
 
-            for (col = 0; col < width; col++) {
-                if (dither)
-                    delta = dither_matrix[row & 0xf][col & 0xf];
-                bright = brightness(*qp++);
-                bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                *dest++ |= (~bright & 3) << shift;
-            }
-#else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
-            /* greyscale iPods */
-            fb_data *dest = (fb_data *)bitmap + dst_width * row;
-            int shift = 6;
-            int delta = 127;
-            unsigned bright;
-            unsigned data = 0;
-            
-            for (col = 0; col < width; col++) {
-                if (dither)
-                    delta = dither_matrix[row & 0xf][col & 0xf];
-                bright = brightness(*qp++);
-                bright = (3 * bright + (bright >> 6) + delta) >> 8;
-                data |= (~bright & 3) << shift;
-                shift -= 2;
-                if (shift < 0) {
-                    *dest++ = data;
-                    data = 0;
-                    shift = 6;
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    bright = brightness(*qp++);
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    *dest++ |= (~bright & 3) << shift;
                 }
-            }
-            if (shift < 6)
-                *dest++ = data;
+#else /* LCD_PIXELFORMAT == HORIZONTAL_PACKING */
+                /* greyscale iPods */
+                fb_data *dest = (fb_data *)bitmap + dst_width * row;
+                int shift = 6;
+                int delta = 127;
+                unsigned bright;
+                unsigned data = 0;
+            
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    bright = brightness(*qp++);
+                    bright = (3 * bright + (bright >> 6) + delta) >> 8;
+                    data |= (~bright & 3) << shift;
+                    shift -= 2;
+                    if (shift < 0) {
+                        *dest++ = data;
+                        data = 0;
+                        shift = 6;
+                    }
+                }
+                if (shift < 6)
+                    *dest++ = data;
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
-            /* iriver h300, colour iPods, X5 */
-            fb_data *dest = (fb_data *)bitmap + dst_width * row;
-            int delta = 127;
-            unsigned r, g, b;
+                /* iriver h300, colour iPods, X5 */
+                fb_data *dest = (fb_data *)bitmap + dst_width * row;
+                int delta = 127;
+                unsigned r, g, b;
 
-            for (col = 0; col < width; col++) {
-                if (dither)
-                    delta = dither_matrix[row & 0xf][col & 0xf];
-                q0 = *qp++;
-                r = (31 * q0.red + (q0.red >> 3) + delta) >> 8;
-                g = (63 * q0.green + (q0.green >> 2) + delta) >> 8;
-                b = (31 * q0.blue + (q0.blue >> 3) + delta) >> 8;
-                *dest++ = LCD_RGBPACK_LCD(r, g, b);
-            }
+                for (col = 0; col < width; col++) {
+                    if (dither)
+                        delta = dither_matrix[row & 0xf][col & 0xf];
+                    q0 = *qp++;
+                    r = (31 * q0.red + (q0.red >> 3) + delta) >> 8;
+                    g = (63 * q0.green + (q0.green >> 2) + delta) >> 8;
+                    b = (31 * q0.blue + (q0.blue >> 3) + delta) >> 8;
+                    *dest++ = LCD_RGBPACK_LCD(r, g, b);
+                }
 #endif /* LCD_DEPTH */
+            }
         } else
-#endif /* LCD_DEPTH > 1 */
+#endif /* (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) */
         {
             p = bitmap + dst_width * (row / 8);
             mask = 1 << (row & 7);
