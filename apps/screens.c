@@ -96,7 +96,7 @@ void usb_screen(void)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
     lcd_remote_bitmap(remote_usblogo,
-                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo)/2,
+                      (LCD_REMOTE_WIDTH-BMPWIDTH_remote_usblogo),
                       (LCD_REMOTE_HEIGHT-BMPHEIGHT_remote_usblogo)/2,
                       BMPWIDTH_remote_usblogo, BMPHEIGHT_remote_usblogo);
     lcd_remote_update();
@@ -104,9 +104,16 @@ void usb_screen(void)
 
     lcd_clear_display();
 #ifdef HAVE_LCD_BITMAP
-    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo)/2,
+#ifdef HAVE_LCD_COLOR
+    lcd_bitmap_transparent(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
+                                    (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
+                                    BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
+#else
+    lcd_bitmap(usblogo, (LCD_WIDTH-BMPWIDTH_usblogo),
                         (LCD_HEIGHT-BMPHEIGHT_usblogo)/2,
                         BMPWIDTH_usblogo, BMPHEIGHT_usblogo);
+#endif  /* HAVE_LCD_COLOR */
+
     lcd_update();
 #else
     lcd_double_height(false);

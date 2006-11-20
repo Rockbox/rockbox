@@ -21,6 +21,21 @@ rockboxlogo.240x74x16.bmp
 rockboxlogo.320x98x16.bmp
 #endif
 
-usblogo.100x32x1.bmp
+/* USB logo */
+#ifdef HAVE_LCD_COLOR
+#if LCD_WIDTH > 176
+usblogo.176x48x16.bmp
+#elif LCD_WIDTH >= 128
+usblogo.128x37x16.bmp
+#endif
+#elif LCD_DEPTH > 1 /* greyscale */
+usblogo.128x33x2.bmp
+#else /* monochrome */
+#if LCD_WIDTH == 112
+usblogo.100x20x1.bmp
+#else
+usblogo.104x27x1.bmp
+#endif
+#endif
 
 #endif /* HAVE_LCD_BITMAP */
