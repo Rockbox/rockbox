@@ -10,7 +10,7 @@ number of languages is included with Rockbox, and the latest \fname{.lng} files
 are always included in the different Rockbox builds.
 
 \opt{HAVE_LCD_BITMAP}{
-  \subsection{\label{ref:Loadingfonts}Loading Fonts}
+  \subsection{\label{ref:Loadingfonts}Loading Fonts}\index{Fonts}
   Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the
   \dap{} and ``play'' it in the \setting{File Browser}. If you want a font to
   be loaded automatically every time you start up, it must be located in the
@@ -25,6 +25,7 @@ are always included in the different Rockbox builds.
 }
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
+\index{Language files}%
 Rockbox can load language files at runtime. Simply copy the \fname{.lng} file 
 \emph{(do not use the .lang file)} to the \dap\ and ``play'' it in the 
 Rockbox directory browser or select \setting{General Settings $\rightarrow$ 
@@ -73,7 +74,7 @@ file find the instructions on the Rockbox website:
 \item [File Location: ]Custom WPS files may be located anywhere on the drive. 
   The only restriction is that they must end in \fname{.wps}. When you ``play''
   a \fname{.wps} file, it will be used for future WPS screens, and if the 
-  ``played'' \fname{.wps} file is located in the \fname{/.rockbox} folder, it 
+  ``played'' \fname{.wps} file is located in the \fname{/.rockbox/wps} folder, it 
   will be remembered and used after reboot. The \fname{.wps} filename must be 
   no more than 24 characters long for it to be remembered.
 \end{description}
