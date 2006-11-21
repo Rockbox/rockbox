@@ -379,7 +379,7 @@ void pcm_rec_dma_start(const void *addr, size_t size)
     INTERRUPTCLEAR = 0x03c00000;
 #endif
 
-    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_DINC |
+    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
            DMA_DSIZE(3) | DMA_START;
 } /* pcm_dma_start */
 
