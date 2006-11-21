@@ -8,6 +8,7 @@
  */
 
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -441,7 +442,7 @@ void SH2Disasm(unsigned v_addr, unsigned char *p_addr, int mode, char *m_addr)
                       }
                     else                            /* .L */
                       {
-                        unsigned char *b_addr = (unsigned char *)((int)p_addr & 0xfffffffc);
+                        unsigned char *b_addr = (unsigned char *)((intptr_t)p_addr & ~3);
                         int dat =  (unsigned int) (*(imm + b_addr) << 24) | (*(imm + b_addr + 1) << 16)
                           | (*(imm + b_addr + 2) << 8) | *(imm + b_addr + 3) ;
 			/* SH-1 register name lookup */
