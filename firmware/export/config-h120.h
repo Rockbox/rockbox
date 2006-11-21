@@ -168,9 +168,9 @@
 /** Port-specific settings **/
 
 /* Main LCD backlight brightness range and defaults */
-#define DEFAULT_CONTRAST_SETTING    28
 #define MIN_CONTRAST_SETTING        14 /* White screen a bit higher than this */
 #define MAX_CONTRAST_SETTING        63 /* Black screen a bit lower than this */
+#define DEFAULT_CONTRAST_SETTING    27
 
 /* Remote LCD contrast range and defaults */
 #define MIN_REMOTE_CONTRAST_SETTING     5
