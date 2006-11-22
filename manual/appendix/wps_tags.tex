@@ -31,8 +31,11 @@ conditionals to show alternate information in preference to assuming.
   \begin{tagmap}{}{}
     \config{\%bl} & Show numeric battery level in percent.\\
                   & Can also be used in a conditional: 
-    \config{\%?bl{\textless}0{\textbar}1{\textbar}2{\textbar}3{\textbar}4{\textgreater}}\\
-           \config{\%bv} & Show the battery level in volts\\
+                    \config{\%?bl{\textless}-1{\textbar}0{\textbar}1{\textbar}%
+                    2{\textbar}\ldots{\textbar}N{\textgreater}}\\
+                  & Where the -1 value is used when the battery level isn't
+                        known (it usually is).\\
+    \config{\%bv} & Show the battery level in volts\\
     \config{\%bt} & Show estimated battery time left\\
     \config{\%bp} & ``p'' if the charger is connected \\
                   & (only on targets that can charge batteries)\\
@@ -48,13 +51,14 @@ conditionals to show alternate information in preference to assuming.
     \config{\%fb} & File Bitrate (in kbps)\\
     \config{\%fc} & File Codec (e.g. ``MP3'' or ``FLAC''). %
            This tag can also be used in a conditional tag, %
-           \config{\%?fc{\textless}mp1\-{\textbar}mp2\-{\textbar}mp3\-{\textbar}wav\-%
-           {\textbar}vorbis\-{\textbar}flac\-{\textbar}mpc\-{\textbar}a52\-%
-           {\textbar}wavpack\-{\textbar}alac\-{\textbar}aac\-{\textbar}shn\-%
-           {\textbar}aiff\-%
-           {\textbar}unknown{\textgreater}}. %
-           The codec order is as follows: MP1, MP2, MP3, WAV, Ogg Vorbis (OGG),%
-           FLAC, MPC, AC3, WavPack (WV), ALAC, AAC, Shorten (SHN), AIFF\\
+           \config{\%?fc{\textless}mp1\-{\textbar}mp2\-{\textbar}mp3\-%
+           {\textbar}aiff\-{\textbar}wav\-{\textbar}vorbis\-{\textbar}flac\-%
+           {\textbar}mpc\-{\textbar}a52\-{\textbar}wavpack\-{\textbar}alac\-%
+           {\textbar}aac\-{\textbar}shn\-{\textbar}sid\-{\textbar}adx\-%
+           {\textbar}unknown{\textgreater}}.\\
+                  & The codec order is as follows: MP1, MP2, MP3, AIFF, WAV,%
+           Ogg Vorbis (OGG), FLAC, MPC, AC3, WavPack (WV), ALAC, AAC,%
+           Shorten (SHN), SID, ADX.\\
     \config{\%ff} & File Frequency (in Hz)\\
     \config{\%fm} & File Name\\
     \config{\%fn} & File Name (without extension)\\
@@ -66,10 +70,9 @@ conditionals to show alternate information in preference to assuming.
     \config{\%d3} & Third directory from end of file path.\\
   \end{tagmap}
 \end{table}
-Example for the the \config{\%dN} commands: If the path is 
+Example for the \config{\%dN} commands: If the path is 
 ``/Rock/Kent/Isola/11 - 747.mp3'', \config{\%d1} is ``Isola'', 
-\config{\%d2} is ``Kent'' \dots
-You get the picture.
+\config{\%d2} is ``Kent'' \dots{} You get the picture.
 
 \section{Playlist/Song Info}
 \begin{table}
@@ -78,7 +81,7 @@ You get the picture.
     \opt{player}{
           & This will display a 1 character ``cup'' %
             that empties as the time progresses.}
-    \opt{recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{
+    \opt{HAVE_LCD_BITMAP}{
          & This will replace the entire line with a progress bar. \\
          & You can set the height, position and width of the progressbar %
            (in pixels): \config{\%pb{\textbar}height{\textbar}leftpos%
@@ -88,16 +91,16 @@ You get the picture.
     }
     \config{\%pc} & Current Time In Song\\
     \config{\%pe} & Total Number of Playlist Entries\\
-    \config{\%pm} & Peak Meter (Recorder only) The entire line is used as volume peak meter.\\
+    \config{\%pm} & Peak Meter (Recorder only) The entire line is used as%
+                    volume peak meter.\\
     \config{\%pn} & Playlist Name (Without path or extension)\\
     \config{\%pp} & Playlist Position\\
     \config{\%pr} & Remaining Time In Song\\
     \config{\%ps} & Shuffle. Shows 's' if shuffle mode is enabled.\\
     \config{\%pt} & Total Track Time\\
-    \config{\%pv} & Current volume. Can also be used in a conditional: \\
-         & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}3%
-           {\textbar}4{\textbar}5{\textbar}6{\textbar}7{\textbar}8%
-           {\textbar}9{\textbar}10{\textgreater}}\\
+    \config{\%pv} & Current volume (x dB). Can also be used in a conditional: \\
+         & \config{\%?pv{\textless}0{\textbar}1{\textbar}2{\textbar}\ldots%
+           {\textbar}N{\textgreater}}\\
   \end{tagmap}
 \end{table}
 
@@ -116,10 +119,13 @@ You get the picture.
 \section{Sound (DSP) settings}
 \begin{table}
   \begin{tagmap}{}{}
-    \config{\%sp} & display current playback pitch \\
+    \config{\%sp} & Display current playback pitch \\
   \opt{SWCODEC}{
     \config{\%xf} & Crossfade setting, in the order: Off, Shuffle, Skip, Always\\
-    \config{\%rg} & ReplayGain setting, in the order: Off, Track, Album, Shuffle\\
+    \config{\%rg} & ReplayGain value in use (x.y dB). If used as a conditional,
+           Replaygain type in use: \config{\%?rg{\textless}Off{\textbar}Track%
+           {\textbar}Album{\textbar}TrackShuffle{\textbar}AlbumShuffle%
+           {\textbar}No tag{\textgreater}}\\
     \config{\%xd} & Crossfeed setting\\
   }
   \end{tagmap}
