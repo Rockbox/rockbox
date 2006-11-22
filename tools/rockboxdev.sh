@@ -14,7 +14,20 @@ prefix="/usr/local"
 # must not exist before this script is invoked (as a security measure).
 builddir="$HOME/build-rbdev"
 
+# This script needs to use GNU Make. On Linux systems, GNU Make is invoked
+# by running the "make" command, on most BSD systems, GNU Make is invoked
+# by running the "gmake" command. Set the "make" variable accordingly.
+if [ -n "`which gmake`" ]; then
+    make="gmake"
+else
+    make="make"
+fi
+
+# If detection fails, override the value of make manually:
+# make="make"
+
 ##############################################################################
+
 
 findtool(){
   file="$1"
@@ -201,9 +214,9 @@ cd build-binu
 echo "ROCKBOXDEV: binutils/configure"
 ../binutils-$binutils/configure --target=$target --prefix=$prefix/$target
 echo "ROCKBOXDEV: binutils/make"
-make
+$make
 echo "ROCKBOXDEV: binutils/make install to $prefix/$target"
-make install
+$make install
 cd .. # get out of build-binu
 PATH="${PATH}:$bindir"
 SHELL=/bin/sh # seems to be needed by the gcc build in some cases
@@ -215,9 +228,9 @@ cd build-gcc
 echo "ROCKBOXDEV: gcc/configure"
 ../gcc-$gccver/configure --target=$target --prefix=$prefix/$target --enable-languages=c
 echo "ROCKBOXDEV: gcc/make"
-make
+$make
 echo "ROCKBOXDEV: gcc/make install to $prefix/$target"
-make install
+$make install
 cd .. # get out of build-gcc
 cd .. # get out of $builddir
 
