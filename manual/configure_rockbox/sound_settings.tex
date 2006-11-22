@@ -385,3 +385,31 @@ is similar to ``Q'' in the Graphical EQ).
 filters, and High Shelf, the peaking filters are not currently operational.}
 
 }
+
+\opt{SWCODEC}{
+\section{Dithering}
+This setting controls the dithering and noise shaping functionality of Rockbox.
+
+Most of Rockbox' audio file decoders work at a higher bit depth than the 16 bits
+used for output on the \daps{} audio connectors. The simplest way in which to
+convert from one bit depth to another is simply discarding all the surplus bits.
+This is the default behaviour, and adds distortion to the signal that will
+vary in character along with the desired sound.
+
+Dithering adds low-level noise to the signal prior to throwing away the surplus
+bits, which gives the resulting signal a uniform noise floor which is
+independent of the signal. Most people find this noise preferable to the
+time-varying noise heard when not performing dithering.
+
+After dithering, noise shaping is performed. This basically just pushes the
+dithering noise to the parts of the frequency spectrum humans cannot hear so
+easily. In Rockbox' case, some of the noise is pushed up to above 10 kHz.
+
+This setting will be put to its best use when listening to dynamic music with
+frequently occuring quiet parts, classical music being a typical example. It is
+worth noting that the effects of dithering and noise shaping are very subtle,
+and not easily noticable.
+
+Rockbox uses highpass triangular distribution noise as the dithering noise
+source, and a third order noise shaper.
+}
