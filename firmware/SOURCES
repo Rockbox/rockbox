@@ -308,10 +308,13 @@ target/sh/archos/lcd-as-archos-bitmap.S
 
 #ifdef SANSA_E200
 #ifndef SIMULATOR
-target/arm/wmcodec-pp.c
 target/arm/sandisk/sansa-e200/ata-e200.c
 target/arm/sandisk/sansa-e200/lcd-e200.c
 target/arm/sandisk/sansa-e200/adc-e200.c
+target/arm/sandisk/sansa-e200/backlight-e200.c
+target/arm/sandisk/sansa-e200/usb-e200.c
+target/arm/sandisk/sansa-e200/button-e200.c
+target/arm/sandisk/sansa-e200/power-e200.c
 #endif /* SIMULATOR */
 #endif /* SANSA_E200 */
 

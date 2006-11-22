@@ -16,10 +16,21 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_TARGET_H
-#define USB_TARGET_H
 
-bool usb_init_device(void);
+#include <stdbool.h>
 
-#endif
+bool usb_init_device(void)
+{
+    return true;
+}
+
+bool usb_detect(void)
+{
+    return false;
+}
+
+void usb_enable(bool on)
+{
+    (void)on;
+}
 

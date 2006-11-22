@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardelll
+ * Copyright (C) 2006 by Daniel Ankers
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,10 +16,11 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef USB_TARGET_H
-#define USB_TARGET_H
 
-bool usb_init_device(void);
+void power_init(void)
+{
+}
 
-#endif
-
+void power_off(void)
+{
+}
