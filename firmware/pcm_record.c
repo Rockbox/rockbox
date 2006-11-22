@@ -55,9 +55,9 @@
     be shared semi-privately **/
 
 /* the registered callback function for when more data is available */
-pcm_more_callback_type pcm_callback_more_ready = NULL;
+volatile pcm_more_callback_type pcm_callback_more_ready = NULL;
 /* DMA transfer in is currently active */
-bool                   pcm_recording           = false;
+volatile bool                   pcm_recording           = false;
 
 /* APIs implemented in the target-specific portion */
 void pcm_rec_dma_start(const void *addr, size_t size);

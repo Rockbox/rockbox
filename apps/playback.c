@@ -396,8 +396,18 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
         logf("get buffer: talk_buf");
         /* ok to use everything from audiobuf to audiobufend */
         if (buffer_state != BUFFER_STATE_TRASHED)
+        {
             talk_buffer_steal();
-        buffer_state = BUFFER_STATE_TRASHED;
+#ifdef PLAYBACK_VOICE
+            if (NULL != iram_buf[CODEC_IDX_VOICE])
+            {
+                /* Voice could be swapped out - wait for it to return */
+                while (current_codec != CODEC_IDX_VOICE)
+                    yield();
+            }
+#endif /* PLAYBACK_VOICE */
+            buffer_state = BUFFER_STATE_TRASHED;
+        }
     }
     else
     {
@@ -423,6 +433,10 @@ void audio_iram_steal(void)
 #ifdef PLAYBACK_VOICE
     if (NULL != iram_buf[CODEC_IDX_VOICE])
     {
+        /* Can't already be stolen */
+        if (voice_iram_stolen)
+            return;
+
         /* Wait for voice to swap back in if current codec was audio */
         while (current_codec != CODEC_IDX_VOICE)
             yield();
@@ -455,15 +469,14 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
 
 #ifdef PLAYBACK_VOICE
 #ifdef IRAM_STEAL
-    end = dram_buf[CODEC_IDX_VOICE] ?
-            dram_buf[CODEC_IDX_VOICE] : audiobufend;
+    end = dram_buf[CODEC_IDX_VOICE];
 #else
-    end = iram_buf[CODEC_IDX_VOICE] ?
-            iram_buf[CODEC_IDX_VOICE] : audiobufend;
+    end = iram_buf[CODEC_IDX_VOICE];
 #endif /* IRAM_STEAL */
-#else
-    end = audiobufend;
+    if (NULL == end)
 #endif /* PLAYBACK_VOICE */
+        end = audiobufend;
+
 
     buffer_state = BUFFER_STATE_TRASHED;
 

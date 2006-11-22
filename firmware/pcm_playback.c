@@ -48,9 +48,9 @@
     be shared semi-privately **/
 
 /* the registered callback function to ask for more mp3 data */
-pcm_more_callback_type pcm_callback_for_more = NULL;
-bool                   pcm_playing           = false;
-bool                   pcm_paused            = false;
+volatile pcm_more_callback_type pcm_callback_for_more = NULL;
+volatile bool                   pcm_playing           = false;
+volatile bool                   pcm_paused            = false;
 
 void pcm_play_dma_start(const void *addr, size_t size);
 void pcm_play_dma_stop(void);
