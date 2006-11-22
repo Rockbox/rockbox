@@ -240,10 +240,14 @@ static void pcmbuf_under_watermark(void)
 #ifdef HAVE_PRIORITY_SCHEDULING
     static int old_priority = 0;
     
-    if (LOW_DATA(2) && !old_priority && pcm_is_playing())
+    if (LOW_DATA(2) && pcm_is_playing())
     {
-        /* Buffer is critically low so override UI priority. */
-        old_priority = thread_set_priority(codec_thread_p, PRIORITY_REALTIME);
+        if (!old_priority)
+        {
+            /* Buffer is critically low so override UI priority. */
+            old_priority = thread_set_priority(codec_thread_p, 
+                                               PRIORITY_REALTIME);
+        }
     }
     else if (old_priority)
     {
