@@ -48,8 +48,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* Define this if you have the WM8975 audio codec */
-#define HAVE_WM8731
+/* Use the built-in DAC on the PP5024 */
+#define HAVE_PP5024_CODEC
 
 #define AB_REPEAT_ENABLE 1
 
@@ -120,5 +120,7 @@
 
 #define BOOTFILE_EXT "e200"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
+
+#define ICODE_ATTR_TREMOR_NOT_MDCT
 
 #endif

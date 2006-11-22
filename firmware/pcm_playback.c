@@ -61,7 +61,7 @@ void pcm_play_pause_unpause(void);
 
 #ifndef CPU_COLDFIRE
 
-#if (CONFIG_CPU == S3C2440)
+#if (CONFIG_CPU == S3C2440) 
 
 /* TODO: Implement for Gigabeat
    For now, just implement some dummy functions.
@@ -99,7 +99,8 @@ size_t pcm_get_bytes_waiting(void)
 }
 
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
-   || defined(HAVE_WM8731) || defined(HAVE_WM8721)
+   || defined(HAVE_WM8731) || defined(HAVE_WM8721) \
+   || defined(HAVE_PP5024_CODEC)
 
 /* We need to unify this code with the uda1380 code as much as possible, but
    we will keep it separate during early development.
@@ -393,6 +394,11 @@ void fiq(void)
 }
 #endif /* CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002 */
 
+#ifdef HAVE_PP5024_CODEC
+void pcm_init(void)
+{
+}
+#else
 void pcm_init(void)
 {
     pcm_playing = false;
@@ -411,7 +417,7 @@ void pcm_init(void)
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
 }
-
+#endif /* HAVE_PP5024_CODEC */
 #elif (CONFIG_CPU == PNX0101)
 
 #define DMA_BUF_SAMPLES 0x100
@@ -633,7 +639,7 @@ void pcm_calculate_peaks(int *left, int *right)
     {
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) \
-   || (CONFIG_CPU == PNX0101)
+   || (CONFIG_CPU == PNX0101) || defined(HAVE_PP5024_CODEC)
         size_t samples = p_size / 4;
         addr = p;
 #endif

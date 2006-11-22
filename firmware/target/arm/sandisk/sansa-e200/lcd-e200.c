@@ -21,9 +21,7 @@
  *
  ****************************************************************************/
 #include "config.h"
-#include "cpu.h"
 #include "lcd.h"
-#include "kernel.h"
 #include "system.h"
 
 #define LCD_DATA_IN_GPIO GPIOB_INPUT_VAL
@@ -108,6 +106,29 @@ static inline void lcd_write_reg(unsigned int reg, unsigned int data)
     lcd_send_msg(0x72, data);
 }
 
+static inline void cache_flush(void)
+{
+#ifndef BOOTLOADER
+    outl(inl(0xf000f044) | 0x2, 0xf000f044);
+    while ((inl(0x6000c000) & 0x8000) != 0)
+    {
+    }
+#endif
+}
+
+/* The LCD controller gets passed the address of the framebuffer, but can only
+   use the physical, not the remapped, address.  This is a quick and dirty way
+   of correcting it */
+static unsigned long phys_fb_address(unsigned long address)
+{
+    if(address < 0x10000000)
+    {
+        return address + 0x10000000;
+    } else {
+        return address;
+    }
+}
+
 inline void lcd_init_device(void)
 {
 /* All this is magic worked out by MrH */
@@ -158,7 +179,7 @@ inline void lcd_init_device(void)
     LCD_REG_6 |= (1 << 4);
 
     LCD_REG_5 &= ~(1 << 7);
-    LCD_FB_BASE_REG = (unsigned long)lcd_framebuffer;
+    LCD_FB_BASE_REG = phys_fb_address((unsigned long)lcd_framebuffer);
 
     udelay(100000);
 
@@ -228,6 +249,7 @@ inline void lcd_init_device(void)
 
 inline void lcd_update(void)
 {
+    cache_flush();
     if(!(LCD_REG_6 & 1))
         LCD_REG_6 |= 1;
 }
@@ -262,3 +284,33 @@ void lcd_set_flip(bool yesno)
     /* TODO: Implement lcd_set_flip() */
     (void)yesno;
 }
+
+/* Blitting functions */
+
+void lcd_blit(const fb_data* data, int x, int by, int width,
+              int bheight, int stride)
+{
+    /* TODO: Implement lcd_blit() */
+    (void)data;
+    (void)x;
+    (void)by;
+    (void)width;
+    (void)bheight;
+    (void)stride;
+}
+
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    /* TODO: Implement lcd_blit() */
+    (void)src;
+    (void)src_x;
+    (void)src_y;
+    (void)stride;
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+}
+

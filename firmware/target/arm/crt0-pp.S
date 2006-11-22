@@ -47,14 +47,28 @@ start:
     .equ    SLEEP,    0x80000000
     .equ    WAKE,     0x0
     .equ    SLEEPING, 0x80000000
+    .equ    CACHE_CTRL, 0x6000c000
 #endif
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 
 #ifndef BOOTLOADER
     b      pad_skip
-.space 50*4 /* (more than enough) space for exception vectors */
+
+#if defined(SANSA_E200)
+/* mi4tool writes junk between 0xe0 and 0xeb.  Avoid this. */
+.space 60*4 /* (more than enough) space for exception vectors */
+#else
+.space 50*4
+#endif
+
 pad_skip:
+#ifdef SANSA_E200
+    /* On the Sansa, copying the vectors fails if the cache is initialised */
+    ldr    r1, =CACHE_CTRL
+    mov    r2, #0x0
+    str    r2, [r1]
+#endif
     /* We need to remap memory from wherever SDRAM is mapped natively, to
        base address 0, so we can put our exception vectors there. We don't
        want to do this remapping while executing from SDRAM, so we copy the
@@ -126,7 +140,7 @@ remap_end:
     ldr    r0, =fiq_handler
     str    r0, [r1, #28]
 #endif
-    
+
 #ifndef STUB
     /* Zero out IBSS */
     ldr    r2, =_iedata

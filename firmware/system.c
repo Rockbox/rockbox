@@ -585,7 +585,7 @@ void UIE(unsigned int pc, unsigned int num)
     }
 }
 
-#if CONFIG_CPU==PP5020
+#if CONFIG_CPU==PP5020 || CONFIG_CPU==PP5024
 
 unsigned int ipod_hw_rev;
 
@@ -605,9 +605,11 @@ void irq(void)
     else if (CPU_HI_INT_STAT & GPIO_MASK)
         ipod_mini_button_int();
 }
-#elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB) || defined(ELIO_TPJ1022)
+#elif (defined IRIVER_H10) || (defined IRIVER_H10_5GB) || defined(ELIO_TPJ1022) \
+    || (defined SANSA_E200)
 /* TODO: this should really be in the target tree, but moving it there caused
    crt0.S not to find it while linking */
+/* TODO: Even if it isn't in the target tree, this should be the default case */
 void irq(void)
 {
     if (CPU_INT_STAT & TIMER1_MASK)

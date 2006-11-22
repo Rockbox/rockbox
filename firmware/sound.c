@@ -89,6 +89,9 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_TREBLE]        = {"dB", 0,  1,  -6,   9,   0, sound_set_treble},
 #elif (CONFIG_CPU == PNX0101)
     [SOUND_VOLUME]        = {"dB", 0,  1, -48,  15,   0, sound_set_volume},
+#elif defined(HAVE_PP5024_CODEC)
+/* TODO: Make this correct */
+    [SOUND_VOLUME]        = {"dB", 0,  1, -74,   6, -25, sound_set_volume},
 #else /* MAS3507D */
     [SOUND_VOLUME]        = {"dB", 0,  1, -78,  18, -18, sound_set_volume},
     [SOUND_BASS]          = {"dB", 0,  1, -15,  15,   7, sound_set_bass},
@@ -420,11 +423,17 @@ static int tenthdb2mixer(int db)
         return -db * 2 / 5;
 }
 
+#elif defined(HAVE_PP5024_CODEC)
+/* TODO: Work out volume/balance/treble/bass interdependency */
+#define VOLUME_MIN 0
+#define VOLUME_MAX 1
+
 #endif
 
 #if (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
     || defined HAVE_WM8975 || defined HAVE_WM8758 || defined(HAVE_WM8731) \
-    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751)
+    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
+    || defined(HAVE_PP5024_CODEC)
  /* volume/balance/treble/bass interdependency main part */
 #define VOLUME_RANGE (VOLUME_MAX - VOLUME_MIN)
 
@@ -599,7 +608,8 @@ void sound_set_volume(int value)
     mas_codec_writereg(0x10, tmp);
 #elif (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 \
    || defined HAVE_WM8975 || defined HAVE_WM8758 || defined HAVE_WM8731 \
-   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751)
+   || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751) \
+   || defined(HAVE_PP5024_CODEC)
     current_volume = value * 10;     /* tenth of dB */
     set_prescaled_volume();                          
 #elif CONFIG_CPU == PNX0101
@@ -620,8 +630,8 @@ void sound_set_balance(int value)
    || defined(HAVE_WM8721) || defined(HAVE_TLV320) || defined(HAVE_WM8751)
     current_balance = value * VOLUME_RANGE / 100; /* tenth of dB */
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
+#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
+    /* TODO: implement for iFP and Sansa */
     (void)value;
 #endif
 }
@@ -647,8 +657,8 @@ void sound_set_bass(int value)
     current_bass = value * 10;
     wmcodec_set_bass(value);
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
+#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
+    /* TODO: implement for iFP and Sansa */
     (void)value;
 #endif               
 }
@@ -673,8 +683,8 @@ void sound_set_treble(int value)
     wmcodec_set_treble(value);
     current_treble = value * 10;
     set_prescaled_volume();
-#elif CONFIG_CPU == PNX0101
-    /* TODO: implement for iFP */
+#elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
+    /* TODO: implement for iFP and Sansa */
     (void)value;
 #endif    
 }
