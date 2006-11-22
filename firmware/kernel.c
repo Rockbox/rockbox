@@ -25,7 +25,7 @@
 #include "system.h"
 #include "panic.h"
 
-#if ((CONFIG_CPU != PP5020) && (CONFIG_CPU != PP5002)) || !defined(BOOTLOADER) 
+#if !defined(CPU_PP) || !defined(BOOTLOADER) 
 long current_tick = 0;
 #endif
 

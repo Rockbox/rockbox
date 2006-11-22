@@ -167,7 +167,7 @@ enum {
 #endif
 
 /* As defined in plugin.lds */
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#if defined(CPU_PP)
 #define CODEC_IRAM_ORIGIN   0x4000c000
 #define CODEC_IRAM_SIZE     0xc000
 #elif defined(IAUDIO_X5)

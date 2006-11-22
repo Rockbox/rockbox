@@ -275,8 +275,7 @@
 #if !defined(SIMULATOR) &&   /* Not for simulators */ \
     (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
     defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
-    (CONFIG_CPU == PP5020) ||  /* iPod and H10: core, plugins, codecs */ \
-    (CONFIG_CPU == PP5002) ||  /* iPod: core, plugins, codecs */ \
+    defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     (CONFIG_CPU == PNX0101))
 #define ICODE_ATTR      __attribute__ ((section(".icode")))
 #define ICONST_ATTR     __attribute__ ((section(".irodata")))

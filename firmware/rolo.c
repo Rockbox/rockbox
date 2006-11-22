@@ -32,8 +32,10 @@
 
 #if !defined(IRIVER_IFP7XX_SERIES) && \
     (CONFIG_CPU != PP5002) && !defined(IRIVER_H10) && \
-    !defined(IRIVER_H10_5GB) && (CONFIG_CPU != S3C2440)
+    !defined(IRIVER_H10_5GB) && (CONFIG_CPU != S3C2440) && \
+    !defined(SANSA_E200)
 /* FIX: this doesn't work on iFP, 3rd Gen ipods, or H10 yet */
+/* TODO: Test on the Sansa */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -111,7 +113,7 @@ int rolo_load(const char* filename)
 {
     int fd;
     long length;
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(CPU_COLDFIRE) || defined(CPU_PP)
     int i;
     unsigned long checksum,file_checksum;
 #else
@@ -141,7 +143,7 @@ int rolo_load(const char* filename)
 
     length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
 
-#if defined(CPU_COLDFIRE) || (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+#if defined(CPU_COLDFIRE) || defined(CPU_PP)
     /* Read and save checksum */
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
     if (read(fd, &file_checksum, 4) != 4) {

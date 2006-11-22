@@ -26,7 +26,7 @@
 #ifndef SIMULATOR
 
 
-#if CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#if defined(CPU_PP)
  /* Portalplayer chips use a microsecond timer. */
  #define TIMER_FREQ 1000000
 #elif defined(CPU_COLDFIRE)

@@ -385,8 +385,8 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
                   unsigned addr1, unsigned addr2)
 
 {
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
-    /* TODO: Implement for iPod */
+#ifdef CPU_PP
+    /* TODO: Implement for PortalPlayer */
     (void)p_manufacturer;
     (void)p_device;
     (void)addr1;

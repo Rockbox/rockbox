@@ -20,10 +20,6 @@ OUTPUT_FORMAT(elf32-sh)
 #define ARCH_IRIVER
 #endif
 
-#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020)
-#define ARCH_IPOD
-#endif
-
 #ifdef ARCH_IRIVER
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x1000c000
@@ -32,7 +28,7 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10010000
 #define IRAMSIZE 0x10000
-#elif defined(ARCH_IPOD)
+#elif defined(CPU_PP)
 #define DRAMORIG 0x00000000
 #define IRAMORIG 0x4000c000
 #define IRAMSIZE 0xc000
@@ -77,7 +73,7 @@ SECTIONS
     .text :
     {
         *(.text*)
-#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101) || (CONFIG_CPU==PP5002)
+#if defined(CPU_PP) || (CONFIG_CPU==PNX0101)
         *(.glue_7)
         *(.glue_7t)
 #endif

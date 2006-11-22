@@ -49,7 +49,7 @@ void TIMER1(void)
         pfn_timer();
     TER1 = 0xff; /* clear all events */
 }
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#elif defined(CPU_PP)
 void TIMER2(void)
 {
     TIMER2_VAL; /* ACK interrupt */
@@ -150,7 +150,7 @@ static bool timer_set(long cycles, bool start)
     if (start || (TCN1 >= TRR1))
         TCN1 = 0; /* reset the timer */
     TER1 = 0xff;  /* clear all events */
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#elif defined(CPU_PP)
     if (cycles > 0x20000000 || cycles < 2)
         return false;
 
@@ -200,9 +200,8 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || cycles == 0)
         return false;
 
-#if (CONFIG_CPU==PP5002) || (CONFIG_CPU==PP5020) || (CONFIG_CPU==PNX0101) \
-    || (CONFIG_CPU==S3C2440)
-    /* TODO: Implement for iPod and iFP (if possible) */
+#if defined(CPU_PP) || (CONFIG_CPU==PNX0101) || (CONFIG_CPU==S3C2440)
+    /* TODO: Implement for PortalPlayer and iFP (if possible) */
     (void)int_prio;
 #endif
 
@@ -227,7 +226,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     ICR2 = 0x90;       /* interrupt on level 4.0 */
     and_l(~(1<<10), &IMR);
     TMR1 |= 1;         /* start timer */
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#elif defined(CPU_PP)
     /* unmask interrupt source */
     CPU_INT_EN = TIMER2_MASK;
 #endif
@@ -247,7 +246,7 @@ void timer_unregister(void)
 #elif defined CPU_COLDFIRE
     TMR1 = 0;               /* disable timer 1 */
     or_l((1<<10), &IMR);    /* disable interrupt */
-#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5002
+#elif defined(CPU_PP)
     TIMER2_CFG = 0;         /* stop timer 2 */
     CPU_INT_CLR = TIMER2_MASK;
 #endif
