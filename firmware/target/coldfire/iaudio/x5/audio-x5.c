@@ -25,7 +25,7 @@
  * Note that microphone is mono, only left value is used 
  * See tlv320_set_recvol() for exact ranges.
  *
- * @param type   0=line-in (radio), 1=mic
+ * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
  * 
  */
 void audio_set_recording_gain(int left, int right, int type)
