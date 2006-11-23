@@ -1278,6 +1278,7 @@ fi
     [Vv])
       echo "Voice build selected"
       voiceconfig
+      toolset="${toolset} voicefont wavtrim"
       voice="yes"
       ;;
     *)
