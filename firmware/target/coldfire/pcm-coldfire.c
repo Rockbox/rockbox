@@ -57,9 +57,9 @@ static int play_peak_left, play_peak_right;
 static unsigned long *rec_peak_addr;
 static int rec_peak_left, rec_peak_right;
 
-#define IIS_DEFPARM     ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
-                          (pcm_txsrc_select[pcm_monitor+1] << 8) | \
-                          (4 << 2) )  /* 64 bit clocks / word clock */
+#define IIS_DEFPARM(output)     ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
+                                  (output) | \
+                                  (4 << 2) )  /* 64 bit clocks / word clock */
 #define IIS_RESET       0x800
 
 #ifdef IAUDIO_X5
@@ -128,78 +128,20 @@ void pcm_set_frequency(unsigned int frequency)
     pcm_freq = hw_freq_sampr[index];
 } /* pcm_set_frequency */
 
-/** monitoring/source selection **/
-static int pcm_monitor = AUDIO_SRC_PLAYBACK;
-
-static const unsigned char pcm_txsrc_select[AUDIO_NUM_SOURCES+1] =
-{
-    [AUDIO_SRC_PLAYBACK+1] = 3, /* PDOR3        */
-    [AUDIO_SRC_MIC+1]      = 4, /* IIS1 RcvData */
-    [AUDIO_SRC_LINEIN+1]   = 4, /* IIS1 RcvData */
-#ifdef HAVE_FMRADIO_IN
-    [AUDIO_SRC_FMRADIO+1]  = 4, /* IIS1 RcvData */
-#endif
-#ifdef HAVE_SPDIF_IN
-    [AUDIO_SRC_SPDIF+1]    = 7, /* EBU1 RcvData */
-#endif
-};
-
-static const unsigned short pcm_dataincontrol[AUDIO_NUM_SOURCES+1] =
-{
-    [AUDIO_SRC_PLAYBACK+1] = 0x0200, /* Reset PDIR2 data flow */
-    [AUDIO_SRC_MIC+1]      = 0xc020, /* Int. when 6 samples in FIFO,
-                                        PDIR2 src = ebu1RcvData */
-    [AUDIO_SRC_LINEIN+1]   = 0xc020, /* Int. when 6 samples in FIFO,
-                                        PDIR2 src = ebu1RcvData */
-#ifdef HAVE_FMRADIO_IN
-    [AUDIO_SRC_FMRADIO+1]  = 0xc020, /* Int. when 6 samples in FIFO,
-                                        PDIR2 src = ebu1RcvData */
-#endif
-#ifdef HAVE_SPDIF_IN
-    [AUDIO_SRC_SPDIF+1]    = 0xc038, /* Int. when 6 samples in FIFO,
-                                        PDIR2 src = ebu1RcvData */
-#endif
-};
-
-static int pcm_rec_src = AUDIO_SRC_PLAYBACK;
-
-void pcm_set_monitor(int monitor)
-{
-    if ((unsigned)monitor >= AUDIO_NUM_SOURCES)
-        monitor = AUDIO_SRC_PLAYBACK;
-    pcm_monitor = monitor;
-} /* pcm_set_monitor */
-
-void pcm_set_rec_source(int source)
-{
-    if ((unsigned)source >= AUDIO_NUM_SOURCES)
-        source = AUDIO_SRC_PLAYBACK;
-    pcm_rec_src = source;
-} /* pcm_set_rec_source */
-
 /* apply audio settings */
 void pcm_apply_settings(bool reset)
 {
-    static int last_pcm_freq    = HW_SAMPR_DEFAULT;
-#if 0
-    static int last_pcm_monitor = AUDIO_SRC_PLAYBACK;
-#endif
-    static int last_pcm_rec_src = AUDIO_SRC_PLAYBACK;
+    static int last_pcm_freq = HW_SAMPR_DEFAULT;
+    unsigned long output = IIS_CONFIG & (7 << 8);
 
-    /* Playback must prevent pops and record monitoring won't work at all
+    /* Playback must prevent pops and record monitoring won't work at all if
        adding IIS_RESET when setting IIS_CONFIG. Use a different method for
        each. */
-    if (reset && (pcm_monitor != AUDIO_SRC_PLAYBACK))
+    if (reset && output != (3 << 8))
     {
         /* Not playback - reset first */
         SET_IIS_CONFIG(IIS_RESET);
         reset = false;
-    }
-
-    if (pcm_rec_src != last_pcm_rec_src)
-    {
-        last_pcm_rec_src = pcm_rec_src;
-        DATAINCONTROL = pcm_dataincontrol[pcm_rec_src+1];
     }
 
     if (pcm_freq != last_pcm_freq)
@@ -209,7 +151,7 @@ void pcm_apply_settings(bool reset)
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
     }
 
-    SET_IIS_CONFIG(IIS_DEFPARM | (reset ? IIS_RESET : 0));
+    SET_IIS_CONFIG(IIS_DEFPARM(output) | (reset ? IIS_RESET : 0));
 } /* pcm_apply_settings */
 
 /** DMA **/
@@ -270,11 +212,10 @@ void pcm_init(void)
     /* Reset the audio FIFO */
     SET_IIS_CONFIG(IIS_RESET);
 
-    pcm_set_frequency(-1);
-    pcm_set_monitor(-1);
+    pcm_set_frequency(HW_FREQ_DEFAULT);
 
     /* Prevent pops (resets DAC to zero point) */
-    SET_IIS_CONFIG(IIS_DEFPARM | IIS_RESET);
+    SET_IIS_CONFIG(IIS_DEFPARM(3 << 8) | IIS_RESET);
 
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
     spdif_init();
@@ -443,7 +384,7 @@ void DMA1(void)
         logf("DMA1 err: 0x%x", res);
     }
 #ifdef HAVE_SPDIF_IN
-    else if (pcm_rec_src == AUDIO_SRC_SPDIF &&
+    else if (DATAINCONTROL == 0xc038 &&
         (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
     {
         INTERRUPTCLEAR = 0x03c00000;
@@ -685,32 +626,3 @@ peak_done:
     if (right)
         *right = rec_peak_right;
 } /* pcm_calculate_rec_peaks */
-
-/**
- * Select VINL & VINR source: 0=Line-in, 1=FM Radio
- */
-/* All use GPIO */
-#if defined(IAUDIO_X5)
-    #define REC_MUX_BIT         (1 << 29)
-    #define REC_MUX_SET_LINE()  or_l(REC_MUX_BIT, &GPIO_OUT)
-    #define REC_MUX_SET_FM()    and_l(~REC_MUX_BIT, &GPIO_OUT)
-#else
-#if defined(IRIVER_H100_SERIES)
-    #define REC_MUX_BIT         (1 << 23)
-#elif defined(IRIVER_H300_SERIES)
-    #define REC_MUX_BIT         (1 << 30)
-#endif
-    #define REC_MUX_SET_LINE()  and_l(~REC_MUX_BIT, &GPIO_OUT)
-    #define REC_MUX_SET_FM()    or_l(REC_MUX_BIT, &GPIO_OUT)
-#endif
-
-void pcm_rec_mux(int source)
-{
-    if (source == 0)
-        REC_MUX_SET_LINE();     /* Line In */
-    else
-        REC_MUX_SET_FM();       /* FM radio */
-
-    or_l(REC_MUX_BIT, &GPIO_ENABLE);
-    or_l(REC_MUX_BIT, &GPIO_FUNCTION);
-} /* pcm_rec_mux */

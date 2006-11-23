@@ -323,13 +323,9 @@ void audio_close_recording(void)
     pcm_thread_wait_for_stop();
     pcm_thread_sync_post(PCMREC_CLOSE, NULL);
     /* reset pcm to defaults (playback only) */
-    pcm_set_frequency(-1);
-    pcm_set_monitor(-1);
-    pcm_set_rec_source(-1);
-#ifdef HAVE_TLV320
-    /* tlv320 screeches if left at 88.2 with no inputs */
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings(true);
-#endif
     audio_remove_encoder();
 } /* audio_close_recording */
 
@@ -408,12 +404,12 @@ void audio_set_recording_options(struct audio_recording_options *options)
         pcm_set_frequency(sample_rate);
     }
 
-    pcm_set_monitor(rec_source);
-    pcm_set_rec_source(rec_source);
+    /* set monitoring */
+    audio_set_output_source(rec_source);
 
     /* apply pcm settings to hardware */
     pcm_apply_settings(true);
-    
+
     if (audio_load_encoder(enc_config.afmt))
     {
         /* start DMA transfer */
@@ -425,25 +421,8 @@ void audio_set_recording_options(struct audio_recording_options *options)
     {
         logf("set rec opt: enc load failed");
         is_error = true;
-}
+    }
 } /* audio_set_recording_options */
-
-/**
- * Note that microphone is mono, only left value is used 
- * See {uda1380,tlv320}_set_recvol() for exact ranges.
- *
- * @param type   0=line-in (radio), 1=mic
- * 
- */
-void audio_set_recording_gain(int left, int right, int type)
-{
-    //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
-#if defined(HAVE_UDA1380)
-    uda1380_set_recvol(left, right, type);
-#elif defined (HAVE_TLV320)
-    tlv320_set_recvol(left, right, type);
-#endif            
-} /* audio_set_recording_gain */
 
 /**
  * Start recording

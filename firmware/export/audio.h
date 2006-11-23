@@ -150,6 +150,17 @@ enum audio_sources
     AUDIO_SRC_MAX = AUDIO_NUM_SOURCES-1
 };
 
+#if CONFIG_CODEC == SWCODEC
+/* selects an audio source for recording or playback */
+#define SRCF_PLAYBACK         0x0000    /* default */
+#define SRCF_RECORDING        0x1000
+#ifdef CONFIG_TUNER
+/* for AUDIO_SRC_FMRADIO */
+#define SRCF_FMRADIO_PLAYING  0x0000    /* default */
+#define SRCF_FMRADIO_PAUSED   0x2000
+#endif
+#endif
+
 #ifdef HAVE_RECORDING
 /* parameters for audio_set_recording_options */
 struct audio_recording_options
@@ -186,6 +197,8 @@ unsigned long audio_num_recorded_bytes(void);
 bool audio_load_encoder(int afmt);
 void audio_remove_encoder(void);
 unsigned char *audio_get_recording_buffer(size_t *buffer_size);
+void audio_set_source(int source, unsigned flags);
+void audio_set_output_source(int source);
 #endif /* CONFIG_CODEC == SWCODEC */
 #endif /* HAVE_RECORDING */
 

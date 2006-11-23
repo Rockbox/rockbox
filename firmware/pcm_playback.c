@@ -597,11 +597,6 @@ void pcm_apply_settings(bool reset)
 {
     (void)reset;
 }
-
-void pcm_set_monitor(int monitor)
-{
-    (void)monitor;
-}
 /** **/
 
 void pcm_mute(bool mute)

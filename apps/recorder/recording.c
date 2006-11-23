@@ -38,12 +38,6 @@
 #include "spdif.h"
 #endif
 #endif /* CONFIG_CODEC == SWCODEC */
-#ifdef HAVE_UDA1380
-#include "uda1380.h"
-#endif
-#ifdef HAVE_TLV320
-#include "tlv320.h"
-#endif
 #include "recording.h"
 #include "mp3_playback.h"
 #include "mas.h"
@@ -580,36 +574,14 @@ static void rec_boost(bool state)
  * The order of setting monitoring may need tweaking dependent upon the
  * selected source to get the smoothest transition.
  */
-#if defined(HAVE_UDA1380)
-#define ac_disable_recording uda1380_disable_recording
-#define ac_enable_recording  uda1380_enable_recording
-#define ac_set_monitor       uda1380_set_monitor
-#elif defined(HAVE_TLV320)
-#define ac_disable_recording tlv320_disable_recording
-#define ac_enable_recording  tlv320_enable_recording
-#define ac_set_monitor       tlv320_set_monitor
-#endif
-
 void rec_set_source(int source, unsigned flags)
 {
-    /* Prevent pops from unneeded switching */
-    static int last_source = AUDIO_SRC_PLAYBACK;
-#ifdef HAVE_TLV320
-    static bool last_recording = false;
-#endif
-
-    bool recording = flags & SRCF_RECORDING;
-    /* Default to peakmeter record. */
-    bool pm_playback = false;
-    bool pm_enabled = true;
-
     /** Do power up/down of associated device(s) **/
 
     /** SPDIF **/
 #ifdef HAVE_SPDIF_IN
     /* Always boost for SPDIF */
-    if ((source == AUDIO_SRC_SPDIF) != (source == last_source))
-        rec_boost(source == AUDIO_SRC_SPDIF);
+    rec_boost(source == AUDIO_SRC_SPDIF);
 #endif /* HAVE_SPDIF_IN */
 
 #ifdef HAVE_SPDIF_POWER
@@ -639,87 +611,11 @@ void rec_set_source(int source, unsigned flags)
         radio_start();
 #endif
 
-    switch (source)
-    {
-        default:                        /* playback - no recording */
-            source = AUDIO_SRC_PLAYBACK;
-        case AUDIO_SRC_PLAYBACK:
-            pm_playback = true;
-            if (source == last_source)
-                break;
-            ac_disable_recording();
-            ac_set_monitor(false);
-            pcm_rec_mux(0);             /* line in */
-        break;
+    /* set hardware inputs */
+    audio_set_source(source, flags);
 
-        case AUDIO_SRC_MIC:             /* recording only */
-            if (source == last_source)
-                break;
-            ac_enable_recording(true);  /* source mic */
-            pcm_rec_mux(0);             /* line in */
-        break;
-
-        case AUDIO_SRC_LINEIN:          /* recording only */
-            if (source == last_source)
-                break;
-            pcm_rec_mux(0);             /* line in */
-            ac_enable_recording(false); /* source line */
-        break;
-
-#ifdef HAVE_SPDIF_IN
-        case AUDIO_SRC_SPDIF:           /* recording only */
-            if (source == last_source)
-                break;
-            ac_disable_recording();
-        break;
-#endif /* HAVE_SPDIF_IN */
-
-#ifdef HAVE_FMRADIO_IN
-        case AUDIO_SRC_FMRADIO:         /* recording and playback */
-            if (!recording)
-            {
-                audio_set_recording_gain(sound_default(SOUND_LEFT_GAIN),
-                        sound_default(SOUND_RIGHT_GAIN), AUDIO_GAIN_LINEIN);
-                pm_playback = true;
-                pm_enabled = false;
-            }
-
-            pcm_rec_mux(1);                     /* fm radio */
-
-#ifdef HAVE_UDA1380
-            if (source == last_source)
-                break;
-            /* I2S recording and playback */
-            uda1380_enable_recording(false);    /* source line */
-            uda1380_set_monitor(true);
-#endif
-#ifdef HAVE_TLV320
-            /* I2S recording and analog playback */
-            if (source == last_source && recording == last_recording)
-                break;
-
-            last_recording = recording;
-
-            if (recording)
-                tlv320_enable_recording(false); /* source line */
-            else
-            {
-                tlv320_disable_recording();
-                tlv320_set_monitor(true);       /* analog bypass */
-            }
-#endif
-        break;
-/* #elif defined(CONFIG_TUNER)  */
-/* Have radio but cannot record it */
-/*      case AUDIO_SRC_FMRADIO: */
-/*          break;              */
-#endif /* HAVE_FMRADIO_IN */
-    } /* end switch */
-
-    peak_meter_playback(pm_playback);
-    peak_meter_enabled = pm_enabled;
-
-    last_source = source;
+    peak_meter_playback((flags & SRCF_RECORDING) == 0);
+    peak_meter_enabled = true;
 } /* rec_set_source */
 #endif /* CONFIG_CODEC == SWCODEC && !defined(SIMULATOR) */
 

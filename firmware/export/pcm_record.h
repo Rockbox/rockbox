@@ -24,9 +24,6 @@
 #ifdef HAVE_SPDIF_IN
 #define DMA_REC_ERROR_SPDIF     ((size_t)-2)
 #endif
-/* Use AUDIO_SRC_* enumeration values */
-void pcm_set_monitor(int monitor);
-void pcm_set_rec_source(int source);
 
 /**
  * RAW pcm data recording
@@ -55,7 +52,6 @@ void pcm_calculate_rec_peaks(int *left, int *right);
    results for consistency with the hardware codec version */
 /* unsigned long pcm_rec_status(void); */
 void pcm_rec_init(void);
-void pcm_rec_mux(int source);
 int  pcm_rec_current_bitrate(void);
 int  pcm_rec_encoder_afmt(void); /* AFMT_* value, AFMT_UNKNOWN if none */
 int  pcm_rec_rec_format(void);   /* Format index or -1 otherwise */

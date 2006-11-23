@@ -324,6 +324,7 @@ target/coldfire/iaudio/x5/power-x5.c
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/x5/adc-x5.c
 target/coldfire/iaudio/x5/ata-x5.c
+target/coldfire/iaudio/x5/audio-x5.c
 target/coldfire/iaudio/x5/backlight-x5.c
 target/coldfire/iaudio/x5/button-x5.c
 target/coldfire/iaudio/x5/lcd-as-x5.S
@@ -348,6 +349,7 @@ target/coldfire/iriver/h300/power-h300.c
 #ifndef SIMULATOR
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/audio-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
@@ -363,6 +365,7 @@ target/coldfire/iriver/h300/usb-h300.c
 target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
 target/coldfire/iriver/ata-iriver.c
+target/coldfire/iriver/audio-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h100/adc-h100.c
 target/coldfire/iriver/h100/backlight-h100.c

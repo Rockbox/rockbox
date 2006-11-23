@@ -568,24 +568,26 @@ struct plugin_api {
 #ifdef HAVE_RECORDING
     const unsigned long *rec_freq_sampr;
 #ifndef SIMULATOR
-    void (*pcm_set_monitor)(int monitor);
-    void (*pcm_set_rec_source)(int source);
     void (*pcm_init_recording)(void);
     void (*pcm_close_recording)(void);
     void (*pcm_record_data)(pcm_more_callback_type more_ready,
                             unsigned char *start, size_t size);
     void (*pcm_stop_recording)(void);
     void (*pcm_calculate_rec_peaks)(int *left, int *right);
+    void (*audio_set_recording_gain)(int left, int right, int type);
+    void (*audio_set_output_source)(int monitor);
     void (*rec_set_source)(int source, unsigned flags);
 #endif
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
-
-
 #ifdef IRAM_STEAL
     void (*plugin_iram_init)(char *iramstart, char *iramcopy, size_t iram_size,
                              char *iedata, size_t iedata_size);
+#endif
+
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    int (*sound_default)(int setting);
 #endif
 };
 

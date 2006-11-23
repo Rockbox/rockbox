@@ -272,7 +272,7 @@ void uda1380_enable_recording(bool source_mic)
     {
         /* VGA_GAIN: 0=0 dB, F=30dB */
         /* Output of left ADC is fed into right bitstream */
-        uda1380_regs[REG_PWR] &= ~(PON_PLL | PON_PGAR | PON_ADCR);
+        uda1380_regs[REG_PWR] &= ~(PON_PGAR | PON_ADCR);
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_LNA | PON_ADCL);
         uda1380_regs[REG_ADC] &= ~SKIP_DCFIL;
         uda1380_write_reg(REG_ADC, (uda1380_regs[REG_ADC] & VGA_GAIN_MASK)
@@ -282,7 +282,7 @@ void uda1380_enable_recording(bool source_mic)
     else
     {
         /* PGA_GAIN: 0=0 dB, F=24dB */
-        uda1380_regs[REG_PWR] &= ~(PON_PLL | PON_LNA);
+        uda1380_regs[REG_PWR] &= ~PON_LNA;
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PGAL | PON_ADCL
                                    | PON_PGAR | PON_ADCR);
         uda1380_write_reg(REG_ADC, EN_DCFIL);
@@ -305,8 +305,9 @@ void uda1380_disable_recording(void)
     
     uda1380_write_reg(REG_I2S, I2S_IFMT_IIS);
 
-    uda1380_regs[REG_PWR] &= ~(PON_LNA | PON_ADCL | PON_ADCR | PON_PGAL | PON_PGAR);
-    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_PLL);
+    uda1380_regs[REG_PWR] &= ~(PON_LNA | PON_ADCL | PON_ADCR |
+                               PON_PGAL | PON_PGAR);
+    uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR]);
 
     uda1380_regs[REG_0] &= ~EN_ADC;
     uda1380_write_reg(REG_0,   uda1380_regs[REG_0] | ADC_CLK | DAC_CLK);

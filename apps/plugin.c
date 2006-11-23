@@ -456,21 +456,24 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_RECORDING
     &rec_freq_sampr[0],
 #ifndef SIMULATOR
-    pcm_set_monitor,
-    pcm_set_rec_source,
     pcm_init_recording,
     pcm_close_recording,
     pcm_record_data,
     pcm_stop_recording,
     pcm_calculate_rec_peaks,
+    audio_set_recording_gain,
+    audio_set_output_source,
     rec_set_source,
 #endif
 #endif /* HAVE_RECORDING */
 #endif /* CONFIG_CODEC == SWCODEC */
 
-
 #ifdef IRAM_STEAL
     plugin_iram_init,
+#endif
+
+#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
+    sound_default,
 #endif
 };
 
