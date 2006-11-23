@@ -49,6 +49,7 @@ enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 #define MP4_cART MP4_ID(0xa9, 'A', 'R', 'T')
 #define MP4_cnam MP4_ID(0xa9, 'n', 'a', 'm')
 #define MP4_cwrt MP4_ID(0xa9, 'w', 'r', 't')
+#define MP4_esds MP4_ID('e', 's', 'd', 's')
 #define MP4_ftyp MP4_ID('f', 't', 'y', 'p')
 #define MP4_gnre MP4_ID('g', 'n', 'r', 'e')
 #define MP4_hdlr MP4_ID('h', 'd', 'l', 'r')
@@ -226,6 +227,14 @@ static unsigned long get_long(void* buf)
     unsigned char* p = (unsigned char*) buf;
 
     return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
+/* Read an unaligned 32-bit big endian long from buffer. */
+static unsigned long get_long_be(void* buf)
+{
+    unsigned char* p = (unsigned char*) buf;
+
+    return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
 }
 
 /* Read a string tag from an M4A file */
@@ -1036,6 +1045,136 @@ static unsigned int read_mp4_atom(int fd, unsigned int* size,
     return size_left;
 }
 
+static unsigned int read_mp4_length(int fd, unsigned int* size)
+{
+    unsigned int length = 0;
+    int bytes = 0;
+    unsigned char c;
+
+    do
+    {
+        read(fd, &c, 1);
+        bytes++;
+        (*size)--;
+        length = (length << 7) | (c & 0x7F);
+    }
+    while ((c & 0x80) && (bytes < 4) && (*size > 0));
+
+    return length;
+}
+
+static bool read_mp4_esds(int fd, struct mp3entry* id3, 
+    unsigned int* size)
+{
+    unsigned char buf[8];
+    bool sbr = false;
+
+    lseek(fd, 4, SEEK_CUR);     /* Version and flags. */
+    read(fd, buf, 1);           /* Verify ES_DescrTag. */
+    *size -= 5;
+
+    if (*buf == 3)
+    {
+        /* read length */
+        if (read_mp4_length(fd, size) < 20)
+        {
+            return sbr;
+        }
+
+        lseek(fd, 3, SEEK_CUR);
+        *size -= 3;
+    } 
+    else
+    {
+        lseek(fd, 2, SEEK_CUR);
+        *size -= 2;
+    }
+
+    read(fd, buf, 1);           /* Verify DecoderConfigDescrTab. */
+    *size -= 1;
+
+    if (*buf != 4)
+    {
+        return sbr;
+    }
+
+    if (read_mp4_length(fd, size) < 13)
+    {
+        return sbr;
+    }
+    
+    lseek(fd, 13, SEEK_CUR);    /* Skip audio type, bit rates, etc. */
+    read(fd, buf, 1);
+    *size -= 14;
+    
+    if (*buf != 5)              /* Verify DecSpecificInfoTag. */
+    {
+        return sbr;
+    }
+
+    {
+        static const int sample_rates[] =
+        {
+            96000, 88200, 64000, 48000, 44100, 32000,
+            24000, 22050, 16000, 12000, 11025, 8000
+        };
+        unsigned long bits;
+        unsigned int length;
+        unsigned int index;
+        int type;
+        
+        /* Read the (leading part of the) decoder config. */
+        length = read_mp4_length(fd, size);
+        length = MIN(length, *size);
+        length = MIN(length, sizeof(buf));
+        read(fd, buf, length);
+        *size -= length;
+
+        /* Decoder config format:
+         * Object type           - 5 bits
+         * Frequency index       - 4 bits
+         * Channel configuration - 4 bits
+         */
+        bits = get_long_be(buf);
+        type = bits >> 27;
+        index = (bits >> 23) & 0xf;
+    
+        if (index < (sizeof(sample_rates) / sizeof(*sample_rates)))
+        {
+            id3->frequency = sample_rates[index];
+        }
+    
+        if (type == 5)
+        {
+            sbr = true;
+            /* Extended frequency index - 4 bits */
+            index = (bits >> 15) & 0xf;
+    
+            if (index == 15)
+            {
+                /* 17 bits read so far... */
+                bits = get_long_be(&buf[2]);
+                id3->frequency = (bits >> 7) & 0x00FFFFFF;
+            }
+            else if (index < (sizeof(sample_rates) / sizeof(*sample_rates)))
+            {
+                id3->frequency = sample_rates[index];
+            }
+        }
+        else if (id3->frequency < 24000)
+        {
+            /* SBR not indicated, but the file might still contain SBR. 
+             * MPEG specification says that one should assume SBR if
+             * samplerate <= 24000 Hz.
+             */
+            id3->frequency *= 2;
+            sbr = true;
+        }
+    }
+    
+    return sbr;
+}
+
 static bool read_mp4_tags(int fd, struct mp3entry* id3, 
     unsigned int size_left)
 {
@@ -1268,7 +1407,25 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 read_uint32be(fd, &frequency);
                 size -= 26;
                 id3->frequency = frequency;
-                /* There're some child atoms here, but we don't need them */
+                
+                if (type == MP4_mp4a)
+                {
+                    unsigned int subsize;
+                    unsigned int subtype;
+
+                    /* Get frequency from the decoder info tag, if possible. */
+                    lseek(fd, 2, SEEK_CUR);
+                    /* The esds atom is a part of the mp4a atom, so ignore 
+                     * the returned size (it's already accounted for).
+                     */
+                    read_mp4_atom(fd, &subsize, &subtype, size);
+                    size -= 10;
+                    
+                    if (subtype == MP4_esds)
+                    {
+                        read_mp4_esds(fd, id3, &size);
+                    }
+                }
             }
             break;
 
