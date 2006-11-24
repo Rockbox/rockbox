@@ -69,14 +69,6 @@ static void adc_tick(void)
 
 void adc_init(void)
 {
-    or_l(0x80600080, &GPIO_FUNCTION); /* GPIO7:  CS
-                                         GPIO21: Data In (to the ADC)
-                                         GPIO22: CLK
-                                         GPIO31: Data Out (from the ADC) */
-    or_l(0x00600080, &GPIO_ENABLE);
-    or_l(0x80, &GPIO_OUT);          /* CS high */
-    and_l(~0x00400000, &GPIO_OUT);  /* CLK low */
-
     adc_scan(ADC_BATTERY);
     
     tick_add_task(adc_tick);
