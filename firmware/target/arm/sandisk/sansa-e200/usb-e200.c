@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include <stdbool.h>
+#include "system.h"
 
 bool usb_init_device(void)
 {
@@ -26,6 +27,8 @@ bool usb_init_device(void)
 
 bool usb_detect(void)
 {
+    if(GPIOB_INPUT_VAL & 0x10)
+        return true;
     return false;
 }
 
