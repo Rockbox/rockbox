@@ -83,8 +83,8 @@ uint32_t      sample_rate;
 uint32_t      enc_size;
 
 /* convert unsigned 32 bit value to 80-bit floating point number */
-static void uint32_to_ieee754_extended(uint8_t f[10], uint32_t l) ICODE_ATTR;
-static void uint32_to_ieee754_extended(uint8_t f[10], uint32_t l)
+static void uint32_h_to_ieee754_extended_be(uint8_t f[10], uint32_t l) ICODE_ATTR;
+static void uint32_h_to_ieee754_extended_be(uint8_t f[10], uint32_t l)
 {
     int32_t exp;
 
@@ -103,7 +103,7 @@ static void uint32_to_ieee754_extended(uint8_t f[10], uint32_t l)
     /* mantissa is value left justified with most significant non-zero
        bit stored in bit 63 - bits 0-63 */
     *(uint32_t *)&f[2] = htobe32(l);
-} /* long_to_ieee754_extended */
+} /* uint32_h_to_ieee754_extended_be */
 
 /* called version often - inline */
 static inline bool is_file_data_ok(struct enc_file_event_data *data) ICODE_ATTR;
@@ -177,12 +177,12 @@ static bool on_end_file(struct enc_file_event_data *data)
     data_size = data->num_pcm_samples*num_channels*PCM_DEPTH_BYTES;
 
     /* 'FORM' chunk */
-    hdr.form_size         = data_size + sizeof (hdr) - 8;
+    hdr.form_size         = htobe32(data_size + sizeof (hdr) - 8);
 
     /* 'COMM' chunk */
     hdr.num_channels      = htobe16(num_channels);
-    hdr.num_sample_frames = htobe32(data->num_pcm_samples*num_channels/2);
-    uint32_to_ieee754_extended(hdr.sample_rate, sample_rate);
+    hdr.num_sample_frames = htobe32(data->num_pcm_samples);
+    uint32_h_to_ieee754_extended_be(hdr.sample_rate, sample_rate);
 
     /* 'SSND' chunk */
     hdr.ssnd_size         = htobe32(data_size + 8);
