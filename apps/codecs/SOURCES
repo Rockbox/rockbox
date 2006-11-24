@@ -17,6 +17,7 @@ sid.c
 adx.c
 #if defined(HAVE_RECORDING) && !defined(SIMULATOR)
 /* encoders */
+aiff_enc.c
 mp3_enc.c
 wav_enc.c
 wavpack_enc.c

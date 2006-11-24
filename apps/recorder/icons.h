@@ -111,6 +111,7 @@ extern const unsigned char bitmap_glyphs_4x8[Glyph_4x8Last][4];
 #ifdef ID3_H
 /* This enum is redundant but sort of in keeping with the style */
 enum rec_format_18x8 {
+    Format_18x8_AIFF    = REC_FORMAT_AIFF,
     Format_18x8_MPA_L3  = REC_FORMAT_MPA_L3,
     Format_18x8_WAVPACK = REC_FORMAT_WAVPACK,
     Format_18x8_PCM_WAV = REC_FORMAT_PCM_WAV,

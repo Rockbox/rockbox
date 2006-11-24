@@ -528,6 +528,7 @@ struct user_settings
     struct mp3_enc_config     mp3_enc_config;
 #if 0 /* These currently contain no members but their places in line
          should be held */
+    struct aiff_enc_config    aiff_enc_config;
     struct wav_enc_config     wav_enc_config;
     struct wavpack_enc_config wavpack_enc_config;
 #endif

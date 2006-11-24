@@ -363,6 +363,7 @@ void make_options_from_indexes(const struct opt_items *src_names,
 static bool recformat(void)
 {
     static const struct opt_items names[REC_NUM_FORMATS] = {
+        [REC_FORMAT_AIFF]    = { STR(LANG_AFMT_AIFF)    },
         [REC_FORMAT_MPA_L3]  = { STR(LANG_AFMT_MPA_L3)  },
         [REC_FORMAT_WAVPACK] = { STR(LANG_AFMT_WAVPACK) },
         [REC_FORMAT_PCM_WAV] = { STR(LANG_AFMT_PCM_WAV) },

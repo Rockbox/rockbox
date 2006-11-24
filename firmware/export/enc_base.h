@@ -24,6 +24,14 @@
 
 /** encoder config structures **/
 
+/** aiff_enc.codec **/
+struct aiff_enc_config
+{
+#if 0
+    unsigned long sample_depth;
+#endif
+};
+
 /** mp3_enc.codec **/
 #define MP3_BITR_CAP_8      (1 << 0)
 #define MP3_BITR_CAP_16     (1 << 1)

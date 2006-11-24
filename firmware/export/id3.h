@@ -78,6 +78,7 @@ enum rec_format_indexes
     /* start formats */
 
     REC_FORMAT_PCM_WAV,
+    REC_FORMAT_AIFF,
     REC_FORMAT_WAVPACK,
     REC_FORMAT_MPA_L3,
 
@@ -93,7 +94,7 @@ enum rec_format_indexes
     REC_FORMAT_CFG_NUM_BITS = 2
 };
 
-#define REC_FORMAT_CFG_VAL_LIST "wave,wvpk,mpa3" 
+#define REC_FORMAT_CFG_VAL_LIST "aiff,wave,wvpk,mpa3" 
 
 /* get REC_FORMAT_* corresponding AFMT_* */
 extern const int rec_format_afmt[REC_NUM_FORMATS];

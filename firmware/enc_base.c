@@ -19,6 +19,8 @@
 #include "config.h"
 #include "audio.h"
 
+/** aiff_enc.codec **/
+
 /** mp3_enc.codec **/
 
 /* These are in descending order rather than in MPEG frequency index

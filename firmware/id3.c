@@ -64,7 +64,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
 #if CONFIG_CODEC == SWCODEC
     /* Audio Interchange File Format */
     [AFMT_AIFF] =
-        AFMT_ENTRY("AIFF", "aiff",    NULL,          "aiff\0aif\0"),
+        AFMT_ENTRY("AIFF", "aiff",    "aiff_enc",    "aiff\0aif\0"),
     /* Uncompressed PCM in a WAV file */
     [AFMT_PCM_WAV] =
         AFMT_ENTRY("WAV",  "wav",     "wav_enc",     "wav\0"      ),
@@ -108,6 +108,7 @@ const int rec_format_afmt[REC_NUM_FORMATS] =
     /* give AFMT_UNKNOWN by default */
     [0 ... REC_NUM_FORMATS-1] = AFMT_UNKNOWN,
     /* add new entries below this line */
+    [REC_FORMAT_AIFF]    = AFMT_AIFF,
     [REC_FORMAT_MPA_L3]  = AFMT_MPA_L3,
     [REC_FORMAT_WAVPACK] = AFMT_WAVPACK,
     [REC_FORMAT_PCM_WAV] = AFMT_PCM_WAV,
@@ -119,6 +120,7 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
     /* give -1 by default */
     [0 ... AFMT_NUM_CODECS-1] = -1,
     /* add new entries below this line */
+    [AFMT_AIFF]    = REC_FORMAT_AIFF,
     [AFMT_MPA_L3]  = REC_FORMAT_MPA_L3,
     [AFMT_WAVPACK] = REC_FORMAT_WAVPACK,
     [AFMT_PCM_WAV] = REC_FORMAT_PCM_WAV,

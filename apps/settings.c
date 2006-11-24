@@ -533,6 +533,8 @@ static const struct bit_entry hd_bits[] =
     {REC_FORMAT_CFG_NUM_BITS ,S_O(rec_format), REC_FORMAT_DEFAULT,
         "rec format", REC_FORMAT_CFG_VAL_LIST },
     /** Encoder settings start - keep these together **/
+    /* aiff_enc */
+    /* (no settings yet) */
     /* mp3_enc */
     {5,S_O(mp3_enc_config.bitrate), MP3_ENC_BITRATE_CFG_DEFAULT,
         "mp3_enc bitrate", MP3_ENC_BITRATE_CFG_VALUE_LIST },

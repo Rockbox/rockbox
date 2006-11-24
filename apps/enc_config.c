@@ -49,6 +49,8 @@ static bool enc_no_config_menu(struct encoder_config *cfg);
 /** Function definitions for each codec - add these to enc_data
     list following the definitions **/
 
+/** aiff_enc.codec **/
+
 /** mp3_enc.codec **/
 /* mp3_enc: return encoder capabilities */
 static void mp3_enc_get_caps(const struct encoder_config *cfg,
@@ -209,6 +211,13 @@ static const struct encoder_data
     bool   (*menu)(struct encoder_config *);
 } enc_data[REC_NUM_FORMATS] =
 {
+    /* aiff_enc.codec */
+    [REC_FORMAT_AIFF] = {
+        NULL,
+        NULL,
+        NULL,
+        enc_no_config_menu,
+    },
     /* mp3_enc.codec */
     [REC_FORMAT_MPA_L3] = {
         mp3_enc_get_caps,
