@@ -1676,45 +1676,45 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
         /* Soul Calibur 2 style (type 03) */
         DEBUGF("get_adx_metadata: type 03 found\n");
         /* check if header is too small for loop data */
-		if (chanstart-6 < 0x2c) looping=0;
-	    else {
-		    looping = (buf[0x18]) ||
-		              (buf[0x19]) ||
-		              (buf[0x1a]) ||
-		              (buf[0x1b]);
-		    end_adr = (buf[0x28]<<24) |
-		              (buf[0x29]<<16) |
-		              (buf[0x2a]<<8) |
-		              (buf[0x2b]);
+        if (chanstart-6 < 0x2c) looping=0;
+        else {
+            looping = (buf[0x18]) ||
+                      (buf[0x19]) ||
+                      (buf[0x1a]) ||
+                      (buf[0x1b]);
+            end_adr = (buf[0x28]<<24) |
+                      (buf[0x29]<<16) |
+                      (buf[0x2a]<<8) |
+                      (buf[0x2b]);
 
-		    start_adr = (
-		      (buf[0x1c]<<24) |
-		      (buf[0x1d]<<16) |
-		      (buf[0x1e]<<8) |
-		      (buf[0x1f])
-		      )/32*channels*18+chanstart;
-		}
+            start_adr = (
+              (buf[0x1c]<<24) |
+              (buf[0x1d]<<16) |
+              (buf[0x1e]<<8) |
+              (buf[0x1f])
+              )/32*channels*18+chanstart;
+        }
     } else if (!memcmp(buf+0x10,"\x01\xF4\x04\x00",4)) {
         /* Standard (type 04) */
         DEBUGF("get_adx_metadata: type 04 found\n");
         /* check if header is too small for loop data */
         if (chanstart-6 < 0x38) looping=0;
-		else {
-			looping = (buf[0x24]) ||
-			          (buf[0x25]) ||
-			          (buf[0x26]) ||
-			          (buf[0x27]);
-		    end_adr = (buf[0x34]<<24) |
-		              (buf[0x35]<<16) |
-		              (buf[0x36]<<8) |
-		              buf[0x37];
-			start_adr = (
-			  (buf[0x28]<<24) |
-			  (buf[0x29]<<16) |
-			  (buf[0x2a]<<8) |
-			  (buf[0x2b])
-			  )/32*channels*18+chanstart;
-		}
+        else {
+            looping = (buf[0x24]) ||
+                      (buf[0x25]) ||
+                      (buf[0x26]) ||
+                      (buf[0x27]);
+            end_adr = (buf[0x34]<<24) |
+                      (buf[0x35]<<16) |
+                      (buf[0x36]<<8) |
+                      buf[0x37];
+            start_adr = (
+              (buf[0x28]<<24) |
+              (buf[0x29]<<16) |
+              (buf[0x2a]<<8) |
+              (buf[0x2b])
+              )/32*channels*18+chanstart;
+        }
     } else {
         DEBUGF("get_adx_metadata: error, couldn't determine ADX type\n");
         return false;
@@ -1752,7 +1752,7 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
     int i;
 
     if ((lseek(fd, 0, SEEK_SET) < 0) 
-        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 44))
+        || ((read_bytes = read(fd, buf, sizeof(id3->path))) < 54))
     {
         return false;
     }

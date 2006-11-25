@@ -95,7 +95,7 @@ next_track:
     
     /* assume the AIFF header is less than 1024 bytes */
     buf = ci->request_buffer(&n, 1024);
-    if (n < 44) {
+    if (n < 54) {
         i = CODEC_ERROR;
         goto done;
     }
@@ -142,9 +142,9 @@ next_track:
                 goto done;
             }
             /* offset2snd */
-            offset2snd = ((buf[8]<<8)|buf[9]);
+            offset2snd = (buf[8]<<24)|(buf[9]<<16)|(buf[10]<<8)|buf[11];
             /* block_size */
-            block_size = ((buf[10]<<8)|buf[11]);
+            block_size = (buf[12]<<24)|(buf[13]<<16)|(buf[14]<<8)|buf[15];
             if (block_size == 0)
                 block_size = num_channels*sample_size;
             numbytes = i - 8 - offset2snd;
