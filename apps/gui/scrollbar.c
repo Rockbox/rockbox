@@ -71,8 +71,7 @@ void gui_scrollbar_draw(struct screen * screen, int x, int y,
     /* avoid overflows */
     while (items > (INT_MAX / inner_len)) {
         items >>= 1;
-        min >>= 1;
-        max >>= 1;
+        range >>= 1;
     }
 
     /* calc start and end of the knob */
