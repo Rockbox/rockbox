@@ -16,10 +16,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-/* TODO: Add ATA Callback support */
 #include "lcd.h"
 #include "ata.h"
 #include "ata-target.h"
+#include "ata_idle_notify.h"
 #include "cpu.h"
 #include "system.h"
 #include <stdio.h>
@@ -99,7 +99,7 @@
 static unsigned short identify_info[SECTOR_SIZE];
 int ata_spinup_time = 0;
 long last_disk_activity = -1;
-static bool delayed_write = false;
+static bool initialized = false;
 
 static unsigned char current_bank = 0; /* The bank that we are working with */
 
@@ -108,7 +108,13 @@ static tSDCardInfo card_info[2];
 /* For multi volume support */
 static int current_card = 0;
 
-static struct mutex ata_mtx;
+static struct mutex sd_mtx;
+
+static long sd_stack [DEFAULT_STACK_SIZE/sizeof(long)];
+
+static const char sd_thread_name[] = "sd";
+static struct event_queue sd_queue;
+
 
 /* Private Functions */
 
@@ -459,7 +465,7 @@ void sd_init_device(void)
             dataptr += (FIFO_SIZE*2); /* Advance one chunk of 16 words */
         }
     }
-    mutex_init(&ata_mtx);
+    mutex_init(&sd_mtx);
 }
 
 /* API Functions */
@@ -467,12 +473,6 @@ void sd_init_device(void)
 void ata_led(bool onoff)
 {
     (void)onoff;
-}
-
-/* write the delayed sector to volume 0 */
-extern void ata_flush(void)
-{
-
 }
 
 int ata_read_sectors(IF_MV2(int drive,)
@@ -495,7 +495,7 @@ int ata_read_sectors(IF_MV2(int drive,)
 #ifdef HAVE_MULTIVOLUME
     (void)drive; /* unused for now */
 #endif
-    mutex_lock(&ata_mtx);
+    mutex_lock(&sd_mtx);
 
     last_disk_activity = current_tick;
     spinup_start = current_tick;
@@ -551,11 +551,7 @@ int ata_read_sectors(IF_MV2(int drive,)
     }
     ata_led(false);
 
-    mutex_unlock(&ata_mtx);
-
-    /* only flush if reading went ok */
-    if ( (ret == 0) && delayed_write )
-        ata_flush();
+    mutex_unlock(&sd_mtx);
 
     return ret;
 }
@@ -576,7 +572,7 @@ int ata_write_sectors(IF_MV2(int drive,)
     long timeout;
     tSDCardInfo *card = &card_info[current_card];
 
-    mutex_lock(&ata_mtx);
+    mutex_lock(&sd_mtx);
     ata_led(true);
     if(current_card == 0)
     {
@@ -629,18 +625,38 @@ retry:
     sd_read_response(&response, 1);
 
     sd_wait_for_state(card, TRAN);
-    mutex_unlock(&ata_mtx);
+    mutex_unlock(&sd_mtx);
     ata_led(false);
     return ret;
 }
 
-/* schedule a single sector write, executed with the the next spinup
-   (volume 0 only, used for config sector) */
-extern void ata_delayed_write(unsigned long sector, const void* buf)
+static void sd_thread(void)
 {
-    (void)sector;
-    (void)buf;
+    struct event ev;
+    bool idle_notified = false;
+    
+    while (1) {
+        queue_wait_w_tmo(&sd_queue, &ev, HZ);
+        switch ( ev.id ) 
+        {
+            default:
+                if (TIME_BEFORE(current_tick, last_disk_activity+(3*HZ)))
+                {
+                    idle_notified = false;
+                }
+                else
+                {
+                    if (!idle_notified)
+                    {
+                        call_ata_idle_notifys(false);
+                        idle_notified = true;
+                    }
+                }
+                break;
+        }
+    }
 }
+
 
 void ata_spindown(int seconds)
 {
@@ -684,5 +700,13 @@ unsigned short* ata_get_identify(void)
 int ata_init(void)
 {
     sd_init_device();
+    if ( !initialized ) 
+    {
+        queue_init(&sd_queue, true);
+        create_thread(sd_thread, sd_stack,
+                      sizeof(sd_stack), sd_thread_name IF_PRIO(, PRIORITY_SYSTEM));
+        initialized = true;
+    }
+
     return 0;
 }
