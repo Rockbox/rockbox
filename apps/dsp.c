@@ -485,8 +485,8 @@ void dsp_dither_enable(bool enable)
 
 static void dither_init(void)
 {
-    memset(&dither_data[0], 0, sizeof(dither_data));
-    memset(&dither_data[1], 0, sizeof(dither_data));
+    memset(&dither_data[0], 0, sizeof(struct dither_data));
+    memset(&dither_data[1], 0, sizeof(struct dither_data));
     dsp->dither_bias = (1L << (dsp->frac_bits - NATIVE_DEPTH));
     dsp->dither_mask = (1L << (dsp->frac_bits + 1 - NATIVE_DEPTH)) - 1;
 }
