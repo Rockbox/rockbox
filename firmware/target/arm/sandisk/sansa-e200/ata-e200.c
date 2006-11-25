@@ -121,7 +121,6 @@ static struct event_queue sd_queue;
 bool sd_send_command(unsigned int cmd, unsigned long arg1, unsigned int arg2)
 {
     bool result = false;
-    unsigned char cbuf[32];
     do
     {
         CMD_REG0 = cmd;

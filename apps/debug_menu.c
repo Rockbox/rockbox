@@ -1079,7 +1079,7 @@ bool dbg_ports(void)
             return false;
     }
 
-#elif CONFIG_CPU == PP5020
+#elif CONFIG_CPU == PP5020 || CONFIG_CPU == PP5024
 
     unsigned int gpio_a, gpio_b, gpio_c, gpio_d;
     unsigned int gpio_e, gpio_f, gpio_g, gpio_h;
