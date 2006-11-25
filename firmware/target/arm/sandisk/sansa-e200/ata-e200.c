@@ -135,11 +135,7 @@ bool sd_send_command(unsigned int cmd, unsigned long arg1, unsigned int arg2)
         if ((STATUS_REG & ERROR_BITS) == 0)
         {
             result = true;
-        } else {
-            snprintf(cbuf, sizeof(cbuf), "%x", (STATUS_REG & ERROR_BITS));
-            lcd_puts(0,10,cbuf);
-            lcd_update();
-        }
+        } 
     } while ((STATUS_REG & ERROR_BITS) != 0);
     return result;
 }
