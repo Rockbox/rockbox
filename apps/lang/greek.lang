@@ -9903,7 +9903,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_AGC_PRESET
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
   <source>
     *: "AGC"
@@ -9983,5 +9983,83 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (αργό)"
+  </dest>
+  <voice>
+    *: "ντι τζέι σετ (αργό)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Συναυλία (αργό)"
+  </dest>
+  <voice>
+    *: "Συναυλία (αργό)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Ομιλία (γρήγορο)"
+  </dest>
+  <voice>
+    *: "Ομιλία (γρήγορο)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Μέτριο"
+  </dest>
+  <voice>
+    *: "Μέτριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Ασφαλές (clip)"
+  </dest>
+  <voice>
+    *: "Ασφαλές"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "Μέγιστη ενίσχυση AGC"
+  </dest>
+  <voice>
+    *: "Μέγιστη ενίσχυση"
   </voice>
 </phrase>

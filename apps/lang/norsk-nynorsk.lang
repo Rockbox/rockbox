@@ -9715,7 +9715,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_AGC_PRESET
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
   <source>
     *: "AGC"
@@ -9902,5 +9902,83 @@
   </dest>
   <voice>
     *: "Pause og framhald"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (slow)"
+  </dest>
+  <voice>
+    *: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Direkte (sakte)"
+  </dest>
+  <voice>
+    *: "Direkte (sakte)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Stemme (rask)"
+  </dest>
+  <voice>
+    *: "Stemme (rask)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Middels"
+  </dest>
+  <voice>
+    *: "Middels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Trygg (klipp)"
+  </dest>
+  <voice>
+    *: "Trygg (klipp)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "AGC maks forsterking"
+  </dest>
+  <voice>
+    *: "AGC maksimum forsterking"
   </voice>
 </phrase>

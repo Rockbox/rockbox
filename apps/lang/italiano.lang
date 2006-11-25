@@ -9729,7 +9729,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_AGC_PRESET
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
   desc: automatic gain control in recording screen
   <source>
     *: "AGC"
@@ -9836,5 +9836,83 @@
   </dest>
   <voice>
     *: "Pausa e Riprendi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Previene saturazione"
+  </dest>
+  <voice>
+    *: "Previene saturazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (lento)"
+  </dest>
+  <voice>
+    *: "Live (lento)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (lento)"
+  </dest>
+  <voice>
+    *: "DJ-Set (lento)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medio"
+  </dest>
+  <voice>
+    *: "Medio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Voce (veloce)"
+  </dest>
+  <voice>
+    *: "Voce (veloce)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "Guadagno massimo"
+  </dest>
+  <voice>
+    *: ""
   </voice>
 </phrase>

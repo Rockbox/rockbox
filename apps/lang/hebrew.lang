@@ -1,8 +1,10 @@
-<phrase>
+﻿<phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
   user:
   <source>
+  id: LANG_SET_BOOL_YES
+  user:
     *: "Yes"
   </source>
   <dest>
@@ -774,9 +776,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
     *: "נגן = כן"
+    h100,h120,h300: "בחר = כן"
+    ipod*: "בחר = כן"
+    x5: "בחר = כן"
+    h10: "הבא = כן"
   </dest>
   <voice>
     *: ""
@@ -1529,7 +1539,7 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
     *: "ID3 מסד נתוני"
@@ -1952,7 +1962,7 @@
     *: ".talk mp3 clip"
   </source>
   <dest>
-    *: ".mp3הקרא קטעי "
+    *: ".mp3 הקרא קטעי"
   </dest>
   <voice>
     *: "talk mp3 clip"
@@ -3602,9 +3612,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "כבה = יציאה"
+    h100,h120,h300: "עצור = יציאה"
+    ipod*: "נגן\עצור = יציאה"
+    x5: "הקלטה = יציאה"
+    h10: "הקודם = יציאה"
   </dest>
   <voice>
     *: ""
@@ -3658,9 +3676,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "נגן = בחירה"
+    h100,h120,h300: "בחר = בחירה"
+    ipod*: "בחר = בחירה"
+    x5: "בחר = בחירה"
+    h10: "הבא = בחירה"
   </dest>
   <voice>
     *: ""
@@ -3672,9 +3698,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "הפעל+נגן = מחיקה"
+    h100,h120,h300: "הקלטה = מחיקה"
+    ipod*: "החזק תפריט = מחיקה"
+    x5: "החזק הקלטה = מחיקה"
+    h10: "הקודם = מחיקה"
   </dest>
   <voice>
     *: ""
@@ -3756,9 +3790,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
-    *: "הפעל כדי לקבוע"
+    *: "הפעל = קביעה"
+    h100,h120,h300: "בחר = קביעה"
+    ipod*: "בחר = קביעה"
+    x5: "בחר = קביעה"
+    h10: "הבא = קביעה"
   </dest>
   <voice>
     *: ""
@@ -3770,9 +3812,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
-    *: "כבה כדי לבטל"
+    *: "כבה = ביטול"
+    h100,h120,h300: "עצור = ביטול"
+    ipod*: "תפריט = ביטול"
+    x5: "הקלטה = ביטול"
+    h10: "הקודם = ביטול"
   </dest>
   <voice>
     *: ""
@@ -3938,9 +3988,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
-    *: "להמשיך כדי כבה על לחץ מלא. הכונן."
+    *: "הכונן מלא. לחץ על כבה כדי להמשיך"
+    h100,h120,h300: "הכונן מלא. לחץ על עצור כדי להמשיך"
   </dest>
   <voice>
     *: ""
@@ -6096,7 +6148,7 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "אליה לחזור שירים רשימת אין"
+    *: "אין רשימת שירים לחזור אליה"
   </dest>
   <voice>
     *: ""
@@ -6486,9 +6538,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
-    *: "לבטל כדי כבה"
+    *: "כבה כדי לבטל"
+    h100,h120,h300: "עצור כדי לבטל"
+    ipod*: "נגן\עצור כדי לבטל"
+    x5: "החזק נגן כדי לבטל"
+    h10: "הקודם כדי לבטל"
   </dest>
   <voice>
     *: ""
@@ -6947,7 +7007,7 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
     *: "מפענח זיכרון תוויות שם"
@@ -7226,10 +7286,10 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "זיכרון תוויות המידע אינו מוכן"
+    *: "זיכרון תוויות השם אינו מוכן"
   </dest>
   <voice>
     *: "Tagcache is not ready"
@@ -7662,7 +7722,7 @@
     *: "Initialize now"
   </source>
   <dest>
-    *: "עדכן עכשיו"
+    *: "אתחל עכשיו"
   </dest>
   <voice>
     *: "Force Tag Cache Update"
@@ -8020,10 +8080,10 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in settings menu 
+  desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
     *: "זיכרון תוויות שם"
@@ -8409,13 +8469,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "אנא אתחל מחדש כדי להפעיל את זיכרון הספריות"
+    *: "אנא אתחל את הנגן כדי להפעיל את זיכרון הספריות"
   </dest>
   <voice>
     *: ""
@@ -8581,9 +8641,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </dest>
   <voice>
     *: ""
@@ -9219,8 +9281,6 @@
     *: "Auto update"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_STOP_RECORDING
   desc: in record timesplit options
@@ -9235,8 +9295,6 @@
     *: "Stop recording"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_TAGCACHE_UPDATE
   desc: in tag cache settings
@@ -9251,8 +9309,6 @@
     *: "Update now"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_TAGCACHE_EXPORT
   desc: in tag cache settings
@@ -9267,8 +9323,6 @@
     *: "Export modifications"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_EQUALIZER_BAND_GAIN
   desc: in the equalizer settings menu
@@ -9283,8 +9337,6 @@
     *: "Gain"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
@@ -9298,8 +9350,6 @@
     *: "Split Filesize"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_REMOTE_LCD_ON
   desc: Remote lcd off splash
@@ -9314,8 +9364,6 @@
     *: "(Vol- : Re-enable)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG
   desc: in onplay menu
@@ -9330,8 +9378,6 @@
     *: "Playlist catalog"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SPLIT_MEASURE
   desc: in record timesplit options
@@ -9345,8 +9391,6 @@
     *: "Split Measure"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG_ADD_TO_NEW
   desc: in onplay playlist catalog submenu
@@ -9361,8 +9405,6 @@
     *: "Add to new playlist"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SPLIT_TIME
   desc: in record timesplit options
@@ -9376,8 +9418,6 @@
     *: "Split Time"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG_ADD_TO
   desc: in onplay playlist catalog submenu
@@ -9392,8 +9432,6 @@
     *: "Add to playlist"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_START_NEW_FILE
   desc: in record timesplit options
@@ -9408,8 +9446,6 @@
     *: "Start new file"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SPLIT_TYPE
   desc: in record timesplit options
@@ -9423,8 +9459,6 @@
     *: "What to do when Splitting"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG_VIEW
   desc: in onplay playlist catalog submenu
@@ -9439,8 +9473,6 @@
     *: "View catalog"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG_NO_DIRECTORY
   desc: error message when playlist catalog directory doesn't exist
@@ -9455,8 +9487,6 @@
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_CATALOG_NO_PLAYLISTS
   desc: error message when no playlists for playlist catalog
@@ -9466,6 +9496,525 @@
   </source>
   <dest>
     *: "אין רשימות שירים"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "צר"
+  </dest>
+  <voice>
+    *: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "שליטת הגברה אוטומטית"
+  </dest>
+  <voice>
+    *: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "הגברה אוטומטית מירבית"
+  </dest>
+  <voice>
+    *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Semitone Down"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "אף פעם"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "(מערכת ד'י-ג'יי (איטי"	
+ </dest>
+  <voice>
+    *: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "שינה (אחרי כיבוי תאורה)"
+  </dest>
+  <voice>
+    *: "Sleep after backlight off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(כמו המקור)"
+  </dest>
+  <voice>
+    *: "Same As Source"
+  </voice>
+</phrase>
+
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Semitone Up"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "אירופה"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "הפעל אקולייזר של החומרה"
+  </dest>
+  <voice>
+    *: "Enable hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "אזהרה! הסוללה חלשה!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "הגדרות מקודד"
+  </dest>
+  <voice>
+    *: "Encoder Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "תבנית"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "נתיב מלא"
+  </dest>
+  <voice>
+    *: "Full Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "משך זמן להעביר אחורה"
+  </dest>
+  <voice>
+    *: "Duration to rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "איכות"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "אקראי"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "קובץ חדש"
+  </dest>
+  <voice>
+    *: "New file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "רגיל"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "(חי (איטי"
+  </dest>
+  <voice>
+    *: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "(קול (מהיר"
+  </dest>
+  <voice>
+    *: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(אין הגדרות)"
+  </dest>
+  <voice>
+    *: "No settings available"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "עצור בניתוק אוזניות"
+  </dest>
+  <voice>
+    *: "Pause on headphone unplug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "בינוני"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Filename:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "(ביטחון (עיוות"
+  </dest>
+  <voice>
+    *: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "הסוללה ריקה! טען מחדש!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "קוריאה"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "ארהב \ קנדה"
+  </dest>
+  <voice>
+    *: "US / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "אזור"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "עצירה"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: " אנא אתחל את הנגן כדי להחיל את השינויים"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "טוען... %d%% נטען (%s)"
   </dest>
   <voice>
     *: ""
@@ -9483,3 +10032,303 @@
   <voice>
     *: "Split Filesize"
   </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "אקולייזר חומרה"
+  </dest>
+  <voice>
+    *: "Hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "בטל חזרה אוטומטית אם האוזניות לא מחוברות"
+  </dest>
+  <voice>
+    *: "Disable auto-resume if phones not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "השהיה"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "יפן"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "הצג נתיב"
+  </dest>
+  <voice>
+    *: "Show Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "ערבוב צלילים"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "טווח תדרים"
+  </dest>
+  <voice>
+    *: "Bandwidth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "עצור וחזור"
+  </dest>
+  <voice>
+    *: "Pause and Resume"
+  </voice>
+</phrase>
+###
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "זמן עיוות בהגברה אוטומטית"
+  </dest>
+  <voice>
+    *: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "הספריה הנוכחית בלבד"
+  </dest>
+  <voice>
+    *: "Current Directory Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "רחב"
+  </dest>
+  <voice>
+    *: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "רישום תחנות רדיו אחרונות"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "(תאורה (במצב נעול"
+  </dest>
+  <voice>
+    *: "Backlight on hold key"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "סוג ההפעלה"
+  </dest>
+  <voice>
+    *: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-Set (slow)"
+ </dest>
+  <voice>
+    *: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (slow)"
+  </dest>
+  <voice>
+    *: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Voice (fast)"
+  </dest>
+  <voice>
+    *: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Safety (clip)"
+  </dest>
+  <voice>
+    *: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "AGC max. gain"
+  </dest>
+  <voice>
+    *: "AGC maximum gain"
+  </voice>
+</phrase>
+

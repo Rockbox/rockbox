@@ -820,12 +820,12 @@ bool recording_screen(bool no_source)
     settings_apply_trigger();
 
 #ifdef HAVE_AGC
-    agc_preset_str[0] = str(LANG_OFF);
-    agc_preset_str[1] = str(LANG_AGC_SAFETY);
-    agc_preset_str[2] = str(LANG_AGC_LIVE);
-    agc_preset_str[3] = str(LANG_AGC_DJSET);
-    agc_preset_str[4] = str(LANG_AGC_MEDIUM);
-    agc_preset_str[5] = str(LANG_AGC_VOICE);
+    agc_preset_str[0] = str(LANG_SYSFONT_OFF);
+    agc_preset_str[1] = str(LANG_SYSFONT_AGC_SAFETY);
+    agc_preset_str[2] = str(LANG_SYSFONT_AGC_LIVE);
+    agc_preset_str[3] = str(LANG_SYSFONT_AGC_DJSET);
+    agc_preset_str[4] = str(LANG_SYSFONT_AGC_MEDIUM);
+    agc_preset_str[5] = str(LANG_SYSFONT_AGC_VOICE);
     if (global_settings.rec_source == AUDIO_SRC_MIC) {
         agc_preset = global_settings.rec_agc_preset_mic;
         agc_maxgain = global_settings.rec_agc_maxgain_mic;
@@ -1548,16 +1548,16 @@ bool recording_screen(bool no_source)
 
             if (cursor == 5)
                 snprintf(buf, sizeof(buf), "%s: %s",
-                         str(LANG_RECORDING_AGC_MAXGAIN),
+                         str(LANG_SYSFONT_RECORDING_AGC_MAXGAIN),
                          fmt_gain(SOUND_LEFT_GAIN,
                                   agc_maxgain, buf2, sizeof(buf2)));
             else if (agc_preset == 0)
                 snprintf(buf, sizeof(buf), "%s: %s",
-                         str(LANG_RECORDING_AGC_PRESET),
+                         str(LANG_SYSFONT_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset]);
             else if (global_settings.rec_source == AUDIO_SRC_MIC)
                 snprintf(buf, sizeof(buf), "%s: %s%s",
-                         str(LANG_RECORDING_AGC_PRESET),
+                         str(LANG_SYSFONT_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset],
                          fmt_gain(SOUND_LEFT_GAIN,
                              agc_maxgain -
@@ -1565,7 +1565,7 @@ bool recording_screen(bool no_source)
                              buf2, sizeof(buf2)));
             else
                 snprintf(buf, sizeof(buf), "%s: %s%s",
-                         str(LANG_RECORDING_AGC_PRESET),
+                         str(LANG_SYSFONT_RECORDING_AGC_PRESET),
                          agc_preset_str[agc_preset],
                          fmt_gain(SOUND_LEFT_GAIN,
                              agc_maxgain -
