@@ -1694,13 +1694,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Tag Cache"
+    *: "Database"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -1764,10 +1764,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "Committing tagcache"
+    *: "Committing database"
   </dest>
   <voice>
     *: ""
@@ -1960,13 +1960,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 Database"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -8543,13 +8543,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </dest>
   <voice>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </voice>
 </phrase>
 <phrase>
