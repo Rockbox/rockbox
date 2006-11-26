@@ -25,6 +25,7 @@
 #include "logf.h"
 #include "sprintf.h"
 #include "string.h"
+#include "inttypes.h"
 
 #include "eeprom_24cxx.h"
 
@@ -56,6 +57,10 @@
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
 #define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
+
+/* Use cache to speedup writing to the chip. */
+static char data_cache[EEPROM_SIZE];
+static uint8_t cached_bitfield[EEPROM_SIZE/8];
 
 static void sw_i2c_init(void)
 {
@@ -280,7 +285,11 @@ int sw_i2c_read(unsigned char location, unsigned char* byte)
 void eeprom_24cxx_init(void)
 {
     sw_i2c_init();
+    memset(cached_bitfield, 0, sizeof cached_bitfield);
 }
+
+#define IS_CACHED(addr) (cached_bitfield[addr/8] & (1 << (addr % 8)))
+#define SET_CACHED(addr) (cached_bitfield[addr/8] |= 1 << (addr % 8))
 
 int eeprom_24cxx_read_byte(unsigned int address, char *c)
 {
@@ -292,6 +301,14 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
     {
         logf("EEPROM address: %d", address);
         return -9;
+    }
+    
+    /* Check from cache. */
+    if (IS_CACHED(address))
+    {
+        logf("EEPROM RCached: %d", address);
+        *c = data_cache[address];
+        return 0;
     }
     
     *c = 0;
@@ -311,7 +328,11 @@ int eeprom_24cxx_read_byte(unsigned int address, char *c)
         /* keep between {} as logf is whitespace in normal builds */
         logf("EEPROM rOK: %d retries", count);
     }
-        
+    
+    /* Cache the byte. */
+    data_cache[address] = byte;
+    SET_CACHED(address);
+    
     *c = byte;
     return 0;
 }
@@ -325,6 +346,13 @@ int eeprom_24cxx_write_byte(unsigned int address, char c)
     {
         logf("EEPROM address: %d", address);
         return -9;
+    }
+    
+    /* Check from cache. */
+    if (IS_CACHED(address) && data_cache[address] == c)
+    {
+        logf("EEPROM WCached: %d", address);
+        return 0;
     }
     
     do
@@ -343,6 +371,9 @@ int eeprom_24cxx_write_byte(unsigned int address, char c)
         /* keep between {} as logf is whitespace in normal builds */
         logf("EEPROM wOK: %d retries", count);
     }
+    
+    SET_CACHED(address);
+    data_cache[address] = c;
     
     return 0;
 }
@@ -366,33 +397,14 @@ int eeprom_24cxx_read(unsigned char address, void *dest, int length)
 int eeprom_24cxx_write(unsigned char address, const void *src, int length)
 {
     const char *buf = (const char *)src;
-    int count = 5;
     int i;
-    bool ok;
     
-    while (count-- > 0)
+    for (i = 0; i < length; i++)
     {
-        for (i = 0; i < length; i++)
-            eeprom_24cxx_write_byte(address+i, buf[i]);
-        
-        ok = true;
-        for (i = 0; i < length; i++)
-        {
-            char byte;
-            
-            eeprom_24cxx_read_byte(address+i, &byte);
-            if (byte != buf[i])
-            {
-                logf("Verify failed: %d/%d", address+i, count);
-                ok = false;
-                break;
-            }
-        }
-        
-        if (ok)
-            return 0;
+        if (eeprom_24cxx_write_byte(address+i, buf[i]) < 0)
+            return -1;
     }
     
-    return -1;
+    return 0;
 }
 
