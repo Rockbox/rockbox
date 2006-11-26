@@ -132,8 +132,13 @@ extern void lcd_remote_setfont(int font);
 extern int  lcd_remote_getstringsize(const unsigned char *str, int *w, int *h);
 
 /* low level drawing function pointer arrays */
+#if LCD_REMOTE_DEPTH > 1
+extern lcd_remote_pixelfunc_type* const *lcd_remote_pixelfuncs;
+extern lcd_remote_blockfunc_type* const *lcd_remote_blockfuncs;
+#else
 extern lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs[8];
 extern lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8];
+#endif
 
 extern void lcd_remote_drawpixel(int x, int y);
 extern void lcd_remote_drawline(int x1, int y1, int x2, int y2);

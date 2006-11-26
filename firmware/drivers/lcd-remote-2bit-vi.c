@@ -42,7 +42,10 @@
 fb_remote_data lcd_remote_framebuffer[LCD_REMOTE_HEIGHT/8][LCD_REMOTE_FBWIDTH]
                                       IBSS_ATTR;
 
-static const fb_data patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
+static const fb_remote_data patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
+
+static fb_remote_data* remote_backdrop = NULL;
+static long remote_backdrop_offset IDATA_ATTR = 0;
 
 static unsigned fg_pattern IDATA_ATTR = 0xFFFF; /* initially black */
 static unsigned bg_pattern IDATA_ATTR = 0x0000; /* initially white */
@@ -173,6 +176,16 @@ static void clearpixel(int x, int y)
     *address = data ^ ((data ^ bg_pattern) & mask);
 }
 
+static void clearimgpixel(int x, int y)
+{
+    unsigned mask = 0x0101 << (y & 7);
+    fb_remote_data *address = &lcd_remote_framebuffer[y>>3][x];
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(fb_remote_data *)((long)address 
+               + remote_backdrop_offset)) & mask);
+}
+
 static void flippixel(int x, int y)
 {
     unsigned mask = 0x0101 << (y & 7);
@@ -187,10 +200,17 @@ static void nopixel(int x, int y)
     (void)y;
 }
 
-lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs[8] = {
+lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs_bgcolor[8] = {
     flippixel, nopixel, setpixel, setpixel,
     nopixel, clearpixel, nopixel, clearpixel
 };
+
+lcd_remote_pixelfunc_type* const lcd_remote_pixelfuncs_backdrop[8] = {
+    flippixel, nopixel, setpixel, setpixel,
+    nopixel, clearimgpixel, nopixel, clearimgpixel
+};
+
+lcd_remote_pixelfunc_type* const *lcd_remote_pixelfuncs = lcd_remote_pixelfuncs_bgcolor;
 
 /* 'mask' and 'bits' contain 2 bits per pixel */
 static void flipblock(fb_remote_data *address, unsigned mask, unsigned bits)
@@ -207,6 +227,16 @@ static void bgblock(fb_remote_data *address, unsigned mask, unsigned bits)
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & ~bits);
+}
+
+static void bgimgblock(fb_remote_data *address, unsigned mask, unsigned bits)
+                       ICODE_ATTR;
+static void bgimgblock(fb_remote_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(fb_remote_data *)((long)address
+               + remote_backdrop_offset)) & mask & ~bits);
 }
 
 static void fgblock(fb_remote_data *address, unsigned mask, unsigned bits)
@@ -229,6 +259,17 @@ static void solidblock(fb_remote_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
+static void solidimgblock(fb_remote_data *address, unsigned mask, unsigned bits)
+                          ICODE_ATTR;
+static void solidimgblock(fb_remote_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+    unsigned bgp  = *(fb_remote_data *)((long)address + remote_backdrop_offset);
+
+    bits     = bgp  ^ ((bgp ^ fg_pattern) & bits);
+    *address = data ^ ((data ^ bits) & mask);
+}
+
 static void flipinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
                          ICODE_ATTR;
 static void flipinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
@@ -243,6 +284,16 @@ static void bginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
     unsigned data = *address;
 
     *address = data ^ ((data ^ bg_pattern) & mask & bits);
+}
+
+static void bgimginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
+                          ICODE_ATTR;
+static void bgimginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+
+    *address = data ^ ((data ^ *(fb_remote_data *)((long)address 
+               + remote_backdrop_offset)) & mask & bits);
 }
 
 static void fginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
@@ -265,10 +316,52 @@ static void solidinvblock(fb_remote_data *address, unsigned mask, unsigned bits)
     *address = data ^ ((data ^ bits) & mask);
 }
 
-lcd_remote_blockfunc_type* const lcd_remote_blockfuncs[8] = {
+static void solidimginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
+                             ICODE_ATTR;
+static void solidimginvblock(fb_remote_data *address, unsigned mask, unsigned bits)
+{
+    unsigned data = *address;
+    unsigned fgp  = fg_pattern;
+
+    bits     = fgp  ^ ((fgp ^ *(fb_remote_data *)((long)address
+               + remote_backdrop_offset)) & bits);
+    *address = data ^ ((data ^ bits) & mask);
+}
+
+lcd_remote_blockfunc_type* const lcd_remote_blockfuncs_bgcolor[8] = {
     flipblock, bgblock, fgblock, solidblock,
     flipinvblock, bginvblock, fginvblock, solidinvblock
 };
+
+lcd_remote_blockfunc_type* const lcd_remote_blockfuncs_backdrop[8] = {
+    flipblock, bgimgblock, fgblock, solidimgblock,
+    flipinvblock, bgimginvblock, fginvblock, solidimginvblock
+};
+
+lcd_remote_blockfunc_type* const *lcd_remote_blockfuncs = lcd_remote_blockfuncs_bgcolor;
+
+
+void lcd_remote_set_backdrop(fb_remote_data* backdrop)
+{
+    remote_backdrop = backdrop;
+    if (backdrop)
+    {
+        remote_backdrop_offset = (long)backdrop - (long)lcd_remote_framebuffer;
+        lcd_remote_pixelfuncs = lcd_remote_pixelfuncs_backdrop;
+        lcd_remote_blockfuncs = lcd_remote_blockfuncs_backdrop;
+    }
+    else
+    {
+        remote_backdrop_offset = 0;
+        lcd_remote_pixelfuncs = lcd_remote_pixelfuncs_bgcolor;
+        lcd_remote_blockfuncs = lcd_remote_blockfuncs_bgcolor;
+    }
+}
+
+fb_remote_data* lcd_remote_get_backdrop(void)
+{
+    return remote_backdrop;
+}
 
 static inline void setblock(fb_remote_data *address, unsigned mask, unsigned bits)
 {
@@ -283,9 +376,20 @@ static inline void setblock(fb_remote_data *address, unsigned mask, unsigned bit
 /* Clear the whole display */
 void lcd_remote_clear_display(void)
 {
-    unsigned bits = (drawmode & DRMODE_INVERSEVID) ? fg_pattern : bg_pattern;
-
-    memset16(lcd_remote_framebuffer, bits, sizeof lcd_remote_framebuffer / 2);
+    if (drawmode & DRMODE_INVERSEVID)
+    {
+        memset(lcd_remote_framebuffer, fg_pattern,
+               sizeof lcd_remote_framebuffer);
+    }
+    else
+    {
+        if (remote_backdrop)
+            memcpy(lcd_remote_framebuffer, remote_backdrop,
+                   sizeof lcd_remote_framebuffer);
+        else
+            memset(lcd_remote_framebuffer, bg_pattern,
+                   sizeof lcd_remote_framebuffer);
+    }
     scrolling_lines = 0;
 }
 
@@ -497,7 +601,7 @@ void lcd_remote_fillrect(int x, int y, int width, int height)
 
     if (drawmode & DRMODE_INVERSEVID)
     {
-        if (drawmode & DRMODE_BG)
+        if ((drawmode & DRMODE_BG) && !remote_backdrop)
         {
             fillopt = true;
             bits = bg_pattern;
