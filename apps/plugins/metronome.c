@@ -26,28 +26,34 @@ PLUGIN_HEADER
 #define METRONOME_VOL_DOWN  PLA_DOWN
 #define METRONOME_VOL_UP_REP    PLA_UP_REPEAT
 #define METRONOME_VOL_DOWN_REP  PLA_DOWN_REPEAT
-#define METRONOME_TAP       PLA_START
 #define METRONOME_LEFT      PLA_LEFT
 #define METRONOME_RIGHT     PLA_RIGHT
 #define METRONOME_LEFT_REP      PLA_LEFT_REPEAT
 #define METRONOME_RIGHT_REP     PLA_RIGHT_REPEAT
 enum {
     METRONOME_PLAY_TAP = LAST_PLUGINLIB_ACTION+1,
+#if CONFIG_KEYPAD == ONDIO_PAD
     METRONOME_PAUSE,
+#endif
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
     METRONOME_SYNC 
+#endif
 };
 
 
 #if CONFIG_KEYPAD == ONDIO_PAD
+#define METRONOME_TAP       PLA_START
 #define METRONOME_MSG_START "start: mode"
 #define METRONOME_MSG_STOP "pause: hold mode"
 static const struct button_mapping ondio_action[] = 
 {
     {METRONOME_PLAY_TAP, BUTTON_MENU|BUTTON_REL, BUTTON_MENU },
-    {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE }
+    {METRONOME_PAUSE, BUTTON_MENU|BUTTON_REPEAT, BUTTON_NONE },
+    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
 #else
-#define METRONOME_PLAYPAUSE PLA_FIRE
+#define METRONOME_TAP       PLA_FIRE
+#define METRONOME_PLAYPAUSE PLA_START
 #define METRONOME_MSG_START "press play"
 #define METRONOME_MSG_STOP "press pause"
 
@@ -55,6 +61,7 @@ static const struct button_mapping ondio_action[] =
 static const struct button_mapping iriver_syncaction[] = 
 {
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
+    {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
 };
 #endif
 #endif /* #if CONFIG_KEYPAD == ONDIO_PAD */
@@ -972,13 +979,13 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 change_bpm(1);
                 break;
 
-#if CONFIG_KEYPAD != ONDIO_PAD
+#ifdef  METRONOME_TAP
             case METRONOME_TAP:
                 tap();
                 break;
 #endif
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if METRONOME_SYNC
             case METRONOME_SYNC:
                 minitick = period;
                 break;
