@@ -222,6 +222,14 @@ int plugin_main(void)
     rb->lcd_getstringsize("A", &font_w, &font_h);
     starfield_init(&starfield);
     starfield_add_stars(&starfield, INIT_STARS);
+    
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+#endif
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_background(LCD_BLACK);
+    rb->lcd_set_foreground(LCD_WHITE);
+#endif
 
     while (true)
     {
