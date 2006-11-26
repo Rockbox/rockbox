@@ -329,7 +329,7 @@ static bool init_encoder(void)
     struct enc_inputs     inputs;
     struct enc_parameters params;
     
-    codec_init(ci);
+    codec_init();
 
     if (ci->enc_get_inputs         == NULL ||
         ci->enc_set_parameters     == NULL ||

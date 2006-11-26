@@ -323,7 +323,7 @@ static bool init_encoder(void)
 } /* init_encoder */
 
 /* main codec entry point */
-enum codec_status codec_start(void)
+enum codec_status codec_main(void)
 {
     bool cpu_boosted;
 
