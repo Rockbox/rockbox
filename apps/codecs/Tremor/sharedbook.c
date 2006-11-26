@@ -24,19 +24,6 @@
 #include "ivorbiscodec.h"
 #include "codebook.h"
 
-/* Size (in number of entries) for static buffers in book_init_decode, so
- * that large alloca() calls can be avoided, which is needed in Rockbox.
- * This is more than enough for one certain test file (which needs 6561 
- * entries)...
- */
-#define BOOK_INIT_MAXSIZE   8192
-
-/* Max value in static_codebook.dim we expect to find in _book_unquantize.
- * Used to avoid some temporary allocations. Again, enough for some test 
- * files...
- */
-#define BOOK_DIM_MAX        4
- 
 /**** pack/unpack helpers ******************************************/
 int _ilog(unsigned int v){
   int ret=0;
@@ -84,11 +71,7 @@ static ogg_int32_t _float32_unpack(long val,int *point){
 ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
   long i,j,count=0;
   ogg_uint32_t marker[33];
-  /* Avoid temporary malloc; _make_words is only called from
-   * vorbis_book_init_decode, and the result is only used for a short while.
-   */
-  static ogg_uint32_t r[BOOK_INIT_MAXSIZE];
-  /* ogg_uint32_t *r=(ogg_uint32_t *)_ogg_malloc((sparsecount?sparsecount:n)*sizeof(*r)); */
+  ogg_uint32_t *r=(ogg_uint32_t *)ogg_tmpmalloc((sparsecount?sparsecount:n)*sizeof(*r));
   memset(marker,0,sizeof(marker));
 
   for(i=0;i<n;i++){
@@ -200,17 +183,12 @@ ogg_int32_t *_book_unquantize(const static_codebook *b,int n,int *sparsemap,
 			      int *maxpoint){
   long j,k,count=0;
   if(b->maptype==1 || b->maptype==2){
-    /* Static buffer to avoid temporary calloc, which Rockbox (currently) 
-     * doesn't handle well 
-     */
-    static int rp_buffer[BOOK_INIT_MAXSIZE*BOOK_DIM_MAX];
     int quantvals;
     int minpoint,delpoint;
     ogg_int32_t mindel=_float32_unpack(b->q_min,&minpoint);
     ogg_int32_t delta=_float32_unpack(b->q_delta,&delpoint);
     ogg_int32_t *r=(ogg_int32_t *)_ogg_calloc(n*b->dim,sizeof(*r));
-    /* int *rp=(int *)_ogg_calloc(n*b->dim,sizeof(*rp)); */
-    int* rp=rp_buffer;
+    int *rp=(int *)ogg_tmpcalloc(n*b->dim,sizeof(*rp));
 
     memset(rp, 0, n*b->dim*sizeof(*rp));
     *maxpoint=minpoint;
@@ -347,6 +325,7 @@ static int sort32a(const void *a,const void *b){
 int vorbis_book_init_decode(codebook *c,const static_codebook *s){
   int i,j,n=0,tabn;
   int *sortindex;
+  long pos = ogg_tmpmalloc_pos();
   memset(c,0,sizeof(*c));
   
   /* count actually used entries */
@@ -372,21 +351,11 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
      by sorted bitreversed codeword to allow treeless decode. */
 
   {
-    /* Static buffers to avoid heavy stack usage */
-    static int sortindex_buffer[BOOK_INIT_MAXSIZE];
-    static ogg_uint32_t* codep_buffer[BOOK_INIT_MAXSIZE];
-
     /* perform sort */
     ogg_uint32_t *codes=_make_words(s->lengthlist,s->entries,c->used_entries);
-    /* ogg_uint32_t **codep=(ogg_uint32_t **)alloca(sizeof(*codep)*n); */
-    ogg_uint32_t **codep=codep_buffer;
+    ogg_uint32_t **codep=(ogg_uint32_t **)ogg_tmpmalloc(sizeof(*codep)*n);
 
-    /* We have buffers for these sizes */
-    if ((n>BOOK_INIT_MAXSIZE) 
-      || (n*s->dim>BOOK_INIT_MAXSIZE*BOOK_DIM_MAX))
-      goto err_out;
-
-    if(codes==NULL)goto err_out;
+    if(codes==NULL||codep==NULL)goto err_out;
 
     for(i=0;i<n;i++){
       codes[i]=bitreverse(codes[i]);
@@ -395,8 +364,7 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
 
     qsort(codep,n,sizeof(*codep),sort32a);
 
-    /* sortindex=(int *)alloca(n*sizeof(*sortindex)); */
-    sortindex=sortindex_buffer;
+    sortindex=(int *)ogg_tmpmalloc(n*sizeof(*sortindex));
     c->codelist=(ogg_uint32_t *)_ogg_malloc(n*sizeof(*c->codelist));
     /* the index is a reverse index */
     for(i=0;i<n;i++){
@@ -468,9 +436,10 @@ int vorbis_book_init_decode(codebook *c,const static_codebook *s){
     }
   }
   
-
+  ogg_tmpmalloc_free(pos);
   return(0);
  err_out:
+  ogg_tmpmalloc_free(pos);
   vorbis_book_clear(c);
   return(-1);
 }

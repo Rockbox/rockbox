@@ -130,6 +130,7 @@ next_track:
         error = CODEC_ERROR;
         goto exit;
     }
+    ogg_malloc_init();
 
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);

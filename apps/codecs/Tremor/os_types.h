@@ -19,6 +19,9 @@
 #ifndef _OS_TYPES_H
 #define _OS_TYPES_H
 
+#include <stdlib.h>
+#include <codecs.h>
+
 #ifdef _LOW_ACCURACY_
 #  define X(n) (((((n)>>22)+1)>>1) - ((((n)>>22)+1)>>9))
 #  define LOOKUP_T const unsigned char  
@@ -29,10 +32,20 @@
 
 /* make it easy on the folks that want to compile the libs with a
    different malloc than stdlib */
-#define _ogg_malloc  malloc
-#define _ogg_calloc  calloc
-#define _ogg_realloc realloc
-#define _ogg_free    free
+
+#define _ogg_malloc  ogg_malloc
+#define _ogg_calloc  ogg_calloc
+#define _ogg_realloc ogg_realloc
+#define _ogg_free(x) do { } while(0)
+
+void ogg_malloc_init(void);
+void *ogg_malloc(size_t size);
+void *ogg_tmpmalloc(size_t size);
+void *ogg_calloc(size_t nmemb, size_t size);
+void *ogg_tmpcalloc(size_t nmemb, size_t size);
+void *ogg_realloc(void *ptr, size_t size);
+long ogg_tmpmalloc_pos(void);
+void ogg_tmpmalloc_free(long pos);
 
    typedef short ogg_int16_t;
    typedef int ogg_int32_t;

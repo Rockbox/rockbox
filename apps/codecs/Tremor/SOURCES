@@ -14,3 +14,4 @@ synthesis.c
 vorbisfile.c
 window.c
 ctype.c
+oggmalloc.c
