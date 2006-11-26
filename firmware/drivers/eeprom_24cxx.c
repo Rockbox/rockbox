@@ -36,6 +36,13 @@
 #define SW_I2C_WRITE 0
 #define SW_I2C_READ  1
 
+/* Use cache to speedup writing to the chip. */
+static char data_cache[EEPROM_SIZE];
+static uint8_t cached_bitfield[EEPROM_SIZE/8];
+
+#define IS_CACHED(addr) (cached_bitfield[addr/8] & (1 << (addr % 8)))
+#define SET_CACHED(addr) (cached_bitfield[addr/8] |= 1 << (addr % 8))
+
 /* h1x0 needs its own i2c driver,
    h3x0 uses the pcf i2c driver */
 
@@ -57,10 +64,6 @@
 
 /* delay loop to achieve 400kHz at 120MHz CPU frequency */
 #define DELAY    do { int _x; for(_x=0;_x<22;_x++);} while(0)
-
-/* Use cache to speedup writing to the chip. */
-static char data_cache[EEPROM_SIZE];
-static uint8_t cached_bitfield[EEPROM_SIZE/8];
 
 static void sw_i2c_init(void)
 {
@@ -287,9 +290,6 @@ void eeprom_24cxx_init(void)
     sw_i2c_init();
     memset(cached_bitfield, 0, sizeof cached_bitfield);
 }
-
-#define IS_CACHED(addr) (cached_bitfield[addr/8] & (1 << (addr % 8)))
-#define SET_CACHED(addr) (cached_bitfield[addr/8] |= 1 << (addr % 8))
 
 int eeprom_24cxx_read_byte(unsigned int address, char *c)
 {
