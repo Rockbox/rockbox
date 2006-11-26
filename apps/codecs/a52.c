@@ -28,8 +28,6 @@ CODEC_HEADER
 
 #define A52_SAMPLESPERFRAME (6*256)
 
-struct codec_api *ci;
-
 static a52_state_t *state;
 unsigned long samplesdone;
 unsigned long frequency;
@@ -117,16 +115,8 @@ void a52_decode_data(uint8_t *start, uint8_t *end)
     }
 }
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
     size_t n;
     unsigned char *filebuf;
@@ -134,19 +124,12 @@ enum codec_status codec_start(struct codec_api *api)
     int retval;
 
     /* Generic codec initialisation */
-    ci = api;
-
-    #ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-    #endif
-
     ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_NONINTERLEAVED);
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*128));
 
 next_track:
-    if (codec_init(api)) {
+    if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }

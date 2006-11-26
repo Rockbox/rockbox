@@ -243,9 +243,6 @@ int codec_load_ram(char* codecptr, int size, void* ptr2, int bufwrap,
     int copy_n;
     
     if ((char *)&codecbuf[0] != codecptr) {
-        /* zero out codec buffer to ensure a properly zeroed bss area */
-        memset(codecbuf, 0, CODEC_SIZE);
-
         size = MIN(size, CODEC_SIZE);
         copy_n = MIN(size, bufwrap);
         memcpy(codecbuf, codecptr, copy_n);         
@@ -308,9 +305,6 @@ int codec_load_file(const char *plugin, struct codec_api *api)
 
     codec_get_full_path(path, plugin);
     
-    /* zero out codec buffer to ensure a properly zeroed bss area */
-    memset(codecbuf, 0, CODEC_SIZE);
-
     fd = open(path, O_RDONLY);
     if (fd < 0) {
         snprintf(msgbuf, sizeof(msgbuf)-1, "Couldn't load codec: %s", path);

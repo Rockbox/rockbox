@@ -61,9 +61,9 @@
 
 #if defined(DEBUG) || defined(SIMULATOR)
 #undef DEBUGF
-#define DEBUGF  rb->debugf
+#define DEBUGF  ci->debugf
 #undef LDEBUGF
-#define LDEBUGF rb->debugf
+#define LDEBUGF ci->debugf
 #else
 #define DEBUGF(...)
 #define LDEBUGF(...)
@@ -71,7 +71,7 @@
 
 #ifdef ROCKBOX_HAS_LOGF
 #undef LOGF
-#define LOGF rb->logf
+#define LOGF ci->logf
 #else
 #define LOGF(...)
 #endif

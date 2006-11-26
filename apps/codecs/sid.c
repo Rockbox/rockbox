@@ -65,20 +65,9 @@ CODEC_HEADER
 
 #define CHUNK_SIZE (1024*2)
 
-
-struct codec_api *rb;
-
 /* This codec supports SID Files:
  * 
  */
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
 
 static int32_t samples[CHUNK_SIZE] IBSS_ATTR;   /* The sample buffer */
 
@@ -1213,9 +1202,8 @@ unsigned short LoadSIDFromMemory(void *pSidData, unsigned short *load_addr,
 }
 
 
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
-    struct codec_api *ci;
     size_t n, bytesfree;
     unsigned char *p;
     unsigned int filesize;
@@ -1228,20 +1216,11 @@ enum codec_status codec_start(struct codec_api *api)
     int nSamplesToRender = 0;
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-        
-
-#ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
 
 next_track:
-    if (codec_init(api)) {
+    if (codec_init()) {
         return CODEC_ERROR;
     }
 
@@ -1251,7 +1230,7 @@ next_track:
     /* Load SID file */    
     p = sidfile;
     bytesfree=sizeof(sidfile);
-    while ((n = rb->read_filebuf(p, bytesfree)) > 0) {
+    while ((n = ci->read_filebuf(p, bytesfree)) > 0) {
         p += n;
         bytesfree -= n;
     }

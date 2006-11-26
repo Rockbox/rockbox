@@ -699,6 +699,7 @@ void plugin_iram_init(char *iramstart, char *iramcopy, size_t iram_size,
     audio_iram_steal();
     memcpy(iramstart, iramcopy, iram_size);
     memset(iedata, 0, iedata_size);
+    memset(iramcopy, 0, iram_size);
 }
 #endif /* IRAM_STEAL */
 

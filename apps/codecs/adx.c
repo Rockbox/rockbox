@@ -21,8 +21,6 @@
 
 CODEC_HEADER
 
-struct codec_api *rb;
-
 /* Maximum number of bytes to process in one iteration */
 #define WAV_CHUNK_SIZE (1024*2)
 
@@ -38,9 +36,8 @@ struct codec_api *rb;
 static int16_t samples[WAV_CHUNK_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
-    struct codec_api *ci;
     int channels;
     int sampleswritten, i;
     uint8_t *buf;
@@ -56,16 +53,13 @@ enum codec_status codec_start(struct codec_api *api)
     off_t chanstart, bufoff;
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-    
     /* we only render 16 bits */
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)16);
     /*ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));*/
   
 next_track:
     DEBUGF("ADX: next_track\n");
-    if (codec_init(api)) {
+    if (codec_init()) {
         return CODEC_ERROR;
     }
     DEBUGF("ADX: after init\n");

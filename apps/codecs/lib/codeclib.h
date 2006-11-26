@@ -24,6 +24,7 @@
 
 #define MALLOC_BUFSIZE (512*1024)
 
+extern struct codec_api *ci;
 extern long mem_ptr;
 extern long bufsize;
 extern unsigned char* mp3buf;     // The actual MP3 buffer from Rockbox
@@ -55,7 +56,7 @@ void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, con
 
 /* Various codec helper functions */
 
-int codec_init(struct codec_api* rb);
+int codec_init(void);
 void codec_set_replaygain(struct mp3entry* id3);
 
 #ifdef RB_PROFILE

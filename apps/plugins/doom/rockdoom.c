@@ -769,6 +769,8 @@ extern int systemvol;
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+   PLUGIN_IRAM_INIT(api)
+
    rb = api;
    (void)parameter;
 
@@ -777,8 +779,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
    rb->cpu_boost(true);
 #endif
-
-   PLUGIN_IRAM_INIT(rb)
 
    rb->lcd_setfont(0);
 

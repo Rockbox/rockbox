@@ -25,8 +25,6 @@ CODEC_HEADER
 /* Macro that sign extends an unsigned byte */
 #define SE(x) ((int32_t)((int8_t)(x)))
 
-struct codec_api *rb;
-
 /* This codec supports AIFF files with the following formats:
  * - PCM, 8, 16 and 24 bits, mono or stereo
  */
@@ -43,19 +41,10 @@ enum
 /* for 44.1kHz stereo 16bits, this represents 0.023s ~= 1/50s */
 #define AIF_CHUNK_SIZE (1024*2)
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 static int32_t samples[AIF_CHUNK_SIZE] IBSS_ATTR;
 
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
-    struct codec_api *ci;
     uint32_t numbytes, bytesdone;
     uint16_t num_channels = 0;
     uint32_t num_sample_frames = 0;
@@ -73,20 +62,12 @@ enum codec_status codec_start(struct codec_api *api)
     off_t firstblockposn;     /* position of the first block in file */
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-
-#ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
   
 next_track:
-    if (codec_init(api)) {
+    if (codec_init()) {
         i = CODEC_ERROR;
         goto exit;
     }

@@ -20,22 +20,11 @@
 #include "codeclib.h"
 #include <codecs/libffmpegFLAC/shndec.h>
 
+CODEC_HEADER
+
 #ifndef IBSS_ATTR_SHORTEN_DECODED0
 #define IBSS_ATTR_SHORTEN_DECODED0 IBSS_ATTR
 #endif
-
-CODEC_HEADER
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
-struct codec_api* rb;
-struct codec_api* ci;
 
 int32_t decoded0[MAX_DECODE_SIZE] IBSS_ATTR_SHORTEN_DECODED0;
 int32_t decoded1[MAX_DECODE_SIZE] IBSS_ATTR;
@@ -46,7 +35,7 @@ int32_t offset1[MAX_OFFSET_SIZE] IBSS_ATTR;
 int8_t ibuf[MAX_BUFFER_SIZE] IBSS_ATTR;
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     ShortenContext sc;
     uint32_t samplesdone;
@@ -56,14 +45,6 @@ enum codec_status codec_start(struct codec_api* api)
     size_t bytesleft;
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
@@ -72,7 +53,7 @@ enum codec_status codec_start(struct codec_api* api)
     
 next_track:
     /* Codec initialization */
-    if (codec_init(api)) {
+    if (codec_init()) {
         LOGF("Shorten: codec_init error\n");
         return CODEC_ERROR;
     }

@@ -67,29 +67,15 @@ MPC_SAMPLE_FORMAT sample_buffer[MPC_DECODER_BUFFER_LENGTH]
 IBSS_ATTR_MPC_SAMPLE_BUF;
 mpc_uint32_t    seek_table[10000];
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
-    struct codec_api *ci = api;
     mpc_int64_t samplesdone;
     unsigned long frequency;
     unsigned status;
     mpc_reader reader;
     mpc_streaminfo info;
     int retval = CODEC_OK;
-    
-    #ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-    #endif
     
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)(28));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (long *)(1024*16));
@@ -109,7 +95,7 @@ enum codec_status codec_start(struct codec_api *api)
     mpc_decoder_set_seek_table(&decoder, seek_table, sizeof(seek_table));
 
 next_track:    
-    if (codec_init(api)) {
+    if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }

@@ -66,7 +66,7 @@ $(OBJDIR)/mp3_enc.elf: $(OBJDIR)/mp3_enc.o
 $(OBJDIR)/wav_enc.elf: $(OBJDIR)/wav_enc.o
 $(OBJDIR)/wavpack_enc.elf: $(OBJDIR)/wavpack_enc.o $(BUILDDIR)/libwavpack.a
 
-$(OBJDIR)/%.elf:
+$(OBJDIR)/%.elf: $(OBJDIR)/codec_crt0.o
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $^ -L$(BUILDDIR) -lcodec -lgcc -T$(LINKCODEC) -Wl,-Map,$(OBJDIR)/$*.map
 
 $(OBJDIR)/%.codec : $(OBJDIR)/%.elf
@@ -77,8 +77,8 @@ ifeq ($(SIMVER), x11)
 ###################################################
 # This is the X11 simulator version
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o $(OBJDIR)/codec_crt0.o $(BUILDDIR)/libcodec.a $(OUTPUT)
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< $(OBJDIR)/codec_crt0.o -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -92,8 +92,8 @@ ifeq ($(SIMVER), sdl)
 ###################################################
 # This is the SDL simulator version
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o $(OBJDIR)/codec_crt0.o $(BUILDDIR)/libcodec.a $(OUTPUT)
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $< $(OBJDIR)/codec_crt0.o -L$(BUILDDIR) $(CODECLIBS) -lcodec -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -108,9 +108,9 @@ else	# end of sdl-simulator
 DLLTOOLFLAGS = --export-all
 DLLWRAPFLAGS = -s --entry _DllMain@12 --target=i386-mingw32 -mno-cygwin
 
-$(OBJDIR)/%.codec : $(OBJDIR)/%.o  $(BUILDDIR)/libcodec.a $(OUTPUT)
-	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $<
-	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< \
+$(OBJDIR)/%.codec : $(OBJDIR)/%.o $(OBJDIR)/codec_crt0.o $(BUILDDIR)/libcodec.a $(OUTPUT)
+	$(call PRINTS,DLL $(@F))$(DLLTOOL) $(DLLTOOLFLAGS) -z $(OBJDIR)/$*.def $< $(OBJDIR)/codec_crt0.o
+	$(SILENT)$(DLLWRAP) $(DLLWRAPFLAGS) --def $(OBJDIR)/$*.def $< $(OBJDIR)/codec_crt0.o\
 		$(BUILDDIR)/libcodec.a $(patsubst -l%,$(BUILDDIR)/lib%.a,$(CODECLIBS)) \
 		-o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)

@@ -364,9 +364,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     (void)parameter;
 
+    PLUGIN_IRAM_INIT(api)
     rb = api;
-
-    PLUGIN_IRAM_INIT(rb)
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);

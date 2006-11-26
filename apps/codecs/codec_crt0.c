@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2005 Jens Arnold
+ * Copyright (C) 2006 Tomasz Malesinski
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,31 +17,30 @@
  *
  ****************************************************************************/
 
-/* Global declarations to be used in rockbox software codecs */
-
 #include "config.h"
-#include "system.h"
+#include "codeclib.h"
 
-#include <sys/types.h>
+struct codec_api *ci;
 
-extern struct codec_api *ci;
+extern unsigned char iramcopy[];
+extern unsigned char iramstart[];
+extern unsigned char iramend[];
+extern unsigned char iedata[];
+extern unsigned char iend[];
+extern unsigned char plugin_bss_start[];
+extern unsigned char plugin_end_addr[];
 
-/* Get these functions 'out of the way' of the standard functions. Not doing
- * so confuses the cygwin linker, and maybe others. These functions need to
- * be implemented elsewhere */
-#define malloc(x) codec_malloc(x)
-#define calloc(x,y) codec_calloc(x,y)
-#define realloc(x,y) codec_realloc(x,y)
-#define free(x) codec_free(x)
-#define alloca(x) __builtin_alloca(x)
+extern enum codec_status codec_main(void);
 
-void* codec_malloc(size_t size);
-void* codec_calloc(size_t nmemb, size_t size);
-void* codec_realloc(void* ptr, size_t size);
-void codec_free(void* ptr);
-
-#define abs(x) ((x)>0?(x):-(x))
-#define labs(x) abs(x)
-
-void qsort(void *base, size_t nmemb, size_t size, int(*compar)(const void *, const void *));
-
+enum codec_status codec_start(struct codec_api *api)
+{
+#ifndef SIMULATOR
+#ifdef USE_IRAM
+    api->memcpy(iramstart, iramcopy, iramend - iramstart);
+    api->memset(iedata, 0, iend - iedata);
+#endif
+    api->memset(plugin_bss_start, 0, plugin_end_addr - plugin_bss_start);
+#endif
+    ci = api;
+    return codec_main();
+}

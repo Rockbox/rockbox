@@ -22,8 +22,6 @@
 
 CODEC_HEADER
 
-static struct codec_api *ci;
-
 #define BUFFER_SIZE 4096
 
 static int32_t temp_buffer [BUFFER_SIZE] IBSS_ATTR;
@@ -35,16 +33,8 @@ static int32_t read_callback (void *buffer, int32_t bytes)
     return retval;
 }
 
-#ifdef USE_IRAM 
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     WavpackContext *wpc;
     char error [80];
@@ -52,13 +42,6 @@ enum codec_status codec_start(struct codec_api* api)
     int retval;
 
     /* Generic codec initialisation */
-    ci = api;
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
   
@@ -66,7 +49,7 @@ enum codec_status codec_start(struct codec_api* api)
 
     next_track:
 
-    if (codec_init(api)) {
+    if (codec_init()) {
         retval = CODEC_ERROR;
         goto exit;
     }

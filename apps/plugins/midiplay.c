@@ -105,16 +105,16 @@ struct plugin_api * rb;
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int retval = 0;
-    rb = api;
 
+    PLUGIN_IRAM_INIT(api)
+
+    rb = api;
     if(parameter == NULL)
     {
         rb->splash(HZ*2, true, " Play .MID file ");
         return PLUGIN_OK;
     }
     rb->lcd_setfont(0);
-
-    PLUGIN_IRAM_INIT(rb)
 
 #if defined(HAVE_ADJUSTABLE_CPU_FREQ)
     rb->cpu_boost(true);

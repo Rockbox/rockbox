@@ -2364,14 +2364,14 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     int   brate[] = { 64,  80,  96,  112,  128,  160,  192,  224,  256,  320 };
 
     (void)parameter;
-    rb = api;
+
+    PLUGIN_IRAM_INIT(api)
 
 #ifdef CPU_COLDFIRE
     asm volatile ("move.l #0, %macsr"); /* integer mode */
 #endif
 
-    PLUGIN_IRAM_INIT(rb)
-
+    rb = api;
     rb->lcd_setfont(FONT_SYSFIXED);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ

@@ -24,14 +24,6 @@
 
 CODEC_ENC_HEADER
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 /** Types **/
 typedef struct
 {
@@ -73,7 +65,6 @@ struct riff_header
 #define PCM_CHUNK_SIZE      (4*PCM_SAMP_PER_CHUNK)
 
 /** Data **/
-static struct codec_api *ci;
 static int8_t input_buffer[PCM_CHUNK_SIZE*2]     IBSS_ATTR;
 static WavpackConfig config                      IBSS_ATTR;
 static WavpackContext *wpc;
@@ -381,16 +372,9 @@ static bool init_encoder(void)
     return true;
 } /* init_encoder */
 
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     bool cpu_boosted;
-
-    ci = api; /* copy to global api pointer */
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
 
     /* initialize params and config */
     if (!init_encoder())

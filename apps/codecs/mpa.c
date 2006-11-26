@@ -42,16 +42,6 @@ unsigned char mad_main_data[MAD_BUFFER_MDLEN] IBSS_ATTR;
 int mpeg_latency[3] = { 0, 481, 529 };
 int mpeg_framesize[3] = {384, 1152, 1152};
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
-struct codec_api *ci;
-
 void init_mad(void)
 {
     ci->memset(&stream, 0, sizeof(struct mad_stream));
@@ -69,7 +59,7 @@ void init_mad(void)
 }
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
     int status;
     size_t size;
@@ -83,14 +73,7 @@ enum codec_status codec_start(struct codec_api *api)
     int framelength;
     int padding = MAD_BUFFER_GUARD; /* to help mad decode the last frame */
 
-    ci = api;
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
-    if (codec_init(api))
+    if (codec_init())
         return CODEC_ERROR;
 
     /* Create a decoder instance */

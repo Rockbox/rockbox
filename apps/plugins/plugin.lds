@@ -115,12 +115,11 @@ SECTIONS
         . = ALIGN(0x4);
         iend = .;
     } > PLUGIN_IRAM
-
-    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
-#else
-    .bss :
 #endif
+
+    .bss (NOLOAD) :
     {
+	plugin_bss_start = .;
         *(.bss*)
         *(COMMON)
         . = ALIGN(0x4);

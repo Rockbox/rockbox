@@ -25,8 +25,6 @@ CODEC_HEADER
 /* Macro that sign extends an unsigned byte */
 #define SE(x) ((int32_t)((int8_t)(x)))
 
-struct codec_api *rb;
-
 /* This codec support WAVE files with the following formats:
  * - PCM, up to 32 bits, supporting 32 bits playback when useful.
  * - ALAW and MULAW (16 bits compressed on 8 bits).
@@ -94,14 +92,6 @@ enum
 /* Maximum number of bytes to process in one iteration */
 /* for 44.1kHz stereo 16bits, this represents 0.023s ~= 1/50s */
 #define WAV_CHUNK_SIZE (1024*2)
-
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
 
 static const int16_t alaw2linear16[256] ICONST_ATTR = {
      -5504,   -5248,   -6016,   -5760,   -4480,   -4224,   -4992,
@@ -213,9 +203,8 @@ decode_dvi_adpcm(struct codec_api *ci,
                  size_t *pcmoutsize);
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api *api)
+enum codec_status codec_main(void)
 {
-    struct codec_api *ci;
     uint32_t numbytes, bytesdone;
     uint32_t totalsamples = 0;
     uint16_t channels = 0;
@@ -235,20 +224,12 @@ enum codec_status codec_start(struct codec_api *api)
     
  
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-
-#ifdef USE_IRAM 
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
   
 next_track:
-    if (codec_init(api)) {
+    if (codec_init()) {
         i = CODEC_ERROR;
         goto exit;
     }

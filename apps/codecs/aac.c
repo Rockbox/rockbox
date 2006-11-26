@@ -25,19 +25,8 @@
 
 CODEC_HEADER
 
-#ifndef SIMULATOR
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
-struct codec_api* rb;
-struct codec_api* ci;
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     /* Note that when dealing with QuickTime/MPEG4 files, terminology is
      * a bit confusing. Files with sound are split up in chunks, where
@@ -62,14 +51,6 @@ enum codec_status codec_start(struct codec_api* api)
     unsigned char c = 0;
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-
-#ifndef SIMULATOR
-    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*16));
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
 
@@ -79,7 +60,7 @@ enum codec_status codec_start(struct codec_api* api)
 next_track:
     err = CODEC_OK;
 
-    if (codec_init(api)) {
+    if (codec_init()) {
         LOGF("FAAD: Codec init error\n");
         err = CODEC_ERROR;
         goto exit;
@@ -90,8 +71,8 @@ next_track:
   
     sound_samples_done = ci->id3->offset;
 
-    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(rb->id3->frequency));
-    codec_set_replaygain(rb->id3);
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+    codec_set_replaygain(ci->id3);
 
     stream_create(&input_stream,ci);
 
@@ -139,7 +120,7 @@ next_track:
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
-        rb->yield();
+        ci->yield();
 
         if (ci->stop_codec || ci->new_track) {
             break;
@@ -195,12 +176,12 @@ next_track:
         ci->advance_buffer(n);
 
         /* Output the audio */
-        rb->yield();
-        while (!rb->pcmbuf_insert_split(decoder->time_out[0],
+        ci->yield();
+        while (!ci->pcmbuf_insert_split(decoder->time_out[0],
                                         decoder->time_out[1],
                                         frame_info.samples * 2))
         {
-            rb->sleep(1);
+            ci->sleep(1);
         }
 
         /* Update the elapsed-time indicator */

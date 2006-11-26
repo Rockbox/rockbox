@@ -24,14 +24,6 @@
 
 CODEC_ENC_HEADER
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 struct riff_header
 {
     uint8_t  riff_id[4];      /* 00h - "RIFF"                            */
@@ -65,7 +57,6 @@ struct riff_header
 #define PCM_SAMP_PER_CHUNK       2048
 #define PCM_CHUNK_SIZE          (PCM_SAMP_PER_CHUNK*4)
 
-static struct codec_api *ci;
 static int    num_channels;
 uint32_t      sample_rate;
 uint32_t      enc_size;
@@ -321,16 +312,9 @@ static bool init_encoder(void)
 } /* init_encoder */
 
 /* main codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     bool cpu_boosted;
-
-    ci = api; // copy to global api pointer
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
 
     if (!init_encoder())
     {

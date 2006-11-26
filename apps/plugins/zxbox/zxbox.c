@@ -61,14 +61,16 @@ long start_time IBSS_ATTR = 0;
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
 
-    rb = api;
 #if CODEC == SWCODEC && !defined SIMULATOR
-    rb->pcm_play_stop();
+    api->pcm_play_stop();
 #endif
+
+    PLUGIN_IRAM_INIT(api)
+
+    rb = api;
     rb->lcd_set_backdrop(NULL);
     rb->splash(HZ, true, "Welcome to ZXBox");
 
-    PLUGIN_IRAM_INIT(rb)
 
     sp_init();
 

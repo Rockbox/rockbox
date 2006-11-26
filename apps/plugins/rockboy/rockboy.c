@@ -157,6 +157,8 @@ void savesettings(void)
 /* this is the plugin entry point */
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
+    PLUGIN_IRAM_INIT(api)
+
     /* if you are using a global api pointer, don't forget to copy it!
        otherwise you will get lovely "I04: IllInstr" errors... :-) */
     rb = api;
@@ -180,8 +182,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         audio_buffer_free = plugin_start_addr - (unsigned char *)audio_bufferbase;
 #endif
     setoptions();
-
-    PLUGIN_IRAM_INIT(rb)
 
     shut=0;
     cleanshut=0;

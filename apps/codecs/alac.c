@@ -23,21 +23,10 @@
 
 CODEC_HEADER
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
-struct codec_api* rb;
-struct codec_api* ci;
-
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
   size_t n;
   demux_res_t demux_res;
@@ -53,14 +42,6 @@ enum codec_status codec_start(struct codec_api* api)
   int retval;
 
   /* Generic codec initialisation */
-  rb = api;
-  ci = api;
-
-#ifdef USE_IRAM
-  rb->memcpy(iramstart, iramcopy, iramend-iramstart);
-  rb->memset(iedata, 0, iend - iedata);
-#endif
-
   ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
   ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
@@ -69,7 +50,7 @@ enum codec_status codec_start(struct codec_api* api)
 
   next_track:
 
-  if (codec_init(api)) {
+  if (codec_init()) {
     LOGF("ALAC: Error initialising codec\n");
     retval = CODEC_ERROR;
     goto exit;
@@ -78,8 +59,8 @@ enum codec_status codec_start(struct codec_api* api)
   while (!*ci->taginfo_ready && !ci->stop_codec)
     ci->sleep(1);
   
-  ci->configure(DSP_SWITCH_FREQUENCY, (long *)(rb->id3->frequency));
-  codec_set_replaygain(rb->id3);
+  ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
+  codec_set_replaygain(ci->id3);
 
   stream_create(&input_stream,ci);
 
@@ -99,7 +80,7 @@ enum codec_status codec_start(struct codec_api* api)
   samplesdone=0;
   /* The main decoding loop */
   while (i < demux_res.num_sample_byte_sizes) {
-    rb->yield();
+    ci->yield();
     if (ci->stop_codec || ci->new_track) {
       break;
     }
@@ -132,18 +113,18 @@ enum codec_status codec_start(struct codec_api* api)
     }
 
     /* Decode one block - returned samples will be host-endian */
-    rb->yield();
-    samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, rb->yield);
+    ci->yield();
+    samplesdecoded=alac_decode_frame(&alac, buffer, outputbuffer, ci->yield);
 
     /* Advance codec buffer n bytes */
     ci->advance_buffer(n);
 
     /* Output the audio */
-    rb->yield();
+    ci->yield();
     while(!ci->pcmbuf_insert_split(outputbuffer[0],
                                    outputbuffer[1],
                                    samplesdecoded*sizeof(int32_t)))
-      rb->yield();
+      ci->yield();
 
     /* Update the elapsed-time indicator */
     samplesdone+=sample_duration;

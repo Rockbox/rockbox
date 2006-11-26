@@ -53,14 +53,6 @@ CODEC_ENC_HEADER
 #define putlong(c, s)  if(s+sz <= 32) { cc = (cc << s) | c;      sz+= s; } \
                        else           { putbits(cc, sz); cc = c; sz = s; }
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 typedef struct {
     int   type; /* 0=(MPEG2 - 22.05,24,16kHz) 1=(MPEG1 - 44.1,48,32kHz) */
     int   mode; /* 0=stereo, 1=jstereo, 2=dual, 3=mono  */
@@ -181,7 +173,6 @@ static unsigned pcm_chunk_size                   IBSS_ATTR;
 static unsigned samp_per_frame                   IBSS_ATTR;
 
 static config_t          cfg                     IBSS_ATTR;
-static struct codec_api *ci;
 static char             *res_buffer;
 
 static const uint8_t ht_count_const[2][2][16] =
@@ -2460,18 +2451,11 @@ static bool enc_init(void)
     return true;
 } /* enc_init */
 
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     bool cpu_boosted;
 
     /* Generic codec initialisation */
-    ci = api;
-
-#ifdef USE_IRAM
-    memcpy(iramstart, iramcopy, iramend - iramstart);
-    memset(iedata, 0, iend - iedata);
-#endif
-
     if (!enc_init())
     {
         ci->enc_codec_loaded = -1;

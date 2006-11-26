@@ -22,17 +22,6 @@
 
 CODEC_HEADER
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
-struct codec_api* rb;
-struct codec_api* ci;
-
 /* The output buffers containing the decoded samples (channels 0 and 1) */
 int32_t decoded0[MAX_BLOCKSIZE] IBSS_ATTR_FLAC_DECODED0;
 int32_t decoded1[MAX_BLOCKSIZE] IBSS_ATTR;
@@ -423,7 +412,7 @@ bool flac_seek_offset(FLACContext* fc, uint32_t offset) {
 }
 
 /* this is the codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_main(void)
 {
     int8_t *buf;
     FLACContext fc;
@@ -436,14 +425,6 @@ enum codec_status codec_start(struct codec_api* api)
     int retval;
 
     /* Generic codec initialisation */
-    rb = api;
-    ci = api;
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend-iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
-
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*128));
 
@@ -455,7 +436,7 @@ enum codec_status codec_start(struct codec_api* api)
     /* Need to save offset for later use (cleared indirectly by flac_init) */
     samplesdone=ci->id3->offset;
 
-    if (codec_init(api)) {
+    if (codec_init()) {
         LOGF("FLAC: Error initialising codec\n");
         retval = CODEC_ERROR;
         goto exit;

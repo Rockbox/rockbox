@@ -24,14 +24,6 @@
 
 CODEC_ENC_HEADER
 
-#ifdef USE_IRAM
-extern char iramcopy[];
-extern char iramstart[];
-extern char iramend[];
-extern char iedata[];
-extern char iend[];
-#endif
-
 struct aiff_header
 {
     uint8_t   form_id[4];           /* 00h - 'FORM'                          */
@@ -77,7 +69,6 @@ struct aiff_header aiff_header =
 
 /* (*) updated when finalizing file */
 
-static struct codec_api *ci;
 static int    num_channels;
 uint32_t      sample_rate;
 uint32_t      enc_size;
@@ -332,16 +323,9 @@ static bool init_encoder(void)
 } /* init_encoder */
 
 /* main codec entry point */
-enum codec_status codec_start(struct codec_api* api)
+enum codec_status codec_start(void)
 {
     bool cpu_boosted;
-
-    ci = api; /* copy to global api pointer */
-
-#ifdef USE_IRAM
-    ci->memcpy(iramstart, iramcopy, iramend - iramstart);
-    ci->memset(iedata, 0, iend - iedata);
-#endif
 
     if (!init_encoder())
     {

@@ -297,10 +297,11 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     uint8_t* buffer;
     size_t buffer_size;
 
-    rb = api;
-
     /* This also stops audio playback - so we do it before using IRAM */
-    audiobuf = rb->plugin_get_audio_buffer(&audiosize);
+    audiobuf = api->plugin_get_audio_buffer(&audiosize);
+
+    PLUGIN_IRAM_INIT(api)
+    rb = api;
 
     /* Initialise our malloc buffer */
     mpeg2_alloc_init(audiobuf,audiosize);
@@ -311,8 +312,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     if (buffer == NULL)
         return PLUGIN_ERROR;
-
-    PLUGIN_IRAM_INIT(rb)
 
     rb->lcd_set_backdrop(NULL);
 
