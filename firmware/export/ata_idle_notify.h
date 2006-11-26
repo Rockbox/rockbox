@@ -44,10 +44,10 @@ extern bool register_ata_idle_func(ata_idle_notify function);
 #if USING_ATA_CALLBACK
 extern void ata_idle_notify_init(void);
 extern void unregister_ata_idle_func(ata_idle_notify function, bool run);
-extern bool call_ata_idle_notifys(bool sleep_after);
+extern bool call_ata_idle_notifys(bool force);
 #else
 #define unregister_ata_idle_func(f,r)
-#define call_ata_idle_notifys(s)
+#define call_ata_idle_notifys(f)
 #define ata_idle_notify_init(s)
 #endif
 

@@ -141,7 +141,7 @@ long gui_wps_show(void)
             if (wps_state.paused) {
                 settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                call_ata_idle_notifys(false);
+                call_ata_idle_notifys(true);
 #endif
             }
         }
@@ -255,7 +255,7 @@ long gui_wps_show(void)
                         audio_pause();
                     settings_save();
 #if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
-                    call_ata_idle_notifys(false);   /* make sure resume info is saved */
+                    call_ata_idle_notifys(true);   /* make sure resume info is saved */
 #endif
                 }
                 break;

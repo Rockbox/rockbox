@@ -555,7 +555,7 @@ bool settings_parseline(char* line, char** name, char** value)
 
 static void system_flush(void)
 {
-    call_ata_idle_notifys(false); /*doesnt work on usb and shutdown from ata thread */
+    call_ata_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
     tree_flush();
 }
 
@@ -569,7 +569,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #ifdef SIMULATOR
     (void)callback;
     (void)parameter;
-    call_ata_idle_notifys(false);
+    call_ata_idle_notifys(true);
     exit(0);
 #else
     int i;

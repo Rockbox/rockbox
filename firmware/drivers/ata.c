@@ -1285,7 +1285,7 @@ static void ata_thread(void)
                 break;
 #endif
             case Q_SLEEP:
-                call_ata_idle_notifys(true);
+                call_ata_idle_notifys(false);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
                 

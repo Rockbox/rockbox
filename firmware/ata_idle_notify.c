@@ -20,7 +20,7 @@
 #include "system.h"
 #include "ata.h"
 #include "ata_idle_notify.h"
-#include "logf.h"
+#include "kernel.h"
 #include "string.h"
 
 #if USING_ATA_CALLBACK
@@ -28,10 +28,13 @@ static ata_idle_notify ata_idle_notify_funcs[MAX_ATA_CALLBACKS];
 static int ata_callback_count = 0;
 #endif
 
+
 bool register_ata_idle_func(ata_idle_notify function)
 {
 #if USING_ATA_CALLBACK
     int i;
+    if (ata_callback_count >= MAX_ATA_CALLBACKS)
+        return false;
     for (i=0; i<MAX_ATA_CALLBACKS; i++)
     {
         if (ata_idle_notify_funcs[i] == NULL)
@@ -69,13 +72,15 @@ void unregister_ata_idle_func(ata_idle_notify func, bool run)
     return;
 }
 
-bool call_ata_idle_notifys(bool sleep_after)
+bool call_ata_idle_notifys(bool force)
 {
     int i;
+    static int lock_until = 0;
     ata_idle_notify function;
-    if (ata_callback_count == 0)
+    if (!force && TIME_BEFORE(current_tick,lock_until) )
         return false;
-    ata_callback_count = 0; /* so we dont re-enter every time the callbacks read/write */
+    lock_until = current_tick + 30*HZ;
+
     for (i = 0; i < MAX_ATA_CALLBACKS; i++)
     {
         if (ata_idle_notify_funcs[i])
@@ -83,10 +88,9 @@ bool call_ata_idle_notifys(bool sleep_after)
             function = ata_idle_notify_funcs[i];
             ata_idle_notify_funcs[i] = NULL;
             function();
+            ata_callback_count--;
         }
     }
-    if (sleep_after)
-        ata_sleep();
     return true;
 }
 
