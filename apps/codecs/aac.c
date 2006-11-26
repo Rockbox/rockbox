@@ -90,7 +90,7 @@ next_track:
   
     sound_samples_done = ci->id3->offset;
 
-    ci->configure(DSP_SET_FREQUENCY, (long *)(rb->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(rb->id3->frequency));
     codec_set_replaygain(rb->id3);
 
     stream_create(&input_stream,ci);

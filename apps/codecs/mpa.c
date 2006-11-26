@@ -110,7 +110,7 @@ next_track:
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
 
-    ci->configure(DSP_SET_FREQUENCY, (int *)ci->id3->frequency);
+    ci->configure(DSP_SWITCH_FREQUENCY, (int *)ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
     

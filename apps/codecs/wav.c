@@ -397,7 +397,7 @@ next_track:
         goto done;
     }
 
-    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
     if (channels == 2) {
         ci->configure(DSP_SET_STEREO_MODE, (long *)STEREO_INTERLEAVED);
     } else if (channels == 1) {

@@ -121,7 +121,7 @@ next_track:
         goto done;
     }
     frequency = info.sample_freq / 1000;
-    ci->configure(DSP_SET_FREQUENCY, (long *)(long)info.sample_freq);
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(long)info.sample_freq);
         
     /* set playback engine up for correct number of channels */
     /* NOTE: current musepack format only allows for stereo files

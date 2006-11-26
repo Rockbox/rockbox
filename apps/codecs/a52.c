@@ -154,7 +154,7 @@ next_track:
     while (!ci->taginfo_ready)
         ci->yield();
     
-    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
     
     /* Intialise the A52 decoder and check for success */
     state = a52_init(0);

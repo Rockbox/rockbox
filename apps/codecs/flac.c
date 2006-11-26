@@ -470,7 +470,7 @@ enum codec_status codec_start(struct codec_api* api)
     while (!*ci->taginfo_ready && !ci->stop_codec)
         ci->sleep(1);
     
-    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
     codec_set_replaygain(ci->id3);
 
     if (samplesdone) {

@@ -1679,7 +1679,8 @@ static void codec_seek_complete_callback(void)
     {
         /* If this is not a seamless seek, clear the buffer */
         pcmbuf_play_stop();
-        
+        dsp_configure(DSP_FLUSH, NULL);
+
         /* If playback was not 'deliberately' paused, unpause now */
         if (!paused)
             pcmbuf_pause(false);

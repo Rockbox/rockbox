@@ -85,7 +85,7 @@ bool vorbis_set_codec_parameters(OggVorbis_File *vf)
         return false;
     }
 
-    rb->configure(DSP_SET_FREQUENCY, (int *)rb->id3->frequency);
+    rb->configure(DSP_SWITCH_FREQUENCY, (int *)rb->id3->frequency);
     codec_set_replaygain(rb->id3);
 
     if (vi->channels == 2) {

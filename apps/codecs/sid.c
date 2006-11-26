@@ -1267,7 +1267,7 @@ next_track:
     
 
     /* Make use of 44.1khz */
-    ci->configure(DSP_SET_FREQUENCY, (long *)44100);
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)44100);
     /* Sample depth is 28 bit host endian */
     ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     /* Mono output */

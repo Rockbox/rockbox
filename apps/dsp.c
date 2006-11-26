@@ -1055,6 +1055,12 @@ bool dsp_configure(int setting, void *value)
         dsp->new_gain = true;
         break;
 
+    case DSP_FLUSH:
+        memset(&resample_data[current_codec], 0,
+               sizeof (struct resample_data));
+        dither_init();
+        break;
+
     case DSP_SET_TRACK_GAIN:
         dsp->track_gain = (long) value;
         dsp->new_gain = true;

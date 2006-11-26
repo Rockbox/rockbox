@@ -81,6 +81,7 @@ enum codec_status codec_start(struct codec_api *api)
     ci->memset(iedata, 0, iend - iedata);
 #endif
 
+    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
     ci->configure(CODEC_SET_FILEBUF_WATERMARK, (int *)(1024*512));
     ci->configure(CODEC_SET_FILEBUF_CHUNKSIZE, (int *)(1024*256));
   
@@ -182,8 +183,7 @@ next_track:
         goto done;
     }
 
-    ci->configure(DSP_SET_FREQUENCY, (long *)(ci->id3->frequency));
-    ci->configure(DSP_SET_SAMPLE_DEPTH, (long *)28);
+    ci->configure(DSP_SWITCH_FREQUENCY, (long *)(ci->id3->frequency));
 
     if (num_channels == 2) {
         ci->configure(DSP_SET_STEREO_MODE, (int *)STEREO_INTERLEAVED);
