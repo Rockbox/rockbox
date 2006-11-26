@@ -82,7 +82,7 @@ void pcf50606_init(void)
     pcf50606_write(0x3a, 0x00); /* GPOOD1 = red led OFF */
 
     /* Accessory detect */
-    pcf50606_write(0x33, 0x8e); /* ACDAPE=1, THRSHLD=2.40V */
+    pcf50606_write(0x33, 0x8c); /* ACDAPE=1, THRSHLD=2.20V */
 
     /* allow GPI0 interrupts from PMU now */
     enable_pmu_interrupts();
