@@ -188,13 +188,13 @@ static struct my_lcd *mylcd = &grayfuncs;
 #define MYLCD(fn) mylcd->fn
 #define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) gray_filltriangle(x1, y1, x2, y2, x3, y3)
 #define MY_SET_FOREGROUND(fg) gray_set_foreground(fg)
-#define MY_BLACK GRAY_BLACK
+#define MY_GET_FOREGROUND() gray_get_foreground()
 
 #else
 #define MYLCD(fn) rb->lcd_ ## fn
 #define MY_FILLTRIANGLE(x1, y1, x2, y2, x3, y3) xlcd_filltriangle(x1, y1, x2, y2, x3, y3)
 #define MY_SET_FOREGROUND(fg) rb->lcd_set_foreground(fg)
-#define MY_BLACK LCD_BLACK
+#define MY_GET_FOREGROUND() rb->lcd_get_foreground()
 #endif
 
 #if CONFIG_LCD == LCD_SSD1815
@@ -443,12 +443,16 @@ static void cube_viewport(void)
 static void cube_draw(void)
 {
     int i, j, line;
+#if LCD_DEPTH > 1 || defined(USE_GSLIB)
+    unsigned old_foreground;
+#endif
 
     switch (mode)
     {
 #if LCD_DEPTH > 1 || defined(USE_GSLIB)
       case SOLID:
-
+      
+        old_foreground = MY_GET_FOREGROUND();
         for (i = 0; i < 6; i++)
         {
             /* backface culling; if the shape winds counter-clockwise, we are
@@ -475,7 +479,7 @@ static void cube_draw(void)
                             point2D[faces[i].corner[3]].y);
 
         }
-        MY_SET_FOREGROUND(MY_BLACK);
+        MY_SET_FOREGROUND(old_foreground);
         break;
 #endif /* (LCD_DEPTH > 1) || GSLIB */
 
@@ -558,7 +562,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
 #ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
     xlcd_init(rb);
 #elif defined(USE_GSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
