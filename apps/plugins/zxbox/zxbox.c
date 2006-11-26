@@ -60,11 +60,6 @@ long start_time IBSS_ATTR = 0;
 
 enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
-
-#if CODEC == SWCODEC && !defined SIMULATOR
-    api->pcm_play_stop();
-#endif
-
     PLUGIN_IRAM_INIT(api)
 
     rb = api;
