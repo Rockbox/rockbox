@@ -5,6 +5,7 @@ FILES
 *.lds
 common/*.[chS]
 drivers/*.[chS]
+drivers/rtc/*.[chS]
 export/*.h
 include/*.h
 include/sys/*.h
