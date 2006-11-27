@@ -127,14 +127,17 @@ eeprom_settings.c
 #endif /* HAVE_EEPROM */
 
 /* RTC */
-#if    (CONFIG_RTC == RTC_M41ST84W) \
-    || (CONFIG_RTC == RTC_PCF50606) \
-    || (CONFIG_RTC == RTC_PCF50605) \
-    || (CONFIG_RTC == RTC_E8564)
 #ifndef SIMULATOR
-drivers/rtc.c
+#if (CONFIG_RTC == RTC_M41ST84W)
+drivers/rtc/rtc_m41st84w.c
+#elif (CONFIG_RTC == RTC_PCF50606)
+drivers/rtc/rtc_pcf50606.c
+#elif (CONFIG_RTC == RTC_PCF50605)
+drivers/rtc/rtc_pcf50605.c
+#elif (CONFIG_RTC == RTC_E8564)
+drivers/rtc/rtc_e8564.c
+#endif /* (CONFIG_RTC == RTC_) */
 #endif /* SIMULATOR */
-#endif /* (CONFIG_RTC == RTC_*)
 
 /* Tuner */
 #ifdef CONFIG_TUNER

@@ -17,108 +17,16 @@
  *
  ****************************************************************************/
 #include "config.h"
-#ifdef CONFIG_RTC
 #include "i2c.h"
 #include "rtc.h"
 #include "kernel.h"
 #include "system.h"
-#include "pcf50606.h"
-#include "pcf50605.h"
-#if CONFIG_RTC == RTC_E8564
-#include "i2c-pp5020.h"
-#endif /*CONFIG_RTC == RTC_E8564*/
 #include <stdbool.h>
 
 #define RTC_ADR 0xd0
 #define	RTC_DEV_WRITE   (RTC_ADR | 0x00)
 #define	RTC_DEV_READ    (RTC_ADR | 0x01)
 
-#if CONFIG_RTC == RTC_E8564
-void rtc_init(void)
-{
-}
-
-int rtc_read_datetime(unsigned char* buf)
-{
-    unsigned char tmp;
-    int read;
-    
-    /*RTC_E8564's slave address is 0x51*/
-    read = i2c_readbytes(0x51,0x02,7,buf);
-
-    /* swap wday and mday to be compatible with
-     * get_time() from firmware/common/timefuncs.c */
-    tmp=buf[3];
-    buf[3]=buf[4];
-    buf[4]=tmp;
-    
-    return read;
-}
-
-int rtc_write_datetime(unsigned char* buf)
-{
-    int i;
-    unsigned char tmp;
-    
-    /* swap wday and mday to be compatible with
-     * set_time() in firmware/common/timefuncs.c */
-    tmp=buf[3];
-    buf[3]=buf[4];
-    buf[4]=tmp;
-
-    for (i=0;i<7;i++){
-        pp_i2c_send(0x51, 0x02+i,buf[i]);
-    }
-    return 1;
-}
-
-#elif CONFIG_RTC == RTC_PCF50605
-void rtc_init(void)
-{
-}
-
-int rtc_read_datetime(unsigned char* buf)
-{
-    return pcf50605_read_multiple(0x0a, buf, 7);
-}
-
-int rtc_write_datetime(unsigned char* buf)
-{
-    int i;
-
-    for (i=0;i<7;i++) {
-        pcf50605_write(0x0a+i, buf[i]);
-    }
-
-    return 1;
-}
-#elif CONFIG_RTC == RTC_PCF50606
-void rtc_init(void)
-{
-}
-
-int rtc_read_datetime(unsigned char* buf) {
-    int rc;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    
-    rc = pcf50606_read_multiple(0x0a, buf, 7);
-
-    set_irq_level(oldlevel);
-    return rc;
-}
-
-int rtc_write_datetime(unsigned char* buf) {
-    int rc;
-    int oldlevel = set_irq_level(HIGHEST_IRQ_LEVEL);
-    
-    rc = pcf50606_write_multiple(0x0a, buf, 7);
-
-    set_irq_level(oldlevel);
-
-    return rc;
-}
-
-#else
 void rtc_init(void)
 {
     unsigned char data; 
@@ -370,6 +278,3 @@ int rtc_write_datetime(unsigned char* buf) {
 
     return rc;
 }
-#endif /* CONFIG_RTC == RTC_PCF50606 */
-
-#endif /* CONFIG_RTC */
