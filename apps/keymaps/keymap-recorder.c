@@ -215,6 +215,7 @@ const struct button_mapping button_context_radio[]  = {
     
 };
 
+#if BUTTON_REMOTE != 0
 /*****************************************************************************
  *    Remote control mappings
  *****************************************************************************/
@@ -254,11 +255,14 @@ static const struct button_mapping* get_context_mapping_remote( int context )
             return remote_button_context_standard;
     }
 }
+#endif /* BUTTON_REMOTE != 0 */
 
 const struct button_mapping* get_context_mapping( int context )
 {
+#if BUTTON_REMOTE != 0
     if (context&CONTEXT_REMOTE)
         return get_context_mapping_remote(context);
+#endif
     
     switch( context )
     {

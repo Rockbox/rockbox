@@ -281,6 +281,7 @@ drivers/i2c.c
 
 #ifdef ARCHOS_PLAYER
 #ifndef SIMULATOR
+target/sh/archos/player/button-player.c
 target/sh/archos/player/lcd-as-player.S
 #endif /* SIMULATOR */
 #endif /* ARCHOS_PLAYER */
@@ -289,6 +290,7 @@ target/sh/archos/player/lcd-as-player.S
 #ifndef SIMULATOR
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
+target/sh/archos/recorder/button-recorder.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_RECORDER */
 
@@ -296,6 +298,7 @@ target/sh/archos/lcd-as-archos-bitmap.S
 #ifndef SIMULATOR
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
+target/sh/archos/fm_v2/button-fm_v2.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
 
@@ -303,6 +306,7 @@ target/sh/archos/lcd-as-archos-bitmap.S
 #ifndef SIMULATOR
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
+target/sh/archos/ondio/button-ondio.c
 #endif /* SIMULATOR */
 #endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 

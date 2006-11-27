@@ -309,8 +309,7 @@ void init(void)
 #ifdef DEBUG
     debug_init();
 #else
-#ifndef HAVE_MMC  /* FIXME: This is also necessary for debug builds
-                   * (do debug builds on the Ondio make sense?) */
+#if !defined(HAVE_FMADC) && !defined(HAVE_MMC)
     serial_setup();
 #endif
 #endif

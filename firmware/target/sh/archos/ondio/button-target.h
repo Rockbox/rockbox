@@ -1,4 +1,3 @@
-
 /***************************************************************************
  *             __________               __   ___.
  *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
@@ -8,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Daniel Stenberg
+ * Copyright (C) 2006 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,42 +16,30 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _BUTTON_H_
-#define _BUTTON_H_
+
+#ifndef _BUTTON_TARGET_H_
+#define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
 #include "config.h"
-#include "button-target.h"
 
-extern struct event_queue button_queue;
+#define button_init_device()
+int button_read_device(void);
 
-void button_init (void);
-long button_get (bool block);
-long button_get_w_tmo(int ticks);
-int button_status(void);
-void button_clear_queue(void);
-#ifdef HAVE_LCD_BITMAP
-void button_set_flip(bool flip); /* turn 180 degrees */
-#endif
-#ifdef CONFIG_BACKLIGHT
-void set_backlight_filter_keypress(bool value);
-#ifdef HAVE_REMOTE_LCD
-void set_remote_backlight_filter_keypress(bool value);
-#endif
-#endif
+#define BUTTON_OFF          0x00000001
+#define BUTTON_MENU         0x00000002
 
-#ifdef HAVE_HEADPHONE_DETECTION
-bool headphones_inserted(void);
-#endif
-#ifdef HAVE_WHEEL_POSITION
-int wheel_status(void);
-void wheel_send_events(bool send);
-#endif
+#define BUTTON_LEFT         0x00000004
+#define BUTTON_RIGHT        0x00000008
+#define BUTTON_UP           0x00000010
+#define BUTTON_DOWN         0x00000020
 
-#define BUTTON_NONE    0x00000000
+#define BUTTON_MAIN (BUTTON_OFF|BUTTON_MENU|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN)
 
-/* Button modifiers */
-#define BUTTON_REL     0x02000000
-#define BUTTON_REPEAT  0x04000000
+#define BUTTON_REMOTE 0
 
-#endif /* _BUTTON_H_ */
+#define POWEROFF_BUTTON BUTTON_OFF
+#define POWEROFF_COUNT 10
+
+#endif /* _BUTTON_TARGET_H_ */

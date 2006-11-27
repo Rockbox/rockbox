@@ -33,7 +33,8 @@
 /* FIX: this doesn't work on iRiver or iPod yet */
 /* iFP7xx has no remote */
 
-#ifndef HAVE_MMC /* MMC takes serial port 1, so don't mess with it */
+#if !defined(HAVE_FMADC) /* Recorder FM/V2 has no remote control pin */ \
+ && !defined(HAVE_MMC)   /* MMC takes serial port 1, so don't mess with it */
 
 /* Received byte identifiers */
 #define PLAY  0xC1
@@ -51,8 +52,8 @@ void serial_setup (void)
     SMR1 = 0x00;
     SCR1 = 0;
     BRR1 = (FREQ/(32*9600))-1;
-    SSR1 &= 0; /* The status bits must be read before they are cleared,
-                  so we do an AND operation */
+    and_b(0, &SSR1); /* The status bits must be read before they are cleared,
+                        so we do an AND operation */
 
     /* Let the hardware settle. The serial port needs to wait "at least
        the interval required to transmit or receive one bit" before it
@@ -75,7 +76,7 @@ int remote_control_rx(void)
     
     /* Errors? Just clear'em. The receiver stops if we don't */
     if(SSR1 & (SCI_ORER | SCI_FER | SCI_PER)) {
-        SSR1 &= ~(SCI_ORER | SCI_FER | SCI_PER);
+        and_b(~(SCI_ORER | SCI_FER | SCI_PER), &SSR1);
         last_valid_button = BUTTON_NONE;
         last_was_error = true;
         return BUTTON_NONE;
@@ -84,7 +85,7 @@ int remote_control_rx(void)
     if(SSR1 & SCI_RDRF) {
         /* Read byte and clear the Rx Full bit */
         btn = RDR1;
-        SSR1 &= ~SCI_RDRF;
+        and_b(~SCI_RDRF, &SSR1);
 
         if(last_was_error)
         {
@@ -93,38 +94,36 @@ int remote_control_rx(void)
         }
         else
         {
-#if CONFIG_KEYPAD != ONDIO_PAD
             switch (btn)
             {
                 case STOP:
                     last_valid_button = BUTTON_RC_STOP;
                     break;
-                    
+
                 case PLAY:
                     last_valid_button = BUTTON_RC_PLAY;
                     break;
-                    
+
                 case VOLUP:
                     last_valid_button = BUTTON_RC_VOL_UP;
                     break;
-                    
+
                 case VOLDN:
                     last_valid_button = BUTTON_RC_VOL_DOWN;
                     break;
-                    
+
                 case PREV:
                     last_valid_button = BUTTON_RC_LEFT;
                     break;
-                    
+
                 case NEXT:
                     last_valid_button = BUTTON_RC_RIGHT;
                     break;
-                    
+
                 default:
                     last_valid_button = BUTTON_NONE;
                     break;
             }
-#endif
         }
     }
     else
@@ -142,7 +141,7 @@ int remote_control_rx(void)
     return ret;
 }
 
-#endif /* HAVE_MMC */
+#endif /* !HAVE_FMADC && !HAVE_MMC */
 #elif defined(CPU_COLDFIRE) && defined(HAVE_SERIAL)
 
 void serial_tx(const unsigned char *buf)

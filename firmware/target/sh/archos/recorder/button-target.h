@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Jonathan Gordon
+ * Copyright (C) 2006 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,30 +17,18 @@
  *
  ****************************************************************************/
 
-/* Custom written for the Hxxx */
-
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
 #include <stdbool.h>
 #include "config.h"
 
-#define HAS_BUTTON_HOLD
-#define HAS_REMOTE_BUTTON_HOLD
+#define HAS_SERIAL_REMOTE
 
-bool button_hold(void);
-bool remote_button_hold(void);
-bool remote_button_hold_only(void);
 void button_init_device(void);
 int button_read_device(void);
-#ifdef IRIVER_H300_SERIES
-void button_enable_scan(bool enable);
-bool button_scan_enabled(void);
-#endif
 
-/* iRiver H100/H300 specific button codes */
-
-        /* Main unit's buttons */
+      /* Main unit's buttons */
 #define BUTTON_ON           0x00000001
 #define BUTTON_OFF          0x00000002
 
@@ -49,38 +37,27 @@ bool button_scan_enabled(void);
 #define BUTTON_UP           0x00000010
 #define BUTTON_DOWN         0x00000020
 
-#define BUTTON_REC          0x00000040
-#define BUTTON_MODE         0x00000080
+#define BUTTON_PLAY         0x00000040
 
-#define BUTTON_SELECT       0x00000100
+#define BUTTON_F1           0x00000080
+#define BUTTON_F2           0x00000100
+#define BUTTON_F3           0x00000200
 
-#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT|\
-                BUTTON_UP|BUTTON_DOWN|BUTTON_REC|BUTTON_MODE|BUTTON_SELECT)
-
+#define BUTTON_MAIN (BUTTON_ON|BUTTON_OFF|BUTTON_LEFT|BUTTON_RIGHT\
+                |BUTTON_UP|BUTTON_DOWN|BUTTON_PLAY\
+                |BUTTON_F1|BUTTON_F2|BUTTON_F3)
+                
     /* Remote control's buttons */
-#define BUTTON_RC_ON        0x00100000
+#define BUTTON_RC_PLAY      0x00100000
 #define BUTTON_RC_STOP      0x00080000
 
-#define BUTTON_RC_REW       0x00040000
-#define BUTTON_RC_FF        0x00020000
+#define BUTTON_RC_LEFT      0x00040000
+#define BUTTON_RC_RIGHT     0x00020000
 #define BUTTON_RC_VOL_UP    0x00010000
 #define BUTTON_RC_VOL_DOWN  0x00008000
 
-#define BUTTON_RC_REC       0x00004000
-#define BUTTON_RC_MODE      0x00002000
-
-#define BUTTON_RC_MENU      0x00001000
-
-#define BUTTON_RC_BITRATE   0x00000800
-#define BUTTON_RC_SOURCE    0x00000400
-
-#define BUTTON_REMOTE (BUTTON_RC_ON|BUTTON_RC_STOP|BUTTON_RC_REW|BUTTON_RC_FF\
-                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN|BUTTON_RC_REC\
-                |BUTTON_RC_MODE|BUTTON_RC_MENU|BUTTON_RC_BITRATE\
-                |BUTTON_RC_SOURCE)
-
-#define POWEROFF_BUTTON BUTTON_OFF
-#define RC_POWEROFF_BUTTON BUTTON_RC_STOP
-#define POWEROFF_COUNT 10
+#define BUTTON_REMOTE (BUTTON_RC_PLAY|BUTTON_RC_STOP\
+                |BUTTON_RC_LEFT|BUTTON_RC_RIGHT\
+                |BUTTON_RC_VOL_UP|BUTTON_RC_VOL_DOWN)
 
 #endif /* _BUTTON_TARGET_H_ */

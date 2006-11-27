@@ -640,6 +640,9 @@ EOF
     # firmware/Makefile assumes it is present always, and 2) we will need it when we
     # build the player simulator
 
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="player"
     ;;
 
    1|recorder)
@@ -659,6 +662,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$archosbitmaptools
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="recorder"
     ;;
 
    2|fmrecorder)
@@ -678,6 +684,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$archosbitmaptools
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="fm_v2"
     ;;
 
    3|recorderv2)
@@ -697,6 +706,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$archosbitmaptools
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="fm_v2"
     ;;
 
    4|ondiosp)
@@ -716,6 +728,9 @@ EOF
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$archosbitmaptools
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="ondio"
     ;;
 
    5|ondiofm)
@@ -733,6 +748,9 @@ EOF
     plugins="yes"
     codecs=""
     toolset=$archosbitmaptools
+    t_cpu="sh"
+    t_manufacturer="archos"
+    t_model="ondio"
     ;;
 
   10|h120)
