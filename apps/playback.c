@@ -378,7 +378,8 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     unsigned char *buf, *end;
 
-    audio_stop();
+    if (audio_is_initialized)
+        audio_stop();
 
     if (buffer_size == NULL)
     {
@@ -390,8 +391,8 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
     buf = audiobuf;
     end = audiobufend;
 
-    if (talk_buf || !talk_voice_required()
-        || buffer_state == BUFFER_STATE_TRASHED)
+    if (talk_buf || buffer_state == BUFFER_STATE_TRASHED
+           || !talk_voice_required())
     {
         logf("get buffer: talk_buf");
         /* ok to use everything from audiobuf to audiobufend */
