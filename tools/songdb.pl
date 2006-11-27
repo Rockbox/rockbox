@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 #
 # Rockbox song database docs:
-# http://www.rockbox.org/twiki/bin/view/Main/TagCache
+# http://www.rockbox.org/twiki/bin/view/Main/DataBase
 #
 
 use mp3info;
 use vorbiscomm;
 
 # configuration settings
-my $db = "tagcache";
+my $db = "database";
 my $dir;
 my $strip;
 my $add;
@@ -72,7 +72,7 @@ songdb --path <dir> [--db <file>] [--strip <path>] [--add <path>] [--dirisalbum]
 Options:
 
   --path <dir>   Where your music collection is found
-  --db <file>    Prefix for output files. Defaults to tagcache.
+  --db <file>    Prefix for output files. Defaults to database.
   --strip <path> Removes this string from the left of all file names
   --add <path>   Adds this string to the left of all file names
   --dirisalbum   Use dir name as album name if the album name is missing in the
