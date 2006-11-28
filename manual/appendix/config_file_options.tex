@@ -182,16 +182,17 @@
       invert        & on, off           & N/A\\
       disk poweroff & on, off           & N/A\\
     }%
-    
-    \nopt{archos}{%
+
+    \opt{SWCODEC}{% This doesn't depend on SWCODEC but using a \nopt here
+                  % causes ondiosp not to build for mysterious reasons.
       backdrop      & /path/filename.bmp    & N/A\\
     }%
-    
+
     \opt{HAVE_LCD_COLOR}{
       foreground color & 000000 to FFFFFF   & RRGGBB\\
       background color & 000000 to FFFFFF   & RRGGBB\\
     }
-    
+
     \opt{HAVE_REMOTE_LCD}{
       rwps      & /path/filename.rwps   & N/A\\
       remote contrast
@@ -256,6 +257,7 @@
       jump scroll delay
                 & 0 to 250              & 0.01s\\
     }%
+
     \bottomrule
   \end{longtable}
 \end{center}
