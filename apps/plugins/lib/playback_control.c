@@ -103,7 +103,7 @@ bool playback_control(struct plugin_api* newapi)
         { "Next Track", nexttrack },
         { "Change Volume", volume },
         { "Enable/Disable Shuffle", shuffle },
-        { "change Repeat Mode", repeat_mode },
+        { "Change Repeat Mode", repeat_mode },
     };
 
     m=api->menu_init( items, sizeof(items) / sizeof(*items), NULL,
