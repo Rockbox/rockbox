@@ -322,16 +322,6 @@ static void voice_thread(void);
 
 #endif /* PLAYBACK_VOICE */
 
-/* --- Shared semi-private interfaces --- */
-
-/* imported */
-extern void talk_buffer_steal(void);
-#ifdef HAVE_RECORDING
-extern void pcm_rec_error_clear(void);
-extern unsigned long pcm_rec_status(void);
-#endif
-
-
 /* --- External interfaces --- */
 
 void mp3_play_data(const unsigned char* start, int size,
@@ -374,12 +364,31 @@ void mpeg_id3_options(bool _v1first)
     v1first = _v1first;
 }
 
+/* If voice could be swapped out - wait for it to return
+ * Used by buffer claming functions.
+ */
+static void wait_for_voice_swap_in(void)
+{
+#ifdef PLAYBACK_VOICE
+    if (NULL == iram_buf[CODEC_IDX_VOICE])
+        return;
+
+    while (current_codec != CODEC_IDX_VOICE)
+        yield();
+#endif /* PLAYBACK_VOICE */
+}
+
 unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
 {
     unsigned char *buf, *end;
 
     if (audio_is_initialized)
+    {
         audio_stop();
+        wait_for_voice_swap_in();
+        voice_stop();
+    }
+    /* else buffer_state will be BUFFER_STATE_TRASHED at this point */
 
     if (buffer_size == NULL)
     {
@@ -387,9 +396,6 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
         buffer_state = BUFFER_STATE_TRASHED;
         return NULL;
     }
-
-    buf = audiobuf;
-    end = audiobufend;
 
     if (talk_buf || buffer_state == BUFFER_STATE_TRASHED
            || !talk_voice_required())
@@ -399,24 +405,18 @@ unsigned char *audio_get_buffer(bool talk_buf, size_t *buffer_size)
         if (buffer_state != BUFFER_STATE_TRASHED)
         {
             talk_buffer_steal();
-#ifdef PLAYBACK_VOICE
-            if (NULL != iram_buf[CODEC_IDX_VOICE])
-            {
-                /* Voice could be swapped out - wait for it to return */
-                while (current_codec != CODEC_IDX_VOICE)
-                    yield();
-            }
-#endif /* PLAYBACK_VOICE */
             buffer_state = BUFFER_STATE_TRASHED;
         }
+
+        buf = audiobuf;
+        end = audiobufend;
     }
     else
     {
         /* skip talk buffer and move pcm buffer to end */
         logf("get buffer: voice");
-        mp3_play_stop();
-        buf += talk_get_bufsize();
-        end -= pcmbuf_init(pcmbuf_get_bufsize(), audiobufend);
+        buf = audiobuf + talk_get_bufsize();
+        end = audiobufend - pcmbuf_init(pcmbuf_get_bufsize(), audiobufend);
         buffer_state = BUFFER_STATE_VOICED_ONLY;
     }
 
@@ -438,10 +438,7 @@ void audio_iram_steal(void)
         if (voice_iram_stolen)
             return;
 
-        /* Wait for voice to swap back in if current codec was audio */
-        while (current_codec != CODEC_IDX_VOICE)
-            yield();
-
+        wait_for_voice_swap_in();
         voice_stop();
 
         /* Save voice IRAM - safe to do here since state is known */
@@ -466,6 +463,8 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
     unsigned char *end;
 
     audio_stop();
+    wait_for_voice_swap_in();
+    voice_stop();
     talk_buffer_steal();
 
 #ifdef PLAYBACK_VOICE
@@ -477,7 +476,6 @@ unsigned char *audio_get_recording_buffer(size_t *buffer_size)
     if (NULL == end)
 #endif /* PLAYBACK_VOICE */
         end = audiobufend;
-
 
     buffer_state = BUFFER_STATE_TRASHED;
 

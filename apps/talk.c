@@ -559,7 +559,9 @@ int talk_get_bufsize(void)
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 int talk_buffer_steal(void)
 {
+#if CONFIG_CODEC != SWCODEC
     mp3_play_stop();
+#endif
 #ifdef HAVE_MMC
     if (filehandle >= 0) /* only relevant for MMC */
     {
