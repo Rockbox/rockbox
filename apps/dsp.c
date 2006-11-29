@@ -1058,6 +1058,7 @@ bool dsp_configure(int setting, void *value)
     case DSP_FLUSH:
         memset(&resample_data[current_codec], 0,
                sizeof (struct resample_data));
+        resampler_set_delta(dsp->frequency);
         dither_init();
         break;
 
