@@ -41,17 +41,6 @@
 #define ac_set_frequency    tlv320_set_frequency
 #endif
 
-/** Semi-private shared symbols **/
-
-/* the registered callback function to ask for more pcm data */
-extern volatile pcm_more_callback_type pcm_callback_for_more;
-extern volatile bool pcm_playing;
-extern volatile bool pcm_paused;
-
-/* the registered callback function for when more data is available */
-extern volatile pcm_more_callback_type pcm_callback_more_ready;
-extern volatile bool pcm_recording;
-
 /* peaks */
 static int play_peak_left, play_peak_right;
 static unsigned long *rec_peak_addr;

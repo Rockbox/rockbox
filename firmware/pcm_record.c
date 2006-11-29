@@ -74,8 +74,10 @@ static size_t        num_rec_bytes;      /* Num bytes recorded             */
 static unsigned long num_rec_samples;    /* Number of PCM samples recorded */
 
 /** Stats on encoded data for all files from start to stop **/
+#if 0
 static unsigned long long accum_rec_bytes; /* total size written to chunks */
 static unsigned long long accum_pcm_samples; /* total pcm count processed  */
+#endif
 
 /* Keeps data about current file and is sent as event data for codec */
 static struct enc_file_event_data rec_fdata IDATA_ATTR =
@@ -272,6 +274,7 @@ unsigned long pcm_rec_status(void)
     return ret;
 } /* pcm_rec_status */
 
+#if 0
 int pcm_rec_current_bitrate(void)
 {
     if (accum_pcm_samples == 0)
@@ -279,17 +282,23 @@ int pcm_rec_current_bitrate(void)
 
     return (int)(8*accum_rec_bytes*enc_sample_rate / (1000*accum_pcm_samples));
 } /* pcm_rec_current_bitrate */
+#endif
 
+#if 0
 int pcm_rec_encoder_afmt(void)
 {
     return enc_config.afmt;
 } /* pcm_rec_encoder_afmt */
+#endif
 
+#if 0
 int pcm_rec_rec_format(void)
-    {
+{
     return afmt_rec_format[enc_config.afmt];
 } /* pcm_rec_rec_format */
+#endif
 
+#ifdef HAVE_SPDIF_IN
 unsigned long pcm_rec_sample_rate(void)
 {
     /* Which is better ?? */
@@ -298,6 +307,7 @@ unsigned long pcm_rec_sample_rate(void)
 #endif
     return sample_rate;
 } /* audio_get_sample_rate */
+#endif
 
 /**
  * Creates pcmrec_thread
@@ -332,7 +342,7 @@ void audio_close_recording(void)
 unsigned long audio_recorded_time(void)
 {
     if (!is_recording || enc_sample_rate == 0)
-    return 0;
+        return 0;
 
     /* return actual recorded time a la encoded data even if encoder rate
        doesn't match the pcm rate */
@@ -589,14 +599,18 @@ static inline void pcmrec_update_sizes_inl(size_t prev_enc_size,
     {
         ssize_t size_diff = rec_fdata.new_enc_size - prev_enc_size;
         num_rec_bytes   += size_diff;
+#if 0
         accum_rec_bytes += size_diff;
+#endif
     }
 
     if (rec_fdata.new_num_pcm != prev_num_pcm)
     {
         unsigned long pcm_diff = rec_fdata.new_num_pcm - prev_num_pcm;
         num_rec_samples   += pcm_diff;
+#if 0
         accum_pcm_samples += pcm_diff;
+#endif
     }
 } /* pcmrec_update_sizes_inl */
 
@@ -980,11 +994,11 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 
         start->flags |= CHUNKF_START_FILE;
 
-        /* flush one file out if full and adding */
+        /* flush all pending files out if full and adding */
         if (fnq_add_fn == pcmrec_fnq_add_filename && pcmrec_fnq_is_full())
         {
-            logf("fnq full: flushing 1");
-            pcmrec_flush(1);
+            logf("fnq full");
+            pcmrec_flush(-1);
         }
    
         fnq_add_fn(filename);
@@ -1014,8 +1028,10 @@ static void pcmrec_init(void)
     /* stats */
     num_rec_bytes     = 0;
     num_rec_samples   = 0;
+#if 0
     accum_rec_bytes   = 0;
     accum_pcm_samples = 0;
+#endif
 
     pcm_thread_unsignal_event(PCMREC_CLOSE);
     is_recording      = false;
@@ -1059,8 +1075,10 @@ static void pcmrec_start(const char *filename)
     /* reset stats */
     num_rec_bytes     = 0;
     num_rec_samples   = 0;
+#if 0
     accum_rec_bytes   = 0;
     accum_pcm_samples = 0;
+#endif
     spinup_time       = -1;
 
     rd_start  = enc_wr_index;
@@ -1103,8 +1121,10 @@ static void pcmrec_start(const char *filename)
                 break;
         }
 
+#if 0
         accum_rec_bytes   = num_rec_bytes;
         accum_pcm_samples = num_rec_samples;
+#endif
     }
 
     enc_rd_index = rd_start;
@@ -1513,9 +1533,13 @@ void enc_finish_chunk(void)
     if (enc_rd_index != enc_wr_index)
     {
         num_rec_bytes      += chunk->enc_size;
+#if 0
         accum_rec_bytes    += chunk->enc_size;
+#endif
         num_rec_samples    += chunk->num_pcm;
+#if 0
         accum_pcm_samples  += chunk->num_pcm;
+#endif
     }
     else if (is_recording)        /* buffer full */
     {

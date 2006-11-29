@@ -60,4 +60,16 @@ int  pcm_get_num_unprocessed(void);
 
 /* audio.h contains audio_* recording functions */
 
+
+/** The following are for internal use between pcm_record.c and target-
+    specific portion **/
+/* the registered callback function for when more data is available */
+extern volatile pcm_more_callback_type pcm_callback_more_ready;
+/* DMA transfer in is currently active */
+extern volatile bool                   pcm_recording;
+
+/* APIs implemented in the target-specific portion */
+extern void pcm_rec_dma_start(const void *addr, size_t size);
+extern void pcm_rec_dma_stop(void);
+
 #endif /* PCM_RECORD_H */

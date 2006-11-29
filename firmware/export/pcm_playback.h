@@ -47,4 +47,17 @@ void pcm_play_pause(bool play);
 bool pcm_is_paused(void);
 bool pcm_is_playing(void);
 
+/** The following are for internal use between pcm_playback.c and target-
+    specific portion **/
+
+/* the registered callback function to ask for more mp3 data */
+extern volatile pcm_more_callback_type pcm_callback_for_more;
+extern volatile bool                   pcm_playing;
+extern volatile bool                   pcm_paused;
+
+extern void pcm_play_dma_start(const void *addr, size_t size);
+extern void pcm_play_dma_stop(void);
+extern void pcm_play_pause_pause(void);
+extern void pcm_play_pause_unpause(void);
+
 #endif /* PCM_PLAYBACK_H */
