@@ -30,7 +30,7 @@
 #define PLAYLIST_ATTR_SKIPPED   0x04
 #define PLAYLIST_MAX_CACHE      16
 
-#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u"
+#define DEFAULT_DYNAMIC_PLAYLIST_NAME "/dynamic.m3u8"
 
 enum playlist_command {
     PLAYLIST_COMMAND_PLAYLIST,
@@ -69,6 +69,7 @@ struct playlist_info
     bool current;        /* current playing playlist                */
     char filename[MAX_PATH];  /* path name of m3u playlist on disk  */
     char control_filename[MAX_PATH]; /* full path of control file   */
+    bool utf8;           /* playlist is in .m3u8 format             */
     int  fd;             /* descriptor of the open playlist file    */
     int  control_fd;     /* descriptor of the open control file     */
     bool control_created; /* has control file been created?         */

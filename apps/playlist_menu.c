@@ -85,8 +85,8 @@ int save_playlist_screen(struct playlist_info* playlist)
 
     filename = playlist_get_name(playlist, temp, sizeof(temp));
 
-    if (!filename || (len=strlen(filename)) <= 4 ||
-        strcasecmp(&filename[len-4], ".m3u"))
+    if (!filename || (len=strlen(filename)) <= 5 ||
+        strcasecmp(&filename[len-5], ".m3u8"))
         strcpy(filename, DEFAULT_DYNAMIC_PLAYLIST_NAME);
 
     if (!kbd_input(filename, sizeof(temp)))

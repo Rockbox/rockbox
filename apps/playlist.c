@@ -68,6 +68,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "playlist.h"
 #include "file.h"
 #include "action.h"
@@ -97,6 +98,7 @@
 #include "lang.h"
 #include "talk.h"
 #include "splash.h"
+#include "rbunicode.h"
 
 #define PLAYLIST_CONTROL_FILE ROCKBOX_DIR "/.playlist_control"
 #define PLAYLIST_CONTROL_FILE_VERSION 2
@@ -202,6 +204,7 @@ static const char playlist_thread_name[] = "playlist cachectrl";
 static void empty_playlist(struct playlist_info* playlist, bool resume)
 {
     playlist->filename[0] = '\0';
+    playlist->utf8 = true;
 
     if(playlist->fd >= 0)
         /* If there is an already open playlist, close it. */
@@ -437,6 +440,10 @@ static void update_playlist_filename(struct playlist_info* playlist,
 {
     char *sep="";
     int dirlen = strlen(dir);
+    int filelen = strlen(file);
+
+    /* Default to utf8 unless explicitly told otherwise. */
+    playlist->utf8 = !(filelen > 4 && strcasecmp(&file[filelen - 4], ".m3u") == 0);
     
     /* If the dir does not end in trailing slash, we use a separator.
        Otherwise we don't. */
@@ -509,6 +516,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
             nread -= 3;
             p += 3;
             i += 3;
+            playlist->utf8 = true;  /* Override any earlier indication. */
         }
 
         for(count=0; count < nread; count++,p++) {
@@ -1267,7 +1275,38 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
             if (lseek(fd, seek, SEEK_SET) != seek)
                 max = -1;
             else
-                max = read(fd, tmp_buf, buf_length);
+            {
+                max = read(fd, tmp_buf, MIN((size_t) buf_length, sizeof(tmp_buf)));
+                
+                if ((max > 0) && !playlist->utf8)
+                {
+                    char* end;
+                    int i = 0;
+
+                    /* Locate EOL. */
+                    while ((tmp_buf[i] != '\n') && (tmp_buf[i] != '\r')
+                        && (i < max))
+                    {
+                        i++;
+                    }
+                
+                    /* Now work back killing white space. */
+                    while ((i > 0) && isspace(tmp_buf[i - 1]))
+                    {
+                        i--;
+                    }
+
+                    /* Borrow dir_buf a little... */
+                    /* TODO: iso_decode can overflow dir_buf; it really 
+                     * should take a dest size argument.
+                     */
+                    end = iso_decode(tmp_buf, dir_buf, -1, i);
+                    *end = 0;
+                    strncpy(tmp_buf, dir_buf, sizeof(tmp_buf));
+                    tmp_buf[sizeof(tmp_buf) - 1] = 0;
+                    max = strlen(tmp_buf);
+                }
+            }
         }
 
         mutex_unlock(&playlist->control_mutex);
@@ -2697,6 +2736,7 @@ int playlist_set_current(struct playlist_info* playlist)
     strncpy(current_playlist.filename, playlist->filename,
         sizeof(current_playlist.filename));
 
+    current_playlist.utf8 = playlist->utf8;
     current_playlist.fd = playlist->fd;
 
     close(playlist->control_fd);
