@@ -1215,6 +1215,15 @@ void ata_sleep(void)
     queue_post(&ata_queue, Q_SLEEP, NULL);
 }
 
+void ata_sleepnow(void)
+{
+    if (!spinup && !sleeping && !ata_mtx.locked)
+    {
+        call_ata_idle_notifys(false);
+        ata_perform_sleep();
+    }
+}
+
 void ata_spin(void)
 {
     last_user_activity = current_tick;
@@ -1288,7 +1297,6 @@ static void ata_thread(void)
                 call_ata_idle_notifys(false);
                 last_disk_activity = current_tick - sleep_timeout + (HZ/2);
                 break;
-                
         }
     }
 }

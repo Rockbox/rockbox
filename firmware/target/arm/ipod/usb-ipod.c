@@ -94,6 +94,9 @@ void usb_enable(bool on)
 #elif defined(IPOD_NANO) || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
         unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
 #endif
+        
+        ata_sleepnow(); /* Immediately spindown the disk. */
+        sleep(HZ*2);
         memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
         DEV_RS |= 4; /* Reboot */
     }
