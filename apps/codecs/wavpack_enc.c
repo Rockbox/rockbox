@@ -29,7 +29,7 @@ typedef struct
 {
     uint8_t type;       /* Type of metadata */
     uint8_t word_size;  /* Size of metadata in words */
-} WavpackMetadataHeader;
+} __attribute__((packed)) WavpackMetadataHeader;
 
 struct riff_header
 {
@@ -53,7 +53,7 @@ struct riff_header
     uint8_t  data_id[4];      /* 24h - "data" */
     uint32_t data_size;       /* 28h - num_samples*num_channels*bits_per_sample/8 */
 /*  unsigned char  *data;              2ch - actual sound data */
-};
+} __attribute__((packed));
 
 #define RIFF_FMT_HEADER_SIZE   12 /* format -> format_size */
 #define RIFF_FMT_DATA_SIZE     16 /* audio_format -> bits_per_sample */
@@ -101,13 +101,19 @@ static const struct riff_header riff_header =
 static void chunk_to_int32(int32_t *src) ICODE_ATTR;
 static void chunk_to_int32(int32_t *src)
 {
-    int32_t *dst     = (int32_t *)input_buffer + PCM_SAMP_PER_CHUNK;
-    int32_t *src_end = dst + PCM_SAMP_PER_CHUNK;
-
+    int32_t *src_end, *dst;
+#ifdef USE_IRAM
     /* copy to IRAM before converting data */
+    dst     = (int32_t *)input_buffer + PCM_SAMP_PER_CHUNK;
+    src_end = dst + PCM_SAMP_PER_CHUNK;
+
     memcpy(dst, src, PCM_CHUNK_SIZE);
 
     src = dst;
+#else
+    src_end = src + PCM_SAMP_PER_CHUNK;
+#endif
+
     dst = (int32_t *)input_buffer;
 
     if (config.num_channels == 1)
@@ -335,7 +341,9 @@ static bool init_encoder(void)
         ci->enc_set_parameters     == NULL ||
         ci->enc_get_chunk          == NULL ||
         ci->enc_finish_chunk       == NULL ||
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         ci->enc_pcm_buf_near_empty == NULL ||
+#endif
         ci->enc_get_pcm_data       == NULL ||
         ci->enc_unget_pcm_data     == NULL )
         return false;
@@ -374,7 +382,9 @@ static bool init_encoder(void)
 
 enum codec_status codec_main(void)
 {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     bool cpu_boosted;
+#endif
 
     /* initialize params and config */
     if (!init_encoder())
@@ -386,8 +396,10 @@ enum codec_status codec_main(void)
     /* main application waits for this flag during encoder loading */
     ci->enc_codec_loaded = 1;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     ci->cpu_boost(true);
     cpu_boosted = true;
+#endif
 
     /* main encoding loop */
     while(!ci->stop_codec)
@@ -406,12 +418,13 @@ enum codec_status codec_main(void)
 
             abort_chunk = true;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
             if (!cpu_boosted && ci->enc_pcm_buf_near_empty() == 0)
             {
                 ci->cpu_boost(true);
                 cpu_boosted = true;
             }
-
+#endif
             chunk = ci->enc_get_chunk();
 
             /* reset counts and pointer */
@@ -455,17 +468,20 @@ enum codec_status codec_main(void)
             }
         }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         if (cpu_boosted && ci->enc_pcm_buf_near_empty() != 0)
         {
             ci->cpu_boost(false);
             cpu_boosted = false;
         }
-
+#endif
         ci->yield();
     }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if (cpu_boosted) /* set initial boost state */
         ci->cpu_boost(false);
+#endif
 
     /* reset parameters to initial state */
     ci->enc_set_parameters(NULL);

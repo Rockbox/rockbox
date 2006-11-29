@@ -2265,9 +2265,9 @@ static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
 
     chunk->enc_size = cfg.byte_per_frame + cfg.mpg.padding;
 
-            /* finish this chunk by adding sideinfo header data */
-            CodedData.bitpos = 0;
-            encodeSideInfo( cfg.cod_info );
+    /* finish this chunk by adding sideinfo header data */
+    CodedData.bitpos = 0;
+    encodeSideInfo( cfg.cod_info );
 
 #ifdef ROCKBOX_BIG_ENDIAN
     /* copy chunk to enc_buffer */
@@ -2419,7 +2419,9 @@ static bool enc_init(void)
         ci->enc_set_parameters     == NULL ||
         ci->enc_get_chunk          == NULL ||
         ci->enc_finish_chunk       == NULL ||
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         ci->enc_pcm_buf_near_empty == NULL ||
+#endif
         ci->enc_get_pcm_data       == NULL ||
         ci->enc_unget_pcm_data     == NULL )
         return false;
@@ -2453,7 +2455,9 @@ static bool enc_init(void)
 
 enum codec_status codec_main(void)
 {
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     bool cpu_boosted;
+#endif
 
     /* Generic codec initialisation */
     if (!enc_init())
@@ -2465,8 +2469,10 @@ enum codec_status codec_main(void)
     /* main application waits for this flag during encoder loading */
     ci->enc_codec_loaded = 1;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     ci->cpu_boost(true);
     cpu_boosted = true;
+#endif
 
     /* main encoding loop */
     while (!ci->stop_codec)
@@ -2480,12 +2486,13 @@ enum codec_status codec_main(void)
             if (ci->stop_codec)
                 break;
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
             if (!cpu_boosted && ci->enc_pcm_buf_near_empty() == 0)
             {
                 ci->cpu_boost(true);
                 cpu_boosted = true;
             }
-
+#endif
             chunk           = ci->enc_get_chunk();
             chunk->enc_data = ENC_CHUNK_SKIP_HDR(chunk->enc_data, chunk);
 
@@ -2502,17 +2509,20 @@ enum codec_status codec_main(void)
             ci->yield();
         }
 
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
         if (cpu_boosted && ci->enc_pcm_buf_near_empty())
-            {
-                ci->cpu_boost(false);
-                cpu_boosted = false;
-            }
-
+        {
+            ci->cpu_boost(false);
+            cpu_boosted = false;
+        }
+#endif
         ci->yield();
     }
 
-    if(cpu_boosted) /* set initial boost state */
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+    if (cpu_boosted) /* set initial boost state */
         ci->cpu_boost(false);
+#endif
 
     /* reset parameters to initial state */
     ci->enc_set_parameters(NULL);
