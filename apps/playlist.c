@@ -194,7 +194,7 @@ static int rotate_index(const struct playlist_info* playlist, int index);
 #define PLAYLIST_LOAD_POINTERS 1
 
 static struct event_queue playlist_queue;
-static long playlist_stack[(DEFAULT_STACK_SIZE + 0x400)/sizeof(long)];
+static long playlist_stack[(DEFAULT_STACK_SIZE + 0x800)/sizeof(long)];
 static const char playlist_thread_name[] = "playlist cachectrl";
 #endif
 
@@ -1169,7 +1169,7 @@ static void playlist_thread(void)
                         flush_cached_control(playlist);
                         mutex_unlock(&playlist->control_mutex);
                     }
-
+                    
                     sync_control(playlist, true);
                 }
 
