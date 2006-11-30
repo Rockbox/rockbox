@@ -227,7 +227,8 @@ const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RIGHT,               BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RIGHT|BUTTON_REL,    BUTTON_NONE },
     { ACTION_PS_TOGGLE_MODE,    BUTTON_MODE,                BUTTON_NONE },
-    { ACTION_PS_RESET,          BUTTON_ON,                  BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_SELECT,              BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_ON,                  BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_OFF,                 BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
@@ -559,8 +560,9 @@ const struct button_mapping button_context_pitchscreen_nonlcdremote[]  = {
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_REW|BUTTON_REL,   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_FF,               BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_FF|BUTTON_REL,    BUTTON_NONE },
-    { ACTION_PS_RESET,          BUTTON_RC_ON|BUTTON_REL,    BUTTON_RC_ON },
-    { ACTION_PS_EXIT,           BUTTON_RC_ON|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_RC_MENU,             BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_RC_ON,               BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_RC_STOP,             BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
@@ -574,7 +576,8 @@ const struct button_mapping button_context_pitchscreen_h100lcdremote[]  = {
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_SOURCE|BUTTON_REL,    BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_BITRATE,              BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_BITRATE|BUTTON_REL,   BUTTON_NONE },
-    { ACTION_PS_RESET,          BUTTON_RC_ON,                   BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_RC_MENU,                 BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_RC_ON,                   BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,                 BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
@@ -589,7 +592,8 @@ const struct button_mapping button_context_pitchscreen_h300lcdremote[]  = {
     { ACTION_PS_NUDGE_LEFTOFF,  BUTTON_RC_REW|BUTTON_REL,   BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHT,    BUTTON_RC_FF,               BUTTON_NONE },
     { ACTION_PS_NUDGE_RIGHTOFF, BUTTON_RC_FF|BUTTON_REL,    BUTTON_NONE },
-    { ACTION_PS_RESET,          BUTTON_RC_ON,               BUTTON_NONE },
+    { ACTION_PS_RESET,          BUTTON_RC_MENU,             BUTTON_NONE },
+    { ACTION_PS_EXIT,           BUTTON_RC_ON,               BUTTON_NONE },
     { ACTION_PS_EXIT,           BUTTON_RC_STOP,             BUTTON_NONE },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
