@@ -162,8 +162,8 @@ static bool _dir_properties(DPS* dps)
                 continue; /* skip these */
 
             dps->dc++; /* new directory */
-            rb->lcd_puts(0,0,"SCANNING...");
             rb->lcd_clear_display();
+            rb->lcd_puts(0,0,"SCANNING...");
             rb->lcd_puts(0,1,dps->dirname);
             rb->lcd_puts(0,2,entry->d_name);
             rb->snprintf(dps->tstr, 64, "Directories: %d", dps->dc);
