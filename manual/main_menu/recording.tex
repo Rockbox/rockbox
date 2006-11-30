@@ -8,7 +8,7 @@ Entering the \setting{Recording} option in the \setting{Main Menu} brings up
 a screen in which you can choose to enter the \setting{Recording Screen} or
 the \setting{Recording Settings} (see below). The \setting{Recording Screen}
 shows the time elapsed and the size of the file being recorded. A peak meter
-is present to allow you set Gain correctly. There is also a volume setting,
+is present to allow you set gain correctly. There is also a volume setting,
 this will only affect the output level of the \dap{} and does \emph{not}
 affect the recorded sound.
 \opt{SWCODEC}{
@@ -19,48 +19,37 @@ nothing to worry about. The recording continues during the spin up.}}
 \opt{SWCODEC}{The frequency and channels} settings are shown on the last line.
 
 The controls for this screen are:
-
 \begin{table}
   \begin{btnmap}{}{}
     
-    \ButtonUp\ / \ButtonDown & Select setting.\\
+    \ActionStdPrev{} / \ActionStdNext & Select setting.\\
     %
-    \ButtonLeft\ / \ButtonRight & Adjust selected setting.\\
+    \ActionSettingsDec{} / \ActionSettingsInc & Adjust selected setting.\\
     %
-    \opt{RECORDER_PAD,IAUDIO_X5_PAD}{\ButtonPlay}
-    \opt{ONDIO_PAD}{\ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
-    & Start recording.\\
-    & While recording: pause recording (press again to continue).\\
+    \ActionRecPause & Start recording.\\
+                    & While recording: pause recording (press again to
+                      continue).\\
     %
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
-    \opt{IAUDIO_X5_PAD}{Hold \ButtonPlay}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\fixme{FixMe}}
-    & Exit \setting{Recording Screen}.\\
-    & While recording: Stop recording.\\
+    \ActionRecExit  & Exit \setting{Recording Screen}.\\
+                    & While recording: Stop recording.\\
     %
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
-      \ButtonRec & Starts recording.\\
-      & While recording: close the current file and open a new one.\\
+      \ActionRecNewfile & Starts recording.\\
+                        & While recording: close the current file and open
+                          a new one.\\
     }
     %
-    \opt{RECORDER_PAD}{\ButtonFOne}
-    \opt{ONDIO_PAD}{Hold \ButtonMenu}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
-    \opt{IAUDIO_X5_PAD}{Hold \ButtonRec}
-    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Hold \ButtonSelect} 
-    & Open \setting{Recording Settings} (see below).\\
+    \ActionRecMenu & Open \setting{Recording Settings} (see below).\\
     %
     \opt{RECORDER_PAD}{
-      \ButtonFTwo & Quick menu for recording settings. A quick press will
-      leave the screen up (press \ButtonFTwo\ again to exit), while holding
+      \ActionRecFTwo & Quick menu for recording settings. A quick press will
+      leave the screen up (press \ActionRecFTwo{} again to exit), while holding
       it will close the screen when you release it.\\
     }
     %
     \opt{RECORDER_PAD}{
-      \ButtonFThree & Quick menu for source setting.\\
-      & Quick/hold works as for \ButtonFTwo.\\
+      \ActionRecFThree & Quick menu for source setting.\\
+      & Quick/hold works as for \ActionRecFTwo.\\
       & While recording: Start a new recording file.\\
     }
   \end{btnmap}
@@ -87,90 +76,149 @@ The controls for this screen are:
     \begin{center}
       \begin{tabularx}{0.75\textwidth}{lX}\toprule
         \emph{Frequency} & \emph{Bitrate} (Kbit/s) -- quality 0$\rightarrow$7 \\\midrule
-        44100Hz stereo        & 75, 80, 90, 100, 120, 140, 160, 170 \\
-        22050Hz stereo        & 39, 41, 45, 50,  60,  80,  110, 130 \\
-        44100Hz mono          & 65, 68, 73, 80,  90,  105, 125, 140 \\
-        22050Hz mono          & 35, 38, 40, 45,  50,  60,  75,  90 \\\bottomrule
+        44100Hz stereo   & 75, 80, 90, 100, 120, 140, 160, 170 \\
+        22050Hz stereo   & 39, 41, 45, 50,  60,  80,  110, 130 \\
+        44100Hz mono     & 65, 68, 73, 80,  90,  105, 125, 140 \\
+        22050Hz mono     & 35, 38, 40, 45,  50,  60,  75,  90 \\\bottomrule
       \end{tabularx}
     \end{center}
   \end{table}
 }
 
 \begin{description}
-  \opt{MASCODEC,x5}{
+\opt{SWCODEC}{
+  \item[Format:]
+    Choose which format to save your recording in. The available choices are
+    the two uncompressed formats \setting{PCM Wave} and \setting{AIFF}, the
+    losslessly compressed \setting{WavPack} and the lossy
+    \setting{MPEG Layer 3}.
+
+  \item[Encoder Settings:]
+    This sets the bitrate when using the \setting{MPEG Layer 3} format. And has
+    no settings for the other formats.
+}
+
   \item[Frequency:]
-    Choose the recording frequency (sample rate) -- 48kHz, 44.1kHz, 32kHz and
-    24kHz, 22.05kHz, 16kHz are available. Higher sample rates use up more disk
-    space, but give better sound quality.
-    This setting determines which frequency range can accurately be reproduced
-    during playback, Lower frequencies produce smaller files.
+    Choose the recording frequency (sample rate).
+    \opt{MASCODEC}{48kHz, 44.1kHz, 32kHz, 24kHz, 22.05kHz, 16kHz}
+    \opt{h1xx,h300}{44.1kHz, 22.05kHz and 11.025kHz}
+    \opt{x5}{88.2kHz, 44.1kHz, 22.05kHz and 11.025kHz}
+    are available. Higher sample rates use up more disk space, but give better
+    sound quality.
+    \opt{SWCODEC}{\note{The 11.025kHz setting is not available when using%
+      \setting{MPEG Layer 3} format.}
+    }%
     \opt{MASCODEC}{
       The frequency setting also determines which version of the MPEG standard
       the sound is recorded using:\\
       MPEG v1 for 48, 44.1 and 32\\
       MPEG v2 for 24, 22.05 and 16\\
     }
-  }
+    \opt{recorder,recorderv2fm,h1xx}
+      {\note{You cannot change the sample rate for digital recordings.}
+    }  
+
 \item[Source:]
   Choose the source of the recording. This can be
-  \opt{recorder,recorderv2fm,h1xx}{SPDIF (digital),} microphone or line in.
+  \opt{recorder,recorderv2fm,h1xx}{\setting{SPDIF (digital)},}%
+  \setting{Mic} or \setting{Line In}.
   \opt{CONFIG_TUNER}{For recording from the radio see \reference{ref:FMradio}.}
-  
-  % Add h1xx here whenever it supports setting recording frequency.
-  \opt{recorder,recorderv2fm}
-      {\note{You cannot change the sample rate for digital recordings.}}
+
+\item[Channels:]
+  This allows you to select mono or stereo recording. Please note that
+  for mono recording, only the left channel is recorded. Mono recordings
+  are usually somewhat smaller than stereo.
+
+\opt{MASCODEC}{
+  \item[Independent Frames:]
+    The independent frames option tells the \dap{} to encode with the bit
+    reservoir disabled, so the frames are independent of each other. This
+    makes a file easier to edit.
+}
       
-      \opt{MASCODEC,x5}{
-      \item[Channels:]
-        This allows you to select mono or stereo recording. Please note that
-        for mono recording, only the left channel is recorded.  Mono recordings
-        are usually somewhat smaller than stereo.
-      }
+\item[File Split Options:]
+  This sub menu contains options for file splitting, which can be used to split
+  up long recordings into manageable pieces. The splits are seamless (frame
+  accurate), no audio is lost at the split point. The break between recordings
+  is only the time required to stop and restart the recording, on the order of
+  2 -- 4 seconds.
+  \begin{description}
+    \item[Split Measure:]
+      This option controls wether to split the recording when the
+      \setting{Split Filesize} is reached or when the
+      \setting{Split Time} has elapsed.
+
+    \item[What to do when Splitting:]
+      This controls what will happend when the splitting condition is
+      fullfilled the two available options here are
+      \setting{Start a new file} or \setting{Stop recording}.
+
+    \item[Split Time:]
+      Set the time to record between each split, if time is used as
+      \setting{Split Measure}.\\
+      Options (hours:minutes between splits): Off, 00:05, 00:10, 00:15, 00:30,
+      1:00, 1:14 (74 minute  CD), 1:20 (80 minute CD), 2:00, 4:00, 8:00, 10:00,
+      12:00, 18:00, 24:00.
+
+    \item[Split Filesize:]
+      Set the filesize to record between each split, if filesize is used as
+      \setting{Split Measure}.
+
+  \end{description}
+
+  \item[Prerecord Time:]
+    This setting buffers a small amount of audio so that when the record button
+    is pressed, the recording will begin from that number of seconds earlier.
+    This is useful for ensuring that a recording begins before a cue that is
+    being waited for.
+
+  \item[Directory:]
+    Allows changing the location where the recorded files are saved. The
+    default location is \fname{/recordings}. If set to
+    \setting{Current Directory} the recorded files will be saved in the
+    directory where the \setting{File Browser} was left.
+
+  \item[Show recording screen on startup:]
+    If set to yes, the \dap{} will start up with the recording screen showing.
       
-      \opt{MASCODEC}{
-      \item[Independent Frames:]
-        The independent frames option tells the \dap\ to encode with the bit
-        reservoir disabled, so the frames are independent of each other. This
-        makes a file easier to edit.
-      }
-      
-    \item[File Split:]
-      This option is useful when timing recordings. If set to active it stops
-      a recording at a given interval and then starts recording again with a
-      new file, which is useful for long term recordings.
-      \newline
-      The splits are seamless (frame accurate), no audio is lost at the split
-      point. The break between recordings is only the time required to stop
-      and restart the recording, on the order of 2 -- 4 seconds.
-      \newline
-      Options (hours:minutes between splits): off, 24:00, 18:00, 12:00, 10:00,
-      8:00, 6:00, 4:00, 2:00, 1:20 (80 minute CD), 1:14 (74 minute  CD), 1:00,
-      00:30, 00:15, 00:10, 00:05.
-      
-    \item[Prerecord Time:]
-      This setting buffers a small amount of audio so that when the record button
-      is pressed, the recording will begin from that number of seconds earlier.
-      This is useful for ensuring that a recording begins before a cue that is
-      being waited for.\\
-      Options: \setting{Off}, \setting{1 -- 30 seconds}
-      
-    \item[Directory:]
-      Allows changing the location where the recorded files are saved. The
-      default location is \fname{/recordings}.
-      
-    \item[Show recording screen on startup:]
-      If set to yes, the \dap\ will start up with the while recording screen
-      showing.\\
-      Options: \setting{Yes}, \setting{No}
-      
-    \item[Clipping Light:]
-      Causes the backlight to flash on when clipping has been detected.\\
-      Options: \setting{Off}, \setting{Remote unit only},
-      \setting{Main and remote unit}, \setting{Main unit only}.
-      
-      \opt{MASCODEC}{
-      \item[Trigger:]
-        \fixme{Add description of triggered recording.}
-      }
-      
+  \item[Clipping Light:]
+    Causes the backlight to flash on when clipping has been detected.\\
+    Options: \setting{Off}, \setting{Main unit only},
+    \setting{Main and remote unit}, \setting{Remote unit only}.
+
+  \item[Trigger:]
+    \fixme{Add description of triggered recording.}
+
+\opt{SWCODEC}{%
+  \item[Automatic Gain Control:]
+    The \setting{Automatic Gain Control} has five different presets for
+    automatically controlling the gain while recording.
+    \begin{description}
+      \item[Safety (clip):]
+        This preset will lower the gain when the levels get too high (-1dB)
+        and will never increase gain.
+        
+      \item[Live (slow):]
+        This preset is designed to be used for recording of live shows and has
+        quite large headroom for loud parts. It heads for a nominal target peak
+        level of -9dB and will slowly increase or decrease gain to reach it.
+        
+      \item[DJ-Set (slow):]
+        This preset heads for a nominal target peak level of -5dB and will
+        slowly increase or decrease gain to reach it.
+        
+      \item[Medium:]
+        This preset heads for a nominal target peak level of -6dB and will
+        increase or decrease gain to reach it.
+
+      \item[Voice (fast):]
+        This preset is designed to be used for voice recording and heads for a
+        nominal target peak level of -7dB and will quickly increase or
+        decrease gain to reach it.
+    \end{description}
+
+  \item[AGC clip time:]
+    This setting controls how long the level is too loud or soft before the
+    \setting{Automatic Gain Control} kicks in.
+}%
 \end{description}
