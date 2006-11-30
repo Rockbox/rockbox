@@ -37,6 +37,9 @@
 #include "config.h"
 #include "system.h"
 #include "dir.h"
+#ifndef SIMULATOR
+#include "dircache.h"
+#endif
 #include "kernel.h"
 #include "thread.h"
 #include "button.h"
@@ -107,12 +110,12 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 37
+#define PLUGIN_API_VERSION 38
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 37
+#define PLUGIN_MIN_API_VERSION 38
 
 /* plugin return codes */
 enum plugin_status {
@@ -281,6 +284,7 @@ struct plugin_api {
 #endif
     unsigned (*gui_synclist_do_button)(struct gui_synclist * lists,
                                          unsigned button,enum list_wrap wrap);
+    void (*gui_synclist_set_title)(struct gui_synclist *lists, char* title, ICON icon);
 
     /* button */
     long (*button_get)(bool block);
@@ -318,6 +322,12 @@ struct plugin_api {
     struct dirent* (*PREFIX(readdir))(DIR* dir);
     int (*PREFIX(mkdir))(const char *name, int mode);
     int (*PREFIX(rmdir))(const char *name);
+    /* dir, cached */
+#ifdef HAVE_DIRCACHE
+    DIRCACHED* (*opendir_cached)(const char* name);
+    struct dircache_entry* (*readdir_cached)(DIRCACHED* dir);
+    int (*closedir_cached)(DIRCACHED* dir);
+#endif
 
     /* kernel/ system */
     void (*PREFIX(sleep))(int ticks);

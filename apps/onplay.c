@@ -560,6 +560,14 @@ bool create_dir(void)
     return true;
 }
 
+static bool properties(void)
+{
+    if(PLUGIN_USB_CONNECTED == filetype_load_plugin("properties",
+                                                    selected_file))
+        onplay_result = ONPLAY_RELOAD_DIR;
+    return false;
+}
+
 /* Store the current selection in the clipboard */
 static bool clipboard_clip(bool copy)
 {
@@ -966,7 +974,12 @@ int onplay(char* file, int attr, int from)
         items[i].desc = ID2P(LANG_CREATE_DIR);
         items[i].function = create_dir;
         i++;
+
+        items[i].desc = ID2P(LANG_PROPERTIES);
+        items[i].function = properties;
+        i++;
     }
+
     if (context == CONTEXT_WPS)
     {
 #ifdef HAVE_PITCHSCREEN

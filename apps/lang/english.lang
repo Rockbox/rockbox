@@ -10358,3 +10358,17 @@
     *: "AGC maximum gain"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Properties"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>

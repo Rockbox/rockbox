@@ -192,6 +192,7 @@ static const struct plugin_api rockbox_api = {
     gui_synclist_scroll_left,
 #endif
     gui_synclist_do_button,
+    gui_synclist_set_title,
 
     /* button */
     button_get,
@@ -229,6 +230,13 @@ static const struct plugin_api rockbox_api = {
     PREFIX(readdir),
     PREFIX(mkdir),
     PREFIX(rmdir),
+    
+    /* dir, cached */
+#ifdef HAVE_DIRCACHE
+    opendir_cached,
+    readdir_cached,
+    closedir_cached,
+#endif
 
     /* kernel/ system */
     PREFIX(sleep),

@@ -56,7 +56,7 @@
 #endif
 
 /* string buffer length */
-#define STRING_BUFFER_SIZE 512
+#define STRING_BUFFER_SIZE 548
 
 /* number of bytes for the binary icon */
 #define ICON_LENGTH 6
