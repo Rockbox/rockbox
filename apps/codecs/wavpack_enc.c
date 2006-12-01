@@ -126,7 +126,7 @@ static void chunk_to_int32(int32_t *src)
         {
             int32_t t = *(*src)++;
             /* endianness irrelevant */
-            *(*dst)++ = ((int16_t)t + (t >> 16)) >> 1;
+            *(*dst)++ = ((int16_t)t + (t >> 16)) / 2;
         } /* to_int32 */
 
         do

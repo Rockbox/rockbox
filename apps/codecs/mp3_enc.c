@@ -2055,7 +2055,7 @@ static void to_mono_mm(void)
     inline void to_mono(uint32_t **samp)
     {
         int32_t lr = **samp;
-        int32_t m  = ((int16_t)lr + (lr >> 16)) >> 1;
+        int32_t m  = ((int16_t)lr + (lr >> 16)) / 2;
         *(*samp)++ = (m << 16) | (uint16_t)m;
     } /* to_mono */
 

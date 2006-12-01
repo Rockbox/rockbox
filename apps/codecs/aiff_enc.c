@@ -240,10 +240,10 @@ static void chunk_to_aiff_format(uint32_t *src, uint32_t *dst)
             int32_t lr1, lr2;
 
             lr1 = *(*src)++;
-            lr1 = ((int16_t)lr1 + (lr1 >> 16)) >> 1;
+            lr1 = ((int16_t)lr1 + (lr1 >> 16)) / 2;
 
             lr2 = *(*src)++;
-            lr2 = ((int16_t)lr2 + (lr2 >> 16)) >> 1;
+            lr2 = ((int16_t)lr2 + (lr2 >> 16)) / 2;
             *(*dst)++ = swap_odd_even_le32((lr1 << 16) | (uint16_t)lr2);
         } /* to_mono */
 
