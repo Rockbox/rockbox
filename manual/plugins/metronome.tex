@@ -1,22 +1,33 @@
 \subsection{Metronome}
 This plugin can be used as a metronome to keep time during music
-practice.  Adjust the tempo though the interface or by tapping it out
+practice. Adjust the tempo through the interface or by tapping it out
 on the appropriate button.
 
 \begin{table}
-\begin{btnmap}{}{}
-\opt{player,h1xx,h300}{Stop}\opt{recorder,recorderv2fm}{Off}
-\opt{ondio}{OnOff}\opt{ipodcolor,ipodnano}{Menu} 
-& Exit plugin \\
-\opt{player,recorder,recorderv2fm,h1xx,h300,ipodcolor,ipodnano}{Play}
-\opt{ondio}{Mode (hold: Stop)} 
-& Start / Stop \\
-\opt{player,recorder,recorderv2fm}{On}\opt{ondio}{Mode (repeatedly)}
-\opt{h1xx,h300,ipodcolor,ipodnano}{Select} 
-& Tap tempo \\
-Left/Right & Adjust tempo \\
-\opt{player}{On+Left/Right}
-\opt{recorder,recorderv2fm,ondio,h1xx,h300,ipodcolor,ipodnano}{Up/Down} 
-& Adjust volume \\
-\end{btnmap}
+  \begin{btnmap}{}{}
+    \opt{PLAYER_PAD}{\ButtonStop}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
+    \opt{IRIVER_H10_PAD,IAUDIO_X5_PAD}{\ButtonPower}
+    \opt{ONDIO_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+        & Exit plugin \\
+    \opt{PLAYER_PAD,RECORDER_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
+      \ButtonPlay}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu\ (Long: Stop)}
+        & Start / Stop \\
+    \opt{PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
+    \opt{ONDIO_PAD}{\ButtonMenu\ (repeatedly)}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
+    \opt{IAUDIO_X5_PAD}{\ButtonRec}
+        & Tap tempo \\
+    \ButtonLeft\ / \ButtonRight
+        & Adjust tempo \\
+    \opt{PLAYER_PAD}{\ButtonOn+\ButtonLeft\ / \ButtonOn+\ButtonRight}
+    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{
+      \ButtonUp\ / \ButtonDown}
+    \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd\ / \ButtonScrollBack}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
+        & Adjust volume \\
+  \end{btnmap}
 \end{table}
