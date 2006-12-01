@@ -79,32 +79,33 @@ your WPS (While Playing Screen).
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{%
         \ActionWpsPitchScreen & Show pitch setting screen.\\}%
       %
+      \opt{ONDIO_PAD}{\ActionWpsContext\ twice}%
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
-      \opt{ONDIO_PAD}{Hold \ButtonMenu{} then \ButtonMenu{} again}%
-      & Enter \setting{Main Menu}.\\%
+      & Enter \setting{Main Menu}%
+      \opt{ONDIO_PAD}{ via the \setting{WPS Context Menu}}.\\%
       %
       \nopt{PLAYER_PAD,ONDIO_PAD}{%
         \ActionWpsQuickScreen & Enter \setting{Quick Screen}.\\}%
       %
       %These actions need definitions for the other targets
       \opt{RECORDER_PAD}{%
-        \ButtonFThree & Toggles Display quick menu.\\
-        \ButtonFOne+\ButtonDown & Key lock on/off.\\
-        \ButtonFOne+\ButtonPlay & Mute on/off.\\
+        \ButtonFThree & Toggles Display quick menu.\\%
+        \ButtonFOne+\ButtonDown & Key lock on/off.\\%
+        \ButtonFOne+\ButtonPlay & Mute on/off.\\%
       }%
       \opt{PLAYER_PAD}{%
-        \ButtonMenu+\ButtonStop & Key lock on/off.\\
-        \ButtonMenu+\ButtonPlay & Mute on/off.\\
+        \ButtonMenu+\ButtonStop & Key lock on/off.\\%
+        \ButtonMenu+\ButtonPlay & Mute on/off.\\%
       }%
       \opt{ONDIO_PAD}{%
-        Hold \ButtonMenu+\ButtonDown & Key lock on/off.\\
+        Hold \ButtonMenu+\ButtonDown & Key lock on/off.\\%
       }%
-      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{
-        \ActionWpsIdThreeScreen & Enter \setting{ID3 Viewer}.\\
+      \opt{PLAYER_PAD,RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{%
+        \ActionWpsIdThreeScreen & Enter \setting{ID3 Viewer}.\\%
       }%
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{%
-        \ActionWpsAbSetBNextDir & Skip to the next directory.\\
-        \ActionWpsAbSetAPrevDir & Skip to the previous directory.\\
+        \ActionWpsAbSetBNextDir & Skip to the next directory.\\%
+        \ActionWpsAbSetAPrevDir & Skip to the previous directory.\\%
       }%
     \end{btnmap}
 \end{table}
