@@ -57,7 +57,7 @@ your WPS (While Playing Screen).
 
 \begin{table}
   \begin{btnmap}{}{}
-      \ActionWpsVolUp/\ActionWpsVolDown & Volume up/down.\\
+      \ActionWpsVolUp{} / \ActionWpsVolDown & Volume up/down.\\
       %
       \ActionWpsSkipPrev & Go to beginning of track, or if pressed while in the
         first seconds of a track, go to previous track.\\
@@ -79,7 +79,7 @@ your WPS (While Playing Screen).
       \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IRIVER_H10_PAD}{%
         \ActionWpsPitchScreen & Show pitch setting screen.\\}%
       %
-      \opt{ONDIO_PAD}{\ActionWpsContext\ twice}%
+      \opt{ONDIO_PAD}{\ActionWpsContext{} twice}%
       \nopt{ONDIO_PAD}{\ActionWpsMenu}%
       & Enter \setting{Main Menu}%
       \opt{ONDIO_PAD}{ via the \setting{WPS Context Menu}}.\\%
@@ -186,24 +186,32 @@ function in the \setting{File Context Menu}.
 
 \nopt{player}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
-  The Pitch Screen allows you to quickly change the pitch of your \dap. The
-  pitch value can be adjusted between 50\% and 200\%.
+  
+  The Pitch Screen allows you to change the pitch and (at the same
+  time) the playback speed of your \dap. The pitch value can be
+  adjusted between 50\% and 200\%. Changing the pitch can be done in
+  two modes: procentual and semitone.
+  
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionPsIncSmall/\ActionPsDecSmall
-      & Increase / Decrease Pitch by 0.1\% \\
+      \ActionPsToggleMode
+      & Toggle pitch changing mode \\
       %
-      \ActionPsIncBig/\ActionPsDecBig
-      & Increase / Decrease Pitch by 1\% \\
+      \ActionPsIncSmall{} / \ActionPsDecSmall
+      & Increase / Decrease pitch by 0.1\% (in procentual mode) or a semitone
+        (in semitone mode)\\
       %
-      \ActionPsNudgeRight/\ActionPsNudgeLeft
-      & Temporarily Increase / Decrease Pitch by 2.0\% \\
+      \ActionPsIncBig{} / \ActionPsDecBig
+      & Increase / Decrease pitch by 1\% (only in procentual mode)\\
+      %
+      \ActionPsNudgeRight{} / \ActionPsNudgeLeft
+      & Temporarily Increase / Decrease pitch by 2.0\% \\
       %
       \ActionPsReset
-      & Reset Pitch to 100\% \\
+      & Reset pitch to 100\% \\
       %
       \ActionPsExit
-      & Leave Pitch screen \\
+      & Leave the Pitch Screen \\
       %
     \end{btnmap}
   \end{table}
