@@ -16,18 +16,21 @@ view a bigger file you may need to stop playback.}
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}
         {\ButtonUp\ / \ButtonDown}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu\ / \ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonScrollUp\ / \ButtonScrollDown}
         / \ButtonLeft\ / \ButtonRight
     & Move around in zoomed in image\\
     \opt{RECORDER_PAD}{\ButtonPlay}
     \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD}{\ButtonSelect}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
+    \opt{IRIVER_H10_PAD}{\ButtonPlay}
     & Zoom in\\
     \opt{RECORDER_PAD}{\ButtonOn}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
-    \opt{IAUDIO_X5_PAD}{Hold \ButtonSelect}
+    \opt{IAUDIO_X5_PAD}{Long \ButtonSelect}
+    \opt{IRIVER_H10_PAD}{Long \ButtonPlay}
     & Zoom out\\
     \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonRight}
@@ -35,16 +38,18 @@ view a bigger file you may need to stop playback.}
     \opt{IRIVER_H300_PAD}{\ButtonRec}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonRight}
     \opt{IAUDIO_X5_PAD}{\ButtonPlay}
+    \opt{IRIVER_H10_PAD}{\ButtonFF}
     & Next jpeg in folder\\
     \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{ONDIO_PAD}{\ButtonMenu+\ButtonLeft}
     \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD}{\ButtonRec}
     \opt{IRIVER_H300_PAD}{\ButtonOn}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonLeft}
+    \opt{IRIVER_H10_PAD}{\ButtonRew}
     & Previous jpeg in folder\\
     \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonMenu}
-    \opt{IAUDIO_X5_PAD}{\ButtonPower}
+    \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD}{\ButtonPower}
     & Show menu\\
 \end{btnmap}
 \end{table}
@@ -55,10 +60,17 @@ The menu has the following entries.
 \item[Toggle Slideshow Mode.] Enables or disables the slideshow mode.
 \item[Change Slideshow Timeout.] You can set the timeout for the slideshow
   between 1 second and 20 seconds.
-\item[Show Playback Menu.] From the playback menu you can control the 
+\nopt{MASCODEC}{
+\item[Show Playback Menu.] From the playback menu you can control the
 playback of the currently loaded playlist and change the volume of you \dap.
+}
 \item[Return.] Returns you to the image
 \end{description}
 
-\note{JPEGs that use progressive scan encoding are not supported and will 
-  produce an error.}
+\note{
+Progressive scan and other unusual JPEG files are not supported, and will
+result in various ``unsupported xx'' messages.%
+\opt{MASCODEC}{
+Processing could also fail if the image is too big or demanding to decode which
+will be explained by a respective message, too.}
+}
