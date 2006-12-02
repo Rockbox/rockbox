@@ -187,10 +187,14 @@ function in the \setting{File Context Menu}.
 \nopt{player}{
   \subsubsection{\label{sec:pitchscreen}Pitch}
   
-  The Pitch Screen allows you to change the pitch and (at the same
-  time) the playback speed of your \dap. The pitch value can be
-  adjusted between 50\% and 200\%. Changing the pitch can be done in
-  two modes: procentual and semitone.
+  The Pitch Screen allows you to change the pitch and (at the same time) the
+  playback speed of your \dap. The pitch value can be adjusted between 50\% and
+  200\%. 50\% means half the normal playback speed and the pitch that's an
+  octave lower than the normal pitch. 200\% means double playback speed and the
+  pitch that's an octave higher than the normal pitch. It's not possible to
+  change the pitch without changing the playback speed and vice versa. Changing
+  the pitch can be done in two modes: procentual and semitone. Initially (after
+  the \dap{} is switched on), procentual mode is active.
   
   \begin{table}
     \begin{btnmap}{}{}
@@ -205,7 +209,7 @@ function in the \setting{File Context Menu}.
       & Increase / Decrease pitch by 1\% (only in procentual mode)\\
       %
       \ActionPsNudgeRight{} / \ActionPsNudgeLeft
-      & Temporarily Increase / Decrease pitch by 2.0\% \\
+      & Temporarily increase / decrease pitch by 2.0\% \\
       %
       \ActionPsReset
       & Reset pitch to 100\% \\
