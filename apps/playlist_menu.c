@@ -79,19 +79,21 @@ bool playlist_menu(void)
 
 int save_playlist_screen(struct playlist_info* playlist)
 {
-    char* filename;
     char temp[MAX_PATH+1];
     int len;
 
-    filename = playlist_get_name(playlist, temp, sizeof(temp));
+    playlist_get_name(playlist, temp, sizeof(temp));
+    len = strlen(temp);
 
-    if (!filename || (len=strlen(filename)) <= 5 ||
-        strcasecmp(&filename[len-5], ".m3u8"))
-        strcpy(filename, DEFAULT_DYNAMIC_PLAYLIST_NAME);
+    if (len > 4 && !strcasecmp(&temp[len-4], ".m3u"))
+        strcat(temp, "8");
+    
+    if (len <= 5 || strcasecmp(&temp[len-5], ".m3u8"))
+        strcpy(temp, DEFAULT_DYNAMIC_PLAYLIST_NAME);
 
-    if (!kbd_input(filename, sizeof(temp)))
+    if (!kbd_input(temp, sizeof(temp)))
     {
-        playlist_save(playlist, filename);
+        playlist_save(playlist, temp);
 
         /* reload in case playlist was saved to cwd */
         reload_directory();

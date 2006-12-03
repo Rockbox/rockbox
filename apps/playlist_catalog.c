@@ -453,13 +453,17 @@ bool catalog_add_to_a_playlist(char* sel, int sel_attr, bool new_playlist)
 
     if (new_playlist)
     {
+        size_t len;
         snprintf(playlist, MAX_PATH, "%s/", playlist_dir);
         if (kbd_input(playlist, MAX_PATH))
             return false;
         
-        if(strlen(playlist) <= 4 ||
-            strcasecmp(&playlist[strlen(playlist)-4], ".m3u"))
-            strcat(playlist, ".m3u");
+        len = strlen(playlist);
+
+        if(len > 4 && !strcasecmp(&playlist[len-4], ".m3u"))
+            strcat(playlist, "8");
+        else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
+            strcat(playlist, ".m3u8");
     }
     else
     {
