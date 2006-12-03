@@ -2115,7 +2115,7 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
 int fat_get_secsize(const struct fat_file *file)
 {
 #ifdef HAVE_MULTIVOLUME
-    fat_bpbs[file->volume].bpb_bytspersec;
+    return fat_bpbs[file->volume].bpb_bytspersec;
 #else
     (void)file;
     return fat_bpbs[0].bpb_bytspersec;
