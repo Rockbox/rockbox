@@ -985,7 +985,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 #endif
 
-#if METRONOME_SYNC
+#ifdef METRONOME_SYNC
             case METRONOME_SYNC:
                 minitick = period;
                 break;
