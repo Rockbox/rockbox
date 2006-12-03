@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Barry Wardell
+ * Copyright (C) 2006 by Jens Arnold
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -16,33 +16,36 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#ifndef ATA_TARGET_H
+#define ATA_TARGET_H
 
-#if (CONFIG_CPU == PP5002) || (CONFIG_CPU == PP5020)
+/* asm optimised read & write loops */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
+#define ATA_ADDRESS_DETECT /* need address detection */
 
-/* Plain C read & write loops */
+#define SWAP_WORDS
 
-#if (CONFIG_CPU == PP5002)
-#define ATA_IOBASE      0xc00031e0
-#define ATA_CONTROL     (*((volatile unsigned char*)(0xc00033f8)))
-#elif (CONFIG_CPU == PP5020)
-#define ATA_IOBASE      0xc30001e0
-#define ATA_CONTROL     (*((volatile unsigned char*)(0xc30003f8)))
-#endif
+#define ATA_IOBASE      0x06100100
+#define ATA_DATA        (*((volatile unsigned short*)0x06104100))
+#define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
+#define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
+#define ATA_CONTROL     (*ata_control)
 
-#define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
-#define ATA_ERROR       (*((volatile unsigned char*)(ATA_IOBASE + 0x04)))
-#define ATA_NSECTOR     (*((volatile unsigned char*)(ATA_IOBASE + 0x08)))
-#define ATA_SECTOR      (*((volatile unsigned char*)(ATA_IOBASE + 0x0c)))
-#define ATA_LCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x10)))
-#define ATA_HCYL        (*((volatile unsigned char*)(ATA_IOBASE + 0x14)))
-#define ATA_SELECT      (*((volatile unsigned char*)(ATA_IOBASE + 0x18)))
-#define ATA_COMMAND     (*((volatile unsigned char*)(ATA_IOBASE + 0x1c)))
+#define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))
+#define ATA_NSECTOR     (*((volatile unsigned char*)ATA_IOBASE + 2))
+#define ATA_SECTOR      (*((volatile unsigned char*)ATA_IOBASE + 3))
+#define ATA_LCYL        (*((volatile unsigned char*)ATA_IOBASE + 4))
+#define ATA_HCYL        (*((volatile unsigned char*)ATA_IOBASE + 5))
+#define ATA_SELECT      (*((volatile unsigned char*)ATA_IOBASE + 6))
+#define ATA_COMMAND     (*((volatile unsigned char*)ATA_IOBASE + 7))
 
 #define STATUS_BSY      0x80
 #define STATUS_RDY      0x40
 #define STATUS_DF       0x20
 #define STATUS_DRQ      0x08
 #define STATUS_ERR      0x01
+
 #define ERROR_ABRT      0x04
 
 #define WRITE_PATTERN1 0xa5
@@ -63,9 +66,15 @@
 #define SET_REG(reg,val) reg = (val)
 #define SET_16BITREG(reg,val) reg = (val)
 
-#endif
+extern volatile unsigned char* ata_control;
+extern int ata_io_address;
 
 void ata_reset(void);
+void ata_address_detect(void);
 void ata_enable(bool on);
-bool ata_is_coldstart(void);
 void ata_device_init(void);
+bool ata_is_coldstart(void);
+
+void copy_read_sectors(unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
+#endif

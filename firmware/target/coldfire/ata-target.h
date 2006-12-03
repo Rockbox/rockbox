@@ -20,8 +20,8 @@
 #define ATA_TARGET_H
 
 /* asm optimised read & write loops */
-
-#define NOINLINE_ATTR __attribute__((noinline)) /* don't inline the loops */
+#define ATA_OPTIMIZED_READING
+#define ATA_OPTIMIZED_WRITING
 
 #define ATA_IOBASE      0x20000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE + 0x20)))
@@ -65,4 +65,6 @@ void ata_reset(void);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
 
+void copy_read_sectors(unsigned char* buf, int wordcount);
+void copy_write_sectors(const unsigned char* buf, int wordcount);
 #endif

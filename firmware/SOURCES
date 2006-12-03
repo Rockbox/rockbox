@@ -284,6 +284,8 @@ drivers/i2c.c
 
 #ifdef ARCHOS_PLAYER
 #ifndef SIMULATOR
+target/sh/archos/ata-archos.c
+target/sh/archos/ata-as-archos.S
 target/sh/archos/player/button-player.c
 target/sh/archos/player/lcd-as-player.S
 #endif /* SIMULATOR */
@@ -291,6 +293,8 @@ target/sh/archos/player/lcd-as-player.S
 
 #ifdef ARCHOS_RECORDER
 #ifndef SIMULATOR
+target/sh/archos/ata-archos.c
+target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/recorder/button-recorder.c
@@ -299,6 +303,8 @@ target/sh/archos/recorder/button-recorder.c
 
 #if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
 #ifndef SIMULATOR
+target/sh/archos/ata-archos.c
+target/sh/archos/ata-as-archos.S
 target/sh/archos/lcd-archos-bitmap.c
 target/sh/archos/lcd-as-archos-bitmap.S
 target/sh/archos/fm_v2/button-fm_v2.c
@@ -328,6 +334,7 @@ target/arm/sandisk/sansa-e200/power-e200.c
 #ifdef IAUDIO_X5
 target/coldfire/iaudio/x5/power-x5.c
 #ifndef SIMULATOR
+target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iaudio/x5/adc-x5.c
 target/coldfire/iaudio/x5/ata-x5.c
@@ -356,6 +363,7 @@ common/sscanf.c
 #ifdef IRIVER_H300_SERIES
 target/coldfire/iriver/h300/power-h300.c
 #ifndef SIMULATOR
+target/coldfire/ata-as-coldfire.S
 target/coldfire/pcf50606-coldfire.c
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/system-iriver.c
@@ -375,6 +383,7 @@ target/coldfire/iriver/audio-iriver.c
 #ifdef IRIVER_H100_SERIES
 target/coldfire/iriver/h100/power-h100.c
 #ifndef SIMULATOR
+target/coldfire/ata-as-coldfire.S
 target/coldfire/iriver/ata-iriver.c
 target/coldfire/iriver/system-iriver.c
 target/coldfire/iriver/h100/adc-h100.c

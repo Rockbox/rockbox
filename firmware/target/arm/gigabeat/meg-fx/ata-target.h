@@ -20,8 +20,6 @@
 #define ATA_TARGET_H
 
 /* Plain C read & write loops */
-#define PREFER_C_READING
-#define PREFER_C_WRITING
 
 #define ATA_IOBASE      0x18000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))

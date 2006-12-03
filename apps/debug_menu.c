@@ -86,7 +86,7 @@
 /*---------------------------------------------------*/
 /*    SPECIAL DEBUG STUFF                            */
 /*---------------------------------------------------*/
-extern char ata_device;
+extern int ata_device;
 extern int ata_io_address;
 extern struct core_entry cores[NUM_CORES];
 
