@@ -36,7 +36,7 @@
 */
 
 struct filedesc {
-    unsigned char cache[SECTOR_SIZE];
+    unsigned char cache[MAX_SECTOR_SIZE];
     int cacheoffset; /* invariant: 0 <= cacheoffset <= SECTOR_SIZE */
     long fileoffset;
     long size;
@@ -415,9 +415,10 @@ int ftruncate(int fd, off_t size)
 {
     int rc, sector;
     struct filedesc* file = &openfiles[fd];
+    int secsize = fat_get_secsize(&(file->fatfile));
 
-    sector = size / SECTOR_SIZE;
-    if (size % SECTOR_SIZE)
+    sector = size / secsize;
+    if (size % secsize)
         sector++;
 
     rc = fat_seek(&(file->fatfile), sector);
@@ -444,7 +445,7 @@ static int flush_cache(int fd)
 {
     int rc;
     struct filedesc* file = &openfiles[fd];
-    long sector = file->fileoffset / SECTOR_SIZE;
+    long sector = file->fileoffset / fat_get_secsize(&(file->fatfile));
       
     DEBUGF("Flushing dirty sector cache\n");
         
@@ -473,6 +474,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
     long sectors;
     long nread=0;
     struct filedesc* file = &openfiles[fd];
+    int secsize = fat_get_secsize(&(file->fatfile));
     int rc;
 
     if ( !file->busy ) {
@@ -490,7 +492,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
     /* any head bytes? */
     if ( file->cacheoffset != -1 ) {
         int offs = file->cacheoffset;
-        int headbytes = MIN(count, SECTOR_SIZE - offs);
+        int headbytes = MIN(count, secsize - offs);
 
         if (write) {
             memcpy( file->cache + offs, buf, headbytes );
@@ -500,7 +502,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
             memcpy( buf, file->cache + offs, headbytes );
         }
 
-        if (offs + headbytes == SECTOR_SIZE) {
+        if (offs + headbytes == secsize) {
             if (file->dirty) {
                 int rc = flush_cache(fd);
                 if ( rc < 0 ) {
@@ -523,7 +525,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
      * more data to follow in this call). Do NOT flush here. */
 
     /* read/write whole sectors right into/from the supplied buffer */
-    sectors = count / SECTOR_SIZE;
+    sectors = count / secsize;
     if ( sectors ) {
         int rc = fat_readwrite(&(file->fatfile), sectors,
             (unsigned char*)buf+nread, write );
@@ -541,8 +543,8 @@ static int readwrite(int fd, void* buf, long count, bool write)
         }
         else {
             if ( rc > 0 ) {
-                nread += rc * SECTOR_SIZE;
-                count -= sectors * SECTOR_SIZE;
+                nread += rc * secsize;
+                count -= sectors * secsize;
 
                 /* if eof, skip tail bytes */
                 if ( rc < sectors )
@@ -575,7 +577,7 @@ static int readwrite(int fd, void* buf, long count, bool write)
                 /* seek back one sector to put file position right */
                 rc = fat_seek(&(file->fatfile), 
                               (file->fileoffset + nread) / 
-                              SECTOR_SIZE);
+                              secsize);
                 if ( rc < 0 ) {
                     DEBUGF("fat_seek() failed\n");
                     errno = EIO;
@@ -641,6 +643,7 @@ off_t lseek(int fd, off_t offset, int whence)
     int sectoroffset;
     int rc;
     struct filedesc* file = &openfiles[fd];
+    int secsize = fat_get_secsize(&(file->fatfile));
 
     LDEBUGF("lseek(%d,%ld,%d)\n",fd,offset,whence);
 
@@ -672,9 +675,9 @@ off_t lseek(int fd, off_t offset, int whence)
     }
 
     /* new sector? */
-    newsector = pos / SECTOR_SIZE;
-    oldsector = file->fileoffset / SECTOR_SIZE;
-    sectoroffset = pos % SECTOR_SIZE;
+    newsector = pos / secsize;
+    oldsector = file->fileoffset / secsize;
+    sectoroffset = pos % secsize;
 
     if ( (newsector != oldsector) ||
          ((file->cacheoffset==-1) && sectoroffset) ) {

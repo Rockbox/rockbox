@@ -109,9 +109,9 @@
 #define FATLONG_TYPE         12
 #define FATLONG_CHKSUM       13
 
-#define CLUSTERS_PER_FAT_SECTOR (SECTOR_SIZE / 4)
-#define CLUSTERS_PER_FAT16_SECTOR (SECTOR_SIZE / 2)
-#define DIR_ENTRIES_PER_SECTOR  (SECTOR_SIZE / DIR_ENTRY_SIZE)
+#define CLUSTERS_PER_FAT_SECTOR   ((unsigned int)(fat_bpb->bpb_bytspersec / 4))
+#define CLUSTERS_PER_FAT16_SECTOR ((unsigned int)(fat_bpb->bpb_bytspersec / 2))
+#define DIR_ENTRIES_PER_SECTOR    ((unsigned int)(fat_bpb->bpb_bytspersec / DIR_ENTRY_SIZE))
 #define DIR_ENTRY_SIZE       32
 #define NAME_BYTES_PER_ENTRY 13
 #define FAT_BAD_MARK         0x0ffffff7
@@ -165,7 +165,11 @@ struct bpb
     int drive; /* on which physical device is this located */
     bool mounted; /* flag if this volume is mounted */
 #endif
+    
+    int secmult; /* bpb_bytspersec / PHYSICAL_SECTOR_SIZE */
 };
+
+int fat_sector_size;
 
 static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
@@ -191,7 +195,7 @@ struct fat_cache_entry
 #endif
 };
 
-static char fat_cache_sectors[FAT_CACHE_SIZE][SECTOR_SIZE];
+static char fat_cache_sectors[FAT_CACHE_SIZE][MAX_SECTOR_SIZE];
 static struct fat_cache_entry fat_cache[FAT_CACHE_SIZE];
 static struct mutex cache_mutex;
 
@@ -233,9 +237,11 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
     if (size)
-      *size = fat_bpb->dataclusters * fat_bpb->bpb_secperclus / 2;
+      *size = (fat_bpb->dataclusters * fat_bpb->bpb_secperclus 
+                * fat_bpb->bpb_bytspersec) / 1024;
     if (free)
-      *free = fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus / 2;
+      *free = (fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus
+                * fat_bpb->bpb_bytspersec) / 1024;
 }
 
 void fat_init(void)
@@ -269,7 +275,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     const int volume = 0;
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
-    unsigned char buf[SECTOR_SIZE];
+    unsigned char buf[MAX_SECTOR_SIZE];
     int rc;
     long datasec;
 #ifdef HAVE_FAT16SUPPORT
@@ -302,6 +308,8 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     fat_bpb->last_word      = BYTES2INT16(buf,BPB_LAST_WORD);
 
     /* calculate a few commonly used values */
+    fat_bpb->secmult = fat_bpb->bpb_bytspersec / PHYSICAL_SECTOR_SIZE;
+    
     if (fat_bpb->bpb_fatsz16 != 0)
         fat_bpb->fatsize = fat_bpb->bpb_fatsz16;
     else
@@ -391,7 +399,7 @@ int fat_mount(IF_MV2(int volume,) IF_MV2(int drive,) long startsector)
     {
         /* Read the fsinfo sector */
         rc = ata_read_sectors(IF_MV2(drive,) 
-            startsector + fat_bpb->bpb_fsinfo, 1, buf);
+            startsector + (fat_bpb->bpb_fsinfo * fat_bpb->secmult), 1, buf);
         if (rc < 0)
         {
             DEBUGF( "fat_mount() - Couldn't read FSInfo (error code %d)\n", rc);
@@ -506,12 +514,15 @@ static int bpb_is_sane(IF_MV_NONVOID(struct bpb* fat_bpb))
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    if(fat_bpb->bpb_bytspersec != 512)
+    if(fat_bpb->bpb_bytspersec > MAX_SECTOR_SIZE
+       || fat_bpb->bpb_bytspersec < PHYSICAL_SECTOR_SIZE
+       || fat_bpb->bpb_bytspersec % PHYSICAL_SECTOR_SIZE)
     {
-        DEBUGF( "bpb_is_sane() - Error: sector size is not 512 (%d)\n",
+        DEBUGF( "bpb_is_sane() - Error: sector size is not sane (%d)\n",
                 fat_bpb->bpb_bytspersec);
         return -1;
     }
+    
     if((long)fat_bpb->bpb_secperclus * (long)fat_bpb->bpb_bytspersec > 128L*1024L)
     {
         DEBUGF( "bpb_is_sane() - Error: cluster size is larger than 128K "
@@ -555,17 +566,20 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
 {
     int rc;
     long secnum;
+    int secmult;
 
     /* With multivolume, use only the FAT info from the cached sector! */
 #ifdef HAVE_MULTIVOLUME
-    secnum = fce->secnum + fce->fat_vol->startsector;
+    secmult = fce->fat_vol->secmult;
+    secnum = (fce->secnum * secmult) + fce->fat_vol->startsector;
 #else
-    secnum = fce->secnum + fat_bpbs[0].startsector;
+    secmult = fat_bpbs[0].secmult;
+    secnum = (fce->secnum * secmult) + fat_bpbs[0].startsector;
 #endif
 
     /* Write to the first FAT */
     rc = ata_write_sectors(IF_MV2(fce->fat_vol->drive,)
-                           secnum, 1,
+                           secnum, secmult,
                            sectorbuf);
     if(rc < 0)
     {
@@ -581,12 +595,12 @@ static void flush_fat_sector(struct fat_cache_entry *fce,
     {
         /* Write to the second FAT */
 #ifdef HAVE_MULTIVOLUME
-        secnum += fce->fat_vol->fatsize;
+        secnum += fce->fat_vol->fatsize * secmult;
 #else
-        secnum += fat_bpbs[0].fatsize;
+        secnum += fat_bpbs[0].fatsize * secmult;
 #endif
         rc = ata_write_sectors(IF_MV2(fce->fat_vol->drive,)
-                               secnum, 1, sectorbuf);
+                               secnum, secmult, sectorbuf);
         if(rc < 0)
         {
             panicf("flush_fat_sector() - Could not write sector %ld"
@@ -632,8 +646,8 @@ static void *cache_fat_sector(IF_MV2(struct bpb* fat_bpb,)
     if(!fce->inuse)
     {
         rc = ata_read_sectors(IF_MV2(fat_bpb->drive,)
-                              secnum + fat_bpb->startsector,1,
-                              sectorbuf);
+                              (secnum * fat_bpb->secmult) + fat_bpb->startsector,
+                              fat_bpb->secmult, sectorbuf);
         if(rc < 0)
         {
             DEBUGF( "cache_fat_sector() - Could not read sector %ld"
@@ -809,10 +823,10 @@ static int update_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry, un
 
 static long read_fat_entry(IF_MV2(struct bpb* fat_bpb,) unsigned long entry)
 {
-#ifdef HAVE_FAT16SUPPORT
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
+#ifdef HAVE_FAT16SUPPORT
     if (fat_bpb->is_fat16)
     {
         int sector = entry / CLUSTERS_PER_FAT16_SECTOR;
@@ -876,7 +890,7 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
 #ifndef HAVE_MULTIVOLUME
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned char fsinfo[SECTOR_SIZE];
+    unsigned char fsinfo[MAX_SECTOR_SIZE];
     unsigned long* intptr;
     int rc;
     
@@ -887,7 +901,8 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
     
     /* update fsinfo */
     rc = ata_read_sectors(IF_MV2(fat_bpb->drive,) 
-                          fat_bpb->startsector + fat_bpb->bpb_fsinfo, 1,fsinfo);
+                          fat_bpb->startsector + 
+                            (fat_bpb->bpb_fsinfo * fat_bpb->secmult), 1, fsinfo);
     if (rc < 0)
     {
         DEBUGF( "flush_fat() - Couldn't read FSInfo (error code %d)\n", rc);
@@ -900,7 +915,8 @@ static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb))
     *intptr = htole32(fat_bpb->fsinfo.nextfree);
 
     rc = ata_write_sectors(IF_MV2(fat_bpb->drive,)
-                           fat_bpb->startsector + fat_bpb->bpb_fsinfo,1,fsinfo);
+                           fat_bpb->startsector + 
+                             (fat_bpb->bpb_fsinfo * fat_bpb->secmult), 1, fsinfo);
     if (rc < 0)
     {
         DEBUGF( "flush_fat() - Couldn't write FSInfo (error code %d)\n", rc);
@@ -1036,7 +1052,12 @@ static int write_long_name(struct fat_file* file,
                            const unsigned char* shortname,
                            bool is_directory)
 {
-    unsigned char buf[SECTOR_SIZE];
+#ifdef HAVE_MULTIVOLUME
+    struct bpb *fat_bpb = &fat_bpbs[file->volume];
+#else
+    struct bpb *fat_bpb = &fat_bpbs[0];
+#endif
+    unsigned char buf[MAX_SECTOR_SIZE];
     unsigned char* entry;
     unsigned int idx = firstentry % DIR_ENTRIES_PER_SECTOR;
     unsigned int sector = firstentry / DIR_ENTRIES_PER_SECTOR;
@@ -1194,7 +1215,7 @@ static int add_dir_entry(struct fat_dir* dir,
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned char buf[SECTOR_SIZE];
+    unsigned char buf[MAX_SECTOR_SIZE];
     unsigned char shortname[12];
     int rc;
     unsigned int sector;
@@ -1429,7 +1450,12 @@ static void randomize_dos_name(unsigned char *name)
 
 static int update_short_entry( struct fat_file* file, long size, int attr )
 {
-    unsigned char buf[SECTOR_SIZE];
+#ifdef HAVE_MULTIVOLUME
+    struct bpb *fat_bpb = &fat_bpbs[file->volume];
+#else
+    struct bpb *fat_bpb = &fat_bpbs[0];
+#endif
+    unsigned char buf[MAX_SECTOR_SIZE];
     int sector = file->direntry / DIR_ENTRIES_PER_SECTOR;
     unsigned char* entry =
         buf + DIR_ENTRY_SIZE * (file->direntry % DIR_ENTRIES_PER_SECTOR);
@@ -1594,7 +1620,7 @@ int fat_create_dir(const char* name,
 #else
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
-    unsigned char buf[SECTOR_SIZE];
+    unsigned char buf[MAX_SECTOR_SIZE];
     int i;
     long sector;
     int rc;
@@ -1716,10 +1742,10 @@ int fat_closewrite(struct fat_file *file, long size, int attr)
             LDEBUGF("cluster %ld: %lx\n", count, next);
             count++;
         }
-        len = count * fat_bpb->bpb_secperclus * SECTOR_SIZE;
+        len = count * fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec;
         LDEBUGF("File is %ld clusters (chainlen=%ld, size=%ld)\n",
                 count, len, size );
-        if ( len > size + fat_bpb->bpb_secperclus * SECTOR_SIZE)
+        if ( len > size + fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec)
             panicf("Cluster chain is too long\n");
         if ( len < size )
             panicf("Cluster chain is too short\n");
@@ -1731,7 +1757,12 @@ int fat_closewrite(struct fat_file *file, long size, int attr)
 
 static int free_direntries(struct fat_file* file)
 {
-    unsigned char buf[SECTOR_SIZE];
+#ifdef HAVE_MULTIVOLUME
+    struct bpb *fat_bpb = &fat_bpbs[file->volume];
+#else
+    struct bpb *fat_bpb = &fat_bpbs[0];
+#endif
+    unsigned char buf[MAX_SECTOR_SIZE];
     struct fat_file dir;
     int numentries = file->direntries;
     unsigned int entry = file->direntry - numentries + 1;
@@ -1933,6 +1964,9 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
     struct bpb* fat_bpb = &fat_bpbs[0];
 #endif
     int rc;
+    
+    start *= fat_bpb->secmult;
+    count *= fat_bpb->secmult;
 
     LDEBUGF("transfer(s=%lx, c=%lx, %s)\n",
         start+ fat_bpb->startsector, count, write?"write":"read");
@@ -1945,9 +1979,9 @@ static int transfer(IF_MV2(struct bpb* fat_bpb,)
 #endif
             firstallowed = fat_bpb->firstdatasector;
             
-        if (start < firstallowed)
+        if (start < (firstallowed * fat_bpb->secmult))
             panicf("Write %ld before data\n", firstallowed - start);
-        if (start + count > fat_bpb->totalsectors)
+        if (start + count > (fat_bpb->totalsectors * fat_bpb->secmult))
             panicf("Write %ld after data\n",
                 start + count - fat_bpb->totalsectors);
         rc = ata_write_sectors(IF_MV2(fat_bpb->drive,)
@@ -2041,13 +2075,14 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
             first = sector;
 
         if ( ((sector != first) && (sector != last+1)) || /* not sequential */
-             (last-first+1 == 256) ) { /* max 256 sectors per ata request */
+             (last-first+1 == (256 / fat_bpb->secmult)) ) { 
+                                         /* max 256 sectors per ata request */
             long count = last - first + 1;
             rc = transfer(IF_MV2(fat_bpb,) first, count, buf, write );
             if (rc < 0)
                 return rc * 10 - 1;
 
-            buf = (char *)buf + count * SECTOR_SIZE;
+            buf = (char *)buf + count * fat_bpb->bpb_bytspersec;
             first = sector;
         }
 
@@ -2075,6 +2110,16 @@ long fat_readwrite( struct fat_file *file, long sectorcount,
 
     DEBUGF("Sectors written: %ld\n", i);
     return i;
+}
+
+int fat_get_secsize(const struct fat_file *file)
+{
+#ifdef HAVE_MULTIVOLUME
+    fat_bpbs[file->volume].bpb_bytspersec;
+#else
+    (void)file;
+    return fat_bpbs[0].bpb_bytspersec;
+#endif
 }
 
 int fat_seek(struct fat_file *file, unsigned long seeksector )
@@ -2196,6 +2241,11 @@ static int fat_copy_long_name_segment(unsigned char *utf16src,
 
 int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 {
+#ifdef HAVE_MULTIVOLUME
+    struct bpb* fat_bpb = &fat_bpbs[dir->file.volume];
+#else
+    struct bpb* fat_bpb = &fat_bpbs[0];
+#endif
     bool done = false;
     int i;
     int rc;
@@ -2229,7 +2279,7 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
         }
 
         for (i = dir->entry % DIR_ENTRIES_PER_SECTOR;
-             i < DIR_ENTRIES_PER_SECTOR; i++)
+             i < (int)DIR_ENTRIES_PER_SECTOR; i++)
         {
             unsigned int entrypos = i * DIR_ENTRY_SIZE;
 
@@ -2283,20 +2333,20 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
                             unsigned char* ptr = cached_buf;
                             int index = longarray[j];
                             /* current or cached sector? */
-                            if ( sectoridx >= SECTOR_SIZE ) {
-                                if ( sectoridx >= SECTOR_SIZE*2 ) {
-                                    if ( ( index >= SECTOR_SIZE ) &&
-                                         ( index < SECTOR_SIZE*2 ))
+                            if ( sectoridx >= fat_bpb->bpb_bytspersec ) {
+                                if ( sectoridx >= fat_bpb->bpb_bytspersec*2 ) {
+                                    if ( ( index >= fat_bpb->bpb_bytspersec ) &&
+                                         ( index < fat_bpb->bpb_bytspersec*2 ))
                                         ptr = dir->sectorcache[1];
                                     else
                                         ptr = dir->sectorcache[2];
                                 }
                                 else {
-                                    if ( index < SECTOR_SIZE )
+                                    if ( index < fat_bpb->bpb_bytspersec )
                                         ptr = dir->sectorcache[1];
                                 }
 
-                                index &= SECTOR_SIZE-1;
+                                index &= fat_bpb->bpb_bytspersec-1;
                             }
 
                             /* Try to append each segment of the long name. Check if we'd
@@ -2356,10 +2406,10 @@ int fat_getnext(struct fat_dir *dir, struct fat_direntry *entry)
 
         /* save this sector, for longname use */
         if ( sectoridx )
-            memcpy( dir->sectorcache[2], dir->sectorcache[0], SECTOR_SIZE );
+            memcpy( dir->sectorcache[2], dir->sectorcache[0], fat_bpb->bpb_bytspersec );
         else
-            memcpy( dir->sectorcache[1], dir->sectorcache[0], SECTOR_SIZE );
-        sectoridx += SECTOR_SIZE;
+            memcpy( dir->sectorcache[1], dir->sectorcache[0], fat_bpb->bpb_bytspersec );
+        sectoridx += fat_bpb->bpb_bytspersec;
 
     }
     return 0;
@@ -2371,7 +2421,7 @@ unsigned int fat_get_cluster_size(IF_MV_NONVOID(int volume))
     const int volume = 0;
 #endif
     struct bpb* fat_bpb = &fat_bpbs[volume];
-    return fat_bpb->bpb_secperclus * SECTOR_SIZE;
+    return fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec;
 }
 
 #ifdef HAVE_MULTIVOLUME

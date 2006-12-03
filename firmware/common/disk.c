@@ -157,7 +157,21 @@ int disk_mount(int drive)
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
             volume = get_free_volume(); /* prepare next entry */
+            continue;
         }
+        
+# if MAX_SECTOR_SIZE != PHYSICAL_SECTOR_SIZE
+        /* Try again with sector size 2048 */
+        if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start 
+                       * (MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE)))
+        {
+            pinfo[i].start *= MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE;
+            pinfo[i].size  *= MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE;
+            mounted++;
+            vol_drive[volume] = drive; /* remember the drive for this volume */
+            volume = get_free_volume(); /* prepare next entry */
+        }
+# endif
     }
 #endif
 
