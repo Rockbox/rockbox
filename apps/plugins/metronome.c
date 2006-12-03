@@ -58,8 +58,7 @@ static const struct button_mapping ondio_action[] =
 #define METRONOME_MSG_STOP "press pause"
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define METRONOME_SYNC
-static const struct button_mapping iriver_syncaction[] = 
+static const struct button_mapping iriver_syncaction[] =
 {
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
     {CONTEXT_CUSTOM,BUTTON_NONE,BUTTON_NONE}
