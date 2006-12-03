@@ -79,50 +79,6 @@ static void read_chunk_ftyp(qtmovie_t *qtmovie, size_t chunk_len)
     }
 }
 
-/* media handler inside mdia */
-static void read_chunk_hdlr(qtmovie_t *qtmovie, size_t chunk_len)
-{
-    fourcc_t comptype, compsubtype;
-    size_t size_remaining = chunk_len - 8;
-
-    int strlen;
-    char str[256] = {0};
-
-    /* version */
-    stream_read_uint8(qtmovie->stream);
-    size_remaining -= 1;
-    /* flags */
-    stream_read_uint8(qtmovie->stream);
-    stream_read_uint8(qtmovie->stream);
-    stream_read_uint8(qtmovie->stream);
-    size_remaining -= 3;
-
-    /* component type */
-    comptype = stream_read_uint32(qtmovie->stream);
-    compsubtype = stream_read_uint32(qtmovie->stream);
-    size_remaining -= 8;
-
-    /* component manufacturer */
-    stream_read_uint32(qtmovie->stream);
-    size_remaining -= 4;
-
-    /* flags */
-    stream_read_uint32(qtmovie->stream);
-    stream_read_uint32(qtmovie->stream);
-    size_remaining -= 8;
-
-    /* name */
-    strlen = stream_read_uint8(qtmovie->stream);
-    stream_read(qtmovie->stream, strlen, str);
-    size_remaining -= 1 + strlen;
-
-    if (size_remaining)
-    {
-        stream_skip(qtmovie->stream, size_remaining);
-    }
-
-}
-
 uint32_t mp4ff_read_mp4_descr_length(stream_t* stream)
 {
     uint8_t b;
@@ -300,7 +256,7 @@ static bool read_chunk_stsd(qtmovie_t *qtmovie, size_t chunk_len)
           sub_chunk_len = stream_read_uint32(qtmovie->stream);
           if (sub_chunk_len <= 1 || sub_chunk_len > entry_remaining)
           {
-              DEBUGF("strange size for chunk inside mp4a\n");
+              DEBUGF("strange size (%u) for chunk inside mp4a\n", sub_chunk_len);
               return false;
           }
 
@@ -531,7 +487,7 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size for chunk inside stbl\n");
+            DEBUGF("strange size (%u) for chunk inside stbl\n", sub_chunk_len);
             return false;
         }
 
@@ -648,7 +604,7 @@ static bool read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size for chunk inside mdia\n");
+            DEBUGF("strange size (%u) for chunk inside mdia\n", sub_chunk_len);
             return false;
         }
 
@@ -656,9 +612,6 @@ static bool read_chunk_mdia(qtmovie_t *qtmovie, size_t chunk_len)
 
         switch (sub_chunk_id)
         {
-        case MAKEFOURCC('h','d','l','r'):
-            read_chunk_hdlr(qtmovie, sub_chunk_len);
-            break;
         case MAKEFOURCC('m','i','n','f'):
             if (!read_chunk_minf(qtmovie, sub_chunk_len)) {
                return false;
@@ -689,7 +642,7 @@ static bool read_chunk_trak(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size for chunk inside trak\n");
+            DEBUGF("strange size (%u) for chunk inside trak\n", sub_chunk_len);
             return false;
         }
 
@@ -727,7 +680,7 @@ static bool read_chunk_moov(qtmovie_t *qtmovie, size_t chunk_len)
         sub_chunk_len = stream_read_uint32(qtmovie->stream);
         if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
         {
-            DEBUGF("strange size for chunk inside moov\n");
+            DEBUGF("strange size (%u) for chunk inside moov\n", sub_chunk_len);
             return false;
         }
 
