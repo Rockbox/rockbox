@@ -169,8 +169,6 @@ struct bpb
     int secmult; /* bpb_bytspersec / PHYSICAL_SECTOR_SIZE */
 };
 
-int fat_sector_size;
-
 static struct bpb fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
 static int update_fsinfo(IF_MV_NONVOID(struct bpb* fat_bpb));
@@ -238,10 +236,10 @@ void fat_size(IF_MV2(int volume,) unsigned long* size, unsigned long* free)
     struct bpb* fat_bpb = &fat_bpbs[volume];
     if (size)
       *size = (fat_bpb->dataclusters * fat_bpb->bpb_secperclus 
-                * fat_bpb->bpb_bytspersec) / 1024;
+                * fat_bpb->secmult) / 2;
     if (free)
       *free = (fat_bpb->fsinfo.freecount * fat_bpb->bpb_secperclus
-                * fat_bpb->bpb_bytspersec) / 1024;
+                * fat_bpb->secmult) / 2;
 }
 
 void fat_init(void)
