@@ -24,14 +24,7 @@
 #include "ata.h" /* for volume definitions */
 #include "config.h"
 
-#define PHYSICAL_SECTOR_SIZE 512
-
-/* Some never players (such as iPod 5.5G) might have 2048 bytes per sector. */
-#ifdef IPOD_VIDEO
-#define MAX_SECTOR_SIZE 2048
-#else
-#define MAX_SECTOR_SIZE 512
-#endif
+#define SECTOR_SIZE 512
 
 /* Number of bytes reserved for a file name (including the trailing \0).
    Since names are stored in the entry as UTF-8, we won't be able to
@@ -86,7 +79,7 @@ struct fat_dir
     unsigned int entrycount;
     long sector;
     struct fat_file file;
-    unsigned char sectorcache[3][MAX_SECTOR_SIZE];
+    unsigned char sectorcache[3][SECTOR_SIZE];
 };
 
 
@@ -109,7 +102,6 @@ extern int fat_create_file(const char* name,
 extern long fat_readwrite(struct fat_file *ent, long sectorcount, 
                          void* buf, bool write );
 extern int fat_closewrite(struct fat_file *ent, long size, int attr);
-extern int fat_get_secsize(const struct fat_file *file);
 extern int fat_seek(struct fat_file *ent, unsigned long sector );
 extern int fat_remove(struct fat_file *ent);
 extern int fat_truncate(const struct fat_file *ent);

@@ -152,26 +152,29 @@ int disk_mount(int drive)
        real problem. */
     for (i=0; volume != -1 && i<4; i++)
     {
+#ifdef MAX_SECTOR_SIZE
+        int j;
+
+        for (j = 1; j <= (MAX_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
+        {
+            if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start * j))
+            {
+                pinfo[i].start *= j;
+                pinfo[i].size *= j;
+                mounted++;
+                vol_drive[volume] = drive; /* remember the drive for this volume */
+                volume = get_free_volume(); /* prepare next entry */
+                break;
+            }
+        }
+#else
         if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start))
         {
             mounted++;
             vol_drive[volume] = drive; /* remember the drive for this volume */
             volume = get_free_volume(); /* prepare next entry */
-            continue;
         }
-        
-# if MAX_SECTOR_SIZE != PHYSICAL_SECTOR_SIZE
-        /* Try again with sector size 2048 */
-        if (!fat_mount(IF_MV2(volume,) IF_MV2(drive,) pinfo[i].start 
-                       * (MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE)))
-        {
-            pinfo[i].start *= MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE;
-            pinfo[i].size  *= MAX_SECTOR_SIZE/PHYSICAL_SECTOR_SIZE;
-            mounted++;
-            vol_drive[volume] = drive; /* remember the drive for this volume */
-            volume = get_free_volume(); /* prepare next entry */
-        }
-# endif
+#endif
     }
 #endif
 
