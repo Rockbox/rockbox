@@ -58,6 +58,7 @@ static const struct button_mapping ondio_action[] =
 #define METRONOME_MSG_STOP "press pause"
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#define MET_SYNC
 static const struct button_mapping iriver_syncaction[] =
 {
     {METRONOME_SYNC, BUTTON_REC, BUTTON_NONE },
@@ -985,7 +986,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter){
                 break;
 #endif
 
-#ifdef METRONOME_SYNC
+#ifdef MET_SYNC
             case METRONOME_SYNC:
                 minitick = period;
                 break;
