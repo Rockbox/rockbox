@@ -24,13 +24,14 @@ that are not available within the \setting{Database Browser}. Read more about
 deals with the \setting{File Browser}.}
 
 \opt{ondio}{
-Unlike the Archos Firmware, Rockbox provides multivolume support for the 
-MultiMediaCard, this means the \dap{} can access both data volumes (internal 
-memory and the MMC), thus being able to for instance, build playlists with 
+Unlike the Archos Firmware, Rockbox provides multivolume support for the
+MultiMediaCard, this means the \dap{} can access both data volumes (internal
+memory and the MMC), thus being able to for instance, build playlists with
 files from both volumes.
-In File Browser mode a new folder will appear as soon as the device has read 
-the content after inserting the card. This new folder's name is generated as
-\fname{<MMC1>}, and will behave exactly as any other folder on the \dap{}.
+In the \setting{File Browser} a new folder will appear as soon as the device
+has read the content after inserting the card. This new folder's name is
+generated as \fname{<MMC1>}, and will behave exactly as any other folder
+on the \dap{}.
 }
 
 \subsection{\label{ref:controls}File Browser Controls}
@@ -42,29 +43,29 @@ the content after inserting the card. This new folder's name is generated as
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
         {
-          \ButtonOn+\ButtonUp/\ButtonDown
-          & Move one page up/down on the list.\\
+          \ButtonOn+\ButtonUp{}/ \ButtonDown
+          & Move one page up/down in the list.\\
         }
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IAUDIO_X5_PAD,ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{\ButtonLeft}
-      \opt{PLAYER_PAD}{\ButtonStop}
-      & Go to the parent directory. \\
+      \ActionTreeParentDirectory & Go to the parent directory.\\
       %
-      \ActionStdOk{}
+      \ActionTreeEnter
       & Executes an action. Depending on the file type, that action may vary.
         (See \reference{ref:Filemenu}) \\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,PLAYER_PAD,RECORDER_PAD}{\ButtonOn}
-      \opt{IAUDIO_X5_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{\ButtonPlay}
-      \opt{ONDIO_PAD}{Short press on \ButtonMenu}
-      & If there is an audio file playing, returns to the While Playing Screen 
-      (WPS) without stopping playback.  \\
+      \ActionTreeWps & If there is an audio file playing, returns to the
+         \setting{While Playing Screen} (WPS) without stopping playback.\\
+      %
+      \nopt{player}%
+        {%
+          \ActionTreeStop & Stops audio playback.\\%
+        }%
       %
       \ActionStdContext{}
-      & Enter the File Menu\\
+      & Enter the \setting{File Menu}\\
       %
       \ActionStdMenu{}
-      & Enter the Main Menu \\
+      & Enter the \setting{Main Menu}\\
       %
       \opt{RECORDER_PAD}{
         \ButtonFTwo & Switches to the Browse/Play Quick Menu \\
@@ -99,7 +100,7 @@ each option pertains both to files and directories):
 \item [Playlist.]
   Enters the \setting{Playlist Submenu} (see below).
 \item [Rename.]
-  This function lets the user modify a file name.
+  This function lets the user modify the name of a file or directory.
 \item [Cut.]
   Copies the name of the currently selected file or directory to the clipboard
   and marks it to be `cut'.
@@ -125,7 +126,7 @@ each option pertains both to files and directories):
   select a viewer by hand.
   For example, this function can be used to view a text file
   even if the file has a non-standard extension (i.e., the file has an extension
-  of something other than \fname{.txt}).  See \reference{ref:Viewersplugins}
+  of something other than \fname{.txt}). See \reference{ref:Viewersplugins}
   for more details on viewers.
 \item [Create Directory.]
   Create a new folder in the current folder on the disk.
@@ -194,38 +195,37 @@ before shutdown.
 
 \subsection{\label{sec:virtual_keyboard}Virtual Keyboard}
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
-This is the virtual keyboard that is used when entering file names in Rockbox.
-
+This is the virtual keyboard that is used when entering text in Rockbox, for
+  example when renaming a file or creating a new directory.
 
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
-      \ActionKbdLeft/\ActionKbdRight/\ActionKbdUp/\ActionKbdDown
+      \ActionKbdLeft{}/ \ActionKbdRight{}/ \ActionKbdUp{}/ \ActionKbdDown
       & Move about the virtual keyboard (moves the solid cursor) \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
         \ActionKbdCursorLeft{} or \ActionKbdCursorRight
-        & Move about within the current file name (moves the line cursor) \\
+        & Move the line cursor within the text line \\
       }
       %
       \ActionKbdSelect
-      & Inserts the currently selected keyboard letter at the current
-      filename cursor position \\
+      & Inserts the selected keyboard letter at the current cursor position \\
       %
       \ActionKbdAbort
       & Exits the virtual keyboard without saving any changes \\
       %
       \opt{RECORDER_PAD}{
         \ButtonFOne
-        & SHIFT: Shifts between the upper case, lower case and accented keyboards \\
+        & Shifts between the upper case, lower case and accented keyboards \\
       }
       %
       \ActionKbdDone
-      & OK: Exits the virtual keyboard and saves any changes \\
+      & Exits the virtual keyboard and saves any changes \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
         \ActionKbdBackSpace
-        & DEL: Deletes the character before the current filename cursor \\
+        & Deletes the character before the line cursor \\
       }
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{
@@ -249,7 +249,7 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
       & Inserts the currently selected keyboard letter at the current
       filename cursor position \\
       \ActionKbdDone
-      & OK: Exits the virtual keyboard and saves any changes \\
+      & Exits the virtual keyboard and saves any changes \\
       \ActionKbdAbort
       & Exits the virtual keyboard without saving any changes\\
     \end{btnmap}
@@ -289,16 +289,16 @@ This is the virtual keyboard that is used when entering file names in Rockbox.
 }
 
 \opt{player}{
-  The current filename is always listed on the first line of the display. The
-  second line of the display can contain the character selection bar, as in the
-  screenshot above.
+  The current text line to be entered or edited is always listed on the first
+  line of the display. The second line of the display can contain the character
+  selection bar, as in the screenshot above.
   \begin{table}
      \begin{btnmap}{}{}
        \ButtonOn & Toggle picker- and line edit mode\\
        \ButtonLeft/\ButtonRight &  moves back and forth in the selected \\
                                 & line (picker of input line) \\
        \ButtonPlay & Picks character in character bar, or acts as backspace \\
-                   & in the filename.\\
+                   & in the text line.\\
        Hold \ButtonPlay & Accept\\
        \ButtonStop & Cancel\\
        \ButtonMenu & Flips picker lines\\
