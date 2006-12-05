@@ -60,32 +60,6 @@ void set_cpu_frequency(long frequency);
 void cpu_boost(bool on_off);
 void cpu_idle_mode(bool on_off);
 int get_cpu_boost_counter(void);
-
-#if MEM > 1
-#define CPU_BOOST_TRACKING
-#endif
-
-#ifdef CPU_BOOST_TRACKING
-void cpu_boost_id(bool on_off, char id);
-const char *get_cpu_boost_tracker(void);
-/* CPU boost ID chars, in alphabetical order */
-#define CPUBOOSTID_PLAYBACK_AUDIO 'A'
-#define CPUBOOSTID_TAGTREE 'a'
-#define CPUBOOSTID_BACKLIGHT 'b'
-#define CPUBOOSTID_PLAYBACK_CODEC 'c'
-#define CPUBOOSTID_DIRCACHE 'd'
-#define CPUBOOSTID_MAININIT 'i'
-#define CPUBOOSTID_DEBUGMENU_MANUAL 'm'
-#define CPUBOOSTID_PLAYLIST 'P'
-#define CPUBOOSTID_PCMBUF 'p'
-#define CPUBOOSTID_PCMRECORD 'R'
-#define CPUBOOSTID_TREE 'r'
-#define CPUBOOSTID_TALK 'T'
-#define CPUBOOSTID_TAGCACHE 't'
-#define CPUBOOSTID_PLAYBACK_VOICE 'v'
-#else
-#define cpu_boost_id(on_off,id) cpu_boost(on_off)
-#endif
 #else
 #define FREQ CPU_FREQ
 #define set_cpu_frequency(frequency)

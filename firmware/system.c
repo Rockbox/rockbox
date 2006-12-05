@@ -34,37 +34,19 @@ long cpu_frequency = CPU_FREQ;
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 static int boost_counter = 0;
 static bool cpu_idle = false;
-#ifdef CPU_BOOST_TRACKING
-#define CPU_BOOST_TRACKER_MAX 15
-static char cpu_boost_tracker[CPU_BOOST_TRACKER_MAX+1] = "";
-#endif
 
 int get_cpu_boost_counter(void)
 {
     return boost_counter;
 }
 
-#ifdef CPU_BOOST_TRACKING
-const char *get_cpu_boost_tracker()
-{
-    return cpu_boost_tracker;
-}
-
-void cpu_boost_id(bool on_off, char id)
+void cpu_boost(bool on_off)
 {
     if(on_off)
     {
         /* Boost the frequency if not already boosted */
         if(boost_counter++ == 0)
             set_cpu_frequency(CPUFREQ_MAX);
-
-        /* Add to the boost tracker for debugging */
-        int l = strlen(cpu_boost_tracker);
-        if (l < CPU_BOOST_TRACKER_MAX)
-        {
-            cpu_boost_tracker[l] = id;
-            cpu_boost_tracker[l+1] = '\0';
-        }
     }
     else
     {
@@ -80,25 +62,7 @@ void cpu_boost_id(bool on_off, char id)
         /* Safety measure */
         if(boost_counter < 0)
             boost_counter = 0;
-
-        /* Remove an entry from the boost tracker */
-        int l = strlen(cpu_boost_tracker);
-        while (l >= 0 && cpu_boost_tracker[l] != id)
-            l--;
-        if (cpu_boost_tracker[l] != id)       /* No match found? */
-            l = strlen(cpu_boost_tracker)-1;  /* Just remove last one */
-        while (l < CPU_BOOST_TRACKER_MAX)
-        {
-            cpu_boost_tracker[l] = cpu_boost_tracker[l+1];
-            l++;
-        }
     }
-}
-#endif
-
-void cpu_boost(bool on_off)
-{
-    cpu_boost_id(on_off, '?');
 }
 
 void cpu_idle_mode(bool on_off)
@@ -115,8 +79,8 @@ void cpu_idle_mode(bool on_off)
             set_cpu_frequency(CPUFREQ_NORMAL);
     }
 }
+#endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
-#endif
 #if CONFIG_CPU == S3C2440
 
 void system_reboot(void) {

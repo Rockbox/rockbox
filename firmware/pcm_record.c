@@ -796,7 +796,7 @@ static void pcmrec_flush(unsigned flush_num)
 
     logf("writing: %d (%d)", num_ready, flush_num);
         
-    cpu_boost_id(true, CPUBOOSTID_PCMRECORD);
+    cpu_boost(true);
 
     for (i=0; i<num_ready; i++)
     {
@@ -844,7 +844,7 @@ static void pcmrec_flush(unsigned flush_num)
     if (rec_fdata.rec_file >= 0)
         fsync(rec_fdata.rec_file);
 
-        cpu_boost_id(false, CPUBOOSTID_PCMRECORD);
+        cpu_boost(false);
 
     if (prio != -1)
     {

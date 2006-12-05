@@ -3534,7 +3534,7 @@ void build_tagcache(const char *path)
 
     filenametag_fd = open_tag_fd(&header, tag_filename, false);
     
-    cpu_boost_id(true, CPUBOOSTID_TAGCACHE);
+    cpu_boost(true);
 
     logf("Scanning files...");
     /* Scan for new files. */
@@ -3562,7 +3562,7 @@ void build_tagcache(const char *path)
     if (!ret)
     {
         logf("Aborted.");
-        cpu_boost_id(false, CPUBOOSTID_TAGCACHE);
+        cpu_boost(false);
         return ;
     }
 
@@ -3588,7 +3588,7 @@ void build_tagcache(const char *path)
     }
 #endif
     
-    cpu_boost_id(false, CPUBOOSTID_TAGCACHE);
+    cpu_boost(false);
 }
 
 #ifdef HAVE_TC_RAMCACHE
@@ -3597,7 +3597,7 @@ static void load_ramcache(void)
     if (!hdr)
         return ;
         
-    cpu_boost_id(true, CPUBOOSTID_TAGCACHE);
+    cpu_boost(true);
     
     /* At first we should load the cache (if exists). */
     tc_stat.ramcache = load_tagcache();
@@ -3610,7 +3610,7 @@ static void load_ramcache(void)
         hdr = NULL;
     }
     
-    cpu_boost_id(false, CPUBOOSTID_TAGCACHE);
+    cpu_boost(false);
 }
 
 void tagcache_unload_ramcache(void)
@@ -3656,7 +3656,7 @@ static void tagcache_thread(void)
 
     /* If the previous cache build/update was interrupted, commit
      * the changes first in foreground. */
-    cpu_boost_id(true, CPUBOOSTID_TAGCACHE);
+    cpu_boost(true);
     allocate_tempbuf();
     commit();
     free_tempbuf();
@@ -3674,7 +3674,7 @@ static void tagcache_thread(void)
         allocate_tagcache();
 #endif
     
-    cpu_boost_id(false, CPUBOOSTID_TAGCACHE);
+    cpu_boost(false);
     tc_stat.initialized = true;
     
     /* Don't delay bootup with the header check but do it on background. */

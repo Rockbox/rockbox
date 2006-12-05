@@ -2872,14 +2872,14 @@ int playlist_insert_directory(struct playlist_info* playlist,
     context.queue = queue;
     context.count = 0;
 
-    cpu_boost_id(true, CPUBOOSTID_PLAYLIST);
+    cpu_boost(true);
 
     result = playlist_directory_tracksearch(dirname, recurse,
         directory_search_callback, &context);
 
     sync_control(playlist, false);
 
-    cpu_boost_id(false, CPUBOOSTID_PLAYLIST);
+    cpu_boost(false);
 
     display_playlist_count(context.count, count_str);
 
@@ -2941,7 +2941,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     display_playlist_count(count, count_str);
 
-    cpu_boost_id(true, CPUBOOSTID_PLAYLIST);
+    cpu_boost(true);
 
     while ((max = read_line(fd, temp_buf, sizeof(temp_buf))) > 0)
     {
@@ -3000,7 +3000,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
 
     sync_control(playlist, false);
 
-    cpu_boost_id(false, CPUBOOSTID_PLAYLIST);
+    cpu_boost(false);
 
     display_playlist_count(count, count_str);
 
@@ -3347,7 +3347,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
     display_playlist_count(count, str(LANG_PLAYLIST_SAVE_COUNT));
 
-    cpu_boost_id(true, CPUBOOSTID_PLAYLIST);
+    cpu_boost(true);
 
     index = playlist->first_index;
     for (i=0; i<playlist->amount; i++)
@@ -3440,7 +3440,7 @@ int playlist_save(struct playlist_info* playlist, char *filename)
 
     }
 
-    cpu_boost_id(false, CPUBOOSTID_PLAYLIST);
+    cpu_boost(false);
 
     return result;
 }

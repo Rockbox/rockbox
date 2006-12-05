@@ -1280,11 +1280,7 @@ bool dbg_cpufreq(void)
         snprintf(buf, sizeof(buf), "Frequency: %ld", FREQ);
         lcd_puts(0, line++, buf);
 
-#ifdef CPU_BOOST_TRACKING
-        snprintf(buf, sizeof(buf), "boost_counter: %d %s", get_cpu_boost_counter(), get_cpu_boost_tracker());
-#else
         snprintf(buf, sizeof(buf), "boost_counter: %d", get_cpu_boost_counter());
-#endif
         lcd_puts(0, line++, buf);
 
         lcd_update();
@@ -1293,16 +1289,16 @@ bool dbg_cpufreq(void)
         switch(button)
         {
             case ACTION_STD_PREV:
-                cpu_boost_id(true, CPUBOOSTID_DEBUGMENU_MANUAL);
+                cpu_boost(true);
                 break;
 
             case ACTION_STD_NEXT:
-                cpu_boost_id(false, CPUBOOSTID_DEBUGMENU_MANUAL);
+                cpu_boost(false);
                 break;
 
             case ACTION_STD_OK:
                 while (get_cpu_boost_counter() > 0)
-                    cpu_boost_id(false, CPUBOOSTID_DEBUGMENU_MANUAL);
+                    cpu_boost(false);
                 set_cpu_frequency(CPUFREQ_DEFAULT);
                 break;
 
