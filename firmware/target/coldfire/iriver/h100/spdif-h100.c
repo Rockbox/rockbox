@@ -62,16 +62,34 @@ void spdif_set_output_source(int source, bool src_on)
         [AUDIO_SRC_FMRADIO+1]  = (7 << 12) | (4 << 8) | (1 << 5) | (5 << 2),
     };
 
+    int level;
+    unsigned long playing, recording;
+
     if ((unsigned)source >= ARRAYLEN(ebu1_config))
         source = AUDIO_SRC_PLAYBACK;
-
-    EBU1CONFIG = 0x800; /* Reset before reprogram */
 
     spdif_source = source;
     spdif_on     = spdif_powered() && src_on;
 
+    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+
+    /* Check if DMA peripheral requests are enabled */
+    playing   = DCR0 & DMA_EEXT;
+    recording = DCR1 & DMA_EEXT;
+
+    EBU1CONFIG = 0x800; /* Reset before reprogram */
+
     /* Tranceiver must be powered or else monitoring will be disabled */
     EBU1CONFIG = spdif_on ? ebu1_config[source + 1] : 0;
+
+    /* Kick-start DMAs if in progress */
+    if (recording)
+        DCR1 |= DMA_START;
+
+    if (playing)
+        DCR0 |= DMA_START;
+
+    set_irq_level(level);
 } /* spdif_set_output_source */
 
 /* Return the last set S/PDIF audio source */
