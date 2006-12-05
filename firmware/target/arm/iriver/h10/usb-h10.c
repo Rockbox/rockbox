@@ -51,6 +51,8 @@ void usb_enable(bool on)
      * bootloader can start up in UMS mode. This does not return. */
     if (on && (button_status()==BUTTON_RIGHT))
     {
+        ata_sleepnow(); /* Immediately spindown the disk. */
+        sleep(HZ*2);
         system_reboot();
     }
 }
