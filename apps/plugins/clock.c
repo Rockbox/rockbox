@@ -986,7 +986,7 @@ void init_clock(void)
     #define ANALOG_VALUES 60
     #define ANALOG_YCENTER (LCD_HEIGHT/2)
     #define ANALOG_XCENTER (LCD_WIDTH/2)
-    #define ANALOG_MIN_RADIUS (LCD_HEIGHT/2 -10)
+    #define ANALOG_MIN_RADIUS MIN(LCD_HEIGHT/2 -10, LCD_WIDTH/2 -10)
     #define ANALOG_HR_RADIUS (ANALOG_MIN_RADIUS-8)
 
     #define PI 3.141592
