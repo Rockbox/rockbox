@@ -288,7 +288,7 @@ void init(void)
 #ifdef CPU_COLDFIRE
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
 #endif
-    cpu_boost_id(true, CPUBOOSTID_MAININIT);
+    cpu_boost(true);
 #endif
     
     buffer_init();
@@ -498,7 +498,7 @@ void init(void)
 #endif
 
     /* runtime database has to be initialized after audio_init() */
-    cpu_boost_id(false, CPUBOOSTID_MAININIT);
+    cpu_boost(false);
 
 #ifdef AUTOROCK
     {
