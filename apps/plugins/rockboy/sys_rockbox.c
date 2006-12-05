@@ -180,7 +180,8 @@ void ev_poll(void)
 #endif
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-    (CONFIG_KEYPAD == IPOD_4G_PAD)
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == GIGABEAT_PAD)
 #ifdef HAVE_WHEEL_POSITION
             rb->wheel_send_events(true);
 #endif
