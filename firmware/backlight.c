@@ -239,7 +239,7 @@ static void backlight_switch(void)
 static void backlight_release_timer(void)
 {
 #ifdef CPU_COLDFIRE
-    cpu_boost_id(false, CPUBOOSTID_BACKLIGHT);
+    cpu_boost(false);
 #endif
     timer_unregister();
     bl_timer_active = false;
@@ -261,7 +261,7 @@ static void backlight_dim(int value)
     {
 #ifdef CPU_COLDFIRE
         /* Prevent cpu frequency changes while dimming. */
-        cpu_boost_id(true, CPUBOOSTID_BACKLIGHT);
+        cpu_boost(true);
 #endif
         bl_timer_active = true;
     }
@@ -478,7 +478,7 @@ void backlight_thread(void)
 #if defined(HAVE_BACKLIGHT_PWM_FADING) && defined(CPU_COLDFIRE) \
     && !defined(SIMULATOR)
             case BACKLIGHT_UNBOOST_CPU:
-                cpu_boost_id(false, CPUBOOSTID_BACKLIGHT);
+                cpu_boost(false);
                 break;
 #endif
 
