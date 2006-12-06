@@ -207,7 +207,7 @@ void pcm_init(void)
        delay is needed for the line out connector). */
     sleep(HZ);
     /* Power on FSDAC and HP amp. */
-    uda1380_enable_output(true);
+    audiohw_enable_output(true);
 #elif defined(HAVE_TLV320)
     sleep(HZ/4);
 #endif
