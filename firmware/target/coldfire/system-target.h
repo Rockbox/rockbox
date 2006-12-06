@@ -140,11 +140,7 @@ static inline void invalidate_icache(void)
                  "movec.l %d0,%cacr");
 }
 
-#ifdef IAUDIO_X5
 #define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
-#else
-#define DEFAULT_PLLCR_AUDIO_BITS 0x10400000
-#endif
 void coldfire_set_pllcr_audio_bits(long bits);
 
 /* 11.2896 MHz */
