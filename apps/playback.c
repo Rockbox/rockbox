@@ -3556,17 +3556,16 @@ static void audio_thread(void)
             if (ev.id == SYS_TIMEOUT)
                 ev.id = Q_AUDIO_FILL_BUFFER;
         }
-#if MEM > 8
         else
         {
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
+#if MEM > 8
             if (playing && (ev.id == SYS_TIMEOUT) &&
                 (FILEBUFUSED < high_watermark))
                 register_ata_idle_func(ata_fillbuffer_callback);
-        }
-#else
-            queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
 #endif
+        }
+
         switch (ev.id) {
 #if MEM > 8
             case Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA:
