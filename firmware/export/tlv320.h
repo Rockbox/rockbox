@@ -23,7 +23,7 @@
 #define VOLUME_MIN -730
 #define VOLUME_MAX  60
 
-extern tenthdb2master(int db);
+extern int tenthdb2master(int db);
 
 /*** definitions ***/
 

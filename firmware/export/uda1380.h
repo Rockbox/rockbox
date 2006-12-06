@@ -24,8 +24,8 @@
 #define VOLUME_MIN -840
 #define VOLUME_MAX  0
 
-extern tenthdb2master(int db);
-extern tenthdb2mixer(int db);
+extern int tenthdb2master(int db);
+extern int tenthdb2mixer(int db);
 
 extern void audiohw_reset(void);
 extern int audiohw_init(void);
