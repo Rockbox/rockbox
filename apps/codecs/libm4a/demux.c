@@ -525,8 +525,8 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
             }
             break;
         default:
-            DEBUGF("(stbl) unknown chunk id: %c%c%c%c\n",
-                   SPLITFOURCC(sub_chunk_id));
+            /*DEBUGF("(stbl) unknown chunk id: %c%c%c%c\n",
+                   SPLITFOURCC(sub_chunk_id));*/
             stream_skip(qtmovie->stream, sub_chunk_len - 8);
         }
 
@@ -537,57 +537,58 @@ static bool read_chunk_stbl(qtmovie_t *qtmovie, size_t chunk_len)
 
 static bool read_chunk_minf(qtmovie_t *qtmovie, size_t chunk_len)
 {
-    size_t dinf_size, stbl_size;
     size_t size_remaining = chunk_len - 8;
     uint32_t i;
 
-  /**** SOUND HEADER CHUNK ****/
-    if ((i=stream_read_uint32(qtmovie->stream)) != 16)
+    /* Check for smhd, only kind of minf we care about */
+
+    if ((i = stream_read_uint32(qtmovie->stream)) != 16)
     {
         DEBUGF("unexpected size in media info: %d\n",i);
         stream_skip(qtmovie->stream, size_remaining-4);
         return true;
     }
+
     if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','m','h','d'))
     {
         DEBUGF("not a sound header! can't handle this.\n");
         return false;
     }
-    /* now skip the rest */
+
+    /* now skip the rest of the atom */
     stream_skip(qtmovie->stream, 16 - 8);
     size_remaining -= 16;
-  /****/
 
-  /**** DINF CHUNK ****/
-    dinf_size = stream_read_uint32(qtmovie->stream);
-    if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('d','i','n','f'))
+    while (size_remaining)
     {
-        DEBUGF("expected dinf, didn't get it.\n");
-        return false;
-    }
-    /* skip it */
-    stream_skip(qtmovie->stream, dinf_size - 8);
-    size_remaining -= dinf_size;
-  /****/
+        size_t sub_chunk_len;
+        fourcc_t sub_chunk_id;
 
+        sub_chunk_len = stream_read_uint32(qtmovie->stream);
 
-  /**** SAMPLE TABLE ****/
-    stbl_size = stream_read_uint32(qtmovie->stream);
-    if (stream_read_uint32(qtmovie->stream) != MAKEFOURCC('s','t','b','l'))
-    {
-        DEBUGF("expected stbl, didn't get it.\n");
-        return false;
-    }
-    if (!read_chunk_stbl(qtmovie, stbl_size)) {
-       return false;
-    }
+        if (sub_chunk_len <= 1 || sub_chunk_len > size_remaining)
+        {
+            DEBUGF("strange size (%u) for chunk inside minf\n", sub_chunk_len);
+            return false;
+        }
 
-    size_remaining -= stbl_size;
+        sub_chunk_id = stream_read_uint32(qtmovie->stream);
+        
+        switch (sub_chunk_id)
+        {
+        case MAKEFOURCC('s','t','b','l'):
+            if (!read_chunk_stbl(qtmovie, sub_chunk_len)) {
+                return false;
+            }
+            break;
+        default:
+            /*DEBUGF("(minf) unknown chunk id: %c%c%c%c\n",
+                   SPLITFOURCC(sub_chunk_id));*/
+            stream_skip(qtmovie->stream, sub_chunk_len - 8);
+            break;
+        }
 
-    if (size_remaining)
-    {
-        DEBUGF("oops\n");
-        stream_skip(qtmovie->stream, size_remaining);
+        size_remaining -= sub_chunk_len;
     }
     return true;
 }
