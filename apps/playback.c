@@ -3560,7 +3560,7 @@ static void audio_thread(void)
         else
         {
             queue_wait_w_tmo(&audio_queue, &ev, HZ/2);
-            if ( (ev.id == SYS_TIMEOUT) &&
+            if (playing && (ev.id == SYS_TIMEOUT) &&
                 (FILEBUFUSED < high_watermark))
                 register_ata_idle_func(ata_fillbuffer_callback);
         }

@@ -614,7 +614,7 @@ static void ata_thread(void)
                      TIME_AFTER( current_tick, 
                                 last_disk_activity + sleep_timeout ) )
                 {
-                    call_ata_idle_notifys(false);
+                    call_ata_idle_notifys(true);
                     ata_perform_sleep();
                     last_sleep = current_tick;
                 }

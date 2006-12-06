@@ -2086,6 +2086,14 @@ bool do_set_setting(const unsigned char* string, void *variable,
         if ( function )
             function(type_fromvoidptr(cb_data->type,variable));
     }
+    if (cb_data->type == INT)
+    {
+        if (oldvalue != *(int*)variable)
+            settings_save();
+    }
+    else if (oldvalue != *(bool*)variable)
+         settings_save();
+
     return false;
 }
 bool set_int(const unsigned char* string,

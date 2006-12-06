@@ -77,8 +77,11 @@ bool call_ata_idle_notifys(bool force)
     int i;
     static int lock_until = 0;
     ata_idle_notify function;
-    if (!force && TIME_BEFORE(current_tick,lock_until) )
-        return false;
+    if (!force)
+    {
+        if (TIME_BEFORE(current_tick,lock_until) )
+            return false;
+    }
     lock_until = current_tick + 30*HZ;
 
     for (i = 0; i < MAX_ATA_CALLBACKS; i++)

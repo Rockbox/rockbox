@@ -162,6 +162,7 @@ int init_dircache(bool preinit)
         {
             backlight_on();
             show_logo();
+            settings_save();
         }
     }
     

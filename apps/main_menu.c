@@ -435,7 +435,6 @@ bool main_menu(void)
 #endif
     menu_exit(m);
 
-    settings_save();
     return result;
 }
 
