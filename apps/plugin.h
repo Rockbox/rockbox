@@ -580,8 +580,8 @@ struct plugin_api {
 #ifndef SIMULATOR
     void (*pcm_init_recording)(void);
     void (*pcm_close_recording)(void);
-    void (*pcm_record_data)(pcm_more_callback_type more_ready,
-                            unsigned char *start, size_t size);
+    void (*pcm_record_data)(pcm_more_callback_type2 more_ready,
+                            void *start, size_t size);
     void (*pcm_stop_recording)(void);
     void (*pcm_calculate_rec_peaks)(int *left, int *right);
     void (*audio_set_recording_gain)(int left, int right, int type);
@@ -598,6 +598,7 @@ struct plugin_api {
 
 #if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
     int (*sound_default)(int setting);
+    void (*pcm_record_more)(void *start, size_t size);
 #endif
 };
 

@@ -20,9 +20,9 @@
 #ifndef PCM_RECORD_H
 #define PCM_RECORD_H
 
-#define DMA_REC_ERROR_DMA       ((size_t)-1)
+#define DMA_REC_ERROR_DMA       (-1)
 #ifdef HAVE_SPDIF_IN
-#define DMA_REC_ERROR_SPDIF     ((size_t)-2)
+#define DMA_REC_ERROR_SPDIF     (-2)
 #endif
 
 /**
@@ -36,11 +36,14 @@ void pcm_init_recording(void);
 void pcm_close_recording(void);
 
 /* Start recording "raw" PCM data */
-void pcm_record_data(pcm_more_callback_type more_ready,
-                     unsigned char *start, size_t size);
+void pcm_record_data(pcm_more_callback_type2 more_ready,
+                     void *start, size_t size);
 
 /* Stop tranferring data into supplied buffer */
 void pcm_stop_recording(void);
+
+/* Continue transferring data in - call during interrupt handler */
+void pcm_record_more(void *start, size_t size);
 
 void pcm_calculate_rec_peaks(int *left, int *right);
 
@@ -64,12 +67,12 @@ int  pcm_get_num_unprocessed(void);
 /** The following are for internal use between pcm_record.c and target-
     specific portion **/
 /* the registered callback function for when more data is available */
-extern volatile pcm_more_callback_type pcm_callback_more_ready;
+extern volatile pcm_more_callback_type2 pcm_callback_more_ready;
 /* DMA transfer in is currently active */
-extern volatile bool                   pcm_recording;
+extern volatile bool                    pcm_recording;
 
 /* APIs implemented in the target-specific portion */
-extern void pcm_rec_dma_start(const void *addr, size_t size);
+extern void pcm_rec_dma_start(void *addr, size_t size);
 extern void pcm_rec_dma_stop(void);
 
 #endif /* PCM_RECORD_H */

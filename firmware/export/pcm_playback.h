@@ -24,6 +24,7 @@
 /* Typedef for registered callback (play and record) */
 typedef void (*pcm_more_callback_type)(unsigned char **start,
                                        size_t *size);
+typedef int (*pcm_more_callback_type2)(int status);
 
 void pcm_init(void);
 

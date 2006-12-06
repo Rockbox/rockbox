@@ -482,6 +482,7 @@ static const struct plugin_api rockbox_api = {
 
 #if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) && !defined(SIMULATOR)
     sound_default,
+    pcm_record_more,
 #endif
 };
 

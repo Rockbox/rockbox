@@ -287,7 +287,7 @@ void DMA0(void)
 /****************************************************************************
  ** Recording DMA transfer
  **/
-void pcm_rec_dma_start(const void *addr, size_t size)
+void pcm_rec_dma_start(void *addr, size_t size)
 {
     logf("pcm_rec_dma_start");
 
@@ -296,12 +296,6 @@ void pcm_rec_dma_start(const void *addr, size_t size)
 
     pcm_recording = true;
 
-    DAR1 = (unsigned long)addr;   /* Destination address */
-    SAR1 = (unsigned long)&PDIR2; /* Source address      */
-    BCR1 = size;                  /* Bytes to transfer   */
-
-    rec_peak_addr = (unsigned long *)addr;
-
     pcm_apply_settings(false);
 
     /* Start the DMA transfer.. */
@@ -309,18 +303,22 @@ void pcm_rec_dma_start(const void *addr, size_t size)
     INTERRUPTCLEAR = 0x03c00000;
 #endif
 
-    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
-           DMA_DSIZE(3) | DMA_START;
+    SAR1 = (unsigned long)&PDIR2; /* Source address        */
+    DCR1 = DMA_INT | DMA_CS | DMA_AA | DMA_DINC | DMA_DSIZE(3);
+
+    pcm_record_more(addr, size);
+
+    DCR1 |= DMA_START;
 } /* pcm_dma_start */
 
 void pcm_rec_dma_stop(void)
 {
     logf("pcm_rec_dma_stop");
 
-    pcm_recording = false;
-
-    DCR1 = 0;
     DSR1 = 1;         /* Clear interrupt */
+    DCR1 = 0;
+
+    pcm_recording = false;
 } /* pcm_dma_stop */
 
 void pcm_init_recording(void)
@@ -338,7 +336,7 @@ void pcm_init_recording(void)
 
     pcm_rec_dma_stop();
 
-    ICR7 = (7 << 2);        /* Enable interrupt at level 7, priority 0      */
+    ICR7 = (6 << 2);        /* Enable interrupt at level 6, priority 0      */
     IMR &= ~(1 << 15);      /* bit 15 is DMA1                               */
 } /* pcm_init_recording */
 
@@ -359,17 +357,15 @@ void DMA1(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA1(void)
 {
     int res = DSR1;
-    pcm_more_callback_type more_ready;
-    unsigned char         *next_start;
-    ssize_t                next_size = 0; /* passing <> 0 is indicates
-                                             an error condition */
+    int status = 0;
+    pcm_more_callback_type2 more_ready;
 
-    DSR1  = 1;    /* Clear interrupt */
-    DCR1 &= ~DMA_EEXT;
+    DSR1  = 1;          /* Clear interrupt */
+    DCR1 &= ~DMA_EEXT;  /* Disable peripheral request */
 
     if (res & 0x70)
     {
-        next_size = DMA_REC_ERROR_DMA;
+        status = DMA_REC_ERROR_DMA;
         logf("DMA1 err: 0x%x", res);
     }
 #ifdef HAVE_SPDIF_IN
@@ -377,36 +373,32 @@ void DMA1(void)
         (INTERRUPTSTAT & 0x01c00000)) /* valnogood, symbolerr, parityerr */
     {
         INTERRUPTCLEAR = 0x03c00000;
-        next_size = DMA_REC_ERROR_SPDIF;
+        status = DMA_REC_ERROR_SPDIF;
         logf("spdif err");
     }
 #endif
 
     more_ready = pcm_callback_more_ready;
 
-    if (more_ready)
-        more_ready(&next_start, &next_size);
-
-    if (next_size > 0)
-    {
-        /* Start peaking at dest */
-        rec_peak_addr = (unsigned long *)next_start;
-        DAR1  = (unsigned long)next_start; /* Destination address */
-        BCR1  = (unsigned long)next_size;  /* Bytes to transfer   */
-        DCR1 |= DMA_EEXT;
+    if (more_ready != NULL && more_ready(status) >= 0)
         return;
-    }
-    else
-    {
-#if 0
-        /* int. logfs can trash the display */
-        logf("DMA1 No Data:0x%04x", res);
-#endif
-    }
 
+#if 0
+    /* int. logfs can trash the display */
+    logf("DMA1 done:%04x %d", res, status);
+#endif
     /* Finished recording */
     pcm_rec_dma_stop();
 } /* DMA1 */
+
+/* Continue transferring data in */
+void pcm_record_more(void *start, size_t size)
+{
+    rec_peak_addr = (unsigned long *)start; /* Start peaking at dest */
+    DAR1          = (unsigned long)start;   /* Destination address */
+    BCR1          = (unsigned long)size;    /* Bytes to transfer   */
+    DCR1         |= DMA_EEXT;
+}
 
 void pcm_mute(bool mute)
 {

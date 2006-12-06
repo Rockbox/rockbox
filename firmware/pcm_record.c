@@ -55,13 +55,9 @@
     be shared semi-privately **/
 
 /* the registered callback function for when more data is available */
-volatile pcm_more_callback_type pcm_callback_more_ready = NULL;
+volatile pcm_more_callback_type2 pcm_callback_more_ready = NULL;
 /* DMA transfer in is currently active */
-volatile bool                   pcm_recording           = false;
-
-/* APIs implemented in the target-specific portion */
-void pcm_rec_dma_start(const void *addr, size_t size);
-void pcm_rec_dma_stop(void);
+volatile bool                    pcm_recording           = false;
 
 /** General recording state **/
 static bool is_recording;              /* We are recording */
@@ -225,16 +221,16 @@ static void pcm_thread_wait_for_stop(void)
 /*******************************************************************/
     
 /* Callback for when more data is ready */
-static void pcm_rec_have_more(unsigned char **data, size_t *size)
+static int pcm_rec_have_more(int status)
 {
-    if (*size != 0)
+    if (status < 0)
     {
         /* some error condition */
-        if (*size == DMA_REC_ERROR_DMA)
+        if (status == DMA_REC_ERROR_DMA)
         {
             /* Flush recorded data to disk and stop recording */
             queue_post(&pcmrec_queue, PCMREC_STOP, NULL);
-            return;
+            return -1;
         }
         /* else try again next transmission */
     }
@@ -243,9 +239,9 @@ static void pcm_rec_have_more(unsigned char **data, size_t *size)
         /* advance write position */
         dma_wr_pos = (dma_wr_pos + PCM_CHUNK_SIZE) & PCM_CHUNK_MASK;
     }
-    
-    *data = (unsigned char *)GET_PCM_CHUNK(dma_wr_pos);
-    *size = PCM_CHUNK_SIZE;
+
+    pcm_record_more(GET_PCM_CHUNK(dma_wr_pos), PCM_CHUNK_SIZE);
+    return 0;
 } /* pcm_rec_have_more */
 
 /** pcm_rec_* group **/
@@ -423,9 +419,9 @@ void audio_set_recording_options(struct audio_recording_options *options)
     if (audio_load_encoder(enc_config.afmt))
     {
         /* start DMA transfer */
-        pcm_record_data(pcm_rec_have_more, NULL, 0);
-        /* do unlock after starting to prevent preincrement of dma_wr_pos */
         dma_lock = pre_record_ticks == 0;
+        pcm_record_data(pcm_rec_have_more, GET_PCM_CHUNK(dma_wr_pos),
+                        PCM_CHUNK_SIZE);
     }
     else
     {
@@ -1621,20 +1617,14 @@ size_t enc_unget_pcm_data(size_t size)
  * Functions that do not require targeted implementation but only a targeted
  * interface
  */
-void pcm_record_data(pcm_more_callback_type more_ready,
-                     unsigned char *start, size_t size)
+void pcm_record_data(pcm_more_callback_type2 more_ready,
+                     void *start, size_t size)
 {
-    pcm_callback_more_ready = more_ready;
-
     if (!(start && size))
-    {
-        size = 0;
-        if (more_ready)
-            more_ready(&start, &size);
-    }
+        return;
 
-    if (start && size)
-        pcm_rec_dma_start(start, size);
+    pcm_callback_more_ready = more_ready;
+    pcm_rec_dma_start(start, size);
 } /* pcm_record_data */
 
 void pcm_stop_recording(void)
