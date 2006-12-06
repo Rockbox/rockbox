@@ -62,9 +62,9 @@ copy_read_sectors:
     move.l  %d2, %d3
     lsr.l   #8, %d3
     move.b  %d3, (%a0)+     /* write high byte of it, aligns dest addr */
-        
-    btst.l  #1, %d0         /* longword aligned? */
-    beq.b   .r_end_u_w1     /* yes, skip leading word handling */
+
+    btst.l  #1, %d0         /* longword aligned? (testing old d0 value!) */
+    bne.b   .r_end_u_w1     /* yes, skip leading word handling */
 
     swap    %d2             /* move initial word up */
     move.w  (%a2), %d2      /* combine with second word */
@@ -273,8 +273,8 @@ copy_write_sectors:
 
     move.b  (%a0)+, %d2
 
-    btst.l  #1, %d0         /* longword aligned? */
-    beq.b   .w_end_u_w1     /* yes, skip leading word handling */
+    btst.l  #1, %d0         /* longword aligned? (testing old d0 value!) */
+    bne.b   .w_end_u_w1     /* yes, skip leading word handling */
 
     swap    %d2
     move.w  (%a0)+, %d2
