@@ -90,7 +90,6 @@ static int shutdown_timeout = 0;
 
 #ifdef SIMULATOR /***********************************************************/
 
-#define TIME2CHANGE     10              /* change levels every 10 seconds */
 #define BATT_MINCVOLT   250             /* minimum centivolts of battery */
 #define BATT_MAXCVOLT   450             /* maximum centivolts of battery */
 #define BATT_MAXRUNTIME (10 * 60)       /* maximum runtime with full battery in minutes */
@@ -105,11 +104,11 @@ static void battery_status_update(void)
     time_t          now;
 
     time(&now);
-    if (last_change < (now - TIME2CHANGE)) {
+    if (last_change < now) {
         last_change = now;
 
         /* change the values: */
-        batt_centivolts -= (unsigned int)(BATT_MAXCVOLT - BATT_MINCVOLT) / 11;
+        batt_centivolts -= (unsigned int)(BATT_MAXCVOLT - BATT_MINCVOLT) / 101;
         if (batt_centivolts < (unsigned int)BATT_MINCVOLT)
             batt_centivolts = (unsigned int)BATT_MAXCVOLT;
 
