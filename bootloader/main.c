@@ -315,7 +315,7 @@ void main(void)
 #endif
 
 #ifdef HAVE_UDA1380
-    uda1380_reset();
+    audiohw_reset();
 #endif
 
     backlight_init();
