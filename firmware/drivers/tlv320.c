@@ -33,6 +33,22 @@
 #include "i2c-coldfire.h"
 #include "tlv320.h"
 
+/* convert tenth of dB volume (-840..0) to master volume register value */
+int tenthdb2master(int db)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 == +6dB  (0x7f) */
+    /* 1111001 == 0dB   (0x79) */
+    /* 0110000 == -73dB (0x30 */
+    /* 0101111 == mute  (0x2f) */
+
+    if (db < VOLUME_MIN) {
+        return 0x2f;
+    } else {
+        return((db/10)+73+0x30);
+    }
+}
+
 /* local functions and definations */
 #define TLV320_ADDR 0x34
 

@@ -20,6 +20,13 @@
 #ifndef _WM8975_H
 #define _WM8975_H
 
+/* volume/balance/treble/bass interdependency */
+#define VOLUME_MIN -730
+#define VOLUME_MAX  60
+
+extern int tenthdb2master(int db);
+extern int tenthdb2mixer(int db);
+
 extern void audiohw_reset(void);
 extern int audiohw_init(void);
 extern void audiohw_enable_output(bool enable);

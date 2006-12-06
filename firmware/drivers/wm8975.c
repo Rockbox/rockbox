@@ -40,6 +40,36 @@
 #include "wmcodec.h"
 #include "wm8975.h"
 
+/* convert tenth of dB volume (-730..60) to master volume register value */
+int tenthdb2master(int db)
+{
+    /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
+    /* 1111111 == +6dB  (0x7f) */
+    /* 1111001 == 0dB   (0x79) */
+    /* 0110000 == -73dB (0x30 */
+    /* 0101111 == mute  (0x2f) */
+
+    if (db < VOLUME_MIN) {
+        return 0x0;
+    } else {
+        return((db/10)+73+0x30);
+    }
+}
+
+/* convert tenth of dB volume (-780..0) to mixer volume register value */
+int tenthdb2mixer(int db)
+{
+    if (db < -660)                 /* 1.5 dB steps */
+        return (2640 - db) / 15;
+    else if (db < -600)            /* 0.75 dB steps */
+        return (990 - db) * 2 / 15;
+    else if (db < -460)            /* 0.5 dB steps */
+        return (460 - db) / 5; 
+    else                           /* 0.25 dB steps */
+        return -db * 2 / 5;
+}
+
+
 void audiohw_reset(void);
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */

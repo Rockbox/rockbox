@@ -20,6 +20,11 @@
 #ifndef _TLV320_H_
 #define _TLV320_H_
 
+#define VOLUME_MIN -730
+#define VOLUME_MAX  60
+
+extern tenthdb2master(int db);
+
 /*** definitions ***/
 
 extern void audiohw_init(void);
