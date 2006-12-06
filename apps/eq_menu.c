@@ -788,7 +788,7 @@ static bool eq_hw_set_band0_cutoff(void)
         sizeof(names) / sizeof(*names), NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
+    audiohw_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
                                 global_settings.eq_hw_band0_gain);
 #endif
 
@@ -803,7 +803,7 @@ static bool eq_hw_set_band0_gain(void)
         eq_hw_gain_format);
         
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
+    audiohw_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0,
                                 global_settings.eq_hw_band0_gain);
 #endif
 
@@ -824,7 +824,7 @@ static bool eq_hw_set_band1_center(void)
         sizeof(names) / sizeof(*names), NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+    audiohw_set_equalizer_band(1, global_settings.eq_hw_band1_center,
                                 global_settings.eq_hw_band1_bandwidth,
                                 global_settings.eq_hw_band1_gain);
 #endif
@@ -839,7 +839,7 @@ static bool eq_hw_set_band1_bandwidth(void)
         BANDWIDTH_NAMES_SIZE, NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+    audiohw_set_equalizer_band(1, global_settings.eq_hw_band1_center,
                                 global_settings.eq_hw_band1_bandwidth,
                                 global_settings.eq_hw_band1_gain);
 #endif
@@ -855,7 +855,7 @@ static bool eq_hw_set_band1_gain(void)
         eq_hw_gain_format);
         
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+    audiohw_set_equalizer_band(1, global_settings.eq_hw_band1_center,
                                 global_settings.eq_hw_band1_bandwidth,
                                 global_settings.eq_hw_band1_gain);
 #endif
@@ -877,7 +877,7 @@ static bool eq_hw_set_band2_center(void)
         sizeof(names) / sizeof(*names), NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+    audiohw_set_equalizer_band(2, global_settings.eq_hw_band2_center,
                                 global_settings.eq_hw_band2_bandwidth,
                                 global_settings.eq_hw_band2_gain);
 #endif
@@ -892,7 +892,7 @@ static bool eq_hw_set_band2_bandwidth(void)
         BANDWIDTH_NAMES_SIZE, NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+    audiohw_set_equalizer_band(2, global_settings.eq_hw_band2_center,
                                 global_settings.eq_hw_band2_bandwidth,
                                 global_settings.eq_hw_band2_gain);
 #endif
@@ -908,7 +908,7 @@ static bool eq_hw_set_band2_gain(void)
         eq_hw_gain_format);
         
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+    audiohw_set_equalizer_band(2, global_settings.eq_hw_band2_center,
                                 global_settings.eq_hw_band2_bandwidth,
                                 global_settings.eq_hw_band2_gain);
 #endif
@@ -930,7 +930,7 @@ static bool eq_hw_set_band3_center(void)
         sizeof(names) / sizeof(*names), NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+    audiohw_set_equalizer_band(3, global_settings.eq_hw_band3_center,
                                 global_settings.eq_hw_band3_bandwidth,
                                 global_settings.eq_hw_band3_gain);
 #endif
@@ -945,7 +945,7 @@ static bool eq_hw_set_band3_bandwidth(void)
         BANDWIDTH_NAMES_SIZE, NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+    audiohw_set_equalizer_band(3, global_settings.eq_hw_band3_center,
                                 global_settings.eq_hw_band3_bandwidth,
                                 global_settings.eq_hw_band3_gain);
 #endif
@@ -961,7 +961,7 @@ static bool eq_hw_set_band3_gain(void)
         eq_hw_gain_format);
         
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+    audiohw_set_equalizer_band(3, global_settings.eq_hw_band3_center,
                                 global_settings.eq_hw_band3_bandwidth,
                                 global_settings.eq_hw_band3_gain);
 #endif
@@ -983,7 +983,7 @@ static bool eq_hw_set_band4_cutoff(void)
         sizeof(names) / sizeof(*names), NULL);
 
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
+    audiohw_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
                                 global_settings.eq_hw_band4_gain);
 #endif
 
@@ -998,7 +998,7 @@ static bool eq_hw_set_band4_gain(void)
         eq_hw_gain_format);
         
 #ifndef SIMULATOR
-    wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
+    audiohw_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0,
                                 global_settings.eq_hw_band4_gain);
 #endif
 
@@ -1011,28 +1011,28 @@ void eq_hw_enable(bool enable)
     (void) enable;
 #else
     if (enable) {
-        wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff,
+        audiohw_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff,
                                    0, global_settings.eq_hw_band0_gain);
-        wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+        audiohw_set_equalizer_band(1, global_settings.eq_hw_band1_center,
                                    global_settings.eq_hw_band1_bandwidth,
                                    global_settings.eq_hw_band1_gain);
-        wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+        audiohw_set_equalizer_band(2, global_settings.eq_hw_band2_center,
                                    global_settings.eq_hw_band2_bandwidth,
                                    global_settings.eq_hw_band2_gain);
-        wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+        audiohw_set_equalizer_band(3, global_settings.eq_hw_band3_center,
                                    global_settings.eq_hw_band3_bandwidth,
                                    global_settings.eq_hw_band3_gain);
-        wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff,
+        audiohw_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff,
                                    0, global_settings.eq_hw_band4_gain);
     } else {
-        wmcodec_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0, 0);
-        wmcodec_set_equalizer_band(1, global_settings.eq_hw_band1_center,
+        audiohw_set_equalizer_band(0, global_settings.eq_hw_band0_cutoff, 0, 0);
+        audiohw_set_equalizer_band(1, global_settings.eq_hw_band1_center,
                                    global_settings.eq_hw_band1_bandwidth, 0);
-        wmcodec_set_equalizer_band(2, global_settings.eq_hw_band2_center,
+        audiohw_set_equalizer_band(2, global_settings.eq_hw_band2_center,
                                    global_settings.eq_hw_band2_bandwidth, 0);
-        wmcodec_set_equalizer_band(3, global_settings.eq_hw_band3_center,
+        audiohw_set_equalizer_band(3, global_settings.eq_hw_band3_center,
                                    global_settings.eq_hw_band3_bandwidth, 0);
-        wmcodec_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0, 0);
+        audiohw_set_equalizer_band(4, global_settings.eq_hw_band4_cutoff, 0, 0);
     }
 #endif
 }

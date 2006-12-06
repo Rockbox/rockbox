@@ -1326,11 +1326,11 @@ void shutdown_hw(void)
 
     mp3_shutdown();
 #ifdef HAVE_UDA1380
-    uda1380_close();
+    audiohw_close();
 #elif defined(HAVE_TLV320)
-    tlv320_close();
+    audiohw_close();
 #elif defined(HAVE_WM8758) || defined(HAVE_WM8975) | defined(HAVE_WM8731)
-    wmcodec_close();
+    audiohw_close();
 #endif
     /* If HD is still active we try to wait for spindown, otherwise the
        shutdown_timeout in power_thread_sleep will force a power off */ 

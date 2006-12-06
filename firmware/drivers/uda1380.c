@@ -97,7 +97,7 @@ int uda1380_write_reg(unsigned char reg, unsigned short value)
 /**
  * Sets left and right master volume  (0(max) to 252(muted))
  */
-int uda1380_set_master_vol(int vol_l, int vol_r)
+int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     return uda1380_write_reg(REG_MASTER_VOL,
                              MASTER_VOL_LEFT(vol_l) | MASTER_VOL_RIGHT(vol_r));
@@ -106,7 +106,7 @@ int uda1380_set_master_vol(int vol_l, int vol_r)
 /**
  * Sets mixer volume for both channels (0(max) to 228(muted))
  */
-int uda1380_set_mixer_vol(int channel1, int channel2)
+int audiohw_set_mixer_vol(int channel1, int channel2)
 {
     return uda1380_write_reg(REG_MIX_VOL,
                              MIX_VOL_CH_1(channel1) | MIX_VOL_CH_2(channel2));
@@ -115,7 +115,7 @@ int uda1380_set_mixer_vol(int channel1, int channel2)
 /**
  * Sets the bass value (0-12)
  */
-void uda1380_set_bass(int value)
+void audiohw_set_bass(int value)
 {
     uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~BASS_MASK)
                               | BASSL(value) | BASSR(value));
@@ -124,7 +124,7 @@ void uda1380_set_bass(int value)
 /**
  * Sets the treble value (0-3)
  */
-void uda1380_set_treble(int value)
+void audiohw_set_treble(int value)
 {
     uda1380_write_reg(REG_EQ, (uda1380_regs[REG_EQ] & ~TREBLE_MASK)
                               | TREBLEL(value) | TREBLER(value));
@@ -134,7 +134,7 @@ void uda1380_set_treble(int value)
  * Mute (mute=1) or enable sound (mute=0)
  *
  */
-int uda1380_mute(int mute)
+int audiohw_mute(int mute)
 {
     unsigned int value = uda1380_regs[REG_MUTE];
 
@@ -147,7 +147,7 @@ int uda1380_mute(int mute)
 }
 
 /* Returns 0 if successful or -1 if some register failed */
-int uda1380_set_regs(void)
+int audiohw_set_regs(void)
 {
     int i;
     memset(uda1380_regs, 0, sizeof(uda1380_regs));
@@ -166,7 +166,7 @@ int uda1380_set_regs(void)
 }
 
 /* Silently enable / disable audio output */
-void uda1380_enable_output(bool enable)
+void audiohw_enable_output(bool enable)
 {
     if (enable) {
         uda1380_write_reg(REG_PWR, uda1380_regs[REG_PWR] | PON_DAC | PON_HP);
@@ -176,7 +176,7 @@ void uda1380_enable_output(bool enable)
     }
 }
 
-void uda1380_reset(void)
+void audiohw_reset(void)
 {
 #ifdef IRIVER_H300_SERIES
     int mask = set_irq_level(HIGHEST_IRQ_LEVEL);
@@ -203,7 +203,7 @@ void uda1380_reset(void)
  *  44100: 2 = 25   to 50   MCLK   SCLK, LRCK: Audio Clk / 4 (default)
  *  88200: 3 = 50   to 100  MCLK   SCLK, LRCK: Audio Clk / 2 <= TODO: Needs WSPLL
  */
-void uda1380_set_frequency(unsigned fsel)
+void audiohw_set_frequency(unsigned fsel)
 {
     static const unsigned short values_reg[4][2] =
     {
@@ -231,21 +231,21 @@ void uda1380_set_frequency(unsigned fsel)
 }
 
 /* Initialize UDA1380 codec with default register values (uda1380_defaults) */
-int uda1380_init(void)
+int audiohw_init(void)
 {
     recgain_mic = 0;
     recgain_line = 0;
 
-    uda1380_reset();
+    audiohw_reset();
     
-    if (uda1380_set_regs() == -1)
+    if (audiohw_set_regs() == -1)
         return -1;
 
     return 0;
 }
 
 /* Nice shutdown of UDA1380 codec */
-void uda1380_close(void)
+void audiohw_close(void)
 {
     /* First enable mute and sleep a while */
     uda1380_write_reg(REG_MUTE, MUTE_MASTER);
@@ -263,7 +263,7 @@ void uda1380_close(void)
  *
  * source_mic: true=record from microphone, false=record from line-in (or radio)
  */
-void uda1380_enable_recording(bool source_mic)
+void audiohw_enable_recording(bool source_mic)
 {
     uda1380_regs[REG_0] &= ~(ADC_CLK | DAC_CLK);
     uda1380_write_reg(REG_0, uda1380_regs[REG_0] | EN_ADC);
@@ -298,7 +298,7 @@ void uda1380_enable_recording(bool source_mic)
 /** 
  * Stop sending samples on the I2S bus
  */
-void uda1380_disable_recording(void)
+void audiohw_disable_recording(void)
 {
     uda1380_write_reg(REG_PGA, MUTE_ADC);
     sleep(HZ/8);
@@ -327,7 +327,7 @@ void uda1380_disable_recording(void)
            be a peak or a dip. The small glitch is caused by the time between
            setting the two gains
  */
-void uda1380_set_recvol(int left, int right, int type)
+void audiohw_set_recvol(int left, int right, int type)
 {
     int left_ag, right_ag;
 
@@ -412,7 +412,7 @@ void uda1380_set_recvol(int left, int right, int type)
  * Enable or disable recording monitor (so one can listen to the recording)
  * 
  */
-void uda1380_set_monitor(int enable)
+void audiohw_set_monitor(int enable)
 {
     if (enable)    /* enable channel 2 */
         uda1380_write_reg(REG_MUTE, uda1380_regs[REG_MUTE] & ~MUTE_CH2);

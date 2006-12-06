@@ -19,15 +19,15 @@
 
 #ifndef _UDA1380_H
 #define _UDA1380_H
-extern void uda1380_reset(void);
-extern int uda1380_init(void);
-extern void uda1380_enable_output(bool enable);
-extern int uda1380_set_master_vol(int vol_l, int vol_r);
-extern int uda1380_set_mixer_vol(int channel1, int channel2);
-extern void uda1380_set_bass(int value);
-extern void uda1380_set_treble(int value);
-extern int uda1380_mute(int mute);
-extern void uda1380_close(void);
+extern void audiohw_reset(void);
+extern int audiohw_init(void);
+extern void audiohw_enable_output(bool enable);
+extern int audiohw_set_master_vol(int vol_l, int vol_r);
+extern int audiohw_set_mixer_vol(int channel1, int channel2);
+extern void audiohw_set_bass(int value);
+extern void audiohw_set_treble(int value);
+extern int audiohw_mute(int mute);
+extern void audiohw_close(void);
 /**
  * Sets frequency settings for DAC and ADC relative to MCLK
  *
@@ -38,11 +38,11 @@ extern void uda1380_close(void);
  *  44100: 2 = 25   to 50   SCLK, LRCK: Audio Clk / 4 (default)
  *  88200: 3 = 50   to 100  SCLK, LRCK: Audio Clk / 2
  */
-extern void uda1380_set_frequency(unsigned fsel);
-extern void uda1380_enable_recording(bool source_mic);
-extern void uda1380_disable_recording(void);
-extern void uda1380_set_recvol(int left, int right, int type);
-extern void uda1380_set_monitor(int enable);
+extern void audiohw_set_frequency(unsigned fsel);
+extern void audiohw_enable_recording(bool source_mic);
+extern void audiohw_disable_recording(void);
+extern void audiohw_set_recvol(int left, int right, int type);
+extern void audiohw_set_monitor(int enable);
 
 #define UDA1380_ADDR        0x30
 

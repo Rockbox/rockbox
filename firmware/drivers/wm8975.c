@@ -40,13 +40,13 @@
 #include "wmcodec.h"
 #include "wm8975.h"
 
-void wmcodec_reset(void);
+void audiohw_reset(void);
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
 
 /* Silently enable / disable audio output */
-void wmcodec_enable_output(bool enable)
+void audiohw_enable_output(bool enable)
 {
     if (enable) 
     {
@@ -77,7 +77,7 @@ void wmcodec_enable_output(bool enable)
         wmcodec_write(AINTFCE, 0x42);
     
         /* The iPod can handle multiple frequencies, but fix at 44.1KHz for now */
-        wmcodec_set_sample_rate(WM8975_44100HZ);
+        audiohw_set_sample_rate(WM8975_44100HZ);
     
         /* set the volume to -6dB */
         wmcodec_write(LOUT1VOL, IPOD_PCM_LEVEL);
@@ -94,13 +94,13 @@ void wmcodec_enable_output(bool enable)
         wmcodec_write(MOUTMIX1, 0x0);     /* Mono out Mix */
         wmcodec_write(MOUTMIX2, 0x0);
 
-        wmcodec_mute(0);
+        audiohw_mute(0);
     } else {
-        wmcodec_mute(1);
+        audiohw_mute(1);
     }
 }
 
-int wmcodec_set_master_vol(int vol_l, int vol_r)
+int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
@@ -115,7 +115,7 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int wmcodec_set_lineout_vol(int vol_l, int vol_r)
+int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
     wmcodec_write(LOUT2VOL, vol_l);
@@ -124,7 +124,7 @@ int wmcodec_set_lineout_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int wmcodec_set_mixer_vol(int channel1, int channel2)
+int audiohw_set_mixer_vol(int channel1, int channel2)
 {
     (void)channel1;
     (void)channel2;
@@ -133,7 +133,7 @@ int wmcodec_set_mixer_vol(int channel1, int channel2)
 }
 
 /* We are using Linear bass control */
-void wmcodec_set_bass(int value)
+void audiohw_set_bass(int value)
 {
   int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
 
@@ -143,7 +143,7 @@ void wmcodec_set_bass(int value)
   }
 }
 
-void wmcodec_set_treble(int value)
+void audiohw_set_treble(int value)
 {
   int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
 
@@ -153,7 +153,7 @@ void wmcodec_set_treble(int value)
   }
 }
 
-int wmcodec_mute(int mute)
+int audiohw_mute(int mute)
 {
     if (mute)
     {
@@ -168,7 +168,7 @@ int wmcodec_mute(int mute)
 }
 
 /* Nice shutdown of WM8975 codec */
-void wmcodec_close(void)
+void audiohw_close(void)
 {
     /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
     wmcodec_write(DACCTRL, 0x8);
@@ -181,35 +181,35 @@ void wmcodec_close(void)
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void wmcodec_set_nsorder(int order)
+void audiohw_set_nsorder(int order)
 {
     (void)order;
 }
 
 /* Note: Disable output before calling this function */
-void wmcodec_set_sample_rate(int sampling_control) {
+void audiohw_set_sample_rate(int sampling_control) {
 
   wmcodec_write(0x08, sampling_control);
 
 }
 
-void wmcodec_enable_recording(bool source_mic) {
+void audiohw_enable_recording(bool source_mic) {
 
     (void)source_mic;
 }
 
-void wmcodec_disable_recording(void) {
+void audiohw_disable_recording(void) {
 
 }
 
-void wmcodec_set_recvol(int left, int right, int type) {
+void audiohw_set_recvol(int left, int right, int type) {
 
     (void)left;
     (void)right;
     (void)type;
 }
 
-void wmcodec_set_monitor(int enable) {
+void audiohw_set_monitor(int enable) {
 
     (void)enable;
 }

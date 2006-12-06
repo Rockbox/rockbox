@@ -464,10 +464,10 @@ static void set_prescaled_volume(void)
 #if CONFIG_CODEC == MAS3507D
     mas_writereg(MAS_REG_KPRESCALE, prescale_table[prescale/10]);
 #elif defined(HAVE_UDA1380)
-    uda1380_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
+    audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
-    wmcodec_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
+    audiohw_set_mixer_vol(tenthdb2mixer(-prescale), tenthdb2mixer(-prescale));
 #endif
 
     if (current_volume == VOLUME_MIN)
@@ -491,16 +491,16 @@ static void set_prescaled_volume(void)
 #if CONFIG_CODEC == MAS3507D
     dac_volume(tenthdb2reg(l), tenthdb2reg(r), false);
 #elif defined(HAVE_UDA1380)
-    uda1380_set_master_vol(tenthdb2master(l), tenthdb2master(r));
+    audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
-    wmcodec_set_master_vol(tenthdb2master(l), tenthdb2master(r));
+    audiohw_set_master_vol(tenthdb2master(l), tenthdb2master(r));
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) || defined(HAVE_WM8751)
-    wmcodec_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
+    audiohw_set_lineout_vol(tenthdb2master(0), tenthdb2master(0));
 #endif
 
 #elif defined(HAVE_TLV320)
-    tlv320_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
+    audiohw_set_headphone_vol(tenthdb2master(l), tenthdb2master(r));
 #endif
 }
 #endif /* (CONFIG_CODEC == MAS3507D) || defined HAVE_UDA1380 */
@@ -649,13 +649,13 @@ void sound_set_bass(int value)
     current_bass = value * 10;
     set_prescaled_volume();
 #elif defined(HAVE_UDA1380)
-    uda1380_set_bass(value >> 1);
+    audiohw_set_bass(value >> 1);
     current_bass = value * 10;
     set_prescaled_volume();
 #elif defined HAVE_WM8975 || defined HAVE_WM8758 \
     || defined HAVE_WM8731 || defined(HAVE_WM8721) || defined(HAVE_WM8751)
     current_bass = value * 10;
-    wmcodec_set_bass(value);
+    audiohw_set_bass(value);
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)
     /* TODO: implement for iFP and Sansa */
@@ -675,12 +675,12 @@ void sound_set_treble(int value)
     current_treble = value * 10;
     set_prescaled_volume();
 #elif defined(HAVE_UDA1380)
-    uda1380_set_treble(value >> 1);
+    audiohw_set_treble(value >> 1);
     current_treble = value * 10;
     set_prescaled_volume();
 #elif defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721) || defined(HAVE_WM8751)
-    wmcodec_set_treble(value);
+    audiohw_set_treble(value);
     current_treble = value * 10;
     set_prescaled_volume();
 #elif CONFIG_CPU == PNX0101 || defined(HAVE_PP5024_CODEC)

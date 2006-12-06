@@ -18,6 +18,6 @@
  ****************************************************************************/
 
 void i2s_reset(void);
-int wmcodec_init(void);
+int audiohw_init(void);
 void wmcodec_write(int reg, int data);
 

@@ -23,7 +23,7 @@
 
 /**
  * Note that microphone is mono, only left value is used 
- * See uda1380_set_recvol() for exact ranges.
+ * See audiohw_set_recvol() for exact ranges.
  *
  * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
  * 
@@ -31,7 +31,7 @@
 void audio_set_recording_gain(int left, int right, int type)
 {
     //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
-    uda1380_set_recvol(left, right, type);
+    audiohw_set_recvol(left, right, type);
 } /* audio_set_recording_gain */
 
 void audio_set_output_source(int source)
@@ -67,8 +67,8 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
-                uda1380_disable_recording();
-                uda1380_set_monitor(false);
+                audiohw_disable_recording();
+                audiohw_set_monitor(false);
                 /* Reset PDIR2 data flow */
                 DATAINCONTROL = (1 << 9);
             }
@@ -77,8 +77,8 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
-                uda1380_enable_recording(true);  /* source mic */
-                uda1380_set_monitor(false);
+                audiohw_enable_recording(true);  /* source mic */
+                audiohw_set_monitor(false);
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
                 DATAINCONTROL = (3 << 14) | (4 << 3);
             }
@@ -87,8 +87,8 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_LINEIN:          /* recording only */
             if (source != last_source)
             {
-                uda1380_enable_recording(false); /* source line */
-                uda1380_set_monitor(false);
+                audiohw_enable_recording(false); /* source line */
+                audiohw_set_monitor(false);
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
                 DATAINCONTROL = (3 << 14) | (4 << 3);
             }
@@ -98,8 +98,8 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_SPDIF:           /* recording only */
             if (source != last_source)
             {
-                uda1380_disable_recording();
-                uda1380_set_monitor(false);
+                audiohw_disable_recording();
+                audiohw_set_monitor(false);
                 /* Int. when 6 samples in FIFO, PDIR2 src = ebu1RcvData */
                 DATAINCONTROL = (3 << 14) | (7 << 3);
             }
@@ -108,7 +108,7 @@ void audio_set_source(int source, unsigned flags)
 
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (!recording)
-                uda1380_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
+                audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
 
             if (source == last_source && recording == last_recording)
                 break;
@@ -127,8 +127,8 @@ void audio_set_source(int source, unsigned flags)
             }
 
             /* I2S recording and playback */
-            uda1380_enable_recording(false);    /* source line */
-            uda1380_set_monitor(!recording);
+            audiohw_enable_recording(false);    /* source line */
+            audiohw_set_monitor(!recording);
         break;
     } /* end switch */
 

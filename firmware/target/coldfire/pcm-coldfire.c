@@ -30,17 +30,6 @@
 #include "spdif.h"
 #endif
 
-/* Avoid further #ifdef's for some codec functions */
-#if defined(HAVE_UDA1380)
-#define ac_init             uda1380_init
-#define ac_mute             uda1380_mute
-#define ac_set_frequency    uda1380_set_frequency
-#elif defined(HAVE_TLV320)
-#define ac_init             tlv320_init
-#define ac_mute             tlv320_mute
-#define ac_set_frequency    tlv320_set_frequency
-#endif
-
 /* peaks */
 static int play_peak_left, play_peak_right;
 static unsigned long *rec_peak_addr;
@@ -136,7 +125,7 @@ void pcm_apply_settings(bool reset)
     if (pcm_freq != last_pcm_freq)
     {
         last_pcm_freq = pcm_freq;
-        ac_set_frequency(freq_ent[FPARM_FSEL]);
+        audiohw_set_frequency(freq_ent[FPARM_FSEL]);
         coldfire_set_pllcr_audio_bits(PLLCR_SET_AUDIO_BITS_DEFPARM);
     }
 
@@ -211,7 +200,7 @@ void pcm_init(void)
 #endif
 
     /* Initialize default register values. */
-    ac_init();
+    audiohw_init();
 
 #if defined(HAVE_UDA1380)
     /* Sleep a while so the power can stabilize (especially a long
@@ -225,7 +214,7 @@ void pcm_init(void)
 
     /* UDA1380: Unmute the master channel
        (DAC should be at zero point now). */
-    ac_mute(false);
+    audiohw_mute(false);
 
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
@@ -402,7 +391,7 @@ void pcm_record_more(void *start, size_t size)
 
 void pcm_mute(bool mute)
 {
-    ac_mute(mute);
+    audiohw_mute(mute);
     if (mute)
         sleep(HZ/16);
 } /* pcm_mute */

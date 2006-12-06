@@ -49,7 +49,7 @@ void i2s_reset(void)
  * Initialise the WM8975 for playback via headphone and line out.
  * Note, I'm using the WM8750 datasheet as its apparently close.
  */
-int wmcodec_init(void) {
+int audiohw_init(void) {
     /* reset I2C */
     i2c_init();
 

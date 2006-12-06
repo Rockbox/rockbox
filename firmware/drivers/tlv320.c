@@ -67,7 +67,7 @@ void tlv320_write_reg(unsigned reg, unsigned value)
 /**
  * Init our tlv with default values
  */
-void tlv320_init(void)
+void audiohw_init(void)
 {
     memset(tlv320_regs, 0, sizeof(tlv320_regs));
 
@@ -75,14 +75,14 @@ void tlv320_init(void)
 
     /* All ON except OUT, ADC, MIC and LINE */
     tlv320_write_reg(REG_PC, PC_OUT | PC_ADC | PC_MIC | PC_LINE);
-    tlv320_set_recvol(0, 0, AUDIO_GAIN_MIC);
-    tlv320_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
-    tlv320_mute(true);
+    audiohw_set_recvol(0, 0, AUDIO_GAIN_MIC);
+    audiohw_set_recvol(0, 0, AUDIO_GAIN_LINEIN);
+    audiohw_mute(true);
     tlv320_write_reg(REG_AAP, AAP_DAC | AAP_MICM);
     tlv320_write_reg(REG_DAP, 0x00);  /* No deemphasis */
     tlv320_write_reg(REG_DAIF, DAIF_IWL_16 | DAIF_FOR_I2S);
     tlv320_write_reg(REG_DIA, DIA_ACT);
-    tlv320_set_frequency(-1); /* default */
+    audiohw_set_frequency(-1); /* default */
     /* All ON except ADC, MIC and LINE */
     tlv320_write_reg(REG_PC, PC_ADC | PC_MIC | PC_LINE);
 }
@@ -90,7 +90,7 @@ void tlv320_init(void)
 /**
  * Resets tlv320 to default values
  */
-void tlv320_reset(void)
+void audiohw_reset(void)
 {
     tlv320_write_reg(REG_RR, RR_RESET);
 }
@@ -104,7 +104,7 @@ void tlv320_reset(void)
  * 44100: 1 = MCLK   MCLK    SCLK, LRCK: Audio Clk / 4 (default)
  * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
  */
-void tlv320_set_frequency(unsigned fsel)
+void audiohw_set_frequency(unsigned fsel)
 {
     /* All rates available for 11.2896MHz besides 8.021 */
     unsigned char values_src[3] =
@@ -126,7 +126,7 @@ void tlv320_set_frequency(unsigned fsel)
  *
  * Left & Right: 48 .. 121 .. 127 => Volume -73dB (mute) .. +0 dB .. +6 dB
  */
-void tlv320_set_headphone_vol(int vol_l, int vol_r)
+void audiohw_set_headphone_vol(int vol_l, int vol_r)
 {
     unsigned value_dap = tlv320_regs[REG_DAP];
     unsigned value_dap_last = value_dap;
@@ -156,7 +156,7 @@ void tlv320_set_headphone_vol(int vol_l, int vol_r)
  * Mic (left): 0 ..  1 => Volume  +0,     +20 dB
  *
  */
-void tlv320_set_recvol(int left, int right, int type)
+void audiohw_set_recvol(int left, int right, int type)
 {
     if (type == AUDIO_GAIN_MIC)
     {
@@ -180,7 +180,7 @@ void tlv320_set_recvol(int left, int right, int type)
  * Mute (mute=true) or enable sound (mute=false)
  *
  */
-void tlv320_mute(bool mute)
+void audiohw_mute(bool mute)
 {
     unsigned value_dap = tlv320_regs[REG_DAP];
     unsigned value_l, value_r;
@@ -205,16 +205,16 @@ void tlv320_mute(bool mute)
 }
 
 /* Nice shutdown of TLV320 codec */
-void tlv320_close(void)
+void audiohw_close(void)
 {
-    tlv320_mute(true);
+    audiohw_mute(true);
     sleep(HZ/8);
 
     tlv320_write_reg(REG_PC, PC_OFF | PC_CLK | PC_OSC | PC_OUT |
         PC_DAC | PC_ADC | PC_MIC | PC_LINE);  /* All OFF */
 }
 
-void tlv320_enable_recording(bool source_mic)
+void audiohw_enable_recording(bool source_mic)
 {
     unsigned value_aap, value_pc;
 
@@ -234,7 +234,7 @@ void tlv320_enable_recording(bool source_mic)
     tlv320_write_reg(REG_AAP, value_aap);
 }
 
-void tlv320_disable_recording(void)
+void audiohw_disable_recording(void)
 {
     unsigned value_pc = tlv320_regs[REG_PC];
     unsigned value_aap = tlv320_regs[REG_AAP];
@@ -246,7 +246,7 @@ void tlv320_disable_recording(void)
     tlv320_write_reg(REG_PC, value_pc);
 }
 
-void tlv320_set_monitor(bool enable)
+void audiohw_set_monitor(bool enable)
 {
     unsigned value_aap, value_pc;
 

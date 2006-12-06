@@ -43,7 +43,7 @@
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
 
-int wmcodec_mute(int mute)
+int audiohw_mute(int mute)
 {
     if (mute)
     {
@@ -70,7 +70,7 @@ static void codec_set_active(int active)
 
 
 /* Silently enable / disable audio output */
-void wmcodec_enable_output(bool enable)
+void audiohw_enable_output(bool enable)
 {
     if (enable)
     {
@@ -96,7 +96,7 @@ void wmcodec_enable_output(bool enable)
         /* IWL=00(16 bit) FORMAT=10(I2S format) */
         wmcodec_write(AINTFCE, 0x42);
 
-        wmcodec_set_sample_rate(WM8731L_44100HZ);
+        audiohw_set_sample_rate(WM8731L_44100HZ);
 
         /* set the volume to -6dB */
         wmcodec_write(LOUTVOL, IPOD_PCM_LEVEL);
@@ -112,17 +112,17 @@ void wmcodec_enable_output(bool enable)
         /* We need to enable bit 4 of GPIOL for output for sound on H10 */
         GPIOL_OUTPUT_VAL |= 0x10;
 #endif
-        wmcodec_mute(0);
+        audiohw_mute(0);
     } else {
 #if defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
         /* We need to disable bit 4 of GPIOL to disable sound on H10 */
         GPIOL_OUTPUT_VAL &= ~0x10;
 #endif
-        wmcodec_mute(1);
+        audiohw_mute(1);
     }
 }
 
-int wmcodec_set_master_vol(int vol_l, int vol_r)
+int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* +6 to -73dB 1dB steps (plus mute == 80levels) 7bits */
     /* 1111111 == +6dB */
@@ -136,7 +136,7 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int wmcodec_set_mixer_vol(int channel1, int channel2)
+int audiohw_set_mixer_vol(int channel1, int channel2)
 {
     (void)channel1;
     (void)channel2;
@@ -144,18 +144,18 @@ int wmcodec_set_mixer_vol(int channel1, int channel2)
     return 0;
 }
 
-void wmcodec_set_bass(int value)
+void audiohw_set_bass(int value)
 {
     (void)value;
 }
 
-void wmcodec_set_treble(int value)
+void audiohw_set_treble(int value)
 {
     (void)value;
 }
 
 /* Nice shutdown of WM8731 codec */
-void wmcodec_close(void)
+void audiohw_close(void)
 {
    /* set DACMU=1 DEEMPH=0 */
     wmcodec_write(DACCTRL, 0x8);
@@ -177,36 +177,36 @@ void wmcodec_close(void)
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void wmcodec_set_nsorder(int order)
+void audiohw_set_nsorder(int order)
 {
     (void)order;
 }
 
-void wmcodec_set_sample_rate(int sampling_control)
+void audiohw_set_sample_rate(int sampling_control)
 {
     codec_set_active(0x0);
     wmcodec_write(SAMPCTRL, sampling_control);
     codec_set_active(0x1);
 }
 
-void wmcodec_enable_recording(bool source_mic)
+void audiohw_enable_recording(bool source_mic)
 {
     (void)source_mic;
 }
 
-void wmcodec_disable_recording(void)
+void audiohw_disable_recording(void)
 {
 
 }
 
-void wmcodec_set_recvol(int left, int right, int type)
+void audiohw_set_recvol(int left, int right, int type)
 {
     (void)left;
     (void)right;
     (void)type;
 }
 
-void wmcodec_set_monitor(int enable)
+void audiohw_set_monitor(int enable)
 {
     (void)enable;
 }

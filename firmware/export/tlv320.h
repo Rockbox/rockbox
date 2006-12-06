@@ -22,8 +22,8 @@
 
 /*** definitions ***/
 
-extern void tlv320_init(void);
-extern void tlv320_reset(void);
+extern void audiohw_init(void);
+extern void audiohw_reset(void);
 /**
  * Sets internal sample rate for DAC and ADC relative to MCLK
  * Selection for frequency:
@@ -33,15 +33,15 @@ extern void tlv320_reset(void);
  * 44100: 1 = MCLK   MCLK    SCLK, LRCK: Audio Clk / 4 (default)
  * 88200: 2 = MCLK*2 MCLK    SCLK, LRCK: Audio Clk / 2
  */
-extern void tlv320_set_frequency(unsigned fsel);
-extern void tlv320_enable_output(bool enable);
-extern void tlv320_set_headphone_vol(int vol_l, int vol_r);
-extern void tlv320_set_recvol(int left, int right, int type);
-extern void tlv320_mute(bool mute);
-extern void tlv320_close(void);
-extern void tlv320_enable_recording(bool source_mic);
-extern void tlv320_disable_recording(void);
-extern void tlv320_set_monitor(bool enable);
+extern void audiohw_set_frequency(unsigned fsel);
+extern void audiohw_enable_output(bool enable);
+extern void audiohw_set_headphone_vol(int vol_l, int vol_r);
+extern void audiohw_set_recvol(int left, int right, int type);
+extern void audiohw_mute(bool mute);
+extern void audiohw_close(void);
+extern void audiohw_enable_recording(bool source_mic);
+extern void audiohw_disable_recording(void);
+extern void audiohw_set_monitor(bool enable);
 
 #define HEADPHONE_MUTE 0x30 /* 0110000 = -73db */
 

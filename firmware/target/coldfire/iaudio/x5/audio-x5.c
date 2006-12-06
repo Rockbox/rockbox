@@ -23,7 +23,7 @@
 
 /**
  * Note that microphone is mono, only left value is used 
- * See tlv320_set_recvol() for exact ranges.
+ * See audiohw_set_recvol() for exact ranges.
  *
  * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
  * 
@@ -31,7 +31,7 @@
 void audio_set_recording_gain(int left, int right, int type)
 {
     //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
-    tlv320_set_recvol(left, right, type);
+    audiohw_set_recvol(left, right, type);
 } /* audio_set_recording_gain */
 
 void audio_set_output_source(int source)
@@ -61,8 +61,8 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
-                tlv320_disable_recording();
-                tlv320_set_monitor(false);
+                audiohw_disable_recording();
+                audiohw_set_monitor(false);
                 /* Reset PDIR2 data flow */
                 DATAINCONTROL = (1 << 9);
             }
@@ -71,7 +71,7 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_MIC:                 /* recording only */
             if (source != last_source)
             {
-                tlv320_enable_recording(true);  /* source mic */
+                audiohw_enable_recording(true);  /* source mic */
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
                 DATAINCONTROL = (3 << 14) | (4 << 3);
             }
@@ -80,7 +80,7 @@ void audio_set_source(int source, unsigned flags)
         case AUDIO_SRC_LINEIN:              /* recording only */
             if (source != last_source)
             {
-                tlv320_enable_recording(false); /* source line */
+                audiohw_enable_recording(false); /* source line */
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
                 DATAINCONTROL = (3 << 14) | (4 << 3);
             }
@@ -88,7 +88,7 @@ void audio_set_source(int source, unsigned flags)
 
         case AUDIO_SRC_FMRADIO:             /* recording and playback */
             if (!recording)
-                tlv320_set_recvol(23, 23, AUDIO_GAIN_LINEIN);
+                audiohw_set_recvol(23, 23, AUDIO_GAIN_LINEIN);
 
             /* I2S recording and analog playback */
             if (source == last_source && recording == last_recording)
@@ -100,12 +100,12 @@ void audio_set_source(int source, unsigned flags)
             {
                 /* Int. when 6 samples in FIFO, PDIR2 src = iis1RcvData */
                 DATAINCONTROL = (3 << 14) | (4 << 3);
-                tlv320_enable_recording(false); /* source line */
+                audiohw_enable_recording(false); /* source line */
             }
             else
             {
-                tlv320_disable_recording();
-                tlv320_set_monitor(true);       /* analog bypass */
+                audiohw_disable_recording();
+                audiohw_set_monitor(true);       /* analog bypass */
                 /* Reset PDIR2 data flow */
                 DATAINCONTROL = (1 << 9);
             }

@@ -40,7 +40,7 @@
 #include "wmcodec.h"
 #include "wm8758.h"
 
-void wmcodec_reset(void);
+void audiohw_reset(void);
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 
@@ -48,7 +48,7 @@ void wmcodec_reset(void);
 //#define TREBCTRL   0x0b
 
 /* Silently enable / disable audio output */
-void wmcodec_enable_output(bool enable)
+void audiohw_enable_output(bool enable)
 {
     if (enable) 
     {
@@ -70,17 +70,17 @@ void wmcodec_enable_output(bool enable)
 
         /* The iPod can handle multiple frequencies, but fix at 44.1KHz
            for now */
-        wmcodec_set_sample_rate(WM8758_44100HZ);
+        audiohw_set_sample_rate(WM8758_44100HZ);
     
         wmcodec_write(LOUTMIX,0x1); /* Enable mixer */
         wmcodec_write(ROUTMIX,0x1); /* Enable mixer */
-        wmcodec_mute(0);
+        audiohw_mute(0);
     } else {
-        wmcodec_mute(1);
+        audiohw_mute(1);
     }
 }
 
-int wmcodec_set_master_vol(int vol_l, int vol_r)
+int audiohw_set_master_vol(int vol_l, int vol_r)
 {
     /* OUT1 */
     wmcodec_write(LOUT1VOL, 0x080 | vol_l);
@@ -89,7 +89,7 @@ int wmcodec_set_master_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int wmcodec_set_lineout_vol(int vol_l, int vol_r)
+int audiohw_set_lineout_vol(int vol_l, int vol_r)
 {
     /* OUT2 */
     wmcodec_write(LOUT2VOL, vol_l);
@@ -98,7 +98,7 @@ int wmcodec_set_lineout_vol(int vol_l, int vol_r)
     return 0;
 }
 
-int wmcodec_set_mixer_vol(int channel1, int channel2)
+int audiohw_set_mixer_vol(int channel1, int channel2)
 {
     (void)channel1;
     (void)channel2;
@@ -107,7 +107,7 @@ int wmcodec_set_mixer_vol(int channel1, int channel2)
 }
 
 /* We are using Linear bass control */
-void wmcodec_set_bass(int value)
+void audiohw_set_bass(int value)
 {
     (void)value;
 #if 0
@@ -121,7 +121,7 @@ void wmcodec_set_bass(int value)
 #endif
 }
 
-void wmcodec_set_treble(int value)
+void audiohw_set_treble(int value)
 {
     (void)value;
 #if 0
@@ -136,7 +136,7 @@ void wmcodec_set_treble(int value)
 
 }
 
-int wmcodec_mute(int mute)
+int audiohw_mute(int mute)
 {
     if (mute)
     {
@@ -151,9 +151,9 @@ int wmcodec_mute(int mute)
 }
 
 /* Nice shutdown of WM8758 codec */
-void wmcodec_close(void)
+void audiohw_close(void)
 {
-    wmcodec_mute(1);
+    audiohw_mute(1);
 
     wmcodec_write(PWRMGMT3, 0x0);
 
@@ -163,13 +163,13 @@ void wmcodec_close(void)
 }
 
 /* Change the order of the noise shaper, 5th order is recommended above 32kHz */
-void wmcodec_set_nsorder(int order)
+void audiohw_set_nsorder(int order)
 {
     (void)order;
 }
 
 /* Note: Disable output before calling this function */
-void wmcodec_set_sample_rate(int sampling_control)
+void audiohw_set_sample_rate(int sampling_control)
 {
     /**** We force 44.1KHz for now. ****/
     (void)sampling_control;
@@ -190,28 +190,28 @@ void wmcodec_set_sample_rate(int sampling_control)
     wmcodec_write(SRATECTRL, (0 << 1));
 }
 
-void wmcodec_enable_recording(bool source_mic)
+void audiohw_enable_recording(bool source_mic)
 {
     (void)source_mic;
 }
 
-void wmcodec_disable_recording(void) {
+void audiohw_disable_recording(void) {
 
 }
 
-void wmcodec_set_recvol(int left, int right, int type) {
+void audiohw_set_recvol(int left, int right, int type) {
 
     (void)left;
     (void)right;
     (void)type;
 }
 
-void wmcodec_set_monitor(int enable) {
+void audiohw_set_monitor(int enable) {
 
     (void)enable;
 }
 
-void wmcodec_set_equalizer_band(int band, int freq, int bw, int gain)
+void audiohw_set_equalizer_band(int band, int freq, int bw, int gain)
 {
     unsigned int eq = 0;
 

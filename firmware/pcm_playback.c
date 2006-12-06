@@ -406,13 +406,13 @@ void pcm_init(void)
     pcm_callback_for_more = NULL;
 
     /* Initialize default register values. */
-    wmcodec_init();
+    audiohw_init();
     
     /* Power on */
-    wmcodec_enable_output(true);
+    audiohw_enable_output(true);
 
     /* Unmute the master channel (DAC should be at zero point now). */
-    wmcodec_mute(false);
+    audiohw_mute(false);
 
     /* Call pcm_play_dma_stop to initialize everything. */
     pcm_play_dma_stop();
@@ -603,7 +603,7 @@ void pcm_mute(bool mute)
 {
 #if defined(HAVE_WM8975) || defined(HAVE_WM8758) \
    || defined(HAVE_WM8731) || defined(HAVE_WM8721)
-    wmcodec_mute(mute);
+    audiohw_mute(mute);
 #endif
     if (mute)
         sleep(HZ/16);
