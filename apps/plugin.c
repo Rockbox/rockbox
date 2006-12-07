@@ -450,7 +450,9 @@ static const struct plugin_api rockbox_api = {
     wheel_status,
     wheel_send_events,
 #endif
-
+#if LCD_DEPTH > 1
+    lcd_get_backdrop,
+#endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 

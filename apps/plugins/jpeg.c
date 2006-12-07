@@ -183,6 +183,9 @@ static int running_slideshow = false;   /* loading image because of slideshw */
 static int immediate_ata_off = false;   /* power down disk after loading */
 #endif
 static int  button_timeout = HZ*5;
+#if LCD_DEPTH > 1
+fb_data* old_backdrop;
+#endif
 
 /**************** begin JPEG code ********************/
 
@@ -2103,6 +2106,16 @@ void cleanup(void *parameter)
 
 int show_menu(void) /* return 1 to quit */
 {
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(old_backdrop);
+#ifdef HAVE_LCD_COLOR
+    rb->lcd_set_foreground(rb->global_settings->fg_color);
+    rb->lcd_set_background(rb->global_settings->bg_color);
+#else
+    rb->lcd_set_foreground(LCD_BLACK);
+    rb->lcd_set_background(LCD_WHITE);
+#endif
+#endif
     int m;
     int result;
     static const struct menu_item items[] = {
@@ -2191,7 +2204,11 @@ int show_menu(void) /* return 1 to quit */
         }
     }
 #endif
-
+#if LCD_DEPTH > 1
+    rb->lcd_set_backdrop(NULL);
+    rb->lcd_set_foreground(LCD_WHITE);
+    rb->lcd_set_background(LCD_BLACK);
+#endif
     rb->lcd_clear_display();
     rb->menu_exit(m);
     return 0;
@@ -2352,6 +2369,7 @@ int scroll_bmp(struct t_disp* pdisp)
 #endif
             if (show_menu() == 1)
                 return PLUGIN_OK;
+
 #ifdef USEGSLIB
             gray_show(true); /* switch on grayscale overlay */
 #else
@@ -2676,9 +2694,10 @@ int load_and_show(char* filename)
 
     if(!running_slideshow)
     {
-#ifdef HAVE_LCD_COLOR
+#if LCD_DEPTH > 1
         rb->lcd_set_foreground(LCD_WHITE);
         rb->lcd_set_background(LCD_BLACK);
+        rb->lcd_set_backdrop(NULL);
 #endif
 
         rb->lcd_clear_display();
@@ -2837,6 +2856,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 #ifdef USEGSLIB
     int grayscales;
     long graysize; /* helper */
+#endif
+#if LCD_DEPTH > 1
+    old_backdrop = rb->lcd_get_backdrop();
 #endif
 
     if(!parameter) return PLUGIN_ERROR;
