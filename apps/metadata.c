@@ -55,6 +55,7 @@ enum tagtype { TAGTYPE_APE = 1, TAGTYPE_VORBIS };
 #define MP4_hdlr MP4_ID('h', 'd', 'l', 'r')
 #define MP4_ilst MP4_ID('i', 'l', 's', 't')
 #define MP4_M4A  MP4_ID('M', '4', 'A', ' ')
+#define MP4_M4B  MP4_ID('M', '4', 'B', ' ')
 #define MP4_mdat MP4_ID('m', 'd', 'a', 't')
 #define MP4_mdia MP4_ID('m', 'd', 'i', 'a')
 #define MP4_mdir MP4_ID('m', 'd', 'i', 'r')
@@ -1318,8 +1319,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                 read_uint32be(fd, &id);
                 size -= 4;
                 
-                if ((id != MP4_M4A) && (id != MP4_mp42) && (id != MP4_qt)
-                    && (id != MP4_3gp6))
+                if ((id != MP4_M4A) && (id != MP4_M4B) && (id != MP4_mp42) 
+                    && (id != MP4_qt) && (id != MP4_3gp6))
                 {
                     DEBUGF("Unknown MP4 file type: '%c%c%c%c'\n", 
                         id >> 24 & 0xff, id >> 16 & 0xff, id >> 8 & 0xff,
