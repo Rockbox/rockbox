@@ -578,6 +578,9 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
     if(!charger_inserted())
 #endif
     {
+        bool batt_crit = battery_level_critical();
+        int audio_stat = audio_status();
+
         FOR_NB_SCREENS(i)
             screens[i].clear_display();
 #ifdef X5_BACKLIGHT_SHUTDOWN
@@ -604,11 +607,23 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         }
         
         if (global_settings.fade_on_stop 
-            && (audio_status() & AUDIO_STATUS_PLAY))
+            && (audio_stat & AUDIO_STATUS_PLAY))
         {
             fade(0);
         }
-        
+
+#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+        if (!batt_crit && (audio_stat & AUDIO_STATUS_RECORD))
+        {
+            audio_stop_recording();
+            while(audio_status() & AUDIO_STATUS_RECORD)
+                sleep(1);
+        }
+            
+        audio_close_recording();
+#endif
+        /* audio_stop_recording == audio_stop for HWCODEC */
+
         audio_stop();
         while (audio_status())
             sleep(1);
@@ -616,7 +631,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
         if (callback != NULL)
             callback(parameter);
 
-        if (!battery_level_critical()) /* do not save on critical battery */
+        if (!batt_crit) /* do not save on critical battery */
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)

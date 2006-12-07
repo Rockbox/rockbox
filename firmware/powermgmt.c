@@ -1266,16 +1266,17 @@ void sys_poweroff(void)
 {
     logf("sys_poweroff()");
     /* If the main thread fails to shut down the system, we will force a
-       power off after an 20 second timeout */
-    shutdown_timeout = HZ*20;
-#if defined(HAVE_RECORDING)
-    int audio_stat = audio_status();
-    if (audio_stat & AUDIO_STATUS_RECORD) {
-        audio_stop_recording();
-        shutdown_timeout += 8*HZ;
-    }
+       power off after an 20 second timeout - 28 seconds if recording */
+#if defined(IAUDIO_X5) && !defined (SIMULATOR)
+    if (shutdown_timeout == 0)
+        pcf50606_reset_timeout(); /* Reset timer on first attempt only */
 #endif
-    
+#ifdef HAVE_RECORDING
+    if (audio_status() & AUDIO_STATUS_RECORD)
+        shutdown_timeout += HZ*8;
+#endif
+
+    shutdown_timeout = HZ*20;    
     queue_post(&button_queue, SYS_POWEROFF, NULL);
 }
 

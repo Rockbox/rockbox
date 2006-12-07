@@ -244,6 +244,14 @@ static int pcm_rec_have_more(int status)
     return 0;
 } /* pcm_rec_have_more */
 
+static void reset_hardware(void)
+{
+    /* reset pcm to defaults (playback only) */
+    pcm_set_frequency(HW_SAMPR_DEFAULT);
+    audio_set_output_source(AUDIO_SRC_PLAYBACK);
+    pcm_apply_settings(true);
+}
+
 /** pcm_rec_* group **/
 void pcm_rec_error_clear(void)
 {
@@ -328,10 +336,7 @@ void audio_close_recording(void)
 {
     pcm_thread_wait_for_stop();
     pcm_thread_sync_post(PCMREC_CLOSE, NULL);
-    /* reset pcm to defaults (playback only) */
-    pcm_set_frequency(HW_SAMPR_DEFAULT);
-    audio_set_output_source(AUDIO_SRC_PLAYBACK);
-    pcm_apply_settings(true);
+    reset_hardware();
     audio_remove_encoder();
 } /* audio_close_recording */
 
@@ -460,10 +465,6 @@ void audio_stop_recording(void)
     logf("audio_stop_recording");
 
     pcm_thread_wait_for_stop();
-
-    if (is_recording)
-        dma_lock = true;  /* fix DMA write ptr at current position */
-
     pcm_thread_sync_post(PCMREC_STOP, NULL);
 
     logf("audio_stop_recording done");
@@ -474,11 +475,8 @@ void audio_pause_recording(void)
     logf("audio_pause_recording");
     
     pcm_thread_wait_for_stop();
-
-    if (is_recording)
-        dma_lock = true;  /* fix DMA write ptr at current position */
-    
     pcm_thread_sync_post(PCMREC_PAUSE, NULL);
+
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
     
@@ -1006,6 +1004,8 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 /* PCMREC_INIT */
 static void pcmrec_init(void)
 {
+    unsigned char *buffer;
+
     rec_fdata.rec_file = -1;
 
     /* pcm FIFO */
@@ -1035,11 +1035,13 @@ static void pcmrec_init(void)
     is_stopping       = false;
     is_error          = false;
 
-    pcm_buffer = audio_get_recording_buffer(&rec_buffer_size);
+    buffer = audio_get_recording_buffer(&rec_buffer_size);
     /* Line align pcm_buffer 2^4=16 bytes */
-    pcm_buffer = (unsigned char *)ALIGN_UP_P2((unsigned)pcm_buffer, 4);
+    pcm_buffer = (unsigned char *)ALIGN_UP_P2((unsigned long)buffer, 4);
     enc_buffer = pcm_buffer + ALIGN_UP_P2(PCM_NUM_CHUNKS*PCM_CHUNK_SIZE +
                                           PCM_MAX_FEED_SIZE, 2);
+    /* Adjust available buffer for possible align advancement */
+    rec_buffer_size -= pcm_buffer - buffer;
 
     pcm_init_recording();
     pcm_thread_signal_event(PCMREC_INIT);
@@ -1132,8 +1134,8 @@ static void pcmrec_start(const char *filename)
         pcmrec_fnq_set_empty();
     }
     
-    dma_lock        = false;
-    is_paused = false;
+    dma_lock     = false;
+    is_paused    = false;
     is_recording = true;
 
     pcmrec_new_stream(filename,
@@ -1187,11 +1189,8 @@ static void pcmrec_finish_stop(void)
     pcmrec_flush(-1);
     
     /* wait for encoder to finish remaining data */
-    if (!is_error)
-    {
-        while (!wav_queue_empty)
-            yield();
-    }
+    while (!is_error && !wav_queue_empty)
+        yield();
     
     /* end stream at last data */
     pcmrec_new_stream(NULL, CHUNKF_END_FILE, 0);
@@ -1307,7 +1306,7 @@ static void pcmrec_thread(void)
 
     while(1)
     {
-        if (is_recording)
+        if (is_recording && !is_stopping)
         {
             /* Poll periodically to flush data */
             queue_wait_w_tmo(&pcmrec_queue, &ev, HZ/5);
@@ -1363,12 +1362,12 @@ static void pcmrec_thread(void)
                 break;
 
             case SYS_USB_CONNECTED:
-                if (!is_recording)
-                {
-                    pcmrec_close();
-                    usb_acknowledge(SYS_USB_CONNECTED_ACK);
-                    usb_wait_for_disconnect(&pcmrec_queue);
-                }
+                if (is_recording)
+                    break;
+                pcmrec_close();
+                reset_hardware();
+                usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                usb_wait_for_disconnect(&pcmrec_queue);
                 break;
         } /* end switch */
     } /* end while */
@@ -1554,7 +1553,8 @@ void enc_finish_chunk(void)
 int enc_pcm_buf_near_empty(void)
 {
     /* less than 1sec raw data? => unboost encoder */
-    size_t avail = (dma_wr_pos - pcm_rd_pos) & PCM_CHUNK_MASK;
+    int wp       = dma_wr_pos;
+    size_t avail = (wp - pcm_rd_pos) & PCM_CHUNK_MASK;
     return avail < (sample_rate << 2) ? 1 : 0;
 } /* enc_pcm_buf_near_empty */
 
@@ -1562,7 +1562,8 @@ int enc_pcm_buf_near_empty(void)
 /* TODO: this really should give the actual size returned */
 unsigned char * enc_get_pcm_data(size_t size)
 {
-    size_t avail = (dma_wr_pos - pcm_rd_pos) & PCM_CHUNK_MASK;
+    int wp       = dma_wr_pos;
+    size_t avail = (wp - pcm_rd_pos) & PCM_CHUNK_MASK;
 
     /* limit the requested pcm data size */
     if (size > PCM_MAX_FEED_SIZE)
