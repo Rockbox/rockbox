@@ -1276,9 +1276,14 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                         /* Re-use the read buffer as the dest buffer... */
                         buffer -= length;
                         buffer_left += length;
-
-                        parse_replaygain(tag_name, buffer, id3, buffer, 
-                            buffer_left);
+                        
+                        if (parse_replaygain(tag_name, buffer, id3, 
+                            buffer, buffer_left) > 0)
+                        {
+                            /* Data used, keep it. */
+                            buffer += length;
+                            buffer_left -= length;
+                        }
                     }
                 }
             }
