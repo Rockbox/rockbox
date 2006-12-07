@@ -219,7 +219,7 @@ bool frame_sync(FLACContext* fc) {
 
     /* Advance and init bit buffer to the new frame. */
     ci->advance_buffer((get_bits_count(&fc->gb)-16)>>3); /* consumed bytes */
-    bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE);
+    bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE+16);
     init_get_bits(&fc->gb, bit_buffer, buff_size*8);
 
     /* Decode the frame to verify the frame crc and
@@ -307,7 +307,7 @@ bool flac_seek(FLACContext* fc, uint32_t target_sample) {
         if(!ci->seek_buffer(pos))
             return false;
 
-        bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE);
+        bit_buffer = ci->request_buffer(&buff_size, MAX_FRAMESIZE+16);
         init_get_bits(&fc->gb, bit_buffer, buff_size*8);
 
         /* Now we need to get a frame.  It is possible for our seek
@@ -368,7 +368,7 @@ bool flac_seek(FLACContext* fc, uint32_t target_sample) {
 
         /* We need to narrow the search. */
         if(target_sample < this_frame_sample) {
-            upper_bound_sample = this_frame_sample + this_block_size;
+            upper_bound_sample = this_frame_sample;
             upper_bound = ci->curpos;
         }
         else { /* Target is beyond this frame. */
