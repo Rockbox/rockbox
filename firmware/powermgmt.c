@@ -1341,6 +1341,11 @@ void shutdown_hw(void)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_set_contrast(0);
 #endif
+    
+    /* Small delay to make sure all HW gets time to flush. Especially
+       eeprom chips are quite slow and might be still writing the last
+       byte. */
+    sleep(HZ/4);
     power_off();
 #endif /* #ifndef SIMULATOR */
 }
