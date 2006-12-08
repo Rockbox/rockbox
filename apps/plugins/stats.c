@@ -64,8 +64,8 @@ static int fontwidth, fontheight;
 
 /* TODO: Better get the exts from the filetypes var in tree.c */
 const char *music_exts[] = {"mp3","mp2","mp1","mpa","ogg",
-        "wav","flac","ac3","a52","mpc","wv","m4a","mp4","shn",
-        "aif","aiff"};
+        "wav","flac","ac3","a52","mpc","wv","m4a","m4b","mp4",
+        "shn","aif","aiff"};
 
 void prn(const char *str, int y)
 {

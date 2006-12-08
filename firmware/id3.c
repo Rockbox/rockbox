@@ -85,7 +85,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("WV",   "wavpack", "wavpack_enc", "wv\0"       ),
     /* Apple Lossless Audio Codec */
     [AFMT_ALAC] =
-        AFMT_ENTRY("ALAC", "alac",    NULL,          "m4a\0"      ),
+        AFMT_ENTRY("ALAC", "alac",    NULL,          "m4a\0m4b\0" ),
     /* Advanced Audio Coding in M4A container */
     [AFMT_AAC] =
         AFMT_ENTRY("AAC",  "aac",     NULL,          "mp4\0"      ),
