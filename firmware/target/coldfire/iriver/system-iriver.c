@@ -134,8 +134,8 @@ void set_cpu_frequency(long frequency)
         PLLCR &= ~1;  /* Bypass mode */
         timers_adjust_prescale(CPUFREQ_DEFAULT_MULT, true);
         RECALC_DELAYS(CPUFREQ_DEFAULT);
-        /* Power down PLL, but keep CLSEL */
-        PLLCR = 0x00000200 | (PLLCR & 0x70400000);
+        /* Power down PLL, but keep CRSEL and CLSEL */
+        PLLCR = 0x00800200 | (PLLCR & 0x70400000);
         CSCR0 = 0x00000180; /* Flash: 0 wait states */
         CSCR1 = 0x00000180; /* LCD: 0 wait states */
 #if CONFIG_USBOTG == USBOTG_ISP1362
