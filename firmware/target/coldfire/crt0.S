@@ -72,12 +72,11 @@ start:
     /* Chip select 2 - ATA controller */
     move.l  #0x20000000,%d0 /* CSAR2 - Base = 0x20000000 */
     move.l  %d0,(0x098,%a0)
-    move.l  #0x000f0001,%d0 /* CSMR2 - 64K, Only data access */
+    moveq.l #0x1,%d0        /* CSMR2 - 64K */
     move.l  %d0,(0x09c,%a0)
     move.l  #0x00000080,%d0 /* CSCR2 - no wait states, 16 bits, no bursts */
-    move.l  %d0,(0x0a0,%a0) /* NOTE:  I'm not sure about the wait states.
-                               We have to be careful with the access times,
-                               since IORDY isn't connected to the HDD. */
+    move.l  %d0,(0x0a0,%a0) /* wait states are handled by the coldfire
+                             * IDE interface logic. */
 
 #if CONFIG_USBOTG == USBOTG_ISP1362
     /* Chip select 3 - USBOTG controller */
