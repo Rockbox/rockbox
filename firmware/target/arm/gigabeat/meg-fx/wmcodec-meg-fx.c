@@ -36,6 +36,7 @@
 #include "file.h"
 #include "buffer.h"
 #include "audio.h"
+#include "i2s.h"
 #include "i2c.h"
 #include "i2c-meg-fx.h"
 /*
