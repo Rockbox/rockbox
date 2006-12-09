@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Marcoen Hirschberg
+ * Copyright (C) 2006 by Daniel Ankers
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -17,6 +17,4 @@
  *
  ****************************************************************************/
 
-int audiohw_init(void);
-void wmcodec_write(int reg, int data);
-
+void i2s_reset(void);

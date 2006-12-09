@@ -39,6 +39,7 @@
 
 #include "wmcodec.h"
 #include "wm8731l.h"
+#include "i2s.h"
 
 #define IPOD_PCM_LEVEL 0x65       /* -6dB */
 

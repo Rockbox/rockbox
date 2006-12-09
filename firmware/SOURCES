@@ -328,6 +328,7 @@ target/arm/sandisk/sansa-e200/backlight-e200.c
 target/arm/sandisk/sansa-e200/usb-e200.c
 target/arm/sandisk/sansa-e200/button-e200.c
 target/arm/sandisk/sansa-e200/power-e200.c
+target/arm/i2s-pp.c
 #endif /* SIMULATOR */
 #endif /* SANSA_E200 */
 
@@ -403,6 +404,7 @@ target/coldfire/iriver/h100/usb-h100.c
 #ifndef SIMULATOR
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
@@ -416,6 +418,7 @@ target/arm/iriver/h10/usb-h10.c
 #ifndef SIMULATOR
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/iriver/h10/adc-h10.c
 target/arm/iriver/h10/backlight-h10.c
 target/arm/iriver/h10/button-h10.c
@@ -445,6 +448,7 @@ target/arm/gigabeat/meg-fx/wmcodec-meg-fx.c
 #ifndef SIMULATOR
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/tatung/tpj1022/adc-tpj1022.c
 target/arm/tatung/tpj1022/backlight-tpj1022.c
 target/arm/tatung/tpj1022/button-tpj1022.c
@@ -459,6 +463,7 @@ target/arm/tatung/tpj1022/usb-tpj1022.c
 drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ata-pp5020.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-4g_color.c
@@ -474,6 +479,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
@@ -488,6 +494,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
@@ -502,6 +509,7 @@ drivers/lcd-ipodvideo.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
@@ -516,6 +524,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5002.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/3g/backlight-3g.c
 target/arm/ipod/3g/button-3g.c
@@ -530,6 +539,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-mini1g.c
@@ -544,6 +554,7 @@ drivers/lcd-ipod.c
 drivers/pcf50605.c
 target/arm/ata-pp5020.c
 target/arm/wmcodec-pp.c
+target/arm/i2s-pp.c
 target/arm/ipod/adc-ipod.c
 target/arm/ipod/backlight-mini1g_mini2g.c
 target/arm/ipod/button-clickwheel.c

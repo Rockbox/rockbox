@@ -39,6 +39,7 @@
 
 #include "wmcodec.h"
 #include "wm8758.h"
+#include "i2s.h"
 
 /* convert tenth of dB volume (-57..6) to master volume register value */
 int tenthdb2master(int db)

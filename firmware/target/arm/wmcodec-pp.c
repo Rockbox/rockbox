@@ -23,19 +23,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
-#include "cpu.h"
-#include "kernel.h"
-#include "thread.h"
-#include "power.h"
-#include "debug.h"
+
 #include "system.h"
-#include "sprintf.h"
-#include "button.h"
-#include "string.h"
-#include "file.h"
-#include "buffer.h"
-#include "audio.h"
 
 #if CONFIG_CPU == PP5020
 #include "i2c-pp5020.h"
@@ -51,47 +40,6 @@
 #define I2C_AUDIO_ADDRESS 0x1a
 #endif
 
-/*
- * Reset the I2S BIT.FORMAT I2S, 16bit, FIFO.FORMAT 32bit
- */
-void i2s_reset(void)
-{
-#if CONFIG_CPU == PP5020
-    /* I2S soft reset */
-    outl(inl(0x70002800) | 0x80000000, 0x70002800);
-    outl(inl(0x70002800) & ~0x80000000, 0x70002800);
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    outl(inl(0x70002800) & ~0xc00, 0x70002800);
-    /* BIT.SIZE [9:8] = 16bit (default) */
-    outl(inl(0x70002800) & ~0x300, 0x70002800);
-
-    /* FIFO.FORMAT [6:4] = 32 bit LSB */
-    /* since BIT.SIZ < FIFO.FORMAT low 16 bits will be 0 */
-    outl(inl(0x70002800) | 0x30, 0x70002800);
-
-    /* RX_ATN_LVL=1 == when 12 slots full */
-    /* TX_ATN_LVL=1 == when 12 slots empty */
-    outl(inl(0x7000280c) | 0x33, 0x7000280c);
-
-    /* Rx.CLR = 1, TX.CLR = 1 */
-    outl(inl(0x7000280c) | 0x1100, 0x7000280c);
-#elif CONFIG_CPU == PP5002
-    /* I2S device reset */
-    outl(inl(0xcf005030) | 0x80, 0xcf005030);
-    outl(inl(0xcf005030) & ~0x80, 0xcf005030);
-
-    /* I2S controller enable */
-    outl(inl(0xc0002500) | 0x1, 0xc0002500);
-
-    /* BIT.FORMAT [11:10] = I2S (default) */
-    /* BIT.SIZE [9:8] = 24bit */
-    /* FIFO.FORMAT = 24 bit LSB */
-
-    /* reset DAC and ADC fifo */
-    outl(inl(0xc000251c) | 0x30000, 0xc000251c);
-#endif
-}
 
 /*
  * Initialise the WM8975 for playback via headphone and line out.
