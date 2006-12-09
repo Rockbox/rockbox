@@ -45,10 +45,8 @@ static int offset_step = 16; /* pixels per screen scroll step */
 static bool offset_out_of_view = false;
 #endif
 
-bool show_list_title(struct gui_list * gui_list)
-{
-    return ((gui_list->title != NULL) && (gui_list->display->nb_lines > 1));
-}
+#define SHOW_LIST_TITLE ((gui_list->title != NULL) && \
+                         (gui_list->display->nb_lines > 1))
 
 void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
@@ -127,7 +125,7 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
 #endif
     gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
-    if (show_list_title(gui_list))
+    if (SHOW_LIST_TITLE)
         nb_lines--;
     if(put_from_end)
     {
@@ -200,7 +198,7 @@ void gui_list_draw(struct gui_list * gui_list)
     gui_textarea_clear(display);
 
     /* position and draw the list title & icon */
-    if (show_list_title(gui_list))
+    if (SHOW_LIST_TITLE)
     {
         i = 1;
         lines = display->nb_lines - 1;
@@ -248,8 +246,8 @@ void gui_list_draw(struct gui_list * gui_list)
     
     draw_cursor = !global_settings.invert_cursor;
     text_pos = 0; /* here it's in pixels */
-    if(draw_scrollbar || show_list_title(gui_list)) /* indent if there's
-                                                       a title */
+    if(draw_scrollbar || SHOW_LIST_TITLE) /* indent if there's
+                                             a title */
     {
         cursor_pos++;
         icon_pos++;
@@ -279,7 +277,7 @@ void gui_list_draw(struct gui_list * gui_list)
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
         int current_item = gui_list->start_item + 
-                           (show_list_title(gui_list) ? i-1 : i);
+                           (SHOW_LIST_TITLE ? i-1 : i);
 
         /* When there are less items to display than the
          * current available space on the screen, we stop*/
@@ -359,7 +357,7 @@ void gui_list_draw(struct gui_list * gui_list)
     if(draw_scrollbar)
     {
         int y_start = gui_textarea_get_ystart(display);
-        if (show_list_title(gui_list))
+        if (SHOW_LIST_TITLE)
             y_start += display->char_height;
         int scrollbar_y_end = display->char_height *
                               lines + y_start;
@@ -395,7 +393,7 @@ void gui_list_select_next(struct gui_list * gui_list)
     {
         gui_list->selected_item+=gui_list->selected_size;
         int nb_lines = gui_list->display->nb_lines;
-        if (show_list_title(gui_list))
+        if (SHOW_LIST_TITLE)
             nb_lines--;
         int item_pos = gui_list->selected_item - gui_list->start_item;
         int end_item = gui_list->start_item + nb_lines;
@@ -427,7 +425,7 @@ void gui_list_select_next(struct gui_list * gui_list)
 void gui_list_select_previous(struct gui_list * gui_list)
 {
     int nb_lines = gui_list->display->nb_lines;        
-    if (show_list_title(gui_list))
+    if (SHOW_LIST_TITLE)
         nb_lines--;
     if( gui_list->selected_item-gui_list->selected_size < 0 )
     {
@@ -478,7 +476,7 @@ void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
-        if (show_list_title(gui_list))
+        if (SHOW_LIST_TITLE)
             nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item += nb_lines;
@@ -498,7 +496,7 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
-        if (show_list_title(gui_list))
+        if (SHOW_LIST_TITLE)
             nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item -= nb_lines;
