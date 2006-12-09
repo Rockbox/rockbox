@@ -45,7 +45,10 @@ static int offset_step = 16; /* pixels per screen scroll step */
 static bool offset_out_of_view = false;
 #endif
 
-
+bool show_list_title(struct gui_list * gui_list)
+{
+    return ((gui_list->title != NULL) && (gui_list->display->nb_lines > 1));
+}
 
 void gui_list_init(struct gui_list * gui_list,
     list_get_name callback_get_item_name,
@@ -104,12 +107,14 @@ void gui_list_flash(struct gui_list * gui_list)
     {
         int cursor_xpos=(global_settings.scrollbar &&
                          display->nb_lines < gui_list->nb_items)?1:0;
-        screen_put_cursorxy(display, cursor_xpos, selected_line, gui_list->cursor_flash_state);
+        screen_put_cursorxy(display, cursor_xpos, selected_line,
+                            gui_list->cursor_flash_state);
     }
     display->update_rect(0, line_ypos,display->width,
                          display->char_height);
 #else
-    screen_put_cursorxy(display, 0, selected_line, gui_list->cursor_flash_state);
+    screen_put_cursorxy(display, 0, selected_line,
+                        gui_list->cursor_flash_state);
     gui_textarea_update(display);
 #endif
 }
@@ -122,7 +127,7 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
 #endif
     gui_textarea_update_nblines(gui_list->display);
     int nb_lines=gui_list->display->nb_lines;
-    if (gui_list->title)
+    if (show_list_title(gui_list))
         nb_lines--;
     if(put_from_end)
     {
@@ -195,7 +200,7 @@ void gui_list_draw(struct gui_list * gui_list)
     gui_textarea_clear(display);
 
     /* position and draw the list title & icon */
-    if (gui_list->title)
+    if (show_list_title(gui_list))
     {
         i = 1;
         lines = display->nb_lines - 1;
@@ -243,7 +248,8 @@ void gui_list_draw(struct gui_list * gui_list)
     
     draw_cursor = !global_settings.invert_cursor;
     text_pos = 0; /* here it's in pixels */
-    if(draw_scrollbar || gui_list->title) /* indent if there's a title */
+    if(draw_scrollbar || show_list_title(gui_list)) /* indent if there's
+                                                       a title */
     {
         cursor_pos++;
         icon_pos++;
@@ -272,7 +278,8 @@ void gui_list_draw(struct gui_list * gui_list)
     {
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
-        int current_item = gui_list->start_item + (gui_list->title?i-1:i);
+        int current_item = gui_list->start_item + 
+                           (show_list_title(gui_list) ? i-1 : i);
 
         /* When there are less items to display than the
          * current available space on the screen, we stop*/
@@ -296,9 +303,12 @@ void gui_list_draw(struct gui_list * gui_list)
                 /* if text got out of view */
                 if (item_offset > item_width - (display->width - text_pos))
                     /* don't scroll */
-                    display->puts_style_offset(0, i, entry_name, STYLE_INVERT,item_offset);
+                    display->puts_style_offset(0, i, entry_name,
+                                               STYLE_INVERT,item_offset);
                 else
-                    display->puts_scroll_style_offset(0, i, entry_name, STYLE_INVERT,item_offset);
+                    display->puts_scroll_style_offset(0, i, entry_name,
+                                                      STYLE_INVERT,
+                                                      item_offset);
 
             else  /*  if (!global_settings.invert_cursor) */
                 if (item_offset > item_width - (display->width - text_pos))
@@ -349,7 +359,7 @@ void gui_list_draw(struct gui_list * gui_list)
     if(draw_scrollbar)
     {
         int y_start = gui_textarea_get_ystart(display);
-        if (gui_list->title)
+        if (show_list_title(gui_list))
             y_start += display->char_height;
         int scrollbar_y_end = display->char_height *
                               lines + y_start;
@@ -385,7 +395,7 @@ void gui_list_select_next(struct gui_list * gui_list)
     {
         gui_list->selected_item+=gui_list->selected_size;
         int nb_lines = gui_list->display->nb_lines;
-        if (gui_list->title)
+        if (show_list_title(gui_list))
             nb_lines--;
         int item_pos = gui_list->selected_item - gui_list->start_item;
         int end_item = gui_list->start_item + nb_lines;
@@ -394,7 +404,8 @@ void gui_list_select_next(struct gui_list * gui_list)
         {
             /* When we reach the bottom of the list
              * we jump to a new page if there are more items*/
-            if( item_pos > nb_lines-gui_list->selected_size && end_item < gui_list->nb_items )
+            if( (item_pos > nb_lines-gui_list->selected_size) && 
+                (end_item < gui_list->nb_items) )
             {
                 gui_list->start_item = gui_list->selected_item;
                 if ( gui_list->start_item > gui_list->nb_items-nb_lines )
@@ -406,7 +417,8 @@ void gui_list_select_next(struct gui_list * gui_list)
             /* we start scrolling vertically when reaching the line
              * (nb_lines-SCROLL_LIMIT)
              * and when we are not in the last part of the list*/
-            if( item_pos > nb_lines-SCROLL_LIMIT && end_item < gui_list->nb_items )
+            if( (item_pos > nb_lines-SCROLL_LIMIT) &&
+                (end_item < gui_list->nb_items) )
                 gui_list->start_item+=gui_list->selected_size;
         }
     }
@@ -415,7 +427,7 @@ void gui_list_select_next(struct gui_list * gui_list)
 void gui_list_select_previous(struct gui_list * gui_list)
 {
     int nb_lines = gui_list->display->nb_lines;        
-    if (gui_list->title)
+    if (show_list_title(gui_list))
         nb_lines--;
     if( gui_list->selected_item-gui_list->selected_size < 0 )
     {
@@ -440,7 +452,8 @@ void gui_list_select_previous(struct gui_list * gui_list)
             /* When we reach the top of the list
              * we jump to a new page if there are more items*/
             if( item_pos < 0)
-                gui_list->start_item = gui_list->selected_item-nb_lines+gui_list->selected_size;
+                gui_list->start_item = gui_list->selected_item - nb_lines +
+                                       gui_list->selected_size;
         }
         else
         {
@@ -465,7 +478,7 @@ void gui_list_select_next_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
-        if (gui_list->title)
+        if (show_list_title(gui_list))
             nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item += nb_lines;
@@ -485,7 +498,7 @@ void gui_list_select_previous_page(struct gui_list * gui_list, int nb_lines)
     }
     else
     {
-        if (gui_list->title)
+        if (show_list_title(gui_list))
             nb_lines--;
         nb_lines-=nb_lines%gui_list->selected_size;
         gui_list->selected_item -= nb_lines;
@@ -614,7 +627,8 @@ int  gui_synclist_get_sel_pos(struct gui_synclist * lists)
 {
     return gui_list_get_sel_pos(&((lists)->gui_list[0]));
 }
-void gui_synclist_set_icon_callback(struct gui_synclist * lists, list_get_icon icon_callback)
+void gui_synclist_set_icon_callback(struct gui_synclist * lists,
+                                    list_get_icon icon_callback)
 {
     int i;
     FOR_NB_SCREENS(i)
@@ -690,7 +704,8 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
         gui_list_limit_scroll(&(lists->gui_list[i]), scroll);
 }
 
-void gui_synclist_set_title(struct gui_synclist * lists, char * title, ICON icon)
+void gui_synclist_set_title(struct gui_synclist * lists,
+                            char * title, ICON icon)
 {
     int i;
     FOR_NB_SCREENS(i)
@@ -761,10 +776,11 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
 
 #ifdef HAVE_LCD_BITMAP
         case ACTION_TREE_ROOT_INIT:
-         /* After this button press ACTION_TREE_PGLEFT is allowed to skip to root.
-            ACTION_TREE_ROOT_INIT must be defined in the keymaps as a repeated
-            button press (the same as the repeated ACTION_TREE_PGLEFT) with the
-            pre condition being the non-repeated button press */
+         /* After this button press ACTION_TREE_PGLEFT is allowed
+            to skip to root. ACTION_TREE_ROOT_INIT must be defined in the
+            keymaps as a repeated button press (the same as the repeated
+            ACTION_TREE_PGLEFT) with the pre condition being the non-repeated
+            button press */
             if (lists->gui_list[0].offset_position == 0)
             {
                 scrolling_left = false;
@@ -779,13 +795,14 @@ unsigned gui_synclist_do_button(struct gui_synclist * lists,
                 return ACTION_STD_CANCEL;
             gui_synclist_scroll_left(lists);
             gui_synclist_draw(lists);
-            scrolling_left = true; /* stop ACTION_TREE_PAGE_LEFT skipping to root */
+            scrolling_left = true; /* stop ACTION_TREE_PAGE_LEFT
+                                      skipping to root */
             return ACTION_TREE_PGLEFT;
 #endif
 
-/* for pgup / pgdown, we are obliged to have a different behaviour depending on the screen
- * for which the user pressed the key since for example, remote and main screen doesn't
- * have the same number of lines*/
+/* for pgup / pgdown, we are obliged to have a different behaviour depending
+ * on the screen for which the user pressed the key since for example, remote
+ * and main screen doesn't have the same number of lines */
         case ACTION_LISTTREE_PGUP:
             gui_synclist_select_previous_page(lists, SCREEN_MAIN);
             gui_synclist_draw(lists);
