@@ -152,10 +152,18 @@ struct encoder_config
 #define CHUNKF_ERROR    0x80000000 /* An error has occured (passed to/
                                       from encoder). Use the sign bit to
                                       check (long)flags < 0.               */
+#define CHUNKF_ALLFLAGS 0x80000033
 
 /* Header at the beginning of every encoder chunk */
+#ifdef PCMREC_PARANOID
+#define ENC_CHUNK_MAGIC H_TO_BE32(('P' << 24) | ('T' << 16) | ('Y' << 8) | 'R')
+#endif
 struct enc_chunk_hdr
 {
+#ifdef PCMREC_PARANOID
+    unsigned long id;         /* overflow detection - 'PTYR' - acronym for
+                                 "PTYR Tells You Right" ;)                 */
+#endif
     unsigned long flags;      /* in/out: flags used by encoder and file
                                          writing                           */
     size_t        enc_size;   /* out:    amount of encoder data written to

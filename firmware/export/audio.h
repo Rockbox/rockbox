@@ -39,16 +39,17 @@
 #define audio_play(x) sim_audio_play(x)
 #endif
 
-#define AUDIO_STATUS_PLAY 1
-#define AUDIO_STATUS_PAUSE 2
-#define AUDIO_STATUS_RECORD 4
-#define AUDIO_STATUS_PRERECORD 8
-#define AUDIO_STATUS_ERROR 16
+#define AUDIO_STATUS_PLAY       0x0001
+#define AUDIO_STATUS_PAUSE      0x0002
+#define AUDIO_STATUS_RECORD     0x0004
+#define AUDIO_STATUS_PRERECORD  0x0008
+#define AUDIO_STATUS_ERROR      0x0010
+#define AUDIO_STATUS_WARNING    0x0020
 
-#define AUDIOERR_DISK_FULL 1
+#define AUDIOERR_DISK_FULL      1
 
-#define AUDIO_GAIN_LINEIN    0
-#define AUDIO_GAIN_MIC       1
+#define AUDIO_GAIN_LINEIN       0
+#define AUDIO_GAIN_MIC          1
 
 
 struct audio_debug

@@ -751,6 +751,10 @@ bool recording_screen(bool no_source)
     bool been_in_usb_mode = false;
     int last_audio_stat = -1;
     int audio_stat;
+#if CONFIG_CODEC == SWCODEC
+    int warning_counter = 0;
+    #define WARNING_PERIOD 7
+#endif
 #ifdef HAVE_FMRADIO_IN
     /* Radio is left on if:
      *   1) Is was on at the start and the initial source is FM Radio
@@ -1292,7 +1296,7 @@ bool recording_screen(bool no_source)
             default:
                 default_event_handler(button);
                 break;
-        }
+        } /* end switch */
 
 #ifdef HAVE_AGC
         peak_read = !peak_read;
@@ -1328,6 +1332,20 @@ bool recording_screen(bool no_source)
             for(i = 0; i < screen_update; i++)
                 screens[i].clear_display(); 
 
+#if CONFIG_CODEC == SWCODEC
+            if ((audio_stat & AUDIO_STATUS_WARNING)
+                && (warning_counter++ % WARNING_PERIOD) < WARNING_PERIOD/2)
+            {
+                /* Switch back and forth displaying warning on first available
+                   line to ensure visibility - the motion should also help
+                   draw attention */
+                /* Don't use language string unless agreed upon to make this
+                   method permanent - could do something in the statusbar */
+                snprintf(buf, sizeof(buf), "Warning: %08X",
+                         pcm_rec_get_warnings());
+            }
+            else
+#endif /* CONFIG_CODEC == SWCODEC */
             if ((global_settings.rec_sizesplit) && (global_settings.rec_split_method))
             {
                 dmb = dsize/1024/1024;
@@ -1381,18 +1399,17 @@ bool recording_screen(bool no_source)
             {
                 if (filename_offset[i] > 0)
                 {
+                    *filename = '\0';
                     if (audio_stat & AUDIO_STATUS_RECORD)
                     {
                         strncpy(filename, path_buffer +
                                     strlen(path_buffer) - 12, 13);
                         filename[12]='\0';
                     }
-                    else
-                        strcpy(filename, "");
 
                     snprintf(buf, sizeof(buf), "%s %s",
                         str(LANG_SYSFONT_RECORDING_FILENAME), filename);
-                    screens[i].puts(0, 2, buf);         
+                    screens[i].puts(0, 2, buf);
                 }
             }
 

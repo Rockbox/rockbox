@@ -25,6 +25,37 @@
 #define DMA_REC_ERROR_SPDIF     (-2)
 #endif
 
+/** Warnings **/
+/* pcm (dma) buffer has overflowed */
+#define PCMREC_W_PCM_BUFFER_OVF         0x00000001
+/* encoder output buffer has overflowed */
+#define PCMREC_W_ENC_BUFFER_OVF         0x00000002
+#ifdef PCMREC_PARANOID
+/* dma write position alignment incorrect */
+#define PCMREC_W_DMA_WR_POS_ALIGN       0x00000004
+/* pcm read position changed at some point not under control of recording */
+#define PCMREC_W_PCM_RD_POS_TRASHED     0x00000008
+/* dma write position changed at some point not under control of recording */
+#define PCMREC_W_DMA_WR_POS_TRASHED     0x00000010
+#endif /* PCMREC_PARANOID */
+/** Errors **/
+/* failed to load encoder */
+#define PCMREC_E_LOAD_ENCODER           0x80001000
+/* error originating in encoder */
+#define PCMREC_E_ENCODER                0x80002000
+/* filename queue has desynced from stream markers */
+#define PCMREC_E_FNQ_DESYNC             0x80004000
+#ifdef PCMREC_PARANOID
+/* encoder has written past end of allotted space */
+#define PCMREC_E_CHUNK_OVF              0x80008000
+/* chunk header incorrect */
+#define PCMREC_E_BAD_CHUNK              0x80010000
+/* encoder read position changed outside of recording control */
+#define PCMREC_E_ENC_RD_INDEX_TRASHED   0x80020000
+/* encoder write position changed outside of recording control */
+#define PCMREC_E_ENC_WR_INDEX_TRASHED   0x80040000
+#endif /* PCMREC_PARANOID */
+
 /**
  * RAW pcm data recording
  * These calls are nescessary only when using the raw pcm apis directly.
@@ -54,6 +85,7 @@ void pcm_rec_error_clear(void);
 /* pcm_rec_status is deprecated for general use. audio_status merges the
    results for consistency with the hardware codec version */
 unsigned long pcm_rec_status(void);
+unsigned long pcm_rec_get_warnings(void);
 void pcm_rec_init(void);
 int  pcm_rec_current_bitrate(void);
 int  pcm_rec_encoder_afmt(void); /* AFMT_* value, AFMT_UNKNOWN if none */
