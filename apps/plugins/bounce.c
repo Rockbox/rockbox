@@ -18,15 +18,11 @@
  **************************************************************************/
 #include "plugin.h"
 #include "time.h"
-
-#ifdef HAVE_LCD_BITMAP
+#include "fixedpoint.h"
 
 PLUGIN_HEADER
 
 #define SS_TITLE       "Bouncer"
-#define SS_TITLE_FONT  2
-
-#define LETTERS_ON_SCREEN (LCD_WIDTH/10)
 
 #define YSPEED 2
 #define XSPEED 3
@@ -89,60 +85,8 @@ PLUGIN_HEADER
 
 static struct plugin_api* rb;
 
-#define TABLE_SIZE (sizeof(table)/sizeof(table[0]))
-
-#if LCD_HEIGHT < 128
-
-static unsigned char table[]={
-26,28,30,33,35,37,39,40,42,43,45,46,46,47,47,47,47,47,46,46,45,43,42,40,39,37,35,33,30,28,26,24,21,19,17,14,12,10,8,7,5,4,2,1,1,0,0,0,0,0,1,1,2,4,5,7,8,10,12,14,17,19,21,23,
-};
-
-static unsigned char xtable[]={
-    50, 54, 59, 64, 69, 73, 77, 81, 85, 88, 91, 94, 96, 97, 99, 99, 99, 99, 
-    99, 97, 96, 94, 91, 88, 85, 81, 77, 73, 69, 64, 59, 54, 50, 45, 40, 35, 
-    30, 26, 22, 18, 14, 11, 8, 5, 3, 2, 0, 0, 0, 0, 0, 2, 3, 5, 8, 11, 14, 
-    18, 22, 26, 30, 35, 40, 45, 
-};
-#else
-
-/* 160 - 12 = 148
-   148 / 2 = 74 (radius)
-*/
-
-static unsigned char xtable[]={
-74, 77, 81, 84, 88, 91, 95, 98, 102, 105, 108, 112, 115, 118, 120, 123, 
-126, 128, 131, 133, 135, 137, 139, 140, 142, 143, 144, 145, 146, 147, 147, 
-147, 147, 147, 147, 147, 146, 145, 144, 143, 142, 140, 139, 137, 135, 133, 
-131, 128, 126, 123, 120, 118, 115, 112, 108, 105, 102, 98, 95, 91, 88, 
-84, 81, 77, 74, 70, 66, 63, 59, 56, 52, 49, 45, 42, 39, 35, 32, 29, 27, 
-24, 21, 19, 16, 14, 12, 10, 8, 7, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 
-2, 3, 4, 5, 7, 8, 10, 12, 14, 16, 19, 21, 24, 27, 29, 32, 35, 39, 42, 45, 
-49, 52, 56, 59, 63, 66, 70, 
-
-};
-
-/* 128 - 16 = 116
-   112 / 2 = 56 (radius)
-*/
-static unsigned char table[]={
-56, 58, 61, 64, 66, 69, 72, 74, 77, 79, 82, 84, 87, 89, 91, 93, 95, 97, 
-99, 100, 102, 104, 105, 106, 107, 108, 109, 110, 110, 111, 111, 111, 111, 
-111, 111, 111, 110, 110, 109, 108, 107, 106, 105, 104, 102, 100, 99, 97, 
-95, 93, 91, 89, 87, 84, 82, 79, 77, 74, 72, 69, 66, 64, 61, 58, 56, 53, 
-50, 47, 45, 42, 39, 37, 34, 32, 29, 27, 24, 22, 20, 18, 16, 14, 12, 11, 
-9, 7, 6, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 3, 4, 5, 6, 7, 
-9, 11, 12, 14, 16, 18, 20, 22, 24, 27, 29, 32, 34, 37, 39, 42, 45, 47, 
-50, 53, 
-
-};
-
-#endif
-
-static signed char speed[]={
-  1,2,3,3,3,2,1,0,-1,-2,-2,-2,-1,0,0,1,
-};
-
-#define LETTER_WIDTH 12 /* pixels wide */
+#define LETTER_WIDTH  11
+#define LETTER_HEIGHT 16
 
 const unsigned char char_gen_12x16[][22] =
 {
@@ -244,8 +188,57 @@ const unsigned char char_gen_12x16[][22] =
     { 0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0x00,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x3f,0x00 }
 };
 
-#define XDIFF -4
-#define YDIFF -6
+static signed char speed[]={
+    1,2,3,3,3,2,1,0,-1,-2,-2,-2,-1,0,0,1,
+};
+
+#if LCD_WIDTH > LCD_HEIGHT /* landscape LCD  */
+
+#define TABLE_SIZE    LCD_HEIGHT
+#define RADIUS_MINUTE (3*LCD_HEIGHT/8)
+#define RADIUS_HOUR   (LCD_HEIGHT/4)
+
+#else /* portrait (or square) LCD */
+
+#define TABLE_SIZE LCD_WIDTH
+#define RADIUS_MINUTE (3*LCD_WIDTH/8)
+#define RADIUS_HOUR   (LCD_WIDTH/4)
+
+#endif /* LCD orientation */
+
+#define RADIUS_X   ((LCD_WIDTH-LETTER_WIDTH)/2)
+#define RADIUS_Y   ((LCD_HEIGHT-LETTER_HEIGHT)/2)
+
+#define PHASE_STEP (0xffffffff/TABLE_SIZE)
+#define PHASE_FRAC (0xffffffff%TABLE_SIZE)
+#define DIV_X      (0x7ffffffe/RADIUS_X+1)
+#define DIV_Y      (0x7ffffffe/RADIUS_Y+1)
+
+static int xtable[TABLE_SIZE];
+static int ytable[TABLE_SIZE];
+
+static void init_tables(void)
+{
+    int i;
+    int pfrac;
+    unsigned long phase;
+    long sin;
+    
+    phase = pfrac = 0;
+
+    for (i = 0; i < TABLE_SIZE; i++) {
+         sin = fsincos(phase, NULL);
+         xtable[i] = RADIUS_X + sin / DIV_X;
+         ytable[i] = RADIUS_Y + sin / DIV_Y;
+         
+         phase += PHASE_STEP;
+         pfrac += PHASE_FRAC;
+         if (pfrac >= TABLE_SIZE) {
+             pfrac -= TABLE_SIZE;
+             phase++;
+         }
+    }
+}
 
 enum {
   NUM_XSANKE,
@@ -273,55 +266,72 @@ struct counter values[]={
 };
 
 #ifdef CONFIG_RTC
-static unsigned char yminute[]={
-53,53,52,52,51,50,49,47,46,44,42,40,38,36,34,32,29,27,25,23,21,19,17,16,14,13,12,11,11,10,10,10,11,11,12,13,14,16,17,19,21,23,25,27,29,31,34,36,38,40,42,44,46,47,49,50,51,52,52,53,
-};
-static unsigned char yhour[]={
-42,42,42,42,41,41,40,39,39,38,37,36,35,34,33,32,30,29,28,27,26,25,24,24,23,22,22,21,21,21,21,21,21,21,22,22,23,24,24,25,26,27,28,29,30,31,33,34,35,36,37,38,39,39,40,41,41,42,42,42,
-};
 
-static unsigned char xminute[]={
-56,59,63,67,71,74,77,80,83,86,88,90,91,92,93,93,93,92,91,90,88,86,83,80,77,74,71,67,63,59,56,52,48,44,40,37,34,31,28,25,23,21,20,19,18,18,18,19,20,21,23,25,28,31,34,37,40,44,48,52,
-};
-static unsigned char xhour[]={
-56,57,59,61,63,65,66,68,69,71,72,73,73,74,74,74,74,74,73,73,72,71,69,68,66,65,63,61,59,57,56,54,52,50,48,46,45,43,42,40,39,38,38,37,37,37,37,37,38,38,39,40,42,43,45,46,48,50,52,54,
-};
+#define CLOCK_STEP (0xffffffff/60)
+#define CLOCK_FRAC (0xffffffff%60)
+
+#define DIV_MY (0x7ffffffe/RADIUS_MINUTE+1)
+#define DIV_HY (0x7ffffffe/RADIUS_HOUR+1)
+
+#if LCD_WIDTH == 112 && LCD_HEIGHT == 64 /* Archos LCD: non-square pixels */
+#define DIV_MX (0x7ffffffe/(5*RADIUS_MINUTE/4)+1)
+#define DIV_HX (0x7ffffffe/(5*RADIUS_HOUR/4)+1)
+#else  /* Square pixels */
+#define DIV_MX DIV_MY
+#define DIV_HX DIV_HY
+#endif
+
+static int xminute[60], yminute[60];
+static int xhour[60], yhour[60];
+
+static void init_clock(void)
+{
+    int i;
+    int pfrac;
+    unsigned long phase;
+    long sin, cos;
+    
+    phase = pfrac = 0;
+    
+    for (i = 0; i < 60; i++) {
+         sin = fsincos(phase, &cos);
+         xminute[i] = LCD_WIDTH/2 + sin / DIV_MX;
+         yminute[i] = LCD_HEIGHT/2 - cos / DIV_MY;
+         xhour[i] = LCD_WIDTH/2 + sin / DIV_HX;
+         yhour[i] = LCD_HEIGHT/2 - cos / DIV_HY;
+
+         phase += CLOCK_STEP;
+         pfrac += CLOCK_FRAC;
+         if (pfrac >= 60) {
+             pfrac -= 60;
+             phase++;
+         }
+    }
+}
 
 static void addclock(void)
 {
     int i;
     int hour;
     int minute;
-    int pos;
 
     struct tm* current_time = rb->get_time();
     hour = current_time->tm_hour;
     minute = current_time->tm_min;
 
-    pos = 90-minute;
-    if(pos >= 60)
-        pos -= 60;
+    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2,
+                     xminute[minute], yminute[minute]);
 
-    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xminute[pos], yminute[pos]);
+    hour = (hour % 12) * 5 + minute / 12;
 
-    hour = hour*5 + minute/12;
-    pos = 90-hour;
-    if(pos >= 60)
-        pos -= 60;
-
-    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[pos], yhour[pos]);
+    rb->lcd_drawline(LCD_WIDTH/2, LCD_HEIGHT/2, xhour[hour], yhour[hour]);
 
     /* draw a circle */
-    for(i=0; i < 60; i+=3) {
-        rb->lcd_drawline( xminute[i],
-                          yminute[i],
-                          xminute[(i+1)%60],
-                          yminute[(i+1)%60]);
-    }
+    for(i = 1; i < 60; i += 3) 
+        rb->lcd_drawline(xminute[i], yminute[i],
+                         xminute[(i+1)%60], yminute[(i+1)%60]);
 }
 #endif /* CONFIG_RTC */
-
-#define DRAW_WIDTH (LCD_WIDTH + LETTER_WIDTH*2)
 
 #if LCD_DEPTH > 1
 static const unsigned face_colors[] =
@@ -338,10 +348,11 @@ static int scrollit(void)
 {
     int b;
     unsigned int y=100;
-    int x=LCD_WIDTH;
-    unsigned int yy,xx;
+    unsigned int yy;
+    int x = LCD_WIDTH;
+    int xx;
     unsigned int i;
-    int textpos=0;
+    unsigned int textpos=0;
 
     char* rock="Rockbox! Pure pleasure. Pure fun. Oooh. What fun! ;-) ";
     unsigned int rocklen = rb->strlen(rock);
@@ -365,32 +376,35 @@ static int scrollit(void)
                     return -1;
         }
         rb->lcd_clear_display();
-
-        for(i=0, yy=y, xx=x; i< LETTERS_ON_SCREEN; i++) {
-            letter = rock[(i+textpos) % rocklen ];
-#if LCD_DEPTH > 1
-            rb->lcd_set_foreground(face_colors[ letter % 3] );
-#endif
-            rb->lcd_mono_bitmap(char_gen_12x16[letter-0x20],
-                                xx, table[yy&(TABLE_SIZE-1)], 11, 16);
-            yy += YADD;
-            xx+= DRAW_WIDTH/LETTERS_ON_SCREEN;
-        }
 #ifdef CONFIG_RTC
         addclock();
+#endif
+
+        for(i=0, yy=y, xx=x; xx < LCD_WIDTH; i++) {
+            letter = rock[(i+textpos) % rocklen ];
+#if LCD_DEPTH > 1
+            rb->lcd_set_foreground(face_colors[letter % 3]);
+#endif
+            rb->lcd_mono_bitmap(char_gen_12x16[letter-0x20],
+                                xx, ytable[yy % TABLE_SIZE],
+                                LETTER_WIDTH, LETTER_HEIGHT);
+            yy += YADD;
+            xx += LETTER_WIDTH;
+        }
+#if LCD_DEPTH > 1
+        rb->lcd_set_foreground(LCD_BLACK);
 #endif
         rb->lcd_update();
 
         x-= XSPEED;
         
         if(x < -LETTER_WIDTH) {
-            x += DRAW_WIDTH/LETTERS_ON_SCREEN;
+            x += LETTER_WIDTH;
             y += YADD;
             textpos++;
         }
 
         y+=YSPEED;
-
     }
 }
 
@@ -460,8 +474,9 @@ static int loopit(void)
             i<rocklen;
             i++, yy+=values[NUM_YDIST].num, xx+=values[NUM_XDIST].num)
             rb->lcd_mono_bitmap(char_gen_12x16[rock[i]-0x20],
-                                xtable[xx&(TABLE_SIZE-1)],
-                                table[yy&(TABLE_SIZE-1)], 11, 16);
+                                xtable[xx % TABLE_SIZE],
+                                ytable[yy % TABLE_SIZE],
+                                LETTER_WIDTH, LETTER_HEIGHT);
         rb->lcd_update();
 
         ysanke+= values[NUM_YSANKE].num;
@@ -474,66 +489,39 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 {
     int w, h;
     char *off = "[Off] to stop";
-    int len;
 
     (void)(parameter);
     rb = api;
 
-    len = rb->strlen(SS_TITLE);
-#if LCD_DEPTH > 1
-    rb->lcd_set_backdrop(NULL);
-#endif
     rb->lcd_setfont(FONT_SYSFIXED);
-    rb->lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
-
-    /* Get horizontel centering for text */
-    len *= w;
-    if (len%2 != 0)
-        len = ((len+1)/2)+(w/2);
-    else
-        len /= 2;
-    
-    if (h%2 != 0)
-        h = (h/2)+1;
-    else
-        h /= 2;
-    
     rb->lcd_clear_display();
-    rb->lcd_putsxy(LCD_WIDTH/2-len, (LCD_HEIGHT/2)-h, (unsigned char *)SS_TITLE);
-    
-    len = 1;
-    rb->lcd_getstringsize((unsigned char *)off, &w, &h);
 
     /* Get horizontel centering for text */
-    len *= w;
-    if (len%2 != 0)
-        len = ((len+1)/2)+(w/2);
-    else
-        len /= 2;
-    
-    if (h%2 != 0)
-        h = (h/2)+1;
-    else
-        h /= 2;
-    
-    rb->lcd_putsxy(LCD_WIDTH/2-len, LCD_HEIGHT-(2*h), (unsigned char *)off);
+    rb->lcd_getstringsize((unsigned char *)SS_TITLE, &w, &h);
+    rb->lcd_putsxy((LCD_WIDTH/2) - w / 2, (LCD_HEIGHT/2) - h / 2,
+                   (unsigned char *)SS_TITLE);
+
+    /* Get horizontel centering for text */
+    rb->lcd_getstringsize((unsigned char *)off, &w, &h);
+    rb->lcd_putsxy((LCD_WIDTH/2) - w / 2, LCD_HEIGHT - 2 * h,
+                    (unsigned char *)off);
+
     rb->lcd_update();
     rb->sleep(HZ);
     rb->lcd_set_drawmode(DRMODE_FG);
+    init_tables();
+#ifdef CONFIG_RTC
+    init_clock();
+#endif
 
     do {
         h = loopit();
         if (h > 0)
             h = scrollit();
-#if LCD_DEPTH > 1
-        rb->lcd_set_foreground(LCD_BLACK);
-#endif
     } while(h > 0);
     
     rb->lcd_set_drawmode(DRMODE_SOLID);
     rb->lcd_setfont(FONT_UI);
-    
+
     return (h == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }
-
-#endif
