@@ -79,9 +79,6 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         : : "a"(dest)
     );
 #elif (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
-    for(i = length; i < length; i++)
-        *localdest++ = *source++;
-
     /* Flush cache */
     outl(inl(0xf000f044) | 0x2, 0xf000f044);
     while ((inl(0x6000c000) & 0x8000) != 0) {}
