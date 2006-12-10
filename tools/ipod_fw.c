@@ -34,9 +34,11 @@
 
 #define TBL 0x4200
 
+int sectorsize = 512;
+
 /* Some firmwares have padding becore the actual image.  */
-#define IMAGE_PADDING ((fw_version == 3) ? 0x200 : 0)
-#define FIRST_OFFSET (TBL + 0x200 + IMAGE_PADDING)
+#define IMAGE_PADDING ((fw_version == 3) ? sectorsize : 0)
+#define FIRST_OFFSET (TBL + ((sectorsize == 0x200) ? 0x200 : 0x600) + IMAGE_PADDING)
 
 int be;
 unsigned short fw_version = 2;
@@ -180,6 +182,15 @@ load_entry(image_t *image, FILE *fw, unsigned offset, int entry)
 	return -1;
     }
     switch_endian(image);
+
+    /* If we find an "osos" image with devOffset 0x4800, we have 2048-byte
+       sectors.  This isn't 100% future-proof, but works as of December 2006.
+       We display this information so users can spot any false-positives that
+       may occur in the future (although this is unlikely). */
+    if ((image->id==0x6f736f73) && (image->devOffset==0x4800)) {
+        sectorsize=2048;
+        fprintf(stderr,"Detected 2048-byte sectors\n");
+    }
     return 0;
 }
 
@@ -219,8 +230,17 @@ extract(FILE *f, int idx, FILE *out)
     fw_version = switch_16(fw_version);
 
     image = (image_t *)buf;
-    if (load_entry(image, f, TBL, idx) == -1)
-	return -1;
+
+    /* We need to detect sector size, so always load image 0 directory
+       entry first */
+    if (load_entry(image, f, TBL, 0) == -1)
+        return -1;
+
+    if (idx > 0) { /* Now read the real image (if it isn't 0) */
+        if (load_entry(image, f, TBL, idx) == -1)
+            return -1;
+    }
+
     off = image->devOffset + IMAGE_PADDING;
 
     if (fseek(f, off, SEEK_SET) == -1) {
@@ -529,6 +549,7 @@ main(int argc, char **argv)
     if (version) image.vers = version;
     image.len = offset + len - FIRST_OFFSET;
     image.entryOffset = offset - FIRST_OFFSET;
+    image.devOffset = (sectorsize==512 ? 0x4400 : 0x4800);
     if ((image.chksum = copysum(out, NULL, image.len, FIRST_OFFSET)) == -1)
 	return 1;
     if (fseek(out, 0x0, SEEK_SET) == -1) {
