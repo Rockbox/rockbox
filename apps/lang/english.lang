@@ -2646,13 +2646,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Internal Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: "Internal Mic"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -9267,13 +9267,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mic"
+    *: "Int. Mic"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
