@@ -34,3 +34,8 @@ bool charger_inserted(void)
         return true;
     return false;
 }
+
+void ide_power_enable(bool on)
+{
+    (void)on;
+}
