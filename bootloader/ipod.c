@@ -65,43 +65,7 @@
 
 char version[] = APPSVERSION;
 
-typedef struct _image {
-    unsigned type;              /* '' */
-    unsigned id;                /* */
-    unsigned pad1;              /* 0000 0000 */
-    unsigned devOffset;         /* byte offset of start of image code */
-    unsigned len;               /* length in bytes of image */
-    void    *addr;              /* load address */
-    unsigned entryOffset;       /* execution start within image */
-    unsigned chksum;            /* checksum for image */
-    unsigned vers;              /* image version */
-    unsigned loadAddr;          /* load address for image */
-} image_t;
-
-extern image_t boot_table[];
-
 int line=0;
-
-static void memmove16(void *dest, const void *src, unsigned count)
-{
-    struct bufstr {
-        unsigned _buf[4];
-    } *d, *s;
-
-    if (src >= dest) {
-        count = (count + 15) >> 4;
-        d = (struct bufstr *) dest;
-        s = (struct bufstr *) src;
-        while (count--)
-            *d++ = *s++;
-    } else {
-        count = (count + 15) >> 4;
-        d = (struct bufstr *)(dest + (count <<4));
-        s = (struct bufstr *)(src + (count <<4));
-        while (count--)
-            *--d = *--s;
-    }
-}
 
 #if CONFIG_KEYPAD == IPOD_4G_PAD && !defined(IPOD_MINI)
 /* check if number of seconds has past */
@@ -318,12 +282,8 @@ unsigned char loadbuffer[MAX_LOADSIZE];
 void* main(void)
 {
     char buf[256];
-    int imageno=0;
     int i;
     int rc;
-    int padding = 0x4400;
-    image_t *tblp = boot_table;
-    void* entry;
     struct partinfo* pinfo;
     unsigned short* identify_info;
 
@@ -447,17 +407,14 @@ void* main(void)
     lcd_puts(0, line, "Loading original firmware...");
     lcd_update();
 
-    /* Pause for 5 seconds so we can see what's happened */
-//    udelay(5000000);
+    /* The original firmware should already be at the correct location
+       in RAM - the Rockbox bootloader has been appended to the end of
+       it, and the "entryOffset" in the firmware header modified to
+       tell the Apple bootloader to pass execution to our bootloader,
+       rather than the start of the original firmware - which is
+       always at the start of RAM. */
 
-    entry = tblp->addr + tblp->entryOffset;
-    if (imageno || ((int)tblp->addr & 0xffffff) != 0) {
-        memmove16(tblp->addr, tblp->addr + tblp->devOffset - padding,
-                  tblp->len);
-    }
-
-    /* Return the start address in loaded image */
-    return entry;
+    return (void*)DRAM_START;
 }
 
 /* These functions are present in the firmware library, but we reimplement

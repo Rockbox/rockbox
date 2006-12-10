@@ -7,14 +7,10 @@ INPUT(target/coldfire/crt0.o)
 #elif defined (CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
-#ifndef IPOD_ARCH
-/* the ipods can't have the crt0.o mentioned here, but the others can't do
-   without it! */
 #ifdef CPU_PP
 INPUT(target/arm/crt0-pp.o)
 #else
 INPUT(target/arm/crt0.o)
-#endif
 #endif
 #else
 OUTPUT_FORMAT(elf32-sh)
