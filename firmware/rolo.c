@@ -32,10 +32,8 @@
 
 #if !defined(IRIVER_IFP7XX_SERIES) && \
     (CONFIG_CPU != PP5002) && !defined(IRIVER_H10) && \
-    !defined(IRIVER_H10_5GB) && (CONFIG_CPU != S3C2440) && \
-    !defined(SANSA_E200)
+    !defined(IRIVER_H10_5GB) && (CONFIG_CPU != S3C2440)
 /* FIX: this doesn't work on iFP, 3rd Gen ipods, or H10 yet */
-/* TODO: Test on the Sansa */
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
@@ -65,7 +63,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
 {
     long i;
     unsigned char* localdest = dest;
-#if (CONFIG_CPU==PP5020)
+#if (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
     unsigned long* memmapregs = (unsigned long*)0xf000f000;
 #endif
 
@@ -80,10 +78,13 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         "jmp     (%0)        \n"
         : : "a"(dest)
     );
-#elif (CONFIG_CPU==PP5020)
-    /* Copy a further 8KB of data to try and ensure the cache is flushed */
-    for(i = length; i < length+8192; i++)
+#elif (CONFIG_CPU==PP5020) || (CONFIG_CPU==PP5024)
+    for(i = length; i < length; i++)
         *localdest++ = *source++;
+
+    /* Flush cache */
+    outl(inl(0xf000f044) | 0x2, 0xf000f044);
+    while ((inl(0x6000c000) & 0x8000) != 0) {}
 
     /* Disable cache */
     outl(0x0, 0x6000C000);
