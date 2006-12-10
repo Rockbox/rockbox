@@ -17,10 +17,20 @@
  *
  ****************************************************************************/
 
+#include <stdbool.h>
+#include "cpu.h"
+
 void power_init(void)
 {
 }
 
 void power_off(void)
 {
+}
+
+bool charger_inserted(void)
+{
+    if(GPIOB_INPUT_VAL & 0x10)
+        return true;
+    return false;
 }

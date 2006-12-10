@@ -4,7 +4,7 @@
 #define TARGET_TREE /* this target is using the target tree system */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 12
+#define MODEL_NUMBER 16
 
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/ /* TODO: add support for this */
@@ -82,11 +82,11 @@
 #define BATTERY_SCALE_FACTOR 5865
 
 /* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* define this if the hardware can be powered off while charging */
 /* TODO: should this be set for the H10? */
-//#define HAVE_POWEROFF_WHILE_CHARGING
+#define HAVE_POWEROFF_WHILE_CHARGING
 
 /* The start address index for ROM builds */
 #define ROM_START 0x00000000
