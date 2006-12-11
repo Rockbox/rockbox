@@ -380,9 +380,14 @@ bool main_menu(void)
     int m;
     bool result;
     int i = 0;
+    static bool inside_menu = false;
+
 
     /* main menu */
     struct menu_item items[11];
+
+    if(inside_menu) return false;
+    inside_menu = true;
 
     items[i].desc = ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS);
     items[i++].function = bookmark_mrb_load;
@@ -434,6 +439,8 @@ bool main_menu(void)
     status_set_param(false);
 #endif
     menu_exit(m);
+
+    inside_menu = false;
 
     return result;
 }
