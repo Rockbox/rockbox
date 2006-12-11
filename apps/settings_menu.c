@@ -46,7 +46,6 @@
 #include "misc.h"
 #include "abrepeat.h"
 #include "power.h"
-#include "database.h"
 #include "dir.h"
 #include "dircache.h"
 #ifdef HAVE_TAGCACHE

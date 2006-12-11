@@ -59,7 +59,6 @@
 #include "talk.h"
 #include "plugin.h"
 #include "misc.h"
-#include "database.h"
 #include "dircache.h"
 #ifdef HAVE_TAGCACHE
 #include "tagcache.h"

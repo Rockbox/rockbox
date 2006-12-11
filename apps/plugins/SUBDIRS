@@ -1,7 +1,6 @@
 #ifndef IRIVER_IFP7XX_SERIES
 
 /* For all targets */
-databox
 
 /* For various targets... */
 #if (CONFIG_KEYPAD == RECORDER_PAD) || \

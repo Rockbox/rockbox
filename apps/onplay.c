@@ -58,7 +58,6 @@
 #endif
 #include "main_menu.h"
 #include "sound_menu.h"
-#include "database.h"
 #if CONFIG_CODEC == SWCODEC
 #include "eq_menu.h"
 #endif

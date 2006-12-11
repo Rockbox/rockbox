@@ -48,7 +48,6 @@
 #include "powermgmt.h"
 #include "system.h"
 #include "sound.h"
-#include "database.h"
 #include "splash.h"
 #include "general.h"
 
