@@ -35,3 +35,4 @@ CVSROOT /usr/bin/syncmail -C4 -u %1{sVv} bjorn@haxx.se
 ^bootloader /usr/bin/syncmail -C4 -u -S "$USER: " %1{sVv} rockbox-cvs@cool.haxx.se
 ^wps /usr/bin/syncmail -C4 -u -S "$USER: " %1{sVv} rockbox-cvs@cool.haxx.se
 ^manual /usr/bin/syncmail -C4 -u -S "$USER: " %1{sVv} rockbox-cvs@cool.haxx.se
+^rbutil /usr/bin/syncmail -C4 -u -S "$USER: " %1{sVv} rockbox-cvs@cool.haxx.se
