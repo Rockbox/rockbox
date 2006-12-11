@@ -76,6 +76,7 @@
 			<Option compilerVar="CPP" />
 			<Option compile="0" />
 			<Option link="0" />
+			<Option target="default" />
 		</Unit>
 		<Unit filename="fonts_3d.xpm">
 			<Option compilerVar="CPP" />
@@ -102,12 +103,6 @@
 		</Unit>
 		<Unit filename="rbutil.cpp">
 			<Option compilerVar="CPP" />
-			<Option target="default" />
-		</Unit>
-		<Unit filename="rbutil.exe.Manifest">
-			<Option compilerVar="CPP" />
-			<Option compile="0" />
-			<Option link="0" />
 			<Option target="default" />
 		</Unit>
 		<Unit filename="rbutil.h">
@@ -154,6 +149,12 @@
 			<Option link="0" />
 			<Option target="default" />
 		</Unit>
+		<Unit filename="tools2_3d.xpm">
+			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="default" />
+		</Unit>
 		<Unit filename="uninstall_3d.xpm">
 			<Option compilerVar="CPP" />
 			<Option compile="0" />
@@ -171,6 +172,12 @@
 			<Option target="default" />
 		</Unit>
 		<Unit filename="wizard_pages.h">
+			<Option compilerVar="CPP" />
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="default" />
+		</Unit>
+		<Unit filename="wx_pch.h">
 			<Option compilerVar="CPP" />
 			<Option compile="0" />
 			<Option link="0" />

@@ -36,7 +36,10 @@ wxDEFINE_SCOPED_PTR_TYPE(wxZipEntry);
 const wxChar* _rootmatch[] = {
     wxT("rockbox.*"),
     wxT("ajbrec.ajz"),
-    wxT("archos.mod")
+    wxT("archos.mod"),
+    wxT(".scrobbler.*"),
+    wxT("battery_bench.txt"),
+    wxT("battery.dummy"),
 };
 const wxArrayString* rootmatch = new wxArrayString(
     (size_t) (sizeof(_rootmatch) / sizeof(wxChar*)), _rootmatch);
