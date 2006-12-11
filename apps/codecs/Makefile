@@ -39,7 +39,7 @@ DIRS = .
 
 CODECDEPS = $(LINKCODEC) $(BUILDDIR)/libcodec.a
 
-.PHONY: libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a
+.PHONY: libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a
 
 OUTPUT = $(SOFTWARECODECS)
 
@@ -164,10 +164,6 @@ libwavpack:
 	$(SILENT)mkdir -p $(OBJDIR)/libwavpack
 	$(call PRINTS,MAKE in libwavpack)$(MAKE) -C libwavpack OBJDIR=$(OBJDIR)/libwavpack OUTPUT=$(BUILDDIR)/libwavpack.a
 
-dumb:
-	$(SILENT)mkdir -p $(OBJDIR)/dumb
-	$(call PRINTS,MAKE in dumb)$(MAKE) -C dumb OBJDIR=$(OBJDIR)/dumb LIBDIR=$(BUILDDIR) OFLAGS="$(CFLAGS)"
-
 $(BUILDDIR)/libmusepack.a: libmusepack
 
 libmusepack:
@@ -193,7 +189,7 @@ libfaad:
 	$(call PRINTS,MAKE in libfaad)$(MAKE) -C libfaad OBJDIR=$(OBJDIR)/libfaad OUTPUT=$(BUILDDIR)/libfaad.a
 
 clean:
-	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/dumb $(BUILDDIR)/libdumb.a $(BUILDDIR)/libdumbd.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
+	$(call PRINTS,cleaning codecs)rm -fr $(OBJDIR)/libmad $(BUILDDIR)/libmad.a $(OBJDIR)/liba52 $(BUILDDIR)/liba52.a $(OBJDIR)/libffmpegFLAC $(BUILDDIR)/libffmpegFLAC.a $(OBJDIR)/Tremor $(BUILDDIR)/libTremor.a $(OBJDIR)/libwavpack $(BUILDDIR)/libwavpack.a $(OBJDIR)/libmusepack $(BUILDDIR)/libmusepack.a $(OBJDIR)/libalac $(BUILDDIR)/libalac.a $(OBJDIR)/libfaad $(BUILDDIR)/libfaad.a $(OBJDIR)/libm4a $(BUILDDIR)/libm4a.a
 	$(SILENT)$(MAKE) -C libmad clean OBJDIR=$(OBJDIR)/libmad
 	$(SILENT)$(MAKE) -C liba52 clean OBJDIR=$(OBJDIR)/liba52
 	$(SILENT)$(MAKE) -C libffmpegFLAC clean OBJDIR=$(OBJDIR)/libffmpegFLAC
@@ -203,7 +199,6 @@ clean:
 	$(SILENT)$(MAKE) -C libalac clean OBJDIR=$(OBJDIR)/libalac
 	$(SILENT)$(MAKE) -C libfaad clean OBJDIR=$(OBJDIR)/libfaad
 	$(SILENT)$(MAKE) -C libm4a clean OBJDIR=$(OBJDIR)/libm4a
-	$(SILENT)$(MAKE) -C dumb clean OBJDIR=$(OBJDIR)/dumb
 	$(SILENT)$(MAKE) -C lib clean OBJDIR=$(OBJDIR)/lib
 
 ifneq ($(MAKECMDGOALS),clean)

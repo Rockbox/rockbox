@@ -769,7 +769,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -794,7 +794,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -819,7 +819,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -844,7 +844,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -868,7 +868,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod4g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -894,7 +894,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod4g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -920,7 +920,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod5g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -946,7 +946,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod3g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -972,7 +972,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod4g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -998,7 +998,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod4g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -1024,7 +1024,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$genericbitmaptools
@@ -1047,7 +1047,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     toolset=$gigabeatbitmaptools
     boottool="$rootdir/tools/scramble -gigabeat"
     bootoutput="FWIMG01.DAT"
@@ -1071,7 +1071,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -ipod4g"
     bootoutput="bootloader.img"
     # toolset is the tools within the tools directory that we build for
@@ -1097,7 +1097,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v3"
     bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1123,7 +1123,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v3"
     bootoutput="PP5022.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1149,7 +1149,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v2"
     bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1175,7 +1175,7 @@ EOF
     archosrom=""
     flash=""
     plugins="yes"
-    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack dumb libmusepack libalac libfaad libm4a"
+    codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     boottool="$rootdir/tools/scramble -mi4v2"
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for
