@@ -157,7 +157,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchcreen */
 
-const struct button_mapping button_context_recscreen[]  = {
+static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
     { ACTION_REC_F2,                BUTTON_F2,                  BUTTON_NONE },
     { ACTION_REC_F3,                BUTTON_F3,                  BUTTON_NONE },
@@ -169,7 +169,7 @@ const struct button_mapping button_context_recscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_recscreen */
 
-const struct button_mapping button_context_keyboard[]  = {
+static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },
@@ -192,7 +192,7 @@ const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
-struct button_mapping button_context_bmark[]  = {
+static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_PLAY },
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_ON },
     { ACTION_BMS_EXIT,      BUTTON_OFF,                 BUTTON_NONE },
@@ -202,7 +202,7 @@ struct button_mapping button_context_bmark[]  = {
     
 }; /* button_context_settings_bmark */
 
-const struct button_mapping button_context_radio[]  = {
+static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_MENU,        BUTTON_F1,                             BUTTON_NONE },
     { ACTION_FM_PRESET,      BUTTON_F2,                             BUTTON_NONE },
     { ACTION_FM_RECORD,      BUTTON_F3,                             BUTTON_NONE },

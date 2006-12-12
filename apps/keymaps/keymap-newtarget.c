@@ -42,12 +42,12 @@
  * if there's no need to check the previous button's value, use BUTTON_NONE
  * Insert LAST_ITEM_IN_LIST at the end of each mapping 
  */
-const struct button_mapping button_context_standard[]  = {
+static const struct button_mapping button_context_standard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
-const struct button_mapping button_context_wps[]  = {
+static const struct button_mapping button_context_wps[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */

@@ -38,7 +38,7 @@ CONTEXT_CUSTOM|CONTEXT_TREE = the standard list/tree defines (without directions
 
 */
 
-const struct button_mapping button_context_standard[]  = {
+static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,          BUTTON_SCROLL_BACK,                 BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_NEXT,          BUTTON_SCROLL_FWD,                  BUTTON_NONE },
@@ -54,14 +54,14 @@ const struct button_mapping button_context_standard[]  = {
 
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
-const struct button_mapping button_context_tree[]  = {
+static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,          BUTTON_PLAY|BUTTON_REL,      BUTTON_PLAY },
     { ACTION_TREE_STOP,         BUTTON_PLAY|BUTTON_REPEAT,   BUTTON_PLAY },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_tree */
 
-const struct button_mapping button_context_tree_scroll_lr[]  = {
+static const struct button_mapping button_context_tree_scroll_lr[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
     { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
@@ -74,7 +74,7 @@ const struct button_mapping button_context_tree_scroll_lr[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 };
 
-const struct button_mapping button_context_wps[]  = {
+static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,      BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY },
     { ACTION_WPS_STOP,      BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_PLAY },
     { ACTION_WPS_SKIPPREV,  BUTTON_LEFT|BUTTON_REL,         BUTTON_LEFT },
@@ -95,7 +95,7 @@ const struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST,
 }; /* button_context_wps */
 
-const struct button_mapping button_context_settings[]  = {
+static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INC,          BUTTON_SCROLL_FWD,         BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_SCROLL_BACK,          BUTTON_NONE },
@@ -110,19 +110,19 @@ const struct button_mapping button_context_settings[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
-const struct button_mapping button_context_yesno[]  = {
+static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_PLAY,                  BUTTON_NONE },
     LAST_ITEM_IN_LIST
 }; /* button_context_settings_yesno */
 
-const struct button_mapping button_context_bmark[]  = {
+static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,          BUTTON_MENU|BUTTON_REPEAT,       BUTTON_MENU },
     { ACTION_BMS_SELECT,       BUTTON_SELECT,   BUTTON_NONE },
     { ACTION_BMS_EXIT,         BUTTON_PLAY,      BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS),
 }; /* button_context_settings_bmark */
 
-const struct button_mapping button_context_quickscreen[]  = {
+static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_QS_DOWN,       BUTTON_PLAY,                    BUTTON_NONE },
     { ACTION_QS_DOWN,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_QS_LEFT,       BUTTON_LEFT,                    BUTTON_NONE },
@@ -134,7 +134,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
 
-const struct button_mapping button_context_pitchscreen[]  = {
+static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_SCROLL_FWD,                BUTTON_NONE },
     { ACTION_PS_INC_BIG,        BUTTON_SCROLL_FWD|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_SCROLL_BACK,                BUTTON_NONE },
@@ -150,7 +150,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_pitchscreen */
 
-const struct button_mapping button_context_keyboard[]  = {
+static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                           BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,             BUTTON_NONE },   
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                          BUTTON_NONE },

@@ -29,22 +29,22 @@
 #include "debug.h"
 #include "splash.h"
 
-bool ignore_until_release = false;
-int last_button = BUTTON_NONE;
+static bool ignore_until_release = false;
+static int last_button = BUTTON_NONE;
 
 /* software keylock stuff */
 #ifndef HAS_BUTTON_HOLD
-bool keys_locked = false;
-int unlock_combo = BUTTON_NONE;
-bool screen_has_lock = false;
+static bool keys_locked = false;
+static int unlock_combo = BUTTON_NONE;
+static bool screen_has_lock = false;
 #endif /* HAVE_SOFTWARE_KEYLOCK */
 
 /*
  * do_button_check is the worker function for get_default_action.
  * returns ACTION_UNKNOWN or the requested return value from the list.
  */
-inline int do_button_check(const struct button_mapping *items, 
-                           int button, int last_button, int *start)
+static inline int do_button_check(const struct button_mapping *items,
+                                  int button, int last_button, int *start)
 {
     int i = 0;
     int ret = ACTION_UNKNOWN;
@@ -68,7 +68,7 @@ inline int do_button_check(const struct button_mapping *items,
     return ret;
 }
 
-inline int get_next_context(const struct button_mapping *items, int i)
+static inline int get_next_context(const struct button_mapping *items, int i)
 {
     while (items[i].button_code != BUTTON_NONE)
         i++;
@@ -92,8 +92,8 @@ inline int get_next_context(const struct button_mapping *items, int i)
 Any number >0   to wait that many ticks for a press
                   
  */
-int get_action_worker(int context, int timeout,
-                      const struct button_mapping* (*get_context_map)(int) )
+static int get_action_worker(int context, int timeout,
+                             const struct button_mapping* (*get_context_map)(int) )
 {
     const struct button_mapping *items = NULL;
     int button;

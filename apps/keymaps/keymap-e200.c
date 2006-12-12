@@ -30,7 +30,7 @@
  * if there's no need to check the previous button's value, use BUTTON_NONE
  * Insert LAST_ITEM_IN_LIST at the end of each mapping 
  */
-const struct button_mapping button_context_standard[]  = {
+static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,        BUTTON_SCROLL_UP|BUTTON_REL,      BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_SCROLL_DOWN|BUTTON_REL,    BUTTON_NONE },
@@ -48,7 +48,7 @@ const struct button_mapping button_context_standard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
-const struct button_mapping button_context_wps[]  = {
+static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_PLAY,     BUTTON_UP|BUTTON_REL,        BUTTON_UP },
     { ACTION_WPS_STOP,     BUTTON_UP|BUTTON_REPEAT,     BUTTON_UP },
    
@@ -82,7 +82,7 @@ const struct button_mapping button_context_wps[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
-const struct button_mapping button_context_settings[] = {
+static const struct button_mapping button_context_settings[] = {
     { ACTION_SETTINGS_INC,      BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_SCROLL_DOWN,               BUTTON_NONE },
@@ -97,21 +97,21 @@ const struct button_mapping button_context_settings[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings */
 
-const struct button_mapping button_context_list[]  = {
+static const struct button_mapping button_context_list[]  = {
     { ACTION_LISTTREE_PGUP,   BUTTON_REC|BUTTON_SCROLL_UP,   BUTTON_REC },
     { ACTION_LISTTREE_PGDOWN, BUTTON_REC|BUTTON_SCROLL_DOWN, BUTTON_REC },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
-const struct button_mapping button_context_tree[]  = {
+static const struct button_mapping button_context_tree[]  = {
     { ACTION_TREE_WPS,    BUTTON_UP|BUTTON_REL,         BUTTON_UP },
     { ACTION_TREE_STOP,   BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
     
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
 
-const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
+static const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
     { ACTION_NONE,              BUTTON_LEFT,                BUTTON_NONE },
     { ACTION_STD_CANCEL,        BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT },
     { ACTION_TREE_ROOT_INIT,    BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT },
@@ -125,7 +125,7 @@ const struct button_mapping button_context_listtree_scroll_without_combo[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_without_combo */
 
-const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
+static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     { ACTION_TREE_ROOT_INIT,BUTTON_LEFT|BUTTON_REPEAT,            BUTTON_NONE },
     { ACTION_TREE_PGLEFT,   BUTTON_REC|BUTTON_LEFT,               BUTTON_REC },
     { ACTION_TREE_PGLEFT,   BUTTON_REC|BUTTON_LEFT|BUTTON_REPEAT, BUTTON_NONE },
@@ -135,13 +135,13 @@ const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
 }; /* button_context_listtree_scroll_with_combo */
 
-const struct button_mapping button_context_yesno[]  = {
+static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,              BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_yesno */
 
-const struct button_mapping button_context_quickscreen[]  = {
+static const struct button_mapping button_context_quickscreen[]  = {
     { ACTION_STD_CANCEL, BUTTON_POWER|BUTTON_REL,       BUTTON_NONE },
     { ACTION_QS_DOWNINV, BUTTON_UP|BUTTON_REL,          BUTTON_NONE },
     { ACTION_QS_DOWNINV, BUTTON_UP|BUTTON_REPEAT,       BUTTON_NONE },
@@ -155,7 +155,7 @@ const struct button_mapping button_context_quickscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_quickscreen */
 
-const struct button_mapping button_context_settings_right_is_inc[]  = {
+static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INC,       BUTTON_SCROLL_UP|BUTTON_REL,     BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT, BUTTON_SCROLL_UP|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,       BUTTON_SCROLL_DOWN|BUTTON_REL,   BUTTON_NONE },
@@ -174,7 +174,7 @@ const struct button_mapping button_context_settings_right_is_inc[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_right_is_inc */
 
-const struct button_mapping button_context_pitchscreen[]  = {
+static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_INC_SMALL,      BUTTON_UP,                 BUTTON_NONE },
     { ACTION_PS_INC_BIG,        BUTTON_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_PS_DEC_SMALL,      BUTTON_DOWN,               BUTTON_NONE },
@@ -189,7 +189,7 @@ const struct button_mapping button_context_pitchscreen[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
-const struct button_mapping button_context_keyboard[]  = {
+static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                      BUTTON_NONE },
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                     BUTTON_NONE },
@@ -214,7 +214,7 @@ const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
-const struct button_mapping button_context_bmark[]  = {
+static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,       BUTTON_UP,         BUTTON_NONE },
     { ACTION_BMS_SELECT,       BUTTON_SELECT,     BUTTON_NONE },
     { ACTION_BMS_EXIT,         BUTTON_POWER,      BUTTON_NONE },

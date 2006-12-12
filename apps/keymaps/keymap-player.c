@@ -84,7 +84,7 @@ static const struct button_mapping button_context_yesno[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesno */
 
-struct button_mapping button_context_bmark[]  = {
+static const struct button_mapping button_context_bmark[]  = {
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_PLAY },
     { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_ON,   BUTTON_ON },
     { ACTION_BMS_EXIT,        BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_NONE },
