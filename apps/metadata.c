@@ -194,11 +194,12 @@ static void convert_endian(void *data, const char *format)
     }
 }
 
+#if 0 /* not needed atm */
 /* Read an unsigned 16-bit integer from a big-endian file. */
 #ifdef ROCKBOX_BIG_ENDIAN
 #define read_uint16be(fd, buf) read((fd), (buf), 2)
 #else
-int read_uint16be(int fd, unsigned short* buf)
+static int read_uint16be(int fd, unsigned short* buf)
 {
     size_t n;
     
@@ -207,12 +208,13 @@ int read_uint16be(int fd, unsigned short* buf)
     return n;
 }
 #endif
+#endif /* if 0 */
 
 /* Read an unsigned 32-bit integer from a big-endian file. */
 #ifdef ROCKBOX_BIG_ENDIAN
 #define read_uint32be(fd,buf) read((fd), (buf), 4)
 #else
-int read_uint32be(int fd, unsigned int* buf) 
+static int read_uint32be(int fd, unsigned int* buf)
 {
   size_t n;
 
@@ -236,35 +238,6 @@ static unsigned long get_long_be(void* buf)
     unsigned char* p = (unsigned char*) buf;
 
     return (p[0] << 24) | (p[1] << 16) | (p[2] << 8) | p[3];
-}
-
-/* Read a string tag from an M4A file */
-void read_m4a_tag_string(int fd, int len,char** bufptr,size_t* bytes_remaining, char** dest)
-{
-  int data_length;
-
-  if (bytes_remaining==0) {
-    lseek(fd,len,SEEK_CUR); /* Skip everything */
-  } else {
-    /* Skip the data tag header - maybe we should parse it properly? */
-    lseek(fd,16,SEEK_CUR); 
-    len-=16;
-
-    *dest=*bufptr;
-    if ((size_t)len+1 > *bytes_remaining) {
-      read(fd,*bufptr,*bytes_remaining-1);
-      lseek(fd,len-(*bytes_remaining-1),SEEK_CUR);
-      *bufptr+=(*bytes_remaining-1);
-    } else {
-      read(fd,*bufptr,len);
-      *bufptr+=len;
-    }
-    **bufptr=(char)0;
-
-    data_length = strlen(*dest)+1;
-    *bufptr=(*dest)+data_length;
-    *bytes_remaining-=data_length;
-  }
 }
 
 /* Parse the tag (the name-value pair) and fill id3 and buffer accordingly.
@@ -953,8 +926,8 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
 /* Read the tag data from an MP4 file, storing up to buffer_size bytes in
  * buffer.
  */
-unsigned long read_mp4_tag(int fd, unsigned int size_left, char* buffer, 
-    unsigned int buffer_left)
+static unsigned long read_mp4_tag(int fd, unsigned int size_left, char* buffer,
+                                  unsigned int buffer_left)
 {
     unsigned int bytes_read = 0;
     
@@ -985,8 +958,8 @@ unsigned long read_mp4_tag(int fd, unsigned int size_left, char* buffer,
 }
 
 /* Read a string tag from an MP4 file */
-unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer, 
-    unsigned int* buffer_left, char** dest)
+static unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
+                                        unsigned int* buffer_left, char** dest)
 {
     unsigned int bytes_read = read_mp4_tag(fd, size_left, *buffer,
         *buffer_left - 1);
@@ -1009,7 +982,7 @@ unsigned int read_mp4_tag_string(int fd, int size_left, char** buffer,
 }
 
 static unsigned int read_mp4_atom(int fd, unsigned int* size, 
-    unsigned int* type, unsigned int size_left)
+                                  unsigned int* type, unsigned int size_left)
 {
     read_uint32be(fd, size);
     read_uint32be(fd, type);
@@ -1177,7 +1150,7 @@ static bool read_mp4_esds(int fd, struct mp3entry* id3,
 }
 
 static bool read_mp4_tags(int fd, struct mp3entry* id3, 
-    unsigned int size_left)
+                          unsigned int size_left)
 {
     unsigned int size;
     unsigned int type;
@@ -1300,7 +1273,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 }
 
 static bool read_mp4_container(int fd, struct mp3entry* id3, 
-    unsigned int size_left)
+                               unsigned int size_left)
 {
     unsigned int size;
     unsigned int type;
@@ -1858,7 +1831,7 @@ unsigned int probe_file_format(const char *filename)
  * file that would prevent playback.
  */
 bool get_metadata(struct track_info* track, int fd, const char* trackname,
-    bool v1first) 
+                  bool v1first) 
 {
 #if CONFIG_CODEC == SWCODEC
     unsigned char* buf;

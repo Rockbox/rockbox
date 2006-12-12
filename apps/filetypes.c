@@ -537,7 +537,7 @@ static int add_plugin(char *plugin)
 }
 
 /* read config file (or cahe file) */
-bool read_config(const char* file)
+static bool read_config(const char* file)
 {
     enum {extension,
           plugin,

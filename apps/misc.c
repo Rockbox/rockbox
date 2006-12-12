@@ -703,7 +703,7 @@ void car_adapter_mode_init(void)
 #endif
 
 #ifdef HAVE_HEADPHONE_DETECTION
-void unplug_change(bool inserted)
+static void unplug_change(bool inserted)
 {
     if (global_settings.unplug_mode)
     {

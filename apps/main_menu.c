@@ -56,7 +56,7 @@
 #include "recording.h"
 #endif
 
-bool show_credits(void)
+static bool show_credits(void)
 {
     plugin_load("/.rockbox/rocks/credits.rock",NULL);
     return false;
@@ -72,7 +72,7 @@ extern bool simulate_usb(void);
 #define SIZE_FMT "%s %s"
 #endif
 
-bool show_info(void)
+static bool show_info(void)
 {
     char s[64], s1[32];
     unsigned long size, free;
@@ -340,7 +340,7 @@ bool rec_menu(void)
 }
 #endif
 
-bool info_menu(void)
+static bool info_menu(void)
 {
     int m;
     bool result;
@@ -374,7 +374,7 @@ static bool do_shutdown(void)
     return false;
 }
 #endif
-    
+
 bool main_menu(void)
 {
     int m;

@@ -104,15 +104,19 @@
 
 const char appsversion[]=APPSVERSION;
 
-void init(void);
+static void init(void);
 
+#ifdef SIMULATOR
 void app_main(void)
+#else
+static void app_main(void)
+#endif
 {
     init();
     browse_root();
 }
 
-int init_dircache(bool preinit)
+static int init_dircache(bool preinit)
 {
 #ifdef HAVE_DIRCACHE
     int result = 0;
@@ -174,7 +178,7 @@ int init_dircache(bool preinit)
 }
 
 #ifdef HAVE_TAGCACHE
-void init_tagcache(void)
+static void init_tagcache(void)
 {
     bool clear = false;
 
@@ -213,7 +217,7 @@ void init_tagcache(void)
 
 #ifdef SIMULATOR
 
-void init(void)
+static void init(void)
 {
     init_threads();
     buffer_init();
@@ -273,7 +277,7 @@ void init(void)
 
 #else
 
-void init(void)
+static void init(void)
 {
     int rc;
     bool mounted = false;

@@ -90,7 +90,9 @@ extern int ata_device;
 extern int ata_io_address;
 extern struct core_entry cores[NUM_CORES];
 
-char thread_status_char(int status)
+#ifndef SIMULATOR
+#ifdef HAVE_LCD_BITMAP
+static char thread_status_char(int status)
 {
     switch (status)
     {
@@ -102,10 +104,9 @@ char thread_status_char(int status)
 
     return '?';
 }
-#ifndef SIMULATOR
-#ifdef HAVE_LCD_BITMAP
+
 /* Test code!!! */
-bool dbg_os(void)
+static bool dbg_os(void)
 {
     struct thread_entry *thread;
     char buf[32];
@@ -168,7 +169,7 @@ bool dbg_os(void)
 # else
             snprintf(buf, 32, "%c%c %s: %d%%",
                      (status == STATE_RUNNING) ? '*' : ' ',
-                     (status == STATE_BLOCKED) ? 'B' : ' ',
+                     thread_status_char(status),
                      cores[CURRENT_CORE].threads[i].name, usage);
 # endif
             lcd_puts(0, 1+i, buf);
@@ -183,7 +184,7 @@ bool dbg_os(void)
     return false;
 }
 #else /* !HAVE_LCD_BITMAP */
-bool dbg_os(void)
+static bool dbg_os(void)
 {
     char buf[32];
     int button;
@@ -229,7 +230,7 @@ bool dbg_os(void)
 #ifdef HAVE_LCD_BITMAP
 #if CONFIG_CODEC != SWCODEC
 #ifndef SIMULATOR
-bool dbg_audio_thread(void)
+static bool dbg_audio_thread(void)
 {
     char buf[32];
     struct audio_debug d;
@@ -282,7 +283,7 @@ extern size_t filebuflen;
 
 static unsigned int ticks, boost_ticks;
 
-void dbg_audio_task(void)
+static void dbg_audio_task(void)
 {
 #ifndef SIMULATOR
     if(FREQ > CPUFREQ_NORMAL)
@@ -292,7 +293,7 @@ void dbg_audio_task(void)
     ticks++;
 }
 
-bool dbg_audio_thread(void)
+static bool dbg_audio_thread(void)
 {
     char buf[32];
     int button;
@@ -373,37 +374,18 @@ bool dbg_audio_thread(void)
 #endif /* HAVE_LCD_BITMAP */
 
 
-#ifndef SIMULATOR
+#if (CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)) && !defined(SIMULATOR)
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
    /* In IRAM to avoid problems when running directly from Flash */
-bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
-                  unsigned addr1, unsigned addr2)
-                  ICODE_ATTR;
-bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
-                  unsigned addr1, unsigned addr2)
+static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
+                         unsigned addr1, unsigned addr2)
+                         ICODE_ATTR __attribute__((noinline));
+static bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
+                         unsigned addr1, unsigned addr2)
 
 {
-#ifdef CPU_PP
-    /* TODO: Implement for PortalPlayer */
-    (void)p_manufacturer;
-    (void)p_device;
-    (void)addr1;
-    (void)addr2;
-#elif CONFIG_CPU == PNX0101
-    /* TODO: Implement for iFP7xx */
-    (void)p_manufacturer;
-    (void)p_device;
-    (void)addr1;
-    (void)addr2;
-#elif CONFIG_CPU == S3C2440
-    /* TODO: Implement for Gigabeat */
-    (void)p_manufacturer;
-    (void)p_device;
-    (void)addr1;
-    (void)addr2;
-#else
     unsigned not_manu, not_id; /* read values before switching to ID mode */
     unsigned manu, id; /* read values when in ID mode */
 
@@ -444,14 +426,13 @@ bool dbg_flash_id(unsigned* p_manufacturer, unsigned* p_device,
         *p_device = id;
         return true; /* success */
     }
-#endif
     return false; /* fail */
 }
-#endif /* !SIMULATOR */
+#endif /* (CONFIG_CPU == SH7034 || CPU_COLDFIRE) && !SIMULATOR */
 
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
-bool dbg_hw_info(void)
+static bool dbg_hw_info(void)
 {
 #if CONFIG_CPU == SH7034
     char buf[32];
@@ -602,7 +583,7 @@ bool dbg_hw_info(void)
     return false;
 }
 #else /* !HAVE_LCD_BITMAP */
-bool dbg_hw_info(void)
+static bool dbg_hw_info(void)
 {
     char buf[32];
     int button;
@@ -765,7 +746,7 @@ bool dbg_partitions(void)
 #endif
 
 #if defined(CPU_COLDFIRE) && defined(HAVE_SPDIF_OUT)
-bool dbg_spdif(void)
+static bool dbg_spdif(void)
 {
     char buf[128];
     int line;
@@ -1261,7 +1242,7 @@ bool dbg_ports(void)
 #endif /* !SIMULATOR */
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-bool dbg_cpufreq(void)
+static bool dbg_cpufreq(void)
 {
     char buf[128];
     int line;
@@ -1323,7 +1304,7 @@ bool dbg_cpufreq(void)
 #define BAT_LAST_VAL  MIN(LCD_WIDTH, POWER_HISTORY_LEN)
 #define BAT_YSPACE    (LCD_HEIGHT - 20)
 
-bool view_battery(void)
+static bool view_battery(void)
 {
     int view = 0;
     int i, x, y;
@@ -1590,7 +1571,7 @@ static bool view_runtime(void)
 
 #ifndef SIMULATOR
 #ifdef HAVE_MMC
-bool dbg_mmc_info(void)
+static bool dbg_mmc_info(void)
 {
     bool done = false;
     int currval = 0;
@@ -1970,7 +1951,7 @@ static bool dbg_tagcache_info(void)
 #endif
 
 #if CONFIG_CPU == SH7034
-bool dbg_save_roms(void)
+static bool dbg_save_roms(void)
 {
     int fd;
     int oldmode = system_memory_guard(MEMGUARD_NONE);
@@ -1993,7 +1974,7 @@ bool dbg_save_roms(void)
     return false;
 }
 #elif defined CPU_COLDFIRE
-bool dbg_save_roms(void)
+static bool dbg_save_roms(void)
 {
     int fd;
     int oldmode = system_memory_guard(MEMGUARD_NONE);
@@ -2042,7 +2023,7 @@ bool dbg_save_roms(void)
 
 #ifndef SIMULATOR
 #ifdef CONFIG_TUNER
-bool dbg_fm_radio(void)
+static bool dbg_fm_radio(void)
 {
     char buf[32];
     bool fm_detected;
@@ -2086,7 +2067,7 @@ bool dbg_fm_radio(void)
 #ifdef HAVE_LCD_BITMAP
 extern bool do_screendump_instead_of_usb;
 
-bool dbg_screendump(void)
+static bool dbg_screendump(void)
 {
     do_screendump_instead_of_usb = !do_screendump_instead_of_usb;
     gui_syncsplash(HZ, true, "Screendump %s",
@@ -2096,7 +2077,7 @@ bool dbg_screendump(void)
 #endif /* HAVE_LCD_BITMAP */
 
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
-bool dbg_set_memory_guard(void)
+static bool dbg_set_memory_guard(void)
 {
     static const struct opt_items names[MAXMEMGUARD] = {
         { "None",             -1 },
@@ -2113,7 +2094,7 @@ bool dbg_set_memory_guard(void)
 #endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
-bool dbg_write_eeprom(void)
+static bool dbg_write_eeprom(void)
 {
     int fd;
     int rc;

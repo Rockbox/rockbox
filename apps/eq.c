@@ -101,7 +101,7 @@ static const unsigned long atan_table[] = {
  * @return sin of phase, value is a signed value from LONG_MIN to LONG_MAX,
  *         representing -1 and 1 respectively. 
  */
-long fsincos(unsigned long phase, long *cos) {
+static long fsincos(unsigned long phase, long *cos) {
     int32_t x, x1, y, y1;
     unsigned long z, z1;
     int i;
@@ -164,7 +164,7 @@ static long fsqrt(long a, unsigned int fracbits)
     return b;
 }
 
-short dbtoatab[49] = {
+static const short dbtoatab[49] = {
     2058, 2180, 2309, 2446, 2591, 2744, 2907, 3079, 3261, 3455, 3659, 3876,
     4106, 4349, 4607, 4880, 5169, 5475, 5799, 6143, 6507, 6893, 7301, 7734,
     8192, 8677, 9192, 9736, 10313, 10924, 11572, 12257, 12983, 13753, 14568,

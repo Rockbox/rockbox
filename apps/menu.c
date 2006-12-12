@@ -65,14 +65,14 @@ struct menu {
 static struct menu menus[MAX_MENUS];
 static bool inuse[MAX_MENUS] = { false };
 
-char * menu_get_itemname(int selected_item, void * data, char *buffer)
+static char * menu_get_itemname(int selected_item, void * data, char *buffer)
 {
     struct menu *local_menus=(struct menu *)data;
     (void)buffer;
     return(P2STR(local_menus->items[selected_item].desc));
 }
 
-int menu_find_free(void)
+static int menu_find_free(void)
 {
     int i;
     /* Tries to find an unused slot to put the new menu */

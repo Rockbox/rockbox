@@ -32,9 +32,11 @@
 #include "settings.h"
 #endif
 
-void ab_repeat_init(void);
+void ab_repeat_init(void);           
+#if 0 /* Currently unused */
 unsigned int ab_get_A_marker(void);
 unsigned int ab_get_B_marker(void);
+#endif /* if 0 */
 bool ab_before_A_marker(unsigned int song_position);
 bool ab_after_A_marker(unsigned int song_position);
 void ab_jump_to_A_marker(void);

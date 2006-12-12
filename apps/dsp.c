@@ -226,7 +226,7 @@ static int channels_mode = 0;
 static int32_t sw_gain, sw_cross;
 
 extern int current_codec;
-struct dsp_config *dsp;
+static struct dsp_config *dsp;
 
 /* The internal format is 32-bit samples, non-interleaved, stereo. This
  * format is similar to the raw output from several codecs, so the amount
@@ -563,7 +563,7 @@ void dsp_set_crossfeed_cross_params(long lf_gain, long hf_gain, long cutoff)
  * to listen to on headphones with no crossfeed.
  */
 #ifndef DSP_HAVE_ASM_CROSSFEED
-void apply_crossfeed(int32_t* src[], int count)
+static void apply_crossfeed(int32_t* src[], int count)
 {
     int32_t *hist_l = &crossfeed_data.history[0];
     int32_t *hist_r = &crossfeed_data.history[2];

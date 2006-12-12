@@ -78,6 +78,7 @@ void ab_repeat_init(void)
     }
 }
 
+#if 0 /* Currently unused */
 unsigned int ab_get_A_marker(void)
 {
     return ab_A_marker;
@@ -87,6 +88,7 @@ unsigned int ab_get_B_marker(void)
 {
     return ab_B_marker;
 }
+#endif /* if 0 */
 
 /* determines if the given song position is earlier than the A mark;
 intended for use in handling the jump NEXT and PREV commands */
