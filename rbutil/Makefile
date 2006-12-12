@@ -10,20 +10,18 @@
 # Unix-style Makefile for rbutil 
 
 
+CXX=$(shell $(PREFIX)wx-config --cxx)
+OBJS=rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o
+
+
 # type "make WIN=1" for a Windows build using the Debian mingw cross-compiler
 ifdef WIN
   CROSS=i586-mingw32msvc-
   WINDRES=i586-mingw32msvc-windres
   EXT=.exe
   PREFIX=/usr/i586-mingw32msvc/bin/
+  OBJS+=rbutil-rc.o
 endif
-
-
-CC=$(CROSS)gcc
-CXX=$(shell $(PREFIX)wx-config --cxx)
-CFLAGS=-Wall $(INCLUDES)
-LIBS=-lm
-OBJS=main.o rbutil.o rbutilApp.o rbutilFrm.o wizard_pages.o rbutil-rc.o
 
 .PHONY: all
 all: rbutil$(EXT)
