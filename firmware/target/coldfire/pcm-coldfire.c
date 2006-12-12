@@ -292,12 +292,13 @@ void pcm_rec_dma_start(void *addr, size_t size)
     INTERRUPTCLEAR = 0x03c00000;
 #endif
 
-    SAR1 = (unsigned long)&PDIR2; /* Source address        */
-    DCR1 = DMA_INT | DMA_CS | DMA_AA | DMA_DINC | DMA_DSIZE(3);
+    SAR1          = (unsigned long)&PDIR2; /* Source address        */
+    rec_peak_addr = (unsigned long *)addr; /* Start peaking at dest */
+    DAR1          = (unsigned long)addr;   /* Destination address   */
+    BCR1          = (unsigned long)size;   /* Bytes to transfer     */
 
-    pcm_record_more(addr, size);
-
-    DCR1 |= DMA_START;
+    DCR1 = DMA_INT | DMA_EEXT | DMA_CS | DMA_AA | DMA_DINC |
+           DMA_DSIZE(3) | DMA_START;
 } /* pcm_dma_start */
 
 void pcm_rec_dma_stop(void)
@@ -325,7 +326,7 @@ void pcm_init_recording(void)
 
     pcm_rec_dma_stop();
 
-    ICR7 = (6 << 2);        /* Enable interrupt at level 6, priority 0      */
+    ICR7 = (7 << 2);        /* Enable interrupt at level 7, priority 0      */
     IMR &= ~(1 << 15);      /* bit 15 is DMA1                               */
 } /* pcm_init_recording */
 
