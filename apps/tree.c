@@ -1437,20 +1437,24 @@ void tree_flush(void)
 #endif
 
 #ifdef HAVE_DIRCACHE
-    if (global_settings.dircache)
     {
-        global_settings.dircache_size = dircache_get_cache_size();
+        int old_val = global_settings.dircache_size;
+        if (global_settings.dircache)
+        {
+            global_settings.dircache_size = dircache_get_cache_size();
 # ifdef HAVE_EEPROM_SETTINGS
-        if (dircache_is_enabled() && firmware_settings.initialized)
-            dircache_save(DIRCACHE_FILE);
+            if (dircache_is_enabled() && firmware_settings.initialized)
+                dircache_save(DIRCACHE_FILE);
 # endif
-        dircache_disable();
+            dircache_disable();
+        }
+        else
+        {
+            global_settings.dircache_size = 0;
+        }
+        if (old_val != global_settings.dircache_size)
+            settings_save();
     }
-    else
-    {
-        global_settings.dircache_size = 0;
-    }
-    settings_save();
 #endif
 }
 

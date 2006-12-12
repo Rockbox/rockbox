@@ -161,8 +161,9 @@ int init_dircache(bool preinit)
         {
             backlight_on();
             show_logo();
-            settings_save();
         }
+        global_settings.dircache_size = dircache_get_cache_size();
+        settings_save();
     }
     
     return result;

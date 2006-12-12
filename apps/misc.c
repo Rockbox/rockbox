@@ -555,8 +555,8 @@ bool settings_parseline(char* line, char** name, char** value)
 
 static void system_flush(void)
 {
-    call_ata_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
     tree_flush();
+    call_ata_idle_notifys(true); /*doesnt work on usb and shutdown from ata thread */
 }
 
 static void system_restore(void)
