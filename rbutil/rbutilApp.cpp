@@ -23,7 +23,7 @@ bool rbutilFrmApp::OnInit()
     if (! wxDirExists(buf) )
     {
         wxLogNull lognull;
-        if (! wxMkdir(buf))
+        if (! wxMkdir(buf, 0777))
         {
             wxLogFatalError(_("Can't create data directory %s"),
                 buf.c_str());
@@ -43,7 +43,7 @@ bool rbutilFrmApp::OnInit()
 
     buf = buf.Left(buf.Len() - 10);
     buf.Append(wxT("download"));
-    if (! wxDirExists(buf) ) wxMkdir(buf);
+    if (! wxDirExists(buf) ) wxMkdir(buf, 0777);
 
     wxFileSystem::AddHandler(new wxInternetFSHandler);
     wxFileSystem::AddHandler(new wxZipFSHandler);

@@ -235,7 +235,7 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
         MESG_DIALOG(_("Errors occured deleting the local download cache."));
     }
 
-    wxMkDir(cacheloc);
+    wxMkDir(cacheloc, 0777);
 }
 
 

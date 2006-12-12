@@ -256,7 +256,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         if (entry->IsDir() ) {
             wxDir* dirname = new wxDir(in_str);
             if (! dirname->Exists(in_str) ) {
-                if (wxMkDir(in_str) ) {
+                if (wxMkDir(in_str, 0777) ) {
                     buf.Printf(_("Unable to create directory %s"),
                                in_str.c_str() );
                     errnum = 100;
