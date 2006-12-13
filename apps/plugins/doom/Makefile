@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.11  2006/12/13 04:44:17  kkurbjun
+# Revision 1.12  2006/12/13 05:46:51  kkurbjun
+# Will it fit?
+#
+# Revision 1.11  2006-12-13 04:44:17  kkurbjun
 # Dehacked and BEX support for Doom - currently only supports a DEHACKED file in a WAD (not as a standalone file yet).
 #
 # Revision 1.10  2006-10-27 21:47:55  amiconn
@@ -49,7 +52,8 @@ ifdef APPEXTRA
 endif
 
 # The arm code compiles too large for the plugin buffer when set to optimize for speed
-ifeq ($(CC), arm-elf-gcc)
+#ifeq ($(CC), arm-elf-gcc)
+ifneq (,$(strip $(foreach tgt,IPOD_NANO IPOD_COLOR IPOD_VIDEO IPOD_MINI IPOD_3G IPOD_4G IRIVER_H10_5GB IRIVER_H10,$(findstring $(tgt),$(TARGET)))))
     CFLAGS += -Os
 ifndef SIMVER
     CFLAGS += -mstructure-size-boundary=8
