@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.10  2006/10/27 21:47:55  amiconn
+# Revision 1.11  2006/12/13 04:44:17  kkurbjun
+# Dehacked and BEX support for Doom - currently only supports a DEHACKED file in a WAD (not as a standalone file yet).
+#
+# Revision 1.10  2006-10-27 21:47:55  amiconn
 # Next step of Makefile tuning: * Use 'make' internal commands for printing messages. Saves build time especially on cygwin. * SILENT variable used in more places. * Bitmap build system uses one Makefille less.
 #
 # Revision 1.9  2006-10-23 22:33:36  amiconn
@@ -39,16 +42,20 @@ INCLUDES = -I$(APPSDIR) -I.. -I. $(TARGET_INC) -I$(FIRMDIR)/include -I$(FIRMDIR)
  -I$(FIRMDIR)/common -I$(FIRMDIR)/drivers -I$(OUTDIR) -I$(BUILDDIR)
 CFLAGS = $(INCLUDES) $(GCCOPTS) $(TARGET) $(EXTRA_DEFINES) \
  -DTARGET_ID=$(TARGET_ID) -DMEM=${MEMORYSIZE} -DPLUGIN \
- -Wno-strict-prototypes -O2 $(PROFILE_OPTS)
+ -Wno-strict-prototypes $(PROFILE_OPTS)
 
 ifdef APPEXTRA
    INCLUDES += $(patsubst %,-I$(APPSDIR)/%,$(subst :, ,$(APPEXTRA)))
 endif
 
-ifneq (,$(strip $(foreach tgt,IPOD_NANO IPOD_COLOR IPOD_VIDEO,$(findstring $(tgt),$(TARGET)))))
+# The arm code compiles too large for the plugin buffer when set to optimize for speed
+ifeq ($(CC), arm-elf-gcc)
+    CFLAGS += -Os
 ifndef SIMVER
     CFLAGS += -mstructure-size-boundary=8
 endif
+else
+    CFLAGS += -O2
 endif
 
 LINKFILE := $(OBJDIR)/link.lds
@@ -62,8 +69,10 @@ SRC = info.c doomdef.c doomstat.c dstrings.c tables.c \
    r_plane.c r_segs.c r_sky.c r_things.c wi_stuff.c v_video.c st_lib.c \
    st_stuff.c hu_stuff.c hu_lib.c s_sound.c z_zone.c z_bmalloc.c sounds.c \
    d_main.c m_misc.c m_bbox.c i_system.c i_sound.c i_video.c \
-   w_wad.c rockdoom.c
-# fixmath2.S
+   w_wad.c rockdoom.c d_deh.c ../../../firmware/common/sscanf.c
+
+# sscanf isn't built into the core right now - should remove from here if that
+# changes
 
 SOURCES = $(SRC)
 OBJS := $(SRC:%.c=$(OBJDIR)/%.o)
@@ -73,13 +82,8 @@ DIRS = .
 
 
 ifndef SIMVER
-ifneq (,$(findstring RECORDER,$(TARGET))) ## Archos recorder targets
-    LDS := archos.lds
-    OUTPUT = $(OUTDIR)/doom.ovl
-else  ## iRiver target
     LDS := ../plugin.lds
     OUTPUT = $(OUTDIR)/doom.rock
-endif
 else  ## simulators
     OUTPUT = $(OUTDIR)/doom.rock
 endif

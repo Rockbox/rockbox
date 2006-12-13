@@ -56,10 +56,10 @@ int hud_graph_keys=1; //jff 3/7/98 display HUD keys as graphics
 //
 // Ty 03/28/98 -
 // These four shortcuts modifed to reflect char ** of mapnamesx[]
-#define HU_TITLE  (mapnames[(gameepisode-1)*9+gamemap-1])
-#define HU_TITLE2 (mapnames2[gamemap-1])
-#define HU_TITLEP (mapnamesp[gamemap-1])
-#define HU_TITLET (mapnamest[gamemap-1])
+#define HU_TITLE  (*mapnames[(gameepisode-1)*9+gamemap-1])
+#define HU_TITLE2 (*mapnames2[gamemap-1])
+#define HU_TITLEP (*mapnamesp[gamemap-1])
+#define HU_TITLET (*mapnamest[gamemap-1])
 #define HU_TITLEHEIGHT  1
 #define HU_TITLEX 0
 //jff 2/16/98 change 167 to ST_Y-1
@@ -131,16 +131,16 @@ const char* chat_macros[] =
    // Ty 03/27/98 - *not* externalized
    // CPhipps - const char*
    {
-      HUSTR_CHATMACRO0,
       HUSTR_CHATMACRO1,
-      HUSTR_CHATMACRO2,
-      HUSTR_CHATMACRO3,
-      HUSTR_CHATMACRO4,
-      HUSTR_CHATMACRO5,
-      HUSTR_CHATMACRO6,
-      HUSTR_CHATMACRO7,
-      HUSTR_CHATMACRO8,
-      HUSTR_CHATMACRO9
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1,
+      HUSTR_CHATMACRO1
    };
 
 const char* player_names[] =
@@ -206,16 +206,16 @@ int hudcolor_list;  // list of messages color
 int hud_list_bgon;  // enable for solid window background for message list
 
 //jff 2/16/98 initialization strings for ammo, health, armor widgets
-static char hud_coordstrx[32];
-static char hud_coordstry[32];
-static char hud_coordstrz[32];
-static char hud_ammostr[80];
-static char hud_healthstr[80];
-static char hud_armorstr[80];
-static char hud_weapstr[80];
-static char hud_keysstr[80];
-static char hud_gkeysstr[80]; //jff 3/7/98 add support for graphic key display
-static char hud_monsecstr[80];
+static char *hud_coordstrx;
+static char *hud_coordstry;
+static char *hud_coordstrz;
+static char *hud_ammostr;
+static char *hud_healthstr;
+static char *hud_armorstr;
+static char *hud_weapstr;
+static char *hud_keysstr;
+static char *hud_gkeysstr; //jff 3/7/98 add support for graphic key display
+static char *hud_monsecstr;
 
 //jff 2/16/98 declaration of color switch points
 extern int ammo_red;
@@ -234,175 +234,10 @@ extern int armor_green;
 // Ty 03/27/98 - externalized map name arrays - now in d_deh.c
 // and converted to arrays of pointers to char *
 // See modified HUTITLEx macros
-char* mapnames[] = // DOOM shareware/registered/retail (Ultimate) names.
-   {
-
-      HUSTR_E1M1,
-      HUSTR_E1M2,
-      HUSTR_E1M3,
-      HUSTR_E1M4,
-      HUSTR_E1M5,
-      HUSTR_E1M6,
-      HUSTR_E1M7,
-      HUSTR_E1M8,
-      HUSTR_E1M9,
-
-      HUSTR_E2M1,
-      HUSTR_E2M2,
-      HUSTR_E2M3,
-      HUSTR_E2M4,
-      HUSTR_E2M5,
-      HUSTR_E2M6,
-      HUSTR_E2M7,
-      HUSTR_E2M8,
-      HUSTR_E2M9,
-
-      HUSTR_E3M1,
-      HUSTR_E3M2,
-      HUSTR_E3M3,
-      HUSTR_E3M4,
-      HUSTR_E3M5,
-      HUSTR_E3M6,
-      HUSTR_E3M7,
-      HUSTR_E3M8,
-      HUSTR_E3M9,
-
-      HUSTR_E4M1,
-      HUSTR_E4M2,
-      HUSTR_E4M3,
-      HUSTR_E4M4,
-      HUSTR_E4M5,
-      HUSTR_E4M6,
-      HUSTR_E4M7,
-      HUSTR_E4M8,
-      HUSTR_E4M9,
-
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL",
-      "NEWLEVEL"
-   };
-
-char* mapnames2[] = // DOOM 2 map names.
-   {
-      HUSTR_1,
-      HUSTR_2,
-      HUSTR_3,
-      HUSTR_4,
-      HUSTR_5,
-      HUSTR_6,
-      HUSTR_7,
-      HUSTR_8,
-      HUSTR_9,
-      HUSTR_10,
-      HUSTR_11,
-
-      HUSTR_12,
-      HUSTR_13,
-      HUSTR_14,
-      HUSTR_15,
-      HUSTR_16,
-      HUSTR_17,
-      HUSTR_18,
-      HUSTR_19,
-      HUSTR_20,
-
-      HUSTR_21,
-      HUSTR_22,
-      HUSTR_23,
-      HUSTR_24,
-      HUSTR_25,
-      HUSTR_26,
-      HUSTR_27,
-      HUSTR_28,
-      HUSTR_29,
-      HUSTR_30,
-      HUSTR_31,
-      HUSTR_32
-   };
-
-
-char* mapnamesp[] = // Plutonia WAD map names.
-   {
-      PHUSTR_1,
-      PHUSTR_2,
-      PHUSTR_3,
-      PHUSTR_4,
-      PHUSTR_5,
-      PHUSTR_6,
-      PHUSTR_7,
-      PHUSTR_8,
-      PHUSTR_9,
-      PHUSTR_10,
-      PHUSTR_11,
-
-      PHUSTR_12,
-      PHUSTR_13,
-      PHUSTR_14,
-      PHUSTR_15,
-      PHUSTR_16,
-      PHUSTR_17,
-      PHUSTR_18,
-      PHUSTR_19,
-      PHUSTR_20,
-
-      PHUSTR_21,
-      PHUSTR_22,
-      PHUSTR_23,
-      PHUSTR_24,
-      PHUSTR_25,
-      PHUSTR_26,
-      PHUSTR_27,
-      PHUSTR_28,
-      PHUSTR_29,
-      PHUSTR_30,
-      PHUSTR_31,
-      PHUSTR_32
-   };
-
-
-char *mapnamest[] = // TNT WAD map names.
-   {
-      THUSTR_1,
-      THUSTR_2,
-      THUSTR_3,
-      THUSTR_4,
-      THUSTR_5,
-      THUSTR_6,
-      THUSTR_7,
-      THUSTR_8,
-      THUSTR_9,
-      THUSTR_10,
-      THUSTR_11,
-
-      THUSTR_12,
-      THUSTR_13,
-      THUSTR_14,
-      THUSTR_15,
-      THUSTR_16,
-      THUSTR_17,
-      THUSTR_18,
-      THUSTR_19,
-      THUSTR_20,
-
-      THUSTR_21,
-      THUSTR_22,
-      THUSTR_23,
-      THUSTR_24,
-      THUSTR_25,
-      THUSTR_26,
-      THUSTR_27,
-      THUSTR_28,
-      THUSTR_29,
-      THUSTR_30,
-      THUSTR_31,
-      THUSTR_32
-   };
+extern char **mapnames[];
+extern char **mapnames2[];
+extern char **mapnamesp[];
+extern char **mapnamest[];
 
 // key tables
 // jff 5/10/98 french support removed,
@@ -465,6 +300,18 @@ void HU_Init(void)
    char  buffer[9];
 
    shiftxform = english_shiftxform;
+
+   // malloc all the strings, trying to get size down
+   hud_ammostr=malloc(80*sizeof(char));
+   hud_healthstr=malloc(80*sizeof(char));
+   hud_armorstr=malloc(80*sizeof(char));
+   hud_weapstr=malloc(80*sizeof(char));
+   hud_keysstr=malloc(80*sizeof(char));
+   hud_gkeysstr=malloc(80*sizeof(char));
+   hud_monsecstr=malloc(80*sizeof(char));
+   hud_coordstrx=malloc(32*sizeof(char));
+   hud_coordstry=malloc(32*sizeof(char));
+   hud_coordstrz=malloc(32*sizeof(char));
 
    // load the heads-up font
    j = HU_FONTSTART;
@@ -768,15 +615,15 @@ void HU_Start(void)
 
    // initialize the automaps coordinate widget
    //jff 3/3/98 split coordstr widget into 3 parts
-   snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %d",0); //jff 2/22/98 added z
+   snprintf(hud_coordstrx,32*sizeof(char),"X: %d",0); //jff 2/22/98 added z
    s = hud_coordstrx;
    while (*s)
       HUlib_addCharToTextLine(&w_coordx, *(s++));
-   snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %d",0); //jff 3/3/98 split x,y,z
+   snprintf(hud_coordstry,32*sizeof(char),"Y: %d",0); //jff 3/3/98 split x,y,z
    s = hud_coordstry;
    while (*s)
       HUlib_addCharToTextLine(&w_coordy, *(s++));
-   snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %d",0); //jff 3/3/98 split x,y,z
+   snprintf(hud_coordstrz,32*sizeof(char),"Z: %d",0); //jff 3/3/98 split x,y,z
    s = hud_coordstrz;
    while (*s)
       HUlib_addCharToTextLine(&w_coordz, *(s++));
@@ -915,7 +762,7 @@ void HU_Drawer(void)
 
       //jff 2/16/98 output new coord display
       // x-coord
-      snprintf(hud_coordstrx,sizeof(hud_coordstrx),"X: %d", (plr->mo->x)>>FRACBITS);
+      snprintf(hud_coordstrx,32*sizeof(char),"X: %d", (plr->mo->x)>>FRACBITS);
       HUlib_clearTextLine(&w_coordx);
       s = hud_coordstrx;
       while (*s)
@@ -924,7 +771,7 @@ void HU_Drawer(void)
 
       //jff 3/3/98 split coord display into x,y,z lines
       // y-coord
-      snprintf(hud_coordstry,sizeof(hud_coordstry),"Y: %d", (plr->mo->y)>>FRACBITS);
+      snprintf(hud_coordstry,32*sizeof(char),"Y: %d", (plr->mo->y)>>FRACBITS);
       HUlib_clearTextLine(&w_coordy);
       s = hud_coordstry;
       while (*s)
@@ -934,7 +781,7 @@ void HU_Drawer(void)
       //jff 3/3/98 split coord display into x,y,z lines
       //jff 2/22/98 added z
       // z-coord
-      snprintf(hud_coordstrz,sizeof(hud_coordstrz),"Z: %d", (plr->mo->z)>>FRACBITS);
+      snprintf(hud_coordstrz,32*sizeof(char),"Z: %d", (plr->mo->z)>>FRACBITS);
       HUlib_clearTextLine(&w_coordz);
       s = hud_coordstrz;
       while (*s)
@@ -1399,7 +1246,7 @@ void HU_Drawer(void)
             // build the init string with fixed colors
             snprintf
             (
-               hud_monsecstr,sizeof(hud_monsecstr),
+               hud_monsecstr,80*sizeof(char),
                "STS \x1b\x36K \x1b\x33%d \x1b\x36M \x1b\x33%d \x1b\x37I \x1b\x33%d/%d \x1b\x35S \x1b\x33%d/%d",
                plr->killcount,totallive,
                plr->itemcount,totalitems,

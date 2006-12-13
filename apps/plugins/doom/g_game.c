@@ -2771,7 +2771,7 @@ boolean G_CheckDemoStatus (void)
       // killough -- added fps information and made it work for longer demos:
       unsigned realtics = endtime-starttime;
       int fd=open("/games/doom/timedemo.txt",O_WRONLY | O_CREAT);
-      fprintf (fd,"Timed %d gametics in %d realtics = %d frames per second",
+      fdprintf (fd,"Timed %d gametics in %d realtics = %d frames per second",
                (unsigned) gametic, realtics,
                (unsigned) gametic * (double) TICRATE / realtics);
       close(fd);

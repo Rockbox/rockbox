@@ -32,13 +32,12 @@
 
 #include "doomstat.h"
 #include "d_event.h"
-#include "d_englsh.h"
 #include "m_swap.h"
 #include "v_video.h"
 #include "w_wad.h"
 #include "s_sound.h"
 #include "sounds.h"
-//#include "d_deh.h"  // Ty 03/22/98 - externalizations
+#include "d_deh.h"  // Ty 03/22/98 - externalizations
 #include "f_finale.h" // CPhipps - hmm...
 #include "rockmacros.h"
 
@@ -98,20 +97,20 @@ void F_StartFinale (void)
          switch (gameepisode)
          {
          case 1:
-            finaleflat = "FLOOR4_8";
-            finaletext = E1TEXT;
+            finaleflat = bgflatE1; // Ty 03/30/98 - new externalized bg flats
+            finaletext = s_E1TEXT; // Ty 03/23/98 - Was e1text variable.
             break;
          case 2:
-            finaleflat = "SFLR6_1";
-            finaletext = E2TEXT;
+            finaleflat = bgflatE2;
+            finaletext = s_E2TEXT; // Ty 03/23/98 - Same stuff for each
             break;
          case 3:
-            finaleflat = "MFLR8_4";
-            finaletext = E3TEXT;
+            finaleflat = bgflatE3;
+            finaletext = s_E3TEXT;
             break;
          case 4:
-            finaleflat = "MFLR8_3";
-            finaletext = E4TEXT;
+            finaleflat = bgflatE4;
+            finaletext = s_E4TEXT;
             break;
          default:
             // Ouch.
@@ -129,48 +128,48 @@ void F_StartFinale (void)
          switch (gamemap)
          {
          case 6:
-            finaleflat = "SLIME16";
-            finaletext = (gamemission==pack_tnt)  ? T1TEXT :
-                         (gamemission==pack_plut) ? P1TEXT : C1TEXT;
+            finaleflat = bgflat06;
+            finaletext = (gamemission==pack_tnt)  ? s_T1TEXT :
+                         (gamemission==pack_plut) ? s_P1TEXT : s_C1TEXT;
             break;
          case 11:
-            finaleflat = "RROCK14";
-            finaletext = (gamemission==pack_tnt)  ? T2TEXT :
-                         (gamemission==pack_plut) ? P2TEXT : C2TEXT;
+            finaleflat = bgflat11;
+            finaletext = (gamemission==pack_tnt)  ? s_T2TEXT :
+                         (gamemission==pack_plut) ? s_P2TEXT : s_C2TEXT;
             break;
          case 20:
-            finaleflat = "RROCK07";
-            finaletext = (gamemission==pack_tnt)  ? T3TEXT :
-                         (gamemission==pack_plut) ? P3TEXT : C3TEXT;
+            finaleflat = bgflat20;
+            finaletext = (gamemission==pack_tnt)  ? s_T3TEXT :
+                         (gamemission==pack_plut) ? s_P3TEXT : s_C3TEXT;
             break;
          case 30:
-            finaleflat = "RROCK17";
-            finaletext = (gamemission==pack_tnt)  ? T4TEXT :
-                         (gamemission==pack_plut) ? P4TEXT : C4TEXT;
+            finaleflat = bgflat30;
+            finaletext = (gamemission==pack_tnt)  ? s_T4TEXT :
+                         (gamemission==pack_plut) ? s_P4TEXT : s_C4TEXT;
             break;
          case 15:
-            finaleflat = "RROCK13";
-            finaletext = (gamemission==pack_tnt)  ? T5TEXT :
-                         (gamemission==pack_plut) ? P5TEXT : C5TEXT;
+            finaleflat = bgflat15;
+            finaletext = (gamemission==pack_tnt)  ? s_T5TEXT :
+                         (gamemission==pack_plut) ? s_P5TEXT : s_C5TEXT;
             break;
          case 31:
-            finaleflat = "RROCK19";
-            finaletext = (gamemission==pack_tnt)  ? T6TEXT :
-                         (gamemission==pack_plut) ? P6TEXT : C6TEXT;
+            finaleflat = bgflat31;
+            finaletext = (gamemission==pack_tnt)  ? s_T6TEXT :
+                         (gamemission==pack_plut) ? s_P6TEXT : s_C6TEXT;
             break;
          default:
             // Ouch.
             break;
          }
          break;
+         // Ty 08/27/98 - end gamemission logic
       }
 
-
       // Indeterminate.
-   default:
+   default:  // Ty 03/30/98 - not externalized
       S_ChangeMusic(mus_read_m, true);
       finaleflat = "F_SKY1"; // Not used anywhere else.
-      finaletext = C1TEXT;  // FIXME - other text, music?
+      finaletext = s_C1TEXT;  // FIXME - other text, music?
       break;
    }
 
@@ -320,29 +319,29 @@ void F_TextWrite (void)
 //
 typedef struct
 {
-   const char *name; // CPhipps - const**
+   const char **name; // CPhipps - const**
    mobjtype_t   type;
 } castinfo_t;
 
 #define MAX_CASTORDER 18 /* Ty - hard coded for now */
 static const castinfo_t castorder[] = { // CPhipps - static const, initialised here
-                                         { CC_ZOMBIE,  MT_POSSESSED },
-                                         { CC_SHOTGUN, MT_SHOTGUY },
-                                         { CC_HEAVY,   MT_CHAINGUY },
-                                         { CC_IMP,     MT_TROOP },
-                                         { CC_DEMON,   MT_SERGEANT },
-                                         { CC_LOST,    MT_SKULL },
-                                         { CC_CACO,    MT_HEAD },
-                                         { CC_HELL,    MT_KNIGHT },
-                                         { CC_BARON,   MT_BRUISER },
-                                         { CC_ARACH,   MT_BABY },
-                                         { CC_PAIN,    MT_PAIN },
-                                         { CC_REVEN,   MT_UNDEAD },
-                                         { CC_MANCU,   MT_FATSO },
-                                         { CC_ARCH,    MT_VILE },
-                                         { CC_SPIDER,  MT_SPIDER },
-                                         { CC_CYBER,   MT_CYBORG },
-                                         { CC_HERO,    MT_PLAYER },
+                                         { &s_CC_ZOMBIE,  MT_POSSESSED },
+                                         { &s_CC_SHOTGUN, MT_SHOTGUY },
+                                         { &s_CC_HEAVY,   MT_CHAINGUY },
+                                         { &s_CC_IMP,     MT_TROOP },
+                                         { &s_CC_DEMON,   MT_SERGEANT },
+                                         { &s_CC_LOST,    MT_SKULL },
+                                         { &s_CC_CACO,    MT_HEAD },
+                                         { &s_CC_HELL,    MT_KNIGHT },
+                                         { &s_CC_BARON,   MT_BRUISER },
+                                         { &s_CC_ARACH,   MT_BABY },
+                                         { &s_CC_PAIN,    MT_PAIN },
+                                         { &s_CC_REVEN,   MT_UNDEAD },
+                                         { &s_CC_MANCU,   MT_FATSO },
+                                         { &s_CC_ARCH,    MT_VILE },
+                                         { &s_CC_SPIDER,  MT_SPIDER },
+                                         { &s_CC_CYBER,   MT_CYBORG },
+                                         { &s_CC_HERO,    MT_PLAYER },
                                          { NULL,         0}
                                       };
 
@@ -560,7 +559,6 @@ static void F_CastPrint (const char* text) // CPhipps - static, const char*
 //
 // F_CastDrawer
 //
-void V_DrawPatchFlipped (int x, int y, int scrn, patch_t *patch);
 
 void F_CastDrawer (void)
 {
@@ -570,9 +568,10 @@ void F_CastDrawer (void)
    boolean  flip;
 
    // erase the entire screen to a background
-   V_DrawNamePatch(0,0,0, "BOSSBACK", CR_DEFAULT, VPT_STRETCH); // Ty 03/30/98 bg texture extern
+   // CPhipps - patch drawing updated
+   V_DrawNamePatch(0,0,0, bgcastcall, CR_DEFAULT, VPT_STRETCH); // Ty 03/30/98 bg texture extern
 
-   F_CastPrint (castorder[castnum].name);
+   F_CastPrint (*(castorder[castnum].name));
 
    // draw the current frame in the middle of the screen
    sprdef = &sprites[caststate->sprite];

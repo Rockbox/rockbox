@@ -35,7 +35,7 @@ int my_open(const char *file, int flags);
 int my_close(int id);
 char *my_strtok( char * s, const char * delim );
 #define alloca             __builtin_alloca
-#define fprintf(...)       rb->fdprintf(__VA_ARGS__)
+#define fdprintf(...)       rb->fdprintf(__VA_ARGS__)
 #define vsnprintf(...)     rb->vsnprintf(__VA_ARGS__)
 
 #ifdef SIMULATOR
@@ -61,6 +61,7 @@ char *my_strtok( char * s, const char * delim );
 #define lseek(a,b,c)       rb->lseek((a),(b),(c))
 #endif /* !SIMULATOR */
 
+#define strtok(a,b)        my_strtok((a),(b))
 #define strcat(a,b)        rb->strcat((a),(b))
 #define read(a,b,c)        rb->read((a),(b),(c))
 #define write(a,b,c)       rb->write((a),(b),(c))
@@ -91,7 +92,6 @@ inline void* memcpy(void* dst, const void* src, size_t size);
 //#define SIMPLECHECKS
 #define NO_PREDEFINED_LUMPS
 #define TABLES_AS_LUMPS // This frees up alot of space in the plugin buffer
-//#define FANCY_MENU  // This is a call to allow load_main_backdrop to run in doom
 
 #define MAKE_FOURCC(a,b,c,d) (uint32_t)((((a)<<24)|((b)<<16)|((c)<<8)|(d)))
 

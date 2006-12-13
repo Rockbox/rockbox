@@ -782,14 +782,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
    rb->lcd_setfont(0);
 
-#ifdef FANCY_MENU
-   /* TO FIX: Don't use load_main_backdrop() - use lcd_set_backdrop() */
-   if(rb->load_main_backdrop(GAMEBASE"backdrop.bmp"))
-      rb->lcd_set_foreground(LCD_RGBPACK(85,208,56));
-
-   rb->lcd_clear_display();
-#endif
-
    // We're using doom's memory management since it implements a proper free (and re-uses the memory)
    // and now with prboom's code: realloc and calloc
    printf ("Z_Init: Init zone memory allocation daemon.\n");
@@ -798,15 +790,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
    printf ("M_LoadDefaults: Load system defaults.\n");
    M_LoadDefaults ();              // load before initing other systems
 
-#ifdef FANCY_MENU
-   rb->lcd_setfont(FONT_UI);
-   rb->lcd_putsxy(5,LCD_HEIGHT-20, "Welcome to RockDoom");
-   rb->lcd_update();
-   rb->sleep(HZ*2);
-   rb->lcd_setfont(0);
-#else
    rb->splash(HZ*2, true, "Welcome to RockDoom");
-#endif
 
    myargv =0;
    myargc=0;

@@ -36,7 +36,7 @@
 #include "sounds.h"
 #include "r_main.h"
 #include "dstrings.h"
-//#include "d_deh.h"  // Ty 03/27/98 - externalized
+#include "d_deh.h"  // Ty 03/27/98 - externalized
 
 #include "rockmacros.h"
 
@@ -295,7 +295,7 @@ int EV_DoLockedDoor
    case 133:
       if (!p->cards[it_bluecard] && !p->cards[it_blueskull])
       {
-         p->message = PD_BLUEO;             // Ty 03/27/98 - externalized
+         p->message = s_PD_BLUEO;             // Ty 03/27/98 - externalized
          S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
          return 0;
       }
@@ -305,7 +305,7 @@ int EV_DoLockedDoor
    case 135:
       if (!p->cards[it_redcard] && !p->cards[it_redskull])
       {
-         p->message = PD_REDO;              // Ty 03/27/98 - externalized
+         p->message = s_PD_REDO;              // Ty 03/27/98 - externalized
          S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
          return 0;
       }
@@ -315,7 +315,7 @@ int EV_DoLockedDoor
    case 137:
       if (!p->cards[it_yellowcard] && !p->cards[it_yellowskull])
       {
-         p->message = PD_YELLOWO;           // Ty 03/27/98 - externalized
+         p->message = s_PD_YELLOWO;           // Ty 03/27/98 - externalized
          S_StartSound(p->mo,sfx_oof);         // killough 3/20/98
          return 0;
       }
@@ -449,7 +449,7 @@ int EV_VerticalDoor
          return 0;
       if (!player->cards[it_bluecard] && !player->cards[it_blueskull])
       {
-         player->message = PD_BLUEK;         // Ty 03/27/98 - externalized
+         player->message = s_PD_BLUEK;         // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
          return 0;
       }
@@ -461,7 +461,7 @@ int EV_VerticalDoor
          return 0;
       if (!player->cards[it_yellowcard] && !player->cards[it_yellowskull])
       {
-         player->message = PD_YELLOWK;       // Ty 03/27/98 - externalized
+         player->message = s_PD_YELLOWK;       // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
          return 0;
       }
@@ -473,7 +473,7 @@ int EV_VerticalDoor
          return 0;
       if (!player->cards[it_redcard] && !player->cards[it_redskull])
       {
-         player->message = PD_REDK;          // Ty 03/27/98 - externalized
+         player->message = s_PD_REDK;          // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);     // killough 3/20/98
          return 0;
       }

@@ -16,7 +16,10 @@
 // GNU General Public License for more details.
 //
 // $Log$
-// Revision 1.6  2006/04/16 23:14:04  kkurbjun
+// Revision 1.7  2006/12/13 04:44:17  kkurbjun
+// Dehacked and BEX support for Doom - currently only supports a DEHACKED file in a WAD (not as a standalone file yet).
+//
+// Revision 1.6  2006-04-16 23:14:04  kkurbjun
 // Fix run so that it stays enabled across level loads.  Removed some unused code and added some back in for hopeful future use.
 //
 // Revision 1.5  2006-04-04 23:58:37  kkurbjun
@@ -53,7 +56,7 @@
 #include "w_wad.h"
 
 #include "r_main.h"
-
+#include "d_deh.h"
 #include "hu_stuff.h"
 
 #include "g_game.h"
@@ -96,7 +99,7 @@ int   quickSaveSlot;
 // 1 = message to be printed
 int   messageToPrint;
 // ...and here is the message string!
-char*   messageString;
+const char*   messageString;
 
 // message x & y
 int   messx;
@@ -109,15 +112,6 @@ boolean   messageNeedsInput;
 void    (*messageRoutine)(int response);
 
 #define SAVESTRINGSIZE  24
-
-char gammamsg[5][26] =
-   {
-      GAMMALVL0,
-      GAMMALVL1,
-      GAMMALVL2,
-      GAMMALVL3,
-      GAMMALVL4
-   };
 
 // we are going to be entering a savegame string
 int   saveStringEnter;
@@ -233,7 +227,7 @@ void M_WriteText(int x, int y, char *string);
 int M_StringWidth(const char* string);
 int M_StringHeight(const char* string);
 void M_StartControlPanel(void);
-void M_StartMessage(char *string,void *routine,boolean input);
+void M_StartMessage(const char *string,void *routine,boolean input);
 void M_StopMessage(void);
 void M_ClearMenus (void);
 
@@ -657,11 +651,11 @@ void M_SaveSelect(int choice)
    saveSlot = choice;
    snprintf(savegamestrings[choice], sizeof(savegamestrings[choice]), 
       (gamemode==shareware||gamemode==registered||gamemode==retail) ? 
-      mapnames[(gameepisode-1)*9+gamemap-1]  : (gamemission==doom2)     ?
-      mapnames2[gamemap-1] : (gamemission==pack_plut) ?
-      mapnamesp[gamemap-1] : (gamemission==pack_tnt)  ?
-      mapnamest[gamemap-1] : "Unknown Location", choice);
-   if (!strcmp(savegamestrings[choice],EMPTYSTRING))
+      *mapnames[(gameepisode-1)*9+gamemap-1]  : (gamemission==doom2)     ?
+      *mapnames2[gamemap-1] : (gamemission==pack_plut) ?
+      *mapnamesp[gamemap-1] : (gamemission==pack_tnt)  ?
+      *mapnamest[gamemap-1] : "Unknown Location", choice);
+   if (!strcmp(savegamestrings[choice],s_EMPTYSTRING))
       savegamestrings[choice][0] = 0;
    saveCharIndex = strlen(savegamestrings[choice]);
 }
@@ -674,7 +668,7 @@ void M_SaveGame (int choice)
    (void)choice;
    if (!usergame)
    {
-      M_StartMessage(SAVEDEAD,NULL,false);
+      M_StartMessage(s_SAVEDEAD,NULL,false);
       return;
    }
 
@@ -722,7 +716,7 @@ void M_QuickSave(void)
       quickSaveSlot = -2; // means to pick a slot now
       return;
    }
-   snprintf(tempstring,sizeof(tempstring),QSPROMPT,savegamestrings[quickSaveSlot]);
+   snprintf(tempstring,sizeof(tempstring),s_QSPROMPT,savegamestrings[quickSaveSlot]);
    M_StartMessage(tempstring,M_QuickSaveResponse,true);
 }
 
@@ -917,7 +911,7 @@ void M_NewGame(int choice)
    (void) choice;
    if (netgame && !demoplayback)
    {
-      M_StartMessage(NEWGAME,NULL,false);
+      M_StartMessage(s_NEWGAME,NULL,false);
       return;
    }
 
@@ -952,7 +946,7 @@ void M_ChooseSkill(int choice)
 {
    if (choice == nightmare)
    {
-      M_StartMessage(NIGHTMARE,M_VerifyNightmare,true);
+      M_StartMessage(s_NIGHTMARE,M_VerifyNightmare,true);
       return;
    }
 
@@ -969,7 +963,7 @@ void M_Episode(int choice)
    if ( (gamemode == shareware)
          && choice)
    {
-      M_StartMessage(SWSTRING,NULL,false);
+      M_StartMessage(s_SWSTRING,NULL,false); // Ty 03/27/98 - externalized
       M_SetupNextMenu(&ReadDef1);
       return;
    }
@@ -1030,9 +1024,9 @@ void M_ChangeMessages(int choice)
    showMessages = 1 - showMessages;
 
    if (!showMessages)
-      players[consoleplayer].message = MSGOFF;
+      players[consoleplayer].message = s_MSGOFF;
    else
-      players[consoleplayer].message = MSGON ;
+      players[consoleplayer].message = s_MSGON ;
 
    message_dontfuckwithme = true;
 }
@@ -1066,11 +1060,11 @@ void M_EndGame(int choice)
 
    if (netgame)
    {
-      M_StartMessage(NETEND,NULL,false);
+      M_StartMessage(s_NETEND,NULL,false);
       return;
    }
 
-   M_StartMessage(ENDGAME,M_EndGameResponse,true);
+   M_StartMessage(s_ENDGAME,M_EndGameResponse,true);
 }
 
 
@@ -1153,9 +1147,9 @@ void M_QuitDOOM(int choice)
    // We pick index 0 which is language sensitive,
    //  or one at random, between 1 and maximum number.
    if (language != english )
-      snprintf(endstring,sizeof(endstring),"%s\n\n"DOSY, endmsg[0] );
+      snprintf(endstring,sizeof(endstring),"%s\n\n%s",s_DOSY, endmsg[0] );
    else
-      snprintf(endstring,sizeof(endstring),"%s\n\n%s", endmsg[gametic%(NUM_QUITMESSAGES-1)+1], DOSY);
+      snprintf(endstring,sizeof(endstring),"%s\n\n%s", endmsg[gametic%(NUM_QUITMESSAGES-1)+1], s_DOSY);
 
    M_StartMessage(endstring,M_QuitResponse,true);
 }
@@ -1256,7 +1250,7 @@ M_DrawSelCell
 
 void
 M_StartMessage
-( char*  string,
+( const char*  string,
   void*  routine,
   boolean input )
 {

@@ -54,7 +54,7 @@
 #include "s_sound.h"
 #include "sounds.h"
 #include "m_bbox.h"                                         // phares 3/20/98
-//#include "d_deh.h"
+#include "d_deh.h"
 #include "r_plane.h"
 #include "i_system.h"
 #include "rockmacros.h"
@@ -818,7 +818,7 @@ boolean P_CanUnlockGenDoor
          !player->cards[it_yellowskull]
       )
       {
-         player->message = PD_ANY; // Ty 03/27/98 - externalized
+         player->message = s_PD_ANY; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -830,7 +830,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_redskull])
       )
       {
-         player->message = skulliscard? PD_REDK : PD_REDC; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_REDK : s_PD_REDC; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -842,7 +842,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_blueskull])
       )
       {
-         player->message = skulliscard? PD_BLUEK : PD_BLUEC; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_BLUEK : s_PD_BLUEC; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -854,7 +854,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_yellowskull])
       )
       {
-         player->message = skulliscard? PD_YELLOWK : PD_YELLOWC; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_YELLOWK : s_PD_YELLOWC; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -866,7 +866,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_redcard])
       )
       {
-         player->message = skulliscard? PD_REDK : PD_REDS; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_REDK : s_PD_REDS; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -878,7 +878,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_bluecard])
       )
       {
-         player->message = skulliscard? PD_BLUEK : PD_BLUES; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_BLUEK : s_PD_BLUES; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -890,7 +890,7 @@ boolean P_CanUnlockGenDoor
          (!skulliscard || !player->cards[it_yellowcard])
       )
       {
-         player->message = skulliscard? PD_YELLOWK : PD_YELLOWS; // Ty 03/27/98 - externalized
+         player->message = skulliscard? s_PD_YELLOWK : s_PD_YELLOWS; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -909,7 +909,7 @@ boolean P_CanUnlockGenDoor
          )
       )
       {
-         player->message = PD_ALL6; // Ty 03/27/98 - externalized
+         player->message = s_PD_ALL6; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }
@@ -926,7 +926,7 @@ boolean P_CanUnlockGenDoor
          )
       )
       {
-         player->message = PD_ALL3; // Ty 03/27/98 - externalized
+         player->message = s_PD_ALL3; // Ty 03/27/98 - externalized
          S_StartSound(player->mo,sfx_oof);             // killough 3/20/98
          return false;
       }

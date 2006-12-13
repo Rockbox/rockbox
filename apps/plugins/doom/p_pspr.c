@@ -46,9 +46,7 @@
 #define WEAPONBOTTOM (FRACUNIT*128)
 #define WEAPONTOP    (FRACUNIT*32)
 
-// plasma cells for a bfg attack
-#define BFGCELLS  40
-//#define BFGCELLS bfgcells        /* Ty 03/09/98 externalized in p_inter.c */
+#define BFGCELLS bfgcells        /* Ty 03/09/98 externalized in p_inter.c */
 
 extern void P_Thrust(player_t *, angle_t, fixed_t);
 

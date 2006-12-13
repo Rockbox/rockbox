@@ -62,8 +62,12 @@
 #include "r_draw.h"
 #include "r_main.h"
 #include "d_main.h"
+#include "d_deh.h"  // Ty 04/08/98 - Externalizations
 #include "am_map.h"
 #include "m_swap.h"
+
+// DEHacked support - Ty 03/09/97 // CPhipps - const char*'s
+void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum);
 
 // CPhipps - removed wadfiles[] stuff
 
@@ -78,6 +82,7 @@ boolean clfastparm;     // checkparm of -fast
 boolean nomonsters;     // working -nomonsters
 boolean respawnparm;    // working -respawn
 boolean fastparm;       // working -fast
+boolean dehout=false;
 
 boolean singletics = false; // debug flag to cancel adaptiveness
 
@@ -724,6 +729,9 @@ void D_DoomMainSetup(void)
 
    printf ("W_Init: Init WADfiles.\n");
    W_Init();
+
+	if ((p = W_CheckNumForName("DEHACKED")) != -1) // cph - add dehacked-in-a-wad support
+		ProcessDehFile(NULL, dehout ? NULL : "/dehlog.txt", p);
 
    V_InitColorTranslation(); //jff 4/24/98 load color translation lumps
 

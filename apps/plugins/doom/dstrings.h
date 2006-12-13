@@ -26,7 +26,7 @@
  *
  * DESCRIPTION:
  *   DOOM strings, by language.
- *   Note:  In BOOM, some new strings hav ebeen defined that are
+ *   Note:  In BOOM, some new strings have been defined that are
  *          not found in the French version.  A better approach is
  *          to create a BEX text-replacement file for other
  *          languages since any language can be supported that way

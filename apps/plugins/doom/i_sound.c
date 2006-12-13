@@ -50,7 +50,7 @@
 // Needed for calling the actual sound output.
 #define SAMPLECOUNT     512
 
-#define NUM_CHANNELS    16
+#define NUM_CHANNELS    24
 // It is 2 for 16bit, and 2 for two channels.
 #define BUFMUL          2
 #define MIXBUFFERSIZE  (SAMPLECOUNT*BUFMUL)
@@ -66,7 +66,7 @@
 //  Basically, samples from all active internal channels
 //  are modifed and added, and stored in the buffer
 //  that is submitted to the audio device.
-signed short mixbuffer[MIXBUFFERSIZE];
+signed short *mixbuffer;
 /* Don't place this in IRAM!
  * Sound playback uses DMA, and not all IRAM is DMA capable on coldfire. */
 
@@ -97,7 +97,7 @@ channel_info_t channelinfo[NUM_CHANNELS] IBSS_ATTR;
 
 int *vol_lookup; // Volume lookups.
 
-int   steptable[256]; // Pitch to stepping lookup. (Not setup properly right now)
+int   *steptable; // Pitch to stepping lookup. (Not setup properly right now)
 
 //
 // This function loads the sound data from the WAD lump for single sound.
@@ -500,6 +500,9 @@ void I_InitSound()
 #endif
 
    vol_lookup=malloc(128*256*sizeof(int));
+
+   mixbuffer=malloc(MIXBUFFERSIZE*sizeof(short));
+   steptable=malloc(256*sizeof(int));
 
    for (i=1 ; i<NUMSFX ; i++)
    {

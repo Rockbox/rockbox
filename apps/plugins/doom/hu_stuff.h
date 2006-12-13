@@ -84,9 +84,9 @@ extern int hud_displayed;   /* hud is displayed */
 extern int hud_active;      /* hud mode 0=off, 1=small, 2=full          */
 extern int hud_nosecrets;   /* status does not list secrets/items/kills */
 
-extern char* mapnames[];
-extern char* mapnames2[];
-extern char* mapnamesp[];
-extern char* mapnamest[];
+extern char **mapnames[];
+extern char **mapnames2[];
+extern char **mapnamesp[];
+extern char **mapnamest[];
 
 #endif

@@ -16,7 +16,10 @@
  * GNU General Public License for more details.
  *
  * $Log$
- * Revision 1.25  2006/10/26 13:38:04  barrywardell
+ * Revision 1.26  2006/12/13 04:44:17  kkurbjun
+ * Dehacked and BEX support for Doom - currently only supports a DEHACKED file in a WAD (not as a standalone file yet).
+ *
+ * Revision 1.25  2006-10-26 13:38:04  barrywardell
  * Allow the Sansa e200 UI simulator to be built. Thanks to Andre Smith for the nice image of the Sansa. Lots more to be done including testing and tweaking the keymaps and modifying the plugins for the Sansa's 176x220 LCD.
  *
  * Revision 1.24  2006-09-05 00:23:06  barrywardell
@@ -418,45 +421,45 @@ void I_FinishUpdate (void)
 #if (CONFIG_LCD == LCD_H300) && !defined(SIMULATOR)
 
 #if 1
-   /* ASM screen update (drops 600 tics (100 asm)) */
+   /* ASM screen update (drops 200 tics (100 asm)) */
    asm (
       "move.w #33,(%[LCD])    \n" /* Setup the LCD controller */
       "clr.w (%[LCD2])        \n"
       "move.w #34,(%[LCD])    \n" /* End LCD controller setup */
-      "move.l #220,%%d0       \n"
-      "move.l #176,%%d1       \n"
-      "clr.l %%d3             \n"
-      "clr.l %%d2             \n"
+      "clr.l %%d1             \n"
+      "clr.l %%d0             \n"
       "widthloop:             \n"
-      "move.l (%[screenptr])+, %%d2             \n"
-      "swap.w %%d2                              \n"
-      "move.w %%d2, %%d3                        \n"
-      "lsr.l #8,%%d3                            \n"
-      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
-      "move.b %%d2,%%d3                         \n"
-      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
-      "swap.w %%d2                              \n"
-      "move.w %%d2, %%d3                        \n"
-      "lsr.l #8,%%d3                            \n"
-      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
-      "move.b %%d2,%%d3                         \n"
-      "move.w (%[palette], %%d3.l:2), (%[LCD2]) \n"
-      "subq.l #4,%%d0         \n"
+      "move.l (%[screenptr])+, %%d0             \n"
+      "swap.w %%d0                              \n"
+      "move.w %%d0, %%d1                        \n"
+      "lsr.l #8,%%d1                            \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b %%d0,%%d1                         \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "swap.w %%d0                              \n"
+      "move.w %%d0, %%d1                        \n"
+      "lsr.l #8,%%d1                            \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "move.b %%d0,%%d1                         \n"
+      "move.w (%[palette], %%d1.l:2), (%[LCD2]) \n"
+      "subq.l #4,%[WIDTH]         \n"
       "bne widthloop          \n"
-      "move.w #220,%%d0       \n"
-      "subq.l #1,%%d1         \n"
+      "move.w #220,%[WIDTH]       \n"
+      "subq.l #1,%[HEIGHT]         \n"
       "bne widthloop          \n"
    : /* outputs */
    : /* inputs */
       [screenptr] "a" (d_screens[0]),
       [palette]   "a" (palette),
       [LCD]       "a" (0xf0000000),
-      [LCD2]      "a" (0xf0000002)
+      [LCD2]      "a" (0xf0000002), 
+      [WIDTH]     "d" (220),
+      [HEIGHT]    "d" (176)
    : /* clobbers */
-      "d0", "d1", "d2", "d3"
+      "d0", "d1"
    );
 #else
-   /* C version of above (drops 500 tics) */
+   /* C version of above (drops 100 tics) */
 
    // Start the write
    *(volatile unsigned short *) 0xf0000000 = 0x21; // register
@@ -464,37 +467,29 @@ void I_FinishUpdate (void)
    *(volatile unsigned short *) 0xf0000000 = 0x22; // GRAM
 
    unsigned char *screenptr=d_screens[0];
-   int wcnt=0, hcnt=0;
+   int hcnt=LCD_HEIGHT*LCD_WIDTH;
 
-   while(hcnt<LCD_HEIGHT)
+   while(hcnt--)
    {
-      while(wcnt<LCD_WIDTH)
-      {
-         *(volatile unsigned short *)0xf0000002 = palette[*screenptr];
-         screenptr++;
-         wcnt++;
-      }
-      wcnt=0;
-      hcnt++;
+      *(volatile unsigned short *)0xf0000002 = palette[*screenptr];
+      screenptr++;
    }
 #endif
 
 #else
    unsigned char paletteIndex;
-   int x, y;
+   int y;
 
 #ifdef HAVE_LCD_COLOR
-   for (y = 0; y < LCD_HEIGHT; y++)
+
+   for (y = 0; y < LCD_HEIGHT*LCD_WIDTH; y++)
    {
-      for (x = 0; x < LCD_WIDTH; x++)
-      {
-         paletteIndex = d_screens[0][y*SCREENWIDTH + x];
-         rb->lcd_framebuffer[y * LCD_WIDTH + x] = palette[paletteIndex];
-      }
+         paletteIndex = d_screens[0][y];
+         rb->lcd_framebuffer[y] = palette[paletteIndex];
    }
    rb->lcd_update();
 #else /* !HAVE_LCD_COLOR */
-   int yd = 0;
+   int x, yd = 0;
 
    for (y = 0; y < LCD_HEIGHT; y++)
    {

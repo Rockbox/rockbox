@@ -41,7 +41,7 @@
 #include "p_spec.h"
 #include "am_map.h"
 #include "dstrings.h"
-//#include "d_deh.h"    // Ty 03/27/98 - externalizations
+#include "d_deh.h"    // Ty 03/27/98 - externalizations
 #include "g_game.h"
 #include "rockmacros.h"
 
@@ -72,7 +72,7 @@ int mapcolor_sngl;    // single player arrow color
 int mapcolor_plyr[4] = { 112, 88, 64, 176 }; // colors for player arrows in multiplayer
 
 //jff 3/9/98 add option to not show secret sectors until entered
-int map_secret_after=0;
+int map_secret_after;
 //jff 4/3/98 add symbols for "no-color" for disable and "black color" for black
 #define NC 0
 #define BC 247
@@ -702,33 +702,33 @@ boolean AM_Responder
          automapmode ^= am_follow;     // CPhipps - put all automap mode stuff into one enum
          f_oldloc.x = INT_MAX;
          // Ty 03/27/98 - externalized
-         plr->message = (automapmode & am_follow) ? AMSTR_FOLLOWON : AMSTR_FOLLOWOFF;
+         plr->message = (automapmode & am_follow) ? s_AMSTR_FOLLOWON : s_AMSTR_FOLLOWOFF;
       }
       else if (ch == key_map_grid)
       {
          automapmode ^= am_grid;      // CPhipps
          // Ty 03/27/98 - *not* externalized
-         plr->message = (automapmode & am_grid) ? AMSTR_GRIDON : AMSTR_GRIDOFF;
+         plr->message = (automapmode & am_grid) ? s_AMSTR_GRIDON : s_AMSTR_GRIDOFF;
       }
       else if (ch == key_map_mark)
       {
          // Ty 03/27/98 - *not* externalized
-         snprintf(buffer, sizeof(buffer), "%s %d", AMSTR_MARKEDSPOT, markpointnum);
+         snprintf(buffer, sizeof(buffer), "%s %d", s_AMSTR_MARKEDSPOT, markpointnum);
          plr->message = buffer;
          AM_addMark();
       }
       else if (ch == key_map_clear)
       {
          AM_clearMarks();  // Ty 03/27/98 - *not* externalized
-         plr->message = AMSTR_MARKSCLEARED;                      //    ^
+         plr->message = s_AMSTR_MARKSCLEARED;                      //    ^
       }                                                           //    |
       else if (ch == key_map_rotate) {
          automapmode ^= am_rotate;
-         plr->message = (automapmode & am_rotate) ? AMSTR_ROTATEON : AMSTR_ROTATEOFF;
+         plr->message = (automapmode & am_rotate) ? s_AMSTR_ROTATEON : s_AMSTR_ROTATEOFF;
       }
       else if (ch == key_map_overlay) {
          automapmode ^= am_overlay;
-         plr->message = (automapmode & am_overlay) ? AMSTR_OVERLAYON : AMSTR_OVERLAYOFF;
+         plr->message = (automapmode & am_overlay) ? s_AMSTR_OVERLAYON : s_AMSTR_OVERLAYOFF;
       }
       else                                                        // phares
       {
