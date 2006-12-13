@@ -134,7 +134,7 @@ static bool _dir_properties(DPS* dps)
     struct dirent* entry;
 #endif
 
-    result = 0;
+    result = true;
     dirlen = rb->strlen(dps->dirname);
 #ifdef HAVE_DIRCACHE
     dir = rb->opendir_cached(dps->dirname);
@@ -146,9 +146,9 @@ static bool _dir_properties(DPS* dps)
 
     /* walk through the directory content */
 #ifdef HAVE_DIRCACHE
-    while((!result) && (0 != (entry = rb->readdir_cached(dir))))
+    while(result && (0 != (entry = rb->readdir_cached(dir))))
 #else
-    while((!result) && (0 != (entry = rb->readdir(dir))))
+    while(result && (0 != (entry = rb->readdir(dir))))
 #endif
     {
         /* append name to current directory */
@@ -178,14 +178,14 @@ static bool _dir_properties(DPS* dps)
 #endif
              /* recursion */
             result = _dir_properties(dps);
-            if(rb->get_action(CONTEXT_TREE,TIMEOUT_NOBLOCK))
-                result = false;
         }
         else
         {   
             dps->fc++; /* new file */
             dps->bc += entry->size;
         }
+        if(ACTION_STD_CANCEL == rb->get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
+            result = false;
         rb->yield();
     }
 #ifdef HAVE_DIRCACHE
@@ -193,8 +193,6 @@ static bool _dir_properties(DPS* dps)
 #else
     rb->closedir(dir);
 #endif
-
-    if(rb->action_userabort(0)) result = false;
 
     return result;
 }
@@ -208,8 +206,8 @@ static bool dir_properties(char* selected_file)
     dps.dc = 0;
     dps.fc = 0;
     dps.bc = 0;
-    if(_dir_properties(&dps))
-        return true;
+    if(false == _dir_properties(&dps))
+        return false;
 
     rb->snprintf(str_dirname, MAX_PATH, selected_file);
     rb->snprintf(str_dircount, sizeof str_dircount, "Subdirs: %d", dps.dc);
