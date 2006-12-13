@@ -103,6 +103,7 @@ off_t filesize(int fd) {
 
 /* Partition table parsing code taken from Rockbox */
 
+#define MAX_SECTOR_SIZE 2048
 #define SECTOR_SIZE 512
 
 struct partinfo {
@@ -115,26 +116,27 @@ struct partinfo {
     ((long)array[pos] | ((long)array[pos+1] << 8 ) |		\
     ((long)array[pos+2] << 16 ) | ((long)array[pos+3] << 24 ))
 
-void display_partinfo(struct partinfo* pinfo)
+void display_partinfo(struct partinfo* pinfo, int sector_size)
 {
     int i;
+    double sectors_per_MB = (1024.0*1024.0)/sector_size;
 
     printf("Part    Start Sector    End Sector    Size (MB)  Type\n");
     for ( i = 0; i < 4; i++ ) {
         if (pinfo[i].start != 0) {
-            printf("   %d      %10ld    %10ld  %10.1f   %s (0x%02x)\n",i,pinfo[i].start,pinfo[i].start+pinfo[i].size-1,pinfo[i].size/2048.0,get_parttype(pinfo[i].type),pinfo[i].type);
+            printf("   %d      %10ld    %10ld  %10.1f   %s (0x%02x)\n",i,pinfo[i].start,pinfo[i].start+pinfo[i].size-1,pinfo[i].size/sectors_per_MB,get_parttype(pinfo[i].type),pinfo[i].type);
         }
     }
 }
 
 
-int read_partinfo(HANDLE dh, struct partinfo* pinfo)
+int read_partinfo(HANDLE dh, int sector_size, struct partinfo* pinfo)
 {
     int i;
-    unsigned char sector[SECTOR_SIZE];
+    unsigned char sector[MAX_SECTOR_SIZE];
     unsigned long count;
 
-    if (!ReadFile(dh, sector, SECTOR_SIZE, &count, NULL)) {
+    if (!ReadFile(dh, sector, sector_size, &count, NULL)) {
         error(" Error reading from disk: ");
         return -1;
     }
@@ -168,7 +170,8 @@ int read_partinfo(HANDLE dh, struct partinfo* pinfo)
     return 0;
 }
 
-int disk_read(HANDLE dh, int outfile,unsigned long start, unsigned long count)
+int disk_read(HANDLE dh, int outfile,unsigned long start, unsigned long count,
+              int sector_size)
 {
     int res;
     unsigned long n;
@@ -177,14 +180,14 @@ int disk_read(HANDLE dh, int outfile,unsigned long start, unsigned long count)
 
     fprintf(stderr,"[INFO] Seeking to sector %ld\n",start);
 
-    if (SetFilePointer(dh, start*SECTOR_SIZE, NULL, FILE_BEGIN)==0xffffffff) {
+    if (SetFilePointer(dh, start*sector_size, NULL, FILE_BEGIN)==0xffffffff) {
         error(" Seek error ");
         return -1;
     }
 
     fprintf(stderr,"[INFO] Writing %ld sectors to output file\n",count);
 
-    bytesleft = count * SECTOR_SIZE;
+    bytesleft = count * sector_size;
     while (bytesleft > 0) {
         if (bytesleft > BUFFER_SIZE) {
            chunksize = BUFFER_SIZE;
@@ -212,7 +215,7 @@ int disk_read(HANDLE dh, int outfile,unsigned long start, unsigned long count)
         }
 
         if (res != n) {
-            fprintf(stderr,"Short write - requested %d, received %d - aborting.\n",SECTOR_SIZE,res);
+            fprintf(stderr,"Short write - requested %lu, received %d - aborting.\n",n,res);
             return -1;
         }
     }
@@ -221,7 +224,7 @@ int disk_read(HANDLE dh, int outfile,unsigned long start, unsigned long count)
     return 0;
 }
 
-int disk_write(HANDLE dh, int infile,unsigned long start)
+int disk_write(HANDLE dh, int infile,unsigned long start, int sector_size)
 {
     unsigned long res;
     int n;
@@ -230,7 +233,7 @@ int disk_write(HANDLE dh, int infile,unsigned long start)
     int eof;
     int padding = 0;
 
-    if (SetFilePointer(dh, start*SECTOR_SIZE, NULL, FILE_BEGIN)==0xffffffff) {
+    if (SetFilePointer(dh, start*sector_size, NULL, FILE_BEGIN)==0xffffffff) {
         error(" Seek error ");
         return -1;
     }
@@ -249,8 +252,8 @@ int disk_write(HANDLE dh, int infile,unsigned long start)
         if (n < BUFFER_SIZE) {
            eof = 1;
            /* We need to pad the last write to a multiple of SECTOR_SIZE */
-           if ((n % SECTOR_SIZE) != 0) {
-               padding = (SECTOR_SIZE-(n % SECTOR_SIZE));
+           if ((n % sector_size) != 0) {
+               padding = (sector_size-(n % sector_size));
                n += padding; 
            }
         }
@@ -301,17 +304,20 @@ int main(int argc, char* argv[])
     int i;
     struct partinfo pinfo[4]; /* space for 4 partitions on 1 drive */
     int res;
+    unsigned long n;
     int outfile;
     int infile;
     int mode = SHOW_INFO;
     int p = 0;
     int diskno = -1;
+    int sector_size;
+    DISK_GEOMETRY_EX diskgeometry;
     char diskname[32];
     HANDLE dh;
     char* filename = NULL;
     off_t inputsize;
 
-    fprintf(stderr,"ipodpatcher v0.3 - (C) Dave Chapman 2006\n");
+    fprintf(stderr,"ipodpatcher v0.4 - (C) Dave Chapman 2006\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
     
@@ -353,8 +359,6 @@ int main(int argc, char* argv[])
 
     snprintf(diskname,sizeof(diskname),"\\\\.\\PhysicalDrive%d",diskno);
 
-    fprintf(stderr,"[INFO] Reading partition table from %s\n",diskname);
-
     /* The ReadFile function requires a memory buffer aligned to a multiple of
        the disk sector size. */
     sectorbuf = VirtualAlloc(NULL, BUFFER_SIZE, MEM_COMMIT, PAGE_READWRITE);
@@ -377,15 +381,32 @@ int main(int argc, char* argv[])
         return 2;
     }
 
-    if (read_partinfo(dh,pinfo) < 0) {
+    if (!DeviceIoControl(dh,
+                         IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+                         NULL,
+                         0,
+                         &diskgeometry,
+                         sizeof(diskgeometry),
+                         &n,
+                         NULL)) {
+        error(" Error reading disk geometry: ");
         return 2;
     }
 
-    display_partinfo(pinfo);
+    sector_size=diskgeometry.Geometry.BytesPerSector;
+
+    fprintf(stderr,"[INFO] Reading partition table from %s\n",diskname);
+    fprintf(stderr,"[INFO] Sector size is %d bytes\n",sector_size);
+
+    if (read_partinfo(dh,sector_size,pinfo) < 0) {
+        return 2;
+    }
+
+    display_partinfo(pinfo, sector_size);
 
     if (pinfo[p].start==0) {
         fprintf(stderr,"[ERR]  Specified partition (%d) does not exist:\n",p);
-        display_partinfo(pinfo);
+        display_partinfo(pinfo, sector_size);
         return 3;
     }
 
@@ -396,7 +417,7 @@ int main(int argc, char* argv[])
            return 4;
         }
 
-        res = disk_read(dh,outfile,pinfo[p].start,pinfo[p].size);
+        res = disk_read(dh,outfile,pinfo[p].start,pinfo[p].size,sector_size);
 
         close(outfile);
     } else if (mode==WRITE) {
@@ -427,9 +448,9 @@ int main(int argc, char* argv[])
         /* Check filesize is <= partition size */
         inputsize=filesize(infile);
         if (inputsize > 0) {
-            if (inputsize <= (pinfo[p].size*SECTOR_SIZE)) {
+            if (inputsize <= (pinfo[p].size*sector_size)) {
                 fprintf(stderr,"[INFO] Input file is %lu bytes\n",inputsize);
-                res = disk_write(dh,infile,pinfo[p].start);
+                res = disk_write(dh,infile,pinfo[p].start,sector_size);
             } else {
                 fprintf(stderr,"[ERR]  File is too large for firmware partition, aborting.\n");
             }
