@@ -51,6 +51,26 @@ static int parse_dec(int (*peek)(void *userp),
     return n;
 }
 
+static int parse_chars(int (*peek)(void *userp),
+                       void (*pop)(void *userp),
+                       void *userp,
+                       char *vp)
+{
+    int n = 0;
+    char *pt=vp;
+
+    while (!isspace((*peek)(userp)))
+    {
+        *(pt++) = (*peek)(userp);
+        n++;
+        (*pop)(userp);
+    } 
+
+    (*pt)='\0';
+
+    return n;
+}
+
 static int parse_hex(int (*peek)(void *userp),
                      void (*pop)(void *userp),
                      void *userp,
@@ -175,6 +195,11 @@ static int scan(int (*peek)(void *userp),
                             break;
                     }
                     break;
+					 case 's':
+						  n_chars += skip_spaces(peek, pop, userp);
+						  n_chars += parse_chars(peek,pop, userp,va_arg(ap, char *) );
+                    n++;
+                    break;
                 case '\0':
                     return n;
                 default:
@@ -188,7 +213,7 @@ static int scan(int (*peek)(void *userp),
         {
             n_chars += skip_spaces(peek, pop, userp);
             if ((*peek)(userp) != ch)
-                return n;
+                continue;
             else
             {
                 (*pop)(userp);
