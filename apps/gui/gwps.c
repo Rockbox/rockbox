@@ -68,6 +68,17 @@ static struct wps_data wps_datas[NB_SCREENS];
 
 /* change the path to the current played track */
 static void wps_state_update_ctp(const char *path);
+/* initial setup of wps_data  */
+static void wps_state_init(void);
+/* initial setup of a wps */
+static void gui_wps_init(struct gui_wps *gui_wps);
+/* connects a wps with a format-description of the displayed content */
+static void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data);
+/* connects a wps with a screen */
+static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display);
+/* connects a wps with a statusbar*/
+static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar);
+
 
 #ifdef HAVE_LCD_BITMAP
 static void gui_wps_set_margin(struct gui_wps *gwps)
@@ -787,7 +798,7 @@ bool wps_data_load(struct wps_data *wps_data,
 
 /* wps_state */
 
-void wps_state_init(void)
+static void wps_state_init(void)
 {
     wps_state.ff_rewind = false;
     wps_state.paused = false;
@@ -823,7 +834,7 @@ static void wps_state_update_ctp(const char *path)
 /* wps_state end*/
 
 /* initial setup of a wps */
-void gui_wps_init(struct gui_wps *gui_wps)
+static void gui_wps_init(struct gui_wps *gui_wps)
 {
     gui_wps->data = NULL;
     gui_wps->display = NULL;
@@ -834,18 +845,18 @@ void gui_wps_init(struct gui_wps *gui_wps)
 }
 
 /* connects a wps with a format-description of the displayed content */
-void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data)
+static void gui_wps_set_data(struct gui_wps *gui_wps, struct wps_data *data)
 {
     gui_wps->data = data;
 }
 
 /* connects a wps with a screen */
-void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display)
+static void gui_wps_set_disp(struct gui_wps *gui_wps, struct screen *display)
 {
     gui_wps->display = display;
 }
 
-void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar)
+static void gui_wps_set_statusbar(struct gui_wps *gui_wps, struct gui_statusbar *statusbar)
 {
     gui_wps->statusbar = statusbar;
 }
