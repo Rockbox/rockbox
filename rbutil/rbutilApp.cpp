@@ -1,10 +1,22 @@
-//---------------------------------------------------------------------------
-//
-// Name:        rbutilApp.cpp
-// Author:      Christi Scarborough
-// Created:     03/12/2005 00:35:02
-//
-//---------------------------------------------------------------------------
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * Module: rbutil
+ * File: rbutilApp.cpp
+ *
+ * Copyright (C) 2005 Christi Alice Scarborough
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include "rbutilApp.h"
 
@@ -19,6 +31,15 @@ bool rbutilFrmApp::OnInit()
     wxLogVerbose(wxT("=== begin rbutilFrmApp::Oninit()"));
 
     gv->stdpaths = new wxStandardPaths();
+
+    // Get application directory
+    // DANGER!  GetDataDir() doesn't portably return the application directory
+    // We want to use the form below instead, but not until wxWidgets 2.8 is
+    // released.
+    //    gv->AppDir = gv->stdpaths->GetExecutablePath()->BeforeLast(&pathsep);
+    buf = gv->stdpaths->GetDataDir(); buf.Append(PATH_SEP);
+    gv->AppDir = buf.BeforeLast(PATH_SEP_CHR).c_str();
+
     buf = gv->stdpaths->GetUserDataDir();
     if (! wxDirExists(buf) )
     {
@@ -48,17 +69,15 @@ bool rbutilFrmApp::OnInit()
     wxFileSystem::AddHandler(new wxInternetFSHandler);
     wxFileSystem::AddHandler(new wxZipFSHandler);
 
-    rbutilFrm *myFrame = new  rbutilFrm(NULL);
-    SetTopWindow(myFrame);
-
-    if (!ReadGlobalConfig(myFrame))
+    if (!ReadGlobalConfig(NULL))
     {
         ERR_DIALOG(gv->ErrStr->GetData(), _("Rockbox Utility"));
         return FALSE;
     }
-
     ReadUserConfig();
 
+    rbutilFrm *myFrame = new  rbutilFrm(NULL);
+    SetTopWindow(myFrame);
     myFrame->Show(TRUE);
 
     wxLogVerbose(wxT("=== end rbUtilFrmApp::OnInit()"));
@@ -96,8 +115,21 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     wxLogVerbose(wxT("=== begin rbutilFrmApp::ReadGlobalConfig(%p)"),
         (void*) myFrame);
 
-    buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"),
-        gv->stdpaths->GetDataDir().c_str() );
+    // Cross-platform compatibility: look for rbutil.ini in the same dir as the
+    // executable before trying the standard data directory.  On Windows these
+    // are of course the same directory.
+    buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"), gv->AppDir.c_str() );
+
+    if (! wxFileExists(buf) )
+    {
+        gv->ResourceDir = gv->stdpaths->GetResourcesDir();
+        buf.Printf(wxT("%s" PATH_SEP "rbutil.ini"),
+            gv->ResourceDir.c_str() );
+    } else
+    {
+        gv->ResourceDir = gv->AppDir;
+    }
+
     wxFileInputStream* cfgis = new wxFileInputStream(buf);
 
     if (!cfgis->CanRead()) {
@@ -106,6 +138,7 @@ bool rbutilFrmApp::ReadGlobalConfig(rbutilFrm* myFrame)
     }
 
     gv->GlobalConfig = new wxFileConfig(*cfgis);
+    gv->GlobalConfigFile = buf;
 
     unsigned int i = 0;
 
@@ -167,9 +200,22 @@ void rbutilFrmApp::ReadUserConfig()
 {
     wxString buf, str, stack;
 
-    buf.Printf(wxT("%s" PATH_SEP "%s"), gv->stdpaths->GetUserDataDir().c_str(),
-        wxT("RockboxUtility.cfg"));
+    buf.Printf(wxT("%s" PATH_SEP "RockboxUtility.cfg"),
+         gv->AppDir.c_str());
+
+    if (wxFileExists(buf) )
+    {
+        gv->portable = true;
+    }
+    else
+    {
+        gv->portable = false;
+        buf.Printf(wxT("%s" PATH_SEP "%s"),
+            gv->stdpaths->GetUserDataDir().c_str(), wxT("RockboxUtility.cfg"));
+    }
+
     gv->UserConfig = new wxFileConfig(wxEmptyString, wxEmptyString, buf);
+    gv->UserConfigFile = buf;
     stack = gv->UserConfig->GetPath();
 
     gv->UserConfig->SetPath(wxT("/defaults"));

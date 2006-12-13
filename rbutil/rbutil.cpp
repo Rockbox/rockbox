@@ -1,10 +1,22 @@
-//---------------------------------------------------------------------------
-//
-// Name:        rbutil.cpp
-// Author:      Christi Scarborough
-// Created:     06-12-05 04:08
-//
-//---------------------------------------------------------------------------
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * Module: rbutil
+ * File: rbutil.cpp
+ *
+ * Copyright (C) 2005 Christi Alice Scarborough
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include "rbutil.h"
 
@@ -524,6 +536,82 @@ wxString stream_err_str(int errnum)
         break;
     }
     return out;
+}
+
+bool InstallRbutil(wxString dest)
+{
+    wxArrayString   filestocopy;
+    wxString        str, buf, dstr, destdir;
+    unsigned int    i;
+    wxDir           dir;
+    bool            copied_exe = false;
+
+    destdir.Printf(wxT("%s" PATH_SEP "RockboxUtility"), dest.c_str());
+    if (! wxDirExists(destdir) )
+    {
+        if (! wxMkdir(destdir) )
+        {
+            buf.Printf(wxT("%s (%s)"),
+                _("Unable to create directory for installer"), destdir.c_str());
+            WARN_DIALOG(buf , _("Portable install") );
+            return false;
+        }
+    }
+
+    dir.GetAllFiles(gv->ResourceDir, &filestocopy, wxT("*"),
+        wxDIR_FILES);
+    if (filestocopy.GetCount() < 1)
+    {
+        WARN_DIALOG(_("No files to copy"), _("Portable install") );
+        return false;
+    }
+
+    // Copy the contents of the program directory
+    for (i = 0; i < filestocopy.GetCount(); i++)
+    {
+        if (filestocopy[i].AfterLast(PATH_SEP_CHR) == EXE_NAME)
+        {
+            copied_exe = true;
+        }
+
+        dstr.Printf(wxT("%s" PATH_SEP "%s"), destdir.c_str(),
+            filestocopy[i].AfterLast(PATH_SEP_CHR).c_str());
+        if (! wxCopyFile(filestocopy[i], dstr) )
+        {
+            buf.Printf(wxT("%s (%s -> %s)"),
+                _("Error copying file"), filestocopy[i].c_str(), dstr.c_str());
+            WARN_DIALOG(buf, _("Portable Install") );
+            return false;
+        }
+    }
+
+    if (! copied_exe)
+    {
+        str.Printf(wxT("%s" PATH_SEP EXE_NAME), gv->AppDir.c_str());
+        dstr.Printf(wxT("%s" PATH_SEP EXE_NAME), destdir.c_str(),
+            filestocopy[i].AfterLast(PATH_SEP_CHR).c_str());
+        if (! wxCopyFile(str, dstr) )
+        {
+            buf.Printf(wxT("Can't copy program binary %s -> %s"),
+                str.c_str(), dstr.c_str() );
+            WARN_DIALOG(buf, _("Portable Install") );
+            return false;
+        }
+    }
+
+    // Copy the local ini file so that it knows that it's a portable copy
+    gv->UserConfig->Flush();
+    dstr.Printf(wxT("%s" PATH_SEP "RockboxUtility.cfg"), destdir.c_str());
+    if (! wxCopyFile(gv->UserConfigFile, dstr) )
+    {
+        buf.Printf(wxT("%s (%s -> %s)"),
+            _("Unable to install user config file"), gv->UserConfigFile.c_str(),
+            dstr.c_str() );
+        WARN_DIALOG(buf, _("Portable Install") );
+        return false;
+    }
+
+    return true;
 }
 
 bool rm_rf(wxString file)

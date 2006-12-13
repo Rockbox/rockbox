@@ -1,10 +1,22 @@
-//---------------------------------------------------------------------------
-//
-// Name:        rbutil.h
-// Author:      Christi Scarborough
-// Created:     03/12/2005 00:35:02
-//
-//---------------------------------------------------------------------------
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * Module: rbutil
+ * File: rbutil.h
+ *
+ * Copyright (C) 2005 Christi Alice Scarborough
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include <wx/wxprec.h>
 #ifdef __BORLANDC__
@@ -43,8 +55,12 @@
 
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
+#define PATH_SEP_CHR '\\'
+#define EXE_NAME "rbutil.exe"
 #else
 #define PATH_SEP "/"
+#define PATH_SEP_CHR '/'
+#define EXE_NAME "rbutil"
 #endif
 
 #define UNINSTALL_FILE ".rockbox" PATH_SEP ".rbutil_install_data"
@@ -60,6 +76,11 @@ public:
     // Program configuration data (rbutil.ini and environment)
     wxFileConfig*           GlobalConfig;
     wxFileConfig*           UserConfig;
+    wxString                UserConfigFile;
+    wxString                GlobalConfigFile;
+    wxString                AppDir;
+    wxString                ResourceDir;
+
     wxString*               ErrStr;
     wxStandardPaths*        stdpaths;
     wxArrayString           plat_id;
@@ -74,12 +95,13 @@ public:
     wxString                prog_name;
 
     // User configuration data.
-    wxString                 curplat;
-    unsigned int             curplatnum;
-    wxString                 curdestdir;
-    unsigned int             curbuild;
-    bool                     curisfull;
-    bool                     nocache;
+    wxString                curplat;
+    unsigned int            curplatnum;
+    wxString                curdestdir;
+    unsigned int            curbuild;
+    bool                    curisfull;
+    bool                    nocache;
+    bool                    portable;
 
     // Global system variables
     wxFFile*                 logfile;
@@ -95,6 +117,7 @@ wxString wxFindAppPath(const wxString& argv0, const wxString& cwd,
 int DownloadURL(wxString src, wxString dest);
 int UnzipFile(wxString src, wxString destdir, bool isInstall = false);
 int Uninstall(const wxString dir, bool isFullUninstall = false);
+bool InstallRbutil(wxString dest);
 wxString stream_err_str(int errnum);
 bool rm_rf(wxString file);
 

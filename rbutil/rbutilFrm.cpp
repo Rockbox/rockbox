@@ -1,10 +1,22 @@
-//---------------------------------------------------------------------------
-//
-// Name:        rbutilFrm.cpp
-// Author:      Christi Scarborough
-// Created:     03/12/2005 00:35:02
-//
-//---------------------------------------------------------------------------
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * Module: rbutil
+ * File: rbutilFrm.cpp
+ *
+ * Copyright (C) 2005 Christi Alice Scarborough
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
 
 #include "rbutilFrm.h"
 #include "credits.h"
@@ -32,6 +44,7 @@ BEGIN_EVENT_TABLE(rbutilFrm,wxFrame)
 	EVT_MENU(ID_FILE_EXIT, rbutilFrm::OnFileExit)
 	EVT_MENU(ID_FILE_ABOUT, rbutilFrm::OnFileAbout)
 	EVT_MENU(ID_FILE_WIPECACHE, rbutilFrm::OnFileWipeCache)
+	EVT_MENU(ID_PORTABLE_INSTALL, rbutilFrm::OnPortableInstall)
 END_EVENT_TABLE()
 
 rbutilFrm::rbutilFrm( wxWindow *parent, wxWindowID id, const wxString &title,
@@ -77,7 +90,7 @@ void rbutilFrm::CreateGUIControls(void)
 
     wxBitmap BootloaderInstallButton (tools2_3d_xpm);
     WxBitmapButton4 = new wxBitmapButton(WxPanel1, ID_BOOTLOADER_BTN,
-        BootloaderInstallButton, wxPoint(0,50), wxSize(60,50),
+        BootloaderInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
     WxBitmapButton4->SetToolTip(_("Instructions for installing the "
         "Rockbox bootloader on your audio device"));
@@ -95,7 +108,7 @@ void rbutilFrm::CreateGUIControls(void)
 
 	wxBitmap WxBitmapButton1_BITMAP (install_3d_xpm);
 	WxBitmapButton1 = new wxBitmapButton(WxPanel1, ID_INSTALL_BTN,
-        WxBitmapButton1_BITMAP, wxPoint(0,0), wxSize(60,50),
+        WxBitmapButton1_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
         wxT("WxBitmapButton1"));
 	WxBitmapButton1->SetToolTip(_("Install Rockbox"));
@@ -110,7 +123,7 @@ void rbutilFrm::CreateGUIControls(void)
 
     wxBitmap FontInstallButton (fonts_3d_xpm);
     WxBitmapButton3 = new wxBitmapButton(WxPanel1, ID_FONT_BTN,
-        FontInstallButton, wxPoint(0,50), wxSize(60,50),
+        FontInstallButton, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW);
     WxBitmapButton3->SetToolTip(_("Download the most up to date "
         "Rockbox fonts."));
@@ -128,7 +141,7 @@ void rbutilFrm::CreateGUIControls(void)
 
 	wxBitmap WxBitmapButton2_BITMAP (uninstall_3d_xpm);
 	WxBitmapButton2 = new wxBitmapButton(WxPanel1, ID_REMOVE_BTN,
-        WxBitmapButton2_BITMAP, wxPoint(0,50), wxSize(60,50),
+        WxBitmapButton2_BITMAP, wxPoint(0,0), wxSize(64,54),
         wxRAISED_BORDER | wxBU_AUTODRAW, wxDefaultValidator,
         wxT("WxBitmapButton2"));
 	WxBitmapButton2->SetToolTip(_("Uninstall Rockbox"));
@@ -147,6 +160,11 @@ void rbutilFrm::CreateGUIControls(void)
 
     ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_WIPECACHE,
         _("&Empty local download cache"), wxT(""), wxITEM_NORMAL);
+    if (! gv->portable )
+    {
+        ID_FILE_MENU_Mnu_Obj->Append(ID_PORTABLE_INSTALL,
+            _("&Install Rockbox Utility on device"), wxT(""), wxITEM_NORMAL);
+    }
     ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_ABOUT, _("&About"), wxT(""),
         wxITEM_NORMAL);
     ID_FILE_MENU_Mnu_Obj->Append(ID_FILE_EXIT, _("E&xit\tCtrl+X"), wxT(""),
@@ -156,7 +174,13 @@ void rbutilFrm::CreateGUIControls(void)
 
 	GetSizer()->Fit(this);
 	GetSizer()->SetSizeHints(this);
-	this->SetTitle(wxT("Rockbox Utility"));
+	if (gv->portable)
+	{
+	    this->SetTitle(_("Rockbox Utility (portable)"));
+	} else
+	{
+        this->SetTitle(_("Rockbox Utility"));
+	}
 	this->Center();
 	wxIcon rbutilFrm_ICON (rbutilFrm_XPM);
 	this->SetIcon(rbutilFrm_XPM);
@@ -490,6 +514,39 @@ void rbutilFrm::OnRemoveBtn(wxCommandEvent& event)
     wxLogVerbose("=== end rbutilFrm::OnRemoveBtn");
 }
 
+void rbutilFrm::OnPortableInstall(wxCommandEvent& event)
+{
+    wxString src, dest, buf;
+    wxLogVerbose("=== begin rbutilFrm::OnPortableInstall(event)");
+    wxFileSystem fs;
+    wxFileConfig* buildinfo;
+    wxDateSpan oneday;
+
+    wxWizard *wizard = new wxWizard(this, wxID_ANY,
+                    _("Rockbox Utility Portable Installation Wizard"),
+                    wxBitmap(wizard_xpm),
+                    wxDefaultPosition,
+                    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    wxLocationPage* page1 = new wxLocationPage(wizard);
+
+    wizard->GetPageAreaSizer()->Add(page1);
+
+    if (wizard->RunWizard(page1) )
+    {
+        if ( InstallRbutil(gv->curdestdir) )
+        {
+            MESG_DIALOG(_("The Rockbox Utility has been installed on your device.") );
+        } else
+        {
+            ERR_DIALOG(_("Installation failed"), _("Portable Install"));
+        }
+    } else
+    {
+        MESG_DIALOG(_("The portable installation wizard was cancelled") );
+    }
+
+    wxLogVerbose("=== end rbutilFrm::OnUnstallPortable");
+}
 
 AboutDlg::AboutDlg(rbutilFrm* parent)
     : wxDialog(parent, -1, _("About"), wxDefaultPosition, wxDefaultSize,

@@ -1,10 +1,23 @@
-//---------------------------------------------------------------------------
-//
-// Name:        rbutilFrm.h
-// Author:      Christi Scarborough
-// Created:     03/12/2005 00:35:02
-//
-//---------------------------------------------------------------------------
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * Module: rbutil
+ * File: rbutilFrm.h
+ *
+ * Copyright (C) 2005 Christi Alice Scarborough
+ *
+ * All files in this archive are subject to the GNU General Public License.
+ * See the file COPYING in the source tree root for full license agreement.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+
 #ifndef __rbutilFrm_HPP_
 #define __rbutilFrm_HPP_
 
@@ -60,6 +73,7 @@ public:
 			ID_FILE_EXIT = 1034,
 			ID_FILE_ABOUT = 1035,
 			ID_FILE_WIPECACHE = 1036,
+			ID_PORTABLE_INSTALL = 1037,
 
 			ID_WXSTATICTEXT3 = 1032,
 			ID_REMOVE_BTN = 1031,
@@ -83,6 +97,7 @@ public:
 	void OnRemoveBtn(wxCommandEvent& event);
 	void OnFontBtn(wxCommandEvent& event);
 	void OnBootloaderBtn(wxCommandEvent& event);
+	void OnPortableInstall(wxCommandEvent& event);
 
 };
 
