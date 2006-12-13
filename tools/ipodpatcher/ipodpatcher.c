@@ -146,7 +146,8 @@ int read_partinfo(HANDLE dh, struct partinfo* pinfo)
         return 0;
     }
 
-    if (memcmp(&sector[71],"iPod",4) != 0) {
+    if ((memcmp(&sector[71],"iPod",4) != 0) &&
+        (memcmp(&sector[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
         fprintf(stderr,"Drive is not an iPod, aborting\n");
         return -1;
     }
@@ -310,7 +311,7 @@ int main(int argc, char* argv[])
     char* filename = NULL;
     off_t inputsize;
 
-    fprintf(stderr,"ipodpatcher v0.2 - (C) Dave Chapman 2005\n");
+    fprintf(stderr,"ipodpatcher v0.3 - (C) Dave Chapman 2006\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
     
