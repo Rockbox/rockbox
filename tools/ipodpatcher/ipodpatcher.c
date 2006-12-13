@@ -311,13 +311,14 @@ int main(int argc, char* argv[])
     int p = 0;
     int diskno = -1;
     int sector_size;
-    DISK_GEOMETRY_EX diskgeometry;
+    DISK_GEOMETRY_EX diskgeometry_ex;
+    DISK_GEOMETRY diskgeometry;
     char diskname[32];
     HANDLE dh;
     char* filename = NULL;
     off_t inputsize;
 
-    fprintf(stderr,"ipodpatcher v0.4 - (C) Dave Chapman 2006\n");
+    fprintf(stderr,"ipodpatcher v0.4b - (C) Dave Chapman 2006\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
     
@@ -385,15 +386,26 @@ int main(int argc, char* argv[])
                          IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
                          NULL,
                          0,
-                         &diskgeometry,
-                         sizeof(diskgeometry),
+                         &diskgeometry_ex,
+                         sizeof(diskgeometry_ex),
                          &n,
                          NULL)) {
-        error(" Error reading disk geometry: ");
-        return 2;
+        if (!DeviceIoControl(dh,
+                             IOCTL_DISK_GET_DRIVE_GEOMETRY,
+                             NULL,
+                             0,
+                             &diskgeometry,
+                             sizeof(diskgeometry),
+                             &n,
+                             NULL)) {
+            error(" Error reading disk geometry: ");
+            return 2;
+        } else {
+            sector_size=diskgeometry.BytesPerSector;
+        }
+    } else {
+        sector_size=diskgeometry_ex.Geometry.BytesPerSector;
     }
-
-    sector_size=diskgeometry.Geometry.BytesPerSector;
 
     fprintf(stderr,"[INFO] Reading partition table from %s\n",diskname);
     fprintf(stderr,"[INFO] Sector size is %d bytes\n",sector_size);
