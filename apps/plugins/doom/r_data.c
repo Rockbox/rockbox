@@ -694,18 +694,17 @@ int R_ColormapNumForName(const char *name)
 // By Lee Killough 2/21/98
 //
 
-struct _cache {
-   unsigned char pct;
-   unsigned char playpal[256];
-}
-cache;
-
 int tran_filter_pct = 66;       // filter percent
 
 #define TSC 12        /* number of fixed point digits in filter percent */
 
 void R_InitTranMap(int progress)
 {
+  struct _cache {
+   unsigned char pct;
+   unsigned char playpal[256];
+}
+cache;
    int lump = W_CheckNumForName("TRANMAP");
 
    // If a tranlucency filter map lump is present, use it

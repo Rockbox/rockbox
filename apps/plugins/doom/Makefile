@@ -3,7 +3,10 @@
 # $Id$
 #
 # $Log$
-# Revision 1.12  2006/12/13 05:46:51  kkurbjun
+# Revision 1.13  2006/12/13 06:52:09  kkurbjun
+# Free more plugin memory
+#
+# Revision 1.12  2006-12-13 05:46:51  kkurbjun
 # Will it fit?
 #
 # Revision 1.11  2006-12-13 04:44:17  kkurbjun
@@ -53,10 +56,12 @@ endif
 
 # The arm code compiles too large for the plugin buffer when set to optimize for speed
 #ifeq ($(CC), arm-elf-gcc)
-ifneq (,$(strip $(foreach tgt,IPOD_NANO IPOD_COLOR IPOD_VIDEO IPOD_MINI IPOD_3G IPOD_4G IRIVER_H10_5GB IRIVER_H10,$(findstring $(tgt),$(TARGET)))))
+ifneq (,$(strip $(foreach tgt,SANSA_E200 IPOD_NANO IPOD_COLOR IPOD_VIDEO IPOD_MINI IPOD_3G IPOD_4G IRIVER_H10_5GB IRIVER_H10,$(findstring $(tgt),$(TARGET)))))
     CFLAGS += -Os
 ifndef SIMVER
+ifeq ($(TARGET), IRIVER_H100)
     CFLAGS += -mstructure-size-boundary=8
+endif
 endif
 else
     CFLAGS += -O2

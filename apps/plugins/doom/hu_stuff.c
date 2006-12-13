@@ -161,8 +161,8 @@ static player_t*  plr;
 
 // font sets
 patchnum_t hu_font[HU_FONTSIZE];
-patchnum_t hu_font2[HU_FONTSIZE];
-patchnum_t hu_fontk[HU_FONTSIZE];//jff 3/7/98 added for graphic key indicators
+patchnum_t *hu_font2;
+patchnum_t *hu_fontk;//jff 3/7/98 added for graphic key indicators
 patchnum_t hu_msgbg[9];          //jff 2/26/98 add patches for message background
 
 // widgets
@@ -312,6 +312,8 @@ void HU_Init(void)
    hud_coordstrx=malloc(32*sizeof(char));
    hud_coordstry=malloc(32*sizeof(char));
    hud_coordstrz=malloc(32*sizeof(char));
+   hu_fontk=malloc(HU_FONTSIZE*sizeof(patchnum_t));
+   hu_font2=malloc(HU_FONTSIZE*sizeof(patchnum_t));
 
    // load the heads-up font
    j = HU_FONTSTART;
@@ -320,53 +322,53 @@ void HU_Init(void)
       if ('0'<=j && j<='9')
       {
          snprintf(buffer, sizeof(buffer), "DIG%d",j-48);
-         R_SetPatchNum(&hu_font2[i], buffer);
+         R_SetPatchNum(hu_font2 +i, buffer);
          snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
          R_SetPatchNum(&hu_font[i], buffer);
       }
       else if ('A'<=j && j<='Z')
       {
          snprintf(buffer, sizeof(buffer), "DIG%c",j);
-         R_SetPatchNum(&hu_font2[i], buffer);
+         R_SetPatchNum(hu_font2 +i, buffer);
          snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
          R_SetPatchNum(&hu_font[i], buffer);
       }
       else if (j=='-')
       {
-         R_SetPatchNum(&hu_font2[i], "DIG45");
+         R_SetPatchNum(hu_font2 +i, "DIG45");
          R_SetPatchNum(&hu_font[i], "STCFN045");
       }
       else if (j=='/')
       {
-         R_SetPatchNum(&hu_font2[i], "DIG47");
+         R_SetPatchNum(hu_font2 +i, "DIG47");
          R_SetPatchNum(&hu_font[i], "STCFN047");
       }
       else if (j==':')
       {
-         R_SetPatchNum(&hu_font2[i], "DIG58");
+         R_SetPatchNum(hu_font2 +i, "DIG58");
          R_SetPatchNum(&hu_font[i], "STCFN058");
       }
       else if (j=='[')
       {
-         R_SetPatchNum(&hu_font2[i], "DIG91");
+         R_SetPatchNum(hu_font2 +i, "DIG91");
          R_SetPatchNum(&hu_font[i], "STCFN091");
       }
       else if (j==']')
       {
-         R_SetPatchNum(&hu_font2[i], "DIG93");
+         R_SetPatchNum(hu_font2 +i, "DIG93");
          R_SetPatchNum(&hu_font[i], "STCFN093");
       }
       else if (j<97)
       {
          snprintf(buffer, sizeof(buffer), "STCFN%s%d", (j/10>0?"0":"00"), j); //NOTE ROCKHACK: "STCFN%.3d"
-         R_SetPatchNum(&hu_font2[i], buffer);
+         R_SetPatchNum(hu_font2 +i, buffer);
          R_SetPatchNum(&hu_font[i], buffer);
          //jff 2/23/98 make all font chars defined, useful or not
       }
       else if (j>122)
       {
          snprintf(buffer, sizeof(buffer), "STBR%d", j); //NOTE: "STBR%.3d"
-         R_SetPatchNum(&hu_font2[i], buffer);
+         R_SetPatchNum(hu_font2 +i, buffer);
          R_SetPatchNum(&hu_font[i], buffer);
       }
       else
@@ -382,7 +384,7 @@ void HU_Init(void)
    // CPhipps - load patches for keys and double keys
    for (i=0; i<6; i++) {
       snprintf(buffer, sizeof(buffer), "STKEYS%d", i);
-      R_SetPatchNum(&hu_fontk[i], buffer);
+      R_SetPatchNum(hu_fontk+i, buffer);
    }
 }
 
