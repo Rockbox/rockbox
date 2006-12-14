@@ -869,8 +869,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod4g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -895,8 +894,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod4g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -921,8 +919,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod5g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -947,8 +944,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod3g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -973,8 +969,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod4g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -999,8 +994,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod4g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
@@ -1072,8 +1066,7 @@ EOF
     flash=""
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
-    boottool="$rootdir/tools/scramble -ipod4g"
-    bootoutput="bootloader.img"
+    bootoutput="bootloader-$archos.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$ipodbitmaptools
