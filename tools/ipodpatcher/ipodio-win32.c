@@ -120,7 +120,7 @@ int ipod_reopen_rw(HANDLE* dh, char* diskname)
     unlock_volume(*dh);
     CloseHandle(*dh);
 
-    *dh = CreateFile(diskname, GENERIC_WRITE,
+    *dh = CreateFile(diskname, GENERIC_READ | GENERIC_WRITE,
                      FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING,
                      FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
