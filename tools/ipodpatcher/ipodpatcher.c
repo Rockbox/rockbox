@@ -183,21 +183,21 @@ int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo)
     }
 
     /* check that the boot sector is initialized */
-    if ( (sector[510] != 0x55) ||
-         (sector[511] != 0xaa)) {
+    if ( (sectorbuf[510] != 0x55) ||
+         (sectorbuf[511] != 0xaa)) {
         fprintf(stderr,"[ERR]  Bad boot sector signature\n");
         return -1;
     }
 
-    if ((memcmp(&sector[71],"iPod",4) != 0) &&
-        (memcmp(&sector[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
+    if ((memcmp(&sectorbuf[71],"iPod",4) != 0) &&
+        (memcmp(&sectorbuf[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
         fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
         return -1;
     }
 
     /* parse partitions */
     for ( i = 0; i < 4; i++ ) {
-        unsigned char* ptr = sector + 0x1be + 16*i;
+        unsigned char* ptr = sectorbuf + 0x1be + 16*i;
         pinfo[i].type  = ptr[4];
         pinfo[i].start = BYTES2INT32(ptr, 8);
         pinfo[i].size  = BYTES2INT32(ptr, 12);
