@@ -22,7 +22,7 @@
 #define CREDITS_H_INCLUDED
 
 #define RBUTIL_FULLNAME "The Rockbox Utility"
-#define RBUTIL_VERSION "Version 0.2.1.0"
+#define RBUTIL_VERSION "Version 0.2.1.1"
 
 static const char* rbutil_developers[] = {
     "Christi Alice Scarborough",
