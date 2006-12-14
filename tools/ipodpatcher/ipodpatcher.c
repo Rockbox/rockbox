@@ -570,14 +570,14 @@ int extract_firmware(HANDLE dh, char* filename, int start, int sector_size,
     int2be(chksum,header);
     memcpy(header+4,modelname,4);
 
-    outfile = open(filename,O_CREAT|O_WRONLY|O_BINARY,0666);
+    outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,0666);
     if (outfile < 0) {
         fprintf(stderr,"[ERR]  Couldn't open file %s\n",filename);
         return -1;
     }
 
     write(outfile,header,8);
-    write(outfile,sectorbuf,ipod_directory[0].len);
+    write(outfile,sectorbuf,length);
     close(outfile);
 
     return 0;
