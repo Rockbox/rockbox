@@ -427,6 +427,11 @@ static int remove_dir(char* dirname, int len)
                 !strcmp((char *)entry->d_name, ".."))
                 continue; /* skip these */
 
+            /* inform the user which dir we're deleting */
+            lcd_puts(0,1,dirname);
+#ifdef HAVE_LCD_BITMAP
+            lcd_update();
+#endif
             result = remove_dir(dirname, len); /* recursion */
             if (result)
                 break; /* or better continue, delete what we can? */
@@ -434,6 +439,12 @@ static int remove_dir(char* dirname, int len)
         else
         {   /* remove a file */
             result = remove(dirname);
+        }
+        if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
+        {
+            gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
+            result = -1;
+            break;
         }
     }
     closedir(dir);
