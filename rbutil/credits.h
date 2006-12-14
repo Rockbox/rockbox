@@ -24,20 +24,17 @@
 #define RBUTIL_FULLNAME "The Rockbox Utility"
 #define RBUTIL_VERSION "Version 0.2.1.0"
 
-static char* rbutil_developers[] = {
+static const char* rbutil_developers[] = {
     "Christi Alice Scarborough",
-    "Dave Chapman"
+    "Dave Chapman",
+    ""
 };
 
-//static char* rbutil_translators[] = (
-//    ""
-//);
-
 #define RBUTIL_WEBSITE "http://www.rockbox.org/"
-#define RBUTIL_COPYRIGHT "(C) 2005-6 The Rockbox Team - " \
+#define RBUTIL_COPYRIGHT "(C) 2005-6 The Rockbox Team\n" \
         "released under the GNU Public License v2"
-#define RBUTIL_DESCRIPTION "Utility for performing housekeepng tasks for" \
-        "the Rockbox open\nsource digital audio player firmware."
+#define RBUTIL_DESCRIPTION "Installer and housekeeping utility for " \
+        "the Rockbox open source digital audio player firmware."
 
 
 class AboutDlg: public wxDialog

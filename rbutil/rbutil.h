@@ -52,7 +52,6 @@
 #include <wx/wizard.h>
 #include <wx/event.h>
 
-
 #ifdef __WXMSW__
 #define PATH_SEP "\\"
 #define PATH_SEP_CHR '\\'

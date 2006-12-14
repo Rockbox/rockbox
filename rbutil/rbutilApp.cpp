@@ -36,9 +36,9 @@ bool rbutilFrmApp::OnInit()
     // DANGER!  GetDataDir() doesn't portably return the application directory
     // We want to use the form below instead, but not until wxWidgets 2.8 is
     // released.
-    //    gv->AppDir = gv->stdpaths->GetExecutablePath()->BeforeLast(&pathsep);
-    buf = gv->stdpaths->GetDataDir(); buf.Append(PATH_SEP);
-    gv->AppDir = buf.BeforeLast(PATH_SEP_CHR).c_str();
+    gv->AppDir = gv->stdpaths->GetExecutablePath().BeforeLast(PATH_SEP_CHR);
+//    buf = gv->stdpaths->GetDataDir(); buf.Append(PATH_SEP);
+//    gv->AppDir = buf.BeforeLast(PATH_SEP_CHR).c_str();
 
     buf = gv->stdpaths->GetUserDataDir();
     if (! wxDirExists(buf) )

@@ -37,6 +37,8 @@
 
 #include <wx/frame.h>
 #include <wx/valgen.h>
+//#include <wx/aboutdlg.h>
+#include <wx/richtext/richtextctrl.h>
 
 #include "rbutil.h"
 #include "wizard_pages.h"

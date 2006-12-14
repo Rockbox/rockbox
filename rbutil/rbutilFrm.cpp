@@ -215,24 +215,22 @@ void rbutilFrm::OnFileAbout(wxCommandEvent& event)
 /*
     wxAboutDialogInfo *info = new wxAboutDialogInfo();
 
-    info->SetName(_(RBUTIL_LONGNAME));
+    info->SetName(_(RBUTIL_FULLNAME));
     info->SetVersion(_(RBUTIL_VERSION));
     info->SetCopyright(_(RBUTIL_COPYRIGHT));
     info->SetDescription(_(RBUTIL_DESCRIPTION));
-    info->SetWebsite(_(RBUTIL_WEBSITE));
-    ind
-    wxArrayString *array = new wxArrayString(sizeof(rbutil_developers[]).
-        rbutil_developers);
-    info->SetDevelopers(array);
-    delete array;
+    info->SetWebSite(_(RBUTIL_WEBSITE));
 
-//    array = new wxArrayString(sizeof(rbutil_translators[]),
-//        rbutil_translators);
-//    info->SetTranslators(array);
-//    delete array;
+    long i = 0;
+    while (rbutil_developers[i] != "")
+    {
+        info->AddDeveloper(wxT(rbutil_developers[i++]));
+    }
 
-    wxAboutBox(info);
+    wxAboutBox(*info);
+    delete info;
 */
+
     AboutDlg(this).ShowModal();
 }
 
@@ -565,19 +563,43 @@ AboutDlg::AboutDlg(rbutilFrm* parent)
     this->SetSizer(WxBoxSizer1);
     this->SetAutoLayout(TRUE);
 
-    wxBitmap WxBitmap1 = wxBitmap(rblogo_xpm);
+    wxBoxSizer* WxBoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
+
+    wxBitmap WxBitmap1 = wxBitmap(rbutilFrm_XPM);
     wxStaticBitmap* WxStaticBitmap1 = new wxStaticBitmap(this, wxID_ANY,
         WxBitmap1);
-    WxBoxSizer1->Add(WxStaticBitmap1, 0, wxALL, 5);
+    WxBoxSizer2->Add(WxStaticBitmap1, 0, wxALL | wxCENTER, 5);
 
     wxStaticText* WxStaticText1 = new wxStaticText(this, wxID_ANY,
-        _(RBUTIL_FULLNAME "\n" RBUTIL_VERSION "\n" RBUTIL_DESCRIPTION "\n\n"
-            RBUTIL_COPYRIGHT));
-    WxBoxSizer1->Add(WxStaticText1, 0, wxALL, 5);
+        _(RBUTIL_FULLNAME), wxDefaultPosition, wxDefaultSize,
+        wxALIGN_CENTER | wxST_NO_AUTORESIZE );
+    WxBoxSizer2->Add(WxStaticText1, 0, wxALL | wxCENTER, 5);
+    WxBoxSizer1->Add(WxBoxSizer2, 0, wxALL, 5);
+
+    wxStaticText* WxStaticText2 = new wxStaticText(this, wxID_ANY,
+        _(RBUTIL_VERSION "\n" RBUTIL_DESCRIPTION "\n\n" RBUTIL_COPYRIGHT));
+    WxStaticText2->Wrap(400);
+    WxBoxSizer1->Add(WxStaticText2, 0, wxALL, 5);
 
     wxHyperlinkCtrl* WxHyperlink1 = new wxHyperlinkCtrl(this, wxID_ANY,
         wxT(RBUTIL_WEBSITE), wxT(RBUTIL_WEBSITE) );
     WxBoxSizer1->Add(WxHyperlink1, 0, wxALL, 5);
+
+    wxStaticBox* WxStaticBox1 = new wxStaticBox(this, wxID_ANY, _("Contributors:"));
+    wxStaticBoxSizer* WxStaticBoxSizer2 = new wxStaticBoxSizer(WxStaticBox1,
+        wxVERTICAL);
+    wxTextCtrl* WxTextCtrl1 = new wxTextCtrl(this, wxID_ANY, wxEmptyString,
+        wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY);
+
+    long i = 0;
+    while ( rbutil_developers[i] != "")
+    {
+        WxTextCtrl1->AppendText(rbutil_developers[i++]);
+        WxTextCtrl1->AppendText("\n");
+    }
+
+    WxBoxSizer1->Add(WxStaticBoxSizer2, 1, wxGROW | wxALL, 5);
+    WxStaticBoxSizer2->Add(WxTextCtrl1, 1, wxGROW | wxALL, 0);
 
     wxStdDialogButtonSizer* WxStdDialogButtonSizer1 = new wxStdDialogButtonSizer();
     wxButton* WxOKButton = new wxButton(this, wxID_OK);
