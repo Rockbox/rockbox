@@ -173,10 +173,9 @@ void display_partinfo(struct partinfo_t* pinfo, int sector_size)
 int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo)
 {
     int i;
-    unsigned char sector[MAX_SECTOR_SIZE];
     unsigned long count;
 
-    count = ipod_read(dh,sector,sector_size);
+    count = ipod_read(dh,sectorbuf,sector_size);
 
     if (count <= 0) {
         print_error(" Error reading from disk: ");
@@ -212,7 +211,7 @@ int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo)
     return 0;
 }
 
-int read_partition(HANDLE dh, int outfile,unsigned long start, 
+int read_partition(HANDLE dh, int outfile,unsigned long start_sector,
                    unsigned long count, int sector_size)
 {
     int res;
@@ -220,9 +219,9 @@ int read_partition(HANDLE dh, int outfile,unsigned long start,
     int bytesleft;
     int chunksize;
 
-    fprintf(stderr,"[INFO] Seeking to sector %ld\n",start);
+    fprintf(stderr,"[INFO] Seeking to sector %ld\n",start_sector);
 
-    if (ipod_seek(dh,start) < 0) {
+    if (ipod_seek(dh,start_sector*sector_size) < 0) {
         return -1;
     }
 
@@ -269,7 +268,8 @@ int read_partition(HANDLE dh, int outfile,unsigned long start,
     return 0;
 }
 
-int write_partition(HANDLE dh, int infile,unsigned long start, int sector_size)
+int write_partition(HANDLE dh, int infile,unsigned long start_sector, 
+                    int sector_size)
 {
     unsigned long res;
     int n;
@@ -278,7 +278,7 @@ int write_partition(HANDLE dh, int infile,unsigned long start, int sector_size)
     int eof;
     int padding = 0;
 
-    if (ipod_seek(dh, start*sector_size) < 0) {
+    if (ipod_seek(dh, start_sector*sector_size) < 0) {
         return -1;
     }
 
