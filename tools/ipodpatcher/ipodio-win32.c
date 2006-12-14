@@ -148,7 +148,7 @@ int ipod_alloc_buffer(unsigned char** sectorbuf, int bufsize)
 {
     /* The ReadFile function requires a memory buffer aligned to a multiple of
        the disk sector size. */
-    *sectorbuf = VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
+    *sectorbuf = (unsigned char*)VirtualAlloc(NULL, bufsize, MEM_COMMIT, PAGE_READWRITE);
     if (*sectorbuf == NULL) {
         print_error(" Error allocating a buffer: ");
         return -1;
