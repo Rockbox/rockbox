@@ -19,6 +19,7 @@
  ****************************************************************************/
 
 #include "rbutil.h"
+#include "installlog.h"
 
 // This class allows us to return directories as well as files to
 // wxDir::Traverse
@@ -195,9 +196,11 @@ int DownloadURL(wxString src, wxString dest)
 
 int UnzipFile(wxString src, wxString destdir, bool isInstall)
 {
-    wxZipEntryPtr entry;
-    wxString in_str, progress_msg, buf, logfile = wxT("");
-    int errnum = 0, curfile = 0, totalfiles = 0;
+    wxZipEntryPtr       entry;
+    wxString            in_str, progress_msg, buf;
+    int                 errnum = 0, curfile = 0, totalfiles = 0;
+    InstallLog*         log = NULL;
+
     wxLogVerbose(_("===begin UnzipFile(%s,%s,%i)"),
                src.c_str(), destdir.c_str(), isInstall);
 
@@ -245,6 +248,13 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
                   wxPD_REMAINING_TIME | wxPD_CAN_ABORT);
     progress->Update(0);
 
+    // We're not overly worried if the logging fails
+    if (isInstall)
+    {
+        buf.Printf(wxT("%s" PATH_SEP UNINSTALL_FILE), destdir.c_str());
+        log = new InstallLog(buf);
+    }
+
     while (! errnum &&
            (entry.reset(in_zip->GetNextEntry()), entry.get() != NULL) )
     {
@@ -260,15 +270,11 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
         }
 
         in_str.Printf(wxT("%s" PATH_SEP "%s"), destdir.c_str(), name.c_str());
-        buf = logfile;
-        // We leave space for adding a future CRC check, if we ever
-        // feel particularly enthunsiastic.
-        logfile.Printf(wxT("0 %s\n%s"), name.c_str(), buf.c_str());
 
         if (entry->IsDir() ) {
             wxDir* dirname = new wxDir(in_str);
             if (! dirname->Exists(in_str) ) {
-                if (wxMkDir(in_str, 0777) ) {
+                if (! wxMkdir(in_str, 0777) ) {
                     buf.Printf(_("Unable to create directory %s"),
                                in_str.c_str() );
                     errnum = 100;
@@ -276,6 +282,7 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
                     break;
                 }
             }
+            log->WriteFile(name, true); // Directory
             delete dirname;
             continue;
         }
@@ -286,6 +293,9 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
             buf.Printf(_("Can't open file %s for writing"), in_str.c_str() );
             delete out;
             return 100;
+        } else if (isInstall)
+        {
+            log->WriteFile(name);
         }
 
         in_zip->Read(*out);
@@ -316,21 +326,9 @@ int UnzipFile(wxString src, wxString destdir, bool isInstall)
     if (errnum)
     {
         ERR_DIALOG(buf, _("Unzip File"));
-    } else if (isInstall)
-    {
-        // If this fails, we have no log.  No biggie.
-        buf = logfile;
-        logfile.Printf(wxT("%s " PATH_SEP "\n%s"), gv->curplat.c_str(),
-            buf.c_str());
-
-        buf.Printf(wxT("%s" PATH_SEP UNINSTALL_FILE),
-                destdir.c_str());
-        wxFFileOutputStream* out = new wxFFileOutputStream(buf);
-        out->Write(logfile, logfile.Len());
-        out->Close();
-        delete out;
     }
 
+    if (log) delete log;
     wxLogVerbose(_("=== end UnzipFile"));
     return(errnum);
 }
@@ -340,6 +338,8 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
     bool gooddata = false;
     unsigned int i;
     bool errflag = false;
+    InstallLog *log = NULL;
+    wxArrayString* FilesToRemove = NULL;
 
     wxLogVerbose(_("=== begin Uninstall(%s,%i)"), dir.c_str(), isFullUninstall);
 
@@ -351,25 +351,13 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
 
     if (! isFullUninstall)
     {
-       buf.Printf(wxT("%s" PATH_SEP UNINSTALL_FILE), dir.c_str());
-       if ( wxFileExists(buf) )
-       {
-           wxFFileInputStream* uninst_data = new wxFFileInputStream(buf);
-           if (uninst_data->Ok() )
-           {
-                wxStringOutputStream* out = new wxStringOutputStream(&uninst);
-                uninst_data->Read(*out);
-                if (uninst_data->GetLastError() == wxSTREAM_EOF &&
-                    ! out->GetLastError() )
-                {
-                    gooddata = true;
-                }
-                delete out;
-           }
-           delete uninst_data;
-       }
 
-       if (! gooddata) {
+        buf.Printf(wxT("%s" PATH_SEP UNINSTALL_FILE), dir.c_str());
+        log = new InstallLog(buf, false); // Don't create the log
+        FilesToRemove = log->GetInstalledFiles();
+        if (log) delete log;
+
+        if (FilesToRemove == NULL || FilesToRemove->GetCount() < 1) {
             wxLogNull lognull;
             if ( wxMessageDialog(NULL,
                 _("Rockbox Utility can't find any uninstall data on this "
@@ -439,25 +427,16 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
     {
         wxString instplat, this_path_sep;
         unsigned int totalfiles, rc;
+        totalfiles = FilesToRemove->GetCount();
+        FilesToRemove->Sort(true); // Reverse alphabetical ie dirs after files
 
-        // First line is "<platform><space><path seperator>\n"
-        instplat = uninst.BeforeFirst(wxT(' '));
-        this_path_sep = uninst.AfterFirst(wxT(' ')).BeforeFirst(wxT('\n'));
-        uninst = uninst.AfterFirst(wxT('\n'));
-        totalfiles = uninst.Freq(wxT('\n'));
-
-        i = 0;
-        while ((buf = uninst.BeforeFirst(wxT('\n'))) != "" )
+        for (i = 0; i < totalfiles; i++)
         {
-            // These lines are all "<crc (unused)><space><filename>\n"
-            buf = buf.AfterFirst(wxT(' '));
-            buf = buf.Format(wxT("%s" PATH_SEP "%s"), dir.c_str(), buf.c_str());
-            // So we can install under Linux and still uninstall under Win
-            buf.Replace(this_path_sep, PATH_SEP);
-
             wxString* buf2 = new wxString;
+            buf.Printf("%s%s", dir.c_str() , FilesToRemove->Item(i).c_str() );
             buf2->Format(_("Deleting %s"), buf.c_str());
-            if (! progress->Update(++i * 100 / totalfiles, *buf2) )
+
+            if (! progress->Update((i + 1) * 100 / totalfiles, *buf2) )
             {
                 WARN_DIALOG(_("Cancelled by user"), _("Normal Uninstall"));
                 delete progress;
@@ -468,7 +447,7 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
             {
                 // If we're about to attempt to remove .rockbox. delete
                 // install data first
-                buf2->Printf(wxT("%s" PATH_SEP ".rockbox" PATH_SEP), dir.c_str() );
+                buf2->Printf(wxT("%s" PATH_SEP ".rockbox"), dir.c_str() );
                 if ( buf.IsSameAs(buf2->c_str()) )
                 {
                     buf2->Printf(wxT("%s" PATH_SEP UNINSTALL_FILE), dir.c_str());
@@ -503,10 +482,12 @@ int Uninstall(const wxString dir, bool isFullUninstall) {
         }
         if (errflag)
         {
-        ERR_DIALOG(_("Unable to remove some files"),
-                            _("Standard uninstall"))    ;
+            ERR_DIALOG(_("Unable to remove some files"),
+                _("Standard uninstall"))    ;
         }
-   }
+
+        if (FilesToRemove != NULL) delete FilesToRemove;
+    }
 
     delete progress;
     wxLogVerbose(_("=== end Uninstall"));
@@ -541,21 +522,35 @@ wxString stream_err_str(int errnum)
 bool InstallRbutil(wxString dest)
 {
     wxArrayString   filestocopy;
-    wxString        str, buf, dstr, destdir;
+    wxString        str, buf, dstr, localpath, destdir;
     unsigned int    i;
     wxDir           dir;
-    bool            copied_exe = false;
+    bool            copied_exe = false, made_rbdir = false;
+    InstallLog*     log;
+
+    buf.Printf(wxT("%s" PATH_SEP ".rockbox"), dest.c_str() );
+
+    if (! wxDirExists(buf) )
+    {
+        wxMkdir(buf);
+        made_rbdir = true;
+    }
+
+    buf.Printf(wxT("%s" PATH_SEP UNINSTALL_FILE), dest.c_str() );
+    log = new InstallLog(buf);
+    if (made_rbdir) log->WriteFile(wxT(".rockbox"), true);
 
     destdir.Printf(wxT("%s" PATH_SEP "RockboxUtility"), dest.c_str());
     if (! wxDirExists(destdir) )
     {
-        if (! wxMkdir(destdir) )
+        if (! wxMkdir(destdir, 0777) )
         {
             buf.Printf(wxT("%s (%s)"),
                 _("Unable to create directory for installer"), destdir.c_str());
             WARN_DIALOG(buf , _("Portable install") );
             return false;
         }
+        log->WriteFile(wxT("RockboxUtility"), true);
     }
 
     dir.GetAllFiles(gv->ResourceDir, &filestocopy, wxT("*"),
@@ -583,6 +578,9 @@ bool InstallRbutil(wxString dest)
             WARN_DIALOG(buf, _("Portable Install") );
             return false;
         }
+        buf = dstr;
+        buf.Replace(dest, wxEmptyString, false);
+        log->WriteFile(buf);
     }
 
     if (! copied_exe)
@@ -597,6 +595,9 @@ bool InstallRbutil(wxString dest)
             WARN_DIALOG(buf, _("Portable Install") );
             return false;
         }
+        buf = dstr;
+        buf.Replace(dest, wxEmptyString, false);
+        log->WriteFile(buf);
     }
 
     // Copy the local ini file so that it knows that it's a portable copy
@@ -610,7 +611,11 @@ bool InstallRbutil(wxString dest)
         WARN_DIALOG(buf, _("Portable Install") );
         return false;
     }
+    buf = dstr;
+    buf.Replace(dest, wxEmptyString, false);
+    log->WriteFile(buf);
 
+    delete log;
     return true;
 }
 

@@ -259,7 +259,7 @@ void rbutilFrm::OnFileWipeCache(wxCommandEvent& event)
         MESG_DIALOG(_("Errors occured deleting the local download cache."));
     }
 
-    wxMkDir(cacheloc, 0777);
+    wxMkdir(cacheloc, 0777);
 }
 
 
@@ -416,7 +416,16 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
 
     if (wizard->RunWizard(page1) )
     {
-        dest.Printf("%s" PATH_SEP "download" PATH_SEP "build-info",
+        buf.Printf(wxT("%s" PATH_SEP ".rockbox"), gv->curdestdir.c_str()) ;
+        if (! wxDirExists(buf) )
+        {
+            buf.Printf(_("Rockbox is not yet installed on %s - install "
+                "Rockbox first."), buf.c_str() );
+            WARN_DIALOG(buf, _("Can't install fonts") );
+            return;
+        }
+
+        dest.Printf(wxT("%s" PATH_SEP "download" PATH_SEP "build-info"),
         gv->stdpaths->GetUserDataDir().c_str());
         if (DownloadURL(gv->server_conf_url, dest))
         {
@@ -463,7 +472,7 @@ void rbutilFrm::OnFontBtn(wxCommandEvent& event)
             }
         }
 
-        if ( !UnzipFile(dest, gv->curdestdir) )
+        if ( !UnzipFile(dest, gv->curdestdir, true) )
         {
             MESG_DIALOG(_("The Rockbox fonts have been installed on your device.") );
         } else

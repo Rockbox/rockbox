@@ -216,6 +216,7 @@ void rbutilFrmApp::ReadUserConfig()
 
     gv->UserConfig = new wxFileConfig(wxEmptyString, wxEmptyString, buf);
     gv->UserConfigFile = buf;
+    gv->UserConfig->Set(gv->UserConfig); // Store wxWidgets internal settings
     stack = gv->UserConfig->GetPath();
 
     gv->UserConfig->SetPath(wxT("/defaults"));

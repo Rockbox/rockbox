@@ -26,7 +26,7 @@
 
 static char* rbutil_developers[] = {
     "Christi Alice Scarborough",
-    ""
+    "Dave Chapman"
 };
 
 //static char* rbutil_translators[] = (
@@ -37,7 +37,7 @@ static char* rbutil_developers[] = {
 #define RBUTIL_COPYRIGHT "(C) 2005-6 The Rockbox Team - " \
         "released under the GNU Public License v2"
 #define RBUTIL_DESCRIPTION "Utility for performing housekeepng tasks for" \
-        "the Rockbox audio jukebox firmware."
+        "the Rockbox open\nsource digital audio player firmware."
 
 
 class AboutDlg: public wxDialog

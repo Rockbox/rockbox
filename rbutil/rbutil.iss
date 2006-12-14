@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Rockbox Utility"
-#define MyAppVerName "Rockbox Utility v0.2"
+#define MyAppVerName "Rockbox Utility v0.2.1"
 #define MyAppPublisher "Rockbox Team"
 #define MyAppURL "http://www.rockbox.org/"
 #define MyAppExeName "rbutil.exe"
@@ -17,8 +17,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-LicenseFile=C:\Documents and Settings\christi\My Documents\devel\rbutil\copying.txt
-OutputBaseFilename=rbutil-0.2-setup
+LicenseFile=copying.txt
+OutputBaseFilename=rbutil-0.2.1-setup
 Compression=lzma/ultra
 SolidCompression=true
 OutputDir=.
