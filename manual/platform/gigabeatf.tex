@@ -1,0 +1,93 @@
+% $Id$ %
+\def\UseOption{gigabeatf}
+\edef\UseOption{\UseOption,HAVE_LCD_BITMAP}
+\edef\UseOption{\UseOption,SWCODEC}
+\edef\UseOption{\UseOption,GIGABEAT_PAD}
+\edef\UseOption{\UseOption,gigabeat}
+
+\newcommand{\playerman}{Toshiba}
+\newcommand{\playertype}{Gigabeat F Series}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\genericimg}{240x320x16}
+\newcommand{\specimg}{gigabeatf}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.gigabeat}}
+\newcommand{\screenshotsize}{6cm}
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume down}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonA}{\btnfnt{A}}
+
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonUp}
+\newcommand{\ActionStdNext}{\ButtonDown}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonDown}
+\newcommand{\ActionStdCancel}{\ButtonLeft{} or \ButtonA}
+\newcommand{\ActionStdContext}{Long \ButtonSelect}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionStdMenu}{\ButtonMenu}
+\newcommand{\ActionStdOk}{\ButtonSelect{} or \ButtonRight}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonSelect}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPower{} + \ButtonRight}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPower{} + \ButtonLeft}
+\newcommand{\ActionWpsStop}{\ButtonA}
+\newcommand{\ActionWpsVolDown}{\ButtonDown}
+\newcommand{\ActionWpsVolUp}{\ButtonUp}
+\newcommand{\ActionWpsPitchScreen}{\ButtonPower{} + \ButtonUp/\ButtonDown}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionWpsMenu}{\ButtonMenu}
+\newcommand{\ActionWpsContext}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{\ButtonPower}
+\newcommand{\ActionWpsAbReset}{\ButtonPower{} + \ButtonSelect}
+\newcommand{\ActionWpsIdThreeScreen}{\ButtonPower{} + \ButtonMenu}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonPower}
+\newcommand{\ActionTreeStop}{\ButtonA}
+\newcommand{\ActionTreeEnter}{\fixme{Edit key}}
+\newcommand{\ActionTreeParentDirectory}{\fixme{Edit key}}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdCursorLeft}{\ButtonPower{} + \ButtonLeft}
+\newcommand{\ActionKbdCursorRight}{\ButtonPower{} + \ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonPower{} + \ButtonMenu}
+\newcommand{\ActionKbdDone}{\ButtonPower}
+\newcommand{\ActionKbdAbort}{\ButtonA}
+\newcommand{\ActionKbdBackSpace}{\ButtonMenu}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonMenu}
+\newcommand{\ActionPsIncSmall}{\ButtonUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecSmall}{\ButtonDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{\ButtonPower}
+\newcommand{\ActionPsExit}{\ButtonA}
