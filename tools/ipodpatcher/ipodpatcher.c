@@ -395,25 +395,21 @@ int diskmove(HANDLE dh, int start, int nimages, struct ipod_directory_t* ipod_di
 {
     int src_start;
     int src_end;
-    int dest_start;
-    int dest_end;
     int bytesleft;
     int chunksize;
     int i;
     int n;
 
-    src_start = start + ipod_directory[1].devOffset + sector_size;
-    src_end = (start + ipod_directory[nimages-1].devOffset + sector_size + ipod_directory[nimages-1].len + (sector_size-1)) & ~(sector_size-1);
+    src_start = ipod_directory[1].devOffset + sector_size;
+    src_end = (ipod_directory[nimages-1].devOffset + sector_size + ipod_directory[nimages-1].len + (sector_size-1)) & ~(sector_size-1);
     bytesleft = src_end - src_start;
-    dest_start = start + src_start + delta;
-    dest_end = start + src_end + delta;
 
     if (verbose) {
         fprintf(stderr,"[INFO] Need to move images 2-%d forward %08x bytes\n",nimages,delta);
         fprintf(stderr,"[VERB] src_start     = %08x\n",src_start);
         fprintf(stderr,"[VERB] src_end       = %08x\n",src_end);
-        fprintf(stderr,"[VERB] dest_start    = %08x\n",dest_start);
-        fprintf(stderr,"[VERB] dest_end      = %08x\n",dest_end);
+        fprintf(stderr,"[VERB] dest_start    = %08x\n",src_start+delta);
+        fprintf(stderr,"[VERB] dest_end      = %08x\n",src_end+delta);
         fprintf(stderr,"[VERB] bytes to copy = %08x\n",bytesleft);
     }
 
@@ -425,14 +421,16 @@ int diskmove(HANDLE dh, int start, int nimages, struct ipod_directory_t* ipod_di
         }
 
         if (verbose) {
-            fprintf(stderr,"[VERB] Copying %08x bytes from %08x to %08x\n",
+            fprintf(stderr,"[VERB] Copying %08x bytes from %08x to %08x (absolute %08x to %08x)\n",
                            chunksize,
-                           dest_end-chunksize,
-                           dest_end-chunksize+delta);
+                           src_end-chunksize,
+                           src_end-chunksize+delta,
+                           start+src_end-chunksize,
+                           start+src_end-chunksize+delta);
         }
 
 
-        if (ipod_seek(dh,dest_end-chunksize) < 0) {
+        if (ipod_seek(dh,start+src_end-chunksize) < 0) {
             fprintf(stderr,"[ERR]  Seek failed\n");
             return -1;
         }
@@ -448,7 +446,7 @@ int diskmove(HANDLE dh, int start, int nimages, struct ipod_directory_t* ipod_di
             return -1;
         }
 
-        if (ipod_seek(dh,dest_end-chunksize+delta) < 0) {
+        if (ipod_seek(dh,start+src_end-chunksize+delta) < 0) {
             fprintf(stderr,"[ERR]  Seek failed\n");
             return -1;
         }
@@ -464,7 +462,7 @@ int diskmove(HANDLE dh, int start, int nimages, struct ipod_directory_t* ipod_di
             return -1;
         }
 
-        dest_end -= chunksize;
+        src_end -= chunksize;
         bytesleft -= chunksize;
     }
 
@@ -558,7 +556,8 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
     if (nimages > 1) {
         if ((entryOffset+paddedlength) >= ipod_directory[1].devOffset) {
             fprintf(stderr,"[INFO] Moving images to create room for new firmware...\n");
-            delta = entryOffset+paddedlength-ipod_directory[1].devOffset;
+            delta = ipod_directory[0].devOffset + entryOffset+paddedlength
+                    - ipod_directory[1].devOffset;
 
             if (diskmove(dh,start,nimages,ipod_directory,sector_size,delta) < 0) {
                 close(infile);
