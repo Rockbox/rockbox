@@ -25,18 +25,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/mount.h>
-#if defined(__APPLE__) && defined(__MACH__)
-#include <sys/disk.h>
-#endif
 
 #if defined(linux) || defined (__linux)
-    #define IPOD_SECTORSIZE_IOCTL BLKSSZGET
+#include <sys/mount.h>
+#define IPOD_SECTORSIZE_IOCTL BLKSSZGET
 #elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
       || defined(__bsdi__) || defined(__DragonFly__)
-    #define IPOD_SECTORSIZE_IOCTL DIOCGSECTORSIZE
+#include <sys/disk.h>
+#define IPOD_SECTORSIZE_IOCTL DIOCGSECTORSIZE
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
+#include <sys/disk.h>
+#define IPOD_SECTORSIZE_IOCTL DKIOCGETBLOCKSIZE
 #else
     #error No sector-size detection implemented for this platform
 #endif
