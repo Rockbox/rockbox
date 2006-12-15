@@ -475,6 +475,7 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
 {
     int length;
     int i;
+    int x;
     int n;
     int infile;
     int paddedlength;
@@ -625,27 +626,28 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
 
     fprintf(stderr,"[INFO]  Wrote %d bytes to firmware partition\n",entryOffset+paddedlength);
 
+    x = diroffset % sector_size;
 
     /* Read directory */
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
 
     n=ipod_read(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
     /* Update entries for image 0 */
-    int2le(entryOffset+length,sectorbuf+16);
-    int2le(entryOffset,sectorbuf+24);
-    int2le(chksum,sectorbuf+28);
+    int2le(entryOffset+length,sectorbuf+x+16);
+    int2le(entryOffset,sectorbuf+x+24);
+    int2le(chksum,sectorbuf+x+28);
 
     /* Update devOffset entries for other images, if we have moved them */
     if (delta > 0) {
         for (i=1;i<nimages;i++) {
-           int2le(le2int(sectorbuf+i*40+12)+delta,sectorbuf+i*40+12);
+           int2le(le2int(sectorbuf+x+i*40+12)+delta,sectorbuf+x+i*40+12);
         }
     }
 
     /* Write directory */    
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
     n=ipod_write(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
@@ -657,6 +659,7 @@ int delete_bootloader(HANDLE dh, int start, int sector_size, off_t diroffset,
 {
     int length;
     int i;
+    int x;
     int n;
     unsigned long chksum=0;   /* 32 bit checksum - Rockbox .ipod style*/
 
@@ -704,19 +707,21 @@ int delete_bootloader(HANDLE dh, int start, int sector_size, off_t diroffset,
 
     fprintf(stderr,"[INFO] Updating firmware checksum\n");
 
+    x = diroffset % sector_size;
+
     /* Read directory */
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
 
     n=ipod_read(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
     /* Update entries for image 0 */
-    int2le(length,sectorbuf+16);
-    int2le(0,sectorbuf+24);
-    int2le(chksum,sectorbuf+28);
+    int2le(length,sectorbuf+x+16);
+    int2le(0,sectorbuf+x+24);
+    int2le(chksum,sectorbuf+x+28);
 
     /* Write directory */    
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
     n=ipod_write(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
@@ -729,6 +734,7 @@ int write_firmware(HANDLE dh, char* filename, int start, int sector_size,
 {
     int length;
     int i;
+    int x;
     int n;
     int infile;
     int newsize;
@@ -834,19 +840,21 @@ int write_firmware(HANDLE dh, char* filename, int start, int sector_size,
          chksum += sectorbuf[i];
     }
 
+    x = diroffset % sector_size;
+
     /* Read directory */
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
 
     n=ipod_read(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
     /* Update entries for image 0 */
-    int2le(length,sectorbuf+16);
-    int2le(0,sectorbuf+24);
-    int2le(chksum,sectorbuf+28);
+    int2le(length,sectorbuf+x+16);
+    int2le(0,sectorbuf+x+24);
+    int2le(chksum,sectorbuf+x+28);
 
     /* Write directory */    
-    if (ipod_seek(dh,start + diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + diroffset - x) < 0) { return -1; }
     n=ipod_write(dh, sectorbuf, sector_size);
     if (n < 0) { return -1; }
 
@@ -917,16 +925,23 @@ int read_directory(HANDLE dh, int start, int sector_size,
                    struct ipod_directory_t* ipod_directory, off_t* diroffset)
 {
     int n;
+    int x;
     int nimages;
     unsigned char* p;
 
     /* Read firmware partition header (first 512 bytes of disk - but 
        let's read a whole sector) */
 
-    if (ipod_seek(dh, start) < 0) { return -1; }
+    if (ipod_seek(dh, start) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to 0x%08x in read_directory() failed.\n",start);
+        return -1;
+    }
 
     n=ipod_read(dh, sectorbuf, sector_size);
-    if (n < 0) { return -1; }
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  ipod_read(dh,buf,0x%08x) failed in read_directory()\n",sector_size);
+        return -1;
+    }
 
     if (memcmp(sectorbuf,apple_stop_sign,sizeof(apple_stop_sign))!=0) {
         fprintf(stderr,"[ERR]  Firmware partition doesn't contain Apple copyright, aborting.");
@@ -940,16 +955,25 @@ int read_directory(HANDLE dh, int start, int sector_size,
 
     *diroffset=le2int(sectorbuf+0x104) + 0x200;
 
+    /* diroffset may not be sector-aligned */
+    x = *diroffset % sector_size;
+
     /* Read directory */
-    if (ipod_seek(dh,start + *diroffset) < 0) { return -1; }
+    if (ipod_seek(dh,start + *diroffset - x) < 0) { 
+        fprintf(stderr,"[ERR]  Seek to diroffset (%08x) failed.\n",(unsigned)*diroffset);
+        return -1;
+    }
 
     n=ipod_read(dh, sectorbuf, sector_size);
-    if (n < 0) { return -1; }
+    if (n < 0) { 
+        fprintf(stderr,"[ERR]  Read of directory failed.\n");
+        return -1;
+    }
 
     nimages=0;
-    p = sectorbuf;
+    p = sectorbuf + x;
     
-    while ((nimages < MAX_IMAGES) && (p < (sectorbuf + 400)) && 
+    while ((nimages < MAX_IMAGES) && (p < (sectorbuf + x + 400)) && 
            (memcmp(p,"!ATA",4)==0)) {
         p+=4;
         if (memcmp(p,"soso",4)==0) {
@@ -1161,7 +1185,7 @@ int main(int argc, char* argv[])
     nimages=read_directory(dh, pinfo[0].start*sector_size, sector_size, 
                            ipod_directory, &diroffset);
     if (nimages <= 0) {
-        fprintf(stderr,"[ERR]  Failed to read firmware directory\n");
+        fprintf(stderr,"[ERR]  Failed to read firmware directory - nimages=%d\n",nimages);
         return 1;
     }
 
