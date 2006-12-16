@@ -39,6 +39,11 @@ static unsigned short highest_priority IBSS_ATTR;
 static int boosted_threads IBSS_ATTR;
 #endif
 
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+#define STAY_IRQ_LEVEL -1
+static int switch_to_irq_level = STAY_IRQ_LEVEL;
+#endif
+
 /* Define to enable additional checks for blocking violations etc. */
 #define THREAD_EXTRA_CHECKS
 
@@ -388,6 +393,18 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list)
     
         /* Rearrange thread lists as needed */
         change_thread_state(blocked_list);
+
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+        /* This has to be done after the scheduler is finished with the
+           blocked_list pointer so that an IRQ can't kill us by attempting
+           a wake but before attempting any core sleep. */
+        if (switch_to_irq_level != STAY_IRQ_LEVEL)
+        {
+            int level = switch_to_irq_level;
+            switch_to_irq_level = STAY_IRQ_LEVEL;
+            set_irq_level(level);
+        }
+#endif
     }
     
     /* Go through the list of sleeping task to check if we need to wake up
@@ -471,6 +488,7 @@ void block_thread(struct thread_entry **list)
     /* Set the state to blocked and ask the scheduler to switch tasks,
      * this takes us off of the run queue until we are explicitly woken */
     SET_STATE(current->statearg, STATE_BLOCKED, 0);
+
     switch_thread(true, list);
 
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
@@ -521,6 +539,23 @@ void block_thread_w_tmo(struct thread_entry **list, int timeout)
     /* It is now safe for another thread to block on this "list" */
     *list = NULL;
 }
+
+#if defined(HAVE_EXTENDED_MESSAGING_AND_NAME) && !defined(SIMULATOR)
+void set_irq_level_and_block_thread(struct thread_entry **list, int level)
+{
+    switch_to_irq_level = level;
+    block_thread(list);
+}
+
+#if 0
+void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
+                                          int timeout, int level)
+{
+    switch_to_irq_level = level;
+    block_thread_w_tmo(list, timeout);
+}
+#endif
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 
 void wakeup_thread(struct thread_entry **list)
 {

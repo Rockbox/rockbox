@@ -33,7 +33,7 @@
 #define QUEUE_LENGTH 16 /* MUST be a power of 2 */
 #define QUEUE_LENGTH_MASK (QUEUE_LENGTH - 1)
 
-/* System defined message ID's, occupying the top 5 bits of the event ID */
+/* System defined message ID's, occupying the top 8 bits of the event ID */
 #define SYS_EVENT                 (long)0x80000000 /* SYS events are negative */
 #define SYS_USB_CONNECTED         ((SYS_EVENT | ((long)1 << 27)))
 #define SYS_USB_CONNECTED_ACK     ((SYS_EVENT | ((long)2 << 27)))
@@ -55,12 +55,29 @@ struct event
     void *data;
 };
 
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+struct queue_sender
+{
+    struct thread_entry *thread;
+    void                *retval;
+};
+
+struct queue_sender_list
+{
+    /* If non-NULL, there is a thread waiting for the corresponding event */
+    struct queue_sender *senders[QUEUE_LENGTH];
+    /* Send info for last message dequeued or NULL if replied or not sent */
+    struct queue_sender *curr_sender;
+};
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
+
 struct event_queue
 {
     struct event events[QUEUE_LENGTH];
     struct thread_entry *thread;
     unsigned int read;
     unsigned int write;
+    struct queue_sender_list *send;
 };
 
 struct mutex
@@ -90,12 +107,18 @@ int tick_add_task(void (*f)(void));
 int tick_remove_task(void (*f)(void));
 
 extern void queue_init(struct event_queue *q, bool register_queue);
+extern void queue_enable_queue_send(struct event_queue *q, struct queue_sender_list *send);
 extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);
 extern void queue_post(struct event_queue *q, long id, void *data);
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+extern void * queue_send(struct event_queue *q, long id, void *data);
+extern void queue_reply(struct event_queue *q, void *retval);
+extern bool queue_in_queue_send(struct event_queue *q);
+#endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 extern bool queue_empty(const struct event_queue* q);
-void queue_clear(struct event_queue* q);
+extern void queue_clear(struct event_queue* q);
 extern void queue_remove_from_head(struct event_queue *q, long id);
 extern int queue_broadcast(long id, void *data);
 

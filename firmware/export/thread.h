@@ -143,6 +143,13 @@ void switch_thread(bool save_context, struct thread_entry **blocked_list);
 void sleep_thread(int ticks);
 void block_thread(struct thread_entry **thread);
 void block_thread_w_tmo(struct thread_entry **thread, int timeout);
+#ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
+void set_irq_level_and_block_thread(struct thread_entry **thread, int level);
+#if 0
+void set_irq_level_and_block_thread_w_tmo(struct thread_entry **list,
+                                          int timeout, int level)
+#endif
+#endif
 void wakeup_thread(struct thread_entry **thread);
 #ifdef HAVE_PRIORITY_SCHEDULING
 int thread_set_priority(struct thread_entry *thread, int priority);
