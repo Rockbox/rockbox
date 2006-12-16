@@ -28,11 +28,17 @@
 #include "backlight.h"
 #include "system.h"
 
+static unsigned int old_wheel_value = 0;
+static unsigned int wheel_repeat = BUTTON_NONE;
 
 void button_init_device(void)
 {
-    /* Enable all buttons except the wheel */
+    /* Enable all buttons */
     GPIOF_ENABLE |= 0xff;
+    GPIOH_ENABLE |= 0xc0;
+    
+    /* Read initial wheel value (bit 6-7 of GPIOH) */
+    old_wheel_value = GPIOH_INPUT_VAL & 0xc0;
 }
 
 bool button_hold(void)
@@ -49,6 +55,7 @@ int button_read_device(void)
     unsigned char state;
     static bool hold_button = false;
     bool hold_button_old;
+    unsigned int new_wheel_value;
 
     /* Hold */
     hold_button_old = hold_button;
@@ -76,6 +83,59 @@ int button_read_device(void)
         if ((state & 0x10) == 0) btn |= BUTTON_SELECT; /* The centre button */
         if ((state & 0x20) == 0) btn |= BUTTON_UP; /* The "play" button */
         if ((state & 0x40) != 0) btn |= BUTTON_POWER;
+        
+        /* Read wheel 
+         * Bits 6 and 7 of GPIOH change as follows:
+         * Clockwise rotation   01 -> 00 -> 10 -> 11
+         * Counter-clockwise    11 -> 10 -> 00 -> 01
+         *
+         * This is equivalent to wheel_value of:
+         * Clockwise rotation   0x40 -> 0x00 -> 0x80 -> 0xc0
+         * Counter-clockwise    0xc0 -> 0x80 -> 0x00 -> 0x40
+         */
+        new_wheel_value = GPIOH_INPUT_VAL & 0xc0;
+        switch(new_wheel_value){
+        case 0x00:
+            if(old_wheel_value==0x80)
+                btn |= BUTTON_SCROLL_UP;
+            else if (old_wheel_value==0x40)
+                btn |= BUTTON_SCROLL_DOWN;
+            break;
+        case 0x40:
+            if(old_wheel_value==0x00)
+                btn |= BUTTON_SCROLL_UP;
+            else if (old_wheel_value==0xc0)
+                btn |= BUTTON_SCROLL_DOWN;
+            break;
+        case 0x80:
+            if(old_wheel_value==0xc0)
+                btn |= BUTTON_SCROLL_UP;
+            else if (old_wheel_value==0x00)
+                btn |= BUTTON_SCROLL_DOWN;
+            break;
+        case 0xc0:
+            if(old_wheel_value==0x40)
+                btn |= BUTTON_SCROLL_UP;
+            else if (old_wheel_value==0x80)
+                btn |= BUTTON_SCROLL_DOWN;
+            break;
+        }
+        
+        if(wheel_repeat == BUTTON_NONE){
+            if(btn & BUTTON_SCROLL_UP)
+                wheel_repeat = BUTTON_SCROLL_UP;
+            
+            if(btn & BUTTON_SCROLL_DOWN)
+                wheel_repeat = BUTTON_SCROLL_DOWN;
+        } else if (wheel_repeat == BUTTON_SCROLL_UP)  {
+            btn |= BUTTON_SCROLL_UP;
+            wheel_repeat = BUTTON_NONE;
+        } else if (wheel_repeat == BUTTON_SCROLL_DOWN) {
+            btn |= BUTTON_SCROLL_DOWN;
+            wheel_repeat = BUTTON_NONE;
+        }
+        
+        old_wheel_value = new_wheel_value;
     }
 
     return btn;
