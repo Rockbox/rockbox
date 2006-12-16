@@ -222,50 +222,30 @@ static int            enc_wr_index_last; /* previsou encoder read position */
 
 /***************************************************************************/
 
-static struct event_queue  pcmrec_queue;
+static struct event_queue       pcmrec_queue;
+static struct queue_sender_list pcmrec_queue_send;
 static long                pcmrec_stack[3*DEFAULT_STACK_SIZE/sizeof(long)];
 static const char          pcmrec_thread_name[] = "pcmrec";
 
 static void pcmrec_thread(void);
 
-/* Event values which are also single-bit flags */
-#define PCMREC_INIT         0x00000001  /* enable recording                */
-#define PCMREC_CLOSE        0x00000002  /* close recording                 */
-#define PCMREC_OPTIONS      0x00000004  /* set recording options           */
-#define PCMREC_START        0x00000008  /* start recording                 */
-#define PCMREC_STOP         0x00000010  /* stop the current recording      */
-#define PCMREC_PAUSE        0x00000020  /* pause the current recording     */
-#define PCMREC_RESUME       0x00000040  /* resume the current recording    */
-#define PCMREC_NEW_FILE     0x00000080  /* start new file                  */
-#define PCMREC_FLUSH_NUM    0x00000100  /* flush a number of files out     */
-#define PCMREC_FINISH_STOP  0x00000200  /* finish the stopping recording   */
-
-/* mask for signaling events */
-static volatile long pcm_thread_event_mask = PCMREC_CLOSE;
-
-static void pcm_thread_sync_post(long event, void *data)
+enum
 {
-    pcm_thread_event_mask &= ~event;
-    queue_post(&pcmrec_queue, event, data);
-    while(!(event & pcm_thread_event_mask))
-        yield();
-} /* pcm_thread_sync_post */
+    PCMREC_NULL = 0,
+    PCMREC_INIT,            /* enable recording                */
+    PCMREC_CLOSE,           /* close recording                 */
+    PCMREC_OPTIONS,         /* set recording options           */
+    PCMREC_START,           /* start recording                 */
+    PCMREC_STOP,            /* stop the current recording      */
+    PCMREC_FINISH_STOP,     /* finish the stopping recording   */
+    PCMREC_PAUSE,           /* pause the current recording     */
+    PCMREC_RESUME,          /* resume the current recording    */
+    PCMREC_NEW_FILE,        /* start new file                  */
+#if 0
+    PCMREC_FLUSH_NUM,       /* flush a number of files out     */
+#endif
+};
 
-static inline void pcm_thread_signal_event(long event)
-{
-    pcm_thread_event_mask |= event;
-} /* pcm_thread_signal_event */
-
-static inline void pcm_thread_unsignal_event(long event)
-{
-    pcm_thread_event_mask &= ~event;
-} /* pcm_thread_unsignal_event */
-
-static inline bool pcm_thread_event_state(long signaled, long unsignaled)
-{
-    return ((signaled | unsignaled) & pcm_thread_event_mask) == signaled;
-} /* pcm_thread_event_state */
- 
 /*******************************************************************/
 /* Functions that are not executing in the pcmrec_thread first     */
 /*******************************************************************/
@@ -401,6 +381,7 @@ unsigned long pcm_rec_sample_rate(void)
 void pcm_rec_init(void)
 {
     queue_init(&pcmrec_queue, true);
+    queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
     create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
                   pcmrec_thread_name, PRIORITY_RECORDING);
 } /* pcm_rec_init */
@@ -417,7 +398,7 @@ void pcm_rec_init(void)
 void audio_init_recording(unsigned int buffer_offset)
 {
     logf("audio_init_recording");
-    pcm_thread_sync_post(PCMREC_INIT, NULL);
+    queue_send(&pcmrec_queue, PCMREC_INIT, NULL);
     logf("audio_init_recording done");
     (void)buffer_offset;
 } /* audio_init_recording */
@@ -428,7 +409,7 @@ void audio_init_recording(unsigned int buffer_offset)
 void audio_close_recording(void)
 {
     logf("audio_close_recording");
-    pcm_thread_sync_post(PCMREC_CLOSE, NULL);
+    queue_send(&pcmrec_queue, PCMREC_CLOSE, NULL);
     logf("audio_close_recording done");
 } /* audio_close_recording */
 
@@ -438,7 +419,7 @@ void audio_close_recording(void)
 void audio_set_recording_options(struct audio_recording_options *options)
 {
     logf("audio_set_recording_options");
-    pcm_thread_sync_post(PCMREC_OPTIONS, (void *)options);
+    queue_send(&pcmrec_queue, PCMREC_OPTIONS, (void *)options);
     logf("audio_set_recording_options done");
 } /* audio_set_recording_options */
 
@@ -448,7 +429,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
-    pcm_thread_sync_post(PCMREC_START, (void *)filename);
+    queue_send(&pcmrec_queue, PCMREC_START, (void *)filename);
     logf("audio_record_done");
 } /* audio_record */
 
@@ -458,7 +439,7 @@ void audio_record(const char *filename)
 void audio_new_file(const char *filename)
 {
     logf("audio_new_file: %s", filename);
-    pcm_thread_sync_post(PCMREC_NEW_FILE, (void *)filename);
+    queue_send(&pcmrec_queue, PCMREC_NEW_FILE, (void *)filename);
     logf("audio_new_file done");
 } /* audio_new_file */
 
@@ -468,7 +449,7 @@ void audio_new_file(const char *filename)
 void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
-    pcm_thread_sync_post(PCMREC_STOP, NULL);
+    queue_send(&pcmrec_queue, PCMREC_STOP, NULL);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
 
@@ -478,7 +459,7 @@ void audio_stop_recording(void)
 void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
-    pcm_thread_sync_post(PCMREC_PAUSE, NULL);
+    queue_send(&pcmrec_queue, PCMREC_PAUSE, NULL);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
 
@@ -488,7 +469,7 @@ void audio_pause_recording(void)
 void audio_resume_recording(void)
 {
     logf("audio_resume_recording");
-    pcm_thread_sync_post(PCMREC_RESUME, NULL);
+    queue_send(&pcmrec_queue, PCMREC_RESUME, NULL);
     logf("audio_resume_recording done");
 } /* audio_resume_recording */
 
@@ -1137,6 +1118,7 @@ static void pcmrec_init(void)
     is_stopping       = false;
 
     buffer = audio_get_recording_buffer(&rec_buffer_size);
+
     /* Line align pcm_buffer 2^4=16 bytes */
     pcm_buffer = (unsigned char *)ALIGN_UP_P2((unsigned long)buffer, 4);
     enc_buffer = pcm_buffer + ALIGN_UP_P2(PCM_NUM_CHUNKS*PCM_CHUNK_SIZE +
@@ -1145,8 +1127,6 @@ static void pcmrec_init(void)
     rec_buffer_size -= pcm_buffer - buffer;
 
     pcm_init_recording();
-    pcm_thread_unsignal_event(PCMREC_CLOSE);
-    pcm_thread_signal_event(PCMREC_INIT);
 } /* pcmrec_init */
 
 /* PCMREC_CLOSE */
@@ -1158,8 +1138,6 @@ static void pcmrec_close(void)
     pcm_close_recording();
     reset_hardware();
     audio_remove_encoder();
-    pcm_thread_unsignal_event(PCMREC_INIT);
-    pcm_thread_signal_event(PCMREC_CLOSE);
 } /* pcmrec_close */
 
 /* PCMREC_OPTIONS */
@@ -1218,12 +1196,11 @@ static void pcmrec_set_recording_options(struct audio_recording_options *options
         errors |= PCMREC_E_LOAD_ENCODER;
     }
 
-    pcm_thread_signal_event(PCMREC_OPTIONS);
 } /* pcmrec_set_recording_options */
 
 /* PCMREC_START/PCMREC_NEW_FILE - start recording (not gapless)
                                   or split stream (gapless) */
-static void pcmrec_start(int event, const char *filename)
+static void pcmrec_start(const char *filename)
 {
     unsigned long pre_sample_ticks;
     int           rd_start;
@@ -1318,7 +1295,6 @@ static void pcmrec_start(int event, const char *filename)
                       enc_rd_index);
 
 start_done:
-    pcm_thread_signal_event(event);
     logf("pcmrec_start done");
 } /* pcmrec_start */
 
@@ -1343,7 +1319,6 @@ static void pcmrec_stop(void)
     queue_post(&pcmrec_queue, PCMREC_FINISH_STOP, NULL);
 
 not_recording_or_stopping:
-    pcm_thread_signal_event(PCMREC_STOP);
     logf("pcmrec_stop done");
 } /* pcmrec_stop */
 
@@ -1419,7 +1394,6 @@ static void pcmrec_pause(void)
     is_paused = true;  
     
 not_recording_or_paused:
-    pcm_thread_signal_event(PCMREC_PAUSE);
     logf("pcmrec_pause done");
 } /* pcmrec_pause */
 
@@ -1444,7 +1418,6 @@ static void pcmrec_resume(void)
     dma_lock     = false;
     
 not_recording_or_not_paused:
-    pcm_thread_signal_event(PCMREC_RESUME);
     logf("pcmrec_resume done");
 } /* pcmrec_resume */
 
@@ -1491,7 +1464,7 @@ static void pcmrec_thread(void)
 
             case PCMREC_START:
             case PCMREC_NEW_FILE:
-                pcmrec_start(ev.id, (const char *)ev.data);
+                pcmrec_start((const char *)ev.data);
                 break;
 
             case PCMREC_STOP:
@@ -1509,11 +1482,11 @@ static void pcmrec_thread(void)
             case PCMREC_RESUME:
                 pcmrec_resume();
                 break;
-
+#if 0
             case PCMREC_FLUSH_NUM:
                 pcmrec_flush((unsigned)ev.data);
                 break;
-
+#endif
             case SYS_USB_CONNECTED:
                 if (is_recording)
                     break;
@@ -1523,6 +1496,8 @@ static void pcmrec_thread(void)
                 usb_wait_for_disconnect(&pcmrec_queue);
                 break;
         } /* end switch */
+
+        queue_reply(&pcmrec_queue, NULL);
     } /* end while */
 } /* pcmrec_thread */
 
