@@ -19,18 +19,12 @@
 #include "system.h"
 #include "kernel.h"
 #include "logf.h"
-#include "panic.h"
 #include "thread.h"
 #include <string.h>
 #include "ata.h"
 #include "usb.h"
-#if defined(HAVE_UDA1380)
-#include "uda1380.h"
-#include "general.h"
-#elif defined(HAVE_TLV320)
-#include "tlv320.h"
-#endif
 #include "buffer.h"
+#include "general.h"
 #include "audio.h"
 #include "sound.h"
 #include "id3.h"
@@ -45,7 +39,6 @@
  * Public -
  *      pcm_init_recording
  *      pcm_close_recording
- *      pcm_rec_mux
  * Semi-private -
  *      pcm_rec_dma_start
  *      pcm_rec_dma_stop
@@ -234,11 +227,10 @@ enum
     PCMREC_INIT,            /* enable recording                */
     PCMREC_CLOSE,           /* close recording                 */
     PCMREC_OPTIONS,         /* set recording options           */
-    PCMREC_START,           /* start recording                 */
+    PCMREC_RECORD,          /* record a new file               */
     PCMREC_STOP,            /* stop the current recording      */
     PCMREC_PAUSE,           /* pause the current recording     */
     PCMREC_RESUME,          /* resume the current recording    */
-    PCMREC_NEW_FILE,        /* start new file                  */
 #if 0
     PCMREC_FLUSH_NUM,       /* flush a number of files out     */
 #endif
@@ -427,19 +419,9 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
-    queue_send(&pcmrec_queue, PCMREC_START, (void *)filename);
+    queue_send(&pcmrec_queue, PCMREC_RECORD, (void *)filename);
     logf("audio_record_done");
 } /* audio_record */
-
-/**
- * Equivalent to audio_record()
- */
-void audio_new_file(const char *filename)
-{
-    logf("audio_new_file: %s", filename);
-    queue_send(&pcmrec_queue, PCMREC_NEW_FILE, (void *)filename);
-    logf("audio_new_file done");
-} /* audio_new_file */
 
 /**
  * Stop current recording if recording
@@ -470,6 +452,19 @@ void audio_resume_recording(void)
     queue_send(&pcmrec_queue, PCMREC_RESUME, NULL);
     logf("audio_resume_recording done");
 } /* audio_resume_recording */
+
+/**
+ * Note that microphone is mono, only left value is used 
+ * See audiohw_set_recvol() for exact ranges.
+ *
+ * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
+ * 
+ */
+void audio_set_recording_gain(int left, int right, int type)
+{
+    //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
+    audiohw_set_recvol(left, right, type);
+} /* audio_set_recording_gain */
 
 /** Information about current state **/
 
@@ -1203,14 +1198,14 @@ static void pcmrec_set_recording_options(struct audio_recording_options *options
     }
 } /* pcmrec_set_recording_options */
 
-/* PCMREC_START/PCMREC_NEW_FILE - start recording (not gapless)
-                                  or split stream (gapless) */
-static void pcmrec_start(const char *filename)
+/* PCMREC_RECORD - start recording (not gapless)
+                   or split stream (gapless) */
+static void pcmrec_record(const char *filename)
 {
     unsigned long pre_sample_ticks;
     int           rd_start;
 
-    logf("pcmrec_start: %s", filename);
+    logf("pcmrec_record: %s", filename);
 
     /* reset stats */
     num_rec_bytes     = 0;
@@ -1223,7 +1218,7 @@ static void pcmrec_start(const char *filename)
         pcmrec_new_stream(filename,
                           CHUNKF_START_FILE | CHUNKF_END_FILE,
                           0);
-        goto start_done;
+        goto record_done;
     }
 
 #if 0
@@ -1299,9 +1294,9 @@ static void pcmrec_start(const char *filename)
                       (pre_sample_ticks > 0 ? CHUNKF_PRERECORD : 0),
                       enc_rd_index);
 
-start_done:
-    logf("pcmrec_start done");
-} /* pcmrec_start */
+record_done:
+    logf("pcmrec_record done");
+} /* pcmrec_record */
 
 /* PCMREC_STOP */
 static void pcmrec_stop(void)
@@ -1445,9 +1440,8 @@ static void pcmrec_thread(void)
                     (struct audio_recording_options *)ev.data);
                 break;
 
-            case PCMREC_START:
-            case PCMREC_NEW_FILE:
-                pcmrec_start((const char *)ev.data);
+            case PCMREC_RECORD:
+                pcmrec_record((const char *)ev.data);
                 break;
 
             case PCMREC_STOP:

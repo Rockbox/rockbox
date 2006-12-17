@@ -19,20 +19,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "audio.h"
-#include "tlv320.h"
-
-/**
- * Note that microphone is mono, only left value is used 
- * See audiohw_set_recvol() for exact ranges.
- *
- * @param type   AUDIO_GAIN_MIC, AUDIO_GAIN_LINEIN
- * 
- */
-void audio_set_recording_gain(int left, int right, int type)
-{
-    //logf("rcmrec: t=%d l=%d r=%d", type, left, right);
-    audiohw_set_recvol(left, right, type);
-} /* audio_set_recording_gain */
+#include "sound.h"
 
 void audio_set_output_source(int source)
 {
