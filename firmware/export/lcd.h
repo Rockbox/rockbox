@@ -367,9 +367,10 @@ extern void lcd_bitmap_transparent(const fb_data *src, int x, int y,
 /* internal usage, but in multiple drivers */
 #ifdef HAVE_LCD_BITMAP
 #define SCROLL_SPACING 3
+#define SCROLL_LINE_SIZE    (MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2)
 
 struct scrollinfo {
-    char line[MAX_PATH + LCD_WIDTH/2 + SCROLL_SPACING + 2];
+    char line[SCROLL_LINE_SIZE];
     int len;    /* length of line in chars */
     int width;  /* length of line in pixels */
     int offset;

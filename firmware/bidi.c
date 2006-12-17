@@ -131,8 +131,8 @@ void arabjoin(unsigned short * stringprt, int length){
 unsigned short *bidi_l2v(const unsigned char *str, int orientation)
 {
     int length = utf8length(str);
-    static unsigned short  utf16_buf[MAX_PATH+1];
-    static unsigned short  bidi_buf[MAX_PATH+1];
+    static unsigned short  utf16_buf[SCROLL_LINE_SIZE];
+    static unsigned short  bidi_buf[SCROLL_LINE_SIZE];
     unsigned short *heb_str, *target, *tmp; // *broken_str
     int block_start, block_end, block_type, block_length, i;
     //long max_chars=0;
