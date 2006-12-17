@@ -31,9 +31,15 @@
 #endif
 
 /* peaks */
-static int play_peak_left, play_peak_right;
 static unsigned long *rec_peak_addr;
-static int rec_peak_left, rec_peak_right;
+enum
+{
+    PLAY_PEAK_LEFT = 0,
+    PLAY_PEAK_RIGHT,
+    REC_PEAK_LEFT,
+    REC_PEAK_RIGHT
+};
+static int peaks[4]; /* p-l, p-r, r-l, r-r */
 
 #define IIS_DEFPARM(output)     ( (freq_ent[FPARM_CLOCKSEL] << 12) | \
                                   (output) | \
@@ -412,19 +418,51 @@ void pcm_play_pause_unpause(void)
 } /* pcm_play_pause_unpause */
 
 /**
+ * Do peak calculation using distance squared from axis and save a lot
+ * of jumps and negation. Don't bother with the calculations of left or
+ * right only as it's never really used and won't save much time.
+ */
+static void pcm_peak_peeker(unsigned long *addr, unsigned long *end,
+                            int peaks[2])
+{
+    long peak_l   = 0, peak_r   = 0;
+    long peaksq_l = 0, peaksq_r = 0;
+
+    do
+    {
+        long value = *addr;
+        long ch, chsq;
+
+        ch   = value >> 16;
+        chsq = ch*ch;
+        if (chsq > peaksq_l)
+            peak_l = ch, peaksq_l = chsq;
+
+        ch   = (short)value;
+        chsq = ch*ch;
+        if (chsq > peaksq_r)
+            peak_r = ch, peaksq_r = chsq;
+
+        addr += 4;
+    }
+    while (addr < end);
+
+    peaks[0] = abs(peak_l);
+    peaks[1] = abs(peak_r);
+} /* pcm_peak_peeker */
+
+/**
  * Return playback peaks - Peaks ahead in the DMA buffer based upon the
  *                         calling period to attempt to compensate for
  *                         delay.
  */
 void pcm_calculate_peaks(int *left, int *right)
 {
-    unsigned long samples;
-    unsigned long *addr, *end;
-    long peak_p, peak_n;
-    int level;
-
     static unsigned long last_peak_tick = 0;
-    static unsigned long frame_period = 0;
+    static unsigned long frame_period   = 0;
+
+    long samples, samp_frames;
+    unsigned long *addr;
 
     /* Throttled peak ahead based on calling period */
     unsigned long period = current_tick - last_peak_tick;
@@ -439,161 +477,74 @@ void pcm_calculate_peaks(int *left, int *right)
 
     last_peak_tick = current_tick;
 
-    if (!pcm_playing || pcm_paused)
+    if (pcm_playing && !pcm_paused)
     {
-        play_peak_left = play_peak_right = 0;
-        goto peak_done;
-    }
+        /* Snapshot as quickly as possible */
+        asm volatile (
+            "move.l %c[sar0], %[start] \n"
+            "move.l %c[bcr0], %[count] \n"
+            : [start]"=r"(addr), [count]"=r"(samples)
+            : [sar0]"p"(&SAR0), [bcr0]"p"(&BCR0)
+        );
 
-    /* prevent interrupt from setting up next transfer and
-       be sure SAR0 and BCR0 refer to current transfer */
-    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        samples    &= 0xfffffc;
+        samp_frames = frame_period*pcm_freq/(HZ/4);
+        samples     = MIN(samp_frames, samples) >> 2;
 
-    addr    = (long *)(SAR0 & ~3);
-    samples = (BCR0 & 0xffffff) >> 2;
-
-    set_irq_level(level);
-
-    samples = MIN(frame_period*pcm_freq/HZ, samples);
-    end     = addr + samples;
-    peak_p  = peak_n = 0;
-
-    if (left && right)
-    {
         if (samples > 0)
         {
-            long peak_rp = 0, peak_rn = 0;
-
-            do
-            {
-                long value = *addr;
-                long ch;
-
-                ch = value >> 16;
-                if (ch > peak_p)       peak_p  = ch;
-                else if (ch < peak_n)  peak_n  = ch;
-
-                ch = (short)value;
-                if (ch > peak_rp)      peak_rp = ch;
-                else if (ch < peak_rn) peak_rn = ch;
-
-                addr += 4;
-            }
-            while (addr < end);
-
-            play_peak_left  = MAX(peak_p,  -peak_n);
-            play_peak_right = MAX(peak_rp, -peak_rn);
+            addr = (long *)((long)addr & ~3);
+            pcm_peak_peeker(addr, addr + samples, &peaks[PLAY_PEAK_LEFT]);
         }
     }
-    else if (left || right)
+    else
     {
-        if (samples > 0)
-        {
-            if (left)
-            {
-                /* Put left channel in low word */
-                addr = (long *)((short *)addr - 1);
-                end  = (long *)((short *)end  - 1);
-            }
-
-            do
-            {
-                long value = *(short *)addr;
-
-                if (value > peak_p)      peak_p = value;
-                else if (value < peak_n) peak_n = value;
-
-                addr += 4;
-            }
-            while (addr < end);
-
-            if (left)
-                play_peak_left  = MAX(peak_p, -peak_n);
-            else
-                play_peak_right = MAX(peak_p, -peak_n);
-        }
+        peaks[PLAY_PEAK_LEFT] = peaks[PLAY_PEAK_RIGHT] = 0;
     }
 
-peak_done:
     if (left)
-        *left = play_peak_left;
+        *left = peaks[PLAY_PEAK_LEFT];
 
     if (right)
-        *right = play_peak_right;
+        *right = peaks[PLAY_PEAK_RIGHT];
 } /* pcm_calculate_peaks */
 
 /**
- * Return recording peaks - Looks at every 4th sample from last peak up to
+ * Return recording peaks - From the end of the last peak up to
  *                          current write position.
  */
 void pcm_calculate_rec_peaks(int *left, int *right)
 {
-    unsigned long *pkaddr, *addr, *end;
-    long peak_lp, peak_ln; /* L +,- */
-    long peak_rp, peak_rn; /* R +,- */
-    int level;
-
-    if (!pcm_recording)
+    if (pcm_recording)
     {
-        rec_peak_left = rec_peak_right = 0;
-        goto peak_done;
-    }
+        unsigned long *addr, *end;
 
-    /* read these atomically or each value may not refer to the
-       same data transfer */
-    level = set_irq_level(HIGHEST_IRQ_LEVEL);
+        /* Snapshot as quickly as possible */
+        asm volatile (
+            "move.l %c[start], %[addr] \n"
+            "move.l %c[dar1],  %[end]  \n"
+            "and.l  %[mask],   %[addr] \n"
+            "and.l  %[mask],   %[end]  \n"
+            : [addr]"=r"(addr), [end]"=r"(end)
+            : [start]"p"(&rec_peak_addr), [dar1]"p"(&DAR1), [mask]"r"(~3)
+        );
 
-    pkaddr = rec_peak_addr;
-    addr   = pkaddr;
-    end    = (unsigned long *)(DAR1 & ~3);
-
-    set_irq_level(level);
-
-    if (addr < end)
-    {
-        peak_lp = peak_ln =
-        peak_rp = peak_rn = 0;
-
-        /* peak one sample per line */
-        do
+        if (addr < end)
         {
-            long value = *addr;
-            long ch;
+            pcm_peak_peeker(addr, end, &peaks[REC_PEAK_LEFT]);
 
-            ch = value >> 16;
-            if (ch < peak_ln)
-                peak_ln = ch;
-            else if (ch > peak_lp)
-                peak_lp = ch;
-
-            ch = (short)value;
-            if (ch > peak_rp)
-                peak_rp = ch;
-            else if (ch < peak_rn)
-                peak_rn = ch;
-
-            addr += 4;
+            if (addr == rec_peak_addr)
+                rec_peak_addr = end;
         }
-        while (addr < end);
-
-        /* only update rec_peak_addr if a DMA interrupt hasn't already
-           done so */
-        level = set_irq_level(HIGHEST_IRQ_LEVEL);
-
-        if (pkaddr == rec_peak_addr)
-            rec_peak_addr = end;
-
-        set_irq_level(level);
-
-        /* save peaks */
-        rec_peak_left  = MAX(peak_lp, -peak_ln);
-        rec_peak_right = MAX(peak_rp, -peak_rn);
+    }
+    else
+    {
+        peaks[REC_PEAK_LEFT] = peaks[REC_PEAK_RIGHT] = 0;
     }
 
-peak_done:
     if (left)
-        *left  = rec_peak_left;
+        *left = peaks[REC_PEAK_LEFT];
 
     if (right)
-        *right = rec_peak_right;
+        *right = peaks[REC_PEAK_RIGHT];
 } /* pcm_calculate_rec_peaks */
