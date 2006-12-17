@@ -36,6 +36,8 @@
 #if ULONG_MAX == 0xfffffffful
 #define int32_t long
 #define uint32_t unsigned long
+#define intptr_t long
+#define uintptr_t unsigned long
 #elif UINT_MAX == 0xffffffffu
 #define int32_t int
 #define uint32_t unsigned int
@@ -45,6 +47,8 @@
 #if ULONG_MAX == 0xffffffffffffffffull
 #define int64_t long
 #define uint64_t unsigned long
+#define intptr_t long
+#define uintptr_t unsigned long
 #else
 #define int64_t long long
 #define uint64_t unsigned long long

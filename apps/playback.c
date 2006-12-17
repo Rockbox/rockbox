@@ -1576,8 +1576,8 @@ static void codec_advance_buffer_callback(size_t amount)
         int result;
         LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
         
-        result = (int)queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
-                                 (void *)(ci.curpos + amount));
+        result = (int)(intptr_t)queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
+                                           (void *)(uintptr_t)(ci.curpos + amount));
 
         switch (result)
         {
@@ -1719,8 +1719,8 @@ static bool codec_seek_buffer_callback(size_t newpos)
         int result;
         
         LOGFQUEUE("codec >| audio Q_AUDIO_REBUFFER_SEEK");
-        result = (int)queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
-                                 (void *)newpos);
+        result = (int)(intptr_t)queue_send(&audio_queue, Q_AUDIO_REBUFFER_SEEK,
+                                           (void *)(uintptr_t)newpos);
         
         switch (result)
         {
@@ -1855,7 +1855,8 @@ static bool codec_load_next_track(void)
     
     trigger_cpu_boost();
     LOGFQUEUE("codec >| audio Q_AUDIO_CHECK_NEW_TRACK");
-    result = (int)queue_send(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK, NULL);
+    result = (int)(intptr_t)queue_send(&audio_queue, Q_AUDIO_CHECK_NEW_TRACK,
+                                       NULL);
 
 #if 0 /* Q_CODEC_REQUEST_PENDING never posted anyway */
     while (1) 
@@ -3625,12 +3626,12 @@ static void audio_thread(void)
 
             case Q_AUDIO_REBUFFER_SEEK:
                 LOGFQUEUE("audio < Q_AUDIO_REBUFFER_SEEK");
-                result = (void *)audio_rebuffer_and_seek((size_t)ev.data);
+                result = (void *)(intptr_t)audio_rebuffer_and_seek((size_t)ev.data);
                 break;
 
             case Q_AUDIO_CHECK_NEW_TRACK:
                 LOGFQUEUE("audio < Q_AUDIO_CHECK_NEW_TRACK");
-                result = (void *)audio_check_new_track();
+                result = (void *)(intptr_t)audio_check_new_track();
                 break;
 
             case Q_AUDIO_DIR_SKIP:

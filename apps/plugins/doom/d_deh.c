@@ -1466,7 +1466,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
    // killough 10/98: allow DEH files to come from wad lumps
    if (filename)
    {
-      if ((int)(infile.inp = (void *) open(filename,O_RDONLY))<0)
+      if ((intptr_t)(infile.inp = (void *)(intptr_t)open(filename,O_RDONLY))<0)
       {
          printf( "-deh file %s not found\n",filename);
          return;  // should be checked up front anyway
@@ -1558,7 +1558,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
    if (infile.lump)
       W_UnlockLumpNum(lumpnum);                 // Mark purgable
    else
-      close((int) infile.inp);              // Close real file
+      close((int)(intptr_t) infile.inp);              // Close real file
 
    close(fileout);
 }
