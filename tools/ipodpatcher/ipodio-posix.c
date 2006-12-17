@@ -47,17 +47,17 @@ void print_error(char* msg)
     perror(msg);
 }
 
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size)
+int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
 {
     *dh=open(diskname,O_RDONLY);
     if (*dh < 0) {
-        perror(diskname);
+        if (!silent) perror(diskname);
         return -1;
     }
 
     if(ioctl(*dh,IPOD_SECTORSIZE_IOCTL,sector_size) < 0) {
         *sector_size=512;
-        fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n",*sector_size);
+        if (!silent) fprintf(stderr,"[ERR] ioctl() call to get sector size failed, defaulting to %d\n",*sector_size);
     }
     return 0;
 }

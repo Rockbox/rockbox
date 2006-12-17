@@ -66,7 +66,7 @@ void print_error(char* msg)
     LocalFree(pMsgBuf);
 }
 
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size)
+int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent)
 {
     DISK_GEOMETRY_EX diskgeometry_ex;
     DISK_GEOMETRY diskgeometry;
@@ -77,12 +77,12 @@ int ipod_open(HANDLE* dh, char* diskname, int* sector_size)
                     FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, NULL);
 
     if (*dh == INVALID_HANDLE_VALUE) {
-        print_error(" Error opening disk: ");
+        if (!silent) print_error(" Error opening disk: ");
         return -1;
     }
 
     if (!lock_volume(*dh)) {
-        print_error(" Error locking disk: ");
+        if (!silent) print_error(" Error locking disk: ");
         return -1;
     }
 
@@ -102,7 +102,7 @@ int ipod_open(HANDLE* dh, char* diskname, int* sector_size)
                              sizeof(diskgeometry),
                              &n,
                              NULL)) {
-            print_error(" Error reading disk geometry: ");
+            if (!silent) print_error(" Error reading disk geometry: ");
             return -1;
         } else {
             *sector_size=diskgeometry.BytesPerSector;

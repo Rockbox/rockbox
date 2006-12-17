@@ -28,7 +28,7 @@
 #endif
 
 void print_error(char* msg);
-int ipod_open(HANDLE* dh, char* diskname, int* sector_size);
+int ipod_open(HANDLE* dh, char* diskname, int* sector_size, int silent);
 int ipod_reopen_rw(HANDLE* dh, char* diskname);
 int ipod_close(HANDLE dh);
 int ipod_seek(HANDLE dh, unsigned long pos);

@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 #include "parttypes.h"
 #include "ipodio.h"
@@ -170,7 +171,8 @@ void display_partinfo(struct partinfo_t* pinfo, int sector_size)
 }
 
 
-int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo)
+int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo,
+                  int silent)
 {
     int i;
     unsigned long count;
@@ -185,13 +187,13 @@ int read_partinfo(HANDLE dh, int sector_size, struct partinfo_t* pinfo)
     /* check that the boot sector is initialized */
     if ( (sectorbuf[510] != 0x55) ||
          (sectorbuf[511] != 0xaa)) {
-        fprintf(stderr,"[ERR]  Bad boot sector signature\n");
+        if (!silent) fprintf(stderr,"[ERR]  Bad boot sector signature\n");
         return -1;
     }
 
     if ((memcmp(&sectorbuf[71],"iPod",4) != 0) &&
         (memcmp(&sectorbuf[0x40],"This is your Apple iPod. You probably do not want to boot from it!",66) != 0) ) {
-        fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
+        if (!silent) fprintf(stderr,"[ERR]  Drive is not an iPod, aborting\n");
         return -1;
     }
 
@@ -327,13 +329,15 @@ int write_partition(HANDLE dh, int infile,unsigned long start_sector,
 
 
 void print_usage(void) {
+    fprintf(stderr,"Usage: ipodpatcher --scan\n");
 #ifdef __WIN32__
-    fprintf(stderr,"Usage: ipodpatcher DISKNO [action]\n");
+    fprintf(stderr,"    or ipodpatcher DISKNO [action]\n");
 #else
-    fprintf(stderr,"Usage: ipodpatcher device [action]\n");
+    fprintf(stderr,"    or ipodpatcher device [action]\n");
 #endif
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
+    fprintf(stderr,"  -l,  --list\n");
     fprintf(stderr,"  -l,  --list\n");
     fprintf(stderr,"  -r,  --read-partition   bootpartition.bin\n");
     fprintf(stderr,"  -w,  --write-partition  bootpartition.bin\n");
@@ -1061,19 +1065,132 @@ int list_images(int nimages, struct ipod_directory_t* ipod_directory,
     return 0;
 }
 
+int getmodel(int ipod_version, char** modelstr, char** modelname, int* modelnum)
+{
+    switch (ipod_version) {
+        case 0x3:
+            *modelstr="3rd Generation";
+            *modelnum = 7;
+            *modelname = "ip3g";
+            break;
+        case 0x4:
+            *modelstr="1st Generation Mini";
+            *modelnum = 9;
+            *modelname = "mini";
+            break;
+        case 0x5:
+            *modelstr="4th Generation";
+            *modelnum = 8;
+            *modelname = "ip4g";
+            break;
+        case 0x6:
+            *modelstr="Photo/Color";
+            *modelnum = 3;
+            *modelname = "ipco";
+            break;
+        case 0x7:
+            *modelstr="2nd Generation Mini";
+            *modelnum = 11;
+            *modelname = "mn2g";
+            break;
+        case 0xc:
+            *modelstr="1st Generation Nano";
+            *modelnum = 4;
+            *modelname = "nano";
+            break;
+        case 0xb:
+            *modelstr="Video (aka 5th Generation)";
+            *modelnum = 5;
+            *modelname = "ipvd";
+            break;
+        default:
+            *modelname = NULL;
+            *modelnum = 0;
+            return -1;
+    }
+    return 0;
+}
 
+int ipod_scan(void)
+{
+    int i;
+    int n = 0;
+    char devicename[96];
+    HANDLE dh;
+    int nimages;
+    struct partinfo_t pinfo[4]; /* space for 4 partitions on 1 drive */
+    int ipod_version;
+    off_t diroffset;
+    char* modelname;
+    char* modelstr;
+    int modelnum;
+    struct ipod_directory_t ipod_directory[MAX_IMAGES];
+    int sector_size;
 
+    printf("[INFO] Scanning disk devices...\n");
+
+    for (i = 0; i < 25 ; i++) {
+#ifdef __WIN32__
+         sprintf(devicename,"\\\\.\\PhysicalDrive%d",i);
+#elif defined(linux) || defined (__linux)
+         sprintf(devicename,"/dev/sd%c",'a'+i);
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) \
+      || defined(__bsdi__) || defined(__DragonFly__)
+         sprintf(devicename,"/dev/da%d",i);
+#elif defined(__APPLE__) && defined(__MACH__)
+         sprintf(devicename,"/dev/disk%d",i);
+#else
+    #error No disk paths defined for this platform
+#endif
+         if (ipod_open(&dh, devicename, &sector_size, 1) < 0) {
+             continue;
+         }
+
+         if (read_partinfo(dh,sector_size,pinfo,1) < 0) {
+             continue;
+         }
+
+         if ((pinfo[0].start==0) || (pinfo[0].type != 0)) {
+             continue;
+         }
+
+         nimages=read_directory(dh, pinfo[0].start*sector_size, sector_size, 
+                                ipod_directory, &diroffset);
+
+         if (nimages < 0) {
+             continue;
+         }
+
+         ipod_version=(ipod_directory[0].vers>>12) & 0x0f;
+         if (getmodel(ipod_version,&modelstr,&modelname,&modelnum) < 0) {
+             continue;
+         }
+
+#ifdef __WIN32__
+         printf("[INFO] Ipod found - %s - disk device %d\n",modelstr,i);
+#else
+         printf("[INFO] Ipod found - %s - %s\n",modelstr,devicename);
+#endif
+         n++;
+    }
+
+    if (n==0) {
+        fprintf(stderr,"[ERR]  No ipods found.\n");
+    }
+    return 0;
+}
 
 int main(int argc, char* argv[])
 {
     int i;
     int infile, outfile;
-    int ipod_version;
     unsigned int inputsize;
     struct partinfo_t pinfo[4]; /* space for 4 partitions on 1 drive */
+    int ipod_version;
     int nimages;
     off_t diroffset;
     char* modelname;
+    char* modelstr;
     int modelnum;
     char* filename;
     struct ipod_directory_t ipod_directory[MAX_IMAGES];
@@ -1085,11 +1202,20 @@ int main(int argc, char* argv[])
     fprintf(stderr,"ipodpatcher v" VERSION " - (C) Dave Chapman 2006\n");
     fprintf(stderr,"This is free software; see the source for copying conditions.  There is NO\n");
     fprintf(stderr,"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n");
-    
+
     if ((argc < 2) || (strcmp(argv[1],"-h")==0) || 
                       (strcmp(argv[1],"--help")==0)) {
         print_usage();
         return 1;
+    }
+
+    if (ipod_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) {
+        fprintf(stderr,"Failed to allocate memory buffer\n");
+    }
+
+    if (strcmp(argv[1],"--scan")==0) {
+        ipod_scan();
+        return 0;
     }
 
     i = 1;
@@ -1159,18 +1285,14 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (ipod_alloc_buffer(&sectorbuf,BUFFER_SIZE) < 0) {
-        fprintf(stderr,"Failed to allocate memory buffer\n");
-    }
-
-    if (ipod_open(&dh, devicename, &sector_size) < 0) {
+    if (ipod_open(&dh, devicename, &sector_size, 0) < 0) {
         return 1;
     }
 
     fprintf(stderr,"[INFO] Reading partition table from %s\n",devicename);
     fprintf(stderr,"[INFO] Sector size is %d bytes\n",sector_size);
 
-    if (read_partinfo(dh,sector_size,pinfo) < 0) {
+    if (read_partinfo(dh,sector_size,pinfo,0) < 0) {
         return 2;
     }
 
@@ -1190,48 +1312,13 @@ int main(int argc, char* argv[])
     }
 
     ipod_version=(ipod_directory[0].vers>>12) & 0x0f;
-    printf("[INFO] Ipod model: ");
-    switch (ipod_version) {
-        case 0x3:
-            printf("3rd Generation\n");
-            modelnum = 7;
-            modelname = "ip3g";
-            break;
-        case 0x4:
-            printf("1st Generation Mini\n");
-            modelnum = 9;
-            modelname = "mini";
-            break;
-        case 0x5:
-            printf("4th Generation\n");
-            modelnum = 8;
-            modelname = "ip4g";
-            break;
-        case 0x6:
-            printf("Photo/Color\n");
-            modelnum = 3;
-            modelname = "ipco";
-            break;
-        case 0x7:
-            printf("2nd Generation Mini\n");
-            modelnum = 11;
-            modelname = "mn2g";
-            break;
-        case 0xc:
-            printf("1st Generation Nano\n");
-            modelnum = 4;
-            modelname = "nano";
-            break;
-        case 0xb:
-            printf("Video (aka 5th Generation)\n");
-            modelnum = 5;
-            modelname = "ipvd";
-            break;
-        default:
-            printf("[ERR] Unknown firmware version (0x%08x)\n",
-                   ipod_directory[0].vers);
-            return -1;
+    if (getmodel(ipod_version,&modelstr,&modelname,&modelnum) < 0) {
+        fprintf(stderr,"[ERR] Unknown version number in firmware (%08x)\n",
+                       ipod_version);
+        return -1;
     }
+
+    printf("[INFO] Ipod model: %s\n",modelstr);
 
     if (action==LIST_IMAGES) {
         list_images(nimages,ipod_directory,sector_size);
