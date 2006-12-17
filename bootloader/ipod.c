@@ -298,8 +298,15 @@ void fatal_error(void)
 {
     bool holdstatus=false;
 
+    /* System font is 6 pixels wide */
+#if LCD_WIDTH >= (30*6)
     lcd_puts(0, line++, "Press MENU+SELECT to reboot");
     lcd_puts(0, line++, "then SELECT+PLAY for disk mode");
+#else
+    lcd_puts(0, line++, "Press MENU+SELECT to");
+    lcd_puts(0, line++, "reboot then SELECT+PLAY");
+    lcd_puts(0, line++, "for disk mode");
+#endif
     lcd_update();
 
     while (1) {
