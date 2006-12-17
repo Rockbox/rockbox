@@ -62,7 +62,7 @@ void i2s_reset(void)
 /* Other formats not yet known */
 
 /* Are we I2S Master or slave? */
-#define I2S_MASTER (0x25)
+#define I2S_MASTER (1<<25)
 
 #define I2S_RESET (0x1 << 31)
 
