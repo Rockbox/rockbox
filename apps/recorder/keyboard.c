@@ -16,13 +16,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include "lcd.h"
-#include "button.h"
 #include "kernel.h"
 #include "system.h"
 #include "version.h"
-#include "debug_menu.h"
-#include "sprintf.h"
 #include <string.h>
 #include "font.h"
 #include "screens.h"
@@ -33,8 +29,6 @@
 #include "rbunicode.h"
 #include "buttonbar.h"
 #include "logf.h"
-#include "icons.h"
-#include "file.h"
 #include "hangul.h"
 #include "action.h"
 
@@ -177,7 +171,7 @@ static void kbd_spellchar(unsigned short c)
     }
 }
 
-void kbd_inschar(unsigned char* text, int buflen, int* editpos, unsigned short ch)
+static void kbd_inschar(unsigned char* text, int buflen, int* editpos, unsigned short ch)
 {
     int i, j, k, len;
     unsigned char tmp[4];
@@ -202,7 +196,7 @@ void kbd_inschar(unsigned char* text, int buflen, int* editpos, unsigned short c
     return;
 }
 
-void kbd_delchar(unsigned char* text, int* editpos)
+static void kbd_delchar(unsigned char* text, int* editpos)
 {
     int i = 0;
     unsigned char* utf8;
@@ -248,6 +242,7 @@ int kbd_input(char* text, int buflen)
 
     FOR_NB_SCREENS(l)
     {
+#if LCD_WIDTH >= 160 && LCD_HEIGHT >=96
         if ((screens[l].width >= 160) && (screens[l].height >= 96))
         {
              param[l].default_kbd =
@@ -258,12 +253,13 @@ int kbd_input(char* text, int buflen)
                       "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË ¢£¤¥¦§©®\n"
                       "àáâãäåæ ìíîï èéêë «»°ºª¹²³\n"
                       "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ ¯±×÷¡¿µ·\n"
-                      "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨";
+                      "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨:;";
 
              param[l].DEFAULT_LINES = 8;
         }
         else
         {
+#endif
              param[l].default_kbd =
                        "ABCDEFG !?\" @#$%+'\n"
                        "HIJKLMN 789 &_()-`\n"
@@ -273,7 +269,7 @@ int kbd_input(char* text, int buflen)
                        "abcdefg ¢£¤¥¦§©®¬\n"
                        "hijklmn «»°ºª¹²³¶\n"
                        "opqrstu ¯±×÷¡¿µ·¨\n"
-                       "vwxyz., ¼½¾      \n"
+                       "vwxyz., :;¼½¾    \n"
 
                        "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË\n"
                        "àáâãäåæ ìíîï èéêë\n"
@@ -281,7 +277,9 @@ int kbd_input(char* text, int buflen)
                        "òóôõöø çðþýÿ ùúûü";
 
               param[l].DEFAULT_LINES = 4;
+#if LCD_WIDTH >= 160
          }
+#endif
     }
 #ifdef KBD_MODES
     bool line_edit = false;
