@@ -258,8 +258,8 @@ int kbd_input(char* text, int buflen)
              param[l].DEFAULT_LINES = 8;
         }
         else
-        {
 #endif
+        {
              param[l].default_kbd =
                        "ABCDEFG !?\" @#$%+'\n"
                        "HIJKLMN 789 &_()-`\n"
@@ -277,9 +277,7 @@ int kbd_input(char* text, int buflen)
                        "òóôõöø çðþýÿ ùúûü";
 
               param[l].DEFAULT_LINES = 4;
-#if LCD_WIDTH >= 160
          }
-#endif
     }
 #ifdef KBD_MODES
     bool line_edit = false;
