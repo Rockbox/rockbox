@@ -60,8 +60,12 @@
 #define BUTTON_PLAY  4
 #define BUTTON_HOLD  5
 
-/* Size of the buffer to store the loaded Rockbox/Linux image */
-#define MAX_LOADSIZE (4*1024*1024)
+/* Size of the buffer to store the loaded Rockbox/Linux/AppleOS image */
+
+/* The largest known current (December 2006) firmware is about 7.5MB
+   (Apple's firmware for the ipod video) so we set this to 8MB. */
+
+#define MAX_LOADSIZE (8*1024*1024)
 
 char version[] = APPSVERSION;
 
@@ -181,7 +185,13 @@ static int key_pressed(void)
     return 0;
 }
 
-int load_rockbox(unsigned char* buf)
+/* This function is the same on all ipods */
+bool button_hold(void)
+{
+    return (GPIOA_INPUT_VAL & 0x20)?false:true;
+}
+
+int load_rockbox(unsigned char* buf, char* firmware)
 {
     int fd;
     int rc;
@@ -191,11 +201,14 @@ int load_rockbox(unsigned char* buf)
     unsigned long sum;
     int i;
     char str[80];
-    
-    fd = open("/.rockbox/" BOOTFILE, O_RDONLY);
+    char filename[MAX_PATH];
+
+    snprintf(filename,sizeof(filename),"/.rockbox/%s",firmware);
+    fd = open(filename, O_RDONLY);
     if(fd < 0)
     {
-        fd = open("/" BOOTFILE, O_RDONLY);
+        snprintf(filename,sizeof(filename),"/%s",firmware);
+        fd = open(filename, O_RDONLY);
         if(fd < 0)
             return -1;
     }
@@ -221,6 +234,8 @@ int load_rockbox(unsigned char* buf)
     snprintf(str, 80, "Model: %s", model);
     lcd_puts(0, line++, str);
     snprintf(str, 80, "Checksum: %x", chksum);
+    lcd_puts(0, line++, str);
+    snprintf(str, 80, "Loading %s", firmware);
     lcd_puts(0, line++, str);
     lcd_update();
 
@@ -279,13 +294,45 @@ int load_linux(unsigned char* buf) {
 /* A buffer to load the Linux kernel or Rockbox into */
 unsigned char loadbuffer[MAX_LOADSIZE];
 
+void fatal_error(void)
+{
+    bool holdstatus=false;
+
+    lcd_puts(0, line++, "Press MENU+SELECT to reboot");
+    lcd_puts(0, line++, "then SELECT+PLAY for disk mode");
+    lcd_update();
+
+    while (1) {
+        if (button_hold() != holdstatus) {
+            if (button_hold()) {
+                holdstatus=true;
+                lcd_puts(0, line, "Hold switch on!");
+            } else {
+                holdstatus=false;
+                lcd_puts(0, line, "               ");
+            }
+            lcd_update();
+        }
+        udelay(100000); /* 100ms */
+    }
+
+}
+
+
 void* main(void)
 {
     char buf[256];
     int i;
     int rc;
+    bool haveretailos;
+    bool button_was_held;
     struct partinfo* pinfo;
     unsigned short* identify_info;
+
+    /* Check the button hold status as soon as possible - to 
+       give the user maximum chance to turn it off in order to
+       reset the settings in rockbox. */
+    button_was_held = button_hold();
 
     /* Turn on the backlight */
 
@@ -318,6 +365,12 @@ void* main(void)
     kernel_init();
     lcd_init();
     font_init();
+
+#ifdef HAVE_LCD_COLOR
+    lcd_set_foreground(LCD_WHITE);
+    lcd_set_background(LCD_BLACK);
+    lcd_clear_display();
+#endif
 
 #if 0
     /* ADC and button drivers are not yet implemented */
@@ -360,8 +413,7 @@ void* main(void)
     if (rc<=0)
     {
         lcd_puts(0, line++, "No partition found");
-        lcd_update();
-//        while(button_get(true) != SYS_USB_CONNECTED) {};
+        fatal_error();
     }
 
     pinfo = disk_partinfo(1);
@@ -370,51 +422,82 @@ void* main(void)
     lcd_puts(0, line++, buf);
     lcd_update();
 
-    /* Check for a keypress */
-    i=key_pressed();
+    /* See if there is an Apple firmware image in RAM */
+    haveretailos = (memcmp((void*)(DRAM_START+0x20),"portalplayer",12)==0);
 
-    if ((i!=BUTTON_MENU) && (i!=BUTTON_PLAY)) {
-        lcd_puts(0, line, "Loading Rockbox...");
-        lcd_update();
-        rc=load_rockbox(loadbuffer);
-        if (rc < 0) {
-            snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
-            lcd_puts(0, line++, buf);
+    /* We don't load Rockbox if the hold button is enabled. */
+    if (!button_was_held) {
+        /* Check for a keypress */
+        i=key_pressed();
+
+        if ((i!=BUTTON_MENU) && (i!=BUTTON_PLAY)) {
+            lcd_puts(0, line, "Loading Rockbox...");
             lcd_update();
-        } else {
-            lcd_puts(0, line++, "Rockbox loaded.");
+            rc=load_rockbox(loadbuffer, BOOTFILE);
+            if (rc < 0) {
+                snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
+                lcd_puts(0, line++, buf);
+                lcd_update();
+            } else {
+                lcd_puts(0, line++, "Rockbox loaded.");
+                lcd_update();
+                memcpy((void*)DRAM_START,loadbuffer,rc);
+                return (void*)DRAM_START;
+            }
+        }
+
+        if (i==BUTTON_PLAY) {
+            lcd_puts(0, line, "Loading Linux...");
             lcd_update();
-            memcpy((void*)DRAM_START,loadbuffer,rc);
-            return (void*)DRAM_START;
+            rc=load_linux(loadbuffer);
+            if (rc < 0) {
+                snprintf(buf, sizeof(buf), "Linux error: %d",rc);
+                lcd_puts(0, line++, buf);
+                lcd_update();
+            } else {
+                memcpy((void*)DRAM_START,loadbuffer,rc);
+                return (void*)DRAM_START;
+            }
         }
     }
 
-    if (i==BUTTON_PLAY) {
-        lcd_puts(0, line, "Loading Linux...");
-        lcd_update();
-        rc=load_linux(loadbuffer);
-        if (rc < 0) {
-            snprintf(buf, sizeof(buf), "Linux error: %d",rc);
-            lcd_puts(0, line++, buf);
-            lcd_update();
-        } else {
-            memcpy((void*)DRAM_START,loadbuffer,rc);
-            return (void*)DRAM_START;
-        }
-    }
 
-    /* If everything else failed, try the original firmware */
+    /* If either the hold switch was on, or loading Rockbox/IPL
+       failed, then try the Apple firmware */
+
     lcd_puts(0, line, "Loading original firmware...");
     lcd_update();
 
-    /* The original firmware should already be at the correct location
-       in RAM - the Rockbox bootloader has been appended to the end of
-       it, and the "entryOffset" in the firmware header modified to
-       tell the Apple bootloader to pass execution to our bootloader,
-       rather than the start of the original firmware - which is
-       always at the start of RAM. */
+    /* First try an apple_os.ipod file on the FAT32 partition
+       (either in .rockbox or the root) 
+     */
 
-    return (void*)DRAM_START;
+    rc=load_rockbox(loadbuffer, "apple_os.ipod");
+
+    /* Only report errors if the file was found */
+    if (rc < -1) {
+        snprintf(buf, sizeof(buf), "apple_os.ipod error: %d",rc);
+        lcd_puts(0, line++, buf);
+        lcd_update();
+    } else if (rc > 0) {
+        lcd_puts(0, line++, "apple_os.ipod loaded.");
+        lcd_update();
+        memcpy((void*)DRAM_START,loadbuffer,rc);
+        return (void*)DRAM_START;
+    }
+
+    if (haveretailos) {
+        /* We have a copy of the retailos in RAM, lets just run it. */
+        return (void*)DRAM_START;
+    }
+
+    /* Everything failed - just loop forever */
+    lcd_puts(0, line++, "No RetailOS detected");
+
+    fatal_error();
+
+    /* We never get here, but keep gcc happy */
+    return (void*)0;
 }
 
 /* These functions are present in the firmware library, but we reimplement
