@@ -338,7 +338,6 @@ void print_usage(void) {
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
     fprintf(stderr,"  -l,  --list\n");
-    fprintf(stderr,"  -l,  --list\n");
     fprintf(stderr,"  -r,  --read-partition   bootpartition.bin\n");
     fprintf(stderr,"  -w,  --write-partition  bootpartition.bin\n");
     fprintf(stderr,"  -rf, --read-firmware    filename.ipod\n");
