@@ -62,7 +62,6 @@ volatile bool                    pcm_recording           = false;
 /** General recording state **/
 static bool is_recording;              /* We are recording                 */
 static bool is_paused;                 /* We have paused                   */
-static bool is_stopping;               /* We are currently stopping        */
 static unsigned long errors;           /* An error has occured             */
 static unsigned long warnings;         /* Warning                          */
 
@@ -237,7 +236,6 @@ enum
     PCMREC_OPTIONS,         /* set recording options           */
     PCMREC_START,           /* start recording                 */
     PCMREC_STOP,            /* stop the current recording      */
-    PCMREC_FINISH_STOP,     /* finish the stopping recording   */
     PCMREC_PAUSE,           /* pause the current recording     */
     PCMREC_RESUME,          /* resume the current recording    */
     PCMREC_NEW_FILE,        /* start new file                  */
@@ -1038,6 +1036,8 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
 
     if (start)
     {
+        char buf[MAX_PATH]; /* place to copy in case we're full */
+
         if (!(flags & CHUNKF_PRERECORD))
         {
             /* get stats on data added to start - sort of a prerecord operation */
@@ -1070,6 +1070,11 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
         if (fnq_add_fn == pcmrec_fnq_add_filename && pcmrec_fnq_is_full())
         {
             logf("fnq full");
+            /* make a local copy of filename and let sender go as this
+               flush will hang the screen for a bit otherwise */
+            strncpy(buf, filename, MAX_PATH);
+            filename = buf;
+            queue_reply(&pcmrec_queue, NULL);
             pcmrec_flush(-1);
         }
    
@@ -1115,7 +1120,6 @@ static void pcmrec_init(void)
 
     is_recording      = false;
     is_paused         = false;
-    is_stopping       = false;
 
     buffer = audio_get_recording_buffer(&rec_buffer_size);
 
@@ -1183,6 +1187,8 @@ static void pcmrec_set_recording_options(struct audio_recording_options *options
     /* apply pcm settings to hardware */
     pcm_apply_settings(true);
 
+    queue_reply(&pcmrec_queue, NULL); /* Release sender */
+
     if (audio_load_encoder(enc_config.afmt))
     {
         /* start DMA transfer */
@@ -1195,7 +1201,6 @@ static void pcmrec_set_recording_options(struct audio_recording_options *options
         logf("set rec opt: enc load failed");
         errors |= PCMREC_E_LOAD_ENCODER;
     }
-
 } /* pcmrec_set_recording_options */
 
 /* PCMREC_START/PCMREC_NEW_FILE - start recording (not gapless)
@@ -1306,33 +1311,12 @@ static void pcmrec_stop(void)
     if (!is_recording)
     {
         logf("not recording");
-        goto not_recording_or_stopping;
-    }
-    else if (is_stopping)
-    {
-        logf("already stopping");
-        goto not_recording_or_stopping;
+        goto not_recording;
     }
 
-    is_stopping = true;
-    dma_lock    = true;    /* lock dma write position */
-    queue_post(&pcmrec_queue, PCMREC_FINISH_STOP, NULL);
+    dma_lock = true;    /* lock dma write position */
+    queue_reply(&pcmrec_queue, NULL);
 
-not_recording_or_stopping:
-    logf("pcmrec_stop done");
-} /* pcmrec_stop */
-
-/* PCMREC_FINISH_STOP */
-static void pcmrec_finish_stop(void)
-{
-    logf("pcmrec_finish_stop");
-    
-    if (!is_stopping)
-    {
-        logf("not stopping");
-        goto not_stopping;
-    }
-    
     /* flush all available data first to avoid overflow while waiting
        for encoding to finish */
     pcmrec_flush(-1);
@@ -1367,12 +1351,11 @@ static void pcmrec_finish_stop(void)
 
     is_recording = false;
     is_paused    = false;
-    is_stopping  = false;
     dma_lock     = pre_record_ticks == 0;
 
-not_stopping:
-    logf("pcmrec_finish_stop done");
-} /* pcmrec_finish_stop */
+not_recording:
+    logf("pcmrec_stop done");
+} /* pcmrec_stop */
 
 /* PCMREC_PAUSE */
 static void pcmrec_pause(void)
@@ -1430,7 +1413,7 @@ static void pcmrec_thread(void)
 
     while(1)
     {
-        if (is_recording && !is_stopping)
+        if (is_recording)
         {
             /* Poll periodically to flush data */
             queue_wait_w_tmo(&pcmrec_queue, &ev, HZ/5);
@@ -1469,10 +1452,6 @@ static void pcmrec_thread(void)
 
             case PCMREC_STOP:
                 pcmrec_stop();
-                break;
-
-            case PCMREC_FINISH_STOP:
-                pcmrec_finish_stop();
                 break;
 
             case PCMREC_PAUSE:
