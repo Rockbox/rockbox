@@ -2047,7 +2047,6 @@ unsigned long audio_num_recorded_bytes(void)
     return 5 * 1024 * 1024;
 }
 
-#if CONFIG_CODEC == SWCODEC
 void rec_set_source(int source, unsigned flags)
 {
     source = source;
@@ -2067,7 +2066,6 @@ bool audio_get_spdif_power_setting(void)
 }
 #endif /* HAVE_SPDIF_POWER */
 #endif /* HAVE_SPDIF_IN */
-#endif /* CONFIG_CODEC == SWCODEC */
 
 void audio_set_recording_options(struct audio_recording_options *options)
 {
@@ -2079,6 +2077,11 @@ void audio_set_recording_gain(int left, int right, int type)
     left = left;
     right = right;
     type = type;
+}
+
+void audio_record(const char *filename)
+{
+    filename = filename;
 }
 
 void audio_stop_recording(void)
@@ -2101,16 +2104,6 @@ void pcm_calculate_rec_peaks(int *left, int *right)
         *right = 0;
 }
 
-void audio_record(const char *filename)
-{
-    filename = filename;
-}
-
-void audio_new_file(const char *filename)
-{
-    filename = filename;
-}
-
 unsigned long pcm_rec_status(void)
 {
     return 0;
@@ -2118,6 +2111,5 @@ unsigned long pcm_rec_status(void)
 
 #endif /* #ifdef SIMULATOR */
 #endif /* #ifdef CONFIG_CODEC == SWCODEC */
-
 
 #endif /* HAVE_RECORDING */
