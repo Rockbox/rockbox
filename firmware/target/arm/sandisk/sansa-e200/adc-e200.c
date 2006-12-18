@@ -50,7 +50,11 @@ unsigned short adc_scan(int channel)
     adc_data_2 = ((ADC_DATA_2 >> (8*channel+6)) & 0x3);
 
     adcdata[channel] = (adc_data_1<<2 | adc_data_2);
-
+    
+    /* FIXME: Hardcode a value for ~82% charge in here until we figure out the
+       ADC. This will avoid the low battery warning message. */
+    adcdata[ADC_UNREG_POWER] = 0x2C0;
+    
     return adcdata[channel];
 }
 
