@@ -262,8 +262,10 @@ drivers/i2c-pnx0101.c
 /* no i2c driver yet */
 #endif
 #if defined(CPU_PP)
+#ifndef BOOTLOADER
 target/arm/pcm-pp.c
 target/arm/audio-pp.c
+#endif
 target/arm/crt0-pp.S
 #elif defined(CPU_ARM)
 target/arm/crt0.S
