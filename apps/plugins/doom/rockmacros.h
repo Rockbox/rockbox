@@ -37,6 +37,7 @@ char *my_strtok( char * s, const char * delim );
 #define alloca             __builtin_alloca
 #define fdprintf(...)       rb->fdprintf(__VA_ARGS__)
 #define vsnprintf(...)     rb->vsnprintf(__VA_ARGS__)
+#define read_line(a,b,c)   rb->read_line((a),(b),(c))
 
 #ifdef SIMULATOR
 #undef opendir
