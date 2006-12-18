@@ -39,10 +39,9 @@ playlists:
 Rockbox can create playlists in four different ways.
 
 \subsubsection{By playing a song}
-Whenever a song is selected from the \setting{File Browser} using the
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect} button, Rockbox will
-automatically create a playlist containing all of the songs in the directory
-in which that song is located.
+Whenever a song is selected from the \setting{File Browser} with
+\ActionTreeEnter, Rockbox will automatically create a playlist containing
+all of the songs in the directory in which that song is located.
 
 \note{If you already have already created a dynamic playlist, playing a new
   song will \emph{erase} the current playlist and create a new one. If you
@@ -50,10 +49,29 @@ in which that song is located.
   playlist, see the section below on ``Adding music to playlists.''}
 
 \subsubsection{By using Insert and Queue functions}
+If playback is stopped, the \setting{Insert} and \setting{Queue} functions
+can be used as described in the next section to create a new playlist instead
+of adding to an existing one.
 
-\subsubsection{By using the Playlist Catalog}
+\subsubsection{By using the Playlist catalog}
+The \setting{Playlist catalog} makes it possible to modify and create playlists
+that are not currently playing. To do this select \setting{Playlist catalog}
+in the \setting{File Menu}. There you will have two choices,
+\setting{Add to playlist} adds the selected track or directory to an existing
+playlist and \setting{Add to a new playlist} creates a new playlist containing
+the selected track or directory.
+
+\note{All playlists in the \setting{Playlist catalog} are stored in the
+  \fname{Playlists} directory in the root of your \daps{} harddisk and
+  playlists stored in other locations are not included in the catalog. It is
+  however possible to move existing playlists there (see
+  \reference{ref:Filemenu}).}
 
 \subsubsection{By using the Main Menu}
+To create a playlist containing all music on your \dap{}, you can use the
+\setting{Create Playlist} command in the \setting{Playlist Options} menu found
+in the \setting{Main Menu}. The created playlist will be named
+\fname{root.m3u} and saved in the root of your \daps{} harddisk.
 
 \subsection{Adding music to playlists}
   
@@ -68,9 +86,10 @@ selected tracks are added to the playlist is determined by the following
 options:
 
 \begin{description} 
-\item [Insert.] Add track(s) to playlist. If no other tracks have been
-  inserted then the selected track will be added immediately after current
-  playing track, otherwise they will be added to end of insertion list.
+\item [Insert.] Add track(s) immediately after any tracks added via the most
+  recent \setting{Insert} operation. If no tracks have yet been added via an
+  \setting{Insert}, new tracks will be added immediately after the current
+  playing track.
   
 \item [Insert next.] Add track(s) immediately after current playing
   track, no matter what else has been inserted.
