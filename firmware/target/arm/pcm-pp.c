@@ -32,7 +32,6 @@
 
 
 /* peaks */
-static int play_peak_left, play_peak_right;
 static unsigned long *rec_peak_addr;
 static int rec_peak_left, rec_peak_right;
 

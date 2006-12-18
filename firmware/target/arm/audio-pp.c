@@ -31,8 +31,9 @@ void audio_set_source(int source, unsigned flags)
 {
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
-    bool recording = flags & SRCF_RECORDING;
+#ifdef CONFIG_TUNER
     static bool last_recording = false;
+#endif
 
     switch (source)
     {
