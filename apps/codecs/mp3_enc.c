@@ -2274,7 +2274,7 @@ static void encode_frame(char *buffer, struct enc_chunk_hdr *chunk)
     memcpy(chunk->enc_data, CodedData.bbuf, chunk->enc_size);
 #else
     /* swap frame to big endian */
-    byte_swap_frame32(chunk->enc_data, CodedData.bbuf, chunk->enc_size);
+    byte_swap_frame32((uint32_t *)chunk->enc_data, CodedData.bbuf, chunk->enc_size);
 #endif
 } /* encode_frame */
 
