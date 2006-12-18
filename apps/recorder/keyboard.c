@@ -54,6 +54,7 @@
 
 #elif (CONFIG_KEYPAD == IPOD_3G_PAD) || (CONFIG_KEYPAD == IPOD_4G_PAD)
 #define KBD_MODES /* iPod uses 2 modes, picker and line edit */
+#define KBD_MORSE_INPUT
 
 #elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
 #define KBD_MODES /* iFP7xx uses 2 modes, picker and line edit */
