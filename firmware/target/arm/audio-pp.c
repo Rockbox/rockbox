@@ -29,6 +29,7 @@ void audio_set_output_source(int source)
 
 void audio_set_source(int source, unsigned flags)
 {
+    (void)flags;
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
 #ifdef CONFIG_TUNER
@@ -39,6 +40,7 @@ void audio_set_source(int source, unsigned flags)
     {
         default:                        /* playback - no recording */
             source = AUDIO_SRC_PLAYBACK;
+#ifdef HAVE_RECORDING
         case AUDIO_SRC_PLAYBACK:
             if (source != last_source)
             {
@@ -46,7 +48,6 @@ void audio_set_source(int source, unsigned flags)
                 audiohw_set_monitor(false);
             }
         break;
-
         case AUDIO_SRC_MIC:             /* recording only */
             if (source != last_source)
             {
@@ -62,6 +63,7 @@ void audio_set_source(int source, unsigned flags)
                 audiohw_set_monitor(false);
             }
         break;
+#endif
 #ifdef CONFIG_TUNER
         case AUDIO_SRC_FMRADIO:         /* recording and playback */
             if (!recording)

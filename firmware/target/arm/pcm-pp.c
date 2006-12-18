@@ -32,8 +32,10 @@
 
 
 /* peaks */
+#ifdef HAVE_RECORDING
 static unsigned long *rec_peak_addr;
 static int rec_peak_left, rec_peak_right;
+#endif
 
 /** DMA **/
 #if CONFIG_CPU == PP5020
@@ -356,6 +358,7 @@ void pcm_init(void)
 /****************************************************************************
  ** Recording DMA transfer
  **/
+#ifdef HAVE_RECORDING
 static short peak_l, peak_r IBSS_ATTR;
 
 void fiq_record(void) ICODE_ATTR __attribute__ ((interrupt ("FIQ")));
@@ -502,6 +505,7 @@ void pcm_calculate_rec_peaks(int *left, int *right)
     *left = rec_peak_left;
     *right = rec_peak_right;
 }
+#endif
 
 /*
  * This function goes directly into the DMA buffer to calculate the left and
