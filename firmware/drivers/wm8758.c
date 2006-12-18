@@ -223,7 +223,7 @@ void audiohw_enable_recording(bool source_mic)
 
     /* The iPod can handle multiple frequencies, but fix at 44.1KHz
        for now */
-    wmcodec_set_sample_rate(WM8758_44100HZ);
+    audiohw_set_sample_rate(WM8758_44100HZ);
 
     wmcodec_write(INCTRL,0x44);  /* Connect L2 and R2 inputs */
 
@@ -248,11 +248,11 @@ void audiohw_enable_recording(bool source_mic)
     wmcodec_write(LOUTMIX,0x17); /* Enable output mixer - BYPL2LMIX @ 0db*/
     wmcodec_write(ROUTMIX,0x17); /* Enable output mixer - BYPR2RMIX @ 0db*/
 
-    wmcodec_mute(0);
+    audiohw_mute(0);
 }
 
 void audiohw_disable_recording(void) {
-    wmcodec_mute(1);
+    audiohw_mute(1);
 
     wmcodec_write(PWRMGMT3, 0x0);
 

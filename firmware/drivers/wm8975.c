@@ -256,7 +256,7 @@ void audiohw_enable_recording(bool source_mic)
     wmcodec_write(0x07, 0x42);
 
     /* The iPod can handle multiple frequencies, but fix at 44.1KHz for now */
-    wmcodec_set_sample_rate(WM8975_44100HZ);
+    audiohw_set_sample_rate(WM8975_44100HZ);
 
     /* unmute inputs */
     wmcodec_write(0x00, 0x17);               /* LINVOL (def 0dB) */
