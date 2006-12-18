@@ -166,6 +166,12 @@ static const struct button_mapping button_context_keyboard[]  = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_recscreen */
+
 /* get_context_mapping returns a pointer to one of the above defined arrays depending on the context */
 const struct button_mapping* get_context_mapping(int context)
 {
@@ -202,6 +208,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
         default:
             return button_context_standard;
     } 

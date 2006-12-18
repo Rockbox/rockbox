@@ -224,13 +224,80 @@ void audiohw_set_sample_rate(int sampling_control) {
 
 }
 
-void audiohw_enable_recording(bool source_mic) {
+void audiohw_enable_recording(bool source_mic)
+{
+     (void)source_mic;
 
-    (void)source_mic;
+    /* reset the I2S controller into known state */
+    i2s_reset();
+
+    /*
+     * 1. Switch on power supplies.
+     *    By default the WM8750L is in Standby Mode, the DAC is
+     *    digitally muted and the Audio Interface, Line outputs
+     *    and Headphone outputs are all OFF (DACMU = 1 Power
+     *    Management registers 1 and 2 are all zeros).
+     */
+    wmcodec_write(0x0f, 0x1ff);
+    wmcodec_write(0x0f, 0x000);
+
+     /* 2. Enable Vmid and VREF. */
+    wmcodec_write(0x19, 0xc0);               /*Pwr Mgmt(1)*/
+
+     /* 3. Enable ADCs as required. */
+    wmcodec_write(0x19, 0xcc);               /*Pwr Mgmt(1)*/
+    wmcodec_write(0x1a, 0x180);              /*Pwr Mgmt(2)*/
+
+     /* 4. Enable line and / or headphone output buffers as required. */
+    wmcodec_write(0x19, 0xfc);               /*Pwr Mgmt(1)*/
+
+    /* BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0 LRP=0 */
+    /* IWL=00(16 bit) FORMAT=10(I2S format) */
+    wmcodec_write(0x07, 0x42);
+
+    /* The iPod can handle multiple frequencies, but fix at 44.1KHz for now */
+    wmcodec_set_sample_rate(WM8975_44100HZ);
+
+    /* unmute inputs */
+    wmcodec_write(0x00, 0x17);               /* LINVOL (def 0dB) */
+    wmcodec_write(0x01, 0x117);              /* RINVOL (def 0dB) */
+
+    wmcodec_write(0x15, 0x1d7);                /* LADCVOL max vol x was ff */
+    wmcodec_write(0x16, 0x1d7);                /* RADCVOL max vol x was ff */
+
+    if (source_mic) {
+        /* VSEL=10(def) DATSEL=10 (use right ADC only) */
+        wmcodec_write(0x17, 0xc8);                 /* Additional control(1) */
+
+        /* VROI=1 (sets output resistance to 40kohms) */
+        wmcodec_write(0x1b, 0x40);                 /* Additional control(3) */
+
+        /* LINSEL=1 (LINPUT2) LMICBOOST=10 (20dB boost) */
+        wmcodec_write(0x20, 0x60);               /* ADCL signal path */
+        wmcodec_write(0x21, 0x60);               /* ADCR signal path */
+    } else {
+        /* VSEL=10(def) DATSEL=00 (left->left, right->right) */
+        wmcodec_write(0x17, 0xc0);                 /* Additional control(1) */
+
+        /* VROI=1 (sets output resistance to 40kohms) */
+        wmcodec_write(0x1b, 0x40);                 /* Additional control(3) */
+
+        /* LINSEL=0 (LINPUT1) LMICBOOST=00 (bypass boost) */
+        wmcodec_write(0x20, 0x00);               /* ADCL signal path */
+        /* RINSEL=0 (RINPUT1) RMICBOOST=00 (bypass boost) */
+        wmcodec_write(0x21, 0x00);               /* ADCR signal path */
+    }
 }
-
+ 
 void audiohw_disable_recording(void) {
+    /* 1. Set DACMU = 1 to soft-mute the audio DACs. */
+    wmcodec_write(0x05, 0x8);
 
+    /* 2. Disable all output buffers. */
+    wmcodec_write(0x1a, 0x0);        /*Pwr Mgmt(2)*/
+
+    /* 3. Switch off the power supplies. */
+    wmcodec_write(0x19, 0x0);        /*Pwr Mgmt(1)*/
 }
 
 void audiohw_set_recvol(int left, int right, int type) {

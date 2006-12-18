@@ -100,7 +100,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 56
+#define CONFIG_BLOCK_VERSION 57
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -521,13 +521,26 @@ static const struct bit_entry hd_bits[] =
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_UDA1380
     {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
-#endif
-#ifdef HAVE_TLV320
-    /* TLV320 only has no mic boost or 20db mic boost */
-    {1, S_O(rec_mic_gain), 0 /* 0 dB */, "rec mic gain", NULL }, /* 0db or 20db */
-#endif
     {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
     {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#elif defined(HAVE_TLV320)
+    /* TLV320 only has no mic boost or 20db mic boost */
+    {1, S_O(rec_mic_gain), 0 /* 0 dB */, "rec mic gain", NULL }, /* 0db or 20db */
+    {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
+    {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#elif defined(HAVE_WM8975)
+    {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
+    {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
+    {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#elif defined(HAVE_WM8758)
+    {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
+    {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
+    {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#elif defined(HAVE_WM8731)
+    {8|SIGNED, S_O(rec_mic_gain), 16 /* 8 dB */, "rec mic gain", NULL }, /* -128...+108 */
+    {8|SIGNED, S_O(rec_left_gain), 0, "rec left gain", NULL }, /* -128...+96 */
+    {8|SIGNED, S_O(rec_right_gain), 0, "rec right gain", NULL }, /* -128...+96 */
+#endif
     {REC_FREQ_CFG_NUM_BITS, S_O(rec_frequency), REC_FREQ_DEFAULT,
         "rec frequency", REC_FREQ_CFG_VAL_LIST },
     {REC_FORMAT_CFG_NUM_BITS ,S_O(rec_format), REC_FORMAT_DEFAULT,

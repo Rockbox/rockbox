@@ -112,7 +112,19 @@ static const struct sound_settings_info sound_settings_table[] = {
     [SOUND_LEFT_GAIN]     = {"dB", 1,  1,   0,  31,  23, NULL},
     [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,   0,  31,  23, NULL},
     [SOUND_MIC_GAIN]      = {"dB", 1,  1,   0,   1,   1, NULL},
- #endif
+#elif defined(HAVE_WM8975)
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
+#elif defined(HAVE_WM8758)
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
+#elif defined(HAVE_WM8731)
+    [SOUND_LEFT_GAIN]     = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_RIGHT_GAIN]    = {"dB", 1,  1,-128,  96,   0, NULL},
+    [SOUND_MIC_GAIN]      = {"dB", 1,  1,-128, 108,  16, NULL},
+#endif
 };
 
 const char *sound_unit(int setting)

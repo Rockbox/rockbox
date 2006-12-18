@@ -298,6 +298,12 @@ static const struct button_mapping button_context_bmark[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_bmark */
 
+const struct button_mapping button_context_recscreen[]  = {
+    { ACTION_REC_PAUSE,             BUTTON_PLAY,                BUTTON_NONE },
+    
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
+}; /* button_context_recscreen */
+
 static const struct button_mapping* get_context_mapping_remote( int context )
 {
     context ^= CONTEXT_REMOTE;
@@ -325,6 +331,8 @@ static const struct button_mapping* get_context_mapping_remote( int context )
             return remote_button_context_quickscreen;
         case CONTEXT_PITCHSCREEN:
             return remote_button_context_pitchscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
 
         default:
             return remote_button_context_standard;
@@ -374,6 +382,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
 
         default:
             return button_context_standard;

@@ -59,7 +59,7 @@ struct aiff_header aiff_header =
     H_TO_BE32(18),                      /* comm_size             */
     0,                                  /* num_channels      (*) */
     0,                                  /* num_sample_frames (*) */
-    H_TO_BE32(PCM_DEPTH_BITS),          /* sample_size           */
+    H_TO_BE16(PCM_DEPTH_BITS),          /* sample_size           */
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },   /* sample_rate       (*) */
     { 'S', 'S', 'N', 'D' },             /* ssnd_id               */
     0,                                  /* ssnd_size         (*) */

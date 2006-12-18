@@ -220,12 +220,73 @@ void audiohw_set_sample_rate(int sampling_control)
 
 void audiohw_enable_recording(bool source_mic)
 {
-    (void)source_mic;
+    static int line_level = 0x17;
+    static int mic_boost = true;
+    codec_set_active(0x0);
+    
+    /* set BCLKINV=0(Dont invert BCLK) MS=1(Enable Master) LRSWAP=0
+     * LRP=0 IWL=00(16 bit) FORMAT=10(I2S format) */
+    wmcodec_write(AINTFCE, 0x42);
+    
+    wmcodec_write(LOUTVOL, 0x0);   /* headphone mute left */
+    wmcodec_write(ROUTVOL, 0x0);   /* headphone mute right */
+
+    
+    if(source_mic){
+        wmcodec_write(LINVOL, 0x80);  /* line in mute left */
+        wmcodec_write(RINVOL, 0x80);  /* line in mute right */
+
+
+        if (mic_boost) {
+            wmcodec_write(AAPCTRL, 0x5);   /* INSEL=mic, MIC_BOOST=enable */
+        } else {
+            wmcodec_write(AAPCTRL, 0x4);   /* INSEL=mic */
+        }
+    } else {
+        if (line_level == 0) {
+            wmcodec_write(LINVOL, 0x80);
+            wmcodec_write(RINVOL, 0x80);
+        } else {
+            wmcodec_write(LINVOL, line_level);
+            wmcodec_write(RINVOL, line_level);
+        }
+        wmcodec_write(AAPCTRL, 0xa);   /* BY PASS, mute mic, INSEL=line in */
+    }
+    
+    /* disable ADC high pass filter, mute dac */
+    wmcodec_write(DACCTRL, 0x9);
+    
+    /* power on (PWR_OFF=0) */
+    if(source_mic){
+        /* CLKOUTPD OSCPD OUTPD DACPD LINEINPD */
+        wmcodec_write(PWRMGMT, 0x79);
+    } else {
+    	wmcodec_write(PWRMGMT, 0x7a);  /* MICPD */
+    }
+    
+    codec_set_active(0x1);
 }
 
 void audiohw_disable_recording(void)
 {
-
+    /* set DACMU=1 DEEMPH=0 */
+    wmcodec_write(DACCTRL, 0x8);
+    
+    /* ACTIVE=0 */
+    codec_set_active(0x0);
+    
+    /* line in mute left & right*/
+    wmcodec_write(LINVOL, 0x80);
+    wmcodec_write(RINVOL, 0x80);
+    
+    /* set DACSEL=0, MUTEMIC=1 */
+    wmcodec_write(AAPCTRL, 0x2);
+    
+    /* set POWEROFF=0 OUTPD=0 DACPD=1 */
+    wmcodec_write(PWRMGMT, 0x6f);
+    
+    /* set POWEROFF=1 OUTPD=1 DACPD=1 */
+    wmcodec_write(PWRMGMT, 0xff);
 }
 
 void audiohw_set_recvol(int left, int right, int type)

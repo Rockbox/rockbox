@@ -55,6 +55,11 @@ extern void audiohw_set_equalizer_band(int band, int freq, int bw, int gain);
 #define CLKCTRL    0x06
 #define SRATECTRL  0x07
 #define DACCTRL    0x0a
+#define INCTRL     0x2c
+#define LINPGAVOL  0x2d
+#define RINPGAVOL  0x2e
+#define LADCBOOST  0x2f
+#define RADCBOOST  0x30
 #define OUTCTRL    0x31
 #define LOUTMIX    0x32
 #define ROUTMIX    0x33

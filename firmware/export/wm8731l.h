@@ -49,6 +49,7 @@ extern void audiohw_set_monitor(int enable);
 #define RINVOL        0x01
 #define LOUTVOL       0x02
 #define ROUTVOL       0x03
+#define AAPCTRL       0x04  /* Analog audio path control */
 #define DACCTRL       0x05
 #define PWRMGMT       0x06
 #define AINTFCE       0x07

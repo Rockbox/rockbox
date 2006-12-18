@@ -78,6 +78,9 @@
 #endif
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && !defined(SIMULATOR)
 #include "pcm_record.h"
+#endif
+
+#ifdef BUTTON_REC
 #define SETTINGS_RESET BUTTON_REC
 #endif
 

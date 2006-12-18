@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Driver for WM8758 audio codec
+ * Driver for WM8758 audio codec - based on datasheet for WM8983
  *
  * Based on code from the ipodlinux project - http://ipodlinux.org/
  * Adapted for Rockbox in December 2005
@@ -142,30 +142,11 @@ int audiohw_set_mixer_vol(int channel1, int channel2)
 void audiohw_set_bass(int value)
 {
     (void)value;
-#if 0
-    /* Not yet implemented - this is the wm8975 code*/
-    int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
-
-    if ((value >= -6) && (value <= 9)) {
-        /* We use linear bass control with 130Hz cutoff */
-        wmcodec_write(BASSCTRL, regvalues[value+6]);
-    }
-#endif
 }
 
 void audiohw_set_treble(int value)
 {
     (void)value;
-#if 0
-    /* Not yet implemented - this is the wm8975 code*/
-    int regvalues[]={11, 10, 10,  9,  8,  8, 0xf , 6, 6, 5, 4, 4, 3, 2, 1, 0};
-
-    if ((value >= -6) && (value <= 9)) {
-        /* We use a 8Khz cutoff */
-        wmcodec_write(TREBCTRL, regvalues[value+6]);
-    }
-#endif
-
 }
 
 int audiohw_mute(int mute)
@@ -224,11 +205,60 @@ void audiohw_set_sample_rate(int sampling_control)
 
 void audiohw_enable_recording(bool source_mic)
 {
-    (void)source_mic;
+    (void)source_mic; /* We only have a line-in (I think) */
+ 
+    /* reset the I2S controller into known state */
+    i2s_reset();
+ 
+    wmcodec_write(RESET, 0x1ff);    /*Reset*/
+    
+    wmcodec_write(PWRMGMT1, 0x2b);
+    wmcodec_write(PWRMGMT2, 0x18f);  /* Enable ADC - 0x0c enables left/right PGA input, and 0x03 turns on power to the ADCs */
+    wmcodec_write(PWRMGMT3, 0x6f);
+
+    wmcodec_write(AINTFCE, 0x10);
+    wmcodec_write(CLKCTRL, 0x49);
+
+    wmcodec_write(OUTCTRL, 1);
+
+    /* The iPod can handle multiple frequencies, but fix at 44.1KHz
+       for now */
+    wmcodec_set_sample_rate(WM8758_44100HZ);
+
+    wmcodec_write(INCTRL,0x44);  /* Connect L2 and R2 inputs */
+
+    /* Set L2/R2_2BOOSTVOL to 0db (bits 4-6) */
+    /* 000 = disabled
+       001 = -12dB
+       010 = -9dB
+       011 = -6dB
+       100 = -3dB
+       101 = 0dB
+       110 = 3dB
+       111 = 6dB
+    */
+    wmcodec_write(LADCBOOST,0x50);
+    wmcodec_write(RADCBOOST,0x50);
+
+    /* Set L/R input PGA Volume to 0db */
+    //    wm8758_write(LINPGAVOL,0x3f);
+    //    wm8758_write(RINPGAVOL,0x13f);
+
+    /* Enable monitoring */
+    wmcodec_write(LOUTMIX,0x17); /* Enable output mixer - BYPL2LMIX @ 0db*/
+    wmcodec_write(ROUTMIX,0x17); /* Enable output mixer - BYPR2RMIX @ 0db*/
+
+    wmcodec_mute(0);
 }
 
 void audiohw_disable_recording(void) {
+    wmcodec_mute(1);
 
+    wmcodec_write(PWRMGMT3, 0x0);
+
+    wmcodec_write(PWRMGMT1, 0x0);
+ 
+    wmcodec_write(PWRMGMT2, 0x40);
 }
 
 void audiohw_set_recvol(int left, int right, int type) {

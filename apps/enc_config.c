@@ -159,9 +159,9 @@ static bool mp3_enc_bitrate(struct encoder_config *cfg)
             MPEG1_BITR_CAPS | MPEG2_BITR_CAPS, mp3_enc_bitr,
             MPEG1_BITR_CAPS
 #ifdef HAVE_MPEG2_SAMPR
-            | (MPEG2_BITR_CAPS & ~(MP3_BITR_CAP_144 | MP3_BITR_CAP_8)),
+            | (MPEG2_BITR_CAPS & ~(MP3_BITR_CAP_144 | MP3_BITR_CAP_8))
 #endif
-            rate_list);
+            , rate_list);
 
     int index = round_value_to_list32(cfg->mp3_enc.bitrate, rate_list,
                                       n_rates, false);

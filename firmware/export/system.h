@@ -314,8 +314,11 @@ static inline int set_irq_level(int level)
     return (cpsr >> 7) & 1;
 }
 
-static inline void enable_fiq(void)
+static inline void enable_fiq(void(*fiq_handler)(void))
 {
+    /* Install the FIQ handler */
+    *((unsigned int*)(15*4)) = (unsigned int)fiq_handler;
+
     /* Clear FIQ disable bit */
     asm volatile (
         "mrs     r0, cpsr         \n"\
