@@ -61,42 +61,73 @@ char* strlwr(char* str)
 // (e.g. from wads)
 
 typedef struct {
-   const byte *inp, *lump; // Pointer to string or FILE
-   long size;
+    const byte *inp; // Pointer to string
+    size_t size;     // Bytes remaining in string
+    int fd;          // Current file descriptor 
 } DEHFILE;
 
 // killough 10/98: emulate IO whether input really comes from a file or not
 
 char *dehfgets(char *buf, size_t n, DEHFILE *fp)
 {
-//   if (!fp->lump)                                     // If this is a real file,
-//      return (fgets)(buf, n, (FILE *) fp->inp);        // return regular fgets
-   if (!n || !*fp->inp || fp->size<=0)                // If no more characters
-      return NULL;
-   if (n==1)
-      fp->size--, *buf = *fp->inp++;
-   else
-   {                                                // copy buffer
-      char *p = buf;
-      while (n>1 && *fp->inp && fp->size &&
-             (n--, fp->size--, *p++ = *fp->inp++) != '\n')
-         ;
-      *p = 0;
+   char *p;
+
+   if (fp->fd >= 0)
+   {                                               // If this is a real file,
+      int r = read_line(fp->fd, buf, (unsigned)n); // return regular line read
+      return (r > 0) ? buf : NULL;
    }
-   return buf;                                        // Return buffer pointer
+
+   n = MIN(fp->size, n);
+
+   if (n == 0 || *fp->inp == '\0')   // If no more characters
+      return NULL;
+
+   p = buf;
+
+   while (--n > 0)
+   {
+      unsigned char c = *fp->inp++;
+      fp->size--;
+
+      if ( c == '\n' )
+         break;
+
+      if ( c != '\r' )
+         *p++ = c;
+   }
+
+   *p = '\0';
+
+   return buf;                       // Return buffer pointer
 }
 
 int dehfeof(DEHFILE *fp)
 {
-   return //!fp->lump ? (feof)((FILE *) fp->inp) : 
-!*fp->inp || fp->size<=0;
+   if (fp->fd >= 0)
+   {
+      off_t size   = filesize(fp->fd);
+      off_t offset = lseek(fp->fd, 0, SEEK_CUR);
+      return (size <= 0 || offset < 0 || offset >= size) ? 1 : 0;
+   }
+
+   return (fp->size == 0 || *fp->inp == '\0') ? 1 : 0;
 }
 
 int dehfgetc(DEHFILE *fp)
 {
-   return //!fp->lump ? (fgetc)((FILE *) fp->inp) : 
-fp->size > 0 ?
-          fp->size--, *fp->inp++ : EOF;
+   if (fp->fd >= 0)
+   {
+      unsigned char c;
+      if (read(fp->fd, &c, 1) == 1)
+         return (unsigned int)c;
+   }
+   else if (fp->size > 0)
+   {
+      return fp->size--, *fp->inp++;
+   }
+
+   return EOF;
 }
 
 
@@ -953,7 +984,6 @@ const char **const mapnamest[] = // TNT WAD map names.
    };
 
 // Function prototypes
-void    lfstrip(char *);     // strip the \r and/or \n off of a line
 void    rstrip(char *);      // strip trailing whitespace
 char *  ptr_lstrip(char *);  // point past leading whitespace
 boolean deh_GetData(char *, char *, uint_64_t *, char **, int );
@@ -1443,45 +1473,48 @@ static actionf_t deh_codeptr[NUMSTATES];
 
 void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
 {
-   static int fileout;       // In case -dehout was used
+   static int fileout = -1;       // In case -dehout was used
    DEHFILE infile, *filein = &infile;    // killough 10/98
    char inbuffer[DEH_BUFFERMAX];  // Place to put the primary infostring
 
    // Open output file if we're writing output
-   if (outfilename && *outfilename && !fileout)
+   if (outfilename && *outfilename && fileout < 0)
    {
       static boolean firstfile = true; // to allow append to output log
-      if (!strcmp(outfilename, "-"))
-         fileout = 0;
-      else
-         if ((fileout=open(outfilename, firstfile ? O_WRONLY | O_CREAT : O_RDONLY)) < 0 )
+      if (strcmp(outfilename, "-"))
+      {
+         fileout = open(outfilename, firstfile ? O_WRONLY | O_CREAT :
+                                                 O_WRONLY | O_APPEND);
+         if (fileout < 0)
          {
             printf( "Could not open -dehout file %s\n... using stdout.\n",
                     outfilename);
-            fileout = 0;
          }
+      }
       firstfile = false;
    }
 
    // killough 10/98: allow DEH files to come from wad lumps
    if (filename)
    {
-      if ((intptr_t)(infile.inp = (void *)(intptr_t)open(filename,O_RDONLY))<0)
+      if ((infile.fd = open(filename,O_RDONLY)) < 0)
       {
          printf( "-deh file %s not found\n",filename);
          return;  // should be checked up front anyway
       }
-      infile.lump = NULL;
+      infile.inp = NULL;
    }
    else  // DEH file comes from lump indicated by third argument
    {
-      infile.size = W_LumpLength(lumpnum);
-      infile.inp = infile.lump = W_CacheLumpNum(lumpnum);
+      int size = W_LumpLength(lumpnum);
+      infile.size = (size < 0) ? 0 : (ssize_t)size;
+      infile.inp  = W_CacheLumpNum(lumpnum);
       filename = "(WAD)";
    }
 
    printf("Loading DEH file %s\n",filename);
-   if (fileout) fdprintf(fileout,"\nLoading DEH file %s\n\n",filename);
+   if (fileout >= 0)
+      fdprintf(fileout,"\nLoading DEH file %s\n\n",filename);
 
    {
       static int i;   // killough 10/98: only run once, by keeping index static
@@ -1495,8 +1528,9 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
    {
       unsigned int i;
 
-      lfstrip(inbuffer);
-      if (fileout) fdprintf(fileout,"Line='%s'\n",inbuffer);
+      if (fileout >= 0)
+         fdprintf(fileout,"Line='%s'\n",inbuffer);
+
       if (!*inbuffer || *inbuffer == '#' || *inbuffer == ' ')
          continue; /* Blank line or comment line */
 
@@ -1517,11 +1551,12 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
          // killough 10/98: exclude if inside wads (only to discourage
          // the practice, since the code could otherwise handle it)
 
-         if (infile.lump)
+         if (infile.inp)
          {
-            if (fileout)
+            if (fileout >= 0)
                fdprintf(fileout,
-                      "No files may be included from wads: %s\n",inbuffer);
+                        "No files may be included from wads: %s\n",
+                        inbuffer);
             continue;
          }
 
@@ -1531,7 +1566,7 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
          if (!strncasecmp(nextfile = ptr_lstrip(inbuffer+7),"NOTEXT",6))
             includenotext = true, nextfile = ptr_lstrip(nextfile+6);
 
-         if (fileout)
+         if (fileout >= 0)
             fdprintf(fileout,"Branching to include file %s...\n", nextfile);
 
          // killough 10/98:
@@ -1540,14 +1575,15 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
          ProcessDehFile(nextfile,NULL,0); // do the included file
 
          includenotext = oldnotext;
-         if (fileout) fdprintf(fileout,"...continuing with %s\n",filename);
+         if (fileout >= 0)
+            fdprintf(fileout,"...continuing with %s\n",filename);
          continue;
       }
 
       for (i=0; i<DEH_BLOCKMAX; i++)
          if (!strncasecmp(inbuffer,deh_blocks[i].key,strlen(deh_blocks[i].key)))
          { // matches one
-            if (fileout)
+            if (fileout >= 0)
                fdprintf(fileout,"Processing function [%d] for %s\n",
                        i, deh_blocks[i].key);
             deh_blocks[i].fptr(filein,fileout,inbuffer);  // call function
@@ -1555,12 +1591,22 @@ void ProcessDehFile(const char *filename, const char *outfilename, int lumpnum)
          }
    }
 
-   if (infile.lump)
-      W_UnlockLumpNum(lumpnum);                 // Mark purgable
-   else
-      close((int)(intptr_t) infile.inp);              // Close real file
+   if (infile.inp)
+   {
+      W_UnlockLumpNum(lumpnum);      // Mark purgable
+   }
 
-   close(fileout);
+   if (infile.fd >= 0)
+   {
+      close(infile.fd);              // Close real file
+      infile.fd = -1;
+   }
+
+   if (fileout >= 0)
+   {
+      close(fileout);
+      fileout = -1;
+   }
 }
 
 // ====================================================================
@@ -1587,7 +1633,6 @@ void deh_procBexCodePointers(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;   // killough 11/98: really exit on blank line
 
       // killough 8/98: allow hex numbers in input:
@@ -1760,7 +1805,6 @@ void deh_procThing(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);  // toss the end of line
 
       // killough 11/98: really bail out on blank lines (break != continue)
       if (!*inbuffer) break;  // bail out with blank line between sections
@@ -1866,7 +1910,6 @@ void deh_procFrame(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;         // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -1957,7 +2000,6 @@ void deh_procPointer(DEHFILE *fpin, int fpout, char *line) // done
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;       // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -2023,7 +2065,6 @@ void deh_procSounds(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;         // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -2091,7 +2132,6 @@ void deh_procAmmo(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;       // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -2137,7 +2177,6 @@ void deh_procWeapon(DEHFILE *fpin, int fpout, char *line)
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;       // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -2193,7 +2232,6 @@ void deh_procSprite(DEHFILE *fpin, int fpout, char *line) // Not supported
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;      // killough 11/98
       // ignore line
       if (fpout) fdprintf(fpout,"- %s\n",inbuffer);
@@ -2237,7 +2275,7 @@ void deh_procPars(DEHFILE *fpin, int fpout, char *line) // extension
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(strlwr(inbuffer)); // lowercase it
+      strlwr(inbuffer); // lowercase it
       if (!*inbuffer) break;      // killough 11/98
       if (3 != sscanf(inbuffer,"par %d %d %d",&episode, &level, &partime))
       { // not 3
@@ -2314,7 +2352,6 @@ void deh_procCheat(DEHFILE *fpin, int fpout, char *line) // done
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;       // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,&strval,fpout)) // returns TRUE if ok
       {
@@ -2386,7 +2423,6 @@ void deh_procMisc(DEHFILE *fpin, int fpout, char *line) // done
    while (!dehfeof(fpin) && *inbuffer && (*inbuffer != ' '))
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
-      lfstrip(inbuffer);
       if (!*inbuffer) break;    // killough 11/98
       if (!deh_GetData(inbuffer,key,&value,NULL,fpout)) // returns TRUE if ok
       {
@@ -2630,7 +2666,6 @@ void deh_procStrings(DEHFILE *fpin, int fpout, char *line)
    {
       if (!dehfgets(inbuffer, sizeof(inbuffer), fpin)) break;
       if (*inbuffer == '#') continue;  // skip comment lines
-      lfstrip(inbuffer);
       if (!*inbuffer) break;  // killough 11/98
       if (!*holdstring) // first one--get the key
       {
@@ -2773,21 +2808,6 @@ char *dehReformatStr(char *string)
    }
    *t = '\0';
    return buff;
-}
-
-// ====================================================================
-// lfstrip
-// Purpose: Strips CR/LF off the end of a string
-// Args:    s -- the string to work on
-// Returns: void -- the string is modified in place
-//
-// killough 10/98: only strip at end of line, not entire string
-
-void lfstrip(char *s)  // strip the \r and/or \n off of a line
-{
-   char *p = s+strlen(s);
-   while (p > s && (*--p=='\r' || *p=='\n'))
-      *p = 0;
 }
 
 // ====================================================================
