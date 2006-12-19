@@ -47,7 +47,9 @@
 
 #define CMD_READ_SECTORS           0x20
 #define CMD_WRITE_SECTORS          0x30
+#define CMD_WRITE_SECTORS_EXT      0x34
 #define CMD_READ_MULTIPLE          0xC4
+#define CMD_READ_MULTIPLE_EXT      0x29
 #define CMD_WRITE_MULTIPLE         0xC5
 #define CMD_SET_MULTIPLE_MODE      0xC6
 #define CMD_STANDBY_IMMEDIATE      0xE0
@@ -75,6 +77,9 @@ static bool poweroff = false;
 static long sleep_timeout = 5*HZ;
 #ifdef HAVE_ATA_POWER_OFF
 static int poweroff_timeout = 2*HZ;
+#endif
+#ifdef HAVE_BIGLBA
+static bool biglba = false; /* set for 48 bit addressing */
 #endif
 static long ata_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char ata_thread_name[] = "ata";
@@ -252,16 +257,34 @@ int ata_read_sectors(IF_MV2(int drive,)
         ret = 0;
         last_disk_activity = current_tick;
 
-        if ( count == 256 )
-            SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
+#ifdef HAVE_BIGLBA
+        if (biglba)
+        {
+            SET_REG(ATA_NSECTOR, count >> 8);
+            SET_REG(ATA_NSECTOR, count & 0xff);
+            SET_REG(ATA_SECTOR, (start >> 24) & 0xff); /* 31:24 */
+            SET_REG(ATA_SECTOR, start & 0xff); /* 7:0 */
+            SET_REG(ATA_LCYL, 0); /* 39:32 */
+            SET_REG(ATA_LCYL, (start >> 8) & 0xff); /* 15:8 */
+            SET_REG(ATA_HCYL, 0); /* 47:40 */
+            SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
+            SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
+            SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE_EXT);
+        }
         else
-            SET_REG(ATA_NSECTOR, (unsigned char)count);
+#endif
+        {
+            if ( count == 256 )
+                SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
+            else
+                SET_REG(ATA_NSECTOR, (unsigned char)count);
 
-        SET_REG(ATA_SECTOR, start & 0xff);
-        SET_REG(ATA_LCYL, (start >> 8) & 0xff);
-        SET_REG(ATA_HCYL, (start >> 16) & 0xff);
-        SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
-        SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE);
+            SET_REG(ATA_SECTOR, start & 0xff);
+            SET_REG(ATA_LCYL, (start >> 8) & 0xff);
+            SET_REG(ATA_HCYL, (start >> 16) & 0xff);
+            SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+            SET_REG(ATA_COMMAND, CMD_READ_MULTIPLE);
+        }
 
         /* wait at least 400ns between writing command and reading status */
         __asm__ volatile ("nop");
@@ -429,15 +452,33 @@ int ata_write_sectors(IF_MV2(int drive,)
         return -2;
     }
 
-    if ( count == 256 )
-        SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
+#ifdef HAVE_BIGLBA
+    if (biglba)
+    {
+        SET_REG(ATA_NSECTOR, count >> 8);
+        SET_REG(ATA_NSECTOR, count & 0xff);
+        SET_REG(ATA_SECTOR, (start >> 24) & 0xff); /* 31:24 */
+        SET_REG(ATA_SECTOR, start & 0xff); /* 7:0 */
+        SET_REG(ATA_LCYL, 0); /* 39:32 */
+        SET_REG(ATA_LCYL, (start >> 8) & 0xff); /* 15:8 */
+        SET_REG(ATA_HCYL, 0); /* 47:40 */
+        SET_REG(ATA_HCYL, (start >> 16) & 0xff); /* 23:16 */
+        SET_REG(ATA_SELECT, SELECT_LBA | ata_device);
+        SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS_EXT);
+    }
     else
-        SET_REG(ATA_NSECTOR, (unsigned char)count);
-    SET_REG(ATA_SECTOR, start & 0xff);
-    SET_REG(ATA_LCYL, (start >> 8) & 0xff);
-    SET_REG(ATA_HCYL, (start >> 16) & 0xff);
-    SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
-    SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS);
+#endif
+    {
+        if ( count == 256 )
+            SET_REG(ATA_NSECTOR, 0); /* 0 means 256 sectors */
+        else
+            SET_REG(ATA_NSECTOR, (unsigned char)count);
+        SET_REG(ATA_SECTOR, start & 0xff);
+        SET_REG(ATA_LCYL, (start >> 8) & 0xff);
+        SET_REG(ATA_HCYL, (start >> 16) & 0xff);
+        SET_REG(ATA_SELECT, ((start >> 24) & 0xf) | SELECT_LBA | ata_device);
+        SET_REG(ATA_COMMAND, CMD_WRITE_SECTORS);
+    }
 
     for (i=0; i<count; i++) {
 
@@ -944,6 +985,14 @@ int ata_init(void)
         multisectors = identify_info[47] & 0xff;
         DEBUGF("ata: %d sectors per ata request\n",multisectors);
 
+#ifdef HAVE_BIGLBA
+        if (identify_info[83] & 0x0400 /* 48 bit address support */
+            && identify_info[60] == 0xFFFF  /* and disk size >= 128 GiB */
+            && identify_info[61] == 0x0FFF) /* (needs BigLBA addressing) */
+        {
+            biglba = true; /* use BigLBA */
+        }
+#endif
         rc = freeze_lock();
 
         if (rc)
