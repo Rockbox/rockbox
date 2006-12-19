@@ -89,7 +89,7 @@ void usage(void)
            "\t-mi4v3  PortalPlayer .mi4 format (revision 010301)\n"
            "\t-add=X  Rockbox generic \"add-up\" checksum format\n"
            "\t        (X values: h100, h120, h140, h300, ipco, nano, ipvd\n"
-           "\t                   ip3g, ip4g, mini, x5, h10, h10_5gb)\n"
+           "\t                   ip3g, ip4g, mini, x5, h10, h10_5gb, tpj2, e200)\n"
            "\nNo option results in Archos standard player/recorder format.\n");
 
     exit(1);
@@ -207,6 +207,8 @@ int main (int argc, char** argv)
             modelnum = 14;
         else if(!strcmp(&argv[1][5], "tpj2"))
             modelnum = 15;
+        else if(!strcmp(&argv[1][5], "e200"))
+            modelnum = 16;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

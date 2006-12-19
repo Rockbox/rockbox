@@ -2,10 +2,8 @@
 ipod.c
 #elif defined(GIGABEAT_F)
 gigabeat.c
-#elif defined(SANSA_E200)
-e200.c
-#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB)
-h10.c
+#elif defined(IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(SANSA_E200)
+main-pp.c
 #elif defined(ELIO_TPJ1022)
 tpj1022.c
 #else

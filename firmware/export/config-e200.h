@@ -5,6 +5,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 16
+#define MODEL_NAME   "Sandisk Sansa e200"
 
 /* define this if you have recording possibility */
 /*#define HAVE_RECORDING 1*/ /* TODO: add support for this */

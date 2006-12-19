@@ -8,7 +8,7 @@ INPUT(target/coldfire/crt0.o)
 OUTPUT_FORMAT(elf32-littlearm)
 OUTPUT_ARCH(arm)
 #ifdef CPU_PP
-INPUT(target/arm/crt0-pp.o)
+INPUT(target/arm/crt0-pp-bl.o)
 #else
 INPUT(target/arm/crt0.o)
 #endif

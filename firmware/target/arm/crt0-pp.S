@@ -52,15 +52,9 @@ start:
 
     msr    cpsr_c, #0xd3 /* enter supervisor mode, disable IRQ */
 
-#ifndef BOOTLOADER
     b      pad_skip
 
-#if defined(SANSA_E200)
-/* mi4tool writes junk between 0xe0 and 0xeb.  Avoid this. */
-.space 60*4 /* (more than enough) space for exception vectors */
-#else
-.space 50*4
-#endif
+.space 50*4 /* (more than enough) space for exception vectors */
 
 pad_skip:
 #ifdef SANSA_E200
@@ -108,11 +102,13 @@ remap_end:
 
     /* After doing the remapping, send the COP to sleep.
        On wakeup it will go to cop_init */
+
+    /* Find out which processor we are */
     ldr    r0, =PROC_ID
     ldr    r0, [r0]
     and    r0, r0, #0xff
     cmp    r0, #0x55
-    beq    1f
+    beq    cpu_init
     
     /* put us (co-processor) to sleep */
     ldr    r4, =COP_CTRL
@@ -121,9 +117,15 @@ remap_end:
 
     ldr    pc, =cop_init
 
-1:
 
-#ifndef DEBUG
+cpu_init:
+    /* Wait for COP to be sleeping */
+    ldr    r4, =COP_STATUS
+1:
+    ldr    r3, [r4]
+    ands   r3, r3, #SLEEPING
+    beq    1b
+    
     /* Copy exception handler code to address 0 */
     ldr    r2, =_vectorsstart
     ldr    r3, =_vectorsend
@@ -133,15 +135,7 @@ remap_end:
     ldrhi  r5, [r4], #4
     strhi  r5, [r2], #4
     bhi    1b
-#else
-    ldr    r1, =vectors
-    ldr    r0, =irq_handler
-    str    r0, [r1, #24]
-    ldr    r0, =fiq_handler
-    str    r0, [r1, #28]
-#endif
 
-#ifndef STUB
     /* Zero out IBSS */
     ldr    r2, =_iedata
     ldr    r3, =_iend
@@ -160,8 +154,6 @@ remap_end:
     ldrhi  r5, [r2], #4
     strhi  r5, [r3], #4
     bhi    1b
-#endif /* !STUB */
-#endif /* !BOOTLOADER */
 
     /* Initialise bss section to zero */
     ldr    r2, =_edata
@@ -181,90 +173,6 @@ remap_end:
     cmp    r3, r2
     strhi  r4, [r2], #4
     bhi    1b
-
-#ifdef BOOTLOADER
-    /* TODO: the high part of the address is probably dependent on CONFIG_CPU.
-       Since we tend to use ifdefs for each chipset target
-       anyway, we might as well just hardcode it here.
-     */
-       
-    /* get the high part of our execute address */
-    ldr    r0, =0xff000000
-    and    r8, pc, r0             @ r8 is used later
-
-    /* Find out which processor we are */
-    mov    r0, #PROC_ID
-    ldr    r0, [r0]
-    and    r0, r0, #0xff
-    cmp    r0, #0x55
-    beq    1f
-
-    /* put us (co-processor) to sleep */
-    ldr    r4, =COP_CTRL
-    mov    r3, #SLEEP
-    str    r3, [r4]
-    ldr    pc, =cop_wake_start
-
-cop_wake_start:
-    /* jump the COP to startup */
-    ldr    r0, =startup_loc
-    ldr    pc, [r0]
-
-1:
-    
-    /* get the high part of our execute address */
-    ldr    r2, =0xffffff00
-    and    r4, pc, r2
-
-    /* Copy bootloader to safe area - 0x40000000 */
-    mov    r5, #0x40000000
-    ldr    r6, = _dataend
-    sub    r0, r6, r5       /* length of loader */
-    add    r0, r4, r0     /* r0 points to start of loader */
-1:
-    cmp    r5, r6
-    ldrcc  r2, [r4], #4
-    strcc  r2, [r5], #4
-    bcc    1b
-
-    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
-    
-start_loc:
-
-    /* execute the loader - this will load an image to 0x10000000 */
-    bl     main
-
-    /* Wake up the coprocessor before executing the firmware */
-
-    /* save the startup address for the COP */
-    ldr    r1, =startup_loc
-    str    r0, [r1]
-
-    /* make sure COP is sleeping */
-    ldr    r4, =COP_STATUS
-1:
-    ldr    r3, [r4]
-    ands   r3, r3, #SLEEPING
-    beq    1b
-
-    /* wake up COP */
-    ldr    r4, =COP_CTRL
-    mov    r3, #WAKE
-    str    r3, [r4]
-
-    /* jump to start location */
-    mov    pc, r0
-
-startup_loc:
-    .word    0x0
-
-.align 8    /* starts at 0x100 */
-.global boot_table
-boot_table:
-    /* here comes the boot table, don't move its offset */
-    .space 400
-
-#else /* BOOTLOADER */
     
     /* Set up stack for IRQ mode */ 
     msr    cpsr_c, #0xd2
@@ -290,6 +198,21 @@ boot_table:
     /* main() should never return */
 
 cop_init:
+#if CONFIG_CPU != PP5002
+    /* COP: Invalidate cache */
+    ldr    r0, =0xf000f044
+    ldr    r1, [r0]
+    orr    r1, r1, #0x6
+    str    r1, [r0]
+
+    ldr    r0, =0x6000c000
+1:
+    ldr    r1, [r0]
+    tst    r1, #0x8000
+    bne    1b
+#endif
+
+    /* Setup stack for COP */
     ldr    sp, =cop_stackend
     mov    r3, sp
     ldr    r2, =cop_stackbegin
@@ -300,6 +223,8 @@ cop_init:
     bhi    2b
 
     ldr    sp, =cop_stackend
+    
+    /* Run cop_main() in apps/main.c */
     bl     cop_main
     
 /* Exception handlers. Will be copied to address 0 after memory remapping */
@@ -385,5 +310,3 @@ irq_stack:
 /* 256 words of FIQ stack */
     .space 256*4
 fiq_stack:
-
-#endif /* BOOTLOADER */ 

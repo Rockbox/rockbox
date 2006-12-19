@@ -40,8 +40,8 @@
 #include "power.h"
 #include "file.h"
 
-/* Size of the buffer to store the loaded Rockbox/iriver image */
-#define MAX_LOADSIZE (5*1024*1024)
+/* Size of the buffer to store the loaded firmware image */
+#define MAX_LOADSIZE (10*1024*1024)
 
 /* A buffer to load the iriver firmware or Rockbox into */
 unsigned char loadbuffer[MAX_LOADSIZE];
@@ -52,18 +52,18 @@ char version[] = APPSVERSION;
 
 int line=0;
 
-/* Load original iriver firmware. This function expects a file called
-   "/System/Original.mi4" on the player. It should be decrypted
-   and have the header stripped using mi4code. It reads the file in to a memory
+/* Load original mi4 firmware. This function expects a file called
+   "/System/OF.bin" on the player. It should be a mi4 firmware decrypted 
+   and header stripped using mi4code. It reads the file in to a memory
    buffer called buf. The rest of the loading is done in main() and crt0.S
 */
-int load_iriver(unsigned char* buf)
+int load_original_firmware(unsigned char* buf)
 {
     int fd;
     int rc;
     int len;
     
-    fd = open("/System/Original.mi4", O_RDONLY);
+    fd = open("/System/OF.bin", O_RDONLY);
 
     len = filesize(fd);
     
@@ -78,7 +78,7 @@ int load_iriver(unsigned char* buf)
     return len;
 }
 
-/* Load Rockbox firmware (rockbox.h10) */
+/* Load Rockbox firmware (rockbox.*) */
 int load_rockbox(unsigned char* buf)
 {
     int fd;
@@ -164,6 +164,7 @@ void* main(void)
     kernel_init();
     lcd_init();
     font_init();
+    button_init();
 
     line=0;
 
@@ -172,7 +173,7 @@ void* main(void)
     lcd_puts(0, line++, "Rockbox boot loader");
     snprintf(buf, sizeof(buf), "Version: 20%s", version);
     lcd_puts(0, line++, buf);
-    snprintf(buf, sizeof(buf), "iriver H10");
+    snprintf(buf, sizeof(buf), MODEL_NAME);
     lcd_puts(0, line++, buf);
     lcd_update();
 
@@ -212,11 +213,11 @@ void* main(void)
     i=button_read_device();
     if(i==BUTTON_LEFT)
     {
-        lcd_puts(0, line, "Loading iriver firmware...");
+        lcd_puts(0, line++, "Loading original firmware...");
         lcd_update();
-        rc=load_iriver(loadbuffer);
+        rc=load_original_firmware(loadbuffer);
     } else {
-        lcd_puts(0, line, "Loading Rockbox...");
+        lcd_puts(0, line++, "Loading Rockbox...");
         lcd_update();
         rc=load_rockbox(loadbuffer);
     }
@@ -225,6 +226,7 @@ void* main(void)
             snprintf(buf, sizeof(buf), "Rockbox error: %d",rc);
             lcd_puts(0, line++, buf);
             lcd_update();
+            while(1) {}
     }
     
     memcpy((void*)DRAM_START,loadbuffer,rc);

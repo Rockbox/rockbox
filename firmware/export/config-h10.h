@@ -6,6 +6,7 @@
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 13
+#define MODEL_NAME   "iriver H10 20GB"
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING 1

@@ -1108,10 +1108,10 @@ EOF
     target="-DSANSA_E200"
     memory=32 # supposedly
     arm7tdmicc
-    tool="$rootdir/tools/scramble -mi4v3"
+    tool="$rootdir/tools/scramble -add=e200"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="PP5022.mi4"
+    output="rockbox.e200"
     appextra="recorder:gui"
     archosrom=""
     flash=""
