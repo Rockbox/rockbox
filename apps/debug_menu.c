@@ -1484,91 +1484,6 @@ static bool view_battery(void)
 #endif /* HAVE_LCD_BITMAP */
 #endif
 
-static bool view_runtime(void)
-{
-    char s[32];
-    bool done = false;
-    int state = 1;
-
-    while(!done)
-    {
-        int y=0;
-        int t;
-        int key;
-        lcd_clear_display();
-#ifdef HAVE_LCD_BITMAP
-        lcd_puts(0, y++, "Running time:");
-        y++;
-#endif
-
-        if (state & 1) {
-#ifdef CONFIG_CHARGING
-            if (charger_inserted()
-#ifdef HAVE_USB_POWER
-                    || usb_powered()
-#endif
-                    )
-            {
-                global_settings.runtime = 0;
-            }
-            else
-#endif
-            {
-                global_settings.runtime += ((current_tick - lasttime) / HZ);
-            }
-            lasttime = current_tick;
-
-            t = global_settings.runtime;
-            lcd_puts(0, y++, "Current time");
-        }
-        else {
-            t = global_settings.topruntime;
-            lcd_puts(0, y++, "Top time");
-        }
-
-        snprintf(s, sizeof(s), "%dh %dm %ds",
-                 t / 3600, (t % 3600) / 60, t % 60);
-        lcd_puts(0, y++, s);
-        lcd_update();
-
-        /* Wait for a key to be pushed */
-        key = get_action(CONTEXT_SETTINGS,HZ);
-        switch(key) {
-            case ACTION_STD_CANCEL:
-                done = true;
-                break;
-
-            case ACTION_SETTINGS_INC:
-            case ACTION_SETTINGS_DEC:
-                if (state == 1)
-                    state = 2;
-                else
-                    state = 1;
-                break;
-
-            case ACTION_STD_OK:
-                lcd_clear_display();
-                /*NOTE: this needs to be changed to sync splash! */
-                lcd_puts(0,0,"Clear time?");
-                lcd_puts(0,1,"PLAY = Yes");
-                lcd_update();
-                while (1) {
-                    key = get_action(CONTEXT_STD,TIMEOUT_BLOCK);
-                    if ( key == ACTION_STD_OK ) {
-                        if ( state == 1 )
-                            global_settings.runtime = 0;
-                        else
-                            global_settings.topruntime = 0;
-                        break;
-                    }
-                }
-                break;
-        }
-    }
-    action_signalscreenchange();
-    return false;
-}
-
 #ifndef SIMULATOR
 #ifdef HAVE_MMC
 static bool dbg_mmc_info(void)
@@ -2192,7 +2107,6 @@ bool debug_menu(void)
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
 #endif /* HAVE_LCD_BITMAP */
-        { "View runtime", view_runtime },
 #ifndef SIMULATOR
 #ifdef CONFIG_TUNER
         { "FM Radio", dbg_fm_radio },

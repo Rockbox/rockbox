@@ -49,6 +49,7 @@ bool set_time_screen(const char* string, struct tm *tm);
 bool shutdown_screen(void);
 bool browse_id3(void);
 bool set_rating(void);
+bool view_runtime(void);
 
 #endif
 

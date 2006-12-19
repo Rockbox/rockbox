@@ -56,6 +56,7 @@
 #include "quickscreen.h"
 #include "pcmbuf.h"
 #include "list.h"
+#include "yesno.h"
 
 #ifdef HAVE_LCD_BITMAP
 #include <bitmaps/usblogo.h>
@@ -1293,6 +1294,101 @@ bool set_rating(void)
 
             default:
                 if(default_event_handler(button) ==  SYS_USB_CONNECTED)
+                    return true;
+                break;
+        }
+    }
+    action_signalscreenchange();
+    return false;
+}
+
+
+bool view_runtime(void)
+{
+    char s[32];
+    bool done = false;
+    int state = 1;
+    int i;
+    int key;
+    unsigned char *lines[]={str(LANG_CLEAR_TIME)};
+    struct text_message message={(char **)lines, 1};
+
+    while(!done)
+    {
+        int y[NB_SCREENS]={0};
+        int t;
+        
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].clear_display();
+#ifdef HAVE_LCD_BITMAP
+            if (screens[i].nb_lines >4)
+            {
+                screens[i].puts(0, y[i]++, str(LANG_RUNNING_TIME));
+            }
+#endif
+        }
+
+        if (state & 1) {
+#ifdef CONFIG_CHARGING
+            if (charger_inserted()
+#ifdef HAVE_USB_POWER
+                    || usb_powered()
+#endif
+                    )
+            {
+                global_settings.runtime = 0;
+            }
+            else
+#endif
+            {
+                global_settings.runtime += ((current_tick - lasttime) / HZ);
+            }
+            lasttime = current_tick;
+
+            t = global_settings.runtime;
+            FOR_NB_SCREENS(i)
+                screens[i].puts(0, y[i]++, str(LANG_CURRENT_TIME));
+        }
+        else {
+            t = global_settings.topruntime;
+            FOR_NB_SCREENS(i)
+                screens[i].puts(0, y[i]++, str(LANG_TOP_TIME));
+        }
+        snprintf(s, sizeof(s), "%dh %dm %ds",
+                 t / 3600, (t % 3600) / 60, t % 60);
+        gui_syncstatusbar_draw(&statusbars, true);
+        FOR_NB_SCREENS(i)
+        {
+            screens[i].puts(0, y[i]++, s);
+#if defined(HAVE_LCD_BITMAP)
+            screens[i].update();
+#endif
+        }
+
+        /* Wait for a key to be pushed */
+        key = get_action(CONTEXT_STD,HZ);
+        switch(key) {
+            case ACTION_STD_CANCEL:
+                done = true;
+                break;
+
+            case ACTION_STD_NEXT:
+            case ACTION_STD_PREV:
+                state = (state==1)?2:1;
+                break;
+
+            case ACTION_STD_OK:
+                if(gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
+                {
+                    if ( state == 1 )
+                        global_settings.runtime = 0;
+                    else
+                        global_settings.topruntime = 0;
+                }
+                break;
+            default:
+                if(default_event_handler(key) ==  SYS_USB_CONNECTED)
                     return true;
                 break;
         }

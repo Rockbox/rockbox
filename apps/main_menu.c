@@ -349,6 +349,7 @@ static bool info_menu(void)
     static const struct menu_item items[] = {
         { ID2P(LANG_INFO_MENU),          show_info         },
         { ID2P(LANG_VERSION),            show_credits      },
+        { ID2P(LANG_RUNNING_TIME),       view_runtime      },
         { ID2P(LANG_DEBUG),              debug_menu        },
 #ifdef SIMULATOR
         { ID2P(LANG_USB),                simulate_usb      },
