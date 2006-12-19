@@ -67,7 +67,6 @@ extern volatile unsigned char* ata_control;
 extern int ata_io_address;
 
 void ata_reset(void);
-void ata_address_detect(void);
 void ata_enable(bool on);
 void ata_device_init(void);
 bool ata_is_coldstart(void);
