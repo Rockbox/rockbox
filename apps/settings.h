@@ -87,8 +87,10 @@
 #define TRIG_DURATION_COUNT 13
 extern const char * const trig_durations[TRIG_DURATION_COUNT];
 
-#define CROSSFADE_ENABLE_SHUFFLE  1
-#define CROSSFADE_ENABLE_ALWAYS   2
+#define CROSSFADE_ENABLE_SHUFFLE                1
+#define CROSSFADE_ENABLE_TRACKSKIP              2
+#define CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP  3
+#define CROSSFADE_ENABLE_ALWAYS                 4
 
 #define FOLDER_ADVANCE_OFF 0
 #define FOLDER_ADVANCE_NEXT 1
@@ -144,7 +146,7 @@ struct user_settings
     bool superbass; /* true/false */
 
 #if CONFIG_CODEC == SWCODEC
-    int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=always)      */
+    int crossfade;     /* Enable crossfade (0=off,1=shuffle,2=trackskip,3=shuff&trackskip,4=always) */
     int crossfade_fade_in_delay;      /* Fade in delay (0-15s)             */
     int crossfade_fade_out_delay;     /* Fade out delay (0-15s)            */
     int crossfade_fade_in_duration;   /* Fade in duration (0-15s)          */

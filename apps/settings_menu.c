@@ -1514,13 +1514,14 @@ static bool crossfade(void)
         { STR(LANG_OFF) },
         { STR(LANG_SHUFFLE) },
         { STR(LANG_TRACKSKIP) },
+        { STR(LANG_SHUFFLE_TRACKSKIP) },
         { STR(LANG_ALWAYS) },
     };
 
     bool ret;
 
     ret=set_option( str(LANG_CROSSFADE_ENABLE),
-                    &global_settings.crossfade, INT, names, 4, NULL);
+                    &global_settings.crossfade, INT, names, 5, NULL);
     audio_set_crossfade(global_settings.crossfade);
     return ret;
 }

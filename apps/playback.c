@@ -1819,10 +1819,27 @@ static void codec_track_skip_done(bool was_manual)
     }
     /* Automatic track change w/crossfade, if not in "Track Skip Only" mode. */
     else if (pcmbuf_is_crossfade_enabled() && !pcmbuf_is_crossfade_active()
-             && global_settings.crossfade != 2)
+             && global_settings.crossfade != CROSSFADE_ENABLE_TRACKSKIP )
     {
-        pcmbuf_crossfade_init(false);
-        codec_track_changed();
+        if ( global_settings.crossfade 
+                == CROSSFADE_ENABLE_SHUFFLE_AND_TRACKSKIP )
+        {
+            if (global_settings.playlist_shuffle)  /* shuffle mode is on, so crossfade: */
+            {
+                pcmbuf_crossfade_init(false);
+                codec_track_changed();
+            }
+            else  /* shuffle mode is off, so do a gapless track change */
+            {
+                pcmbuf_set_position_callback(codec_pcmbuf_position_callback);    /* Gapless playback  */
+                pcmbuf_set_event_handler(codec_pcmbuf_track_changed_callback);   /* copied from below */
+            }
+        }
+        else  /* normal crossfade:  */
+        {
+            pcmbuf_crossfade_init(false);
+            codec_track_changed();
+         }
     }
     /* Gapless playback. */
     else

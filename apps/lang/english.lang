@@ -10372,3 +10372,18 @@
     *: "Properties"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Shuffle and Track Skip"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
