@@ -22,14 +22,11 @@
 /* asm optimised read & write loops */
 #define ATA_OPTIMIZED_READING
 #define ATA_OPTIMIZED_WRITING
-#define ATA_ADDRESS_DETECT /* need address detection */
 
 #define SWAP_WORDS
 
 #define ATA_IOBASE      0x06100100
 #define ATA_DATA        (*((volatile unsigned short*)0x06104100))
-#define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
-#define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
 #define ATA_CONTROL     (*ata_control)
 
 #define ATA_ERROR       (*((volatile unsigned char*)ATA_IOBASE + 1))

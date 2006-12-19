@@ -25,6 +25,9 @@
 #include "ata-target.h"
 #include "hwcompat.h"
 
+#define ATA_CONTROL1    ((volatile unsigned char*)0x06200206)
+#define ATA_CONTROL2    ((volatile unsigned char*)0x06200306)
+
 volatile unsigned char* ata_control;
 int ata_io_address; /* 0x300 or 0x200 */
 
@@ -37,20 +40,6 @@ void ata_reset(void)
     /* state HRR1 */
     or_b(0x02, &PADRH); /* negate _RESET */
     sleep(1); /* > 2ms */
-}
-
-void ata_address_detect(void)
-{
-    if (read_hw_mask() & ATA_ADDRESS_200)
-    {
-        ata_io_address = 0x200; /* For debug purposes only */
-        ata_control = ATA_CONTROL1;
-    }
-    else
-    {
-        ata_io_address = 0x300; /* For debug purposes only */
-        ata_control = ATA_CONTROL2;
-    }
 }
 
 void ata_enable(bool on)
@@ -68,6 +57,17 @@ void ata_device_init(void)
     or_b(0x02, &PAIORH); /* output for ATA reset */
     or_b(0x02, &PADRH);  /* release ATA reset */
     PACR2 &= 0xBFFF; /* GPIO function for PA7 (IDE enable) */
+ 
+    if (read_hw_mask() & ATA_ADDRESS_200)
+    {
+        ata_io_address = 0x200; /* For debug purposes only */
+        ata_control = ATA_CONTROL1;
+    }
+    else
+    {
+        ata_io_address = 0x300; /* For debug purposes only */
+        ata_control = ATA_CONTROL2;
+    }
 }
 
 bool ata_is_coldstart(void)

@@ -909,6 +909,7 @@ int ata_init(void)
 {
     int rc;
     bool coldstart = ata_is_coldstart();
+         /* must be called before ata_device_init() */          
 
     mutex_init(&ata_mtx);
 
@@ -924,13 +925,10 @@ int ata_init(void)
             sleep(HZ); /* allow voltage to build up */
         }
 
-#ifdef ATA_ADDRESS_DETECT
-        ata_address_detect();
-#endif  
         /* first try, hard reset at cold start only */
-        rc = init_and_check(coldstart);  
+        rc = init_and_check(coldstart);
 
-        if (rc) 
+        if (rc)
         {   /* failed? -> second try, always with hard reset */
             DEBUGF("ata: init failed, retrying...\n");
             rc  = init_and_check(true);
