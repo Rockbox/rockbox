@@ -89,7 +89,7 @@ extern int playlist_update_resume_info(const struct mp3entry* id3);
 #define MPEG_PRERECORDING_TICK   104
 
 /* indicator for MPEG_NEED_DATA */
-#define GENERATE_UNBUFFER_EVENTS ((void*)1)
+#define GENERATE_UNBUFFER_EVENTS 1
 
 /* list of tracks in memory */
 #define MAX_TRACK_ENTRIES (1<<4) /* Must be power of 2 */
@@ -2006,7 +2006,7 @@ static void mpeg_thread(void)
                                 break;
 
                             case STOP_RECORDING:
-                                queue_post(&mpeg_queue, MPEG_STOP_DONE, NULL);
+                                queue_post(&mpeg_queue, MPEG_STOP_DONE, 0);
                                 /* will close the file */
                                 break;
 
@@ -2123,7 +2123,7 @@ bool audio_has_changed_track(void)
 void audio_init_playback(void)
 {
     init_playback_done = false;
-    queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, NULL);
+    queue_post(&mpeg_queue, MPEG_INIT_PLAYBACK, 0);
 
     while(!init_playback_done)
         sleep_thread(1);
@@ -2137,7 +2137,7 @@ void audio_init_recording(unsigned int buffer_offset)
 {
     buffer_offset = buffer_offset;
     init_recording_done = false;
-    queue_post(&mpeg_queue, MPEG_INIT_RECORDING, NULL);
+    queue_post(&mpeg_queue, MPEG_INIT_RECORDING, 0);
 
     while(!init_recording_done)
         sleep_thread(1);
@@ -2256,17 +2256,17 @@ void audio_record(const char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 
-    queue_post(&mpeg_queue, MPEG_RECORD, NULL);
+    queue_post(&mpeg_queue, MPEG_RECORD, 0);
 }
 
 void audio_pause_recording(void)
 {
-    queue_post(&mpeg_queue, MPEG_PAUSE_RECORDING, NULL);
+    queue_post(&mpeg_queue, MPEG_PAUSE_RECORDING, 0);
 }
 
 void audio_resume_recording(void)
 {
-    queue_post(&mpeg_queue, MPEG_RESUME_RECORDING, NULL);
+    queue_post(&mpeg_queue, MPEG_RESUME_RECORDING, 0);
 }
 
 static void prepend_header(void)
@@ -2569,7 +2569,7 @@ void audio_new_file(const char *filename)
     strncpy(recording_filename, filename, MAX_PATH - 1);
     recording_filename[MAX_PATH - 1] = 0;
 
-    queue_post(&mpeg_queue, MPEG_NEW_FILE, NULL);
+    queue_post(&mpeg_queue, MPEG_NEW_FILE, 0);
 }
 
 unsigned long audio_recorded_time(void)
@@ -2707,7 +2707,7 @@ void audio_play(long offset)
 #else /* !SIMULATOR */
     is_playing = true;
 
-    queue_post(&mpeg_queue, MPEG_PLAY, (void*)offset);
+    queue_post(&mpeg_queue, MPEG_PLAY, offset);
 #endif /* !SIMULATOR */
 
     mpeg_errno = 0;
@@ -2717,7 +2717,7 @@ void audio_stop(void)
 {
 #ifndef SIMULATOR
     mpeg_stop_done = false;
-    queue_post(&mpeg_queue, MPEG_STOP, NULL);
+    queue_post(&mpeg_queue, MPEG_STOP, 0);
     while(!mpeg_stop_done)
         yield();
 #else /* SIMULATOR */
@@ -2736,7 +2736,7 @@ void audio_stop_recording(void)
 void audio_pause(void)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_PAUSE, NULL);
+    queue_post(&mpeg_queue, MPEG_PAUSE, 0);
 #else /* SIMULATOR */
     is_playing = true;
     playing = false;
@@ -2747,7 +2747,7 @@ void audio_pause(void)
 void audio_resume(void)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_RESUME, NULL);
+    queue_post(&mpeg_queue, MPEG_RESUME, 0);
 #else /* SIMULATOR */
     is_playing = true;
     playing = true;
@@ -2759,7 +2759,7 @@ void audio_next(void)
 {
 #ifndef SIMULATOR
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
-    queue_post(&mpeg_queue, MPEG_NEXT, NULL);
+    queue_post(&mpeg_queue, MPEG_NEXT, 0);
 #else /* SIMULATOR */
     char* file;
     int steps = 1;
@@ -2788,7 +2788,7 @@ void audio_prev(void)
 {
 #ifndef SIMULATOR
     queue_remove_from_head(&mpeg_queue, MPEG_NEED_DATA);
-    queue_post(&mpeg_queue, MPEG_PREV, NULL);
+    queue_post(&mpeg_queue, MPEG_PREV, 0);
 #else /* SIMULATOR */
     char* file;
     int steps = -1;
@@ -2815,7 +2815,7 @@ void audio_prev(void)
 void audio_ff_rewind(long newtime)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_FF_REWIND, (void *)newtime);
+    queue_post(&mpeg_queue, MPEG_FF_REWIND, newtime);
 #else /* SIMULATOR */
     (void)newtime;
 #endif /* SIMULATOR */
@@ -2824,7 +2824,7 @@ void audio_ff_rewind(long newtime)
 void audio_flush_and_reload_tracks(void)
 {
 #ifndef SIMULATOR
-    queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, NULL);
+    queue_post(&mpeg_queue, MPEG_FLUSH_RELOAD, 0);
 #endif /* !SIMULATOR*/
 }
 

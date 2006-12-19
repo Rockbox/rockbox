@@ -249,7 +249,7 @@ static int pcm_rec_have_more(int status)
         if (status == DMA_REC_ERROR_DMA)
         {
             /* Flush recorded data to disk and stop recording */
-            queue_post(&pcmrec_queue, PCMREC_STOP, NULL);
+            queue_post(&pcmrec_queue, PCMREC_STOP, 0);
             return -1;
         }
         /* else try again next transmission */
@@ -388,7 +388,7 @@ void pcm_rec_init(void)
 void audio_init_recording(unsigned int buffer_offset)
 {
     logf("audio_init_recording");
-    queue_send(&pcmrec_queue, PCMREC_INIT, NULL);
+    queue_send(&pcmrec_queue, PCMREC_INIT, 0);
     logf("audio_init_recording done");
     (void)buffer_offset;
 } /* audio_init_recording */
@@ -399,7 +399,7 @@ void audio_init_recording(unsigned int buffer_offset)
 void audio_close_recording(void)
 {
     logf("audio_close_recording");
-    queue_send(&pcmrec_queue, PCMREC_CLOSE, NULL);
+    queue_send(&pcmrec_queue, PCMREC_CLOSE, 0);
     logf("audio_close_recording done");
 } /* audio_close_recording */
 
@@ -409,7 +409,7 @@ void audio_close_recording(void)
 void audio_set_recording_options(struct audio_recording_options *options)
 {
     logf("audio_set_recording_options");
-    queue_send(&pcmrec_queue, PCMREC_OPTIONS, (void *)options);
+    queue_send(&pcmrec_queue, PCMREC_OPTIONS, (intptr_t)options);
     logf("audio_set_recording_options done");
 } /* audio_set_recording_options */
 
@@ -419,7 +419,7 @@ void audio_set_recording_options(struct audio_recording_options *options)
 void audio_record(const char *filename)
 {
     logf("audio_record: %s", filename);
-    queue_send(&pcmrec_queue, PCMREC_RECORD, (void *)filename);
+    queue_send(&pcmrec_queue, PCMREC_RECORD, (intptr_t)filename);
     logf("audio_record_done");
 } /* audio_record */
 
@@ -429,7 +429,7 @@ void audio_record(const char *filename)
 void audio_stop_recording(void)
 {
     logf("audio_stop_recording");
-    queue_send(&pcmrec_queue, PCMREC_STOP, NULL);
+    queue_send(&pcmrec_queue, PCMREC_STOP, 0);
     logf("audio_stop_recording done");
 } /* audio_stop_recording */
 
@@ -439,7 +439,7 @@ void audio_stop_recording(void)
 void audio_pause_recording(void)
 {
     logf("audio_pause_recording");
-    queue_send(&pcmrec_queue, PCMREC_PAUSE, NULL);
+    queue_send(&pcmrec_queue, PCMREC_PAUSE, 0);
     logf("audio_pause_recording done");
 } /* audio_pause_recording */
 
@@ -449,7 +449,7 @@ void audio_pause_recording(void)
 void audio_resume_recording(void)
 {
     logf("audio_resume_recording");
-    queue_send(&pcmrec_queue, PCMREC_RESUME, NULL);
+    queue_send(&pcmrec_queue, PCMREC_RESUME, 0);
     logf("audio_resume_recording done");
 } /* audio_resume_recording */
 
@@ -1069,7 +1069,7 @@ static void pcmrec_new_stream(const char *filename, /* next file name */
                flush will hang the screen for a bit otherwise */
             strncpy(buf, filename, MAX_PATH);
             filename = buf;
-            queue_reply(&pcmrec_queue, NULL);
+            queue_reply(&pcmrec_queue, 0);
             pcmrec_flush(-1);
         }
    
@@ -1182,7 +1182,7 @@ static void pcmrec_set_recording_options(struct audio_recording_options *options
     /* apply pcm settings to hardware */
     pcm_apply_settings(true);
 
-    queue_reply(&pcmrec_queue, NULL); /* Release sender */
+    queue_reply(&pcmrec_queue, 0); /* Release sender */
 
     if (audio_load_encoder(enc_config.afmt))
     {
@@ -1310,7 +1310,7 @@ static void pcmrec_stop(void)
     }
 
     dma_lock = true;    /* lock dma write position */
-    queue_reply(&pcmrec_queue, NULL);
+    queue_reply(&pcmrec_queue, 0);
 
     /* flush all available data first to avoid overflow while waiting
        for encoding to finish */
@@ -1470,7 +1470,7 @@ static void pcmrec_thread(void)
                 break;
         } /* end switch */
 
-        queue_reply(&pcmrec_queue, NULL);
+        queue_reply(&pcmrec_queue, 0);
     } /* end while */
 } /* pcmrec_thread */
 

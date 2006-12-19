@@ -213,7 +213,7 @@ static void backlight_isr(void)
     if (idle) 
     {
 #ifdef CPU_COLDFIRE
-        queue_post(&backlight_queue, BACKLIGHT_UNBOOST_CPU, NULL);
+        queue_post(&backlight_queue, BACKLIGHT_UNBOOST_CPU, 0);
 #endif
         timer_unregister();
         bl_timer_active = false;
@@ -530,7 +530,7 @@ static void backlight_tick(void)
         if(lcd_sleep_timer == 0)
         {
             /* Queue on bl thread or freeze! */
-            queue_post(&backlight_queue, LCD_SLEEP, NULL);
+            queue_post(&backlight_queue, LCD_SLEEP, 0);
         }
     }
 #endif /* HAVE_LCD_SLEEP */
@@ -579,7 +579,7 @@ void x5_backlight_shutdown(void)
     queue_empty(&backlight_queue);
     tick_remove_task(backlight_tick);
     /* Next time the thread runs, if at all, it will just remove itself. */
-    queue_post(&backlight_queue, BACKLIGHT_QUIT, NULL);
+    queue_post(&backlight_queue, BACKLIGHT_QUIT, 0);
     __backlight_on();
 }
 #endif /* X5_BACKLIGHT_SHUTDOWN */
@@ -587,12 +587,12 @@ void x5_backlight_shutdown(void)
 void backlight_on(void)
 {
     queue_remove_from_head(&backlight_queue, BACKLIGHT_ON);
-    queue_post(&backlight_queue, BACKLIGHT_ON, NULL);
+    queue_post(&backlight_queue, BACKLIGHT_ON, 0);
 }
 
 void backlight_off(void)
 {
-    queue_post(&backlight_queue, BACKLIGHT_OFF, NULL);
+    queue_post(&backlight_queue, BACKLIGHT_OFF, 0);
 }
 
 /* returns true when the backlight is on OR when it's set to always off */
@@ -692,12 +692,12 @@ void lcd_set_sleep_after_backlight_off(int index)
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_on(void)
 {
-    queue_post(&backlight_queue, REMOTE_BACKLIGHT_ON, NULL);
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_ON, 0);
 }
 
 void remote_backlight_off(void)
 {
-    queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, NULL);
+    queue_post(&backlight_queue, REMOTE_BACKLIGHT_OFF, 0);
 }
 
 void remote_backlight_set_timeout(int index)

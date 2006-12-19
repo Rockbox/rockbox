@@ -141,7 +141,7 @@ bool exit_tsr(bool reenter)
         exit = false;
     if (exit)
     {
-        rb->queue_post(&thread_q, EV_EXIT, NULL);
+        rb->queue_post(&thread_q, EV_EXIT, 0);
         while (!s_thread.ended)
             rb->yield();
         /* remove the thread's queue from the broadcast list */

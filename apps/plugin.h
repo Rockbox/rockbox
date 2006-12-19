@@ -354,7 +354,7 @@ struct plugin_api {
 #endif
     void (*queue_init)(struct event_queue *q, bool register_queue);
     void (*queue_delete)(struct event_queue *q);
-    void (*queue_post)(struct event_queue *q, long id, void *data);
+    void (*queue_post)(struct event_queue *q, long id, intptr_t data);
     void (*queue_wait_w_tmo)(struct event_queue *q, struct event *ev,
             int ticks);
     void (*usb_acknowledge)(long id);

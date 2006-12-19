@@ -20,6 +20,7 @@
 #define _KERNEL_H_
 
 #include <stdbool.h>
+#include <inttypes.h>
 #include "config.h"
 
 /* wrap-safe macros for tick comparison */
@@ -51,15 +52,15 @@
 
 struct event
 {
-    long id;
-    void *data;
+    long     id;
+    intptr_t data;
 };
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 struct queue_sender
 {
     struct thread_entry *thread;
-    void                *retval;
+    intptr_t             retval;
 };
 
 struct queue_sender_list
@@ -112,17 +113,17 @@ extern void queue_init(struct event_queue *q, bool register_queue);
 extern void queue_delete(struct event_queue *q);
 extern void queue_wait(struct event_queue *q, struct event *ev);
 extern void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks);
-extern void queue_post(struct event_queue *q, long id, void *data);
+extern void queue_post(struct event_queue *q, long id, intptr_t data);
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
 extern void queue_enable_queue_send(struct event_queue *q, struct queue_sender_list *send);
-extern void * queue_send(struct event_queue *q, long id, void *data);
-extern void queue_reply(struct event_queue *q, void *retval);
+extern intptr_t queue_send(struct event_queue *q, long id, intptr_t data);
+extern void queue_reply(struct event_queue *q, intptr_t retval);
 extern bool queue_in_queue_send(struct event_queue *q);
 #endif /* HAVE_EXTENDED_MESSAGING_AND_NAME */
 extern bool queue_empty(const struct event_queue* q);
 extern void queue_clear(struct event_queue* q);
 extern void queue_remove_from_head(struct event_queue *q, long id);
-extern int queue_broadcast(long id, void *data);
+extern int queue_broadcast(long id, intptr_t data);
 
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);

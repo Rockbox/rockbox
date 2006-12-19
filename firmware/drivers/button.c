@@ -85,7 +85,7 @@ static void button_tick(void)
     btn = remote_control_rx();
     if(btn)
     {
-        queue_post(&button_queue, btn, NULL);
+        queue_post(&button_queue, btn, 0);
     }
 #endif
 
@@ -94,13 +94,13 @@ static void button_tick(void)
     {
         if (! phones_present )
         {
-            queue_post(&button_queue, SYS_PHONE_PLUGGED, NULL);
+            queue_post(&button_queue, SYS_PHONE_PLUGGED, 0);
             phones_present = true;
         }
     } else {
         if ( phones_present )
         {
-            queue_post(&button_queue, SYS_PHONE_UNPLUGGED, NULL);
+            queue_post(&button_queue, SYS_PHONE_UNPLUGGED, 0);
             phones_present = false;
         }
     }
@@ -116,17 +116,17 @@ static void button_tick(void)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_release = false;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, NULL);
+        queue_post(&button_queue, BUTTON_REL | diff, 0);
 #endif
     }
     else
@@ -201,7 +201,7 @@ static void button_tick(void)
                      * to avoid afterscroll effects. */
                     if (queue_empty(&button_queue))
                     {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                         skip_remote_release = false;
@@ -221,18 +221,18 @@ static void button_tick(void)
                            || (remote_type()==REMOTETYPE_H300_NONLCD)
 #endif
                             )
-                            queue_post(&button_queue, btn, NULL);
+                            queue_post(&button_queue, btn, 0);
                         else
                             skip_remote_release = true;
                     }
                     else
 #endif
                         if (!filter_first_keypress || is_backlight_on())
-                            queue_post(&button_queue, btn, NULL);
+                            queue_post(&button_queue, btn, 0);
                         else
                             skip_release = true;
 #else /* no backlight, nothing to skip */
-                    queue_post(&button_queue, btn, NULL);
+                    queue_post(&button_queue, btn, 0);
 #endif
                     post = false;
                 }

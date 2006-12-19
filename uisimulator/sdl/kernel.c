@@ -53,7 +53,8 @@ static void queue_fetch_sender(struct queue_sender_list *send,
 
 /* Puts the specified return value in the waiting thread's return value
    and wakes the thread  - a sender should be confirmed to exist first */
-static void queue_release_sender(struct queue_sender **sender, void *retval)
+static void queue_release_sender(struct queue_sender **sender,
+                                 intptr_t retval)
 {
     (*sender)->retval = retval;
     *sender = NULL;
@@ -72,7 +73,7 @@ static void queue_release_all_senders(struct event_queue *q)
                 &q->send->senders[i & QUEUE_LENGTH_MASK];
             if(*spp)
             {
-                queue_release_sender(spp, NULL);
+                queue_release_sender(spp, 0);
             }
         }
     }
@@ -154,7 +155,7 @@ void queue_wait_w_tmo(struct event_queue *q, struct event *ev, int ticks)
     }
 }
 
-void queue_post(struct event_queue *q, long id, void *data)
+void queue_post(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(15<<4);
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
@@ -170,7 +171,7 @@ void queue_post(struct event_queue *q, long id, void *data)
         if(*spp)
         {
             /* overflow protect - unblock any thread waiting at this index */
-            queue_release_sender(spp, NULL);
+            queue_release_sender(spp, 0);
         }
     }
 #endif
@@ -179,7 +180,7 @@ void queue_post(struct event_queue *q, long id, void *data)
 }
 
 #ifdef HAVE_EXTENDED_MESSAGING_AND_NAME
-void * queue_send(struct event_queue *q, long id, void *data)
+intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
 {
     int oldlevel = set_irq_level(15<<4);
     unsigned int wr = q->write++ & QUEUE_LENGTH_MASK;
@@ -195,7 +196,7 @@ void * queue_send(struct event_queue *q, long id, void *data)
         if(*spp)
         {
             /* overflow protect - unblock any thread waiting at this index */
-            queue_release_sender(spp, NULL);
+            queue_release_sender(spp, 0);
         }
 
         *spp = &sender;
@@ -211,7 +212,7 @@ void * queue_send(struct event_queue *q, long id, void *data)
 
     /* Function as queue_post if sending is not enabled */
     set_irq_level(oldlevel);
-    return NULL;
+    return 0;
 }
 
 #if 0 /* not used now but probably will be later */
@@ -223,7 +224,7 @@ bool queue_in_queue_send(struct event_queue *q)
 #endif
 
 /* Replies with retval to any dequeued message sent with queue_send */
-void queue_reply(struct event_queue *q, void *retval)
+void queue_reply(struct event_queue *q, intptr_t retval)
 {
     if(q->send && q->send->curr_sender)
     {
@@ -270,7 +271,7 @@ void queue_remove_from_head(struct event_queue *q, long id)
             if(*spp)
             {
                 /* Release any thread waiting on this message */
-                queue_release_sender(spp, NULL);
+                queue_release_sender(spp, 0);
             }
         }
 #endif

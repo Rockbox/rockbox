@@ -784,7 +784,7 @@ static void power_thread_sleep(int ticks)
                     charger_input_state = CHARGER_PLUGGED;
                     return;
                 case CHARGER_PLUGGED:
-                    queue_broadcast(SYS_CHARGER_CONNECTED, NULL);
+                    queue_broadcast(SYS_CHARGER_CONNECTED, 0);
                     charger_input_state = CHARGER;
                     break;
                 case CHARGER:
@@ -795,7 +795,7 @@ static void power_thread_sleep(int ticks)
                 case NO_CHARGER:
                     break;
                 case CHARGER_UNPLUGGED:
-                    queue_broadcast(SYS_CHARGER_DISCONNECTED, NULL);
+                    queue_broadcast(SYS_CHARGER_DISCONNECTED, 0);
                     charger_input_state = NO_CHARGER;
                     break;
                 case CHARGER_PLUGGED:
@@ -1279,7 +1279,7 @@ void sys_poweroff(void)
         shutdown_timeout += HZ*20;
     }
 
-    queue_post(&button_queue, SYS_POWEROFF, NULL);
+    queue_post(&button_queue, SYS_POWEROFF, 0);
 }
 
 void cancel_shutdown(void)

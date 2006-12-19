@@ -481,17 +481,17 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
         if(diff & BUTTON_REMOTE)
             if(!skip_remote_release)
-                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_remote_release = false;
         else
 #endif
             if(!skip_release)
-                queue_post(&button_queue, BUTTON_REL | diff, NULL);
+                queue_post(&button_queue, BUTTON_REL | diff, 0);
             else
                 skip_release = false;
 #else
-        queue_post(&button_queue, BUTTON_REL | diff, NULL);
+        queue_post(&button_queue, BUTTON_REL | diff, 0);
 #endif
     }
 
@@ -543,7 +543,7 @@ void button_event(int key, bool pressed)
                 {
                     if (queue_empty(&button_queue))
                     {
-                        queue_post(&button_queue, BUTTON_REPEAT | btn, NULL);
+                        queue_post(&button_queue, BUTTON_REPEAT | btn, 0);
 #ifdef CONFIG_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                             if(btn & BUTTON_REMOTE)
@@ -565,18 +565,18 @@ void button_event(int key, bool pressed)
 #ifdef HAVE_REMOTE_LCD
                         if (btn & BUTTON_REMOTE) {
                             if (!remote_filter_first_keypress || is_remote_backlight_on())
-                                queue_post(&button_queue, btn, NULL);
+                                queue_post(&button_queue, btn, 0);
                             else
                                 skip_remote_release = true;
                         }
                         else
 #endif                                    
                             if (!filter_first_keypress || is_backlight_on())
-                                queue_post(&button_queue, btn, NULL);
+                                queue_post(&button_queue, btn, 0);
                             else
                                 skip_release = true;
 #else /* no backlight, nothing to skip */
-                        queue_post(&button_queue, btn, NULL);
+                        queue_post(&button_queue, btn, 0);
 #endif
                     post = false;
                 }    

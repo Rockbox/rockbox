@@ -235,7 +235,7 @@ static void usb_thread(void)
                     /* Tell all threads that they have to back off the ATA.
                        We subtract one for our own thread. */
                     num_acks_to_expect =
-                        queue_broadcast(SYS_USB_CONNECTED, NULL) - 1;
+                        queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
                     waiting_for_ack = true;
                     DEBUGF("USB inserted. Waiting for ack from %d threads...\n",
                            num_acks_to_expect);
@@ -290,7 +290,7 @@ static void usb_thread(void)
 
                 /* Tell all threads that we are back in business */
                 num_acks_to_expect =
-                    queue_broadcast(SYS_USB_DISCONNECTED, NULL) - 1;
+                    queue_broadcast(SYS_USB_DISCONNECTED, 0) - 1;
                 waiting_for_ack = true;
                 DEBUGF("USB extracted. Waiting for ack from %d threads...\n",
                        num_acks_to_expect);
@@ -392,9 +392,9 @@ static void usb_tick(void)
             if(countdown == 0)
             {
                 if(current_status)
-                    queue_post(&usb_queue, USB_INSERTED, NULL);
+                    queue_post(&usb_queue, USB_INSERTED, 0);
                 else
-                    queue_post(&usb_queue, USB_EXTRACTED, NULL);
+                    queue_post(&usb_queue, USB_EXTRACTED, 0);
             }
         }
     }
@@ -403,7 +403,7 @@ static void usb_tick(void)
     {
         usb_mmc_countdown--;
         if (usb_mmc_countdown == 0)
-            queue_post(&usb_queue, USB_REENABLE, NULL);
+            queue_post(&usb_queue, USB_REENABLE, 0);
     }
 #endif
 }
@@ -411,7 +411,7 @@ static void usb_tick(void)
 
 void usb_acknowledge(long id)
 {
-    queue_post(&usb_queue, id, NULL);
+    queue_post(&usb_queue, id, 0);
 }
 
 void usb_init(void)

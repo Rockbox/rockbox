@@ -139,7 +139,7 @@ static inline int ipod_4g_button_read(void)
                     {
                     data = (wheel_delta << 16) | new_wheel_value;
                     queue_post(&button_queue, wheel_keycode | wheel_repeat,
-                            (void *)data);
+                               data);
                     }
 
                     if (!wheel_repeat) wheel_repeat = BUTTON_REPEAT;

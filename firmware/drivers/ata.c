@@ -571,7 +571,7 @@ static int ata_perform_sleep(void)
 
 void ata_sleep(void)
 {
-    queue_post(&ata_queue, Q_SLEEP, NULL);
+    queue_post(&ata_queue, Q_SLEEP, 0);
 }
 
 void ata_sleepnow(void)
