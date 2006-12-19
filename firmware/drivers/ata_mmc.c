@@ -995,12 +995,12 @@ static void mmc_thread(void)
 #ifdef HAVE_HOTSWAP
             case SYS_MMC_INSERTED:
                 disk_mount(1); /* mount MMC */
-                queue_broadcast(SYS_FS_CHANGED, NULL);
+                queue_broadcast(SYS_FS_CHANGED, 0);
                 break;
 
             case SYS_MMC_EXTRACTED:
                 disk_unmount(1); /* release "by force" */
-                queue_broadcast(SYS_FS_CHANGED, NULL);
+                queue_broadcast(SYS_FS_CHANGED, 0);
                 break;
 #endif
                 
@@ -1097,11 +1097,11 @@ static void mmc_tick(void)
             {
                 if (current_status)
                 {
-                    queue_broadcast(SYS_MMC_INSERTED, NULL);
+                    queue_broadcast(SYS_MMC_INSERTED, 0);
                 }
                 else
                 {
-                    queue_broadcast(SYS_MMC_EXTRACTED, NULL);
+                    queue_broadcast(SYS_MMC_EXTRACTED, 0);
                     mmc_status = MMC_UNTOUCHED;
                     card_info[1].initialized = false;
                 }
