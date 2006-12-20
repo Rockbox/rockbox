@@ -59,6 +59,12 @@
 #define DEV_RS (*(volatile unsigned long *)( 0xcf005030))
 #define DEV_EN (*(volatile unsigned long *)( 0xcf005000))
 
+#define DEV_USB     0x400000
+
+#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
+
+#define INIT_USB    0x80000000
+
 #define CPU_INT_STAT     (*(volatile unsigned long*)(0xcf001000))
 #define CPU_INT_EN       (*(volatile unsigned long*)(0xcf001024))
 #define CPU_INT_CLR      (*(volatile unsigned long*)(0xcf001028))
