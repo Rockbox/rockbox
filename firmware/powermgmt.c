@@ -936,7 +936,7 @@ static void power_thread(void)
     avgbat = avgbat * BATT_AVE_SAMPLES;
     battery_centivolts = avgbat / BATT_AVE_SAMPLES / 10000;
 
-#ifdef CONFIG_CHARING
+#ifdef CONFIG_CHARGING
     if(charger_inserted()) {
         battery_percent  = voltage_to_percent(battery_centivolts,
                            percent_to_volt_charge);
