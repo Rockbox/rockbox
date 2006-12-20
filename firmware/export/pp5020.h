@@ -126,6 +126,11 @@
 #define DEV_EN (*(volatile unsigned long *)(0x6000600c))
 
 #define DEV_SYSTEM  0x4
+#define DEV_USB     0x400000
+
+#define DEV_INIT    (*(volatile unsigned long *)(0x70000020))
+
+#define INIT_USB    0x80000000
 
 #define TIMER1_CFG   (*(volatile unsigned long *)(0x60005000))
 #define TIMER1_VAL   (*(volatile unsigned long *)(0x60005004))
@@ -157,9 +162,6 @@
 #define SER0_MASK    (1 << (SER0_IRQ-32))
 #define SER1_MASK    (1 << (SER1_IRQ-32))
 #define I2C_MASK     (1 << (I2C_IRQ-32))
-
-#define USB2D_IDENT         (*(volatile unsigned long*)(0xc5000000))
-#define USB_STATUS          (*(volatile unsigned long*)(0xc50001a4))
 
 #define IISCONFIG           (*(volatile unsigned long*)(0x70002800))
 

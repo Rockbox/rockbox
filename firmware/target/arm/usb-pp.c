@@ -38,6 +38,8 @@
 #include "sprintf.h"
 #include "string.h"
 #include "hwcompat.h"
+
+#include "usb-target.h"
  
 void usb_init_device(void)
 {
@@ -45,36 +47,36 @@ void usb_init_device(void)
     outl(inl(0x70000084) | 0x200, 0x70000084);
 
     outl(inl(0x7000002C) | 0x3000000, 0x7000002C);
-    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
+    DEV_EN |= DEV_USB;
 
-    outl(inl(0x60006004) | 0x400000, 0x60006004);   /* reset usb start */
-    outl(inl(0x60006004) & ~0x400000, 0x60006004);  /* reset usb end */
+    DEV_RS |= DEV_USB; /* reset usb start */
+    DEV_RS &=~DEV_USB;/* reset usb end */
 
-    outl(inl(0x70000020) | 0x80000000, 0x70000020);
+    DEV_INIT |= INIT_USB;
     while ((inl(0x70000028) & 0x80) == 0);
 
-    outl(inl(0xc5000184) | 0x100, 0xc5000184);
-    while ((inl(0xc5000184) & 0x100) != 0);
+    UOG_PORTSC1 |= 0x100;
+    while ((UOG_PORTSC1 & 0x100) != 0);
 
-    outl(inl(0xc50001A4) | 0x5F000000, 0xc50001A4);
-    if ((inl(0xc50001A4) & 0x100) == 0) {
-        outl(inl(0xc50001A8) & ~0x3, 0xc50001A8);
-        outl(inl(0xc50001A8) | 0x2, 0xc50001A8);
+    UOG_OTGSC |= 0x5F000000;
+    if( (UOG_OTGSC & 0x100) == 0) {
+        UOG_USBMODE &=~ 0x3;
+        UOG_USBMODE |= 0x2;
         outl(inl(0x70000028) | 0x4000, 0x70000028);
         outl(inl(0x70000028) | 0x2, 0x70000028);
     } else {
-        outl(inl(0xc50001A8) | 0x3, 0xc50001A8);
+        UOG_USBMODE |= 0x2;
         outl(inl(0x70000028) &~0x4000, 0x70000028);
         outl(inl(0x70000028) | 0x2, 0x70000028);
     }
-    outl(inl(0xc5000140) | 0x2, 0xc5000140);
-    while((inl(0xc5000140) & 0x2) != 0);
-    r0 = inl(0xc5000184);
+    UOG_USBCMD |= 0x2;
+    while((UOG_USBCMD & 0x2) != 0);
+    r0 = UOG_PORTSC1;
 
     /* Note from IPL source (referring to next 5 lines of code: 
        THIS NEEDS TO BE CHANGED ONCE THERE IS KERNEL USB */
     outl(inl(0x70000020) | 0x80000000, 0x70000020);
-    outl(inl(0x6000600C) | 0x400000, 0x6000600C);
+    DEV_EN |= DEV_USB;
     while ((inl(0x70000028) & 0x80) == 0);
     outl(inl(0x70000028) | 0x2, 0x70000028);
 
@@ -83,22 +85,34 @@ void usb_init_device(void)
 
 void usb_enable(bool on)
 {
-    /* For the ipod, we can only do one thing with USB mode - reboot
-       into Apple's flash-based disk-mode.  This does not return. */
+    /* This device specific code will eventually give way to proper USB
+       handling, which should be the same for all PortalPlayer targets. */
     if (on)
     {
-      /* The following code is copied from ipodlinux */
+#if IPOD_ARCH || defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+        /* For the H10 and iPod, we can only do one thing with USB mode - reboot
+           into the flash-based disk-mode.  This does not return. */
+       
+        /* The following code is copied from ipodlinux */
 #if defined(IPOD_COLOR) || defined(IPOD_3G) || \
     defined(IPOD_4G) || defined(IPOD_MINI)
         unsigned char* storage_ptr = (unsigned char *)0x40017F00;
 #elif defined(IPOD_NANO) || defined(IPOD_VIDEO) || defined(IPOD_MINI2G)
         unsigned char* storage_ptr = (unsigned char *)0x4001FF00;
 #endif
-        
-        ata_sleepnow(); /* Immediately spindown the disk. */
-        sleep(HZ*2);
-        memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
-        DEV_RS |= 4; /* Reboot */
+
+#if defined(IRIVER_H10) || defined (IRIVER_H10_5GB)
+        if(button_status()==BUTTON_RIGHT)
+#endif
+        {
+            ata_sleepnow(); /* Immediately spindown the disk. */
+            sleep(HZ*2);
+#ifdef IPOD_ARCH
+            memcpy(storage_ptr, "diskmode\0\0hotstuff\0\0\1", 21);
+#endif
+            system_reboot(); /* Reboot */
+        }
+#endif
     }
 }
 
@@ -106,12 +120,17 @@ bool usb_detect(void)
 {
     bool current_status;
 
-    /* The following check is in the ipodlinux source, with the
-       comment "USB2D_IDENT is bad" if USB2D_IDENT != 0x22FA05 */
-    if (USB2D_IDENT != 0x22FA05) {
+    /* UOG_ID should have the bit format:
+        [31:24] = 0x0
+        [23:16] = 0x22 (Revision number)
+        [15:14] = 0x3 (Reserved)
+        [13:8]  = 0x3a (NID - 1's compliment of ID)
+        [7:6]   = 0x0 (Reserved)
+        [5:0]   = 0x05 (ID) */
+    if (UOG_ID != 0x22FA05) {
         return false;
     }
-    current_status = (USB_STATUS & 0x800)?true:false;
+    current_status = (UOG_OTGSC & 0x800)?true:false;
     
     return current_status;
 }
