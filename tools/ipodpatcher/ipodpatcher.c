@@ -25,12 +25,11 @@
 #include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
 
 #include "parttypes.h"
 #include "ipodio.h"
 
-#define VERSION "0.5"
+#define VERSION "0.6cvs"
 
 int verbose = 0;
 
@@ -338,11 +337,12 @@ void print_usage(void) {
     fprintf(stderr,"\n");
     fprintf(stderr,"Where [action] is one of the following options:\n");
     fprintf(stderr,"  -l,  --list\n");
-    fprintf(stderr,"  -r,  --read-partition   bootpartition.bin\n");
-    fprintf(stderr,"  -w,  --write-partition  bootpartition.bin\n");
-    fprintf(stderr,"  -rf, --read-firmware    filename.ipod\n");
-    fprintf(stderr,"  -wf, --write-firmware   filename.ipod\n");
-    fprintf(stderr,"  -a,  --add-bootloader   filename.ipod\n");
+    fprintf(stderr,"  -r,  --read-partition     bootpartition.bin\n");
+    fprintf(stderr,"  -w,  --write-partition    bootpartition.bin\n");
+    fprintf(stderr,"  -rf, --read-firmware      filename.ipod\n");
+    fprintf(stderr,"  -wf, --write-firmware     filename.ipod\n");
+    fprintf(stderr,"  -a,  --add-bootloader     filename.ipod\n");
+    fprintf(stderr,"  -ab, --add-bootloader-bin filename.bin\n");
     fprintf(stderr,"  -d,  --delete-bootloader\n");
     fprintf(stderr,"\n");
 
@@ -370,6 +370,9 @@ enum {
    READ_PARTITION,
    WRITE_PARTITION
 };
+
+#define DOT_IPOD 0
+#define DOT_BIN  1
 
 char* ftypename[] = { "OSOS", "RSRC", "AUPD", "HIBE" };
 
@@ -472,7 +475,7 @@ int diskmove(HANDLE dh, int start, int nimages, struct ipod_directory_t* ipod_di
     return 0;
 }
 
-int add_bootloader(HANDLE dh, char* filename, int start, int sector_size, 
+int add_bootloader(HANDLE dh, int type, char* filename, int start, int sector_size, 
                    int nimages, struct ipod_directory_t* ipod_directory, 
                    off_t diroffset, int modelnum, char* modelname)
 {
@@ -495,23 +498,27 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
         return -1;
     }
 
-    n = read(infile,header,8);
-    if (n < 8) {
-        fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
-        close(infile);
-        return -1;
+    if (type==DOT_IPOD) {
+        n = read(infile,header,8);
+        if (n < 8) {
+            fprintf(stderr,"[ERR]  Failed to read header from %s\n",filename);
+            close(infile);
+            return -1;
+        }
+
+        if (memcmp(header+4,modelname,4)!=0) {
+            fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
+                    header[4],header[5],header[6],header[7],modelname);
+            close(infile);
+            return -1;
+        }
+
+        filechksum = be2int(header);
+
+        length=filesize(infile)-8;
+    } else {
+        length=filesize(infile);
     }
-
-    if (memcmp(header+4,modelname,4)!=0) {
-        fprintf(stderr,"[ERR]  Model name in input file (%c%c%c%c) doesn't match ipod model (%s)\n",
-                header[4],header[5],header[6],header[7],modelname);
-        close(infile);
-        return -1;
-    }
-
-    filechksum = be2int(header);
-
-    length=filesize(infile)-8;
     paddedlength=(length+sector_size-1)&~(sector_size-1);
 
     /* Now read our bootloader - we need to check it before modifying the partition*/
@@ -522,18 +529,20 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
         return -1;
     }
 
-    /* Calculate and confirm bootloader checksum */
-    chksum = modelnum;
-    for (i = 0; i < length; i++) {
-         /* add 8 unsigned bits but keep a 32 bit sum */
-         chksum += sectorbuf[i];
-    }
+    if (type==DOT_IPOD) {
+        /* Calculate and confirm bootloader checksum */
+        chksum = modelnum;
+        for (i = 0; i < length; i++) {
+             /* add 8 unsigned bits but keep a 32 bit sum */
+             chksum += sectorbuf[i];
+        }
 
-    if (chksum == filechksum) {
-        fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
-    } else {
-        fprintf(stderr,"[ERR]  Checksum in %s failed check\n",filename);
-        return -1;
+        if (chksum == filechksum) {
+            fprintf(stderr,"[INFO] Checksum OK in %s\n",filename);
+        } else {
+            fprintf(stderr,"[ERR]  Checksum in %s failed check\n",filename);
+            return -1;
+        }
     }
 
     if (ipod_directory[0].entryOffset>0) {
@@ -593,8 +602,8 @@ int add_bootloader(HANDLE dh, char* filename, int start, int sector_size,
         return -1;
     }
 
-    /* Now read our bootloader - we need to seek back to 8 bytes from start */
-    lseek(infile,8,SEEK_SET);
+    /* Now read our bootloader - we need to seek back to the start */
+    lseek(infile,(type == DOT_IPOD ? 8 : 0),SEEK_SET);
     n = read(infile,sectorbuf+entryOffset,length);
     if (n < 0) {
         fprintf(stderr,"[ERR]  Couldn't read input file\n");
@@ -1195,6 +1204,7 @@ int main(int argc, char* argv[])
     struct ipod_directory_t ipod_directory[MAX_IMAGES];
     int action = SHOW_INFO;
     int sector_size;
+    int type;
     char devicename[4096];
     HANDLE dh;
 
@@ -1238,6 +1248,15 @@ int main(int argc, char* argv[])
         } else if ((strcmp(argv[i],"-a")==0) || 
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
+            type = DOT_IPOD;
+            i++;
+            if (i == argc) { print_usage(); return 1; }
+            filename=argv[i];
+            i++;
+        } else if ((strcmp(argv[i],"-ab")==0) || 
+                   (strcmp(argv[i],"--add-bootloader-bin")==0)) {
+            action = ADD_BOOTLOADER;
+            type = DOT_BIN;
             i++;
             if (i == argc) { print_usage(); return 1; }
             filename=argv[i];
@@ -1341,7 +1360,7 @@ int main(int argc, char* argv[])
             return 5;
         }
 
-        if (add_bootloader(dh, filename,pinfo[0].start*sector_size, 
+        if (add_bootloader(dh, type, filename,pinfo[0].start*sector_size, 
                            sector_size, nimages, ipod_directory, diroffset, 
                            modelnum, modelname)==0) {
             fprintf(stderr,"[INFO] Bootloader %s written to device.\n",filename);
