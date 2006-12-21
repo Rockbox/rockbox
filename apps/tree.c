@@ -1212,7 +1212,7 @@ bool create_playlist(void)
 
     pltick = current_tick;
 
-    snprintf(filename, sizeof filename, "%s.m3u",
+    snprintf(filename, sizeof filename, "%s.m3u8",
              tc.currdir[1] ? tc.currdir : "/root");
     FOR_NB_SCREENS(i)
     {
