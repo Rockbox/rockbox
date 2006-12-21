@@ -28,20 +28,20 @@ you wish. Note that these files should be saved onto your computer's hard disk,
   
   \item Next, download the following file to the installation folder: 
 
-    \opt{ipodvideo}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
+    \opt{ipodvideo}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipod
     video.ipod}} 
     \opt{ipodnano}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    nano.ipod}} 
+    ipodnano.ipod}} 
     \opt{ipodmini}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    mini1g.ipod} or \url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    mini2g.ipod} depending on which generation your \dap{} is.  \fixme{Describe 
+    ipodmini1g.ipod} or \url{http://download.rockbox.org/bootloader/ipod/bootloader-
+    ipodmini2g.ipod} depending on which generation your \dap{} is.  \fixme{Describe 
     how to identify 1/2G}} 
     \opt{ipodcolor}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    color.ipod}} 
+    ipodcolor.ipod}} 
     \opt{ipod4g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    4g.ipod}} 
+    ipod4g.ipod}} 
     \opt{ipod3g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-
-    3g.ipod}}
+    ipod3g.ipod}}
 
   \item Next, open a command prompt (Windows) or terminal window (Mac OSX and Linux).
   
@@ -57,121 +57,121 @@ you wish. Note that these files should be saved onto your computer's hard disk,
   
   \item Connect your ipod to your computer.
 
-		If you haven't already done so, you should now plug your iPod into your 
-		computer (via either the USB or Firewire cable).
+    If you haven't already done so, you should now plug your iPod into your 
+    computer (via either the USB or Firewire cable).
 
-		\fixme{Notes about closing itunes, enabling the ``show ipod as disk'' option 
-		in ipod, anything else?}
+    \fixme{Notes about closing itunes, enabling the ``show ipod as disk'' option 
+    in ipod, anything else?}
 
-	\item Find your ipod with ipodpatcher (Windows users only)
+  \item Find your ipod with ipodpatcher (Windows users only)
 
-		Windows users:  Type the following command to search for ipods attached to 
-		your computer: 
-			\begin{code} 
-				ipodpatcher \-\-scan 
-			\end{code}
-		
-		When ipodpatcher finds your ipod, remember the number it displays - this 
-		will 	be the number you use to access your ipod in the following steps.
+    Windows users:  Type the following command to search for ipods attached to 
+    your computer: 
+      \begin{code} 
+        ipodpatcher --scan 
+      \end{code}
+    
+    When ipodpatcher finds your ipod, remember the number it displays - this 
+    will  be the number you use to access your ipod in the following steps.
 
-		\note{Windows users require administrator rights for running 	ipodpatcher. 
-		Either re-login as administrator, or open a command prompt running under an 
-		administrator account by using one of the "Run as" features	of Windows XP.}
+    \note{Windows users require administrator rights for running  ipodpatcher. 
+    Either re-login as administrator, or open a command prompt running under an 
+    administrator account by using one of the "Run as" features of Windows XP.}
 
-	\item Find your ipod (Mac OS X users only)
+  \item Find your ipod (Mac OS X users only)
 
-		Attach your iPod to your Mac (using either USB or Firewire) and wait for 
-		iTunes to open. When iTunes opens, close it down.  In your Terminal window, 
-		type the command mount and press enter. This will list all the disks (and 
-		other devices) that are "mounted" on your computer. The last 	drive in the 
-		list should be your iPod. For example: 
-		\begin{code}
-			 /dev/disk1s2 on /Volumes/DAVE_S IPOD 1 (local, nodev, nosuid) 
-		\end{code}
+    Attach your iPod to your Mac (using either USB or Firewire) and wait for 
+    iTunes to open. When iTunes opens, close it down.  In your Terminal window, 
+    type the command mount and press enter. This will list all the disks (and 
+    other devices) that are "mounted" on your computer. The last  drive in the 
+    list should be your iPod. For example: 
+    \begin{code}
+       /dev/disk1s2 on /Volumes/DAVE_S IPOD 1 (local, nodev, nosuid) 
+    \end{code}
 
-		In order to install the ipod bootloader, you need to "unmount" this disk 
-		using 	the following command: 
-			\begin{code} 
-				diskutil unmount /dev/disk1s2 
-			\end{code}
-			
-		replacing ``/dev/disk1s2'' with the device name Mac OS has assigned to your
-		ipod. This may take a few seconds, after which Mac OS will say ``Volume 
-		/dev/disk1s2 unmounted.''	``/dev/disk1s2'' refers to the second partition on 
-		/dev/disk1 - remember 	``/dev/disk1'' for the next step.
+    In order to install the ipod bootloader, you need to "unmount" this disk 
+    using   the following command: 
+      \begin{code} 
+        diskutil unmount /dev/disk1s2 
+      \end{code}
+      
+    replacing ``/dev/disk1s2'' with the device name Mac OS has assigned to your
+    ipod. This may take a few seconds, after which Mac OS will say ``Volume 
+    /dev/disk1s2 unmounted.'' ``/dev/disk1s2'' refers to the second partition on 
+    /dev/disk1 - remember   ``/dev/disk1'' for the next step.
 
-		It's possible that itunes will try to be ``helpful'' and remount your ipod 
-		after you modify it with ipodpatcher. If this happens, you need to unmount 
-		it again using the above command. 
+    It's possible that itunes will try to be ``helpful'' and remount your ipod 
+    after you modify it with ipodpatcher. If this happens, you need to unmount 
+    it again using the above command. 
   
-	\item Create a backup of your ipod's firmware partition
+  \item Create a backup of your ipod's firmware partition
 
-		Type the following command, replacing "[device]" with the number (for 
-		Windows users) or the device name (Mac OS X and Unix users) assigned to 
-		your ipod that 	you found in the previous step: 
-			\begin{code} 
-				ipodpatcher [device] -r bootpartition.bin (Windows) 
-			\end{code}
+    Type the following command, replacing "[device]" with the number (for 
+    Windows users) or the device name (Mac OS X and Unix users) assigned to 
+    your ipod that  you found in the previous step: 
+      \begin{code} 
+        ipodpatcher [device] -r bootpartition.bin (Windows) 
+      \end{code}
 
-			or
+      or
 
-			\begin{code}
-				./ipodpatcher [device] -r bootpartition.bin (Mac OS X/Unix)
-			\end{code}
-	
-		This should create a file in the current folder called bootpartition.bin 
-		(approximately 40MB for the iPod 3G, 4G and Color/Photo, 80MB for the Nano 
-		1st gen and 30GB Video, and 112MB for the 60GB Video) containing a copy of 
-		the ``firmware partition'' from your iPod.
+      \begin{code}
+        ./ipodpatcher [device] -r bootpartition.bin (Mac OS X/Unix)
+      \end{code}
+  
+    This should create a file in the current folder called bootpartition.bin 
+    (approximately 40MB for the iPod 3G, 4G and Color/Photo, 80MB for the Nano 
+    1st gen and 30GB Video, and 112MB for the 60GB Video) containing a copy of 
+    the ``firmware partition'' from your iPod.
 
-		If it ever becomes necessary (i.e. your ipod refuses to start), you can 
-		restore this backup to your ipod using the command ipodpatcher [device] -w 
-		bootpartition.bin (Windows) or ./ipodpatcher [device] -w bootpartition.bin 
-		(Mac OS X/Unix).   
-	
-	\item Install the bootloader.
+    If it ever becomes necessary (i.e. your ipod refuses to start), you can 
+    restore this backup to your ipod using the command ipodpatcher [device] -w 
+    bootpartition.bin (Windows) or ./ipodpatcher [device] -w bootpartition.bin 
+    (Mac OS X/Unix).   
+  
+  \item Install the bootloader.
 
-		Windows users should now type:
-		\begin{code}
-			ipodpatcher [device] -a 
-				\opt{ipodvideo}{bootloader-video.ipod}
-    		\opt{ipodnano}{bootloader-nano.ipod}
-	 		  \opt{ipodmini}{bootloader-mini1g.ipod 
-	 		  	\end{code} 
-	 		  	or
-	 		  	\begin{code}
-	 		  		ipodpatcher [device] -a bootloader-mini2g.ipod
-	 		  	}
-    		\opt{ipodcolor}{bootloader-color.ipod}
-		    \opt{ipod4g}{bootloader-4g.ipod}
-		    \opt{ipod3g}{bootloader-3g.ipod}
-		\end{code}
+    Windows users should now type:
+    \begin{code}
+      ipodpatcher [device] -a 
+        \opt{ipodvideo}{bootloader-video.ipod}
+        \opt{ipodnano}{bootloader-nano.ipod}
+        \opt{ipodmini}{bootloader-mini1g.ipod 
+          \end{code} 
+          or
+          \begin{code}
+            ipodpatcher [device] -a bootloader-mini2g.ipod
+          }
+        \opt{ipodcolor}{bootloader-color.ipod}
+        \opt{ipod4g}{bootloader-4g.ipod}
+        \opt{ipod3g}{bootloader-3g.ipod}
+    \end{code}
 
-		and Mac OS X/Unix users should type:
-		\begin{code}
-			./ipodpatcher [device] -a 
-			\opt{ipodvideo}{bootloader-video.ipod}
-    		\opt{ipodnano}{bootloader-nano.ipod} 
-	 		  \opt{ipodmini}{bootloader-mini1g.ipod 
-	 		  	\end{code} 
-	 		  	or
-	 		  	\begin{code}
-	 		  		or ipodpatcher [device] -a bootloader-mini2g.ipod
-	 		  	}
-    		\opt{ipodcolor}{bootloader-color.ipod}
-		    \opt{ipod4g}{bootloader-4g.ipod}
-		    \opt{ipod3g}{bootloader-3g.ipod}
-		\end{code}
+    and Mac OS X/Unix users should type:
+    \begin{code}
+      ./ipodpatcher [device] -a 
+      \opt{ipodvideo}{bootloader-video.ipod}
+        \opt{ipodnano}{bootloader-nano.ipod} 
+        \opt{ipodmini}{bootloader-mini1g.ipod 
+          \end{code} 
+          or
+          \begin{code}
+            or ipodpatcher [device] -a bootloader-mini2g.ipod
+          }
+        \opt{ipodcolor}{bootloader-color.ipod}
+        \opt{ipod4g}{bootloader-4g.ipod}
+        \opt{ipod3g}{bootloader-3g.ipod}
+    \end{code}
 
-	Replace [device] with the number (Windows users) or device name (Mac OS X/Unix 
-	users) you've been using to access your ipod.
+  Replace [device] with the number (Windows users) or device name (Mac OS X/Unix 
+  users) you've been using to access your ipod.
 
-	You can now disconnect your ipod from your computer in the normal way. This 
-	should cause your iPod to reboot and start Rockbox.
+  You can now disconnect your ipod from your computer in the normal way. This 
+  should cause your iPod to reboot and start Rockbox.
 
-	\item Troubleshooting.
+  \item Troubleshooting.
 
-	\fixme{Add some notes here about common problems - "rockbox error -1" is the 
-	main one. Or maybe have a new troubleshooting page.}
+  \fixme{Add some notes here about common problems - "rockbox error -1" is the 
+  main one. Or maybe have a new troubleshooting page.}
   
 \end{enumerate} 
