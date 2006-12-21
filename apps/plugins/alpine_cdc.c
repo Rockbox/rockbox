@@ -202,7 +202,6 @@ struct
 /* communication to the worker thread */
 struct 
 {
-    struct thread_entry *id; /* Pointer of the thread */
     bool foreground; /* set as long as we're owning the UI */
     bool exiting; /* signal to the thread that we want to exit */
     bool ended; /* response from the thread, that is has exited */
@@ -1117,8 +1116,7 @@ void thread(void)
     } while (!gTread.exiting);
 
     gTread.ended = true; /* acknowledge the exit */
-    rb->remove_thread(gTread.id); /* commit suicide */
-    rb->yield(); /* pass control to other threads, we won't return */
+    rb->remove_thread(NULL); /* commit suicide */
 }
 
 /* callback to end the TSR plugin, called before a new one gets loaded */
@@ -1172,8 +1170,8 @@ int main(void* parameter)
 
     rb->memset(&gTread, 0, sizeof(gTread));
     gTread.foreground = true;
-    gTread.id = rb->create_thread(thread, stack, stacksize, "CDC"
-                                  IF_PRIO(, PRIORITY_BACKGROUND));
+    rb->create_thread(thread, stack, stacksize, "CDC"
+                      IF_PRIO(, PRIORITY_BACKGROUND));
 
 #ifdef DEBUG
     do
