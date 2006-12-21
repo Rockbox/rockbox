@@ -32,6 +32,7 @@
 
 #define BLOCK_SIZE      (512)
 #define SECTOR_SIZE     (512)
+#define BLOCKS_PER_BANK 0x7a7800
 
 #define STATUS_REG      (*(volatile unsigned int *)(0x70008204))
 #define REG_1           (*(volatile unsigned int *)(0x70008208))
@@ -440,7 +441,7 @@ void sd_init_device(void)
     BLOCK_SIZE_REG = card->block_size;
 
     /* If this card is > 4Gb, then we need to enable bank switching */
-    if(card->numblocks > 0x7a77ff)
+    if(card->numblocks >= BLOCKS_PER_BANK)
     {
         SD_STATE_REG = TRAN;
         BLOCK_COUNT_REG = 1;
@@ -502,10 +503,10 @@ int ata_read_sectors(IF_MV2(int drive,)
     /* TODO: Select device */
     if(current_card == 0)
     {
-        if(start > 0x7a77ff)
+        if(start >= BLOCKS_PER_BANK)
         {
             sd_select_bank(1);
-            start-=0x7a77ff;
+            start -= BLOCKS_PER_BANK;
         } else {
             sd_select_bank(0);
         }
@@ -571,12 +572,12 @@ int ata_write_sectors(IF_MV2(int drive,)
     ata_led(true);
     if(current_card == 0)
     {
-        if(start <= 0x7a77ff)
+        if(start < BLOCKS_PER_BANK)
         {
             sd_select_bank(0);
         } else {
             sd_select_bank(1);
-            start -= 0x7a77ff;
+            start -= BLOCKS_PER_BANK;
         }
     }
 
