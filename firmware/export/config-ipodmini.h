@@ -63,6 +63,7 @@
 #define HAVE_WM8721 /* actually WM8731 but no recording */
 
 #define AB_REPEAT_ENABLE 1
+#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODMINI /* port controlled */

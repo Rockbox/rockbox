@@ -60,6 +60,7 @@
 #define HAVE_WM8758
 
 #define AB_REPEAT_ENABLE 1
+#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_IPODNANO /* port controlled */

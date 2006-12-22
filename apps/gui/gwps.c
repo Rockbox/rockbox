@@ -208,7 +208,28 @@ long gui_wps_show(void)
            from F1 */
         if (!audio_status())
             exit = true;
-            
+#ifdef ACTION_WPSAB_SINGLE
+        if (!global_settings.party_mode && ab_repeat_mode_enabled())
+        {
+            static int wps_ab_state = 0;
+            if (button == ACTION_WPSAB_SINGLE)
+            {
+                switch (wps_ab_state)
+                {
+                    case 0: /* set the A spot */
+                        button = ACTION_WPS_ABSETA_PREVDIR;
+                        break;
+                    case 1: /* set the B spot */
+                        button = ACTION_WPS_ABSETB_NEXTDIR;
+                        break;
+                    case 2:
+                        button = ACTION_WPSAB_RESET;
+                        break;
+                }
+                wps_ab_state = (wps_ab_state+1) % 3;
+            }
+        }
+#endif
         switch(button)
         {
             case ACTION_WPS_CONTEXT:
@@ -507,25 +528,6 @@ long gui_wps_show(void)
 #endif /* HAVE_PITCHSCREEN */
 
 #ifdef AB_REPEAT_ENABLE
-            case ACTION_WPSAB_SINGLE:
-/* If we are using the menu option to enable ab_repeat mode, don't do anything
- * when it's disabled */
-#if (AB_REPEAT_ENABLE == 1)
-                if (!ab_repeat_mode_enabled())
-                    break;
-#endif
-                if (ab_A_marker_set()) {
-                    update_track = true;
-                    if (ab_B_marker_set()) {
-                        ab_reset_markers();
-                        break;
-                    }
-                    ab_set_B_marker(wps_state.id3->elapsed);
-                    ab_jump_to_A_marker();
-                    break;
-                }
-                ab_set_A_marker(wps_state.id3->elapsed);
-                break;
             /* reset A&B markers */
             case ACTION_WPSAB_RESET:
                 if (ab_repeat_mode_enabled())
