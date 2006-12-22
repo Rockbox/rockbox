@@ -25,7 +25,8 @@
 
 #define DIRCACHE_RESERVE  (1024*64)
 #define DIRCACHE_LIMIT    (1024*1024*6)
-#define DIRCACHE_FILE     ROCKBOX_DIR "/dircache.dat"
+/* FIXME: We should use ROCKBOX_DIR here but it's defined in apps/ */
+#define DIRCACHE_FILE     "/.rockbox/dircache.dat"
 
 /* Internal structures. */
 struct travel_data {
@@ -80,8 +81,8 @@ typedef struct {
 } DIRCACHED;
 
 void dircache_init(void);
-int dircache_load(const char *path);
-int dircache_save(const char *path);
+int dircache_load(void);
+int dircache_save(void);
 int dircache_build(int last_size);
 void* dircache_steal_buffer(long *size);
 bool dircache_is_enabled(void);

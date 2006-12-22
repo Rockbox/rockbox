@@ -128,25 +128,32 @@ static int init_dircache(bool preinit)
     if (preinit)
         dircache_init();
     
-    if (global_settings.dircache)
-    {
+    if (!global_settings.dircache)
+        return 0;
+    
 # ifdef HAVE_EEPROM_SETTINGS
-        if (firmware_settings.initialized && firmware_settings.disk_clean 
-            && preinit)
-        {
-            result = dircache_load(DIRCACHE_FILE);
-            remove(DIRCACHE_FILE);
-            if (result < 0)
-            {
-                firmware_settings.disk_clean = false;
-                if (global_settings.dircache_size >= 0)
-                    dircache_build(global_settings.dircache_size);
-            }
+    if (firmware_settings.initialized && firmware_settings.disk_clean 
+        && preinit)
+    {
+        result = dircache_load();
 
-            return result;
+        if (result < 0)
+        {
+            firmware_settings.disk_clean = false;
+            if (global_settings.dircache_size <= 0)
+            {
+                /* This will be in default language, settings are not
+                   applied yet. Not really any easy way to fix that. */
+                gui_syncsplash(0, true, str(LANG_DIRCACHE_BUILDING));
+                clear = true;
+            }
+            
+            dircache_build(global_settings.dircache_size);
         }
+    }
+    else
 # endif
-        
+    {
         if (preinit)
             return -1;
         
@@ -163,12 +170,12 @@ static int init_dircache(bool preinit)
         
         if (result < 0)
             gui_syncsplash(0, true, "Failed! Result: %d", result);
-        
-        if (clear)
-        {
-            backlight_on();
-            show_logo();
-        }
+    }
+    
+    if (clear)
+    {
+        backlight_on();
+        show_logo();
         global_settings.dircache_size = dircache_get_cache_size();
         settings_save();
     }

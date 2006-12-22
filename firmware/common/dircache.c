@@ -410,7 +410,7 @@ static struct dircache_entry* dircache_get_entry(const char *path,
  * Function to load the internal cache structure from disk to initialize
  * the dircache really fast and little disk access.
  */
-int dircache_load(const char *path)
+int dircache_load(void)
 {
     struct dircache_maindata maindata;
     int bytes_read;
@@ -422,7 +422,7 @@ int dircache_load(const char *path)
     logf("Loading directory cache");
     dircache_size = 0;
     
-    fd = open(path, O_RDONLY);
+    fd = open(DIRCACHE_FILE, O_RDONLY);
     if (fd < 0)
         return -2;
         
@@ -432,6 +432,7 @@ int dircache_load(const char *path)
     {
         logf("Dircache file header error");
         close(fd);
+        remove(DIRCACHE_FILE);
         return -3;
     }
 
@@ -440,6 +441,7 @@ int dircache_load(const char *path)
     {
         logf("Position missmatch");
         close(fd);
+        remove(DIRCACHE_FILE);
         return -4;
     }
     
@@ -447,6 +449,7 @@ int dircache_load(const char *path)
     entry_count = maindata.entry_count;
     bytes_read = read(fd, dircache_root, MIN(DIRCACHE_LIMIT, maindata.size));
     close(fd);
+    remove(DIRCACHE_FILE);
     
     if (bytes_read != maindata.size)
     {
@@ -469,13 +472,13 @@ int dircache_load(const char *path)
  * Function to save the internal cache stucture to disk for fast loading
  * on boot.
  */
-int dircache_save(const char *path)
+int dircache_save(void)
 {
     struct dircache_maindata maindata;
     int fd;
     unsigned long bytes_written;
 
-    remove(path);
+    remove(DIRCACHE_FILE);
     
     while (thread_enabled)
         sleep(1);
@@ -484,7 +487,7 @@ int dircache_save(const char *path)
         return -1;
 
     logf("Saving directory cache");
-    fd = open(path, O_WRONLY | O_CREAT | O_TRUNC);
+    fd = open(DIRCACHE_FILE, O_WRONLY | O_CREAT | O_TRUNC);
 
     maindata.magic = DIRCACHE_MAGIC;
     maindata.size = dircache_size;
@@ -529,6 +532,7 @@ static int dircache_do_rebuild(void)
     /* Measure how long it takes build the cache. */
     start_tick = current_tick;
     dircache_initializing = true;
+    remove(DIRCACHE_FILE);
     
 #ifdef SIMULATOR
     pdir = opendir("/");
@@ -633,6 +637,8 @@ int dircache_build(int last_size)
         return -3;
 
     logf("Building directory cache");
+    remove(DIRCACHE_FILE);
+    
     /* Background build, dircache has been previously allocated */
     if (dircache_size > 0)
     {

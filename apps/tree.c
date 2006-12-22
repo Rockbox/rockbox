@@ -1443,8 +1443,7 @@ void tree_flush(void)
         {
             global_settings.dircache_size = dircache_get_cache_size();
 # ifdef HAVE_EEPROM_SETTINGS
-            if (dircache_is_enabled() && firmware_settings.initialized)
-                dircache_save(DIRCACHE_FILE);
+            dircache_save();
 # endif
             dircache_disable();
         }
