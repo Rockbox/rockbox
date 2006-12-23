@@ -73,9 +73,31 @@ generateclips() {
                 # String
                 STRING=`echo $line |cut -b 8-`
 
-                # Now generate the file
-                voice "$STRING" "$TEMPDIR/$ID".wav
-                encode "$TEMPDIR/$ID".wav "$TEMPDIR/$ID".mp3
+                if [ -n "$POOL" ]; then
+                    # we have a common pool of snippets, check that first
+                    # for available mp3 sounds, and if it is available copy
+                    # (symlink!) it over
+                    if [ -f "$POOL/$STRING.mp3" ]; then
+                        echo "Re-using $ID from pool"
+                        if [ ! -e "$TEMPDIR/$ID".mp3 ]; then
+                            # only do this if not present
+                            ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                        fi
+                    fi
+                fi
+
+                # only make an mp3 if not already present
+                if [ ! -e "$TEMPDIR/$ID".mp3 ]; then
+                    # Now generate the file
+                    voice "$STRING" "$TEMPDIR/$ID".wav
+                    if [ -n "$POOL" ]; then
+                        # create it in the pool, symlink it back
+                        encode "$TEMPDIR/$ID".wav "$POOL/$STRING".mp3
+                        ln -s "$POOL/$STRING.mp3" "$TEMPDIR/$ID".mp3
+                    else
+                        encode "$TEMPDIR/$ID".wav "$TEMPDIR/$ID".mp3
+                    fi
+                fi
                 ;;
         esac
         i=`expr $i + 1`
