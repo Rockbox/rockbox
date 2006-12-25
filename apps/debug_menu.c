@@ -142,11 +142,18 @@ static bool dbg_os(void)
                 usage = thread_stack_usage(thread);
                 status = thread_get_status(thread);
 
+# ifdef HAVE_PRIORITY_SCHEDULING
                 snprintf(buf, 32, "(%d) %c%c %d %s: %d%%", core,
                          (status == STATE_RUNNING) ? '*' : ' ',
                          thread_status_char(status),
                          cores[CURRENT_CORE].threads[i].priority,
                          cores[core].threads[i].name, usage);
+# else
+                snprintf(buf, 32, "(%d) %c%c %s: %d%%", core,
+                         (status == STATE_RUNNING) ? '*' : ' ',
+                         thread_status_char(status),
+                         cores[core].threads[i].name, usage);
+# endif
                 lcd_puts(0, ++line, buf);
             }
         }
