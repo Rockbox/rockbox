@@ -127,13 +127,13 @@ static int preset_menu; /* The menu index of the preset list */
 static struct menu_item preset_menu_items[MAX_PRESETS];
 static int num_presets = 0; /* The number of presets in the preset list */
 
-void radio_save_presets(void);
-bool handle_radio_presets(void);
-bool radio_menu(void);
-bool radio_add_preset(void);
-bool save_preset_list(void);
-bool load_preset_list(void);
-bool clear_preset_list(void);
+static void radio_save_presets(void);
+static bool handle_radio_presets(void);
+static bool radio_menu(void);
+static bool radio_add_preset(void);
+static bool save_preset_list(void);
+static bool load_preset_list(void);
+static bool clear_preset_list(void);
 
 static bool scan_presets(void);
 
@@ -148,14 +148,14 @@ int radio_get(int setting);
 #define radio_set philips_set
 #define radio_get philips_get
 #elif CONFIG_TUNER == (S1A0903X01 | TEA5767) /* OndioFM */
-void (*radio_set)(int setting, int value);
-int (*radio_get)(int setting);
+static void (*radio_set)(int setting, int value);
+static int (*radio_get)(int setting);
 #endif
 #endif
 
 /* Function to manipulate all yesno dialogues.
    This function needs the output text as an argument. */
-bool yesno_pop(char* text)
+static bool yesno_pop(char* text)
 {
     int i;
     char *lines[]={text};
@@ -338,7 +338,7 @@ static void remember_frequency(void)
     settings_save();
 }
 
-void next_preset(int direction)
+static void next_preset(int direction)
 {
     if (num_presets < 1)
         return;
@@ -967,7 +967,7 @@ bool radio_screen(void)
     return have_recorded;
 } /* radio_screen */
 
-void radio_save_presets(void)
+static void radio_save_presets(void)
 {
     int fd;
     int i;
@@ -1064,7 +1064,7 @@ static void rebuild_preset_menu(void)
     }
 }
 
-bool radio_add_preset(void)
+static bool radio_add_preset(void)
 {
     char buf[MAX_FMPRESET_LEN];
 
@@ -1129,7 +1129,7 @@ static bool radio_edit_preset(void)
     return true;
 }
 
-bool radio_delete_preset(void)
+static bool radio_delete_preset(void)
 {
     int pos = menu_cursor(preset_menu);
     int i;
@@ -1157,12 +1157,12 @@ bool radio_delete_preset(void)
     return true; /* Make the menu return immediately */
 }
 
-bool load_preset_list(void)
+static bool load_preset_list(void)
 {
     return !rockbox_browse(FMPRESET_PATH, SHOW_FMR);
 }
 
-bool save_preset_list(void)
+static bool save_preset_list(void)
 {   
     if(num_presets != 0)
     { 
@@ -1215,7 +1215,7 @@ bool save_preset_list(void)
     return true;
 }
 
-bool clear_preset_list(void)
+static bool clear_preset_list(void)
 {
     int i;
     
@@ -1236,7 +1236,7 @@ bool clear_preset_list(void)
 }
 
 /* little menu on what to do with a preset entry */
-bool handle_radio_presets_menu(void)
+static bool handle_radio_presets_menu(void)
 {
     static const struct menu_item preset_menu_items[] = {
         { ID2P(LANG_FM_EDIT_PRESET), radio_edit_preset },
@@ -1254,7 +1254,7 @@ bool handle_radio_presets_menu(void)
 }
 
 /* button preprocessor for list of preset stations menu */
-int handle_radio_presets_cb(int key, int m)
+static int handle_radio_presets_cb(int key, int m)
 {
     (void)m;
 
@@ -1292,7 +1292,7 @@ int handle_radio_presets_cb(int key, int m)
 }
 
 /* present a list of preset stations */
-bool handle_radio_presets(void)
+static bool handle_radio_presets(void)
 {
     int result;
     bool reload_dir = false;
@@ -1328,7 +1328,7 @@ bool handle_radio_presets(void)
     return reload_dir;
 }
 
-char monomode_menu_string[32];
+static char monomode_menu_string[32];
 
 static void create_monomode_menu(void)
 {
@@ -1347,7 +1347,7 @@ static bool toggle_mono_mode(void)
     return false;
 }
 
-char region_menu_string[32];
+static char region_menu_string[32];
 static void create_region_menu(void)
 {
     snprintf(region_menu_string, sizeof(region_menu_string),
@@ -1381,7 +1381,7 @@ static bool toggle_region_mode(void)
 }
 
 #ifndef FM_MODE
-char radiomode_menu_string[32];
+static char radiomode_menu_string[32];
 
 static void create_radiomode_menu(void)
 {
@@ -1471,7 +1471,7 @@ static bool scan_presets(void)
 }
 
 /* button preprocessor for the main menu */
-int radio_menu_cb(int key, int m)
+static int radio_menu_cb(int key, int m)
 {
     (void)m;
 #if 0 /* this screen needs fixing! */
@@ -1548,7 +1548,7 @@ static bool fm_recording_settings(void)
 
 
 /* main menu of the radio screen */
-bool radio_menu(void)
+static bool radio_menu(void)
 {
     int m;
     bool result;

@@ -762,7 +762,7 @@ static void set_bits(
 #define hex2dec(c) (((c) >= '0' && ((c) <= '9')) ? (toupper(c)) - '0' : \
                                                    (toupper(c)) - 'A' + 10)
 
-int hex_to_rgb(const char* hex)
+static int hex_to_rgb(const char* hex)
 {   int ok = 1;
     int i;
     int red, green, blue;
@@ -821,7 +821,7 @@ static void init_config_buffer( void )
     config_block[3] = CONFIG_BLOCK_VERSION;
 }
 
-bool flush_config_block_callback(void)
+static bool flush_config_block_callback(void)
 {
     ata_write_sectors(IF_MV2(0,) config_sector, 1, config_block);
     return true;
@@ -1942,7 +1942,7 @@ bool set_bool(const char* string, bool* variable )
 
 /* wrapper to convert from int param to bool param in set_option */
 static void (*boolfunction)(bool);
-void bool_funcwrapper(int value)
+static void bool_funcwrapper(int value)
 {
     if (value)
         boolfunction(true);
@@ -1967,7 +1967,7 @@ bool set_bool_options(const char* string, bool* variable,
     return result;
 }
 
-void talk_unit(int unit, int value)
+static void talk_unit(int unit, int value)
 {
     if (global_settings.talk_menu)
     {
@@ -1996,7 +1996,7 @@ struct value_setting_data {
     struct opt_items* options;    
 };
     
-char * value_setting_get_name_cb(int selected_item,void * data, char *buffer)
+static char * value_setting_get_name_cb(int selected_item,void * data, char *buffer)
 {
     struct value_setting_data* cb_data = 
             (struct value_setting_data*)data;
@@ -2016,10 +2016,10 @@ char * value_setting_get_name_cb(int selected_item,void * data, char *buffer)
         (int)(*(int*)(value)) \
     : \
         (bool)(*(bool*)(value))
-bool do_set_setting(const unsigned char* string, void *variable,
-                    int nb_items,int selected, 
-                    struct value_setting_data *cb_data,
-                    void (*function)(int))
+static bool do_set_setting(const unsigned char* string, void *variable,
+                           int nb_items,int selected,
+                           struct value_setting_data *cb_data,
+                           void (*function)(int))
 {
     int action;
     bool done = false;

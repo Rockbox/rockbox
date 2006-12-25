@@ -60,7 +60,9 @@ extern const char* const dir_thumbnail_name; /* "_dirname.talk" */
 extern const char* const file_thumbnail_ext; /* ".talk" for file voicing */
 
 void talk_init(void);
+#if CONFIG_CODEC == SWCODEC
 bool talk_voice_required(void); /* returns true if voice codec required */
+#endif
 int talk_get_bufsize(void); /* get the loaded voice file size */
 /* talk_buffer_steal - on SWCODEC, for use by buffer functions only */
 int talk_buffer_steal(void); /* claim the mp3 buffer e.g. for play/record */

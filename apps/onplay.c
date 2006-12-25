@@ -85,7 +85,7 @@ struct playlist_args {
 /* Displays the bookmark menu options for the user to decide.  This is an  */
 /* interface function.                                                     */
 /* ----------------------------------------------------------------------- */
-bool bookmark_menu(void)
+static bool bookmark_menu(void)
 {
     int i,m;
     bool result;
@@ -240,13 +240,13 @@ static bool view_playlist(void)
     return result;
 }
 
-bool cat_add_to_a_playlist(void)
+static bool cat_add_to_a_playlist(void)
 {
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
         false);
 }
 
-bool cat_add_to_a_new_playlist(void)
+static bool cat_add_to_a_new_playlist(void)
 {
     return catalog_add_to_a_playlist(selected_file, selected_file_attr, true);
 }
@@ -541,7 +541,7 @@ static bool rename_file(void)
     return false;
 }
 
-bool create_dir(void)
+static bool create_dir(void)
 {
     char dirname[MAX_PATH];
     char *cwd;

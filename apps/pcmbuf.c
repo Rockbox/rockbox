@@ -873,6 +873,7 @@ void pcmbuf_write_complete(size_t length)
     }
 }
 
+#if 0
 bool pcmbuf_insert_buffer(char *buf, size_t length)
 {
     if (crossfade_active)
@@ -889,6 +890,7 @@ bool pcmbuf_insert_buffer(char *buf, size_t length)
     }
     return true;
 }
+#endif
 
 /* Generates a constant square wave sound with a given frequency
    in Hertz for a duration in milliseconds. */

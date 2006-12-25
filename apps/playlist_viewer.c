@@ -108,15 +108,15 @@ static struct playlist_viewer  viewer;
 /* Used when viewing playlists on disk */
 static struct playlist_info temp_playlist;
 
-void playlist_buffer_init(struct playlist_buffer * pb, char * names_buffer,
-                          int names_buffer_size);
-void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
-                                  enum direction direction);
-int playlist_entry_load(struct playlist_entry *entry, int index,
-                        char* name_buffer, int remaining_size);
+static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
+                                 int names_buffer_size);
+static void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
+                                         enum direction direction);
+static int playlist_entry_load(struct playlist_entry *entry, int index,
+                               char* name_buffer, int remaining_size);
 
-struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer * pb,
-                                                  int index);
+static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer *pb,
+                                                         int index);
 
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
                                  char* filename, bool reload);
@@ -133,8 +133,8 @@ static bool show_indices(void);
 static bool track_display(void);
 static bool save_playlist(void);
 
-void playlist_buffer_init(struct playlist_buffer * pb, char * names_buffer,
-                          int names_buffer_size)
+static void playlist_buffer_init(struct playlist_buffer *pb, char *names_buffer,
+                                 int names_buffer_size)
 {
     pb->name_buffer=names_buffer;
     pb->buffer_size=names_buffer_size;
@@ -145,8 +145,8 @@ void playlist_buffer_init(struct playlist_buffer * pb, char * names_buffer,
 /*
  * Loads the entries following 'index' in the playlist buffer
  */
-void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
-                                  enum direction direction)
+static void playlist_buffer_load_entries(struct playlist_buffer *pb, int index,
+                                         enum direction direction)
 {
     int num_entries = viewer.num_tracks;
     char* p = pb->name_buffer;
@@ -181,8 +181,8 @@ void playlist_buffer_load_entries(struct playlist_buffer * pb, int index,
     pb->num_loaded = i;
 }
 
-void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
-                                         enum direction direction)
+static void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
+                                                enum direction direction)
 {
     if(direction==FORWARD)
     {
@@ -200,8 +200,8 @@ void playlist_buffer_load_entries_screen(struct playlist_buffer * pb,
     }
 }
 
-int playlist_entry_load(struct playlist_entry *entry, int index,
-                        char* name_buffer, int remaining_size)
+static int playlist_entry_load(struct playlist_entry *entry, int index,
+                               char* name_buffer, int remaining_size)
 {
     struct playlist_track_info info;
     int len;
@@ -229,7 +229,7 @@ int playlist_entry_load(struct playlist_entry *entry, int index,
     return -1;
 }
 
-int playlist_buffer_get_index(struct playlist_buffer * pb, int index )
+static int playlist_buffer_get_index(struct playlist_buffer *pb, int index )
 {
     int buffer_index;
     if(pb->direction==FORWARD)
@@ -252,7 +252,7 @@ int playlist_buffer_get_index(struct playlist_buffer * pb, int index )
 
 #define distance(a, b) \
     a>b? (a) - (b) : (b) - (a)
-bool playlist_buffer_needs_reload(struct playlist_buffer* pb, int track_index)
+static bool playlist_buffer_needs_reload(struct playlist_buffer* pb, int track_index)
 {
     if(pb->num_loaded==viewer.num_tracks)
         return(false);
@@ -267,8 +267,8 @@ bool playlist_buffer_needs_reload(struct playlist_buffer* pb, int track_index)
     return(false);
 }
 
-struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer * pb,
-                                                  int index)
+static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer *pb,
+                                                         int index)
 {
     int buffer_index=playlist_buffer_get_index(pb, index);
     return(&(pb->tracks[buffer_index]));
@@ -561,7 +561,7 @@ bool playlist_viewer(void)
     return playlist_viewer_ex(NULL);
 }
 
-char * playlist_callback_name(int selected_item, void * data, char *buffer)
+static char *playlist_callback_name(int selected_item, void *data, char *buffer)
 {
     struct playlist_viewer * local_viewer = (struct playlist_viewer *)data;
     struct playlist_entry *track=
@@ -571,7 +571,7 @@ char * playlist_callback_name(int selected_item, void * data, char *buffer)
 }
 
 
-void playlist_callback_icons(int selected_item, void * data, ICON * icon)
+static void playlist_callback_icons(int selected_item, void *data, ICON * icon)
 {
     struct playlist_viewer * local_viewer=(struct playlist_viewer *)data;
     struct playlist_entry *track=
@@ -780,7 +780,8 @@ exit:
     action_signalscreenchange();
     return ret;
 }
-char * playlist_search_callback_name(int selected_item, void * data, char *buffer)
+
+static char *playlist_search_callback_name(int selected_item, void * data, char *buffer)
 {
     int *found_indicies = (int*)data;
     static struct playlist_track_info track;
@@ -790,7 +791,7 @@ char * playlist_search_callback_name(int selected_item, void * data, char *buffe
 }
 
 
-void playlist_search_callback_icons(int selected_item, void * data, ICON * icon)
+static void playlist_search_callback_icons(int selected_item, void * data, ICON * icon)
 {
     (void)selected_item;
     (void)data;

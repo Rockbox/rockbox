@@ -690,7 +690,7 @@ bool tagtree_import(void)
 
 static bool parse_menu(const char *filename);
 
-int parse_line(int n, const char *buf, void *parameters)
+static int parse_line(int n, const char *buf, void *parameters)
 {
     char data[256];
     int variable;
@@ -865,7 +865,7 @@ void tagtree_init(void)
     audio_set_track_unbuffer_event(tagtree_unbuffer_event);
 }
 
-bool show_search_progress(bool init, int count)
+static bool show_search_progress(bool init, int count)
 {
     static int last_tick = 0;
     
@@ -893,8 +893,8 @@ bool show_search_progress(bool init, int count)
     return true;
 }
 
-int format_str(struct tagcache_search *tcs, struct display_format *fmt,
-               char *buf, int buf_size)
+static int format_str(struct tagcache_search *tcs, struct display_format *fmt,
+                      char *buf, int buf_size)
 {
     char fmtbuf[8];
     bool read_format = false;
@@ -973,8 +973,8 @@ int format_str(struct tagcache_search *tcs, struct display_format *fmt,
     return 0;
 }
 
-int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs, 
-                     int offset, bool init)
+static int retrieve_entries(struct tree_context *c, struct tagcache_search *tcs,
+                            int offset, bool init)
 {
     struct tagentry *dptr = (struct tagentry *)c->dircache;
     struct display_format *fmt;
@@ -1453,7 +1453,7 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     return 0;
 }
 
-bool insert_all_playlist(struct tree_context *c, int position, bool queue)
+static bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 {
     int i;
     char buf[MAX_PATH];

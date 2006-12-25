@@ -175,7 +175,7 @@ int mmc_remove_request(void)
 #if defined(CONFIG_CHARGING) && !defined(HAVE_POWEROFF_WHILE_CHARGING)
 
 #ifdef HAVE_LCD_BITMAP
-void charging_display_info(bool animate)
+static void charging_display_info(bool animate)
 {
     unsigned char charging_logo[36];
     const int pox_x = (LCD_WIDTH - sizeof(charging_logo)) / 2;
@@ -280,7 +280,7 @@ static void logo_lock_patterns(bool on)
     }
 }
 
-void charging_display_info(bool animate)
+static void charging_display_info(bool animate)
 {
     int battv;
     unsigned i, ypos;
@@ -383,7 +383,7 @@ static int pitch_mode = PITCH_MODE_ABSOLUTE; /* 1 - absolute, -1 - semitone */
    0 if no key was pressed
    1 if USB was connected */
 
-void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
+static void pitch_screen_draw(struct screen *display, int pitch, int pitch_mode)
 {
     unsigned char* ptr;
     unsigned char buf[32];
@@ -631,7 +631,7 @@ bool pitch_screen(void)
 #define int_to_bool(i)\
     i==0?false:true
 
-void quick_screen_quick_apply(struct gui_quickscreen *qs)
+static void quick_screen_quick_apply(struct gui_quickscreen *qs)
 {
     global_settings.playlist_shuffle=int_to_bool(qs->left_option->option);
     global_settings.dirfilter=qs->bottom_option->option;
@@ -718,7 +718,7 @@ bool quick_screen_quick(int button_enter)
 }
 
 #ifdef BUTTON_F3
-void quick_screen_f3_apply(struct gui_quickscreen *qs)
+static void quick_screen_f3_apply(struct gui_quickscreen *qs)
 {
     global_settings.scrollbar=int_to_bool(qs->left_option->option);
 
@@ -1131,7 +1131,7 @@ bool shutdown_screen(void)
 #define ID3_ITEMS   11
 #endif
 
-char * id3_get_info(int selected_item, void* data, char *buffer)
+static char * id3_get_info(int selected_item, void* data, char *buffer)
 {
     struct mp3entry* id3 =(struct mp3entry*)data;
     int info_no=selected_item/2;

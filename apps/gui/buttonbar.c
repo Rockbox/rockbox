@@ -44,7 +44,7 @@ void gui_buttonbar_set_display(struct gui_buttonbar * buttonbar,
     buttonbar->display = display;
 }
 
-void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
+static void gui_buttonbar_draw_button(struct gui_buttonbar * buttonbar, int num)
 {
     int xpos, ypos, button_width, text_width;
     int fh;

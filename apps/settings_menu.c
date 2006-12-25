@@ -1470,7 +1470,7 @@ static bool replaygain_noclip(void)
     return result;
 }
 
-void replaygain_preamp_format(char* buffer, int buffer_size, int value,
+static void replaygain_preamp_format(char* buffer, int buffer_size, int value,
     const char* unit)
 {
     int v = abs(value);

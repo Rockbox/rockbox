@@ -50,7 +50,7 @@ static bool pm_playback = true; /* selects between playback and recording peaks 
 
 #endif
 
-struct meter_scales scales[NB_SCREENS];
+static struct meter_scales scales[NB_SCREENS];
 
 #if !defined(SIMULATOR) && CONFIG_CODEC != SWCODEC
 /* Data source */
@@ -84,7 +84,7 @@ unsigned short peak_meter_range_min;  /* minimum of range in samples */
 unsigned short peak_meter_range_max;  /* maximum of range in samples */
 static unsigned short pm_range;       /* range width in samples */
 static bool pm_use_dbfs = true;       /* true if peakmeter displays dBfs */
-bool level_check;                     /* true if peeked at peakmeter before drawing */
+static bool level_check;              /* true if peeked at peakmeter before drawing */
 static unsigned short pm_db_min = 0;      /* minimum of range in 1/100 dB */
 static unsigned short pm_db_max = 9000;   /* maximum of range in 1/100 dB */
 static unsigned short pm_db_range = 9000; /* range width in 1/100 dB */
@@ -298,7 +298,7 @@ static int db_to_sample_bin_search(int min, int max, int db)
  * @return int - The return value is in the range of
  *               0 <= return value < MAX_PEAK
  */
-int peak_meter_db2sample(int db) 
+int peak_meter_db2sample(int db)
 {
     int retval = 0;
 
@@ -791,7 +791,7 @@ static int peak_meter_read_r(void)
  * This is used by the histogram feature in the recording screen.
  * Values are in the range 0 <= peak_x < MAX_PEAK. MAX_PEAK is typ 32767.
  */
-extern void peak_meter_get_peakhold(int *peak_left, int *peak_right)
+void peak_meter_get_peakhold(int *peak_left, int *peak_right)
 {
     if (peak_left)
         *peak_left  = pm_peakhold_left;

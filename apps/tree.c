@@ -160,7 +160,7 @@ static int curr_context = false;/* id3db or tree*/
  * removes the extension of filename (if it doesn't start with a .)
  * puts the result in buffer
  */
-char * strip_extension(char * filename, char * buffer)
+static char * strip_extension(char * filename, char * buffer)
 {
     int dotpos;
     char * dot=strrchr(filename, '.');
@@ -174,7 +174,8 @@ char * strip_extension(char * filename, char * buffer)
     else
         return(filename);
 }
-char * tree_get_filename(int selected_item, void * data, char *buffer)
+
+static char * tree_get_filename(int selected_item, void * data, char *buffer)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
     char *name;
@@ -206,7 +207,7 @@ char * tree_get_filename(int selected_item, void * data, char *buffer)
 }
 
 
-void tree_get_fileicon(int selected_item, void * data, ICON * icon)
+static void tree_get_fileicon(int selected_item, void * data, ICON * icon)
 {
     struct tree_context * local_tc=(struct tree_context *)data;
 #ifdef HAVE_TAGCACHE
@@ -290,7 +291,7 @@ struct tree_context* tree_get_context(void)
  * Returns the position of a given file in the current directory
  * returns -1 if not found
  */
-int tree_get_file_position(char * filename)
+static int tree_get_file_position(char * filename)
 {
     int i;
 

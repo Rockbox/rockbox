@@ -149,7 +149,7 @@ void gui_list_put_selection_in_screen(struct gui_list * gui_list,
 }
 
 #ifdef HAVE_LCD_BITMAP
-int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
+static int gui_list_get_item_offset(struct gui_list * gui_list, int item_width,
                              int text_pos)
 {
     struct screen * display=gui_list->display;

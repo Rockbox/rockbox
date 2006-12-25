@@ -542,6 +542,7 @@ void talk_init(void)
 
 }
 
+#if CONFIG_CODEC == SWCODEC
 /* return if a voice codec is required or not */
 bool talk_voice_required(void)
 {
@@ -549,6 +550,7 @@ bool talk_voice_required(void)
         || (global_settings.talk_dir == 3)  /* Thumbnail clips are required */
         || (global_settings.talk_file == 3);
 }
+#endif
 
 /* return size of voice file */
 int talk_get_bufsize(void)

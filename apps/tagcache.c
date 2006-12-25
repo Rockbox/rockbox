@@ -203,7 +203,7 @@ struct tempbuf_searchidx {
 /* Lookup buffer for fixing messed up index while after sorting. */
 static long commit_entry_count;
 static long lookup_buffer_depth;
-struct tempbuf_searchidx **lookup;
+static struct tempbuf_searchidx **lookup;
 
 /* Used when building the temporary file. */
 static int cachefd = -1, filenametag_fd;
@@ -773,9 +773,9 @@ static bool check_against_clause(long numeric, const char *str,
     return false;
 }
 
-bool check_clauses(struct tagcache_search *tcs,
-                   struct index_entry *idx,
-                   struct tagcache_search_clause **clause, int count)
+static bool check_clauses(struct tagcache_search *tcs,
+                          struct index_entry *idx,
+                          struct tagcache_search_clause **clause, int count)
 {
     int i;
     

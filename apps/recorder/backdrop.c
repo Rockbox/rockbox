@@ -23,23 +23,23 @@
 #include "backdrop.h"
 
 #if LCD_DEPTH >= 8
-fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH];
-fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH];
+static fb_data main_backdrop[LCD_HEIGHT][LCD_WIDTH];
+static fb_data wps_backdrop[LCD_HEIGHT][LCD_WIDTH];
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
-fb_data main_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
-fb_data wps_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
+static fb_data main_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
+static fb_data wps_backdrop[(LCD_HEIGHT+3)/4][LCD_WIDTH];
 #else
-fb_data main_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
-fb_data wps_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
+static fb_data main_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
+static fb_data wps_backdrop[LCD_HEIGHT][LCD_FBWIDTH];
 #endif
 #endif
 
-bool main_backdrop_valid = false;
-bool wps_backdrop_valid = false;
+static bool main_backdrop_valid = false;
+static bool wps_backdrop_valid = false;
 
 /* load a backdrop into a buffer */
-bool load_backdrop(char* filename, fb_data* backdrop_buffer)
+static bool load_backdrop(char* filename, fb_data* backdrop_buffer)
 {
     struct bitmap bm;
     int ret;

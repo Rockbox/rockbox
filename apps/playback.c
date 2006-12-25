@@ -3552,7 +3552,7 @@ static void audio_playback_init(void)
 #if MEM > 8
 /* we dont want this rebuffering on targets with little ram
    because the disk may never spin down */
-bool ata_fillbuffer_callback(void)
+static bool ata_fillbuffer_callback(void)
 {
     queue_post(&audio_queue, Q_AUDIO_FILL_BUFFER_IF_ACTIVE_ATA, 0);
     return true;

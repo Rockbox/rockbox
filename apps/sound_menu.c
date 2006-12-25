@@ -61,8 +61,8 @@
 #endif
 #include "action.h"
 
-int selected_setting; /* Used by the callback */
-void dec_sound_formatter(char *buffer, int buffer_size, int val, const char * unit)
+static int selected_setting; /* Used by the callback */
+static void dec_sound_formatter(char *buffer, int buffer_size, int val, const char *unit)
 {
     val = sound_val2phys(selected_setting, val);
     char sign = ' ';
@@ -351,10 +351,10 @@ static bool receditable(void)
 
 #if CONFIG_CODEC == SWCODEC
 /* Makes an options list from a source list of options and indexes */
-void make_options_from_indexes(const struct opt_items *src_names,
-                               const long *src_indexes,
-                               int n_indexes,
-                               struct opt_items *dst_names)
+static void make_options_from_indexes(const struct opt_items *src_names,
+                                      const long *src_indexes,
+                                      int n_indexes,
+                                      struct opt_items *dst_names)
 {
     while (--n_indexes >= 0)
         dst_names[n_indexes] = src_names[src_indexes[n_indexes]];

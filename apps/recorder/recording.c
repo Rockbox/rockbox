@@ -73,14 +73,14 @@
 #define PM_HEIGHT ((LCD_HEIGHT >= 72) ? 2 : 1)
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-bool f2_rec_screen(void);
-bool f3_rec_screen(void);
+static bool f2_rec_screen(void);
+static bool f3_rec_screen(void);
 #endif
 
 #define MAX_FILE_SIZE 0x7F800000 /* 2 GB - 4 MB */
 
-int screen_update = NB_SCREENS;
-bool remote_display_on = true;
+static int screen_update = NB_SCREENS;
+static bool remote_display_on = true;
 
 /** File name creation **/
 #if CONFIG_CODEC == SWCODEC
@@ -124,7 +124,7 @@ static short balance_mem[BAL_MEM_SIZE];
 #define AGC_MODE_SIZE 5
 #define AGC_SAFETY_MODE 0
 
-static char* agc_preset_str[] =
+static const char* agc_preset_str[] =
 { "Off", "S", "L", "D", "M", "V" };
 /*  "Off",
     "Safety (clip)",
@@ -137,17 +137,17 @@ static char* agc_preset_str[] =
 #define AGC_HIGH 27254 /* accelerated gain reduction threshold -1.6dB */
 #define AGC_IMG    823 /* threshold for balance control -32dB */
 /* autogain high level thresholds (-3dB, -7dB, -4dB, -5dB, -5dB) */
-const short agc_th_hi[AGC_MODE_SIZE] =
+static const short agc_th_hi[AGC_MODE_SIZE] =
 { 23197, 14637, 21156, 18428, 18426 };
 /* autogain low level thresholds (-14dB, -11dB, -6dB, -7dB, -8dB) */
-const short agc_th_lo[AGC_MODE_SIZE] =
+static const short agc_th_lo[AGC_MODE_SIZE] =
 { 6538, 9235, 16422, 14636, 13045 };
 /* autogain threshold times [1/5s] or [200ms] */
-const short agc_tdrop[AGC_MODE_SIZE] =
+static const short agc_tdrop[AGC_MODE_SIZE] =
 { 900,  225, 150, 60, 8 };
-const short agc_trise[AGC_MODE_SIZE] =
+static const short agc_trise[AGC_MODE_SIZE] =
 { 9000, 750, 400, 150, 20 };
-const short agc_tbal[AGC_MODE_SIZE] =
+static const short agc_tbal[AGC_MODE_SIZE] =
 { 4500, 500, 300, 100, 15 };
 /* AGC operation */
 static bool agc_enable = true;
@@ -186,7 +186,7 @@ static void set_gain(void)
  * Returns validity of peak values.
  * Used for automatic gain control and history diagram.
  */
-bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
+static bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
 {
     peak_meter_get_peakhold(peak_l, peak_r);
     peak_valid_mem[peak_time % 3] = *peak_l;
@@ -215,7 +215,7 @@ bool read_peak_levels(int *peak_l, int *peak_r, int *balance)
 }
 
 /* AGC helper function to check if maximum gain is reached */
-bool agc_gain_is_max(bool left, bool right)
+static bool agc_gain_is_max(bool left, bool right)
 {
     /* range -128...+108 [0.5dB] */
     short gain_current_l;
@@ -242,7 +242,7 @@ bool agc_gain_is_max(bool left, bool right)
             (right && (gain_current_r >= agc_maxgain)));
 }
 
-void change_recording_gain(bool increment, bool left, bool right)
+static void change_recording_gain(bool increment, bool left, bool right)
 {
     int factor = (increment ? 1 : -1);
 
@@ -265,7 +265,7 @@ void change_recording_gain(bool increment, bool left, bool right)
  * Change recording gain if peak_x levels are above or below
  * target volume for specified timeouts.
  */
-void auto_gain_control(int *peak_l, int *peak_r, int *balance)
+static void auto_gain_control(int *peak_l, int *peak_r, int *balance)
 {
     int agc_mono;
     short agc_mode;
@@ -421,7 +421,7 @@ static const char* const fmtstr[] =
     "%c%d.%02d %s "       /* 2 decimals */
 };
 
-char *fmt_gain(int snd, int val, char *str, int len)
+static char *fmt_gain(int snd, int val, char *str, int len)
 {
     int i, d, numdec;
     const char *unit;
@@ -450,7 +450,7 @@ char *fmt_gain(int snd, int val, char *str, int len)
 
 static int cursor;
 
-void adjust_cursor(void)
+static void adjust_cursor(void)
 {
     int max_cursor;
     
@@ -1776,7 +1776,7 @@ bool recording_screen(bool no_source)
 } /* recording_screen */
 
 #if CONFIG_KEYPAD == RECORDER_PAD
-bool f2_rec_screen(void)
+static bool f2_rec_screen(void)
 {
     static const char* const freq_str[6] =
     {
@@ -1916,7 +1916,7 @@ bool f2_rec_screen(void)
     return false;
 }
 
-bool f3_rec_screen(void)
+static bool f3_rec_screen(void)
 {
     bool exit = false;
     bool used = false;

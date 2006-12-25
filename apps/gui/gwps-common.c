@@ -1644,6 +1644,7 @@ static void wps_display_images(struct gui_wps *gwps, bool always)
 }
 #endif
 
+#if 0 /* currently unused */
 void gui_wps_reset(struct gui_wps *gui_wps)
 {
     if(!gui_wps || !gui_wps->data)
@@ -1652,6 +1653,7 @@ void gui_wps_reset(struct gui_wps *gui_wps)
     memset(&gui_wps->data->format_buffer, 0,
            sizeof(gui_wps->data->format_buffer));
 }
+#endif
 
 bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                      unsigned char refresh_mode)

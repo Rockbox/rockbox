@@ -90,7 +90,7 @@ struct keyboard_parameters {
     int y;
 };
 
-struct keyboard_parameters param[NB_SCREENS];
+static struct keyboard_parameters param[NB_SCREENS];
 static bool kbd_loaded = false;
 
 #ifdef KBD_MORSE_INPUT
