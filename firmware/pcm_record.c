@@ -373,7 +373,7 @@ void pcm_rec_init(void)
     queue_init(&pcmrec_queue, true);
     queue_enable_queue_send(&pcmrec_queue, &pcmrec_queue_send);
     create_thread(pcmrec_thread, pcmrec_stack, sizeof(pcmrec_stack),
-                  pcmrec_thread_name, PRIORITY_RECORDING);
+                  pcmrec_thread_name IF_PRIO(, PRIORITY_RECORDING));
 } /* pcm_rec_init */
 
 /** audio_* group **/
@@ -801,7 +801,9 @@ static void pcmrec_flush(unsigned flush_num)
     static unsigned long last_flush_tick = 0;
     unsigned long start_tick;
     int num_ready, num;
+#ifdef HAVE_PRIORITY_SCHEDULING
     int prio;
+#endif
     int i;
 
     num_ready = enc_wr_index - enc_rd_index;
@@ -849,7 +851,9 @@ static void pcmrec_flush(unsigned flush_num)
     }
 
     start_tick = current_tick;
+#ifdef HAVE_PRIORITY_SCHEDULING
     prio = -1;
+#endif
 
     logf("writing: %d (%d)", num_ready, flush_num);
         
@@ -857,6 +861,7 @@ static void pcmrec_flush(unsigned flush_num)
 
     for (i = 0; i < num_ready; i++)
     {
+#ifdef HAVE_PRIORITY_SCHEDULING
         if (prio == -1 && (num >= panic_threshold ||
                            current_tick - start_tick > 10*HZ))
         {
@@ -864,6 +869,7 @@ static void pcmrec_flush(unsigned flush_num)
             logf("pcmrec: boost priority");
             prio = thread_set_priority(NULL, thread_get_priority(NULL)-1);
         }
+#endif
 
         rec_fdata.chunk        = GET_ENC_CHUNK(enc_rd_index);
         rec_fdata.new_enc_size = rec_fdata.chunk->enc_size;
@@ -889,7 +895,9 @@ static void pcmrec_flush(unsigned flush_num)
         if (errors != 0)
             break;
 
+#ifdef HAVE_PRIORITY_SCHEDULING
         if (prio == -1)
+#endif
         {
             num = enc_wr_index - enc_rd_index;
             if (num < 0)
@@ -903,14 +911,16 @@ static void pcmrec_flush(unsigned flush_num)
     if (rec_fdata.rec_file >= 0)
         fsync(rec_fdata.rec_file);
 
-        cpu_boost(false);
+    cpu_boost(false);
 
+#ifdef HAVE_PRIORITY_SCHEDULING
     if (prio != -1)
     {
         /* return to original priority */
         logf("pcmrec: unboost priority");
         thread_set_priority(NULL, prio);
     }
+#endif
 
     last_flush_tick = current_tick; /* save tick when we left */
     logf("done");
