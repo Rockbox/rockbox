@@ -1415,7 +1415,7 @@ static bool scan_presets(void)
         memset(presets, 0, sizeof(presets));
         while(curr_freq <= fm_region[global_settings.fm_region].freq_max)
         {
-            if (num_presets >= MAX_PRESETS)
+            if (num_presets >= MAX_PRESETS || action_userabort(TIMEOUT_NOBLOCK))
                 break;
 
             freq = curr_freq / 10000;
