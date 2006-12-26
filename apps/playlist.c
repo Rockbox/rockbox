@@ -561,6 +561,33 @@ exit:
 }
 
 /*
+ * Removes all tracks, from the playlist, leaving the presently playing
+ * track queued.
+ */
+int remove_all_tracks(struct playlist_info *playlist)
+{
+    int result;
+
+    if (playlist == NULL)
+        playlist = &current_playlist;
+
+    while (playlist->index > 0)
+        if ((result = remove_track_from_playlist(playlist, 0, true)) < 0)
+            return result;
+
+    while (playlist->amount > 1)
+        if ((result = remove_track_from_playlist(playlist, 1, true)) < 0)
+            return result;
+
+    if (playlist->amount == 1) {
+        playlist->indices[0] |= PLAYLIST_QUEUED;
+    }
+
+    return 0;
+}
+
+
+/*
  * Add track to playlist at specified position.  There are five special
  * positions that can be specified:
  *     PLAYLIST_PREPEND         - Add track at beginning of playlist
@@ -572,6 +599,8 @@ exit:
  *     PLAYLIST_INSERT_LAST     - Add track to end of playlist
  *     PLAYLIST_INSERT_SHUFFLED - Add track at some random point between the
  *                                current playing track and end of playlist
+ *     PLAYLIST_REPLACE         - Erase current playlist, Cue the current track
+ *                                and inster this track at the end.
  */
 static int add_track_to_playlist(struct playlist_info* playlist,
                                  const char *filename, int position,
@@ -648,6 +677,12 @@ static int add_track_to_playlist(struct playlist_info* playlist,
                 position = insert_position = (rand() % (playlist->amount+1));
             break;
         }
+        case PLAYLIST_REPLACE:
+            if (remove_all_tracks(playlist) < 0)
+                return -1;
+    
+            position = insert_position = playlist->index + 1;
+            break;
     }
     
     if (queue)
@@ -2860,6 +2895,14 @@ int playlist_insert_directory(struct playlist_info* playlist,
         return -1;
     }
 
+    if (position == PLAYLIST_REPLACE)
+    {
+        if (remove_all_tracks(playlist) == 0)
+            position = PLAYLIST_INSERT_LAST;
+        else
+            return -1;
+    }
+
     if (queue)
         count_str = str(LANG_PLAYLIST_QUEUE_COUNT);
     else
@@ -2871,7 +2914,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     context.position = position;
     context.queue = queue;
     context.count = 0;
-
+    
     cpu_boost(true);
 
     result = playlist_directory_tracksearch(dirname, recurse,
@@ -2940,6 +2983,13 @@ int playlist_insert_playlist(struct playlist_info* playlist, char *filename,
         count_str = str(LANG_PLAYLIST_INSERT_COUNT);
 
     display_playlist_count(count, count_str);
+
+    if (position == PLAYLIST_REPLACE)
+    {
+        if (remove_all_tracks(playlist) == 0)
+            position = PLAYLIST_INSERT_LAST;
+        else return -1;
+    }
 
     cpu_boost(true);
 

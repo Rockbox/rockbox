@@ -1468,6 +1468,12 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
         return false;
     }
     
+    if (position == PLAYLIST_REPLACE)
+    {
+        if (remove_all_tracks(NULL) == 0)
+            position = PLAYLIST_INSERT_LAST;
+        else return -1;    }
+
     if (position == PLAYLIST_INSERT_FIRST)
     {
         from = c->filesindir - 1;

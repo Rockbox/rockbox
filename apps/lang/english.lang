@@ -10442,3 +10442,17 @@
     *: "Clear Time?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Play Next"
+  </dest>
+  <voice>
+    *: "Play Next"
+  </voice>
+</phrase>
