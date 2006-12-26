@@ -808,8 +808,9 @@ bool sound_menu(void)
 #if CONFIG_CODEC == SWCODEC
                 pcmbuf_set_low_latency(true);
 #endif
-                if (items[selected].function)
-                    items[selected].function();
+                if (items[selected].function &&
+                    items[selected].function())
+                   done = true;
 
 #if CONFIG_CODEC == SWCODEC
                 pcmbuf_set_low_latency(false);
@@ -819,7 +820,7 @@ bool sound_menu(void)
     }
     menu_exit(m);
 
-    return selected==MENU_ATTACHED_USB?true:false;
+    return selected == MENU_SELECTED_EXIT ? false : true;
 }
 
 #ifdef HAVE_RECORDING
