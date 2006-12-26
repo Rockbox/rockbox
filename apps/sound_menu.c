@@ -763,7 +763,8 @@ static bool stereo_width(void)
 bool sound_menu(void)
 {
     int m;
-    bool result;
+    bool done = false;
+    int selected;
     static const struct menu_item items[] = {
         { ID2P(LANG_VOLUME), volume },
 #ifndef HAVE_TLV320
@@ -792,21 +793,33 @@ bool sound_menu(void)
         { ID2P(LANG_MDB_SHAPE), mdb_shape },
 #endif
     };
-    
-#if CONFIG_CODEC == SWCODEC
-    pcmbuf_set_low_latency(true);
-#endif
 
     m=menu_init( items, sizeof(items) / sizeof(*items), NULL,
                  NULL, NULL, NULL);
-    result = menu_run(m);
-    menu_exit(m);
+    while (!done)
+    {
+        switch (selected=menu_show(m))
+        {
+            case MENU_SELECTED_EXIT:
+            case MENU_ATTACHED_USB:
+                done = true;
+                break;
+            default:
+#if CONFIG_CODEC == SWCODEC
+                pcmbuf_set_low_latency(true);
+#endif
+                if (items[selected].function)
+                    items[selected].function();
 
 #if CONFIG_CODEC == SWCODEC
-    pcmbuf_set_low_latency(false);
+                pcmbuf_set_low_latency(false);
 #endif
+                gui_syncstatusbar_draw(&statusbars, true);
+        }
+    }
+    menu_exit(m);
 
-    return result;
+    return selected==MENU_ATTACHED_USB?true:false;
 }
 
 #ifdef HAVE_RECORDING
