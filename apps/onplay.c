@@ -410,6 +410,7 @@ static int remove_dir(char* dirname, int len)
     int result = 0;
     DIR* dir;
     int dirlen = strlen(dirname);
+    int i;
 
     dir = opendir(dirname);
     if (!dir)
@@ -423,9 +424,12 @@ static int remove_dir(char* dirname, int len)
         if (!entry)
             break;
 
+        dirname[dirlen] ='\0';
+        FOR_NB_SCREENS(i)
+            screens[i].puts(0,1,dirname);
+        
         /* append name to current directory */
         snprintf(dirname+dirlen, len-dirlen, "/%s", entry->d_name);
-
         if (entry->attribute & ATTR_DIRECTORY)
         {   /* remove a subdirectory */
             if (!strcmp((char *)entry->d_name, ".") ||
@@ -433,18 +437,21 @@ static int remove_dir(char* dirname, int len)
                 continue; /* skip these */
 
             /* inform the user which dir we're deleting */
-            lcd_puts(0,1,dirname);
-#ifdef HAVE_LCD_BITMAP
-            lcd_update();
-#endif
+            
             result = remove_dir(dirname, len); /* recursion */
             if (result)
                 break; /* or better continue, delete what we can? */
         }
         else
         {   /* remove a file */
+            FOR_NB_SCREENS(i)
+                screens[i].puts_scroll(0,2,entry->d_name);
             result = remove(dirname);
         }
+#ifdef HAVE_LCD_BITMAP
+        FOR_NB_SCREENS(i)
+            screens[i].update();
+#endif
         if(ACTION_STD_CANCEL == get_action(CONTEXT_STD,TIMEOUT_NOBLOCK))
         {
             gui_syncsplash(HZ, true, str(LANG_MENU_SETTING_CANCEL));
@@ -485,8 +492,10 @@ static bool delete_handler(bool is_dir)
     if (is_dir)
     {
         char pathname[MAX_PATH]; /* space to go deep */
+        cpu_boost(true);
         strncpy(pathname, selected_file, sizeof pathname);
         res = remove_dir(pathname, sizeof(pathname));
+        cpu_boost(false);
     }
     else
         res = remove(selected_file);
