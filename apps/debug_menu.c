@@ -930,6 +930,40 @@ static bool dbg_spdif(void)
 
 #ifndef SIMULATOR
 #ifdef HAVE_LCD_BITMAP
+ /* button definitions */
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+   (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#   define DEBUG_CANCEL  BUTTON_OFF
+
+#elif CONFIG_KEYPAD == RECORDER_PAD
+#   define DEBUG_CANCEL  BUTTON_OFF
+
+#elif CONFIG_KEYPAD == ONDIO_PAD
+#   define DEBUG_CANCEL  BUTTON_MENU
+
+#elif CONFIG_KEYPAD == GMINI100_PAD
+#   define DEBUG_CANCEL  BUTTON_OFF
+
+#elif (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD)
+#   define DEBUG_CANCEL  BUTTON_MENU
+
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+#   define DEBUG_CANCEL  BUTTON_PLAY
+
+#elif CONFIG_KEYPAD == IAUDIO_X5_PAD
+#   define DEBUG_CANCEL  BUTTON_REC
+
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+#   define DEBUG_CANCEL  BUTTON_A
+
+#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#   define DEBUG_CANCEL  BUTTON_REW
+
+#elif CONFIG_KEYPAD == SANSA_E200_PAD
+#   define DEBUG_CANCEL  BUTTON_LEFT
+#endif /* key definitios */
+
 /* Test code!!! */
 bool dbg_ports(void)
 {
@@ -975,7 +1009,7 @@ bool dbg_ports(void)
         lcd_puts(0, 7, buf);
 #endif
         lcd_update();
-        if (action_userabort(HZ/10))
+        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
 #elif defined(CPU_COLDFIRE)
@@ -1063,7 +1097,7 @@ bool dbg_ports(void)
 #endif
 
         lcd_update();
-        if (action_userabort(HZ/10))
+        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
 
@@ -1125,7 +1159,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 #endif
         lcd_update();
-        if (action_userabort(HZ/10))
+        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
 
@@ -1153,7 +1187,7 @@ bool dbg_ports(void)
         lcd_puts(0, line++, buf);
 
         lcd_update();
-        if (action_userabort(HZ/10))
+        if (button_get_w_tmo(HZ/10) == (DEBUG_CANCEL|BUTTON_REL))
             return false;
     }
 #endif /* CPU */
