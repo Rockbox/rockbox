@@ -132,46 +132,39 @@ you wish. Note that these files should be saved onto your computer's hard disk,
   \item Install the bootloader.
 
     Windows users should now type:
-    \begin{code}
-      ipodpatcher [device] -a 
-        \opt{ipodvideo}{bootloader-video.ipod}
-        \opt{ipodnano}{bootloader-nano.ipod}
-        \opt{ipodmini}{bootloader-mini1g.ipod 
+      \begin{code}
+        \opt{ipodvideo}{ipodpatcher [device] -a bootloader-ipodvideo.ipod}
+        \opt{ipodnano}{ipodpatcher [device] -a bootloader-ipodnano.ipod}
+        \opt{ipodmini}{ipodpatcher [device] -a bootloader-ipodmini1g.ipod 
           \end{code} 
           or
           \begin{code}
-            ipodpatcher [device] -a bootloader-mini2g.ipod
+            ipodpatcher [device] -a ipodpatcher [device] -a bootloader-ipodmini2g.ipod
           }
-        \opt{ipodcolor}{bootloader-color.ipod}
-        \opt{ipod4g}{bootloader-4g.ipod}
-        \opt{ipod3g}{bootloader-3g.ipod}
-    \end{code}
-
+        \opt{ipodcolor}{ipodpatcher [device] -a bootloader-ipodcolor.ipod}
+        \opt{ipod4g}{ipodpatcher [device] -a bootloader-ipod4g.ipod}
+        \opt{ipod3g}{ipodpatcher [device] -a bootloader-ipod3g.ipod}
+      \end{code}
+    
     and Mac OS X/Unix users should type:
-    \begin{code}
-      ./ipodpatcher [device] -a 
-      \opt{ipodvideo}{bootloader-video.ipod}
-        \opt{ipodnano}{bootloader-nano.ipod} 
-        \opt{ipodmini}{bootloader-mini1g.ipod 
+      \begin{code}
+        \opt{ipodvideo}{./ipodpatcher [device] -a bootloader-ipodvideo.ipod}
+        \opt{ipodnano}{./ipodpatcher [device] -a bootloader-ipodnano.ipod} 
+        \opt{ipodmini}{./ipodpatcher [device] -a bootloader-ipodmini1g.ipod 
           \end{code} 
           or
           \begin{code}
-            or ipodpatcher [device] -a bootloader-mini2g.ipod
+            or ipodpatcher [device] -a bootloader-ipodmini2g.ipod
           }
-        \opt{ipodcolor}{bootloader-color.ipod}
-        \opt{ipod4g}{bootloader-4g.ipod}
-        \opt{ipod3g}{bootloader-3g.ipod}
-    \end{code}
-
+        \opt{ipodcolor}{./ipodpatcher [device] -a bootloader-ipodcolor.ipod}
+        \opt{ipod4g}{./ipodpatcher [device] -a bootloader-ipod4g.ipod}
+        \opt{ipod3g}{./ipodpatcher [device] -a bootloader-ipod3g.ipod}
+      \end{code}
+    
   Replace [device] with the number (Windows users) or device name (Mac OS X/Unix 
   users) you've been using to access your ipod.
 
   You can now disconnect your ipod from your computer in the normal way. This 
   should cause your iPod to reboot and start Rockbox.
-
-  \item Troubleshooting.
-
-  \fixme{Add some notes here about common problems - "rockbox error -1" is the 
-  main one. Or maybe have a new troubleshooting page.}
   
 \end{enumerate} 
