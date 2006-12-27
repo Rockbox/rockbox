@@ -1033,8 +1033,7 @@ static int get_next_index(const struct playlist_info* playlist, int steps,
     if (repeat_mode == -1)
         repeat_mode = global_settings.repeat_mode;
 
-    if (repeat_mode == REPEAT_SHUFFLE &&
-        (!global_settings.playlist_shuffle || playlist->amount <= 1))
+    if (repeat_mode == REPEAT_SHUFFLE && playlist->amount <= 1)
         repeat_mode = REPEAT_ALL;
 
     steps = calculate_step_count(playlist, steps);
@@ -2505,8 +2504,7 @@ int playlist_next(int steps)
     if (index < 0)
     {
         /* end of playlist... or is it */
-        if (global_settings.repeat_mode == REPEAT_SHUFFLE &&
-            global_settings.playlist_shuffle &&
+        if (global_settings.repeat_mode == REPEAT_SHUFFLE && 
             playlist->amount > 1)
         {
             /* Repeat shuffle mode.  Re-shuffle playlist and resume play */
