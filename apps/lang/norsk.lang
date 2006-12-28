@@ -90,7 +90,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "Laster..."
+    *: "Laster ..."
   </dest>
   <voice>
     *: ""
@@ -118,7 +118,7 @@
     *: "Shutting down..."
   </source>
   <dest>
-    *: "Avslutter..."
+    *: "Avslutter ..."
   </dest>
   <voice>
     *: ""
@@ -132,7 +132,7 @@
     *: "Restarting playback..."
   </source>
   <dest>
-    *: "Omstarter avspilling..."
+    *: "Omstarter avspilling ..."
   </dest>
   <voice>
     *: "Restarting playback..."
@@ -657,6 +657,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Equalizer"
+  </dest>
+  <voice>
+    *: "Equalizer"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PLAYBACK
   desc: in settings_menu()
   user:
@@ -816,10 +830,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Yes"
+    ipod*: "SELECT = Yes"
+    x5: "SELECT = Yes"
+    h10: "NEXT = Yes"
   </source>
   <dest>
-    *: "PLAY = Ja"
+    *: "SPILL = Ja"
     h100,h120,h300: "NAVI = Ja"
+    ipod*: "VELG = Ja"
+    x5: "VELG = Ja"
+    h10: "NESTE = Ja"
   </dest>
   <voice>
     *: ""
@@ -1029,7 +1050,7 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Sett inn mappeer rekursivt"
+    *: "Sett inn kataloger rekursivt"
   </dest>
   <voice>
     *: "Recursively Insert Directories"
@@ -1099,7 +1120,7 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Stokk om rekkefølge"
+    *: "Bare i omstokket modus"
   </dest>
   <voice>
     *: "Shuffle"
@@ -1337,7 +1358,7 @@
     *: "ID3 Tag Priority"
   </source>
   <dest>
-    *: "ID3-lappprioritet"
+    *: "ID3-lapprioritet"
   </dest>
   <voice>
     *: "ID3 tag priority"
@@ -1379,7 +1400,7 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Bytt mappe automatisk"
+    *: "Bytt katalog automatisk"
   </dest>
   <voice>
     *: "Auto change directory"
@@ -1407,7 +1428,7 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Sortere små/store bokstaver"
+    *: "Sorter små/store bokstaver"
   </dest>
   <voice>
     *: "Sort Case Sensitive"
@@ -1421,7 +1442,7 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Sortere mapper"
+    *: "Sorter kataloger"
   </dest>
   <voice>
     *: "sort directories"
@@ -1435,7 +1456,7 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Sortere filer"
+    *: "Sorter filer"
   </dest>
   <voice>
     *: "sort files"
@@ -1572,13 +1593,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "Spordatabase"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -1589,7 +1610,7 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Følg spillelisten"
+    *: "Følg spilleliste"
   </dest>
   <voice>
     *: "Follow Playlist"
@@ -2149,7 +2170,7 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Uttale mappenavn"
+    *: "Uttal katalognavn"
   </dest>
   <voice>
     *: "Voice Directories"
@@ -2258,10 +2279,10 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Internal Mic"
   </source>
   <dest>
-    *: "Mikrofon"
+    *: "Intern mikrofon"
   </dest>
   <voice>
     *: "Microphone"
@@ -2325,16 +2346,16 @@
 </phrase>
 <phrase>
   id: LANG_RECORD_TIMESPLIT
-  desc: Prompt for record timer interval setting, in the record settings menu
+  desc: Record split menu
   user:
   <source>
-    *: "Time Split"
+    *: "File Split Options"
   </source>
   <dest>
-    *: "Tidsdeling"
+    *: "Filsplittingsvalg"
   </dest>
   <voice>
-    *: "Time Split"
+    *: "File Split Options"
   </voice>
 </phrase>
 <phrase>
@@ -2373,7 +2394,7 @@
     *: "Current Directory"
   </source>
   <dest>
-    *: "Nåværende mappe"
+    *: "Nåværende katalog"
   </dest>
   <voice>
     *: "Current directory"
@@ -2653,7 +2674,7 @@
     *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Skjermlys (Når strøm er koblet til)"
+    *: "Skjermlys (når strøm er koblet til)"
   </dest>
   <voice>
     *: "Backlight When Plugged"
@@ -3297,7 +3318,7 @@
     *: "Directory Cache"
   </source>
   <dest>
-    *: "Forhåndsles mappestruktur"
+    *: "Forhåndsles katalogstruktur"
   </dest>
   <voice>
     *: "Directory cache"
@@ -3305,13 +3326,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "Start på nytt for å aktivere"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -3325,7 +3346,7 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Leser mappestruktur..."
+    *: "Leser katalogstruktur ..."
   </dest>
   <voice>
     *: ""
@@ -3520,7 +3541,7 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Slett mappe"
+    *: "Slett katalog"
   </dest>
   <voice>
     *: "delete directory"
@@ -3562,7 +3583,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Åpne med..."
+    *: "Åpne med ..."
   </dest>
   <voice>
     *: "open with"
@@ -3576,7 +3597,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Lag mappe"
+    *: "Opprett katalog"
   </dest>
   <voice>
     *: "Create directory"
@@ -4022,9 +4043,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "AV = Avslutt"
+    h100,h120,h300: "STOPP = Avslutt"
+    ipod*: "SPILL/PAUSE = Avslutt"
+    x5: "OPPTAK = Avslutt"
+    h10: "FORRIGE = Avslutt"
   </dest>
   <voice>
     *: ""
@@ -4078,10 +4107,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
-    *: "PLAY = Velg"
+    *: "SPILL = Velg"
     h100,h120,h300: "NAVI = Velg"
+    ipod*: "VELG = Velg"
+    x5: "VELG = Velg"
+    h10: "NESTE = Velg"
   </dest>
   <voice>
     *: ""
@@ -4093,10 +4129,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
-    *: "PÅ+Play = Slett"
-    h100,h120,h300: "PÅ+NAVI = Slett"
+    *: "PÅ+Spill = Slett"
+    h100,h120,h300: "OPPTAK = Delete"
+    ipod*: "Lang MENY = Delete"
+    x5: "Lang OPPTAK = Delete"
+    h10: "SPOL TILBAKE = Delete"
   </dest>
   <voice>
     *: ""
@@ -4178,9 +4221,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "PÅ for å stille"
+    h100,h120,h300: "NAVI = Still"
+    ipod*: "VELG = Still"
+    x5: "VELG = Still"
+    h10: "NESTE = Still"
   </dest>
   <voice>
     *: ""
@@ -4192,9 +4243,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "AV for å tilbakestille"
+    h100,h120,h300: "STOPP = Tilbakestill"
+    ipod*: "MENY = Tilbakestill"
+    x5: "OPPTAK = Tilbakestill"
+    h10: "FORRIGE = Tilbakestill"
   </dest>
   <voice>
     *: ""
@@ -4278,7 +4337,7 @@
     *: "Split Time:"
   </source>
   <dest>
-    *: "Tidsdeling:"
+    *: "Tidssplitting:"
   </dest>
   <voice>
     *: ""
@@ -4360,9 +4419,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken er full. Trykk AV for å fortsette."
+    h100,h120,h300: "Disken er full. Trykk STOPP for å fortsette."
   </dest>
   <voice>
     *: ""
@@ -6392,7 +6453,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "Laster..."
+    *: "Laster ..."
   </dest>
   <voice>
     *: ""
@@ -6406,7 +6467,7 @@
     *: "Shuffling..."
   </source>
   <dest>
-    *: "Stokker om..."
+    *: "Stokker om ..."
   </dest>
   <voice>
     *: ""
@@ -6588,7 +6649,7 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Problemer med tilgang til mappe
+    *: "Problemer med tilgang til katalog"
   </dest>
   <voice>
     *: ""
@@ -6966,7 +7027,7 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "mappeffereret full!"
+    *: "Katalogbufferen er full!"
   </dest>
   <voice>
     *: ""
@@ -6994,7 +7055,7 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Innstillingene var lastet"
+    *: "Innstillingene er lastet"
   </dest>
   <voice>
     *: ""
@@ -7008,7 +7069,7 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Innstillingene var lagret"
+    *: "Innstillingene er lagret"
   </dest>
   <voice>
     *: ""
@@ -7048,9 +7109,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "AV for å avbryte"
+    h100,h120,h300: "STOPP for å avbryte"
+    ipod*: "SPILL/PAUSE for å avbryte"
+    x5: "Lang SPILL for å avbryte"
+    h10: "FORRIGE for å avbryte"
   </dest>
   <voice>
     *: ""
@@ -7501,7 +7570,7 @@
     *: "Advar når den dynamiske spillelisten slettes"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7509,10 +7578,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "Oppdaterer spordatabase"
+    *: "Oppdaterer database"
   </dest>
   <voice>
     *: ""
@@ -7618,13 +7687,13 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: in tag cache settings
+  desc: 
   user:
   <source>
-    *: "Keep on Disk"
+    *: ""
   </source>
   <dest>
-    *: "Behold på disken"
+    *: ""
   </dest>
   <voice>
     *: "Keep on Disk"
@@ -7641,7 +7710,7 @@
     *: "Slett dynamisk spilleliste?"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7764,7 +7833,7 @@
     *: "Load to RAM"
   </source>
   <dest>
-    *: "Last inn i RAMmen"
+    *: "Last inn i RAM-en"
   </dest>
   <voice>
     *: "Load to RAM"
@@ -7886,13 +7955,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </source>
   <dest>
-    *: "Tving oppdatering av spordatabase"
+    *: "Initialiser nå"
   </dest>
   <voice>
-    *: "Force Tag Cache Update"
+    *: "Initialize now"
   </voice>
 </phrase>
 <phrase>
@@ -8001,7 +8070,7 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Fila/Mappa finnes. Skriv over?"
+    *: "Fila/katalogen finnes. Skriv over?"
   </dest>
   <voice>
     *: ""
@@ -8074,7 +8143,7 @@
     *: "RGB"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8085,7 +8154,7 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Søker... %d funnet (%s)"
+    *: "Søker ... %d funnet (%s)"
   </dest>
   <voice>
     *: ""
@@ -8099,7 +8168,7 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "Nivå for %d Hz båndet "
+    *: "Nivå for %d Hz-båndet"
   </dest>
   <voice>
     *: ""
@@ -8163,16 +8232,16 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE
-  desc: in tag cache settings
+  desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Spordatabase"
+    *: "Database"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
@@ -8240,7 +8309,7 @@
     *: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: 
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8355,20 +8424,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_EQUALIZER
-  desc: in the sound settings menu
-  user:
-  <source>
-    *: "Equalizer"
-  </source>
-  <dest>
-    *: "Lydbalanse"
-  </dest>
-  <voice>
-    *: "Equalizer"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RECORDING_GAIN_ANALOG
   desc: in the recording screen
   user:
@@ -8446,7 +8501,7 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Updaterer i bakgrunnen"
+    *: "Oppdaterer i bakgrunnen"
   </dest>
   <voice>
     *: ""
@@ -8470,13 +8525,13 @@
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "Sportdatabasen er ikke klar"
+    *: "Databasen er ikke klar"
   </dest>
   <voice>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </voice>
 </phrase>
 <phrase>
@@ -8778,13 +8833,13 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Mic"
+    *: "Int. Mic"
   </source>
   <dest>
-    *: "Mikrofon"
+    *: "Intern mikrofon"
   </dest>
   <voice>
-    *: "Microphone"
+    *: "Internal microphone"
   </voice>
 </phrase>
 <phrase>
@@ -8949,7 +9004,7 @@
     *: "Split Time:"
   </source>
   <dest>
-    *: "Tidsdeling:"
+    *: "Tidssplitting:"
   </dest>
   <voice>
     *: ""
@@ -9031,9 +9086,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disken er full. Trykk AV for å fortsette."
+    h100,h120,h300: "Disken er full. Trykk STOPP for å fortsette."
   </dest>
   <voice>
     *: ""
@@ -9137,8 +9194,6 @@
     *: ""
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
@@ -9146,14 +9201,12 @@
     *: "Safety (clip)"
   </source>
   <dest>
-    *: "Safety (clip)"
+    *: "Sikkerhet (forvrengning)"
   </dest>
   <voice>
     *: "Safety (clip)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_VOICE
   desc: AGC preset
@@ -9161,14 +9214,12 @@
     *: "Voice (fast)"
   </source>
   <dest>
-    *: "Voice (fast)"
+    *: "Stemme (rask)"
   </dest>
   <voice>
     *: "Voice (fast)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_MEDIUM
   desc: AGC preset
@@ -9182,8 +9233,6 @@
     *: "Medium"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_LIVE
   desc: AGC preset
@@ -9191,14 +9240,12 @@
     *: "Live (slow)"
   </source>
   <dest>
-    *: "Live (slow)"
+    *: "Live (sakte)"
   </dest>
   <voice>
     *: "Live (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_AGC_DJSET
   desc: AGC preset
@@ -9212,8 +9259,6 @@
     *: "DJ set (slow)"
   </voice>
 </phrase>
-###
-### This phrase below was not present in the translated file
 <phrase>
   id: LANG_SYSFONT_RECORDING_AGC_MAXGAIN
   desc: AGC maximum gain in recording screen
@@ -9225,5 +9270,1157 @@
   </dest>
   <voice>
     *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_NARROW
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Narrow"
+  </source>
+  <dest>
+    *: "Smal"
+  </dest>
+  <voice>
+    *: "Narrow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_PRESET
+  desc: automatic gain control in record settings
+  <source>
+    *: "Automatic Gain Control"
+  </source>
+  <dest>
+    *: "Automatisk nivåkontroll (AGC)"
+  </dest>
+  <voice>
+    *: "Automatic gain control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_TIME
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Time"
+  </source>
+  <dest>
+    *: "Tid"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KBIT_PER_SEC
+  desc: spoken only, a unit postfix
+  user:
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "kilobits per second"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_AGC_MAXGAIN
+  desc: AGC maximum gain in recording screen
+  <source>
+    *: "AGC max. gain"
+  </source>
+  <dest>
+    *: "AGC-maksimumsnivå"
+  </dest>
+  <voice>
+    *: "AGC maximum gain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Halvtone ned"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Aldri"
+  </dest>
+  <voice>
+    *: "Never"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_DJSET
+  desc: AGC preset
+  <source>
+    *: "DJ-Set (slow)"
+  </source>
+  <dest>
+    *: "DJ-sett (sakte)"
+  </dest>
+  <voice>
+    *: "DJ set (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Import modifications"
+  </source>
+  <dest>
+    *: "Importer modifikasjoner"
+  </dest>
+  <voice>
+    *: "Import modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user:
+  <source>
+    *: "Sleep (After Backlight Off)"
+  </source>
+  <dest>
+    *: "Sov (etter at skjermlyset er av)"
+  </dest>
+  <voice>
+    *: "Sleep after backlight off"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_SIZE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Filesize"
+  </source>
+  <dest>
+    *: "Filstørrelse"
+  </dest>
+  <voice>
+    *: "Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(Samme som kilde)"
+  </dest>
+  <voice>
+    *: "Same As Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_OFF
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "Remote Display OFF"
+  </source>
+  <dest>
+    *: "Fjernkontrollskjerm AV"
+  </dest>
+  <voice>
+    *: "Remote Display OFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Halvtone opp"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
+  <source>
+    *: "Europe"
+  </source>
+  <dest>
+    *: "Europa"
+  </dest>
+  <voice>
+    *: "Europe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_ENABLED
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Enable Hardware EQ"
+  </source>
+  <dest>
+    *: "Slå på maskinvarelydbalanse"
+  </dest>
+  <voice>
+    *: "Enable hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "ADVARSEL! Lavt batteri!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Kodeinnstillinger"
+  </dest>
+  <voice>
+    *: "Encoder Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Auto update"
+  </source>
+  <dest>
+    *: "Oppdater automatisk"
+  </dest>
+  <voice>
+    *: "Auto update"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Stop recording"
+  </source>
+  <dest>
+    *: "Stopp opptak"
+  </dest>
+  <voice>
+    *: "Stop recording"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Format"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Omstokket modus og sporbytte"
+  </dest>
+  <voice>
+    *: "Shuffle and Track Skip"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_FULL
+  desc: in show path menu
+  user:
+  <source>
+    *: "Full Path"
+  </source>
+  <dest>
+    *: "Full sti"
+  </dest>
+  <voice>
+    *: "Full Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Duration to rewind"
+  </source>
+  <dest>
+    *: "Varighet å spole tilbake"
+  </dest>
+  <voice>
+    *: "Duration to rewind"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Update now"
+  </source>
+  <dest>
+    *: "Oppdater nå"
+  </dest>
+  <voice>
+    *: "Update now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Bitrate"
+  </dest>
+  <voice>
+    *: "Bitrate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Topptid"
+  </dest>
+  <voice>
+    *: "Top Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Tilfeldig"
+  </dest>
+  <voice>
+    *: "Random"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Ny fil"
+  </dest>
+  <voice>
+    *: "New file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user:
+  <source>
+    *: "Remote Scrolling Options"
+  </source>
+  <dest>
+    *: "Rullevalg for fjernkontroll"
+  </dest>
+  <voice>
+    *: "Remote Scrolling Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD_NORMAL
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Normal"
+  </source>
+  <dest>
+    *: "Normal"
+  </dest>
+  <voice>
+    *: "Normal"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_LIVE
+  desc: AGC preset
+  <source>
+    *: "Live (slow)"
+  </source>
+  <dest>
+    *: "Live (sakte)"
+  </dest>
+  <voice>
+    *: "Live (slow)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_VOICE
+  desc: AGC preset
+  <source>
+    *: "Voice (fast)"
+  </source>
+  <dest>
+    *: "Stemme (rask)"
+  </dest>
+  <voice>
+    *: "Voice (fast)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user:
+  <source>
+    *: "Export modifications"
+  </source>
+  <dest>
+    *: "Eksporter modifikasjoner"
+  </dest>
+  <voice>
+    *: "Export modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(Ingen innstillinger)"
+  </dest>
+  <voice>
+    *: "No settings available"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Filstørrelsessplitting"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_LCD_ON
+  desc: Remote lcd off splash
+  user:
+  <source>
+    *: "(Vol- : Re-enable)"
+  </source>
+  <dest>
+    *: "(Vol- : Slå på igjen)"
+  </dest>
+  <voice>
+    *: "(Vol- : Re-enable)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG
+  desc: in settings_menu.
+  user:
+  <source>
+    *: "Pause on headphone unplug"
+  </source>
+  <dest>
+    *: "Pause når hodetelefonene plugges ut"
+  </dest>
+  <voice>
+    *: "Pause on headphone unplug"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_MEDIUM
+  desc: AGC preset
+  <source>
+    *: "Medium"
+  </source>
+  <dest>
+    *: "Medium"
+  </dest>
+  <voice>
+    *: "Medium"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_FILENAME
+  desc: Filename header in recording screen
+  user:
+  <source>
+    *: "Filename:"
+  </source>
+  <dest>
+    *: "Filnavn:"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AGC_SAFETY
+  desc: AGC preset
+  <source>
+    *: "Safety (clip)"
+  </source>
+  <dest>
+    *: "Sikkerhet (forvregning)"
+  </dest>
+  <voice>
+    *: "Safety (clip)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG
+  desc: in onplay menu
+  user:
+  <source>
+    *: "Playlist catalog"
+  </source>
+  <dest>
+    *: "Spillelistekatalog"
+  </dest>
+  <voice>
+    *: "Playlist catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
+  <source>
+    *: "Split Measure"
+  </source>
+  <dest>
+    *: "Splitteregel"
+  </dest>
+  <voice>
+    *: "Split Measure"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Batteriet er tomt! LAD DET OPP!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_KOREA
+  desc: fm region korea
+  <source>
+    *: "Korea"
+  </source>
+  <dest>
+    *: "Korea"
+  </dest>
+  <voice>
+    *: "Korea"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Kjøretid"
+  </dest>
+  <voice>
+    *: "Running Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INVALID_FILENAME
+  desc: "invalid filename entered" error message
+  user:
+  <source>
+    *: "Invalid Filename!"
+  </source>
+  <dest>
+    *: "Ugyldig filnavn!"
+  </dest>
+  <voice>
+    *: "Invalid Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_US
+  desc: fm region us / canada
+  <source>
+    *: "US / Canada"
+  </source>
+  <dest>
+    *: "USA / Canada"
+  </dest>
+  <voice>
+    *: "US / Canada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
+  <source>
+    *: "Region"
+  </source>
+  <dest>
+    *: "Region"
+  </dest>
+  <voice>
+    *: "Region"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_RECORDING_AGC_PRESET
+  desc: automatic gain control in recording screen
+  <source>
+    *: "AGC"
+  </source>
+  <dest>
+    *: "AGC"
+  </dest>
+  <voice>
+    *: "AGC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO_NEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to new playlist"
+  </source>
+  <dest>
+    *: "Legg til i ny spilleliste"
+  </dest>
+  <voice>
+    *: "Add to new playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stopp"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
+  <source>
+    *: "Split Time"
+  </source>
+  <dest>
+    *: "Tidssplitting"
+  </dest>
+  <voice>
+    *: "Split Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Vennligst omstart for å aktivere"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_ADD_TO
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "Add to playlist"
+  </source>
+  <dest>
+    *: "Legg til i spilleliste"
+  </dest>
+  <voice>
+    *: "Add to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user:
+  <source>
+    *: "Loading... %d%% done (%s)"
+  </source>
+  <dest>
+    *: "Laster ... %d%% ferdig (%s)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user:
+  <source>
+    *: "Start new file"
+  </source>
+  <dest>
+    *: "Start ny fil"
+  </dest>
+  <voice>
+    *: "Start new file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
+  <source>
+    *: "What to do when Splitting"
+  </source>
+  <dest>
+    *: "Hva skal gjøres ved splitting?"
+  </dest>
+  <voice>
+    *: "What to do when Splitting"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_SPLIT_SIZE
+  desc: in record timesplit options
+  <source>
+    *: "Split Filesize"
+  </source>
+  <dest>
+    *: "Filstørrelsessplitting"
+  </dest>
+  <voice>
+    *: "Split Filesize"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Hardware Equalizer"
+  </source>
+  <dest>
+    *: "Maskinvarelydbalanse"
+  </dest>
+  <voice>
+    *: "Hardware equalizer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Disable auto-resume if phones not present"
+  </source>
+  <dest>
+    *: "Slå av auto-fortsett hvis hodetelefoner ikke er plugget i"
+  </dest>
+  <voice>
+    *: "Disable auto-resume if phones not present"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_JAPAN
+  desc: fm region japan
+  <source>
+    *: "Japan"
+  </source>
+  <dest>
+    *: "Japan"
+  </dest>
+  <voice>
+    *: "Japan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Show Path"
+  </source>
+  <dest>
+    *: "Vis sti"
+  </dest>
+  <voice>
+    *: "Show Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_BANDWIDTH
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Bandwidth"
+  </source>
+  <dest>
+    *: "Båndbredde"
+  </dest>
+  <voice>
+    *: "Bandwidth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user:
+  <source>
+    *: "Pause and Resume"
+  </source>
+  <dest>
+    *: "Pause og fortsett"
+  </dest>
+  <voice>
+    *: "Pause and Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Egenskaper"
+  </dest>
+  <voice>
+    *: "Properties"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_VIEW
+  desc: in onplay playlist catalog submenu
+  user:
+  <source>
+    *: "View catalog"
+  </source>
+  <dest>
+    *: "Vis katalog"
+  </dest>
+  <voice>
+    *: "View catalog"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_AGC_CLIPTIME
+  desc: in record settings
+  <source>
+    *: "AGC clip time"
+  </source>
+  <dest>
+    *: "AGC-forvrengningstid"
+  </dest>
+  <voice>
+    *: "AGC clip time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user:
+  <source>
+    *: "Current Directory Only"
+  </source>
+  <dest>
+    *: "Kun gjeldende katalog"
+  </dest>
+  <voice>
+    *: "Current Directory Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EQUALIZER_HARDWARE_BANDWIDTH_WIDE
+  desc: in the equalizer settings menu
+  user:
+  <source>
+    *: "Wide"
+  </source>
+  <dest>
+    *: "Bred"
+  </dest>
+  <voice>
+    *: "Wide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Gjeldende tid"
+  </dest>
+  <voice>
+    *: "Current Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Slett tid?"
+  </dest>
+  <voice>
+    *: "Clear Time?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Last.fm-logg"
+  </dest>
+  <voice>
+    *: "Last.fm Log"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user:
+  <source>
+    *: "Backlight (On Hold Key)"
+  </source>
+  <dest>
+    *: "Skjermlys (når Hold-knappen er på)"
+  </dest>
+  <voice>
+    *: "Backlight on hold key"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_DIRECTORY
+  desc: error message when playlist catalog directory doesn't exist
+  user:
+  <source>
+    *: "%s doesn't exist"
+  </source>
+  <dest>
+    *: "%s eksisterer ikke"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CATALOG_NO_PLAYLISTS
+  desc: error message when no playlists for playlist catalog
+  user:
+  <source>
+    *: "No playlists"
+  </source>
+  <dest>
+    *: "Ingen spillelister"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Utløsertype"
+  </dest>
+  <voice>
+    *: "Trigtype"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Spill som neste"
+  </dest>
+  <voice>
+    *: "Play Next"
   </voice>
 </phrase>
