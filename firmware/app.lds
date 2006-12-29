@@ -45,9 +45,10 @@ INPUT(target/sh/crt0.o)
 #define IRAMORIG 0x400000
 #define IRAMSIZE 0x7000
 #elif CONFIG_CPU==S3C2440
-#define DRAMORIG 0x30000000 + STUBOFFSET
-#define IRAMORIG 0x40000000
+#define DRAMORIG 0x100 + STUBOFFSET
+#define IRAMORIG DRAMORIG
 #define IRAMSIZE 4K
+#define IRAM DRAM
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #define IRAMORIG 0x0f000000
@@ -63,7 +64,9 @@ INPUT(target/sh/crt0.o)
 MEMORY
 {
    DRAM : ORIGIN = DRAMORIG, LENGTH = DRAMSIZE
+#if CONFIG_CPU != S3C2440
    IRAM : ORIGIN = IRAMORIG, LENGTH = IRAMSIZE
+#endif
 #if CONFIG_CPU==PNX0101
    IRAM0 : ORIGIN = 0x0, LENGTH = IRAMSIZE
 #endif
@@ -146,6 +149,8 @@ SECTIONS
 
 #if CONFIG_CPU==PNX0101
     .iram IRAMORIG + SIZEOF(.vectors) :
+#elif CONFIG_CPU==S3C2440
+    .iram :
 #else
     .iram IRAMORIG :
 #endif
@@ -200,7 +205,7 @@ SECTIONS
 
 #if defined(CPU_COLDFIRE)
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
-#elif defined(CPU_ARM)
+#elif defined(CPU_ARM) && CONFIG_CPU != S3C2440
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram) + SIZEOF(.vectors):
 #else
     .bss :

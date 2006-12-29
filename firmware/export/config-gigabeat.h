@@ -14,6 +14,12 @@
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR 1
 
+/* define this if you have access to the quickscreen */
+#define HAVE_QUICKSCREEN
+
+/* define this if you have access to the pitchscreen */
+#define HAVE_PITCHSCREEN
+
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
@@ -30,13 +36,23 @@
 #define CONFIG_CODEC SWCODEC
 
 /* define this if you have a real-time clock */
-
-#if 0 /* TODO */
 #define CONFIG_RTC RTC_S3C2440
-#endif
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_GIGABEAT /* port controlled PWM */
+
+#define HAVE_BACKLIGHT_BRIGHTNESS
+
+/* Main LCD backlight brightness range and defaults */
+#define MIN_BRIGHTNESS_SETTING          0   /* 0.5 mA */
+#define MIN_ACTIVE_BRIGHTNESS_SETTING   16  /* lowest active brightness */
+#define MAX_DIM_BRIGHTNESS_SETTING      15  /* highest 'dimness' */
+#define MAX_BRIGHTNESS_SETTING          63  /* 32 mA */
+#define DEFAULT_BRIGHTNESS_SETTING      39  /* 20 mA */
+#define DEFAULT_DIMNESS_SETTING          9  /* 5 mA */
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
@@ -54,23 +70,27 @@
 
 #ifndef SIMULATOR
 
+/* The LCD on a Gigabeat is 240x320 - it is portrait */
+#define HAVE_PORTRAIT_LCD
+
 /* Define this if you have a Motorola SCF5249 */
 #define CONFIG_CPU S3C2440
 
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_S3C2440
 
-/* Type of mobile power */
-#define CONFIG_BATTERY BATT_LIPOL1300
-#define BATTERY_CAPACITY_MIN 1300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
-#define BATTERY_CAPACITY_INC 50   /* capacity increment */
-#define BATTERY_TYPES_COUNT  1    /* only one type */
+/* Type of mobile power - check this out */
+#define CONFIG_BATTERY BATT_LIION830    /* could change this later */
+#define BATTERY_CAPACITY_MIN 750        /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 850        /* max. capacity selectable */
+#define BATTERY_CAPACITY_INC 25         /* capacity increment */
+#define BATTERY_TYPES_COUNT  1          /* only one type */
 
-#define BATTERY_SCALE_FACTOR 6852 /* FIX: this value is picked at random */
+/* ADC[0] is (530) at discharge and 625 at full charge */
+#define BATTERY_SCALE_FACTOR 6450 
 
-/* Hardware controlled charging? FIXME */
-#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Hardware controlled charging with monitoring */
+#define CONFIG_CHARGING CHARGING_MONITOR
 
 /* define this if the hardware can be powered off while charging */
 #define HAVE_POWEROFF_WHILE_CHARGING
@@ -82,9 +102,7 @@
 #define CPU_FREQ 16934400
 
 /* Define this if you have ATA power-off control */
-#if 0 /* TODO */
 #define HAVE_ATA_POWER_OFF
-#endif
 
 /* Virtual LED (icon) */
 #define CONFIG_LED LED_VIRTUAL
@@ -99,6 +117,7 @@
 
 #define USB_GIGABEAT_STYLE
 
+#define HAVE_HEADPHONE_DETECTION
 /* Define this if you have adjustable CPU frequency */
 #if 0 /* TODO */
 #define HAVE_ADJUSTABLE_CPU_FREQ
@@ -107,8 +126,5 @@
 #define BOOTFILE_EXT "gigabeat"
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 
-#if 0 /* TODO */
-#define HAVE_BACKLIGHT_BRIGHTNESS
-#endif
-
+ 
 #endif

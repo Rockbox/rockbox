@@ -18,24 +18,67 @@
  ****************************************************************************/
 #include "cpu.h"
 #include "adc-target.h"
+#include "kernel.h"
 
 
-void adc_init(void) {
-  /* Turn on the ADC PCLK */
-  CLKCON |= (1<<15);
 
-  /* Set channel 0, normal mode, disable "start by read" */
-  ADCCON &= ~(0x3F);
+static unsigned short adc_readings[NUM_ADC_CHANNELS];
 
-  /* No start delay.  Use nromal conversion mode. */
-  ADCDLY |= 0x1;
+/* prototypes */
+static unsigned short __adc_read(int channel);
+static void adc_tick(void);
 
-  /* Set and enable the prescaler */
-  ADCCON = (ADCCON & ~(0xff<<6)) | (0x19<<6);
-  ADCCON |= (1<<14);
+
+
+void adc_init(void) 
+{
+    int i;
+
+    /* Turn on the ADC PCLK */
+    CLKCON |= (1<<15);
+
+    /* Set channel 0, normal mode, disable "start by read" */
+    ADCCON &= ~(0x3F);
+
+    /* No start delay.  Use normal conversion mode. */
+    ADCDLY = 0x1;
+
+    /* Set and enable the prescaler */
+    ADCCON = (ADCCON & ~(0xff<<6)) | (0x19<<6);
+    ADCCON |= (1<<14);
+
+    /* prefill the adc channels */
+    for (i = 0; i < NUM_ADC_CHANNELS; i++)
+    {
+        adc_readings[i] = __adc_read(i);
+    }
+
+    /* start at zero so when the tick starts it is at zero */
+    adc_readings[0] = __adc_read(0);
+
+    /* attach the adc reading to the tick */
+    tick_add_task(adc_tick);
+
+    
 }
 
-unsigned short adc_read(int channel) {
+
+
+/* Called to get the recent ADC reading */
+inline unsigned short adc_read(int channel)
+{
+    return adc_readings[channel];
+}
+
+
+
+/** 
+  * Read the ADC by polling
+  * @param channel The ADC channel to read
+  * @return 10bit reading from ADC channel or ADC_READ_ERROR if timeout
+  */
+static unsigned short __adc_read(int channel) 
+{
   int i;
 
   /* Set the channel */
@@ -45,34 +88,57 @@ unsigned short adc_read(int channel) {
   ADCCON |= 0x1;
 
   /* Wait for a low Enable_start */
-  i = 20000;
-  while(i > 0) {
-    if(ADCCON & 0x1) {
-      i--;
-    }
-    else {
+  for (i = 20000;;) {
+    if(0 == (ADCCON & 0x1)) {
       break;
     }
-  }
-  if(i == 0) {
-    /* Ran out of time */
-    return(0);
+    else {
+      i--;
+      if (0 == i) {
+        /* Ran out of time */
+        return ADC_READ_ERROR;
+      }
+    }
   }
 
   /* Wait for high End_of_Conversion */
-  i = 20000;
-  while(i > 0) {
-    if(ADCCON & (1<<15)) { 	
+  for(i = 20000;;) {
+    if(ADCCON & (1<<15)) {
       break;
     }
     else {
       i--;
+      if(0 == i) {
+        /* Ran out of time */
+        return ADC_READ_ERROR;
+      }
     }
   }
-  if(i == 0) {
-    /* Ran out of time */
-    return(0);
-  }
 
-  return(ADCDAT0 & 0x3ff);
+  return (ADCDAT0 & 0x3ff);
 }
+
+
+
+/* add this to the tick so that the ADC converts are done in the background */
+static void adc_tick(void)
+{
+    static unsigned channel;
+
+    /* Check if the End Of Conversion is set */
+    if (ADCCON & (1<<15)) 
+    {
+        adc_readings[channel] = (ADCDAT0 & 0x3FF);
+        if (++channel >= NUM_ADC_CHANNELS)
+        {
+            channel = 0;
+        }
+
+        /* setup the next conversion and start it*/
+        ADCCON = (ADCCON & ~(0x7<<3)) | (channel<<3) | 0x01;
+    }
+}
+
+
+
+  

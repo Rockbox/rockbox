@@ -24,10 +24,11 @@
 
 #define SCL_SDA_HI    GPHDAT |= (3 << 9)
 
-/* arbitrary delay loop */
-#define DELAY   do { int _x; for(_x=0;_x<2000;_x++);} while (0)
+/* The SC606 can clock at 400KHz: 2.5uS period -> 1.25uS half period */
+/* At 300Mhz - if loop takes 6 cycles @ 3.3nS each -> 1.25uS / 20nS -> 63 */
+#define DELAY   do { volatile int _x; for(_x=0;_x<63;_x++);} while (0)
 
-void sc606_i2c_start(void)
+static void sc606_i2c_start(void)
 {
     SCL_SDA_HI;
     DELAY;
@@ -36,7 +37,7 @@ void sc606_i2c_start(void)
     SCL_LO;
 }
 
-void sc606_i2c_restart(void)
+static void sc606_i2c_restart(void)
 {
     SCL_SDA_HI;
     DELAY;
@@ -45,7 +46,7 @@ void sc606_i2c_restart(void)
     SCL_LO;
 }
 
-void sc606_i2c_stop(void)
+static void sc606_i2c_stop(void)
 {
     SDA_LO;
     DELAY;
@@ -55,7 +56,7 @@ void sc606_i2c_stop(void)
     DELAY;
 }
 
-void sc606_i2c_ack(void)
+static void sc606_i2c_ack(void)
 {
 
     SDA_LO;
@@ -64,11 +65,11 @@ void sc606_i2c_ack(void)
     SCL_LO;
 }
 
-int sc606_i2c_getack(void)
+static int sc606_i2c_getack(void)
 {
     int ret = 0;
 
-    /* Don't need a delay since this follows a data bit with a delay on the end */
+    /* Don't need a delay since follows a data bit with a delay on the end */
     SDA_INPUT;   /* And set to input */
     SCL_HI;
     DELAY;
@@ -83,7 +84,7 @@ int sc606_i2c_getack(void)
     return ret;
 }
 
-int sc606_i2c_outb(unsigned char byte)
+static int sc606_i2c_outb(unsigned char byte)
 {
     int i;
 
@@ -106,7 +107,7 @@ int sc606_i2c_outb(unsigned char byte)
     return sc606_i2c_getack();
 }
 
-unsigned char sc606_i2c_inb(void)
+static unsigned char sc606_i2c_inb(void)
 {
    int i;
    unsigned char byte = 0;
@@ -127,6 +128,8 @@ unsigned char sc606_i2c_inb(void)
 
    return byte;
 }
+
+
 
 int sc606_write(unsigned char reg, unsigned char data)
 {

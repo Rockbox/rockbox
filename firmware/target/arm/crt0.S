@@ -122,7 +122,26 @@ start:
 /* Code for ARM bootloader targets other than iPod go here */
 
 #if CONFIG_CPU == S3C2440
-    bl main
+    /* get the high part of our execute address */
+    ldr    r2, =0xffffff00
+    and    r4, pc, r2
+
+    /* Copy bootloader to safe area - 0x31000000 */
+    mov    r5, #0x30000000
+    add    r5, r5, #0x1000000
+    ldr    r6, = _dataend
+    sub    r0, r6, r5       /* length of loader */
+    add    r0, r4, r0     /* r0 points to start of loader */
+1:
+    cmp    r5, r6
+    ldrcc  r2, [r4], #4
+    strcc  r2, [r5], #4
+    bcc    1b
+
+    ldr    pc, =start_loc    /* jump to the relocated start_loc:  */
+    
+start_loc:
+     bl main
 #endif
 
 #else /* BOOTLOADER */
@@ -201,7 +220,10 @@ prefetch_abort_handler:
 fiq_handler:
     @ Branch straight to FIQ handler in pcm_playback.c. This also handles the
     @ the correct return sequence.
-    ldr    pc, =fiq
+    stmfd sp!, {r0-r7, r12, lr}
+    bl    fiq
+    ldmfd sp!, {r0-r7, r12, lr}
+    subs pc, lr, #4
 
 data_abort_handler:
     sub    r0, lr, #8 
@@ -210,9 +232,9 @@ data_abort_handler:
 
 irq_handler:
 #ifndef STUB
-    stmfd  sp!, {r0-r3, r12, lr}
+    stmfd  sp!, {r0-r11, r12, lr}
     bl     irq
-    ldmfd  sp!, {r0-r3, r12, lr}
+    ldmfd  sp!, {r0-r11, r12, lr}
 #endif
     subs   pc, lr, #4
 

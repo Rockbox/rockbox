@@ -59,46 +59,9 @@ void pcm_play_pause_unpause(void);
 
 /** Functions that require targeted implementation **/
 
-#ifndef CPU_COLDFIRE
+#if !defined(CPU_COLDFIRE) && (CONFIG_CPU != S3C2440)
 
-#if (CONFIG_CPU == S3C2440) 
-
-/* TODO: Implement for Gigabeat
-   For now, just implement some dummy functions.
-*/
-void pcm_init(void)
-{
-}
-
-void pcm_play_dma_start(const void *addr, size_t size)
-{
-    (void)addr;
-    (void)size;
-}
-
-void pcm_play_dma_stop(void)
-{
-}
-
-void pcm_play_pause_pause(void)
-{
-}
-
-void pcm_play_pause_unpause(void)
-{
-}
-
-void pcm_set_frequency(unsigned int frequency)
-{
-    (void)frequency;
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return 0;
-}
-
-#elif (CONFIG_CPU == PNX0101)
+#if (CONFIG_CPU == PNX0101)
 
 #define DMA_BUF_SAMPLES 0x100
 

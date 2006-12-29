@@ -56,7 +56,7 @@ void kernel_init(void)
 void sleep(int ticks)
 {
 #if CONFIG_CPU == S3C2440 && defined(BOOTLOADER)
-    int counter;
+    volatile int counter;
     TCON &= ~(1 << 20); // stop timer 4
     // TODO: this constant depends on dividers settings inherited from
     // firmware. Set them explicitly somwhere.
@@ -76,7 +76,7 @@ void sleep(int ticks)
 
 void yield(void)
 {
-#if (CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022) && defined(BOOTLOADER))
+#if ((CONFIG_CPU == S3C2440 || defined(ELIO_TPJ1022)) && defined(BOOTLOADER))
     /* Some targets don't like yielding in the bootloader */
 #else
     switch_thread(true, NULL);
@@ -560,27 +560,34 @@ void tick_start(unsigned int interval_in_ms)
 #elif CONFIG_CPU == S3C2440
 void tick_start(unsigned int interval_in_ms)
 {
-    unsigned long count;
+    TCON &= ~(1 << 20); // stop timer 4
+    // TODO: this constant depends on dividers settings inherited from
+    // firmware. Set them explicitly somwhere.
+    TCNTB4 = 12193 * interval_in_ms / 1000;
+    TCON |= 1 << 21; // set manual bit
+    TCON &= ~(1 << 21); // reset manual bit
+    TCON |= 1 << 22; //interval mode
+    TCON |= (1 << 20); // start timer 4
 
-    /* period = (n + 1) / 128 , n = tick time count (1~127)*/
-    count = interval_in_ms / 1000 * 128 - 1;
+    INTMOD &= ~(1 << 14); // timer 4 to IRQ mode
+    INTMSK &= ~(1 << 14); // timer 4 unmask interrupts
+}
 
-    if(count > 127)
+void timer4(void) {
+	int i;
+    /* Run through the list of tick tasks */
+    for(i = 0; i < MAX_NUM_TICK_TASKS; i++)
     {
-        panicf("Error! The tick interval is too long (%d ms)\n",
-               interval_in_ms);
-        return;
+        if(tick_funcs[i])
+        {
+            tick_funcs[i]();
+        }
     }
 
-    /* Disable the tick */
-    TICNT &= ~(1<<7);
-    /* Set the count value */
-    TICNT |= count;
-    /* Start up the ticker */
-    TICNT |= (1<<7);
+    current_tick++;
 
-    /* need interrupt handler ??? */
-    
+    /* following needs to be fixed.  */
+    /*wake_up_thread();*/
 }
 #endif
 

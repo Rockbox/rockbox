@@ -36,7 +36,6 @@
 #include "file.h"
 #include "buffer.h"
 #include "audio.h"
-#include "i2s.h"
 #include "i2c.h"
 #include "i2c-meg-fx.h"
 /*
@@ -53,11 +52,16 @@ void i2s_reset(void)
 int audiohw_init(void) {
     /* reset I2C */
     i2c_init();
+    
+    /* GPC5 controls headphone output */
+    GPCCON &= ~(0x3 << 10);
+    GPCCON |= (1 << 10);
+    GPCDAT |= (1 << 5);
 
     return 0;
 }
 
 void wmcodec_write(int reg, int data)
 {
-    i2c_send(0x34, (reg<<1) | ((data&0x100)>>8),data&0xff);
+    i2c_send(0x34, (reg<<1) | ((data&0x100)>>8), data&0xff);
 }

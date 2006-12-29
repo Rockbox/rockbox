@@ -119,7 +119,7 @@ SECTIONS
 }
 #elif (CONFIG_CPU==S3C2440)
 {
-  . = DRAMORIG + 0x8000;
+  . = DRAMORIG + 0x1000000;
   .text : {
     *(.init.text)
     *(.text)

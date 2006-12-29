@@ -19,11 +19,16 @@
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
+#include "backlight-target.h"
 #include "backlight.h"
 #include "lcd.h"
 #include "sc606-meg-fx.h"
 
-int confval = SC606_LOW_FREQ;
+static int confval = SC606_LOW_FREQ;
+
+void __backlight_init(void)
+{
+}
 
 void __backlight_on(void)
 {

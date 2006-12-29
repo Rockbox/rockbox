@@ -36,6 +36,11 @@ OUTPUT_FORMAT(elf32-sh)
 #define DRAMORIG 0xc00000 + STUBOFFSET
 #define IRAMORIG 0x407000
 #define IRAMSIZE 0x9000
+#elif CONFIG_CPU == S3C2440
+#define DRAMORIG 0x100 + STUBOFFSET
+#define IRAMORIG DRAMORIG
+#define IRAMSIZE 4K
+#define IRAM DRAM
 #else
 #define DRAMORIG 0x09000000 + STUBOFFSET
 #endif
@@ -73,7 +78,7 @@ SECTIONS
     .text :
     {
         *(.text*)
-#if defined(CPU_PP) || (CONFIG_CPU==PNX0101)
+#ifdef CPU_ARM
         *(.glue_7)
         *(.glue_7t)
 #endif

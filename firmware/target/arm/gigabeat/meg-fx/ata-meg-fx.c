@@ -26,11 +26,18 @@
 
 void ata_reset(void)
 {
+    GPGDAT &= ~(1 << 10);
+    sleep(1); /* > 25us */
+    GPGDAT |= (1 << 10);
+    sleep(1); /* > 2ms */
 }
 
 void ata_enable(bool on)
 {
-    (void)on;
+    if(on)
+        GPGDAT &= ~(1 << 12);
+    else
+        GPGDAT |= (1 << 12);
 }
 
 bool ata_is_coldstart(void)

@@ -23,6 +23,8 @@
 #include "system.h"
 #include "power.h"
 #include "pcf50606.h"
+#include "backlight.h"
+#include "backlight-target.h"
 
 #ifndef SIMULATOR
 
@@ -33,21 +35,34 @@ void power_init(void)
 
 bool charger_inserted(void)
 {
-    return !(GPFDAT & (1 << 4));
+    return (GPFDAT & (1 << 4)) ? false : true;
+}
+
+/* Returns true if the unit is charging the batteries. */
+bool charging_state(void) {
+    return (GPGDAT & (1 << 8)) ? false : true;
 }
 
 void ide_power_enable(bool on)
 {
-    (void)on;
+    if (on)
+        GPGDAT |= (1 << 11);
+    else
+        GPGDAT &= ~(1 << 11);
 }
 
 bool ide_powered(void)
 {
-    return true;
+    return (GPGDAT & (1 << 11)) != 0;
 }
 
 void power_off(void)
 {
+    /* turn off backlight and wait for 1 second */
+    __backlight_off();
+    sleep(HZ/2);
+    /* set SLEEP bit to on in CLKCON to turn off */
+    CLKCON |=(1<<3);
 }
 
 #else /* SIMULATOR */

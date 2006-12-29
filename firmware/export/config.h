@@ -74,6 +74,7 @@
 #define BATT_LIPOL1300  1300 /* the type used in iRiver h1x0 models */
 #define BATT_LPCS355385 1550 /* iriver h10 20Gb - SKC LPCS355385 */
 #define BATT_BP009       820 /* iriver H10 5/6Gb - iriver BP009 */
+#define BATT_LIION830    830 /* Toshiba Gigabeat Fxx and Xxx series MK11-2740 */
 
 /* CONFIG_CHARGING */
 #define CHARGING_SIMPLE  1 /* Simple, hardware controlled charging */

@@ -191,6 +191,8 @@ static const unsigned int battery_level_dangerous[BATTERY_TYPES_COUNT] =
     105, 115
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver H1x0: LiPolymer */
     338
+#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
+    340
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
     354
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB: LiPolymer*/
@@ -210,6 +212,8 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
     270, 280
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
     299
+#elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
+    338
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
     350
 #elif CONFIG_BATTERY == BATT_LPCS355385 /* iriver H10 20GB */
@@ -252,6 +256,9 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
     /* May need recalibration. */
     {  93, 108, 114, 118, 121, 125, 128, 132, 136, 142, 158 }, /* alkaline */
     { 103, 118, 121, 123, 124, 125, 126, 127, 128, 129, 135 }  /* NiMH */
+#elif CONFIG_BATTERY == BATT_LIION830
+    /* Toshiba Gigabeat Li Ion 830mAH figured from discharge curve */
+    { 342, 358, 361, 368, 371, 374, 377, 381, 387, 390, 397 }
 #else /* NiMH */
     /* original values were taken directly after charging, but it should show
        100% after turning off the device for some hours, too */
@@ -263,12 +270,16 @@ static const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 #ifdef CONFIG_CHARGING
 charger_input_state_type charger_input_state IDATA_ATTR;
 
+
 /* voltages (centivolt) of 0%, 10%, ... 100% when charging enabled */
 static const unsigned short percent_to_volt_charge[11] =
 {
 #if CONFIG_BATTERY == BATT_LIPOL1300
     /* values measured over one full charging cycle */
     354, 386, 393, 398, 400, 402, 404, 408, 413, 418, 423 /* LiPo */
+#elif CONFIG_BATTERY == BATT_LIION830
+    /* Toshiba Gigabeat Li Ion 830mAH */
+    347, 363, 366, 373, 376, 379, 382, 386, 393, 403, 411
 #elif CONFIG_BATTERY == BATT_LPCS355385
     /* iriver H10 20GB */
     399, 403, 406, 408, 410, 412, 415, 418, 422, 426, 431
