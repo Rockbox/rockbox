@@ -109,11 +109,6 @@ void pcm_init(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
-    //FIXME
-    //return;
-
-    int i;
-    
     /* sanity check: bad pointer or too small file */
     if ((NULL == addr) || (size & ~1) <= IIS_FIFO_SIZE) return;
 
