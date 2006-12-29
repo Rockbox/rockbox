@@ -157,6 +157,7 @@ static long read_string(int fd, char* buf, long buf_size, int eos, long size)
  */ 
 static void convert_endian(void *data, const char *format)
 {
+#ifdef ROCKBOX_BIG_ENDIAN
     while (*format) 
     {
         switch (*format) 
@@ -192,6 +193,10 @@ static void convert_endian(void *data, const char *format)
 
         format++;
     }
+#else
+    (void) data;
+    (void) format;
+#endif
 }
 
 #if 0 /* not needed atm */
@@ -225,7 +230,7 @@ static int read_uint32be(int fd, unsigned int* buf)
 #endif
 
 /* Read an unaligned 32-bit little endian long from buffer. */
-static unsigned long get_long(void* buf)
+static unsigned long get_long_le(void* buf)
 {
     unsigned char* p = (unsigned char*) buf;
 
@@ -564,8 +569,8 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
     /* We need to ensure the serial number from this page is the same as the
      * one from the last page (since we only support a single bitstream).
      */
-    serial = get_long(&buf[14]);
-    id3->frequency = get_long(&buf[40]);
+    serial = get_long_le(&buf[14]);
+    id3->frequency = get_long_le(&buf[40]);
     id3->filesize = filesize(fd);
 
     /* Comments are in second Ogg page */
@@ -666,8 +671,8 @@ static bool get_vorbis_metadata(int fd, struct mp3entry* id3)
                     /* Note that this only reads the low 32 bits of a
                      * 64 bit value.
                      */
-                     id3->samples = get_long(&buf[i + 6]);
-                     last_serial = get_long(&buf[i + 14]);
+                     id3->samples = get_long_le(&buf[i + 6]);
+                     last_serial = get_long_le(&buf[i + 14]);
 
                     /* If this page is very small the beginning of the next
                      * header could be in buffer. Jump near end of this header
@@ -779,8 +784,7 @@ static bool get_flac_metadata(int fd, struct mp3entry* id3)
             rc = true;  /* Got vital metadata */
 
             /* totalsamples is a 36-bit field, but we assume <= 32 bits are used */
-            totalsamples = (buf[14] << 24) | (buf[15] << 16) 
-                | (buf[16] << 8) | buf[17];
+            totalsamples = get_long_be(&buf[14]);
 
             /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
             id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
@@ -854,7 +858,7 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
             return false;
 
         /* chunkSize */
-        i = get_long(&buf[4]);
+        i = get_long_le(&buf[4]);
 
         if (memcmp(buf, "fmt ", 4) == 0)
         {
@@ -868,9 +872,9 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
             /* wChannels */
             channels = buf[2] | (buf[3] << 8);
             /* dwSamplesPerSec */
-            id3->frequency = get_long(&buf[4]);
+            id3->frequency = get_long_le(&buf[4]);
             /* dwAvgBytesPerSec */
-            id3->bitrate = (get_long(&buf[8]) * 8) / 1000;
+            id3->bitrate = (get_long_le(&buf[8]) * 8) / 1000;
             /* skipping wBlockAlign */
             /* wBitsPerSample */
             bitspersample = buf[14] | (buf[15] << 8);
@@ -890,7 +894,7 @@ static bool get_wave_metadata(int fd, struct mp3entry* id3)
                     return false;
 
                 i -= 2;
-                totalsamples = get_long(buf);
+                totalsamples = get_long_le(buf);
             }
         }
 
@@ -1641,12 +1645,10 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
         return false;
     }
     
-    id3->frequency = (buf[8] << 24) | (buf[9] << 16) | (buf[10] << 8) | buf[11];
+    id3->frequency = get_long_be(&buf[8]);
     /* 32 samples per 18 bytes */
     id3->bitrate = id3->frequency * channels * 18 * 8 / 32 / 1000;
-    id3->length = ((unsigned long)
-        (buf[12] << 24) | (buf[13] << 16) | (buf[14] << 8) | buf[15]) /
-        id3->frequency * 1000;
+    id3->length = get_long_be(&buf[12]) / id3->frequency * 1000;
     id3->vbr = false;
     id3->filesize = filesize(fd);
     
@@ -1657,21 +1659,9 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
         /* check if header is too small for loop data */
         if (chanstart-6 < 0x2c) looping=0;
         else {
-            looping = (buf[0x18]) ||
-                      (buf[0x19]) ||
-                      (buf[0x1a]) ||
-                      (buf[0x1b]);
-            end_adr = (buf[0x28]<<24) |
-                      (buf[0x29]<<16) |
-                      (buf[0x2a]<<8) |
-                      (buf[0x2b]);
-
-            start_adr = (
-              (buf[0x1c]<<24) |
-              (buf[0x1d]<<16) |
-              (buf[0x1e]<<8) |
-              (buf[0x1f])
-              )/32*channels*18+chanstart;
+            looping = get_long_be(&buf[0x18]);
+            end_adr = get_long_be(&buf[0x28]);
+            start_adr = get_long_be(&buf[0x1c])/32*channels*18+chanstart;
         }
     } else if (!memcmp(buf+0x10,"\x01\xF4\x04\x00",4)) {
         /* Standard (type 04) */
@@ -1679,20 +1669,9 @@ static bool get_adx_metadata(int fd, struct mp3entry* id3)
         /* check if header is too small for loop data */
         if (chanstart-6 < 0x38) looping=0;
         else {
-            looping = (buf[0x24]) ||
-                      (buf[0x25]) ||
-                      (buf[0x26]) ||
-                      (buf[0x27]);
-            end_adr = (buf[0x34]<<24) |
-                      (buf[0x35]<<16) |
-                      (buf[0x36]<<8) |
-                      buf[0x37];
-            start_adr = (
-              (buf[0x28]<<24) |
-              (buf[0x29]<<16) |
-              (buf[0x2a]<<8) |
-              (buf[0x2b])
-              )/32*channels*18+chanstart;
+            looping = get_long_be(&buf[0x24]);
+            end_adr = get_long_be(&buf[0x34]);
+            start_adr = get_long_be(&buf[0x28])/32*channels*18+chanstart;
         }
     } else {
         DEBUGF("get_adx_metadata: error, couldn't determine ADX type\n");
@@ -1748,18 +1727,18 @@ static bool get_aiff_metadata(int fd, struct mp3entry* id3)
     while ((numbytes == 0) && (read_bytes >= 8)) 
     {
         /* chunkSize */
-        i = ((buf[4]<<24)|(buf[5]<<16)|(buf[6]<<8)|buf[7]);
+        i = get_long_be(&buf[4]);
         
         if (memcmp(buf, "COMM", 4) == 0)
         {
             /* numChannels */
             numChannels = ((buf[8]<<8)|buf[9]);
             /* numSampleFrames */
-            numSampleFrames =((buf[10]<<24)|(buf[11]<<16)|(buf[12]<<8)|buf[13]);
+            numSampleFrames = get_long_be(&buf[10]);
             /* sampleSize */
             sampleSize = ((buf[14]<<8)|buf[15]);
             /* sampleRate */
-            sampleRate = ((buf[18]<<24)|(buf[19]<<16)|(buf[20]<<8)|buf[21]);
+            sampleRate = get_long_be(&buf[18]);
             sampleRate = sampleRate >> (16+14-buf[17]);
             /* save format infos */
             id3->bitrate = (sampleSize * numChannels * sampleRate) / 1000;
@@ -1813,9 +1792,9 @@ unsigned int probe_file_format(const char *filename)
         const char *ext = audio_formats[i].ext_list;
 
         do
-    {
-            if (strcasecmp(suffix, ext) == 0)
         {
+            if (strcasecmp(suffix, ext) == 0)
+            {
                 return i;
             }
 
@@ -1936,7 +1915,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
                 track->id3.frequency = wavpack_sample_rates[srindx];
             }
 
-            totalsamples = get_long(&buf[12]);
+            totalsamples = get_long_le(&buf[12]);
             track->id3.length = totalsamples / (track->id3.frequency / 100) * 10;
             track->id3.bitrate = filesize (fd) / (track->id3.length / 8);
         }
