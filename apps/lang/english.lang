@@ -8436,10 +8436,10 @@
   desc: When you run the radio without an fmr file in settings
   user:
   <source>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </source>
   <dest>
-    *: "No Settings found, AutoScan?"
+    *: "No settings found. Autoscan?"
   </dest>
   <voice>
     *: ""
@@ -8599,13 +8599,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Update now"
+    *: "Update Now"
   </source>
   <dest>
-    *: "Update now"
+    *: "Update Now"
   </dest>
   <voice>
-    *: "Update now"
+    *: "Update Now"
   </voice>
 </phrase>
 <phrase>
@@ -8613,13 +8613,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Auto update"
+    *: "Auto Update"
   </source>
   <dest>
-    *: "Auto update"
+    *: "Auto Update"
   </dest>
   <voice>
-    *: "Auto update"
+    *: "Auto Update"
   </voice>
 </phrase>
 <phrase>
@@ -8627,13 +8627,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Export modifications"
+    *: "Export Modifications"
   </source>
   <dest>
-    *: "Export modifications"
+    *: "Export Modifications"
   </dest>
   <voice>
-    *: "Export modifications"
+    *: "Export Modifications"
   </voice>
 </phrase>
 <phrase>
@@ -8641,13 +8641,13 @@
   desc: in onplay menu
   user:
   <source>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </source>
   <dest>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </dest>
   <voice>
-    *: "Playlist catalog"
+    *: "Playlist Catalog"
   </voice>
 </phrase>
 <phrase>
@@ -8655,13 +8655,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </source>
   <dest>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </dest>
   <voice>
-    *: "Add to playlist"
+    *: "Add to Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8669,13 +8669,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </source>
   <dest>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </dest>
   <voice>
-    *: "Add to new playlist"
+    *: "Add to New Playlist"
   </voice>
 </phrase>
 <phrase>
@@ -8683,13 +8683,13 @@
   desc: in onplay playlist catalog submenu
   user:
   <source>
-    *: "View catalog"
+    *: "View Catalog"
   </source>
   <dest>
-    *: "View catalog"
+    *: "View Catalog"
   </dest>
   <voice>
-    *: "View catalog"
+    *: "View Catalog"
   </voice>
 </phrase>
 <phrase>
@@ -8711,10 +8711,10 @@
   desc: error message when no playlists for playlist catalog
   user:
   <source>
-    *: "No playlists"
+    *: "No Playlists"
   </source>
   <dest>
-    *: "No playlists"
+    *: "No Playlists"
   </dest>
   <voice>
     *: ""
@@ -8725,13 +8725,13 @@
   desc: in tag cache settings
   user:
   <source>
-    *: "Import modifications"
+    *: "Import Modifications"
   </source>
   <dest>
-    *: "Import modifications"
+    *: "Import Modifications"
   </dest>
   <voice>
-    *: "Import modifications"
+    *: "Import Modifications"
   </voice>
 </phrase>
 <phrase>
@@ -9875,13 +9875,13 @@
   desc: in settings_menu.
   user:
   <source>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </source>
   <dest>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </dest>
   <voice>
-    *: "Pause on headphone unplug"
+    *: "Pause on Headphone Unplug"
   </voice>
 </phrase>
 <phrase>
@@ -9903,13 +9903,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </source>
   <dest>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </dest>
   <voice>
-    *: "Duration to rewind"
+    *: "Duration to Rewind"
   </voice>
 </phrase>
 <phrase>
@@ -9917,13 +9917,13 @@
   desc: in pause_phones_menu.
   user:
   <source>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </source>
   <dest>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </dest>
   <voice>
-    *: "Disable auto-resume if phones not present"
+    *: "Disable resume on startup if phones unplugged"
   </voice>
 </phrase>
 <phrase>
