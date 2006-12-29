@@ -1840,7 +1840,8 @@ bool gui_wps_refresh(struct gui_wps *gwps, int ffwd_offset,
                                         HORIZONTAL);
 #ifdef AB_REPEAT_ENABLE
                 if ( ab_repeat_mode_enabled() )
-                    ab_draw_markers(display, state->id3->length, 0, sb_y, 
+                    ab_draw_markers(display, state->id3->length,
+                            data->progress_start, data->progress_end, sb_y,
                             data->progress_height);
 #endif
                 update_line = true;

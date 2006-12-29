@@ -166,7 +166,7 @@ static inline int ab_calc_mark_x_pos(int mark, int capacity,
     return offset + ( (w * mark) / capacity );
 }
 
-static inline void ab_draw_veritcal_line_mark(struct screen * screen,
+static inline void ab_draw_vertical_line_mark(struct screen * screen,
                                               int x, int y, int h)
 {
     screen->set_drawmode(DRMODE_COMPLEMENT);
@@ -192,20 +192,19 @@ static inline void ab_draw_arrow_mark(struct screen * screen,
 }
 
 void ab_draw_markers(struct screen * screen, int capacity, 
-                     int x, int y, int h)
+                     int x0, int x1, int y, int h)
 {
-    int w = screen->width;
     /* if both markers are set, determine if they're far enough apart
     to draw arrows */
     if ( ab_A_marker_set() && ab_B_marker_set() )
     {
-        int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x, w);
-        int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x, w);
+        int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x0, x1);
+        int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x0, x1);
         int arrow_width = (h+1) / 2;
         if ( (xb-xa) < (arrow_width*2) )
         {
-            ab_draw_veritcal_line_mark(screen, xa, y, h);
-            ab_draw_veritcal_line_mark(screen, xb, y, h);
+            ab_draw_vertical_line_mark(screen, xa, y, h);
+            ab_draw_vertical_line_mark(screen, xb, y, h);
         }
         else
         {
@@ -217,12 +216,12 @@ void ab_draw_markers(struct screen * screen, int capacity,
     {
         if (ab_A_marker_set())
         {
-            int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x, w);
+            int xa = ab_calc_mark_x_pos(ab_A_marker, capacity, x0, x1);
             ab_draw_arrow_mark(screen, xa, y, h, DIRECTION_RIGHT);
         }
         if (ab_B_marker_set())
         {
-            int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x, w);
+            int xb = ab_calc_mark_x_pos(ab_B_marker, capacity, x0, x1);
             ab_draw_arrow_mark(screen, xb, y, h, DIRECTION_LEFT);
         }
     }
