@@ -306,7 +306,9 @@ static inline void sleep_core(void)
            interrupts */
         CPU_CTL = 0x80000000;
 #elif CONFIG_CPU == S3C2440
-        CLKCON |= 2;
+        CLKCON |= (1 << 2); /* set IDLE bit */
+        for(i=0; i<10; i++); /* wait for IDLE */
+        CLKCON &= ~(1 << 2); /* reset IDLE bit when wake up */
 #endif
     }
 }
