@@ -13,7 +13,7 @@
 #    Modifié par Manuel Dejonghe (lImbus) <lImbus AT users.soureforge.net> - February 2005
 #
 #    Refonte totale du fichier par Mustapha Senhaji (Moos) <moos75 AT gmail.com>
-#    Nov 2005, Avr 2006, Mai 2006, Juillet 2006, Octobre 2006
+#    Nov 2005, Avr 2006, Mai 2006, Juil 2006, Oct 2006, Dec 2006
 
 <phrase>
   id: LANG_SET_BOOL_YES
@@ -306,7 +306,7 @@
     *: "Options Listes de Lecture"
   </dest>
   <voice>
-    *: "Options de listes de lecture"
+    *: "Options listes de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -796,7 +796,7 @@
     *: "Charger Fichier .cfg"
   </dest>
   <voice>
-    *: "Charger un fichier de configuration"
+    *: "Charger fichier de config."
   </voice>
 </phrase>
 <phrase>
@@ -847,10 +847,17 @@
   user:
   <source>
     *: "PLAY = Yes"
+    h100,h120,h300: "NAVI = Oui"
+    ipod*: "SELECT = Oui"
+    x5: "SELECT = Oui"
+    h10: "NEXT = Oui"
   </source>
   <dest>
     *: "PLAY = Oui"
     h100,h120,h300: "NAVI = Oui"
+    ipod*: "SELECT = Oui"
+    x5: "SELECT = Oui"
+    h10: "NEXT = Oui"
   </dest>
   <voice>
     *: ""
@@ -923,7 +930,7 @@
     *: "Sauvegarder .cfg Actuel"
   </dest>
   <voice>
-    *: "Sauvegarder la configuration actuelle"
+    *: "Sauvegarder configuration actuelle"
   </voice>
 </phrase>
 <phrase>
@@ -987,7 +994,7 @@
   desc: in the recording sub menu
   user:
   <source>
-    *: "Recording screen"
+    *: "Recording Screen"
   </source>
   <dest>
     *: "Ecran d'Enregistrement"
@@ -1091,7 +1098,7 @@
     *: "Sauvegarder Config. EQ"
   </dest>
   <voice>
-    *: "Sauvegarder la configuration equaliseur"
+    *: "Sauvegarder configuration equaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1105,7 +1112,7 @@
     *: "Sélectionner une Config. EQ"
   </dest>
   <voice>
-    *: "Sélectionner une configuration equaliseur"
+    *: "Sélectionner configuration equaliseur"
   </voice>
 </phrase>
 <phrase>
@@ -1245,7 +1252,7 @@
     *: "Créer une Nouvelle Liste"
   </dest>
   <voice>
-    *: "Créer une nouvelle liste de lecture"
+    *: "Créer nouvelle liste de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -1259,7 +1266,7 @@
     *: "Voir la Liste Courante"
   </dest>
   <voice>
-    *: "Voir la liste de lecture courante"
+    *: "Voir liste de lecture courante"
   </voice>
 </phrase>
 <phrase>
@@ -1273,7 +1280,7 @@
     *: "Enregistrer la Liste Courante"
   </dest>
   <voice>
-    *: "Enregistrer la liste de lecture courante"
+    *: "Enregistrer liste de lecture courante"
   </voice>
 </phrase>
 <phrase>
@@ -1662,10 +1669,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Passer au Rép. Suiv/Prec. Auto."
+    *: "Changement de Répertoire Auto."
   </dest>
   <voice>
-    *: "Passer au Répertoire suivant/precédant automatique"
+    *: "Changement de répertoire automatique"
   </voice>
 </phrase>
 <phrase>
@@ -1673,13 +1680,13 @@
   desc: in settings menu
   user:
   <source>
-    *: "Tag Cache"
+    *: "Database"
   </source>
   <dest>
-    *: "Cache des Tags"
+    *: "Base de données Tags"
   </dest>
   <voice>
-    *: "Cache des Tags"
+    *: "Base de données des Tags"
   </voice>
 </phrase>
 <phrase>
@@ -1743,10 +1750,10 @@
   desc: while initializing tagcache on boot
   user:
   <source>
-    *: "Committing tagcache"
+    *: "Committing database"
   </source>
   <dest>
-    *: "Ecriture CacheTag"
+    *: "Ecriture Base de données"
   </dest>
   <voice>
     *: ""
@@ -1886,10 +1893,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Tous Types"
+    *: "Tout Type"
   </dest>
   <voice>
-    *: "Tous types"
+    *: "Tout type"
   </voice>
 </phrase>
 <phrase>
@@ -1939,7 +1946,7 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
     *: "Base de Données Tags"
@@ -2001,7 +2008,7 @@
     *: "Charger Config. Ecran de lecture LCD Principal"
   </dest>
   <voice>
-    *: "Charger config. écran de lecture pour LCD principal"
+    *: "Charger config. écran de lecture LCD principal"
   </voice>
 </phrase>
 <phrase>
@@ -2015,7 +2022,7 @@
     *: "Charger Config. Ecran de Lecture LCD Télécommande"
   </dest>
   <voice>
-    *: "Charger config. écran de lecture pour LCD télécommande"
+    *: "Charger config. écran de lecture LCD télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -2477,7 +2484,7 @@
     *: "Maintenir Liste des Derniers Signets?"
   </dest>
   <voice>
-    *: "Maintenir une liste des derniers signets?"
+    *: "Maintenir liste des derniers signets?"
   </voice>
 </phrase>
 <phrase>
@@ -2502,10 +2509,10 @@
     *: "Voice Menus"
   </source>
   <dest>
-    *: "Menus Vocalisés"
+    *: "Menus Prononcés"
   </dest>
   <voice>
-    *: "Menus vocalisés"
+    *: "Menus prononcés"
   </voice>
 </phrase>
 <phrase>
@@ -2516,10 +2523,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Répertoires Vocalisés"
+    *: "Répertoires Prononcés"
   </dest>
   <voice>
-    *: "Répertoires vocalisés"
+    *: "Répertoires prononcés"
   </voice>
 </phrase>
 <phrase>
@@ -2530,10 +2537,10 @@
     *: "Voice Filenames"
   </source>
   <dest>
-    *: "Noms de Fichiers Vocalisés"
+    *: "Noms de Fichiers Prononcés"
   </dest>
   <voice>
-    *: "Noms de fichiers vocalisés"
+    *: "Noms de fichiers prononcés"
   </voice>
 </phrase>
 <phrase>
@@ -2698,10 +2705,10 @@
     *: "File Split Options"
   </source>
   <dest>
-    *: "Options Temps de Coupure Fichier"
+    *: "Options de Coupure Fichier Auto."
   </dest>
   <voice>
-    *: "Options temps de coupure fichier"
+    *: "Options de coupure fichier automatique"
   </voice>
 </phrase>
 <phrase>
@@ -2757,7 +2764,7 @@
     *: "Afficher Menu Enregistrement au Démarrage"
   </dest>
   <voice>
-    *: "Afficher le menu d'enregistrement au démarrage"
+    *: "Afficher menu d'enregistrement au démarrage"
   </voice>
 </phrase>
 <phrase>
@@ -3009,7 +3016,7 @@
     *: "Type de ReplayGain"
   </dest>
   <voice>
-    *: "Type de replayGain"
+    *: "Type de replaygain"
   </voice>
 </phrase>
 <phrase>
@@ -3090,7 +3097,7 @@
     *: "Backlight (While Plugged In)"
   </source>
   <dest>
-    *: "Rétro-éclairage Pendant Charge"
+    *: "Rétro-éclairage pendant Charge"
   </dest>
   <voice>
     *: "Rétroéclairage pendant charge"
@@ -3177,7 +3184,7 @@
     *: "1ère Pression Bouton Active Eclairage Seul"
   </dest>
   <voice>
-    *: "Première pression d'un bouton active seulement l'éclairage"
+    *: "Première pression bouton active seulement l'éclairage"
   </voice>
 </phrase>
 <phrase>
@@ -3854,13 +3861,13 @@
 </phrase>
 <phrase>
   id: LANG_DIRCACHE_REBOOT
-  desc: when activating directory cache
+  desc: DEPRECATED
   user:
   <source>
-    *: "Please reboot to enable the cache"
+    *: ""
   </source>
   <dest>
-    *: "Redémarrer pour Activer Cache"
+    *: ""
   </dest>
   <voice>
     *: ""
@@ -3947,7 +3954,7 @@
     *: "Max. Fichiers par Répertoire"
   </dest>
   <voice>
-    *: "Maximum de fichiers par répertoire"
+    *: "Max de fichiers par répertoire"
   </voice>
 </phrase>
 <phrase>
@@ -3961,7 +3968,7 @@
     *: "Max. Fichiers par Liste de Lecture"
   </dest>
   <voice>
-    *: "Maximum de fichiers par liste de lecture"
+    *: "Max de fichiers par liste de lecture"
   </voice>
 </phrase>
 <phrase>
@@ -4698,9 +4705,17 @@
   user:
   <source>
     *: "OFF = Exit"
+    h100,h120,h300: "STOP = Exit"
+    ipod*: "PLAY/PAUSE = Exit"
+    x5: "RECORD = Exit"
+    h10: "PREV = Exit"
   </source>
   <dest>
     *: "OFF = Sortie"
+    h100,h120,h300: "STOP = Sotie"
+    ipod*: "PLAY/PAUSE = Sotie"
+    x5: "RECORD = Sotie"
+    h10: "PREV = Sotie"
   </dest>
   <voice>
     *: ""
@@ -4754,10 +4769,17 @@
   user:
   <source>
     *: "PLAY = Select"
+    h100,h120,h300: "NAVI = Select"
+    ipod*: "SELECT = Select"
+    x5: "SELECT = Select"
+    h10: "NEXT = Select"
   </source>
   <dest>
     *: "PLAY = Sélect."
     h100,h120,h300: "NAVI = Sélect."
+    ipod*: "SELECT = Sélect."
+    x5: "SELECT = Sélect."
+    h10: "NEXT = Sélect."
   </dest>
   <voice>
     *: ""
@@ -4769,10 +4791,17 @@
   user:
   <source>
     *: "ON+Play = Delete"
+    h100,h120,h300: "RECORD = Delete"
+    ipod*: "Long MENU = Delete"
+    x5: "Long RECORD = Delete"
+    h10: "REWIND = Delete"
   </source>
   <dest>
     *: "ON+PLAY = Suppr."
     h100,h120,h300: "RECORD = Suppr."
+    ipod*: "Long MENU = Suppr."
+    x5: "Long RECORD = Suppr."
+    h10: "REWIND = Suppr."
   </dest>
   <voice>
     *: ""
@@ -4854,9 +4883,17 @@
   user:
   <source>
     *: "ON To Set"
+    h100,h120,h300: "NAVI = Set"
+    ipod*: "SELECT = Set"
+    x5: "SELECT = Set"
+    h10: "NEXT = Set"
   </source>
   <dest>
     *: "ON pour Valider"
+    h100,h120,h300: "NAVI = Valider"
+    ipod*: "SELECT = Valider"
+    x5: "SELECT = Valider"
+    h10: "NEXT = Valider"
   </dest>
   <voice>
     *: ""
@@ -4868,9 +4905,17 @@
   user:
   <source>
     *: "OFF To Revert"
+    h100,h120,h300: "STOP = Revert"
+    ipod*: "MENU = Revert"
+    x5: "RECORD = Revert"
+    h10: "PREV = Revert"
   </source>
   <dest>
     *: "OFF pour Annuler"
+    h100,h120,h300: "STOP = Annuler"
+    ipod*: "MENU = Annuler"
+    x5: "RECORD = Annuler"
+    h10: "PREV = Annuler"
   </dest>
   <voice>
     *: ""
@@ -5064,9 +5109,11 @@
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disque Plein. Presser OFF pour Continuer"
+    h100,h120,h300: "Disque Plein. Presser STOP pour Continuer"
   </dest>
   <voice>
     *: ""
@@ -7057,7 +7104,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Text"
+    *: "Texte"
   </voice>
 </phrase>
 <phrase>
@@ -7141,7 +7188,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Fichier config. écran de lecture de la télécommande"
+    *: "Fichier config. écran de lecture pour télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -7348,7 +7395,7 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Erreur d'accès au fichier contrôle Liste de lecture"
+    *: "Erreur d'accès au fichier Liste de lecture"
   </dest>
   <voice>
     *: ""
@@ -7836,9 +7883,17 @@
   user:
   <source>
     *: "OFF to abort"
+    h100,h120,h300: "STOP to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    x5: "Long PLAY to abort"
+    h10: "PREV to abort"
   </source>
   <dest>
     *: "OFF pour Annuler"
+    h100,h120,h300: "STOP pour Annuler"
+    ipod*: "PLAY/PAUSE pour Annuler"
+    x5: "Long PLAY pour Annuler"
+    h10: "PREV pour Annuler"
   </dest>
   <voice>
     *: ""
@@ -8317,7 +8372,7 @@
     *: "Charger Liste de Stations"
   </dest>
   <voice>
-    *: "Charger une liste de stations"
+    *: "Charger liste de stations"
   </voice>
 </phrase>
 <phrase>
@@ -8331,7 +8386,7 @@
     *: "Sauvegarder Liste de Stations"
   </dest>
   <voice>
-    *: "Sauvegarder une liste de stations"
+    *: "Sauvegarder liste de stations"
   </voice>
 </phrase>
 <phrase>
@@ -8345,7 +8400,7 @@
     *: "Réinitialiser Liste Stations"
   </dest>
   <voice>
-    *: "Réinitialiser la liste des stations"
+    *: "Réinitialiser liste des stations"
   </voice>
 </phrase>
 <phrase>
@@ -8474,13 +8529,13 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   id: LANG_TAGCACHE_BUSY
   desc: when trying to shutdown and tagcache is committing
   <source>
-    *: "Tagcache is not ready"
+    *: "Database is not ready"
   </source>
   <dest>
-    *: "CacheTag n'est pas Prêt"
+    *: "Base de données pas Prête"
   </dest>
   <voice>
-    *: "CacheTag n'est pas prêt"
+    *: "Base de données pas prête"
   </voice>
 </phrase>
 <phrase>
@@ -8522,7 +8577,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Options de Défilement Télécommande"
   </dest>
   <voice>
-    *: "Options de défilement de la télécommande"
+    *: "Options de défilement pour télécommande"
   </voice>
 </phrase>
 <phrase>
@@ -8659,7 +8714,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Import modifications"
   </source>
   <dest>
-    *: "Importer Modifications"
+    *: "Importer des Modifications"
   </dest>
   <voice>
     *: "Importer des modifications"
@@ -8823,7 +8878,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
     *: "Backlight (On Hold Key)"
   </source>
   <dest>
-    *: "Rétro-Eclairage (Quand touches vérrouillées)"
+    *: "Rétro-éclairage quand touches vérrouillées"
   </dest>
   <voice>
     *: "Rétroéclairage quand touches vérrouillées"
@@ -9465,9 +9520,11 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   user:
   <source>
     *: "The disk is full. Press OFF to continue."
+    h100,h120,h300: "The disk is full. Press STOP to continue."
   </source>
   <dest>
     *: "Disque Plein. Presser OFF pour Continuer"
+    h100,h120,h300: "Disque Plein. Presser STOP pour Continuer"
   </dest>
   <voice>
     *: ""
@@ -9533,7 +9590,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   desc: splash number of percents loaded
   user:
   <source>
-    *: "Chargement... %d%% Fait (%s)"
+    *: "Loading... %d%% done (%s)"
   </source>
   <dest>
     *: "Chargement... %d%% Fait (%s)"
@@ -9773,7 +9830,7 @@ id: LANG_CROSSFEED_DIRECT_GAIN
 </phrase>
 <phrase>
   id: VOICE_KBIT_PER_SEC
-  desc: spoken only, for file extension
+  desc: spoken only, a unit postfix
   user:
   <source>
     *: ""
@@ -9921,6 +9978,295 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   </voice>
 </phrase>
 <phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  <source>
+    *: "Random"
+  </source>
+  <dest>
+    *: "Aléatoire"
+  </dest>
+  <voice>
+    *: "Aléatoire"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user:
+  <source>
+    *: "Last.fm Log"
+  </source>
+  <dest>
+    *: "Log Last.fm"
+  </dest>
+  <voice>
+    *: "Log Last.fm"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLEASE_REBOOT
+  desc: when activating an option that requires a reboot
+  user:
+  <source>
+    *: "Please reboot to enable"
+  </source>
+  <dest>
+    *: "Redémarrer pour Activer "
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user:
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_UP_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Up"
+  </source>
+  <dest>
+    *: "Demi-ton (+)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SYSFONT_PITCH_DOWN_SEMITONE
+  desc: in wps
+  user:
+  <source>
+    *: "Semitone Down"
+  </source>
+  <dest>
+    *: "Demi-ton (-)"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user:
+  <source>
+    *: "Format"
+  </source>
+  <dest>
+    *: "Format"
+  </dest>
+  <voice>
+    *: "Format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user:
+  <source>
+    *: "MPEG Layer 3"
+  </source>
+  <dest>
+    *: "MPEG Layer 3"
+  </dest>
+  <voice>
+    *: "MPEG Layer 3"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user:
+  <source>
+    *: "PCM Wave"
+  </source>
+  <dest>
+    *: "PCM Wave"
+  </dest>
+  <voice>
+    *: "PCM Wave"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user:
+  <source>
+    *: "WavPack"
+  </source>
+  <dest>
+    *: "WavPack"
+  </dest>
+  <voice>
+    *: "WavPack"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user:
+  <source>
+    *: "Encoder Settings"
+  </source>
+  <dest>
+    *: "Réglages Encodeur"
+  </dest>
+  <voice>
+    *: "Réglages de l'encodeur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user:
+  <source>
+    *: "(No Settings)"
+  </source>
+  <dest>
+    *: "(Aucune option)"
+  </dest>
+  <voice>
+    *: "Aucune option disponible"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user:
+  <source>
+    *: "(Same As Source)"
+  </source>
+  <dest>
+    *: "(Comme la Source)"
+  </dest>
+  <voice>
+    *: "Comme la Source"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user:
+  <source>
+    *: "Bitrate"
+  </source>
+  <dest>
+    *: "Echantillonnage"
+  </dest>
+  <voice>
+    *: "échantillonnage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
+  <source>
+    *: "Trigtype"
+  </source>
+  <dest>
+    *: "Type"
+  </dest>
+  <voice>
+    *: "Type"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_STOP
+  desc: trigger types
+  <source>
+    *: "Stop"
+  </source>
+  <dest>
+    *: "Stop"
+  </dest>
+  <voice>
+    *: "Stop"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_PAUSE
+  desc: trigger types
+  <source>
+    *: "Pause"
+  </source>
+  <dest>
+    *: "Pause"
+  </dest>
+  <voice>
+    *: "Pause"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORD_TRIGGER_NEWFILESTP
+  desc: trigger types
+  <source>
+    *: "New file"
+  </source>
+  <dest>
+    *: "Nouveau Fichier"
+  </dest>
+  <voice>
+    *: "Nouveau fichier"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_LOW
+  desc: general warning
+  user:
+  <source>
+    *: "WARNING! Low Battery!"
+  </source>
+  <dest>
+    *: "ATTENTION! Batterie Faible!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WARNING_BATTERY_EMPTY
+  desc: general warning
+  user:
+  <source>
+    *: "Battery empty! RECHARGE!"
+  </source>
+  <dest>
+    *: "Batterie vide! RECHARGEZ!"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user:
+  <source>
+    *: "AIFF"
+  </source>
+  <dest>
+    *: "AIFF"
+  </dest>
+  <voice>
+    *: "AIFF"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SYSFONT_AGC_SAFETY
   desc: AGC preset
   <source>
@@ -9996,5 +10342,103 @@ id: LANG_CROSSFEED_DIRECT_GAIN
   </dest>
   <voice>
     *: "CAG gain maximum"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES
+  desc: browser file/dir properties
+  user:
+  <source>
+    *: "Properties"
+  </source>
+  <dest>
+    *: "Propriétés"
+  </dest>
+  <voice>
+    *: "Propriétés"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user:
+  <source>
+    *: "Shuffle and Track Skip"
+  </source>
+  <dest>
+    *: "Aléatoire et quand changement piste"
+  </dest>
+  <voice>
+    *: "Aléatoire et quand changement piste"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNNING_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Running Time"
+  </source>
+  <dest>
+    *: "Durée d'utilisation"
+  </dest>
+  <voice>
+    *: "Durée d'utilisation"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Current Time"
+  </source>
+  <dest>
+    *: "Durée Courante"
+  </dest>
+  <voice>
+    *: "Durée courante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOP_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Top Time"
+  </source>
+  <dest>
+    *: "Durée Record"
+  </dest>
+  <voice>
+    *: "Durée record"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_TIME
+  desc: in run time screen
+  user:
+  <source>
+    *: "Clear Time?"
+  </source>
+  <dest>
+    *: "Réinitialiser le Compteur?"
+  </dest>
+  <voice>
+    *: "Réinitialiser le Compteur?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLACE
+  desc: in onplay menu.  Replace the current playlist with a new one.
+  user:
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Lire suivant (remplacer)"
+  </dest>
+  <voice>
+    *: "Lire suivant (remplacer)"
   </voice>
 </phrase>
