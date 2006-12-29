@@ -62,15 +62,11 @@ inline bool button_hold(void)
 
 int button_read_device(void)
 {
-    int btn;
     int touchpad;
     int buttons;
     static int lastbutton;
     unsigned short remote_adc;
-
-    /* Check for hold first - exit if asserted with no button pressed */
-    if (button_hold())
-        return BUTTON_NONE;
+    int btn = BUTTON_NONE;
 
     /* See header for ADC values when remote control buttons are pressed */
     /* Only one button can be sensed at a time on the remote. */
@@ -83,16 +79,11 @@ int button_read_device(void)
         lastbutton = btn;
         btn = BUTTON_NONE;
     }
-        
-    /* 
-     * Code can be added that overrides the side buttons when the remote is
-     *  plugged in: Check for remote_adc > 64 && remote_adc < 930 then skip
-     *  reading the side and touch volume buttons, right, left, up, down, etc.
-     *  but keep reading the Power and 'A'.
-     * For now, the buttons from remote and side and touch are used together.
-     */
 
-    
+    /* Check for hold first - exit if asserted with no button pressed */
+    if (button_hold())
+        return btn;
+
     /* the side buttons - Check before doing all of the work on each bit */
     buttons = GPGDAT & 0x1F;
     if (buttons)
