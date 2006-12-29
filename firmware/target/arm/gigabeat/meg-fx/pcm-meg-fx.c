@@ -133,13 +133,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* connect DMA to the FIFO and enable the FIFO */
     IISFCON = (1<<15) | (1<<13);
 
-    /* prefill the FIFO with half words */
-    for (i=0; i < IIS_FIFO_SIZE; i+=2)
-    {
-        IISFIFO = *p++;
-        p_size -= 2;
-    }
-
     /* set DMA dest */
     DIDST2 = (int)&IISFIFO; 
 
