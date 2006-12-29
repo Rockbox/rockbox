@@ -281,6 +281,9 @@ void check_sleepers(void)
 static inline void sleep_core(void)
 {
     static long last_tick = 0;
+#if CONFIG_CPU == S3C2440
+    int i;
+#endif
     
     for (;;)
     {
