@@ -9211,13 +9211,13 @@
   desc: show ID3 Database
   user:
   <source>
-    *: "ID3 Database"
+    *: "Database"
   </source>
   <dest>
-    *: "ID3 Database"
+    *: "Database"
   </dest>
   <voice>
-    *: "ID3 Database"
+    *: "Database"
   </voice>
 </phrase>
 <phrase>
