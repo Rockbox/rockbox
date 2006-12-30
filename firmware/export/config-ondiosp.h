@@ -30,6 +30,9 @@
 /* Define this if you have a MAS3539F */
 #define CONFIG_CODEC MAS3539F
 
+/* Enable this if you have done the backlight mod */
+//#define CONFIG_BACKLIGHT BL_PA14_HI
+
 #define BATTERY_CAPACITY_DEFAULT 1000 /* default battery capacity */
 
 #ifndef SIMULATOR
