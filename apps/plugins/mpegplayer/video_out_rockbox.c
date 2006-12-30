@@ -199,6 +199,14 @@ void vo_draw_frame (uint8_t * const * buf)
 #endif
 }
 
+#if LCD_WIDTH >= LCD_HEIGHT
+#define SCREEN_WIDTH LCD_WIDTH
+#define SCREEN_HEIGHT LCD_HEIGHT
+#else /* Assume the screen is rotates on portraid LCDs */
+#define SCREEN_WIDTH LCD_HEIGHT
+#define SCREEN_HEIGHT LCD_WIDTH
+#endif
+
 void vo_setup(unsigned int width, unsigned int height, 
              unsigned int chroma_width, unsigned int chroma_height)
 {
@@ -207,19 +215,19 @@ void vo_setup(unsigned int width, unsigned int height,
     image_chroma_x=image_width/chroma_width;
     image_chroma_y=image_height/chroma_height;
 
-    if (image_width >= LCD_WIDTH) {
-        output_width = LCD_WIDTH;
+    if (image_width >= SCREEN_WIDTH) {
+        output_width = SCREEN_WIDTH;
         output_x = 0;
     } else {
         output_width = image_width;
-        output_x = (LCD_WIDTH-image_width)/2;
+        output_x = (SCREEN_WIDTH-image_width)/2;
     }
 
-    if (image_height >= LCD_HEIGHT) {
-        output_height = LCD_HEIGHT;
+    if (image_height >= SCREEN_HEIGHT) {
+        output_height = SCREEN_HEIGHT;
         output_y = 0;
     } else {
         output_height = image_height;
-        output_y = (LCD_HEIGHT-image_height)/2;
+        output_y = (SCREEN_HEIGHT-image_height)/2;
     }
 }
