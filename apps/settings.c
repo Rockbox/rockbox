@@ -100,7 +100,7 @@ const char rec_base_directory[] = REC_BASE_DIR;
 #include "eq_menu.h"
 #endif
 
-#define CONFIG_BLOCK_VERSION 58
+#define CONFIG_BLOCK_VERSION 59
 #define CONFIG_BLOCK_SIZE 512
 #define RTC_BLOCK_SIZE 44
 
@@ -357,7 +357,7 @@ static const struct bit_entry hd_bits[] =
         "remote caption backlight", off_on },
 #endif
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    {4, S_O(brightness), DEFAULT_BRIGHTNESS_SETTING, "brightness", NULL },
+    {6, S_O(brightness), DEFAULT_BRIGHTNESS_SETTING, "brightness", NULL },
 #endif
 #ifdef HAVE_BACKLIGHT_PWM_FADING
     /* backlight fading */
