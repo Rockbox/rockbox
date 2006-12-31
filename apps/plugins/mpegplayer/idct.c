@@ -60,11 +60,10 @@ static inline unsigned CLIP(int value)
     );
     return value;
 }
-/* FIXME why doesn't this work on the gigabeat? */
-#elif defined CPU_ARM && CONFIG_CPU != S3C2440
+#elif defined CPU_ARM
 static inline unsigned CLIP(int value)
 {
-    asm ( /* Note: Uses knowledge that only the low byte of the result is used */
+    asm volatile ( /* Note: Uses knowledge that only the low byte of the result is used */
         "cmp     %[v], #255          \n"
         "mvnhi   %[v], %[v], asr #31 \n"
         : /* outputs */
@@ -302,7 +301,7 @@ void mpeg2_idct_init (uint32_t accel)
 
         mpeg2_idct_copy = mpeg2_idct_copy_c;
         mpeg2_idct_add = mpeg2_idct_add_c;
-#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM) || CONFIG_CPU == S3C2440
+#if !defined(CPU_COLDFIRE) && !defined(CPU_ARM)
         for (i = -3840; i < 3840 + 256; i++)
             CLIP(i) = (i < 0) ? 0 : ((i > 255) ? 255 : i);
 #endif
