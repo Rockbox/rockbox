@@ -25,10 +25,10 @@
    All LPC filtering up to order 9 is done in specially optimised unrolled
    loops, while every order above this is handled by a slower default routine.
  */
-#if USE_IRAM
+#ifdef USE_IRAM
     .section .icode,"ax",%progbits
 #else
-    .section .text
+    .text
 #endif
     .global lpc_decode_arm
 lpc_decode_arm:
