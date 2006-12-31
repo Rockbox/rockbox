@@ -16,14 +16,20 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
+#include "config.h"
+
 /* The following is an assembler optimised version of the LPC filtering
    routines needed for FLAC decoding. It is optimised for use with ARM 
    processors.
    All LPC filtering up to order 9 is done in specially optimised unrolled
    loops, while every order above this is handled by a slower default routine.
  */
+#if USE_IRAM
     .section .icode,"ax",%progbits
+#else
+    .section .text
+#endif
     .global lpc_decode_arm
 lpc_decode_arm:
     stmdb sp!, { r4-r11, lr }
