@@ -144,6 +144,12 @@ bool pcm_is_playing(void)
     return pcm_playing;
 }
 
+void pcm_set_frequency(unsigned int frequency)
+{
+    /* To be implemented */
+    (void)frequency;
+}
+
 /*
  * This function goes directly into the DMA buffer to calculate the left and
  * right peak values. To avoid missing peaks it tries to look forward two full
