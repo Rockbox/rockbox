@@ -4,6 +4,7 @@ chessclock.c
 credits.c
 cube.c
 dict.c
+fireworks.c
 firmware_flash.c
 logo.c
 mosaique.c
@@ -93,6 +94,7 @@ rockboy.c
 
 /* not support recorder models for now */
 #if (LCD_WIDTH > 112) && (LCD_HEIGHT > 64)
+fireworks.c
 xobox.c
 #endif
 #if !defined(SANSA_E200)
