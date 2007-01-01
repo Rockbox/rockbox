@@ -46,6 +46,7 @@ void * mpeg2_malloc (unsigned size, mpeg2_alloc_t reason)
 
     (void)reason;
 
+    DEBUGF("mpeg2_malloc(%d,%d)\n",size,reason);
     if (mem_ptr + (long)size > bufsize) {
         DEBUGF("OUT OF MEMORY\n");
         return NULL;
@@ -73,4 +74,46 @@ void *memcpy(void *dest, const void *src, size_t n) {
         d[i]=s[i];
 
     return dest;
+}
+
+
+/* The following are expected by libmad */
+void* codec_malloc(size_t size)
+{
+      return mpeg2_malloc(size,-3);
+}
+
+void* codec_calloc(size_t nmemb, size_t size)
+{
+    void* ptr;
+
+    ptr = mpeg2_malloc(nmemb*size,-3);
+
+    if (ptr)
+        rb->memset(ptr,0,size);
+    
+    return ptr;
+}
+
+void codec_free(void* ptr) {
+    (void)ptr;
+}
+
+void *memmove(void *dest, const void *src, size_t n)
+{
+    return rb->memmove(dest,src,n);
+}
+
+void *memset(void *s, int c, size_t n)
+{
+    return rb->memset(s,c,n);
+}
+
+void abort(void)
+{
+    rb->lcd_putsxy(0,0,"ABORT!");
+    rb->lcd_update();
+
+    while (1);
+    /* Let's hope this is never called */
 }

@@ -110,7 +110,7 @@
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 39
+#define PLUGIN_API_VERSION 40
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -602,6 +602,11 @@ struct plugin_api {
     int (*sound_default)(int setting);
     void (*pcm_record_more)(void *start, size_t size);
 #endif
+
+    struct thread_entry*(*create_thread_on_core)(
+                          unsigned int core, void (*function)(void), 
+                          void* stack, int stack_size,
+                          const char *name IF_PRIO(, int priority));
 };
 
 /* plugin header */

@@ -34,7 +34,7 @@ all: $(OUTPUT)
 
 ifndef SIMVER
 $(OBJDIR)/mpegplayer.elf: $(OBJS) $(LINKFILE)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lgcc \
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -O -nostdlib -o $@ $(OBJS) -L$(BUILDDIR) -lplugin -lmad -lgcc\
            -T$(LINKFILE) -Wl,-Map,$(OBJDIR)/mpegplayer.map
 
 $(OUTPUT): $(OBJDIR)/mpegplayer.elf
@@ -46,7 +46,7 @@ ifeq ($(SIMVER), x11)
 # This is the X11 simulator version
 
 $(OUTPUT): $(OBJS)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
@@ -61,7 +61,7 @@ ifeq ($(SIMVER), sdl)
 # This is the SDL simulator version
 
 $(OUTPUT): $(OBJS)
-	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -o $@
+	$(call PRINTS,LD $(@F))$(CC) $(CFLAGS) $(SHARED_FLAG) $(OBJS) -L$(BUILDDIR) -lplugin -lmad -o $@
 ifeq ($(findstring CYGWIN,$(UNAME)),CYGWIN)
 # 'x' must be kept or you'll have "Win32 error 5"
 #     $ fgrep 5 /usr/include/w32api/winerror.h | head -1
