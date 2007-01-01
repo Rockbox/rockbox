@@ -418,6 +418,7 @@ struct plugin_api {
 #if CONFIG_CODEC != SWCODEC
     void (*bitswap)(unsigned char *data, int length);
 #endif
+#endif /* !SIMULATOR */
 #if CONFIG_CODEC == SWCODEC
     void (*pcm_play_data)(pcm_more_callback_type get_more,
             unsigned char* start, size_t size);
@@ -426,7 +427,6 @@ struct plugin_api {
     bool (*pcm_is_playing)(void);
     void (*pcm_play_pause)(bool play);
 #endif
-#endif /* !SIMULATOR */
 #if CONFIG_CODEC == SWCODEC
     void (*pcm_calculate_peaks)(int *left, int *right);
 #endif

@@ -322,13 +322,13 @@ static const struct plugin_api rockbox_api = {
 #if CONFIG_CODEC != SWCODEC
     bitswap,
 #endif
+#endif
 #if CONFIG_CODEC == SWCODEC
     pcm_play_data,
     pcm_play_stop,
     pcm_set_frequency,
     pcm_is_playing,
     pcm_play_pause,
-#endif
 #endif
 #if CONFIG_CODEC == SWCODEC
     pcm_calculate_peaks,
