@@ -4,7 +4,6 @@ chessclock.c
 credits.c
 cube.c
 dict.c
-fireworks.c
 firmware_flash.c
 logo.c
 mosaique.c
