@@ -217,7 +217,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
 #endif
 
     /* Clear the FIQ disable bit in cpsr_c */
-    enable_fiq(fiq);
+    set_fiq_handler(fiq);
+    enable_fiq();
 
     /* Enable playback FIFO */
 #if CONFIG_CPU == PP5020
@@ -290,7 +291,8 @@ void pcm_play_pause_unpause(void)
 {
     /* Enable the FIFO and fill it */
 
-    enable_fiq(fiq);
+    set_fiq_handler(fiq);
+    enable_fiq();
 
     /* Enable playback FIFO */
 #if CONFIG_CPU == PP5020
@@ -459,7 +461,8 @@ void pcm_rec_dma_start(void *addr, size_t size)
     /* enable record fifo */
     outl(inl(0x70002800) | 0x10000000, 0x70002800);
 
-    enable_fiq(fiq_record);
+    set_fiq_handler(fiq_record);
+    enable_fiq();
 }
 
 void pcm_close_recording(void)

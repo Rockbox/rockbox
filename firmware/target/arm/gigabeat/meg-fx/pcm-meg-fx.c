@@ -146,7 +146,8 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* clear pending DMA interrupt */
     SRCPND = 1<<19;
 
-    enable_fiq(fiq);
+    set_fiq_handler(fiq);
+    enable_fiq();
 
     /* unmask the DMA interrupt */
     INTMSK &= ~(1<<19);
