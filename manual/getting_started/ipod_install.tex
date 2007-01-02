@@ -1,5 +1,12 @@
 % $Id$ %
 
+\opt{ipodvideo}{\newcommand{\bootloaderfile}{bootloader-ipodvideo.ipod}}%
+\opt{ipodmini}{\newcommand{\bootloaderfile}{bootloader-ipodmini1g.ipod}}%
+\opt{ipodnano}{\newcommand{\bootloaderfile}{bootloader-ipodnano.ipod}}%
+\opt{ipodcolor}{\newcommand{\bootloaderfile}{bootloader-ipodcolor.ipod}}%
+\opt{ipod4g}{\newcommand{\bootloaderfile}{bootloader-ipod4g.ipod}}%
+\opt{ipod3g}{\newcommand{\bootloaderfile}{bootloader-ipod3g.ipod}}%
+%
 \opt{ipodnano}{\warn{If your Nano has a stainless steel back and plastic front 
 it is a 1st generation and is compatible with Rockbox.  If, on the other hand, 
 your Nano has a one-piece aluminum body it is a 2nd generation Nano and there 
@@ -23,19 +30,18 @@ you wish. Note that these files should be saved onto your computer's hard disk,
 
   \item First, download the \fname{ipodpatcher} tool to your installation 
   folder.  You can download the \fname{ipodpatcher} tool for your operating 
-  system at 
-  \url{http://www.rockbox.org/twiki/bin/view/Main/IpodInstallationBeta}.
+  system at \download{bootloader/ipod}.
   
   \item Next, download the following file to the installation folder: 
 
-    \opt{ipodvideo}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipodvideo.ipod}} 
-    \opt{ipodnano}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipodnano.ipod}} 
-    \opt{ipodmini}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipodmini1g.ipod}
-     or \url{http://download.rockbox.org/bootloader/ipod/bootloader-ipodmini2g.ipod} 
-    depending on which generation your \dap{} is.  \fixme{Describe how to identify 1/2G}} 
-    \opt{ipodcolor}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipodcolor.ipod}} 
-    \opt{ipod4g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipod4g.ipod}} 
-    \opt{ipod3g}{\url{http://download.rockbox.org/bootloader/ipod/bootloader-ipod3g.ipod}}
+    \download{bootloader/ipod/\bootloaderfile}
+    \opt{ipodmini}{%
+        or \download{bootloader/ipod/bootloader-ipodmini2g.ipod}
+        depending on which generation your \dap{} is.
+        The following page describes the differences between the two
+        generations of the \dap{}: 
+        \url{http://docs.info.apple.com/article.html?artnum=300850}.
+    }
 
   \item Next, open a command prompt (Windows) or terminal window (Mac OSX and Linux).
   
@@ -106,9 +112,7 @@ you wish. Note that these files should be saved onto your computer's hard disk,
       \begin{code} 
         ipodpatcher [device] -r bootpartition.bin (Windows) 
       \end{code}
-
       or
-
       \begin{code}
         ./ipodpatcher [device] -r bootpartition.bin (Mac OS X/Unix)
       \end{code}
@@ -122,36 +126,25 @@ you wish. Note that these files should be saved onto your computer's hard disk,
     restore this backup to your ipod using the command ipodpatcher [device] -w 
     bootpartition.bin (Windows) or ./ipodpatcher [device] -w bootpartition.bin 
     (Mac OS X/Unix).   
-  
-  \item Install the bootloader.
 
+    \opt{ipodmini}{
+      \note{Ipod Mini 2g users need to replace ``1g'' with ``2g'' in the
+      following commands.} 
+    }
+ 
+  \item Install the bootloader.
     Windows users should now type:
-      \begin{code}
-        \opt{ipodvideo}{ipodpatcher [device] -a bootloader-ipodvideo.ipod}
-        \opt{ipodnano}{ipodpatcher [device] -a bootloader-ipodnano.ipod}
-        \opt{ipodmini}{ipodpatcher [device] -a bootloader-ipodmini1g.ipod} 
-        \opt{ipodcolor}{ipodpatcher [device] -a bootloader-ipodcolor.ipod}
-        \opt{ipod4g}{ipodpatcher [device] -a bootloader-ipod4g.ipod}
-        \opt{ipod3g}{ipodpatcher [device] -a bootloader-ipod3g.ipod}
-      \end{code}
-    
+    \begin{code}
+    ipodpatcher [device] -a \bootloaderfile
+    \end{code}
+    %
     and Mac OS X/Unix users should type:
-      \begin{code}
-        \opt{ipodvideo}{./ipodpatcher [device] -a bootloader-ipodvideo.ipod}
-        \opt{ipodnano}{./ipodpatcher [device] -a bootloader-ipodnano.ipod} 
-        \opt{ipodmini}{./ipodpatcher [device] -a bootloader-ipodmini1g.ipod} 
-        \opt{ipodcolor}{./ipodpatcher [device] -a bootloader-ipodcolor.ipod}
-        \opt{ipod4g}{./ipodpatcher [device] -a bootloader-ipod4g.ipod}
-        \opt{ipod3g}{./ipodpatcher [device] -a bootloader-ipod3g.ipod}
-      \end{code}
-    
+    \begin{code}
+    ./ipodpatcher [device] -a \bootloaderfile
+    \end{code}
+
   Replace [device] with the number (Windows users) or device name (Mac OS X/Unix 
   users) you've been using to access your ipod.  
-  
-    \opt{ipodmini}{
-      \note{Ipod Mini 2g users should replace ``1g'' with ``2g'' in the above 
-      commands.} 
-    }
   
   You can now disconnect your ipod from your computer in the normal way. This 
   should cause your iPod to reboot and start Rockbox.

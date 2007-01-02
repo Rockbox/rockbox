@@ -1,3 +1,24 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             __________               __   ___.
+%   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+%   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+%   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+%   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+%                     \/            \/     \/    \/            \/
+%                                   - M A N U A L -
+%
+% $Id$
+%
+% Copyright (C) 2006 The Rockbox Manual Team
+%
+% All files in this archive are subject to the GNU Free Documentation License
+% See the file COPYING-MANUAL in the source tree docs/ folder for full license
+% agreement.
+%
+% Contributors are listed in the file docs/CREDITS-MANUAL
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \documentclass[a4paper,11pt]{scrreprt}
 \usepackage[latin1]{inputenc}
 \usepackage{palatino}
@@ -222,6 +243,12 @@
 \newcommand{\setting}[1]{\textsc{#1}}
 
 \newcommand{\config}[1]{\texttt{#1}}
+
+% set link to download server
+% Usage: \download{bootloader/bootloader-ipodnano.ipod}
+%        gets expanded to 
+%        "http://download.rockbox.org/bootloader/bootloader-ipodnano.ipod"
+\newcommand{\download}[1]{\url{http://download.rockbox.org/#1}}
 
 % set link to the wiki.
 % Usage: \wikilink{WebHome}
