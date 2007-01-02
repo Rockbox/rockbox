@@ -46,21 +46,20 @@ software.
   your \dap{}.
 
   \opt{ipod}{
-    \note{Your \dap{} should enter disk mode automatically when connected to a
-      computer via USB. If your computer does not recognise your \dap{}, you
-      may need to enter the disk mode manually. Disconnect your \dap{} from the
-      computer. Reset the \dap{} by pressing and holding the \ButtonMenu{} and
-      \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets,
-      press and hold the \ButtonMenu{} and \ButtonPlay{} buttons
-      simultaneously. Your \dap{} should enter disk mode, and you can try
-      reconnecting to the computer.
-    }
-    \opt{ipod3g,ipod4g,ipodcolor,ipodmini}{
-      \note{\index{Firewire}Firewire detection is not supported in Rockbox at
-        the moment. Please use USB only.}
-    }
+    Your \dap{} should enter disk mode automatically when connected to a 
+    computer via USB. If your computer does not recognise your \dap{}, you may 
+    need to enter the disk mode manually. Disconnect your \dap{} from the 
+    computer. Reset the \dap{} by pressing and holding the \ButtonMenu{} and 
+    \ButtonSelect{} buttons simultaneously. As soon as the \dap{} resets, press 
+    and hold the \ButtonMenu{} and \ButtonPlay{} buttons simultaneously. Your 
+    \dap{} should enter disk mode, and you can try reconnecting to the computer. 
+  }  
+         
+  \opt{ipod3g,ipod4g,ipodcolor,ipodmini}{
+    \note{\index{Firewire}Firewire detection is not supported in Rockbox at 
+    the moment. Please use USB only.} 
   }
-
+    
 \item[Text editor.]  As you will see in the following chapters, Rockbox is
   highly configurable. In addition to saving configurations within Rockbox,
   Rockbox also allows you to create customised configuration files. If you
@@ -69,6 +68,17 @@ software.
 
 \end{description}
 
+\opt{ipod}{
+  \note{In addition to the requirements described above, Rockbox only works on 
+  Ipods formatted with the FAT32 filesystem (i.e., Ipods initialised by iTunes 
+  for Windows). It does not work with the HFS+ filesystem (i.e. Ipods 
+  initialised by iTunes for the Mac). More information and instructions for 
+  converting an Ipod to FAT32 can be found on the 
+  \url{http://www.rockbox.org/twiki/bin/view/Main/IpodConversionToFAT32} wiki 
+  page on the Rockbox web site.  Note that after conversion, you can still use 
+  a FAT32 Ipod on a Mac. 
+  } 
+}
 
 \section{Installing Rockbox}\label{sec:installing_rockbox}
 \index{Installation}
