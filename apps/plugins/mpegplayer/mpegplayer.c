@@ -307,7 +307,6 @@ static void init_mad(void* mad_frame_overlap)
 
     mad_stream_init(&stream);
     mad_frame_init(&frame);
-    mad_synth_init(&synth);
 
     /* We do this so libmad doesn't try to call codec_calloc() */
     frame.overlap = mad_frame_overlap;
@@ -531,6 +530,9 @@ static void mad_decode(void)
     size_t len;
     int file_end = 0;  /* A count of the errors in each frame */
     int framelength;
+
+    /* We need this here to init the EMAC for Coldfire targets */
+    mad_synth_init(&synth);
 
     init_pcmbuf();
 
@@ -825,7 +827,8 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     /* Initialise our malloc buffer */
     mpeg2_alloc_init(audiobuf,audiosize);
 
-    /* Grab most of the buffer for the compressed video - leave 4MB for mpeg audio, and 512KB for PCM audio data */
+    /* Grab most of the buffer for the compressed video - leave some for 
+       PCM audio data and some for libmpeg2 malloc use. */
     buffer_size = audiosize - (PCMBUFFER_SIZE+AUDIOBUFFER_SIZE+LIBMPEG2BUFFER_SIZE);
     DEBUGF("audiosize=%d, buffer_size=%d\n",audiosize,buffer_size);
     buffer = mpeg2_malloc(buffer_size,-1);
@@ -839,7 +842,6 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
     if (mpa_buffer == NULL)
         return PLUGIN_ERROR;
 
-    /* Use 0.5MB of the remaining 4MB for audio data */
     pcm_buffer_size = PCMBUFFER_SIZE;
     pcm_buffer = mpeg2_malloc(pcm_buffer_size,-2);
 
@@ -922,6 +924,7 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
         (uint8_t*)audio_stack,AUDIO_STACKSIZE,"mpgaudio" IF_PRIO(,PRIORITY_PLAYBACK))) == NULL)
     {
         rb->splash(HZ,true,"Cannot create audio thread!");
+        rb->remove_thread(videothread_id);
         return PLUGIN_ERROR;
     }
 
