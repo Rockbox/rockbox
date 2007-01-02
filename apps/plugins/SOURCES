@@ -36,6 +36,7 @@ flipit.c
 
 #ifdef HAVE_LCD_BITMAP             /* Not for the Player */
 disktidy.c
+mazezam.c
 text_editor.c
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
