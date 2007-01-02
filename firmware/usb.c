@@ -350,14 +350,6 @@ bool usb_detect(void)
 #ifdef USB_PLAYERSTYLE
     current_status = (PADR & 0x8000)?false:true;
 #endif
-#ifdef USB_IPODSTYLE
-    /* The following check is in the ipodlinux source, with the
-       comment "USB2D_IDENT is bad" if USB2D_IDENT != 0x22FA05 */
-    if (USB2D_IDENT != 0x22FA05) {
-        return false;
-    }
-    current_status = (USB_STATUS & 0x800)?true:false;
-#endif
 #ifdef USB_ISP1582
     /* TODO: Implement USB_ISP1582 */
     current_status = false;
