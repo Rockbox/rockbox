@@ -179,22 +179,19 @@ static struct plugin_api* rb;
 #   define SOL_QUIT          BUTTON_POWER
 #   define SOL_UP            BUTTON_UP
 #   define SOL_DOWN          BUTTON_DOWN
-#   define SOL_LEFT          BUTTON_LEFT
-#   define SOL_RIGHT         BUTTON_RIGHT
-#   define SOL_MOVE_PRE      BUTTON_SELECT
-#   define SOL_MOVE          (BUTTON_SELECT | BUTTON_UP)
-#   define SOL_DRAW_PRE      BUTTON_UP
-#   define SOL_DRAW          (BUTTON_UP | BUTTON_LEFT)
-#   define SOL_REM2CUR_PRE   BUTTON_UP
-#   define SOL_REM2CUR       (BUTTON_UP | BUTTON_RIGHT)
-#   define SOL_CUR2STACK_PRE BUTTON_SELECT
-#   define SOL_CUR2STACK     (BUTTON_SELECT | BUTTON_RIGHT)
-#   define SOL_REM2STACK     BUTTON_REC
+#   define SOL_LEFT          BUTTON_SCROLL_UP
+#   define SOL_RIGHT         BUTTON_SCROLL_DOWN
+#   define SOL_MOVE          BUTTON_SELECT
+#   define SOL_DRAW          BUTTON_REC
+#   define SOL_REM2CUR       BUTTON_LEFT
+#   define SOL_CUR2STACK_PRE BUTTON_REC
+#   define SOL_CUR2STACK     (BUTTON_REC | BUTTON_RIGHT)
+#   define SOL_REM2STACK     BUTTON_RIGHT
 #   define HK_MOVE           "SELECT"
-#   define HK_DRAW           "PLAY"
-#   define HK_REM2CUR        "PLAY.."
-#   define HK_CUR2STACK      "SELECT.."
-#   define HK_REM2STACK      "REC"
+#   define HK_DRAW           "REC"
+#   define HK_REM2CUR        "LEFT"
+#   define HK_CUR2STACK      "DOUBLE SELECT"
+#   define HK_REM2STACK      "RIGHT"
 
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #   define SOL_QUIT          BUTTON_POWER
