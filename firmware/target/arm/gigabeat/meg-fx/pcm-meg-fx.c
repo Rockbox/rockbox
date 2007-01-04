@@ -22,6 +22,7 @@
 #include "audio.h"
 #include "wm8975.h"
 #include "file.h"
+#include "mmu-meg-fx.h"
 
 static int pcm_freq = HW_SAMPR_DEFAULT; /* 44.1 is default */
 
@@ -48,11 +49,11 @@ void fiq(void)
     SRCPND = (1<<19);
 
     /* Buffer empty.  Try to get more. */
-    if (pcm_callback_for_more) 
+    if (pcm_callback_for_more)
     {
         pcm_callback_for_more((unsigned char**)&p, &p_size);
     }
-    else 
+    else
     {
         /* callback func is missing? */
         pcm_play_dma_stop();
@@ -61,19 +62,22 @@ void fiq(void)
 
     if (p_size)
     {
+        /* Flush any pending cache writes */
+        clean_dcache_range(p, p_size);
+
         /* set the new DMA values */
         DCON2 = DMA_CONTROL_SETUP | (p_size >> 1);
         DISRC2 = (int)p + 0x30000000;
 
         /* Re-Activate the channel */
-        DMASKTRIG2 = 0x2; 
+        DMASKTRIG2 = 0x2;
     }
     else
     {
         /* No more DMA to do */
         pcm_play_dma_stop();
     }
-        
+
 }
 
 
@@ -83,7 +87,7 @@ void pcm_init(void)
     pcm_playing = false;
     pcm_paused = false;
     pcm_callback_for_more = NULL;
-    
+
     audiohw_init();
     audiohw_enable_output(true);
     audiohw_mute(true);
@@ -117,23 +121,23 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
 
     /* Enable the IIS clock */
-    CLKCON |= (1<<17);  
+    CLKCON |= (1<<17);
 
     /* IIS interface setup and set to idle */
     IISCON = (1<<5) | (1<<3);
 
-    /* slave, transmit mode, 16 bit samples - 384fs - use 16.9344Mhz */ 
+    /* slave, transmit mode, 16 bit samples - 384fs - use 16.9344Mhz */
     IISMOD = (1<<9) | (1<<8) | (2<<6) | (1<<3) | (1<<2);
 
     /* connect DMA to the FIFO and enable the FIFO */
     IISFCON = (1<<15) | (1<<13);
 
     /* set DMA dest */
-    DIDST2 = (int)&IISFIFO; 
+    DIDST2 = (int)&IISFIFO;
 
     /* IIS is on the APB bus, INT when TC reaches 0, fixed dest addr */
     DIDSTC2 = 0x03;
-    
+
     /* How many transfers to make - we transfer half-word at a time = 2 bytes */
     /* DMA control: CURR_TC int, single service mode, I2SSDO int, HW trig */
     /*     no auto-reload, half-word (16bit) */
@@ -152,9 +156,12 @@ void pcm_play_dma_start(const void *addr, size_t size)
     /* unmask the DMA interrupt */
     INTMSK &= ~(1<<19);
 
+    /* Flush any pending writes */
+    clean_dcache_range(addr, size);
+
     /* Activate the channel */
     DMASKTRIG2 = 0x2;
-    
+
     /* turn off the idle */
     IISCON &= ~(1<<3);
 
@@ -185,7 +192,7 @@ void pcm_play_dma_stop(void)
     IISCON &= ~(1<<0);
 
     /* Disconnect the IIS IIS clock */
-    CLKCON &= ~(1<<17);  
+    CLKCON &= ~(1<<17);
 
 
     disable_fiq();
