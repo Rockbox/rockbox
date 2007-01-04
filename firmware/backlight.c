@@ -290,6 +290,8 @@ static void _backlight_on(void)
         bl_dim_target = bl_dim_current = BL_PWM_COUNT;
         __backlight_on();
     }
+#elif defined(HAVE_BACKLIGHT_SET_FADING) && !defined(SIMULATOR)
+    __backlight_dim(false);
 #else
     __backlight_on();
 #endif
@@ -308,6 +310,8 @@ static void _backlight_off(void)
         bl_dim_target = bl_dim_current = 0;
         __backlight_off();
     }
+#elif defined(HAVE_BACKLIGHT_SET_FADING) && !defined(SIMULATOR)
+    __backlight_dim(true);
 #else
     __backlight_off();
 #endif
