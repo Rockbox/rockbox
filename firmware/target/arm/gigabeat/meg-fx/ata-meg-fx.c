@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
+ * $Id $
  *
- * Copyright (C) 2006 by Linus Nielsen Feltzing
+ * Copyright (C) 2006,2007 by Marcoen Hirschberg
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -22,7 +22,10 @@
 #include "kernel.h"
 #include "system.h"
 #include "power.h"
+#include "panic.h"
 #include "pcf50606.h"
+#include "ata-target.h"
+#include "mmu-meg-fx.h"
 
 void ata_reset(void)
 {
@@ -48,3 +51,50 @@ bool ata_is_coldstart(void)
 void ata_device_init(void)
 {
 }
+
+void copy_read_sectors(unsigned char* buf, int wordcount)
+{
+    /* This should never happen, but worth watching for */
+    if(wordcount > (1 << 18))
+        panicf("atd-meg-fx.c: copy_read_sectors: too many sectors per read!");
+#undef GIGABEAT_DEBUG_ATA
+#ifdef GIGABEAT_DEBUG_ATA
+    static int line = 0;
+    static char str[256];
+    snprintf(str, sizeof(str), "DMA to %08x, %d", buf, wordcount);
+    lcd_puts(16, line, str);
+    line = (line+1) % 32;
+    lcd_update();
+#endif
+    /* Reset the channel */
+    DMASKTRIG0 |= 4;
+    /* Wait for DMA controller to be ready */
+    while(DMASKTRIG0 & 0x2)
+        ;
+    while(DSTAT0 & (1 << 20))
+        ;
+    /* Source is ATA_DATA, on AHB Bus, Fixed */
+    DISRC0 = (int) 0x18000000;
+    DISRCC0 = 0x1;
+    /* Dest mapped to physical address, on AHB bus, increment */
+    DIDST0 = (int) (buf + 0x30000000);
+    DIDSTC0 = 0;
+
+    /* DACK/DREQ Sync to AHB, Int on Transfer complete, Whole service, No reload, 16-bit transfers */
+    DCON0 = ((1 << 30) | (1<<27) | (1<<22) | (1<<20)) | wordcount;
+
+    /* Activate the channel */
+    DMASKTRIG0 = 0x2;
+
+    /* Dump cache for the buffer  */
+    dump_dcache_range((void *)buf, wordcount*2);
+
+    /* Start DMA */
+    DMASKTRIG0 |= 0x1;
+
+    /* Wait for transfer to complete */
+    while((DSTAT0 & 0x000fffff))
+        yield();
+}
+
+

@@ -22,6 +22,10 @@
 /* Plain C read & write loops */
 #define PREFER_C_READING
 #define PREFER_C_WRITING
+#if !defined(BOOTLOADER)
+#define ATA_OPTIMIZED_READING
+void copy_read_sectors(unsigned char* buf, int wordcount);
+#endif
 
 #define ATA_IOBASE      0x18000000
 #define ATA_DATA        (*((volatile unsigned short*)(ATA_IOBASE)))
