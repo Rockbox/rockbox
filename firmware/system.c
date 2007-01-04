@@ -81,23 +81,6 @@ void cpu_idle_mode(bool on_off)
 }
 #endif /* HAVE_ADJUSTABLE_CPU_FREQ */
 
-#if CONFIG_CPU == S3C2440
-
-void system_reboot(void) {
-}
-
-void system_init(void) 
-{
-    /* Turn off un-needed devices */
-
-    /* Turn off all of the UARTS */
-    CLKCON &= ~( (1<<10) | (1<<11) |(1<<12) );
-
-    /* Turn off AC97 and Camera */
-    CLKCON &= ~( (1<<19) | (1<<20) );
-}
-
-#endif
 
 bool detect_flashed_rockbox(void)
 {
