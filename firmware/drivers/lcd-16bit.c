@@ -104,7 +104,7 @@ int lcd_get_drawmode(void)
     return drawmode;
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F)
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_set_foreground(unsigned color)
 {
     fg_pattern = color;
@@ -116,7 +116,7 @@ unsigned lcd_get_foreground(void)
     return fg_pattern;
 }
 
-#if !defined(TOSHIBA_GIGABEAT_F)
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_set_background(unsigned color)
 {
     bg_pattern = color;
@@ -231,7 +231,7 @@ fb_data* lcd_get_backdrop(void)
 /*** drawing functions ***/
 
 /* Clear the whole display */
-#if !defined(TOSHIBA_GIGABEAT_F)
+#if !defined(TOSHIBA_GIGABEAT_F) || defined(SIMULATOR)
 void lcd_clear_display(void)
 {
     fb_data *dst = LCDADDR(0, 0);

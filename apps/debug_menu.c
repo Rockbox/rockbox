@@ -2049,7 +2049,7 @@ static bool dbg_set_memory_guard(void)
 }
 #endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
-#if defined(TOSHIBA_GIGABEAT_F)
+#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
 
 extern volatile bool lcd_poweroff;
 
@@ -2139,7 +2139,7 @@ bool debug_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
-#if defined(TOSHIBA_GIGABEAT_F)
+#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
         { "LCD Power Off", dbg_lcd_power_off },
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)

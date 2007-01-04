@@ -345,10 +345,10 @@ extern unsigned lcd_get_background(void);
 extern void     lcd_set_drawinfo(int mode, unsigned foreground,
                                  unsigned background);
 void lcd_set_backdrop(fb_data* backdrop);
-#if !defined(TOSHIBA_GIGABEAT_F)
-#define lcd_device_prepare_backdrop(x) ;
-#else
+#if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
 void lcd_device_prepare_backdrop(fb_data* backdrop);
+#else
+#define lcd_device_prepare_backdrop(x) ;
 #endif
 
 fb_data* lcd_get_backdrop(void);
