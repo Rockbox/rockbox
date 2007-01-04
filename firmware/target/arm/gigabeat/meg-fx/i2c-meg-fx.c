@@ -27,52 +27,52 @@
 #include "string.h"
 #include "generic_i2c.h"
 
-void i2c_sda_output(void)
+static void i2c_sda_output(void)
 {
     GPECON |= (1 << 30);
 }
 
-void i2c_sda_input(void)
+static void i2c_sda_input(void)
 {
     GPECON &= ~(3 << 30);
 }
 
-void i2c_sda_lo(void)
+static void i2c_sda_lo(void)
 {
     GPEDAT &= ~(1 << 15);
 }
 
-void i2c_sda_hi(void)
+static void i2c_sda_hi(void)
 {
     GPEDAT |= (1 << 15);
 }
 
-int i2c_sda(void)
+static int i2c_sda(void)
 {
     return GPEDAT & (1 << 15);
 }
 
-void i2c_scl_output(void)
+static void i2c_scl_output(void)
 {
     GPECON |= (1 << 28);
 }
 
-void i2c_scl_input(void)
+static void i2c_scl_input(void)
 {
     GPECON &= ~(3 << 28);
 }
 
-void i2c_scl_lo(void)
+static void i2c_scl_lo(void)
 {
     GPEDAT &= ~(1 << 14);
 }
 
-int i2c_scl(void)
+static int i2c_scl(void)
 {
     return GPEDAT & (1 << 14);
 }
 
-void i2c_scl_hi(void)
+static void i2c_scl_hi(void)
 {
     i2c_scl_input();
     while(!i2c_scl());
@@ -80,9 +80,17 @@ void i2c_scl_hi(void)
     i2c_scl_output();
 }
 
-void i2c_delay(void)
+
+static void i2c_delay(void)
 {
-    do { int _x; for(_x=0;_x<2000;_x++);} while (0);
+    volatile int _x; 
+
+    /* The i2c can clock at 500KHz: 2uS period -> 1uS half period */
+    /* At 300Mhz - if loop takes 10 cycles @ 3.3nS each -> 1uS / 33nS -> 30 */
+    for (_x=0; _x<30; _x++)
+    {
+        /* burn CPU cycles */
+    }
 }
 
 struct i2c_interface s3c2440_i2c = {
