@@ -33,6 +33,11 @@
 #include "font.h"
 #include "rbunicode.h"
 #include "bidi.h"
+#if defined(TOSHIBA_GIGABEAT_F)
+#define NON_GB_STATIC
+#else
+#define NON_GB_STATIC static
+#endif
 
 #define SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
 
@@ -45,11 +50,12 @@ enum fill_opt {
 /*** globals ***/
 fb_data lcd_framebuffer[LCD_HEIGHT][LCD_WIDTH] IRAM_LCDFRAMEBUFFER __attribute__ ((aligned (16)));
 
+
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
-static unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
-static unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
+NON_GB_STATIC unsigned fg_pattern IDATA_ATTR = LCD_DEFAULT_FG;
+NON_GB_STATIC unsigned bg_pattern IDATA_ATTR = LCD_DEFAULT_BG;
 static int drawmode = DRMODE_SOLID;
 static int xmargin = 0;
 static int ymargin = 0;
@@ -75,9 +81,12 @@ static const char scroll_tick_table[16] = {
 /* LCD init */
 void lcd_init(void)
 {
-    lcd_clear_display();
-    /* Call device specific init */
-    lcd_init_device();
+	lcd_clear_display();
+
+	/* Call device specific init */
+	lcd_init_device();
+
+
     create_thread(scroll_thread, scroll_stack,
                   sizeof(scroll_stack), scroll_name
                   IF_PRIO(, PRIORITY_USER_INTERFACE));
@@ -95,20 +104,24 @@ int lcd_get_drawmode(void)
     return drawmode;
 }
 
+#if !defined(TOSHIBA_GIGABEAT_F)
 void lcd_set_foreground(unsigned color)
 {
     fg_pattern = color;
 }
+#endif
 
 unsigned lcd_get_foreground(void)
 {
     return fg_pattern;
 }
 
+#if !defined(TOSHIBA_GIGABEAT_F)
 void lcd_set_background(unsigned color)
 {
     bg_pattern = color;
 }
+#endif
 
 unsigned lcd_get_background(void)
 {
@@ -201,12 +214,13 @@ void lcd_set_backdrop(fb_data* backdrop)
     {
         lcd_backdrop_offset = (long)backdrop - (long)&lcd_framebuffer[0][0];
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
-    } 
-    else 
+    }
+    else
     {
         lcd_backdrop_offset = 0;
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
     }
+	lcd_device_prepare_backdrop(backdrop);
 }
 
 fb_data* lcd_get_backdrop(void)
@@ -217,10 +231,11 @@ fb_data* lcd_get_backdrop(void)
 /*** drawing functions ***/
 
 /* Clear the whole display */
+#if !defined(TOSHIBA_GIGABEAT_F)
 void lcd_clear_display(void)
 {
-    fb_data *dst = LCDADDR(0, 0); 
-    
+    fb_data *dst = LCDADDR(0, 0);
+
     if (drawmode & DRMODE_INVERSEVID)
     {
         memset16(dst, fg_pattern, LCD_WIDTH*LCD_HEIGHT);
@@ -234,6 +249,7 @@ void lcd_clear_display(void)
     }
     scrolling_lines = 0;
 }
+#endif
 
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
@@ -329,17 +345,17 @@ void lcd_hline(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /* nothing to draw? */
     if (((unsigned)y >= LCD_HEIGHT) || (x1 >= LCD_WIDTH) || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
     if (x2 >= LCD_WIDTH)
         x2 = LCD_WIDTH-1;
-        
+
     if (drawmode & DRMODE_INVERSEVID)
     {
         if (drawmode & DRMODE_BG)
@@ -363,7 +379,7 @@ void lcd_hline(int x1, int x2, int y)
     }
     dst = LCDADDR(x1, y);
     width = x2 - x1 + 1;
-    
+
     switch (fillopt)
     {
       case OPT_SET:
@@ -401,14 +417,14 @@ void lcd_vline(int x, int y1, int y2)
 
     /* nothing to draw? */
     if (((unsigned)x >= LCD_WIDTH) || (y1 >= LCD_HEIGHT) || (y2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
     if (y2 >= LCD_HEIGHT)
         y2 = LCD_HEIGHT-1;
-        
+
     dst = LCDADDR(x, y1);
     dst_end = dst + (y2 - y1) * LCD_WIDTH;
 
@@ -463,7 +479,7 @@ void lcd_fillrect(int x, int y, int width, int height)
         width = LCD_WIDTH - x;
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
-        
+
     if (drawmode & DRMODE_INVERSEVID)
     {
         if (drawmode & DRMODE_BG)
@@ -544,7 +560,7 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -577,7 +593,7 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y,
         unsigned data = *src_col >> src_y;
         fb_data *dst_col = dst++;
         int numbits = 8 - src_y;
-        
+
         dst_end = dst_col + height * LCD_WIDTH;
         do
         {
@@ -620,7 +636,7 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -672,7 +688,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y,
     if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -742,7 +758,7 @@ static void lcd_putsxyofs(int x, int y, int ofs, const unsigned char *str)
         bits = font_get_bits(pf, ch);
 
         lcd_mono_bitmap_part(bits, ofs, 0, width, x, y, width - ofs, pf->height);
-        
+
         x += width - ofs;
         ofs = 0;
     }
@@ -850,8 +866,8 @@ void lcd_puts_scroll_style(int x, int y, const unsigned char *string, int style)
 void lcd_puts_scroll_offset(int x, int y, const unsigned char *string, int offset)
 {
      lcd_puts_scroll_style_offset(x, y, string, STYLE_DEFAULT, offset);
-}          
-   
+}
+
 void lcd_puts_scroll_style_offset(int x, int y, const unsigned char *string,
                                          int style, int offset)
 {
@@ -963,7 +979,7 @@ static void scroll_thread(void)
             }
 
             lastmode = drawmode;
-            drawmode = s->invert ? 
+            drawmode = s->invert ?
                        (DRMODE_SOLID|DRMODE_INVERSEVID) : DRMODE_SOLID;
             lcd_putsxyofs(xpos, ypos, s->offset, s->line);
             drawmode = lastmode;
