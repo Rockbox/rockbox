@@ -2049,6 +2049,48 @@ static bool dbg_set_memory_guard(void)
 }
 #endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
 
+#if defined(TOSHIBA_GIGABEAT_F)
+
+extern volatile bool lcd_poweroff;
+
+static bool dbg_lcd_power_off(void)
+{
+    lcd_setmargins(0, 0);
+
+    while(1)
+    {
+		int button;
+
+        lcd_clear_display();
+        lcd_puts(0, 0, "LCD Power Off");
+		if(lcd_poweroff)
+			lcd_puts(1, 1, "Yes");
+		else
+			lcd_puts(1, 1, "No");
+
+        lcd_update();
+
+        button = get_action(CONTEXT_STD,HZ/5);
+        switch(button)
+        {
+            case ACTION_STD_PREV:
+            case ACTION_STD_NEXT:
+                lcd_poweroff = !lcd_poweroff;
+                break;
+			case ACTION_STD_OK:
+			case ACTION_STD_CANCEL:
+				action_signalscreenchange();
+				return false;
+			default:
+                sleep(HZ/10);
+				break;
+        }
+    }
+    return false;
+}
+
+#endif
+
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
 static bool dbg_write_eeprom(void)
 {
@@ -2097,6 +2139,9 @@ bool debug_menu(void)
     bool result;
 
     static const struct menu_item items[] = {
+#if defined(TOSHIBA_GIGABEAT_F)
+        { "LCD Power Off", dbg_lcd_power_off },
+#endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Dump ROM contents", dbg_save_roms },
 #endif
