@@ -24,4 +24,6 @@ void __backlight_on(void);
 void __backlight_off(void);
 void __backlight_set_brightness(int val);
 
+void __backlight_dim(bool dim);
+
 #endif
