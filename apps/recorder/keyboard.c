@@ -64,6 +64,7 @@
 
 #elif CONFIG_KEYPAD == IRIVER_H10_PAD
 #define KBD_MODES /* iriver H10 uses 2 modes, picker and line edit */
+#define KBD_MORSE_INPUT
 #endif
 
 struct keyboard_parameters {
@@ -708,7 +709,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_DOWN:
-#ifdef KBD_MORSE_INPUT
+#if defined KBD_MORSE_INPUT && !defined KBD_MODES
                 if (morse_mode)
                     break;
 #endif
@@ -746,7 +747,7 @@ int kbd_input(char* text, int buflen)
                 break;
 
             case ACTION_KBD_UP:
-#ifdef KBD_MORSE_INPUT
+#if defined KBD_MORSE_INPUT && !defined KBD_MODES
                 if (morse_mode)
                     break;
 #endif
@@ -762,8 +763,13 @@ int kbd_input(char* text, int buflen)
 #endif
                     FOR_NB_SCREENS(l)
                     {
+#ifdef KBD_MORSE_INPUT
+                        if (param[l].y && !morse_mode)
+#else
                         if (param[l].y)
+#endif
                             param[l].y--;
+
                         else
 #ifndef KBD_MODES
                             param[l].y = param[l].lines - 1;}
@@ -807,7 +813,11 @@ int kbd_input(char* text, int buflen)
                 else
                     char_screen = 0;
 #ifdef KBD_MORSE_INPUT
+#ifdef KBD_MODES
+                if (morse_mode && !line_edit)
+#else
                 if (morse_mode)
+#endif
                 {
                     morse_tick = current_tick;
                     if (!morse_reading)

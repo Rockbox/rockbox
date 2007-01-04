@@ -5,6 +5,7 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
+ * $Id$
  *
  * Copyright (C) Barry Wardell 2006
  *
@@ -280,13 +281,15 @@ static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                     BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,       BUTTON_NONE },
-    { ACTION_KBD_SELECT,       BUTTON_REW|BUTTON_REL,            BUTTON_REW },
-    { ACTION_KBD_DONE,         BUTTON_PLAY,                      BUTTON_NONE },
+    { ACTION_KBD_SELECT,       BUTTON_REW,                       BUTTON_NONE },
+    { ACTION_KBD_DONE,         BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
     { ACTION_KBD_ABORT,        BUTTON_FF,                        BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_SCROLL_UP,                 BUTTON_NONE },
     { ACTION_KBD_UP,           BUTTON_SCROLL_UP|BUTTON_REPEAT,   BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_SCROLL_DOWN,               BUTTON_NONE },
     { ACTION_KBD_DOWN,         BUTTON_SCROLL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_KBD_MORSE_INPUT,  BUTTON_REW|BUTTON_PLAY,           BUTTON_NONE },
+    { ACTION_KBD_MORSE_SELECT, BUTTON_REW|BUTTON_REL,            BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
