@@ -25,8 +25,8 @@
 #define SCL_SDA_HI    GPHDAT |= (3 << 9)
 
 /* The SC606 can clock at 400KHz: 2.5uS period -> 1.25uS half period */
-/* At 300Mhz - if loop takes 6 cycles @ 3.3nS each -> 1.25uS / 20nS -> 63 */
-#define DELAY   do { volatile int _x; for(_x=0;_x<63;_x++);} while (0)
+/* At 300Mhz - if loop takes 10 cycles @ 3.3nS each -> 1.25uS / 30nS -> 40 */
+#define DELAY   do { volatile int _x; for(_x=0;_x<40;_x++);} while (0)
 
 static void sc606_i2c_start(void)
 {
@@ -164,6 +164,8 @@ int sc606_read(unsigned char reg, unsigned char* data)
 
 void sc606_init(void)
 {
+    volatile int i;
+    
     /* Set GPB2 (EN) to 1 */
     GPBCON = (GPBCON & ~(3<<4)) | 1<<4;
 
@@ -172,11 +174,10 @@ void sc606_init(void)
     /* OFF GPBDAT &= ~(1 << 2); */
 
     /* About 400us - needs 350us */
-    DELAY;
-    DELAY;
-    DELAY;
-    DELAY;
-    DELAY;
+    for (i = 200; i; i--)
+    {
+        DELAY;
+    }
 
     /* Set GPH9 (SDA) and GPH10 (SCL) to 1 */
     GPHUP &= ~(3<<9);
