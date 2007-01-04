@@ -181,6 +181,11 @@ enum {
 #include "system-target.h"
 #endif
 #endif
+#ifndef SIMULATOR
+#if CONFIG_CPU == S3C2440
+#include "system-target.h"
+#endif
+#endif
 
 #if CONFIG_CPU == SH7034
 #define or_b(mask, address) \
@@ -342,7 +347,9 @@ static inline void disable_fiq(void)
     );
 }
 
+#if CONFIG_CPU != S3C2440
 #define invalidate_icache()
+#endif
 
 #if CONFIG_CPU == PNX0101
 typedef void (*interrupt_handler_t)(void);
