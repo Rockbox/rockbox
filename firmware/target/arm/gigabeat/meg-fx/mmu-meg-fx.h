@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2006 by Greg White
+ * Copyright (C) 2006,2007 by Greg White
  *
  * All files in this archive are subject to the GNU General Public License.
  * See the file COPYING in the source tree root for full license agreement.
@@ -28,4 +28,8 @@ void clean_dcache_range(const void *base, unsigned int size);
 /* Dump DCache for this range  */
 /* Will *NOT* do write back */
 void dump_dcache_range(const void *base, unsigned int size);
+
+/* Cleans entire DCache */
+void clean_dcache(void);
+
 
