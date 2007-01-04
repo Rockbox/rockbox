@@ -1,5 +1,6 @@
 #include <string.h>
 #include "s3c2440.h"
+#include "mmu-meg-fx.h"
 
 void map_memory(void);
 static void enable_mmu(void);
@@ -82,3 +83,78 @@ static void enable_mmu(void) {
         "mcr p15, 0, r0, c1, c0, 0" : : : "r0");
     asm volatile("nop \n nop \n nop \n nop");
 }
+
+/* Invalidate DCache for this range  */
+/* Will do write back */
+void invalidate_dcache_range(const void *base, unsigned int size) {
+    unsigned int addr = (int) base;
+    unsigned int end = addr+size;
+    asm volatile(
+    "bic %0, %0, #31 \n"
+"inv_start: \n"
+    "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+    "add %0, %0, #32 \n"
+    "cmp %0, %1 \n"
+    "blo inv_start \n"
+    "mov %0, #0\n"
+    "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
+        : : "r" (addr), "r" (end));
+}
+
+/* clean DCache for this range  */
+/* forces DCache writeback for the specified range */
+void clean_dcache_range(const void *base, unsigned int size) {
+    unsigned int addr = (int) base;
+    unsigned int end = addr+size;
+    asm volatile(
+    "bic %0, %0, #31 \n"
+"clean_start: \n"
+    "mcr p15, 0, %0, c7, c10, 1 \n" /* Clean this line */
+    "add %0, %0, #32 \n"
+    "cmp %0, %1 \n"
+    "blo clean_start \n"
+    "mov %0, #0\n"
+    "mcr p15,0,%0,c7,c10,4 \n"    /* Drain write buffer */
+        : : "r" (addr), "r" (end));
+}
+
+/* Dump DCache for this range  */
+/* Will *NOT* do write back */
+void dump_dcache_range(const void *base, unsigned int size) {
+    unsigned int addr = (int) base;
+    unsigned int end = addr+size;
+    asm volatile(
+    "tst %0, #31 \n"
+    "bic %0, %0, #31 \n"
+    "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
+    "add %0, %0, #32 \n"
+    "tst %1, #31 \n"
+    "bic %1, %1, #31 \n"
+    "mcrne p15, 0, %1, c7, c14, 1 \n" /* Clean and invalidate this line, if not cache aligned */
+    "cmp %0, %1 \n"
+    "beq dump_end \n"
+"dump_start: \n"
+    "mcr p15, 0, %0, c7, c6, 1 \n" /* Invalidate this line */
+    "add %0, %0, #32 \n"
+    "cmp %0, %1 \n"
+    "bne dump_start \n"
+"dump_end: \n"
+    "mcr p15,0,%0,c7,c10,4 \n"    /* Drain write buffer */
+        : : "r" (addr), "r" (end));
+}
+/* Cleans entire DCache */
+void clean_dcache(void)
+{
+    unsigned int seg, index, addr;
+
+    /* @@@ This is straight from the manual.  It needs to be optimized. */
+    for(seg = 0; seg <= 7; seg++) {
+        for(index = 0; index <= 63; index++) {
+            addr = (seg << 5) | (index << 26);
+            asm volatile(
+                "mcr p15, 0, %0, c7, c10, 2 \n" /* Clean this entry by index */
+                : : "r" (addr));
+        }
+    }
+}
+
