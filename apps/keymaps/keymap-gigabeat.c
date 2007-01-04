@@ -78,8 +78,13 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_STOP,          BUTTON_A|BUTTON_REL,          BUTTON_A },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,       BUTTON_DOWN,                    BUTTON_NONE },
+	{ ACTION_WPS_VOLDOWN,       BUTTON_VOL_DOWN,                BUTTON_NONE },
+    { ACTION_WPS_VOLDOWN,       BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE },
+
     { ACTION_WPS_VOLUP,         BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_VOLUP,         BUTTON_UP,                      BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_WPS_VOLUP,         BUTTON_VOL_UP,                      BUTTON_NONE },
     { ACTION_WPS_PITCHSCREEN,   BUTTON_POWER|BUTTON_UP,            BUTTON_POWER },
     { ACTION_WPS_PITCHSCREEN,   BUTTON_POWER|BUTTON_DOWN,          BUTTON_POWER },
     { ACTION_WPS_QUICKSCREEN,   BUTTON_MENU|BUTTON_REPEAT,      BUTTON_MENU },
@@ -225,7 +230,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
 
 static const struct button_mapping button_context_keyboard[]  = {
     { ACTION_KBD_LEFT,         BUTTON_LEFT,                             BUTTON_NONE },
-    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,               BUTTON_NONE },   
+    { ACTION_KBD_LEFT,         BUTTON_LEFT|BUTTON_REPEAT,               BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT,                            BUTTON_NONE },
     { ACTION_KBD_RIGHT,        BUTTON_RIGHT|BUTTON_REPEAT,              BUTTON_NONE },
     { ACTION_KBD_CURSOR_LEFT,  BUTTON_POWER|BUTTON_LEFT,                BUTTON_NONE },
