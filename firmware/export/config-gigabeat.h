@@ -38,9 +38,6 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_S3C2440
 
-/* define this if the unit can be powered or charged via USB */
-#define HAVE_USB_POWER
-
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_GIGABEAT /* port controlled PWM */
 
@@ -100,6 +97,9 @@
 
 /* Define this to the CPU frequency */
 #define CPU_FREQ 16934400
+
+/* define this if the unit can be powered or charged via USB */
+#define HAVE_USB_POWER
 
 /* Define this if you have ATA power-off control */
 #define HAVE_ATA_POWER_OFF
