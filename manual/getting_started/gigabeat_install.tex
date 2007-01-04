@@ -1,0 +1,24 @@
+% $Id$
+
+Installing the bootloader is only needed once. It simply requires you
+to replace a file on your \dap{} with the Rockbox bootloader. To be able
+booting the original firmware please make sure to rename the original file
+properly. If you ever wish to uninstall Rockbox you should keep a backup copy
+of the original file.
+
+\begin{itemize}
+\item Download the Rockbox bootloader. \fixme{Currently there isn't a
+  prebuild bootloader available and you'll need to build it yourself.
+  This is described in the wiki. Once a prebuild bootloader is available
+  the link comes here. Have a look at \download{bootloader/}.}
+\item Starting at the root folder of your player browse into the folder
+  \fname{GBSYSTEM} and from that into the subfolder \fname{FWIMG}.
+  These folders are hidden. You can enter them by simply typing the name in
+  Windows explorers location bar or changing the display settings.
+\item In that folder you'll find a file called \fname{FWIMG01.DAT}. Rename
+  the file to \fname{FWIMG01.DAT.ORIG}. Make sure you spelled that name
+  correctly as it is needed for booting the \playerman{} firmware.
+\item Now copy the file \fname{FWIMG01.DAT} you downloaded to that folder.
+  Make sure the spelling is correct.
+\end{itemize}
+
