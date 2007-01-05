@@ -10,23 +10,28 @@
 
 #define SLAVE_ADDRESS 0xCC
 
-#define SDA_LO     GPHDAT &= ~(1 << 9)
-#define SDA_HI     GPHDAT |= (1 << 9)
-#define SDA_INPUT  GPHCON &= ~(3 << 18)
-#define SDA_OUTPUT GPHCON |= (1 << 18)
-#define SDA        GPHDAT & (1 << 9)
+#define SDA_LO     (GPHDAT &= ~(1 << 9))
+#define SDA_HI     (GPHDAT |= (1 << 9))
+#define SDA_INPUT  (GPHCON &= ~(3 << 18))
+#define SDA_OUTPUT (GPHCON |= (1 << 18))
+#define SDA        (GPHDAT & (1 << 9))
 
-#define SCL_LO     GPHDAT &= ~(1 << 10)
-#define SCL_HI     GPHDAT |= (1 << 10)
-#define SCL_INPUT  GPHCON &= ~(3 << 20)
-#define SCL_OUTPUT GPHCON |= (1 << 20)
-#define SCL        GPHDAT & (1 << 10)
+#define SCL_LO     (GPHDAT &= ~(1 << 10))
+#define SCL_HI     (GPHDAT |= (1 << 10))
+#define SCL_INPUT  (GPHCON &= ~(3 << 20))
+#define SCL_OUTPUT (GPHCON |= (1 << 20))
+#define SCL        (GPHDAT & (1 << 10))
 
-#define SCL_SDA_HI    GPHDAT |= (3 << 9)
+#define SCL_SDA_HI (GPHDAT |= (3 << 9))
 
 /* The SC606 can clock at 400KHz: 2.5uS period -> 1.25uS half period */
-/* At 300Mhz - if loop takes 10 cycles @ 3.3nS each -> 1.25uS / 30nS -> 40 */
-#define DELAY   do { volatile int _x; for(_x=0;_x<40;_x++);} while (0)
+/* The high and low times are different enough to need different timings */
+/* At 300Mhz - one loop takes about 10 cycles */
+#define DELAY_LO   do { volatile int _x; for(_x=0;_x<20;_x++);} while (0)
+#define DELAY      do { volatile int _x; for(_x=0;_x<15;_x++);} while (0)
+#define DELAY_HI   do { volatile int _x; for(_x=0;_x<10;_x++);} while (0)
+
+
 
 static void sc606_i2c_start(void)
 {
@@ -49,11 +54,9 @@ static void sc606_i2c_restart(void)
 static void sc606_i2c_stop(void)
 {
     SDA_LO;
-    DELAY;
     SCL_HI;
-    DELAY;
+    DELAY_HI;
     SDA_HI;
-    DELAY;
 }
 
 static void sc606_i2c_ack(void)
@@ -61,51 +64,65 @@ static void sc606_i2c_ack(void)
 
     SDA_LO;
     SCL_HI;
-    DELAY;
+    DELAY_HI;
     SCL_LO;
 }
+
+
 
 static int sc606_i2c_getack(void)
 {
-    int ret = 0;
+    int ret;
 
     /* Don't need a delay since follows a data bit with a delay on the end */
     SDA_INPUT;   /* And set to input */
+    DELAY;
     SCL_HI;
-    DELAY;
 
-    if (SDA) /* ack failed */
-        ret = 1;
+    ret = (SDA != 0);   /* ack failed if SDA is not low */
+    DELAY_HI;
 
-    DELAY;
     SCL_LO;
-    DELAY;
+    DELAY_LO;
+
+    SDA_HI;
     SDA_OUTPUT;
+    DELAY_LO;
+
     return ret;
 }
 
-static int sc606_i2c_outb(unsigned char byte)
+
+
+static void sc606_i2c_outb(unsigned char byte)
 {
     int i;
 
     /* clock out each bit, MSB first */
-    for (i = 0x80; i; i >>= 1) {
+    for (i = 0x80; i; i >>= 1) 
+    {
+        if (i & byte) 
+        {
+            SDA_HI;
+        } 
+        else 
+        {
+            SDA_LO;
+        }
+        DELAY;
 
-       if (i & byte) {
-           SDA_HI;
-       } else {
-           SDA_LO;
-       }
+        SCL_HI;
+        DELAY_HI;
 
-       DELAY;
-       SCL_HI;
-       DELAY;
-       SCL_LO;
-       DELAY;
+        SCL_LO;
+        DELAY_LO;
     }
 
-    return sc606_i2c_getack();
+    SDA_HI;
+
 }
+
+
 
 static unsigned char sc606_i2c_inb(void)
 {
@@ -131,21 +148,33 @@ static unsigned char sc606_i2c_inb(void)
 
 
 
+/* returns number of acks that were bad */
 int sc606_write(unsigned char reg, unsigned char data)
 {
     int x = 0;
 
     sc606_i2c_start();
-    x += sc606_i2c_outb(SLAVE_ADDRESS);
-    x += 0x10 * sc606_i2c_outb(reg);
-    sc606_i2c_start();
-/*    sc606_i2c_restart(); */
-    x += 0x100 * sc606_i2c_outb(SLAVE_ADDRESS);
-    x += 0x1000 *sc606_i2c_outb(data);
+    
+    sc606_i2c_outb(SLAVE_ADDRESS);
+    x = sc606_i2c_getack();
+    
+    sc606_i2c_outb(reg);
+    x += sc606_i2c_getack();
+
+    sc606_i2c_restart();
+
+    sc606_i2c_outb(SLAVE_ADDRESS);
+    x += sc606_i2c_getack();
+
+    sc606_i2c_outb(data);
+    x += sc606_i2c_getack();
+    
     sc606_i2c_stop();
 
     return x;
 }
+
+
 
 int sc606_read(unsigned char reg, unsigned char* data)
 {
@@ -153,14 +182,22 @@ int sc606_read(unsigned char reg, unsigned char* data)
 
     sc606_i2c_start();
     sc606_i2c_outb(SLAVE_ADDRESS);
+    x = sc606_i2c_getack();
+    
     sc606_i2c_outb(reg);
+    x += sc606_i2c_getack();
+    
     sc606_i2c_restart();
     sc606_i2c_outb(SLAVE_ADDRESS | 1);
+    x += sc606_i2c_getack();
+
     *data = sc606_i2c_inb();
     sc606_i2c_stop();
 
     return x;
 }
+
+
 
 void sc606_init(void)
 {
@@ -176,7 +213,7 @@ void sc606_init(void)
     /* About 400us - needs 350us */
     for (i = 200; i; i--)
     {
-        DELAY;
+        DELAY_LO;
     }
 
     /* Set GPH9 (SDA) and GPH10 (SCL) to 1 */
