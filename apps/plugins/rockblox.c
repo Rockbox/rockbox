@@ -475,8 +475,6 @@ static void show_details (void)
 
 static void init_rockblox (void)
 {
-	int i;
-    char str[25];               /* for strings */
 	highscore_update(score, level, Highest, MAX_HIGH_SCORES);
 
     level = 1;
@@ -498,6 +496,8 @@ static void init_rockblox (void)
 #endif
     show_details ();
 #ifdef HIGH_SCORE_Y
+	int i;
+	char str[25];               /* for strings */
 	for (i = MAX_HIGH_SCORES-1; i>=0; i--)
 	{
 		rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
@@ -814,7 +814,7 @@ static int rockblox_loop (void)
                                                              turned it off) */
             if (rb->global_settings->backlight_timeout > 0)
                 rb->backlight_set_timeout (1);
-            
+
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
             show_details ();
@@ -833,7 +833,7 @@ static int rockblox_loop (void)
 
 #if defined(ROCKBLOX_ROTATE)
 			case ROCKBLOX_ROTATE:
-#endif			
+#endif
             case ROCKBLOX_ROTATE_RIGHT:
             case ROCKBLOX_ROTATE_RIGHT | BUTTON_REPEAT:
 #ifdef SCROLL_WHEEL
@@ -963,7 +963,7 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->srand (*rb->current_tick);
-    
+
     /* Load HighScore if any */
     highscore_init(rb);
     highscore_load(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
