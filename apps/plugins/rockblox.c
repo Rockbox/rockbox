@@ -118,6 +118,17 @@ PLUGIN_HEADER
 #define ROCKBLOX_DROP          BUTTON_FF
 #define ROCKBLOX_RESTART       BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == GIGABEAT_PAD
+
+#define ROCKBLOX_OFF           BUTTON_A
+#define ROCKBLOX_ROTATE_RIGHT  BUTTON_VOL_DOWN
+#define ROCKBLOX_ROTATE_LEFT   BUTTON_VOL_UP
+#define ROCKBLOX_ROTATE		   BUTTON_UP
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_SELECT
+#define ROCKBLOX_RESTART       BUTTON_MENU
 #endif
 
 #define BLOCKS_NUM  7
@@ -141,6 +152,24 @@ PLUGIN_HEADER
 #define SCORE_Y 25
 #define LEVEL_Y 70
 #define LINES_Y 105
+
+#elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
+
+#define BLOCK_WIDTH 12
+#define BLOCK_HEIGHT 12
+#define BOARD_X 86
+#define BOARD_Y 0
+#define PREVIEW_X 12
+#define PREVIEW_Y 11
+#define LABEL_X 20
+#define SCORE_Y 80
+#define LEVEL_Y 110
+#define LEVEL_X 46
+#define LINES_X 16
+#define LINES_Y 110
+#define HIGH_SCORE_Y	184
+#define HIGH_LEVEL_Y	193
+#define HIGH_LABEL_X	7
 
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 
@@ -227,6 +256,10 @@ PLUGIN_HEADER
 #define LEVEL_X LABEL_X
 #endif
 
+#ifndef LINES_X
+#define LINES_X LABEL_X
+#endif
+
 #define MYLCD(fn) rb->lcd_ ## fn
 
 extern const fb_data rockblox_background[];
@@ -282,7 +315,7 @@ static struct plugin_api *rb;
 
 static bool gameover = false;
 /* c=current f=figure o=orientation n=next */
-static int lines, level, score, cx, cy, cf, co, nf;
+static int lines = 0, level = 0, score = 0, cx, cy, cf, co, nf;
 static short board[BOARD_HEIGHT][BOARD_WIDTH];   /* 20 rows of 10 blocks */
 
 #ifdef SCROLL_WHEEL
@@ -395,6 +428,12 @@ figures[BLOCKS_NUM] = {
     }
 };
 
+/* Rockbox File System only supports full filenames inc dir */
+#define HIGH_SCORE "/.rockbox/rocks/rockblox.score"
+#define MAX_HIGH_SCORES 5
+/* Default High Scores... */
+struct highscore Highest[MAX_HIGH_SCORES];
+
 /* get random number from (0) to (range-1) */
 static int t_rand (int range)
 {
@@ -425,7 +464,7 @@ static void show_details (void)
     rb->snprintf (str, sizeof (str), "%d", level);
     rb->lcd_putsxy (LEVEL_X, LEVEL_Y, str);
     rb->snprintf (str, sizeof (str), "%d", lines);
-    rb->lcd_putsxy (LABEL_X, LINES_Y, str);
+    rb->lcd_putsxy (LINES_X, LINES_Y, str);
 #else  /* HAVE_LCD_CHARCELLS */
     rb->snprintf (str, sizeof (str), "L%d/%d", level, lines);
     rb->lcd_puts (5, 0, str);
@@ -436,6 +475,10 @@ static void show_details (void)
 
 static void init_rockblox (void)
 {
+	int i;
+    char str[25];               /* for strings */
+	highscore_update(score, level, Highest, MAX_HIGH_SCORES);
+
     level = 1;
     lines = 0;
     score = 0;
@@ -454,6 +497,13 @@ static void init_rockblox (void)
     pgfx_update();
 #endif
     show_details ();
+#ifdef HIGH_SCORE_Y
+	for (i = MAX_HIGH_SCORES-1; i>=0; i--)
+	{
+		rb->snprintf (str, sizeof (str), "%06d L%1d", Highest[i].score, Highest[i].level);
+		rb->lcd_putsxy (HIGH_LABEL_X, HIGH_SCORE_Y + (10 * ((MAX_HIGH_SCORES-1) - i)), str);
+	}
+#endif
 }
 
 static inline int level_speed(int level)
@@ -781,6 +831,9 @@ static int rockblox_loop (void)
             case ROCKBLOX_OFF:
                 return PLUGIN_OK;
 
+#if defined(ROCKBLOX_ROTATE)
+			case ROCKBLOX_ROTATE:
+#endif			
             case ROCKBLOX_ROTATE_RIGHT:
             case ROCKBLOX_ROTATE_RIGHT | BUTTON_REPEAT:
 #ifdef SCROLL_WHEEL
@@ -910,6 +963,11 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
     rb = api;
 
     rb->srand (*rb->current_tick);
+    
+    /* Load HighScore if any */
+    highscore_init(rb);
+    highscore_load(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
@@ -935,6 +993,8 @@ enum plugin_status plugin_start (struct plugin_api *api, void *parameter)
 #else
     pgfx_release();
 #endif
+    /* Save user's HighScore */
+    highscore_save(HIGH_SCORE,Highest,MAX_HIGH_SCORES);
     /* Restore user's original backlight setting */
     rb->backlight_set_timeout (rb->global_settings->backlight_timeout);
 

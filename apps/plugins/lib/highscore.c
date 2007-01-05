@@ -61,10 +61,11 @@ int highscore_load(char *filename, struct highscore *scores, int num_scores)
     char *ptr;
 
     fd = rb->open(filename, O_RDONLY);
+
+    rb->memset(scores, 0, sizeof(struct highscore)*(num_scores+1));
+    
     if(fd < 0)
         return -1;
-
-    rb->memset(scores, 0, sizeof(struct highscore)*num_scores);
 
     i = -1;
     while(rb->read_line(fd, buf, sizeof(buf)-1) && i < num_scores)
@@ -96,4 +97,32 @@ int highscore_load(char *filename, struct highscore *scores, int num_scores)
         scores[i].level = rb->atoi(level);
     }    
     return 0;
+}
+
+int highscore_update(int score, int level, struct highscore *scores, int num_scores)
+{
+	int i, j;
+	int new = 0;
+	
+	/* look through the scores and see if this one is in the top ones */
+	for(i = num_scores-1;i >= 0; i--)
+    {
+		if ((score > scores[i].score))
+		{
+			/* Move the rest down one... */
+			if (i > 0)
+			{
+				for (j=1; j<=i; j++)
+				{
+					rb->memcpy((void *)&scores[j-1], (void *)&scores[j], sizeof(struct highscore));
+				}
+			}
+			scores[i].score = score;
+			scores[i].level = level;
+			/* Need to sort out entering a name... maybe old three letter arcade style */
+			new = 1;
+			break;
+		}
+	}
+	return new;
 }
