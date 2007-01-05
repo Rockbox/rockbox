@@ -35,6 +35,9 @@ static bool pcm_paused;
 static Uint8* pcm_data;
 static size_t pcm_data_size;
 
+static SDL_AudioSpec obtained;
+static SDL_AudioCVT cvt;
+
 extern bool debug_audio;
 
 static void sdl_dma_start(const void *addr, size_t size)
@@ -146,8 +149,9 @@ bool pcm_is_playing(void)
 
 void pcm_set_frequency(unsigned int frequency)
 {
-    /* To be implemented */
-    (void)frequency;
+    // FIXME: Check return values
+    SDL_BuildAudioCVT(&cvt, AUDIO_S16SYS, 2, frequency,
+                        obtained.format, obtained.channels, obtained.freq);
 }
 
 /*
@@ -214,43 +218,64 @@ void pcm_calculate_peaks(int *left, int *right)
     }
 }
 
+static long write_to_soundcard(Uint8 *stream, int len, FILE *debug) {
+    Uint32 written = (((Uint32) len) > pcm_data_size) ? pcm_data_size : (Uint32) len;
+
+    if (cvt.needed) {
+        cvt.buf = (Uint8 *) malloc(written * cvt.len_mult);
+        cvt.len = written;
+
+        memcpy(cvt.buf, pcm_data, written);
+
+        SDL_ConvertAudio(&cvt);
+        
+        memcpy(stream, cvt.buf, cvt.len_cvt);
+
+        if (debug != NULL) {
+           fwrite(cvt.buf, sizeof(Uint8), cvt.len_cvt, debug);
+        }
+
+        free(cvt.buf);
+    } else {
+        memcpy(stream, pcm_data, written);
+        
+        if (debug != NULL) {
+           fwrite(pcm_data, sizeof(Uint8), written, debug);
+        }
+    }
+    
+    return written;
+}
+
 void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 {
     Uint32 have_now;
-    FILE *debug = (FILE *)udata;
+    FILE *debug = (FILE *) udata;
 
     /* At all times we need to write a full 'len' bytes to stream. */
 
+    /* Write what we have in the PCM buffer */
     if (pcm_data_size > 0) {
-        have_now = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
-
-        memcpy(stream, pcm_data, have_now);
-
-        if (debug != NULL) {
-            fwrite(pcm_data, sizeof(Uint8), have_now, debug);
-        }
+        have_now = write_to_soundcard(stream, len, debug);
+        
         stream += have_now;
         len -= have_now;
         pcm_data += have_now;
         pcm_data_size -= have_now;
     }
 
-    while (len > 0)
-    {
+    /* Audio card wants more? Get some more then. */
+    while (len > 0) {
         if (callback_for_more) {
             callback_for_more(&pcm_data, &pcm_data_size);
         } else {
             pcm_data = NULL;
             pcm_data_size = 0;
         }
+
         if (pcm_data_size > 0) {
-            have_now = (((Uint32)len) > pcm_data_size) ? pcm_data_size : (Uint32)len;
-
-            memcpy(stream, pcm_data, have_now);
-
-            if (debug != NULL) {
-                fwrite(pcm_data, sizeof(Uint8), have_now, debug);
-            }
+            have_now = write_to_soundcard(stream, len, debug);
+            
             stream += have_now;
             len -= have_now;
             pcm_data += have_now;
@@ -265,7 +290,7 @@ void sdl_audio_callback(void *udata, Uint8 *stream, int len)
 
 int pcm_init(void)
 {
-    SDL_AudioSpec fmt;
+    SDL_AudioSpec wanted_spec;
     FILE *debug = NULL;
 
     if (debug_audio) {
@@ -273,15 +298,15 @@ int pcm_init(void)
     }
 
     /* Set 16-bit stereo audio at 44Khz */
-    fmt.freq = 44100;
-    fmt.format = AUDIO_S16SYS;
-    fmt.channels = 2;
-    fmt.samples = 2048;
-    fmt.callback = sdl_audio_callback;
-    fmt.userdata = debug;
+    wanted_spec.freq = 44100;
+    wanted_spec.format = AUDIO_S16SYS;
+    wanted_spec.channels = 2;
+    wanted_spec.samples = 2048;
+    wanted_spec.callback = sdl_audio_callback;
+    wanted_spec.userdata = debug;
 
     /* Open the audio device and start playing sound! */
-    if(SDL_OpenAudio(&fmt, NULL) < 0) {
+    if(SDL_OpenAudio(&wanted_spec, &obtained) < 0) {
         fprintf(stderr, "Unable to open audio: %s\n", SDL_GetError());
         return -1;
     }

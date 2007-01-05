@@ -475,17 +475,13 @@ void I_SubmitSound(void)
    if (nosfxparm)
       return;
 
-#if !defined(SIMULATOR)
    rb->pcm_play_data(&get_more, NULL, 0);
-#endif
 }
 
 void I_ShutdownSound(void)
 {
-#if !defined(SIMULATOR)
    rb->pcm_play_stop();
    rb->pcm_set_frequency(44100); // 44100
-#endif
 }
 
 void I_InitSound()
@@ -494,10 +490,8 @@ void I_InitSound()
 
    // Initialize external data (all sounds) at start, keep static.
    printf( "I_InitSound: ");
-#if !defined(SIMULATOR)
    rb->pcm_play_stop();
    rb->pcm_set_frequency(SAMPLERATE);
-#endif
 
    vol_lookup=malloc(128*256*sizeof(int));
 
