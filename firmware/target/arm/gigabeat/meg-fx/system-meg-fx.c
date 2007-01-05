@@ -33,6 +33,8 @@ void irq(void)
     /* Timer 4 */
     if ((intpending & TIMER4_MASK) != 0)
         timer4();
+	else if ((intpending & DMA0_MASK) != 0)
+		dma0();
     else
     {
         /* unexpected interrupt */
