@@ -198,7 +198,7 @@ before shutdown.
 This is the virtual keyboard that is used when entering text in Rockbox, for
   example when renaming a file or creating a new directory.
 
-\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
   \begin{table}
     \begin{btnmap}{}{}
       \ActionKbdLeft{}/ \ActionKbdRight{}/ \ActionKbdUp{}/ \ActionKbdDown
@@ -222,11 +222,8 @@ This is the virtual keyboard that is used when entering text in Rockbox, for
       %
       \ActionKbdDone
       & Exits the virtual keyboard and saves any changes \\
-      %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}{
-        \ActionKbdBackSpace
-        & Deletes the character before the line cursor \\
-      }
+      \ActionKbdBackSpace
+      & Deletes the character before the line cursor \\
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \ActionKbdMorseInput
@@ -238,7 +235,7 @@ This is the virtual keyboard that is used when entering text in Rockbox, for
   \end{table}
 }
 
-\opt{IPOD_4G_PAD,IPOD_3G_PAD}{
+\opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD}{
   \textbf{Picker area}
   \begin{table}
     \begin{btnmap}{}{}
@@ -252,10 +249,12 @@ This is the virtual keyboard that is used when entering text in Rockbox, for
       & Exits the virtual keyboard and saves any changes \\
       \ActionKbdAbort
       & Exits the virtual keyboard without saving any changes\\
-      \ActionKbdMorseInput
-      & Enters Morse input mode \\
-      \ActionKbdMorseSelect
-      & Tap to select a character in Morse input mode \\
+      \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD}{
+          \ActionKbdMorseInput
+          & Enters Morse input mode \\
+          \ActionKbdMorseSelect
+          & Tap to select a character in Morse input mode \\
+      }
     \end{btnmap}
   \end{table}
   \textbf{Line edit mode}
