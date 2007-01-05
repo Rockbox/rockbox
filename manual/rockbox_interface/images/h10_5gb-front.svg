@@ -6,7 +6,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://inkscape.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xml:space="preserve"
    width="102mm"
@@ -18,26 +18,26 @@
    viewBox="0 0 10200 17000"
    id="svg3092"
    sodipodi:version="0.32"
-   inkscape:version="0.43"
-   sodipodi:docname="h10_5g-front.svg"
-   sodipodi:docbase="/home/vmware/dev/pix"><metadata
+   inkscape:version="0.44.1"
+   sodipodi:docname="h10_5gb-front.svg"
+   sodipodi:docbase="/home/dom/projects/rockbox/clean-copy/manual/rockbox_interface/images"><metadata
    id="metadata3506"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
    id="defs3504" /><sodipodi:namedview
-   inkscape:window-height="584"
-   inkscape:window-width="872"
+   inkscape:window-height="694"
+   inkscape:window-width="1022"
    inkscape:pageshadow="2"
    inkscape:pageopacity="0.0"
    borderopacity="1.0"
    bordercolor="#666666"
    pagecolor="#ffffff"
    id="base"
-   inkscape:zoom="0.6690327"
-   inkscape:cx="180.70866"
-   inkscape:cy="301.18109"
+   inkscape:zoom="0.70710678"
+   inkscape:cx="247.38375"
+   inkscape:cy="328.19419"
    inkscape:window-x="0"
-   inkscape:window-y="37"
+   inkscape:window-y="0"
    inkscape:current-layer="layer2" />
  <g
    id="Ebene_x0020_1">
@@ -1131,9 +1131,10 @@
      x="-3079.4048"
      y="3796.5256">Power</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
    x="10767.387"
    y="3110.2944"
    id="text1730"
@@ -1144,7 +1145,8 @@
      sodipodi:role="line"
      id="tspan1732"
      x="10767.387"
-     y="3110.2944">Rew</tspan></text>
+     y="3110.2944">Prev</tspan></text>
+
 
 <text
    xml:space="preserve"
@@ -1161,9 +1163,10 @@
      x="10767.388"
      y="4839.8228">Play</tspan></text>
 
+
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
    x="10809.57"
    y="6653.7192"
    id="text1738"
@@ -1174,11 +1177,12 @@
      sodipodi:role="line"
      id="tspan1740"
      x="10809.57"
-     y="6653.7192">Ffwd</tspan></text>
+     y="6653.7192">Next</tspan></text>
+
 
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
    x="10767.387"
    y="8298.8809"
    id="text1742"
@@ -1189,11 +1193,12 @@
      sodipodi:role="line"
      id="tspan1744"
      x="10767.387"
-     y="8298.8809">Next</tspan></text>
+     y="8298.8809">Select</tspan></text>
+
 
 <text
    xml:space="preserve"
-   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
+   style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
    x="-3321.9426"
    y="8467.6143"
    id="text1746"
@@ -1204,7 +1209,8 @@
      sodipodi:role="line"
      id="tspan1748"
      x="-3321.9426"
-     y="8467.6143">Prev</tspan></text>
+     y="8467.6143">Cancel</tspan></text>
+
 
 <text
    xml:space="preserve"
@@ -1221,6 +1227,7 @@
      x="-3364.1262"
      y="10618.979">Scroll Up</tspan></text>
 
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
@@ -1236,6 +1243,7 @@
      x="10725.203"
      y="15048.26">Scroll Down</tspan></text>
 
+
 <text
    xml:space="preserve"
    style="font-size:790.222229px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;display:inline;font-family:URW Palladio L"
@@ -1250,6 +1258,7 @@
      id="tspan1760"
      x="2752.4988"
      y="579.27704">Hold</tspan></text>
+
 
 <path
    style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:28.22222326;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;display:inline"
