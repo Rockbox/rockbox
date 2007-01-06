@@ -54,18 +54,31 @@ void ata_device_init(void)
 
 void copy_read_sectors(unsigned char* buf, int wordcount)
 {
+    /* Unaligned transfer - slow copy */
+    if ( (unsigned long)buf & 1)
+    {   /* not 16-bit aligned, copy byte by byte */
+        unsigned short tmp = 0;
+        unsigned char* bufend = buf + wordcount*2;
+        do
+        {
+            tmp = ATA_DATA;
+            *buf++ = tmp & 0xff; /* I assume big endian */
+            *buf++ = tmp >> 8;   /*  and don't use the SWAB16 macro */
+        } while (buf < bufend); /* tail loop is faster */
+        return;
+    }
     /* This should never happen, but worth watching for */
     if(wordcount > (1 << 18))
         panicf("atd-meg-fx.c: copy_read_sectors: too many sectors per read!");
 
 //#define GIGABEAT_DEBUG_ATA
 #ifdef GIGABEAT_DEBUG_ATA
-		static int line = 0;
-		static char str[256];
-		snprintf(str, sizeof(str), "ODD DMA to %08x, %d", buf, wordcount);
-		lcd_puts(10, line, str);
-		line = (line+1) % 32;
-		lcd_update();
+        static int line = 0;
+        static char str[256];
+        snprintf(str, sizeof(str), "ODD DMA to %08x, %d", buf, wordcount);
+        lcd_puts(10, line, str);
+        line = (line+1) % 32;
+        lcd_update();
 #endif
     /* Reset the channel */
     DMASKTRIG0 |= 4;
@@ -87,17 +100,17 @@ void copy_read_sectors(unsigned char* buf, int wordcount)
     /* Activate the channel */
     DMASKTRIG0 = 0x2;
 
-	invalidate_dcache_range((void *)buf, wordcount*2);
+    invalidate_dcache_range((void *)buf, wordcount*2);
 
-	INTMSK &= ~(1<<17);      /* unmask the interrupt */
-	SRCPND = (1<<17);       /* clear any pending interrupts */
+    INTMSK &= ~(1<<17);      /* unmask the interrupt */
+    SRCPND = (1<<17);       /* clear any pending interrupts */
     /* Start DMA */
     DMASKTRIG0 |= 0x1;
 
     /* Wait for transfer to complete */
     while((DSTAT0 & 0x000fffff))
-		CLKCON |= (1 << 2); /* set IDLE bit */
-	/* Dump cache for the buffer  */
+        CLKCON |= (1 << 2); /* set IDLE bit */
+    /* Dump cache for the buffer  */
 }
 
 void dma0(void)
