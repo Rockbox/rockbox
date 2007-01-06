@@ -87,15 +87,14 @@ static void enable_mmu(void) {
 /* Invalidate DCache for this range  */
 /* Will do write back */
 void invalidate_dcache_range(const void *base, unsigned int size) {
-    unsigned int addr = (int) base;
-    unsigned int end = addr+size;
+    unsigned int addr = ((int) base) & ~31;
+    unsigned int end = addr+size+32;
     asm volatile(
-    "bic %0, %0, #31 \n"
 "inv_start: \n"
     "mcr p15, 0, %0, c7, c14, 1 \n" /* Clean and invalidate this line */
     "add %0, %0, #32 \n"
     "cmp %0, %1 \n"
-    "blo inv_start \n"
+    "ble inv_start \n"
     "mov %0, #0\n"
     "mcr p15,0,%0,c7,c10,4\n"    /* Drain write buffer */
         : : "r" (addr), "r" (end));
@@ -105,7 +104,7 @@ void invalidate_dcache_range(const void *base, unsigned int size) {
 /* forces DCache writeback for the specified range */
 void clean_dcache_range(const void *base, unsigned int size) {
     unsigned int addr = (int) base;
-    unsigned int end = addr+size;
+    unsigned int end = addr+size+32;
     asm volatile(
     "bic %0, %0, #31 \n"
 "clean_start: \n"
