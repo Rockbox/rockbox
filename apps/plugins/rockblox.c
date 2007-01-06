@@ -155,21 +155,19 @@ PLUGIN_HEADER
 
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT == 320)
 
-#define BLOCK_WIDTH 12
-#define BLOCK_HEIGHT 12
-#define BOARD_X 86
-#define BOARD_Y 0
-#define PREVIEW_X 12
-#define PREVIEW_Y 11
-#define LABEL_X 20
-#define SCORE_Y 80
-#define LEVEL_Y 110
-#define LEVEL_X 46
-#define LINES_X 16
-#define LINES_Y 110
-#define HIGH_SCORE_Y	184
-#define HIGH_LEVEL_Y	193
-#define HIGH_LABEL_X	7
+#define BLOCK_WIDTH 15
+#define BLOCK_HEIGHT 15
+#define BOARD_X 7
+#define BOARD_Y 1
+#define PREVIEW_X 171
+#define PREVIEW_Y 241
+#define LABEL_X 172
+#define SCORE_Y 29
+#define LEVEL_Y 71
+#define LINES_Y 109
+#define HIGH_LABEL_X   172
+#define HIGH_SCORE_Y   163
+#define HIGH_LEVEL_Y   172
 
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 
