@@ -123,12 +123,24 @@ PLUGIN_HEADER
 #define ROCKBLOX_OFF           BUTTON_A
 #define ROCKBLOX_ROTATE_RIGHT  BUTTON_VOL_DOWN
 #define ROCKBLOX_ROTATE_LEFT   BUTTON_VOL_UP
-#define ROCKBLOX_ROTATE		   BUTTON_UP
+#define ROCKBLOX_ROTATE	       BUTTON_UP
 #define ROCKBLOX_DOWN          BUTTON_DOWN
 #define ROCKBLOX_LEFT          BUTTON_LEFT
 #define ROCKBLOX_RIGHT         BUTTON_RIGHT
 #define ROCKBLOX_DROP          BUTTON_SELECT
 #define ROCKBLOX_RESTART       BUTTON_MENU
+
+#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
+
+#define ROCKBLOX_OFF           BUTTON_PLAY
+#define ROCKBLOX_ROTATE_RIGHT  BUTTON_UP
+#define ROCKBLOX_ROTATE_LEFT   BUTTON_SELECT
+#define ROCKBLOX_DOWN          BUTTON_DOWN
+#define ROCKBLOX_LEFT          BUTTON_LEFT
+#define ROCKBLOX_RIGHT         BUTTON_RIGHT
+#define ROCKBLOX_DROP          BUTTON_MODE
+#define ROCKBLOX_RESTART       BUTTON_EQ
+
 #endif
 
 #define BLOCKS_NUM  7
@@ -195,6 +207,18 @@ PLUGIN_HEADER
 #define LEVEL_Y 49
 #define LINES_Y 81
 
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220)
+
+#define BLOCK_WIDTH 10
+#define BLOCK_HEIGHT 10
+#define BOARD_X 6
+#define BOARD_Y 10
+#define PREVIEW_X 124
+#define PREVIEW_Y 167
+#define LABEL_X 117
+#define SCORE_Y 24
+#define LEVEL_Y 65
+#define LINES_Y 103
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128)
 
 #define BLOCK_WIDTH 6
@@ -220,6 +244,19 @@ PLUGIN_HEADER
 #define SCORE_Y 17
 #define LEVEL_Y 49
 #define LINES_Y 82
+
+#elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 64)
+
+#define BLOCK_WIDTH 3
+#define BLOCK_HEIGHT 3
+#define BOARD_X 9
+#define BOARD_Y 3
+#define PREVIEW_X 53
+#define PREVIEW_Y 5
+#define LABEL_X 70
+#define SCORE_Y 32
+#define LEVEL_Y 13
+#define LINES_Y 51
 
 #elif (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 

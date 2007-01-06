@@ -9,9 +9,7 @@ logo.c
 mosaique.c
 properties.c
 random_folder_advance_config.c
-#if ((LCD_WIDTH != 128) || (LCD_HEIGHT != 64)) && !defined(SANSA_E200) 
 rockblox.c
-#endif
 rockbox_flash.c
 search.c
 snow.c

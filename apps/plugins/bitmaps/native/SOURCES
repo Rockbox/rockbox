@@ -318,6 +318,8 @@ rockblox_background.240x320x16.bmp
 rockblox_background.220x176x16.bmp
 #elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 132) && (LCD_DEPTH == 16)
 rockblox_background.176x132x16.bmp
+#elif (LCD_WIDTH == 176) && (LCD_HEIGHT == 220) && (LCD_DEPTH == 16)
+rockblox_background.176x220x16.bmp
 #elif (LCD_WIDTH == 160) && (LCD_HEIGHT == 128) && (LCD_DEPTH >= 16)
 rockblox_background.160x128x16.bmp
 #elif (LCD_WIDTH == 128) && (LCD_HEIGHT == 128) && (LCD_DEPTH == 16)
