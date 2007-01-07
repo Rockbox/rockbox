@@ -165,7 +165,7 @@ static const char* const genres[] = {
     "Goa", "Drum & Bass", "Club-House", "Hardcore", "Terror", "Indie",
     "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap",
     "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian",
-    "Christian Rock", "Merengue", "Salsa", "Trash Metal", "Anime", "Jpop",
+    "Christian Rock", "Merengue", "Salsa", "Thrash Metal", "Anime", "Jpop",
     "Synthpop"
 };
 
