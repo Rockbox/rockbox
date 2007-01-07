@@ -2647,12 +2647,15 @@
   user:
   <source>
     *: "Internal Mic"
+    ipod*: "Mic"
   </source>
   <dest>
     *: "Internal Mic"
+    ipod*: "Mic"
   </dest>
   <voice>
     *: "Internal Microphone"
+    ipod*: "Microphone"
   </voice>
 </phrase>
 <phrase>
