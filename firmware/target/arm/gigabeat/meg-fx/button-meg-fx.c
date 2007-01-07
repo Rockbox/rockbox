@@ -26,6 +26,7 @@
 #include "backlight.h"
 #include "adc.h"
 #include "system.h"
+#include "backlight-target.h"
 
 static bool headphones_detect;
 
