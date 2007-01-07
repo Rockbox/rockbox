@@ -71,6 +71,7 @@
 \urlstyle{sf}
 \usepackage{marvosym}
 \usepackage{ifthen}
+\usepackage{rotating}
 
 % mark this ad draft version (only for pdflatex) -- comment this out at release
 \ifpdfoutput{
@@ -262,8 +263,8 @@
 %       This is intended to make the LaTeX sources more readable.
 % Note: when using the code environment you need to use optv instead of opt!
 \DefineVerbatimEnvironment{code}{Verbatim}%
-  {framerule=0.4pt, framesep=1ex,numbers=left,frame=lines,%stepnumber=5,%
-   gobble=4,fontsize=\footnotesize,xleftmargin=10pt,%
+  {framerule=0.4pt, framesep=1ex,frame=lines,%numbers=left,stepnumber=5,%
+   gobble=4,fontsize=\footnotesize,xleftmargin=10pt,xrightmargin=10pt,%
    label=\textnormal{\textsc{Code}},%
    commandchars=\\\{\}%
    }
@@ -276,7 +277,7 @@
 % Note: when using the example environment you need to use optv instead of opt!
 \DefineVerbatimEnvironment{example}{Verbatim}%
   {commentchar=!,framerule=0.4pt, framesep=1ex,frame=lines,%
-   gobble=4,fontsize=\footnotesize,xleftmargin=10pt,%
+   gobble=4,fontsize=\footnotesize,xleftmargin=10pt,xrightmargin=10pt,%
    label=\textnormal{\textsc{Example}},%
    commandchars=\\\{\}%
    }
