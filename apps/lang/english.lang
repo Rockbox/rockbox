@@ -2646,16 +2646,16 @@
   desc: in the recording settings
   user:
   <source>
-    *: "Internal Mic"
-    ipod*: "Mic"
+    *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </source>
   <dest>
-    *: "Internal Mic"
-    ipod*: "Mic"
+    *: "Mic"
+    h100,h120,h300: "Internal Mic"
   </dest>
   <voice>
-    *: "Internal Microphone"
-    ipod*: "Microphone"
+    *: "Microphone"
+    h100,h120,h300: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
