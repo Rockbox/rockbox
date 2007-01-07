@@ -2089,6 +2089,98 @@ static bool dbg_lcd_power_off(void)
     return false;
 }
 
+#include "backlight-target.h"
+
+static bool dbg_buttonlights(void)
+{
+    unsigned short mode_changed = 1, mode = 0;
+    unsigned short which_led = BUTTONLIGHT_LED_ALL;
+    
+    lcd_setmargins(0, 0);
+    for (;;)
+    {
+        int button;
+
+
+        if (mode_changed)
+        {
+            lcd_clear_display();
+            lcd_puts(0, 0, "Button light support");
+            lcd_puts(0, 1, "Press UP for mode change");
+            lcd_puts(0, 2, "Press DOWN for buttonlight selection");
+
+            switch (mode)
+            {
+                case 0: 
+                lcd_puts(1, 3, "Off");
+                __buttonlight_mode(BUTTONLIGHT_OFF);
+                break;
+                
+                case 1: 
+                lcd_puts(1, 3, "On");
+                __buttonlight_mode(BUTTONLIGHT_ON);
+                break;
+                
+                case 2: 
+                lcd_puts(1, 3, "Faint");
+                __buttonlight_mode(BUTTONLIGHT_FAINT);
+                break;
+                
+                case 3: 
+                lcd_puts(1, 3, "Flicker");
+                __buttonlight_mode(BUTTONLIGHT_FLICKER);
+                break;
+                
+            }
+            mode_changed = 0;
+            lcd_update();
+        }
+        
+
+
+        /* does nothing unless in flicker mode */
+        /* the parameter sets the brightness */
+        __buttonlight_flicker(20); 
+        button = get_action(CONTEXT_STD,HZ/5);
+        switch(button)
+        {
+            case ACTION_STD_PREV:
+            mode++;
+            if (mode > 3) mode = 0;
+            mode_changed = 1;
+            break;
+
+            case ACTION_STD_NEXT:
+            if (which_led == BUTTONLIGHT_LED_ALL)
+            {
+                which_led = BUTTONLIGHT_LED_MENU;
+            }
+            else
+            {
+                which_led = BUTTONLIGHT_LED_ALL;
+            }
+
+            __buttonlight_select(which_led);
+
+            break;
+
+                
+            case ACTION_STD_OK:
+            case ACTION_STD_CANCEL:
+            action_signalscreenchange();
+            return false;
+
+            default:
+            sleep(HZ/10);
+            break;
+        }
+    }
+    return false;
+}
+
+
+
+
 #endif
 
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
@@ -2141,6 +2233,8 @@ bool debug_menu(void)
     static const struct menu_item items[] = {
 #if defined(TOSHIBA_GIGABEAT_F) && !defined(SIMULATOR)
         { "LCD Power Off", dbg_lcd_power_off },
+        { "Button Light modes", dbg_buttonlights },
+            
 #endif
 #if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
         { "Dump ROM contents", dbg_save_roms },

@@ -26,6 +26,7 @@
 #include "pcf50606.h"
 #include "ata-target.h"
 #include "mmu-meg-fx.h"
+#include "backlight-target.h"
 
 void ata_reset(void)
 {
@@ -54,6 +55,8 @@ void ata_device_init(void)
 
 void copy_read_sectors(unsigned char* buf, int wordcount)
 {
+    __buttonlight_flicker(DEFAULT_BRIGHTNESS_SETTING);
+    
     /* Unaligned transfer - slow copy */
     if ( (unsigned long)buf & 1)
     {   /* not 16-bit aligned, copy byte by byte */

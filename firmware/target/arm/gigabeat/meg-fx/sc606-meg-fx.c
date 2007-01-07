@@ -151,7 +151,7 @@ static unsigned char sc606_i2c_inb(void)
 /* returns number of acks that were bad */
 int sc606_write(unsigned char reg, unsigned char data)
 {
-    int x = 0;
+    int x;
 
     sc606_i2c_start();
     
@@ -178,7 +178,7 @@ int sc606_write(unsigned char reg, unsigned char data)
 
 int sc606_read(unsigned char reg, unsigned char* data)
 {
-    int x = 0;
+    int x;
 
     sc606_i2c_start();
     sc606_i2c_outb(SLAVE_ADDRESS);
