@@ -610,7 +610,7 @@ void ata_sleep(void)
 
 void ata_sleepnow(void)
 {
-    if (!spinup && !sleeping && !ata_mtx.locked)
+    if (!spinup && !sleeping && !ata_mtx.locked && initialized)
     {
         call_ata_idle_notifys(false);
         ata_perform_sleep();
