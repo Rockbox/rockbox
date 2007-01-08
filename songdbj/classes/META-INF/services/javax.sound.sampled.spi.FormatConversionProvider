@@ -1,3 +1,0 @@
-# for the javalayer mp3 decoder
-javazoom.spi.mpeg.sampled.convert.MpegFormatConversionProvider
-javazoom.spi.vorbis.sampled.convert.VorbisFormatConversionProvider
