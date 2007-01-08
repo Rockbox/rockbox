@@ -1867,9 +1867,9 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
 
     case AFMT_WAVPACK:
         /* A simple parser to read basic information from a WavPack file. This
-         * now works with self-extrating WavPack files and also will fail on
-         * WavPack files containing floating-point audio data (although these
-         * should be possible to play in theory).
+         * now works with self-extrating WavPack files. This no longer fails on
+         * WavPack files containing floating-point audio data because these are
+         * now converted to standard Rockbox format in the decoder.
          */
 
         /* Use the trackname part of the id3 structure as a temporary buffer */
@@ -1887,7 +1887,7 @@ bool get_metadata(struct track_info* track, int fd, const char* trackname,
             /* if valid WavPack 4 header version & not floating data, break */
 
             if (memcmp (buf, "wvpk", 4) == 0 && buf [9] == 4 &&
-                (buf [8] >= 2 && buf [8] <= 0x10) && !(buf [24] & 0x80))
+                (buf [8] >= 2 && buf [8] <= 0x10))
             {          
                 break;
             }

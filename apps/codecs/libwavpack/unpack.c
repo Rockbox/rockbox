@@ -393,10 +393,6 @@ int32_t unpack_samples (WavpackContext *wpc, int32_t *buffer, uint32_t sample_co
 
     fixup_samples (wps, buffer, i);
 
-    if (flags & FLOAT_DATA)
-        float_normalize (buffer, (flags & MONO_DATA) ? i : i * 2,
-            127 - wps->float_norm_exp + wpc->norm_offset);
-
     if (flags & FALSE_STEREO) {
         int32_t *dptr = buffer + i * 2;
         int32_t *sptr = buffer + i;

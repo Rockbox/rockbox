@@ -18,17 +18,6 @@ typedef unsigned char   uchar;
 typedef unsigned short  ushort;
 typedef unsigned int    uint;
 
-// This structure is used to access the individual fields of 32-bit ieee
-// floating point numbers. This will not be compatible with compilers that
-// allocate bit fields from the most significant bits, although I'm not sure
-// how common that is.
-
-typedef struct {
-    unsigned mantissa : 23;
-    unsigned exponent : 8;
-    unsigned sign : 1;
-} f32;
-
 #include <stdio.h>
 
 #define FALSE 0
@@ -281,8 +270,14 @@ uint32_t bs_close_write (Bitstream *bs);
         (bs)->bc += 8; \
     } \
     *(value) = (bs)->sr; \
-    (bs)->sr >>= (nbits); \
-    (bs)->bc -= (nbits); \
+    if ((bs)->bc > 32) { \
+        (bs)->bc -= (nbits); \
+        (bs)->sr = *((bs)->ptr) >> (8 - (bs)->bc); \
+    } \
+    else { \
+        (bs)->bc -= (nbits); \
+        (bs)->sr >>= (nbits); \
+    } \
 }
 
 #define putbit(bit, bs) { if (bit) (bs)->sr |= (1 << (bs)->bc); \
@@ -319,10 +314,15 @@ uint32_t bs_close_write (Bitstream *bs);
 void little_endian_to_native (void *data, char *format);
 void native_to_little_endian (void *data, char *format);
 
-// these macros implement the weight application and update operations
-// that are at the heart of the decorrelation loops
+// These macros implement the weight application and update operations
+// that are at the heart of the decorrelation loops. Note that when there
+// are several alternative versions of the same macro (marked with PERFCOND)
+// then the versions are functionally equivalent with respect to WavPack
+// decoding and the user should choose the one that provides the best
+// performance. This may be easier to check when NOT using the assembly
+// language optimizations.
 
-#if 0   // PERFCOND
+#if 1   // PERFCOND
 #define apply_weight_i(weight, sample) ((weight * sample + 512) >> 10)
 #else
 #define apply_weight_i(weight, sample) ((((weight * sample) >> 8) + 2) >> 2)
@@ -340,15 +340,18 @@ void native_to_little_endian (void *data, char *format);
 
 #if 0   // PERFCOND
 #define update_weight(weight, delta, source, result) \
-    if (source && result) weight -= ((((source ^ result) >> 30) & 2) - 1) * delta;
+    if (source && result) { int32_t s = (int32_t) (source ^ result) >> 31; weight = (delta ^ s) + (weight - s); }
+#elif 1
+#define update_weight(weight, delta, source, result) \
+    if (source && result) weight += (((source ^ result) >> 30) | 1) * delta
 #else
 #define update_weight(weight, delta, source, result) \
-    if (source && result) (source ^ result) < 0 ? (weight -= delta) : (weight += delta);
+    if (source && result) (source ^ result) < 0 ? (weight -= delta) : (weight += delta)
 #endif
 
 #define update_weight_clip(weight, delta, source, result) \
     if (source && result && ((source ^ result) < 0 ? (weight -= delta) < -1024 : (weight += delta) > 1024)) \
-        weight = weight < 0 ? -1024 : 1024;
+        weight = weight < 0 ? -1024 : 1024
 
 // unpack.c
 
