@@ -139,7 +139,11 @@ SECTIONS
        . += 0x2000;
        _stackend = .;
        stackend = .;
+#if IRAMSIZE > 0x1000
     } > IRAM
+#else
+    } > DRAM
+#endif
 
 #ifdef CPU_COLDFIRE
     .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
