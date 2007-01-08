@@ -52,7 +52,8 @@ void lcd_update_rect(int x, int y, int width, int height)
 
     if(!lcd_on)
     {
-        yield();
+        for(x=0; x < 2; x++)
+            yield();
         return;
     }
     if (use_dma_blit)
@@ -95,15 +96,14 @@ void lcd_update_rect(int x, int y, int width, int height)
 void lcd_enable(bool state)
 {
     if(state) {
-        if(lcd_poweroff) {
-            if(!lcd_on)
-                memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
+        if(lcd_poweroff && !lcd_on) {
+            memcpy(FRAME, lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT*2);
             lcd_on = true;
             LCDCON1 |= 1;
         }
     }
     else {
-        if(lcd_poweroff) {
+        if(lcd_poweroff && lcd_on) {
             lcd_on = false;
             LCDCON1 &= ~1;
         }
@@ -134,6 +134,11 @@ void lcd_clear_display_dma(void)
 {
     void *src;
     bool inc = false;
+
+    if(!lcd_on) {
+        yield();
+        yield();
+    }
 
     if (lcd_get_drawmode() & DRMODE_INVERSEVID)
         src = fg_pattern_blit;
