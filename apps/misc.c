@@ -675,7 +675,10 @@ static void car_adapter_mode_processing(bool inserted)
             if ((audio_status() & AUDIO_STATUS_PLAY) &&
                 !(audio_status() & AUDIO_STATUS_PAUSE))
             {
-                audio_pause(); 
+                if (global_settings.fade_on_stop)
+                    fade(0);
+                else
+                    audio_pause();
             }
         }
     }
