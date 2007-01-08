@@ -211,7 +211,7 @@ static const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 #elif CONFIG_BATTERY == BATT_3AAA       /* Ondio */
     270, 280
 #elif CONFIG_BATTERY == BATT_LIPOL1300  /* iRiver Hxxx */
-    299
+    302
 #elif CONFIG_BATTERY == BATT_LIION830   /* Gigabeat F */
     338
 #elif CONFIG_BATTERY == BATT_IAUDIO_X5  /* iAudio X5 */
