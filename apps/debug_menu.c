@@ -2094,13 +2094,13 @@ static bool dbg_lcd_power_off(void)
 static bool dbg_buttonlights(void)
 {
     unsigned short mode_changed = 1, mode = 0;
-    unsigned short which_led = BUTTONLIGHT_LED_ALL;
+    enum buttonlight_selection which_led = BUTTONLIGHT_LED_ALL;
+    unsigned short brightness = DEFAULT_BRIGHTNESS_SETTING;
     
     lcd_setmargins(0, 0);
     for (;;)
     {
         int button;
-
 
         if (mode_changed)
         {
@@ -2113,22 +2113,37 @@ static bool dbg_buttonlights(void)
             {
                 case 0: 
                 lcd_puts(1, 3, "Off");
-                __buttonlight_mode(BUTTONLIGHT_OFF);
+                __buttonlight_mode(BUTTONLIGHT_OFF, which_led, brightness);
                 break;
                 
                 case 1: 
-                lcd_puts(1, 3, "On");
-                __buttonlight_mode(BUTTONLIGHT_ON);
+                lcd_puts(1, 3, "On - Set to brightness");
+                __buttonlight_mode(BUTTONLIGHT_ON, which_led, brightness);
                 break;
                 
                 case 2: 
-                lcd_puts(1, 3, "Faint");
-                __buttonlight_mode(BUTTONLIGHT_FAINT);
+                lcd_puts(1, 3, "Faint - Always on at lowest brightness");
+                __buttonlight_mode(BUTTONLIGHT_FAINT, which_led, brightness);
                 break;
                 
                 case 3: 
-                lcd_puts(1, 3, "Flicker");
-                __buttonlight_mode(BUTTONLIGHT_FLICKER);
+                lcd_puts(1, 3, "Flicker on disk access");
+                __buttonlight_mode(BUTTONLIGHT_FLICKER, which_led, brightness);
+                break;
+                
+                case 4: 
+                lcd_puts(1, 3, "Solid on disk access");
+                __buttonlight_mode(BUTTONLIGHT_SIGNAL, which_led, brightness);
+                break;
+                
+                case 5: 
+                lcd_puts(1, 3, "Follows backlight");
+                __buttonlight_mode(BUTTONLIGHT_FOLLOW, which_led, brightness);
+                break;
+                
+                case 6: 
+                lcd_puts(1, 3, "Shows 'battery charging'");
+                __buttonlight_mode(BUTTONLIGHT_CHARGING, which_led, brightness);
                 break;
                 
             }
@@ -2140,13 +2155,12 @@ static bool dbg_buttonlights(void)
 
         /* does nothing unless in flicker mode */
         /* the parameter sets the brightness */
-        __buttonlight_flicker(20); 
+        __buttonlight_trigger(); 
         button = get_action(CONTEXT_STD,HZ/5);
         switch(button)
         {
             case ACTION_STD_PREV:
-            mode++;
-            if (mode > 3) mode = 0;
+            if (++mode > 6) mode = 0;
             mode_changed = 1;
             break;
 
@@ -2159,8 +2173,7 @@ static bool dbg_buttonlights(void)
             {
                 which_led = BUTTONLIGHT_LED_ALL;
             }
-
-            __buttonlight_select(which_led);
+            mode_changed = 1;
 
             break;
 

@@ -291,6 +291,8 @@ static void _backlight_on(void)
         __backlight_on();
     }
 #elif defined(HAVE_BACKLIGHT_SET_FADING) && !defined(SIMULATOR)
+    /* call the enable from here - it takes longer than the disable */
+    lcd_enable(true);
     __backlight_dim(false);
 #else
     __backlight_on();

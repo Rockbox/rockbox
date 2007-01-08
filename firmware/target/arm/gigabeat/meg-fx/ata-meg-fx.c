@@ -55,7 +55,7 @@ void ata_device_init(void)
 
 void copy_read_sectors(unsigned char* buf, int wordcount)
 {
-    __buttonlight_flicker(DEFAULT_BRIGHTNESS_SETTING);
+    __buttonlight_trigger();
     
     /* Unaligned transfer - slow copy */
     if ( (unsigned long)buf & 1)

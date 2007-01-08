@@ -41,6 +41,8 @@
 /* Define this for LCD backlight available */
 #define CONFIG_BACKLIGHT BL_GIGABEAT /* port controlled PWM */
 
+#define HAVE_LCD_ENABLE
+
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults */

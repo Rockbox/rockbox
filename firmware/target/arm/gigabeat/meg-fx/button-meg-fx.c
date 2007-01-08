@@ -123,8 +123,6 @@ int button_read_device(void)
 
         if (touchpad & (1 << 3))
             btn |= BUTTON_SELECT;
-
-        __buttonlight_flicker(DEFAULT_BRIGHTNESS_SETTING/2);
     }
     
     return btn;
