@@ -767,7 +767,7 @@ EOF
     output="rockbox.iriver"
     appextra="recorder:gui"
     archosrom=""
-    flash=""
+    flash="$pwd/rombox.iriver"
     plugins="yes"
     codecs="libmad liba52 libffmpegFLAC libTremor libwavpack libmusepack libalac libfaad libm4a"
     # toolset is the tools within the tools directory that we build for
@@ -1244,6 +1244,7 @@ fi
           extradefines="-DBOOTLOADER" # for target makefile symbol EXTRA_DEFINES
           appsdir='\$(ROOTDIR)/bootloader'
           apps="bootloader"
+          flash=""
           if test -n "$boottool"; then
               tool="$boottool"
           fi

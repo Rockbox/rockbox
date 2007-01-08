@@ -216,6 +216,16 @@ sub buildzip {
         if( filesize("rombox.ucl") > 1000) {
             `cp rombox.ucl .rockbox/`;  # UCL for flashing
         }
+        
+        # Check for rombox.target
+        if ($image=~/(.*)\.(\w+)$/)
+        {
+            my $romfile = "rombox.$2";
+            if (filesize($romfile) > 1000)
+            {
+                `cp $romfile .rockbox/`;
+            }
+        }
     }
 
     mkdir ".rockbox/docs", 0777;

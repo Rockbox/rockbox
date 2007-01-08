@@ -190,6 +190,9 @@ $(BUILDDIR)/rombox.ucl: $(OBJDIR)/rombox.bin $(MAXOUTFILE)
 	  echo "fake" > $@; \
 	fi
 
+$(BUILDDIR)/rombox.iriver: $(OBJDIR)/rombox.bin
+	$(call PRINTS,Build ROM file)$(MKFIRMWARE) $< $@
+    
 include $(TOOLSDIR)/make.inc
 
 $(OBJDIR)/lang.o: lang/$(LANGUAGE).lang

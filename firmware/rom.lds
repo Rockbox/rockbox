@@ -1,38 +1,39 @@
 #include "config.h"
 
 ENTRY(start)
+
 #ifdef CPU_COLDFIRE
 OUTPUT_FORMAT(elf32-m68k)
-#else
-OUTPUT_FORMAT(elf32-sh)
-#endif
-#ifdef CPU_COLDFIRE
 INPUT(target/coldfire/crt0.o)
 #elif defined(CPU_PP)
+OUTPUT_FORMAT(elf32-littlearm)
 INPUT(target/arm/crt0-pp.o)
 #elif defined(CPU_ARM)
+OUTPUT_FORMAT(elf32-littlearm)
 INPUT(target/arm/crt0.o)
 #elif CONFIG_CPU == SH7034
+OUTPUT_FORMAT(elf32-sh)
 INPUT(target/sh/crt0.o)
 #else
+OUTPUT_FORMAT(elf32-sh)
 INPUT(crt0.o)
 #endif
 
 
 #if MEMORYSIZE >= 32
-#define PLUGINSIZE 0xC0000
+#define PLUGINSIZE PLUGIN_BUFFER_SIZE
 #else
 #define PLUGINSIZE 0x8000
 #endif
 
-#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
 
-#ifdef IRIVER_H100
+#ifdef IRIVER_H100_SERIES
+#define CODECSIZE CODEC_SIZE
 #define DRAMORIG 0x31000000
 #define IRAMORIG 0x10000000
-#define IRAMSIZE 0x18000
-#define FLASHORIG 0x001f0000
-#define FLASHSIZE 2M
+#define IRAMSIZE 0xc000
+#define FLASHORIG 0x00100028
+#define FLASHSIZE 0x000eff80
 #else
 #define DRAMORIG 0x09000000
 #define IRAMORIG 0x0f000000
@@ -41,7 +42,18 @@ INPUT(crt0.o)
 #define FLASHSIZE 256K - ROM_START
 #endif
 
-#define ENDADDR  (DRAMORIG + DRAMSIZE)
+#ifdef CODECSIZE
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE - CODECSIZE
+/* Where the codec buffer ends, and the plugin buffer starts */
+#define ENDADDR (ENDAUDIOADDR + CODECSIZE)
+#else
+#define DRAMSIZE (MEMORYSIZE * 0x100000) - PLUGINSIZE
+/* Where the audio buffer ends, and the plugin buffer starts */
+#define ENDADDR ENDAUDIOADDR
+#endif
+
+/* End of the audio buffer, where the codec/plugin buffer starts */
+#define ENDAUDIOADDR  (DRAMORIG + DRAMSIZE)
 
 MEMORY
 {
@@ -74,10 +86,15 @@ SECTIONS
         . = ALIGN(0x200);
         *(.data)
         . = ALIGN(0x4);
-        _dataend = .;         
+        _dataend = .;        
         . = ALIGN(0x10);  /* Maintain proper alignment for .text section */
     } > DRAM
     
+    /DISCARD/ : 
+    {
+        *(.eh_frame)
+    }
+
     /* TRICK ALERT! Newer versions of the linker don't allow output sections
        to overlap even if one of them is empty, so advance the location pointer
        "by hand" */
@@ -105,7 +122,7 @@ SECTIONS
         *(.idata)
         _iramend = .;
     } > IRAM
-  
+
     .ibss (NOLOAD) :
     {
         _iedata = .;
@@ -122,29 +139,48 @@ SECTIONS
        . += 0x2000;
        _stackend = .;
        stackend = .;
-    } > DRAM
+    } > IRAM
 
+#ifdef CPU_COLDFIRE
+    .bss ADDR(.data) + SIZEOF(.data) + SIZEOF(.iram):
+#else
     .bss :
+#endif
     {
        _edata = .;
-        *(.bss)
+        *(.bss*)
         *(COMMON)
+        . = ALIGN(0x4);
        _end = .;
     } > DRAM
 
-    .audiobuf :
+    .audiobuf ALIGN(4):
     {
-        . = ALIGN(0x4);
         _audiobuffer = .;
+        audiobuffer = .;
     } > DRAM
 
+#ifdef CODECSIZE
+    .audiobufend ENDAUDIOADDR:
+#else
     .audiobufend ENDADDR:
+#endif
     {
         _audiobufend = .;
+        audiobufend = .;
     } > DRAM
 
+#ifdef CODECSIZE
+    .codec ENDAUDIOADDR:
+    {
+        codecbuf = .;
+        _codecbuf = .;
+    }
+#endif
+    
     .plugin ENDADDR:
     {
         _pluginbuf = .;
+        pluginbuf = .;
     }
 }
