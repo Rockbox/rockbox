@@ -156,8 +156,9 @@ enum plugin_status plugin_start(struct plugin_api* api, void* parameter)
 
     DEBUGF("%s - %s\n", parameter, &filename[rb->strlen(filename)-4]);
     /* Check the extension. We only allow .m3u files. */
-    if(rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u")) {
-        rb->splash(HZ, true, "Not a .m3u file");
+    if(rb->strcasecmp(&filename[rb->strlen(filename)-4], ".m3u") &&
+       rb->strcasecmp(&filename[rb->strlen(filename)-5], ".m3u8")) {
+        rb->splash(HZ, true, "Not a .m3u or .m3u8 file");
         return PLUGIN_ERROR;
     }
 
