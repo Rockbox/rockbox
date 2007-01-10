@@ -59,7 +59,7 @@ letters as they will only appear weird in some camps no matter what.
 
 Patches
 -------
-Create a patch using 'cvs diff -ub'. 
+Create a patch using 'svn diff > mychanges.patch
 Trim your patches so they only contain relevant changes.
 
 Submit your patch to the project via our patch tracker:
