@@ -188,7 +188,7 @@ void pressNote(int ch, int note, int vol)
         if(voices[a].isUsed==0)
             break;
     }
-    if(a==MAX_VOICES-1)
+    if(a==MAX_VOICES)
     {
 //        printf("\nVoice kill");
 //        printf("\nToo many voices playing at once. No more left");
